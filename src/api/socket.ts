@@ -1,35 +1,29 @@
-import { io, type Socket } from 'socket.io-client';
-import { getDefaultStore } from 'jotai';
-import { accessTokenAtom } from '../store/authStore';
-import { socketStatusAtom } from '../store/socketStore';
+import { io, type Socket } from "socket.io-client";
 
-const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 let socket: Socket | null = null;
 
+/**
+ * Lazy singleton Socket.IO klient. BE běží na default namespace `/` a očekává
+ * JWT v `auth.token`. Viz `Projekt-ikaros/docs/websocket-api.md` pro seznam eventů.
+ */
 export function getSocket(): Socket {
-  if (socket?.connected) return socket;
+  if (socket) return socket;
 
-  const token = getDefaultStore().get(accessTokenAtom) ?? undefined;
+  const token = localStorage.getItem("ikaros.jwt") ?? undefined;
 
   socket = io(baseUrl, {
     auth: token ? { token } : undefined,
     withCredentials: true,
     autoConnect: true,
-    transports: ['websocket'],
+    transports: ["websocket"],
   });
 
-  const store = getDefaultStore();
-  socket.on('connect', () => store.set(socketStatusAtom, 'connected'));
-  socket.on('disconnect', () => store.set(socketStatusAtom, 'disconnected'));
-  socket.on('connect_error', () => store.set(socketStatusAtom, 'error'));
-
-  store.set(socketStatusAtom, 'connecting');
   return socket;
 }
 
 export function disconnectSocket(): void {
   socket?.disconnect();
   socket = null;
-  getDefaultStore().set(socketStatusAtom, 'disconnected');
 }
