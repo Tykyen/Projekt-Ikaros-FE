@@ -1,0 +1,15 @@
+/* ── Hospoda — středověká krčma ── */
+
+[data-theme="hospoda"] {
+  background-image:
+    radial-gradient(ellipse at 50% 100%, rgba(224, 152, 32, 0.20) 0%, transparent 60%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+[data-theme="hospoda"] .card,
+[data-theme="hospoda"] [class*="card"] {
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 4px 12px rgba(20, 10, 4, 0.4);
+}
