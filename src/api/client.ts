@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
+// BE má `setGlobalPrefix('api')` v main.ts — všechny REST endpointy jsou pod `/api/*`.
 export const apiClient = axios.create({
-  baseURL,
-  withCredentials: false,
+  baseURL: `${apiBase}/api`,
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use((config) => {

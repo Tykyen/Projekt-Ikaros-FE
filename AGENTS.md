@@ -5,7 +5,7 @@ Tento repozitář je **frontend** pro [Projekt Ikaros](https://github.com/Tykyen
 - **Backend (BE):** `c:\Matrix\ProjektIkaros\Projekt-ikaros` (NestJS, MongoDB, port 3000)
 - **Frontend (FE):** `c:\Matrix\ProjektIkaros\Projekt-ikaros-FE` (tenhle repo — Vite + React + TS)
 
-FE volá BE přes REST (axios) a real-time přes (TBD: SignalR/WebSocket — sjednotí se podle BE).
+FE volá BE přes REST (axios) a real-time přes **Socket.IO 4** (`socket.io-client`).
 
 ---
 
@@ -31,9 +31,20 @@ Postup: nejdřív zkus dokumentaci v BE, pokud nestačí dohledej konkrétní so
 # Vztah k backendu
 
 - API kontrakty drží BE (`backend/src/**`). Pokud něco v API potřebuješ jinak, **nejdřív** to prodiskutuj s userem a pak se to mění v BE — FE se pak adaptuje.
-- DTO typy zatím **neimportujeme** z BE (oddělená repa) — držíme paralelní typy v `src/types/` a hlídáme synchronizaci ručně. Pokud tohle začne bobtnat, navrhni sdílený `@projekt-ikaros/shared-types` package (do té doby do `docs/dluhy.md`).
-- Auth: JWT v `Authorization: Bearer <token>` headeru — flow drží BE, FE jen ukládá a posílá.
+- **REST prefix:** BE má `setGlobalPrefix('api')` ([Projekt-ikaros/backend/src/main.ts](../Projekt-ikaros/backend/src/main.ts)) — všechny endpointy jsou pod `/api/*`. `apiClient` to už zahrnuje v `baseURL`, takže v kódu volej čistě `/health`, `/auth/login`, atd.
+- **Swagger:** `http://localhost:3000/docs` — kompletní REST kontrakt.
+- DTO typy zatím **neimportujeme** z BE (oddělená repa, dva GitHub repozitáře — BE: `Projekt-Ikaros`, FE: `Projekt-Ikaros-FE`). Držíme paralelní typy v `src/types/` a hlídáme synchronizaci ručně. Pokud tohle začne bobtnat, navrhni jedno z: git submodule, sdílený npm package `@projekt-ikaros/shared-types`, nebo OpenAPI generátor ze Swagger JSON (do té doby do `docs/dluhy.md`).
+- Auth: JWT v `Authorization: Bearer <token>` headeru — flow drží BE, FE jen ukládá a posílá. Token v `localStorage["ikaros.jwt"]`.
 - Anti-leak / 404 vs 403 policy: viz `../Projekt-ikaros/.claude/rules/auth-leak-policy.md` — FE musí korektně rozlišovat 401/403/404 v UI.
+
+## Real-time (Socket.IO)
+
+- Klient: `socket.io-client` přes `getSocket()` v [src/api/socket.ts](./src/api/socket.ts) (lazy singleton).
+- BE gateway: 11 gateway sdílí jednu Socket.io instanci, default namespace `/` ([base.gateway.ts](../Projekt-ikaros/backend/src/gateways/base.gateway.ts)).
+- **Auth:** `io(url, { auth: { token: '<JWT>' } })` — JWT validuje BE per-event (ne na connection).
+- **Rooms:** `world:{worldId}`, `chat:{channelId}`, `user:{userId}`, `map:{sceneId}`, atd. Klient se připojuje přes emit (`map:join`, `chat:join`) — viz dokumentace.
+- **Kompletní seznam eventů:** [Projekt-ikaros/docs/websocket-api.md](../Projekt-ikaros/docs/websocket-api.md) — 11 modulů (chat, maps, global-chat, ikaros-messages, emotes, worlds, universe).
+- **Pozor:** starý Matrix používal `@microsoft/signalr` — to **NEPŘENÁŠÍME**. Nový BE je čistá Socket.IO 4.
 
 ---
 

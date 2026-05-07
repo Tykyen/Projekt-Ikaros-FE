@@ -2,7 +2,7 @@
 
 Frontend pro [Projekt Ikaros](https://github.com/Tykyen/Projekt-Ikaros) (NestJS backend).
 
-**Stack:** React 19 + Vite + TypeScript + React Router + TanStack Query + Axios
+**Stack:** React 19 + Vite + TypeScript + React Router + TanStack Query + Axios + Socket.IO client
 
 ## Vztah k BE
 
@@ -11,7 +11,9 @@ Frontend pro [Projekt Ikaros](https://github.com/Tykyen/Projekt-Ikaros) (NestJS 
 | Backend | [Projekt-Ikaros](https://github.com/Tykyen/Projekt-Ikaros) | NestJS + MongoDB | `3000` |
 | Frontend | tento repo | Vite + React + TS | `5173` |
 
-FE komunikuje s BE přes REST (`/api/*`). Real-time kanál bude doplněn (TBD).
+FE komunikuje s BE přes:
+- **REST** — všechny endpointy pod prefixem `/api/*` ([Swagger docs](http://localhost:3000/docs))
+- **Socket.IO 4** — real-time eventy (chat, mapy, globální chat, emoty, ...). Auth přes `auth.token`. Default namespace `/`. Detaily v `Projekt-ikaros/docs/websocket-api.md`.
 
 ## Vývoj — rychlý start
 
