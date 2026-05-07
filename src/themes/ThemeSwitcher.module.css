@@ -119,3 +119,9 @@
     min-height: 60px;
   }
 }
+
+.optionFocused {
+  background: var(--bg-card-hover);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}

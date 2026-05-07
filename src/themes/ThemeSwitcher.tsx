@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { useTheme } from './useTheme';
 import { listThemes } from './registry';
 import type { ThemeId } from './types';
@@ -7,7 +7,11 @@ import s from './ThemeSwitcher.module.css';
 export function ThemeSwitcher() {
   const { themeId, theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
+  const [focusIndex, setFocusIndex] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLUListElement>(null);
+
+  const themes = listThemes();
 
   useEffect(() => {
     if (!open) return;
@@ -16,7 +20,7 @@ export function ThemeSwitcher() {
         setOpen(false);
       }
     };
-    const onEsc = (e: KeyboardEvent) => {
+    const onEsc = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
     };
     document.addEventListener('mousedown', onClickOutside);
@@ -27,12 +31,38 @@ export function ThemeSwitcher() {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      const idx = themes.findIndex((t) => t.id === themeId);
+      setFocusIndex(idx >= 0 ? idx : 0);
+      popoverRef.current?.focus();
+    }
+  }, [open, themeId, themes]);
+
   const handleSelect = async (id: ThemeId) => {
     await setTheme(id);
     setOpen(false);
   };
 
-  const themes = listThemes();
+  const onKeyDown = (e: KeyboardEvent<HTMLUListElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFocusIndex((i) => Math.min(i + 1, themes.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocusIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setFocusIndex(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setFocusIndex(themes.length - 1);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const t = themes[focusIndex];
+      if (t) void handleSelect(t.id);
+    }
+  };
 
   return (
     <div ref={wrapperRef} className={s.wrapper}>
@@ -50,15 +80,23 @@ export function ThemeSwitcher() {
       </button>
 
       {open && (
-        <ul className={s.popover} role="listbox" aria-label="Motivy aplikace">
-          {themes.map((t) => (
+        <ul
+          ref={popoverRef}
+          className={s.popover}
+          role="listbox"
+          aria-label="Motivy aplikace"
+          onKeyDown={onKeyDown}
+          tabIndex={-1}
+        >
+          {themes.map((t, idx) => (
             <li key={t.id}>
               <button
                 type="button"
-                className={`${s.option} ${t.id === themeId ? s.optionActive : ''}`}
+                className={`${s.option} ${t.id === themeId ? s.optionActive : ''} ${idx === focusIndex ? s.optionFocused : ''}`}
                 onClick={() => void handleSelect(t.id)}
                 role="option"
                 aria-selected={t.id === themeId}
+                data-index={idx}
               >
                 <img src={t.thumbnail} alt="" className={s.optionThumb} />
                 <span className={s.optionName}>{t.name}</span>
