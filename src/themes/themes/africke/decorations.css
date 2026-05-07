@@ -1,0 +1,14 @@
+/* ── Africké — savana, kmenové vzory ── */
+
+[data-theme="africke"] {
+  background-image:
+    radial-gradient(ellipse at 50% 100%, rgba(224, 96, 16, 0.18) 0%, transparent 60%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+[data-theme="africke"] .card,
+[data-theme="africke"] [class*="card"] {
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+}
