@@ -1,0 +1,15 @@
+/* ── Indiánské — frontier sunset ── */
+
+[data-theme="indiane"] {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(208, 96, 16, 0.20) 0%, transparent 60%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+[data-theme="indiane"] .card,
+[data-theme="indiane"] [class*="card"] {
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 4px 12px rgba(20, 10, 4, 0.4);
+}

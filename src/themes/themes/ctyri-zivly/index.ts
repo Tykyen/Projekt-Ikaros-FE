@@ -15,7 +15,7 @@ export const ctyriZivlyTheme: Theme = {
     '--accent-dim':       '#604808',
     '--accent-soft':      'rgba(200, 144, 10, 0.16)',
     '--text-primary':     '#d8c090',
-    '--text-secondary':   '#7a6040',
+    '--text-secondary':   '#95754e',
     '--text-muted':       '#403020',
     '--border':           '#302818',
     '--border-subtle':    '#1c1810',
