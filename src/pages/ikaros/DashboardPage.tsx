@@ -1,5 +1,12 @@
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { apiClient } from '../../api/client';
+import {
+  isAuthenticatedAtom,
+  loginModalOpenAtom,
+} from '../../store/authStore';
 
 async function fetchHealth() {
   const res = await apiClient.get('/health');
@@ -7,6 +14,20 @@ async function fetchHealth() {
 }
 
 export default function DashboardPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  const setLoginModalOpen = useSetAtom(loginModalOpenAtom);
+
+  // Auto-otevřít login modal pokud nás sem requireAuth shodil přes ?openLogin=1
+  useEffect(() => {
+    if (searchParams.get('openLogin') === '1' && !isAuthenticated) {
+      setLoginModalOpen(true);
+      const next = new URLSearchParams(searchParams);
+      next.delete('openLogin');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams, isAuthenticated, setLoginModalOpen]);
+
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['health'],
     queryFn: fetchHealth,

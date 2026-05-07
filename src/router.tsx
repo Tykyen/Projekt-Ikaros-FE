@@ -1,16 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
-import { createBrowserRouter, redirect } from 'react-router-dom';
-import { IkarosLayout, WorldLayout, AuthLayout } from './components/layout';
+import { createBrowserRouter, redirect, type LoaderFunctionArgs } from 'react-router-dom';
+import { IkarosLayout, WorldLayout } from './components/layout';
 import { Spinner } from './components/ui';
 import { RoleGuard } from './components/guards/RoleGuard';
 import { UserRole } from './types';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ErrorPage from './pages/errors/ErrorPage';
-
-// ── Lazy pages — Auth ──────────────────────────────────────────────────────
-const LoginPage    = lazy(() => import('./pages/auth/LoginPage'));
-const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'));
 
 // ── Lazy pages — Ikaros ───────────────────────────────────────────────────
 const DashboardPage    = lazy(() => import('./pages/ikaros/DashboardPage'));
@@ -65,53 +61,68 @@ function p(Comp: LazyExoticComponent<ComponentType>) {
   );
 }
 
-// ── Auth loader ───────────────────────────────────────────────────────────
-// Jotai atomWithStorage ukládá hodnoty jako JSON → je třeba JSON.parse
-export function authLoader() {
+const LOGIN_INTENT_KEY = 'ikaros.loginIntent';
+
+// ── Per-route auth loader ─────────────────────────────────────────────────
+// Pokud chybí token, uloží zamýšlenou cestu do sessionStorage (LoginModal
+// po úspěšném přihlášení tam naviguje), redirectne na úvodník s
+// `?openLogin=1` aby se modal automaticky otevřel.
+export function requireAuth({ request }: LoaderFunctionArgs) {
   const raw = localStorage.getItem('ikaros.jwt');
-  if (!raw) return redirect('/login');
-  try {
-    const token: string | null = JSON.parse(raw);
-    if (!token) return redirect('/login');
-  } catch {
-    return redirect('/login');
+  if (raw) {
+    try {
+      const token: string | null = JSON.parse(raw);
+      if (token) return null;
+    } catch {
+      // fall through
+    }
   }
-  return null;
+  const url = new URL(request.url);
+  const target = url.pathname + url.search;
+  // Bezpečnostní filtr: target musí být relativní cesta začínající /
+  if (target.startsWith('/') && !target.startsWith('//')) {
+    sessionStorage.setItem(LOGIN_INTENT_KEY, target);
+  }
+  return redirect('/?openLogin=1');
 }
 
 // ── Router ────────────────────────────────────────────────────────────────
 export const router = createBrowserRouter([
-  // Veřejné — AuthLayout
-  {
-    element: <AuthLayout />,
-    children: [
-      { path: '/login',    element: p(LoginPage) },
-      { path: '/register', element: p(RegisterPage) },
-    ],
-  },
-
-  // Chráněné — IkarosLayout
+  // IkarosLayout — některé child routes veřejné, některé chráněné per-route
   {
     path: '/',
     element: <IkarosLayout />,
-    loader: authLoader,
     errorElement: <ErrorPage />,
     children: [
+      // Veřejné — anon má přístup
       { index: true,                    element: p(DashboardPage) },
-      { path: 'chat',                   element: p(ChatPage) },
       { path: 'ikaros/vesmiry',         element: p(WorldsPage) },
-      { path: 'ikaros/vytvorit-svet',   element: p(CreateWorldPage) },
-      { path: 'ikaros/profil',          element: p(ProfilePage) },
-      { path: 'ikaros/uzivatele',       element: p(UsersPage) },
-      { path: 'ikaros/uzivatel/:id',    element: p(UserProfilePage) },
       { path: 'ikaros/clanky',          element: p(ArticlesPage) },
       { path: 'ikaros/galerie',         element: p(GalleryPage) },
-      { path: 'ikaros/diskuze',          element: p(DiscussionsPage) },
-      { path: 'ikaros/diskuze/nova',     element: p(DiscussionsNewPage) },
-      { path: 'ikaros/posta',           element: p(MailPage) },
+      { path: 'ikaros/diskuze',         element: p(DiscussionsPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
+
+      // Chráněné — vyžadují přihlášení (per-route loader)
+      { path: 'chat',                   element: p(ChatPage),         loader: requireAuth },
+      { path: 'ikaros/vytvorit-svet',   element: p(CreateWorldPage),  loader: requireAuth },
+      { path: 'ikaros/profil',          element: p(ProfilePage),      loader: requireAuth },
+      { path: 'ikaros/uzivatel/:id',    element: p(UserProfilePage),  loader: requireAuth },
+      { path: 'ikaros/diskuze/nova',    element: p(DiscussionsNewPage), loader: requireAuth },
+      { path: 'ikaros/posta',           element: p(MailPage),         loader: requireAuth },
+
+      // Chráněné + role gate
+      {
+        path: 'ikaros/uzivatele',
+        loader: requireAuth,
+        element: (
+          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
+            {p(UsersPage)}
+          </RoleGuard>
+        ),
+      },
       {
         path: 'admin',
+        loader: requireAuth,
         element: (
           <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
             {p(PlatformAdminPage)}
@@ -120,6 +131,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'admin/dungeon-builder',
+        loader: requireAuth,
         element: (
           <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin, UserRole.PJ]}>
             {p(DungeonBuilderPage)}
@@ -129,11 +141,11 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Chráněné — WorldLayout
+  // Chráněné — WorldLayout (celá světová vrstva za auth)
   {
     path: '/svet/:worldId',
     element: <WorldLayout />,
-    loader: authLoader,
+    loader: requireAuth,
     errorElement: <ErrorPage />,
     children: [
       { index: true,                    element: p(WorldDashboardPage) },
