@@ -43,8 +43,8 @@ export function ThemeSwitcher() {
     setOpen(true);
   };
 
-  const handleSelect = async (id: ThemeId) => {
-    await setTheme(id);
+  const handleSelect = (id: ThemeId) => {
+    setTheme(id);
     setOpen(false);
   };
 
@@ -64,7 +64,7 @@ export function ThemeSwitcher() {
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       const t = themes[focusIndex];
-      if (t) void handleSelect(t.id);
+      if (t) handleSelect(t.id);
     }
   };
 
@@ -89,6 +89,7 @@ export function ThemeSwitcher() {
           className={s.popover}
           role="listbox"
           aria-label="Motivy aplikace"
+          aria-activedescendant={`theme-option-${focusIndex}`}
           onKeyDown={onKeyDown}
           tabIndex={-1}
         >
@@ -96,8 +97,9 @@ export function ThemeSwitcher() {
             <li key={t.id}>
               <button
                 type="button"
+                id={`theme-option-${idx}`}
                 className={`${s.option} ${t.id === themeId ? s.optionActive : ''} ${idx === focusIndex ? s.optionFocused : ''}`}
-                onClick={() => void handleSelect(t.id)}
+                onClick={() => handleSelect(t.id)}
                 role="option"
                 aria-selected={t.id === themeId}
                 data-index={idx}

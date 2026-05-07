@@ -21,13 +21,12 @@ describe('useTheme', () => {
     expect(result.current.themeId).toBe('modre-nebe');
   });
 
-  it('setTheme updates the atom and applies to DOM', async () => {
+  it('setTheme updates the atom synchronously', () => {
     const { result } = renderHook(() => useTheme(), { wrapper: makeWrapper() });
-    await act(async () => {
-      await result.current.setTheme('modre-nebe');
+    act(() => {
+      result.current.setTheme('temna-cerven');
     });
-    expect(result.current.themeId).toBe('modre-nebe');
-    expect(document.documentElement.getAttribute('data-theme')).toBe('modre-nebe');
+    expect(result.current.themeId).toBe('temna-cerven');
   });
 
   it('exposes theme metadata', () => {

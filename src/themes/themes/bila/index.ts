@@ -16,7 +16,7 @@ export const bilaTheme: Theme = {
     '--accent-soft':      'rgba(196, 160, 87, 0.18)',
     '--text-primary':     '#3a2e1e',
     '--text-secondary':   '#7a6a4e',
-    '--text-muted':       '#aa9a7e',
+    '--text-muted':       '#80704a',
     '--border':           '#d8cca8',
     '--border-subtle':    '#e8dcb8',
     '--border-strong':    '#c4a057',
