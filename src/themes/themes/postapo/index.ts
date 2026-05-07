@@ -15,7 +15,7 @@ export const postapoTheme: Theme = {
     '--accent-dim':       '#484808',
     '--accent-soft':      'rgba(138, 136, 16, 0.18)',
     '--text-primary':     '#b0a888',
-    '--text-secondary':   '#686050',
+    '--text-secondary':   '#857b66',
     '--text-muted':       '#383830',
     '--border':           '#302e20',
     '--border-subtle':    '#1c1c14',

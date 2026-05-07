@@ -25,7 +25,7 @@ export const sciFiTheme: Theme = {
     '--danger':           '#f06060',
     '--info':             '#00c8ff',
     '--text-on-accent':       '#04101a',
-    '--text-on-danger':       '#ffffff',
+    '--text-on-danger':       '#050508',
     '--bg-overlay':           'rgba(0, 8, 16, 0.7)',
     '--success-soft':         'rgba(62, 207, 142, 0.12)',
     '--success-soft-border':  'rgba(62, 207, 142, 0.4)',

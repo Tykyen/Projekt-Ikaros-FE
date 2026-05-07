@@ -15,7 +15,7 @@ export const arabskySvetTheme: Theme = {
     '--accent-dim':       '#604808',
     '--accent-soft':      'rgba(200, 144, 10, 0.18)',
     '--text-primary':     '#e8d0a0',
-    '--text-secondary':   '#806040',
+    '--text-secondary':   '#98724c',
     '--text-muted':       '#402820',
     '--border':           '#6a0820',
     '--border-subtle':    '#3a0410',

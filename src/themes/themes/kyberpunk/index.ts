@@ -25,7 +25,7 @@ export const kyberpunkTheme: Theme = {
     '--danger':           '#e020c0',
     '--info':             '#00d8e8',
     '--text-on-accent':       '#04101a',
-    '--text-on-danger':       '#ffffff',
+    '--text-on-danger':       '#050508',
     '--bg-overlay':           'rgba(0, 4, 12, 0.8)',
     '--success-soft':         'rgba(62, 207, 142, 0.12)',
     '--success-soft-border':  'rgba(62, 207, 142, 0.4)',

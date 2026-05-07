@@ -15,7 +15,7 @@ export const africkeTheme: Theme = {
     '--accent-dim':       '#604008',
     '--accent-soft':      'rgba(200, 136, 10, 0.16)',
     '--text-primary':     '#d4a060',
-    '--text-secondary':   '#806030',
+    '--text-secondary':   '#9a733a',
     '--text-muted':       '#403018',
     '--border':           '#2a1808',
     '--border-subtle':    '#1a0c04',

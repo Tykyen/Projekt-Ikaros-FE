@@ -15,7 +15,7 @@ export const slunceTheme: Theme = {
     '--accent-dim':       '#604008',
     '--accent-soft':      'rgba(200, 128, 16, 0.18)',
     '--text-primary':     '#e8c070',
-    '--text-secondary':   '#806030',
+    '--text-secondary':   '#9a733a',
     '--text-muted':       '#381e08',
     '--border':           '#2a1e0c',
     '--border-subtle':    '#180c04',

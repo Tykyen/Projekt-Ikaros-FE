@@ -13,6 +13,7 @@
     "test:ui": "vitest --ui",
     "themes:optimize": "node scripts/optimize-theme-assets.mjs",
     "lint:colors": "node scripts/lint-no-hardcoded-colors.mjs",
+    "audit:contrast": "node scripts/audit-theme-contrast.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

@@ -15,7 +15,7 @@ export const nemrtviTheme: Theme = {
     '--accent-dim':       '#186030',
     '--accent-soft':      'rgba(48, 192, 96, 0.18)',
     '--text-primary':     '#c0b890',
-    '--text-secondary':   '#607050',
+    '--text-secondary':   '#6d7f5b',
     '--text-muted':       '#303828',
     '--border':           '#282e20',
     '--border-subtle':    '#181c14',

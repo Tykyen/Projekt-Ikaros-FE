@@ -15,7 +15,7 @@ export const magieTheme: Theme = {
     '--accent-dim':       '#604808',
     '--accent-soft':      'rgba(200, 144, 10, 0.18)',
     '--text-primary':     '#e0d0f8',
-    '--text-secondary':   '#806090',
+    '--text-secondary':   '#8d6c9d',
     '--text-muted':       '#302040',
     '--border':           '#3a2050',
     '--border-subtle':    '#1c1030',

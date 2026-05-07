@@ -15,7 +15,7 @@ export const vesmirnaBitvaTheme: Theme = {
     '--accent-dim':       '#600808',
     '--accent-soft':      'rgba(192, 24, 24, 0.18)',
     '--text-primary':     '#e0c0c0',
-    '--text-secondary':   '#804040',
+    '--text-secondary':   '#b06161',
     '--text-muted':       '#402020',
     '--border':           '#150808',
     '--border-subtle':    '#0a0404',

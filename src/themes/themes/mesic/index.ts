@@ -25,7 +25,7 @@ export const mesicTheme: Theme = {
     '--danger':           '#e08080',
     '--info':             '#6090e0',
     '--text-on-accent':       '#04081a',
-    '--text-on-danger':       '#ffffff',
+    '--text-on-danger':       '#050508',
     '--bg-overlay':           'rgba(0, 4, 16, 0.65)',
     '--success-soft':         'rgba(62, 207, 142, 0.12)',
     '--success-soft-border':  'rgba(62, 207, 142, 0.4)',
