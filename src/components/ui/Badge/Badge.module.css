@@ -1,0 +1,37 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 2px var(--sp-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.default {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.accent {
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  border: 1px solid var(--accent-soft);
+}
+.success {
+  background: rgba(62, 207, 142, .15);
+  color: var(--success);
+  border: 1px solid rgba(62, 207, 142, .3);
+}
+.warning {
+  background: rgba(245, 166, 35, .15);
+  color: var(--warning);
+  border: 1px solid rgba(245, 166, 35, .3);
+}
+.danger {
+  background: rgba(240, 96, 96, .15);
+  color: var(--danger);
+  border: 1px solid rgba(240, 96, 96, .3);
+}
