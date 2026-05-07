@@ -1,0 +1,22 @@
+/* ── Nemrtví — krypta, toxická zelená ── */
+
+[data-theme="nemrtvi"] {
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(48, 192, 96, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(0, 16, 0, 0.6) 0%, transparent 70%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+/* Téměř pravoúhlé karty (kamenné) */
+[data-theme="nemrtvi"] .card,
+[data-theme="nemrtvi"] [class*="card"] {
+  border-radius: 2px;
+  border: 1px solid var(--border-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="nemrtvi"] button:hover {
+    box-shadow: 0 0 16px rgba(48, 192, 96, 0.6);
+  }
+}
