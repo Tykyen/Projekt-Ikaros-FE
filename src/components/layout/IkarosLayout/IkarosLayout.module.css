@@ -131,6 +131,11 @@
   min-height: 0;
 }
 
+/* Logged-out — žádný pravý panel */
+.shellAnon .body {
+  grid-template-columns: var(--sidebar-w) 1fr;
+}
+
 .main {
   overflow-y: auto;
   min-width: 0;

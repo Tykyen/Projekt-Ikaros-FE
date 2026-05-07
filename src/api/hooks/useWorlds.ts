@@ -22,3 +22,16 @@ export function useWorld(worldId: string) {
     staleTime: 5 * 60_000,
   });
 }
+
+/**
+ * Veřejný přehled světů — pro logged-out sidebar. BE `GET /api/worlds`
+ * je veřejný (bez auth guardu). Pokud BE filtruje vlastní viditelnost
+ * podle accessMode, dostaneme jen public + open světy automaticky.
+ */
+export function usePublicWorlds() {
+  return useQuery({
+    queryKey: ['worlds', 'public'],
+    queryFn: () => api.get<World[]>('/worlds'),
+    staleTime: 5 * 60_000,
+  });
+}
