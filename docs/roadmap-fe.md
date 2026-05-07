@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 ✅ hotovo, 1.1-1.5 čeká) |
+| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 ✅, 1.2-1.6 čeká) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -110,10 +110,22 @@
 
 **Tracked dluhy:** D-003 (BE endpoint `PATCH /users/me { themeId }`), D-004 (`User.themeId` field type)
 
-### - [ ] 1.1 Login (`/login`)
-- [ ] Formulář (email + password), react-hook-form + zod validace
-- [ ] JWT → store, redirect na dashboard
-- [ ] Error stavy (wrong credentials, rate limit 5/min)
+### - [x] 1.1 Login ✅
+
+**Realizováno jako modal v hlavičce IkarosLayoutu** (deviace od původního "Login na `/login`" — viz spec `docs/arch/phase-1/spec-1.1.md`). Klíčové změny:
+
+- [x] **BE:** `LoginDto.email` → `identifier` (přijímá e-mail NEBO přezdívku); `AuthService.login` rozhoduje podle `@`; `RegisterDto.username` zakázán `@`
+- [x] **FE:** `LoginModal` komponenta (RHF + zod, themed, 3D buttons) — show/hide password toggle, error banner pro 401/429/network/5xx
+- [x] **IkarosLayout je teď public shell** — anon vidí úvodník, vesmíry, články, galerii, diskuze, nápovědu; pravý sloupec a CHAT sekce jen pro logged-in
+- [x] **Hlavička role-aware** — logged-out: PŘIHLÁSIT SE / REGISTRACE-disabled; logged-in: POŠTA, PŘÁTELÉ (placeholder pro 1.6) / UŽIVATELÉ (admin → 1.4), avatar+přezdívka, ODHLÁSIT
+- [x] **Logout flow s 5s "Vrátit"** (sonner toast) — tokeny se mažou až po vypršení timeru
+- [x] **Per-route `requireAuth` loader** nahradil global authLoader — chráněné routes redirectují na `/?openLogin=1` + uloží intent do sessionStorage
+- [x] **JWT decode** pro hydrataci user dat po refreshi (`useAuthBootstrap`)
+- [x] **`@hookform/resolvers`** přidán; `/login` a `/register` URL smazané, `LoginPage.tsx` smazán, `AuthLayout` čeká na 1.2
+
+**Test coverage:** 72 FE testů (loginSchema, jwt, useAuth, LoginModal, themes); 22 BE unit + 9 E2E (auth-login-identifier).
+
+**Tracked dluhy:** D-005 (`/users/me` plnohodnotná hydratace — 1.3), D-006 (Reset hesla — BE neumí, samostatný krok), D-008 (BE controller-level guards na `ikaros-articles/gallery/discussions` — vyřeší 3.2-3.4).
 
 ### - [ ] 1.2 Registrace (`/register`)
 - [ ] Formulář (username, email, password, confirm), validace
