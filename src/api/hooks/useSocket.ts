@@ -45,7 +45,10 @@ export function useSocketEvent<T = unknown>(
   handler: (data: T) => void,
 ): void {
   const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+
+  useEffect(() => {
+    handlerRef.current = handler;
+  }, [handler]);
 
   useEffect(() => {
     const socket = getSocket();

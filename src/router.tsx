@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import { IkarosLayout, WorldLayout, AuthLayout } from './components/layout';
