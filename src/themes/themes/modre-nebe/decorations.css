@@ -1,0 +1,28 @@
+/* ── Modré nebe — dekorativní vrstva ──
+   Aplikuje se přes [data-theme="modre-nebe"] selektor.
+   Animace jsou pod prefers-reduced-motion: no-preference.
+   Statické dekor (ornamenty) jsou vždy aktivní.
+*/
+
+[data-theme="modre-nebe"] {
+  /* Fallback gradient (když background image chybí) */
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(232, 184, 96, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 30% 100%, rgba(20, 40, 80, 0.4) 0%, transparent 60%);
+  background-color: var(--bg-primary);
+}
+
+/* Diamond ornamentální oddělovače mezi sekcemi */
+[data-theme="modre-nebe"] .section-divider::before {
+  content: '◆';
+  color: var(--accent);
+  font-size: 12px;
+  margin: 0 var(--sp-3);
+}
+
+/* Subtilní hvězdný třpyt na pozadí — jen když uživatel pohyb neomezuje */
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="modre-nebe"] {
+    /* (placeholder pro future hvězdný třpyt; zatím prázdné) */
+  }
+}

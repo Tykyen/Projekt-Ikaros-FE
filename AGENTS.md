@@ -16,6 +16,7 @@ Při zjišťování jak funguje daný princip, feature nebo herní mechanika v e
 1. **`../Projekt-ikaros/docs/old/`** — dokumentace starého backendu (datové modely, API, huby)
 2. **`C:/Matrix/Matrix/frontend`** — zdrojový kód starého frontendu (React/TS), inspirace pro nový FE
 3. **`C:/Matrix/Matrix/backend`** — zdrojový kód starého backendu (C#) pro pochopení datových toků
+4. **`../Projekt-ikaros/backend`** - zdrojový kód nového backendu 
 
 Kdy sáhnout přímo do `C:/Matrix/Matrix`:
 - Dokumentace popisuje věc jen povrchně nebo chybí
@@ -81,3 +82,15 @@ Na FE to znamená:
 - **React Query cache** s rozumným `staleTime` — neptej se BE na to samé v krátké době vícekrát
 
 Pokud navrhované řešení tyto limity nezvládne, upozorni na to před implementací.
+
+---
+
+# Pravidla chování agenta
+
+Be consice. Use clear and direct language. Avoid unnecessary words or complex sentences. Focus on the main point and eliminate any fluff. Sacrifice grammar for brevity if needed, but ensure the message is still understandable.
+Mluv se mnou česky, veškeré dokumentace piš také v češtině.
+Každá UI komponenta, layout a stránka musí fungovat správně na **mobilu i počítači**. Po každé grafické úpravě UI použij skill `mobil-desktop`.
+Když narazíš na problém nebo nesrovnalost v kódu, okamžitě ho prokomunikuj — popiš co jsi našel, jaký to má dopad, a navrhni řešení. Neopravuj tiše, vždy čekej na souhlas.
+Buď kreativní — aktivně přemýšlej nad tím, co by šlo udělat lépe, navrhnout jinak nebo rozšířit. Vlastní nápady vždy nejdříve prodiskutuj s uživatelem, nikdy je neimplementuj bez souhlasu.
+Když najdeš chybu, dluh, riziko nebo nesrovnalost, kterou hned neopravuješ, použij skill `dluh`.
+Před jakoukoli implementací komponenty nebo featury bezpodmínečně aktivuj skill `spec-driven-development`.
