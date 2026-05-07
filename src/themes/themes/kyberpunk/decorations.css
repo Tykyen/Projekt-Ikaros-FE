@@ -1,0 +1,22 @@
+/* ── Kyberpunk — neonová megalopole ── */
+
+[data-theme="kyberpunk"] {
+  background-image:
+    radial-gradient(ellipse at 30% 30%, rgba(0, 216, 232, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 70%, rgba(224, 32, 192, 0.10) 0%, transparent 50%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+[data-theme="kyberpunk"] .card,
+[data-theme="kyberpunk"] [class*="card"] {
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  border-radius: 0;
+  border: 1px solid var(--border-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="kyberpunk"] button:hover {
+    box-shadow: 0 0 20px rgba(0, 216, 232, 0.6);
+  }
+}
