@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | ⬜ |
+| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 ✅ hotovo, 1.1-1.5 čeká) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -87,13 +87,28 @@
 
 **BE:** `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/refresh`, `POST /api/auth/logout`, `GET /api/users/me`, `PATCH /api/users/me`
 
-### - [ ] 1.0 Globální theme systém
-- [ ] Definice ~20 vizuálních témat platformy (zlatý standard, sci-fi, kyberpunk, hospoda, příroda, pergament, nemrtví, čtyři živly, vesmírná bitva, vesmírná loď, severské runy, indiánské, africké, arabský svět, kyberpunk, postapo, temná červeň, magie, měsíc, slunce, bílá/čistá)
-- [ ] CSS design tokeny per téma (`data-theme` atribut)
-- [ ] 3D moderní efekty tlačítek per téma
-- [ ] Výběr tématu v nastavení profilu (`/ikaros/profil`)
-- [ ] Uložení volby uživatele (Jotai atom + localStorage)
-- [ ] Výchozí téma před přihlášením
+### - [x] 1.0 Globální theme systém ✅
+
+**Iterace A** (foundation + 3 reference themes) + **Iterace B** (zbývajících 18 témat) — viz `docs/superpowers/specs/2026-05-07-theme-system-design.md` a `docs/superpowers/plans/2026-05-07-theme-system-iterace-{a,b}.md`.
+
+- [x] Definice **21 vizuálních témat platformy**: modré nebe (default), zlatý standard, sci-fi, vesmírná loď, vesmírná bitva, kyberpunk, postapo, příroda, pergamen, hospoda, nemrtví, temná červeň, čtyři živly, magie, severské runy, indiánské, africké, arabský svět, měsíc, slunce, bílá
+- [x] CSS design tokeny per téma (`data-theme` atribut na layout root) — `src/themes/themes/<id>/index.ts`
+- [x] 3D moderní efekty tlačítek per téma — translateY + box-shadow + per-theme glow v `decorations.css`
+- [x] **Theme switcher v hlavičce** (deviace od původního plánu — switcher je v headeru místo v profilu, vždy dostupný)
+- [x] Uložení volby uživatele — `themeAtom` (Jotai `atomWithStorage('ikaros.theme')`) + hybrid BE sync (graceful 404)
+- [x] Výchozí téma před přihlášením — `DEFAULT_THEME = 'modre-nebe'` + pre-hydration script (žádný FOUT)
+
+**Bonus nad rámec původního plánu:**
+- [x] WCAG AA kontrast pro všech 21 témat (`npm run audit:contrast`)
+- [x] Storybook gallery (Themes/Gallery → All Themes) pro vizuální testování
+- [x] `prefers-reduced-motion` auto-disable animací
+- [x] Lazy-load decorations.css + display fontů per téma
+- [x] Architecture připravená pro **fázi 5.0** (theme scope na úrovni layoutu — `IkarosLayout` vs `WorldLayout`)
+- [x] `lint:colors` skript zakazující hardcoded barvy v komponentech
+- [x] 36 unit testů (registry, applyTheme, useTheme, useThemeSync)
+- [x] Asset pipeline — `npm run themes:optimize` (sharp PNG → WebP, 21 thumbs + 21 backgrounds)
+
+**Tracked dluhy:** D-003 (BE endpoint `PATCH /users/me { themeId }`), D-004 (`User.themeId` field type)
 
 ### - [ ] 1.1 Login (`/login`)
 - [ ] Formulář (email + password), react-hook-form + zod validace
