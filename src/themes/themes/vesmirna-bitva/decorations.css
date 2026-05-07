@@ -1,0 +1,21 @@
+/* ── Vesmírná bitva — alarm, červená urgence ── */
+
+[data-theme="vesmirna-bitva"] {
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(192, 24, 24, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.8) 0%, transparent 70%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+[data-theme="vesmirna-bitva"] .card,
+[data-theme="vesmirna-bitva"] [class*="card"],
+[data-theme="vesmirna-bitva"] button {
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="vesmirna-bitva"] button:hover {
+    box-shadow: 0 0 20px rgba(192, 24, 24, 0.6);
+  }
+}
