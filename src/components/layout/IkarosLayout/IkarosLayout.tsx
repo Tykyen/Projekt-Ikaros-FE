@@ -9,6 +9,7 @@ import { useUnreadCount } from '../../../api/hooks/useMessages';
 import { currentUserAtom } from '../../../store/authStore';
 import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
+import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
 
 const PRIMARY_NAV = [
   { label: 'Úvodník',       to: '/',                      end: true },
@@ -149,6 +150,7 @@ export function IkarosLayout() {
         <Link to="/" className={s.logo}>Projekt Ikaros</Link>
 
         <nav className={s.headerNav}>
+          <ThemeSwitcher />
           <NavLink
             to="/ikaros/posta"
             className={({ isActive }) => clsx(s.headerLink, isActive && s.headerLinkActive)}
