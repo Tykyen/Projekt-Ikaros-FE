@@ -3,7 +3,7 @@ import { listThemes } from './registry';
 
 function ThemePreview({ themeId, themeName }: { themeId: string; themeName: string }) {
   return (
-    <div data-theme={themeId} style={{ padding: 24, minHeight: 220, border: '1px solid #333' }}>
+    <div data-theme={themeId} style={{ padding: 24, minHeight: 220, border: '1px solid var(--border)' }}>
       <h3 style={{ color: 'var(--text-primary)', marginTop: 0 }}>{themeName}</h3>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
         <button style={{ padding: '8px 16px', background: 'var(--accent)', color: 'var(--text-on-accent)', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
