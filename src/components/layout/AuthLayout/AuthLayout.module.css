@@ -1,0 +1,13 @@
+.shell {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  padding: var(--sp-4);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+}
