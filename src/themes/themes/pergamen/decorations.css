@@ -1,0 +1,29 @@
+/* ── Pergamen — knihovna, světlé pergamen karty na tmavém dřevě ── */
+
+[data-theme="pergamen"] {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(208, 128, 32, 0.20) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(138, 26, 16, 0.10) 0%, transparent 70%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+/* Pergamenové karty — světlé, mírně zaoblené */
+[data-theme="pergamen"] .card,
+[data-theme="pergamen"] [class*="card"] {
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 4px 12px rgba(20, 10, 4, 0.4);
+}
+
+/* Tenká zlatá linka pod nadpisy */
+[data-theme="pergamen"] h1::after,
+[data-theme="pergamen"] h2::after {
+  content: '';
+  display: block;
+  width: 60%;
+  height: 1px;
+  background: var(--border-strong);
+  margin-top: var(--sp-2);
+  opacity: 0.5;
+}
