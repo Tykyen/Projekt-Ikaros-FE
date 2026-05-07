@@ -1,10 +1,14 @@
 import type { Theme, ThemeId, ThemeScope } from './types';
 import { modreNebeTheme } from './themes/modre-nebe';
+import { bilaTheme } from './themes/bila';
+import { temnaCervenTheme } from './themes/temna-cerven';
 
 export const DEFAULT_THEME: ThemeId = 'modre-nebe';
 
 export const THEMES: Partial<Record<ThemeId, Theme>> = {
-  'modre-nebe': modreNebeTheme,
+  'modre-nebe':   modreNebeTheme,
+  'bila':         bilaTheme,
+  'temna-cerven': temnaCervenTheme,
 };
 
 export function getTheme(id: string): Theme {
