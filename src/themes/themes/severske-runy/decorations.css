@@ -1,0 +1,16 @@
+/* ── Severské runy — Viking, led + železo ── */
+
+[data-theme="severske-runy"] {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(74, 176, 208, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 100%, rgba(192, 128, 48, 0.10) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 100%, rgba(192, 128, 48, 0.10) 0%, transparent 40%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+[data-theme="severske-runy"] .card,
+[data-theme="severske-runy"] [class*="card"] {
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+}
