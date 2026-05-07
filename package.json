@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "themes:optimize": "node scripts/optimize-theme-assets.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.9",
@@ -41,6 +42,7 @@
     "globals": "^17.5.0",
     "happy-dom": "^20.9.0",
     "jsdom": "^29.1.1",
+    "sharp": "^0.34.5",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10",
