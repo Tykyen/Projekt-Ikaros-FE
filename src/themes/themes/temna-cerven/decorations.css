@@ -1,0 +1,22 @@
+/* ── Temná červeň — gotická katedrála ── */
+
+[data-theme="temna-cerven"] {
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(192, 0, 24, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(64, 0, 8, 0.6) 0%, transparent 70%);
+  background-color: var(--bg-primary);
+}
+
+/* Téměř pravoúhlé karty s krevní bordurou */
+[data-theme="temna-cerven"] .card,
+[data-theme="temna-cerven"] [class*="card"] {
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+}
+
+/* Krevní hover glow — animace pod motion-safe */
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="temna-cerven"] button:hover {
+    box-shadow: 0 0 12px rgba(138, 0, 16, 0.6);
+  }
+}
