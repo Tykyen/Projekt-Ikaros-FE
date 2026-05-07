@@ -1,0 +1,46 @@
+/* ── Vesmírná loď — vojenský hangár, L-bracket rohy ── */
+
+[data-theme="vesmirna-lod"] {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(0, 184, 232, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 100%, rgba(232, 160, 32, 0.06) 0%, transparent 50%),
+    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-color: var(--bg-primary);
+}
+
+/* Žádné zaoblené rohy globálně */
+[data-theme="vesmirna-lod"] .card,
+[data-theme="vesmirna-lod"] [class*="card"],
+[data-theme="vesmirna-lod"] button {
+  border-radius: 0;
+}
+
+/* L-bracket rohy na panelech */
+[data-theme="vesmirna-lod"] .card,
+[data-theme="vesmirna-lod"] [class*="card"] {
+  position: relative;
+}
+[data-theme="vesmirna-lod"] .card::before,
+[data-theme="vesmirna-lod"] [class*="card"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+  pointer-events: none;
+}
+[data-theme="vesmirna-lod"] .card::after,
+[data-theme="vesmirna-lod"] [class*="card"]::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-bottom: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  pointer-events: none;
+}
