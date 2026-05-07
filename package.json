@@ -11,7 +11,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "themes:optimize": "node scripts/optimize-theme-assets.mjs"
+    "themes:optimize": "node scripts/optimize-theme-assets.mjs",
+    "lint:colors": "node scripts/lint-no-hardcoded-colors.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.9",

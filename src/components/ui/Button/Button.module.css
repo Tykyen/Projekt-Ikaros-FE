@@ -23,7 +23,7 @@
 /* Variants */
 .primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
 }
 .primary:hover { background: var(--accent-bright); }
 
@@ -42,7 +42,7 @@
 
 .danger {
   background: var(--danger);
-  color: #fff;
+  color: var(--text-on-danger);
 }
 .danger:hover { opacity: 0.85; }
 

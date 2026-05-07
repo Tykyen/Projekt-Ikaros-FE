@@ -202,7 +202,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.6);
+  background: var(--bg-overlay);
   z-index: var(--z-overlay);
 }
 .drawerBackdropOpen { display: block; }
@@ -240,7 +240,7 @@
   white-space: nowrap;
   transition: background var(--transition-fast);
 }
-.newPageBtn:hover { background: var(--accent); color: #fff; }
+.newPageBtn:hover { background: var(--accent); color: var(--text-on-accent); }
 
 .drawerNewPage {
   display: flex;

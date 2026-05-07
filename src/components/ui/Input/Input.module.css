@@ -48,7 +48,7 @@
   border-color: var(--danger);
 }
 .error .input:focus {
-  box-shadow: 0 0 0 3px rgba(240,96,96,.2);
+  box-shadow: 0 0 0 3px var(--danger-focus-ring);
 }
 
 .errorMsg {

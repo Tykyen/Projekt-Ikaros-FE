@@ -21,17 +21,17 @@
   border: 1px solid var(--accent-soft);
 }
 .success {
-  background: rgba(62, 207, 142, .15);
+  background: var(--success-soft);
   color: var(--success);
-  border: 1px solid rgba(62, 207, 142, .3);
+  border: 1px solid var(--success-soft-border);
 }
 .warning {
-  background: rgba(245, 166, 35, .15);
+  background: var(--warning-soft);
   color: var(--warning);
-  border: 1px solid rgba(245, 166, 35, .3);
+  border: 1px solid var(--warning-soft-border);
 }
 .danger {
-  background: rgba(240, 96, 96, .15);
+  background: var(--danger-soft);
   color: var(--danger);
-  border: 1px solid rgba(240, 96, 96, .3);
+  border: 1px solid var(--danger-soft-border);
 }
