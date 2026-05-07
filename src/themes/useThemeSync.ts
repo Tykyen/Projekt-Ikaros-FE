@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { themeAtom } from './state';
 import { currentUserAtom } from '../store/authStore';
 import { api } from '../api/client';
@@ -7,9 +7,24 @@ import type { ThemeId } from './types';
 
 export function useThemeSync(): void {
   const user = useAtomValue(currentUserAtom);
-  const themeId = useAtomValue(themeAtom);
+  const [themeId, setThemeId] = useAtom(themeAtom);
   const previous = useRef<ThemeId | null>(null);
+  const initialSynced = useRef(false);
 
+  // Initial sync: pokud user má themeId a liší se od localStorage, BE výhrává
+  useEffect(() => {
+    if (!user) return;
+    if (initialSynced.current) return;
+    initialSynced.current = true;
+
+    const userThemeId = (user as { themeId?: string }).themeId;
+    if (userThemeId && userThemeId !== themeId) {
+      setThemeId(userThemeId as ThemeId);
+      previous.current = userThemeId as ThemeId;
+    }
+  }, [user, themeId, setThemeId]);
+
+  // Outbound sync: na změnu posílá PATCH (debounced 500ms)
   useEffect(() => {
     if (!user) {
       previous.current = themeId;
@@ -17,7 +32,7 @@ export function useThemeSync(): void {
     }
     if (previous.current === null) {
       previous.current = themeId;
-      return; // initial mount, neposílat
+      return;
     }
     if (previous.current === themeId) return;
     previous.current = themeId;
