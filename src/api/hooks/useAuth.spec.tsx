@@ -1,0 +1,211 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { getDefaultStore } from 'jotai';
+import type { PropsWithChildren } from 'react';
+import { useLogin, useLogout, useAuthBootstrap } from './useAuth';
+import {
+  accessTokenAtom,
+  refreshTokenAtom,
+  currentUserAtom,
+  pendingLogoutAtom,
+} from '../../store/authStore';
+import { api } from '../client';
+import { UserRole } from '../../types';
+
+vi.mock('../client', () => ({
+  api: {
+    post: vi.fn(),
+  },
+}));
+
+function makeJwt(payload: Record<string, unknown>): string {
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const body = btoa(JSON.stringify(payload))
+    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  return `${header}.${body}.fake`;
+}
+
+function makeWrapper() {
+  const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+  return ({ children }: PropsWithChildren) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+}
+
+const store = getDefaultStore();
+
+beforeEach(() => {
+  localStorage.clear();
+  store.set(accessTokenAtom, null);
+  store.set(refreshTokenAtom, null);
+  store.set(currentUserAtom, null);
+  store.set(pendingLogoutAtom, null);
+  vi.clearAllMocks();
+});
+
+describe('useLogin', () => {
+  it('po úspěchu zapíše tokeny + user do store', async () => {
+    const mockUser = { id: '1', username: 'alice', role: UserRole.Hrac };
+    vi.mocked(api.post).mockResolvedValueOnce({
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+      user: mockUser,
+    });
+
+    const { result } = renderHook(() => useLogin(), { wrapper: makeWrapper() });
+    await act(async () => {
+      await result.current.mutateAsync({ identifier: 'alice', password: 'pw' });
+    });
+
+    expect(store.get(accessTokenAtom)).toBe('access-1');
+    expect(store.get(refreshTokenAtom)).toBe('refresh-1');
+    expect(store.get(currentUserAtom)).toEqual(mockUser);
+    expect(api.post).toHaveBeenCalledWith('/auth/login', {
+      identifier: 'alice', password: 'pw',
+    });
+  });
+
+  it('po úspěchu zruší pending logout (kdyby běžel)', async () => {
+    store.set(pendingLogoutAtom, { startedAt: Date.now() });
+    vi.mocked(api.post).mockResolvedValueOnce({
+      accessToken: 'a', refreshToken: 'r',
+      user: { id: '1', username: 'x', role: UserRole.Hrac },
+    });
+
+    const { result } = renderHook(() => useLogin(), { wrapper: makeWrapper() });
+    await act(async () => {
+      await result.current.mutateAsync({ identifier: 'x', password: 'pw' });
+    });
+
+    expect(store.get(pendingLogoutAtom)).toBeNull();
+  });
+
+  it('při selhání nezapíše tokeny', async () => {
+    vi.mocked(api.post).mockRejectedValueOnce(new Error('401'));
+    const { result } = renderHook(() => useLogin(), { wrapper: makeWrapper() });
+    await act(async () => {
+      await result.current.mutateAsync({ identifier: 'x', password: 'pw' })
+        .catch(() => {});
+    });
+    expect(store.get(accessTokenAtom)).toBeNull();
+  });
+});
+
+describe('useLogout', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    store.set(accessTokenAtom, 'access-token');
+    store.set(refreshTokenAtom, 'refresh-token');
+    store.set(currentUserAtom, {
+      id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
+      themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
+      isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('nastaví pendingLogoutAtom okamžitě', () => {
+    const { result } = renderHook(() => useLogout());
+    act(() => { result.current(); });
+    expect(store.get(pendingLogoutAtom)).not.toBeNull();
+  });
+
+  it('po 5s smaže tokeny + user a zavolá BE /auth/logout', () => {
+    vi.mocked(api.post).mockResolvedValue({});
+    const { result } = renderHook(() => useLogout());
+    act(() => { result.current(); });
+
+    act(() => { vi.advanceTimersByTime(5000); });
+
+    expect(store.get(accessTokenAtom)).toBeNull();
+    expect(store.get(refreshTokenAtom)).toBeNull();
+    expect(store.get(currentUserAtom)).toBeNull();
+    expect(store.get(pendingLogoutAtom)).toBeNull();
+    expect(api.post).toHaveBeenCalledWith('/auth/logout', {
+      refreshToken: 'refresh-token',
+    });
+  });
+
+  it('cancel funkce zruší timer a obnoví UI', () => {
+    const { result } = renderHook(() => useLogout());
+    let cancel: () => void;
+    act(() => { cancel = result.current(); });
+
+    act(() => { cancel!(); });
+
+    expect(store.get(pendingLogoutAtom)).toBeNull();
+    expect(store.get(accessTokenAtom)).toBe('access-token');
+
+    // Po vypršení timeru by se nemělo nic stát
+    act(() => { vi.advanceTimersByTime(6000); });
+    expect(store.get(accessTokenAtom)).toBe('access-token');
+    expect(api.post).not.toHaveBeenCalled();
+  });
+});
+
+describe('useAuthBootstrap', () => {
+  it('hydratuje currentUser z JWT pokud je token validní a user prázdný', async () => {
+    const exp = Math.floor(Date.now() / 1000) + 3600;
+    const token = makeJwt({
+      sub: '42', email: 'b@b.com', username: 'bob', role: UserRole.Hrac,
+      characterPath: 'p', ikarosSkin: 'default', exp,
+    });
+    store.set(accessTokenAtom, token);
+
+    renderHook(() => useAuthBootstrap());
+
+    await waitFor(() => {
+      expect(store.get(currentUserAtom)?.username).toBe('bob');
+    });
+    expect(store.get(currentUserAtom)?.id).toBe('42');
+  });
+
+  it('smaže tokeny pokud je JWT expirovaný', async () => {
+    const exp = Math.floor(Date.now() / 1000) - 60;
+    const token = makeJwt({ sub: '1', exp });
+    store.set(accessTokenAtom, token);
+    store.set(refreshTokenAtom, 'r');
+
+    renderHook(() => useAuthBootstrap());
+
+    await waitFor(() => {
+      expect(store.get(accessTokenAtom)).toBeNull();
+    });
+    expect(store.get(refreshTokenAtom)).toBeNull();
+  });
+
+  it('nepřepíše existující currentUser', async () => {
+    const exp = Math.floor(Date.now() / 1000) + 3600;
+    const token = makeJwt({
+      sub: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
+      characterPath: '', ikarosSkin: 'default', exp,
+    });
+    const existing = {
+      id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
+      displayName: 'Alice', avatarUrl: 'http://x.com/a.png',
+      themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
+      isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
+    };
+    store.set(accessTokenAtom, token);
+    store.set(currentUserAtom, existing);
+
+    renderHook(() => useAuthBootstrap());
+
+    // Krátká pauza pro useEffect
+    await waitFor(() => {
+      expect(store.get(currentUserAtom)).toBe(existing);
+    });
+  });
+
+  it('nedělá nic když není token', async () => {
+    renderHook(() => useAuthBootstrap());
+    await waitFor(() => {
+      expect(store.get(currentUserAtom)).toBeNull();
+    });
+  });
+});

@@ -64,6 +64,7 @@ Vizuální design platformy a světů se řeší separátně — plán barvy nes
 - **1.3** Profil (`/ikaros/profil`) — editace, avatar upload (Cloudinary)
 - **1.4** Adresář uživatelů (`/ikaros/uzivatele`, `/ikaros/uzivatel/:id`)
 - **1.5** Presence — online indikátor, Socket.IO `presence:update`
+- **1.6** Přátelé — friendships modul (BE + FE), žádosti, seznam přátel, header link nahradí placeholder z 1.1
 
 ---
 

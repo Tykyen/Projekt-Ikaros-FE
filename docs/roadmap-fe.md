@@ -132,6 +132,29 @@
 - [ ] Online indikátor v user menu (header)
 - [ ] Socket.IO `presence:update` event
 
+### - [ ] 1.6 Přátelé
+
+**Nový subsystém — BE i FE od nuly.** V roadmapě nebyl, doplněno při brainstormingu kroku 1.1 (UI hlavičky odkazuje na "PŘÁTELÉ" pro běžné uživatele, ADMIN/SUPERADMIN vidí "UŽIVATELÉ" z 1.4).
+
+**BE (nový modul `friendships`):**
+- [ ] Entity `Friendship` (userAId, userBId, status: `pending` | `accepted` | `blocked`, requestedById, createdAt, acceptedAt)
+- [ ] `GET /api/friends` — seznam přijatých přátel
+- [ ] `GET /api/friends/requests` — příchozí žádosti
+- [ ] `POST /api/friends/request/:userId` — odeslat žádost
+- [ ] `POST /api/friends/accept/:friendshipId` — přijmout
+- [ ] `DELETE /api/friends/:friendshipId` — odmítnout / odebrat
+- [ ] `POST /api/friends/block/:userId` — blokovat (volitelné)
+- [ ] Notifikace přes Ikaros poštu (3.5) nebo Socket.IO event `friend:request`
+
+**FE:**
+- [ ] `/ikaros/pratele` — seznam přátel + příchozí/odeslané žádosti (taby)
+- [ ] Tlačítko "Přidat do přátel" na veřejném profilu uživatele (1.4)
+- [ ] Header link "PŘÁTELÉ" → `/ikaros/pratele` (nahradí placeholder z 1.1)
+- [ ] Badge s počtem příchozích žádostí
+- [ ] Toast / Socket event při přijetí žádosti
+
+**Závislosti:** vyžaduje 1.4 (Adresář uživatelů) — odkud se přátelství iniciuje.
+
 ---
 
 ## Fáze 2 — Ikaros jádro

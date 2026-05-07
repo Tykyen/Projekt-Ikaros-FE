@@ -44,7 +44,8 @@ export interface PublicUser {
 
 // Auth
 export interface LoginRequest {
-  email: string;
+  /** E-mail (pokud obsahuje @) nebo přezdívka uživatele */
+  identifier: string;
   password: string;
 }
 
@@ -57,7 +58,7 @@ export interface RegisterRequest {
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
-  user: Omit<User, 'passwordHash'>;
+  user: User;
 }
 
 export interface RefreshResponse {
