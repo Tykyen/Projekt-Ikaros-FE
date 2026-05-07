@@ -8,7 +8,7 @@ describe('registry', () => {
 
   it('THEMES contains modre-nebe entry', () => {
     expect(THEMES['modre-nebe']).toBeDefined();
-    expect(THEMES['modre-nebe'].id).toBe('modre-nebe');
+    expect(THEMES['modre-nebe']!.id).toBe('modre-nebe');
   });
 
   it('getTheme returns the theme for valid id', () => {

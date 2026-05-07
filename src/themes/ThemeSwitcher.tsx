@@ -33,11 +33,15 @@ export function ThemeSwitcher() {
 
   useEffect(() => {
     if (open) {
-      const idx = themes.findIndex((t) => t.id === themeId);
-      setFocusIndex(idx >= 0 ? idx : 0);
       popoverRef.current?.focus();
     }
-  }, [open, themeId, themes]);
+  }, [open]);
+
+  const handleOpen = () => {
+    const idx = themes.findIndex((t) => t.id === themeId);
+    setFocusIndex(idx >= 0 ? idx : 0);
+    setOpen(true);
+  };
 
   const handleSelect = async (id: ThemeId) => {
     await setTheme(id);
@@ -69,7 +73,7 @@ export function ThemeSwitcher() {
       <button
         type="button"
         className={s.trigger}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? setOpen(false) : handleOpen())}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Vybrat motiv aplikace"
