@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 ✅, 1.2-1.8 čeká) |
+| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 + 1.2 ✅, 1.3-1.8 čeká) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -127,19 +127,22 @@
 
 **Tracked dluhy:** D-005 (`/users/me` plnohodnotná hydratace — 1.3), D-006 (Reset hesla — BE neumí, samostatný krok), D-008 (BE controller-level guards na `ikaros-articles/gallery/discussions` — vyřeší 3.2-3.4).
 
-### - [ ] 1.2 Registrace
+### - [x] 1.2 Registrace ✅
 
-**Modal v hlavičce IkarosLayoutu** (konzistence s 1.1 Login — žádný `/register` URL). BE auto-login → po úspěchu jsou tokeny zapsány a uživatel je přihlášen. Detailní spec: `docs/arch/phase-1/spec-1.2.md`.
+**Realizováno jako modal v hlavičce IkarosLayoutu** (konzistence s 1.1 — viz spec `docs/arch/phase-1/spec-1.2.md` a plán `plan-1.2.md`). BE auto-login: po úspěšné registraci jsou tokeny zapsány a uživatel je rovnou přihlášen.
 
-- [ ] **BE:** `ConflictException` rozšířen o `code: 'EMAIL_TAKEN' | 'USERNAME_TAKEN'` pro field-level chyby
-- [ ] **BE:** nové public endpointy `GET /api/auth/check-username?u=...` a `GET /api/auth/check-email?e=...` (throttled)
-- [ ] **FE:** `RegisterModal` (RHF + zod, themed, 3D buttons) — email, username, password, passwordConfirm
-- [ ] **FE:** indikátor síly hesla (zxcvbn-style barevný progress)
-- [ ] **FE:** debounced live check username/email availability (✓/✗ ikona)
-- [ ] **FE:** cross-linky LoginModal ↔ RegisterModal ("Nemáš účet?" / "Už máš účet?")
-- [ ] **FE:** REGISTRACE button v hlavičce odblokovat (1.1 měl `disabled`)
-- [ ] **FE:** `?openRegister=1` query trigger + auto-login + deep-link intent (sessionStorage)
-- [ ] **FE:** smazat `AuthLayout.tsx` + `RegisterPage.tsx` (orphan po 1.1)
+- [x] **BE:** `ConflictException` v register() rozšířen o `code: 'EMAIL_TAKEN' | 'USERNAME_TAKEN'`; `HttpExceptionFilter` propaguje custom code z payloadu
+- [x] **BE:** Nové public endpointy `GET /api/auth/check-username?u=...` a `GET /api/auth/check-email?e=...` (throttle 60/min)
+- [x] **FE:** `RegisterModal` (RHF + zod, themed, 3D buttons) — email, username, password, passwordConfirm, show/hide toggle
+- [x] **FE:** Indikátor síly hesla — vlastní heuristika (5-segmentový bar bez externí deps)
+- [x] **FE:** Debounced live check username/email availability (✓/✗/spinner ikona, 400ms debounce)
+- [x] **FE:** Cross-linky LoginModal ↔ RegisterModal přes `openLoginModalAtom` / `openRegisterModalAtom` (vždy max 1 modal otevřený)
+- [x] **FE:** REGISTRACE button v hlavičce odblokovaný; `?openRegister=1` query trigger; deep-link intent reuse
+- [x] **FE:** Smazány orphan `AuthLayout.tsx`, `RegisterPage.tsx`, `LoginPage.tsx`
+- [x] **Tests:** 117 FE testů (registerSchema 9, passwordStrength 8, useDebouncedValue 3, useRegister 3, useAvailability 7, RegisterModal 14, +cross-link); BE 35 unit + 11 e2e + 4 filter testy
+- [x] **Bonus:** Superadmin seed skript `npm run seed:superadmin` — Tyky účet (spec `spec-superadmin-seed.md`)
+
+**Tracked dluhy:** D-009 (BE `code` field napříč moduly), D-010 (GDPR souhlas), D-011 (captcha), D-012 (email verifikace).
 
 ### - [ ] 1.3 Uživatelský profil (`/ikaros/profil`)
 - [ ] Editace profilu (displayName, username)
