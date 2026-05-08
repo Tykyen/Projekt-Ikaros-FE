@@ -28,11 +28,11 @@ export function passwordStrength(pw: string): PasswordStrengthResult {
     'Velmi silné',
   ];
   const colors = [
-    'var(--danger, #d33)',
-    'var(--warning, #e80)',
-    'var(--accent, #c90)',
-    'var(--success, #2a8)',
-    'var(--success, #2a8)',
+    'var(--danger)',
+    'var(--warning)',
+    'var(--accent)',
+    'var(--success)',
+    'var(--success)',
   ];
   return { score, label: labels[score], color: colors[score] };
 }
