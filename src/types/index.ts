@@ -131,11 +131,21 @@ export interface UnreadCountResponse {
   pendingRequestCount: number;
 }
 
-// API error
+// API error — BE response shape z HttpExceptionFilter
 export interface ApiError {
-  message: string | string[];
-  error?: string;
-  statusCode: number;
+  error: {
+    code: string;       // např. 'CONFLICT', 'BAD_REQUEST', 'EMAIL_TAKEN', 'USERNAME_TAKEN'
+    message: string | string[];
+    timestamp: string;
+  };
+}
+
+// Doménové error kódy pro registrační flow (1.2)
+export type RegisterErrorCode = 'EMAIL_TAKEN' | 'USERNAME_TAKEN';
+
+// Response z GET /auth/check-username a /check-email
+export interface AvailabilityResponse {
+  available: boolean;
 }
 
 // Pagination

@@ -57,16 +57,27 @@ apiClient.interceptors.response.use(
   },
 );
 
-// Parsování BE error payloadu
+// Parsování BE error message z payloadu (HttpExceptionFilter shape)
 export function parseApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiError | undefined;
-    if (data?.message) {
-      return Array.isArray(data.message) ? data.message[0] : data.message;
+    const msg = data?.error?.message;
+    if (msg) {
+      return Array.isArray(msg) ? msg[0] : msg;
     }
     return error.message;
   }
   return 'Neznámá chyba';
+}
+
+// Parsování BE error code (doménové, např. 'EMAIL_TAKEN', 'USERNAME_TAKEN')
+// pro field-level mapping. Vrací null pokud chybí.
+export function parseApiErrorCode(error: unknown): string | null {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as ApiError | undefined;
+    return data?.error?.code ?? null;
+  }
+  return null;
 }
 
 // Typované metody
