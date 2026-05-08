@@ -81,9 +81,7 @@ export function LoginModal() {
       toast.success(`Vítej zpět, ${username}!`);
       close();
 
-      if (isSafeRedirect(intent)) {
-        navigate(intent);
-      }
+      navigate(isSafeRedirect(intent) ? intent : '/');
     } catch (err) {
       setSubmitError(mapErrorToMessage(err));
     }

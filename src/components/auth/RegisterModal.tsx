@@ -128,9 +128,7 @@ export function RegisterModal() {
       toast.success(`Vítej, ${username}! Účet vytvořen.`);
       close();
 
-      if (isSafeRedirect(intent)) {
-        navigate(intent);
-      }
+      navigate(isSafeRedirect(intent) ? intent : '/');
     } catch (err) {
       const code = parseApiErrorCode(err);
       if (code === 'EMAIL_TAKEN') {
