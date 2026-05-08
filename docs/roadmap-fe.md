@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 ✅, 1.2-1.6 čeká) |
+| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 ✅, 1.2-1.8 čeká) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -127,9 +127,19 @@
 
 **Tracked dluhy:** D-005 (`/users/me` plnohodnotná hydratace — 1.3), D-006 (Reset hesla — BE neumí, samostatný krok), D-008 (BE controller-level guards na `ikaros-articles/gallery/discussions` — vyřeší 3.2-3.4).
 
-### - [ ] 1.2 Registrace (`/register`)
-- [ ] Formulář (username, email, password, confirm), validace
-- [ ] Success → redirect na login
+### - [ ] 1.2 Registrace
+
+**Modal v hlavičce IkarosLayoutu** (konzistence s 1.1 Login — žádný `/register` URL). BE auto-login → po úspěchu jsou tokeny zapsány a uživatel je přihlášen. Detailní spec: `docs/arch/phase-1/spec-1.2.md`.
+
+- [ ] **BE:** `ConflictException` rozšířen o `code: 'EMAIL_TAKEN' | 'USERNAME_TAKEN'` pro field-level chyby
+- [ ] **BE:** nové public endpointy `GET /api/auth/check-username?u=...` a `GET /api/auth/check-email?e=...` (throttled)
+- [ ] **FE:** `RegisterModal` (RHF + zod, themed, 3D buttons) — email, username, password, passwordConfirm
+- [ ] **FE:** indikátor síly hesla (zxcvbn-style barevný progress)
+- [ ] **FE:** debounced live check username/email availability (✓/✗ ikona)
+- [ ] **FE:** cross-linky LoginModal ↔ RegisterModal ("Nemáš účet?" / "Už máš účet?")
+- [ ] **FE:** REGISTRACE button v hlavičce odblokovat (1.1 měl `disabled`)
+- [ ] **FE:** `?openRegister=1` query trigger + auto-login + deep-link intent (sessionStorage)
+- [ ] **FE:** smazat `AuthLayout.tsx` + `RegisterPage.tsx` (orphan po 1.1)
 
 ### - [ ] 1.3 Uživatelský profil (`/ikaros/profil`)
 - [ ] Editace profilu (displayName, username)
@@ -144,7 +154,31 @@
 - [ ] Online indikátor v user menu (header)
 - [ ] Socket.IO `presence:update` event
 
-### - [ ] 1.6 Přátelé
+### - [ ] 1.7 Reset hesla
+
+**Nový krok — vyčleněn z dluhu D-006.** Plný spec a brainstorming po dokončení 1.2. Směr níže rozhodnut.
+
+**Stack (rozhodnuto):**
+- **Mailer:** Resend (SMTP) + `@nestjs-modules/mailer` + `nodemailer` — vyměnitelnost s SES/Mailgun beze změn kódu
+- **Token:** 32-byte crypto random, v DB **jen sha256 hash**, single-use, TTL 1 h
+- **E-mail template:** prostá HTML šablona (Handlebars) v repo, bez MJML
+
+**BE:**
+- [ ] Modul `mailer` — abstrakce nad providerem, ENV `MAIL_*` (host, port, user, pass, from)
+- [ ] Entity `PasswordResetToken` (tokenHash, userId, expiresAt, usedAt)
+- [ ] `POST /api/auth/forgot-password` — vždy 200 (proti enumeraci), rate limit 3/15min/IP
+- [ ] `POST /api/auth/reset-password` — ověří hash, nastaví heslo, smaže token, **revokuje rodinu refresh tokenů**
+- [ ] HTML e-mail šablona `forgot-password.hbs` + `subject` "Reset hesla — Projekt Ikaros"
+
+**FE:**
+- [ ] Link "Zapomněl jsem heslo" v `LoginModal`
+- [ ] `ForgotPasswordModal` (e-mail input) → toast "Pokud e-mail existuje, poslali jsme link"
+- [ ] `/reset-password?token=...` route + `ResetPasswordModal` (nové heslo + potvrzení + indikátor síly z 1.2)
+- [ ] Po úspěšném resetu **bez auto-login** — toast "Heslo změněno, přihlas se" → otevře LoginModal (bezpečnost: vědomé přihlášení)
+
+**Závislosti:** Resend účet + API klíč v `.env` (PJ založí před implementací).
+
+### - [ ] 1.8 Přátelé
 
 **Nový subsystém — BE i FE od nuly.** V roadmapě nebyl, doplněno při brainstormingu kroku 1.1 (UI hlavičky odkazuje na "PŘÁTELÉ" pro běžné uživatele, ADMIN/SUPERADMIN vidí "UŽIVATELÉ" z 1.4).
 
