@@ -7,12 +7,15 @@ import {
   refreshTokenAtom,
   currentUserAtom,
   pendingLogoutAtom,
+  loginModalOpenAtom,
+  registerModalOpenAtom,
 } from '../../store/authStore';
 import { decodeJwt, isJwtValid } from '../../utils/jwt';
 import type {
   AccessTokenPayload,
   AuthResponse,
   LoginRequest,
+  RegisterRequest,
   User,
 } from '../../types';
 
@@ -27,7 +30,29 @@ export function useLogin() {
       store.set(accessTokenAtom, accessToken);
       store.set(refreshTokenAtom, refreshToken);
       store.set(currentUserAtom, user);
+      store.set(loginModalOpenAtom, false);
       // Pokud byl spuštěný pending logout, zruš ho — uživatel se přihlásil znovu
+      store.set(pendingLogoutAtom, null);
+    },
+  });
+}
+
+/**
+ * Registrace — BE auto-loguje (vrací tokeny + user). Po úspěchu zapíše
+ * do store a zavře RegisterModal. Navigace na deep-link intent
+ * (sessionStorage 'ikaros.loginIntent') se řeší v komponentě, která
+ * má přístup k useNavigate.
+ */
+export function useRegister() {
+  return useMutation({
+    mutationFn: (dto: RegisterRequest) =>
+      api.post<AuthResponse>('/auth/register', dto),
+    onSuccess: ({ accessToken, refreshToken, user }) => {
+      const store = getDefaultStore();
+      store.set(accessTokenAtom, accessToken);
+      store.set(refreshTokenAtom, refreshToken);
+      store.set(currentUserAtom, user);
+      store.set(registerModalOpenAtom, false);
       store.set(pendingLogoutAtom, null);
     },
   });
