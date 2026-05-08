@@ -12,6 +12,7 @@ import {
   refreshTokenAtom,
   currentUserAtom,
   loginModalOpenAtom,
+  registerModalOpenAtom,
 } from '../../store/authStore';
 import { api } from '../../api/client';
 import { UserRole } from '../../types';
@@ -200,6 +201,16 @@ describe('LoginModal', () => {
     await waitFor(() => {
       expect(sessionStorage.getItem('ikaros.loginIntent')).toBeNull();
     });
+  });
+
+  it('cross-link "Zaregistruj se" otevře RegisterModal a zavře LoginModal', async () => {
+    const user = userEvent.setup();
+    render(<LoginModal />, { wrapper: makeWrapper() });
+
+    await user.click(screen.getByRole('button', { name: 'Zaregistruj se' }));
+
+    expect(store.get(registerModalOpenAtom)).toBe(true);
+    expect(store.get(loginModalOpenAtom)).toBe(false);
   });
 
   it('odmítne unsafe redirect target (//evil.com)', async () => {

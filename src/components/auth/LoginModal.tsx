@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -10,7 +10,10 @@ import { Input } from '../ui/Input/Input';
 import { Button } from '../ui/Button/Button';
 import { loginSchema, type LoginFormValues } from './loginSchema';
 import { useLogin } from '../../api/hooks/useAuth';
-import { loginModalOpenAtom } from '../../store/authStore';
+import {
+  loginModalOpenAtom,
+  openRegisterModalAtom,
+} from '../../store/authStore';
 import s from './LoginModal.module.css';
 
 const LOGIN_INTENT_KEY = 'ikaros.loginIntent';
@@ -35,6 +38,7 @@ function isSafeRedirect(target: string | null): target is string {
 
 export function LoginModal() {
   const [open, setOpen] = useAtom(loginModalOpenAtom);
+  const openRegister = useSetAtom(openRegisterModalAtom);
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -57,6 +61,13 @@ export function LoginModal() {
     setSubmitError(null);
     setShowPassword(false);
     reset();
+  }
+
+  function switchToRegister() {
+    setSubmitError(null);
+    setShowPassword(false);
+    reset();
+    openRegister();
   }
 
   async function onSubmit(values: LoginFormValues) {
@@ -131,7 +142,14 @@ export function LoginModal() {
         </Button>
 
         <div className={s.footer}>
-          Nemáš účet? Registrace připravujeme.
+          Nemáš účet?{' '}
+          <button
+            type="button"
+            className={s.crossLink}
+            onClick={switchToRegister}
+          >
+            Zaregistruj se
+          </button>
         </div>
       </form>
     </Modal>
