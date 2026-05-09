@@ -72,6 +72,29 @@
   flex-direction: column;
   gap: 6px;
   z-index: var(--z-dropdown);
+
+  /* Themed scrollbar — Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+/* Themed scrollbar — Chromium / WebKit */
+.popover::-webkit-scrollbar {
+  width: 8px;
+}
+.popover::-webkit-scrollbar-track {
+  background: transparent;
+}
+.popover::-webkit-scrollbar-thumb {
+  background: var(--accent-soft, var(--border));
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.popover::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+  background-clip: padding-box;
+  border: 2px solid transparent;
 }
 
 .option {

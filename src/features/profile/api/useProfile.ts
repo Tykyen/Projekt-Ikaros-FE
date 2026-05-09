@@ -1,7 +1,7 @@
 ﻿import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getDefaultStore } from 'jotai';
 import { toast } from 'sonner';
-import { api } from '@/shared/api/client';
+import { api, parseApiError } from '@/shared/api/client';
 import { currentUserAtom } from '@/shared/store/authStore';
 import type {
   ChangePasswordRequest,
@@ -57,6 +57,7 @@ export function useUploadAvatar() {
       getDefaultStore().set(currentUserAtom, data);
       toast.success('Avatar aktualizován');
     },
+    onError: (err) => toast.error(`Nahrání selhalo: ${parseApiError(err)}`),
   });
 }
 
@@ -69,6 +70,7 @@ export function useDeleteAvatar() {
       getDefaultStore().set(currentUserAtom, data);
       toast.success('Avatar odebrán');
     },
+    onError: (err) => toast.error(`Smazání selhalo: ${parseApiError(err)}`),
   });
 }
 
@@ -88,6 +90,7 @@ export function useUploadCharacterAvatar() {
       getDefaultStore().set(currentUserAtom, data);
       toast.success('Avatar postavy aktualizován');
     },
+    onError: (err) => toast.error(`Nahrání selhalo: ${parseApiError(err)}`),
   });
 }
 
@@ -100,5 +103,6 @@ export function useDeleteCharacterAvatar() {
       getDefaultStore().set(currentUserAtom, data);
       toast.success('Avatar postavy odebrán');
     },
+    onError: (err) => toast.error(`Smazání selhalo: ${parseApiError(err)}`),
   });
 }

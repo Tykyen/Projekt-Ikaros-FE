@@ -1,4 +1,4 @@
-﻿import { useRef, useState, type DragEvent } from 'react';
+﻿import { useRef, useState, useEffect, type DragEvent } from 'react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui';
@@ -18,9 +18,12 @@ interface Props {
 }
 
 /**
- * AvatarUploader — drag&drop + file input + preview + upload tlačítko.
- * Klient-side validace typu (image/*) a velikosti (≤ 5 MB).
- * Při selhání volá toast.error; volající mutation řeší další onSuccess/onError.
+ * AvatarUploader — drag&drop + file input s auto-uploadem.
+ * Vybereš (nebo přetáhneš) soubor → klient-side validace (image/*, ≤ 5 MB)
+ * → okamžitě se nahrává. Žádné explicitní „Nahrát" tlačítko, jednoduchý flow.
+ *
+ * Preview se zobrazí lokálně okamžitě; po dokončení uploadu se přepne
+ * na finální URL z BE response (přes prop `currentUrl` z parent re-renderu).
  */
 export function AvatarUploader({
   currentUrl,
@@ -33,12 +36,18 @@ export function AvatarUploader({
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
   const previewSrc = previewUrl ?? currentUrl ?? fallbackUrl;
 
-  function handleFiles(files: FileList | null) {
+  // Cleanup object URLs při unmountu (memory leak prevention)
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     const file = files[0];
     if (!file.type.startsWith('image/')) {
@@ -49,24 +58,25 @@ export function AvatarUploader({
       toast.error('Soubor je příliš velký (max 5 MB)');
       return;
     }
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(URL.createObjectURL(file));
-    setPendingFile(file);
-  }
 
-  async function commit() {
-    if (!pendingFile) return;
-    await onUpload(pendingFile);
+    // Lokální preview hned, ať uživatel vidí, že se akce začala
     if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(null);
-    setPendingFile(null);
-  }
+    const newPreview = URL.createObjectURL(file);
+    setPreviewUrl(newPreview);
 
-  function cancel() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(null);
-    setPendingFile(null);
-    if (inputRef.current) inputRef.current.value = '';
+    // Auto-upload — žádné další kliknutí potřeba
+    try {
+      await onUpload(file);
+      // BE vrátil novou avatarUrl → parent re-renderne s `currentUrl` aktuální,
+      // smažeme local preview ať se vykreslí finální asset z BE.
+      URL.revokeObjectURL(newPreview);
+      setPreviewUrl(null);
+    } catch {
+      // onUpload errorhandler v useProfile už ukázal toast.
+      // Preview si necháme — uživatel vidí, co zkusil nahrát; může vybrat jiný soubor.
+    } finally {
+      if (inputRef.current) inputRef.current.value = '';
+    }
   }
 
   function onDragOver(e: DragEvent<HTMLDivElement>) {
@@ -79,7 +89,7 @@ export function AvatarUploader({
   function onDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
     setDragOver(false);
-    handleFiles(e.dataTransfer.files);
+    void handleFiles(e.dataTransfer.files);
   }
 
   return (
@@ -92,6 +102,7 @@ export function AvatarUploader({
       >
         <img src={previewSrc} alt={label} className={styles.preview} />
         {dragOver && <div className={styles.dropOverlay}>Pusť obrázek</div>}
+        {isUploading && <div className={styles.dropOverlay}>Nahrávám…</div>}
       </div>
 
       <input
@@ -99,48 +110,31 @@ export function AvatarUploader({
         type="file"
         accept="image/*"
         className={styles.fileInput}
-        onChange={(e) => handleFiles(e.target.files)}
+        onChange={(e) => void handleFiles(e.target.files)}
         aria-label={`Vybrat ${label.toLowerCase()}`}
       />
 
       <div className={styles.controls}>
-        {pendingFile ? (
-          <>
-            <Button
-              type="button"
-              variant="primary"
-              onClick={commit}
-              disabled={isUploading}
-            >
-              {isUploading ? 'Nahrávám…' : 'Nahrát'}
-            </Button>
-            <Button type="button" variant="secondary" onClick={cancel}>
-              Zrušit
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => inputRef.current?.click()}
-            >
-              Vybrat soubor
-            </Button>
-            {onDelete && currentUrl && (
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => onDelete()}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Mažu…' : 'Odebrat'}
-              </Button>
-            )}
-          </>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => inputRef.current?.click()}
+          disabled={isUploading}
+        >
+          {isUploading ? 'Nahrávám…' : 'Vybrat soubor'}
+        </Button>
+        {onDelete && currentUrl && (
+          <Button
+            type="button"
+            variant="danger"
+            onClick={() => onDelete()}
+            disabled={isDeleting || isUploading}
+          >
+            {isDeleting ? 'Mažu…' : 'Odebrat'}
+          </Button>
         )}
       </div>
-      <p className={styles.hint}>JPG / PNG / WebP / GIF. Max 5 MB.</p>
+      <p className={styles.hint}>JPG / PNG / WebP / GIF. Max 5 MB. Nahrání proběhne okamžitě po výběru.</p>
     </div>
   );
 }

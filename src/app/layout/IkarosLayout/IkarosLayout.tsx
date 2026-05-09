@@ -56,11 +56,11 @@ type NavItemDef = {
 
 const PRIMARY_NAV: NavItemDef[] = [
   { label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
-  { label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
+  { label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
   { label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} /> },
   { label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} /> },
   { label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} /> },
-  { label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
+  { label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
 ];
 
 const CHAT_ROOMS: { key: string; label: string; to: string }[] = [
@@ -163,9 +163,31 @@ function SidebarContent({
 function RightPanel() {
   const currentUser = useAtomValue(currentUserAtom);
   const { data: worlds } = useMyWorlds();
+  const isAdmin =
+    currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
 
   return (
     <div className={s.rightPanelInner}>
+      <div className={s.section}>
+        <SectionTitle>Administrace</SectionTitle>
+        <div className={s.themeSwitcherSlot}>
+          <ThemeSwitcher />
+        </div>
+        <div className={s.navList}>
+          {isAdmin ? (
+            <Link to="/ikaros/uzivatele" className={s.navItem}>
+              <span className={s.navItemIcon}><Users size={18} /></span>
+              <span className={s.navItemLabel}>Uživatelé</span>
+            </Link>
+          ) : (
+            <Link to="/ikaros/profil#pratele" className={s.navItem}>
+              <span className={s.navItemIcon}><Users size={18} /></span>
+              <span className={s.navItemLabel}>Přátelé</span>
+            </Link>
+          )}
+        </div>
+      </div>
+
       <div className={s.section}>
         <div className={s.rightSectionHeader}>
           <SectionTitle>Moje světy</SectionTitle>
@@ -292,20 +314,12 @@ function HeaderLoggedIn() {
 
   if (!user) return null;
 
-  const displayName = user.displayName ?? user.username;
-  const isAdmin =
-    user.role === UserRole.Superadmin || user.role === UserRole.Admin;
-
   function handleLogout() {
     const cancel = startLogout();
     toast('Odhlášeno', {
       duration: 5000,
       action: { label: 'Vrátit', onClick: cancel },
     });
-  }
-
-  function notReady() {
-    toast.info('Připravujeme.');
   }
 
   return (
@@ -317,23 +331,6 @@ function HeaderLoggedIn() {
         badge={totalUnread}
       />
 
-      {isAdmin ? (
-        <HeaderButton
-          to="/ikaros/uzivatele"
-          icon={<Users size={16} />}
-          label="Uživatelé"
-        />
-      ) : (
-        <HeaderButton
-          icon={<Users size={16} />}
-          label="Přátelé"
-          onClick={notReady}
-          title="Připravujeme"
-        />
-      )}
-
-      <ThemeSwitcher />
-
       <Link to="/ikaros/profil" className={s.headerBtn}>
         <UserAvatar
           src={user.avatarUrl}
@@ -342,7 +339,7 @@ function HeaderLoggedIn() {
           alt={user.username}
           className={s.avatar}
         />
-        <span className={s.headerBtnLabel}>{displayName}</span>
+        <span className={s.headerBtnLabel}>{user.username}</span>
       </Link>
 
       <button type="button" className={s.headerBtn} onClick={handleLogout}>

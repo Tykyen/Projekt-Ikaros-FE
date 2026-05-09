@@ -102,6 +102,27 @@ export const zlatyStandardTheme: Theme = {
 
     // ── Welcome card medallion ──
     '--asset-andel-medallion': `url('${decor}/andel-medallion.webp')`,
+
+    // ── Cosmic Royal Portal upgrade — decor assets ──
+    '--asset-page-frame-tl':    `url('${decor}/page-frame-corner-tl.webp')`,
+    '--asset-page-frame-tr':    `url('${decor}/page-frame-corner-tr.webp')`,
+    '--asset-page-frame-bl':    `url('${decor}/page-frame-corner-bl.webp')`,
+    '--asset-page-frame-br':    `url('${decor}/page-frame-corner-br.webp')`,
+    '--asset-nav-end-cap-l':    `url('${decor}/nav-end-cap-l.webp')`,
+    '--asset-nav-end-cap-r':    `url('${decor}/nav-end-cap-r.webp')`,
+
+    // Lancet-bezel illuminated nav ikony — nahrazují lucide-react SVG
+    '--asset-icon-home':            `url('${decor}/home.webp')`,
+    '--asset-icon-plus-star':       `url('${decor}/plus-star.webp')`,
+    '--asset-icon-scroll':          `url('${decor}/scroll.webp')`,
+    '--asset-icon-book':            `url('${decor}/book.webp')`,
+    '--asset-icon-portrait-frame':  `url('${decor}/portraite-frame.webp')`,
+    '--asset-icon-compass':         `url('${decor}/compass.webp')`,
+    '--asset-icon-beer':            `url('${decor}/beer.webp')`,
+
+    // Panel double-stroke inner border (pro inset zlatý druhý rám)
+    '--panel-inner-border':    'rgba(212, 160, 23, 0.32)',
+    '--panel-inner-inset':     '7px',
   },
   fonts: {
     logo: 'Cinzel Decorative',

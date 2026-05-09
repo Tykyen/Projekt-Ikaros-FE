@@ -6,6 +6,7 @@ import { ProfileHeader } from '../components/ProfileHeader';
 import { BioSection } from '../components/BioSection';
 import { CharacterSection } from '../components/CharacterSection';
 import { WorldsSection } from '../components/WorldsSection';
+import { FriendsPlaceholder } from '../components/FriendsPlaceholder';
 import { CommunityPlaceholders } from '../components/CommunityPlaceholders';
 import { AppearanceSection } from '../components/AppearanceSection';
 import { SecuritySection } from '../components/SecuritySection';
@@ -58,6 +59,8 @@ export default function ProfilePage() {
           characterBio={user.characterBio}
           characterAvatarUrl={user.characterAvatarUrl}
         />
+
+        <FriendsPlaceholder />
 
         <WorldsSection />
 

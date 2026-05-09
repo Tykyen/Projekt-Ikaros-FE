@@ -219,6 +219,26 @@
   gap: 6px;
 }
 
+/* ── Theme switcher v Administraci pravého sidebaru — full-width varianta ── */
+.themeSwitcherSlot {
+  width: 100%;
+}
+.themeSwitcherSlot > div {
+  display: block;
+  width: 100%;
+}
+.themeSwitcherSlot button[aria-haspopup] {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.themeSwitcherSlot ul[role="listbox"] {
+  right: auto;
+  left: 0;
+  width: 100%;
+  min-width: 240px;
+}
+
 /* ── Sidebar nav items — 3D vystouplá tlačítka ── */
 .navItem {
   composes: btn3d from '../../../themes/_shared/btn3d.module.css';
