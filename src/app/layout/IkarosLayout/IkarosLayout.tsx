@@ -48,6 +48,7 @@ function PanelCorners() {
 }
 
 type NavItemDef = {
+  navKey: string;
   label: string;
   to: string;
   icon: ReactNode;
@@ -55,12 +56,12 @@ type NavItemDef = {
 };
 
 const PRIMARY_NAV: NavItemDef[] = [
-  { label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
-  { label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
-  { label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} /> },
-  { label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} /> },
-  { label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} /> },
-  { label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
+  { navKey: 'uvodnik',       label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
+  { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
+  { navKey: 'diskuze',       label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} /> },
+  { navKey: 'clanky',        label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} /> },
+  { navKey: 'galerie',       label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} /> },
+  { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
 ];
 
 const CHAT_ROOMS: { key: string; label: string; to: string }[] = [
@@ -74,11 +75,12 @@ function SectionTitle({ children }: { children: ReactNode }) {
   return <div className={s.sectionTitle}>{children}</div>;
 }
 
-function NavItem({ to, end, icon, label, onClick }: NavItemDef & { onClick?: () => void }) {
+function NavItem({ navKey, to, end, icon, label, onClick }: NavItemDef & { onClick?: () => void }) {
   return (
     <NavLink
       to={to}
       end={end}
+      data-nav-key={navKey}
       onClick={onClick}
       className={({ isActive }) => clsx(s.navItem, isActive && s.navItemActive)}
     >
@@ -145,6 +147,7 @@ function SidebarContent({
             <NavLink
               key={room.key}
               to={room.to}
+              data-nav-key={room.key}
               onClick={onNav}
               className={({ isActive }) => clsx(s.navItem, isActive && s.navItemActive)}
             >

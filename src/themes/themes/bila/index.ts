@@ -43,12 +43,15 @@ export const bilaTheme: Theme = {
     '--theme-accent-magenta':  '#a890c8',
     '--theme-accent-gold':     '#c7b07a',  // warm gold detail (line accents)
 
-    // Glow — světlejší (intenzita 0.20-0.32 vs 0.42 dark themes)
-    '--theme-glow-cyan':         'rgba(120, 180, 210, 0.32)',
-    '--theme-glow-cyan-strong':  'rgba(120, 180, 210, 0.50)',
+    // Glow — bumpnuto pro light mode (audit: 0.32 fade na ivory)
+    '--theme-glow-cyan':         'rgba(120, 180, 210, 0.40)',
+    '--theme-glow-cyan-strong':  'rgba(120, 180, 210, 0.55)',
     '--theme-glow-magenta':      'rgba(168, 144, 200, 0.20)',
-    '--theme-glow-gold':         'rgba(180, 155, 105, 0.22)',
+    '--theme-glow-gold':         'rgba(180, 155, 105, 0.28)',
     '--theme-shadow':            'rgba(96, 76, 42, 0.16)',  // warm light shadow
+
+    // Ornament drop-shadow (audit: žádný gold halo, místo něj tmavší shade pro depth)
+    '--theme-ornament-shadow':   'rgba(168, 144, 88, 0.20)',  // #a89058 alpha 0.20
 
     // Nav interactive — světlo modrý gradient
     '--theme-nav-hover-bg':   'linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(236,246,250,0.75) 100%)',
@@ -109,6 +112,21 @@ export const bilaTheme: Theme = {
 
     // ── Welcome andel medallion (0.75:1 portrétový PNG) ──
     '--asset-andel-medallion': `url('${decor}/andel-medallion.webp')`,
+
+    // ── Ornament assety (spec 1.0g — heraldic upgrade) ──
+    '--asset-corner-ornament':    `url('${decor}/corner-ornament.webp')`,
+    '--asset-page-frame-tl':      `url('${decor}/page-frame-corner-tl.webp')`,
+    '--asset-nav-end-cap-l':      `url('${decor}/nav-end-cap-l.webp')`,
+    '--asset-nav-end-cap-r':      `url('${decor}/nav-end-cap-r.webp')`,
+
+    // ── Heraldic nav ikony (Level 3 — nahrazují lucide-react SVG) ──
+    '--asset-icon-home':            `url('${decor}/home.webp')`,
+    '--asset-icon-plus-star':       `url('${decor}/plus-star.webp')`,
+    '--asset-icon-scroll':          `url('${decor}/scroll.webp')`,
+    '--asset-icon-book':            `url('${decor}/book.webp')`,
+    '--asset-icon-portrait-frame':  `url('${decor}/portraite-frame.webp')`,
+    '--asset-icon-compass':         `url('${decor}/compass.webp')`,
+    '--asset-icon-beer':            `url('${decor}/beer.webp')`,
   },
   fonts: {
     logo: 'Cinzel',

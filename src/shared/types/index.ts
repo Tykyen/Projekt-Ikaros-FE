@@ -10,7 +10,8 @@ export enum UserRole {
   Ikarus = 9,
   SpravceBohu = 10,
   SpravceGalerie = 11,
-  SprávceDisukzi = 12,
+  SpravceDiskuzi = 12,
+  SpravceClanku = 13,
 }
 
 export type DefaultAvatarType = 'male' | 'female' | 'being';

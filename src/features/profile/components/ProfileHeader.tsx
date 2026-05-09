@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Badge, Button, Input, UserAvatar } from '@/shared/ui';
+import { Button, Input, RoleStar, UserAvatar } from '@/shared/ui';
 import { AvatarUploader } from './AvatarUploader';
 import {
   useUpdateProfile,
@@ -9,7 +9,7 @@ import {
   useDeleteAvatar,
 } from '@/features/profile/api/useProfile';
 import { headerSchema, type HeaderForm } from '../lib/profileSchemas';
-import { UserRole, type User } from '@/shared/types';
+import { type User } from '@/shared/types';
 import styles from './ProfileHeader.module.css';
 
 const DATE_FMT = new Intl.DateTimeFormat('cs-CZ', {
@@ -105,12 +105,7 @@ export function ProfileHeader({ user }: Props) {
         <div className={styles.fields}>
           <div className={styles.titleRow}>
             <h1 className={styles.username}>OSOBNÍ KARTA</h1>
-            {user.role === UserRole.Superadmin && (
-              <Badge variant="warning">SUPERADMIN</Badge>
-            )}
-            {user.role === UserRole.Admin && (
-              <Badge variant="accent">ADMIN</Badge>
-            )}
+            <RoleStar role={user.role} size="md" />
             {!editing && (
               <Button
                 type="button"

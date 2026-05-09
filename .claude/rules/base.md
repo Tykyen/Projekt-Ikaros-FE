@@ -5,4 +5,4 @@ Když narazíš na problém nebo nesrovnalost v kódu, okamžitě ho prokomuniku
 Buď kreativní — aktivně přemýšlej nad tím, co by šlo udělat lépe, navrhnout jinak nebo rozšířit. Vlastní nápady vždy nejdříve prodiskutuj s uživatelem, nikdy je neimplementuj bez souhlasu.
 Když najdeš chybu, dluh, riziko nebo nesrovnalost, kterou hned neopravuješ, použij skill `dluh`.
 Před jakoukoli implementací komponenty nebo featury bezpodmínečně aktivuj skill `spec-driven-development`.
-Pokud to půjde využívej superpower:brainstorming a pokud superpower:brainstorming zahrnuje grafickou úpravu, využij i skill `frontend-design`.
+Pokud to půjde, využívej skill `superpowers:brainstorming`. Když brainstorming zahrnuje grafickou úpravu, přidej i skill `frontend-design`.

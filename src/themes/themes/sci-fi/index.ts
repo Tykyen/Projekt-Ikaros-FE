@@ -93,16 +93,19 @@ export const sciFiTheme: Theme = {
     '--font-script':      '"Rajdhani", system-ui, sans-serif',
 
     // ── Layout chrome ──
-    '--header-h':         '70px',
+    // Slim header — kompaktní HUD lišta (ne dominantní). Logo se v decorations.css
+    // renderuje s mix-blend-mode pro odstranění černého rectangulárního pozadí
+    // asset webp (= "průhledné logo").
+    '--header-h':         '56px',
     '--header-bg':        '#020711',
     '--frame-pad-y':      '40px',
     '--frame-pad-x':      '18px',
     '--sidebar-w':        '280px',
 
-    // ── Logo asset (aspect 4:1 — thin wide banner) ──
+    // ── Logo asset (aspect 4:1 — thin wide banner s vepsaným PROJEKT IKAROS) ──
     '--asset-logo':           `url('${decor}/logo.webp')`,
-    '--asset-logo-w':         '280px',
-    '--asset-logo-w-mobile':  '210px',
+    '--asset-logo-w':         '180px',
+    '--asset-logo-w-mobile':  '150px',
     '--logo-img-display':     'block',
     '--logo-fallback-display':'none',
 
