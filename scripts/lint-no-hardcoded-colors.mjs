@@ -7,6 +7,7 @@ const ALLOW = [
   'src/themes/_shared/',          // base reset/tokens
   'src/__tests__/',               // testy
   'src/themes/__tests__/',
+  '.spec.',                       // test fixtures (mock data, default values)
 ];
 const HEX_RE = /(?<!var\(--[\w-]*?:\s*?)#[0-9a-fA-F]{3,8}\b/g;
 const RGB_RE = /\b(rgb|rgba|hsl|hsla)\s*\(/g;

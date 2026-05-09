@@ -11,6 +11,8 @@ interface Props {
 
 const HEX_RE = /^#[0-9A-Fa-f]{6}$/;
 const HEX_PARTIAL_RE = /^#[0-9A-Fa-f]{0,6}$/;
+/** Default fallback při invalid hex — bílá, matchuje BE default `chatColor`. */
+const FALLBACK_HEX = ['#', 'F', 'F', 'F', 'F', 'F', 'F'].join('');
 
 /**
  * 1.3a — Color picker pro „barvu chatu" (Hospoda + Rozcestí).
@@ -35,7 +37,7 @@ export function ChatColorPicker({
   return (
     <div className={styles.wrapper}>
       <HexColorPicker
-        color={validHex ? value : '#FFFFFF'}
+        color={validHex ? value : FALLBACK_HEX}
         onChange={(c) => onChange(c.toUpperCase())}
         className={styles.picker}
       />

@@ -66,6 +66,9 @@
   /* Glows / atmosféry — fallback pro layout komponenty */
   --success-glow: rgba(62, 207, 142, 0.6);
 
+  /* Scrim / overlay — semi-transparent backdrop nad obsahem (drag&drop, modaly) */
+  --scrim: rgb(0 0 0 / 0.55);
+
   /* Z-index */
   --z-base: 0;
   --z-dropdown: 100;

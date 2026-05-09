@@ -34,7 +34,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(0 0 0 / 0.55);
+  background: var(--scrim);
   color: var(--text-strong);
   font-weight: 600;
   font-size: 0.85rem;

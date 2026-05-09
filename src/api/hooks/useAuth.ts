@@ -10,9 +10,8 @@ import {
   loginModalOpenAtom,
   registerModalOpenAtom,
 } from '../../store/authStore';
-import { decodeJwt, isJwtValid } from '../../utils/jwt';
+import { isJwtValid } from '../../utils/jwt';
 import type {
-  AccessTokenPayload,
   AuthResponse,
   LoginRequest,
   RegisterRequest,

@@ -148,25 +148,35 @@
 
 Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role infrastruktura, admin schvalování username) → tři menší PR místo jednoho monolitu.
 
-#### - [ ] 1.3a Profil — self-edit (`/ikaros/profil`)
+#### - [x] 1.3a Profil — self-edit (`/ikaros/profil`) ✅
 
-**Spec:** `docs/arch/phase-1/spec-1.3a.md`
+**Spec:** `docs/arch/phase-1/spec-1.3a.md`, **Plan:** `docs/arch/phase-1/plan-1.3a.md`
 
-- [ ] Hydratace `GET /users/me` (vyřešit D-005) — rozšíření o `displayName`, `city`, `bio`, `avatarUrl`, `defaultAvatarType`, `characterName`, `characterBio`, `characterAvatarUrl`, `chatColor`, `themeId`, `emailVerified`, `lastLoginAt`, `createdAt`
-- [ ] Route `/ikaros/profil` (full-page, taby/sekce uvnitř `IkarosLayout`)
-- [ ] **Header karta** — avatar, username, displayName, město, účet založen, poslední přihlášení, barva chatu (swatch), globální motiv
-- [ ] **Sekce NĚCO O MNĚ** — bio (1000 znaků, plain text)
-- [ ] **Sekce POSTAVA V ROZCESTÍ** — jméno postavy, bio postavy (1000 znaků), avatar postavy (samostatný slot)
-- [ ] **Sekce MOJE SVĚTY** — read-only readout (PJ badge, klik → svět)
-- [ ] **Placeholder sekce** Moje diskuze / Moje články / Moje galerie (prázdné readouts pro 3.x)
-- [ ] Edit pole: displayName, město, bio, postava (jméno + bio + avatar), barva chatu (color picker `react-colorful`, default `#FFFFFF`), theme
-- [ ] Email v header kartě **read-only** (změna přijde v 1.7 s verifikací)
-- [ ] **Sekce Bezpečnost** — změna hesla (vyžaduje staré heslo, revokuje rodinu refresh tokenů)
-- [ ] **Default avatary** muž (default) / žena / bytost — ikonky dodá PJ, FE optimalizuje
-- [ ] **BE `MediaUploadService`** — sharp → WebP konverze pro všechny image uploady (crosscutting BE feature)
-- [ ] BE endpointy: `PATCH /users/me`, `PATCH /users/me/password`, `POST /users/me/avatar`, `POST /users/me/character/avatar`
-- [ ] Username change UI **disabled** v 1.3a (přijde v 1.3b)
-- [ ] Smazání účtu UI **disabled** v 1.3a (přijde v 1.3c)
+- [x] Hydratace `GET /users/me` (vyřešen D-005) — `useMyProfile` hook + `useAuthBootstrap` druhá fáze; rozšířeno o `displayName`, `city`, `bio`, `avatarUrl`, `defaultAvatarType`, `characterName`, `characterBio`, `characterAvatarUrl`, `chatColor`, `themeId`, `emailVerified`, `lastLoginAt`, `createdAt`
+- [x] Route `/ikaros/profil` (lazy, `requireAuth` loader, pod `IkarosLayout`)
+- [x] **Header karta** (`ProfileHeader`) — avatar, username, displayName, město, účet založen, poslední přihlášení, barva chatu (swatch), globální motiv
+- [x] **Sekce NĚCO O MNĚ** (`BioSection`) — bio textarea, max 1000, counter
+- [x] **Sekce POSTAVA V ROZCESTÍ** (`CharacterSection`) — jméno + bio + avatar (samostatný `<AvatarUploader scope="character">`)
+- [x] **Sekce MOJE SVĚTY** (`WorldsSection`) — read-only readout
+- [x] **Placeholder sekce** (`CommunityPlaceholders`) Moje diskuze / Moje články / Moje galerie
+- [x] Edit pole přes `<EditCard>` (Upravit / Uložit / Zrušit) — displayName, město, bio, postava, barva chatu (`react-colorful` `<HexColorPicker>` + sync hex input, default `#FFFFFF`), theme
+- [x] Email v header kartě **read-only** + tooltip "Změna emailu bude dostupná v 1.7"
+- [x] **Sekce Bezpečnost** (`SecuritySection`) — změna hesla (currentPassword + newPassword, vyžaduje staré heslo, BE revokuje rodinu refresh tokenů); username field disabled + tooltip
+- [x] **Sekce Účet** (`AccountSection`) — smazání účtu disabled + tooltip "Připravujeme (1.3c)"
+- [x] **Default avatary** muž / žena / bytost — `assets-source/default-avatars/{male,female,being}.png` → `scripts/optimize-default-avatars.mjs` → `public/defaults/avatars/{type}{,-sm}.webp` (sharp 512+256, WebP q=85)
+- [x] **`UserAvatar`** komponenta — fallback na `defaultAvatarType` + onError fallback
+- [x] **`AvatarUploader`** komponenta — drag&drop + file input, client-side validace (typ image/*, ≤5 MB), preview, progress
+- [x] BE Cloudinary upload pipeline (reuse existující `UploadService`, `publicId: 'main'` strategie přepíše)
+- [x] BE endpointy: `GET /users/me` (rozšířený shape + worldsCount agregát), `PATCH /users/me`, `PATCH /users/me/password`, `POST /users/me/avatar`, `POST /users/me/character/avatar`, `DELETE` varianty
+- [x] BE: `lastLoginAt` updatovaný v `auth.service.login()` a `register()`
+- [x] **IkarosLayout header** — dynamic avatar přes `<UserAvatar>` (live update po profile change)
+- [x] **Theme write-back** — `useThemeSync` posílá `themeId` do `PATCH /users/me` (vyřešen D-003 + D-004)
+- [x] Username change UI **disabled** v 1.3a (přijde v 1.3b)
+- [x] Smazání účtu UI **disabled** v 1.3a (přijde v 1.3c)
+- [x] Tests: `profileSchemas.spec.ts`, `UserAvatar.spec.tsx` + 140 FE testů celkem prochází
+- [x] `lint`, `lint:colors`, `test:run`, `build` ✅
+
+**Tracked dluhy z 1.3a:** D-019 (legacy User polí cleanup), D-020 (JWT/me payload dedup).
 
 #### - [ ] 1.3b Username change + Admin role infrastruktura
 
