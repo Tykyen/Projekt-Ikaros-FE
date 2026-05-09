@@ -1,13 +1,8 @@
 ﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Badge,
-  Button,
-  Input,
-  UserAvatar,
-  AvatarUploader,
-} from '@/components/ui';
+import { Badge, Button, Input, UserAvatar } from '@/shared/ui';
+import { AvatarUploader } from './AvatarUploader';
 import {
   useUpdateProfile,
   useUploadAvatar,

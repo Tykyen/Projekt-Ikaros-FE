@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useAtom } from 'jotai';
-import { ChatColorPicker, EditCard } from '@/components/ui';
+import { ChatColorPicker } from './ChatColorPicker';
+import { EditCard } from './EditCard';
 import { ThemeSwitcher } from '@/themes/ThemeSwitcher';
 import { themeAtom } from '@/themes/state';
 import { useUpdateProfile } from '@/features/profile/api/useProfile';

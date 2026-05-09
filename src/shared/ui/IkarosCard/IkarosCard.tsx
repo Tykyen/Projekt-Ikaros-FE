@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
+﻿import type { ReactNode } from 'react';
 import clsx from 'clsx';
-import { CornerOrnament } from '@/components/layout/PanelFrame/CornerOrnament';
+import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import s from './IkarosCard.module.css';
 
 type Variant = 'welcome' | 'news';

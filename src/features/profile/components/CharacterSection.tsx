@@ -1,12 +1,9 @@
 ﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  EditCard,
-  Input,
-  AvatarUploader,
-  UserAvatar,
-} from '@/components/ui';
+import { Input, UserAvatar } from '@/shared/ui';
+import { EditCard } from './EditCard';
+import { AvatarUploader } from './AvatarUploader';
 import {
   useUpdateProfile,
   useUploadCharacterAvatar,

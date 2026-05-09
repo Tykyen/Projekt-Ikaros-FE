@@ -6,7 +6,7 @@ import { Toaster } from "sonner";
 import { router } from "./router";
 import { GlobalErrorBoundary } from "@/shared/ui/GlobalErrorBoundary";
 import { AuthBootstrap } from '@/features/auth/components';
-import { ThemeProvider } from "./themes/ThemeProvider";
+import { ThemeProvider } from "@/themes/ThemeProvider";
 import "./index.css";
 
 const queryClient = new QueryClient({

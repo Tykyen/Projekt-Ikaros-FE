@@ -1,13 +1,13 @@
 ﻿/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { createBrowserRouter, redirect, type LoaderFunctionArgs } from 'react-router-dom';
-import { IkarosLayout, WorldLayout } from './components/layout';
-import { Spinner } from './components/ui';
+import { IkarosLayout, WorldLayout } from './layout';
+import { Spinner } from '@/shared/ui';
 import { RoleGuard } from '@/features/admin/components/RoleGuard';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
 import { UserRole } from '@/shared/types';
-import NotFoundPage from './pages/errors/NotFoundPage';
-import ErrorPage from './pages/errors/ErrorPage';
+import NotFoundPage from '@/pages/errors/NotFoundPage';
+import ErrorPage from '@/pages/errors/ErrorPage';
 
 // ── Lazy pages — Ikaros ───────────────────────────────────────────────────
 const DashboardPage    = lazy(() => import('@/features/ikaros/pages/DashboardPage'));

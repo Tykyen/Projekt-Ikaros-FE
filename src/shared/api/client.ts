@@ -1,6 +1,6 @@
 ﻿import axios, { type AxiosError } from 'axios';
 import { getDefaultStore } from 'jotai';
-import { router } from '@/router';
+import { router } from '@/app/router';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
 import { accessTokenAtom, refreshTokenAtom } from '@/shared/store/authStore';
 import type { ApiError, RefreshResponse } from '@/shared/types';

@@ -2,7 +2,8 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
-import { Button, EditCard, Input } from '@/components/ui';
+import { Button, Input } from '@/shared/ui';
+import { EditCard } from './EditCard';
 import { useChangePassword } from '@/features/profile/api/useProfile';
 import { passwordSchema, type PasswordForm } from '../lib/profileSchemas';
 import styles from './ProfileSections.module.css';

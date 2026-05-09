@@ -4,5 +4,5 @@
    Theme tokens (barvy) přidává ThemeProvider runtime.
 ──────────────────────────────────────────────────────────── */
 
-@import './themes/_shared/tokens.css';
-@import './themes/_shared/reset.css';
+@import '../themes/_shared/tokens.css';
+@import '../themes/_shared/reset.css';

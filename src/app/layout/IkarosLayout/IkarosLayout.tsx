@@ -32,7 +32,7 @@ import { getTheme } from '../../../themes/registry';
 import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
 import { LoginModal } from '@/features/auth/components/LoginModal';
 import { RegisterModal } from '@/features/auth/components/RegisterModal';
-import { CornerOrnament } from '../PanelFrame/CornerOrnament';
+import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import { UserAvatar } from '@/shared/ui';
 import { UserRole, type World } from '@/shared/types';
 

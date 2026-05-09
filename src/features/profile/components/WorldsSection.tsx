@@ -1,6 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import { useMyWorlds } from '@/features/world/api/useWorlds';
-import { Spinner, Badge } from '@/components/ui';
+import { Spinner, Badge } from '@/shared/ui';
 import styles from './ProfileSections.module.css';
 
 /**
