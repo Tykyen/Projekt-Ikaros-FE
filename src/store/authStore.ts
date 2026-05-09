@@ -1,6 +1,6 @@
-import { atom } from 'jotai';
+﻿import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { User } from '../types';
+import type { User } from '@/shared/types';
 
 export const accessTokenAtom = atomWithStorage<string | null>('ikaros.jwt', null);
 export const refreshTokenAtom = atomWithStorage<string | null>('ikaros.rt', null);

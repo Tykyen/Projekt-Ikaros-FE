@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
-import { api } from '../client';
+import { api } from '@/shared/api/client';
 import {
   accessTokenAtom,
   refreshTokenAtom,
@@ -10,13 +10,13 @@ import {
   loginModalOpenAtom,
   registerModalOpenAtom,
 } from '../../store/authStore';
-import { isJwtValid } from '../../utils/jwt';
+import { isJwtValid } from '@/shared/lib/jwt';
 import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
   User,
-} from '../../types';
+} from '@/shared/types';
 
 const LOGOUT_UNDO_MS = 5000;
 

@@ -1,13 +1,13 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAtom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { Modal } from '../ui/Modal/Modal';
-import { Input } from '../ui/Input/Input';
-import { Button } from '../ui/Button/Button';
+import { Modal } from '@/shared/ui';
+import { Input } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
 import { AvailabilityIcon, type AvailabilityStatus } from './AvailabilityIcon';
 import { registerSchema, type RegisterFormValues } from './registerSchema';
@@ -17,7 +17,7 @@ import {
   registerModalOpenAtom,
   openLoginModalAtom,
 } from '../../store/authStore';
-import { parseApiErrorCode } from '../../api/client';
+import { parseApiErrorCode } from '@/shared/api/client';
 import { consumeLoginIntent } from '../../auth/loginIntent';
 import s from './RegisterModal.module.css';
 

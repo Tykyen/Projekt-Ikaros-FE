@@ -1,5 +1,5 @@
-import { type ReactNode } from 'react';
-import { Button } from '../Button/Button';
+﻿import { type ReactNode } from 'react';
+import { Button } from '@/shared/ui';
 import styles from './EditCard.module.css';
 
 interface Props {

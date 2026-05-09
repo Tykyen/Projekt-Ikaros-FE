@@ -1,9 +1,9 @@
-import axios, { type AxiosError } from 'axios';
+﻿import axios, { type AxiosError } from 'axios';
 import { getDefaultStore } from 'jotai';
-import { router } from '../router';
-import { saveLoginIntent } from '../auth/loginIntent';
-import { accessTokenAtom, refreshTokenAtom } from '../store/authStore';
-import type { ApiError, RefreshResponse } from '../types';
+import { router } from '@/router';
+import { saveLoginIntent } from '@/auth/loginIntent';
+import { accessTokenAtom, refreshTokenAtom } from '@/store/authStore';
+import type { ApiError, RefreshResponse } from '@/shared/types';
 
 const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 

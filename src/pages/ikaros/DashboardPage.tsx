@@ -7,7 +7,7 @@ import {
   loginModalOpenAtom,
   registerModalOpenAtom,
 } from '../../store/authStore';
-import { IkarosCard } from '../../components/ui/IkarosCard/IkarosCard';
+import { IkarosCard } from '@/shared/ui';
 import s from './DashboardPage.module.css';
 
 export default function DashboardPage() {

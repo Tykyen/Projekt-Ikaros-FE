@@ -1,13 +1,13 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+﻿import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getDefaultStore } from 'jotai';
 import { toast } from 'sonner';
-import { api } from '../client';
+import { api } from '@/shared/api/client';
 import { currentUserAtom } from '../../store/authStore';
 import type {
   ChangePasswordRequest,
   UpdateUserRequest,
   User,
-} from '../../types';
+} from '@/shared/types';
 
 /**
  * 1.3a — Update profilu. PATCH /users/me, response = updated User.

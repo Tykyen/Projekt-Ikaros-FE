@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../client';
-import { useDebouncedValue } from '../../utils/useDebouncedValue';
-import type { AvailabilityResponse } from '../../types';
+﻿import { useQuery } from '@tanstack/react-query';
+import { api } from '@/shared/api/client';
+import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
+import type { AvailabilityResponse } from '@/shared/types';
 
 const DEBOUNCE_MS = 400;
 

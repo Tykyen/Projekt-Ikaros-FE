@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+﻿import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { getDefaultStore } from 'jotai';
@@ -12,10 +12,10 @@ import {
   loginModalOpenAtom,
   registerModalOpenAtom,
 } from '../../store/authStore';
-import { api } from '../client';
-import { UserRole } from '../../types';
+import { api } from '@/shared/api/client';
+import { UserRole } from '@/shared/types';
 
-vi.mock('../client', () => ({
+vi.mock('@/shared/api/client', () => ({
   api: {
     post: vi.fn(),
   },

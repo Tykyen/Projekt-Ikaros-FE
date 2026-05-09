@@ -1,5 +1,5 @@
-import { createContext, useContext } from 'react';
-import type { World, WorldRole } from '../types';
+﻿import { createContext, useContext } from 'react';
+import type { World, WorldRole } from '@/shared/types';
 
 export interface WorldContextValue {
   worldId: string;

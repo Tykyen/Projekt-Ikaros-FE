@@ -1,11 +1,11 @@
-/* eslint-disable react-refresh/only-export-components */
+﻿/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { createBrowserRouter, redirect, type LoaderFunctionArgs } from 'react-router-dom';
 import { IkarosLayout, WorldLayout } from './components/layout';
 import { Spinner } from './components/ui';
 import { RoleGuard } from './components/guards/RoleGuard';
 import { saveLoginIntent } from './auth/loginIntent';
-import { UserRole } from './types';
+import { UserRole } from '@/shared/types';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ErrorPage from './pages/errors/ErrorPage';
 

@@ -1,7 +1,7 @@
-import { useRef, useState, type DragEvent } from 'react';
+﻿import { useRef, useState, type DragEvent } from 'react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
-import { Button } from '../Button/Button';
+import { Button } from '@/shared/ui';
 import styles from './AvatarUploader.module.css';
 
 const MAX_BYTES = 5 * 1024 * 1024;

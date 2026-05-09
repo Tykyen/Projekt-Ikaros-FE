@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { api } from '../client';
+import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '../../store/authStore';
-import type { World } from '../../types';
+import type { World } from '@/shared/types';
 
 export function useMyWorlds() {
   const token = useAtomValue(accessTokenAtom);

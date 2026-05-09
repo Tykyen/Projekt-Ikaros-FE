@@ -1,10 +1,10 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useAtom } from 'jotai';
 import { ChatColorPicker, EditCard } from '../../../components/ui';
 import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
 import { themeAtom } from '../../../themes/state';
 import { useUpdateProfile } from '../../../api/hooks/useProfile';
-import type { User } from '../../../types';
+import type { User } from '@/shared/types';
 import styles from './ProfileSections.module.css';
 
 interface Props {

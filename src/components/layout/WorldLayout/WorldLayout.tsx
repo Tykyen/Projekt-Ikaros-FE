@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+﻿import { useState, useRef, useEffect, useMemo } from 'react';
 import { NavLink, Outlet, Link, useParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
@@ -6,7 +6,7 @@ import s from './WorldLayout.module.css';
 import { WorldContext } from '../../../contexts/WorldContext';
 import { useWorld } from '../../../api/hooks/useWorlds';
 import { currentUserAtom } from '../../../store/authStore';
-import { WorldRole } from '../../../types';
+import { WorldRole } from '@/shared/types';
 import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 

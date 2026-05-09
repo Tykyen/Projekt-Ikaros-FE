@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+﻿import { useState, type ReactNode } from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { toast } from 'sonner';
@@ -33,8 +33,8 @@ import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
 import { LoginModal } from '../../auth/LoginModal';
 import { RegisterModal } from '../../auth/RegisterModal';
 import { CornerOrnament } from '../PanelFrame/CornerOrnament';
-import { UserAvatar } from '../../ui';
-import { UserRole, type World } from '../../../types';
+import { UserAvatar } from '@/shared/ui';
+import { UserRole, type World } from '@/shared/types';
 
 function PanelCorners() {
   return (

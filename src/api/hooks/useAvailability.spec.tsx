@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import { useCheckUsername, useCheckEmail } from './useAvailability';
-import { api } from '../client';
+import { api } from '@/shared/api/client';
 
-vi.mock('../client', () => ({
+vi.mock('@/shared/api/client', () => ({
   api: {
     get: vi.fn(),
   },

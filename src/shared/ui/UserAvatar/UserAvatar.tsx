@@ -1,6 +1,6 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import clsx from 'clsx';
-import type { DefaultAvatarType } from '../../../types';
+import type { DefaultAvatarType } from '@/shared/types';
 import styles from './UserAvatar.module.css';
 
 type Size = 'sm' | 'md' | 'lg' | 'xl';

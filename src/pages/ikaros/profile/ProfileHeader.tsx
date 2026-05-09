@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -14,7 +14,7 @@ import {
   useDeleteAvatar,
 } from '../../../api/hooks/useProfile';
 import { headerSchema, type HeaderForm } from './profileSchemas';
-import { UserRole, type User } from '../../../types';
+import { UserRole, type User } from '@/shared/types';
 import styles from './ProfileHeader.module.css';
 
 const DATE_FMT = new Intl.DateTimeFormat('cs-CZ', {
