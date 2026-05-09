@@ -3,44 +3,17 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
-const SRC_BASE = path.resolve('docs/themes/assets');
+// Po 1.6b: zdrojáky v assets-source/themes/, slug filenames (žádná diakritika).
+// references/ → 320×180 thumbnails (vizuální náhled tématu, jiný obrázek než bg)
+// backgrounds/ → 1920×1080 fullscreen background
+
+const SRC_BASE = path.resolve('assets-source/themes');
 const OUT_BASE = path.resolve('public/themes');
 
-// Thumbnaily čteme z root assets/ (současné mockupy s diakritikou).
-// Backgrounds čteme z assets/backgrounds/ (slugified PNGs dodané PJ).
 const TARGETS = [
-  { src: '.',           out: 'thumbnails',  width: 320,  height: 180,  quality: 82 },
+  { src: 'references',  out: 'thumbnails',  width: 320,  height: 180,  quality: 82 },
   { src: 'backgrounds', out: 'backgrounds', width: 1920, height: 1080, quality: 80 },
 ];
-
-// Mapping diakritiky / mezer / překlepů → ASCII slug (theme ID).
-const FILENAME_MAP = {
-  'Modré nebe.png': 'modre-nebe.png',
-  'Zlatý standart.png': 'zlaty-standard.png',
-  'Sci-fi.png': 'sci-fi.png',
-  'Bílá.png': 'bila.png',
-  'Vesmírná loď.png': 'vesmirna-lod.png',
-  'Příroda.png': 'priroda.png',
-  'Pergamen.png': 'pergamen.png',
-  'Nemrtví.png': 'nemrtvi.png',
-  'Čtyři živly.png': 'ctyri-zivly.png',
-  'Vesmírná bitva.png': 'vesmirna-bitva.png',
-  'Hospoda.png': 'hospoda.png',
-  'Severské runy.png': 'severske-runy.png',
-  'Indiáni.png': 'indiane.png',
-  'Afrika.png': 'africke.png',
-  'Arábie.png': 'arabsky-svet.png',
-  'Kyberpunk.png': 'kyberpunk.png',
-  'Apokalypsa.png': 'postapo.png',
-  'Temná červeň.png': 'temna-cerven.png',
-  'Magie.png': 'magie.png',
-  'Měsíc.png': 'mesic.png',
-  'Slunce.png': 'slunce.png',
-};
-
-function slugify(filename) {
-  return FILENAME_MAP[filename] ?? filename.toLowerCase();
-}
 
 async function processDir(target) {
   const { src, out, width, height, quality } = target;
@@ -54,7 +27,6 @@ async function processDir(target) {
 
   await mkdir(outDir, { recursive: true });
 
-  // withFileTypes: true → odfiltruje subdirectories (důležité pro src: '.' aby nezpracoval backgrounds/)
   const entries = await readdir(srcDir, { withFileTypes: true });
   const pngs = entries
     .filter((e) => e.isFile() && /\.png$/i.test(e.name))
@@ -62,7 +34,7 @@ async function processDir(target) {
 
   for (const file of pngs) {
     const srcPath = path.join(srcDir, file);
-    const outName = slugify(file).replace(/\.png$/i, '.webp');
+    const outName = file.toLowerCase().replace(/\.png$/i, '.webp');
     const outPath = path.join(outDir, outName);
 
     try {
