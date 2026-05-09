@@ -17,9 +17,9 @@ import {
   Beer,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
-import { useSocketInit } from '../../../api/hooks/useSocket';
-import { useMyWorlds, usePublicWorlds } from '../../../api/hooks/useWorlds';
-import { useUnreadCount } from '../../../api/hooks/useMessages';
+import { useSocketInit } from '@/features/chat/api/useSocket';
+import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
+import { useUnreadCount } from '@/features/chat/api/useMessages';
 import { useLogout } from '@/features/auth/api/useAuth';
 import {
   currentUserAtom,

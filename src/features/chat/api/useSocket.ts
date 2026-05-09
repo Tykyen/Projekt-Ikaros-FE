@@ -1,9 +1,9 @@
 ﻿import { useEffect, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
-import { getSocket, disconnectSocket } from '../socket';
+import { getSocket, disconnectSocket } from './socket';
 import { accessTokenAtom } from '@/shared/store/authStore';
-import { socketStatusAtom } from '../../store/socketStore';
+import { socketStatusAtom } from '../store/socketStore';
 import type { Socket } from 'socket.io-client';
 
 /** Řídí životní cyklus socketu podle auth stavu — volat jednou v root layoutu. */

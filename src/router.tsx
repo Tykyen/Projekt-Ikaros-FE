@@ -3,56 +3,56 @@ import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 're
 import { createBrowserRouter, redirect, type LoaderFunctionArgs } from 'react-router-dom';
 import { IkarosLayout, WorldLayout } from './components/layout';
 import { Spinner } from './components/ui';
-import { RoleGuard } from './components/guards/RoleGuard';
+import { RoleGuard } from '@/features/admin/components/RoleGuard';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
 import { UserRole } from '@/shared/types';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ErrorPage from './pages/errors/ErrorPage';
 
 // ── Lazy pages — Ikaros ───────────────────────────────────────────────────
-const DashboardPage    = lazy(() => import('./pages/ikaros/DashboardPage'));
-const ChatPage         = lazy(() => import('./pages/ikaros/ChatPage'));
-const WorldsPage       = lazy(() => import('./pages/ikaros/WorldsPage'));
-const CreateWorldPage  = lazy(() => import('./pages/ikaros/CreateWorldPage'));
+const DashboardPage    = lazy(() => import('@/features/ikaros/pages/DashboardPage'));
+const ChatPage         = lazy(() => import('@/features/chat/pages/ChatPage'));
+const WorldsPage       = lazy(() => import('@/features/ikaros/pages/WorldsPage'));
+const CreateWorldPage  = lazy(() => import('@/features/ikaros/pages/CreateWorldPage'));
 const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
-const UsersPage        = lazy(() => import('./pages/ikaros/UsersPage'));
-const UserProfilePage  = lazy(() => import('./pages/ikaros/UserProfilePage'));
-const ArticlesPage     = lazy(() => import('./pages/ikaros/ArticlesPage'));
-const GalleryPage      = lazy(() => import('./pages/ikaros/GalleryPage'));
-const DiscussionsPage  = lazy(() => import('./pages/ikaros/DiscussionsPage'));
-const MailPage             = lazy(() => import('./pages/ikaros/MailPage'));
-const HelpPage             = lazy(() => import('./pages/ikaros/HelpPage'));
-const TermsPage            = lazy(() => import('./pages/ikaros/TermsPage'));
-const DiscussionsNewPage   = lazy(() => import('./pages/ikaros/DiscussionsNewPage'));
+const UsersPage        = lazy(() => import('@/features/ikaros/pages/UsersPage'));
+const UserProfilePage  = lazy(() => import('@/features/ikaros/pages/UserProfilePage'));
+const ArticlesPage     = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
+const GalleryPage      = lazy(() => import('@/features/ikaros/pages/GalleryPage'));
+const DiscussionsPage  = lazy(() => import('@/features/ikaros/pages/DiscussionsPage'));
+const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage'));
+const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage'));
+const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
+const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
-const PlatformAdminPage  = lazy(() => import('./pages/admin/PlatformAdminPage'));
-const DungeonBuilderPage = lazy(() => import('./pages/admin/DungeonBuilderPage'));
+const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
+const DungeonBuilderPage = lazy(() => import('@/features/admin/pages/DungeonBuilderPage'));
 
 // ── Lazy pages — World ────────────────────────────────────────────────────
-const WorldDashboardPage = lazy(() => import('./pages/world/WorldDashboardPage'));
-const WorldChatPage      = lazy(() => import('./pages/world/WorldChatPage'));
-const PagesListPage      = lazy(() => import('./pages/world/PagesListPage'));
-const PageViewerPage     = lazy(() => import('./pages/world/PageViewerPage'));
-const PageEditorPage     = lazy(() => import('./pages/world/PageEditorPage'));
-const CharactersPage     = lazy(() => import('./pages/world/CharactersPage'));
-const MyCharacterPage    = lazy(() => import('./pages/world/MyCharacterPage'));
-const MapPage            = lazy(() => import('./pages/world/MapPage'));
-const TacticalMapPage    = lazy(() => import('./pages/world/TacticalMapPage'));
-const CalendarPage       = lazy(() => import('./pages/world/CalendarPage'));
-const TimelinePage       = lazy(() => import('./pages/world/TimelinePage'));
-const WeatherPage        = lazy(() => import('./pages/world/WeatherPage'));
-const EventsPage         = lazy(() => import('./pages/world/EventsPage'));
-const CampaignPage       = lazy(() => import('./pages/world/CampaignPage'));
-const StorylinesPage     = lazy(() => import('./pages/world/StorylinesPage'));
-const ShopPage           = lazy(() => import('./pages/world/ShopPage'));
-const SoundsPage         = lazy(() => import('./pages/world/SoundsPage'));
-const CurrencyPage       = lazy(() => import('./pages/world/CurrencyPage'));
-const WorldSettingsPage  = lazy(() => import('./pages/world/WorldSettingsPage'));
-const GroupsPage         = lazy(() => import('./pages/world/GroupsPage'));
-const RulesPage          = lazy(() => import('./pages/world/RulesPage'));
-const PagesAdminPage     = lazy(() => import('./pages/world/PagesAdminPage'));
-const NPCDirectoryPage   = lazy(() => import('./pages/world/NPCDirectoryPage'));
+const WorldDashboardPage = lazy(() => import('@/features/world/pages/WorldDashboardPage'));
+const WorldChatPage      = lazy(() => import('@/features/world/pages/WorldChatPage'));
+const PagesListPage      = lazy(() => import('@/features/world/pages/PagesListPage'));
+const PageViewerPage     = lazy(() => import('@/features/world/pages/PageViewerPage'));
+const PageEditorPage     = lazy(() => import('@/features/world/pages/PageEditorPage'));
+const CharactersPage     = lazy(() => import('@/features/world/pages/CharactersPage'));
+const MyCharacterPage    = lazy(() => import('@/features/world/pages/MyCharacterPage'));
+const MapPage            = lazy(() => import('@/features/world/pages/MapPage'));
+const TacticalMapPage    = lazy(() => import('@/features/world/pages/TacticalMapPage'));
+const CalendarPage       = lazy(() => import('@/features/world/pages/CalendarPage'));
+const TimelinePage       = lazy(() => import('@/features/world/pages/TimelinePage'));
+const WeatherPage        = lazy(() => import('@/features/world/pages/WeatherPage'));
+const EventsPage         = lazy(() => import('@/features/world/pages/EventsPage'));
+const CampaignPage       = lazy(() => import('@/features/world/pages/CampaignPage'));
+const StorylinesPage     = lazy(() => import('@/features/world/pages/StorylinesPage'));
+const ShopPage           = lazy(() => import('@/features/world/pages/ShopPage'));
+const SoundsPage         = lazy(() => import('@/features/world/pages/SoundsPage'));
+const CurrencyPage       = lazy(() => import('@/features/world/pages/CurrencyPage'));
+const WorldSettingsPage  = lazy(() => import('@/features/world/pages/WorldSettingsPage'));
+const GroupsPage         = lazy(() => import('@/features/world/pages/GroupsPage'));
+const RulesPage          = lazy(() => import('@/features/world/pages/RulesPage'));
+const PagesAdminPage     = lazy(() => import('@/features/world/pages/PagesAdminPage'));
+const NPCDirectoryPage   = lazy(() => import('@/features/world/pages/NPCDirectoryPage'));
 
 // ── Suspense wrapper ──────────────────────────────────────────────────────
 function p(Comp: LazyExoticComponent<ComponentType>) {

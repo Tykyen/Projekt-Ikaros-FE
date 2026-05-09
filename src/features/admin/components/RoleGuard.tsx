@@ -2,7 +2,7 @@
 import { useAtomValue } from 'jotai';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
-import ForbiddenPage from '../../pages/errors/ForbiddenPage';
+import ForbiddenPage from '@/pages/errors/ForbiddenPage';
 
 interface Props {
   roles: UserRole[];
