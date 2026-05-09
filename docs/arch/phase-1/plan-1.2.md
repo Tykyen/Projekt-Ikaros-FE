@@ -2,7 +2,7 @@
 
 **Datum:** 2026-05-08
 **Status:** ⏳ Čeká na schválení
-**Spec:** [`spec-1.2.md`](./spec-1.2.md), [`spec-superadmin-seed.md`](./spec-superadmin-seed.md)
+**Spec:** [`spec-1.2.md`](./spec-1.2.md), [`_side-tasks/spec-superadmin-seed.md`](./_side-tasks/spec-superadmin-seed.md)
 **Větev:** `feat/krok-1.2-registrace` (vytvořím při startu)
 
 ---
