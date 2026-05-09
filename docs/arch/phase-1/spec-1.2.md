@@ -4,7 +4,7 @@
 **Status:** ⏳ Čeká na schválení
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.2
 **Závisí na:** 1.1 (Login modal + per-route auth) ✅, 1.0 (theme systém) ✅
-**Souvisí s:** `docs/arch/phase-1/spec-superadmin-seed.md` (paralelní jednorázová úloha)
+**Souvisí s:** `docs/arch/phase-1/_side-tasks/spec-superadmin-seed.md` (paralelní jednorázová úloha)
 
 ---
 
