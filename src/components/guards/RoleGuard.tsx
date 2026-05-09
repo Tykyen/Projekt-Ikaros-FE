@@ -1,6 +1,6 @@
 ﻿import type { ReactNode } from 'react';
 import { useAtomValue } from 'jotai';
-import { currentUserAtom } from '../../store/authStore';
+import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import ForbiddenPage from '../../pages/errors/ForbiddenPage';
 

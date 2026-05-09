@@ -1,6 +1,6 @@
-import { io, type Socket } from 'socket.io-client';
+﻿import { io, type Socket } from 'socket.io-client';
 import { getDefaultStore } from 'jotai';
-import { accessTokenAtom } from '../store/authStore';
+import { accessTokenAtom } from '@/shared/store/authStore';
 import { socketStatusAtom } from '../store/socketStore';
 
 const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';

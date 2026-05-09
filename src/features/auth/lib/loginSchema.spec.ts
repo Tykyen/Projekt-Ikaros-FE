@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { loginSchema } from './loginSchema';
+﻿import { describe, it, expect } from 'vitest';
+import { loginSchema } from '../lib/loginSchema';
 
 describe('loginSchema', () => {
   it('projde s e-mailem a heslem', () => {

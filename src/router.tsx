@@ -4,7 +4,7 @@ import { createBrowserRouter, redirect, type LoaderFunctionArgs } from 'react-ro
 import { IkarosLayout, WorldLayout } from './components/layout';
 import { Spinner } from './components/ui';
 import { RoleGuard } from './components/guards/RoleGuard';
-import { saveLoginIntent } from './auth/loginIntent';
+import { saveLoginIntent } from '@/shared/lib/loginIntent';
 import { UserRole } from '@/shared/types';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ErrorPage from './pages/errors/ErrorPage';
@@ -14,7 +14,7 @@ const DashboardPage    = lazy(() => import('./pages/ikaros/DashboardPage'));
 const ChatPage         = lazy(() => import('./pages/ikaros/ChatPage'));
 const WorldsPage       = lazy(() => import('./pages/ikaros/WorldsPage'));
 const CreateWorldPage  = lazy(() => import('./pages/ikaros/CreateWorldPage'));
-const ProfilePage      = lazy(() => import('./pages/ikaros/ProfilePage'));
+const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
 const UsersPage        = lazy(() => import('./pages/ikaros/UsersPage'));
 const UserProfilePage  = lazy(() => import('./pages/ikaros/UserProfilePage'));
 const ArticlesPage     = lazy(() => import('./pages/ikaros/ArticlesPage'));

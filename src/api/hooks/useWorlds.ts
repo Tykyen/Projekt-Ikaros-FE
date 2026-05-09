@@ -1,7 +1,7 @@
 ﻿import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
-import { accessTokenAtom } from '../../store/authStore';
+import { accessTokenAtom } from '@/shared/store/authStore';
 import type { World } from '@/shared/types';
 
 export function useMyWorlds() {

@@ -2,7 +2,7 @@
 import { getDefaultStore } from 'jotai';
 import { toast } from 'sonner';
 import { api } from '@/shared/api/client';
-import { currentUserAtom } from '../../store/authStore';
+import { currentUserAtom } from '@/shared/store/authStore';
 import type {
   ChangePasswordRequest,
   UpdateUserRequest,

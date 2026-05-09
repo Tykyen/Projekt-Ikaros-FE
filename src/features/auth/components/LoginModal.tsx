@@ -8,13 +8,13 @@ import axios from 'axios';
 import { Modal } from '@/shared/ui';
 import { Input } from '@/shared/ui';
 import { Button } from '@/shared/ui';
-import { loginSchema, type LoginFormValues } from './loginSchema';
-import { useLogin } from '../../api/hooks/useAuth';
-import { consumeLoginIntent } from '../../auth/loginIntent';
+import { loginSchema, type LoginFormValues } from '../lib/loginSchema';
+import { useLogin } from '@/features/auth/api/useAuth';
+import { consumeLoginIntent } from '@/shared/lib/loginIntent';
 import {
   loginModalOpenAtom,
   openRegisterModalAtom,
-} from '../../store/authStore';
+} from '@/shared/store/authStore';
 import s from './LoginModal.module.css';
 
 function mapErrorToMessage(error: unknown): string {

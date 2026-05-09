@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -6,13 +6,13 @@ import {
   Input,
   AvatarUploader,
   UserAvatar,
-} from '../../../components/ui';
+} from '@/components/ui';
 import {
   useUpdateProfile,
   useUploadCharacterAvatar,
   useDeleteCharacterAvatar,
-} from '../../../api/hooks/useProfile';
-import { characterSchema, type CharacterForm } from './profileSchemas';
+} from '@/features/profile/api/useProfile';
+import { characterSchema, type CharacterForm } from '../lib/profileSchemas';
 import styles from './ProfileSections.module.css';
 
 interface Props {

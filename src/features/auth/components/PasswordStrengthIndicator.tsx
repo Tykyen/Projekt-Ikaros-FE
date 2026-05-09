@@ -1,4 +1,4 @@
-import { passwordStrength } from './passwordStrength';
+﻿import { passwordStrength } from '../lib/passwordStrength';
 import s from './PasswordStrengthIndicator.module.css';
 
 interface Props {

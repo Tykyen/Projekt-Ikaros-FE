@@ -10,15 +10,15 @@ import { Input } from '@/shared/ui';
 import { Button } from '@/shared/ui';
 import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
 import { AvailabilityIcon, type AvailabilityStatus } from './AvailabilityIcon';
-import { registerSchema, type RegisterFormValues } from './registerSchema';
-import { useRegister } from '../../api/hooks/useAuth';
-import { useCheckUsername, useCheckEmail } from '../../api/hooks/useAvailability';
+import { registerSchema, type RegisterFormValues } from '../lib/registerSchema';
+import { useRegister } from '@/features/auth/api/useAuth';
+import { useCheckUsername, useCheckEmail } from '@/features/auth/api/useAvailability';
 import {
   registerModalOpenAtom,
   openLoginModalAtom,
-} from '../../store/authStore';
+} from '@/shared/store/authStore';
 import { parseApiErrorCode } from '@/shared/api/client';
-import { consumeLoginIntent } from '../../auth/loginIntent';
+import { consumeLoginIntent } from '@/shared/lib/loginIntent';
 import s from './RegisterModal.module.css';
 
 function mapErrorToBanner(error: unknown): string | null {

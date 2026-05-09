@@ -4,7 +4,7 @@ import { Provider as JotaiProvider, createStore } from 'jotai';
 import type { PropsWithChildren } from 'react';
 import { useThemeSync } from '../useThemeSync';
 import { themeAtom } from '../state';
-import { currentUserAtom } from '../../store/authStore';
+import { currentUserAtom } from '@/shared/store/authStore';
 import { api } from '@/shared/api/client';
 
 vi.mock('@/shared/api/client', () => ({

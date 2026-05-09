@@ -1,7 +1,5 @@
-// Transitional barrel — re-exports generic UI primitives from @/shared/ui
-// + feature-specific UI (které se v commit 3 přesunou do features/profile/).
-// Po dokončení 1.6a refactoru tento barrel zmizí; importy půjdou
-// přímo z '@/shared/ui' nebo '@/features/profile'.
+// Transitional barrel — bude smazán v commit 5.
+// Generické UI primitivy z @/shared/ui, profile-specific z @/features/profile/components.
 export {
   Button,
   Input,
@@ -14,6 +12,6 @@ export {
   GlobalErrorBoundary,
 } from '@/shared/ui';
 
-export { AvatarUploader } from './AvatarUploader';
-export { ChatColorPicker } from './ChatColorPicker';
-export { EditCard } from './EditCard';
+export { AvatarUploader } from '@/features/profile/components/AvatarUploader';
+export { ChatColorPicker } from '@/features/profile/components/ChatColorPicker';
+export { EditCard } from '@/features/profile/components/EditCard';

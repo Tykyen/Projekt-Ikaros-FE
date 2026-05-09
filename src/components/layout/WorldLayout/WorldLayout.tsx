@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import s from './WorldLayout.module.css';
 import { WorldContext } from '../../../contexts/WorldContext';
 import { useWorld } from '../../../api/hooks/useWorlds';
-import { currentUserAtom } from '../../../store/authStore';
+import { currentUserAtom } from '@/shared/store/authStore';
 import { WorldRole } from '@/shared/types';
 import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Newspaper, Plus } from 'lucide-react';
@@ -6,7 +6,7 @@ import {
   isAuthenticatedAtom,
   loginModalOpenAtom,
   registerModalOpenAtom,
-} from '../../store/authStore';
+} from '@/shared/store/authStore';
 import { IkarosCard } from '@/shared/ui';
 import s from './DashboardPage.module.css';
 

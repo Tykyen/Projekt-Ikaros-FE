@@ -1,7 +1,7 @@
 ﻿import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
-import { accessTokenAtom } from '../../store/authStore';
+import { accessTokenAtom } from '@/shared/store/authStore';
 import { useSocketEvent } from './useSocket';
 import type { UnreadCountResponse } from '@/shared/types';
 

@@ -1,9 +1,9 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { EditCard } from '../../../components/ui';
-import { useUpdateProfile } from '../../../api/hooks/useProfile';
-import { bioSchema, type BioForm } from './profileSchemas';
+import { EditCard } from '@/components/ui';
+import { useUpdateProfile } from '@/features/profile/api/useProfile';
+import { bioSchema, type BioForm } from '../lib/profileSchemas';
 import styles from './ProfileSections.module.css';
 
 interface Props {

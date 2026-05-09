@@ -1,15 +1,15 @@
-import { useAtomValue } from 'jotai';
-import { Spinner } from '../../components/ui';
-import { currentUserAtom } from '../../store/authStore';
-import { useMyProfile } from '../../api/hooks/useAuth';
-import { ProfileHeader } from './profile/ProfileHeader';
-import { BioSection } from './profile/BioSection';
-import { CharacterSection } from './profile/CharacterSection';
-import { WorldsSection } from './profile/WorldsSection';
-import { CommunityPlaceholders } from './profile/CommunityPlaceholders';
-import { AppearanceSection } from './profile/AppearanceSection';
-import { SecuritySection } from './profile/SecuritySection';
-import { AccountSection } from './profile/AccountSection';
+﻿import { useAtomValue } from 'jotai';
+import { Spinner } from '@/shared/ui';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { useMyProfile } from '@/features/auth/api/useAuth';
+import { ProfileHeader } from '../components/ProfileHeader';
+import { BioSection } from '../components/BioSection';
+import { CharacterSection } from '../components/CharacterSection';
+import { WorldsSection } from '../components/WorldsSection';
+import { CommunityPlaceholders } from '../components/CommunityPlaceholders';
+import { AppearanceSection } from '../components/AppearanceSection';
+import { SecuritySection } from '../components/SecuritySection';
+import { AccountSection } from '../components/AccountSection';
 import styles from './ProfilePage.module.css';
 
 /**

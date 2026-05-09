@@ -9,7 +9,7 @@ import {
   pendingLogoutAtom,
   loginModalOpenAtom,
   registerModalOpenAtom,
-} from '../../store/authStore';
+} from '@/shared/store/authStore';
 import { isJwtValid } from '@/shared/lib/jwt';
 import type {
   AuthResponse,

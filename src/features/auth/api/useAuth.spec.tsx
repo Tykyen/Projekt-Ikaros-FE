@@ -11,7 +11,7 @@ import {
   pendingLogoutAtom,
   loginModalOpenAtom,
   registerModalOpenAtom,
-} from '../../store/authStore';
+} from '@/shared/store/authStore';
 import { api } from '@/shared/api/client';
 import { UserRole } from '@/shared/types';
 

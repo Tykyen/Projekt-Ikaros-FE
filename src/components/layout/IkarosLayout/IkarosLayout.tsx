@@ -20,18 +20,18 @@ import s from './IkarosLayout.module.css';
 import { useSocketInit } from '../../../api/hooks/useSocket';
 import { useMyWorlds, usePublicWorlds } from '../../../api/hooks/useWorlds';
 import { useUnreadCount } from '../../../api/hooks/useMessages';
-import { useLogout } from '../../../api/hooks/useAuth';
+import { useLogout } from '@/features/auth/api/useAuth';
 import {
   currentUserAtom,
   isAuthenticatedAtom,
   loginModalOpenAtom,
   registerModalOpenAtom,
-} from '../../../store/authStore';
+} from '@/shared/store/authStore';
 import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
-import { LoginModal } from '../../auth/LoginModal';
-import { RegisterModal } from '../../auth/RegisterModal';
+import { LoginModal } from '@/features/auth/components/LoginModal';
+import { RegisterModal } from '@/features/auth/components/RegisterModal';
 import { CornerOrnament } from '../PanelFrame/CornerOrnament';
 import { UserAvatar } from '@/shared/ui';
 import { UserRole, type World } from '@/shared/types';

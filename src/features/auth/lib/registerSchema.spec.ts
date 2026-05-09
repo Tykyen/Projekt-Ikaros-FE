@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { registerSchema } from './registerSchema';
+﻿import { describe, it, expect } from 'vitest';
+import { registerSchema } from '../lib/registerSchema';
 
 const valid = {
   email: 'user@test.io',

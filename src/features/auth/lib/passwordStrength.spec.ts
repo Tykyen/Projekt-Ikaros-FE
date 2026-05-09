@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { passwordStrength } from './passwordStrength';
+﻿import { describe, it, expect } from 'vitest';
+import { passwordStrength } from '../lib/passwordStrength';
 
 describe('passwordStrength', () => {
   it('prázdné heslo → score 0 ("Velmi slabé")', () => {

@@ -1,11 +1,11 @@
-import { StrictMode } from "react";
+﻿import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { router } from "./router";
 import { GlobalErrorBoundary } from "@/shared/ui/GlobalErrorBoundary";
-import { AuthBootstrap } from "./components/auth";
+import { AuthBootstrap } from '@/features/auth/components';
 import { ThemeProvider } from "./themes/ThemeProvider";
 import "./index.css";
 

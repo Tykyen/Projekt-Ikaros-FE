@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import {
   bioSchema,
   characterSchema,
   headerSchema,
   passwordSchema,
-} from './profileSchemas';
+} from '../lib/profileSchemas';
 
 describe('bioSchema', () => {
   it('akceptuje prázdný bio', () => {

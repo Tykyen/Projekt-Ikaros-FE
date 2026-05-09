@@ -1,7 +1,7 @@
-import {
+﻿import {
   useAuthBootstrap,
   useCurrentUserHydration,
-} from '../../api/hooks/useAuth';
+} from '@/features/auth/api/useAuth';
 
 /**
  * Mountuj jednou v root stromu.

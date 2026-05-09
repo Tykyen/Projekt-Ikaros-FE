@@ -7,13 +7,13 @@ import {
   Input,
   UserAvatar,
   AvatarUploader,
-} from '../../../components/ui';
+} from '@/components/ui';
 import {
   useUpdateProfile,
   useUploadAvatar,
   useDeleteAvatar,
-} from '../../../api/hooks/useProfile';
-import { headerSchema, type HeaderForm } from './profileSchemas';
+} from '@/features/profile/api/useProfile';
+import { headerSchema, type HeaderForm } from '../lib/profileSchemas';
 import { UserRole, type User } from '@/shared/types';
 import styles from './ProfileHeader.module.css';
 

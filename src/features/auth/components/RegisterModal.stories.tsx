@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+﻿import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 import { useSetAtom } from 'jotai';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { RegisterModal } from './RegisterModal';
-import { registerModalOpenAtom } from '../../store/authStore';
+import { registerModalOpenAtom } from '@/shared/store/authStore';
 
 const queryClient = new QueryClient({
   defaultOptions: { mutations: { retry: false }, queries: { retry: false } },
