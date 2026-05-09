@@ -18,6 +18,8 @@
   z-index: 0;
 }
 
+/* (Page-frame ornaments přesunuty na panely — viz sekce 5 níže) */
+
 /* ──────────────── 2. Header band — gold rule + central diamond ──────────────── */
 
 [data-theme="modre-nebe"] header {
@@ -48,23 +50,7 @@
   background-size: contain;
 }
 
-[data-theme="modre-nebe"] header > a[class*="logo"] {
-  position: relative;
-}
-
-[data-theme="modre-nebe"] header > a[class*="logo"]::after {
-  content: '';
-  position: absolute;
-  left: 8px;
-  right: 12px;
-  bottom: 14px;
-  height: 8px;
-  pointer-events: none;
-  background: center / 100% 100% no-repeat
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 8' preserveAspectRatio='none'><path d='M3 5 Q 30 1 60 5 T 118 5 Q 145 9 175 5 T 237 5' stroke='%23d6aa45' stroke-width='0.7' fill='none' stroke-linecap='round'/><circle cx='118' cy='5' r='1.3' fill='%2325d0e6'/></svg>");
-  opacity: 0.85;
-  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
-}
+/* Logo flourish je nyní zapečen v logo.webp asset — žádné CSS ::after už nepotřebujeme */
 
 /* ──────────────── 4. Glass panely + double-stroke border ──────────────── */
 
@@ -127,36 +113,51 @@
 
 /* ──────────────── 5. CornerOrnament — un-hide + re-style ──────────────── */
 
+/* Velké page-frame corner ornaments lemující každý panel — 4 mirror varianty per pozice */
 [data-theme="modre-nebe"] [data-frame-panel] [class*="ornament"] {
   display: block;
-  width: 32px;
-  height: 32px;
-  background: center / contain no-repeat
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><g fill='none' stroke='%23d6aa45' stroke-linecap='round'><path d='M3 16 L3 3 L16 3' stroke-width='1.1'/><path d='M6.5 13.5 L6.5 6.5 L13.5 6.5' stroke-width='0.9' opacity='0.55'/><path d='M14 3 Q 22 5 22 13' stroke-width='0.9'/><path d='M3 14 Q 5 22 13 22' stroke-width='0.9'/><path d='M22 13 Q 25 14 27 16' stroke-width='0.7' opacity='0.6'/><path d='M13 22 Q 14 25 16 27' stroke-width='0.7' opacity='0.6'/></g><path d='M11 14 L8 11 L11 8 L14 11 Z' fill='%23d6aa45'/><circle cx='11' cy='11' r='1.4' fill='%2325d0e6'/></svg>");
+  width: 120px;
+  height: 120px;
+  background: center / contain no-repeat;
   border: none;
   border-radius: 0;
   transform: none;
-  filter: drop-shadow(0 0 5px var(--theme-glow-gold));
+  filter: drop-shadow(0 0 6px var(--theme-glow-gold));
+  opacity: 0.95;
 }
 
 [data-theme="modre-nebe"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
-  top: 4px;
-  left: 4px;
+  top: 0;
+  left: 0;
+  background-image: var(--asset-page-frame-tl);
 }
 [data-theme="modre-nebe"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
-  top: 4px;
-  right: 4px;
-  transform: scaleX(-1);
+  top: 0;
+  right: 0;
+  background-image: var(--asset-page-frame-tr);
 }
 [data-theme="modre-nebe"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
-  bottom: 4px;
-  left: 4px;
-  transform: scaleY(-1);
+  bottom: 0;
+  left: 0;
+  background-image: var(--asset-page-frame-bl);
 }
 [data-theme="modre-nebe"] [data-frame-panel] [class*="ornament"][data-position="br"] {
-  bottom: 4px;
-  right: 4px;
-  transform: scale(-1, -1);
+  bottom: 0;
+  right: 0;
+  background-image: var(--asset-page-frame-br);
+}
+
+/* Menší panely (sidebar, right) → menší ornamenty, ať nezahlcují obsah */
+[data-theme="modre-nebe"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="modre-nebe"] [data-frame-panel="right"] [class*="ornament"] {
+  width: 90px;
+  height: 90px;
+}
+
+/* Novinky — užší na výšku, zmenšit ornamenty aby nepřekrývaly text */
+[data-theme="modre-nebe"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: 80px;
+  height: 80px;
 }
 
 /* ──────────────── 6. Section title — `◆ ━━ TITLE ━━ ◆` ──────────────── */
@@ -169,30 +170,34 @@
 
 [data-theme="modre-nebe"] [class*="sectionTitle"]::before {
   flex: 1;
-  height: 14px;
+  height: 24px;
   opacity: 1;
   background:
-    left center / 8px 8px no-repeat
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path d='M4 0 L8 4 L4 8 L0 4 Z' fill='%2325d0e6'/></svg>"),
+    left center / auto 24px no-repeat var(--asset-nav-end-cap-l),
     center / 100% 1px no-repeat
-      linear-gradient(90deg, rgba(214,170,69,0.85) 0%, rgba(214,170,69,0.65) 100%);
+      linear-gradient(90deg, transparent 0%, rgba(214,170,69,0.45) 30%, rgba(214,170,69,0.85) 100%);
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
 }
 
 [data-theme="modre-nebe"] [class*="sectionTitle"]::after {
   flex: 1;
-  height: 14px;
+  height: 24px;
   opacity: 1;
   background:
-    right center / 8px 8px no-repeat
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path d='M4 0 L8 4 L4 8 L0 4 Z' fill='%2325d0e6'/></svg>"),
+    right center / auto 24px no-repeat var(--asset-nav-end-cap-r),
     center / 100% 1px no-repeat
-      linear-gradient(90deg, rgba(214,170,69,0.65) 0%, rgba(214,170,69,0.85) 100%);
+      linear-gradient(90deg, rgba(214,170,69,0.85) 0%, rgba(214,170,69,0.45) 70%, transparent 100%);
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
 }
 
 /* ──────────────── 7. Nav items — flat-glow, cobalt active ──────────────── */
 
 [data-theme="modre-nebe"] [class*="navItem"]:not([class*="navItemActive"]):not([class*="navItemIcon"]):not([class*="navItemLabel"]) {
-  background: rgba(8, 14, 28, 0.45);
+  position: relative;
+  /* Inner gold sheen — subtle bronze-plate feel přes plochou výplň */
+  background:
+    linear-gradient(180deg, rgba(214,170,69,0.06) 0%, transparent 35%, transparent 65%, rgba(214,170,69,0.08) 100%),
+    rgba(8, 14, 28, 0.45);
   border: 1px solid var(--theme-border-soft);
   border-radius: 10px;
   font-family: var(--font-display);
@@ -201,22 +206,85 @@
   font-size: 0.82rem;
   color: var(--theme-text);
   transition: border-color 160ms ease, background 160ms ease, box-shadow 200ms ease, color 160ms ease;
+  isolation: isolate;
+}
+
+/* Cornerstone rivets — 4 drobné zlaté kuličky v rozích buttonu (rivety na bronzové ceduli) */
+[data-theme="modre-nebe"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle 1.6px at 6px 6px,                rgba(255,211,106,0.95), transparent 100%),
+    radial-gradient(circle 1.6px at calc(100% - 6px) 6px,   rgba(255,211,106,0.95), transparent 100%),
+    radial-gradient(circle 1.6px at 6px calc(100% - 6px),   rgba(255,211,106,0.95), transparent 100%),
+    radial-gradient(circle 1.6px at calc(100% - 6px) calc(100% - 6px), rgba(255,211,106,0.95), transparent 100%);
+  filter: drop-shadow(0 0 2px var(--theme-glow-gold));
+  z-index: 1;
+}
+
+/* Hover gold shimmer — gradient sweep zleva doprava */
+[data-theme="modre-nebe"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg,
+    transparent 30%,
+    rgba(255,211,106,0.18) 50%,
+    transparent 70%);
+  background-size: 200% 100%;
+  background-position: 110% 0;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  z-index: 1;
+}
+
+[data-theme="modre-nebe"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]):hover::after {
+  opacity: 1;
+  animation: modre-nebe-nav-shimmer 1.1s ease-out;
+}
+
+@keyframes modre-nebe-nav-shimmer {
+  from { background-position: 110% 0; }
+  to   { background-position: -110% 0; }
 }
 
 [data-theme="modre-nebe"] [class*="navItem"]:not([class*="navItemActive"]):not([class*="navItemIcon"]):not([class*="navItemLabel"]):hover {
   border-color: var(--theme-border);
-  background: var(--theme-nav-hover-bg);
+  background:
+    linear-gradient(180deg, rgba(214,170,69,0.10) 0%, transparent 50%, rgba(214,170,69,0.12) 100%),
+    var(--theme-nav-hover-bg);
   box-shadow: inset 3px 0 0 var(--theme-accent-bright), 0 0 8px rgba(214,170,69,0.18);
   color: var(--theme-text);
 }
 
 [data-theme="modre-nebe"] [class*="navItemActive"] {
-  background: var(--theme-nav-active-bg);
+  background:
+    linear-gradient(180deg, rgba(37,208,230,0.10) 0%, transparent 50%, rgba(37,208,230,0.08) 100%),
+    var(--theme-nav-active-bg);
   border-color: var(--theme-border-cyan);
   color: var(--theme-text);
   box-shadow:
     inset 3px 0 0 var(--theme-accent-cyan),
     0 0 18px var(--theme-glow-cyan);
+}
+
+/* Aktivní state — cobalt cornerstones + žádný shimmer (cobalt halo dělá svoji práci) */
+[data-theme="modre-nebe"] [class*="navItemActive"]::before {
+  background:
+    radial-gradient(circle 2px at 6px 6px,                rgba(37,208,230,0.95), transparent 100%),
+    radial-gradient(circle 2px at calc(100% - 6px) 6px,   rgba(37,208,230,0.95), transparent 100%),
+    radial-gradient(circle 2px at 6px calc(100% - 6px),   rgba(37,208,230,0.95), transparent 100%),
+    radial-gradient(circle 2px at calc(100% - 6px) calc(100% - 6px), rgba(37,208,230,0.95), transparent 100%);
+  filter: drop-shadow(0 0 3px var(--theme-glow-cyan));
+}
+
+[data-theme="modre-nebe"] [class*="navItemActive"]::after {
+  display: none;
 }
 
 [data-theme="modre-nebe"] [class*="navItemActive"] [class*="navItemIcon"] {
@@ -230,8 +298,63 @@
 }
 
 [data-theme="modre-nebe"] [class*="navItemIcon"] svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Heraldic icon swap — lucide-react SVG → custom illuminated assets ── */
+
+/* Hide all original lucide SVGs that we replace */
+[data-theme="modre-nebe"] [class*="navItemIcon"] svg.lucide-beer,
+[data-theme="modre-nebe"] [class*="navItemIcon"] svg.lucide-house,
+[data-theme="modre-nebe"] [class*="navItemIcon"] svg.lucide-circle-plus,
+[data-theme="modre-nebe"] [class*="navItemIcon"] svg.lucide-message-square,
+[data-theme="modre-nebe"] [class*="navItemIcon"] svg.lucide-book-open,
+[data-theme="modre-nebe"] [class*="navItemIcon"] svg.lucide-image,
+[data-theme="modre-nebe"] [class*="navItemIcon"] svg.lucide-circle-question-mark {
+  display: none;
+}
+
+/* Each icon span gets a custom heraldic asset */
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-beer),
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-house),
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-circle-plus),
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-message-square),
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-book-open),
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-image),
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-circle-question-mark) {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  background: center / contain no-repeat;
+  filter: drop-shadow(0 0 5px var(--theme-glow-gold));
+}
+
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-beer) {
+  background-image: var(--asset-beer);
+}
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-house) {
+  background-image: var(--asset-icon-home);
+}
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-circle-plus) {
+  background-image: var(--asset-icon-plus-star);
+}
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-message-square) {
+  background-image: var(--asset-icon-scroll);
+}
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-book-open) {
+  background-image: var(--asset-icon-book);
+}
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-image) {
+  background-image: var(--asset-icon-portrait-frame);
+}
+[data-theme="modre-nebe"] [class*="navItemIcon"]:has(svg.lucide-circle-question-mark) {
+  background-image: var(--asset-icon-compass);
+}
+
+/* Active state — cobalt glow filter (gold + cyan combined) */
+[data-theme="modre-nebe"] [class*="navItemActive"] [class*="navItemIcon"]:has(svg) {
+  filter: drop-shadow(0 0 8px var(--theme-glow-cyan)) drop-shadow(0 0 4px var(--theme-glow-gold));
 }
 
 /* ──────────────── 8. PJ badge — cobalt-cyan gradient pill ──────────────── */
@@ -307,8 +430,8 @@
 /* ──────────────── 11. Welcome card — andel medallion + script divider ──────────────── */
 
 [data-theme="modre-nebe"] [data-andel-medallion] {
-  width: 220px;
-  height: 235px;
+  width: 240px;
+  height: 240px;
   background-image: var(--asset-andel-medallion, none);
   background-size: contain;
   background-repeat: no-repeat;
@@ -325,14 +448,16 @@
 [data-theme="modre-nebe"] [data-frame-panel="card"] [class*="signature"]::before {
   content: '';
   position: absolute;
-  top: -32px;
+  top: -36px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(60%, 280px);
-  height: 14px;
-  background: center / 100% 100% no-repeat
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 14' preserveAspectRatio='none'><path d='M8 7 Q 60 2 110 7 Q 160 12 212 7' stroke='%23d6aa45' stroke-width='0.8' fill='none' stroke-linecap='round'/><path d='M2 7 L8 7 M212 7 L218 7' stroke='%23d6aa45' stroke-width='0.7'/><path d='M110 3 L114 7 L110 11 L106 7 Z' fill='%2325d0e6'/></svg>");
-  opacity: 0.9;
+  width: min(75%, 380px);
+  height: 24px;
+  background:
+    left center / auto 24px no-repeat var(--asset-nav-end-cap-l),
+    right center / auto 24px no-repeat var(--asset-nav-end-cap-r),
+    center / 100% 1px no-repeat
+      linear-gradient(90deg, transparent 0%, rgba(214,170,69,0.55) 25%, rgba(214,170,69,0.85) 50%, rgba(214,170,69,0.55) 75%, transparent 100%);
   filter: drop-shadow(0 0 4px var(--theme-glow-gold));
 }
 
@@ -340,12 +465,23 @@
   text-shadow: 0 0 14px var(--theme-glow-cyan);
 }
 
-/* ──────────────── 12. Responsive — mobile graceful degradation ──────────────── */
+/* ──────────────── 12. Responsive — graceful degradation ──────────────── */
+
+@media (max-width: 1280px) {
+  [data-theme="modre-nebe"] [data-frame-panel="card"] [class*="ornament"] {
+    width: 100px;
+    height: 100px;
+  }
+}
 
 @media (max-width: 768px) {
-  [data-theme="modre-nebe"] [data-frame-panel] [class*="ornament"] {
-    width: 24px;
-    height: 24px;
+  [data-theme="modre-nebe"] [data-frame-panel] [class*="ornament"],
+  [data-theme="modre-nebe"] [data-frame-panel="sidebar"] [class*="ornament"],
+  [data-theme="modre-nebe"] [data-frame-panel="right"] [class*="ornament"],
+  [data-theme="modre-nebe"] [data-frame-panel="card"] [class*="ornament"],
+  [data-theme="modre-nebe"] [data-frame-panel="novinky"] [class*="ornament"] {
+    width: 60px;
+    height: 60px;
   }
 
   [data-theme="modre-nebe"] [data-frame-panel="sidebar"]::before,
@@ -361,5 +497,10 @@
 
   [data-theme="modre-nebe"] header::after {
     background-size: 24px 12px, 100% 1px;
+  }
+
+  [data-theme="modre-nebe"] [data-andel-medallion] {
+    width: 180px;
+    height: 180px;
   }
 }

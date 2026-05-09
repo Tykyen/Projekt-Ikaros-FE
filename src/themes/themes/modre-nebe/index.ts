@@ -115,13 +115,31 @@ export const modreNebeTheme: Theme = {
 
     // ── Logo asset (zachováno z PNG: anděl + wordmark) ──
     '--asset-logo':           `url('${decor}/logo.webp')`,
-    '--asset-logo-w':         '220px',
-    '--asset-logo-w-mobile':  '180px',
+    '--asset-logo-w':         '320px',
+    '--asset-logo-w-mobile':  '200px',
     '--logo-img-display':     'block',
     '--logo-fallback-display':'none',
 
     // ── Welcome card medallion (zachováno z PNG) ──
     '--asset-andel-medallion': `url('${decor}/andel-medallion.webp')`,
+
+    // ── Heraldic upgrade decor assets (spec 1.0f) ──
+    '--asset-corner-ornament':  `url('${decor}/corner-ornament.webp')`,
+    '--asset-page-frame-tl':    `url('${decor}/page-frame-corner-tl.webp')`,
+    '--asset-page-frame-tr':    `url('${decor}/page-frame-corner-tr.webp')`,
+    '--asset-page-frame-bl':    `url('${decor}/page-frame-corner-bl.webp')`,
+    '--asset-page-frame-br':    `url('${decor}/page-frame-corner-br.webp')`,
+    '--asset-beer':             `url('${decor}/beer.webp')`,
+    '--asset-nav-end-cap-l':    `url('${decor}/nav-end-cap-l.webp')`,
+    '--asset-nav-end-cap-r':    `url('${decor}/nav-end-cap-r.webp')`,
+
+    // Heraldické nav ikony (Level 3) — nahrazují lucide-react SVG
+    '--asset-icon-home':            `url('${decor}/home.webp')`,
+    '--asset-icon-plus-star':       `url('${decor}/plus-star.webp')`,
+    '--asset-icon-scroll':          `url('${decor}/scroll.webp')`,
+    '--asset-icon-book':            `url('${decor}/book.webp')`,
+    '--asset-icon-portrait-frame':  `url('${decor}/portraite-frame.webp')`,
+    '--asset-icon-compass':         `url('${decor}/compass.webp')`,
   },
   fonts: {
     logo: 'Cinzel Decorative',

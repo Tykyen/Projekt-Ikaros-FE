@@ -146,13 +146,32 @@ async function processDecor() {
       const outPath = path.join(outDir, outName);
       // Loga mívají velké průhledné okraje od AI generátorů — auto-trim na bounding box obsahu.
       const isLogo = /^logo\.png$/i.test(file);
+      // Page-frame corner ornament: vygenerujeme 4 mirror varianty (tl/tr/bl/br) pro 4 rohy viewportu.
+      const isPageFrame = /^page-frame-corner\.png$/i.test(file);
+      // Nav end-cap: vygenerujeme 2 mirror varianty (-l, -r) pro oba konce sekčních dividerů + nav button rámečků.
+      const isNavEndCap = /^nav-end-cap\.png$/i.test(file);
       try {
         let note = '';
         if (isLogo) {
-          // Logo pipeline: trim source PNG (alpha-edge crop) → WebP. Bez chroma-key,
-          // moderní AI generátory dávají PNG s alpha kanálem rovnou.
-          const info = await sharp(srcPath).trim().webp({ quality: 88 }).toFile(outPath);
-          note = ` [trimmed → ${info.width}×${info.height}]`;
+          // Logo pipeline: chroma-key (white → transparent) + trim → WebP, vše v paměti
+          // jedním sharp instance (Windows má file-lock issues s read+write na stejný path).
+          const { data, info } = await sharp(srcPath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+            if (Math.max(r, g, b) - Math.min(r, g, b) > ACHROMATIC_TOLERANCE) continue;
+            const lum = (r + g + b) / 3;
+            if (lum >= BRIGHT_HARD) data[i + 3] = 0;
+            else if (lum >= BRIGHT_SOFT) {
+              const fade = 1 - (lum - BRIGHT_SOFT) / (BRIGHT_HARD - BRIGHT_SOFT);
+              const desired = Math.round(255 * fade);
+              if (data[i + 3] > desired) data[i + 3] = desired;
+            }
+          }
+          const out = await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
+            .trim()
+            .webp({ quality: 88 })
+            .toFile(outPath);
+          note = ` [chroma-keyed bright + trimmed → ${out.width}×${out.height}]`;
         } else {
           const mode = await detectBgMode(srcPath);
           if (mode) {
@@ -165,6 +184,41 @@ async function processDecor() {
         }
         const stats = await stat(outPath);
         console.log(`✓ ${themeId}/${file} → decor/${outName} (${(stats.size / 1024).toFixed(0)} KB)${note}`);
+
+        // Page-frame corner: dodatečně vygeneruj tr/bl/br varianty z chroma-keyed bufferu
+        if (isPageFrame) {
+          const baseBuf = await sharp(outPath).toBuffer();
+          const variants = [
+            { suffix: '-tr', op: (s) => s.flop() },           // mirror horizontal
+            { suffix: '-bl', op: (s) => s.flip() },           // mirror vertical
+            { suffix: '-br', op: (s) => s.flip().flop() },    // both
+          ];
+          for (const v of variants) {
+            const variantPath = path.join(outDir, outName.replace(/\.webp$/, v.suffix + '.webp'));
+            await v.op(sharp(baseBuf)).webp({ quality: 85 }).toFile(variantPath);
+          }
+          // Rename TL variant to make naming consistent
+          const tlPath = path.join(outDir, outName.replace(/\.webp$/, '-tl.webp'));
+          if (existsSync(tlPath)) await unlink(tlPath);
+          await rename(outPath, tlPath);
+          console.log(`  + ${themeId}/${file} mirrors: -tl, -tr, -bl, -br`);
+        }
+
+        // Nav end-cap: zdrojový PNG má jewel vpravo (= -r). Vygenerujeme -l přes flop.
+        if (isNavEndCap) {
+          const baseBuf = await sharp(outPath).toBuffer();
+          const lPath = path.join(outDir, outName.replace(/\.webp$/, '-l.webp'));
+          const rPath = path.join(outDir, outName.replace(/\.webp$/, '-r.webp'));
+          await Promise.all([
+            sharp(baseBuf).flop().webp({ quality: 85 }).toFile(lPath),
+            sharp(baseBuf).webp({ quality: 85 }).toFile(rPath),
+          ]);
+          // Drop the unsuffixed original (only -l + -r are referenced from CSS).
+          if (existsSync(outPath)) {
+            try { await unlink(outPath); } catch { /* Windows lock — ponecháme, je idempotent */ }
+          }
+          console.log(`  + ${themeId}/${file} mirrors: -l, -r`);
+        }
       } catch (err) {
         console.error(`✗ ${themeId}/${file}: ${err.message}`);
       }
