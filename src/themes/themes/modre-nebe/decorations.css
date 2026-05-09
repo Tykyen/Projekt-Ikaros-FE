@@ -1,28 +1,52 @@
-/* ── Modré nebe — dekorativní vrstva ──
-   Aplikuje se přes [data-theme="modre-nebe"] selektor.
-   Animace jsou pod prefers-reduced-motion: no-preference.
-   Statické dekor (ornamenty) jsou vždy aktivní.
-*/
+/* ── Modré nebe — luxusní fantasy/sci-fi observatoř (spec 1.0b-v2)
+   Aktivuje se přes [data-theme="modre-nebe"]. UI je kompletně CSS-native:
+   glass panely, gold + cyan akcenty, SVG corner ornamenty (renderuje
+   <CornerOrnament>). Žádné PNG UI fragmenty — z PNG se používá pouze
+   logo + andel-medallion + atmosférický background. */
 
 [data-theme="modre-nebe"] {
-  /* Fallback gradient (když background image chybí) */
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(232, 184, 96, 0.15) 0%, transparent 60%),
-    radial-gradient(ellipse at 30% 100%, rgba(20, 40, 80, 0.4) 0%, transparent 60%);
-  background-color: var(--bg-primary);
+  background-color: #050a18;
 }
 
-/* Diamond ornamentální oddělovače mezi sekcemi */
-[data-theme="modre-nebe"] .section-divider::before {
-  content: '◆';
-  color: var(--accent);
-  font-size: 12px;
-  margin: 0 var(--sp-3);
+/* ── Atmosférický overlay nad backgroundem (čitelnost UI) ── */
+[data-theme="modre-nebe"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Subtilní hvězdný třpyt na pozadí — jen když uživatel pohyb neomezuje */
-@media (prefers-reduced-motion: no-preference) {
-  [data-theme="modre-nebe"] {
-    /* (placeholder pro future hvězdný třpyt; zatím prázdné) */
-  }
+/* ── Header — žádný spodní okraj, splývá s pozadím přes header-bg fade ── */
+[data-theme="modre-nebe"] header {
+  position: relative;
 }
+
+/* ──────────── Glass panely — sidebar + right ──────────── */
+
+[data-theme="modre-nebe"] [data-frame-panel="sidebar"],
+[data-theme="modre-nebe"] [data-frame-panel="right"],
+[data-theme="modre-nebe"] [data-frame-panel="card"],
+[data-theme="modre-nebe"] [data-frame-panel="novinky"] {
+  position: relative;
+  background: var(--theme-surface);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-border);
+  border-radius: 22px;
+  isolation: isolate;
+}
+
+/* ── Anděl medallion uvnitř welcome card (image aspect ~0.93:1) ── */
+[data-theme="modre-nebe"] [data-andel-medallion] {
+  width: 200px;
+  height: 215px;
+  background-image: var(--asset-andel-medallion, none);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 16px var(--theme-glow-gold));
+}
+

@@ -11,13 +11,18 @@ export function useThemeSync(): void {
   const previous = useRef<ThemeId | null>(null);
   const initialSynced = useRef(false);
 
-  // Initial sync: pokud user má themeId a liší se od localStorage, BE výhrává
+  // Initial sync: pokud user má themeId v profilu a liší se od localStorage, BE výhrává.
+  // 1.3a: čteme z `user.themeId` (nové explicitní pole). Fallback na legacy
+  // `themeSettings.themeId` pro existující dokumenty před migrací.
   useEffect(() => {
     if (!user) return;
     if (initialSynced.current) return;
     initialSynced.current = true;
 
-    const userThemeId = (user as { themeId?: string }).themeId;
+    const legacyId = (
+      user.themeSettings as { themeId?: string } | undefined
+    )?.themeId;
+    const userThemeId = user.themeId ?? legacyId;
     if (userThemeId && userThemeId !== themeId) {
       setThemeId(userThemeId as ThemeId);
       previous.current = userThemeId as ThemeId;
@@ -38,11 +43,8 @@ export function useThemeSync(): void {
     previous.current = themeId;
 
     const handle = setTimeout(() => {
-      api.patch('/users/me', { themeId }).catch((err: { response?: { status?: number } }) => {
-        if (err?.response?.status === 404) {
-          console.warn('[theme] BE sync skipped — endpoint /users/me theme not implemented yet');
-          return;
-        }
+      // 1.3a: posíláme nové explicitní `themeId`. BE DTO ho akceptuje.
+      api.patch('/users/me', { themeId }).catch((err: unknown) => {
         console.warn('[theme] BE sync failed:', err);
       });
     }, 500);

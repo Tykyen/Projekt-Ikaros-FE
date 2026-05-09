@@ -10,13 +10,12 @@ import { Input } from '../ui/Input/Input';
 import { Button } from '../ui/Button/Button';
 import { loginSchema, type LoginFormValues } from './loginSchema';
 import { useLogin } from '../../api/hooks/useAuth';
+import { consumeLoginIntent } from '../../auth/loginIntent';
 import {
   loginModalOpenAtom,
   openRegisterModalAtom,
 } from '../../store/authStore';
 import s from './LoginModal.module.css';
-
-const LOGIN_INTENT_KEY = 'ikaros.loginIntent';
 
 function mapErrorToMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
@@ -29,11 +28,6 @@ function mapErrorToMessage(error: unknown): string {
     return 'Přihlášení se nezdařilo.';
   }
   return 'Přihlášení se nezdařilo.';
-}
-
-function isSafeRedirect(target: string | null): target is string {
-  if (!target) return false;
-  return target.startsWith('/') && !target.startsWith('//');
 }
 
 export function LoginModal() {
@@ -74,14 +68,13 @@ export function LoginModal() {
     setSubmitError(null);
     try {
       const result = await login.mutateAsync(values);
-      const intent = sessionStorage.getItem(LOGIN_INTENT_KEY);
-      sessionStorage.removeItem(LOGIN_INTENT_KEY);
+      const intent = consumeLoginIntent();
 
       const username = result.user.displayName ?? result.user.username;
       toast.success(`Vítej zpět, ${username}!`);
       close();
 
-      navigate(isSafeRedirect(intent) ? intent : '/');
+      navigate(intent ?? '/');
     } catch (err) {
       setSubmitError(mapErrorToMessage(err));
     }

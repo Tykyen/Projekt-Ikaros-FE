@@ -18,9 +18,8 @@ import {
   openLoginModalAtom,
 } from '../../store/authStore';
 import { parseApiErrorCode } from '../../api/client';
+import { consumeLoginIntent } from '../../auth/loginIntent';
 import s from './RegisterModal.module.css';
-
-const LOGIN_INTENT_KEY = 'ikaros.loginIntent';
 
 function mapErrorToBanner(error: unknown): string | null {
   if (!axios.isAxiosError(error)) return 'Registrace se nezdařila.';
@@ -34,11 +33,6 @@ function mapErrorToBanner(error: unknown): string | null {
   if (status >= 500) return 'Něco se pokazilo. Zkus to znovu.';
   if (status === 400) return 'Některá data nejsou platná.';
   return 'Registrace se nezdařila.';
-}
-
-function isSafeRedirect(target: string | null): target is string {
-  if (!target) return false;
-  return target.startsWith('/') && !target.startsWith('//');
 }
 
 function deriveStatus(
@@ -76,6 +70,8 @@ export function RegisterModal() {
       username: '',
       password: '',
       passwordConfirm: '',
+      acceptedTerms: false,
+      hp: '',
     },
   });
 
@@ -120,15 +116,16 @@ export function RegisterModal() {
         email: values.email,
         username: values.username,
         password: values.password,
+        acceptedTerms: values.acceptedTerms,
+        hp: values.hp,
       });
-      const intent = sessionStorage.getItem(LOGIN_INTENT_KEY);
-      sessionStorage.removeItem(LOGIN_INTENT_KEY);
+      const intent = consumeLoginIntent();
 
       const username = result.user.displayName ?? result.user.username;
       toast.success(`Vítej, ${username}! Účet vytvořen.`);
       close();
 
-      navigate(isSafeRedirect(intent) ? intent : '/');
+      navigate(intent ?? '/');
     } catch (err) {
       const code = parseApiErrorCode(err);
       if (code === 'EMAIL_TAKEN') {
@@ -221,6 +218,40 @@ export function RegisterModal() {
             {...rhfRegister('passwordConfirm')}
           />
         </div>
+
+        {/* D-011 — honeypot field. Skutečný uživatel ho nevidí. Bot vyplní → bot detection. */}
+        <input
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+            pointerEvents: 'none',
+          }}
+          {...rhfRegister('hp')}
+        />
+
+        {/* D-010 — GDPR souhlas */}
+        <label className={s.terms}>
+          <input type="checkbox" {...rhfRegister('acceptedTerms')} />
+          <span>
+            Souhlasím s{' '}
+            <a href="/podminky" target="_blank" rel="noopener noreferrer">
+              podmínkami použití
+            </a>
+            .
+          </span>
+        </label>
+        {errors.acceptedTerms && (
+          <p className={s.bannerError} role="alert" aria-live="polite">
+            {errors.acceptedTerms.message}
+          </p>
+        )}
 
         {submitError && (
           <div className={s.banner} role="alert" aria-live="polite">

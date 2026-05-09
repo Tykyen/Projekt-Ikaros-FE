@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { getDefaultStore, useSetAtom } from 'jotai';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import { api } from '../client';
 import {
   accessTokenAtom,
@@ -91,11 +91,18 @@ export function useLogout() {
 }
 
 /**
- * Při startu app: pokud existuje access token, ale `currentUserAtom` je prázdný
- * (např. první volání po reloadu před tím než `atomWithStorage` zhydratoval),
- * dekóduje JWT a doplní základní user data. Nepřepisuje existující záznam.
+ * Při startu app:
+ * - Pokud token chybí → no-op
+ * - Pokud token je expirovaný → clean logout (smaže oba tokeny + user)
+ * - Pokud token je validní → no-op (plnohodnotnou hydrataci řeší
+ *   `useCurrentUserHydration` přes `/users/me`).
  *
- * Když je token expirovaný, smaže oba tokeny + user (clean logged-out).
+ * D-020 (1.3a) — JWT decode dříve psal minimalUser do `currentUserAtom`,
+ * ale data z JWT jsou subset `/users/me` (chybí avatar, bio, themeId, …).
+ * Optimistic minimal user vedl k UI flashům (placeholder pole → reálná data
+ * po 100-300ms). Nyní spoléháme jen na `/me` query — `currentUserAtom`
+ * je null až do prvního úspěšného fetchu. Header komponenty mají
+ * `if (!user) return null;` ochranu, takže žádná regrese.
  */
 export function useAuthBootstrap(): void {
   useEffect(() => {
@@ -107,32 +114,52 @@ export function useAuthBootstrap(): void {
       store.set(accessTokenAtom, null);
       store.set(refreshTokenAtom, null);
       store.set(currentUserAtom, null);
-      return;
     }
-
-    if (store.get(currentUserAtom) !== null) return;
-
-    const payload = decodeJwt<AccessTokenPayload>(token);
-    if (!payload) return;
-
-    const minimalUser: User = {
-      id: payload.sub,
-      email: payload.email,
-      username: payload.username,
-      role: payload.role,
-      characterPath: payload.characterPath,
-      ikarosSkin: payload.ikarosSkin,
-      themeSettings: {},
-      chatPreferences: {},
-      favoriteDiscussionIds: [],
-      isOnline: true,
-      lastSeenAt: '',
-      displayName: undefined,
-      avatarUrl: undefined,
-      profileImageUrl: undefined,
-      createdAt: '',
-      updatedAt: '',
-    };
-    store.set(currentUserAtom, minimalUser);
   }, []);
+}
+
+/**
+ * Plnohodnotná hydratace currentUser z /users/me (1.3a — vyřeší D-005).
+ * Volá se v provider tree (např. <App>) — je závislé na QueryClient + access token.
+ *
+ * Tok:
+ * 1. JWT decode v useAuthBootstrap → minimal user (rychlá optimistic UI)
+ * 2. /users/me query → plnohodnotná data → přepíše currentUserAtom
+ */
+export function useCurrentUserHydration(): void {
+  const accessToken = useAtomValue(accessTokenAtom);
+  const setUser = useSetAtom(currentUserAtom);
+
+  const { data } = useQuery({
+    queryKey: ['users', 'me'],
+    queryFn: () => api.get<User>('/users/me'),
+    enabled: !!accessToken,
+    staleTime: 30_000,
+  });
+
+  useEffect(() => {
+    if (data) setUser(data);
+  }, [data, setUser]);
+}
+
+/**
+ * 1.3a — TanStack Query hook pro vlastní profil. Vrací stejný shape jako User.
+ * Po mutation (PATCH/avatar upload) se invalidace: queryClient.invalidateQueries(['users', 'me'])
+ */
+export function useMyProfile() {
+  const accessToken = useAtomValue(accessTokenAtom);
+  return useQuery({
+    queryKey: ['users', 'me'],
+    queryFn: () => api.get<User>('/users/me'),
+    enabled: !!accessToken,
+    staleTime: 30_000,
+  });
+}
+
+/**
+ * Helper: invalidate /users/me cache. Volá se po každé mutaci profilu.
+ */
+export function useInvalidateMyProfile() {
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: ['users', 'me'] });
 }

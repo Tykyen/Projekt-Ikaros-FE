@@ -140,14 +140,61 @@
 - [x] **FE:** REGISTRACE button v hlavičce odblokovaný; `?openRegister=1` query trigger; deep-link intent reuse
 - [x] **FE:** Smazány orphan `AuthLayout.tsx`, `RegisterPage.tsx`, `LoginPage.tsx`
 - [x] **Tests:** 117 FE testů (registerSchema 9, passwordStrength 8, useDebouncedValue 3, useRegister 3, useAvailability 7, RegisterModal 14, +cross-link); BE 35 unit + 11 e2e + 4 filter testy
-- [x] **Bonus:** Superadmin seed skript `npm run seed:superadmin` — Tyky účet (spec `spec-superadmin-seed.md`)
+- [x] **Bonus:** Superadmin seed skript `npm run seed:superadmin` — Tyky účet (spec `_side-tasks/spec-superadmin-seed.md`)
 
 **Tracked dluhy:** D-009 (BE `code` field napříč moduly), D-010 (GDPR souhlas), D-011 (captcha), D-012 (email verifikace).
 
-### - [ ] 1.3 Uživatelský profil (`/ikaros/profil`)
-- [ ] Editace profilu (displayName, username)
-- [ ] Avatar upload (Cloudinary `POST /api/upload`)
-- [ ] Theme settings, chat preferences
+### - [ ] 1.3 Uživatelský profil — rozděleno do tří podkroků
+
+Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role infrastruktura, admin schvalování username) → tři menší PR místo jednoho monolitu.
+
+#### - [ ] 1.3a Profil — self-edit (`/ikaros/profil`)
+
+**Spec:** `docs/arch/phase-1/spec-1.3a.md`
+
+- [ ] Hydratace `GET /users/me` (vyřešit D-005) — rozšíření o `displayName`, `city`, `bio`, `avatarUrl`, `defaultAvatarType`, `characterName`, `characterBio`, `characterAvatarUrl`, `chatColor`, `themeId`, `emailVerified`, `lastLoginAt`, `createdAt`
+- [ ] Route `/ikaros/profil` (full-page, taby/sekce uvnitř `IkarosLayout`)
+- [ ] **Header karta** — avatar, username, displayName, město, účet založen, poslední přihlášení, barva chatu (swatch), globální motiv
+- [ ] **Sekce NĚCO O MNĚ** — bio (1000 znaků, plain text)
+- [ ] **Sekce POSTAVA V ROZCESTÍ** — jméno postavy, bio postavy (1000 znaků), avatar postavy (samostatný slot)
+- [ ] **Sekce MOJE SVĚTY** — read-only readout (PJ badge, klik → svět)
+- [ ] **Placeholder sekce** Moje diskuze / Moje články / Moje galerie (prázdné readouts pro 3.x)
+- [ ] Edit pole: displayName, město, bio, postava (jméno + bio + avatar), barva chatu (color picker `react-colorful`, default `#FFFFFF`), theme
+- [ ] Email v header kartě **read-only** (změna přijde v 1.7 s verifikací)
+- [ ] **Sekce Bezpečnost** — změna hesla (vyžaduje staré heslo, revokuje rodinu refresh tokenů)
+- [ ] **Default avatary** muž (default) / žena / bytost — ikonky dodá PJ, FE optimalizuje
+- [ ] **BE `MediaUploadService`** — sharp → WebP konverze pro všechny image uploady (crosscutting BE feature)
+- [ ] BE endpointy: `PATCH /users/me`, `PATCH /users/me/password`, `POST /users/me/avatar`, `POST /users/me/character/avatar`
+- [ ] Username change UI **disabled** v 1.3a (přijde v 1.3b)
+- [ ] Smazání účtu UI **disabled** v 1.3a (přijde v 1.3c)
+
+#### - [ ] 1.3b Username change + Admin role infrastruktura
+
+**Spec:** `docs/arch/phase-1/spec-1.3b.md` (po 1.3a)
+
+- [ ] BE entity `UsernameChangeRequest` (userId, requestedUsername, status: `pending` | `approved` | `rejected`, requestedAt, decidedAt, decidedBy)
+- [ ] BE: cooldown 30 dní (`usernameChangedAt` na User)
+- [ ] BE endpointy: `POST /api/users/me/username-request`, `GET /api/admin/username-requests`, `POST /api/admin/username-requests/:id/approve`, `POST /api/admin/username-requests/:id/reject`
+- [ ] BE: role machinery aktivní (USER / ADMIN / SUPERADMIN guards napříč admin endpointy)
+- [ ] BE endpointy `GET /api/admin/users`, `PATCH /api/admin/users/:id/role`, `POST /api/admin/users/:id/ban`
+- [ ] FE: profil — formulář žádosti o username + zobrazení pending stavu
+- [ ] FE: minimal `/admin/uzivatele` (seznam, role změna, ban)
+- [ ] FE: minimal `/admin/zadosti-username` (schvalovat / odmítat)
+
+#### - [ ] 1.3c Tombstone smazaného účtu + cleanup
+
+**Spec:** `docs/arch/phase-1/spec-1.3c.md` (po 1.3b)
+
+- [ ] BE: soft delete (`deletionRequestedAt`), 30denní hold; cron auto hard delete
+- [ ] BE: tombstone řádek (zachovává username/displayName/avatar/chatColor s `isDeleted: true` + `deletedAt`)
+- [ ] BE: blokace smazání pokud jediný PJ světa bez Pomocného PJ; auto-promote Pomocného PJ při smazání
+- [ ] BE: moderační smazání (admin/superadmin) → tombstone + avatar = admin-set default
+- [ ] BE: chat / články / galerie / diskuze **zachovány**, autor → tombstone
+- [ ] FE: sekce **Účet** v profilu — tlačítko "Smazat účet" + confirm flow + zobrazení pending stavu
+- [ ] FE: login během hold = obnova účtu + toast
+- [ ] FE: `<UserAvatar deleted />` overlay komponenta (černá páska CSS)
+- [ ] FE: admin moderační delete v `/admin/uzivatele`
+- [ ] BE: trvalá rezervace username/email (DB constraint)
 
 ### - [ ] 1.4 Adresář uživatelů
 - [ ] `/ikaros/uzivatele` — seznam (paginace)
@@ -172,12 +219,16 @@
 - [ ] `POST /api/auth/forgot-password` — vždy 200 (proti enumeraci), rate limit 3/15min/IP
 - [ ] `POST /api/auth/reset-password` — ověří hash, nastaví heslo, smaže token, **revokuje rodinu refresh tokenů**
 - [ ] HTML e-mail šablona `forgot-password.hbs` + `subject` "Reset hesla — Projekt Ikaros"
+- [ ] **Změna emailu s verifikací (přesunuto z 1.3a):** Entity `EmailChangeToken` (tokenHash, userId, newEmail, expiresAt, usedAt); `POST /api/users/me/email-change-request` (rate limit) → e-mail s linkem na nový email; `POST /api/auth/email-change-confirm` ověří token a přepne `email` + nastaví `emailVerified: true`
+- [ ] HTML šablona `email-change.hbs`
 
 **FE:**
 - [ ] Link "Zapomněl jsem heslo" v `LoginModal`
 - [ ] `ForgotPasswordModal` (e-mail input) → toast "Pokud e-mail existuje, poslali jsme link"
 - [ ] `/reset-password?token=...` route + `ResetPasswordModal` (nové heslo + potvrzení + indikátor síly z 1.2)
 - [ ] Po úspěšném resetu **bez auto-login** — toast "Heslo změněno, přihlas se" → otevře LoginModal (bezpečnost: vědomé přihlášení)
+- [ ] **Změna emailu na profilu** (sekce Header karta) — odblokovat read-only z 1.3a, formulář "Nový email" → odešle verifikační email → toast "Klikni na link v e-mailu pro potvrzení"
+- [ ] `/email-change/confirm?token=...` route → BE potvrzení → toast "Email změněn"
 
 **Závislosti:** Resend účet + API klíč v `.env` (PJ založí před implementací).
 

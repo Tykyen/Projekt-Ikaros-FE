@@ -180,6 +180,7 @@ describe('useLogout', () => {
       id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
       themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
       isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
+      defaultAvatarType: 'male', chatColor: '#FFFFFF', emailVerified: false,
     });
   });
 
@@ -227,7 +228,11 @@ describe('useLogout', () => {
 });
 
 describe('useAuthBootstrap', () => {
-  it('hydratuje currentUser z JWT pokud je token validní a user prázdný', async () => {
+  // D-020: useAuthBootstrap už nezapisuje JWT data do currentUserAtom.
+  // Plnohodnotnou hydrataci řeší useCurrentUserHydration přes /users/me.
+  // useAuthBootstrap teď řeší pouze: 1) cleanup expirovaného tokenu, 2) no-op když token chybí.
+
+  it('s validním tokenem ponechá currentUser null (čeká se na /me query)', async () => {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const token = makeJwt({
       sub: '42', email: 'b@b.com', username: 'bob', role: UserRole.Hrac,
@@ -237,10 +242,10 @@ describe('useAuthBootstrap', () => {
 
     renderHook(() => useAuthBootstrap());
 
-    await waitFor(() => {
-      expect(store.get(currentUserAtom)?.username).toBe('bob');
-    });
-    expect(store.get(currentUserAtom)?.id).toBe('42');
+    // useAuthBootstrap nezapisuje JWT do currentUser
+    expect(store.get(currentUserAtom)).toBeNull();
+    // Token zůstává nedotčený (expirace nepřišla)
+    expect(store.get(accessTokenAtom)).toBe(token);
   });
 
   it('smaže tokeny pokud je JWT expirovaný', async () => {
@@ -268,6 +273,7 @@ describe('useAuthBootstrap', () => {
       displayName: 'Alice', avatarUrl: 'http://x.com/a.png',
       themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
       isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
+      defaultAvatarType: 'male' as const, chatColor: '#FFFFFF', emailVerified: false,
     };
     store.set(accessTokenAtom, token);
     store.set(currentUserAtom, existing);

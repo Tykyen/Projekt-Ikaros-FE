@@ -87,6 +87,8 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText('Přezdívka'), 'newbie');
   await user.type(screen.getByLabelText('Heslo'), 'pass1234');
   await user.type(screen.getByLabelText('Potvrzení hesla'), 'pass1234');
+  // D-010 — GDPR checkbox je povinný
+  await user.click(screen.getByRole('checkbox'));
 }
 
 describe('RegisterModal — render + validation', () => {
@@ -153,6 +155,8 @@ describe('RegisterModal — submit + auto-login', () => {
       email: 'newbie@test.io',
       username: 'newbie',
       password: 'pass1234',
+      acceptedTerms: true,
+      hp: '',
     });
   });
 

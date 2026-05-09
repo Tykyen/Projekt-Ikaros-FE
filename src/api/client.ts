@@ -1,5 +1,7 @@
 import axios, { type AxiosError } from 'axios';
 import { getDefaultStore } from 'jotai';
+import { router } from '../router';
+import { saveLoginIntent } from '../auth/loginIntent';
 import { accessTokenAtom, refreshTokenAtom } from '../store/authStore';
 import type { ApiError, RefreshResponse } from '../types';
 
@@ -9,6 +11,18 @@ export const apiClient = axios.create({
   baseURL: `${apiBase}/api`,
   withCredentials: true,
 });
+
+// Cleanup tokenů + redirect na úvodník s otevřeným LoginModalem.
+// `/login` route neexistuje — login se otvírá modálně přes ?openLogin=1.
+function logoutAndRedirectToLogin() {
+  const store = getDefaultStore();
+  store.set(accessTokenAtom, null);
+  store.set(refreshTokenAtom, null);
+
+  saveLoginIntent(window.location.pathname + window.location.search);
+
+  void router.navigate('/?openLogin=1');
+}
 
 // Request — přidá Bearer token
 apiClient.interceptors.request.use((config) => {
@@ -30,9 +44,7 @@ apiClient.interceptors.response.use(
       const refreshToken = store.get(refreshTokenAtom);
 
       if (!refreshToken) {
-        store.set(accessTokenAtom, null);
-        store.set(refreshTokenAtom, null);
-        window.location.href = '/login';
+        logoutAndRedirectToLogin();
         return Promise.reject(error);
       }
 
@@ -47,9 +59,7 @@ apiClient.interceptors.response.use(
         original.headers.Authorization = `Bearer ${data.accessToken}`;
         return apiClient(original);
       } catch {
-        store.set(accessTokenAtom, null);
-        store.set(refreshTokenAtom, null);
-        window.location.href = '/login';
+        logoutAndRedirectToLogin();
         return Promise.reject(error);
       }
     }

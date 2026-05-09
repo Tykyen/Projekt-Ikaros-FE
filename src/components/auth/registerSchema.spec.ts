@@ -6,6 +6,8 @@ const valid = {
   username: 'newuser',
   password: 'pass1234',
   passwordConfirm: 'pass1234',
+  acceptedTerms: true,
+  hp: '',
 };
 
 describe('registerSchema', () => {
@@ -74,8 +76,35 @@ describe('registerSchema', () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].path).toEqual(['passwordConfirm']);
-      expect(result.error.issues[0].message).toMatch(/neshod/i);
+      const mismatchIssue = result.error.issues.find((i) =>
+        i.path.includes('passwordConfirm'),
+      );
+      expect(mismatchIssue).toBeDefined();
+      expect(mismatchIssue?.message).toMatch(/neshod/i);
     }
+  });
+
+  // D-010 — GDPR souhlas
+  it('odmítne registraci bez souhlasu s podmínkami', () => {
+    const result = registerSchema.safeParse({
+      ...valid,
+      acceptedTerms: false,
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find((i) =>
+        i.path.includes('acceptedTerms'),
+      );
+      expect(issue?.message).toMatch(/podmínkami/i);
+    }
+  });
+
+  // D-011 — honeypot
+  it('odmítne registraci s vyplněným honeypotem (bot detection)', () => {
+    const result = registerSchema.safeParse({
+      ...valid,
+      hp: 'spam-link',
+    });
+    expect(result.success).toBe(false);
   });
 });

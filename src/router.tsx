@@ -4,6 +4,7 @@ import { createBrowserRouter, redirect, type LoaderFunctionArgs } from 'react-ro
 import { IkarosLayout, WorldLayout } from './components/layout';
 import { Spinner } from './components/ui';
 import { RoleGuard } from './components/guards/RoleGuard';
+import { saveLoginIntent } from './auth/loginIntent';
 import { UserRole } from './types';
 import NotFoundPage from './pages/errors/NotFoundPage';
 import ErrorPage from './pages/errors/ErrorPage';
@@ -21,6 +22,7 @@ const GalleryPage      = lazy(() => import('./pages/ikaros/GalleryPage'));
 const DiscussionsPage  = lazy(() => import('./pages/ikaros/DiscussionsPage'));
 const MailPage             = lazy(() => import('./pages/ikaros/MailPage'));
 const HelpPage             = lazy(() => import('./pages/ikaros/HelpPage'));
+const TermsPage            = lazy(() => import('./pages/ikaros/TermsPage'));
 const DiscussionsNewPage   = lazy(() => import('./pages/ikaros/DiscussionsNewPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
@@ -61,8 +63,6 @@ function p(Comp: LazyExoticComponent<ComponentType>) {
   );
 }
 
-const LOGIN_INTENT_KEY = 'ikaros.loginIntent';
-
 // ── Per-route auth loader ─────────────────────────────────────────────────
 // Pokud chybí token, uloží zamýšlenou cestu do sessionStorage (LoginModal
 // po úspěšném přihlášení tam naviguje), redirectne na úvodník s
@@ -78,11 +78,7 @@ export function requireAuth({ request }: LoaderFunctionArgs) {
     }
   }
   const url = new URL(request.url);
-  const target = url.pathname + url.search;
-  // Bezpečnostní filtr: target musí být relativní cesta začínající /
-  if (target.startsWith('/') && !target.startsWith('//')) {
-    sessionStorage.setItem(LOGIN_INTENT_KEY, target);
-  }
+  saveLoginIntent(url.pathname + url.search);
   return redirect('/?openLogin=1');
 }
 
@@ -101,6 +97,7 @@ export const router = createBrowserRouter([
       { path: 'ikaros/galerie',         element: p(GalleryPage) },
       { path: 'ikaros/diskuze',         element: p(DiscussionsPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
+      { path: 'podminky',               element: p(TermsPage) },
 
       // Chráněné — vyžadují přihlášení (per-route loader)
       { path: 'chat',                   element: p(ChatPage),         loader: requireAuth },

@@ -4,3 +4,7 @@ export { Card } from './Card/Card';
 export { Spinner } from './Spinner/Spinner';
 export { Modal } from './Modal/Modal';
 export { Badge } from './Badge/Badge';
+export { UserAvatar } from './UserAvatar';
+export { AvatarUploader } from './AvatarUploader';
+export { ChatColorPicker } from './ChatColorPicker';
+export { EditCard } from './EditCard';

@@ -1,0 +1,247 @@
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.placeholderHint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
+/* Bio / Character textareas */
+.textareaWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.textarea {
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border-radius: 4px;
+  width: 100%;
+  min-height: 120px;
+}
+
+.counter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* Character section */
+.characterEdit {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.editField span {
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.editField em {
+  font-style: normal;
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
+.characterRead {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.characterFields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.characterName {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+/* Worlds */
+.worldList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.worldLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text-strong);
+  transition: background-color 0.15s;
+}
+
+.worldLink:hover {
+  background: var(--surface-3, var(--surface-2));
+}
+
+.worldName {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.worldGenre {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Theme + chat color */
+.themeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.swatchRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.swatchLg {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--frame-border);
+  flex-shrink: 0;
+}
+
+.swatchHex {
+  font-family: var(--font-mono, monospace);
+  color: var(--text-strong);
+  font-size: 0.9rem;
+}
+
+.chatPreview {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Disabled fields */
+.disabledField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Password form */
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 16px;
+  }
+  .characterRead {
+    grid-template-columns: 1fr;
+  }
+  .themeRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

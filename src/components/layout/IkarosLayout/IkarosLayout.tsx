@@ -33,6 +33,7 @@ import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
 import { LoginModal } from '../../auth/LoginModal';
 import { RegisterModal } from '../../auth/RegisterModal';
 import { CornerOrnament } from '../PanelFrame/CornerOrnament';
+import { UserAvatar } from '../../ui';
 import { UserRole, type World } from '../../../types';
 
 function PanelCorners() {
@@ -283,7 +284,6 @@ function HeaderLoggedIn() {
 
   if (!user) return null;
 
-  const initials = (user.displayName ?? user.username).slice(0, 2).toUpperCase();
   const displayName = user.displayName ?? user.username;
   const isAdmin =
     user.role === UserRole.Superadmin || user.role === UserRole.Admin;
@@ -327,11 +327,13 @@ function HeaderLoggedIn() {
       <ThemeSwitcher />
 
       <Link to="/ikaros/profil" className={s.headerBtn}>
-        {user.avatarUrl ? (
-          <img src={user.avatarUrl} alt={user.username} className={s.avatar} />
-        ) : (
-          <span className={s.avatar}>{initials}</span>
-        )}
+        <UserAvatar
+          src={user.avatarUrl}
+          defaultType={user.defaultAvatarType ?? 'male'}
+          size="sm"
+          alt={user.username}
+          className={s.avatar}
+        />
         <span className={s.headerBtnLabel}>{displayName}</span>
       </Link>
 

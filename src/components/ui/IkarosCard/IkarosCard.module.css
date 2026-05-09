@@ -1,0 +1,46 @@
+.card {
+  position: relative;
+  z-index: 1;
+}
+
+.welcome {
+  padding: 48px 56px;
+  margin-bottom: var(--sp-5);
+}
+
+.news {
+  padding: 32px 40px;
+}
+
+.header {
+  position: relative;
+  z-index: 2;
+  margin-bottom: var(--sp-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.body {
+  display: flex;
+  gap: var(--sp-5);
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+}
+
+.medallionSlot {
+  flex-shrink: 0;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .welcome { padding: 32px 24px; }
+  .news { padding: 24px 20px; }
+  .body { flex-direction: column; align-items: center; text-align: center; }
+}

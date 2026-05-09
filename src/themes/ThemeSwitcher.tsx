@@ -77,8 +77,8 @@ export function ThemeSwitcher() {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Vybrat motiv aplikace"
+        style={theme.background ? { backgroundImage: `url(${theme.background})` } : undefined}
       >
-        <img src={theme.thumbnail} alt="" className={s.triggerThumb} />
         <span className={s.triggerName}>{theme.name}</span>
         <span className={s.triggerCaret} aria-hidden="true">▼</span>
       </button>
@@ -103,8 +103,8 @@ export function ThemeSwitcher() {
                 role="option"
                 aria-selected={t.id === themeId}
                 data-index={idx}
+                style={t.background ? { backgroundImage: `url(${t.background})` } : undefined}
               >
-                <img src={t.thumbnail} alt="" className={s.optionThumb} />
                 <span className={s.optionName}>{t.name}</span>
                 {t.id === themeId && <span className={s.optionCheck} aria-hidden="true">✓</span>}
               </button>

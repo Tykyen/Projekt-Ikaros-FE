@@ -17,6 +17,14 @@ export const registerSchema = z
       .min(6, 'Minimálně 6 znaků')
       .max(128, 'Maximálně 128 znaků'),
     passwordConfirm: z.string().min(1, 'Potvrď heslo'),
+    // D-010 — GDPR souhlas
+    acceptedTerms: z
+      .boolean()
+      .refine((v) => v === true, {
+        message: 'Pro vytvoření účtu musíš souhlasit s podmínkami',
+      }),
+    // D-011 — honeypot. Skutečný uživatel pole nevidí (offscreen). Bot ho vyplní → odmítneme.
+    hp: z.string().max(0, 'Bot detection').optional(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     path: ['passwordConfirm'],
