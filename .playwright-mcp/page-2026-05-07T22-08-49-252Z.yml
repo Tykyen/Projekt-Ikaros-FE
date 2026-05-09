@@ -1,0 +1,103 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - link "Projekt Ikaros — domů" [ref=e5] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e7]:
+        - button "Vybrat motiv aplikace" [ref=e9] [cursor=pointer]:
+          - generic [ref=e10]: Modré nebe
+          - generic [ref=e11]: ▼
+        - button "Přihlásit se" [ref=e12] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Přihlásit se
+        - button "Registrace" [disabled] [ref=e18]:
+          - generic [ref=e19]: Registrace
+    - generic [ref=e20]:
+      - complementary [ref=e21]:
+        - img
+        - img
+        - img
+        - img
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - generic [ref=e24]: — ✦ Navigace ✦ —
+            - generic [ref=e25]:
+              - link "Úvodník" [ref=e26] [cursor=pointer]:
+                - /url: /
+                - img [ref=e28]
+                - generic [ref=e31]: Úvodník
+              - link "Diskuze" [ref=e32] [cursor=pointer]:
+                - /url: /ikaros/diskuze
+                - img [ref=e34]
+                - generic [ref=e36]: Diskuze
+              - link "Články" [ref=e37] [cursor=pointer]:
+                - /url: /ikaros/clanky
+                - img [ref=e39]
+                - generic [ref=e41]: Články
+              - link "Galerie" [ref=e42] [cursor=pointer]:
+                - /url: /ikaros/galerie
+                - img [ref=e44]
+                - generic [ref=e48]: Galerie
+              - link "Nápověda" [ref=e49] [cursor=pointer]:
+                - /url: /ikaros/napoveda
+                - img [ref=e51]
+                - generic [ref=e54]: Nápověda
+          - generic [ref=e55]:
+            - generic [ref=e56]: — ✦ Vesmíry ✦ —
+            - generic [ref=e57]:
+              - link "Matrix" [ref=e58] [cursor=pointer]:
+                - /url: /svet/69f5154fdb96c18758b1a038
+                - generic [ref=e60]: Matrix
+              - link "Zobrazit vše →" [ref=e61] [cursor=pointer]:
+                - /url: /ikaros/vesmiry
+      - complementary [ref=e62]:
+        - img
+        - img
+        - img
+        - img
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e65]: — ✦ Navigace ✦ —
+            - generic [ref=e66]:
+              - link "Úvodník" [ref=e67] [cursor=pointer]:
+                - /url: /
+                - img [ref=e69]
+                - generic [ref=e72]: Úvodník
+              - link "Diskuze" [ref=e73] [cursor=pointer]:
+                - /url: /ikaros/diskuze
+                - img [ref=e75]
+                - generic [ref=e77]: Diskuze
+              - link "Články" [ref=e78] [cursor=pointer]:
+                - /url: /ikaros/clanky
+                - img [ref=e80]
+                - generic [ref=e82]: Články
+              - link "Galerie" [ref=e83] [cursor=pointer]:
+                - /url: /ikaros/galerie
+                - img [ref=e85]
+                - generic [ref=e89]: Galerie
+              - link "Nápověda" [ref=e90] [cursor=pointer]:
+                - /url: /ikaros/napoveda
+                - img [ref=e92]
+                - generic [ref=e95]: Nápověda
+          - generic [ref=e96]:
+            - generic [ref=e97]: — ✦ Vesmíry ✦ —
+            - generic [ref=e98]:
+              - link "Matrix" [ref=e99] [cursor=pointer]:
+                - /url: /svet/69f5154fdb96c18758b1a038
+                - generic [ref=e101]: Matrix
+              - link "Zobrazit vše →" [ref=e102] [cursor=pointer]:
+                - /url: /ikaros/vesmiry
+      - main [ref=e103]
+      - complementary [ref=e106]:
+        - img
+        - img
+        - img
+        - img
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - generic [ref=e110]: — ✦ Moje diskuze ✦ —
+            - paragraph [ref=e111]: Přihlaste se pro správu diskuzí.
+          - generic [ref=e112]:
+            - generic [ref=e114]: — ✦ Moje světy ✦ —
+            - paragraph [ref=e115]: Přihlaste se pro správu světů.
+  - region "Notifications alt+T"

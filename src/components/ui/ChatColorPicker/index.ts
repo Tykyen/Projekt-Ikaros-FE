@@ -1,0 +1,1 @@
+export { ChatColorPicker } from './ChatColorPicker';

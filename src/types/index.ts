@@ -13,6 +13,8 @@ export enum UserRole {
   SprávceDisukzi = 12,
 }
 
+export type DefaultAvatarType = 'male' | 'female' | 'being';
+
 export interface User {
   id: string;
   email: string;
@@ -23,6 +25,18 @@ export interface User {
   profileImageUrl?: string;
   characterPath?: string;
   ikarosSkin?: string;
+  // 1.3a profil
+  city?: string;
+  bio?: string;
+  defaultAvatarType: DefaultAvatarType;
+  characterName?: string;
+  characterBio?: string;
+  characterAvatarUrl?: string;
+  chatColor: string;
+  themeId?: string;
+  emailVerified: boolean;
+  lastLoginAt?: string;
+  usernameChangedAt?: string;
   themeSettings: Record<string, unknown>;
   chatPreferences: Record<string, unknown>;
   favoriteDiscussionIds: string[];
@@ -53,6 +67,10 @@ export interface RegisterRequest {
   email: string;
   username: string;
   password: string;
+  // D-010 — GDPR souhlas (povinný checkbox v RegisterModalu)
+  acceptedTerms?: boolean;
+  // D-011 — honeypot (skutečný uživatel nevyplňuje, bot ano → BE odmítne)
+  hp?: string;
 }
 
 export interface AuthResponse {
@@ -74,6 +92,20 @@ export interface UpdateUserRequest {
   username?: string;
   themeSettings?: Record<string, unknown>;
   chatPreferences?: Record<string, unknown>;
+  // 1.3a profil
+  city?: string;
+  bio?: string;
+  defaultAvatarType?: DefaultAvatarType;
+  characterName?: string;
+  characterBio?: string;
+  characterAvatarUrl?: string;
+  chatColor?: string;
+  themeId?: string;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
 }
 
 // JWT access token payload (dekódovaný)
@@ -131,11 +163,21 @@ export interface UnreadCountResponse {
   pendingRequestCount: number;
 }
 
-// API error
+// API error — BE response shape z HttpExceptionFilter
 export interface ApiError {
-  message: string | string[];
-  error?: string;
-  statusCode: number;
+  error: {
+    code: string;       // např. 'CONFLICT', 'BAD_REQUEST', 'EMAIL_TAKEN', 'USERNAME_TAKEN'
+    message: string | string[];
+    timestamp: string;
+  };
+}
+
+// Doménové error kódy pro registrační flow (1.2)
+export type RegisterErrorCode = 'EMAIL_TAKEN' | 'USERNAME_TAKEN';
+
+// Response z GET /auth/check-username a /check-email
+export interface AvailabilityResponse {
+  available: boolean;
 }
 
 // Pagination

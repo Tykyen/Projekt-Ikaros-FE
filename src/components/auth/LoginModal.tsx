@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -10,10 +10,12 @@ import { Input } from '../ui/Input/Input';
 import { Button } from '../ui/Button/Button';
 import { loginSchema, type LoginFormValues } from './loginSchema';
 import { useLogin } from '../../api/hooks/useAuth';
-import { loginModalOpenAtom } from '../../store/authStore';
+import { consumeLoginIntent } from '../../auth/loginIntent';
+import {
+  loginModalOpenAtom,
+  openRegisterModalAtom,
+} from '../../store/authStore';
 import s from './LoginModal.module.css';
-
-const LOGIN_INTENT_KEY = 'ikaros.loginIntent';
 
 function mapErrorToMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
@@ -28,13 +30,9 @@ function mapErrorToMessage(error: unknown): string {
   return 'Přihlášení se nezdařilo.';
 }
 
-function isSafeRedirect(target: string | null): target is string {
-  if (!target) return false;
-  return target.startsWith('/') && !target.startsWith('//');
-}
-
 export function LoginModal() {
   const [open, setOpen] = useAtom(loginModalOpenAtom);
+  const openRegister = useSetAtom(openRegisterModalAtom);
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -59,20 +57,24 @@ export function LoginModal() {
     reset();
   }
 
+  function switchToRegister() {
+    setSubmitError(null);
+    setShowPassword(false);
+    reset();
+    openRegister();
+  }
+
   async function onSubmit(values: LoginFormValues) {
     setSubmitError(null);
     try {
       const result = await login.mutateAsync(values);
-      const intent = sessionStorage.getItem(LOGIN_INTENT_KEY);
-      sessionStorage.removeItem(LOGIN_INTENT_KEY);
+      const intent = consumeLoginIntent();
 
       const username = result.user.displayName ?? result.user.username;
       toast.success(`Vítej zpět, ${username}!`);
       close();
 
-      if (isSafeRedirect(intent)) {
-        navigate(intent);
-      }
+      navigate(intent ?? '/');
     } catch (err) {
       setSubmitError(mapErrorToMessage(err));
     }
@@ -131,7 +133,14 @@ export function LoginModal() {
         </Button>
 
         <div className={s.footer}>
-          Nemáš účet? Registrace připravujeme.
+          Nemáš účet?{' '}
+          <button
+            type="button"
+            className={s.crossLink}
+            onClick={switchToRegister}
+          >
+            Zaregistruj se
+          </button>
         </div>
       </form>
     </Modal>

@@ -1,0 +1,31 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.loading,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50vh;
+  color: var(--text-muted);
+}
+
+.error {
+  color: var(--danger);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px 12px 32px;
+  }
+}

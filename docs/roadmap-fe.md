@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 ✅, 1.2-1.6 čeká) |
+| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 + 1.2 ✅, 1.3-1.8 čeká) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -127,14 +127,84 @@
 
 **Tracked dluhy:** D-005 (`/users/me` plnohodnotná hydratace — 1.3), D-006 (Reset hesla — BE neumí, samostatný krok), D-008 (BE controller-level guards na `ikaros-articles/gallery/discussions` — vyřeší 3.2-3.4).
 
-### - [ ] 1.2 Registrace (`/register`)
-- [ ] Formulář (username, email, password, confirm), validace
-- [ ] Success → redirect na login
+### - [x] 1.2 Registrace ✅
 
-### - [ ] 1.3 Uživatelský profil (`/ikaros/profil`)
-- [ ] Editace profilu (displayName, username)
-- [ ] Avatar upload (Cloudinary `POST /api/upload`)
-- [ ] Theme settings, chat preferences
+**Realizováno jako modal v hlavičce IkarosLayoutu** (konzistence s 1.1 — viz spec `docs/arch/phase-1/spec-1.2.md` a plán `plan-1.2.md`). BE auto-login: po úspěšné registraci jsou tokeny zapsány a uživatel je rovnou přihlášen.
+
+- [x] **BE:** `ConflictException` v register() rozšířen o `code: 'EMAIL_TAKEN' | 'USERNAME_TAKEN'`; `HttpExceptionFilter` propaguje custom code z payloadu
+- [x] **BE:** Nové public endpointy `GET /api/auth/check-username?u=...` a `GET /api/auth/check-email?e=...` (throttle 60/min)
+- [x] **FE:** `RegisterModal` (RHF + zod, themed, 3D buttons) — email, username, password, passwordConfirm, show/hide toggle
+- [x] **FE:** Indikátor síly hesla — vlastní heuristika (5-segmentový bar bez externí deps)
+- [x] **FE:** Debounced live check username/email availability (✓/✗/spinner ikona, 400ms debounce)
+- [x] **FE:** Cross-linky LoginModal ↔ RegisterModal přes `openLoginModalAtom` / `openRegisterModalAtom` (vždy max 1 modal otevřený)
+- [x] **FE:** REGISTRACE button v hlavičce odblokovaný; `?openRegister=1` query trigger; deep-link intent reuse
+- [x] **FE:** Smazány orphan `AuthLayout.tsx`, `RegisterPage.tsx`, `LoginPage.tsx`
+- [x] **Tests:** 117 FE testů (registerSchema 9, passwordStrength 8, useDebouncedValue 3, useRegister 3, useAvailability 7, RegisterModal 14, +cross-link); BE 35 unit + 11 e2e + 4 filter testy
+- [x] **Bonus:** Superadmin seed skript `npm run seed:superadmin` — Tyky účet (spec `_side-tasks/spec-superadmin-seed.md`)
+
+**Tracked dluhy:** D-009 (BE `code` field napříč moduly), D-010 (GDPR souhlas), D-011 (captcha), D-012 (email verifikace).
+
+### - [ ] 1.3 Uživatelský profil — rozděleno do tří podkroků
+
+Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role infrastruktura, admin schvalování username) → tři menší PR místo jednoho monolitu.
+
+#### - [x] 1.3a Profil — self-edit (`/ikaros/profil`) ✅
+
+**Spec:** `docs/arch/phase-1/spec-1.3a.md`, **Plan:** `docs/arch/phase-1/plan-1.3a.md`
+
+- [x] Hydratace `GET /users/me` (vyřešen D-005) — `useMyProfile` hook + `useAuthBootstrap` druhá fáze; rozšířeno o `displayName`, `city`, `bio`, `avatarUrl`, `defaultAvatarType`, `characterName`, `characterBio`, `characterAvatarUrl`, `chatColor`, `themeId`, `emailVerified`, `lastLoginAt`, `createdAt`
+- [x] Route `/ikaros/profil` (lazy, `requireAuth` loader, pod `IkarosLayout`)
+- [x] **Header karta** (`ProfileHeader`) — avatar, username, displayName, město, účet založen, poslední přihlášení, barva chatu (swatch), globální motiv
+- [x] **Sekce NĚCO O MNĚ** (`BioSection`) — bio textarea, max 1000, counter
+- [x] **Sekce POSTAVA V ROZCESTÍ** (`CharacterSection`) — jméno + bio + avatar (samostatný `<AvatarUploader scope="character">`)
+- [x] **Sekce MOJE SVĚTY** (`WorldsSection`) — read-only readout
+- [x] **Placeholder sekce** (`CommunityPlaceholders`) Moje diskuze / Moje články / Moje galerie
+- [x] Edit pole přes `<EditCard>` (Upravit / Uložit / Zrušit) — displayName, město, bio, postava, barva chatu (`react-colorful` `<HexColorPicker>` + sync hex input, default `#FFFFFF`), theme
+- [x] Email v header kartě **read-only** + tooltip "Změna emailu bude dostupná v 1.7"
+- [x] **Sekce Bezpečnost** (`SecuritySection`) — změna hesla (currentPassword + newPassword, vyžaduje staré heslo, BE revokuje rodinu refresh tokenů); username field disabled + tooltip
+- [x] **Sekce Účet** (`AccountSection`) — smazání účtu disabled + tooltip "Připravujeme (1.3c)"
+- [x] **Default avatary** muž / žena / bytost — `assets-source/default-avatars/{male,female,being}.png` → `scripts/optimize-default-avatars.mjs` → `public/defaults/avatars/{type}{,-sm}.webp` (sharp 512+256, WebP q=85)
+- [x] **`UserAvatar`** komponenta — fallback na `defaultAvatarType` + onError fallback
+- [x] **`AvatarUploader`** komponenta — drag&drop + file input, client-side validace (typ image/*, ≤5 MB), preview, progress
+- [x] BE Cloudinary upload pipeline (reuse existující `UploadService`, `publicId: 'main'` strategie přepíše)
+- [x] BE endpointy: `GET /users/me` (rozšířený shape + worldsCount agregát), `PATCH /users/me`, `PATCH /users/me/password`, `POST /users/me/avatar`, `POST /users/me/character/avatar`, `DELETE` varianty
+- [x] BE: `lastLoginAt` updatovaný v `auth.service.login()` a `register()`
+- [x] **IkarosLayout header** — dynamic avatar přes `<UserAvatar>` (live update po profile change)
+- [x] **Theme write-back** — `useThemeSync` posílá `themeId` do `PATCH /users/me` (vyřešen D-003 + D-004)
+- [x] Username change UI **disabled** v 1.3a (přijde v 1.3b)
+- [x] Smazání účtu UI **disabled** v 1.3a (přijde v 1.3c)
+- [x] Tests: `profileSchemas.spec.ts`, `UserAvatar.spec.tsx` + 140 FE testů celkem prochází
+- [x] `lint`, `lint:colors`, `test:run`, `build` ✅
+
+**Tracked dluhy z 1.3a:** D-019 (legacy User polí cleanup), D-020 (JWT/me payload dedup).
+
+#### - [ ] 1.3b Username change + Admin role infrastruktura
+
+**Spec:** `docs/arch/phase-1/spec-1.3b.md` (po 1.3a)
+
+- [ ] BE entity `UsernameChangeRequest` (userId, requestedUsername, status: `pending` | `approved` | `rejected`, requestedAt, decidedAt, decidedBy)
+- [ ] BE: cooldown 30 dní (`usernameChangedAt` na User)
+- [ ] BE endpointy: `POST /api/users/me/username-request`, `GET /api/admin/username-requests`, `POST /api/admin/username-requests/:id/approve`, `POST /api/admin/username-requests/:id/reject`
+- [ ] BE: role machinery aktivní (USER / ADMIN / SUPERADMIN guards napříč admin endpointy)
+- [ ] BE endpointy `GET /api/admin/users`, `PATCH /api/admin/users/:id/role`, `POST /api/admin/users/:id/ban`
+- [ ] FE: profil — formulář žádosti o username + zobrazení pending stavu
+- [ ] FE: minimal `/admin/uzivatele` (seznam, role změna, ban)
+- [ ] FE: minimal `/admin/zadosti-username` (schvalovat / odmítat)
+
+#### - [ ] 1.3c Tombstone smazaného účtu + cleanup
+
+**Spec:** `docs/arch/phase-1/spec-1.3c.md` (po 1.3b)
+
+- [ ] BE: soft delete (`deletionRequestedAt`), 30denní hold; cron auto hard delete
+- [ ] BE: tombstone řádek (zachovává username/displayName/avatar/chatColor s `isDeleted: true` + `deletedAt`)
+- [ ] BE: blokace smazání pokud jediný PJ světa bez Pomocného PJ; auto-promote Pomocného PJ při smazání
+- [ ] BE: moderační smazání (admin/superadmin) → tombstone + avatar = admin-set default
+- [ ] BE: chat / články / galerie / diskuze **zachovány**, autor → tombstone
+- [ ] FE: sekce **Účet** v profilu — tlačítko "Smazat účet" + confirm flow + zobrazení pending stavu
+- [ ] FE: login během hold = obnova účtu + toast
+- [ ] FE: `<UserAvatar deleted />` overlay komponenta (černá páska CSS)
+- [ ] FE: admin moderační delete v `/admin/uzivatele`
+- [ ] BE: trvalá rezervace username/email (DB constraint)
 
 ### - [ ] 1.4 Adresář uživatelů
 - [ ] `/ikaros/uzivatele` — seznam (paginace)
@@ -144,7 +214,35 @@
 - [ ] Online indikátor v user menu (header)
 - [ ] Socket.IO `presence:update` event
 
-### - [ ] 1.6 Přátelé
+### - [ ] 1.7 Reset hesla
+
+**Nový krok — vyčleněn z dluhu D-006.** Plný spec a brainstorming po dokončení 1.2. Směr níže rozhodnut.
+
+**Stack (rozhodnuto):**
+- **Mailer:** Resend (SMTP) + `@nestjs-modules/mailer` + `nodemailer` — vyměnitelnost s SES/Mailgun beze změn kódu
+- **Token:** 32-byte crypto random, v DB **jen sha256 hash**, single-use, TTL 1 h
+- **E-mail template:** prostá HTML šablona (Handlebars) v repo, bez MJML
+
+**BE:**
+- [ ] Modul `mailer` — abstrakce nad providerem, ENV `MAIL_*` (host, port, user, pass, from)
+- [ ] Entity `PasswordResetToken` (tokenHash, userId, expiresAt, usedAt)
+- [ ] `POST /api/auth/forgot-password` — vždy 200 (proti enumeraci), rate limit 3/15min/IP
+- [ ] `POST /api/auth/reset-password` — ověří hash, nastaví heslo, smaže token, **revokuje rodinu refresh tokenů**
+- [ ] HTML e-mail šablona `forgot-password.hbs` + `subject` "Reset hesla — Projekt Ikaros"
+- [ ] **Změna emailu s verifikací (přesunuto z 1.3a):** Entity `EmailChangeToken` (tokenHash, userId, newEmail, expiresAt, usedAt); `POST /api/users/me/email-change-request` (rate limit) → e-mail s linkem na nový email; `POST /api/auth/email-change-confirm` ověří token a přepne `email` + nastaví `emailVerified: true`
+- [ ] HTML šablona `email-change.hbs`
+
+**FE:**
+- [ ] Link "Zapomněl jsem heslo" v `LoginModal`
+- [ ] `ForgotPasswordModal` (e-mail input) → toast "Pokud e-mail existuje, poslali jsme link"
+- [ ] `/reset-password?token=...` route + `ResetPasswordModal` (nové heslo + potvrzení + indikátor síly z 1.2)
+- [ ] Po úspěšném resetu **bez auto-login** — toast "Heslo změněno, přihlas se" → otevře LoginModal (bezpečnost: vědomé přihlášení)
+- [ ] **Změna emailu na profilu** (sekce Header karta) — odblokovat read-only z 1.3a, formulář "Nový email" → odešle verifikační email → toast "Klikni na link v e-mailu pro potvrzení"
+- [ ] `/email-change/confirm?token=...` route → BE potvrzení → toast "Email změněn"
+
+**Závislosti:** Resend účet + API klíč v `.env` (PJ založí před implementací).
+
+### - [ ] 1.8 Přátelé
 
 **Nový subsystém — BE i FE od nuly.** V roadmapě nebyl, doplněno při brainstormingu kroku 1.1 (UI hlavičky odkazuje na "PŘÁTELÉ" pro běžné uživatele, ADMIN/SUPERADMIN vidí "UŽIVATELÉ" z 1.4).
 

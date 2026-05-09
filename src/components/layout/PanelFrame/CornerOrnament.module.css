@@ -1,0 +1,16 @@
+.ornament {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--theme-surface-strong, var(--bg-primary));
+  border: 1px solid var(--theme-accent);
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+}
+
+.ornament[data-position="tl"] { top: -6px;    left: -6px; }
+.ornament[data-position="tr"] { top: -6px;    right: -6px; }
+.ornament[data-position="bl"] { bottom: -6px; left: -6px; }
+.ornament[data-position="br"] { bottom: -6px; right: -6px; }

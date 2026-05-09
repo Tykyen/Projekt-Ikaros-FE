@@ -1,54 +1,87 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { apiClient } from '../../api/client';
+import { Newspaper, Plus } from 'lucide-react';
 import {
   isAuthenticatedAtom,
   loginModalOpenAtom,
+  registerModalOpenAtom,
 } from '../../store/authStore';
-
-async function fetchHealth() {
-  const res = await apiClient.get('/health');
-  return res.data;
-}
+import { IkarosCard } from '../../components/ui/IkarosCard/IkarosCard';
+import s from './DashboardPage.module.css';
 
 export default function DashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
   const setLoginModalOpen = useSetAtom(loginModalOpenAtom);
+  const setRegisterModalOpen = useSetAtom(registerModalOpenAtom);
 
-  // Auto-otevřít login modal pokud nás sem requireAuth shodil přes ?openLogin=1
   useEffect(() => {
-    if (searchParams.get('openLogin') === '1' && !isAuthenticated) {
-      setLoginModalOpen(true);
+    if (isAuthenticated) return;
+    const wantsLogin = searchParams.get('openLogin') === '1';
+    const wantsRegister = searchParams.get('openRegister') === '1';
+    if (wantsLogin) setLoginModalOpen(true);
+    else if (wantsRegister) setRegisterModalOpen(true);
+
+    if (wantsLogin || wantsRegister) {
       const next = new URLSearchParams(searchParams);
       next.delete('openLogin');
+      next.delete('openRegister');
       setSearchParams(next, { replace: true });
     }
-  }, [searchParams, setSearchParams, isAuthenticated, setLoginModalOpen]);
-
-  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
-    queryKey: ['health'],
-    queryFn: fetchHealth,
-    enabled: false,
-  });
+  }, [
+    searchParams,
+    setSearchParams,
+    isAuthenticated,
+    setLoginModalOpen,
+    setRegisterModalOpen,
+  ]);
 
   return (
-    <section style={{ padding: '2rem' }}>
-      <h2>[stub] Dashboard</h2>
-      <div style={{ marginTop: '1rem' }}>
-        <button type="button" onClick={() => refetch()} disabled={isFetching}>
-          {isFetching ? 'Pingám BE...' : 'Ping BE /health'}
-        </button>
-        {isLoading && <p>Načítám…</p>}
-        {isError && <p style={{ color: 'var(--danger)' }}>Chyba: {String(error)}</p>}
-        {data !== undefined && (
-          <pre style={{ background: 'var(--bg-secondary)', padding: '1rem', marginTop: '0.5rem', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)' }}>
-            {JSON.stringify(data, null, 2)}
-          </pre>
-        )}
-      </div>
-    </section>
+    <div className={s.page}>
+      <IkarosCard
+        variant="welcome"
+        medallion={<div className={s.medallion} data-andel-medallion aria-hidden="true" />}
+      >
+        <h2 className={s.welcomeTitle}>
+          Vítej v <span className={s.titleAccent}>Projektu Ikaros.</span>
+        </h2>
+
+        <p className={s.paragraph}>
+          Projekt Ikaros je místo pro všechny, které baví RPG světy, společné příběhy
+          a tvorba vlastních dobrodružství. Vytvoř si vlastní svět, hraj jej se svými
+          přáteli a využij nástroje, které ti pomohou ulehčit hru i správu jeho obsahu.
+        </p>
+
+        <p className={s.paragraph}>
+          Zároveň je to prostor pro setkávání lidí podobného smýšlení, kteří chtějí sdílet
+          své nápady, inspirovat se navzájem a objevovat nové světy i možnosti hraní.
+        </p>
+
+        <p className={s.signature}>
+          Příjemnou zábavu přeje administrátor.
+        </p>
+      </IkarosCard>
+
+      <IkarosCard
+        variant="news"
+        header={
+          <>
+            <h3 className={s.novinkyTitle}>
+              <Newspaper size={20} aria-hidden="true" />
+              <span>Novinky</span>
+            </h3>
+            {isAuthenticated && (
+              <button type="button" className={s.addBtn}>
+                <Plus size={16} aria-hidden="true" />
+                <span>Přidat novinku</span>
+              </button>
+            )}
+          </>
+        }
+      >
+        <p className={s.empty}>Zatím žádné novinky.</p>
+      </IkarosCard>
+    </div>
   );
 }

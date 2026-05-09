@@ -3,12 +3,14 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { getDefaultStore } from 'jotai';
 import type { PropsWithChildren } from 'react';
-import { useLogin, useLogout, useAuthBootstrap } from './useAuth';
+import { useLogin, useLogout, useRegister, useAuthBootstrap } from './useAuth';
 import {
   accessTokenAtom,
   refreshTokenAtom,
   currentUserAtom,
   pendingLogoutAtom,
+  loginModalOpenAtom,
+  registerModalOpenAtom,
 } from '../../store/authStore';
 import { api } from '../client';
 import { UserRole } from '../../types';
@@ -42,6 +44,8 @@ beforeEach(() => {
   store.set(refreshTokenAtom, null);
   store.set(currentUserAtom, null);
   store.set(pendingLogoutAtom, null);
+  store.set(loginModalOpenAtom, false);
+  store.set(registerModalOpenAtom, false);
   vi.clearAllMocks();
 });
 
@@ -93,6 +97,80 @@ describe('useLogin', () => {
   });
 });
 
+describe('useRegister', () => {
+  it('po úspěchu zapíše tokeny + user a zavře RegisterModal', async () => {
+    const mockUser = { id: '1', username: 'newbie', role: UserRole.Hrac };
+    vi.mocked(api.post).mockResolvedValueOnce({
+      accessToken: 'access-r',
+      refreshToken: 'refresh-r',
+      user: mockUser,
+    });
+    store.set(registerModalOpenAtom, true);
+
+    const { result } = renderHook(() => useRegister(), {
+      wrapper: makeWrapper(),
+    });
+    await act(async () => {
+      await result.current.mutateAsync({
+        email: 'newbie@test.io',
+        username: 'newbie',
+        password: 'pass1234',
+      });
+    });
+
+    expect(store.get(accessTokenAtom)).toBe('access-r');
+    expect(store.get(refreshTokenAtom)).toBe('refresh-r');
+    expect(store.get(currentUserAtom)).toEqual(mockUser);
+    expect(store.get(registerModalOpenAtom)).toBe(false);
+    expect(api.post).toHaveBeenCalledWith('/auth/register', {
+      email: 'newbie@test.io',
+      username: 'newbie',
+      password: 'pass1234',
+    });
+  });
+
+  it('po úspěchu zruší pending logout (kdyby běžel)', async () => {
+    store.set(pendingLogoutAtom, { startedAt: Date.now() });
+    vi.mocked(api.post).mockResolvedValueOnce({
+      accessToken: 'a',
+      refreshToken: 'r',
+      user: { id: '1', username: 'x', role: UserRole.Hrac },
+    });
+
+    const { result } = renderHook(() => useRegister(), {
+      wrapper: makeWrapper(),
+    });
+    await act(async () => {
+      await result.current.mutateAsync({
+        email: 'x@x.com',
+        username: 'x',
+        password: 'pass1234',
+      });
+    });
+
+    expect(store.get(pendingLogoutAtom)).toBeNull();
+  });
+
+  it('při selhání nezapíše tokeny ani nezavře modal', async () => {
+    store.set(registerModalOpenAtom, true);
+    vi.mocked(api.post).mockRejectedValueOnce(new Error('409'));
+    const { result } = renderHook(() => useRegister(), {
+      wrapper: makeWrapper(),
+    });
+    await act(async () => {
+      await result.current
+        .mutateAsync({
+          email: 'taken@test.io',
+          username: 'newbie',
+          password: 'pass1234',
+        })
+        .catch(() => {});
+    });
+    expect(store.get(accessTokenAtom)).toBeNull();
+    expect(store.get(registerModalOpenAtom)).toBe(true);
+  });
+});
+
 describe('useLogout', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -102,6 +180,7 @@ describe('useLogout', () => {
       id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
       themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
       isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
+      defaultAvatarType: 'male', chatColor: '#FFFFFF', emailVerified: false,
     });
   });
 
@@ -149,7 +228,11 @@ describe('useLogout', () => {
 });
 
 describe('useAuthBootstrap', () => {
-  it('hydratuje currentUser z JWT pokud je token validní a user prázdný', async () => {
+  // D-020: useAuthBootstrap už nezapisuje JWT data do currentUserAtom.
+  // Plnohodnotnou hydrataci řeší useCurrentUserHydration přes /users/me.
+  // useAuthBootstrap teď řeší pouze: 1) cleanup expirovaného tokenu, 2) no-op když token chybí.
+
+  it('s validním tokenem ponechá currentUser null (čeká se na /me query)', async () => {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const token = makeJwt({
       sub: '42', email: 'b@b.com', username: 'bob', role: UserRole.Hrac,
@@ -159,10 +242,10 @@ describe('useAuthBootstrap', () => {
 
     renderHook(() => useAuthBootstrap());
 
-    await waitFor(() => {
-      expect(store.get(currentUserAtom)?.username).toBe('bob');
-    });
-    expect(store.get(currentUserAtom)?.id).toBe('42');
+    // useAuthBootstrap nezapisuje JWT do currentUser
+    expect(store.get(currentUserAtom)).toBeNull();
+    // Token zůstává nedotčený (expirace nepřišla)
+    expect(store.get(accessTokenAtom)).toBe(token);
   });
 
   it('smaže tokeny pokud je JWT expirovaný', async () => {
@@ -190,6 +273,7 @@ describe('useAuthBootstrap', () => {
       displayName: 'Alice', avatarUrl: 'http://x.com/a.png',
       themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
       isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
+      defaultAvatarType: 'male' as const, chatColor: '#FFFFFF', emailVerified: false,
     };
     store.set(accessTokenAtom, token);
     store.set(currentUserAtom, existing);

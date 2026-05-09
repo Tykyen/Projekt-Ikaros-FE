@@ -7,37 +7,49 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: var(--sp-1) var(--sp-3);
-  background: var(--bg-card);
+  height: 36px;
+  padding: 0 14px;
+  background-color: var(--bg-card);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  font-family: var(--font-body);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px var(--theme-shadow, var(--bg-overlay)),
+               0 0 10px var(--theme-shadow, var(--bg-overlay));
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.trigger::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  pointer-events: none;
+  transition: background var(--transition-fast);
 }
 .trigger:hover {
-  background: var(--bg-card-hover);
   border-color: var(--accent);
-}
-
-.triggerThumb {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-  flex-shrink: 0;
+  transform: translateY(-1px);
 }
 
 .triggerName {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  position: relative;
+  z-index: 1;
   white-space: nowrap;
 }
 
 .triggerCaret {
+  position: relative;
+  z-index: 1;
   font-size: 10px;
   color: var(--text-secondary);
 }
@@ -46,8 +58,8 @@
   position: absolute;
   top: calc(100% + var(--sp-1));
   right: 0;
-  min-width: 280px;
-  max-height: min(520px, 70vh);
+  width: 260px;
+  max-height: min(560px, 75vh);
   overflow-y: auto;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
@@ -55,50 +67,72 @@
   box-shadow: var(--shadow-lg);
   list-style: none;
   margin: 0;
-  padding: var(--sp-1);
+  padding: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   z-index: var(--z-dropdown);
 }
 
 .option {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  justify-content: center;
   width: 100%;
-  padding: var(--sp-2) var(--sp-3);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm);
+  height: 80px;
+  padding: var(--sp-3);
+  background-color: var(--bg-secondary);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   color: var(--text-primary);
+  font-family: var(--font-display);
   font-size: var(--text-sm);
-  font-family: var(--font-body);
-  text-align: left;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 1px 4px var(--theme-shadow, var(--bg-overlay)),
+               0 0 14px var(--theme-shadow, var(--bg-overlay));
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.option::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  pointer-events: none;
   transition: background var(--transition-fast);
 }
 .option:hover, .option:focus-visible {
-  background: var(--bg-card-hover);
+  border-color: var(--accent);
   outline: none;
-}
-.optionActive {
-  background: var(--accent-soft);
+  transform: translateY(-1px);
 }
 
-.optionThumb {
-  width: 64px;
-  height: 40px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-  flex-shrink: 0;
+.optionActive {
+  border-color: var(--accent);
+  border-width: 2px;
+  padding: calc(var(--sp-3) - 1px);
 }
 
 .optionName {
-  flex: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  position: relative;
+  z-index: 1;
 }
 
 .optionCheck {
-  color: var(--accent);
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 1;
+  color: var(--accent-bright);
+  font-size: var(--text-md);
   font-weight: var(--weight-bold);
 }
 
