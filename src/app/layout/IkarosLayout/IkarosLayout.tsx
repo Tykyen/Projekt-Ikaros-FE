@@ -95,6 +95,7 @@ function SidebarContent({
   isAuthenticated: boolean;
   onNav?: () => void;
 }) {
+  const currentUser = useAtomValue(currentUserAtom);
   const myWorldsQuery = useMyWorlds();
   const publicWorldsQuery = usePublicWorlds();
   const worlds: World[] | undefined = isAuthenticated
@@ -121,6 +122,9 @@ function SidebarContent({
             <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
               <span className={s.worldOnlineDot} />
               <span className={s.navItemLabel}>{w.name}</span>
+              {currentUser?.id && w.ownerId === currentUser.id && (
+                <span className={s.pjBadge} data-pj-badge>PJ</span>
+              )}
             </Link>
           ))}
           {(worlds?.length ?? 0) > 0 && (
@@ -157,6 +161,7 @@ function SidebarContent({
 }
 
 function RightPanel() {
+  const currentUser = useAtomValue(currentUserAtom);
   const { data: worlds } = useMyWorlds();
 
   return (
@@ -171,6 +176,9 @@ function RightPanel() {
             <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem}>
               <span className={s.worldOnlineDot} />
               <span className={s.navItemLabel}>{w.name}</span>
+              {currentUser?.id && w.ownerId === currentUser.id && (
+                <span className={s.pjBadge} data-pj-badge>PJ</span>
+              )}
             </Link>
           ))}
           {(worlds?.length ?? 0) === 0 && (

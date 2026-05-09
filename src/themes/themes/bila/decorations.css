@@ -1,16 +1,159 @@
-/* ── Bílá — světlé téma, picture-frame karty ── */
+/* ── Bílá — éterická mramorová síň (spec 1.0e, light mode)
+   Aktivuje se přes [data-theme="bila"]. UI je CSS-native:
+   ivory glass panely, gold-ivory border, light blue accent na aktivních stavech,
+   krystalové diamondy v rozích. Žádné dark text na světlém — full inverze. */
 
 [data-theme="bila"] {
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(212, 184, 120, 0.15) 0%, transparent 60%),
-    linear-gradient(to bottom, #fbf6e9 0%, #f4ecd8 100%);
-  background-color: var(--bg-primary);
+  background-color: #f7f2e8;
   color-scheme: light;
 }
 
-/* Picture-frame styl pro karty */
-[data-theme="bila"] .card,
-[data-theme="bila"] [class*="card"] {
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+/* ── 1. Atmosférický overlay nad backgroundem ── */
+[data-theme="bila"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 2. Glass panely — ivory frosted glass + gold-ivory border ── */
+[data-theme="bila"] [data-frame-panel="sidebar"],
+[data-theme="bila"] [data-frame-panel="right"],
+[data-theme="bila"] [data-frame-panel="card"],
+[data-theme="bila"] [data-frame-panel="novinky"] {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 252, 245, 0.92) 0%, rgba(246, 241, 230, 0.86) 100%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid var(--theme-border);
+  border-radius: 22px;
+  isolation: isolate;
+  box-shadow:
+    0 8px 24px rgba(96, 76, 42, 0.14),       /* warm soft drop */
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9), /* horní bílý lesk */
+    inset 0 0 28px rgba(255, 255, 255, 0.55); /* perlový vnitřní lesk */
+}
+
+/* ── 3. CornerOrnament — VIDITELNÉ light blue krystaly (na rozdíl od ostatních témat) ── */
+[data-theme="bila"] [class*="ornament"] {
+  display: block;
+  background: #ffffff;
+  border: 1px solid var(--theme-accent-cyan);
+  filter: drop-shadow(0 0 8px var(--theme-glow-cyan-strong));
+}
+
+/* ── 4. Welcome andel medallion (PNG portrétový 0.75:1) ── */
+[data-theme="bila"] [data-andel-medallion] {
+  position: relative;
+  width: 200px;
+  height: 265px;
+  background-image: var(--asset-andel-medallion, none);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 14px var(--theme-glow-cyan));
+}
+
+/* ── 5. Section title — dark text + gold-ivory gradient line ── */
+[data-theme="bila"] [class*="sectionTitle"] {
+  color: var(--theme-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-family: var(--font-display);
+}
+
+/* ── 6. Header logo banner (4.27:1 thin wide) ── */
+[data-theme="bila"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: var(--header-h);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 4px 8px rgba(96, 76, 42, 0.16));
+}
+
+/* ── 7. 3D btn3d override (light mode!) — pokrývá headerBtn + navItem + showAllLink ── */
+[data-theme="bila"] [class*="btn3d"] {
+  --btn-bg-1: rgba(255, 255, 255, 0.92);
+  --btn-bg-2: rgba(241, 236, 224, 0.90);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-text);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 2px 0 rgba(150, 125, 75, 0.12),
+    0 3px 10px rgba(80, 60, 30, 0.10);
+}
+
+[data-theme="bila"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(255, 255, 255, 0.95);
+  --btn-bg-2: rgba(236, 246, 250, 0.85);
+  --btn-border: var(--theme-accent);
+  --btn-color: var(--theme-accent);
+  --btn-translate: -2px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 2px 0 rgba(79, 136, 168, 0.12),
+    0 0 16px var(--theme-glow-cyan),
+    0 4px 10px rgba(80, 60, 30, 0.12);
+}
+
+[data-theme="bila"] [class*="btn3dActive"],
+[data-theme="bila"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(232, 244, 250, 0.95);
+  --btn-bg-2: rgba(210, 229, 239, 0.90);
+  --btn-border: var(--theme-accent);
+  --btn-color: #315f78;
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.7),
+    inset 4px 0 0 0 var(--theme-accent),
+    0 0 16px var(--theme-glow-cyan-strong);
+}
+
+/* Header buttons — uppercase + letter-spacing */
+[data-theme="bila"] [class*="headerBtn"] {
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+
+/* ── 8. PJ badge — light blue chip ── */
+[data-theme="bila"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-accent-bright), var(--theme-accent));
+  color: #ffffff;
+  border: 1px solid var(--theme-accent);
+  box-shadow:
+    0 0 6px var(--theme-glow-cyan),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+  text-shadow: none;
+}
+
+/* ── 9. Welcome heading title accent — light blue ── */
+[data-theme="bila"] [class*="titleAccent"] {
+  color: var(--theme-accent);
+  text-shadow: 0 0 8px var(--theme-glow-cyan);
+}
+
+/* ── 10. Welcome signature — light blue script ── */
+[data-theme="bila"] [class*="signature"] {
+  color: var(--theme-accent);
+  text-shadow: 0 0 6px var(--theme-glow-cyan);
+}
+
+/* ── 11. Tyky avatar v hlavičce — 18px (scoped, vyšší specificita přebije UserAvatar `.sm` 32px) ── */
+[data-theme="bila"] [class*="headerBtn"] [class*="avatar"] {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── 12. Heading ◆ marker — odstraněn (jako u sci-fi, žádné diamondy v textu) ── */
+
+/* ── 13. Reduced motion safe ── */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="bila"] * {
+    transition: none !important;
+  }
 }

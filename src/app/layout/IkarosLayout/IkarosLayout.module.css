@@ -254,6 +254,21 @@
   flex-shrink: 0;
 }
 
+/* ── PJ badge — base layout, theme barvy v decorations.css ── */
+.pjBadge {
+  display: inline-block;
+  margin-left: auto;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  flex-shrink: 0;
+}
+
 .showAllLink {
   composes: btn3d from '../../../themes/_shared/btn3d.module.css';
   width: 100%;

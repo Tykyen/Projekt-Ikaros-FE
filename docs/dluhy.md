@@ -8,6 +8,17 @@
 
 ## Otevřené
 
+### D-021 — Tyky header avatar specificity hack opakovaný per-tématu
+**Soubor:** `src/themes/themes/<theme>/decorations.css` (zlaty-standard, sci-fi; budoucí luxury upgrades)
+**Problém:** `UserAvatar.module.css` má `.sm { width: 32px }` se specificitou 0,1,0. `IkarosLayout.module.css` má `.avatar { width: 20px }` s totožnou specificitou — UserAvatar vyhrává díky pozdějšímu načtení v cascade. Každé luxury téma musí proto duplikovat scoped fix `[data-theme="..."] [class*="headerBtn"] [class*="avatar"] { width: 18px }`. Aktuálně už 2× (zlaty-standard + sci-fi); každé další téma kopíruje stejné 4 řádky.
+**Dopad:** Nízký — funkčně OK, ale duplikace + technický dluh; při dalším luxury theme upgrade riziko zapomenutí.
+**Řešení:** Jedna z možností (vyžaduje souhlas, zasahuje shared):
+  - (a) Přidat `xs` size (18-20px) do `UserAvatar` + použít `<UserAvatar size="xs">` v IkarosLayout headeru.
+  - (b) Zvýšit specificitu `IkarosLayout.module.css` na `.headerBtn .avatar { width: 20px }` — překoná `UserAvatar.module.css .sm` 32px globálně, fix jednorázový.
+**Kdy:** Před dalším luxury theme upgrade NEBO dříve, samostatný spec/plán; oba přístupy = úprava shared modulu, vyžaduje schválení.
+
+---
+
 ### D-011 — Captcha provider integrace
 **Soubor:** `src/components/auth/RegisterModal.tsx` + BE `auth` modul
 **Stav:** Honeypot field implementován (FE skryté pole + BE DTO `@MaxLength(0)` validace v `RegisterDto`). Plný captcha provider (hCaptcha / Turnstile) **stále chybí**.

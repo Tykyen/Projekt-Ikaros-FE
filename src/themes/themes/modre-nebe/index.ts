@@ -47,6 +47,25 @@ export const modreNebeTheme: Theme = {
     '--theme-nav-active-bg': 'linear-gradient(90deg, rgba(37, 208, 230, 0.15) 0%, rgba(37, 208, 230, 0) 100%)',
 
     // ──────────────────────────────────────────────
+    // Heraldic upgrade tokens (spec 1.0f)
+    // ──────────────────────────────────────────────
+
+    // Ornament fills (documentation; SVG data-URI fills jsou inlined v CSS)
+    '--ornament-gold':         '#d6aa45',
+    '--ornament-gold-bright':  '#ffd36a',
+    '--ornament-cyan':         '#25d0e6',
+
+    // Header band
+    '--header-band-h':         '6px',
+
+    // Panel double-stroke inner border
+    '--panel-inner-border':    'rgba(214, 170, 69, 0.30)',
+    '--panel-inner-inset':     '7px',
+
+    // Section title gradient
+    '--section-divider':       'linear-gradient(90deg, transparent 0%, rgba(214,170,69,0.65) 50%, transparent 100%)',
+
+    // ──────────────────────────────────────────────
     // Legacy color tokens — namapované na luxury tokeny
     // (zbytek apky používá tyto názvy: btn3d, IkarosLayout aj.)
     // ──────────────────────────────────────────────
@@ -96,7 +115,7 @@ export const modreNebeTheme: Theme = {
 
     // ── Logo asset (zachováno z PNG: anděl + wordmark) ──
     '--asset-logo':           `url('${decor}/logo.webp')`,
-    '--asset-logo-w':         '240px',
+    '--asset-logo-w':         '220px',
     '--asset-logo-w-mobile':  '180px',
     '--logo-img-display':     'block',
     '--logo-fallback-display':'none',

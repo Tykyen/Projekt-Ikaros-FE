@@ -28,6 +28,7 @@ export const THEMES: Record<ThemeId, Theme> = {
   'modre-nebe':     modreNebeTheme,
   'zlaty-standard': zlatyStandardTheme,
   'sci-fi':         sciFiTheme,
+  'bila':           bilaTheme,
   'vesmirna-lod':   vesmirnaLodTheme,
   'vesmirna-bitva': vesmirnaBitvaTheme,
   'kyberpunk':      kyberpunkTheme,
@@ -45,7 +46,6 @@ export const THEMES: Record<ThemeId, Theme> = {
   'arabsky-svet':   arabskySvetTheme,
   'mesic':          mesicTheme,
   'slunce':         slunceTheme,
-  'bila':           bilaTheme,
 };
 
 export function getTheme(id: string): Theme {

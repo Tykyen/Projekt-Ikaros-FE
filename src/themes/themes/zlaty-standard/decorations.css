@@ -1,27 +1,185 @@
-/* ── Zlatý standard — královský luxus ── */
+/* ── Zlatý standard — královský kosmický portál (spec 1.0c, iterace 2)
+   Aktivuje se přes [data-theme="zlaty-standard"]. UI je CSS-native:
+   glass black panely s dvojitým zlatým rámem, 3D metallic tlačítka,
+   cyan corner diamondy, kosmický background s lehčím overlayem. */
 
 [data-theme="zlaty-standard"] {
-  background-image:
-    radial-gradient(ellipse at 50% 50%, rgba(212, 160, 23, 0.05) 0%, transparent 70%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  background-color: var(--bg-primary);
+  background-color: #020308;
 }
 
-[data-theme="zlaty-standard"] .card,
-[data-theme="zlaty-standard"] [class*="card"] {
-  border: 2px solid var(--border-strong);
+/* ── 1. Atmosférický overlay nad backgroundem (lehký, ať citadela prosvítá) ── */
+[data-theme="zlaty-standard"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
+/* ── 2. Glass panely — sidebar + right + welcome + novinky
+   Dvojitý rám: tmavé zlato outer + jasné zlato inner + inset darkness ── */
+[data-theme="zlaty-standard"] [data-frame-panel="sidebar"],
+[data-theme="zlaty-standard"] [data-frame-panel="right"],
+[data-theme="zlaty-standard"] [data-frame-panel="card"],
+[data-theme="zlaty-standard"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(10, 15, 25, 0.78) 0%, rgba(5, 5, 10, 0.88) 100%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-border);
+  border-radius: 18px;
+  isolation: isolate;
+  box-shadow:
+    0 0 0 1px rgba(74, 59, 18, 0.9),               /* druhá outer linka — tmavé zlato */
+    inset 0 1px 0 0 rgba(255, 220, 150, 0.08),     /* horní highlight */
+    inset 0 0 22px 0 rgba(0, 0, 0, 0.75),          /* vnitřní hloubka */
+    0 10px 30px 0 rgba(0, 0, 0, 0.85);             /* drop shadow do prostoru */
+}
+
+/* ── 3. CornerOrnament diamondy v rozích panelů — skryté (uživatelův požadavek) ── */
+[data-theme="zlaty-standard"] [class*="ornament"] {
+  display: none;
+}
+
+/* ── 4. Welcome andel medallion + cyan diamondy nahoře/dole ── */
+[data-theme="zlaty-standard"] [data-andel-medallion] {
+  position: relative;
+  width: 200px;
+  height: 215px;
+  background-image: var(--asset-andel-medallion, none);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 16px var(--theme-glow-gold));
+}
+/* Medallion diamondy nahoře/dole — odstraněny dle požadavku */
+
+/* ── 5. Section title — diamondy + zlatá uppercase typografie ── */
+[data-theme="zlaty-standard"] [class*="sectionTitle"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--theme-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-family: var(--font-display);
+  text-shadow: 0 0 8px rgba(240, 192, 64, 0.35);
+}
+[data-theme="zlaty-standard"] [class*="sectionTitle"]::before,
+[data-theme="zlaty-standard"] [class*="sectionTitle"]::after {
+  content: '◆';
+  color: var(--theme-accent);
+  font-size: 0.7em;
+  flex: 0 0 auto;
+  height: auto;
+  background: none;
+  opacity: 1;
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+}
+
+/* ── 6. Header logo banner ── */
+[data-theme="zlaty-standard"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: var(--header-h);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 0 12px var(--theme-glow-gold));
+  -webkit-mask-image: radial-gradient(ellipse 95% 85% at center, black 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 95% 85% at center, black 60%, transparent 100%);
+}
+
+/* ── 7. 3D metallic btn3d override (pokrývá headerBtn + navItem + showAllLink) ── */
+[data-theme="zlaty-standard"] [class*="btn3d"] {
+  --btn-bg-1: rgba(26, 21, 13, 0.95);
+  --btn-bg-2: rgba(10, 8, 5, 0.98);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-accent);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 220, 150, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.85),
+    0 2px 5px 0 rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="zlaty-standard"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(36, 29, 18, 0.96);
+  --btn-bg-2: rgba(15, 12, 8, 0.98);
+  --btn-border: var(--theme-accent-bright);
+  --btn-color: var(--theme-accent-bright);
+  --btn-translate: -2px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 223, 0, 0.18),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.85),
+    0 0 14px var(--theme-glow-gold),
+    0 4px 7px 0 rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+/* Active selected (Úvodník current route, header active) — cyan dominance */
+[data-theme="zlaty-standard"] [class*="btn3dActive"],
+[data-theme="zlaty-standard"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(25, 214, 232, 0.20);
+  --btn-bg-2: rgba(8, 80, 100, 0.32);
+  --btn-border: var(--theme-border-cyan);
+  --btn-color: #ffffff;
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.55),
+    inset 3px 0 0 0 var(--theme-accent-cyan),
+    0 0 16px var(--theme-glow-cyan);
+  text-shadow: 0 0 10px var(--theme-glow-cyan);
+}
+
+/* Header buttons — užší padding, větší letter-spacing */
+[data-theme="zlaty-standard"] [class*="headerBtn"] {
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+}
+
+/* ── 7b. Welcome heading — menší font + cyan glow (scoped) ── */
+[data-theme="zlaty-standard"] [class*="welcomeTitle"] {
+  font-size: var(--text-xl);
+}
+[data-theme="zlaty-standard"] [class*="titleAccent"] {
+  text-shadow: 0 0 10px var(--theme-glow-cyan);
+}
+
+/* ── 7c. Tyky avatar v hlavičce — 18px (scoped, vyšší specificita) ── */
+[data-theme="zlaty-standard"] [class*="headerBtn"] [class*="avatar"] {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── 8. PJ badge — zlatý chip ── */
+[data-theme="zlaty-standard"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-accent-bright), var(--theme-accent));
+  color: var(--bg-primary);
+  border: 1px solid var(--theme-accent);
+  box-shadow:
+    0 0 8px var(--theme-glow-gold),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+  text-shadow: none;
+}
+
+/* ── 9. Heading ◆ marker ── */
 [data-theme="zlaty-standard"] h1::before,
 [data-theme="zlaty-standard"] h2::before {
   content: '◆';
-  color: var(--accent);
-  margin-right: var(--sp-2);
+  color: var(--theme-accent);
+  margin-right: 8px;
   font-size: 0.7em;
+  text-shadow: 0 0 6px var(--theme-glow-gold);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-theme="zlaty-standard"] button:hover {
-    box-shadow: 0 0 12px rgba(212, 160, 23, 0.6);
+/* ── 10. Reduced motion safe ── */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="zlaty-standard"] * {
+    transition: none !important;
   }
 }
