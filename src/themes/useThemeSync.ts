@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { themeAtom } from './state';
-import { currentUserAtom } from '../store/authStore';
-import { api } from '../api/client';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { api } from '@/shared/api/client';
 import type { ThemeId } from './types';
 
 export function useThemeSync(): void {

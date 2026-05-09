@@ -1,4 +1,4 @@
-import type { Theme } from '../../types';
+﻿import type { Theme } from '@/themes/types';
 
 export const vesmirnaBitvaTheme: Theme = {
   id: 'vesmirna-bitva',

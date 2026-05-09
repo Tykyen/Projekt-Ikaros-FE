@@ -1,4 +1,4 @@
-import type { Theme } from '../../types';
+﻿import type { Theme } from '@/themes/types';
 
 export const bilaTheme: Theme = {
   id: 'bila',

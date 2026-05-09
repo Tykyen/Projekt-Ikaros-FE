@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+﻿import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { Provider as JotaiProvider, createStore } from 'jotai';
 import type { PropsWithChildren } from 'react';
 import { useThemeSync } from '../useThemeSync';
 import { themeAtom } from '../state';
-import { currentUserAtom } from '../../store/authStore';
-import { api } from '../../api/client';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { api } from '@/shared/api/client';
 
-vi.mock('../../api/client', () => ({
+vi.mock('@/shared/api/client', () => ({
   api: {
     patch: vi.fn(() => Promise.resolve({})),
   },

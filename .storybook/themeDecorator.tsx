@@ -4,7 +4,7 @@ import type * as React from 'react';
 import type { Decorator } from '@storybook/react-vite';
 import { applyTheme } from '../src/themes/applyTheme';
 import { listThemes } from '../src/themes/registry';
-import '../src/index.css';
+import '../src/app/index.css';
 
 function ThemeDecoratorWrapper({ themeId, children }: { themeId: string; children: React.ReactNode }) {
   useEffect(() => {
