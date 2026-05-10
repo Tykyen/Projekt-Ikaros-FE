@@ -697,3 +697,31 @@
     margin-right: 6px;
   }
 }
+
+/* ──────────────── 22. Reduced motion (audit C12) ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="pergamen"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  [data-theme="pergamen"] [class*="btn3d"]:hover,
+  [data-theme="pergamen"] [class*="headerBtn"]:hover {
+    transition: none !important;
+  }
+}
+
+/* ──────────────── 23. High contrast / forced-colors fallback ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="pergamen"] [data-frame-panel] [class*="ornament"] {
+    forced-color-adjust: none;
+  }
+
+  [data-theme="pergamen"] [class*="welcomeTitle"]::first-letter {
+    color: CanvasText;
+    -webkit-text-stroke: none;
+    text-shadow: none;
+  }
+}
