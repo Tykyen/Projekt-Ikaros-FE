@@ -1,22 +1,956 @@
-/* ── Nemrtví — krypta, toxická zelená ── */
+/* ── Nemrtví — Sedlec Kostnice o půlnoci × ossuary dread × Bloodborne aesthetic.
+   Blackened iron + weathered ivory bone + cracked dark stone + teal-ghost-green phosphorescence.
+   12 dodaných assetů: logo, medailon, corner-tl, divider-skull, skull-arch,
+   7× ossuary nav medailon (lebka, key, dvě lebky, grimoár, mirror, lantern, opuštěný tankard).
+   Bone drop-cap "V" = CSS-only ::first-letter (žádný asset).
+   Scoped přes [data-theme="nemrtvi"], žádný globální dopad. */
 
 [data-theme="nemrtvi"] {
-  background-image:
-    radial-gradient(ellipse at 50% 30%, rgba(48, 192, 96, 0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 100%, rgba(0, 16, 0, 0.6) 0%, transparent 70%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-/* Téměř pravoúhlé karty (kamenné) */
-[data-theme="nemrtvi"] .card,
-[data-theme="nemrtvi"] [class*="card"] {
-  border-radius: 2px;
-  border: 1px solid var(--border-strong);
+/* ──────────────── 1. Atmosférický overlay + ghost-pulse + dust motes ──────────────── */
+
+[data-theme="nemrtvi"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-theme="nemrtvi"] button:hover {
-    box-shadow: 0 0 16px rgba(48, 192, 96, 0.6);
+/* Ghost-pulse — radial-gradient teal-green záře z horní třetiny obrazovky.
+   "Krypta dýchá pomalu, jako by spala." 8s loop, opacity 0.6→1.0→0.6. */
+[data-theme="nemrtvi"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 25%,
+    rgba(95, 200, 168, 0.22) 0%,
+    rgba(95, 200, 168, 0.08) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: nemrtvi-ghost-breathe 8s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+@keyframes nemrtvi-ghost-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1.0; }
+}
+
+/* Drifting dust motes — 3 staggered particles via body pseudo + radial-gradient layers.
+   Velmi subtle (opacity 0.15), 30s linear, no looping reset (random drift feel). */
+[data-theme="nemrtvi"][data-shell="ikaros"] body::before,
+[data-theme="nemrtvi"][data-shell="ikaros"] body::after {
+  content: '';
+  position: fixed;
+  inset: -10vh 0 0 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 12% 30%, rgba(205, 192, 152, 0.35) 0, rgba(205, 192, 152, 0) 1.2px),
+    radial-gradient(circle at 67% 55%, rgba(205, 192, 152, 0.30) 0, rgba(205, 192, 152, 0) 1.5px),
+    radial-gradient(circle at 88% 18%, rgba(205, 192, 152, 0.25) 0, rgba(205, 192, 152, 0) 1.0px);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  animation: nemrtvi-dust-drift 30s linear infinite;
+}
+
+[data-theme="nemrtvi"][data-shell="ikaros"] body::after {
+  background-image:
+    radial-gradient(circle at 24% 75%, rgba(205, 192, 152, 0.32) 0, rgba(205, 192, 152, 0) 1.4px),
+    radial-gradient(circle at 52% 22%, rgba(205, 192, 152, 0.28) 0, rgba(205, 192, 152, 0) 1.0px),
+    radial-gradient(circle at 78% 88%, rgba(205, 192, 152, 0.30) 0, rgba(205, 192, 152, 0) 1.3px);
+  animation-duration: 42s;
+  animation-delay: -14s;
+}
+
+@keyframes nemrtvi-dust-drift {
+  0%   { transform: translateY(0) translateX(0); }
+  50%  { transform: translateY(50vh) translateX(2vw); }
+  100% { transform: translateY(110vh) translateX(-1vw); }
+}
+
+/* ──────────────── 2. Topbar — slim 56px, solidní zčernalé železo ──────────────── */
+
+[data-theme="nemrtvi"][data-shell="ikaros"] > header {
+  position: relative;
+  background:
+    linear-gradient(180deg, #13140f 0%, #0c0d0a 100%);
+  border-bottom: 1px solid var(--theme-iron-cold);
+  box-shadow:
+    0 1px 0 rgba(95, 200, 168, 0.10),
+    0 4px 12px rgba(0, 0, 0, 0.70);
+}
+
+/* Iron-cold hairline pod topbarem */
+[data-theme="nemrtvi"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-iron-cold) 25%,
+    var(--theme-ghost-teal) 50%,
+    var(--theme-iron-cold) 75%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--theme-glow-ghost));
+}
+
+/* ──────────────── 3. Logo banner ──────────────── */
+
+[data-theme="nemrtvi"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
+}
+
+/* ──────────────── 4. Header buttons — kamenné cedule + bone-ivory text + iron rám ──────────────── */
+
+[data-theme="nemrtvi"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  background:
+    linear-gradient(180deg, #1a1b16 0%, #0e0f0c 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(95, 200, 168, 0.06), transparent 60%);
+  color: var(--theme-bone-ivory);
+  border: 1px solid var(--theme-iron-cold);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  font-size: 0.72rem;
+  padding: 0 14px;
+  height: 32px;
+  min-height: 32px;
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.10),
+    inset 0 1px 0 rgba(205, 192, 152, 0.06),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.40),
+    0 2px 4px rgba(0, 0, 0, 0.55);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 4px rgba(95, 200, 168, 0.20);
+  transition: border-color 280ms ease-out, color 280ms ease-out, box-shadow 280ms ease-out;
+}
+
+[data-theme="nemrtvi"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, #1c1d18 0%, #0e0f0c 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(95, 200, 168, 0.16), transparent 60%);
+  border-color: var(--theme-ghost-teal);
+  color: var(--theme-ghost-radium);
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.45),
+    inset 0 1px 0 rgba(205, 192, 152, 0.10),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55),
+    0 0 14px var(--theme-glow-ghost-strong),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 8px var(--theme-glow-radium-strong);
+}
+
+[data-theme="nemrtvi"] [class*="headerBtnIcon"],
+[data-theme="nemrtvi"] [class*="headerBtnLabel"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+[data-theme="nemrtvi"] [class*="headerBtn"] [class*="avatar"] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ──────────────── 5. Glass panely — kamenné desky s glassmorphism ──────────────── */
+
+[data-theme="nemrtvi"] [data-frame-panel="sidebar"],
+[data-theme="nemrtvi"] [data-frame-panel="right"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(20, 22, 18, 0.92) 0%, rgba(12, 14, 12, 0.96) 100%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--theme-border-iron);
+  border-radius: 6px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.08),
+    0 6px 22px rgba(0, 0, 0, 0.65),
+    inset 0 0 24px rgba(95, 200, 168, 0.04);
+}
+
+/* Welcome card + Novinky = stejný stone material, glassmorphism, ghost rim */
+[data-theme="nemrtvi"] [data-frame-panel="card"],
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(20, 22, 18, 0.86) 0%, rgba(12, 14, 12, 0.92) 100%);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  backdrop-filter: blur(8px) saturate(1.05);
+  border: 1px solid var(--theme-iron-cold);
+  border-radius: 6px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.12),
+    inset 0 0 36px rgba(95, 200, 168, 0.06),
+    0 8px 28px rgba(0, 0, 0, 0.75);
+}
+
+/* ──────────────── 6. Corner ornamenty — pouze welcome + novinky (Q&A 8B) ──────────────── */
+
+/* Sidebar + right panel: žádné corner ornamenty (potlačit defaultní diamant) */
+[data-theme="nemrtvi"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="ornament"] {
+  display: none;
+}
+
+/* Welcome + Novinky: 4 corner-tl ornamenty (mirror přes CSS) */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"],
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: var(--asset-corner-size);
+  height: var(--asset-corner-size);
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 6px rgba(95, 200, 168, 0.18));
+  position: absolute;
+  display: block;
+  /* potlačit default tvar diamantu z CornerOrnament.module.css */
+  transform: none;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Novinky = menší corner */
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: var(--asset-corner-size-novinky);
+  height: var(--asset-corner-size-novinky);
+}
+
+/* TL */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="tl"],
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="tl"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+}
+/* TR — mirror přes scaleX */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="tr"],
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="tr"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scaleX(-1);
+}
+/* BL — mirror přes scaleY */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="bl"],
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="bl"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+  transform: scaleY(-1);
+}
+/* BR — mirror obě */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="br"],
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="br"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scale(-1, -1);
+}
+
+/* Z-index strategy — content nad ornamenty */
+[data-theme="nemrtvi"] [data-frame-panel] > [class*="header"],
+[data-theme="nemrtvi"] [data-frame-panel] > [class*="body"] {
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 7. Welcome card — oltář v kostnici (signature centerpiece) ──────────────── */
+
+[data-theme="nemrtvi"] [data-frame-panel="card"] {
+  min-height: clamp(420px, 60vh, 720px);
+  /* extra padding-top pro skull-arch crown který přesahuje nahoru */
+  padding-top: 56px;
+}
+
+/* 🎨 Skull-arch crown nad welcome card (Q&A 7b A — top only, "vstup do krypty") */
+[data-theme="nemrtvi"] [data-frame-panel="card"]::before {
+  content: '';
+  position: absolute;
+  top: -32px;
+  left: 0;
+  right: 0;
+  height: 96px;
+  background-image: var(--asset-skull-arch);
+  background-size: contain;
+  background-position: center top;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.85));
+}
+
+/* Welcome heading — bone-ivory weathered, carved-into-stone shadow */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  color: var(--theme-bone-ivory);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(95, 200, 168, 0.25);
+}
+
+/* "Projektu Ikaros." accent — radium-bright italic, ghost-glow */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-ghost-radium);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.85),
+    0 0 12px var(--theme-glow-radium-strong);
+}
+
+/* Decorativní ghost-teal hairline pod nadpisem */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 12px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-ghost-teal) 22%,
+    var(--theme-ghost-radium) 50%,
+    var(--theme-ghost-teal) 78%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  filter: drop-shadow(0 0 3px var(--theme-glow-ghost));
+}
+
+/* Body paragraphs — IM Fell DW Pica, weathered ivory, ink-bleed feel */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="paragraph"] {
+  color: var(--theme-bone-ivory);
+  font-family: var(--font-body);
+  font-size: 1.05em;
+  line-height: 1.65;
+}
+
+/* Signature — IM Fell DW Pica italic, teal-ghost (mortuální tón) */
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="signature"] {
+  color: var(--theme-ghost-teal);
+  font-family: var(--font-body);
+  font-style: italic;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 8px var(--theme-glow-ghost);
+}
+
+/* ──────────────── 8. Andel medailon — anděl v iron-skull rámu (statický, žádný flutter) ──────────────── */
+
+[data-theme="nemrtvi"] [data-andel-medallion] {
+  width: 280px;
+  height: 340px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter:
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.75))
+    drop-shadow(0 0 16px rgba(95, 200, 168, 0.18));
+}
+
+/* ──────────────── 9. Bone drop-cap "V" — UnifrakturCook, multi-stack ghost-glow shadow ──────────────── */
+
+[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+  font-family: var(--font-logo);
+  font-size: 4.2em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.05em 0.10em 0 0;
+  color: var(--theme-bone-ivory);
+  text-shadow:
+    0 0 0.04em rgba(0, 0, 0, 1),
+    0 2px 0.06em rgba(0, 0, 0, 0.9),
+    0 0 0.25em rgba(95, 200, 168, 0.45),
+    0 0 0.5em rgba(95, 200, 168, 0.20);
+  font-weight: 700;
+}
+
+/* ──────────────── 10. Section title — bone-ivory New Rocker uppercase + ghost-glow ──────────────── */
+
+[data-theme="nemrtvi"] [class*="sectionTitle"] {
+  color: var(--theme-bone-ivory);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 0.92em;
+  line-height: 1.2;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 8px rgba(95, 200, 168, 0.18);
+  position: relative;
+  padding-bottom: 14px;
+}
+
+[data-theme="nemrtvi"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 14px;
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(95, 200, 168, 0.55) 30%,
+      transparent 48%,
+      transparent 52%,
+      rgba(95, 200, 168, 0.55) 70%,
+      transparent 100%
+    ),
+    var(--asset-divider-skull);
+  background-size: 100% 1px, 80px 14px;
+  background-position: 0 50%, center center;
+  background-repeat: no-repeat, no-repeat;
+  opacity: 0.85;
+}
+
+/* ──────────────── 11. NavItem (btn3d) — kamenný štít + ghost edge-light hover + recess-into-stone active ──────────────── */
+
+[data-theme="nemrtvi"] [class*="btn3d"] {
+  --btn-bg-1: rgba(20, 22, 18, 0.92);
+  --btn-bg-2: rgba(12, 14, 12, 0.96);
+  --btn-border: var(--theme-iron-cold);
+  --btn-color: var(--theme-bone-ivory);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(95, 200, 168, 0.06),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.65),
+    0 2px 5px 0 rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="nemrtvi"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(28, 30, 24, 0.95);
+  --btn-bg-2: rgba(14, 16, 14, 0.98);
+  --btn-border: var(--theme-ghost-teal);
+  --btn-color: var(--theme-ghost-radium);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(95, 200, 168, 0.18),
+    inset 0 0 14px 0 rgba(95, 200, 168, 0.20),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.65),
+    0 0 14px var(--theme-glow-ghost-strong),
+    0 4px 7px 0 rgba(0, 0, 0, 0.55);
+  text-shadow: 0 0 6px var(--theme-glow-radium);
+}
+
+/* Active = recess-into-stone (Q&A 9A — žádný candle flicker, statika) */
+[data-theme="nemrtvi"] [class*="btn3dActive"],
+[data-theme="nemrtvi"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(8, 10, 8, 0.95);
+  --btn-bg-2: rgba(4, 6, 4, 0.98);
+  --btn-border: var(--theme-ghost-teal);
+  --btn-color: var(--theme-ghost-radium);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 0 12px rgba(95, 200, 168, 0.30),
+    inset 2px 0 0 0 var(--theme-ghost-teal),
+    inset 0 1px 0 0 rgba(124, 255, 174, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.65);
+  text-shadow:
+    0 0 8px var(--theme-glow-radium-strong),
+    0 1px 1px rgba(0, 0, 0, 0.85);
+}
+
+/* NavItem text (boxíky ÚVODNÍK / NÁPOVĚDA / DISKUZE / ČLÁNKY / GALERIE / VYTVOŘIT SVĚT)
+   — New Rocker display font, ostře řezané gotické letterforms. */
+[data-theme="nemrtvi"] [class*="navItem"] [class*="navItemLabel"],
+[data-theme="nemrtvi"] [class*="btn3d"] [class*="navItemLabel"] {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.92em;
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+/* ──────────────── 12. Pravý panel — ThemeSwitcher trigger ──────────────── */
+
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background:
+    linear-gradient(180deg, #1a1b16 0%, #0e0f0c 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(95, 200, 168, 0.06), transparent 60%);
+  color: var(--theme-bone-ivory);
+  border: 1px solid var(--theme-iron-cold);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 4px rgba(95, 200, 168, 0.20);
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.10),
+    inset 0 1px 0 rgba(205, 192, 152, 0.06),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.40),
+    0 2px 4px rgba(0, 0, 0, 0.55);
+  height: 38px;
+  transition: border-color 280ms ease-out, color 280ms ease-out, box-shadow 280ms ease-out;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  background:
+    linear-gradient(180deg, #1c1d18 0%, #0e0f0c 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(95, 200, 168, 0.16), transparent 60%);
+  border-color: var(--theme-ghost-teal);
+  color: var(--theme-ghost-radium);
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.45),
+    inset 0 1px 0 rgba(205, 192, 152, 0.10),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55),
+    0 0 14px var(--theme-glow-ghost-strong),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]::before {
+  display: none;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] [class*="triggerCaret"] {
+  color: var(--theme-bone-ivory);
+  font-size: 11px;
+}
+
+/* Empty hints */
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="emptyHint"] {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
+/* "+" tlačítko v pravém panelu — CSS-only stone CTA (Q&A 8B — žádný custom asset) */
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="rightAddBtn"] {
+  background: linear-gradient(180deg, rgba(28, 30, 24, 0.85) 0%, rgba(8, 10, 8, 0.95) 100%);
+  border: 1px solid var(--theme-iron-cold);
+  color: var(--theme-bone-ivory);
+  text-shadow: 0 0 4px rgba(95, 200, 168, 0.25);
+  box-shadow:
+    inset 0 1px 0 rgba(95, 200, 168, 0.10),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.55),
+    0 1px 3px rgba(0, 0, 0, 0.60);
+  border-radius: 4px;
+  transition: border-color 280ms ease-out, color 280ms ease-out, box-shadow 280ms ease-out;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover {
+  background: linear-gradient(180deg, rgba(36, 40, 32, 0.92) 0%, rgba(12, 14, 12, 0.98) 100%);
+  border-color: var(--theme-ghost-teal);
+  color: var(--theme-ghost-radium);
+  box-shadow:
+    inset 0 1px 0 rgba(95, 200, 168, 0.20),
+    inset 0 0 10px rgba(95, 200, 168, 0.18),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.55),
+    0 0 12px var(--theme-glow-ghost-strong);
+  text-shadow: 0 0 6px var(--theme-glow-radium);
+}
+
+/* Section spacing */
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="section"]:not([class*="sectionTitle"]):not([class*="rightSectionHeader"]) {
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+/* Pravý panel kompaktnější */
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1) var(--sp-2);
+  font-size: 0.66rem;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+/* ──────────────── 13. PJ badge — bone-ivory na iron, teal-ghost rim ──────────────── */
+
+[data-theme="nemrtvi"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-stone-tablet-hi), var(--theme-stone-tablet));
+  color: var(--theme-bone-ivory);
+  border: 1px solid var(--theme-ghost-teal);
+  box-shadow:
+    0 0 8px var(--theme-glow-ghost),
+    inset 0 0 0 1px rgba(95, 200, 168, 0.15),
+    inset 0 1px 0 0 rgba(205, 192, 152, 0.10);
+  text-shadow: 0 0 4px var(--theme-glow-radium);
+}
+
+/* ──────────────── 14. Welcome heading — drop-cap definován v sekci 9 ──────────────── */
+
+/* ──────────────── 15. Nav ikony — 7 unikátních ossuary medailonů přes data-nav-key ──────────────── */
+
+[data-theme="nemrtvi"] [data-nav-key] [class*="navItemIcon"] {
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-ghost));
+}
+
+[data-theme="nemrtvi"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+[data-theme="nemrtvi"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="nemrtvi"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="nemrtvi"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="nemrtvi"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="nemrtvi"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="nemrtvi"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="nemrtvi"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* Active nav icon — scale + radium glow halo (statika, žádné keyframes) */
+[data-theme="nemrtvi"] [class*="navItemActive"] [data-nav-key] [class*="navItemIcon"],
+[data-theme="nemrtvi"] [class*="btn3dActive"] [data-nav-key] [class*="navItemIcon"] {
+  filter: drop-shadow(0 0 5px var(--theme-glow-radium-strong));
+  transform: scale(1.05);
+}
+
+/* ──────────────── 16. Novinky panel — stone glassmorphism (defined in section 5),
+                       heading + empty + addBtn styling ──────────────── */
+
+/* Heading "Novinky" — bone-ivory display, ghost-glow */
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="novinkyTitle"] {
+  color: var(--theme-bone-ivory);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 8px rgba(95, 200, 168, 0.20);
+}
+
+/* Lucide Newspaper ikona vedle headingu */
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="novinkyTitle"] svg {
+  color: var(--theme-ghost-teal);
+  filter: drop-shadow(0 0 3px var(--theme-glow-ghost));
+}
+
+/* Empty state "Zatím žádné novinky." — teal-ghost italic */
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="empty"] {
+  color: var(--theme-ghost-teal);
+  font-family: var(--font-body);
+  font-style: italic;
+  opacity: 0.75;
+}
+
+/* "Přidat novinku" — CSS-only stone CTA (Q&A 8B — žádný custom asset, sjednocené s rightAddBtn) */
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="addBtn"] {
+  background:
+    linear-gradient(180deg, #1a1b16 0%, #0e0f0c 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(95, 200, 168, 0.06), transparent 60%);
+  color: var(--theme-bone-ivory);
+  border: 1px solid var(--theme-iron-cold);
+  border-radius: 4px;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 4px rgba(95, 200, 168, 0.20);
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.10),
+    inset 0 1px 0 rgba(205, 192, 152, 0.06),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.40),
+    0 2px 4px rgba(0, 0, 0, 0.55);
+  position: relative;
+  transition: border-color 280ms ease-out, color 280ms ease-out, box-shadow 280ms ease-out, transform 150ms ease-out;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="addBtn"]:hover {
+  background:
+    linear-gradient(180deg, #1c1d18 0%, #0e0f0c 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(95, 200, 168, 0.16), transparent 60%);
+  border-color: var(--theme-ghost-teal);
+  color: var(--theme-ghost-radium);
+  box-shadow:
+    inset 0 0 0 1px rgba(95, 200, 168, 0.45),
+    inset 0 1px 0 rgba(205, 192, 152, 0.10),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55),
+    0 0 14px var(--theme-glow-ghost-strong),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 8px var(--theme-glow-radium-strong);
+}
+
+/* Klik mikrointerakce — scale UX feedback (zachováno i v reduced-motion) */
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="addBtn"]:active,
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="rightAddBtn"]:active {
+  transform: scale(0.96);
+}
+
+/* Lucide Plus ikona — necháme viditelnou (CSS-only stone button, žádný asset replacement) */
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="addBtn"] > svg {
+  color: var(--theme-ghost-teal);
+  filter: drop-shadow(0 0 3px var(--theme-glow-ghost));
+}
+
+[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="addBtn"]:hover > svg {
+  color: var(--theme-ghost-radium);
+  filter: drop-shadow(0 0 5px var(--theme-glow-radium));
+}
+
+/* ──────────────── 17. Showmore / pravý panel link styling ──────────────── */
+
+[data-theme="nemrtvi"] [class*="showAllLink"] {
+  color: var(--theme-ghost-teal);
+  border-color: var(--theme-iron-cold);
+}
+
+[data-theme="nemrtvi"] [class*="showAllLink"]:hover {
+  color: var(--theme-ghost-radium);
+  text-shadow: 0 0 6px var(--theme-glow-radium);
+  box-shadow: 0 0 10px var(--theme-glow-ghost);
+}
+
+/* ──────────────── 18. Focus visible — radium ring ──────────────── */
+
+[data-theme="nemrtvi"] [class*="navItem"]:focus-visible,
+[data-theme="nemrtvi"] [class*="btn3d"]:focus-visible,
+[data-theme="nemrtvi"] [class*="showAllLink"]:focus-visible,
+[data-theme="nemrtvi"] [class*="rightAddBtn"]:focus-visible,
+[data-theme="nemrtvi"] [class*="addBtn"]:focus-visible,
+[data-theme="nemrtvi"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-ghost-radium),
+    0 0 14px var(--theme-glow-radium-strong);
+}
+
+/* ──────────────── 19. Scrollbar styling ──────────────── */
+
+[data-theme="nemrtvi"] [data-frame-panel] {
+  scrollbar-color: var(--theme-ghost-teal) var(--theme-surface);
+  scrollbar-width: thin;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel]::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme="nemrtvi"] [data-frame-panel]::-webkit-scrollbar-track {
+  background: var(--theme-surface);
+}
+
+[data-theme="nemrtvi"] [data-frame-panel]::-webkit-scrollbar-thumb {
+  background: var(--theme-ghost-teal);
+  border-radius: 4px;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="nemrtvi"] [data-frame-panel]::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-ghost-radium);
+}
+
+/* ──────────────── 20. Tablet (1024–1279px) — menší corner, menší skull-arch ──────────────── */
+
+@media (max-width: 1279px) {
+  [data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"] {
+    --asset-corner-size: 80px;
+  }
+  [data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"] {
+    --asset-corner-size-novinky: 64px;
+  }
+  [data-theme="nemrtvi"] [data-frame-panel="card"]::before {
+    top: -24px;
+    height: 80px;
+  }
+  [data-theme="nemrtvi"] [data-andel-medallion] {
+    width: 220px;
+    height: 268px;
+  }
+}
+
+@media (max-width: 1023px) {
+  [data-theme="nemrtvi"] [data-andel-medallion] {
+    width: 200px;
+    height: 240px;
+  }
+}
+
+/* ──────────────── 21. Mobile (≤768px) — corner zmenšeno, dust motes hidden, drawer ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="nemrtvi"] [data-frame-panel="sidebar"],
+  [data-theme="nemrtvi"] [data-frame-panel="right"],
+  [data-theme="nemrtvi"] [data-frame-panel="card"],
+  [data-theme="nemrtvi"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-radius: 4px;
+  }
+
+  /* Corner zmenšen */
+  [data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"],
+  [data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"] {
+    width: var(--asset-corner-size-mobile);
+    height: var(--asset-corner-size-mobile);
+    opacity: 0.7;
+  }
+
+  /* Drawer mode — corner schovaný */
+  [data-theme="nemrtvi"] [class*="drawer"] [data-frame-panel] [class*="ornament"],
+  [data-theme="nemrtvi"] [data-drawer-open] [data-frame-panel] [class*="ornament"] {
+    display: none;
+  }
+
+  /* Welcome card mobile */
+  [data-theme="nemrtvi"] [data-frame-panel="card"] {
+    min-height: clamp(360px, 50vh, 560px);
+    padding-top: 32px;
+  }
+
+  /* Skull-arch crown mobile zmenšeno */
+  [data-theme="nemrtvi"] [data-frame-panel="card"]::before {
+    top: -16px;
+    height: 56px;
+  }
+
+  /* Medailon zmenšen na 120×144 */
+  [data-theme="nemrtvi"] [data-andel-medallion] {
+    width: 120px;
+    height: 144px;
+  }
+
+  /* Bone drop-cap menší */
+  [data-theme="nemrtvi"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+    font-size: 3.4em;
+  }
+
+  /* Signature menší */
+  [data-theme="nemrtvi"] [class*="signature"] {
+    font-size: 18px;
+  }
+
+  /* Nav ikony menší */
+  [data-theme="nemrtvi"] [data-nav-key] [class*="navItemIcon"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Touch target ≥48px */
+  [data-theme="nemrtvi"] [class*="navItem"] {
+    min-height: 48px;
+  }
+
+  /* Header buttony icon-only */
+  [data-theme="nemrtvi"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+    padding: 0 10px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 0.7rem;
+  }
+
+  [data-theme="nemrtvi"] [class*="headerBtnLabel"] {
+    display: none;
+  }
+
+  /* Dust motes hidden — visual noise reduction */
+  [data-theme="nemrtvi"][data-shell="ikaros"] body::before,
+  [data-theme="nemrtvi"][data-shell="ikaros"] body::after {
+    display: none;
+  }
+}
+
+/* ──────────────── 22. Reduced motion (`reducedMotion: 'heavy'`) ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Vypnout všechny pojmenované animace */
+  [data-theme="nemrtvi"][data-shell="ikaros"]::after {
+    animation: none;
+    opacity: 0.7; /* statická hodnota uprostřed cyklu */
+  }
+  [data-theme="nemrtvi"][data-shell="ikaros"] body::before,
+  [data-theme="nemrtvi"][data-shell="ikaros"] body::after {
+    animation: none;
+    display: none; /* dust motes hidden */
+  }
+
+  /* Vypnout všechny transitions */
+  [data-theme="nemrtvi"] *,
+  [data-theme="nemrtvi"] *::before,
+  [data-theme="nemrtvi"] *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+
+  /* UX feedback — klik scale zachováno (krátká transformace, ne keyframe) */
+  [data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="addBtn"]:active,
+  [data-theme="nemrtvi"] [data-frame-panel="right"] [class*="rightAddBtn"]:active {
+    transform: scale(0.96);
+  }
+}
+
+/* ──────────────── 23. Forced colors (Windows high contrast) ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"],
+  [data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"],
+  [data-theme="nemrtvi"] [data-frame-panel="card"]::before,
+  [data-theme="nemrtvi"] [data-andel-medallion],
+  [data-theme="nemrtvi"] [data-nav-key] [class*="navItemIcon"] {
+    forced-color-adjust: none;
+  }
+
+  [data-theme="nemrtvi"] [class*="btn3dActive"],
+  [data-theme="nemrtvi"] [class*="navItemActive"] {
+    forced-color-adjust: none;
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
   }
 }
