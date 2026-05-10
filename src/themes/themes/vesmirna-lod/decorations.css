@@ -276,7 +276,7 @@
 
 /* ──────────────── 12. Header buttons — chamfered 5-úhelník + uppercase ──────────────── */
 
-[data-theme="vesmirna-lod"] [class*="headerBtn"] {
+[data-theme="vesmirna-lod"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
   letter-spacing: 0.14em;
   font-size: 0.72rem;
   padding: 0 14px;
@@ -285,6 +285,14 @@
   align-items: center;
   gap: 6px;
   clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px);
+}
+
+/* Reset inner spans — bez padding/height, jinak ikona + text se rozlézají */
+[data-theme="vesmirna-lod"] [class*="headerBtnIcon"],
+[data-theme="vesmirna-lod"] [class*="headerBtnLabel"] {
+  padding: 0;
+  height: auto;
+  min-height: 0;
 }
 
 [data-theme="vesmirna-lod"] [class*="headerBtn"] [class*="avatar"] {
@@ -362,7 +370,7 @@
 /* ──────────────── 16. Focus-visible — box-shadow ring (ne outline kvůli pseudoelementům) ──────────────── */
 
 [data-theme="vesmirna-lod"] [class*="navItem"]:focus-visible,
-[data-theme="vesmirna-lod"] [class*="headerBtn"]:focus-visible,
+[data-theme="vesmirna-lod"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):focus-visible,
 [data-theme="vesmirna-lod"] [class*="btn3d"]:focus-visible,
 [data-theme="vesmirna-lod"] [class*="showAllLink"]:focus-visible,
 [data-theme="vesmirna-lod"] [class*="rightAddBtn"]:focus-visible {
@@ -412,7 +420,7 @@
     display: none;
   }
 
-  [data-theme="vesmirna-lod"] [class*="headerBtn"] {
+  [data-theme="vesmirna-lod"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
     padding: 0 10px;
     height: 36px;
     min-height: 36px;

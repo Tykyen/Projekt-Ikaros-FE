@@ -1,7 +1,8 @@
 # Spec 1.0h — Příroda visual upgrade
 
 **Datum:** 2026-05-09
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Schváleno (po audit-1.0h-priroda.md)
+**Audit:** [audit-1.0h-priroda.md](audit-1.0h-priroda.md)
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.0h
 **Závisí na:** 1.0g vesmirna-lod ✅ (pattern předlohy)
 **Reference:**
@@ -36,12 +37,14 @@ Po načtení s `themeId === 'priroda'` má dashboard vypadat dle `references/pri
 ### 1.2 Topbar (slim, 56px)
 - Pozadí: dřevěná deska s jemným textury wood-grain (CSS gradient, ne raster)
 - Logo vlevo (z `logo.png`): šíře `--asset-logo-w: 220px` desktop / `170px` mobile
-- Pravé tlačítka (Pošta, Uživatelé, Zlatý standard, Tyky, Odhlásit) — **chamfered dřevěné cedulky** se zlatým rámečkem, zlatý uppercase text Cinzel
+- Pravé tlačítka (Pošta, Uživatelé, Zlatý standard, Tyky, Odhlásit) — **chamfered dřevěné cedulky** se zlatým rámečkem, **TMAVÝ uppercase text `#3d2914` Cinzel** (audit H8 — krémová proti zlaté = WCAG fail 1.5:1)
 - Zlatý standard má rozbalovací caret — zachovat current pattern
+- **Pod 768px**: buttony icon-only s `aria-label` (Cinzel uppercase se nevejde — audit H3)
+- **Pod 480px**: Tyky + Odhlásit do hamburger menu
 
 ### 1.3 Sidebar levý — NAVIGACE / VESMÍRY / CHAT
 - Frame: tmavě hnědý dřevěný panel, břečťanové úponky obtáčející levou hranu (CSS clip-path nebo dekorovaný element, **NE** plná raster ramečky — ty řešíme rohovými assety v 1.4)
-- Section title: zlatý uppercase Cinzel, **bez chevronů** (priroda je jemnější než vesmirna-lod), pod ním tenký zlatý ornament `❦` nebo CSS rule s leafy ends
+- Section title: zlatý uppercase Cinzel, **bez chevronů** (priroda je jemnější než vesmirna-lod), pod ním tenký **CSS-only** zlatý gradient rule (1px linear-gradient s leafy `::before`/`::after` glyphs) — Cinzel nemá `❦` glyph (audit H6)
 - NavItem (každá položka):
   - Pozadí v klidu = `linear-gradient` tmavě zelený dřevěný panel s velmi jemným highlightem
   - Před textem = malý zelený lístek (ikona — viz 1.7 Ikony)
@@ -50,10 +53,10 @@ Po načtení s `themeId === 'priroda'` má dashboard vypadat dle `references/pri
   - Text uppercase Cinzel, krémová `#e8d8a0`
 
 ### 1.4 Welcome card (centrální panel)
-- **Min-height 60vh**, frame v kaligrafickém dřevěném rámečku s břečťanem v rozích
+- **Min-height `clamp(420px, 60vh, 720px)`** (audit H2 — fixed 60vh praskne na 1366×720 + taskbar), frame v kaligrafickém dřevěném rámečku s břečťanem v rozích
 - Vlevo: **medailon** z `medailon.png` (anděl ve dřevěném rámu s květy) — `--asset-andel-medallion`
 - Nahoře nad medailonem: kruhový dekorační uzel z `references/priroda.png` (ten malý medailon s úponky uprostřed nahoře) — **CSS only nebo malý raster** (rozhodne audit)
-- Heading: `Vítej v <span>Projektu Ikaros</span>.` — sériová Cinzel s kurzívnou ozdobou na "Projektu Ikaros" zlatou
+- Heading: `Vítej v <span class="titleAccent">Projektu Ikaros.</span>` — wrap **už existuje** v [`DashboardPage.tsx:47`](../../../src/features/ikaros/pages/DashboardPage.tsx). Žádný shared edit. Pod `[data-theme="priroda"] .titleAccent` aplikujeme italic Cinzel + zlatou.
 - Body text: Lora regular, krémová
 - Signature: `Příjemnou zábavu přeji administrátoři.` — IM Fell English italic, zlatá
 
@@ -72,13 +75,13 @@ Po načtení s `themeId === 'priroda'` má dashboard vypadat dle `references/pri
 
 Reference ukazuje **drobný zelený lístek** u každého nav-itemu. Místo 7 jednotlivých rasterových ikon (jako `vesmirna-lod`) jdeme **hybridně**:
 
-- **Default leaf glyph pro všechny nav-itemy** — jediný malý SVG/raster lístek, sdílený jako CSS background var (`--asset-icon-leaf`)
-- **Speciální assety pouze pro 3 položky** (uživatel explicitně zvažoval):
+- **Default leaf glyph pro všechny nav-itemy** — sdílený lístek ve **2 výstupních velikostech** (audit M3): `icon-leaf-64.webp` (desktop) + `icon-leaf-32.webp` (mobile, sharp downscale)
+- **Speciální assety pouze pro 3 položky**:
   - **Hospoda** — pivní korbel s listovým ornamentem
   - **Úvodník** — rozvinutý svitek s pečetí
-  - **Nápověda** — kniha s zlatým křížkem nebo otazníkem v rámečku z větviček
+  - **Nápověda** — kniha s ivy úponkem (audit B1: regenerace s 3/4 angled view + hand-painted)
 
-Prompty pro AI generování těchto assetů → kapitola 4.
+Prompty pro AI generování těchto assetů → [`_asset-prompts.md`](../../../public/themes/priroda/decor/_asset-prompts.md).
 
 ### 1.8 Hover & focus & reduced motion
 - Hover: jemný 200ms ease zlatý glow (12px), bez transformace pozice
@@ -111,10 +114,12 @@ Replikuje luxury token schema z 1.0g (vesmirna-lod). Paleta = smaragd + zlato + 
 '--theme-border-gold':   'rgba(212, 169, 70, 0.62)',
 '--theme-border-emerald':'rgba(31, 106, 58, 0.55)',
 
-// Text
+// Text (audit M1: muted #a09060→#b8a070 pro WCAG AA pass)
 '--theme-text':       '#e8d8a0',
-'--theme-text-muted': '#a09060',
+'--theme-text-muted': '#b8a070',
 '--theme-heading':    '#d4a946',
+'--theme-text-on-emerald': '#fff8e0',  // NavItem aktivní (audit H1)
+'--theme-text-on-gold':    '#3d2914',  // topbar zlaté cedulky (audit H8)
 
 // Accents
 '--theme-accent':              '#1f6a3a',  // smaragd
@@ -193,8 +198,15 @@ const decor = '/themes/priroda/decor';
 '--asset-logo':            `url('${decor}/logo.webp')`,
 '--asset-andel-medallion': `url('${decor}/medallion.webp')`,
 
-// Default leaf pro všechny nav-itemy
-'--asset-icon-leaf':       `url('${decor}/icon-leaf.webp')`,
+// Corner ornament (audit H1: chyběl ve spec)
+'--asset-corner':           `url('${decor}/corner-tl.webp')`,
+'--asset-corner-size':      '120px',
+'--asset-corner-size-mobile':'64px',
+'--frame-corner-inset':     '8px',
+
+// Default leaf pro všechny nav-itemy (audit M3: 2 výstupní velikosti)
+'--asset-icon-leaf':        `url('${decor}/icon-leaf-64.webp')`,
+'--asset-icon-leaf-mobile': `url('${decor}/icon-leaf-32.webp')`,
 
 // 3 speciální nav ikony
 '--asset-icon-hospoda':    `url('${decor}/icon-hospoda.webp')`,
@@ -211,11 +223,17 @@ const decor = '/themes/priroda/decor';
 
 Vše pod `[data-theme="priroda"]`. Klíčové pravidla:
 
-- **Žádné raster border-image** pro panely (pomalé). Místo toho: tmavě zelený surface + 1px smaragd border + corner pseudo-elementy s břečťanovým úponkem (CSS gradient `radial`+`linear` skládaný do tvaru lístku) — pokud audit ukáže že to nestačí, nahradíme malými PNG corner ornamenty (4 unikátní rohy z reference).
-- **NavItem aktivní**: smaragd gradient + zlatý 2px left-border + zlatý glow.
-- **Buttony Pošta/Uživatelé/...**: dřevěná cedulka pomocí `linear-gradient` + 1px zlatý outer border + 1px tmavě hnědý inner shadow.
-- **Heading "Vítej v Projektu Ikaros."**: `Projektu Ikaros` ovinout do `<span>` v existující komponentě `WelcomeHero` (nebo její ekvivalent — viz Open Questions Q3) → CSS nasází zlatou kurzivní Cinzel.
-- **Reduced motion**: vypnuté všechny `transition` u glow; `box-shadow` nastaven staticky.
+- **Corner ornamenty** (audit rozhodnutí Q1) — raster `corner-tl.webp` + 4 absolutní `<i>` divy NEBO výrazný pseudo-element pattern. TL = původní; TR = `scaleX(-1)`; BL = `scaleY(-1)`; BR = `scale(-1,-1)`.
+- **Z-index** (audit H7): corner ornaments `z-index: 0` + `pointer-events: none`; panel content `z-index: 1`; focus outline browser default (=2+).
+- **Border-radius** panelu = stejný na corner pseudo / wrapper, ať corner respektuje skraje.
+- **Mobile corner** (audit H5): `--asset-corner-size-mobile: 64px` + `opacity: 0.7`. **V drawer modu `display: none`**.
+- **NavItem aktivní**: smaragd gradient + zlatý 2px left-border + zlatý glow + text `var(--theme-text-on-emerald)`.
+- **Buttony Pošta/Uživatelé/...** (audit H8): dřevěná cedulka `linear-gradient` + 1px zlatý outer border + 1px tmavě hnědý inner shadow + **TMAVÝ text `var(--theme-text-on-gold)`** (NE krémový — WCAG fail).
+- **Heading "Vítej v Projektu Ikaros."**: wrap `<span class="titleAccent">` **už existuje** v [`DashboardPage.tsx:47`](../../../src/features/ikaros/pages/DashboardPage.tsx). Pod `[data-theme="priroda"] .titleAccent` aplikujeme Cinzel italic + zlatá. Žádný shared edit (audit H10 vyřešen).
+- **Section title decoration** (audit H6): místo `❦` (Cinzel nemá) — CSS-only `::after` 1px zlatý gradient rule s leafy pseudo-elementy.
+- **Reduced motion** (audit L1): explicit `transition: none` na všechny `:hover` a `:focus-visible` glow shadows.
+- **Focus visible na zlatých cedulkách**: fallback `outline: 2px solid var(--theme-accent-emerald)` (audit Accessibility — zlatý outline by zmizel).
+- **Scrollbar styling** pro overflow-y panely: `scrollbar-color: var(--theme-accent-gold) var(--theme-surface)` (FF), webkit thumb gold.
 
 ---
 
@@ -232,41 +250,42 @@ Uživatel explicitně požádal o samostatný soubor s prompty. **Vyrobíme ho z
 | `assets-source/themes/backgrounds/priroda.png` | `public/themes/backgrounds/priroda.webp` | quality 88, max 1920px wide |
 | `assets-source/themes/references/priroda.png` | `public/themes/thumbnails/priroda.webp` | resize 480×270, quality 80 |
 
-### 4.2 Nové assety k AI-generování (prompty níže)
+### 4.2 Nové assety k AI-generování
 
-#### `icon-leaf.webp` — default nav ikona (jeden kus, sdílený)
-- Velikost: 64×64 px, transparentní pozadí
-- Prompt:
-  > A single small ivy leaf icon, deep emerald green with subtle gold outline, soft warm rim-light from top-left, hand-painted storybook style (Brian Froud / Hidden Folks), clean transparent background, centered, no shadow, no text, no frame. Slight glossy highlight on the leaf surface. Style consistent with a dark fantasy enchanted forest UI.
+| Asset | Cíl | Velikost |
+|---|---|---|
+| `icon-leaf.webp` | `public/themes/priroda/decor/icon-leaf.webp` | 64×64 |
+| `icon-hospoda.webp` | `public/themes/priroda/decor/icon-hospoda.webp` | 96×96 |
+| `icon-uvodnik.webp` | `public/themes/priroda/decor/icon-uvodnik.webp` | 96×96 |
+| `icon-napoveda.webp` | `public/themes/priroda/decor/icon-napoveda.webp` | 96×96 |
+| `corner-tl.webp` (master) | `public/themes/priroda/decor/corner-tl.webp` | 256×256 |
 
-#### `icon-hospoda.webp` — pivní korbel (Hospoda)
-- Velikost: 96×96 px, transparentní pozadí
-- Prompt:
-  > A small wooden beer tankard with golden rim and small ivy leaf wrapping around the handle, deep amber ale visible at the top, hand-painted storybook style (Brian Froud / Stardew Valley), warm gold rim-light, clean transparent background, centered icon, no text, no shadow, no frame. Color palette: dark wood brown, amber gold, emerald green ivy. Style consistent with a dark fantasy enchanted forest UI.
+`corner-tl.webp` je jediný master roh — TR/BL/BR generujeme runtime CSS transformem (`scaleX/Y(-1)`).
 
-#### `icon-uvodnik.webp` — svitek s pečetí (Úvodník)
-- Velikost: 96×96 px, transparentní pozadí
-- Prompt:
-  > A small unrolled parchment scroll with a dark green wax seal in the center stamped with a leaf-shaped emblem, soft golden edges of the parchment, two ivy tendrils curling around the rolled ends, hand-painted storybook style (Brian Froud), warm rim-light, clean transparent background, centered icon, no text on the parchment, no shadow, no frame. Color palette: cream parchment, emerald green seal, gold accents. Style consistent with a dark fantasy enchanted forest UI.
-
-#### `icon-napoveda.webp` — kniha v rámečku z větviček (Nápověda)
-- Velikost: 96×96 px, transparentní pozadí
-- Prompt:
-  > A small closed leather-bound spellbook with a golden question mark embossed on the cover, framed by two small intertwined ivy branches forming an arch above it, hand-painted storybook style (Brian Froud), warm gold rim-light, clean transparent background, centered icon, no text apart from the question mark, no shadow, no frame. Color palette: dark green leather, brushed gold, emerald ivy. Style consistent with a dark fantasy enchanted forest UI.
+**Plné prompty + style guide + paleta + negative list + kontrolní seznam:**
+[`public/themes/priroda/decor/_asset-prompts.md`](../../../public/themes/priroda/decor/_asset-prompts.md)
 
 > **Pravidlo konzistence:** všechny 4 nové ikony mají stejný light angle (top-left), stejnou barevnou paletu (smaragd + zlato + dřevo) a stejný stylistický charakter (Brian Froud / storybook). Pokud kterákoli z nich vypadá outlier, regenerujeme ji s explicitní referencí na ostatní 3.
 
 ---
 
-## 5. Mobile vs desktop
+## 5. Mobile vs desktop (audit H3, H4, H5, M2, M4)
 
 Per project rule (`base.md`): UI funguje na mobilu i desktopu, audit přes skill `mobil-desktop` po implementaci.
 
-- **Desktop ≥1024px** — full layout dle reference (3 sloupce: levý sidebar 280px, střed flex, pravý sidebar 280px)
-- **Tablet 768–1023px** — pravý sidebar collapsuje do drawer / pod welcome card; logo `--asset-logo-w-mobile`
-- **Mobile <768px** — oba sidebary za hamburger, welcome card full-width, medailon zmenšen na 120px
-- Břečťanové úponky v rozích panelů — na mobilu zmenšit na 50% (jinak působí těžce)
-- Topbar buttony — na mobilu pouze ikona (text v `aria-label`)
+| Viewport | Layout |
+|---|---|
+| **≥1280px** | Full 3-column (levý 280px + center + pravý 280px), corner 120px, leaf 64×64 |
+| **1024–1279px** | Pravý sidebar do drawer (audit H4), levý visible, corner 120px |
+| **768–1023px** | Levý sidebar do drawer, welcome card full-width, corner 96px |
+| **<768px** | Oba sidebary za hamburger, medailon 120px, corner **64px** + opacity 0.7, leaf **32×32**, topbar buttony icon-only s `aria-label` |
+| **<480px** | Tyky + Odhlásit do hamburger menu |
+
+Další pravidla:
+- **NavItem touch target ≥48px** na mobile (audit M4)
+- **Corner ornament v drawer modu `display: none`** (audit H5)
+- **Heading wrap**: `text-wrap: balance` aby Cinzel italic neteklo divně
+- **Welcome medailon 240px desktop → 120px mobile**, žádný corner ornament v rohu medailonu na mobilu (audit M1)
 
 ---
 
@@ -279,12 +298,28 @@ Per project rule (`base.md`): UI funguje na mobilu i desktopu, audit přes skill
 
 ---
 
-## 7. Open questions (čekají na odpověď před fází impl-plan)
+## 7. Rozhodnutí (původní open questions)
 
-1. **Q1 — corner ornamenty rohů panelů**: pokud CSS-only břečťan v rozích nedá dostatek "kouzla", vyrobíme 4 unikátní raster rohy (TL, TR, BL, BR) jako `corner-tl.webp` … atd.? Nebo necháme čistě CSS?
-2. **Q2 — "Default leaf" ikona pro 4 zbylé nav-itemy**: stačí jedna sdílená ikona, nebo chceš pro každý nav-item vlastní (Vytvořit svět = klíček, Diskuze = bublina, Články = svitek, Galerie = rámeček)? Pozn. svitek už máme pro Úvodník, mohli bychom kolidovat.
-3. **Q3 — heading wrapping**: `WelcomeHero` (nebo její ekvivalent) má `<h1>Vítej v <span>Projektu Ikaros</span>.</h1>`? Pokud ne, je úprava této shared komponenty pro nás přípustná, nebo to obejdeme čistě CSS pseudo-elementem?
-4. **Q4 — chat / hospoda v levém sidebaru**: aktuálně levý sidebar má sekci "CHAT (0)" + "DIMENZIONÁLNÍ HOSPODA". Necháváme přesně dle reference, nebo má hospoda vlastní section title?
+1. **Q1 — corner ornamenty** ✅ RASTER. Vyrábíme **1 master `corner-tl.webp`**, ostatní 3 rohy přes CSS `transform: scaleX/Y(-1)`. Prompt v `_asset-prompts.md`.
+2. **Q2 — default leaf** ✅ **1 sdílený `icon-leaf` + 3 speciální** (hospoda, úvodník, nápověda). 4 nav-itemy bez vlastní ikony (Vytvořit svět, Diskuze, Články, Galerie) padají na sdílený leaf.
+3. **Q3 — heading wrap** ✅ **Wrap už existuje** v [`DashboardPage.tsx:47`](../../../src/features/ikaros/pages/DashboardPage.tsx) jako `<span className={s.titleAccent}>`. Žádný shared edit. Stačí pod `[data-theme="priroda"] .titleAccent { … }` v `decorations.css`.
+4. **Q4 — chat / hospoda** ✅ Přesně dle reference: CHAT (0) + DIMENZIONÁLNÍ HOSPODA jako 2 spodní položky levého sidebaru, žádný nový section title.
+
+---
+
+## 7b. Performance & FOUC (audit M2)
+
+- **8 WebP assetů** (~125 kb decor + ~280 kb background) — OK na 4G < 0.5 s
+- **FOUC při theme switch** — preload target backgroundu před `data-theme` flip:
+  ```ts
+  // V theme switcheru: před setData-theme
+  const img = new Image();
+  img.src = nextTheme.background;
+  img.onload = () => document.documentElement.dataset.theme = nextThemeId;
+  ```
+- **decorationsModule** lazy import (existuje v Theme typu) — žádná akce
+- **Asset weight target**: ikona < 12 kb / kus, corner < 25 kb, logo < 35 kb, medailon < 40 kb
+- **Composite layers**: `will-change: auto` (default), žádný `transform` GPU promote pro corner ornaments
 
 ---
 

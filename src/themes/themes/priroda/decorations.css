@@ -1,22 +1,598 @@
-/* ── Příroda — zakletý les, smaragdové krystaly ── */
+/* ── Příroda — zakletý prastarý les (spec 1.0h + audit 1.0h)
+   Smaragd + zlato + dřevo, hand-painted ornamenty, organická paleta,
+   raster corner-tl mirror přes CSS scaleX/Y, žádné animace.
+   Scoped přes [data-theme="priroda"], žádný globální dopad. */
 
 [data-theme="priroda"] {
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(212, 144, 10, 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 100%, rgba(0, 192, 144, 0.08) 0%, transparent 70%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-/* Organicky zaoblené karty */
-[data-theme="priroda"] .card,
-[data-theme="priroda"] [class*="card"] {
-  border-radius: 6px;
-  border: 1px solid var(--border);
+/* ──────────────── 1. Atmosférický overlay ──────────────── */
+
+[data-theme="priroda"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-theme="priroda"] button:hover {
-    box-shadow: 0 0 12px rgba(0, 192, 144, 0.4);
+/* ──────────────── 2. Topbar — slim 56px, dřevěný panel ──────────────── */
+
+[data-theme="priroda"][data-shell="ikaros"] > header {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(20, 32, 22, 0.96) 0%, rgba(12, 22, 14, 0.96) 100%);
+  border-bottom: 1px solid var(--theme-border-gold);
+  box-shadow: 0 1px 0 rgba(212, 169, 70, 0.15), 0 4px 12px rgba(4, 8, 6, 0.6);
+}
+
+/* Zlatá hairline pod topbarem (subtle leafy glow) */
+[data-theme="priroda"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-accent-gold) 25%,
+    var(--theme-accent-gold) 75%,
+    transparent 100%
+  );
+  opacity: 0.45;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+}
+
+/* ──────────────── 3. Logo banner ──────────────── */
+
+[data-theme="priroda"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(4, 8, 6, 0.7));
+}
+
+/* ──────────────── 4. Header buttons — TMAVĚ DŘEVĚNÉ cedulky + zlatý text + zlatý rám
+   FIX: selektor vyloučí .headerBtnIcon + .headerBtnLabel (CSS modules je všechny chytá),
+   jinak ikona a text vypadají jako 2 samostatné gold-orámované krabičky. ──────────────── */
+
+[data-theme="priroda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #28190a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(120, 80, 30, 0.35), transparent 60%);
+  color: var(--theme-accent-gold);
+  border: 1px solid #5a3f1c;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  padding: 0 14px;
+  height: 32px;
+  min-height: 32px;
+  /* Engraved look: vnitřní zlatá inset linka + dřevo bevel */
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 169, 70, 0.45),
+    inset 0 1px 0 rgba(212, 169, 70, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 169, 70, 0.18),
+    0 2px 4px rgba(4, 8, 6, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 3px var(--theme-glow-gold);
+}
+
+[data-theme="priroda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: #7a5828;
+  color: var(--theme-accent-gold-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 96, 0.65),
+    inset 0 1px 0 rgba(240, 200, 96, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-gold-strong),
+    0 2px 6px rgba(4, 8, 6, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 5px var(--theme-glow-gold-strong);
+}
+
+/* Inner spans (.headerBtnIcon, .headerBtnLabel) — žádné vlastní pozadí/border, jen barva */
+[data-theme="priroda"] [class*="headerBtnIcon"],
+[data-theme="priroda"] [class*="headerBtnLabel"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+[data-theme="priroda"] [class*="headerBtn"] [class*="avatar"] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ──────────────── 5. Glass panely — dřevěná deska + smaragdový border ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="sidebar"],
+[data-theme="priroda"] [data-frame-panel="right"],
+[data-theme="priroda"] [data-frame-panel="card"],
+[data-theme="priroda"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(20, 32, 22, 0.88) 0%, rgba(12, 22, 14, 0.94) 100%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  isolation: isolate;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 169, 70, 0.12),
+    0 4px 18px rgba(4, 8, 6, 0.55),
+    inset 0 0 24px rgba(31, 106, 58, 0.08);
+}
+
+/* ──────────────── 6. Corner ornamenty — raster corner-tl s CSS mirror (audit H1, H7) ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="sidebar"]::before,
+[data-theme="priroda"] [data-frame-panel="right"]::before,
+[data-theme="priroda"] [data-frame-panel="card"]::before,
+[data-theme="priroda"] [data-frame-panel="novinky"]::before,
+[data-theme="priroda"] [data-frame-panel="sidebar"]::after,
+[data-theme="priroda"] [data-frame-panel="right"]::after,
+[data-theme="priroda"] [data-frame-panel="card"]::after,
+[data-theme="priroda"] [data-frame-panel="novinky"]::after {
+  content: '';
+  position: absolute;
+  width: var(--asset-corner-size);
+  height: var(--asset-corner-size);
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 4px var(--theme-glow-emerald));
+}
+
+/* TL corner */
+[data-theme="priroda"] [data-frame-panel]::before {
+  top: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+}
+
+/* TR corner — mirror přes scaleX */
+[data-theme="priroda"] [data-frame-panel]::after {
+  top: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scaleX(-1);
+}
+
+/* Z-index strategy — content nad ornamenty */
+[data-theme="priroda"] [data-frame-panel] > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ──────────────── 7. Welcome card — clamp height (audit H2) ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="card"] {
+  min-height: clamp(420px, 60vh, 720px);
+}
+
+/* ──────────────── 8. Andel medailon — použít plný asset s rámečkem ──────────────── */
+
+[data-theme="priroda"] [data-andel-medallion] {
+  width: 240px;
+  height: 290px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 12px rgba(4, 8, 6, 0.6));
+}
+
+/* ──────────────── 9. Section title — zlatá Cinzel + CSS-only leafy rule (audit H6) ──────────────── */
+
+[data-theme="priroda"] [class*="sectionTitle"] {
+  color: var(--theme-accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.20em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(4, 8, 6, 0.7);
+  position: relative;
+  padding-bottom: 6px;
+}
+
+[data-theme="priroda"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 6px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-accent-gold) 20%,
+    var(--theme-accent-gold-bright) 50%,
+    var(--theme-accent-gold) 80%,
+    transparent 100%
+  );
+  opacity: 0.55;
+}
+
+/* ──────────────── 10. NavItem (btn3d) — smaragd gradient + zlatý active border ──────────────── */
+
+[data-theme="priroda"] [class*="btn3d"] {
+  --btn-bg-1: rgba(20, 36, 24, 0.92);
+  --btn-bg-2: rgba(12, 22, 14, 0.95);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-text);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 169, 70, 0.10),
+    inset 0 -2px 4px 0 rgba(4, 8, 6, 0.65),
+    0 2px 5px 0 rgba(4, 8, 6, 0.55);
+}
+
+[data-theme="priroda"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(28, 50, 32, 0.95);
+  --btn-bg-2: rgba(14, 28, 18, 0.98);
+  --btn-border: var(--theme-accent-bright);
+  --btn-color: var(--theme-accent-gold-bright);
+  --btn-translate: -1px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 169, 70, 0.18),
+    inset 0 -2px 4px 0 rgba(4, 8, 6, 0.65),
+    0 0 12px var(--theme-glow-emerald),
+    0 4px 7px 0 rgba(4, 8, 6, 0.55);
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+}
+
+[data-theme="priroda"] [class*="btn3dActive"],
+[data-theme="priroda"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(31, 106, 58, 0.42);
+  --btn-bg-2: rgba(20, 32, 22, 0.65);
+  --btn-border: var(--theme-accent-bright);
+  --btn-color: var(--theme-text-on-emerald);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -2px 4px 0 rgba(4, 8, 6, 0.45),
+    inset 2px 0 0 0 var(--theme-accent-gold),
+    0 0 14px var(--theme-glow-emerald-strong);
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+/* ──────────────── 11a. Pravý panel — ThemeSwitcher trigger (oprava: vypadal ploše) ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #28190a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(120, 80, 30, 0.35), transparent 60%);
+  color: var(--theme-accent-gold);
+  border: 1px solid #5a3f1c;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6), 0 0 3px var(--theme-glow-gold);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 169, 70, 0.45),
+    inset 0 1px 0 rgba(212, 169, 70, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 169, 70, 0.18),
+    0 2px 4px rgba(4, 8, 6, 0.6);
+  height: 38px;
+}
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: #7a5828;
+  color: var(--theme-accent-gold-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 96, 0.65),
+    inset 0 1px 0 rgba(240, 200, 96, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-gold-strong),
+    0 2px 6px rgba(4, 8, 6, 0.6);
+}
+
+/* Skrýt overlay before pseudo (řeší ThemeSwitcher.module.css ::before s var(--bg-overlay)) */
+[data-theme="priroda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]::before {
+  display: none;
+}
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] [class*="triggerCaret"] {
+  color: var(--theme-accent-gold);
+  font-size: 11px;
+}
+
+/* ──────────────── 11b. Pravý panel — empty hints (Žádné světy/diskuze) ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="emptyHint"] {
+  font-family: var(--font-script);
+  font-style: italic;
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+/* ──────────────── 11c. Pravý panel — "+" tlačítko (Vytvořit svět / Nová diskuze) ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="rightAddBtn"] {
+  background: linear-gradient(180deg, rgba(31, 106, 58, 0.55) 0%, rgba(20, 32, 22, 0.85) 100%);
+  border: 1px solid var(--theme-accent-gold);
+  color: var(--theme-accent-gold);
+  text-shadow: 0 0 4px var(--theme-glow-gold);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 169, 70, 0.20),
+    inset 0 -1px 2px rgba(4, 8, 6, 0.55),
+    0 1px 3px rgba(4, 8, 6, 0.5);
+  border-radius: 4px;
+}
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover {
+  background: linear-gradient(180deg, rgba(31, 106, 58, 0.75) 0%, rgba(28, 44, 30, 0.95) 100%);
+  color: var(--theme-accent-gold-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 169, 70, 0.30),
+    inset 0 -1px 2px rgba(4, 8, 6, 0.55),
+    0 0 10px var(--theme-glow-gold);
+}
+
+/* ──────────────── 11d. Pravý panel — section spacing ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="section"]:not([class*="sectionTitle"]):not([class*="rightSectionHeader"]) {
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="section"]:not(:last-child)::after {
+  content: '';
+  display: block;
+  margin-top: 8px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-border-gold) 30%,
+    var(--theme-border-gold) 70%,
+    transparent 100%
+  );
+  opacity: 0.35;
+}
+
+/* ──────────────── 12. Pravý panel — kompaktnější (původní 11) ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="priroda"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1) var(--sp-2);
+  font-size: 0.66rem;
+}
+
+[data-theme="priroda"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="priroda"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+/* ──────────────── 12. PJ badge — zlatý chip s emerald inner ring ──────────────── */
+
+[data-theme="priroda"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-accent-gold-bright), var(--theme-accent-gold));
+  color: var(--theme-text-on-gold);
+  border: 1px solid #8a6420;
+  box-shadow:
+    0 0 8px var(--theme-glow-gold),
+    inset 0 0 0 1px var(--theme-accent-emerald),
+    inset 0 1px 0 0 rgba(255, 248, 224, 0.30);
+  text-shadow: none;
+}
+
+/* ──────────────── 13. Welcome heading + signature ──────────────── */
+
+[data-theme="priroda"] [class*="titleAccent"] {
+  font-family: var(--font-script);
+  font-style: italic;
+  color: var(--theme-accent-gold);
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+  font-weight: 500;
+}
+
+[data-theme="priroda"] [class*="signature"] {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--theme-accent-gold);
+  font-size: 22px;
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+}
+
+/* ──────────────── 14. Nav ikony — leaf default + 3 speciální (audit Q2) ──────────────── */
+
+[data-theme="priroda"] [data-nav-key] [class*="navItemIcon"] {
+  width: 22px;
+  height: 22px;
+  background-image: var(--asset-icon-leaf);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-emerald));
+}
+
+[data-theme="priroda"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+/* 3 speciální assety přepisují default leaf */
+[data-theme="priroda"] [data-nav-key="hospoda"]  [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+[data-theme="priroda"] [data-nav-key="uvodnik"]  [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="priroda"] [data-nav-key="napoveda"] [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+/* Ostatní (vytvorit-svet, diskuze, clanky, galerie) padají na default leaf */
+
+/* ──────────────── 15. "Přidat novinku" + "Zobrazit vše" tlačítka ──────────────── */
+
+[data-theme="priroda"] [class*="rightAddBtn"],
+[data-theme="priroda"] [class*="showAllLink"] {
+  color: var(--theme-accent-gold);
+  border-color: var(--theme-border-gold);
+}
+
+[data-theme="priroda"] [class*="rightAddBtn"]:hover,
+[data-theme="priroda"] [class*="showAllLink"]:hover {
+  color: var(--theme-accent-gold-bright);
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+  box-shadow: 0 0 10px var(--theme-glow-gold);
+}
+
+/* ──────────────── 16. Focus visible — zlatý ring (jednotně, headerBtn už není zlatě plný) ──────────────── */
+
+[data-theme="priroda"] [class*="navItem"]:focus-visible,
+[data-theme="priroda"] [class*="btn3d"]:focus-visible,
+[data-theme="priroda"] [class*="showAllLink"]:focus-visible,
+[data-theme="priroda"] [class*="rightAddBtn"]:focus-visible,
+[data-theme="priroda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-accent-gold),
+    0 0 14px var(--theme-glow-gold-strong);
+}
+
+/* ──────────────── 17. Scrollbar styling pro overflow-y panely ──────────────── */
+
+[data-theme="priroda"] [data-frame-panel] {
+  scrollbar-color: var(--theme-accent-gold) var(--theme-surface);
+  scrollbar-width: thin;
+}
+
+[data-theme="priroda"] [data-frame-panel]::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme="priroda"] [data-frame-panel]::-webkit-scrollbar-track {
+  background: var(--theme-surface);
+}
+
+[data-theme="priroda"] [data-frame-panel]::-webkit-scrollbar-thumb {
+  background: var(--theme-accent-gold);
+  border-radius: 4px;
+}
+
+/* ──────────────── 18. Tablet (1024–1279px) — pravý sidebar má méně ornamentů (audit H4) ──────────────── */
+
+@media (max-width: 1279px) {
+  [data-theme="priroda"] [data-frame-panel="right"]::before,
+  [data-theme="priroda"] [data-frame-panel="right"]::after {
+    --asset-corner-size: 96px;
+  }
+}
+
+/* ──────────────── 19. Mobile (≤768px) — corner zmenšen, drawer = bez corneru, leaf-32 (audit H5, M2, M4) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="priroda"] [data-frame-panel="sidebar"],
+  [data-theme="priroda"] [data-frame-panel="right"],
+  [data-theme="priroda"] [data-frame-panel="card"],
+  [data-theme="priroda"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-radius: 6px;
+  }
+
+  /* Zmenšený corner */
+  [data-theme="priroda"] [data-frame-panel]::before,
+  [data-theme="priroda"] [data-frame-panel]::after {
+    width: var(--asset-corner-size-mobile);
+    height: var(--asset-corner-size-mobile);
+    opacity: 0.7;
+  }
+
+  /* Drawer mode — corner schovaný (audit H5) */
+  [data-theme="priroda"] [class*="drawer"] [data-frame-panel]::before,
+  [data-theme="priroda"] [class*="drawer"] [data-frame-panel]::after,
+  [data-theme="priroda"] [data-drawer-open] [data-frame-panel]::before,
+  [data-theme="priroda"] [data-drawer-open] [data-frame-panel]::after {
+    display: none;
+  }
+
+  /* Welcome card mobile */
+  [data-theme="priroda"] [data-frame-panel="card"] {
+    min-height: clamp(360px, 50vh, 560px);
+  }
+
+  /* Medailon zmenšen na 120px */
+  [data-theme="priroda"] [data-andel-medallion] {
+    width: 120px;
+    height: 145px;
+  }
+
+  /* Signature menší */
+  [data-theme="priroda"] [class*="signature"] {
+    font-size: 18px;
+  }
+
+  /* Nav leaf icon → 32px varianta */
+  [data-theme="priroda"] [data-nav-key]:not([data-nav-key="hospoda"]):not([data-nav-key="uvodnik"]):not([data-nav-key="napoveda"]) [class*="navItemIcon"] {
+    width: 18px;
+    height: 18px;
+    background-image: var(--asset-icon-leaf-mobile);
+  }
+
+  /* Touch target (audit M4) */
+  [data-theme="priroda"] [class*="navItem"] {
+    min-height: 48px;
+  }
+
+  /* Header buttony icon-only (audit H3) */
+  [data-theme="priroda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+    padding: 0 10px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 0.7rem;
+  }
+
+  [data-theme="priroda"] [class*="headerBtnLabel"] {
+    display: none;
+  }
+}
+
+/* ──────────────── 20. Reduced motion (audit L1) ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="priroda"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Hover/focus glow zachován ale bez fade-in */
+  [data-theme="priroda"] [class*="btn3d"]:hover,
+  [data-theme="priroda"] [class*="headerBtn"]:hover {
+    transition: none !important;
   }
 }
