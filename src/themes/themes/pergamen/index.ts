@@ -83,11 +83,16 @@ export const pergamenTheme: Theme = {
     '--text-on-danger':       '#f0e0b8',
     '--bg-overlay':           'rgba(20, 14, 4, 0.7)',
 
-    // ── Typography ──
-    '--font-logo':    '"IM Fell English", "Cinzel", Georgia, serif',
-    '--font-display': '"Cinzel", Georgia, serif',
-    '--font-body':    '"Lora", "EB Garamond", Georgia, serif',
-    '--font-script':  '"IM Fell English", "Lora", Georgia, serif',
+    // ── Typography (klášterní iluminace — barokní psací + manuscript pro UI) ──
+    // --font-baroque = Petit Formal Script (francouzský 18. století copperplate) — section titles, signature
+    // --font-display = IM Fell English SC (čitelný manuscript hand) — NavItemy, UI buttons
+    // --font-body    = EB Garamond (renaissance/barokní serif) — body text
+    '--font-logo':    '"Petit Formal Script", "Pinyon Script", "IM Fell English", Georgia, serif',
+    '--font-display': '"IM Fell English SC", "IM Fell English", "EB Garamond", Georgia, serif',
+    '--font-baroque': '"Petit Formal Script", "Pinyon Script", "Italianno", "IM Fell English", Georgia, serif',
+    '--font-gothic':  '"Petit Formal Script", "Pinyon Script", "IM Fell English", Georgia, serif',
+    '--font-body':    '"EB Garamond", "Lora", Georgia, serif',
+    '--font-script':  '"Petit Formal Script", "Italianno", "IM Fell English", "EB Garamond", Georgia, serif',
 
     // ── Layout chrome ──
     '--header-h':            '56px',
@@ -125,9 +130,9 @@ export const pergamenTheme: Theme = {
     '--asset-icon-hospoda':       `url('${decor}/icon-hospoda.webp')`,
   },
   fonts: {
-    logo: 'IM Fell English',
-    display: 'Cinzel',
-    body: 'Lora',
+    logo: 'Petit Formal Script',
+    display: 'Petit Formal Script',
+    body: 'EB Garamond',
   },
   thumbnail: '/themes/thumbnails/pergamen.webp',
   background: '/themes/backgrounds/pergamen.webp',

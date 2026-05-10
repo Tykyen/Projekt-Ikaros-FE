@@ -79,10 +79,11 @@ export const prirodaTheme: Theme = {
     '--bg-overlay':           'rgba(8, 16, 10, 0.7)',
 
     // ── Typography ──
-    '--font-logo':    '"Cinzel", "Uncial Antiqua", Georgia, serif',
-    '--font-display': '"Cinzel", "IM Fell English", Georgia, serif',
-    '--font-body':    '"Lora", Georgia, serif',
-    '--font-script':  '"IM Fell English", "Lora", Georgia, serif',
+    /* Typografie (organický les — humanist romantic feel) */
+    '--font-logo':    '"Cormorant Garamond", "Crimson Text", Georgia, serif',
+    '--font-display': '"Cormorant Garamond", "Crimson Text", Georgia, serif',
+    '--font-body':    '"Crimson Text", Georgia, serif',
+    '--font-script':  '"Tangerine", "Cormorant Garamond", "Lora", Georgia, serif',
 
     // ── Layout chrome ──
     '--header-h':            '56px',
@@ -116,9 +117,9 @@ export const prirodaTheme: Theme = {
     '--asset-icon-napoveda': `url('${decor}/icon-napoveda.webp')`,
   },
   fonts: {
-    logo: 'Cinzel',
-    display: 'Cinzel',
-    body: 'Lora',
+    logo: 'Cormorant Garamond',
+    display: 'Cormorant Garamond',
+    body: 'Crimson Text',
   },
   thumbnail: '/themes/thumbnails/priroda.webp',
   background: '/themes/backgrounds/priroda.webp',

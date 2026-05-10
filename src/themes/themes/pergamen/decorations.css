@@ -286,13 +286,15 @@
 
 [data-theme="pergamen"] [class*="sectionTitle"] {
   color: var(--theme-accent-gold);
-  text-transform: uppercase;
-  letter-spacing: 0.20em;
-  font-family: var(--font-display);
-  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-family: var(--font-baroque);
+  font-weight: 400;
+  font-size: 1.35em;
+  line-height: 1.2;
   text-shadow: 0 1px 2px rgba(20, 14, 4, 0.7);
   position: relative;
-  padding-bottom: 12px;
+  padding-bottom: 14px;
 }
 
 [data-theme="pergamen"] [class*="sectionTitle"]::after {
@@ -360,6 +362,18 @@
     inset 2px 0 0 0 var(--theme-accent-gold),
     0 0 14px var(--theme-glow-burgundy);
   text-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+/* NavItem text (boxíky ÚVODNÍK / NÁPOVĚDA / DISKUZE / ČLÁNKY / GALERIE / VYTVOŘIT SVĚT)
+   — barokní psací font (Petit Formal Script). Větší font-size pro čitelnost. */
+[data-theme="pergamen"] [class*="navItem"] [class*="navItemLabel"],
+[data-theme="pergamen"] [class*="btn3d"] [class*="navItemLabel"] {
+  font-family: var(--font-baroque);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 1.25em;
+  line-height: 1.15;
+  font-weight: 400;
 }
 
 /* ──────────────── 12. Pravý panel — ThemeSwitcher trigger ──────────────── */

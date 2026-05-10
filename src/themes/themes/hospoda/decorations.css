@@ -1,15 +1,913 @@
-/* ── Hospoda — středověká krčma ── */
+/* ── Hospoda — středověká krčma „U Letícího Orla"
+   Warm hearth, dubové trámy, kovaná mosaz, vínová heraldika, krčmářský papír.
+   ORIGINÁLNÍ MOTIFY: visící železný lustůr v topbaru, welcome card jako visící
+   cedule s řetězy, visící svíčky v rozích panelů, pivní pěna section divider.
+   Dodané assety: logo, medailon (banner), 7× nav medailon, brass-stamp.
+   Scoped přes [data-theme="hospoda"], žádný globální dopad. */
 
 [data-theme="hospoda"] {
-  background-image:
-    radial-gradient(ellipse at 50% 100%, rgba(224, 152, 32, 0.20) 0%, transparent 60%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-[data-theme="hospoda"] .card,
-[data-theme="hospoda"] [class*="card"] {
+/* ──────────────── 1. Atmosférický overlay (audit H1 — pure darken) ──────────────── */
+
+[data-theme="hospoda"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. Hearth pulse (warm hearth glow zespoda, 6s loop) ──────────────── */
+
+[data-theme="hospoda"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60vh;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(255, 178, 96, 0.42) 0%,
+    rgba(255, 112, 40, 0.18) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: screen;
+  animation: hospoda-hearth-pulse 6s ease-in-out infinite;
+}
+
+@keyframes hospoda-hearth-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1.00; }
+}
+
+/* ──────────────── 3. Topbar — solidní těžký dub (no backdrop) ──────────────── */
+
+[data-theme="hospoda"][data-shell="ikaros"] > header {
+  position: relative;
+  background:
+    linear-gradient(180deg, #2c1a0a 0%, #1a0e06 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 40px,
+      rgba(74, 46, 21, 0.08) 40px,
+      rgba(74, 46, 21, 0.08) 41px
+    );
+  border-bottom: 1px solid var(--theme-brass-base);
+  box-shadow:
+    0 1px 0 rgba(212, 160, 80, 0.18),
+    0 4px 12px rgba(20, 12, 4, 0.6);
+  /* Aby lustůr (::before) mohl viset dolů z topbaru */
+  overflow: visible;
+  z-index: 10;
+}
+
+/* Brass hairline pod topbarem (after pseudo) */
+[data-theme="hospoda"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-brass-shine) 25%,
+    var(--theme-brass-shine) 75%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--theme-glow-brass));
+}
+
+/* (Lustr v topbaru odstraněn na vyžádání usera — 1.0j v3) */
+
+/* ──────────────── 4. Logo banner ──────────────── */
+
+[data-theme="hospoda"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(20, 12, 4, 0.7));
+}
+
+/* ──────────────── 5. Header buttons — dřevěné cedulky + mosazný okraj + amber text ──────────────── */
+
+[data-theme="hospoda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #2c1a0a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(122, 80, 40, 0.35), transparent 60%);
+  color: var(--theme-brass-shine);
+  border: 1px solid var(--theme-brass-base);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  padding: 0 14px;
+  height: 32px;
+  min-height: 32px;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 80, 0.45),
+    inset 0 1px 0 rgba(212, 160, 80, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 160, 80, 0.18),
+    0 2px 4px rgba(20, 12, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 3px var(--theme-glow-brass);
+}
+
+[data-theme="hospoda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: var(--theme-brass-shine);
+  color: #ffd070;
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 100, 0.65),
+    inset 0 1px 0 rgba(240, 200, 100, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-brass-strong),
+    0 2px 6px rgba(20, 12, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 5px var(--theme-glow-brass-strong);
+}
+
+[data-theme="hospoda"] [class*="headerBtnIcon"],
+[data-theme="hospoda"] [class*="headerBtnLabel"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+[data-theme="hospoda"] [class*="headerBtn"] [class*="avatar"] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ──────────────── 6. Glass panely — tmavé dřevo + brass border ──────────────── */
+
+[data-theme="hospoda"] [data-frame-panel="sidebar"],
+[data-theme="hospoda"] [data-frame-panel="right"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(44, 26, 10, 0.92) 0%, rgba(28, 18, 8, 0.96) 100%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--theme-iron-cold);
   border-radius: 6px;
-  border: 1px solid var(--border-strong);
-  box-shadow: 0 4px 12px rgba(20, 10, 4, 0.4);
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(138, 100, 40, 0.18),
+    0 6px 22px rgba(20, 12, 4, 0.65);
+}
+
+[data-theme="hospoda"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 35%, var(--theme-parch-warm) 0%, var(--theme-parch-aged) 60%, var(--theme-parch-stained) 100%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid #604030;
+  border-radius: 6px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(96, 64, 48, 0.18),
+    inset 0 0 60px rgba(96, 64, 48, 0.10),
+    0 8px 28px rgba(20, 12, 4, 0.70);
+}
+
+/* ──────────────── 7. ✦ ORIGINÁL: VISÍCÍ SVÍČKY V ROZÍCH PANELŮ ✦
+   Místo carved corner ornament — kovaný S-držák + svíčka + plamen.
+   CSS-only (žádný asset). 4× v každém panelu via [data-position]. ──────────────── */
+
+[data-theme="hospoda"] [data-frame-panel] [class*="ornament"] {
+  width: 36px;
+  height: 70px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 70'><defs><linearGradient id='ironC' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%231a1410'/><stop offset='0.5' stop-color='%233a3128'/><stop offset='1' stop-color='%232a2620'/></linearGradient><linearGradient id='wax' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23f4e8c4'/><stop offset='0.5' stop-color='%23e8d4a0'/><stop offset='1' stop-color='%23a08850'/></linearGradient><radialGradient id='flameC' cx='0.5' cy='0.7' r='0.5'><stop offset='0' stop-color='%23ffd070'/><stop offset='0.4' stop-color='%23ffb260'/><stop offset='0.8' stop-color='%23ff7028'/><stop offset='1' stop-color='%23c04010' stop-opacity='0'/></radialGradient></defs><path d='M 4 4 Q 4 18 14 22 L 22 22 Q 32 24 32 36 L 32 38' stroke='url(%23ironC)' stroke-width='2.5' fill='none' stroke-linecap='round'/><circle cx='4' cy='4' r='2.5' fill='%238a6428'/><ellipse cx='22' cy='44' rx='8' ry='2.5' fill='%231a1410' opacity='0.5'/><rect x='17' y='38' width='10' height='14' rx='1' fill='url(%23wax)' stroke='%238a6428' stroke-width='0.4'/><line x1='22' y1='38' x2='22' y2='34' stroke='%232a2620' stroke-width='0.8'/><ellipse cx='22' cy='28' rx='4.5' ry='8' fill='url(%23flameC)'/><ellipse cx='22' cy='27' rx='2' ry='5' fill='%23ffe090' opacity='0.85'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  background-color: transparent !important;
+  border: none !important;
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 0 6px var(--theme-glow-amber));
+  position: absolute;
+  display: block;
+  transform: none;
+}
+
+/* TL+TR — horní svíčky odstraněny na vyžádání usera (1.0j v3) */
+[data-theme="hospoda"] [data-frame-panel] [class*="ornament"][data-position="tl"],
+[data-theme="hospoda"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  display: none;
+}
+/* BL — visí nahoru z jihozápadního rohu (mirror přes scaleY) */
+[data-theme="hospoda"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: -4px;
+  left: 4px;
+  transform: scaleY(-1);
+}
+/* BR — mirror obě */
+[data-theme="hospoda"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: -4px;
+  right: 4px;
+  transform: scale(-1, -1);
+}
+
+/* Z-index — content nad ornamenty */
+[data-theme="hospoda"] [data-frame-panel] > [class*="header"],
+[data-theme="hospoda"] [data-frame-panel] > [class*="body"] {
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 8. ✦ ORIGINÁL: WELCOME CARD JAKO VISÍCÍ KRČMÁŘSKÁ CEDULE ✦
+   Krčmářský papír materiál, mírně rotovaná, "visí" z 2 řetězů v horních rozích.
+   Subtle sway sync s lustrem. Vrhá deep stín jako visící cedule ze zdi. ──────────────── */
+
+[data-theme="hospoda"] [data-frame-panel="card"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 35%, var(--theme-parch-warm) 0%, var(--theme-parch-aged) 60%, var(--theme-parch-stained) 100%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 2px solid var(--theme-hearth-wood-warm);
+  border-radius: 4px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(96, 64, 48, 0.30),
+    inset 0 0 60px rgba(96, 64, 48, 0.10),
+    0 16px 40px -8px rgba(20, 12, 4, 0.85),
+    0 24px 60px -12px rgba(20, 12, 4, 0.55);
+  min-height: clamp(420px, 60vh, 720px);
+  /* Mírná rotace — vypadá jako visící cedule */
+  transform: rotate(-0.6deg);
+  transform-origin: top center;
+  /* Subtle sway sync s lustrem (5s loop, opačný směr — víc real life) */
+  animation: hospoda-sign-sway 5s ease-in-out infinite;
+  margin-top: 24px; /* Prostor pro řetězy */
+}
+
+@keyframes hospoda-sign-sway {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50%      { transform: rotate(0.6deg); }
+}
+
+/* Levý řetěz — visí z horního levého rohu cedule k topbaru */
+[data-theme="hospoda"] [data-frame-panel="card"]::before {
+  content: '';
+  position: absolute;
+  top: -28px;
+  left: 24px;
+  width: 8px;
+  height: 32px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 32'><defs><linearGradient id='chL' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%231a1410'/><stop offset='0.5' stop-color='%233a3128'/><stop offset='1' stop-color='%232a2620'/></linearGradient></defs><ellipse cx='4' cy='3' rx='3' ry='2' fill='none' stroke='url(%23chL)' stroke-width='1.2'/><ellipse cx='4' cy='9' rx='3' ry='2' fill='none' stroke='url(%23chL)' stroke-width='1.2'/><ellipse cx='4' cy='15' rx='3' ry='2' fill='none' stroke='url(%23chL)' stroke-width='1.2'/><ellipse cx='4' cy='21' rx='3' ry='2' fill='none' stroke='url(%23chL)' stroke-width='1.2'/><ellipse cx='4' cy='27' rx='3' ry='2' fill='none' stroke='url(%23chL)' stroke-width='1.2'/><circle cx='4' cy='30' r='1.5' fill='%238a6428'/></svg>");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 1px 1px rgba(20, 12, 4, 0.6));
+}
+
+/* Pravý řetěz */
+[data-theme="hospoda"] [data-frame-panel="card"]::after {
+  content: '';
+  position: absolute;
+  top: -28px;
+  right: 24px;
+  width: 8px;
+  height: 32px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 32'><defs><linearGradient id='chR' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%231a1410'/><stop offset='0.5' stop-color='%233a3128'/><stop offset='1' stop-color='%232a2620'/></linearGradient></defs><ellipse cx='4' cy='3' rx='3' ry='2' fill='none' stroke='url(%23chR)' stroke-width='1.2'/><ellipse cx='4' cy='9' rx='3' ry='2' fill='none' stroke='url(%23chR)' stroke-width='1.2'/><ellipse cx='4' cy='15' rx='3' ry='2' fill='none' stroke='url(%23chR)' stroke-width='1.2'/><ellipse cx='4' cy='21' rx='3' ry='2' fill='none' stroke='url(%23chR)' stroke-width='1.2'/><ellipse cx='4' cy='27' rx='3' ry='2' fill='none' stroke='url(%23chR)' stroke-width='1.2'/><circle cx='4' cy='30' r='1.5' fill='%238a6428'/></svg>");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 1px 1px rgba(20, 12, 4, 0.6));
+}
+
+/* Welcome heading — tmavý ink, Pirata One drama */
+[data-theme="hospoda"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  color: var(--theme-text-on-parch);
+  font-family: var(--font-tavern-sign);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* "Projektu Ikaros." accent — burgundy Pirata One */
+[data-theme="hospoda"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-banner-burgundy);
+  font-family: var(--font-tavern-sign);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+  font-weight: 400;
+}
+
+/* Body paragraphs — tmavý ink */
+[data-theme="hospoda"] [data-frame-panel="card"] [class*="paragraph"] {
+  color: var(--theme-text-on-parch);
+  font-family: var(--font-body);
+}
+
+/* Signature — burgundy IM Fell English italic */
+[data-theme="hospoda"] [data-frame-panel="card"] [class*="signature"] {
+  color: var(--theme-banner-burgundy);
+  font-family: var(--font-script);
+  font-style: italic;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* Brass hairline pod nadpisem (jako knižní pravítko) */
+[data-theme="hospoda"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 10px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-brass-base) 20%,
+    var(--theme-brass-shine) 50%,
+    var(--theme-brass-base) 80%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+/* ──────────────── 9. Heraldický banner medailon ──────────────── */
+
+[data-theme="hospoda"] [data-andel-medallion] {
+  width: 250px;
+  height: 340px;
+  background-image: var(--asset-medailon-banner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center top;
+  flex-shrink: 0;
+  filter: drop-shadow(0 6px 14px rgba(20, 12, 4, 0.6));
+  /* Banner subtle flutter */
+  animation: hospoda-banner-flutter 6s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@keyframes hospoda-banner-flutter {
+  0%, 100% { transform: scaleY(1.000); }
+  50%      { transform: scaleY(0.985); }
+}
+
+/* ──────────────── 10. ✦ ORIGINÁL: PIVNÍ PĚNA SECTION DIVIDER ✦
+   Místo iron-clasp-divider asset — CSS gradient s "bublinkami" pivní pěny.
+   Vypadá jako rozteklo pěny piva přes stůl. ──────────────── */
+
+[data-theme="hospoda"] [class*="sectionTitle"] {
+  color: var(--theme-brass-shine);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-family: var(--font-tavern-sign);
+  font-weight: 400;
+  font-size: 0.95em;
+  text-shadow: 0 1px 2px rgba(20, 12, 4, 0.7);
+  position: relative;
+  padding-bottom: 16px;
+}
+
+[data-theme="hospoda"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 10px;
+  background:
+    /* Pivní pěna — bubliny v různých velikostech */
+    radial-gradient(circle at 8% 60%,  var(--theme-ale-foam) 1.5px, transparent 2px),
+    radial-gradient(circle at 18% 40%, var(--theme-ale-foam) 2px,   transparent 2.5px),
+    radial-gradient(circle at 28% 65%, var(--theme-ale-foam) 1.2px, transparent 1.7px),
+    radial-gradient(circle at 38% 35%, var(--theme-ale-foam) 1.8px, transparent 2.3px),
+    radial-gradient(circle at 50% 55%, var(--theme-ale-foam) 2.2px, transparent 2.7px),
+    radial-gradient(circle at 62% 30%, var(--theme-ale-foam) 1.5px, transparent 2px),
+    radial-gradient(circle at 72% 60%, var(--theme-ale-foam) 1.8px, transparent 2.3px),
+    radial-gradient(circle at 82% 40%, var(--theme-ale-foam) 1.3px, transparent 1.8px),
+    radial-gradient(circle at 92% 55%, var(--theme-ale-foam) 1.6px, transparent 2.1px),
+    /* Spodní amber pruh — pivo */
+    linear-gradient(180deg, transparent 0%, transparent 50%, rgba(192, 132, 62, 0.6) 70%, rgba(107, 58, 20, 0.85) 100%);
+  background-repeat: no-repeat;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  filter: drop-shadow(0 1px 1px rgba(20, 12, 4, 0.4));
+  opacity: 0.92;
+}
+
+/* ──────────────── 11. NavItem (btn3d) — vyřezávané dřevo + mosazný okraj ──────────────── */
+
+[data-theme="hospoda"] [class*="btn3d"] {
+  --btn-bg-1: rgba(44, 26, 10, 0.92);
+  --btn-bg-2: rgba(28, 18, 8, 0.96);
+  --btn-border: var(--theme-brass-base);
+  --btn-color: var(--theme-text);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 160, 80, 0.10),
+    inset 0 -2px 4px 0 rgba(20, 12, 4, 0.65),
+    0 2px 5px 0 rgba(20, 12, 4, 0.55);
+}
+
+[data-theme="hospoda"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(58, 38, 18, 0.95);
+  --btn-bg-2: rgba(34, 22, 10, 0.98);
+  --btn-border: var(--theme-brass-shine);
+  --btn-color: #ffd070;
+  --btn-translate: -1px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 160, 80, 0.20),
+    inset 0 -2px 4px 0 rgba(20, 12, 4, 0.65),
+    0 0 12px var(--theme-glow-brass),
+    0 4px 7px 0 rgba(20, 12, 4, 0.55);
+  text-shadow: 0 0 6px var(--theme-glow-brass);
+}
+
+[data-theme="hospoda"] [class*="btn3dActive"],
+[data-theme="hospoda"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(138, 21, 32, 0.45);
+  --btn-bg-2: rgba(44, 26, 10, 0.65);
+  --btn-border: var(--theme-brass-shine);
+  --btn-color: var(--theme-text-on-burgundy);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -2px 4px 0 rgba(20, 12, 4, 0.45),
+    inset 2px 0 0 0 var(--theme-brass-shine),
+    0 0 14px var(--theme-glow-burgundy);
+  text-shadow: 0 0 8px var(--theme-glow-amber);
+  /* Candle flicker animace */
+  animation: hospoda-candle-flicker 3s ease-in-out infinite;
+}
+
+@keyframes hospoda-candle-flicker {
+  0%, 100% {
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+      inset 0 -2px 4px 0 rgba(20, 12, 4, 0.45),
+      inset 2px 0 0 0 var(--theme-brass-shine),
+      0 0 8px var(--theme-glow-amber);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+      inset 0 -2px 4px 0 rgba(20, 12, 4, 0.45),
+      inset 2px 0 0 0 var(--theme-brass-shine),
+      0 0 16px var(--theme-glow-amber-strong);
+  }
+}
+
+/* ──────────────── 12. Pravý panel — ThemeSwitcher + empty hints ──────────────── */
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #2c1a0a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(122, 80, 40, 0.35), transparent 60%);
+  color: var(--theme-brass-shine);
+  border: 1px solid var(--theme-brass-base);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6), 0 0 3px var(--theme-glow-brass);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 80, 0.45),
+    inset 0 1px 0 rgba(212, 160, 80, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 160, 80, 0.18),
+    0 2px 4px rgba(20, 12, 4, 0.6);
+  height: 38px;
+}
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: var(--theme-brass-shine);
+  color: #ffd070;
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 100, 0.65),
+    inset 0 1px 0 rgba(240, 200, 100, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-brass-strong),
+    0 2px 6px rgba(20, 12, 4, 0.6);
+}
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]::before {
+  display: none;
+}
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] [class*="triggerCaret"] {
+  color: var(--theme-brass-shine);
+  font-size: 11px;
+}
+
+/* Empty hints — italic, parchment-stained */
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="emptyHint"] {
+  font-family: var(--font-script);
+  font-style: italic;
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+/* Section spacing */
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="section"]:not([class*="sectionTitle"]):not([class*="rightSectionHeader"]) {
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs, 0.75rem);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1, 4px) var(--sp-2, 8px);
+  font-size: 0.66rem;
+}
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+/* "+" tlačítko — brass stamp CTA */
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"] {
+  background: linear-gradient(180deg, rgba(138, 21, 32, 0.55) 0%, rgba(44, 26, 10, 0.85) 100%);
+  border: 1px solid var(--theme-brass-shine);
+  color: var(--theme-brass-shine);
+  text-shadow: 0 0 4px var(--theme-glow-brass);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 160, 80, 0.20),
+    inset 0 -1px 2px rgba(20, 12, 4, 0.55),
+    0 1px 3px rgba(20, 12, 4, 0.5);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover {
+  background: linear-gradient(180deg, rgba(168, 48, 32, 0.75) 0%, rgba(58, 38, 18, 0.95) 100%);
+  color: #ffd070;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 160, 80, 0.30),
+    inset 0 -1px 2px rgba(20, 12, 4, 0.55),
+    0 0 10px var(--theme-glow-brass);
+}
+
+/* ──────────────── 13. PJ badge ──────────────── */
+
+[data-theme="hospoda"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-brass-shine), var(--theme-brass-base));
+  color: var(--theme-text-on-brass);
+  border: 1px solid #5a4018;
+  box-shadow:
+    0 0 8px var(--theme-glow-brass),
+    inset 0 0 0 1px var(--theme-banner-burgundy),
+    inset 0 1px 0 0 rgba(255, 248, 224, 0.30);
+  text-shadow: none;
+}
+
+/* ──────────────── 14. Nav ikony — 7 unikátních dřevěných medailonů přes data-nav-key ──────────────── */
+
+[data-theme="hospoda"] [data-nav-key] [class*="navItemIcon"] {
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-brass));
+}
+
+[data-theme="hospoda"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+[data-theme="hospoda"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="hospoda"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="hospoda"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="hospoda"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="hospoda"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="hospoda"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="hospoda"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* ──────────────── 15. Novinky panel — krčmářský papír + brass stamp CTA ──────────────── */
+
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="novinkyTitle"] {
+  color: var(--theme-banner-burgundy);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="novinkyTitle"] svg {
+  color: var(--theme-banner-burgundy);
+  filter: drop-shadow(0 1px 0 rgba(255, 240, 200, 0.4));
+}
+
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="empty"] {
+  color: #5a3818;
+  font-family: var(--font-script);
+  font-style: italic;
+}
+
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"] {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #2c1a0a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(122, 80, 40, 0.35), transparent 60%);
+  color: var(--theme-brass-shine);
+  border: 1px solid var(--theme-brass-base);
+  border-radius: 4px;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 3px var(--theme-glow-brass);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 80, 0.45),
+    inset 0 1px 0 rgba(212, 160, 80, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 160, 80, 0.18),
+    0 2px 4px rgba(20, 12, 4, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"]:hover {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: var(--theme-brass-shine);
+  color: #ffd070;
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 100, 0.65),
+    inset 0 1px 0 rgba(240, 200, 100, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-brass-strong),
+    0 2px 6px rgba(20, 12, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 5px var(--theme-glow-brass-strong);
+}
+
+/* Skrýt lucide Plus ikonu */
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"] > svg,
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"] > svg {
+  display: none;
+}
+
+/* Brass stamp CTA pseudo-element (sdílený) */
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"]::before,
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"]::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  background-image: var(--asset-brass-stamp);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-right: 8px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 3px var(--theme-glow-brass));
+  transition: transform 150ms ease;
+}
+
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"]:active::before,
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"]:active::before {
+  transform: scale(0.92);
+}
+
+/* Brass shine sweep na hover */
+[data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"]:hover::after,
+[data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(212, 160, 80, 0.30) 50%,
+    transparent 100%
+  );
+  animation: hospoda-brass-sweep 800ms ease-out;
+  pointer-events: none;
+}
+
+@keyframes hospoda-brass-sweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* ──────────────── 16. Showmore link styling ──────────────── */
+
+[data-theme="hospoda"] [class*="showAllLink"] {
+  color: var(--theme-brass-shine);
+  border-color: var(--theme-brass-base);
+}
+
+[data-theme="hospoda"] [class*="showAllLink"]:hover {
+  color: #ffd070;
+  text-shadow: 0 0 6px var(--theme-glow-brass);
+  box-shadow: 0 0 10px var(--theme-glow-brass);
+}
+
+/* ──────────────── 17. Focus visible — brass ring ──────────────── */
+
+[data-theme="hospoda"] [class*="navItem"]:focus-visible,
+[data-theme="hospoda"] [class*="btn3d"]:focus-visible,
+[data-theme="hospoda"] [class*="showAllLink"]:focus-visible,
+[data-theme="hospoda"] [class*="rightAddBtn"]:focus-visible,
+[data-theme="hospoda"] [class*="addBtn"]:focus-visible,
+[data-theme="hospoda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-brass-shine),
+    0 0 14px var(--theme-glow-amber-strong);
+}
+
+/* ──────────────── 18. Scrollbar styling ──────────────── */
+
+[data-theme="hospoda"] [data-frame-panel] {
+  scrollbar-color: var(--theme-brass-shine) var(--theme-surface);
+  scrollbar-width: thin;
+}
+
+[data-theme="hospoda"] [data-frame-panel]::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme="hospoda"] [data-frame-panel]::-webkit-scrollbar-track {
+  background: var(--theme-surface);
+}
+
+[data-theme="hospoda"] [data-frame-panel]::-webkit-scrollbar-thumb {
+  background: var(--theme-brass-shine);
+  border-radius: 4px;
+}
+
+/* ──────────────── 19. Tablet (1024–1279px) — menší lustůr, svíčky ──────────────── */
+
+@media (max-width: 1279px) {
+  /* Lustůr menší */
+  [data-theme="hospoda"][data-shell="ikaros"] > header::before {
+    width: 220px;
+    height: 90px;
+    margin-left: -110px;
+  }
+}
+
+/* ──────────────── 20. Mobile (≤768px) — lustůr hidden, banner mobile, simplified chains ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="hospoda"] [data-frame-panel="sidebar"],
+  [data-theme="hospoda"] [data-frame-panel="right"],
+  [data-theme="hospoda"] [data-frame-panel="card"],
+  [data-theme="hospoda"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-radius: 4px;
+  }
+
+  /* Lustůr na mobile SKRYT (rušil by malou obrazovku) */
+  [data-theme="hospoda"][data-shell="ikaros"] > header::before {
+    display: none;
+  }
+
+  /* Visící svíčky v rozích — menší */
+  [data-theme="hospoda"] [data-frame-panel] [class*="ornament"] {
+    width: 24px;
+    height: 48px;
+    opacity: 0.85;
+  }
+
+  /* Drawer mode — svíčky schované */
+  [data-theme="hospoda"] [class*="drawer"] [data-frame-panel] [class*="ornament"],
+  [data-theme="hospoda"] [data-drawer-open] [data-frame-panel] [class*="ornament"] {
+    display: none;
+  }
+
+  /* Welcome card — bez rotace na mobile (vertikální stack těžko snese), žádný sway */
+  [data-theme="hospoda"] [data-frame-panel="card"] {
+    min-height: clamp(360px, 50vh, 560px);
+    transform: none !important;
+    animation: none !important;
+    margin-top: 8px;
+  }
+
+  /* Řetězy zmenšené */
+  [data-theme="hospoda"] [data-frame-panel="card"]::before,
+  [data-theme="hospoda"] [data-frame-panel="card"]::after {
+    top: -16px;
+    height: 20px;
+    width: 6px;
+  }
+
+  /* Heraldický banner mobile */
+  [data-theme="hospoda"] [data-andel-medallion] {
+    width: 100px;
+    height: 136px;
+  }
+
+  /* Signature menší */
+  [data-theme="hospoda"] [class*="signature"] {
+    font-size: 22px;
+  }
+
+  /* Nav ikony menší */
+  [data-theme="hospoda"] [data-nav-key] [class*="navItemIcon"] {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Touch target ≥48px */
+  [data-theme="hospoda"] [class*="navItem"] {
+    min-height: 48px;
+  }
+
+  /* Header buttony icon-only */
+  [data-theme="hospoda"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+    padding: 0 10px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 0.7rem;
+  }
+
+  [data-theme="hospoda"] [class*="headerBtnLabel"] {
+    display: none;
+  }
+
+  /* Brass stamp CTA mobile */
+  [data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"]::before,
+  [data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"]::before {
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+  }
+}
+
+/* ──────────────── 21. Reduced motion ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="hospoda"] *,
+  [data-theme="hospoda"][data-shell="ikaros"]::before,
+  [data-theme="hospoda"][data-shell="ikaros"]::after,
+  [data-theme="hospoda"][data-shell="ikaros"] > header::before,
+  [data-theme="hospoda"] [data-frame-panel="card"],
+  [data-theme="hospoda"] [data-andel-medallion],
+  [data-theme="hospoda"] [class*="btn3dActive"],
+  [data-theme="hospoda"] [class*="navItemActive"] {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Welcome card — zachovat rotaci, ale bez sway */
+  [data-theme="hospoda"] [data-frame-panel="card"] {
+    transform: rotate(-0.6deg) !important;
+  }
+
+  /* Razidlo scale na klik je UX feedback */
+  [data-theme="hospoda"] [data-frame-panel="novinky"] [class*="addBtn"]::before,
+  [data-theme="hospoda"] [data-frame-panel="right"] [class*="rightAddBtn"]::before {
+    transition: transform 150ms ease !important;
+  }
+}
+
+/* ──────────────── 22. Forced colors (Windows high contrast) ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="hospoda"] [data-frame-panel] [class*="ornament"],
+  [data-theme="hospoda"] [data-andel-medallion],
+  [data-theme="hospoda"] [data-nav-key] [class*="navItemIcon"],
+  [data-theme="hospoda"][data-shell="ikaros"] > header::before,
+  [data-theme="hospoda"] [data-frame-panel="card"]::before,
+  [data-theme="hospoda"] [data-frame-panel="card"]::after {
+    forced-color-adjust: none;
+  }
 }
