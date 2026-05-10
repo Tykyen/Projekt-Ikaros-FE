@@ -127,9 +127,7 @@
 /* ──────────────── 5. Glass panely — tmavé dřevo + zlatý border ──────────────── */
 
 [data-theme="pergamen"] [data-frame-panel="sidebar"],
-[data-theme="pergamen"] [data-frame-panel="right"],
-[data-theme="pergamen"] [data-frame-panel="card"],
-[data-theme="pergamen"] [data-frame-panel="novinky"] {
+[data-theme="pergamen"] [data-frame-panel="right"] {
   position: relative;
   background:
     linear-gradient(160deg, rgba(40, 26, 12, 0.88) 0%, rgba(28, 18, 8, 0.94) 100%);
@@ -138,11 +136,29 @@
   border: 1px solid var(--theme-border);
   border-radius: 8px;
   isolation: isolate;
-  overflow: visible; /* aby bookmark mohl vyčuhovat */
+  overflow: visible;
   box-shadow:
     inset 0 0 0 1px rgba(212, 169, 70, 0.12),
     0 4px 18px rgba(20, 14, 4, 0.55),
     inset 0 0 24px rgba(138, 26, 16, 0.08);
+}
+
+/* Welcome card + Novinky = světlý pergamen — knižní stránky, tmavý text */
+[data-theme="pergamen"] [data-frame-panel="card"],
+[data-theme="pergamen"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 35%, #f0e0b8 0%, #e0cc94 60%, #c8b078 100%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid var(--theme-accent-gold);
+  border-radius: 8px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(138, 26, 16, 0.18),
+    inset 0 0 60px rgba(138, 26, 16, 0.10),
+    0 6px 24px rgba(20, 14, 4, 0.65);
 }
 
 /* ──────────────── 6. Corner ornamenty — 4× CornerOrnament span via [data-position] ──────────────── */
@@ -197,38 +213,57 @@
   z-index: 1;
 }
 
-/* ──────────────── 7. Welcome card — big-book layer + clamp height ──────────────── */
+/* ──────────────── 7. Welcome card — pergamenové pozadí, tmavý text (varianta B) ──────────────── */
 
 [data-theme="pergamen"] [data-frame-panel="card"] {
   min-height: clamp(420px, 60vh, 720px);
 }
 
-/* Big-book decorative layer (audit B1: opacity 0.30 + multiply blend) */
-[data-theme="pergamen"] [data-frame-panel="card"] [class*="content"] {
-  position: relative;
-}
-[data-theme="pergamen"] [data-frame-panel="card"] [class*="content"]::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: clamp(420px, 75%, 600px);
-  aspect-ratio: 600 / 340;
-  background-image: var(--asset-bigbook);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0.30;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  z-index: 0;
+/* Welcome heading — tmavý inkoust na pergamenu */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  color: #2a1a08;
+  font-family: var(--font-display);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
 }
 
-/* Content nad big-book */
-[data-theme="pergamen"] [data-frame-panel="card"] [class*="content"] > * {
-  position: relative;
-  z-index: 1;
+/* "Projektu Ikaros." accent — burgundy script italic */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-accent-burgundy);
+  font-family: var(--font-script);
+  font-style: italic;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+  font-weight: 500;
+}
+
+/* Body paragraphs — tmavý inkoust */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="paragraph"] {
+  color: #2a1a08;
+  font-family: var(--font-body);
+}
+
+/* Signature — burgundy IM Fell English italic */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="signature"] {
+  color: var(--theme-accent-burgundy);
+  font-family: var(--font-script);
+  font-style: italic;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* Decorativní zlatá hairline pod nadpisem (jako v mockupu — knižní pravítko) */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 10px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-accent-gold) 20%,
+    var(--theme-accent-gold-bright) 50%,
+    var(--theme-accent-gold) 80%,
+    transparent 100%
+  );
+  opacity: 0.6;
 }
 
 /* ──────────────── 8. Andel medailon ──────────────── */
@@ -244,23 +279,8 @@
   filter: drop-shadow(0 4px 12px rgba(20, 14, 4, 0.6));
 }
 
-/* ──────────────── 9. Bookmark — visí zvenku TR welcome card (audit B2) ──────────────── */
-
-[data-theme="pergamen"] [data-frame-panel="card"]::after {
-  content: '';
-  position: absolute;
-  top: 24px;
-  right: -32px;
-  width: 48px;
-  height: 160px;
-  background-image: var(--asset-bookmark);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: top center;
-  pointer-events: none;
-  z-index: 2;
-  filter: drop-shadow(2px 4px 8px rgba(20, 14, 4, 0.7));
-}
+/* ──────────────── 9. Bookmark — DROPPED (mockup ho nemá, čistší layout) ──────────────── */
+/* (Bookmark asset zůstává v public/themes/pergamen/decor/ pro budoucí use.) */
 
 /* ──────────────── 10. Section title — zlatý Cinzel + gradient + divider seal ──────────────── */
 
@@ -456,41 +476,9 @@
   text-shadow: none;
 }
 
-/* ──────────────── 14. Welcome heading + signature + CSS-only iluminated V drop-cap ──────────────── */
-
-/* titleAccent — burgundy s glow (override -- theme-accent-cyan z DashboardPage.module.css) */
-[data-theme="pergamen"] [class*="titleAccent"] {
-  color: var(--theme-accent-burgundy-bright);
-  font-family: var(--font-script);
-  font-style: italic;
-  text-shadow: 0 0 8px var(--theme-glow-burgundy), 0 0 12px var(--theme-glow-gold);
-  font-weight: 500;
-}
-
-/* Signature — IM Fell English italic, zlatá s glow (override -- accent-bright signature default) */
-[data-theme="pergamen"] [class*="signature"] {
-  color: var(--theme-accent-gold);
-  text-shadow: 0 0 12px var(--theme-glow-gold);
-  font-family: var(--font-script);
-}
-
-/* CSS-only iluminated V drop-cap (audit H1 fix — žádný asset)
-   Aplikujeme na první písmeno welcomeTitle h2 */
-[data-theme="pergamen"] [class*="welcomeTitle"]::first-letter {
-  font-family: var(--font-script);
-  font-size: 3.5em;
-  line-height: 0.85;
-  color: var(--theme-accent-gold-bright);
-  float: left;
-  padding: 0 10px 0 0;
-  margin-top: 4px;
-  text-shadow:
-    0 0 8px var(--theme-glow-gold-strong),
-    0 0 16px var(--theme-glow-burgundy),
-    0 1px 0 rgba(0, 0, 0, 0.4);
-  -webkit-text-stroke: 0.5px var(--theme-accent-gold);
-  font-weight: 600;
-}
+/* ──────────────── 14. Welcome heading — drop-cap DROPPED, styling v sekci 7 ──────────────── */
+/* (Welcome card má specifický light-pergamen styling v sekci 7 — drop-cap neaplikujeme,
+   mockup čistý layout bez drop-cap.) */
 
 /* ──────────────── 15. Nav ikony — 7 unikátních pečetí přes data-nav-key ──────────────── */
 
@@ -515,23 +503,51 @@
 [data-theme="pergamen"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
 [data-theme="pergamen"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
 
-/* ──────────────── 16. Novinky panel — addBtn + wax seal CTA ──────────────── */
+/* ──────────────── 16. Novinky panel — light pergamen, tmavý text + wax seal CTA ──────────────── */
 
-/* Wax seal CTA pro Novinky "Přidat novinku" tlačítko (audit H5) */
+/* Heading "Novinky" — burgundy script italic */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="novinkyTitle"] {
+  color: var(--theme-accent-burgundy);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* Lucide Newspaper ikona vedle headingu */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="novinkyTitle"] svg {
+  color: var(--theme-accent-burgundy);
+  filter: drop-shadow(0 1px 0 rgba(255, 240, 200, 0.4));
+}
+
+/* Empty state "Zatím žádné novinky." — tmavý kurzív */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="empty"] {
+  color: #5a3818;
+  font-family: var(--font-script);
+  font-style: italic;
+}
+
+/* Wax seal CTA pro "Přidat novinku" — burgundy fill na light pergamenu (audit H5) */
 [data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"] {
   background:
-    linear-gradient(180deg, rgba(138, 26, 16, 0.55) 0%, rgba(40, 26, 12, 0.85) 100%);
+    linear-gradient(180deg, rgba(138, 26, 16, 0.85) 0%, rgba(96, 16, 8, 0.95) 100%);
   border: 1px solid var(--theme-accent-gold);
-  color: var(--theme-accent-gold);
-  text-shadow: 0 0 4px var(--theme-glow-gold);
+  color: var(--theme-accent-gold-bright);
+  text-shadow: 0 0 4px var(--theme-glow-gold), 0 1px 0 rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 169, 70, 0.30),
+    inset 0 -1px 2px rgba(20, 14, 4, 0.45),
+    0 2px 6px rgba(20, 14, 4, 0.5);
   position: relative;
 }
 
 [data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"]:hover {
   background:
-    linear-gradient(180deg, rgba(168, 48, 32, 0.75) 0%, rgba(58, 38, 18, 0.95) 100%);
-  color: var(--theme-accent-gold-bright);
-  box-shadow: 0 0 10px var(--theme-glow-gold);
+    linear-gradient(180deg, rgba(168, 48, 32, 0.95) 0%, rgba(120, 24, 12, 0.98) 100%);
+  color: #fff8e0;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 169, 70, 0.45),
+    inset 0 -1px 2px rgba(20, 14, 4, 0.45),
+    0 0 14px var(--theme-glow-gold-strong);
 }
 
 /* Skrýt lucide Plus ikonu — nahradí ji wax seal před textem */
@@ -637,23 +653,9 @@
     display: none;
   }
 
-  /* Welcome card — big-book + bookmark hidden */
-  [data-theme="pergamen"] [data-frame-panel="card"] [class*="content"]::before {
-    display: none;
-  }
-  [data-theme="pergamen"] [data-frame-panel="card"]::after {
-    display: none;
-  }
-
   /* Welcome card mobile */
   [data-theme="pergamen"] [data-frame-panel="card"] {
     min-height: clamp(360px, 50vh, 560px);
-  }
-
-  /* Iluminated V drop-cap — menší */
-  [data-theme="pergamen"] [class*="welcomeTitle"]::first-letter {
-    font-size: 2.5em;
-    padding-right: 8px;
   }
 
   /* Medailon zmenšen na 96×116 (audit M3) */
