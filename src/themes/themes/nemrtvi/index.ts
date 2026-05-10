@@ -135,11 +135,12 @@ export const nemrtviTheme: Theme = {
     '--asset-andel-medallion':   `url('${decor}/medailon.webp')`,
     '--asset-medailon':          `url('${decor}/medailon.webp')`,
 
-    /* Corner ornament (master TL, mirror přes CSS) — welcome card + novinky panel */
+    /* Corner ornament (master TL, mirror přes CSS) — všechny panely */
     '--asset-corner':            `url('${decor}/corner-tl.webp')`,
-    '--asset-corner-size':       '96px',
-    '--asset-corner-size-novinky':'80px',
-    '--asset-corner-size-mobile':'56px',
+    '--asset-corner-size':       '96px', /* welcome card */
+    '--asset-corner-size-novinky':'80px', /* novinky panel */
+    '--asset-corner-size-side':  '64px', /* sidebar + right panel */
+    '--asset-corner-size-mobile':'48px', /* všechny na mobile */
     '--frame-corner-inset':      '8px',
 
     /* Section divider (femur + lebka) */

@@ -1,6 +1,6 @@
 # Nemrtví skin — asset prompty (1.0k)
 
-> **STAV (2026-05-10):** ⏳ čeká na generování. **Asset folder:** `assets-source/themes/Nemrtví/` (logo + medailon dodány, 10 AI assetů níže).
+> **STAV (2026-05-10):** ✅ 10 AI assetů hotovo. **Asset folder:** `assets-source/themes/nemrtvi/`.
 
 Seznam **10 AI assetů** skinu Nemrtví:
 - 1× corner ornament (TL master, mirror přes CSS na zbylé 3 rohy)
@@ -260,7 +260,7 @@ Aspect ratio: 4:1 (very wide horizontal, např. 1792×448 nebo 2048×512). Pokud
    - Vyhodnoť výsledek vůči STYLE GUIDE výše.
    - Pokud se odchýlí (špatná paleta, chybný materiál, horror-cheese), v chatu řekni *"drž STYLE LOCK, paleta sklouzla — regeneruj"* a opakuj.
    - Při větší odchylce (např. 3+ regenerací stejného assetu) → otevři nový chat se STYLE LOCK znovu.
-4. **Ulož 10 PNG souborů** do `assets-source/themes/Nemrtví/decor/`:
+4. **Ulož PNG soubory** do `assets-source/themes/nemrtvi/`:
    - `corner-tl.png`
    - `divider-skull.png`
    - `icon-uvodnik.png`, `icon-vytvorit-svet.png`, `icon-diskuze.png`, `icon-clanky.png`, `icon-galerie.png`, `icon-hospoda.png`, `icon-napoveda.png`

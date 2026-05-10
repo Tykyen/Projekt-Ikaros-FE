@@ -222,17 +222,9 @@
     0 8px 28px rgba(0, 0, 0, 0.75);
 }
 
-/* ──────────────── 6. Corner ornamenty — pouze welcome + novinky (Q&A 8B) ──────────────── */
+/* ──────────────── 6. Corner ornamenty — všechny panely (welcome, novinky, sidebar, right) ──────────────── */
 
-/* Sidebar + right panel: žádné corner ornamenty (potlačit defaultní diamant) */
-[data-theme="nemrtvi"] [data-frame-panel="sidebar"] [class*="ornament"],
-[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="ornament"] {
-  display: none;
-}
-
-/* Welcome + Novinky: 4 corner-tl ornamenty (mirror přes CSS) */
-[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"],
-[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"] {
+[data-theme="nemrtvi"] [data-frame-panel] [class*="ornament"] {
   width: var(--asset-corner-size);
   height: var(--asset-corner-size);
   background-image: var(--asset-corner);
@@ -257,29 +249,33 @@
   height: var(--asset-corner-size-novinky);
 }
 
+/* Sidebar + right panel = nejmenší corner (boční panely jsou užší) */
+[data-theme="nemrtvi"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="nemrtvi"] [data-frame-panel="right"] [class*="ornament"] {
+  width: var(--asset-corner-size-side);
+  height: var(--asset-corner-size-side);
+  opacity: 0.85;
+}
+
 /* TL */
-[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="tl"],
-[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="tl"] {
+[data-theme="nemrtvi"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
   top: calc(var(--frame-corner-inset) * -1);
   left: calc(var(--frame-corner-inset) * -1);
 }
 /* TR — mirror přes scaleX */
-[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="tr"],
-[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="tr"] {
+[data-theme="nemrtvi"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
   top: calc(var(--frame-corner-inset) * -1);
   right: calc(var(--frame-corner-inset) * -1);
   transform: scaleX(-1);
 }
 /* BL — mirror přes scaleY */
-[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="bl"],
-[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="bl"] {
+[data-theme="nemrtvi"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
   bottom: calc(var(--frame-corner-inset) * -1);
   left: calc(var(--frame-corner-inset) * -1);
   transform: scaleY(-1);
 }
 /* BR — mirror obě */
-[data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"][data-position="br"],
-[data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"][data-position="br"] {
+[data-theme="nemrtvi"] [data-frame-panel] [class*="ornament"][data-position="br"] {
   bottom: calc(var(--frame-corner-inset) * -1);
   right: calc(var(--frame-corner-inset) * -1);
   transform: scale(-1, -1);
@@ -805,6 +801,10 @@
   [data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"] {
     --asset-corner-size-novinky: 64px;
   }
+  [data-theme="nemrtvi"] [data-frame-panel="sidebar"] [class*="ornament"],
+  [data-theme="nemrtvi"] [data-frame-panel="right"] [class*="ornament"] {
+    --asset-corner-size-side: 56px;
+  }
   [data-theme="nemrtvi"] [data-frame-panel="card"]::before {
     top: -24px;
     height: 80px;
@@ -834,9 +834,8 @@
     border-radius: 4px;
   }
 
-  /* Corner zmenšen */
-  [data-theme="nemrtvi"] [data-frame-panel="card"] [class*="ornament"],
-  [data-theme="nemrtvi"] [data-frame-panel="novinky"] [class*="ornament"] {
+  /* Corner zmenšen na všech panelech */
+  [data-theme="nemrtvi"] [data-frame-panel] [class*="ornament"] {
     width: var(--asset-corner-size-mobile);
     height: var(--asset-corner-size-mobile);
     opacity: 0.7;
