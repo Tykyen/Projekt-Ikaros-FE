@@ -600,3 +600,100 @@
   background: var(--theme-accent-gold);
   border-radius: 4px;
 }
+
+/* ──────────────── 20. Tablet (1024–1279px) — menší corner ──────────────── */
+
+@media (max-width: 1279px) {
+  [data-theme="pergamen"] [data-frame-panel="right"] [class*="ornament"] {
+    --asset-corner-size: 96px;
+  }
+  [data-theme="pergamen"] [data-frame-panel="card"] [class*="content"]::before {
+    width: clamp(360px, 65%, 480px);
+  }
+}
+
+/* ──────────────── 21. Mobile (≤768px) — corner zmenšeno, big-book + bookmark hidden ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="pergamen"] [data-frame-panel="sidebar"],
+  [data-theme="pergamen"] [data-frame-panel="right"],
+  [data-theme="pergamen"] [data-frame-panel="card"],
+  [data-theme="pergamen"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-radius: 6px;
+  }
+
+  /* Corner zmenšen */
+  [data-theme="pergamen"] [data-frame-panel] [class*="ornament"] {
+    width: var(--asset-corner-size-mobile);
+    height: var(--asset-corner-size-mobile);
+    opacity: 0.7;
+  }
+
+  /* Drawer mode — corner schovaný */
+  [data-theme="pergamen"] [class*="drawer"] [data-frame-panel] [class*="ornament"],
+  [data-theme="pergamen"] [data-drawer-open] [data-frame-panel] [class*="ornament"] {
+    display: none;
+  }
+
+  /* Welcome card — big-book + bookmark hidden */
+  [data-theme="pergamen"] [data-frame-panel="card"] [class*="content"]::before {
+    display: none;
+  }
+  [data-theme="pergamen"] [data-frame-panel="card"]::after {
+    display: none;
+  }
+
+  /* Welcome card mobile */
+  [data-theme="pergamen"] [data-frame-panel="card"] {
+    min-height: clamp(360px, 50vh, 560px);
+  }
+
+  /* Iluminated V drop-cap — menší */
+  [data-theme="pergamen"] [class*="welcomeTitle"]::first-letter {
+    font-size: 2.5em;
+    padding-right: 8px;
+  }
+
+  /* Medailon zmenšen na 96×116 (audit M3) */
+  [data-theme="pergamen"] [data-andel-medallion] {
+    width: 96px;
+    height: 116px;
+  }
+
+  /* Signature menší */
+  [data-theme="pergamen"] [class*="signature"] {
+    font-size: 22px;
+  }
+
+  /* Nav ikony — menší pečetě */
+  [data-theme="pergamen"] [data-nav-key] [class*="navItemIcon"] {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Touch target ≥48px (audit C13) */
+  [data-theme="pergamen"] [class*="navItem"] {
+    min-height: 48px;
+  }
+
+  /* Header buttony icon-only (audit C11) */
+  [data-theme="pergamen"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+    padding: 0 10px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 0.7rem;
+  }
+
+  [data-theme="pergamen"] [class*="headerBtnLabel"] {
+    display: none;
+  }
+
+  /* Wax seal CTA mobile — zmenšeno */
+  [data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"]::before {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+  }
+}
