@@ -421,46 +421,38 @@ body:has(> [data-theme="severske-runy"][data-shell="ikaros"])::before,
   100% { opacity: 0; transform: translateX(-50%) translateY(-12px); }
 }
 
-/* Active nav button — ice-blue glow přes CELÝ button (vyšší specificita než :hover) */
+/* Active nav button — celý button rovnoměrně ice-blue (vyšší specificita než :hover) */
 [data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"],
 [data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"]:hover {
-  background:
-    linear-gradient(180deg, rgba(112, 208, 240, 0.28) 0%, rgba(74, 176, 208, 0.18) 50%, rgba(32, 88, 112, 0.45) 100%);
+  background-color: rgba(74, 176, 208, 0.42);
+  background-image:
+    linear-gradient(180deg, rgba(168, 216, 232, 0.18) 0%, rgba(74, 176, 208, 0.05) 100%);
   border-color: var(--theme-ice-bright);
   color: var(--theme-ice-bright);
   box-shadow:
-    inset 0 0 0 1px rgba(168, 216, 232, 0.35),
-    inset 0 2px 16px rgba(112, 208, 240, 0.35),
-    inset 0 -2px 10px rgba(74, 176, 208, 0.25),
-    0 0 20px rgba(74, 176, 208, 0.55);
+    inset 0 0 0 1px rgba(200, 232, 248, 0.5),
+    0 0 22px rgba(74, 176, 208, 0.6);
 }
 
-/* Active nav icon — medailon zachovaný, ice-blue halo glow okolo + jemný breathe */
+/* Active nav icon — medailon zachovaný, ice-blue dual drop-shadow glow */
 [data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"] [class*="navItemIcon"] {
-  position: relative;
-  filter: drop-shadow(0 0 6px rgba(112, 208, 240, 0.55));
+  filter:
+    drop-shadow(0 0 6px rgba(112, 208, 240, 0.7))
+    drop-shadow(0 0 14px rgba(74, 176, 208, 0.5));
+  animation: severske-icon-breathe 4s ease-in-out infinite;
 }
 
-/* Ice-blue halo overlay okolo medailonu — kulaté glow pozadí */
-[data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"] [class*="navItemIcon"]::before {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  background: radial-gradient(
-    circle,
-    rgba(112, 208, 240, 0.35) 0%,
-    rgba(74, 176, 208, 0.18) 45%,
-    transparent 75%
-  );
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: -1;
-  animation: severske-icon-halo-breathe 4s ease-in-out infinite;
-}
-
-@keyframes severske-icon-halo-breathe {
-  0%, 100% { opacity: 0.7; transform: scale(1.0); }
-  50%      { opacity: 1.0; transform: scale(1.1); }
+@keyframes severske-icon-breathe {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 6px rgba(112, 208, 240, 0.5))
+      drop-shadow(0 0 10px rgba(74, 176, 208, 0.35));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 10px rgba(112, 208, 240, 0.85))
+      drop-shadow(0 0 18px rgba(74, 176, 208, 0.55));
+  }
 }
 
 /* Nav button label — Lora (NE Sancreek — labels musí být čitelné) */
@@ -497,6 +489,9 @@ body:has(> [data-theme="severske-runy"][data-shell="ikaros"])::before,
 [data-theme="severske-runy"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
 [data-theme="severske-runy"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
 [data-theme="severske-runy"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* Uživatelé button v pravém panelu (Administrace) — sdílí Matrix symbol (Othala + dlouhá síň) */
+[data-theme="severske-runy"] a[href="/ikaros/uzivatele"] [class*="navItemIcon"] { background-image: var(--asset-icon-matrix); }
 
 /* ──────────────── 13. ThemeSwitcher — decentní bronze trim ──────────────── */
 
