@@ -328,6 +328,24 @@
   z-index: 2;
 }
 
+/* Andělský medailon vlevo v bubnu — kompaktní kruh s křídly (asset medailon.webp) */
+[data-theme="indiane"] [data-frame-panel="card"] [data-andel-medallion] {
+  width: 96px;
+  height: 96px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 12px rgba(26, 12, 4, 0.7));
+}
+
+/* Welcome card body — flex row s těsnějším gap */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="body"] {
+  gap: 24px;
+  align-items: center;
+}
+
 /* ──────────────── 10. Welcome content typography ──────────────── */
 
 /* Heading — Cinzel weight 600 dark color, menší než default kvůli ovalu */
@@ -399,7 +417,7 @@
   background-image: var(--asset-corner);
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: top left;
+  background-position: center;
   background-color: transparent !important;
   border: none !important;
   pointer-events: none;
@@ -407,6 +425,8 @@
   filter: drop-shadow(0 1px 2px rgba(26, 12, 4, 0.6));
   position: absolute;
   display: block;
+  /* Reset shared CornerOrnament transform: rotate(45deg) — indián používá vlastní mirror přes data-position */
+  transform: none;
 }
 
 /* TL — master, žádný transform */
@@ -651,7 +671,7 @@
 }
 
 [data-theme="indiane"] [data-frame-panel="right"] [class*="sectionTitle"] {
-  padding: var(--sp-1, 4px) var(--sp-2, 8px);
+  padding: var(--sp-1, 4px) var(--sp-2, 8px) 16px var(--sp-2, 8px);
   font-size: 0.66rem;
 }
 
