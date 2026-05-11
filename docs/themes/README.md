@@ -1,0 +1,42 @@
+# Globální témata — Projekt Ikaros
+
+Každé téma má vlastní soubor s paletou, popisem atmosféry a design tokeny.
+Referenční obrázky ukládej do `assets-source/themes/references/` (slug filename, např. `modre-nebe.png`).
+
+## Globální pravidla pro všechna témata
+
+- **Logo:** Vždy kulatý rám s ptákem Ikarosem — formát se nemění, pouze stylizace kruhu odpovídá tématu (zlatý ornament, železný knoflíkový vzor, dřevěný rám, ledový kruh atd.)
+- **3D tlačítka:** Každé téma má vlastní 3D efekt — translateY + shadow, vždy přítomné
+- **Responzivita:** Každé téma musí fungovat na mobilu i desktopu
+
+## Workflow přidání nového tématu
+
+1. Ulož obrázek do `assets-source/themes/references/<nazev-tematu>.png` (slug, ne diakritika)
+2. Já vytvořím `<nazev-tematu>.md` s extrakcí palety a popisem
+3. Téma se přidá do implementačního plánu fáze 1.0
+
+## Přehled témat
+
+| # | ID | Název | Stav | Obrázek |
+|---|----|-------|------|---------|
+| 1 | `modre-nebe` | Modré nebe | ✅ Popsáno | [modre-nebe.png](../../assets-source/themes/references/modre-nebe.png) |
+| 2 | `zlaty-standard` | Zlatý standard | ✅ Popsáno | [zlaty-standard.png](../../assets-source/themes/references/zlaty-standard.png) |
+| 3 | `sci-fi` | Sci-fi | ✅ Popsáno | [sci-fi.png](../../assets-source/themes/references/sci-fi.png) |
+| 4 | `vesmirna-lod` | Vesmírná loď | ✅ Popsáno | [vesmirna-lod.png](../../assets-source/themes/references/vesmirna-lod.png) |
+| 5 | `priroda` | Příroda | ✅ Popsáno | [priroda.png](../../assets-source/themes/references/priroda.png) |
+| 6 | `pergamen` | Pergamen | ✅ Popsáno | [pergamen.png](../../assets-source/themes/references/pergamen.png) |
+| 7 | `nemrtvi` | Nemrtví | ✅ Popsáno | [nemrtvi.png](../../assets-source/themes/references/nemrtvi.png) |
+| 8 | `ctyri-zivly` | Čtyři živly | ✅ 1.0m upgrade hotový | [ctyri-zivly.png](../../assets-source/themes/references/ctyri-zivly.png) |
+| 9 | `vesmirna-bitva` | Vesmírná bitva | ✅ Popsáno | [vesmirna-bitva.png](../../assets-source/themes/references/vesmirna-bitva.png) |
+| 10 | `hospoda` | Hospoda | ✅ Popsáno | [hospoda.png](../../assets-source/themes/references/hospoda.png) |
+| 11 | `severske-runy` | Severské runy | ✅ Popsáno | [severske-runy.png](../../assets-source/themes/references/severske-runy.png) |
+| 12 | `indiane` | Indiánské | ✅ Popsáno | [indiane.png](../../assets-source/themes/references/indiane.png) |
+| 13 | `africke` | Africké | ✅ Popsáno | [africke.png](../../assets-source/themes/references/africke.png) |
+| 14 | `arabsky-svet` | Arabský svět | ✅ Popsáno | [arabsky-svet.png](../../assets-source/themes/references/arabsky-svet.png) |
+| 15 | `kyberpunk` | Kyberpunk | ✅ Popsáno | [kyberpunk.png](../../assets-source/themes/references/kyberpunk.png) |
+| 16 | `postapo` | Postapo | ✅ Popsáno | [postapo.png](../../assets-source/themes/references/postapo.png) |
+| 17 | `temna-cerven` | Temná červeň | ✅ 1.0l upgrade hotový | [temna-cerven.png](../../assets-source/themes/references/temna-cerven.png) |
+| 18 | `magie` | Magie a kouzla | ✅ Popsáno | [magie.png](../../assets-source/themes/references/magie.png) |
+| 19 | `mesic` | Měsíc | ✅ Popsáno | [mesic.png](../../assets-source/themes/references/mesic.png) |
+| 20 | `slunce` | Slunce | ✅ Popsáno | [slunce.png](../../assets-source/themes/references/slunce.png) |
+| 21 | `bila` | Bílá / čistá | ✅ Popsáno | [bila.png](../../assets-source/themes/references/bila.png) |
