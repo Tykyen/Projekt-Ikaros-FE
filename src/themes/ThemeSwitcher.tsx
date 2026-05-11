@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import { useState, useRef, useEffect, type KeyboardEvent, type CSSProperties } from 'react';
 import { useTheme } from './useTheme';
 import { listThemes } from './registry';
 import type { ThemeId } from './types';
@@ -93,23 +93,34 @@ export function ThemeSwitcher() {
           onKeyDown={onKeyDown}
           tabIndex={-1}
         >
-          {themes.map((t, idx) => (
-            <li key={t.id}>
-              <button
-                type="button"
-                id={`theme-option-${idx}`}
-                className={`${s.option} ${t.id === themeId ? s.optionActive : ''} ${idx === focusIndex ? s.optionFocused : ''}`}
-                onClick={() => handleSelect(t.id)}
-                role="option"
-                aria-selected={t.id === themeId}
-                data-index={idx}
-                style={t.background ? { backgroundImage: `url(${t.background})` } : undefined}
-              >
-                <span className={s.optionName}>{t.name}</span>
-                {t.id === themeId && <span className={s.optionCheck} aria-hidden="true">✓</span>}
-              </button>
-            </li>
-          ))}
+          {themes.map((t, idx) => {
+            const previewFont = t.fonts?.display ?? t.fonts?.logo;
+            const optionStyle: CSSProperties = {};
+            if (t.background) optionStyle.backgroundImage = `url(${t.background})`;
+            return (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  id={`theme-option-${idx}`}
+                  className={`${s.option} ${t.id === themeId ? s.optionActive : ''} ${idx === focusIndex ? s.optionFocused : ''}`}
+                  onClick={() => handleSelect(t.id)}
+                  role="option"
+                  aria-selected={t.id === themeId}
+                  data-index={idx}
+                  data-theme-id={t.id}
+                  style={optionStyle}
+                >
+                  <span
+                    className={s.optionName}
+                    style={previewFont ? { fontFamily: `"${previewFont}", Georgia, serif` } : undefined}
+                  >
+                    {t.name}
+                  </span>
+                  {t.id === themeId && <span className={s.optionCheck} aria-hidden="true">✓</span>}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

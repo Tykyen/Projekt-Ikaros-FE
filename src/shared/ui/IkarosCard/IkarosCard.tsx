@@ -50,6 +50,9 @@ export function IkarosCard({
         {medallion && <div className={s.medallionSlot}>{medallion}</div>}
         <div className={s.content}>{children}</div>
       </div>
+      {variant === 'welcome' && (
+        <div data-theme-decoration="ember-orbit" aria-hidden="true" />
+      )}
     </article>
   );
 }

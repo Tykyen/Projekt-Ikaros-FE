@@ -33,3 +33,6 @@ a:hover { color: var(--accent-bright); }
 
 button { font-family: inherit; cursor: pointer; }
 input, textarea, select { font-family: inherit; }
+
+/* Theme decorations — gated displej, theme-specific decorations.css je zviditelní */
+[data-theme-decoration] { display: none; }

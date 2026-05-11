@@ -1,16 +1,654 @@
-/* ── Severské runy — Viking, led + železo ── */
+/* ── Severské runy — Carved Saga × Mead-hall na konci fjordu.
+   Dark stained oak + iron banding + iron-cast vlčí hlavy + oxidovaný bronz + ledové rampouchy.
+   18 dodaných assetů: logo, medailon, corner-tl (vlčí hlava), welcome-arch (s integrovanými hlavami + rampouchy),
+   wolfshield-divider, rune-circle-floor, rune-knot-seal, medailon-frame, 10× carved-oak runové medailony.
+   Scoped přes [data-theme="severske-runy"], žádný globální dopad. */
 
 [data-theme="severske-runy"] {
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(74, 176, 208, 0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 0% 100%, rgba(192, 128, 48, 0.10) 0%, transparent 40%),
-    radial-gradient(ellipse at 100% 100%, rgba(192, 128, 48, 0.10) 0%, transparent 40%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-[data-theme="severske-runy"] .card,
-[data-theme="severske-runy"] [class*="card"] {
+/* ──────────────── 1. Atmosférický overlay (chladný ice glow + dark vignette) ──────────────── */
+
+[data-theme="severske-runy"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. Snow fall — 3 vrstvy parallax ──────────────── */
+
+/* Vrstva 1 — far (nejpomalejší, nejmenší vločky) */
+[data-theme="severske-runy"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  inset: -10vh -10vw -10vh -10vw;
+  background-image: var(--theme-snow-far);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.85;
+  animation: severske-snow-far 120s linear infinite;
+}
+
+/* Vrstva 2 — mid (středně rychlý, střední vločky) — pojí se na body::before */
+body:has(> [data-theme="severske-runy"][data-shell="ikaros"])::before,
+[data-theme="severske-runy"][data-shell="ikaros"] > body::before {
+  /* Fallback for browsers without :has — viz alternativní pravidlo níže */
+}
+
+/* Použijeme atypický anchor — wrapper #root nemůžeme předpokládat → spoléháme na shell `.shell::before` + `.shell::after`
+   už použité, takže přidáme 2 vrstvy přes pseudo-overlays na sidebar/main shell. */
+
+/* Snow mid — jeden ekvivalentní vrstva, využijeme pseudo-element na header element */
+[data-theme="severske-runy"][data-shell="ikaros"] > header::before {
+  content: '';
+  position: fixed;
+  inset: -10vh -10vw -10vh -10vw;
+  background-image: var(--theme-snow-mid);
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.9;
+  animation: severske-snow-mid 90s linear infinite;
+}
+
+/* Snow near — třetí vrstva, na .main pseudo */
+[data-theme="severske-runy"][data-shell="ikaros"] main::before {
+  content: '';
+  position: fixed;
+  inset: -10vh -10vw -10vh -10vw;
+  background-image: var(--theme-snow-near);
+  background-repeat: repeat;
+  background-size: 220px 220px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.95;
+  animation: severske-snow-near 60s linear infinite;
+}
+
+@keyframes severske-snow-far {
+  0%   { transform: translate(0, -10vh); }
+  100% { transform: translate(-4vw, 110vh); }
+}
+@keyframes severske-snow-mid {
+  0%   { transform: translate(0, -10vh); }
+  100% { transform: translate(3vw, 110vh); }
+}
+@keyframes severske-snow-near {
+  0%   { transform: translate(0, -10vh); }
+  100% { transform: translate(-2vw, 110vh); }
+}
+
+/* ──────────────── 3. Shell (root) — logo s ice-blue glow ──────────────── */
+
+[data-theme="severske-runy"][data-shell="ikaros"] [class*="logoImg"] {
+  filter: drop-shadow(0 0 14px var(--theme-glow-ice));
+}
+
+/* ──────────────── 4. Topbar — dark oak panel s iron strap dole ──────────────── */
+
+[data-theme="severske-runy"][data-shell="ikaros"] > header {
+  position: relative;
+  background:
+    linear-gradient(180deg, #1a1612 0%, #14110d 100%);
+  border-bottom: 2px solid var(--mat-iron);
+  box-shadow:
+    0 1px 0 rgba(74, 176, 208, 0.10),
+    0 4px 16px rgba(0, 4, 8, 0.70);
+}
+
+/* Iron strap hairline pod topbarem (mead-hall horní trám) */
+[data-theme="severske-runy"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(138, 90, 42, 0.4) 10%,
+    rgba(58, 62, 68, 0.7) 50%,
+    rgba(138, 90, 42, 0.4) 90%,
+    transparent 100%
+  );
+  z-index: 3;
+}
+
+/* Header buttons — dark oak + iron rivet feel */
+[data-theme="severske-runy"][data-shell="ikaros"] [class*="headerBtn"] {
+  background: linear-gradient(180deg, #2a2218 0%, #1a1612 100%);
+  border: 1px solid var(--mat-iron);
   border-radius: 3px;
-  border: 1px solid var(--border-strong);
+  color: var(--theme-text-pale);
+  box-shadow:
+    inset 0 1px 0 rgba(168, 200, 220, 0.05),
+    inset 0 -2px 4px rgba(0, 4, 8, 0.5);
+  transition: all 200ms ease;
+}
+[data-theme="severske-runy"][data-shell="ikaros"] [class*="headerBtn"]:hover {
+  background: linear-gradient(180deg, #3a2c1e 0%, #2a2218 100%);
+  border-color: var(--theme-ice);
+  color: var(--theme-ice-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(168, 200, 220, 0.1),
+    0 0 8px rgba(74, 176, 208, 0.25);
+}
+[data-theme="severske-runy"][data-shell="ikaros"] [class*="headerBtnActive"] {
+  border-color: var(--theme-ice);
+  color: var(--theme-ice-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(168, 200, 220, 0.15),
+    0 0 12px rgba(74, 176, 208, 0.4);
+}
+
+/* Tyky header avatar — sjednotit výšku s ostatními header buttony (D-021) */
+[data-theme="severske-runy"][data-shell="ikaros"] [class*="headerBtn"] [class*="avatar"] {
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
+}
+
+/* ──────────────── 5. Side panely (sidebar + drawer + rightPanel) — dark oak + iron banding ──────────────── */
+
+[data-theme="severske-runy"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+[data-theme="severske-runy"][data-shell="ikaros"] [data-frame-panel="right"] {
+  position: relative;
+  background:
+    /* subtle vertical woodgrain via repeating gradient */
+    repeating-linear-gradient(
+      180deg,
+      transparent 0,
+      transparent 18px,
+      rgba(0, 4, 8, 0.08) 19px,
+      transparent 20px,
+      transparent 38px,
+      rgba(0, 4, 8, 0.04) 39px,
+      transparent 40px
+    ),
+    linear-gradient(180deg, #1a1612 0%, #2a2218 50%, #1a1612 100%);
+  border: 1px solid var(--mat-iron);
+  border-radius: 4px;
+  /* Risk 9.7 — vlčí hlavy musí být uvnitř panelu kvůli overflow-y: auto */
+  box-shadow:
+    inset 0 0 0 1px rgba(58, 62, 68, 0.3),
+    inset 2px 0 6px rgba(0, 4, 8, 0.6),
+    inset -2px 0 6px rgba(0, 4, 8, 0.6),
+    0 4px 16px rgba(0, 4, 8, 0.55);
+}
+
+/* Iron strap nahoře a dole (horizontální banding) */
+[data-theme="severske-runy"][data-shell="ikaros"] [data-frame-panel="sidebar"]::before,
+[data-theme="severske-runy"][data-shell="ikaros"] [data-frame-panel="right"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background:
+    linear-gradient(180deg, #2a2c30 0%, #1a1c20 50%, #0a0c10 100%);
+  border-bottom: 1px solid rgba(138, 90, 42, 0.35);
+  z-index: 1;
+}
+[data-theme="severske-runy"][data-shell="ikaros"] [data-frame-panel="sidebar"]::after,
+[data-theme="severske-runy"][data-shell="ikaros"] [data-frame-panel="right"]::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background:
+    linear-gradient(0deg, #2a2c30 0%, #1a1c20 50%, #0a0c10 100%);
+  border-top: 1px solid rgba(138, 90, 42, 0.35);
+  z-index: 1;
+}
+
+/* ──────────────── 6. Vlčí hlavy v rozích (CornerOrnament) ──────────────── */
+
+[data-theme="severske-runy"] [data-position] {
+  width: var(--asset-corner-size-side, 64px);
+  height: var(--asset-corner-size-side, 64px);
+  background: var(--asset-corner) no-repeat center / contain;
+  border: none;
+  border-radius: 0;
+  transform: none;
+  filter: drop-shadow(0 4px 8px rgba(0, 4, 8, 0.7));
+  z-index: 5;
+}
+
+[data-theme="severske-runy"] [data-position="tl"] {
+  top: 4px;
+  left: 4px;
+  transform: none;
+}
+[data-theme="severske-runy"] [data-position="tr"] {
+  top: 4px;
+  right: 4px;
+  transform: scaleX(-1);
+}
+[data-theme="severske-runy"] [data-position="bl"] {
+  bottom: 4px;
+  left: 4px;
+  transform: scaleY(-1);
+}
+[data-theme="severske-runy"] [data-position="br"] {
+  bottom: 4px;
+  right: 4px;
+  transform: scaleX(-1) scaleY(-1);
+}
+
+/* Hover na panel → wolf eye intensify (subtle filter shift přes glow) */
+[data-theme="severske-runy"] [data-frame-panel="sidebar"]:hover [data-position],
+[data-theme="severske-runy"] [data-frame-panel="right"]:hover [data-position] {
+  filter:
+    drop-shadow(0 4px 8px rgba(0, 4, 8, 0.7))
+    drop-shadow(0 0 8px rgba(112, 208, 240, 0.55));
+  transition: filter 1.5s ease-in;
+}
+
+/* Idle subtle eye breathe (4s loop) */
+[data-theme="severske-runy"] [data-position] {
+  animation: severske-wolf-eye-breathe 4s ease-in-out infinite;
+}
+
+@keyframes severske-wolf-eye-breathe {
+  0%, 100% { filter: drop-shadow(0 4px 8px rgba(0, 4, 8, 0.7)) drop-shadow(0 0 3px rgba(74, 176, 208, 0.2)); }
+  50%      { filter: drop-shadow(0 4px 8px rgba(0, 4, 8, 0.7)) drop-shadow(0 0 6px rgba(112, 208, 240, 0.4)); }
+}
+
+/* ──────────────── 7. Section titles — Sancreek display font ──────────────── */
+
+[data-theme="severske-runy"] [class*="sectionTitle"] {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--theme-ice);
+  text-shadow:
+    0 1px 2px rgba(0, 4, 8, 0.8),
+    0 0 8px rgba(74, 176, 208, 0.25);
+  padding: 14px 14px 8px;
+  position: relative;
+}
+
+/* ──────────────── 8. Wolfshield divider mezi sekcemi ──────────────── */
+
+[data-theme="severske-runy"] [class*="section"] + [class*="section"]::before {
+  content: '';
+  display: block;
+  height: 32px;
+  margin: 4px 12px 12px;
+  background: var(--asset-wolfshield-divider) no-repeat center / contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 4, 8, 0.6));
+  z-index: 4;
+}
+
+/* ──────────────── 9. Welcome card — granit stone + welcome-arch + medailon ──────────────── */
+
+[data-theme="severske-runy"] [data-frame-panel="card"] {
+  position: relative;
+  background:
+    linear-gradient(180deg, var(--mat-stone-bright) 0%, var(--mat-stone) 50%, var(--mat-stone-deep) 100%);
+  border: 2px solid var(--mat-iron);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(200, 216, 232, 0.08),
+    inset 0 -2px 8px rgba(0, 4, 8, 0.55),
+    0 8px 24px rgba(0, 4, 8, 0.7);
+  color: var(--theme-text-pale);
+}
+
+/* Welcome card heading — Sancreek display */
+[data-theme="severske-runy"] [data-frame-panel="card"] h1,
+[data-theme="severske-runy"] [data-frame-panel="card"] h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--theme-ice-bright);
+  text-shadow:
+    0 2px 4px rgba(0, 4, 8, 0.9),
+    0 0 16px rgba(74, 176, 208, 0.4);
+}
+
+/* Welcome card medailon (orel Ikaros) — vlevo, self-framed shield asset */
+[data-theme="severske-runy"] [data-andel-medallion] {
+  width: 240px;
+  height: 320px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 6px 18px rgba(0, 4, 8, 0.7))
+          drop-shadow(0 0 16px rgba(74, 176, 208, 0.25));
+}
+
+@media (max-width: 1023px) {
+  [data-theme="severske-runy"] [data-andel-medallion] {
+    width: 180px;
+    height: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  [data-theme="severske-runy"] [data-andel-medallion] {
+    width: 140px;
+    height: 188px;
+    margin: 0 auto;
+  }
+}
+
+/* ──────────────── 10. News card (Novinky) — dark oak + iron banding ──────────────── */
+
+[data-theme="severske-runy"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0,
+      transparent 18px,
+      rgba(0, 4, 8, 0.06) 19px,
+      transparent 20px
+    ),
+    linear-gradient(180deg, var(--mat-oak-mid) 0%, var(--mat-oak) 100%);
+  border: 1px solid var(--mat-iron);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(168, 200, 220, 0.05),
+    inset 0 -2px 6px rgba(0, 4, 8, 0.5),
+    0 4px 12px rgba(0, 4, 8, 0.5);
+  color: var(--theme-text-pale);
+}
+
+/* ──────────────── 11. Nav buttons (medailony) — idle/hover/active ──────────────── */
+
+[data-theme="severske-runy"] [class*="navItem"] {
+  position: relative;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--theme-text-pale);
+  padding: 8px 12px;
+  margin: 2px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 250ms ease;
+  font-family: var(--font-body);
+  text-decoration: none;
+  overflow: hidden;
+}
+
+/* Hover platí pouze pokud NENÍ active — jinak active vyhraje */
+[data-theme="severske-runy"] [class*="navItem"]:not([class*="navItemActive"]):hover {
+  background: var(--theme-nav-hover-bg);
+  border-color: rgba(74, 176, 208, 0.35);
+  color: var(--theme-ice-bright);
+}
+
+/* Frostbreath hover — mlhový obláček zespodu (pouze non-active) */
+[data-theme="severske-runy"] [class*="navItem"]:not([class*="navItemActive"]):hover::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 60%;
+  height: 24px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center bottom,
+    rgba(168, 216, 232, 0.35) 0%,
+    rgba(168, 216, 232, 0.15) 40%,
+    transparent 80%
+  );
+  pointer-events: none;
+  animation: severske-frostbreath 1.2s ease-out 1;
+  opacity: 0;
+}
+
+@keyframes severske-frostbreath {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+}
+
+/* Active nav button — ice-blue glow přes CELÝ button (vyšší specificita než :hover) */
+[data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"],
+[data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"]:hover {
+  background:
+    linear-gradient(180deg, rgba(112, 208, 240, 0.28) 0%, rgba(74, 176, 208, 0.18) 50%, rgba(32, 88, 112, 0.45) 100%);
+  border-color: var(--theme-ice-bright);
+  color: var(--theme-ice-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(168, 216, 232, 0.35),
+    inset 0 2px 16px rgba(112, 208, 240, 0.35),
+    inset 0 -2px 10px rgba(74, 176, 208, 0.25),
+    0 0 20px rgba(74, 176, 208, 0.55);
+}
+
+/* Active nav icon — medailon zachovaný, ice-blue halo glow okolo + jemný breathe */
+[data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"] [class*="navItemIcon"] {
+  position: relative;
+  filter: drop-shadow(0 0 6px rgba(112, 208, 240, 0.55));
+}
+
+/* Ice-blue halo overlay okolo medailonu — kulaté glow pozadí */
+[data-theme="severske-runy"] [class*="navItem"][class*="navItemActive"] [class*="navItemIcon"]::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  background: radial-gradient(
+    circle,
+    rgba(112, 208, 240, 0.35) 0%,
+    rgba(74, 176, 208, 0.18) 45%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  animation: severske-icon-halo-breathe 4s ease-in-out infinite;
+}
+
+@keyframes severske-icon-halo-breathe {
+  0%, 100% { opacity: 0.7; transform: scale(1.0); }
+  50%      { opacity: 1.0; transform: scale(1.1); }
+}
+
+/* Nav button label — Lora (NE Sancreek — labels musí být čitelné) */
+[data-theme="severske-runy"] [class*="navItemLabel"] {
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+/* ──────────────── 12. Nav ikony per data-nav-key (10 unikátních runových medailónů) ──────────────── */
+
+[data-theme="severske-runy"] [class*="navItem"] [class*="navItemIcon"] {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Hide lucide-react icons under custom medailon assets */
+[data-theme="severske-runy"] [class*="navItem"] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+[data-theme="severske-runy"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="severske-runy"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="severske-runy"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="severske-runy"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="severske-runy"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="severske-runy"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="severske-runy"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* ──────────────── 13. ThemeSwitcher — decentní bronze trim ──────────────── */
+
+[data-theme="severske-runy"] [class*="themeSwitcherSlot"] {
+  padding: 0 12px 8px;
+}
+[data-theme="severske-runy"] [class*="themeSwitcherSlot"] select,
+[data-theme="severske-runy"] [class*="themeSwitcherSlot"] button {
+  background: linear-gradient(180deg, #2a2218 0%, #1a1612 100%);
+  border: 1px solid var(--mat-iron);
+  color: var(--theme-text-pale);
+  border-radius: 3px;
+  font-family: var(--font-body);
+}
+
+/* ──────────────── 14. Empty hints + show-all-links ──────────────── */
+
+[data-theme="severske-runy"] [class*="emptyHint"] {
+  color: var(--theme-text-muted);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 13px;
+  padding: 8px 14px;
+}
+
+[data-theme="severske-runy"] [class*="showAllLink"] {
+  color: var(--theme-ice);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 6px 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: color 200ms ease;
+}
+[data-theme="severske-runy"] [class*="showAllLink"]:hover {
+  color: var(--theme-ice-bright);
+  text-shadow: 0 0 8px rgba(112, 208, 240, 0.45);
+}
+
+/* ──────────────── 15. Right panel "+" add buttons — iron rivet styling ──────────────── */
+
+[data-theme="severske-runy"] [class*="rightAddBtn"] {
+  background: linear-gradient(180deg, #2a2218 0%, #1a1612 100%);
+  border: 1px solid var(--theme-bronze);
+  color: var(--theme-bronze-bright);
+  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(168, 112, 56, 0.15),
+    0 1px 2px rgba(0, 4, 8, 0.5);
+  transition: all 200ms ease;
+}
+[data-theme="severske-runy"] [class*="rightAddBtn"]:hover {
+  background: linear-gradient(180deg, #3a2c1e 0%, #2a2218 100%);
+  border-color: var(--theme-ice);
+  color: var(--theme-ice-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(168, 200, 220, 0.12),
+    0 0 10px rgba(74, 176, 208, 0.35);
+}
+
+/* ──────────────── 16. Body global text styling ──────────────── */
+
+[data-theme="severske-runy"] {
+  font-family: var(--font-body);
+  color: var(--theme-text-pale);
+}
+
+[data-theme="severske-runy"] h1,
+[data-theme="severske-runy"] h2,
+[data-theme="severske-runy"] h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--theme-ice-bright);
+}
+
+[data-theme="severske-runy"] p,
+[data-theme="severske-runy"] li,
+[data-theme="severske-runy"] span,
+[data-theme="severske-runy"] a {
+  font-family: var(--font-body);
+}
+
+/* ──────────────── 17. Mobile breakpoints ──────────────── */
+
+@media (max-width: 1023px) {
+  [data-theme="severske-runy"] [data-position] {
+    width: var(--asset-corner-size-mobile, 48px);
+    height: var(--asset-corner-size-mobile, 48px);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Snow fall — redukce na 1 vrstvu (performance) */
+  [data-theme="severske-runy"][data-shell="ikaros"] > header::before,
+  [data-theme="severske-runy"][data-shell="ikaros"] main::before {
+    display: none;
+  }
+
+  [data-theme="severske-runy"] [class*="navItem"] [class*="navItemIcon"] {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Snow fall úplně skip */
+  [data-theme="severske-runy"][data-shell="ikaros"]::after {
+    display: none;
+  }
+
+  [data-theme="severske-runy"] [data-position] {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* ──────────────── 18. Reduced-motion fallback ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="severske-runy"][data-shell="ikaros"]::after,
+  [data-theme="severske-runy"][data-shell="ikaros"] > header::before,
+  [data-theme="severske-runy"][data-shell="ikaros"] main::before {
+    display: none;
+  }
+
+  [data-theme="severske-runy"] [data-position],
+  [data-theme="severske-runy"] [class*="navItemActive"] [class*="navItemIcon"]::before {
+    animation: none !important;
+  }
+
+  [data-theme="severske-runy"] [class*="navItem"]:hover::after {
+    display: none;
+  }
+
+  /* Static brightened state pro active nav icon */
+  [data-theme="severske-runy"] [class*="navItemActive"] [class*="navItemIcon"] {
+    filter: brightness(1.3) drop-shadow(0 0 12px rgba(112, 208, 240, 0.6));
+  }
+
+  /* Static glow pro vlčí hlavy */
+  [data-theme="severske-runy"] [data-position] {
+    filter:
+      drop-shadow(0 4px 8px rgba(0, 4, 8, 0.7))
+      drop-shadow(0 0 5px rgba(74, 176, 208, 0.3));
+  }
 }

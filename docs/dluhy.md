@@ -8,6 +8,24 @@
 
 ## Otevřené
 
+### D-022 — Anonymous mobile layout: main content zúžen na ~95px
+**Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.module.css` (řádek 143-145 a 371-380)
+**Problém:** Na anonymous user (logged-out) na mobile (≤768px viewport) má main content jen ~59-95px width. Pravidlo `.shellAnon .body { grid-template-columns: var(--sidebar-w, 280px) 1fr }` (specificita 2-0-0) přepíše mobile media query `.body { grid-template-columns: 1fr }` (specificita 1-0-0 — media query nezvyšuje specificitu selektoru). Tedy `.shellAnon` mobile zachová 280px sidebar slot + 95px main, i když `.sidebar { display: none }`.
+**Dopad:** Střední — všechny skiny (welcome card zúžený na 52px, paragraph nečitelný) když anonymous user otevře aplikaci na mobile. Authenticated mobile (přihlášený user) je OK.
+**Reprodukce:** localhost dev, incognito (anonymous), viewport 375×812 — welcome card width 52px.
+**Řešení:** přidat `.shellAnon` do mobile media query:
+```css
+@media (max-width: 768px) {
+  .body,
+  .shellAnon .body { grid-template-columns: 1fr; }
+  ...
+}
+```
+Triviální 1-řádkový fix shared layoutu.
+**Kdy:** Při dalším shared layout patch (samostatný spec není nutný, ale shared edit vyžaduje souhlas dle memory `feedback_theme_isolation.md`).
+
+---
+
 ### D-021 — Tyky header avatar specificity hack opakovaný per-tématu
 **Soubor:** `src/themes/themes/<theme>/decorations.css` (zlaty-standard, sci-fi; budoucí luxury upgrades)
 **Problém:** `UserAvatar.module.css` má `.sm { width: 32px }` se specificitou 0,1,0. `IkarosLayout.module.css` má `.avatar { width: 20px }` s totožnou specificitou — UserAvatar vyhrává díky pozdějšímu načtení v cascade. Každé luxury téma musí proto duplikovat scoped fix `[data-theme="..."] [class*="headerBtn"] [class*="avatar"] { width: 18px }`. Aktuálně už 2× (zlaty-standard + sci-fi); každé další téma kopíruje stejné 4 řádky.

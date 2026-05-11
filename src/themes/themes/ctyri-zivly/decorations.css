@@ -1,23 +1,997 @@
-/* ── Čtyři živly — elementální zóny + zlatá unifikace ── */
+/* ── Čtyři živly — Pactum Quattuor (posvátný pakt čtyř živlů).
+   Leštěné stříbro-ocel (strukturální skeleton) + warm bronze/vermeil (dominantní ornament)
+   + 4 cardinal cabochon gemy (rubín=oheň, safír=voda, smaragd=země, topaz=vzduch)
+   + Ikaros-fénix jako pátý sjednotitel + phoenix-radiance halo.
+   14 AI assetů + 2 user (logo, medailon): corner-tl, 4× cardinal, compass mandala,
+   divider-chain, 7× heraldic-shield nav medailony.
+   Signature motion triple: Quartered Aurora drift + Phoenix Ember orbit + Cardinal Pulse sequence.
+   Scoped přes [data-theme="ctyri-zivly"], žádný globální dopad. */
 
 [data-theme="ctyri-zivly"] {
-  background-image:
-    radial-gradient(ellipse at 0% 50%, rgba(232, 96, 32, 0.10) 0%, transparent 30%),
-    radial-gradient(ellipse at 100% 50%, rgba(32, 128, 208, 0.10) 0%, transparent 30%),
-    radial-gradient(ellipse at 50% 0%, rgba(192, 216, 232, 0.06) 0%, transparent 30%),
-    radial-gradient(ellipse at 50% 100%, rgba(74, 96, 32, 0.10) 0%, transparent 30%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-[data-theme="ctyri-zivly"] .card,
-[data-theme="ctyri-zivly"] [class*="card"] {
-  border-radius: 5px;
-  border: 1px solid var(--border-strong);
+/* ──────────────── 1. Atmosférický overlay (phoenix-radiance halo + steel grounding + vignette) ──────────────── */
+
+[data-theme="ctyri-zivly"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-theme="ctyri-zivly"] button:hover {
-    box-shadow: 0 0 12px rgba(200, 144, 10, 0.5);
+/* Quartered Aurora — 4 elementální mlhy v rozích (passive atmosphere — slow drift) */
+[data-theme="ctyri-zivly"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-aurora-pattern);
+  pointer-events: none;
+  z-index: 0;
+  animation: cz-aurora-drift 45s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes cz-aurora-drift {
+  0%   { transform: translate(-10px, -5px); opacity: 0.85; }
+  100% { transform: translate(10px,  5px);  opacity: 1.0;  }
+}
+
+/* Film grain — analogová textura, jemnější než temna-cerven (0.18 vs 0.35) */
+[data-theme="ctyri-zivly"][data-shell="ikaros"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--theme-grain-pattern);
+  background-size: 160px 160px;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ──────────────── 2. Topbar — solidní steel plate + bronze inlay korunovační linie ──────────────── */
+
+[data-theme="ctyri-zivly"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(26, 29, 38, 0.96) 0%, rgba(19, 20, 26, 0.98) 100%);
+  border-bottom: 1px solid var(--theme-border-bronze);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.06),
+    inset 0 0 0 1px rgba(176, 136, 64, 0.12),
+    0 14px 30px rgba(0, 0, 0, 0.55);
+}
+
+/* Bronze inlay korunovační linie podél spodní hrany topbaru */
+[data-theme="ctyri-zivly"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--theme-bronze-deep) 12%,
+    var(--theme-bronze-bright) 50%,
+    var(--theme-bronze-deep) 88%,
+    transparent 100%);
+  opacity: 0.7;
+  filter: drop-shadow(0 0 4px var(--theme-glow-bronze));
+  pointer-events: none;
+}
+
+/* ──────────────── 3. Logo banner ──────────────── */
+
+[data-theme="ctyri-zivly"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter:
+    drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 14px var(--theme-glow-phoenix));
+}
+
+/* ──────────────── 4. Header buttons — heraldic shield buttons s bronzovým borderem ──────────────── */
+
+[data-theme="ctyri-zivly"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  position: relative;
+  background: linear-gradient(180deg, rgba(37, 40, 48, 0.92) 0%, rgba(26, 29, 38, 0.96) 100%);
+  color: var(--theme-gold-leaf);
+  border: 1px solid var(--theme-border-bronze);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.78rem;
+  padding: 0 16px;
+  height: 34px;
+  min-height: 34px;
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 6px 14px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  transition: border-color 280ms, color 280ms, box-shadow 280ms;
+}
+
+/* Thin gold inlay underline pod textem — heraldic ryta linka */
+[data-theme="ctyri-zivly"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"])::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 5px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--theme-bronze-warm), transparent);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+[data-theme="ctyri-zivly"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  color: var(--theme-phoenix-radiance);
+  border-color: var(--theme-bronze-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(232, 200, 96, 0.40),
+    0 0 18px var(--theme-glow-bronze),
+    0 8px 22px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="ctyri-zivly"] [class*="headerBtnIcon"],
+[data-theme="ctyri-zivly"] [class*="headerBtnLabel"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+[data-theme="ctyri-zivly"] [class*="headerBtn"] [class*="avatar"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ──────────────── 5. Panely (sidebar, right) — heraldic steel plates ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-frame-panel="sidebar"],
+[data-theme="ctyri-zivly"] [data-frame-panel="right"] {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(26, 29, 38, 0.95) 0%, rgba(19, 20, 26, 0.97) 100%),
+    var(--theme-glyph-pattern);
+  background-size: auto, 120px 120px;
+  background-blend-mode: normal, multiply;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--theme-border-silver);
+  border-radius: 4px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.08),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--theme-border-bronze),
+    0 22px 50px rgba(0, 0, 0, 0.55);
+}
+
+/* Welcome card + Novinky — steel-card materiál s phoenix-radiance subtle aura */
+[data-theme="ctyri-zivly"] [data-frame-panel="card"],
+[data-theme="ctyri-zivly"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 35%, rgba(255, 232, 168, 0.06), transparent 70%),
+    linear-gradient(180deg, rgba(37, 40, 48, 0.96) 0%, rgba(28, 34, 48, 0.98) 100%);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  backdrop-filter: blur(8px) saturate(1.05);
+  border: 1px solid var(--theme-border-silver);
+  border-radius: 4px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    var(--theme-inner-shadow),
+    inset 0 0 0 2px var(--theme-border-bronze),
+    0 28px 70px rgba(0, 0, 0, 0.6);
+}
+
+/* ──────────────── 6. Corner ornamenty — všechny panely (mirror přes CSS) ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-frame-panel] [class*="ornament"] {
+  width: var(--asset-corner-size);
+  height: var(--asset-corner-size);
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.95;
+  filter:
+    drop-shadow(0 1px 0 #000)
+    drop-shadow(0 0 6px var(--theme-glow-bronze));
+  position: absolute;
+  display: block;
+  /* potlačit default tvar diamantu z CornerOrnament.module.css */
+  transform: none;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Novinky = menší corner */
+[data-theme="ctyri-zivly"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: var(--asset-corner-size-novinky);
+  height: var(--asset-corner-size-novinky);
+}
+
+/* Sidebar + right panel = nejmenší corner */
+[data-theme="ctyri-zivly"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="ctyri-zivly"] [data-frame-panel="right"] [class*="ornament"] {
+  width: var(--asset-corner-size-side);
+  height: var(--asset-corner-size-side);
+  opacity: 0.82;
+}
+
+[data-theme="ctyri-zivly"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+}
+[data-theme="ctyri-zivly"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scaleX(-1);
+}
+[data-theme="ctyri-zivly"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+  transform: scaleY(-1);
+}
+[data-theme="ctyri-zivly"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scale(-1, -1);
+}
+
+/* Z-index strategy — content nad ornamenty */
+[data-theme="ctyri-zivly"] [data-frame-panel] > [class*="header"],
+[data-theme="ctyri-zivly"] [data-frame-panel] > [class*="body"] {
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 7. Welcome card — heraldic reliquář-mřížka + 4 cardinal gemy ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-frame-panel="card"] {
+  min-height: clamp(420px, 60vh, 720px);
+  padding: 48px 36px 40px;
+}
+
+/* 4 cardinal gem markers — midpoints všech 4 stran (TOP topaz, RIGHT sapphire, BOTTOM emerald, LEFT ruby) */
+[data-theme="ctyri-zivly"] [data-frame-panel="card"]::before {
+  /* TOP topaz (vzduch) — vyšlehne když přes něj projede Phoenix Ember (sync 12s cyklus) */
+  content: '';
+  position: absolute;
+  width: var(--asset-cardinal-size);
+  height: var(--asset-cardinal-size);
+  top: calc(var(--asset-cardinal-size) / -2);
+  left: 50%;
+  transform: translateX(-50%);
+  background-image: var(--asset-cardinal-topaz);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+  animation: cz-cardinal-pulse-topaz 12s linear infinite;
+  will-change: filter;
+}
+
+/* 3 další cardinal gemy renderujeme přes dodatečné dekorativní wrapper (data-cardinal markers) NEBO přes panel siblings.
+   Bez shared editu řešíme přes :nth-* selektor s existujícími :empty placeholder elementy.
+   Alternativně: vykreslit jako :before/:after na child elementech welcome card.
+   ŘEŠENÍ: dáme RIGHT (safír) na ::after welcome cardu, a BOTTOM (smaragd) + LEFT (rubín) na ::before/::after andel-medallion sousedního elementu. */
+
+[data-theme="ctyri-zivly"] [data-frame-panel="card"]::after {
+  /* RIGHT sapphire (voda) — vyšlehne při průletu emberu (sync 12s cyklus) */
+  content: '';
+  position: absolute;
+  width: var(--asset-cardinal-size);
+  height: var(--asset-cardinal-size);
+  top: 50%;
+  right: calc(var(--asset-cardinal-size) / -2);
+  transform: translateY(-50%);
+  background-image: var(--asset-cardinal-sapphire);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+  animation: cz-cardinal-pulse-sapphire 12s linear infinite;
+  will-change: filter;
+}
+
+/* Pro LEFT ruby + BOTTOM emerald + Phoenix Ember orbit potřebujeme decoration wrapper.
+   Použijeme [data-theme-decoration="cardinal-markers"] z IkarosLayout (přidáme) NEBO
+   reuse existing wrapperu. Fallback: pomocí before/after na child elementech.
+   Pro tuto verzi: dáme LEFT a BOTTOM na andel-medallion wrapper (existující), což je v welcome card. */
+
+/* Andel medailon obsahuje 2 z 4 cardinálních gemů jako pseudo-elements (LEFT, BOTTOM)
+   — když medailon je vlevo v welcome cardu, je vhodný anchor */
+[data-theme="ctyri-zivly"] [data-andel-medallion]::after {
+  /* LEFT ruby (oheň) — anchor na levé hraně welcome cardu skrz medailon wrapper position */
+  content: '';
+  position: absolute;
+  width: var(--asset-cardinal-size);
+  height: var(--asset-cardinal-size);
+  top: 50%;
+  /* Medailon je v left padding-x 36px welcome cardu. Posuneme ruby gem až k vnější hraně cardu */
+  left: calc(var(--asset-cardinal-size) / -2 - 36px);
+  transform: translateY(-50%);
+  background-image: var(--asset-cardinal-ruby);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+  animation: cz-cardinal-pulse-ruby 12s linear infinite;
+  will-change: filter;
+}
+
+/* BOTTOM emerald + Phoenix Ember orbit — render přes [data-theme-decoration="cardinal-bottom"] wrapper.
+   Pokud wrapper neexistuje v IkarosLayout, je to nice-to-have a CSS gate jej skryje gracefully.
+   Bottom emerald + Phoenix Ember = single shared wrapper z IkarosLayout. */
+[data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"] {
+  display: block;
+  position: absolute;
+  inset: 8px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+[data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::before {
+  /* BOTTOM emerald (země) — anchor na spodní hraně welcome cardu */
+  content: '';
+  position: absolute;
+  width: var(--asset-cardinal-size);
+  height: var(--asset-cardinal-size);
+  bottom: calc(var(--asset-cardinal-size) / -2 - 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-image: var(--asset-cardinal-emerald);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+  animation: cz-cardinal-pulse-emerald 12s linear infinite;
+  will-change: filter;
+}
+
+/* Phoenix Ember — 12×12 zlatá tečka obíhající po vnitřním obvodu welcome cardu.
+   12s cyklus, projíždí přes 4 cardinální midpointy:
+     - 12.5% topaz (TOP)
+     - 37.5% sapphire (RIGHT)
+     - 62.5% emerald (BOTTOM)
+     - 87.5% ruby (LEFT) */
+[data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    var(--theme-phoenix-radiance) 0%,
+    var(--theme-phoenix-glow) 40%,
+    transparent 70%);
+  box-shadow:
+    0 0 14px var(--theme-glow-phoenix),
+    0 0 28px var(--theme-glow-phoenix);
+  pointer-events: none;
+  margin-top: -7px;
+  margin-left: -7px;
+  animation: cz-ember-orbit 12s linear infinite;
+  will-change: top, left;
+  filter: blur(0.5px);
+}
+
+@keyframes cz-ember-orbit {
+  0%    { top: 0;    left: 0;    }    /* TL roh */
+  12.5% { top: 0;    left: 50%;  }    /* TOP midpoint = TOPAZ */
+  25%   { top: 0;    left: 100%; }    /* TR roh */
+  37.5% { top: 50%;  left: 100%; }    /* RIGHT midpoint = SAPPHIRE */
+  50%   { top: 100%; left: 100%; }    /* BR roh */
+  62.5% { top: 100%; left: 50%;  }    /* BOTTOM midpoint = EMERALD */
+  75%   { top: 100%; left: 0;    }    /* BL roh */
+  87.5% { top: 50%;  left: 0;    }    /* LEFT midpoint = RUBY */
+  100%  { top: 0;    left: 0;    }    /* zpět TL */
+}
+
+/* ──────────────── 8. Cardinal Pulse — synchronizováno s ember orbitem (12s cyklus).
+   Každý krystal vyšlehne (peak brightness + drop-shadow glow) v okamžiku,
+   kdy přes něj prolétá Phoenix Ember. Pulse window ~5% (cca 600 ms).
+   Pořadí: topaz @ 12.5% → sapphire @ 37.5% → emerald @ 62.5% → ruby @ 87.5%. ──────────────── */
+
+@keyframes cz-cardinal-pulse-topaz {
+  /* peak při 12.5% (ember projíždí přes TOP midpoint) */
+  0%, 8%, 17%, 100% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)); }
+  10% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-topaz-glow)); }
+  12.5% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 18px var(--theme-topaz-glow)) drop-shadow(0 0 32px var(--theme-phoenix-radiance)) brightness(1.45); }
+  15% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-topaz-glow)); }
+}
+
+@keyframes cz-cardinal-pulse-sapphire {
+  /* peak při 37.5% (ember projíždí přes RIGHT midpoint) */
+  0%, 33%, 42%, 100% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)); }
+  35% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-sapphire-glow)); }
+  37.5% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 18px var(--theme-sapphire-glow)) drop-shadow(0 0 32px var(--theme-phoenix-radiance)) brightness(1.45); }
+  40% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-sapphire-glow)); }
+}
+
+@keyframes cz-cardinal-pulse-emerald {
+  /* peak při 62.5% (ember projíždí přes BOTTOM midpoint) */
+  0%, 58%, 67%, 100% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)); }
+  60% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-emerald-glow)); }
+  62.5% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 18px var(--theme-emerald-glow)) drop-shadow(0 0 32px var(--theme-phoenix-radiance)) brightness(1.45); }
+  65% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-emerald-glow)); }
+}
+
+@keyframes cz-cardinal-pulse-ruby {
+  /* peak při 87.5% (ember projíždí přes LEFT midpoint) */
+  0%, 83%, 92%, 100% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)); }
+  85% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-ruby-glow)); }
+  87.5% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 18px var(--theme-ruby-glow)) drop-shadow(0 0 32px var(--theme-phoenix-radiance)) brightness(1.45); }
+  90% { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--theme-ruby-glow)); }
+}
+
+/* ──────────────── 9. Welcome heading & body ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  color: var(--theme-text-pale);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.85),
+    0 0 14px var(--theme-glow-phoenix);
+}
+
+/* "Projektu Ikaros." accent — gold-leaf glow */
+[data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-gold-leaf);
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.85),
+    0 0 14px var(--theme-glow-gold);
+}
+
+/* Decorativní bronze-gold hairline pod nadpisem */
+[data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 12px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--theme-silver-base) 22%,
+    var(--theme-gold-leaf) 50%,
+    var(--theme-silver-base) 78%,
+    transparent 100%);
+  opacity: 0.7;
+  filter: drop-shadow(0 0 3px var(--theme-glow-gold));
+}
+
+/* Body paragraphs — Cardo Renaissance roman */
+[data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="paragraph"] {
+  color: var(--theme-text-pale);
+  font-family: var(--font-body);
+  font-size: 1.08em;
+  line-height: 1.65;
+}
+
+/* Signature — Pinyon Script copperplate, gold-leaf color */
+[data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="signature"] {
+  color: var(--theme-gold-leaf);
+  font-family: var(--font-script);
+  font-size: 1.6em;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 14px var(--theme-glow-gold);
+}
+
+/* ──────────────── 10. Andel medailon — Ikaros-fénix v heraldic square frame ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-andel-medallion] {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter:
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.75))
+    drop-shadow(0 0 22px var(--theme-glow-phoenix));
+}
+
+/* ──────────────── 11. Gold-leaf drop-cap "V" — MedievalSharp + phoenix-radiance halo ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-size: 4.2em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.05em 0.12em 0 0;
+  color: var(--theme-gold-leaf);
+  text-shadow:
+    0 0 0.04em rgba(0, 0, 0, 1),
+    0 2px 0.06em rgba(0, 0, 0, 0.9),
+    0 0 0.20em var(--theme-glow-phoenix),
+    0 0 0.40em var(--theme-glow-gold);
+  font-weight: 400;
+}
+
+/* ──────────────── 12. Section title — MedievalSharp + bronze-warm + minor divider (CSS-only) ──────────────── */
+
+[data-theme="ctyri-zivly"] [class*="sectionTitle"] {
+  color: var(--theme-bronze-warm);
+  text-transform: uppercase;
+  letter-spacing: 0.30em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 0.92em;
+  line-height: 1.2;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 6px var(--theme-glow-bronze);
+  position: relative;
+  padding-bottom: 14px;
+  text-align: center;
+}
+
+/* CSS-only divider — 1px bronze gradient line + central cabochon dot (Q-5 C minor divider) */
+[data-theme="ctyri-zivly"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background:
+    radial-gradient(circle 3px at 50% 3px, var(--theme-ruby) 0%, var(--theme-ruby-glow) 40%, transparent 70%),
+    linear-gradient(90deg,
+      transparent 0%,
+      var(--theme-bronze-warm) 30%,
+      transparent 48%,
+      transparent 52%,
+      var(--theme-bronze-warm) 70%,
+      transparent 100%);
+  background-size: 6px 6px, 100% 1px;
+  background-position: center, 0 50%;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 4px var(--theme-glow-bronze));
+}
+
+/* ──────────────── 13. Section divider — chain asset (Q-5 C major divider mezi Novinky title + content + ADMINISTRACE separace) ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-section-divider],
+[data-theme="ctyri-zivly"] [class*="sectionDivider"] {
+  display: block;
+  height: 20px;
+  margin: 16px auto;
+  background-image: var(--asset-divider-chain);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 4px var(--theme-glow-bronze));
+}
+
+/* ──────────────── 14. NavItem (btn3d) — heraldic štít + bronze hover + bronze-bright border-left active ──────────────── */
+
+[data-theme="ctyri-zivly"] [class*="btn3d"] {
+  --btn-bg-1: rgba(37, 40, 48, 0.7);
+  --btn-bg-2: rgba(26, 29, 38, 0.88);
+  --btn-border: transparent;
+  --btn-color: var(--theme-text-pale);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(232, 236, 240, 0.06),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.55),
+    0 2px 5px 0 rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="ctyri-zivly"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(50, 44, 32, 0.85);
+  --btn-bg-2: rgba(30, 26, 18, 0.92);
+  --btn-border: var(--theme-bronze-bright);
+  --btn-color: var(--theme-phoenix-radiance);
+  --btn-translate: -1px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(232, 236, 240, 0.16),
+    inset 0 0 0 1px var(--theme-border-gold),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.55),
+    0 0 16px var(--theme-glow-bronze),
+    0 4px 7px 0 rgba(0, 0, 0, 0.55);
+  text-shadow: 0 0 6px var(--theme-glow-phoenix);
+}
+
+/* Active = bronze-bright border-left + inset bronze + ruby cabochon dot ::before (signature) */
+[data-theme="ctyri-zivly"] [class*="btn3dActive"],
+[data-theme="ctyri-zivly"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(90, 66, 32, 0.55);
+  --btn-bg-2: rgba(30, 26, 18, 0.85);
+  --btn-border: transparent;
+  --btn-color: var(--theme-gold-leaf);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 3px 0 0 0 var(--theme-bronze-bright),
+    inset 0 0 0 1px var(--theme-border-bronze),
+    inset 0 1px 0 0 rgba(232, 236, 240, 0.10),
+    0 0 18px var(--theme-glow-bronze);
+  text-shadow:
+    0 0 8px var(--theme-glow-gold),
+    0 1px 1px rgba(0, 0, 0, 0.85);
+  position: relative;
+}
+
+/* Ruby cabochon dot u levého okraje active NavItem (signature element) */
+[data-theme="ctyri-zivly"] [class*="btn3dActive"]::before,
+[data-theme="ctyri-zivly"] [class*="navItemActive"]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -2px;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%,
+    var(--theme-ruby-glow) 0%,
+    var(--theme-ruby) 60%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 6px var(--theme-ruby-glow);
+  pointer-events: none;
+}
+
+/* NavItem text — MedievalSharp display, heraldic */
+[data-theme="ctyri-zivly"] [class*="navItem"] [class*="navItemLabel"],
+[data-theme="ctyri-zivly"] [class*="btn3d"] [class*="navItemLabel"] {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.92em;
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+/* ──────────────── 15. Nav icons — 7 heraldic shield medailony per data-nav-key ──────────────── */
+
+/* Společný blok: dimenze + background pravidla pro všech 7 nav ikon */
+[data-theme="ctyri-zivly"] [data-nav-key] [class*="navItemIcon"] {
+  width: 28px;
+  height: 28px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  transition: filter 280ms, transform 280ms;
+}
+
+/* Skrýt Lucide SVG ikony uvnitř nav-icon containeru — bg-image je naše heraldic-shield */
+[data-theme="ctyri-zivly"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+/* Per-key background-image mapping (7 nav ikon) */
+[data-theme="ctyri-zivly"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="ctyri-zivly"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="ctyri-zivly"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="ctyri-zivly"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="ctyri-zivly"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="ctyri-zivly"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="ctyri-zivly"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* Hover ikony — phoenix-radiance ambient glow + jemný scale */
+[data-theme="ctyri-zivly"] [data-nav-key]:hover [class*="navItemIcon"] {
+  filter:
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 8px var(--theme-glow-phoenix));
+  transform: scale(1.05);
+}
+
+/* Active nav icon — bronze-bright phoenix glow halo (statika) */
+[data-theme="ctyri-zivly"] [class*="navItemActive"] [class*="navItemIcon"],
+[data-theme="ctyri-zivly"] [class*="btn3dActive"] [class*="navItemIcon"] {
+  filter:
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 6px var(--theme-glow-phoenix))
+    drop-shadow(0 0 12px var(--theme-glow-bronze));
+  transform: scale(1.08);
+}
+
+/* ──────────────── 16. Pravý panel — ADMINISTRACE + Compass mandala dole (Q-1 A + Q-3 A) ──────────────── */
+
+/* ThemeSwitcher trigger v ADMINISTRACE — bronze heraldic button */
+[data-theme="ctyri-zivly"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background: linear-gradient(180deg, rgba(50, 44, 32, 0.92) 0%, rgba(30, 26, 18, 0.96) 100%);
+  color: var(--theme-gold-leaf);
+  border: 1px solid var(--theme-border-bronze);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.55);
+  height: 42px;
+  transition: border-color 280ms, color 280ms, box-shadow 280ms;
+}
+
+[data-theme="ctyri-zivly"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  color: var(--theme-phoenix-radiance);
+  border-color: var(--theme-bronze-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.16),
+    inset 0 0 0 1px var(--theme-border-gold),
+    0 0 18px var(--theme-glow-bronze),
+    0 4px 10px rgba(0, 0, 0, 0.55);
+}
+
+/* Compass of Four mandala — dole v pravém panelu (Q-3 A — dekorativní rotace) */
+[data-theme="ctyri-zivly"] [data-frame-panel="right"]::after {
+  content: '';
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--asset-compass-size);
+  height: var(--asset-compass-size);
+  background-image: var(--asset-compass);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.94;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.75));
+  animation: cz-compass-rotate 90s linear infinite;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+@keyframes cz-compass-rotate {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to   { transform: translateX(-50%) rotate(360deg); }
+}
+
+/* Pravý panel needs bottom padding aby content nepřesahoval přes compass */
+[data-theme="ctyri-zivly"] [data-frame-panel="right"] {
+  padding-bottom: calc(var(--asset-compass-size) + 48px);
+}
+
+/* ──────────────── 17. CTAs — bronze gradient primary + double-border + phoenix outer glow ──────────────── */
+
+[data-theme="ctyri-zivly"] [class*="btnPrimary"],
+[data-theme="ctyri-zivly"] [class*="primaryBtn"],
+[data-theme="ctyri-zivly"] [data-add-btn],
+[data-theme="ctyri-zivly"] [data-novinky-add] {
+  background: linear-gradient(180deg,
+    var(--theme-bronze-bright) 0%,
+    var(--theme-bronze-warm) 50%,
+    var(--theme-bronze-deep) 100%);
+  color: var(--theme-steel-deep);
+  border: 1px solid var(--theme-silver-bright);
+  box-shadow:
+    inset 0 1px 0 var(--theme-gold-leaf),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(232, 200, 96, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.55),
+    0 0 14px var(--theme-glow-bronze);
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-shadow: 0 1px 0 rgba(232, 200, 96, 0.5);
+  transition: transform 150ms, box-shadow 280ms, color 280ms;
+}
+
+[data-theme="ctyri-zivly"] [class*="btnPrimary"]:hover:not(:disabled),
+[data-theme="ctyri-zivly"] [class*="primaryBtn"]:hover:not(:disabled),
+[data-theme="ctyri-zivly"] [data-add-btn]:hover:not(:disabled),
+[data-theme="ctyri-zivly"] [data-novinky-add]:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 var(--theme-phoenix-radiance),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px var(--theme-gold-leaf),
+    0 6px 18px rgba(0, 0, 0, 0.55),
+    0 0 22px var(--theme-glow-phoenix);
+}
+
+[data-theme="ctyri-zivly"] [class*="btnPrimary"]:active:not(:disabled),
+[data-theme="ctyri-zivly"] [class*="primaryBtn"]:active:not(:disabled),
+[data-theme="ctyri-zivly"] [data-add-btn]:active:not(:disabled),
+[data-theme="ctyri-zivly"] [data-novinky-add]:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px var(--theme-gold-leaf),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+/* Secondary CTA — steel-card bg + bronze border (ZOBRAZIT VŠE → atp.) */
+[data-theme="ctyri-zivly"] [class*="btnSecondary"],
+[data-theme="ctyri-zivly"] [class*="secondaryBtn"] {
+  background: linear-gradient(180deg, rgba(37, 40, 48, 0.92) 0%, rgba(26, 29, 38, 0.96) 100%);
+  color: var(--theme-gold-leaf);
+  border: 1px solid var(--theme-border-bronze);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  transition: border-color 280ms, color 280ms, box-shadow 280ms;
+}
+
+[data-theme="ctyri-zivly"] [class*="btnSecondary"]:hover:not(:disabled),
+[data-theme="ctyri-zivly"] [class*="secondaryBtn"]:hover:not(:disabled) {
+  color: var(--theme-phoenix-radiance);
+  border-color: var(--theme-bronze-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 236, 240, 0.16),
+    0 0 14px var(--theme-glow-bronze),
+    0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* ──────────────── 18. PJ badge / decorative tags (heraldic styling) ──────────────── */
+
+[data-theme="ctyri-zivly"] [data-pj-badge] {
+  color: var(--theme-gold-leaf);
+  font-family: var(--font-script);
+  font-size: 1.1em;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 8px var(--theme-glow-gold);
+}
+
+/* ──────────────── 19. Focus rings (a11y) — bronze-bright outline + phoenix halo ──────────────── */
+
+[data-theme="ctyri-zivly"] :focus-visible {
+  outline: 2px solid var(--theme-bronze-bright);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 232, 168, 0.25);
+}
+
+/* ──────────────── 20. Mobile breakpoints ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"] {
+    padding: 40px 24px 32px;
   }
+  [data-theme="ctyri-zivly"] [data-andel-medallion] {
+    width: 160px;
+    height: 160px;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::before,
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::after,
+  [data-theme="ctyri-zivly"] [data-andel-medallion]::after,
+  [data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::before {
+    width: 48px;
+    height: 48px;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::before {
+    top: -24px;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::after {
+    right: -24px;
+  }
+  [data-theme="ctyri-zivly"] [data-andel-medallion]::after {
+    left: -48px;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+    font-size: 3.4em;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="right"]::after {
+    width: var(--asset-compass-size-tablet);
+    height: var(--asset-compass-size-tablet);
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="right"] {
+    padding-bottom: calc(var(--asset-compass-size-tablet) + 40px);
+  }
+}
+
+@media (max-width: 480px) {
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"] {
+    padding: 32px 18px 28px;
+  }
+  [data-theme="ctyri-zivly"] [data-andel-medallion] {
+    width: 128px;
+    height: 128px;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::before,
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::after,
+  [data-theme="ctyri-zivly"] [data-andel-medallion]::after,
+  [data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::before {
+    width: var(--asset-cardinal-size-mobile);
+    height: var(--asset-cardinal-size-mobile);
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::before {
+    top: -18px;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::after {
+    right: -18px;
+  }
+  [data-theme="ctyri-zivly"] [data-andel-medallion]::after {
+    left: -36px;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+    font-size: 2.8em;
+  }
+  /* Compass hidden na nejmenším mobile */
+  [data-theme="ctyri-zivly"] [data-frame-panel="right"]::after {
+    display: none;
+  }
+  [data-theme="ctyri-zivly"] [data-frame-panel="right"] {
+    padding-bottom: 24px;
+  }
+  /* Corner ornaments menší */
+  [data-theme="ctyri-zivly"] [data-frame-panel] [class*="ornament"] {
+    width: var(--asset-corner-size-mobile);
+    height: var(--asset-corner-size-mobile);
+  }
+  /* Phoenix Ember ember menší + skrytý (mohl by působit rušivě v úzkém prostoru) */
+  [data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::after {
+    display: none;
+  }
+  /* Major dividers (chain) hidden, použijeme jen CSS minor divider */
+  [data-theme="ctyri-zivly"] [data-section-divider],
+  [data-theme="ctyri-zivly"] [class*="sectionDivider"] {
+    display: none;
+  }
+  /* NavItem touch target ≥48px */
+  [data-theme="ctyri-zivly"] [class*="btn3d"],
+  [data-theme="ctyri-zivly"] [data-nav-item] {
+    min-height: 48px;
+  }
+}
+
+/* ──────────────── 21. Reduced motion — vypnout animace, zachovat estetiku ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ctyri-zivly"][data-shell="ikaros"]::after,
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::before,
+  [data-theme="ctyri-zivly"] [data-frame-panel="card"]::after,
+  [data-theme="ctyri-zivly"] [data-andel-medallion]::after,
+  [data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::before,
+  [data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::after,
+  [data-theme="ctyri-zivly"] [data-frame-panel="right"]::after {
+    animation: none !important;
+  }
+  /* Phoenix Ember zcela skrytý při reduced motion (jeho podstata = pohyb) */
+  [data-theme="ctyri-zivly"] [data-theme-decoration="ember-orbit"]::after {
+    display: none;
+  }
+  /* Hover transitions zachovat (UX feedback, max 280ms) — žádný globální `transition: none` */
 }

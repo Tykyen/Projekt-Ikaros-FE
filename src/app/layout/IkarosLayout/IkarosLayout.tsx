@@ -391,6 +391,18 @@ export function IkarosLayout() {
           <span className={s.logoFallback}>Projekt Ikaros</span>
         </Link>
 
+        {/* Theme decoration: status strip — viditelná jen pro vesmirna-bitva (gated via CSS) */}
+        <div data-theme-decoration="status-strip" aria-hidden="true">
+          <span className="reticle" />
+          <span className="status-text">VŠECHNY SYSTÉMY V POHOTOVOSTI</span>
+          <span className="chevrons">
+            <svg viewBox="0 0 24 12" xmlns="http://www.w3.org/2000/svg" width="24" height="12">
+              <polygon points="0,0 10,6 0,12" fill="#d4111c" opacity="0.85" />
+              <polygon points="13,0 23,6 13,12" fill="#d4111c" opacity="0.85" />
+            </svg>
+          </span>
+        </div>
+
         {isAuthenticated ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </header>
 
@@ -425,6 +437,15 @@ export function IkarosLayout() {
             <RightPanel />
           </aside>
         )}
+      </div>
+
+      {/* Theme decorations: gated displej via CSS — viditelné pouze pro temna-cerven */}
+      <div data-theme-decoration="petals" aria-hidden="true">
+        <span className="petal" />
+        <span className="petal" />
+        <span className="petal" />
+        <span className="petal" />
+        <span className="petal" />
       </div>
 
       <LoginModal />

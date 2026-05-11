@@ -1,21 +1,925 @@
-/* ── Vesmírná bitva — alarm, červená urgence ── */
+/* ── Vesmírná bitva — můstek bitevního křižníku v akutním boji.
+   Gunmetal + hellfire-red + plasma-orange + burned ember edges + lava ohni.
+   13 dodaných assetů: logo, medailon (rectangular self-framed display), corner-tl,
+   medailon-frame (repurposed → ALERT panel R1), destroyer-schematic, targeting-reticle,
+   7× console-panel button nav ikon.
+   Alarm pulse (1.4s klaxon) + spark burst (corner pseudo) + triangle flash + reticle sweep
+   = signature motion language.
+   Scoped přes [data-theme="vesmirna-bitva"], žádný globální dopad. */
 
 [data-theme="vesmirna-bitva"] {
-  background-image:
-    radial-gradient(ellipse at 50% 30%, rgba(192, 24, 24, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.8) 0%, transparent 70%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-[data-theme="vesmirna-bitva"] .card,
-[data-theme="vesmirna-bitva"] [class*="card"],
-[data-theme="vesmirna-bitva"] button {
+/* ──────────────── 1. Atmosférický overlay (4-vrstvý gradient + scanline + grain) ──────────────── */
+
+[data-theme="vesmirna-bitva"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scanline overlay — subtle HUD layer (fixed full-screen) */
+[data-theme="vesmirna-bitva"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--theme-scanline-pattern);
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Film grain — heavy combat atmosphere (overlay blend) */
+[data-theme="vesmirna-bitva"][data-shell="ikaros"] > div[data-theme-decoration]::after {
+  /* gating wrap, not used directly — grain rendered via body::after below */
+}
+
+/* ──────────────── 2. Topbar — gunmetal panel s embedded red LED strip ──────────────── */
+
+[data-theme="vesmirna-bitva"][data-shell="ikaros"] > header {
+  background: linear-gradient(180deg, rgba(20, 14, 16, 0.92), rgba(8, 4, 6, 0.96));
+  border-bottom: 1px solid var(--theme-gunmetal-edge);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.06),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.7),
+    0 14px 30px rgba(0, 0, 0, 0.6);
+  position: relative;
+  backdrop-filter: none;
+}
+
+/* Bottom LED strip (signature) — alarm pulse opacity */
+[data-theme="vesmirna-bitva"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--theme-hellfire), var(--theme-plasma), var(--theme-hellfire), transparent);
+  opacity: 0.6;
+  animation: vb-led-pulse 1.4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes vb-led-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.95; }
+}
+
+/* Logo — combined banner s baked-in angel-medallion kruhem vlevo */
+[data-theme="vesmirna-bitva"] header [class*="logoImg"] {
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  width: var(--asset-logo-w, 560px);
+  height: 60px;
+  filter: drop-shadow(0 0 14px rgba(184, 16, 28, 0.5));
+}
+
+[data-theme="vesmirna-bitva"] header [class*="logoFallback"] {
+  display: none;
+}
+
+/* Header buttons (POŠTA, UŽIVATELÉ, ZLATÝ STANDARD, TYKY, ODHLÁSIT) — angular gunmetal name plates */
+[data-theme="vesmirna-bitva"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  background: linear-gradient(180deg, #1a1418, #0a0608);
+  border: 1px solid var(--theme-gunmetal-edge);
+  color: var(--theme-text-pale);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    0 2px 8px rgba(0, 0, 0, 0.6);
+  position: relative;
+  transition: color 200ms, border-color 200ms, box-shadow 200ms, transform 150ms;
+  /* Konzistentní výška napříč POŠTA/TYKY/ODHLÁSIT — bez ohledu na velikost obsahu */
+  height: 40px;
+  align-items: center;
+  box-sizing: border-box;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Bottom burnt-edge gradient */
+[data-theme="vesmirna-bitva"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"])::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--theme-ember-burn), transparent);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+[data-theme="vesmirna-bitva"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  color: var(--theme-plasma-bright);
+  border-color: var(--theme-gunmetal-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    inset 0 0 0 1px rgba(184, 16, 28, 0.4),
+    0 0 18px var(--theme-glow-hellfire),
+    0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="vesmirna-bitva"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+[data-theme="vesmirna-bitva"] [class*="headerBtnIcon"],
+[data-theme="vesmirna-bitva"] [class*="headerBtnLabel"] {
+  color: inherit;
+  font-family: inherit;
+  letter-spacing: inherit;
+}
+
+/* Avatar pill v header (TYKY button) — zmenšit z 32×32 base na 24×24 aby se vešel do 40px tlačítka */
+[data-theme="vesmirna-bitva"] [class*="headerBtn"] [class*="avatar"] {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  background: linear-gradient(180deg, var(--theme-hellfire), var(--theme-hellfire-deep));
+  border: 1px solid var(--theme-gunmetal-edge);
+  color: var(--theme-text-pale);
+  flex-shrink: 0;
+}
+
+/* UserAvatar má vnitřní <img> nebo <svg> — sjednotit i ten obsah */
+[data-theme="vesmirna-bitva"] [class*="headerBtn"] [class*="avatar"] img,
+[data-theme="vesmirna-bitva"] [class*="headerBtn"] [class*="avatar"] svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ──────────────── 3. Sidebars (left + right) — battle-plate gunmetal s burnt edge ──────────────── */
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="sidebar"],
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] {
+  background:
+    linear-gradient(180deg, rgba(20, 14, 16, 0.94), rgba(8, 4, 6, 0.96));
+  border: 1px solid var(--theme-gunmetal-edge);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.06),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(184, 16, 28, 0.15),
+    0 22px 50px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: visible;
+  animation: vb-alarm-pulse 1.4s ease-in-out infinite;
+}
+
+/* Burned edge bottom — subtle ember gradient on lower part of panels */
+[data-theme="vesmirna-bitva"] [data-frame-panel="sidebar"]::before,
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"]::before,
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"]::before,
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48px;
+  background: linear-gradient(180deg, transparent, rgba(255, 80, 40, 0.14) 60%, rgba(40, 8, 4, 0.45) 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 70%);
+          mask-image: linear-gradient(180deg, transparent, black 70%);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+/* ──────────────── 4. Welcome card + Novinky panel ──────────────── */
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"],
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] {
+  background:
+    linear-gradient(180deg, rgba(22, 14, 18, 0.95), rgba(8, 4, 6, 0.97));
+  border: 1px solid var(--theme-gunmetal-edge);
+  border-radius: 4px;
+  -webkit-backdrop-filter: blur(6px) saturate(1.05);
+          backdrop-filter: blur(6px) saturate(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.06),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(184, 16, 28, 0.15),
+    0 28px 70px rgba(0, 0, 0, 0.65);
+  position: relative;
+  overflow: visible;
+  animation: vb-alarm-pulse 1.4s ease-in-out infinite;
+}
+
+/* Welcome card má větší výšku kvůli destroyer schematic strip nahoře + status strip dole */
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] {
+  min-height: clamp(440px, 60vh, 720px);
+  margin-top: 32px;   /* prostor pro destroyer-schematic */
+  margin-bottom: 32px;/* prostor pro status-strip pseudo */
+}
+
+/* Destroyer schematic strip — signature crown nad welcome cardem */
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"]::after {
+  content: '';
+  position: absolute;
+  top: -28px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background-image: var(--asset-destroyer-schematic);
+  background-size: contain;
+  background-position: center top;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 12px rgba(184, 16, 28, 0.4));
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ──────────────── 5. Welcome card content (heading, body, signature, drop-cap, medailon) ──────────────── */
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.2vw, 38px);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: var(--theme-text-pale);
+  text-transform: uppercase;
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-hellfire-bright);
+  text-shadow:
+    0 0 14px rgba(255, 80, 64, 0.5),
+    0 2px 0 #000;
+}
+
+/* Underline pod heading — heart-monitor flatline */
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  width: 240px;
+  height: 14px;
+  margin: 14px 0 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 14"><path d="M0 7 L96 7 L104 7 L108 1 L112 13 L116 4 L120 10 L124 7 L240 7" stroke="%23b8101c" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  background-repeat: no-repeat;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px rgba(184, 16, 28, 0.5));
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="paragraph"] {
+  font-family: var(--font-body);
+  color: var(--theme-text-pale);
+  line-height: 1.65;
+  font-size: 16px;
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="paragraph"] strong,
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="paragraph"] [class*="pi-name"],
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="paragraph"] [class*="piName"] {
+  font-family: var(--font-display);
+  color: var(--theme-hellfire-bright);
+  font-size: 1.1em;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 10px rgba(184, 16, 28, 0.4);
+}
+
+/* Signature — damaged typewriter Special Elite */
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="signature"] {
+  font-family: var(--font-script);
+  font-size: clamp(18px, 2vw, 22px);
+  color: var(--theme-hellfire-bright);
+  text-shadow:
+    0 0 14px rgba(212, 32, 42, 0.45),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.04em;
+  text-align: center;
+  margin-top: 24px;
+  position: relative;
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="signature"]::before,
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="signature"]::after {
+  content: '';
+  display: inline-block;
+  width: 60px;
+  height: 1px;
+  vertical-align: middle;
+  background: linear-gradient(90deg, transparent, var(--theme-hellfire), transparent);
+  margin: 0 14px;
+}
+
+/* Stencil drop-cap "V" — first letter of first paragraph */
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-size: 4.2em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.05em 0.12em 0 0;
+  color: var(--theme-hellfire-bright);
+  text-shadow:
+    0 0 0.04em rgba(0, 0, 0, 1),
+    0 2px 0.06em rgba(0, 0, 0, 0.9),
+    0 0 0.25em rgba(184, 16, 28, 0.45),
+    0 0 0.5em rgba(255, 80, 64, 0.25);
+}
+
+/* Medailon — rectangular self-framed tactical display */
+[data-theme="vesmirna-bitva"] [data-andel-medallion],
+[data-theme="vesmirna-bitva"] [class*="andelMedallion"],
+[data-theme="vesmirna-bitva"] [class*="medailon"] {
+  background-image: var(--asset-medailon);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 220px;
+  height: 290px;
+  filter: drop-shadow(0 0 22px rgba(184, 16, 28, 0.45));
   border-radius: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-theme="vesmirna-bitva"] button:hover {
-    box-shadow: 0 0 20px rgba(192, 24, 24, 0.6);
+/* ──────────────── 6. CornerOrnament — battle-plate L bracket ──────────────── */
+
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"] {
+  width: var(--asset-corner-size, 40px);
+  height: var(--asset-corner-size, 40px);
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  filter:
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 8px var(--theme-glow-hellfire));
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 0;
+  position: absolute;
+  /* override any base styles (rotation, gradient, color from default ornament) */
+  transform: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* Per-panel velikost rohu */
+[data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="ornament"] {
+  width: var(--asset-corner-size, 44px);
+  height: var(--asset-corner-size, 44px);
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: var(--asset-corner-size-novinky, 32px);
+  height: var(--asset-corner-size-novinky, 32px);
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="ornament"] {
+  width: var(--asset-corner-size-side, 40px);
+  height: var(--asset-corner-size-side, 40px);
+}
+
+/* Mirroring per position — master TL → flip pro TR/BL/BR */
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: -6px; left: -6px;
+  transform: rotate(0deg);
+}
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  top: -6px; right: -6px;
+  transform: scaleX(-1);
+}
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: -6px; left: -6px;
+  transform: scaleY(-1);
+}
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: -6px; right: -6px;
+  transform: scale(-1, -1);
+}
+
+/* Spark burst — ::before pseudo na corner ornamentech (4 rohy * panels = staggered sparky) */
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"]::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  background: radial-gradient(circle, var(--theme-plasma-bright), var(--theme-ember-burn) 60%, transparent 100%);
+  box-shadow: 0 0 4px var(--theme-plasma);
+  pointer-events: none;
+  opacity: 0;
+  --spark-x: 12px;
+  --spark-y: 14px;
+  animation: vb-spark-fly 8s ease-out infinite;
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="tl"]::before {
+  --spark-x: -12px; --spark-y: -14px; animation-delay: 0s;
+}
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="tr"]::before {
+  --spark-x: 12px; --spark-y: -14px; animation-delay: 2s;
+}
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="bl"]::before {
+  --spark-x: -12px; --spark-y: 14px; animation-delay: 4s;
+}
+[data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"][data-position="br"]::before {
+  --spark-x: 12px; --spark-y: 14px; animation-delay: 6s;
+}
+
+/* Per-panel offset variace — různý "rytmus" */
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="ornament"]::before {
+  animation-duration: 9s;
+}
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="ornament"]::before {
+  animation-duration: 10s;
+}
+
+@keyframes vb-spark-fly {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  3%   { opacity: 0.95; }
+  10%  { opacity: 0.8; }
+  16%  { opacity: 0; transform: translate(var(--spark-x), var(--spark-y)) scale(1.2); }
+  100% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+}
+
+/* ──────────────── 7. Section titles + hellfire dot decorations ──────────────── */
+
+[data-theme="vesmirna-bitva"] [class*="sectionTitle"] {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  color: var(--theme-gunmetal-bright);
+  font-size: 13px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+[data-theme="vesmirna-bitva"] [class*="sectionTitle"]::before,
+[data-theme="vesmirna-bitva"] [class*="sectionTitle"]::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--theme-gunmetal-edge), transparent);
+  max-width: 60px;
+}
+
+/* Section divider mezi sekcemi v sidebaru — heart-monitor flatline SVG */
+[data-theme="vesmirna-bitva"] [data-section-divider],
+[data-theme="vesmirna-bitva"] [class*="sectionDivider"] {
+  height: 22px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 22"><path d="M0 11 L96 11 L104 11 L108 3 L112 19 L116 6 L120 16 L124 11 L240 11" stroke="%23b8101c" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  border: none;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px rgba(184, 16, 28, 0.4));
+  margin: 12px 0;
+}
+
+/* ──────────────── 8. NavItem styling + 7 console-panel button ikon ──────────────── */
+
+[data-theme="vesmirna-bitva"] [class*="btn3d"]:not([class*="btn3dActive"]) {
+  background: linear-gradient(180deg, rgba(28, 20, 22, 0.55), rgba(12, 8, 10, 0.55));
+  border: 1px solid transparent;
+  font-family: var(--font-display);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--theme-text-pale);
+  transition: color 200ms, border-color 200ms, box-shadow 200ms, background 200ms;
+}
+
+[data-theme="vesmirna-bitva"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  color: var(--theme-gunmetal-bright);
+  border-color: var(--theme-gunmetal-edge);
+  box-shadow:
+    inset 0 0 0 1px rgba(184, 16, 28, 0.4),
+    0 0 16px var(--theme-glow-hellfire);
+  background: linear-gradient(180deg, rgba(40, 24, 28, 0.55), rgba(16, 10, 12, 0.6));
+}
+
+[data-theme="vesmirna-bitva"] [class*="btn3dActive"],
+[data-theme="vesmirna-bitva"] [class*="navItemActive"] {
+  color: var(--theme-gunmetal-bright);
+  background: var(--theme-nav-active-bg);
+  border-color: var(--theme-gunmetal-edge);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 80, 64, 0.4),
+    0 0 20px var(--theme-glow-hellfire);
+  position: relative;
+}
+
+/* Bracket [ ] kolem active NavItem */
+[data-theme="vesmirna-bitva"] [class*="btn3dActive"]::before,
+[data-theme="vesmirna-bitva"] [class*="btn3dActive"]::after,
+[data-theme="vesmirna-bitva"] [class*="navItemActive"]::before,
+[data-theme="vesmirna-bitva"] [class*="navItemActive"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 60%;
+  border-style: solid;
+  border-color: var(--theme-gunmetal-bright);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+[data-theme="vesmirna-bitva"] [class*="btn3dActive"]::before,
+[data-theme="vesmirna-bitva"] [class*="navItemActive"]::before {
+  left: -10px;
+  border-width: 1px 0 1px 1px;
+}
+[data-theme="vesmirna-bitva"] [class*="btn3dActive"]::after,
+[data-theme="vesmirna-bitva"] [class*="navItemActive"]::after {
+  right: -10px;
+  border-width: 1px 1px 1px 0;
+}
+
+[data-theme="vesmirna-bitva"] [class*="navItem"] [class*="navItemLabel"],
+[data-theme="vesmirna-bitva"] [class*="btn3d"] [class*="navItemLabel"] {
+  font-family: var(--font-display);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+/* 7 console-panel button nav ikon per data-nav-key */
+[data-theme="vesmirna-bitva"] [data-nav-key] [class*="navItemIcon"] {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 32px;
+  height: 32px;
+  filter: none;
+}
+
+[data-theme="vesmirna-bitva"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;  /* skrýt lucide SVG, render asset přes background */
+}
+
+[data-theme="vesmirna-bitva"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="vesmirna-bitva"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="vesmirna-bitva"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="vesmirna-bitva"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="vesmirna-bitva"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="vesmirna-bitva"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="vesmirna-bitva"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* Active state — scale + hellfire halo */
+[data-theme="vesmirna-bitva"] [class*="navItemActive"] [data-nav-key] [class*="navItemIcon"],
+[data-theme="vesmirna-bitva"] [class*="btn3dActive"] [data-nav-key] [class*="navItemIcon"] {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 6px var(--theme-hellfire-bright));
+}
+
+/* ──────────────── 9. Novinky panel — heading, empty, addBtn ──────────────── */
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="novinkyTitle"] {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: var(--theme-gunmetal-bright);
+  font-size: 18px;
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="novinkyTitle"] svg {
+  color: var(--theme-hellfire-bright);
+  filter: drop-shadow(0 0 6px var(--theme-glow-hellfire));
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="empty"] {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--theme-text-muted);
+  opacity: 0.7;
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="addBtn"] {
+  background: linear-gradient(180deg, #c8121c, #6e0a14);
+  border: 1px solid var(--theme-gunmetal-edge);
+  color: var(--theme-gunmetal-bright);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 0 24px var(--theme-glow-hellfire),
+    0 6px 16px rgba(0, 0, 0, 0.5);
+  transition: background 200ms, box-shadow 200ms, transform 150ms;
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="addBtn"]:hover {
+  background: linear-gradient(180deg, #e8202a, #8a0e1a);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 0 32px var(--theme-glow-hellfire-strong),
+    0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="addBtn"]:active {
+  transform: scale(0.96);
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="addBtn"] > svg {
+  color: var(--theme-gunmetal-bright);
+}
+
+/* ──────────────── 10. Right panel — sections, ThemeSwitcher slot ──────────────── */
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  color: var(--theme-gunmetal-bright);
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background: linear-gradient(180deg, rgba(40, 24, 28, 0.7), rgba(16, 10, 12, 0.85));
+  border: 1px solid var(--theme-gunmetal-edge);
+  color: var(--theme-text-pale);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 0 rgba(180, 190, 200, 0.08);
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  color: var(--theme-gunmetal-bright);
+  border-color: var(--theme-gunmetal-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.12),
+    inset 0 0 0 1px rgba(184, 16, 28, 0.4),
+    0 0 18px var(--theme-glow-hellfire);
+}
+
+[data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]::before {
+  content: '►';
+  margin-right: 8px;
+  color: var(--theme-hellfire-bright);
+  filter: drop-shadow(0 0 4px var(--theme-glow-plasma));
+}
+
+/* PJ badge (uživatel role) */
+[data-theme="vesmirna-bitva"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-hellfire), var(--theme-hellfire-deep));
+  color: var(--theme-text-pale);
+  border: 1px solid var(--theme-gunmetal-edge);
+  font-family: var(--font-sub);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  padding: 2px 6px;
+  font-size: 9px;
+  box-shadow: 0 0 8px var(--theme-glow-hellfire);
+}
+
+/* ──────────────── 11. Theme decoration: Status strip ──────────────── */
+
+[data-theme-decoration="status-strip"] {
+  display: none;
+}
+
+/* Default ostatní skiny: i kdyby se decoration nějak ukázal, sklidíme ho. */
+[data-shell="ikaros"] > header [data-theme-decoration="status-strip"] {
+  display: none;
+}
+
+/* Vesmirna-bitva: zobrazit jako flex-fill HUD strip mezi logem a header buttony */
+[data-theme="vesmirna-bitva"][data-shell="ikaros"] > header [data-theme-decoration="status-strip"] {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;            /* aby flex shrinkoval text-overflow */
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 18px;
+  padding: 0 16px;
+  height: 36px;
+  background: linear-gradient(180deg, rgba(20, 14, 16, 0.85), rgba(8, 4, 6, 0.92));
+  border: 1px solid var(--theme-gunmetal-edge);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(184, 16, 28, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  gap: 14px;
+  pointer-events: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtilní spodní LED strip ve status panelu — sync s header alarm pulse */
+[data-theme="vesmirna-bitva"][data-shell="ikaros"] > header [data-theme-decoration="status-strip"]::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--theme-hellfire), var(--theme-plasma), var(--theme-hellfire), transparent);
+  opacity: 0.5;
+  animation: vb-led-pulse 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+[data-theme="vesmirna-bitva"] [data-theme-decoration="status-strip"] .reticle {
+  width: 22px;
+  height: 22px;
+  background-image: var(--asset-targeting-reticle);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: vb-reticle-sweep 8s linear infinite;
+  filter: drop-shadow(0 0 4px var(--theme-glow-hellfire));
+  flex-shrink: 0;
+}
+
+[data-theme="vesmirna-bitva"] [data-theme-decoration="status-strip"] .status-text {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--theme-hellfire-bright);
+  text-shadow: 0 0 6px var(--theme-glow-hellfire);
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="vesmirna-bitva"] [data-theme-decoration="status-strip"] .chevrons {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px var(--theme-glow-hellfire));
+}
+
+/* ──────────────── 13. Theme switcher dropdown — hellfire styling když opened ──────────────── */
+
+[data-theme="vesmirna-bitva"] [class*="themeSwitcherDropdown"],
+[data-theme="vesmirna-bitva"] [role="menu"][data-theme-switcher],
+[data-theme="vesmirna-bitva"] [class*="themeSwitcher"] [role="menu"] {
+  background: linear-gradient(180deg, rgba(20, 14, 16, 0.97), rgba(8, 4, 6, 0.98));
+  border: 1px solid var(--theme-gunmetal-edge);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 190, 200, 0.06),
+    0 22px 50px rgba(0, 0, 0, 0.7),
+    0 0 24px var(--theme-glow-hellfire);
+  border-radius: 4px;
+}
+
+/* ──────────────── 14. Animace ──────────────── */
+
+@keyframes vb-alarm-pulse {
+  0%, 100% {
+    border-color: var(--theme-gunmetal-edge);
+    box-shadow:
+      inset 0 1px 0 rgba(180, 190, 200, 0.06),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.7),
+      inset 0 0 0 1px rgba(184, 16, 28, 0.15),
+      0 22px 50px rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    border-color: var(--theme-hellfire-bright);
+    box-shadow:
+      inset 0 1px 0 rgba(180, 190, 200, 0.06),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.7),
+      inset 0 0 0 1px rgba(255, 80, 64, 0.5),
+      0 0 28px var(--theme-glow-hellfire-strong),
+      0 22px 50px rgba(0, 0, 0, 0.6);
+  }
+}
+
+@keyframes vb-reticle-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ──────────────── 15. Reduced-motion ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="vesmirna-bitva"] [data-frame-panel="sidebar"],
+  [data-theme="vesmirna-bitva"] [data-frame-panel="right"],
+  [data-theme="vesmirna-bitva"] [data-frame-panel="card"],
+  [data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] {
+    animation: none;
+    border-color: var(--theme-gunmetal-edge);
+    box-shadow:
+      inset 0 1px 0 rgba(180, 190, 200, 0.06),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.7),
+      inset 0 0 0 1px rgba(184, 16, 28, 0.35),
+      0 22px 50px rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="vesmirna-bitva"] [data-frame-panel] [class*="ornament"]::before {
+    display: none;
+  }
+
+  [data-theme="vesmirna-bitva"][data-shell="ikaros"] > header::after {
+    animation: none;
+    opacity: 0.7;
+  }
+
+  [data-theme="vesmirna-bitva"] [data-theme-decoration="status-strip"] .reticle {
+    animation: none;
+  }
+}
+
+/* ──────────────── 16. Responsive breakpoints ──────────────── */
+
+@media (max-width: 1279px) {
+  [data-theme="vesmirna-bitva"] [data-andel-medallion],
+  [data-theme="vesmirna-bitva"] [class*="andelMedallion"],
+  [data-theme="vesmirna-bitva"] [class*="medailon"] {
+    width: 180px;
+    height: 235px;
+  }
+  [data-theme="vesmirna-bitva"] [data-frame-panel="card"]::after {
+    height: 64px;
+    top: -22px;
+  }
+  [data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="ornament"] {
+    width: 36px;
+    height: 36px;
+  }
+  [data-theme="vesmirna-bitva"] [data-frame-panel="sidebar"] [class*="ornament"],
+  [data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="ornament"] {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 1023px) {
+  [data-theme="vesmirna-bitva"] [data-andel-medallion],
+  [data-theme="vesmirna-bitva"] [class*="andelMedallion"],
+  [data-theme="vesmirna-bitva"] [class*="medailon"] {
+    width: 160px;
+    height: 210px;
+  }
+}
+
+@media (max-width: 768px) {
+  [data-theme="vesmirna-bitva"] header [class*="logoImg"] {
+    width: var(--asset-logo-w-mobile, 320px);
+    height: 48px;
+  }
+  [data-theme="vesmirna-bitva"] [data-andel-medallion],
+  [data-theme="vesmirna-bitva"] [class*="andelMedallion"],
+  [data-theme="vesmirna-bitva"] [class*="medailon"] {
+    width: 140px;
+    height: 185px;
+  }
+  [data-theme="vesmirna-bitva"] [data-frame-panel="card"]::after {
+    height: 48px;
+    top: -16px;
+  }
+  [data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="ornament"],
+  [data-theme="vesmirna-bitva"] [data-frame-panel="sidebar"] [class*="ornament"],
+  [data-theme="vesmirna-bitva"] [data-frame-panel="right"] [class*="ornament"],
+  [data-theme="vesmirna-bitva"] [data-frame-panel="novinky"] [class*="ornament"] {
+    width: 28px;
+    height: 28px;
+  }
+  [data-theme="vesmirna-bitva"] [data-nav-key] [class*="navItemIcon"] {
+    width: 28px;
+    height: 28px;
+  }
+  [data-theme="vesmirna-bitva"][data-shell="ikaros"] > header [data-theme-decoration="status-strip"] {
+    /* V hlavičce na mobilu skryjeme strip — místo je málo. */
+    display: none;
+  }
+  [data-theme="vesmirna-bitva"] [data-theme-decoration="status-strip"] .status-text {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+  }
+  [data-theme="vesmirna-bitva"] [data-theme-decoration="status-strip"] .reticle {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  [data-theme="vesmirna-bitva"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+    font-size: 2.4em;
   }
 }

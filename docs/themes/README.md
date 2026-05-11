@@ -26,7 +26,7 @@ Referenční obrázky ukládej do `assets-source/themes/references/` (slug filen
 | 5 | `priroda` | Příroda | ✅ Popsáno | [priroda.png](../../assets-source/themes/references/priroda.png) |
 | 6 | `pergamen` | Pergamen | ✅ Popsáno | [pergamen.png](../../assets-source/themes/references/pergamen.png) |
 | 7 | `nemrtvi` | Nemrtví | ✅ Popsáno | [nemrtvi.png](../../assets-source/themes/references/nemrtvi.png) |
-| 8 | `ctyri-zivly` | Čtyři živly | ✅ Popsáno | [ctyri-zivly.png](../../assets-source/themes/references/ctyri-zivly.png) |
+| 8 | `ctyri-zivly` | Čtyři živly | ✅ 1.0m upgrade hotový | [ctyri-zivly.png](../../assets-source/themes/references/ctyri-zivly.png) |
 | 9 | `vesmirna-bitva` | Vesmírná bitva | ✅ Popsáno | [vesmirna-bitva.png](../../assets-source/themes/references/vesmirna-bitva.png) |
 | 10 | `hospoda` | Hospoda | ✅ Popsáno | [hospoda.png](../../assets-source/themes/references/hospoda.png) |
 | 11 | `severske-runy` | Severské runy | ✅ Popsáno | [severske-runy.png](../../assets-source/themes/references/severske-runy.png) |
@@ -35,7 +35,7 @@ Referenční obrázky ukládej do `assets-source/themes/references/` (slug filen
 | 14 | `arabsky-svet` | Arabský svět | ✅ Popsáno | [arabsky-svet.png](../../assets-source/themes/references/arabsky-svet.png) |
 | 15 | `kyberpunk` | Kyberpunk | ✅ Popsáno | [kyberpunk.png](../../assets-source/themes/references/kyberpunk.png) |
 | 16 | `postapo` | Postapo | ✅ Popsáno | [postapo.png](../../assets-source/themes/references/postapo.png) |
-| 17 | `temna-cerven` | Temná červeň | ⏳ Čeká na obrázek | — |
+| 17 | `temna-cerven` | Temná červeň | ✅ 1.0l upgrade hotový | [temna-cerven.png](../../assets-source/themes/references/temna-cerven.png) |
 | 18 | `magie` | Magie a kouzla | ✅ Popsáno | [magie.png](../../assets-source/themes/references/magie.png) |
 | 19 | `mesic` | Měsíc | ✅ Popsáno | [mesic.png](../../assets-source/themes/references/mesic.png) |
 | 20 | `slunce` | Slunce | ✅ Popsáno | [slunce.png](../../assets-source/themes/references/slunce.png) |
