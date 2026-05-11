@@ -78,6 +78,18 @@ const ROSE_PETAL_MID =
 const ROSE_PETAL_FAR =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><g><ellipse cx='30' cy='50' rx='3' ry='2' fill='%23c8385a' opacity='0.30' transform='rotate(45 30 50)'/><ellipse cx='100' cy='30' rx='4' ry='2.5' fill='%23d85878' opacity='0.28' transform='rotate(70 100 30)'/><ellipse cx='80' cy='130' rx='3' ry='2' fill='%23e8b040' opacity='0.25' transform='rotate(120 80 130)'/><ellipse cx='150' cy='100' rx='3.5' ry='2' fill='%23c8385a' opacity='0.32' transform='rotate(30 150 100)'/></g></svg>\")";
 
+// Damask wallpaper pattern — orientální geometric tile pro panel BG (subtle @ 5% opacity)
+const DAMASK_PATTERN =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80' fill='none' stroke='%23e8b040' stroke-width='0.8'><path d='M40 4 L52 16 L64 16 L56 28 L64 40 L52 40 L40 64 L28 40 L16 40 L24 28 L16 16 L28 16 Z'/><circle cx='40' cy='40' r='4'/><path d='M4 40 L16 40 M64 40 L76 40 M40 4 L40 16 M40 64 L40 76'/><circle cx='40' cy='4' r='1.5' fill='%23e8b040'/><circle cx='40' cy='76' r='1.5' fill='%23e8b040'/><circle cx='4' cy='40' r='1.5' fill='%23e8b040'/><circle cx='76' cy='40' r='1.5' fill='%23e8b040'/></svg>\")";
+
+// Flourish left — kaligrafická svinka před section title / signature
+const FLOURISH_LEFT =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 16' fill='none' stroke='%23a87830' stroke-width='1.2' stroke-linecap='round'><path d='M2 8 Q8 2 14 8 Q18 12 22 8 Q26 6 30 8 Q34 10 38 8 Q42 6 46 8'/><circle cx='46' cy='8' r='1.5' fill='%23a87830'/></svg>\")";
+
+// Flourish right — zrcadlený před signature
+const FLOURISH_RIGHT =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 16' fill='none' stroke='%23a87830' stroke-width='1.2' stroke-linecap='round'><circle cx='2' cy='8' r='1.5' fill='%23a87830'/><path d='M2 8 Q6 10 10 8 Q14 6 18 8 Q22 10 26 8 Q34 2 40 8 Q44 14 46 8'/></svg>\")";
+
 export const arabskySvetTheme: Theme = {
   id: 'arabsky-svet',
   name: 'Arabský svět',
@@ -262,6 +274,11 @@ export const arabskySvetTheme: Theme = {
     '--asset-rose-petal-near':  ROSE_PETAL_NEAR,
     '--asset-rose-petal-mid':   ROSE_PETAL_MID,
     '--asset-rose-petal-far':   ROSE_PETAL_FAR,
+
+    /* Richness 1.0r-followup: damask wallpaper + kaligrafické flourish brackets (inline SVG) */
+    '--asset-damask-pattern':   DAMASK_PATTERN,
+    '--asset-flourish-left':    FLOURISH_LEFT,
+    '--asset-flourish-right':   FLOURISH_RIGHT,
   },
   fonts: {
     logo: 'Pinyon Script',
