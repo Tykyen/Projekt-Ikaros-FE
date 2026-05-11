@@ -1,101 +1,104 @@
-# Téma: Indiánské
+# Téma: Indiánské — „Strážci horizontu"
 
-**ID:** `indiane`  
-**Referenční obrázek:** [assets/indiane.png](assets/indiane.png)
+**ID:** `indiane`
+**Spec:** [spec-1.0p-indiane-upgrade.md](../arch/phase-1/spec-1.0p-indiane-upgrade.md)
+**Plan:** [plan-1.0p.md](../arch/phase-1/plan-1.0p.md)
+**Asset prompty:** [_asset-prompts.md](../../public/themes/indiane/decor/_asset-prompts.md)
+**Stav:** ✅ Implementováno (krok 1.0p, 2026-05-11)
+
+> **Pozn:** staré frontier hybrid Wild West vize (saloon + kovbojové + karty) byly **odhozeny** 2026-05-11 — nahrazeny čistou prairie linkou „svět před západem".
 
 ---
 
 ## Atmosféra
 
-Hranice divokého západu při dramatickém západu slunce. Kovbojové na koních, teepee, saloon, blesky v bouřkovém nebi. Indiánské motivy prostupují vším — lapače snů, peří, korálkové bordury, tyrkysová barva. Hybrid dvou světů: frontier Amerika + původní kultura. Pocit svobody, nebezpečí, ztracených horizontů a staré moudrosti.
+Prairie soumrak. Vysoká planina, žhavé nebe nad horizontem. Tipi v dálce, totemy na kopci, dreamcatcher houpající se ve větru. Žádný saloon, žádné kovboje. Tato země ještě patří lidem, kteří po ní chodili tisíc let — svět *před* tím, než ho rozparcelovali. Tichá posvátná vážnost, ne romantický „western".
+
+**Inspirace:** Howard Terpning (Plains-Indian paintings) × Frank Frazetta prairies × Lakota/Cheyenne/Dakota tradiční umění × *Dances with Wolves* (1990) × Anasazi/Fremont rock art.
+
+**NE:** Hollywood western / Disney Pocahontas / „Hollywood Indian" stereotyp / maori tribal patterns / neon turquoise.
 
 ---
 
-## Barevná paleta
+## Barevná paleta (klíčové role)
 
 | Role | Hex | Použití |
 |------|-----|---------|
-| `--bg-primary` | `#120a04` | Hlavní pozadí — tmavé zvětralé dřevo |
-| `--bg-secondary` | `#1a1008` | Sidebary — staré saloonové prkna |
-| `--bg-card` | `#d4a870` | Karty — starý pergamen/kůže |
-| `--bg-card-dark` | `#b08050` | Tmavší kůže — okraje karet |
-| `--bg-card-hover` | `#e0bc88` | Hover — světlejší pergamen |
-| `--accent-sunset` | `#d06010` | Západ slunce — primární oranžová |
-| `--accent-sunset-bright` | `#f08020` | Světlý západ, hover |
-| `--accent-sunset-dim` | `#803010` | Temný západ, bordury |
-| `--accent-turquoise` | `#208080` | Tyrkysová — indiánský akcent, admin text |
-| `--accent-turquoise-bright` | `#30a0a0` | Světlá tyrkys, hover |
-| `--accent-terracotta` | `#c04820` | Hlína/cihlová — "Projekt Ikaros" text |
-| `--accent-gold-west` | `#c8900a` | Zlatá — kapesní hodinky, mince, bordury |
-| `--text-on-leather` | `#2a1808` | Text na kůži/pergamenu — tmavý |
-| `--text-on-leather-sec` | `#604020` | Sekundární text na kůži |
-| `--text-on-dark` | `#c8900a` | Text na tmavém dřevu — zlatohnědá |
-| `--text-muted` | `#503020` | Vypnuté prvky |
-| `--border-wood` | `#3a1e08` | Dřevěná bordura |
-| `--border-leather` | `#805030` | Kožená bordura |
-| `--border-bead` | viz dekor | Korálkové bordury — viz dekorativní prvky |
+| `--bg-primary` | `#2a1208` | Hlavní pozadí — tmavá pálená zem |
+| `--theme-wood-dark` | `#3a1e08` | Patinované dřevo panelů |
+| `--theme-buffalo-blood` | `#c8501c` | Primární akcent (active nav, danger) |
+| `--theme-flame` | `#ff8030` | Nejteplejší jiskra plamene |
+| `--theme-prairie-gold` | `#d4a050` | Sekundární akcent (text na dřevě, ornamenty) |
+| `--theme-sage-turquoise` | `#5fc8d0` | Decorative-only — titleAccent + signature italic + empty hints |
+| `--theme-leather-cream` | `#f0e0c0` | Napnutá kůže šamanského bubnu (welcome BG) |
+| `--theme-bone-white` | `#e8d8b8` | Pictogramy, kostí |
+
+**Korálkový cyklus** (left-border na active nav): buffalo-blood / sage-turquoise / prairie-gold / cream-leather.
 
 ---
 
-## Tlačítka (3D efekt)
+## Typografie (Carved & Spoken)
 
-Saloonové dřevěné tlačítko — robustní, zvětralé, s koženým nádechem.
-
-```
-Tvar:      border-radius: 4px — mírně zaoblené (ruční tesání)
-Normální:  tmavý dřevěný gradient + kožená bordura + teplý zemitý stín
-Hover:     sunset oranžový glow + translateY(-2px) + bordura oranžoví
-Active:    translateY(2px) — těžký western dopad
-Aktivní nav: oranžová/sunset left-border (4px) + zlatý text + `>` šipka vpravo
-Primární:  sunset gradient (tmavý → oranžový) + zlatá bordura
-```
+- **Logo:** `Cinzel Decorative` (ornamentální majuskule — match logo asset)
+- **Display / nav UPPERCASE:** `Cinzel`
+- **Body:** `Spectral` (organický serif)
+- **Signature italic:** `Caveat` (sage-turquoise, 24–28px)
 
 ---
 
-## Dekorativní prvky
+## Originální motivy (žádný jiný skin nemá)
 
-- **Lapače snů (dreamcatcher):** SVG lapač snů s visícím peřím — levý sidebar (top) a pravý panel
-- **Peří:** Visící indiánská pera z lapačů snů — CSS animace jemného pohybu
-- **Korálkové bordury:** Řada malých barevných korálků (červená, modrá, tyrkysová, bílá) jako `border-image` nebo SVG pattern na horizontálních oddělovačích
-- **Západ slunce background:** Dramatický oranžovo-červený západ s blesky, teepee, saloon
-- **Kapesní hodinky:** Zlaté hodinky dole vpravo (background-image detail)
-- **Hrací karty + kostky:** Dole ve scéně — western gambling rekvizity
-- **Lucerna:** Starý petroleum lampáš dole vlevo (background-image)
-- **Šipka `>`:** Navigační prvky mají `>` jako indikátor — frontier styl
-- **Kulatý logo medailon:** Tmavý kruh se sunset zlatým rámem + peří-ornament okolo
-
----
-
-## Typografie
-
-- **Logo:** Rye nebo Playfair Display — western serif s patinou
-- **Nadpisy:** Lora Bold nebo IM Fell English — teplý historický serif
-- **Navigace:** Uppercase, letter-spacing 2px, bez ikony (jen text + `>`)
-- **Text:** Lora — čitelný, knižní, teplý
-- **Admin kurzíva:** Tyrkysová italic — indiánský kontrast k zemitým tónům
-- **"Projekt Ikaros" v textu:** Terracotta (`--accent-terracotta`)
+1. **Šamanský oválný buben jako welcome card** (aspect 1.55:1) v `medailon-frame` dřevěném rámu se 4 nail-stud brackety. Drum-pictograph s 4 Medicine Wheel pictogramy (vlk N / orel E / had S / bizon W + sun spiral) přes ::before s opacity 0.40.
+2. **Drum-beat pulse** welcome card (10s scale 1.000→1.008 — „tlukoucí srdce kmene").
+3. **Korálkový left-border na active nav** (CSS radial-gradient cyklus 12 korálků R/T/G/C) místo plné linky.
+4. **Spirit smoke ze active nav** (`::after` pseudo, 6s loop, „obětní kouř indikuje vybranou cestu").
+5. **Bead-string visící z topbaru** (CSS inline SVG vertikální řetízek 12 korálků, 8s sway).
+6. **Hearth glow zdola** (radial-gradient warm flame, 8s breathe, „země dýchá oheň").
+7. **Constellation overlay** (5–7 prairie-gold dots opacity 0.55, statické, v top třetině BG).
+8. **Petroglyph-divider** pod section titles (sandstone slab s pecked glyfy).
+9. **Feather-stamp** na „+" tlačítkách (orlí pero s tyrkysovými korálky), hover rotuje +8°.
 
 ---
 
-## Rozdíly od Hospody a Pergamenu
+## Asset list (15 ks v [public/themes/indiane/decor/](../../public/themes/indiane/decor/))
 
-| Vlastnost | Hospoda | Pergamen | Indiánské |
-|-----------|---------|---------|-----------|
-| Prostředí | Středověká krčma | Studovna | Frontier západ |
-| Primární akcent | Crimson | Crimson/zlatá | Sunset oranžová |
-| Sekundární | Amber | — | Tyrkysová |
-| Dekor | Cechovní banner | Brk, kompas | Lapač snů, peří, korálek |
-| Karta bg | Pergamen | Pergamen | Kůže/kožený pergamen |
-| Kultura | Evropská | Evropská | Americká (hybrid) |
+- `logo.webp`, `medailon.webp` (user dodal)
+- `corner-tl.webp` (256×256, master TL, mirror přes CSS)
+- `medailon-frame.webp` (800×600, oval pro welcome buben)
+- `drum-pictograph.webp` (720×540, napnutá kůže s Medicine Wheel)
+- 7× `icon-*.webp` (96×96, carved-oak medailony): uvodnik (slunce), vytvorit-svet (tipi), diskuze (rada), clanky (svitek), galerie (petroglyph), napoveda (sova), hospoda (oheň)
+- `feather-stamp.webp` (96×96), `decor-fire-stones.webp` (1200×300), `petroglyph-divider.webp` (800×80)
+
+**Style guide pro retrogeneraci:** [public/themes/indiane/decor/_asset-prompts.md](../../public/themes/indiane/decor/_asset-prompts.md) — 13 ChatGPT/DALL-E promptů + paleta + materiálové popisy.
 
 ---
 
-## Poznámky pro implementaci
+## Animace inventář (5 typů, všechny `reduced-motion` fallback)
 
-- Korálkové bordury: SVG `<pattern>` s malými kruhy v barvách `#c04820`, `#208080`, `#c8900a`, `#f0f0f0`
-- Dreamcatcher: SVG komponenta `<Dreamcatcher />` — kruh + paprsčité nitě + visící peří
-- Peří animace: `@keyframes feather-sway { 0%,100% { rotate: -3deg } 50% { rotate: 3deg } }`
-- Světlé karty (kůže) — tmavý text stejně jako Hospoda/Pergamen
-- Logo kruh: sunset zlatý rám + miniaturní peří dekorace okolo kruhu (SVG)
-- `>` navigační šipky: CSS `::after` content na nav items
-- Teplý ambient: `radial-gradient` sunset oranžová ze středu top oblasti
+| # | Animace | Trvání | Element |
+|---|---------|--------|---------|
+| 1 | `indiane-hearth-breathe` | 8s | `[data-shell="ikaros"]::after` |
+| 2 | `indiane-drum-beat` | 10s | `[data-frame-panel="card"]` |
+| 3 | `indiane-bead-sway` | 8s | `> header::before` |
+| 4 | `indiane-spirit-smoke` | 6s | active nav `::after` |
+| 5 | feather-stamp rotate/scale | transition | `+` tlačítka `:hover/:active` |
+
+---
+
+## Mobile degradace (≤768px)
+
+- Welcome buben → obdélník `border-radius: 24px`, animation off
+- Bead-string + constellation → skryté
+- Hearth glow → 30vh (z 60vh)
+- Decor fire-stones → 120px (≤480px skryto)
+- Header buttons → icon-only
+- Touch target ≥48px
+
+---
+
+## Pravý panel — ADMINISTRACE order
+
+Odchylka od mockupů ([memory: project_admin_panel_decision.md](../../C:/Users/arafo/.claude/projects/c--Matrix-ProjektIkaros-Projekt-ikaros-FE/memory/project_admin_panel_decision.md)):
+1. **ADMINISTRACE** (skin selector + uživatelé) — nahoře
+2. **MOJE DISKUZE** + **MOJE SVĚTY** — uprostřed
+3. **OBLÍBENÉ ČLÁNKY** + **OBLÍBENÉ OBRÁZKY** — dole

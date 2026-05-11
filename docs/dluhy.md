@@ -8,6 +8,16 @@
 
 ## Otevřené
 
+### D-023 — severske-runy index.ts má `reducedMotion: 'gentle'` mimo povolený union typ
+**Soubor:** `src/themes/themes/severske-runy/index.ts` (řádek 178)
+**Problém:** Typ `ThemeReducedMotion = 'safe' | 'heavy'` ([src/themes/types.ts:32](src/themes/types.ts#L32)). Severske-runy nastavuje `'gentle'`, který neexistuje. `tsc -b` reportuje TS2322 error. Pravděpodobně přehled v 1.0o, build pravděpodobně projde díky `tsc --noEmit` / Vite tolerance, ale formálně je to typ-error.
+**Dopad:** Nízký — runtime nefunkční dopad není (pole je `?`, používá se jen v `useReducedMotion` hooku který fallbackuje na default), ale `tsc -b` reportuje chybu při buildu.
+**Reprodukce:** `npx tsc -b` v root projektu → `error TS2322: Type '"gentle"' is not assignable to type 'ThemeReducedMotion | undefined'`.
+**Řešení:** Buď (a) přidat `'gentle'` do unionu `ThemeReducedMotion` (pokud byl plánovaný 3. stupeň mezi safe a heavy), nebo (b) změnit severske-runy na `'safe'` (5 animací s reduced-motion fallback, je to bezpečné).
+**Kdy:** Při dalším šťouchu do severske-runy nebo v dluh-cleanup batch. Triviální 1-line fix.
+
+---
+
 ### D-022 — Anonymous mobile layout: main content zúžen na ~95px
 **Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.module.css` (řádek 143-145 a 371-380)
 **Problém:** Na anonymous user (logged-out) na mobile (≤768px viewport) má main content jen ~59-95px width. Pravidlo `.shellAnon .body { grid-template-columns: var(--sidebar-w, 280px) 1fr }` (specificita 2-0-0) přepíše mobile media query `.body { grid-template-columns: 1fr }` (specificita 1-0-0 — media query nezvyšuje specificitu selektoru). Tedy `.shellAnon` mobile zachová 280px sidebar slot + 95px main, i když `.sidebar { display: none }`.
