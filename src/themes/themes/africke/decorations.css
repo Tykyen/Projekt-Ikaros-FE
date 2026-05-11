@@ -183,19 +183,17 @@
 
 /* ──────────────── 7. Logo — kente weave banner s Allura script ──────────────── */
 
-[data-theme="africke"][data-shell="ikaros"] [class*="logoImg"],
-[data-theme="africke"][data-shell="ikaros"] img[alt*="Ikaros"],
-[data-theme="africke"][data-shell="ikaros"] img[src*="logo"] {
-  width: var(--asset-logo-w, 360px);
-  height: auto;
-  max-height: 48px;
-  object-fit: contain;
-  display: var(--logo-img-display, block);
-  filter: drop-shadow(0 1px 2px rgba(16, 8, 4, 0.70));
-  forced-color-adjust: none;
+[data-theme="africke"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(16, 8, 4, 0.70));
 }
 
-[data-theme="africke"][data-shell="ikaros"] [class*="logoFallback"] {
+[data-theme="africke"] header [class*="logoFallback"] {
   display: var(--logo-fallback-display, none);
   font-family: var(--font-logo);
   font-size: 26px;
@@ -251,16 +249,19 @@
 }
 
 /* Corner ornaments — carved bronze diamond, master TL mirror přes CSS.
-   Selectory pro CornerOrnament <span data-position="tl|tr|bl|br" />. */
+   Selectory pro CornerOrnament <span data-position="tl|tr|bl|br" />.
+   IMPORTANT: override default rotated-diamond style z CornerOrnament.module.css
+   (background-color + border + rotate). Africké chce čistý PNG ornament. */
 [data-theme="africke"] [data-position] {
   position: absolute;
   width: var(--asset-corner-size, 72px);
   height: var(--asset-corner-size, 72px);
+  background-color: transparent !important;
   background-image: var(--asset-corner);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  border: none;
+  border: none !important;
   border-radius: 0;
   pointer-events: none;
   z-index: 5;
@@ -607,35 +608,25 @@
      pseudo elementy přes ::before/::after na child welcomeContent */
 }
 
-/* Side ornaments — ::before/::after na .body wrapperu uvnitř welcome card.
-   IkarosCard wrapper: <article data-frame-panel="card">
-     → <div class="body_xxx"> → <div class="content_xxx">…</div></div> */
-[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"] {
-  position: relative;
-}
-[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::before,
-[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 56px;
-  height: 56px;
-  background-image: var(--asset-corner);
+/* Andělský medailon vlevo ve welcome stéle — větší dominantní čtverec
+   (medailon.webp = patinované dřevo s carved bronze diamonds + anděl-křídlo) */
+[data-theme="africke"] [data-frame-panel="card"] [data-andel-medallion] {
+  width: 192px;
+  height: 192px;
+  background-image: var(--asset-andel-medallion);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  transform: translateY(-50%);
-  filter: drop-shadow(0 2px 4px rgba(16, 8, 4, 0.65));
-  pointer-events: none;
-  z-index: 3;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 14px rgba(16, 8, 4, 0.75));
   forced-color-adjust: none;
 }
-[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::before {
-  left: -82px;
-}
-[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::after {
-  right: -82px;
-  transform: translateY(-50%) scaleX(-1);
+
+/* Welcome body — flex row s těsnějším gap, vertikálně centrované */
+[data-theme="africke"] [data-frame-panel="card"] [class*="body"] {
+  gap: 32px;
+  align-items: center;
+  position: relative;
 }
 
 /* ──────────────── 16. Welcome card text styling — rytí do pískovce ──────────────── */
@@ -859,16 +850,9 @@
     --asset-logo-w: 280px;
   }
 
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::before,
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::after {
-    width: 40px;
-    height: 40px;
-  }
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::before {
-    left: -54px;
-  }
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::after {
-    right: -54px;
+  [data-theme="africke"] [data-frame-panel="card"] [data-andel-medallion] {
+    width: 144px;
+    height: 144px;
   }
 }
 
@@ -936,17 +920,10 @@
     bottom: 10px;
   }
 
-  /* Side bronze ornaments scaled (480-768px) nebo skryté (<480px) */
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::before,
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::after {
-    width: 36px;
-    height: 36px;
-  }
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::before {
-    left: -8px;
-  }
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::after {
-    right: -8px;
+  /* Andělský medailon menší na mobile (ale stále dominantní) */
+  [data-theme="africke"] [data-frame-panel="card"] [data-andel-medallion] {
+    width: 112px;
+    height: 112px;
   }
 
   /* Welcome title menší */
@@ -967,12 +944,6 @@
 }
 
 @media (max-width: 480px) {
-  /* Side bronze ornaments úplně skryté na malé mobile */
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::before,
-  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] > [class*="body"]::after {
-    display: none;
-  }
-
   /* Welcome signature menší */
   [data-theme="africke"][data-shell="ikaros"] [class*="welcomeSignature"],
   [data-theme="africke"][data-shell="ikaros"] [class*="signature"] {
