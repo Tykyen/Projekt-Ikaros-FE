@@ -108,7 +108,7 @@ function SidebarContent({
 
   return (
     <div className={s.sidebarInner}>
-      <div className={s.section}>
+      <div className={s.section} data-section-key="navigace">
         <SectionTitle>Navigace</SectionTitle>
         <div className={s.navList}>
           {PRIMARY_NAV.map((item) => (
@@ -117,7 +117,7 @@ function SidebarContent({
         </div>
       </div>
 
-      <div className={s.section}>
+      <div className={s.section} data-section-key="vesmiry">
         <SectionTitle>Vesmíry</SectionTitle>
         <div className={s.navList}>
           {worlds?.slice(0, 8).map((w) => (
@@ -140,7 +140,7 @@ function SidebarContent({
         </div>
       </div>
 
-      <div className={s.section}>
+      <div className={s.section} data-section-key="chat">
         <SectionTitle>{`Chat (${chatCount})`}</SectionTitle>
         <div className={s.navList}>
           {CHAT_ROOMS.map((room, idx) => (
@@ -171,7 +171,7 @@ function RightPanel() {
 
   return (
     <div className={s.rightPanelInner}>
-      <div className={s.section}>
+      <div className={s.section} data-section-key="administrace">
         <SectionTitle>Administrace</SectionTitle>
         <div className={s.themeSwitcherSlot}>
           <ThemeSwitcher />
@@ -191,7 +191,7 @@ function RightPanel() {
         </div>
       </div>
 
-      <div className={s.section}>
+      <div className={s.section} data-section-key="moje-svety">
         <div className={s.rightSectionHeader}>
           <SectionTitle>Moje světy</SectionTitle>
           <Link to="/ikaros/vytvorit-svet" className={s.rightAddBtn} title="Vytvořit svět">+</Link>
@@ -215,7 +215,7 @@ function RightPanel() {
         </div>
       </div>
 
-      <div className={s.section}>
+      <div className={s.section} data-section-key="moje-diskuze">
         <div className={s.rightSectionHeader}>
           <SectionTitle>Moje diskuze</SectionTitle>
           <Link to="/ikaros/diskuze/nova" className={s.rightAddBtn} title="Nová diskuze">+</Link>
@@ -223,12 +223,12 @@ function RightPanel() {
         <p className={s.emptyHint}>Žádné diskuze</p>
       </div>
 
-      <div className={s.section}>
+      <div className={s.section} data-section-key="oblibene-clanky">
         <SectionTitle>Oblíbené články</SectionTitle>
         <p className={s.emptyHint}>Žádné oblíbené</p>
       </div>
 
-      <div className={s.section}>
+      <div className={s.section} data-section-key="oblibene-obrazky">
         <SectionTitle>Oblíbené obrázky</SectionTitle>
         <p className={s.emptyHint}>Žádné oblíbené</p>
       </div>

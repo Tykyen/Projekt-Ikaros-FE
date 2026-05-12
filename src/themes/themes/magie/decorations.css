@@ -1,21 +1,952 @@
-/* ── Magie — arcane fialová + zlato ── */
+/* ── Magie a kouzla — „Kouzelnická síň, kde tlačítka levitují" (spec 1.0u).
+   Glassmorphic backdrop-blur + zlato+ametyst dual border + ametyst inner glow.
+   Lehkost přichází z polotransparence + pomalého driftu + iridescence.
+
+   ⭐ HERO MOTIV: Polished glassmorphic btn3d — extension shared modulu skrz
+   [class*="btn3d"] selektor → automaticky chytí header (pošta/Tyky/odhlásit) +
+   levý panel (nav items) + pravý panel (rightAddBtn) konzistentně.
+
+   ORIGINÁLNÍ MOTIFY (žádný jiný skin):
+   - Polished glassmorphic btn3d (zlato+ametyst dual border, backdrop-blur)
+   - Faceted ametystový corner krystal (RASTER, levitace 6s phase offset)
+   - Spell-book scrying disc (RASTER, centerpiece welcome card, rotace 90s CW)
+   - 8× floating arcane sigils per section (inline SVG kruhové glyfy)
+   - Iridescent section underline (hue-shift 5 barev, 12s)
+   - Levitating navItem (individuální phase offset přes :nth-child)
+   - Sparkle orbit na active nav (3 dots, 6s)
+   - Mea Culpa signature self-draw (extra-thin éterický cursive)
+
+   Žádné AI gen WEBP mimo 2 hero raster (ametyst-corner + spell-disc).
+   16 inline SVG vars v index.ts pro sigily, ikony, signature flourish.
+
+   Scoped přes [data-theme="magie"], žádný globální dopad. */
 
 [data-theme="magie"] {
-  background-image:
-    radial-gradient(ellipse at 30% 30%, rgba(128, 32, 208, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 70%, rgba(32, 168, 208, 0.08) 0%, transparent 50%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-[data-theme="magie"] .card,
-[data-theme="magie"] [class*="card"] {
-  border-radius: 4px;
-  border: 1px solid var(--border-strong);
+/* ──────────────── 1. Atmosférický overlay ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
+/* ──────────────── 2. Topbar — glassmorphic header ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(10, 4, 24, 0.85) 0%, rgba(22, 10, 46, 0.92) 100%);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid rgba(212, 160, 23, 0.45);
+  box-shadow:
+    0 1px 0 rgba(157, 78, 221, 0.20),
+    0 4px 16px rgba(10, 4, 24, 0.65);
+  overflow: visible;
+  z-index: 5;
+}
+
+/* Gold+ametyst hairline pod topbarem */
+[data-theme="magie"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--magie-gold-antique) 25%,
+    var(--magie-amethyst-bright) 50%,
+    var(--magie-gold-antique) 75%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold)) drop-shadow(0 0 6px var(--theme-glow-amethyst));
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.85;
+}
+
+/* ──────────────── 3. Logo ──────────────── */
+
+[data-theme="magie"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 0 6px rgba(157, 78, 221, 0.50)) drop-shadow(0 0 10px rgba(212, 160, 23, 0.35));
+}
+
+[data-theme="magie"] header [class*="logoFallback"] {
+  display: var(--logo-fallback-display, none);
+  font-family: var(--font-logo);
+  font-size: 22px;
+  color: var(--magie-gold-bright);
+  text-shadow:
+    0 0 6px var(--theme-glow-gold),
+    0 0 12px var(--theme-glow-amethyst);
+  letter-spacing: 0.04em;
+}
+
+/* ──────────────── 4. ⭐ POLISHED GLASSMORPHIC btn3d (hero motiv)
+   Override shared btn3d modulu pro WŠECHNA tlačítka napříč shellem.
+   Selektor [class*="btn3d"] chytí: headerBtn, navItem, rightAddBtn, btn3dActive.
+   ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3d"] {
+  background:
+    linear-gradient(180deg, rgba(36, 16, 72, 0.40) 0%, rgba(10, 4, 24, 0.55) 100%) !important;
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(212, 160, 23, 0.50) !important;
+  color: var(--magie-silver-moon) !important;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 0 0 1px rgba(157, 78, 221, 0.18),
+    inset 0 1px 0 0 rgba(245, 200, 110, 0.18),
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.50),
+    0 3px 6px -1px rgba(0, 0, 0, 0.55),
+    0 6px 12px -3px rgba(10, 4, 24, 0.55) !important;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background 220ms ease, color 220ms ease;
+}
+
+/* Hover — gold border bright + ametyst halo */
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3d"]:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(60, 24, 110, 0.60) 0%, rgba(20, 8, 40, 0.75) 100%) !important;
+  border-color: var(--magie-gold-bright) !important;
+  color: var(--magie-pearl) !important;
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 0 0 1px rgba(157, 78, 221, 0.45),
+    inset 0 1px 0 0 rgba(255, 230, 160, 0.30),
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.55),
+    0 5px 10px -2px rgba(0, 0, 0, 0.65),
+    0 10px 18px -5px rgba(157, 78, 221, 0.45),
+    0 12px 24px -8px rgba(212, 160, 23, 0.32) !important;
+}
+
+/* Active (current route / btn3dActive) — gold rim + ametyst inner glow */
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3dActive"] {
+  background:
+    radial-gradient(ellipse 80% 100% at 50% 50%, rgba(90, 24, 154, 0.55) 0%, rgba(36, 16, 72, 0.85) 70%),
+    linear-gradient(180deg, rgba(60, 24, 110, 0.85) 0%, rgba(20, 8, 40, 0.92) 100%) !important;
+  border-color: var(--magie-gold-antique) !important;
+  color: var(--magie-pearl) !important;
+  text-shadow: 0 0 8px rgba(212, 160, 23, 0.55);
+  transform: translateY(0);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 23, 0.55),
+    inset 0 0 14px 2px rgba(157, 78, 221, 0.45),
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(212, 160, 23, 0.30),
+    0 0 16px 0 rgba(157, 78, 221, 0.40) !important;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3dActive"]:hover {
+  color: var(--magie-pearl) !important;
+  border-color: var(--magie-gold-bright) !important;
+  transform: translateY(0);
+}
+
+/* Primary CTA (Přihlásit se / save) */
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3dPrimary"] {
+  background: linear-gradient(180deg, var(--magie-gold-bright) 0%, var(--magie-gold-antique) 100%) !important;
+  border-color: rgba(255, 240, 200, 0.65) !important;
+  color: var(--theme-text-on-gold) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 245, 210, 0.55),
+    inset 0 -2px 0 0 rgba(90, 60, 8, 0.40),
+    0 4px 10px -2px rgba(212, 160, 23, 0.55),
+    0 8px 18px -4px rgba(157, 78, 221, 0.32) !important;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3dPrimary"]:hover:not(:disabled) {
+  color: var(--theme-text-on-gold) !important;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 245, 210, 0.70),
+    inset 0 -2px 0 0 rgba(90, 60, 8, 0.45),
+    0 6px 14px -2px rgba(245, 200, 83, 0.65),
+    0 12px 24px -6px rgba(212, 160, 23, 0.45) !important;
+}
+
+/* Pressed state */
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3d"]:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.55),
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.40),
+    inset 0 0 8px 0 rgba(157, 78, 221, 0.35) !important;
+}
+
+/* ──────────────── 5. Sidebar + Right panel — glassmorphic floating slabs ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+[data-theme="magie"][data-shell="ikaros"] [data-frame-panel="right"],
+[data-theme="magie"][data-shell="ikaros"] [class*="sideFrame"],
+[data-theme="magie"][data-shell="ikaros"] [class*="rightFrame"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(36, 16, 72, 0.55) 0%, rgba(10, 4, 24, 0.65) 100%);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(212, 160, 23, 0.35);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 0 1px rgba(157, 78, 221, 0.12),
+    0 8px 32px rgba(10, 4, 24, 0.55);
+}
+
+/* @supports fallback — silnější opacity bez blur */
+@supports not (backdrop-filter: blur(1px)) {
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="right"],
+  [data-theme="magie"][data-shell="ikaros"] [class*="sideFrame"],
+  [data-theme="magie"][data-shell="ikaros"] [class*="rightFrame"] {
+    background:
+      linear-gradient(160deg, rgba(36, 16, 72, 0.92) 0%, rgba(10, 4, 24, 0.95) 100%);
+  }
+}
+
+/* ──────────────── 6. ⭐ FACETED AMETYST CORNER CRYSTAL (raster, 4× per panel, levitace) ──────────────── */
+
+[data-theme="magie"] [data-position] {
+  position: absolute;
+  width: var(--asset-corner-size, 76px);
+  height: var(--asset-corner-size, 76px);
+  background-color: transparent !important;
+  background-image: var(--asset-ametyst-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none !important;
+  border-radius: 0;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 0 4px var(--theme-glow-amethyst)) drop-shadow(0 0 8px rgba(212, 160, 23, 0.30));
+  forced-color-adjust: none;
+  animation: magie-corner-levitate 6s ease-in-out infinite alternate;
+}
+
+[data-theme="magie"] [data-position="tl"] {
+  top: var(--frame-corner-inset, 6px);
+  left: var(--frame-corner-inset, 6px);
+  transform: none;
+  animation-delay: 0s;
+}
+[data-theme="magie"] [data-position="tr"] {
+  top: var(--frame-corner-inset, 6px);
+  right: var(--frame-corner-inset, 6px);
+  transform: scaleX(-1);
+  animation-delay: 1.5s;
+}
+[data-theme="magie"] [data-position="bl"] {
+  bottom: var(--frame-corner-inset, 6px);
+  left: var(--frame-corner-inset, 6px);
+  transform: scaleY(-1);
+  animation-delay: 3s;
+}
+[data-theme="magie"] [data-position="br"] {
+  bottom: var(--frame-corner-inset, 6px);
+  right: var(--frame-corner-inset, 6px);
+  transform: scale(-1, -1);
+  animation-delay: 4.5s;
+}
+
+@keyframes magie-corner-levitate {
+  0%   { translate: 0 -2px; }
+  100% { translate: 0 2px; }
+}
+
+/* ──────────────── 7. Section titles — Quintessential + iridescent underline ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="sectionTitle"],
+[data-theme="magie"][data-shell="ikaros"] [class*="sectionHeading"],
+[data-theme="magie"][data-shell="ikaros"] h3[class*="navSection"],
+[data-theme="magie"][data-shell="ikaros"] [data-section-title] {
+  position: relative;
+  color: var(--section-color, var(--magie-gold-bright));
+  font-family: var(--font-display); /* Quintessential */
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 6px var(--section-color, var(--magie-gold-antique));
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+}
+
+/* Iridescent hue-shift underline */
+[data-theme="magie"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+[data-theme="magie"][data-shell="ikaros"] [class*="sectionHeading"]::after,
+[data-theme="magie"][data-shell="ikaros"] h3[class*="navSection"]::after,
+[data-theme="magie"][data-shell="ikaros"] [data-section-title]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--magie-gold-antique) 0%,
+    var(--magie-amethyst-bright) 25%,
+    var(--magie-silver-moon) 50%,
+    var(--magie-aurora-teal) 75%,
+    var(--magie-rose-mist) 100%
+  );
+  background-size: 200% 100%;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px var(--section-color, var(--magie-amethyst)));
+  animation: magie-iridescent-shift 12s ease-in-out infinite alternate;
+}
+
+@keyframes magie-iridescent-shift {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* ──────────────── 8. Per-section barva (data-section-key + class fallback) ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="navigace"],
+[data-theme="magie"][data-shell="ikaros"] [class*="navigaceSection"] {
+  --section-color: var(--theme-section-gold);
+}
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="vesmiry"],
+[data-theme="magie"][data-shell="ikaros"] [class*="vesmirySection"] {
+  --section-color: var(--theme-section-teal);
+}
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="chat"],
+[data-theme="magie"][data-shell="ikaros"] [class*="chatSection"] {
+  --section-color: var(--theme-section-rose);
+}
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="administrace"],
+[data-theme="magie"][data-shell="ikaros"] [class*="administraceSection"] {
+  --section-color: var(--theme-section-gold);
+}
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="moje-svety"],
+[data-theme="magie"][data-shell="ikaros"] [class*="mojeSvetySection"] {
+  --section-color: var(--theme-section-teal);
+}
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="moje-diskuze"],
+[data-theme="magie"][data-shell="ikaros"] [class*="mojeDiskuzeSection"] {
+  --section-color: var(--theme-section-rose);
+}
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="oblibene-clanky"],
+[data-theme="magie"][data-shell="ikaros"] [class*="oblibeneClankySection"] {
+  --section-color: var(--theme-section-gold);
+}
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"],
+[data-theme="magie"][data-shell="ikaros"] [class*="oblibeneObrazkySection"] {
+  --section-color: var(--theme-section-silver);
+}
+
+/* ──────────────── 9. ⭐ FLOATING ARCANE SIGILS per section (watermark) ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [data-section-key]::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  color: var(--section-color, var(--magie-amethyst));
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  filter: drop-shadow(0 0 3px var(--section-color, var(--magie-amethyst)));
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="navigace"]::before        { background-image: var(--asset-sigil-nav); }
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="vesmiry"]::before         { background-image: var(--asset-sigil-universe); }
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="chat"]::before            { background-image: var(--asset-sigil-chat); }
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="administrace"]::before    { background-image: var(--asset-sigil-admin); }
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="moje-svety"]::before      { background-image: var(--asset-sigil-worlds); }
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="moje-diskuze"]::before    { background-image: var(--asset-sigil-talk); }
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="oblibene-clanky"]::before { background-image: var(--asset-sigil-book); }
+[data-theme="magie"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"]::before{ background-image: var(--asset-sigil-eye); }
+
+/* Section musí mít position:relative pro absolutní sigil */
+[data-theme="magie"][data-shell="ikaros"] [data-section-key] {
+  position: relative;
+}
+
+/* ──────────────── 10. Per-nav-key barva (6 nav items v NAVIGACE) ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key="uvodnik"]       { --nav-color: var(--magie-gold-antique); }
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] { --nav-color: var(--magie-aurora-teal); }
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key="diskuze"]       { --nav-color: var(--magie-rose-mist); }
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key="clanky"]        { --nav-color: var(--magie-gold-bright); }
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key="galerie"]       { --nav-color: var(--magie-silver-moon); }
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key="napoveda"]      { --nav-color: var(--magie-amethyst-bright); }
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key="hospoda"]       { --nav-color: var(--magie-gold-antique); }
+
+/* ──────────────── 11. ⭐ LEVITATING navItem (phase offset přes :nth-child) ──────────────── */
+
 @media (prefers-reduced-motion: no-preference) {
-  [data-theme="magie"] button:hover {
-    box-shadow: 0 0 16px rgba(128, 32, 208, 0.5);
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]):not([class*="navItemActive"]) {
+    animation: magie-nav-levitate 5s ease-in-out infinite alternate;
+  }
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(1) { animation-delay: 0s; }
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(2) { animation-delay: 0.7s; }
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(3) { animation-delay: 1.4s; }
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(4) { animation-delay: 2.1s; }
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(5) { animation-delay: 2.8s; }
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(6) { animation-delay: 3.5s; }
+}
+
+@keyframes magie-nav-levitate {
+  0%   { translate: 0 0; }
+  100% { translate: 0 -1.5px; }
+}
+
+/* ──────────────── 12. ⭐ SPARKLE ORBIT na active nav (3 dots) ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="navItemActive"]::after,
+[data-theme="magie"][data-shell="ikaros"] [class*="btn3dActive"]:not([class*="headerBtn"])::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background-color: var(--magie-amethyst-bright);
+  border-radius: 50%;
+  box-shadow:
+    0 0 4px var(--magie-amethyst-bright),
+    0 0 8px var(--magie-amethyst);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 2;
+  animation: magie-sparkle-orbit 6s linear infinite;
+}
+
+@keyframes magie-sparkle-orbit {
+  0%   { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+/* ──────────────── 13. NavItem icons — mask-image s --nav-color ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"] {
+  color: var(--nav-color, var(--magie-amethyst-bright));
+  filter: drop-shadow(0 0 3px var(--nav-color, var(--magie-amethyst)));
+}
+
+[data-theme="magie"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"] svg {
+  stroke: currentColor;
+}
+
+/* ──────────────── 14. „+" tlačítka (rightAddBtn) — ametyst plus glyph ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="rightAddBtn"] {
+  position: relative;
+  color: var(--magie-amethyst-bright) !important;
+  font-size: 0;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="rightAddBtn"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  background-color: var(--magie-amethyst-bright);
+  -webkit-mask-image: var(--asset-plus-magic);
+  mask-image: var(--asset-plus-magic);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-amethyst));
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="rightAddBtn"]:hover::after {
+  background-color: var(--magie-gold-bright);
+  filter: drop-shadow(0 0 5px var(--theme-glow-gold-strong));
+  transform: scale(1.10);
+}
+
+/* ──────────────── 15. ⭐ WELCOME CARD — glassmorphic + spell-disc centerpiece ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [data-frame-panel="card"],
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"],
+[data-theme="magie"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 80% at 25% 30%, rgba(157, 78, 221, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 75% 70%, rgba(212, 160, 23, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(36, 16, 72, 0.65) 0%, rgba(10, 4, 24, 0.78) 100%);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid var(--magie-gold-antique);
+  border-radius: 8px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 6vw, 100px);
+  min-height: clamp(380px, 50vh, 540px);
+  box-shadow:
+    inset 0 0 0 1px rgba(157, 78, 221, 0.32),
+    inset 0 0 80px rgba(10, 4, 24, 0.30),
+    0 16px 40px -8px rgba(157, 78, 221, 0.28),
+    0 24px 60px -12px rgba(212, 160, 23, 0.18),
+    0 32px 80px -16px rgba(10, 4, 24, 0.85);
+  overflow: hidden;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] {
+    background:
+      radial-gradient(ellipse 60% 80% at 25% 30%, rgba(157, 78, 221, 0.20) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(36, 16, 72, 0.95) 0%, rgba(10, 4, 24, 0.97) 100%);
+  }
+}
+
+/* Spell-disc scrying centerpiece (rotace 90s CW) */
+[data-theme="magie"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(520px, 90%);
+  height: min(520px, 90%);
+  margin: -260px 0 0 -260px;
+  max-width: 90%;
+  max-height: 90%;
+  background-image: var(--asset-spell-disc);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  mix-blend-mode: screen;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  animation: magie-spell-disc-rotate 90s linear infinite;
+}
+
+@keyframes magie-spell-disc-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ──────────────── 16. Welcome card medailon ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [data-andel-medallion],
+[data-theme="magie"][data-shell="ikaros"] [class*="medallion"] {
+  width: 192px;
+  height: 192px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 14px rgba(10, 4, 24, 0.75)) drop-shadow(0 0 12px rgba(157, 78, 221, 0.45));
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 17. Welcome card typography — Quintessential H1 + Sorts Mill Goudy body + Mea Culpa signature ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeTitle"],
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] h1,
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] h2 {
+  font-family: var(--font-display); /* Quintessential */
+  font-weight: 400;
+  font-size: clamp(32px, 4.5vw, 50px);
+  color: var(--magie-pearl);
+  text-shadow:
+    0 0 8px rgba(157, 78, 221, 0.50),
+    0 0 14px rgba(212, 160, 23, 0.30);
+  letter-spacing: 0.02em;
+  margin: 0 0 8px 0;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="titleAccent"] {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--magie-gold-bright);
+  text-shadow:
+    0 0 10px var(--theme-glow-gold-strong),
+    0 0 16px var(--theme-glow-amethyst);
+}
+
+/* Cyan→gold hairline pod welcomeTitle */
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeTitle"]::after,
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] h1::after,
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] h2::after {
+  content: '';
+  display: block;
+  margin-top: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--magie-gold-antique), var(--magie-amethyst-bright), var(--magie-gold-antique), transparent);
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+  opacity: 0.85;
+  width: 240px;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] p,
+[data-theme="magie"][data-shell="ikaros"] [class*="welcomeText"] p {
+  font-family: var(--font-body); /* Sorts Mill Goudy */
+  font-size: 16px;
+  color: var(--magie-pearl);
+  line-height: 1.75;
+  position: relative;
+  z-index: 2;
+}
+
+/* ⭐ ADMINISTRATOR SIGNATURE — Mea Culpa extra-thin cursive + self-draw flourish */
+[data-theme="magie"][data-shell="ikaros"] [class*="signature"],
+[data-theme="magie"][data-shell="ikaros"] [data-signature] {
+  font-family: var(--font-script); /* Mea Culpa */
+  font-style: normal;
+  font-size: 32px;
+  color: var(--magie-amethyst-bright);
+  text-shadow:
+    0 0 8px var(--theme-glow-amethyst-strong),
+    0 0 14px rgba(212, 160, 23, 0.40);
+  text-align: center;
+  margin-top: 24px;
+  letter-spacing: 0.02em;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="signature"]::after,
+[data-theme="magie"][data-shell="ikaros"] [data-signature]::after {
+  content: '';
+  display: block;
+  width: 280px;
+  height: 24px;
+  margin: 6px auto 0 auto;
+  background-image: var(--asset-signature-flourish);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 4px var(--theme-glow-amethyst));
+  animation: magie-signature-draw 2.5s ease-out 1;
+  animation-fill-mode: backwards;
+}
+
+@keyframes magie-signature-draw {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+  100% { clip-path: inset(0 0 0 0);    opacity: 1; }
+}
+
+/* Skryjeme ametyst-corner krystaly na novinky kartě — vypadají divně na úzkém tvaru */
+[data-theme="magie"][data-shell="ikaros"] [data-frame-panel="novinky"] [data-position] {
+  display: none;
+}
+
+/* ──────────────── 18. Novinky card — stejný glassmorphic material, bez spell-disc ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="novinkyCard"],
+[data-theme="magie"][data-shell="ikaros"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 80% at 25% 30%, rgba(157, 78, 221, 0.12) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(36, 16, 72, 0.65) 0%, rgba(10, 4, 24, 0.78) 100%);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid var(--magie-gold-antique);
+  border-radius: 6px;
+  padding: 18px 24px;
+  box-shadow:
+    inset 0 0 0 1px rgba(157, 78, 221, 0.20),
+    0 8px 24px rgba(10, 4, 24, 0.65);
+  color: var(--magie-pearl);
+  font-family: var(--font-body);
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="novinkyTitle"],
+[data-theme="magie"][data-shell="ikaros"] [class*="novinkyCard"] h3 {
+  font-family: var(--font-display); /* Quintessential */
+  color: var(--magie-gold-bright);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 4px var(--theme-glow-gold);
+}
+
+/* ──────────────── 19. Form controls — glass plate + gold border ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="magie"][data-shell="ikaros"] select,
+[data-theme="magie"][data-shell="ikaros"] textarea {
+  background: rgba(22, 10, 46, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(212, 160, 23, 0.40);
+  color: var(--magie-pearl);
+  font-family: var(--font-body);
+  border-radius: 3px;
+  padding: 8px 12px;
+  transition: all 200ms ease;
+}
+
+[data-theme="magie"][data-shell="ikaros"] input:focus,
+[data-theme="magie"][data-shell="ikaros"] select:focus,
+[data-theme="magie"][data-shell="ikaros"] textarea:focus {
+  border-color: var(--magie-amethyst-bright);
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(157, 78, 221, 0.22),
+    0 0 12px var(--theme-glow-amethyst);
+}
+
+[data-theme="magie"][data-shell="ikaros"] input::placeholder,
+[data-theme="magie"][data-shell="ikaros"] textarea::placeholder {
+  color: var(--theme-text-muted);
+  opacity: 0.65;
+  font-style: italic;
+}
+
+/* ──────────────── 20. Skin selector dropdown (ThemeSwitcher) ──────────────── */
+/* Module CSS produkuje classes začínající "ThemeSwitcher_" — case-sensitive selektor */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="ThemeSwitcher_trigger"] {
+  background-color: rgba(22, 10, 46, 0.85) !important;
+  border: 1px solid var(--magie-gold-antique) !important;
+  color: var(--magie-pearl) !important;
+  border-radius: 4px;
+  box-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="ThemeSwitcher_trigger"]:hover {
+  border-color: var(--magie-amethyst-bright) !important;
+  box-shadow: 0 0 14px var(--theme-glow-amethyst);
+}
+
+/* Popover dropdown — explicitní z-index nad section stacking + solid bg */
+[data-theme="magie"][data-shell="ikaros"] [class*="ThemeSwitcher_popover"] {
+  background: rgba(10, 4, 24, 0.97) !important;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid var(--magie-gold-antique) !important;
+  border-radius: 6px;
+  box-shadow:
+    0 16px 40px rgba(10, 4, 24, 0.85),
+    0 0 14px var(--theme-glow-amethyst) !important;
+  z-index: 9999 !important;
+}
+
+/* Option buttons — gold border, glassmorphic feel */
+[data-theme="magie"][data-shell="ikaros"] [class*="ThemeSwitcher_option"] {
+  border-color: rgba(212, 160, 23, 0.40) !important;
+  color: var(--magie-pearl) !important;
+  font-family: var(--font-display) !important;
+  letter-spacing: 0.04em;
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="ThemeSwitcher_option"]:hover {
+  border-color: var(--magie-gold-bright) !important;
+  box-shadow: 0 0 10px var(--theme-glow-amethyst);
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="ThemeSwitcher_optionActive"] {
+  border-color: var(--magie-gold-antique) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 23, 0.55),
+    inset 0 0 14px 2px rgba(157, 78, 221, 0.40),
+    0 0 12px var(--theme-glow-gold) !important;
+}
+
+/* ──────────────── 21. Tooltips, badges, scrollbars ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="tooltip"] {
+  background: rgba(22, 10, 46, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--magie-gold-antique);
+  color: var(--magie-pearl);
+  font-family: var(--font-body);
+  font-size: 13px;
+  box-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+[data-theme="magie"][data-shell="ikaros"] [class*="badge"],
+[data-theme="magie"][data-shell="ikaros"] [class*="chip"] {
+  background: rgba(157, 78, 221, 0.18);
+  border: 1px solid var(--magie-amethyst);
+  color: var(--magie-pearl);
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  border-radius: 3px;
+  padding: 2px 8px;
+}
+
+[data-theme="magie"][data-shell="ikaros"] *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+[data-theme="magie"][data-shell="ikaros"] *::-webkit-scrollbar-track {
+  background: rgba(10, 4, 24, 0.85);
+}
+[data-theme="magie"][data-shell="ikaros"] *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--magie-gold-antique) 0%, var(--magie-amethyst) 100%);
+  border-radius: 5px;
+  border: 2px solid rgba(10, 4, 24, 0.85);
+}
+[data-theme="magie"][data-shell="ikaros"] *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--magie-gold-bright) 0%, var(--magie-amethyst-bright) 100%);
+}
+
+/* ──────────────── 22. Focus visible ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] *:focus-visible {
+  outline: 2px solid var(--magie-amethyst-bright);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(157, 78, 221, 0.22);
+}
+
+/* ──────────────── 23. Empty hints ──────────────── */
+
+[data-theme="magie"][data-shell="ikaros"] [class*="emptyHint"],
+[data-theme="magie"][data-shell="ikaros"] [class*="emptyText"] {
+  font-family: var(--font-tribal-accent); /* Macondo */
+  color: var(--magie-silver-moon);
+  font-size: 14px;
+  opacity: 0.70;
+  letter-spacing: 0.02em;
+}
+
+/* ──────────────── 24. Mobile responsive (≤768px) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="magie"][data-shell="ikaros"] > header,
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="right"] {
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+  }
+
+  [data-theme="magie"] [data-position] {
+    width: var(--asset-corner-size-mobile, 40px);
+    height: var(--asset-corner-size-mobile, 40px);
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 32px 16px;
+    min-height: 320px;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+    opacity: 0.10;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="magie"][data-shell="ikaros"] [class*="medallion"] {
+    width: 144px;
+    height: 144px;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [data-section-key]::before {
+    width: 32px;
+    height: 32px;
+    top: 6px;
+    right: 8px;
+  }
+
+  /* Sparkle orbit OFF na mobilu (perf) */
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItemActive"]::after,
+  [data-theme="magie"][data-shell="ikaros"] [class*="btn3dActive"]:not([class*="headerBtn"])::after {
+    display: none;
+  }
+
+  [data-theme="magie"] header [class*="logoImg"] {
+    width: var(--asset-logo-w-mobile);
+  }
+}
+
+/* ──────────────── 25. Mobile small (≤480px) ──────────────── */
+
+@media (max-width: 480px) {
+  [data-theme="magie"][data-shell="ikaros"] > header,
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="right"] {
+    backdrop-filter: blur(6px) saturate(130%);
+    -webkit-backdrop-filter: blur(6px) saturate(130%);
+  }
+
+  [data-theme="magie"] [data-position] {
+    width: 32px;
+    height: 32px;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="magie"][data-shell="ikaros"] [class*="medallion"] {
+    width: 112px;
+    height: 112px;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 24px 12px;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] > header [class*="headerBtn"] {
+    padding: 8px 10px;
+  }
+}
+
+/* ──────────────── 26. Reduced-motion safe ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="magie"] [data-position] {
+    animation: none;
+    translate: 0 0;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+  [data-theme="magie"][data-shell="ikaros"] [class*="sectionHeading"]::after,
+  [data-theme="magie"][data-shell="ikaros"] h3[class*="navSection"]::after,
+  [data-theme="magie"][data-shell="ikaros"] [data-section-title]::after {
+    animation: none;
+    background: linear-gradient(90deg, transparent, var(--magie-gold-antique), var(--magie-amethyst), transparent);
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItem"] {
+    animation: none !important;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="magie"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+    animation: none;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [class*="navItemActive"]::after,
+  [data-theme="magie"][data-shell="ikaros"] [class*="btn3dActive"]:not([class*="headerBtn"])::after {
+    animation: none;
+    transform: translate(60px, 0);
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] [class*="signature"]::after,
+  [data-theme="magie"][data-shell="ikaros"] [data-signature]::after {
+    animation: none;
+    clip-path: inset(0);
+    opacity: 1;
+  }
+
+  [data-theme="magie"][data-shell="ikaros"] * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

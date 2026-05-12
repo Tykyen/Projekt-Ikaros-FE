@@ -1,25 +1,876 @@
-/* ── Měsíc — glassmorphism panely ── */
+/* ── Měsíc — „Lunární pohádková zahrada" (spec 1.0v).
+   Glassmorphic backdrop-blur + silver+cobalt dual border + cobalt inner glow.
+   Calm wedding-under-moonlight elegance. NE iridescent, NE comety, NE rotace na max.
+
+   ⭐ HERO MOTIV: Polished glassmorphic btn3d (silver+cobalt variant) skrz [class*="btn3d"]
+   → automaticky chytí header + nav + admin konzistentně.
+
+   ORIGINÁLNÍ MOTIVY (žádný jiný skin):
+   - Polished glassmorphic btn3d (silver+cobalt)
+   - 4 různé měsíční fáze v rozích (RASTER, per-position image)
+   - Lunar disc centerpiece (RASTER, 180s CCW — 2× pomalejší než magie)
+   - Constellation-dot hairline (connected dots, NE iridescent)
+   - Single twinkle star pulse (NE orbit)
+   - Lantern glow vlevo welcome card
+   - 8× celestial sigils per section
+   - Sail signature self-draw
+
+   Scoped přes [data-theme="mesic"], žádný globální dopad. */
 
 [data-theme="mesic"] {
-  background-image:
-    radial-gradient(circle at 50% 15%, rgba(120, 160, 240, 0.15) 0%, transparent 60%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-[data-theme="mesic"] .card,
-[data-theme="mesic"] [class*="card"] {
-  border-radius: 6px;
-  border: 1px solid rgba(184, 204, 232, 0.3);
-  background: rgba(14, 22, 58, 0.82);
-  backdrop-filter: blur(10px) saturate(1.2);
-}
+/* ──────────────── 1. Atmosférický overlay ──────────────── */
 
-[data-theme="mesic"]::after {
+[data-theme="mesic"][data-shell="ikaros"]::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: linear-gradient(to top, rgba(96, 144, 224, 0.06) 0%, transparent 30%);
+  background: var(--theme-bg-overlay);
   pointer-events: none;
   z-index: 0;
+}
+
+/* ──────────────── 2. Topbar — glassmorphic header ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(10, 20, 48, 0.85) 0%, rgba(19, 24, 58, 0.92) 100%);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border-bottom: 1px solid rgba(212, 216, 255, 0.45);
+  box-shadow:
+    0 1px 0 rgba(61, 108, 250, 0.20),
+    0 4px 16px rgba(10, 20, 48, 0.65);
+  overflow: visible;
+  z-index: 5;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--mesic-silver-moon) 25%,
+    var(--mesic-cobalt-bright) 50%,
+    var(--mesic-silver-moon) 75%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 4px var(--theme-glow-silver)) drop-shadow(0 0 6px var(--theme-glow-cobalt));
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.85;
+}
+
+/* ──────────────── 3. Logo ──────────────── */
+
+[data-theme="mesic"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 0 6px rgba(212, 216, 255, 0.50)) drop-shadow(0 0 10px rgba(61, 108, 250, 0.35));
+}
+
+[data-theme="mesic"] header [class*="logoFallback"] {
+  display: var(--logo-fallback-display, none);
+  font-family: var(--font-logo);
+  font-size: 24px;
+  color: var(--mesic-silver-bright);
+  text-shadow:
+    0 0 6px var(--theme-glow-silver),
+    0 0 12px var(--theme-glow-cobalt);
+  letter-spacing: 0.04em;
+}
+
+/* ──────────────── 4. ⭐ POLISHED GLASSMORPHIC btn3d (hero motiv) ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="btn3d"] {
+  background:
+    linear-gradient(180deg, rgba(29, 37, 82, 0.40) 0%, rgba(10, 20, 48, 0.55) 100%) !important;
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(212, 216, 255, 0.50) !important;
+  color: var(--mesic-pearl) !important;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 0 0 1px rgba(61, 108, 250, 0.18),
+    inset 0 1px 0 0 rgba(244, 248, 255, 0.20),
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.40),
+    0 3px 6px -1px rgba(0, 0, 0, 0.50),
+    0 6px 12px -3px rgba(10, 20, 48, 0.55) !important;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background 220ms ease, color 220ms ease;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="btn3d"]:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(50, 62, 130, 0.60) 0%, rgba(20, 28, 70, 0.75) 100%) !important;
+  border-color: var(--mesic-silver-bright) !important;
+  color: var(--mesic-pearl) !important;
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 0 0 1px rgba(61, 108, 250, 0.45),
+    inset 0 1px 0 0 rgba(244, 248, 255, 0.30),
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.50),
+    0 5px 10px -2px rgba(0, 0, 0, 0.60),
+    0 10px 18px -5px rgba(61, 108, 250, 0.45),
+    0 12px 24px -8px rgba(212, 216, 255, 0.30) !important;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="btn3dActive"] {
+  background:
+    radial-gradient(ellipse 80% 100% at 50% 50%, rgba(26, 58, 138, 0.55) 0%, rgba(29, 37, 82, 0.85) 70%),
+    linear-gradient(180deg, rgba(50, 62, 130, 0.85) 0%, rgba(20, 28, 70, 0.92) 100%) !important;
+  border-color: var(--mesic-silver-moon) !important;
+  color: var(--mesic-pearl) !important;
+  text-shadow: 0 0 8px rgba(212, 216, 255, 0.55);
+  transform: translateY(0);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 216, 255, 0.55),
+    inset 0 0 14px 2px rgba(61, 108, 250, 0.45),
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.50),
+    0 0 0 1px rgba(212, 216, 255, 0.30),
+    0 0 16px 0 rgba(61, 108, 250, 0.40) !important;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="btn3dActive"]:hover {
+  color: var(--mesic-pearl) !important;
+  border-color: var(--mesic-silver-bright) !important;
+  transform: translateY(0);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="btn3dPrimary"] {
+  background: linear-gradient(180deg, var(--mesic-cobalt-bright) 0%, var(--mesic-cobalt) 100%) !important;
+  border-color: rgba(244, 248, 255, 0.65) !important;
+  color: var(--theme-text-on-cobalt) !important;
+  text-shadow: 0 1px 0 rgba(10, 20, 48, 0.30);
+  box-shadow:
+    inset 0 1px 0 0 rgba(244, 248, 255, 0.55),
+    inset 0 -2px 0 0 rgba(26, 58, 138, 0.40),
+    0 4px 10px -2px rgba(61, 108, 250, 0.55),
+    0 8px 18px -4px rgba(212, 216, 255, 0.32) !important;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="btn3d"]:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.50),
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.40),
+    inset 0 0 8px 0 rgba(61, 108, 250, 0.35) !important;
+}
+
+/* ──────────────── 5. Sidebar + Right panel — glassmorphic ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+[data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="right"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="sideFrame"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="rightFrame"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(29, 37, 82, 0.50) 0%, rgba(10, 20, 48, 0.65) 100%);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(212, 216, 255, 0.35);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 0 1px rgba(61, 108, 250, 0.12),
+    0 8px 32px rgba(10, 20, 48, 0.55);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="right"] {
+    background:
+      linear-gradient(160deg, rgba(29, 37, 82, 0.92) 0%, rgba(10, 20, 48, 0.95) 100%);
+  }
+}
+
+/* ──────────────── 6. ⭐ 4 RŮZNÉ MĚSÍČNÍ FÁZE V ROZÍCH (per-position image) ──────────────── */
+
+[data-theme="mesic"] [data-position] {
+  position: absolute;
+  width: var(--asset-corner-size, 70px);
+  height: var(--asset-corner-size, 70px);
+  background-color: transparent !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none !important;
+  border-radius: 0;
+  pointer-events: none;
+  /* Lower z-index než section title (10) — corner je za textem, ne přes něj */
+  z-index: 2;
+  /* Prominentní moonlight — contrast/saturate boost + 4-vrstvý glow */
+  filter:
+    contrast(1.20)
+    saturate(1.35)
+    brightness(1.05)
+    drop-shadow(0 0 8px var(--theme-glow-silver-strong))
+    drop-shadow(0 0 16px var(--theme-glow-cobalt-strong))
+    drop-shadow(0 0 24px rgba(244, 248, 255, 0.45))
+    drop-shadow(0 2px 6px rgba(10, 20, 48, 0.6));
+  forced-color-adjust: none;
+  animation: mesic-corner-drift 7s ease-in-out infinite alternate;
+}
+
+[data-theme="mesic"] [data-position="tl"] {
+  top: var(--frame-corner-inset, 0px);
+  left: var(--frame-corner-inset, 0px);
+  background-image: var(--asset-moon-phase-tl);
+  animation-delay: 0s;
+}
+[data-theme="mesic"] [data-position="tr"] {
+  top: var(--frame-corner-inset, 0px);
+  right: var(--frame-corner-inset, 0px);
+  background-image: var(--asset-moon-phase-tr);
+  animation-delay: 1.75s;
+}
+[data-theme="mesic"] [data-position="bl"] {
+  bottom: var(--frame-corner-inset, 0px);
+  left: var(--frame-corner-inset, 0px);
+  background-image: var(--asset-moon-phase-bl);
+  animation-delay: 3.5s;
+}
+[data-theme="mesic"] [data-position="br"] {
+  bottom: var(--frame-corner-inset, 0px);
+  right: var(--frame-corner-inset, 0px);
+  background-image: var(--asset-moon-phase-br);
+  animation-delay: 5.25s;
+}
+
+@keyframes mesic-corner-drift {
+  0%   { translate: 0 -1.5px; }
+  100% { translate: 0 1.5px; }
+}
+
+/* ──────────────── 7. Section titles — Eagle Lake + constellation-dot hairline ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="sectionTitle"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="sectionHeading"],
+[data-theme="mesic"][data-shell="ikaros"] h3[class*="navSection"],
+[data-theme="mesic"][data-shell="ikaros"] [data-section-title] {
+  position: relative;
+  color: var(--section-color, var(--mesic-silver-bright));
+  font-family: var(--font-display); /* Eagle Lake */
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-shadow:
+    0 0 6px var(--section-color, var(--mesic-silver-moon)),
+    0 1px 3px rgba(10, 20, 48, 0.85);  /* dark backdrop pro čitelnost přes corner glow */
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+  /* Section title NAD corner ornamentem (corner má z-index 2) */
+  z-index: 10;
+}
+
+/* Constellation-dot hairline — radial dots + line (5 connected dots) */
+[data-theme="mesic"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+[data-theme="mesic"][data-shell="ikaros"] [class*="sectionHeading"]::after,
+[data-theme="mesic"][data-shell="ikaros"] h3[class*="navSection"]::after,
+[data-theme="mesic"][data-shell="ikaros"] [data-section-title]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background-image:
+    radial-gradient(circle 2px at 10% 50%, var(--section-color, var(--mesic-silver-moon)) 0%, transparent 100%),
+    radial-gradient(circle 2px at 30% 50%, var(--section-color, var(--mesic-silver-moon)) 0%, transparent 100%),
+    radial-gradient(circle 2.5px at 50% 50%, var(--section-color, var(--mesic-silver-moon)) 0%, transparent 100%),
+    radial-gradient(circle 2px at 70% 50%, var(--section-color, var(--mesic-silver-moon)) 0%, transparent 100%),
+    radial-gradient(circle 2px at 90% 50%, var(--section-color, var(--mesic-silver-moon)) 0%, transparent 100%),
+    linear-gradient(90deg, transparent 5%, var(--section-color, var(--mesic-silver-moon)) 10%, var(--section-color, var(--mesic-silver-moon)) 90%, transparent 95%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 1px;
+  background-position: 0 50%, 0 50%, 0 50%, 0 50%, 0 50%, 0 50%;
+  background-repeat: no-repeat;
+  opacity: 0.75;
+  filter: drop-shadow(0 0 3px var(--section-color, var(--mesic-silver-moon)));
+}
+
+/* ──────────────── 8. Per-section barva ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="navigace"]        { --section-color: var(--theme-section-silver); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="vesmiry"]         { --section-color: var(--theme-section-cobalt); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="chat"]            { --section-color: var(--theme-section-pearl); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="administrace"]    { --section-color: var(--theme-section-silver); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-svety"]      { --section-color: var(--theme-section-cobalt); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-diskuze"]    { --section-color: var(--theme-section-pearl); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-clanky"] { --section-color: var(--theme-section-cream); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"]{ --section-color: var(--theme-section-silver); }
+
+/* ──────────────── 9. Floating celestial sigils per section ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key]::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  color: var(--section-color, var(--mesic-silver-moon));
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.10;
+  filter: drop-shadow(0 0 3px var(--section-color, var(--mesic-silver-moon)));
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key]            { position: relative; }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="navigace"]::before        { background-image: var(--asset-sigil-nav); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="vesmiry"]::before         { background-image: var(--asset-sigil-universe); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="chat"]::before            { background-image: var(--asset-sigil-chat); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="administrace"]::before    { background-image: var(--asset-sigil-admin); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-svety"]::before      { background-image: var(--asset-sigil-worlds); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-diskuze"]::before    { background-image: var(--asset-sigil-talk); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-clanky"]::before { background-image: var(--asset-sigil-book); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"]::before{ background-image: var(--asset-sigil-image); }
+
+/* ──────────────── 10. Per-nav-key barva (6 nav items) ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key="uvodnik"]       { --nav-color: var(--mesic-silver-moon); }
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] { --nav-color: var(--mesic-cobalt-bright); }
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key="diskuze"]       { --nav-color: var(--mesic-pearl); }
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key="clanky"]        { --nav-color: var(--mesic-cream); }
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key="galerie"]       { --nav-color: var(--mesic-silver-bright); }
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key="napoveda"]      { --nav-color: var(--mesic-cobalt); }
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key="hospoda"]       { --nav-color: var(--mesic-silver-moon); }
+
+/* ──────────────── 11. Levitating navItem (subtle phase offset) ──────────────── */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]):not([class*="navItemActive"]) {
+    animation: mesic-nav-drift 6s ease-in-out infinite alternate;
+  }
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(1) { animation-delay: 0s; }
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(2) { animation-delay: 0.85s; }
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(3) { animation-delay: 1.7s; }
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(4) { animation-delay: 2.55s; }
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(5) { animation-delay: 3.4s; }
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemActive"]):nth-child(6) { animation-delay: 4.25s; }
+}
+
+@keyframes mesic-nav-drift {
+  0%   { translate: 0 0; }
+  100% { translate: 0 -1px; }
+}
+
+/* ──────────────── 12. ⭐ SINGLE TWINKLE STAR na active nav (NE orbit) ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="navItemActive"]::after,
+[data-theme="mesic"][data-shell="ikaros"] [class*="btn3dActive"]:not([class*="headerBtn"])::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  background-color: var(--mesic-silver-moon);
+  -webkit-mask-image: var(--asset-twinkle-star);
+  mask-image: var(--asset-twinkle-star);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  filter: drop-shadow(0 0 4px var(--mesic-silver-moon));
+  pointer-events: none;
+  z-index: 2;
+  animation: mesic-twinkle-pulse 4s ease-in-out infinite;
+}
+
+@keyframes mesic-twinkle-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+/* ──────────────── 13. NavItem icons — mask-image s --nav-color ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"] {
+  color: var(--nav-color, var(--mesic-silver-moon));
+  filter: drop-shadow(0 0 3px var(--nav-color, var(--mesic-silver-moon)));
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"] svg {
+  stroke: currentColor;
+}
+
+/* ──────────────── 14. „+" tlačítka ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="rightAddBtn"] {
+  position: relative;
+  color: var(--mesic-silver-bright) !important;
+  font-size: 0;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="rightAddBtn"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  background-color: var(--mesic-silver-bright);
+  -webkit-mask-image: var(--asset-plus-lunar);
+  mask-image: var(--asset-plus-lunar);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-silver));
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="rightAddBtn"]:hover::after {
+  background-color: var(--mesic-cobalt-bright);
+  filter: drop-shadow(0 0 5px var(--theme-glow-cobalt-strong));
+  transform: scale(1.10);
+}
+
+/* ──────────────── 15. ⭐ WELCOME CARD — glassmorphic + lunar disc centerpiece + lantern glow ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 80% at 25% 30%, rgba(61, 108, 250, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 75% 70%, rgba(212, 216, 255, 0.10) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(29, 37, 82, 0.60) 0%, rgba(10, 20, 48, 0.78) 100%);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--mesic-silver-moon);
+  border-radius: 8px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 6vw, 100px);
+  min-height: clamp(380px, 50vh, 540px);
+  box-shadow:
+    inset 0 0 0 1px rgba(61, 108, 250, 0.30),
+    inset 0 0 80px rgba(10, 20, 48, 0.30),
+    0 16px 40px -8px rgba(61, 108, 250, 0.28),
+    0 24px 60px -12px rgba(212, 216, 255, 0.18),
+    0 32px 80px -16px rgba(10, 20, 48, 0.85);
+  overflow: hidden;
+}
+
+/* Lunar disc scrying centerpiece (rotace 180s CCW — 2× pomalejší než magie + opačný směr) */
+[data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(520px, 90%);
+  height: min(520px, 90%);
+  margin: -260px 0 0 -260px;
+  background-image: var(--asset-moon-disc);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  mix-blend-mode: screen;
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+  animation: mesic-disc-rotate 180s linear infinite;
+}
+
+@keyframes mesic-disc-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Lantern glow vlevo welcome card — warm cream pulse 8s (reference k BG lanternám) */
+[data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"]::after {
+  content: '';
+  position: absolute;
+  top: 75%;
+  left: 8%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(245, 239, 214, 0.45) 0%, rgba(245, 239, 214, 0.15) 40%, transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+  animation: mesic-lantern-pulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes mesic-lantern-pulse {
+  0%   { opacity: 0.4; transform: scale(0.95); }
+  100% { opacity: 0.85; transform: scale(1.05); }
+}
+
+/* ──────────────── 16. Welcome card medailon ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-andel-medallion],
+[data-theme="mesic"][data-shell="ikaros"] [class*="medallion"] {
+  width: 192px;
+  height: 192px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 14px rgba(10, 20, 48, 0.75)) drop-shadow(0 0 12px rgba(61, 108, 250, 0.45));
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 17. Welcome card typography ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeTitle"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"] h1,
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"] h2 {
+  font-family: var(--font-display); /* Eagle Lake */
+  font-weight: 400;
+  font-size: clamp(32px, 4.5vw, 50px);
+  color: var(--mesic-pearl);
+  text-shadow:
+    0 0 8px rgba(61, 108, 250, 0.50),
+    0 0 14px rgba(212, 216, 255, 0.40);
+  letter-spacing: 0.02em;
+  margin: 0 0 8px 0;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="titleAccent"] {
+  font-family: var(--font-display);
+  color: var(--mesic-silver-bright);
+  text-shadow:
+    0 0 10px var(--theme-glow-silver-strong),
+    0 0 16px var(--theme-glow-cobalt);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeTitle"]::after,
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"] h1::after,
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"] h2::after {
+  content: '';
+  display: block;
+  margin-top: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mesic-silver-moon), var(--mesic-cobalt-bright), var(--mesic-silver-moon), transparent);
+  filter: drop-shadow(0 0 4px var(--theme-glow-silver));
+  opacity: 0.85;
+  width: 240px;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"] p,
+[data-theme="mesic"][data-shell="ikaros"] [class*="welcomeText"] p {
+  font-family: var(--font-body); /* Cormorant Infant */
+  font-size: 16px;
+  color: var(--mesic-pearl);
+  line-height: 1.75;
+  position: relative;
+  z-index: 2;
+}
+
+/* ⭐ Sail signature self-draw */
+[data-theme="mesic"][data-shell="ikaros"] [class*="signature"],
+[data-theme="mesic"][data-shell="ikaros"] [data-signature] {
+  font-family: var(--font-script); /* Sail */
+  font-style: italic;
+  font-size: 24px;
+  color: var(--mesic-silver-bright);
+  text-shadow:
+    0 0 8px var(--theme-glow-silver-strong),
+    0 0 14px rgba(61, 108, 250, 0.40);
+  text-align: center;
+  margin-top: 24px;
+  letter-spacing: 0.02em;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="signature"]::after,
+[data-theme="mesic"][data-shell="ikaros"] [data-signature]::after {
+  content: '';
+  display: block;
+  width: 280px;
+  height: 24px;
+  margin: 6px auto 0 auto;
+  background-image: var(--asset-signature-flourish);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 4px var(--theme-glow-silver));
+  animation: mesic-signature-draw 2.5s ease-out 1;
+  animation-fill-mode: backwards;
+}
+
+@keyframes mesic-signature-draw {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+  100% { clip-path: inset(0 0 0 0);    opacity: 1; }
+}
+
+/* ──────────────── 18. Novinky card (krystaly skryté — vypadají divně na úzkém tvaru) ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="novinky"] [data-position] {
+  display: none;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="novinkyCard"],
+[data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 80% at 25% 30%, rgba(61, 108, 250, 0.12) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(29, 37, 82, 0.60) 0%, rgba(10, 20, 48, 0.78) 100%);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid var(--mesic-silver-moon);
+  border-radius: 6px;
+  padding: 18px 24px;
+  box-shadow:
+    inset 0 0 0 1px rgba(61, 108, 250, 0.20),
+    0 8px 24px rgba(10, 20, 48, 0.65);
+  color: var(--mesic-pearl);
+  font-family: var(--font-body);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="novinkyTitle"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="novinkyCard"] h3 {
+  font-family: var(--font-display);
+  color: var(--mesic-silver-bright);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 4px var(--theme-glow-silver);
+}
+
+/* ──────────────── 19. Form controls ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="mesic"][data-shell="ikaros"] select,
+[data-theme="mesic"][data-shell="ikaros"] textarea {
+  background: rgba(19, 24, 58, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(212, 216, 255, 0.40);
+  color: var(--mesic-pearl);
+  font-family: var(--font-body);
+  border-radius: 3px;
+  padding: 8px 12px;
+  transition: all 200ms ease;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] input:focus,
+[data-theme="mesic"][data-shell="ikaros"] select:focus,
+[data-theme="mesic"][data-shell="ikaros"] textarea:focus {
+  border-color: var(--mesic-cobalt-bright);
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(61, 108, 250, 0.22),
+    0 0 12px var(--theme-glow-cobalt);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] input::placeholder,
+[data-theme="mesic"][data-shell="ikaros"] textarea::placeholder {
+  color: var(--theme-text-muted);
+  opacity: 0.65;
+  font-style: italic;
+}
+
+/* ──────────────── 20. ThemeSwitcher dropdown (jako magie — module CSS scoped) ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="ThemeSwitcher_trigger"] {
+  background-color: rgba(19, 24, 58, 0.85) !important;
+  border: 1px solid var(--mesic-silver-moon) !important;
+  color: var(--mesic-pearl) !important;
+  border-radius: 4px;
+  box-shadow: 0 0 8px var(--theme-glow-silver);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="ThemeSwitcher_trigger"]:hover {
+  border-color: var(--mesic-cobalt-bright) !important;
+  box-shadow: 0 0 14px var(--theme-glow-cobalt);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="ThemeSwitcher_popover"] {
+  background: rgba(10, 20, 48, 0.97) !important;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid var(--mesic-silver-moon) !important;
+  border-radius: 6px;
+  box-shadow:
+    0 16px 40px rgba(10, 20, 48, 0.85),
+    0 0 14px var(--theme-glow-cobalt) !important;
+  z-index: 9999 !important;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="ThemeSwitcher_option"] {
+  border-color: rgba(212, 216, 255, 0.40) !important;
+  color: var(--mesic-pearl) !important;
+  font-family: var(--font-display) !important;
+  letter-spacing: 0.04em;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="ThemeSwitcher_option"]:hover {
+  border-color: var(--mesic-silver-bright) !important;
+  box-shadow: 0 0 10px var(--theme-glow-cobalt);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="ThemeSwitcher_optionActive"] {
+  border-color: var(--mesic-silver-moon) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 216, 255, 0.55),
+    inset 0 0 14px 2px rgba(61, 108, 250, 0.40),
+    0 0 12px var(--theme-glow-silver) !important;
+}
+
+/* ──────────────── 21. Tooltips, badges, scrollbars ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="tooltip"] {
+  background: rgba(19, 24, 58, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--mesic-silver-moon);
+  color: var(--mesic-pearl);
+  font-family: var(--font-body);
+  font-size: 13px;
+  box-shadow: 0 0 8px var(--theme-glow-silver);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="badge"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="chip"] {
+  background: rgba(61, 108, 250, 0.18);
+  border: 1px solid var(--mesic-cobalt);
+  color: var(--mesic-pearl);
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  border-radius: 3px;
+  padding: 2px 8px;
+}
+
+[data-theme="mesic"][data-shell="ikaros"] *::-webkit-scrollbar { width: 10px; height: 10px; }
+[data-theme="mesic"][data-shell="ikaros"] *::-webkit-scrollbar-track { background: rgba(10, 20, 48, 0.85); }
+[data-theme="mesic"][data-shell="ikaros"] *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--mesic-silver-moon) 0%, var(--mesic-cobalt) 100%);
+  border-radius: 5px;
+  border: 2px solid rgba(10, 20, 48, 0.85);
+}
+[data-theme="mesic"][data-shell="ikaros"] *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--mesic-silver-bright) 0%, var(--mesic-cobalt-bright) 100%);
+}
+
+/* ──────────────── 22. Focus + empty hints ──────────────── */
+
+[data-theme="mesic"][data-shell="ikaros"] *:focus-visible {
+  outline: 2px solid var(--mesic-cobalt-bright);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(61, 108, 250, 0.22);
+}
+
+[data-theme="mesic"][data-shell="ikaros"] [class*="emptyHint"],
+[data-theme="mesic"][data-shell="ikaros"] [class*="emptyText"] {
+  font-family: var(--font-tribal-accent); /* Imperial Script */
+  color: var(--mesic-silver-moon);
+  font-size: 16px;
+  opacity: 0.70;
+  letter-spacing: 0.02em;
+}
+
+/* ──────────────── 23. Mobile responsive (≤768px) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="mesic"][data-shell="ikaros"] > header,
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="right"] {
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+  }
+
+  [data-theme="mesic"] [data-position] {
+    width: var(--asset-corner-size-mobile, 42px);
+    height: var(--asset-corner-size-mobile, 42px);
+  }
+
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 32px 16px;
+    min-height: 320px;
+  }
+
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+    opacity: 0.12;
+  }
+
+  [data-theme="mesic"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="mesic"][data-shell="ikaros"] [class*="medallion"] {
+    width: 144px;
+    height: 144px;
+  }
+
+  [data-theme="mesic"][data-shell="ikaros"] [data-section-key]::before {
+    width: 32px;
+    height: 32px;
+    top: 6px;
+    right: 8px;
+  }
+
+  /* Twinkle star OFF na mobilu */
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItemActive"]::after,
+  [data-theme="mesic"][data-shell="ikaros"] [class*="btn3dActive"]:not([class*="headerBtn"])::after {
+    display: none;
+  }
+
+  [data-theme="mesic"] header [class*="logoImg"] {
+    width: var(--asset-logo-w-mobile);
+  }
+}
+
+@media (max-width: 480px) {
+  [data-theme="mesic"][data-shell="ikaros"] > header,
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="right"] {
+    backdrop-filter: blur(6px) saturate(130%);
+    -webkit-backdrop-filter: blur(6px) saturate(130%);
+  }
+
+  [data-theme="mesic"] [data-position] { width: 34px; height: 34px; }
+
+  [data-theme="mesic"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="mesic"][data-shell="ikaros"] [class*="medallion"] {
+    width: 112px;
+    height: 112px;
+  }
+
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="mesic"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 24px 12px;
+  }
+}
+
+/* ──────────────── 24. Reduced-motion safe ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="mesic"] [data-position],
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItem"],
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="mesic"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+  [data-theme="mesic"][data-shell="ikaros"] [class*="navItemActive"]::after,
+  [data-theme="mesic"][data-shell="ikaros"] [class*="btn3dActive"]:not([class*="headerBtn"])::after {
+    animation: none !important;
+    translate: 0 0;
+  }
+
+  [data-theme="mesic"][data-shell="ikaros"] [class*="signature"]::after,
+  [data-theme="mesic"][data-shell="ikaros"] [data-signature]::after {
+    animation: none;
+    clip-path: inset(0);
+    opacity: 1;
+  }
+
+  [data-theme="mesic"][data-shell="ikaros"] * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

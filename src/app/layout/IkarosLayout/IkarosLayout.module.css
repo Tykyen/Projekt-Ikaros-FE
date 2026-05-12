@@ -98,8 +98,11 @@
 }
 
 .avatar {
-  width: 20px;
-  height: 20px;
+  /* Override UserAvatar's own `.sm` class (32px) — header avatar must match
+     Mail/LogOut icons (size=16). Specificity tie with UserAvatar.module.css,
+     load order isn't deterministic → !important wins. */
+  width: 16px !important;
+  height: 16px !important;
   border-radius: var(--radius-full);
   background: var(--accent-soft);
   border: 1px solid var(--accent);
@@ -258,11 +261,14 @@
 }
 
 .navItemLabel {
-  line-height: 1.2;
+  line-height: 1.3;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Vždy plný název — žádný ellipsis (žádné „...") — dlouhé labely wrapnou na 2 řádky */
+  white-space: normal;
+  overflow: visible;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .worldOnlineDot {
