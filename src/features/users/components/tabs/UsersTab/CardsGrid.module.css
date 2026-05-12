@@ -1,0 +1,60 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.empty,
+.error {
+  grid-column: 1 / -1;
+  padding: var(--sp-12) var(--sp-6);
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--theme-text-muted, var(--text-muted));
+  border: 1px dashed var(--theme-border-soft, var(--frame-border));
+  border-radius: var(--radius-lg);
+}
+
+.skeleton {
+  height: 220px;
+  background: var(--theme-surface-soft, var(--surface-2));
+  border: 1px solid var(--theme-border-soft, var(--frame-border));
+  border-radius: var(--radius-lg);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-3);
+  }
+}
+
+@media (max-width: 360px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

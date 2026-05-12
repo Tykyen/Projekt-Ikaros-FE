@@ -1,0 +1,70 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 2px var(--sp-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 0 0 1px transparent;
+  transition: box-shadow var(--transition-base);
+}
+
+.chip:hover {
+  box-shadow: 0 0 0 3px var(--chip-ring, transparent);
+}
+
+.sm {
+  font-size: 10px;
+  padding: 1px var(--sp-1);
+  letter-spacing: 0.06em;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.label {
+  display: inline-block;
+}
+
+/* Superadmin — gold/bright */
+.chip--superadmin {
+  background: var(--role-superadmin-bg);
+  color: var(--role-superadmin-fg);
+  --chip-ring: var(--role-superadmin-ring);
+}
+
+/* Admin — brand accent */
+.chip--admin {
+  background: var(--role-admin-bg);
+  color: var(--role-admin-fg);
+  --chip-ring: var(--role-admin-ring);
+}
+
+/* Správce článků — amber */
+.chip--spravce-clanku {
+  background: var(--role-spravce-clanku-bg);
+  color: var(--role-spravce-clanku-fg);
+  --chip-ring: var(--role-spravce-clanku-ring);
+}
+
+/* Správce galerie — magenta */
+.chip--spravce-galerie {
+  background: var(--role-spravce-galerie-bg);
+  color: var(--role-spravce-galerie-fg);
+  --chip-ring: var(--role-spravce-galerie-ring);
+}
+
+/* Správce diskuzí — teal */
+.chip--spravce-diskuzi {
+  background: var(--role-spravce-diskuzi-bg);
+  color: var(--role-spravce-diskuzi-fg);
+  --chip-ring: var(--role-spravce-diskuzi-ring);
+}
