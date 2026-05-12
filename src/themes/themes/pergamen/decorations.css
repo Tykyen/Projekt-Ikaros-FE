@@ -1,29 +1,750 @@
-/* ── Pergamen — knihovna, světlé pergamen karty na tmavém dřevě ── */
+/* ── Pergamen — klášterní skriptórium 13. století × Tolkienova chronika
+   Pergamen + tmavé dřevo + zlatá iluminace + burgundy pečetě.
+   14 dodaných assetů: logo, medailon, big-book, corner-tl,
+   7× pečeť, wax-seal, bookmark, divider-seal.
+   Iluminované „V" = CSS-only ::first-letter drop-cap (žádný asset).
+   Scoped přes [data-theme="pergamen"], žádný globální dopad. */
 
 [data-theme="pergamen"] {
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(208, 128, 32, 0.20) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 100%, rgba(138, 26, 16, 0.10) 0%, transparent 70%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   background-color: var(--bg-primary);
 }
 
-/* Pergamenové karty — světlé, mírně zaoblené */
-[data-theme="pergamen"] .card,
-[data-theme="pergamen"] [class*="card"] {
-  border-radius: 4px;
-  border: 1px solid var(--border-strong);
-  box-shadow: 0 4px 12px rgba(20, 10, 4, 0.4);
+/* ──────────────── 1. Atmosférický overlay (audit H2 — pure darken) ──────────────── */
+
+[data-theme="pergamen"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Tenká zlatá linka pod nadpisy */
-[data-theme="pergamen"] h1::after,
-[data-theme="pergamen"] h2::after {
+/* ──────────────── 2. Topbar — slim 56px, dřevěný panel ──────────────── */
+
+[data-theme="pergamen"][data-shell="ikaros"] > header {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(40, 26, 12, 0.96) 0%, rgba(28, 18, 8, 0.96) 100%);
+  border-bottom: 1px solid var(--theme-border-gold);
+  box-shadow: 0 1px 0 rgba(212, 169, 70, 0.15), 0 4px 12px rgba(20, 14, 4, 0.6);
+}
+
+/* Zlatá hairline pod topbarem */
+[data-theme="pergamen"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-accent-gold) 25%,
+    var(--theme-accent-gold) 75%,
+    transparent 100%
+  );
+  opacity: 0.45;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+}
+
+/* ──────────────── 3. Logo banner ──────────────── */
+
+[data-theme="pergamen"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(20, 14, 4, 0.7));
+}
+
+/* ──────────────── 4. Header buttons — dřevěné cedulky + zlatý text + zlatý rám ──────────────── */
+
+[data-theme="pergamen"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #28190a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(120, 80, 30, 0.35), transparent 60%);
+  color: var(--theme-accent-gold);
+  border: 1px solid #5a3f1c;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  padding: 0 14px;
+  height: 32px;
+  min-height: 32px;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 169, 70, 0.45),
+    inset 0 1px 0 rgba(212, 169, 70, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 169, 70, 0.18),
+    0 2px 4px rgba(20, 14, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 3px var(--theme-glow-gold);
+}
+
+[data-theme="pergamen"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: #7a5828;
+  color: var(--theme-accent-gold-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 96, 0.65),
+    inset 0 1px 0 rgba(240, 200, 96, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-gold-strong),
+    0 2px 6px rgba(20, 14, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 5px var(--theme-glow-gold-strong);
+}
+
+[data-theme="pergamen"] [class*="headerBtnIcon"],
+[data-theme="pergamen"] [class*="headerBtnLabel"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+/* ──────────────── 5. Glass panely — tmavé dřevo + zlatý border ──────────────── */
+
+[data-theme="pergamen"] [data-frame-panel="sidebar"],
+[data-theme="pergamen"] [data-frame-panel="right"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(40, 26, 12, 0.88) 0%, rgba(28, 18, 8, 0.94) 100%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 169, 70, 0.12),
+    0 4px 18px rgba(20, 14, 4, 0.55),
+    inset 0 0 24px rgba(138, 26, 16, 0.08);
+}
+
+/* Welcome card + Novinky = světlý pergamen — knižní stránky, tmavý text */
+[data-theme="pergamen"] [data-frame-panel="card"],
+[data-theme="pergamen"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 35%, #f0e0b8 0%, #e0cc94 60%, #c8b078 100%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid var(--theme-accent-gold);
+  border-radius: 8px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(138, 26, 16, 0.18),
+    inset 0 0 60px rgba(138, 26, 16, 0.10),
+    0 6px 24px rgba(20, 14, 4, 0.65);
+}
+
+/* ──────────────── 6. Corner ornamenty — 4× CornerOrnament span via [data-position] ──────────────── */
+
+[data-theme="pergamen"] [data-frame-panel] [class*="ornament"] {
+  width: var(--asset-corner-size);
+  height: var(--asset-corner-size);
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+  position: absolute;
+  display: block;
+  /* potlačit default tvar diamantu z CornerOrnament.module.css */
+  transform: none;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* TL */
+[data-theme="pergamen"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+}
+/* TR — mirror přes scaleX */
+[data-theme="pergamen"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scaleX(-1);
+}
+/* BL — mirror přes scaleY */
+[data-theme="pergamen"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+  transform: scaleY(-1);
+}
+/* BR — mirror obě */
+[data-theme="pergamen"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scale(-1, -1);
+}
+
+/* Z-index strategy — content nad ornamenty */
+[data-theme="pergamen"] [data-frame-panel] > [class*="header"],
+[data-theme="pergamen"] [data-frame-panel] > [class*="body"] {
+  position: relative;
+  z-index: 1;
+}
+
+/* ──────────────── 7. Welcome card — pergamenové pozadí, tmavý text (varianta B) ──────────────── */
+
+[data-theme="pergamen"] [data-frame-panel="card"] {
+  min-height: clamp(420px, 60vh, 720px);
+}
+
+/* Welcome heading — tmavý inkoust na pergamenu */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  color: #2a1a08;
+  font-family: var(--font-display);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* "Projektu Ikaros." accent — burgundy script italic */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-accent-burgundy);
+  font-family: var(--font-script);
+  font-style: italic;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+  font-weight: 500;
+}
+
+/* Body paragraphs — tmavý inkoust */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="paragraph"] {
+  color: #2a1a08;
+  font-family: var(--font-body);
+}
+
+/* Signature — burgundy IM Fell English italic */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="signature"] {
+  color: var(--theme-accent-burgundy);
+  font-family: var(--font-script);
+  font-style: italic;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* Decorativní zlatá hairline pod nadpisem (jako v mockupu — knižní pravítko) */
+[data-theme="pergamen"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
   content: '';
   display: block;
-  width: 60%;
+  margin-top: 10px;
   height: 1px;
-  background: var(--border-strong);
-  margin-top: var(--sp-2);
-  opacity: 0.5;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-accent-gold) 20%,
+    var(--theme-accent-gold-bright) 50%,
+    var(--theme-accent-gold) 80%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+/* ──────────────── 8. Andel medailon ──────────────── */
+
+[data-theme="pergamen"] [data-andel-medallion] {
+  width: 240px;
+  height: 290px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 12px rgba(20, 14, 4, 0.6));
+}
+
+/* ──────────────── 9. Bookmark — DROPPED (mockup ho nemá, čistší layout) ──────────────── */
+/* (Bookmark asset zůstává v public/themes/pergamen/decor/ pro budoucí use.) */
+
+/* ──────────────── 10. Section title — zlatý Cinzel + gradient + divider seal ──────────────── */
+
+[data-theme="pergamen"] [class*="sectionTitle"] {
+  color: var(--theme-accent-gold);
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-family: var(--font-baroque);
+  font-weight: 400;
+  font-size: 1.35em;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(20, 14, 4, 0.7);
+  position: relative;
+  padding-bottom: 14px;
+}
+
+[data-theme="pergamen"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12px;
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--theme-accent-gold) 30%,
+      transparent 48%,
+      transparent 52%,
+      var(--theme-accent-gold) 70%,
+      transparent 100%
+    ),
+    var(--asset-divider-seal);
+  background-size: 100% 1px, 12px 12px;
+  background-position: 0 50%, center center;
+  background-repeat: no-repeat, no-repeat;
+  opacity: 0.85;
+}
+
+/* ──────────────── 11. NavItem (btn3d) — dřevo gradient + burgundy active ──────────────── */
+
+[data-theme="pergamen"] [class*="btn3d"] {
+  --btn-bg-1: rgba(40, 26, 12, 0.92);
+  --btn-bg-2: rgba(28, 18, 8, 0.95);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-text);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 169, 70, 0.10),
+    inset 0 -2px 4px 0 rgba(20, 14, 4, 0.65),
+    0 2px 5px 0 rgba(20, 14, 4, 0.55);
+}
+
+[data-theme="pergamen"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(58, 38, 18, 0.95);
+  --btn-bg-2: rgba(34, 22, 10, 0.98);
+  --btn-border: var(--theme-accent-gold);
+  --btn-color: var(--theme-accent-gold-bright);
+  --btn-translate: -1px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 169, 70, 0.18),
+    inset 0 -2px 4px 0 rgba(20, 14, 4, 0.65),
+    0 0 12px var(--theme-glow-gold),
+    0 4px 7px 0 rgba(20, 14, 4, 0.55);
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+}
+
+[data-theme="pergamen"] [class*="btn3dActive"],
+[data-theme="pergamen"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(138, 26, 16, 0.45);
+  --btn-bg-2: rgba(40, 26, 12, 0.65);
+  --btn-border: var(--theme-accent-gold);
+  --btn-color: var(--theme-text-on-burgundy);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -2px 4px 0 rgba(20, 14, 4, 0.45),
+    inset 2px 0 0 0 var(--theme-accent-gold),
+    0 0 14px var(--theme-glow-burgundy);
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+/* NavItem text (boxíky ÚVODNÍK / NÁPOVĚDA / DISKUZE / ČLÁNKY / GALERIE / VYTVOŘIT SVĚT)
+   — barokní psací font (Petit Formal Script). Větší font-size pro čitelnost. */
+[data-theme="pergamen"] [class*="navItem"] [class*="navItemLabel"],
+[data-theme="pergamen"] [class*="btn3d"] [class*="navItemLabel"] {
+  font-family: var(--font-baroque);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 1.25em;
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+/* ──────────────── 12. Pravý panel — ThemeSwitcher trigger ──────────────── */
+
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #28190a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(120, 80, 30, 0.35), transparent 60%);
+  color: var(--theme-accent-gold);
+  border: 1px solid #5a3f1c;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6), 0 0 3px var(--theme-glow-gold);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 169, 70, 0.45),
+    inset 0 1px 0 rgba(212, 169, 70, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 169, 70, 0.18),
+    0 2px 4px rgba(20, 14, 4, 0.6);
+  height: 38px;
+}
+
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: #7a5828;
+  color: var(--theme-accent-gold-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 96, 0.65),
+    inset 0 1px 0 rgba(240, 200, 96, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-gold-strong),
+    0 2px 6px rgba(20, 14, 4, 0.6);
+}
+
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]::before {
+  display: none;
+}
+
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] [class*="triggerCaret"] {
+  color: var(--theme-accent-gold);
+  font-size: 11px;
+}
+
+/* Empty hints */
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="emptyHint"] {
+  font-family: var(--font-script);
+  font-style: italic;
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+/* "+" tlačítko — Wax seal CTA (audit H5: jen na PŘIDAT NOVINKU/rightAddBtn, NE showAllLink) */
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="rightAddBtn"] {
+  background: linear-gradient(180deg, rgba(138, 26, 16, 0.55) 0%, rgba(40, 26, 12, 0.85) 100%);
+  border: 1px solid var(--theme-accent-gold);
+  color: var(--theme-accent-gold);
+  text-shadow: 0 0 4px var(--theme-glow-gold);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 169, 70, 0.20),
+    inset 0 -1px 2px rgba(20, 14, 4, 0.55),
+    0 1px 3px rgba(20, 14, 4, 0.5);
+  border-radius: 4px;
+}
+
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover {
+  background: linear-gradient(180deg, rgba(168, 48, 32, 0.75) 0%, rgba(58, 38, 18, 0.95) 100%);
+  color: var(--theme-accent-gold-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 169, 70, 0.30),
+    inset 0 -1px 2px rgba(20, 14, 4, 0.55),
+    0 0 10px var(--theme-glow-gold);
+}
+
+/* Section spacing */
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="section"]:not([class*="sectionTitle"]):not([class*="rightSectionHeader"]) {
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+/* Pravý panel kompaktnější */
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1) var(--sp-2);
+  font-size: 0.66rem;
+}
+
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="pergamen"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+/* ──────────────── 13. PJ badge ──────────────── */
+
+[data-theme="pergamen"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-accent-gold-bright), var(--theme-accent-gold));
+  color: var(--theme-text-on-gold);
+  border: 1px solid #8a6420;
+  box-shadow:
+    0 0 8px var(--theme-glow-gold),
+    inset 0 0 0 1px var(--theme-accent-burgundy),
+    inset 0 1px 0 0 rgba(255, 248, 224, 0.30);
+  text-shadow: none;
+}
+
+/* ──────────────── 14. Welcome heading — drop-cap DROPPED, styling v sekci 7 ──────────────── */
+/* (Welcome card má specifický light-pergamen styling v sekci 7 — drop-cap neaplikujeme,
+   mockup čistý layout bez drop-cap.) */
+
+/* ──────────────── 15. Nav ikony — 7 unikátních pečetí přes data-nav-key ──────────────── */
+
+[data-theme="pergamen"] [data-nav-key] [class*="navItemIcon"] {
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-burgundy));
+}
+
+[data-theme="pergamen"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+[data-theme="pergamen"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="pergamen"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="pergamen"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="pergamen"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="pergamen"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="pergamen"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="pergamen"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* ──────────────── 16. Novinky panel — light pergamen, tmavý text + wax seal CTA ──────────────── */
+
+/* Heading "Novinky" — burgundy script italic */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="novinkyTitle"] {
+  color: var(--theme-accent-burgundy);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* Lucide Newspaper ikona vedle headingu */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="novinkyTitle"] svg {
+  color: var(--theme-accent-burgundy);
+  filter: drop-shadow(0 1px 0 rgba(255, 240, 200, 0.4));
+}
+
+/* Empty state "Zatím žádné novinky." — tmavý kurzív */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="empty"] {
+  color: #5a3818;
+  font-family: var(--font-script);
+  font-style: italic;
+}
+
+/* "Přidat novinku" — dřevěná cedulka shodná s bočními NavItem (audit H5 + UX feedback) */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"] {
+  background:
+    linear-gradient(180deg, #3a2814 0%, #28190a 50%, #1c1107 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(120, 80, 30, 0.35), transparent 60%);
+  color: var(--theme-accent-gold);
+  border: 1px solid #5a3f1c;
+  border-radius: 4px;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 3px var(--theme-glow-gold);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 169, 70, 0.45),
+    inset 0 1px 0 rgba(212, 169, 70, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 169, 70, 0.18),
+    0 2px 4px rgba(20, 14, 4, 0.6);
+  position: relative;
+}
+
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"]:hover {
+  background:
+    linear-gradient(180deg, #4a3520 0%, #322110 50%, #221608 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(160, 110, 40, 0.40), transparent 60%);
+  border-color: #7a5828;
+  color: var(--theme-accent-gold-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 96, 0.65),
+    inset 0 1px 0 rgba(240, 200, 96, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-gold-strong),
+    0 2px 6px rgba(20, 14, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 5px var(--theme-glow-gold-strong);
+}
+
+/* Skrýt lucide Plus ikonu — nahradí ji wax seal před textem */
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"] > svg {
+  display: none;
+}
+
+[data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"]::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: var(--asset-wax-seal);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-right: 8px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 3px var(--theme-glow-burgundy));
+}
+
+/* ──────────────── 17. Showmore / pravý panel link styling ──────────────── */
+
+[data-theme="pergamen"] [class*="showAllLink"] {
+  color: var(--theme-accent-gold);
+  border-color: var(--theme-border-gold);
+}
+
+[data-theme="pergamen"] [class*="showAllLink"]:hover {
+  color: var(--theme-accent-gold-bright);
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+  box-shadow: 0 0 10px var(--theme-glow-gold);
+}
+
+/* ──────────────── 18. Focus visible — zlatý ring (audit C14) ──────────────── */
+
+[data-theme="pergamen"] [class*="navItem"]:focus-visible,
+[data-theme="pergamen"] [class*="btn3d"]:focus-visible,
+[data-theme="pergamen"] [class*="showAllLink"]:focus-visible,
+[data-theme="pergamen"] [class*="rightAddBtn"]:focus-visible,
+[data-theme="pergamen"] [class*="addBtn"]:focus-visible,
+[data-theme="pergamen"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-accent-gold),
+    0 0 14px var(--theme-glow-gold-strong);
+}
+
+/* ──────────────── 19. Scrollbar styling ──────────────── */
+
+[data-theme="pergamen"] [data-frame-panel] {
+  scrollbar-color: var(--theme-accent-gold) var(--theme-surface);
+  scrollbar-width: thin;
+}
+
+[data-theme="pergamen"] [data-frame-panel]::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme="pergamen"] [data-frame-panel]::-webkit-scrollbar-track {
+  background: var(--theme-surface);
+}
+
+[data-theme="pergamen"] [data-frame-panel]::-webkit-scrollbar-thumb {
+  background: var(--theme-accent-gold);
+  border-radius: 4px;
+}
+
+/* ──────────────── 20. Tablet (1024–1279px) — menší corner ──────────────── */
+
+@media (max-width: 1279px) {
+  [data-theme="pergamen"] [data-frame-panel="right"] [class*="ornament"] {
+    --asset-corner-size: 96px;
+  }
+  [data-theme="pergamen"] [data-frame-panel="card"] [class*="content"]::before {
+    width: clamp(360px, 65%, 480px);
+  }
+}
+
+/* ──────────────── 21. Mobile (≤768px) — corner zmenšeno, big-book + bookmark hidden ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="pergamen"] [data-frame-panel="sidebar"],
+  [data-theme="pergamen"] [data-frame-panel="right"],
+  [data-theme="pergamen"] [data-frame-panel="card"],
+  [data-theme="pergamen"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-radius: 6px;
+  }
+
+  /* Corner zmenšen */
+  [data-theme="pergamen"] [data-frame-panel] [class*="ornament"] {
+    width: var(--asset-corner-size-mobile);
+    height: var(--asset-corner-size-mobile);
+    opacity: 0.7;
+  }
+
+  /* Drawer mode — corner schovaný */
+  [data-theme="pergamen"] [class*="drawer"] [data-frame-panel] [class*="ornament"],
+  [data-theme="pergamen"] [data-drawer-open] [data-frame-panel] [class*="ornament"] {
+    display: none;
+  }
+
+  /* Welcome card mobile */
+  [data-theme="pergamen"] [data-frame-panel="card"] {
+    min-height: clamp(360px, 50vh, 560px);
+  }
+
+  /* Medailon zmenšen na 96×116 (audit M3) */
+  [data-theme="pergamen"] [data-andel-medallion] {
+    width: 96px;
+    height: 116px;
+  }
+
+  /* Signature menší */
+  [data-theme="pergamen"] [class*="signature"] {
+    font-size: 22px;
+  }
+
+  /* Nav ikony — menší pečetě */
+  [data-theme="pergamen"] [data-nav-key] [class*="navItemIcon"] {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Touch target ≥48px (audit C13) */
+  [data-theme="pergamen"] [class*="navItem"] {
+    min-height: 48px;
+  }
+
+  /* Header buttony icon-only (audit C11) */
+  [data-theme="pergamen"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+    padding: 0 10px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 0.7rem;
+  }
+
+  [data-theme="pergamen"] [class*="headerBtnLabel"] {
+    display: none;
+  }
+
+  /* Wax seal CTA mobile — zmenšeno */
+  [data-theme="pergamen"] [data-frame-panel="novinky"] [class*="addBtn"]::before {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+  }
+}
+
+/* ──────────────── 22. Reduced motion (audit C12) ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="pergamen"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  [data-theme="pergamen"] [class*="btn3d"]:hover,
+  [data-theme="pergamen"] [class*="headerBtn"]:hover {
+    transition: none !important;
+  }
+}
+
+/* ──────────────── 23. High contrast / forced-colors fallback ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="pergamen"] [data-frame-panel] [class*="ornament"] {
+    forced-color-adjust: none;
+  }
+
+  [data-theme="pergamen"] [class*="welcomeTitle"]::first-letter {
+    color: CanvasText;
+    -webkit-text-stroke: none;
+    text-shadow: none;
+  }
 }

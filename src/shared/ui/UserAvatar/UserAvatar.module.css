@@ -1,0 +1,69 @@
+.avatar {
+  display: inline-block;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--surface-2, transparent);
+  border: 2px solid var(--frame-border, transparent);
+  flex-shrink: 0;
+}
+
+.avatar[role='button'] {
+  cursor: pointer;
+}
+
+.xs {
+  width: 20px;
+  height: 20px;
+  border-width: 1px;
+}
+
+.sm {
+  width: 32px;
+  height: 32px;
+}
+
+.md {
+  width: 64px;
+  height: 64px;
+}
+
+.lg {
+  width: 96px;
+  height: 96px;
+}
+
+.xl {
+  width: 128px;
+  height: 128px;
+}
+
+/* 1.3c — tombstone overlay (smazaný účet) ------------------------------- */
+.wrap {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.deletedWrap {
+  border-radius: 50%;
+}
+
+.deletedImg {
+  filter: grayscale(1) brightness(0.6);
+}
+
+.deletedBand {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: linear-gradient(
+    -45deg,
+    transparent 0%,
+    transparent 40%,
+    var(--tombstone-band) 40%,
+    var(--tombstone-band) 60%,
+    transparent 60%,
+    transparent 100%
+  );
+}

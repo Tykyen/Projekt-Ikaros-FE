@@ -1,0 +1,424 @@
+/* ── Zlatý standard — Cosmic Royal Portal (spec 2.0) ──
+   Aktivuje se přes [data-theme="zlaty-standard"]. Vše scoped, žádný globální dopad.
+   Jazyk: obsidián černá + královské zlato + cyan brilianty.
+   Ostré gotic-cathedral filigrány: lancet bezels, 8-point hvězdy s alternovanými
+   rays, hvězdné konstelace na end-capech, mini ✦ rivety v navItems. */
+
+/* ──────────────── 1. Root + atmosférický overlay ──────────────── */
+
+[data-theme="zlaty-standard"] {
+  background-color: #020308;
+}
+
+[data-theme="zlaty-standard"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. Header bottom rule — gold linka s 8-point hvězdou ──────────────── */
+
+[data-theme="zlaty-standard"] header {
+  position: relative;
+  border-bottom: 1px solid var(--theme-border-soft);
+}
+
+[data-theme="zlaty-standard"] header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 16px;
+  pointer-events: none;
+  background:
+    /* Centrální 8-point hvězda s cyan jádrem */
+    center bottom / 28px 16px no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 16'><path d='M14 1 L15.5 7 L21 8 L15.5 9 L14 15 L12.5 9 L7 8 L12.5 7 Z' fill='%23f0c040' stroke='%23d4a017' stroke-width='0.3'/><circle cx='14' cy='8' r='1.5' fill='%2319d6e8'/></svg>"),
+    /* Gold rule s fade na okrajích */
+    center / 100% 1px no-repeat
+      linear-gradient(90deg, transparent 0%, rgba(212,160,23,0.40) 18%, rgba(212,160,23,0.85) 50%, rgba(212,160,23,0.40) 82%, transparent 100%);
+  filter: drop-shadow(0 0 6px var(--theme-glow-gold));
+}
+
+/* ──────────────── 3. Glass panely + double-stroke inset gold border ──────────────── */
+
+[data-theme="zlaty-standard"] [data-frame-panel="sidebar"],
+[data-theme="zlaty-standard"] [data-frame-panel="right"],
+[data-theme="zlaty-standard"] [data-frame-panel="card"],
+[data-theme="zlaty-standard"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(10, 15, 25, 0.78) 0%, rgba(5, 5, 10, 0.88) 100%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-border);
+  border-radius: 18px;
+  isolation: isolate;
+  box-shadow:
+    0 0 0 1px rgba(74, 59, 18, 0.9),                                              /* outer dark gold */
+    inset 0 0 0 var(--panel-inner-inset, 7px) transparent,
+    inset 0 0 0 calc(var(--panel-inner-inset, 7px) + 1px) var(--panel-inner-border), /* inset second border */
+    inset 0 1px 0 0 rgba(255, 220, 150, 0.08),                                    /* top highlight */
+    inset 0 0 22px 0 rgba(0, 0, 0, 0.75),                                         /* depth */
+    0 10px 30px 0 rgba(0, 0, 0, 0.85);                                            /* drop shadow */
+  overflow: visible;
+}
+
+/* ──────────────── 4. Page-frame corner ornaments — un-hide a aplikovat assety ──────────────── */
+
+[data-theme="zlaty-standard"] [data-frame-panel] [class*="ornament"] {
+  display: block;
+  width: 120px;
+  height: 120px;
+  background: center / contain no-repeat;
+  border: none;
+  border-radius: 0;
+  transform: none;
+  filter: drop-shadow(0 0 7px var(--theme-glow-gold));
+  opacity: 0.95;
+}
+
+[data-theme="zlaty-standard"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: 0;
+  left: 0;
+  background-image: var(--asset-page-frame-tl);
+}
+[data-theme="zlaty-standard"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  top: 0;
+  right: 0;
+  background-image: var(--asset-page-frame-tr);
+}
+[data-theme="zlaty-standard"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: 0;
+  left: 0;
+  background-image: var(--asset-page-frame-bl);
+}
+[data-theme="zlaty-standard"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: 0;
+  right: 0;
+  background-image: var(--asset-page-frame-br);
+}
+
+/* Side panely (sidebar, right) — menší než welcome card, ale viditelnější
+   než dřív. Mírný negative offset, ať vystupují z rámu jako architektonické
+   konzoly. */
+[data-theme="zlaty-standard"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="zlaty-standard"] [data-frame-panel="right"] [class*="ornament"] {
+  width: 100px;
+  height: 100px;
+  opacity: 0.88;
+}
+
+[data-theme="zlaty-standard"] [data-frame-panel="sidebar"] [class*="ornament"][data-position="tl"],
+[data-theme="zlaty-standard"] [data-frame-panel="right"] [class*="ornament"][data-position="tl"] {
+  top: -4px;
+  left: -4px;
+}
+[data-theme="zlaty-standard"] [data-frame-panel="sidebar"] [class*="ornament"][data-position="tr"],
+[data-theme="zlaty-standard"] [data-frame-panel="right"] [class*="ornament"][data-position="tr"] {
+  top: -4px;
+  right: -4px;
+}
+[data-theme="zlaty-standard"] [data-frame-panel="sidebar"] [class*="ornament"][data-position="bl"],
+[data-theme="zlaty-standard"] [data-frame-panel="right"] [class*="ornament"][data-position="bl"] {
+  bottom: -4px;
+  left: -4px;
+}
+[data-theme="zlaty-standard"] [data-frame-panel="sidebar"] [class*="ornament"][data-position="br"],
+[data-theme="zlaty-standard"] [data-frame-panel="right"] [class*="ornament"][data-position="br"] {
+  bottom: -4px;
+  right: -4px;
+}
+
+/* Novinky — užší na výšku, ještě menší ornamenty */
+[data-theme="zlaty-standard"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: 80px;
+  height: 80px;
+}
+
+/* ──────────────── 5. Welcome andel medallion (větší, audit-approved) ──────────────── */
+
+[data-theme="zlaty-standard"] [data-andel-medallion] {
+  position: relative;
+  width: 240px;
+  height: 270px;
+  background-image: var(--asset-andel-medallion, none);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 22px var(--theme-glow-gold));
+}
+
+/* ──────────────── 6. Section title — ✦ ━━ NAVIGACE ━━ ✦ s end-cap konstelacemi ──────────────── */
+
+[data-theme="zlaty-standard"] [class*="sectionTitle"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--theme-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.20em;
+  font-family: var(--font-display);
+  text-shadow: 0 0 10px var(--theme-glow-gold);
+}
+
+[data-theme="zlaty-standard"] [class*="sectionTitle"]::before {
+  content: '';
+  flex: 1;
+  height: 24px;
+  opacity: 1;
+  background:
+    left center / auto 24px no-repeat var(--asset-nav-end-cap-l),
+    center / 100% 1px no-repeat
+      linear-gradient(90deg, transparent 0%, rgba(212,160,23,0.45) 30%, rgba(212,160,23,0.85) 100%);
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+}
+
+[data-theme="zlaty-standard"] [class*="sectionTitle"]::after {
+  content: '';
+  flex: 1;
+  height: 24px;
+  opacity: 1;
+  background:
+    right center / auto 24px no-repeat var(--asset-nav-end-cap-r),
+    center / 100% 1px no-repeat
+      linear-gradient(90deg, rgba(212,160,23,0.85) 0%, rgba(212,160,23,0.45) 70%, transparent 100%);
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+}
+
+/* ──────────────── 7. Header logo banner ──────────────── */
+
+[data-theme="zlaty-standard"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: var(--header-h);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 0 12px var(--theme-glow-gold));
+  -webkit-mask-image: radial-gradient(ellipse 95% 85% at center, black 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 95% 85% at center, black 60%, transparent 100%);
+}
+
+/* ──────────────── 8. 3D metallic btn3d override ──────────────── */
+
+[data-theme="zlaty-standard"] [class*="btn3d"] {
+  --btn-bg-1: rgba(26, 21, 13, 0.95);
+  --btn-bg-2: rgba(10, 8, 5, 0.98);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-accent);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 220, 150, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.85),
+    0 2px 5px 0 rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="zlaty-standard"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(36, 29, 18, 0.96);
+  --btn-bg-2: rgba(15, 12, 8, 0.98);
+  --btn-border: var(--theme-accent-bright);
+  --btn-color: var(--theme-accent-bright);
+  --btn-translate: -2px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 223, 0, 0.18),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.85),
+    0 0 14px var(--theme-glow-gold),
+    0 4px 7px 0 rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+[data-theme="zlaty-standard"] [class*="btn3dActive"],
+[data-theme="zlaty-standard"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(25, 214, 232, 0.20);
+  --btn-bg-2: rgba(8, 80, 100, 0.32);
+  --btn-border: var(--theme-border-cyan);
+  --btn-color: #ffffff;
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.55),
+    0 0 16px var(--theme-glow-cyan);
+  text-shadow: 0 0 10px var(--theme-glow-cyan);
+}
+
+/* ──────────────── 9. NavItem position — pro ::before/::after ──────────────── */
+
+[data-theme="zlaty-standard"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]) {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ──────────────── 10. Mini ✦ rivety v rozích navItem (CSS-only, ::after) ──────────────── */
+
+[data-theme="zlaty-standard"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    no-repeat 4px 4px / 10px 10px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%23f0c040' stroke='%23d4a017' stroke-width='0.2'/></svg>"),
+    no-repeat calc(100% - 4px) 4px / 10px 10px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%23f0c040' stroke='%23d4a017' stroke-width='0.2'/></svg>"),
+    no-repeat 4px calc(100% - 4px) / 10px 10px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%23f0c040' stroke='%23d4a017' stroke-width='0.2'/></svg>"),
+    no-repeat calc(100% - 4px) calc(100% - 4px) / 10px 10px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%23f0c040' stroke='%23d4a017' stroke-width='0.2'/></svg>");
+  filter: drop-shadow(0 0 3px var(--theme-glow-gold));
+  z-index: 1;
+}
+
+/* Active stav — rivety v cyan místo gold, mírně větší */
+[data-theme="zlaty-standard"] [class*="navItemActive"]::after {
+  background:
+    no-repeat 4px 4px / 11px 11px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%2319d6e8' stroke='%23ffffff' stroke-width='0.2'/></svg>"),
+    no-repeat calc(100% - 4px) 4px / 11px 11px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%2319d6e8' stroke='%23ffffff' stroke-width='0.2'/></svg>"),
+    no-repeat 4px calc(100% - 4px) / 11px 11px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%2319d6e8' stroke='%23ffffff' stroke-width='0.2'/></svg>"),
+    no-repeat calc(100% - 4px) calc(100% - 4px) / 11px 11px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z' fill='%2319d6e8' stroke='%23ffffff' stroke-width='0.2'/></svg>");
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan));
+}
+
+/* ──────────────── 11. Aktivní navItem — bez ::before markeru
+   (cyan rivety ze sekce 10 + cyan glow z btn3dActive stačí jako indikátor;
+   ::before vlevo přeskakoval mezi položkami při změně aktivního itemu) ──────────────── */
+
+/* ──────────────── 12. Lancet-bezel illuminated nav icons — swap lucide → assety ──────────────── */
+
+[data-theme="zlaty-standard"] [class*="navItemIcon"] svg.lucide-beer,
+[data-theme="zlaty-standard"] [class*="navItemIcon"] svg.lucide-house,
+[data-theme="zlaty-standard"] [class*="navItemIcon"] svg.lucide-circle-plus,
+[data-theme="zlaty-standard"] [class*="navItemIcon"] svg.lucide-message-square,
+[data-theme="zlaty-standard"] [class*="navItemIcon"] svg.lucide-book-open,
+[data-theme="zlaty-standard"] [class*="navItemIcon"] svg.lucide-image,
+[data-theme="zlaty-standard"] [class*="navItemIcon"] svg.lucide-circle-question-mark {
+  display: none;
+}
+
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-beer),
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-house),
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-circle-plus),
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-message-square),
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-book-open),
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-image),
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-circle-question-mark) {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  background: center / contain no-repeat;
+  filter: drop-shadow(0 0 5px var(--theme-glow-gold));
+}
+
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-beer) {
+  background-image: var(--asset-icon-beer);
+}
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-house) {
+  background-image: var(--asset-icon-home);
+}
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-circle-plus) {
+  background-image: var(--asset-icon-plus-star);
+}
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-message-square) {
+  background-image: var(--asset-icon-scroll);
+}
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-book-open) {
+  background-image: var(--asset-icon-book);
+}
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-image) {
+  background-image: var(--asset-icon-portrait-frame);
+}
+[data-theme="zlaty-standard"] [class*="navItemIcon"]:has(svg.lucide-circle-question-mark) {
+  background-image: var(--asset-icon-compass);
+}
+
+/* Active state — cyan glow filter overlay */
+[data-theme="zlaty-standard"] [class*="navItemActive"] [class*="navItemIcon"]:has(svg) {
+  filter: drop-shadow(0 0 8px var(--theme-glow-cyan)) drop-shadow(0 0 4px var(--theme-glow-gold));
+}
+
+/* ──────────────── 13. Header buttons ──────────────── */
+
+[data-theme="zlaty-standard"] [class*="headerBtn"] {
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+}
+
+/* ──────────────── 14. Welcome heading + script signature ──────────────── */
+
+[data-theme="zlaty-standard"] [class*="welcomeTitle"] {
+  font-size: var(--text-xl);
+}
+
+[data-theme="zlaty-standard"] [class*="titleAccent"] {
+  text-shadow: 0 0 14px var(--theme-glow-cyan);
+}
+
+/* ──────────────── 15. PJ badge — zlatý chip ──────────────── */
+
+[data-theme="zlaty-standard"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-accent-bright), var(--theme-accent));
+  color: var(--bg-primary);
+  border: 1px solid var(--theme-accent);
+  box-shadow:
+    0 0 8px var(--theme-glow-gold),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+  text-shadow: none;
+}
+
+/* ──────────────── 16. Heading ✦ marker (cosmic-cathedral, ne ◆) ──────────────── */
+
+[data-theme="zlaty-standard"] h1::before,
+[data-theme="zlaty-standard"] h2::before {
+  content: '✦';
+  color: var(--theme-accent);
+  margin-right: 8px;
+  font-size: 0.7em;
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+}
+
+/* ──────────────── 17. Reduced motion safe ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="zlaty-standard"] * {
+    transition: none !important;
+  }
+}
+
+/* ──────────────── 18. Responsive — graceful degradation ──────────────── */
+
+@media (max-width: 1280px) {
+  [data-theme="zlaty-standard"] [data-frame-panel="card"] [class*="ornament"] {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  [data-theme="zlaty-standard"] [data-frame-panel] [class*="ornament"],
+  [data-theme="zlaty-standard"] [data-frame-panel="sidebar"] [class*="ornament"],
+  [data-theme="zlaty-standard"] [data-frame-panel="right"] [class*="ornament"],
+  [data-theme="zlaty-standard"] [data-frame-panel="card"] [class*="ornament"],
+  [data-theme="zlaty-standard"] [data-frame-panel="novinky"] [class*="ornament"] {
+    width: 60px;
+    height: 60px;
+  }
+
+  [data-theme="zlaty-standard"] header::after {
+    background-size: 22px 12px, 100% 1px;
+  }
+
+  [data-theme="zlaty-standard"] [data-andel-medallion] {
+    width: 180px;
+    height: 200px;
+  }
+}

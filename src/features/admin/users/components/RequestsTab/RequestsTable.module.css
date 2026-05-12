@@ -1,0 +1,185 @@
+.statusTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.statusTab {
+  padding: 6px 12px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.statusTab:hover {
+  background: var(--surface-1);
+}
+
+.statusTabActive {
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  border-color: var(--accent-soft);
+}
+
+.tableWrapper {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--frame-border);
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--frame-border);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody td {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userName {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.arrow {
+  color: var(--text-muted);
+  margin: 0 4px;
+}
+
+.targetUsername {
+  font-weight: 700;
+  color: var(--accent-bright);
+}
+
+.empty {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.actionsRow {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modalField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modalField span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.modalTextarea {
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border-radius: 4px;
+  width: 100%;
+  min-height: 80px;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.decisionReason {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Mobile cards */
+@media (max-width: 768px) {
+  .table thead {
+    display: none;
+  }
+  .table,
+  .table tbody,
+  .table tbody tr,
+  .table tbody td {
+    display: block;
+  }
+  .table tbody tr {
+    padding: 12px;
+    margin: 12px;
+    border: 1px solid var(--frame-border);
+    border-radius: 8px;
+    background: var(--surface-1);
+  }
+  .table tbody td {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--frame-border);
+  }
+  .table tbody td:last-child {
+    border-bottom: none;
+  }
+  .table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+}

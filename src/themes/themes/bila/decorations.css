@@ -1,0 +1,515 @@
+/* ── Bílá — heraldic upgrade (spec 1.0g, light mode)
+   Aktivuje se přes [data-theme="bila"]. Vše scoped, žádný globální dopad.
+   Audit-driven: glow bumped 0.40+, no text-shadow on headings, no warm-gold text,
+   ornaments only on TL+BR (audit: 16→8 reduction), drop-shadow uses #a89058
+   instead of gold halo (luminance gap on ivory).
+   Vokabulář: ivory marble + warm gold filigree + light-blue crystals. */
+
+/* ──────────────── 1. Root + atmospheric overlay ──────────────── */
+
+[data-theme="bila"] {
+  background-color: #f7f2e8;
+  color-scheme: light;
+}
+
+[data-theme="bila"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. Header — gold hairline rule (audit #5) ──────────────── */
+
+[data-theme="bila"] header {
+  position: relative;
+  border-bottom: 1px solid var(--theme-border-soft);
+}
+
+[data-theme="bila"] header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 12px;
+  pointer-events: none;
+  background:
+    center bottom / 24px 12px no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'><path d='M12 1 L18 6 L12 11 L6 6 Z' fill='%23fbf8f1' stroke='%23c7b07a' stroke-width='0.7'/><circle cx='12' cy='6' r='1.4' fill='%239ed4ef' stroke='%234f88a8' stroke-width='0.4'/></svg>"),
+    center / 100% 1px no-repeat
+      linear-gradient(90deg, transparent 0%, rgba(199,176,122,0.35) 18%, rgba(199,176,122,0.75) 50%, rgba(199,176,122,0.35) 82%, transparent 100%);
+}
+
+/* ──────────────── 3. Glass panely — ivory frosted ──────────────── */
+
+[data-theme="bila"] [data-frame-panel="sidebar"],
+[data-theme="bila"] [data-frame-panel="right"],
+[data-theme="bila"] [data-frame-panel="card"],
+[data-theme="bila"] [data-frame-panel="novinky"] {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 252, 245, 0.92) 0%, rgba(246, 241, 230, 0.86) 100%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid var(--theme-border);
+  border-radius: 22px;
+  isolation: isolate;
+  box-shadow:
+    0 8px 24px rgba(96, 76, 42, 0.14),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 28px rgba(255, 255, 255, 0.55);
+  overflow: visible;
+}
+
+/* Panel section divider — diamond+crystal at top/bottom (sidebar/right/card only) */
+[data-theme="bila"] [data-frame-panel="sidebar"]::before,
+[data-theme="bila"] [data-frame-panel="right"]::before,
+[data-theme="bila"] [data-frame-panel="card"]::before {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: -5px;
+  height: 10px;
+  pointer-events: none;
+  background:
+    center / 22px 10px no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 10'><path d='M11 1 L16 5 L11 9 L6 5 Z' fill='%23fbf8f1' stroke='%23c7b07a' stroke-width='0.7'/><circle cx='11' cy='5' r='1.3' fill='%239ed4ef' stroke='%234f88a8' stroke-width='0.4'/></svg>"),
+    left center / calc(50% - 12px) 1px no-repeat
+      linear-gradient(90deg, transparent 0%, rgba(199,176,122,0.55) 60%, rgba(199,176,122,0.85) 100%),
+    right center / calc(50% - 12px) 1px no-repeat
+      linear-gradient(90deg, rgba(199,176,122,0.85) 0%, rgba(199,176,122,0.55) 40%, transparent 100%);
+}
+
+/* ──────────────── 4. CornerOrnament — TL+BR only (audit #2: 16→8 reduction) ──────────────── */
+
+/* Hide TR + BL globally on bilá panels — diagonal balance only */
+[data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="tr"],
+[data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  display: none;
+}
+
+/* TL + BR — show with page-frame asset, BR is TL flipped */
+[data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="tl"],
+[data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  display: block;
+  width: 70px;
+  height: 70px;
+  background: center / contain no-repeat var(--asset-page-frame-tl);
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  filter: drop-shadow(0 2px 5px var(--theme-ornament-shadow));
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+/* TL — anchor top-left, žádná rotace (override base rotate(45deg)) */
+[data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: 0;
+  left: 0;
+  transform: none;
+}
+
+/* BR — anchor bottom-right, mirror obě osy (180° flip z TL assetu) */
+[data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  top: auto;
+  bottom: 0;
+  left: auto;
+  right: 0;
+  transform: scale(-1, -1);
+}
+
+/* Welcome card — větší (90px) protože panel je široký */
+[data-theme="bila"] [data-frame-panel="card"] [class*="ornament"][data-position="tl"],
+[data-theme="bila"] [data-frame-panel="card"] [class*="ornament"][data-position="br"] {
+  width: 90px;
+  height: 90px;
+}
+
+/* Novinky — žádné ornamenty (audit #2: panel je úzký, konkurence s "PŘIDAT NOVINKU") */
+[data-theme="bila"] [data-frame-panel="novinky"] [class*="ornament"] {
+  display: none;
+}
+
+/* ──────────────── 5. Section title — `[◆] ━━ TITLE ━━ [◆]` (audit #3) ──────────────── */
+
+[data-theme="bila"] [class*="sectionTitle"] {
+  color: var(--theme-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  /* žádný text-shadow — audit #6: blur na light = unreadable */
+}
+
+[data-theme="bila"] [class*="sectionTitle"]::before,
+[data-theme="bila"] [class*="sectionTitle"]::after {
+  flex: 1;
+  height: 14px;
+  opacity: 1;
+}
+
+[data-theme="bila"] [class*="sectionTitle"]::before {
+  background:
+    left center / 14px 14px no-repeat var(--asset-corner-ornament),
+    left center / 100% 1px no-repeat
+      linear-gradient(90deg, transparent 0%, rgba(199,176,122,0.40) 20%, rgba(199,176,122,0.80) 100%);
+  background-position: left center, 18px center;
+  background-size: 14px 14px, calc(100% - 18px) 1px;
+}
+
+[data-theme="bila"] [class*="sectionTitle"]::after {
+  background:
+    right center / 14px 14px no-repeat var(--asset-corner-ornament),
+    right center / 100% 1px no-repeat
+      linear-gradient(90deg, rgba(199,176,122,0.80) 0%, rgba(199,176,122,0.40) 80%, transparent 100%);
+  background-position: right center, calc(100% - 18px) center;
+  background-size: 14px 14px, calc(100% - 18px) 1px;
+}
+
+/* ──────────────── 6. Nav buttons — ribbon stuhy (audit #1) ──────────────── */
+
+[data-theme="bila"] [class*="navItem"]:not([class*="navItemActive"]):not([class*="navItemIcon"]):not([class*="navItemLabel"]) {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 245, 0.95) 0%, rgba(246, 241, 230, 0.85) 100%);
+  border: 1px solid var(--theme-border-soft);
+  border-radius: 10px;
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--theme-text);
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 200ms ease;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 2px 0 rgba(150, 125, 75, 0.10),
+    0 2px 6px rgba(96, 76, 42, 0.08);
+}
+
+/* Ribbon end-caps — left + right (right je flipped left) */
+[data-theme="bila"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::before,
+[data-theme="bila"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  background: center / contain no-repeat var(--asset-nav-end-cap-l);
+  opacity: 0.85;
+  z-index: 2;
+}
+
+[data-theme="bila"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::before {
+  left: -6px;
+}
+
+[data-theme="bila"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::after {
+  right: -6px;
+  transform: translateY(-50%) scaleX(-1);
+}
+
+/* Hover — jen border + box-shadow shift, žádný overlay (audit #1: zachovat kontrast) */
+[data-theme="bila"] [class*="navItem"]:not([class*="navItemActive"]):not([class*="navItemIcon"]):not([class*="navItemLabel"]):hover {
+  border-color: var(--theme-accent);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 244, 235, 0.92) 100%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 0 14px var(--theme-glow-cyan),
+    0 3px 8px rgba(96, 76, 42, 0.12);
+}
+
+/* Active — light-blue inner, cobalt left bar, redukovaný glow (audit #1) */
+[data-theme="bila"] [class*="navItemActive"] {
+  background: linear-gradient(180deg, rgba(232, 244, 250, 0.95) 0%, rgba(210, 229, 239, 0.88) 100%);
+  border-color: var(--theme-accent);
+  color: #2d4a5a;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    inset 4px 0 0 0 var(--theme-accent),
+    0 0 12px var(--theme-glow-cyan);
+}
+
+[data-theme="bila"] [class*="navItemActive"] [class*="navItemLabel"] {
+  color: #2d4a5a;
+}
+
+[data-theme="bila"] [class*="navItemIcon"] svg {
+  width: 20px;
+  height: 20px;
+  color: var(--theme-text);
+}
+
+[data-theme="bila"] [class*="navItemActive"] [class*="navItemIcon"] svg {
+  color: var(--theme-accent);
+}
+
+/* ──────────────── 7. Heraldic icon swap — lucide → custom ivory assety ──────────────── */
+
+[data-theme="bila"] [class*="navItemIcon"] svg.lucide-beer,
+[data-theme="bila"] [class*="navItemIcon"] svg.lucide-house,
+[data-theme="bila"] [class*="navItemIcon"] svg.lucide-circle-plus,
+[data-theme="bila"] [class*="navItemIcon"] svg.lucide-message-square,
+[data-theme="bila"] [class*="navItemIcon"] svg.lucide-book-open,
+[data-theme="bila"] [class*="navItemIcon"] svg.lucide-image,
+[data-theme="bila"] [class*="navItemIcon"] svg.lucide-circle-question-mark {
+  display: none;
+}
+
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-beer),
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-house),
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-circle-plus),
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-message-square),
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-book-open),
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-image),
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-circle-question-mark) {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  background: center / contain no-repeat;
+  filter: drop-shadow(0 1px 3px var(--theme-ornament-shadow));
+}
+
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-beer)                  { background-image: var(--asset-icon-beer); }
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-house)                 { background-image: var(--asset-icon-home); }
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-circle-plus)           { background-image: var(--asset-icon-plus-star); }
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-message-square)        { background-image: var(--asset-icon-scroll); }
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-book-open)             { background-image: var(--asset-icon-book); }
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-image)                 { background-image: var(--asset-icon-portrait-frame); }
+[data-theme="bila"] [class*="navItemIcon"]:has(svg.lucide-circle-question-mark)  { background-image: var(--asset-icon-compass); }
+
+/* Active — cyan glow on top of base shadow */
+[data-theme="bila"] [class*="navItemActive"] [class*="navItemIcon"]:has(svg) {
+  filter: drop-shadow(0 0 6px var(--theme-glow-cyan-strong)) drop-shadow(0 1px 2px var(--theme-ornament-shadow));
+}
+
+/* ──────────────── 8. btn3d override (light mode) — header + showAllLink ──────────────── */
+
+[data-theme="bila"] [class*="btn3d"] {
+  --btn-bg-1: rgba(255, 255, 255, 0.92);
+  --btn-bg-2: rgba(241, 236, 224, 0.90);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-text);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 2px 0 rgba(150, 125, 75, 0.12),
+    0 3px 10px rgba(80, 60, 30, 0.10);
+}
+
+[data-theme="bila"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(255, 255, 255, 0.95);
+  --btn-bg-2: rgba(236, 246, 250, 0.85);
+  --btn-border: var(--theme-accent);
+  --btn-color: var(--theme-accent);
+  --btn-translate: -2px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 0 14px var(--theme-glow-cyan),
+    0 4px 10px rgba(80, 60, 30, 0.12);
+}
+
+[data-theme="bila"] [class*="btn3dActive"] {
+  --btn-bg-1: rgba(232, 244, 250, 0.95);
+  --btn-bg-2: rgba(210, 229, 239, 0.90);
+  --btn-border: var(--theme-accent);
+  --btn-color: #2d4a5a;
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.7),
+    inset 4px 0 0 0 var(--theme-accent),
+    0 0 14px var(--theme-glow-cyan-strong);
+}
+
+/* Header buttons — uppercase + tight letter-spacing */
+[data-theme="bila"] [class*="headerBtn"] {
+  letter-spacing: 0.10em;
+  font-size: 0.72rem;
+}
+
+/* ──────────────── 9. „Zobrazit vše →" pill ──────────────── */
+
+[data-theme="bila"] [class*="showAllLink"] {
+  border: 1px solid var(--theme-border);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.85);
+  color: var(--theme-accent);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  transition: background 160ms, box-shadow 200ms, border-color 160ms;
+}
+
+[data-theme="bila"] [class*="showAllLink"]:hover {
+  background: rgba(232, 244, 250, 0.95);
+  border-color: var(--theme-accent);
+  color: #2d4a5a;
+  box-shadow: 0 0 12px var(--theme-glow-cyan);
+}
+
+/* ──────────────── 10. PJ badge — cobalt-blue chip (light variant) ──────────────── */
+
+[data-theme="bila"] [class*="pjBadge"],
+[data-theme="bila"] [data-pj-badge] {
+  height: 18px;
+  padding: 0 7px;
+  border: 1px solid var(--theme-accent);
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--theme-accent-bright), var(--theme-accent));
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  box-shadow:
+    0 0 6px var(--theme-glow-cyan),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+  text-shadow: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ──────────────── 11. Welcome card — andel medallion + script signature ──────────────── */
+
+[data-theme="bila"] [data-andel-medallion] {
+  position: relative;
+  width: 200px;
+  height: 265px;
+  background-image: var(--asset-andel-medallion, none);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 16px var(--theme-glow-cyan-strong));
+}
+
+[data-theme="bila"] [data-frame-panel="card"] [class*="signature"] {
+  position: relative;
+  margin-top: 56px;
+  color: var(--theme-accent);
+  /* žádný text-shadow — audit #6 */
+}
+
+[data-theme="bila"] [data-frame-panel="card"] [class*="signature"]::before {
+  content: '';
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(70%, 340px);
+  height: 18px;
+  background:
+    left center / 16px 16px no-repeat var(--asset-corner-ornament),
+    right center / 16px 16px no-repeat var(--asset-corner-ornament),
+    center / 100% 1px no-repeat
+      linear-gradient(90deg, transparent 0%, rgba(199,176,122,0.55) 25%, rgba(199,176,122,0.85) 50%, rgba(199,176,122,0.55) 75%, transparent 100%);
+}
+
+[data-theme="bila"] [class*="titleAccent"] {
+  color: var(--theme-accent);
+  /* žádný text-shadow — audit #6 */
+}
+
+/* ──────────────── 12. Heading marker — odstraněn (jako sci-fi) ──────────────── */
+/* žádný h1::before / h2::before */
+
+/* ──────────────── 13. Empty state — italic + script feeling ──────────────── */
+
+[data-theme="bila"] [class*="emptyState"],
+[data-theme="bila"] [class*="empty-state"] {
+  font-family: var(--font-script), var(--font-body);
+  font-style: italic;
+  color: var(--theme-text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ──────────────── 14. Custom scrollbar ──────────────── */
+
+[data-theme="bila"] {
+  scrollbar-color: rgba(199, 176, 122, 0.55) transparent;
+  scrollbar-width: thin;
+}
+
+[data-theme="bila"] *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="bila"] *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-theme="bila"] *::-webkit-scrollbar-thumb {
+  background: rgba(199, 176, 122, 0.45);
+  border-radius: 4px;
+}
+
+[data-theme="bila"] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 136, 168, 0.65);
+}
+
+/* ──────────────── 15. Focus rings — cobalt 2px + offset (audit #6 WCAG) ──────────────── */
+
+[data-theme="bila"] *:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ──────────────── 16. Reduced motion safe ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="bila"] * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ──────────────── 17. Mobile (<768px) — graceful degradation (audit #7) ──────────────── */
+
+@media (max-width: 768px) {
+  /* Ornamenty: jen TL+BR ale menší (60×60) */
+  [data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="tl"],
+  [data-theme="bila"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+    width: 60px;
+    height: 60px;
+  }
+
+  [data-theme="bila"] [data-frame-panel="card"] [class*="ornament"][data-position="tl"],
+  [data-theme="bila"] [data-frame-panel="card"] [class*="ornament"][data-position="br"] {
+    width: 50px;
+    height: 50px;
+  }
+
+  /* Header diamond — menší */
+  [data-theme="bila"] header::after {
+    background-size: 18px 9px, 100% 1px;
+  }
+
+  /* Welcome medailon — zmenšit */
+  [data-theme="bila"] [data-andel-medallion] {
+    width: 160px;
+    height: 212px;
+  }
+
+  /* Nav buttons — zachovej end-caps ale menší */
+  [data-theme="bila"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::before,
+  [data-theme="bila"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"])::after {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Section title — menší letter-spacing */
+  [data-theme="bila"] [class*="sectionTitle"] {
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+  }
+}

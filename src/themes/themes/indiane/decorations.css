@@ -1,0 +1,1028 @@
+/* ── Indiánské — „Strážci horizontu" (spec 1.0p).
+   Prairie soumrak, svět před západem. Patinované dřevo + železné nail studs +
+   tribal cik-cak diamond carving + šamanský buben jako welcome card + korálkový
+   left-border na active nav + spirit smoke z active nav + drum-beat pulse welcome
+   card (tlukoucí srdce kmene) + bead-string visící z topbaru + constellation
+   overlay nad horizontem + hearth glow zdola (země dýchá oheň).
+
+   ORIGINÁLNÍ MOTIFY: oval drum welcome card s drum-pictograph (4 Medicine Wheel
+   pictogramy + sun spiral), bead-string left-border CSS radial-gradient, spirit
+   smoke ::after animace, drum-beat 10s pulse, bead-string vertikální SVG s 8s
+   sway, constellation 7 prairie-gold dots, feather-stamp + tlačítka.
+
+   15 assetů: logo, medailon (čtverec), corner-tl (master TL, mirror přes CSS),
+   medailon-frame (oval), drum-pictograph, 7× nav ikony, feather-stamp,
+   decor-fire-stones, petroglyph-divider.
+
+   Scoped přes [data-theme="indiane"], žádný globální dopad. */
+
+[data-theme="indiane"] {
+  background-color: var(--bg-primary);
+}
+
+/* ──────────────── 1. Atmosférický overlay (pure darken — BG je už warm) ──────────────── */
+
+[data-theme="indiane"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. ✦ ORIGINÁL: HEARTH GLOW ZDOLA (signature breath) ✦
+   Warm flame záře zespoda, 8s breathe — "země dýchá oheň". ──────────────── */
+
+[data-theme="indiane"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60vh;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(255, 128, 48, 0.30) 0%,
+    rgba(200, 80, 28, 0.14) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: screen;
+  animation: indiane-hearth-breathe 8s ease-in-out infinite;
+}
+
+@keyframes indiane-hearth-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1.00; }
+}
+
+/* ──────────────── 3. ✦ ORIGINÁL: CONSTELLATION OVERLAY (5–7 prairie-gold hvězd nad horizontem) ✦
+   Statické, žádná animace. Mikro-easter-egg pro pozorné. ──────────────── */
+
+[data-theme="indiane"][data-shell="ikaros"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(212, 160, 80, 0.7) 0, transparent 1.6px),
+    radial-gradient(circle at 28% 18%, rgba(212, 160, 80, 0.5) 0, transparent 1.2px),
+    radial-gradient(circle at 42% 8%,  rgba(212, 160, 80, 0.4) 0, transparent 1.0px),
+    radial-gradient(circle at 58% 14%, rgba(212, 160, 80, 0.5) 0, transparent 1.2px),
+    radial-gradient(circle at 72% 9%,  rgba(212, 160, 80, 0.4) 0, transparent 1.0px),
+    radial-gradient(circle at 82% 16%, rgba(212, 160, 80, 0.7) 0, transparent 1.6px),
+    radial-gradient(circle at 90% 11%, rgba(212, 160, 80, 0.4) 0, transparent 1.0px);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+/* ──────────────── 4. Topbar — patinované dřevo + wood-grain texture ──────────────── */
+
+[data-theme="indiane"][data-shell="ikaros"] > header {
+  position: relative;
+  background:
+    linear-gradient(180deg, #3a1e08 0%, #2a1208 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 40px,
+      rgba(90, 51, 24, 0.10) 40px,
+      rgba(90, 51, 24, 0.10) 41px
+    );
+  border-bottom: 1px solid var(--theme-wood-mid);
+  box-shadow:
+    0 1px 0 rgba(212, 160, 80, 0.18),
+    0 4px 12px rgba(26, 12, 4, 0.6);
+  overflow: visible;
+  z-index: 10;
+}
+
+/* Prairie-gold hairline pod topbarem (after pseudo) */
+[data-theme="indiane"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-prairie-gold) 25%,
+    var(--theme-prairie-gold-bright) 50%,
+    var(--theme-prairie-gold) 75%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+}
+
+/* ──────────────── 5. ✦ ORIGINÁL: BEAD-STRING SVÍSÍCÍ Z TOPBARU (8s sway) ✦
+   Vertikální řetízek 12 korálků (R/T/G/C cyklus) visící z bottom-left topbaru.
+   CSS-only inline SVG. Sway -2deg → +2deg 8s ease-in-out. ──────────────── */
+
+[data-theme="indiane"][data-shell="ikaros"] > header::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 24px;
+  width: 8px;
+  height: 130px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 130'><line x1='4' y1='0' x2='4' y2='130' stroke='%235a3318' stroke-width='1'/><circle cx='4' cy='6'   r='3' fill='%23c8501c'/><circle cx='4' cy='16'  r='3' fill='%235fc8d0'/><circle cx='4' cy='26'  r='3' fill='%23d4a050'/><circle cx='4' cy='36'  r='3' fill='%23f0e0c0'/><circle cx='4' cy='46'  r='3' fill='%23c8501c'/><circle cx='4' cy='56'  r='3' fill='%235fc8d0'/><circle cx='4' cy='66'  r='3' fill='%23d4a050'/><circle cx='4' cy='76'  r='3' fill='%23f0e0c0'/><circle cx='4' cy='86'  r='3' fill='%23c8501c'/><circle cx='4' cy='96'  r='3' fill='%235fc8d0'/><circle cx='4' cy='106' r='3' fill='%23d4a050'/><circle cx='4' cy='116' r='3' fill='%23f0e0c0'/><path d='M 4 122 L 1 130 L 7 130 Z' fill='%23c8501c'/></svg>");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 5;
+  transform-origin: top center;
+  animation: indiane-bead-sway 8s ease-in-out infinite;
+  filter: drop-shadow(0 2px 3px rgba(26, 12, 4, 0.6));
+}
+
+@keyframes indiane-bead-sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2deg);  }
+}
+
+/* ──────────────── 6. Logo banner ──────────────── */
+
+[data-theme="indiane"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(26, 12, 4, 0.7));
+}
+
+/* ──────────────── 7. Header buttons — dřevěné cedule + prairie-gold okraj ──────────────── */
+
+[data-theme="indiane"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  background:
+    linear-gradient(180deg, #3a1e08 0%, #2a1208 50%, #1a0c04 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(138, 88, 40, 0.35), transparent 60%);
+  color: var(--theme-prairie-gold);
+  border: 1px solid var(--theme-wood-mid);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  padding: 0 14px;
+  height: 32px;
+  min-height: 32px;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 80, 0.35),
+    inset 0 1px 0 rgba(212, 160, 80, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 160, 80, 0.18),
+    0 2px 4px rgba(26, 12, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 3px var(--theme-glow-gold);
+}
+
+[data-theme="indiane"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, #4a2810 0%, #321810 50%, #221208 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(170, 110, 50, 0.40), transparent 60%);
+  border-color: var(--theme-prairie-gold-bright);
+  color: var(--theme-leather-cream);
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 112, 0.55),
+    inset 0 1px 0 rgba(240, 200, 112, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-gold-strong),
+    0 2px 6px rgba(26, 12, 4, 0.6);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 5px var(--theme-glow-gold-strong);
+}
+
+[data-theme="indiane"] [class*="headerBtnIcon"],
+[data-theme="indiane"] [class*="headerBtnLabel"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+/* ──────────────── 8. Glass panely — patinované dřevo + iron border ──────────────── */
+
+[data-theme="indiane"] [data-frame-panel="sidebar"],
+[data-theme="indiane"] [data-frame-panel="right"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(58, 30, 8, 0.92) 0%, rgba(42, 18, 8, 0.96) 100%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--theme-wood-mid);
+  border-radius: 6px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(138, 88, 40, 0.18),
+    0 6px 22px rgba(26, 12, 4, 0.65);
+}
+
+[data-theme="indiane"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(58, 30, 8, 0.92) 0%, rgba(42, 18, 8, 0.96) 100%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--theme-wood-mid);
+  border-radius: 6px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px rgba(138, 88, 40, 0.18),
+    0 6px 22px rgba(26, 12, 4, 0.65);
+}
+
+/* ──────────────── 9. ✦ ORIGINÁL: WELCOME CARD JAKO ŠAMANSKÝ OVÁLNÝ BUBEN ✦
+   Aspect-ratio 1.4/1 (oval, ne čistý kruh), leather-cream BG s drum-pictograph
+   pictogramy (0.45 opacity přes ::before), medailon-frame outer rám přes ::after,
+   drum-beat 10s pulse scale 1.000→1.005. ──────────────── */
+
+[data-theme="indiane"] [data-frame-panel="card"] {
+  position: relative;
+  aspect-ratio: 1.55 / 1;
+  border-radius: 50%;
+  max-width: 800px;
+  min-height: clamp(380px, 50vh, 520px);
+  max-height: 560px;
+  margin: 16px auto;
+  padding: 90px 110px 90px 110px;
+  background-color: var(--theme-leather-cream);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 0;
+  isolation: isolate;
+  overflow: visible;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(90, 51, 24, 0.30),
+    inset 0 0 60px rgba(90, 51, 24, 0.10),
+    0 16px 40px -8px rgba(26, 12, 4, 0.85),
+    0 24px 60px -12px rgba(26, 12, 4, 0.55);
+  animation: indiane-drum-beat 10s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Drum-pictograph (4 Medicine Wheel pictogramy + sun spiral) pod text vrstvou */
+[data-theme="indiane"] [data-frame-panel="card"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--asset-drum-pictograph);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: inherit;
+  opacity: 0.40;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Outer wooden oval frame přes ::after */
+[data-theme="indiane"] [data-frame-panel="card"]::after {
+  content: '';
+  position: absolute;
+  inset: -24px;
+  background-image: var(--asset-medailon-frame);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 8px 20px rgba(26, 12, 4, 0.5));
+}
+
+@keyframes indiane-drum-beat {
+  0%, 100% { transform: scale(1.000); }
+  50%      { transform: scale(1.008); }
+}
+
+/* Obsah uvnitř bubnu musí být nad ::before (z-index: 1) */
+[data-theme="indiane"] [data-frame-panel="card"] > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Andělský medailon vlevo v bubnu — kompaktní kruh s křídly (asset medailon.webp) */
+[data-theme="indiane"] [data-frame-panel="card"] [data-andel-medallion] {
+  width: 96px;
+  height: 96px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 12px rgba(26, 12, 4, 0.7));
+}
+
+/* Welcome card body — flex row s těsnějším gap */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="body"] {
+  gap: 24px;
+  align-items: center;
+}
+
+/* ──────────────── 10. Welcome content typography ──────────────── */
+
+/* Heading — Cinzel weight 600 dark color, menší než default kvůli ovalu */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  color: var(--theme-text-on-leather);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.6vw + 0.4rem, 1.3rem);
+  letter-spacing: 0.02em;
+  margin: 0 0 14px 0;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+  white-space: nowrap;
+}
+
+/* "Projektu Ikaros." accent — Cinzel Decorative sage-turquoise */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-sage-turquoise-deep);
+  font-family: var(--font-tribal-accent);
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* Body paragraphs — Spectral dark ink, menší font + line-height */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="paragraph"] {
+  color: var(--theme-text-on-leather);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+/* Signature — Caveat italic sage-turquoise deep (kontrast safety) */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="signature"] {
+  color: var(--theme-sage-turquoise-deep);
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 24px;
+  margin: 6px 0 0 0;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+  text-align: center;
+}
+
+/* Prairie-gold hairline pod nadpisem (jako knižní pravítko) */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 10px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-prairie-gold) 20%,
+    var(--theme-prairie-gold-bright) 50%,
+    var(--theme-prairie-gold) 80%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+/* ──────────────── 11. Corner ornaments — corner-tl asset (4 pozice, mirror přes CSS) ──────────────── */
+
+[data-theme="indiane"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="indiane"] [data-frame-panel="right"] [class*="ornament"],
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: var(--asset-corner-size);
+  height: var(--asset-corner-size);
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent !important;
+  border: none !important;
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 1px 2px rgba(26, 12, 4, 0.6));
+  position: absolute;
+  display: block;
+  /* Reset shared CornerOrnament transform: rotate(45deg) — indián používá vlastní mirror přes data-position */
+  transform: none;
+}
+
+/* TL — master, žádný transform */
+[data-theme="indiane"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: var(--frame-corner-inset);
+  left: var(--frame-corner-inset);
+}
+/* TR — mirror přes scaleX */
+[data-theme="indiane"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  top: var(--frame-corner-inset);
+  right: var(--frame-corner-inset);
+  transform: scaleX(-1);
+}
+/* BL — mirror přes scaleY */
+[data-theme="indiane"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: var(--frame-corner-inset);
+  left: var(--frame-corner-inset);
+  transform: scaleY(-1);
+}
+/* BR — mirror obě */
+[data-theme="indiane"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: var(--frame-corner-inset);
+  right: var(--frame-corner-inset);
+  transform: scale(-1, -1);
+}
+
+/* Welcome card NEMÁ corner ornamenty (oval = jiná geometrie, frame ve ::after) */
+[data-theme="indiane"] [data-frame-panel="card"] [class*="ornament"] {
+  display: none;
+}
+
+/* Z-index — content nad ornamenty */
+[data-theme="indiane"] [data-frame-panel] > [class*="header"],
+[data-theme="indiane"] [data-frame-panel] > [class*="body"] {
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 12. Section titles + petroglyph-divider ──────────────── */
+
+[data-theme="indiane"] [class*="sectionTitle"] {
+  color: var(--theme-prairie-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.78em;
+  text-shadow: 0 1px 2px rgba(26, 12, 4, 0.7);
+  position: relative;
+  padding-bottom: 16px;
+}
+
+[data-theme="indiane"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 12px;
+  background-image: var(--asset-petroglyph-divider);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 1px rgba(26, 12, 4, 0.4));
+}
+
+/* ──────────────── 13. NavItem (btn3d) — vyřezávané dřevo + iron border + active bead-string + spirit smoke ──────────────── */
+
+[data-theme="indiane"] [class*="btn3d"] {
+  --btn-bg-1: rgba(58, 30, 8, 0.92);
+  --btn-bg-2: rgba(42, 18, 8, 0.96);
+  --btn-border: var(--theme-wood-mid);
+  --btn-color: var(--theme-prairie-gold);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 160, 80, 0.10),
+    inset 0 -2px 4px 0 rgba(26, 12, 4, 0.65),
+    0 2px 5px 0 rgba(26, 12, 4, 0.55);
+}
+
+[data-theme="indiane"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(74, 40, 16, 0.95);
+  --btn-bg-2: rgba(50, 24, 16, 0.98);
+  --btn-border: var(--theme-prairie-gold-bright);
+  --btn-color: var(--theme-prairie-gold-bright);
+  --btn-translate: -1px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(240, 200, 112, 0.20),
+    inset 0 -2px 4px 0 rgba(26, 12, 4, 0.65),
+    0 0 12px var(--theme-glow-gold),
+    0 4px 7px 0 rgba(26, 12, 4, 0.55);
+  text-shadow: 0 0 6px var(--theme-glow-gold-strong);
+}
+
+[data-theme="indiane"] [class*="btn3dActive"],
+[data-theme="indiane"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(200, 80, 28, 0.45);
+  --btn-bg-2: rgba(58, 30, 8, 0.85);
+  --btn-border: var(--theme-prairie-gold-bright);
+  --btn-color: var(--theme-leather-cream);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 240, 192, 0.10),
+    inset 0 -2px 4px 0 rgba(26, 12, 4, 0.45),
+    0 0 14px var(--theme-glow-buffalo);
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+  position: relative;
+}
+
+/* ──────────────── 14. ✦ ORIGINÁL: AKTIVNÍ NAV — KORÁLKOVÝ LEFT-BORDER + SPIRIT SMOKE ✦ ──────────────── */
+
+/* Korálkový left-border (CSS radial-gradient cyklus R/T/G/C) */
+[data-theme="indiane"] [class*="btn3dActive"]::before,
+[data-theme="indiane"] [class*="navItemActive"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 5px;
+  background:
+    radial-gradient(circle at 50%  4%, var(--theme-bead-red)       1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 12%, var(--theme-bead-turquoise) 1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 20%, var(--theme-bead-gold)      1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 28%, var(--theme-bead-cream)     1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 36%, var(--theme-bead-red)       1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 44%, var(--theme-bead-turquoise) 1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 52%, var(--theme-bead-gold)      1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 60%, var(--theme-bead-cream)     1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 68%, var(--theme-bead-red)       1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 76%, var(--theme-bead-turquoise) 1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 84%, var(--theme-bead-gold)      1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 92%, var(--theme-bead-cream)     1.8px, transparent 2.2px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Spirit smoke ze active nav stoupá (6s loop) */
+[data-theme="indiane"] [class*="btn3dActive"]::after,
+[data-theme="indiane"] [class*="navItemActive"]::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 36px;
+  height: 28px;
+  background: linear-gradient(180deg, rgba(240, 224, 192, 0.20) 0%, transparent 100%);
+  filter: blur(8px);
+  transform: translateX(-50%) translateY(0) scale(1);
+  animation: indiane-spirit-smoke 6s ease-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes indiane-spirit-smoke {
+  0%   { transform: translateX(-50%) translateY(0)     scale(1);   opacity: 0.7; }
+  70%  { transform: translateX(-50%) translateY(-20px) scale(1.4); opacity: 0.2; }
+  100% { transform: translateX(-50%) translateY(-30px) scale(1.6); opacity: 0;   }
+}
+
+/* ──────────────── 15. Nav ikony — 7 carved-oak medailonů přes data-nav-key ──────────────── */
+
+[data-theme="indiane"] [data-nav-key] [class*="navItemIcon"] {
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-gold));
+}
+
+[data-theme="indiane"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+[data-theme="indiane"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="indiane"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="indiane"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="indiane"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="indiane"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="indiane"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="indiane"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* ──────────────── 16. Pravý panel — ADMINISTRACE order (skin selector + uživatelé nahoře) ──────────────── */
+
+/* ThemeSwitcher button styling */
+[data-theme="indiane"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background:
+    linear-gradient(180deg, #3a1e08 0%, #2a1208 50%, #1a0c04 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(138, 88, 40, 0.35), transparent 60%);
+  color: var(--theme-prairie-gold);
+  border: 1px solid var(--theme-wood-mid);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6), 0 0 3px var(--theme-glow-gold);
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 80, 0.35),
+    inset 0 1px 0 rgba(212, 160, 80, 0.20),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(212, 160, 80, 0.18),
+    0 2px 4px rgba(26, 12, 4, 0.6);
+  height: 38px;
+}
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  background:
+    linear-gradient(180deg, #4a2810 0%, #321810 50%, #221208 100%),
+    radial-gradient(ellipse at 50% 20%, rgba(170, 110, 50, 0.40), transparent 60%);
+  border-color: var(--theme-prairie-gold-bright);
+  color: var(--theme-leather-cream);
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 200, 112, 0.55),
+    inset 0 1px 0 rgba(240, 200, 112, 0.30),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px var(--theme-glow-gold-strong),
+    0 2px 6px rgba(26, 12, 4, 0.6);
+}
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]::before {
+  display: none;
+}
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] [class*="triggerCaret"] {
+  color: var(--theme-prairie-gold);
+  font-size: 11px;
+}
+
+/* Section spacing */
+[data-theme="indiane"] [data-frame-panel="right"] [class*="section"]:not([class*="sectionTitle"]):not([class*="rightSectionHeader"]) {
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="indiane"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs, 0.75rem);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1, 4px) var(--sp-2, 8px) 16px var(--sp-2, 8px);
+  font-size: 0.66rem;
+}
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="indiane"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+/* ──────────────── 17. „+" tlačítka — feather-stamp CTA ──────────────── */
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"],
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"] {
+  background: linear-gradient(180deg, rgba(200, 80, 28, 0.55) 0%, rgba(58, 30, 8, 0.85) 100%);
+  border: 1px solid var(--theme-prairie-gold-bright);
+  color: var(--theme-prairie-gold-bright);
+  text-shadow: 0 0 4px var(--theme-glow-gold);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 160, 80, 0.20),
+    inset 0 -1px 2px rgba(26, 12, 4, 0.55),
+    0 1px 3px rgba(26, 12, 4, 0.5);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover,
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]:hover {
+  background: linear-gradient(180deg, rgba(232, 96, 40, 0.75) 0%, rgba(74, 40, 16, 0.95) 100%);
+  color: var(--theme-leather-cream);
+  box-shadow:
+    inset 0 1px 0 rgba(240, 200, 112, 0.30),
+    inset 0 -1px 2px rgba(26, 12, 4, 0.55),
+    0 0 10px var(--theme-glow-gold);
+}
+
+/* Skrýt lucide Plus ikonu */
+[data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"] > svg,
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"] > svg {
+  display: none;
+}
+
+/* Feather-stamp pseudo-element (sdílený) */
+[data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]::before,
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]::before {
+  content: '';
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  background-image: var(--asset-feather-stamp);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-right: 8px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 3px var(--theme-glow-gold));
+  transition: transform 200ms ease;
+}
+
+/* Hover — feather rotuje +8deg */
+[data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover::before,
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]:hover::before {
+  transform: rotate(8deg);
+}
+
+/* Active (click) — feather scale 0.92 */
+[data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]:active::before,
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]:active::before {
+  transform: scale(0.92) rotate(4deg);
+}
+
+/* ──────────────── 18. Novinky panel — dark wood + cream-leather text ──────────────── */
+
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="novinkyTitle"] {
+  color: var(--theme-buffalo-bright);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(26, 12, 4, 0.6), 0 0 4px var(--theme-glow-buffalo);
+}
+
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="novinkyTitle"] svg {
+  color: var(--theme-buffalo-bright);
+  filter: drop-shadow(0 0 3px var(--theme-glow-buffalo));
+}
+
+[data-theme="indiane"] [data-frame-panel="novinky"] [class*="empty"] {
+  color: var(--theme-sage-turquoise);
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 18px;
+  opacity: 0.85;
+}
+
+/* ──────────────── 19. Decor — Fire stones pruh dole ──────────────── */
+
+/* Hlavní fire-stones decor jako dedicated layer pod content vrstvou */
+[data-theme="indiane"][data-shell="ikaros"] body::before {
+  content: '';
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: min(900px, 90vw);
+  height: 180px;
+  background-image: var(--asset-fire-stones);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+  filter: drop-shadow(0 -8px 24px rgba(255, 128, 48, 0.18));
+}
+
+/* ──────────────── 20. PJ badge — kožený štítek ──────────────── */
+
+[data-theme="indiane"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-prairie-gold-bright), var(--theme-prairie-gold));
+  color: var(--theme-text-on-gold);
+  border: 1px solid var(--theme-wood-mid);
+  box-shadow:
+    0 0 8px var(--theme-glow-gold),
+    inset 0 0 0 1px var(--theme-buffalo-blood),
+    inset 0 1px 0 0 rgba(255, 240, 200, 0.30);
+  text-shadow: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+}
+
+/* ──────────────── 21. Empty hints — Caveat italic sage-turquoise ──────────────── */
+
+[data-theme="indiane"] [data-frame-panel="right"] [class*="emptyHint"] {
+  font-family: var(--font-script);
+  font-style: italic;
+  color: var(--theme-sage-turquoise);
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
+/* ──────────────── 22. Showmore link styling ──────────────── */
+
+[data-theme="indiane"] [class*="showAllLink"] {
+  color: var(--theme-prairie-gold);
+  border-color: var(--theme-wood-mid);
+}
+
+[data-theme="indiane"] [class*="showAllLink"]:hover {
+  color: var(--theme-prairie-gold-bright);
+  text-shadow: 0 0 6px var(--theme-glow-gold);
+  box-shadow: 0 0 10px var(--theme-glow-gold);
+  border-color: var(--theme-prairie-gold-bright);
+}
+
+/* ──────────────── 23. Focus visible — buffalo-blood ring ──────────────── */
+
+[data-theme="indiane"] [class*="navItem"]:focus-visible,
+[data-theme="indiane"] [class*="btn3d"]:focus-visible,
+[data-theme="indiane"] [class*="showAllLink"]:focus-visible,
+[data-theme="indiane"] [class*="rightAddBtn"]:focus-visible,
+[data-theme="indiane"] [class*="addBtn"]:focus-visible,
+[data-theme="indiane"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-buffalo-bright),
+    0 0 14px var(--theme-glow-buffalo-strong);
+}
+
+/* ──────────────── 24. Scrollbar styling ──────────────── */
+
+[data-theme="indiane"] [data-frame-panel] {
+  scrollbar-color: var(--theme-prairie-gold) var(--theme-wood-dark);
+  scrollbar-width: thin;
+}
+
+[data-theme="indiane"] [data-frame-panel]::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme="indiane"] [data-frame-panel]::-webkit-scrollbar-track {
+  background: var(--theme-wood-dark);
+}
+
+[data-theme="indiane"] [data-frame-panel]::-webkit-scrollbar-thumb {
+  background: var(--theme-prairie-gold);
+  border-radius: 4px;
+}
+
+/* ──────────────── 25. Tablet (1024–1279px) — menší corner-tl + logo ──────────────── */
+
+@media (max-width: 1279px) {
+  [data-theme="indiane"] {
+    --asset-corner-size: 56px;
+    --asset-logo-w: 280px;
+  }
+}
+
+/* ──────────────── 26. Mobile (≤768px) — oval → obdélník, hide bead-string + constellation, drum-beat off ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="indiane"] {
+    --asset-corner-size: var(--asset-corner-size-mobile);
+    --asset-logo-w: var(--asset-logo-w-mobile);
+    --frame-pad-x: 12px;
+  }
+
+  [data-theme="indiane"] [data-frame-panel="sidebar"],
+  [data-theme="indiane"] [data-frame-panel="right"],
+  [data-theme="indiane"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-radius: 4px;
+  }
+
+  /* Bead-string skryté na mobile (vyrušuje) */
+  [data-theme="indiane"][data-shell="ikaros"] > header::before {
+    display: none;
+  }
+
+  /* Drawer mode — corner ornamenty schované */
+  [data-theme="indiane"] [class*="drawer"] [data-frame-panel] [class*="ornament"],
+  [data-theme="indiane"] [data-drawer-open] [data-frame-panel] [class*="ornament"] {
+    display: none;
+  }
+
+  /* Welcome card — z oval na obdélník, bez drum-beat */
+  [data-theme="indiane"] [data-frame-panel="card"] {
+    aspect-ratio: auto;
+    border-radius: 24px;
+    min-height: clamp(360px, 50vh, 560px);
+    padding: 28px 24px;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Drum-pictograph na mobile slabší (text by jinak nečitelný) */
+  [data-theme="indiane"] [data-frame-panel="card"]::before {
+    opacity: 0.22;
+  }
+
+  /* Outer frame schovat (na úzkém oval frame nesedí na obdélník) */
+  [data-theme="indiane"] [data-frame-panel="card"]::after {
+    display: none;
+  }
+
+  /* Welcome content — paddings menší, signature menší font */
+  [data-theme="indiane"] [data-frame-panel="card"] [class*="signature"] {
+    font-size: 22px;
+  }
+
+  /* Hearth glow menší */
+  [data-theme="indiane"][data-shell="ikaros"]::after {
+    height: 30vh;
+  }
+
+  /* Constellation skryto */
+  [data-theme="indiane"][data-shell="ikaros"] body::after {
+    display: none;
+  }
+
+  /* Decor fire-stones menší (nebo skryto pro ≤480px) */
+  [data-theme="indiane"][data-shell="ikaros"] body::before {
+    height: 120px;
+    opacity: 0.55;
+  }
+
+  /* Nav ikony menší */
+  [data-theme="indiane"] [data-nav-key] [class*="navItemIcon"] {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Touch target ≥48px */
+  [data-theme="indiane"] [class*="navItem"] {
+    min-height: 48px;
+  }
+
+  /* Header buttony icon-only */
+  [data-theme="indiane"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+    padding: 0 10px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 0.7rem;
+  }
+
+  [data-theme="indiane"] [class*="headerBtnLabel"] {
+    display: none;
+  }
+
+  /* Feather-stamp menší */
+  [data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]::before,
+  [data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]::before {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+  }
+
+  /* Petroglyph-divider menší */
+  [data-theme="indiane"] [class*="sectionTitle"]::after {
+    height: 8px;
+  }
+}
+
+/* ≤480px — decor fire-stones úplně schovat */
+@media (max-width: 480px) {
+  [data-theme="indiane"][data-shell="ikaros"] body::before {
+    display: none;
+  }
+}
+
+/* ──────────────── 27. Reduced motion — všech 5 animací off ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="indiane"] *,
+  [data-theme="indiane"][data-shell="ikaros"]::after,
+  [data-theme="indiane"][data-shell="ikaros"] > header::before,
+  [data-theme="indiane"] [data-frame-panel="card"],
+  [data-theme="indiane"] [class*="btn3dActive"]::after,
+  [data-theme="indiane"] [class*="navItemActive"]::after,
+  [data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]::before,
+  [data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Welcome card — zachovat scale 1.0, žádný drum-beat */
+  [data-theme="indiane"] [data-frame-panel="card"] {
+    transform: scale(1.000) !important;
+  }
+
+  /* Bead-string — zachovat rotation 0deg (nesouroží 2deg vlevo) */
+  [data-theme="indiane"][data-shell="ikaros"] > header::before {
+    transform: rotate(0deg) !important;
+  }
+
+  /* Feather stamp scale na klik je UX feedback (transitin not animation) */
+  [data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]::before,
+  [data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]::before {
+    transition: transform 150ms ease !important;
+  }
+}
+
+/* ──────────────── 28. Forced colors (Windows high contrast) ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="indiane"] [data-frame-panel] [class*="ornament"],
+  [data-theme="indiane"] [data-frame-panel="card"]::before,
+  [data-theme="indiane"] [data-frame-panel="card"]::after,
+  [data-theme="indiane"] [data-nav-key] [class*="navItemIcon"],
+  [data-theme="indiane"][data-shell="ikaros"] > header::before,
+  [data-theme="indiane"][data-shell="ikaros"] body::before,
+  [data-theme="indiane"] [class*="sectionTitle"]::after,
+  [data-theme="indiane"] [data-frame-panel="right"] [class*="rightAddBtn"]::before,
+  [data-theme="indiane"] [data-frame-panel="novinky"] [class*="addBtn"]::before,
+  [data-theme="indiane"] [class*="btn3dActive"]::before,
+  [data-theme="indiane"] [class*="navItemActive"]::before {
+    forced-color-adjust: none;
+  }
+}

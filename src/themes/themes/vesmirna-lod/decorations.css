@@ -1,46 +1,433 @@
-/* ── Vesmírná loď — vojenský hangár, L-bracket rohy ── */
+/* ── Vesmírná loď — vojenský hangár (spec 1.0g + audit 1.0g)
+   Cyan + amber dual-tone, plate-metal panely, asymmetric corner plates
+   (TL cyan plate, BR amber warning stripe), chamfered topbar buttons,
+   stencil section title `>>> NAVIGACE`, 7 nav icon assety přes data-nav-key.
+   Scoped přes [data-theme="vesmirna-lod"], žádný globální dopad. */
 
 [data-theme="vesmirna-lod"] {
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(0, 184, 232, 0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 100%, rgba(232, 160, 32, 0.06) 0%, transparent 50%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  background-color: var(--bg-primary);
+  background-color: #040810;
 }
 
-/* Žádné zaoblené rohy globálně */
-[data-theme="vesmirna-lod"] .card,
-[data-theme="vesmirna-lod"] [class*="card"],
-[data-theme="vesmirna-lod"] button {
-  border-radius: 0;
+/* ──────────────── 1. Atmosférický overlay ──────────────── */
+
+[data-theme="vesmirna-lod"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* L-bracket rohy na panelech */
-[data-theme="vesmirna-lod"] .card,
-[data-theme="vesmirna-lod"] [class*="card"] {
+/* ──────────────── 2. Topbar — slim 56px, double-rule cyan + amber ──────────────── */
+
+[data-theme="vesmirna-lod"][data-shell="ikaros"] > header {
   position: relative;
+  border-bottom: 1px solid var(--theme-border-cyan);
 }
-[data-theme="vesmirna-lod"] .card::before,
-[data-theme="vesmirna-lod"] [class*="card"]::before {
+
+[data-theme="vesmirna-lod"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-accent-amber) 20%,
+    var(--theme-accent-amber) 80%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px var(--theme-glow-amber));
+}
+
+/* ──────────────── 3. Logo banner — zachovat asset, cyan glow ──────────────── */
+
+[data-theme="vesmirna-lod"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 12px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 0 8px var(--theme-glow-cyan));
+}
+
+/* ──────────────── 4. Glass panely — plate-metal + chamfered TR + cyan glow ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-frame-panel="sidebar"],
+[data-theme="vesmirna-lod"] [data-frame-panel="right"],
+[data-theme="vesmirna-lod"] [data-frame-panel="card"],
+[data-theme="vesmirna-lod"] [data-frame-panel="novinky"] {
+  position: relative;
+  background: linear-gradient(135deg, rgba(8, 22, 36, 0.85) 0%, rgba(4, 10, 18, 0.95) 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--theme-border);
+  border-radius: 0;
+  /* Chamfered TR roh — 14×14 ořez (industrial plate cut) */
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  isolation: isolate;
+  box-shadow:
+    inset 0 0 0 4px rgba(0, 184, 232, 0.10),
+    0 5px 25px rgba(0, 4, 8, 0.7),
+    inset 0 0 24px rgba(0, 184, 232, 0.06);
+}
+
+/* ──────────────── 5. Industrial corner plates — TL cyan, BR amber warning stripe (audit A3) ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-frame-panel="sidebar"]::before,
+[data-theme="vesmirna-lod"] [data-frame-panel="right"]::before,
+[data-theme="vesmirna-lod"] [data-frame-panel="card"]::before,
+[data-theme="vesmirna-lod"] [data-frame-panel="novinky"]::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 12px;
-  height: 12px;
-  border-top: 2px solid var(--accent);
-  border-left: 2px solid var(--accent);
+  width: 36px;
+  height: 24px;
+  background:
+    radial-gradient(circle at 18% 50%, var(--theme-accent-cyan) 0 2px, transparent 3px),
+    radial-gradient(circle at 82% 50%, var(--theme-accent-cyan) 0 2px, transparent 3px),
+    linear-gradient(135deg, rgba(20, 40, 60, 0.95), rgba(8, 22, 36, 0.95));
+  border-right: 1px solid var(--theme-border-cyan);
+  border-bottom: 1px solid var(--theme-border-cyan);
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan));
   pointer-events: none;
+  z-index: 3;
 }
-[data-theme="vesmirna-lod"] .card::after,
-[data-theme="vesmirna-lod"] [class*="card"]::after {
+
+[data-theme="vesmirna-lod"] [data-frame-panel="sidebar"]::after,
+[data-theme="vesmirna-lod"] [data-frame-panel="right"]::after,
+[data-theme="vesmirna-lod"] [data-frame-panel="card"]::after,
+[data-theme="vesmirna-lod"] [data-frame-panel="novinky"]::after {
   content: '';
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 12px;
-  height: 12px;
-  border-bottom: 2px solid var(--accent);
-  border-right: 2px solid var(--accent);
+  width: 36px;
+  height: 24px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      var(--theme-accent-amber) 0 4px,
+      #0a0e14 4px 8px
+    );
+  border-left: 1px solid var(--theme-border-amber);
+  border-top: 1px solid var(--theme-border-amber);
+  filter: drop-shadow(0 0 4px var(--theme-glow-amber));
   pointer-events: none;
+  z-index: 3;
+  opacity: 0.85;
+}
+
+/* ──────────────── 6. CornerOrnamenty — reaktivace na malé cyan rivetové body, žádná animace ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-frame-panel] [class*="ornament"] {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, var(--theme-accent-cyan) 0%, transparent 70%);
+  border: none;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 3px var(--theme-glow-cyan));
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.85;
+  transform: none;
+}
+
+[data-theme="vesmirna-lod"] [data-frame-panel] [class*="ornament"][data-position="tl"] { top: 6px; left: 6px; }
+[data-theme="vesmirna-lod"] [data-frame-panel] [class*="ornament"][data-position="tr"] { top: 6px; right: 18px; }
+[data-theme="vesmirna-lod"] [data-frame-panel] [class*="ornament"][data-position="bl"] { bottom: 6px; left: 6px; }
+[data-theme="vesmirna-lod"] [data-frame-panel] [class*="ornament"][data-position="br"] { bottom: 6px; right: 6px; }
+
+/* ──────────────── 7. Welcome card — dominantní min-height ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-frame-panel="card"] {
+  min-height: 60vh;
+}
+
+/* ──────────────── 8. Andel medailon — minimální 4 cyan rivet body (audit A1) ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-andel-medallion] {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  background-image:
+    radial-gradient(circle at calc(100% - 7px) 7px, var(--theme-accent-cyan) 0 3px, transparent 4px),
+    radial-gradient(circle at 7px calc(100% - 7px), var(--theme-accent-cyan) 0 3px, transparent 4px),
+    var(--asset-andel-medallion);
+  background-size: auto, auto, contain;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: top right, bottom left, center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 18px var(--theme-glow-cyan));
+}
+
+[data-theme="vesmirna-lod"] [data-andel-medallion]::before,
+[data-theme="vesmirna-lod"] [data-andel-medallion]::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, var(--theme-accent-cyan) 0%, transparent 70%);
+  filter: drop-shadow(0 0 3px var(--theme-glow-cyan));
+  pointer-events: none;
+}
+
+[data-theme="vesmirna-lod"] [data-andel-medallion]::before { top: 4px; left: 4px; }
+[data-theme="vesmirna-lod"] [data-andel-medallion]::after  { bottom: 4px; right: 4px; }
+
+/* ──────────────── 9. Section title — amber stencil + chevron POUZE vlevo (audit A2) ──────────────── */
+
+[data-theme="vesmirna-lod"] [class*="sectionTitle"] {
+  color: var(--theme-accent-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-shadow: 0 0 6px var(--theme-glow-amber);
+  position: relative;
+  padding-left: 2.4em;
+}
+
+[data-theme="vesmirna-lod"] [class*="sectionTitle"]::before {
+  content: '>>> ';
+  position: absolute;
+  left: 0;
+  color: var(--theme-accent-amber);
+  letter-spacing: 0;
+}
+
+[data-theme="vesmirna-lod"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 4px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--theme-accent-cyan) 0%, transparent 100%);
+  filter: drop-shadow(0 0 3px var(--theme-glow-cyan));
+}
+
+/* ──────────────── 10. NavItem (btn3d) — plate-metal, aktivní cyan + amber 3px left rule ──────────────── */
+
+[data-theme="vesmirna-lod"] [class*="btn3d"] {
+  --btn-bg-1: rgba(10, 24, 38, 0.92);
+  --btn-bg-2: rgba(4, 12, 22, 0.92);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-text);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(0, 184, 232, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 4, 8, 0.85),
+    0 2px 5px 0 rgba(0, 4, 8, 0.7);
+}
+
+[data-theme="vesmirna-lod"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(18, 42, 62, 0.95);
+  --btn-bg-2: rgba(6, 20, 34, 0.98);
+  --btn-border: var(--theme-accent);
+  --btn-color: var(--theme-accent-bright);
+  --btn-translate: -2px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(0, 184, 232, 0.18),
+    inset 0 -2px 4px 0 rgba(0, 4, 8, 0.85),
+    0 0 14px var(--theme-glow-cyan),
+    0 4px 7px 0 rgba(0, 4, 8, 0.7);
+  text-shadow: 0 0 8px var(--theme-glow-cyan);
+}
+
+[data-theme="vesmirna-lod"] [class*="btn3dActive"],
+[data-theme="vesmirna-lod"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(0, 184, 232, 0.32);
+  --btn-bg-2: rgba(8, 22, 36, 0.55);
+  --btn-border: var(--theme-accent);
+  --btn-color: #ffffff;
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 4, 8, 0.55),
+    inset 3px 0 0 0 var(--theme-accent-amber),
+    0 0 16px var(--theme-glow-cyan);
+  text-shadow: 0 0 10px var(--theme-glow-cyan-strong);
+}
+
+/* ──────────────── 11. Pravý panel kompakt ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="vesmirna-lod"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="vesmirna-lod"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1) var(--sp-2);
+  font-size: 0.66rem;
+}
+
+[data-theme="vesmirna-lod"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="vesmirna-lod"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+/* ──────────────── 12. Header buttons — chamfered 5-úhelník + uppercase ──────────────── */
+
+[data-theme="vesmirna-lod"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  padding: 0 14px;
+  height: 32px;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px);
+}
+
+/* Reset inner spans — bez padding/height, jinak ikona + text se rozlézají */
+[data-theme="vesmirna-lod"] [class*="headerBtnIcon"],
+[data-theme="vesmirna-lod"] [class*="headerBtnLabel"] {
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+/* ──────────────── 13. PJ badge — cyan chip + amber inner ring ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-accent-bright), var(--theme-accent));
+  color: var(--bg-primary);
+  border: 1px solid var(--theme-accent);
+  box-shadow:
+    0 0 8px var(--theme-glow-cyan),
+    inset 0 0 0 1px var(--theme-accent-amber),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.20);
+  text-shadow: none;
+}
+
+/* ──────────────── 14. Welcome heading + signature ──────────────── */
+
+[data-theme="vesmirna-lod"] [class*="titleAccent"] {
+  text-shadow: 0 0 10px var(--theme-glow-cyan);
+  border-bottom: 2px solid var(--theme-accent-amber);
+  padding-bottom: 2px;
+}
+
+[data-theme="vesmirna-lod"] [class*="signature"] {
+  font-family: 'Rajdhani', system-ui, sans-serif;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.10em;
+  color: var(--theme-accent-amber);
+  font-size: 22px;
+}
+
+[data-theme="vesmirna-lod"] [class*="signature"]::after {
+  content: '';
+  display: inline-block;
+  width: 60px;
+  height: 6px;
+  margin-left: 14px;
+  vertical-align: middle;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 6'><rect x='0' y='1' width='9' height='4' fill='%23e8a020'/><rect x='14' y='1' width='9' height='4' fill='%23e8a020'/><rect x='28' y='1' width='9' height='4' fill='%23e8a020'/><rect x='42' y='1' width='9' height='4' fill='%23e8a020'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 5px var(--theme-glow-amber));
+}
+
+/* ──────────────── 15. Nav ikony — 7 assetů přes data-nav-key ──────────────── */
+
+[data-theme="vesmirna-lod"] [data-nav-key] [class*="navItemIcon"] {
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan));
+}
+
+[data-theme="vesmirna-lod"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+[data-theme="vesmirna-lod"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="vesmirna-lod"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="vesmirna-lod"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="vesmirna-lod"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="vesmirna-lod"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="vesmirna-lod"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="vesmirna-lod"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* ──────────────── 16. Focus-visible — box-shadow ring (ne outline kvůli pseudoelementům) ──────────────── */
+
+[data-theme="vesmirna-lod"] [class*="navItem"]:focus-visible,
+[data-theme="vesmirna-lod"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):focus-visible,
+[data-theme="vesmirna-lod"] [class*="btn3d"]:focus-visible,
+[data-theme="vesmirna-lod"] [class*="showAllLink"]:focus-visible,
+[data-theme="vesmirna-lod"] [class*="rightAddBtn"]:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-accent-cyan),
+    0 0 14px var(--theme-glow-cyan-strong);
+}
+
+/* ──────────────── 17. Mobile (≤768px) — zjednodušení + KEEP-ON-MOBILE marker (audit A4) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="vesmirna-lod"] [data-frame-panel="sidebar"],
+  [data-theme="vesmirna-lod"] [data-frame-panel="right"],
+  [data-theme="vesmirna-lod"] [data-frame-panel="card"],
+  [data-theme="vesmirna-lod"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    clip-path: none;
+    border-left: 2px solid var(--theme-accent-amber);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 184, 232, 0.18),
+      0 4px 14px rgba(0, 4, 8, 0.7);
+  }
+
+  [data-theme="vesmirna-lod"] [data-frame-panel]::before,
+  [data-theme="vesmirna-lod"] [data-frame-panel]::after,
+  [data-theme="vesmirna-lod"] [data-frame-panel] [class*="ornament"] {
+    display: none;
+  }
+
+  [data-theme="vesmirna-lod"] [data-frame-panel="card"] {
+    min-height: 0;
+  }
+
+  [data-theme="vesmirna-lod"] [data-andel-medallion] {
+    width: 180px;
+    height: 180px;
+  }
+
+  [data-theme="vesmirna-lod"] [class*="signature"] {
+    font-size: 18px;
+  }
+
+  [data-theme="vesmirna-lod"] [class*="signature"]::after {
+    display: none;
+  }
+
+  [data-theme="vesmirna-lod"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+    padding: 0 10px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 0.7rem;
+    clip-path: none;
+  }
+}
+
+/* ──────────────── 18. Reduced motion ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="vesmirna-lod"] * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

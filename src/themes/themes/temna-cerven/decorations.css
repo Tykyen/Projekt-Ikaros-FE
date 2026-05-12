@@ -1,0 +1,1013 @@
+/* ── Temná červeň — salón nesmrtelného šlechtice × upír-sběratel.
+   Křižácké železo + baroque tarnishované stříbro + viktoriánský granát + jet-bead smutek + crimson velvet.
+   12 dodaných assetů: logo, medailon, corner-tl, wax-seal, jet-bead-frame, bat-arch, divider-rose,
+   7× vampire-collector nav medailony (dopis-pečeť, glóbus, masky, deník, portrét-bez-odrazu, kandelábr, pohár-krve).
+   Garnet drop-cap "V" = CSS-only ::first-letter (žádný asset).
+   Heartbeat tep + padající okvětní lístky růží + damask wallpaper + film grain = signature motion language.
+   Scoped přes [data-theme="temna-cerven"], žádný globální dopad. */
+
+[data-theme="temna-cerven"] {
+  background-color: var(--bg-primary);
+}
+
+/* ──────────────── 1. Atmosférický overlay (5-vrstvý gradient + damask + film grain) ──────────────── */
+
+[data-theme="temna-cerven"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Damask wallpaper — subtle crimson pattern přes celý shell (multiply blend) */
+[data-theme="temna-cerven"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--theme-damask-pattern);
+  background-size: 80px 120px;
+  background-repeat: repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Film grain — analogová textura (overlay blend, fixed full-screen) */
+[data-theme="temna-cerven"][data-shell="ikaros"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--theme-grain-pattern);
+  background-size: 160px 160px;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ──────────────── 2. Padající okvětní lístky růží (signature animation) ──────────────── */
+
+[data-theme="temna-cerven"] [data-theme-decoration="petals"] {
+  display: block;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+[data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal {
+  position: absolute;
+  width: 10px;
+  height: 14px;
+  background: radial-gradient(ellipse at 30% 20%,
+    var(--theme-garnet-incand) 0%,
+    var(--theme-garnet-deep) 75%);
+  border-radius: 80% 10% 80% 10% / 60% 10% 90% 10%;
+  filter: blur(0.3px) drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
+  opacity: 0.55;
+  animation: tc-drift linear infinite;
+}
+
+[data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(1) {
+  left: 8%;  top: -20px; animation-duration: 28s; animation-delay: -3s;
+}
+[data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(2) {
+  left: 22%; top: -20px; animation-duration: 36s; animation-delay: -10s;
+}
+[data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(3) {
+  left: 47%; top: -20px; animation-duration: 32s; animation-delay: -18s;
+}
+[data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(4) {
+  left: 71%; top: -20px; animation-duration: 40s; animation-delay: -7s;
+}
+[data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(5) {
+  left: 88%; top: -20px; animation-duration: 30s; animation-delay: -22s;
+}
+
+@keyframes tc-drift {
+  0%   { transform: translate(0, -30px) rotate(0deg); opacity: 0; }
+  8%   { opacity: 0.6; }
+  100% { transform: translate(70px, 110vh) rotate(540deg); opacity: 0; }
+}
+
+/* ──────────────── 3. Topbar — solidní zčernalý kov + tufting buttons ──────────────── */
+
+[data-theme="temna-cerven"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(35, 12, 18, 0.8) 0%, rgba(15, 5, 9, 0.92) 100%);
+  border-bottom: 1px solid var(--theme-border-silver);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.06),
+    inset 0 0 0 1px rgba(126, 10, 30, 0.18),
+    0 14px 30px rgba(0, 0, 0, 0.55);
+}
+
+/* Tufting buttons na koncích topbaru (signature čalouněný styling) */
+[data-theme="temna-cerven"][data-shell="ikaros"] > header::before,
+[data-theme="temna-cerven"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%,
+    var(--theme-silver-bright) 0%,
+    var(--theme-silver-shadow) 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 4px var(--theme-glow-silver);
+  z-index: 5;
+}
+[data-theme="temna-cerven"][data-shell="ikaros"] > header::before { left: 10px; }
+[data-theme="temna-cerven"][data-shell="ikaros"] > header::after  { right: 10px; }
+
+/* ──────────────── 4. Logo banner ──────────────── */
+
+[data-theme="temna-cerven"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter:
+    drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 14px rgba(191, 31, 58, 0.45));
+}
+
+/* ──────────────── 5. Header buttons — silver name plates + thin bracket ──────────────── */
+
+[data-theme="temna-cerven"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]) {
+  position: relative;
+  background: linear-gradient(180deg, #1d0911 0%, #100509 100%);
+  color: var(--theme-text-pale);
+  border: 1px solid var(--theme-border-silver);
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  padding: 0 16px;
+  height: 34px;
+  min-height: 34px;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 6px 14px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  transition: border-color 280ms, color 280ms, box-shadow 280ms;
+}
+
+/* Thin silver bracket pod textem — name plate na opera-boxu */
+[data-theme="temna-cerven"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"])::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 5px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--theme-silver-tarnish),
+    transparent);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+[data-theme="temna-cerven"] [class*="headerBtn"]:not([class*="headerBtnIcon"]):not([class*="headerBtnLabel"]):not([class*="headerBtnActive"]):not([class*="headerBtnPrimary"]):not([class*="headerBtnDisabled"]):hover:not(:disabled) {
+  color: var(--theme-silver-bright);
+  border-color: rgba(212, 200, 190, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(168, 19, 46, 0.45),
+    0 0 18px var(--theme-glow-garnet),
+    0 8px 22px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="temna-cerven"] [class*="headerBtnIcon"],
+[data-theme="temna-cerven"] [class*="headerBtnLabel"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+
+/* ──────────────── 6. Glass panely — čalouněné sametové desky ──────────────── */
+
+[data-theme="temna-cerven"] [data-frame-panel="sidebar"],
+[data-theme="temna-cerven"] [data-frame-panel="right"] {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(28, 8, 14, 0.92) 0%, rgba(14, 5, 9, 0.95) 100%),
+    var(--theme-damask-pattern);
+  background-size: auto, 60px 90px;
+  background-blend-mode: normal, multiply;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--theme-border-silver);
+  border-radius: 4px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.08),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--theme-border-garnet),
+    0 22px 50px rgba(0, 0, 0, 0.55);
+}
+
+/* Welcome card + Novinky = stejný čalouněný materiál + glassmorphism + heartbeat */
+[data-theme="temna-cerven"] [data-frame-panel="card"],
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(28, 9, 15, 0.94) 0%, rgba(14, 5, 9, 0.96) 100%),
+    var(--theme-damask-pattern);
+  background-size: auto, 80px 120px;
+  background-blend-mode: normal, multiply;
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  backdrop-filter: blur(8px) saturate(1.05);
+  border: 1px solid var(--theme-border-silver);
+  border-radius: 4px;
+  isolation: isolate;
+  overflow: visible;
+  box-shadow:
+    var(--theme-inner-shadow),
+    inset 0 0 0 1px var(--theme-border-garnet),
+    0 28px 70px rgba(0, 0, 0, 0.6);
+}
+
+/* Heartbeat tep srdce upíra — jen welcome card (signature animation) */
+[data-theme="temna-cerven"] [data-frame-panel="card"] {
+  animation: tc-heartbeat 6.4s ease-in-out infinite;
+  will-change: box-shadow;
+}
+
+@keyframes tc-heartbeat {
+  0%, 18%, 100% {
+    box-shadow:
+      var(--theme-inner-shadow),
+      inset 0 0 0 1px var(--theme-border-garnet),
+      0 28px 70px rgba(0, 0, 0, 0.6);
+  }
+  8% {  /* lub */
+    box-shadow:
+      var(--theme-inner-shadow),
+      inset 0 0 0 1px rgba(191, 31, 58, 0.7),
+      inset 0 0 28px rgba(168, 19, 46, 0.18),
+      0 28px 70px rgba(0, 0, 0, 0.6);
+  }
+  14% { /* dub */
+    box-shadow:
+      var(--theme-inner-shadow),
+      inset 0 0 0 1px rgba(212, 200, 190, 0.4),
+      inset 0 0 22px rgba(168, 19, 46, 0.10),
+      0 28px 70px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ──────────────── 7. Corner ornamenty — všechny panely (welcome, novinky, sidebar, right) ──────────────── */
+
+[data-theme="temna-cerven"] [data-frame-panel] [class*="ornament"] {
+  width: var(--asset-corner-size);
+  height: var(--asset-corner-size);
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.95;
+  filter: drop-shadow(0 1px 0 #000) drop-shadow(0 0 6px rgba(168, 19, 46, 0.35));
+  position: absolute;
+  display: block;
+  /* potlačit default tvar diamantu z CornerOrnament.module.css */
+  transform: none;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Novinky = menší corner */
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: var(--asset-corner-size-novinky);
+  height: var(--asset-corner-size-novinky);
+}
+
+/* Sidebar + right panel = nejmenší corner */
+[data-theme="temna-cerven"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="ornament"] {
+  width: var(--asset-corner-size-side);
+  height: var(--asset-corner-size-side);
+  opacity: 0.85;
+}
+
+[data-theme="temna-cerven"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+}
+[data-theme="temna-cerven"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  top: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scaleX(-1);
+}
+[data-theme="temna-cerven"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  left: calc(var(--frame-corner-inset) * -1);
+  transform: scaleY(-1);
+}
+[data-theme="temna-cerven"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: calc(var(--frame-corner-inset) * -1);
+  right: calc(var(--frame-corner-inset) * -1);
+  transform: scale(-1, -1);
+}
+
+/* Z-index strategy — content nad ornamenty */
+[data-theme="temna-cerven"] [data-frame-panel] > [class*="header"],
+[data-theme="temna-cerven"] [data-frame-panel] > [class*="body"] {
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 8. Welcome card — vampire-aristokratický oltář (signature centerpiece) ──────────────── */
+
+[data-theme="temna-cerven"] [data-frame-panel="card"] {
+  min-height: clamp(420px, 60vh, 720px);
+  /* extra padding-top pro bat-arch crown který přesahuje nahoru */
+  padding-top: 56px;
+}
+
+/* 🎨 Bat-arch crown nad welcome card (signature element — analog skull-arch nemrtvi) */
+[data-theme="temna-cerven"] [data-frame-panel="card"]::before {
+  content: '';
+  position: absolute;
+  top: -32px;
+  left: 0;
+  right: 0;
+  height: 96px;
+  background-image: var(--asset-bat-arch);
+  background-size: contain;
+  background-position: center top;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.85));
+}
+
+/* Welcome heading — porcelánová pleť, garnet glow */
+[data-theme="temna-cerven"] [data-frame-panel="card"] [class*="welcomeTitle"] {
+  color: var(--theme-text-pale);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(168, 19, 46, 0.25);
+}
+
+/* "Projektu Ikaros." accent — granátový glow + carved depth */
+[data-theme="temna-cerven"] [data-frame-panel="card"] [class*="titleAccent"] {
+  color: var(--theme-garnet-bright);
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(168, 19, 46, 0.5);
+}
+
+/* Decorativní silver-garnet hairline pod nadpisem */
+[data-theme="temna-cerven"] [data-frame-panel="card"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 12px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--theme-silver-tarnish) 22%,
+    var(--theme-garnet-bright) 50%,
+    var(--theme-silver-tarnish) 78%,
+    transparent 100%);
+  opacity: 0.65;
+  filter: drop-shadow(0 0 3px var(--theme-glow-garnet));
+}
+
+/* Body paragraphs — Cormorant Garamond, porcelánová pleť, didone elegance */
+[data-theme="temna-cerven"] [data-frame-panel="card"] [class*="paragraph"] {
+  color: var(--theme-text-pale);
+  font-family: var(--font-body);
+  font-size: 1.08em;
+  line-height: 1.65;
+}
+
+/* Signature — Italianno cursive ink-blood color (jako podpis krví) */
+[data-theme="temna-cerven"] [data-frame-panel="card"] [class*="signature"] {
+  color: var(--theme-ink-blood);
+  font-family: var(--font-script);
+  font-size: 1.6em;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 14px rgba(155, 18, 38, 0.45);
+}
+
+/* ──────────────── 9. Andel medailon — Ikaros bird v iron-cross frame + jet-bead obtočení ──────────────── */
+
+[data-theme="temna-cerven"] [data-andel-medallion] {
+  position: relative;
+  width: 240px;
+  height: 290px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter:
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.75))
+    drop-shadow(0 0 22px rgba(168, 19, 46, 0.45));
+}
+
+/* Jet-bead viktoriánský smuteční rámeček okolo medailonu */
+[data-theme="temna-cerven"] [data-andel-medallion]::before {
+  content: '';
+  position: absolute;
+  inset: -22px;
+  background-image: var(--asset-jet-bead-frame);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.92;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+}
+
+/* ──────────────── 10. Garnet drop-cap "V" — Pirata One, multi-stack garnet halo ──────────────── */
+
+[data-theme="temna-cerven"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-size: 4.2em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.05em 0.10em 0 0;
+  color: var(--theme-garnet-bright);
+  text-shadow:
+    0 0 0.04em rgba(0, 0, 0, 1),
+    0 2px 0.06em rgba(0, 0, 0, 0.9),
+    0 0 0.25em rgba(168, 19, 46, 0.45),
+    0 0 0.5em rgba(74, 6, 18, 0.30);
+  font-weight: 400;
+}
+
+/* ──────────────── 11. Wax seal s otisky tesáků (signature element — visí z welcome card) ──────────────── */
+
+[data-theme="temna-cerven"] [data-frame-panel="card"]::after {
+  content: '';
+  position: absolute;
+  bottom: -22px;
+  left: 36px;
+  width: 64px;
+  height: 64px;
+  background-image: var(--asset-wax-seal);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  z-index: 4;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.7));
+}
+
+/* ──────────────── 12. Section title — Pirata One uppercase + silver tarnish ──────────────── */
+
+[data-theme="temna-cerven"] [class*="sectionTitle"] {
+  color: var(--theme-silver-tarnish);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 0.92em;
+  line-height: 1.2;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 6px rgba(168, 19, 46, 0.18);
+  position: relative;
+  padding-bottom: 18px;
+  text-align: center;
+}
+
+/* Divider-rose pod section title (signature element — místo nemrtvi divider-skull) */
+[data-theme="temna-cerven"] [class*="sectionTitle"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  background-image:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(168, 152, 144, 0.45) 30%,
+      transparent 48%,
+      transparent 52%,
+      rgba(168, 152, 144, 0.45) 70%,
+      transparent 100%),
+    var(--asset-divider-rose);
+  background-size: 100% 1px, 90px 16px;
+  background-position: 0 50%, center center;
+  background-repeat: no-repeat, no-repeat;
+  opacity: 0.92;
+}
+
+/* ──────────────── 13. NavItem (btn3d) — čalouněný štít + granátový hover + silver bracket [ ] active ──────────────── */
+
+[data-theme="temna-cerven"] [class*="btn3d"] {
+  --btn-bg-1: rgba(35, 12, 18, 0.65);
+  --btn-bg-2: rgba(14, 5, 9, 0.85);
+  --btn-border: transparent;
+  --btn-color: var(--theme-text-pale);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 200, 190, 0.06),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.55),
+    0 2px 5px 0 rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="temna-cerven"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(50, 14, 22, 0.82);
+  --btn-bg-2: rgba(20, 6, 12, 0.92);
+  --btn-border: var(--theme-silver-tarnish);
+  --btn-color: var(--theme-silver-bright);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(212, 200, 190, 0.16),
+    inset 0 0 0 1px var(--theme-border-garnet),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.55),
+    0 0 16px rgba(168, 19, 46, 0.35),
+    0 4px 7px 0 rgba(0, 0, 0, 0.55);
+  text-shadow: 0 0 6px rgba(168, 19, 46, 0.5);
+}
+
+/* Active = silver bracket [ ] kolem položky (signature — NE červené pozadí) */
+[data-theme="temna-cerven"] [class*="btn3dActive"],
+[data-theme="temna-cerven"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(74, 6, 18, 0.7);
+  --btn-bg-2: rgba(30, 6, 12, 0.85);
+  --btn-border: rgba(212, 200, 190, 0.35);
+  --btn-color: var(--theme-silver-bright);
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 0 0 1px var(--theme-border-garnet),
+    inset 0 1px 0 0 rgba(212, 200, 190, 0.10),
+    0 0 22px rgba(191, 31, 58, 0.35);
+  text-shadow:
+    0 0 8px rgba(191, 31, 58, 0.5),
+    0 1px 1px rgba(0, 0, 0, 0.85);
+  position: relative;
+}
+
+/* Silver name-plate brackets [ ] L+R (signature — opera box jmenovka) */
+[data-theme="temna-cerven"] [class*="btn3dActive"]::before,
+[data-theme="temna-cerven"] [class*="btn3dActive"]::after,
+[data-theme="temna-cerven"] [class*="navItemActive"]::before,
+[data-theme="temna-cerven"] [class*="navItemActive"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 14px;
+  border: 1px solid var(--theme-silver-tarnish);
+  pointer-events: none;
+}
+[data-theme="temna-cerven"] [class*="btn3dActive"]::before,
+[data-theme="temna-cerven"] [class*="navItemActive"]::before {
+  left: -3px;
+  border-right: none;
+}
+[data-theme="temna-cerven"] [class*="btn3dActive"]::after,
+[data-theme="temna-cerven"] [class*="navItemActive"]::after {
+  right: -3px;
+  border-left: none;
+}
+
+/* NavItem text — Pirata One display, drippy blackletter */
+[data-theme="temna-cerven"] [class*="navItem"] [class*="navItemLabel"],
+[data-theme="temna-cerven"] [class*="btn3d"] [class*="navItemLabel"] {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.92em;
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+/* ──────────────── 14. Pravý panel — ThemeSwitcher trigger v ADMINISTRACE ──────────────── */
+
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] {
+  background: linear-gradient(180deg, #1d0911 0%, #100509 100%);
+  color: var(--theme-text-pale);
+  border: 1px solid var(--theme-border-silver);
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.55);
+  height: 42px;
+  transition: border-color 280ms, color 280ms, box-shadow 280ms;
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]:hover {
+  color: var(--theme-silver-bright);
+  border-color: rgba(212, 200, 190, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(168, 19, 46, 0.45),
+    0 0 18px var(--theme-glow-garnet),
+    0 6px 16px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup]::before {
+  display: none;
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="themeSwitcherSlot"] button[aria-haspopup] [class*="triggerCaret"] {
+  color: var(--theme-silver-tarnish);
+  font-size: 11px;
+}
+
+/* ThemeSwitcher popover — vampire-styled */
+[data-theme="temna-cerven"] [class*="themeSwitcherSlot"] [class*="popover"] {
+  background: linear-gradient(180deg, rgba(28, 9, 15, 0.96), rgba(14, 5, 9, 0.98));
+  border: 1px solid var(--theme-border-silver);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.08),
+    0 0 0 1px var(--theme-border-garnet) inset,
+    0 18px 40px rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="temna-cerven"] [class*="themeSwitcherSlot"] [class*="option"] {
+  color: var(--theme-text-pale);
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+}
+
+[data-theme="temna-cerven"] [class*="themeSwitcherSlot"] [class*="optionActive"] {
+  color: var(--theme-silver-bright);
+  background: rgba(74, 6, 18, 0.5);
+  box-shadow: inset 0 0 0 1px var(--theme-border-garnet);
+}
+
+[data-theme="temna-cerven"] [class*="themeSwitcherSlot"] [class*="optionFocused"] {
+  background: rgba(126, 10, 30, 0.35);
+}
+
+/* Empty hints */
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="emptyHint"] {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
+/* "+" tlačítko v pravém panelu — granátový primary CTA */
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="rightAddBtn"] {
+  background: linear-gradient(180deg, #a01029 0%, #5a081a 100%);
+  border: 1px solid var(--theme-silver-tarnish);
+  color: var(--theme-silver-bright);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 0 18px var(--theme-glow-garnet),
+    0 4px 10px rgba(0, 0, 0, 0.55);
+  border-radius: 3px;
+  transition: background 280ms, border-color 280ms, color 280ms, box-shadow 280ms;
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="rightAddBtn"]:hover {
+  background: linear-gradient(180deg, #c8133a 0%, #6e0a20 100%);
+  border-color: var(--theme-silver-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 0 28px var(--theme-glow-garnet-strong),
+    0 6px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* Section spacing */
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="section"]:not([class*="sectionTitle"]):not([class*="rightSectionHeader"]) {
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+/* Pravý panel kompaktnější */
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1) var(--sp-2) 14px;
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+/* ──────────────── 15. PJ badge — granátový rim + silver text ──────────────── */
+
+[data-theme="temna-cerven"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-bordeaux-card-hi), var(--theme-bordeaux-card));
+  color: var(--theme-silver-bright);
+  border: 1px solid var(--theme-garnet-bright);
+  box-shadow:
+    0 0 8px var(--theme-glow-garnet),
+    inset 0 0 0 1px rgba(168, 19, 46, 0.2),
+    inset 0 1px 0 0 rgba(212, 200, 190, 0.10);
+  text-shadow: 0 0 4px var(--theme-glow-garnet);
+  font-family: var(--font-display);
+  letter-spacing: 0.12em;
+}
+
+/* ──────────────── 16. Nav ikony — 7 unikátních vampire-collector medailonů přes data-nav-key ──────────────── */
+
+[data-theme="temna-cerven"] [data-nav-key] [class*="navItemIcon"] {
+  width: 28px;
+  height: 28px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px rgba(168, 19, 46, 0.3));
+}
+
+[data-theme="temna-cerven"] [data-nav-key] [class*="navItemIcon"] svg {
+  display: none;
+}
+
+[data-theme="temna-cerven"] [data-nav-key="uvodnik"]       [class*="navItemIcon"] { background-image: var(--asset-icon-uvodnik); }
+[data-theme="temna-cerven"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"] { background-image: var(--asset-icon-vytvorit-svet); }
+[data-theme="temna-cerven"] [data-nav-key="diskuze"]       [class*="navItemIcon"] { background-image: var(--asset-icon-diskuze); }
+[data-theme="temna-cerven"] [data-nav-key="clanky"]        [class*="navItemIcon"] { background-image: var(--asset-icon-clanky); }
+[data-theme="temna-cerven"] [data-nav-key="galerie"]       [class*="navItemIcon"] { background-image: var(--asset-icon-galerie); }
+[data-theme="temna-cerven"] [data-nav-key="napoveda"]      [class*="navItemIcon"] { background-image: var(--asset-icon-napoveda); }
+[data-theme="temna-cerven"] [data-nav-key="hospoda"]       [class*="navItemIcon"] { background-image: var(--asset-icon-hospoda); }
+
+/* Active nav icon — scale + granet glow halo (statika) */
+[data-theme="temna-cerven"] [class*="navItemActive"] [data-nav-key] [class*="navItemIcon"],
+[data-theme="temna-cerven"] [class*="btn3dActive"] [data-nav-key] [class*="navItemIcon"] {
+  filter: drop-shadow(0 0 6px var(--theme-glow-garnet-strong));
+  transform: scale(1.05);
+}
+
+/* ──────────────── 17. Novinky panel — heading + empty + addBtn ──────────────── */
+
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="novinkyTitle"] {
+  color: var(--theme-silver-bright);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 8px rgba(168, 19, 46, 0.2);
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="novinkyTitle"] svg {
+  color: var(--theme-garnet-bright);
+  filter: drop-shadow(0 0 3px var(--theme-glow-garnet));
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="empty"] {
+  color: var(--theme-text-muted);
+  font-family: var(--font-body);
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* "Přidat novinku" — granátový primary CTA */
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="addBtn"] {
+  background: linear-gradient(180deg, #a01029 0%, #5a081a 100%);
+  color: var(--theme-silver-bright);
+  border: 1px solid var(--theme-silver-tarnish);
+  border-radius: 3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  font-family: var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 0 24px var(--theme-glow-garnet),
+    0 8px 18px rgba(0, 0, 0, 0.55);
+  position: relative;
+  transition: background 280ms, border-color 280ms, color 280ms, box-shadow 280ms, transform 150ms;
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="addBtn"]:hover {
+  background: linear-gradient(180deg, #c8133a 0%, #6e0a20 100%);
+  border-color: var(--theme-silver-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 190, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 0 32px var(--theme-glow-garnet-strong),
+    0 10px 22px rgba(0, 0, 0, 0.6);
+}
+
+/* Klik mikrointerakce — translateY UX feedback (zachováno i v reduced-motion) */
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="addBtn"]:active,
+[data-theme="temna-cerven"] [data-frame-panel="right"] [class*="rightAddBtn"]:active {
+  transform: translateY(1px);
+}
+
+/* Lucide Plus ikona v addBtn */
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="addBtn"] > svg {
+  color: var(--theme-silver-bright);
+  filter: drop-shadow(0 0 3px var(--theme-glow-garnet));
+}
+
+[data-theme="temna-cerven"] [data-frame-panel="novinky"] [class*="addBtn"]:hover > svg {
+  color: var(--theme-silver-bright);
+  filter: drop-shadow(0 0 5px var(--theme-glow-garnet-strong));
+}
+
+/* ──────────────── 18. Showmore / pravý panel link styling ──────────────── */
+
+[data-theme="temna-cerven"] [class*="showAllLink"] {
+  color: var(--theme-silver-tarnish);
+  border-color: var(--theme-border-silver);
+  font-family: var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+[data-theme="temna-cerven"] [class*="showAllLink"]:hover {
+  color: var(--theme-silver-bright);
+  border-color: rgba(212, 200, 190, 0.55);
+  box-shadow: 0 0 16px var(--theme-glow-garnet);
+}
+
+/* ──────────────── 19. Focus visible — granet ring outline ──────────────── */
+
+[data-theme="temna-cerven"] :focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-garnet-incand),
+    0 0 14px var(--theme-glow-garnet);
+}
+
+/* ──────────────── 20. Scrollbar — silver tarnish + garnet thumb ──────────────── */
+
+[data-theme="temna-cerven"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="temna-cerven"] ::-webkit-scrollbar-track {
+  background: var(--theme-bordeaux-mid);
+  border-radius: 0;
+}
+
+[data-theme="temna-cerven"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--theme-garnet) 0%, var(--theme-garnet-deep) 100%);
+  border: 1px solid var(--theme-border-silver);
+  border-radius: 4px;
+}
+
+[data-theme="temna-cerven"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--theme-garnet-bright) 0%, var(--theme-garnet) 100%);
+}
+
+/* ──────────────── 21. Tablet (≤1023px) breakpoints ──────────────── */
+
+@media (max-width: 1023px) {
+  [data-theme="temna-cerven"] [data-frame-panel="card"]::before {
+    top: -24px;
+    height: 72px;
+  }
+  [data-theme="temna-cerven"] [data-andel-medallion] {
+    width: 200px;
+    height: 240px;
+  }
+  [data-theme="temna-cerven"] [data-andel-medallion]::before {
+    inset: -16px;
+  }
+  [data-theme="temna-cerven"] [data-frame-panel="card"]::after {
+    width: 56px;
+    height: 56px;
+    bottom: -18px;
+    left: 24px;
+  }
+}
+
+/* ──────────────── 22. Mobile (≤768px) breakpoints ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="temna-cerven"] [data-frame-panel="card"] {
+    padding-top: 40px;
+  }
+  [data-theme="temna-cerven"] [data-frame-panel="card"]::before {
+    top: -16px;
+    height: 56px;
+  }
+  [data-theme="temna-cerven"] [data-andel-medallion] {
+    width: 140px;
+    height: 168px;
+  }
+  [data-theme="temna-cerven"] [data-andel-medallion]::before {
+    inset: -12px;
+  }
+  [data-theme="temna-cerven"] [data-frame-panel="card"]::after {
+    width: 48px;
+    height: 48px;
+    bottom: -14px;
+    left: 16px;
+  }
+  /* Header mobile — tufting buttons hidden */
+  [data-theme="temna-cerven"][data-shell="ikaros"] > header::before,
+  [data-theme="temna-cerven"][data-shell="ikaros"] > header::after {
+    display: none;
+  }
+  /* NavItem touch target */
+  [data-theme="temna-cerven"] [class*="btn3d"],
+  [data-theme="temna-cerven"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]) {
+    min-height: 48px;
+  }
+  /* Petals snížený count na mobile */
+  [data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(3),
+  [data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(4),
+  [data-theme="temna-cerven"] [data-theme-decoration="petals"] .petal:nth-child(5) {
+    display: none;
+  }
+  /* Bone drop-cap menší na mobile */
+  [data-theme="temna-cerven"] [data-frame-panel="card"] [class*="paragraph"]:first-of-type::first-letter {
+    font-size: 3.4em;
+  }
+}
+
+/* ──────────────── 23. Mobile small (≤480px) — petals hidden ──────────────── */
+
+@media (max-width: 480px) {
+  [data-theme="temna-cerven"] [data-theme-decoration="petals"] {
+    display: none;
+  }
+  [data-theme="temna-cerven"] [data-frame-panel="card"]::after {
+    display: none; /* wax-seal hidden — přesahuje mimo card na úzkém viewportu */
+  }
+}
+
+/* ──────────────── 24. Reduced motion — heartbeat, petals OFF; klik translateY ON ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="temna-cerven"] [data-frame-panel="card"] {
+    animation: none;
+  }
+  [data-theme="temna-cerven"] [data-theme-decoration="petals"] {
+    display: none;
+  }
+  [data-theme="temna-cerven"] [class*="btn3d"],
+  [data-theme="temna-cerven"] [class*="headerBtn"],
+  [data-theme="temna-cerven"] [class*="addBtn"],
+  [data-theme="temna-cerven"] [class*="rightAddBtn"] {
+    transition-duration: 0ms;
+  }
+  /* Klik translateY zachováno (UX feedback nutný — viz 17) */
+}
+
+/* ──────────────── 25. Forced colors fallback ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="temna-cerven"] [data-frame-panel] [class*="ornament"],
+  [data-theme="temna-cerven"] [data-frame-panel="card"]::before,
+  [data-theme="temna-cerven"] [data-frame-panel="card"]::after,
+  [data-theme="temna-cerven"] [data-andel-medallion]::before,
+  [data-theme="temna-cerven"] [data-theme-decoration="petals"] {
+    forced-color-adjust: none;
+  }
+}

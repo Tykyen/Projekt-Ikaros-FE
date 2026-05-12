@@ -1,0 +1,193 @@
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+}
+
+.actionSelect {
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border: 1px solid var(--frame-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tableWrapper {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--frame-border);
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--frame-border);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody td {
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  color: var(--text);
+  vertical-align: top;
+}
+
+.actionBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 11px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.actionBadge.ban {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.actionBadge.unban {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.actionBadge.roleChange {
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+}
+
+.actionBadge.permissions {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.actionBadge.approved {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.actionBadge.rejected {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.diffBox {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  margin: 2px 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.actorTarget {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.userName {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.userSub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--text-muted);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  border-top: 1px solid var(--frame-border);
+  background: var(--surface-2);
+}
+
+.pageInfo {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.reasonBox {
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .table thead {
+    display: none;
+  }
+  .table,
+  .table tbody,
+  .table tbody tr,
+  .table tbody td {
+    display: block;
+  }
+  .table tbody tr {
+    padding: 12px;
+    margin: 12px;
+    border: 1px solid var(--frame-border);
+    border-radius: 8px;
+    background: var(--surface-1);
+  }
+  .table tbody td {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--frame-border);
+  }
+  .table tbody td:last-child {
+    border-bottom: none;
+  }
+  .table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+}

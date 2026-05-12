@@ -1,39 +1,403 @@
-/* ── Sci-fi — civilní stanice, chamfered HUD ── */
+/* ── Sci-fi — futuristic command HUD (spec 1.0e — image-2 visual upgrade)
+   Aktivuje se přes [data-theme="sci-fi"]. UI je CSS-native:
+   holografické glass panely, HUD bracket rohy v cyan, magenta glow nody
+   ve všech 4 rozích (přes reaktivaci CornerOrnament markupu), prominentní
+   topbar s double-rule linkou, hairline cyan typografie pro signature.
+   ZÁKLADNÍ PRAVIDLO: scope pod [data-theme="sci-fi"], žádný globální dopad. */
+
+/* Rajdhani Light (300) — používaná pro hairline accenty a script signature.
+   Načítá se jen když je sci-fi aktivní (decorationsModule lazy import). */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300&display=swap');
+
+/* ──────────────── 1. Root + atmosférický overlay ──────────────── */
 
 [data-theme="sci-fi"] {
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(0, 200, 255, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 100%, rgba(192, 32, 224, 0.08) 0%, transparent 60%),
-    linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  background-color: var(--bg-primary);
+  background-color: #020711;
 }
 
-/* Chamfered (zkosené) rohy panelů a tlačítek */
-[data-theme="sci-fi"] .card,
-[data-theme="sci-fi"] [class*="card"],
-[data-theme="sci-fi"] button {
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-  border-radius: 0;
+[data-theme="sci-fi"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Scan-line efekt na panelech (CRT feel) */
-[data-theme="sci-fi"] .card::before,
-[data-theme="sci-fi"] [class*="card"]::before {
+/* ──────────────── 2. Topbar — bigger header s double-rule linkou ──────────────── */
+
+[data-theme="sci-fi"][data-shell="ikaros"] > header {
+  position: relative;
+  border-bottom: 1px solid var(--theme-border-cyan);
+}
+
+/* Double-rule pod topbarem — cyan main + magenta sekundární s offsetem */
+[data-theme="sci-fi"][data-shell="ikaros"] > header::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 3px,
-    rgba(0, 200, 255, 0.03) 3px,
-    rgba(0, 200, 255, 0.03) 4px
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-accent-magenta) 20%,
+    var(--theme-accent-magenta) 80%,
+    transparent 100%
   );
+  opacity: 0.55;
   pointer-events: none;
+  filter: drop-shadow(0 0 6px var(--theme-glow-magenta));
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-theme="sci-fi"] button:hover {
-    box-shadow: 0 0 15px rgba(0, 200, 255, 0.6);
+/* Logo banner — kompaktní + cyan glow.
+   mix-blend-mode: screen → černé pozadí asset webp se "vyextrahuje"
+   (black + anything = anything ve screen módu), takže logo působí transparentně.
+   Cyan/bright pixely zůstávají viditelné. */
+[data-theme="sci-fi"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 12px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px var(--theme-glow-cyan));
+}
+
+/* ──────────────── 3. Glass panely — base background + double-stroke border ──────────────── */
+
+[data-theme="sci-fi"] [data-frame-panel="sidebar"],
+[data-theme="sci-fi"] [data-frame-panel="right"],
+[data-theme="sci-fi"] [data-frame-panel="card"],
+[data-theme="sci-fi"] [data-frame-panel="novinky"] {
+  position: relative;
+  background: linear-gradient(135deg, rgba(6, 15, 30, 0.85) 0%, rgba(2, 6, 12, 0.95) 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--theme-border);
+  border-radius: 4px;
+  isolation: isolate;
+  /* Inner stroke — druhý cyan border s gap (double-stroke HUD look) */
+  box-shadow:
+    inset 0 0 0 3px transparent,
+    inset 0 0 0 4px rgba(22, 217, 255, 0.22),
+    0 5px 25px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px rgba(22, 217, 255, 0.06);
+}
+
+/* ──────────────── 4. HUD brackets v rozích TL + BR (cyan) ──────────────── */
+
+[data-theme="sci-fi"] [data-frame-panel="sidebar"]::before,
+[data-theme="sci-fi"] [data-frame-panel="right"]::before,
+[data-theme="sci-fi"] [data-frame-panel="card"]::before,
+[data-theme="sci-fi"] [data-frame-panel="novinky"]::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 32px;
+  height: 32px;
+  border-top: 2px solid var(--theme-accent-cyan);
+  border-left: 2px solid var(--theme-accent-cyan);
+  filter: drop-shadow(0 0 6px var(--theme-glow-cyan));
+  pointer-events: none;
+  z-index: 3;
+}
+[data-theme="sci-fi"] [data-frame-panel="sidebar"]::after,
+[data-theme="sci-fi"] [data-frame-panel="right"]::after,
+[data-theme="sci-fi"] [data-frame-panel="card"]::after,
+[data-theme="sci-fi"] [data-frame-panel="novinky"]::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 32px;
+  height: 32px;
+  border-bottom: 2px solid var(--theme-accent-cyan);
+  border-right: 2px solid var(--theme-accent-cyan);
+  filter: drop-shadow(0 0 6px var(--theme-glow-cyan));
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ──────────────── 5. CornerOrnamenty — reaktivace jako magenta glow nody (všechny 4 rohy) ──────────────── */
+
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"] {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background:
+    radial-gradient(
+      circle,
+      rgba(176, 38, 255, 0.95) 0%,
+      rgba(176, 38, 255, 0.55) 35%,
+      transparent 75%
+    );
+  border: none;
+  border-radius: 50%;
+  transform: none;
+  filter: drop-shadow(0 0 8px var(--theme-glow-magenta))
+          drop-shadow(0 0 14px rgba(176, 38, 255, 0.45));
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.92;
+  animation: sci-fi-magenta-pulse 4s ease-in-out infinite;
+}
+
+/* Pozice nodů — mírný negative offset, ať vystupují z rámu jako HUD glow nody */
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"][data-position="tl"] {
+  top: -6px;
+  left: -6px;
+}
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"][data-position="tr"] {
+  top: -6px;
+  right: -6px;
+}
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"][data-position="bl"] {
+  bottom: -6px;
+  left: -6px;
+}
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"][data-position="br"] {
+  bottom: -6px;
+  right: -6px;
+}
+
+/* Stagger animace — různá fáze pro každý roh, ať netiká synchronně */
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"][data-position="tr"] { animation-delay: 1s; }
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"][data-position="bl"] { animation-delay: 2s; }
+[data-theme="sci-fi"] [data-frame-panel] [class*="ornament"][data-position="br"] { animation-delay: 3s; }
+
+@keyframes sci-fi-magenta-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.92); }
+  50%      { opacity: 1.00; transform: scale(1.08); }
+}
+
+/* ──────────────── 6. Welcome card — dominantní min-height na desktopu ──────────────── */
+
+[data-theme="sci-fi"] [data-frame-panel="card"] {
+  min-height: 60vh;
+}
+
+/* ──────────────── 7. Welcome andel medallion ──────────────── */
+
+[data-theme="sci-fi"] [data-andel-medallion] {
+  position: relative;
+  width: 200px;
+  height: 215px;
+  background-image: var(--asset-andel-medallion, none);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 18px var(--theme-glow-cyan));
+}
+
+/* ──────────────── 8. Section title — cyan typografie + glow ──────────────── */
+
+[data-theme="sci-fi"] [class*="sectionTitle"] {
+  color: var(--theme-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-family: var(--font-display);
+  text-shadow: 0 0 10px var(--theme-glow-cyan);
+}
+
+/* ──────────────── 9. NavItem — mírně ostřejší rohy + 3D btn3d overrides ──────────────── */
+
+[data-theme="sci-fi"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]) {
+  border-radius: 2px;
+}
+
+/* Pravý panel políčka — kompaktnější (uživatelův wish: tenší než sidebar items) */
+[data-theme="sci-fi"] [data-frame-panel="right"] [class*="navItem"]:not([class*="navItemIcon"]):not([class*="navItemLabel"]),
+[data-theme="sci-fi"] [data-frame-panel="right"] [class*="showAllLink"] {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+/* Pravý panel section title — menší, méně paddingu */
+[data-theme="sci-fi"] [data-frame-panel="right"] [class*="sectionTitle"] {
+  padding: var(--sp-1) var(--sp-2);
+  font-size: 0.66rem;
+}
+
+/* Pravý panel inner gap — menší rozestup mezi sekcemi */
+[data-theme="sci-fi"] [data-frame-panel="right"] [class*="rightPanelInner"],
+[data-theme="sci-fi"] [data-frame-panel="right"] [class*="navList"] {
+  gap: 4px;
+}
+
+[data-theme="sci-fi"] [class*="btn3d"] {
+  --btn-bg-1: rgba(8, 22, 36, 0.92);
+  --btn-bg-2: rgba(3, 10, 18, 0.92);
+  --btn-border: var(--theme-border-soft);
+  --btn-color: var(--theme-text);
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(22, 217, 255, 0.12),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.85),
+    0 2px 5px 0 rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="sci-fi"] [class*="btn3d"]:hover:not(:disabled):not([class*="btn3dDisabled"]) {
+  --btn-bg-1: rgba(15, 40, 60, 0.95);
+  --btn-bg-2: rgba(5, 18, 32, 0.98);
+  --btn-border: var(--theme-accent);
+  --btn-color: var(--theme-accent-bright);
+  --btn-translate: -2px;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(22, 217, 255, 0.20),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.85),
+    0 0 14px var(--theme-glow-cyan),
+    0 4px 7px 0 rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 8px var(--theme-glow-cyan);
+}
+
+[data-theme="sci-fi"] [class*="btn3dActive"],
+[data-theme="sci-fi"] [class*="navItemActive"] {
+  --btn-bg-1: rgba(22, 217, 255, 0.28);
+  --btn-bg-2: rgba(5, 18, 32, 0.55);
+  --btn-border: var(--theme-accent);
+  --btn-color: #ffffff;
+  --btn-translate: 0;
+  --btn-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.55),
+    inset 3px 0 0 0 var(--theme-accent),
+    0 0 16px var(--theme-glow-cyan);
+  text-shadow: 0 0 10px var(--theme-glow-cyan-strong);
+}
+
+/* ──────────────── 10. Header buttons — uppercase letter-spacing, slim padding ──────────────── */
+
+[data-theme="sci-fi"] [class*="headerBtn"] {
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  padding: 6px 14px;
+  min-height: 0;
+}
+
+/* ──────────────── 11. PJ badge — cyan chip ──────────────── */
+
+[data-theme="sci-fi"] [data-pj-badge] {
+  background: linear-gradient(180deg, var(--theme-accent-bright), var(--theme-accent));
+  color: var(--bg-primary);
+  border: 1px solid var(--theme-accent);
+  box-shadow:
+    0 0 8px var(--theme-glow-cyan),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+  text-shadow: none;
+}
+
+/* ──────────────── 12. Welcome heading + script signature s end-bracket markerem ──────────────── */
+
+[data-theme="sci-fi"] [class*="titleAccent"] {
+  text-shadow: 0 0 10px var(--theme-glow-cyan);
+}
+
+/* Signature — italic hairline, end-bracket SVG marker (4× magenta dlažební kostky) */
+[data-theme="sci-fi"] [class*="signature"] {
+  font-family: 'Rajdhani', system-ui, sans-serif;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  font-size: 22px;
+}
+
+[data-theme="sci-fi"] [class*="signature"]::after {
+  content: '';
+  display: inline-block;
+  width: 60px;
+  height: 6px;
+  margin-left: 14px;
+  vertical-align: middle;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 6'><rect x='0' y='1' width='9' height='4' fill='%23b026ff'/><rect x='14' y='1' width='9' height='4' fill='%23b026ff'/><rect x='28' y='1' width='9' height='4' fill='%23b026ff'/><rect x='42' y='1' width='9' height='4' fill='%23b026ff'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 5px var(--theme-glow-magenta));
+}
+
+/* ──────────────── 13. Focus-visible custom rings — box-shadow (ne outline, kvůli pseudoelementům) ──────────────── */
+
+[data-theme="sci-fi"] [class*="navItem"]:focus-visible,
+[data-theme="sci-fi"] [class*="headerBtn"]:focus-visible,
+[data-theme="sci-fi"] [class*="btn3d"]:focus-visible,
+[data-theme="sci-fi"] [class*="showAllLink"]:focus-visible,
+[data-theme="sci-fi"] [class*="rightAddBtn"]:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-accent-cyan),
+    0 0 14px var(--theme-glow-cyan-strong);
+}
+
+/* ──────────────── 14. Mobile (≤768px) — zjednodušení (bez bracketů, glow nodes; backdrop-filter off pro perf) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="sci-fi"] [data-frame-panel="sidebar"],
+  [data-theme="sci-fi"] [data-frame-panel="right"],
+  [data-theme="sci-fi"] [data-frame-panel="card"],
+  [data-theme="sci-fi"] [data-frame-panel="novinky"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+      inset 0 0 0 1px rgba(22, 217, 255, 0.18),
+      0 4px 14px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Brackety + glow nody schované — appearance simplifikovaná pro úzký viewport */
+  [data-theme="sci-fi"] [data-frame-panel="sidebar"]::before,
+  [data-theme="sci-fi"] [data-frame-panel="sidebar"]::after,
+  [data-theme="sci-fi"] [data-frame-panel="right"]::before,
+  [data-theme="sci-fi"] [data-frame-panel="right"]::after,
+  [data-theme="sci-fi"] [data-frame-panel="card"]::before,
+  [data-theme="sci-fi"] [data-frame-panel="card"]::after,
+  [data-theme="sci-fi"] [data-frame-panel="novinky"]::before,
+  [data-theme="sci-fi"] [data-frame-panel="novinky"]::after {
+    display: none;
+  }
+
+  [data-theme="sci-fi"] [data-frame-panel] [class*="ornament"] {
+    display: none;
+  }
+
+  /* Welcome card min-height vypnut na mobilu (bere si přirozenou výšku) */
+  [data-theme="sci-fi"] [data-frame-panel="card"] {
+    min-height: 0;
+  }
+
+  /* Andel medallion menší */
+  [data-theme="sci-fi"] [data-andel-medallion] {
+    width: 150px;
+    height: 160px;
+  }
+
+  /* Signature menší + bez end-bracket markeru (šetří místo) */
+  [data-theme="sci-fi"] [class*="signature"] {
+    font-size: 18px;
+  }
+  [data-theme="sci-fi"] [class*="signature"]::after {
+    display: none;
+  }
+
+  /* Header buttons — uzší padding, jak je IkarosLayout zvyklý dělat na mobilu */
+  [data-theme="sci-fi"] [class*="headerBtn"] {
+    padding: 8px 10px;
+    font-size: 0.7rem;
+  }
+}
+
+/* ──────────────── 15. Reduced motion — všechny animace off ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="sci-fi"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+  [data-theme="sci-fi"] [data-frame-panel] [class*="ornament"] {
+    opacity: 0.85;
+    transform: none;
   }
 }

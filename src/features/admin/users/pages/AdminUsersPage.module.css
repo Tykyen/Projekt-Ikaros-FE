@@ -1,0 +1,82 @@
+.page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--frame-border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition:
+    color var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive {
+  color: var(--text-strong);
+  border-bottom-color: var(--accent-bright);
+}
+
+.tabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+  .tab {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
