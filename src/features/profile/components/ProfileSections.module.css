@@ -314,6 +314,42 @@
   gap: 12px;
 }
 
+/* 1.5 D-052 — PrivacySection toggle */
+.toggleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.toggleRow input[type="checkbox"] {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggleLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggleLabelTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.toggleLabelDesc {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+}
+
 @media (max-width: 640px) {
   .card {
     padding: 16px;

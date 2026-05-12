@@ -21,6 +21,7 @@ import { useSocketInit } from '@/features/chat/api/useSocket';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
 import { useUnreadCount } from '@/features/chat/api/useMessages';
 import { useLogout } from '@/features/auth/api/useAuth';
+import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import {
   currentUserAtom,
   isAuthenticatedAtom,
@@ -34,6 +35,8 @@ import { LoginModal } from '@/features/auth/components/LoginModal';
 import { RegisterModal } from '@/features/auth/components/RegisterModal';
 import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import { UserAvatar } from '@/shared/ui';
+import { OnlineDot } from '@/shared/presence/OnlineDot';
+import { usePresenceInit } from '@/shared/presence/usePresence';
 import { UserRole, type World } from '@/shared/types';
 
 function PanelCorners() {
@@ -122,7 +125,6 @@ function SidebarContent({
         <div className={s.navList}>
           {worlds?.slice(0, 8).map((w) => (
             <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
-              <span className={s.worldOnlineDot} />
               <span className={s.navItemLabel}>{w.name}</span>
               {currentUser?.id && w.ownerId === currentUser.id && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>
@@ -168,6 +170,10 @@ function RightPanel() {
   const { data: worlds } = useMyWorlds();
   const isAdmin =
     currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
+  const { data: pendingCount } = usePendingActionsCount(!!currentUser);
+
+  const label = isAdmin ? 'Uživatelé' : 'Přátelé';
+  const badge = pendingCount?.total ?? 0;
 
   return (
     <div className={s.rightPanelInner}>
@@ -177,17 +183,15 @@ function RightPanel() {
           <ThemeSwitcher />
         </div>
         <div className={s.navList}>
-          {isAdmin ? (
-            <Link to="/ikaros/uzivatele" className={s.navItem}>
-              <span className={s.navItemIcon}><Users size={18} /></span>
-              <span className={s.navItemLabel}>Uživatelé</span>
-            </Link>
-          ) : (
-            <Link to="/ikaros/profil#pratele" className={s.navItem}>
-              <span className={s.navItemIcon}><Users size={18} /></span>
-              <span className={s.navItemLabel}>Přátelé</span>
-            </Link>
-          )}
+          <Link to="/ikaros/uzivatele" className={s.navItem}>
+            <span className={s.navItemIcon}><Users size={18} /></span>
+            <span className={s.navItemLabel}>{label}</span>
+            {badge > 0 && (
+              <span className={s.navItemBadge} aria-label={`${badge} čekajících akcí`}>
+                {badge}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 
@@ -199,7 +203,6 @@ function RightPanel() {
         <div className={s.navList}>
           {worlds?.slice(0, 5).map((w) => (
             <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem}>
-              <span className={s.worldOnlineDot} />
               <span className={s.navItemLabel}>{w.name}</span>
               {currentUser?.id && w.ownerId === currentUser.id && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>
@@ -335,13 +338,16 @@ function HeaderLoggedIn() {
       />
 
       <Link to="/ikaros/profil" className={s.headerBtn}>
-        <UserAvatar
-          src={user.avatarUrl}
-          defaultType={user.defaultAvatarType ?? 'male'}
-          size="xs"
-          alt={user.username}
-          className={s.avatar}
-        />
+        <span className={s.avatarWrapper}>
+          <UserAvatar
+            src={user.avatarUrl}
+            defaultType={user.defaultAvatarType ?? 'male'}
+            size="xs"
+            alt={user.username}
+            className={s.avatar}
+          />
+          <OnlineDot userId={user.id} size="sm" />
+        </span>
         <span className={s.headerBtnLabel}>{user.username}</span>
       </Link>
 
@@ -358,6 +364,7 @@ export function IkarosLayout() {
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
 
   useSocketInit();
+  usePresenceInit();
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);
@@ -397,8 +404,8 @@ export function IkarosLayout() {
           <span className="status-text">VŠECHNY SYSTÉMY V POHOTOVOSTI</span>
           <span className="chevrons">
             <svg viewBox="0 0 24 12" xmlns="http://www.w3.org/2000/svg" width="24" height="12">
-              <polygon points="0,0 10,6 0,12" fill="#d4111c" opacity="0.85" />
-              <polygon points="13,0 23,6 13,12" fill="#d4111c" opacity="0.85" />
+              <polygon points="0,0 10,6 0,12" fill="currentColor" opacity="0.85" />
+              <polygon points="13,0 23,6 13,12" fill="currentColor" opacity="0.85" />
             </svg>
           </span>
         </div>

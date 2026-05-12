@@ -6,6 +6,7 @@ import {
   accessTokenAtom,
   refreshTokenAtom,
   currentUserAtom,
+  loginModalOpenAtom,
 } from '@/shared/store/authStore';
 
 /**
@@ -97,19 +98,19 @@ export function useReactivateDeletion() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (creds: { identifier: string; password: string }) =>
-      api.post<{
-        status: 'ok';
-        accessToken: string;
-        refreshToken: string;
-        user: import('@/shared/types').User;
-      }>('/auth/reactivate-deletion', creds),
+      api.post<import('@/shared/types').LoginOkResponse>(
+        '/auth/reactivate-deletion',
+        creds,
+      ),
     onSuccess: (response) => {
       const store = getDefaultStore();
       store.set(accessTokenAtom, response.accessToken);
       store.set(refreshTokenAtom, response.refreshToken);
       store.set(currentUserAtom, response.user);
+      store.set(loginModalOpenAtom, false);
       qc.invalidateQueries({ queryKey: ['users', 'me'] });
       toast.success('Účet obnoven, vítej zpět');
+      // D-034b — info modal řeší volající (ReactivateAccountModal) přes response.revertablePromotions
     },
     onError: (err) => toast.error(parseApiError(err)),
   });

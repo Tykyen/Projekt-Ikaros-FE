@@ -6,6 +6,17 @@
   line-height: 1;
 }
 
+.wrapper svg {
+  color: var(--role-star-color);
+  fill: var(--role-star-color);
+}
+
+.starSuperadmin     { --role-star-color: var(--role-star-superadmin); }
+.starAdmin          { --role-star-color: var(--role-star-admin); }
+.starSpravceDiskuzi { --role-star-color: var(--role-star-spravce-diskuzi); }
+.starSpravceClanku  { --role-star-color: var(--role-star-spravce-clanku); }
+.starSpravceGalerie { --role-star-color: var(--role-star-spravce-galerie); }
+
 .label {
   font-size: var(--text-sm);
   font-weight: var(--weight-semi);

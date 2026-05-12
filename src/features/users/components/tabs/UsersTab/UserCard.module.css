@@ -1,0 +1,197 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  background: var(--theme-surface, var(--surface-1));
+  border: 1px solid var(--theme-border-soft, var(--frame-border));
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 24px var(--theme-shadow),
+    0 0 24px var(--theme-glow-gold, transparent);
+}
+
+.card:focus-within {
+  outline: 2px solid var(--theme-accent-bright, var(--accent-bright));
+  outline-offset: 2px;
+}
+
+.card:active {
+  transform: scale(0.985);
+  transition: transform 80ms;
+}
+
+/* Cornerstones — 4 rohy, theme-aware */
+.corner {
+  position: absolute;
+  width: var(--usercard-corner-size);
+  height: var(--usercard-corner-size);
+  border-color: var(--usercard-corner-color);
+  pointer-events: none;
+}
+
+.cornerTl {
+  top: 6px;
+  left: 6px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.cornerTr {
+  top: 6px;
+  right: 6px;
+  border-top: 1px solid;
+  border-right: 1px solid;
+}
+
+.cornerBl {
+  bottom: 6px;
+  left: 6px;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+}
+
+.cornerBr {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+}
+
+/* Kebab — vždy viditelný (rozhodnutí design §5.4 / §10.4) */
+.kebab {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base);
+}
+
+.kebab:hover,
+.kebab:focus-visible {
+  background: var(--theme-surface-soft, var(--surface-2));
+  color: var(--theme-text, var(--text-primary));
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  margin-top: var(--sp-2);
+}
+
+/* 1.5 — relative wrapper okolo avataru pro OnlineDot overlay */
+.avatarWrapper {
+  position: relative;
+  display: inline-block;
+  margin-top: var(--sp-2);
+}
+.avatarWrapper .avatar {
+  margin-top: 0;
+}
+
+.username {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semi);
+  color: var(--theme-heading, var(--text-strong));
+  letter-spacing: 0.02em;
+  line-height: var(--leading-tight);
+  word-break: break-word;
+}
+
+.displayName {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--theme-text-muted, var(--text-muted));
+  line-height: var(--leading-tight);
+  word-break: break-word;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--theme-text-muted, var(--text-muted));
+  line-height: var(--leading-tight);
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.statusBand {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--sp-1) var(--sp-3);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: var(--status-band-fg);
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}
+
+.statusBandPending {
+  background: var(--status-band-pending);
+}
+
+.statusBandDeleted {
+  background: var(--status-band-deleted);
+}
+
+.deletedCard {
+  opacity: 0.78;
+  filter: grayscale(0.35);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: var(--sp-4) var(--sp-3) var(--sp-3);
+  }
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+  .username {
+    font-size: var(--text-sm);
+  }
+  .displayName {
+    font-size: var(--text-xs);
+  }
+}

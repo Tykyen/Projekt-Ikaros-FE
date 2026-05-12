@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Button } from '@/shared/ui';
 import { useReactivateDeletion } from '@/features/profile/api/useDeleteAccount';
 import { consumeLoginIntent } from '@/shared/lib/loginIntent';
+import type { LoginOkResponse } from '@/shared/types';
 import styles from './ReactivateAccountModal.module.css';
+
+type Promotions = NonNullable<LoginOkResponse['revertablePromotions']>;
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('cs-CZ', {
@@ -39,15 +43,65 @@ export function ReactivateAccountModal({
 }: Props) {
   const reactivate = useReactivateDeletion();
   const navigate = useNavigate();
+  // D-034b — info o povýšených Pomocných PJ; po reaktivaci se zobrazí dialog před redirectem
+  const [pendingPromotions, setPendingPromotions] = useState<Promotions | null>(
+    null,
+  );
 
   const handleReactivate = () => {
     reactivate.mutate(credentials, {
-      onSuccess: () => {
+      onSuccess: (response) => {
+        if (
+          response.revertablePromotions &&
+          response.revertablePromotions.length > 0
+        ) {
+          setPendingPromotions(response.revertablePromotions);
+          return;
+        }
         const intent = consumeLoginIntent();
         navigate(intent ?? '/');
       },
     });
   };
+
+  const dismissPromotions = () => {
+    setPendingPromotions(null);
+    const intent = consumeLoginIntent();
+    navigate(intent ?? '/');
+  };
+
+  // Info modal po reaktivaci s promotions
+  if (pendingPromotions) {
+    return (
+      <Modal
+        open
+        onClose={dismissPromotions}
+        title="Tvůj svět má teď 2 PJ"
+        size="md"
+      >
+        <div className={styles.body}>
+          <p className={styles.intro}>
+            Při plánování smazání byli tito Pomocní PJ automaticky povýšeni na
+            PJ. Nyní máš ve svých světech 2 PJ — uprav role v nastavení světa,
+            pokud chceš svou PJ roli odebrat.
+          </p>
+          <ul className={styles.dates} style={{ listStyle: 'disc inside' }}>
+            {pendingPromotions.map((p) => (
+              <li key={p.worldId}>
+                <strong>{p.worldName}</strong> — povýšen{' '}
+                <code>{p.promotedUsername}</code>
+              </li>
+            ))}
+          </ul>
+          <div className={styles.actions}>
+            <Button type="button" variant="primary" onClick={dismissPromotions}>
+              Rozumím
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal

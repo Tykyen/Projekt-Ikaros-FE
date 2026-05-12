@@ -91,4 +91,65 @@
   /* 1.3c — tombstone overlay (UserAvatar deleted prop).
      Záměrně theme-independent — smazaný účet má vždy stejný vizuál napříč skiny. */
   --tombstone-band: rgba(0, 0, 0, 0.85);
+
+  /* ── 1.4 — Role chip semantic colors ────────────────────────────────────
+     Spec design-1.4 §2.3. Theme-aware s fallbackem na legacy --accent /
+     --warning. Sub-typy Spravce mají hardcoded distinkční barvy (amber /
+     magenta / teal), aby kategorie byly rozpoznatelné napříč skiny. Témata
+     mohou v `index.ts` override pokud chtějí výraznější styl. */
+
+  /* Superadmin — nejvyšší autorita, gold/bright */
+  --role-superadmin-bg:    var(--theme-accent-bright, var(--warning));
+  --role-superadmin-fg:    var(--text-on-accent, #050508);
+  --role-superadmin-ring:  var(--theme-glow-gold, var(--success-glow));
+
+  /* Admin — platform autorita, brand accent */
+  --role-admin-bg:         var(--theme-accent, var(--accent));
+  --role-admin-fg:         var(--text-on-accent, #050508);
+  --role-admin-ring:       var(--theme-border, var(--accent-soft));
+
+  /* Správce článků — warm amber (pero/inkoust/manuskript) */
+  --role-spravce-clanku-bg:    #d97706;
+  --role-spravce-clanku-fg:    #ffffff;
+  --role-spravce-clanku-ring:  rgba(217, 119, 6, 0.35);
+
+  /* Správce galerie — magenta/purple (vizuální/obraz) */
+  --role-spravce-galerie-bg:   #a855f7;
+  --role-spravce-galerie-fg:   #ffffff;
+  --role-spravce-galerie-ring: rgba(168, 85, 247, 0.35);
+
+  /* Správce diskuzí — teal (konverzace/proud) */
+  --role-spravce-diskuzi-bg:   #14b8a6;
+  --role-spravce-diskuzi-fg:   #ffffff;
+  --role-spravce-diskuzi-ring: rgba(20, 184, 166, 0.35);
+
+  /* ── 1.4 — UserCard cornerstones (default fallback; témata mohou override) */
+  --usercard-corner-size:    8px;
+  --usercard-corner-color:   var(--theme-border, var(--accent-soft));
+
+  /* ── 1.4 — Tab nav (Přátelé / Uživatelé / Zpracovat / Audit) */
+  --tab-underline-h:         2px;
+  --tab-underline-color:     var(--theme-accent, var(--accent));
+  --tab-badge-bg:            var(--danger);
+  --tab-badge-fg:            var(--text-on-danger, #fff);
+
+  /* ── 1.4 — Status pásek pro pending-deletion / deleted v UserCard (admin includeDeleted view) */
+  --status-band-pending:     rgba(245, 166, 35, 0.85);
+  --status-band-deleted:     var(--tombstone-band);
+  /* Text uvnitř status pásku — theme-independent (musí být čitelný na pending amber i black deleted) */
+  --status-band-fg:          rgba(255, 255, 255, 1);
+
+  /* ── 1.5 — Presence (online indikátor) */
+  --presence-online:         #22c55e;
+  /* D-049 — idle stav (amber-500) */
+  --presence-idle:           #eab308;
+  --presence-offline:        transparent;
+  --presence-ring:           var(--theme-bg, #ffffff);
+
+  /* ── RoleStar — barvy hvězdičky pro globální role (cleanup hardcoded barev) */
+  --role-star-superadmin:    #3ecf8e;
+  --role-star-admin:         #f5a623;
+  --role-star-spravce-diskuzi: #f0c040;
+  --role-star-spravce-clanku:  #c04040;
+  --role-star-spravce-galerie: #3b82f6;
 }

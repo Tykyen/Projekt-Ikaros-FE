@@ -13,6 +13,9 @@
 ```
 Ikaros Platforma  ← PRIMÁRNÍ, staví se PRVNÍ
 ├── Auth & uživatelé
+│   └── Univerzální action queue („Zpracovat" tab) — agregátor pending akcí
+│       napříč moduly (friend requests, world join, content moderation, …).
+│       Infra zavedena v 1.4, naplňují další fáze. Spec 1.4.
 ├── Komunita (články, galerie, diskuze, pošta, novinky)
 ├── Globální chat (Hospoda)
 ├── Správa světů (browse, create, join)
@@ -59,12 +62,13 @@ Vizuální design platformy a světů se řeší separátně — plán barvy nes
 ### Fáze 1 — Auth & Uživatelé
 *Platform-level — nepatří žádnému světu.*
 
-- **1.1** Login (`/login`) — formulář, JWT do store
-- **1.2** Registrace (`/register`) — formulář, validace
-- **1.3** Profil (`/ikaros/profil`) — editace, avatar upload (Cloudinary)
-- **1.4** Adresář uživatelů (`/ikaros/uzivatele`, `/ikaros/uzivatel/:id`)
+- **1.1** Login — modal v hlavičce, JWT do store, identifier (email/username)
+- **1.2** Registrace — modal v hlavičce, validace, auto-login, password strength
+- **1.3** Profil (`/ikaros/profil`) — 1.3a self-edit, 1.3b username + admin role, 1.3c tombstone
+- **1.4** Stránka Uživatelé (`/ikaros/uzivatele`) — **tab struktura, role-aware** (Admin/Superadmin: Přátelé + Uživatelé + Zpracovat + Audit; ostatní role: Přátelé + Zpracovat). Veřejný profil (`/ikaros/uzivatel/:id`). **Univerzální `PendingActionType` infrastruktura** — Zpracovat tab je agregátor pending akcí napříč moduly. Spec 1.4 + design audit.
 - **1.5** Presence — online indikátor, Socket.IO `presence:update`
-- **1.6** Přátelé — friendships modul (BE + FE), žádosti, seznam přátel, header link nahradí placeholder z 1.1
+- **1.7** Reset hesla — Resend mailer, password reset flow, change email s verifikací (vyčleněno z dluhu D-006)
+- **1.8** Přátelé — friendships modul (BE + FE) **+ první `IPendingActionProvider`** (`FriendRequestProvider`). Naplní Přátelé tab a queue typ `friend_request` ve Zpracovat (kostra z 1.4). Není samostatná stránka.
 
 ---
 
@@ -74,7 +78,7 @@ Vizuální design platformy a světů se řeší separátně — plán barvy nes
 - **2.1** Ikaros dashboard (`/`) — přehled vlastních světů, platformové novinky
 - **2.2** Přehled světů (`/ikaros/vesmiry`) — mřížka, filtry, search
 - **2.3** Vytvoření světa (`/ikaros/vytvorit-svet`) — wizard (název/žánr → přístup → RPG systém)
-- **2.4** Detail světa / join flow (`/svet/:worldId`) — info, join pro public/private
+- **2.4** Detail světa / join flow (`/svet/:worldId`) — info, join pro public/private. **Private world join request** → queue typ `world_join_request` ve Zpracovat tabu PJ vlastníka (infra z 1.4).
 
 ---
 
@@ -82,10 +86,10 @@ Vizuální design platformy a světů se řeší separátně — plán barvy nes
 *Platformové funkce — nadsvětové, patří přímo Ikarosu.*
 
 - **3.1** Ikaros novinky — v dashboardu (čtení bez přihlášení)
-- **3.2** Články (`/ikaros/clanky`) — přehled, TipTap editor, Draft→Published workflow, rating
-- **3.3** Galerie (`/ikaros/galerie`) — Cloudinary upload, schvalovací workflow
-- **3.4** Diskuze (`/ikaros/diskuze`) — vlákna příspěvků, manageři, pozvánky
-- **3.5** Pošta (`/ikaros/posta`) — Inbox/Sent, RSVP akce, počítadlo nepřečtených
+- **3.2** Články (`/ikaros/clanky`) — přehled, TipTap editor, Draft→Published workflow, rating. **Pending článek** → `article_pending_review` ve Zpracovat tabu SpravceClanku.
+- **3.3** Galerie (`/ikaros/galerie`) — Cloudinary upload, schvalovací workflow. **Pending obrázek** → `gallery_pending_review` ve Zpracovat tabu SpravceGalerie.
+- **3.4** Diskuze (`/ikaros/diskuze`) — vlákna příspěvků, manageři, pozvánky. **Hlášení** → `discussion_report`; **žádost o vstup do uzamčené diskuze** → `discussion_join_request` ve Zpracovat tabu manažera/SpravceDiskuzi.
+- **3.5** Pošta (`/ikaros/posta`) — Inbox/Sent, RSVP akce, počítadlo nepřečtených. **Hranice:** pošta = konverzace; aktionovatelné žádosti (přátele, world join, content approval) jdou do Zpracovat (1.4).
 - **3.6** Nápověda (`/ikaros/napoveda`)
 
 **Nové balíčky:** `@tiptap/react`, `@tiptap/starter-kit` + extensions

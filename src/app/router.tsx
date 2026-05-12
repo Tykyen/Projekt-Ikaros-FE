@@ -15,13 +15,13 @@ const ChatPage         = lazy(() => import('@/features/chat/pages/ChatPage'));
 const WorldsPage       = lazy(() => import('@/features/ikaros/pages/WorldsPage'));
 const CreateWorldPage  = lazy(() => import('@/features/ikaros/pages/CreateWorldPage'));
 const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
-const UsersPage        = lazy(() => import('@/features/admin/users/pages/AdminUsersPage'));
-const UserProfilePage  = lazy(() => import('@/features/ikaros/pages/UserProfilePage'));
+const UsersPage        = lazy(() => import('@/features/users/pages/UsersPage'));
+const UserProfilePage  = lazy(() => import('@/features/users/pages/PublicUserProfilePage'));
 const ArticlesPage     = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
 const GalleryPage      = lazy(() => import('@/features/ikaros/pages/GalleryPage'));
 const DiscussionsPage  = lazy(() => import('@/features/ikaros/pages/DiscussionsPage'));
 const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage'));
-const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage'));
+const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
 
@@ -107,16 +107,9 @@ export const router = createBrowserRouter([
       { path: 'ikaros/diskuze/nova',    element: p(DiscussionsNewPage), loader: requireAuth },
       { path: 'ikaros/posta',           element: p(MailPage),         loader: requireAuth },
 
-      // Chráněné + role gate
-      {
-        path: 'ikaros/uzivatele',
-        loader: requireAuth,
-        element: (
-          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
-            {p(UsersPage)}
-          </RoleGuard>
-        ),
-      },
+      // Spec 1.4 — `/ikaros/uzivatele` dostupné každému přihlášenému
+      // (page sama řeší tab visibility per role; admin-only taby jsou skryté).
+      { path: 'ikaros/uzivatele',       element: p(UsersPage),        loader: requireAuth },
       {
         path: 'admin',
         loader: requireAuth,

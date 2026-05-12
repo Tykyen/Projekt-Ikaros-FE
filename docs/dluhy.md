@@ -1,38 +1,20 @@
 # Technické dluhy
 
-> **Souhrn k 2026-05-12 (po 1.3c):**
-> - **Uzavřené:** D-001, D-002, D-003, D-004, D-005, D-007, D-008, D-009 (batch 1+2, ~95% pokrytí), D-010, D-011 (honeypot část), D-013, D-014, D-015, D-016 (částečně), D-018, D-020, D-021 (header avatar xs), D-022 (anon mobile fix), D-023 (timed ban), D-024 (audit log), D-025 (bulk akce), D-027 (cooldown env), D-028 (in-memory cache), D-030 (toast po login), D-031 (Zakaz deprecate), D-032 (audit canManageAdmins + 1.3b interní enum mismatch), D-033 (granular perm framework), **D-034 (auto-promote Pomocného PJ — vyřešeno v 1.3c díky existujícímu `WorldRole.PomocnyPJ` v BE)**, severske-runy reducedMotion fix
+> **Souhrn k 2026-05-12 (po 1.4 + cleanup batch):**
+> - **Uzavřené v 1.4:** D-029 (admin detail link uživatele → vyřešen „Otevřít v administraci" na public profilu), D-040 *principiálně* (tombstone v public adresáři nezobrazujeme; integrace do obsahu řeší fáze 3.x/6.x), D-044 *částečně* (Mongo compound indexy pro `findPublicPaginated`)
+> - **Uzavřené v 1.4 cleanup batch (2026-05-12):** **D-042** (GDPR data export endpoint `GET /users/me/data-export` + `DataExportModule` s `IDataExportProvider` registry + první konkrétní `UserProfileExportProvider`), **D-043** (tombstone retention policy — druhá fáze `AccountCleanupCron.removeExpiredTombstones`, daily 04:00, ENV `TOMBSTONE_RETENTION_DAYS` default 5 let), **D-046** (per-theme RoleChip overrides pro kyberpunk + nemrtvi), **D-047** (Storybook stories pro RoleChip, UserCard, PendingActionCard)
+> - **Uzavřené dříve:** D-001, D-002, D-003, D-004, D-005, D-007, D-008, D-009 (batch 1+2, ~95% pokrytí), D-010, D-011 (honeypot část), D-013, D-014, D-015, D-016 (částečně), D-018, D-020, D-021 (header avatar xs), D-022 (anon mobile fix), D-023 (timed ban), D-024 (audit log), D-025 (bulk akce), D-027 (cooldown env), D-028 (in-memory cache), D-030 (toast po login), D-031 (Zakaz deprecate), D-032 (audit canManageAdmins + 1.3b interní enum mismatch), D-033 (granular perm framework), D-034 (auto-promote Pomocného PJ — díky `WorldRole.PomocnyPJ`), **D-034b (revert PJ handover — info modal po reaktivaci)**, **D-035 (audit log delete akcí — event-driven přes EventEmitter)**, **D-038 (hold configurable — ENV `DELETION_HOLD_DAYS`)**, **D-039 (dev trigger-cleanup endpoint)**, severske-runy reducedMotion fix
 > - **Stále otevřené (čekají na PJ rozhodnutí / externí závislost):** D-011 (full captcha provider), D-012 (mailer SMTP)
-> - **Zbývající z 1.3b (čekají na externí infru / fáze):** D-026 (email notif — čeká 1.7), D-028 Redis varianta (multi-instance), D-029 (detail link — čeká 1.4)
-> - **Nové z 1.3c:** D-034b (revert PJ handover při reaktivaci), D-035 (audit log delete akcí), D-036 (email notif — 1.7), D-037 (reset hesla během hold — 1.7), D-038 (hold cooldown configurable), D-039 (dev trigger-cleanup endpoint), D-040 (tombstone integrace do chat/článků/galerie — fáze 3.x/6.x), D-041 (Friendship hard-delete při tombstone), D-042 (GDPR data export endpoint), D-043 (tombstone retention policy)
+> - **Zbývající z 1.3b (čekají na externí infru / fáze):** D-026 (email notif — čeká 1.7), D-028 Redis varianta (multi-instance)
+> - **Zbývající z 1.3c (čekají na fáze):** D-036 (email notif — 1.7), D-037 (reset hesla během hold — 1.7), D-041 (Friendship hard-delete při tombstone — 1.8)
+> - **Z 1.4 stále otevřené:** D-044 *full text-index až 10k+ uživatelů*, D-045 (privacy toggle — diskuse pro 1.7+)
+> - **Uzavřené v 1.5 cleanup batch (2026-05-12):** **D-049** (idle stav 3-stavový — FE activity tracker + BE registry idle aggregate), **D-050** (last-seen tooltip — `PublicUserProfile.lastSeenAt` + `relativeTimeCs` util + tooltip v `PublicProfileHeader`; null pro hidden/tombstone), **D-052** (privacy „neviditelný" mód — `User.hiddenPresence` flag + `PrivacySection` v profilu + gateway respektuje při handshake)
+> - **Pre-existing cleanup (2026-05-12):** `RoleStar.tsx` hardcoded barvy → `--role-star-*` tokeny; `IkarosLayout` chevrons SVG `#d4111c` → `currentColor` + `--theme-hellfire-bright`; `PendingActionCard.stories.tsx` TS generic cast pro Storybook
+> - **Nové z 1.5 (otevřené):** D-051 (Redis adapter pro presence registry — multi-instance deploy)
 >
 > Drobné nedořešené části jsou zaznamenány u jednotlivých záznamů níže.
 
-## Otevřené z 1.3c
-
-### D-034b — Revert PJ handover při reaktivaci
-**Kontext:** 1.3c při soft-delete povýší Pomocného PJ na PJ. Při reaktivaci povýšení **nezvracíme** — svět má 2 PJ. Acceptable, ale UX by mohlo zobrazit dialog při reaktivaci.
-**Řešení:** Při `POST /auth/reactivate-deletion` zkontrolovat, jestli existovaly promotions; pokud ano, zobrazit modal „Tvůj svět má teď 2 PJ. Chceš odebrat svou PJ roli?" → PATCH membership.
-
-### D-035 — Audit log delete akcí
-**Kontext:** 1.3c uchovává jen `deletionRequestedBy`/`deletionReason` na aktuálním záznamu (přepsáno při revert/re-request). `ACCOUNT_DELETE_REQUEST` / `ACCOUNT_DELETE_CANCEL` jsou v `AdminAuditLogEntry` ale jen pro admin akce.
-**Řešení:** Self-delete + admin delete + cron hard-cleanup vždy zapsat do audit logu s before/after diff.
-
-### D-036 — Email notifikace o naplánovaném smazání / přicházejícím hard delete
-**Kontext:** Čeká na mailer modul (1.7). 1.3c: uživatel vidí stav přes profil banner; admin vidí v admin tabulce.
-**Řešení:** Po `POST /users/me/deletion-request` poslat HTML email "Účet bude smazán 9.6.2026, pro obnovení klikni…". 3 dny před hard delete připomínkový email.
-
-### D-037 — Reset hesla během deletion hold
-**Kontext:** Pokud uživatel zapomene heslo během 30denního hold, nemůže se vrátit (reaktivace vyžaduje heslo). Čeká na 1.7 mailer (reset password flow). Mezitím: admin manual revert přes admin endpoint.
-**Řešení:** Po 1.7 — reset password flow musí akceptovat deletion-pending stav, send token, password set → standardní login (clear deletion flagy stejně jako reactivate-deletion endpoint).
-
-### D-038 — Hold cooldown jako admin-konfigurovatelná konstanta
-**Kontext:** 1.3c hardcoded 30 dní (`DELETION_HOLD_DAYS = 30` v UsersService + cron). Analog D-027 (username cooldown).
-**Řešení:** ENV `DELETION_HOLD_DAYS` (default 30), inject přes ConfigService.
-
-### D-039 — Dev-only endpoint pro trigger cleanup cronu
-**Kontext:** V testech / staging chceme manuálně spustit cron bez čekání na 03:00. 1.3c: cron je test-only přes mock Date.
-**Řešení:** `POST /api/admin/_dev/trigger-cleanup` (jen ne-production, Superadmin-only) → vola `AccountCleanupCron.hardDeleteExpired()` immediately.
+## Otevřené z 1.3c (čekající na externí infru / fáze)
 
 ### D-040 — Tombstone integrace do chat / článek / galerie / diskuze renderingu
 **Kontext:** 1.3c poskytuje `<UserAvatar deleted />` primitive. Integrace do konkrétních komponent přijde s pipelines těch fází.
@@ -42,13 +24,7 @@
 **Kontext:** 1.3c zachovává `Friendship` záznamy v DB (FE filtruje na render). Po 3.5 (přátelé) zvážit hard-delete těchto záznamů při cronu.
 **Řešení:** V cronu `AccountCleanupCron.hardDeleteOne` doplnit `friendshipRepo.deleteByUserId(userId)` (až existuje).
 
-### D-042 — GDPR data export endpoint (právo na přenositelnost)
-**Kontext:** GDPR článek 20 — uživatel má právo dostat svoje data v strojově čitelném formátu (JSON). 1.3c implementuje erasure (deletion), ale ne export.
-**Řešení:** `GET /users/me/data-export` → ZIP s JSON dump všech user data (profile, posts, friendships, …). Samostatný spec po 1.7.
-
-### D-043 — Tombstone retention policy
-**Kontext:** Tombstone řádky (username + displayName zachované) zůstávají v DB forever. Po X letech retence by se měly opravdu smazat (a username uvolnit). Žádná retention policy zatím nemáme.
-**Řešení:** Samostatný spec s rozhodnutím retention period (např. 5 let od `deletedAt`). Cron nebo manual admin action.
+*D-042 + D-043 uzavřeny v 1.4 cleanup batch — viz sekce ## Uzavřené.*
 
 ---
 
@@ -64,11 +40,27 @@
 **Kontext:** In-memory cache uzavřena (viz Uzavřené níže), single-instance funguje plně. Pro multi-instance deployu nutno swap na Redis pub/sub.
 **Řešení:** Vyměnit `UserBanCacheService` Map za Redis client (`ioredis`); invalidate přes pub/sub channel `user-ban-invalidate`.
 
-### D-029 — Veřejný profil link z admin tabulky
-**Kontext:** Akce „Detail" v AdminUsersPage skryta v 1.3b. Závisí na 1.4 (veřejný profil `/ikaros/uzivatel/:id`).
-**Řešení:** Po 1.4 odblokovat akci.
+*D-029 uzavřen v 1.4 — viz sekce ## Uzavřené.*
 
+### D-044 — Mongo full text-index pro public adresář (částečně uzavřeno 1.4)
+**Kontext:** 1.4 zavedl `findPublicPaginated` se substring regex search nad `usernameLower` + `displayName`. Compound index `{ isDeleted, deletionRequestedAt, createdAt }` + `displayName` index přidány. Pro 100k+ uživatelů by pak bylo vhodné full text index.
+**Řešení:** Až DB přeroste ~10k uživatelů, přidat `UserSchema.index({ usernameLower: 'text', displayName: 'text' })` + přepnout query z `$regex` na `$text`. Měřit perfomance předtím.
 
+### D-045 — Privacy toggle „skrýt mě v adresáři"
+**Kontext:** 1.4 adresář vidí jen Admin/Superadmin, takže privacy concern je nízký. Až přijde širší použití (1.8 přátele iniciace přes adresář), uživatel by měl mít opt-out.
+**Řešení:** `User.hiddenInDirectory: boolean` flag + filter ve `findPublicPaginated`. Diskuse pro 1.7+.
+
+*D-046 + D-047 uzavřeny v 1.4 cleanup batch — viz sekce ## Uzavřené.*
+
+### D-048 — HelpPage content drift
+**Kontext:** Krok 3.6 (Nápověda na `/ikaros/napoveda`) dokumentuje stav platformy k 2026-05-12. Sekce „Stránky" a „FAQ" obsahují ✅/🚧 značky napojené na aktuální fáze. Při každé doručené fázi musí někdo aktualizovat odpovídající položky, jinak nápověda přestane být pravdivá.
+**Řešení:** Do PR checklistu fází 1.5 / 1.7 / 1.8 / 2.x / 3.x přidat položku „aktualizovat HelpPage (sekce Stránky + případně FAQ)". Připadnu i automatizace přes kontrolu obsahu vs roadmap-fe.md (ale stačí discipline v review).
+
+*D-049, D-050, D-052 uzavřeny v 1.5 cleanup batch — viz sekce ## Uzavřené.*
+
+### D-051 — Redis adapter pro `OnlinePresenceRegistry`
+**Kontext:** 1.5 registr je in-memory Map<userId, RegistryEntry>. Single-instance only — při multi-instance deployu by každá instance měla vlastní obraz a `presence:update` broadcast by se nepropagoval mezi instancemi.
+**Řešení:** Swap `OnlinePresenceRegistry` Map za Redis hash + použít `@socket.io/redis-adapter` pro multi-instance broadcast. Analogicky k D-028 (cache pro ban check). Až bude potřeba škálování.
 
 ---
 
@@ -141,6 +133,36 @@
 ---
 
 ## Uzavřené
+
+### D-042 — GDPR data export endpoint (právo na přenositelnost)
+**Soubory:** `backend/src/modules/data-export/` (nový modul — `data-export.module.ts`, `data-export.service.ts`, `data-export.controller.ts`, `data-export-provider.interface.ts`), `backend/src/modules/users/providers/user-profile-export.provider.ts`, `backend/src/modules/users/users.module.ts`, `backend/src/app.module.ts`, `backend/src/modules/data-export/data-export.service.spec.ts`
+**Opraveno v:** 1.4 cleanup batch (2026-05-12). Nový global `DataExportModule` s `IDataExportProvider` registry — stejný princip jako `PendingActionsService` z 1.4. Endpoint `GET /api/users/me/data-export` (auth, throttle 3/hour). Agreguje data napříč registrovanými providery do JSON dumpu s metadaty (`exportedAt`, `userId`, `schemaVersion: 1`, `sections[]`). První konkrétní provider `UserProfileExportProvider` (profile, character, worldMemberships, preferences). Audit event `user.data.exported`. Budoucí moduly (3.x články/galerie/diskuze, 3.5 pošta, 4.x chat, 1.8 friendships) zaregistrují svoje providery v `onApplicationBootstrap` a tím rozšíří export bez zásahu do core endpointu. 8 unit testů pro `DataExportService` (registry, aggregation, error isolation, audit event).
+
+---
+
+### D-043 — Tombstone retention policy
+**Soubory:** `backend/src/modules/users/services/account-cleanup.cron.ts` (rozšíření), `backend/src/modules/users/services/account-cleanup.cron.spec.ts` (nový), `backend/src/modules/users/users.repository.ts`, `backend/src/modules/users/interfaces/users-repository.interface.ts`, `backend/src/app.module.ts` (Joi schema)
+**Opraveno v:** 1.4 cleanup batch (2026-05-12). Druhá retention fáze v `AccountCleanupCron.removeExpiredTombstones` — daily 04:00 Europe/Prague (1h po hard-delete cronu na 03:00). ENV `TOMBSTONE_RETENTION_DAYS` default 1825 (5 let), minimum 30 dní (sanity check, kratší retention nedává smysl). Nová repo metoda `findExpiredTombstones(cutoff)`. Audit event `user.tombstone.removed`. Po retention dni se username uvolní pro novou registraci (unique index drop). 9 unit testů (ENV override, fallback, sanity check, multi-tombstone batch, error isolation, audit event, empty list).
+
+---
+
+### D-029 — Veřejný profil link z admin tabulky
+**Soubory:** `src/features/users/pages/PublicUserProfilePage.tsx`, `src/features/users/components/PublicProfile/PublicProfileActions.tsx`, `src/features/admin/users/components/UsersTab/UsersTable.tsx` (`focus` query param highlight)
+**Opraveno v:** 1.4 (2026-05-12). `PublicUserProfilePage` zavedl Admin/Superadmin tlačítko „Otevřít v administraci" → `/ikaros/uzivatele?tab=uzivatele&view=table&focus=:id`. Plus klik na avatar/jméno autora v adresářové kartě vede na `/ikaros/uzivatel/:id` (každý přihlášený, viz spec 1.4 §1.3). Tlačítko skryté pro self (`profileId === me.id`).
+
+---
+
+### D-046 — Per-theme RoleChip overrides
+**Soubory:** `src/themes/themes/kyberpunk/index.ts`, `src/themes/themes/nemrtvi/index.ts`
+**Opraveno v:** 1.4 cleanup batch (2026-05-12). Override CSS proměnných `--role-superadmin-bg/-fg/-ring` atd. v `vars` map každého z dvou skinů. Kyberpunk: neonové varianty (electric yellow / cyan / hot amber / hot magenta / acid green). Nemrtvi: krvavé/hřbitovní tóny (tmavá krev / mahogany / pergamen / nekrotická fialová / hřbitovní mech). Ostatní skiny zůstávají na universal default (`src/themes/_shared/tokens.css`). Polishing dalších skinů se může přidat individuálně bez core změny.
+
+---
+
+### D-047 — Storybook stories pro RoleChip / UserCard / PendingActionCard
+**Soubory:** `src/features/users/components/shared/RoleChip.stories.tsx` (nový), `src/features/users/components/tabs/UsersTab/UserCard.stories.tsx` (nový), `src/features/users/components/tabs/ZpracovatTab/PendingActionCard.stories.tsx` (nový)
+**Opraveno v:** 1.4 cleanup batch (2026-05-12). RoleChip stories: všech 5 chipů (Superadmin/Admin/3× Spravce) + None pro Hrac/PJ (null render) + Gallery view + Small size. UserCard stories: všechny role variants + edge cases (NoCity, NoDisplayName, SingleWorld 1 svět, ZeroWorlds, WithKebab) + PendingDeletion + TombstoneDeleted overlay. PendingActionCard stories: UsernameRequest variants (default, Resolving, FreshlyCreated, OldRequest 3 dny zpět) + Gallery 2 cards stacked. Připraveno pro budoucí rendery 1.8/2.4/3.x — jen přidat novou story s mock daty.
+
+---
 
 ### D-028 (in-memory varianta) — In-memory cache pro ban check
 **Soubory:** `backend/src/modules/users/services/user-ban-cache.service.ts` (nový), `users.module.ts`, `auth/strategies/jwt.strategy.ts`, `admin/admin.service.ts`

@@ -157,6 +157,28 @@ export const nemrtviTheme: Theme = {
     '--asset-icon-galerie':       `url('${decor}/icon-galerie.webp')`,
     '--asset-icon-napoveda':      `url('${decor}/icon-napoveda.webp')`,
     '--asset-icon-hospoda':       `url('${decor}/icon-hospoda.webp')`,
+
+    /* ── 1.4 — Role chip overrides (D-046)
+       Nemrtvi: krvavé/hřbitovní tóny, světlý kostnatý text na tmavé BG. */
+    '--role-superadmin-bg':       '#8b0000',          /* tmavá krev */
+    '--role-superadmin-fg':       '#f4e8d0',          /* ošlehaná kost */
+    '--role-superadmin-ring':     'rgba(139, 0, 0, 0.55)',
+
+    '--role-admin-bg':            '#5a3a1a',          /* mahogany rakev */
+    '--role-admin-fg':            '#f4e8d0',
+    '--role-admin-ring':          'rgba(90, 58, 26, 0.55)',
+
+    '--role-spravce-clanku-bg':   '#7a5d2a',          /* zažloutlý pergamen */
+    '--role-spravce-clanku-fg':   '#1a0e08',
+    '--role-spravce-clanku-ring': 'rgba(122, 93, 42, 0.55)',
+
+    '--role-spravce-galerie-bg':  '#4a1f4a',          /* nekrotický fialový */
+    '--role-spravce-galerie-fg':  '#f4e8d0',
+    '--role-spravce-galerie-ring':'rgba(74, 31, 74, 0.55)',
+
+    '--role-spravce-diskuzi-bg':  '#2d4a2d',          /* hřbitovní mech */
+    '--role-spravce-diskuzi-fg':  '#f4e8d0',
+    '--role-spravce-diskuzi-ring':'rgba(45, 74, 45, 0.55)',
   },
   fonts: {
     logo: 'UnifrakturCook',

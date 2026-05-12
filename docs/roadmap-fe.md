@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0 + 1.1 + 1.2 ✅, 1.3-1.8 čeká) |
+| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0–1.5 ✅, 1.7 / 1.8 čeká) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -135,7 +135,7 @@ Spec: `docs/arch/phase-1/spec-1.0f-modre-nebe-upgrade.md`, plán: `docs/arch/pha
 - [x] **BE:** `LoginDto.email` → `identifier` (přijímá e-mail NEBO přezdívku); `AuthService.login` rozhoduje podle `@`; `RegisterDto.username` zakázán `@`
 - [x] **FE:** `LoginModal` komponenta (RHF + zod, themed, 3D buttons) — show/hide password toggle, error banner pro 401/429/network/5xx
 - [x] **IkarosLayout je teď public shell** — anon vidí úvodník, vesmíry, články, galerii, diskuze, nápovědu; pravý sloupec a CHAT sekce jen pro logged-in
-- [x] **Hlavička role-aware** — logged-out: PŘIHLÁSIT SE / REGISTRACE-disabled; logged-in: POŠTA, PŘÁTELÉ (placeholder pro 1.6) / UŽIVATELÉ (admin → 1.4), avatar+přezdívka, ODHLÁSIT
+- [x] **Hlavička role-aware** — logged-out: PŘIHLÁSIT SE / REGISTRACE-disabled; logged-in: POŠTA, PŘÁTELÉ (placeholder pro 1.8) / UŽIVATELÉ (admin → 1.4), avatar+přezdívka, ODHLÁSIT
 - [x] **Logout flow s 5s "Vrátit"** (sonner toast) — tokeny se mažou až po vypršení timeru
 - [x] **Per-route `requireAuth` loader** nahradil global authLoader — chráněné routes redirectují na `/?openLogin=1` + uloží intent do sessionStorage
 - [x] **JWT decode** pro hydrataci user dat po refreshi (`useAuthBootstrap`)
@@ -162,7 +162,7 @@ Spec: `docs/arch/phase-1/spec-1.0f-modre-nebe-upgrade.md`, plán: `docs/arch/pha
 
 **Tracked dluhy:** D-009 (BE `code` field napříč moduly), D-010 (GDPR souhlas), D-011 (captcha), D-012 (email verifikace).
 
-### - [ ] 1.3 Uživatelský profil — rozděleno do tří podkroků
+### - [x] 1.3 Uživatelský profil — rozděleno do tří podkroků ✅ (všechny tři dokončené 2026-05-12)
 
 Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role infrastruktura, admin schvalování username) → tři menší PR místo jednoho monolitu.
 
@@ -238,13 +238,76 @@ Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role 
 
 **D-034 ✅ uzavřen** — auto-promote Pomocného PJ rovnou implementován díky Fáze 0 auditu (`WorldRole.PomocnyPJ` už v BE existoval).
 
-### - [ ] 1.4 Adresář uživatelů
-- [ ] `/ikaros/uzivatele` — seznam (paginace)
-- [ ] `/ikaros/uzivatel/:id` — veřejný profil
+### - [x] 1.4 Stránka Uživatelé (tabs) + Veřejný profil + univerzální Zpracovat tab ✅ (2026-05-12)
 
-### - [ ] 1.5 Presence
-- [ ] Online indikátor v user menu (header)
-- [ ] Socket.IO `presence:update` event
+**Spec:** `docs/arch/phase-1/spec-1.4.md` ✅ schváleno 2026-05-12
+**Design audit:** `docs/arch/phase-1/design-1.4.md` ✅ schváleno 2026-05-12
+**Plán:** `docs/arch/phase-1/plan-1.4.md` ✅ implementováno 2026-05-12 (BE 850 testů, FE 197 testů, tsc ✓, lint ✓, build ✓)
+
+Sjednocená stránka `/ikaros/uzivatele` s horními taby, role-aware viditelnost. Architektonický princip: **tab „Zpracovat" je univerzální action queue** — cokoliv co vyžaduje rozhodnutí příjemce (přátele, world join, content approval, …) sem vstoupí.
+
+**Tab visibility:**
+- **Admin/Superadmin:** 4 taby — Přátelé + Uživatelé + Zpracovat + Audit (default `?tab=uzivatele`)
+- **SpravceClanku/Galerie/Diskuzi + PJ + Hrac:** 2 taby — Přátelé + Zpracovat (default `?tab=pratele`)
+
+**Tab obsah v 1.4:**
+- **Přátelé** — kostra (placeholder, naplnění v 1.8)
+- **Uživatelé** (Admin/Superadmin) — view-toggle `▦ Karty | ≡ Tabulka` (default Karty), search, sort, paginace, kebab akce na kartě (reuse modaly z 1.3b)
+- **Zpracovat:**
+  - Admin/Superadmin — funkční (Žádosti o username, přesun z 1.3b „Žádosti" tabu)
+  - Spravce*/PJ/Hrac — placeholder „X bude dostupné s krokem Y"
+- **Audit** (Admin/Superadmin) — read-only historie admin akcí (přesun `AuditLogTab` z 1.3b bez funkčních změn)
+
+**Veřejný profil `/ikaros/uzivatel/:id`** — read-only zrcadlo 1.3a profilu bez citlivých polí (email, lastLoginAt, themeId, chatColor, ban/delete metadata). Dostupný každému přihlášenému (D-027 se uzavírá: admin „Otevřít v administraci" link).
+
+**BE:**
+- [x] `GET /api/users` — paginovaný adresář (RoleGuard Admin/Superadmin), search/sort/includeDeleted
+- [x] `GET /api/users/profile/:id` — public profile (auth, bez role gate), 404 pro tombstone/pending, admin výjimka 200+flag
+- [x] `PendingActionType` enum + `IPendingActionProvider` interface + první konkrétní `UsernameRequestProvider` (přesun z 1.3b)
+- [x] `GET /api/pending-actions/count` + `GET /api/pending-actions?type=...` agregátor endpoint
+- [x] DTO: `PublicUserListItem`, `PublicUserProfile`, `PublicUsersQuery`
+- [x] Throttle 60/min/IP, privacy test (response neobsahuje email/lastLoginAt/themeId/chatColor/bannedAt/deletionRequestedAt/passwordHash)
+- [x] Mongo compound indexy pro `findPublicPaginated` (`{ isDeleted, deletionRequestedAt, createdAt }` + `displayName`)
+- [x] BE testy: 17 nových (PendingActions 12, listPublic/publicProfileV14 5) + celkem 850 ✓
+
+**FE:**
+- [x] Refactor `AdminUsersPage` → `UsersPage` v `src/features/users/` (4/2 taby + role-aware visibility + view-toggle uvnitř Uživatelé)
+- [x] `PublicUserProfilePage` (naplnění stávajícího stubu — 5 sub-komponent: PublicProfileHeader / PublicBioSection / PublicCharacterSection / PublicProfileActions / SelfProfileBanner + TombstoneBanner)
+- [x] `UserCard` (karta s avatarem, role chipem, městem, worldsCount, kebab menu, 4 cornerstones, deletion overlay)
+- [x] `RoleChip` (jednotná komponenta, ikona + label + barva, 5 variant + None pro Hrac/PJ)
+- [x] Zpracovat tab kontejner + renderer-by-type registry + `UsernameRequestRenderer`
+- [x] Pravý panel: adaptivní label (Uživatelé/Přátelé), badge s pending count
+- [x] Self-profile banner „Toto je tvůj veřejný profil — upravit můžeš v Nastavení"
+- [x] `?tab=…&view=…&page=…&search=…&sort=…&includeDeleted=…` URL state (sdíleno mezi módy)
+- [x] CSS tokeny: role chip semantic colors + cornerstones + tab + status pásek v `_shared/tokens.css`
+- [x] FE testy: 27 nových (RoleChip 9, helpers 11, UserCard 11+) + celkem 197 ✓
+- [x] Storybook stories: RoleChip + UserCard + PendingActionCard (D-047)
+
+**Uzavírá:** D-029 (admin detail link), D-040 *principiálně* (tombstone v public adresáři), D-044 *částečně* (Mongo indexy).
+
+**Mimo rozsah:** plnohodnotná funkčnost Přátelé (1.8), funkční Zpracovat pro Spravce* (3.2-3.4), pro PJ (2.4), pro Hrac (1.8); online indikátor (1.5); samostatná URL `/ikaros/pratele` (sjednoceno do `?tab=pratele`).
+
+### - [x] 1.5 Presence ✅ (2026-05-12)
+
+**Spec:** `docs/arch/phase-1/spec-1.5.md` ✅ schváleno 2026-05-12
+**Plán:** `docs/arch/phase-1/plan-1.5.md` ✅ implementováno 2026-05-12 (BE 871 testů, FE 219 testů)
+
+Canonický presence stav (online = aktivní socket spojení) napříč platformou — jediný zdroj pravdy v BE, push aktualizace přes Socket.IO, sjednocená vizualizace přes `<OnlineDot />`.
+
+- [x] **BE:** `OnlinePresenceRegistry` (in-memory Map<userId, Set<socketId>>, multi-socket aware)
+- [x] **BE:** `PresenceGateway` (Nest WebSocketGateway) — JWT verify v handshake, emit `presence:snapshot` { userIds } novému klientovi + broadcast `presence:update` { userId, online } při změně stavu
+- [x] **BE:** `GET /api/presence/online-now` endpoint (dev tooling, throttle 30/min)
+- [x] **BE:** stávající `GET /api/presence/online` (25h `lastSeenAt` threshold) zachován beze změny
+- [x] **FE:** Jotai `onlineUserIdsAtom: Set<string>` + `usePresenceInit()` (přihlášení snapshot/update v `IkarosLayout`) + `useIsOnline(id)` selector
+- [x] **FE:** `<OnlineDot userId size>` komponenta (absolute overlay, transparent offline — Q1-A; ring `var(--presence-ring)`)
+- [x] **FE:** integrace v header avataru (`HeaderLoggedIn`, size sm), `UserCard` (Uživatelé tab, size md), `PublicProfileHeader` (size md)
+- [x] **FE cleanup:** smazán placeholder `worldOnlineDot` u světů (sidebar + right panel) — světy nemají presence
+- [x] **CSS tokeny:** `--presence-online` (#22c55e), `--presence-offline` (transparent), `--presence-ring` (theme bg) v `_shared/tokens.css`
+- [x] **Tests:** BE 21 nových (12 registry + 9 gateway) + FE 13 nových (6 hook + 6 OnlineDot)
+
+**Cleanup batch (2026-05-12):** D-049 ✅ idle stav (3-stavový, activity tracker, BE registry idle aggregate), D-050 ✅ last-seen tooltip (`relativeTimeCs` util + tooltip pro offline usery), D-052 ✅ privacy „neviditelný" mód (`User.hiddenPresence` + `PrivacySection` v profilu). Pre-existing failures vyřešené (`PendingActionCard.stories.tsx` TS cast, `RoleStar.tsx` barvy → tokeny, chevrons SVG `currentColor`).
+
+**Mimo rozsah:** D-051 (Redis adapter pro multi-instance deploy — čeká škálování).
 
 ### - [ ] 1.7 Reset hesla
 
@@ -274,28 +337,28 @@ Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role 
 
 **Závislosti:** Resend účet + API klíč v `.env` (PJ založí před implementací).
 
-### - [ ] 1.8 Přátelé
+### - [ ] 1.8 Přátelé — naplní tab Přátelé + queue typ `friend_request`
 
-**Nový subsystém — BE i FE od nuly.** V roadmapě nebyl, doplněno při brainstormingu kroku 1.1 (UI hlavičky odkazuje na "PŘÁTELÉ" pro běžné uživatele, ADMIN/SUPERADMIN vidí "UŽIVATELÉ" z 1.4).
+**Nový subsystém — BE i FE od nuly.** **Není samostatná stránka** — sjednoceno do `/ikaros/uzivatele?tab=pratele` (kostra z 1.4). 1.8 naplní funkčnost.
 
 **BE (nový modul `friendships`):**
 - [ ] Entity `Friendship` (userAId, userBId, status: `pending` | `accepted` | `blocked`, requestedById, createdAt, acceptedAt)
-- [ ] `GET /api/friends` — seznam přijatých přátel
-- [ ] `GET /api/friends/requests` — příchozí žádosti
-- [ ] `POST /api/friends/request/:userId` — odeslat žádost
-- [ ] `POST /api/friends/accept/:friendshipId` — přijmout
+- [ ] `GET /api/friends` — seznam přijatých přátel (naplnění tabu Přátelé)
+- [ ] `POST /api/friends/request/:userId` — odeslat žádost (vytváří `PendingAction` typu `friend_request` u příjemce)
+- [ ] `POST /api/friends/accept/:friendshipId` — přijmout (uzavře pending action, vytvoří přátelství)
 - [ ] `DELETE /api/friends/:friendshipId` — odmítnout / odebrat
 - [ ] `POST /api/friends/block/:userId` — blokovat (volitelné)
-- [ ] Notifikace přes Ikaros poštu (3.5) nebo Socket.IO event `friend:request`
+- [ ] **`FriendRequestProvider implements IPendingActionProvider`** — první konkrétní provider nad infra z 1.4
+- [ ] Socket.IO event `friend:request` (push badge update)
 
 **FE:**
-- [ ] `/ikaros/pratele` — seznam přátel + příchozí/odeslané žádosti (taby)
-- [ ] Tlačítko "Přidat do přátel" na veřejném profilu uživatele (1.4)
-- [ ] Header link "PŘÁTELÉ" → `/ikaros/pratele` (nahradí placeholder z 1.1)
-- [ ] Badge s počtem příchozích žádostí
-- [ ] Toast / Socket event při přijetí žádosti
+- [ ] Naplnění Přátelé tabu (grid karet akceptovaných přátel) na `/ikaros/uzivatele?tab=pratele`
+- [ ] Renderer karty `friend_request` ve Zpracovat tabu (avatar + username žadatele + tlačítka Přijmout/Odmítnout)
+- [ ] Odblokovat tlačítko „Přidat do přátel" na veřejném profilu (1.4)
+- [ ] Badge s počtem příchozích žádostí na Zpracovat tabu + pravý panel
+- [ ] Toast + socket invalidace při akceptaci žádosti
 
-**Závislosti:** vyžaduje 1.4 (Adresář uživatelů) — odkud se přátelství iniciuje.
+**Závislosti:** 1.4 (kostra stránky, `PendingActionType` infra, public profil).
 
 ---
 
@@ -318,6 +381,7 @@ Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role 
 ### - [ ] 2.4 Detail světa + join flow (`/svet/:worldId`)
 - [ ] Informace o světě
 - [ ] Join tlačítko (public = přímé, private = žádost)
+- [ ] **Žádost o vstup do private světa** → queue typ `world_join_request` ve Zpracovat tabu PJ vlastníka (infra z 1.4). `WorldJoinRequestProvider implements IPendingActionProvider`. Renderer karty: avatar žadatele + název světa + tlačítka Přijmout/Odmítnout.
 
 ---
 
@@ -334,22 +398,40 @@ Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role 
 ### - [ ] 3.2 Články (`/ikaros/clanky`)
 - [ ] Přehled (Published), `/novy` editor (TipTap)
 - [ ] Draft → Pending → Published workflow, rating
+- [ ] **Pending článek** → queue typ `article_pending_review` ve Zpracovat tabu SpravceClanku (infra z 1.4). `ArticleReviewProvider implements IPendingActionProvider`. Renderer karty: náhled článku + tlačítka Schválit/Vrátit s poznámkou/Odmítnout.
 
 ### - [ ] 3.3 Galerie (`/ikaros/galerie`)
 - [ ] Mřížka obrázků, `/nahrat` upload (Cloudinary)
 - [ ] Schvalovací workflow (Pending → Approved)
+- [ ] **Pending obrázek** → queue typ `gallery_pending_review` ve Zpracovat tabu SpravceGalerie (infra z 1.4). `GalleryReviewProvider implements IPendingActionProvider`. Renderer karty: thumbnail + tlačítka Schválit/Odmítnout.
 
 ### - [ ] 3.4 Diskuze (`/ikaros/diskuze`)
 - [ ] Seznam diskuzí, `/:id` vlákno příspěvků
 - [ ] Manageři, pozvánky
+- [ ] **Hlášené příspěvky** → queue typ `discussion_report` ve Zpracovat tabu SpravceDiskuzi (infra z 1.4). `DiscussionReportProvider implements IPendingActionProvider`.
+- [ ] **Žádost o přidání do uzamčené diskuze** → queue typ `discussion_join_request` ve Zpracovat tabu manažera diskuze. `DiscussionJoinProvider implements IPendingActionProvider`. Renderer karty: avatar žadatele + název diskuze + tlačítka Přijmout/Odmítnout.
 
 ### - [ ] 3.5 Soukromá pošta (`/ikaros/posta`)
 - [ ] Inbox / Sent, nová zpráva
-- [ ] RSVP a join request akce
+- [ ] RSVP eventů (konverzace s odpovědí — zůstává v poště)
 - [ ] Počítadlo nepřečtených v headeru
 
-### - [ ] 3.6 Nápověda (`/ikaros/napoveda`)
-- [ ] Statická stránka s tutoriály
+**Hranice pošta vs. Zpracovat (z 1.4):** Pošta = konverzace + informativní zprávy + RSVP (s odpovědí). Zpracovat = aktionovatelné žádosti (přátele, world join, content approval, discussion join). Pravidlo: *vyžaduje rozhodnutí příjemce = Zpracovat; konverzace = pošta*.
+
+### - [x] 3.6 Nápověda (`/ikaros/napoveda`) ✅ (2026-05-12, vytaženo dopředu)
+
+**Spec:** `docs/arch/phase-3/spec-3.6.md`, **Plán:** `docs/arch/phase-3/plan-3.6.md`
+
+- [x] Statická stránka — 5 tabů (Začni tady / Stránky / Účet & profil / Role & oprávnění / FAQ)
+- [x] URL state `?sekce=...` (back/forward funguje, neznámý sekce fallback na default)
+- [x] Sekce Stránky — všechny funkční (✅) i připravované (🚧) stránky platformy
+- [x] Sekce Role — globální tabulka + akční matice + světové role
+- [x] FAQ s nativním `<details>` accordionem (žádný JS state)
+- [x] Anon i logged-in identický obsah (žádný gating)
+- [x] Žádné nové theme tokeny ani ornamenty — reuse `var(--*)` napříč 21 motivy
+- [x] Tests: 9 cases (tabs render, URL sync, parseTab, fallback, sections smoke)
+
+**Tracked dluh:** D-NEW (HelpPage content drift — aktualizovat tab Stránky/FAQ při fázích 1.5/1.7/1.8/2.x/3.x).
 
 ---
 

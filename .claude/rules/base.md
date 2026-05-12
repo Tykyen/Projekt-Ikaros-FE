@@ -6,3 +6,4 @@ Buď kreativní — aktivně přemýšlej nad tím, co by šlo udělat lépe, na
 Když najdeš chybu, dluh, riziko nebo nesrovnalost, kterou hned neopravuješ, použij skill `dluh`.
 Před jakoukoli implementací komponenty nebo featury bezpodmínečně aktivuj skill `spec-driven-development`.
 při úpravě grafického designu před napsáním spec plánu použij skill `frontend-design`.
+Po dokončení implementace nové stránky, role/oprávnění nebo změně funkčnosti spusť skill `napoveda` — aktualizuje stránku Nápověda (`/ikaros/napoveda`) tak, aby zůstala v souladu se stavem platformy.

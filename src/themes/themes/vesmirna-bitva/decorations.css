@@ -754,6 +754,8 @@
   align-items: center;
   flex-shrink: 0;
   filter: drop-shadow(0 0 4px var(--theme-glow-hellfire));
+  /* SVG chevrons fill přes currentColor — barva z theme token (cleanup hardcoded #d4111c) */
+  color: var(--theme-hellfire-bright);
 }
 
 /* ──────────────── 13. Theme switcher dropdown — hellfire styling když opened ──────────────── */

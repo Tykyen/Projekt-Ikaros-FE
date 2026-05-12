@@ -50,6 +50,8 @@ export interface User {
   chatColor: string;
   themeId?: string;
   emailVerified: boolean;
+  /** 1.5 D-052 — privacy „neviditelný" mód (skrýt online stav před ostatními). */
+  hiddenPresence?: boolean;
   lastLoginAt?: string;
   usernameChangedAt?: string;
   // 1.3b — ban + admin permissions (D-033 granular)
@@ -196,6 +198,17 @@ export interface AuthResponse {
 // 1.3c — login response union: ok = standardní login pair, deletion_pending = nabídka reaktivace
 export interface LoginOkResponse extends AuthResponse {
   status: 'ok';
+  /**
+   * D-034b — pokud login byl reaktivace soft-delete a uživatel měl Pomocné PJ
+   * povýšené při delete, BE vrátí promotions. FE zobrazí informační modal.
+   */
+  revertablePromotions?: Array<{
+    worldId: string;
+    worldName: string;
+    worldSlug: string;
+    promotedUserId: string;
+    promotedUsername: string;
+  }>;
 }
 export interface LoginDeletionPendingResponse {
   status: 'deletion_pending';
@@ -227,6 +240,8 @@ export interface UpdateUserRequest {
   characterAvatarUrl?: string;
   chatColor?: string;
   themeId?: string;
+  // 1.5 D-052 — privacy „neviditelný" mód
+  hiddenPresence?: boolean;
 }
 
 export interface ChangePasswordRequest {
@@ -312,4 +327,81 @@ export interface PaginatedResponse<T> {
   total: number;
   page: number;
   limit: number;
+}
+
+// ── Spec 1.4 — Public adresář + veřejný profil + univerzální action queue ───
+
+export interface PublicUserListItem {
+  id: string;
+  username: string;
+  displayName: string | null;
+  city: string | null;
+  avatarUrl: string | null;
+  defaultAvatarType: DefaultAvatarType;
+  role: UserRole;
+  worldsCount: number;
+  createdAt: string;
+  /** Admin-only flag (jen pokud requester je Admin/Superadmin + includeDeleted=1) */
+  pendingDeletion?: boolean;
+  /** Admin-only flag (jen pokud requester je Admin/Superadmin + includeDeleted=1) */
+  deleted?: boolean;
+}
+
+export interface PublicUsersListResponse {
+  items: PublicUserListItem[];
+  total: number;
+}
+
+export interface PublicUserProfile {
+  id: string;
+  username: string;
+  displayName: string | null;
+  city: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  defaultAvatarType: DefaultAvatarType;
+  characterName: string | null;
+  characterBio: string | null;
+  characterAvatarUrl: string | null;
+  role: UserRole;
+  worldsCount: number;
+  createdAt: string;
+  /** 1.5 D-050 — kdy byl naposledy aktivní. `null` pro hiddenPresence/tombstone. */
+  lastSeenAt: string | null;
+  pendingDeletion?: boolean;
+  deleted?: boolean;
+}
+
+export type PublicUsersSort = 'new' | 'abc';
+
+export interface PublicUsersQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort?: PublicUsersSort;
+  includeDeleted?: boolean;
+}
+
+/**
+ * Univerzální action queue (Zpracovat tab). Každý typ má provider na BE
+ * a renderer-by-type registry na FE. Spec design-1.4 §6.3 mapuje typ →
+ * vizuální anatomie.
+ */
+export enum PendingActionType {
+  UsernameRequest = 'username_request',
+  FriendRequest = 'friend_request',
+  WorldJoinRequest = 'world_join_request',
+  ArticlePendingReview = 'article_pending_review',
+  GalleryPendingReview = 'gallery_pending_review',
+  DiscussionReport = 'discussion_report',
+  DiscussionJoinRequest = 'discussion_join_request',
+}
+
+export interface PendingActionsCountResponse {
+  total: number;
+}
+
+export interface PendingActionsListResponse<T = unknown> {
+  items: T[];
+  total: number;
 }

@@ -9,6 +9,7 @@ import { WorldsSection } from '../components/WorldsSection';
 import { FriendsPlaceholder } from '../components/FriendsPlaceholder';
 import { CommunityPlaceholders } from '../components/CommunityPlaceholders';
 import { AppearanceSection } from '../components/AppearanceSection';
+import { PrivacySection } from '../components/PrivacySection';
 import { SecuritySection } from '../components/SecuritySection';
 import { AccountSection } from '../components/AccountSection';
 import styles from './ProfilePage.module.css';
@@ -67,6 +68,8 @@ export default function ProfilePage() {
         <CommunityPlaceholders />
 
         <AppearanceSection user={user} />
+
+        <PrivacySection hiddenPresence={!!user.hiddenPresence} />
 
         <SecuritySection username={user.username} />
 

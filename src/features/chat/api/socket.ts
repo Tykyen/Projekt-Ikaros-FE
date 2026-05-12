@@ -33,3 +33,12 @@ export function disconnectSocket(): void {
   socket = null;
   getDefaultStore().set(socketStatusAtom, 'disconnected');
 }
+
+/**
+ * 1.5 D-052 — force reconnect socketu po změně hiddenPresence
+ * (server čte flag z DB při handleConnection, takže reconnect ho aplikuje).
+ */
+export function reconnectSocket(): void {
+  disconnectSocket();
+  getSocket();
+}

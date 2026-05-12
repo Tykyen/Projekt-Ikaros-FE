@@ -271,13 +271,28 @@
   overflow-wrap: break-word;
 }
 
-.worldOnlineDot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background: var(--success);
-  box-shadow: 0 0 8px var(--success-glow);
+/* Spec 1.4 — badge pro pending count vedle labelu „Uživatelé"/„Přátelé" v pravém panelu */
+.navItemBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--sp-2);
+  border-radius: var(--radius-full);
+  background: var(--tab-badge-bg);
+  color: var(--tab-badge-fg);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
+
+/* 1.5 — wrapper okolo header UserAvatar pro OnlineDot overlay (absolute pozicování) */
+.avatarWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* ── PJ badge — base layout, theme barvy v decorations.css ── */

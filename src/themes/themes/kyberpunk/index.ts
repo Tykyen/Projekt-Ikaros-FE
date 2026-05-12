@@ -408,6 +408,29 @@ export const kyberpunkTheme: Theme = {
     /* ── Signature self-draw + plus glyph ── */
     '--asset-signature-script':  SIGNATURE_SCRIPT,
     '--asset-plus-neon':         PLUS_NEON,
+
+    /* ── 1.4 — Role chip overrides (D-046)
+       Kyberpunk: neonové varianty stejných sémantických hue jako default.
+       Pevný tmavý text na neon BG (kontrast > 4.5:1, ověřeno na #04101a fg). */
+    '--role-superadmin-bg':       '#fff200',          /* electric yellow (Superadmin = nejvyšší power) */
+    '--role-superadmin-fg':       '#04101a',
+    '--role-superadmin-ring':     'rgba(255, 242, 0, 0.55)',
+
+    '--role-admin-bg':            '#00f0ff',          /* cyan (kyberpunk brand accent) */
+    '--role-admin-fg':            '#04101a',
+    '--role-admin-ring':          'rgba(0, 240, 255, 0.55)',
+
+    '--role-spravce-clanku-bg':   '#ffa20a',          /* hot amber neon */
+    '--role-spravce-clanku-fg':   '#04101a',
+    '--role-spravce-clanku-ring': 'rgba(255, 162, 10, 0.55)',
+
+    '--role-spravce-galerie-bg':  '#ff0080',          /* hot magenta neon */
+    '--role-spravce-galerie-fg':  '#fff5fa',
+    '--role-spravce-galerie-ring':'rgba(255, 0, 128, 0.55)',
+
+    '--role-spravce-diskuzi-bg':  '#39ff14',          /* acid green neon */
+    '--role-spravce-diskuzi-fg':  '#04101a',
+    '--role-spravce-diskuzi-ring':'rgba(57, 255, 20, 0.55)',
   },
   fonts: {
     logo: 'Audiowide',
