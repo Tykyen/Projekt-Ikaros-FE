@@ -157,12 +157,6 @@
   min-height: 0;
 }
 
-[data-theme="ctyri-zivly"] [class*="headerBtn"] [class*="avatar"] {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
 /* ──────────────── 5. Panely (sidebar, right) — heraldic steel plates ──────────────── */
 
 [data-theme="ctyri-zivly"] [data-frame-panel="sidebar"],

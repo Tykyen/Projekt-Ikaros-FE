@@ -11,6 +11,12 @@
   cursor: pointer;
 }
 
+.xs {
+  width: 20px;
+  height: 20px;
+  border-width: 1px;
+}
+
 .sm {
   width: 32px;
   height: 32px;
@@ -29,4 +35,35 @@
 .xl {
   width: 128px;
   height: 128px;
+}
+
+/* 1.3c — tombstone overlay (smazaný účet) ------------------------------- */
+.wrap {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.deletedWrap {
+  border-radius: 50%;
+}
+
+.deletedImg {
+  filter: grayscale(1) brightness(0.6);
+}
+
+.deletedBand {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: linear-gradient(
+    -45deg,
+    transparent 0%,
+    transparent 40%,
+    var(--tombstone-band) 40%,
+    var(--tombstone-band) 60%,
+    transparent 60%,
+    transparent 100%
+  );
 }

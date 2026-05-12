@@ -34,7 +34,20 @@ export const passwordSchema = z
     message: 'Nové heslo se musí lišit od současného',
   });
 
+// 1.3b — žádost o změnu username (přísnější regex shodný s BE: /^[a-z0-9-]{3,32}$/)
+export const usernameRequestSchema = z.object({
+  requestedUsername: z
+    .string()
+    .min(3, 'Minimálně 3 znaky')
+    .max(32, 'Maximálně 32 znaků')
+    .regex(
+      /^[a-z0-9-]+$/,
+      'Jen malá písmena, číslice a pomlčky',
+    ),
+});
+
 export type BioForm = z.infer<typeof bioSchema>;
 export type CharacterForm = z.infer<typeof characterSchema>;
 export type HeaderForm = z.infer<typeof headerSchema>;
 export type PasswordForm = z.infer<typeof passwordSchema>;
+export type UsernameRequestForm = z.infer<typeof usernameRequestSchema>;

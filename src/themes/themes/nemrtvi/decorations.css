@@ -179,12 +179,6 @@
   min-height: 0;
 }
 
-[data-theme="nemrtvi"] [class*="headerBtn"] [class*="avatar"] {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
 /* ──────────────── 5. Glass panely — kamenné desky s glassmorphism ──────────────── */
 
 [data-theme="nemrtvi"] [data-frame-panel="sidebar"],

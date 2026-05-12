@@ -332,11 +332,6 @@
   font-size: 0.72rem;
 }
 
-[data-theme="bila"] [class*="headerBtn"] [class*="avatar"] {
-  width: 18px;
-  height: 18px;
-}
-
 /* ──────────────── 9. „Zobrazit vše →" pill ──────────────── */
 
 [data-theme="bila"] [class*="showAllLink"] {

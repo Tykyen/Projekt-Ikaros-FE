@@ -52,7 +52,9 @@ beforeEach(() => {
 describe('useLogin', () => {
   it('po úspěchu zapíše tokeny + user do store', async () => {
     const mockUser = { id: '1', username: 'alice', role: UserRole.Hrac };
+    // 1.3c — login response je union; ok varianta má `status: 'ok'`
     vi.mocked(api.post).mockResolvedValueOnce({
+      status: 'ok',
       accessToken: 'access-1',
       refreshToken: 'refresh-1',
       user: mockUser,
@@ -74,6 +76,7 @@ describe('useLogin', () => {
   it('po úspěchu zruší pending logout (kdyby běžel)', async () => {
     store.set(pendingLogoutAtom, { startedAt: Date.now() });
     vi.mocked(api.post).mockResolvedValueOnce({
+      status: 'ok',
       accessToken: 'a', refreshToken: 'r',
       user: { id: '1', username: 'x', role: UserRole.Hrac },
     });

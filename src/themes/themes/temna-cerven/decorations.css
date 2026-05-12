@@ -204,12 +204,6 @@
   min-height: 0;
 }
 
-[data-theme="temna-cerven"] [class*="headerBtn"] [class*="avatar"] {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
 /* ──────────────── 6. Glass panely — čalouněné sametové desky ──────────────── */
 
 [data-theme="temna-cerven"] [data-frame-panel="sidebar"],

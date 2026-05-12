@@ -375,7 +375,10 @@
 }
 
 @media (max-width: 768px) {
-  .body { grid-template-columns: 1fr; padding: var(--sp-3); }
+  /* D-022 fix — .shellAnon .body má spec 2-0-0, přebíjí .body 1-0-0.
+     Musíme explicitně cílit oba (mobile přepíše desktop layout pro anon i auth). */
+  .body,
+  .shellAnon .body { grid-template-columns: 1fr; padding: var(--sp-3); }
   .sidebar { display: none; }
   .hamburger { display: flex; }
   .header { padding: 0 var(--sp-3); }

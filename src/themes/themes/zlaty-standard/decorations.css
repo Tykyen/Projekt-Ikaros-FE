@@ -353,11 +353,6 @@
   font-size: 0.72rem;
 }
 
-[data-theme="zlaty-standard"] [class*="headerBtn"] [class*="avatar"] {
-  width: 18px;
-  height: 18px;
-}
-
 /* ──────────────── 14. Welcome heading + script signature ──────────────── */
 
 [data-theme="zlaty-standard"] [class*="welcomeTitle"] {

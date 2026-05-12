@@ -422,11 +422,6 @@
   box-shadow: 0 0 12px var(--theme-glow-cyan);
 }
 
-[data-theme="modre-nebe"] [class*="headerBtn"] [class*="avatar"] {
-  width: 18px;
-  height: 18px;
-}
-
 /* ──────────────── 11. Welcome card — andel medallion + script divider ──────────────── */
 
 [data-theme="modre-nebe"] [data-andel-medallion] {

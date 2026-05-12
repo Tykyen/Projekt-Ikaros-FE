@@ -15,7 +15,7 @@ const ChatPage         = lazy(() => import('@/features/chat/pages/ChatPage'));
 const WorldsPage       = lazy(() => import('@/features/ikaros/pages/WorldsPage'));
 const CreateWorldPage  = lazy(() => import('@/features/ikaros/pages/CreateWorldPage'));
 const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
-const UsersPage        = lazy(() => import('@/features/ikaros/pages/UsersPage'));
+const UsersPage        = lazy(() => import('@/features/admin/users/pages/AdminUsersPage'));
 const UserProfilePage  = lazy(() => import('@/features/ikaros/pages/UserProfilePage'));
 const ArticlesPage     = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
 const GalleryPage      = lazy(() => import('@/features/ikaros/pages/GalleryPage'));

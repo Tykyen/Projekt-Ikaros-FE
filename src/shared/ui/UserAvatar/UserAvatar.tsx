@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import type { DefaultAvatarType } from '@/shared/types';
 import styles from './UserAvatar.module.css';
 
-type Size = 'sm' | 'md' | 'lg' | 'xl';
+type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface Props {
   src?: string | null;
@@ -12,9 +12,17 @@ interface Props {
   alt?: string;
   className?: string;
   onClick?: () => void;
+  /**
+   * 1.3c — tombstone overlay (smazaný účet).
+   * - Vykreslí černou diagonální pásku přes avatar.
+   * - Grayscale + brightness 0.6 na samotném obrázku.
+   * - `alt` se přepíše na "Smazaný účet".
+   */
+  deleted?: boolean;
 }
 
 const sizePxMap: Record<Size, number> = {
+  xs: 20,
   sm: 32,
   md: 64,
   lg: 96,
@@ -22,7 +30,8 @@ const sizePxMap: Record<Size, number> = {
 };
 
 function defaultUrl(type: DefaultAvatarType, size: Size): string {
-  const small = size === 'sm' || size === 'md';
+  // xs/sm/md používají 256px webp asset (suffix -sm), lg/xl plnou 512px
+  const small = size === 'xs' || size === 'sm' || size === 'md';
   const suffix = small ? '-sm' : '';
   return `/defaults/avatars/${type}${suffix}.webp`;
 }
@@ -39,16 +48,38 @@ export function UserAvatar({
   alt = '',
   className,
   onClick,
+  deleted = false,
 }: Props) {
   const fallback = defaultUrl(defaultType, size);
   const [errored, setErrored] = useState(false);
   const url = !src || errored ? fallback : src;
   const px = sizePxMap[size];
+  const effectiveAlt = deleted ? 'Smazaný účet' : alt;
+
+  if (deleted) {
+    return (
+      <span
+        className={clsx(styles.wrap, styles[size], styles.deletedWrap, className)}
+        style={{ width: px, height: px }}
+        aria-label="Smazaný účet"
+      >
+        <img
+          src={url}
+          alt={effectiveAlt}
+          width={px}
+          height={px}
+          className={clsx(styles.avatar, styles[size], styles.deletedImg)}
+          onError={() => setErrored(true)}
+        />
+        <span className={styles.deletedBand} aria-hidden="true" />
+      </span>
+    );
+  }
 
   return (
     <img
       src={url}
-      alt={alt}
+      alt={effectiveAlt}
       width={px}
       height={px}
       className={clsx(styles.avatar, styles[size], className)}

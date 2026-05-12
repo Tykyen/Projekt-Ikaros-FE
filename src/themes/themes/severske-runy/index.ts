@@ -175,5 +175,5 @@ export const severskeRunyTheme: Theme = {
   thumbnail: '/themes/thumbnails/severske-runy.webp',
   background: '/themes/backgrounds/severske-runy.webp',
   decorationsModule: () => import('./decorations.css'),
-  reducedMotion: 'gentle',
+  reducedMotion: 'safe',
 };

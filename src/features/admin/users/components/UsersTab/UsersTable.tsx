@@ -1,0 +1,386 @@
+import { useState } from 'react';
+import { Ban, Clock, KeyRound, Skull } from 'lucide-react';
+import { useAtomValue } from 'jotai';
+import { Badge, Button, RoleStar, Spinner, UserAvatar } from '@/shared/ui';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { UserRole, type AdminUsersListItem } from '@/shared/types';
+import { ROLE_LABELS, ASSIGNABLE_ROLES } from '@/shared/types/userRoleLabels';
+import {
+  useAdminUpdateRole,
+  useAdminUnbanUser,
+  useAdminSetAdminPermissions,
+  useAdminCancelDeletion,
+} from '../../api/useAdminUsers';
+import { BanModal } from './BanModal';
+import { AdminDeleteUserModal } from './AdminDeleteUserModal';
+import { BulkToolbar } from './BulkToolbar';
+import s from './UsersTable.module.css';
+
+interface Props {
+  items: AdminUsersListItem[];
+  total: number;
+  page: number;
+  limit: number;
+  isLoading?: boolean;
+  onPageChange: (page: number) => void;
+}
+
+function formatShortDate(iso?: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  });
+}
+
+export function UsersTable({
+  items,
+  total,
+  page,
+  limit,
+  isLoading,
+  onPageChange,
+}: Props) {
+  const currentUser = useAtomValue(currentUserAtom);
+  const updateRole = useAdminUpdateRole();
+  const unban = useAdminUnbanUser();
+  const setPerms = useAdminSetAdminPermissions();
+  const cancelDeletion = useAdminCancelDeletion();
+  const [banTarget, setBanTarget] = useState<AdminUsersListItem | null>(null);
+  const [deleteTarget, setDeleteTarget] =
+    useState<AdminUsersListItem | null>(null);
+  // D-025 — bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const selectableItems = items.filter((u) => u.id !== currentUser?.id);
+  const allSelected =
+    selectableItems.length > 0 &&
+    selectableItems.every((u) => selectedIds.has(u.id));
+  const selectedItems = items.filter((u) => selectedIds.has(u.id));
+
+  function toggleOne(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  function toggleAll() {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(selectableItems.map((u) => u.id)));
+    }
+  }
+
+  const isSuperadmin = currentUser?.role === UserRole.Superadmin;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  if (isLoading) {
+    return (
+      <div className={s.tableWrapper}>
+        <div className={s.empty}>
+          <Spinner /> Načítám uživatele…
+        </div>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className={s.tableWrapper}>
+        <div className={s.empty}>Žádní uživatelé neodpovídají filtrům.</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <BulkToolbar
+        selected={selectedItems}
+        onClear={() => setSelectedIds(new Set())}
+      />
+      <div className={s.tableWrapper}>
+        <table className={s.table}>
+          <thead>
+            <tr>
+              <th scope="col" className={s.checkboxCell}>
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  aria-label="Vybrat vše"
+                />
+              </th>
+              <th scope="col">Uživatel</th>
+              <th scope="col">Role</th>
+              <th scope="col">Status</th>
+              <th scope="col">Vytvořen</th>
+              <th scope="col" className={s.actionsCell}>
+                Akce
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((u) => {
+              const isSelf = currentUser?.id === u.id;
+              return (
+                <tr key={u.id}>
+                  <td data-label="" className={s.checkboxCell}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(u.id)}
+                      onChange={() => toggleOne(u.id)}
+                      disabled={isSelf}
+                      aria-label={`Vybrat ${u.username}`}
+                    />
+                  </td>
+                  <td data-label="Uživatel">
+                    <div className={s.userCell}>
+                      <UserAvatar
+                        src={u.avatarUrl}
+                        defaultType={u.defaultAvatarType}
+                        size="sm"
+                        alt={u.username}
+                      />
+                      <div className={s.userMeta}>
+                        <span className={s.username}>{u.username}</span>
+                        <span className={s.userSub}>
+                          {u.displayName ?? '—'} · {u.email}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span className={s.roleCell}>
+                      <RoleStar role={u.role} size="sm" />
+                      {ROLE_LABELS[u.role]}
+                      {u.adminPermissions?.canManageAdmins && (
+                        <Badge variant="accent" icon={<KeyRound size={12} />}>
+                          A+
+                        </Badge>
+                      )}
+                    </span>
+                  </td>
+                  <td data-label="Status">
+                    <span className={s.statusChips}>
+                      {u.isDeleted && (
+                        <Badge variant="default" icon={<Skull size={12} />}>
+                          DELETED
+                        </Badge>
+                      )}
+                      {u.bannedAt && (
+                        <Badge
+                          variant="danger"
+                          icon={<Ban size={12} />}
+                          title={
+                            u.bannedUntil
+                              ? `Do ${new Date(u.bannedUntil).toLocaleString('cs-CZ')}`
+                              : 'Trvalý ban'
+                          }
+                        >
+                          {u.bannedUntil
+                            ? `BAN do ${new Date(u.bannedUntil).toLocaleDateString('cs-CZ')}`
+                            : 'BANNED'}
+                        </Badge>
+                      )}
+                      {!u.isDeleted && u.deletionRequestedAt && (
+                        <Badge
+                          variant="warning"
+                          icon={<Clock size={12} />}
+                          title={u.deletionReason ?? 'Pending soft-delete'}
+                        >
+                          DELETION PENDING
+                        </Badge>
+                      )}
+                      {u.pendingUsernameRequest && (
+                        <Badge variant="warning">PENDING USERNAME</Badge>
+                      )}
+                      {!u.bannedAt &&
+                        !u.deletionRequestedAt &&
+                        !u.isDeleted &&
+                        !u.pendingUsernameRequest && (
+                          <span className={s.userSub}>—</span>
+                        )}
+                    </span>
+                  </td>
+                  <td data-label="Vytvořen">{formatShortDate(u.createdAt)}</td>
+                  <td data-label="Akce" className={s.actionsCell}>
+                    <div className={s.actionsRow}>
+                      <select
+                        className={s.roleSelect}
+                        value={u.role}
+                        disabled={isSelf || updateRole.isPending}
+                        aria-label={`Změnit roli pro ${u.username}`}
+                        onChange={(e) =>
+                          updateRole.mutate({
+                            userId: u.id,
+                            role: Number(e.target.value) as UserRole,
+                          })
+                        }
+                        title={
+                          isSelf
+                            ? 'Sebe nelze upravit'
+                            : 'Změnit roli (BE odmítne pokud nemáš oprávnění)'
+                        }
+                      >
+                        {ASSIGNABLE_ROLES.map((r) => (
+                          <option key={r} value={r}>
+                            {ROLE_LABELS[r]}
+                          </option>
+                        ))}
+                      </select>
+
+                      {u.bannedAt ? (
+                        <button
+                          type="button"
+                          className={s.actionsButton}
+                          onClick={() => {
+                            if (confirm(`Odbanovat ${u.username}?`))
+                              unban.mutate(u.id);
+                          }}
+                          disabled={isSelf || unban.isPending}
+                        >
+                          Odbanovat
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className={s.actionsButton}
+                          onClick={() => setBanTarget(u)}
+                          disabled={isSelf}
+                        >
+                          Banovat
+                        </button>
+                      )}
+
+                      {/* 1.3c — Smazat účet / Obnovit smazání */}
+                      {!u.isDeleted &&
+                        (u.deletionRequestedAt ? (
+                          <button
+                            type="button"
+                            className={s.actionsButton}
+                            onClick={() => {
+                              if (
+                                confirm(
+                                  `Zrušit plánované smazání pro ${u.username}?`,
+                                )
+                              )
+                                cancelDeletion.mutate(u.id);
+                            }}
+                            disabled={isSelf || cancelDeletion.isPending}
+                            title="Revert pending soft-delete (před hard cleanup cronem)"
+                          >
+                            Obnovit smazání
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className={s.actionsButton}
+                            onClick={() => setDeleteTarget(u)}
+                            disabled={isSelf}
+                            title="Naplánovat smazání účtu (30denní hold, lze revertnout)"
+                          >
+                            Smazat účet
+                          </button>
+                        ))}
+
+                      {isSuperadmin && u.role === UserRole.Admin && !isSelf && (
+                        <div className={s.permissionsGroup}>
+                          <label className={s.filterCheckbox}>
+                            <input
+                              type="checkbox"
+                              checked={!!u.adminPermissions?.canManageAdmins}
+                              onChange={(e) =>
+                                setPerms.mutate({
+                                  userId: u.id,
+                                  permissions: {
+                                    canManageAdmins: e.target.checked,
+                                  },
+                                })
+                              }
+                              disabled={setPerms.isPending}
+                              title="Smí měnit role / banovat jiné Adminy"
+                            />
+                            Správa adminů
+                          </label>
+                          <label className={s.filterCheckbox}>
+                            <input
+                              type="checkbox"
+                              checked={!!u.adminPermissions?.canModerateContent}
+                              onChange={(e) =>
+                                setPerms.mutate({
+                                  userId: u.id,
+                                  permissions: {
+                                    canModerateContent: e.target.checked,
+                                  },
+                                })
+                              }
+                              disabled={setPerms.isPending}
+                              title="Schvalování příspěvků (3.x pipeline)"
+                            />
+                            Moderace obsahu
+                          </label>
+                          <label className={s.filterCheckbox}>
+                            <input
+                              type="checkbox"
+                              checked={
+                                !!u.adminPermissions?.canEditPlatformPages
+                              }
+                              onChange={(e) =>
+                                setPerms.mutate({
+                                  userId: u.id,
+                                  permissions: {
+                                    canEditPlatformPages: e.target.checked,
+                                  },
+                                })
+                              }
+                              disabled={setPerms.isPending}
+                              title="Editace statických stránek platformy"
+                            />
+                            Stránky platformy
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className={s.pagination}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
+          >
+            ← Předchozí
+          </Button>
+          <span className={s.pageInfo}>
+            Strana {page} z {totalPages} · celkem {total}
+          </span>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onPageChange(page + 1)}
+            disabled={page >= totalPages}
+          >
+            Další →
+          </Button>
+        </div>
+      </div>
+
+      <BanModal
+        target={banTarget}
+        onClose={() => setBanTarget(null)}
+      />
+      <AdminDeleteUserModal
+        target={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+      />
+    </>
+  );
+}

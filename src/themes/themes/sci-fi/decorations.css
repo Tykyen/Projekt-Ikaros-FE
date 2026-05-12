@@ -279,12 +279,6 @@
   min-height: 0;
 }
 
-/* Tyky avatar v hlavičce — 18px (scoped, vyšší specificita) */
-[data-theme="sci-fi"] [class*="headerBtn"] [class*="avatar"] {
-  width: 18px;
-  height: 18px;
-}
-
 /* ──────────────── 11. PJ badge — cyan chip ──────────────── */
 
 [data-theme="sci-fi"] [data-pj-badge] {

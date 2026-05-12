@@ -1,0 +1,66 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.confirm {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.textarea {
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border-radius: 4px;
+  width: 100%;
+  min-height: 90px;
+}
+
+.select {
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.warning {
+  margin: 0;
+  padding: 8px 12px;
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-soft-border);
+  border-radius: 4px;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

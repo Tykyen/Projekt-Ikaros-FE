@@ -149,13 +149,6 @@ body:has(> [data-theme="severske-runy"][data-shell="ikaros"])::before,
     0 0 12px rgba(74, 176, 208, 0.4);
 }
 
-/* Tyky header avatar — sjednotit výšku s ostatními header buttony (D-021) */
-[data-theme="severske-runy"][data-shell="ikaros"] [class*="headerBtn"] [class*="avatar"] {
-  width: 20px;
-  height: 20px;
-  font-size: 10px;
-}
-
 /* ──────────────── 5. Side panely (sidebar + drawer + rightPanel) — dark oak + iron banding ──────────────── */
 
 [data-theme="severske-runy"][data-shell="ikaros"] [data-frame-panel="sidebar"],

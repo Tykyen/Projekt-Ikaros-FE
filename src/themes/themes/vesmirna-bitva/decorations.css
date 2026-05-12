@@ -147,25 +147,7 @@
 }
 
 /* Avatar pill v header (TYKY button) — zmenšit z 32×32 base na 24×24 aby se vešel do 40px tlačítka */
-[data-theme="vesmirna-bitva"] [class*="headerBtn"] [class*="avatar"] {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
-  background: linear-gradient(180deg, var(--theme-hellfire), var(--theme-hellfire-deep));
-  border: 1px solid var(--theme-gunmetal-edge);
-  color: var(--theme-text-pale);
-  flex-shrink: 0;
-}
-
 /* UserAvatar má vnitřní <img> nebo <svg> — sjednotit i ten obsah */
-[data-theme="vesmirna-bitva"] [class*="headerBtn"] [class*="avatar"] img,
-[data-theme="vesmirna-bitva"] [class*="headerBtn"] [class*="avatar"] svg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 /* ──────────────── 3. Sidebars (left + right) — battle-plate gunmetal s burnt edge ──────────────── */
 
 [data-theme="vesmirna-bitva"] [data-frame-panel="sidebar"],

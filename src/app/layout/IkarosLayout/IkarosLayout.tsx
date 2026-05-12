@@ -338,7 +338,7 @@ function HeaderLoggedIn() {
         <UserAvatar
           src={user.avatarUrl}
           defaultType={user.defaultAvatarType ?? 'male'}
-          size="sm"
+          size="xs"
           alt={user.username}
           className={s.avatar}
         />

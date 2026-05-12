@@ -196,33 +196,47 @@ Rozsah narostl po brainstormingu (avatar postavy, soft delete s tombstone, role 
 
 **Tracked dluhy z 1.3a:** D-019 (legacy User polí cleanup), D-020 (JWT/me payload dedup).
 
-#### - [ ] 1.3b Username change + Admin role infrastruktura
+#### - [x] 1.3b Username change + Admin role infrastruktura
 
-**Spec:** `docs/arch/phase-1/spec-1.3b.md` (po 1.3a)
+**Spec:** `docs/arch/phase-1/spec-1.3b.md` ✅ schváleno 2026-05-12
+**Plán:** `docs/arch/phase-1/plan-1.3b.md` ✅ 9 fází dokončeno 2026-05-12
 
-- [ ] BE entity `UsernameChangeRequest` (userId, requestedUsername, status: `pending` | `approved` | `rejected`, requestedAt, decidedAt, decidedBy)
-- [ ] BE: cooldown 30 dní (`usernameChangedAt` na User)
-- [ ] BE endpointy: `POST /api/users/me/username-request`, `GET /api/admin/username-requests`, `POST /api/admin/username-requests/:id/approve`, `POST /api/admin/username-requests/:id/reject`
-- [ ] BE: role machinery aktivní (USER / ADMIN / SUPERADMIN guards napříč admin endpointy)
-- [ ] BE endpointy `GET /api/admin/users`, `PATCH /api/admin/users/:id/role`, `POST /api/admin/users/:id/ban`
-- [ ] FE: profil — formulář žádosti o username + zobrazení pending stavu
-- [ ] FE: minimal `/admin/uzivatele` (seznam, role změna, ban)
-- [ ] FE: minimal `/admin/zadosti-username` (schvalovat / odmítat)
+- [x] BE entity `UsernameChangeRequest` (Mongoose schema + interface + repo, partial unique index pro pending)
+- [x] BE: cooldown 30 dní (jen od posledního approved, `usernameChangedAt` na User)
+- [x] BE endpointy user: `POST/GET/DELETE /api/users/me/username-request`
+- [x] BE endpointy admin: `GET /api/admin/username-requests`, `POST .../:id/approve`, `POST .../:id/reject`
+- [x] BE: role machinery doplněna o hierarchy (`assertCanChangeRole`, `assertCanModerate`) + granular `canManageAdmins` flag
+- [x] BE endpointy ban: `POST /api/admin/users/:id/ban`, `POST /api/admin/users/:id/unban`, `POST /api/admin/users/:id/admin-permissions` (Superadmin-only)
+- [x] BE: ban gate v `JwtStrategy.validate` (DB lookup; cache = D-026) + `AuthService.login` 403 BANNED + revokace refresh tokenů
+- [x] FE: SecuritySection — žádost o username + pending banner + cooldown UI
+- [x] FE: `/ikaros/uzivatele` plnohodnotná stránka — taby Uživatelé + Žádosti, filtry, role-change dropdown, ban/unban modaly, canManageAdmins toggle
+- [x] FE: axios interceptor BANNED → instant logout
+- [x] D-032 (enum mismatch FE↔BE) vyřešeno — sjednocený `UserRole` enum (Superadmin=1, …, SpravceClanku=10, SpravceGalerie=11, SpravceDiskuzi=12; Zakaz=8 deprecated)
 
-#### - [ ] 1.3c Tombstone smazaného účtu + cleanup
+**Tracked dluhy z 1.3b:** D-021 (timed ban), D-022 (audit log), D-023 (bulk akce), D-024 (email notif), D-025 (cooldown configurable), D-026 (cache ban check), D-027 (detail link 1.4), D-028 (toast po login), D-029 (Zakaz deprecate), D-030 (audit canManageAdmins), D-031 (granular perm framework).
 
-**Spec:** `docs/arch/phase-1/spec-1.3c.md` (po 1.3b)
+#### - [x] 1.3c Tombstone smazaného účtu + cleanup ✅ (2026-05-12)
 
-- [ ] BE: soft delete (`deletionRequestedAt`), 30denní hold; cron auto hard delete
-- [ ] BE: tombstone řádek (zachovává username/displayName/avatar/chatColor s `isDeleted: true` + `deletedAt`)
-- [ ] BE: blokace smazání pokud jediný PJ světa bez Pomocného PJ; auto-promote Pomocného PJ při smazání
-- [ ] BE: moderační smazání (admin/superadmin) → tombstone + avatar = admin-set default
-- [ ] BE: chat / články / galerie / diskuze **zachovány**, autor → tombstone
-- [ ] FE: sekce **Účet** v profilu — tlačítko "Smazat účet" + confirm flow + zobrazení pending stavu
-- [ ] FE: login během hold = obnova účtu + toast
-- [ ] FE: `<UserAvatar deleted />` overlay komponenta (černá páska CSS)
-- [ ] FE: admin moderační delete v `/admin/uzivatele`
-- [ ] BE: trvalá rezervace username/email (DB constraint)
+**Spec:** `docs/arch/phase-1/spec-1.3c.md`, **Plán:** `docs/arch/phase-1/plan-1.3c.md`
+
+- [x] BE: soft delete (`deletionRequestedAt`, `deletionRequestedBy`, `deletionReason`, `deletedAt`, `isDeleted`), 30denní hold; `AccountCleanupCron` daily 03:00 Europe/Prague hard delete
+- [x] BE: tombstone řádek (zachovává `username`/`displayName`/`chatColor`/`defaultAvatarType` s `isDeleted: true` + `deletedAt`; email anonymizován na `deleted-<id>@deleted.local`)
+- [x] BE: blokace smazání pokud jediný PJ světa bez Pomocného PJ (`SOLE_PJ_BLOCK`); **auto-promote Pomocného PJ** při smazání (Fáze 0 audit objevil `WorldRole.PomocnyPJ = 2`, helper `pj-handover.helper.ts`)
+- [x] BE: moderační smazání (admin/superadmin přes `POST /admin/users/:id/deletion-request`) → 30denní hold + povinný `reason` + revert přes `DELETE /admin/users/:id/deletion-request`; hierarchy guards stejné jako ban (self/Superadmin/canManageAdmins)
+- [x] BE: chat / články / galerie / diskuze **zachovány**, autor → tombstone (avatar files smazány z disku — GDPR right-to-erasure)
+- [x] FE: sekce **Účet** v profilu plnohodnotná — tlačítko "Smazat účet" + `DeleteAccountModal` (typing username + checkbox + PJ handover preview přes `dryRun=true`) + banner pending stavu
+- [x] FE: `login()` union response (`status: 'ok' | 'deletion_pending'`); LoginModal switchne na `ReactivateAccountModal` při deletion_pending → `POST /auth/reactivate-deletion`
+- [x] FE: `<UserAvatar deleted />` overlay komponenta (CSS black diagonální páska + grayscale + brightness 0.6; theme-independent token `--tombstone-band`)
+- [x] FE: admin moderační delete v `/ikaros/uzivatele` — akce "Smazat účet" / "Obnovit smazání" v `UsersTable` + `AdminDeleteUserModal` (typing target username + povinný reason); status chip DELETION PENDING / DELETED
+- [x] BE: trvalá rezervace `username`/`usernameLower` (unique index drží i pro tombstone řádky); email anonymizovaný format `deleted-<id>@deleted.local` (unique constraint splněn)
+- [x] BE: `JwtStrategy.validate` sjednocený gate — `isDeleted` (401 DELETED), `deletionRequestedAt` (401 DELETION_PENDING), `bannedAt` (401 BANNED — regression z 1.3b)
+- [x] BE: `AuthService.login` rozšířený — `isDeleted` → 401 DELETED, `deletionRequestedAt` → 200 `{ status: 'deletion_pending', ... }` (nabídka reaktivace)
+- [x] FE: axios interceptor rozšíření — 401 DELETED / DELETION_PENDING → force logout + redirect
+- [x] Testy: BE 816 (61 suites passed) + FE 140 (23 suites passed); FE build OK
+
+**Tracked dluhy z 1.3c:** D-034b (revert PJ handover při reaktivaci), D-035 (audit log delete akcí), D-036 (email notif — 1.7), D-037 (reset hesla během hold — 1.7), D-038 (cooldown configurable), D-039 (dev-only trigger-cleanup endpoint), D-040 (tombstone integrace do chat/článků/galerie — fáze 3.x/6.x), D-041 (Friendship hard-delete při tombstone), D-042 (GDPR data export endpoint), D-043 (tombstone retention policy).
+
+**D-034 ✅ uzavřen** — auto-promote Pomocného PJ rovnou implementován díky Fáze 0 auditu (`WorldRole.PomocnyPJ` už v BE existoval).
 
 ### - [ ] 1.4 Adresář uživatelů
 - [ ] `/ikaros/uzivatele` — seznam (paginace)

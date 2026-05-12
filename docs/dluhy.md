@@ -1,49 +1,78 @@
 # Technické dluhy
 
-> **Souhrn k 2026-05-08 (po 1.3a + dluh-cleanup):**
-> - **Uzavřené:** D-001, D-002, D-003, D-004, D-005, D-007, D-008, D-009 (částečně), D-010, D-011 (honeypot část), D-013, D-014, D-015, D-016 (částečně), D-018, D-020 — **15 dluhů řešeno alespoň částečně**
+> **Souhrn k 2026-05-12 (po 1.3c):**
+> - **Uzavřené:** D-001, D-002, D-003, D-004, D-005, D-007, D-008, D-009 (batch 1+2, ~95% pokrytí), D-010, D-011 (honeypot část), D-013, D-014, D-015, D-016 (částečně), D-018, D-020, D-021 (header avatar xs), D-022 (anon mobile fix), D-023 (timed ban), D-024 (audit log), D-025 (bulk akce), D-027 (cooldown env), D-028 (in-memory cache), D-030 (toast po login), D-031 (Zakaz deprecate), D-032 (audit canManageAdmins + 1.3b interní enum mismatch), D-033 (granular perm framework), **D-034 (auto-promote Pomocného PJ — vyřešeno v 1.3c díky existujícímu `WorldRole.PomocnyPJ` v BE)**, severske-runy reducedMotion fix
 > - **Stále otevřené (čekají na PJ rozhodnutí / externí závislost):** D-011 (full captcha provider), D-012 (mailer SMTP)
+> - **Zbývající z 1.3b (čekají na externí infru / fáze):** D-026 (email notif — čeká 1.7), D-028 Redis varianta (multi-instance), D-029 (detail link — čeká 1.4)
+> - **Nové z 1.3c:** D-034b (revert PJ handover při reaktivaci), D-035 (audit log delete akcí), D-036 (email notif — 1.7), D-037 (reset hesla během hold — 1.7), D-038 (hold cooldown configurable), D-039 (dev trigger-cleanup endpoint), D-040 (tombstone integrace do chat/článků/galerie — fáze 3.x/6.x), D-041 (Friendship hard-delete při tombstone), D-042 (GDPR data export endpoint), D-043 (tombstone retention policy)
 >
 > Drobné nedořešené části jsou zaznamenány u jednotlivých záznamů níže.
 
+## Otevřené z 1.3c
+
+### D-034b — Revert PJ handover při reaktivaci
+**Kontext:** 1.3c při soft-delete povýší Pomocného PJ na PJ. Při reaktivaci povýšení **nezvracíme** — svět má 2 PJ. Acceptable, ale UX by mohlo zobrazit dialog při reaktivaci.
+**Řešení:** Při `POST /auth/reactivate-deletion` zkontrolovat, jestli existovaly promotions; pokud ano, zobrazit modal „Tvůj svět má teď 2 PJ. Chceš odebrat svou PJ roli?" → PATCH membership.
+
+### D-035 — Audit log delete akcí
+**Kontext:** 1.3c uchovává jen `deletionRequestedBy`/`deletionReason` na aktuálním záznamu (přepsáno při revert/re-request). `ACCOUNT_DELETE_REQUEST` / `ACCOUNT_DELETE_CANCEL` jsou v `AdminAuditLogEntry` ale jen pro admin akce.
+**Řešení:** Self-delete + admin delete + cron hard-cleanup vždy zapsat do audit logu s before/after diff.
+
+### D-036 — Email notifikace o naplánovaném smazání / přicházejícím hard delete
+**Kontext:** Čeká na mailer modul (1.7). 1.3c: uživatel vidí stav přes profil banner; admin vidí v admin tabulce.
+**Řešení:** Po `POST /users/me/deletion-request` poslat HTML email "Účet bude smazán 9.6.2026, pro obnovení klikni…". 3 dny před hard delete připomínkový email.
+
+### D-037 — Reset hesla během deletion hold
+**Kontext:** Pokud uživatel zapomene heslo během 30denního hold, nemůže se vrátit (reaktivace vyžaduje heslo). Čeká na 1.7 mailer (reset password flow). Mezitím: admin manual revert přes admin endpoint.
+**Řešení:** Po 1.7 — reset password flow musí akceptovat deletion-pending stav, send token, password set → standardní login (clear deletion flagy stejně jako reactivate-deletion endpoint).
+
+### D-038 — Hold cooldown jako admin-konfigurovatelná konstanta
+**Kontext:** 1.3c hardcoded 30 dní (`DELETION_HOLD_DAYS = 30` v UsersService + cron). Analog D-027 (username cooldown).
+**Řešení:** ENV `DELETION_HOLD_DAYS` (default 30), inject přes ConfigService.
+
+### D-039 — Dev-only endpoint pro trigger cleanup cronu
+**Kontext:** V testech / staging chceme manuálně spustit cron bez čekání na 03:00. 1.3c: cron je test-only přes mock Date.
+**Řešení:** `POST /api/admin/_dev/trigger-cleanup` (jen ne-production, Superadmin-only) → vola `AccountCleanupCron.hardDeleteExpired()` immediately.
+
+### D-040 — Tombstone integrace do chat / článek / galerie / diskuze renderingu
+**Kontext:** 1.3c poskytuje `<UserAvatar deleted />` primitive. Integrace do konkrétních komponent přijde s pipelines těch fází.
+**Řešení:** Fáze 3.x (články, galerie, diskuze) + 4.x/6.x (chat) — autor s `isDeleted=true` rendrovat s `<UserAvatar deleted />` + zobrazit "Smazaný účet" jako displayName tooltip.
+
+### D-041 — Friendship hard-delete při tombstone
+**Kontext:** 1.3c zachovává `Friendship` záznamy v DB (FE filtruje na render). Po 3.5 (přátelé) zvážit hard-delete těchto záznamů při cronu.
+**Řešení:** V cronu `AccountCleanupCron.hardDeleteOne` doplnit `friendshipRepo.deleteByUserId(userId)` (až existuje).
+
+### D-042 — GDPR data export endpoint (právo na přenositelnost)
+**Kontext:** GDPR článek 20 — uživatel má právo dostat svoje data v strojově čitelném formátu (JSON). 1.3c implementuje erasure (deletion), ale ne export.
+**Řešení:** `GET /users/me/data-export` → ZIP s JSON dump všech user data (profile, posts, friendships, …). Samostatný spec po 1.7.
+
+### D-043 — Tombstone retention policy
+**Kontext:** Tombstone řádky (username + displayName zachované) zůstávají v DB forever. Po X letech retence by se měly opravdu smazat (a username uvolnit). Žádná retention policy zatím nemáme.
+**Řešení:** Samostatný spec s rozhodnutím retention period (např. 5 let od `deletedAt`). Cron nebo manual admin action.
+
+---
+
 ## Otevřené
 
-### D-023 — severske-runy index.ts má `reducedMotion: 'gentle'` mimo povolený union typ
-**Soubor:** `src/themes/themes/severske-runy/index.ts` (řádek 178)
-**Problém:** Typ `ThemeReducedMotion = 'safe' | 'heavy'` ([src/themes/types.ts:32](src/themes/types.ts#L32)). Severske-runy nastavuje `'gentle'`, který neexistuje. `tsc -b` reportuje TS2322 error. Pravděpodobně přehled v 1.0o, build pravděpodobně projde díky `tsc --noEmit` / Vite tolerance, ale formálně je to typ-error.
-**Dopad:** Nízký — runtime nefunkční dopad není (pole je `?`, používá se jen v `useReducedMotion` hooku který fallbackuje na default), ale `tsc -b` reportuje chybu při buildu.
-**Reprodukce:** `npx tsc -b` v root projektu → `error TS2322: Type '"gentle"' is not assignable to type 'ThemeReducedMotion | undefined'`.
-**Řešení:** Buď (a) přidat `'gentle'` do unionu `ThemeReducedMotion` (pokud byl plánovaný 3. stupeň mezi safe a heavy), nebo (b) změnit severske-runy na `'safe'` (5 animací s reduced-motion fallback, je to bezpečné).
-**Kdy:** Při dalším šťouchu do severske-runy nebo v dluh-cleanup batch. Triviální 1-line fix.
+
+### D-026 — Email notifikace o approve/reject username žádosti
+**Kontext:** Čeká na mailer modul (1.7). 1.3b: žadatel zjistí stav přes profil banner.
+**Řešení:** Po `approveUsernameRequest` / `rejectUsernameRequest` poslat HTML email žadateli s rozhodnutím.
+
+
+### D-028 (zbývající Redis varianta) — Cache pro `JwtStrategy.validate` ban check
+**Kontext:** In-memory cache uzavřena (viz Uzavřené níže), single-instance funguje plně. Pro multi-instance deployu nutno swap na Redis pub/sub.
+**Řešení:** Vyměnit `UserBanCacheService` Map za Redis client (`ioredis`); invalidate přes pub/sub channel `user-ban-invalidate`.
+
+### D-029 — Veřejný profil link z admin tabulky
+**Kontext:** Akce „Detail" v AdminUsersPage skryta v 1.3b. Závisí na 1.4 (veřejný profil `/ikaros/uzivatel/:id`).
+**Řešení:** Po 1.4 odblokovat akci.
+
+
 
 ---
 
-### D-022 — Anonymous mobile layout: main content zúžen na ~95px
-**Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.module.css` (řádek 143-145 a 371-380)
-**Problém:** Na anonymous user (logged-out) na mobile (≤768px viewport) má main content jen ~59-95px width. Pravidlo `.shellAnon .body { grid-template-columns: var(--sidebar-w, 280px) 1fr }` (specificita 2-0-0) přepíše mobile media query `.body { grid-template-columns: 1fr }` (specificita 1-0-0 — media query nezvyšuje specificitu selektoru). Tedy `.shellAnon` mobile zachová 280px sidebar slot + 95px main, i když `.sidebar { display: none }`.
-**Dopad:** Střední — všechny skiny (welcome card zúžený na 52px, paragraph nečitelný) když anonymous user otevře aplikaci na mobile. Authenticated mobile (přihlášený user) je OK.
-**Reprodukce:** localhost dev, incognito (anonymous), viewport 375×812 — welcome card width 52px.
-**Řešení:** přidat `.shellAnon` do mobile media query:
-```css
-@media (max-width: 768px) {
-  .body,
-  .shellAnon .body { grid-template-columns: 1fr; }
-  ...
-}
-```
-Triviální 1-řádkový fix shared layoutu.
-**Kdy:** Při dalším shared layout patch (samostatný spec není nutný, ale shared edit vyžaduje souhlas dle memory `feedback_theme_isolation.md`).
-
 ---
-
-### D-021 — Tyky header avatar specificity hack opakovaný per-tématu
-**Soubor:** `src/themes/themes/<theme>/decorations.css` (zlaty-standard, sci-fi; budoucí luxury upgrades)
-**Problém:** `UserAvatar.module.css` má `.sm { width: 32px }` se specificitou 0,1,0. `IkarosLayout.module.css` má `.avatar { width: 20px }` s totožnou specificitou — UserAvatar vyhrává díky pozdějšímu načtení v cascade. Každé luxury téma musí proto duplikovat scoped fix `[data-theme="..."] [class*="headerBtn"] [class*="avatar"] { width: 18px }`. Aktuálně už 2× (zlaty-standard + sci-fi); každé další téma kopíruje stejné 4 řádky.
-**Dopad:** Nízký — funkčně OK, ale duplikace + technický dluh; při dalším luxury theme upgrade riziko zapomenutí.
-**Řešení:** Jedna z možností (vyžaduje souhlas, zasahuje shared):
-  - (a) Přidat `xs` size (18-20px) do `UserAvatar` + použít `<UserAvatar size="xs">` v IkarosLayout headeru.
-  - (b) Zvýšit specificitu `IkarosLayout.module.css` na `.headerBtn .avatar { width: 20px }` — překoná `UserAvatar.module.css .sm` 32px globálně, fix jednorázový.
-**Kdy:** Před dalším luxury theme upgrade NEBO dříve, samostatný spec/plán; oba přístupy = úprava shared modulu, vyžaduje schválení.
 
 ---
 
@@ -70,10 +99,10 @@ Triviální 1-řádkový fix shared layoutu.
 
 ## Částečně řešené (zbývající práce)
 
-### D-009 — BE `code` field v error responses (rolling)
+### D-009 — BE `code` field v error responses (rolling, většina hotová)
 **Soubor:** `Projekt-ikaros/backend/src/modules/**/*.service.ts`
-**Stav:** Pattern aplikovaný na 7 míst napříč moduly (`admin.service`, `worlds.service` 2×, `users.service`, `characters.service`, `pages.service`, `ikaros-messages.service`). Codes: `EMAIL_TAKEN`, `USERNAME_TAKEN`, `WORLD_SLUG_TAKEN`, `WORLD_ALREADY_MEMBER`, `CHARACTER_SLUG_TAKEN`, `PAGE_SLUG_TAKEN`, `JOIN_REQUEST_RESOLVED`.
-**Zbývá:** `NotFoundException`, `ForbiddenException`, `BadRequestException` v dotyčných modulech. Postupné rolování při BE patchích — žádný blokátor.
+**Stav:** **Batch 1** (1.3a): 7 míst (ConflictException codes). **Batch 2** (post-1.3b, 2026-05-12): 350 exceptions (NotFound/Forbidden/BadRequest) batch transform script → 27 service souborů. **Hotovo viz Uzavřené.**
+**Zbývá:** ~19 exceptions s komplexnějšími patterns (template literals s ${}, multi-line msg, nested expressions). Doplnit při dalším šťouchu do těchto míst.
 
 ---
 
@@ -112,6 +141,86 @@ Triviální 1-řádkový fix shared layoutu.
 ---
 
 ## Uzavřené
+
+### D-028 (in-memory varianta) — In-memory cache pro ban check
+**Soubory:** `backend/src/modules/users/services/user-ban-cache.service.ts` (nový), `users.module.ts`, `auth/strategies/jwt.strategy.ts`, `admin/admin.service.ts`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). `UserBanCacheService` — `Map<userId, BanCacheEntry>` s TTL (default 10 s, env `USER_BAN_CACHE_TTL_MS`, 0 = disabled). LRU eviction při překročení 10 000 entries. `JwtStrategy.validate` má fast-path: cache hit + banned + non-expired → throw bez DB hitu; cache miss → DB lookup + populate cache (positive i negative entry). `AdminService.banUser`/`unbanUser` invaliduje cache. Single-instance plné řešení. **Redis varianta pro multi-instance deploy** je tracked jako follow-up D-028 v Otevřených.
+
+---
+
+### D-009 — BE `code` field v error responses (rolling — batch 2)
+**Soubory:** 27 BE service souborů napříč moduly (admin, auth, calendars, campaign, character-subdocs, characters, chat, dungeon-maps, emotes, game-events, global-chat, ikaros-articles, ikaros-discussions, ikaros-gallery, ikaros-messages, ikaros-news, maps, npc-templates, pages, sounds, timeline, universe, users, world-calendar-config, world-currencies, world-news, world-weather, worlds)
+**Opraveno v:** post-1.3b cleanup (2026-05-12). Batch transform skriptem (`tmp/fix-codes.mjs`) → **350 exceptions** přepsaných z `throw new NotFoundException('msg')` na `throw new NotFoundException({ statusCode: 404, code: '<MODULE>_NOT_FOUND', message: 'msg' })`. Per-module codes: `USER_NOT_FOUND`, `WORLD_NOT_FOUND`, `CHARACTER_NOT_FOUND`, `PAGE_NOT_FOUND`, `ARTICLE_NOT_FOUND`, `DISCUSSION_NOT_FOUND`, `GALLERY_NOT_FOUND`, `CAMPAIGN_ENTITY_NOT_FOUND`, `TIMELINE_ENTRY_NOT_FOUND`, `EVENT_NOT_FOUND` atd. Generic `FORBIDDEN` a `BAD_REQUEST` pro ostatní. 816 BE testů zelených po refactoru.
+
+**Zbývá:** ~19 exceptions s složitějšími patterns (template literals, multi-line msg, nested expressions) — minor rolling.
+
+---
+
+### D-025 — Bulk akce v admin tabulce
+**Soubory:** `backend/src/modules/admin/dto/bulk-ban.dto.ts`, `bulk-unban.dto.ts`, `bulk-role-change.dto.ts`, `admin.service.ts`, `admin.controller.ts`, `src/features/admin/users/components/UsersTab/BulkToolbar.tsx`, `UsersTable.tsx`, `useAdminUsers.ts`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). BE batch endpointy `POST /admin/users/bulk-ban|bulk-unban|bulk-role-change` (max 50 userů per request), per-user hierarchy check uvnitř service, response `{ successful: string[], failed: { userId, code, message }[] }` aby selhání jednoho neblokoval ostatní. FE: checkbox sloupec v UsersTable + select-all v thead + sticky `BulkToolbar` s akcemi Ban/Unban/Změnit roli + modaly s reason a duration dropdown. Toast s počtem `úspěšně/selhalo`.
+
+---
+
+### D-023 — Timed ban (`bannedUntil` + cron auto-unban)
+**Soubory:** `backend/src/modules/users/schemas/user.schema.ts`, `users.service.ts` (cron), `users.repository.ts`, `interfaces/users-repository.interface.ts`, `admin/dto/ban-user.dto.ts`, `admin.service.ts`, `auth/strategies/jwt.strategy.ts`, `auth.service.ts`, `src/features/admin/users/components/UsersTab/BanModal.tsx`, `UsersTable.tsx`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). Pole `User.bannedUntil: Date | null`. DTO `BanUserDto.durationDays` (0/undefined = trvalý). `AdminService.banUser` computuje `bannedUntil = now + durationDays * 86400_000`. Cron `@Cron(EVERY_HOUR)` v `UsersService.cronAutoUnbanExpired` cleared expired bans. Lazy unban v `JwtStrategy.validate` + `AuthService.login` (instantní pro right-now requesty). FE BanModal: dropdown trvání (trvalý / 1d / 7d / 30d / 90d). UsersTable: status chip zobrazí "BAN do <date>" pokud `bannedUntil`, jinak "BANNED".
+
+---
+
+### D-024 + D-032 — Audit log feed pro admin operace
+**Soubory:** `backend/src/modules/admin/schemas/admin-audit-log.schema.ts`, `interfaces/admin-audit-log.interface.ts`, `repositories/admin-audit-log.repository.ts`, `admin.module.ts`, `admin.service.ts` (helper `audit()` + hook ve všech mutacích), `admin.controller.ts`, `src/features/admin/users/components/AuditLogTab/AuditLogTab.tsx`, `useAdminUsers.ts`, `AdminUsersPage.tsx`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). Nová Mongo kolekce `admin_audit_log` s aktor/cíl identifikací, action enum (BAN/UNBAN/ROLE_CHANGE/ADMIN_PERMISSIONS_CHANGE/USERNAME_REQUEST_APPROVED/USERNAME_REQUEST_REJECTED), before/after diff JSON. Audit volání hooknutá ve všech AdminService mutacích (try/catch — audit failure neblokuje business logiku). Endpoint `GET /admin/audit-log` s filtry action/actorId/targetId. FE: 3. tab "Audit log" v AdminUsersPage s tabulkou (filter action select, badge per akce, diff JSON viewer, paginace, mobile cards). D-032 (audit canManageAdmins) je natural součást action ADMIN_PERMISSIONS_CHANGE.
+
+---
+
+### D-033 — Granular permissions framework
+**Soubory:** `backend/src/modules/users/interfaces/user.interface.ts`, `schemas/user.schema.ts`, `users.repository.ts`, `admin/helpers/hierarchy.ts`, `admin.service.ts`, `admin/dto/set-admin-permissions.dto.ts`, `auth/strategies/jwt.strategy.ts`, `src/shared/types/index.ts`, `src/features/admin/users/api/useAdminUsers.ts`, `components/UsersTab/UsersTable.tsx`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). Refactor `User.canManageAdmins: boolean` → `User.adminPermissions: { canManageAdmins, canModerateContent, canEditPlatformPages }`. BE: nový `AdminPermissions` interface + `DEFAULT_ADMIN_PERMISSIONS` konstanta; Mongoose schema sub-document. `MongoUsersRepository.toEntity` legacy fallback (čte staré `canManageAdmins: boolean` pokud `adminPermissions` chybí). Hierarchy helpers (`assertCanChangeRole`, `assertCanModerate`) čtou `actor.adminPermissions?.canManageAdmins`. DTO `SetAdminPermissionsDto` — všechny 3 flagy optional, granular merge v service. FE: rozšířený toggle popover v UsersTable (3 checkboxy s tooltipy). canModerateContent + canEditPlatformPages jsou zatím "future" flags pro 3.x content moderation a admin pages editor — schema připravená.
+
+---
+
+### D-030 — Toast po login s rozhodnutou username žádostí
+**Soubory:** `backend/src/modules/users/schemas/username-change-request.schema.ts`, `interfaces/username-change-request.interface.ts`, `repositories/username-change-requests.repository.ts`, `users.service.ts`, `users.controller.ts`, `src/shared/types/index.ts`, `src/features/admin/users/api/useAdminUsers.ts`, `src/features/auth/components/AuthBootstrap.tsx`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). Pole `seenAt: Date | null` na `UsernameChangeRequest`. Nové endpointy `GET /users/me/username-request/last-unseen-decided` + `POST .../:id/seen`. FE komponenta `UsernameRequestToast` v `AuthBootstrap` po hydrataci: pokud existuje rozhodnutá nesehnutá žádost, zobrazí toast (success pro approved s novým username, error pro rejected s důvodem) + auto-mark seen. Toast se zobrazí jen jednou per request (ref-tracker proti opakovanému renderu).
+
+---
+
+### D-027 — Cooldown username change jako konfigurovatelná konstanta
+**Soubory:** `backend/src/modules/users/users.service.ts`, `backend/.env.example`, `src/shared/types/index.ts`, `src/features/profile/components/SecuritySection.tsx`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). `USERNAME_CHANGE_COOLDOWN_DAYS` env var (default 30) přes `ConfigService.get` v `UsersService.getCooldownDays()`. `MeResponse` rozšířen o `usernameChangeCooldownDays` — FE `SecuritySection` čte z `profile.usernameChangeCooldownDays`. Hodnota 0 = cooldown vypnut. Admin UI pro nastavení = separátní budoucí dluh (db-backed settings dokument).
+
+---
+
+### D-021 — Tyky header avatar specificity hack opakovaný per-tématu
+**Soubory:** `src/shared/ui/UserAvatar/UserAvatar.tsx`, `UserAvatar.module.css`, `src/app/layout/IkarosLayout/IkarosLayout.tsx`, decorations.css v 14 tématech (bila, modre-nebe, sci-fi, zlaty-standard, ctyri-zivly, hospoda, indiane, nemrtvi, pergamen, priroda, severske-runy, temna-cerven, vesmirna-bitva, vesmirna-lod).
+**Opraveno v:** post-1.3b cleanup (2026-05-12). (a) varianta zvolena: přidán `xs` size (20px) do `UserAvatar`, IkarosLayout header používá `<UserAvatar size="xs">`. Per-theme specificity hacky `[data-theme="X"] [class*="headerBtn"] [class*="avatar"] { width: 16/18/20px }` odebrané ze všech 14 témat (regex sweep + manual fix pro severske-runy s atypickou strukturou). Žádná per-theme duplikace.
+
+---
+
+### D-022 — Anonymous mobile layout: main content zúžen na ~95px
+**Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.module.css` (řádek 377-380)
+**Opraveno v:** post-1.3b cleanup (2026-05-12). V mobile media query přidán selektor `.shellAnon .body` (specificita 2-0-0) vedle `.body` → mobile přepíše desktop `grid-template-columns: var(--sidebar-w) 1fr` pro auth i anon shell.
+
+---
+
+### D-031 — `UserRole.Zakaz` deprecate z enum
+**Soubory:** `backend/src/modules/users/interfaces/user.interface.ts`, `src/shared/types/index.ts`, `backend/src/modules/admin/helpers/hierarchy.ts`, `src/shared/types/userRoleLabels.ts`
+**Opraveno v:** post-1.3b cleanup (2026-05-12). `Zakaz = 8` smazán z BE i FE enum, callsites (`assertCanChangeRole` `ZAKAZ_DEPRECATED` block, `ROLE_LABELS` record) vyčištěné. Bez migration scriptu — pokud production DB obsahuje user.role=8, bude potřeba před deployem `db.users.updateMany({ role: 8 }, { $set: { role: 5, bannedAt: ISODate(), banReason: 'Migrated from Zakaz role' } })`.
+
+---
+
+### D-032 (interní 1.3b) — Enum `UserRole` mismatch FE ↔ BE
+**Soubory:** `backend/src/modules/users/interfaces/user.interface.ts`, `src/shared/types/index.ts`
+**Opraveno v:** 1.3b Phase 1 (2026-05-12). Sjednocený enum: 1=Superadmin, 2=Admin, 3=PJ, 4=Korektor, 5=Hrac, 6=Ctenar, 7=Zadatel, 8=Zakaz (deprecated), 9=Ikarus, 10=SpravceClanku, 11=SpravceGalerie, 12=SpravceDiskuzi. BE překlepy `SpravceClankuu`/`SpravceDisukzi` opraveny, FE-only `SpravceBohu` (dead code) smazán. Všechny callsites v `ikaros-articles.service.ts`, `ikaros-discussions.service.ts`, `RoleStar.tsx` aktualizovány.
+
+---
+
+### Severske-runy `reducedMotion: 'gentle'` mimo union typ
+**Soubor:** `src/themes/themes/severske-runy/index.ts` (řádek 178)
+**Opraveno v:** 1.3b Phase 9 (2026-05-12) — změna na `'safe'` (5 animací s reduced-motion fallback). 1-line fix při buildu.
+
+---
 
 ### D-001 — `window.location.href` při selhání refreshe → 404
 **Soubor:** `src/api/client.ts` — response interceptor

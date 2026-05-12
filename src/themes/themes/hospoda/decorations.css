@@ -158,12 +158,6 @@
   min-height: 0;
 }
 
-[data-theme="hospoda"] [class*="headerBtn"] [class*="avatar"] {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
 /* ──────────────── 6. Glass panely — tmavé dřevo + brass border ──────────────── */
 
 [data-theme="hospoda"] [data-frame-panel="sidebar"],

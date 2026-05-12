@@ -15,7 +15,17 @@ import {
   loginModalOpenAtom,
   openRegisterModalAtom,
 } from '@/shared/store/authStore';
+import { ReactivateAccountModal } from './ReactivateAccountModal';
 import s from './LoginModal.module.css';
+
+// 1.3c — když /auth/login vrátí deletion_pending, LoginModal switchne na
+// ReactivateAccountModal. State tady zachycuje credentials + dates.
+interface DeletionPendingContext {
+  identifier: string;
+  password: string;
+  deletionRequestedAt: string;
+  scheduledHardDeleteAt: string;
+}
 
 function mapErrorToMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
@@ -35,6 +45,8 @@ export function LoginModal() {
   const openRegister = useSetAtom(openRegisterModalAtom);
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [deletionContext, setDeletionContext] =
+    useState<DeletionPendingContext | null>(null);
   const navigate = useNavigate();
   const login = useLogin();
 
@@ -54,6 +66,7 @@ export function LoginModal() {
     setOpen(false);
     setSubmitError(null);
     setShowPassword(false);
+    setDeletionContext(null);
     reset();
   }
 
@@ -68,8 +81,19 @@ export function LoginModal() {
     setSubmitError(null);
     try {
       const result = await login.mutateAsync(values);
-      const intent = consumeLoginIntent();
 
+      // 1.3c — soft-delete pending: switch na ReactivateAccountModal
+      if (result.status === 'deletion_pending') {
+        setDeletionContext({
+          identifier: values.identifier,
+          password: values.password,
+          deletionRequestedAt: result.deletionRequestedAt,
+          scheduledHardDeleteAt: result.scheduledHardDeleteAt,
+        });
+        return; // nezavírat LoginModal — overlay ReactivateAccountModal převezme
+      }
+
+      const intent = consumeLoginIntent();
       const username = result.user.displayName ?? result.user.username;
       toast.success(`Vítej zpět, ${username}!`);
       close();
@@ -78,6 +102,26 @@ export function LoginModal() {
     } catch (err) {
       setSubmitError(mapErrorToMessage(err));
     }
+  }
+
+  // 1.3c — overlay ReactivateAccountModal nad zavřeným LoginModalem.
+  // Render PŘED return s LoginModalem, aby měl modal stack focus management.
+  if (deletionContext) {
+    return (
+      <ReactivateAccountModal
+        open
+        credentials={{
+          identifier: deletionContext.identifier,
+          password: deletionContext.password,
+        }}
+        deletionRequestedAt={deletionContext.deletionRequestedAt}
+        scheduledHardDeleteAt={deletionContext.scheduledHardDeleteAt}
+        onCancel={() => {
+          setDeletionContext(null);
+          close();
+        }}
+      />
+    );
   }
 
   return (

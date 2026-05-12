@@ -14,21 +14,32 @@ import { isJwtValid } from '@/shared/lib/jwt';
 import type {
   AuthResponse,
   LoginRequest,
+  LoginResponse,
   RegisterRequest,
   User,
 } from '@/shared/types';
 
 const LOGOUT_UNDO_MS = 5000;
 
+/**
+ * 1.3c — login vrací union `LoginResponse`:
+ *   - { status: 'ok', accessToken, refreshToken, user }  → standardní login
+ *   - { status: 'deletion_pending', ...}                  → soft-delete hold, FE
+ *     otevře ReactivateAccountModal pro reaktivaci s credentials.
+ *
+ * onSuccess zapisuje tokeny jen v "ok" case. Caller (LoginModal) musí switchovat
+ * dle `result.status` před navigací / toast.
+ */
 export function useLogin() {
   return useMutation({
     mutationFn: (dto: LoginRequest) =>
-      api.post<AuthResponse>('/auth/login', dto),
-    onSuccess: ({ accessToken, refreshToken, user }) => {
+      api.post<LoginResponse>('/auth/login', dto),
+    onSuccess: (result) => {
+      if (result.status !== 'ok') return; // deletion_pending řeší caller
       const store = getDefaultStore();
-      store.set(accessTokenAtom, accessToken);
-      store.set(refreshTokenAtom, refreshToken);
-      store.set(currentUserAtom, user);
+      store.set(accessTokenAtom, result.accessToken);
+      store.set(refreshTokenAtom, result.refreshToken);
+      store.set(currentUserAtom, result.user);
       store.set(loginModalOpenAtom, false);
       // Pokud byl spuštěný pending logout, zruš ho — uživatel se přihlásil znovu
       store.set(pendingLogoutAtom, null);

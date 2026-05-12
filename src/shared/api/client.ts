@@ -33,11 +33,32 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Response — 401 → pokus o refresh, pak retry
+// Response — 401 → pokus o refresh, pak retry. BANNED → instant logout (1.3b)
 apiClient.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
     const original = error.config as typeof error.config & { _retry?: boolean };
+    const data = error.response?.data as ApiError | undefined;
+    const code = data?.error?.code;
+
+    // 1.3b — banned user: 401 BANNED z JwtStrategy.validate → logout bez refresh pokusu.
+    // (Refresh by selhal stejně, ale instant logout je správnější UX.)
+    if (error.response?.status === 401 && code === 'BANNED') {
+      logoutAndRedirectToLogin();
+      return Promise.reject(error);
+    }
+
+    // 1.3c — soft-delete pending nebo hard-deleted: instant logout, žádný refresh.
+    // Login flow rozpoznává deletion_pending stav přes status field a otevře
+    // ReactivateAccountModal; tady jen vyklidíme session pokud existuje.
+    if (
+      error.response?.status === 401 &&
+      (code === 'DELETED' || code === 'DELETION_PENDING')
+    ) {
+      logoutAndRedirectToLogin();
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
       const store = getDefaultStore();
@@ -49,14 +70,14 @@ apiClient.interceptors.response.use(
       }
 
       try {
-        const { data } = await axios.post<RefreshResponse>(
+        const { data: refreshData } = await axios.post<RefreshResponse>(
           `${apiBase}/api/auth/refresh`,
           { refreshToken },
         );
-        store.set(accessTokenAtom, data.accessToken);
-        store.set(refreshTokenAtom, data.refreshToken);
+        store.set(accessTokenAtom, refreshData.accessToken);
+        store.set(refreshTokenAtom, refreshData.refreshToken);
         original.headers = original.headers ?? {};
-        original.headers.Authorization = `Bearer ${data.accessToken}`;
+        original.headers.Authorization = `Bearer ${refreshData.accessToken}`;
         return apiClient(original);
       } catch {
         logoutAndRedirectToLogin();

@@ -87,4 +87,8 @@
   --frame-border: var(--theme-border-soft,    var(--border,          rgba(255, 255, 255, 0.18)));
   --text:         var(--theme-text,           var(--text-primary,    #e8e8e8));
   --text-strong:  var(--theme-heading,        var(--theme-text,      var(--text-primary, #ffffff)));
+
+  /* 1.3c — tombstone overlay (UserAvatar deleted prop).
+     Záměrně theme-independent — smazaný účet má vždy stejný vizuál napříč skiny. */
+  --tombstone-band: rgba(0, 0, 0, 0.85);
 }

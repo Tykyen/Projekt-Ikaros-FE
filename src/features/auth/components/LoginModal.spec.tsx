@@ -71,7 +71,9 @@ describe('LoginModal', () => {
   });
 
   it('submit s validními údaji → atomy nastaveny + modal zavřen', async () => {
+    // 1.3c — login response je union; ok varianta má `status: 'ok'`
     vi.mocked(api.post).mockResolvedValueOnce({
+      status: 'ok',
       accessToken: 'a-1',
       refreshToken: 'r-1',
       user: {

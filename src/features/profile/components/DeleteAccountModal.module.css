@@ -1,0 +1,107 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.warningList li {
+  margin-bottom: 4px;
+}
+
+.placeholder {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.promotionsBlock {
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.intro {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.worldList {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.9rem;
+  color: var(--text-strong);
+}
+
+.worldList li {
+  margin-bottom: 4px;
+}
+
+.worldSlug {
+  margin-left: 4px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.confirmField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--text-strong);
+}
+
+.label code {
+  font-family: ui-monospace, monospace;
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ackLabel {
+  font-size: 0.9rem;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pjBlockView {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .footerActions {
+    flex-direction: column-reverse;
+  }
+  .footerActions button {
+    width: 100%;
+  }
+}
