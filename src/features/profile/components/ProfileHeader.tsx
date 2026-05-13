@@ -1,13 +1,16 @@
 ﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 import { Button, Input, RoleStar, UserAvatar } from '@/shared/ui';
 import { AvatarUploader } from './AvatarUploader';
+import { ChangeEmailModal } from './ChangeEmailModal';
 import {
   useUpdateProfile,
   useUploadAvatar,
   useDeleteAvatar,
 } from '@/features/profile/api/useProfile';
+import { useEmailVerifyResend } from '@/features/auth/api/useEmailVerify';
 import { headerSchema, type HeaderForm } from '../lib/profileSchemas';
 import { type User } from '@/shared/types';
 import styles from './ProfileHeader.module.css';
@@ -49,9 +52,20 @@ interface Props {
  */
 export function ProfileHeader({ user }: Props) {
   const [editing, setEditing] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
   const update = useUpdateProfile();
   const uploadAvatar = useUploadAvatar();
   const deleteAvatar = useDeleteAvatar();
+  const resendVerify = useEmailVerifyResend();
+
+  async function handleResendVerify() {
+    try {
+      await resendVerify.mutateAsync();
+      toast.success('Verifikační e-mail jsme znovu odeslali.');
+    } catch {
+      toast.error('Verifikační e-mail se nepodařilo odeslat.');
+    }
+  }
 
   const form = useForm<HeaderForm>({
     resolver: zodResolver(headerSchema),
@@ -128,11 +142,22 @@ export function ProfileHeader({ user }: Props) {
               />
               <Field
                 label="Email"
-                value={user.email}
-                hint={
-                  user.emailVerified
-                    ? undefined
-                    : 'Změna v 1.7 (vyžaduje verifikaci)'
+                value={
+                  <span className={styles.emailRow}>
+                    <span>{user.email}</span>
+                    <EmailVerifyBadge
+                      verified={user.emailVerified}
+                      onResend={handleResendVerify}
+                      resending={resendVerify.isPending}
+                    />
+                    <button
+                      type="button"
+                      className={styles.linkButton}
+                      onClick={() => setEmailModalOpen(true)}
+                    >
+                      Změnit
+                    </button>
+                  </span>
                 }
               />
               <Field label="Město" value={user.city || '—'} />
@@ -184,14 +209,18 @@ export function ProfileHeader({ user }: Props) {
                 )}
               </label>
               <label className={styles.editField}>
-                <span>Email (read-only)</span>
-                <Input
-                  type="email"
-                  value={user.email}
-                  readOnly
-                  disabled
-                  title="Změna emailu bude dostupná v 1.7"
-                />
+                <span>E-mail</span>
+                <div className={styles.emailEditRow}>
+                  <Input type="email" value={user.email} readOnly disabled />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEmailModalOpen(true)}
+                  >
+                    Změnit e-mail
+                  </Button>
+                </div>
               </label>
               <div className={styles.editActions}>
                 <Button
@@ -209,7 +238,54 @@ export function ProfileHeader({ user }: Props) {
           )}
         </div>
       </div>
+
+      <ChangeEmailModal
+        open={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        currentEmail={user.email}
+      />
     </article>
+  );
+}
+
+function EmailVerifyBadge({
+  verified,
+  onResend,
+  resending,
+}: {
+  verified: boolean;
+  onResend: () => void;
+  resending: boolean;
+}) {
+  if (verified) {
+    return (
+      <span
+        className={styles.badge}
+        data-variant="success"
+        title="E-mail byl ověřen"
+      >
+        ✓ Ověřeno
+      </span>
+    );
+  }
+  return (
+    <>
+      <span
+        className={styles.badge}
+        data-variant="warning"
+        title="E-mail zatím nebyl ověřen"
+      >
+        ⚠ Neověřeno
+      </span>
+      <button
+        type="button"
+        className={styles.linkButton}
+        onClick={onResend}
+        disabled={resending}
+      >
+        {resending ? 'Odesílám…' : 'Poslat znovu'}
+      </button>
+    </>
   );
 }
 

@@ -15,8 +15,13 @@ export function AccountSection() {
         upravíš přes tlačítko <strong>Upravit</strong>.
       </p>
       <p>
-        E-mail je v 1.3a <strong>jen pro čtení</strong>. Změna emailu s
-        verifikačním linkem přijde v kroku 1.7.
+        Vedle e-mailu vidíš odznak <strong>✓ Ověřeno</strong> nebo{' '}
+        <strong>⚠ Neověřeno</strong>. Pokud ti e-mail nedorazil, klikni na{' '}
+        <strong>„Poslat znovu"</strong> a zkontroluj i složku Spam. E-mail
+        změníš tlačítkem <strong>Změnit</strong>: zadáš novou adresu a aktuální
+        heslo, na novou adresu ti pošleme potvrzovací link — po kliknutí se
+        adresa přepne. Na starou adresu zároveň dorazí informativní e-mail
+        (signál proti zneužití).
       </p>
 
       <h2>2. Něco o mně</h2>
@@ -60,9 +65,16 @@ export function AccountSection() {
           se odhlásí všechna ostatní zařízení.
         </li>
         <li>
+          <strong>Zapomenuté heslo</strong> — v přihlašovacím modalu klikni na{' '}
+          „Zapomněl/a jsi heslo?". Pošleme ti link na reset (platnost 1 hodina).
+          Po nastavení nového hesla se musíš znovu přihlásit (žádný auto-login,
+          bezpečnostní standard). Pokud měl tvůj účet naplánované smazání,
+          reset hesla ho současně zruší.
+        </li>
+        <li>
           <strong>Žádost o změnu přezdívky</strong> — schvaluje administrátor. Po
           schválení následuje cooldown 30 dní, kdy nelze žádat znovu. Žádost
-          můžeš stáhnout, dokud je „pending".
+          můžeš stáhnout, dokud je „pending". O rozhodnutí ti přijde e-mail.
         </li>
       </ul>
 

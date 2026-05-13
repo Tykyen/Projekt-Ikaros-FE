@@ -6,6 +6,7 @@ import {
   isAuthenticatedAtom,
   loginModalOpenAtom,
   registerModalOpenAtom,
+  forgotPasswordModalOpenAtom,
 } from '@/shared/store/authStore';
 import { IkarosCard } from '@/shared/ui';
 import s from './DashboardPage.module.css';
@@ -15,18 +16,22 @@ export default function DashboardPage() {
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
   const setLoginModalOpen = useSetAtom(loginModalOpenAtom);
   const setRegisterModalOpen = useSetAtom(registerModalOpenAtom);
+  const setForgotPasswordModalOpen = useSetAtom(forgotPasswordModalOpenAtom);
 
   useEffect(() => {
     if (isAuthenticated) return;
     const wantsLogin = searchParams.get('openLogin') === '1';
     const wantsRegister = searchParams.get('openRegister') === '1';
+    const wantsForgot = searchParams.get('openForgotPassword') === '1';
     if (wantsLogin) setLoginModalOpen(true);
     else if (wantsRegister) setRegisterModalOpen(true);
+    else if (wantsForgot) setForgotPasswordModalOpen(true);
 
-    if (wantsLogin || wantsRegister) {
+    if (wantsLogin || wantsRegister || wantsForgot) {
       const next = new URLSearchParams(searchParams);
       next.delete('openLogin');
       next.delete('openRegister');
+      next.delete('openForgotPassword');
       setSearchParams(next, { replace: true });
     }
   }, [
@@ -35,6 +40,7 @@ export default function DashboardPage() {
     isAuthenticated,
     setLoginModalOpen,
     setRegisterModalOpen,
+    setForgotPasswordModalOpen,
   ]);
 
   return (

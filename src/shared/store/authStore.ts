@@ -10,18 +10,27 @@ export const currentUserAtom = atomWithStorage<User | null>('ikaros.user', null)
 // (token zůstává v store kdyby user kliknul "Vrátit")
 export const pendingLogoutAtom = atom<{ startedAt: number } | null>(null);
 
-// Login / Register modal open/close — vždy max jeden otevřený
+// Login / Register / ForgotPassword modal open/close — vždy max jeden otevřený
 export const loginModalOpenAtom = atom<boolean>(false);
 export const registerModalOpenAtom = atom<boolean>(false);
+// 1.7 — forgot password modal
+export const forgotPasswordModalOpenAtom = atom<boolean>(false);
 
-// Write-only akce: zaručí, že druhý modal je zavřený (cross-link mezi modaly)
+// Write-only akce: zaručí, že ostatní modaly jsou zavřené (cross-link)
 export const openLoginModalAtom = atom(null, (_get, set) => {
   set(registerModalOpenAtom, false);
+  set(forgotPasswordModalOpenAtom, false);
   set(loginModalOpenAtom, true);
 });
 export const openRegisterModalAtom = atom(null, (_get, set) => {
   set(loginModalOpenAtom, false);
+  set(forgotPasswordModalOpenAtom, false);
   set(registerModalOpenAtom, true);
+});
+export const openForgotPasswordModalAtom = atom(null, (_get, set) => {
+  set(loginModalOpenAtom, false);
+  set(registerModalOpenAtom, false);
+  set(forgotPasswordModalOpenAtom, true);
 });
 
 export const isAuthenticatedAtom = atom(

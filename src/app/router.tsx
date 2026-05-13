@@ -15,6 +15,9 @@ const ChatPage         = lazy(() => import('@/features/chat/pages/ChatPage'));
 const WorldsPage       = lazy(() => import('@/features/ikaros/pages/WorldsPage'));
 const CreateWorldPage  = lazy(() => import('@/features/ikaros/pages/CreateWorldPage'));
 const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
+const ResetPasswordPage      = lazy(() => import('@/features/auth/pages/ResetPasswordPage'));
+const EmailVerifyPage        = lazy(() => import('@/features/auth/pages/EmailVerifyPage'));
+const EmailChangeConfirmPage = lazy(() => import('@/features/auth/pages/EmailChangeConfirmPage'));
 const UsersPage        = lazy(() => import('@/features/users/pages/UsersPage'));
 const UserProfilePage  = lazy(() => import('@/features/users/pages/PublicUserProfilePage'));
 const ArticlesPage     = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
@@ -98,6 +101,10 @@ export const router = createBrowserRouter([
       { path: 'ikaros/diskuze',         element: p(DiscussionsPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'podminky',               element: p(TermsPage) },
+      // 1.7 — anonymní routes pro mailové linky (reset / verify / email change)
+      { path: 'reset-password',         element: p(ResetPasswordPage) },
+      { path: 'email-verify',           element: p(EmailVerifyPage) },
+      { path: 'email-change/confirm',   element: p(EmailChangeConfirmPage) },
 
       // Chráněné — vyžadují přihlášení (per-route loader)
       { path: 'chat',                   element: p(ChatPage),         loader: requireAuth },

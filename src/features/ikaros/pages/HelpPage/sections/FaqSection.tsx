@@ -27,11 +27,38 @@ const FAQ: FaqItem[] = [
   {
     q: 'Co dělat, když jsem zapomněl heslo?',
     a: (
-      <p>
-        Automatický reset hesla zatím není dostupný (přijde v kroku 1.7). Pokud
-        heslo potřebuješ teď, ozvi se administrátorovi přes e-mail v{' '}
-        <Link to="/podminky">podmínkách použití</Link>.
-      </p>
+      <>
+        <p>
+          V přihlašovacím dialogu klikni na <strong>„Zapomněl/a jsi heslo?"</strong>.
+          Zadáš e-mail a my ti pošleme link na nastavení nového hesla. Link platí
+          jednu hodinu a lze ho použít jen jednou.
+        </p>
+        <p>
+          Po úspěšném resetu se musíš znovu přihlásit (žádný auto-login —
+          bezpečnostní standard). Pokud měl tvůj účet naplánované smazání, reset
+          hesla ho současně zruší a účet se obnoví.
+        </p>
+      </>
+    ),
+  },
+  {
+    q: 'Jak si změním e-mail?',
+    a: (
+      <>
+        <p>
+          V <Link to="/ikaros/profil">Profilu</Link> → karta Hlavička je vedle
+          e-mailu tlačítko <strong>Změnit</strong>. Zadáš novou adresu a aktuální
+          heslo. Na nový e-mail dostaneš potvrzovací link (platnost 1 hodina) —
+          po kliknutí se adresa přepne. Na původní adresu zároveň přijde
+          informativní e-mail (pokud o tom nevíš, někdo má přístup k tvému účtu
+          a měl/a bys hned změnit heslo).
+        </p>
+        <p>
+          Vedle e-mailu v profilu vidíš odznak{' '}
+          <strong>✓ Ověřeno / ⚠ Neověřeno</strong>. Pokud verifikační e-mail
+          nedorazí, klikni na <strong>„Poslat znovu"</strong> (max 3× za 15 min).
+        </p>
+      </>
     ),
   },
   {

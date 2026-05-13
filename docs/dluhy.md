@@ -1,12 +1,16 @@
 # Technické dluhy
 
+> **Souhrn k 2026-05-12 (po 1.7 — mailer + reset hesla + email verify + email change):**
+> - **Uzavřené v 1.7:** **D-006** (reset hesla — full flow), **D-012** (e-mail verifikace full flow), **D-026** (notifikace o username žádosti přes `MailerEventListener`), **D-036** (notifikace o account deletion), **D-037** (reset hesla současně zruší pending soft-delete + vrátí `revertablePromotions`)
+> - **Mailer stack:** Resend SMTP přes `@nestjs-modules/mailer` + `nodemailer`, stub fallback pokud `MAIL_PASS` chybí (dev mode), 6 Handlebars šablon, `SecurityTokensService` univerzální token pattern (sha256 hash v DB, TTL index)
+
 > **Souhrn k 2026-05-12 (po 1.4 + cleanup batch):**
 > - **Uzavřené v 1.4:** D-029 (admin detail link uživatele → vyřešen „Otevřít v administraci" na public profilu), D-040 *principiálně* (tombstone v public adresáři nezobrazujeme; integrace do obsahu řeší fáze 3.x/6.x), D-044 *částečně* (Mongo compound indexy pro `findPublicPaginated`)
 > - **Uzavřené v 1.4 cleanup batch (2026-05-12):** **D-042** (GDPR data export endpoint `GET /users/me/data-export` + `DataExportModule` s `IDataExportProvider` registry + první konkrétní `UserProfileExportProvider`), **D-043** (tombstone retention policy — druhá fáze `AccountCleanupCron.removeExpiredTombstones`, daily 04:00, ENV `TOMBSTONE_RETENTION_DAYS` default 5 let), **D-046** (per-theme RoleChip overrides pro kyberpunk + nemrtvi), **D-047** (Storybook stories pro RoleChip, UserCard, PendingActionCard)
 > - **Uzavřené dříve:** D-001, D-002, D-003, D-004, D-005, D-007, D-008, D-009 (batch 1+2, ~95% pokrytí), D-010, D-011 (honeypot část), D-013, D-014, D-015, D-016 (částečně), D-018, D-020, D-021 (header avatar xs), D-022 (anon mobile fix), D-023 (timed ban), D-024 (audit log), D-025 (bulk akce), D-027 (cooldown env), D-028 (in-memory cache), D-030 (toast po login), D-031 (Zakaz deprecate), D-032 (audit canManageAdmins + 1.3b interní enum mismatch), D-033 (granular perm framework), D-034 (auto-promote Pomocného PJ — díky `WorldRole.PomocnyPJ`), **D-034b (revert PJ handover — info modal po reaktivaci)**, **D-035 (audit log delete akcí — event-driven přes EventEmitter)**, **D-038 (hold configurable — ENV `DELETION_HOLD_DAYS`)**, **D-039 (dev trigger-cleanup endpoint)**, severske-runy reducedMotion fix
-> - **Stále otevřené (čekají na PJ rozhodnutí / externí závislost):** D-011 (full captcha provider), D-012 (mailer SMTP)
+> - **Stále otevřené (čekají na PJ rozhodnutí / externí závislost):** D-011 (full captcha provider), Resend domain verification (mailer projde, ale prod e-maily vyžadují verified domain — PJ ji založí před deployem; do té doby stub fallback)
 > - **Zbývající z 1.3b (čekají na externí infru / fáze):** D-026 (email notif — čeká 1.7), D-028 Redis varianta (multi-instance)
-> - **Zbývající z 1.3c (čekají na fáze):** D-036 (email notif — 1.7), D-037 (reset hesla během hold — 1.7), D-041 (Friendship hard-delete při tombstone — 1.8)
+> - **Zbývající z 1.3c:** D-041 (Friendship hard-delete při tombstone — 1.8). D-036 + D-037 uzavřené v 1.7.
 > - **Z 1.4 stále otevřené:** D-044 *full text-index až 10k+ uživatelů*, D-045 (privacy toggle — diskuse pro 1.7+)
 > - **Uzavřené v 1.5 cleanup batch (2026-05-12):** **D-049** (idle stav 3-stavový — FE activity tracker + BE registry idle aggregate), **D-050** (last-seen tooltip — `PublicUserProfile.lastSeenAt` + `relativeTimeCs` util + tooltip v `PublicProfileHeader`; null pro hidden/tombstone), **D-052** (privacy „neviditelný" mód — `User.hiddenPresence` flag + `PrivacySection` v profilu + gateway respektuje při handshake)
 > - **Pre-existing cleanup (2026-05-12):** `RoleStar.tsx` hardcoded barvy → `--role-star-*` tokeny; `IkarosLayout` chevrons SVG `#d4111c` → `currentColor` + `--theme-hellfire-bright`; `PendingActionCard.stories.tsx` TS generic cast pro Storybook
@@ -31,9 +35,7 @@
 ## Otevřené
 
 
-### D-026 — Email notifikace o approve/reject username žádosti
-**Kontext:** Čeká na mailer modul (1.7). 1.3b: žadatel zjistí stav přes profil banner.
-**Řešení:** Po `approveUsernameRequest` / `rejectUsernameRequest` poslat HTML email žadateli s rozhodnutím.
+*D-026 uzavřen v 1.7 — `MailerEventListener.onUsernameDecided` poslouchá `username-request.decided`, šablona `username-decided.hbs`.*
 
 
 ### D-028 (zbývající Redis varianta) — Cache pro `JwtStrategy.validate` ban check
@@ -77,15 +79,7 @@
 
 ---
 
-### D-012 — E-mail verifikace po registraci (full flow)
-**Soubor:** BE `auth` + `mailer` moduly + FE verify route
-**Stav:** Mailer skeleton zaveden (`MailerService` stub v `modules/mailer/`), `auth.service.register` ho volá při registraci (zatím loguje URL místo skutečného odeslání). `User.emailVerified` flag připravený. **Plný flow chybí:**
-- Není `EmailVerificationToken` schema (token + hash + TTL)
-- Není endpoint `GET /auth/email/verify?token=...`
-- Není FE route `/email-verify`
-- MailerService je stub (nepoužívá reálný SMTP)
-**Blokátor:** Resend / SES / Mailgun účet + API klíč. Dokončí 1.7 (Reset hesla) — sdílí stejnou mailer infru.
-**Kdy:** Krok 1.7.
+*D-012 uzavřen v 1.7 — `SecurityToken` schema (`email_verify` type), `POST /auth/email-verify` + `/auth/email-verify/resend`, FE route `/email-verify`, `MailerService` přepojen na reálný Resend SMTP transport (stub fallback pro dev).*
 
 ---
 
@@ -121,12 +115,7 @@
 
 ---
 
-### D-012 — E-mail verifikace po registraci
-**Soubor:** BE `auth` modul + FE `RegisterModal`
-**Problém:** Po registraci v 1.2 je uživatel auto-loginován bez ověření e-mailu. Útočník může registrovat na cizí adresy.
-**Dopad:** Střední — umožňuje fake účty + může spam citizens (toxické stížnosti od majitelů e-mailů).
-**Řešení:** Verifikace e-mailem se sdílenou mailer infrastrukturou z 1.7 Reset hesla. Po registraci pošle ověřovací link, `User.emailVerified` field (přidán v 1.3a, default `false`). Funkčnost gate-ovaná na verified (např. odesílání zpráv).
-**Kdy:** Po dokončení 1.7 (sdílí mailer infra). **Status 1.3a:** `emailVerified: boolean` field je v User schemě připravený. Změna emailu (PATCH /me s polem `email`) byla **odebrána z 1.3a** a přesunuta do 1.7, takže `emailVerified` zůstává nedotčený dokud nepřijde mailer. **Závislost:** Resend (nebo SES/Mailgun) účet + API klíč v `.env` — viz roadmap 1.7.
+*(D-012 uzavřen v 1.7 — viz close marker výše a sekci Uzavřené níže.)*
 
 ---
 

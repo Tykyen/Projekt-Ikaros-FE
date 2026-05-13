@@ -33,6 +33,7 @@ import { getTheme } from '../../../themes/registry';
 import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
 import { LoginModal } from '@/features/auth/components/LoginModal';
 import { RegisterModal } from '@/features/auth/components/RegisterModal';
+import { ForgotPasswordModal } from '@/features/auth/components/ForgotPasswordModal';
 import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import { UserAvatar } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
@@ -457,6 +458,7 @@ export function IkarosLayout() {
 
       <LoginModal />
       <RegisterModal />
+      <ForgotPasswordModal />
     </div>
   );
 }

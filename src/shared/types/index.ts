@@ -50,6 +50,8 @@ export interface User {
   chatColor: string;
   themeId?: string;
   emailVerified: boolean;
+  /** 1.7 — kdy byl e-mail naposledy ověřen (po kliku na verifikační link). */
+  emailVerifiedAt?: string;
   /** 1.5 D-052 — privacy „neviditelný" mód (skrýt online stav před ostatními). */
   hiddenPresence?: boolean;
   lastLoginAt?: string;

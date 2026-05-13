@@ -14,6 +14,7 @@ import { consumeLoginIntent } from '@/shared/lib/loginIntent';
 import {
   loginModalOpenAtom,
   openRegisterModalAtom,
+  openForgotPasswordModalAtom,
 } from '@/shared/store/authStore';
 import { ReactivateAccountModal } from './ReactivateAccountModal';
 import s from './LoginModal.module.css';
@@ -43,6 +44,7 @@ function mapErrorToMessage(error: unknown): string {
 export function LoginModal() {
   const [open, setOpen] = useAtom(loginModalOpenAtom);
   const openRegister = useSetAtom(openRegisterModalAtom);
+  const openForgotPassword = useSetAtom(openForgotPasswordModalAtom);
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [deletionContext, setDeletionContext] =
@@ -75,6 +77,13 @@ export function LoginModal() {
     setShowPassword(false);
     reset();
     openRegister();
+  }
+
+  function switchToForgotPassword() {
+    setSubmitError(null);
+    setShowPassword(false);
+    reset();
+    openForgotPassword();
   }
 
   async function onSubmit(values: LoginFormValues) {
@@ -157,6 +166,16 @@ export function LoginModal() {
             tabIndex={-1}
           >
             {showPassword ? '🙈' : '👁'}
+          </button>
+        </div>
+
+        <div className={s.forgotLinkRow}>
+          <button
+            type="button"
+            className={s.crossLink}
+            onClick={switchToForgotPassword}
+          >
+            Zapomněl/a jsi heslo?
           </button>
         </div>
 

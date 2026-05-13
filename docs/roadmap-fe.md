@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0–1.5 ✅, 1.7 / 1.8 čeká) |
+| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0–1.5 ✅, 1.7 ✅, 1.8 čeká) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -309,33 +309,32 @@ Canonický presence stav (online = aktivní socket spojení) napříč platformo
 
 **Mimo rozsah:** D-051 (Redis adapter pro multi-instance deploy — čeká škálování).
 
-### - [ ] 1.7 Reset hesla
+### - [x] 1.7 Reset hesla, e-mail verifikace, změna e-mailu (mailer integrace) ✅ (2026-05-12)
 
-**Nový krok — vyčleněn z dluhu D-006.** Plný spec a brainstorming po dokončení 1.2. Směr níže rozhodnut.
+**Spec:** `docs/arch/phase-1/spec-1.7.md` ✅ schváleno 2026-05-12 (defaults Q1-A až Q9-A)
+**Plán:** `docs/arch/phase-1/plan-1.7.md` ✅ implementováno 2026-05-12 (BE 960 testů ✓, FE 240 testů ✓)
 
-**Stack (rozhodnuto):**
-- **Mailer:** Resend (SMTP) + `@nestjs-modules/mailer` + `nodemailer` — vyměnitelnost s SES/Mailgun beze změn kódu
-- **Token:** 32-byte crypto random, v DB **jen sha256 hash**, single-use, TTL 1 h
-- **E-mail template:** prostá HTML šablona (Handlebars) v repo, bez MJML
+Mailer infrastruktura + tři uživatelské flow + dvě notifikace. Stack: Resend (SMTP) přes `@nestjs-modules/mailer` + `nodemailer` + Handlebars šablony v repo. Token: 32-byte crypto random, v DB jen sha256 hash, single-use, TTL 1 h (reset/change) / 24 h (verify).
 
-**BE:**
-- [ ] Modul `mailer` — abstrakce nad providerem, ENV `MAIL_*` (host, port, user, pass, from)
-- [ ] Entity `PasswordResetToken` (tokenHash, userId, expiresAt, usedAt)
-- [ ] `POST /api/auth/forgot-password` — vždy 200 (proti enumeraci), rate limit 3/15min/IP
-- [ ] `POST /api/auth/reset-password` — ověří hash, nastaví heslo, smaže token, **revokuje rodinu refresh tokenů**
-- [ ] HTML e-mail šablona `forgot-password.hbs` + `subject` "Reset hesla — Projekt Ikaros"
-- [ ] **Změna emailu s verifikací (přesunuto z 1.3a):** Entity `EmailChangeToken` (tokenHash, userId, newEmail, expiresAt, usedAt); `POST /api/users/me/email-change-request` (rate limit) → e-mail s linkem na nový email; `POST /api/auth/email-change-confirm` ověří token a přepne `email` + nastaví `emailVerified: true`
-- [ ] HTML šablona `email-change.hbs`
+- [x] **BE mailer:** real SMTP transport, **stub fallback** pokud `MAIL_PASS` chybí (dev funguje bez SMTP účtu, žádné selhání při startu), 6 Handlebars šablon (verify-email, password-reset, email-change, email-change-notice, username-decided, account-deletion)
+- [x] **BE SecurityTokens modul:** univerzální schema `SecurityToken` (type: `password_reset | email_change | email_verify`), Mongo TTL index pro auto-cleanup, `SecurityTokensService.issue/consume` (invaliduje předchozí tokeny stejného typu při issue)
+- [x] **Password reset (D-006):** `POST /auth/forgot-password` (vždy 200, anti-enumeration, throttle 3/15min/IP) + `POST /auth/reset-password` (revokuje všechny refresh tokeny, žádný auto-login, redirect na `/?openLogin=1`)
+- [x] **D-037 reaktivace:** reset hesla u pending-deletion účtu současně zruší soft-delete + vrátí `revertablePromotions` (sjednocený flow s `reactivateDeletion`)
+- [x] **Email verify (D-012):** `register` nahrazuje stub token reálným, `POST /auth/email-verify` (anon) + `POST /auth/email-verify/resend` (JWT, throttle 3/15min/user), `User.emailVerifiedAt` field, route `/email-verify?token=...`
+- [x] **Email change:** `POST /users/me/email-change-request` (vyžaduje `currentPassword`, throttle 3/15min/user) → confirm mail na NOVÝ + info mail na STARÝ; `POST /auth/email-change-confirm` (anon, race check 409 EMAIL_TAKEN), `mask-email.util` pro UX, route `/email-change/confirm?token=...`
+- [x] **Notifikační maily (D-026 + D-036):** `MailerEventListener` poslouchá `username-request.decided` (z `AdminService.approveUsernameRequest/rejectUsernameRequest`) a `account.deletion.scheduled` (z `UsersService.requestSelfDeletion` + `AdminService.requestUserDeletion`); best-effort, nikdy nebrzdí response
+- [x] **FE auth modaly:** `ForgotPasswordModal` (atom-driven, cross-link s LoginModal a RegisterModal), link „Zapomněl/a jsi heslo?" v LoginModalu, `?openForgotPassword=1` deep-link trigger v DashboardPage
+- [x] **FE stránky:** `ResetPasswordPage` (token z query, PasswordStrengthIndicator reuse, RHF + zod, mapování chybových kódů z BE), `EmailVerifyPage` (auto-fire on mount, 3 stavy verifying/success/failed, resend tlačítko pro JWT), `EmailChangeConfirmPage` (auto-fire, 3 stavy, `EMAIL_TAKEN` race handling)
+- [x] **FE profil:** `ChangeEmailModal` z ProfileHeader karty (současně řeší read-only email z 1.3a), `EmailVerifyBadge` v Header kartě (✓ Ověřeno / ⚠ Neověřeno + „Poslat znovu" link)
+- [x] **Schemas:** `forgotPasswordSchema`, `resetPasswordSchema` (zod + match validace), `emailChangeSchema`
+- [x] **Hooks:** `useForgotPassword`, `useResetPassword`, `useEmailVerify`, `useEmailVerifyResend`, `useEmailChangeRequest`, `useEmailChangeConfirm`
+- [x] **Routes:** `/reset-password`, `/email-verify`, `/email-change/confirm` (lazy, anon, pod IkarosLayout public shell)
+- [x] **ENV:** `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASS`, `MAIL_FROM` (validace v Joi schema + dev warn pokud chybí)
+- [x] **Bezpečnost:** token v DB jen sha256 hash, single-use, TTL index Mongo, anti-enumeration na `forgot-password`, throttle všude, `currentPassword` pro email change, info mail na starý e-mail při change, revoke refresh tokens po resetu
 
-**FE:**
-- [ ] Link "Zapomněl jsem heslo" v `LoginModal`
-- [ ] `ForgotPasswordModal` (e-mail input) → toast "Pokud e-mail existuje, poslali jsme link"
-- [ ] `/reset-password?token=...` route + `ResetPasswordModal` (nové heslo + potvrzení + indikátor síly z 1.2)
-- [ ] Po úspěšném resetu **bez auto-login** — toast "Heslo změněno, přihlas se" → otevře LoginModal (bezpečnost: vědomé přihlášení)
-- [ ] **Změna emailu na profilu** (sekce Header karta) — odblokovat read-only z 1.3a, formulář "Nový email" → odešle verifikační email → toast "Klikni na link v e-mailu pro potvrzení"
-- [ ] `/email-change/confirm?token=...` route → BE potvrzení → toast "Email změněn"
+**Uzavírá dluhy:** D-006 (reset hesla), D-012 (e-mail verifikace full flow), D-026 (notifikace o username žádosti), D-036 (notifikace o account deletion), D-037 (reset hesla během deletion hold)
 
-**Závislosti:** Resend účet + API klíč v `.env` (PJ založí před implementací).
+**Mimo rozsah (samostatné dluhy):** D-011 (captcha provider), D-045 (privacy „skrýt mě v adresáři"), branding e-mailových šablon, multi-tenant / vlastní doména, 2FA, magic-link login
 
 ### - [ ] 1.8 Přátelé — naplní tab Přátelé + queue typ `friend_request`
 
