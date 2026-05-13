@@ -51,7 +51,7 @@ beforeEach(() => {
 
 describe('useLogin', () => {
   it('po úspěchu zapíše tokeny + user do store', async () => {
-    const mockUser = { id: '1', username: 'alice', role: UserRole.Hrac };
+    const mockUser = { id: '1', username: 'alice', role: UserRole.Ikarus };
     // 1.3c — login response je union; ok varianta má `status: 'ok'`
     vi.mocked(api.post).mockResolvedValueOnce({
       status: 'ok',
@@ -78,7 +78,7 @@ describe('useLogin', () => {
     vi.mocked(api.post).mockResolvedValueOnce({
       status: 'ok',
       accessToken: 'a', refreshToken: 'r',
-      user: { id: '1', username: 'x', role: UserRole.Hrac },
+      user: { id: '1', username: 'x', role: UserRole.Ikarus },
     });
 
     const { result } = renderHook(() => useLogin(), { wrapper: makeWrapper() });
@@ -102,7 +102,7 @@ describe('useLogin', () => {
 
 describe('useRegister', () => {
   it('po úspěchu zapíše tokeny + user a zavře RegisterModal', async () => {
-    const mockUser = { id: '1', username: 'newbie', role: UserRole.Hrac };
+    const mockUser = { id: '1', username: 'newbie', role: UserRole.Ikarus };
     vi.mocked(api.post).mockResolvedValueOnce({
       accessToken: 'access-r',
       refreshToken: 'refresh-r',
@@ -137,7 +137,7 @@ describe('useRegister', () => {
     vi.mocked(api.post).mockResolvedValueOnce({
       accessToken: 'a',
       refreshToken: 'r',
-      user: { id: '1', username: 'x', role: UserRole.Hrac },
+      user: { id: '1', username: 'x', role: UserRole.Ikarus },
     });
 
     const { result } = renderHook(() => useRegister(), {
@@ -180,7 +180,7 @@ describe('useLogout', () => {
     store.set(accessTokenAtom, 'access-token');
     store.set(refreshTokenAtom, 'refresh-token');
     store.set(currentUserAtom, {
-      id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
+      id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Ikarus,
       themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
       isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
       defaultAvatarType: 'male', chatColor: '#FFFFFF', emailVerified: false,
@@ -238,7 +238,7 @@ describe('useAuthBootstrap', () => {
   it('s validním tokenem ponechá currentUser null (čeká se na /me query)', async () => {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const token = makeJwt({
-      sub: '42', email: 'b@b.com', username: 'bob', role: UserRole.Hrac,
+      sub: '42', email: 'b@b.com', username: 'bob', role: UserRole.Ikarus,
       characterPath: 'p', ikarosSkin: 'default', exp,
     });
     store.set(accessTokenAtom, token);
@@ -268,11 +268,11 @@ describe('useAuthBootstrap', () => {
   it('nepřepíše existující currentUser', async () => {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const token = makeJwt({
-      sub: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
+      sub: '1', email: 'a@a.com', username: 'alice', role: UserRole.Ikarus,
       characterPath: '', ikarosSkin: 'default', exp,
     });
     const existing = {
-      id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Hrac,
+      id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Ikarus,
       displayName: 'Alice', avatarUrl: 'http://x.com/a.png',
       themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
       isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',

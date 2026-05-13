@@ -1,13 +1,13 @@
+/**
+ * D-053 (2026-05-13) — Cleanup: zúženo na 6 GLOBÁLNÍCH rolí.
+ * World role (PJ/Korektor/Hrac/Ctenar/Zadatel) přesunuty do `WorldRole`.
+ * BE migrace `migrate:d053` přemapuje historické DB hodnoty 3–7 na 9 (Ikarus).
+ */
 export enum UserRole {
-  Superadmin = 1,
-  Admin = 2,
-  PJ = 3,
-  Korektor = 4,
-  Hrac = 5,
-  Ctenar = 6,
-  Zadatel = 7,
-  Ikarus = 9,
-  SpravceClanku = 10,
+  Superadmin     = 1,
+  Admin          = 2,
+  Ikarus         = 9,
+  SpravceClanku  = 10,
   SpravceGalerie = 11,
   SpravceDiskuzi = 12,
 }
@@ -127,13 +127,15 @@ export interface AdminUsersListItem {
 }
 
 // D-024 — Admin audit log
+// D-056 — rozšířeno o FRIENDSHIP_COOLDOWN_RESET (admin override per-pair cooldownu)
 export type AdminAuditAction =
   | 'BAN'
   | 'UNBAN'
   | 'ROLE_CHANGE'
   | 'ADMIN_PERMISSIONS_CHANGE'
   | 'USERNAME_REQUEST_APPROVED'
-  | 'USERNAME_REQUEST_REJECTED';
+  | 'USERNAME_REQUEST_REJECTED'
+  | 'FRIENDSHIP_COOLDOWN_RESET';
 
 export interface AdminAuditLogEntry {
   id: string;
@@ -264,12 +266,17 @@ export interface AccessTokenPayload {
 }
 
 // World
+/**
+ * D-053 (2026-05-13) — Renumber 0–5 + nová `Ctenar` + rename `Pending` → `Zadatel`.
+ * BE migrace přemapuje historické DB hodnoty: -1→0, 0→2, 1→3, 2→4, 3→5.
+ */
 export enum WorldRole {
-  Pending   = -1,
-  Hrac      = 0,
-  Korektor  = 1,
-  PomocnyPJ = 2,
-  PJ        = 3,
+  Zadatel   = 0,
+  Ctenar    = 1,
+  Hrac      = 2,
+  Korektor  = 3,
+  PomocnyPJ = 4,
+  PJ        = 5,
 }
 
 export interface World {
@@ -405,5 +412,120 @@ export interface PendingActionsCountResponse {
 
 export interface PendingActionsListResponse<T = unknown> {
   items: T[];
+  total: number;
+}
+
+// ── Spec 1.8 — Přátelé ─────────────────────────────────────────────────────
+
+export interface FriendListItem {
+  friendshipId: string;
+  acceptedAt: string;
+  friend: {
+    id: string;
+    username: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+    defaultAvatarType: DefaultAvatarType;
+    role: UserRole;
+    city: string | null;
+    deleted: boolean;
+    pendingDeletion: boolean;
+  };
+}
+
+export interface FriendRequestListItem {
+  friendshipId: string;
+  requestedAt: string;
+  direction: 'incoming' | 'outgoing';
+  counterpart: {
+    id: string;
+    username: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+    defaultAvatarType: DefaultAvatarType;
+    role: UserRole;
+  };
+}
+
+export type FriendshipStatusKind =
+  | 'none'
+  | 'pending_outgoing'
+  | 'pending_incoming'
+  | 'accepted'
+  | 'self'
+  | 'cooldown'
+  | 'blocked_by_me';
+
+export interface FriendshipStatusResponse {
+  kind: FriendshipStatusKind;
+  friendshipId?: string;
+}
+
+export interface FriendshipDto {
+  id: string;
+  userAId: string;
+  userBId: string;
+  requestedById: string;
+  status: 'pending' | 'accepted' | 'declined' | 'blocked';
+  createdAt: string;
+  acceptedAt: string | null;
+  updatedAt: string;
+}
+
+export interface FriendsListResponse {
+  items: FriendListItem[];
+  total: number;
+}
+
+export interface FriendRequestsListResponse {
+  items: FriendRequestListItem[];
+  total: number;
+}
+
+// ── Spec D-055 — Block flow ────────────────────────────────────────────
+
+export interface BlockedItem {
+  friendshipId: string;
+  blockedAt: string;
+  user: {
+    id: string;
+    username: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+    defaultAvatarType: DefaultAvatarType;
+    role: UserRole;
+    deleted: boolean;
+  };
+}
+
+export interface BlocksListResponse {
+  items: BlockedItem[];
+  total: number;
+}
+
+// ── D-056 — Admin friendship debug ─────────────────────────────────────
+
+export interface AdminFriendshipView {
+  id: string;
+  userAId: string;
+  userBId: string;
+  userAUsername: string | null;
+  userBUsername: string | null;
+  status: 'pending' | 'accepted' | 'declined' | 'blocked';
+  requestedById: string;
+  blockedById: string | null;
+  lastDeclinedAt: string | null;
+  lastDeclinedById: string | null;
+  acceptedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminFriendshipByPairResponse {
+  friendship: AdminFriendshipView | null;
+}
+
+export interface AdminFriendshipsListResponse {
+  items: AdminFriendshipView[];
   total: number;
 }

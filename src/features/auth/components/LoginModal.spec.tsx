@@ -77,7 +77,7 @@ describe('LoginModal', () => {
       accessToken: 'a-1',
       refreshToken: 'r-1',
       user: {
-        id: '1', email: 'a@a.cz', username: 'alice', role: UserRole.Hrac,
+        id: '1', email: 'a@a.cz', username: 'alice', role: UserRole.Ikarus,
         themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
         isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
       },
@@ -188,7 +188,7 @@ describe('LoginModal', () => {
       accessToken: 'a',
       refreshToken: 'r',
       user: {
-        id: '1', email: 'a@a.cz', username: 'alice', role: UserRole.Hrac,
+        id: '1', email: 'a@a.cz', username: 'alice', role: UserRole.Ikarus,
         themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
         isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
       },
@@ -221,7 +221,7 @@ describe('LoginModal', () => {
       accessToken: 'a',
       refreshToken: 'r',
       user: {
-        id: '1', email: 'a@a.cz', username: 'alice', role: UserRole.Hrac,
+        id: '1', email: 'a@a.cz', username: 'alice', role: UserRole.Ikarus,
         themeSettings: {}, chatPreferences: {}, favoriteDiscussionIds: [],
         isOnline: true, lastSeenAt: '', createdAt: '', updatedAt: '',
       },

@@ -38,12 +38,12 @@ describe('RoleChip', () => {
   });
 
   it('Hrac: nevykreslí žádný chip (null)', () => {
-    const { container } = render(<RoleChip role={UserRole.Hrac} />);
+    const { container } = render(<RoleChip role={UserRole.Ikarus} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it('PJ: nevykreslí žádný chip (per-world role, ne platforma-wide)', () => {
-    const { container } = render(<RoleChip role={UserRole.PJ} />);
+    const { container } = render(<RoleChip role={UserRole.Ikarus} />);
     expect(container).toBeEmptyDOMElement();
   });
 

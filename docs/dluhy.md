@@ -1,5 +1,16 @@
 # Technické dluhy
 
+> **Souhrn k 2026-05-13 (post-1.8 cleanup batch + D-055 + D-056):**
+> - **Uzavřené v cleanup batch po 1.8:** **D-041** (`AccountCleanupCron.hardDeleteOne` volá `IFriendshipsRepository.deleteAllByUser` jako součást tombstone pipeline — counterparti nemají orphan „Smazaný účet" karty), **D-059** (4 výskyty `window.confirm()` v `UsersTable` / `BulkToolbar` / `RequestsTable` zrefaktorovány na sdílený `<ConfirmDialog>` — vizuální konzistence, theme-aware, focus management z Modal).
+> - **Uzavřeno 2026-05-13:** **D-055 — Block flow** (spec/plan v `_side-tasks/spec-d055-block-flow.md` / `plan-d055-block-flow.md`). BE: `POST/DELETE /api/friends/block/:userId`, `GET /api/friends/blocks`, rozšíření `sendRequest` + `getStatusForPair` o blocked větve, nová helper `isBlockedBetween()` pro forward-compat 3.5+. Anti-stalk asymetrie: blokovaný vidí `kind='none'` + `sendRequest` vrací 404 `USER_NOT_FOUND`. Q4: po unblock čistý slate (žádný residual cooldown). FE: `PublicProfileActions` kebab menu „Blokovat" + stav `blocked_by_me`, `FriendsTab` třetí collapsible sekce „Zablokovaní" (default collapsed), nové hooky `useBlockUser/useUnblockUser/useBlockedFriends`, `BlockedRequestCard` row pattern. Testy: +16 BE service + 1 BE repo + 9 BE e2e + 3 FE = 29 nových.
+> - **Uzavřeno 2026-05-13:** **D-056 — Cool-down konfigurovatelný + audit**. BE: nový `AdminFriendshipsController` + `AdminFriendshipsService` v admin modulu (`GET /api/admin/friendships/by-pair`, `GET /api/admin/friendships?userId=X`, `POST /api/admin/friendships/:id/reset-cooldown`). `AdminAuditAction` rozšířen o `'FRIENDSHIP_COOLDOWN_RESET'`. FE: 5. tab „Friendship debug" v `UsersPage` (visible jen Admin/Superadmin) s 2 módy lookupu (by-pair / by-user), full friendship detail + Reset cooldown akce s confirm. Testy: +5 BE service + 2 FE = 7 nových.
+> - **Stále otevřené z 1.8:** D-057 (friend-only privacy — čeká na 3.5).
+>
+> **Souhrn k 2026-05-13 (po 1.8 — Přátelé):**
+> - **Uzavřené v 1.8:** placeholder z 1.4 (`FriendsTab`, `PublicProfileActions` Add friend tlačítko, `ZpracovatTab` non-admin placeholder). `ZpracovatTab` přepsán na agregátor přes všechny `PendingActionType` rendery (Q3). Nové sdílené primitivy `<ConfirmDialog>` + `<KebabMenu>` v `shared/ui`.
+> - **Pre-existing fix (mimo spec 1.8):** `SecurityTokenSchema.type` decorator dostal `type: String` (blokoval AppModule loading v e2e testech).
+> - **Nové dluhy (otevřené):** D-055 (block flow), D-056 (cool-down konfigurovatelný + audit), D-057 (friend-only privacy). D-058 (KebabMenu primitiv) **uzavřen rovnou** v 1.8. **D-041 + D-059** uzavřené v post-1.8 cleanup batch (viz výše).
+>
 > **Souhrn k 2026-05-12 (po 1.7 — mailer + reset hesla + email verify + email change):**
 > - **Uzavřené v 1.7:** **D-006** (reset hesla — full flow), **D-012** (e-mail verifikace full flow), **D-026** (notifikace o username žádosti přes `MailerEventListener`), **D-036** (notifikace o account deletion), **D-037** (reset hesla současně zruší pending soft-delete + vrátí `revertablePromotions`)
 > - **Mailer stack:** Resend SMTP přes `@nestjs-modules/mailer` + `nodemailer`, stub fallback pokud `MAIL_PASS` chybí (dev mode), 6 Handlebars šablon, `SecurityTokensService` univerzální token pattern (sha256 hash v DB, TTL index)
@@ -24,25 +35,14 @@
 **Kontext:** 1.3c poskytuje `<UserAvatar deleted />` primitive. Integrace do konkrétních komponent přijde s pipelines těch fází.
 **Řešení:** Fáze 3.x (články, galerie, diskuze) + 4.x/6.x (chat) — autor s `isDeleted=true` rendrovat s `<UserAvatar deleted />` + zobrazit "Smazaný účet" jako displayName tooltip.
 
-### D-041 — Friendship hard-delete při tombstone
-**Kontext:** 1.3c zachovává `Friendship` záznamy v DB (FE filtruje na render). Po 3.5 (přátelé) zvážit hard-delete těchto záznamů při cronu.
-**Řešení:** V cronu `AccountCleanupCron.hardDeleteOne` doplnit `friendshipRepo.deleteByUserId(userId)` (až existuje).
-
-*D-042 + D-043 uzavřeny v 1.4 cleanup batch — viz sekce ## Uzavřené.*
 
 ---
 
 ## Otevřené
 
-
-*D-026 uzavřen v 1.7 — `MailerEventListener.onUsernameDecided` poslouchá `username-request.decided`, šablona `username-decided.hbs`.*
-
-
 ### D-028 (zbývající Redis varianta) — Cache pro `JwtStrategy.validate` ban check
 **Kontext:** In-memory cache uzavřena (viz Uzavřené níže), single-instance funguje plně. Pro multi-instance deployu nutno swap na Redis pub/sub.
 **Řešení:** Vyměnit `UserBanCacheService` Map za Redis client (`ioredis`); invalidate přes pub/sub channel `user-ban-invalidate`.
-
-*D-029 uzavřen v 1.4 — viz sekce ## Uzavřené.*
 
 ### D-044 — Mongo full text-index pro public adresář (částečně uzavřeno 1.4)
 **Kontext:** 1.4 zavedl `findPublicPaginated` se substring regex search nad `usernameLower` + `displayName`. Compound index `{ isDeleted, deletionRequestedAt, createdAt }` + `displayName` index přidány. Pro 100k+ uživatelů by pak bylo vhodné full text index.
@@ -52,23 +52,69 @@
 **Kontext:** 1.4 adresář vidí jen Admin/Superadmin, takže privacy concern je nízký. Až přijde širší použití (1.8 přátele iniciace přes adresář), uživatel by měl mít opt-out.
 **Řešení:** `User.hiddenInDirectory: boolean` flag + filter ve `findPublicPaginated`. Diskuse pro 1.7+.
 
-*D-046 + D-047 uzavřeny v 1.4 cleanup batch — viz sekce ## Uzavřené.*
-
 ### D-048 — HelpPage content drift
 **Kontext:** Krok 3.6 (Nápověda na `/ikaros/napoveda`) dokumentuje stav platformy k 2026-05-12. Sekce „Stránky" a „FAQ" obsahují ✅/🚧 značky napojené na aktuální fáze. Při každé doručené fázi musí někdo aktualizovat odpovídající položky, jinak nápověda přestane být pravdivá.
 **Řešení:** Do PR checklistu fází 1.5 / 1.7 / 1.8 / 2.x / 3.x přidat položku „aktualizovat HelpPage (sekce Stránky + případně FAQ)". Připadnu i automatizace přes kontrolu obsahu vs roadmap-fe.md (ale stačí discipline v review).
-
-*D-049, D-050, D-052 uzavřeny v 1.5 cleanup batch — viz sekce ## Uzavřené.*
 
 ### D-051 — Redis adapter pro `OnlinePresenceRegistry`
 **Kontext:** 1.5 registr je in-memory Map<userId, RegistryEntry>. Single-instance only — při multi-instance deployu by každá instance měla vlastní obraz a `presence:update` broadcast by se nepropagoval mezi instancemi.
 **Řešení:** Swap `OnlinePresenceRegistry` Map za Redis hash + použít `@socket.io/redis-adapter` pro multi-instance broadcast. Analogicky k D-028 (cache pro ban check). Až bude potřeba škálování.
 
----
+*D-053 uzavřen 2026-05-13 — Cross-repo role architecture cleanup. `UserRole` zúžen na 6
+globálních hodnot (Sa/Admin/Ikarus/Spr.D/Spr.Č/Spr.G). `WorldRole` rozšířen o `Ctenar` a
+renumberován 0–5 (Zadatel/Ctenar/Hrac/Korektor/PomocnyPJ/PJ); `Pending` přejmenován na `Zadatel`.
+BE migrační skript `migrate:d053` (idempotentní, --dry-run) přemapuje historické DB hodnoty.
+Default user role změněn `Hrac → Ikarus` (auth.service, admin.service, schema). Endpointy
+`@Roles(UserRole.PJ)` v `admin/recent-pages` zúženy na Sa/Admin (PJ-in-any-world variantu
+vyřazena). Spec: `docs/arch/phase-1/_side-tasks/spec-d053-role-architecture-cleanup.md`,
+plán: `docs/arch/phase-1/_side-tasks/plan-d053-role-architecture-cleanup.md`.
 
----
+Otevřený follow-up **D-053b** — per-world PJ check v maps.service / FE per-world admin
+routes je dočasně zúžen na Sa/Admin; chce membership-based guard (`WorldMembership.role >= PJ`
+v daném světě) pro plné obnovení world-PJ pravomocí přes UI.*
 
----
+### D-053b — Per-world PJ access v UI/BE check (follow-up D-053)
+**Kontext:** D-053 odstranil `UserRole.PJ` z globálního enumu. Místa, která historicky
+spoléhala na „PJ globally", jsou dočasně zúžena na Sa/Admin (`maps.service.ts`
+moveToken/removeToken, FE `router.tsx` per-world admin routes `admin/stranky`,
+`admin/adresar-postav`). World PJ tímto **ztratil přístup** přes tyto endpointy.
+**Dopad:** Sa/Admin operuje beze změny; world PJ daného světa musí ad-hoc požádat staff
+pro tokenové akce / admin stránky světa, dokud není membership-based guard hotov.
+**Řešení:**
+- BE: rozšířit `maps.service.moveToken/removeToken` o `worldId` param + membership lookup
+  (`WorldMembership.role >= WorldRole.PJ` v daném světě → povolit).
+- FE: nahradit `RoleGuard roles={[Sa, Admin]}` v per-world routes komponentou, která navíc
+  konzultuje `WorldContext.userRole` (membership-based).
+**Kdy:** Před fází 5 (world layer), nebo při explicitní stížnosti world PJ.
+
+*D-056 uzavřen 2026-05-13 — admin override per-pair cooldownu + audit log entry.*
+
+*BE:*
+- *Nový `AdminFriendshipsController` v admin modulu — 3 endpointy (`GET /api/admin/friendships/by-pair?userA=X&userB=Y`, `GET /api/admin/friendships?userId=X`, `POST /api/admin/friendships/:friendshipId/reset-cooldown`)*
+- *`AdminFriendshipsService` s `findByPair` / `listByUser` / `resetCooldown` (poslední smaže `lastDeclinedAt` + `lastDeclinedById` na null a zaloguje akci)*
+- *`AdminAuditAction` rozšířen o `'FRIENDSHIP_COOLDOWN_RESET'` (schema + interface) — admin audit trail*
+- *Admin/Superadmin only, Throttle 60/min pro GET, 30/min pro reset*
+- *409 `NO_COOLDOWN` pokud friendship nemá aktivní cooldown (idempotency check)*
+
+*FE:*
+- *`AdminAuditAction` na FE rozšířen, `AuditLogTab` má label „Reset friendship cooldownu"*
+- *Nový tab `friendship-debug` v `UsersPage` (5. tab, visible jen Admin/Superadmin) — refactor `visibleTabsForRole` z 4 → 5 tabů pro adminy*
+- *Komponenta `FriendshipDebugTab` se 2 módy: lookup podle páru (2 user IDs) + lookup podle jednoho usera. Každý friendship má detail (status, requestedBy, lastDeclined, blockedBy, accepted, updated) + 3 akce (Profil A / Profil B / Reset cooldown s `ConfirmDialog`)*
+- *Hooky `useAdminFriendshipByPair`, `useAdminFriendshipsByUser`, `useAdminResetCooldown` v `src/features/admin/friendships/`*
+- *Tlačítko „Reset cooldown" disabled pokud `lastDeclinedAt === null` (nemá smysl resetovat)*
+
+*Mimo rozsah:* per-user/per-pair cooldown override (např. „premium uživatelé"), admin dashboard s aggregate stats nad declines. Per-user override není v plánu — globální `FRIEND_REQUEST_COOLDOWN_HOURS` env stačí.
+
+*Testy:* +5 BE service unit (`admin-friendships.service.spec.ts`) + 2 FE (`useAdminResetCooldown.spec.tsx`) + update `usersPageTabs.helpers.spec.ts` (4→5 tabů). Celkem 1031 BE ✓, 281 FE ✓, 22 e2e ✓.
+
+### D-057 — Friend-only privacy v profilu / poště
+**Kontext:** Spec 1.8 §8 — privacy úroveň „jen přátelé vidí můj profil / mohou mi psát"
+mimo rozsah 1.8. Závisí na 3.5 (pošta) a možná na rozšíření 1.4 privacy.
+**Dopad:** Veřejný profil je dostupný každému přihlášenému, nezávisle na friendship statu.
+Pošta (3.5) když přijde, bude default „kdokoliv mi může psát".
+**Řešení:** Spec až s 3.5. Pole `User.profileVisibility: 'public' | 'friends'` + filtr
+v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 403).
+**Kdy:** Společně se spec 3.5.
 
 ### D-011 — Captcha provider integrace
 **Soubor:** `src/components/auth/RegisterModal.tsx` + BE `auth` modul
@@ -76,10 +122,6 @@
 **Dopad zbytkový:** Honeypot odfiltruje naivní boty, ale dedikované scraper boty s headless browserem ho obejdou. Pro produkci nezbytné dodat reálnou captchu.
 **Blokátor:** PJ musí rozhodnout provider (hCaptcha free + GDPR-friendly / Cloudflare Turnstile / Friendly Captcha) a založit účet (site key + secret v `.env`).
 **Kdy:** Před prod nasazením, samostatný spec.
-
----
-
-*D-012 uzavřen v 1.7 — `SecurityToken` schema (`email_verify` type), `POST /auth/email-verify` + `/auth/email-verify/resend`, FE route `/email-verify`, `MailerService` přepojen na reálný Resend SMTP transport (stub fallback pro dev).*
 
 ---
 
@@ -112,14 +154,6 @@
 **Řešení:** Plný BE audit. Pro každý unguarded endpoint rozhodnout: (a) přidat `@UseGuards(JwtAuthGuard)` pokud má být chráněný; (b) nechat bez guardu pokud má být public (a explicitně doložit komentářem v controlleru). Po dokončení zvážit přechod na variantu B (`APP_GUARD` + `@Public()` decorator) pro vynucený opt-in security model.
 
 **Kdy:** Před produkčním nasazením. Vyžaduje aktivní review s PJ, ne autonomní implementace. Samostatný spec. **Blokátor:** Per-endpoint rozhodnutí (~43 voleb) musí dodat PJ — Claude nemůže autonomně rozhodnout, které world endpointy mají být public (např. veřejný katalog světů) vs chráněné. Doporučuju otevřít samostatný spec `1.3d-be-auth-audit.md` po dokončení 1.3b/c, kde projdeme ekndpoint po endpointu.
-
----
-
-*(D-012 uzavřen v 1.7 — viz close marker výše a sekci Uzavřené níže.)*
-
----
-
----
 
 ## Uzavřené
 

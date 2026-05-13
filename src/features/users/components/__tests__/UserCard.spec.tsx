@@ -14,7 +14,7 @@ function makeUser(
     city: 'Praha',
     avatarUrl: null,
     defaultAvatarType: 'female',
-    role: UserRole.Hrac,
+    role: UserRole.Ikarus,
     worldsCount: 3,
     createdAt: new Date().toISOString(),
     ...overrides,
@@ -57,7 +57,7 @@ describe('UserCard', () => {
   });
 
   it('Hrac role: žádný role chip', () => {
-    renderCard({ user: makeUser({ role: UserRole.Hrac }) });
+    renderCard({ user: makeUser({ role: UserRole.Ikarus }) });
     expect(screen.queryByText('Hrac')).not.toBeInTheDocument();
     expect(screen.queryByText('Admin')).not.toBeInTheDocument();
   });

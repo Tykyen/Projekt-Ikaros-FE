@@ -14,6 +14,7 @@ import { FriendsTab } from '../components/tabs/FriendsTab/FriendsTab';
 import { UsersTab } from '../components/tabs/UsersTab/UsersTab';
 import { ZpracovatTab } from '../components/tabs/ZpracovatTab/ZpracovatTab';
 import { AuditTab } from '../components/tabs/AuditTab/AuditTab';
+import { FriendshipDebugTab } from '../components/tabs/FriendshipDebugTab/FriendshipDebugTab';
 import { usePendingActionsCount } from '../api/usePendingActions';
 import s from './UsersPage.module.css';
 
@@ -22,6 +23,7 @@ const TAB_TITLES: Record<UsersPageTab, string> = {
   uzivatele: 'Uživatelé',
   zpracovat: 'Zpracovat',
   audit: 'Audit log',
+  'friendship-debug': 'Friendship debug',
 };
 
 /**
@@ -31,7 +33,7 @@ const TAB_TITLES: Record<UsersPageTab, string> = {
  */
 export default function UsersPage() {
   const me = useAtomValue(currentUserAtom);
-  const role = me?.role ?? UserRole.Hrac;
+  const role = me?.role ?? UserRole.Ikarus;
 
   const [params, setParams] = useSearchParams();
   const requestedTab = params.get('tab') as UsersPageTab | null;
@@ -89,8 +91,9 @@ export default function UsersPage() {
       />
       {tab === 'pratele' && <FriendsTab />}
       {tab === 'uzivatele' && <UsersTab />}
-      {tab === 'zpracovat' && <ZpracovatTab role={role} />}
+      {tab === 'zpracovat' && <ZpracovatTab />}
       {tab === 'audit' && <AuditTab />}
+      {tab === 'friendship-debug' && <FriendshipDebugTab />}
     </div>
   );
 }

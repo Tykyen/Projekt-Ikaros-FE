@@ -15,7 +15,7 @@
 | # | Název | Doména | Splněno |
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
-| 1 | Auth & Uživatelé | Ikaros | 🟡 (1.0–1.5 ✅, 1.7 ✅, 1.8 čeká) |
+| 1 | Auth & Uživatelé | Ikaros | ✅ (1.0–1.8 hotovo) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
 | 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
@@ -336,28 +336,47 @@ Mailer infrastruktura + tři uživatelské flow + dvě notifikace. Stack: Resend
 
 **Mimo rozsah (samostatné dluhy):** D-011 (captcha provider), D-045 (privacy „skrýt mě v adresáři"), branding e-mailových šablon, multi-tenant / vlastní doména, 2FA, magic-link login
 
-### - [ ] 1.8 Přátelé — naplní tab Přátelé + queue typ `friend_request`
+### - [x] 1.8 Přátelé ✅ (2026-05-13)
 
-**Nový subsystém — BE i FE od nuly.** **Není samostatná stránka** — sjednoceno do `/ikaros/uzivatele?tab=pratele` (kostra z 1.4). 1.8 naplní funkčnost.
+**Spec:** `docs/arch/phase-1/spec-1.8.md` ✅ schváleno 2026-05-13 (Q1=B, Q2=skryté, Q3=full agregátor, Q4=B, Q5=B)
+**Plán:** `docs/arch/phase-1/plan-1.8.md` ✅ 11 fází (A–K) dokončeno 2026-05-13
+
+Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. Sjednoceno do `/ikaros/uzivatele?tab=pratele` (žádný samostatný route).
 
 **BE (nový modul `friendships`):**
-- [ ] Entity `Friendship` (userAId, userBId, status: `pending` | `accepted` | `blocked`, requestedById, createdAt, acceptedAt)
-- [ ] `GET /api/friends` — seznam přijatých přátel (naplnění tabu Přátelé)
-- [ ] `POST /api/friends/request/:userId` — odeslat žádost (vytváří `PendingAction` typu `friend_request` u příjemce)
-- [ ] `POST /api/friends/accept/:friendshipId` — přijmout (uzavře pending action, vytvoří přátelství)
-- [ ] `DELETE /api/friends/:friendshipId` — odmítnout / odebrat
-- [ ] `POST /api/friends/block/:userId` — blokovat (volitelné)
-- [ ] **`FriendRequestProvider implements IPendingActionProvider`** — první konkrétní provider nad infra z 1.4
-- [ ] Socket.IO event `friend:request` (push badge update)
+- [x] Entity `Friendship` (`userAId < userBId` kanonicky, status `pending|accepted|declined|blocked`, `requestedById`, `lastDeclinedAt`, `lastDeclinedById`)
+- [x] `GET /api/friends`, `GET /api/friends/requests/outgoing`, `GET /api/friends/status/:userId`
+- [x] `POST /api/friends/request` (body `{ userId }`), `POST /api/friends/:id/accept`, `DELETE /api/friends/:id`, `DELETE /api/friends/by-user/:userId`
+- [x] **`FriendRequestProvider implements IPendingActionProvider`** — registrace v `onApplicationBootstrap`
+- [x] `FriendshipsGateway` (JWT v handshake, EventEmitter2 most service↔gateway, 5 eventů: `friend:request:incoming/accepted/declined/canceled`, `friend:removed`)
+- [x] Per-pair cool-down 24h (Q4 — env `FRIEND_REQUEST_COOLDOWN_HOURS`, persistentní `declined` status + `lastDeclinedAt` marker, asymetrický — blokuje jen odmítnutou stranu, po vypršení recyklace na `pending`)
+- [x] Tombstone gate: `sendRequest` na `isDeleted` / `deletionRequestedAt` → 404 `USER_NOT_FOUND`
 
-**FE:**
-- [ ] Naplnění Přátelé tabu (grid karet akceptovaných přátel) na `/ikaros/uzivatele?tab=pratele`
-- [ ] Renderer karty `friend_request` ve Zpracovat tabu (avatar + username žadatele + tlačítka Přijmout/Odmítnout)
-- [ ] Odblokovat tlačítko „Přidat do přátel" na veřejném profilu (1.4)
-- [ ] Badge s počtem příchozích žádostí na Zpracovat tabu + pravý panel
-- [ ] Toast + socket invalidace při akceptaci žádosti
+**FE (nový feature `src/features/friendships/`):**
+- [x] API hooky: `useFriends`, `useOutgoingFriendRequests`, `useFriendshipStatus`, `useSendFriendRequest` / `useAccept` / `useRemove` / `useRemoveByUserId` (mutations s cílenými error toasty na 429 `REJECTED_RECENTLY`, 409 `ALREADY_FRIENDS`, 409 `REQUEST_EXISTS`)
+- [x] `FriendsTab` plně naplněn — sekce „Moji přátelé" (grid `UserCard` reuse s friend kebab menu) + collapsible „Odeslané žádosti" + empty state s CTA „Otevřít adresář →"
+- [x] `OutgoingRequestCard` (inline řádek, design audit §3)
+- [x] `FriendRequestRenderer` v `PENDING_ACTION_RENDERERS` registry (Zpracovat tab)
+- [x] `PublicProfileActions` plnohodnotně dynamický — 5 stavů: `none` → primary, `pending_outgoing` → ghost se „Zrušit", `pending_incoming` → 2 buttons (Odmítnout/Přijmout), `accepted` → secondary + confirm modal, `cooldown` → schované (Q2)
+- [x] `useFriendshipsSocket` v `IkarosLayout` — invaliduje query klíče + akční toast (`incoming` s linkem do Zpracovat tabu, `accepted` success)
+- [x] **`ZpracovatTab` přepsán na agregátor (Q3)** — smyčka přes všechny registered typy v `PENDING_ACTION_RENDERERS`, group se sám skryje pokud má 0 items, globální empty state z `usePendingActionsCount`
 
-**Závislosti:** 1.4 (kostra stránky, `PendingActionType` infra, public profil).
+**Nové sdílené primitivy (Q1=B, design audit §1, §6):**
+- [x] `<ConfirmDialog>` v `src/shared/ui/ConfirmDialog/` (wrapper nad existující `<Modal>` se cancel/confirm tlačítky, focus na cancel default, danger variant pro destructive akce)
+- [x] `<KebabMenu>` v `src/shared/ui/KebabMenu/` (popover na desktopu, bottom-sheet na ≤ 768 px, generic API s `KebabMenuItem[]`)
+
+**Pre-existing fix mimo scope spec 1.8:**
+- [x] `backend/src/modules/security-tokens/schemas/security-token.schema.ts` — explicit `@Prop({ type: String, ... })` u union pole `type: SecurityTokenType` (bez toho e2e testy importující AppModule padaly při evaluaci modulu)
+
+**Testy:** BE 50 nových (3 canonical-pair + 9 repo + 25 service + 6 provider + 7 gateway) + 13 e2e (full happy path / 409/403 paths / cool-down asymetrie / status endpoint / pending-actions integrace / by-user alias). FE 36 nových (5 ConfirmDialog + 6 KebabMenu + 5 useFriendshipStatus + 4 useSendFriendRequest + 5 FriendRequestRenderer + 5 FriendsTab + 6 ostatní). Celkem 1019 BE unit ✓, 13+ e2e ✓, 276 FE ✓. `lint`, `lint:colors`, `tsc`, `build` ✓.
+
+**Tracked dluhy z 1.8 (otevřené):** D-057 (friend-only privacy v profilu/poště — čeká na 3.5 pošta).
+
+**Post-1.8 cleanup batch (2026-05-13):** **D-041** (tombstone cleanup pipeline volá `friendshipsRepo.deleteAllByUser` v `AccountCleanupCron.hardDeleteOne`), **D-055** (block flow side-task: `POST/DELETE /api/friends/block/:userId`, `GET /api/friends/blocks`, kind `'blocked_by_me'`, anti-stalk asymetrie, `isBlockedBetween` helper pro 3.5+ forward-compat, sekce „Zablokovaní" v FriendsTab, kebab v PublicProfileActions), **D-056** (admin friendship debug — nový `AdminFriendshipsController` s 3 endpointy, `AdminAuditAction` rozšířen o `FRIENDSHIP_COOLDOWN_RESET`, 5. tab „Friendship debug" v UsersPage pro Admin/Superadmin), **D-058** (sdílený `<KebabMenu>` v `shared/ui` — uzavřen rovnou v 1.8), **D-059** (4× native `window.confirm()` → sdílený `<ConfirmDialog>` v admin akcích).
+
+**Uzavírá:** placeholder z 1.4 (`FriendsTab` + `PublicProfileActions` „Přidat do přátel" + `ZpracovatTab` non-admin placeholder).
+
+**Mimo rozsah (dluhy a budoucí fáze):** blokace uživatelů (D-055), spam mitigation beyond per-pair cooldown (D-056), friend-only privacy (D-057), mail notifikace o žádosti.
 
 ---
 
@@ -430,7 +449,21 @@ Mailer infrastruktura + tři uživatelské flow + dvě notifikace. Stack: Resend
 - [x] Žádné nové theme tokeny ani ornamenty — reuse `var(--*)` napříč 21 motivy
 - [x] Tests: 9 cases (tabs render, URL sync, parseTab, fallback, sections smoke)
 
-**Tracked dluh:** D-NEW (HelpPage content drift — aktualizovat tab Stránky/FAQ při fázích 1.5/1.7/1.8/2.x/3.x).
+#### - [x] 3.6a Role matrix — dvouúrovňový model + vizuální matice (2026-05-13)
+
+**Spec:** `docs/arch/phase-3/spec-3.6a-role-matrix.md`, **Plán:** `docs/arch/phase-3/plan-3.6a-role-matrix.md`
+
+- [x] Sekce „Role & oprávnění" rozdělena na **dva bloky** — Globální role + Role ve světech
+- [x] Každý blok = **karty rolí** (6 kusů) + **matice oprávnění** (✓ v barvě role / —)
+- [x] Nová sdílená komponenta `<WorldRoleIcon>` s 6 lucide ikonami (Crown / Shield / PenLine / User / Eye / Hourglass)
+- [x] 6 nových CSS tokenů `--role-world-*` (theme-independent base, skiny mohou override)
+- [x] Mobil < 720 px — matice horizontálně scrollovatelná, první sloupec sticky
+- [x] Sekce „Hierarchie a omezení adminů" + „Co kdo smí udělat s kým" + tip o Pomocném PJ zachovány
+- [x] Tests: +9 cases (8× WorldRoleIcon role + size + showLabel, rozšířený HelpPage role-tab test)
+
+**Otevřené dluhy z 3.6a:** ~~D-053~~ (uzavřen 2026-05-13 — viz `docs/arch/phase-1/_side-tasks/spec-d053-role-architecture-cleanup.md`), ~~D-054~~ (uzavřen 2026-05-13 — point-fix `ASSIGNABLE_ROLES`). Follow-up **D-053b** otevřen pro per-world PJ check.
+
+**Tracked dluh (zůstává):** D-NEW (HelpPage content drift — aktualizovat tab Stránky/FAQ při fázích 1.5/1.7/1.8/2.x/3.x).
 
 ---
 

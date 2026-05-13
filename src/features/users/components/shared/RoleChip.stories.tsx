@@ -21,8 +21,7 @@ const meta: Meta<typeof RoleChip> = {
         UserRole.SpravceClanku,
         UserRole.SpravceGalerie,
         UserRole.SpravceDiskuzi,
-        UserRole.PJ,
-        UserRole.Hrac,
+        UserRole.Ikarus,
       ],
     },
   },
@@ -51,14 +50,9 @@ export const SpravceDiskuzi: Story = {
   args: { role: UserRole.SpravceDiskuzi, size: 'md', tooltip: true },
 };
 
-/** Hrac role nevykreslí žádný chip — chip stories nezobrazí nic. */
-export const Hrac_None: Story = {
-  args: { role: UserRole.Hrac },
-};
-
-/** PJ je per-world role, v Ikaros vrstvě nedává smysl → žádný chip. */
-export const PJ_None: Story = {
-  args: { role: UserRole.PJ },
+/** Ikarus (base user) nevykreslí žádný chip — chip stories nezobrazí nic. */
+export const Ikarus_None: Story = {
+  args: { role: UserRole.Ikarus },
 };
 
 export const SmallSize: Story = {

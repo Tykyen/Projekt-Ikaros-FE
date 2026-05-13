@@ -7,6 +7,7 @@ const TAB_LABELS: Record<UsersPageTab, string> = {
   uzivatele: 'Uživatelé',
   zpracovat: 'Zpracovat',
   audit: 'Audit',
+  'friendship-debug': 'Friendship debug',
 };
 
 interface UsersPageTabsProps {

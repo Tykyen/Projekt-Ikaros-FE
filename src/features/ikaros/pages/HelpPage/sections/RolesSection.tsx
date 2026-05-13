@@ -1,4 +1,280 @@
+import type { ReactNode } from 'react';
+import { Check, Star } from 'lucide-react';
+import { RoleStar, WorldRoleIcon, type WorldRoleKey } from '@/shared/ui';
+import { UserRole } from '@/shared/types';
 import s from '../HelpPage.module.css';
+
+// ── Karty (data-driven) ────────────────────────────────────────────────
+
+type GlobalCardKey =
+  | 'ikaros'
+  | 'superadmin'
+  | 'admin'
+  | 'spravce-diskuzi'
+  | 'spravce-clanku'
+  | 'spravce-galerie';
+
+type GlobalCard = {
+  key: GlobalCardKey;
+  cardCls: string;
+  title: string;
+  badge: string;
+  desc: string;
+  icon: ReactNode;
+};
+
+const IKAROS_ICON = (
+  <Star size={24} strokeWidth={1.5} aria-hidden="true" />
+);
+
+const GLOBAL_CARDS: GlobalCard[] = [
+  {
+    key: 'ikaros',
+    cardCls: s.roleCardIkaros,
+    title: 'Ikaros',
+    badge: 'Základní uživatel',
+    desc:
+      'Každý registrovaný uživatel. Vlastní profil, postava v Rozcestí, ' +
+      'účast v komunitě. Sám o sobě nemá moderační oprávnění — ta nastavuje Superadmin.',
+    icon: IKAROS_ICON,
+  },
+  {
+    key: 'superadmin',
+    cardCls: s.roleCardSuperadmin,
+    title: 'Superadmin',
+    badge: 'Zakladatel platformy',
+    desc:
+      'Plný přístup ke všem funkcím platformy. Jediný, kdo nastavuje Admin role ' +
+      'a granular permissions (canManageAdmins, canModerateContent, canEditPlatformPages).',
+    icon: <RoleStar role={UserRole.Superadmin} size="lg" />,
+  },
+  {
+    key: 'admin',
+    cardCls: s.roleCardAdmin,
+    title: 'Admin',
+    badge: 'Důvěryhodný moderátor',
+    desc:
+      'Adresář uživatelů, ban/role/smazání (s hierarchií), schvalování žádostí ' +
+      'o přezdívku, čtení audit logu. Nemůže měnit Admina ani Superadmina.',
+    icon: <RoleStar role={UserRole.Admin} size="lg" />,
+  },
+  {
+    key: 'spravce-diskuzi',
+    cardCls: s.roleCardSpravceDiskuzi,
+    title: 'Správce diskuzí',
+    badge: 'Moderátor diskuzí',
+    desc:
+      'Schvaluje a zamítá pending diskuze, moderuje příspěvky a vlákna. ' +
+      'Dostává notifikaci při nové čekající diskuzi.',
+    icon: <RoleStar role={UserRole.SpravceDiskuzi} size="lg" />,
+  },
+  {
+    key: 'spravce-clanku',
+    cardCls: s.roleCardSpravceClanku,
+    title: 'Správce článků',
+    badge: 'Moderátor článků',
+    desc:
+      'Schvaluje a zamítá články, moderuje literární obsah a autory. ' +
+      'Dostává notifikaci při novém článku ke schválení.',
+    icon: <RoleStar role={UserRole.SpravceClanku} size="lg" />,
+  },
+  {
+    key: 'spravce-galerie',
+    cardCls: s.roleCardSpravceGalerie,
+    title: 'Správce galerie',
+    badge: 'Moderátor galerie',
+    desc:
+      'Schvaluje obrázky, moderuje galerii a nahrávaný obsah. ' +
+      'Dostává notifikaci při novém obrázku ke schválení.',
+    icon: <RoleStar role={UserRole.SpravceGalerie} size="lg" />,
+  },
+];
+
+type WorldCard = {
+  key: WorldRoleKey;
+  cardCls: string;
+  title: string;
+  badge: string;
+  desc: string;
+};
+
+const WORLD_CARDS: WorldCard[] = [
+  {
+    key: 'pj',
+    cardCls: s.roleCardPj,
+    title: 'PJ (Průvodce hrou)',
+    badge: 'Vlastník světa',
+    desc:
+      'Plná správa světa: členové, role, obsah, mapy, kampaně, kalendář, nastavení.',
+  },
+  {
+    key: 'pj-asst',
+    cardCls: s.roleCardPjAsst,
+    title: 'Pomocný PJ',
+    badge: 'Zástupce PJ',
+    desc:
+      'Stejné pravomoci jako PJ kromě mazání obsahu a nastavení světa. ' +
+      'Když PJ smaže účet, Pomocný PJ se automaticky povýší na PJ.',
+  },
+  {
+    key: 'corrector',
+    cardCls: s.roleCardCorrector,
+    title: 'Korektor',
+    badge: 'Editor',
+    desc:
+      'Read + úprava dat světa (texty, stránky, postavy). Bez mazání obsahu ' +
+      'a bez správy členů.',
+  },
+  {
+    key: 'player',
+    cardCls: s.roleCardPlayer,
+    title: 'Hráč',
+    badge: 'Základní role',
+    desc:
+      'Účastní se hry, prohlíží obsah, spravuje svou postavu. ' +
+      'Nemůže upravovat data světa.',
+  },
+  {
+    key: 'reader',
+    cardCls: s.roleCardReader,
+    title: 'Čtenář',
+    badge: 'Pasivní účastník',
+    desc:
+      'Jen prohlíží obsah světa. Nemůže spravovat ani svou postavu. ' +
+      'Dříve označovaný jako „Nezařazený".',
+  },
+  {
+    key: 'applicant',
+    cardCls: s.roleCardApplicant,
+    title: 'Žadatel',
+    badge: 'Čeká na schválení',
+    desc:
+      'Požádal o přístup do uzavřeného světa a čeká na schválení od PJ. ' +
+      'Zatím není členem světa.',
+  },
+];
+
+// ── Matice oprávnění (data-driven) ─────────────────────────────────────
+
+type MatrixHeader = {
+  key: string;
+  label: string;
+  colorVar: string;
+  icon: ReactNode;
+};
+
+type MatrixRow = {
+  label: string;
+  cells: boolean[];
+};
+
+const GLOBAL_HEADERS: MatrixHeader[] = [
+  { key: 'superadmin',      label: 'Superadmin',   colorVar: '--role-star-superadmin',      icon: <RoleStar role={UserRole.Superadmin} size="md" /> },
+  { key: 'admin',           label: 'Admin',        colorVar: '--role-star-admin',           icon: <RoleStar role={UserRole.Admin} size="md" /> },
+  { key: 'spravce-diskuzi', label: 'Spr. diskuzí', colorVar: '--role-star-spravce-diskuzi', icon: <RoleStar role={UserRole.SpravceDiskuzi} size="md" /> },
+  { key: 'spravce-clanku',  label: 'Spr. článků',  colorVar: '--role-star-spravce-clanku',  icon: <RoleStar role={UserRole.SpravceClanku} size="md" /> },
+  { key: 'spravce-galerie', label: 'Spr. galerie', colorVar: '--role-star-spravce-galerie', icon: <RoleStar role={UserRole.SpravceGalerie} size="md" /> },
+];
+
+const GLOBAL_ROWS: MatrixRow[] = [
+  { label: 'Schvalování diskuzí',      cells: [true,  true,  true,  false, false] },
+  { label: 'Schvalování článků',       cells: [true,  true,  false, true,  false] },
+  { label: 'Schvalování galerie',      cells: [true,  true,  false, false, true ] },
+  { label: 'Správa příspěvků',         cells: [true,  true,  true,  true,  true ] },
+  { label: 'Úprava profilů uživatelů', cells: [true,  true,  false, false, false] },
+  { label: 'Správa uživatelů',         cells: [true,  true,  false, false, false] },
+  { label: 'Správa obsahu platformy',  cells: [true,  true,  false, false, false] },
+  { label: 'Systémová nastavení',      cells: [true,  false, false, false, false] },
+];
+
+const WORLD_HEADERS: MatrixHeader[] = [
+  { key: 'pj',        label: 'PJ',       colorVar: '--role-world-pj',        icon: <WorldRoleIcon role="pj"        size="md" /> },
+  { key: 'pj-asst',   label: 'Pom. PJ',  colorVar: '--role-world-pj-asst',   icon: <WorldRoleIcon role="pj-asst"   size="md" /> },
+  { key: 'corrector', label: 'Korektor', colorVar: '--role-world-corrector', icon: <WorldRoleIcon role="corrector" size="md" /> },
+  { key: 'player',    label: 'Hráč',     colorVar: '--role-world-player',    icon: <WorldRoleIcon role="player"    size="md" /> },
+  { key: 'reader',    label: 'Čtenář',   colorVar: '--role-world-reader',    icon: <WorldRoleIcon role="reader"    size="md" /> },
+  { key: 'applicant', label: 'Žadatel',  colorVar: '--role-world-applicant', icon: <WorldRoleIcon role="applicant" size="md" /> },
+];
+
+const WORLD_ROWS: MatrixRow[] = [
+  { label: 'Prohlížení obsahu',  cells: [true,  true,  true,  true,  true,  false] },
+  { label: 'Správa své postavy', cells: [true,  true,  true,  true,  false, false] },
+  { label: 'Úprava dat světa',   cells: [true,  true,  true,  false, false, false] },
+  { label: 'Vytváření obsahu',   cells: [true,  true,  false, false, false, false] },
+  { label: 'Správa členů',       cells: [true,  true,  false, false, false, false] },
+  { label: 'Mazání obsahu',      cells: [true,  false, false, false, false, false] },
+  { label: 'Nastavení světa',    cells: [true,  false, false, false, false, false] },
+];
+
+// ── Privátní komponenty ────────────────────────────────────────────────
+
+function RoleCard({ cardCls, icon, title, badge, desc }: {
+  cardCls: string; icon: ReactNode; title: string; badge: string; desc: string;
+}) {
+  return (
+    <div className={`${s.roleCard} ${cardCls}`}>
+      <span className={s.roleCardIcon}>{icon}</span>
+      <div className={s.roleCardBody}>
+        <div className={s.roleCardTitle}>
+          <span>{title}</span>
+          <span className={s.roleCardBadge}>{badge}</span>
+        </div>
+        <p className={s.roleCardDesc}>{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function PermissionMatrix({ headers, rows, caption }: {
+  headers: MatrixHeader[]; rows: MatrixRow[]; caption: string;
+}) {
+  return (
+    <div className={s.matrixWrap}>
+      <table className={s.matrix} aria-label={caption}>
+        <thead>
+          <tr>
+            <th scope="col">Oprávnění</th>
+            {headers.map(h => (
+              <th key={h.key} scope="col">
+                <span className={s.matrixHeaderCell}>
+                  {h.icon}
+                  <span className={s.matrixHeaderLabel}>{h.label}</span>
+                </span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.label}>
+              <td>{row.label}</td>
+              {row.cells.map((has, idx) => {
+                const h = headers[idx];
+                return (
+                  <td key={h.key}>
+                    {has ? (
+                      <span
+                        className={s.matrixCheck}
+                        style={{ ['--cell-color' as string]: `var(${h.colorVar})` }}
+                        aria-label="ano"
+                      >
+                        <Check size={18} strokeWidth={2.5} aria-hidden="true" />
+                      </span>
+                    ) : (
+                      <span className={s.matrixEmpty} aria-label="ne">—</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Hlavní export ──────────────────────────────────────────────────────
 
 export function RolesSection() {
   return (
@@ -6,82 +282,39 @@ export function RolesSection() {
       <p>
         Ikaros má dvě úrovně rolí: <strong>globální</strong> (napříč
         platformou) a <strong>světová</strong> (uvnitř konkrétního světa).
-        Globální role se zdědí všude; světová platí jen v daném světě.
+        Globální role řídí oprávnění v rámci celé platformy; světová role
+        platí jen v daném světě a každý uživatel může být v různých světech
+        v různých rolích.
       </p>
 
       <h2>Globální role</h2>
-      <div className={s.tableWrap}>
-        <table>
-          <thead>
-            <tr>
-              <th>Role</th>
-              <th>Kdo to je</th>
-              <th>Co může</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Superadmin</strong></td>
-              <td>Zakladatel platformy (Tyky)</td>
-              <td>
-                Vše. Jediný, kdo nastavuje Admin role a granular permissions
-                (<code>canManageAdmins</code>, <code>canModerateContent</code>,
-                {' '}<code>canEditPlatformPages</code>).
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Admin</strong></td>
-              <td>Důvěryhodný moderátor</td>
-              <td>
-                Adresář uživatelů, ban/unban, změna role (s hierarchií),
-                schvalování žádostí o změnu přezdívky, čtení audit logu,
-                moderační smazání účtu (s povinným důvodem).
-              </td>
-            </tr>
-            <tr>
-              <td><strong>PJ</strong></td>
-              <td>Game master ve svém světě</td>
-              <td>
-                Globálně se chová jako Hráč. Plné pravomoci uvnitř svých světů
-                (správa členů, content, mapy, kampaně).
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Hráč</strong></td>
-              <td>Standardní uživatel</td>
-              <td>
-                Vlastní profil, vlastní postava, účast v adresáři, brzy chat /
-                diskuze / pošta.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Správce článků / galerie / diskuzí</strong>
-              </td>
-              <td>Moderátor konkrétního typu obsahu</td>
-              <td>
-                Schvalování pending obsahu daného typu. Role je v enumu už dnes,
-                reálná funkčnost přijde s fází 3.2–3.4.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <em>Korektor / Čtenář / Žadatel / Ikarus</em>
-              </td>
-              <td>—</td>
-              <td>
-                V přípravě. Tyto role jsou v systému, ale jejich přesné chování
-                bude definováno v pozdějších krocích.
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <p>
+        Platí napříč celou platformou. Každý registrovaný má jednu globální
+        roli; další oprávnění (granular permissions) k ní volitelně přidává
+        Superadmin.
+      </p>
+      <div className={s.roleCardGrid}>
+        {GLOBAL_CARDS.map(c => (
+          <RoleCard
+            key={c.key}
+            cardCls={c.cardCls}
+            icon={c.icon}
+            title={c.title}
+            badge={c.badge}
+            desc={c.desc}
+          />
+        ))}
       </div>
 
+      <h3>Matice oprávnění</h3>
+      <PermissionMatrix
+        headers={GLOBAL_HEADERS}
+        rows={GLOBAL_ROWS}
+        caption="Matice oprávnění globálních rolí"
+      />
+
       <h2>Hierarchie a omezení adminů</h2>
-      <p>
-        Hlavní pravidla, která BE vynucuje při admin akcích:
-      </p>
+      <p>Hlavní pravidla, která BE vynucuje při admin akcích:</p>
       <ul>
         <li>
           Admin <strong>nemůže měnit role / banovat / mazat jiného Admina</strong>{' '}
@@ -91,9 +324,7 @@ export function RolesSection() {
           Admin <strong>nemůže povyšovat jiné na Admin</strong>, dokud nemá flag{' '}
           <code>canManageAdmins</code> (uděluje Superadmin).
         </li>
-        <li>
-          Nikdo nemůže banovat nebo smazat sám sebe.
-        </li>
+        <li>Nikdo nemůže banovat nebo smazat sám sebe.</li>
         <li>
           Granular permissions (<code>canManageAdmins</code>, ...) nastavuje
           výhradně Superadmin.
@@ -149,56 +380,34 @@ export function RolesSection() {
         </table>
       </div>
 
-      <h2>Světové role</h2>
+      <h2>Role ve světech</h2>
       <p>
-        Každý uživatel může být v každém světě v jiné roli. Světovou roli ti
-        přidělí PJ daného světa.
+        World role platí jen v daném světě. Uživatel může být ve více
+        světech v různých rolích — světovou roli ti přidělí PJ daného světa.
       </p>
-      <div className={s.tableWrap}>
-        <table>
-          <thead>
-            <tr>
-              <th>Role</th>
-              <th>Co může</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>PJ</strong></td>
-              <td>
-                Vlastník světa. Plná správa: členové, role, obsah, mapy,
-                kampaně, kalendář, nastavení.
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Pomocný PJ</strong></td>
-              <td>
-                Zastupuje PJ. Pokud PJ smaže účet a Pomocný PJ existuje,
-                <strong> automaticky se povýší</strong> na PJ.
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Korektor</strong></td>
-              <td>
-                Read + gramatická korektura obsahu světa. Detail v rámci fáze 5+.
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Hráč</strong></td>
-              <td>
-                Účastní se chatu, postav, deníků, eventů. Edituje svou postavu.
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Čeká na schválení</strong></td>
-              <td>
-                Zažádal o vstup do uzavřeného světa. PJ ho potvrdí nebo zamítne
-                v tabu Zpracovat (Fáze 2.4).
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div className={s.roleCardGrid}>
+        {WORLD_CARDS.map(c => (
+          <RoleCard
+            key={c.key}
+            cardCls={c.cardCls}
+            icon={<WorldRoleIcon role={c.key} size="lg" />}
+            title={c.title}
+            badge={c.badge}
+            desc={c.desc}
+          />
+        ))}
       </div>
+
+      <h3>Matice oprávnění</h3>
+      <PermissionMatrix
+        headers={WORLD_HEADERS}
+        rows={WORLD_ROWS}
+        caption="Matice oprávnění světových rolí"
+      />
+      <p className={s.matrixNote}>
+        Reálná funkčnost rolí Korektor, Čtenář a Žadatel ve světech přijde
+        s fází 5+ (světová vrstva).
+      </p>
 
       <div className={s.callout}>
         <strong>Tip:</strong> Pokud chceš svůj svět dlouhodobě, založ si v něm{' '}

@@ -15,6 +15,7 @@ import {
   Image as ImageIcon,
   HelpCircle,
   Beer,
+  Settings,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
 import { useSocketInit } from '@/features/chat/api/useSocket';
@@ -38,6 +39,7 @@ import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import { UserAvatar } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
+import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { UserRole, type World } from '@/shared/types';
 
 function PanelCorners() {
@@ -166,7 +168,7 @@ function SidebarContent({
   );
 }
 
-function RightPanel() {
+function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   const currentUser = useAtomValue(currentUserAtom);
   const { data: worlds } = useMyWorlds();
   const isAdmin =
@@ -184,7 +186,7 @@ function RightPanel() {
           <ThemeSwitcher />
         </div>
         <div className={s.navList}>
-          <Link to="/ikaros/uzivatele" className={s.navItem}>
+          <Link to="/ikaros/uzivatele" className={s.navItem} onClick={onNav}>
             <span className={s.navItemIcon}><Users size={18} /></span>
             <span className={s.navItemLabel}>{label}</span>
             {badge > 0 && (
@@ -199,11 +201,11 @@ function RightPanel() {
       <div className={s.section} data-section-key="moje-svety">
         <div className={s.rightSectionHeader}>
           <SectionTitle>Moje světy</SectionTitle>
-          <Link to="/ikaros/vytvorit-svet" className={s.rightAddBtn} title="Vytvořit svět">+</Link>
+          <Link to="/ikaros/vytvorit-svet" className={s.rightAddBtn} title="Vytvořit svět" onClick={onNav}>+</Link>
         </div>
         <div className={s.navList}>
           {worlds?.slice(0, 5).map((w) => (
-            <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem}>
+            <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
               <span className={s.navItemLabel}>{w.name}</span>
               {currentUser?.id && w.ownerId === currentUser.id && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>
@@ -214,7 +216,7 @@ function RightPanel() {
             <p className={s.emptyHint}>Žádné světy</p>
           )}
           {(worlds?.length ?? 0) > 0 && (
-            <Link to="/ikaros/vesmiry" className={s.showAllLink}>Zobrazit vše →</Link>
+            <Link to="/ikaros/vesmiry" className={s.showAllLink} onClick={onNav}>Zobrazit vše →</Link>
           )}
         </div>
       </div>
@@ -222,7 +224,7 @@ function RightPanel() {
       <div className={s.section} data-section-key="moje-diskuze">
         <div className={s.rightSectionHeader}>
           <SectionTitle>Moje diskuze</SectionTitle>
-          <Link to="/ikaros/diskuze/nova" className={s.rightAddBtn} title="Nová diskuze">+</Link>
+          <Link to="/ikaros/diskuze/nova" className={s.rightAddBtn} title="Nová diskuze" onClick={onNav}>+</Link>
         </div>
         <p className={s.emptyHint}>Žádné diskuze</p>
       </div>
@@ -362,10 +364,25 @@ function HeaderLoggedIn() {
 
 export function IkarosLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+
+  function openLeftDrawer() {
+    setRightDrawerOpen(false);
+    setDrawerOpen(true);
+  }
+  function openRightDrawer() {
+    setDrawerOpen(false);
+    setRightDrawerOpen(true);
+  }
+  function closeDrawers() {
+    setDrawerOpen(false);
+    setRightDrawerOpen(false);
+  }
 
   useSocketInit();
   usePresenceInit();
+  useFriendshipsSocket();
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);
@@ -388,7 +405,7 @@ export function IkarosLayout() {
       <header className={s.header}>
         <button
           className={s.hamburger}
-          onClick={() => setDrawerOpen(true)}
+          onClick={openLeftDrawer}
           aria-label="Otevřít menu"
         >
           ☰
@@ -411,6 +428,16 @@ export function IkarosLayout() {
           </span>
         </div>
 
+        {isAuthenticated && (
+          <button
+            className={s.rightHamburger}
+            onClick={openRightDrawer}
+            aria-label="Otevřít administraci"
+          >
+            <Settings size={20} />
+          </button>
+        )}
+
         {isAuthenticated ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </header>
 
@@ -421,8 +448,8 @@ export function IkarosLayout() {
         </aside>
 
         <div
-          className={clsx(s.drawerBackdrop, drawerOpen && s.drawerBackdropOpen)}
-          onClick={() => setDrawerOpen(false)}
+          className={clsx(s.drawerBackdrop, (drawerOpen || rightDrawerOpen) && s.drawerBackdropOpen)}
+          onClick={closeDrawers}
         />
         <aside
           className={clsx(s.drawerSidebar, drawerOpen && s.drawerSidebarOpen)}
@@ -443,6 +470,16 @@ export function IkarosLayout() {
           <aside className={s.rightPanel} data-frame-panel="right">
             <PanelCorners />
             <RightPanel />
+          </aside>
+        )}
+
+        {isAuthenticated && (
+          <aside
+            className={clsx(s.drawerRightSidebar, rightDrawerOpen && s.drawerRightSidebarOpen)}
+            data-frame-panel="right"
+          >
+            <PanelCorners />
+            <RightPanel onNav={() => setRightDrawerOpen(false)} />
           </aside>
         )}
       </div>

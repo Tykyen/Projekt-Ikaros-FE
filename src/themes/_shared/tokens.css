@@ -152,4 +152,13 @@
   --role-star-spravce-diskuzi: #f0c040;
   --role-star-spravce-clanku:  #c04040;
   --role-star-spravce-galerie: #3b82f6;
+
+  /* ── 3.6a — World role barvy (analogicky k --role-star-* pro globální role).
+     Theme-independent base; jednotlivé skiny mohou override v `themes/<id>/index.ts`. */
+  --role-world-pj:           #c050a0;
+  --role-world-pj-asst:      #9333ea;
+  --role-world-corrector:    #06b6d4;
+  --role-world-player:       #60a5fa;
+  --role-world-reader:       #94a3b8;
+  --role-world-applicant:    #f59e0b;
 }

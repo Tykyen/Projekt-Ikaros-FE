@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, X } from 'lucide-react';
-import { Button, Spinner, UserAvatar } from '@/shared/ui';
+import { Button, ConfirmDialog, Spinner, UserAvatar } from '@/shared/ui';
 import type {
   AdminUsernameRequestListItem,
   UsernameChangeRequestStatus,
@@ -30,6 +30,9 @@ export function RequestsTable() {
   const [status, setStatus] = useState<UsernameChangeRequestStatus>('pending');
   const [page, setPage] = useState(1);
   const [rejectTarget, setRejectTarget] =
+    useState<AdminUsernameRequestListItem | null>(null);
+  // D-059 — sdílený ConfirmDialog místo native window.confirm
+  const [approveTarget, setApproveTarget] =
     useState<AdminUsernameRequestListItem | null>(null);
 
   const { data, isLoading } = useAdminUsernameRequests({ status, page });
@@ -122,15 +125,7 @@ export function RequestsTable() {
                       <div className={s.actionsRow}>
                         <Button
                           size="sm"
-                          onClick={() => {
-                            if (
-                              confirm(
-                                `Schválit změnu z "${req.user?.username}" na "${req.requestedUsername}"?`,
-                              )
-                            ) {
-                              approve.mutate(req.id);
-                            }
-                          }}
+                          onClick={() => setApproveTarget(req)}
                           disabled={approve.isPending}
                         >
                           <Check size={14} /> Schválit
@@ -155,6 +150,28 @@ export function RequestsTable() {
       <RejectRequestModal
         target={rejectTarget}
         onClose={() => setRejectTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={!!approveTarget}
+        onClose={() => setApproveTarget(null)}
+        title="Schválit změnu přezdívky?"
+        message={
+          approveTarget ? (
+            <>
+              Schválit změnu z{' '}
+              <strong>{approveTarget.user?.username ?? '(neznámý)'}</strong> na{' '}
+              <strong>{approveTarget.requestedUsername}</strong>?
+            </>
+          ) : null
+        }
+        confirmLabel="Schválit"
+        isPending={approve.isPending}
+        onConfirm={async () => {
+          if (!approveTarget) return;
+          await approve.mutateAsync(approveTarget.id);
+          setApproveTarget(null);
+        }}
       />
     </>
   );

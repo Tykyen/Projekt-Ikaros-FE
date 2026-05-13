@@ -94,7 +94,7 @@ export interface AdminUsersQuery {
   hasPendingRequest?: boolean;
 }
 
-export function useAdminUsers(query: AdminUsersQuery) {
+export function useAdminUsers(query: AdminUsersQuery, enabled = true) {
   const params: Record<string, unknown> = {
     page: query.page,
     limit: query.limit ?? 20,
@@ -109,6 +109,7 @@ export function useAdminUsers(query: AdminUsersQuery) {
         '/admin/users',
         params,
       ),
+    enabled,
   });
 }
 

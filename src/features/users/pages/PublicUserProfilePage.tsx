@@ -20,7 +20,7 @@ import s from '../components/PublicProfile/PublicProfile.module.css';
 export default function PublicUserProfilePage() {
   const { id } = useParams<{ id: string }>();
   const me = useAtomValue(currentUserAtom);
-  const role = me?.role ?? UserRole.Hrac;
+  const role = me?.role ?? UserRole.Ikarus;
   const isAdmin = role === UserRole.Superadmin || role === UserRole.Admin;
   const isSelf = id === me?.id;
 
@@ -66,6 +66,7 @@ export default function PublicUserProfilePage() {
         profileId={profile.id}
         meId={me?.id}
         isAdmin={isAdmin}
+        username={profile.username}
       />
     </div>
   );

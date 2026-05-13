@@ -83,14 +83,65 @@ const FAQ: FaqItem[] = [
     a: (
       <>
         <p>
-          Univerzální fronta akcí, které vyžadují tvé rozhodnutí. Dnes obsahuje
-          žádosti o změnu přezdívky (pro adminy). Postupně přibude:
+          Univerzální fronta akcí, které vyžadují tvé rozhodnutí. Dnes obsahuje:
         </p>
         <ul>
-          <li>žádosti o přátelství (Fáze 1.8)</li>
+          <li>žádosti o přátelství (přicházejí, když ti někdo pošle pozvánku)</li>
+          <li>žádosti o změnu přezdívky (jen Admin/Superadmin)</li>
+        </ul>
+        <p>Postupně přibude:</p>
+        <ul>
           <li>žádosti o vstup do uzavřeného světa (Fáze 2.4, pro PJ)</li>
           <li>pending články / obrázky / hlášené příspěvky (Fáze 3.2–3.4)</li>
         </ul>
+        <p>
+          Číslo u záložky „Zpracovat" v pravém panelu ukazuje, kolik položek
+          čeká na tvé rozhodnutí.
+        </p>
+      </>
+    ),
+  },
+  {
+    q: 'Jak si přidám přítele?',
+    a: (
+      <>
+        <p>
+          Otevři jeho <strong>veřejný profil</strong> (klikni na avatar / kartu
+          v adresáři) a stiskni <strong>„Přidat do přátel"</strong>. Druhá strana
+          dostane žádost ve svém tabu <strong>Zpracovat</strong> a může ji
+          přijmout nebo odmítnout.
+        </p>
+        <p>
+          Po přijetí se přítel objeví v tabu <strong>Přátelé</strong> u obou.
+          Odebrání je možné kdykoliv (kebab menu na kartě „Odebrat z přátel").
+          Pokud druhá strana žádost odmítne, můžeš ji znovu poslat až za{' '}
+          <strong>24 hodin</strong> (anti-spam pojistka).
+        </p>
+      </>
+    ),
+  },
+  {
+    q: 'Jak někoho zablokovat?',
+    a: (
+      <>
+        <p>
+          Ve veřejném profilu uživatele klikni vpravo na <strong>„…"</strong>{' '}
+          (kebab menu) → <strong>„Blokovat uživatele"</strong>. Potvrdíš dialog a:
+        </p>
+        <ul>
+          <li>Existující přátelství zmizí.</li>
+          <li>Pending žádost (od kterékoliv strany) se zruší.</li>
+          <li>Nepošlete si novou žádost o přátelství, dokud blok neukončíš.</li>
+          <li>
+            Druhá strana <strong>nedostane žádné upozornění</strong>
+            {' '}(anti-stalk).
+          </li>
+        </ul>
+        <p>
+          Své zablokované najdeš v tabu <strong>Přátelé</strong> → sbalitelná
+          sekce <strong>„Zablokovaní"</strong> (default zavřená). Odblokuješ je
+          jedním klikem.
+        </p>
       </>
     ),
   },

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Ban, ShieldOff, UserCog, X } from 'lucide-react';
-import { Button, Modal } from '@/shared/ui';
+import { Button, ConfirmDialog, Modal } from '@/shared/ui';
 import { UserRole, type AdminUsersListItem } from '@/shared/types';
 import { ROLE_LABELS, ASSIGNABLE_ROLES } from '@/shared/types/userRoleLabels';
 import {
@@ -31,9 +31,10 @@ export function BulkToolbar({ selected, onClear }: Props) {
 
   const [banOpen, setBanOpen] = useState(false);
   const [roleOpen, setRoleOpen] = useState(false);
+  const [unbanOpen, setUnbanOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [duration, setDuration] = useState<Duration>('permanent');
-  const [newRole, setNewRole] = useState<UserRole>(UserRole.Hrac);
+  const [newRole, setNewRole] = useState<UserRole>(UserRole.Ikarus);
 
   const count = selected.length;
   if (count === 0) return null;
@@ -55,8 +56,8 @@ export function BulkToolbar({ selected, onClear }: Props) {
   }
 
   async function onConfirmUnban() {
-    if (!confirm(`Odbanovat ${count} uživatelů?`)) return;
     await bulkUnban.mutateAsync(ids);
+    setUnbanOpen(false);
     onClear();
   }
 
@@ -81,7 +82,7 @@ export function BulkToolbar({ selected, onClear }: Props) {
         <Button
           size="sm"
           variant="secondary"
-          onClick={onConfirmUnban}
+          onClick={() => setUnbanOpen(true)}
           disabled={bulkUnban.isPending}
         >
           <ShieldOff size={14} /> Odbanovat
@@ -190,6 +191,21 @@ export function BulkToolbar({ selected, onClear }: Props) {
           </label>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        open={unbanOpen}
+        onClose={() => setUnbanOpen(false)}
+        title="Odbanovat?"
+        message={
+          <>
+            Opravdu chceš odbanovat <strong>{count}</strong>{' '}
+            {count === 1 ? 'uživatele' : 'uživatelů'}?
+          </>
+        }
+        confirmLabel="Odbanovat"
+        isPending={bulkUnban.isPending}
+        onConfirm={onConfirmUnban}
+      />
     </>
   );
 }

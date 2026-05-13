@@ -170,6 +170,49 @@
   min-height: 44px;
 }
 
+/* Spec 1.8 §4.3 — fixní min-width na friend zóně pro vizuální stabilitu
+   při přepínání mezi stavy (none / pending_outgoing / pending_incoming /
+   accepted). pending_incoming má dvě tlačítka — proto fit-content na inline. */
+.friendZone {
+  display: inline-flex;
+  gap: var(--sp-2);
+  min-width: 220px;
+  min-height: 40px;
+  flex: 1 1 220px;
+}
+
+.friendZone > * {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 480px) {
+  .friendZone {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+/* D-055 — kebab pro „Další akce" (Blokovat / budoucí). */
+.kebabBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid var(--theme-border-soft, var(--frame-border));
+  border-radius: var(--radius-md);
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.kebabBtn:hover,
+.kebabBtn:focus-visible {
+  background: var(--theme-surface, var(--bg-card-hover));
+  color: var(--theme-text, var(--text-primary));
+}
+
 .notFound {
   padding: var(--sp-12) var(--sp-6);
   text-align: center;

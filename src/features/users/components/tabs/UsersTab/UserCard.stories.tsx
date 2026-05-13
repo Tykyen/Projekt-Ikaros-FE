@@ -63,7 +63,7 @@ export const SpravceDiskuziCard: Story = {
 
 export const HracCard: Story = {
   args: {
-    user: { ...baseUser, role: UserRole.Hrac, username: 'alice' },
+    user: { ...baseUser, role: UserRole.Ikarus, username: 'alice' },
     onOpen: () => {},
   },
 };

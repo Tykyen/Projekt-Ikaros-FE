@@ -22,7 +22,8 @@ interface ChipConfig {
  * profil i tabulkový view. `label` je krátká doménová zkratka (8 znaků),
  * `longLabel` v tooltipu doplní plné jméno (čte i screenreader přes title).
  *
- * Hrac/PJ/Korektor/Ctenar/Zadatel/Ikarus = null (žádný chip).
+ * D-053 — Po cleanupu UserRole jen 6 hodnot. `Ikarus` (base user) = null
+ * (žádný chip pro běžné uživatele).
  */
 const CHIP_CONFIG: Partial<Record<UserRole, ChipConfig>> = {
   [UserRole.Superadmin]: {

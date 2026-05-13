@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { Ban, Clock, KeyRound, Skull } from 'lucide-react';
 import { useAtomValue } from 'jotai';
-import { Badge, Button, RoleStar, Spinner, UserAvatar } from '@/shared/ui';
+import {
+  Badge,
+  Button,
+  ConfirmDialog,
+  RoleStar,
+  Spinner,
+  UserAvatar,
+} from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, type AdminUsersListItem } from '@/shared/types';
 import { ROLE_LABELS, ASSIGNABLE_ROLES } from '@/shared/types/userRoleLabels';
@@ -49,6 +56,10 @@ export function UsersTable({
   const cancelDeletion = useAdminCancelDeletion();
   const [banTarget, setBanTarget] = useState<AdminUsersListItem | null>(null);
   const [deleteTarget, setDeleteTarget] =
+    useState<AdminUsersListItem | null>(null);
+  const [unbanTarget, setUnbanTarget] =
+    useState<AdminUsersListItem | null>(null);
+  const [cancelDeletionTarget, setCancelDeletionTarget] =
     useState<AdminUsersListItem | null>(null);
   // D-025 — bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -236,10 +247,7 @@ export function UsersTable({
                         <button
                           type="button"
                           className={s.actionsButton}
-                          onClick={() => {
-                            if (confirm(`Odbanovat ${u.username}?`))
-                              unban.mutate(u.id);
-                          }}
+                          onClick={() => setUnbanTarget(u)}
                           disabled={isSelf || unban.isPending}
                         >
                           Odbanovat
@@ -261,14 +269,7 @@ export function UsersTable({
                           <button
                             type="button"
                             className={s.actionsButton}
-                            onClick={() => {
-                              if (
-                                confirm(
-                                  `Zrušit plánované smazání pro ${u.username}?`,
-                                )
-                              )
-                                cancelDeletion.mutate(u.id);
-                            }}
+                            onClick={() => setCancelDeletionTarget(u)}
                             disabled={isSelf || cancelDeletion.isPending}
                             title="Revert pending soft-delete (před hard cleanup cronem)"
                           >
@@ -380,6 +381,47 @@ export function UsersTable({
       <AdminDeleteUserModal
         target={deleteTarget}
         onClose={() => setDeleteTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={!!unbanTarget}
+        onClose={() => setUnbanTarget(null)}
+        title="Odbanovat uživatele?"
+        message={
+          unbanTarget ? (
+            <>
+              Opravdu chceš odbanovat <strong>{unbanTarget.username}</strong>?
+            </>
+          ) : null
+        }
+        confirmLabel="Odbanovat"
+        isPending={unban.isPending}
+        onConfirm={async () => {
+          if (!unbanTarget) return;
+          await unban.mutateAsync(unbanTarget.id);
+          setUnbanTarget(null);
+        }}
+      />
+
+      <ConfirmDialog
+        open={!!cancelDeletionTarget}
+        onClose={() => setCancelDeletionTarget(null)}
+        title="Zrušit plánované smazání?"
+        message={
+          cancelDeletionTarget ? (
+            <>
+              Obnovit účet <strong>{cancelDeletionTarget.username}</strong>{' '}
+              (zruší pending soft-delete před hard cleanup cronem)?
+            </>
+          ) : null
+        }
+        confirmLabel="Obnovit"
+        isPending={cancelDeletion.isPending}
+        onConfirm={async () => {
+          if (!cancelDeletionTarget) return;
+          await cancelDeletion.mutateAsync(cancelDeletionTarget.id);
+          setCancelDeletionTarget(null);
+        }}
       />
     </>
   );

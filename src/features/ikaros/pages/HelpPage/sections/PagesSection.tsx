@@ -46,15 +46,15 @@ const IKAROS_PAGES: PageDoc[] = [
     path: '/ikaros/uzivatele',
     name: 'Adresář uživatelů',
     status: 'ok',
-    who: 'Přihlášený (Admin/Superadmin vidí navíc taby Uživatelé a Audit)',
-    what: 'Taby Přátelé, Uživatelé, Zpracovat (univerzální fronta žádostí), Audit log. Hráč vidí Přátelé + Zpracovat; admin všechny čtyři.',
+    who: 'Přihlášený (Admin/Superadmin vidí navíc tab Audit)',
+    what: 'Taby Přátelé, Uživatelé, Zpracovat (univerzální fronta žádostí napříč moduly — žádosti o přátelství, změnu přezdívky a postupně i další), Audit log. Tab Přátelé: mřížka přijatých přátel + sbalitelná sekce „Odeslané žádosti". Tab Uživatelé: mřížka karet pro hráče, admin navíc přepínač Karty/Tabulka a „Zobrazit smazané". Admin/Superadmin navíc vidí Audit.',
   },
   {
     path: '/ikaros/uzivatel/:id',
     name: 'Veřejný profil',
     status: 'ok',
     who: 'Přihlášený',
-    what: 'Read-only zrcadlo profilu jiného uživatele bez citlivých polí (e-mail, motiv, barva chatu, ban/delete metadata).',
+    what: 'Read-only zrcadlo profilu jiného uživatele bez citlivých polí (e-mail, motiv, barva chatu, ban/delete metadata). Tlačítko „Přidat do přátel" mění stav podle vztahu (žádost odeslána / čeká rozhodnutí / odebrat z přátel). „Napsat zprávu" čeká na fázi 3.5.',
   },
   {
     path: '—',

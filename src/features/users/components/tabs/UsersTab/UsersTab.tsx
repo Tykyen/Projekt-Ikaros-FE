@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
 import { Input } from '@/shared/ui';
-import type { PublicUsersSort } from '@/shared/types';
+import { UserRole, type PublicUsersSort } from '@/shared/types';
+import { currentUserAtom } from '@/shared/store/authStore';
 import { useAdminUsers } from '@/features/admin/users/api/useAdminUsers';
 import { UsersTable } from '@/features/admin/users/components/UsersTab/UsersTable';
 import { usePublicUsers } from '../../../api/usePublicUsers';
@@ -40,12 +42,18 @@ function readPage(params: URLSearchParams): number {
  * Tabulka reuse `useAdminUsers` z 1.3b (`GET /api/admin/users`).
  */
 export function UsersTab() {
+  const me = useAtomValue(currentUserAtom);
+  const isAdmin =
+    me?.role === UserRole.Superadmin || me?.role === UserRole.Admin;
+
   const [params, setParams] = useSearchParams();
-  const view = readView(params);
+  // Non-admin force-fallback na 'cards' — admin-only features (tabulka,
+  // includeDeleted) silently ignored z URL.
+  const view: UsersTabView = isAdmin ? readView(params) : 'cards';
   const sort = readSort(params);
   const page = readPage(params);
   const search = params.get('search') ?? '';
-  const includeDeleted = params.get('includeDeleted') === '1';
+  const includeDeleted = isAdmin && params.get('includeDeleted') === '1';
 
   const [searchInput, setSearchInput] = useState(search);
 
@@ -80,12 +88,16 @@ export function UsersTab() {
     view === 'cards',
   );
 
-  // Tabulka mód — admin users endpoint (reuse 1.3b)
-  const tableQuery = useAdminUsers({
-    page,
-    limit: PAGE_LIMIT_TABLE,
-    username: search || undefined,
-  });
+  // Tabulka mód — admin users endpoint (reuse 1.3b). Volat jen pro admin
+  // ve view 'table' (non-admin nemá ten endpoint povolený).
+  const tableQuery = useAdminUsers(
+    {
+      page,
+      limit: PAGE_LIMIT_TABLE,
+      username: search || undefined,
+    },
+    isAdmin && view === 'table',
+  );
 
   const total =
     view === 'cards' ? (cardsQuery.data?.total ?? 0) : (tableQuery.data?.total ?? 0);
@@ -146,7 +158,7 @@ export function UsersTab() {
   return (
     <section className={s.tab} aria-label="Uživatelé">
       <div className={s.toolbar}>
-        <ViewToggle value={view} onChange={setView} />
+        {isAdmin && <ViewToggle value={view} onChange={setView} />}
         <Input
           className={s.searchInput}
           type="search"
@@ -164,14 +176,16 @@ export function UsersTab() {
           <option value="new">Nejnovější</option>
           <option value="abc">Abecedně</option>
         </select>
-        <label className={s.includeDeleted}>
-          <input
-            type="checkbox"
-            checked={includeDeleted}
-            onChange={(e) => toggleIncludeDeleted(e.target.checked)}
-          />
-          Zobrazit smazané
-        </label>
+        {isAdmin && (
+          <label className={s.includeDeleted}>
+            <input
+              type="checkbox"
+              checked={includeDeleted}
+              onChange={(e) => toggleIncludeDeleted(e.target.checked)}
+            />
+            Zobrazit smazané
+          </label>
+        )}
       </div>
 
       {view === 'cards' ? (

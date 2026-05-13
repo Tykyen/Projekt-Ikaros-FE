@@ -60,7 +60,7 @@ const successUser = {
   id: '1',
   email: 'newbie@test.io',
   username: 'newbie',
-  role: UserRole.Hrac,
+  role: UserRole.Ikarus,
   themeSettings: {},
   chatPreferences: {},
   favoriteDiscussionIds: [],

@@ -11,6 +11,7 @@ const ACTION_LABELS: Record<AdminAuditAction, string> = {
   ADMIN_PERMISSIONS_CHANGE: 'Změna oprávnění',
   USERNAME_REQUEST_APPROVED: 'Schválen username',
   USERNAME_REQUEST_REJECTED: 'Odmítnut username',
+  FRIENDSHIP_COOLDOWN_RESET: 'Reset friendship cooldownu',
 };
 
 const ACTION_CLASS: Record<AdminAuditAction, string> = {
@@ -20,6 +21,7 @@ const ACTION_CLASS: Record<AdminAuditAction, string> = {
   ADMIN_PERMISSIONS_CHANGE: s.permissions,
   USERNAME_REQUEST_APPROVED: s.approved,
   USERNAME_REQUEST_REJECTED: s.rejected,
+  FRIENDSHIP_COOLDOWN_RESET: s.approved,
 };
 
 function formatDateTime(iso: string): string {

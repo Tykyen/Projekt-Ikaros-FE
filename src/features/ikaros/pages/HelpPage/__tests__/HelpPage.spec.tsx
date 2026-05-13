@@ -55,12 +55,43 @@ describe('HelpPage', () => {
     expect(screen.getAllByText(/Pošta/).length).toBeGreaterThan(0);
   });
 
-  it('klik na „Role & oprávnění" → obsahuje Superadmin + Hierarchie + světové role', () => {
+  it('klik na „Role & oprávnění" → dva bloky (globální + svět) s kartami a maticemi', () => {
     renderHelp();
     fireEvent.click(screen.getByRole('tab', { name: 'Role & oprávnění' }));
+
+    // Hlavní bloky
+    expect(
+      screen.getByRole('heading', { level: 2, name: /Globální role/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: /Role ve světech/ }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Hierarchie a omezení adminů/)).toBeInTheDocument();
+
+    // Globální karty: Superadmin, Admin, 3× Správce, Ikaros (6 karet)
     expect(screen.getAllByText(/Superadmin/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Správce diskuzí').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Správce článků').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Správce galerie').length).toBeGreaterThan(0);
+
+    // World karty — Pomocný PJ + nově Čtenář a Žadatel
     expect(screen.getAllByText(/Pomocný PJ/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Čtenář/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Žadatel/).length).toBeGreaterThan(0);
+
+    // Matice — typické řádky oprávnění z obou matic
+    expect(screen.getByText('Schvalování diskuzí')).toBeInTheDocument();
+    expect(screen.getByText('Systémová nastavení')).toBeInTheDocument();
+    expect(screen.getByText('Vytváření obsahu')).toBeInTheDocument();
+    expect(screen.getByText('Nastavení světa')).toBeInTheDocument();
+
+    // 2 matice oprávnění (aria-label)
+    expect(
+      screen.getByRole('table', { name: /Matice oprávnění globálních rolí/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('table', { name: /Matice oprávnění světových rolí/ }),
+    ).toBeInTheDocument();
   });
 
   it('klik na „FAQ" → render details s otázkou o přezdívce', () => {

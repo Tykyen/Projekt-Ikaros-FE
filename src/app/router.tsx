@@ -130,7 +130,8 @@ export const router = createBrowserRouter([
         path: 'admin/dungeon-builder',
         loader: requireAuth,
         element: (
-          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin, UserRole.PJ]}>
+          // D-053 — `UserRole.Ikarus` (global) odebrán; per-world PJ check je follow-up D-053b
+          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
             {p(DungeonBuilderPage)}
           </RoleGuard>
         ),
@@ -169,7 +170,8 @@ export const router = createBrowserRouter([
       {
         path: 'admin/stranky',
         element: (
-          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin, UserRole.PJ]}>
+          // D-053 — `UserRole.Ikarus` odebrán; per-world PJ access je tracked jako D-053b.
+          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
             {p(PagesAdminPage)}
           </RoleGuard>
         ),
@@ -177,7 +179,8 @@ export const router = createBrowserRouter([
       {
         path: 'admin/adresar-postav',
         element: (
-          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin, UserRole.PJ]}>
+          // D-053 — `UserRole.Ikarus` odebrán; per-world PJ access je tracked jako D-053b.
+          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
             {p(NPCDirectoryPage)}
           </RoleGuard>
         ),
