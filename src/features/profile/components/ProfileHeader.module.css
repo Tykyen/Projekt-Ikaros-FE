@@ -1,0 +1,206 @@
+.card {
+  position: relative;
+  background: var(--surface-1);
+  border: 2px solid var(--frame-border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md, none);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.avatarColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.username {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-strong);
+}
+
+.editBtn {
+  margin-left: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+  margin: 0;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.fieldValue {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-strong);
+  word-break: break-word;
+}
+
+.fieldHint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.swatchRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--frame-border);
+  vertical-align: middle;
+}
+
+.editGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.editField span {
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.editField em {
+  font-style: normal;
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
+.editActions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* 1.7 — email row se stavem ověření + change link */
+.emailRow {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emailEditRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid currentColor;
+  background: transparent;
+}
+.badge[data-variant='success'] {
+  color: var(--success, var(--accent));
+}
+.badge[data-variant='warning'] {
+  color: var(--warning, var(--danger));
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.linkButton:hover {
+  color: var(--accent-hover, var(--accent));
+}
+.linkButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.linkButton:disabled {
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 20px;
+  }
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .avatarColumn {
+    align-items: flex-start;
+  }
+  .grid,
+  .editGrid {
+    grid-template-columns: 1fr;
+  }
+}
