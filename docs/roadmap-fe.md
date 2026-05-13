@@ -384,10 +384,35 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 
 **BE:** `/api/worlds`, `/api/worlds/:id`, `/api/worlds/:id/join`, `/api/worlds/:id/members`, `/api/ikaros-news`
 
-### - [ ] 2.1 Ikaros dashboard (`/`)
-- [ ] Přehled světů uživatele
-- [ ] Platformové novinky
-- [ ] Blížící se eventy
+### - [x] 2.1 Ikaros dashboard (`/`) ✅ (2026-05-13)
+
+**Spec:** `docs/arch/phase-2/spec-2.1.md`, **Plán:** `docs/arch/phase-2/plan-2.1.md`
+
+- [x] **BE:** `GET /api/game-events/upcoming/mine?limit=<n>` — cross-world agregátor blížících se eventů přihlášeného uživatele; respektuje `Zadatel` filter + `groupOnly`/`targetGroup` + binární `myRsvp: 'confirmed'|'none'`
+- [x] **BE:** `findUpcomingForWorlds` v `MongoGameEventRepository` (`$in: worldIds`, sort `date: 1`, limit cap 500)
+- [x] **BE:** `UpcomingEventDto` + `UpcomingQueryDto` (validation `@IsInt`, `@Min(1)`, `@Max(20)`)
+- [x] **BE:** 9 nových unit testů + 6 e2e (visibility, ordering, group filter, RSVP myRsvp, 401 anon)
+- [x] **FE bug fix:** `useMyWorlds` shape `MyWorldEntry[] = { world, membership }[]` (BE vrací tento shape, FE měl `World[]` typ → sidebar PJ badge byl počítán přes `world.ownerId === currentUser.id` místo `membership.role === WorldRole.PJ`). Tři callsite opravené: SidebarContent + RightPanel + ProfileWorldsSection.
+- [x] **FE typy:** `MyWorldEntry`, `IkarosNews`, `UpcomingEventDto` v `src/shared/types/index.ts`
+- [x] **FE hooky:** `useIkarosNews` (5min cache, public), `useUpcomingEventsMine` (1min cache, JWT-gated), `useToggleRsvp` (POST `/game-events/:id/confirm` + invalidace)
+- [x] **FE util:** `relativeEventDate(iso, now)` — cs lokál (dnes/zítra/weekday/D.M./jiný rok) + `isWithin24h` urgency hint
+- [x] **FE komponenta:** `WorldRoleChip` (6 rolí, 2 sizes, použitelný napříč platformou — analog `RoleChip` pro globální role)
+- [x] **FE struktura:** `DashboardPage/` složka — orchestrátor + 4 sekce (`AnonWelcomeSection`, `WorldsSection`, `UpcomingEventsSection`, `PlatformNewsSection`) + 3 inner karty (`WorldCard`, `EventCard`, `NewsCard`) + sdílený `SectionHeader` + util `formatRelativePast`
+- [x] **Auth-aware:** anon = welcome card + Novinky (beze změny); logged-in = Moje světy → Blížící se schůzky → Novinky
+- [x] **WorldCard:** hero 96/80 px (desktop/mobil), gradient fallback bez obrázku, role chip, počet hráčů (singulár/paukal/plural), popis truncate 2 řádky, "Vstoupit do světa" CTA
+- [x] **Empty state Moje světy:** "Zatím nejsi v žádném světě" + 2 CTA (Prozkoumat / Vytvořit)
+- [x] **EventCard:** datum chip (relativní formát, urgent variant ≤24h), název + svět, RSVP toggle Půjdu/none (binární), klik na řádek → `/svet/:id`, `stopPropagation` na RSVP button
+- [x] **NewsCard:** nadpis + excerpt 2-line + autor + relativní datum
+- [x] **Responsivita:** grid 2col → 1col @ 768px, touch targety 44px+ na mobilu, ne-hardcoded barvy (`var(--surface-2)`, `var(--frame-border)`, `var(--shadow-lg)`, `var(--accent)`, `var(--role-world-*)`)
+- [x] **Stagger reveal** 0/80/160/240 ms + `prefers-reduced-motion: reduce` override
+- [x] **48 nových FE testů:** WorldRoleChip 8, relativeEventDate 12, useIkarosNews 2, useGameEvents 4, WorldCard 8, EventCard 5, NewsCard 2, DashboardPage 2, BE service findUpcomingForUser 9 + BE e2e 6 (celkem +63)
+- [x] `lint`, `lint:colors`, `tsc`, `build`, `test:run` ✓ — FE 324 testů, BE 62+ game-events.service testů
+
+**Tracked dluhy z 2.1:** **D-NEW1** (cross-world kalendář link — Eventy "Zobrazit vše →" vede dočasně na `/ikaros/vesmiry`, finální target s fází 9.2), **D-NEW2** (BE `GET /api/IkarosNews` paginace — pokud bude novinek mnoho, FE dnes slice(0,5) na FE).
+
+**Uzavírá / souvisí:** Bug fix `useMyWorlds` shape (sidebar PJ badge přesněji přes membership.role místo ownerId).
+
+**Mimo rozsah (samostatné fáze):** Správa novinek (3.1), 3-stavový RSVP (9.1), detail eventu (9.1), cross-world kalendář (9.2), stránka `/ikaros/novinky` (3.1).
 
 ### - [ ] 2.2 Přehled světů (`/ikaros/vesmiry`)
 - [ ] Mřížka světů (vlastní + veřejné)

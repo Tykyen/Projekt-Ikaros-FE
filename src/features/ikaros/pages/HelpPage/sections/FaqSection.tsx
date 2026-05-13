@@ -8,6 +8,36 @@ interface FaqItem {
 
 const FAQ: FaqItem[] = [
   {
+    q: 'Co najdu na úvodní stránce po přihlášení?',
+    a: (
+      <>
+        <p>
+          Úvodní stránka <Link to="/">/</Link> je tvůj rozcestník. Postupně
+          vidíš tři sekce:
+        </p>
+        <ul>
+          <li>
+            <strong>Moje světy</strong> — karty světů, kterých jsi členem;
+            klik na kartu nebo tlačítko „Vstoupit do světa" tě přesune do
+            světa. U každého světa vidíš svou roli (PJ, Hráč, …) a počet
+            hráčů. Pokud ještě nejsi v žádném světě, ukáže se výzva s
+            tlačítky „Prozkoumat světy" a „Vytvořit svět".
+          </li>
+          <li>
+            <strong>Blížící se schůzky</strong> — 5 nejbližších herních
+            událostí napříč všemi tvými světy, seřazené podle data. U
+            každé schůzky můžeš kliknout na „Půjdu" a přihlásit se. Klik
+            na řádek tě přesune do konkrétního světa.
+          </li>
+          <li>
+            <strong>Novinky</strong> — platformové novinky, které píše
+            administrátor.
+          </li>
+        </ul>
+      </>
+    ),
+  },
+  {
     q: 'Jak si změním přezdívku?',
     a: (
       <>

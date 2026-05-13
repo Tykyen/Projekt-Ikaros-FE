@@ -375,3 +375,23 @@ Zbývá: ostatní HttpException typy (NotFound/Forbidden/BadRequest) — viz **D
 Public endpointy ponechány bez guardu se záměrem (komentář v controlleru): `world-news`, `users.profile/:id`, `users.exists/:username`, `map-templates`, `IkarosNews`, `system-presets`, `push/vapid-public-key`.
 
 Zbývá: zvážit Variantu B (`APP_GUARD` + `@Public()`) pro vynucený opt-in model — samostatný spec.
+
+---
+
+### D-060 — Cross-world kalendář link (2.1 → 9.2)
+**Soubory:** `src/features/ikaros/pages/DashboardPage/sections/UpcomingEventsSection.tsx`
+**Stav:** Otevřený, čeká na fázi 9.2 (Kalendář).
+**Kontext:** Sekce „Blížící se schůzky" má action „Zobrazit vše →", která dnes míří dočasně na `/ikaros/vesmiry`. Cross-world kalendář (`/ikaros/kalendar` nebo equivalent) ještě neexistuje; vznikne s fází 9.2 nebo dříve jako side-task. **Action:** po dokončení 9.2 přesměrovat link na novou route.
+
+---
+
+### D-061 — BE `GET /api/IkarosNews` paginace
+**Soubory:** `backend/src/modules/ikaros-news/ikaros-news.controller.ts`
+**Stav:** Otevřený, lazy — provede se pokud novinek bude víc než ~50.
+**Kontext:** Dnes endpoint vrací **všechny aktivní novinky** bez paginace; FE provádí `slice(0, 5)` v `PlatformNewsSection`. Pro fázi 3.1 (stránka novinek s "Zobrazit všechny") bude potřeba `?limit=&offset=`. Není urgent — dnes je v DB ~0 novinek.
+
+---
+
+### D-062 — Sidebar bug fix (uzavřen) — `useMyWorlds` shape
+**Soubory:** `src/app/layout/IkarosLayout/IkarosLayout.tsx` (SidebarContent + RightPanel), `src/features/profile/components/WorldsSection.tsx`
+**Opraveno v:** 2.1 — FE typoval `useMyWorlds` jako `World[]`, BE `worldsService.findMyWorlds` vrací `{ world, membership }[]`. Tři callsite (sidebar PJ badge přes `world.ownerId === currentUser.id`, right panel, profil) opravené. PJ badge se teď počítá přes `membership.role === WorldRole.PJ` (správnější — vlastník nemusí být PJ, např. admin promovaný hierarchií).
