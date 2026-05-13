@@ -40,7 +40,7 @@ import { UserAvatar } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
-import { UserRole, type World } from '@/shared/types';
+import { UserRole, WorldRole } from '@/shared/types';
 
 function PanelCorners() {
   return (
@@ -96,6 +96,8 @@ function NavItem({ navKey, to, end, icon, label, onClick }: NavItemDef & { onCli
   );
 }
 
+type SidebarWorld = { id: string; name: string; isPJ: boolean };
+
 function SidebarContent({
   isAuthenticated,
   onNav,
@@ -103,12 +105,19 @@ function SidebarContent({
   isAuthenticated: boolean;
   onNav?: () => void;
 }) {
-  const currentUser = useAtomValue(currentUserAtom);
   const myWorldsQuery = useMyWorlds();
   const publicWorldsQuery = usePublicWorlds();
-  const worlds: World[] | undefined = isAuthenticated
-    ? myWorldsQuery.data
-    : publicWorldsQuery.data;
+  const worlds: SidebarWorld[] | undefined = isAuthenticated
+    ? myWorldsQuery.data?.map(({ world, membership }) => ({
+        id: world.id,
+        name: world.name,
+        isPJ: membership.role === WorldRole.PJ,
+      }))
+    : publicWorldsQuery.data?.map((w) => ({
+        id: w.id,
+        name: w.name,
+        isPJ: false,
+      }));
   const { data: unread } = useUnreadCount();
   const chatCount = isAuthenticated ? unread?.unreadCount ?? 0 : 0;
 
@@ -129,7 +138,7 @@ function SidebarContent({
           {worlds?.slice(0, 8).map((w) => (
             <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
               <span className={s.navItemLabel}>{w.name}</span>
-              {currentUser?.id && w.ownerId === currentUser.id && (
+              {w.isPJ && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>
               )}
             </Link>
@@ -170,7 +179,14 @@ function SidebarContent({
 
 function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   const currentUser = useAtomValue(currentUserAtom);
-  const { data: worlds } = useMyWorlds();
+  const { data: myWorlds } = useMyWorlds();
+  const worlds: SidebarWorld[] | undefined = myWorlds?.map(
+    ({ world, membership }) => ({
+      id: world.id,
+      name: world.name,
+      isPJ: membership.role === WorldRole.PJ,
+    }),
+  );
   const isAdmin =
     currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
   const { data: pendingCount } = usePendingActionsCount(!!currentUser);
@@ -207,7 +223,7 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
           {worlds?.slice(0, 5).map((w) => (
             <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
               <span className={s.navItemLabel}>{w.name}</span>
-              {currentUser?.id && w.ownerId === currentUser.id && (
+              {w.isPJ && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>
               )}
             </Link>

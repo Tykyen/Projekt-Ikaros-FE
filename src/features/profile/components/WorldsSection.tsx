@@ -33,12 +33,12 @@ export function WorldsSection() {
       )}
       {data && data.length > 0 && (
         <ul className={styles.worldList}>
-          {data.map((w) => (
-            <li key={w.id}>
-              <Link to={`/svet/${w.slug}`} className={styles.worldLink}>
-                <span className={styles.worldName}>{w.name}</span>
-                {w.genre && (
-                  <span className={styles.worldGenre}>{w.genre}</span>
+          {data.map(({ world }) => (
+            <li key={world.id}>
+              <Link to={`/svet/${world.id}`} className={styles.worldLink}>
+                <span className={styles.worldName}>{world.name}</span>
+                {world.genre && (
+                  <span className={styles.worldGenre}>{world.genre}</span>
                 )}
               </Link>
             </li>
