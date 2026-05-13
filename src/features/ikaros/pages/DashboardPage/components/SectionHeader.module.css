@@ -1,0 +1,27 @@
+.title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.06em;
+  color: var(--accent-bright);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.action:hover {
+  color: var(--accent-bright);
+}
