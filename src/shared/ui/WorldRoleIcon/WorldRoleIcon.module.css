@@ -1,0 +1,25 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.wrapper svg {
+  color: var(--role-world-color);
+}
+
+.iconPj        { --role-world-color: var(--role-world-pj); }
+.iconPjAsst    { --role-world-color: var(--role-world-pj-asst); }
+.iconCorrector { --role-world-color: var(--role-world-corrector); }
+.iconPlayer    { --role-world-color: var(--role-world-player); }
+.iconReader    { --role-world-color: var(--role-world-reader); }
+.iconApplicant { --role-world-color: var(--role-world-applicant); }
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+}

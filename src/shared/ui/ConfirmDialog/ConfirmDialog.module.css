@@ -1,0 +1,10 @@
+.body {
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  line-height: 1.55;
+}
+
+.body strong {
+  color: var(--text-strong, var(--text-primary));
+  font-weight: var(--weight-semi);
+}

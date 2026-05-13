@@ -1,0 +1,122 @@
+.menu {
+  position: fixed;
+  width: 220px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-2);
+  z-index: calc(var(--z-modal) - 10);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: kebabFadeIn var(--transition-fast);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  z-index: calc(var(--z-modal) - 11);
+  animation: kebabFadeIn var(--transition-base);
+}
+
+.menuMobile {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--sp-3);
+  gap: var(--sp-1);
+  animation: kebabSlideUp var(--transition-base);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 36px;
+  padding: var(--sp-2) var(--sp-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.item:hover:not(:disabled),
+.item:focus-visible:not(:disabled) {
+  background: var(--bg-card-hover);
+}
+
+.itemDanger {
+  color: var(--color-danger);
+}
+
+.itemDanger:hover:not(:disabled),
+.itemDanger:focus-visible:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+}
+
+.itemDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .item {
+    min-height: 48px;
+    padding: var(--sp-3) var(--sp-4);
+    font-size: var(--text-base);
+  }
+  .icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@keyframes kebabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kebabSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

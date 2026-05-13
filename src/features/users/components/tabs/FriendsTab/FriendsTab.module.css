@@ -1,0 +1,104 @@
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  color: var(--theme-heading, var(--text-strong));
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.count {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.collapseToggle {
+  background: transparent;
+  border: none;
+  padding: var(--sp-2) 0;
+  color: var(--theme-heading, var(--text-strong));
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.chevron {
+  transition: transform var(--transition-base);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.chevronCollapsed {
+  transform: rotate(-90deg);
+}
+
+.outgoingList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────── */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-16) var(--sp-6);
+  text-align: center;
+  border: 1px dashed var(--theme-border-soft, var(--frame-border));
+  border-radius: var(--radius-lg);
+  background: var(--theme-surface-soft, var(--surface-2));
+}
+
+.icon {
+  display: inline-flex;
+  margin-bottom: var(--sp-4);
+  color: var(--theme-text-muted, var(--text-muted));
+  opacity: 0.7;
+}
+
+.title {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  color: var(--theme-heading, var(--text-strong));
+  letter-spacing: 0.04em;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 440px;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.emptyAction {
+  margin-top: var(--sp-5);
+}
