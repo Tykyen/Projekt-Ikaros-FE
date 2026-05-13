@@ -307,6 +307,33 @@ export interface WorldMembership {
   group?: string;
 }
 
+export interface MyWorldEntry {
+  world: World;
+  membership: WorldMembership;
+}
+
+export interface IkarosNews {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  createdAtUtc: string;
+  isActive: boolean;
+}
+
+export interface UpcomingEventDto {
+  id: string;
+  worldId: string;
+  worldName: string;
+  worldSlug: string;
+  title: string;
+  date: string;
+  confirmable: boolean;
+  myRsvp: 'confirmed' | 'none';
+  confirmedCount: number;
+}
+
 // Ikaros Messages
 export interface UnreadCountResponse {
   unreadCount: number;

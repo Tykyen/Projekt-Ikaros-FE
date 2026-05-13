@@ -2,13 +2,13 @@
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
-import type { World } from '@/shared/types';
+import type { MyWorldEntry, World } from '@/shared/types';
 
 export function useMyWorlds() {
   const token = useAtomValue(accessTokenAtom);
   return useQuery({
     queryKey: ['worlds', 'my'],
-    queryFn: () => api.get<World[]>('/worlds/my'),
+    queryFn: () => api.get<MyWorldEntry[]>('/worlds/my'),
     enabled: !!token,
     staleTime: 5 * 60_000,
   });

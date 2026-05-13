@@ -1,0 +1,39 @@
+.medallion {
+  width: 200px;
+  height: 215px;
+}
+
+.welcomeTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.02em;
+  margin: 0 0 var(--sp-3) 0;
+  color: var(--text-primary);
+}
+
+.titleAccent {
+  color: var(--theme-accent-cyan, var(--accent-bright));
+}
+
+.paragraph {
+  margin: 0 0 var(--sp-3) 0;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+.paragraph:last-of-type {
+  margin-bottom: 0;
+}
+
+.signature {
+  font-family: var(--font-script);
+  font-size: 32px;
+  font-style: italic;
+  text-align: center;
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  margin: var(--sp-4) 0 0 0;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 16px var(--theme-glow-cyan);
+}

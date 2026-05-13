@@ -19,7 +19,7 @@ const IKAROS_PAGES: PageDoc[] = [
     name: 'Úvodník',
     status: 'ok',
     who: 'Všichni (anon i přihlášený)',
-    what: 'Vstupní stránka platformy. Uvítání, krátké novinky, v sidebaru přehled vesmírů.',
+    what: 'Vstupní stránka platformy. Anonymní vidí uvítací kartu a novinky platformy. Po přihlášení nahrazuje uvítání rozcestník: Moje světy (karty s obrázkem, tvou rolí ve světě a tlačítkem Vstoupit), Blížící se schůzky (až 5 nejbližších eventů napříč všemi tvými světy, s tlačítkem Půjdu) a Novinky platformy.',
   },
   {
     path: '/ikaros/napoveda',
