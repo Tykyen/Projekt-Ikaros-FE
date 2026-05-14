@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import {
@@ -7,6 +7,15 @@ import {
   type WorldMembership,
 } from '@/shared/types';
 import { WorldCard } from '../components/WorldCard';
+
+// 2.4 — WorldCard interně volá `useWorldLink` → `useMyWorlds`. Mock vrací
+// světy s membership Hrac (testovaný world je "member") → link `/svet/:id`.
+// Pro test anon scenario nastavíme prázdný seznam (override v `it`).
+const mockUseMyWorlds = vi.fn();
+
+vi.mock('@/features/world/api/useWorlds', () => ({
+  useMyWorlds: () => mockUseMyWorlds(),
+}));
 
 function makeWorld(overrides: Partial<World> = {}): World {
   return {
@@ -40,6 +49,15 @@ function makeMembership(role: WorldRole): WorldMembership {
 }
 
 function renderCard(world: World, role: WorldRole | null = WorldRole.Hrac) {
+  // Mock useMyWorlds: pokud role je member, vrátí entry → link `/svet/:id`.
+  // Pokud null nebo Zadatel, vrátí prázdné pole → fallback `/svet/:id/info`.
+  if (role !== null && role !== WorldRole.Zadatel) {
+    mockUseMyWorlds.mockReturnValue({
+      data: [{ world, membership: makeMembership(role) }],
+    });
+  } else {
+    mockUseMyWorlds.mockReturnValue({ data: [] });
+  }
   return render(
     <MemoryRouter>
       <WorldCard
@@ -51,6 +69,10 @@ function renderCard(world: World, role: WorldRole | null = WorldRole.Hrac) {
 }
 
 describe('WorldCard', () => {
+  beforeEach(() => {
+    mockUseMyWorlds.mockReset();
+  });
+
   it('vykreslí název, žánr, počet hráčů, popis', () => {
     renderCard(makeWorld());
     expect(screen.getByText('Matrix')).toBeInTheDocument();
@@ -91,10 +113,17 @@ describe('WorldCard', () => {
     expect(img?.getAttribute('src')).toBe('https://example.com/cover.png');
   });
 
-  it('odkaz vede na /svet/:id', () => {
-    renderCard(makeWorld());
+  it('odkaz vede na /svet/:id pokud je member', () => {
+    renderCard(makeWorld(), WorldRole.Hrac);
     const link = screen.getByRole('link', { name: /Matrix/i });
     expect(link.getAttribute('href')).toBe('/svet/w1');
+  });
+
+  // 2.4 — link dispatch: nečlen / anon → /svet/:id/info (public detail).
+  it('odkaz vede na /svet/:id/info pokud není member (anon/Zadatel)', () => {
+    renderCard(makeWorld(), null);
+    const link = screen.getByRole('link', { name: /Matrix/i });
+    expect(link.getAttribute('href')).toBe('/svet/w1/info');
   });
 
   it('CTA tlačítko obsahuje "Vstoupit do světa" pokud je člen', () => {

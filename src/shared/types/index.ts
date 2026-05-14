@@ -301,6 +301,15 @@ export interface World {
   favoritePageSlugs: string[];
   createdAt: string;
   updatedAt: string;
+  /** Spec 2.4 — populated `GET /api/worlds/:id` / `/slug/:slug`. */
+  owner?: PublicOwnerSummary;
+}
+
+/** Spec 2.4 — public owner shape v `World.owner` (žádná citlivá pole). */
+export interface PublicOwnerSummary {
+  id: string;
+  username: string;
+  avatarUrl?: string;
 }
 
 export interface WorldMembership {
@@ -500,6 +509,23 @@ export interface FriendRequestListItem {
     avatarUrl: string | null;
     defaultAvatarType: DefaultAvatarType;
     role: UserRole;
+  };
+}
+
+/**
+ * Spec 2.4 — pending položka v Zpracovat tabu pro `world_join_request`.
+ * Mirror BE `WorldJoinRequestListItem` z `worlds/interfaces/world-join-request.interface.ts`.
+ */
+export interface WorldJoinRequestListItem {
+  membershipId: string;
+  worldId: string;
+  worldName: string;
+  worldSlug: string;
+  requestedAt: string;
+  requester: {
+    id: string;
+    username: string;
+    avatarUrl?: string;
   };
 }
 

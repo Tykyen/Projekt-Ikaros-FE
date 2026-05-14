@@ -1,12 +1,14 @@
 ﻿import { Link } from 'react-router-dom';
 import { useMyWorlds } from '@/features/world/api/useWorlds';
 import { Spinner, Badge } from '@/shared/ui';
+import { WorldRole } from '@/shared/types';
 import styles from './ProfileSections.module.css';
 
 /**
  * 1.3a — read-only readout světů uživatele.
- * Klik na svět = navigace na /svet/:slug.
- * PJ badge: zatím TODO — vyžaduje WorldMembership read (přidá 5.3).
+ * Klik na svět:
+ *  - full member (Hrac+) → `/svet/:id` (gameplay welcome)
+ *  - Zadatel (pending) → `/svet/:id/info` (public detail s pending CTA)
  */
 export function WorldsSection() {
   const { data, isPending, isError } = useMyWorlds();
@@ -33,16 +35,22 @@ export function WorldsSection() {
       )}
       {data && data.length > 0 && (
         <ul className={styles.worldList}>
-          {data.map(({ world }) => (
-            <li key={world.id}>
-              <Link to={`/svet/${world.id}`} className={styles.worldLink}>
-                <span className={styles.worldName}>{world.name}</span>
-                {world.genre && (
-                  <span className={styles.worldGenre}>{world.genre}</span>
-                )}
-              </Link>
-            </li>
-          ))}
+          {data.map(({ world, membership }) => {
+            const isFullMember = membership.role !== WorldRole.Zadatel;
+            const to = isFullMember
+              ? `/svet/${world.id}`
+              : `/svet/${world.id}/info`;
+            return (
+              <li key={world.id}>
+                <Link to={to} className={styles.worldLink}>
+                  <span className={styles.worldName}>{world.name}</span>
+                  {world.genre && (
+                    <span className={styles.worldGenre}>{world.genre}</span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

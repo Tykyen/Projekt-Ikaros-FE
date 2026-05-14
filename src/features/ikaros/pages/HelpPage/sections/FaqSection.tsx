@@ -118,10 +118,13 @@ const FAQ: FaqItem[] = [
         <ul>
           <li>žádosti o přátelství (přicházejí, když ti někdo pošle pozvánku)</li>
           <li>žádosti o změnu přezdívky (jen Admin/Superadmin)</li>
+          <li>
+            žádosti o vstup do tvého světa (pokud jsi PJ vlastník otevřeného
+            nebo soukromého světa)
+          </li>
         </ul>
         <p>Postupně přibude:</p>
         <ul>
-          <li>žádosti o vstup do uzavřeného světa (Fáze 2.4, pro PJ)</li>
           <li>pending články / obrázky / hlášené příspěvky (Fáze 3.2–3.4)</li>
         </ul>
         <p>

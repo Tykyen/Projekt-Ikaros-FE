@@ -8,6 +8,7 @@ import {
   isWithin24h,
 } from '@/features/world/utils/relativeEventDate';
 import { useToggleRsvp } from '@/features/world/api/useGameEvents';
+import { useWorldLink } from '@/features/world/hooks/useWorldLink';
 import s from './EventCard.module.css';
 
 interface EventCardProps {
@@ -18,6 +19,8 @@ export function EventCard({ event }: EventCardProps) {
   const toggle = useToggleRsvp();
   const isConfirmed = event.myRsvp === 'confirmed';
   const urgent = isWithin24h(event.date);
+  // 2.4 — link dispatch (member → gameplay, jinak → public detail).
+  const linkTarget = useWorldLink(event.worldId);
 
   function handleToggle(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -28,7 +31,7 @@ export function EventCard({ event }: EventCardProps) {
   }
 
   return (
-    <Link to={`/svet/${event.worldId}`} className={s.card}>
+    <Link to={linkTarget} className={s.card}>
       <span
         className={clsx(s.dateChip, urgent && s.dateChipUrgent)}
         aria-label={`Datum eventu: ${event.date}`}

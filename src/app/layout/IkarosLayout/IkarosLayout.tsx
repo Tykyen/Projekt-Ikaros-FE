@@ -96,7 +96,13 @@ function NavItem({ navKey, to, end, icon, label, onClick }: NavItemDef & { onCli
   );
 }
 
-type SidebarWorld = { id: string; name: string; isPJ: boolean };
+type SidebarWorld = {
+  id: string;
+  name: string;
+  isPJ: boolean;
+  // 2.4 — zda je current user member tohoto světa (řídí link dispatch).
+  isMember: boolean;
+};
 
 function SidebarContent({
   isAuthenticated,
@@ -112,11 +118,14 @@ function SidebarContent({
         id: world.id,
         name: world.name,
         isPJ: membership.role === WorldRole.PJ,
+        isMember: membership.role !== WorldRole.Zadatel,
       }))
     : publicWorldsQuery.data?.map((w) => ({
         id: w.id,
         name: w.name,
         isPJ: false,
+        // anon → nikdy není member → link na /info.
+        isMember: false,
       }));
   const { data: unread } = useUnreadCount();
   const chatCount = isAuthenticated ? unread?.unreadCount ?? 0 : 0;
@@ -136,7 +145,12 @@ function SidebarContent({
         <SectionTitle>Vesmíry</SectionTitle>
         <div className={s.navList}>
           {worlds?.slice(0, 8).map((w) => (
-            <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
+            <Link
+              key={w.id}
+              to={w.isMember ? `/svet/${w.id}` : `/svet/${w.id}/info`}
+              className={s.navItem}
+              onClick={onNav}
+            >
               <span className={s.navItemLabel}>{w.name}</span>
               {w.isPJ && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>
@@ -186,6 +200,8 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
       id: world.id,
       name: world.name,
       isPJ: membership.role === WorldRole.PJ,
+      // RightPanel zobrazuje výhradně myWorlds, takže member = !Zadatel.
+      isMember: membership.role !== WorldRole.Zadatel,
     }),
   );
   const isAdmin =

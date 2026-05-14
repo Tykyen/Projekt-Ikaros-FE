@@ -70,25 +70,30 @@ const IKAROS_PAGES: PageDoc[] = [
     who: 'Přihlášený',
     what: 'Zelená tečka u avataru = uživatel má právě otevřenou platformu. Žlutá tečka = uživatel je u počítače, ale ~5 min nebyl aktivní (idle). Žádná tečka = offline. U offline uživatelů na veřejném profilu vidíš „naposledy aktivní před X". Lze skrýt svůj stav přes Soukromí v profilu.',
   },
-];
-
-const SOON_IKAROS: PageDoc[] = [
   {
     path: '/ikaros/vytvorit-svet',
     name: 'Vytvořit svět',
-    status: 'soon',
-    fáze: 'Fáze 2.3',
+    status: 'ok',
     who: 'Přihlášený',
-    what: 'Wizard pro založení nového světa (název, žánr, popis, přístupový režim, RPG systém).',
+    what: 'Single-page formulář s pěti sekcemi: základní informace (název + adresa + popis), žánr a tóny vyprávění, hráči (text pro zájemce + kapacita), přístupový režim (Veřejný / Otevřený / Soukromý), herní systém + kostky. Po vytvoření se otevře úvodní stránka nového světa.',
+  },
+  {
+    path: '/svet/:worldId/info',
+    name: 'Detail světa',
+    status: 'ok',
+    who: 'Všichni (anon vidí public/open, přihlášený podle členství)',
+    what: 'Vitrína světa — popis, žánr, tóny, kostky, herní systém, počet hráčů, vlastník (PJ). Akce „Vstoupit" (veřejný svět = okamžitě) nebo „Požádat o vstup" (otevřený / soukromý svět). Žadatel vidí status „Žádost odeslána", než ji PJ schválí. Tlačítko Sdílet kopíruje veřejnou adresu světa do schránky.',
   },
   {
     path: '/svet/:worldId',
-    name: 'Detail světa + vstup',
-    status: 'soon',
-    fáze: 'Fáze 2.4',
-    who: 'Přihlášený',
-    what: 'Info o světě, tlačítko Vstoupit (public = okamžitě, private = žádost ke schválení PJ).',
+    name: 'Úvodní stránka světa',
+    status: 'ok',
+    who: 'Členové světa (Hrac+ a PJ)',
+    what: 'Po vstupu do svého světa vidíš pozdrav a čtyři rychlé dlaždice (Chat, Stránky, Mapa, Postavy). Plnohodnotný dashboard s aktivitou, kalendářem a online členy přibyde v pozdější fázi.',
   },
+];
+
+const SOON_IKAROS: PageDoc[] = [
   {
     path: '/ikaros/clanky',
     name: 'Články',
@@ -150,11 +155,11 @@ const SOON_IKAROS: PageDoc[] = [
 const SOON_WORLD: PageDoc[] = [
   {
     path: '/svet/:worldId',
-    name: 'Světový dashboard',
+    name: 'Plnohodnotný dashboard světa',
     status: 'soon',
     fáze: 'Fáze 5.2',
     who: 'Členové světa',
-    what: 'Novinky světa, poslední stránky, blížící se eventy.',
+    what: 'Rozšíření úvodní stránky o novinky světa, poslední stránky, blížící se eventy a online členy.',
   },
   {
     path: '/svet/:worldId/chat',

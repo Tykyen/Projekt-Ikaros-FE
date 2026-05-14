@@ -1,0 +1,46 @@
+.body,
+.empty {
+  font-family: var(--font-body);
+}
+
+.metaLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted, var(--text));
+  margin: 0 0 12px;
+}
+
+.text {
+  color: var(--text-primary, var(--text));
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.text p {
+  margin: 0 0 20px;
+  white-space: pre-wrap;
+}
+
+.text p:last-child {
+  margin-bottom: 0;
+}
+
+.emptyText {
+  font-style: italic;
+  color: var(--text-muted, var(--text));
+  margin: 0;
+}
+
+/* Drop cap pouze na desktopu — mobile by rozbil flow. */
+@media (min-width: 1024px) {
+  .text p:first-of-type::first-letter {
+    font-family: var(--font-display, Georgia, serif);
+    font-size: 64px;
+    line-height: 0.9;
+    float: left;
+    padding: 4px 12px 0 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+}

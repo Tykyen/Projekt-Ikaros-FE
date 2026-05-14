@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Globe } from 'lucide-react';
 import type { World, WorldMembership } from '@/shared/types';
 import { WorldRoleChip } from '@/features/world/components/WorldRoleChip';
+import { useWorldLink } from '@/features/world/hooks/useWorldLink';
 import s from './WorldCard.module.css';
 
 interface WorldCardProps {
@@ -20,8 +21,10 @@ function formatPlayers(playerCount: number, maxPlayers?: number | null): string 
 
 export function WorldCard({ world, membership }: WorldCardProps) {
   const isMember = membership !== undefined;
+  // 2.4 — link dispatch: member → /svet/:id (gameplay), jinak → /svet/:id/info (public detail).
+  const linkTarget = useWorldLink(world.id);
   return (
-    <Link to={`/svet/${world.id}`} className={s.card}>
+    <Link to={linkTarget} className={s.card}>
       <div className={s.top}>
         <div className={s.hero} aria-hidden={!world.imageUrl}>
           {world.imageUrl ? (

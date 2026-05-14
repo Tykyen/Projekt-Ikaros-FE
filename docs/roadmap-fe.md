@@ -474,10 +474,34 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - ✅ **D-NEW-tooltips** — `PillChips` má volitelný prop `descriptions: Record<string, string>`. Pokud existuje match, chip dostane native `title` attribut (hover desktop / long-press mobil) + viditelný `?` indikátor uvnitř chipu (vpravo, `currentColor` border, opacity 0.55). `TONE_DESCRIPTIONS` (24 + Vlastní) a `DICE_DESCRIPTIONS` (13) jako konstanty. GenreSection + SystemSection propnou popisky do PillChips. Žádný custom Tooltip overlay — native browser tooltip stačí pro MVP.
 - Celkem **+5 FE testů** (4 useSlugAvailability + 1 quota toast), +6 BE testů (3 isSlugAvailable + 3 quota). Total: 400 FE + 45 worlds.service ✓.
 
-### - [ ] 2.4 Detail světa + join flow (`/svet/:worldId`)
-- [ ] Informace o světě
-- [ ] Join tlačítko (public = přímé, private = žádost)
-- [ ] **Žádost o vstup do private světa** → queue typ `world_join_request` ve Zpracovat tabu PJ vlastníka (infra z 1.4). `WorldJoinRequestProvider implements IPendingActionProvider`. Renderer karty: avatar žadatele + název světa + tlačítka Přijmout/Odmítnout.
+### - [x] 2.4 Detail světa + join flow ✅ (2026-05-14)
+
+**Spec:** `docs/arch/phase-2/spec-2.4.md`, **Design audit:** `docs/arch/phase-2/design-2.4.md` (Almanach), **Plán:** `docs/arch/phase-2/plan-2.4.md`
+
+**Architektonická volba:** routing migrace **NE** — public Detail dostal samostatnou URL `/svet/:worldId/info`, gameplay struktura `/svet/:worldId/*` beze změny. `useWorldLink` hook dispatchuje karty (member → `/svet/:id`, jinak → `/info`).
+
+- [x] **Public Detail světa** (`/svet/:worldId/info`) — Almanach kompozice: indicia stripe + H1 ragged-right + 2-sloupcový content (popis s drop cap na desktopu + meta sidebar sticky) + owner sekce.
+- [x] **Member welcome view** — `WorldDashboardPage` upgrade ze stubu (nadpis „Vítej zpět", 4 dlaždice Chat/Stránky/Mapa/Postavy, placeholder).
+- [x] **Join CTA — 5 stavů**: anon (login redirect), public-join (přímý vstup), request-join (Zadatel pending), member („Vstoupit do hry"), closed (disabled).
+- [x] **Join flow** — `POST /api/worlds/:id/join` (BE už existoval) + automatický dispatch podle accessMode (public → Hrac, open/private → Zadatel).
+- [x] **Resolve flow PJ** — `POST /api/worlds/:id/join-requests/:m/accept` (Zadatel→Hrac + playerCount++) a `/reject` (delete membership). Atomicky, JWT, owner + Admin/Superadmin.
+- [x] **WorldJoinRequestProvider** (BE) — implementuje `IPendingActionProvider`, registrován v `WorldsModule.onModuleInit`. Cross-world scope: PJ owner vidí jen své světy, Admin/Superadmin vidí globálně.
+- [x] **WorldJoinRequestRenderer** (FE) — Left (avatar) + Mid (požádá o vstup + worldName link na /info) + Actions (Přijmout + Odmítnout s confirm dialog). Registrace v `PENDING_ACTION_RENDERERS`.
+- [x] **WorldLayout guard** — logged-in non-member (Zadatel + ručně psaná URL) → `Navigate replace` na `/svet/:id/info`. Admin/Superadmin prochází.
+- [x] **Owner populate** v `GET /api/worlds/:id` — `world.owner = { id, username, avatarUrl }`. Smazaný účet → owner undefined (graceful fallback).
+- [x] **Share button** kopíruje `/info` URL (ne current), drží share-link public-friendly.
+- [x] **Tests:** +17 FE (useWorldLink 4, useJoinWorld 2, JoinCTA 6, WorldDetailPage 4, welcome 1, renderer 4) + 2 edit (WorldCard, EventCard dispatch link).
+- [x] **Tests BE:** +9 (acceptJoinRequest 3, rejectJoinRequest 2, findById owner populate 2, provider countForUser 3, listForUser 2, canHandle 1).
+
+**Mimo rozsah (samostatné fáze / dluhy):**
+- 2.5 World settings (edit, hero image upload, manage members)
+- 4.x Real WorldDashboardPage obsah (calendar widget, recent events, online members)
+- D-NEW-2.4-join-resume (anon klik → login → auto-join po návratu)
+- D-NEW-2.4-join-history (audit log odmítnutých žádostí, throttle re-request)
+- D-NEW-2.4-share-og (OG image pro share link)
+- D-NEW-2.4-private-leak-test (integration test: anon GET `/api/worlds/:id` na private world → 404)
+
+**Total: 422 FE testů + 58 BE testů zelené.** lint:colors v 2.4 souborech ✓ (rgba/hex fallbacky vyhozené ve prospěch theme tokenů).
 
 ---
 
