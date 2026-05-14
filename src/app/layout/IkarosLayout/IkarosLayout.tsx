@@ -40,6 +40,7 @@ import { UserAvatar } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
+import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
 import { UserRole, WorldRole } from '@/shared/types';
 
 function PanelCorners() {
@@ -400,6 +401,7 @@ export function IkarosLayout() {
   useSocketInit();
   usePresenceInit();
   useFriendshipsSocket();
+  useWorldAccessSocket();
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);

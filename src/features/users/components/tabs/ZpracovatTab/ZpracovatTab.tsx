@@ -13,7 +13,7 @@ import s from './ZpracovatTab.module.css';
 const GROUP_TITLES: Record<PendingActionType, string> = {
   [PendingActionType.UsernameRequest]: 'Žádosti o změnu přezdívky',
   [PendingActionType.FriendRequest]: 'Žádosti o přátelství',
-  [PendingActionType.WorldJoinRequest]: 'Žádosti o vstup do světa',
+  [PendingActionType.WorldAccessRequest]: 'Žádosti o vstup do světa',
   [PendingActionType.ArticlePendingReview]: 'Články ke schválení',
   [PendingActionType.GalleryPendingReview]: 'Obrázky ke schválení',
   [PendingActionType.DiscussionReport]: 'Hlášené příspěvky',

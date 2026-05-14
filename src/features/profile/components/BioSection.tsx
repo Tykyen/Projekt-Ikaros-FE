@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EditCard } from './EditCard';
 import { useUpdateProfile } from '@/features/profile/api/useProfile';
@@ -28,7 +28,7 @@ export function BioSection({ bio }: Props) {
     form.reset({ bio: bio ?? '' });
   }
 
-  const value = form.watch('bio') ?? '';
+  const value = useWatch({ control: form.control, name: 'bio' }) ?? '';
 
   return (
     <EditCard

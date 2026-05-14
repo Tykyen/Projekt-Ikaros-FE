@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input, UserAvatar } from '@/shared/ui';
 import { EditCard } from './EditCard';
@@ -57,7 +57,7 @@ export function CharacterSection({
     });
   }
 
-  const bioLen = (form.watch('characterBio') ?? '').length;
+  const bioLen = (useWatch({ control: form.control, name: 'characterBio' }) ?? '').length;
 
   return (
     <EditCard

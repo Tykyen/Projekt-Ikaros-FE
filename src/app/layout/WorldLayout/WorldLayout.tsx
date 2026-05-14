@@ -5,8 +5,9 @@ import clsx from 'clsx';
 import s from './WorldLayout.module.css';
 import { WorldContext } from '@/features/world/context/WorldContext';
 import { useWorld } from '@/features/world/api/useWorlds';
+import { useWorldStatus } from '@/features/world/api/useWorldStatus';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { WorldRole } from '@/shared/types';
+import { UserRole, WorldRole } from '@/shared/types';
 import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 
@@ -108,19 +109,30 @@ export function WorldLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const currentUser = useAtomValue(currentUserAtom);
   const { data: world, isLoading } = useWorld(worldId);
+  const { status, membership, isLoading: statusLoading } =
+    useWorldStatus(worldId);
   const nav = useMemo(() => buildNav(worldId), [worldId]);
 
   const isPJ =
     world?.ownerId === currentUser?.id ||
     (currentUser?.role !== undefined && currentUser.role <= 3); // Admin, PJ, Superadmin
+  const isGlobalAdmin =
+    currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
 
-  const ctxValue = useMemo(() => ({
-    worldId,
-    world: world ?? null,
-    isPJ,
-    userRole: null as WorldRole | null,
-    loading: isLoading,
-  }), [worldId, world, isPJ, isLoading]);
+  // Spec 2.4 — full nav jen pro membery (libovolná role 0–5) nebo globální adminy.
+  // Non-member / pending-access vidí light header (jen EXIT + název + accessMode badge).
+  const showFullNav = status === 'member' || isGlobalAdmin;
+
+  const ctxValue = useMemo(
+    () => ({
+      worldId,
+      world: world ?? null,
+      isPJ,
+      userRole: (membership?.role ?? null) as WorldRole | null,
+      loading: isLoading || statusLoading,
+    }),
+    [worldId, world, isPJ, membership, isLoading, statusLoading],
+  );
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);
@@ -141,77 +153,96 @@ export function WorldLayout() {
           </Link>
           {world?.genre && <span className={s.genreBadge}>{world.genre}</span>}
 
-          {/* Desktop nav */}
-          <nav className={s.nav}>
-            {nav.map((group) => (
-              <NavDropdown key={group.label} group={group} onClose={() => {}} />
-            ))}
-          </nav>
+          {/* Spec 2.4 — full nav jen pro membery / globální adminy */}
+          {showFullNav && (
+            <>
+              <nav className={s.nav}>
+                {nav.map((group) => (
+                  <NavDropdown
+                    key={group.label}
+                    group={group}
+                    onClose={() => {}}
+                  />
+                ))}
+              </nav>
 
-          {/* Akce */}
-          <div className={s.actions}>
-            <div className={s.searchBar}>Hledat...</div>
-            {isPJ && (
-              <Link to={`/svet/${worldId}/nova-stranka`} className={s.newPageBtn}>
-                + Nová stránka
-              </Link>
-            )}
-            <Link to="/ikaros/posta" className={s.actionBtn} title="Pošta">✉</Link>
-          </div>
+              <div className={s.actions}>
+                <div className={s.searchBar}>Hledat...</div>
+                {isPJ && (
+                  <Link
+                    to={`/svet/${worldId}/nova-stranka`}
+                    className={s.newPageBtn}
+                  >
+                    + Nová stránka
+                  </Link>
+                )}
+                <Link
+                  to="/ikaros/posta"
+                  className={s.actionBtn}
+                  title="Pošta"
+                >
+                  ✉
+                </Link>
+              </div>
 
-          {/* Hamburger — mobile */}
-          <button
-            className={s.hamburger}
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Otevřít menu"
-          >
-            ☰
-          </button>
+              <button
+                className={s.hamburger}
+                onClick={() => setDrawerOpen(true)}
+                aria-label="Otevřít menu"
+              >
+                ☰
+              </button>
+            </>
+          )}
         </header>
 
-        {/* Mobile drawer (zprava) */}
-        <div
-          className={clsx(s.drawerBackdrop, drawerOpen && s.drawerBackdropOpen)}
-          onClick={() => setDrawerOpen(false)}
-        />
-        <div className={clsx(s.drawer, drawerOpen && s.drawerOpen)}>
-          {isPJ && (
-            <Link
-              to={`/svet/${worldId}/nova-stranka`}
-              className={s.drawerNewPage}
+        {/* Mobile drawer (zprava) — jen pro membery */}
+        {showFullNav && (
+          <>
+            <div
+              className={clsx(s.drawerBackdrop, drawerOpen && s.drawerBackdropOpen)}
               onClick={() => setDrawerOpen(false)}
-            >
-              + Nová stránka
-            </Link>
-          )}
-          {nav.map((group) => (
-            <div key={group.label} className={s.drawerSection}>
-              {'items' in group ? (
-                <>
-                  <div className={s.drawerSectionTitle}>{group.label}</div>
-                  {group.items.map((item) => (
+            />
+            <div className={clsx(s.drawer, drawerOpen && s.drawerOpen)}>
+              {isPJ && (
+                <Link
+                  to={`/svet/${worldId}/nova-stranka`}
+                  className={s.drawerNewPage}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  + Nová stránka
+                </Link>
+              )}
+              {nav.map((group) => (
+                <div key={group.label} className={s.drawerSection}>
+                  {'items' in group ? (
+                    <>
+                      <div className={s.drawerSectionTitle}>{group.label}</div>
+                      {group.items.map((item) => (
+                        <NavLink
+                          key={item.to}
+                          to={item.to}
+                          className={s.drawerLink}
+                          onClick={() => setDrawerOpen(false)}
+                        >
+                          {item.label}
+                        </NavLink>
+                      ))}
+                    </>
+                  ) : (
                     <NavLink
-                      key={item.to}
-                      to={item.to}
+                      to={group.to}
                       className={s.drawerLink}
                       onClick={() => setDrawerOpen(false)}
                     >
-                      {item.label}
+                      {group.label}
                     </NavLink>
-                  ))}
-                </>
-              ) : (
-                <NavLink
-                  to={group.to}
-                  className={s.drawerLink}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  {group.label}
-                </NavLink>
-              )}
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
 
         <main className={s.main}>
           <Outlet />

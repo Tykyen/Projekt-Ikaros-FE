@@ -16,15 +16,6 @@
 
 ## Otevřené
 
-### D-063 — BE: `POST /IkarosNews` autorizace zúžit jen na globální role
-**Soubor:** `Projekt-ikaros/backend/src/modules/ikaros-news/ikaros-news.controller.ts` + service
-**Problém:** Endpoint dnes povoluje i `WorldRole.PJ` (world-scoped role) pro vytvoření platformové novinky. Sémanticky špatně — Ikaros novinky jsou platformový obsah, PJ je role uvnitř konkrétního světa.
-**Dopad:** Nízký — FE už nyní řídí přístup správně (krok 3.1a, jen Admin/Superadmin), takže UI tuto cestu pro PJ neukazuje. Riziko jen pokud někdo zavolá BE přímo s JWT PJ uživatele.
-**Řešení:** Zúžit autorizaci v `IkarosNewsService.create` jen na `UserRole.Admin` + `UserRole.Superadmin`. Případně rozšířit na další globální „obsahové" role po definici matice ve fázi 3.1.
-**Kdy:** Při plné implementaci fáze 3.1 (admin správa novinek).
-
----
-
 ### D-028 (zbývající Redis varianta) — Cache pro `JwtStrategy.validate` ban check
 **Kontext:** In-memory cache uzavřena, single-instance funguje plně. Pro multi-instance deployu nutno swap na Redis pub/sub.
 **Řešení:** Vyměnit `UserBanCacheService` Map za Redis client (`ioredis`); invalidate přes pub/sub channel `user-ban-invalidate`.
@@ -43,31 +34,9 @@
 
 ---
 
-### D-048 — HelpPage content drift
-**Kontext:** Krok 3.6 (Nápověda na `/ikaros/napoveda`) dokumentuje stav platformy k 2026-05-12. Sekce „Stránky" a „FAQ" obsahují ✅/🚧 značky napojené na aktuální fáze. Při každé doručené fázi musí někdo aktualizovat odpovídající položky, jinak nápověda přestane být pravdivá.
-**Řešení:** Do PR checklistu fází 1.5 / 1.7 / 1.8 / 2.x / 3.x přidat položku „aktualizovat HelpPage (sekce Stránky + případně FAQ)". Připadnu i automatizace přes kontrolu obsahu vs roadmap-fe.md (ale stačí discipline v review).
-
----
-
 ### D-051 — Redis adapter pro `OnlinePresenceRegistry`
 **Kontext:** 1.5 registr je in-memory Map<userId, RegistryEntry>. Single-instance only — při multi-instance deployu by každá instance měla vlastní obraz a `presence:update` broadcast by se nepropagoval mezi instancemi.
 **Řešení:** Swap `OnlinePresenceRegistry` Map za Redis hash + použít `@socket.io/redis-adapter` pro multi-instance broadcast. Analogicky k D-028 (cache pro ban check). Až bude potřeba škálování.
-
----
-
-### D-053b — Per-world PJ access v UI/BE check (follow-up D-053)
-**Kontext:** D-053 odstranil `UserRole.PJ` z globálního enumu. Místa, která historicky
-spoléhala na „PJ globally", jsou dočasně zúžena na Sa/Admin (`maps.service.ts`
-moveToken/removeToken, FE `router.tsx` per-world admin routes `admin/stranky`,
-`admin/adresar-postav`). World PJ tímto **ztratil přístup** přes tyto endpointy.
-**Dopad:** Sa/Admin operuje beze změny; world PJ daného světa musí ad-hoc požádat staff
-pro tokenové akce / admin stránky světa, dokud není membership-based guard hotov.
-**Řešení:**
-- BE: rozšířit `maps.service.moveToken/removeToken` o `worldId` param + membership lookup
-  (`WorldMembership.role >= WorldRole.PJ` v daném světě → povolit).
-- FE: nahradit `RoleGuard roles={[Sa, Admin]}` v per-world routes komponentou, která navíc
-  konzultuje `WorldContext.userRole` (membership-based).
-**Kdy:** Před fází 5 (world layer), nebo při explicitní stížnosti world PJ.
 
 ---
 
@@ -91,6 +60,48 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
+### D-061 — Mongo replica set pro atomické transakce v approveAccessRequest (2.4)
+**Soubory:** `backend/src/modules/worlds/worlds.service.ts` (metoda `approveAccessRequest`), `backend/src/database/database.module.ts`
+**Stav:** Otevřený — dev Mongo bez replica setu, transakce nepoužité.
+**Kontext:** Spec 2.4 §4.1 požaduje atomickou operaci (smaž `WorldAccessRequest` + vytvoř `WorldMembership`). Bez replica setu Mongo transakce selžou. Implementace dnes používá **pragmatický fallback**: nejdřív create membership (s unique key check), pak best-effort delete AR. Pokud druhá operace failne, orphan AR v DB — další pokus o approve / cancel ho čistí, výsledek je idempotentní.
+**Dopad:** Velmi nízký v dev. V prod by stačil 1-node replica set (`rs.initiate()` na single instance). Cleanup orphan AR by mohl být cron job.
+**Řešení:** (1) Konfigurovat MongoDB replica set v `database.module.ts` (`replicaSet: 'rs0'`). (2) Upravit `approveAccessRequest` na `connection.startSession().withTransaction(async () => { … })`. (3) Doplnit test pro transaction abort scenario.
+**Kdy:** Před prod nasazením 2.4 (nebo později, pokud orphan AR míra zůstane nízká).
+
+---
+
+### D-062 — Charakter request flow (Čtenář → Žadatel role upgrade, 2.4 → 5+)
+**Soubory:** `src/features/world/*` (in-world UI), `backend/src/modules/worlds/*` (service+controller)
+**Stav:** Otevřený — Žadatel role (0) existuje, ale chybí in-world akce, která promote přivede.
+**Kontext:** Spec 2.4 v2 přesně odděluje pre-membership (`WorldAccessRequest`) od role Žadatel. Po schválení AR se uživatel stane Čtenář; chce-li hrát, musí klika na „Chci postavu" → upgrade Čtenář → Žadatel (čeká na přidělení postavy PJ). Tato akce v 2.4 chybí.
+**Dopad:** Hráčem se dnes uživatel nestává plně — zůstane Čtenář navždy. PJ musí ručně upravit roli (přes settings, 2.5). Out of scope 2.4.
+**Řešení:** Spec fáze 5+ (character flow) — endpoint `POST /worlds/:id/request-character`, který memberovi s rolí Čtenář povýší na Žadatel + vznikne pending action `character_request` ve Zpracovat tabu PJ.
+**Kdy:** Fáze 5+ (character flow).
+
+---
+
+### D-063 — Anon viewing public/open světů (2.4 → samostatná fáze)
+**Soubory:** `src/app/router.tsx` (loader `requireAuth` na `/svet/:worldId`), `backend/src/modules/worlds/worlds.controller.ts` (`OptionalJwtAuthGuard`)
+**Stav:** Otevřený — anon nevidí žádný detail.
+**Kontext:** Spec 2.3 §4.4 říká „public = kdokoliv vidí, kdokoliv se přidá". V 2.4 ale `/svet/:worldId` celá za `requireAuth` (loader) → anon redirectne na `/?openLogin=1`. BE už podporuje anon GET `/worlds/:id` (přes `OptionalJwtAuthGuard`), problém je čistě FE routing.
+**Dopad:** Anon přijde z venku přes přímý link → musí se přihlásit, i když by kvůli public světu nemusel. Mírný onboarding friction.
+**Řešení:** (1) Odebrat `loader: requireAuth` z route `/svet/:worldId` v `router.tsx`. (2) Sub-routes nech za `requireAuth` (membership stejně vyžaduje login). (3) Light header zobrazit i pro anon. (4) JoinCTA pro anon → tlačítko „Přihlásit se a vstoupit" (otevře LoginModal).
+**Kdy:** Samostatná malá iterace 2.4b nebo v rámci 2.5.
+
+---
+
+### D-064 — Leave world flow (self-leave pro Ctenar+, 2.4 → 2.5)
+**Soubory:** `backend/src/modules/worlds/worlds.controller.ts` (`DELETE /:worldId/members/me`), `src/features/world/components/MemberDashboardStub`
+**Stav:** Otevřený — existuje stará `leave(membershipId)` endpoint pro PJ removal, ale chybí self-leave UI.
+**Kontext:** Po join do public světa nemá uživatel jak ze světa zase odejít. Operace musí být:
+- Pro Čtenář/Hráč: smazat vlastní membership, redirect na `/`.
+- Pro PJ: zákaz (musí předat svět nebo smazat).
+**Dopad:** Trapped state — user vstoupí, pak se chce odhlásit, ale není možno.
+**Řešení:** (1) BE endpoint `DELETE /worlds/:id/members/me` (self-leave). (2) FE tlačítko „Odejít ze světa" v MemberDashboardStub / settings (2.5). (3) Confirm dialog. (4) Po success redirect na `/`.
+**Kdy:** 2.5 (world settings).
+
+---
+
 ### D-060 — Cross-world kalendář link (2.1 → 9.2)
 **Soubory:** `src/features/ikaros/pages/DashboardPage/sections/UpcomingEventsSection.tsx`
 **Stav:** Otevřený, čeká na fázi 9.2 (Kalendář).
@@ -98,19 +109,18 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
-### D-061 — BE `GET /api/IkarosNews` paginace
-**Soubory:** `backend/src/modules/ikaros-news/ikaros-news.controller.ts`
-**Stav:** Otevřený, lazy — provede se pokud novinek bude víc než ~50.
-**Kontext:** Dnes endpoint vrací **všechny aktivní novinky** bez paginace; FE provádí `slice(0, 5)` v `PlatformNewsSection`. Pro fázi 3.1 (stránka novinek s "Zobrazit všechny") bude potřeba `?limit=&offset=`. Není urgent — dnes je v DB ~0 novinek.
-
----
-
 ## Částečně řešené (zbývající práce)
 
-### D-009 — BE `code` field v error responses (rolling, většina hotová)
-**Soubor:** `Projekt-ikaros/backend/src/modules/**/*.service.ts`
-**Stav:** **Batch 1** (1.3a): 7 míst (ConflictException codes). **Batch 2** (post-1.3b, 2026-05-12): 350 exceptions (NotFound/Forbidden/BadRequest) batch transform script → 27 service souborů.
-**Zbývá:** ~19 exceptions s komplexnějšími patterns (template literals s ${}, multi-line msg, nested expressions). Doplnit při dalším šťouchu do těchto míst.
+### D-009 — BE `code` field v error responses (DOKONČENO 2026-05-14)
+**Stav:** **0 zbývajících** plain string exceptions v `backend/src` — ověřeno greepem.
+**Historie:**
+- **Batch 1** (1.3a): 7 míst (ConflictException codes).
+- **Batch 2** (post-1.3b, 2026-05-12): 350 exceptions batch transform script → 27 service souborů.
+- **Batch 3** (2026-05-14, várka A): 5 menších modulů — `universe`, `calendars`, `npc-templates`, `dungeon-maps`, `emotes` (vč. template-literal). +3 z D-063 šťouchu: `world-currencies` ×2 + `ikaros-news`.
+- **Batch 4** (2026-05-14, várka B): `world-calendar-config` (5), `sounds` (15), `world-news` (10 vč. 2 multi-line).
+- **Batch 5** (2026-05-14, finální sweep): `chat` (36), `pages` (12), `maps` (12), `character-subdocs` (12), `timeline` (11), `characters` (10), `ikaros-articles` (16), `ikaros-discussions` (16), `ikaros-gallery` (16), `world-weather` (16), `users.service` (14), `ikaros-messages` (8), `auth.service` (7), `campaign.service` (24), `users.controller` (8), `world-currencies` (5 zbylých), `map-templates.controller` (5), `worlds.controller` (2), `legacy-calenders.controller` (2), `upload.controller` (2), `campaign.controller` (1), `game-events.controller` (1), `global-chat.service` (1), `system-presets.controller` (1), `admin.guard` (1). Celkem **~240 míst** přes 25 souborů, **BE 942/942 testů zelených**, tsc čistý.
+**Codes konvence (etablovaná):** `{MODULE}_{ENTITY}_NOT_FOUND` (např. `CAMPAIGN_SUBJECT_NOT_FOUND`, `MAP_SCENE_NOT_FOUND`), `{MODULE}_FORBIDDEN` / `{MODULE}_ACCESS_DENIED` pro auth, sdílené `WORLD_NOT_FOUND`, `USER_NOT_FOUND`, `NOT_WORLD_MEMBER`, `PENDING_MEMBERSHIP`, `INVALID_CREDENTIALS`, `INVALID_REFRESH_TOKEN` napříč moduly.
+**Drobné nesrovnalosti k diskuzi:** `map-templates.controller.ts:68/85/97` házelo `NotFoundException` pro forbidden — *sémanticky špatně*, nesahal jsem (mimo D-009 scope). Při dalším šťouchu do `maps` přepsat na `ForbiddenException` (+ `CAMPAIGN_FORBIDDEN` pattern).
 
 ---
 

@@ -301,6 +301,12 @@ export interface World {
   favoritePageSlugs: string[];
   createdAt: string;
   updatedAt: string;
+  /** Spec 2.4 — populated jen při `GET /worlds/:id` / `GET /worlds/slug/:slug`. */
+  owner?: {
+    id: string;
+    username: string;
+    avatarUrl?: string;
+  };
 }
 
 export interface WorldMembership {
@@ -455,7 +461,7 @@ export interface PublicUsersQuery {
 export enum PendingActionType {
   UsernameRequest = 'username_request',
   FriendRequest = 'friend_request',
-  WorldJoinRequest = 'world_join_request',
+  WorldAccessRequest = 'world_access_request',
   ArticlePendingReview = 'article_pending_review',
   GalleryPendingReview = 'gallery_pending_review',
   DiscussionReport = 'discussion_report',
@@ -469,6 +475,46 @@ export interface PendingActionsCountResponse {
 export interface PendingActionsListResponse<T = unknown> {
   items: T[];
   total: number;
+}
+
+// ── Spec 2.4 — World access requests (pre-membership) ─────────────────────
+
+/**
+ * Pre-membership entita pro vstup do open/private světů. Žadatel zatím není
+ * členem; PJ schvaluje ve Zpracovat tabu (`world_access_request`).
+ *
+ * Sémantika rolí (PJ 2026-05-14): Žadatel jako role (WorldRole.Zadatel=0) ≠
+ * tato entita. Žadatel = člen čekající na postavu (fáze 5+).
+ */
+export interface WorldAccessRequest {
+  id: string;
+  worldId: string;
+  userId: string;
+  requestedAt: string;
+}
+
+export interface MyWorldAccessRequest {
+  accessRequest: WorldAccessRequest;
+  world: {
+    id: string;
+    name: string;
+    slug: string;
+    accessMode: World['accessMode'];
+  };
+}
+
+/** Payload karty v Zpracovat tabu (`world_access_request`). */
+export interface WorldAccessRequestListItem {
+  accessRequestId: string;
+  worldId: string;
+  worldName: string;
+  worldSlug: string;
+  requestedAt: string;
+  requester: {
+    id: string;
+    username: string;
+    avatarUrl?: string;
+  };
 }
 
 // ── Spec 1.8 — Přátelé ─────────────────────────────────────────────────────

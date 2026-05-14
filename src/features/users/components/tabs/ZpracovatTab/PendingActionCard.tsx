@@ -9,7 +9,7 @@ import s from './PendingActionCard.module.css';
  *
  * Konkrétní rendery (renderer registry) skládají L/Mid/R sloty pro daný
  * typ akce. 1.4 implementuje jen `UsernameRequestRenderer`. Další fáze
- * (1.8 friend_request, 2.4 world_join_request, 3.x content review)
+ * (1.8 friend_request, 2.4 world_access_request, 3.x content review)
  * přidají vlastní rendery.
  */
 export interface PendingActionRenderer<T> {

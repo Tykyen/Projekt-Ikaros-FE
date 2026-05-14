@@ -1,0 +1,110 @@
+/* Spec 2.4 — Hero banner pro detail světa. Reuse skin tokenů. */
+
+.heroWithImage,
+.heroPlaceholder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: var(--surface-2);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-md);
+}
+
+.heroPlaceholder {
+  background-image: linear-gradient(
+    135deg,
+    var(--surface-2) 0%,
+    var(--surface-1) 100%
+  );
+}
+
+/* Overlay = ztmavění obrazu pro čitelnost textu. Pro placeholder (bez image)
+   stačí surface-1 gradient; pro image variantu použij accent overlay. */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 40%,
+    color-mix(in srgb, var(--surface-1) 92%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+.content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.accessBadge,
+.genreBadge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+
+.accessBadge {
+  background: var(--accent);
+  color: var(--accent-fg, var(--surface-1));
+}
+
+.accessBadge[data-mode='private'] {
+  background: var(--text-muted);
+  color: var(--surface-1);
+}
+
+.accessBadge[data-mode='closed'] {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--frame-border);
+}
+
+.genreBadge {
+  background: color-mix(in srgb, var(--surface-1) 60%, transparent);
+  color: var(--text-primary);
+  border: 1px solid var(--frame-border);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+@media (max-width: 768px) {
+  .heroWithImage,
+  .heroPlaceholder {
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+  }
+
+  .content {
+    padding: 14px 16px;
+  }
+
+  .title {
+    font-size: clamp(22px, 6vw, 32px);
+  }
+}

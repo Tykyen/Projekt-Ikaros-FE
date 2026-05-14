@@ -474,10 +474,36 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - ✅ **D-NEW-tooltips** — `PillChips` má volitelný prop `descriptions: Record<string, string>`. Pokud existuje match, chip dostane native `title` attribut (hover desktop / long-press mobil) + viditelný `?` indikátor uvnitř chipu (vpravo, `currentColor` border, opacity 0.55). `TONE_DESCRIPTIONS` (24 + Vlastní) a `DICE_DESCRIPTIONS` (13) jako konstanty. GenreSection + SystemSection propnou popisky do PillChips. Žádný custom Tooltip overlay — native browser tooltip stačí pro MVP.
 - Celkem **+5 FE testů** (4 useSlugAvailability + 1 quota toast), +6 BE testů (3 isSlugAvailable + 3 quota). Total: 400 FE + 45 worlds.service ✓.
 
-### - [ ] 2.4 Detail světa + join flow (`/svet/:worldId`)
-- [ ] Informace o světě
-- [ ] Join tlačítko (public = přímé, private = žádost)
-- [ ] **Žádost o vstup do private světa** → queue typ `world_join_request` ve Zpracovat tabu PJ vlastníka (infra z 1.4). `WorldJoinRequestProvider implements IPendingActionProvider`. Renderer karty: avatar žadatele + název světa + tlačítka Přijmout/Odmítnout.
+### - [x] 2.4 Detail světa + join flow (`/svet/:worldId`) ✅ (2026-05-14)
+
+**Spec:** [spec-2.4.md](arch/phase-2/spec-2.4.md), **Plán:** [plan-2.4.md](arch/phase-2/plan-2.4.md)
+
+- [x] Informace o světě (hero + popis + tóny/kostky chips + stats)
+- [x] Join tlačítko (public = přímý join jako **Čtenář**, open/private = `WorldAccessRequest` žádost)
+- [x] **`WorldAccessRequest` pre-membership entita** — nová Mongo kolekce `worldaccessrequests` s unique indexem `(worldId, userId)`. Po schválení vznikne `WorldMembership` s rolí `Ctenar`.
+- [x] **Žádost o vstup do open/private světa** → queue typ `world_access_request` ve Zpracovat tabu PJ vlastníka (přejmenováno z `world_join_request`). `WorldAccessRequestProvider implements IPendingActionProvider`. Renderer karty: avatar žadatele + název světa + tlačítka Přijmout/Odmítnout.
+- [x] **WorldLayout split** — non-member/pending-access vidí *light header* (EXIT + název + accessMode badge), member plný nav.
+- [x] **Sub-route guard** — `/svet/:id/chat`, `/stranky`, …, `/pravidla` chráněné `WorldMembershipGuard(minWorldRole=Ctenar, redirectTo='/svet/:worldId')` (non-member redirect na index detail-page).
+- [x] **Private 404 scoping** — `GET /worlds/:id` pro private vrátí 404 non-memberovi bez pending AR (= GitHub private repo pattern, neprozradí existenci).
+- [x] **WS eventy:** `world:access-requested/approved/rejected/cancelled` (specifické místo reuse `membership:changed` kvůli per-akci toastům, konzistence s `friend:request:*`).
+- [x] **BE testy:** 956 passed (worlds.service +12 cases pro joinPublic/requestAccess/cancel/approve/reject/findMyAccessRequests/findByIdForRequester).
+
+**Sémantika rolí (PJ 2026-05-14, mění od původního v1 draftu):**
+- `WorldAccessRequest` = pre-membership entita, žadatel zatím **není** člen.
+- `Čtenář` (1) = první role po schválení (= „má přístup, jen čte").
+- `Žadatel` (0) = člen čekající na **postavu** (fáze 5+). Není pre-membership stav.
+
+**Uzavírá dluhy:** D-053b membership guard rozšířen o `redirectTo` prop.
+
+**Mimo rozsah (samostatné fáze / dluhy):**
+- 2.5 World settings (edit světa, hero upload, leave world, accessMode toggle, promote rolí).
+- Fáze 5+ Žádost o postavu (Čtenář → Žadatel role upgrade) — nový character flow.
+- **D-NEW-character-request** (in-world akce „Žádám PJ o postavu").
+- **D-NEW-anon-world-detail** (logged-out viewing public/open detailu).
+- **D-NEW-leave-world** (self-leave pro Ctenar+, ne PJ).
+- **D-NEW-mongo-replica-set** (atomická transakce v approveAccessRequest — dnes pragmatický fallback).
+- **D-NEW-world-invites** (pozvánky PJ → konkrétní user).
+- **D-NEW-bulk-pending** (bulk approve/reject ve Zpracovat tabu).
 
 ---
 
