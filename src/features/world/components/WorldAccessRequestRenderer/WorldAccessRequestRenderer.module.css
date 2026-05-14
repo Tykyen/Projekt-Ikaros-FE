@@ -1,0 +1,46 @@
+/* Spec 2.4 — WorldAccessRequestRenderer. Reuse skin tokenů, sjednoceno s FriendRequestRenderer. */
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.typeLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.timestamp {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.title {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--theme-text, var(--text-primary));
+}
+
+.title strong {
+  color: var(--theme-accent-bright, var(--accent-bright));
+  font-weight: var(--weight-semi);
+}
+
+.worldLink {
+  color: var(--theme-accent, var(--accent));
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+.worldLink:hover {
+  text-decoration: underline;
+}
