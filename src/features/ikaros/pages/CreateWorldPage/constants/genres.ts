@@ -5,8 +5,10 @@
  */
 export const GENRES = [
   'Fantasy',
+  'Dark Fantasy',
   'Sci-Fi',
   'Cyberpunk',
+  'Steampunk',
   'Post-apokalypsa',
   'Horror',
   'Mystery',
