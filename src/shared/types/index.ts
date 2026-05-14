@@ -292,6 +292,8 @@ export interface World {
   isActive: boolean;
   accessMode: 'public' | 'private' | 'open' | 'closed';
   playerCount: number;
+  /** 2.2 — volitelná max kapacita pro sort "volná místa" + 2.3 wizard. */
+  maxPlayers?: number | null;
   favoritePageSlugs: string[];
   createdAt: string;
   updatedAt: string;

@@ -96,31 +96,29 @@ beforeEach(() => {
 });
 
 describe('DashboardPage', () => {
-  it('anon: zobrazuje welcome a Novinky, neukáže Moje světy ani Schůzky', async () => {
+  it('anon: welcome + Novinky, žádné Akce', async () => {
     renderAt({ token: null });
     await waitFor(() => {
       expect(screen.getByText(/Vítej v/)).toBeInTheDocument();
     });
     expect(screen.getByText('Novinky')).toBeInTheDocument();
+    expect(screen.queryByText('Akce')).toBeNull();
     expect(screen.queryByText('Moje světy')).toBeNull();
-    expect(screen.queryByText('Blížící se schůzky')).toBeNull();
   });
 
-  it('logged-in: zobrazuje 3 sekce v pořadí Světy → Schůzky → Novinky', async () => {
+  it('logged-in: welcome + Akce + Novinky (žádná sekce Moje světy)', async () => {
     renderAt({ token: 'token123' });
     await waitFor(() => {
-      expect(screen.getByText('Moje světy')).toBeInTheDocument();
+      expect(screen.getByText(/Vítej v/)).toBeInTheDocument();
     });
-    expect(screen.getByText('Blížící se schůzky')).toBeInTheDocument();
+    expect(screen.getByText('Akce')).toBeInTheDocument();
     expect(screen.getByText('Novinky')).toBeInTheDocument();
-    expect(screen.queryByText(/Vítej v/)).toBeNull();
+    expect(screen.queryByText('Moje světy')).toBeNull();
 
     const headings = screen.getAllByRole('heading', { level: 3 });
     const titles = headings.map((h) => h.textContent);
-    const worldsIdx = titles.findIndex((t) => t?.includes('Moje světy'));
-    const eventsIdx = titles.findIndex((t) => t?.includes('Blížící se'));
+    const eventsIdx = titles.findIndex((t) => t?.includes('Akce'));
     const newsIdx = titles.findIndex((t) => t?.includes('Novinky'));
-    expect(worldsIdx).toBeLessThan(eventsIdx);
     expect(eventsIdx).toBeLessThan(newsIdx);
   });
 });

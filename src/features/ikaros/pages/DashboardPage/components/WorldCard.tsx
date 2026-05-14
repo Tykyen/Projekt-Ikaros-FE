@@ -6,17 +6,20 @@ import s from './WorldCard.module.css';
 
 interface WorldCardProps {
   world: World;
-  membership: WorldMembership;
+  membership?: WorldMembership;
+}
+
+function formatPlayers(playerCount: number, maxPlayers?: number | null): string {
+  if (maxPlayers != null) {
+    return `${playerCount} / ${maxPlayers} hráčů`;
+  }
+  if (playerCount === 1) return '1 hráč';
+  if (playerCount >= 2 && playerCount <= 4) return `${playerCount} hráči`;
+  return `${playerCount} hráčů`;
 }
 
 export function WorldCard({ world, membership }: WorldCardProps) {
-  const players =
-    world.playerCount === 1
-      ? '1 hráč'
-      : world.playerCount >= 2 && world.playerCount <= 4
-        ? `${world.playerCount} hráči`
-        : `${world.playerCount} hráčů`;
-
+  const isMember = membership !== undefined;
   return (
     <Link to={`/svet/${world.id}`} className={s.card}>
       <div className={s.top}>
@@ -32,13 +35,15 @@ export function WorldCard({ world, membership }: WorldCardProps) {
           <div className={s.metaRow}>
             {world.genre && <span>{world.genre}</span>}
             {world.genre && <span aria-hidden="true">·</span>}
-            <span>{players}</span>
+            <span>{formatPlayers(world.playerCount, world.maxPlayers)}</span>
           </div>
-          <WorldRoleChip role={membership.role} size="sm" />
+          {membership && <WorldRoleChip role={membership.role} size="sm" />}
         </div>
       </div>
       {world.description && <p className={s.description}>{world.description}</p>}
-      <span className={s.cta}>Vstoupit do světa →</span>
+      <span className={s.cta}>
+        {isMember ? 'Vstoupit do světa →' : 'Detail světa →'}
+      </span>
     </Link>
   );
 }

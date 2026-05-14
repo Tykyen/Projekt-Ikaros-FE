@@ -24,9 +24,9 @@ const FAQ: FaqItem[] = [
             tlačítky „Prozkoumat světy" a „Vytvořit svět".
           </li>
           <li>
-            <strong>Blížící se schůzky</strong> — 5 nejbližších herních
+            <strong>Akce</strong> — 5 nejbližších herních
             událostí napříč všemi tvými světy, seřazené podle data. U
-            každé schůzky můžeš kliknout na „Půjdu" a přihlásit se. Klik
+            každé akce můžeš kliknout na „Půjdu" a přihlásit se. Klik
             na řádek tě přesune do konkrétního světa.
           </li>
           <li>

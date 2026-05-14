@@ -414,9 +414,26 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 
 **Mimo rozsah (samostatné fáze):** Správa novinek (3.1), 3-stavový RSVP (9.1), detail eventu (9.1), cross-world kalendář (9.2), stránka `/ikaros/novinky` (3.1).
 
-### - [ ] 2.2 Přehled světů (`/ikaros/vesmiry`)
-- [ ] Mřížka světů (vlastní + veřejné)
-- [ ] Filtry (public/private/closed), search
+### - [x] 2.2 Přehled vesmírů (`/ikaros/vesmiry`) ✅ (2026-05-13)
+
+**Spec:** `docs/arch/phase-2/spec-2.2.md`
+
+- [x] **BE:** `World.maxPlayers?: number` (min 1, max 999, default null) — schema + interface + DTO (create/update) + repo toEntity mapping
+- [x] **FE typy:** `World.maxPlayers` v `src/shared/types/index.ts`
+- [x] **FE `WorldsPage/` složka** — orchestrátor + `WorldsToolbar` (search + filter chip + sort dropdown) + reuse `WorldCard` z 2.1 (`membership` volitelný — anon dostane "Detail světa →" místo "Vstoupit")
+- [x] **WorldCard úprava:** zobrazuje `X / Y hráčů` pokud `maxPlayers != null`, jinak `X hráčů` (singulár/paukal/plural). Role chip jen pro logged-in member.
+- [x] **Visibility:** anon vidí public/open (BE `OptionalJwtAuthGuard`), logged-in navíc moje světy (merge `usePublicWorlds` + `useMyWorlds` přes `Map<worldId, World>`)
+- [x] **Search:** debounce-free substring match `world.name` (case-insensitive `cs`)
+- [x] **Filter chip group:** Vše / Veřejné (public+open) / Mé světy (logged-in only)
+- [x] **Sort dropdown:** Nejnovější (createdAt DESC, default) / Abecedně (name ASC `cs`) / Volná místa (`(maxPlayers ?? 0) - playerCount` DESC)
+- [x] **URL state:** `?q=&filter=&sort=` (replace: true, back/forward funguje)
+- [x] **Sidebar update:** "Zobrazit vše →" pro 0+světové, "Prozkoumat světy →" pro 0-světové (i anon) — vše vede na `/ikaros/vesmiry`
+- [x] **Responsivita:** 2col grid → 1col @ 768 px; touch targety filter chip + sort select 44px+ na mobilu
+- [x] **Empty state:** "Žádné světy odpovídající filtru." / "Zatím tu nejsou žádné aktivní světy."
+- [x] **Loading skeleton:** 3 placeholder cards
+- [x] **FE testy:** +12 nových (6 WorldsToolbar + 4 WorldsPage + 2 WorldCard update). Celkem 336 FE testů zelených.
+
+**Mimo rozsah (samostatné fáze):** Wizard pro nastavení `maxPlayers` (2.3), join flow (2.4), pagination (až bude víc světů), genre/tones filtr, server-side search.
 
 ### - [ ] 2.3 Vytvoření světa (`/ikaros/vytvorit-svet`)
 - [ ] Wizard: název/slug/žánr/popis → přístupový režim → RPG systém preset

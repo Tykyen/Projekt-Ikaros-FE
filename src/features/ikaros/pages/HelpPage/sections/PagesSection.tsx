@@ -19,7 +19,7 @@ const IKAROS_PAGES: PageDoc[] = [
     name: 'Úvodník',
     status: 'ok',
     who: 'Všichni (anon i přihlášený)',
-    what: 'Vstupní stránka platformy. Anonymní vidí uvítací kartu a novinky platformy. Po přihlášení nahrazuje uvítání rozcestník: Moje světy (karty s obrázkem, tvou rolí ve světě a tlačítkem Vstoupit), Blížící se schůzky (až 5 nejbližších eventů napříč všemi tvými světy, s tlačítkem Půjdu) a Novinky platformy.',
+    what: 'Vstupní stránka platformy. Uvítací karta pro všechny + boxíky Akce (5 nejbližších herních událostí napříč tvými světy, s tlačítkem Půjdu — jen po přihlášení) a Novinky platformy vedle sebe.',
   },
   {
     path: '/ikaros/napoveda',
@@ -41,6 +41,13 @@ const IKAROS_PAGES: PageDoc[] = [
     status: 'ok',
     who: 'Přihlášený (vlastník účtu)',
     what: 'Sedm sekcí: hlavička, něco o mně, postava v Rozcestí, moje světy, komunitní stopa, bezpečnost (heslo, žádost o změnu přezdívky), účet (smazání).',
+  },
+  {
+    path: '/ikaros/vesmiry',
+    name: 'Přehled vesmírů',
+    status: 'ok',
+    who: 'Všichni (anon vidí public/open, přihlášený navíc své)',
+    what: 'Mřížka aktivních světů platformy. Search podle názvu, filtr Vše / Veřejné / Mé světy (přihlášený), řazení podle data vzniku / abecedy / volných míst. URL si pamatuje nastavení. Kliknutím na kartu otevřeš detail světa.',
   },
   {
     path: '/ikaros/uzivatele',
@@ -66,14 +73,6 @@ const IKAROS_PAGES: PageDoc[] = [
 ];
 
 const SOON_IKAROS: PageDoc[] = [
-  {
-    path: '/ikaros/vesmiry',
-    name: 'Přehled vesmírů',
-    status: 'soon',
-    fáze: 'Fáze 2.2',
-    who: 'Všichni',
-    what: 'Mřížka veřejných + vlastních světů, filtry (public/private/closed), search.',
-  },
   {
     path: '/ikaros/vytvorit-svet',
     name: 'Vytvořit svět',

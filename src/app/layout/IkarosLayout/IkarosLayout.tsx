@@ -143,13 +143,14 @@ function SidebarContent({
               )}
             </Link>
           ))}
-          {(worlds?.length ?? 0) > 0 && (
+          {(worlds?.length ?? 0) > 0 ? (
             <Link to="/ikaros/vesmiry" className={s.showAllLink} onClick={onNav}>
               Zobrazit vše →
             </Link>
-          )}
-          {(worlds?.length ?? 0) === 0 && !isAuthenticated && (
-            <p className={s.emptyHint}>Žádné dostupné světy</p>
+          ) : (
+            <Link to="/ikaros/vesmiry" className={s.showAllLink} onClick={onNav}>
+              Prozkoumat světy →
+            </Link>
           )}
         </div>
       </div>

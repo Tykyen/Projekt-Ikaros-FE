@@ -7,6 +7,19 @@
   margin: 0 auto;
 }
 
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}
+
 .page > * {
   animation: fadeUp 360ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
 }

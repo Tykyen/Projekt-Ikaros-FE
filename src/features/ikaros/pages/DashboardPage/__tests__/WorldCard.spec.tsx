@@ -39,10 +39,13 @@ function makeMembership(role: WorldRole): WorldMembership {
   };
 }
 
-function renderCard(world: World, role: WorldRole = WorldRole.Hrac) {
+function renderCard(world: World, role: WorldRole | null = WorldRole.Hrac) {
   return render(
     <MemoryRouter>
-      <WorldCard world={world} membership={makeMembership(role)} />
+      <WorldCard
+        world={world}
+        membership={role === null ? undefined : makeMembership(role)}
+      />
     </MemoryRouter>,
   );
 }
@@ -94,8 +97,20 @@ describe('WorldCard', () => {
     expect(link.getAttribute('href')).toBe('/svet/w1');
   });
 
-  it('CTA tlačítko obsahuje "Vstoupit do světa"', () => {
+  it('CTA tlačítko obsahuje "Vstoupit do světa" pokud je člen', () => {
     renderCard(makeWorld());
     expect(screen.getByText(/Vstoupit do světa/)).toBeInTheDocument();
+  });
+
+  it('anon (bez membership): CTA "Detail světa", žádný role chip', () => {
+    renderCard(makeWorld(), null);
+    expect(screen.getByText(/Detail světa/)).toBeInTheDocument();
+    expect(screen.queryByText(/Vstoupit do/)).toBeNull();
+    expect(screen.queryByText(/Hráč/)).toBeNull();
+  });
+
+  it('maxPlayers: zobrazuje "X / Y hráčů"', () => {
+    renderCard(makeWorld({ playerCount: 3, maxPlayers: 6 }));
+    expect(screen.getByText('3 / 6 hráčů')).toBeInTheDocument();
   });
 });

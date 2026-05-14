@@ -14,7 +14,7 @@ export function UpcomingEventsSection() {
       variant="news"
       header={
         <SectionHeader
-          title="Blížící se schůzky"
+          title="Akce"
           icon={<CalendarClock size={20} aria-hidden="true" />}
           action={
             data && data.length > 0 ? (
@@ -25,18 +25,18 @@ export function UpcomingEventsSection() {
       }
     >
       {isPending && (
-        <div className={s.skeleton} aria-label="Načítám události">
+        <div className={s.skeleton} aria-label="Načítám akce">
           <div className={s.skeletonRow} />
           <div className={s.skeletonRow} />
         </div>
       )}
 
       {isError && (
-        <p className={s.empty}>Nepodařilo se načíst události.</p>
+        <p className={s.empty}>Nepodařilo se načíst akce.</p>
       )}
 
       {data && data.length === 0 && (
-        <p className={s.empty}>Žádné nadcházející schůzky.</p>
+        <p className={s.empty}>Žádné nadcházející akce.</p>
       )}
 
       {data && data.length > 0 && (

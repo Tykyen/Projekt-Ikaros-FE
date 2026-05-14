@@ -8,7 +8,6 @@ import {
   forgotPasswordModalOpenAtom,
 } from '@/shared/store/authStore';
 import { AnonWelcomeSection } from './sections/AnonWelcomeSection';
-import { WorldsSection } from './sections/WorldsSection';
 import { UpcomingEventsSection } from './sections/UpcomingEventsSection';
 import { PlatformNewsSection } from './sections/PlatformNewsSection';
 import s from './DashboardPage.module.css';
@@ -47,10 +46,11 @@ export default function DashboardPage() {
 
   return (
     <div className={s.page}>
-      {!isAuthenticated && <AnonWelcomeSection />}
-      {isAuthenticated && <WorldsSection />}
-      {isAuthenticated && <UpcomingEventsSection />}
-      <PlatformNewsSection />
+      <AnonWelcomeSection />
+      <div className={s.twoCol}>
+        {isAuthenticated && <UpcomingEventsSection />}
+        <PlatformNewsSection />
+      </div>
     </div>
   );
 }
