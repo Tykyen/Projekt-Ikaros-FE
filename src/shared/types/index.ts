@@ -287,6 +287,10 @@ export interface World {
   imageUrl?: string;
   genre?: string;
   tones?: string[];
+  /** 2.3 — volný text „koho hledáte" pro listing/karty. */
+  playersWanted?: string;
+  /** 2.3 — multi-select kostek/mechanik (z `CreateWorldPage`). */
+  dice?: string[];
   system: string;
   ownerId: string;
   isActive: boolean;

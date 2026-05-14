@@ -442,8 +442,34 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 
 **Mimo rozsah (samostatné fáze):** Wizard pro nastavení `maxPlayers` (2.3), join flow (2.4), pagination (až bude víc světů), genre/tones filtr, server-side search.
 
-### - [ ] 2.3 Vytvoření světa (`/ikaros/vytvorit-svet`)
-- [ ] Wizard: název/slug/žánr/popis → přístupový režim → RPG systém preset
+### - [x] 2.3 Vytvoření světa (`/ikaros/vytvorit-svet`) ✅ (2026-05-14)
+
+**Spec:** `docs/arch/phase-2/spec-2.3.md`, **Plán:** `docs/arch/phase-2/plan-2.3.md`
+
+- [x] **BE:** `CreateWorldDto` přijímá `tones`, `playersWanted`, `dice` (+ `MaxLength` pro description a playersWanted). `UpdateWorldDto` měl pole už dříve. Service `create` spreaduje `...dto` → propagace zdarma.
+- [x] **BE:** 1 nový unit test (`forwards tones/dice/playersWanted to worldsRepo.save`). Celkem 39 worlds.service testů ✓.
+- [x] **FE typy:** `World.playersWanted?: string` a `World.dice?: string[]` v `src/shared/types/index.ts`.
+- [x] **FE hook:** `useCreateWorld` (`POST /worlds`, invalidates `['worlds','public'|'my']`).
+- [x] **FE design:** směr „Workshop" (po frontend-design auditu) — 2col card grid, pill chips místo checkboxů, sticky footer s blur, žádné progress dots, žádné ornamenty.
+- [x] **FE struktura:** `CreateWorldPage/` složka — orchestrátor + 5 sekčních komponent (`BasicInfo`, `Genre`, `Players`, `Access`, `System`) + sdílený `SectionCard` (s pořadovým číslem ①–⑤ jako vodoznak) + reusable `PillChips` (multi-select) + `useWorldSlug` (cs translit + dirty flag).
+- [x] **FE konstanty:** 4 soubory — `genres` (10 + Vlastní), `tones` (24 + Vlastní), `dice` (13), `systems` (13 RPG presetů, default `matrix`).
+- [x] **13 herních systémů:** Matrix / D&D 5e / Jeskyně a Draci / Dračí Doupě 1.6 / DrD Plus / DrD II / Dračí Hlídka / Příběhy Impéria / Shadowrun / GURPS / Fate / Call of Cthulhu / Vlastní (mapping na BE `system-presets`; chybějící presety → empty diarySchema).
+- [x] **„Vlastní" volba** pro Žánr / Tón / Systém vyvolá free-text input; jeho hodnota putuje do BE místo labelu „Vlastní".
+- [x] **Auto-slug** z názvu s cs transliterací (š→s, č→c, ř→r…), max 40 znaků. Po manuálním editu dirty flag zastaví auto-derive.
+- [x] **Validace:** Název 2–60 / Adresa 2+ / Žánr required / Systém required. Submit disabled-tooltip „Vyplň: X, Y" identifikuje chybějící pole.
+- [x] **Submit flow:** sonner toast „Svět «name» byl vytvořen." + `navigate('/svet/:id')`. 409 `WORLD_SLUG_TAKEN` → toast „Adresa už existuje, zvol jinou."
+- [x] **Animace:** stagger reveal sekce 0/80/160/240/320 ms, respekt `prefers-reduced-motion: reduce`.
+- [x] **Responsivita:** 2col → 1col @ 1024 px, padding tighter @ 768 px, touch target pill chips 44px+ na mobilu.
+- [x] **Vizuální vrstva 100% skin-agnostická** — `var(--surface-*)`, `var(--frame-border)`, `var(--accent)`, `var(--text-*)`. Žádné hardcoded barvy v novém kódu.
+- [x] **+12 FE testů:** useWorldSlug 6 (translit, dirty flag, length cap), PillChips 3 (toggle add/remove + aria-pressed), CreateWorldPage 3 (submit blocked → enabled → mutation called; slug auto-derive a manual override; Vlastní žánr free-text submitted). Celkem 395 FE testů ✓.
+- [x] `npx tsc --noEmit`, `npm run build`, `npm run test:run` ✓.
+
+**Mimo rozsah (samostatné fáze / dluhy):**
+- 2.4 Detail světa + join flow
+- 2.5 World settings (edit existujícího světa, hero image upload)
+- **D-NEW-tooltips** — help tooltipy „?" u tónů/kostek (chybí slovník popisků)
+- **D-NEW-quota** — limit počtu světů per user (pokud přijde spam)
+- **D-NEW-slug-check** — live availability check `/api/worlds/slug-available`
 
 ### - [ ] 2.4 Detail světa + join flow (`/svet/:worldId`)
 - [ ] Informace o světě
