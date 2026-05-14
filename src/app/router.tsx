@@ -56,6 +56,7 @@ const GroupsPage         = lazy(() => import('@/features/world/pages/GroupsPage'
 const RulesPage          = lazy(() => import('@/features/world/pages/RulesPage'));
 const PagesAdminPage     = lazy(() => import('@/features/world/pages/PagesAdminPage'));
 const NPCDirectoryPage   = lazy(() => import('@/features/world/pages/NPCDirectoryPage'));
+const WorldDetailPage    = lazy(() => import('@/features/world/pages/WorldDetailPage'));
 
 // ── Suspense wrapper ──────────────────────────────────────────────────────
 function p(Comp: LazyExoticComponent<ComponentType>) {
@@ -137,6 +138,15 @@ export const router = createBrowserRouter([
         ),
       },
     ],
+  },
+
+  // Spec 2.4 — Public Detail světa (anon-friendly, žádný WorldLayout, žádný
+  // requireAuth). MUSÍ být před `/svet/:worldId` blokem, aby `/svet/w1/info`
+  // matchnul public route, ne gameplay child.
+  {
+    path: '/svet/:worldId/info',
+    element: p(WorldDetailPage),
+    errorElement: <ErrorPage />,
   },
 
   // Chráněné — WorldLayout (celá světová vrstva za auth)

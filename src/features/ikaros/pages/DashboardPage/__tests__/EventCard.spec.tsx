@@ -11,6 +11,11 @@ vi.mock('@/shared/api/client', () => ({
   api: { post: vi.fn() },
 }));
 
+// 2.4 — EventCard volá useWorldLink → useMyWorlds. Default: anon (žádné světy).
+vi.mock('@/features/world/api/useWorlds', () => ({
+  useMyWorlds: () => ({ data: undefined }),
+}));
+
 function makeEvent(overrides: Partial<UpcomingEventDto> = {}): UpcomingEventDto {
   return {
     id: 'e1',
@@ -48,10 +53,11 @@ describe('EventCard', () => {
     expect(screen.getByText('Matrix')).toBeInTheDocument();
   });
 
-  it('odkaz vede na /svet/:worldId', () => {
+  // 2.4 — anon (žádné myWorlds) → link dispatch na /svet/:id/info (public detail).
+  it('odkaz vede na /svet/:worldId/info pro anon (nečlena)', () => {
     render(<EventCard event={makeEvent()} />, { wrapper: Wrapper });
     const link = screen.getByRole('link');
-    expect(link.getAttribute('href')).toBe('/svet/w1');
+    expect(link.getAttribute('href')).toBe('/svet/w1/info');
   });
 
   it('confirmable=false → žádný RSVP button', () => {

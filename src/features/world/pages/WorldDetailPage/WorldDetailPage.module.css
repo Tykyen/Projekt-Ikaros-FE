@@ -1,0 +1,16 @@
+/* Spec 2.4 — Almanach kompozice. Editorial magazine layout, skin-agnostic.
+   Žádné hardcoded barvy ani fonty — vše přes CSS variables. */
+
+.page {
+  min-height: 100vh;
+  background: var(--surface-1);
+  color: var(--text-primary, var(--text));
+  font-family: var(--font-body);
+  padding-bottom: 96px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding-bottom: 120px; /* místo pro sticky CTA bar */
+  }
+}

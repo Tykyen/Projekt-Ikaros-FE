@@ -1,0 +1,154 @@
+/* Spec 2.4 — welcome view pro člena. Almanach styl, skin-agnostic. */
+
+.welcome {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 32px;
+  font-family: var(--font-body);
+}
+
+.hero {
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 0ms;
+}
+
+.indicia {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--text-muted, var(--text));
+  margin: 0 0 16px;
+}
+
+.title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(36px, 6vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-strong, var(--text-primary));
+  margin: 0 0 16px;
+  text-wrap: balance;
+}
+
+.divider {
+  width: 48px;
+  height: 1px;
+  border: none;
+  background: var(--accent);
+  margin: 0 0 16px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--text-muted, var(--text));
+  margin: 0;
+  font-style: italic;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 150ms;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--frame-border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-primary, var(--text));
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 88px;
+}
+
+.tile:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-2));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.tileIcon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.tileText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tileLabel {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 18px;
+  letter-spacing: 0.01em;
+}
+
+.tileHint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted, var(--text));
+}
+
+.placeholder {
+  padding: 24px;
+  border: 1px dashed var(--frame-border);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--text-muted, var(--text));
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 300ms;
+}
+
+.placeholder p {
+  margin: 0;
+  font-style: italic;
+  font-size: 14px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome {
+    padding: 32px 20px;
+  }
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .tiles,
+  .placeholder {
+    opacity: 1;
+    animation: none;
+  }
+}

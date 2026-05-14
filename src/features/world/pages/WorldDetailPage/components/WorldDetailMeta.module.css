@@ -1,0 +1,47 @@
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 24px;
+  border: 1px solid var(--frame-border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.row {
+  font-family: var(--font-body);
+}
+
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted, var(--text));
+  margin: 0 0 6px;
+}
+
+.value {
+  font-size: 14px;
+  color: var(--text-primary, var(--text));
+}
+
+.free {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid var(--frame-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-primary, var(--text));
+}

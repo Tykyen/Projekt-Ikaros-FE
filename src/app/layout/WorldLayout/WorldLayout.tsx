@@ -1,10 +1,10 @@
 ﻿import { useState, useRef, useEffect, useMemo } from 'react';
-import { NavLink, Outlet, Link, useParams } from 'react-router-dom';
+import { NavLink, Outlet, Link, Navigate, useParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 import s from './WorldLayout.module.css';
 import { WorldContext } from '@/features/world/context/WorldContext';
-import { useWorld } from '@/features/world/api/useWorlds';
+import { useWorld, useMyWorlds } from '@/features/world/api/useWorlds';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { WorldRole } from '@/shared/types';
 import { themeAtom } from '../../../themes/state';
@@ -108,7 +108,20 @@ export function WorldLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const currentUser = useAtomValue(currentUserAtom);
   const { data: world, isLoading } = useWorld(worldId);
+  const { data: myWorlds, isLoading: myWorldsLoading } = useMyWorlds();
   const nav = useMemo(() => buildNav(worldId), [worldId]);
+
+  // 2.4 — Member guard. Logged-in non-member (typicky Zadatel nebo user, který
+  // sem zabloudil přes ručně napsaný URL) → redirect na public /info.
+  // Admin/Superadmin (role <= Admin) prochází bez kontroly membership.
+  const isAdminPlatform =
+    currentUser?.role !== undefined && currentUser.role <= 3;
+  const myMembership = useMemo(
+    () => myWorlds?.find((m) => m.world.id === worldId)?.membership,
+    [myWorlds, worldId],
+  );
+  const isFullMember =
+    myMembership != null && myMembership.role !== WorldRole.Zadatel;
 
   const isPJ =
     world?.ownerId === currentUser?.id ||
@@ -127,6 +140,13 @@ export function WorldLayout() {
   const bgStyle = theme.background
     ? { backgroundImage: `url(${theme.background})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' as const }
     : undefined;
+
+  // 2.4 — Member guard redirect. Hooks musí být zavolané před tímto returnem
+  // (rules-of-hooks). Čekáme až `useMyWorlds` doběhne (jinak flicker redirect
+  // pro pomalé queries). isAdminPlatform user smí dovnitř i bez membership.
+  if (!myWorldsLoading && !isFullMember && !isAdminPlatform) {
+    return <Navigate to={`/svet/${worldId}/info`} replace />;
+  }
 
   return (
     <WorldContext.Provider value={ctxValue}>

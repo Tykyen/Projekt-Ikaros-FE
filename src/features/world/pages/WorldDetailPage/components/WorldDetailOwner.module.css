@@ -1,0 +1,82 @@
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 80px;
+  border-top: 1px solid var(--frame-border);
+}
+
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted, var(--text));
+  margin: 0 0 16px;
+  font-family: var(--font-body);
+}
+
+.card {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar,
+.avatarFallback {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+}
+
+.avatar {
+  object-fit: cover;
+}
+
+.avatarFallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 18px;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  margin: 0 0 4px;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 18px;
+  color: var(--text-primary, var(--text));
+}
+
+.role {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted, var(--text));
+  font-family: var(--font-body);
+}
+
+.unknown {
+  margin: 0;
+  font-style: italic;
+  color: var(--text-muted, var(--text));
+  font-family: var(--font-body);
+}
+
+@media (max-width: 1023px) {
+  .section {
+    padding: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 24px 20px;
+  }
+}
