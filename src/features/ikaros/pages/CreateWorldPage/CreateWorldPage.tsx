@@ -13,7 +13,6 @@ import { PlayersSection } from './components/PlayersSection';
 import { AccessModeSection } from './components/AccessModeSection';
 import { SystemSection } from './components/SystemSection';
 import { GENRE_CUSTOM_LABEL } from './constants/genres';
-import { TONE_CUSTOM_LABEL } from './constants/tones';
 import { DEFAULT_SYSTEM, SYSTEM_CUSTOM_ID } from './constants/systems';
 import { useWorldSlug } from './hooks/useWorldSlug';
 import s from './CreateWorldPage.module.css';
@@ -29,8 +28,8 @@ export default function CreateWorldPage() {
 
   const [genre, setGenre] = useState('');
   const [customGenre, setCustomGenre] = useState('');
-  const [tones, setTones] = useState<string[]>([]);
-  const [customTone, setCustomTone] = useState('');
+  // Tóny vyprávění: UI sekce dočasně vyřazena (2026-05-14). Pole zůstává
+  // v BE schématu i `CreateWorldInput`; nyní z formuláře neposíláme.
 
   const [playersWanted, setPlayersWanted] = useState('');
   const [maxPlayers, setMaxPlayers] = useState<number | null>(null);
@@ -72,10 +71,6 @@ export default function CreateWorldPage() {
     const finalGenre =
       genre === GENRE_CUSTOM_LABEL ? customGenre.trim() : genre;
 
-    const finalTones = tones
-      .filter((t) => t !== TONE_CUSTOM_LABEL)
-      .concat(customTone.trim() ? [customTone.trim()] : []);
-
     const finalSystem =
       system === SYSTEM_CUSTOM_ID ? customSystem.trim() : system;
 
@@ -85,7 +80,6 @@ export default function CreateWorldPage() {
         slug,
         description: description.trim() || undefined,
         genre: finalGenre || undefined,
-        tones: finalTones.length ? finalTones : undefined,
         playersWanted: playersWanted.trim() || undefined,
         maxPlayers,
         accessMode,
@@ -136,12 +130,8 @@ export default function CreateWorldPage() {
         <GenreSection
           genre={genre}
           customGenre={customGenre}
-          tones={tones}
-          customTone={customTone}
           onGenreChange={setGenre}
           onCustomGenreChange={setCustomGenre}
-          onTonesChange={setTones}
-          onCustomToneChange={setCustomTone}
         />
         <PlayersSection
           playersWanted={playersWanted}
