@@ -132,7 +132,7 @@ describe('CreateWorldPage', () => {
 
     await waitFor(() => expect(toast.error).toHaveBeenCalled());
     expect(toast.error).toHaveBeenCalledWith(
-      expect.stringMatching(/limitu 5 aktivních světů/),
+      expect.stringMatching(/limitu 30 aktivních světů/),
     );
   });
 

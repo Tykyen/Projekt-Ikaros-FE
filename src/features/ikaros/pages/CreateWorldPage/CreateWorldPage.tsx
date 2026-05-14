@@ -101,7 +101,7 @@ export default function CreateWorldPage() {
         toast.error('Adresa už existuje, zvol jinou.');
       } else if (code === 'WORLD_QUOTA_REACHED') {
         toast.error(
-          'Dosáhl jsi limitu 5 aktivních světů. Smaž některý nebo požádej admina.',
+          'Dosáhl jsi limitu 30 aktivních světů. Smaž některý nebo požádej admina.',
         );
       } else {
         toast.error('Vytvoření světa selhalo. Zkus to znovu.');
