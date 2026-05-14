@@ -1,4 +1,4 @@
-import { DICE } from '../constants/dice';
+import { DICE, DICE_DESCRIPTIONS } from '../constants/dice';
 import { RPG_SYSTEMS, SYSTEM_CUSTOM_ID } from '../constants/systems';
 import { PillChips } from './PillChips';
 import { SectionCard } from './SectionCard';
@@ -70,6 +70,7 @@ export function SystemSection({
           value={dice}
           onChange={onDiceChange}
           ariaLabel="Kostky a mechaniky"
+          descriptions={DICE_DESCRIPTIONS}
         />
       </div>
     </SectionCard>

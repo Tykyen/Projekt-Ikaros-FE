@@ -464,12 +464,15 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - [x] **+12 FE testů:** useWorldSlug 6 (translit, dirty flag, length cap), PillChips 3 (toggle add/remove + aria-pressed), CreateWorldPage 3 (submit blocked → enabled → mutation called; slug auto-derive a manual override; Vlastní žánr free-text submitted). Celkem 395 FE testů ✓.
 - [x] `npx tsc --noEmit`, `npm run build`, `npm run test:run` ✓.
 
-**Mimo rozsah (samostatné fáze / dluhy):**
+**Mimo rozsah (samostatné fáze):**
 - 2.4 Detail světa + join flow
 - 2.5 World settings (edit existujícího světa, hero image upload)
-- **D-NEW-tooltips** — help tooltipy „?" u tónů/kostek (chybí slovník popisků)
-- **D-NEW-quota** — limit počtu světů per user (pokud přijde spam)
-- **D-NEW-slug-check** — live availability check `/api/worlds/slug-available`
+
+**Post-2.3 následné úpravy (2026-05-14):**
+- ✅ **D-NEW-slug-check** — BE `GET /api/worlds/slug-available?slug=` (public, bez auth) + `worlds.service.isSlugAvailable` (validuje regex `^[a-z0-9-]+$` + délku 2–40). FE `useSlugAvailability(slug)` (debounce 350 ms přes `useDebouncedValue` + react-query, 30s cache) vrací `idle|invalid|checking|available|taken`. `BasicInfoSection` zobrazí inline status: ✓ k dispozici (zelený) / ✗ obsazeno (červený) / Adresa musí být…/Ověřuji (helper). Submit blokován při `taken`/`invalid`/`checking`. +4 testy.
+- ✅ **D-NEW-quota** — BE konstanta `MAX_ACTIVE_WORLDS_PER_OWNER = 5`. `worlds.service.create(dto, ownerId, ownerRole?)` přijímá role; pro `role > UserRole.Admin` count `worldsRepo.findByOwnerId(ownerId)` aktivních; pokud `>= 5` → `ForbiddenException` s code `WORLD_QUOTA_REACHED`. Superadmin/Admin (≤ Admin) skip; legacy callers bez role skip. Controller předá `user.role` z `RequestUser`. FE `CreateWorldPage` `onError` zachytí code → specific toast: „Dosáhl jsi limitu 5 aktivních světů. Smaž některý nebo požádej admina." +3 BE testy + 1 FE test.
+- ✅ **D-NEW-tooltips** — `PillChips` má volitelný prop `descriptions: Record<string, string>`. Pokud existuje match, chip dostane native `title` attribut (hover desktop / long-press mobil) + viditelný `?` indikátor uvnitř chipu (vpravo, `currentColor` border, opacity 0.55). `TONE_DESCRIPTIONS` (24 + Vlastní) a `DICE_DESCRIPTIONS` (13) jako konstanty. GenreSection + SystemSection propnou popisky do PillChips. Žádný custom Tooltip overlay — native browser tooltip stačí pro MVP.
+- Celkem **+5 FE testů** (4 useSlugAvailability + 1 quota toast), +6 BE testů (3 isSlugAvailable + 3 quota). Total: 400 FE + 45 worlds.service ✓.
 
 ### - [ ] 2.4 Detail světa + join flow (`/svet/:worldId`)
 - [ ] Informace o světě

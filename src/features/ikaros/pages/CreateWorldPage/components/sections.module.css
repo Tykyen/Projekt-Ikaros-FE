@@ -77,6 +77,14 @@
   line-height: 1.5;
 }
 
+.helperOk {
+  font-size: 12px;
+  color: var(--accent);
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
 .inputError {
   border-color: var(--accent);
 }

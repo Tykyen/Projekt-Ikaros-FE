@@ -35,6 +35,11 @@ function renderPage() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // D-NEW-slug-check — default: každý slug volný.
+  vi.mocked(api.get).mockImplementation(async (url: string) => {
+    if (url === '/worlds/slug-available') return { available: true };
+    return null;
+  });
 });
 
 describe('CreateWorldPage', () => {
@@ -65,7 +70,10 @@ describe('CreateWorldPage', () => {
       target: { value: 'Fantasy' },
     });
 
-    expect(submit).not.toBeDisabled();
+    // Slug availability debounce + fetch → submit enabled až po `available`.
+    await waitFor(() => expect(submit).not.toBeDisabled(), {
+      timeout: 2000,
+    });
 
     fireEvent.click(submit);
 
@@ -101,6 +109,33 @@ describe('CreateWorldPage', () => {
     expect((slugInput as HTMLInputElement).value).toBe('muj-vlastni');
   });
 
+  it('WORLD_QUOTA_REACHED z BE → specifický toast', async () => {
+    const { toast } = await import('sonner');
+    vi.mocked(api.post).mockRejectedValueOnce({
+      response: {
+        data: { error: { code: 'WORLD_QUOTA_REACHED', message: 'limit' } },
+      },
+    });
+
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/Název světa/), {
+      target: { value: 'Šestý' },
+    });
+    fireEvent.change(screen.getByLabelText(/^Žánr$/), {
+      target: { value: 'Fantasy' },
+    });
+
+    const submit = screen.getByRole('button', { name: /Vytvořit svět/ });
+    await waitFor(() => expect(submit).not.toBeDisabled(), { timeout: 2000 });
+
+    fireEvent.click(submit);
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenCalledWith(
+      expect.stringMatching(/limitu 5 aktivních světů/),
+    );
+  });
+
   it('„Vlastní žánr" odhalí free-text input a posílá jeho hodnotu místo labelu', async () => {
     vi.mocked(api.post).mockResolvedValueOnce({
       id: 'w2',
@@ -129,7 +164,10 @@ describe('CreateWorldPage', () => {
     );
     fireEvent.change(customGenreInput, { target: { value: 'Steampunk' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Vytvořit svět/ }));
+    const submit = screen.getByRole('button', { name: /Vytvořit svět/ });
+    await waitFor(() => expect(submit).not.toBeDisabled(), { timeout: 2000 });
+
+    fireEvent.click(submit);
 
     await waitFor(() => expect(api.post).toHaveBeenCalled());
     expect(api.post).toHaveBeenCalledWith(

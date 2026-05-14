@@ -1,3 +1,4 @@
+import type { SlugStatus } from '@/features/world/api/useSlugAvailability';
 import { SectionCard } from './SectionCard';
 import s from './sections.module.css';
 
@@ -5,15 +6,25 @@ interface Props {
   name: string;
   slug: string;
   description: string;
+  slugStatus: SlugStatus;
   onNameChange: (v: string) => void;
   onSlugChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
 }
 
+const SLUG_STATUS_LABEL: Record<SlugStatus, string> = {
+  idle: '',
+  invalid: 'Adresa musí být 2–40 znaků, jen a–z, 0–9, pomlčka.',
+  checking: 'Ověřuji…',
+  available: '✓ k dispozici',
+  taken: '✗ obsazeno',
+};
+
 export function BasicInfoSection({
   name,
   slug,
   description,
+  slugStatus,
   onNameChange,
   onSlugChange,
   onDescriptionChange,
@@ -51,17 +62,33 @@ export function BasicInfoSection({
           <input
             id="cw-slug"
             type="text"
-            className={`${s.input} ${s.adressInput}`}
+            className={`${s.input} ${s.adressInput} ${
+              slugStatus === 'taken' || slugStatus === 'invalid'
+                ? s.inputError
+                : ''
+            }`}
             value={slug}
             onChange={(e) => onSlugChange(e.target.value)}
             maxLength={40}
             placeholder="auto-derive z názvu"
             autoComplete="off"
+            aria-describedby="cw-slug-status"
           />
         </div>
-        <p className={s.helper}>
-          Použije se v URL světa. Auto-doplňuje se z názvu, ale můžeš ji
-          změnit.
+        <p
+          id="cw-slug-status"
+          className={
+            slugStatus === 'available'
+              ? s.helperOk
+              : slugStatus === 'taken' || slugStatus === 'invalid'
+                ? s.error
+                : s.helper
+          }
+        >
+          {slugStatus === 'idle' || slugStatus === 'checking'
+            ? 'Použije se v URL světa. Auto-doplňuje se z názvu, ale můžeš ji změnit.'
+            : SLUG_STATUS_LABEL[slugStatus]}
+          {slugStatus === 'checking' && ' (ověřuji)'}
         </p>
       </div>
 

@@ -6,6 +6,7 @@ import {
   useCreateWorld,
   type WorldAccessMode,
 } from '@/features/world/api/useCreateWorld';
+import { useSlugAvailability } from '@/features/world/api/useSlugAvailability';
 import { BasicInfoSection } from './components/BasicInfoSection';
 import { GenreSection } from './components/GenreSection';
 import { PlayersSection } from './components/PlayersSection';
@@ -40,15 +41,20 @@ export default function CreateWorldPage() {
   const [customSystem, setCustomSystem] = useState('');
   const [dice, setDice] = useState<string[]>([]);
 
+  // 2.3 D-NEW-slug-check — live availability check
+  const slugStatus = useSlugAvailability(slug);
+
   // Validace
   const nameOk = name.trim().length >= 2 && name.trim().length <= 60;
-  const slugOk = slug.length >= 2;
+  const slugOk =
+    slug.length >= 2 && slugStatus !== 'taken' && slugStatus !== 'invalid';
   const genreOk =
     genre !== '' && (genre !== GENRE_CUSTOM_LABEL || customGenre.trim() !== '');
   const systemOk =
     system !== '' &&
     (system !== SYSTEM_CUSTOM_ID || customSystem.trim() !== '');
-  const canSubmit = nameOk && slugOk && genreOk && systemOk;
+  const canSubmit =
+    nameOk && slugOk && genreOk && systemOk && slugStatus !== 'checking';
 
   const missing: string[] = [];
   if (!nameOk) missing.push('Název');
@@ -93,6 +99,10 @@ export default function CreateWorldPage() {
       const code = apiErr?.error?.code;
       if (code === 'WORLD_SLUG_TAKEN' || code === 'CONFLICT') {
         toast.error('Adresa už existuje, zvol jinou.');
+      } else if (code === 'WORLD_QUOTA_REACHED') {
+        toast.error(
+          'Dosáhl jsi limitu 5 aktivních světů. Smaž některý nebo požádej admina.',
+        );
       } else {
         toast.error('Vytvoření světa selhalo. Zkus to znovu.');
       }
@@ -118,6 +128,7 @@ export default function CreateWorldPage() {
           name={name}
           slug={slug}
           description={description}
+          slugStatus={slugStatus}
           onNameChange={setName}
           onSlugChange={onSlugChange}
           onDescriptionChange={setDescription}

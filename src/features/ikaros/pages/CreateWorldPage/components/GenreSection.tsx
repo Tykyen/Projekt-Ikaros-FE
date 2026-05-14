@@ -1,5 +1,9 @@
 import { GENRES, GENRE_CUSTOM_LABEL } from '../constants/genres';
-import { TONES, TONE_CUSTOM_LABEL } from '../constants/tones';
+import {
+  TONES,
+  TONE_CUSTOM_LABEL,
+  TONE_DESCRIPTIONS,
+} from '../constants/tones';
 import { PillChips } from './PillChips';
 import { SectionCard } from './SectionCard';
 import s from './sections.module.css';
@@ -79,6 +83,7 @@ export function GenreSection({
           value={tones}
           onChange={onTonesChange}
           ariaLabel="Tóny vyprávění"
+          descriptions={TONE_DESCRIPTIONS}
         />
         {showCustomTone && (
           <input
