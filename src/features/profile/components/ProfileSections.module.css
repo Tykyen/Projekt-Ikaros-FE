@@ -144,6 +144,23 @@
   color: var(--text-strong);
 }
 
+/* Header link (e.g. "Zobrazit vše →" in ProfileEventsSection) */
+.headerLink {
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.headerLink:hover {
+  text-decoration: underline;
+}
+
+/* Events list (cross-world game-events) */
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* Worlds */
 .worldList {
   list-style: none;

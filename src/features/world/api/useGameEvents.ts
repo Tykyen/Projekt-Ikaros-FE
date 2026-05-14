@@ -13,6 +13,7 @@ export function useUpcomingEventsMine(opts: { limit?: number } = {}) {
       api.get<UpcomingEventDto[]>(`/game-events/upcoming/mine?limit=${limit}`),
     enabled: !!token,
     staleTime: 60_000,
+    placeholderData: [],
   });
 }
 

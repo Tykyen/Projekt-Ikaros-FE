@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import { Newspaper, Plus } from 'lucide-react';
+import { CalendarClock, Plus } from 'lucide-react';
 import { useAtomValue } from 'jotai';
 import { IkarosCard } from '@/shared/ui';
-import { useIkarosNews } from '@/features/ikaros/api/useIkarosNews';
-import { CreateNewsModal } from '@/features/ikaros/components/CreateNewsModal';
+import { useUpcomingIkarosEvents } from '@/features/ikaros/api/useIkarosEvents';
+import { IkarosEventCard } from '@/features/ikaros/components/IkarosEventCard';
+import { IkarosEventModal } from '@/features/ikaros/components/IkarosEventModal';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { SectionHeader } from '../components/SectionHeader';
-import { NewsCard } from '../components/NewsCard';
-import s from './PlatformNewsSection.module.css';
+import s from './IkarosEventsSection.module.css';
 
-export function PlatformNewsSection() {
-  const { data, isError } = useIkarosNews();
-  const items = data?.slice(0, 5) ?? [];
+export function IkarosEventsSection() {
+  const { data, isError } = useUpcomingIkarosEvents(5);
+  const items = data ?? [];
   const currentUser = useAtomValue(currentUserAtom);
   const canCreate =
     currentUser?.role === UserRole.Admin ||
@@ -24,14 +24,14 @@ export function PlatformNewsSection() {
       variant="news"
       header={
         <SectionHeader
-          title="Novinky"
-          icon={<Newspaper size={20} aria-hidden="true" />}
+          title="Akce"
+          icon={<CalendarClock size={20} aria-hidden="true" />}
           action={
             canCreate ? (
               <button
                 type="button"
                 className={s.addBtn}
-                aria-label="Nová novinka"
+                aria-label="Nová akce"
                 onClick={() => setCreateOpen(true)}
               >
                 <Plus size={18} aria-hidden="true" />
@@ -42,22 +42,19 @@ export function PlatformNewsSection() {
       }
     >
       {isError ? (
-        <p className={s.empty}>Nepodařilo se načíst novinky.</p>
+        <p className={s.empty}>Nepodařilo se načíst akce.</p>
       ) : items.length === 0 ? (
-        <p className={s.empty}>Zatím žádné novinky.</p>
+        <p className={s.empty}>Žádné nadcházející akce.</p>
       ) : (
         <div className={s.list}>
-          {items.map((news) => (
-            <NewsCard key={news.id} news={news} />
+          {items.map((event) => (
+            <IkarosEventCard key={event.id} event={event} />
           ))}
         </div>
       )}
 
-      {canCreate && (
-        <CreateNewsModal
-          open={createOpen}
-          onClose={() => setCreateOpen(false)}
-        />
+      {canCreate && createOpen && (
+        <IkarosEventModal open onClose={() => setCreateOpen(false)} />
       )}
     </IkarosCard>
   );

@@ -19,7 +19,7 @@ const IKAROS_PAGES: PageDoc[] = [
     name: 'Úvodník',
     status: 'ok',
     who: 'Všichni (anon i přihlášený)',
-    what: 'Vstupní stránka platformy. Uvítací karta pro všechny + boxíky Akce (5 nejbližších herních událostí napříč tvými světy, s tlačítkem Půjdu — jen po přihlášení) a Novinky platformy vedle sebe.',
+    what: 'Vstupní stránka platformy. Uvítací karta + dvě sekce vedle sebe: vlevo Akce (globální platformové akce — top 5 nadcházejících, s obrázkem, tlačítkem Zúčastním se, jen po přihlášení), vpravo Novinky platformy. Admin/Superadmin vidí v hlavičkách obou sekcí tlačítko +, kterým rovnou vytvoří novou globální akci / novinku. Na každé akci pak má Admin/Superadmin v rohu kebab menu (•••) s akcemi Upravit a Smazat. Akce a novinky tvého konkrétního světa jsou jen v daném světě, nikdy se nemíchají.',
   },
   {
     path: '/ikaros/napoveda',
@@ -40,7 +40,7 @@ const IKAROS_PAGES: PageDoc[] = [
     name: 'Profil',
     status: 'ok',
     who: 'Přihlášený (vlastník účtu)',
-    what: 'Sedm sekcí: hlavička, něco o mně, postava v Rozcestí, moje světy, komunitní stopa, bezpečnost (heslo, žádost o změnu přezdívky), účet (smazání).',
+    what: 'Sekce: hlavička, něco o mně, postava v Rozcestí, moje světy, moje akce ve světech (cross-world agregátor blížících se herních akcí), komunitní stopa, bezpečnost (heslo, žádost o změnu přezdívky), účet (smazání).',
   },
   {
     path: '/ikaros/vesmiry',

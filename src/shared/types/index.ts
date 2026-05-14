@@ -336,6 +336,29 @@ export interface UpcomingEventDto {
   confirmedCount: number;
 }
 
+export interface IkarosEventAttendee {
+  userId: string;
+  userName: string;
+}
+
+export interface IkarosEvent {
+  id: string;
+  title: string;
+  date: string;
+  description: string;
+  imageUrl: string | null;
+  imageFocalX: number | null;
+  imageFocalY: number | null;
+  confirmable: boolean;
+  confirmedCount: number;
+  confirmedBy: IkarosEventAttendee[];
+  myRsvp: 'confirmed' | 'none';
+  authorId: string;
+  authorName: string;
+  createdAtUtc: string;
+  isActive: boolean;
+}
+
 // Ikaros Messages
 export interface UnreadCountResponse {
   unreadCount: number;
