@@ -41,7 +41,7 @@
   gap: var(--sp-2);
   padding: var(--sp-2) var(--sp-4);
   background: var(--accent, var(--theme-accent));
-  color: var(--text-on-accent, #050508);
+  color: var(--prose-on-accent);
   border: none;
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
@@ -259,7 +259,7 @@
 }
 
 .starFull {
-  color: #ffd700;
+  color: var(--star-gold);
 }
 
 .starEmpty {

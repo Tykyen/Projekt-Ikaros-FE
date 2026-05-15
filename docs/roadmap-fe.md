@@ -533,21 +533,38 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - **D-066** (FE): TipTap rich-text editor pro `content` (plain textarea bylo MVP).
 - **D-067** (FE/BE): Audit log UI pro archive/delete (fields se ukládají, UI chybí).
 
-### - [ ] 3.2 Články (`/ikaros/clanky`)
-- [ ] Přehled (Published), `/novy` editor (TipTap)
-- [ ] Draft → Pending → Published workflow, rating
-- [ ] **Pending článek** → queue typ `article_pending_review` ve Zpracovat tabu SpravceClanku (infra z 1.4). `ArticleReviewProvider implements IPendingActionProvider`. Renderer karty: náhled článku + tlačítka Schválit/Vrátit s poznámkou/Odmítnout.
+### - [x] 3.2 Články (`/ikaros/clanky`) ✅ (2026-05-15)
+
+**Spec:** [spec-3.2.md](arch/phase-3/spec-3.2.md), **Plány:** [plan-3.2a.md](arch/phase-3/plan-3.2a.md) – [plan-3.2e.md](arch/phase-3/plan-3.2e.md)
+
+Rozsah rozdělen na 5 sub-fází (3.2a–e). Vizuální směr „Editorial Atelier" (drop cap, glyph dividers, sticky margin-note autor card, 65ch reading width).
+
+- [x] **3.2a — BE infra** (commit `8b9e386e`): `ArticleReviewProvider` (queue typ `article_pending_review`), anon read přes `OptionalJwtAuthGuard`, `article_reads` collection (mark-as-read tracking), `article_categories` collection s admin CRUD + seed 6 výchozích, kategorie refactor z enumu na DB slug. **Pre-fix:** `PendingActionsModule` zapojen do `AppModule` (1.4 infra byla dangling). +34 BE testů.
+- [x] **3.2b — Sdílený TipTap editor** (commit `73952d4`): `<RichTextEditor>` v `src/shared/ui/RichTextEditor/` — bubble menu 7 tlačítek, `useDraftAutoSave` (localStorage debounce 3 s), readOnly + drop cap mode. Self-hostované fonty Fraunces/Crimson Pro/JetBrains Mono. **Částečně řeší D-066** (TipTap setup hotov; retrofit novinek `NewsFormModal` zbývá — viz dluhy.md). +17 testů.
+- [x] **3.2c — Stránky** (commit `cee1c91`): `/ikaros/clanky` (Přehled/Moje taby, search, sort, kategorie filter, mini stats), `/clanky/:id` detail (reading flow, rating distribuce, „více od autora"), `/clanky/novy` + `/:id/upravit` editor, `RejectReasonModal` (povinný reason min 10 znaků). +20 testů.
+- [x] **3.2d — Zpracovat renderer** (commit `42ca2a9`): `ArticleReviewRenderer` registrován v `PENDING_ACTION_RENDERERS`. +11 testů.
+- [x] **3.2e — Discovery** (commit `486e52a`): `AutoTOC` (sticky desktop / accordion mobile). RatingDistribution + MoreFromAuthor + mark-as-read shipped už v 3.2c. +12 testů.
+
+**Uzavírá dluhy:** D-NEW-pending-actions-wired (`PendingActionsModule` zapojen). **Částečně D-066** — TipTap setup hotov, retrofit novinek zbývá.
+
+**Mimo rozsah → přesunuto do navazujících fází:**
+- Cloudinary upload obrázku v TipTap → **3.3** (po vybudování Cloudinary infra).
+- „Diskuze o článku" link → **3.4** (po vytvoření modulu diskuzí).
+
+**Nově vzniklé dluhy:** D-NEW-search-be (server-side full-text search), D-NEW-bulk-pending-articles, D-NEW-article-versions, D-NEW-role-name-mismatch (BE `SpravceClankuu` vs FE `SpravceClanku`).
 
 ### - [ ] 3.3 Galerie (`/ikaros/galerie`)
 - [ ] Mřížka obrázků, `/nahrat` upload (Cloudinary)
 - [ ] Schvalovací workflow (Pending → Approved)
 - [ ] **Pending obrázek** → queue typ `gallery_pending_review` ve Zpracovat tabu SpravceGalerie (infra z 1.4). `GalleryReviewProvider implements IPendingActionProvider`. Renderer karty: thumbnail + tlačítka Schválit/Odmítnout.
+- [ ] **Cloudinary upload extension pro `<RichTextEditor>`** (z 3.2) — po vybudování Cloudinary infra zaregistrovat TipTap Image extension; využije article editor i galerie.
 
 ### - [ ] 3.4 Diskuze (`/ikaros/diskuze`)
 - [ ] Seznam diskuzí, `/:id` vlákno příspěvků
 - [ ] Manageři, pozvánky
 - [ ] **Hlášené příspěvky** → queue typ `discussion_report` ve Zpracovat tabu SpravceDiskuzi (infra z 1.4). `DiscussionReportProvider implements IPendingActionProvider`.
 - [ ] **Žádost o přidání do uzamčené diskuze** → queue typ `discussion_join_request` ve Zpracovat tabu manažera diskuze. `DiscussionJoinProvider implements IPendingActionProvider`. Renderer karty: avatar žadatele + název diskuze + tlačítka Přijmout/Odmítnout.
+- [ ] **Sekce „Diskuze o článku" na detailu článku** (z 3.2) — link „Diskutuj o tomto článku" vytvoří/otevře diskuzi; reverse link z diskuze zpět na článek.
 
 ### - [ ] 3.5 Soukromá pošta (`/ikaros/posta`)
 - [ ] Inbox / Sent, nová zpráva

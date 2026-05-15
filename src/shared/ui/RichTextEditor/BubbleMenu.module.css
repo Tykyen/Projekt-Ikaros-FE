@@ -30,7 +30,7 @@
 
 .btnActive {
   background: var(--accent, var(--theme-accent));
-  color: var(--text-on-accent, #050508);
+  color: var(--prose-on-accent);
 }
 
 .btnActive:hover {

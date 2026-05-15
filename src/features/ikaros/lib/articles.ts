@@ -4,7 +4,8 @@ import type { ArticleCategory, IkarosArticle } from '@/shared/types';
 const FALLBACK_CATEGORY: ArticleCategory = {
   key: 'ostatni',
   label: 'Ostatní',
-  color: '#8b98a5',
+  // CSS var — categoryStyle ji předá do `--cat-current`; var() lze nestovat.
+  color: 'var(--cat-ostatni)',
   order: 999,
 };
 

@@ -77,6 +77,13 @@ const IKAROS_PAGES: PageDoc[] = [
     who: 'Admin / Superadmin',
     what: 'Administrace platformových novinek. Taby Aktivní a Archiv (s počty), tabulka 20 novinek na stránce, akce v řádku: upravit, archivovat / obnovit a trvale smazat. Archivace je vratná (objeví se v tabu Archiv, lze odtud zase Obnovit); smazání je nevratné s potvrzovacím dialogem. Z hlavičky se otevírá modal Nová novinka. Stejnou novinku lze založit i přímo z Úvodníku — sekce Novinky má v hlavičce tlačítko +.',
   },
+  {
+    path: '/ikaros/clanky',
+    name: 'Články',
+    status: 'ok',
+    who: 'Čtení všichni (anon i přihlášený), psaní přihlášený',
+    what: 'Literární archiv komunity. Přehled publikovaných článků s vyhledáváním, řazením (nejnovější / nejlépe hodnocené / nejvíc hodnocených) a filtrem podle kategorie. Tab Moje (po přihlášení) ukazuje tvé články včetně konceptů a souhrn statistik. Nový článek píšeš v editoru s formátováním (tučně, kurzíva, nadpisy, citace, odrážky, odkazy) — text se průběžně ukládá do prohlížeče, kdyby ses odpojil. Workflow: koncept → odeslat ke schválení → publikováno (schvaluje Správce článků). Detail článku má hodnocení hvězdičkami, obsah dlouhých článků a sekci „Více od autora".',
+  },
 ];
 
 const SOON_IKAROS: PageDoc[] = [
@@ -95,14 +102,6 @@ const SOON_IKAROS: PageDoc[] = [
     fáze: 'Fáze 2.4',
     who: 'Přihlášený',
     what: 'Info o světě, tlačítko Vstoupit (public = okamžitě, private = žádost ke schválení PJ).',
-  },
-  {
-    path: '/ikaros/clanky',
-    name: 'Články',
-    status: 'soon',
-    fáze: 'Fáze 3.2',
-    who: 'Čtení anon, psaní přihlášený',
-    what: 'Komunitní články s TipTap editorem. Workflow draft → pending → published (schvaluje Správce článků).',
   },
   {
     path: '/ikaros/galerie',

@@ -118,11 +118,15 @@ const FAQ: FaqItem[] = [
         <ul>
           <li>žádosti o přátelství (přicházejí, když ti někdo pošle pozvánku)</li>
           <li>žádosti o změnu přezdívky (jen Admin/Superadmin)</li>
+          <li>žádosti o vstup do uzavřeného světa (pro PJ světa)</li>
+          <li>
+            články čekající na schválení (pro Správce článků a
+            Admin/Superadmin) — schválíš je, nebo vrátíš autorovi s poznámkou
+          </li>
         </ul>
         <p>Postupně přibude:</p>
         <ul>
-          <li>žádosti o vstup do uzavřeného světa (Fáze 2.4, pro PJ)</li>
-          <li>pending články / obrázky / hlášené příspěvky (Fáze 3.2–3.4)</li>
+          <li>pending obrázky / hlášené příspěvky (Fáze 3.3–3.4)</li>
         </ul>
         <p>
           Číslo u záložky „Zpracovat" v pravém panelu ukazuje, kolik položek

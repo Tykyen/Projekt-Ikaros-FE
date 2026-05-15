@@ -41,4 +41,11 @@
   --status-pending: #ff9800;
   --status-published: #4caf50;
   --status-rejected: #ff4444;
+
+  /* Article-specific accents. */
+  --star-gold: #ffd700;
+  /* Tmavý text na accent pozadí (fallback pokud skin nedefinuje). */
+  --prose-on-accent: var(--text-on-accent, #050508);
+  /* Bílý text na barevném status pozadí (badge Schválit). */
+  --prose-on-status: #ffffff;
 }

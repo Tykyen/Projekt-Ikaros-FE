@@ -150,7 +150,7 @@
   padding: var(--sp-2) var(--sp-4);
   background: var(--accent, var(--theme-accent));
   border: 1px solid var(--accent, var(--theme-accent));
-  color: var(--text-on-accent, #050508);
+  color: var(--prose-on-accent);
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
   font-weight: var(--weight-semi);

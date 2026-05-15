@@ -109,13 +109,13 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
-### D-066 — TipTap rich-text editor pro IkarosNews content (3.1 → 3.2)
+### D-066 — TipTap rich-text editor pro IkarosNews content (3.1 → 3.2, ČÁSTEČNĚ ŘEŠENO)
 **Soubory:** `src/features/ikaros/components/NewsFormModal.tsx` (textarea), `src/features/ikaros/pages/DashboardPage/components/NewsCard.tsx` (render)
-**Stav:** Otevřený — 3.1 dodáno s plain `<textarea>` jako MVP.
-**Kontext:** Novinka má strukturovaný obsah (paragrafy, odkazy, tučně) — plain text limituje formátování. Rozhodnuto v 3.1a, plán bylo dodělat s 3.2 (Články), kde TipTap stejně přijde.
-**Dopad:** Autor nemůže formátovat obsah; čtenář vidí plain text bez vizuální hierarchie.
-**Řešení:** (1) Přidat `@tiptap/react` + extensions (StarterKit, Link, Image). (2) Replace `<textarea>` v `NewsFormModal` za `<TipTapEditor>`. (3) Migrate stávající content z plaintextu na JSON / HTML (může zůstat plain — TipTap si poradí). (4) Render v `NewsCard` přes TipTap render nebo HTML output.
-**Kdy:** Společně s 3.2 (články) — sdílený TipTap setup.
+**Stav:** Částečně řešeno — 3.2b dodala sdílenou komponentu `<RichTextEditor>` (`src/shared/ui/RichTextEditor/`). **Zbývá retrofit novinek** — `NewsFormModal` stále používá plain `<textarea>`.
+**Kontext:** 3.2b postavila TipTap setup pro články; novinky ho ještě nepoužívají. Retrofit nebyl v rozsahu 3.2 (FE fáze o článcích).
+**Dopad:** Autor novinky nemůže formátovat obsah; čtenář vidí plain text bez vizuální hierarchie. Články formátování mají.
+**Řešení (zbývá):** (1) Replace `<textarea>` v `NewsFormModal` za `<RichTextEditor>`. (2) `NewsCard` render přes `<RichTextEditor readOnly>`. (3) Stávající plain-text content TipTap zvládne (obalí do `<p>`). ⚠️ Ověřit že 3.1 `NewsFormModal.spec.tsx` + `NewsCard` testy projdou (plain → HTML render).
+**Kdy:** Drobný samostatný PR — kdykoli, nízká priorita (novinky fungují, jen bez rich-textu).
 
 ---
 
@@ -126,6 +126,53 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 **Dopad:** Bez audit logu nelze dohledat, kdo provedl změnu. Pro malý team (Tyky + 1-2 admini) zatím nekritické.
 **Řešení:** (1) Hard delete → log do AdminAuditLog před `findByIdAndDelete`. (2) Archive/unarchive také log do AuditLog (i když data jsou na entitě, AuditLog je centrální view). (3) FE: rozšířit AuditLogTab v `/ikaros/uzivatele` o filter na entity typu „IkarosNews".
 **Kdy:** Až bude širší team admin nebo se objeví incident dohledávání. Low priority.
+
+---
+
+### D-NEW-pending-actions-wired — PendingActionsModule nebyl v AppModule (uzavřeno 3.2a)
+**Stav:** ✅ Uzavřeno 2026-05-15, commit `8b9e386e`.
+**Co bylo:** `PendingActionsModule` (1.4 Zpracovat infra) existoval, ale nebyl importovaný v `AppModule`. `FriendshipsModule` (1.8) + `WorldsModule` (2.4) injectovaly `PendingActionsService` — DI by selhalo při startu. Objeveno při 3.2a auditu.
+**Fix:** Přidán `PendingActionsModule` do `AppModule.imports`.
+
+---
+
+### D-NEW-role-name-mismatch — BE `SpravceClankuu` vs FE `SpravceClanku`
+**Soubory:** `backend/.../users/interfaces/user.interface.ts` (`SpravceClankuu`, `SpravceDisukzi` — překlepy), `Projekt-ikaros-FE/src/shared/types/index.ts` (`SpravceClanku`, `SpravceDiskuzi`).
+**Stav:** Otevřený — objeveno v 3.2a.
+**Kontext:** BE enum má překlepy v názvech (`SpravceClankuu` dvojité „u", `SpravceDisukzi` přehozené „su"). FE enum má opravené názvy. Numerické hodnoty (10/11/12) se shodují, takže runtime funguje, ale názvy se liší — matoucí, riziko bugu při refactoru.
+**Dopad:** Nízký (runtime OK). Cognitive load + past pro budoucí kód.
+**Řešení:** Sjednotit BE enum názvy na opravené (`SpravceClanku`, `SpravceDiskuzi`). Hodnoty zůstávají. Grep všech použití BE enum názvů.
+
+---
+
+### D-NEW-search-be — Server-side full-text search článků (z 3.2)
+**Stav:** Otevřený.
+**Kontext:** 3.2 Přehled článků filtruje client-side (`filterArticles` nad `useArticles()` array). OK do ~500 článků; pak je přenos celého listu neefektivní.
+**Řešení:** Mongo `$text` index na `ikaros_articles` (`title` + stripped `content`). BE `GET /ikaros-articles?search=` query. FE přepnout `filterArticles` na server query při velkém datasetu.
+**Kdy:** Až článků naroste přes ~500.
+
+---
+
+### D-NEW-bulk-pending-articles — Bulk approve/reject článků ve Zpracovat tabu (z 3.2)
+**Stav:** Otevřený. Souvisí s D-NEW-bulk-pending z 2.4.
+**Kontext:** SpravceClanku schvaluje pending články jeden po druhém. Při mnoha pending najednou je to zdlouhavé.
+**Řešení:** Multi-select ve Zpracovat tabu + bulk endpoint. Společné řešení s 2.4 bulk pending.
+
+---
+
+### D-NEW-touch-targets — Malé touch targety na mobilu (z 3.2, projektový pattern)
+**Stav:** Otevřený, drobnost.
+**Kontext:** 3.2 filtr-chipy (~26 px) a rating hvězdy (~24 px) jsou na mobilu pod doporučenou velikostí dotykového cíle 44×44 px. Vzor je konzistentní s existujícím projektem (3.1 NewsCard, kategorie chipy v CreateWorldPage).
+**Dopad:** Nízký — prvky jsou klikatelné, jen méně pohodlné na malých displejích.
+**Řešení:** Projektová revize touch-target politiky — buď zvětšit chipy/hvězdy na mobilu (`@media` `min-height: 44px`), nebo akceptovat jako záměr. Nejde jen o 3.2.
+
+---
+
+### D-NEW-article-versions — Historie editů článku (z 3.2)
+**Stav:** Otevřený, nice-to-have.
+**Kontext:** Pro literární komunitu by se hodila historie verzí článku (kdo co kdy změnil, rollback).
+**Řešení:** Collection `article_versions` se snapshoty při každém update. Diff UI na detailu.
+**Kdy:** Low priority, až bude poptávka.
 
 ---
 
