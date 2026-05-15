@@ -8,6 +8,7 @@ import { api } from '@/shared/api/client';
 
 vi.mock('@/shared/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+  apiClient: { post: vi.fn() },
 }));
 
 vi.mock('sonner', () => ({
@@ -38,7 +39,13 @@ import { toast } from 'sonner';
 
 interface RenderOpts {
   mode?: 'create' | 'edit';
-  initialData?: { id: string; title: string; content: string };
+  initialData?: {
+    id: string;
+    title: string;
+    content: string;
+    type?: 'info' | 'warning' | 'system';
+    imageUrl?: string;
+  };
   onClose?: ReturnType<typeof vi.fn>;
 }
 
@@ -117,10 +124,39 @@ describe('NewsFormModal — create mode (BC s 3.1a)', () => {
       expect(api.post).toHaveBeenCalledWith('/IkarosNews', {
         title: 'Můj nadpis',
         content: 'Obsah novinky',
+        type: 'info',
       });
     });
     expect(toast.success).toHaveBeenCalledWith('Novinka vytvořena.');
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('výběr typu „Upozornění" se promítne do payloadu', async () => {
+    vi.mocked(api.post).mockResolvedValue({
+      id: 'n3',
+      title: 'T',
+      content: 'C',
+      authorId: 'a',
+      authorName: 'A',
+      createdAtUtc: '',
+      archived: false,
+      type: 'warning',
+    });
+    renderModal();
+    const user = userEvent.setup();
+
+    await user.type(screen.getByLabelText('Nadpis'), 'Varování');
+    await user.type(screen.getByLabelText('Obsah'), 'Pozor!');
+    await user.click(screen.getByRole('radio', { name: 'Upozornění' }));
+    await user.click(screen.getByRole('button', { name: 'Vytvořit' }));
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/IkarosNews', {
+        title: 'Varování',
+        content: 'Pozor!',
+        type: 'warning',
+      });
+    });
   });
 
   it('403 → toast.error "Nemáš oprávnění." + onClose', async () => {
@@ -200,6 +236,8 @@ describe('NewsFormModal — edit mode (Spec 3.1)', () => {
       expect(api.patch).toHaveBeenCalledWith('/IkarosNews/news-42', {
         title: 'Nový nadpis',
         content: 'Starý obsah',
+        type: 'info',
+        imageUrl: null,
       });
     });
     expect(toast.success).toHaveBeenCalledWith('Novinka uložena.');
