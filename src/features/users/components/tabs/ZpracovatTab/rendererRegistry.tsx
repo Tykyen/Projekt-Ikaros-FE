@@ -3,6 +3,7 @@ import {
   type AdminUsernameRequestListItem,
   type FriendRequestListItem,
   type WorldAccessRequestListItem,
+  type ArticleReviewListItem,
 } from '@/shared/types';
 import type { PendingActionRenderer } from './PendingActionCard';
 import {
@@ -20,6 +21,11 @@ import {
   WorldAccessRequestLeft,
   WorldAccessRequestMid,
 } from '@/features/world/components/WorldAccessRequestRenderer';
+import {
+  ArticleReviewActions,
+  ArticleReviewLeft,
+  ArticleReviewMid,
+} from '@/features/ikaros/components/ArticleReviewRenderer';
 
 const usernameRequestRenderer: PendingActionRenderer<AdminUsernameRequestListItem> =
   {
@@ -62,6 +68,16 @@ const worldAccessRequestRenderer: PendingActionRenderer<WorldAccessRequestListIt
     ),
   };
 
+// 3.2d — article_pending_review (SpravceClanku/Admin/Superadmin schvalují pending články).
+const articleReviewRenderer: PendingActionRenderer<ArticleReviewListItem> = {
+  type: PendingActionType.ArticlePendingReview,
+  renderLeft: (item) => <ArticleReviewLeft item={item} />,
+  renderMid: (item) => <ArticleReviewMid item={item} />,
+  renderActions: (item, helpers) => (
+    <ArticleReviewActions item={item} helpers={helpers} />
+  ),
+};
+
 /**
  * Spec 1.4 — registry rendererů pro Zpracovat tab. Klíč = `PendingActionType`,
  * hodnota = konkrétní renderer.
@@ -80,4 +96,6 @@ export const PENDING_ACTION_RENDERERS: Partial<
     friendRequestRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.WorldAccessRequest]:
     worldAccessRequestRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.ArticlePendingReview]:
+    articleReviewRenderer as PendingActionRenderer<unknown>,
 };

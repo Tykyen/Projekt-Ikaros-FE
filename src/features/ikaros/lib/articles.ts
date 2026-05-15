@@ -51,6 +51,23 @@ export function categoryByKey(
   );
 }
 
+/** Relativní čas („před 30 min", „před 3 d", absolute pro starší). */
+export function timeAgo(iso: string): string {
+  const sec = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
+  if (sec < 60) return 'právě teď';
+  const min = Math.round(sec / 60);
+  if (min < 60) return `před ${min} min`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `před ${hr} h`;
+  const days = Math.round(hr / 24);
+  if (days < 7) return `před ${days} d`;
+  return new Date(iso).toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  });
+}
+
 /** CS locale date (např. „12. listopadu 2026"). */
 export function formatDateCs(iso: string): string {
   return new Date(iso).toLocaleDateString('cs-CZ', {
