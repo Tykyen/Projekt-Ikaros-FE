@@ -527,9 +527,9 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 **Uzavírá dluhy:**
 - D-NEW3 z 3.1a (BE povoloval `WorldRole.PJ` pro create/delete) → uzavřen jako **D-069** (zúžení authz na Admin/Superadmin, commit `584946d0`).
 - D-NEW2 z 2.1 (BE paginace `IkarosNews`) → uzavřen jako **D-068** (`?limit=&offset=` + `GET /count`, commit `584946d0`).
+- ~~D-065~~ ✅ Legacy `isActive` pole vyčištěno (2026-05-15, commity `324e2929` BE + `98d7b5b` FE).
 
-**Nově vzniklé dluhy:**
-- **D-065** (BE): Legacy `isActive` pole na schemě — nepoužívané, vyčistit.
+**Nově vzniklé dluhy (otevřené):**
 - **D-066** (FE): TipTap rich-text editor pro `content` (plain textarea bylo MVP).
 - **D-067** (FE/BE): Audit log UI pro archive/delete (fields se ukládají, UI chybí).
 
