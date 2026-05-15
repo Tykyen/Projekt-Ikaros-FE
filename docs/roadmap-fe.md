@@ -524,7 +524,9 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - [x] Tests: BE 46/46 (+27 cases), FE 427/427 (+14 cases v page spec + 6 cases v modal spec).
 - [x] **3.1a (early slice, 2026-05-14):** Vytvoření novinky z dashboardu — `+` tlačítko v hlavičce Novinky pro Admin/Superadmin, modal s plain textarea, mutation hook, sonner toasty. Spec: [spec-3.1a-news-create-early.md](arch/phase-3/spec-3.1a-news-create-early.md).
 
-**Uzavírá dluhy:** D-NEW3 z 3.1a (BE povoloval WorldRole.PJ pro create/delete — D-063 commit zúžil na Admin/Superadmin).
+**Uzavírá dluhy:**
+- D-NEW3 z 3.1a (BE povoloval `WorldRole.PJ` pro create/delete) → uzavřen jako **D-069** (zúžení authz na Admin/Superadmin, commit `584946d0`).
+- D-NEW2 z 2.1 (BE paginace `IkarosNews`) → uzavřen jako **D-068** (`?limit=&offset=` + `GET /count`, commit `584946d0`).
 
 **Nově vzniklé dluhy:**
 - **D-065** (BE): Legacy `isActive` pole na schemě — nepoužívané, vyčistit.

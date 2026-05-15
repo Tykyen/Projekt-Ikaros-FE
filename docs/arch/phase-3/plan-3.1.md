@@ -643,7 +643,7 @@ Zaškrtnout položku v 3.1 a označit jako hotovo s datumem:
 ### O2. `docs/dluhy.md`
 
 Otevřít nové dluhy:
-- **D-NEW3 (resolved)** (zůstává otevřený) — BE controller `WorldRole.PJ` authz pro IkarosNews.
+- **D-069 (resolved)** (zůstává otevřený) — BE controller `WorldRole.PJ` authz pro IkarosNews.
 - **D-065** (nový) — legacy `isActive` pole vyčistit.
 - **D-066** (nový) — TipTap rich-text editor pro `content`.
 - **D-067** (nový) — Audit log UI pro archive/delete.
@@ -657,7 +657,7 @@ docs: O. close 3.1, open follow-up debts
 
 - roadmap-fe.md: mark 3.1 done with date
 - dluhy.md: D-065 (isActive cleanup), D-066 (richtext), D-067 (audit UI)
-- D-NEW3 (resolved) carries over (BE PJ authz)
+- D-069 (resolved) carries over (BE PJ authz)
 ```
 
 ---

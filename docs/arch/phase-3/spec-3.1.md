@@ -47,7 +47,7 @@ Dashboard (krok 2.1) a create-modal flow (3.1a) zůstávají beze změny — adm
   - `POST /IkarosNews` — JWT + role check v service (`Admin/Superadmin`).
   - `DELETE /IkarosNews/:id` — JWT + role check, hard delete, 204.
 - Service: `assertCanWrite(role)` → 403 pokud ne `Admin/Superadmin`.
-- ⚠️ BE controller dříve povoloval `WorldRole.PJ` pro create/delete (dluh D-NEW3 z 3.1a) — **vyřešeno** pre-existujícím commitem před 3.1 (zúžení authz na Admin/Superadmin, viz commit `584946d0`).
+- ⚠️ BE controller dříve povoloval `WorldRole.PJ` pro create/delete (dluh D-069 z 3.1a) — **vyřešeno** pre-existujícím commitem před 3.1 (zúžení authz na Admin/Superadmin, viz commit `584946d0`).
 
 ### 3.2 FE — Ikaros novinky
 
@@ -306,7 +306,7 @@ export function useDeleteIkarosNews() {
 - ❌ Kategorie / tagy novinek — později.
 - ❌ Audit log UI (kdo co kdy archivoval / smazal) — fields se ukládají, UI přijde v 3.6c (universal audit) nebo později.
 - ❌ Vyčištění legacy `isActive` pole — dluh **D-065** (BE).
-- ✅ ~~Oprava BE controller authz pro `WorldRole.PJ`~~ — dluh **D-NEW3** z 3.1a, uzavřen pre-existujícím commitem před fází A (viz commit `584946d0`).
+- ✅ ~~Oprava BE controller authz pro `WorldRole.PJ`~~ — dluh **D-069** z 3.1a, uzavřen pre-existujícím commitem před fází A (viz commit `584946d0`).
 - ❌ Undo toast pro archivaci — KISS, můžeme přidat později.
 - ❌ Bulk akce (archive více najednou) — později, pokud bude poptávka.
 - ❌ Search / filter v adminu — později.
@@ -416,7 +416,7 @@ export function useDeleteIkarosNews() {
 
 ### 8.1 Otevřené dluhy z 3.1 (tracked)
 
-- ✅ **D-NEW3** (z 3.1a): BE povoluje `WorldRole.PJ` create/delete — **uzavřen** pre-existujícím commitem `584946d0` před fází A (zúžení `assertCanWrite` na `Admin || Superadmin`). PATCH/archive/unarchive ho dědí.
+- ✅ **D-069** (z 3.1a): BE povoluje `WorldRole.PJ` create/delete — **uzavřen** pre-existujícím commitem `584946d0` před fází A (zúžení `assertCanWrite` na `Admin || Superadmin`). PATCH/archive/unarchive ho dědí.
 - **D-065** (nový): Legacy `isActive` pole na schemě — nepoužívané, vyčistit v samostatném BE PR.
 
 ### 8.2 Rizika

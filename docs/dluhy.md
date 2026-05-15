@@ -139,6 +139,27 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
+## Vyřešené (historie, zachovat pro audit trail)
+
+### D-068 — IkarosNews paginace `?limit=&offset=` + `/count` endpoint
+**Stav:** ✅ Uzavřeno 2026-05-15, commit `584946d0`.
+**Soubory:** `backend/src/modules/ikaros-news/ikaros-news.controller.ts`, `ikaros-news.service.ts`, `repositories/ikaros-news.repository.ts`, `interfaces/ikaros-news-repository.interface.ts`.
+**Co bylo:** Dashboard 2.1 sekce Novinky načítala plný list bez paginace (`data.slice(0,5)` na FE). Tento dluh byl původně sledován v `roadmap-fe.md` jako **D-NEW2 z 2.1**. PJ ho rozdělal jako součást nějaké session, kód byl uncommitted v ikaros-news/. Při 3.1 spec auditu byl objeven a commitnut samostatně před fází A.
+**Fix:** `parsePositiveInt` helper s `max=100`. `GET ?limit=&offset=` + samostatný `GET /count` endpoint (Nest-friendly místo X-Total-Count headeru). Repository `findActive(opts?)` + `countActive()`. BC zachována — bez query params se chová jako dříve.
+**Pozn.:** Číslo **D-068** zvoleno k vyhnutí kolizi — původní komment v kódu (PJ rozdělaná práce) odkazoval na `D-061`, ale to číslo už bylo zabráno otevřeným dluhem „Mongo replica set pro atomické transakce v approveAccessRequest" (sekce „Otevřené" výše). Při rebrandu 3.1 byl label v kódu sjednocen na **D-068**.
+
+---
+
+### D-069 — IkarosNews authz: zúžení z `WorldRole.PJ` na Admin/Superadmin
+**Stav:** ✅ Uzavřeno 2026-05-15, commit `584946d0`.
+**Soubory:** `backend/src/modules/ikaros-news/ikaros-news.service.ts` (`assertCanWrite`), `ikaros-news.controller.ts` (ApiOperation summary), `ikaros-news.service.spec.ts` (test cases).
+**Co bylo:** BE `assertCanWrite(role)` měl podmínku `role > UserRole.PJ`, což pouštělo `WorldRole.PJ` (world-scoped role) k vytváření/mazání platformového obsahu. Sémantická chyba — Ikaros novinky jsou globální platforma, PJ je world role. Sledováno jako **D-NEW3 z 3.1a**.
+**Fix:** Zúžení na `role !== Admin && role !== Superadmin → 403`. Strukturované error code `FORBIDDEN_PLATFORM_ROLE` a `IKAROS_NEWS_NOT_FOUND` (D-009 konvence). Spec testy přejmenovány „PJ NESMÍ vytvořit/smazat" (D-069 label).
+**Pozn.:** Číslo **D-069** zvoleno k vyhnutí kolizi — původní komment v kódu (PJ rozdělaná práce) odkazoval na `D-063`, ale to bylo zabráno otevřeným dluhem „Anon viewing public/open světů" (sekce „Otevřené" výše). Při rebrandu 3.1 byl label v kódu sjednocen na **D-069**.
+**Navazující:** 3.1 přidalo `PATCH`, `POST /:id/archive`, `POST /:id/unarchive` endpointy — všechny dědí stejný `assertCanWrite`.
+
+---
+
 ## Částečně řešené (zbývající práce)
 
 ### D-009 — BE `code` field v error responses (DOKONČENO 2026-05-14)
