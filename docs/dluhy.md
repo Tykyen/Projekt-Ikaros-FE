@@ -109,6 +109,36 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
+### D-065 — Legacy `isActive` field na IkarosNews schemě (3.1 → fast-follow)
+**Soubory:** `backend/src/modules/ikaros-news/schemas/ikaros-news.schema.ts`, `ikaros-news.repository.ts` (buildFilter), `ikaros-news.interface.ts`
+**Stav:** Otevřený — 3.1 zavedlo nové pole `archived`, ale legacy `isActive` zůstává jako defensive filter.
+**Kontext:** `isActive: true` se v `findByScope` filtru kombinuje s `archived` filtrem. `isActive: false` se nikde nenastavuje (žádný kód ho neumí toggle). Pole je dead code.
+**Dopad:** Mírný — extra `{isActive: true}` v každém query, zbytečný cognitive load při čtení schemy.
+**Řešení:** (1) Migrace dat: vyhodit `isActive: false` dokumenty (pokud nějaké jsou) — nebo set `isActive: true` všem. (2) Odstranit pole ze schemy + interface. (3) Odstranit z buildFilter. (4) Update testů.
+**Kdy:** Vlastní mini-PR, low priority.
+
+---
+
+### D-066 — TipTap rich-text editor pro IkarosNews content (3.1 → 3.2)
+**Soubory:** `src/features/ikaros/components/NewsFormModal.tsx` (textarea), `src/features/ikaros/pages/DashboardPage/components/NewsCard.tsx` (render)
+**Stav:** Otevřený — 3.1 dodáno s plain `<textarea>` jako MVP.
+**Kontext:** Novinka má strukturovaný obsah (paragrafy, odkazy, tučně) — plain text limituje formátování. Rozhodnuto v 3.1a, plán bylo dodělat s 3.2 (Články), kde TipTap stejně přijde.
+**Dopad:** Autor nemůže formátovat obsah; čtenář vidí plain text bez vizuální hierarchie.
+**Řešení:** (1) Přidat `@tiptap/react` + extensions (StarterKit, Link, Image). (2) Replace `<textarea>` v `NewsFormModal` za `<TipTapEditor>`. (3) Migrate stávající content z plaintextu na JSON / HTML (může zůstat plain — TipTap si poradí). (4) Render v `NewsCard` přes TipTap render nebo HTML output.
+**Kdy:** Společně s 3.2 (články) — sdílený TipTap setup.
+
+---
+
+### D-067 — Audit log UI pro Ikaros novinky (archive/delete)
+**Soubory:** `backend/src/modules/ikaros-news/schemas/ikaros-news.schema.ts` (data už jsou), FE: nová audit komponenta nebo rozšíření existujícího AuditLogTab.
+**Stav:** Otevřený — data se ukládají (`archivedAtUtc`, `archivedByUserId`), ale UI je nezobrazuje.
+**Kontext:** 3.1 archive endpoint nastavuje audit fields. Admin/Superadmin by mohl chtít vidět „kdo a kdy zarchivoval/smazal novinku" pro accountability. Pro hard delete (DELETE) ale chybí audit log — záznam zmizí z DB.
+**Dopad:** Bez audit logu nelze dohledat, kdo provedl změnu. Pro malý team (Tyky + 1-2 admini) zatím nekritické.
+**Řešení:** (1) Hard delete → log do AdminAuditLog před `findByIdAndDelete`. (2) Archive/unarchive také log do AuditLog (i když data jsou na entitě, AuditLog je centrální view). (3) FE: rozšířit AuditLogTab v `/ikaros/uzivatele` o filter na entity typu „IkarosNews".
+**Kdy:** Až bude širší team admin nebo se objeví incident dohledávání. Low priority.
+
+---
+
 ## Částečně řešené (zbývající práce)
 
 ### D-009 — BE `code` field v error responses (DOKONČENO 2026-05-14)

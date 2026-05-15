@@ -496,7 +496,7 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 **Uzavírá dluhy:** D-053b membership guard rozšířen o `redirectTo` prop.
 
 **Mimo rozsah (samostatné fáze / dluhy):**
-- 2.5 World settings (edit světa, hero upload, leave world, accessMode toggle, promote rolí).
+- World settings (edit světa, hero upload, leave world, accessMode toggle, promote rolí) → **krok 5.3**.
 - Fáze 5+ Žádost o postavu (Čtenář → Žadatel role upgrade) — nový character flow.
 - **D-NEW-character-request** (in-world akce „Žádám PJ o postavu").
 - **D-NEW-anon-world-detail** (logged-out viewing public/open detailu).
@@ -513,10 +513,23 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 
 **Nové balíčky:** `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-image`, `@tiptap/extension-link`, `@tiptap/extension-table`
 
-### - [ ] 3.1 Ikaros novinky
+### - [x] 3.1 Ikaros novinky ✅ (2026-05-15)
+
+**Spec:** [spec-3.1.md](arch/phase-3/spec-3.1.md), **Plán:** [plan-3.1.md](arch/phase-3/plan-3.1.md)
+
 - [x] V dashboardu — čtení bez přihlášení (krok 2.1)
-- [ ] Admin správa (full list, edit, delete, archiv, paginace — `/ikaros/novinky`)
+- [x] **Admin správa** (`/ikaros/novinky`) — full list s tabs Aktivní / Archiv, paginace 20/page, edit (PATCH), archive/unarchive (idempotent), hard delete (ConfirmDialog "nevratné"). Mobile = stacked layout.
+- [x] **BE rozšíření:** schema field `archived` + audit (archivedAtUtc, archivedByUserId); endpointy `PATCH /:id`, `POST /:id/archive`, `POST /:id/unarchive`; `GET ?scope=active\|archived\|all` s OptionalJwtAuthGuard (anon vidí jen active).
+- [x] **FE:** nová page `IkarosNewsManagementPage`, refactor `CreateNewsModal` → `NewsFormModal { mode: 'create'\|'edit' }`, 5 nových react-query hooks, menu „Správa novinek" v sekci Administrace pro Admin/Superadmin.
+- [x] Tests: BE 46/46 (+27 cases), FE 427/427 (+14 cases v page spec + 6 cases v modal spec).
 - [x] **3.1a (early slice, 2026-05-14):** Vytvoření novinky z dashboardu — `+` tlačítko v hlavičce Novinky pro Admin/Superadmin, modal s plain textarea, mutation hook, sonner toasty. Spec: [spec-3.1a-news-create-early.md](arch/phase-3/spec-3.1a-news-create-early.md).
+
+**Uzavírá dluhy:** D-NEW3 z 3.1a (BE povoloval WorldRole.PJ pro create/delete — D-063 commit zúžil na Admin/Superadmin).
+
+**Nově vzniklé dluhy:**
+- **D-065** (BE): Legacy `isActive` pole na schemě — nepoužívané, vyčistit.
+- **D-066** (FE): TipTap rich-text editor pro `content` (plain textarea bylo MVP).
+- **D-067** (FE/BE): Audit log UI pro archive/delete (fields se ukládají, UI chybí).
 
 ### - [ ] 3.2 Články (`/ikaros/clanky`)
 - [ ] Přehled (Published), `/novy` editor (TipTap)
@@ -609,8 +622,10 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - [ ] Novinky světa, poslední stránky, blížící se eventy
 
 ### - [ ] 5.3 Nastavení světa (`/svet/:worldId/nastaveni`)
-- [ ] Základní info (název, popis, obrázek) — PJ+
-- [ ] Custom skupiny, správa členů (role)
+- [ ] Základní info (název, popis, obrázek / hero upload) — PJ+
+- [ ] Custom skupiny, správa členů (role, promote Čtenář → PJ apod.)
+- [ ] **accessMode toggle** (public ↔ open ↔ private) — PJ+ (z dluhu 2.5)
+- [ ] **Leave world** (self-leave pro Ctenar+, ne PJ) — z dluhu 2.5 / D-NEW-leave-world
 
 ---
 
