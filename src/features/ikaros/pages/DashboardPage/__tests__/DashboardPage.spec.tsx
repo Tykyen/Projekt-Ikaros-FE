@@ -56,7 +56,7 @@ beforeEach(() => {
           authorId: 'a1',
           authorName: 'Admin',
           createdAtUtc: new Date().toISOString(),
-          isActive: true,
+          archived: false,
         },
       ]);
     }

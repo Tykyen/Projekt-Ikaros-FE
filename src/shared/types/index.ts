@@ -331,7 +331,6 @@ export interface IkarosNews {
   authorId: string;
   authorName: string;
   createdAtUtc: string;
-  isActive: boolean;
   /** Spec 3.1 — revertibilní soft toggle pro archiv. Default `false`. */
   archived: boolean;
   archivedAtUtc?: string;

@@ -35,7 +35,6 @@ function makeNews(overrides: Partial<{ id: string; title: string; content: strin
     authorId: 'u1',
     authorName: 'Admin',
     createdAtUtc: '2026-05-14T10:00:00Z',
-    isActive: true,
     archived: overrides.archived ?? false,
   };
 }

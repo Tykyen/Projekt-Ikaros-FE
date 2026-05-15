@@ -12,7 +12,7 @@ function makeNews(overrides: Partial<IkarosNews> = {}): IkarosNews {
     authorId: 'admin1',
     authorName: 'Admin',
     createdAtUtc: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    isActive: true,
+    archived: false,
     ...overrides,
   };
 }

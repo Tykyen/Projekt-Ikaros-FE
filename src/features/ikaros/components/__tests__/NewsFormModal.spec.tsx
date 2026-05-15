@@ -83,7 +83,6 @@ describe('NewsFormModal — create mode (BC s 3.1a)', () => {
       authorId: 'a',
       authorName: 'A',
       createdAtUtc: '',
-      isActive: true,
       archived: false,
     });
     const onClose = vi.fn();
@@ -167,7 +166,6 @@ describe('NewsFormModal — edit mode (Spec 3.1)', () => {
       authorId: 'a',
       authorName: 'A',
       createdAtUtc: '',
-      isActive: true,
       archived: false,
     });
     const onClose = vi.fn();

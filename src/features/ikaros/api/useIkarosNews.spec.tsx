@@ -33,7 +33,7 @@ describe('useIkarosNews', () => {
         authorId: 'a1',
         authorName: 'Admin',
         createdAtUtc: '2026-05-13T10:00:00Z',
-        isActive: true,
+        archived: false,
       },
     ]);
     const { result } = renderHook(() => useIkarosNews(), {
@@ -69,7 +69,7 @@ describe('useCreateIkarosNews', () => {
       authorId: 'a1',
       authorName: 'Admin',
       createdAtUtc: '2026-05-14T10:00:00Z',
-      isActive: true,
+      archived: false,
     });
 
     const { result } = renderHook(() => useCreateIkarosNews(), {

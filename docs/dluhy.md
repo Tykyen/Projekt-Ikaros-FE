@@ -109,16 +109,6 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
-### D-065 — Legacy `isActive` field na IkarosNews schemě (3.1 → fast-follow)
-**Soubory:** `backend/src/modules/ikaros-news/schemas/ikaros-news.schema.ts`, `ikaros-news.repository.ts` (buildFilter), `ikaros-news.interface.ts`
-**Stav:** Otevřený — 3.1 zavedlo nové pole `archived`, ale legacy `isActive` zůstává jako defensive filter.
-**Kontext:** `isActive: true` se v `findByScope` filtru kombinuje s `archived` filtrem. `isActive: false` se nikde nenastavuje (žádný kód ho neumí toggle). Pole je dead code.
-**Dopad:** Mírný — extra `{isActive: true}` v každém query, zbytečný cognitive load při čtení schemy.
-**Řešení:** (1) Migrace dat: vyhodit `isActive: false` dokumenty (pokud nějaké jsou) — nebo set `isActive: true` všem. (2) Odstranit pole ze schemy + interface. (3) Odstranit z buildFilter. (4) Update testů.
-**Kdy:** Vlastní mini-PR, low priority.
-
----
-
 ### D-066 — TipTap rich-text editor pro IkarosNews content (3.1 → 3.2)
 **Soubory:** `src/features/ikaros/components/NewsFormModal.tsx` (textarea), `src/features/ikaros/pages/DashboardPage/components/NewsCard.tsx` (render)
 **Stav:** Otevřený — 3.1 dodáno s plain `<textarea>` jako MVP.
@@ -140,6 +130,16 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 ---
 
 ## Vyřešené (historie, zachovat pro audit trail)
+
+### D-065 — Legacy `isActive` field na IkarosNews schemě
+**Stav:** ✅ Uzavřeno 2026-05-15.
+**Soubory:** `backend/src/modules/ikaros-news/schemas/ikaros-news.schema.ts`, `interfaces/ikaros-news.interface.ts`, `repositories/ikaros-news.repository.ts`, `ikaros-news.service.ts`, `repositories/ikaros-news.repository.spec.ts`, `ikaros-news.service.spec.ts`, FE: `src/shared/types/index.ts`, 5 testů.
+**Co bylo:** Legacy boolean `isActive` (default `true`) zůstával na schemě po zavedení nového `archived` flagu v 3.1. Pole se nikde nenastavovalo na `false`, ale v `buildFilter` se defensivně přidávalo `isActive: true` do každého MongoDB query. Dead code + cognitive load.
+**Fix:** (1) Schema: odstraněno `@Prop isActive`. (2) Interface (entity + response): odstraněno pole. (3) Repository toEntity: nečte `isActive`. (4) Repository buildFilter: zjednodušeno — `active` → `{archived: {$ne: true}}`, `archived` → `{archived: true}`, `all` → `{}`. (5) Service create: neukládá `isActive`. (6) Service joinAuthorNames: nevrací v response. (7) FE `IkarosNews` type: odstraněno pole.
+**Data migrace:** Žádná — orphan `isActive` v existujících Mongo dokumentech není problém (MongoDB schema-less, pole ignorováno).
+**Tests:** BE 46/46 + FE 427/427 (žádné regrese, jen mock data zbavena `isActive: true`).
+
+---
 
 ### D-068 — IkarosNews paginace `?limit=&offset=` + `/count` endpoint
 **Stav:** ✅ Uzavřeno 2026-05-15, commit `584946d0`.
