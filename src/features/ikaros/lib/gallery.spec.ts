@@ -78,7 +78,7 @@ describe('statusLabel', () => {
 
 describe('filterImages', () => {
   const images = [
-    makeImage({ id: 'a', title: 'Drak', category: 'fanart', averageRating: 5, ratings: [{ userId: 'x', stars: 5 }] }),
+    makeImage({ id: 'a', title: 'Drak', category: 'fanart', averageRating: 5, ratings: [{ userId: 'x', stars: 5, userName: 'X', text: '', createdAtUtc: '2026-01-01' }] }),
     makeImage({ id: 'b', title: 'Mapa', category: 'ostatni', averageRating: 2 }),
     makeImage({ id: 'c', title: 'Koncept', status: 'Draft' }),
   ];

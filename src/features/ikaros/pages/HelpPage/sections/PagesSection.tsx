@@ -123,10 +123,14 @@ const SOON_IKAROS: PageDoc[] = [
   {
     path: '/ikaros/diskuze',
     name: 'Diskuze',
-    status: 'soon',
-    fáze: 'Fáze 3.4',
-    who: 'Čtení anon, zápis přihlášený',
-    what: 'Vlákna diskuzí, manažeři, pozvánky, hlášení moderaci. Moderuje Správce diskuzí.',
+    status: 'ok',
+    who: 'Jen přihlášení',
+    what:
+      'Témata k rozhovoru — založ téma a veď vlákno příspěvků (formátovaný text). ' +
+      'Diskuze může být otevřená nebo uzamčená (pozvánky, žádosti o přidání); ' +
+      'správce diskuze řeší manažery a pozvánky. Příspěvky lze lajkovat, ' +
+      'diskuzi přidat do oblíbených a nevhodné příspěvky nahlásit. ' +
+      'Schvaluje a moderuje Správce diskuzí.',
   },
   {
     path: '/ikaros/posta',

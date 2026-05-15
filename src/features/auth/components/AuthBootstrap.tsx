@@ -17,7 +17,7 @@ import {
  *    state); smaže expirovaný token.
  * 2) `useCurrentUserHydration` (1.3a) — plnohodnotná hydratace z `/users/me`.
  *    Přepíše atom plnými daty (D-005). Závisí na QueryClientProvider.
- * 3) `UsernameRequestToast` (D-030) — po login zobrazí toast s rozhodnutou
+ * 3) `UsernameRequestToast` (D-028) — po login zobrazí toast s rozhodnutou
  *    username žádostí, kterou žadatel ještě neviděl.
  */
 export function AuthBootstrap() {

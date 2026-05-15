@@ -58,7 +58,7 @@ export function useCancelMyUsernameRequest() {
   });
 }
 
-// D-030 — Toast po login s rozhodnutou žádostí
+// D-028 — Toast po login s rozhodnutou žádostí
 export function useMyLastUnseenDecidedRequest(enabled = true) {
   return useQuery({
     queryKey: ['users', 'me', 'username-request', 'last-unseen-decided'],

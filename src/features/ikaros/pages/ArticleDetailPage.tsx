@@ -10,6 +10,7 @@ import { UserRole } from '@/shared/types';
 import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles } from '../api/useArticles';
 import { useArticleCategories } from '../api/useArticleCategories';
 import { RejectReasonModal } from '../components/RejectReasonModal';
+import { ReviewsSection } from '../components/ReviewsSection';
 import { AutoTOC } from '../components/AutoTOC';
 import {
   articleNumber,
@@ -188,99 +189,29 @@ function AuthorSidebar({ article }: { article: IkarosArticle }) {
   );
 }
 
-// ─── Rating panel ────────────────────────────────────────────────────────
+// ─── Recenze (3.4f) ──────────────────────────────────────────────────────
 
 function RatingPanel({ article }: { article: IkarosArticle }) {
   const user = useAtomValue(currentUserAtom);
-  const isAuthor = user?.id === article.authorId;
-  const myRating = article.ratings.find((r) => r.userId === user?.id)?.stars ?? 0;
-  const [hover, setHover] = useState(0);
   const rate = useRateArticle();
 
   return (
-    <section className={s.ratingPanel}>
-      <h3 className={s.sectionHeading}>Hodnocení</h3>
-      <div className={s.ratingAvg}>
-        <span className={s.ratingStars}>
-          {[1, 2, 3, 4, 5].map((n) => (
-            <span
-              key={n}
-              className={n <= Math.round(article.averageRating) ? s.starFull : s.starEmpty}
-              aria-hidden
-            >
-              ★
-            </span>
-          ))}
-        </span>
-        <span className={s.ratingNum}>
-          {article.averageRating > 0 ? article.averageRating.toFixed(1) : '—'} z 5
-        </span>
-        <span className={s.ratingCount}>
-          · {article.ratings.length} hodnocení
-        </span>
-      </div>
-
-      <RatingDistribution ratings={article.ratings} />
-
-      {user && !isAuthor && (
-        <div className={s.rateInput}>
-          <span className={s.rateLabel}>
-            {myRating > 0 ? 'Tvé hodnocení:' : 'Ohodnoť:'}
-          </span>
-          <div className={s.rateStars}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onMouseEnter={() => setHover(n)}
-                onMouseLeave={() => setHover(0)}
-                onClick={() => {
-                  rate.mutate(
-                    { id: article.id, stars: n },
-                    {
-                      onSuccess: () => toast.success('Hodnocení uloženo'),
-                      onError: () => toast.error('Nepodařilo se uložit'),
-                    },
-                  );
-                }}
-                className={s.rateBtn}
-                aria-label={`${n} hvězd`}
-              >
-                <span className={n <= (hover || myRating) ? s.starFull : s.starEmpty}>
-                  ★
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </section>
-  );
-}
-
-function RatingDistribution({ ratings }: { ratings: IkarosArticle['ratings'] }) {
-  if (ratings.length === 0) return null;
-  const buckets = [5, 4, 3, 2, 1].map((stars) => {
-    const count = ratings.filter((r) => r.stars === stars).length;
-    return { stars, count, pct: (count / ratings.length) * 100 };
-  });
-  return (
-    <div className={s.dist}>
-      {buckets.map(({ stars, count, pct }) => (
-        <div key={stars} className={s.distRow}>
-          <span className={s.distStar}>{stars}</span>
-          <div
-            className={s.distBar}
-            role="progressbar"
-            aria-valuenow={count}
-            aria-valuemax={ratings.length}
-          >
-            <div className={s.distFill} style={{ width: `${pct}%` }} />
-          </div>
-          <span className={s.distPct}>{pct.toFixed(0)}%</span>
-        </div>
-      ))}
-    </div>
+    <ReviewsSection
+      ratings={article.ratings}
+      averageRating={article.averageRating}
+      canReview={!!user && user.id !== article.authorId}
+      currentUserId={user?.id}
+      isPending={rate.isPending}
+      onSubmit={(stars, text) =>
+        rate.mutate(
+          { id: article.id, stars, text },
+          {
+            onSuccess: () => toast.success('Recenze uložena'),
+            onError: () => toast.error('Nepodařilo se uložit recenzi'),
+          },
+        )
+      }
+    />
   );
 }
 

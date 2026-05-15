@@ -77,9 +77,9 @@ describe('filterArticles', () => {
 
   it('sort=top — DESC podle averageRating', () => {
     const articles = [
-      mkArticle({ id: '1', averageRating: 3.5, ratings: [{ userId: 'u', stars: 3 }] }),
-      mkArticle({ id: '2', averageRating: 4.8, ratings: [{ userId: 'u', stars: 5 }] }),
-      mkArticle({ id: '3', averageRating: 4.2, ratings: [{ userId: 'u', stars: 4 }] }),
+      mkArticle({ id: '1', averageRating: 3.5, ratings: [{ userId: 'u', stars: 3, userName: 'U', text: '', createdAtUtc: '2026-01-01' }] }),
+      mkArticle({ id: '2', averageRating: 4.8, ratings: [{ userId: 'u', stars: 5, userName: 'U', text: '', createdAtUtc: '2026-01-01' }] }),
+      mkArticle({ id: '3', averageRating: 4.2, ratings: [{ userId: 'u', stars: 4, userName: 'U', text: '', createdAtUtc: '2026-01-01' }] }),
     ];
     const result = filterArticles(articles, '', new Set(), 'top');
     expect(result.map((a) => a.id)).toEqual(['2', '3', '1']);

@@ -158,7 +158,43 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
+### D-NEW-html-sanitization — Chybí server-side sanitizace HTML (z 3.2, potvrzeno 3.4)
+**Stav:** Otevřený, bezpečnostní — **blokované prostředím**.
+**Soubory:** `backend` — `ikaros-articles` (`content`), `ikaros-discussions` (post `content`).
+**Problém:** BE neukládá-sanitizuje HTML z RichTextEditoru — spoléhá na to, že TipTap produkuje bezpečné HTML a že render jde vždy přes `<RichTextEditor readOnly>` (TipTap při re-parse zahodí cokoli mimo schema). Kdo obejde FE a POSTne `<script>` přímo na API, uloží ho do DB.
+**Dopad:** Střední — stored XSS je při dnešním renderu (TipTap re-parse) neutralizovaný, ale uložená data jsou „špinavá" a jakýkoli budoucí `dangerouslySetInnerHTML` render by je zneužil.
+**Řešení:** Server-side sanitizér (`sanitize-html`) v `addPost` / article create+update — allowlist tagů shodný s TipTap schématem. Wiring je ~15 řádků (sdílený `sanitizeRichText()` util).
+**Blocker (2026-05-15):** `npm install sanitize-html` v tomto prostředí selhává — `UNABLE_TO_VERIFY_LEAF_SIGNATURE` (TLS/CA na npm registry). Hand-rollovaný regex sanitizér by dával falešný pocit bezpečí (mutation XSS) — záměrně nezvolen. Dořeší se po opravě npm CA / dostupnosti registry.
+**Kdy:** Bezpečnostní úklid, ideálně před produkčním nasazením — jakmile lze nainstalovat dependency.
+
+---
+
+## Čeká na trigger (přesun z „Otevřené")
+
+### D-NEW-discussion-pagination — Stránkování seznamu diskuzí a vlákna — TRIGGER: ~stovky diskuzí / dlouhá vlákna
+**Soubory:** FE `useDiscussions()` / `useDiscussionPosts()`, BE `ikaros-discussions` `findAll`.
+**Co dělá aktuální stav:** `GET /ikaros-discussions` vrací všechny dostupné diskuze; `useDiscussionPosts` natáhne 50 příspěvků; filtrování/řazení je client-side. Pro desítky diskuzí **správné rozhodnutí** — žádný server-side paging overhead, okamžitý fulltext.
+**Trigger:** počet diskuzí přeroste ~stovky, nebo vlákno přesáhne ~50 příspěvků, nebo výkonnostní audit.
+**Co bude potřeba:** Server-side paging listu (skip/limit + total) — pozor, rozbije client-side search/sort, nutné přesunout i ně na server. „Načíst starší" ve vlákně (BE `getPosts` skip/limit už existuje). **Řešit společně s `D-NEW-search-be`** — stejný pattern, stejný trigger; články dnes mají identický client-side přístup, sjednotit.
+**Pozn.:** Překlasifikováno 2026-05-15 z „Otevřené" — pro aktuální objem dat je client-side správně, předčasná optimalizace by zbytečně zkomplikovala UX (paged search).
+
+---
+
 ## Vyřešené (historie, zachovat pro audit trail)
+
+### D-NEW-postcount-race — `postCount` diskuze se počítal read-then-write (z 3.4)
+**Stav:** ✅ Uzavřeno 2026-05-15.
+**Soubory:** `backend/src/modules/ikaros-discussions/` — `repositories/ikaros-discussions.repository.ts`, `ikaros-discussions.service.ts`.
+**Co bylo:** `postCount` se aktualizoval načti-pak-zapiš (`update(id, { postCount: discussion.postCount ± 1 })`) v `addPost`/`deletePost`/`resolveReport` → při souběhu hrozila ztracená inkrementace.
+**Fix:** Nová repo metoda `adjustPostCount(id, delta, touchActivity?)` — atomický `$inc` (zrcadlí `adjustLikeCount`), volitelně posune `lastActivityUtc`, sklápí záporný `postCount` na 0. Service všechny tři cesty přepnuty na ni; `addPost` ani `resolveReport` už kvůli čítači nečtou diskuzi. Test `addPost` ověřuje `adjustPostCount('disc1', 1, true)`.
+
+### D-071 — GET /ikaros-gallery/:id s nevalidním ObjectId vrací 500 místo 404
+**Stav:** ✅ Uzavřeno 2026-05-15.
+**Soubory:** `backend/src/modules/ikaros-gallery/repositories/ikaros-gallery.repository.ts` (`findById`), `ikaros-gallery.repository.spec.ts`.
+**Co bylo:** Nevalidní `:id` (ne-ObjectId) → `model.findById(id)` vyhodil Mongoose `CastError`, neošetřený → 500 místo 404.
+**Fix:** `findById` na začátku validuje `isValidObjectId(id)`; při neplatném vrací `null`. Všechny service metody (`findById`/`update`/`delete`/`submit`/`approve`/`reject`/`rate`) volají `repo.findById` jako první existence-check → jedna oprava pokrývá všechny cesty, výsledek je standardní 404 (`GALLERY_ITEM_NOT_FOUND`). +2 regresní testy.
+
+---
 
 ### D-066 — TipTap rich-text editor pro IkarosNews content
 **Stav:** ✅ Uzavřeno 2026-05-15 (3.2b dodala `<RichTextEditor>`, retrofit novinek dotažen v navazujícím commitu).

@@ -16,6 +16,7 @@ const GROUP_TITLES: Record<PendingActionType, string> = {
   [PendingActionType.WorldAccessRequest]: 'Žádosti o vstup do světa',
   [PendingActionType.ArticlePendingReview]: 'Články ke schválení',
   [PendingActionType.GalleryPendingReview]: 'Obrázky ke schválení',
+  [PendingActionType.DiscussionPendingReview]: 'Diskuze ke schválení',
   [PendingActionType.DiscussionReport]: 'Hlášené příspěvky',
   [PendingActionType.DiscussionJoinRequest]: 'Žádosti o vstup do diskuze',
 };

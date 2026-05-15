@@ -112,21 +112,17 @@ function SidebarContent({
   isAuthenticated: boolean;
   onNav?: () => void;
 }) {
-  const myWorldsQuery = useMyWorlds();
+  // Levý panel = objevování: poslední vytvořené veřejné světy (public/open),
+  // stejně pro anon i přihlášené. Osobní „Moje světy" žijí v pravém panelu.
   const publicWorldsQuery = usePublicWorlds();
-  const worlds: SidebarWorld[] | undefined = isAuthenticated
-    ? myWorldsQuery.data?.map(({ world, membership }) => ({
-        id: world.id,
-        slug: world.slug,
-        name: world.name,
-        isPJ: membership.role === WorldRole.PJ,
-      }))
-    : publicWorldsQuery.data?.map((w) => ({
-        id: w.id,
-        slug: w.slug,
-        name: w.name,
-        isPJ: false,
-      }));
+  const worlds: SidebarWorld[] | undefined = publicWorldsQuery.data?.map(
+    (w) => ({
+      id: w.id,
+      slug: w.slug,
+      name: w.name,
+      isPJ: false,
+    }),
+  );
   const { data: unread } = useUnreadCount();
   const chatCount = isAuthenticated ? unread?.unreadCount ?? 0 : 0;
 
@@ -144,12 +140,9 @@ function SidebarContent({
       <div className={s.section} data-section-key="vesmiry">
         <SectionTitle>Vesmíry</SectionTitle>
         <div className={s.navList}>
-          {worlds?.slice(0, 8).map((w) => (
+          {worlds?.slice(0, 3).map((w) => (
             <Link key={w.id} to={`/svet/${w.slug}`} className={s.navItem} onClick={onNav}>
               <span className={s.navItemLabel}>{w.name}</span>
-              {w.isPJ && (
-                <span className={s.pjBadge} data-pj-badge>PJ</span>
-              )}
             </Link>
           ))}
           {(worlds?.length ?? 0) > 0 ? (
@@ -246,7 +239,7 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
             <p className={s.emptyHint}>Žádné světy</p>
           )}
           {(worlds?.length ?? 0) > 0 && (
-            <Link to="/ikaros/vesmiry" className={s.showAllLink} onClick={onNav}>Zobrazit vše →</Link>
+            <Link to="/ikaros/vesmiry?filter=mine" className={s.showAllLink} onClick={onNav}>Zobrazit vše →</Link>
           )}
         </div>
       </div>

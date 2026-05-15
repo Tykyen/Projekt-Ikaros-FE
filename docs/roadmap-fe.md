@@ -583,12 +583,18 @@ Vizuální směr „Salon" (masonry, wall label, lightbox). **Brownfield** — B
 - [x] **3.3e — Úklid:** `napoveda` (galerie 🚧→✅, queue typ ve FAQ), `mobil-desktop` audit, Lightbox barvy → tokeny; uzavřen i preexistující dluh **D-NEW-event-color-lint** (event/akce barvy → `--img-ctrl-*` tokeny). `lint:colors` clean.
 - [x] **3.3x — TipTap `Image` extension** pro `<RichTextEditor>`: nový BE endpoint `POST /upload/content-image` (bez admin gate, folder `content`), `Image` extension volitelně přes prop `onImageUpload`, `RTEToolbar` s tlačítkem „Obrázek", napojeno na `ArticleEditorPage`. Galerie RTE nepoužívá (popis = plain textarea). +5 FE, +2 BE testů.
 
-### - [ ] 3.4 Diskuze (`/ikaros/diskuze`)
-- [ ] Seznam diskuzí, `/:id` vlákno příspěvků
-- [ ] Manageři, pozvánky
-- [ ] **Hlášené příspěvky** → queue typ `discussion_report` ve Zpracovat tabu SpravceDiskuzi (infra z 1.4). `DiscussionReportProvider implements IPendingActionProvider`.
-- [ ] **Žádost o přidání do uzamčené diskuze** → queue typ `discussion_join_request` ve Zpracovat tabu manažera diskuze. `DiscussionJoinProvider implements IPendingActionProvider`. Renderer karty: avatar žadatele + název diskuze + tlačítka Přijmout/Odmítnout.
-- [ ] **Sekce „Diskuze o článku" na detailu článku** (z 3.2) — link „Diskutuj o tomto článku" vytvoří/otevře diskuzi; reverse link z diskuze zpět na článek.
+### - [x] 3.4 Diskuze (`/ikaros/diskuze`) ✅ (2026-05-15)
+
+**Spec:** [spec-3.4.md](arch/phase-3/spec-3.4.md), **Plán:** [plan-3.4a.md](arch/phase-3/plan-3.4a.md)
+Brownfield — BE modul `ikaros-discussions` existoval z feature-parity. Diskuze = samostatné téma (ne komentář k obsahu).
+
+- [x] **3.4a+b — BE rozšíření + pending integrace**: pole `joinRequestIds`, collection `ikaros_discussion_reports`, endpointy toggle-like / managers / join-request / report / resolve-report, `User.likedDiscussionIds`, PJ pryč z `ADMIN_ROLES`; 3 providery (`DiscussionReview/Report/Join`) + enum `discussion_pending_review`; FE 3 renderery do Zpracovat tabu, `useDiscussions` workflow hooky. +25 BE testů.
+- [x] **3.4c — FE seznam + vytvoření**: `DiscussionsPage` (taby Přehled/Moje, hledání, řazení), `DiscussionsNewPage`, `lib/discussions`, routing (diskuze logged-in only — R4).
+- [x] **3.4d — FE detail/vlákno**: `DiscussionDetailPage` (vlákno RTE příspěvků, like/oblíbené, admin schválení), `DiscussionManagePanel` (zámek, vývěska, správci, pozvánky, žádosti o přidání), hlášení příspěvků. BE: `GET /users/lookup` (picker), `GET /ikaros-discussions/:id/members`.
+- [x] **3.4e — úklid**: nápověda (diskuze 🚧→✅, FAQ, StartSection), responsivní audit (mobil i desktop).
+- [x] **3.4f — Recenze**: hodnocení 1–5★ článků (3.2) i obrázků (3.3) rozšířeno o textovou recenzi (`text`/`userName`/`createdAtUtc`); sdílená `ReviewsSection` na obou detailech. *(Nahrazuje původní položku „Diskuze o článku" — spec-3.4 R5: je to recenze, ne diskuze.)*
+
+**Dluhy:** ~~D-NEW-postcount-race~~ (vyřešeno 2026-05-15 — atomický `$inc`); D-NEW-discussion-pagination → přesunuto na „čeká na trigger"; **D-NEW-html-sanitization zůstává otevřený** — blokuje `npm install sanitize-html` (TLS/CA chyba registry). Viz `docs/dluhy.md`.
 
 ### - [ ] 3.5 Soukromá pošta (`/ikaros/posta`)
 - [ ] Inbox / Sent, nová zpráva
@@ -625,6 +631,26 @@ Vizuální směr „Salon" (masonry, wall label, lightbox). **Brownfield** — B
 **Otevřené dluhy z 3.6a:** ~~D-053~~ (uzavřen 2026-05-13 — viz `docs/arch/phase-1/_side-tasks/spec-d053-role-architecture-cleanup.md`), ~~D-054~~ (uzavřen 2026-05-13 — point-fix `ASSIGNABLE_ROLES`). Follow-up **D-053b** otevřen pro per-world PJ check.
 
 **Tracked dluh (zůstává):** D-NEW (HelpPage content drift — aktualizovat tab Stránky/FAQ při fázích 1.5/1.7/1.8/2.x/3.x).
+
+### - [ ] 3.7 Oblíbené — globální obsah (články / diskuze / obrázky)
+
+Sjednocená featura „oblíbené" napříč globálním (Ikaros) obsahem. `IkarosLayout`
+sidebar už má sekce-placeholdery „Oblíbené články" / „Oblíbené obrázky" → 3.7 je
+naplní reálnými daty a doplní „Oblíbené diskuze".
+
+- [ ] **Oblíbené články** — BE chybí: `User.favoriteArticleIds` +
+  `POST/DELETE /ikaros-articles/:id/favorite` + `GET /ikaros-articles/my-favorites`.
+  FE: hvězdička na kartě/detailu, naplnit sidebar sekci.
+- [ ] **Oblíbené diskuze** — BE hotové (`favoriteDiscussionIds`,
+  `GET /ikaros-discussions/my-favorites`, `POST /:id/toggle-favorite`).
+  FE: napojit hvězdičku + nová sidebar sekce „Oblíbené diskuze". Závisí na 3.4.
+- [ ] **Oblíbené obrázky** — BE chybí: `User.favoriteGalleryIds` +
+  `POST/DELETE /ikaros-gallery/:id/favorite` + `GET /ikaros-gallery/my-favorites`.
+  FE: hvězdička v galerii/lightboxu, naplnit sidebar sekci.
+- [ ] Sjednotit datový model — buď tři pole `favorite*Ids` (jako diskuze dnes),
+  nebo jedno `favorites: { type, id }[]`. Rozhodnout ve spec fázi.
+
+⚠️ „Oblíbené diskuze" jsou blokované fází 3.4 Diskuze; články a obrázky lze udělat hned.
 
 ---
 

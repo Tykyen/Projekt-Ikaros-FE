@@ -5,6 +5,9 @@ import {
   type WorldAccessRequestListItem,
   type ArticleReviewListItem,
   type GalleryReviewListItem,
+  type DiscussionReviewListItem,
+  type DiscussionReportListItem,
+  type DiscussionJoinRequestListItem,
 } from '@/shared/types';
 import type { PendingActionRenderer } from './PendingActionCard';
 import {
@@ -32,6 +35,21 @@ import {
   GalleryReviewLeft,
   GalleryReviewMid,
 } from '@/features/ikaros/components/GalleryReviewRenderer';
+import {
+  DiscussionReviewActions,
+  DiscussionReviewLeft,
+  DiscussionReviewMid,
+} from '@/features/ikaros/components/DiscussionReviewRenderer';
+import {
+  DiscussionReportActions,
+  DiscussionReportLeft,
+  DiscussionReportMid,
+} from '@/features/ikaros/components/DiscussionReportRenderer';
+import {
+  DiscussionJoinRequestActions,
+  DiscussionJoinRequestLeft,
+  DiscussionJoinRequestMid,
+} from '@/features/ikaros/components/DiscussionJoinRequestRenderer';
 
 const usernameRequestRenderer: PendingActionRenderer<AdminUsernameRequestListItem> =
   {
@@ -94,6 +112,39 @@ const galleryReviewRenderer: PendingActionRenderer<GalleryReviewListItem> = {
   ),
 };
 
+// 3.4b — discussion_pending_review (SpravceDiskuzi/Admin/Superadmin schvalují diskuze).
+const discussionReviewRenderer: PendingActionRenderer<DiscussionReviewListItem> =
+  {
+    type: PendingActionType.DiscussionPendingReview,
+    renderLeft: () => <DiscussionReviewLeft />,
+    renderMid: (item) => <DiscussionReviewMid item={item} />,
+    renderActions: (item, helpers) => (
+      <DiscussionReviewActions item={item} helpers={helpers} />
+    ),
+  };
+
+// 3.4b — discussion_report (SpravceDiskuzi/Admin/Superadmin řeší nahlášené příspěvky).
+const discussionReportRenderer: PendingActionRenderer<DiscussionReportListItem> =
+  {
+    type: PendingActionType.DiscussionReport,
+    renderLeft: () => <DiscussionReportLeft />,
+    renderMid: (item) => <DiscussionReportMid item={item} />,
+    renderActions: (item, helpers) => (
+      <DiscussionReportActions item={item} helpers={helpers} />
+    ),
+  };
+
+// 3.4b — discussion_join_request (manažer diskuze řeší žádosti o přidání).
+const discussionJoinRequestRenderer: PendingActionRenderer<DiscussionJoinRequestListItem> =
+  {
+    type: PendingActionType.DiscussionJoinRequest,
+    renderLeft: (item) => <DiscussionJoinRequestLeft item={item} />,
+    renderMid: (item) => <DiscussionJoinRequestMid item={item} />,
+    renderActions: (item, helpers) => (
+      <DiscussionJoinRequestActions item={item} helpers={helpers} />
+    ),
+  };
+
 /**
  * Spec 1.4 — registry rendererů pro Zpracovat tab. Klíč = `PendingActionType`,
  * hodnota = konkrétní renderer.
@@ -116,4 +167,10 @@ export const PENDING_ACTION_RENDERERS: Partial<
     articleReviewRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.GalleryPendingReview]:
     galleryReviewRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.DiscussionPendingReview]:
+    discussionReviewRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.DiscussionReport]:
+    discussionReportRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.DiscussionJoinRequest]:
+    discussionJoinRequestRenderer as PendingActionRenderer<unknown>,
 };

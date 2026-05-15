@@ -21,8 +21,9 @@ export function StartSection() {
         <li>Úvodník platformy</li>
         <li>Veřejně dostupné vesmíry</li>
         <li>Tuto nápovědu a podmínky použití</li>
-        <li>(Brzy) články, galerii a diskuze ke čtení</li>
+        <li>Články a galerii ke čtení</li>
       </ul>
+      <p>Diskuze jsou jen pro přihlášené — vyžadují účet.</p>
 
       <h2>Co odemkne registrace</h2>
       <ul>

@@ -38,6 +38,7 @@ const GalleryPage      = lazy(() => import('@/features/ikaros/pages/GalleryPage'
 const GalleryUploadPage = lazy(() => import('@/features/ikaros/pages/GalleryUploadPage'));
 const GalleryDetailPage = lazy(() => import('@/features/ikaros/pages/GalleryDetailPage'));
 const DiscussionsPage  = lazy(() => import('@/features/ikaros/pages/DiscussionsPage'));
+const DiscussionDetailPage = lazy(() => import('@/features/ikaros/pages/DiscussionDetailPage'));
 const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage'));
 const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
@@ -138,7 +139,6 @@ export const router = createBrowserRouter([
       { path: 'ikaros/galerie/nahrat',        element: p(GalleryUploadPage), loader: requireAuth },
       { path: 'ikaros/galerie/:id/upravit',   element: p(GalleryUploadPage), loader: requireAuth },
       { path: 'ikaros/galerie/:id',           element: p(GalleryDetailPage) },
-      { path: 'ikaros/diskuze',         element: p(DiscussionsPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'podminky',               element: p(TermsPage) },
       // 1.7 — anonymní routes pro mailové linky (reset / verify / email change)
@@ -151,7 +151,10 @@ export const router = createBrowserRouter([
       { path: 'ikaros/vytvorit-svet',   element: p(CreateWorldPage),  loader: requireAuth },
       { path: 'ikaros/profil',          element: p(ProfilePage),      loader: requireAuth },
       { path: 'ikaros/uzivatel/:id',    element: p(UserProfilePage),  loader: requireAuth },
+      // 3.4 — diskuze jsou logged-in only (spec-3.4 R4); pořadí: /nova před /:id.
+      { path: 'ikaros/diskuze',         element: p(DiscussionsPage),    loader: requireAuth },
       { path: 'ikaros/diskuze/nova',    element: p(DiscussionsNewPage), loader: requireAuth },
+      { path: 'ikaros/diskuze/:id',     element: p(DiscussionDetailPage), loader: requireAuth },
       { path: 'ikaros/posta',           element: p(MailPage),         loader: requireAuth },
       // 3.1b — kalendář akcí (akce jsou logged-in only, viz spec 2.1b).
       { path: 'ikaros/akce',            element: p(AkcePage),         loader: requireAuth },

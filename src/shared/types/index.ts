@@ -91,7 +91,6 @@ export interface UsernameChangeRequest {
   id: string;
   userId: string;
   requestedUsername: string;
-  requestedUsernameLower: string;
   status: UsernameChangeRequestStatus;
   requestedAt: string;
   decidedAt?: string;
@@ -357,6 +356,10 @@ export type ArticleStatus = 'Draft' | 'Pending' | 'Published' | 'Rejected';
 export interface ArticleRating {
   userId: string;
   stars: number;
+  /** 3.4f — jméno recenzenta + volitelný text recenze. */
+  userName: string;
+  text: string;
+  createdAtUtc: string;
 }
 
 export interface IkarosArticle {
@@ -413,6 +416,10 @@ export type GalleryStatus = 'Draft' | 'Pending' | 'Published' | 'Rejected';
 export interface GalleryRating {
   userId: string;
   stars: number;
+  /** 3.4f — jméno recenzenta + volitelný text recenze. */
+  userName: string;
+  text: string;
+  createdAtUtc: string;
 }
 
 export interface IkarosGalleryItem {
@@ -466,6 +473,38 @@ export interface GalleryReviewListItem {
   authorId: string;
   authorName: string;
   submittedAt: string;
+}
+
+// ─── Diskuze (3.4) — entity ────────────────────────────────────────────────
+
+export interface IkarosDiscussion {
+  id: string;
+  title: string;
+  description: string;
+  /** Vývěska — zvýrazněné oznámení v hlavičce diskuze. */
+  bulletin: string;
+  creatorId: string;
+  creatorName: string;
+  isApproved: boolean;
+  /** False = uzamčená (přístup jen pro pozvané). */
+  isOpen: boolean;
+  managerIds: string[];
+  invitedUserIds: string[];
+  joinRequestIds: string[];
+  postCount: number;
+  likeCount: number;
+  createdAtUtc: string;
+  lastActivityUtc: string;
+}
+
+export interface IkarosDiscussionPost {
+  id: string;
+  discussionId: string;
+  authorId: string;
+  authorName: string;
+  /** HTML z RichTextEditoru. */
+  content: string;
+  createdAtUtc: string;
 }
 
 export interface UpcomingEventDto {
@@ -598,8 +637,43 @@ export enum PendingActionType {
   WorldAccessRequest = 'world_access_request',
   ArticlePendingReview = 'article_pending_review',
   GalleryPendingReview = 'gallery_pending_review',
+  DiscussionPendingReview = 'discussion_pending_review',
   DiscussionReport = 'discussion_report',
   DiscussionJoinRequest = 'discussion_join_request',
+}
+
+// ─── Diskuze (3.4) — payloady karet ve Zpracovat tabu ──────────────────────
+
+/** `discussion_pending_review` — diskuze čekající na schválení. */
+export interface DiscussionReviewListItem {
+  discussionId: string;
+  title: string;
+  descriptionExcerpt: string;
+  creatorId: string;
+  creatorName: string;
+  submittedAt: string;
+}
+
+/** `discussion_report` — nahlášený příspěvek. */
+export interface DiscussionReportListItem {
+  reportId: string;
+  discussionId: string;
+  discussionTitle: string;
+  postId: string;
+  /** Snapshot obsahu příspěvku v době nahlášení (HTML z RTE). */
+  postContentSnapshot: string;
+  postAuthorName: string;
+  reporterName: string;
+  reason: string;
+  createdAt: string;
+}
+
+/** `discussion_join_request` — žádost o přidání do uzamčené diskuze. */
+export interface DiscussionJoinRequestListItem {
+  discussionId: string;
+  discussionTitle: string;
+  userId: string;
+  username: string;
 }
 
 export interface PendingActionsCountResponse {

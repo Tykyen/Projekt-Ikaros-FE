@@ -135,10 +135,18 @@ export function useRejectGalleryImage() {
 export function useRateGalleryImage() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, stars }: { id: string; stars: number }) =>
+    mutationFn: ({
+      id,
+      stars,
+      text,
+    }: {
+      id: string;
+      stars: number;
+      text?: string;
+    }) =>
       api.post<{ averageRating: number; totalRatings: number }>(
         `${PREFIX}/${id}/rate`,
-        { stars },
+        { stars, text },
       ),
     onSuccess: (_, { id }) =>
       qc.invalidateQueries({ queryKey: [...GALLERY_KEY, 'detail', id] }),

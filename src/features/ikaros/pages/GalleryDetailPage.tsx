@@ -16,7 +16,7 @@ import {
 } from '../api/useGallery';
 import { useGalleryCategories } from '../api/useGalleryCategories';
 import { categoryByKey, formatDateCs, statusColor, statusLabel } from '../lib/gallery';
-import { RatingStars } from '../components/RatingStars';
+import { ReviewsSection } from '../components/ReviewsSection';
 import { RejectReasonModal } from '../components/RejectReasonModal';
 import type { IkarosGalleryItem } from '@/shared/types';
 import s from './GalleryDetailPage.module.css';
@@ -95,40 +95,29 @@ export default function GalleryDetailPage() {
   );
 }
 
-// ─── Hodnocení ───────────────────────────────────────────────────────────
+// ─── Recenze (3.4f) ──────────────────────────────────────────────────────
 
 function Rating({ image }: { image: IkarosGalleryItem }) {
   const user = useAtomValue(currentUserAtom);
   const rate = useRateGalleryImage();
-  const isAuthor = user?.id === image.authorId;
-  const canRate = !!user && !isAuthor;
-  const myRating =
-    image.ratings.find((r) => r.userId === user?.id)?.stars ?? 0;
-
-  function handleRate(stars: number) {
-    rate.mutate(
-      { id: image.id, stars },
-      {
-        onSuccess: () => toast.success('Hodnocení uloženo'),
-        onError: () => toast.error('Nepodařilo se uložit hodnocení'),
-      },
-    );
-  }
 
   return (
-    <div className={s.ratingBlock}>
-      <RatingStars
-        average={image.averageRating}
-        count={image.ratings.length}
-        myRating={myRating}
-        onRate={canRate ? handleRate : undefined}
-        disabled={rate.isPending}
-        size="lg"
-      />
-      {isAuthor && (
-        <p className={s.ratingHint}>Vlastní obrázek nelze hodnotit.</p>
-      )}
-    </div>
+    <ReviewsSection
+      ratings={image.ratings}
+      averageRating={image.averageRating}
+      canReview={!!user && user.id !== image.authorId}
+      currentUserId={user?.id}
+      isPending={rate.isPending}
+      onSubmit={(stars, text) =>
+        rate.mutate(
+          { id: image.id, stars, text },
+          {
+            onSuccess: () => toast.success('Recenze uložena'),
+            onError: () => toast.error('Nepodařilo se uložit recenzi'),
+          },
+        )
+      }
+    />
   );
 }
 
