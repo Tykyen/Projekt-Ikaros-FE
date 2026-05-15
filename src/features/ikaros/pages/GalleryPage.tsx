@@ -1,3 +1,250 @@
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+import { Plus, Search, ArrowUpDown } from 'lucide-react';
+import { isAuthenticatedAtom } from '@/shared/store/authStore';
+import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
+import { Spinner } from '@/shared/ui';
+import {
+  useGalleryImages,
+  useMyGalleryImages,
+  useGalleryStats,
+} from '../api/useGallery';
+import { useGalleryCategories } from '../api/useGalleryCategories';
+import { GalleryGrid } from '../components/GalleryGrid';
+import { Lightbox } from '../components/Lightbox';
+import { categoryStyle, filterImages, type SortKey } from '../lib/gallery';
+import type { GalleryStats } from '@/shared/types';
+import s from './GalleryPage.module.css';
+
+type Tab = 'prehled' | 'moje';
+
 export default function GalleryPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Galerie</div>;
+  const [params, setParams] = useSearchParams();
+  const tab = (params.get('tab') ?? 'prehled') as Tab;
+  const isAuth = useAtomValue(isAuthenticatedAtom);
+
+  const setTab = (next: Tab) => {
+    if (next === 'prehled') params.delete('tab');
+    else params.set('tab', next);
+    setParams(params, { replace: true });
+  };
+
+  return (
+    <div className={s.page}>
+      <header className={s.header}>
+        <div className={s.headerLeft}>
+          <h1 className={s.title}>Galerie</h1>
+          <p className={s.subtitle}>Obrazový salon komunity</p>
+        </div>
+        {isAuth && (
+          <Link to="/ikaros/galerie/nahrat" className={s.newBtn}>
+            <Plus size={16} /> Nahrát obrázek
+          </Link>
+        )}
+      </header>
+
+      <nav className={s.tabs} role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'prehled'}
+          onClick={() => setTab('prehled')}
+          className={tab === 'prehled' ? s.tabActive : s.tab}
+        >
+          Přehled
+        </button>
+        {isAuth && (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'moje'}
+            onClick={() => setTab('moje')}
+            className={tab === 'moje' ? s.tabActive : s.tab}
+          >
+            Moje obrázky
+          </button>
+        )}
+      </nav>
+
+      {tab === 'prehled' && <PrehledTab />}
+      {tab === 'moje' && isAuth && <MojeTab />}
+    </div>
+  );
+}
+
+// ─── Přehled tab ─────────────────────────────────────────────────────────
+
+function PrehledTab() {
+  const { data: images = [], isLoading } = useGalleryImages();
+  const { data: categories = [] } = useGalleryCategories();
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, 250);
+  const [sort, setSort] = useState<SortKey>('new');
+  const [catFilter, setCatFilter] = useState<Set<string>>(new Set());
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const toggleCat = (key: string) => {
+    setCatFilter((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const filtered = useMemo(
+    () => filterImages(images, debouncedQuery, catFilter, sort),
+    [images, debouncedQuery, catFilter, sort],
+  );
+
+  if (isLoading) return <Spinner center />;
+
+  return (
+    <>
+      <div className={s.toolbar}>
+        <label className={s.searchWrap}>
+          <Search size={14} className={s.searchIcon} aria-hidden />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Hledat…"
+            className={s.searchInput}
+            aria-label="Hledat obrázek"
+          />
+        </label>
+        <label className={s.sortWrap}>
+          <ArrowUpDown size={14} aria-hidden />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className={s.sortSelect}
+            aria-label="Řazení"
+          >
+            <option value="new">Nejnovější</option>
+            <option value="top">Nejlépe hodnocené</option>
+            <option value="most-rated">Nejvíc hodnocených</option>
+          </select>
+        </label>
+      </div>
+
+      {categories.length > 0 && (
+        <div className={s.catChips} role="group" aria-label="Filtr kategorií">
+          {categories.map((cat) => {
+            const active = catFilter.has(cat.key);
+            return (
+              <button
+                key={cat.key}
+                type="button"
+                onClick={() => toggleCat(cat.key)}
+                className={active ? s.chipActive : s.chip}
+                style={categoryStyle(cat)}
+                aria-pressed={active}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <div className={s.empty}>
+          <p>
+            {catFilter.size > 0 || debouncedQuery
+              ? 'Žádné obrázky neodpovídají filtru.'
+              : 'Galerie je zatím prázdná.'}
+          </p>
+        </div>
+      ) : (
+        <GalleryGrid
+          images={filtered}
+          categories={categories}
+          onOpen={(img) =>
+            setLightboxIndex(filtered.findIndex((i) => i.id === img.id))
+          }
+        />
+      )}
+
+      {lightboxIndex !== null && (
+        <Lightbox
+          images={filtered}
+          index={lightboxIndex}
+          categories={categories}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+        />
+      )}
+    </>
+  );
+}
+
+// ─── Moje obrázky tab ────────────────────────────────────────────────────
+
+function MojeTab() {
+  const { data: images = [], isLoading } = useMyGalleryImages();
+  const { data: stats } = useGalleryStats();
+  const { data: categories = [] } = useGalleryCategories();
+
+  if (isLoading) return <Spinner center />;
+
+  return (
+    <>
+      {stats && <MyStatsWidget stats={stats} />}
+      {images.length === 0 ? (
+        <div className={s.empty}>
+          <p>Zatím jsi nenahrál žádný obrázek.</p>
+          <Link to="/ikaros/galerie/nahrat" className={s.newBtn}>
+            <Plus size={16} /> Nahrát první obrázek
+          </Link>
+        </div>
+      ) : (
+        <GalleryGrid images={images} categories={categories} isMine />
+      )}
+    </>
+  );
+}
+
+// ─── Mini stats widget ───────────────────────────────────────────────────
+
+function MyStatsWidget({ stats }: { stats: GalleryStats }) {
+  const items: Array<{
+    label: string;
+    value: number | string;
+    color?: string;
+  }> = [
+    {
+      label: 'Celkem',
+      value: stats.draft + stats.pending + stats.published + stats.rejected,
+    },
+    {
+      label: 'Publikováno',
+      value: stats.published,
+      color: 'var(--status-published)',
+    },
+    { label: 'Konceptů', value: stats.draft, color: 'var(--status-draft)' },
+    { label: 'Pending', value: stats.pending, color: 'var(--status-pending)' },
+    {
+      label: 'Zamítnutých',
+      value: stats.rejected,
+      color: 'var(--status-rejected)',
+    },
+    { label: 'Průměr ★', value: stats.averageRating || '—' },
+  ];
+  return (
+    <div className={s.stats}>
+      {items.map((item) => (
+        <div key={item.label} className={s.statItem}>
+          <span
+            className={s.statValue}
+            style={item.color ? { color: item.color } : undefined}
+          >
+            {item.value}
+          </span>
+          <span className={s.statLabel}>{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
 }

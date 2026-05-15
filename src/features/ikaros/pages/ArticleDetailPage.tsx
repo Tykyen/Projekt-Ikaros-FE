@@ -7,7 +7,7 @@ import { currentUserAtom } from '@/shared/store/authStore';
 import { Spinner, ConfirmDialog } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { UserRole } from '@/shared/types';
-import { useArticle, useApproveArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles } from '../api/useArticles';
+import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles } from '../api/useArticles';
 import { useArticleCategories } from '../api/useArticleCategories';
 import { RejectReasonModal } from '../components/RejectReasonModal';
 import { AutoTOC } from '../components/AutoTOC';
@@ -289,6 +289,7 @@ function RatingDistribution({ ratings }: { ratings: IkarosArticle['ratings'] }) 
 function AdminActions({ article }: { article: IkarosArticle }) {
   const user = useAtomValue(currentUserAtom);
   const approve = useApproveArticle();
+  const reject = useRejectArticle();
   const [rejectOpen, setRejectOpen] = useState(false);
 
   const isAdmin = user && REVIEWER_ROLES.includes(user.role);
@@ -323,8 +324,20 @@ function AdminActions({ article }: { article: IkarosArticle }) {
       <RejectReasonModal
         open={rejectOpen}
         onClose={() => setRejectOpen(false)}
-        articleId={article.id}
-        articleTitle={article.title}
+        title={`Vrátit článek „${article.title}"`}
+        isPending={reject.isPending}
+        onConfirm={(reason) =>
+          reject.mutate(
+            { id: article.id, reason },
+            {
+              onSuccess: () => {
+                toast.success('Článek vrácen autorovi s poznámkou');
+                setRejectOpen(false);
+              },
+              onError: () => toast.error('Nepodařilo se vrátit článek'),
+            },
+          )
+        }
       />
     </section>
   );

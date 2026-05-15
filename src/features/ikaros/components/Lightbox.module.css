@@ -1,0 +1,168 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-8) var(--sp-12);
+  background: var(--gal-lightbox-bg);
+  backdrop-filter: blur(4px);
+  animation: fade var(--transition-base);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.close {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  display: flex;
+  padding: var(--sp-2);
+  background: transparent;
+  border: none;
+  color: var(--gal-lightbox-fg-dim);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.close:hover {
+  color: var(--gal-lightbox-fg-strong);
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  padding: var(--sp-3);
+  background: var(--gal-lightbox-ctrl-bg);
+  border: none;
+  border-radius: 50%;
+  color: var(--gal-lightbox-fg-dim);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--transition-base),
+    color var(--transition-fast);
+}
+
+.overlay:hover .nav {
+  opacity: 1;
+}
+
+.nav:hover {
+  color: var(--gal-lightbox-fg-strong);
+}
+
+.navPrev {
+  left: var(--sp-3);
+}
+
+.navNext {
+  right: var(--sp-3);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  align-items: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.img {
+  max-width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--gal-lightbox-img-shadow);
+}
+
+/* ── Wall label v lightboxu ────────────────────────────────────────────── */
+
+.label {
+  width: 100%;
+  max-width: 640px;
+  color: var(--gal-lightbox-fg);
+}
+
+.labelMain {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.title {
+  font-family: var(--prose-font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin: 0;
+  color: var(--gal-lightbox-fg-strong);
+}
+
+.detailLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--gal-lightbox-fg-dim);
+  text-decoration: none;
+}
+
+.detailLink:hover {
+  color: var(--gal-lightbox-fg-strong);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-top: var(--sp-1);
+  font-family: var(--prose-font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gal-lightbox-fg-dim);
+}
+
+.author {
+  color: var(--gal-lightbox-fg);
+}
+
+.dot {
+  opacity: 0.5;
+}
+
+.desc {
+  margin: var(--sp-2) 0 0;
+  font-family: var(--prose-font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--gal-lightbox-fg);
+}
+
+.rating {
+  margin-top: var(--sp-3);
+}
+
+@media (max-width: 768px) {
+  .overlay {
+    padding: var(--sp-4) var(--sp-2);
+  }
+  .img {
+    max-height: 60vh;
+  }
+  /* Mobil — bez hoveru, šipky vždy viditelné. */
+  .nav {
+    opacity: 1;
+    background: var(--gal-lightbox-ctrl-bg-strong);
+  }
+}

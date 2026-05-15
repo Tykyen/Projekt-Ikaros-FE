@@ -1,31 +1,40 @@
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { Modal } from '@/shared/ui/Modal/Modal';
-import { useRejectArticle } from '../api/useArticles';
 import s from './RejectReasonModal.module.css';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  articleId: string;
-  articleTitle: string;
+  /** Nadpis modalu, např. `Vrátit článek „Název"`. */
+  title: string;
+  /** Probíhá mutace (disabluje tlačítka). */
+  isPending: boolean;
+  /** Callback s ořezaným důvodem (min 10 znaků zaručeno modalem). */
+  onConfirm: (reason: string) => void;
+  /** Pomocný text nad textareou. */
+  helpText?: string;
+  /** Label potvrzovacího tlačítka. */
+  confirmLabel?: string;
 }
 
 const MIN_REASON = 10;
 const MAX_REASON = 2000;
 
 /**
- * 3.2c — modal pro „Vrátit s poznámkou" (reject). Povinný reason min 10
- * znaků (forc reasonable feedback autorovi).
+ * 3.2c — modal pro „Vrátit s poznámkou" (reject). Povinný reason min 10 znaků.
+ * 3.3b — zobecněn na content-agnostic (`onConfirm` callback) — sdílí ho
+ * článkový i galerijní review renderer.
  */
 export function RejectReasonModal({
   open,
   onClose,
-  articleId,
-  articleTitle,
+  title,
+  isPending,
+  onConfirm,
+  helpText,
+  confirmLabel = 'Vrátit autorovi',
 }: Props) {
   const [reason, setReason] = useState('');
-  const reject = useRejectArticle();
 
   function handleClose() {
     setReason('');
@@ -35,34 +44,18 @@ export function RejectReasonModal({
   function handleConfirm() {
     const trimmed = reason.trim();
     if (trimmed.length < MIN_REASON) return;
-    reject.mutate(
-      { id: articleId, reason: trimmed },
-      {
-        onSuccess: () => {
-          toast.success('Článek vrácen autorovi s poznámkou');
-          setReason('');
-          onClose();
-        },
-        onError: () => {
-          toast.error('Nepodařilo se vrátit článek');
-        },
-      },
-    );
+    onConfirm(trimmed);
   }
 
   const trimmedLen = reason.trim().length;
   const isValid = trimmedLen >= MIN_REASON;
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      title={`Vrátit článek „${articleTitle}"`}
-      size="md"
-    >
+    <Modal open={open} onClose={handleClose} title={title} size="md">
       <p className={s.help}>
-        Napiš autorovi, co potřebuje upravit nebo doplnit. Minimální délka{' '}
-        {MIN_REASON} znaků.
+        {helpText ??
+          'Napiš autorovi, co potřebuje upravit nebo doplnit.'}{' '}
+        Minimální délka {MIN_REASON} znaků.
       </p>
       <textarea
         value={reason}
@@ -84,17 +77,17 @@ export function RejectReasonModal({
           type="button"
           onClick={handleClose}
           className={s.btnSecondary}
-          disabled={reject.isPending}
+          disabled={isPending}
         >
           Zrušit
         </button>
         <button
           type="button"
           onClick={handleConfirm}
-          disabled={!isValid || reject.isPending}
+          disabled={!isValid || isPending}
           className={s.btnPrimary}
         >
-          {reject.isPending ? 'Vracím…' : 'Vrátit autorovi'}
+          {isPending ? 'Vracím…' : confirmLabel}
         </button>
       </div>
     </Modal>

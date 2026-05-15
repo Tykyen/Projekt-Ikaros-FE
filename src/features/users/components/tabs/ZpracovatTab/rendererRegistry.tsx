@@ -4,6 +4,7 @@ import {
   type FriendRequestListItem,
   type WorldAccessRequestListItem,
   type ArticleReviewListItem,
+  type GalleryReviewListItem,
 } from '@/shared/types';
 import type { PendingActionRenderer } from './PendingActionCard';
 import {
@@ -26,6 +27,11 @@ import {
   ArticleReviewLeft,
   ArticleReviewMid,
 } from '@/features/ikaros/components/ArticleReviewRenderer';
+import {
+  GalleryReviewActions,
+  GalleryReviewLeft,
+  GalleryReviewMid,
+} from '@/features/ikaros/components/GalleryReviewRenderer';
 
 const usernameRequestRenderer: PendingActionRenderer<AdminUsernameRequestListItem> =
   {
@@ -78,6 +84,16 @@ const articleReviewRenderer: PendingActionRenderer<ArticleReviewListItem> = {
   ),
 };
 
+// 3.3b — gallery_pending_review (SpravceGalerie/Admin/Superadmin schvalují pending obrázky).
+const galleryReviewRenderer: PendingActionRenderer<GalleryReviewListItem> = {
+  type: PendingActionType.GalleryPendingReview,
+  renderLeft: (item) => <GalleryReviewLeft item={item} />,
+  renderMid: (item) => <GalleryReviewMid item={item} />,
+  renderActions: (item, helpers) => (
+    <GalleryReviewActions item={item} helpers={helpers} />
+  ),
+};
+
 /**
  * Spec 1.4 — registry rendererů pro Zpracovat tab. Klíč = `PendingActionType`,
  * hodnota = konkrétní renderer.
@@ -98,4 +114,6 @@ export const PENDING_ACTION_RENDERERS: Partial<
     worldAccessRequestRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.ArticlePendingReview]:
     articleReviewRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.GalleryPendingReview]:
+    galleryReviewRenderer as PendingActionRenderer<unknown>,
 };

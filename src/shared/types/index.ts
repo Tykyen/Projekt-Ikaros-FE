@@ -406,6 +406,68 @@ export interface ArticleReviewListItem {
   submittedAt: string;
 }
 
+// ─── Galerie (3.3) ─────────────────────────────────────────────────────────
+
+export type GalleryStatus = 'Draft' | 'Pending' | 'Published' | 'Rejected';
+
+export interface GalleryRating {
+  userId: string;
+  stars: number;
+}
+
+export interface IkarosGalleryItem {
+  id: string;
+  title: string;
+  description?: string;
+  /** Cloudinary secure_url. */
+  imageUrl: string;
+  /** Cloudinary public_id (pro mazání assetu). */
+  publicId: string;
+  /** Rozměry pro masonry aspect-ratio (0 = starý dokument, fallback 1:1). */
+  width: number;
+  height: number;
+  /** Slug, ref na `gallery_categories.key`. */
+  category: string;
+  authorId: string;
+  authorName: string;
+  status: GalleryStatus;
+  rejectReason?: string;
+  ratings: GalleryRating[];
+  averageRating: number;
+  createdAtUtc: string;
+  updatedAtUtc: string;
+  publishedAtUtc?: string;
+}
+
+export interface GalleryCategory {
+  key: string;
+  label: string;
+  /** Hex barva `#RRGGBB`. */
+  color: string;
+  order: number;
+}
+
+export interface GalleryStats {
+  draft: number;
+  pending: number;
+  published: number;
+  rejected: number;
+  totalRatings: number;
+  averageRating: number;
+}
+
+/** Payload karty v Zpracovat tabu (3.3b renderer pro `gallery_pending_review`). */
+export interface GalleryReviewListItem {
+  imageId: string;
+  title: string;
+  /** Cloudinary URL — FE z ní udělá thumbnail. */
+  imageUrl: string;
+  category: string;
+  authorId: string;
+  authorName: string;
+  submittedAt: string;
+}
+
 export interface UpcomingEventDto {
   id: string;
   worldId: string;

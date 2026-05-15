@@ -42,10 +42,42 @@
   --status-published: #4caf50;
   --status-rejected: #ff4444;
 
+  /* Ovládací prvky nad obrázky (kebab menu, focal marker, remove tlačítko).
+     Barvy fixní bílá/černá — musí mít kontrast nad libovolným obrázkem,
+     proto theme-independent. */
+  --img-ctrl-bg: rgba(0, 0, 0, 0.55);
+  --img-ctrl-bg-strong: rgba(0, 0, 0, 0.8);
+  --img-ctrl-fg: #ffffff;
+  --img-marker-border: #ffffff;
+  --img-marker-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+
   /* Article-specific accents. */
   --star-gold: #ffd700;
   /* Tmavý text na accent pozadí (fallback pokud skin nedefinuje). */
   --prose-on-accent: var(--text-on-accent, #050508);
   /* Bílý text na barevném status pozadí (badge Schválit). */
   --prose-on-status: #ffffff;
+
+  /* ── 3.3 Galerie — vizuální směr „Salon" (theme-independent base).
+     Skiny mohou override v [data-theme="<id>"] blocích. */
+  --gal-frame-border: var(--border, #2a2a33);
+  --gal-label-fg: var(--text-muted, #8b98a5);
+  --gal-lift-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.55);
+  --gal-lightbox-bg: rgba(8, 8, 12, 0.94);
+  /* Lightbox je vždy tmavé plátno — barvy textu/ovládání jsou konstantní
+     (theme-independent), proto fixní bílá/černá s alfou. */
+  --gal-lightbox-fg: rgba(255, 255, 255, 0.85);
+  --gal-lightbox-fg-dim: rgba(255, 255, 255, 0.6);
+  --gal-lightbox-fg-strong: #ffffff;
+  --gal-lightbox-ctrl-bg: rgba(0, 0, 0, 0.35);
+  --gal-lightbox-ctrl-bg-strong: rgba(0, 0, 0, 0.55);
+  --gal-lightbox-img-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.8);
+
+  /* Kategorie galerie — default paleta (skiny override). */
+  --gal-cat-fanart: #f06292;
+  --gal-cat-mapy: #4db6ac;
+  --gal-cat-postavy: #ff8a65;
+  --gal-cat-svety: #64b5f6;
+  --gal-cat-ostatni: #8b98a5;
+  --gal-cat-current: var(--accent, #f06292); /* runtime override per-card */
 }

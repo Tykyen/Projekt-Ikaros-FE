@@ -33,6 +33,7 @@ function makeUser(role: UserRole): User {
 function makeCtx(overrides: Partial<WorldContextValue> = {}): WorldContextValue {
   return {
     worldId: 'w1',
+    worldSlug: 'w1-slug',
     world: null,
     isPJ: false,
     userRole: null,

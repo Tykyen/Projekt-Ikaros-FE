@@ -2,6 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import { useEffect } from 'react';
 import { getExtensions } from './extensions';
 import { RTEBubbleMenu } from './BubbleMenu';
+import { RTEToolbar } from './RTEToolbar';
 import s from './RichTextEditor.module.css';
 
 export interface RichTextEditorProps {
@@ -19,6 +20,11 @@ export interface RichTextEditorProps {
   withDropCap?: boolean;
   /** ARIA label pro contenteditable oblast (accessibility / testy). */
   ariaLabel?: string;
+  /**
+   * 3.3x — nahraje obrázek a vrátí jeho URL. Když zadáno, aktivuje se
+   * `Image` extension + toolbar s tlačítkem „Obrázek".
+   */
+  onImageUpload?: (file: File) => Promise<string>;
   className?: string;
 }
 
@@ -37,10 +43,11 @@ export function RichTextEditor({
   readOnly,
   withDropCap,
   ariaLabel,
+  onImageUpload,
   className,
 }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: getExtensions({ placeholder }),
+    extensions: getExtensions({ placeholder, enableImage: !!onImageUpload }),
     content: value,
     editable: !readOnly,
     immediatelyRender: false,
@@ -77,6 +84,9 @@ export function RichTextEditor({
 
   return (
     <div className={wrapperClass}>
+      {!readOnly && onImageUpload && (
+        <RTEToolbar editor={editor} onImageUpload={onImageUpload} />
+      )}
       {!readOnly && <RTEBubbleMenu editor={editor} />}
       <EditorContent editor={editor} className={s.content} />
     </div>

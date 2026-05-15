@@ -1,48 +1,47 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useArticleCategories } from '../api/useArticleCategories';
-import { useApproveArticle, useRejectArticle } from '../api/useArticles';
+import { useGalleryCategories } from '../api/useGalleryCategories';
 import {
-  articleNumber,
-  categoryByKey,
-  categoryStyle,
-  timeAgo,
-} from '../lib/articles';
+  useApproveGalleryImage,
+  useRejectGalleryImage,
+} from '../api/useGallery';
+import { categoryByKey, categoryStyle, cloudinaryThumb, timeAgo } from '../lib/gallery';
 import { RejectReasonModal } from './RejectReasonModal';
-import type { ArticleReviewListItem } from '@/shared/types';
-import s from './ArticleReviewRenderer.module.css';
+import type { GalleryReviewListItem } from '@/shared/types';
+import s from './GalleryReviewRenderer.module.css';
 
 interface ActionsHelpers {
   onResolve: () => void;
   isLoading: boolean;
 }
 
-// ─── Left slot — N° ID + kategorie ──────────────────────────────────────
+// ─── Left slot — thumbnail + kategorie ──────────────────────────────────
 
-export function ArticleReviewLeft({ item }: { item: ArticleReviewListItem }) {
-  const { data: categories = [] } = useArticleCategories();
+export function GalleryReviewLeft({ item }: { item: GalleryReviewListItem }) {
+  const { data: categories = [] } = useGalleryCategories();
   const cat = categoryByKey(categories, item.category);
   return (
     <div className={s.left} style={categoryStyle(cat)}>
-      <span className={s.number}>N° {articleNumber(item.articleId)}</span>
-      <span className={s.category}>
-        <span className={s.waxSeal} />
-        {cat.label}
-      </span>
+      <img
+        src={cloudinaryThumb(item.imageUrl, 120, 120)}
+        alt=""
+        className={s.thumb}
+        loading="lazy"
+      />
+      <span className={s.category}>{cat.label}</span>
     </div>
   );
 }
 
-// ─── Mid slot — title + preview + autor + time ──────────────────────────
+// ─── Mid slot — title + autor + time ────────────────────────────────────
 
-export function ArticleReviewMid({ item }: { item: ArticleReviewListItem }) {
+export function GalleryReviewMid({ item }: { item: GalleryReviewListItem }) {
   return (
     <div className={s.mid}>
-      <Link to={`/ikaros/clanky/${item.articleId}`} className={s.title}>
+      <Link to={`/ikaros/galerie/${item.imageId}`} className={s.title}>
         {item.title}
       </Link>
-      <p className={s.preview}>{item.preview}…</p>
       <div className={s.meta}>
         <Link to={`/ikaros/uzivatel/${item.authorId}`} className={s.author}>
           {item.authorName}
@@ -56,33 +55,33 @@ export function ArticleReviewMid({ item }: { item: ArticleReviewListItem }) {
 
 // ─── Actions slot — Schválit / Vrátit s poznámkou ───────────────────────
 
-export function ArticleReviewActions({
+export function GalleryReviewActions({
   item,
   helpers,
 }: {
-  item: ArticleReviewListItem;
+  item: GalleryReviewListItem;
   helpers: ActionsHelpers;
 }) {
   const [rejectOpen, setRejectOpen] = useState(false);
-  const approve = useApproveArticle();
-  const reject = useRejectArticle();
+  const approve = useApproveGalleryImage();
+  const reject = useRejectGalleryImage();
   const isLoading = helpers.isLoading || approve.isPending;
 
   function handleApprove() {
-    approve.mutate(item.articleId, {
+    approve.mutate(item.imageId, {
       onSuccess: () => helpers.onResolve(),
     });
   }
 
   function handleReject(reason: string) {
     reject.mutate(
-      { id: item.articleId, reason },
+      { id: item.imageId, reason },
       {
         onSuccess: () => {
-          toast.success('Článek vrácen autorovi s poznámkou');
+          toast.success('Obrázek vrácen autorovi s poznámkou');
           setRejectOpen(false);
         },
-        onError: () => toast.error('Nepodařilo se vrátit článek'),
+        onError: () => toast.error('Nepodařilo se vrátit obrázek'),
       },
     );
   }
@@ -108,7 +107,7 @@ export function ArticleReviewActions({
       <RejectReasonModal
         open={rejectOpen}
         onClose={() => setRejectOpen(false)}
-        title={`Vrátit článek „${item.title}"`}
+        title={`Vrátit obrázek „${item.title}"`}
         isPending={reject.isPending}
         onConfirm={handleReject}
       />

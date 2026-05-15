@@ -35,6 +35,8 @@ const ArticlesPage         = lazy(() => import('@/features/ikaros/pages/Articles
 const ArticleDetailPage    = lazy(() => import('@/features/ikaros/pages/ArticleDetailPage'));
 const ArticleEditorPage    = lazy(() => import('@/features/ikaros/pages/ArticleEditorPage'));
 const GalleryPage      = lazy(() => import('@/features/ikaros/pages/GalleryPage'));
+const GalleryUploadPage = lazy(() => import('@/features/ikaros/pages/GalleryUploadPage'));
+const GalleryDetailPage = lazy(() => import('@/features/ikaros/pages/GalleryDetailPage'));
 const DiscussionsPage  = lazy(() => import('@/features/ikaros/pages/DiscussionsPage'));
 const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage'));
 const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
@@ -132,6 +134,10 @@ export const router = createBrowserRouter([
       { path: 'ikaros/clanky/:id/upravit',    element: p(ArticleEditorPage), loader: requireAuth },
       { path: 'ikaros/clanky/:id',            element: p(ArticleDetailPage) },
       { path: 'ikaros/galerie',         element: p(GalleryPage) },
+      // ⚠️ `/nahrat` musí být před `/:id` (specifické route před parametrické).
+      { path: 'ikaros/galerie/nahrat',        element: p(GalleryUploadPage), loader: requireAuth },
+      { path: 'ikaros/galerie/:id/upravit',   element: p(GalleryUploadPage), loader: requireAuth },
+      { path: 'ikaros/galerie/:id',           element: p(GalleryDetailPage) },
       { path: 'ikaros/diskuze',         element: p(DiscussionsPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'podminky',               element: p(TermsPage) },

@@ -26,8 +26,8 @@
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: rgba(0, 0, 0, 0.55);
-  color: white;
+  background: var(--img-ctrl-bg);
+  color: var(--img-ctrl-fg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,7 +37,7 @@
 }
 .kebabBtn:hover,
 .kebabBtn:focus-visible {
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--img-ctrl-bg-strong);
   outline: none;
 }
 @media (max-width: 768px) {

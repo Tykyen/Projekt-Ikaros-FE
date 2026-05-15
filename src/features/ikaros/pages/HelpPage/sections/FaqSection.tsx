@@ -123,10 +123,14 @@ const FAQ: FaqItem[] = [
             články čekající na schválení (pro Správce článků a
             Admin/Superadmin) — schválíš je, nebo vrátíš autorovi s poznámkou
           </li>
+          <li>
+            obrázky čekající na schválení (pro Správce galerie a
+            Admin/Superadmin) — schválíš je, nebo vrátíš autorovi s poznámkou
+          </li>
         </ul>
         <p>Postupně přibude:</p>
         <ul>
-          <li>pending obrázky / hlášené příspěvky (Fáze 3.3–3.4)</li>
+          <li>hlášené příspěvky v diskuzích (Fáze 3.4)</li>
         </ul>
         <p>
           Číslo u záložky „Zpracovat" v pravém panelu ukazuje, kolik položek

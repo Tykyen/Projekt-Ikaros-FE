@@ -13,6 +13,7 @@ import {
   useSubmitArticle,
 } from '../api/useArticles';
 import { useArticleCategories } from '../api/useArticleCategories';
+import { useUploadContentImage } from '../api/useUploadContentImage';
 import type { ArticleCategory } from '@/shared/types';
 import s from './ArticleEditorPage.module.css';
 
@@ -27,6 +28,7 @@ export default function ArticleEditorPage() {
   const user = useAtomValue(currentUserAtom);
   const { data: article, isLoading: loadingArticle } = useArticle(id);
   const { data: categories = [] } = useArticleCategories();
+  const uploadImage = useUploadContentImage();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -164,6 +166,7 @@ export default function ArticleEditorPage() {
           onChange={setContent}
           placeholder="Začni psát…"
           maxLength={MAX_CONTENT}
+          onImageUpload={async (file) => (await uploadImage.mutateAsync(file)).url}
           className={s.editorContent}
         />
       </main>

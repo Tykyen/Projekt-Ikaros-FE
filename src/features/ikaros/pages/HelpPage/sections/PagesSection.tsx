@@ -113,10 +113,12 @@ const SOON_IKAROS: PageDoc[] = [
   {
     path: '/ikaros/galerie',
     name: 'Galerie',
-    status: 'soon',
-    fáze: 'Fáze 3.3',
+    status: 'ok',
     who: 'Čtení anon, upload přihlášený',
-    what: 'Sdílené obrázky. Workflow pending → approved (schvaluje Správce galerie).',
+    what:
+      'Obrazový salon komunity — mřížka obrázků s kategoriemi, hledáním a řazením, ' +
+      'fullscreen prohlížeč (lightbox). Nahraj obrázek, ulož koncept nebo odešli ' +
+      'ke schválení; po schválení (Správce galerie) ho lze hodnotit hvězdičkami.',
   },
   {
     path: '/ikaros/diskuze',

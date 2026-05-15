@@ -547,7 +547,7 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - [x] Tab „Novinky" odstraněn z `/ikaros/uzivatele`; `NewsManagementTab` smazán.
 - [x] Tests: BE +42 (upload 4, ikaros-news 6, ikaros-events 32), FE +31. Commity přímo do `main` (10 sub-fází 3.1b-a … 3.1b-j).
 
-**Otevřené dluhy:** D-NEW-event-color-lint (`IkarosEventCard/Modal.module.css` mají hardcoded barvy — `lint:colors` 8 porušení, předchází 3.1b).
+**Otevřené dluhy:** ~~D-NEW-event-color-lint~~ (uzavřen 2026-05-15 v rámci 3.3e — hardcoded barvy v `IkarosEventCard/Modal` + `AkcePage` nahrazeny tokeny `--img-ctrl-*` / `--img-marker-*`; `lint:colors` clean).
 
 ### - [x] 3.2 Články (`/ikaros/clanky`) ✅ (2026-05-15)
 
@@ -570,11 +570,18 @@ Rozsah rozdělen na 5 sub-fází (3.2a–e). Vizuální směr „Editorial Ateli
 
 **Otevřené dluhy (budoucí featury / optimalizace, ne nedodělky 3.2):** D-NEW-search-be (server-side search až nad ~500 článků), D-NEW-bulk-pending-articles, D-NEW-article-versions.
 
-### - [ ] 3.3 Galerie (`/ikaros/galerie`)
-- [ ] Mřížka obrázků, `/nahrat` upload (Cloudinary)
-- [ ] Schvalovací workflow (Pending → Approved)
-- [ ] **Pending obrázek** → queue typ `gallery_pending_review` ve Zpracovat tabu SpravceGalerie (infra z 1.4). `GalleryReviewProvider implements IPendingActionProvider`. Renderer karty: thumbnail + tlačítka Schválit/Odmítnout.
-- [ ] **Cloudinary upload extension pro `<RichTextEditor>`** (z 3.2) — po vybudování Cloudinary infra zaregistrovat TipTap Image extension; využije article editor i galerie.
+### - [x] 3.3 Galerie (`/ikaros/galerie`) ✅ (2026-05-15)
+
+**Spec:** [spec-3.3.md](arch/phase-3/spec-3.3.md), **Plány:** [plan-3.3a.md](arch/phase-3/plan-3.3a.md), [plan-3.3c.md](arch/phase-3/plan-3.3c.md), [plan-3.3x.md](arch/phase-3/plan-3.3x.md)
+
+Vizuální směr „Salon" (masonry, wall label, lightbox). **Brownfield** — BE modul `ikaros-gallery` z velké části existoval z feature-parity kroku; 3.3a ho rozšířil. Rozsah rozdělen na sub-fáze 3.3a–e (+ 3.3x mimo).
+
+- [x] **3.3a — BE rozšíření `ikaros-gallery`:** schema pole `category`/`width`/`height`/`publicId`, `gallery_categories` collection + seed (5) + CRUD endpointy, `stats` endpoint, anon read, povinný reject reason, odebrán `PJ` z `ADMIN_ROLES`; `UploadService` vrací rozměry + `deleteImage()`. +35 BE testů.
+- [x] **3.3b — Pending-actions:** `GalleryReviewProvider` (queue `gallery_pending_review`) + registrace; FE `GalleryReviewRenderer` v `PENDING_ACTION_RENDERERS`. `RejectReasonModal` zobecněn (content-agnostic, sdílí články i galerie).
+- [x] **3.3c — Přehled + upload:** `GalleryPage` (masonry CSS columns, taby, filtr kategorií, hledání, statistiky), `GalleryUploadPage` (inline multipart upload + edit), tokeny „Salon" (`--gal-*`), routing. +12 FE testů.
+- [x] **3.3d — Detail + lightbox:** `GalleryDetailPage` (rating, admin/autor akce), `Lightbox` (fullscreen, klávesy ←/→/Esc, swipe), sdílená `RatingStars`. +5 FE testů.
+- [x] **3.3e — Úklid:** `napoveda` (galerie 🚧→✅, queue typ ve FAQ), `mobil-desktop` audit, Lightbox barvy → tokeny; uzavřen i preexistující dluh **D-NEW-event-color-lint** (event/akce barvy → `--img-ctrl-*` tokeny). `lint:colors` clean.
+- [x] **3.3x — TipTap `Image` extension** pro `<RichTextEditor>`: nový BE endpoint `POST /upload/content-image` (bez admin gate, folder `content`), `Image` extension volitelně přes prop `onImageUpload`, `RTEToolbar` s tlačítkem „Obrázek", napojeno na `ArticleEditorPage`. Galerie RTE nepoužívá (popis = plain textarea). +5 FE, +2 BE testů.
 
 ### - [ ] 3.4 Diskuze (`/ikaros/diskuze`)
 - [ ] Seznam diskuzí, `/:id` vlákno příspěvků

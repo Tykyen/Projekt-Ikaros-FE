@@ -126,7 +126,7 @@
 }
 .eventChip:hover {
   background: var(--accent);
-  color: var(--text-on-accent, #fff);
+  color: var(--text-on-accent, var(--prose-on-status));
 }
 
 .chipTime {
