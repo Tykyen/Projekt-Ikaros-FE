@@ -324,6 +324,12 @@ export interface MyWorldEntry {
   membership: WorldMembership;
 }
 
+/**
+ * Spec 3.1b — typ novinky. Určuje barvu nadpisu
+ * (info = fialová, warning = červená, system = zelená).
+ */
+export type IkarosNewsType = 'info' | 'warning' | 'system';
+
 export interface IkarosNews {
   id: string;
   title: string;
@@ -335,6 +341,10 @@ export interface IkarosNews {
   archived: boolean;
   archivedAtUtc?: string;
   archivedByUserId?: string;
+  /** Spec 3.1b — typ novinky. Vždy přítomné (BE default `'info'`). */
+  type: IkarosNewsType;
+  /** Spec 3.1b — URL obrázku nebo `undefined`. */
+  imageUrl?: string;
 }
 
 /** Spec 3.1 — scope filter pro list/count endpointy. */

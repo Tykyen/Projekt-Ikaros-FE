@@ -1,6 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { IkarosNews, IkarosNewsScope } from '@/shared/types';
+import type { IkarosNews, IkarosNewsScope, IkarosNewsType } from '@/shared/types';
+
+/** Spec 3.1b — payload polí novinky sdílený create/update mutacemi. */
+export interface NewsMutationDto {
+  title?: string;
+  content?: string;
+  type?: IkarosNewsType;
+  /** `null` = odebrat obrázek (jen update). */
+  imageUrl?: string | null;
+}
 
 const NEWS_KEY = ['ikaros-news'] as const;
 
@@ -54,7 +63,7 @@ export function useIkarosNewsCount(scope: IkarosNewsScope) {
 export function useCreateIkarosNews() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (dto: { title: string; content: string }) =>
+    mutationFn: (dto: NewsMutationDto & { title: string; content: string }) =>
       api.post<IkarosNews>('/IkarosNews', dto),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: NEWS_KEY });
@@ -62,17 +71,12 @@ export function useCreateIkarosNews() {
   });
 }
 
-/** Spec 3.1 — PATCH /:id partial update title/content. */
+/** Spec 3.1 — PATCH /:id partial update; 3.1b — i type/imageUrl. */
 export function useUpdateIkarosNews() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      dto,
-    }: {
-      id: string;
-      dto: { title?: string; content?: string };
-    }) => api.patch<IkarosNews>(`/IkarosNews/${id}`, dto),
+    mutationFn: ({ id, dto }: { id: string; dto: NewsMutationDto }) =>
+      api.patch<IkarosNews>(`/IkarosNews/${id}`, dto),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: NEWS_KEY });
     },
