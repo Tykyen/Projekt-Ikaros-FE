@@ -16,6 +16,15 @@
 
 ## Otevřené
 
+### D-070 — Hardcoded barvy v IkarosEventCard / IkarosEventModal CSS
+**Soubor:** `src/features/ikaros/components/IkarosEventCard.module.css`, `IkarosEventModal.module.css` — 8 porušení (`rgba(...)`, `color name "white"`).
+**Problém:** `npm run lint:colors` hlásí 8 hardcoded barev. Vzniklo ve fázi 2.1b, odhaleno při auditu 3.1b. Barvy se neřídí theme tokeny → nekonzistence napříč skiny.
+**Dopad:** Nízký — vizuální nekonzistence, ne funkční chyba. `lint:colors` je kvůli tomu trvale červený.
+**Řešení:** Nahradit hardcoded hodnoty `var(--token)` z `themes/_shared/tokens.css` (nebo přidat chybějící tokeny).
+**Kdy:** Při příští práci na akcích (9.1 RSVP) nebo samostatný úklidový commit.
+
+---
+
 ### D-028 (zbývající Redis varianta) — Cache pro `JwtStrategy.validate` ban check
 **Kontext:** In-memory cache uzavřena, single-instance funguje plně. Pro multi-instance deployu nutno swap na Redis pub/sub.
 **Řešení:** Vyměnit `UserBanCacheService` Map za Redis client (`ioredis`); invalidate přes pub/sub channel `user-ban-invalidate`.

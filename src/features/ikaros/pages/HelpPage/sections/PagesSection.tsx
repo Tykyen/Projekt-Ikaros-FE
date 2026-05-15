@@ -19,7 +19,7 @@ const IKAROS_PAGES: PageDoc[] = [
     name: 'Úvodník',
     status: 'ok',
     who: 'Všichni (anon i přihlášený)',
-    what: 'Vstupní stránka platformy. Uvítací karta + dvě sekce vedle sebe: vlevo Akce (globální platformové akce — top 5 nadcházejících, s obrázkem, tlačítkem Zúčastním se, jen po přihlášení), vpravo Novinky platformy. Admin/Superadmin vidí v hlavičkách obou sekcí tlačítko +, kterým rovnou vytvoří novou globální akci / novinku. Na každé akci pak má Admin/Superadmin v rohu kebab menu (•••) s akcemi Upravit a Smazat. Akce a novinky tvého konkrétního světa jsou jen v daném světě, nikdy se nemíchají.',
+    what: 'Vstupní stránka platformy. Uvítací karta + dvě sekce vedle sebe: vlevo Akce (první 3 nadcházející globální akce, jen po přihlášení; odkaz Kalendář akcí otevře celý kalendář), vpravo Novinky platformy (první 3, odkaz Všechny novinky otevře archiv). Admin/Superadmin vidí v hlavičkách obou sekcí tlačítko +, kterým rovnou vytvoří novou globální akci / novinku. Akce a novinky tvého konkrétního světa jsou jen v daném světě, nikdy se nemíchají.',
   },
   {
     path: '/ikaros/napoveda',
@@ -71,11 +71,18 @@ const IKAROS_PAGES: PageDoc[] = [
     what: 'Zelená tečka u avataru = uživatel má právě otevřenou platformu. Žlutá tečka = uživatel je u počítače, ale ~5 min nebyl aktivní (idle). Žádná tečka = offline. U offline uživatelů na veřejném profilu vidíš „naposledy aktivní před X". Lze skrýt svůj stav přes Soukromí v profilu.',
   },
   {
-    path: '/ikaros/uzivatele?tab=novinky',
-    name: 'Správa novinek',
+    path: '/ikaros/novinky',
+    name: 'Novinky',
     status: 'ok',
-    who: 'Admin / Superadmin',
-    what: 'Administrace platformových novinek — záložka „Novinky" na stránce Uživatelé. Pod-taby Aktivní a Archiv (s počty), tabulka 20 novinek na stránce, akce v řádku: upravit, archivovat / obnovit a trvale smazat. Archivace je vratná (objeví se v Archivu, lze odtud zase Obnovit); smazání je nevratné s potvrzovacím dialogem. Obsah novinky se píše v editoru s formátováním. Novinku lze založit i přímo z Úvodníku — sekce Novinky má v hlavičce tlačítko +.',
+    who: 'Všichni (anon i přihlášený); správa Admin / Superadmin',
+    what: 'Archiv platformových novinek. Každá novinka má typ — Informace, Upozornění nebo Systémová — který barevně odlišuje nadpis. Karta je ve výchozím stavu sbalená (nadpis, typ, datum); po kliknutí se rozbalí a ukáže obrázek (pokud je), celý text a dole autora s datem. Admin/Superadmin tu novinky rovnou spravuje: přepínač Aktivní/Archiv, tlačítko Nová novinka, na každé kartě upravit / archivovat (vratné) / smazat (nevratné). Novinku lze založit i z Úvodníku tlačítkem + v hlavičce sekce Novinky.',
+  },
+  {
+    path: '/ikaros/akce',
+    name: 'Akce (kalendář)',
+    status: 'ok',
+    who: 'Přihlášený; vytváření Admin / Superadmin',
+    what: 'Měsíční kalendář globálních platformových akcí — minulých i budoucích. Listuješ mezi měsíci šipkami, tlačítko Dnes skočí na aktuální měsíc. Klik na akci v kalendáři otevře detail s obrázkem, popisem a tlačítkem Zúčastním se. Na mobilu se místo mřížky zobrazí seznam Nadcházející / Proběhlé. Admin/Superadmin zakládá akce tlačítkem Nová akce.',
   },
   {
     path: '/ikaros/clanky',

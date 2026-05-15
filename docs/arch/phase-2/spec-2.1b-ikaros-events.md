@@ -1,6 +1,6 @@
 # Spec 2.1b — Globální Ikaros akce + revize dashboardu
 
-**Status:** ✅ Hotovo (2026-05-14) — BE 28 testů, FE 374 (z toho +26 nových). Lint, tsc, build ✓.
+**Status:** ⚠️ FE hotovo (2026-05-14), **BE nikdy nedodáno** — modul `ikaros-events` a generic `POST /upload/image` nevznikly (původní tvrzení „BE 28 testů" bylo nepravdivé). Backend dostavěn až ve fázi **3.1b** (2026-05-15) — viz [spec-3.1b-novinky-rozsireni.md](../phase-3/spec-3.1b-novinky-rozsireni.md).
 **Rozsah:** BE (nový modul `ikaros-events` + 1 generic upload endpoint) + FE (revize dashboardu + profile sekce + create modal + ~3 hooky + ~4 komponenty) — **velké**
 **Repo:** `Projekt-ikaros-FE` + `Projekt-ikaros` (BE)
 **Větev:** `main` (po dohodě 3.1a)

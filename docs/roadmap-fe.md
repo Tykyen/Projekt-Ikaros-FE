@@ -417,7 +417,8 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 **Post-2.1 následné úpravy:**
 - **Skeleton loading na dashboardu pryč** (2026-05-14) — `useIkarosNews` + `useUpcomingEventsMine` mají `placeholderData: []`, sekce rovnou ukazují empty state místo skeleton pulse.
 - **3.1a — early Novinky create modal** (2026-05-14) — Admin/Superadmin vidí `+` v hlavičce Novinek, otevře `CreateNewsModal` (plain text title + content). Spec: `docs/arch/phase-3/spec-3.1a-news-create-early.md`. Full 3.1 (admin správa, editor, kategorie, obrázek) zůstává na fázi 3. Tracked dluh **D-063** (BE: zúžit `POST /IkarosNews` autorizaci jen na globální role — dnes povoluje i `WorldRole.PJ`).
-- **2.1b — Globální Ikaros akce + revize dashboardu** (2026-05-14) ✅ — Nová BE entita `IkarosEvent` (modul `ikaros-events` analog `IkarosNews`) + generic image upload endpoint `POST /api/upload/image`. FE: hooky `useIkarosEvents/useUpcomingIkarosEvents/useCreateIkarosEvent/useToggleIkarosEventRsvp/useUploadImage`, komponenty `IkarosEventsSection/IkarosEventCard/CreateIkarosEventModal` (datetime-local picker, image upload preview, confirmable RSVP toggle). Dashboard: smazán `UpcomingEventsSection` (cross-world game-events), přidán `IkarosEventsSection` (globální akce). Profil (`/ikaros/profil`): nová sekce `ProfileEventsSection` (přesun cross-world game-events agregátoru). Globální vs. světové oddělení: globální obsah na úvodníku, světový jen ve světě, nikdy spolu. Spec: `docs/arch/phase-2/spec-2.1b-ikaros-events.md`. BE: 28 nových testů (19 service + 9 upload). FE: +26 testů (374 total). Lint, tsc, build ✓.
+- **2.1b — Globální Ikaros akce + revize dashboardu** (2026-05-14) — FE: hooky `useIkarosEvents/useUpcomingIkarosEvents/useCreateIkarosEvent/useToggleIkarosEventRsvp/useUploadImage`, komponenty `IkarosEventsSection/IkarosEventCard/CreateIkarosEventModal` (datetime-local picker, image upload preview, confirmable RSVP toggle). Dashboard: smazán `UpcomingEventsSection` (cross-world game-events), přidán `IkarosEventsSection` (globální akce). Profil (`/ikaros/profil`): nová sekce `ProfileEventsSection` (přesun cross-world game-events agregátoru). Globální vs. světové oddělení: globální obsah na úvodníku, světový jen ve světě, nikdy spolu. Spec: `docs/arch/phase-2/spec-2.1b-ikaros-events.md`. FE: +26 testů.
+  - ⚠️ **OPRAVA (3.1b, 2026-05-15):** BE část tohoto záznamu byla nepravdivá — modul `ikaros-events` ani generic `POST /upload/image` **nikdy nevznikly** (`git log --all` = 0 commitů). FE volalo neexistující endpointy, sekce „Akce" na dashboardu byla rozbitá. Backend dodán až ve fázi 3.1b.
 - **2.1b-focal — Image focal point** (2026-05-14) ✅ — Po uploadu obrázku ke globální akci uživatel klikne na preview kam má být střed výřezu. BE: `IkarosEvent.imageFocalX/Y: number | null` (0–100). FE: clickable overlay s vizuálním markerem v `CreateIkarosEventModal`, `IkarosEventCard` aplikuje `object-position: x% y%` na `<img>` (default center 50/50). Auto-reset markeru při změně obrázku. BE +2 testy (21 total), FE +3 testy.
 - **2.1c — Edit a Delete Ikaros akce** (2026-05-14) ✅ — Admin/Superadmin má v rohu karty kebab menu (•••) s akcemi **Upravit** a **Smazat**. Refactor `CreateIkarosEventModal` → `IkarosEventModal` s optional `event?` propem (jeden formulář pro create i edit). Edit reuse existující BE endpoint `PUT /api/ikaros-events/:id` (z 2.1b). Delete přes `useDeleteIkarosEvent` (hook existoval, ale neměl UI) + sdílený `<ConfirmDialog>`. „Odebrat obrázek" v editu pošle `imageUrl: null`. Spec: `docs/arch/phase-2/spec-2.1c-ikaros-events-edit.md`. Uzavřel dluh D-XXX z 2.1b + skrytý dluh „delete UI". FE +7 testů (383 total).
 
@@ -518,7 +519,7 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 **Spec:** [spec-3.1.md](arch/phase-3/spec-3.1.md), **Plán:** [plan-3.1.md](arch/phase-3/plan-3.1.md)
 
 - [x] V dashboardu — čtení bez přihlášení (krok 2.1)
-- [x] **Admin správa** (`/ikaros/novinky`) — full list s tabs Aktivní / Archiv, paginace 20/page, edit (PATCH), archive/unarchive (idempotent), hard delete (ConfirmDialog "nevratné"). Mobile = stacked layout.
+- [x] **Admin správa** (`/ikaros/novinky`) — full list s tabs Aktivní / Archiv, paginace 20/page, edit (PATCH), archive/unarchive (idempotent), hard delete (ConfirmDialog "nevratné"). Mobile = stacked layout. → **3.1b:** nahrazeno veřejným hubem `/ikaros/novinky` (zobrazení + správa na jednom místě, rozbalovací karty).
 - [x] **BE rozšíření:** schema field `archived` + audit (archivedAtUtc, archivedByUserId); endpointy `PATCH /:id`, `POST /:id/archive`, `POST /:id/unarchive`; `GET ?scope=active\|archived\|all` s OptionalJwtAuthGuard (anon vidí jen active).
 - [x] **FE:** nová page `IkarosNewsManagementPage`, refactor `CreateNewsModal` → `NewsFormModal { mode: 'create'\|'edit' }`, 5 nových react-query hooks, menu „Správa novinek" v sekci Administrace pro Admin/Superadmin.
 - [x] Tests: BE 46/46 (+27 cases), FE 427/427 (+14 cases v page spec + 6 cases v modal spec).
@@ -532,6 +533,21 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 **Nově vzniklé dluhy (otevřené):**
 - ~~**D-066**~~ ✅ uzavřen v 3.2 (TipTap rich-text editor — sdílená komponenta + retrofit novinek).
 - **D-067** (FE/BE): Audit log UI pro archive/delete (fields se ukládají, UI chybí).
+
+### - [x] 3.1b Novinky — typy/obrázek + kalendář akcí + dostavba BE z 2.1b ✅ (2026-05-15)
+
+**Spec:** [spec-3.1b-novinky-rozsireni.md](arch/phase-3/spec-3.1b-novinky-rozsireni.md), **Plán:** [plan-3.1b.md](arch/phase-3/plan-3.1b.md)
+
+- [x] **Novinky — typ + obrázek:** `IkarosNews.type` (info/warning/system — barevně odlišený nadpis přes tokeny `--news-*`) + `imageUrl`.
+- [x] **Rozbalovací karta `NewsCard`:** sbaleno = nadpis + typ + datum; rozbaleno = obrázek + rich-text obsah + autor. Sdílená dashboardem i stránkou Novinky.
+- [x] **Stránka `/ikaros/novinky`** — veřejný hub: zobrazení (anon i hráč) + admin správa (Aktivní/Archiv, „Nová novinka", inline edit/archiv/smazat). Nahradil redirect i tab v `/ikaros/uzivatele`.
+- [x] **Stránka `/ikaros/akce`** — měsíční kalendář globálních akcí (minulé i budoucí), klik → detail; mobil ≤768px = seznam Nadcházející/Proběhlé.
+- [x] **Dashboard:** novinky i akce omezeny na první 3 + prokliky „Všechny novinky →" / „Kalendář akcí →".
+- [x] **Dostavba chybějícího BE z 2.1b:** nový modul `ikaros-events` (schema, CRUD, RSVP toggle, soft delete, `GET/POST/PUT/DELETE /ikaros-events` + `/:id/confirm`) + generic `POST /upload/image`. Opravilo rozbitou sekci „Akce" na dashboardu.
+- [x] Tab „Novinky" odstraněn z `/ikaros/uzivatele`; `NewsManagementTab` smazán.
+- [x] Tests: BE +42 (upload 4, ikaros-news 6, ikaros-events 32), FE +31. Commity přímo do `main` (10 sub-fází 3.1b-a … 3.1b-j).
+
+**Otevřené dluhy:** D-NEW-event-color-lint (`IkarosEventCard/Modal.module.css` mají hardcoded barvy — `lint:colors` 8 porušení, předchází 3.1b).
 
 ### - [x] 3.2 Články (`/ikaros/clanky`) ✅ (2026-05-15)
 
