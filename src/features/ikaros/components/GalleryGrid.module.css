@@ -1,0 +1,24 @@
+.grid {
+  column-count: 4;
+  column-gap: var(--sp-5);
+}
+
+@media (max-width: 1280px) {
+  .grid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    column-count: 3;
+    column-gap: var(--sp-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    column-count: 2;
+    column-gap: var(--sp-3);
+  }
+}

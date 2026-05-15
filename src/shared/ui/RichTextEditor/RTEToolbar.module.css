@@ -1,0 +1,45 @@
+.toolbar {
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-1) 0 var(--sp-2);
+  border-bottom: 1px solid var(--frame-border);
+  margin-bottom: var(--sp-3);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary, var(--text-muted));
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.btn:hover:not(:disabled) {
+  color: var(--text-primary, var(--text-strong));
+  border-color: var(--text-muted, var(--text-subtle));
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fileInput {
+  display: none;
+}
+
+.spin {
+  animation: rte-spin 0.8s linear infinite;
+}
+
+@keyframes rte-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

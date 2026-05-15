@@ -1,0 +1,83 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   3.2 Prose tokeny — typografie pro literární obsah článků.
+
+   Editorial Atelier styling (spec-3.2 §5) je opt-in přes class `.prose`.
+   Defaultně mapuje na Fraunces (display) + Crimson Pro (body) + JetBrains
+   Mono (mono accent). Skiny mohou override v `[data-theme="<id>"]` blocích.
+
+   Kategorie barvy (default legacy paleta) — skiny override podle palety.
+   ────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Prose fonty — fallback chain (self-hostované přes @fontsource-variable). */
+  --prose-font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --prose-font-body: 'Crimson Pro Variable', ui-serif, Georgia, serif;
+  --prose-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Layout — reading experience. */
+  --prose-max-width: 65ch;
+  --prose-line-height: 1.7;
+  --prose-paragraph-spacing: 1.5em;
+
+  /* Drop cap — dramatic init letter na detail page. */
+  --prose-drop-cap-size: 5em;
+  --prose-drop-cap-line-height: 0.85;
+
+  /* Glyph divider — náhodný z palety per article ID (deterministic JS).
+     Skiny mohou nastavit jeden specifický (např. sci-fi → '▸'). */
+  --prose-divider-glyph: '✦';
+
+  /* ── Kategorie article — default legacy paleta (skiny override). */
+  --cat-povidky: #64b5f6;
+  --cat-poezie: #ce93d8;
+  --cat-uvahy: #ffb74d;
+  --cat-recenze: #4caf50;
+  --cat-postavy: #ff8a65;
+  --cat-ostatni: #8b98a5;
+  --cat-current: var(--accent, #64b5f6); /* runtime override per-card via style */
+
+  /* Status badges. */
+  --status-draft: var(--text-muted, #8b98a5);
+  --status-pending: #ff9800;
+  --status-published: #4caf50;
+  --status-rejected: #ff4444;
+
+  /* Ovládací prvky nad obrázky (kebab menu, focal marker, remove tlačítko).
+     Barvy fixní bílá/černá — musí mít kontrast nad libovolným obrázkem,
+     proto theme-independent. */
+  --img-ctrl-bg: rgba(0, 0, 0, 0.55);
+  --img-ctrl-bg-strong: rgba(0, 0, 0, 0.8);
+  --img-ctrl-fg: #ffffff;
+  --img-marker-border: #ffffff;
+  --img-marker-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+
+  /* Article-specific accents. */
+  --star-gold: #ffd700;
+  /* Tmavý text na accent pozadí (fallback pokud skin nedefinuje). */
+  --prose-on-accent: var(--text-on-accent, #050508);
+  /* Bílý text na barevném status pozadí (badge Schválit). */
+  --prose-on-status: #ffffff;
+
+  /* ── 3.3 Galerie — vizuální směr „Salon" (theme-independent base).
+     Skiny mohou override v [data-theme="<id>"] blocích. */
+  --gal-frame-border: var(--border, #2a2a33);
+  --gal-label-fg: var(--text-muted, #8b98a5);
+  --gal-lift-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.55);
+  --gal-lightbox-bg: rgba(8, 8, 12, 0.94);
+  /* Lightbox je vždy tmavé plátno — barvy textu/ovládání jsou konstantní
+     (theme-independent), proto fixní bílá/černá s alfou. */
+  --gal-lightbox-fg: rgba(255, 255, 255, 0.85);
+  --gal-lightbox-fg-dim: rgba(255, 255, 255, 0.6);
+  --gal-lightbox-fg-strong: #ffffff;
+  --gal-lightbox-ctrl-bg: rgba(0, 0, 0, 0.35);
+  --gal-lightbox-ctrl-bg-strong: rgba(0, 0, 0, 0.55);
+  --gal-lightbox-img-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.8);
+
+  /* Kategorie galerie — default paleta (skiny override). */
+  --gal-cat-fanart: #f06292;
+  --gal-cat-mapy: #4db6ac;
+  --gal-cat-postavy: #ff8a65;
+  --gal-cat-svety: #64b5f6;
+  --gal-cat-ostatni: #8b98a5;
+  --gal-cat-current: var(--accent, #f06292); /* runtime override per-card */
+}

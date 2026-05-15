@@ -1,0 +1,198 @@
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: var(--sp-4);
+  color: var(--text-secondary, var(--text-muted));
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.back:hover {
+  color: var(--text-primary, var(--text-strong));
+}
+
+.title {
+  font-family: var(--prose-font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin: 0 0 var(--sp-6);
+  color: var(--text-primary, var(--text-strong));
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
+}
+
+.label {
+  font-family: var(--prose-font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary, var(--text-muted));
+  font-weight: var(--weight-semi);
+}
+
+.optional {
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface-1);
+  border: 1px solid var(--gal-frame-border, var(--frame-border));
+  border-radius: var(--radius-sm);
+  color: var(--text-primary, var(--text-strong));
+  font-size: var(--text-sm);
+  font-family: inherit;
+}
+
+.textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent, var(--theme-accent));
+}
+
+.fileInput {
+  display: none;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: var(--sp-10) var(--sp-4);
+  background: var(--surface-sunken, var(--surface-1));
+  border: 2px dashed var(--gal-frame-border, var(--frame-border));
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary, var(--text-muted));
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-base);
+}
+
+.dropzone:hover {
+  border-color: var(--accent, var(--theme-accent));
+  color: var(--text-primary, var(--text-strong));
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted, var(--text-subtle));
+}
+
+.previewWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: flex-start;
+}
+
+.preview {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border: 1px solid var(--gal-frame-border, var(--frame-border));
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken, var(--surface-1));
+}
+
+.changeBtn {
+  align-self: flex-start;
+  padding: var(--sp-1) var(--sp-3);
+  background: transparent;
+  border: 1px solid var(--gal-frame-border, var(--frame-border));
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary, var(--text-muted));
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.changeBtn:hover {
+  color: var(--text-primary, var(--text-strong));
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btnPrimary,
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-5);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: 1px solid;
+}
+
+.btnPrimary {
+  background: var(--accent, var(--theme-accent));
+  border-color: var(--accent, var(--theme-accent));
+  color: var(--prose-on-accent);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btnSecondary {
+  background: transparent;
+  border-color: var(--gal-frame-border, var(--frame-border));
+  color: var(--text-secondary, var(--text-muted));
+}
+
+.btnSecondary:hover:not(:disabled) {
+  color: var(--text-primary, var(--text-strong));
+}
+
+.btnPrimary:disabled,
+.btnSecondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--sp-4) var(--sp-3);
+  }
+  .actions {
+    flex-direction: column-reverse;
+  }
+  .btnPrimary,
+  .btnSecondary {
+    justify-content: center;
+    min-height: 44px;
+  }
+}
