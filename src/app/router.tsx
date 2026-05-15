@@ -29,6 +29,8 @@ const UsersPage        = lazy(() => import('@/features/users/pages/UsersPage'));
 const UserProfilePage  = lazy(() => import('@/features/users/pages/PublicUserProfilePage'));
 // 3.1b — `/ikaros/novinky` veřejná stránka (hub: zobrazení + admin správa).
 const NovinkyPage          = lazy(() => import('@/features/ikaros/pages/NovinkyPage'));
+// 3.1b — `/ikaros/akce` měsíční kalendář globálních akcí.
+const AkcePage             = lazy(() => import('@/features/ikaros/pages/AkcePage'));
 const ArticlesPage         = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
 const ArticleDetailPage    = lazy(() => import('@/features/ikaros/pages/ArticleDetailPage'));
 const ArticleEditorPage    = lazy(() => import('@/features/ikaros/pages/ArticleEditorPage'));
@@ -145,6 +147,8 @@ export const router = createBrowserRouter([
       { path: 'ikaros/uzivatel/:id',    element: p(UserProfilePage),  loader: requireAuth },
       { path: 'ikaros/diskuze/nova',    element: p(DiscussionsNewPage), loader: requireAuth },
       { path: 'ikaros/posta',           element: p(MailPage),         loader: requireAuth },
+      // 3.1b — kalendář akcí (akce jsou logged-in only, viz spec 2.1b).
+      { path: 'ikaros/akce',            element: p(AkcePage),         loader: requireAuth },
 
       // Spec 1.4 — `/ikaros/uzivatele` dostupné každému přihlášenému
       // (page sama řeší tab visibility per role; admin-only taby jsou skryté).

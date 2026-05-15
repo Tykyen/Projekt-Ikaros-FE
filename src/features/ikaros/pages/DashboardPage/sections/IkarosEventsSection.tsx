@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { CalendarClock, Plus } from 'lucide-react';
 import { useAtomValue } from 'jotai';
 import { IkarosCard } from '@/shared/ui';
@@ -11,7 +12,8 @@ import { SectionHeader } from '../components/SectionHeader';
 import s from './IkarosEventsSection.module.css';
 
 export function IkarosEventsSection() {
-  const { data, isError } = useUpcomingIkarosEvents(5);
+  // Spec 3.1b — dashboard ukazuje jen 3 akce, zbytek na `/ikaros/akce`.
+  const { data, isError } = useUpcomingIkarosEvents(3);
   const items = data ?? [];
   const currentUser = useAtomValue(currentUserAtom);
   const canCreate =
@@ -46,11 +48,16 @@ export function IkarosEventsSection() {
       ) : items.length === 0 ? (
         <p className={s.empty}>Žádné nadcházející akce.</p>
       ) : (
-        <div className={s.list}>
-          {items.map((event) => (
-            <IkarosEventCard key={event.id} event={event} />
-          ))}
-        </div>
+        <>
+          <div className={s.list}>
+            {items.map((event) => (
+              <IkarosEventCard key={event.id} event={event} />
+            ))}
+          </div>
+          <Link to="/ikaros/akce" className={s.moreLink}>
+            Kalendář akcí →
+          </Link>
+        </>
       )}
 
       {canCreate && createOpen && (
