@@ -1,0 +1,139 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.textareaWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+/* 3.2 — RichTextEditor wrapper (nahradil plain textarea). */
+.editor {
+  min-height: 180px;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+.editor:focus-within {
+  border-color: var(--accent);
+}
+
+.errorMsg {
+  font-size: var(--text-xs);
+  color: var(--danger);
+}
+
+/* ── 3.1b — výběr typu novinky ── */
+.typeField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.typeOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.typeOption {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+/* Vybraný typ — orámování i text v barvě typu (přístupnost: zůstává i text). */
+.typeOption:has(input:checked) {
+  font-weight: var(--weight-semi);
+}
+.typeOption[data-type='info']:has(input:checked) {
+  border-color: var(--news-info);
+  color: var(--news-info);
+}
+.typeOption[data-type='warning']:has(input:checked) {
+  border-color: var(--news-warning);
+  color: var(--news-warning);
+}
+.typeOption[data-type='system']:has(input:checked) {
+  border-color: var(--news-system);
+  color: var(--news-system);
+}
+.typeOption:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── 3.1b — obrázek novinky ── */
+.imageField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.imageUpload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+.imageUpload:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.imagePreview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: flex-start;
+}
+.imagePreview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+  margin-top: var(--sp-2);
+}
+
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column-reverse;
+  }
+  .actions :global(button) {
+    width: 100%;
+  }
+}
