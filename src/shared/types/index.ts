@@ -332,7 +332,14 @@ export interface IkarosNews {
   authorName: string;
   createdAtUtc: string;
   isActive: boolean;
+  /** Spec 3.1 — revertibilní soft toggle pro archiv. Default `false`. */
+  archived: boolean;
+  archivedAtUtc?: string;
+  archivedByUserId?: string;
 }
+
+/** Spec 3.1 — scope filter pro list/count endpointy. */
+export type IkarosNewsScope = 'active' | 'archived' | 'all';
 
 export interface UpcomingEventDto {
   id: string;

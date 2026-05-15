@@ -3,7 +3,7 @@ import { Newspaper, Plus } from 'lucide-react';
 import { useAtomValue } from 'jotai';
 import { IkarosCard } from '@/shared/ui';
 import { useIkarosNews } from '@/features/ikaros/api/useIkarosNews';
-import { CreateNewsModal } from '@/features/ikaros/components/CreateNewsModal';
+import { NewsFormModal } from '@/features/ikaros/components/NewsFormModal';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { SectionHeader } from '../components/SectionHeader';
@@ -54,7 +54,8 @@ export function PlatformNewsSection() {
       )}
 
       {canCreate && (
-        <CreateNewsModal
+        <NewsFormModal
+          mode="create"
           open={createOpen}
           onClose={() => setCreateOpen(false)}
         />
