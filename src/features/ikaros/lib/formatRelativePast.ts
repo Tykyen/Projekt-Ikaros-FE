@@ -29,9 +29,19 @@ export function formatRelativePast(iso: string, now: Date = new Date()): string 
   const days = Math.floor(hours / 24);
   if (days < 7) {
     if (days === 1) return 'včera';
-    if (days >= 2 && days <= 4) return `před ${days} dny`;
     return `před ${days} dny`;
   }
 
   return `${target.getDate()}.${target.getMonth() + 1}.${target.getFullYear()}`;
+}
+
+/** Absolutní český formát data — pro rozbalený detail (D. M. YYYY). */
+export function formatAbsoluteDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  });
 }
