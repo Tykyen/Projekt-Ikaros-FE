@@ -91,10 +91,10 @@ describe('WorldCard', () => {
     expect(img?.getAttribute('src')).toBe('https://example.com/cover.png');
   });
 
-  it('odkaz vede na /svet/:id', () => {
+  it('odkaz vede na /svet/:slug', () => {
     renderCard(makeWorld());
     const link = screen.getByRole('link', { name: /Matrix/i });
-    expect(link.getAttribute('href')).toBe('/svet/w1');
+    expect(link.getAttribute('href')).toBe('/svet/matrix');
   });
 
   it('CTA tlačítko obsahuje "Vstoupit do světa" pokud je člen', () => {

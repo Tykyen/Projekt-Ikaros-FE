@@ -20,10 +20,10 @@ import s from './WorldDashboardPage.module.css';
  *  - 404 / error      → WorldNotFound (BE 404 pro private bez přístupu)
  */
 export default function WorldDashboardPage() {
-  const { worldId = '' } = useParams<{ worldId: string }>();
-  const { data: world, isLoading, isError } = useWorld(worldId);
+  const { worldSlug = '' } = useParams<{ worldSlug: string }>();
+  const { data: world, isLoading, isError } = useWorld(worldSlug);
   const { status, pendingAccessRequest, isLoading: statusLoading } =
-    useWorldStatus(worldId);
+    useWorldStatus(world?.id ?? '');
 
   if (isLoading || statusLoading) {
     return (
@@ -50,7 +50,9 @@ export default function WorldDashboardPage() {
               requestedAt={pendingAccessRequest.requestedAt}
             />
           )}
-          {status === 'member' && <MemberDashboardStub worldId={world.id} />}
+          {status === 'member' && (
+            <MemberDashboardStub worldSlug={world.slug} />
+          )}
         </aside>
       </div>
     </article>

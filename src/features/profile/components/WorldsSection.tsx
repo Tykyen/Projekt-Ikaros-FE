@@ -35,7 +35,7 @@ export function WorldsSection() {
         <ul className={styles.worldList}>
           {data.map(({ world }) => (
             <li key={world.id}>
-              <Link to={`/svet/${world.id}`} className={styles.worldLink}>
+              <Link to={`/svet/${world.slug}`} className={styles.worldLink}>
                 <span className={styles.worldName}>{world.name}</span>
                 {world.genre && (
                   <span className={styles.worldGenre}>{world.genre}</span>

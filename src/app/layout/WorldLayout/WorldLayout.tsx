@@ -12,8 +12,8 @@ import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 
 /* ── Nav definice ── */
-function buildNav(worldId: string) {
-  const b = `/svet/${worldId}`;
+function buildNav(worldSlug: string) {
+  const b = `/svet/${worldSlug}`;
   return [
     {
       label: 'Informace',
@@ -105,13 +105,16 @@ function NavDropdown({ group, onClose }: { group: NavGroup; onClose: () => void 
 
 /* ── WorldLayout ── */
 export function WorldLayout() {
-  const { worldId = '' } = useParams<{ worldId: string }>();
+  // URL nese slug (`/svet/matrix`) — případně ObjectId u starých odkazů.
+  const { worldSlug = '' } = useParams<{ worldSlug: string }>();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const currentUser = useAtomValue(currentUserAtom);
-  const { data: world, isLoading } = useWorld(worldId);
+  const { data: world, isLoading } = useWorld(worldSlug);
+  // Reálné ObjectId — pro membership lookup i BE volání downstream.
+  const realWorldId = world?.id ?? '';
   const { status, membership, isLoading: statusLoading } =
-    useWorldStatus(worldId);
-  const nav = useMemo(() => buildNav(worldId), [worldId]);
+    useWorldStatus(realWorldId);
+  const nav = useMemo(() => buildNav(worldSlug), [worldSlug]);
 
   const isPJ =
     world?.ownerId === currentUser?.id ||
@@ -125,13 +128,14 @@ export function WorldLayout() {
 
   const ctxValue = useMemo(
     () => ({
-      worldId,
+      worldId: realWorldId,
+      worldSlug,
       world: world ?? null,
       isPJ,
       userRole: (membership?.role ?? null) as WorldRole | null,
       loading: isLoading || statusLoading,
     }),
-    [worldId, world, isPJ, membership, isLoading, statusLoading],
+    [realWorldId, worldSlug, world, isPJ, membership, isLoading, statusLoading],
   );
 
   const themeId = useAtomValue(themeAtom);
@@ -148,7 +152,7 @@ export function WorldLayout() {
           <Link to="/" className={s.exitBtn}>EXIT</Link>
 
           {/* Název světa */}
-          <Link to={`/svet/${worldId}`} className={s.worldName}>
+          <Link to={`/svet/${worldSlug}`} className={s.worldName}>
             {world?.name ?? (isLoading ? '...' : 'Svět')}
           </Link>
           {world?.genre && <span className={s.genreBadge}>{world.genre}</span>}
@@ -170,7 +174,7 @@ export function WorldLayout() {
                 <div className={s.searchBar}>Hledat...</div>
                 {isPJ && (
                   <Link
-                    to={`/svet/${worldId}/nova-stranka`}
+                    to={`/svet/${worldSlug}/nova-stranka`}
                     className={s.newPageBtn}
                   >
                     + Nová stránka
@@ -206,7 +210,7 @@ export function WorldLayout() {
             <div className={clsx(s.drawer, drawerOpen && s.drawerOpen)}>
               {isPJ && (
                 <Link
-                  to={`/svet/${worldId}/nova-stranka`}
+                  to={`/svet/${worldSlug}/nova-stranka`}
                   className={s.drawerNewPage}
                   onClick={() => setDrawerOpen(false)}
                 >

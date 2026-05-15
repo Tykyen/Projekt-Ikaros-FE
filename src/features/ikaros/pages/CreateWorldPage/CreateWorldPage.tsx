@@ -87,7 +87,7 @@ export default function CreateWorldPage() {
         dice: dice.length ? dice : undefined,
       });
       toast.success(`Svět „${world.name}" byl vytvořen.`);
-      navigate(`/svet/${world.id}`);
+      navigate(`/svet/${world.slug}`);
     } catch (err) {
       const apiErr = (err as { response?: { data?: ApiError } })?.response?.data;
       const code = apiErr?.error?.code;

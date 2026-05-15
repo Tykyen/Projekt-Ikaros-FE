@@ -98,7 +98,12 @@ function NavItem({ navKey, to, end, icon, label, onClick }: NavItemDef & { onCli
   );
 }
 
-type SidebarWorld = { id: string; name: string; isPJ: boolean };
+type SidebarWorld = {
+  id: string;
+  slug: string;
+  name: string;
+  isPJ: boolean;
+};
 
 function SidebarContent({
   isAuthenticated,
@@ -112,11 +117,13 @@ function SidebarContent({
   const worlds: SidebarWorld[] | undefined = isAuthenticated
     ? myWorldsQuery.data?.map(({ world, membership }) => ({
         id: world.id,
+        slug: world.slug,
         name: world.name,
         isPJ: membership.role === WorldRole.PJ,
       }))
     : publicWorldsQuery.data?.map((w) => ({
         id: w.id,
+        slug: w.slug,
         name: w.name,
         isPJ: false,
       }));
@@ -138,7 +145,7 @@ function SidebarContent({
         <SectionTitle>Vesmíry</SectionTitle>
         <div className={s.navList}>
           {worlds?.slice(0, 8).map((w) => (
-            <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
+            <Link key={w.id} to={`/svet/${w.slug}`} className={s.navItem} onClick={onNav}>
               <span className={s.navItemLabel}>{w.name}</span>
               {w.isPJ && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>
@@ -186,6 +193,7 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   const worlds: SidebarWorld[] | undefined = myWorlds?.map(
     ({ world, membership }) => ({
       id: world.id,
+      slug: world.slug,
       name: world.name,
       isPJ: membership.role === WorldRole.PJ,
     }),
@@ -227,7 +235,7 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
         </div>
         <div className={s.navList}>
           {worlds?.slice(0, 5).map((w) => (
-            <Link key={w.id} to={`/svet/${w.id}`} className={s.navItem} onClick={onNav}>
+            <Link key={w.id} to={`/svet/${w.slug}`} className={s.navItem} onClick={onNav}>
               <span className={s.navItemLabel}>{w.name}</span>
               {w.isPJ && (
                 <span className={s.pjBadge} data-pj-badge>PJ</span>

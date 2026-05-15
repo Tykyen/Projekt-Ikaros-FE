@@ -103,7 +103,7 @@ const SOON_IKAROS: PageDoc[] = [
     what: 'Wizard pro založení nového světa (název, žánr, popis, přístupový režim, RPG systém).',
   },
   {
-    path: '/svet/:worldId',
+    path: '/svet/:slug',
     name: 'Detail světa + vstup',
     status: 'soon',
     fáze: 'Fáze 2.4',
@@ -162,7 +162,7 @@ const SOON_IKAROS: PageDoc[] = [
 
 const SOON_WORLD: PageDoc[] = [
   {
-    path: '/svet/:worldId',
+    path: '/svet/:slug',
     name: 'Světový dashboard',
     status: 'soon',
     fáze: 'Fáze 5.2',
@@ -170,7 +170,7 @@ const SOON_WORLD: PageDoc[] = [
     what: 'Novinky světa, poslední stránky, blížící se eventy.',
   },
   {
-    path: '/svet/:worldId/chat',
+    path: '/svet/:slug/chat',
     name: 'Světový chat',
     status: 'soon',
     fáze: 'Fáze 6',
@@ -178,7 +178,7 @@ const SOON_WORLD: PageDoc[] = [
     what: 'Chat uvnitř světa, kanály, kostky (dice), whispers, reakce.',
   },
   {
-    path: '/svet/:worldId/stranky',
+    path: '/svet/:slug/stranky',
     name: 'Wiki stránky',
     status: 'soon',
     fáze: 'Fáze 7',
@@ -186,7 +186,7 @@ const SOON_WORLD: PageDoc[] = [
     what: 'TipTap stránky světa: lokace, frakce, příběhy, pravidla.',
   },
   {
-    path: '/svet/:worldId/postavy',
+    path: '/svet/:slug/postavy',
     name: 'Postavy a deníky',
     status: 'soon',
     fáze: 'Fáze 8',
@@ -194,7 +194,7 @@ const SOON_WORLD: PageDoc[] = [
     what: 'Adresář postav, deníky, dynamické fieldy podle RPG systému světa.',
   },
   {
-    path: '/svet/:worldId/mapa',
+    path: '/svet/:slug/mapa',
     name: 'Mapy (Universe + taktická)',
     status: 'soon',
     fáze: 'Fáze 10',
@@ -202,7 +202,7 @@ const SOON_WORLD: PageDoc[] = [
     what: '3D Universe mapa lokací + 2D taktická mapa pro boj (hex grid, tokeny, fog of war).',
   },
   {
-    path: '/svet/:worldId/kalendar',
+    path: '/svet/:slug/kalendar',
     name: 'Kalendář & časová osa',
     status: 'soon',
     fáze: 'Fáze 9',
@@ -210,7 +210,7 @@ const SOON_WORLD: PageDoc[] = [
     what: 'Fantasy kalendář, per-postava deníky, historická timeline, počasí, eventy s RSVP.',
   },
   {
-    path: '/svet/:worldId/pavucina',
+    path: '/svet/:slug/pavucina',
     name: 'Kampaně',
     status: 'soon',
     fáze: 'Fáze 11',
@@ -279,7 +279,7 @@ export function PagesSection() {
       <div className={s.pageGroup}>
         <h2>Světová vrstva — připravujeme</h2>
         <p>
-          Vše níže běží uvnitř konkrétního světa (URL <code>/svet/:worldId/...</code>).
+          Vše níže běží uvnitř konkrétního světa (URL <code>/svet/:slug/...</code>).
           Každý svět má vlastní motiv, role a obsah nezávisle na Ikaru.
         </p>
         {SOON_WORLD.map((doc) => (

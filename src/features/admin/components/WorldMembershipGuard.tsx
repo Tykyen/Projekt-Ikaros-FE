@@ -17,7 +17,7 @@ interface Props {
    * Použito pro sub-routes `/svet/:worldId/*` — non-member přesměrujeme na
    * index detail-page, ne na 403 (tam si vybere Vstoupit/Požádat).
    *
-   * Speciální token `:worldId` v cíli se nahradí aktuálním worldId z URL.
+   * Speciální token `:worldSlug` v cíli se nahradí aktuálním slugem z URL.
    */
   redirectTo?: string;
   children: ReactNode;
@@ -43,7 +43,7 @@ export function WorldMembershipGuard({
 }: Props) {
   const user = useAtomValue(currentUserAtom);
   const { userRole: worldRole, loading } = useWorldContext();
-  const { worldId } = useParams<{ worldId: string }>();
+  const { worldSlug } = useParams<{ worldSlug: string }>();
 
   if (loading) return <Spinner center />;
 
@@ -56,7 +56,7 @@ export function WorldMembershipGuard({
   }
 
   if (redirectTo) {
-    const resolved = redirectTo.replace(':worldId', worldId ?? '');
+    const resolved = redirectTo.replace(':worldSlug', worldSlug ?? '');
     return <Navigate to={resolved} replace />;
   }
 

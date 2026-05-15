@@ -81,7 +81,7 @@ function p(Comp: LazyExoticComponent<ComponentType>) {
 
 /**
  * Spec 2.4 — wrap sub-route content into membership guard. Non-member /
- * pending-access se redirectne na index detail-page (`/svet/:worldId`), kde
+ * pending-access se redirectne na index detail-page (`/svet/:worldSlug`), kde
  * si vybere Vstoupit / Požádat. Sa/Admin bypass přes globální role.
  */
 function memberOnly(element: ReactNode): ReactNode {
@@ -89,7 +89,7 @@ function memberOnly(element: ReactNode): ReactNode {
     <WorldMembershipGuard
       minWorldRole={WorldRole.Ctenar}
       fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
-      redirectTo="/svet/:worldId"
+      redirectTo="/svet/:worldSlug"
     >
       {element}
     </WorldMembershipGuard>
@@ -181,7 +181,7 @@ export const router = createBrowserRouter([
 
   // Chráněné — WorldLayout (celá světová vrstva za auth)
   {
-    path: '/svet/:worldId',
+    path: '/svet/:worldSlug',
     element: <WorldLayout />,
     loader: requireAuth,
     errorElement: <ErrorPage />,

@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import s from './MemberDashboardStub.module.css';
 
 interface Props {
-  worldId: string;
+  /** Slug světa — pro generování odkazů `/svet/<slug>/...`. */
+  worldSlug: string;
 }
 
 interface SectionLink {
@@ -16,8 +17,8 @@ interface SectionLink {
  * na hlavní sekce světa. Plný obsah (recent activity, statistiky) přijde
  * v pozdějších fázích.
  */
-export function MemberDashboardStub({ worldId }: Props) {
-  const base = `/svet/${worldId}`;
+export function MemberDashboardStub({ worldSlug }: Props) {
+  const base = `/svet/${worldSlug}`;
   const links: SectionLink[] = [
     {
       to: `${base}/stranky`,

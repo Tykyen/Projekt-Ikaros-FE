@@ -14,11 +14,23 @@ export function useMyWorlds() {
   });
 }
 
-export function useWorld(worldId: string) {
+/** Mongo ObjectId má pevný tvar 24 hex znaků — odlišení od slugu. */
+const OBJECT_ID_RE = /^[0-9a-fA-F]{24}$/;
+
+/**
+ * Načte svět podle klíče z URL. `worldKey` je buď slug (`matrix` —
+ * `/svet/matrix`), nebo ObjectId (zpětná kompatibilita se starými odkazy).
+ * Tvar rozhodne, jestli se volá `GET /worlds/:id` nebo `/worlds/slug/:slug`.
+ */
+export function useWorld(worldKey: string) {
+  const isObjectId = OBJECT_ID_RE.test(worldKey);
   return useQuery({
-    queryKey: ['worlds', worldId],
-    queryFn: () => api.get<World>(`/worlds/${worldId}`),
-    enabled: !!worldId,
+    queryKey: ['worlds', isObjectId ? 'id' : 'slug', worldKey],
+    queryFn: () =>
+      api.get<World>(
+        isObjectId ? `/worlds/${worldKey}` : `/worlds/slug/${worldKey}`,
+      ),
+    enabled: !!worldKey,
     staleTime: 5 * 60_000,
   });
 }

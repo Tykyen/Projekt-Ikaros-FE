@@ -21,7 +21,7 @@ function formatPlayers(playerCount: number, maxPlayers?: number | null): string 
 export function WorldCard({ world, membership }: WorldCardProps) {
   const isMember = membership !== undefined;
   return (
-    <Link to={`/svet/${world.id}`} className={s.card}>
+    <Link to={`/svet/${world.slug}`} className={s.card}>
       <div className={s.top}>
         <div className={s.hero} aria-hidden={!world.imageUrl}>
           {world.imageUrl ? (

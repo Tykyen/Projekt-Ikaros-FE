@@ -90,7 +90,9 @@ describe('CreateWorldPage', () => {
       }),
     );
 
-    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/svet/w1'));
+    await waitFor(() =>
+      expect(navigateMock).toHaveBeenCalledWith('/svet/muj-svet'),
+    );
   });
 
   it('po manuálním editu adresy už auto-derive z názvu nezpřepisuje slug', () => {
