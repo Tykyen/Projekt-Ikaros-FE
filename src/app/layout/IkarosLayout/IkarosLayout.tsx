@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Beer,
   Settings,
+  Newspaper,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
 import { useSocketInit } from '@/features/chat/api/useSocket';
@@ -204,6 +205,12 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
           <ThemeSwitcher />
         </div>
         <div className={s.navList}>
+          {isAdmin && (
+            <Link to="/ikaros/novinky" className={s.navItem} onClick={onNav}>
+              <span className={s.navItemIcon}><Newspaper size={18} /></span>
+              <span className={s.navItemLabel}>Správa novinek</span>
+            </Link>
+          )}
           <Link to="/ikaros/uzivatele" className={s.navItem} onClick={onNav}>
             <span className={s.navItemIcon}><Users size={18} /></span>
             <span className={s.navItemLabel}>{label}</span>

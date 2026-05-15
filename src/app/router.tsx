@@ -34,6 +34,7 @@ const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage
 const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
+const IkarosNewsManagementPage = lazy(() => import('@/features/ikaros/pages/IkarosNewsManagementPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -141,6 +142,17 @@ export const router = createBrowserRouter([
       // Spec 1.4 — `/ikaros/uzivatele` dostupné každému přihlášenému
       // (page sama řeší tab visibility per role; admin-only taby jsou skryté).
       { path: 'ikaros/uzivatele',       element: p(UsersPage),        loader: requireAuth },
+
+      // Spec 3.1 — `/ikaros/novinky` admin správa platformových novinek (Admin/Superadmin).
+      {
+        path: 'ikaros/novinky',
+        loader: requireAuth,
+        element: (
+          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
+            {p(IkarosNewsManagementPage)}
+          </RoleGuard>
+        ),
+      },
       {
         path: 'admin',
         loader: requireAuth,
