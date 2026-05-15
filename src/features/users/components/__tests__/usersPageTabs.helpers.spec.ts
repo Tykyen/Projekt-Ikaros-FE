@@ -6,23 +6,21 @@ import {
 } from '../usersPageTabs.helpers';
 
 describe('visibleTabsForRole', () => {
-  it('Admin: vidí všech 6 tabů (vč. Novinky + Audit + Friendship debug)', () => {
+  it('Admin: vidí všech 5 tabů (Audit + Friendship debug, bez Novinky)', () => {
     expect(visibleTabsForRole(UserRole.Admin)).toEqual([
       'pratele',
       'uzivatele',
       'zpracovat',
-      'novinky',
       'audit',
       'friendship-debug',
     ]);
   });
 
-  it('Superadmin: vidí všech 6 tabů (vč. Novinky + Audit + Friendship debug)', () => {
+  it('Superadmin: vidí všech 5 tabů (Audit + Friendship debug, bez Novinky)', () => {
     expect(visibleTabsForRole(UserRole.Superadmin)).toEqual([
       'pratele',
       'uzivatele',
       'zpracovat',
-      'novinky',
       'audit',
       'friendship-debug',
     ]);

@@ -6,7 +6,6 @@ const TAB_LABELS: Record<UsersPageTab, string> = {
   pratele: 'Přátelé',
   uzivatele: 'Uživatelé',
   zpracovat: 'Zpracovat',
-  novinky: 'Novinky',
   audit: 'Audit',
   'friendship-debug': 'Friendship debug',
 };

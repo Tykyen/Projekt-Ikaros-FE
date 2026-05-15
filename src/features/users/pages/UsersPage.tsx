@@ -15,7 +15,6 @@ import { UsersTab } from '../components/tabs/UsersTab/UsersTab';
 import { ZpracovatTab } from '../components/tabs/ZpracovatTab/ZpracovatTab';
 import { AuditTab } from '../components/tabs/AuditTab/AuditTab';
 import { FriendshipDebugTab } from '../components/tabs/FriendshipDebugTab/FriendshipDebugTab';
-import { NewsManagementTab } from '../components/tabs/NewsManagementTab/NewsManagementTab';
 import { usePendingActionsCount } from '../api/usePendingActions';
 import s from './UsersPage.module.css';
 
@@ -23,7 +22,6 @@ const TAB_TITLES: Record<UsersPageTab, string> = {
   pratele: 'Přátelé',
   uzivatele: 'Uživatelé',
   zpracovat: 'Zpracovat',
-  novinky: 'Správa novinek',
   audit: 'Audit log',
   'friendship-debug': 'Friendship debug',
 };
@@ -72,7 +70,6 @@ export default function UsersPage() {
         out.delete('sort');
         out.delete('search');
         out.delete('includeDeleted');
-        out.delete('novinky'); // 3.2f — sub-tab Novinky scope
         return out;
       },
       { replace: false },
@@ -95,7 +92,6 @@ export default function UsersPage() {
       {tab === 'pratele' && <FriendsTab />}
       {tab === 'uzivatele' && <UsersTab />}
       {tab === 'zpracovat' && <ZpracovatTab />}
-      {tab === 'novinky' && <NewsManagementTab />}
       {tab === 'audit' && <AuditTab />}
       {tab === 'friendship-debug' && <FriendshipDebugTab />}
     </div>

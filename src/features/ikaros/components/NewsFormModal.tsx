@@ -24,7 +24,7 @@ interface InitialData {
   id: string;
   title: string;
   content: string;
-  /** Volitelné — starší volání (NewsManagementTab) je nemusí předat. */
+  /** Volitelné — fallback na 'info' / bez obrázku, pokud volající nepředá. */
   type?: IkarosNewsType;
   imageUrl?: string;
 }
