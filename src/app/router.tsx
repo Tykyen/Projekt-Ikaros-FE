@@ -27,7 +27,9 @@ const EmailVerifyPage        = lazy(() => import('@/features/auth/pages/EmailVer
 const EmailChangeConfirmPage = lazy(() => import('@/features/auth/pages/EmailChangeConfirmPage'));
 const UsersPage        = lazy(() => import('@/features/users/pages/UsersPage'));
 const UserProfilePage  = lazy(() => import('@/features/users/pages/PublicUserProfilePage'));
-const ArticlesPage     = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
+const ArticlesPage         = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
+const ArticleDetailPage    = lazy(() => import('@/features/ikaros/pages/ArticleDetailPage'));
+const ArticleEditorPage    = lazy(() => import('@/features/ikaros/pages/ArticleEditorPage'));
 const GalleryPage      = lazy(() => import('@/features/ikaros/pages/GalleryPage'));
 const DiscussionsPage  = lazy(() => import('@/features/ikaros/pages/DiscussionsPage'));
 const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage'));
@@ -121,7 +123,11 @@ export const router = createBrowserRouter([
       // Veřejné — anon má přístup
       { index: true,                    element: p(DashboardPage) },
       { path: 'ikaros/vesmiry',         element: p(WorldsPage) },
-      { path: 'ikaros/clanky',          element: p(ArticlesPage) },
+      { path: 'ikaros/clanky',                element: p(ArticlesPage) },
+      // ⚠️ `/novy` musí být před `/:id` (specifické route před parametrické).
+      { path: 'ikaros/clanky/novy',           element: p(ArticleEditorPage), loader: requireAuth },
+      { path: 'ikaros/clanky/:id/upravit',    element: p(ArticleEditorPage), loader: requireAuth },
+      { path: 'ikaros/clanky/:id',            element: p(ArticleDetailPage) },
       { path: 'ikaros/galerie',         element: p(GalleryPage) },
       { path: 'ikaros/diskuze',         element: p(DiscussionsPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },

@@ -340,6 +340,62 @@ export interface IkarosNews {
 /** Spec 3.1 — scope filter pro list/count endpointy. */
 export type IkarosNewsScope = 'active' | 'archived' | 'all';
 
+// ─── Spec 3.2 — Ikaros články ────────────────────────────────────────────
+
+export type ArticleStatus = 'Draft' | 'Pending' | 'Published' | 'Rejected';
+
+export interface ArticleRating {
+  userId: string;
+  stars: number;
+}
+
+export interface IkarosArticle {
+  id: string;
+  title: string;
+  /** HTML z TipTap (3.2). */
+  content: string;
+  /** Slug, ref na `article_categories.key` (3.2a refactor z hardcoded enumu). */
+  category: string;
+  authorId: string;
+  authorName: string;
+  status: ArticleStatus;
+  rejectReason?: string;
+  ratings: ArticleRating[];
+  averageRating: number;
+  createdAtUtc: string;
+  updatedAtUtc: string;
+  publishedAtUtc?: string;
+}
+
+export interface ArticleCategory {
+  key: string;
+  label: string;
+  /** Hex barva `#RRGGBB`. */
+  color: string;
+  order: number;
+}
+
+export interface ArticleStats {
+  draft: number;
+  pending: number;
+  published: number;
+  rejected: number;
+  totalRatings: number;
+  averageRating: number;
+}
+
+/** Payload karty v Zpracovat tabu (3.2d renderer pro `article_pending_review`). */
+export interface ArticleReviewListItem {
+  articleId: string;
+  title: string;
+  /** Prvních 200 znaků obsahu, stripped HTML. */
+  preview: string;
+  category: string;
+  authorId: string;
+  authorName: string;
+  submittedAt: string;
+}
+
 export interface UpcomingEventDto {
   id: string;
   worldId: string;

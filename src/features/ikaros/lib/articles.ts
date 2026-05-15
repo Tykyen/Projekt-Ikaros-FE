@@ -1,0 +1,139 @@
+import type { CSSProperties } from 'react';
+import type { ArticleCategory, IkarosArticle } from '@/shared/types';
+
+const FALLBACK_CATEGORY: ArticleCategory = {
+  key: 'ostatni',
+  label: 'Ostatní',
+  color: '#8b98a5',
+  order: 999,
+};
+
+const GLYPHS = ['✦', '❦', '❧', '☙'] as const;
+
+/** Spec 3.2 — minimální čtenářská doba v minutách (200 slov/min). */
+export function readingTime(html: string): number {
+  const plain = html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const words = plain.split(' ').filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+/** Deterministický glyph divider per article ID — variabilita bez chaosu. */
+export function glyphFor(articleId: string): string {
+  const code = articleId.charCodeAt(0) || 0;
+  return GLYPHS[code % GLYPHS.length];
+}
+
+/** N° label — posledních 4 znaků ID, uppercase. */
+export function articleNumber(articleId: string): string {
+  return articleId.slice(-4).toUpperCase();
+}
+
+/** Inline style s `--cat-current` (předává barvu do CSS module). */
+export function categoryStyle(
+  category: ArticleCategory | undefined,
+): CSSProperties {
+  if (!category) return {};
+  return { ['--cat-current' as never]: category.color };
+}
+
+/** Najde kategorii podle key; fallback `ostatni` nebo hardcoded fallback. */
+export function categoryByKey(
+  categories: ArticleCategory[],
+  key: string,
+): ArticleCategory {
+  return (
+    categories.find((c) => c.key === key) ??
+    categories.find((c) => c.key === 'ostatni') ??
+    FALLBACK_CATEGORY
+  );
+}
+
+/** CS locale date (např. „12. listopadu 2026"). */
+export function formatDateCs(iso: string): string {
+  return new Date(iso).toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+/** Strip HTML pro plain text preview / search. */
+export function stripHtml(html: string, maxLen?: number): string {
+  const plain = html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+  return maxLen !== undefined ? plain.slice(0, maxLen) : plain;
+}
+
+/** Status label CZ. */
+export function statusLabel(status: IkarosArticle['status']): string {
+  return (
+    {
+      Draft: 'Koncept',
+      Pending: 'Čeká na schválení',
+      Published: 'Publikováno',
+      Rejected: 'Zamítnuto',
+    } as const
+  )[status];
+}
+
+export type SortKey = 'new' | 'top' | 'most-rated';
+
+/**
+ * 3.2c — filter + sort article list pro Přehled tab. Published only,
+ * client-side search (title + stripped content), multi-kategorie OR filter.
+ */
+export function filterArticles(
+  articles: IkarosArticle[],
+  query: string,
+  catFilter: Set<string>,
+  sort: SortKey,
+): IkarosArticle[] {
+  const q = query.trim().toLowerCase();
+  const filtered = articles.filter((a) => {
+    if (a.status !== 'Published') return false;
+    if (catFilter.size > 0 && !catFilter.has(a.category)) return false;
+    if (q) {
+      const inTitle = a.title.toLowerCase().includes(q);
+      const inContent = stripHtml(a.content).toLowerCase().includes(q);
+      if (!inTitle && !inContent) return false;
+    }
+    return true;
+  });
+
+  return [...filtered].sort((a, b) => {
+    if (sort === 'top') {
+      if (b.averageRating !== a.averageRating)
+        return b.averageRating - a.averageRating;
+      return b.ratings.length - a.ratings.length;
+    }
+    if (sort === 'most-rated') {
+      return b.ratings.length - a.ratings.length;
+    }
+    const aDate = new Date(a.publishedAtUtc ?? a.createdAtUtc).getTime();
+    const bDate = new Date(b.publishedAtUtc ?? b.createdAtUtc).getTime();
+    return bDate - aDate;
+  });
+}
+
+/** Status CSS var (badge color). */
+export function statusColor(status: IkarosArticle['status']): string {
+  return (
+    {
+      Draft: 'var(--status-draft)',
+      Pending: 'var(--status-pending)',
+      Published: 'var(--status-published)',
+      Rejected: 'var(--status-rejected)',
+    } as const
+  )[status];
+}

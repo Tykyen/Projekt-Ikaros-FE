@@ -17,6 +17,7 @@ import {
   Beer,
   Settings,
   Newspaper,
+  FileText,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
 import { useSocketInit } from '@/features/chat/api/useSocket';
@@ -192,6 +193,9 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   );
   const isAdmin =
     currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
+  // 3.2 — link na správu článků pro Admin/Superadmin/SpravceClanku
+  const isArticlesManager =
+    isAdmin || currentUser?.role === UserRole.SpravceClanku;
   const { data: pendingCount } = usePendingActionsCount(!!currentUser);
 
   const label = isAdmin ? 'Uživatelé' : 'Přátelé';
@@ -209,6 +213,12 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
             <Link to="/ikaros/novinky" className={s.navItem} onClick={onNav}>
               <span className={s.navItemIcon}><Newspaper size={18} /></span>
               <span className={s.navItemLabel}>Správa novinek</span>
+            </Link>
+          )}
+          {isArticlesManager && (
+            <Link to="/ikaros/clanky" className={s.navItem} onClick={onNav}>
+              <span className={s.navItemIcon}><FileText size={18} /></span>
+              <span className={s.navItemLabel}>Správa článků</span>
             </Link>
           )}
           <Link to="/ikaros/uzivatele" className={s.navItem} onClick={onNav}>
