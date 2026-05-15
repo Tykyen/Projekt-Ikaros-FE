@@ -1,5 +1,4 @@
 import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 
 /**
@@ -9,6 +8,9 @@ import Placeholder from '@tiptap/extension-placeholder';
  *
  * Bez `Image` / `Table` — 3.3 přidá Cloudinary Image extension; tabulky
  * pro literární obsah nejsou potřeba.
+ *
+ * Link je součást StarterKit v3 — konfigurujeme ho přes `link` klíč
+ * (samostatný `@tiptap/extension-link` by způsobil duplicitu).
  */
 export function getExtensions(opts: { placeholder?: string } = {}) {
   return [
@@ -17,13 +19,13 @@ export function getExtensions(opts: { placeholder?: string } = {}) {
       codeBlock: false,
       code: false,
       horizontalRule: false,
-    }),
-    Link.configure({
-      openOnClick: false,
-      autolink: true,
-      HTMLAttributes: {
-        rel: 'noopener noreferrer nofollow',
-        target: '_blank',
+      link: {
+        openOnClick: false,
+        autolink: true,
+        HTMLAttributes: {
+          rel: 'noopener noreferrer nofollow',
+          target: '_blank',
+        },
       },
     }),
     Placeholder.configure({

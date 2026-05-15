@@ -14,6 +14,26 @@ vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
+// RichTextEditor (TipTap) je v jsdom těžký — mock na prostou textarea
+// se stejným kontraktem (value / onChange / ariaLabel).
+vi.mock('@/shared/ui/RichTextEditor', () => ({
+  RichTextEditor: ({
+    value,
+    onChange,
+    ariaLabel,
+  }: {
+    value: string;
+    onChange?: (v: string) => void;
+    ariaLabel?: string;
+  }) => (
+    <textarea
+      aria-label={ariaLabel}
+      value={value}
+      onChange={(e) => onChange?.(e.target.value)}
+    />
+  ),
+}));
+
 import { toast } from 'sonner';
 
 interface RenderOpts {

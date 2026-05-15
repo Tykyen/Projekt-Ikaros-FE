@@ -17,6 +17,8 @@ export interface RichTextEditorProps {
   readOnly?: boolean;
   /** Aktivuje drop cap pro první písmeno (jen v readOnly). */
   withDropCap?: boolean;
+  /** ARIA label pro contenteditable oblast (accessibility / testy). */
+  ariaLabel?: string;
   className?: string;
 }
 
@@ -34,6 +36,7 @@ export function RichTextEditor({
   maxLength,
   readOnly,
   withDropCap,
+  ariaLabel,
   className,
 }: RichTextEditorProps) {
   const editor = useEditor({
@@ -41,6 +44,11 @@ export function RichTextEditor({
     content: value,
     editable: !readOnly,
     immediatelyRender: false,
+    // ⚠️ editorProps musí být vždy objekt — TipTap `createView` čte
+    // `editorProps.dispatchTransaction` bez null-checku; `undefined` → crash.
+    editorProps: ariaLabel
+      ? { attributes: { 'aria-label': ariaLabel, role: 'textbox' } }
+      : {},
     onUpdate({ editor }) {
       if (readOnly) return;
       const html = editor.getHTML();

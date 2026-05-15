@@ -530,7 +530,7 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 - ~~D-065~~ ✅ Legacy `isActive` pole vyčištěno (2026-05-15, commity `324e2929` BE + `98d7b5b` FE).
 
 **Nově vzniklé dluhy (otevřené):**
-- **D-066** (FE): TipTap rich-text editor pro `content` (plain textarea bylo MVP).
+- ~~**D-066**~~ ✅ uzavřen v 3.2 (TipTap rich-text editor — sdílená komponenta + retrofit novinek).
 - **D-067** (FE/BE): Audit log UI pro archive/delete (fields se ukládají, UI chybí).
 
 ### - [x] 3.2 Články (`/ikaros/clanky`) ✅ (2026-05-15)
@@ -540,18 +540,19 @@ Naplnění tabu „Přátelé" + queue typ `friend_request` ve Zpracovat tabu. S
 Rozsah rozdělen na 5 sub-fází (3.2a–e). Vizuální směr „Editorial Atelier" (drop cap, glyph dividers, sticky margin-note autor card, 65ch reading width).
 
 - [x] **3.2a — BE infra** (commit `8b9e386e`): `ArticleReviewProvider` (queue typ `article_pending_review`), anon read přes `OptionalJwtAuthGuard`, `article_reads` collection (mark-as-read tracking), `article_categories` collection s admin CRUD + seed 6 výchozích, kategorie refactor z enumu na DB slug. **Pre-fix:** `PendingActionsModule` zapojen do `AppModule` (1.4 infra byla dangling). +34 BE testů.
-- [x] **3.2b — Sdílený TipTap editor** (commit `73952d4`): `<RichTextEditor>` v `src/shared/ui/RichTextEditor/` — bubble menu 7 tlačítek, `useDraftAutoSave` (localStorage debounce 3 s), readOnly + drop cap mode. Self-hostované fonty Fraunces/Crimson Pro/JetBrains Mono. **Částečně řeší D-066** (TipTap setup hotov; retrofit novinek `NewsFormModal` zbývá — viz dluhy.md). +17 testů.
+- [x] **3.2b — Sdílený TipTap editor** (commit `73952d4`): `<RichTextEditor>` v `src/shared/ui/RichTextEditor/` — bubble menu 7 tlačítek, `useDraftAutoSave` (localStorage debounce 3 s), readOnly + drop cap mode. Self-hostované fonty Fraunces/Crimson Pro/JetBrains Mono. +17 testů.
 - [x] **3.2c — Stránky** (commit `cee1c91`): `/ikaros/clanky` (Přehled/Moje taby, search, sort, kategorie filter, mini stats), `/clanky/:id` detail (reading flow, rating distribuce, „více od autora"), `/clanky/novy` + `/:id/upravit` editor, `RejectReasonModal` (povinný reason min 10 znaků). +20 testů.
 - [x] **3.2d — Zpracovat renderer** (commit `42ca2a9`): `ArticleReviewRenderer` registrován v `PENDING_ACTION_RENDERERS`. +11 testů.
 - [x] **3.2e — Discovery** (commit `486e52a`): `AutoTOC` (sticky desktop / accordion mobile). RatingDistribution + MoreFromAuthor + mark-as-read shipped už v 3.2c. +12 testů.
+- [x] **3.2f — Dluhový úklid:** retrofit novinek `NewsFormModal` na `<RichTextEditor>` (zavírá D-066), BE enum rename `SpravceClankuu→SpravceClanku` / `SpravceDisukzi→SpravceDiskuzi` (D-NEW-role-name-mismatch), touch targety 44px na mobilu (D-NEW-touch-targets).
 
-**Uzavírá dluhy:** D-NEW-pending-actions-wired (`PendingActionsModule` zapojen). **Částečně D-066** — TipTap setup hotov, retrofit novinek zbývá.
+**Uzavírá dluhy:** D-066 (TipTap — vč. retrofitu novinek), D-NEW-pending-actions-wired, D-NEW-role-name-mismatch, D-NEW-touch-targets.
 
 **Mimo rozsah → přesunuto do navazujících fází:**
 - Cloudinary upload obrázku v TipTap → **3.3** (po vybudování Cloudinary infra).
 - „Diskuze o článku" link → **3.4** (po vytvoření modulu diskuzí).
 
-**Nově vzniklé dluhy:** D-NEW-search-be (server-side full-text search), D-NEW-bulk-pending-articles, D-NEW-article-versions, D-NEW-role-name-mismatch (BE `SpravceClankuu` vs FE `SpravceClanku`).
+**Otevřené dluhy (budoucí featury / optimalizace, ne nedodělky 3.2):** D-NEW-search-be (server-side search až nad ~500 článků), D-NEW-bulk-pending-articles, D-NEW-article-versions.
 
 ### - [ ] 3.3 Galerie (`/ikaros/galerie`)
 - [ ] Mřížka obrázků, `/nahrat` upload (Cloudinary)

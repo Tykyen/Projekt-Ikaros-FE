@@ -109,16 +109,6 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
-### D-066 — TipTap rich-text editor pro IkarosNews content (3.1 → 3.2, ČÁSTEČNĚ ŘEŠENO)
-**Soubory:** `src/features/ikaros/components/NewsFormModal.tsx` (textarea), `src/features/ikaros/pages/DashboardPage/components/NewsCard.tsx` (render)
-**Stav:** Částečně řešeno — 3.2b dodala sdílenou komponentu `<RichTextEditor>` (`src/shared/ui/RichTextEditor/`). **Zbývá retrofit novinek** — `NewsFormModal` stále používá plain `<textarea>`.
-**Kontext:** 3.2b postavila TipTap setup pro články; novinky ho ještě nepoužívají. Retrofit nebyl v rozsahu 3.2 (FE fáze o článcích).
-**Dopad:** Autor novinky nemůže formátovat obsah; čtenář vidí plain text bez vizuální hierarchie. Články formátování mají.
-**Řešení (zbývá):** (1) Replace `<textarea>` v `NewsFormModal` za `<RichTextEditor>`. (2) `NewsCard` render přes `<RichTextEditor readOnly>`. (3) Stávající plain-text content TipTap zvládne (obalí do `<p>`). ⚠️ Ověřit že 3.1 `NewsFormModal.spec.tsx` + `NewsCard` testy projdou (plain → HTML render).
-**Kdy:** Drobný samostatný PR — kdykoli, nízká priorita (novinky fungují, jen bez rich-textu).
-
----
-
 ### D-067 — Audit log UI pro Ikaros novinky (archive/delete)
 **Soubory:** `backend/src/modules/ikaros-news/schemas/ikaros-news.schema.ts` (data už jsou), FE: nová audit komponenta nebo rozšíření existujícího AuditLogTab.
 **Stav:** Otevřený — data se ukládají (`archivedAtUtc`, `archivedByUserId`), ale UI je nezobrazuje.
@@ -133,15 +123,6 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 **Stav:** ✅ Uzavřeno 2026-05-15, commit `8b9e386e`.
 **Co bylo:** `PendingActionsModule` (1.4 Zpracovat infra) existoval, ale nebyl importovaný v `AppModule`. `FriendshipsModule` (1.8) + `WorldsModule` (2.4) injectovaly `PendingActionsService` — DI by selhalo při startu. Objeveno při 3.2a auditu.
 **Fix:** Přidán `PendingActionsModule` do `AppModule.imports`.
-
----
-
-### D-NEW-role-name-mismatch — BE `SpravceClankuu` vs FE `SpravceClanku`
-**Soubory:** `backend/.../users/interfaces/user.interface.ts` (`SpravceClankuu`, `SpravceDisukzi` — překlepy), `Projekt-ikaros-FE/src/shared/types/index.ts` (`SpravceClanku`, `SpravceDiskuzi`).
-**Stav:** Otevřený — objeveno v 3.2a.
-**Kontext:** BE enum má překlepy v názvech (`SpravceClankuu` dvojité „u", `SpravceDisukzi` přehozené „su"). FE enum má opravené názvy. Numerické hodnoty (10/11/12) se shodují, takže runtime funguje, ale názvy se liší — matoucí, riziko bugu při refactoru.
-**Dopad:** Nízký (runtime OK). Cognitive load + past pro budoucí kód.
-**Řešení:** Sjednotit BE enum názvy na opravené (`SpravceClanku`, `SpravceDiskuzi`). Hodnoty zůstávají. Grep všech použití BE enum názvů.
 
 ---
 
@@ -160,14 +141,6 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 
 ---
 
-### D-NEW-touch-targets — Malé touch targety na mobilu (z 3.2, projektový pattern)
-**Stav:** Otevřený, drobnost.
-**Kontext:** 3.2 filtr-chipy (~26 px) a rating hvězdy (~24 px) jsou na mobilu pod doporučenou velikostí dotykového cíle 44×44 px. Vzor je konzistentní s existujícím projektem (3.1 NewsCard, kategorie chipy v CreateWorldPage).
-**Dopad:** Nízký — prvky jsou klikatelné, jen méně pohodlné na malých displejích.
-**Řešení:** Projektová revize touch-target politiky — buď zvětšit chipy/hvězdy na mobilu (`@media` `min-height: 44px`), nebo akceptovat jako záměr. Nejde jen o 3.2.
-
----
-
 ### D-NEW-article-versions — Historie editů článku (z 3.2)
 **Stav:** Otevřený, nice-to-have.
 **Kontext:** Pro literární komunitu by se hodila historie verzí článku (kdo co kdy změnil, rollback).
@@ -177,6 +150,28 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 ---
 
 ## Vyřešené (historie, zachovat pro audit trail)
+
+### D-066 — TipTap rich-text editor pro IkarosNews content
+**Stav:** ✅ Uzavřeno 2026-05-15 (3.2b dodala `<RichTextEditor>`, retrofit novinek dotažen v navazujícím commitu).
+**Co bylo:** Novinky (`NewsFormModal`) měly plain `<textarea>` jako MVP z 3.1; rich-text se měl dodělat s 3.2.
+**Fix:** `NewsFormModal` — `<textarea>` nahrazena `<RichTextEditor>` přes `react-hook-form` `Controller`. `NewsCard` — náhled stripuje HTML na plain text (`toExcerpt`), backward-kompatibilní se staršími plain-text novinkami. RichTextEditor dostal `ariaLabel` prop (accessibility + testovatelnost). `NewsFormModal.spec.tsx` mockuje RichTextEditor na textarea.
+**Pozn.:** Při retrofitu objeven a opraven latentní bug — `editorProps: undefined` shazoval TipTap `createView` (`Cannot read dispatchTransaction`); nyní vždy `{}`.
+
+---
+
+### D-NEW-role-name-mismatch — BE `SpravceClankuu` vs FE `SpravceClanku`
+**Stav:** ✅ Uzavřeno 2026-05-15.
+**Co bylo:** BE enum měl překlepy v názvech (`SpravceClankuu` dvojité „u", `SpravceDisukzi` přehozené „su"); FE enum měl opravené názvy. Numerické hodnoty se shodovaly (runtime OK), ale názvy se lišily.
+**Fix:** BE enum `UserRole` přejmenován na `SpravceClanku` / `SpravceDiskuzi` (7 souborů, hodnoty 10/12 zachovány). DB data + JWT beze změny. BE 1017 testů zelených.
+
+---
+
+### D-NEW-touch-targets — Malé touch targety na mobilu
+**Stav:** ✅ Uzavřeno 2026-05-15.
+**Co bylo:** 3.2 filtr-chipy a rating hvězdy byly na mobilu pod 44×44 px.
+**Fix:** `@media (max-width: 768px)` — `.chip`/`.chipActive` (ArticlesPage + ArticleEditorPage) `min-height: 44px`; `.rateBtn` (ArticleDetailPage) `min-width/height: 44px`.
+
+---
 
 ### D-065 — Legacy `isActive` field na IkarosNews schemě
 **Stav:** ✅ Uzavřeno 2026-05-15.

@@ -537,4 +537,12 @@
   .header {
     padding: var(--sp-4) 0;
   }
+  /* Touch targety — rating hvězdy min 44px na mobilu (D-NEW-touch-targets). */
+  .rateBtn {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

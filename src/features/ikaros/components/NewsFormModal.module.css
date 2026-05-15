@@ -16,31 +16,17 @@
   color: var(--text-primary);
 }
 
-.textarea {
-  width: 100%;
+/* 3.2 — RichTextEditor wrapper (nahradil plain textarea). */
+.editor {
   min-height: 180px;
-  resize: vertical;
   padding: var(--sp-2) var(--sp-3);
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  font-family: var(--font-body);
-  line-height: 1.5;
-  outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
-.textarea::placeholder { color: var(--text-secondary); }
-.textarea:focus {
+.editor:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-.textarea[aria-invalid='true'] {
-  border-color: var(--danger);
-}
-.textarea[aria-invalid='true']:focus {
-  box-shadow: 0 0 0 3px var(--danger-focus-ring);
 }
 
 .errorMsg {

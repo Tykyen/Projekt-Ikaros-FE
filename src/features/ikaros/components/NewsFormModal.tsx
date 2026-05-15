@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { Modal, Input, Button } from '@/shared/ui';
+import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import {
   useCreateIkarosNews,
   useUpdateIkarosNews,
@@ -36,6 +37,7 @@ export function NewsFormModal({ open, onClose, mode, initialData }: Props) {
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<CreateNewsFormValues>({
     resolver: zodResolver(createNewsSchema),
     mode: 'onBlur',
@@ -115,16 +117,20 @@ export function NewsFormModal({ open, onClose, mode, initialData }: Props) {
         />
 
         <div className={s.textareaWrap}>
-          <label htmlFor="news-content" className={s.label}>
-            Obsah
-          </label>
-          <textarea
-            id="news-content"
-            className={s.textarea}
-            rows={8}
-            maxLength={10000}
-            aria-invalid={errors.content ? 'true' : 'false'}
-            {...register('content')}
+          <span className={s.label}>Obsah</span>
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => (
+              <RichTextEditor
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Napiš obsah novinky…"
+                maxLength={10000}
+                ariaLabel="Obsah"
+                className={s.editor}
+              />
+            )}
           />
           {errors.content?.message && (
             <span className={s.errorMsg}>{errors.content.message}</span>

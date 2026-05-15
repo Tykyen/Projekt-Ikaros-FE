@@ -410,4 +410,10 @@
   .toolbar {
     flex-direction: column;
   }
+  /* Touch targety — min 44px na mobilu (D-NEW-touch-targets). */
+  .chip,
+  .chipActive {
+    min-height: 44px;
+    padding: var(--sp-2) var(--sp-4);
+  }
 }
