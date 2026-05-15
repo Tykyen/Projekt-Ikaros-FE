@@ -38,7 +38,7 @@ function renderModal({
       open
       mode={mode}
       initialData={initialData}
-      onClose={onClose}
+      onClose={onClose as unknown as () => void}
     />,
     { wrapper: Wrapper },
   );

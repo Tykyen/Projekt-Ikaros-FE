@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 
 const apiGet = vi.mocked(api.get);
 const apiPost = vi.mocked(api.post);
-const apiPatch = vi.mocked(api.patch);
+void vi.mocked(api.patch); // 3.2b pre-fix: byl unused — odebrané spec testy
 const apiDelete = vi.mocked(api.delete);
 
 function makeNews(overrides: Partial<{ id: string; title: string; content: string; archived: boolean }> = {}) {

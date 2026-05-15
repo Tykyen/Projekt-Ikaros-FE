@@ -1,0 +1,38 @@
+.menu {
+  display: flex;
+  gap: 2px;
+  background: var(--surface-3);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  box-shadow: var(--shadow-md);
+}
+
+.btn,
+.btnActive {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, var(--text-secondary));
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn:hover {
+  background: var(--surface-1);
+  color: var(--text-primary, var(--text-strong));
+}
+
+.btnActive {
+  background: var(--accent, var(--theme-accent));
+  color: var(--text-on-accent, #050508);
+}
+
+.btnActive:hover {
+  filter: brightness(1.1);
+}

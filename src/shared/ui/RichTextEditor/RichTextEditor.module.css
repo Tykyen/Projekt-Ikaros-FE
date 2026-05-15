@@ -1,0 +1,127 @@
+/* ──────────────────────────────────────────────────────────────────────
+   3.2b RichTextEditor — Editorial Atelier prose styling.
+
+   Read-only mode (`.readOnly`) je optimalizovaný pro reading: max-width 65ch,
+   Crimson Pro body font, dramatic drop cap přes `::first-letter` (volitelný
+   via `.withDropCap` modifier).
+
+   Editable mode má decentní typografii (Crimson Pro), žádný drop cap,
+   žádný max-width (autor potřebuje plné UI prostor).
+   ────────────────────────────────────────────────────────────────────── */
+
+.wrapper {
+  position: relative;
+}
+
+.content {
+  font-family: var(--prose-font-body);
+  font-size: 19px;
+  line-height: var(--prose-line-height);
+  color: var(--text-primary, var(--text-strong));
+}
+
+.content :global(.ProseMirror) {
+  outline: none;
+  min-height: 200px;
+}
+
+.content :global(.ProseMirror p) {
+  margin: 0 0 var(--prose-paragraph-spacing);
+}
+
+.content :global(.ProseMirror p:last-child) {
+  margin-bottom: 0;
+}
+
+.content :global(.ProseMirror h2) {
+  font-family: var(--prose-font-display);
+  font-size: 32px;
+  font-weight: 600;
+  font-feature-settings: 'wonk' 0;
+  letter-spacing: -0.01em;
+  margin: 1.5em 0 0.5em;
+  color: var(--text-primary, var(--text-strong));
+}
+
+.content :global(.ProseMirror h3) {
+  font-family: var(--prose-font-display);
+  font-size: 24px;
+  font-weight: 500;
+  margin: 1.2em 0 0.4em;
+  color: var(--text-primary, var(--text-strong));
+}
+
+.content :global(.ProseMirror blockquote) {
+  border-left: 3px solid var(--accent, var(--theme-accent));
+  padding-left: 1em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: var(--text-secondary, var(--text-muted));
+}
+
+.content :global(.ProseMirror ul) {
+  padding-left: 1.5em;
+  margin: 1em 0;
+  list-style-type: disc;
+}
+
+.content :global(.ProseMirror ol) {
+  padding-left: 1.5em;
+  margin: 1em 0;
+  list-style-type: decimal;
+}
+
+.content :global(.ProseMirror li) {
+  margin: 0.25em 0;
+}
+
+.content :global(.ProseMirror a) {
+  color: var(--accent, var(--theme-accent));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.content :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--text-muted, var(--text-subtle));
+  pointer-events: none;
+  height: 0;
+  font-style: italic;
+}
+
+/* ─── Read-only mode — reading-focused prose ─────────────────────────── */
+
+.readOnly .content :global(.ProseMirror) {
+  max-width: var(--prose-max-width);
+  margin: 0 auto;
+}
+
+/* Drop cap — Fraunces italic (WONK axis on, SOFT axis high) dramatic init letter. */
+.withDropCap .content :global(.ProseMirror > p:first-of-type::first-letter) {
+  font-family: var(--prose-font-display);
+  font-size: var(--prose-drop-cap-size);
+  font-weight: 700;
+  font-style: italic;
+  font-feature-settings: 'wonk' 1;
+  float: left;
+  line-height: var(--prose-drop-cap-line-height);
+  padding-right: 0.08em;
+  padding-top: 0.05em;
+  color: var(--accent, var(--theme-accent));
+}
+
+@media (max-width: 768px) {
+  .content {
+    font-size: 17px;
+  }
+  .content :global(.ProseMirror h2) {
+    font-size: 26px;
+  }
+  .content :global(.ProseMirror h3) {
+    font-size: 20px;
+  }
+  .withDropCap .content :global(.ProseMirror > p:first-of-type::first-letter) {
+    font-size: 4em;
+  }
+}

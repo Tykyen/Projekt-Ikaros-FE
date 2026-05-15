@@ -19,8 +19,16 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@fontsource-variable/crimson-pro": "^5.2.8",
+    "@fontsource-variable/fraunces": "^5.2.9",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.100.9",
+    "@tiptap/extension-bubble-menu": "^3.23.4",
+    "@tiptap/extension-link": "^3.23.4",
+    "@tiptap/extension-placeholder": "^3.23.4",
+    "@tiptap/react": "^3.23.4",
+    "@tiptap/starter-kit": "^3.23.4",
     "axios": "^1.16.0",
     "clsx": "^2.1.1",
     "jotai": "^2.20.0",

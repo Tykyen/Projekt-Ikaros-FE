@@ -1,0 +1,44 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   3.2 Prose tokeny — typografie pro literární obsah článků.
+
+   Editorial Atelier styling (spec-3.2 §5) je opt-in přes class `.prose`.
+   Defaultně mapuje na Fraunces (display) + Crimson Pro (body) + JetBrains
+   Mono (mono accent). Skiny mohou override v `[data-theme="<id>"]` blocích.
+
+   Kategorie barvy (default legacy paleta) — skiny override podle palety.
+   ────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Prose fonty — fallback chain (self-hostované přes @fontsource-variable). */
+  --prose-font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --prose-font-body: 'Crimson Pro Variable', ui-serif, Georgia, serif;
+  --prose-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Layout — reading experience. */
+  --prose-max-width: 65ch;
+  --prose-line-height: 1.7;
+  --prose-paragraph-spacing: 1.5em;
+
+  /* Drop cap — dramatic init letter na detail page. */
+  --prose-drop-cap-size: 5em;
+  --prose-drop-cap-line-height: 0.85;
+
+  /* Glyph divider — náhodný z palety per article ID (deterministic JS).
+     Skiny mohou nastavit jeden specifický (např. sci-fi → '▸'). */
+  --prose-divider-glyph: '✦';
+
+  /* ── Kategorie article — default legacy paleta (skiny override). */
+  --cat-povidky: #64b5f6;
+  --cat-poezie: #ce93d8;
+  --cat-uvahy: #ffb74d;
+  --cat-recenze: #4caf50;
+  --cat-postavy: #ff8a65;
+  --cat-ostatni: #8b98a5;
+  --cat-current: var(--accent, #64b5f6); /* runtime override per-card via style */
+
+  /* Status badges. */
+  --status-draft: var(--text-muted, #8b98a5);
+  --status-pending: #ff9800;
+  --status-published: #4caf50;
+  --status-rejected: #ff4444;
+}
