@@ -10,6 +10,7 @@ import { UserRole } from '@/shared/types';
 import { useArticle, useApproveArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles } from '../api/useArticles';
 import { useArticleCategories } from '../api/useArticleCategories';
 import { RejectReasonModal } from '../components/RejectReasonModal';
+import { AutoTOC } from '../components/AutoTOC';
 import {
   articleNumber,
   categoryByKey,
@@ -107,6 +108,10 @@ export default function ArticleDetailPage() {
           />
           <div data-article-end aria-hidden style={{ height: 1 }} />
           <MarkAsReadObserver article={article} />
+        </div>
+
+        <div className={s.tocColumn}>
+          <AutoTOC html={article.content} />
         </div>
       </div>
 

@@ -106,6 +106,24 @@ export function statusLabel(status: IkarosArticle['status']): string {
 
 export type SortKey = 'new' | 'top' | 'most-rated';
 
+export interface TOCEntry {
+  id: string;
+  text: string;
+  level: 2 | 3;
+}
+
+/** 3.2e — extrahuje H2/H3 nadpisy z TipTap HTML pro AutoTOC. */
+export function extractHeadings(html: string): TOCEntry[] {
+  if (typeof window === 'undefined' || !html) return [];
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const elements = doc.querySelectorAll('h2, h3');
+  return Array.from(elements).map((el, idx) => ({
+    id: `heading-${idx}`,
+    text: el.textContent ?? '',
+    level: el.tagName === 'H2' ? 2 : 3,
+  }));
+}
+
 /**
  * 3.2c — filter + sort article list pro Přehled tab. Published only,
  * client-side search (title + stripped content), multi-kategorie OR filter.

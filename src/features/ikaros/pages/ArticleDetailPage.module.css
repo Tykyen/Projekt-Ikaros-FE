@@ -141,10 +141,14 @@
 
 .body {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 200px minmax(0, 1fr) 200px;
   gap: var(--sp-10);
   align-items: start;
   margin-bottom: var(--sp-12);
+}
+
+.tocColumn {
+  /* 3. grid kolona — AutoTOC desktop sticky nav. */
 }
 
 .authorSidebar {
@@ -504,6 +508,15 @@
   }
   .authorSidebar {
     position: static;
+    order: 1;
+  }
+  /* TOC accordion nad obsahem na mobilu/tabletu. */
+  .tocColumn {
+    order: 2;
+  }
+  .content {
+    order: 3;
+    max-width: 100%;
   }
   .authorCard {
     text-align: left;
@@ -511,9 +524,6 @@
     border-left: 3px solid var(--accent, var(--theme-accent));
     background: var(--surface-1);
     border-radius: var(--radius-sm);
-  }
-  .content {
-    max-width: 100%;
   }
 }
 
