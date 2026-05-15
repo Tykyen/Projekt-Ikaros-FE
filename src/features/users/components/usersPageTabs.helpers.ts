@@ -4,18 +4,26 @@ export type UsersPageTab =
   | 'pratele'
   | 'uzivatele'
   | 'zpracovat'
+  | 'novinky'
   | 'audit'
   | 'friendship-debug';
 
 /**
- * Spec 1.4 (+ side-task „uzivatele-tab-ikarus" + D-056 friendship debug)
- * — role-aware viditelnost tabů.
- *  - Admin/Superadmin: 5 tabů (Přátelé / Uživatelé / Zpracovat / Audit / Friendship debug)
- *  - ostatní role: 3 taby (Přátelé / Uživatelé / Zpracovat) — Audit + Friendship debug zůstávají admin-only.
+ * Spec 1.4 (+ side-task „uzivatele-tab-ikarus" + D-056 friendship debug
+ * + 3.2f Novinky tab) — role-aware viditelnost tabů.
+ *  - Admin/Superadmin: 6 tabů (Přátelé / Uživatelé / Zpracovat / Novinky / Audit / Friendship debug)
+ *  - ostatní role: 3 taby (Přátelé / Uživatelé / Zpracovat) — Novinky/Audit/Friendship debug admin-only.
  */
 export function visibleTabsForRole(role: UserRole | undefined): UsersPageTab[] {
   if (role === UserRole.Superadmin || role === UserRole.Admin) {
-    return ['pratele', 'uzivatele', 'zpracovat', 'audit', 'friendship-debug'];
+    return [
+      'pratele',
+      'uzivatele',
+      'zpracovat',
+      'novinky',
+      'audit',
+      'friendship-debug',
+    ];
   }
   return ['pratele', 'uzivatele', 'zpracovat'];
 }

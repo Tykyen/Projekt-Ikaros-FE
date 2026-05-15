@@ -27,6 +27,8 @@ const EmailVerifyPage        = lazy(() => import('@/features/auth/pages/EmailVer
 const EmailChangeConfirmPage = lazy(() => import('@/features/auth/pages/EmailChangeConfirmPage'));
 const UsersPage        = lazy(() => import('@/features/users/pages/UsersPage'));
 const UserProfilePage  = lazy(() => import('@/features/users/pages/PublicUserProfilePage'));
+// 3.2f — `/ikaros/novinky` přesunuto jako tab do `/ikaros/uzivatele`. Route
+// zachována jako redirect kvůli starým bookmarkům / odkazům.
 const ArticlesPage         = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
 const ArticleDetailPage    = lazy(() => import('@/features/ikaros/pages/ArticleDetailPage'));
 const ArticleEditorPage    = lazy(() => import('@/features/ikaros/pages/ArticleEditorPage'));
@@ -36,7 +38,6 @@ const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage
 const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
-const IkarosNewsManagementPage = lazy(() => import('@/features/ikaros/pages/IkarosNewsManagementPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -149,15 +150,12 @@ export const router = createBrowserRouter([
       // (page sama řeší tab visibility per role; admin-only taby jsou skryté).
       { path: 'ikaros/uzivatele',       element: p(UsersPage),        loader: requireAuth },
 
-      // Spec 3.1 — `/ikaros/novinky` admin správa platformových novinek (Admin/Superadmin).
+      // 3.2f — `/ikaros/novinky` přesunuto jako tab do `/ikaros/uzivatele`.
+      // Route zachována jako redirect kvůli starým bookmarkům.
       {
         path: 'ikaros/novinky',
-        loader: requireAuth,
-        element: (
-          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
-            {p(IkarosNewsManagementPage)}
-          </RoleGuard>
-        ),
+        loader: () => redirect('/ikaros/uzivatele?tab=novinky'),
+        element: null,
       },
       {
         path: 'admin',

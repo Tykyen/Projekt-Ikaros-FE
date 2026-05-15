@@ -16,7 +16,6 @@ import {
   HelpCircle,
   Beer,
   Settings,
-  Newspaper,
   FileText,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
@@ -209,18 +208,6 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
           <ThemeSwitcher />
         </div>
         <div className={s.navList}>
-          {isAdmin && (
-            <Link to="/ikaros/novinky" className={s.navItem} onClick={onNav}>
-              <span className={s.navItemIcon}><Newspaper size={18} /></span>
-              <span className={s.navItemLabel}>Správa novinek</span>
-            </Link>
-          )}
-          {isArticlesManager && (
-            <Link to="/ikaros/clanky" className={s.navItem} onClick={onNav}>
-              <span className={s.navItemIcon}><FileText size={18} /></span>
-              <span className={s.navItemLabel}>Správa článků</span>
-            </Link>
-          )}
           <Link to="/ikaros/uzivatele" className={s.navItem} onClick={onNav}>
             <span className={s.navItemIcon}><Users size={18} /></span>
             <span className={s.navItemLabel}>{label}</span>
@@ -266,7 +253,15 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
 
       <div className={s.section} data-section-key="oblibene-clanky">
         <SectionTitle>Oblíbené články</SectionTitle>
-        <p className={s.emptyHint}>Žádné oblíbené</p>
+        <div className={s.navList}>
+          {isArticlesManager && (
+            <Link to="/ikaros/clanky" className={s.navItem} onClick={onNav}>
+              <span className={s.navItemIcon}><FileText size={18} /></span>
+              <span className={s.navItemLabel}>Správa článků</span>
+            </Link>
+          )}
+          <p className={s.emptyHint}>Žádné oblíbené</p>
+        </div>
       </div>
 
       <div className={s.section} data-section-key="oblibene-obrazky">

@@ -1,24 +1,10 @@
-.page {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
+/* 3.2f — jako tab v UsersPage; h1 dává UsersPage, tady jen toolbar. */
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   margin-bottom: 20px;
-}
-
-.title {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--text-strong);
 }
 
 .tabs {
@@ -187,14 +173,6 @@
 
 /* Mobile: tabulka → karty */
 @media (max-width: 768px) {
-  .page {
-    padding: 16px;
-  }
-
-  .title {
-    font-size: 1.25rem;
-  }
-
   .header {
     flex-wrap: wrap;
   }

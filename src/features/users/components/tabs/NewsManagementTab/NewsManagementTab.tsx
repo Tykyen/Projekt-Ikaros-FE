@@ -2,13 +2,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
-import {
-  Archive,
-  ArchiveRestore,
-  Pencil,
-  Plus,
-  Trash2,
-} from 'lucide-react';
+import { Archive, ArchiveRestore, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button, ConfirmDialog } from '@/shared/ui';
 import { NewsFormModal } from '@/features/ikaros/components/NewsFormModal';
 import {
@@ -19,9 +13,9 @@ import {
   useUnarchiveIkarosNews,
 } from '@/features/ikaros/api/useIkarosNews';
 import type { IkarosNews } from '@/shared/types';
-import s from './IkarosNewsManagementPage.module.css';
+import s from './NewsManagementTab.module.css';
 
-type Tab = 'active' | 'archived';
+type Scope = 'active' | 'archived';
 const LIMIT = 20;
 
 function formatDate(iso: string): string {
@@ -44,13 +38,19 @@ function mapAxiosError(err: unknown, fallback: string): string {
   return fallback;
 }
 
-export default function IkarosNewsManagementPage() {
+/**
+ * Spec 3.2f — správa platformových novinek jako tab v `/ikaros/uzivatele`
+ * (přesun z `/ikaros/novinky`). Vnitřní sub-tab Aktivní/Archiv používá
+ * URL param `?novinky=archived` (NE `?tab` — ten patří UsersPage tabům).
+ */
+export function NewsManagementTab() {
   const [params, setParams] = useSearchParams();
-  const tab: Tab = params.get('tab') === 'archived' ? 'archived' : 'active';
+  const scope: Scope =
+    params.get('novinky') === 'archived' ? 'archived' : 'active';
   const [page, setPage] = useState(1);
 
   const listQuery = useIkarosNewsList({
-    scope: tab,
+    scope,
     limit: LIMIT,
     offset: (page - 1) * LIMIT,
   });
@@ -66,13 +66,14 @@ export default function IkarosNewsManagementPage() {
   const [deleteTarget, setDeleteTarget] = useState<IkarosNews | null>(null);
 
   const items = listQuery.data ?? [];
-  const total = (tab === 'active' ? activeCount : archivedCount).data?.total ?? 0;
+  const total =
+    (scope === 'active' ? activeCount : archivedCount).data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
-  function changeTab(next: Tab) {
+  function changeScope(next: Scope) {
     const newParams = new URLSearchParams(params);
-    if (next === 'active') newParams.delete('tab');
-    else newParams.set('tab', next);
+    if (next === 'active') newParams.delete('novinky');
+    else newParams.set('novinky', next);
     setParams(newParams, { replace: true });
     setPage(1);
   }
@@ -108,9 +109,8 @@ export default function IkarosNewsManagementPage() {
   }
 
   return (
-    <div className={s.page}>
+    <div>
       <div className={s.header}>
-        <h1 className={s.title}>Správa novinek</h1>
         <Button
           variant="primary"
           size="md"
@@ -126,9 +126,9 @@ export default function IkarosNewsManagementPage() {
         <button
           type="button"
           role="tab"
-          aria-selected={tab === 'active'}
-          className={`${s.tab} ${tab === 'active' ? s.tabActive : ''}`}
-          onClick={() => changeTab('active')}
+          aria-selected={scope === 'active'}
+          className={`${s.tab} ${scope === 'active' ? s.tabActive : ''}`}
+          onClick={() => changeScope('active')}
         >
           Aktivní
           {activeCount.data && (
@@ -138,9 +138,9 @@ export default function IkarosNewsManagementPage() {
         <button
           type="button"
           role="tab"
-          aria-selected={tab === 'archived'}
-          className={`${s.tab} ${tab === 'archived' ? s.tabActive : ''}`}
-          onClick={() => changeTab('archived')}
+          aria-selected={scope === 'archived'}
+          className={`${s.tab} ${scope === 'archived' ? s.tabActive : ''}`}
+          onClick={() => changeScope('archived')}
         >
           Archiv
           {archivedCount.data && (
@@ -154,7 +154,7 @@ export default function IkarosNewsManagementPage() {
           <p className={s.empty}>Načítám…</p>
         ) : items.length === 0 ? (
           <p className={s.empty}>
-            {tab === 'active'
+            {scope === 'active'
               ? 'Žádné aktivní novinky.'
               : 'Archiv je prázdný.'}
           </p>
@@ -188,7 +188,7 @@ export default function IkarosNewsManagementPage() {
                     >
                       <Pencil size={16} aria-hidden="true" />
                     </button>
-                    {tab === 'active' ? (
+                    {scope === 'active' ? (
                       <button
                         type="button"
                         className={s.iconBtn}

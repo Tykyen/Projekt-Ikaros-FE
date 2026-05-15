@@ -71,11 +71,11 @@ const IKAROS_PAGES: PageDoc[] = [
     what: 'Zelená tečka u avataru = uživatel má právě otevřenou platformu. Žlutá tečka = uživatel je u počítače, ale ~5 min nebyl aktivní (idle). Žádná tečka = offline. U offline uživatelů na veřejném profilu vidíš „naposledy aktivní před X". Lze skrýt svůj stav přes Soukromí v profilu.',
   },
   {
-    path: '/ikaros/novinky',
+    path: '/ikaros/uzivatele?tab=novinky',
     name: 'Správa novinek',
     status: 'ok',
     who: 'Admin / Superadmin',
-    what: 'Administrace platformových novinek. Taby Aktivní a Archiv (s počty), tabulka 20 novinek na stránce, akce v řádku: upravit, archivovat / obnovit a trvale smazat. Archivace je vratná (objeví se v tabu Archiv, lze odtud zase Obnovit); smazání je nevratné s potvrzovacím dialogem. Z hlavičky se otevírá modal Nová novinka. Stejnou novinku lze založit i přímo z Úvodníku — sekce Novinky má v hlavičce tlačítko +.',
+    what: 'Administrace platformových novinek — záložka „Novinky" na stránce Uživatelé. Pod-taby Aktivní a Archiv (s počty), tabulka 20 novinek na stránce, akce v řádku: upravit, archivovat / obnovit a trvale smazat. Archivace je vratná (objeví se v Archivu, lze odtud zase Obnovit); smazání je nevratné s potvrzovacím dialogem. Obsah novinky se píše v editoru s formátováním. Novinku lze založit i přímo z Úvodníku — sekce Novinky má v hlavičce tlačítko +.',
   },
   {
     path: '/ikaros/clanky',

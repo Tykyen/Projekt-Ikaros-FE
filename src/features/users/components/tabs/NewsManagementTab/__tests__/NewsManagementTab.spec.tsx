@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
-import IkarosNewsManagementPage from '../IkarosNewsManagementPage';
+import { NewsManagementTab } from '../NewsManagementTab';
 import { api } from '@/shared/api/client';
 
 vi.mock('@/shared/api/client', () => ({
@@ -20,14 +20,40 @@ vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
+// RichTextEditor (TipTap) je v jsdom těžký — mock na textarea (NewsFormModal
+// ho používá pro obsah novinky).
+vi.mock('@/shared/ui/RichTextEditor', () => ({
+  RichTextEditor: ({
+    value,
+    onChange,
+    ariaLabel,
+  }: {
+    value: string;
+    onChange?: (v: string) => void;
+    ariaLabel?: string;
+  }) => (
+    <textarea
+      aria-label={ariaLabel}
+      value={value}
+      onChange={(e) => onChange?.(e.target.value)}
+    />
+  ),
+}));
+
 import { toast } from 'sonner';
 
 const apiGet = vi.mocked(api.get);
 const apiPost = vi.mocked(api.post);
-void vi.mocked(api.patch); // 3.2b pre-fix: byl unused — odebrané spec testy
 const apiDelete = vi.mocked(api.delete);
 
-function makeNews(overrides: Partial<{ id: string; title: string; content: string; archived: boolean }> = {}) {
+function makeNews(
+  overrides: Partial<{
+    id: string;
+    title: string;
+    content: string;
+    archived: boolean;
+  }> = {},
+) {
   return {
     id: overrides.id ?? 'n1',
     title: overrides.title ?? 'Test novinka',
@@ -39,7 +65,7 @@ function makeNews(overrides: Partial<{ id: string; title: string; content: strin
   };
 }
 
-function makeWrapper(initialEntry = '/ikaros/novinky') {
+function makeWrapper(initialEntry = '/ikaros/uzivatele?tab=novinky') {
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
@@ -54,52 +80,56 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe('IkarosNewsManagementPage — render & taby', () => {
-  it('zobrazí titulek "Správa novinek" a tab Aktivní/Archiv', async () => {
+describe('NewsManagementTab — render & sub-taby', () => {
+  it('zobrazí sub-tab Aktivní/Archiv', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 0 });
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
-    expect(screen.getByText('Správa novinek')).toBeInTheDocument();
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     expect(screen.getByRole('tab', { name: /Aktivní/ })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Archiv/ })).toBeInTheDocument();
   });
 
-  it('empty state pro tab Aktivní', async () => {
+  it('empty state pro sub-tab Aktivní', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 0 });
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     await waitFor(() =>
       expect(screen.getByText('Žádné aktivní novinky.')).toBeInTheDocument(),
     );
   });
 
-  it('zobrazí badge počty u tabů z count endpointu', async () => {
-    apiGet.mockImplementation((url: string, opts?: { params?: { scope?: string } }) => {
-      if (url === '/IkarosNews/count') {
-        if (opts?.params?.scope === 'active') return Promise.resolve({ total: 12 });
-        if (opts?.params?.scope === 'archived') return Promise.resolve({ total: 3 });
-        return Promise.resolve({ total: 0 });
-      }
-      return Promise.resolve([]);
-    });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+  it('zobrazí badge počty u sub-tabů z count endpointu', async () => {
+    apiGet.mockImplementation(
+      (url: string, opts?: { params?: { scope?: string } }) => {
+        if (url === '/IkarosNews/count') {
+          if (opts?.params?.scope === 'active')
+            return Promise.resolve({ total: 12 });
+          if (opts?.params?.scope === 'archived')
+            return Promise.resolve({ total: 3 });
+          return Promise.resolve({ total: 0 });
+        }
+        return Promise.resolve([]);
+      },
+    );
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     await waitFor(() => {
       expect(screen.getByText('12')).toBeInTheDocument();
       expect(screen.getByText('3')).toBeInTheDocument();
     });
   });
 
-  it('list zobrazí novinky s autorem a datem', async () => {
+  it('list zobrazí novinky s autorem', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 1 });
-      if (url === '/IkarosNews') return Promise.resolve([makeNews({ title: 'První novinka' })]);
+      if (url === '/IkarosNews')
+        return Promise.resolve([makeNews({ title: 'První novinka' })]);
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     await waitFor(() => {
       expect(screen.getByText('První novinka')).toBeInTheDocument();
       expect(screen.getByText('Admin')).toBeInTheDocument();
@@ -107,28 +137,25 @@ describe('IkarosNewsManagementPage — render & taby', () => {
   });
 });
 
-describe('IkarosNewsManagementPage — create modal', () => {
-  it('klik na "+ Nová novinka" otevře create modal', async () => {
+describe('NewsManagementTab — create modal', () => {
+  it('klik na "Nová novinka" otevře create modal', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 0 });
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('button', { name: 'Nová novinka' }));
-    // Po otevření modalu se musí v dokumentu objevit formulářová pole "Nadpis"
-    // a "Obsah" (= NewsFormModal create body).
     expect(screen.getByLabelText('Nadpis')).toBeInTheDocument();
     expect(screen.getByLabelText('Obsah')).toBeInTheDocument();
-    // A primární akce "Vytvořit" (rozlišuje od edit "Uložit").
     expect(
       screen.getByRole('button', { name: 'Vytvořit' }),
     ).toBeInTheDocument();
   });
 });
 
-describe('IkarosNewsManagementPage — edit', () => {
+describe('NewsManagementTab — edit', () => {
   it('klik na edit ikonu otevře edit modal s daty', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 1 });
@@ -136,7 +163,7 @@ describe('IkarosNewsManagementPage — edit', () => {
         return Promise.resolve([makeNews({ title: 'K editaci' })]);
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     const user = userEvent.setup();
 
     await waitFor(() => screen.getByText('K editaci'));
@@ -147,7 +174,7 @@ describe('IkarosNewsManagementPage — edit', () => {
   });
 });
 
-describe('IkarosNewsManagementPage — archive', () => {
+describe('NewsManagementTab — archive', () => {
   it('klik na archive ikonu zavolá POST /:id/archive + toast', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 1 });
@@ -156,7 +183,7 @@ describe('IkarosNewsManagementPage — archive', () => {
       return Promise.resolve([]);
     });
     apiPost.mockResolvedValue(makeNews({ id: 'n-arch', archived: true }));
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     const user = userEvent.setup();
 
     await waitFor(() => screen.getByText('Test novinka'));
@@ -169,8 +196,8 @@ describe('IkarosNewsManagementPage — archive', () => {
   });
 });
 
-describe('IkarosNewsManagementPage — unarchive (tab=archived)', () => {
-  it('v archive tabu se zobrazí Obnovit ikona a volá unarchive endpoint', async () => {
+describe('NewsManagementTab — unarchive (novinky=archived)', () => {
+  it('v archive sub-tabu se zobrazí Obnovit ikona a volá unarchive', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 1 });
       if (url === '/IkarosNews')
@@ -179,8 +206,8 @@ describe('IkarosNewsManagementPage — unarchive (tab=archived)', () => {
     });
     apiPost.mockResolvedValue(makeNews({ id: 'n-un', archived: false }));
 
-    render(<IkarosNewsManagementPage />, {
-      wrapper: makeWrapper('/ikaros/novinky?tab=archived'),
+    render(<NewsManagementTab />, {
+      wrapper: makeWrapper('/ikaros/uzivatele?tab=novinky&novinky=archived'),
     });
     const user = userEvent.setup();
 
@@ -194,7 +221,7 @@ describe('IkarosNewsManagementPage — unarchive (tab=archived)', () => {
   });
 });
 
-describe('IkarosNewsManagementPage — delete', () => {
+describe('NewsManagementTab — delete', () => {
   it('klik na trash otevře ConfirmDialog s varováním', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 1 });
@@ -202,7 +229,7 @@ describe('IkarosNewsManagementPage — delete', () => {
         return Promise.resolve([makeNews({ title: 'Smazat mě' })]);
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     const user = userEvent.setup();
 
     await waitFor(() => screen.getByText('Smazat mě'));
@@ -212,7 +239,7 @@ describe('IkarosNewsManagementPage — delete', () => {
     expect(screen.getByText(/nevratná/i)).toBeInTheDocument();
   });
 
-  it('potvrzení v dialogu volá DELETE + toast + uzavře dialog', async () => {
+  it('potvrzení v dialogu volá DELETE + toast', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 1 });
       if (url === '/IkarosNews')
@@ -220,14 +247,12 @@ describe('IkarosNewsManagementPage — delete', () => {
       return Promise.resolve([]);
     });
     apiDelete.mockResolvedValue(undefined);
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     const user = userEvent.setup();
 
     await waitFor(() => screen.getByText('Test novinka'));
     await user.click(screen.getByRole('button', { name: 'Smazat' }));
-    // Dialog otevřen — v dialogu je další button "Smazat" (confirm) a "Zrušit".
     const confirmButtons = screen.getAllByRole('button', { name: 'Smazat' });
-    // Druhý "Smazat" je v dialogu (první je trash icon v řádku).
     await user.click(confirmButtons[confirmButtons.length - 1]);
 
     await waitFor(() => {
@@ -242,7 +267,7 @@ describe('IkarosNewsManagementPage — delete', () => {
       if (url === '/IkarosNews') return Promise.resolve([makeNews()]);
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     const user = userEvent.setup();
 
     await waitFor(() => screen.getByText('Test novinka'));
@@ -254,8 +279,8 @@ describe('IkarosNewsManagementPage — delete', () => {
   });
 });
 
-describe('IkarosNewsManagementPage — paginace', () => {
-  it('paginace se ukáže až při total > LIMIT (20)', async () => {
+describe('NewsManagementTab — paginace', () => {
+  it('paginace se ukáže při total > LIMIT (20)', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 50 });
       if (url === '/IkarosNews')
@@ -266,40 +291,41 @@ describe('IkarosNewsManagementPage — paginace', () => {
         );
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     await waitFor(() => {
       expect(screen.getByText(/Strana 1 \/ 3/)).toBeInTheDocument();
     });
+    expect(screen.getByRole('button', { name: /Předchozí/ })).toBeDisabled();
     expect(
-      screen.getByRole('button', { name: /Předchozí/ }),
-    ).toBeDisabled();
-    expect(screen.getByRole('button', { name: /Další/ })).not.toBeDisabled();
+      screen.getByRole('button', { name: /Další/ }),
+    ).not.toBeDisabled();
   });
 
   it('paginace se NEukáže pokud total <= LIMIT', async () => {
     apiGet.mockImplementation((url: string) => {
       if (url === '/IkarosNews/count') return Promise.resolve({ total: 5 });
-      if (url === '/IkarosNews')
-        return Promise.resolve([makeNews()]);
+      if (url === '/IkarosNews') return Promise.resolve([makeNews()]);
       return Promise.resolve([]);
     });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     await waitFor(() => screen.getByText('Test novinka'));
     expect(screen.queryByText(/Strana/)).not.toBeInTheDocument();
   });
 });
 
-describe('IkarosNewsManagementPage — tab switching', () => {
-  it('klik na tab Archiv updatuje ?tab a změní query parametr', async () => {
-    apiGet.mockImplementation((url: string, opts?: { params?: { scope?: string } }) => {
-      if (url === '/IkarosNews/count') return Promise.resolve({ total: 0 });
-      if (url === '/IkarosNews') {
-        expect(['active', 'archived']).toContain(opts?.params?.scope);
+describe('NewsManagementTab — sub-tab switching', () => {
+  it('klik na sub-tab Archiv změní scope query parametr', async () => {
+    apiGet.mockImplementation(
+      (url: string, opts?: { params?: { scope?: string } }) => {
+        if (url === '/IkarosNews/count') return Promise.resolve({ total: 0 });
+        if (url === '/IkarosNews') {
+          expect(['active', 'archived']).toContain(opts?.params?.scope);
+          return Promise.resolve([]);
+        }
         return Promise.resolve([]);
-      }
-      return Promise.resolve([]);
-    });
-    render(<IkarosNewsManagementPage />, { wrapper: makeWrapper() });
+      },
+    );
+    render(<NewsManagementTab />, { wrapper: makeWrapper() });
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('tab', { name: /Archiv/ }));
@@ -307,7 +333,8 @@ describe('IkarosNewsManagementPage — tab switching', () => {
       const archivedCall = apiGet.mock.calls.find(
         ([url, opts]) =>
           url === '/IkarosNews' &&
-          (opts as { params?: { scope?: string } })?.params?.scope === 'archived',
+          (opts as { params?: { scope?: string } })?.params?.scope ===
+            'archived',
       );
       expect(archivedCall).toBeDefined();
     });
