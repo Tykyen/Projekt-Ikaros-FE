@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import type { IkarosNews, IkarosNewsType } from '@/shared/types';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import {
@@ -18,6 +18,8 @@ interface NewsCardProps {
   news: IkarosNews;
   /** Volitelně rozbalená hned po mountu (např. deep-link na stránce Novinky). */
   defaultExpanded?: boolean;
+  /** Spec 3.1b — admin akce (edit/archiv/smazat). Render mimo klikací hlavičku. */
+  adminSlot?: ReactNode;
 }
 
 /**
@@ -26,7 +28,11 @@ interface NewsCardProps {
  * rich-text obsah a autor za absolutním datem. Sdílená dashboardem i
  * stránkou `/ikaros/novinky`.
  */
-export function NewsCard({ news, defaultExpanded = false }: NewsCardProps) {
+export function NewsCard({
+  news,
+  defaultExpanded = false,
+  adminSlot,
+}: NewsCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   // Legacy fallback — starší novinky bez `type` se chovají jako 'info'.
   const type: IkarosNewsType = news.type ?? 'info';
@@ -59,6 +65,8 @@ export function NewsCard({ news, defaultExpanded = false }: NewsCardProps) {
           {formatRelativePast(news.createdAtUtc)}
         </span>
       </button>
+
+      {adminSlot && <div className={s.adminBar}>{adminSlot}</div>}
 
       {expanded && (
         <div className={s.body}>

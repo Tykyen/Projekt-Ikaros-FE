@@ -51,12 +51,17 @@ export function useIkarosNewsList(params: ListParams) {
   });
 }
 
-/** Spec 3.1 — count pro paginační meta + tab badges. */
-export function useIkarosNewsCount(scope: IkarosNewsScope) {
+/**
+ * Spec 3.1 — count pro paginační meta + tab badges.
+ * `enabled=false` (3.1b) — scope `archived` je Admin-only, pro běžné
+ * uživatele dotaz nespouštět (jinak 403).
+ */
+export function useIkarosNewsCount(scope: IkarosNewsScope, enabled = true) {
   return useQuery({
     queryKey: [...NEWS_KEY, 'count', scope],
     queryFn: () =>
       api.get<{ total: number }>('/IkarosNews/count', { params: { scope } }),
+    enabled,
   });
 }
 

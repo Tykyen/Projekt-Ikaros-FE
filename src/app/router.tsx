@@ -27,8 +27,8 @@ const EmailVerifyPage        = lazy(() => import('@/features/auth/pages/EmailVer
 const EmailChangeConfirmPage = lazy(() => import('@/features/auth/pages/EmailChangeConfirmPage'));
 const UsersPage        = lazy(() => import('@/features/users/pages/UsersPage'));
 const UserProfilePage  = lazy(() => import('@/features/users/pages/PublicUserProfilePage'));
-// 3.2f — `/ikaros/novinky` přesunuto jako tab do `/ikaros/uzivatele`. Route
-// zachována jako redirect kvůli starým bookmarkům / odkazům.
+// 3.1b — `/ikaros/novinky` veřejná stránka (hub: zobrazení + admin správa).
+const NovinkyPage          = lazy(() => import('@/features/ikaros/pages/NovinkyPage'));
 const ArticlesPage         = lazy(() => import('@/features/ikaros/pages/ArticlesPage'));
 const ArticleDetailPage    = lazy(() => import('@/features/ikaros/pages/ArticleDetailPage'));
 const ArticleEditorPage    = lazy(() => import('@/features/ikaros/pages/ArticleEditorPage'));
@@ -150,13 +150,8 @@ export const router = createBrowserRouter([
       // (page sama řeší tab visibility per role; admin-only taby jsou skryté).
       { path: 'ikaros/uzivatele',       element: p(UsersPage),        loader: requireAuth },
 
-      // 3.2f — `/ikaros/novinky` přesunuto jako tab do `/ikaros/uzivatele`.
-      // Route zachována jako redirect kvůli starým bookmarkům.
-      {
-        path: 'ikaros/novinky',
-        loader: () => redirect('/ikaros/uzivatele?tab=novinky'),
-        element: null,
-      },
+      // 3.1b — `/ikaros/novinky` veřejná stránka (anon povolen, bez loaderu).
+      { path: 'ikaros/novinky', element: p(NovinkyPage) },
       {
         path: 'admin',
         loader: requireAuth,

@@ -78,6 +78,15 @@
   color: var(--news-system);
 }
 
+/* ── Admin akční lišta (edit/archiv/smazat) ── */
+.adminBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  border-top: 1px solid var(--frame-border);
+}
+
 /* ── Rozbalené tělo ── */
 .body {
   display: flex;
