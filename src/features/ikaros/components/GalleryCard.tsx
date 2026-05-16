@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+import { currentUserAtom } from '@/shared/store/authStore';
 import {
   aspectRatio,
   categoryByKey,
@@ -7,6 +9,8 @@ import {
   statusColor,
   statusLabel,
 } from '../lib/gallery';
+import { useToggleFavoriteGallery } from '../api/useGallery';
+import { FavoriteToggle } from './FavoriteToggle';
 import type { GalleryCategory, IkarosGalleryItem } from '@/shared/types';
 import s from './GalleryCard.module.css';
 
@@ -25,6 +29,12 @@ interface Props {
 export function GalleryCard({ image, categories, isMine, onOpen }: Props) {
   const cat = categoryByKey(categories, image.category);
   const ratio = aspectRatio(image);
+  const user = useAtomValue(currentUserAtom);
+  const toggleFav = useToggleFavoriteGallery();
+
+  const showFav = !!user && image.status === 'Published';
+  const isFavorite =
+    !!user && (user.favoriteGalleryIds ?? []).includes(image.id);
 
   // Vlastní Draft/Rejected → rovnou editor; jinak detail.
   const editLink =
@@ -41,6 +51,16 @@ export function GalleryCard({ image, categories, isMine, onOpen }: Props) {
           className={s.img}
           loading="lazy"
         />
+        {showFav && (
+          <div className={s.favoriteOverlay}>
+            <FavoriteToggle
+              variant="icon"
+              isFavorite={isFavorite}
+              pending={toggleFav.isPending}
+              onToggle={() => toggleFav.mutate(image.id)}
+            />
+          </div>
+        )}
       </div>
       <figcaption className={s.label}>
         <span className={s.title}>{image.title}</span>

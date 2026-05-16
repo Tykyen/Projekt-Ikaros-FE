@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { IkarosDiscussion, IkarosDiscussionPost } from '@/shared/types';
+import type {
+  IkarosDiscussion,
+  IkarosDiscussionPost,
+  ToggleFavoriteResponse,
+  TogglePinResponse,
+} from '@/shared/types';
 
 const PREFIX = '/ikaros-discussions';
 export const DISCUSSIONS_KEY = ['discussions'] as const;
@@ -136,12 +141,42 @@ export function useToggleLikeDiscussion() {
   });
 }
 
+// ─── 3.7 — Oblíbené (záložky) + připnutí ───────────────────────────────────
+
+/** Oblíbené diskuze přihlášeného (sidebar + stránka /ikaros/oblibene). */
+export function useMyFavoriteDiscussions(options: { enabled?: boolean } = {}) {
+  return useQuery({
+    queryKey: [...DISCUSSIONS_KEY, 'favorites'],
+    queryFn: () => api.get<IkarosDiscussion[]>(`${PREFIX}/my-favorites`),
+    enabled: options.enabled !== false,
+    staleTime: 20_000,
+  });
+}
+
+/** Invaliduje seznam oblíbených i `users/me` (pinned ids jsou na User). */
+function invalidateFavorites(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: [...DISCUSSIONS_KEY, 'favorites'] });
+  qc.invalidateQueries({ queryKey: ['users', 'me'] });
+}
+
 export function useToggleFavoriteDiscussion() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) =>
-      api.post<{ isFavorite: boolean }>(`${PREFIX}/${id}/toggle-favorite`),
-    onSuccess: () => invalidate(qc),
+      api.post<ToggleFavoriteResponse>(`${PREFIX}/${id}/toggle-favorite`),
+    onSuccess: () => {
+      invalidate(qc);
+      invalidateFavorites(qc);
+    },
+  });
+}
+
+export function useTogglePinDiscussion() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.post<TogglePinResponse>(`${PREFIX}/${id}/toggle-pin`),
+    onSuccess: () => invalidateFavorites(qc),
   });
 }
 

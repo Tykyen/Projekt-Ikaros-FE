@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, apiClient } from '@/shared/api/client';
-import type { IkarosGalleryItem, GalleryStats } from '@/shared/types';
+import type {
+  IkarosGalleryItem,
+  GalleryStats,
+  ToggleFavoriteResponse,
+  TogglePinResponse,
+} from '@/shared/types';
 
 const PREFIX = '/ikaros-gallery';
 export const GALLERY_KEY = ['gallery'] as const;
@@ -150,5 +155,41 @@ export function useRateGalleryImage() {
       ),
     onSuccess: (_, { id }) =>
       qc.invalidateQueries({ queryKey: [...GALLERY_KEY, 'detail', id] }),
+  });
+}
+
+// ─── 3.7 — Oblíbené (záložky) + připnutí ─────────────────────────────────
+
+/** Oblíbené obrázky přihlášeného (sidebar + stránka /ikaros/oblibene). */
+export function useMyFavoriteGallery(options: { enabled?: boolean } = {}) {
+  return useQuery({
+    queryKey: [...GALLERY_KEY, 'favorites'],
+    queryFn: () => api.get<IkarosGalleryItem[]>(`${PREFIX}/my-favorites`),
+    enabled: options.enabled !== false,
+    staleTime: 20_000,
+  });
+}
+
+/** Invaliduje seznam oblíbených i `users/me` (pinned ids jsou na User). */
+function invalidateFavorites(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: [...GALLERY_KEY, 'favorites'] });
+  qc.invalidateQueries({ queryKey: ['users', 'me'] });
+}
+
+export function useToggleFavoriteGallery() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.post<ToggleFavoriteResponse>(`${PREFIX}/${id}/toggle-favorite`),
+    onSuccess: () => invalidateFavorites(qc),
+  });
+}
+
+export function useTogglePinGallery() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.post<TogglePinResponse>(`${PREFIX}/${id}/toggle-pin`),
+    onSuccess: () => invalidateFavorites(qc),
   });
 }

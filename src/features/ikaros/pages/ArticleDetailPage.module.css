@@ -54,6 +54,13 @@
   margin-bottom: var(--sp-8);
 }
 
+/* 3.7 — lišta s tlačítkem Oblíbené pod hlavičkou článku */
+.favoriteBar {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-4);
+}
+
 .header {
   text-align: center;
   padding: var(--sp-6) 0;

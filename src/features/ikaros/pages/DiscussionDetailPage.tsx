@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   Lock,
   Heart,
-  Star,
   MessageCircle,
   Check,
   Trash2,
@@ -31,6 +30,7 @@ import {
 } from '../api/useDiscussions';
 import { DiscussionManagePanel } from '../components/DiscussionManagePanel';
 import { RejectReasonModal } from '../components/RejectReasonModal';
+import { FavoriteToggle } from '../components/FavoriteToggle';
 import { timeAgo, initials } from '../lib/discussions';
 import s from './DiscussionDetailPage.module.css';
 
@@ -96,6 +96,8 @@ function DiscussionDetail({ discussion: d }: { discussion: IkarosDiscussion }) {
   const toggleLike = useToggleLikeDiscussion();
   const toggleFav = useToggleFavoriteDiscussion();
 
+  const isFavorite = !!user && (user.favoriteDiscussionIds ?? []).includes(d.id);
+
   const isCreator = user?.id === d.creatorId;
   const isManager = !!user && d.managerIds.includes(user.id);
   const isReviewer = !!user && REVIEWER_ROLES.includes(user.role);
@@ -148,11 +150,11 @@ function DiscussionDetail({ discussion: d }: { discussion: IkarosDiscussion }) {
         >
           <Heart size={14} /> {d.likeCount}
         </button>
-        <button
-          type="button"
-          className={s.toggleBtn}
-          disabled={toggleFav.isPending}
-          onClick={() =>
+        <FavoriteToggle
+          variant="button"
+          isFavorite={isFavorite}
+          pending={toggleFav.isPending}
+          onToggle={() =>
             toggleFav.mutate(d.id, {
               onSuccess: (res) =>
                 toast.success(
@@ -162,9 +164,7 @@ function DiscussionDetail({ discussion: d }: { discussion: IkarosDiscussion }) {
                 ),
             })
           }
-        >
-          <Star size={14} /> Oblíbené
-        </button>
+        />
       </div>
 
       {isReviewer && !d.isApproved && <AdminApproval discussion={d} />}

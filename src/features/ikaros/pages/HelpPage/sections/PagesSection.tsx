@@ -89,7 +89,7 @@ const IKAROS_PAGES: PageDoc[] = [
     name: 'Články',
     status: 'ok',
     who: 'Čtení všichni (anon i přihlášený), psaní přihlášený',
-    what: 'Literární archiv komunity. Přehled publikovaných článků s vyhledáváním, řazením (nejnovější / nejlépe hodnocené / nejvíc hodnocených) a filtrem podle kategorie. Tab Moje (po přihlášení) ukazuje tvé články včetně konceptů a souhrn statistik. Nový článek píšeš v editoru s formátováním (tučně, kurzíva, nadpisy, citace, odrážky, odkazy) — text se průběžně ukládá do prohlížeče, kdyby ses odpojil. Workflow: koncept → odeslat ke schválení → publikováno (schvaluje Správce článků). Detail článku má hodnocení hvězdičkami, obsah dlouhých článků a sekci „Více od autora".',
+    what: 'Literární archiv komunity. Přehled publikovaných článků s vyhledáváním, řazením (nejnovější / nejlépe hodnocené / nejvíc hodnocených) a filtrem podle kategorie. Tab Moje (po přihlášení) ukazuje tvé články včetně konceptů a souhrn statistik. Nový článek píšeš v editoru s formátováním (tučně, kurzíva, nadpisy, citace, odrážky, odkazy) — text se průběžně ukládá do prohlížeče, kdyby ses odpojil. Workflow: koncept → odeslat ke schválení → publikováno (schvaluje Správce článků). Detail článku má hodnocení hvězdičkami, obsah dlouhých článků a sekci „Více od autora". Publikovaný článek si přidáš do oblíbených ikonou záložky (na kartě i v detailu).',
   },
   {
     path: '/ikaros/posta',
@@ -97,6 +97,13 @@ const IKAROS_PAGES: PageDoc[] = [
     status: 'ok',
     who: 'Přihlášený',
     what: 'Soukromé zprávy mezi uživateli. Vlevo přepínáš Doručené / Odeslané, vpravo čteš vybranou zprávu jako vlákno konverzace. Novou zprávu pošleš tlačítkem Nová zpráva — příjemce najdeš našeptávačem podle přezdívky. Na zprávu lze odpovědět (odpovědi se řetězí do jednoho vlákna) a zprávy mazat (zmizí jen tobě). Počet nepřečtených ukazuje odznak u ikony Pošta v hlavičce. V profilu v sekci Soukromí si můžeš zapnout, že ti smí psát jen přátelé.',
+  },
+  {
+    path: '/ikaros/oblibene',
+    name: 'Oblíbené',
+    status: 'ok',
+    who: 'Přihlášený',
+    what: 'Tvoje záložky napříč diskuzemi, články a galerií na jednom místě — stránka má tři taby. Položku si přidáš do oblíbených ikonou záložky na jejím detailu nebo na kartě v seznamu. Vybrané oblíbené si můžeš „připnout" (ikona špendlíku) — připnuté položky se zobrazují v pravém panelu, maximálně 5 na každý typ obsahu. Oblíbené je čistě osobní — vidíš je jen ty, neovlivňuje to hodnocení obsahu.',
   },
 ];
 
@@ -125,7 +132,8 @@ const SOON_IKAROS: PageDoc[] = [
     what:
       'Obrazový salon komunity — mřížka obrázků s kategoriemi, hledáním a řazením, ' +
       'fullscreen prohlížeč (lightbox). Nahraj obrázek, ulož koncept nebo odešli ' +
-      'ke schválení; po schválení (Správce galerie) ho lze hodnotit hvězdičkami.',
+      'ke schválení; po schválení (Správce galerie) ho lze hodnotit hvězdičkami ' +
+      'a přidat do oblíbených ikonou záložky (na dlaždici i v detailu).',
   },
   {
     path: '/ikaros/diskuze',

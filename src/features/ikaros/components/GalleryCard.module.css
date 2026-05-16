@@ -23,12 +23,21 @@
 }
 
 .frame {
+  position: relative;
   width: 100%;
   overflow: hidden;
   border: 1px solid var(--gal-frame-border, var(--border));
   border-radius: var(--radius-sm);
   background: var(--surface-sunken, var(--surface));
   transition: box-shadow var(--transition-base);
+}
+
+/* 3.7 — záložka v rohu dlaždice galerie */
+.favoriteOverlay {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  z-index: 1;
 }
 
 .card:hover .frame {

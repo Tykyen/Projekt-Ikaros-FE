@@ -642,25 +642,30 @@ Brownfield — BE modul `ikaros-discussions` existoval z feature-parity. Diskuze
 
 **Tracked dluh (zůstává):** D-NEW (HelpPage content drift — aktualizovat tab Stránky/FAQ při fázích 1.5/1.7/1.8/2.x/3.x).
 
-### - [ ] 3.7 Oblíbené — globální obsah (články / diskuze / obrázky)
+### - [x] 3.7 Oblíbené — globální obsah (články / diskuze / obrázky) ✅ (2026-05-16)
 
-Sjednocená featura „oblíbené" napříč globálním (Ikaros) obsahem. `IkarosLayout`
-sidebar už má sekce-placeholdery „Oblíbené články" / „Oblíbené obrázky" → 3.7 je
-naplní reálnými daty a doplní „Oblíbené diskuze".
+**Spec:** `docs/arch/phase-3/spec-3.7.md`, **Plán:** `docs/arch/phase-3/plan-3.7.md`
 
-- [ ] **Oblíbené články** — BE chybí: `User.favoriteArticleIds` +
-  `POST/DELETE /ikaros-articles/:id/favorite` + `GET /ikaros-articles/my-favorites`.
-  FE: hvězdička na kartě/detailu, naplnit sidebar sekci.
-- [ ] **Oblíbené diskuze** — BE hotové (`favoriteDiscussionIds`,
-  `GET /ikaros-discussions/my-favorites`, `POST /:id/toggle-favorite`).
-  FE: napojit hvězdičku + nová sidebar sekce „Oblíbené diskuze". Závisí na 3.4.
-- [ ] **Oblíbené obrázky** — BE chybí: `User.favoriteGalleryIds` +
-  `POST/DELETE /ikaros-gallery/:id/favorite` + `GET /ikaros-gallery/my-favorites`.
-  FE: hvězdička v galerii/lightboxu, naplnit sidebar sekci.
-- [ ] Sjednotit datový model — buď tři pole `favorite*Ids` (jako diskuze dnes),
-  nebo jedno `favorites: { type, id }[]`. Rozhodnout ve spec fázi.
-
-⚠️ „Oblíbené diskuze" jsou blokované fází 3.4 Diskuze; články a obrázky lze udělat hned.
+- [x] **Datový model** — tři pole `favorite*Ids` na `User` (`favoriteDiscussionIds`
+  už byl, přibyl `favoriteArticleIds` + `favoriteGalleryIds`) + tři `pinned*Ids`.
+  Sjednocené `favorites[]` zamítnuto — nulová migrace, konzistence s diskuzemi.
+- [x] **Dvě vrstvy** — *oblíbené* (celá kolekce záložek, stránka `/ikaros/oblibene`)
+  vs. *připnuté* (ručně vybraná podmnožina v pravém panelu, max 5/typ).
+- [x] **BE** — `toggle-favorite` + `toggle-pin` + `my-favorites` ve všech třech
+  modulech (články, galerie nově; diskuze doplněno o pin). Pin guardy: jen
+  oblíbené (`409 NOT_FAVORITE`), limit 5 (`409 PIN_LIMIT`); cascade odepnutí
+  při odebrání z oblíbených. `repo.findByIds` doplněn do článků i galerie.
+- [x] **FE** — sdílené komponenty `<FavoriteToggle>` (ikona `Bookmark`) a
+  `<PinToggle>` (`Pin`). `DiscussionDetailPage` refaktorován ze `Star` na
+  `Bookmark`. Záložka na detailu i kartách článků/galerie.
+- [x] **Stránka `/ikaros/oblibene`** — 3 taby (Diskuze/Články/Obrázky), URL
+  `?typ=`, mřížka karet s připínáním.
+- [x] **Sidebar** — pravý panel naplnil 3 sekce (diskuze nově) reálnými daty;
+  zobrazuje připnuté, fallback na 5 nejnovějších oblíbených; „Zobrazit vše →".
+- [x] **Ikona = záložka, ne hvězda** — hvězda kolidovala s rating hvězdičkami
+  na kartách; oblíbené ≠ hodnocení.
+- [x] Tests: BE +21 (3 moduly: toggle/pin/limit/cascade, 1180 ✓), FE +17
+  (`FavoriteToggle`, `PinToggle`, `FavoritesPage`).
 
 ### - [x] 3.8 Badge pending akcí u nav Diskuze / Články / Galerie ✅ (2026-05-16)
 

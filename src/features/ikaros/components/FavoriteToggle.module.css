@@ -1,0 +1,70 @@
+/* 3.7 — sdílený přepínač oblíbenosti. Postaveno na design tokenech (21 motivů). */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary, var(--text-muted));
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  min-height: 40px;
+  transition: all var(--transition-base);
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--accent, var(--theme-accent));
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: var(--radius-full, 999px);
+  background: color-mix(in srgb, var(--surface, var(--bg)) 80%, transparent);
+  color: var(--text-secondary, var(--text-muted));
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+/* Mobil — zvětšit na pohodlný dotykový cíl (44×44) */
+@media (max-width: 768px) {
+  .iconBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.iconBtn:hover:not(:disabled) {
+  border-color: var(--accent, var(--theme-accent));
+  color: var(--accent, var(--theme-accent));
+}
+
+/* Aktivní stav (oblíbené) — pro obě varianty */
+.active {
+  border-color: var(--accent, var(--theme-accent));
+  color: var(--accent, var(--theme-accent));
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.button:disabled,
+.iconBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* „Pop" micro-moment při zapnutí — CSS-only, drží napříč motivy */
+.icon {
+  transition: transform var(--transition-base, 120ms);
+}
+
+.iconActive {
+  transform: scale(1.15);
+}

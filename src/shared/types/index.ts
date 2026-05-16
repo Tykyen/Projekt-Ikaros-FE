@@ -80,10 +80,27 @@ export interface User {
   themeSettings: Record<string, unknown>;
   chatPreferences: Record<string, unknown>;
   favoriteDiscussionIds: string[];
+  /** 3.7 — oblíbené (záložky) napříč globálním obsahem */
+  favoriteArticleIds?: string[];
+  favoriteGalleryIds?: string[];
+  /** 3.7 — připnuté do sidebaru (podmnožina oblíbených, max 5/typ) */
+  pinnedDiscussionIds?: string[];
+  pinnedArticleIds?: string[];
+  pinnedGalleryIds?: string[];
   isOnline: boolean;
   lastSeenAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+/** 3.7 — návratový tvar `POST /:id/toggle-favorite` */
+export interface ToggleFavoriteResponse {
+  isFavorite: boolean;
+}
+
+/** 3.7 — návratový tvar `POST /:id/toggle-pin` */
+export interface TogglePinResponse {
+  isPinned: boolean;
 }
 
 // 1.3b — Username change request

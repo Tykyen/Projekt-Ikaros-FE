@@ -7,9 +7,10 @@ import { currentUserAtom } from '@/shared/store/authStore';
 import { Spinner, ConfirmDialog } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { UserRole } from '@/shared/types';
-import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles } from '../api/useArticles';
+import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles, useToggleFavoriteArticle } from '../api/useArticles';
 import { useArticleCategories } from '../api/useArticleCategories';
 import { RejectReasonModal } from '../components/RejectReasonModal';
+import { FavoriteToggle } from '../components/FavoriteToggle';
 import { ReviewsSection } from '../components/ReviewsSection';
 import { AutoTOC } from '../components/AutoTOC';
 import {
@@ -95,6 +96,7 @@ export default function ArticleDetailPage() {
             <span>{readingTime(article.content)} min čtení</span>
           </div>
         </header>
+        <ArticleFavorite article={article} />
       </div>
 
       <div className={s.body}>
@@ -129,6 +131,34 @@ export default function ArticleDetailPage() {
         excludeArticleId={article.id}
       />
     </article>
+  );
+}
+
+// ─── 3.7 — Oblíbené (záložka) ────────────────────────────────────────────
+
+function ArticleFavorite({ article }: { article: IkarosArticle }) {
+  const user = useAtomValue(currentUserAtom);
+  const toggle = useToggleFavoriteArticle();
+  if (!user || article.status !== 'Published') return null;
+  const isFavorite = (user.favoriteArticleIds ?? []).includes(article.id);
+  return (
+    <div className={s.favoriteBar}>
+      <FavoriteToggle
+        variant="button"
+        isFavorite={isFavorite}
+        pending={toggle.isPending}
+        onToggle={() =>
+          toggle.mutate(article.id, {
+            onSuccess: (res) =>
+              toast.success(
+                res.isFavorite
+                  ? 'Přidáno do oblíbených'
+                  : 'Odebráno z oblíbených',
+              ),
+          })
+        }
+      />
+    </div>
   );
 }
 

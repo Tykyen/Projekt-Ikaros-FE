@@ -43,6 +43,8 @@ const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage
 const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
+// 3.7 — `/ikaros/oblibene` stránka oblíbeného obsahu (záložky napříč moduly).
+const FavoritesPage        = lazy(() => import('@/features/ikaros/pages/FavoritesPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -156,6 +158,8 @@ export const router = createBrowserRouter([
       { path: 'ikaros/diskuze/nova',    element: p(DiscussionsNewPage), loader: requireAuth },
       { path: 'ikaros/diskuze/:id',     element: p(DiscussionDetailPage), loader: requireAuth },
       { path: 'ikaros/posta',           element: p(MailPage),         loader: requireAuth },
+      // 3.7 — oblíbený obsah (záložky); jen pro přihlášené.
+      { path: 'ikaros/oblibene',        element: p(FavoritesPage),    loader: requireAuth },
       // 3.1b — kalendář akcí (akce jsou logged-in only, viz spec 2.1b).
       { path: 'ikaros/akce',            element: p(AkcePage),         loader: requireAuth },
 

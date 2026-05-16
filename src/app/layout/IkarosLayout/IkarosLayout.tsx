@@ -22,6 +22,10 @@ import { pendingTooltip } from './pendingBadge';
 import { useSocketInit } from '@/features/chat/api/useSocket';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
 import { useUnreadCount } from '@/features/ikaros/api/useMail';
+import { useMyFavoriteArticles } from '@/features/ikaros/api/useArticles';
+import { useMyFavoriteGallery } from '@/features/ikaros/api/useGallery';
+import { useMyFavoriteDiscussions } from '@/features/ikaros/api/useDiscussions';
+import { cloudinaryThumb } from '@/features/ikaros/lib/gallery';
 import { useLogout } from '@/features/auth/api/useAuth';
 import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import {
@@ -218,6 +222,84 @@ function SidebarContent({
   );
 }
 
+/**
+ * 3.7 — vybere položky pro sidebar sekci Oblíbené: připnuté (v pořadí
+ * `pinnedIds`), a když uživatel nic nepřipnul, fallback na prvních 5 oblíbených.
+ */
+function pinnedFirst<T extends { id: string }>(
+  items: T[] | undefined,
+  pinnedIds: string[] | undefined,
+): T[] {
+  if (!items || items.length === 0) return [];
+  const pinned = pinnedIds ?? [];
+  if (pinned.length > 0) {
+    const byId = new Map(items.map((i) => [i.id, i]));
+    return pinned
+      .map((id) => byId.get(id))
+      .filter((i): i is T => !!i)
+      .slice(0, 5);
+  }
+  return items.slice(0, 5);
+}
+
+interface FavoriteSectionItem {
+  id: string;
+  label: string;
+  to: string;
+  thumbUrl?: string;
+}
+
+/** 3.7 — sidebar sekce Oblíbené (diskuze / články / obrázky). */
+function FavoriteSection({
+  title,
+  sectionKey,
+  items,
+  totalCount,
+  allHref,
+  onNav,
+}: {
+  title: string;
+  sectionKey: string;
+  items: FavoriteSectionItem[];
+  totalCount: number;
+  allHref: string;
+  onNav?: () => void;
+}) {
+  return (
+    <div className={s.section} data-section-key={sectionKey}>
+      <SectionTitle>{title}</SectionTitle>
+      <div className={s.navList}>
+        {items.map((it) => (
+          <Link
+            key={it.id}
+            to={it.to}
+            className={s.navItem}
+            onClick={onNav}
+          >
+            {it.thumbUrl && (
+              <img
+                src={it.thumbUrl}
+                alt=""
+                className={s.favThumb}
+                loading="lazy"
+              />
+            )}
+            <span className={s.navItemLabel}>{it.label}</span>
+          </Link>
+        ))}
+        {items.length === 0 && (
+          <p className={s.emptyHint}>Žádné oblíbené</p>
+        )}
+        {totalCount > 0 && (
+          <Link to={allHref} className={s.showAllLink} onClick={onNav}>
+            Zobrazit vše →
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   const currentUser = useAtomValue(currentUserAtom);
   const { data: myWorlds } = useMyWorlds();
@@ -235,6 +317,30 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
 
   const label = isAdmin ? 'Uživatelé' : 'Přátelé';
   const badge = pendingCount?.total ?? 0;
+
+  // 3.7 — oblíbené pro sidebar (připnuté + fallback)
+  const { data: favDiscussions } = useMyFavoriteDiscussions({
+    enabled: !!currentUser,
+  });
+  const { data: favArticles } = useMyFavoriteArticles({
+    enabled: !!currentUser,
+  });
+  const { data: favGallery } = useMyFavoriteGallery({
+    enabled: !!currentUser,
+  });
+
+  const sidebarDiscussions = pinnedFirst(
+    favDiscussions,
+    currentUser?.pinnedDiscussionIds,
+  );
+  const sidebarArticles = pinnedFirst(
+    favArticles,
+    currentUser?.pinnedArticleIds,
+  );
+  const sidebarGallery = pinnedFirst(
+    favGallery,
+    currentUser?.pinnedGalleryIds,
+  );
 
   return (
     <div className={s.rightPanelInner}>
@@ -287,17 +393,45 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
         <p className={s.emptyHint}>Žádné diskuze</p>
       </div>
 
-      <div className={s.section} data-section-key="oblibene-clanky">
-        <SectionTitle>Oblíbené články</SectionTitle>
-        <div className={s.navList}>
-          <p className={s.emptyHint}>Žádné oblíbené</p>
-        </div>
-      </div>
+      <FavoriteSection
+        title="Oblíbené diskuze"
+        sectionKey="oblibene-diskuze"
+        items={sidebarDiscussions.map((d) => ({
+          id: d.id,
+          label: d.title,
+          to: `/ikaros/diskuze/${d.id}`,
+        }))}
+        totalCount={favDiscussions?.length ?? 0}
+        allHref="/ikaros/oblibene?typ=diskuze"
+        onNav={onNav}
+      />
 
-      <div className={s.section} data-section-key="oblibene-obrazky">
-        <SectionTitle>Oblíbené obrázky</SectionTitle>
-        <p className={s.emptyHint}>Žádné oblíbené</p>
-      </div>
+      <FavoriteSection
+        title="Oblíbené články"
+        sectionKey="oblibene-clanky"
+        items={sidebarArticles.map((a) => ({
+          id: a.id,
+          label: a.title,
+          to: `/ikaros/clanky/${a.id}`,
+        }))}
+        totalCount={favArticles?.length ?? 0}
+        allHref="/ikaros/oblibene?typ=clanky"
+        onNav={onNav}
+      />
+
+      <FavoriteSection
+        title="Oblíbené obrázky"
+        sectionKey="oblibene-obrazky"
+        items={sidebarGallery.map((g) => ({
+          id: g.id,
+          label: g.title,
+          to: `/ikaros/galerie/${g.id}`,
+          thumbUrl: cloudinaryThumb(g.imageUrl, 80),
+        }))}
+        totalCount={favGallery?.length ?? 0}
+        allHref="/ikaros/oblibene?typ=obrazky"
+        onNav={onNav}
+      />
     </div>
   );
 }

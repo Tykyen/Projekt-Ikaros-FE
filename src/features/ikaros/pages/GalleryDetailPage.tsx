@@ -13,11 +13,13 @@ import {
   useDeleteGalleryImage,
   useSubmitGalleryImage,
   useRateGalleryImage,
+  useToggleFavoriteGallery,
 } from '../api/useGallery';
 import { useGalleryCategories } from '../api/useGalleryCategories';
 import { categoryByKey, formatDateCs, statusColor, statusLabel } from '../lib/gallery';
 import { ReviewsSection } from '../components/ReviewsSection';
 import { RejectReasonModal } from '../components/RejectReasonModal';
+import { FavoriteToggle } from '../components/FavoriteToggle';
 import type { IkarosGalleryItem } from '@/shared/types';
 import s from './GalleryDetailPage.module.css';
 
@@ -78,6 +80,8 @@ export default function GalleryDetailPage() {
           )}
         </div>
 
+        <GalleryFavorite image={image} />
+
         {image.description && <p className={s.desc}>{image.description}</p>}
 
         {image.status === 'Rejected' && image.rejectReason && (
@@ -91,6 +95,34 @@ export default function GalleryDetailPage() {
         <OwnerActions image={image} />
         <AdminActions image={image} />
       </div>
+    </div>
+  );
+}
+
+// ─── 3.7 — Oblíbené (záložka) ────────────────────────────────────────────
+
+function GalleryFavorite({ image }: { image: IkarosGalleryItem }) {
+  const user = useAtomValue(currentUserAtom);
+  const toggle = useToggleFavoriteGallery();
+  if (!user || image.status !== 'Published') return null;
+  const isFavorite = (user.favoriteGalleryIds ?? []).includes(image.id);
+  return (
+    <div className={s.favoriteBar}>
+      <FavoriteToggle
+        variant="button"
+        isFavorite={isFavorite}
+        pending={toggle.isPending}
+        onToggle={() =>
+          toggle.mutate(image.id, {
+            onSuccess: (res) =>
+              toast.success(
+                res.isFavorite
+                  ? 'Přidáno do oblíbených'
+                  : 'Odebráno z oblíbených',
+              ),
+          })
+        }
+      />
     </div>
   );
 }

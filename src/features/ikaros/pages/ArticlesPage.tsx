@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { Plus, Search, ArrowUpDown } from 'lucide-react';
-import { isAuthenticatedAtom } from '@/shared/store/authStore';
+import { isAuthenticatedAtom, currentUserAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
 import { Spinner } from '@/shared/ui';
 import {
@@ -10,8 +10,10 @@ import {
   useMyArticles,
   useArticleStats,
   useArticleReadStatus,
+  useToggleFavoriteArticle,
 } from '../api/useArticles';
 import { useArticleCategories } from '../api/useArticleCategories';
+import { FavoriteToggle } from '../components/FavoriteToggle';
 import {
   articleNumber,
   categoryByKey,
@@ -258,10 +260,16 @@ interface ArticleCardProps {
 function ArticleCard({ article, categories, isMine }: ArticleCardProps) {
   const cat = categoryByKey(categories, article.category);
   const isAuth = useAtomValue(isAuthenticatedAtom);
+  const user = useAtomValue(currentUserAtom);
+  const toggleFav = useToggleFavoriteArticle();
   const { data: readStatus } = useArticleReadStatus(article.id, {
     enabled: isAuth && !isMine && article.status === 'Published',
   });
   const isUnread = readStatus?.read === false && article.status === 'Published';
+
+  const showFav = !!user && article.status === 'Published';
+  const isFavorite =
+    !!user && (user.favoriteArticleIds ?? []).includes(article.id);
 
   const linkTo =
     isMine && (article.status === 'Draft' || article.status === 'Rejected')
@@ -272,13 +280,29 @@ function ArticleCard({ article, categories, isMine }: ArticleCardProps) {
     <Link to={linkTo} className={s.card} style={categoryStyle(cat)}>
       <div className={s.cardHeader}>
         <span className={s.number}>N° {articleNumber(article.id)}</span>
-        {article.status === 'Published' ? (
-          <RatingInline avg={article.averageRating} count={article.ratings.length} />
-        ) : (
-          <span className={s.status} style={{ color: statusColor(article.status) }}>
-            {statusLabel(article.status)}
-          </span>
-        )}
+        <div className={s.cardHeaderRight}>
+          {article.status === 'Published' ? (
+            <RatingInline
+              avg={article.averageRating}
+              count={article.ratings.length}
+            />
+          ) : (
+            <span
+              className={s.status}
+              style={{ color: statusColor(article.status) }}
+            >
+              {statusLabel(article.status)}
+            </span>
+          )}
+          {showFav && (
+            <FavoriteToggle
+              variant="icon"
+              isFavorite={isFavorite}
+              pending={toggleFav.isPending}
+              onToggle={() => toggleFav.mutate(article.id)}
+            />
+          )}
+        </div>
       </div>
       <h3 className={s.cardTitle}>{article.title}</h3>
       <p className={s.preview}>{stripHtml(article.content, 200)}…</p>

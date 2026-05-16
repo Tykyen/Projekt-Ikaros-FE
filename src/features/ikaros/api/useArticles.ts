@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { IkarosArticle, ArticleStats } from '@/shared/types';
+import type {
+  IkarosArticle,
+  ArticleStats,
+  ToggleFavoriteResponse,
+  TogglePinResponse,
+} from '@/shared/types';
 
 const PREFIX = '/ikaros-articles';
 export const ARTICLES_KEY = ['articles'] as const;
@@ -176,5 +181,41 @@ export function useMarkRead() {
       qc.setQueryData(['article-reads', 'status', id], { read: true });
       qc.invalidateQueries({ queryKey: ['article-reads', 'unread-count'] });
     },
+  });
+}
+
+// ─── 3.7 — Oblíbené (záložky) + připnutí ─────────────────────────────────
+
+/** Oblíbené články přihlášeného (sidebar + stránka /ikaros/oblibene). */
+export function useMyFavoriteArticles(options: { enabled?: boolean } = {}) {
+  return useQuery({
+    queryKey: [...ARTICLES_KEY, 'favorites'],
+    queryFn: () => api.get<IkarosArticle[]>(`${PREFIX}/my-favorites`),
+    enabled: options.enabled !== false,
+    staleTime: 20_000,
+  });
+}
+
+/** Invaliduje seznam oblíbených i `users/me` (pinned ids jsou na User). */
+function invalidateFavorites(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: [...ARTICLES_KEY, 'favorites'] });
+  qc.invalidateQueries({ queryKey: ['users', 'me'] });
+}
+
+export function useToggleFavoriteArticle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.post<ToggleFavoriteResponse>(`${PREFIX}/${id}/toggle-favorite`),
+    onSuccess: () => invalidateFavorites(qc),
+  });
+}
+
+export function useTogglePinArticle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.post<TogglePinResponse>(`${PREFIX}/${id}/toggle-pin`),
+    onSuccess: () => invalidateFavorites(qc),
   });
 }

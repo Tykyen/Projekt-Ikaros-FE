@@ -335,6 +335,16 @@
   text-align: center;
 }
 
+/* 3.7 — malý náhled obrázku v sidebar sekci Oblíbené obrázky */
+.favThumb {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--frame-border, var(--border));
+}
+
 .rightSectionHeader {
   display: flex;
   align-items: center;

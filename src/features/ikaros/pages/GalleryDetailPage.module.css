@@ -90,6 +90,12 @@
   opacity: 0.5;
 }
 
+/* 3.7 — lišta s tlačítkem Oblíbené pod meta */
+.favoriteBar {
+  display: flex;
+  margin-top: var(--sp-3);
+}
+
 .desc {
   font-family: var(--prose-font-body);
   font-size: var(--text-md);
