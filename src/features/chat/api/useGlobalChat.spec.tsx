@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import {
@@ -7,12 +7,21 @@ import {
   useChatHistory,
   useSendMessage,
   useDeleteMessage,
+  useRoomEnvironment,
+  useSetRoomEnvironment,
+  useRoomPresenceCounts,
+  chatQueryKeys,
 } from './useGlobalChat';
+import { useSocketEvent } from './useSocket';
 import { api } from '@/shared/api/client';
+import type { RoomPresenceCounts } from '../lib/types';
 
 vi.mock('@/shared/api/client', () => ({
-  api: { get: vi.fn(), post: vi.fn(), delete: vi.fn() },
+  api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
 }));
+
+// Socket vrstva — testujeme jen REST + cache, WS handler voláme ručně.
+vi.mock('./useSocket', () => ({ useSocketEvent: vi.fn() }));
 
 function makeWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -22,47 +31,145 @@ function makeWrapper() {
   return { Wrapper };
 }
 
+describe('chatQueryKeys', () => {
+  it('klíče nesou room — Hospoda a Rozcestí se nekříží', () => {
+    expect(chatQueryKeys('hospoda').messages).toEqual([
+      'global-chat',
+      'hospoda',
+      'messages',
+    ]);
+    expect(chatQueryKeys('rozcesti-1').messages).toEqual([
+      'global-chat',
+      'rozcesti-1',
+      'messages',
+    ]);
+  });
+});
+
 describe('useGlobalChat', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('useRoomInfo načte info o místnosti', async () => {
+  it('useRoomInfo načte info o místnosti s parametrem room', async () => {
     vi.mocked(api.get).mockResolvedValue({ channelId: 'ch1', users: [] });
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useRoomInfo(), { wrapper: Wrapper });
+    const { result } = renderHook(() => useRoomInfo('rozcesti-1'), {
+      wrapper: Wrapper,
+    });
     await waitFor(() =>
       expect(result.current.data).toEqual({ channelId: 'ch1', users: [] }),
     );
-    expect(api.get).toHaveBeenCalledWith('/global-chat/room-info');
+    expect(api.get).toHaveBeenCalledWith('/global-chat/room-info', {
+      room: 'rozcesti-1',
+    });
   });
 
-  it('useChatHistory načte historii s limitem 50', async () => {
+  it('useChatHistory načte historii s room + limitem 50', async () => {
     vi.mocked(api.get).mockResolvedValue([]);
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useChatHistory(), { wrapper: Wrapper });
+    const { result } = renderHook(() => useChatHistory('hospoda'), {
+      wrapper: Wrapper,
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/global-chat/messages', {
+      room: 'hospoda',
       limit: 50,
     });
   });
 
-  it('useSendMessage pošle content + color na POST endpoint', async () => {
+  it('useSendMessage pošle content + color na POST endpoint s room v query', async () => {
     vi.mocked(api.post).mockResolvedValue({ id: 'm1' });
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useSendMessage(), { wrapper: Wrapper });
-    await result.current.mutateAsync({ content: 'ahoj', color: '#ff8800' });
-    expect(api.post).toHaveBeenCalledWith('/global-chat/messages', {
-      content: 'ahoj',
-      color: '#ff8800',
+    const { result } = renderHook(() => useSendMessage('rozcesti-2'), {
+      wrapper: Wrapper,
     });
+    await result.current.mutateAsync({ content: 'ahoj', color: '#ff8800' });
+    expect(api.post).toHaveBeenCalledWith(
+      '/global-chat/messages?room=rozcesti-2',
+      { content: 'ahoj', color: '#ff8800' },
+    );
   });
 
-  it('useDeleteMessage zavolá DELETE s id zprávy', async () => {
+  it('useDeleteMessage zavolá DELETE s id zprávy + room', async () => {
     vi.mocked(api.delete).mockResolvedValue(undefined);
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useDeleteMessage(), {
+    const { result } = renderHook(() => useDeleteMessage('hospoda'), {
       wrapper: Wrapper,
     });
     await result.current.mutateAsync('m1');
-    expect(api.delete).toHaveBeenCalledWith('/global-chat/messages/m1');
+    expect(api.delete).toHaveBeenCalledWith(
+      '/global-chat/messages/m1?room=hospoda',
+    );
+  });
+
+  it('useRoomEnvironment načte prostředí Rozcestí', async () => {
+    vi.mocked(api.get).mockResolvedValue({ style: 'fantasy', placeId: '1' });
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useRoomEnvironment('rozcesti-1'), {
+      wrapper: Wrapper,
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(api.get).toHaveBeenCalledWith(
+      '/global-chat/rooms/rozcesti-1/environment',
+    );
+  });
+
+  it('useRoomEnvironment se pro Hospodu nevolá (disabled)', async () => {
+    const { Wrapper } = makeWrapper();
+    renderHook(() => useRoomEnvironment('hospoda'), { wrapper: Wrapper });
+    expect(api.get).not.toHaveBeenCalled();
+  });
+
+  it('useSetRoomEnvironment pošle PUT se stylem + lokací', async () => {
+    vi.mocked(api.put).mockResolvedValue({ style: 'scifi', placeId: '7' });
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useSetRoomEnvironment('rozcesti-3'), {
+      wrapper: Wrapper,
+    });
+    await result.current.mutateAsync({ style: 'scifi', placeId: '7' });
+    expect(api.put).toHaveBeenCalledWith(
+      '/global-chat/rooms/rozcesti-3/environment',
+      { style: 'scifi', placeId: '7' },
+    );
+  });
+});
+
+describe('useRoomPresenceCounts (4.2c §4)', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const zero: RoomPresenceCounts = {
+    hospoda: 0,
+    'rozcesti-1': 0,
+    'rozcesti-2': 0,
+    'rozcesti-3': 0,
+  };
+
+  it('načte počty přítomných z REST endpointu', async () => {
+    vi.mocked(api.get).mockResolvedValue({ ...zero, hospoda: 3 });
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useRoomPresenceCounts(), {
+      wrapper: Wrapper,
+    });
+    await waitFor(() =>
+      expect(result.current).toEqual({ ...zero, hospoda: 3 }),
+    );
+    expect(api.get).toHaveBeenCalledWith('/global-chat/rooms/presence');
+  });
+
+  it('WS event `chat:rooms:presence` přepíše počty v cache', async () => {
+    vi.mocked(api.get).mockResolvedValue(zero);
+    let wsHandler: ((c: RoomPresenceCounts) => void) | undefined;
+    vi.mocked(useSocketEvent).mockImplementation((event, handler) => {
+      if (event === 'chat:rooms:presence') {
+        wsHandler = handler as (c: RoomPresenceCounts) => void;
+      }
+    });
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useRoomPresenceCounts(), {
+      wrapper: Wrapper,
+    });
+    await waitFor(() => expect(result.current).toEqual(zero));
+
+    act(() => wsHandler!({ ...zero, 'rozcesti-1': 5 }));
+    await waitFor(() => expect(result.current?.['rozcesti-1']).toBe(5));
   });
 });

@@ -1,20 +1,33 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { ChatMessage, RoomInfo } from '../lib/types';
-
-const CHAT_KEY = ['global-chat'] as const;
+import { useSocketEvent } from './useSocket';
+import type {
+  ChatMessage,
+  RoomEnvironment,
+  RoomInfo,
+  RoomKey,
+  RoomPresenceCounts,
+} from '../lib/types';
 
 /** Počet zpráv načtených z historie při vstupu do místnosti. */
 export const HISTORY_LIMIT = 50;
+
+/** Query klíče per místnost — sdílené s `ChatRoom` (WS cache mutace). */
+export const chatQueryKeys = (room: RoomKey) =>
+  ({
+    roomInfo: ['global-chat', room, 'room-info'] as const,
+    messages: ['global-chat', room, 'messages'] as const,
+    environment: ['global-chat', room, 'environment'] as const,
+  }) as const;
 
 /**
  * Info o místnosti — `channelId` + seznam přítomných.
  * Volá se jednou při mountu; další změny presence řeší WS `chat:presence`.
  */
-export function useRoomInfo() {
+export function useRoomInfo(room: RoomKey) {
   return useQuery({
-    queryKey: [...CHAT_KEY, 'room-info'],
-    queryFn: () => api.get<RoomInfo>('/global-chat/room-info'),
+    queryKey: chatQueryKeys(room).roomInfo,
+    queryFn: () => api.get<RoomInfo>('/global-chat/room-info', { room }),
   });
 }
 
@@ -22,12 +35,35 @@ export function useRoomInfo() {
  * Historie zpráv (posledních 50, TTL 1 h na BE).
  * Slouží jako počáteční seed — další zprávy přicházejí přes WS `chat:message`.
  */
-export function useChatHistory() {
+export function useChatHistory(room: RoomKey) {
   return useQuery({
-    queryKey: [...CHAT_KEY, 'messages'],
+    queryKey: chatQueryKeys(room).messages,
     queryFn: () =>
-      api.get<ChatMessage[]>('/global-chat/messages', { limit: HISTORY_LIMIT }),
+      api.get<ChatMessage[]>('/global-chat/messages', {
+        room,
+        limit: HISTORY_LIMIT,
+      }),
   });
+}
+
+/** Sdílený query klíč pro počty přítomných (REST seed + WS aktualizace). */
+const ROOM_PRESENCE_COUNTS_KEY = ['global-chat', 'room-presence-counts'] as const;
+
+/**
+ * Počet přítomných v každé místnosti — odznaky v navigaci (4.2c §4).
+ * REST seed + živá aktualizace přes WS `chat:rooms:presence`.
+ */
+export function useRoomPresenceCounts(): RoomPresenceCounts | undefined {
+  const qc = useQueryClient();
+  const query = useQuery({
+    queryKey: ROOM_PRESENCE_COUNTS_KEY,
+    queryFn: () =>
+      api.get<RoomPresenceCounts>('/global-chat/rooms/presence'),
+  });
+  useSocketEvent<RoomPresenceCounts>('chat:rooms:presence', (counts) => {
+    qc.setQueryData(ROOM_PRESENCE_COUNTS_KEY, counts);
+  });
+  return query.data;
 }
 
 export interface SendMessagePayload {
@@ -37,17 +73,41 @@ export interface SendMessagePayload {
 }
 
 /** Odeslání veřejné zprávy. Zpráva se vykreslí až přes WS echo. */
-export function useSendMessage() {
+export function useSendMessage(room: RoomKey) {
   return useMutation({
     mutationFn: (dto: SendMessagePayload) =>
-      api.post<ChatMessage>('/global-chat/messages', dto),
+      api.post<ChatMessage>(
+        `/global-chat/messages?room=${room}`,
+        dto,
+      ),
   });
 }
 
 /** Smazání zprávy (Admin/Superadmin). Propsání všem přes WS `chat:message:deleted`. */
-export function useDeleteMessage() {
+export function useDeleteMessage(room: RoomKey) {
   return useMutation({
     mutationFn: (messageId: string) =>
-      api.delete(`/global-chat/messages/${messageId}`),
+      api.delete(`/global-chat/messages/${messageId}?room=${room}`),
+  });
+}
+
+/** Aktuální prostředí Rozcestí (styl + lokace). Pro Hospodu se nevolá. */
+export function useRoomEnvironment(room: RoomKey) {
+  return useQuery({
+    queryKey: chatQueryKeys(room).environment,
+    queryFn: () =>
+      api.get<RoomEnvironment>(`/global-chat/rooms/${room}/environment`),
+    enabled: room !== 'hospoda',
+  });
+}
+
+/**
+ * Změna prostředí Rozcestí — REST endpoint za role guardem (jen platformová
+ * funkce). BE po uložení odbroadcastne WS `chat:room:environment`.
+ */
+export function useSetRoomEnvironment(room: RoomKey) {
+  return useMutation({
+    mutationFn: (dto: RoomEnvironment) =>
+      api.put<RoomEnvironment>(`/global-chat/rooms/${room}/environment`, dto),
   });
 }

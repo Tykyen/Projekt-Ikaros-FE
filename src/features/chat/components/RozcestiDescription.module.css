@@ -1,0 +1,56 @@
+/* Accordion panel — animace přes max-height + opacity. */
+.panel,
+.panelOpen {
+  overflow: hidden;
+  background: var(--theme-surface-soft, var(--bg-secondary));
+  border-bottom: 1px solid var(--theme-border-soft, var(--border));
+  transition:
+    max-height var(--transition-slow) ease,
+    opacity var(--transition-base) ease;
+}
+
+.panel {
+  max-height: 0;
+  opacity: 0;
+  border-bottom-color: transparent;
+}
+
+.panelOpen {
+  max-height: 340px;
+  opacity: 1;
+}
+
+.inner {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.title {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semi);
+  color: var(--theme-heading, var(--accent));
+}
+
+.text {
+  max-width: 64ch;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-loose);
+  color: var(--theme-text, var(--text));
+  white-space: pre-line;
+}
+
+/* Na mobilu nesmí popis překrýt celý chat — nižší strop + scroll. */
+@media (max-width: 768px) {
+  .panelOpen {
+    max-height: 50vh;
+  }
+
+  .inner {
+    max-height: 50vh;
+  }
+}

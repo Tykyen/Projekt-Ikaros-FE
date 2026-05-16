@@ -19,6 +19,7 @@ import ErrorPage from '@/pages/errors/ErrorPage';
 // ── Lazy pages — Ikaros ───────────────────────────────────────────────────
 const DashboardPage    = lazy(() => import('@/features/ikaros/pages/DashboardPage'));
 const ChatPage         = lazy(() => import('@/features/chat/pages/ChatPage'));
+const RozcestiPage     = lazy(() => import('@/features/chat/pages/RozcestiPage'));
 const WorldsPage       = lazy(() => import('@/features/ikaros/pages/WorldsPage'));
 const CreateWorldPage  = lazy(() => import('@/features/ikaros/pages/CreateWorldPage'));
 const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
@@ -150,6 +151,10 @@ export const router = createBrowserRouter([
 
       // Chráněné — vyžadují přihlášení (per-route loader)
       { path: 'chat',                   element: p(ChatPage),         loader: requireAuth },
+      // 4.2a — Rozcestí I.–III. (atmosférické roleplay místnosti)
+      { path: 'chat/rozcesti',          element: p(RozcestiPage),     loader: requireAuth },
+      { path: 'chat/rozcesti2',         element: p(RozcestiPage),     loader: requireAuth },
+      { path: 'chat/rozcesti3',         element: p(RozcestiPage),     loader: requireAuth },
       { path: 'ikaros/vytvorit-svet',   element: p(CreateWorldPage),  loader: requireAuth },
       { path: 'ikaros/profil',          element: p(ProfilePage),      loader: requireAuth },
       { path: 'ikaros/uzivatel/:id',    element: p(UserProfilePage),  loader: requireAuth },

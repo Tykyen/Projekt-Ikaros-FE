@@ -152,10 +152,20 @@
   grid-template-columns: var(--sidebar-w, 280px) 1fr;
 }
 
+/* `/chat*` — bez pravého panelu (viz spec-chat-hide-right-panel). */
+.bodyNoRight {
+  grid-template-columns: var(--sidebar-w, 280px) 1fr;
+}
+
 .main {
   overflow-y: auto;
   min-width: 0;
   padding-top: 220px;
+}
+
+/* `/chat*` — chat vyplní výšku, jen drobný odstup od headeru. */
+.mainChat {
+  padding-top: var(--sp-2);
 }
 
 /* ── Sidebar / Right panel ── */
@@ -321,6 +331,30 @@
   line-height: 1;
 }
 
+/* 4.2c §4 — počet přítomných u chat místností. Zobrazuje se vždy (i „0");
+   prázdná místnost = decentní obrys, obsazená = plný badge. */
+.roomCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--sp-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
+.roomCountActive {
+  border-color: transparent;
+  background: var(--tab-badge-bg);
+  color: var(--tab-badge-fg);
+}
+
 /* 1.5 — wrapper okolo header UserAvatar pro OnlineDot overlay (absolute pozicování) */
 .avatarWrapper {
   position: relative;
@@ -446,6 +480,9 @@
     padding: var(--sp-2) var(--sp-3) var(--sp-3);
   }
   .shellAnon .body {
+    grid-template-columns: 220px 1fr;
+  }
+  .bodyNoRight {
     grid-template-columns: 220px 1fr;
   }
 }

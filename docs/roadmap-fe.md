@@ -715,16 +715,62 @@ Brownfield — BE modul `ikaros-discussions` existoval z feature-parity. Diskuze
 - [x] Sidebar: Hospoda → `/chat`; Rozcestí I.–III. disabled položky do kroku 4.2.
 - [x] Tests: BE +4 (color v sendMessage/sendWhisper), FE +37 (lib, api, komponenty).
 
-### - [ ] 4.2 Rozcestí (`/chat/rozcesti`)
-- [ ] Atmosférická roleplay místnost — bez kostek a mechanik, hra na jeden večer
-- [ ] 3 nezávislé místnosti (Rozcestí I.–III.) — víc her současně
-- [ ] 3 styly prostředí (Fantasy / Sci-fi / Mystika), každý 20 lokací
-- [ ] Ilustrace lokace jako pozadí chatu + slovní popis místa (📖 panel)
-- [ ] Přepínání stylu/lokace v záhlaví, synchronizace stylu přes WS (`SetRoomStyle`)
-- [ ] „Postava v Rozcestí" (≤200 znaků) — editace v Osobní kartě profilu
-- [ ] Barva textu uživatele, šepot (whisper) konkrétnímu hráči
-- [x] Ilustrace lokací (60 ks) migrovány ze starého Matrixu, převedeny na `.webp` → `public/images/rozcesti/`
-- [ ] Slovní popisy 60 lokací — migrovat ze starého Matrixu (`descriptions/{fantasy,scifi,mystic}.ts`)
+### - [x] 4.2a Rozcestí (`/chat/rozcesti*`) ✅ (2026-05-16)
+
+**Spec:** `docs/arch/phase-4/spec-4.2a.md`, **Plán:** `docs/arch/phase-4/plan-4.2a.md`
+
+- [x] Atmosférická roleplay místnost — bez kostek a mechanik, hra na jeden večer
+- [x] 3 nezávislé místnosti (Rozcestí I.–III.) — víc her současně, presence per-channel
+- [x] 3 styly prostředí (Fantasy / Sci-fi / Mystika), každý 20 lokací
+- [x] Ilustrace lokace jako pozadí chatu + slovní popis místa (📖 panel)
+- [x] Přepínání stylu **i lokace** v záhlaví, sdílené přes WS `chat:room:environment`
+  (REST `PUT .../environment` za role guardem — jen platformová funkce)
+- [x] Šepot (whisper) konkrétnímu hráči, barva textu — reuse infry Hospody
+- [x] Ilustrace lokací (60 ks) migrovány ze starého Matrixu, převedeny na `.webp`
+- [x] Slovní popisy 60 lokací migrovány ze starého Matrixu
+- [x] BE: `global-chat` rozšířen o víc kanálů; FE: `ChatRoom` parametrizován
+- [x] Tests: BE +12 (kanály, presence, environment), FE +22 (lib, api, RozcestiHeader)
+
+### - [x] 4.2b Rozcestí — vazba na profil postavy ✅ (2026-05-16)
+- [x] Seznam přítomných v Rozcestí zobrazuje postavu z profilu
+  (`characterName`/`characterAvatarUrl`); fallback na účet. Dodáno v rámci
+  kroku 4.2d §8.
+
+### - [x] 4.2c Chat — presence & přítomnost ✅ (2026-05-16)
+
+**Spec:** `docs/arch/phase-4/spec-4.2c.md`, **Plán:** `docs/arch/phase-4/plan-4.2c.md`
+
+- [x] Self-include — uživatel se po vstupu hned vidí v seznamu přítomných
+  (bez refreshe; Hospoda i Rozcestí).
+- [x] Tlačítko „Odejít" v hlavičce místnosti → navigace na Úvodník.
+- [x] Narativní hlášky příchodu/odchodu — krčmářský tón Hospody vs. poutnický
+  Rozcestí (`presenceLine`).
+- [x] Počet přítomných u Hospody / Rozcestí I.–III. v levém nav — živě
+  (BE `chat:rooms:presence` broadcast + REST `rooms/presence`).
+- [x] Auto-odhlášení po 60 min nečinnosti — FE heartbeat á 5 min, BE cleanup
+  cron á 5 min; socket se neodpojuje (sdílený aplikací), jen presence.
+- [x] Chat fullheight — `/chat*` ruší 220px rezervu nad oknem (side-task).
+- [x] Tests: BE +4 (counts, heartbeat, cleanup), FE +9 (presenceLine,
+  presentUsers, useRoomPresenceCounts).
+- Dluh D-069 — „Chat (N)" v nav nadpisu = počet nepřečtené pošty.
+
+### - [x] 4.2d Chat — multi-room presence ✅ (2026-05-16)
+
+**Spec:** `docs/arch/phase-4/spec-4.2d.md`, **Plán:** `docs/arch/phase-4/plan-4.2d.md`
+
+Revize 4.2c — model přítomnosti „jsem v místnosti, dokud z ní explicitně neodejdu".
+
+- [x] Multi-room — uživatel je přítomný ve víc místnostech zároveň; odchod jen
+  tlačítkem Odejít / „×" v nav / 60min timeout, ne opuštěním stránky.
+- [x] Příchod/odchod jako uložené systémové zprávy (`isSystem`) — vidí je
+  i pozdější příchozí; `presenceLine` přesunut na BE.
+- [x] `chat:presence` přes `server.to()` — uživatel vidí i vlastní příchod.
+- [x] Heartbeat globálně v layoutu (presence drží i mimo `ChatRoom`).
+- [x] Počty u místností v nav vždy (i „0"); „×" pro odchod u místnosti, kde jsem.
+- [x] §8 — seznam přítomných: Hospoda = účet, Rozcestí = postava
+  (`characterName`/`characterAvatarUrl`). Splňuje krok 4.2b.
+- [x] Tests: BE +5 (multi-room, dedup, character, systémová zpráva), FE +7
+  (toChatItems, UserList režim).
 
 ### - [ ] 4.3 Zprávy — rozšíření
 - [ ] Reply, reakce (emoji), přílohy

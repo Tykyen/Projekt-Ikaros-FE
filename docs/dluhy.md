@@ -16,6 +16,18 @@
 
 ## Otevřené
 
+### D-069 — „Chat (N)" v nav ukazuje počet nepřečtené pošty
+**Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.tsx:168` — `chatCount` + nadpis sekce (~ř. 210)
+**Problém:** Nadpis sekce chatu v levém sidebaru zobrazuje `Chat (N)`, kde `N` je
+`useUnreadCount().unreadCount` — počet **nepřečtené pošty**, ne nic chatového.
+Matoucí: uživatel u nadpisu „Chat" čeká počet zpráv / přítomných.
+**Dopad:** Nízký — kosmetické, ale zavádějící.
+**Řešení:** Buď nadpis sekce zbavit čísla úplně, nebo dosadit smysluplnou
+chatovou metriku (krok 4.2c §4 zavádí per-místnost počty lidí — lze sečíst).
+**Kdy:** Při dokončování 4.2c, nebo samostatný UI cleanup.
+
+---
+
 ### D-068 — Header IkarosLayout přetéká na úzkém mobilu (375 px)
 **Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.tsx` + `.module.css` — `.header` / `.headerBtn`
 **Problém:** Na šířce 375 px tlačítka v hlavičce (Pošta, Zprávy, avatar, odhlásit) přetékají

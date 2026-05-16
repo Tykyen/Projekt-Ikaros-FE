@@ -1,10 +1,14 @@
-/* --chat-reserve = výška logo-overlay prostoru v .main (IkarosLayout
-   má .main { padding-top: 220px }). Chat tím vyplní zbytek viewportu
-   bez vlastního scrollu okolo. Step 7 (mobil-desktop) hodnotu doladí. */
+/* --chat-reserve = padding-top `.main` na chat stránkách. IkarosLayout
+   dává `<main>` třídu `.mainChat { padding-top: var(--sp-2) }`, takže
+   rezerva nad chatem je jen drobný odstup od headeru — hodnota MUSÍ
+   sedět s `.mainChat`, jinak chat přeteče / nedosáhne spodku viewportu.
+   Výška se počítá z viewportu (dvh), ne z `%` — rodič nemá explicitní
+   výšku, takže `height: 100%` by selhalo a chat by spadl na `min-height`.
+   Chat tak vyplní výšku od headeru ke spodku viewportu (Hospoda i Rozcestí). */
 .room {
-  --chat-reserve: 220px;
+  --chat-reserve: var(--sp-2);
   position: relative;
-  height: calc(100% - var(--chat-reserve));
+  height: calc(100dvh - var(--header-h) - var(--chat-reserve));
   min-height: 360px;
   display: flex;
   flex-direction: column;
@@ -15,7 +19,7 @@
 }
 
 .state {
-  height: calc(100% - 220px);
+  height: calc(100dvh - var(--header-h) - var(--chat-reserve, var(--sp-2)));
   min-height: 360px;
   display: flex;
   align-items: center;
@@ -58,6 +62,76 @@
   font-family: var(--font-body);
   font-size: var(--text-sm);
   cursor: default;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+/* Tlačítko „Odejít" — stejný tvar jako .count, ale klikací (akcentový hover). */
+.leave {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+.leave:hover {
+  color: var(--theme-heading, var(--accent));
+  border-color: var(--theme-heading, var(--accent));
+}
+
+/* ── Stav auto-odhlášení (4.2c §5) — překryje celou místnost ── */
+.kicked {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-dropdown);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  text-align: center;
+  background: color-mix(
+    in srgb,
+    var(--theme-surface, var(--bg-card)) 92%,
+    transparent
+  );
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.kickedText {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+.kickedBtn {
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--theme-heading, var(--accent));
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--theme-heading, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.kickedBtn:hover {
+  background: var(--accent-soft);
 }
 
 /* ── Body: zprávy + přítomní ── */
@@ -111,6 +185,51 @@
   flex-shrink: 0;
 }
 
+/* ── Scéna Rozcestí — pozadí z ilustrace lokace ── */
+.scene > *:not(.sceneBg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Vrstva pozadí — ilustrace lokace. `key` na elementu spouští fade
+   („stmívačka") při přepnutí lokace. ::after = vinětový overlay pro
+   čitelnost zpráv. */
+.sceneBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  animation: sceneFade var(--transition-slow) ease;
+}
+
+.sceneBg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0.35) 0%,
+      rgba(0, 0, 0, 0.72) 100%
+    );
+}
+
+@keyframes sceneFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Panely zpráv a přítomných — poloprůhledný závoj nad scénou. */
+.scenePanel {
+  background: color-mix(in srgb, var(--theme-surface, #1a1a1a) 80%, transparent);
+  backdrop-filter: blur(3px);
+}
+
 /* ── Mobil ── */
 @media (max-width: 768px) {
   .title {
@@ -125,6 +244,15 @@
     min-height: 36px;
     padding: var(--sp-2) var(--sp-3);
     cursor: pointer;
+  }
+
+  /* Na mobilu jen ikona — hlavička je úzká. */
+  .leave {
+    min-height: 36px;
+    padding: var(--sp-2);
+  }
+  .leaveLabel {
+    display: none;
   }
 
   .body {

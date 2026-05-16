@@ -3,14 +3,15 @@ import { api } from '@/shared/api/client';
 import type { PublicUserProfile } from '@/shared/types';
 
 /**
- * Spec 1.4 — public profil (`GET /api/users/profile/:id`). Dostupný každému
- * přihlášenému. 404 pro tombstone/pending-deletion běžnému uživateli,
- * admin výjimka 200 + flag.
+ * Spec 1.4 — public profil (`GET /api/users/profile/v14/:id`). Dostupný
+ * každému přihlášenému; vrací plný `PublicUserProfile` tvar (bio, postava
+ * v Rozcestí, defaultAvatarType, worldsCount, lastSeenAt). 404 pro
+ * tombstone/pending-deletion běžnému uživateli, admin výjimka 200 + flag.
  */
 export function usePublicUserProfile(id: string | undefined) {
   return useQuery({
     queryKey: ['public-user-profile', id],
-    queryFn: () => api.get<PublicUserProfile>(`/users/profile/${id}`),
+    queryFn: () => api.get<PublicUserProfile>(`/users/profile/v14/${id}`),
     enabled: !!id,
     staleTime: 60_000,
     retry: (failureCount, error) => {

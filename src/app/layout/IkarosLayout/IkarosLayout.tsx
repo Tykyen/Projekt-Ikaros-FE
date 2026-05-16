@@ -1,5 +1,5 @@
 ﻿import { useState, type ReactNode } from 'react';
-import { NavLink, Outlet, Link } from 'react-router-dom';
+import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { toast } from 'sonner';
 import clsx from 'clsx';
@@ -15,11 +15,15 @@ import {
   Image as ImageIcon,
   HelpCircle,
   Beer,
+  Signpost,
   Settings,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
 import { pendingTooltip } from './pendingBadge';
 import { useSocketInit } from '@/features/chat/api/useSocket';
+import { usePresenceHeartbeat } from '@/features/chat/api/usePresenceHeartbeat';
+import { useRoomPresenceCounts } from '@/features/chat/api/useGlobalChat';
+import type { RoomKey } from '@/features/chat/lib/types';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
 import { useUnreadCount } from '@/features/ikaros/api/useMail';
 import { useMyFavoriteArticles } from '@/features/ikaros/api/useArticles';
@@ -81,18 +85,20 @@ const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
 ];
 
-// Krok 4.1 — Hospoda žije na `/chat`. Rozcestí I.–III. (krok 4.2) zatím
-// nemají route → zobrazují se jako disabled položky s popiskem „Brzy".
+// Krok 4.1 — Hospoda žije na `/chat`. Krok 4.2a — Rozcestí I.–III. na `/chat/rozcesti*`.
+// `roomKey` = BE RoomKey (pro odznak počtu přítomných, 4.2c §4) — pozor, liší se
+// od `key` (URL segment bez pomlčky).
 const CHAT_ROOMS: {
   key: string;
+  roomKey: RoomKey;
   label: string;
   to: string;
   disabled?: boolean;
 }[] = [
-  { key: 'hospoda',   label: 'Hospoda',       to: '/chat' },
-  { key: 'rozcesti1', label: 'Rozcestí I.',   to: '/chat/rozcesti',  disabled: true },
-  { key: 'rozcesti2', label: 'Rozcestí II.',  to: '/chat/rozcesti2', disabled: true },
-  { key: 'rozcesti3', label: 'Rozcestí III.', to: '/chat/rozcesti3', disabled: true },
+  { key: 'hospoda',   roomKey: 'hospoda',    label: 'Hospoda',       to: '/chat' },
+  { key: 'rozcesti1', roomKey: 'rozcesti-1', label: 'Rozcestí I.',   to: '/chat/rozcesti' },
+  { key: 'rozcesti2', roomKey: 'rozcesti-2', label: 'Rozcestí II.',  to: '/chat/rozcesti2' },
+  { key: 'rozcesti3', roomKey: 'rozcesti-3', label: 'Rozcestí III.', to: '/chat/rozcesti3' },
 ];
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -166,6 +172,8 @@ function SidebarContent({
   );
   const { data: unread } = useUnreadCount();
   const chatCount = isAuthenticated ? unread?.unreadCount ?? 0 : 0;
+  // 4.2c §4 — počet přítomných per místnost (REST seed + WS živá aktualizace).
+  const roomCounts = useRoomPresenceCounts();
   // Spec 3.8 — sdílená query s pravým panelem (`['pending-actions','count']`),
   // druhé volání nestojí extra request. Pro anon disabled → žádný badge.
   const { data: pendingCount } = usePendingActionsCount(isAuthenticated);
@@ -209,18 +217,22 @@ function SidebarContent({
       <div className={s.section} data-section-key="chat">
         <SectionTitle>{`Chat (${chatCount})`}</SectionTitle>
         <div className={s.navList}>
-          {CHAT_ROOMS.map((room) =>
-            room.disabled ? (
-              <span
-                key={room.key}
-                className={s.navItemDisabled}
-                data-nav-key={room.key}
-                title="Brzy — krok 4.2"
-              >
-                <span className={s.navItemLabel}>{room.label}</span>
-                <span className={s.soonBadge}>Brzy</span>
-              </span>
-            ) : (
+          {CHAT_ROOMS.map((room) => {
+            if (room.disabled) {
+              return (
+                <span
+                  key={room.key}
+                  className={s.navItemDisabled}
+                  data-nav-key={room.key}
+                  title="Brzy — krok 4.2"
+                >
+                  <span className={s.navItemLabel}>{room.label}</span>
+                  <span className={s.soonBadge}>Brzy</span>
+                </span>
+              );
+            }
+            const count = roomCounts?.[room.roomKey] ?? 0;
+            return (
               <NavLink
                 key={room.key}
                 to={room.to}
@@ -231,12 +243,26 @@ function SidebarContent({
                 }
               >
                 <span className={s.navItemIcon}>
-                  <Beer size={18} />
+                  {room.key === 'hospoda' ? (
+                    <Beer size={18} />
+                  ) : (
+                    <Signpost size={18} />
+                  )}
                 </span>
                 <span className={s.navItemLabel}>{room.label}</span>
+                <span
+                  className={clsx(
+                    s.roomCount,
+                    count > 0 && s.roomCountActive,
+                  )}
+                  aria-label={`${count} přítomných`}
+                  title={`Přítomných: ${count}`}
+                >
+                  {count}
+                </span>
               </NavLink>
-            ),
-          )}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -585,6 +611,9 @@ export function IkarosLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  // Hospoda (`/chat*`) běží bez pravého panelu — viz spec-chat-hide-right-panel.
+  const isChat = useLocation().pathname.startsWith('/chat');
+  const showRightPanel = isAuthenticated && !isChat;
 
   function openLeftDrawer() {
     setRightDrawerOpen(false);
@@ -603,6 +632,8 @@ export function IkarosLayout() {
   usePresenceInit();
   useFriendshipsSocket();
   useWorldAccessSocket();
+  // 4.2d §4 — chat heartbeat běží globálně: presence drží i mimo `ChatRoom`.
+  usePresenceHeartbeat(isAuthenticated);
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);
@@ -648,7 +679,7 @@ export function IkarosLayout() {
           </span>
         </div>
 
-        {isAuthenticated && (
+        {showRightPanel && (
           <button
             className={s.rightHamburger}
             onClick={openRightDrawer}
@@ -661,7 +692,7 @@ export function IkarosLayout() {
         {isAuthenticated ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </header>
 
-      <div className={s.body}>
+      <div className={clsx(s.body, isChat && s.bodyNoRight)}>
         <aside className={s.sidebar} data-frame-panel="sidebar">
           <PanelCorners />
           <SidebarContent isAuthenticated={isAuthenticated} />
@@ -682,18 +713,18 @@ export function IkarosLayout() {
           />
         </aside>
 
-        <main className={s.main}>
+        <main className={clsx(s.main, isChat && s.mainChat)}>
           <Outlet />
         </main>
 
-        {isAuthenticated && (
+        {showRightPanel && (
           <aside className={s.rightPanel} data-frame-panel="right">
             <PanelCorners />
             <RightPanel />
           </aside>
         )}
 
-        {isAuthenticated && (
+        {showRightPanel && (
           <aside
             className={clsx(s.drawerRightSidebar, rightDrawerOpen && s.drawerRightSidebarOpen)}
             data-frame-panel="right"

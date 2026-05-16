@@ -118,7 +118,13 @@ const IKAROS_PAGES: PageDoc[] = [
       'uvidí jen on (orámování pole se přebarví, ať víš, že šeptáš). Text zprávy se ' +
       'zobrazuje v barvě, kterou máš nastavenou v profilu. V textu fungují emotes ' +
       'přes dvojtečkové zkratky (např. :beer: → 🍺). Zprávy mizí po hodině. ' +
-      'Admin a Superadmin mohou nevhodnou zprávu smazat.',
+      'Admin a Superadmin mohou nevhodnou zprávu smazat. ' +
+      'Příchody a odchody se zapisují přímo do chatu jako hláška — vidí je ' +
+      'i ten, kdo dorazí později. V levém menu je u každé místnosti počet ' +
+      'lidí, kteří jsou zrovna uvnitř. Jakmile do místnosti vejdeš, zůstáváš ' +
+      'v ní přihlášený, i když mezitím odejdeš jinam — můžeš tak být v Hospodě ' +
+      'a Rozcestích zároveň. Odcházíš ručně tlačítkem „Odejít" v záhlaví ' +
+      'místnosti; po 60 minutách nečinnosti tě místnost odhlásí sama.',
   },
 ];
 
@@ -165,10 +171,20 @@ const SOON_IKAROS: PageDoc[] = [
   {
     path: '/chat/rozcesti',
     name: 'Rozcestí I.–III.',
-    status: 'soon',
-    fáze: 'Fáze 4.2',
+    status: 'ok',
     who: 'Přihlášený',
-    what: 'Atmosférické roleplay místnosti — hra na jeden večer bez kostek a mechanik, s ilustrovaným prostředím a popisem lokace.',
+    what:
+      'Tři nezávislé atmosférické roleplay místnosti — hra na jeden večer bez ' +
+      'kostek a mechanik. Každá má prostředí: zvolený styl (Fantasy / Sci-fi / ' +
+      'Mystika) a v něm jednu z 20 lokací, jejíž ilustrace tvoří pozadí chatu a ' +
+      'popis najdeš v rozbalovacím panelu (tlačítko 📖). Prostředí je sdílené — ' +
+      'vidí ho všichni v místnosti; měnit styl a lokaci smí jen role s ' +
+      'platformovou funkcí (správci). Zprávy, soukromý šepot, indikátor psaní, ' +
+      'hlášky příchodu/odchodu, počty v menu, odchod i odhlášení po nečinnosti ' +
+      'fungují stejně jako v Hospodě. Na rozdíl od Hospody se ale v seznamu ' +
+      'přítomných zobrazuje tvoje postava (jméno a obrázek z profilu), ne účet — ' +
+      'kdo postavu nevyplnil, vystupuje pod účtem. Kliknutím na osobu v seznamu ' +
+      'přítomných si otevřeš kartu její postavy — avatar, jméno a popis postavy.',
   },
   {
     path: '/ikaros/uzivatele?tab=pratele',

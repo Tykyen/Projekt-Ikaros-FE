@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAtomValue } from 'jotai';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
-import { Beer, Users, X } from 'lucide-react';
+import { Users, X, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
@@ -9,6 +17,7 @@ import { Spinner } from '@/shared/ui';
 import { useSocketEvent } from '../api/useSocket';
 import { getSocket } from '../api/socket';
 import {
+  chatQueryKeys,
   useRoomInfo,
   useChatHistory,
   useSendMessage,
@@ -20,39 +29,54 @@ import type {
   MessageDeletedEvent,
   PresenceEvent,
   RoomInfo,
+  RoomKey,
   TypingEvent,
 } from '../lib/types';
+import { presentUsers } from '../lib/presenceUsers';
+import { toChatItems } from '../lib/chatItems';
+import { myRoomsAtom } from '../store/roomsStore';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { UserList } from './UserList';
+import { CharacterDetailModal } from './CharacterDetailModal';
 import { TypingIndicator } from './TypingIndicator';
 import s from './ChatRoom.module.css';
 
-const ROOM_NAME = 'Interdimenzionální hospoda';
-const MESSAGES_KEY = ['global-chat', 'messages'];
-const ROOM_INFO_KEY = ['global-chat', 'room-info'];
-
-interface SystemLine {
-  id: string;
-  text: string;
-  at: string;
+/** Volitelné prostředí Rozcestí — záhlaví scény + pozadí z ilustrace lokace. */
+export interface RoomScene {
+  /** Obsah pod hlavičkou (výběr stylu/lokace + 📖 panel). */
+  node: ReactNode;
+  /** URL ilustrace lokace — pozadí místnosti. */
+  backgroundUrl?: string;
 }
 
-const itemTime = (i: ChatItem): number =>
-  new Date(i.kind === 'message' ? i.message.createdAt : i.at).getTime();
+export interface ChatRoomProps {
+  room: RoomKey;
+  roomName: string;
+  icon: ReactNode;
+  /** Vyplněno → místnost běží v „divadelním" režimu Rozcestí. */
+  scene?: RoomScene;
+}
 
-/** Globální chat „Hospoda" — drží socket lifecycle a stav místnosti. */
-export function ChatRoom() {
+/** Globální chat — drží socket lifecycle a stav místnosti (Hospoda i Rozcestí). */
+export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   const user = useAtomValue(currentUserAtom);
+  const navigate = useNavigate();
   const qc = useQueryClient();
-  const roomInfo = useRoomInfo();
-  const history = useChatHistory();
-  const sendMutation = useSendMessage();
-  const deleteMutation = useDeleteMessage();
+  const keys = useMemo(() => chatQueryKeys(room), [room]);
+  const roomInfo = useRoomInfo(room);
+  const history = useChatHistory(room);
+  const sendMutation = useSendMessage(room);
+  const deleteMutation = useDeleteMessage(room);
 
-  const [systemLines, setSystemLines] = useState<SystemLine[]>([]);
   const [typingNames, setTypingNames] = useState<string[]>([]);
   const [usersOpen, setUsersOpen] = useState(false);
+  // Detail postavy v Rozcestí — ID kliknuté osoby z `PŘÍTOMNÍ`, `null` = zavřeno.
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  // Auto-odhlášení pro neaktivitu (4.2c §5) — BE odebral z presence.
+  const [kicked, setKicked] = useState(false);
+  const setMyRooms = useSetAtom(myRoomsAtom);
+  const store = useStore();
   // Prázdné dokud effect nepřečte skutečné --theme-surface z DOM.
   const [surfaceColor, setSurfaceColor] = useState('');
 
@@ -60,16 +84,11 @@ export function ChatRoom() {
   const typingTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 
   const channelId = roomInfo.data?.channelId;
-  // Dedup dle userId — `room-info` může téhož uživatele uvést víckrát
-  // (víc otevřených tabů / socket spojení jednoho člověka).
-  const users = useMemo(() => {
-    const seen = new Set<string>();
-    return (roomInfo.data?.users ?? []).filter((u) => {
-      if (seen.has(u.userId)) return false;
-      seen.add(u.userId);
-      return true;
-    });
-  }, [roomInfo.data]);
+  // Dedup dle userId + self-include — viz `presentUsers`.
+  const users = useMemo(
+    () => presentUsers(roomInfo.data?.users, user),
+    [roomInfo.data, user],
+  );
   const messages = useMemo(() => history.data ?? [], [history.data]);
 
   const canDelete =
@@ -80,20 +99,11 @@ export function ChatRoom() {
     [users],
   );
 
-  // Zprávy (z React Query cache) + systémové hlášky → jeden časově seřazený výpis.
-  const items = useMemo<ChatItem[]>(() => {
-    const msgItems: ChatItem[] = messages.map((m) => ({
-      kind: 'message',
-      message: m,
-    }));
-    const sysItems: ChatItem[] = systemLines.map((l) => ({
-      kind: 'system',
-      id: l.id,
-      text: l.text,
-      at: l.at,
-    }));
-    return [...msgItems, ...sysItems].sort((a, b) => itemTime(a) - itemTime(b));
-  }, [messages, systemLines]);
+  // Pozn.: ChatRoom se při přepnutí místnosti vždy remountuje (`RozcestiRoom`
+  // má `key={room}`, Hospoda je statická) → lokální stav se resetuje sám.
+
+  // Výpis chatu — běžné i systémové zprávy z jedné cache (4.2d §5).
+  const items = useMemo<ChatItem[]>(() => toChatItems(messages), [messages]);
 
   // Barva pozadí panelu pro kontrast guard textu zpráv (čteno z DOM po mountu).
   useEffect(() => {
@@ -105,17 +115,17 @@ export function ChatRoom() {
   // ── WS listenery — mutují React Query cache, resp. lokální UI stav ─────
   const handleMessage = useCallback(
     (m: ChatMessage) => {
-      qc.setQueryData<ChatMessage[]>(MESSAGES_KEY, (old) => {
+      qc.setQueryData<ChatMessage[]>(keys.messages, (old) => {
         const list = old ?? [];
         return list.some((x) => x.id === m.id) ? list : [...list, m];
       });
     },
-    [qc],
+    [qc, keys.messages],
   );
 
   const handleDeleted = useCallback(
     (e: MessageDeletedEvent) => {
-      qc.setQueryData<ChatMessage[]>(MESSAGES_KEY, (old) =>
+      qc.setQueryData<ChatMessage[]>(keys.messages, (old) =>
         (old ?? []).map((x) =>
           x.id === e.messageId
             ? { ...x, isDeleted: true, content: null }
@@ -123,12 +133,29 @@ export function ChatRoom() {
         ),
       );
     },
-    [qc],
+    [qc, keys.messages],
   );
 
   const handlePresence = useCallback(
     (e: PresenceEvent) => {
-      qc.setQueryData<RoomInfo>(ROOM_INFO_KEY, (old) => {
+      // Overlay auto-odhlášení jen pro `timeout` (60min nečinnost). `disconnect`
+      // (reload/zavření jiného socketu) ani `explicit` ho nespustí.
+      if (
+        e.action === 'leave' &&
+        e.userId &&
+        e.userId === user?.id &&
+        e.reason === 'timeout'
+      ) {
+        setKicked(true);
+        // BE nás odebral z místnosti → uvolnit i klientský stav, ať „Vrátit
+        // se" znovu joinuje (joinRoom přeskakuje místnosti v `myRoomsAtom`).
+        setMyRooms((prev) => {
+          const next = new Set(prev);
+          next.delete(room);
+          return next;
+        });
+      }
+      qc.setQueryData<RoomInfo>(keys.roomInfo, (old) => {
         if (!old) return old;
         if (e.action === 'join') {
           if (!e.userId || old.users.some((u) => u.userId === e.userId)) {
@@ -138,7 +165,13 @@ export function ChatRoom() {
             ...old,
             users: [
               ...old.users,
-              { userId: e.userId, username: e.username },
+              {
+                userId: e.userId,
+                username: e.username,
+                avatarUrl: e.avatarUrl,
+                characterName: e.characterName,
+                characterAvatarUrl: e.characterAvatarUrl,
+              },
             ],
           };
         }
@@ -149,19 +182,8 @@ export function ChatRoom() {
           ),
         };
       });
-      setSystemLines((prev) => [
-        ...prev,
-        {
-          id: `sys-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          text:
-            e.action === 'join'
-              ? `${e.username} přichází do hospody.`
-              : `${e.username} odchází z hospody.`,
-          at: new Date().toISOString(),
-        },
-      ]);
     },
-    [qc],
+    [qc, keys.roomInfo, user?.id, room, setMyRooms],
   );
 
   const handleTyping = useCallback(
@@ -191,27 +213,61 @@ export function ChatRoom() {
   useSocketEvent<PresenceEvent>('chat:presence', handlePresence);
   useSocketEvent<TypingEvent>('chat:typing', handleTyping);
 
-  // Vstup / odchod z místnosti. `getSocket()` voláme až v effectu —
-  // má vedlejší efekty (vytvoření socketu), nesmí běžet při renderu.
-  useEffect(() => {
+  // Vstup do místnosti — vyčleněno z effectu, ať ho lze zavolat i ručně
+  // po auto-odhlášení („Vrátit se"). Hospoda jede na `chat:hospoda:*` (4.1),
+  // Rozcestí na `chat:room:*`.
+  const joinRoom = useCallback(() => {
     if (!channelId || !user) return;
+    // Už v místnosti jsem (překlik mezi stránkami) → žádný nový join ani
+    // hláška „vchází" (4.2d §1). Vstoupit jde znovu jen po skutečném odchodu.
+    if (store.get(myRoomsAtom).has(room)) return;
     const socket = getSocket();
-    const room = `chat:${channelId}`;
-    socket.emit('room:join', room);
-    socket.emit('chat:hospoda:join', {
-      username: user.username,
-      userId: user.id,
+    socket.emit('room:join', `chat:${channelId}`);
+    if (room === 'hospoda') {
+      socket.emit('chat:hospoda:join', {
+        username: user.username,
+        userId: user.id,
+      });
+    } else {
+      socket.emit('chat:room:join', {
+        room,
+        username: user.username,
+        userId: user.id,
+      });
+    }
+    setMyRooms((prev) => new Set(prev).add(room));
+  }, [channelId, user, room, setMyRooms, store]);
+
+  // Explicitní odchod z místnosti (4.2d §1/§4) — opuštění stránky neodhlašuje.
+  const leaveRoom = useCallback(() => {
+    if (!channelId) return;
+    const socket = getSocket();
+    if (room === 'hospoda') {
+      socket.emit('chat:hospoda:leave', {});
+    } else {
+      socket.emit('chat:room:leave', { room });
+    }
+    socket.emit('room:leave', `chat:${channelId}`);
+    setMyRooms((prev) => {
+      const next = new Set(prev);
+      next.delete(room);
+      return next;
     });
-    return () => {
-      socket.emit('chat:hospoda:leave', { username: user.username });
-      socket.emit('room:leave', room);
-    };
-  }, [channelId, user]);
+  }, [channelId, room, setMyRooms]);
+
+  // Vstup při mountu. Odchod NENÍ vázán na unmount — místnost se opouští
+  // jen explicitně (tlačítko Odejít / „×" v nav / 60min timeout).
+  useEffect(() => {
+    joinRoom();
+  }, [joinRoom]);
 
   // Úklid typing timerů při odmountování.
   useEffect(() => {
     const timers = typingTimers.current;
-    return () => timers.forEach((t) => clearTimeout(t));
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
   }, []);
 
   // ── Akce ──────────────────────────────────────────────────────────────
@@ -224,6 +280,7 @@ export function ChatRoom() {
       toUserId,
       content: text,
       color: user?.chatColor,
+      room,
     });
   };
 
@@ -233,6 +290,17 @@ export function ChatRoom() {
       channelId,
       characterName: user.username,
     });
+  };
+
+  // Odejít z místnosti — explicitní leave + návrat na Úvodník.
+  const handleLeave = () => {
+    leaveRoom();
+    navigate('/');
+  };
+  // Po auto-odhlášení „Vrátit se" — znovu joinuje stejnou místnost.
+  const handleReturn = () => {
+    setKicked(false);
+    joinRoom();
   };
 
   // ── Render ────────────────────────────────────────────────────────────
@@ -249,29 +317,58 @@ export function ChatRoom() {
   if (roomInfo.isError) {
     return (
       <div className={s.state}>
-        Hospodu se nepodařilo otevřít. Zkus to znovu.
+        Místnost se nepodařilo otevřít. Zkus to znovu.
       </div>
     );
   }
 
   return (
-    <div className={clsx(s.room, usersOpen && s.usersOpen)} ref={roomRef}>
+    <div
+      className={clsx(
+        s.room,
+        usersOpen && s.usersOpen,
+        scene && s.scene,
+      )}
+      ref={roomRef}
+    >
+      {scene?.backgroundUrl && (
+        <div
+          key={scene.backgroundUrl}
+          className={s.sceneBg}
+          style={{ backgroundImage: `url(${scene.backgroundUrl})` }}
+          aria-hidden="true"
+        />
+      )}
+
       <header className={s.header}>
         <h1 className={s.title}>
-          <Beer size={18} /> {ROOM_NAME}
+          {icon} {roomName}
         </h1>
-        <button
-          type="button"
-          className={s.count}
-          onClick={() => setUsersOpen((v) => !v)}
-          aria-label="Přítomní"
-        >
-          <Users size={14} /> {users.length}
-        </button>
+        <div className={s.headerActions}>
+          <button
+            type="button"
+            className={s.count}
+            onClick={() => setUsersOpen((v) => !v)}
+            aria-label="Přítomní"
+          >
+            <Users size={14} /> {users.length}
+          </button>
+          <button
+            type="button"
+            className={s.leave}
+            onClick={handleLeave}
+            aria-label="Odejít z místnosti"
+          >
+            <LogOut size={14} />
+            <span className={s.leaveLabel}>Odejít</span>
+          </button>
+        </div>
       </header>
 
+      {scene?.node}
+
       <div className={s.body}>
-        <div className={s.messages}>
+        <div className={clsx(s.messages, scene && s.scenePanel)}>
           <MessageList
             items={items}
             currentUserId={user.id}
@@ -282,7 +379,7 @@ export function ChatRoom() {
           />
         </div>
 
-        <aside className={s.users}>
+        <aside className={clsx(s.users, scene && s.scenePanel)}>
           <div className={s.usersHead}>
             <span className={s.usersLabel}>Přítomní ({users.length})</span>
             <button
@@ -294,7 +391,14 @@ export function ChatRoom() {
               <X size={16} />
             </button>
           </div>
-          <UserList users={users} currentUserId={user.id} />
+          <UserList
+            users={users}
+            currentUserId={user.id}
+            mode={room === 'hospoda' ? 'account' : 'character'}
+            onSelectUser={
+              room === 'hospoda' ? undefined : setSelectedUserId
+            }
+          />
         </aside>
       </div>
 
@@ -310,6 +414,26 @@ export function ChatRoom() {
           onTypingStop={() => emitTyping(false)}
         />
       </div>
+
+      <CharacterDetailModal
+        userId={selectedUserId}
+        onClose={() => setSelectedUserId(null)}
+      />
+
+      {kicked && (
+        <div className={s.kicked} role="alertdialog" aria-label="Odhlášen">
+          <p className={s.kickedText}>
+            Byl jsi odhlášen z místnosti pro neaktivitu.
+          </p>
+          <button
+            type="button"
+            className={s.kickedBtn}
+            onClick={handleReturn}
+          >
+            Vrátit se
+          </button>
+        </div>
+      )}
     </div>
   );
 }

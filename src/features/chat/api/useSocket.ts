@@ -45,6 +45,11 @@ export function useSocketEvent<T = unknown>(
   handler: (data: T) => void,
 ): void {
   const handlerRef = useRef(handler);
+  // Socket může být během života komponenty vyměněn — `useSocketInit` ho
+  // zahodí, dokud není auth token, a po jeho načtení vytvoří nový. Sledujeme
+  // proto socket stav a po každé změně listener přeregistrujeme na aktuální
+  // instanci; jinak by zůstal viset na mrtvém socketu (viz počty místností).
+  const status = useAtomValue(socketStatusAtom);
 
   useEffect(() => {
     handlerRef.current = handler;
@@ -55,5 +60,5 @@ export function useSocketEvent<T = unknown>(
     const cb = (data: T) => handlerRef.current(data);
     socket.on(event, cb);
     return () => { socket.off(event, cb); };
-  }, [event]);
+  }, [event, status]);
 }
