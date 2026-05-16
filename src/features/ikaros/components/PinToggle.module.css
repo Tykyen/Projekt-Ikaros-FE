@@ -1,0 +1,48 @@
+/* 3.7 — přepínač připnutí do sidebaru. Postaveno na design tokenech. */
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: var(--radius-full, 999px);
+  background: color-mix(in srgb, var(--surface, var(--bg)) 80%, transparent);
+  color: var(--text-secondary, var(--text-muted));
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+/* Mobil — zvětšit na pohodlný dotykový cíl (44×44) */
+@media (max-width: 768px) {
+  .iconBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.iconBtn:hover:not(:disabled) {
+  border-color: var(--accent, var(--theme-accent));
+  color: var(--accent, var(--theme-accent));
+}
+
+.active {
+  border-color: var(--accent, var(--theme-accent));
+  color: var(--accent, var(--theme-accent));
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.iconBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Připnutý špendlík se nakloní — vizuálně odlišuje stav od záložky */
+.icon {
+  transition: transform var(--transition-base, 120ms);
+}
+
+.iconActive {
+  transform: rotate(-20deg) scale(1.1);
+}
