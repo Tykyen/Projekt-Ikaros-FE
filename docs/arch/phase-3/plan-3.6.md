@@ -1,6 +1,6 @@
 # Plán 3.6 — Implementace stránky Nápověda
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [spec-3.6.md](spec-3.6.md) ✅ schváleno 2026-05-12
 **Větev:** `feat/krok-3.6-napoveda`
 **Datum:** 2026-05-12

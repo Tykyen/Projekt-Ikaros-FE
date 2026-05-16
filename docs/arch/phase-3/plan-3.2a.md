@@ -1,6 +1,6 @@
 # Implementační plán 3.2a — BE infrastruktura
 
-**Status:** Návrh — čeká na potvrzení PJ
+**Status:** ✅ Implementováno
 **Spec:** [spec-3.2.md §7](./spec-3.2.md)
 **Větev:** `feat/krok-3.2a-be-articles-infra` (v `Projekt-ikaros`)
 **Odhad:** ~600 ř. nového BE + ~350 ř. BE testů

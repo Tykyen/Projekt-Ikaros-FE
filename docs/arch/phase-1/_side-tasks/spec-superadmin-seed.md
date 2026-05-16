@@ -1,7 +1,7 @@
 # Spec — Superadmin seed (Tyky účet)
 
 **Datum:** 2026-05-08
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Související:** `docs/arch/phase-1/spec-1.2.md` (Registrace) — paralelní práce, nezávislé
 **Typ:** Jednorázová BE úloha (idempotentní skript)
 

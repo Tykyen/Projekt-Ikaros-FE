@@ -1,7 +1,7 @@
 # Implementační plán — D-053 Role architecture cleanup
 
 **Datum:** 2026-05-13
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-d053-role-architecture-cleanup.md`](./spec-d053-role-architecture-cleanup.md)
 **Větev:** bez větve, hodíme do mainu (per autor)
 **Odhad:** BE ~30 souborů, FE ~14, +1 migration script, ~700 ř. diff

@@ -1,6 +1,6 @@
 # Spec 2.1 — Ikaros dashboard (`/`)
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** FE (dashboard stránka + 3 sekce + 3 nové inner karty) + BE (1 nový endpoint pro cross-world upcoming events) + 1 bug fix shape `useMyWorlds`
 **Repo:** `Projekt-ikaros-FE` (FE) + `Projekt-ikaros` (BE), větev `feat/krok-2.1-dashboard`
 **Velikost:** odhad ~22 FE souborů (~900 ř.) + ~6 BE souborů (~300 ř.)

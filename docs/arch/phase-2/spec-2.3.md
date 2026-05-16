@@ -1,6 +1,6 @@
 # Spec 2.3 — Vytvoření světa (`/ikaros/vytvorit-svet`)
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** FE (nová stránka + formulář + 4 konstanty + 1 mutation hook) + BE (3 pole doplnit do DTO, žádná schema změna)
 **Větev:** `feat/krok-2.3-create-world`
 **Velikost:** ~12 FE souborů (~700 ř.) + ~2 BE soubory (~20 ř.)

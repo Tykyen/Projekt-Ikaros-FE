@@ -1,7 +1,7 @@
 # Spec 1.0i — Pergamen visual upgrade
 
 **Datum:** 2026-05-10
-**Status:** 📝 Draft v3 (po frontend-design auditu + revizi reálných assetů) — čeká na souhlas
+**Status:** ✅ Implementováno
 **Audit:** [audit-1.0i-pergamen.md](audit-1.0i-pergamen.md)
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.0i (po 1.0h Příroda)
 **Závisí na:** 1.0h Příroda ✅ (pattern předlohy + asset pipeline)

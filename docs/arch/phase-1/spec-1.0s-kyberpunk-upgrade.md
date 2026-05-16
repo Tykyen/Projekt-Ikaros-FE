@@ -1,6 +1,6 @@
 # Spec 1.0s — Kyberpunk visual upgrade
 
-**Status:** 🟡 Spec ke schválení (2026-05-11)
+**Status:** ✅ Implementováno
 **Datum:** 2026-05-11
 **Rozsah:** FE skin upgrade — `[data-theme="kyberpunk"]` izolace, žádný globální dopad
 **Repo:** `Projekt-ikaros-FE`, větev `feat/krok-1.0s-kyberpunk-upgrade` (vytvoří se při impl plánu)

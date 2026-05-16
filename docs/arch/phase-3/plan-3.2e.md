@@ -1,6 +1,6 @@
 # Implementační plán 3.2e — Discovery features
 
-**Status:** Návrh — čeká na potvrzení PJ
+**Status:** ✅ Implementováno
 **Spec:** [spec-3.2.md §11](./spec-3.2.md)
 **Větev:** `feat/krok-3.2e-articles-discovery`
 **Odhad:** ~500 ř. FE + ~250 ř. FE testů

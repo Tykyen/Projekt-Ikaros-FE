@@ -1,6 +1,6 @@
 # Spec 3.6a — Sekce „Role & oprávnění" v Nápovědě: dvě úrovně, karty + matice
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** FE — středně velké (1 sekce stránky + 1 nová sdílená UI komponenta + tokeny)
 **Repo:** `Projekt-ikaros-FE`, větev `feat/krok-3.6a-role-matrix`
 **Velikost:** odhad ~6 souborů / ~450 ř. (z toho ~60 % obsah/JSX)

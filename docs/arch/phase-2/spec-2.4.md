@@ -1,6 +1,6 @@
 # Spec 2.4 — Detail světa + join flow (`/svet/:worldId`)
 
-**Status:** Draft — čeká na schválení (verze 2 — sémantika rolí přepracována dle PJ)
+**Status:** ✅ Implementováno
 **Rozsah:** FE (pre-join detail view + member dashboard split + 5 mutation hooků + WorldAccessRequest renderer) + BE (nová entita `WorldAccessRequest` + 5 endpointů + 4 WS eventy + úprava existujícího providera)
 **Větev:** `feat/krok-2.4-world-detail-join`
 **Velikost:** ~20 FE souborů (~1000 ř.) + ~12 BE souborů (~350 ř.)

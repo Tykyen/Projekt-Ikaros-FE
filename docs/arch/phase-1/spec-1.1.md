@@ -1,7 +1,7 @@
 # Spec 1.1 — Login
 
 **Datum:** 2026-05-07
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.1
 **Závisí na:** 0.4 (auth infra) ✅, 1.0 (theme systém) ✅
 **Blokuje:** 1.2 (Registrace), 1.3 (Profil), 1.4 (Adresář), 1.5 (Presence), 1.6 (Přátelé)

@@ -1,6 +1,6 @@
 # Implementační plán 3.2b — Sdílený TipTap editor
 
-**Status:** Návrh — čeká na potvrzení PJ
+**Status:** ✅ Implementováno
 **Spec:** [spec-3.2.md §8](./spec-3.2.md)
 **Větev:** `feat/krok-3.2b-shared-tiptap-editor`
 **Odhad:** ~450 ř. FE + ~250 ř. FE testů

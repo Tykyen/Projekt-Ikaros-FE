@@ -1,6 +1,6 @@
 # Spec 1.0p — Indiánské visual upgrade
 
-**Status:** 🟡 Spec ke schválení (2026-05-11)
+**Status:** ✅ Implementováno
 **Datum:** 2026-05-11
 **Rozsah:** FE skin upgrade — `[data-theme="indiane"]` izolace, žádný globální dopad
 **Repo:** `Projekt-ikaros-FE`, větev `feat/krok-1.0p-indiane-upgrade` (vytvoří se při impl plánu)
@@ -580,5 +580,5 @@ Dle [base.md](../../../.claude/rules/base.md) + memory `feedback_workflow.md`:
 
 ---
 
-**Status:** 🟡 **Čeká na schválení uživatelem.**
+**Status:** ✅ Implementováno
 Po souhlasu → impl. plán `plan-1.0p.md` → po souhlasu → kód.

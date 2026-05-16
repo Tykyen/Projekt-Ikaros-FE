@@ -1,6 +1,6 @@
 # Implementační plán 2.4 — Detail světa + join flow
 
-**Status:** Návrh — čeká na potvrzení
+**Status:** ✅ Implementováno
 **Spec:** [spec-2.4.md](./spec-2.4.md)
 **Větev:** `feat/krok-2.4-world-detail-join` (vznikne až po souhlasu)
 **Odhad:** ~350 ř. BE + ~1000 ř. FE + ~400 ř. testů

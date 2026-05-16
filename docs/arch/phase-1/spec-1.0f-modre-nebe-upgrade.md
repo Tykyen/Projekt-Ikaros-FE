@@ -1,7 +1,7 @@
 # Spec 1.0f — Modré nebe visual upgrade (heraldic ornament tier)
 
 **Datum:** 2026-05-09
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.0f
 **Závisí na:** 1.0 ✅, 1.0b ✅ (původní pilot modre-nebe), 1.1 ✅
 **Reference:** Obrázek 1 z chatu 2026-05-09 (target), obrázek 2 (current state)

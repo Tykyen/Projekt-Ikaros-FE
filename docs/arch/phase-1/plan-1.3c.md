@@ -1,7 +1,7 @@
 # Plán 1.3c — Smazání účtu + tombstone + cleanup
 
 **Datum:** 2026-05-12
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-1.3c.md`](./spec-1.3c.md)
 **Odhad rozsahu:** ~9 fází, BE ~12 souborů + FE ~14 souborů, ~2–3 dny soustředěné práce
 

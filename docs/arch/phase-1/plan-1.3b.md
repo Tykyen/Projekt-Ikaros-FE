@@ -1,7 +1,7 @@
 # Plán 1.3b — Username change + Admin role infrastruktura
 
 **Datum:** 2026-05-12
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-1.3b.md`](./spec-1.3b.md)
 **Odhad rozsahu:** ~9 fází, BE 14 souborů + FE 22 souborů, ~3–4 dny soustředěné práce
 

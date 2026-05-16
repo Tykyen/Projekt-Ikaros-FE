@@ -1,7 +1,7 @@
 # Implementační plán — krok 2.1 Ikaros dashboard
 
 **Datum:** 2026-05-13
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-2.1.md`](./spec-2.1.md)
 **Větev:** `feat/krok-2.1-dashboard` (vytvořím při startu, oba repa)
 

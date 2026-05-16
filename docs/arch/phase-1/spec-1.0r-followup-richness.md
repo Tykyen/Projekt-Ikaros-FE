@@ -1,6 +1,6 @@
 # Spec 1.0r follow-up — Arabský svět richness upgrade (D = A + B + minimal C)
 
-**Status:** 🟡 Spec ke schválení (2026-05-11)
+**Status:** ✅ Implementováno
 **Datum:** 2026-05-11
 **Rozsah:** FE refinement upgrade — `[data-theme="arabsky-svet"]` izolace, žádný globální dopad
 **Předchozí spec:** [`spec-1.0r-arabsky-svet-upgrade.md`](spec-1.0r-arabsky-svet-upgrade.md) ✅ implementováno commit `d25c2d9`
@@ -748,7 +748,7 @@ Reduced-motion vypíná hamsa-pulse (opacity static 0.30).
 
 ---
 
-**Status:** 🟡 **Čeká na schválení uživatelem.**
+**Status:** ✅ Implementováno
 Po souhlasu → kód v jednom passu (žádný separátní impl. plán dokument — změny jsou aditivní, žádné nové assety).
 
 ---

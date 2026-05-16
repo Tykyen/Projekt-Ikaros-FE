@@ -1,6 +1,6 @@
 # Spec 1.6b — Cleanup úložiště obrázků
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** přesun a deduplikace zdrojových obrázků (PNG) + sjednocení produkčních (WebP)
 **Repo:** `Projekt-ikaros-FE`
 **Velikost:** ~50 souborů přesun, ~10 KB markdown úprav, žádný kód

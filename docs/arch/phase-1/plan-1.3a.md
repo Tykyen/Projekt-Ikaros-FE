@@ -1,7 +1,7 @@
 # Plán 1.3a — Profil (self-edit)
 
 **Datum:** 2026-05-08
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** `docs/arch/phase-1/spec-1.3a.md` ✅
 **Pořadí prací:** BE → FE → Asset pipeline → Tests
 

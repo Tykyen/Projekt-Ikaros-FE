@@ -1,7 +1,7 @@
 # Plán 1.0i — Pergamen visual upgrade
 
 **Datum:** 2026-05-10
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-1.0i-pergamen-upgrade.md`](spec-1.0i-pergamen-upgrade.md) v3 ✅
 **Audit:** [`audit-1.0i-pergamen.md`](audit-1.0i-pergamen.md) — 3 BLOCKER + 6 HIGH zapracováno do specu (B3, H3, H4 padly po vizuální revizi assetů)
 **Pořadí prací:** Pre-flight → Folder rename → Asset konverze → Tokens → Decorations → Mobile breakpoints → A11y polish → Test sweep

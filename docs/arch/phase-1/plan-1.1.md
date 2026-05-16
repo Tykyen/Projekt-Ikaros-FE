@@ -2,7 +2,7 @@
 
 **Datum:** 2026-05-07
 **Spec:** `docs/arch/phase-1/spec-1.1.md`
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 
 ---
 

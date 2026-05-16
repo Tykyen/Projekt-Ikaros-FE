@@ -1,6 +1,6 @@
 # Spec 1.6a — Reorganizace na feature-based moduly
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** strukturní refactor FE, žádná funkční změna
 **Repo:** `Projekt-ikaros-FE`, větev TBD (po domergování `feat/krok-1.2-registrace` a uzavření 1.3*)
 **Velikost:** velký diff (~80–120 souborů přesun + update importů), 0 ř. behavior diff

@@ -1,6 +1,6 @@
 # Spec 2.2 — Přehled vesmírů (`/ikaros/vesmiry`)
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** FE (WorldsPage + 1 nová sekce + sort/filter) + BE (1 nový field `maxPlayers` + 1 endpoint úprava)
 **Větev:** `feat/krok-2.1-dashboard` (pokračování — 2.1 a 2.2 spolu)
 **Velikost:** ~10 FE souborů (~500 ř.) + ~3 BE soubory (~50 ř.)

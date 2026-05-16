@@ -1,6 +1,6 @@
 # Spec 1.0q — Africké visual upgrade („Země předků")
 
-**Status:** 🟡 Spec ke schválení (2026-05-11)
+**Status:** ✅ Implementováno
 **Datum:** 2026-05-11
 **Rozsah:** FE skin upgrade — `[data-theme="africke"]` izolace, žádný globální dopad
 **Repo:** `Projekt-ikaros-FE`, větev `feat/krok-1.0q-africke-upgrade` (vytvoří se při impl plánu)
@@ -594,5 +594,5 @@ Dle [base.md](../../../.claude/rules/base.md) + memory `feedback_workflow.md`:
 
 ---
 
-**Status:** 🟡 **Čeká na schválení uživatelem.**
+**Status:** ✅ Implementováno
 Po souhlasu → `_asset-prompts.md` + impl. plán `plan-1.0q.md` → po souhlasu → kód.

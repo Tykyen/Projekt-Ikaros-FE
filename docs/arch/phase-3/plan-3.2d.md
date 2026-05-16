@@ -1,6 +1,6 @@
 # Implementační plán 3.2d — Zpracovat tab renderer
 
-**Status:** Návrh — čeká na potvrzení PJ
+**Status:** ✅ Implementováno
 **Spec:** [spec-3.2.md §10](./spec-3.2.md)
 **Větev:** `feat/krok-3.2d-zpracovat-article-renderer`
 **Odhad:** ~150 ř. FE + ~100 ř. FE testů

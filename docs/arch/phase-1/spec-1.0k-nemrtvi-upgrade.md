@@ -1,6 +1,6 @@
 # Spec 1.0k — Nemrtví visual upgrade
 
-**Status:** 📝 Draft — čeká na souhlas
+**Status:** ✅ Implementováno
 **Datum:** 2026-05-10
 **Rozsah:** FE skin upgrade — `[data-theme="nemrtvi"]` izolace, žádný globální dopad
 **Repo:** `Projekt-ikaros-FE`, větev `feat/krok-1.0k-nemrtvi-upgrade`

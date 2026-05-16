@@ -1,7 +1,7 @@
 # Spec 1.3b — Username change + Admin role infrastruktura
 
 **Datum:** 2026-05-12
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.3b
 **Závisí na:** 1.3a (Profil self-edit) ✅
 **Předchází:** 1.3c (Tombstone + cleanup), 1.4 (Adresář uživatelů)

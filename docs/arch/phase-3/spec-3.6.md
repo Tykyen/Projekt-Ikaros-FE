@@ -1,6 +1,6 @@
 # Spec 3.6 — Stránka Nápověda (`/ikaros/napoveda`)
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** FE (statická obsahová stránka + jedna feature komponenta) — středně velké
 **Repo:** `Projekt-ikaros-FE`, větev `feat/krok-3.6-napoveda`
 **Velikost:** odhad ~6–8 souborů / ~700–900 ř. (z toho ~70 % obsah)

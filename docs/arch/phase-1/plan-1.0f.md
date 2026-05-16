@@ -2,7 +2,7 @@
 
 **Datum:** 2026-05-09
 **Spec:** `spec-1.0f-modre-nebe-upgrade.md`
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 
 ---
 

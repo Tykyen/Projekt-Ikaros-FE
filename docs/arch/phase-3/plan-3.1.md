@@ -1,6 +1,6 @@
 # Implementační plán 3.1 — Admin správa Ikaros novinek (`/ikaros/novinky`)
 
-**Status:** Návrh — čeká na potvrzení PJ
+**Status:** ✅ Implementováno
 **Spec:** [spec-3.1.md](./spec-3.1.md)
 **Větve:**
 - BE: `feat/krok-3.1-be-ikaros-news-mgmt` (v `Projekt-ikaros`)

@@ -1,7 +1,7 @@
 # Plán 1.0k — Nemrtví visual upgrade
 
 **Datum:** 2026-05-10
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-1.0k-nemrtvi-upgrade.md`](spec-1.0k-nemrtvi-upgrade.md) ✅
 **Asset prompty:** [`prompts-1.0k-nemrtvi-assets.md`](prompts-1.0k-nemrtvi-assets.md) ✅
 **Pořadí prací:** Pre-flight → Asset pipeline → Tokens → Decorations → Animace → Mobile breakpoints → A11y polish → Test sweep

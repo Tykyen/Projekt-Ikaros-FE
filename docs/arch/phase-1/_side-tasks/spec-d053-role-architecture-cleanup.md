@@ -1,6 +1,6 @@
 # Spec D-053 — Role architecture cleanup (cross-repo)
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** FE + BE + datová migrace — velké
 **Repo:** `Projekt-ikaros-FE` + `Projekt-ikaros` (backend), bez větve („hodíme to do mainu" — viz volba autora)
 **Velikost:** odhad ~50 souborů změněno (BE 30, FE 14, migrace 1, testy ~10), ~700 ř.

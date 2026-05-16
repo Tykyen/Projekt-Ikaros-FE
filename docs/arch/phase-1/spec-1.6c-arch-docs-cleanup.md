@@ -1,6 +1,6 @@
 # Spec 1.6c — Cleanup `docs/arch/` (sjednocení konvence + index)
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Implementováno
 **Rozsah:** přejmenování / přesun spec dokumentů, vytvoření indexu, aktualizace `_spec-guide.md`
 **Repo:** `Projekt-ikaros-FE`
 **Velikost:** ~30 souborů (přesun + 1 nový index + úprava guide), žádný kód

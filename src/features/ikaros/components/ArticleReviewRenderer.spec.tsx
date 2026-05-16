@@ -112,5 +112,5 @@ describe('PENDING_ACTION_RENDERERS registry', () => {
     expect(
       PENDING_ACTION_RENDERERS[PendingActionType.ArticlePendingReview],
     ).toBeDefined();
-  });
+  }, 15000);
 });

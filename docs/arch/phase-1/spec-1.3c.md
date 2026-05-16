@@ -1,7 +1,7 @@
 # Spec 1.3c — Smazání účtu + tombstone + cleanup
 
 **Datum:** 2026-05-12
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.3c
 **Závisí na:** 1.3a (Profil) ✅, 1.3b (Admin role + ban) ✅
 **Předchází:** 1.4 (Adresář uživatelů — bude číst tombstones)

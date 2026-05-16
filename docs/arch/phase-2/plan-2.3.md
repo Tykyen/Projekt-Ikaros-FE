@@ -1,6 +1,6 @@
 # Implementační plán 2.3 — Vytvoření světa
 
-**Status:** Návrh — čeká na potvrzení
+**Status:** ✅ Implementováno
 **Spec:** [spec-2.3.md](./spec-2.3.md)
 **Větev:** `feat/krok-2.3-create-world` (vznikne až po souhlasu)
 **Odhad:** ~700 ř. FE + ~20 ř. BE + ~150 ř. testů

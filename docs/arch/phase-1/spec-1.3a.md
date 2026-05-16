@@ -1,7 +1,7 @@
 # Spec 1.3a — Profil (self-edit)
 
 **Datum:** 2026-05-08
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Roadmap:** `docs/roadmap-fe.md` → Fáze 1 → 1.3a
 **Závisí na:** 1.2 (Registrace) ✅, 1.1 (Login modal) ✅, 1.0 (theme systém) ✅
 **Předchází:** 1.3b (Username change + Admin role), 1.3c (Tombstone + cleanup)

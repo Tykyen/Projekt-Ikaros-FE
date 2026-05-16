@@ -1,7 +1,7 @@
 # Implementační plán — krok 3.6a Role matrix v Nápovědě
 
 **Datum:** 2026-05-13
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-3.6a-role-matrix.md`](./spec-3.6a-role-matrix.md)
 **Větev:** `feat/krok-3.6a-role-matrix` (vytvořím při startu)
 **Odhad:** ~6 souborů změněno, ~3 nové soubory, ~450 ř. změn.

@@ -1,7 +1,7 @@
 # Implementační plán — krok 1.2 Registrace + Superadmin seed
 
 **Datum:** 2026-05-08
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno
 **Spec:** [`spec-1.2.md`](./spec-1.2.md), [`_side-tasks/spec-superadmin-seed.md`](./_side-tasks/spec-superadmin-seed.md)
 **Větev:** `feat/krok-1.2-registrace` (vytvořím při startu)
 

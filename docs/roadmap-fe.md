@@ -18,7 +18,7 @@
 | 1 | Auth & Uživatelé | Ikaros | ✅ (1.0–1.8 hotovo) |
 | 2 | Ikaros jádro | Ikaros | ⬜ |
 | 3 | Ikaros komunita | Ikaros | ⬜ |
-| 4 | Globální chat (Hospoda) | Ikaros | ⬜ |
+| 4 | Globální chat (Hospoda + Rozcestí) | Ikaros | ⬜ |
 | — | **← Ikaros platforma hotová** | — | — |
 | 5 | Svět — základ | Svět | ⬜ |
 | 6 | Svět — chat | Svět | ⬜ |
@@ -308,6 +308,16 @@ Canonický presence stav (online = aktivní socket spojení) napříč platformo
 **Cleanup batch (2026-05-12):** D-049 ✅ idle stav (3-stavový, activity tracker, BE registry idle aggregate), D-050 ✅ last-seen tooltip (`relativeTimeCs` util + tooltip pro offline usery), D-052 ✅ privacy „neviditelný" mód (`User.hiddenPresence` + `PrivacySection` v profilu). Pre-existing failures vyřešené (`PendingActionCard.stories.tsx` TS cast, `RoleStar.tsx` barvy → tokeny, chevrons SVG `currentColor`).
 
 **Mimo rozsah:** D-051 (Redis adapter pro multi-instance deploy — čeká škálování).
+
+### - [x] 1.6 Cleanup — feature moduly, assets, docs/arch ✅ (2026-05-09)
+
+**Specy:** `docs/arch/phase-1/spec-1.6{a,b,c}.md`
+
+Strukturní úklid, **0 funkční změny** — proto v přehledové tabulce splývá s „1.0–1.8 hotovo".
+
+- [x] **1.6a — feature-based moduly** (merge `1a94bd9`, 5 commitů) — kód sjednocen do `src/features/<feature>/` (auth, profile, world, chat, admin, ikaros, users, friendships) + generika do `src/shared/`; zaveden path alias `@/` (`a350410`).
+- [x] **1.6b — assets cleanup** (`5eb4848`) — sjednocení úložiště obrázků: `assets-source/` (zdrojové PNG) vs `public/` (produkční WebP), deduplikace.
+- [x] **1.6c — docs/arch cleanup** (`eaba656`) — sjednocení konvence pojmenování spec dokumentů + `README.md` index.
 
 ### - [x] 1.7 Reset hesla, e-mail verifikace, změna e-mailu (mailer integrace) ✅ (2026-05-12)
 
@@ -686,16 +696,27 @@ Brownfield — BE modul `ikaros-discussions` existoval z feature-parity. Diskuze
 
 ---
 
-## Fáze 4 — Globální chat (Hospoda)
+## Fáze 4 — Globální chat (Hospoda + Rozcestí)
 
 **BE:** Socket.IO `GlobalChatGateway`  
 **WS eventy:** viz `Projekt-ikaros/docs/websocket-api.md`
 
 ### - [ ] 4.1 Hospoda (`/chat`)
-- [ ] Interdimenzionální chat, kanály, real-time zprávy
+- [ ] Interdimenzionální chat, kanály (Hospoda, Pokec), real-time zprávy
 - [ ] Emotes (`:shortcode:`), typing indikátory
 
-### - [ ] 4.2 Zprávy — rozšíření
+### - [ ] 4.2 Rozcestí (`/chat/rozcesti`)
+- [ ] Atmosférická roleplay místnost — bez kostek a mechanik, hra na jeden večer
+- [ ] 3 nezávislé místnosti (Rozcestí I.–III.) — víc her současně
+- [ ] 3 styly prostředí (Fantasy / Sci-fi / Mystika), každý 20 lokací
+- [ ] Ilustrace lokace jako pozadí chatu + slovní popis místa (📖 panel)
+- [ ] Přepínání stylu/lokace v záhlaví, synchronizace stylu přes WS (`SetRoomStyle`)
+- [ ] „Postava v Rozcestí" (≤200 znaků) — editace v Osobní kartě profilu
+- [ ] Barva textu uživatele, šepot (whisper) konkrétnímu hráči
+- [x] Ilustrace lokací (60 ks) migrovány ze starého Matrixu, převedeny na `.webp` → `public/images/rozcesti/`
+- [ ] Slovní popisy 60 lokací — migrovat ze starého Matrixu (`descriptions/{fantasy,scifi,mystic}.ts`)
+
+### - [ ] 4.3 Zprávy — rozšíření
 - [ ] Reply, reakce (emoji), přílohy
 
 ---
