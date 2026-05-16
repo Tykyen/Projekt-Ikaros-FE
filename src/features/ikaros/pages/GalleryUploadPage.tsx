@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ArrowLeft, Upload, Save, Send } from 'lucide-react';
@@ -37,15 +37,17 @@ export default function GalleryUploadPage() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('ostatni');
 
-  // Edit mód — předvyplnit z existujícího obrázku.
-  useEffect(() => {
-    if (existing) {
-      setTitle(existing.title);
-      setDescription(existing.description ?? '');
-      setCategory(existing.category);
-      setPreview(cloudinaryThumb(existing.imageUrl, 800));
-    }
-  }, [existing]);
+  // Edit mód — předvyplnit z existujícího obrázku. Render-time pattern
+  // (stráž přes prev id) místo useEffect → žádný extra render, hydratace
+  // proběhne jakmile query dodá data.
+  const [hydratedId, setHydratedId] = useState<string | null>(null);
+  if (existing && existing.id !== hydratedId) {
+    setHydratedId(existing.id);
+    setTitle(existing.title);
+    setDescription(existing.description ?? '');
+    setCategory(existing.category);
+    setPreview(cloudinaryThumb(existing.imageUrl, 800));
+  }
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const picked = e.target.files?.[0];

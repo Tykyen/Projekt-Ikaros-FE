@@ -307,7 +307,7 @@
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="chat"]            { --section-color: var(--theme-section-pearl); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="administrace"]    { --section-color: var(--theme-section-silver); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-svety"]      { --section-color: var(--theme-section-cobalt); }
-[data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-diskuze"]    { --section-color: var(--theme-section-pearl); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]    { --section-color: var(--theme-section-pearl); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-clanky"] { --section-color: var(--theme-section-cream); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"]{ --section-color: var(--theme-section-silver); }
 
@@ -335,7 +335,7 @@
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="chat"]::before            { background-image: var(--asset-sigil-chat); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="administrace"]::before    { background-image: var(--asset-sigil-admin); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-svety"]::before      { background-image: var(--asset-sigil-worlds); }
-[data-theme="mesic"][data-shell="ikaros"] [data-section-key="moje-diskuze"]::before    { background-image: var(--asset-sigil-talk); }
+[data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]::before    { background-image: var(--asset-sigil-talk); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-clanky"]::before { background-image: var(--asset-sigil-book); }
 [data-theme="mesic"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"]::before{ background-image: var(--asset-sigil-image); }
 

@@ -448,7 +448,7 @@
 }
 
 /* MOJE DISKUZE — Akoma (srdce, trpělivost) */
-[data-theme="africke"][data-shell="ikaros"] [data-section-key="moje-diskuze"]::before,
+[data-theme="africke"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]::before,
 [data-theme="africke"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before {
   content: '';
   position: absolute;

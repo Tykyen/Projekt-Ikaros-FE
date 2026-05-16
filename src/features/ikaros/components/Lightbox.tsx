@@ -35,6 +35,15 @@ export function Lightbox({
   const [myRating, setMyRating] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
+  // Reset „mého hodnocení" při přepnutí obrázku — render-time pattern
+  // (set state během renderu se stráží přes prev id; React doporučený postup
+  // místo useEffect, žádný extra render).
+  const [ratedImageId, setRatedImageId] = useState(image?.id);
+  if (image?.id !== ratedImageId) {
+    setRatedImageId(image?.id);
+    setMyRating(0);
+  }
+
   const goPrev = useCallback(() => {
     onIndexChange((index - 1 + images.length) % images.length);
   }, [index, images.length, onIndexChange]);
@@ -62,11 +71,6 @@ export function Lightbox({
       document.body.style.overflow = prev;
     };
   }, []);
-
-  // Reset „mého hodnocení" při přepnutí obrázku.
-  useEffect(() => {
-    setMyRating(0);
-  }, [image?.id]);
 
   if (!image) return null;
 

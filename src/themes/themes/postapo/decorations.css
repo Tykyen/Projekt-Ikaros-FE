@@ -346,7 +346,7 @@
   --section-color: var(--theme-section-yellow);
 }
 
-[data-theme="postapo"][data-shell="ikaros"] [data-section-key="moje-diskuze"],
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"],
 [data-theme="postapo"][data-shell="ikaros"] [class*="mojeDiskuzeSection"] {
   --section-color: var(--theme-section-rust);
 }

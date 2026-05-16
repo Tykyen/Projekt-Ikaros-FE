@@ -219,8 +219,12 @@ Dedikovaná stránka se všemi záložkami uživatele + správa připnutí.
 - **3 taby** — Diskuze / Články / Obrázky; aktivní tab v URL `?typ=clanky`
   (vzor `?sekce=` z `HelpPage`, `?slozka=` z pošty). Neznámý `typ` → fallback
   na default tab. Back/forward funguje.
-- Obsah tabu = mřížka karet — **reuse** `ArticleCard` / `GalleryCard` / karta
-  diskuze, žádné nové dlaždice.
+- Obsah tabu = mřížka **jednotných karet** `FavoriteCard` (sdílená v rámci
+  stránky). *Odchylka od původního návrhu „reuse `ArticleCard`/`GalleryCard`/
+  karta diskuze" (implementace 2026-05-16): tři existující karty jsou
+  neexportované, mají nesourodou strukturu (`<li>` vs `<Link>` vs `<button>`)
+  a každá vlastní `categories` závislost — jednotná `FavoriteCard` dala čistší
+  kód i konzistentní vzhled stránky Oblíbené.*
 - Každá karta má **pin toggle** (ikona `Pin`): připnuté zvýrazněné. Při dosažení
   limitu 5 v daném tabu jsou nepřipnuté pin ikony `disabled` + tooltip
   „Připnout lze max 5 — nejdřív něco odepni". (Limit reálně enforcuje BE `409`.)

@@ -2,7 +2,7 @@
 
 > Soubor obsahuje **pouze otevřené a částečně řešené** dluhy.
 > Historie uzavřených dluhů dohledatelná v git logu (`git log --all -- docs/dluhy.md`).
-> Stav k 2026-05-14.
+> Stav k 2026-05-16.
 
 ---
 
@@ -108,13 +108,6 @@
 
 ---
 
-### D-NEW-pending-actions-wired — PendingActionsModule nebyl v AppModule (uzavřeno 3.2a)
-**Stav:** ✅ Uzavřeno 2026-05-15, commit `8b9e386e`.
-**Co bylo:** `PendingActionsModule` (1.4 Zpracovat infra) existoval, ale nebyl importovaný v `AppModule`. `FriendshipsModule` (1.8) + `WorldsModule` (2.4) injectovaly `PendingActionsService` — DI by selhalo při startu. Objeveno při 3.2a auditu.
-**Fix:** Přidán `PendingActionsModule` do `AppModule.imports`.
-
----
-
 ### D-NEW-search-be — Server-side full-text search článků (z 3.2)
 **Stav:** Otevřený.
 **Kontext:** 3.2 Přehled článků filtruje client-side (`filterArticles` nad `useArticles()` array). OK do ~500 článků; pak je přenos celého listu neefektivní.
@@ -160,151 +153,7 @@
 
 ---
 
-## Vyřešené (historie, zachovat pro audit trail)
-
-### D-072 — `chatColor` na backendu vůbec neexistoval
-**Stav:** ✅ Uzavřeno 2026-05-16.
-**Co bylo:** `/ikaros/profil` padala všem (`Cannot read properties of undefined (reading 'toUpperCase')`). Původní diagnóza („starý účet bez `chatColor`, chybí migrace") byla **chybná** — backend pole `chatColor` neměl vůbec: ani ve `user.schema.ts`, ani v `User` interface, ani v `UpdateUserDto`, ani v repository mapperu. FE typ `User.chatColor: string` deklaroval pole jako povinné, FE ukládal barvu přes `PATCH /users/me { chatColor }` — ale DTO whitelist hodnotu tiše zahazoval. Featura „Barva chatu" (`AppearanceSection` + `ChatColorPicker`, od kroku 1.6a) byla end-to-end mrtvá; `user.chatColor` byl `undefined` u **každého** uživatele.
-**Fix (FE):** Defenzivní fallback `#FFFFFF` v `ProfileHeader.tsx` a `AppearanceSection.tsx` (zabránit crashi).
-**Fix (BE):** `chatColor: string` doplněn do `user.schema.ts` (`@Prop default '#FFFFFF'`), `User` interface, `UpdateUserDto` (`@Matches /^#[0-9a-fA-F]{6}$/`), `users.repository.toEntity` (`?? '#FFFFFF'` fallback pro dokumenty bez pole), `users.service.update` (propaguje `dto.chatColor`). Migrace netřeba — mapper sklápí existující dokumenty. +2 service testy. BE tsc čistý, 72/72 users testů zelených.
-
----
-
-### D-073 — BE polovina kroku 1.3a (profil) nikdy nevznikla
-**Stav:** ✅ Uzavřeno 2026-05-16.
-**Co bylo:** Objeveno při auditu navazujícím na D-072. [plan-1.3a.md §2](arch/phase-1/plan-1.3a.md) specifikoval BE práci (pořadí „BE → FE"); FE část vznikla, BE část ne. Chybělo:
-- **6 profilových polí** — `city`, `bio`, `characterName`, `characterBio`, `characterAvatarUrl`, `themeId` (+`lastLoginAt`) — ani ve schématu, ani v `User` interface / `UpdateUserDto` / mapperu. Editace profilu (město, bio, postava) se tiše zahazovala přes DTO whitelist.
-- **`PATCH /users/me`** — controller měl jen `@Patch(':id')`; `me` spadlo do parametrické routy → 403 / 404. Editace profilu nefungovala nikomu.
-- **4 avatar endpointy** — `POST/DELETE /users/me/avatar` a `…/character/avatar` — FE je volal, BE je neměl → 404.
-- **`lastLoginAt`** — FE zobrazoval „Poslední přihlášení", BE pole neexistovalo.
-**Fix (BE):** (1) 7 polí do `user.schema.ts` + `User` interface + `toEntity` mapper + `UpdateUserDto` (`city ≤100`, `bio ≤1000`, `characterName ≤64`, `characterBio ≤1000`, `themeId ≤64`, `defaultAvatarType male|female|being`); `users.service.update` je propaguje. (2) Nový `@Patch('me')` deklarovaný **před** `@Patch(':id')` (routing priorita), blokuje změnu username (jde přes request-flow). (3) `UploadService.uploadUserImage` (deterministický `public_id: 'main'`, overwrite → žádné orphany) + `deleteUserImage`; 4 endpointy v `UsersController`, `UsersModule` importuje `UploadModule`. (4) `UsersRepository.updateLastLogin` volaný z `auth.service` `login()` (+ `register()` ho ukládá rovnou do `save`). +5 testů (service 2, auth 2 + 1 assertion). BE tsc čistý, 136/136 users+auth unit testů, e2e bootuje (modul graf OK).
-**Navíc:** `defaultAvatarType` dostal `@Prop({ enum, default: 'male' })` + `toEntity` fallback `?? 'male'` (FE typ ho čeká povinný; dřív `@Prop()` bez defaultu).
-**Zbytek:** Avatar endpointy nemají controller/e2e test (thin delegace; `UploadService` obaluje Cloudinary SDK — pokrytí až s users e2e harness).
-
----
-
-### D-070 — Hardcoded barvy v module CSS (`lint:colors` červený)
-**Stav:** ✅ Uzavřeno 2026-05-16.
-**Co bylo:** `lint:colors` hlásil 10 hardcoded hex barev. Záznam D-070 byl zastaralý — uváděl `IkarosEventCard/Modal` (ty už byly čisté); reálná porušení byla v Discussion/Reviews CSS (fáze 3.4): `var(--star-gold, #e0a82e)` ×3 a `var(--bg-base, #fff)` ×7 — hex jako fallback uvnitř `var()`.
-**Fix:** `--star-gold` je definovaný (`prose-tokens.css`) → drop hex fallback. `--bg-base` je nedefinovaný (phantom token) → hex fallback `#fff` nahrazen definovaným theme-independent bílým tokenem `var(--status-band-fg)`. Zero behavior change, žádný shared/theme edit. `lint:colors` nyní zelený.
-
-### D-057 — Friend-only privacy v profilu / poště
-**Stav:** ✅ Uzavřeno 2026-05-15 (fáze 3.5).
-**Co bylo:** Veřejný profil dostupný každému přihlášenému; pošta bez omezení odesílatele.
-**Fix:** Pole `User.profileVisibility: 'public' | 'friends'` (default `public`). BE enforce — `publicProfileV14` (403 `PROFILE_FRIENDS_ONLY` pro nepřítele/ne-admina/ne-self), `IkarosMessagesService.create` (403 `RECIPIENT_FRIENDS_ONLY`; odpověď ve vlákně + Admin výjimka). FE — přepínač „Jen pro přátele" v profilu (`PrivacySection`), 403 handling v poště i na veřejném profilu. Friend-check přes `FriendshipsService.areFriends`.
-
-### D-NEW-mail-useUnreadCount-modul — `useUnreadCount` ve špatném feature modulu (dluh A z 3.5)
-**Stav:** ✅ Uzavřeno 2026-05-15 (fáze 3.5).
-**Co bylo:** `useUnreadCount` (pošta) žil v `src/features/chat/api/useMessages.ts`, ač s chatem nesouvisí.
-**Fix:** Přesunut do `src/features/ikaros/api/useMail.ts` (kde vznikly i ostatní pošta-hooky). `chat/api/useMessages.ts` smazán, barrel `chat/index.ts` i header import přesměrovány. Při tom opraven latentní bug — `getUnreadCount` BE vracel `{ messages, pendingRequests }`, FE typ čekal `{ unreadCount, pendingRequestCount }` → header badge byl trvale 0; sjednoceno na `{ unreadCount }`.
-
-### D-NEW-mail-legacy-world-join — Legacy `world_join_request` v `IkarosMessage` (dluh B z 3.5)
-**Stav:** ✅ Uzavřeno 2026-05-15 (fáze 3.5).
-**Co bylo:** `IkarosMessage` nesl `actionType`/`actionWorldId`/`actionUserId`/`actionResolved` + endpoint `/resolve` + handler `handleJoinRequest` — parity-relikt starého systému, nahrazený modulem `pending-actions` + `WorldAccessRequestProvider`.
-**Fix:** Ověřeno, že `world.join.requested` nemá emittera (mrtvý kód) → odstraněna všechna action pole, `/resolve`, `ResolveIkarosMessageDto`, `handleJoinRequest`, `countPendingRequests`, `resolveIfPending`. `getUnreadCount` → `{ unreadCount }`. World-join flow přes `pending-actions` nedotčen.
-
-### D-NEW-mailer-module-not-imported — `MailerModule` (@Global) nikdo neimportoval
-**Stav:** ✅ Uzavřeno 2026-05-15 (objeveno při 3.5 e2e).
-**Co bylo:** `MailerModule` je `@Global`, ale žádný modul ho explicitně neimportoval — `MailerService` se do DI dostával jen náhodným tranzitivním načtením přes jiný modul. Úklid module grafu v 3.5 (dluh B — `IkarosMessagesModule` přestal importovat `WorldsModule`) ten řetězec přerušil → e2e s částečným module grafem padaly na „MailerService not available in UsersModule".
-**Fix:** `UsersModule` importuje explicitně `MailerModule` + `SecurityTokensModule` (oba @Global, `UsersService` je konzumuje). `FriendshipsModule` analogicky importuje `PendingActionsModule`. Moduly jsou nyní soběstačné i v částečných grafech.
-**Pozn.:** Stejný anti-pattern byl i jinde — viz `D-NEW-e2e-chat-push-wiring`.
-
-### D-NEW-e2e-chat-push-wiring — `@Global` moduly bez explicitního importu (ChatModule/WorldsModule/FriendshipsModule)
-**Stav:** ✅ Uzavřeno 2026-05-16.
-**Co bylo:** Tři BE e2e suity (`auth-refresh`, `worlds-join`, `auth-register-check`) nebootovaly — `Nest can't resolve … PushService in ChatModule` → po opravě → `PendingActionsService in WorldsModule`. Řetěz `@Global`-not-imported bugů: `ChatService` konzumuje `PushService`, `WorldAccessRequestProvider` konzumuje `PendingActionsService`, `FriendshipsModule` konzumuje `PendingActionsService` — žádný host modul cílový `@Global` modul explicitně neimportoval, spoléhalo se na náhodné tranzitivní načtení. Pre-existující (ověřeno `git stash`).
-**Fix:** `ChatModule` importuje `PushModule`, `WorldsModule` importuje `PendingActionsModule`, `FriendshipsModule` importuje `PendingActionsModule`. Po opravě bootovaly všechny suity; zbylé assertion-faily → `D-NEW-e2e-stale-assertions`.
-
-### D-NEW-e2e-stale-assertions — `worlds-join` + `game-events` e2e zastaralé assertions
-**Stav:** ✅ Uzavřeno 2026-05-16.
-**Co bylo:** Po opravě wiringu suity bootovaly, ale 6 testů padalo na assertions zastaralých vůči refaktorům:
-- **D-053 renumber `WorldRole`** — testy používaly stará čísla (PomocnyPJ 2→4, PJ 3→5, Hrac 0→2). `game-events-role-gating` nastavoval PomocnyPJ na číslo 2 (= dnes Hrac) → 403 místo 201.
-- **2.4 JOIN refaktor** — `worlds-join` cílil na zrušený unified-join (open/private svět dnes vyžaduje `POST /access-request`, ne `/join`) + `world_join_request` IkarosMessage (zrušeno dluhem B).
-**Fix:** `game-events-role-gating.e2e` — opravena 4 čísla rolí na post-D-053 hodnoty. `worlds-join.e2e` — kompletně přepsán proti 2.4 kontraktu (public→join→Čtenář; open/private→access-request→`WorldAccessRequest`; approve flow; closed→403), 10 testů. Ověřeno proti aktuálnímu service kódu, ne slepě. **Celá e2e suite zelená — 10/10 suit, 73/73 testů.**
-
-### D-NEW-users-toEntity-fields — `users.repository.toEntity` zahazoval 16 polí
-**Stav:** ✅ Uzavřeno 2026-05-15 (objeveno při 3.5 D-057).
-**Co bylo:** `MongoUsersRepository.toEntity` mapoval jen 21 základních polí — chybělo 16 rozšíření (`isDeleted`, `deletionRequestedAt`, `bannedAt/Until`, `adminPermissions`, `hiddenPresence`, `profileImageUrl`…). `repo.findById` jede přes tento mapper → pole byla `undefined`. `publicProfileV14` tak měl `isTombstone` vždy `false` (tombstone/pending uživatelé se v profilu tiše neskrývali). Unit testy to nechytly — mockují repository.
-**Fix:** `toEntity` doplněn o všech 16 polí. Behavior change — tombstone hiding ap. nyní reálně funguje.
-
-### D-NEW-postcount-race — `postCount` diskuze se počítal read-then-write (z 3.4)
-**Stav:** ✅ Uzavřeno 2026-05-15.
-**Soubory:** `backend/src/modules/ikaros-discussions/` — `repositories/ikaros-discussions.repository.ts`, `ikaros-discussions.service.ts`.
-**Co bylo:** `postCount` se aktualizoval načti-pak-zapiš (`update(id, { postCount: discussion.postCount ± 1 })`) v `addPost`/`deletePost`/`resolveReport` → při souběhu hrozila ztracená inkrementace.
-**Fix:** Nová repo metoda `adjustPostCount(id, delta, touchActivity?)` — atomický `$inc` (zrcadlí `adjustLikeCount`), volitelně posune `lastActivityUtc`, sklápí záporný `postCount` na 0. Service všechny tři cesty přepnuty na ni; `addPost` ani `resolveReport` už kvůli čítači nečtou diskuzi. Test `addPost` ověřuje `adjustPostCount('disc1', 1, true)`.
-
-### D-071 — GET /ikaros-gallery/:id s nevalidním ObjectId vrací 500 místo 404
-**Stav:** ✅ Uzavřeno 2026-05-15.
-**Soubory:** `backend/src/modules/ikaros-gallery/repositories/ikaros-gallery.repository.ts` (`findById`), `ikaros-gallery.repository.spec.ts`.
-**Co bylo:** Nevalidní `:id` (ne-ObjectId) → `model.findById(id)` vyhodil Mongoose `CastError`, neošetřený → 500 místo 404.
-**Fix:** `findById` na začátku validuje `isValidObjectId(id)`; při neplatném vrací `null`. Všechny service metody (`findById`/`update`/`delete`/`submit`/`approve`/`reject`/`rate`) volají `repo.findById` jako první existence-check → jedna oprava pokrývá všechny cesty, výsledek je standardní 404 (`GALLERY_ITEM_NOT_FOUND`). +2 regresní testy.
-
----
-
-### D-066 — TipTap rich-text editor pro IkarosNews content
-**Stav:** ✅ Uzavřeno 2026-05-15 (3.2b dodala `<RichTextEditor>`, retrofit novinek dotažen v navazujícím commitu).
-**Co bylo:** Novinky (`NewsFormModal`) měly plain `<textarea>` jako MVP z 3.1; rich-text se měl dodělat s 3.2.
-**Fix:** `NewsFormModal` — `<textarea>` nahrazena `<RichTextEditor>` přes `react-hook-form` `Controller`. `NewsCard` — náhled stripuje HTML na plain text (`toExcerpt`), backward-kompatibilní se staršími plain-text novinkami. RichTextEditor dostal `ariaLabel` prop (accessibility + testovatelnost). `NewsFormModal.spec.tsx` mockuje RichTextEditor na textarea.
-**Pozn.:** Při retrofitu objeven a opraven latentní bug — `editorProps: undefined` shazoval TipTap `createView` (`Cannot read dispatchTransaction`); nyní vždy `{}`.
-
----
-
-### D-NEW-role-name-mismatch — BE `SpravceClankuu` vs FE `SpravceClanku`
-**Stav:** ✅ Uzavřeno 2026-05-15.
-**Co bylo:** BE enum měl překlepy v názvech (`SpravceClankuu` dvojité „u", `SpravceDisukzi` přehozené „su"); FE enum měl opravené názvy. Numerické hodnoty se shodovaly (runtime OK), ale názvy se lišily.
-**Fix:** BE enum `UserRole` přejmenován na `SpravceClanku` / `SpravceDiskuzi` (7 souborů, hodnoty 10/12 zachovány). DB data + JWT beze změny. BE 1017 testů zelených.
-
----
-
-### D-NEW-touch-targets — Malé touch targety na mobilu
-**Stav:** ✅ Uzavřeno 2026-05-15.
-**Co bylo:** 3.2 filtr-chipy a rating hvězdy byly na mobilu pod 44×44 px.
-**Fix:** `@media (max-width: 768px)` — `.chip`/`.chipActive` (ArticlesPage + ArticleEditorPage) `min-height: 44px`; `.rateBtn` (ArticleDetailPage) `min-width/height: 44px`.
-
----
-
-### D-065 — Legacy `isActive` field na IkarosNews schemě
-**Stav:** ✅ Uzavřeno 2026-05-15.
-**Soubory:** `backend/src/modules/ikaros-news/schemas/ikaros-news.schema.ts`, `interfaces/ikaros-news.interface.ts`, `repositories/ikaros-news.repository.ts`, `ikaros-news.service.ts`, `repositories/ikaros-news.repository.spec.ts`, `ikaros-news.service.spec.ts`, FE: `src/shared/types/index.ts`, 5 testů.
-**Co bylo:** Legacy boolean `isActive` (default `true`) zůstával na schemě po zavedení nového `archived` flagu v 3.1. Pole se nikde nenastavovalo na `false`, ale v `buildFilter` se defensivně přidávalo `isActive: true` do každého MongoDB query. Dead code + cognitive load.
-**Fix:** (1) Schema: odstraněno `@Prop isActive`. (2) Interface (entity + response): odstraněno pole. (3) Repository toEntity: nečte `isActive`. (4) Repository buildFilter: zjednodušeno — `active` → `{archived: {$ne: true}}`, `archived` → `{archived: true}`, `all` → `{}`. (5) Service create: neukládá `isActive`. (6) Service joinAuthorNames: nevrací v response. (7) FE `IkarosNews` type: odstraněno pole.
-**Data migrace:** Žádná — orphan `isActive` v existujících Mongo dokumentech není problém (MongoDB schema-less, pole ignorováno).
-**Tests:** BE 46/46 + FE 427/427 (žádné regrese, jen mock data zbavena `isActive: true`).
-
----
-
-### D-068 — IkarosNews paginace `?limit=&offset=` + `/count` endpoint
-**Stav:** ✅ Uzavřeno 2026-05-15, commit `584946d0`.
-**Soubory:** `backend/src/modules/ikaros-news/ikaros-news.controller.ts`, `ikaros-news.service.ts`, `repositories/ikaros-news.repository.ts`, `interfaces/ikaros-news-repository.interface.ts`.
-**Co bylo:** Dashboard 2.1 sekce Novinky načítala plný list bez paginace (`data.slice(0,5)` na FE). Tento dluh byl původně sledován v `roadmap-fe.md` jako **D-NEW2 z 2.1**. PJ ho rozdělal jako součást nějaké session, kód byl uncommitted v ikaros-news/. Při 3.1 spec auditu byl objeven a commitnut samostatně před fází A.
-**Fix:** `parsePositiveInt` helper s `max=100`. `GET ?limit=&offset=` + samostatný `GET /count` endpoint (Nest-friendly místo X-Total-Count headeru). Repository `findActive(opts?)` + `countActive()`. BC zachována — bez query params se chová jako dříve.
-**Pozn.:** Číslo **D-068** zvoleno k vyhnutí kolizi — původní komment v kódu (PJ rozdělaná práce) odkazoval na `D-061`, ale to číslo už bylo zabráno otevřeným dluhem „Mongo replica set pro atomické transakce v approveAccessRequest" (sekce „Otevřené" výše). Při rebrandu 3.1 byl label v kódu sjednocen na **D-068**.
-
----
-
-### D-069 — IkarosNews authz: zúžení z `WorldRole.PJ` na Admin/Superadmin
-**Stav:** ✅ Uzavřeno 2026-05-15, commit `584946d0`.
-**Soubory:** `backend/src/modules/ikaros-news/ikaros-news.service.ts` (`assertCanWrite`), `ikaros-news.controller.ts` (ApiOperation summary), `ikaros-news.service.spec.ts` (test cases).
-**Co bylo:** BE `assertCanWrite(role)` měl podmínku `role > UserRole.PJ`, což pouštělo `WorldRole.PJ` (world-scoped role) k vytváření/mazání platformového obsahu. Sémantická chyba — Ikaros novinky jsou globální platforma, PJ je world role. Sledováno jako **D-NEW3 z 3.1a**.
-**Fix:** Zúžení na `role !== Admin && role !== Superadmin → 403`. Strukturované error code `FORBIDDEN_PLATFORM_ROLE` a `IKAROS_NEWS_NOT_FOUND` (D-009 konvence). Spec testy přejmenovány „PJ NESMÍ vytvořit/smazat" (D-069 label).
-**Pozn.:** Číslo **D-069** zvoleno k vyhnutí kolizi — původní komment v kódu (PJ rozdělaná práce) odkazoval na `D-063`, ale to bylo zabráno otevřeným dluhem „Anon viewing public/open světů" (sekce „Otevřené" výše). Při rebrandu 3.1 byl label v kódu sjednocen na **D-069**.
-**Navazující:** 3.1 přidalo `PATCH`, `POST /:id/archive`, `POST /:id/unarchive` endpointy — všechny dědí stejný `assertCanWrite`.
-
----
-
 ## Částečně řešené (zbývající práce)
-
-### D-009 — BE `code` field v error responses (DOKONČENO 2026-05-14)
-**Stav:** **0 zbývajících** plain string exceptions v `backend/src` — ověřeno greepem.
-**Historie:**
-- **Batch 1** (1.3a): 7 míst (ConflictException codes).
-- **Batch 2** (post-1.3b, 2026-05-12): 350 exceptions batch transform script → 27 service souborů.
-- **Batch 3** (2026-05-14, várka A): 5 menších modulů — `universe`, `calendars`, `npc-templates`, `dungeon-maps`, `emotes` (vč. template-literal). +3 z D-063 šťouchu: `world-currencies` ×2 + `ikaros-news`.
-- **Batch 4** (2026-05-14, várka B): `world-calendar-config` (5), `sounds` (15), `world-news` (10 vč. 2 multi-line).
-- **Batch 5** (2026-05-14, finální sweep): `chat` (36), `pages` (12), `maps` (12), `character-subdocs` (12), `timeline` (11), `characters` (10), `ikaros-articles` (16), `ikaros-discussions` (16), `ikaros-gallery` (16), `world-weather` (16), `users.service` (14), `ikaros-messages` (8), `auth.service` (7), `campaign.service` (24), `users.controller` (8), `world-currencies` (5 zbylých), `map-templates.controller` (5), `worlds.controller` (2), `legacy-calenders.controller` (2), `upload.controller` (2), `campaign.controller` (1), `game-events.controller` (1), `global-chat.service` (1), `system-presets.controller` (1), `admin.guard` (1). Celkem **~240 míst** přes 25 souborů, **BE 942/942 testů zelených**, tsc čistý.
-**Codes konvence (etablovaná):** `{MODULE}_{ENTITY}_NOT_FOUND` (např. `CAMPAIGN_SUBJECT_NOT_FOUND`, `MAP_SCENE_NOT_FOUND`), `{MODULE}_FORBIDDEN` / `{MODULE}_ACCESS_DENIED` pro auth, sdílené `WORLD_NOT_FOUND`, `USER_NOT_FOUND`, `NOT_WORLD_MEMBER`, `PENDING_MEMBERSHIP`, `INVALID_CREDENTIALS`, `INVALID_REFRESH_TOKEN` napříč moduly.
-**Drobné nesrovnalosti k diskuzi:** `map-templates.controller.ts:68/85/97` házelo `NotFoundException` pro forbidden — *sémanticky špatně*, nesahal jsem (mimo D-009 scope). Při dalším šťouchu do `maps` přepsat na `ForbiddenException` (+ `CAMPAIGN_FORBIDDEN` pattern).
-
----
 
 ### D-016 — BE auth audit (rolling)
 **Soubor:** `Projekt-ikaros/backend/src/modules/{worlds,npc-templates,maps,universe}/*.controller.ts`

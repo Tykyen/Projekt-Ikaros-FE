@@ -355,7 +355,7 @@ export const mesicTheme: Theme = {
 
     '--asset-icon-administrace':    ICON_ADMINISTRACE,
     '--asset-icon-moje-svety':      ICON_MOJE_SVETY,
-    '--asset-icon-moje-diskuze':    ICON_MOJE_DISKUZE,
+    '--asset-icon-oblibene-diskuze':    ICON_MOJE_DISKUZE,
     '--asset-icon-oblibene-clanky': ICON_OBLIBENE_CLANKY,
     '--asset-icon-oblibene-obrazky':ICON_OBLIBENE_OBRAZKY,
 

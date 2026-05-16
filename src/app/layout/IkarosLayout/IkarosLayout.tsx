@@ -224,11 +224,14 @@ function SidebarContent({
 
 /**
  * 3.7 — vybere položky pro sidebar sekci Oblíbené: připnuté (v pořadí
- * `pinnedIds`), a když uživatel nic nepřipnul, fallback na prvních 5 oblíbených.
+ * `pinnedIds`), a když uživatel nic nepřipnul, fallback na 5 naposledy
+ * přidaných oblíbených. Pořadí přidání = index ve `favoriteIds` (BE pushuje
+ * na konec) → konec pole je nejnovější.
  */
 function pinnedFirst<T extends { id: string }>(
   items: T[] | undefined,
   pinnedIds: string[] | undefined,
+  favoriteIds: string[] | undefined,
 ): T[] {
   if (!items || items.length === 0) return [];
   const pinned = pinnedIds ?? [];
@@ -239,7 +242,13 @@ function pinnedFirst<T extends { id: string }>(
       .filter((i): i is T => !!i)
       .slice(0, 5);
   }
-  return items.slice(0, 5);
+  // Fallback — `my-favorites` ($in) nezachovává pořadí, takže seřadíme dle
+  // indexu ve favoriteIds a vezmeme 5 naposledy přidaných (nejnovější první).
+  const order = favoriteIds ?? [];
+  const sorted = [...items].sort(
+    (a, b) => order.indexOf(a.id) - order.indexOf(b.id),
+  );
+  return sorted.slice(-5).reverse();
 }
 
 interface FavoriteSectionItem {
@@ -332,14 +341,17 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   const sidebarDiscussions = pinnedFirst(
     favDiscussions,
     currentUser?.pinnedDiscussionIds,
+    currentUser?.favoriteDiscussionIds,
   );
   const sidebarArticles = pinnedFirst(
     favArticles,
     currentUser?.pinnedArticleIds,
+    currentUser?.favoriteArticleIds,
   );
   const sidebarGallery = pinnedFirst(
     favGallery,
     currentUser?.pinnedGalleryIds,
+    currentUser?.favoriteGalleryIds,
   );
 
   return (
@@ -383,14 +395,6 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
             <Link to="/ikaros/vesmiry?filter=mine" className={s.showAllLink} onClick={onNav}>Zobrazit vše →</Link>
           )}
         </div>
-      </div>
-
-      <div className={s.section} data-section-key="moje-diskuze">
-        <div className={s.rightSectionHeader}>
-          <SectionTitle>Moje diskuze</SectionTitle>
-          <Link to="/ikaros/diskuze/nova" className={s.rightAddBtn} title="Nová diskuze" onClick={onNav}>+</Link>
-        </div>
-        <p className={s.emptyHint}>Žádné diskuze</p>
       </div>
 
       <FavoriteSection

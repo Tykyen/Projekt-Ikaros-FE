@@ -312,7 +312,7 @@
 }
 
 /* Pravý panel — MOJE DISKUZE = green */
-[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="moje-diskuze"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"],
 [data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeDiskuzeSection"] {
   --section-color: var(--theme-section-green);
 }
@@ -377,7 +377,7 @@
 [data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeSvetySection"]::before {
   background-image: var(--asset-cjk-world);  /* 界 */
 }
-[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="moje-diskuze"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]::before,
 [data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before {
   background-image: var(--asset-cjk-talk);  /* 話 */
 }

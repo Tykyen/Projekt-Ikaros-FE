@@ -89,7 +89,6 @@ export function NewsFormModal({ open, onClose, mode, initialData }: Props) {
     } else if (mode === 'create' && open) {
       reset(EMPTY_VALUES);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, initialData, open, reset]);
 
   const imageUrl = watch('imageUrl');

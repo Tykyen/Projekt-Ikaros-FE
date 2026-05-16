@@ -813,7 +813,7 @@
 }
 
 /* MOJE DISKUZE — Girih cross (kříž, setkávání) */
-[data-theme="arabsky-svet"][data-shell="ikaros"] [data-section-key="moje-diskuze"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]::before,
 [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before {
   content: '';
   position: absolute;
