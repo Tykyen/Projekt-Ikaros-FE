@@ -596,12 +596,22 @@ Brownfield — BE modul `ikaros-discussions` existoval z feature-parity. Diskuze
 
 **Dluhy:** ~~D-NEW-postcount-race~~ (vyřešeno 2026-05-15 — atomický `$inc`); D-NEW-discussion-pagination → přesunuto na „čeká na trigger"; **D-NEW-html-sanitization zůstává otevřený** — blokuje `npm install sanitize-html` (TLS/CA chyba registry). Viz `docs/dluhy.md`.
 
-### - [ ] 3.5 Soukromá pošta (`/ikaros/posta`)
-- [ ] Inbox / Sent, nová zpráva
-- [ ] RSVP eventů (konverzace s odpovědí — zůstává v poště)
-- [ ] Počítadlo nepřečtených v headeru
+### - [x] 3.5 Soukromá pošta (`/ikaros/posta`) ✅ (2026-05-15)
 
-**Hranice pošta vs. Zpracovat (z 1.4):** Pošta = konverzace + informativní zprávy + RSVP (s odpovědí). Zpracovat = aktionovatelné žádosti (přátele, world join, content approval, discussion join). Pravidlo: *vyžaduje rozhodnutí příjemce = Zpracovat; konverzace = pošta*.
+**Spec:** `docs/arch/phase-3/spec-3.5.md`, **Plán:** `docs/arch/phase-3/plan-3.5.md`
+
+- [x] Master-detail stránka — taby Doručené / Odeslané (URL `?slozka=`), detail jako vlákno konverzace
+- [x] Nová zpráva + Odpovědět (`RecipientPicker` našeptávač nad `/users/lookup`), mazání zpráv (soft-delete)
+- [x] BE threading — `conversationId`/`replyToId` na `IkarosMessage`, endpoint `GET /ikaros-messages/conversation/:id`, migrace `migrate-message-threads`
+- [x] Počítadlo nepřečtených v headeru — opraven latentní bug (`getUnreadCount` vracel `{messages,pendingRequests}`, FE čekal jiný tvar → badge byl vždy 0)
+- [x] **RSVP eventů „zůstává v poště"** — vyřešeno threadingem: RSVP-konverzace = běžná zpráva + odpověď, žádná event-specific logika; potvrzení účasti zůstává na `/ikaros/akce`
+- [x] **Dluh A** — `useUnreadCount` přesunut z `chat/api/` do `ikaros/api/useMail`
+- [x] **Dluh B** — odstraněn legacy `world_join_request`/`resolve`/`handleJoinRequest` z `IkarosMessage` (mrtvý kód — `world.join.requested` nemá emittera, world-join jede přes `pending-actions`)
+- [x] **D-057** — friend-only privacy: `User.profileVisibility`, enforce na profilu i poště, přepínač v profilu (sekce Soukromí)
+- [x] **Bonus** — opraven `users.repository.toEntity`, který zahazoval 16 polí (`isDeleted`, ban*, `adminPermissions`… → tombstone hiding tiše nefungoval)
+- [x] Testy: BE +nové unit (1131 ✓), FE +13 (`useMail`, `MailListItem`, `RecipientPicker`)
+
+**Hranice pošta vs. Zpracovat (z 1.4):** Pošta = konverzace + informativní zprávy. Zpracovat = aktionovatelné žádosti (přátele, world join, content approval, discussion join). Action zprávy v poště vědomě descopovány — pošta je jen osobní konverzace.
 
 ### - [x] 3.6 Nápověda (`/ikaros/napoveda`) ✅ (2026-05-12, vytaženo dopředu)
 
@@ -651,6 +661,23 @@ naplní reálnými daty a doplní „Oblíbené diskuze".
   nebo jedno `favorites: { type, id }[]`. Rozhodnout ve spec fázi.
 
 ⚠️ „Oblíbené diskuze" jsou blokované fází 3.4 Diskuze; články a obrázky lze udělat hned.
+
+### - [x] 3.8 Badge pending akcí u nav Diskuze / Články / Galerie ✅ (2026-05-16)
+
+**Spec:** `docs/arch/phase-3/spec-3.8.md`, **Plán:** `docs/arch/phase-3/plan-3.8.md`
+
+- [x] BE: `GET /pending-actions/count` rozšířen o `byType` rozpad (počet per
+  queue typ; obsahuje jen typy, které uživatel přes `canHandle` vidí). `total`
+  zachován — stávající badge „Uživatelé" beze změny.
+- [x] FE: u nav položek Diskuze / Články / Galerie badge s počtem obsahu ve
+  stavu `Pending` (reuse `navItemBadge`, žádný nový vizuál ani token).
+- [x] Role gating čistě z BE — admin/superadmin vidí vše, SpravceClanku jen
+  články, SpravceGalerie jen galerii, SpravceDiskuzi jen diskuze. FE roli neřeší.
+- [x] Badge u „Diskuze" = jen `discussion_pending_review` (schvalování nových
+  diskuzí). Reporty + žádosti o vstup zůstávají v agregátním badge + „Zpracovat".
+- [x] Tooltip se skloňováním (1 / 2–4 / 5+) + `aria-label`.
+- [x] Tests: BE +2 (`byType` rozpad, prázdné `byType`), FE +8 (`NavItem` badge
+  render/skrytí, `pendingTooltip` skloňování).
 
 ---
 

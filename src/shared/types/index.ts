@@ -54,6 +54,8 @@ export interface User {
   emailVerifiedAt?: string;
   /** 1.5 D-052 — privacy „neviditelný" mód (skrýt online stav před ostatními). */
   hiddenPresence?: boolean;
+  /** 3.5 D-057 — kdo vidí profil a může psát: `public` (default) | `friends`. */
+  profileVisibility?: 'public' | 'friends';
   lastLoginAt?: string;
   usernameChangedAt?: string;
   // 1.3b — ban + admin permissions (D-033 granular)
@@ -245,6 +247,8 @@ export interface UpdateUserRequest {
   themeId?: string;
   // 1.5 D-052 — privacy „neviditelný" mód
   hiddenPresence?: boolean;
+  // 3.5 D-057 — friend-only viditelnost profilu / pošty
+  profileVisibility?: 'public' | 'friends';
 }
 
 export interface ChangePasswordRequest {
@@ -542,11 +546,30 @@ export interface IkarosEvent {
   isActive: boolean;
 }
 
-// Ikaros Messages
+// Ikaros Messages (pošta — 3.5)
 export interface UnreadCountResponse {
   unreadCount: number;
-  pendingRequestCount: number;
 }
+
+export interface IkarosMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  recipientId: string;
+  recipientName: string;
+  subject: string;
+  body: string;
+  sentAtUtc: string;
+  isRead: boolean;
+  deletedBySender: boolean;
+  deletedByRecipient: boolean;
+  conversationId: string;
+  replyToId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type MailFolder = 'dorucene' | 'odeslane';
 
 // API error — BE response shape z HttpExceptionFilter
 export interface ApiError {
@@ -678,6 +701,12 @@ export interface DiscussionJoinRequestListItem {
 
 export interface PendingActionsCountResponse {
   total: number;
+  /**
+   * Spec 3.8 — počet pending položek per queue typ. Obsahuje jen typy, které
+   * uživatel přes BE `canHandle` vidí → FE z toho odvozuje per-doména badge
+   * u nav položek (Diskuze/Články/Galerie) bez vlastní role logiky.
+   */
+  byType: Partial<Record<PendingActionType, number>>;
 }
 
 export interface PendingActionsListResponse<T = unknown> {

@@ -16,12 +16,12 @@ import {
   HelpCircle,
   Beer,
   Settings,
-  FileText,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
+import { pendingTooltip } from './pendingBadge';
 import { useSocketInit } from '@/features/chat/api/useSocket';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
-import { useUnreadCount } from '@/features/chat/api/useMessages';
+import { useUnreadCount } from '@/features/ikaros/api/useMail';
 import { useLogout } from '@/features/auth/api/useAuth';
 import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import {
@@ -42,7 +42,7 @@ import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
-import { UserRole, WorldRole } from '@/shared/types';
+import { PendingActionType, UserRole, WorldRole } from '@/shared/types';
 
 function PanelCorners() {
   return (
@@ -61,14 +61,19 @@ type NavItemDef = {
   to: string;
   icon: ReactNode;
   end?: boolean;
+  /**
+   * Spec 3.8 — pokud je nastaveno, u položky se zobrazí badge s počtem pending
+   * akcí daného typu (jen pro uživatele, který typ přes BE `canHandle` vidí).
+   */
+  pendingType?: PendingActionType;
 };
 
 const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'uvodnik',       label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
   { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
-  { navKey: 'diskuze',       label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} /> },
-  { navKey: 'clanky',        label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} /> },
-  { navKey: 'galerie',       label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} /> },
+  { navKey: 'diskuze',       label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} />, pendingType: PendingActionType.DiscussionPendingReview },
+  { navKey: 'clanky',        label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} />,      pendingType: PendingActionType.ArticlePendingReview },
+  { navKey: 'galerie',       label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} />,     pendingType: PendingActionType.GalleryPendingReview },
   { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
 ];
 
@@ -83,17 +88,42 @@ function SectionTitle({ children }: { children: ReactNode }) {
   return <div className={s.sectionTitle}>{children}</div>;
 }
 
-function NavItem({ navKey, to, end, icon, label, onClick }: NavItemDef & { onClick?: () => void }) {
+export function NavItem({
+  navKey,
+  to,
+  end,
+  icon,
+  label,
+  pendingType,
+  pendingByType,
+  onClick,
+}: NavItemDef & {
+  onClick?: () => void;
+  pendingByType?: Partial<Record<PendingActionType, number>>;
+}) {
+  // Spec 3.8 — badge se zobrazí jen když má položka pendingType a BE pro
+  // current usera vrátil nenulový počet (chybějící klíč = uživatel typ nevidí).
+  const pendingCount = pendingType ? pendingByType?.[pendingType] ?? 0 : 0;
+  const tooltip =
+    pendingType && pendingCount > 0
+      ? pendingTooltip(pendingType, pendingCount)
+      : undefined;
   return (
     <NavLink
       to={to}
       end={end}
       data-nav-key={navKey}
       onClick={onClick}
+      title={tooltip}
       className={({ isActive }) => clsx(s.navItem, isActive && s.navItemActive)}
     >
       <span className={s.navItemIcon}>{icon}</span>
       <span className={s.navItemLabel}>{label}</span>
+      {pendingCount > 0 && (
+        <span className={s.navItemBadge} aria-label={tooltip}>
+          {pendingCount}
+        </span>
+      )}
     </NavLink>
   );
 }
@@ -125,6 +155,9 @@ function SidebarContent({
   );
   const { data: unread } = useUnreadCount();
   const chatCount = isAuthenticated ? unread?.unreadCount ?? 0 : 0;
+  // Spec 3.8 — sdílená query s pravým panelem (`['pending-actions','count']`),
+  // druhé volání nestojí extra request. Pro anon disabled → žádný badge.
+  const { data: pendingCount } = usePendingActionsCount(isAuthenticated);
 
   return (
     <div className={s.sidebarInner}>
@@ -132,7 +165,12 @@ function SidebarContent({
         <SectionTitle>Navigace</SectionTitle>
         <div className={s.navList}>
           {PRIMARY_NAV.map((item) => (
-            <NavItem key={item.to} {...item} onClick={onNav} />
+            <NavItem
+              key={item.to}
+              {...item}
+              pendingByType={pendingCount?.byType}
+              onClick={onNav}
+            />
           ))}
         </div>
       </div>
@@ -193,9 +231,6 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   );
   const isAdmin =
     currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
-  // 3.2 — link na správu článků pro Admin/Superadmin/SpravceClanku
-  const isArticlesManager =
-    isAdmin || currentUser?.role === UserRole.SpravceClanku;
   const { data: pendingCount } = usePendingActionsCount(!!currentUser);
 
   const label = isAdmin ? 'Uživatelé' : 'Přátelé';
@@ -255,12 +290,6 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
       <div className={s.section} data-section-key="oblibene-clanky">
         <SectionTitle>Oblíbené články</SectionTitle>
         <div className={s.navList}>
-          {isArticlesManager && (
-            <Link to="/ikaros/clanky" className={s.navItem} onClick={onNav}>
-              <span className={s.navItemIcon}><FileText size={18} /></span>
-              <span className={s.navItemLabel}>Správa článků</span>
-            </Link>
-          )}
           <p className={s.emptyHint}>Žádné oblíbené</p>
         </div>
       </div>
@@ -349,7 +378,7 @@ function HeaderLoggedOut() {
 function HeaderLoggedIn() {
   const user = useAtomValue(currentUserAtom);
   const { data: unread } = useUnreadCount();
-  const totalUnread = (unread?.unreadCount ?? 0) + (unread?.pendingRequestCount ?? 0);
+  const totalUnread = unread?.unreadCount ?? 0;
   const startLogout = useLogout();
 
   if (!user) return null;

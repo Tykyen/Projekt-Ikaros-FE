@@ -5,6 +5,7 @@ import { EditCard } from './EditCard';
 import { ThemeSwitcher } from '@/themes/ThemeSwitcher';
 import { themeAtom } from '@/themes/state';
 import { useUpdateProfile } from '@/features/profile/api/useProfile';
+import { DEFAULT_CHAT_COLOR } from '@/features/profile/lib/chatColor';
 import type { User } from '@/shared/types';
 import styles from './ProfileSections.module.css';
 
@@ -19,8 +20,9 @@ interface Props {
  * Barva chatu se ukládá hned přes PATCH /users/me { chatColor }.
  */
 export function AppearanceSection({ user }: Props) {
+  const chatColor = user.chatColor ?? DEFAULT_CHAT_COLOR;
   const [editingColor, setEditingColor] = useState(false);
-  const [color, setColor] = useState(user.chatColor);
+  const [color, setColor] = useState(chatColor);
   const [theme] = useAtom(themeAtom);
   const update = useUpdateProfile();
 
@@ -30,7 +32,7 @@ export function AppearanceSection({ user }: Props) {
   }
 
   function cancelColor() {
-    setColor(user.chatColor);
+    setColor(chatColor);
   }
 
   return (
@@ -67,15 +69,15 @@ export function AppearanceSection({ user }: Props) {
         <div className={styles.swatchRow}>
           <span
             className={styles.swatchLg}
-            style={{ backgroundColor: user.chatColor }}
+            style={{ backgroundColor: chatColor }}
             aria-hidden="true"
           />
           <code className={styles.swatchHex}>
-            {user.chatColor.toUpperCase()}
+            {chatColor.toUpperCase()}
           </code>
           <span
             className={styles.chatPreview}
-            style={{ color: user.chatColor }}
+            style={{ color: chatColor }}
           >
             Tvé zprávy budou vypadat takto
           </span>

@@ -41,7 +41,9 @@ export default function PublicUserProfilePage() {
         <div className={s.notFound}>
           {status === 404
             ? 'Tento uživatel neexistuje nebo byl odstraněn.'
-            : 'Profil se nepodařilo načíst.'}
+            : status === 403
+              ? 'Tento profil je viditelný jen přátelům.'
+              : 'Profil se nepodařilo načíst.'}
         </div>
       </div>
     );

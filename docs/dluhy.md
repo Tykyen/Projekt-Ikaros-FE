@@ -16,15 +16,6 @@
 
 ## Otevřené
 
-### D-070 — Hardcoded barvy v IkarosEventCard / IkarosEventModal CSS
-**Soubor:** `src/features/ikaros/components/IkarosEventCard.module.css`, `IkarosEventModal.module.css` — 8 porušení (`rgba(...)`, `color name "white"`).
-**Problém:** `npm run lint:colors` hlásí 8 hardcoded barev. Vzniklo ve fázi 2.1b, odhaleno při auditu 3.1b. Barvy se neřídí theme tokeny → nekonzistence napříč skiny.
-**Dopad:** Nízký — vizuální nekonzistence, ne funkční chyba. `lint:colors` je kvůli tomu trvale červený.
-**Řešení:** Nahradit hardcoded hodnoty `var(--token)` z `themes/_shared/tokens.css` (nebo přidat chybějící tokeny).
-**Kdy:** Při příští práci na akcích (9.1 RSVP) nebo samostatný úklidový commit.
-
----
-
 ### D-028 (zbývající Redis varianta) — Cache pro `JwtStrategy.validate` ban check
 **Kontext:** In-memory cache uzavřena, single-instance funguje plně. Pro multi-instance deployu nutno swap na Redis pub/sub.
 **Řešení:** Vyměnit `UserBanCacheService` Map za Redis client (`ioredis`); invalidate přes pub/sub channel `user-ban-invalidate`.
@@ -46,17 +37,6 @@
 ### D-051 — Redis adapter pro `OnlinePresenceRegistry`
 **Kontext:** 1.5 registr je in-memory Map<userId, RegistryEntry>. Single-instance only — při multi-instance deployu by každá instance měla vlastní obraz a `presence:update` broadcast by se nepropagoval mezi instancemi.
 **Řešení:** Swap `OnlinePresenceRegistry` Map za Redis hash + použít `@socket.io/redis-adapter` pro multi-instance broadcast. Analogicky k D-028 (cache pro ban check). Až bude potřeba škálování.
-
----
-
-### D-057 — Friend-only privacy v profilu / poště
-**Kontext:** Spec 1.8 §8 — privacy úroveň „jen přátelé vidí můj profil / mohou mi psát"
-mimo rozsah 1.8. Závisí na 3.5 (pošta) a možná na rozšíření 1.4 privacy.
-**Dopad:** Veřejný profil je dostupný každému přihlášenému, nezávisle na friendship statu.
-Pošta (3.5) když přijde, bude default „kdokoliv mi může psát".
-**Řešení:** Spec až s 3.5. Pole `User.profileVisibility: 'public' | 'friends'` + filtr
-v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 403).
-**Kdy:** Společně se spec 3.5.
 
 ---
 
@@ -181,6 +161,70 @@ v `usePublicUserProfile` / `usePublicUsers` (pokud requester není friend → 40
 ---
 
 ## Vyřešené (historie, zachovat pro audit trail)
+
+### D-072 — `chatColor` na backendu vůbec neexistoval
+**Stav:** ✅ Uzavřeno 2026-05-16.
+**Co bylo:** `/ikaros/profil` padala všem (`Cannot read properties of undefined (reading 'toUpperCase')`). Původní diagnóza („starý účet bez `chatColor`, chybí migrace") byla **chybná** — backend pole `chatColor` neměl vůbec: ani ve `user.schema.ts`, ani v `User` interface, ani v `UpdateUserDto`, ani v repository mapperu. FE typ `User.chatColor: string` deklaroval pole jako povinné, FE ukládal barvu přes `PATCH /users/me { chatColor }` — ale DTO whitelist hodnotu tiše zahazoval. Featura „Barva chatu" (`AppearanceSection` + `ChatColorPicker`, od kroku 1.6a) byla end-to-end mrtvá; `user.chatColor` byl `undefined` u **každého** uživatele.
+**Fix (FE):** Defenzivní fallback `#FFFFFF` v `ProfileHeader.tsx` a `AppearanceSection.tsx` (zabránit crashi).
+**Fix (BE):** `chatColor: string` doplněn do `user.schema.ts` (`@Prop default '#FFFFFF'`), `User` interface, `UpdateUserDto` (`@Matches /^#[0-9a-fA-F]{6}$/`), `users.repository.toEntity` (`?? '#FFFFFF'` fallback pro dokumenty bez pole), `users.service.update` (propaguje `dto.chatColor`). Migrace netřeba — mapper sklápí existující dokumenty. +2 service testy. BE tsc čistý, 72/72 users testů zelených.
+
+---
+
+### D-073 — BE polovina kroku 1.3a (profil) nikdy nevznikla
+**Stav:** ✅ Uzavřeno 2026-05-16.
+**Co bylo:** Objeveno při auditu navazujícím na D-072. [plan-1.3a.md §2](arch/phase-1/plan-1.3a.md) specifikoval BE práci (pořadí „BE → FE"); FE část vznikla, BE část ne. Chybělo:
+- **6 profilových polí** — `city`, `bio`, `characterName`, `characterBio`, `characterAvatarUrl`, `themeId` (+`lastLoginAt`) — ani ve schématu, ani v `User` interface / `UpdateUserDto` / mapperu. Editace profilu (město, bio, postava) se tiše zahazovala přes DTO whitelist.
+- **`PATCH /users/me`** — controller měl jen `@Patch(':id')`; `me` spadlo do parametrické routy → 403 / 404. Editace profilu nefungovala nikomu.
+- **4 avatar endpointy** — `POST/DELETE /users/me/avatar` a `…/character/avatar` — FE je volal, BE je neměl → 404.
+- **`lastLoginAt`** — FE zobrazoval „Poslední přihlášení", BE pole neexistovalo.
+**Fix (BE):** (1) 7 polí do `user.schema.ts` + `User` interface + `toEntity` mapper + `UpdateUserDto` (`city ≤100`, `bio ≤1000`, `characterName ≤64`, `characterBio ≤1000`, `themeId ≤64`, `defaultAvatarType male|female|being`); `users.service.update` je propaguje. (2) Nový `@Patch('me')` deklarovaný **před** `@Patch(':id')` (routing priorita), blokuje změnu username (jde přes request-flow). (3) `UploadService.uploadUserImage` (deterministický `public_id: 'main'`, overwrite → žádné orphany) + `deleteUserImage`; 4 endpointy v `UsersController`, `UsersModule` importuje `UploadModule`. (4) `UsersRepository.updateLastLogin` volaný z `auth.service` `login()` (+ `register()` ho ukládá rovnou do `save`). +5 testů (service 2, auth 2 + 1 assertion). BE tsc čistý, 136/136 users+auth unit testů, e2e bootuje (modul graf OK).
+**Navíc:** `defaultAvatarType` dostal `@Prop({ enum, default: 'male' })` + `toEntity` fallback `?? 'male'` (FE typ ho čeká povinný; dřív `@Prop()` bez defaultu).
+**Zbytek:** Avatar endpointy nemají controller/e2e test (thin delegace; `UploadService` obaluje Cloudinary SDK — pokrytí až s users e2e harness).
+
+---
+
+### D-070 — Hardcoded barvy v module CSS (`lint:colors` červený)
+**Stav:** ✅ Uzavřeno 2026-05-16.
+**Co bylo:** `lint:colors` hlásil 10 hardcoded hex barev. Záznam D-070 byl zastaralý — uváděl `IkarosEventCard/Modal` (ty už byly čisté); reálná porušení byla v Discussion/Reviews CSS (fáze 3.4): `var(--star-gold, #e0a82e)` ×3 a `var(--bg-base, #fff)` ×7 — hex jako fallback uvnitř `var()`.
+**Fix:** `--star-gold` je definovaný (`prose-tokens.css`) → drop hex fallback. `--bg-base` je nedefinovaný (phantom token) → hex fallback `#fff` nahrazen definovaným theme-independent bílým tokenem `var(--status-band-fg)`. Zero behavior change, žádný shared/theme edit. `lint:colors` nyní zelený.
+
+### D-057 — Friend-only privacy v profilu / poště
+**Stav:** ✅ Uzavřeno 2026-05-15 (fáze 3.5).
+**Co bylo:** Veřejný profil dostupný každému přihlášenému; pošta bez omezení odesílatele.
+**Fix:** Pole `User.profileVisibility: 'public' | 'friends'` (default `public`). BE enforce — `publicProfileV14` (403 `PROFILE_FRIENDS_ONLY` pro nepřítele/ne-admina/ne-self), `IkarosMessagesService.create` (403 `RECIPIENT_FRIENDS_ONLY`; odpověď ve vlákně + Admin výjimka). FE — přepínač „Jen pro přátele" v profilu (`PrivacySection`), 403 handling v poště i na veřejném profilu. Friend-check přes `FriendshipsService.areFriends`.
+
+### D-NEW-mail-useUnreadCount-modul — `useUnreadCount` ve špatném feature modulu (dluh A z 3.5)
+**Stav:** ✅ Uzavřeno 2026-05-15 (fáze 3.5).
+**Co bylo:** `useUnreadCount` (pošta) žil v `src/features/chat/api/useMessages.ts`, ač s chatem nesouvisí.
+**Fix:** Přesunut do `src/features/ikaros/api/useMail.ts` (kde vznikly i ostatní pošta-hooky). `chat/api/useMessages.ts` smazán, barrel `chat/index.ts` i header import přesměrovány. Při tom opraven latentní bug — `getUnreadCount` BE vracel `{ messages, pendingRequests }`, FE typ čekal `{ unreadCount, pendingRequestCount }` → header badge byl trvale 0; sjednoceno na `{ unreadCount }`.
+
+### D-NEW-mail-legacy-world-join — Legacy `world_join_request` v `IkarosMessage` (dluh B z 3.5)
+**Stav:** ✅ Uzavřeno 2026-05-15 (fáze 3.5).
+**Co bylo:** `IkarosMessage` nesl `actionType`/`actionWorldId`/`actionUserId`/`actionResolved` + endpoint `/resolve` + handler `handleJoinRequest` — parity-relikt starého systému, nahrazený modulem `pending-actions` + `WorldAccessRequestProvider`.
+**Fix:** Ověřeno, že `world.join.requested` nemá emittera (mrtvý kód) → odstraněna všechna action pole, `/resolve`, `ResolveIkarosMessageDto`, `handleJoinRequest`, `countPendingRequests`, `resolveIfPending`. `getUnreadCount` → `{ unreadCount }`. World-join flow přes `pending-actions` nedotčen.
+
+### D-NEW-mailer-module-not-imported — `MailerModule` (@Global) nikdo neimportoval
+**Stav:** ✅ Uzavřeno 2026-05-15 (objeveno při 3.5 e2e).
+**Co bylo:** `MailerModule` je `@Global`, ale žádný modul ho explicitně neimportoval — `MailerService` se do DI dostával jen náhodným tranzitivním načtením přes jiný modul. Úklid module grafu v 3.5 (dluh B — `IkarosMessagesModule` přestal importovat `WorldsModule`) ten řetězec přerušil → e2e s částečným module grafem padaly na „MailerService not available in UsersModule".
+**Fix:** `UsersModule` importuje explicitně `MailerModule` + `SecurityTokensModule` (oba @Global, `UsersService` je konzumuje). `FriendshipsModule` analogicky importuje `PendingActionsModule`. Moduly jsou nyní soběstačné i v částečných grafech.
+**Pozn.:** Stejný anti-pattern byl i jinde — viz `D-NEW-e2e-chat-push-wiring`.
+
+### D-NEW-e2e-chat-push-wiring — `@Global` moduly bez explicitního importu (ChatModule/WorldsModule/FriendshipsModule)
+**Stav:** ✅ Uzavřeno 2026-05-16.
+**Co bylo:** Tři BE e2e suity (`auth-refresh`, `worlds-join`, `auth-register-check`) nebootovaly — `Nest can't resolve … PushService in ChatModule` → po opravě → `PendingActionsService in WorldsModule`. Řetěz `@Global`-not-imported bugů: `ChatService` konzumuje `PushService`, `WorldAccessRequestProvider` konzumuje `PendingActionsService`, `FriendshipsModule` konzumuje `PendingActionsService` — žádný host modul cílový `@Global` modul explicitně neimportoval, spoléhalo se na náhodné tranzitivní načtení. Pre-existující (ověřeno `git stash`).
+**Fix:** `ChatModule` importuje `PushModule`, `WorldsModule` importuje `PendingActionsModule`, `FriendshipsModule` importuje `PendingActionsModule`. Po opravě bootovaly všechny suity; zbylé assertion-faily → `D-NEW-e2e-stale-assertions`.
+
+### D-NEW-e2e-stale-assertions — `worlds-join` + `game-events` e2e zastaralé assertions
+**Stav:** ✅ Uzavřeno 2026-05-16.
+**Co bylo:** Po opravě wiringu suity bootovaly, ale 6 testů padalo na assertions zastaralých vůči refaktorům:
+- **D-053 renumber `WorldRole`** — testy používaly stará čísla (PomocnyPJ 2→4, PJ 3→5, Hrac 0→2). `game-events-role-gating` nastavoval PomocnyPJ na číslo 2 (= dnes Hrac) → 403 místo 201.
+- **2.4 JOIN refaktor** — `worlds-join` cílil na zrušený unified-join (open/private svět dnes vyžaduje `POST /access-request`, ne `/join`) + `world_join_request` IkarosMessage (zrušeno dluhem B).
+**Fix:** `game-events-role-gating.e2e` — opravena 4 čísla rolí na post-D-053 hodnoty. `worlds-join.e2e` — kompletně přepsán proti 2.4 kontraktu (public→join→Čtenář; open/private→access-request→`WorldAccessRequest`; approve flow; closed→403), 10 testů. Ověřeno proti aktuálnímu service kódu, ne slepě. **Celá e2e suite zelená — 10/10 suit, 73/73 testů.**
+
+### D-NEW-users-toEntity-fields — `users.repository.toEntity` zahazoval 16 polí
+**Stav:** ✅ Uzavřeno 2026-05-15 (objeveno při 3.5 D-057).
+**Co bylo:** `MongoUsersRepository.toEntity` mapoval jen 21 základních polí — chybělo 16 rozšíření (`isDeleted`, `deletionRequestedAt`, `bannedAt/Until`, `adminPermissions`, `hiddenPresence`, `profileImageUrl`…). `repo.findById` jede přes tento mapper → pole byla `undefined`. `publicProfileV14` tak měl `isTombstone` vždy `false` (tombstone/pending uživatelé se v profilu tiše neskrývali). Unit testy to nechytly — mockují repository.
+**Fix:** `toEntity` doplněn o všech 16 polí. Behavior change — tombstone hiding ap. nyní reálně funguje.
 
 ### D-NEW-postcount-race — `postCount` diskuze se počítal read-then-write (z 3.4)
 **Stav:** ✅ Uzavřeno 2026-05-15.

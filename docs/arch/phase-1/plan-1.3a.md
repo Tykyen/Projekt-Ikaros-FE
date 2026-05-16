@@ -46,6 +46,12 @@ Tyto dva body **nemění funkční rozsah ani UX** — jen implementační vrstv
 
 ## 2. Backend — pořadí kroků
 
+> **STAV (2026-05-16): BE část dohnána dodatečně — viz dluh D-073.** Tato sekce
+> se původně neimplementovala; FE (§3+) se postavil proti neexistujícímu BE.
+> Dohnáno: §2.1 schema, §2.2 DTO, §2.3 (bez worldsCount agregátu — FE ho
+> nepotřebuje), §2.4 `@Patch('me')`, §2.6 avatar endpointy, §2.7 `lastLoginAt`.
+> §2.5 `changePassword` už existoval dřív (`PUT /users/password`).
+
 > Pracovní adresář BE: `C:\Matrix\ProjektIkaros\Projekt-ikaros\backend`
 
 ### 2.1 Rozšířit `user.schema.ts`

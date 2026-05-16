@@ -1,0 +1,424 @@
+.page {
+  padding: var(--sp-6);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--theme-heading, var(--text-strong));
+}
+
+/* ── Master-detail split ──────────────────────────────── */
+.split {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-1);
+}
+
+.listPane {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--frame-border);
+  max-height: 72vh;
+  min-height: 360px;
+}
+
+.detailPane {
+  display: flex;
+  flex-direction: column;
+  max-height: 72vh;
+  min-height: 360px;
+  overflow-y: auto;
+}
+
+/* ── Taby Doručené / Odeslané ─────────────────────────── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--frame-border);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: var(--sp-3) var(--sp-2);
+  background: none;
+  border: none;
+  border-bottom: var(--tab-underline-h) solid transparent;
+  color: var(--text-muted, var(--text));
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.tab:hover {
+  background: var(--surface-2);
+}
+
+.tabActive {
+  color: var(--text-strong);
+  border-bottom-color: var(--tab-underline-color);
+  font-weight: var(--weight-semi);
+}
+
+/* ── Seznam zpráv ─────────────────────────────────────── */
+.items {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--frame-border);
+  border-left: 2px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.item:hover {
+  background: var(--surface-2);
+}
+
+.itemSelected {
+  background: var(--surface-2);
+  border-left-color: var(--accent, var(--theme-accent));
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  background: var(--surface-3);
+  color: var(--text-strong);
+  font-weight: var(--weight-semi);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+}
+
+.itemMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.itemName {
+  font-size: var(--text-sm);
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemNameUnread {
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+}
+
+.itemTime {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--text-muted, var(--text));
+}
+
+.itemSubject {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--text-sm);
+  color: var(--text-muted, var(--text));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.unreadDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--accent, var(--theme-accent));
+}
+
+.loadMore {
+  margin: var(--sp-3);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-10) var(--sp-4);
+  color: var(--text-muted, var(--text));
+  text-align: center;
+}
+
+.stateBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-10) var(--sp-4);
+  color: var(--text-muted, var(--text));
+  text-align: center;
+}
+
+/* ── Detail / vlákno ──────────────────────────────────── */
+.detailHeader {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--frame-border);
+  padding: var(--sp-4);
+}
+
+.backBtn {
+  display: none;
+  align-items: center;
+  gap: var(--sp-1);
+  background: none;
+  border: none;
+  color: var(--accent, var(--theme-accent));
+  font-size: var(--text-sm);
+  cursor: pointer;
+  padding: var(--sp-2) 0;
+  margin-bottom: var(--sp-1);
+}
+
+.detailSubject {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  color: var(--text-strong);
+}
+
+.detailMeta {
+  font-size: var(--text-xs);
+  color: var(--text-muted, var(--text));
+  margin-top: 2px;
+}
+
+.thread {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+}
+
+.bubble {
+  max-width: 80%;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-2);
+}
+
+.bubbleMine {
+  align-self: flex-end;
+  border-color: var(--accent, var(--theme-accent));
+  background: var(--surface-3);
+}
+
+.bubbleOther {
+  align-self: flex-start;
+}
+
+.bubbleHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.bubbleAuthor {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+}
+
+.bubbleTime {
+  font-size: var(--text-xs);
+  color: var(--text-muted, var(--text));
+}
+
+.bubbleBody {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.bubbleFoot {
+  margin-top: var(--sp-2);
+  text-align: right;
+}
+
+.bubbleDelete {
+  background: none;
+  border: none;
+  color: var(--text-muted, var(--text));
+  font-size: var(--text-xs);
+  cursor: pointer;
+  padding: var(--sp-1) var(--sp-2);
+}
+
+.bubbleDelete:hover {
+  color: var(--danger, var(--warning));
+}
+
+.detailActions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--frame-border);
+  background: var(--surface-1);
+}
+
+/* ── Compose form ─────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-strong);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 160px;
+  resize: vertical;
+  padding: var(--sp-3);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+.lockedRecipient {
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+
+.errorMsg {
+  font-size: var(--text-xs);
+  color: var(--danger, var(--warning));
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+/* ── Mobil — drill-down ───────────────────────────────── */
+@media (max-width: 768px) {
+  .page {
+    padding: var(--sp-4);
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+  }
+
+  .split[data-view='list'] .detailPane {
+    display: none;
+  }
+
+  .split[data-view='detail'] .listPane {
+    display: none;
+  }
+
+  .listPane {
+    border-right: none;
+    max-height: none;
+  }
+
+  .detailPane {
+    max-height: none;
+  }
+
+  .backBtn {
+    display: flex;
+    min-height: 44px;
+  }
+
+  .tab {
+    min-height: 44px;
+  }
+
+  .item {
+    padding: var(--sp-4);
+  }
+
+  .bubble {
+    max-width: 92%;
+  }
+
+  .bubbleDelete {
+    padding: var(--sp-2) var(--sp-3);
+    min-height: 36px;
+  }
+}

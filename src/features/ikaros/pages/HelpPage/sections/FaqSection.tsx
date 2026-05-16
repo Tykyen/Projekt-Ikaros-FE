@@ -137,7 +137,10 @@ const FAQ: FaqItem[] = [
         </ul>
         <p>
           Číslo u záložky „Zpracovat" v pravém panelu ukazuje, kolik položek
-          čeká na tvé rozhodnutí.
+          čeká na tvé rozhodnutí. Pokud schvaluješ obsah, vidíš počet
+          čekajících položek i jako číslo přímo vedle <strong>Diskuze</strong>,
+          {' '}<strong>Články</strong> a <strong>Galerie</strong> v levé
+          navigaci — víš tak rovnou, kde něco čeká.
         </p>
       </>
     ),
@@ -182,6 +185,27 @@ const FAQ: FaqItem[] = [
           Své zablokované najdeš v tabu <strong>Přátelé</strong> → sbalitelná
           sekce <strong>„Zablokovaní"</strong> (default zavřená). Odblokuješ je
           jedním klikem.
+        </p>
+      </>
+    ),
+  },
+  {
+    q: 'Jak funguje Pošta a kdo mi může psát?',
+    a: (
+      <>
+        <p>
+          <strong>Pošta</strong> (ikona v hlavičce) jsou soukromé zprávy mezi
+          uživateli. Máš složky <strong>Doručené</strong> a{' '}
+          <strong>Odeslané</strong>; po otevření zprávy ji čteš jako vlákno
+          konverzace a můžeš rovnou <strong>Odpovědět</strong>. Odznak u ikony
+          ukazuje počet nepřečtených.
+        </p>
+        <p>
+          Novou zprávu napíšeš komukoliv — příjemce vybereš našeptávačem podle
+          přezdívky. Pokud si ale v <strong>profilu → Soukromí</strong> zapneš{' '}
+          <strong>„Jen pro přátele"</strong>, napsat ti jako první může jen tvůj
+          přítel (a administrátor). Na zprávu, kterou jsi sám/sama poslal/a, ti
+          druhá strana může odpovědět vždy.
         </p>
       </>
     ),

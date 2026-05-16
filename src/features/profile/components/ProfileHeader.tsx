@@ -11,6 +11,7 @@ import {
   useDeleteAvatar,
 } from '@/features/profile/api/useProfile';
 import { useEmailVerifyResend } from '@/features/auth/api/useEmailVerify';
+import { DEFAULT_CHAT_COLOR } from '../lib/chatColor';
 import { headerSchema, type HeaderForm } from '../lib/profileSchemas';
 import { type User } from '@/shared/types';
 import styles from './ProfileHeader.module.css';
@@ -172,10 +173,10 @@ export function ProfileHeader({ user }: Props) {
                   <span className={styles.swatchRow}>
                     <span
                       className={styles.swatch}
-                      style={{ backgroundColor: user.chatColor }}
+                      style={{ backgroundColor: user.chatColor ?? DEFAULT_CHAT_COLOR }}
                       aria-hidden="true"
                     />
-                    <code>{user.chatColor.toUpperCase()}</code>
+                    <code>{(user.chatColor ?? DEFAULT_CHAT_COLOR).toUpperCase()}</code>
                   </span>
                 }
               />

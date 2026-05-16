@@ -91,6 +91,13 @@ const IKAROS_PAGES: PageDoc[] = [
     who: 'Čtení všichni (anon i přihlášený), psaní přihlášený',
     what: 'Literární archiv komunity. Přehled publikovaných článků s vyhledáváním, řazením (nejnovější / nejlépe hodnocené / nejvíc hodnocených) a filtrem podle kategorie. Tab Moje (po přihlášení) ukazuje tvé články včetně konceptů a souhrn statistik. Nový článek píšeš v editoru s formátováním (tučně, kurzíva, nadpisy, citace, odrážky, odkazy) — text se průběžně ukládá do prohlížeče, kdyby ses odpojil. Workflow: koncept → odeslat ke schválení → publikováno (schvaluje Správce článků). Detail článku má hodnocení hvězdičkami, obsah dlouhých článků a sekci „Více od autora".',
   },
+  {
+    path: '/ikaros/posta',
+    name: 'Pošta',
+    status: 'ok',
+    who: 'Přihlášený',
+    what: 'Soukromé zprávy mezi uživateli. Vlevo přepínáš Doručené / Odeslané, vpravo čteš vybranou zprávu jako vlákno konverzace. Novou zprávu pošleš tlačítkem Nová zpráva — příjemce najdeš našeptávačem podle přezdívky. Na zprávu lze odpovědět (odpovědi se řetězí do jednoho vlákna) a zprávy mazat (zmizí jen tobě). Počet nepřečtených ukazuje odznak u ikony Pošta v hlavičce. V profilu v sekci Soukromí si můžeš zapnout, že ti smí psát jen přátelé.',
+  },
 ];
 
 const SOON_IKAROS: PageDoc[] = [
@@ -131,14 +138,6 @@ const SOON_IKAROS: PageDoc[] = [
       'správce diskuze řeší manažery a pozvánky. Příspěvky lze lajkovat, ' +
       'diskuzi přidat do oblíbených a nevhodné příspěvky nahlásit. ' +
       'Schvaluje a moderuje Správce diskuzí.',
-  },
-  {
-    path: '/ikaros/posta',
-    name: 'Pošta',
-    status: 'soon',
-    fáze: 'Fáze 3.5',
-    who: 'Přihlášený',
-    what: 'Soukromé zprávy + RSVP na eventy. Počítadlo nepřečtených v hlavičce.',
   },
   {
     path: '/chat/hospoda',

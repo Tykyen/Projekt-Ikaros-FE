@@ -231,7 +231,7 @@
   align-items: center;
   justify-content: center;
   background: var(--accent, var(--theme-accent));
-  color: var(--bg-base, #fff);
+  color: var(--bg-base, var(--status-band-fg));
   font-weight: var(--weight-semi);
   font-size: var(--text-xs);
 }
@@ -333,7 +333,7 @@
   border: none;
   border-radius: var(--radius-sm);
   background: var(--accent, var(--theme-accent));
-  color: var(--bg-base, #fff);
+  color: var(--bg-base, var(--status-band-fg));
   font-size: var(--text-sm);
   font-weight: var(--weight-semi);
   cursor: pointer;

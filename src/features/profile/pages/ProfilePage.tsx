@@ -72,7 +72,10 @@ export default function ProfilePage() {
 
         <AppearanceSection user={user} />
 
-        <PrivacySection hiddenPresence={!!user.hiddenPresence} />
+        <PrivacySection
+          hiddenPresence={!!user.hiddenPresence}
+          profileVisibility={user.profileVisibility ?? 'public'}
+        />
 
         <SecuritySection username={user.username} />
 

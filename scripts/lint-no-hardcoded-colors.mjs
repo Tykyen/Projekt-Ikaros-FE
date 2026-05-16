@@ -32,9 +32,31 @@ for await (const file of walk(ROOT)) {
 
   const content = await readFile(file, 'utf8');
   const issues = [];
-  for (const m of content.matchAll(HEX_RE)) issues.push(`hex ${m[0]}`);
-  for (const m of content.matchAll(RGB_RE)) issues.push(`${m[1]}(...)`);
-  for (const m of content.matchAll(COLOR_NAME_RE)) issues.push(`color name "${m[1]}"`);
+
+  // Řádek s `lint-colors-ignore` komentářem se přeskočí — pro legitimní
+  // datové barvy (perzistované uživatelské hodnoty, ne designové tokeny).
+  const lineStarts = [0];
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] === '\n') lineStarts.push(i + 1);
+  }
+  const lines = content.split('\n');
+  const ignored = (idx) => {
+    let lo = 0;
+    let hi = lineStarts.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (lineStarts[mid] <= idx) lo = mid;
+      else hi = mid - 1;
+    }
+    return lines[lo].includes('lint-colors-ignore');
+  };
+
+  for (const m of content.matchAll(HEX_RE))
+    if (!ignored(m.index)) issues.push(`hex ${m[0]}`);
+  for (const m of content.matchAll(RGB_RE))
+    if (!ignored(m.index)) issues.push(`${m[1]}(...)`);
+  for (const m of content.matchAll(COLOR_NAME_RE))
+    if (!ignored(m.index)) issues.push(`color name "${m[1]}"`);
 
   if (issues.length > 0) {
     console.error(`✗ ${rel}`);
