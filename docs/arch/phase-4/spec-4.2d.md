@@ -29,15 +29,17 @@ Map<socketId, { lastSeen, username, userId, rooms: Set<RoomKey> }>
   `userId` (uživatel může mít víc socketů / tabů).
 - `getRoomCounts()` — počet **unikátních userId** per místnost.
 
-### Zavření appky → „duch" (vědomě BEZ `handleDisconnect`)
-Socket se odpojí (zavření okna, uspání) → presence záznam **zůstává**.
-Heartbeat (§4) ustane → `lastSeen` zamrzne → cleanup (60 min) záznam odebere.
-Do té doby je uživatel „duch" — pořád přítomný v místnostech, kam vstoupil.
+### Zavření / reload / ztráta spojení → `handleDisconnect`
+Socket se odpojí → `OnGatewayDisconnect` ho odebere ze **všech** místností
+(`chat:presence` `leave` s `reason: 'disconnect'` + `chat:rooms:presence`).
 
-To je **záměr** (potvrzeno uživatelem): chci být přítomný ve víc místnostech
-zároveň — Hospoda + víc Rozcestí — bez ohledu na to, kam zrovna koukám.
-Proto se `OnGatewayDisconnect` handler **nepřidává**; jediné cesty ven jsou
-tlačítko Odejít a 60min timeout.
+> Revize oproti původnímu návrhu: spec nejdřív počítal s „duchem" (záznam
+> přežije odpojení až do 60min cleanupu) a `handleDisconnect` vynechával.
+> Integrační ladění ukázalo, že **reload stránky = nový socket** — bez
+> `handleDisconnect` se z každého reloadu hromadily duch-záznamy a držely
+> počty přítomných („odejdu a počet zůstane"). `handleDisconnect` se proto
+> přidal. Multi-room funguje dál: dokud je appka otevřená, socket žije a
+> uživatel je přítomný všude, kam vstoupil.
 
 ## §2 — BE: hlášky příchodu/odchodu jako systémové zprávy
 
@@ -86,12 +88,9 @@ pozdější příchozí; TTL 1 h jako ostatní zprávy).
 
 ## §7 — Reload stránky
 
-Reload = nový socket. Starý socket se odpojí, jeho presence záznam dožívá
-jako „duch" do 60min cleanupu. Nový socket joinuje místnost, kterou uživatel
-otevřel. `getPresence` i `getRoomCounts` deduplikují dle `userId`, takže se
-uživatel v seznamech ani počtech nezdvojí. Důsledek: po reloadu zůstává
-„duchem" i ve starých místnostech, dokud staré duch-záznamy nevyprší —
-vědomě přijaté (odpovídá multi-room modelu).
+Reload = nový socket. Starý socket se odpojí → `handleDisconnect` (§1) ho
+odebere ze všech místností. Nový socket joinuje znovu místnost, kterou
+uživatel otevřel. Žádné duch-záznamy se nehromadí; počty zůstávají přesné.
 
 ## §8 — Seznam přítomných: účet (Hospoda) vs. postava (Rozcestí)
 
@@ -118,6 +117,29 @@ Splňuje roadmap krok **4.2b**.
 **K potvrzení:** týká se to **jen seznamu přítomných**, nebo i jmen
 u zpráv a hlášek v Rozcestí (autor = `characterName`)? Tento spec řeší
 zatím jen seznam přítomných (to, co bylo na screenshotu).
+
+## §9 — Opravy z integračního ladění
+
+Vyšlo najevo až při testování s běžícím BE/FE:
+
+- **`handleDisconnect`** přidán (viz §1) — odpojení/reload socketu = odchod
+  ze všech místností. Bez něj zombie záznamy držely počty.
+- **`chat:presence` `reason`** (`timeout` | `disconnect` | `explicit`) —
+  overlay auto-odhlášení na FE se spustí **jen** pro `timeout`, ne pro reload.
+- **`useSocketEvent` re-registrace** — listener se po výměně socketu
+  (`useSocketInit` ho zahodí, dokud není auth token) přeregistruje na
+  aktuální instanci (sleduje `socketStatusAtom`). Bez toho `chat:rooms:presence`
+  nedorazil do navigace — listener visel na mrtvém socketu.
+- **Účtový `avatarUrl` v presence** — BE presence nese i avatar účtu (nejen
+  postavu), jinak Hospoda zobrazovala jen iniciály.
+- **Pořadí v `unregisterPresence`** — hláška „opouští" se uloží/odešle ještě
+  než socket opustí WS kanál; jinak by ji odcházející na své stránce neviděl.
+- **`saveSystemMessage`** — `senderName: 'system'` (ne prázdný řetězec —
+  schema má `required: true`).
+- **Re-join guard** — překlik mezi stránkami už v místnosti negeneruje nový
+  `join` ani hlášku (`joinRoom` přeskočí místnost v `myRoomsAtom`, BE navíc
+  ignoruje re-join socketu, který už v místnosti je).
+- **Posuvník chatu** — tenký tematizovaný (`MessageList`).
 
 ## Dopad na 4.2c
 

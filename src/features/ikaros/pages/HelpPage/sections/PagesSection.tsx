@@ -71,6 +71,13 @@ const IKAROS_PAGES: PageDoc[] = [
     what: 'Zelená tečka u avataru = uživatel má právě otevřenou platformu. Žlutá tečka = uživatel je u počítače, ale ~5 min nebyl aktivní (idle). Žádná tečka = offline. U offline uživatelů na veřejném profilu vidíš „naposledy aktivní před X". Lze skrýt svůj stav přes Soukromí v profilu.',
   },
   {
+    path: '—',
+    name: 'Reset hesla',
+    status: 'ok',
+    who: 'Anon (zapomenuté heslo)',
+    what: '„Zapomněl/a jsi heslo?" v přihlašovacím dialogu → zadáš e-mail → pokud účet existuje, pošleme e-mail s odkazem na reset (platí 1 hodinu, na jedno použití). Na odkazu nastavíš nové heslo a znovu se přihlásíš. Pokud měl účet naplánované smazání, reset ho zároveň zruší a účet obnoví.',
+  },
+  {
     path: '/ikaros/novinky',
     name: 'Novinky',
     status: 'ok',
@@ -118,6 +125,10 @@ const IKAROS_PAGES: PageDoc[] = [
       'uvidí jen on (orámování pole se přebarví, ať víš, že šeptáš). Text zprávy se ' +
       'zobrazuje v barvě, kterou máš nastavenou v profilu. V textu fungují emotes ' +
       'přes dvojtečkové zkratky (např. :beer: → 🍺). Zprávy mizí po hodině. ' +
+      'Najetím na zprávu se objeví akce: odpovědět a přidat emoji reakci. ' +
+      'Odpověď nad sebou ukáže citaci původní zprávy — kliknutím na citaci ' +
+      'skočíš k originálu. Reakce vybíráš z emoji výběru; opětovný klik na ' +
+      'svou reakci ji zase odebere. ' +
       'Admin a Superadmin mohou nevhodnou zprávu smazat. ' +
       'Příchody a odchody se zapisují přímo do chatu jako hláška — vidí je ' +
       'i ten, kdo dorazí později. V levém menu je u každé místnosti počet ' +
@@ -125,6 +136,47 @@ const IKAROS_PAGES: PageDoc[] = [
       'v ní přihlášený, i když mezitím odejdeš jinam — můžeš tak být v Hospodě ' +
       'a Rozcestích zároveň. Odcházíš ručně tlačítkem „Odejít" v záhlaví ' +
       'místnosti; po 60 minutách nečinnosti tě místnost odhlásí sama.',
+  },
+  {
+    path: '/chat/rozcesti',
+    name: 'Rozcestí I.–III.',
+    status: 'ok',
+    who: 'Přihlášený',
+    what:
+      'Tři nezávislé atmosférické roleplay místnosti — hra na jeden večer bez ' +
+      'kostek a mechanik. Každá má prostředí: zvolený styl (Fantasy / Sci-fi / ' +
+      'Mystika) a v něm jednu z 20 lokací, jejíž ilustrace tvoří pozadí chatu a ' +
+      'popis najdeš v rozbalovacím panelu (tlačítko 📖). Prostředí je sdílené — ' +
+      'vidí ho všichni v místnosti; měnit styl a lokaci smí jen role s ' +
+      'platformovou funkcí (správci). Zprávy, soukromý šepot, odpovědi, emoji ' +
+      'reakce, indikátor psaní, hlášky příchodu/odchodu, počty v menu, odchod ' +
+      'i odhlášení po nečinnosti fungují stejně jako v Hospodě. Na rozdíl od Hospody se ale v seznamu ' +
+      'přítomných zobrazuje tvoje postava (jméno a obrázek z profilu), ne účet — ' +
+      'kdo postavu nevyplnil, vystupuje pod účtem. Kliknutím na osobu v seznamu ' +
+      'přítomných si otevřeš kartu její postavy — avatar, jméno a popis postavy.',
+  },
+  {
+    path: '/ikaros/diskuze',
+    name: 'Diskuze',
+    status: 'ok',
+    who: 'Jen přihlášení',
+    what:
+      'Témata k rozhovoru — založ téma a veď vlákno příspěvků (formátovaný text). ' +
+      'Diskuze může být otevřená nebo uzamčená (pozvánky, žádosti o přidání); ' +
+      'správce diskuze řeší manažery a pozvánky. Příspěvky lze lajkovat, ' +
+      'diskuzi přidat do oblíbených a nevhodné příspěvky nahlásit. ' +
+      'Schvaluje a moderuje Správce diskuzí.',
+  },
+  {
+    path: '/ikaros/galerie',
+    name: 'Galerie',
+    status: 'ok',
+    who: 'Čtení anon, upload přihlášený',
+    what:
+      'Obrazový salon komunity — mřížka obrázků s kategoriemi, hledáním a řazením, ' +
+      'fullscreen prohlížeč (lightbox). Nahraj obrázek, ulož koncept nebo odešli ' +
+      'ke schválení; po schválení (Správce galerie) ho lze hodnotit hvězdičkami ' +
+      'a přidat do oblíbených ikonou záložky (na dlaždici i v detailu).',
   },
 ];
 
@@ -144,63 +196,6 @@ const SOON_IKAROS: PageDoc[] = [
     fáze: 'Fáze 2.4',
     who: 'Přihlášený',
     what: 'Info o světě, tlačítko Vstoupit (public = okamžitě, private = žádost ke schválení PJ).',
-  },
-  {
-    path: '/ikaros/galerie',
-    name: 'Galerie',
-    status: 'ok',
-    who: 'Čtení anon, upload přihlášený',
-    what:
-      'Obrazový salon komunity — mřížka obrázků s kategoriemi, hledáním a řazením, ' +
-      'fullscreen prohlížeč (lightbox). Nahraj obrázek, ulož koncept nebo odešli ' +
-      'ke schválení; po schválení (Správce galerie) ho lze hodnotit hvězdičkami ' +
-      'a přidat do oblíbených ikonou záložky (na dlaždici i v detailu).',
-  },
-  {
-    path: '/ikaros/diskuze',
-    name: 'Diskuze',
-    status: 'ok',
-    who: 'Jen přihlášení',
-    what:
-      'Témata k rozhovoru — založ téma a veď vlákno příspěvků (formátovaný text). ' +
-      'Diskuze může být otevřená nebo uzamčená (pozvánky, žádosti o přidání); ' +
-      'správce diskuze řeší manažery a pozvánky. Příspěvky lze lajkovat, ' +
-      'diskuzi přidat do oblíbených a nevhodné příspěvky nahlásit. ' +
-      'Schvaluje a moderuje Správce diskuzí.',
-  },
-  {
-    path: '/chat/rozcesti',
-    name: 'Rozcestí I.–III.',
-    status: 'ok',
-    who: 'Přihlášený',
-    what:
-      'Tři nezávislé atmosférické roleplay místnosti — hra na jeden večer bez ' +
-      'kostek a mechanik. Každá má prostředí: zvolený styl (Fantasy / Sci-fi / ' +
-      'Mystika) a v něm jednu z 20 lokací, jejíž ilustrace tvoří pozadí chatu a ' +
-      'popis najdeš v rozbalovacím panelu (tlačítko 📖). Prostředí je sdílené — ' +
-      'vidí ho všichni v místnosti; měnit styl a lokaci smí jen role s ' +
-      'platformovou funkcí (správci). Zprávy, soukromý šepot, indikátor psaní, ' +
-      'hlášky příchodu/odchodu, počty v menu, odchod i odhlášení po nečinnosti ' +
-      'fungují stejně jako v Hospodě. Na rozdíl od Hospody se ale v seznamu ' +
-      'přítomných zobrazuje tvoje postava (jméno a obrázek z profilu), ne účet — ' +
-      'kdo postavu nevyplnil, vystupuje pod účtem. Kliknutím na osobu v seznamu ' +
-      'přítomných si otevřeš kartu její postavy — avatar, jméno a popis postavy.',
-  },
-  {
-    path: '/ikaros/uzivatele?tab=pratele',
-    name: 'Přátelé',
-    status: 'soon',
-    fáze: 'Fáze 1.8',
-    who: 'Přihlášený',
-    what: 'Žádosti, akceptace, blokace. Fronta žádostí v tabu Zpracovat.',
-  },
-  {
-    path: '—',
-    name: 'Reset hesla',
-    status: 'soon',
-    fáze: 'Fáze 1.7',
-    who: 'Anon (zapomenuté heslo)',
-    what: '„Zapomněl jsem heslo" v Login modalu → e-mail s reset linkem. Zatím přes administrátora.',
   },
 ];
 

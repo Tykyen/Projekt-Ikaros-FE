@@ -110,7 +110,7 @@
 .descBtnActive {
   background: var(--theme-accent, var(--accent));
   border-color: var(--theme-accent, var(--accent));
-  color: var(--theme-on-accent, #fff);
+  color: var(--theme-on-accent, var(--text-on-accent));
 }
 
 @media (max-width: 768px) {

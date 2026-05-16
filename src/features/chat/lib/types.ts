@@ -36,7 +36,12 @@ export interface ChatMessage {
   isSystem?: boolean;
   /** Vyplněno → whisper viditelný jen těmto userId. */
   visibleTo?: string[];
+  /** Emoji → pole `userId`, kteří reagovali (krok 4.3a). */
   reactions: Record<string, string[]>;
+  /** Reply (krok 4.3a) — ID, úryvek a jméno autora citované zprávy. */
+  replyToId?: string;
+  replyToPreview?: string;
+  replyToSenderName?: string;
   createdAt: string;
   updatedAt: string;
   expiresAt?: string;
@@ -86,6 +91,13 @@ export interface TypingEvent {
 export interface MessageDeletedEvent {
   messageId: string;
   channelId: string;
+}
+
+/** WS `chat:message:reaction` — změna emoji reakcí zprávy (krok 4.3a). */
+export interface ReactionEvent {
+  messageId: string;
+  channelId: string;
+  reactions: Record<string, string[]>;
 }
 
 /**

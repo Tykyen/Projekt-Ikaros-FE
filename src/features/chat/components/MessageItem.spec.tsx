@@ -25,7 +25,12 @@ const baseProps = {
   surfaceColor: '#1a0f06',
   canDelete: false,
   usersById: new Map<string, string>(),
+  highlighted: false,
   onDelete: vi.fn(),
+  onReply: vi.fn(),
+  onJumpToMessage: vi.fn(),
+  onToggleReaction: vi.fn(),
+  registerRef: vi.fn(),
 };
 
 describe('MessageItem', () => {
@@ -69,5 +74,58 @@ describe('MessageItem', () => {
     );
     fireEvent.click(screen.getByLabelText('Smazat zprávu'));
     expect(onDelete).toHaveBeenCalledWith('m1');
+  });
+
+  it('tlačítko Odpovědět zavolá onReply se zprávou', () => {
+    const onReply = vi.fn();
+    const msg = makeMsg();
+    render(<MessageItem {...baseProps} onReply={onReply} message={msg} />);
+    fireEvent.click(screen.getByLabelText('Odpovědět'));
+    expect(onReply).toHaveBeenCalledWith(msg);
+  });
+
+  it('vykreslí citaci a klik na ni skočí na originál', () => {
+    const onJump = vi.fn();
+    render(
+      <MessageItem
+        {...baseProps}
+        onJumpToMessage={onJump}
+        message={makeMsg({
+          replyToId: 'orig',
+          replyToSenderName: 'Frodo',
+          replyToPreview: 'kde je prsten',
+        })}
+      />,
+    );
+    expect(screen.getByText('Frodo')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('kde je prsten'));
+    expect(onJump).toHaveBeenCalledWith('orig');
+  });
+
+  it('vykreslí reaction chip se zvýrazněním mé reakce', () => {
+    const onToggle = vi.fn();
+    render(
+      <MessageItem
+        {...baseProps}
+        onToggleReaction={onToggle}
+        message={makeMsg({ reactions: { '👍': ['me', 'u2'] } })}
+      />,
+    );
+    const chip = screen.getByLabelText('Reakce 👍, 2×');
+    expect(chip).toBeInTheDocument();
+    expect(chip.className).toMatch(/chipMine/);
+    fireEvent.click(chip);
+    expect(onToggle).toHaveBeenCalledWith('m1', '👍');
+  });
+
+  it('smazaná zpráva nevykreslí akce ani reakce', () => {
+    render(
+      <MessageItem
+        {...baseProps}
+        message={makeMsg({ isDeleted: true, reactions: { '👍': ['u2'] } })}
+      />,
+    );
+    expect(screen.queryByLabelText('Odpovědět')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Reakce 👍, 1×')).not.toBeInTheDocument();
   });
 });

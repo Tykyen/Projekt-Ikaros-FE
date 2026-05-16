@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChatItem, ChatMessage } from '../lib/types';
 import { MessageItem } from './MessageItem';
 import { formatTime } from '../lib/format';
@@ -8,6 +8,8 @@ import s from './MessageList.module.css';
 const GROUP_WINDOW_MS = 3 * 60 * 1000;
 /** Vzdálenost od konce, do které ještě auto-scrollujeme na novou zprávu. */
 const STICK_THRESHOLD_PX = 140;
+/** Jak dlouho po skoku z citace zvýraznit originál. */
+const HIGHLIGHT_MS = 1200;
 
 interface MessageListProps {
   items: ChatItem[];
@@ -16,6 +18,10 @@ interface MessageListProps {
   canDelete: boolean;
   usersById: Map<string, string>;
   onDelete: (messageId: string) => void;
+  /** Začít odpověď na zprávu (4.3a). */
+  onReply: (message: ChatMessage) => void;
+  /** Toggle emoji reakce (4.3a). */
+  onToggleReaction: (messageId: string, emoji: string) => void;
 }
 
 const isWhisper = (m: ChatMessage) => !!m.visibleTo && m.visibleTo.length > 0;
@@ -29,10 +35,37 @@ export function MessageList({
   canDelete,
   usersById,
   onDelete,
+  onReply,
+  onToggleReaction,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const didInit = useRef(false);
+  // ID zprávy → její root element (pro skok z citace na originál, 4.3a).
+  const itemRefs = useRef(new Map<string, HTMLDivElement>());
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const highlightTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const registerRef = useCallback((id: string, el: HTMLDivElement | null) => {
+    if (el) itemRefs.current.set(id, el);
+    else itemRefs.current.delete(id);
+  }, []);
+
+  // Skok na citovaný originál — scroll + krátké zvýraznění. Pokud originál
+  // vypadl z načteného okna (starší 50 zpráv), klik nic neudělá.
+  const handleJump = useCallback((messageId: string) => {
+    const el = itemRefs.current.get(messageId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setHighlightedId(messageId);
+    clearTimeout(highlightTimer.current);
+    highlightTimer.current = setTimeout(
+      () => setHighlightedId(null),
+      HIGHLIGHT_MS,
+    );
+  }, []);
+
+  useEffect(() => () => clearTimeout(highlightTimer.current), []);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -69,6 +102,7 @@ export function MessageList({
           prev?.kind === 'message' &&
           prev.message.senderId === item.message.senderId &&
           isWhisper(prev.message) === isWhisper(item.message) &&
+          !item.message.replyToId &&
           msgTime(item.message) - msgTime(prev.message) < GROUP_WINDOW_MS;
         return (
           <MessageItem
@@ -79,7 +113,12 @@ export function MessageList({
             surfaceColor={surfaceColor}
             canDelete={canDelete}
             usersById={usersById}
+            highlighted={highlightedId === item.message.id}
             onDelete={onDelete}
+            onReply={onReply}
+            onJumpToMessage={handleJump}
+            onToggleReaction={onToggleReaction}
+            registerRef={registerRef}
           />
         );
       })}

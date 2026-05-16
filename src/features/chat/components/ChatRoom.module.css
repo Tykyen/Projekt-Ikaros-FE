@@ -210,8 +210,8 @@
   background:
     radial-gradient(
       ellipse at center,
-      rgba(0, 0, 0, 0.35) 0%,
-      rgba(0, 0, 0, 0.72) 100%
+      color-mix(in srgb, black 35%, transparent) 0%,
+      color-mix(in srgb, black 72%, transparent) 100%
     );
 }
 
@@ -226,7 +226,11 @@
 
 /* Panely zpráv a přítomných — poloprůhledný závoj nad scénou. */
 .scenePanel {
-  background: color-mix(in srgb, var(--theme-surface, #1a1a1a) 80%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--theme-surface, var(--surface-1)) 80%,
+    transparent
+  );
   backdrop-filter: blur(3px);
 }
 

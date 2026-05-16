@@ -7,6 +7,7 @@ import {
   useChatHistory,
   useSendMessage,
   useDeleteMessage,
+  useToggleReaction,
   useRoomEnvironment,
   useSetRoomEnvironment,
   useRoomPresenceCounts,
@@ -16,12 +17,15 @@ import { useSocketEvent } from './useSocket';
 import { api } from '@/shared/api/client';
 import type { RoomPresenceCounts } from '../lib/types';
 
+const { mockEmit } = vi.hoisted(() => ({ mockEmit: vi.fn() }));
+
 vi.mock('@/shared/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
 }));
 
 // Socket vrstva — testujeme jen REST + cache, WS handler voláme ručně.
 vi.mock('./useSocket', () => ({ useSocketEvent: vi.fn() }));
+vi.mock('./socket', () => ({ getSocket: () => ({ emit: mockEmit }) }));
 
 function makeWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -87,6 +91,32 @@ describe('useGlobalChat', () => {
       '/global-chat/messages?room=rozcesti-2',
       { content: 'ahoj', color: '#ff8800' },
     );
+  });
+
+  it('useSendMessage propíše replyToId do payloadu (4.3a)', async () => {
+    vi.mocked(api.post).mockResolvedValue({ id: 'm2' });
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useSendMessage('hospoda'), {
+      wrapper: Wrapper,
+    });
+    await result.current.mutateAsync({ content: 'odpoved', replyToId: 'm1' });
+    expect(api.post).toHaveBeenCalledWith('/global-chat/messages?room=hospoda', {
+      content: 'odpoved',
+      replyToId: 'm1',
+    });
+  });
+
+  it('useToggleReaction emitne chat:reaction:toggle se room (4.3a)', () => {
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useToggleReaction('rozcesti-1'), {
+      wrapper: Wrapper,
+    });
+    result.current('m1', '👍');
+    expect(mockEmit).toHaveBeenCalledWith('chat:reaction:toggle', {
+      room: 'rozcesti-1',
+      messageId: 'm1',
+      emoji: '👍',
+    });
   });
 
   it('useDeleteMessage zavolá DELETE s id zprávy + room', async () => {

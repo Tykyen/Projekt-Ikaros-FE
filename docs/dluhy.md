@@ -16,6 +16,23 @@
 
 ## Otevřené
 
+### D-070 — `MaxListenersExceededWarning` na socket.io socketech (BE)
+**Soubor:** `Projekt-ikaros/backend` — socket.io gateways (`AppGateway`,
+`GlobalChatGateway`, presence, friendships, …)
+**Problém:** BE log při každém připojení klienta hlásí
+`MaxListenersExceededWarning: 11 disconnect listeners added to [Socket]`.
+Víc gateways/služeb registruje na jeden socket `disconnect` listener →
+překročen Node default limit 10. `GlobalChatGateway.handleDisconnect`
+(krok 4.2d) k tomu přidal jeden další.
+**Dopad:** Nízký — jen varování v logu, žádná funkční chyba; teoreticky
+maskuje skutečný listener leak, kdyby vznikl.
+**Řešení:** Zvýšit limit na socketu (`socket.setMaxListeners(N)` v
+`handleConnection`, nebo `io.sockets.setMaxListeners`), případně sjednotit
+disconnect handling.
+**Kdy:** Při nejbližším průchodu socket infrou.
+
+---
+
 ### D-069 — „Chat (N)" v nav ukazuje počet nepřečtené pošty
 **Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.tsx:168` — `chatCount` + nadpis sekce (~ř. 210)
 **Problém:** Nadpis sekce chatu v levém sidebaru zobrazuje `Chat (N)`, kde `N` je

@@ -44,16 +44,16 @@ export function StartSection() {
         </li>
       </ol>
 
-      <div className={s.warning}>
-        <strong>Pozor:</strong> Reset hesla zatím není dostupný (přijde v kroku 1.7).
-        Pokud heslo zapomeneš, ozvi se administrátorovi přes e-mail v podmínkách.
-      </div>
-
       <h2>Jak se přihlásit</h2>
       <p>
         Klikni na <strong>Přihlásit se</strong> v hlavičce. Lze přihlásit přes
         e-mail nebo přezdívku. Pokud je tvůj účet ve stavu „smazání čeká",
         nabídne se ti reaktivace.
+      </p>
+      <p>
+        Zapomenuté heslo vyřešíš odkazem{' '}
+        <strong>„Zapomněl/a jsi heslo?"</strong> přímo v přihlašovacím dialogu
+        &mdash; zadáš e-mail a přijde ti odkaz na nastavení nového hesla.
       </p>
 
       <h2>Orientace v rozhraní</h2>

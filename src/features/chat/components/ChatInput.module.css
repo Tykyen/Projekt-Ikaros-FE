@@ -1,10 +1,60 @@
+.wrap {
+  border-top: 1px solid var(--theme-border-soft, var(--border));
+  background: var(--theme-surface-strong, var(--bg-secondary));
+}
+
 .bar {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-2) var(--sp-3);
-  border-top: 1px solid var(--theme-border-soft, var(--border));
-  background: var(--theme-surface-strong, var(--bg-secondary));
+}
+
+/* ── Reply lišta (4.3a) ── */
+.replyBar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--theme-border-soft, var(--border));
+  font-size: var(--text-xs);
+}
+
+.replyIcon {
+  flex-shrink: 0;
+  color: var(--theme-heading, var(--accent));
+}
+
+.replyName {
+  flex-shrink: 0;
+  font-weight: var(--weight-semi);
+  color: var(--theme-heading, var(--accent));
+}
+
+.replyText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-text-muted, var(--text-muted));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.replyCancel {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+}
+
+.replyCancel:hover {
+  color: var(--danger);
 }
 
 /* Whisper mód — orámování polí se přebarví jako vizuální pojistka. */
@@ -92,5 +142,10 @@
   .input {
     padding-top: var(--sp-3);
     padding-bottom: var(--sp-3);
+  }
+
+  /* Dotykový cíl pro zrušení odpovědi. */
+  .replyCancel {
+    padding: var(--sp-2);
   }
 }

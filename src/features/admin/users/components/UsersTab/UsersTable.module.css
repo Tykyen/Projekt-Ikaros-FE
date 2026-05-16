@@ -28,7 +28,7 @@
   background: var(--surface-1);
   border: 1px solid var(--frame-border);
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .table {
@@ -72,22 +72,30 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .userMeta {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .username {
   font-weight: 600;
   color: var(--text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .userSub {
   font-size: 0.8rem;
   color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .roleCell {

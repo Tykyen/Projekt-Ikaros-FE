@@ -157,7 +157,10 @@ export function UsersTable({
                       />
                       <div className={s.userMeta}>
                         <span className={s.username}>{u.username}</span>
-                        <span className={s.userSub}>
+                        <span
+                          className={s.userSub}
+                          title={`${u.displayName ?? '—'} · ${u.email}`}
+                        >
                           {u.displayName ?? '—'} · {u.email}
                         </span>
                       </div>

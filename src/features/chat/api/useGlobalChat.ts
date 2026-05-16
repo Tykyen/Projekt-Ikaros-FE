@@ -1,6 +1,8 @@
+import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { useSocketEvent } from './useSocket';
+import { getSocket } from './socket';
 import type {
   ChatMessage,
   RoomEnvironment,
@@ -70,6 +72,8 @@ export interface SendMessagePayload {
   content: string;
   /** Hex barva textu — chatColor odesílatele. */
   color?: string;
+  /** ID zprávy, na kterou se odpovídá (krok 4.3a — reply). */
+  replyToId?: string;
 }
 
 /** Odeslání veřejné zprávy. Zpráva se vykreslí až přes WS echo. */
@@ -81,6 +85,19 @@ export function useSendMessage(room: RoomKey) {
         dto,
       ),
   });
+}
+
+/**
+ * Přepnutí emoji reakce na zprávě (krok 4.3a). Žádný REST — reakce je
+ * efemérní jako zpráva (TTL 1 h). BE odpoví WS `chat:message:reaction`.
+ */
+export function useToggleReaction(room: RoomKey) {
+  return useCallback(
+    (messageId: string, emoji: string) => {
+      getSocket().emit('chat:reaction:toggle', { room, messageId, emoji });
+    },
+    [room],
+  );
 }
 
 /** Smazání zprávy (Admin/Superadmin). Propsání všem přes WS `chat:message:deleted`. */

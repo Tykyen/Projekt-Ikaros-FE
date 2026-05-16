@@ -32,7 +32,7 @@
 
 .body {
   position: relative;
-  padding-right: var(--sp-8);
+  padding-right: calc(var(--sp-8) + var(--sp-8));
 }
 
 .content {
@@ -78,11 +78,66 @@
   color: var(--theme-text-muted, var(--text-muted));
 }
 
-/* ── Admin delete ── */
-.delete {
+/* ── Citace reply (4.3a) ── */
+.replyQuote {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-1);
+  max-width: 100%;
+  margin-bottom: 2px;
+  padding: 1px var(--sp-2);
+  border: none;
+  border-left: 2px solid var(--theme-heading, var(--accent));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--theme-surface-soft, var(--surface-2));
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-align: left;
+  cursor: pointer;
+}
+
+.replyIcon {
+  flex-shrink: 0;
+  color: var(--theme-heading, var(--accent));
+  transform: translateY(2px);
+}
+
+.replyName {
+  flex-shrink: 0;
+  font-weight: var(--weight-semi);
+  color: var(--theme-heading, var(--accent));
+}
+
+.replyPreview {
+  overflow: hidden;
+  color: var(--theme-text-muted, var(--text-muted));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Skok z citace na originál — krátké zvýraznění ── */
+.highlighted {
+  background: var(--theme-surface-soft, var(--surface-2));
+  box-shadow: inset 3px 0 0 var(--theme-heading, var(--accent));
+  transition: box-shadow 1s ease;
+}
+
+/* ── Akční lišta zprávy (odpovědět / reakce / smazat) ── */
+.actions {
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.item:hover .actions {
+  opacity: 1;
+}
+
+.action {
   display: inline-flex;
   align-items: center;
   padding: 2px;
@@ -91,26 +146,73 @@
   background: transparent;
   color: var(--theme-text-muted, var(--text-muted));
   cursor: pointer;
-  opacity: 0;
-  transition:
-    opacity var(--transition-fast),
-    color var(--transition-fast);
+  transition: color var(--transition-fast);
 }
 
-.item:hover .delete {
-  opacity: 1;
+.action:hover {
+  color: var(--theme-heading, var(--accent));
 }
 
 .delete:hover {
   color: var(--danger);
 }
 
-/* Dotyková zařízení nemají hover — delete musí být trvale viditelný. */
+/* Dotyková zařízení nemají hover — akce musí být trvale viditelné. */
 @media (hover: none) {
-  .delete {
+  .actions {
     opacity: 1;
+  }
+
+  .action {
     padding: var(--sp-2);
   }
+}
+
+/* ── Emoji reakce (4.3a) ── */
+.reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin: 2px 0 var(--sp-1);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 0 var(--sp-2);
+  height: 22px;
+  border: 1px solid var(--theme-border, var(--border));
+  border-radius: 999px;
+  background: var(--theme-surface-soft, var(--surface-2));
+  font-size: var(--text-xs);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.chip:hover {
+  border-color: var(--theme-heading, var(--accent));
+}
+
+.chipMine {
+  background: color-mix(in srgb, var(--theme-heading, var(--accent)) 22%, transparent);
+  border-color: var(--theme-heading, var(--accent));
+}
+
+.chipEmoji {
+  font-size: 0.9rem;
+}
+
+.chipCount {
+  font-family: var(--font-mono);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.chipMine .chipCount {
+  color: var(--theme-text, var(--text-1));
 }
 
 @media (prefers-reduced-motion: no-preference) {

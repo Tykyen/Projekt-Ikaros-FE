@@ -295,15 +295,6 @@
   color: var(--text-strong);
 }
 
-.warning {
-  padding: var(--sp-3) var(--sp-4);
-  margin: var(--sp-3) 0;
-  background: var(--surface-2);
-  border-left: 3px solid var(--warning);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-}
-
 /* ── 3.6a — Role karty + permission matice ──────────────────────────── */
 
 .roleCardGrid {

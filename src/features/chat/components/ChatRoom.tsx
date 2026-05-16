@@ -22,12 +22,14 @@ import {
   useChatHistory,
   useSendMessage,
   useDeleteMessage,
+  useToggleReaction,
 } from '../api/useGlobalChat';
 import type {
   ChatItem,
   ChatMessage,
   MessageDeletedEvent,
   PresenceEvent,
+  ReactionEvent,
   RoomInfo,
   RoomKey,
   TypingEvent,
@@ -68,8 +70,11 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   const history = useChatHistory(room);
   const sendMutation = useSendMessage(room);
   const deleteMutation = useDeleteMessage(room);
+  const toggleReaction = useToggleReaction(room);
 
   const [typingNames, setTypingNames] = useState<string[]>([]);
+  // Zpráva, na kterou se právě odpovídá (4.3a); `null` = běžná zpráva.
+  const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [usersOpen, setUsersOpen] = useState(false);
   // Detail postavy v Rozcestí — ID kliknuté osoby z `PŘÍTOMNÍ`, `null` = zavřeno.
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -186,6 +191,17 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
     [qc, keys.roomInfo, user?.id, room, setMyRooms],
   );
 
+  const handleReaction = useCallback(
+    (e: ReactionEvent) => {
+      qc.setQueryData<ChatMessage[]>(keys.messages, (old) =>
+        (old ?? []).map((x) =>
+          x.id === e.messageId ? { ...x, reactions: e.reactions } : x,
+        ),
+      );
+    },
+    [qc, keys.messages],
+  );
+
   const handleTyping = useCallback(
     (e: TypingEvent) => {
       if (e.characterName === user?.username) return;
@@ -210,6 +226,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
 
   useSocketEvent<ChatMessage>('chat:message', handleMessage);
   useSocketEvent<MessageDeletedEvent>('chat:message:deleted', handleDeleted);
+  useSocketEvent<ReactionEvent>('chat:message:reaction', handleReaction);
   useSocketEvent<PresenceEvent>('chat:presence', handlePresence);
   useSocketEvent<TypingEvent>('chat:typing', handleTyping);
 
@@ -272,7 +289,12 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
 
   // ── Akce ──────────────────────────────────────────────────────────────
   const sendPublic = (text: string) => {
-    sendMutation.mutate({ content: text, color: user?.chatColor });
+    sendMutation.mutate({
+      content: text,
+      color: user?.chatColor,
+      replyToId: replyTo?.id,
+    });
+    setReplyTo(null);
   };
 
   const sendWhisper = (toUserId: string, text: string) => {
@@ -281,7 +303,9 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
       content: text,
       color: user?.chatColor,
       room,
+      replyToId: replyTo?.id,
     });
+    setReplyTo(null);
   };
 
   const emitTyping = (isTyping: boolean) => {
@@ -376,6 +400,8 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
             canDelete={canDelete}
             usersById={usersById}
             onDelete={(id) => deleteMutation.mutate(id)}
+            onReply={setReplyTo}
+            onToggleReaction={toggleReaction}
           />
         </div>
 
@@ -408,10 +434,12 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
           disabled={!channelId}
           users={users}
           currentUserId={user.id}
+          replyTo={replyTo}
           onSendPublic={sendPublic}
           onSendWhisper={sendWhisper}
           onTypingStart={() => emitTyping(true)}
           onTypingStop={() => emitTyping(false)}
+          onCancelReply={() => setReplyTo(null)}
         />
       </div>
 
