@@ -1,0 +1,136 @@
+/* Záhlaví scény — pod hlavičkou místnosti. Neprůhledné, drží se nad scénou. */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--theme-border-soft, var(--border));
+  background: var(--theme-surface-strong, var(--bg-secondary));
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+/* „Kartuše" — rámovaný štítek místo syrového selectu. */
+.cartouche {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-sm);
+  background: var(--theme-surface, var(--bg-card));
+  transition: border-color var(--transition-base);
+}
+
+.cartouche:focus-within {
+  border-color: var(--theme-accent, var(--accent));
+}
+
+.cartouchePlace {
+  min-width: 0;
+  flex: 1 1 auto;
+  max-width: 280px;
+}
+
+.cartoucheLabel {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+/* Stylizovaný nativní select — bez defaultního chrome. */
+.select {
+  min-width: 0;
+  max-width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--theme-text, var(--text));
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+}
+
+.select:disabled {
+  cursor: default;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+/* Zamčená cedule — bez oprávnění. */
+.locked {
+  opacity: 0.7;
+}
+
+.lockHint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--theme-text-muted, var(--text-muted));
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+}
+
+/* Tlačítko popisu místa — „pečeť". */
+.descBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-full);
+  background: var(--theme-surface, var(--bg-card));
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.descBtn:hover {
+  color: var(--theme-text, var(--text));
+  border-color: var(--theme-accent, var(--accent));
+}
+
+.descBtnActive {
+  background: var(--theme-accent, var(--accent));
+  border-color: var(--theme-accent, var(--accent));
+  color: var(--theme-on-accent, var(--text-on-accent));
+}
+
+@media (max-width: 768px) {
+  .bar {
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .controls {
+    flex: 1 1 100%;
+    order: 2;
+  }
+
+  .cartouchePlace {
+    max-width: none;
+    flex: 1 1 100%;
+  }
+
+  .descBtn {
+    order: 1;
+    margin-left: auto;
+  }
+}
