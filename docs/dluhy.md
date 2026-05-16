@@ -16,6 +16,20 @@
 
 ## Otevřené
 
+### D-068 — Header IkarosLayout přetéká na úzkém mobilu (375 px)
+**Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.tsx` + `.module.css` — `.header` / `.headerBtn`
+**Problém:** Na šířce 375 px tlačítka v hlavičce (Pošta, Zprávy, avatar, odhlásit) přetékají
+vpravo až na ~450 px → horizontální scroll celého dokumentu. Odhaleno při `mobil-desktop`
+smoke testu kroku 4.1, ale jde o **pre-existující** problém layoutu, ne chatu — týká se
+všech stránek na úzkém mobilu.
+**Dopad:** Střední — horizontální scroll na malých telefonech, kosmeticky rušivé.
+**Řešení:** Na `@media (max-width: 768px)` zmenšit/sbalit header tlačítka (skrýt labely —
+už se děje pro `.headerBtnLabel`, ale ikony + avatar + logout pořád nevejdou), případně
+přesunout část akcí do draweru nebo zmenšit gap/padding.
+**Kdy:** Při nejbližším průchodu responzivitou layoutu (samostatný UI cleanup).
+
+---
+
 ### D-028 (zbývající Redis varianta) — Cache pro `JwtStrategy.validate` ban check
 **Kontext:** In-memory cache uzavřena, single-instance funguje plně. Pro multi-instance deployu nutno swap na Redis pub/sub.
 **Řešení:** Vyměnit `UserBanCacheService` Map za Redis client (`ioredis`); invalidate přes pub/sub channel `user-ban-invalidate`.

@@ -1,6 +1,6 @@
 # Spec 4.1 — Hospoda (globální chat `/chat`)
 
-**Status:** Draft — čeká na schválení
+**Status:** ✅ Hotovo (2026-05-16)
 **Rozsah:** FE (nová stránka chatu) + drobná BE úprava (barva textu + `userId` v presence)
 **Repo:** `Projekt-ikaros-FE` + `Projekt-ikaros` (BE), větev `feat/krok-4.1-hospoda`
 **Velikost:** odhad ~13 FE souborů / ~700 ř. + ~5 BE souborů / ~40 ř.
@@ -282,6 +282,27 @@ projde do uložené zprávy; gateway test na `userId` v presence payloadu.
 - Rozcestí v sidebaru → **disabled položky** s popiskem „Brzy".
 - Dluhy #4 (barva textu) a #5 (`userId` v presence) → **vtaženy do scope 4.1** (drobné BE úpravy, §4.7).
 - Vzhled → respektovat aktivní theme + naše tokeny (ze zadání „ať sedí s naší prací").
+
+---
+
+## 10. Integrace — odchylky odhalené při smoke testu
+
+Smoke test (2 klienti, viewporty 375/768/1440) odhalil 3 problémy, které spec
+nepředvídal. Všechny opraveny, prokomunikováno s autorem:
+
+1. **Schema enum vs. hex barva.** `chatmessages` Mongoose schéma mělo `color` jako
+   enum 8 pojmenovaných barev → hex z profilu spadl na 500. **Fix:** `color` uvolněno
+   na volný `String` (`chat-message.schema.ts`) — zpětně kompatibilní (world chat dál
+   posílá názvy přes vlastní `@IsIn` DTO). Nad rámec původního §4.7.
+2. **`getSocket()` vytvářel duplicitní spojení.** `socket.ts` při `!socket.connected`
+   vytvořil nový `io()` → listenery a `room:join` skončily na různých instancích,
+   WS echo nedorazilo. **Fix:** `getSocket()` vrací existující instanci bez ohledu na
+   stav (`if (socket) return socket`). Sdílený soubor — postihovalo i presence/poštu.
+3. **setState při renderu.** `useSocket()` v render fázi `ChatRoom` spouštěl side-efekt
+   `getSocket()`. **Fix:** `getSocket()` se volá jen v effectu / event handlerech.
+
+Pre-existující problém mimo scope → zapsán jako **D-068** (header `IkarosLayout`
+přetéká na 375 px).
 
 ---
 

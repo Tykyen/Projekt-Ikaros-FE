@@ -1,0 +1,131 @@
+.item {
+  padding: 1px var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+.item:hover {
+  background: var(--theme-surface-soft, var(--surface-2));
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semi);
+  font-size: var(--text-sm);
+  color: var(--theme-heading, var(--accent));
+}
+
+.time {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.body {
+  position: relative;
+  padding-right: var(--sp-8);
+}
+
+.content {
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.timeHover {
+  margin-left: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--theme-text-muted, var(--text-muted));
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.item:hover .timeHover {
+  opacity: 1;
+}
+
+/* ── Whisper ── */
+.whisper {
+  margin: 1px 0;
+  padding-left: var(--sp-3);
+  border-left: 3px solid var(--theme-border-burgundy, var(--accent));
+  background: var(--theme-surface-soft, var(--surface-2));
+  font-style: italic;
+}
+
+.whisperTag {
+  font-size: var(--text-xs);
+  font-style: normal;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+/* ── Smazaná zpráva ── */
+.deleted {
+  font-style: italic;
+}
+
+.deletedText {
+  font-size: var(--text-sm);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+/* ── Admin delete ── */
+.delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.item:hover .delete {
+  opacity: 1;
+}
+
+.delete:hover {
+  color: var(--danger);
+}
+
+/* Dotyková zařízení nemají hover — delete musí být trvale viditelný. */
+@media (hover: none) {
+  .delete {
+    opacity: 1;
+    padding: var(--sp-2);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes msgIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .item {
+    animation: msgIn 120ms ease;
+  }
+}

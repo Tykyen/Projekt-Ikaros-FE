@@ -105,6 +105,21 @@ const IKAROS_PAGES: PageDoc[] = [
     who: 'Přihlášený',
     what: 'Tvoje záložky napříč diskuzemi, články a galerií na jednom místě — stránka má tři taby. Položku si přidáš do oblíbených ikonou záložky na jejím detailu nebo na kartě v seznamu. Vybrané oblíbené si můžeš „připnout" (ikona špendlíku) — připnuté položky se zobrazují v pravém panelu, maximálně 5 na každý typ obsahu. Oblíbené je čistě osobní — vidíš je jen ty, neovlivňuje to hodnocení obsahu.',
   },
+  {
+    path: '/chat',
+    name: 'Hospoda (globální chat)',
+    status: 'ok',
+    who: 'Přihlášený',
+    what:
+      'Interdimenzionální hospoda — jedna sdílená místnost pro celou platformu, ' +
+      'napříč všemi světy. Píšeš zprávy v reálném čase, vidíš seznam přítomných ' +
+      'a indikátor, kdo právě píše. Komu napsat volíš nahoře u pole: „Všem" pošle ' +
+      'zprávu veřejně, výběrem konkrétního uživatele pošleš soukromý šepot, který ' +
+      'uvidí jen on (orámování pole se přebarví, ať víš, že šeptáš). Text zprávy se ' +
+      'zobrazuje v barvě, kterou máš nastavenou v profilu. V textu fungují emotes ' +
+      'přes dvojtečkové zkratky (např. :beer: → 🍺). Zprávy mizí po hodině. ' +
+      'Admin a Superadmin mohou nevhodnou zprávu smazat.',
+  },
 ];
 
 const SOON_IKAROS: PageDoc[] = [
@@ -148,12 +163,12 @@ const SOON_IKAROS: PageDoc[] = [
       'Schvaluje a moderuje Správce diskuzí.',
   },
   {
-    path: '/chat/hospoda',
-    name: 'Hospoda (globální chat)',
+    path: '/chat/rozcesti',
+    name: 'Rozcestí I.–III.',
     status: 'soon',
-    fáze: 'Fáze 4',
+    fáze: 'Fáze 4.2',
     who: 'Přihlášený',
-    what: 'Interdimenzionální chat napříč světy. Kanály, emotes, typing indikátory.',
+    what: 'Atmosférické roleplay místnosti — hra na jeden večer bez kostek a mechanik, s ilustrovaným prostředím a popisem lokace.',
   },
   {
     path: '/ikaros/uzivatele?tab=pratele',

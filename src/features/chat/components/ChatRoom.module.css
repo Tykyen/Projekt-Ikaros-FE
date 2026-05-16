@@ -1,0 +1,151 @@
+/* --chat-reserve = výška logo-overlay prostoru v .main (IkarosLayout
+   má .main { padding-top: 220px }). Chat tím vyplní zbytek viewportu
+   bez vlastního scrollu okolo. Step 7 (mobil-desktop) hodnotu doladí. */
+.room {
+  --chat-reserve: 220px;
+  position: relative;
+  height: calc(100% - var(--chat-reserve));
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-md);
+  background: var(--theme-surface, var(--bg-card));
+}
+
+.state {
+  height: calc(100% - 220px);
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-muted, var(--text-muted));
+  font-family: var(--font-body);
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--theme-border-soft, var(--border));
+  background: var(--theme-surface-strong, var(--bg-secondary));
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semi);
+  color: var(--theme-heading, var(--accent));
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: default;
+}
+
+/* ── Body: zprávy + přítomní ── */
+.body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 200px;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.users {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--sp-2);
+  border-left: 1px solid var(--theme-border-soft, var(--border));
+}
+
+.usersHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-2);
+}
+
+.usersLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+/* Zavírací tlačítko sheetu — jen na mobilu. */
+.usersClose {
+  display: none;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+}
+
+.foot {
+  flex-shrink: 0;
+}
+
+/* ── Mobil ── */
+@media (max-width: 768px) {
+  .title {
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .count {
+    min-height: 36px;
+    padding: var(--sp-2) var(--sp-3);
+    cursor: pointer;
+  }
+
+  .body {
+    grid-template-columns: 1fr;
+  }
+
+  /* Přítomní jako překryvný sheet přes celou místnost. */
+  .users {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-dropdown);
+    display: none;
+    background: var(--theme-surface, var(--bg-card));
+    border-left: none;
+  }
+
+  .usersOpen .users {
+    display: flex;
+  }
+
+  .usersClose {
+    display: inline-flex;
+  }
+}

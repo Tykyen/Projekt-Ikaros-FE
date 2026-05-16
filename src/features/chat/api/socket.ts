@@ -8,7 +8,12 @@ const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 let socket: Socket | null = null;
 
 export function getSocket(): Socket {
-  if (socket?.connected) return socket;
+  // Vrátit existující instanci bez ohledu na `connected` — socket.io si stavy
+  // connecting/reconnecting řeší interně. Recyklace jediné instance brání tomu,
+  // aby paralelní `getSocket()` volání během navazování spojení vytvořila víc
+  // socketů (pak by listenery a room:join skončily na různých instancích).
+  // Nová instance vznikne jen po `disconnectSocket()` (které `socket` nuluje).
+  if (socket) return socket;
 
   const token = getDefaultStore().get(accessTokenAtom) ?? undefined;
 

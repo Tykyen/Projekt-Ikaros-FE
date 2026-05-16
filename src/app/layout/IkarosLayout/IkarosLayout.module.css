@@ -260,6 +260,32 @@
 }
 .navItemActive { composes: btn3dActive from '../../../themes/_shared/btn3d.module.css'; }
 
+/* Krok 4.1 — disabled nav položka (Rozcestí I.–III. do kroku 4.2). */
+.navItemDisabled {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: 10px 14px;
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  color: var(--theme-text-muted, var(--text-muted));
+  opacity: 0.55;
+  cursor: default;
+  user-select: none;
+}
+
+.soonBadge {
+  flex-shrink: 0;
+  padding: 1px var(--sp-2);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .navItemIcon {
   display: inline-flex;
   align-items: center;

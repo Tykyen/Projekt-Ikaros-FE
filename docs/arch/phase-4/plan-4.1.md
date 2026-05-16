@@ -1,7 +1,7 @@
 # Implementační plán — krok 4.1 Hospoda (globální chat `/chat`)
 
 **Datum:** 2026-05-16
-**Status:** ⏳ Čeká na schválení
+**Status:** ✅ Implementováno (2026-05-16)
 **Spec:** [`spec-4.1.md`](./spec-4.1.md)
 **Větev:** `main` (FE i BE repo) — autor explicitně chce práci rovnou v `main`, bez feature větví
 

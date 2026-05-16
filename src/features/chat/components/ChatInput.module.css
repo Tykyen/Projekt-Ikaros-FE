@@ -1,0 +1,96 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-top: 1px solid var(--theme-border-soft, var(--border));
+  background: var(--theme-surface-strong, var(--bg-secondary));
+}
+
+/* Whisper mód — orámování polí se přebarví jako vizuální pojistka. */
+.barWhisper .input,
+.barWhisper .target {
+  border-color: var(--theme-border-burgundy, var(--accent));
+}
+
+.target {
+  flex-shrink: 0;
+  max-width: 9rem;
+  padding: var(--sp-2);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-sm);
+  background: var(--theme-surface, var(--bg-base));
+  color: var(--theme-text, var(--text-primary));
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-sm);
+  background: var(--theme-surface, var(--bg-base));
+  color: var(--theme-text, var(--text-primary));
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+}
+
+.input:focus,
+.target:focus {
+  outline: none;
+  border-color: var(--theme-border-strong, var(--accent));
+}
+
+.input::placeholder {
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.send {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--theme-border, var(--accent));
+  border-radius: var(--radius-sm);
+  background: var(--theme-accent, var(--accent));
+  color: var(--text-on-accent);
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.send:hover:not(:disabled) {
+  background: var(--theme-accent-bright, var(--accent-bright));
+}
+
+.send:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .target {
+    max-width: 6.5rem;
+  }
+
+  /* Dotykové cíle min. 44×44 px. */
+  .send {
+    width: 44px;
+    height: 44px;
+  }
+
+  .input {
+    padding-top: var(--sp-3);
+    padding-bottom: var(--sp-3);
+  }
+}

@@ -81,11 +81,18 @@ const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
 ];
 
-const CHAT_ROOMS: { key: string; label: string; to: string }[] = [
-  { key: 'hospoda',   label: 'Dimenzionální hospoda', to: '/chat/hospoda' },
-  { key: 'rozcesti1', label: 'Rozcestí I.',           to: '/chat/rozcesti' },
-  { key: 'rozcesti2', label: 'Rozcestí II.',          to: '/chat/rozcesti2' },
-  { key: 'rozcesti3', label: 'Rozcestí III.',         to: '/chat/rozcesti3' },
+// Krok 4.1 — Hospoda žije na `/chat`. Rozcestí I.–III. (krok 4.2) zatím
+// nemají route → zobrazují se jako disabled položky s popiskem „Brzy".
+const CHAT_ROOMS: {
+  key: string;
+  label: string;
+  to: string;
+  disabled?: boolean;
+}[] = [
+  { key: 'hospoda',   label: 'Hospoda',       to: '/chat' },
+  { key: 'rozcesti1', label: 'Rozcestí I.',   to: '/chat/rozcesti',  disabled: true },
+  { key: 'rozcesti2', label: 'Rozcestí II.',  to: '/chat/rozcesti2', disabled: true },
+  { key: 'rozcesti3', label: 'Rozcestí III.', to: '/chat/rozcesti3', disabled: true },
 ];
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -202,20 +209,34 @@ function SidebarContent({
       <div className={s.section} data-section-key="chat">
         <SectionTitle>{`Chat (${chatCount})`}</SectionTitle>
         <div className={s.navList}>
-          {CHAT_ROOMS.map((room, idx) => (
-            <NavLink
-              key={room.key}
-              to={room.to}
-              data-nav-key={room.key}
-              onClick={onNav}
-              className={({ isActive }) => clsx(s.navItem, isActive && s.navItemActive)}
-            >
-              {idx === 0 && (
-                <span className={s.navItemIcon}><Beer size={18} /></span>
-              )}
-              <span className={s.navItemLabel}>{room.label}</span>
-            </NavLink>
-          ))}
+          {CHAT_ROOMS.map((room) =>
+            room.disabled ? (
+              <span
+                key={room.key}
+                className={s.navItemDisabled}
+                data-nav-key={room.key}
+                title="Brzy — krok 4.2"
+              >
+                <span className={s.navItemLabel}>{room.label}</span>
+                <span className={s.soonBadge}>Brzy</span>
+              </span>
+            ) : (
+              <NavLink
+                key={room.key}
+                to={room.to}
+                data-nav-key={room.key}
+                onClick={onNav}
+                className={({ isActive }) =>
+                  clsx(s.navItem, isActive && s.navItemActive)
+                }
+              >
+                <span className={s.navItemIcon}>
+                  <Beer size={18} />
+                </span>
+                <span className={s.navItemLabel}>{room.label}</span>
+              </NavLink>
+            ),
+          )}
         </div>
       </div>
     </div>

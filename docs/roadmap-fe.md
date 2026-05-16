@@ -701,9 +701,19 @@ Brownfield — BE modul `ikaros-discussions` existoval z feature-parity. Diskuze
 **BE:** Socket.IO `GlobalChatGateway`  
 **WS eventy:** viz `Projekt-ikaros/docs/websocket-api.md`
 
-### - [ ] 4.1 Hospoda (`/chat`)
-- [ ] Interdimenzionální chat, kanály (Hospoda, Pokec), real-time zprávy
-- [ ] Emotes (`:shortcode:`), typing indikátory
+### - [x] 4.1 Hospoda (`/chat`) ✅ (2026-05-16)
+
+**Spec:** `docs/arch/phase-4/spec-4.1.md`, **Plán:** `docs/arch/phase-4/plan-4.1.md`
+
+- [x] Interdimenzionální hospoda — jeden globální kanál, real-time veřejné zprávy.
+  „Pokec" zrušen — BE má jen jeden globální kanál (nemělo oporu v backendu).
+- [x] Whisper (soukromý šepot), seznam přítomných, typing indikátory.
+- [x] Emotes (`:shortcode:` → emoji, klientský set), barva textu (`chatColor`)
+  s kontrast guardem vůči aktivnímu tématu.
+- [x] BE: `color` v message DTO + `userId` v `chat:presence` (dluhy #4/#5 vyřešeny).
+- [x] Mazání zpráv (Admin/Superadmin).
+- [x] Sidebar: Hospoda → `/chat`; Rozcestí I.–III. disabled položky do kroku 4.2.
+- [x] Tests: BE +4 (color v sendMessage/sendWhisper), FE +37 (lib, api, komponenty).
 
 ### - [ ] 4.2 Rozcestí (`/chat/rozcesti`)
 - [ ] Atmosférická roleplay místnost — bez kostek a mechanik, hra na jeden večer

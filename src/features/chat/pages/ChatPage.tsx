@@ -1,3 +1,6 @@
+import { ChatRoom } from '../components/ChatRoom';
+
+/** Stránka `/chat` — globální chat „Hospoda" (krok 4.1). */
 export default function ChatPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Hospoda (globální chat)</div>;
+  return <ChatRoom />;
 }
