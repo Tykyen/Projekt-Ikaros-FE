@@ -1,0 +1,1101 @@
+/* ── Kyberpunk — „Neo-Akihabara 2099" (spec 1.0s).
+   Noční ulice megalopole v dešti. Cinematic BG + obří fénix/anděl hologram +
+   sparse digital rain v edge strips + section-color-coded navigace + vadné
+   neony s flicker + RGB-split hover + magenta hairline divider + wet pavement
+   reflection + CJK watermarks v rozích sekcí + administrator signature.
+
+   ORIGINÁLNÍ MOTIFY: sparse typografický rain ve 2 edge strips (50px vlevo+vpravo,
+   padající CJK + binární znaky v 6 neonových barvách, 80s loop — žádný jiný skin
+   nemá padající znaky), section-color stripe 4px vlevo od každého nav itemu
+   (6 různých neonů — žádný jiný skin), broken neon flicker (60ms blackout 1× za
+   ~15s — žádný jiný skin nemá flickerující neonku), RGB-split chromatic aberration
+   na hover (žádný jiný skin), magenta horizontal hairline divider uprostřed welcome
+   card (žádný jiný skin), wet pavement reflection pod welcome card (vertical blur+
+   gradient — žádný jiný skin), CJK watermark znaky v rozích sekcí (光宇声制界話文画,
+   per-section barva — žádný jiný skin nemá CJK), administrator signature self-draw
+   (Audiowide italic cyan, 1× per session — žádný jiný skin), cyan+magenta neon HUD
+   bracket corner ornaments (žádný jiný skin).
+
+   Žádné AI gen WEBP. 3 raster assety (logo + medailon + BG, dodáno uživatelem).
+   Všechny ornamenty inline SVG data-uri v index.ts (22 vars).
+
+   Scoped přes [data-theme="kyberpunk"], žádný globální dopad. */
+
+[data-theme="kyberpunk"] {
+  background-color: var(--bg-primary);
+}
+
+/* ──────────────── 1. Atmosférický overlay (radial vignette + linear darken) ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. ✦ ORIGINÁL: SPARSE RAIN ve 2 edge strips (levý + pravý) ✦
+   Vertikální 50px sloupce padajících CJK + binárních znaků v 6 cyklujících neonových
+   barvách. background-repeat: repeat-y, animace 80s linear. Mobile (≤768px) skryto.
+   Reduced-motion: animace zastavena, opacity 0.30. ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] body::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  background-image: var(--asset-rain-strip);
+  background-size: 50px 600px;
+  background-repeat: repeat-y;
+  mix-blend-mode: screen;
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] body::before {
+  left: 8px;
+  animation: kyberpunk-rain-fall 80s linear infinite;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] body::after {
+  right: 8px;
+  animation: kyberpunk-rain-fall 100s linear infinite reverse;
+}
+
+@keyframes kyberpunk-rain-fall {
+  from { background-position: 0 0; }
+  to   { background-position: 0 600px; }
+}
+
+/* ──────────────── 3. Topbar — dark HUD chrome + cyan+magenta hairline ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(8, 5, 26, 0.95) 0%, rgba(13, 10, 37, 0.98) 100%);
+  border-bottom: 1px solid var(--theme-cyan);
+  box-shadow:
+    0 1px 0 rgba(255, 0, 128, 0.25),
+    0 4px 12px rgba(8, 5, 26, 0.75);
+  overflow: visible;
+  z-index: 5;
+}
+
+/* ✦ ORIGINÁL: CYAN+MAGENTA NEON HAIRLINE pod topbarem (alternativa africke kente / arabsky-svet mašrabíja) */
+[data-theme="kyberpunk"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-cyan) 20%,
+    var(--theme-magenta) 50%,
+    var(--theme-cyan) 80%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan)) drop-shadow(0 0 6px var(--theme-glow-magenta));
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ──────────────── 4. Logo — neon HUD plaketa s baked-in anděl + "PROJEKT IKAROS" ──────────────── */
+
+[data-theme="kyberpunk"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan)) drop-shadow(0 0 6px var(--theme-glow-magenta));
+}
+
+[data-theme="kyberpunk"] header [class*="logoFallback"] {
+  display: var(--logo-fallback-display, none);
+  font-family: var(--font-logo);
+  font-size: 24px;
+  color: var(--theme-cyan);
+  text-shadow:
+    0 0 6px var(--theme-glow-cyan),
+    0 0 12px var(--theme-glow-magenta);
+  letter-spacing: 0.04em;
+}
+
+/* ──────────────── 5. Header buttons — dark HUD plate s cyan border + RGB-split hover ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] > header [class*="headerBtn"],
+[data-theme="kyberpunk"][data-shell="ikaros"] > header button:not([class*="logo"]) {
+  background: linear-gradient(180deg, rgba(13, 10, 37, 0.85) 0%, rgba(8, 5, 26, 0.92) 100%);
+  border: 1px solid var(--theme-cyan);
+  color: var(--theme-text);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  padding: 8px 18px;
+  border-radius: 2px;
+  transition: all 220ms ease;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 0, 128, 0.15),
+    0 0 8px rgba(0, 240, 255, 0.20);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] > header [class*="headerBtn"]:hover,
+[data-theme="kyberpunk"][data-shell="ikaros"] > header button:not([class*="logo"]):hover {
+  border-color: var(--theme-magenta);
+  color: #ffffff;
+  text-shadow:
+    1px 0 var(--theme-magenta),
+    -1px 0 var(--theme-cyan);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 240, 255, 0.30),
+    0 0 14px var(--theme-glow-magenta-strong);
+  transform: translateY(-1px);
+}
+
+/* ✦ ZLATÝ STANDARD speciální — magenta-purple gradient glow (kontextově sedí
+   místo gold v kyberpunku — Q2 ve spec) */
+[data-theme="kyberpunk"][data-shell="ikaros"] > header [class*="zlatyStandard"],
+[data-theme="kyberpunk"][data-shell="ikaros"] > header [data-button-key="zlaty-standard"] {
+  border-color: var(--theme-magenta);
+  background: linear-gradient(180deg, rgba(180, 0, 255, 0.18) 0%, rgba(255, 0, 128, 0.20) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(180, 0, 255, 0.25),
+    0 0 10px rgba(180, 0, 255, 0.40),
+    0 0 14px rgba(255, 0, 128, 0.35);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] > header [class*="zlatyStandard"]:hover,
+[data-theme="kyberpunk"][data-shell="ikaros"] > header [data-button-key="zlaty-standard"]:hover {
+  border-color: var(--theme-magenta-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(180, 0, 255, 0.45),
+    0 0 16px rgba(180, 0, 255, 0.65),
+    0 0 20px rgba(255, 0, 128, 0.55);
+}
+
+/* ──────────────── 6. Sidebar frame — midnight indigo panel + 4× HUD bracket corner ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="right"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="sideFrame"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="rightFrame"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(13, 10, 37, 0.88) 0%, rgba(8, 5, 26, 0.94) 100%);
+  border: 1px solid var(--theme-border-soft);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 0, 128, 0.10),
+    0 6px 22px rgba(8, 5, 26, 0.80);
+}
+
+/* ──────────────── 7. Corner ornaments — cyan+magenta HUD bracket (master TL, scaleX/Y mirror) ──────────────── */
+
+[data-theme="kyberpunk"] [data-position] {
+  position: absolute;
+  width: var(--asset-corner-size, 72px);
+  height: var(--asset-corner-size, 72px);
+  background-color: transparent !important;
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none !important;
+  border-radius: 0;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan)) drop-shadow(0 0 6px var(--theme-glow-magenta));
+  forced-color-adjust: none;
+}
+
+[data-theme="kyberpunk"] [data-position="tl"] {
+  top: var(--frame-corner-inset, 4px);
+  left: var(--frame-corner-inset, 4px);
+  transform: none;
+}
+[data-theme="kyberpunk"] [data-position="tr"] {
+  top: var(--frame-corner-inset, 4px);
+  right: var(--frame-corner-inset, 4px);
+  transform: scaleX(-1);
+}
+[data-theme="kyberpunk"] [data-position="bl"] {
+  bottom: var(--frame-corner-inset, 4px);
+  left: var(--frame-corner-inset, 4px);
+  transform: scaleY(-1);
+}
+[data-theme="kyberpunk"] [data-position="br"] {
+  bottom: var(--frame-corner-inset, 4px);
+  right: var(--frame-corner-inset, 4px);
+  transform: scale(-1, -1);
+}
+
+/* ──────────────── 8. Section titles — Bebas Neue + per-section neon barva + horizon-neon divider ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="sectionTitle"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="sectionHeading"],
+[data-theme="kyberpunk"][data-shell="ikaros"] h3[class*="navSection"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-title] {
+  position: relative;
+  color: var(--section-color, var(--theme-cyan));
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 8px var(--section-color, var(--theme-cyan));
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+}
+
+/* ✦ ORIGINÁL: HORIZON-NEON DIVIDER pod section title (alternativa africke horizon-glow / arabsky-svet mihrab) */
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="sectionHeading"]::after,
+[data-theme="kyberpunk"][data-shell="ikaros"] h3[class*="navSection"]::after,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-title]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--section-color, var(--theme-cyan)) 50%,
+    transparent 100%
+  );
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px var(--section-color, var(--theme-cyan)));
+}
+
+/* ──────────────── 9. Per-section barva (data-section-key attribute na sidebar sekcích) ──────────────── */
+
+/* Levý panel — NAVIGACE = cyan */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="navigace"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navigaceSection"] {
+  --section-color: var(--theme-section-cyan);
+}
+
+/* Levý panel — VESMÍRY = magenta */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="vesmiry"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="vesmirySection"] {
+  --section-color: var(--theme-section-magenta);
+}
+
+/* Levý panel — CHAT = green */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="chat"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="chatSection"] {
+  --section-color: var(--theme-section-green);
+}
+
+/* Pravý panel — ADMINISTRACE = cyan */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="administrace"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="administraceSection"] {
+  --section-color: var(--theme-section-cyan);
+}
+
+/* Pravý panel — MOJE SVĚTY = magenta */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="moje-svety"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeSvetySection"] {
+  --section-color: var(--theme-section-magenta);
+}
+
+/* Pravý panel — MOJE DISKUZE = green */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeDiskuzeSection"] {
+  --section-color: var(--theme-section-green);
+}
+
+/* Pravý panel — OBLÍBENÉ ČLÁNKY = yellow */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-clanky"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="oblibeneClankySection"] {
+  --section-color: var(--theme-section-yellow);
+}
+
+/* Pravý panel — OBLÍBENÉ OBRÁZKY = purple */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="oblibeneObrazkySection"] {
+  --section-color: var(--theme-section-purple);
+}
+
+/* ──────────────── 10. ✦ ORIGINÁL: CJK WATERMARKS v rozích sekcí (per-section barva) ✦
+   Statické subtle stamps, opacity 0.04 (jako šepot). Žádný jiný skin nemá CJK znaky. ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navigaceSection"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="vesmirySection"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="chatSection"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="administraceSection"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeSvetySection"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="oblibeneClankySection"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="oblibeneObrazkySection"]::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  color: var(--section-color, var(--theme-cyan));
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.10;
+  filter: drop-shadow(0 0 4px var(--section-color, var(--theme-cyan)));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Per-section CJK glyph */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="navigace"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navigaceSection"]::before {
+  background-image: var(--asset-cjk-light);  /* 光 */
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="vesmiry"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="vesmirySection"]::before {
+  background-image: var(--asset-cjk-universe);  /* 宇 */
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="chat"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="chatSection"]::before {
+  background-image: var(--asset-cjk-voice);  /* 声 */
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="administrace"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="administraceSection"]::before {
+  background-image: var(--asset-cjk-order);  /* 制 */
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="moje-svety"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeSvetySection"]::before {
+  background-image: var(--asset-cjk-world);  /* 界 */
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before {
+  background-image: var(--asset-cjk-talk);  /* 話 */
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-clanky"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="oblibeneClankySection"]::before {
+  background-image: var(--asset-cjk-text);  /* 文 */
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="oblibeneObrazkySection"]::before {
+  background-image: var(--asset-cjk-image);  /* 画 */
+}
+
+/* ──────────────── 11. Per-nav-item barva (6 nav items v NAVIGACE sekci, data-nav-key attribute) ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="uvodnik"] {
+  --nav-color: var(--theme-section-cyan);
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] {
+  --nav-color: var(--theme-section-magenta);
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="diskuze"] {
+  --nav-color: var(--theme-section-green);
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="clanky"] {
+  --nav-color: var(--theme-section-yellow);
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="galerie"] {
+  --nav-color: var(--theme-section-purple);
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="napoveda"] {
+  --nav-color: var(--theme-section-pink);
+}
+
+/* ──────────────── 12. NavItem idle — dark HUD plate + cyan border + section-color stripe vlevo ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3d"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]) {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(13, 10, 37, 0.88) 0%, rgba(8, 5, 26, 0.94) 100%);
+  border: 1px solid var(--theme-border-soft);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 10px 14px 10px 18px;
+  border-radius: 3px;
+  transition: all 220ms ease;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 0, 128, 0.06),
+    0 2px 6px rgba(8, 5, 26, 0.55);
+  min-height: 44px;
+  overflow: hidden;
+}
+
+/* ✦ ORIGINÁL: SECTION-COLOR STRIPE 4px vlevo od každého nav itemu */
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3d"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"])::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8%;
+  bottom: 8%;
+  width: 4px;
+  background: var(--nav-color, var(--theme-cyan));
+  filter: drop-shadow(0 0 4px var(--nav-color, var(--theme-cyan)));
+  opacity: 0.75;
+  transition: opacity 220ms ease, width 220ms ease;
+  pointer-events: none;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3d"]:hover,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):hover {
+  border-color: var(--theme-cyan);
+  color: #ffffff;
+  text-shadow:
+    1px 0 var(--theme-magenta),
+    -1px 0 var(--theme-cyan);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 240, 255, 0.25),
+    0 0 12px var(--theme-glow-cyan),
+    0 0 18px var(--theme-glow-magenta);
+  transform: translateY(-1px);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3d"]:hover::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):hover::before {
+  opacity: 1.0;
+  width: 5px;
+}
+
+/* ──────────────── 13. ✦ ORIGINÁL: ACTIVE NAV — cyan+magenta combined neon + broken flicker ✦ ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3dActive"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItemActive"] {
+  background: var(--theme-nav-active-bg);
+  border-color: var(--theme-cyan);
+  color: #ffffff;
+  text-shadow:
+    0 0 6px var(--theme-glow-cyan-strong),
+    0 0 10px var(--theme-glow-magenta-strong);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 0, 128, 0.45),
+    0 0 14px var(--theme-glow-cyan),
+    0 0 20px var(--theme-glow-magenta);
+  animation: kyberpunk-neon-flicker 15s linear infinite;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3dActive"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItemActive"]::before {
+  width: 6px;
+  opacity: 1.0;
+  filter: drop-shadow(0 0 6px var(--nav-color, var(--theme-cyan)));
+}
+
+@keyframes kyberpunk-neon-flicker {
+  0%, 99.5%, 99.85%, 100% {
+    opacity: 1.0;
+    filter: brightness(1.0);
+  }
+  99.6%, 99.8% {
+    opacity: 0.20;
+    filter: brightness(0.35);
+  }
+}
+
+/* ──────────────── 14. NavItem icons (6× nav + 1× chat) — stroke=currentColor → section-color ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key] svg[class*="icon"] {
+  color: var(--nav-color, var(--theme-cyan));
+  filter: drop-shadow(0 0 4px var(--nav-color, var(--theme-cyan)));
+}
+
+/* Mask-based icon rendering pro [class*="navItemIcon"] kde komponenta nedělá inline SVG */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="uvodnik"] [class*="navItemIcon"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="diskuze"] [class*="navItemIcon"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="clanky"] [class*="navItemIcon"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="galerie"] [class*="navItemIcon"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="napoveda"] [class*="navItemIcon"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="hospoda"] [class*="navItemIcon"]::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: var(--nav-color, var(--theme-cyan));
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 4px var(--nav-color, var(--theme-cyan)));
+}
+
+/* Per-nav-key icon mapping — pomocí mask-image (zachovává sectionColor přes background-color) */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="uvodnik"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-uvodnik);
+  mask-image: var(--asset-icon-uvodnik);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-vytvorit-svet);
+  mask-image: var(--asset-icon-vytvorit-svet);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="diskuze"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-diskuze);
+  mask-image: var(--asset-icon-diskuze);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="clanky"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-clanky);
+  mask-image: var(--asset-icon-clanky);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="galerie"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-galerie);
+  mask-image: var(--asset-icon-galerie);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="napoveda"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-napoveda);
+  mask-image: var(--asset-icon-napoveda);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-nav-key="hospoda"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-hospoda);
+  mask-image: var(--asset-icon-hospoda);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+
+/* ──────────────── 15. „+" tlačítka — neon plus glyph + cyan→magenta gradient ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="rightAddBtn"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]) {
+  position: relative;
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.25) 0%, rgba(255, 0, 128, 0.18) 100%);
+  border: 1px solid var(--theme-cyan);
+  color: var(--theme-text);
+  padding: 6px 12px 6px 36px;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  transition: all 220ms ease;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 240, 255, 0.20),
+    0 0 8px var(--theme-glow-cyan);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="rightAddBtn"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"])::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  background-color: var(--theme-cyan);
+  -webkit-mask-image: var(--asset-plus-neon);
+  mask-image: var(--asset-plus-neon);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  transform: translateY(-50%);
+  opacity: 0.90;
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan));
+  transition: transform 200ms ease, background-color 200ms ease;
+  pointer-events: none;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="rightAddBtn"]:hover,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover {
+  border-color: var(--theme-magenta);
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.35) 0%, rgba(255, 0, 128, 0.30) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 0, 128, 0.40),
+    0 0 14px var(--theme-glow-cyan),
+    0 0 18px var(--theme-glow-magenta-strong);
+  transform: translateY(-1px);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="rightAddBtn"]:hover::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover::before {
+  background-color: var(--theme-magenta);
+  filter: drop-shadow(0 0 6px var(--theme-glow-magenta-strong));
+  transform: translateY(-50%) scale(1.10);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="rightAddBtn"]:active::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):active::before {
+  transform: translateY(-50%) scale(0.94);
+}
+
+/* ──────────────── 16. ✦ ORIGINÁL: WELCOME CARD — neonová výloha v dešti ✦
+   Tmavý HUD panel + 4× cyan+magenta corner brackets + magenta hairline divider
+   uprostřed + wet pavement reflection pod kartou + administrator signature. ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="card"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 80% at 25% 30%, rgba(0, 240, 255, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 75% 70%, rgba(255, 0, 128, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(17, 12, 46, 0.92) 0%, rgba(8, 5, 26, 0.96) 100%);
+  border: 1px solid var(--theme-cyan);
+  border-radius: 6px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 6vw, 100px);
+  min-height: clamp(380px, 50vh, 540px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 0, 128, 0.30),
+    inset 0 0 80px rgba(8, 5, 26, 0.30),
+    0 16px 40px -8px rgba(0, 240, 255, 0.25),
+    0 24px 60px -12px rgba(255, 0, 128, 0.20),
+    0 32px 80px -16px rgba(8, 5, 26, 0.85);
+  overflow: visible;
+}
+
+/* ✦ ORIGINÁL: MAGENTA HORIZONTAL HAIRLINE DIVIDER uprostřed welcome card */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: clamp(20px, 6vw, 100px);
+  right: clamp(20px, 6vw, 100px);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-magenta) 15%,
+    var(--theme-magenta-bright) 50%,
+    var(--theme-magenta) 85%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 4px var(--theme-glow-magenta-strong)) drop-shadow(0 0 8px var(--theme-glow-magenta));
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ✦ ORIGINÁL: WET PAVEMENT REFLECTION pod welcome card (vertical mirror+blur gradient) */
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"]::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background:
+    linear-gradient(180deg, rgba(255, 0, 128, 0.22) 0%, transparent 100%),
+    linear-gradient(180deg, rgba(0, 240, 255, 0.14) 0%, transparent 100%);
+  filter: blur(6px);
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 17. Welcome card medailon (anděl-křídlo silhouette vlevo) ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-andel-medallion],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="medallion"] {
+  width: 192px;
+  height: 192px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 14px rgba(8, 5, 26, 0.85)) drop-shadow(0 0 8px var(--theme-glow-cyan)) drop-shadow(0 0 12px var(--theme-glow-magenta));
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 18. Welcome card text styling — Bebas Neue + Share Tech Mono + signature ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeTitle"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"] h1,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"] h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(28px, 4vw, 44px);
+  color: var(--theme-text);
+  text-shadow: 0 0 4px rgba(0, 240, 255, 0.40);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 4px 0;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="titleAccent"] {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--theme-cyan);
+  text-shadow:
+    0 0 8px var(--theme-glow-cyan-strong),
+    0 0 14px var(--theme-glow-cyan);
+}
+
+/* Cyan hairline pod welcomeTitle */
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeTitle"]::after,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"] h1::after,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"] h2::after {
+  content: '';
+  display: block;
+  margin-top: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--theme-cyan), transparent);
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan));
+  opacity: 0.85;
+  width: 220px;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"] p,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeText"] p {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--theme-text);
+  line-height: 1.7;
+  position: relative;
+  z-index: 2;
+}
+
+/* ✦ ORIGINÁL: ADMINISTRATOR SIGNATURE — Audiowide italic cyan + self-draw flourish */
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="signature"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-signature] {
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--theme-cyan);
+  text-shadow:
+    0 0 6px var(--theme-glow-cyan),
+    0 0 10px var(--theme-glow-cyan-strong);
+  text-align: center;
+  margin-top: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* SVG flourish self-draw pod signature (1× per session) */
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="signature"]::after,
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-signature]::after {
+  content: '';
+  display: block;
+  width: 280px;
+  height: 24px;
+  margin: 6px auto 0 auto;
+  background-image: var(--asset-signature-script);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 4px var(--theme-glow-cyan));
+  animation: kyberpunk-signature-draw 2s ease-out 1;
+  animation-fill-mode: backwards;
+}
+
+@keyframes kyberpunk-signature-draw {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+  100% { clip-path: inset(0 0 0 0);    opacity: 1; }
+}
+
+/* ──────────────── 19. Novinky card — stejný material jako welcome, bez hairline/wet/signature ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="novinkyCard"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 80% at 25% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(17, 12, 46, 0.92) 0%, rgba(8, 5, 26, 0.96) 100%);
+  border: 1px solid var(--theme-cyan);
+  border-radius: 4px;
+  padding: 18px 24px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 0, 128, 0.20),
+    0 8px 24px rgba(8, 5, 26, 0.65);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="novinkyTitle"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="novinkyCard"] h3 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  color: var(--theme-text);
+  letter-spacing: 0.10em;
+  text-shadow: 0 0 4px var(--theme-glow-cyan);
+}
+
+/* ──────────────── 20. Form controls — input / select / textarea — dark HUD plate + cyan border ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="kyberpunk"][data-shell="ikaros"] select,
+[data-theme="kyberpunk"][data-shell="ikaros"] textarea {
+  background: rgba(13, 10, 37, 0.85);
+  border: 1px solid var(--theme-border-soft);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  border-radius: 2px;
+  padding: 8px 12px;
+  transition: all 200ms ease;
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] input:focus,
+[data-theme="kyberpunk"][data-shell="ikaros"] select:focus,
+[data-theme="kyberpunk"][data-shell="ikaros"] textarea:focus {
+  border-color: var(--theme-magenta);
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(255, 0, 128, 0.20),
+    0 0 10px var(--theme-glow-magenta);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] input::placeholder,
+[data-theme="kyberpunk"][data-shell="ikaros"] textarea::placeholder {
+  color: var(--theme-text-muted);
+  opacity: 0.65;
+}
+
+/* ──────────────── 21. Buttons — primary / secondary / danger ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] button[class*="primary"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btnPrimary"] {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.30) 0%, rgba(255, 0, 128, 0.25) 100%);
+  border: 1px solid var(--theme-cyan);
+  color: #ffffff;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  text-shadow: 0 0 4px var(--theme-glow-cyan);
+  box-shadow:
+    0 0 10px var(--theme-glow-cyan),
+    0 0 14px var(--theme-glow-magenta);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] button[class*="primary"]:hover,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btnPrimary"]:hover {
+  border-color: var(--theme-magenta);
+  box-shadow:
+    0 0 14px var(--theme-glow-cyan-strong),
+    0 0 20px var(--theme-glow-magenta-strong);
+  transform: translateY(-1px);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] button[class*="danger"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="btnDanger"] {
+  background: linear-gradient(180deg, rgba(255, 32, 80, 0.30) 0%, rgba(255, 0, 128, 0.25) 100%);
+  border: 1px solid var(--theme-magenta);
+  color: #ffffff;
+  text-shadow: 0 0 4px var(--theme-glow-magenta);
+}
+
+/* ──────────────── 22. Skin selector dropdown ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="skinSelector"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="themeSwitcher"] {
+  background: rgba(13, 10, 37, 0.92);
+  border: 1px solid var(--theme-cyan);
+  color: var(--theme-text);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--theme-glow-cyan);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="skinSelector"]:hover,
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="themeSwitcher"]:hover {
+  border-color: var(--theme-magenta);
+  box-shadow: 0 0 14px var(--theme-glow-magenta);
+}
+
+/* ──────────────── 23. Tooltips, badges, scrollbars ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="tooltip"] {
+  background: rgba(13, 10, 37, 0.95);
+  border: 1px solid var(--theme-cyan);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  box-shadow: 0 0 8px var(--theme-glow-cyan);
+}
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="badge"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="chip"] {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid var(--theme-cyan);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 2px;
+  padding: 2px 8px;
+}
+
+/* Webkit scrollbars */
+[data-theme="kyberpunk"][data-shell="ikaros"] *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] *::-webkit-scrollbar-track {
+  background: rgba(8, 5, 26, 0.85);
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--theme-cyan) 0%, var(--theme-magenta) 100%);
+  border-radius: 5px;
+  border: 2px solid rgba(8, 5, 26, 0.85);
+}
+[data-theme="kyberpunk"][data-shell="ikaros"] *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--theme-cyan-bright) 0%, var(--theme-magenta-bright) 100%);
+}
+
+/* ──────────────── 24. Focus visible (accessibility) ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] *:focus-visible {
+  outline: 2px solid var(--theme-cyan);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.20);
+}
+
+/* ──────────────── 25. Empty hints / placeholders ──────────────── */
+
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="emptyHint"],
+[data-theme="kyberpunk"][data-shell="ikaros"] [class*="emptyText"] {
+  font-family: var(--font-body);
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  opacity: 0.75;
+  font-style: italic;
+}
+
+/* ──────────────── 26. Mobile responsive (≤768px) ──────────────── */
+
+@media (max-width: 768px) {
+  /* Sparse rain skryt na mobilu */
+  [data-theme="kyberpunk"][data-shell="ikaros"] body::before,
+  [data-theme="kyberpunk"][data-shell="ikaros"] body::after {
+    display: none;
+  }
+
+  /* HUD bracket corners zmenšené */
+  [data-theme="kyberpunk"] [data-position] {
+    width: var(--asset-corner-size-mobile, 38px);
+    height: var(--asset-corner-size-mobile, 38px);
+  }
+
+  /* Welcome card padding compressed */
+  [data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 32px 16px;
+    min-height: 320px;
+  }
+
+  /* Medailon menší */
+  [data-theme="kyberpunk"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="medallion"] {
+    width: 144px;
+    height: 144px;
+  }
+
+  /* Wet pavement reflection menší */
+  [data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"]::after {
+    height: 40px;
+  }
+
+  /* CJK watermarks menší */
+  [data-theme="kyberpunk"][data-shell="ikaros"] [data-section-key]::before {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Logo menší */
+  [data-theme="kyberpunk"] header [class*="logoImg"] {
+    width: var(--asset-logo-w-mobile);
+  }
+}
+
+/* ──────────────── 27. Mobile small (≤480px) ──────────────── */
+
+@media (max-width: 480px) {
+  /* Welcome card medailon stack nad text */
+  [data-theme="kyberpunk"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="medallion"] {
+    width: 112px;
+    height: 112px;
+  }
+
+  [data-theme="kyberpunk"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 24px 12px;
+  }
+
+  /* HUD bracket corners ještě menší */
+  [data-theme="kyberpunk"] [data-position] {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Header buttons icon-only */
+  [data-theme="kyberpunk"][data-shell="ikaros"] > header [class*="headerBtn"] {
+    padding: 8px 10px;
+  }
+}
+
+/* ──────────────── 28. Reduced-motion (prefers-reduced-motion: reduce) ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Rain animace zastavena */
+  [data-theme="kyberpunk"][data-shell="ikaros"] body::before,
+  [data-theme="kyberpunk"][data-shell="ikaros"] body::after {
+    animation: none;
+    opacity: 0.30;
+  }
+
+  /* Broken neon flicker disabled */
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3dActive"],
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItemActive"] {
+    animation: none;
+  }
+
+  /* RGB-split chromatic disabled na hover */
+  [data-theme="kyberpunk"][data-shell="ikaros"] > header [class*="headerBtn"]:hover,
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="btn3d"]:hover,
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="navItem"]:hover {
+    text-shadow: none;
+  }
+
+  /* Signature self-draw → instant full state */
+  [data-theme="kyberpunk"][data-shell="ikaros"] [class*="signature"]::after,
+  [data-theme="kyberpunk"][data-shell="ikaros"] [data-signature]::after {
+    animation: none;
+    clip-path: inset(0);
+    opacity: 1;
+  }
+
+  /* Všechny ostatní transitions kratší */
+  [data-theme="kyberpunk"][data-shell="ikaros"] * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

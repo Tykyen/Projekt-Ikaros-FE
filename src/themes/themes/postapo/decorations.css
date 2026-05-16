@@ -1,0 +1,1172 @@
+/* ── Postapo — „Bunkr 7 pod ruinami Zóny 7" (spec 1.0t, lite varianta).
+   Apokalyptický wasteland: korodovaný kov + matná radiace + popel.
+   Plochý, jednoduchý, atmosférický — žádné rušivé animace.
+
+   MOTIFY:
+   - Header buttons: heavy metal plate s 2 nýty (TL + TR) — to jediné místo,
+     kde nýty zůstávají (líbí se uživateli, distinguished feature)
+   - Caution hazard stripes (žluto-černé úhlopříčky) pod section title +
+     pod welcome title + jako vertikální nav-item indicator vlevo
+   - Stencil section titulky v Big Shoulders Stencil
+   - DEAD WORLD stencil watermark („ZÓNA 7") uprostřed welcome card
+   - Korodovaný kovový panel s rezavou subtle bordurou (žádná corner
+     ornamenty, žádné HAZMAT watermarks v rozích sekcí)
+   - NavItem buttons: subtle 3D heavy metal gradient (žádné nýty)
+   - Administrator signature v Special Elite italic (jednoduchá, bez self-draw)
+
+   Žádné AI gen WEBP. 3 raster assety (logo + medailon + BG, dodáno uživatelem).
+   Žádné CRT static, dust drift, ghost signal, geiger pulse animace.
+
+   Scoped přes [data-theme="postapo"], žádný globální dopad. */
+
+[data-theme="postapo"] {
+  background-color: var(--bg-primary);
+}
+
+/* ──────────────── 1. Atmosférický overlay (radial vignette + linear darken) ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. Topbar — dark metal chrome ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(20, 17, 10, 0.96) 0%, rgba(10, 9, 5, 0.98) 100%);
+  border-bottom: 1px solid var(--theme-border);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 160, 120, 0.06),
+    0 4px 12px rgba(10, 9, 5, 0.85);
+  overflow: visible;
+  z-index: 5;
+}
+
+/* Slabý rust hairline pod topbarem (alternativa cyan/magenta hairline z kyberpunku) */
+[data-theme="postapo"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-rust) 20%,
+    var(--theme-rust-bright) 50%,
+    var(--theme-rust) 80%,
+    transparent 100%
+  );
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ──────────────── 3. Logo — korodovaná železná cedule ──────────────── */
+
+[data-theme="postapo"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 2px 4px rgba(10, 9, 5, 0.85));
+}
+
+[data-theme="postapo"] header [class*="logoFallback"] {
+  display: var(--logo-fallback-display, none);
+  font-family: var(--font-logo);
+  font-size: 28px;
+  color: var(--theme-text);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ──────────────── 4. Header buttons — heavy metal plate s 2 nýty (TL + TR) ✦ ────────────────
+   To je ta část, která se uživateli líbí — 3D heavy metal gradient + 2 nýty v horních rozích. */
+
+[data-theme="postapo"][data-shell="ikaros"] > header [class*="headerBtn"],
+[data-theme="postapo"][data-shell="ikaros"] > header button:not([class*="logo"]) {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(48, 42, 30, 0.95) 0%, rgba(26, 22, 18, 0.95) 45%, rgba(14, 12, 8, 0.98) 100%);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  padding: 8px 22px 8px 22px;
+  border-radius: 2px;
+  transition: all 180ms ease;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 168, 0.10),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(10, 9, 5, 0.7);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* 2 nýty v horních rozích header buttonu (jediné místo s nýty) */
+[data-theme="postapo"][data-shell="ikaros"] > header [class*="headerBtn"]::before,
+[data-theme="postapo"][data-shell="ikaros"] > header button:not([class*="logo"])::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #b0a888 10%, #5a523f 50%, #1a1612 100%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] > header [class*="headerBtn"]::after,
+[data-theme="postapo"][data-shell="ikaros"] > header button:not([class*="logo"])::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #b0a888 10%, #5a523f 50%, #1a1612 100%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] > header [class*="headerBtn"]:hover,
+[data-theme="postapo"][data-shell="ikaros"] > header button:not([class*="logo"]):hover {
+  border-color: var(--theme-rust);
+  color: var(--theme-olive-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 168, 0.14),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 4px 8px rgba(10, 9, 5, 0.85);
+  transform: translateY(-1px);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] > header [class*="headerBtn"]:active,
+[data-theme="postapo"][data-shell="ikaros"] > header button:not([class*="logo"]):active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    inset 0 -1px 0 rgba(212, 200, 168, 0.05),
+    0 1px 0 rgba(10, 9, 5, 0.4);
+}
+
+/* ZLATÝ STANDARD speciální — matná caution-yellow rim */
+[data-theme="postapo"][data-shell="ikaros"] > header [class*="zlatyStandard"],
+[data-theme="postapo"][data-shell="ikaros"] > header [data-button-key="zlaty-standard"] {
+  border-color: var(--theme-caution-yellow);
+  background:
+    linear-gradient(180deg, rgba(48, 42, 30, 0.95) 0%, rgba(34, 28, 16, 0.95) 45%, rgba(16, 14, 8, 0.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 100, 0.16),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(10, 9, 5, 0.7);
+  color: var(--theme-caution-yellow);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] > header [class*="zlatyStandard"]:hover,
+[data-theme="postapo"][data-shell="ikaros"] > header [data-button-key="zlaty-standard"]:hover {
+  border-color: var(--theme-hazard-amber);
+  color: var(--theme-hazard-amber);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 100, 0.22),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 4px 8px rgba(10, 9, 5, 0.85);
+}
+
+/* ──────────────── 5. Sidebar frame — Chiral Glass (frosted translucent HUD) ──────────────── */
+/* Frosted glass HUD overlay — BG se „soft-focusuje" za panelem přes backdrop-filter.
+   Hairline rust border, žádné inset shadows, žádný gradient. Computer game UI vibe. */
+
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="right"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="sideFrame"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="rightFrame"] {
+  position: relative;
+  background: rgba(14, 12, 8, 0.42);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  backdrop-filter: blur(8px) saturate(1.05);
+  border: 1px solid rgba(122, 56, 16, 0.32);
+  border-radius: 3px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ──────────────── 6. Corner ornaments — rivet brackets jen pro Welcome + Novinky card ──────────────── */
+/* Sidebar/right panely zůstávají čisté (žádné nýty na okrajích). Welcome + Novinky
+   dostanou 4× rusty L-shape s 2 nýty jako distinguished decoration. */
+
+/* Sidebar + right panel — žádné ornamenty (čisté kovové desky) */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="sidebar"] [class*="ornament"],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="right"] [class*="ornament"] {
+  display: none !important;
+}
+
+/* Welcome + Novinky — master rivet corner (TL), ostatní pozice přes scaleX/Y mirror */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="ornament"],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"] {
+  position: absolute;
+  display: block;
+  width: var(--asset-corner-size);
+  height: var(--asset-corner-size);
+  background-image: var(--asset-rivet-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent !important;
+  border: none !important;
+  pointer-events: none;
+  z-index: 4;
+  filter: drop-shadow(0 2px 4px rgba(10, 9, 5, 0.85));
+  transform: none;
+}
+
+/* Novinky má menší rohy (subordinate role) */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"] {
+  width: var(--asset-corner-size-novinky);
+  height: var(--asset-corner-size-novinky);
+}
+
+/* TL — master, žádný transform */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="ornament"][data-position="tl"],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"][data-position="tl"] {
+  top: var(--frame-corner-inset);
+  left: var(--frame-corner-inset);
+}
+/* TR — mirror přes scaleX */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="ornament"][data-position="tr"],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"][data-position="tr"] {
+  top: var(--frame-corner-inset);
+  right: var(--frame-corner-inset);
+  transform: scaleX(-1);
+}
+/* BL — mirror přes scaleY */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="ornament"][data-position="bl"],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"][data-position="bl"] {
+  bottom: var(--frame-corner-inset);
+  left: var(--frame-corner-inset);
+  transform: scaleY(-1);
+}
+/* BR — mirror obě */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="ornament"][data-position="br"],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"][data-position="br"] {
+  bottom: var(--frame-corner-inset);
+  right: var(--frame-corner-inset);
+  transform: scale(-1, -1);
+}
+
+/* ──────────────── 7. Section titles — Big Shoulders Stencil + hazard stripe divider ──────────────── */
+
+/* Section titles — refined monochrome (žádné per-section barvy, žádný text-shadow) */
+[data-theme="postapo"][data-shell="ikaros"] [class*="sectionTitle"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="sectionHeading"],
+[data-theme="postapo"][data-shell="ikaros"] h3[class*="navSection"],
+[data-theme="postapo"][data-shell="ikaros"] [data-section-title] {
+  position: relative;
+  color: rgba(180, 168, 136, 0.55);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  text-shadow: none;
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+}
+
+/* Section divider — 1px rust hairline (žádné hazard stripes) */
+[data-theme="postapo"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+[data-theme="postapo"][data-shell="ikaros"] [class*="sectionHeading"]::after,
+[data-theme="postapo"][data-shell="ikaros"] h3[class*="navSection"]::after,
+[data-theme="postapo"][data-shell="ikaros"] [data-section-title]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(122, 56, 16, 0.32) 18%,
+    rgba(122, 56, 16, 0.32) 82%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border-radius: 0;
+  opacity: 1;
+}
+
+/* HAZMAT watermarks v rozích sekcí — VYPNUTO (uživatel chce bez zbytečných ozdob) */
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="navigaceSection"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="vesmirySection"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="chatSection"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="administraceSection"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="mojeSvetySection"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="oblibeneClankySection"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="oblibeneObrazkySection"]::before {
+  display: none;
+}
+
+/* ──────────────── 8. Per-section barva (data-section-key) ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="navigace"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="navigaceSection"] {
+  --section-color: var(--theme-section-olive);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="vesmiry"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="vesmirySection"] {
+  --section-color: var(--theme-section-rust);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="chat"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="chatSection"] {
+  --section-color: var(--theme-section-yellow);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="administrace"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="administraceSection"] {
+  --section-color: var(--theme-section-yellow);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="mojeDiskuzeSection"] {
+  --section-color: var(--theme-section-rust);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="moje-svety"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="mojeSvetySection"] {
+  --section-color: var(--theme-section-olive);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="oblibene-clanky"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="oblibeneClankySection"] {
+  --section-color: var(--theme-section-amber);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-section-key="oblibene-obrazky"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="oblibeneObrazkySection"] {
+  --section-color: var(--theme-section-green);
+}
+
+/* ──────────────── 9. Per-nav-item barva (6 nav items) ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="uvodnik"] {
+  --nav-color: var(--theme-section-olive);
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] {
+  --nav-color: var(--theme-section-rust);
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="diskuze"] {
+  --nav-color: var(--theme-section-yellow);
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="clanky"] {
+  --nav-color: var(--theme-section-amber);
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="galerie"] {
+  --nav-color: var(--theme-section-green);
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="napoveda"] {
+  --nav-color: var(--theme-section-concrete);
+}
+
+/* ──────────────── 10. NavItem — Chiral Glass (visible translucent cards) ──────────────── */
+/* Translucent dark plate s 1px rust hairline border. Žádný 3D metal, žádný hazard stripe,
+   žádné inset shadows. Tlačítko je viditelné jako karta ale BG prosvítá. */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3d"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]) {
+  position: relative;
+  background: rgba(20, 17, 10, 0.45);
+  border: 1px solid rgba(122, 56, 16, 0.22);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 10px 14px 10px 16px;
+  border-radius: 2px;
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+  box-shadow: none;
+  min-height: 40px;
+  text-shadow: none;
+  /* text wrap je řešen globálně v IkarosLayout.module.css `.navItemLabel` */
+}
+
+/* Left bar indicator — 0px idle, 2px na active (olive bright). Reuses ::before slot. */
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3d"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"])::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 0;
+  background: var(--theme-olive-bright);
+  background-image: none;
+  opacity: 0;
+  transition: opacity 220ms ease, width 220ms ease;
+  pointer-events: none;
+  border-radius: 0;
+}
+
+/* NavItem ::after (nýt) — VYPNUTO */
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3d"]::after,
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"])::after {
+  display: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3d"]:hover,
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):hover {
+  background: rgba(28, 22, 12, 0.60);
+  border-color: rgba(122, 56, 16, 0.42);
+  color: #c4baa0;
+  box-shadow: none;
+  transform: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3d"]:hover::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):hover::before {
+  opacity: 0;
+  width: 0;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3d"]:active,
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):active {
+  background: rgba(28, 22, 12, 0.72);
+  border-color: rgba(154, 80, 32, 0.55);
+  transform: none;
+  box-shadow: none;
+}
+
+/* ──────────────── 11. Active nav — olive-tinted plate + 2px olive bright left bar ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3dActive"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItemActive"] {
+  background: rgba(48, 44, 14, 0.65);
+  border-color: rgba(168, 168, 24, 0.50);
+  color: #c4baa0;
+  box-shadow: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="btn3dActive"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItemActive"]::before {
+  width: 3px;
+  opacity: 1;
+  background: var(--theme-olive-bright);
+  background-image: none;
+}
+
+/* ──────────────── 12. NavItem icons — lucide SVG only (postapo mask ikony VYPNUTY) ──────────────── */
+/* Lucide ikony (Home/HelpCircle/MessageSquare/...) z IkarosLayout.tsx používají currentColor,
+   takže dědí color z parent .navItemIcon spanu. Žádné vlastní mask ikony — jen tlumená olive. */
+
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"],
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key] svg[class*="icon"] {
+  color: rgba(168, 168, 24, 0.70);
+  filter: none;
+  transition: color 220ms ease;
+}
+
+/* Hover + active: ikona zjasní na olive bright */
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:hover [class*="navItemIcon"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItem"]:hover svg[class*="icon"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItemActive"] [class*="navItemIcon"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="navItemActive"] svg[class*="icon"] {
+  color: var(--theme-olive-bright);
+}
+
+/* Postapo mask ikony — VYPNUTY (původně přes ::before, teď jen lucide SVG) */
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"]::before {
+  display: none !important;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="uvodnik"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-uvodnik);
+  mask-image: var(--asset-icon-uvodnik);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-vytvorit-svet);
+  mask-image: var(--asset-icon-vytvorit-svet);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="diskuze"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-diskuze);
+  mask-image: var(--asset-icon-diskuze);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="clanky"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-clanky);
+  mask-image: var(--asset-icon-clanky);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="galerie"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-galerie);
+  mask-image: var(--asset-icon-galerie);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="napoveda"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-napoveda);
+  mask-image: var(--asset-icon-napoveda);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+[data-theme="postapo"][data-shell="ikaros"] [data-nav-key="hospoda"] [class*="navItemIcon"]::before {
+  -webkit-mask-image: var(--asset-icon-hospoda);
+  mask-image: var(--asset-icon-hospoda);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+
+/* ──────────────── 13. „+" tlačítka — Chiral Glass (subtle rust tint, bez 3D) ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="rightAddBtn"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]) {
+  position: relative;
+  background: rgba(122, 56, 16, 0.18);
+  border: 1px solid rgba(122, 56, 16, 0.45);
+  color: var(--theme-text);
+  padding: 6px 12px 6px 30px;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  transition: background-color 220ms ease, border-color 220ms ease, color 220ms ease;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="rightAddBtn"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"])::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background-color: rgba(168, 168, 24, 0.85);
+  -webkit-mask-image: var(--asset-plus-stencil);
+  mask-image: var(--asset-plus-stencil);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  transform: translateY(-50%);
+  opacity: 1;
+  filter: none;
+  transition: background-color 220ms ease;
+  pointer-events: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="rightAddBtn"]:hover,
+[data-theme="postapo"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover {
+  background: rgba(122, 56, 16, 0.28);
+  border-color: rgba(154, 80, 32, 0.60);
+  color: var(--theme-olive-bright);
+  box-shadow: none;
+  transform: none;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="rightAddBtn"]:hover::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover::before {
+  background-color: var(--theme-olive-bright);
+  transform: translateY(-50%);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="rightAddBtn"]:active,
+[data-theme="postapo"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):active {
+  background: rgba(122, 56, 16, 0.35);
+  transform: none;
+}
+
+/* ──────────────── 14. Welcome card — Gaming HUD overlay (Fallout/STALKER vibe) ──────────────── */
+/* Žádný kontinuální border — 4 rivet corner brackets fungují jako HUD anchor markers.
+   BG image (toxické nebe + ruiny + havran) prosvítá skrz ~75%.
+   Content elementy (title/medailon/body/signature) jsou jednotlivé HUD elementy
+   s vlastními backdropy a multi-layer haloy. */
+
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(20, 17, 10, 0.10) 0%, rgba(10, 9, 5, 0.22) 100%);
+  border: none;
+  border-radius: 2px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 6vw, 100px);
+  min-height: clamp(380px, 50vh, 540px);
+  box-shadow:
+    inset 0 0 40px 4px rgba(10, 9, 5, 0.35),
+    inset 0 0 0 1px rgba(122, 56, 16, 0.18),
+    inset 0 1px 0 rgba(212, 200, 168, 0.05),
+    0 12px 32px -8px rgba(10, 9, 5, 0.85);
+  overflow: hidden;
+}
+
+/* ZÓNA 7 stencil — HUD warning indicator v TR rohu */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+[data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"]::before {
+  content: 'ZÓNA 7';
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  transform: rotate(-6deg);
+  transform-origin: center;
+  font-family: var(--font-logo);
+  font-size: clamp(20px, 2.2vw, 32px);
+  font-weight: 400;
+  color: var(--theme-caution-yellow);
+  letter-spacing: 0.16em;
+  opacity: 0.78;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+  padding: 5px 12px;
+  background: rgba(10, 9, 5, 0.78);
+  border: 1px solid var(--theme-rust-dim);
+  border-radius: 2px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.85);
+  box-shadow: 0 2px 8px rgba(10, 9, 5, 0.75);
+}
+
+/* Top HUD hazard bar — gaming UI frame marker (anchor pod rivet corners) */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+[data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"]::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 76px;
+  right: 76px;
+  height: 4px;
+  background-image: var(--asset-hazard-stripe);
+  background-repeat: repeat;
+  background-size: 16px 4px;
+  opacity: 0.42;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 1px;
+}
+
+/* Bottom HUD hazard bar — uses [data-theme-decoration="ember-orbit"] child of welcome card */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [data-theme-decoration="ember-orbit"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"] [data-theme-decoration="ember-orbit"] {
+  position: absolute;
+  bottom: 18px;
+  left: 76px;
+  right: 76px;
+  height: 4px;
+  background-image: var(--asset-hazard-stripe);
+  background-repeat: repeat;
+  background-size: 16px 4px;
+  opacity: 0.42;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 1px;
+  display: block;
+}
+
+/* ──────────────── 15. Welcome card medailon (Ikaros silueta s nýty vlevo) ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [data-andel-medallion],
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="medallion"] {
+  width: 200px;
+  height: 215px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  /* Silnější halo + slabý rust glow — medailon vystoupí z pustiny */
+  filter:
+    drop-shadow(0 8px 28px rgba(10, 9, 5, 0.95))
+    drop-shadow(0 2px 6px rgba(10, 9, 5, 0.85))
+    drop-shadow(0 0 18px rgba(122, 56, 16, 0.30));
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 16. Welcome card text styling — Big Shoulders Stencil + Special Elite ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="welcomeTitle"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="welcomeCard"] h1,
+[data-theme="postapo"][data-shell="ikaros"] [class*="welcomeCard"] h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(28px, 4vw, 44px);
+  color: var(--theme-text);
+  /* Multi-layer dark halo — robustní proti libovolnému BG color/luminosity */
+  text-shadow:
+    0 0 30px rgba(10, 9, 5, 0.92),
+    0 0 60px rgba(10, 9, 5, 0.70),
+    3px 3px 0 rgba(0, 0, 0, 0.95);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 4px 0;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="titleAccent"] {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--theme-olive-bright);
+  text-shadow:
+    0 0 30px rgba(10, 9, 5, 0.92),
+    0 0 60px rgba(10, 9, 5, 0.70),
+    3px 3px 0 rgba(0, 0, 0, 0.95);
+}
+
+/* Hazard stripe pod welcomeTitle */
+[data-theme="postapo"][data-shell="ikaros"] [class*="welcomeTitle"]::after,
+[data-theme="postapo"][data-shell="ikaros"] [class*="welcomeCard"] h1::after,
+[data-theme="postapo"][data-shell="ikaros"] [class*="welcomeCard"] h2::after {
+  content: '';
+  display: block;
+  margin-top: 14px;
+  height: 4px;
+  width: 240px;
+  background-image: var(--asset-hazard-stripe);
+  background-repeat: repeat;
+  background-size: 16px 4px;
+  opacity: 0.80;
+  border-radius: 1px;
+}
+
+/* Body paragrafy — HUD info plate styling.
+   Selectors: [data-frame-panel="card"] p target všechny p uvnitř welcome cardu;
+   [class*="paragraph"] target DashboardPage_paragraph__xyz z CSS-modules. */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] p,
+[data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"] p,
+[data-theme="postapo"][data-shell="ikaros"] [class*="paragraph"] {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--theme-text);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  /* Multi-layer dark halo — robustní proti BG variability */
+  text-shadow:
+    0 0 14px rgba(10, 9, 5, 0.92),
+    0 0 28px rgba(10, 9, 5, 0.60),
+    1px 1px 0 rgba(0, 0, 0, 0.90);
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 17. Administrator signature — Special Elite italic (BEZ self-draw) ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="signature"],
+[data-theme="postapo"][data-shell="ikaros"] [data-signature] {
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--theme-rust-bright);
+  /* Multi-layer halo aby rust signature zůstala čitelná nad pustinou */
+  text-shadow:
+    0 0 14px rgba(10, 9, 5, 0.88),
+    0 0 28px rgba(10, 9, 5, 0.55),
+    1px 1px 0 rgba(0, 0, 0, 0.85);
+  text-align: center;
+  margin-top: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 18. Novinky card — stejný material, jednoduchý ──────────────── */
+
+/* Novinky karta — stejný gaming HUD vibe jako Welcome, subordinate role
+   (menší rivet rohy 32px, lehčí vinetace, jeden top hazard accent). */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(20, 17, 10, 0.14) 0%, rgba(10, 9, 5, 0.30) 100%);
+  border: none;
+  border-radius: 2px;
+  padding: 22px 28px;
+  box-shadow:
+    inset 0 0 32px 4px rgba(10, 9, 5, 0.35),
+    inset 0 0 0 1px rgba(122, 56, 16, 0.16),
+    inset 0 1px 0 rgba(212, 200, 168, 0.05),
+    0 8px 22px rgba(10, 9, 5, 0.75);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+/* Novinky top HUD hazard accent bar (anchor mezi rivet rohy) */
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"]::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50px;
+  right: 50px;
+  height: 3px;
+  background-image: var(--asset-hazard-stripe);
+  background-repeat: repeat;
+  background-size: 16px 3px;
+  opacity: 0.38;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 1px;
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="novinkyTitle"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="novinkyCard"] h3,
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] h2,
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--theme-text);
+  letter-spacing: 0.10em;
+  /* Multi-layer halo — Novinky title musí být čitelný nad pustinou */
+  text-shadow:
+    0 0 14px rgba(10, 9, 5, 0.90),
+    0 0 28px rgba(10, 9, 5, 0.60),
+    1px 1px 0 rgba(0, 0, 0, 0.90);
+  position: relative;
+  z-index: 2;
+}
+
+/* Novinky body text — light halo */
+[data-theme="postapo"][data-shell="ikaros"] [class*="novinkyCard"] p,
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] p,
+[data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] li {
+  text-shadow:
+    0 0 10px rgba(10, 9, 5, 0.85),
+    1px 1px 0 rgba(0, 0, 0, 0.80);
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 19. Form controls — dark metal input + caution yellow focus ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="postapo"][data-shell="ikaros"] select,
+[data-theme="postapo"][data-shell="ikaros"] textarea {
+  background:
+    linear-gradient(180deg, rgba(20, 17, 10, 0.85) 0%, rgba(26, 22, 18, 0.95) 100%);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  border-radius: 2px;
+  padding: 8px 12px;
+  transition: all 180ms ease;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] input:focus,
+[data-theme="postapo"][data-shell="ikaros"] select:focus,
+[data-theme="postapo"][data-shell="ikaros"] textarea:focus {
+  border-color: var(--theme-caution-yellow);
+  outline: none;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(200, 160, 8, 0.16);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] input::placeholder,
+[data-theme="postapo"][data-shell="ikaros"] textarea::placeholder {
+  color: var(--theme-text-muted);
+  opacity: 0.65;
+  font-style: italic;
+}
+
+/* ──────────────── 20. Buttons — primary / danger ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] button[class*="primary"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="btnPrimary"] {
+  background:
+    linear-gradient(180deg, rgba(138, 136, 16, 0.32) 0%, rgba(74, 72, 8, 0.55) 100%),
+    linear-gradient(180deg, rgba(40, 35, 25, 0.92) 0%, rgba(14, 12, 8, 0.95) 100%);
+  border: 1px solid var(--theme-olive);
+  color: var(--theme-text);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 168, 0.08),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.4),
+    0 2px 4px rgba(10, 9, 5, 0.6);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] button[class*="primary"]:hover,
+[data-theme="postapo"][data-shell="ikaros"] [class*="btnPrimary"]:hover {
+  border-color: var(--theme-olive-bright);
+  color: var(--theme-olive-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 168, 0.12),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(10, 9, 5, 0.75);
+  transform: translateY(-1px);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] button[class*="primary"]:active,
+[data-theme="postapo"][data-shell="ikaros"] [class*="btnPrimary"]:active {
+  transform: translateY(1px);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] button[class*="danger"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="btnDanger"] {
+  background:
+    linear-gradient(180deg, rgba(154, 64, 32, 0.38) 0%, rgba(74, 32, 16, 0.55) 100%),
+    linear-gradient(180deg, rgba(40, 22, 14, 0.92) 0%, rgba(14, 8, 4, 0.95) 100%);
+  border: 1px solid var(--theme-rust);
+  color: #fff5e8;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* ──────────────── 21. Skin selector dropdown ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="skinSelector"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="themeSwitcher"] {
+  background:
+    linear-gradient(180deg, rgba(40, 35, 25, 0.92) 0%, rgba(14, 12, 8, 0.95) 100%);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  border-radius: 2px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 168, 0.06),
+    0 2px 4px rgba(10, 9, 5, 0.6);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="skinSelector"]:hover,
+[data-theme="postapo"][data-shell="ikaros"] [class*="themeSwitcher"]:hover {
+  border-color: var(--theme-rust);
+  color: var(--theme-olive-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 200, 168, 0.10),
+    0 4px 8px rgba(10, 9, 5, 0.75);
+}
+
+/* ──────────────── 22. Tooltips, badges, scrollbars ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="tooltip"] {
+  background: rgba(20, 17, 10, 0.96);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 12px rgba(10, 9, 5, 0.85);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="badge"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="chip"] {
+  background: rgba(138, 136, 16, 0.16);
+  border: 1px solid var(--theme-olive);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 2px;
+  padding: 2px 8px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="postapo"][data-shell="ikaros"] *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+[data-theme="postapo"][data-shell="ikaros"] *::-webkit-scrollbar-track {
+  background: rgba(10, 9, 5, 0.85);
+}
+[data-theme="postapo"][data-shell="ikaros"] *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--theme-rust) 0%, var(--theme-rust-dim) 100%);
+  border-radius: 1px;
+  border: 2px solid rgba(10, 9, 5, 0.85);
+}
+[data-theme="postapo"][data-shell="ikaros"] *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--theme-rust-bright) 0%, var(--theme-rust) 100%);
+}
+
+/* ──────────────── 23. Focus visible ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] *:focus-visible {
+  outline: 2px solid var(--theme-rust-bright);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(154, 80, 32, 0.18);
+}
+
+/* ──────────────── 24. Empty hints / placeholders ──────────────── */
+
+[data-theme="postapo"][data-shell="ikaros"] [class*="emptyHint"],
+[data-theme="postapo"][data-shell="ikaros"] [class*="emptyText"] {
+  font-family: var(--font-body);
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  opacity: 0.75;
+  font-style: italic;
+}
+
+/* ──────────────── 25. Mobile responsive (≤768px) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+    padding: 32px 16px;
+    min-height: 320px;
+    box-shadow:
+      inset 0 0 28px 4px rgba(10, 9, 5, 0.40),
+      inset 0 0 0 1px rgba(122, 56, 16, 0.18),
+      inset 0 1px 0 rgba(212, 200, 168, 0.05),
+      0 10px 24px -6px rgba(10, 9, 5, 0.85);
+  }
+
+  /* Top + bottom HUD hazard bars — menší inset od okrajů na tabletu */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"]::after,
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [data-theme-decoration="ember-orbit"],
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"] [data-theme-decoration="ember-orbit"] {
+    left: 56px;
+    right: 56px;
+  }
+
+  [data-theme="postapo"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="medallion"] {
+    width: 144px;
+    height: 154px;
+  }
+
+  /* ZÓNA 7 cedule menší na tabletu */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"]::before {
+    top: 12px;
+    right: 14px;
+    font-size: clamp(16px, 3.4vw, 22px);
+    padding: 4px 9px;
+  }
+
+  /* Rivet corners menší (welcome 36px, novinky 24px) */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="ornament"] {
+    width: 36px;
+    height: 36px;
+  }
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"] {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Novinky lehčí vinetace na tabletu */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] {
+    box-shadow:
+      inset 0 0 24px 4px rgba(10, 9, 5, 0.35),
+      inset 0 0 0 1px rgba(122, 56, 16, 0.16),
+      inset 0 1px 0 rgba(212, 200, 168, 0.05),
+      0 6px 18px rgba(10, 9, 5, 0.70);
+  }
+  /* Novinky top hazard accent — menší inset */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"]::after {
+    left: 38px;
+    right: 38px;
+  }
+
+  [data-theme="postapo"] header [class*="logoImg"] {
+    width: var(--asset-logo-w-mobile);
+  }
+}
+
+/* ──────────────── 26. Mobile small (≤480px) ──────────────── */
+
+@media (max-width: 480px) {
+  [data-theme="postapo"][data-shell="ikaros"] [data-andel-medallion],
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="medallion"] {
+    width: 112px;
+    height: 120px;
+  }
+
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+    padding: 24px 12px;
+    box-shadow:
+      inset 0 0 20px 3px rgba(10, 9, 5, 0.40),
+      inset 0 0 0 1px rgba(122, 56, 16, 0.18),
+      0 6px 16px -4px rgba(10, 9, 5, 0.85);
+  }
+
+  /* ZÓNA 7 cedule nejmenší — drobná značka v rohu */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"]::before {
+    top: 10px;
+    right: 10px;
+    font-size: 13px;
+    padding: 3px 7px;
+    letter-spacing: 0.12em;
+  }
+
+  /* HUD hazard bars (top + bottom) — krátké, blíže k rivet rohům */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"]::after,
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [data-theme-decoration="ember-orbit"],
+  [data-theme="postapo"][data-shell="ikaros"] [class*="card"][class*="welcome"] [data-theme-decoration="ember-orbit"] {
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    opacity: 0.45;
+  }
+
+  /* Rivet corners nejmenší (welcome 28px, novinky 20px) */
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="card"] [class*="ornament"] {
+    width: 28px;
+    height: 28px;
+  }
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"] [class*="ornament"] {
+    width: 20px;
+    height: 20px;
+  }
+  [data-theme="postapo"][data-shell="ikaros"] [data-frame-panel="novinky"]::after {
+    left: 28px;
+    right: 28px;
+  }
+
+  [data-theme="postapo"][data-shell="ikaros"] > header [class*="headerBtn"] {
+    padding: 8px 12px;
+  }
+}
+
+/* ──────────────── 27. Reduced-motion ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="postapo"][data-shell="ikaros"] * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,995 @@
+/* ── Africké — „Země předků" (spec 1.0q).
+   Velký horizont s vetkanou pamětí. Savana za úsvitem, monolithy, baobaby,
+   akácie. Sandstone panely + carved bronze diamond corners (z medailonu) +
+   kente weave hairline + mudcloth band na dolní hraně welcome stély +
+   adinkra watermarks (Sankofa/Gye Nyame/Adinkrahene/Akoma) kontextové.
+   Welcome card = vyrytá pískovcová stéla (statická — kámen předků nepulsuje).
+
+   ORIGINÁLNÍ MOTIFY: heat shimmer overlay (SVG turbulence, 8s, vzduch dýchá),
+   diagonal dust drift (3 vrstvy, 12s/15s/18s zleva doprava — žádný jiný skin),
+   acacia canopy sway (12s, 2° rotation), baobab corner silhouette (statická),
+   sun ascending one-shot (horizon-glow vystoupá 1× při načtení), aged-gold+
+   bronze stitch left-border na active nav, adinkra watermarks v rozích.
+
+   15 assetů: logo, medailon (čtverec s carved bronze diamonds), corner-tl
+   (master TL, mirror přes CSS), stele-frame, mudcloth-band, baobab-corner,
+   acacia-canopy, monolith-watermark, 7× nav ikony (sandstone tablets).
+   Adinkra symboly = inline SVG data-uri (4 symboly).
+
+   Scoped přes [data-theme="africke"], žádný globální dopad. */
+
+[data-theme="africke"] {
+  background-color: var(--bg-primary);
+}
+
+/* ──────────────── 1. Atmosférický overlay (radial vignette + linear darken) ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. ✦ ORIGINÁL: HEAT SHIMMER OVERLAY (vzduch dýchá v horní třetině) ✦
+   SVG turbulence filter aplikovaný jako transparentní vrstva, 8s opacity puls.
+   Žádný jiný skin nemá animovaný vzduch. ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"]::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 35vh;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.85  0 0 0 0 0.6  0 0 0 0.3 0'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>");
+  background-size: 600px 600px;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+  animation: africke-heat-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes africke-heat-shimmer {
+  0%, 100% { opacity: 0.06; }
+  50%      { opacity: 0.12; }
+}
+
+/* ──────────────── 3. ✦ ORIGINÁL: BAOBAB CORNER SILUETA (levý horní roh BG) ✦
+   Decentní silueta baobabu, statická, opacity 0.18, fixed.
+   Skryto mobile (≤768px). ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] body::before {
+  content: '';
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 220px;
+  height: 320px;
+  background-image: var(--asset-baobab-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  forced-color-adjust: none;
+}
+
+/* ──────────────── 4. ✦ ORIGINÁL: DIAGONAL DUST DRIFT (3 vrstvy particles zleva doprava) ✦
+   Vítr přes savanu — diagonální posun, 12s/15s/18s.
+   Mobile redukce na 1 vrstvu. ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    /* near layer — velké, opacity 0.40 */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><circle cx='60' cy='40' r='1.8' fill='%23e8b840' opacity='0.40'/><circle cx='220' cy='110' r='1.5' fill='%23e8b840' opacity='0.35'/><circle cx='140' cy='250' r='2.0' fill='%23e8b840' opacity='0.42'/><circle cx='280' cy='200' r='1.4' fill='%23e8b840' opacity='0.30'/></svg>"),
+    /* mid layer — střední, opacity 0.25 */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><circle cx='40' cy='80' r='1.2' fill='%23d4a060' opacity='0.30'/><circle cx='160' cy='40' r='1.0' fill='%23d4a060' opacity='0.28'/><circle cx='100' cy='180' r='1.4' fill='%23d4a060' opacity='0.32'/><circle cx='200' cy='130' r='1.0' fill='%23d4a060' opacity='0.26'/></svg>"),
+    /* far layer — malé, opacity 0.15 */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='30' cy='50' r='0.8' fill='%23c89878' opacity='0.20'/><circle cx='100' cy='30' r='0.6' fill='%23c89878' opacity='0.18'/><circle cx='80' cy='130' r='0.9' fill='%23c89878' opacity='0.22'/><circle cx='150' cy='90' r='0.7' fill='%23c89878' opacity='0.18'/></svg>");
+  background-size: 320px 320px, 240px 240px, 180px 180px;
+  background-repeat: repeat, repeat, repeat;
+  pointer-events: none;
+  z-index: 0;
+  animation:
+    africke-dust-near 12s linear infinite,
+    africke-dust-mid  15s linear infinite,
+    africke-dust-far  18s linear infinite;
+}
+
+@keyframes africke-dust-near {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 400px -120px, 0 0, 0 0; }
+}
+@keyframes africke-dust-mid {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 400px -120px, 320px -90px, 0 0; }
+}
+@keyframes africke-dust-far {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 400px -120px, 320px -90px, 240px -60px; }
+}
+
+/* ──────────────── 5. Topbar — patinované dřevo + kente weave hairline ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, #2a1408 0%, #100804 100%);
+  border-bottom: 1px solid var(--theme-earth-ochre);
+  box-shadow:
+    0 1px 0 rgba(200, 136, 26, 0.18),
+    0 4px 12px rgba(16, 8, 4, 0.65);
+  overflow: visible;
+  z-index: 5;
+}
+
+/* Kente weave hairline — repeating vertical gold+bronze stripes */
+[data-theme="africke"][data-shell="ikaros"] > header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    var(--theme-aged-gold) 4px,
+    var(--theme-bronze-warm) 8px,
+    var(--theme-aged-gold) 12px,
+    transparent 16px,
+    transparent 22px
+  );
+  opacity: 0.65;
+  filter: drop-shadow(0 0 4px var(--theme-glow-gold));
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ──────────────── 6. ✦ ORIGINÁL: ACACIA CANOPY V TOPBARU (silueta větvení s 12s sway) ✦ ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] > header::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background-image: var(--asset-acacia-canopy);
+  background-size: 1200px 120px;
+  background-position: center top;
+  background-repeat: no-repeat;
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 1;
+  transform-origin: top center;
+  animation: africke-acacia-sway 12s ease-in-out infinite;
+  forced-color-adjust: none;
+}
+
+@keyframes africke-acacia-sway {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50%      { transform: rotate(1.5deg); }
+}
+
+/* ──────────────── 7. Logo — kente weave banner s Allura script ──────────────── */
+
+[data-theme="africke"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(16, 8, 4, 0.70));
+}
+
+[data-theme="africke"] header [class*="logoFallback"] {
+  display: var(--logo-fallback-display, none);
+  font-family: var(--font-logo);
+  font-size: 26px;
+  color: var(--theme-aged-gold);
+  text-shadow: 0 1px 2px rgba(16, 8, 4, 0.70);
+  letter-spacing: 0.02em;
+}
+
+/* ──────────────── 8. Header buttons — sandstone tablet style ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] > header [class*="headerBtn"],
+[data-theme="africke"][data-shell="ikaros"] > header button:not([class*="logo"]) {
+  background: linear-gradient(180deg, #2a1408 0%, #100804 100%);
+  border: 1px solid var(--theme-earth-ochre);
+  color: var(--theme-aged-gold);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  padding: 8px 16px;
+  border-radius: 3px;
+  transition: all 220ms ease;
+  box-shadow:
+    inset 0 1px 0 rgba(200, 136, 26, 0.15),
+    0 2px 6px rgba(16, 8, 4, 0.45);
+}
+
+[data-theme="africke"][data-shell="ikaros"] > header [class*="headerBtn"]:hover,
+[data-theme="africke"][data-shell="ikaros"] > header button:not([class*="logo"]):hover {
+  border-color: var(--theme-aged-gold-bright);
+  color: var(--theme-cream);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 184, 64, 0.30),
+    0 0 14px var(--theme-glow-gold-strong);
+  transform: translateY(-1px);
+}
+
+/* ──────────────── 9. Sidebar — sandstone panely + 4× carved bronze diamond corners ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="right"],
+[data-theme="africke"][data-shell="ikaros"] [class*="sideFrame"],
+[data-theme="africke"][data-shell="ikaros"] [class*="rightFrame"] {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(58, 30, 8, 0.90) 0%, rgba(42, 20, 8, 0.95) 100%);
+  border: 1px solid var(--theme-earth-ochre);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px rgba(200, 152, 120, 0.10),
+    0 6px 22px rgba(16, 8, 4, 0.70);
+}
+
+/* Corner ornaments — carved bronze diamond, master TL mirror přes CSS.
+   Selectory pro CornerOrnament <span data-position="tl|tr|bl|br" />.
+   IMPORTANT: override default rotated-diamond style z CornerOrnament.module.css
+   (background-color + border + rotate). Africké chce čistý PNG ornament. */
+[data-theme="africke"] [data-position] {
+  position: absolute;
+  width: var(--asset-corner-size, 72px);
+  height: var(--asset-corner-size, 72px);
+  background-color: transparent !important;
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none !important;
+  border-radius: 0;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 1px 2px rgba(16, 8, 4, 0.65));
+  forced-color-adjust: none;
+}
+
+[data-theme="africke"] [data-position="tl"] {
+  top: var(--frame-corner-inset, 6px);
+  left: var(--frame-corner-inset, 6px);
+  transform: none;
+}
+[data-theme="africke"] [data-position="tr"] {
+  top: var(--frame-corner-inset, 6px);
+  right: var(--frame-corner-inset, 6px);
+  transform: scaleX(-1);
+}
+[data-theme="africke"] [data-position="bl"] {
+  bottom: var(--frame-corner-inset, 6px);
+  left: var(--frame-corner-inset, 6px);
+  transform: scaleY(-1);
+}
+[data-theme="africke"] [data-position="br"] {
+  bottom: var(--frame-corner-inset, 6px);
+  right: var(--frame-corner-inset, 6px);
+  transform: scale(-1, -1);
+}
+
+/* ──────────────── 10. Section titles — Yeseva One + horizon-glow divider ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="sectionTitle"],
+[data-theme="africke"][data-shell="ikaros"] [class*="sectionHeading"],
+[data-theme="africke"][data-shell="ikaros"] h3[class*="navSection"],
+[data-theme="africke"][data-shell="ikaros"] [data-section-title] {
+  position: relative;
+  color: var(--theme-aged-gold);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  text-shadow: 0 1px 2px rgba(16, 8, 4, 0.75);
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+}
+
+/* ✦ ORIGINÁL: HORIZON-GLOW DIVIDER (alternativa indián petroglyph-divider) */
+[data-theme="africke"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+[data-theme="africke"][data-shell="ikaros"] [class*="sectionHeading"]::after,
+[data-theme="africke"][data-shell="ikaros"] h3[class*="navSection"]::after,
+[data-theme="africke"][data-shell="ikaros"] [data-section-title]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-horizon-dawn) 25%,
+    var(--theme-horizon-sun) 50%,
+    var(--theme-horizon-dawn) 75%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  filter: drop-shadow(0 0 6px var(--theme-glow-gold));
+}
+
+/* Sun ascending one-shot — divider vystoupá zdola nahoru při načtení (1× per session) */
+[data-theme="africke"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+[data-theme="africke"][data-shell="ikaros"] [class*="sectionHeading"]::after {
+  animation: africke-sun-ascending 2s ease-out 1;
+  animation-fill-mode: backwards;
+}
+
+@keyframes africke-sun-ascending {
+  0%   { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 0.55; }
+}
+
+/* ──────────────── 11. NavItem idle/hover — sandstone tablet styling ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="btn3d"],
+[data-theme="africke"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]) {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(58, 30, 8, 0.88) 0%, rgba(42, 20, 8, 0.94) 100%);
+  border: 1px solid var(--theme-earth-ochre);
+  color: var(--theme-cream);
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 10px 14px;
+  border-radius: 3px;
+  transition: all 220ms ease;
+  box-shadow:
+    inset 0 1px 0 rgba(200, 152, 120, 0.12),
+    0 2px 6px rgba(16, 8, 4, 0.45);
+  min-height: 44px;
+  overflow: hidden;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="btn3d"]:hover,
+[data-theme="africke"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):hover {
+  border-color: var(--theme-aged-gold-bright);
+  color: var(--theme-aged-gold-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 184, 64, 0.25),
+    0 0 12px var(--theme-glow-gold);
+  transform: translateY(-1px);
+}
+
+/* ──────────────── 12. ✦ ORIGINÁL: ACTIVE NAV — aged-gold/bronze stitch left-border + Sankofa stamp ✦ ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="btn3dActive"],
+[data-theme="africke"][data-shell="ikaros"] [class*="navItemActive"] {
+  background: var(--theme-nav-active-bg);
+  border-color: var(--theme-aged-gold);
+  color: var(--theme-cream);
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+}
+
+/* ✦ ORIGINÁL: STITCH LEFT-BORDER — aged-gold + bronze vertikální dashed pattern */
+[data-theme="africke"][data-shell="ikaros"] [class*="btn3dActive"]::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="navItemActive"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--theme-aged-gold)    0,
+    var(--theme-aged-gold)    8px,
+    transparent               8px,
+    transparent              11px,
+    var(--theme-bronze-warm) 11px,
+    var(--theme-bronze-warm) 14px,
+    transparent              14px,
+    transparent              17px
+  );
+  filter: drop-shadow(0 0 3px var(--theme-glow-gold));
+  pointer-events: none;
+}
+
+/* ✦ ORIGINÁL: SANKOFA STAMP — adinkra v pravém rohu active nav */
+[data-theme="africke"][data-shell="ikaros"] [class*="btn3dActive"]::after,
+[data-theme="africke"][data-shell="ikaros"] [class*="navItemActive"]::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  background-image: var(--asset-adinkra-active-stamp);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.22;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* ──────────────── 13. Adinkra watermarks per section (kontextové, decentní) ──────────────── */
+
+/* ADMINISTRACE — Adinkrahene (3 soustředné kruhy, vůdcovství) */
+[data-theme="africke"][data-shell="ikaros"] [data-section-key="administrace"]::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="administraceSection"]::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background-image: var(--asset-adinkra-adinkrahene);
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* MOJE DISKUZE — Akoma (srdce, trpělivost) */
+[data-theme="africke"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background-image: var(--asset-adinkra-akoma);
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* MOJE SVĚTY — Gye Nyame (kromě Boha, vesmír) */
+[data-theme="africke"][data-shell="ikaros"] [data-section-key="moje-svety"]::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="mojeSvetySection"]::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background-image: var(--asset-adinkra-gye-nyame);
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ──────────────── 14. „+" tlačítka — horizon gradient + Akoma adinkra stamp ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="rightAddBtn"],
+[data-theme="africke"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]) {
+  position: relative;
+  background: linear-gradient(180deg, rgba(244, 160, 80, 0.55) 0%, rgba(42, 20, 8, 0.85) 100%);
+  border: 1px solid var(--theme-aged-gold-bright);
+  color: var(--theme-cream);
+  padding: 6px 10px 6px 36px;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: all 220ms ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.25),
+    0 0 8px var(--theme-glow-horizon);
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="rightAddBtn"]::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"])::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  background-image: var(--asset-adinkra-akoma);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: translateY(-50%);
+  opacity: 0.85;
+  transition: transform 200ms ease, opacity 200ms ease;
+  filter: drop-shadow(0 0 3px var(--theme-glow-gold));
+  pointer-events: none;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="rightAddBtn"]:hover,
+[data-theme="africke"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover {
+  background: linear-gradient(180deg, rgba(255, 208, 120, 0.65) 0%, rgba(58, 30, 8, 0.85) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.40),
+    0 0 16px var(--theme-glow-gold-strong);
+  transform: translateY(-1px);
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="rightAddBtn"]:hover::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover::before {
+  transform: translateY(-50%) scale(1.08);
+  opacity: 1.0;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="rightAddBtn"]:active::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):active::before {
+  transform: translateY(-50%) scale(0.94);
+}
+
+/* ──────────────── 15. ✦ ORIGINÁL: WELCOME CARD — vyrytá pískovcová stéla ✦
+   Statická, signaturní klid. Monolith watermark BG + 2× carved bronze diamonds
+   po stranách + mudcloth band na dolní hraně. ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"],
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"],
+[data-theme="africke"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+  position: relative;
+  background:
+    linear-gradient(180deg, var(--theme-earth-dust) 0%, var(--theme-earth-ochre) 100%);
+  border: 1px solid var(--theme-bronze-warm);
+  border-radius: 6px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 6vw, 100px);
+  min-height: clamp(380px, 50vh, 540px);
+  box-shadow:
+    inset 0 0 0 1px rgba(58, 30, 8, 0.30),
+    inset 0 0 80px rgba(58, 30, 8, 0.15),
+    0 16px 40px -8px rgba(16, 8, 4, 0.85),
+    0 24px 60px -12px rgba(16, 8, 4, 0.55);
+  overflow: hidden;
+}
+
+/* Monolith watermark v pozadí — opacity 0.12, position center-right */
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  width: 320px;
+  height: 480px;
+  background-image: var(--asset-monolith-watermark);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.12;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 0;
+  forced-color-adjust: none;
+}
+
+/* Mudcloth band na dolní hraně welcome stély */
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"]::after {
+  content: '';
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 16px;
+  height: 24px;
+  background-image: var(--asset-mudcloth-band);
+  background-size: 100% 24px;
+  background-repeat: repeat-x;
+  background-position: center;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 1;
+  forced-color-adjust: none;
+}
+
+/* Carved bronze diamonds po levé+pravé straně stély */
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"]::marker,
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"] > [data-side-ornament] {
+  /* fallback class-selector via decor element — pokud div není přítomen, použijí se
+     pseudo elementy přes ::before/::after na child welcomeContent */
+}
+
+/* Andělský medailon vlevo ve welcome stéle — větší dominantní čtverec
+   (medailon.webp = patinované dřevo s carved bronze diamonds + anděl-křídlo) */
+[data-theme="africke"] [data-frame-panel="card"] [data-andel-medallion] {
+  width: 192px;
+  height: 192px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 14px rgba(16, 8, 4, 0.75));
+  forced-color-adjust: none;
+}
+
+/* Welcome body — flex row s těsnějším gap, vertikálně centrované */
+[data-theme="africke"] [data-frame-panel="card"] [class*="body"] {
+  gap: 32px;
+  align-items: center;
+  position: relative;
+}
+
+/* ──────────────── 16. Welcome card text styling — rytí do pískovce ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeTitle"] {
+  color: var(--theme-text-on-sandstone);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(28px, 4vw, 44px);
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+  text-shadow:
+    0 1px 0 rgba(255, 240, 200, 0.35),
+    0 -1px 0 rgba(16, 8, 4, 0.45);
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeTitle"] [class*="titleAccent"],
+[data-theme="africke"][data-shell="ikaros"] [class*="titleAccent"] {
+  color: var(--theme-earth-laterite);
+  font-family: var(--font-display);
+  text-shadow:
+    0 1px 0 rgba(255, 240, 200, 0.30),
+    0 -1px 0 rgba(16, 8, 4, 0.50);
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"] p,
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"] p {
+  color: var(--theme-text-on-sandstone);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeSignature"],
+[data-theme="africke"][data-shell="ikaros"] [class*="signature"] {
+  color: var(--theme-aged-gold);
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 30px;
+  text-align: center;
+  letter-spacing: 0.01em;
+  margin-top: 24px;
+  text-shadow: 0 1px 2px rgba(16, 8, 4, 0.35);
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 17. Welcome card hairline pod titulkem ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 14px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--theme-aged-gold-bright), transparent);
+  opacity: 0.65;
+}
+
+/* ──────────────── 18. Nav ikony — 7 sandstone tablets přes data-nav-key ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key] [class*="icon"] {
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-gold));
+  forced-color-adjust: none;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"] svg,
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key] [class*="icon"] svg {
+  display: none;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="uvodnik"] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="uvodnik"] [class*="icon"] {
+  background-image: var(--asset-icon-uvodnik);
+}
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] [class*="icon"] {
+  background-image: var(--asset-icon-vytvorit-svet);
+}
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="diskuze"] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="diskuze"] [class*="icon"] {
+  background-image: var(--asset-icon-diskuze);
+}
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="clanky"] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="clanky"] [class*="icon"] {
+  background-image: var(--asset-icon-clanky);
+}
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="galerie"] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="galerie"] [class*="icon"] {
+  background-image: var(--asset-icon-galerie);
+}
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="napoveda"] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="napoveda"] [class*="icon"] {
+  background-image: var(--asset-icon-napoveda);
+}
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="hospoda"] [class*="navItemIcon"],
+[data-theme="africke"][data-shell="ikaros"] [data-nav-key="hospoda"] [class*="icon"] {
+  background-image: var(--asset-icon-hospoda);
+}
+
+/* ──────────────── 19. Novinky panel ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="novinkyPanel"],
+[data-theme="africke"][data-shell="ikaros"] [data-frame-panel="novinky"] {
+  position: relative;
+  background: linear-gradient(160deg, rgba(58, 30, 8, 0.90) 0%, rgba(42, 20, 8, 0.95) 100%);
+  border: 1px solid var(--theme-earth-ochre);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px rgba(200, 152, 120, 0.10),
+    0 6px 22px rgba(16, 8, 4, 0.70);
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="novinkyTitle"],
+[data-theme="africke"][data-shell="ikaros"] [class*="novinkyPanel"] h2,
+[data-theme="africke"][data-shell="ikaros"] [class*="novinkyPanel"] h3 {
+  color: var(--theme-horizon-dawn);
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 2px rgba(16, 8, 4, 0.70);
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="emptyHint"],
+[data-theme="africke"][data-shell="ikaros"] [class*="novinkyEmpty"] {
+  color: var(--theme-aged-gold);
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 18px;
+  opacity: 0.75;
+}
+
+/* ──────────────── 20. PJ badge — mosazný štítek ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="pjBadge"],
+[data-theme="africke"][data-shell="ikaros"] [data-role-badge="pj"] {
+  background: linear-gradient(180deg, var(--theme-aged-gold-bright), var(--theme-aged-gold));
+  color: var(--theme-text-on-gold);
+  border: 1px solid var(--theme-bronze-deep);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  box-shadow:
+    0 0 8px var(--theme-glow-gold),
+    inset 0 0 0 1px var(--theme-bronze-warm),
+    inset 0 1px 0 0 rgba(255, 240, 200, 0.32);
+}
+
+/* ──────────────── 21. Show-all links (zobrazit vše →) ──────────────── */
+
+[data-theme="africke"][data-shell="ikaros"] [class*="showAllLink"],
+[data-theme="africke"][data-shell="ikaros"] a[class*="showAll"] {
+  color: var(--theme-horizon-dawn);
+  font-family: var(--font-display);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+[data-theme="africke"][data-shell="ikaros"] [class*="showAllLink"]:hover,
+[data-theme="africke"][data-shell="ikaros"] a[class*="showAll"]:hover {
+  color: var(--theme-horizon-sun);
+  text-shadow: 0 0 6px var(--theme-glow-horizon);
+}
+
+/* ──────────────── 22. Scrollbar styling ──────────────── */
+
+[data-theme="africke"] *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-theme="africke"] *::-webkit-scrollbar-track {
+  background: var(--theme-earth-shadow);
+}
+[data-theme="africke"] *::-webkit-scrollbar-thumb {
+  background: var(--theme-aged-gold);
+  border-radius: 4px;
+}
+[data-theme="africke"] *::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-aged-gold-bright);
+}
+
+/* ──────────────── 23. Focus visible (a11y) ──────────────── */
+
+[data-theme="africke"] [class*="btn3d"]:focus-visible,
+[data-theme="africke"] [class*="navItem"]:focus-visible,
+[data-theme="africke"] [class*="headerBtn"]:focus-visible,
+[data-theme="africke"] [class*="rightAddBtn"]:focus-visible,
+[data-theme="africke"] [class*="addBtn"]:focus-visible,
+[data-theme="africke"] [class*="showAll"]:focus-visible,
+[data-theme="africke"] button:focus-visible,
+[data-theme="africke"] a:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-horizon-dawn),
+    0 0 14px var(--theme-glow-gold-strong);
+}
+
+/* ──────────────── 24. Tablet adjustments (769–1024px) ──────────────── */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  [data-theme="africke"][data-shell="ikaros"] {
+    --asset-corner-size: 52px;
+    --asset-logo-w: 280px;
+  }
+
+  [data-theme="africke"] [data-frame-panel="card"] [data-andel-medallion] {
+    width: 144px;
+    height: 144px;
+  }
+}
+
+/* ──────────────── 25. Mobile degradace (≤768px) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="africke"][data-shell="ikaros"] {
+    --frame-pad-x: 12px;
+    --asset-corner-size: 38px;
+    --asset-logo-w: 220px;
+  }
+
+  /* Baobab corner silueta skryta */
+  [data-theme="africke"][data-shell="ikaros"] body::before {
+    display: none;
+  }
+
+  /* Heat shimmer redukován */
+  [data-theme="africke"][data-shell="ikaros"]::after {
+    opacity: 0.04;
+    height: 25vh;
+  }
+  @keyframes africke-heat-shimmer {
+    0%, 100% { opacity: 0.03; }
+    50%      { opacity: 0.06; }
+  }
+
+  /* Dust drift — jen 1 vrstva, slabší */
+  [data-theme="africke"][data-shell="ikaros"] body::after {
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><circle cx='60' cy='40' r='1.5' fill='%23e8b840' opacity='0.30'/><circle cx='220' cy='110' r='1.2' fill='%23e8b840' opacity='0.26'/><circle cx='140' cy='250' r='1.6' fill='%23e8b840' opacity='0.32'/></svg>");
+    background-size: 320px 320px;
+    animation: africke-dust-near 12s linear infinite;
+  }
+
+  /* Acacia canopy redukováno */
+  [data-theme="africke"][data-shell="ikaros"] > header::after {
+    height: 32px;
+    background-size: 1200px 60px;
+    opacity: 0.25;
+  }
+
+  /* Welcome stéla — uvolnit aspect, menší padding */
+  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 28px 20px 36px !important;
+    min-height: auto;
+  }
+
+  /* Monolith watermark — menší + nižší opacity */
+  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+    width: 180px;
+    height: 270px;
+    opacity: 0.06;
+  }
+
+  /* Mudcloth band redukováno */
+  [data-theme="africke"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+  [data-theme="africke"][data-shell="ikaros"] [class*="welcomeCard"]::after {
+    height: 16px;
+    background-size: 100% 16px;
+    left: 12px;
+    right: 12px;
+    bottom: 10px;
+  }
+
+  /* Andělský medailon menší na mobile (ale stále dominantní) */
+  [data-theme="africke"] [data-frame-panel="card"] [data-andel-medallion] {
+    width: 112px;
+    height: 112px;
+  }
+
+  /* Welcome title menší */
+  [data-theme="africke"][data-shell="ikaros"] [class*="welcomeTitle"] {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+
+  /* Touch targets ≥48px */
+  [data-theme="africke"][data-shell="ikaros"] [class*="btn3d"],
+  [data-theme="africke"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]) {
+    min-height: 48px;
+  }
+
+  /* Header buttons icon-only */
+  [data-theme="africke"][data-shell="ikaros"] > header [class*="headerBtnLabel"] {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Welcome signature menší */
+  [data-theme="africke"][data-shell="ikaros"] [class*="welcomeSignature"],
+  [data-theme="africke"][data-shell="ikaros"] [class*="signature"] {
+    font-size: 24px;
+  }
+}
+
+/* ──────────────── 26. Reduced-motion fallback ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="africke"] *,
+  [data-theme="africke"][data-shell="ikaros"]::before,
+  [data-theme="africke"][data-shell="ikaros"]::after,
+  [data-theme="africke"][data-shell="ikaros"] body::before,
+  [data-theme="africke"][data-shell="ikaros"] body::after,
+  [data-theme="africke"][data-shell="ikaros"] > header::after,
+  [data-theme="africke"] [class*="sectionTitle"]::after,
+  [data-theme="africke"] [class*="sectionHeading"]::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Sun ascending fallback — instant opacity 0.55 */
+  [data-theme="africke"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+  [data-theme="africke"][data-shell="ikaros"] [class*="sectionHeading"]::after {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+}
+
+/* ──────────────── 27. Forced colors (Windows high contrast) ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="africke"] [data-position],
+  [data-theme="africke"] [class*="welcome"]::before,
+  [data-theme="africke"] [class*="welcome"]::after,
+  [data-theme="africke"] [data-frame-panel="card"]::before,
+  [data-theme="africke"] [data-frame-panel="card"]::after,
+  [data-theme="africke"] [class*="welcomeCard"]::before,
+  [data-theme="africke"] [class*="welcomeCard"]::after,
+  [data-theme="africke"][data-shell="ikaros"] body::before,
+  [data-theme="africke"][data-shell="ikaros"] > header::after,
+  [data-theme="africke"] [data-nav-key] [class*="navItemIcon"],
+  [data-theme="africke"] [data-nav-key] [class*="icon"],
+  [data-theme="africke"] [class*="btn3dActive"]::after,
+  [data-theme="africke"] [class*="navItemActive"]::after {
+    forced-color-adjust: none;
+  }
+}

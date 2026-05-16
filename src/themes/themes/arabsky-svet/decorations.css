@@ -1,0 +1,1276 @@
+/* ── Arabský svět (spec 1.0r).
+   Noční komnata sultánova paláce, 1001 nocí. BG dodán uživatelem: noční palácová
+   scenérie s mašrabíja rámem, samet závěsy, perské koberce, lucerny + narghile +
+   dallah baked-in. UI ornamenty: midnight indigo panely + multifoil zlato corners
+   s drahokamy (z medailonu) + mukarnasová římsa pod topbarem + mašrabíja girih
+   hairline + welcome card jako odhrnutý hedvábný závěs.
+
+   ORIGINÁLNÍ MOTIFY: rose petal drift (3 vrstvy parallax, damask + gold flakes,
+   90s/120s/150s — žádný jiný skin nemá padající okvětní lístky), kouř z narghile
+   (vlnitá SVG ribbon stoupá z pravého dolního rohu, 8s — žádný jiný skin nemá
+   kouř), lampa génia v rohu hlavního panelu + caustic glow 4s breathe + 14s sway,
+   mukarnasová římsa (statická voštinová struktura — žádný jiný skin), mašrabíja
+   girih hairline (8-cípé hvězdy v pásku), arabesque vine left-border s rubínovým
+   krystalem na active nav, Hamsa stamp v rohu active nav, girih watermarks
+   (Star-8 / Cross / Pentagon) v rozích sekcí, Šeherezádin signature self-draw
+   na welcome card (1× per session).
+
+   17 assetů: logo + medailon + background (user dodal) + corner-tl + mukarnas-
+   cornice + narghile-smoke + genie-lamp + caustic-glow + carpet-strip +
+   rose-petals-scatter + 7× nav ikony. Plus inline SVG (girih × 4, hamsa,
+   arabesque vine, rose stamp, 3× rose-petal drift vrstvy).
+
+   Scoped přes [data-theme="arabsky-svet"], žádný globální dopad. */
+
+[data-theme="arabsky-svet"] {
+  background-color: var(--bg-primary);
+}
+
+/* ──────────────── 1. Atmosférický overlay (radial vignette + linear darken) ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--theme-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────── 2. ✦ ORIGINÁL: ROSE PETAL DRIFT (3 vrstvy parallax — damask + gold flakes) ✦
+   Žádný jiný skin nemá padající okvětní lístky. Pomalá diagonální drift shora-dolů.
+   Mobile redukce na 1 vrstvu. ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    var(--asset-rose-petal-near),
+    var(--asset-rose-petal-mid),
+    var(--asset-rose-petal-far);
+  background-size: 800px 800px, 240px 240px, 180px 180px;
+  background-repeat: repeat, repeat, repeat;
+  pointer-events: none;
+  z-index: 1;
+  animation:
+    arabsky-petal-near 90s linear infinite,
+    arabsky-petal-mid 120s linear infinite,
+    arabsky-petal-far 150s linear infinite;
+}
+
+@keyframes arabsky-petal-near {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 280px 900px, 0 0, 0 0; }
+}
+@keyframes arabsky-petal-mid {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 280px 900px, 200px 800px, 0 0; }
+}
+@keyframes arabsky-petal-far {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 280px 900px, 200px 800px, 140px 700px; }
+}
+
+/* Kouř z narghile ODSTRANĚN (1.0r-followup) — uživatel zhodnotil jako rušivý
+   ("va tento dým vyřaď"). Asset narghile-smoke.webp zůstává v decor/ pro případné
+   budoucí použití (nezapojen do žádné CSS). */
+
+/* ──────────────── 4. Topbar — dark walnut + mukarnasová římsa + mašrabíja hairline ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header {
+  position: relative;
+  background: linear-gradient(180deg, #1a0a08 0%, #0a0508 100%);
+  border-bottom: 1px solid var(--theme-patinated-gold);
+  box-shadow:
+    0 1px 0 rgba(232, 192, 96, 0.18),
+    0 4px 12px rgba(10, 14, 44, 0.65);
+  overflow: visible;
+  z-index: 5;
+}
+
+/* Mukarnasová římsa pod topbarem ODSTRANĚNA (1.0r-followup) — uživatel zhodnotil
+   jako rušivou ("ty horní závěsy či co to je vyřaď"). Asset mukarnas-cornice.webp
+   zůstává v decor/ pro případné budoucí použití (nezapojen do žádné CSS). */
+
+/* Mašrabíja girih hairline ODSTRANĚNA (1.0r-followup) — uživatel označil za rušivou
+   pod header buttony ("prosvítá ta čára vypadá divně"). Topbar má vlastní 1px
+   patinated-gold border-bottom který slouží jako finish. */
+
+/* ──────────────── 5. Logo banner ──────────────── */
+
+[data-theme="arabsky-svet"] header [class*="logoImg"] {
+  width: var(--asset-logo-w);
+  height: calc(var(--header-h) - 8px);
+  background-image: var(--asset-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  filter: drop-shadow(0 1px 3px rgba(10, 14, 44, 0.70));
+}
+
+[data-theme="arabsky-svet"] header [class*="logoFallback"] {
+  display: var(--logo-fallback-display, none);
+  font-family: var(--font-logo);
+  font-size: 26px;
+  color: var(--theme-polished-gold);
+  text-shadow: 0 1px 2px rgba(10, 14, 44, 0.70);
+  letter-spacing: 0.02em;
+}
+
+/* ──────────────── 6. Header buttons — DRAMATIC 3D MOSAZNÝ KABOŠON s ornamentem ────────────────
+   Multi-stop background (cream→saffron→walnut→deep), masivní top highlight (cream 50%+),
+   visible brass bottom edge (thickness lip), warm halo. Bohatě působivé, ne plochý. */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header [class*="headerBtn"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header button:not([class*="logo"]) {
+  position: relative;
+  background:
+    /* Diagonal silk shimmer top */
+    linear-gradient(135deg,
+      rgba(255, 240, 200, 0.12) 0%,
+      rgba(232, 192, 96, 0.08) 30%,
+      transparent 60%),
+    /* Main brass→walnut gradient */
+    linear-gradient(180deg,
+      rgba(168, 120, 48, 0.55) 0%,        /* brass highlight top edge */
+      rgba(74, 40, 24, 0.92) 12%,
+      rgba(42, 20, 8, 0.96) 50%,
+      rgba(26, 12, 4, 0.98) 100%);
+  border: 1.5px solid var(--theme-polished-gold);
+  color: var(--theme-polished-gold);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 12px 22px;
+  border-radius: 5px;
+  transition: all 200ms ease-out;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+  box-shadow:
+    /* TOP HIGHLIGHT — masivní cream reflex */
+    inset 0 1px 0 rgba(255, 250, 220, 0.55),
+    inset 0 2px 0 rgba(255, 240, 200, 0.30),
+    inset 0 3px 2px rgba(232, 192, 96, 0.18),
+    /* SIDE HIGHLIGHTS */
+    inset 1px 0 0 rgba(255, 240, 200, 0.20),
+    inset -1px 0 0 rgba(60, 30, 8, 0.55),
+    /* BOTTOM EMBOSS — strong */
+    inset 0 -3px 4px rgba(0, 0, 0, 0.55),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.70),
+    /* DROP SHADOW — brass thickness + black depth */
+    0 1px 0 rgba(255, 240, 200, 0.32),     /* fine top edge reflect */
+    0 2px 0 rgba(232, 192, 96, 0.55),       /* brass edge */
+    0 4px 0 rgba(74, 40, 24, 0.75),         /* walnut depth */
+    0 6px 12px rgba(0, 0, 0, 0.55),         /* mid blur */
+    0 12px 24px rgba(0, 0, 0, 0.30);        /* far ambient */
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header [class*="headerBtn"]:hover,
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header button:not([class*="logo"]):hover {
+  border-color: rgba(255, 240, 200, 0.95);
+  color: var(--theme-pearl-ivory);
+  transform: translateY(-2px);
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 240, 0.22) 0%,
+      rgba(255, 240, 180, 0.14) 30%,
+      transparent 60%),
+    linear-gradient(180deg,
+      rgba(232, 192, 96, 0.75) 0%,
+      rgba(120, 80, 32, 0.95) 12%,
+      rgba(60, 30, 8, 0.96) 50%,
+      rgba(40, 18, 8, 0.98) 100%);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 12px var(--theme-glow-saffron-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 240, 0.85),
+    inset 0 2px 0 rgba(255, 240, 200, 0.50),
+    inset 0 3px 2px rgba(232, 192, 96, 0.30),
+    inset 1px 0 0 rgba(255, 240, 200, 0.35),
+    inset -1px 0 0 rgba(60, 30, 8, 0.65),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.60),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.75),
+    0 2px 0 rgba(255, 240, 200, 0.55),
+    0 4px 0 rgba(232, 192, 96, 0.70),
+    0 6px 0 rgba(74, 40, 24, 0.80),
+    0 10px 18px rgba(0, 0, 0, 0.60),
+    0 16px 32px rgba(0, 0, 0, 0.35),
+    0 0 22px var(--theme-glow-saffron-strong);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header [class*="headerBtn"]:active,
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header button:not([class*="logo"]):active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 192, 96, 0.25),
+    inset 0 2px 8px rgba(0, 0, 0, 0.75),
+    inset 0 -1px 0 rgba(60, 30, 8, 0.55),
+    inset 1px 0 0 rgba(232, 192, 96, 0.12),
+    inset -1px 0 0 rgba(60, 30, 8, 0.40),
+    0 1px 2px rgba(0, 0, 0, 0.50);
+}
+
+/* Ruby gem accent v levém horním rohu header button — drobný drahokamový detail */
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header [class*="headerBtn"]::after,
+[data-theme="arabsky-svet"][data-shell="ikaros"] > header button:not([class*="logo"])::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle at 30% 30%,
+    #f04860 0%,
+    #d8485c 40%,
+    #a8283c 75%,
+    #58101c 100%);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 3px rgba(168, 40, 60, 0.65);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* ──────────────── 7. Sidebary — hedvábí + zlato + multi-layer border (gold → turquoise → gold) + 4× corner ornament ────────────────
+   Diagonal silk shimmer (saffron+ruby+turquoise sheen overlay) na multi-stop gradient.
+   Multi-layer border: outer 1px gold + inset turquoise + inner gold trio přes box-shadow. */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="sidebar"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="right"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="sideFrame"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="rightFrame"] {
+  position: relative;
+  background:
+    /* Diagonal silk shimmer overlay */
+    linear-gradient(135deg,
+      rgba(232, 192, 96, 0.04) 0%,
+      rgba(168, 40, 60, 0.03) 35%,
+      rgba(232, 192, 96, 0.04) 70%,
+      rgba(26, 138, 138, 0.03) 100%),
+    /* Hluboký indigo gradient base */
+    linear-gradient(160deg, rgba(14, 26, 58, 0.88) 0%, rgba(10, 14, 44, 0.94) 100%);
+  border: 1px solid var(--theme-patinated-gold);
+  border-radius: 6px;
+  box-shadow:
+    /* Multi-layer border: gold → turquoise → gold trio */
+    inset 0 0 0 3px rgba(10, 14, 44, 0.5),
+    inset 0 0 0 4px rgba(26, 138, 138, 0.42),
+    inset 0 0 0 5px rgba(10, 14, 44, 0.5),
+    inset 0 0 0 6px rgba(168, 120, 48, 0.50),
+    /* Original deep shadow ven */
+    0 6px 22px rgba(10, 14, 44, 0.70);
+}
+
+/* Damask wallpaper pattern — subtle islamic geometric tile @ 5% opacity */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="sidebar"]::after,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="right"]::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  background-image: var(--asset-damask-pattern);
+  background-size: 80px 80px;
+  background-repeat: repeat;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 5px;
+}
+
+/* ──────────────── 8. Corner ornaments — multifoil zlato s drahokamy (master TL mirror přes CSS) ──────────────── */
+
+[data-theme="arabsky-svet"] [data-position] {
+  position: absolute;
+  width: var(--asset-corner-size, 72px);
+  height: var(--asset-corner-size, 72px);
+  background-color: transparent !important;
+  background-image: var(--asset-corner);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none !important;
+  border-radius: 0;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 1px 2px rgba(10, 14, 44, 0.65));
+  forced-color-adjust: none;
+}
+
+[data-theme="arabsky-svet"] [data-position="tl"] {
+  top: var(--frame-corner-inset, 6px);
+  left: var(--frame-corner-inset, 6px);
+  transform: none;
+}
+[data-theme="arabsky-svet"] [data-position="tr"] {
+  top: var(--frame-corner-inset, 6px);
+  right: var(--frame-corner-inset, 6px);
+  transform: scaleX(-1);
+}
+[data-theme="arabsky-svet"] [data-position="bl"] {
+  bottom: var(--frame-corner-inset, 6px);
+  left: var(--frame-corner-inset, 6px);
+  transform: scaleY(-1);
+}
+[data-theme="arabsky-svet"] [data-position="br"] {
+  bottom: var(--frame-corner-inset, 6px);
+  right: var(--frame-corner-inset, 6px);
+  transform: scale(-1, -1);
+}
+
+/* Welcome card: VŠECHNY 4 rohové ornamenty SKRYTY (1.0r-followup) — uživatel chce
+   čistý mihrab arch shape bez zlatých rohů, plně zaoblené welcome bez ornament rušení. */
+[data-theme="arabsky-svet"] [data-frame-panel="card"] [data-position],
+[data-theme="arabsky-svet"] [class*="welcomeCard"] [data-position] {
+  display: none;
+}
+
+/* ──────────────── 9. Section titles + horizon-mihrab divider ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="sectionTitle"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="sectionHeading"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] h3[class*="navSection"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-section-title] {
+  position: relative;
+  color: var(--theme-polished-gold);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  text-shadow: 0 1px 2px rgba(10, 14, 44, 0.75);
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+}
+
+/* ✦ ORIGINÁL: HORIZON-MIHRAB DIVIDER (turquoise → gold → turquoise gradient) */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="sectionTitle"]::after,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="sectionHeading"]::after,
+[data-theme="arabsky-svet"][data-shell="ikaros"] h3[class*="navSection"]::after,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-section-title]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--theme-turquoise-deep) 25%,
+    var(--theme-polished-gold) 50%,
+    var(--theme-turquoise-deep) 75%,
+    transparent 100%
+  );
+  opacity: 0.65;
+  filter: drop-shadow(0 0 6px var(--theme-glow-turquoise));
+}
+
+/* ──────────────── 10. NavItem 3D — reliéfní mosazná destička + arabesque vine + Hamsa stamp ────────────────
+   Plně 3D multi-stop gradient + top highlight (saffron) + bottom emboss (black) +
+   drop shadow stack (brass edge + black blur + far shadow). Hover translateY(-2px),
+   active translateY(1px) s inner pressed shadow. */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="btn3d"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]) {
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      rgba(58, 42, 88, 0.75) 0%,
+      rgba(26, 26, 68, 0.92) 40%,
+      rgba(14, 14, 44, 0.96) 60%,
+      rgba(20, 20, 56, 0.92) 100%);
+  border: 1px solid var(--theme-patinated-gold);
+  color: var(--theme-pearl-ivory);
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  padding: 10px 12px;
+  border-radius: 4px;
+  transition: all 200ms ease-out;
+  min-height: 48px;
+  overflow: hidden;
+  /* Allow long labels (DIMENZIONÁLNÍ HOSPODA) to wrap místo truncation */
+  white-space: normal;
+  line-height: 1.25;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  box-shadow:
+    /* TOP HIGHLIGHT — světelný reflex shora */
+    inset 0 1px 0 rgba(232, 192, 96, 0.35),
+    inset 0 2px 0 rgba(232, 192, 96, 0.12),
+    /* LEFT HIGHLIGHT */
+    inset 1px 0 0 rgba(232, 192, 96, 0.18),
+    /* BOTTOM SHADOW INSIDE — emboss depth */
+    inset 0 -2px 4px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    /* RIGHT SHADOW */
+    inset -1px 0 2px rgba(0, 0, 0, 0.30),
+    /* OUTER DROP SHADOW STACK — button physically raised */
+    0 1px 0 rgba(168, 120, 48, 0.40),
+    0 2px 0 rgba(74, 40, 24, 0.65),
+    0 4px 8px rgba(0, 0, 0, 0.45),
+    0 8px 16px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="btn3d"]:hover,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):hover {
+  background:
+    linear-gradient(180deg,
+      rgba(74, 56, 108, 0.85) 0%,
+      rgba(38, 38, 88, 0.94) 40%,
+      rgba(22, 22, 60, 0.96) 60%,
+      rgba(28, 28, 72, 0.92) 100%);
+  border-color: var(--theme-polished-gold);
+  color: var(--theme-polished-gold);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 192, 96, 0.55),
+    inset 0 2px 0 rgba(232, 192, 96, 0.22),
+    inset 1px 0 0 rgba(232, 192, 96, 0.30),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.50),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.60),
+    inset -1px 0 2px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(232, 192, 96, 0.50),
+    0 3px 0 rgba(74, 40, 24, 0.70),
+    0 6px 12px rgba(0, 0, 0, 0.55),
+    0 12px 24px rgba(0, 0, 0, 0.30),
+    0 0 16px var(--theme-glow-saffron);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="btn3d"]:active,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]):active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 192, 96, 0.15),
+    inset 1px 0 0 rgba(232, 192, 96, 0.08),
+    inset 0 2px 6px rgba(0, 0, 0, 0.65),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.40),
+    0 1px 0 rgba(74, 40, 24, 0.40),
+    0 2px 4px rgba(0, 0, 0, 0.40);
+}
+
+/* Active state (current page) — saffron horizon gradient s 3D depth */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="btn3dActive"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="navItemActive"] {
+  background:
+    linear-gradient(180deg,
+      rgba(232, 176, 64, 0.45) 0%,
+      rgba(168, 120, 48, 0.55) 30%,
+      rgba(58, 42, 88, 0.85) 70%,
+      rgba(14, 14, 44, 0.92) 100%);
+  border-color: var(--theme-polished-gold);
+  color: var(--theme-pearl-ivory);
+  text-shadow: 0 0 10px var(--theme-glow-saffron-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.40),
+    inset 0 2px 0 rgba(232, 192, 96, 0.25),
+    inset 1px 0 0 rgba(232, 192, 96, 0.32),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.40),
+    inset 0 -1px 0 rgba(74, 40, 24, 0.65),
+    inset -1px 0 2px rgba(0, 0, 0, 0.25),
+    0 1px 0 rgba(232, 192, 96, 0.55),
+    0 2px 0 rgba(74, 40, 24, 0.70),
+    0 4px 8px rgba(0, 0, 0, 0.45),
+    0 0 18px var(--theme-glow-saffron);
+}
+
+/* ✦ ORIGINÁL: ARABESQUE VINE LEFT-BORDER s rubínovým krystalem */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="btn3dActive"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="navItemActive"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 8px;
+  background-image: var(--asset-arabesque-vine);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px var(--theme-glow-saffron));
+  pointer-events: none;
+}
+
+/* ✦ ORIGINÁL: HAMSA STAMP v pravém rohu active nav (talisman ochrany) */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="btn3dActive"]::after,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="navItemActive"]::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  background-image: var(--asset-hamsa-stamp);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.22;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* ──────────────── 11. ✦ ORIGINÁL: LAMPA GÉNIA v pravém horním rohu hlavního panelu ✦
+   Visící lampa s 14s sway + caustic glow patch dolů s 4s breathe.
+   Pozicovanou relativně k `main` (přidáno position: relative níže). ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] main {
+  position: relative;
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] main::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  right: 18px;
+  width: 70px;
+  height: 124px;
+  background-image: var(--asset-genie-lamp);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top center;
+  opacity: 0.92;
+  pointer-events: none;
+  z-index: 4;
+  transform-origin: top center;
+  animation: arabsky-lamp-sway 14s ease-in-out infinite;
+  filter: drop-shadow(0 6px 12px rgba(232, 192, 96, 0.40));
+  forced-color-adjust: none;
+}
+
+@keyframes arabsky-lamp-sway {
+  0%, 100% { transform: rotate(-0.4deg); }
+  50%      { transform: rotate(0.4deg); }
+}
+
+/* Caustic glow patch dolů z lampy — 4s breathe, subtle warm halo */
+[data-theme="arabsky-svet"][data-shell="ikaros"] main::after {
+  content: '';
+  position: absolute;
+  top: 96px;
+  right: -10px;
+  width: 140px;
+  height: 180px;
+  background-image: var(--asset-caustic-glow);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top center;
+  opacity: 0.28;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 1;
+  animation: arabsky-caustic-breathe 4s ease-in-out infinite;
+  forced-color-adjust: none;
+}
+
+@keyframes arabsky-caustic-breathe {
+  0%, 100% { opacity: 0.22; }
+  50%      { opacity: 0.35; }
+}
+
+/* ──────────────── 12. Welcome card — „Mihrab niche s odhrnutým hedvábným závěsem" ────────────────
+   Lomený keel-arch shape (border-radius 100px na horních rozích) + mihrab depth gradient
+   (radial od horní centrum saffron 12% → transparent — jako by lampa shora osvětlovala niku) +
+   multi-layer turquoise border. */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="card"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeCard"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="card"][class*="welcome"] {
+  position: relative;
+  background:
+    /* Mihrab depth — radial halo z horního centra (jako svit lampy do niky) */
+    radial-gradient(ellipse 80% 60% at 50% 0%,
+      rgba(232, 192, 96, 0.14) 0%,
+      transparent 55%),
+    /* Subtle silk shimmer */
+    linear-gradient(135deg,
+      rgba(232, 192, 96, 0.03) 0%,
+      rgba(168, 40, 60, 0.02) 50%,
+      rgba(26, 138, 138, 0.03) 100%),
+    /* Top-left lamp light leak */
+    radial-gradient(ellipse at top left, rgba(232, 192, 96, 0.08) 0%, transparent 60%),
+    /* Midnight base */
+    linear-gradient(180deg, var(--theme-midnight-indigo) 0%, var(--theme-midnight-night) 100%);
+  border: 1px solid var(--theme-turquoise-deep);
+  /* MIHRAB ARCH SHAPE — všechny 4 rohy zaoblené (top dramatický, bottom mírnější) */
+  border-radius: 100px 100px 80px 80px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 6vw, 100px);
+  min-height: clamp(380px, 50vh, 540px);
+  box-shadow:
+    /* Multi-layer border: outer turquoise + inset gold trio */
+    inset 0 0 0 1px rgba(26, 138, 138, 0.40),
+    inset 0 0 0 3px rgba(10, 14, 44, 0.5),
+    inset 0 0 0 4px rgba(168, 120, 48, 0.45),
+    inset 0 0 80px rgba(10, 14, 44, 0.25),
+    /* Deep stone shadow */
+    0 16px 40px -8px rgba(10, 14, 44, 0.85),
+    0 24px 60px -12px rgba(10, 14, 44, 0.55);
+  overflow: hidden;
+}
+
+/* Rose petals scatter v pozadí welcome card (subtle BG layer) */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--asset-rose-petals-scatter);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  forced-color-adjust: none;
+}
+
+/* Persian carpet strip na dolní hraně welcome card */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeCard"]::after {
+  content: '';
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 16px;
+  height: 16px;
+  background-image: var(--asset-carpet-strip);
+  background-size: 100% 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.90;
+  pointer-events: none;
+  z-index: 1;
+  forced-color-adjust: none;
+}
+
+/* Andělský medailon vlevo ve welcome card — backlit saffron halo (jako by lampa svítila zezadu) */
+[data-theme="arabsky-svet"] [data-frame-panel="card"] [data-andel-medallion] {
+  width: 192px;
+  height: 192px;
+  background-image: var(--asset-andel-medallion);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter:
+    drop-shadow(0 4px 14px rgba(10, 14, 44, 0.75))
+    drop-shadow(0 0 32px rgba(232, 176, 64, 0.45))
+    drop-shadow(0 0 64px rgba(232, 176, 64, 0.20));
+  forced-color-adjust: none;
+  position: relative;
+  z-index: 2;
+}
+
+/* Welcome body — flex row s gap, vertikálně centrované */
+[data-theme="arabsky-svet"] [data-frame-panel="card"] [class*="body"] {
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* ──────────────── 13. Welcome card text styling ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeTitle"] {
+  color: var(--theme-pearl-ivory);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(28px, 4vw, 46px);
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+  text-shadow:
+    0 1px 2px rgba(10, 14, 44, 0.85),
+    0 0 24px rgba(232, 176, 64, 0.30),
+    0 0 48px rgba(232, 176, 64, 0.15);
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeTitle"] [class*="titleAccent"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="titleAccent"] {
+  color: var(--theme-turquoise-deep);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(10, 14, 44, 0.75);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeCard"] p,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="card"] p {
+  color: var(--theme-pearl-ivory);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  position: relative;
+  z-index: 2;
+}
+
+/* ✦ ORIGINÁL: Šeherezádin signature self-draw (1× per session na page load) */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeSignature"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="signature"] {
+  color: var(--theme-turquoise-deep);
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 32px;
+  text-align: center;
+  letter-spacing: 0.01em;
+  margin-top: 24px;
+  text-shadow: 0 1px 2px rgba(10, 14, 44, 0.35);
+  position: relative;
+  z-index: 2;
+  /* Self-draw reveal — clip-path z 0 do 100% width (zleva doprava) */
+  animation: arabsky-signature-draw 2s ease-out 1;
+  animation-fill-mode: backwards;
+}
+
+@keyframes arabsky-signature-draw {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+/* ──────────────── 14. Welcome card turquoise hairline pod titulkem ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeTitle"]::after {
+  content: '';
+  display: block;
+  margin-top: 14px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--theme-turquoise-deep), transparent);
+  opacity: 0.65;
+}
+
+/* ──────────────── 15. Nav ikony — 7 ornament medailonů přes data-nav-key
+   Velikost zvětšena (22→36px desktop, 18→28px mobile) — uživatel chce výraznější medailony.
+   Drop-shadow zlatý + jemný hnědý spodní rim pro 3D feeling. ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key] [class*="icon"] {
+  width: 42px;
+  height: 42px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter:
+    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 4px var(--theme-glow-saffron));
+  forced-color-adjust: none;
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key] [class*="navItemIcon"] svg,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key] [class*="icon"] svg {
+  display: none;
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="uvodnik"] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="uvodnik"] [class*="icon"] {
+  background-image: var(--asset-icon-uvodnik);
+}
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="vytvorit-svet"] [class*="icon"] {
+  background-image: var(--asset-icon-vytvorit-svet);
+}
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="diskuze"] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="diskuze"] [class*="icon"] {
+  background-image: var(--asset-icon-diskuze);
+}
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="clanky"] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="clanky"] [class*="icon"] {
+  background-image: var(--asset-icon-clanky);
+}
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="galerie"] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="galerie"] [class*="icon"] {
+  background-image: var(--asset-icon-galerie);
+}
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="napoveda"] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="napoveda"] [class*="icon"] {
+  background-image: var(--asset-icon-napoveda);
+}
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="hospoda"] [class*="navItemIcon"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-nav-key="hospoda"] [class*="icon"] {
+  background-image: var(--asset-icon-hospoda);
+}
+
+/* ──────────────── 16. Girih watermarks per section (kontextové, decentní) ──────────────── */
+
+/* ADMINISTRACE — Girih star-8 (8-cípá hvězda, leadership/centrum) */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-section-key="administrace"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="administraceSection"]::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background-image: var(--asset-girih-star-8);
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* MOJE DISKUZE — Girih cross (kříž, setkávání) */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-section-key="oblibene-diskuze"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="mojeDiskuzeSection"]::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background-image: var(--asset-girih-cross);
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* MOJE SVĚTY — Girih pentagon (5-úhelník, dimenze) */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-section-key="moje-svety"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="mojeSvetySection"]::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background-image: var(--asset-girih-pentagon);
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ──────────────── 17. „+" tlačítka — 3D MOSAZNÝ KABOŠON s rose stamp ────────────────
+   Premium variant: super silný cream highlight (mosaz reflektivní),
+   warm halo, dark text na zlatém povrchu. */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="rightAddBtn"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]) {
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 220, 140, 0.70) 0%,
+      rgba(232, 176, 64, 0.85) 30%,
+      rgba(168, 120, 48, 0.90) 60%,
+      rgba(120, 80, 32, 0.92) 100%);
+  border: 1px solid var(--theme-polished-gold);
+  color: var(--theme-text-on-gold);
+  padding: 8px 14px 8px 38px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  transition: all 200ms ease-out;
+  box-shadow:
+    /* Super strong cream highlight — mosaz reflektivní */
+    inset 0 1px 0 rgba(255, 250, 220, 0.75),
+    inset 0 2px 0 rgba(255, 240, 200, 0.40),
+    inset 1px 0 0 rgba(255, 240, 200, 0.30),
+    /* Bottom emboss — warm dark */
+    inset 0 -2px 3px rgba(74, 40, 24, 0.55),
+    inset 0 -1px 0 rgba(60, 30, 8, 0.75),
+    inset -1px 0 0 rgba(74, 40, 24, 0.40),
+    /* Drop shadow + warm halo */
+    0 1px 0 rgba(232, 192, 96, 0.60),
+    0 2px 0 rgba(74, 40, 24, 0.70),
+    0 4px 8px rgba(0, 0, 0, 0.40),
+    0 0 12px var(--theme-glow-saffron);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="rightAddBtn"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"])::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  background-image: var(--asset-rose-stamp);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: translateY(-50%);
+  opacity: 0.85;
+  transition: transform 200ms ease, opacity 200ms ease;
+  filter: drop-shadow(0 0 3px var(--theme-glow-rose));
+  pointer-events: none;
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="rightAddBtn"]:hover,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 240, 180, 0.85) 0%,
+      rgba(255, 208, 96, 0.95) 30%,
+      rgba(200, 152, 56, 0.95) 60%,
+      rgba(140, 96, 40, 0.95) 100%);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 240, 0.90),
+    inset 0 2px 0 rgba(255, 240, 200, 0.55),
+    inset 1px 0 0 rgba(255, 240, 200, 0.45),
+    inset 0 -2px 3px rgba(74, 40, 24, 0.60),
+    inset 0 -1px 0 rgba(60, 30, 8, 0.80),
+    0 2px 0 rgba(232, 192, 96, 0.70),
+    0 4px 0 rgba(74, 40, 24, 0.75),
+    0 6px 14px rgba(0, 0, 0, 0.50),
+    0 0 22px var(--theme-glow-saffron-strong);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="rightAddBtn"]:hover::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):hover::before {
+  transform: translateY(-50%) scale(1.08);
+  opacity: 1.0;
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="rightAddBtn"]:active,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.30),
+    inset 0 2px 6px rgba(74, 40, 24, 0.70),
+    inset 0 -1px 0 rgba(60, 30, 8, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.40);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="rightAddBtn"]:active::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="addBtn"]:not([class*="btn3d"]):active::before {
+  transform: translateY(-50%) scale(0.94);
+}
+
+/* ──────────────── 18. Novinky panel ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="novinkyPanel"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="novinky"] {
+  position: relative;
+  background: linear-gradient(160deg, rgba(14, 26, 58, 0.88) 0%, rgba(10, 14, 44, 0.94) 100%);
+  border: 1px solid var(--theme-patinated-gold);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 0 1px rgba(26, 138, 138, 0.18),
+    0 6px 22px rgba(10, 14, 44, 0.70);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="novinkyTitle"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="novinkyPanel"] h2,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="novinkyPanel"] h3 {
+  color: var(--theme-turquoise-deep);
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 2px rgba(10, 14, 44, 0.70);
+}
+
+/* ──────────────── 19. Empty hints — Tangerine italic turquoise ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="emptyHint"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="novinkyEmpty"] {
+  color: var(--theme-turquoise-deep);
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 20px;
+  opacity: 0.85;
+}
+
+/* ──────────────── 20. PJ badge — 3D MOSAZNÝ COIN s ruby border + ruby gem inset ────────────────
+   Radial gradient simuluje kruhový reflex (jako kov), border ruby-crystal, gem dot před textem. */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="pjBadge"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-role-badge="pj"] {
+  background:
+    radial-gradient(ellipse 100% 100% at 50% 30%,
+      rgba(255, 240, 200, 0.80) 0%,
+      rgba(232, 192, 96, 0.95) 40%,
+      rgba(168, 120, 48, 1) 75%,
+      rgba(120, 80, 32, 1) 100%);
+  color: var(--theme-text-on-gold);
+  border: 1px solid var(--theme-ruby-crystal);
+  border-radius: 3px;
+  padding: 3px 10px 3px 16px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 240, 0.75),
+    inset 0 -1px 0 rgba(74, 40, 24, 0.55),
+    inset 1px 0 0 rgba(255, 240, 200, 0.30),
+    inset -1px 0 0 rgba(60, 30, 8, 0.35),
+    0 1px 0 rgba(232, 192, 96, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.40),
+    0 0 10px var(--theme-glow-saffron);
+}
+
+/* Ruby gem inset před textem */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="pjBadge"]::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-role-badge="pj"]::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle at 35% 35%,
+    #f04860 0%,
+    #d8485c 40%,
+    #a8283c 75%,
+    #58101c 100%);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    0 0 4px rgba(168, 40, 60, 0.65);
+  pointer-events: none;
+}
+
+/* PJ badge musí mít position relative pro ::before gem */
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="pjBadge"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] [data-role-badge="pj"] {
+  position: relative;
+}
+
+/* ──────────────── 21. Show-all links — subtle 3D rim button ──────────────── */
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="showAllLink"],
+[data-theme="arabsky-svet"][data-shell="ikaros"] a[class*="showAll"] {
+  display: inline-block;
+  color: var(--theme-turquoise-deep);
+  font-family: var(--font-display);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  text-decoration: none;
+  padding: 5px 12px;
+  border: 1px solid rgba(168, 120, 48, 0.50);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(14, 26, 58, 0.50) 0%, rgba(10, 14, 44, 0.70) 100%);
+  transition: all 200ms ease-out;
+  box-shadow:
+    inset 0 1px 0 rgba(232, 192, 96, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 1px 2px rgba(0, 0, 0, 0.30);
+}
+
+[data-theme="arabsky-svet"][data-shell="ikaros"] [class*="showAllLink"]:hover,
+[data-theme="arabsky-svet"][data-shell="ikaros"] a[class*="showAll"]:hover {
+  color: var(--theme-turquoise-bright);
+  border-color: var(--theme-turquoise-deep);
+  text-shadow: 0 0 6px var(--theme-glow-turquoise);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 192, 96, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.40),
+    0 2px 4px rgba(0, 0, 0, 0.40),
+    0 0 10px var(--theme-glow-turquoise);
+}
+
+/* ──────────────── 22. Scrollbar styling ──────────────── */
+
+[data-theme="arabsky-svet"] *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-theme="arabsky-svet"] *::-webkit-scrollbar-track {
+  background: var(--theme-midnight-night);
+}
+[data-theme="arabsky-svet"] *::-webkit-scrollbar-thumb {
+  background: var(--theme-patinated-gold);
+  border-radius: 4px;
+}
+[data-theme="arabsky-svet"] *::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-polished-gold);
+}
+
+/* ──────────────── 23. Focus visible (a11y) ──────────────── */
+
+[data-theme="arabsky-svet"] [class*="btn3d"]:focus-visible,
+[data-theme="arabsky-svet"] [class*="navItem"]:focus-visible,
+[data-theme="arabsky-svet"] [class*="headerBtn"]:focus-visible,
+[data-theme="arabsky-svet"] [class*="rightAddBtn"]:focus-visible,
+[data-theme="arabsky-svet"] [class*="addBtn"]:focus-visible,
+[data-theme="arabsky-svet"] [class*="showAll"]:focus-visible,
+[data-theme="arabsky-svet"] button:focus-visible,
+[data-theme="arabsky-svet"] a:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--theme-turquoise-deep),
+    0 0 14px var(--theme-glow-saffron-strong);
+}
+
+/* ──────────────── 24. Tablet adjustments (769–1024px) ──────────────── */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  [data-theme="arabsky-svet"][data-shell="ikaros"] {
+    --asset-corner-size: 52px;
+    --asset-logo-w: 280px;
+  }
+
+  [data-theme="arabsky-svet"] [data-frame-panel="card"] [data-andel-medallion] {
+    width: 144px;
+    height: 144px;
+  }
+
+  /* Genie lamp menší na tablet */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::before {
+    width: 70px;
+    height: 130px;
+  }
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::after {
+    top: 110px;
+    width: 200px;
+    height: 270px;
+  }
+}
+
+/* ──────────────── 25. Mobile degradace (≤768px) ──────────────── */
+
+@media (max-width: 768px) {
+  [data-theme="arabsky-svet"][data-shell="ikaros"] {
+    --frame-pad-x: 12px;
+    --asset-corner-size: 38px;
+    --asset-logo-w: 220px;
+  }
+
+  /* Rose petal drift — jen 1 vrstva (near), slabší */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] body::after {
+    background-image: var(--asset-rose-petal-near);
+    background-size: 800px 800px;
+    background-repeat: repeat;
+    animation: arabsky-petal-near 90s linear infinite;
+    opacity: 0.65;
+  }
+
+  /* Genie lamp menší */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::before {
+    width: 60px;
+    height: 100px;
+    top: -10px;
+    right: 12px;
+  }
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::after {
+    top: 85px;
+    width: 160px;
+    height: 210px;
+    opacity: 0.40;
+  }
+
+  /* Welcome card — uvolnit aspect, menší padding */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="card"],
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeCard"] {
+    padding: 28px 20px 36px !important;
+    min-height: auto;
+  }
+
+  /* Rose petals scatter v pozadí welcome card — slabší */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="card"]::before,
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeCard"]::before {
+    opacity: 0.10;
+  }
+
+  /* Persian carpet strip redukováno */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [data-frame-panel="card"]::after,
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeCard"]::after {
+    height: 12px;
+    background-size: 100% 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 10px;
+  }
+
+  /* Andělský medailon menší na mobile */
+  [data-theme="arabsky-svet"] [data-frame-panel="card"] [data-andel-medallion] {
+    width: 112px;
+    height: 112px;
+  }
+
+  /* Welcome title menší */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeTitle"] {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+
+  /* Touch targets ≥48px */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="btn3d"],
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="navItem"]:not([class*="navItemIcon"]) {
+    min-height: 48px;
+  }
+
+  /* Header buttons icon-only */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] > header [class*="headerBtnLabel"] {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Welcome signature menší */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="welcomeSignature"],
+  [data-theme="arabsky-svet"][data-shell="ikaros"] [class*="signature"] {
+    font-size: 26px;
+  }
+}
+
+/* ──────────────── 26. Reduced-motion fallback ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="arabsky-svet"] *,
+  [data-theme="arabsky-svet"][data-shell="ikaros"] body::after,
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::before,
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::after,
+  [data-theme="arabsky-svet"] [class*="welcomeSignature"],
+  [data-theme="arabsky-svet"] [class*="signature"] {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Rose petals static visible */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] body::after {
+    background-position: 0 0, 0 0, 0 0;
+  }
+
+  /* Lamp static */
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::before {
+    transform: rotate(0deg);
+  }
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::after {
+    opacity: 0.55;
+  }
+
+  /* Signature instant visible */
+  [data-theme="arabsky-svet"] [class*="welcomeSignature"],
+  [data-theme="arabsky-svet"] [class*="signature"] {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+/* ──────────────── 27. Forced colors (Windows high contrast) ──────────────── */
+
+@media (forced-colors: active) {
+  [data-theme="arabsky-svet"] [data-position],
+  [data-theme="arabsky-svet"][data-shell="ikaros"] body::after,
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::before,
+  [data-theme="arabsky-svet"][data-shell="ikaros"] main::after,
+  [data-theme="arabsky-svet"] [class*="welcome"]::before,
+  [data-theme="arabsky-svet"] [class*="welcome"]::after,
+  [data-theme="arabsky-svet"] [data-frame-panel="card"]::before,
+  [data-theme="arabsky-svet"] [data-frame-panel="card"]::after,
+  [data-theme="arabsky-svet"] [data-nav-key] [class*="navItemIcon"],
+  [data-theme="arabsky-svet"] [data-nav-key] [class*="icon"],
+  [data-theme="arabsky-svet"] [class*="btn3dActive"]::before,
+  [data-theme="arabsky-svet"] [class*="btn3dActive"]::after,
+  [data-theme="arabsky-svet"] [class*="navItemActive"]::before,
+  [data-theme="arabsky-svet"] [class*="navItemActive"]::after {
+    forced-color-adjust: none;
+  }
+}
