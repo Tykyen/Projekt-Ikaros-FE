@@ -1,0 +1,38 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--theme-heading, var(--accent));
+}
+
+.bio {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--theme-text, var(--text-primary));
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.message {
+  margin: 0;
+  padding: var(--sp-3) 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
