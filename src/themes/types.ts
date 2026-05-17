@@ -19,8 +19,7 @@ export type ThemeId =
   | 'temna-cerven'
   | 'magie'
   | 'mesic'
-  | 'slunce'
-  | 'matrix';
+  | 'slunce';
 
 /**
  * `platform` — jen platforma Ikaros · `world` — jen světy (krok 5.0) ·

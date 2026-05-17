@@ -31,15 +31,9 @@ describe('registry', () => {
     expect(both.every((t) => t.scope === 'both')).toBe(true);
   });
 
-  it('THEMES contains matrix skin with world scope (krok 5.0)', () => {
-    expect(THEMES['matrix']).toBeDefined();
-    expect(THEMES['matrix']!.id).toBe('matrix');
-    expect(THEMES['matrix']!.scope).toBe('world');
-  });
-
-  it("listThemes('world') includes world + both, excludes platform-only (krok 5.0)", () => {
+  it("listThemes('world') vrací motivy world + both (krok 5.0)", () => {
     const world = listThemes('world');
-    expect(world.some((t) => t.id === 'matrix')).toBe(true);
+    expect(world.length).toBeGreaterThan(0);
     expect(world.every((t) => t.scope === 'world' || t.scope === 'both')).toBe(
       true,
     );

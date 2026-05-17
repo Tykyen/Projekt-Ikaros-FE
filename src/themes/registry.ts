@@ -20,7 +20,6 @@ import { magieTheme } from './themes/magie';
 import { mesicTheme } from './themes/mesic';
 import { slunceTheme } from './themes/slunce';
 import { zlatyStandardTheme } from './themes/zlaty-standard';
-import { matrixTheme } from './themes/matrix';
 
 export const DEFAULT_THEME: ThemeId = 'modre-nebe';
 
@@ -47,7 +46,6 @@ export const THEMES: Record<ThemeId, Theme> = {
   'magie':          magieTheme,
   'mesic':          mesicTheme,
   'slunce':         slunceTheme,
-  'matrix':         matrixTheme,
 };
 
 export function getTheme(id: string): Theme {

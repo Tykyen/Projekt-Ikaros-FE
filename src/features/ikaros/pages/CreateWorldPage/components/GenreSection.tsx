@@ -45,10 +45,11 @@ export function GenreSection({
             -- Vyberte žánr --
           </option>
           {GENRES.map((g) => (
-            <option key={g} value={g}>
-              {g}
+            <option key={g.label} value={g.label}>
+              {g.label}
             </option>
           ))}
+          <option value={GENRE_CUSTOM_LABEL}>{GENRE_CUSTOM_LABEL}</option>
         </select>
         {showCustomGenre && (
           <input

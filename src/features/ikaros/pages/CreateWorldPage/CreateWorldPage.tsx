@@ -13,8 +13,7 @@ import { PlayersSection } from './components/PlayersSection';
 import { AccessModeSection } from './components/AccessModeSection';
 import { SystemSection } from './components/SystemSection';
 import { ThemeSection } from './components/ThemeSection';
-import { DEFAULT_THEME } from '@/themes/registry';
-import { GENRE_CUSTOM_LABEL } from './constants/genres';
+import { GENRE_CUSTOM_LABEL, themeForGenre } from './constants/genres';
 import { DEFAULT_SYSTEM, SYSTEM_CUSTOM_ID } from './constants/systems';
 import { useWorldSlug } from './hooks/useWorldSlug';
 import s from './CreateWorldPage.module.css';
@@ -42,8 +41,9 @@ export default function CreateWorldPage() {
   const [customSystem, setCustomSystem] = useState('');
   const [dice, setDice] = useState<string[]>([]);
 
-  // 5.0 — motiv světa (sdílený základ vzhledu).
-  const [themeId, setThemeId] = useState<string>(DEFAULT_THEME);
+  // 5.0 — motiv světa se odvozuje ze žánru; `themeOverride` = ruční přepis PJ
+  // (null = odvozeno).
+  const [themeOverride, setThemeOverride] = useState<string | null>(null);
 
   // 2.3 D-NEW-slug-check — live availability check
   const slugStatus = useSlugAvailability(slug);
@@ -69,12 +69,13 @@ export default function CreateWorldPage() {
     ? 'Vytvořit svět'
     : `Vyplň: ${missing.join(', ')}`;
 
+  // 5.0 — efektivní žánr (po rozbalení „Vlastní") a z něj odvozený motiv.
+  const finalGenre = genre === GENRE_CUSTOM_LABEL ? customGenre.trim() : genre;
+  const effectiveTheme = themeOverride ?? themeForGenre(finalGenre);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!canSubmit || mutation.isPending) return;
-
-    const finalGenre =
-      genre === GENRE_CUSTOM_LABEL ? customGenre.trim() : genre;
 
     const finalSystem =
       system === SYSTEM_CUSTOM_ID ? customSystem.trim() : system;
@@ -90,7 +91,7 @@ export default function CreateWorldPage() {
         accessMode,
         system: finalSystem,
         dice: dice.length ? dice : undefined,
-        themeId,
+        themeId: effectiveTheme,
       });
       toast.success(`Svět „${world.name}" byl vytvořen.`);
       navigate(`/svet/${world.slug}`);
@@ -154,7 +155,11 @@ export default function CreateWorldPage() {
           onCustomSystemChange={setCustomSystem}
           onDiceChange={setDice}
         />
-        <ThemeSection themeId={themeId} onThemeChange={setThemeId} />
+        <ThemeSection
+          genre={finalGenre}
+          themeOverride={themeOverride}
+          onThemeOverrideChange={setThemeOverride}
+        />
       </div>
 
       <footer className={s.footer}>

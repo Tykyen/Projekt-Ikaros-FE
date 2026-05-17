@@ -34,11 +34,11 @@ describe('useWorldTheme', () => {
   });
 
   it('vrátí themeId ze sdíleného základu World', () => {
-    const world = makeWorld({ themeId: 'matrix' });
+    const world = makeWorld({ themeId: 'sci-fi' });
     const { result } = renderHook(() => useWorldTheme(world), {
       wrapper: makeWrapper(),
     });
-    expect(result.current.themeId).toBe('matrix');
+    expect(result.current.themeId).toBe('sci-fi');
     expect(result.current.isOverridden).toBe(false);
   });
 
@@ -50,7 +50,7 @@ describe('useWorldTheme', () => {
   });
 
   it('uživatelský override přebije sdílený základ', () => {
-    const world = makeWorld({ themeId: 'matrix' });
+    const world = makeWorld({ themeId: 'sci-fi' });
     const { result } = renderHook(() => useWorldTheme(world), {
       wrapper: makeWrapper(),
     });
@@ -60,19 +60,19 @@ describe('useWorldTheme', () => {
   });
 
   it('reset() smaže override — návrat na sdílený základ', () => {
-    const world = makeWorld({ themeId: 'matrix' });
+    const world = makeWorld({ themeId: 'sci-fi' });
     const { result } = renderHook(() => useWorldTheme(world), {
       wrapper: makeWrapper(),
     });
     act(() => result.current.setOverride('kyberpunk'));
     act(() => result.current.reset());
-    expect(result.current.themeId).toBe('matrix');
+    expect(result.current.themeId).toBe('sci-fi');
     expect(result.current.isOverridden).toBe(false);
   });
 
   it('předá custom themeOverrides ze sdíleného základu', () => {
     const world = makeWorld({
-      themeId: 'matrix',
+      themeId: 'sci-fi',
       themeOverrides: { '--theme-accent': '#fff' },
     });
     const { result } = renderHook(() => useWorldTheme(world), {
@@ -86,7 +86,7 @@ describe('useWorldTheme', () => {
       wrapper: makeWrapper(),
     });
     expect(result.current.themeId).toBe('modre-nebe');
-    act(() => result.current.setOverride('matrix'));
+    act(() => result.current.setOverride('kyberpunk'));
     expect(result.current.themeId).toBe('modre-nebe');
   });
 });
