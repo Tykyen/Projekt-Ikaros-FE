@@ -1,0 +1,90 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.levelCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.nameCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cellLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.levelInput,
+.nameInput {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 38px;
+}
+
+.levelInput:focus,
+.nameInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.remove {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 9px 11px;
+  min-height: 38px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.remove:hover {
+  color: var(--danger, var(--accent));
+  border-color: var(--danger, var(--accent));
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}

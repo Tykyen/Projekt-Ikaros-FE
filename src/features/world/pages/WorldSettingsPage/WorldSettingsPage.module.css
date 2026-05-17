@@ -1,0 +1,25 @@
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.heading {
+  font-family: var(--font-display, inherit);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  margin: 0 0 24px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px 14px 40px;
+  }
+
+  .heading {
+    font-size: 19px;
+    margin-bottom: 16px;
+  }
+}
