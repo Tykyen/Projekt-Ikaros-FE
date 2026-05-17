@@ -1,0 +1,477 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAtomValue, useSetAtom, useStore } from 'jotai';
+import { useQueryClient } from '@tanstack/react-query';
+import { Users, X, LogOut } from 'lucide-react';
+import clsx from 'clsx';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { UserRole } from '@/shared/types';
+import { Spinner } from '@/shared/ui';
+import { useSocketEvent } from '../api/useSocket';
+import { getSocket } from '../api/socket';
+import {
+  chatQueryKeys,
+  useRoomInfo,
+  useChatHistory,
+  useSendMessage,
+  useDeleteMessage,
+  useToggleReaction,
+  useUploadAttachment,
+} from '../api/useGlobalChat';
+import type {
+  ChatAttachment,
+  ChatItem,
+  ChatMessage,
+  MessageDeletedEvent,
+  PresenceEvent,
+  ReactionEvent,
+  RoomInfo,
+  RoomKey,
+  TypingEvent,
+} from '../lib/types';
+import { presentUsers } from '../lib/presenceUsers';
+import { toChatItems } from '../lib/chatItems';
+import { myRoomsAtom } from '../store/roomsStore';
+import { MessageList } from './MessageList';
+import { ChatInput } from './ChatInput';
+import { UserList } from './UserList';
+import { CharacterDetailModal } from './CharacterDetailModal';
+import { TypingIndicator } from './TypingIndicator';
+import s from './ChatRoom.module.css';
+
+/** Volitelné prostředí Rozcestí — záhlaví scény + pozadí z ilustrace lokace. */
+export interface RoomScene {
+  /** Obsah pod hlavičkou (výběr stylu/lokace + 📖 panel). */
+  node: ReactNode;
+  /** URL ilustrace lokace — pozadí místnosti. */
+  backgroundUrl?: string;
+}
+
+export interface ChatRoomProps {
+  room: RoomKey;
+  roomName: string;
+  icon: ReactNode;
+  /** Vyplněno → místnost běží v „divadelním" režimu Rozcestí. */
+  scene?: RoomScene;
+}
+
+/** Globální chat — drží socket lifecycle a stav místnosti (Hospoda i Rozcestí). */
+export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
+  const user = useAtomValue(currentUserAtom);
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const keys = useMemo(() => chatQueryKeys(room), [room]);
+  const roomInfo = useRoomInfo(room);
+  const history = useChatHistory(room);
+  const sendMutation = useSendMessage(room);
+  const deleteMutation = useDeleteMessage(room);
+  const toggleReaction = useToggleReaction(room);
+  const uploadAttachment = useUploadAttachment(room);
+
+  const [typingNames, setTypingNames] = useState<string[]>([]);
+  // Zpráva, na kterou se právě odpovídá (4.3a); `null` = běžná zpráva.
+  const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
+  const [usersOpen, setUsersOpen] = useState(false);
+  // Detail postavy v Rozcestí — ID kliknuté osoby z `PŘÍTOMNÍ`, `null` = zavřeno.
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  // Auto-odhlášení pro neaktivitu (4.2c §5) — BE odebral z presence.
+  const [kicked, setKicked] = useState(false);
+  const setMyRooms = useSetAtom(myRoomsAtom);
+  const store = useStore();
+  // Prázdné dokud effect nepřečte skutečné --theme-surface z DOM.
+  const [surfaceColor, setSurfaceColor] = useState('');
+
+  const roomRef = useRef<HTMLDivElement>(null);
+  const typingTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+
+  const channelId = roomInfo.data?.channelId;
+  // Dedup dle userId + self-include — viz `presentUsers`.
+  const users = useMemo(
+    () => presentUsers(roomInfo.data?.users, user),
+    [roomInfo.data, user],
+  );
+  const messages = useMemo(() => history.data ?? [], [history.data]);
+
+  const canDelete =
+    !!user &&
+    (user.role === UserRole.Superadmin || user.role === UserRole.Admin);
+  const usersById = useMemo(
+    () => new Map(users.map((u) => [u.userId, u.username])),
+    [users],
+  );
+
+  // Pozn.: ChatRoom se při přepnutí místnosti vždy remountuje (`RozcestiRoom`
+  // má `key={room}`, Hospoda je statická) → lokální stav se resetuje sám.
+
+  // Výpis chatu — běžné i systémové zprávy z jedné cache (4.2d §5).
+  const items = useMemo<ChatItem[]>(() => toChatItems(messages), [messages]);
+
+  // Barva pozadí panelu pro kontrast guard textu zpráv (čteno z DOM po mountu).
+  useEffect(() => {
+    if (!roomRef.current) return;
+    const bg = getComputedStyle(roomRef.current).backgroundColor;
+    if (bg) setSurfaceColor(bg);
+  }, []);
+
+  // ── WS listenery — mutují React Query cache, resp. lokální UI stav ─────
+  const handleMessage = useCallback(
+    (m: ChatMessage) => {
+      qc.setQueryData<ChatMessage[]>(keys.messages, (old) => {
+        const list = old ?? [];
+        return list.some((x) => x.id === m.id) ? list : [...list, m];
+      });
+    },
+    [qc, keys.messages],
+  );
+
+  const handleDeleted = useCallback(
+    (e: MessageDeletedEvent) => {
+      qc.setQueryData<ChatMessage[]>(keys.messages, (old) =>
+        (old ?? []).map((x) =>
+          x.id === e.messageId
+            ? { ...x, isDeleted: true, content: null }
+            : x,
+        ),
+      );
+    },
+    [qc, keys.messages],
+  );
+
+  const handlePresence = useCallback(
+    (e: PresenceEvent) => {
+      // Overlay auto-odhlášení jen pro `timeout` (60min nečinnost). `disconnect`
+      // (reload/zavření jiného socketu) ani `explicit` ho nespustí.
+      if (
+        e.action === 'leave' &&
+        e.userId &&
+        e.userId === user?.id &&
+        e.reason === 'timeout'
+      ) {
+        setKicked(true);
+        // BE nás odebral z místnosti → uvolnit i klientský stav, ať „Vrátit
+        // se" znovu joinuje (joinRoom přeskakuje místnosti v `myRoomsAtom`).
+        setMyRooms((prev) => {
+          const next = new Set(prev);
+          next.delete(room);
+          return next;
+        });
+      }
+      qc.setQueryData<RoomInfo>(keys.roomInfo, (old) => {
+        if (!old) return old;
+        if (e.action === 'join') {
+          if (!e.userId || old.users.some((u) => u.userId === e.userId)) {
+            return old;
+          }
+          return {
+            ...old,
+            users: [
+              ...old.users,
+              {
+                userId: e.userId,
+                username: e.username,
+                avatarUrl: e.avatarUrl,
+                characterName: e.characterName,
+                characterAvatarUrl: e.characterAvatarUrl,
+              },
+            ],
+          };
+        }
+        return {
+          ...old,
+          users: old.users.filter(
+            (u) => u.userId !== e.userId && u.username !== e.username,
+          ),
+        };
+      });
+    },
+    [qc, keys.roomInfo, user?.id, room, setMyRooms],
+  );
+
+  const handleReaction = useCallback(
+    (e: ReactionEvent) => {
+      qc.setQueryData<ChatMessage[]>(keys.messages, (old) =>
+        (old ?? []).map((x) =>
+          x.id === e.messageId ? { ...x, reactions: e.reactions } : x,
+        ),
+      );
+    },
+    [qc, keys.messages],
+  );
+
+  const handleTyping = useCallback(
+    (e: TypingEvent) => {
+      if (e.characterName === user?.username) return;
+      const timers = typingTimers.current;
+      const existing = timers.get(e.characterName);
+      if (existing) clearTimeout(existing);
+      if (e.isTyping) {
+        timers.set(
+          e.characterName,
+          setTimeout(() => {
+            timers.delete(e.characterName);
+            setTypingNames(Array.from(timers.keys()));
+          }, 5000),
+        );
+      } else {
+        timers.delete(e.characterName);
+      }
+      setTypingNames(Array.from(timers.keys()));
+    },
+    [user?.username],
+  );
+
+  useSocketEvent<ChatMessage>('chat:message', handleMessage);
+  useSocketEvent<MessageDeletedEvent>('chat:message:deleted', handleDeleted);
+  useSocketEvent<ReactionEvent>('chat:message:reaction', handleReaction);
+  useSocketEvent<PresenceEvent>('chat:presence', handlePresence);
+  useSocketEvent<TypingEvent>('chat:typing', handleTyping);
+
+  // Vstup do místnosti — vyčleněno z effectu, ať ho lze zavolat i ručně
+  // po auto-odhlášení („Vrátit se"). Hospoda jede na `chat:hospoda:*` (4.1),
+  // Rozcestí na `chat:room:*`.
+  const joinRoom = useCallback(() => {
+    if (!channelId || !user) return;
+    // Už v místnosti jsem (překlik mezi stránkami) → žádný nový join ani
+    // hláška „vchází" (4.2d §1). Vstoupit jde znovu jen po skutečném odchodu.
+    if (store.get(myRoomsAtom).has(room)) return;
+    const socket = getSocket();
+    socket.emit('room:join', `chat:${channelId}`);
+    if (room === 'hospoda') {
+      socket.emit('chat:hospoda:join', {
+        username: user.username,
+        userId: user.id,
+      });
+    } else {
+      socket.emit('chat:room:join', {
+        room,
+        username: user.username,
+        userId: user.id,
+      });
+    }
+    setMyRooms((prev) => new Set(prev).add(room));
+  }, [channelId, user, room, setMyRooms, store]);
+
+  // Explicitní odchod z místnosti (4.2d §1/§4) — opuštění stránky neodhlašuje.
+  const leaveRoom = useCallback(() => {
+    if (!channelId) return;
+    const socket = getSocket();
+    if (room === 'hospoda') {
+      socket.emit('chat:hospoda:leave', {});
+    } else {
+      socket.emit('chat:room:leave', { room });
+    }
+    socket.emit('room:leave', `chat:${channelId}`);
+    setMyRooms((prev) => {
+      const next = new Set(prev);
+      next.delete(room);
+      return next;
+    });
+  }, [channelId, room, setMyRooms]);
+
+  // Vstup při mountu. Odchod NENÍ vázán na unmount — místnost se opouští
+  // jen explicitně (tlačítko Odejít / „×" v nav / 60min timeout).
+  useEffect(() => {
+    joinRoom();
+  }, [joinRoom]);
+
+  // Úklid typing timerů při odmountování.
+  useEffect(() => {
+    const timers = typingTimers.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, []);
+
+  // ── Akce ──────────────────────────────────────────────────────────────
+  const sendPublic = (text: string, attachments: ChatAttachment[]) => {
+    sendMutation.mutate({
+      content: text,
+      color: user?.chatColor,
+      replyToId: replyTo?.id,
+      attachments,
+    });
+    setReplyTo(null);
+  };
+
+  const sendWhisper = (
+    toUserId: string,
+    text: string,
+    attachments: ChatAttachment[],
+  ) => {
+    getSocket().emit('ikaros:whisper', {
+      toUserId,
+      content: text,
+      color: user?.chatColor,
+      room,
+      replyToId: replyTo?.id,
+      attachments,
+    });
+    setReplyTo(null);
+  };
+
+  const emitTyping = (isTyping: boolean) => {
+    if (!channelId || !user) return;
+    getSocket().emit(isTyping ? 'typing:start' : 'typing:stop', {
+      channelId,
+      characterName: user.username,
+    });
+  };
+
+  // Odejít z místnosti — explicitní leave + návrat na Úvodník.
+  const handleLeave = () => {
+    leaveRoom();
+    navigate('/');
+  };
+  // Po auto-odhlášení „Vrátit se" — znovu joinuje stejnou místnost.
+  const handleReturn = () => {
+    setKicked(false);
+    joinRoom();
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────
+  if (!user) return null;
+
+  if (roomInfo.isLoading || history.isLoading) {
+    return (
+      <div className={s.state}>
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (roomInfo.isError) {
+    return (
+      <div className={s.state}>
+        Místnost se nepodařilo otevřít. Zkus to znovu.
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={clsx(
+        s.room,
+        usersOpen && s.usersOpen,
+        scene && s.scene,
+      )}
+      ref={roomRef}
+    >
+      {scene?.backgroundUrl && (
+        <div
+          key={scene.backgroundUrl}
+          className={s.sceneBg}
+          style={{ backgroundImage: `url(${scene.backgroundUrl})` }}
+          aria-hidden="true"
+        />
+      )}
+
+      <header className={s.header}>
+        <h1 className={s.title}>
+          {icon} {roomName}
+        </h1>
+        <div className={s.headerActions}>
+          <button
+            type="button"
+            className={s.count}
+            onClick={() => setUsersOpen((v) => !v)}
+            aria-label="Přítomní"
+          >
+            <Users size={14} /> {users.length}
+          </button>
+          <button
+            type="button"
+            className={s.leave}
+            onClick={handleLeave}
+            aria-label="Odejít z místnosti"
+          >
+            <LogOut size={14} />
+            <span className={s.leaveLabel}>Odejít</span>
+          </button>
+        </div>
+      </header>
+
+      {scene?.node}
+
+      <div className={s.body}>
+        <div className={clsx(s.messages, scene && s.scenePanel)}>
+          <MessageList
+            items={items}
+            currentUserId={user.id}
+            surfaceColor={surfaceColor}
+            canDelete={canDelete}
+            usersById={usersById}
+            onDelete={(id) => deleteMutation.mutate(id)}
+            onReply={setReplyTo}
+            onToggleReaction={toggleReaction}
+          />
+        </div>
+
+        <aside className={clsx(s.users, scene && s.scenePanel)}>
+          <div className={s.usersHead}>
+            <span className={s.usersLabel}>Přítomní ({users.length})</span>
+            <button
+              type="button"
+              className={s.usersClose}
+              onClick={() => setUsersOpen(false)}
+              aria-label="Zavřít"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <UserList
+            users={users}
+            currentUserId={user.id}
+            mode={room === 'hospoda' ? 'account' : 'character'}
+            onSelectUser={
+              room === 'hospoda' ? undefined : setSelectedUserId
+            }
+          />
+        </aside>
+      </div>
+
+      <div className={s.foot}>
+        <TypingIndicator names={typingNames} />
+        <ChatInput
+          disabled={!channelId}
+          users={users}
+          currentUserId={user.id}
+          replyTo={replyTo}
+          onSendPublic={sendPublic}
+          onSendWhisper={sendWhisper}
+          onUploadAttachment={(file) => uploadAttachment.mutateAsync(file)}
+          onTypingStart={() => emitTyping(true)}
+          onTypingStop={() => emitTyping(false)}
+          onCancelReply={() => setReplyTo(null)}
+        />
+      </div>
+
+      <CharacterDetailModal
+        userId={selectedUserId}
+        onClose={() => setSelectedUserId(null)}
+      />
+
+      {kicked && (
+        <div className={s.kicked} role="alertdialog" aria-label="Odhlášen">
+          <p className={s.kickedText}>
+            Byl jsi odhlášen z místnosti pro neaktivitu.
+          </p>
+          <button
+            type="button"
+            className={s.kickedBtn}
+            onClick={handleReturn}
+          >
+            Vrátit se
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
