@@ -16,9 +16,25 @@ export function WorldThemeSwitcher() {
   const { world } = useWorldContext();
   const { themeId, isOverridden, setOverride, reset } = useWorldTheme(world);
   const [open, setOpen] = useState(false);
+  // Popover je `position: fixed` — header má `overflow: hidden`, který by
+  // absolutně pozicovaný popover ořízl. Pozici počítáme z triggeru.
+  const [pos, setPos] = useState<{ top: number; right: number } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const themes = listThemes('world');
+
+  const toggle = () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    const r = triggerRef.current?.getBoundingClientRect();
+    if (r) {
+      setPos({ top: r.bottom + 8, right: window.innerWidth - r.right });
+    }
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -41,9 +57,10 @@ export function WorldThemeSwitcher() {
   return (
     <div ref={ref} className={s.wrapper}>
       <button
+        ref={triggerRef}
         type="button"
         className={s.trigger}
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Vzhled světa"
@@ -52,8 +69,12 @@ export function WorldThemeSwitcher() {
         <Palette size={18} aria-hidden="true" />
       </button>
 
-      {open && (
-        <div className={s.popover} role="menu">
+      {open && pos && (
+        <div
+          className={s.popover}
+          role="menu"
+          style={{ top: pos.top, right: pos.right }}
+        >
           <div className={s.title}>Vzhled světa</div>
           <ul className={s.list}>
             {themes.map((t) => (
