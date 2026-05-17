@@ -343,11 +343,44 @@ export interface WorldMembership {
   joinedAt: string;
   characterPath?: string;
   group?: string;
+  /** 5.3 — AKJ úroveň člena (stupňovaná prověrka viditelnosti stránek). */
+  akj?: number;
+  /** 5.3 — public summary uživatele; populuje `GET /worlds/:id/members`. */
+  user?: {
+    id: string;
+    username: string;
+    avatarUrl?: string;
+  };
 }
 
 export interface MyWorldEntry {
   world: World;
   membership: WorldMembership;
+}
+
+/**
+ * 5.3d — AKJ úroveň (stupňovaná „prověrka"). PJ/PomocnyPJ ji libovolně
+ * pojmenuje dle světa; `level` řídí, které stránky člen vidí (krok 7.2e).
+ */
+export interface AkjType {
+  key: string;
+  name: string;
+  level: number;
+}
+
+/**
+ * 5.3 — nastavení světa (`GET /worlds/:worldId/settings`). FE čte zejména
+ * `customGroups`, `groupColors` (tab Členové) a `akjTypes` (tab AKJ úrovně).
+ */
+export interface WorldSettings {
+  id: string;
+  worldId: string;
+  hiddenNavItems: string[];
+  customGroups: string[];
+  groupColors: Record<string, string>;
+  akjTypes: AkjType[];
+  hideDefaultWeather: boolean;
+  updatedAt: string;
 }
 
 /**

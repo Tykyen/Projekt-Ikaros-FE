@@ -15,4 +15,6 @@ export { IkarosCard } from './IkarosCard/IkarosCard';
 export { GlobalErrorBoundary } from './GlobalErrorBoundary';
 export { ImageLightbox } from './ImageLightbox';
 export type { LightboxImage } from './ImageLightbox';
+export { Tabs } from './Tabs';
+export type { TabItem } from './Tabs';
 
