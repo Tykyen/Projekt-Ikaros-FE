@@ -88,6 +88,14 @@ export function StartSection() {
         switcheru v hlavičce nebo v pravém panelu v sekci Administrace. Volba
         se ukládá k účtu, na jiném zařízení se ti vrátí.
       </p>
+      <p>
+        <strong>Motiv světa</strong> je samostatný &mdash; každý svět má vlastní
+        vizuální styl nezávislý na platformě. PJ ho volí při tvorbě světa;
+        uvnitř světa pak motiv vidí všichni členové. Tlačítko{' '}
+        <strong>Vzhled světa</strong> (ikona palety v hlavičce světa) ti dovolí
+        přepnout si motiv světa jen pro sebe (uloženo na zařízení) &mdash;
+        „Reset" vrátí na motiv nastavený PJ.
+      </p>
     </>
   );
 }

@@ -27,6 +27,29 @@ describe('applyTheme', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe('modre-nebe');
   });
 
+  it('applies overrides on top of theme.vars (krok 5.0)', async () => {
+    await applyTheme('modre-nebe', {
+      overrides: { '--theme-accent': '#abcdef' },
+    });
+    expect(
+      document.documentElement.style.getPropertyValue('--theme-accent'),
+    ).toBe('#abcdef');
+  });
+
+  it('clears stale --theme-* properties between applies (krok 5.0)', async () => {
+    await applyTheme('modre-nebe', {
+      overrides: { '--theme-extra-token': 'red' },
+    });
+    expect(
+      document.documentElement.style.getPropertyValue('--theme-extra-token'),
+    ).toBe('red');
+    // Druhý motiv override token nedefinuje → musí se vyčistit.
+    await applyTheme('temna-cerven');
+    expect(
+      document.documentElement.style.getPropertyValue('--theme-extra-token'),
+    ).toBe('');
+  });
+
   it('preloads background image when defined', async () => {
     const theme = THEMES['modre-nebe']!;
     const original = theme.background;
