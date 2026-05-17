@@ -1,0 +1,38 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  display: inline-flex;
+  color: var(--accent);
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.action {
+  margin-left: auto;
+}
+
+.panel {
+  border: 1px solid var(--frame-border);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--surface-2);
+  box-shadow: var(--shadow-md);
+}

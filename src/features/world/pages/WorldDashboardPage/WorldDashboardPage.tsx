@@ -6,8 +6,8 @@ import { WorldDetailHero } from '@/features/world/components/WorldDetailHero';
 import { WorldDetailInfo } from '@/features/world/components/WorldDetailInfo';
 import { JoinCTA } from '@/features/world/components/JoinCTA';
 import { AccessRequestPending } from '@/features/world/components/AccessRequestPending';
-import { MemberDashboardStub } from '@/features/world/components/MemberDashboardStub';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
+import { WorldDashboard } from './WorldDashboard';
 import s from './WorldDashboardPage.module.css';
 
 /**
@@ -16,7 +16,7 @@ import s from './WorldDashboardPage.module.css';
  *
  *  - `non-member`     → hero + info + JoinCTA
  *  - `pending-access` → hero + info + AccessRequestPending (banner + cancel)
- *  - `member`         → hero + info + MemberDashboardStub (links na sub-routes)
+ *  - `member`         → hero + info + WorldDashboard (3sloupcový — krok 5.2)
  *  - 404 / error      → WorldNotFound (BE 404 pro private bez přístupu)
  */
 export default function WorldDashboardPage() {
@@ -37,6 +37,16 @@ export default function WorldDashboardPage() {
     return <WorldNotFound />;
   }
 
+  if (status === 'member') {
+    return (
+      <article className={s.page}>
+        <WorldDetailHero world={world} />
+        <WorldDetailInfo world={world} />
+        <WorldDashboard world={world} />
+      </article>
+    );
+  }
+
   return (
     <article className={s.page}>
       <WorldDetailHero world={world} />
@@ -49,9 +59,6 @@ export default function WorldDashboardPage() {
               worldId={world.id}
               requestedAt={pendingAccessRequest.requestedAt}
             />
-          )}
-          {status === 'member' && (
-            <MemberDashboardStub worldSlug={world.slug} />
           )}
         </aside>
       </div>

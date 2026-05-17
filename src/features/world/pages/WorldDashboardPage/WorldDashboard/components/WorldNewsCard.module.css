@@ -1,0 +1,93 @@
+.card {
+  padding: 12px 14px;
+  border: 1px solid var(--frame-border);
+  border-left: 3px solid var(--text-muted);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-1) 50%, transparent);
+}
+
+/* Type-proužek dle druhu oznámení. */
+.info {
+  border-left-color: var(--text-muted);
+}
+
+.alert {
+  border-left-color: var(--warning, var(--accent));
+}
+
+.system {
+  border-left-color: var(--accent);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.iconBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.date {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 4px 0 6px;
+}
+
+.excerpt {
+  font-size: 13px;
+  color: var(--text-secondary, var(--text-muted));
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

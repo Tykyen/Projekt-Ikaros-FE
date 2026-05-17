@@ -1,0 +1,63 @@
+.wrap {
+  margin-top: 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.col {
+  min-width: 0;
+  opacity: 0;
+  animation: fadeUp 0.4s ease forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .col {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Tablet — 2 sloupce, oblíbené stránky plnou šířkou pod. */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .col:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Mobil — 1 sloupec, pořadí Novinky → Akce → Oblíbené. */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .col:nth-child(1) {
+    order: 2;
+  }
+  .col:nth-child(2) {
+    order: 1;
+  }
+  .col:nth-child(3) {
+    order: 3;
+    grid-column: auto;
+  }
+}
