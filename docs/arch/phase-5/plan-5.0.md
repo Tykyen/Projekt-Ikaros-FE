@@ -1,11 +1,14 @@
 # Implementační plán 5.0 — Světový theme systém
 
-**Spec:** [spec-5.0.md](spec-5.0.md) · **Audit Matrix skinu:** [audit-5.0-matrix-skin.md](audit-5.0-matrix-skin.md)
-**Repo:** `Projekt-ikaros-FE` (Task 2–9) + `Projekt-ikaros` (Task 1, BE)
+**Spec:** [spec-5.0.md](spec-5.0.md)
+**Repo:** `Projekt-ikaros-FE` + `Projekt-ikaros` (BE)
 **Větev FE:** `feat/krok-5.0-world-theme` · **Větev BE:** `feat/krok-5.0a-world-themeid`
-**Pořadí:** Task 1 (BE) → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Tasky 3 a 4 lze paralelně.
 
-Schválená rozhodnutí: Matrix směr = **dimenzionální glass / rift**; fonty = **Unbounded** (display/logo) + **Exo 2** (body).
+> ⚠️ **Revize (2026-05-17, po vizuálním smoke).** Dedikovaný „Matrix skin" (Task 3)
+> a ruční výběr motivu ve wizardu (Task 7) byly **zrušeny**. Nově: motiv světa se
+> **odvozuje ze žánru** (`genres.ts` 32 žánrů + `themeForGenre`), Matrix svět má
+> jen vlastní pozadí. Task 3 níže (Matrix skin) je **neplatný** — neřiď se jím.
+> Aktuální stav viz spec-5.0 §4.6 a commity `feat(svet): motiv světa odvozen ze žánru`.
 
 ---
 

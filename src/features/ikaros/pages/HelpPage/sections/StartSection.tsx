@@ -90,10 +90,11 @@ export function StartSection() {
       </p>
       <p>
         <strong>Motiv světa</strong> je samostatný &mdash; každý svět má vlastní
-        vizuální styl nezávislý na platformě. PJ ho volí při tvorbě světa;
-        uvnitř světa pak motiv vidí všichni členové. Tlačítko{' '}
-        <strong>Vzhled světa</strong> (ikona palety v hlavičce světa) ti dovolí
-        přepnout si motiv světa jen pro sebe (uloženo na zařízení) &mdash;
+        vizuální styl nezávislý na platformě. Odvozuje se ze{' '}
+        <strong>žánru světa</strong> (fantasy, cyberpunk, horor&hellip;), PJ ho
+        při tvorbě může přepsat. Uvnitř světa motiv vidí všichni členové.
+        Tlačítko <strong>Vzhled světa</strong> (ikona palety v hlavičce světa)
+        ti dovolí přepnout si motiv jen pro sebe (uloženo na zařízení) &mdash;
         „Reset" vrátí na motiv nastavený PJ.
       </p>
     </>

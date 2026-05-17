@@ -19,7 +19,7 @@ Theme světa je **dvouvrstvý** (rozhodnutí autora 2026-05-17):
 1. **Sdílený základ** — PJ nastaví na `World` (kanonický vzhled světa, default pro všechny členy). Buď preset z 21 motivů, nebo **vlastní (custom) theme** — vlastní pozadí + override barev a stínů.
 2. **Uživatelský override** — každý člen si vzhled světa pro sebe může přenastavit (jiný preset / vlastní úpravy). Per zařízení (localStorage). „Reset" vrací na sdílený základ PJ.
 
-Součástí kroku je **Matrix skin** — svět Matrix dostane vlastní motiv portovaný ze starého Matrix design systému (`C:\Matrix\Matrix\frontend\src\styles\matrix.tokens.scss`).
+Motiv světa se **odvozuje z jeho žánru** (jako ve starém Matrixu — mapa žánr→skin). Svět Matrix má navíc **vlastní pozadí** (`matrix-bg`).
 
 ---
 
@@ -78,13 +78,16 @@ Kompletní `--mx-*` token systém: violet (`#c86dff`) + cyan (`#3fe0ff`) akcenty
 
 ### 4.0 Rozhodnutí autora (2026-05-17)
 
+> **Revize (2026-05-17, po vizuálním smoke).** Původní rozhodnutí B (dedikovaný „Matrix skin") a D (PJ ručně volí motiv z dlaždic) byla **zrušena**. Nahrazena revidovanými rozhodnutími níže — motiv se odvozuje ze žánru světa, věrně starému Matrixu.
+
 | # | Rozhodnutí |
 |---|---|
-| A | **Sada motivů:** reuse 21 globálních. Rozšířit `scope` o `'world'`; motivy nabízené světům dostanou `scope: 'both'`. Žádná nová sada skinů. |
-| B | **Matrix skin:** svět Matrix má vlastní motiv `matrix` portovaný ze starého Matrix design systému; `scope: 'world'` (jen světy). |
+| A | **Sada motivů:** reuse 21 globálních (= staré Matrix skiny přeložené). `ThemeScope` rozšířen o `'world'`; všechny motivy `scope: 'both'`. Žádná nová sada. |
+| B | **Motiv se odvozuje ze žánru světa.** Starý Matrix měl mapu žánr→skin. Krok 5.0 ji obnovuje: 32 žánrů (`genres.ts`), každý má výchozí `theme`. Žádný dedikovaný „Matrix skin" — zrušeno. |
 | C | **Uživatelský override (5.0e):** jen localStorage, per zařízení. Žádný BE / cross-device sync. |
-| D | **Sdílený základ `themeId` volí PJ při tvorbě světa** — wizard `/ikaros/vytvorit-svet` (krok 2.3) dostane volbu motivu. BE schema default `'modre-nebe'` slouží jen jako fallback pro světy bez volby (migrace). |
+| D | **`themeId` = žánrový default + ruční přepis.** Wizard `/ikaros/vytvorit-svet` neukazuje mřížku motivů — ukáže motiv **odvozený ze zvoleného žánru** (`themeForGenre`); PJ ho může přepsat výběrem z 21. Uloží se výsledný `themeId`. |
 | E | **5.0 přidá lehký preset switcher** „Vzhled světa" do headeru `WorldLayout` — hráč si pro sebe přepne mezi 21 motivy (osobní override). Plný editor (color pickery, upload pozadí) až 5.3f. |
+| F | **Matrix svět** = motiv ze žánru jako každý jiný + **vlastní pozadí** (`themeBackgroundUrl` na `matrix-bg.webp`, nastaví `MatrixWorldSeed`). |
 
 ### 4.1 BE — `World` theme pole (5.0a) — repo `Projekt-ikaros`
 
@@ -96,17 +99,17 @@ Kompletní `--mx-*` token systém: violet (`#c86dff`) + cyan (`#3fe0ff`) akcenty
 @Prop() themeBackgroundUrl?: string;
 ```
 
-- `themeId` — id sdíleného základu (preset nebo `'matrix'`). Volí PJ ve wizardu tvorby světa (rozhodnutí D); schema default `'modre-nebe'` = fallback pro světy bez volby.
+- `themeId` — id motivu světa (jeden z 21). Wizard ho odvodí ze žánru (`themeForGenre`), PJ může přepsat; schema default `'modre-nebe'` = fallback.
 - `themeOverrides` — mapa CSS token → hodnota; vrství se nad `themeId` (custom theme, 5.0d). Prázdná = čistý preset.
-- `themeBackgroundUrl` — URL vlastního pozadí (custom theme, 5.0d). Prázdné = pozadí z presetu.
+- `themeBackgroundUrl` — URL vlastního pozadí (custom theme, 5.0d / Matrix svět). Prázdné = pozadí z presetu.
 
-**`UpdateWorldDto`** — přidat `themeId?` (`@IsString`), `themeOverrides?` (`@IsObject`), `themeBackgroundUrl?` (`@IsOptional @IsString`). Validaci hodnot `themeOverrides` (jen `--theme-*` klíče, max počet) ověřit v impl. plánu.
+**`UpdateWorldDto`** — přidat `themeId?` (`@IsString`), `themeOverrides?` (`@IsObject`), `themeBackgroundUrl?` (`@IsOptional @IsString`). Hodnoty `themeOverrides` sanitizovány v service (`sanitizeThemeOverrides` — jen `--theme-*` klíče, max 60).
 
-**`CreateWorldDto`** — přidat `themeId?` (`@IsOptional @IsString`) — wizard pošle zvolený motiv při tvorbě světa (rozhodnutí D). Bez hodnoty → schema default.
+**`CreateWorldDto`** — přidat `themeId?` (`@IsOptional @IsString`) — wizard pošle motiv odvozený ze žánru (nebo ruční přepis). Bez hodnoty → schema default.
 
-**FE — create-world wizard** ([`/ikaros/vytvorit-svet`](../../../src/), krok 2.3) — dostane krok / pole „Motiv světa" (výběr z `listThemes('world')`, náhled thumbnailu). Posílá `themeId` v `POST /worlds`. Konkrétní soubor wizardu dohledá impl. plán.
+**FE — create-world wizard** (`/ikaros/vytvorit-svet`, krok 2.3) — `ThemeSection` ukáže motiv **odvozený ze zvoleného žánru** (`themeForGenre`); PJ ho může přepsat výběrem z 21. Posílá výsledný `themeId` v `POST /worlds`.
 
-**Migrace** — existující světy bez `themeId` dostanou default. Seedovaný svět **Matrix** dostane `themeId: 'matrix'` (úprava `MatrixWorldSeed` + migrační skript pro běžící DB).
+**Migrace** — existující světy bez `themeId` dostanou default `'modre-nebe'`. Seedovaný svět **Matrix** dostane `themeBackgroundUrl` na `matrix-bg.webp` (`MatrixWorldSeed`, idempotentní).
 
 **Odpověď z API** — `themeId / themeOverrides / themeBackgroundUrl` vracené v `GET /worlds/:id` i `GET /worlds/slug/:slug` (mapper world→DTO).
 
@@ -161,7 +164,7 @@ Hodnota = **uživatelský override** (5.0e, localStorage keyed `worldId`) **nebo
 
 PJ může místo presetu sestavit vlastní vzhled — uloženo do `World.themeOverrides` (token→hodnota) + `World.themeBackgroundUrl`:
 
-- **Datová stránka (5.0d, tato spec):** `applyWorldTheme` umí `overrides` vrstvit nad zvolený preset; BE pole + DTO + API z 4.1; FE typ.
+- **Datová stránka (5.0d, tato spec):** `applyTheme(id, opts)` umí `overrides` vrstvit nad zvolený preset; BE pole + DTO + API z 4.1; FE typ.
 - **Editor UI (selektor + color pickery + upload pozadí + živý náhled):** je **krok 5.3f** — mimo rozsah 5.0. 5.0 dodá jen *runtime* — když `World` overrides obsahuje, aplikují se. Naplnění overrides UI přijde v 5.3.
 - Override sada = whitelist `--theme-*` tokenů (barvy, `--theme-shadow*`, `--theme-glow*`). Přesný whitelist → impl. plán.
 
@@ -173,15 +176,15 @@ PJ může místo presetu sestavit vlastní vzhled — uloženo do `World.themeOv
 - **Preset switcher** (rozhodnutí E) — tlačítko / položka „Vzhled světa" v headeru `WorldLayout` otevře jednoduchý výběr z 21 motivů (`listThemes('world')`, thumbnaily) + „Reset na výchozí". Volba zapíše override do localStorage → `WorldLayout` překreslí. Plný editor (color pickery, upload pozadí) sdílí UI s 5.3f — mimo 5.0.
 - Žádný BE — per zařízení (rozhodnutí C).
 
-### 4.6 Matrix skin — nový motiv `matrix`
+### 4.6 Žánr → motiv (rozhodnutí B)
 
-Nový motiv `src/themes/themes/matrix/` (`index.ts` + `decorations.css`), portovaný z `C:\Matrix\Matrix\frontend\src\styles\matrix.tokens.scss`:
+Starý Matrix měl mapu `GENRE_TO_SKIN` (32 žánrů → ~21 skinů). Krok 5.0 ji obnovuje na 21 motivů Ikara:
 
-- Mapování `--mx-*` → `--theme-*` token kontrakt (violet `#c86dff` + cyan `#3fe0ff`, tmavé ink pozadí, glass panely, glow).
-- `scope: 'world'` — Matrix skin se nabízí jen světům, ne jako platformní motiv.
-- Zařadit do `THEMES` registry; `ThemeId` union rozšířit o `'matrix'`.
-- Pozadí — port `matrix-bg.png` (asset pipeline `npm run themes:optimize`).
-- **`frontend-design` skill audit** mezi touto spec a impl. plánem — Matrix skin je nový skin (memory `feedback_frontend_design_audit`). Ornamenty originální, ne recyklované (memory `feedback_skin_originality`).
+- **`genres.ts`** — `GENRES: GenreOption[]` (32 žánrů ze starého Matrixu — Fantasy, Dark fantasy, Heroic fantasy, Space opera, Cyberpunk, Biopunk, …). Každý `GenreOption` = `{ label, description, theme: ThemeId }`.
+- **`themeForGenre(genre)`** — vrátí výchozí motiv pro žánr; neznámý / `Vlastní` → `GENRE_FALLBACK_THEME` (`modre-nebe`).
+- `world.genre` ukládá `label` (zpětně kompatibilní); mapa je keyed labelem.
+- Žádný dedikovaný „Matrix skin" — Matrix svět dostává motiv ze žánru + vlastní pozadí (rozhodnutí F).
+- Nevyužité motivy (`zlaty-standard`, `africke`, `arabsky-svet`) — dostupné jen ručním přepisem ve wizardu / přes switcher.
 
 ### 4.7 Kontrast guard
 
@@ -193,7 +196,7 @@ Po sestavení world theme ověřit čitelnost UI prvků (chat barvy zpráv, badg
 
 - **Editor world theme UI** (preset selektor + color pickery + upload pozadí + živý náhled) — **krok 5.3f**. 5.0 dodá jen runtime aplikaci a datový model.
 - **Cross-device sync user override** — rozhodnutí C: jen localStorage.
-- **Nová sada světových skinů** — rozhodnutí A: reuse 21 globálních. (Matrix skin je výjimka — port existujícího designu.)
+- **Nová sada světových skinů** — rozhodnutí A: reuse 21 globálních. Žádný dedikovaný Matrix skin.
 - **Headline / menu builder** — fáze 12.
 - **Automatický kontrast guard** v editoru — krok 5.3f.
 - **BE sync `themeId` jako u `useThemeSync`** — world theme základ se mění jen přes 5.3f (PATCH `/worlds/:id`), žádný debounced auto-sync.
@@ -204,8 +207,9 @@ Po sestavení world theme ověřit čitelnost UI prvků (chat barvy zpráv, badg
 
 1. BE `World` má `themeId` (default `modre-nebe`), `themeOverrides` (default `{}`), `themeBackgroundUrl?`; vracené v `GET /worlds/:id` i `/slug/:slug`.
 2. `UpdateWorldDto` i `CreateWorldDto` přijímají `themeId`; `UpdateWorldDto` i `themeOverrides / themeBackgroundUrl`; nevalidní `themeOverrides` klíče odmítnuty.
-3. Migrace: existující světy mají default `themeId`; seedovaný Matrix má `themeId: 'matrix'`.
-3b. Create-world wizard (krok 2.3) má výběr „Motiv světa"; zvolený `themeId` se uloží při `POST /worlds`.
+3. Migrace: existující světy mají default `themeId`; seedovaný Matrix má `themeBackgroundUrl` = `matrix-bg.webp`.
+3b. Create-world wizard (krok 2.3) — `ThemeSection` ukáže motiv odvozený ze žánru (`themeForGenre`) s možností přepisu; výsledný `themeId` se uloží při `POST /worlds`.
+3c. `genres.ts` má 32 žánrů, každý s `theme`; `themeForGenre` mapuje žánr→motiv s fallbackem.
 4. FE typ `World` rozšířen o 3 theme pole.
 5. `ThemeScope` = `'platform' | 'world' | 'both'`; `listThemes('world')` vrací motivy `world`+`both`.
 6. `applyTheme(id, opts?)` přijímá `overrides` + `backgroundUrl`; před zápisem čistí staré `--theme-*` inline properties.
@@ -214,14 +218,13 @@ Po sestavení world theme ověřit čitelnost UI prvků (chat barvy zpráv, badg
 9. `themeBackgroundUrl` světa přebije pozadí presetu.
 10. Uživatelský override (localStorage `ikaros.world-theme.<worldId>`) přebije sdílený základ; „Reset" vrací na základ.
 10b. Header `WorldLayout` má preset switcher „Vzhled světa" — výběr z 21 motivů + Reset; volba se okamžitě projeví.
-11. Motiv `matrix` v registry (`scope: 'world'`), `ThemeId` rozšířen; svět Matrix se vykreslí Matrix skinem.
+11. Svět Matrix se vykreslí motivem ze žánru + vlastním pozadím (`themeBackgroundUrl`); žádný dedikovaný `matrix` motiv.
 12. Odchod ze světa (`EXIT`) → `:root` obnoven na globální motiv uživatele; žádný reziduální world token / override na `:root`.
 13. V každý okamžik je na `:root` aktivní jediný motiv (`data-theme`) — žádné překrývání decorations platforma×svět; modaly/portály otevřené ve světě dědí motiv světa.
 14. `lint`, `lint:colors`, `tsc`, `build`, `test:run` ✓ (FE) — `tsc` + `jest` ✓ (BE).
-15. Žádný hardcoded barevný literál mimo definici motivu `matrix`.
-16. Mobil (≤768) i tablet (769–1024) ověřen — světové pozadí + tokeny drží (`mobil-desktop` audit).
-17. `frontend-design` audit Matrix skinu proveden mezi spec a impl. plánem.
-18. Stránka `Nápověda` aktualizována (`napoveda` skill) — světový theme + osobní override světa.
+15. Žádný hardcoded barevný literál v komponentách (`lint:colors`).
+16. Mobil (≤768) i tablet (769–1024) ověřen — světové pozadí + tokeny drží.
+17. Stránka `Nápověda` aktualizována — světový theme (odvozen ze žánru) + osobní override světa.
 
 ---
 
@@ -238,7 +241,7 @@ Po sestavení world theme ověřit čitelnost UI prvků (chat barvy zpráv, badg
 - `listThemes('world')` — vrací `world`+`both`, vynechá `platform`.
 - `worldThemeAtom` resolver — localStorage override > `World` základ > fallback.
 - `WorldLayout` — `.shell` má `data-theme` = `world.themeId`; override z localStorage přebije.
-- `getTheme('matrix')` vrací Matrix motiv; je v `THEMES`.
+- `themeForGenre` — známý žánr → správný motiv; neznámý → `modre-nebe` fallback.
 - Odhad: **+10–14 testů** (FE+BE).
 
 ### Manuální smoke
@@ -258,8 +261,8 @@ Po sestavení world theme ověřit čitelnost UI prvků (chat barvy zpráv, badg
 |--------|--------|-------|----------|
 | EXIT ze světa neobnoví uživatelův globální motiv (`:root` zůstane na world theme) | Střední | Střední | Cleanup efekt `WorldLayout` (4.3 bod 3); acceptance #12 to ověří; smoke EXIT. |
 | Override z předchozího motivu „visí" na `:root` po swapu (token, co nový motiv nedefinuje) | Střední | Nízký | `applyTheme` čistí `--theme-*` inline properties před zápisem (4.2). |
-| Port Matrix `--mx-*` → `--theme-*` neúplný (chybějící token → fallback vzhled) | Střední | Nízký | Mapovací tabulka v impl. plánu; frontend-design audit; vizuální smoke. |
-| BE migrace na běžící DB selže / Matrix svět nedostane `matrix` | Nízká | Střední | Idempotentní migrační skript; default `themeId` pokryje neošetřené světy. |
+| Žánr→motiv mapa: nevhodné spárování (subjektivní) | Střední | Nízký | Mapa odsouhlasena autorem; PJ může motiv přepsat ve wizardu. |
+| BE migrace na běžící DB selže | Nízká | Střední | Idempotentní migrační skript; `toEntity` fallback `'modre-nebe'`. |
 | User override v localStorage „uvízne" po změně sady motivů (smazaný motiv) | Nízká | Nízký | `getTheme` fallbackuje na `DEFAULT_THEME` u neznámého id. |
 | Přebliknutí motivu během načítání světa | Nízká | Nízký | Krátké u cache hitu; přijatelné. Lze maskovat header skeletonem z 5.1. |
 
@@ -269,11 +272,11 @@ Po sestavení world theme ověřit čitelnost UI prvků (chat barvy zpráv, badg
 
 ## 9. Otázky k autorovi
 
-Vyřešeno (2026-05-17) — viz rozhodnutí D / E v sekci 4.0:
+Vyřešeno (2026-05-17) — viz rozhodnutí A–F v sekci 4.0:
 
-1. **Default `themeId`** → PJ volí motiv ve wizardu tvorby světa (krok 2.3); schema default `'modre-nebe'` jen fallback. *(Matrix svět = `'matrix'` napevno.)*
+1. **Default `themeId`** → odvozen ze žánru světa (`themeForGenre`); PJ může přepsat ve wizardu. Schema default `'modre-nebe'` jen fallback.
 2. **Rozsah UI 5.0e** → 5.0 přidá lehký preset switcher „Vzhled světa" do headeru; plný editor až 5.3f.
-3. **Matrix skin scope** → `'world'`.
+3. **Matrix svět** → motiv ze žánru + vlastní pozadí (`matrix-bg`); dedikovaný „Matrix skin" zrušen.
 
 ---
 

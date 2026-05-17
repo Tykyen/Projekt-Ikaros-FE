@@ -226,11 +226,11 @@ const FAQ: FaqItem[] = [
     a: (
       <p>
         Každý svět má <strong>vlastní motiv</strong>, nezávislý na platformě.
-        PJ ho volí při tvorbě světa &mdash; uvnitř světa pak vzhled vidí
-        všichni členové. Přes tlačítko <strong>Vzhled světa</strong> (ikona
-        palety v hlavičce světa) si motiv můžeš přepnout jen pro sebe (uloženo
-        na zařízení); „Reset" vrátí na motiv nastavený PJ. Mimo svět platí dál
-        tvůj globální motiv účtu.
+        Odvozuje se ze <strong>žánru světa</strong> (PJ ho při tvorbě může
+        přepsat) &mdash; uvnitř světa vzhled vidí všichni členové. Přes tlačítko{' '}
+        <strong>Vzhled světa</strong> (ikona palety v hlavičce světa) si motiv
+        můžeš přepnout jen pro sebe (uloženo na zařízení); „Reset" vrátí na
+        motiv nastavený PJ. Mimo svět platí dál tvůj globální motiv účtu.
       </p>
     ),
   },
