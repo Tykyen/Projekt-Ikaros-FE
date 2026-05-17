@@ -14,6 +14,7 @@ import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 import { applyTheme } from '../../../themes/applyTheme';
 import { useWorldTheme } from '../../../themes/useWorldTheme';
+import { WorldThemeSwitcher } from '@/features/world/components/WorldThemeSwitcher';
 
 /* ── Nav definice ── */
 function buildNav(worldSlug: string) {
@@ -253,6 +254,9 @@ export function WorldLayout() {
                 >
                   ✉
                 </Link>
+
+                {/* Spec 5.0e — preset switcher „Vzhled světa" */}
+                <WorldThemeSwitcher />
 
                 {/* Spec 5.1 — slot postavy (fallback na účet), neklikatelné */}
                 <div className={s.persona} title={personaName}>
