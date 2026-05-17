@@ -12,6 +12,8 @@ import { UserRole, WorldRole } from '@/shared/types';
 import { UserAvatar } from '@/shared/ui';
 import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
+import { applyTheme } from '../../../themes/applyTheme';
+import { useWorldTheme } from '../../../themes/useWorldTheme';
 
 /* ── Nav definice ── */
 function buildNav(worldSlug: string) {
@@ -147,11 +149,35 @@ export function WorldLayout() {
     [realWorldId, worldSlug, world, isPJ, membership, loading],
   );
 
-  const themeId = useAtomValue(themeAtom);
+  // Spec 5.0 — světový theme. `.shell` vykresluje motiv světa; po vstupu se
+  // přepne globální `:root` (kvůli portálům — modaly mimo `.shell`), EXIT obnoví.
+  const { themeId, overrides, backgroundUrl } = useWorldTheme(world ?? null);
   const theme = getTheme(themeId);
-  const bgStyle = theme.background
-    ? { backgroundImage: `url(${theme.background})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' as const }
+  const bg = backgroundUrl ?? theme.background;
+  const bgStyle = bg
+    ? { backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' as const }
     : undefined;
+
+  // Globální motiv uživatele — ref, aby unmount cleanup měl aktuální hodnotu.
+  const globalThemeId = useAtomValue(themeAtom);
+  const globalThemeIdRef = useRef(globalThemeId);
+  useEffect(() => {
+    globalThemeIdRef.current = globalThemeId;
+  }, [globalThemeId]);
+
+  // Apply motiv světa na `:root` (až po načtení světa — během loadingu
+  // zůstává globální motiv).
+  useEffect(() => {
+    if (loading || !world) return;
+    void applyTheme(themeId, { overrides, backgroundUrl });
+  }, [loading, world, themeId, overrides, backgroundUrl]);
+
+  // Unmount (EXIT ze světa) → obnova uživatelova globálního motivu.
+  useEffect(() => {
+    return () => {
+      void applyTheme(globalThemeIdRef.current);
+    };
+  }, []);
 
   // Spec 5.1 — slot „aktuální přihlášená postava". Fáze 8 dotáhne reálnou
   // postavu; do té doby fallback na username účtu. Neklikatelné.
