@@ -1,3 +1,5 @@
+import { WorldStubPage } from './WorldStubPage';
+
 export default function RulesPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Pravidla světa</div>;
+  return <WorldStubPage area="rules" />;
 }

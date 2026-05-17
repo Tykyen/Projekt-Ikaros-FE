@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function PageViewerPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Stránka (viewer)</div>;
+  return <WorldStubPage area="page-viewer" />;
 }

@@ -1,13 +1,15 @@
-﻿import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { NavLink, Outlet, Link, useParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 import s from './WorldLayout.module.css';
-import { WorldContext } from '@/features/world/context/WorldContext';
+import { WorldContext, type WorldContextValue } from '@/features/world/context/WorldContext';
 import { useWorld } from '@/features/world/api/useWorlds';
 import { useWorldStatus } from '@/features/world/api/useWorldStatus';
+import { accessModeLabel } from '@/features/world/lib/accessMode';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, WorldRole } from '@/shared/types';
+import { UserAvatar } from '@/shared/ui';
 import { themeAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 
@@ -122,20 +124,27 @@ export function WorldLayout() {
   const isGlobalAdmin =
     currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
 
-  // Spec 2.4 — full nav jen pro membery (libovolná role 0–5) nebo globální adminy.
-  // Non-member / pending-access vidí light header (jen EXIT + název + accessMode badge).
-  const showFullNav = status === 'member' || isGlobalAdmin;
+  // Spec 5.1 — loading shellu: header skeleton, dokud world + status nedoběhnou.
+  const loading = isLoading || statusLoading;
 
-  const ctxValue = useMemo(
+  // Spec 2.4 — full nav jen pro membery (libovolná role 0–5) nebo globální adminy.
+  // Spec 5.1 — když world chybí (404 / private bez přístupu), nav se nesmí
+  // renderovat ani globálnímu adminovi; tělo ukáže `WorldNotFound`.
+  const showFullNav =
+    !!world && !loading && (status === 'member' || isGlobalAdmin);
+
+  const ctxValue = useMemo<WorldContextValue>(
     () => ({
       worldId: realWorldId,
       worldSlug,
       world: world ?? null,
       isPJ,
       userRole: (membership?.role ?? null) as WorldRole | null,
-      loading: isLoading || statusLoading,
+      // Fáze 8 — aktivní postava; do té doby null (header fallbackuje na účet).
+      character: null,
+      loading,
     }),
-    [realWorldId, worldSlug, world, isPJ, membership, isLoading, statusLoading],
+    [realWorldId, worldSlug, world, isPJ, membership, loading],
   );
 
   const themeId = useAtomValue(themeAtom);
@@ -144,18 +153,50 @@ export function WorldLayout() {
     ? { backgroundImage: `url(${theme.background})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' as const }
     : undefined;
 
+  // Spec 5.1 — slot „aktuální přihlášená postava". Fáze 8 dotáhne reálnou
+  // postavu; do té doby fallback na účet uživatele. Neklikatelné.
+  const personaName =
+    ctxValue.character?.name ??
+    currentUser?.displayName ??
+    currentUser?.username ??
+    'Účet';
+  const personaAvatar =
+    ctxValue.character?.avatarUrl ??
+    currentUser?.profileImageUrl ??
+    currentUser?.avatarUrl ??
+    null;
+
   return (
     <WorldContext.Provider value={ctxValue}>
       <div className={s.shell} data-theme={themeId} style={bgStyle}>
         <header className={s.header}>
-          {/* EXIT */}
+          {/* EXIT — funkční i během loadingu / 404 */}
           <Link to="/" className={s.exitBtn}>EXIT</Link>
 
-          {/* Název světa */}
-          <Link to={`/svet/${worldSlug}`} className={s.worldName}>
-            {world?.name ?? (isLoading ? '...' : 'Svět')}
-          </Link>
-          {world?.genre && <span className={s.genreBadge}>{world.genre}</span>}
+          {loading ? (
+            /* Spec 5.1 — header skeleton během načítání světa */
+            <>
+              <span className={clsx(s.skeletonBlock, s.skeletonName)} aria-hidden="true" />
+              <span className={clsx(s.skeletonBlock, s.skeletonBadge)} aria-hidden="true" />
+            </>
+          ) : (
+            <>
+              {/* Název světa */}
+              <Link to={`/svet/${worldSlug}`} className={s.worldName}>
+                {world?.name ?? 'Svět nenalezen'}
+              </Link>
+              {world && (
+                <span
+                  className={s.accessBadge}
+                  data-mode={world.accessMode}
+                  aria-label={`Přístupový režim: ${accessModeLabel(world.accessMode)}`}
+                >
+                  {accessModeLabel(world.accessMode)}
+                </span>
+              )}
+              {world?.genre && <span className={s.genreBadge}>{world.genre}</span>}
+            </>
+          )}
 
           {/* Spec 2.4 — full nav jen pro membery / globální adminy */}
           {showFullNav && (
@@ -187,6 +228,17 @@ export function WorldLayout() {
                 >
                   ✉
                 </Link>
+
+                {/* Spec 5.1 — slot postavy (fallback na účet), neklikatelné */}
+                <div className={s.persona} title={personaName}>
+                  <UserAvatar
+                    src={personaAvatar}
+                    defaultType={currentUser?.defaultAvatarType}
+                    size="sm"
+                    alt={personaName}
+                  />
+                  <span className={s.personaName}>{personaName}</span>
+                </div>
               </div>
 
               <button

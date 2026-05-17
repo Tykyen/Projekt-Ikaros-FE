@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function TacticalMapPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Taktická mapa</div>;
+  return <WorldStubPage area="tactical-map" />;
 }

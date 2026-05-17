@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function ShopPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Obchod / QuickNotes</div>;
+  return <WorldStubPage area="shop" />;
 }

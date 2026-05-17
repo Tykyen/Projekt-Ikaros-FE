@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function CampaignPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Pavučina (campaign)</div>;
+  return <WorldStubPage area="campaign" />;
 }

@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function MyCharacterPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Moje postava</div>;
+  return <WorldStubPage area="my-character" />;
 }

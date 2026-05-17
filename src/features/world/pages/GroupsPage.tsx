@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function GroupsPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Skupiny</div>;
+  return <WorldStubPage area="groups" />;
 }

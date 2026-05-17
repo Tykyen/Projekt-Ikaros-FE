@@ -1,12 +1,6 @@
 import type { World } from '@/shared/types';
+import { accessModeLabel } from '@/features/world/lib/accessMode';
 import s from './WorldDetailHero.module.css';
-
-const ACCESS_LABELS: Record<string, string> = {
-  public: 'Veřejný',
-  open: 'Veřejný se schválením',
-  private: 'Soukromý',
-  closed: 'Uzavřený',
-};
 
 interface Props {
   world: World;
@@ -17,7 +11,7 @@ interface Props {
  * overlay s názvem + accessMode badge + žánrem. Reuse skin tokenů (žádné hardcoded barvy).
  */
 export function WorldDetailHero({ world }: Props) {
-  const accessLabel = ACCESS_LABELS[world.accessMode] ?? world.accessMode;
+  const accessLabel = accessModeLabel(world.accessMode);
   const heroStyle: React.CSSProperties | undefined = world.imageUrl
     ? { backgroundImage: `url(${world.imageUrl})` }
     : undefined;

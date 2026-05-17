@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function EventsPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Správa událostí</div>;
+  return <WorldStubPage area="events" />;
 }

@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function PagesListPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Stránky světa</div>;
+  return <WorldStubPage area="pages" />;
 }

@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function CurrencyPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Převodník měn</div>;
+  return <WorldStubPage area="currency" />;
 }

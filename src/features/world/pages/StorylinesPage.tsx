@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function StorylinesPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Storyboard / Scénáře</div>;
+  return <WorldStubPage area="storylines" />;
 }

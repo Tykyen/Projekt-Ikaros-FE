@@ -53,7 +53,11 @@
   color: var(--text-primary);
   white-space: nowrap;
   text-decoration: none;
-  flex-shrink: 0;
+  /* Spec 5.1 — místo odtlačení ostatních prvků se dlouhý název zkrátí ellipsis */
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .worldName:hover { color: var(--accent-bright); }
 
@@ -65,6 +69,36 @@
   font-weight: var(--weight-medium);
   color: var(--text-secondary);
   flex-shrink: 0;
+}
+
+/* Spec 5.1 — accessMode badge (sdílený label přes lib/accessMode) */
+.accessBadge {
+  padding: 2px var(--sp-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--accent-bright);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Spec 5.1 — header skeleton během načítání světa */
+.skeletonBlock {
+  display: inline-block;
+  height: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-hover);
+  flex-shrink: 0;
+  animation: skeletonPulse 1.2s ease-in-out infinite;
+}
+.skeletonName  { width: 140px; }
+.skeletonBadge { width: 72px; }
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: .5; }
+  50%      { opacity: 1; }
 }
 
 /* ── Desktop nav ── */
@@ -180,13 +214,34 @@
 }
 .actionBtn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
 
+/* ── Slot postavy (Spec 5.1) — neklikatelné, fallback na účet ── */
+.persona {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 2px var(--sp-2) 2px 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  max-width: 180px;
+  flex-shrink: 0;
+}
+
+.personaName {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Hamburger (mobile) ── */
 .hamburger {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: none;
   color: var(--text-primary);
@@ -245,6 +300,7 @@
 .drawerNewPage {
   display: flex;
   align-items: center;
+  min-height: 44px; /* touch target — base.md */
   padding: var(--sp-3) var(--sp-2);
   border-radius: var(--radius-md);
   background: var(--accent-soft);
@@ -273,7 +329,8 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-2);
+  min-height: 44px; /* touch target — base.md */
+  padding: var(--sp-3) var(--sp-2);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
   color: var(--text-primary);
@@ -288,4 +345,11 @@
   .searchBar { display: none; }
   .hamburger { display: flex; }
   .header { gap: var(--sp-2); }
+  /* Spec 5.1 — na mobilu slot postavy jen avatar (jméno by tlačilo header) */
+  .personaName { display: none; }
+  .persona { max-width: none; }
+  /* Spec 5.1 — na mobilu má přednost accessMode badge; genre je v detailu */
+  .genreBadge { display: none; }
+  /* Spec 5.1 — „Nová stránka" je na mobilu v draweru (drawerNewPage) */
+  .newPageBtn { display: none; }
 }

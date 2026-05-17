@@ -37,6 +37,7 @@ function makeCtx(overrides: Partial<WorldContextValue> = {}): WorldContextValue 
     world: null,
     isPJ: false,
     userRole: null,
+    character: null,
     loading: false,
     ...overrides,
   };

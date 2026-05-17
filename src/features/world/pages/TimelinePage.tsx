@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function TimelinePage() {
-  return <div style={{ padding: '2rem' }}>[stub] Timeline</div>;
+  return <WorldStubPage area="timeline" />;
 }

@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function PagesAdminPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Správa stránek (admin)</div>;
+  return <WorldStubPage area="pages-admin" />;
 }

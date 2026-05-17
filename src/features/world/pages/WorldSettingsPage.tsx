@@ -1,3 +1,5 @@
+﻿import { WorldStubPage } from './WorldStubPage';
+
 export default function WorldSettingsPage() {
-  return <div style={{ padding: '2rem' }}>[stub] Nastavení světa</div>;
+  return <WorldStubPage area="settings" />;
 }
