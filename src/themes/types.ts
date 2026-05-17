@@ -19,9 +19,14 @@ export type ThemeId =
   | 'temna-cerven'
   | 'magie'
   | 'mesic'
-  | 'slunce';
+  | 'slunce'
+  | 'matrix';
 
-export type ThemeScope = 'platform' | 'both';
+/**
+ * `platform` — jen platforma Ikaros · `world` — jen světy (krok 5.0) ·
+ * `both` — obojí. `listThemes(scope)` filtruje `scope === arg || 'both'`.
+ */
+export type ThemeScope = 'platform' | 'world' | 'both';
 
 export type ThemeFonts = {
   display?: string;

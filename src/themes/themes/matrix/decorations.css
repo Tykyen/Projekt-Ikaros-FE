@@ -1,0 +1,209 @@
+/* ── Matrix — dimenzionální glass (krok 5.0) ──
+   Aktivuje se přes [data-theme="matrix"]. Scope: světový motiv (WorldLayout).
+   Vokabulář: prizmatická refrakce hran + konstelační rohy + klidný rift glow
+   + hmota skla. Vědomě KLIDNÝ — opak kyberpunkové neon-chaotičnosti.
+   Originalita vs. kyberpunk: žádný digital rain / HUD brackety / CJK / flicker. */
+
+/* ──────────────── 1. Root + rift overlay ──────────────── */
+
+/* `html[...]` cílí výhradně :root — overlay se nezdvojí na .shell divu,
+   který nese data-theme taky. */
+html[data-theme="matrix"] {
+  background-color: #070812;
+}
+
+html[data-theme="matrix"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--theme-bg-overlay);
+}
+
+/* Klidný diagonální rift — světelná trhlina mezi dimenzemi.
+   Statická (žádné blikání); pomalý drift jen mimo reduced-motion. */
+html[data-theme="matrix"]::after {
+  content: '';
+  position: fixed;
+  inset: -20% -10%;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    118deg,
+    transparent 44%,
+    rgba(63, 224, 255, 0.05) 49%,
+    rgba(200, 109, 255, 0.12) 50%,
+    rgba(63, 224, 255, 0.05) 51%,
+    transparent 56%
+  );
+  filter: blur(2px);
+  opacity: 0.9;
+  animation: matrix-rift-drift 38s ease-in-out infinite alternate;
+}
+
+@keyframes matrix-rift-drift {
+  from { transform: translateY(-2%) rotate(-0.6deg); }
+  to   { transform: translateY(2%) rotate(0.6deg); }
+}
+
+/* ──────────────── 2. Header — prizmatická refrakce ──────────────── */
+
+[data-theme="matrix"] header {
+  position: relative;
+  border-bottom: 1px solid var(--theme-border-soft);
+  -webkit-backdrop-filter: blur(var(--mx-glass-blur, 14px));
+  backdrop-filter: blur(var(--mx-glass-blur, 14px));
+}
+
+/* Prizmatický spodní lem — violet→cyan lom světla pod headerem. */
+[data-theme="matrix"] header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: var(--header-band-h, 5px);
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(63, 224, 255, 0.5) 22%,
+    rgba(200, 109, 255, 0.85) 50%,
+    rgba(63, 224, 255, 0.5) 78%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 6px var(--theme-glow-violet));
+}
+
+[data-theme="matrix"] header [class*="logoImg"] {
+  height: var(--header-h, 64px);
+  background-size: contain;
+}
+
+/* ──────────────── 3. Nav linky — glass + dimenzionální hover ──────────────── */
+
+[data-theme="matrix"] [class*="navLink"] {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--theme-text);
+  border-radius: 8px;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    box-shadow 220ms ease;
+}
+
+[data-theme="matrix"] [class*="navLink"]:hover {
+  color: var(--theme-heading);
+  background: var(--theme-nav-hover-bg);
+  box-shadow: inset 2px 0 0 var(--theme-accent-cyan);
+}
+
+[data-theme="matrix"] [class*="navLinkActive"] {
+  color: var(--theme-heading);
+  background: var(--theme-nav-active-bg);
+  box-shadow:
+    inset 2px 0 0 var(--theme-accent),
+    0 0 16px var(--theme-glow-violet);
+}
+
+/* ──────────────── 4. Dropdown — glass panel + konstelační roh ──────────────── */
+
+[data-theme="matrix"] [class*="dropdown"] {
+  position: relative;
+  background: var(--theme-surface);
+  -webkit-backdrop-filter: blur(var(--mx-glass-blur, 14px));
+  backdrop-filter: blur(var(--mx-glass-blur, 14px));
+  border: 1px solid var(--theme-border);
+  border-radius: 14px;
+  box-shadow:
+    0 12px 40px var(--theme-shadow),
+    var(--mx-glass-highlight);
+}
+
+/* Konstelační uzel v levém horním rohu dropdownu — síť propojených bodů. */
+[data-theme="matrix"] [class*="dropdown"]::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: var(--asset-corner-size, 64px);
+  height: var(--asset-corner-size, 64px);
+  pointer-events: none;
+  background: var(--asset-corner) center / contain no-repeat;
+  opacity: 0.85;
+}
+
+[data-theme="matrix"] [class*="dropdownItem"] {
+  color: var(--theme-text);
+  transition: color 160ms ease, background 160ms ease;
+}
+
+[data-theme="matrix"] [class*="dropdownItem"]:hover {
+  color: var(--theme-heading);
+  background: var(--theme-nav-hover-bg);
+}
+
+/* ──────────────── 5. Mobilní drawer — glass + prizmatická hrana ──────────────── */
+
+[data-theme="matrix"] [class*="drawer"]:not([class*="drawerBackdrop"]):not([class*="drawerLink"]):not([class*="drawerSection"]):not([class*="drawerNewPage"]) {
+  background: var(--theme-surface-strong);
+  -webkit-backdrop-filter: blur(var(--mx-glass-blur, 14px));
+  backdrop-filter: blur(var(--mx-glass-blur, 14px));
+  border-left: 1px solid transparent;
+  border-image: var(--mx-prism-edge) 1;
+}
+
+[data-theme="matrix"] [class*="drawerLink"]:hover,
+[data-theme="matrix"] [class*="drawerNewPage"]:hover {
+  background: var(--theme-nav-hover-bg);
+  color: var(--theme-heading);
+}
+
+/* ──────────────── 6. Badge / akcent prvky ──────────────── */
+
+[data-theme="matrix"] [class*="accessBadge"],
+[data-theme="matrix"] [class*="genreBadge"] {
+  border: 1px solid var(--theme-border-soft);
+  background: var(--theme-surface-soft);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+[data-theme="matrix"] [class*="newPageBtn"] {
+  border: 1px solid transparent;
+  border-image: var(--mx-prism-edge) 1;
+  color: var(--theme-heading);
+  transition: box-shadow 200ms ease;
+}
+
+[data-theme="matrix"] [class*="newPageBtn"]:hover {
+  box-shadow: 0 0 16px var(--theme-glow-violet);
+}
+
+/* ──────────────── 7. Scrollbar — violet/cyan ──────────────── */
+
+[data-theme="matrix"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-theme="matrix"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(200, 109, 255, 0.5), rgba(63, 224, 255, 0.4));
+  border-radius: 999px;
+}
+
+[data-theme="matrix"] ::-webkit-scrollbar-track {
+  background: rgba(12, 10, 34, 0.6);
+}
+
+/* ──────────────── 8. Reduced motion ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="matrix"]::after {
+    animation: none;
+  }
+}

@@ -319,6 +319,12 @@ export interface World {
   /** 2.2 — volitelná max kapacita pro sort "volná místa" + 2.3 wizard. */
   maxPlayers?: number | null;
   favoritePageSlugs: string[];
+  /** 5.0 — id sdíleného základu světového motivu (preset nebo 'matrix'). */
+  themeId?: string;
+  /** 5.0 — custom theme: mapa CSS token → hodnota nad `themeId`. */
+  themeOverrides?: Record<string, string>;
+  /** 5.0 — custom theme: URL vlastního pozadí světa. */
+  themeBackgroundUrl?: string;
   createdAt: string;
   updatedAt: string;
   /** Spec 2.4 — populated jen při `GET /worlds/:id` / `GET /worlds/slug/:slug`. */
