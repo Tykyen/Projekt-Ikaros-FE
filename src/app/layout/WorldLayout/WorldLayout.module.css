@@ -185,13 +185,14 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: 0 var(--sp-3);
-  height: 32px;
+  padding: 0 var(--sp-4);
+  height: 40px;
+  min-width: 220px;
   background: var(--bg-card-hover);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
   cursor: pointer;
   transition: border-color var(--transition-fast);
   white-space: nowrap;
@@ -340,9 +341,14 @@
 .drawerLink:hover { background: var(--bg-card-hover); color: var(--text-primary); }
 
 /* ── Responsive ── */
+/* Spec 5.1 — search se vejde komfortně až na desktopu; na užším headeru
+   (tablet) by se tlačil s „+ Nová stránka". Funkce hledání = fáze 13.1. */
+@media (max-width: 1024px) {
+  .searchBar { display: none; }
+}
+
 @media (max-width: 768px) {
   .nav { display: none; }
-  .searchBar { display: none; }
   .hamburger { display: flex; }
   .header { gap: var(--sp-2); }
   /* Spec 5.1 — na mobilu slot postavy jen avatar (jméno by tlačilo header) */

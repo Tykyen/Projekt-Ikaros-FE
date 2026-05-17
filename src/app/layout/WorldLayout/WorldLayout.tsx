@@ -154,10 +154,9 @@ export function WorldLayout() {
     : undefined;
 
   // Spec 5.1 — slot „aktuální přihlášená postava". Fáze 8 dotáhne reálnou
-  // postavu; do té doby fallback na účet uživatele. Neklikatelné.
+  // postavu; do té doby fallback na username účtu. Neklikatelné.
   const personaName =
     ctxValue.character?.name ??
-    currentUser?.displayName ??
     currentUser?.username ??
     'Účet';
   const personaAvatar =
