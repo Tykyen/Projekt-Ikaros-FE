@@ -124,7 +124,7 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 
 ### D-064 — Leave world flow (self-leave pro Ctenar+, 2.4 → 2.5)
 **Soubory:** `backend/src/modules/worlds/worlds.controller.ts` (`DELETE /:worldId/members/me`), `src/features/world/components/MemberDashboardStub`
-**Stav:** Otevřený — existuje stará `leave(membershipId)` endpoint pro PJ removal, ale chybí self-leave UI.
+**Stav:** ✅ Uzavřeno (krok 5.3e) — tab Členství ve `WorldSettingsPage` má „Odejít ze světa" (Čtenář+), confirm dialog, `DELETE .../members/:membershipId`, redirect `/`. PJ leave zablokován (→ D-NEW-world-transfer).
 **Kontext:** Po join do public světa nemá uživatel jak ze světa zase odejít. Operace musí být:
 - Pro Čtenář/Hráč: smazat vlastní membership, redirect na `/`.
 - Pro PJ: zákaz (musí předat svět nebo smazat).
@@ -182,6 +182,26 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 **Řešení:** Server-side sanitizér (`sanitize-html`) v `addPost` / article create+update — allowlist tagů shodný s TipTap schématem. Wiring je ~15 řádků (sdílený `sanitizeRichText()` util).
 **Blocker (2026-05-15):** `npm install sanitize-html` v tomto prostředí selhává — `UNABLE_TO_VERIFY_LEAF_SIGNATURE` (TLS/CA na npm registry). Hand-rollovaný regex sanitizér by dával falešný pocit bezpečí (mutation XSS) — záměrně nezvolen. Dořeší se po opravě npm CA / dostupnosti registry.
 **Kdy:** Bezpečnostní úklid, ideálně před produkčním nasazením — jakmile lze nainstalovat dependency.
+
+---
+
+### D-NEW-world-transfer — Předání vlastnictví světa jinému uživateli (z 5.3)
+**Soubory:** `backend` — `worlds` modul (chybí endpoint `PATCH /worlds/:id/owner`), FE: tab Členství / Členové ve `WorldSettingsPage`.
+**Stav:** Otevřený.
+**Kontext:** PJ nemůže opustit svět (tab Členství 5.3e ho blokuje) — musel by ho předat jinému PJ. Promote jiného člena na roli PJ funguje (`PATCH .../members/:id/role`), ale tím vznikne druhý PJ; skutečné vlastnictví (`World.ownerId`) se nepřevede a původní PJ nadále nemůže odejít.
+**Dopad:** PJ je ve světě „uvězněn" — jediná cesta ven je smazat svět.
+**Řešení:** (1) BE endpoint pro transfer `ownerId` (přesun + případná demote původního PJ na PomocnyPJ). (2) FE akce „Předat svět" v tabu Členové (výběr nového vlastníka) nebo Členství. (3) Po transferu povolit původnímu PJ odejít.
+**Kdy:** Až bude reálná potřeba (PJ chce předat svět) — zatím low priority.
+
+---
+
+### D-NEW-slug-rename — Změna slugu (adresy) existujícího světa (z 5.3)
+**Soubory:** `backend` — `worlds` (slug je `unique`), FE: `BasicInfoTab` (slug je dnes read-only).
+**Stav:** Otevřený.
+**Kontext:** Tab Základní info (5.3a) zobrazuje slug jako read-only — změna by rozbila všechny existující odkazy `/svet/<slug>/...` (záložky, sdílené URL, interní linky).
+**Dopad:** Nízký — slug se volí při zakládání světa; nutnost přejmenování je vzácná.
+**Řešení:** Buď (a) historie slugů + redirect ze starých na aktuální, nebo (b) povolit změnu s jasným varováním „staré odkazy přestanou fungovat". Vyžaduje rozhodnutí o redirect strategii.
+**Kdy:** Až někdo přejmenování světa vyžádá.
 
 ---
 
