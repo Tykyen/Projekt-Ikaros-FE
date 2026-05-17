@@ -5,10 +5,10 @@ import {
   aspectRatio,
   categoryByKey,
   categoryStyle,
-  cloudinaryThumb,
   statusColor,
   statusLabel,
 } from '../lib/gallery';
+import { cloudinaryThumb } from '@/shared/lib/cloudinary';
 import { useToggleFavoriteGallery } from '../api/useGallery';
 import { FavoriteToggle } from './FavoriteToggle';
 import type { GalleryCategory, IkarosGalleryItem } from '@/shared/types';

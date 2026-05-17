@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/shared/api/client';
+import { api, apiClient } from '@/shared/api/client';
 import { useSocketEvent } from './useSocket';
 import { getSocket } from './socket';
 import type {
+  ChatAttachment,
   ChatMessage,
   RoomEnvironment,
   RoomInfo,
@@ -74,6 +75,8 @@ export interface SendMessagePayload {
   color?: string;
   /** ID zprávy, na kterou se odpovídá (krok 4.3a — reply). */
   replyToId?: string;
+  /** Přílohy — obrázky / dokumenty nahrané přes `useUploadAttachment` (4.3b). */
+  attachments?: ChatAttachment[];
 }
 
 /** Odeslání veřejné zprávy. Zpráva se vykreslí až přes WS echo. */
@@ -84,6 +87,26 @@ export function useSendMessage(room: RoomKey) {
         `/global-chat/messages?room=${room}`,
         dto,
       ),
+  });
+}
+
+/**
+ * Nahrání jedné přílohy chatu na Cloudinary (krok 4.3b). Vrací `ChatAttachment`,
+ * který se pak posílá v `attachments` zprávy. ChatInput volá per soubor až
+ * při odeslání (upload-on-send) — žádné osiřelé soubory z nepoužitého výběru.
+ */
+export function useUploadAttachment(room: RoomKey) {
+  return useMutation({
+    mutationFn: async (file: File): Promise<ChatAttachment> => {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await apiClient.post<ChatAttachment>(
+        `/global-chat/upload?room=${room}`,
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      );
+      return res.data;
+    },
   });
 }
 

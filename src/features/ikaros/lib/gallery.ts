@@ -8,27 +8,6 @@ const FALLBACK_CATEGORY: GalleryCategory = {
   order: 999,
 };
 
-/**
- * 3.3 — vloží Cloudinary transformace do URL (thumbnaily v mřížce nestahují
- * full-res). `mode` `fill` ořízne na rozměr, `fit` zachová celý obraz.
- */
-export function cloudinaryThumb(
-  url: string,
-  width: number,
-  height?: number,
-  mode: 'fill' | 'fit' = 'fill',
-): string {
-  if (!url || !url.includes('/upload/')) return url;
-  const parts = [
-    `w_${width}`,
-    height ? `h_${height}` : '',
-    `c_${mode}`,
-    'q_auto',
-    'f_auto',
-  ].filter(Boolean);
-  return url.replace('/upload/', `/upload/${parts.join(',')}/`);
-}
-
 /** Poměr stran pro masonry placeholder; fallback 1:1 u starých dokumentů. */
 export function aspectRatio(item: Pick<IkarosGalleryItem, 'width' | 'height'>): number {
   if (item.width > 0 && item.height > 0) return item.width / item.height;

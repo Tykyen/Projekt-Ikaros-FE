@@ -129,6 +129,11 @@ const IKAROS_PAGES: PageDoc[] = [
       'Odpověď nad sebou ukáže citaci původní zprávy — kliknutím na citaci ' +
       'skočíš k originálu. Reakce vybíráš z emoji výběru; opětovný klik na ' +
       'svou reakci ji zase odebere. ' +
+      'Ke zprávě můžeš připnout přílohy — obrázky a dokumenty (tlačítko se ' +
+      'sponkou u pole, max 10 MB na soubor, až 10 obrázků a 4 dokumenty). ' +
+      'Obrázky se v chatu zobrazí jako náhledy a kliknutím se otevřou na ' +
+      'celou obrazovku, dokumenty jako odkaz ke stažení. Zpráva může být ' +
+      'i jen příloha bez textu. ' +
       'Admin a Superadmin mohou nevhodnou zprávu smazat. ' +
       'Příchody a odchody se zapisují přímo do chatu jako hláška — vidí je ' +
       'i ten, kdo dorazí později. V levém menu je u každé místnosti počet ' +

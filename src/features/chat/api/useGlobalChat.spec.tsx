@@ -8,19 +8,21 @@ import {
   useSendMessage,
   useDeleteMessage,
   useToggleReaction,
+  useUploadAttachment,
   useRoomEnvironment,
   useSetRoomEnvironment,
   useRoomPresenceCounts,
   chatQueryKeys,
 } from './useGlobalChat';
 import { useSocketEvent } from './useSocket';
-import { api } from '@/shared/api/client';
+import { api, apiClient } from '@/shared/api/client';
 import type { RoomPresenceCounts } from '../lib/types';
 
 const { mockEmit } = vi.hoisted(() => ({ mockEmit: vi.fn() }));
 
 vi.mock('@/shared/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
+  apiClient: { post: vi.fn() },
 }));
 
 // Socket vrstva — testujeme jen REST + cache, WS handler voláme ručně.
@@ -104,6 +106,46 @@ describe('useGlobalChat', () => {
       content: 'odpoved',
       replyToId: 'm1',
     });
+  });
+
+  it('useSendMessage propíše attachments do payloadu (4.3b)', async () => {
+    vi.mocked(api.post).mockResolvedValue({ id: 'm3' });
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useSendMessage('hospoda'), {
+      wrapper: Wrapper,
+    });
+    const attachments = [
+      {
+        url: 'https://res.cloudinary.com/c/global-chat/hospoda/a.png',
+        publicId: 'global-chat/hospoda/a',
+        type: 'image' as const,
+        mimeType: 'image/png',
+        filename: 'a.png',
+        size: 10,
+      },
+    ];
+    await result.current.mutateAsync({ content: '', attachments });
+    expect(api.post).toHaveBeenCalledWith('/global-chat/messages?room=hospoda', {
+      content: '',
+      attachments,
+    });
+  });
+
+  it('useUploadAttachment pošle multipart na upload endpoint s room (4.3b)', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({
+      data: { publicId: 'global-chat/rozcesti-1/a' },
+    });
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useUploadAttachment('rozcesti-1'), {
+      wrapper: Wrapper,
+    });
+    const file = new File(['x'], 'a.png', { type: 'image/png' });
+    await result.current.mutateAsync(file);
+    expect(apiClient.post).toHaveBeenCalledWith(
+      '/global-chat/upload?room=rozcesti-1',
+      expect.any(FormData),
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
   });
 
   it('useToggleReaction emitne chat:reaction:toggle se room (4.3a)', () => {

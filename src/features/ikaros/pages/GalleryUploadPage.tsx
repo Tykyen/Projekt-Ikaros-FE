@@ -10,7 +10,7 @@ import {
   useGalleryImage,
 } from '../api/useGallery';
 import { useGalleryCategories } from '../api/useGalleryCategories';
-import { cloudinaryThumb } from '../lib/gallery';
+import { cloudinaryThumb } from '@/shared/lib/cloudinary';
 import s from './GalleryUploadPage.module.css';
 
 const MAX_FILE_MB = 10;

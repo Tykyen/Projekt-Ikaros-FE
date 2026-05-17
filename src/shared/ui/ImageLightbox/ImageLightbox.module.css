@@ -1,0 +1,121 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-8) var(--sp-12);
+  background: var(--lightbox-scrim);
+  backdrop-filter: blur(4px);
+  animation: lightbox-fade var(--transition-base);
+}
+
+@keyframes lightbox-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.close {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  display: flex;
+  padding: var(--sp-2);
+  background: transparent;
+  border: none;
+  color: var(--lightbox-fg-dim);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.close:hover {
+  color: var(--lightbox-fg-strong);
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  padding: var(--sp-3);
+  background: var(--lightbox-ctrl-bg);
+  border: none;
+  border-radius: 50%;
+  color: var(--lightbox-fg-dim);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--transition-base),
+    color var(--transition-fast);
+}
+
+.overlay:hover .nav {
+  opacity: 1;
+}
+
+.nav:hover {
+  color: var(--lightbox-fg-strong);
+}
+
+.navPrev {
+  left: var(--sp-3);
+}
+
+.navNext {
+  right: var(--sp-3);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--lightbox-img-shadow);
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  max-width: 640px;
+  font-size: var(--text-sm);
+  color: var(--lightbox-fg);
+}
+
+.captionText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.counter {
+  flex-shrink: 0;
+  font-family: var(--prose-font-mono, monospace);
+  font-size: var(--text-xs);
+  color: var(--lightbox-fg-dim);
+}
+
+@media (max-width: 768px) {
+  .overlay {
+    padding: var(--sp-4) var(--sp-2);
+  }
+  .img {
+    max-height: 68vh;
+  }
+  /* Mobil — bez hoveru, šipky vždy viditelné. */
+  .nav {
+    opacity: 1;
+    background: var(--lightbox-ctrl-bg-strong);
+  }
+}

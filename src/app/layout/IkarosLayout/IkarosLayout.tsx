@@ -29,7 +29,7 @@ import { useUnreadCount } from '@/features/ikaros/api/useMail';
 import { useMyFavoriteArticles } from '@/features/ikaros/api/useArticles';
 import { useMyFavoriteGallery } from '@/features/ikaros/api/useGallery';
 import { useMyFavoriteDiscussions } from '@/features/ikaros/api/useDiscussions';
-import { cloudinaryThumb } from '@/features/ikaros/lib/gallery';
+import { cloudinaryThumb } from '@/shared/lib/cloudinary';
 import { useLogout } from '@/features/auth/api/useAuth';
 import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import {

@@ -6,7 +6,8 @@ import {
   useApproveGalleryImage,
   useRejectGalleryImage,
 } from '../api/useGallery';
-import { categoryByKey, categoryStyle, cloudinaryThumb, timeAgo } from '../lib/gallery';
+import { categoryByKey, categoryStyle, timeAgo } from '../lib/gallery';
+import { cloudinaryThumb } from '@/shared/lib/cloudinary';
 import { RejectReasonModal } from './RejectReasonModal';
 import type { GalleryReviewListItem } from '@/shared/types';
 import s from './GalleryReviewRenderer.module.css';

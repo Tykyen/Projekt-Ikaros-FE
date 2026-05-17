@@ -18,7 +18,7 @@ import {
   useTogglePinGallery,
 } from '../api/useGallery';
 import { PinToggle } from '../components/PinToggle';
-import { cloudinaryThumb } from '../lib/gallery';
+import { cloudinaryThumb } from '@/shared/lib/cloudinary';
 import s from './FavoritesPage.module.css';
 
 /**

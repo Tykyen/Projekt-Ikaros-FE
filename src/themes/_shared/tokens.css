@@ -92,6 +92,16 @@
      Záměrně theme-independent — smazaný účet má vždy stejný vizuál napříč skiny. */
   --tombstone-band: rgba(0, 0, 0, 0.85);
 
+  /* 4.3b — ImageLightbox (shared fullscreen prohlížeč obrázků).
+     Záměrně theme-independent — tmavé plátno má stejný vizuál napříč skiny. */
+  --lightbox-scrim: rgba(0, 0, 0, 0.86);
+  --lightbox-fg: rgba(255, 255, 255, 0.85);
+  --lightbox-fg-dim: rgba(255, 255, 255, 0.55);
+  --lightbox-fg-strong: #ffffff;
+  --lightbox-ctrl-bg: rgba(255, 255, 255, 0.1);
+  --lightbox-ctrl-bg-strong: rgba(255, 255, 255, 0.16);
+  --lightbox-img-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+
   /* ── 1.4 — Role chip semantic colors ────────────────────────────────────
      Spec design-1.4 §2.3. Theme-aware s fallbackem na legacy --accent /
      --warning. Sub-typy Spravce mají hardcoded distinkční barvy (amber /

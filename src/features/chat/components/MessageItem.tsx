@@ -6,6 +6,7 @@ import { parseEmotes } from '../lib/emotes';
 import { guardChatColor } from '../lib/chatColorGuard';
 import { formatTime } from '../lib/format';
 import { EmojiPickerPopover } from './EmojiPickerPopover';
+import { MessageAttachments } from './MessageAttachments';
 import s from './MessageItem.module.css';
 
 interface MessageItemProps {
@@ -155,6 +156,11 @@ export function MessageItem({
           )}
         </div>
       </div>
+
+      {/* Přílohy zprávy (4.3b). */}
+      {message.attachments && message.attachments.length > 0 && (
+        <MessageAttachments attachments={message.attachments} />
+      )}
 
       {/* Emoji reakce (4.3a). */}
       {reactions.length > 0 && (

@@ -23,8 +23,10 @@ import {
   useSendMessage,
   useDeleteMessage,
   useToggleReaction,
+  useUploadAttachment,
 } from '../api/useGlobalChat';
 import type {
+  ChatAttachment,
   ChatItem,
   ChatMessage,
   MessageDeletedEvent,
@@ -71,6 +73,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   const sendMutation = useSendMessage(room);
   const deleteMutation = useDeleteMessage(room);
   const toggleReaction = useToggleReaction(room);
+  const uploadAttachment = useUploadAttachment(room);
 
   const [typingNames, setTypingNames] = useState<string[]>([]);
   // Zpráva, na kterou se právě odpovídá (4.3a); `null` = běžná zpráva.
@@ -288,22 +291,28 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   }, []);
 
   // ── Akce ──────────────────────────────────────────────────────────────
-  const sendPublic = (text: string) => {
+  const sendPublic = (text: string, attachments: ChatAttachment[]) => {
     sendMutation.mutate({
       content: text,
       color: user?.chatColor,
       replyToId: replyTo?.id,
+      attachments,
     });
     setReplyTo(null);
   };
 
-  const sendWhisper = (toUserId: string, text: string) => {
+  const sendWhisper = (
+    toUserId: string,
+    text: string,
+    attachments: ChatAttachment[],
+  ) => {
     getSocket().emit('ikaros:whisper', {
       toUserId,
       content: text,
       color: user?.chatColor,
       room,
       replyToId: replyTo?.id,
+      attachments,
     });
     setReplyTo(null);
   };
@@ -437,6 +446,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
           replyTo={replyTo}
           onSendPublic={sendPublic}
           onSendWhisper={sendWhisper}
+          onUploadAttachment={(file) => uploadAttachment.mutateAsync(file)}
           onTypingStart={() => emitTyping(true)}
           onTypingStop={() => emitTyping(false)}
           onCancelReply={() => setReplyTo(null)}

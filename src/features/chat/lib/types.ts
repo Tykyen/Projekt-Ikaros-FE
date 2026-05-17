@@ -20,6 +20,20 @@ export interface EnvironmentEvent extends RoomEnvironment {
   room: RoomKey;
 }
 
+/**
+ * Příloha zprávy (krok 4.3b) — soubor nahraný na Cloudinary přes
+ * `POST /global-chat/upload`. Chat povoluje jen obrázky a dokumenty;
+ * BE `ChatAttachment` zná navíc `'video'`, to ale chat nikdy neuloží.
+ */
+export interface ChatAttachment {
+  url: string;
+  publicId: string;
+  type: 'image' | 'document';
+  mimeType: string;
+  filename: string;
+  size: number;
+}
+
 export interface ChatMessage {
   id: string;
   channelId: string;
@@ -42,6 +56,8 @@ export interface ChatMessage {
   replyToId?: string;
   replyToPreview?: string;
   replyToSenderName?: string;
+  /** Přílohy zprávy — obrázky / dokumenty (krok 4.3b). */
+  attachments?: ChatAttachment[];
   createdAt: string;
   updatedAt: string;
   expiresAt?: string;
