@@ -1,0 +1,83 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 14px;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.remove {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.remove:hover {
+  color: var(--danger, var(--accent));
+  border-color: var(--danger, var(--accent));
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.addInput {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  flex: 1;
+  min-width: 0;
+}
+
+.addInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}

@@ -1,0 +1,10 @@
+.note {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--frame-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}

@@ -405,9 +405,37 @@ export function RolesSection() {
         caption="Matice oprávnění světových rolí"
       />
       <p className={s.matrixNote}>
-        Reálná funkčnost rolí Korektor, Čtenář a Žadatel ve světech přijde
-        s fází 5+ (světová vrstva).
+        Matice je orientační — některé sekce mají jemnější práh (viz Nastavení
+        světa níže). Plná funkčnost rolí ve světech se dotváří v průběhu fáze 5+.
       </p>
+
+      <h2>Přístup k nastavení světa</h2>
+      <p>
+        Stránka <code>/svet/&lt;svět&gt;/nastaveni</code> je členěná do tabů a
+        každý tab se zobrazí podle světové role — co uživatel neuvidí, to mu
+        ani server neuloží:
+      </p>
+      <ul>
+        <li>
+          <strong>Základní info, Přístup, Vzhled</strong> — od role{' '}
+          <strong>Korektor</strong> výš. Metadata světa, přístupový režim a
+          motiv (theme).
+        </li>
+        <li>
+          <strong>Členové, AKJ úrovně</strong> — od role{' '}
+          <strong>Pomocný PJ</strong> výš. Správa rolí, skupin a stupňované
+          „prověrky" (AKJ) viditelnosti stránek.
+        </li>
+        <li>
+          <strong>Barvy skupin</strong> (uvnitř tabu Členové) — jen{' '}
+          <strong>PJ</strong>.
+        </li>
+        <li>
+          <strong>Členství</strong> (odchod ze světa) — kdokoli od{' '}
+          <strong>Čtenáře</strong> výš. PJ svět opustit nemůže — musel by ho
+          předat nebo smazat.
+        </li>
+      </ul>
 
       <div className={s.callout}>
         <strong>Tip:</strong> Pokud chceš svůj svět dlouhodobě, založ si v něm{' '}

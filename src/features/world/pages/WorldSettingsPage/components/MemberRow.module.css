@@ -1,0 +1,118 @@
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--frame-border);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cellLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: none;
+}
+
+.select {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 7px 9px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+}
+
+.removeBtn {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--danger, var(--accent));
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  min-height: 36px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.removeBtn:hover:not(:disabled) {
+  border-color: var(--danger, var(--accent));
+  background: color-mix(in srgb, var(--danger, var(--accent)) 10%, transparent);
+}
+
+.removeBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Mobil — řádek se rozpadá na kartu s popisky polí. */
+@media (max-width: 768px) {
+  .row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px 0;
+  }
+
+  .identity {
+    grid-column: 1 / -1;
+  }
+
+  .cellLabel {
+    display: block;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+  }
+
+  .removeBtn {
+    width: 100%;
+  }
+}

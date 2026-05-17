@@ -1,0 +1,14 @@
+.table {
+  display: flex;
+  flex-direction: column;
+}
+
+.table > div:last-child {
+  border-bottom: none;
+}
+
+.empty {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}

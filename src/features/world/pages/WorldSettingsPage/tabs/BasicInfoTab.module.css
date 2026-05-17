@@ -1,0 +1,40 @@
+.heroRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.heroPreview {
+  width: 200px;
+  height: 112px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--frame-border);
+}
+
+.heroEmpty {
+  width: 200px;
+  height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px dashed var(--frame-border);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.heroActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .heroPreview,
+  .heroEmpty {
+    width: 100%;
+    height: 140px;
+  }
+}

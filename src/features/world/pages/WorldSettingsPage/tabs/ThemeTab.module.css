@@ -1,0 +1,90 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.bgRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bgPreview {
+  width: 220px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--frame-border);
+}
+
+.bgEmpty {
+  width: 220px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--frame-border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.bgActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Náhledový blok — stylovaný theme tokeny, ukáže výsledek overrides. */
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid var(--theme-border, var(--frame-border));
+  background: var(--theme-surface, var(--surface-2));
+  box-shadow: 0 4px 16px var(--theme-shadow, transparent);
+}
+
+.previewHeading {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--theme-heading, var(--text-primary));
+}
+
+.previewText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--theme-text, var(--text-primary));
+}
+
+.previewAccent {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--theme-accent-bright, var(--accent-bright, var(--accent)));
+  border: 1px solid var(--theme-accent, var(--accent));
+}
+
+@media (max-width: 768px) {
+  .bgPreview,
+  .bgEmpty {
+    width: 100%;
+    height: 140px;
+  }
+}
