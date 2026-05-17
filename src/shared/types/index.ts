@@ -579,6 +579,51 @@ export interface UpcomingEventDto {
   confirmedCount: number;
 }
 
+/** 5.2 — potvrzení účasti na herní akci. */
+export interface EventConfirmation {
+  userId: string;
+  userName: string;
+}
+
+/**
+ * 5.2 — herní akce světa (`GET /game-events?worldId=`). Plný tvar z BE
+ * modulu `game-events`; dashboard čte zejména `title`, `date`, `confirmedBy`.
+ */
+export interface GameEvent {
+  id: string;
+  worldId: string;
+  title: string;
+  date: string;
+  description: string;
+  imageUrl: string | null;
+  targetGroup: string | null;
+  groupOnly: boolean;
+  confirmable: boolean;
+  confirmedBy: EventConfirmation[];
+  reminderSent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 5.2 — typ oznámení světa (řídí barvu type-proužku v kartě). */
+export type WorldNewsType = 'info' | 'alert' | 'system';
+
+/**
+ * 5.2 — oznámení světa (`GET /world-news?worldId=`). `worldId: null` =
+ * globální oznámení napříč platformou.
+ */
+export interface WorldNewsItem {
+  id: string;
+  worldId: string | null;
+  title: string;
+  content: string;
+  /** ISO 8601 UTC. */
+  date: string;
+  type: WorldNewsType;
+  link?: string;
+  createdBy?: string;
+}
+
 export interface IkarosEventAttendee {
   userId: string;
   userName: string;
