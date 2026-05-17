@@ -15,6 +15,8 @@ export interface CreateWorldInput {
   accessMode: WorldAccessMode;
   system: string;
   dice?: string[];
+  /** 5.0 — motiv světa zvolený ve wizardu. */
+  themeId?: string;
 }
 
 /**

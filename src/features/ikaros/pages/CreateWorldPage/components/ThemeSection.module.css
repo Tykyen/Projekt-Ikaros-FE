@@ -1,0 +1,46 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--sp-2);
+}
+
+/* Dlaždice motivu — thumbnail na pozadí, název v dolním scrimu. */
+.tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 16 / 9;
+  padding: var(--sp-2);
+  border: 2px solid var(--theme-border-soft);
+  border-radius: var(--radius-md);
+  background-color: var(--theme-surface);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base),
+    transform var(--transition-fast);
+}
+
+.tile:hover {
+  border-color: var(--theme-border);
+  transform: translateY(-2px);
+}
+
+.tileActive {
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 0 1px var(--theme-accent), 0 0 14px var(--theme-glow-cyan);
+}
+
+.tileName {
+  position: relative;
+  z-index: 1;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--theme-surface-strong);
+  color: var(--theme-text);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}

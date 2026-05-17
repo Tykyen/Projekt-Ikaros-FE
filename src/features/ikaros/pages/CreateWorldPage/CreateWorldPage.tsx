@@ -12,6 +12,8 @@ import { GenreSection } from './components/GenreSection';
 import { PlayersSection } from './components/PlayersSection';
 import { AccessModeSection } from './components/AccessModeSection';
 import { SystemSection } from './components/SystemSection';
+import { ThemeSection } from './components/ThemeSection';
+import { DEFAULT_THEME } from '@/themes/registry';
 import { GENRE_CUSTOM_LABEL } from './constants/genres';
 import { DEFAULT_SYSTEM, SYSTEM_CUSTOM_ID } from './constants/systems';
 import { useWorldSlug } from './hooks/useWorldSlug';
@@ -39,6 +41,9 @@ export default function CreateWorldPage() {
   const [system, setSystem] = useState(DEFAULT_SYSTEM);
   const [customSystem, setCustomSystem] = useState('');
   const [dice, setDice] = useState<string[]>([]);
+
+  // 5.0 — motiv světa (sdílený základ vzhledu).
+  const [themeId, setThemeId] = useState<string>(DEFAULT_THEME);
 
   // 2.3 D-NEW-slug-check — live availability check
   const slugStatus = useSlugAvailability(slug);
@@ -85,6 +90,7 @@ export default function CreateWorldPage() {
         accessMode,
         system: finalSystem,
         dice: dice.length ? dice : undefined,
+        themeId,
       });
       toast.success(`Svět „${world.name}" byl vytvořen.`);
       navigate(`/svet/${world.slug}`);
@@ -148,6 +154,7 @@ export default function CreateWorldPage() {
           onCustomSystemChange={setCustomSystem}
           onDiceChange={setDice}
         />
+        <ThemeSection themeId={themeId} onThemeChange={setThemeId} />
       </div>
 
       <footer className={s.footer}>
