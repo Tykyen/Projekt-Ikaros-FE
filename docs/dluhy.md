@@ -16,6 +16,15 @@
 
 ## Otevřené
 
+### D-071 — Nápověda: drift světové vrstvy (dashboard 5.2, nastavení 5.3 značené „připravujeme")
+**Soubor:** `src/features/ikaros/pages/HelpPage/sections/PagesSection.tsx` — `SOON_WORLD`.
+**Problém:** „Světový dashboard" (Fáze 5.2) a „Nastavení světa" (5.3) jsou hotové a funkční, ale v nápovědě jsou stále v `SOON_WORLD` se štítkem 🚧 Připravujeme. Krok 5.5 přidal skupinu „Světová vrstva — to, co funguje" (kalendář, novinky), ale dashboard/nastavení nepřesunul (mimo rozsah 5.5).
+**Dopad:** Nízký — uživatel dostává nepravdivou informaci o stavu světových stránek.
+**Řešení:** Přesunout dashboard (5.2) a doplnit nastavení světa (5.3) do `WORLD_PAGES_OK` s reálným `what`; aktualizovat `SOON_WORLD`.
+**Kdy:** Při příštím průchodu nápovědou nebo samostatný úklid světové vrstvy.
+
+---
+
 ### D-070 — `MaxListenersExceededWarning` na socket.io socketech (BE)
 **Soubor:** `Projekt-ikaros/backend` — socket.io gateways (`AppGateway`,
 `GlobalChatGateway`, presence, friendships, …)

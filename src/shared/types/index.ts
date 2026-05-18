@@ -617,6 +617,9 @@ export interface GameEvent {
 /** 5.2 — typ oznámení světa (řídí barvu type-proužku v kartě). */
 export type WorldNewsType = 'info' | 'alert' | 'system';
 
+/** 5.5b — scope archivu novinek světa. */
+export type WorldNewsScope = 'active' | 'archived' | 'all';
+
 /**
  * 5.2 — oznámení světa (`GET /world-news?worldId=`). `worldId: null` =
  * globální oznámení napříč platformou.
@@ -631,6 +634,8 @@ export interface WorldNewsItem {
   type: WorldNewsType;
   link?: string;
   createdBy?: string;
+  /** 5.5b — archivovaná novinka (legacy bez pole = false). */
+  archived?: boolean;
 }
 
 export interface IkarosEventAttendee {

@@ -24,6 +24,7 @@ function buildNav(worldSlug: string) {
       label: 'Informace',
       items: [
         { label: 'Přehled',    to: b },
+        { label: 'Novinky',    to: `${b}/novinky` },
         { label: 'Pravidla',   to: `${b}/pravidla` },
       ],
     },

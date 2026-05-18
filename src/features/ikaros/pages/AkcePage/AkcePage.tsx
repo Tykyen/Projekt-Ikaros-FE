@@ -12,7 +12,7 @@ import {
   dayKey,
   isSameDay,
   WEEKDAY_LABELS,
-} from './calendarGrid';
+} from '@/shared/lib/calendarGrid';
 import s from './AkcePage.module.css';
 
 function formatTime(iso: string): string {

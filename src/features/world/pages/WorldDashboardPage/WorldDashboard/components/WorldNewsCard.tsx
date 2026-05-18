@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Archive, ArchiveRestore, Pencil, Trash2 } from 'lucide-react';
 import type { WorldNewsItem } from '@/shared/types';
 import { relativeEventDate } from '@/features/world/utils/relativeEventDate';
 import s from './WorldNewsCard.module.css';
@@ -10,6 +10,8 @@ interface Props {
   canManage: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  /** 5.5d — archivace/obnova; jen na stránce novinek. Bez něj se akce neukáže. */
+  onArchive?: () => void;
 }
 
 /** Převede HTML obsah na zkrácený plain text (bezpečný render). */
@@ -24,8 +26,15 @@ function plainText(html: string): string {
 /**
  * 5.2 — karta oznámení světa. Barevný type-proužek vlevo; PJ+ vidí akce.
  */
-export function WorldNewsCard({ news, canManage, onEdit, onDelete }: Props) {
+export function WorldNewsCard({
+  news,
+  canManage,
+  onEdit,
+  onDelete,
+  onArchive,
+}: Props) {
   const validDate = !Number.isNaN(new Date(news.date).getTime());
+  const isArchived = !!news.archived;
 
   return (
     <article className={clsx(s.card, s[news.type])}>
@@ -41,6 +50,20 @@ export function WorldNewsCard({ news, canManage, onEdit, onDelete }: Props) {
             >
               <Pencil size={14} />
             </button>
+            {onArchive && (
+              <button
+                type="button"
+                className={s.iconBtn}
+                title={isArchived ? 'Obnovit z archivu' : 'Archivovat oznámení'}
+                onClick={onArchive}
+              >
+                {isArchived ? (
+                  <ArchiveRestore size={14} />
+                ) : (
+                  <Archive size={14} />
+                )}
+              </button>
+            )}
             <button
               type="button"
               className={s.iconBtn}

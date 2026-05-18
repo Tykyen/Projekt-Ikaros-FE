@@ -3,7 +3,11 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider as JotaiProvider, createStore } from 'jotai';
 import type { PropsWithChildren } from 'react';
-import { useUpcomingEventsMine, useToggleRsvp } from './useGameEvents';
+import {
+  useUpcomingEventsMine,
+  useToggleRsvp,
+  useAllWorldGameEvents,
+} from './useGameEvents';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
 
@@ -58,6 +62,27 @@ describe('useUpcomingEventsMine', () => {
     await waitFor(() => {
       expect(result.current.fetchStatus).toBe('idle');
     });
+    expect(api.get).not.toHaveBeenCalled();
+  });
+});
+
+describe('useAllWorldGameEvents', () => {
+  it('volá /game-events bez fromDate (i minulé akce), limit 500', async () => {
+    vi.mocked(api.get).mockResolvedValue([]);
+    const { result } = renderHook(() => useAllWorldGameEvents('w1'), {
+      wrapper: makeWrapper('token123'),
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(api.get).toHaveBeenCalledWith(
+      '/game-events?worldId=w1&limit=500',
+    );
+  });
+
+  it('není enabled bez tokenu', async () => {
+    const { result } = renderHook(() => useAllWorldGameEvents('w1'), {
+      wrapper: makeWrapper(null),
+    });
+    await waitFor(() => expect(result.current.fetchStatus).toBe('idle'));
     expect(api.get).not.toHaveBeenCalled();
   });
 });

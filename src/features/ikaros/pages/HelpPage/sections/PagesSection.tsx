@@ -246,12 +246,12 @@ const SOON_WORLD: PageDoc[] = [
     what: '3D Universe mapa lokací + 2D taktická mapa pro boj (hex grid, tokeny, fog of war).',
   },
   {
-    path: '/svet/:slug/kalendar',
-    name: 'Kalendář & časová osa',
+    path: '/svet/:slug/timeline',
+    name: 'Časová osa & počasí',
     status: 'soon',
     fáze: 'Fáze 9',
     who: 'Členové světa',
-    what: 'Fantasy kalendář, per-postava deníky, historická timeline, počasí, eventy s RSVP.',
+    what: 'Historická timeline světa, fantasy kalendář pro hraní, generátor počasí.',
   },
   {
     path: '/svet/:slug/pavucina',
@@ -260,6 +260,24 @@ const SOON_WORLD: PageDoc[] = [
     fáze: 'Fáze 11',
     who: 'PJ (PomocnyPJ na úrovni čtení)',
     what: 'Pavučina vztahů (2D graf), scénáře, storylines, quick notes, ekonomika světa.',
+  },
+];
+
+// 5.5 — světové stránky, které už reálně fungují.
+const WORLD_PAGES_OK: PageDoc[] = [
+  {
+    path: '/svet/:slug/novinky',
+    name: 'Novinky světa',
+    status: 'ok',
+    who: 'Členové světa (správa PomocnyPJ+)',
+    what: 'Oznámení daného světa. Karta má typ — Informace, Důležité nebo Systémové — barevně odlišený. PomocnyPJ+ a PJ tu novinky spravují: přepínač Aktivní/Archiv, tlačítko Nové oznámení, na kartě upravit / archivovat (vratné) / smazat. Stránka se prokliká i z dlaždice Novinky na přehledu světa.',
+  },
+  {
+    path: '/svet/:slug/kalendar',
+    name: 'Kalendář akcí',
+    status: 'ok',
+    who: 'Členové světa',
+    what: 'Měsíční kalendář herních akcí světa — minulých i budoucích. Listuješ mezi měsíci šipkami, tlačítko Dnes skočí na aktuální měsíc. Klik na akci otevře detail s popisem. Na mobilu se místo mřížky zobrazí seznam Nadcházející / Proběhlé. Zakládání akcí přijde s pozdější fází.',
   },
 ];
 
@@ -316,6 +334,18 @@ export function PagesSection() {
       <div className={s.pageGroup}>
         <h2>Ikaros — připravujeme</h2>
         {SOON_IKAROS.map((doc) => (
+          <PageItem key={doc.path + doc.name} doc={doc} />
+        ))}
+      </div>
+
+      <div className={s.pageGroup}>
+        <h2>Světová vrstva — to, co funguje</h2>
+        <p>
+          Stránky uvnitř konkrétního světa (URL <code>/svet/:slug/...</code>),
+          které jsou už hotové. Každý svět má vlastní motiv, role a obsah
+          nezávisle na Ikaru.
+        </p>
+        {WORLD_PAGES_OK.map((doc) => (
           <PageItem key={doc.path + doc.name} doc={doc} />
         ))}
       </div>

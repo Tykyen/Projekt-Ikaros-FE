@@ -54,6 +54,7 @@ const DungeonBuilderPage = lazy(() => import('@/features/admin/pages/DungeonBuil
 // ── Lazy pages — World ────────────────────────────────────────────────────
 const WorldDashboardPage = lazy(() => import('@/features/world/pages/WorldDashboardPage'));
 const WorldChatPage      = lazy(() => import('@/features/world/pages/WorldChatPage'));
+const WorldNewsPage      = lazy(() => import('@/features/world/pages/WorldNewsPage'));
 const PagesListPage      = lazy(() => import('@/features/world/pages/PagesListPage'));
 const PageViewerPage     = lazy(() => import('@/features/world/pages/PageViewerPage'));
 const PageEditorPage     = lazy(() => import('@/features/world/pages/PageEditorPage'));
@@ -208,6 +209,7 @@ export const router = createBrowserRouter([
       { index: true,                    element: p(WorldDashboardPage) },
       // Spec 2.4 — všechny content sub-routes vyžadují Čtenář+ (non-member redirect).
       { path: 'chat',                   element: memberOnly(p(WorldChatPage)) },
+      { path: 'novinky',                element: memberOnly(p(WorldNewsPage)) },
       { path: 'stranky',                element: memberOnly(p(PagesListPage)) },
       { path: 'nova-stranka',           element: memberOnly(p(PageEditorPage)) },
       { path: 'edit/:slug',             element: memberOnly(p(PageEditorPage)) },

@@ -1,20 +1,30 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import type { World, WorldNewsItem } from '@/shared/types';
+import { MemoryRouter } from 'react-router-dom';
+import type { World, WorldNewsItem, GameEvent } from '@/shared/types';
 import { FavoritePagesColumn } from '../columns/FavoritePagesColumn';
 import { NewsColumn } from '../columns/NewsColumn';
+import { EventsColumn } from '../columns/EventsColumn';
 
-// ── NewsColumn mocky ──────────────────────────────────────────────
+// ── Sdílené mocky ─────────────────────────────────────────────────
 const ctx = vi.hoisted(() => ({ role: 2 as number })); // WorldRole.Hrac
 const newsData = vi.hoisted(() => ({ items: [] as WorldNewsItem[] }));
+const eventsData = vi.hoisted(() => ({ items: [] as GameEvent[] }));
 
 vi.mock('@/features/world/context/WorldContext', () => ({
-  useWorldContext: () => ({ userRole: ctx.role }),
+  useWorldContext: () => ({ userRole: ctx.role, worldSlug: 'svet' }),
 }));
 vi.mock('@/features/world/api/useWorldNews', () => ({
   useWorldNews: () => ({ data: newsData.items, isLoading: false }),
   useDeleteWorldNews: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
+vi.mock('@/features/world/api/useGameEvents', () => ({
+  useWorldGameEvents: () => ({ data: eventsData.items, isLoading: false }),
+}));
+
+function renderWithRouter(ui: React.ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
 
 function makeWorld(over: Partial<World> = {}): World {
   return {
@@ -33,47 +43,112 @@ function makeWorld(over: Partial<World> = {}): World {
   };
 }
 
+function makeNews(id: string): WorldNewsItem {
+  return {
+    id,
+    worldId: 'w1',
+    title: `Novinka ${id}`,
+    content: 'obsah',
+    date: '2026-05-10T12:00:00.000Z',
+    type: 'info',
+  };
+}
+
+function makeEvent(id: string): GameEvent {
+  return {
+    id,
+    worldId: 'w1',
+    title: `Akce ${id}`,
+    date: '2026-06-15T19:00:00.000Z',
+    description: '',
+    imageUrl: null,
+    targetGroup: null,
+    groupOnly: false,
+    confirmable: true,
+    confirmedBy: [],
+    reminderSent: false,
+    createdAt: '',
+    updatedAt: '',
+  };
+}
+
 describe('FavoritePagesColumn', () => {
   it('prázdné favoritePageSlugs → empty stav + poznámka o kroku 7', () => {
-    render(<FavoritePagesColumn world={makeWorld()} />);
+    renderWithRouter(<FavoritePagesColumn world={makeWorld()} />);
     expect(
       screen.getByText(/Zatím žádné oblíbené stránky/),
     ).toBeInTheDocument();
     expect(screen.getByText(/krokem 7/)).toBeInTheDocument();
   });
 
-  it('se slugy → vypíše je', () => {
-    render(
-      <FavoritePagesColumn
-        world={makeWorld({ favoritePageSlugs: ['mesto-x', 'rod-y'] })}
-      />,
+  it('limit 10 — z 12 slugů zobrazí 10', () => {
+    const slugs = Array.from({ length: 12 }, (_, i) => `str-${i}`);
+    renderWithRouter(
+      <FavoritePagesColumn world={makeWorld({ favoritePageSlugs: slugs })} />,
     );
-    expect(screen.getByText('mesto-x')).toBeInTheDocument();
-    expect(screen.getByText('rod-y')).toBeInTheDocument();
+    expect(screen.getByText('str-0')).toBeInTheDocument();
+    expect(screen.getByText('str-9')).toBeInTheDocument();
+    expect(screen.queryByText('str-10')).not.toBeInTheDocument();
+  });
+
+  it('tlačítko „Všechny stránky" odkazuje na /svet/svet/stranky', () => {
+    renderWithRouter(<FavoritePagesColumn world={makeWorld()} />);
+    expect(
+      screen.getByRole('link', { name: /Všechny stránky/ }),
+    ).toHaveAttribute('href', '/svet/svet/stranky');
   });
 });
 
-describe('NewsColumn — gating tvorby', () => {
+describe('NewsColumn', () => {
   it('Hráč nevidí „Nové oznámení"', () => {
-    ctx.role = 2; // Hrac
-    render(<NewsColumn worldId="w1" />);
+    ctx.role = 2;
+    newsData.items = [];
+    renderWithRouter(<NewsColumn worldId="w1" />);
     expect(
       screen.queryByRole('button', { name: /Nové oznámení/ }),
     ).not.toBeInTheDocument();
   });
 
   it('PomocnyPJ vidí „Nové oznámení"', () => {
-    ctx.role = 4; // PomocnyPJ
-    render(<NewsColumn worldId="w1" />);
+    ctx.role = 4;
+    renderWithRouter(<NewsColumn worldId="w1" />);
     expect(
       screen.getByRole('button', { name: /Nové oznámení/ }),
     ).toBeInTheDocument();
   });
 
-  it('prázdná data → „Zatím žádná oznámení"', () => {
+  it('limit 3 — z 5 novinek zobrazí 3', () => {
+    ctx.role = 2;
+    newsData.items = ['1', '2', '3', '4', '5'].map(makeNews);
+    renderWithRouter(<NewsColumn worldId="w1" />);
+    expect(screen.getByText('Novinka 1')).toBeInTheDocument();
+    expect(screen.getByText('Novinka 3')).toBeInTheDocument();
+    expect(screen.queryByText('Novinka 4')).not.toBeInTheDocument();
+  });
+
+  it('tlačítko „Všechny novinky" odkazuje na /svet/svet/novinky', () => {
     ctx.role = 2;
     newsData.items = [];
-    render(<NewsColumn worldId="w1" />);
-    expect(screen.getByText('Zatím žádná oznámení.')).toBeInTheDocument();
+    renderWithRouter(<NewsColumn worldId="w1" />);
+    expect(
+      screen.getByRole('link', { name: /Všechny novinky/ }),
+    ).toHaveAttribute('href', '/svet/svet/novinky');
+  });
+});
+
+describe('EventsColumn', () => {
+  it('prázdná data → empty stav', () => {
+    eventsData.items = [];
+    renderWithRouter(<EventsColumn worldId="w1" />);
+    expect(screen.getByText('Žádné nadcházející akce.')).toBeInTheDocument();
+  });
+
+  it('vykreslí akce a tlačítko Kalendář akcí', () => {
+    eventsData.items = ['1', '2', '3'].map(makeEvent);
+    renderWithRouter(<EventsColumn worldId="w1" />);
+    expect(screen.getByText('Akce 1')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Kalendář akcí/ }),
+    ).toHaveAttribute('href', '/svet/svet/kalendar');
   });
 });

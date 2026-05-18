@@ -41,6 +41,24 @@ export function useWorldGameEvents(worldId: string, limit = 10) {
   });
 }
 
+/**
+ * 5.5c — všechny herní akce světa (minulé i budoucí) pro kalendář.
+ * Bez `fromDate` → BE vrací vše; `limit` 500 (světy mají desítky akcí).
+ */
+export function useAllWorldGameEvents(worldId: string, limit = 500) {
+  const token = useAtomValue(accessTokenAtom);
+  return useQuery({
+    queryKey: ['game-events', 'world-all', worldId, limit],
+    queryFn: () =>
+      api.get<GameEvent[]>(
+        `/game-events?worldId=${worldId}&limit=${limit}`,
+      ),
+    enabled: !!token && !!worldId,
+    staleTime: 60_000,
+    placeholderData: [],
+  });
+}
+
 export function useToggleRsvp() {
   const qc = useQueryClient();
   return useMutation({

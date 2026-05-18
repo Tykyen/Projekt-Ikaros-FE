@@ -36,3 +36,9 @@
   background: var(--surface-2);
   box-shadow: var(--shadow-md);
 }
+
+/* 5.5a — řádek s odkazem „na vše" pod panelem. */
+.footer {
+  display: flex;
+  justify-content: center;
+}

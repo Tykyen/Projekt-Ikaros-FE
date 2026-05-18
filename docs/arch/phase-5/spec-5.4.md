@@ -7,7 +7,7 @@
 **Autor:** PJ + Claude
 **Datum:** 2026-05-18
 **Souvisí:** [spec-2.4.md](../phase-2/spec-2.4.md), [spec-5.2.md](spec-5.2.md)
-**Navazuje:** krok 5.5 — žánrové skiny světa (obrázková pozadí + textury per skin)
+**Navazuje:** krok 5.6 — žánrové skiny světa (obrázková pozadí + textury per skin)
 
 ---
 

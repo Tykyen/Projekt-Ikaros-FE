@@ -7,13 +7,15 @@ interface Props {
   /** Akční prvek vpravo v nadpisové liště (např. „Nové oznámení"). */
   action?: ReactNode;
   children: ReactNode;
+  /** 5.5a — odkaz „na vše" pod panelem (např. „Všechny novinky →"). */
+  footer?: ReactNode;
 }
 
 /**
  * 5.2 — obal sloupce dashboardu. Nadpisová lišta (ikona + titulek) nad
  * panelem — vizuální jazyk starého Matrixu (`sectionLabelStyle`).
  */
-export function DashColumn({ icon, title, action, children }: Props) {
+export function DashColumn({ icon, title, action, children, footer }: Props) {
   return (
     <section className={s.column}>
       <header className={s.label}>
@@ -24,6 +26,7 @@ export function DashColumn({ icon, title, action, children }: Props) {
         {action && <span className={s.action}>{action}</span>}
       </header>
       <div className={s.panel}>{children}</div>
+      {footer && <div className={s.footer}>{footer}</div>}
     </section>
   );
 }

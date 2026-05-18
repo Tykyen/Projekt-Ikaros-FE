@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 import { Newspaper, Plus } from 'lucide-react';
@@ -19,9 +20,9 @@ interface Props {
   worldId: string;
 }
 
-/** 5.2 — prostřední sloupec: oznámení světa + tvorba (PomocnyPJ+). */
+/** 5.2 — prostřední sloupec: oznámení světa + tvorba (PomocnyPJ+), max 3. */
 export function NewsColumn({ worldId }: Props) {
-  const { userRole } = useWorldContext();
+  const { userRole, worldSlug } = useWorldContext();
   const currentUser = useAtomValue(currentUserAtom);
   const { data, isLoading } = useWorldNews(worldId);
   const deleteMut = useDeleteWorldNews(worldId);
@@ -36,7 +37,7 @@ export function NewsColumn({ worldId }: Props) {
     isGlobalAdmin ||
     (userRole ?? WorldRole.Zadatel) >= WorldRole.PomocnyPJ;
 
-  const news = data ?? [];
+  const news = (data ?? []).slice(0, 3);
 
   return (
     <DashColumn
@@ -56,6 +57,11 @@ export function NewsColumn({ worldId }: Props) {
             <Plus size={14} /> Nové oznámení
           </Button>
         ) : undefined
+      }
+      footer={
+        <Link className={s.moreLink} to={`/svet/${worldSlug}/novinky`}>
+          Všechny novinky →
+        </Link>
       }
     >
       {isLoading ? (
