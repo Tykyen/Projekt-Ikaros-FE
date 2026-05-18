@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import type { GameEvent, WorldNewsItem } from '@/shared/types';
 import { WorldEventCard } from '../components/WorldEventCard';
 import { WorldNewsCard } from '../components/WorldNewsCard';
-import { StatBar } from '../components/StatBar';
+import { DashTile } from '../components/DashTile';
 
 function makeEvent(over: Partial<GameEvent> = {}): GameEvent {
   return {
@@ -102,53 +102,36 @@ describe('WorldNewsCard', () => {
   });
 });
 
-describe('StatBar', () => {
-  it('vykreslí všechny statistiky', () => {
-    render(
-      <StatBar
-        stats={[
-          { icon: null, value: 7, label: 'Hráčů' },
-          { icon: null, value: 3, label: 'Akcí' },
-          { icon: null, value: 12, label: 'Novinek' },
-        ]}
-      />,
-    );
-    expect(screen.getByText('7')).toBeInTheDocument();
-    expect(screen.getByText('Hráčů')).toBeInTheDocument();
-    expect(screen.getByText('Novinek')).toBeInTheDocument();
-  });
-
-  it('dlaždice s `to` je odkaz, bez `to` není (5.6)', () => {
+describe('DashTile', () => {
+  it('vykreslí label, value a je odkaz na `to`', () => {
     render(
       <MemoryRouter>
-        <StatBar
-          stats={[
-            { icon: null, value: 7, label: 'Hráčů', to: '/svet/x/hraci' },
-            { icon: null, value: 3, label: 'Akcí' },
-          ]}
+        <DashTile
+          icon={null}
+          label="Hráči"
+          to="/svet/x/hraci"
+          value={7}
         />
       </MemoryRouter>,
     );
-    expect(screen.getByRole('link', { name: /Hráčů/ })).toHaveAttribute(
-      'href',
-      '/svet/x/hraci',
-    );
-    expect(
-      screen.queryByRole('link', { name: /Akcí/ }),
-    ).not.toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /Hráči/ });
+    expect(link).toHaveAttribute('href', '/svet/x/hraci');
+    expect(screen.getByText('7')).toBeInTheDocument();
   });
 
-  it('badge se zobrazí jen když > 0, dlaždice bez value nemá číslo', () => {
-    render(
-      <StatBar
-        stats={[
-          { icon: null, label: 'Chat', badge: 4 },
-          { icon: null, label: 'Ticho', badge: 0 },
-        ]}
-      />,
+  it('badge se zobrazí jen když > 0', () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <DashTile icon={null} label="Chat" to="/svet/x/chat" badge={4} />
+      </MemoryRouter>,
     );
     expect(screen.getByText('4')).toBeInTheDocument();
-    expect(screen.getByText('Chat')).toBeInTheDocument();
+
+    rerender(
+      <MemoryRouter>
+        <DashTile icon={null} label="Chat" to="/svet/x/chat" badge={0} />
+      </MemoryRouter>,
+    );
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
 });

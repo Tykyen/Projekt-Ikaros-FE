@@ -8,8 +8,8 @@ interface Props {
 
 /**
  * Spec 5.4 — kompaktní sbalitelný blok „O světě" pod dashboardem (member view).
- * Popis + tóny + kostky. Bez „Detaily" (Systém/Hráči/PJ) — Hráči jsou ve StatBar,
- * Systém/PJ v nastavení světa. Sbalitelný nativním <details> (bez JS stavu).
+ * Popis + tóny + kostky. Bez „Detaily" (Systém/Hráči/PJ) — Hráči jsou
+ * v dlaždici Hráči, Systém/PJ v nastavení světa. Sbalitelný <details>.
  */
 export function WorldAboutPanel({ world }: Props) {
   const hasDescription = !!world.description?.trim();

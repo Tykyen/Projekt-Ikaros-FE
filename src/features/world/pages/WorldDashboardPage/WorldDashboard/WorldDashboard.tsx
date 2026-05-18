@@ -1,13 +1,11 @@
-import { Users, CalendarDays, Newspaper, MessageSquare } from 'lucide-react';
+import { Users, MessageSquare } from 'lucide-react';
 import type { World } from '@/shared/types';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
-import { useWorldNews } from '@/features/world/api/useWorldNews';
-import { useWorldGameEvents } from '@/features/world/api/useGameEvents';
 import { useWorldChatUnread } from '@/features/world/api/useWorldChat';
 import { EventsColumn } from './columns/EventsColumn';
 import { NewsColumn } from './columns/NewsColumn';
 import { FavoritePagesColumn } from './columns/FavoritePagesColumn';
-import { StatBar } from './components/StatBar';
+import { DashTile } from './components/DashTile';
 import s from './WorldDashboard.module.css';
 
 interface Props {
@@ -15,55 +13,39 @@ interface Props {
 }
 
 /**
- * 5.2 — 3sloupcový dashboard úvodní stránky světa pro členy.
- * Akce / Novinky / Oblíbené stránky + spodní lišta statistik.
- * Dotazy se sdílí přes React Query cache se sloupci (stejné queryKey).
+ * 5.2 + side-task layout — dashboard úvodní stránky světa.
+ * Levý sloupec: dlaždice Hráči + box Akce. Střední: dlaždice Chat + box
+ * Novinky. Pravý: Oblíbené stránky přes plnou výšku.
  */
 export function WorldDashboard({ world }: Props) {
   const members = useWorldMembers(world.id);
-  const news = useWorldNews(world.id);
-  const events = useWorldGameEvents(world.id, 10);
   const chatUnread = useWorldChatUnread(world.id);
 
   return (
-    <div className={s.wrap}>
-      <div className={s.grid}>
-        <div className={s.col} style={{ animationDelay: '0ms' }}>
-          <EventsColumn worldId={world.id} />
-        </div>
-        <div className={s.col} style={{ animationDelay: '80ms' }}>
-          <NewsColumn worldId={world.id} />
-        </div>
-        <div className={s.col} style={{ animationDelay: '160ms' }}>
-          <FavoritePagesColumn world={world} />
-        </div>
-      </div>
-      <StatBar
-        stats={[
-          {
-            icon: <Users size={20} />,
-            value: members.data?.length ?? 0,
-            label: 'Hráčů',
-            to: `/svet/${world.slug}/hraci`,
-          },
-          {
-            icon: <CalendarDays size={20} />,
-            value: events.data?.length ?? 0,
-            label: 'Nadcházejících akcí',
-          },
-          {
-            icon: <Newspaper size={20} />,
-            value: news.data?.length ?? 0,
-            label: 'Novinek',
-          },
-          {
-            icon: <MessageSquare size={20} />,
-            label: 'Chat',
-            to: `/svet/${world.slug}/chat`,
-            badge: chatUnread,
-          },
-        ]}
+    <div className={s.grid}>
+      <DashTile
+        className={`${s.cell} ${s.tileHraci}`}
+        icon={<Users size={20} />}
+        label="Hráči"
+        to={`/svet/${world.slug}/hraci`}
+        value={members.data?.length ?? 0}
       />
+      <DashTile
+        className={`${s.cell} ${s.tileChat}`}
+        icon={<MessageSquare size={20} />}
+        label="Chat"
+        to={`/svet/${world.slug}/chat`}
+        badge={chatUnread}
+      />
+      <div className={`${s.cell} ${s.colAkce}`}>
+        <EventsColumn worldId={world.id} />
+      </div>
+      <div className={`${s.cell} ${s.colNovinky}`}>
+        <NewsColumn worldId={world.id} />
+      </div>
+      <div className={`${s.cell} ${s.colOblibene}`}>
+        <FavoritePagesColumn world={world} />
+      </div>
     </div>
   );
 }
