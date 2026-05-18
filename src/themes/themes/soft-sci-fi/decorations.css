@@ -1,0 +1,52 @@
+/* ── Soft sci-fi — explorativní cyan (krok 5.0g) ──
+   Signature: soustředné radar-pulsy + tenké čisté linky. */
+
+[data-theme='soft-sci-fi'] {
+  background-color: #061520;
+}
+
+[data-theme='soft-sci-fi']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* Signature — pomalý radarový puls z rohu. */
+[data-theme='soft-sci-fi']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-radial-gradient(
+    circle at 85% 12%,
+    transparent 0 38px,
+    rgba(0, 229, 255, 0.06) 38px 40px
+  );
+  animation: soft-radar 12s ease-in-out infinite;
+}
+
+@keyframes soft-radar {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+[data-theme='soft-sci-fi'] [data-frame-panel] {
+  box-shadow:
+    0 4px 24px var(--theme-shadow),
+    inset 0 0 0 1px rgba(0, 229, 255, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='soft-sci-fi']::after {
+    animation: none;
+  }
+}

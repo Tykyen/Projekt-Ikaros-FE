@@ -1,0 +1,41 @@
+/* ── Post-postapo — obnova zeleně (krok 5.0g) ──
+   Signature: zeleň prorůstající z rohů + praskliny. */
+
+[data-theme='post-postapo'] {
+  background-color: #101404;
+}
+
+[data-theme='post-postapo']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* Signature — zeleň prorůstající z dolních rohů. */
+[data-theme='post-postapo']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      ellipse 50% 40% at 0% 100%,
+      rgba(156, 204, 101, 0.12) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 100% 100%,
+      rgba(139, 195, 74, 0.1) 0%,
+      transparent 70%
+    );
+}
+
+[data-theme='post-postapo'] [data-frame-panel] {
+  box-shadow:
+    0 4px 24px var(--theme-shadow),
+    inset 0 -2px 0 rgba(156, 204, 101, 0.14);
+}

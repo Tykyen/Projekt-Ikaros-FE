@@ -19,7 +19,24 @@ export type ThemeId =
   | 'temna-cerven'
   | 'magie'
   | 'mesic'
-  | 'slunce';
+  | 'slunce'
+  // Krok 5.0g — port 16 žánrových skinů ze starého Matrixu.
+  | 'fantasy'
+  | 'heroic'
+  | 'urban-fantasy'
+  | 'soft-sci-fi'
+  | 'biopunk'
+  | 'post-postapo'
+  | 'dystopie'
+  | 'military'
+  | 'psycho'
+  | 'lovecraft'
+  | 'thriller'
+  | 'alt-historie'
+  | 'steampunk'
+  | 'dieselpunk'
+  | 'weird'
+  | 'grimdark';
 
 /**
  * `platform` — jen platforma Ikaros · `world` — jen světy (krok 5.0) ·

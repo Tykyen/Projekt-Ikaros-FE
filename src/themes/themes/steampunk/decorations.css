@@ -1,0 +1,50 @@
+/* ── Steampunk — viktoriánská pára (krok 5.0g) ──
+   Signature: otáčející se ozubené kolo + mosazné nýty v rozích panelů. */
+
+[data-theme='steampunk'] {
+  background-color: #160d04;
+}
+
+[data-theme='steampunk']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* Signature — pomalu rotující ozubené kolo v rohu. */
+[data-theme='steampunk']::after {
+  content: '';
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 90px;
+  height: 90px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background: center / contain no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='%23ffb300'><circle cx='50' cy='50' r='20'/><circle cx='50' cy='50' r='9' fill='%23160d04'/><g><rect x='46' y='4' width='8' height='16'/><rect x='46' y='80' width='8' height='16'/><rect x='4' y='46' width='16' height='8'/><rect x='80' y='46' width='16' height='8'/><rect x='16' y='16' width='8' height='16' transform='rotate(45 20 24)'/><rect x='76' y='68' width='8' height='16' transform='rotate(45 80 76)'/><rect x='76' y='16' width='8' height='16' transform='rotate(-45 80 24)'/><rect x='16' y='68' width='8' height='16' transform='rotate(-45 20 76)'/></g></g></svg>");
+  animation: steampunk-gear 40s linear infinite;
+}
+
+@keyframes steampunk-gear {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mosazné nýty v rozích panelů. */
+[data-theme='steampunk'] [data-frame-panel] {
+  box-shadow:
+    0 4px 20px var(--theme-shadow),
+    inset 0 0 0 1px rgba(255, 179, 0, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='steampunk']::after {
+    animation: none;
+  }
+}

@@ -1,0 +1,54 @@
+/* ── Thriller — napětí bez odpočinku (krok 5.0g) ──
+   Signature: žluto-černé hazard šrafování + tikající puls. */
+
+[data-theme='thriller'] {
+  background-color: #0a0a0a;
+}
+
+[data-theme='thriller']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* Signature — hazard šrafování pod headerem. */
+[data-theme='thriller'] header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 5px;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    #ffeb3b 0 12px,
+    #0a0a0a 12px 24px
+  );
+  opacity: 0.7;
+  animation: thriller-pulse 1.6s steps(2) infinite;
+}
+
+@keyframes thriller-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+[data-theme='thriller'] [data-frame-panel] {
+  border-radius: 3px;
+  box-shadow: 0 2px 18px var(--theme-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='thriller'] header::after {
+    animation: none;
+  }
+}

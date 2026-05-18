@@ -1,0 +1,50 @@
+/* ── Weird fiction — chromatický chaos (krok 5.0g) ──
+   Signature: chromatická aberace nadpisů + nepravidelné rotace. */
+
+[data-theme='weird'] {
+  background-color: #0e0418;
+}
+
+[data-theme='weird']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* Signature — chromatická aberace nadpisů (RGB-split). */
+[data-theme='weird'] h1,
+[data-theme='weird'] h2 {
+  text-shadow:
+    -2px 0 rgba(255, 64, 129, 0.6),
+    2px 0 rgba(0, 200, 220, 0.5);
+  animation: weird-shift 5s ease-in-out infinite;
+}
+
+@keyframes weird-shift {
+  0%,
+  100% {
+    text-shadow:
+      -2px 0 rgba(255, 64, 129, 0.6),
+      2px 0 rgba(0, 200, 220, 0.5);
+  }
+  50% {
+    text-shadow:
+      2px 0 rgba(255, 64, 129, 0.6),
+      -2px 0 rgba(0, 200, 220, 0.5);
+  }
+}
+
+/* Nepravidelně nakloněné panely. */
+[data-theme='weird'] [data-frame-panel] {
+  box-shadow: 0 0 26px var(--theme-glow-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='weird'] h1,
+  [data-theme='weird'] h2 {
+    animation: none;
+  }
+}
