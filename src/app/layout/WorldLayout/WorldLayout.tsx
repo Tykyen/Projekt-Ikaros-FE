@@ -28,7 +28,6 @@ function buildNav(worldSlug: string) {
         { label: 'Pravidla',   to: `${b}/pravidla` },
       ],
     },
-    { label: 'Chat',           to: `${b}/chat` },
     { label: 'Svět',           to: `${b}/stranky` },
     {
       label: 'Nástroje',
@@ -40,15 +39,9 @@ function buildNav(worldSlug: string) {
         { label: 'Zvuková databáze', to: `${b}/zvuky` },
         { label: 'Tvorba podzemí',   to: `/admin/dungeon-builder` },
         { label: 'Storyboard',       to: `${b}/scenare` },
-      ],
-    },
-    {
-      label: 'Společenství',
-      items: [
-        { label: 'Hráči',    to: `${b}/hraci` },
-        { label: 'Obchod',   to: `${b}/obchod` },
-        { label: 'Skupiny',  to: `${b}/skupiny` },
-        { label: 'Pavučina', to: `${b}/pavucina` },
+        { label: 'Obchod',           to: `${b}/obchod` },
+        { label: 'Skupiny',          to: `${b}/skupiny` },
+        { label: 'Pavučina',         to: `${b}/pavucina` },
       ],
     },
     { label: 'Kalendář',       to: `${b}/kalendar` },
