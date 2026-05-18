@@ -4,6 +4,7 @@ import { useWorld } from '@/features/world/api/useWorlds';
 import { useWorldStatus } from '@/features/world/api/useWorldStatus';
 import { WorldDetailHero } from '@/features/world/components/WorldDetailHero';
 import { WorldDetailInfo } from '@/features/world/components/WorldDetailInfo';
+import { WorldAboutPanel } from '@/features/world/components/WorldAboutPanel';
 import { JoinCTA } from '@/features/world/components/JoinCTA';
 import { AccessRequestPending } from '@/features/world/components/AccessRequestPending';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
@@ -16,7 +17,7 @@ import s from './WorldDashboardPage.module.css';
  *
  *  - `non-member`     → hero + info + JoinCTA
  *  - `pending-access` → hero + info + AccessRequestPending (banner + cancel)
- *  - `member`         → hero + info + WorldDashboard (3sloupcový — krok 5.2)
+ *  - `member`         → hero + WorldDashboard (3sloupcový) + WorldAboutPanel (5.4)
  *  - 404 / error      → WorldNotFound (BE 404 pro private bez přístupu)
  */
 export default function WorldDashboardPage() {
@@ -41,8 +42,8 @@ export default function WorldDashboardPage() {
     return (
       <article className={s.page}>
         <WorldDetailHero world={world} />
-        <WorldDetailInfo world={world} />
         <WorldDashboard world={world} />
+        <WorldAboutPanel world={world} />
       </article>
     );
   }

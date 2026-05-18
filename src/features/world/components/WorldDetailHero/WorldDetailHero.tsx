@@ -7,8 +7,9 @@ interface Props {
 }
 
 /**
- * Spec 2.4 — banner detailu světa. Hero image (16:9) nebo placeholder gradient,
- * overlay s názvem + accessMode badge + žánrem. Reuse skin tokenů (žádné hardcoded barvy).
+ * Spec 2.4 + 5.4 — banner detailu světa. Nízký pruh (~220 px) s hero image
+ * nebo placeholder gradientem; název + accessMode badge + žánr jako overlay
+ * v horní části. Reuse skin tokenů (žádné hardcoded barvy).
  */
 export function WorldDetailHero({ world }: Props) {
   const accessLabel = accessModeLabel(world.accessMode);

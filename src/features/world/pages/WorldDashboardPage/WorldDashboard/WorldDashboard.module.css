@@ -1,5 +1,7 @@
 .wrap {
-  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .grid {

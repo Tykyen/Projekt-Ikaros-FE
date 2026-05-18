@@ -1,0 +1,1 @@
+export { WorldAboutPanel } from './WorldAboutPanel';
