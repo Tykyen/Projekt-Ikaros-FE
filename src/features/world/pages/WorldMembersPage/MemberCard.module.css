@@ -1,0 +1,39 @@
+/* Spec 5.6 — karta člena světa. Panel-styl jako DashColumn. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  transition: border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: border-color var(--transition-fast);
+  }
+  .card:hover {
+    transform: none;
+  }
+}

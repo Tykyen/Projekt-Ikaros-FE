@@ -42,6 +42,7 @@ export function WorldDashboard({ world }: Props) {
             icon: <Users size={20} />,
             value: members.data?.length ?? 0,
             label: 'Hráčů',
+            to: `/svet/${world.slug}/hraci`,
           },
           {
             icon: <CalendarDays size={20} />,

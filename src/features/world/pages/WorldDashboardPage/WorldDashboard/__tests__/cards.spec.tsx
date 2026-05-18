@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import type { GameEvent, WorldNewsItem } from '@/shared/types';
 import { WorldEventCard } from '../components/WorldEventCard';
@@ -115,5 +116,25 @@ describe('StatBar', () => {
     expect(screen.getByText('7')).toBeInTheDocument();
     expect(screen.getByText('Hráčů')).toBeInTheDocument();
     expect(screen.getByText('Novinek')).toBeInTheDocument();
+  });
+
+  it('dlaždice s `to` je odkaz, bez `to` není (5.6)', () => {
+    render(
+      <MemoryRouter>
+        <StatBar
+          stats={[
+            { icon: null, value: 7, label: 'Hráčů', to: '/svet/x/hraci' },
+            { icon: null, value: 3, label: 'Akcí' },
+          ]}
+        />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('link', { name: /Hráčů/ })).toHaveAttribute(
+      'href',
+      '/svet/x/hraci',
+    );
+    expect(
+      screen.queryByRole('link', { name: /Akcí/ }),
+    ).not.toBeInTheDocument();
   });
 });

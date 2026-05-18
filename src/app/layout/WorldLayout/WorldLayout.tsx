@@ -45,6 +45,7 @@ function buildNav(worldSlug: string) {
     {
       label: 'Společenství',
       items: [
+        { label: 'Hráči',    to: `${b}/hraci` },
         { label: 'Obchod',   to: `${b}/obchod` },
         { label: 'Skupiny',  to: `${b}/skupiny` },
         { label: 'Pavučina', to: `${b}/pavucina` },

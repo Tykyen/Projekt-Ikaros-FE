@@ -16,6 +16,27 @@
   box-shadow: var(--shadow-md);
 }
 
+/* 5.6 — klikací varianta dlaždice (odkaz na stránku). */
+.statLink {
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.statLink:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statLink {
+    transition: border-color var(--transition-fast);
+  }
+  .statLink:hover {
+    transform: none;
+  }
+}
+
 .icon {
   display: inline-flex;
   color: var(--text-muted);

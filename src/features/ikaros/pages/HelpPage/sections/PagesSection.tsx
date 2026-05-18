@@ -279,6 +279,13 @@ const WORLD_PAGES_OK: PageDoc[] = [
     who: 'Členové světa',
     what: 'Měsíční kalendář herních akcí světa — minulých i budoucích. Listuješ mezi měsíci šipkami, tlačítko Dnes skočí na aktuální měsíc. Klik na akci otevře detail s popisem. Na mobilu se místo mřížky zobrazí seznam Nadcházející / Proběhlé. Zakládání akcí přijde s pozdější fází.',
   },
+  {
+    path: '/svet/:slug/hraci',
+    name: 'Hráči světa',
+    status: 'ok',
+    who: 'Členové světa',
+    what: 'Adresář členů světa. Nahoře vedení — Pán jeskyně a Pomocní PJ —, pod tím skupiny a jejich členové, nakonec členové bez skupiny. Každý člen má kartu s avatarem, jménem a rolí. Otevřeš ji i kliknutím na dlaždici Hráčů na přehledu světa. Odkaz na stránku postavy a deníky přibude s krokem postav.',
+  },
 ];
 
 function StatusPill({ status }: { status: PageStatus }) {

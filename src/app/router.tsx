@@ -55,6 +55,7 @@ const DungeonBuilderPage = lazy(() => import('@/features/admin/pages/DungeonBuil
 const WorldDashboardPage = lazy(() => import('@/features/world/pages/WorldDashboardPage'));
 const WorldChatPage      = lazy(() => import('@/features/world/pages/WorldChatPage'));
 const WorldNewsPage      = lazy(() => import('@/features/world/pages/WorldNewsPage'));
+const WorldMembersPage   = lazy(() => import('@/features/world/pages/WorldMembersPage'));
 const PagesListPage      = lazy(() => import('@/features/world/pages/PagesListPage'));
 const PageViewerPage     = lazy(() => import('@/features/world/pages/PageViewerPage'));
 const PageEditorPage     = lazy(() => import('@/features/world/pages/PageEditorPage'));
@@ -228,6 +229,7 @@ export const router = createBrowserRouter([
       { path: 'prevodnik-men',          element: memberOnly(p(CurrencyPage)) },
       { path: 'nastaveni',              element: memberOnly(p(WorldSettingsPage)) },
       { path: 'skupiny',                element: memberOnly(p(GroupsPage)) },
+      { path: 'hraci',                  element: memberOnly(p(WorldMembersPage)) },
       { path: 'pravidla',               element: memberOnly(p(RulesPage)) },
       {
         path: 'admin/stranky',
