@@ -1,0 +1,56 @@
+/* Spec 2.4 — WorldDashboardPage layout. Reuse skin tokenů. */
+
+/* 5.4 — jednotný vertikální rytmus přes `gap`; komponenty uvnitř už
+   nepřidávají vlastní `margin-top`. */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+.aside {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+
+  .aside {
+    position: static;
+    order: -1; /* CTA nahoře pro lepší UX na úzkých obrazovkách */
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 12px;
+    gap: var(--sp-4);
+  }
+
+  .body {
+    gap: 16px;
+  }
+}
