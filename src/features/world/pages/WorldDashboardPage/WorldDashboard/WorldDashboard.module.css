@@ -1,0 +1,90 @@
+/* Side-task layout — Hráči+Akce | Chat+Novinky | Oblíbené (plná výška). */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'hraci   chat     oblibene'
+    'akce    novinky  oblibene';
+  gap: 20px;
+  align-items: start;
+}
+
+.tileHraci {
+  grid-area: hraci;
+}
+.tileChat {
+  grid-area: chat;
+}
+.colAkce {
+  grid-area: akce;
+}
+.colNovinky {
+  grid-area: novinky;
+}
+.colOblibene {
+  grid-area: oblibene;
+}
+
+.cell {
+  min-width: 0;
+  opacity: 0;
+  animation: fadeUp 0.4s ease forwards;
+}
+.tileHraci {
+  animation-delay: 0ms;
+}
+.tileChat {
+  animation-delay: 60ms;
+}
+.colAkce {
+  animation-delay: 120ms;
+}
+.colNovinky {
+  animation-delay: 180ms;
+}
+.colOblibene {
+  animation-delay: 240ms;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Tablet — 2 sloupce, Oblíbené plnou šířkou pod. */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'hraci   chat'
+      'akce    novinky'
+      'oblibene oblibene';
+  }
+}
+
+/* Mobil — 1 sloupec, páry Hráči→Akce, Chat→Novinky pohromadě. */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'hraci'
+      'akce'
+      'chat'
+      'novinky'
+      'oblibene';
+  }
+}
