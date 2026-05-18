@@ -1,8 +1,9 @@
-import { Users, CalendarDays, Newspaper } from 'lucide-react';
+import { Users, CalendarDays, Newspaper, MessageSquare } from 'lucide-react';
 import type { World } from '@/shared/types';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { useWorldNews } from '@/features/world/api/useWorldNews';
 import { useWorldGameEvents } from '@/features/world/api/useGameEvents';
+import { useWorldChatUnread } from '@/features/world/api/useWorldChat';
 import { EventsColumn } from './columns/EventsColumn';
 import { NewsColumn } from './columns/NewsColumn';
 import { FavoritePagesColumn } from './columns/FavoritePagesColumn';
@@ -22,6 +23,7 @@ export function WorldDashboard({ world }: Props) {
   const members = useWorldMembers(world.id);
   const news = useWorldNews(world.id);
   const events = useWorldGameEvents(world.id, 10);
+  const chatUnread = useWorldChatUnread(world.id);
 
   return (
     <div className={s.wrap}>
@@ -53,6 +55,12 @@ export function WorldDashboard({ world }: Props) {
             icon: <Newspaper size={20} />,
             value: news.data?.length ?? 0,
             label: 'Novinek',
+          },
+          {
+            icon: <MessageSquare size={20} />,
+            label: 'Chat',
+            to: `/svet/${world.slug}/chat`,
+            badge: chatUnread,
           },
         ]}
       />

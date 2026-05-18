@@ -137,4 +137,18 @@ describe('StatBar', () => {
       screen.queryByRole('link', { name: /Akcí/ }),
     ).not.toBeInTheDocument();
   });
+
+  it('badge se zobrazí jen když > 0, dlaždice bez value nemá číslo', () => {
+    render(
+      <StatBar
+        stats={[
+          { icon: null, label: 'Chat', badge: 4 },
+          { icon: null, label: 'Ticho', badge: 0 },
+        ]}
+      />,
+    );
+    expect(screen.getByText('4')).toBeInTheDocument();
+    expect(screen.getByText('Chat')).toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+  });
 });

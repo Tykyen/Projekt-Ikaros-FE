@@ -4,10 +4,13 @@ import s from './StatBar.module.css';
 
 export interface StatItem {
   icon: ReactNode;
-  value: number | string;
+  /** Hlavní velké číslo. Volitelné — dlaždice „Chat" číslo nemá. */
+  value?: number | string;
   label: string;
   /** 5.6 — když je zadáno, dlaždice je klikací odkaz. */
   to?: string;
+  /** Svítící počet (např. nepřečtené zprávy). Zobrazí se jen když > 0. */
+  badge?: number;
 }
 
 interface Props {
@@ -15,8 +18,9 @@ interface Props {
 }
 
 /**
- * 5.2 — spodní lišta dashboardu: 3 statistiky světa (hráčů / akcí / novinek).
+ * 5.2 — spodní lišta dashboardu: statistiky světa (hráčů / akcí / novinek).
  * 5.6 — dlaždice s `to` je klikací odkaz.
+ * 5.x — dlaždice „Chat" — `badge` svítí počtem nepřečtených (fáze 6).
  */
 export function StatBar({ stats }: Props) {
   return (
@@ -24,10 +28,15 @@ export function StatBar({ stats }: Props) {
       {stats.map((st) => {
         const inner = (
           <>
+            {st.badge !== undefined && st.badge > 0 && (
+              <span className={s.badge}>{st.badge}</span>
+            )}
             <span className={s.icon} aria-hidden>
               {st.icon}
             </span>
-            <span className={s.value}>{st.value}</span>
+            {st.value !== undefined && (
+              <span className={s.value}>{st.value}</span>
+            )}
             <span className={s.label}>{st.label}</span>
           </>
         );
