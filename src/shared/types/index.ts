@@ -153,14 +153,23 @@ export type AdminAuditAction =
   | 'ADMIN_PERMISSIONS_CHANGE'
   | 'USERNAME_REQUEST_APPROVED'
   | 'USERNAME_REQUEST_REJECTED'
-  | 'FRIENDSHIP_COOLDOWN_RESET';
+  | 'FRIENDSHIP_COOLDOWN_RESET'
+  // D-067 — audit nad novinkami Ikaros.
+  | 'IKAROS_NEWS_ARCHIVE'
+  | 'IKAROS_NEWS_UNARCHIVE'
+  | 'IKAROS_NEWS_DELETE';
+
+/** D-067 — typ cílové entity audit záznamu. */
+export type AuditTargetType = 'user' | 'ikaros-news';
 
 export interface AdminAuditLogEntry {
   id: string;
   actorId: string;
   actorUsername: string;
   targetId: string;
+  /** Username uživatele nebo název novinky — dle `targetType`. */
   targetUsername: string;
+  targetType: AuditTargetType;
   action: AdminAuditAction;
   before: Record<string, unknown> | null;
   after: Record<string, unknown> | null;

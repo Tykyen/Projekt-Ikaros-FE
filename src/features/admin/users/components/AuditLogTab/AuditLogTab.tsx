@@ -12,6 +12,9 @@ const ACTION_LABELS: Record<AdminAuditAction, string> = {
   USERNAME_REQUEST_APPROVED: 'Schválen username',
   USERNAME_REQUEST_REJECTED: 'Odmítnut username',
   FRIENDSHIP_COOLDOWN_RESET: 'Reset friendship cooldownu',
+  IKAROS_NEWS_ARCHIVE: 'Archivace novinky',
+  IKAROS_NEWS_UNARCHIVE: 'Obnova novinky',
+  IKAROS_NEWS_DELETE: 'Smazání novinky',
 };
 
 const ACTION_CLASS: Record<AdminAuditAction, string> = {
@@ -22,6 +25,9 @@ const ACTION_CLASS: Record<AdminAuditAction, string> = {
   USERNAME_REQUEST_APPROVED: s.approved,
   USERNAME_REQUEST_REJECTED: s.rejected,
   FRIENDSHIP_COOLDOWN_RESET: s.approved,
+  IKAROS_NEWS_ARCHIVE: s.roleChange,
+  IKAROS_NEWS_UNARCHIVE: s.approved,
+  IKAROS_NEWS_DELETE: s.ban,
 };
 
 function formatDateTime(iso: string): string {

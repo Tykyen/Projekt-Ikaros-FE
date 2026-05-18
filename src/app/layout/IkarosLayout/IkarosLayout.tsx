@@ -170,10 +170,13 @@ function SidebarContent({
       isPJ: false,
     }),
   );
-  const { data: unread } = useUnreadCount();
-  const chatCount = isAuthenticated ? unread?.unreadCount ?? 0 : 0;
   // 4.2c §4 — počet přítomných per místnost (REST seed + WS živá aktualizace).
   const roomCounts = useRoomPresenceCounts();
+  // D-069 — nadpis sekce „Chat" ukazuje počet lidí přítomných v chatu
+  // (součet místností), ne nepřečtenou poštu.
+  const chatPresence = roomCounts
+    ? Object.values(roomCounts).reduce((sum, n) => sum + n, 0)
+    : 0;
   // Spec 3.8 — sdílená query s pravým panelem (`['pending-actions','count']`),
   // druhé volání nestojí extra request. Pro anon disabled → žádný badge.
   const { data: pendingCount } = usePendingActionsCount(isAuthenticated);
@@ -215,7 +218,9 @@ function SidebarContent({
       </div>
 
       <div className={s.section} data-section-key="chat">
-        <SectionTitle>{`Chat (${chatCount})`}</SectionTitle>
+        <SectionTitle>
+          {chatPresence > 0 ? `Chat (${chatPresence})` : 'Chat'}
+        </SectionTitle>
         <div className={s.navList}>
           {CHAT_ROOMS.map((room) => {
             if (room.disabled) {

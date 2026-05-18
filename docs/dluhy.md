@@ -34,6 +34,7 @@ disconnect handling.
 ---
 
 ### D-069 — „Chat (N)" v nav ukazuje počet nepřečtené pošty
+**Stav:** ✅ Uzavřeno — nadpis sekce „Chat" ukazuje součet přítomných v chatu (`useRoomPresenceCounts`), ne nepřečtenou poštu; při 0 bez čísla.
 **Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.tsx:168` — `chatCount` + nadpis sekce (~ř. 210)
 **Problém:** Nadpis sekce chatu v levém sidebaru zobrazuje `Chat (N)`, kde `N` je
 `useUnreadCount().unreadCount` — počet **nepřečtené pošty**, ne nic chatového.
@@ -46,6 +47,7 @@ chatovou metriku (krok 4.2c §4 zavádí per-místnost počty lidí — lze seč
 ---
 
 ### D-068 — Header IkarosLayout přetéká na úzkém mobilu (375 px)
+**Stav:** ✅ Uzavřeno — `@media ≤ 768` zmenšuje logo/tlačítka/gap, přidán breakpoint `≤ 380` pro velmi úzké telefony; header se vejde bez horizontálního scrollu.
 **Soubor:** `src/app/layout/IkarosLayout/IkarosLayout.tsx` + `.module.css` — `.header` / `.headerBtn`
 **Problém:** Na šířce 375 px tlačítka v hlavičce (Pošta, Zprávy, avatar, odhlásit) přetékají
 vpravo až na ~450 px → horizontální scroll celého dokumentu. Odhaleno při `mobil-desktop`
@@ -143,7 +145,7 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 
 ### D-067 — Audit log UI pro Ikaros novinky (archive/delete)
 **Soubory:** `backend/src/modules/ikaros-news/schemas/ikaros-news.schema.ts` (data už jsou), FE: nová audit komponenta nebo rozšíření existujícího AuditLogTab.
-**Stav:** Otevřený — data se ukládají (`archivedAtUtc`, `archivedByUserId`), ale UI je nezobrazuje.
+**Stav:** ✅ Uzavřeno — `AdminAuditLog` rozšířen o `targetType` (`user` | `ikaros-news`); `ikaros-news.service` loguje archivaci/obnovu/mazání novinek; FE `AuditLogTab` zobrazuje nové akce. AdminAuditAction +`IKAROS_NEWS_ARCHIVE`/`UNARCHIVE`/`DELETE`.
 **Kontext:** 3.1 archive endpoint nastavuje audit fields. Admin/Superadmin by mohl chtít vidět „kdo a kdy zarchivoval/smazal novinku" pro accountability. Pro hard delete (DELETE) ale chybí audit log — záznam zmizí z DB.
 **Dopad:** Bez audit logu nelze dohledat, kdo provedl změnu. Pro malý team (Tyky + 1-2 admini) zatím nekritické.
 **Řešení:** (1) Hard delete → log do AdminAuditLog před `findByIdAndDelete`. (2) Archive/unarchive také log do AuditLog (i když data jsou na entitě, AuditLog je centrální view). (3) FE: rozšířit AuditLogTab v `/ikaros/uzivatele` o filter na entity typu „IkarosNews".
@@ -187,7 +189,7 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 
 ### D-NEW-world-transfer — Předání vlastnictví světa jinému uživateli (z 5.3)
 **Soubory:** `backend` — `worlds` modul (chybí endpoint `PATCH /worlds/:id/owner`), FE: tab Členství / Členové ve `WorldSettingsPage`.
-**Stav:** Otevřený.
+**Stav:** ✅ Uzavřeno — `PATCH /worlds/:id/owner` (`transferOwnership`): nový vlastník → PJ, původní → PomocnyPJ, `ownerId` převeden. FE: tab Členství „Předat svět" (modal s výběrem člena) pro vlastníka. Po transferu může původní vlastník svět opustit.
 **Kontext:** PJ nemůže opustit svět (tab Členství 5.3e ho blokuje) — musel by ho předat jinému PJ. Promote jiného člena na roli PJ funguje (`PATCH .../members/:id/role`), ale tím vznikne druhý PJ; skutečné vlastnictví (`World.ownerId`) se nepřevede a původní PJ nadále nemůže odejít.
 **Dopad:** PJ je ve světě „uvězněn" — jediná cesta ven je smazat svět.
 **Řešení:** (1) BE endpoint pro transfer `ownerId` (přesun + případná demote původního PJ na PomocnyPJ). (2) FE akce „Předat svět" v tabu Členové (výběr nového vlastníka) nebo Členství. (3) Po transferu povolit původnímu PJ odejít.

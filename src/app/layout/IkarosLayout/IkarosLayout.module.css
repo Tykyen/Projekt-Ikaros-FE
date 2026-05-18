@@ -496,9 +496,19 @@
   .rightPanel { display: none; }
   .hamburger,
   .rightHamburger { display: flex; }
-  .header { padding: 0 var(--sp-3); }
+  /* D-068 — header se musí vejít na úzký mobil bez horizontálního scrollu. */
+  .header { padding: 0 var(--sp-2); gap: var(--sp-2); min-width: 0; }
   .headerBtnLabel { display: none; }
-  .headerBtn { padding: 8px 10px; }
-  .logoImg { width: var(--asset-logo-w-mobile, 200px); }
+  .headerBtn { padding: 8px 9px; }
+  .headerNav { gap: var(--sp-1); }
+  .logo { min-width: 0; overflow: hidden; }
+  .logoImg { width: 150px; }
   .logoFallback { font-size: var(--text-md); }
+}
+
+/* D-068 — velmi úzké telefony (≤ 380 px): logo a tlačítka ještě menší. */
+@media (max-width: 380px) {
+  .header { padding: 0 var(--sp-1); }
+  .headerBtn { padding: 7px 7px; }
+  .logoImg { width: 112px; }
 }
