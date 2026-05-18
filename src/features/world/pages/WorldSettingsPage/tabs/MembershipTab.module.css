@@ -1,0 +1,43 @@
+.note {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+.transferBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.transferLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.transferSelect {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.transferSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
