@@ -205,6 +205,16 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 
 ---
 
+### D-NEW-skin-assets — Dedikovaná pozadí a thumbnaily 16 žánrových skinů (z 5.0g)
+**Soubory:** `public/themes/backgrounds/`, `public/themes/thumbnails/`, `src/themes/themes/<skin>/index.ts`.
+**Stav:** Otevřený.
+**Kontext:** Krok 5.0g portoval 16 žánrových skinů, ale 16 nových `.webp` pozadí/thumbnailů nevzniklo (textový agent grafiku nevyrobí). Skiny proto sdílí pozadí s existujícími motivy (`fantasy` → `magie.webp`, `grimdark` → `temna-cerven.webp` ap.) — věrný port, starý Matrix `$skins-bg` rovněž sdílel.
+**Dopad:** Nízký — skiny jsou plně funkční a barevně odlišené; jen pozadí není unikátní.
+**Řešení:** Dodat 16 dedikovaných pozadí (1920×1080 webp) + 16 thumbnailů; v `index.ts` přepnout `background`/`thumbnail` na nové cesty.
+**Kdy:** Až bude k dispozici grafik / asset pipeline. Volitelné vylepšení.
+
+---
+
 ## Čeká na trigger (přesun z „Otevřené")
 
 ### D-NEW-discussion-pagination — Stránkování seznamu diskuzí a vlákna — TRIGGER: ~stovky diskuzí / dlouhá vlákna
