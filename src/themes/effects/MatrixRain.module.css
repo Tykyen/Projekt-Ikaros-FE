@@ -1,0 +1,8 @@
+/* Krok 5.7a — Matrix rain canvas. Fixed vrstva nad pozadím, pod obsahem. */
+.canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}

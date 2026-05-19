@@ -1,0 +1,125 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  transition: background var(--transition-fast), opacity var(--transition-fast), transform var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; pointer-events: none; }
+
+/* Sizes */
+.sm { padding: var(--sp-2) var(--sp-3); font-size: var(--text-xs); }
+.md { padding: var(--sp-2) var(--sp-4); height: 36px; }
+.lg { padding: var(--sp-3) var(--sp-6); height: 44px; font-size: var(--text-base); }
+
+/* Variants */
+.primary {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+.primary:hover { background: var(--accent-bright); }
+
+.secondary {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.secondary:hover { background: var(--bg-card); }
+
+.ghost {
+  background: transparent;
+  color: var(--text-primary);
+}
+.ghost:hover { background: var(--bg-card-hover); }
+
+.danger {
+  background: var(--danger);
+  color: var(--text-on-danger);
+}
+.danger:hover { opacity: 0.85; }
+
+.loading { pointer-events: none; opacity: 0.7; }
+
+/* ──────────────────────────────────────────────
+   Krok 5.8 — 3D matná vrstva. Aktivní JEN uvnitř světa
+   (`[data-world-shell]` = WorldLayout). Platforma zůstává plochá.
+   Hloubka stínem + hranou, ne leskem.
+   ────────────────────────────────────────────── */
+
+[data-world-shell] .btn {
+  background: linear-gradient(
+    180deg,
+    var(--theme-surface-soft, var(--bg-card-hover)) 0%,
+    var(--theme-surface-strong, var(--bg-card)) 100%
+  );
+  border: 1px solid var(--theme-border-soft, var(--border));
+  color: var(--theme-text, var(--text-primary));
+  box-shadow: var(--depth-raised);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+[data-world-shell] .btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--theme-accent, var(--accent));
+  box-shadow: var(--depth-hover);
+}
+
+/* Zamáčknutí — zruší vržený stín, přidá vnitřní horní stín. */
+[data-world-shell] .btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--depth-pressed);
+}
+
+/* Primary CTA — accent povrch, pořád matný (žádný gloss). */
+[data-world-shell] .primary {
+  background: linear-gradient(
+    180deg,
+    var(--theme-accent-bright, var(--accent-bright)) 0%,
+    var(--theme-accent, var(--accent)) 100%
+  );
+  border-color: var(--theme-accent, var(--accent));
+  color: var(--text-on-accent);
+}
+[data-world-shell] .primary:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    var(--theme-accent-bright, var(--accent-bright)) 0%,
+    var(--theme-accent-bright, var(--accent-bright)) 100%
+  );
+}
+
+/* Danger — danger povrch (hloubku drží box-shadow z .btn). */
+[data-world-shell] .danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--text-on-danger);
+}
+
+/* Ghost zůstává plochý i ve světě — nízko-prioritní akce. */
+[data-world-shell] .ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+[data-world-shell] .ghost:hover:not(:disabled) {
+  transform: none;
+  background: var(--theme-surface-soft, var(--bg-card-hover));
+  box-shadow: none;
+}
+
+[data-world-shell] .btn:disabled {
+  transform: none;
+  box-shadow: var(--depth-disabled);
+}

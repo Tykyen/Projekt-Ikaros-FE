@@ -1,0 +1,67 @@
+/* ── Western — pohraniční městečko (krok 5.7l) ──
+   Aktivuje se přes [data-theme="western"]. Vše scoped.
+   Signature: jemný prach vznášející se v teplém světle + soumrační svit
+   nadpisů. Panely 3D řeší jednotná vrstva (krok 5.8). */
+
+[data-theme='western'] {
+  background-color: #171009;
+}
+
+/* ── Atmosférický overlay nad pozadím ── */
+[data-theme='western']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* ── Signature — prach unášený ve vzduchu ── */
+[data-theme='western']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(230, 216, 188, 0.5) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(230, 216, 188, 0.35) 0%, transparent 55%);
+  background-size:
+    3px 3px,
+    2px 2px;
+  background-position:
+    0 0,
+    40px 20px;
+  animation: western-dust 42s linear infinite;
+}
+
+@keyframes western-dust {
+  from {
+    background-position:
+      0 0,
+      40px 20px;
+  }
+  to {
+    background-position:
+      220px -70px,
+      200px -50px;
+  }
+}
+
+/* ── Teplý soumrační svit nadpisů ── */
+[data-theme='western'] h1,
+[data-theme='western'] h2,
+[data-theme='western'] h3 {
+  text-shadow:
+    0 0 14px var(--theme-glow-gold),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='western']::after {
+    animation: none;
+  }
+}

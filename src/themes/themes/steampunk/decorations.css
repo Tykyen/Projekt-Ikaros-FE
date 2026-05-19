@@ -1,0 +1,62 @@
+/* ── Steampunk — parní metropole (krok 5.7f) ──
+   Aktivuje se přes [data-theme="steampunk"]. Vše scoped.
+   Signature: jemná pára u dolního okraje + mosazný svit nadpisů.
+   Panely 3D řeší jednotná vrstva (krok 5.8). */
+
+[data-theme='steampunk'] {
+  background-color: #16100a;
+}
+
+/* ── Atmosférický overlay nad pozadím ── */
+[data-theme='steampunk']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* ── Signature — stoupající pára u dolního okraje ── */
+[data-theme='steampunk']::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    0deg,
+    rgba(232, 220, 196, 0.12) 0%,
+    transparent 100%
+  );
+  animation: steampunk-steam 14s ease-in-out infinite;
+}
+
+@keyframes steampunk-steam {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Mosazný svit nadpisů ── */
+[data-theme='steampunk'] h1,
+[data-theme='steampunk'] h2,
+[data-theme='steampunk'] h3 {
+  text-shadow:
+    0 0 12px var(--theme-glow-gold),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.03em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='steampunk']::after {
+    animation: none;
+  }
+}

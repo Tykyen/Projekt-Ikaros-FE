@@ -1,0 +1,47 @@
+/* ── Cyberpunk — korporátní megablok (krok 5.7e) ──
+   Aktivuje se přes [data-theme="cyberpunk"]. Vše scoped.
+   Signature: žluto-černý hazard pruh dole + ostrý žlutý svit nadpisů.
+   Panely 3D řeší jednotná vrstva (krok 5.8). */
+
+[data-theme='cyberpunk'] {
+  background-color: #0a0a08;
+}
+
+/* ── Atmosférický overlay nad pozadím ── */
+[data-theme='cyberpunk']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* ── Signature — žluto-černý hazard pruh při dolním okraji ── */
+[data-theme='cyberpunk']::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    45deg,
+    #f0d020 0 14px,
+    #0a0a08 14px 28px
+  );
+}
+
+/* ── Ostrý žlutý svit nadpisů (tvrdý, korporátní) ── */
+[data-theme='cyberpunk'] h1,
+[data-theme='cyberpunk'] h2,
+[data-theme='cyberpunk'] h3 {
+  text-shadow:
+    0 0 8px var(--theme-glow-gold),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

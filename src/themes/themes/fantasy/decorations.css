@@ -1,0 +1,44 @@
+/* ── Fantasy — vznešená elfí síň (krok 5.7b) ──
+   Aktivuje se přes [data-theme="fantasy"]. Vše scoped, žádné externí soubory.
+   Signature: zlatý dvojitý filigránový okraj panelů + smaragdo-zlatý svit
+   nadpisů + zlatá záře klenby shora. */
+
+[data-theme='fantasy'] {
+  background-color: #0b1510;
+}
+
+/* ── Atmosférický overlay nad pozadím ── */
+[data-theme='fantasy']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* ── Signature — zlatá záře klenby shora (světlo elfí síně) ── */
+[data-theme='fantasy']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 90% 55% at 50% 0%,
+    rgba(227, 198, 107, 0.14) 0%,
+    transparent 60%
+  );
+}
+
+/* ── Smaragdo-zlatý svit nadpisů ── */
+[data-theme='fantasy'] h1,
+[data-theme='fantasy'] h2,
+[data-theme='fantasy'] h3 {
+  text-shadow:
+    0 0 12px var(--theme-glow-gold),
+    0 0 26px rgba(111, 211, 168, 0.25);
+  letter-spacing: 0.03em;
+}
+
+/* Panely — 3D hloubku řeší jednotná vrstva (krok 5.8, `--depth-panel`). */

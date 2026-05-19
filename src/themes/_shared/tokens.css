@@ -1,0 +1,218 @@
+/* ── Strukturální tokeny — neměnné napříč tématy ── */
+
+:root {
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Typography sizes */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 42px;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-loose: 1.75;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semi: 600;
+  --weight-bold: 700;
+
+  /* Font families — fallback chain; témata override --font-logo, --font-display */
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, 'Courier New', monospace;
+  --font-body: 'Lora', Georgia, serif;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-logo: 'Cinzel', Georgia, serif;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.08);
+  --shadow-lg: 0 10px 24px rgba(0,0,0,.18), 0 4px 8px rgba(0,0,0,.10);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,.22);
+
+  /* Krok 5.8 — 3D hloubka (matná hmota, scoped na svět). Konstanty napříč skiny. */
+  --depth-raised:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.09),
+    inset 0 -2px 1px 0 rgba(0, 0, 0, 0.30),
+    0 2px 3px -1px rgba(0, 0, 0, 0.40),
+    0 6px 14px -4px rgba(0, 0, 0, 0.45);
+  --depth-hover:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 1px 0 rgba(0, 0, 0, 0.32),
+    0 4px 6px -2px rgba(0, 0, 0, 0.45),
+    0 12px 22px -6px rgba(0, 0, 0, 0.50);
+  --depth-pressed:
+    inset 0 2px 5px 0 rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.04),
+    0 1px 2px 0 rgba(0, 0, 0, 0.30);
+  --depth-disabled:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+    0 1px 2px 0 rgba(0, 0, 0, 0.30);
+  /* Panel — mírné vyvýšení (úroveň 1; karty a tlačítka uvnitř vystupují výš). */
+  --depth-panel:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+    0 2px 8px -2px rgba(0, 0, 0, 0.35),
+    0 10px 24px -10px rgba(0, 0, 0, 0.45);
+  /* Karta / dlaždice — výraznější (úroveň 2). */
+  --depth-card:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),
+    0 3px 6px -2px rgba(0, 0, 0, 0.40),
+    0 12px 28px -10px rgba(0, 0, 0, 0.50);
+  --depth-card-hover:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    0 6px 12px -3px rgba(0, 0, 0, 0.45),
+    0 20px 38px -12px rgba(0, 0, 0, 0.55);
+  /* Vstupní pole — zapuštěné (negativní hloubka, „dolík"). */
+  --depth-inset:
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.35),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
+
+  /* Transitions */
+  --transition-fast: 100ms ease;
+  --transition-base: 180ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Layout */
+  --header-h: 56px;
+  --sidebar-w: 240px;
+  --sidebar-w-collapsed: 56px;
+  --content-max: 1200px;
+
+  /* Glows / atmosféry — fallback pro layout komponenty */
+  --success-glow: rgba(62, 207, 142, 0.6);
+
+  /* Scrim / overlay — semi-transparent backdrop nad obsahem (drag&drop, modaly) */
+  --scrim: rgb(0 0 0 / 0.55);
+
+  /* Z-index */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* ── Legacy color aliasy — mapování starších tokenů (--surface-1, --text-strong…)
+     používaných v Profile sekcích / EditCard / AvatarUploader na canonické theme tokeny.
+     Bez nich se transparentní karty kreslily přes pozadí skinu a text byl nečitelný.
+     CSS variables se rezolvují dynamicky — alias čte aktuální --theme-* daného skinu. */
+  --surface-1:    var(--theme-surface,        var(--bg-card,         rgba(0, 0, 0, 0.72)));
+  --surface-2:    var(--theme-surface-soft,   var(--bg-card-hover,   rgba(0, 0, 0, 0.45)));
+  --surface-3:    var(--theme-surface-strong, var(--bg-secondary,    rgba(0, 0, 0, 0.85)));
+  --frame-border: var(--theme-border-soft,    var(--border,          rgba(255, 255, 255, 0.18)));
+  --text:         var(--theme-text,           var(--text-primary,    #e8e8e8));
+  --text-strong:  var(--theme-heading,        var(--theme-text,      var(--text-primary, #ffffff)));
+
+  /* 1.3c — tombstone overlay (UserAvatar deleted prop).
+     Záměrně theme-independent — smazaný účet má vždy stejný vizuál napříč skiny. */
+  --tombstone-band: rgba(0, 0, 0, 0.85);
+
+  /* 4.3b — ImageLightbox (shared fullscreen prohlížeč obrázků).
+     Záměrně theme-independent — tmavé plátno má stejný vizuál napříč skiny. */
+  --lightbox-scrim: rgba(0, 0, 0, 0.86);
+  --lightbox-fg: rgba(255, 255, 255, 0.85);
+  --lightbox-fg-dim: rgba(255, 255, 255, 0.55);
+  --lightbox-fg-strong: #ffffff;
+  --lightbox-ctrl-bg: rgba(255, 255, 255, 0.1);
+  --lightbox-ctrl-bg-strong: rgba(255, 255, 255, 0.16);
+  --lightbox-img-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+
+  /* ── 1.4 — Role chip semantic colors ────────────────────────────────────
+     Spec design-1.4 §2.3. Theme-aware s fallbackem na legacy --accent /
+     --warning. Sub-typy Spravce mají hardcoded distinkční barvy (amber /
+     magenta / teal), aby kategorie byly rozpoznatelné napříč skiny. Témata
+     mohou v `index.ts` override pokud chtějí výraznější styl. */
+
+  /* Superadmin — nejvyšší autorita, gold/bright */
+  --role-superadmin-bg:    var(--theme-accent-bright, var(--warning));
+  --role-superadmin-fg:    var(--text-on-accent, #050508);
+  --role-superadmin-ring:  var(--theme-glow-gold, var(--success-glow));
+
+  /* Admin — platform autorita, brand accent */
+  --role-admin-bg:         var(--theme-accent, var(--accent));
+  --role-admin-fg:         var(--text-on-accent, #050508);
+  --role-admin-ring:       var(--theme-border, var(--accent-soft));
+
+  /* Správce článků — warm amber (pero/inkoust/manuskript) */
+  --role-spravce-clanku-bg:    #d97706;
+  --role-spravce-clanku-fg:    #ffffff;
+  --role-spravce-clanku-ring:  rgba(217, 119, 6, 0.35);
+
+  /* Správce galerie — magenta/purple (vizuální/obraz) */
+  --role-spravce-galerie-bg:   #a855f7;
+  --role-spravce-galerie-fg:   #ffffff;
+  --role-spravce-galerie-ring: rgba(168, 85, 247, 0.35);
+
+  /* Správce diskuzí — teal (konverzace/proud) */
+  --role-spravce-diskuzi-bg:   #14b8a6;
+  --role-spravce-diskuzi-fg:   #ffffff;
+  --role-spravce-diskuzi-ring: rgba(20, 184, 166, 0.35);
+
+  /* ── 1.4 — UserCard cornerstones (default fallback; témata mohou override) */
+  --usercard-corner-size:    8px;
+  --usercard-corner-color:   var(--theme-border, var(--accent-soft));
+
+  /* ── 1.4 — Tab nav (Přátelé / Uživatelé / Zpracovat / Audit) */
+  --tab-underline-h:         2px;
+  --tab-underline-color:     var(--theme-accent, var(--accent));
+  --tab-badge-bg:            var(--danger);
+  --tab-badge-fg:            var(--text-on-danger, #fff);
+
+  /* ── 1.4 — Status pásek pro pending-deletion / deleted v UserCard (admin includeDeleted view) */
+  --status-band-pending:     rgba(245, 166, 35, 0.85);
+  --status-band-deleted:     var(--tombstone-band);
+  /* Text uvnitř status pásku — theme-independent (musí být čitelný na pending amber i black deleted) */
+  --status-band-fg:          rgba(255, 255, 255, 1);
+
+  /* ── 1.5 — Presence (online indikátor) */
+  --presence-online:         #22c55e;
+  /* D-049 — idle stav (amber-500) */
+  --presence-idle:           #eab308;
+  --presence-offline:        transparent;
+  --presence-ring:           var(--theme-bg, #ffffff);
+
+  /* ── RoleStar — barvy hvězdičky pro globální role (cleanup hardcoded barev) */
+  --role-star-superadmin:    #3ecf8e;
+  --role-star-admin:         #f5a623;
+  --role-star-spravce-diskuzi: #f0c040;
+  --role-star-spravce-clanku:  #c04040;
+  --role-star-spravce-galerie: #3b82f6;
+
+  /* ── 3.6a — World role barvy (analogicky k --role-star-* pro globální role).
+     Theme-independent base; jednotlivé skiny mohou override v `themes/<id>/index.ts`. */
+  --role-world-pj:           #c050a0;
+  --role-world-pj-asst:      #9333ea;
+  --role-world-corrector:    #06b6d4;
+  --role-world-player:       #60a5fa;
+  --role-world-reader:       #94a3b8;
+  --role-world-applicant:    #f59e0b;
+
+  /* ── 3.1b — Novinky: barva nadpisu dle typu. Theme-independent base;
+     skiny mohou override v `themes/<id>/index.ts`. Hodnoty zvolené pro
+     dostatečný kontrast na světlém i tmavém pozadí. */
+  --news-info:               #8b5cf6;  /* Informace — fialová */
+  --news-warning:            #dc2626;  /* Upozornění — červená */
+  --news-system:             #16a34a;  /* Systémová — zelená */
+}

@@ -1,0 +1,27 @@
+/* ── Krok 5.8 — jednotná 3D vrstva UI světa ──
+   Scoped na [data-world-shell] (WorldLayout). Globální platforma Ikaros se
+   nemění. Hloubka stínem (tokeny --depth-*), povrch a barvy z tokenů skinu.
+
+   Elevace přes atribut `data-elev`:
+     panel = úroveň 1 (mírné vyvýšení — sekce, sloupce)
+     card  = úroveň 2 (výrazné — karty, dlaždice; hover je zvedne) */
+
+/* ── Panely a sekce (úroveň 1) ── */
+[data-world-shell] [data-frame-panel],
+[data-world-shell] [data-elev='panel'] {
+  box-shadow: var(--depth-panel);
+}
+
+/* ── Karty a dlaždice (úroveň 2) ── */
+[data-world-shell] [data-elev='card'] {
+  box-shadow: var(--depth-card);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 160ms ease;
+}
+
+[data-world-shell] [data-elev='card']:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--depth-card-hover);
+}
