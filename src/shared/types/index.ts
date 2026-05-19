@@ -380,6 +380,8 @@ export interface WorldMembership {
     id: string;
     username: string;
     avatarUrl?: string;
+    /** 6.1d — poslední aktivita; `undefined` u „neviditelného" módu. */
+    lastSeenAt?: string;
   };
 }
 

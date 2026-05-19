@@ -22,6 +22,12 @@ interface MessageListProps {
   onReply: (message: ChatMessage) => void;
   /** Toggle emoji reakce (4.3a). */
   onToggleReaction: (messageId: string, emoji: string) => void;
+  /** Text prázdného stavu. Default Hospoda („Hospoda je tichá…"). */
+  emptyText?: string;
+  /** 6.1 — skryje reply tlačítka (reply až 6.2). Default true. */
+  allowReply?: boolean;
+  /** 6.1 — skryje přidávání reakcí (reakce až 6.2). Default true. */
+  allowReactions?: boolean;
 }
 
 const isWhisper = (m: ChatMessage) => !!m.visibleTo && m.visibleTo.length > 0;
@@ -37,6 +43,9 @@ export function MessageList({
   onDelete,
   onReply,
   onToggleReaction,
+  emptyText = 'Hospoda je tichá… zatím. 🍺',
+  allowReply = true,
+  allowReactions = true,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -83,7 +92,7 @@ export function MessageList({
   }, [items]);
 
   if (items.length === 0) {
-    return <div className={s.empty}>Hospoda je tichá… zatím. 🍺</div>;
+    return <div className={s.empty}>{emptyText}</div>;
   }
 
   return (
@@ -119,6 +128,8 @@ export function MessageList({
             onJumpToMessage={handleJump}
             onToggleReaction={onToggleReaction}
             registerRef={registerRef}
+            allowReply={allowReply}
+            allowReactions={allowReactions}
           />
         );
       })}

@@ -1,0 +1,93 @@
+.room {
+  position: relative;
+  height: calc(100dvh - var(--header-h, 88px) - var(--sp-5));
+  min-height: 440px;
+  display: grid;
+  grid-template-columns: 272px 1fr;
+  overflow: hidden;
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-md);
+  background: var(--theme-surface, var(--bg-card));
+}
+
+/* 3-panel layout — jen pro PJ/Pomocný PJ (presence panel). */
+.withMembers {
+  grid-template-columns: 272px 1fr 240px;
+}
+
+.sidebarSlot,
+.viewSlot,
+.membersSlot {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+.sidebarSlot > *,
+.viewSlot > *,
+.membersSlot > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.state {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100dvh - var(--header-h, 88px) - var(--sp-5));
+  min-height: 440px;
+  padding: var(--sp-4);
+  text-align: center;
+  color: var(--theme-text-muted, var(--text-muted));
+  font-family: var(--font-body);
+}
+
+.scrim {
+  display: none;
+}
+
+/* ── Mobil / tablet — sidebar a presence panel jako šuplíky ── */
+@media (max-width: 1024px) {
+  .room,
+  .withMembers {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebarSlot {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(280px, 82vw);
+    z-index: var(--z-dropdown, 50);
+    transform: translateX(-100%);
+    transition: transform var(--transition-fast);
+  }
+  .sidebarOpen .sidebarSlot {
+    transform: translateX(0);
+  }
+
+  .membersSlot {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: min(260px, 78vw);
+    z-index: var(--z-dropdown, 50);
+    transform: translateX(100%);
+    transition: transform var(--transition-fast);
+  }
+  .membersOpen .membersSlot {
+    transform: translateX(0);
+  }
+
+  .scrim {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: calc(var(--z-dropdown, 50) - 1);
+    border: none;
+    background: color-mix(in srgb, black 55%, transparent);
+    cursor: pointer;
+  }
+}

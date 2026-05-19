@@ -31,6 +31,10 @@ interface MessageItemProps {
   onToggleReaction: (messageId: string, emoji: string) => void;
   /** Registrace root elementu do mapy `MessageList` (pro scroll-to). */
   registerRef: (id: string, el: HTMLDivElement | null) => void;
+  /** 6.1 — skryje tlačítko Odpovědět (world chat shell; reply až 6.2). Default true. */
+  allowReply?: boolean;
+  /** 6.1 — skryje přidávání emoji reakcí (reakce až 6.2). Default true. */
+  allowReactions?: boolean;
 }
 
 /** Jedna položka výpisu chatu — veřejná zpráva / whisper / smazaná zpráva. */
@@ -47,6 +51,8 @@ export function MessageItem({
   onJumpToMessage,
   onToggleReaction,
   registerRef,
+  allowReply = true,
+  allowReactions = true,
 }: MessageItemProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const reactionBtnRef = useRef<HTMLButtonElement>(null);
@@ -117,26 +123,30 @@ export function MessageItem({
         {grouped && time && <time className={s.timeHover}>{time}</time>}
 
         <div className={s.actions}>
-          <button
-            type="button"
-            className={s.action}
-            onClick={() => onReply(message)}
-            title="Odpovědět"
-            aria-label="Odpovědět"
-          >
-            <Reply size={14} />
-          </button>
-          <button
-            ref={reactionBtnRef}
-            type="button"
-            className={s.action}
-            onClick={() => setPickerOpen((v) => !v)}
-            title="Přidat reakci"
-            aria-label="Přidat reakci"
-          >
-            <SmilePlus size={14} />
-          </button>
-          {pickerOpen && (
+          {allowReply && (
+            <button
+              type="button"
+              className={s.action}
+              onClick={() => onReply(message)}
+              title="Odpovědět"
+              aria-label="Odpovědět"
+            >
+              <Reply size={14} />
+            </button>
+          )}
+          {allowReactions && (
+            <button
+              ref={reactionBtnRef}
+              type="button"
+              className={s.action}
+              onClick={() => setPickerOpen((v) => !v)}
+              title="Přidat reakci"
+              aria-label="Přidat reakci"
+            >
+              <SmilePlus size={14} />
+            </button>
+          )}
+          {allowReactions && pickerOpen && (
             <EmojiPickerPopover
               anchorRef={reactionBtnRef}
               onSelect={(emoji) => onToggleReaction(message.id, emoji)}

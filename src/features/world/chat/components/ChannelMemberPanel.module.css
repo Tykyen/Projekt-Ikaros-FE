@@ -1,0 +1,132 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--theme-border-soft, var(--border));
+  background: var(--theme-surface, var(--bg-card));
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--theme-border-soft, var(--border));
+}
+
+.headLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.close {
+  display: none;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-2) 0;
+}
+
+.section {
+  margin-bottom: var(--sp-1);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  width: 100%;
+  padding: var(--sp-1) var(--sp-3);
+  border: none;
+  background: transparent;
+  color: var(--theme-heading, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.chevron {
+  transition: transform var(--transition-fast);
+}
+.chevronUp {
+  transform: rotate(-90deg);
+}
+
+.count {
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--text-sm);
+  color: var(--theme-text, var(--text-primary));
+}
+
+.offline .name {
+  opacity: 0.7;
+}
+
+/* „Naposledy viděn" — časový štítek vlevo, barva dle stáří (krok 6.1d). */
+.seen {
+  flex-shrink: 0;
+  width: 44px;
+  text-align: right;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--theme-text-dim, var(--text-muted));
+}
+.seen_online {
+  color: var(--success);
+  font-weight: var(--weight-semi, 600);
+}
+.seen_recent {
+  color: var(--success);
+}
+.seen_week {
+  color: var(--warning);
+}
+.seen_old {
+  color: var(--danger);
+}
+.seen_unknown {
+  color: var(--theme-text-dim, var(--text-muted));
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  padding: var(--sp-3);
+  font-size: var(--text-sm);
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+@media (max-width: 1024px) {
+  .close {
+    display: inline-flex;
+  }
+}

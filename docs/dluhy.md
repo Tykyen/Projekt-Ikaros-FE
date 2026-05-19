@@ -224,7 +224,17 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 **Řešení:** Editor vzhledu má při „žádné pozadí" posílat `null` (nebo pole vynechat). Existující `''` v DB čistí BE migrace `migrate-world-theme-5.7` (`$unset`).
 **Kdy:** Při příští práci na theme editoru (5.3f) nebo žánrových skinech.
 
+### D-NEW-channel-group-sync — Průběžná synchronizace členství družiny ↔ konverzace
+**Soubory:** BE `chat` modul (`syncWorldGroupChannels`, `ChatChannel.allowedMemberIds`).
+**Stav:** Otevřený — částečně vyřešeno krokem 6.1g.
+**Hotovo (6.1g):** Kanál + `members` konverzace se za družinu **auto-zakládá** (`world.settings.updated` → nové `customGroups`; backfill při startu). `ChatGroup.linkedWorldGroup` drží vazbu.
+**Zbývá:** Při změně **členství** družiny (member přidán/odebrán z `customGroups` skupiny, změna role) se `allowedMemberIds` auto-konverzace neaktualizuje. PJ to musí dorovnat ručně. Družina odebraná z `customGroups` nechá kanál osiřet (mazání je ruční — záměr, neničíme historii).
+**Dopad:** Nízký — PJ dorovná ručně přes správu konverzace.
+**Řešení:** `@OnEvent('world.membership.changed')` → najít konverzaci dle `linkedWorldGroup` → přepočítat `allowedMemberIds`.
+**Kdy:** Až bude koncept družin víc využíván (fáze 8+) nebo na žádost PJ.
+
 > **Pozn.:** dluh *D-NEW-skin-assets* (sdílená pozadí 16 portů z 5.0g) uzavřen 2026-05-18 — krok 5.7a oněch 16 world-only skinů smazal, dluh bezpředmětný.
+> **Pozn.:** dluh *D-NEW-chat-last-seen* uzavřen 2026-05-19 — krok 6.1d doplnil časové štítky „naposledy viděn" do presence panelu (`User.lastSeenAt` už existoval + udržuje ho jwt guard; stačilo vystavit přes `publicProfile`, respektuje `hiddenPresence`).
 
 ---
 
@@ -236,6 +246,15 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 **Trigger:** počet diskuzí přeroste ~stovky, nebo vlákno přesáhne ~50 příspěvků, nebo výkonnostní audit.
 **Co bude potřeba:** Server-side paging listu (skip/limit + total) — pozor, rozbije client-side search/sort, nutné přesunout i ně na server. „Načíst starší" ve vlákně (BE `getPosts` skip/limit už existuje). **Řešit společně s `D-NEW-search-be`** — stejný pattern, stejný trigger; články dnes mají identický client-side přístup, sjednotit.
 **Pozn.:** Překlasifikováno 2026-05-15 z „Otevřené" — pro aktuální objem dat je client-side správně, předčasná optimalizace by zbytečně zkomplikovala UX (paged search).
+
+---
+
+### D-NEW-chat-presence-scale — In-memory presence světového chatu × více instancí BE — TRIGGER: horizontální škálování BE
+**Soubory:** BE `chat/chat-presence.service.ts`.
+**Co dělá aktuální stav:** `ChatPresenceService` drží presence konverzací v `Map` v paměti procesu. Pro single-instance BE **správné rozhodnutí** — nulová latence, žádná infra závislost.
+**Trigger:** nasazení víc instancí BE (load balancer / horizontální scaling) — presence by se mezi instancemi neviděla.
+**Co bude potřeba:** Sdílený presence store (Redis adapter pro Socket.IO + presence v Redis), nebo sticky sessions.
+**Pozn.:** Zavedeno krokem 6.1d (spec-6.1.md §8).
 
 ---
 

@@ -1,19 +1,21 @@
-/**
- * Chat světa — hooky. Plný chat světa je fáze 6; tento soubor zatím
- * obsahuje jen švový bod pro dashboard dlaždici „Chat".
- */
+import { useMemo } from 'react';
+import {
+  useUnread,
+  useUnreadSync,
+} from '@/features/world/chat/api/useWorldChat';
 
 /**
- * Počet nepřečtených zpráv chatu světa.
+ * Chat světa — švový hook pro dashboard dlaždici „Chat".
  *
- * **Placeholder (fáze 5):** chat světa ještě neexistuje (`WorldChatPage`
- * je stub), proto vrací vždy `0`.
- *
- * **Fáze 6:** vyměnit tělo za reálný unread tracking — `useQuery` nad BE
- * endpointem + invalidace na socket eventu nové zprávy. Signatura
- * `(worldId) => number` zůstává, dashboard dlaždice se nemění.
+ * Počet nepřečtených zpráv chatu světa — souhrn napříč konverzacemi.
+ * Krok 6.1e — napojeno na reálný BE unread tracking
+ * (`GET /worlds/:id/chat/unread` + živá synchronizace přes WS `chat:unread`).
  */
 export function useWorldChatUnread(worldId: string): number {
-  void worldId;
-  return 0;
+  const unread = useUnread(worldId);
+  useUnreadSync(worldId);
+  return useMemo(
+    () => (unread.data ?? []).reduce((sum, u) => sum + u.count, 0),
+    [unread.data],
+  );
 }

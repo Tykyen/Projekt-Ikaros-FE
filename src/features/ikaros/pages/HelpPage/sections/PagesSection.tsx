@@ -214,14 +214,6 @@ const SOON_WORLD: PageDoc[] = [
     what: 'Novinky světa, poslední stránky, blížící se eventy.',
   },
   {
-    path: '/svet/:slug/chat',
-    name: 'Světový chat',
-    status: 'soon',
-    fáze: 'Fáze 6',
-    who: 'Členové světa',
-    what: 'Chat uvnitř světa, kanály, kostky (dice), whispers, reakce.',
-  },
-  {
     path: '/svet/:slug/stranky',
     name: 'Wiki stránky',
     status: 'soon',
@@ -285,6 +277,13 @@ const WORLD_PAGES_OK: PageDoc[] = [
     status: 'ok',
     who: 'Členové světa',
     what: 'Adresář členů světa. Nahoře vedení — Pán jeskyně a Pomocní PJ —, pod tím skupiny a jejich členové, nakonec členové bez skupiny. Každý člen má kartu s avatarem, jménem a rolí. Otevřeš ji i kliknutím na dlaždici Hráčů na přehledu světa. Odkaz na stránku postavy a deníky přibude s krokem postav.',
+  },
+  {
+    path: '/svet/:slug/chat',
+    name: 'Světový chat',
+    status: 'ok',
+    who: 'Členové světa (konverzace podle přístupu)',
+    what: 'Chat uvnitř světa — 3-panelový: vlevo kanály a v nich konverzace, uprostřed zprávy, vpravo (jen pro PJ) seznam přítomných podle role. Konverzace přepínáš, oblíbené si připneš nahoru. U každé konverzace je odznak nepřečtených a náhled poslední zprávy. Globální konverzace jsou pro hráče a výš; PJ a Pomocný PJ zakládají kanály a konverzace (veřejné, podle rolí, nebo soukromé pro vybrané členy — včetně hromadného 1:1 se všemi hráči). Kostky, šepoty, reakce, přílohy a vlastní emotikony přibydou postupně.',
   },
 ];
 

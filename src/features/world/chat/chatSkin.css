@@ -1,0 +1,20 @@
+/**
+ * Skinovací proměnné světového chatu (krok 6.1, design-6.1.md §7).
+ *
+ * `--chat-group-1…6` — harmonická paleta barev kanálů (ne náhodná duha).
+ * Mid-tóny čitelné na tmavých i světlých skinech. Per-skin `decorations.css`
+ * je smí přebarvit k žánru (scoped na `[data-theme]`).
+ *
+ * `--chat-panel-texture` — opt-in textura panelů; default `none`. Rastrové
+ * textury dodá autor (skin-asset-prompts.md) → zapojí se v decorations.css.
+ */
+:root {
+  --chat-group-1: #c9883e;
+  --chat-group-2: #5fa8c4;
+  --chat-group-3: #a86fb0;
+  --chat-group-4: #6fae74;
+  --chat-group-5: #cc6f6f;
+  --chat-group-6: #b0934e;
+
+  --chat-panel-texture: none;
+}
