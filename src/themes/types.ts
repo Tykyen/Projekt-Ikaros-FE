@@ -1,4 +1,5 @@
 export type ThemeId =
+  // 21 platformových motivů (vzhled platformy Ikaros).
   | 'modre-nebe'
   | 'zlaty-standard'
   | 'sci-fi'
@@ -20,29 +21,28 @@ export type ThemeId =
   | 'magie'
   | 'mesic'
   | 'slunce'
-  // Krok 5.0g — port 16 žánrových skinů ze starého Matrixu.
+  // Krok 5.7 — světové vzhledy (reforma vzhledů světa).
+  | 'ikaros'
   | 'fantasy'
-  | 'heroic'
-  | 'urban-fantasy'
-  | 'soft-sci-fi'
-  | 'biopunk'
-  | 'post-postapo'
-  | 'dystopie'
-  | 'military'
-  | 'psycho'
-  | 'lovecraft'
-  | 'thriller'
-  | 'alt-historie'
+  | 'dark-fantasy'
+  | 'vesmir'
+  | 'cyberpunk'
   | 'steampunk'
-  | 'dieselpunk'
-  | 'weird'
-  | 'grimdark';
+  | 'apokalypsa'
+  | 'horor'
+  | 'mystery'
+  | 'historie'
+  | 'moderni'
+  | 'western';
 
 /**
  * `platform` — jen platforma Ikaros · `world` — jen světy (krok 5.0) ·
  * `both` — obojí. `listThemes(scope)` filtruje `scope === arg || 'both'`.
  */
 export type ThemeScope = 'platform' | 'world' | 'both';
+
+/** Krok 5.7a — JS canvas efekt vrstvený nad pozadím skinu. */
+export type ThemeEffect = 'matrix-rain';
 
 export type ThemeFonts = {
   display?: string;
@@ -63,4 +63,6 @@ export type Theme = {
   background: string | null;
   decorationsModule: () => Promise<unknown>;
   reducedMotion?: ThemeReducedMotion;
+  /** Krok 5.7a — volitelný JS canvas efekt (Matrix rain u `ikaros`). */
+  effect?: ThemeEffect;
 };

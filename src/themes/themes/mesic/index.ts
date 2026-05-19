@@ -215,7 +215,7 @@ const TWINKLE_STAR = svg(`
 export const mesicTheme: Theme = {
   id: 'mesic',
   name: 'Měsíc',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Měsíc — lunární pohádková zahrada + glassmorphic levitující tlačítka + silver+cobalt glow + 4 měsíční fáze v rozích + lunar disc centerpiece',
   vars: {

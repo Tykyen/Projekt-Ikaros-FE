@@ -7,6 +7,7 @@
 @import '../themes/_shared/tokens.css';
 @import '../themes/_shared/prose-tokens.css';
 @import '../themes/_shared/reset.css';
+@import '../themes/_shared/world-depth.css';
 
 /* 3.2 — self-hostované prose fonty (latin-ext subset, variable). */
 @import '@fontsource-variable/fraunces/wght.css';

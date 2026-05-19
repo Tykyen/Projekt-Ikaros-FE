@@ -1,0 +1,44 @@
+/* ── Ikaros — fialové synthwave (krok 5.7a) ──
+   Aktivuje se přes [data-theme="ikaros"]. Vše scoped, žádné externí soubory.
+   Signature efekt (Matrix rain) řeší JS komponenta MatrixRain — zde jen
+   atmosféra: overlay, neonový svit nadpisů, fialová vignette krajů. */
+
+[data-theme='ikaros'] {
+  background-color: #0c0820;
+}
+
+/* ── Atmosférický overlay nad pozadím ── */
+[data-theme='ikaros']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* ── Fialová vignette krajů — podporuje hustší Matrix rain u okrajů ── */
+[data-theme='ikaros']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 75% 65% at 50% 45%,
+    transparent 55%,
+    rgba(169, 108, 255, 0.16) 100%
+  );
+}
+
+/* ── Neonový svit nadpisů ── */
+[data-theme='ikaros'] h1,
+[data-theme='ikaros'] h2,
+[data-theme='ikaros'] h3 {
+  text-shadow:
+    0 0 12px var(--theme-glow-gold),
+    0 0 28px rgba(169, 108, 255, 0.3);
+  letter-spacing: 0.02em;
+}
+
+/* Panely — 3D hloubku řeší jednotná vrstva (krok 5.8, `--depth-panel`). */

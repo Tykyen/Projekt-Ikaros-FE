@@ -20,7 +20,7 @@ interface Props {
  */
 export function DashTile({ icon, label, to, value, badge, className }: Props) {
   return (
-    <Link to={to} className={`${s.tile} ${className ?? ''}`}>
+    <Link to={to} className={`${s.tile} ${className ?? ''}`} data-elev="card">
       <span className={s.icon} aria-hidden>
         {icon}
       </span>

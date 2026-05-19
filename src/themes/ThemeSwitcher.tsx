@@ -11,7 +11,9 @@ export function ThemeSwitcher() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLUListElement>(null);
 
-  const themes = listThemes();
+  // Krok 5.7 — platformový switcher nabízí jen platformové skiny;
+  // světové vzhledy (ikaros, žánrové) sem nepatří.
+  const themes = listThemes('platform');
 
   useEffect(() => {
     if (!open) return;

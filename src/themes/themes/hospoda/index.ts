@@ -5,7 +5,7 @@ const decor = '/themes/hospoda/decor';
 export const hospodaTheme: Theme = {
   id: 'hospoda',
   name: 'Hospoda',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Středověká krčma „U Letícího Orla" — warm hearth, dubové trámy, kovaná mosaz, vínová heraldika, krčmářský papír',
   vars: {

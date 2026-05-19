@@ -35,7 +35,7 @@ export function WorldEventCard({ event }: Props) {
   const urgent = valid && isWithin24h(event.date);
 
   return (
-    <article className={s.card}>
+    <article className={s.card} data-elev="card">
       <div className={clsx(s.chip, urgent && s.chipUrgent)}>
         {valid ? (
           <>

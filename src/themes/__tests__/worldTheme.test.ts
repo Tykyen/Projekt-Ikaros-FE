@@ -1,15 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { Provider as JotaiProvider, createStore } from 'jotai';
-import type { PropsWithChildren } from 'react';
-import { useWorldTheme } from '../useWorldTheme';
+import { describe, it, expect } from 'vitest';
+import { resolveWorldTheme } from '../worldTheme';
 import type { World } from '@/shared/types';
-
-function makeWrapper(store = createStore()) {
-  return ({ children }: PropsWithChildren) => (
-    <JotaiProvider store={store}>{children}</JotaiProvider>
-  );
-}
 
 function makeWorld(overrides: Partial<World> = {}): World {
   return {
@@ -28,65 +19,31 @@ function makeWorld(overrides: Partial<World> = {}): World {
   };
 }
 
-describe('useWorldTheme', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
+/** Krok 5.7a — vzhled světa je jediný a sdílený (per-uživatel override zrušen). */
+describe('resolveWorldTheme', () => {
   it('vrátí themeId ze sdíleného základu World', () => {
-    const world = makeWorld({ themeId: 'sci-fi' });
-    const { result } = renderHook(() => useWorldTheme(world), {
-      wrapper: makeWrapper(),
-    });
-    expect(result.current.themeId).toBe('sci-fi');
-    expect(result.current.isOverridden).toBe(false);
+    expect(resolveWorldTheme(makeWorld({ themeId: 'ikaros' })).themeId).toBe(
+      'ikaros',
+    );
   });
 
-  it('fallback na DEFAULT_THEME, když World nemá themeId', () => {
-    const { result } = renderHook(() => useWorldTheme(makeWorld()), {
-      wrapper: makeWrapper(),
-    });
-    expect(result.current.themeId).toBe('modre-nebe');
+  it('fallback na ikaros, když World nemá themeId', () => {
+    expect(resolveWorldTheme(makeWorld()).themeId).toBe('ikaros');
   });
 
-  it('uživatelský override přebije sdílený základ', () => {
-    const world = makeWorld({ themeId: 'sci-fi' });
-    const { result } = renderHook(() => useWorldTheme(world), {
-      wrapper: makeWrapper(),
-    });
-    act(() => result.current.setOverride('kyberpunk'));
-    expect(result.current.themeId).toBe('kyberpunk');
-    expect(result.current.isOverridden).toBe(true);
+  it('null svět → ikaros', () => {
+    expect(resolveWorldTheme(null).themeId).toBe('ikaros');
   });
 
-  it('reset() smaže override — návrat na sdílený základ', () => {
-    const world = makeWorld({ themeId: 'sci-fi' });
-    const { result } = renderHook(() => useWorldTheme(world), {
-      wrapper: makeWrapper(),
-    });
-    act(() => result.current.setOverride('kyberpunk'));
-    act(() => result.current.reset());
-    expect(result.current.themeId).toBe('sci-fi');
-    expect(result.current.isOverridden).toBe(false);
-  });
-
-  it('předá custom themeOverrides ze sdíleného základu', () => {
-    const world = makeWorld({
-      themeId: 'sci-fi',
-      themeOverrides: { '--theme-accent': '#fff' },
-    });
-    const { result } = renderHook(() => useWorldTheme(world), {
-      wrapper: makeWrapper(),
-    });
-    expect(result.current.overrides).toEqual({ '--theme-accent': '#fff' });
-  });
-
-  it('null svět → DEFAULT_THEME, setOverride je no-op', () => {
-    const { result } = renderHook(() => useWorldTheme(null), {
-      wrapper: makeWrapper(),
-    });
-    expect(result.current.themeId).toBe('modre-nebe');
-    act(() => result.current.setOverride('kyberpunk'));
-    expect(result.current.themeId).toBe('modre-nebe');
+  it('předá custom themeOverrides a themeBackgroundUrl', () => {
+    const r = resolveWorldTheme(
+      makeWorld({
+        themeId: 'ikaros',
+        themeOverrides: { '--theme-accent': '#fff' },
+        themeBackgroundUrl: '/bg.webp',
+      }),
+    );
+    expect(r.overrides).toEqual({ '--theme-accent': '#fff' });
+    expect(r.backgroundUrl).toBe('/bg.webp');
   });
 });

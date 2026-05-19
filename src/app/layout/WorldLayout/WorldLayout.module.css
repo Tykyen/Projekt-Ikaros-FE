@@ -9,6 +9,9 @@
 .main {
   flex: 1;
   overflow-y: auto;
+  /* Krok 5.7a — obsah nad Matrix rain canvasem (z-index 0). */
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Header ── */
@@ -358,4 +361,88 @@
   .genreBadge { display: none; }
   /* Spec 5.1 — „Nová stránka" je na mobilu v draweru (drawerNewPage) */
   .newPageBtn { display: none; }
+  /* Krok 5.7a — touch target ikon (pošta, nastavení) ≥ 44px na mobilu */
+  .actionBtn { width: 44px; height: 44px; }
+}
+
+/* ──────────────────────────────────────────────
+   Krok 5.8 — 3D hlavička. Scoped na svět; platforma se nemění.
+   Header tlačítka vystupují (raised), aktivní nav je zamáčknutá.
+   ────────────────────────────────────────────── */
+
+[data-world-shell] .navLink,
+[data-world-shell] .exitBtn,
+[data-world-shell] .actionBtn,
+[data-world-shell] .newPageBtn,
+[data-world-shell] .hamburger {
+  box-shadow: var(--depth-raised);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+/* Běžná header tlačítka — matný surface povrch + světlý text. */
+[data-world-shell] .navLink,
+[data-world-shell] .exitBtn,
+[data-world-shell] .actionBtn,
+[data-world-shell] .hamburger {
+  background: linear-gradient(
+    180deg,
+    var(--theme-surface-soft, var(--bg-card-hover)) 0%,
+    var(--theme-surface-strong, var(--bg-card)) 100%
+  );
+  border: 1px solid var(--theme-border-soft, var(--border));
+  color: var(--theme-text, var(--text-primary));
+}
+
+/* „+ Nová stránka" je CTA — accent 3D povrch + kontrastní text. */
+[data-world-shell] .newPageBtn {
+  background: linear-gradient(
+    180deg,
+    var(--theme-accent-bright, var(--accent-bright)) 0%,
+    var(--theme-accent, var(--accent)) 100%
+  );
+  border: 1px solid var(--theme-accent, var(--accent));
+  color: var(--text-on-accent);
+}
+
+[data-world-shell] .navLink:hover,
+[data-world-shell] .exitBtn:hover,
+[data-world-shell] .actionBtn:hover,
+[data-world-shell] .newPageBtn:hover,
+[data-world-shell] .hamburger:hover {
+  transform: translateY(-2px);
+  border-color: var(--theme-accent, var(--accent));
+  box-shadow: var(--depth-hover);
+}
+
+[data-world-shell] .navLink:active,
+[data-world-shell] .exitBtn:active,
+[data-world-shell] .actionBtn:active,
+[data-world-shell] .newPageBtn:active,
+[data-world-shell] .hamburger:active {
+  transform: translateY(1px);
+  box-shadow: var(--depth-pressed);
+}
+
+/* Aktivní nav (otevřený dropdown / current route) — zamáčknutá. */
+[data-world-shell] .navLinkActive,
+[data-world-shell] .navLinkActive:hover {
+  transform: translateY(1px);
+  border-color: var(--theme-accent, var(--accent));
+  color: var(--theme-accent, var(--accent));
+  box-shadow: var(--depth-pressed);
+}
+
+/* Nav dropdown — 3D panel. */
+[data-world-shell] .dropdown {
+  box-shadow: var(--depth-panel);
+}
+
+/* Vyhledávací pole — zapuštěné (krok 5.8 sk.5). */
+[data-world-shell] .searchBar {
+  box-shadow: var(--depth-inset);
 }

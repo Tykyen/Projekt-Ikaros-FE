@@ -14,9 +14,9 @@ interface Props {
 }
 
 /**
- * 5.0 — motiv světa ve wizardu. Výchozí motiv se **odvozuje ze žánru**
- * (`themeForGenre`); PJ ho může přepsat výběrem z 21 motivů. „Zpět na
- * žánrový" override zruší.
+ * 5.0 / 5.7 — motiv světa ve wizardu. Výchozí motiv se **odvozuje ze
+ * žánru** (`themeForGenre`); PJ ho může přepsat výběrem ze světových
+ * vzhledů (`listThemes('world')`). „Zpět na žánrový" override zruší.
  */
 export function ThemeSection({
   genre,
@@ -28,7 +28,8 @@ export function ThemeSection({
   const derived = themeForGenre(genre);
   const effective = themeOverride ?? derived;
   const theme = getTheme(effective);
-  const themes = listThemes();
+  // Krok 5.7 — wizard tvorby světa nabízí jen světové vzhledy.
+  const themes = listThemes('world');
 
   return (
     <SectionCard

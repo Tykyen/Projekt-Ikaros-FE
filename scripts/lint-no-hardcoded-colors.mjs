@@ -4,6 +4,7 @@ import path from 'node:path';
 const ROOT = path.resolve('src');
 const ALLOW = [
   'src/themes/themes/',          // theme definice mají hexy
+  'src/themes/effects/',          // canvas efekty skinů (Matrix rain) — barvy v JS
   'src/themes/_shared/',          // base reset/tokens
   'src/__tests__/',               // testy
   'src/themes/__tests__/',

@@ -5,7 +5,7 @@ const decor = '/themes/zlaty-standard/decor';
 export const zlatyStandardTheme: Theme = {
   id: 'zlaty-standard',
   name: 'Zlatý standard',
-  scope: 'both',
+  scope: 'platform',
   atmosphere: 'Královský luxus — pure black + rich gold + subtle cobalt accents on active states',
   vars: {
     // ──────────────────────────────────────────────

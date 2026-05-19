@@ -5,7 +5,7 @@ const decor = '/themes/nemrtvi/decor';
 export const nemrtviTheme: Theme = {
   id: 'nemrtvi',
   name: 'Nemrtví',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Sedlec Kostnice o půlnoci — opuštěná nekromantická kapitula, blackened iron, kosti, ghost-green záře, end-of-world dread',
   vars: {

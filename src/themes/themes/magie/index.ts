@@ -247,7 +247,7 @@ const SPARKLE_DOT = svg(`
 export const magieTheme: Theme = {
   id: 'magie',
   name: 'Magie a kouzla',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Magie a kouzla — kouzelnická síň + glassmorphic levitující tlačítka + ametyst+zlato glow + spell-book scrying disc + arcane sigils',
   vars: {

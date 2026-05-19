@@ -25,7 +25,7 @@ export function DashColumn({ icon, title, action, children, footer }: Props) {
         <h2 className={s.title}>{title}</h2>
         {action && <span className={s.action}>{action}</span>}
       </header>
-      <div className={s.panel}>{children}</div>
+      <div className={s.panel} data-elev="panel">{children}</div>
       {footer && <div className={s.footer}>{footer}</div>}
     </section>
   );

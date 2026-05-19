@@ -48,7 +48,7 @@ const ADINKRA_AKOMA =
 export const africkeTheme: Theme = {
   id: 'africke',
   name: 'Země předků',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Země předků — savana za úsvitem, sandstone + carved bronze + kente weave bandy + mudcloth band, monolithy a baobaby na horizontu',
   vars: {

@@ -24,6 +24,7 @@ export function ThemePresetGrid({ value, onChange }: Props) {
             role="radio"
             aria-checked={active}
             className={clsx(s.card, active && s.active)}
+            data-elev="card"
             onClick={() => onChange(t.id)}
           >
             <img

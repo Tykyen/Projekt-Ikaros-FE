@@ -1,12 +1,13 @@
-/* ── Fantasy — temná lesní magie (krok 5.0g) ──
+/* ── Fantasy — vznešená elfí síň (krok 5.7b) ──
    Aktivuje se přes [data-theme="fantasy"]. Vše scoped, žádné externí soubory.
-   Signature: stoupající světélkující spory + fialový svit nadpisů. */
+   Signature: zlatý dvojitý filigránový okraj panelů + smaragdo-zlatý svit
+   nadpisů + zlatá záře klenby shora. */
 
 [data-theme='fantasy'] {
-  background-color: #06140d;
+  background-color: #0b1510;
 }
 
-/* ── Atmosférický overlay ── */
+/* ── Atmosférický overlay nad pozadím ── */
 [data-theme='fantasy']::before {
   content: '';
   position: fixed;
@@ -16,73 +17,28 @@
   background: var(--theme-bg-overlay);
 }
 
-/* ── Signature ornament — stoupající světélkující spory ── */
+/* ── Signature — zlatá záře klenby shora (světlo elfí síně) ── */
 [data-theme='fantasy']::after {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image:
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(155, 255, 201, 0.7) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(200, 168, 255, 0.6) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(155, 255, 201, 0.4) 0%,
-      transparent 55%
-    );
-  background-size:
-    4px 4px,
-    3px 3px,
-    2px 2px;
-  background-position:
-    12% 0,
-    63% 0,
-    87% 0;
-  background-repeat: repeat-y;
-  opacity: 0.5;
-  animation: fantasy-spores 26s linear infinite;
+  background: radial-gradient(
+    ellipse 90% 55% at 50% 0%,
+    rgba(227, 198, 107, 0.14) 0%,
+    transparent 60%
+  );
 }
 
-@keyframes fantasy-spores {
-  from {
-    background-position:
-      12% 0,
-      63% 0,
-      87% 0;
-  }
-  to {
-    background-position:
-      12% -480px,
-      63% -640px,
-      87% -560px;
-  }
-}
-
-/* ── Fialový svit nadpisů ── */
+/* ── Smaragdo-zlatý svit nadpisů ── */
 [data-theme='fantasy'] h1,
 [data-theme='fantasy'] h2,
 [data-theme='fantasy'] h3 {
-  text-shadow: 0 0 14px var(--theme-glow-cyan);
+  text-shadow:
+    0 0 12px var(--theme-glow-gold),
+    0 0 26px rgba(111, 211, 168, 0.25);
+  letter-spacing: 0.03em;
 }
 
-/* ── Section divider pod nadpisy sekcí ── */
-[data-theme='fantasy'] [data-frame-panel] {
-  box-shadow:
-    0 4px 24px var(--theme-shadow),
-    inset 0 0 28px rgba(105, 240, 174, 0.05);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-theme='fantasy']::after {
-    animation: none;
-  }
-}
+/* Panely — 3D hloubku řeší jednotná vrstva (krok 5.8, `--depth-panel`). */

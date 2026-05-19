@@ -10,11 +10,11 @@ import { accessModeLabel } from '@/features/world/lib/accessMode';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, WorldRole } from '@/shared/types';
 import { UserAvatar } from '@/shared/ui';
-import { themeAtom } from '../../../themes/state';
+import { themeAtom, worldThemePreviewAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 import { applyTheme } from '../../../themes/applyTheme';
-import { useWorldTheme } from '../../../themes/useWorldTheme';
-import { WorldThemeSwitcher } from '@/features/world/components/WorldThemeSwitcher';
+import { resolveWorldTheme } from '../../../themes/worldTheme';
+import { MatrixRain } from '../../../themes/effects/MatrixRain';
 
 /* ── Nav definice ── */
 function buildNav(worldSlug: string) {
@@ -147,9 +147,30 @@ export function WorldLayout() {
 
   // Spec 5.0 — světový theme. `.shell` vykresluje motiv světa; po vstupu se
   // přepne globální `:root` (kvůli portálům — modaly mimo `.shell`), EXIT obnoví.
-  const { themeId, overrides, backgroundUrl } = useWorldTheme(world ?? null);
+  // Krok 5.7b — editor vzhledu publikuje náhled; má přednost před `World`.
+  const preview = useAtomValue(worldThemePreviewAtom);
+  const resolved = resolveWorldTheme(world ?? null);
+  const themeId = preview?.themeId ?? resolved.themeId;
+  // Krok 5.9 — uživatelské overrides člena se vrší nad sdílené (PJ).
+  const sharedOverrides = membership?.themeUserOverrides
+    ? { ...resolved.overrides, ...membership.themeUserOverrides }
+    : resolved.overrides;
+  const overrides = preview ? preview.overrides : sharedOverrides;
+  const backgroundUrl = preview ? preview.backgroundUrl : resolved.backgroundUrl;
+  // Krok 5.9 — jas / kontrast (přístupnost) přes filter na obsahové vrstvě.
+  const adjust = preview ? preview.adjust : membership?.themeAdjust;
+  const mainStyle =
+    adjust && (adjust.brightness != null || adjust.contrast != null)
+      ? {
+          filter: `brightness(${adjust.brightness ?? 1}) contrast(${
+            adjust.contrast ?? 1
+          })`,
+        }
+      : undefined;
   const theme = getTheme(themeId);
-  const bg = backgroundUrl ?? theme.background;
+  // `||` (ne `??`) — prázdný `themeBackgroundUrl` ('') musí padnout na
+  // pozadí skinu, jinak svět zůstane bez obrázku (krok 5.7a).
+  const bg = (backgroundUrl && backgroundUrl.trim()) || theme.background;
   const bgStyle = bg
     ? { backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' as const }
     : undefined;
@@ -189,7 +210,14 @@ export function WorldLayout() {
 
   return (
     <WorldContext.Provider value={ctxValue}>
-      <div className={s.shell} data-theme={themeId} style={bgStyle}>
+      <div
+        className={s.shell}
+        data-theme={themeId}
+        data-world-shell
+        style={bgStyle}
+      >
+        {/* Spec 5.7a — JS canvas efekt skinu (Matrix rain u `ikaros`) */}
+        {theme.effect === 'matrix-rain' && <MatrixRain />}
         <header className={s.header}>
           {/* EXIT — funkční i během loadingu / 404 */}
           <Link to="/" className={s.exitBtn}>EXIT</Link>
@@ -250,8 +278,15 @@ export function WorldLayout() {
                   ✉
                 </Link>
 
-                {/* Spec 5.0e — preset switcher „Vzhled světa" */}
-                <WorldThemeSwitcher />
+                {/* Krok 5.7a — vstup do Nastavení světa (vč. tab Vzhled);
+                    viditelnost tabů uvnitř gatuje role */}
+                <Link
+                  to={`/svet/${worldSlug}/nastaveni`}
+                  className={s.actionBtn}
+                  title="Nastavení světa"
+                >
+                  ⚙
+                </Link>
 
                 {/* Spec 5.1 — slot postavy (fallback na účet), neklikatelné */}
                 <div className={s.persona} title={personaName}>
@@ -324,7 +359,7 @@ export function WorldLayout() {
           </>
         )}
 
-        <main className={s.main}>
+        <main className={s.main} style={mainStyle}>
           <Outlet />
         </main>
       </div>

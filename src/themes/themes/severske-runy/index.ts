@@ -5,7 +5,7 @@ const decor = '/themes/severske-runy/decor';
 export const severskeRunyTheme: Theme = {
   id: 'severske-runy',
   name: 'Severské runy',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Mead-hall síň na konci fjordu, kde se rozhoduje, kdo přežije zimu. Dark stained oak s iron banding, iron-cast vlčí hlavy, ledové rampouchy, oxidovaný bronz. Drsná, vážná, ale obyvatelná — Carved Saga.',
   vars: {

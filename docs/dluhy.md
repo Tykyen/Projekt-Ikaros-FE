@@ -216,13 +216,15 @@ přesunout část akcí do draweru nebo zmenšit gap/padding.
 
 ---
 
-### D-NEW-skin-assets — Dedikovaná pozadí a thumbnaily 16 žánrových skinů (z 5.0g)
-**Soubory:** `public/themes/backgrounds/`, `public/themes/thumbnails/`, `src/themes/themes/<skin>/index.ts`.
-**Stav:** Otevřený.
-**Kontext:** Krok 5.0g portoval 16 žánrových skinů, ale 16 nových `.webp` pozadí/thumbnailů nevzniklo (textový agent grafiku nevyrobí). Skiny proto sdílí pozadí s existujícími motivy (`fantasy` → `magie.webp`, `grimdark` → `temna-cerven.webp` ap.) — věrný port, starý Matrix `$skins-bg` rovněž sdílel.
-**Dopad:** Nízký — skiny jsou plně funkční a barevně odlišené; jen pozadí není unikátní.
-**Řešení:** Dodat 16 dedikovaných pozadí (1920×1080 webp) + 16 thumbnailů; v `index.ts` přepnout `background`/`thumbnail` na nové cesty.
-**Kdy:** Až bude k dispozici grafik / asset pipeline. Volitelné vylepšení.
+### D-NEW-theme-bg-empty — Editor vzhledu ukládá prázdný `themeBackgroundUrl` ('') místo `null`
+**Soubory:** `src/features/world/pages/WorldSettingsPage/tabs/ThemeTab.tsx` (+ editor pozadí), BE `update-world.dto.ts`.
+**Stav:** Otevřený — FE workaround nasazen.
+**Kontext:** Krok 5.7a — `WorldLayout` počítá pozadí `(backgroundUrl && backgroundUrl.trim()) || theme.background`. Workaround vznikl, protože editor / „Zpět na preset" ukládá `themeBackgroundUrl` jako `''` místo `null`/unset; `''` ≠ „žádné pozadí" a `??` by ho nepřeskočil → svět zůstal bez obrázku.
+**Dopad:** Nízký — `WorldLayout` to ošetří (`||` + `trim`). Jen DB nese sémanticky špatnou hodnotu.
+**Řešení:** Editor vzhledu má při „žádné pozadí" posílat `null` (nebo pole vynechat). Existující `''` v DB čistí BE migrace `migrate-world-theme-5.7` (`$unset`).
+**Kdy:** Při příští práci na theme editoru (5.3f) nebo žánrových skinech.
+
+> **Pozn.:** dluh *D-NEW-skin-assets* (sdílená pozadí 16 portů z 5.0g) uzavřen 2026-05-18 — krok 5.7a oněch 16 world-only skinů smazal, dluh bezpředmětný.
 
 ---
 

@@ -5,7 +5,7 @@ const decor = '/themes/ctyri-zivly/decor';
 export const ctyriZivlyTheme: Theme = {
   id: 'ctyri-zivly',
   name: 'Čtyři živly',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Pactum Quattuor — heraldická reliquář-mřížka, leštěné stříbro-ocel + warm bronze/vermeil + 4 cardinal cabochon gemy (rubín/safír/smaragd/topaz) + Ikaros-fénix jako pátý sjednotitel',
   vars: {

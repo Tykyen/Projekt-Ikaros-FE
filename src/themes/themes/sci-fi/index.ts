@@ -5,7 +5,7 @@ const decor = '/themes/sci-fi/decor';
 export const sciFiTheme: Theme = {
   id: 'sci-fi',
   name: 'Sci-fi',
-  scope: 'both',
+  scope: 'platform',
   atmosphere: 'Futuristic command HUD — cyan + magenta neon, holographic glass panely, sci-fi typografie',
   vars: {
     // ──────────────────────────────────────────────

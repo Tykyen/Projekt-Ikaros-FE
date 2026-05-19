@@ -5,7 +5,7 @@ const decor = '/themes/pergamen/decor';
 export const pergamenTheme: Theme = {
   id: 'pergamen',
   name: 'Pergamen',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Klášterní skriptórium 13. století okem Tolkienova kronikáře — pergamen + dřevo + zlatá iluminace + burgundy pečetě',
   vars: {

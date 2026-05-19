@@ -15,7 +15,7 @@ export function WorldStubPage({ area }: Props) {
   const meta = worldStubMap[area];
 
   return (
-    <section className={s.card}>
+    <section className={s.card} data-elev="panel">
       <div className={s.icon} aria-hidden="true">
         🚧
       </div>

@@ -1,0 +1,73 @@
+/* ── Horor — opuštěné sídlo (krok 5.7h) ──
+   Aktivuje se přes [data-theme="horor"]. Vše scoped.
+   Signature: chvějivé světlo svíčky + těžká černá vignette + jantarový
+   svit nadpisů. Panely 3D řeší jednotná vrstva (krok 5.8). */
+
+[data-theme='horor'] {
+  background-color: #090807;
+}
+
+/* ── Atmosférický overlay nad pozadím ── */
+[data-theme='horor']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* ── Signature — vignette + jantarová záře svíčky, chvějivá ── */
+[data-theme='horor']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 52% 42% at 50% 44%,
+      rgba(200, 154, 82, 0.1) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 80% 70% at 50% 44%,
+      transparent 42%,
+      rgba(0, 0, 0, 0.72) 100%
+    );
+  animation: horor-flicker 5.5s ease-in-out infinite;
+}
+
+@keyframes horor-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 0.88;
+  }
+  38% {
+    opacity: 0.97;
+  }
+  55% {
+    opacity: 0.82;
+  }
+  72% {
+    opacity: 0.94;
+  }
+}
+
+/* ── Tlumený jantarový svit nadpisů ── */
+[data-theme='horor'] h1,
+[data-theme='horor'] h2,
+[data-theme='horor'] h3 {
+  text-shadow:
+    0 0 14px var(--theme-glow-gold),
+    0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='horor']::after {
+    animation: none;
+  }
+}

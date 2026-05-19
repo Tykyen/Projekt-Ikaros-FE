@@ -5,7 +5,7 @@ const decor = '/themes/modre-nebe/decor';
 export const modreNebeTheme: Theme = {
   id: 'modre-nebe',
   name: 'Modré nebe',
-  scope: 'both',
+  scope: 'platform',
   atmosphere: 'Heroická fantasy říše pod hvězdnatým modrým nebem',
   vars: {
     // ──────────────────────────────────────────────

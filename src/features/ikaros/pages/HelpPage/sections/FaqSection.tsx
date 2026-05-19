@@ -222,16 +222,24 @@ const FAQ: FaqItem[] = [
     ),
   },
   {
-    q: 'Má svět vlastní vzhled, nebo dědí motiv platformy?',
+    q: 'Má svět vlastní vzhled a můžu si ho upravit?',
     a: (
-      <p>
-        Každý svět má <strong>vlastní motiv</strong>, nezávislý na platformě.
-        Odvozuje se ze <strong>žánru světa</strong> (PJ ho při tvorbě může
-        přepsat) &mdash; uvnitř světa vzhled vidí všichni členové. Přes tlačítko{' '}
-        <strong>Vzhled světa</strong> (ikona palety v hlavičce světa) si motiv
-        můžeš přepnout jen pro sebe (uloženo na zařízení); „Reset" vrátí na
-        motiv nastavený PJ. Mimo svět platí dál tvůj globální motiv účtu.
-      </p>
+      <>
+        <p>
+          Každý svět má <strong>vlastní vzhled</strong>, nezávislý na platformě.
+          Určuje ho <strong>PJ</strong> v Nastavení světa (odvozuje se ze žánru,
+          PJ ho může přepsat a doladit) &mdash; tento vzhled vidí všichni
+          členové stejně.
+        </p>
+        <p>
+          Ty si můžeš <strong>pro sebe</strong> doladit barvy, jas a kontrast
+          kvůli čitelnosti &mdash; v Nastavení světa → tab{' '}
+          <strong>„Můj vzhled"</strong>. Skin a písmo zůstávají, měníš jen
+          barevnou vrstvu. Vzhled platformy Ikaros si doladíš obdobně v{' '}
+          <Link to="/ikaros/profil">Profilu</Link> → sekce{' '}
+          <strong>Doladění vzhledu</strong>.
+        </p>
+      </>
     ),
   },
   {

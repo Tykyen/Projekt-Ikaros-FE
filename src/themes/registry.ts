@@ -20,27 +20,26 @@ import { magieTheme } from './themes/magie';
 import { mesicTheme } from './themes/mesic';
 import { slunceTheme } from './themes/slunce';
 import { zlatyStandardTheme } from './themes/zlaty-standard';
-// Krok 5.0g — 16 žánrových skinů portovaných ze starého Matrixu.
+// Krok 5.7 — světové vzhledy (reforma vzhledů světa).
+import { ikarosTheme } from './themes/ikaros';
 import { fantasyTheme } from './themes/fantasy';
-import { heroicTheme } from './themes/heroic';
-import { urbanFantasyTheme } from './themes/urban-fantasy';
-import { softSciFiTheme } from './themes/soft-sci-fi';
-import { biopunkTheme } from './themes/biopunk';
-import { postPostapoTheme } from './themes/post-postapo';
-import { dystopieTheme } from './themes/dystopie';
-import { militaryTheme } from './themes/military';
-import { psychoTheme } from './themes/psycho';
-import { lovecraftTheme } from './themes/lovecraft';
-import { thrillerTheme } from './themes/thriller';
-import { altHistorieTheme } from './themes/alt-historie';
+import { darkFantasyTheme } from './themes/dark-fantasy';
+import { vesmirTheme } from './themes/vesmir';
+import { cyberpunkTheme } from './themes/cyberpunk';
 import { steampunkTheme } from './themes/steampunk';
-import { dieselpunkTheme } from './themes/dieselpunk';
-import { weirdTheme } from './themes/weird';
-import { grimdarkTheme } from './themes/grimdark';
+import { apokalypsaTheme } from './themes/apokalypsa';
+import { hororTheme } from './themes/horor';
+import { mysteryTheme } from './themes/mystery';
+import { historieTheme } from './themes/historie';
+import { moderniTheme } from './themes/moderni';
+import { westernTheme } from './themes/western';
 
+/** Platformový výchozí motiv (vzhled platformy Ikaros). */
 export const DEFAULT_THEME: ThemeId = 'modre-nebe';
+/** Krok 5.7 — výchozí vzhled světa (fallback pro `themeForGenre` i světy). */
+export const DEFAULT_WORLD_THEME: ThemeId = 'ikaros';
 
-// Plný registry — 37 motivů (21 původních + 16 žánrových z 5.0g).
+// 21 platformových motivů + světové vzhledy (krok 5.7).
 export const THEMES: Record<ThemeId, Theme> = {
   'modre-nebe':     modreNebeTheme,
   'zlaty-standard': zlatyStandardTheme,
@@ -63,23 +62,19 @@ export const THEMES: Record<ThemeId, Theme> = {
   'magie':          magieTheme,
   'mesic':          mesicTheme,
   'slunce':         slunceTheme,
-  // Krok 5.0g — žánrové skiny.
+  // Krok 5.7 — světové vzhledy.
+  'ikaros':         ikarosTheme,
   'fantasy':        fantasyTheme,
-  'heroic':         heroicTheme,
-  'urban-fantasy':  urbanFantasyTheme,
-  'soft-sci-fi':    softSciFiTheme,
-  'biopunk':        biopunkTheme,
-  'post-postapo':   postPostapoTheme,
-  'dystopie':       dystopieTheme,
-  'military':       militaryTheme,
-  'psycho':         psychoTheme,
-  'lovecraft':      lovecraftTheme,
-  'thriller':       thrillerTheme,
-  'alt-historie':   altHistorieTheme,
+  'dark-fantasy':   darkFantasyTheme,
+  'vesmir':         vesmirTheme,
+  'cyberpunk':      cyberpunkTheme,
   'steampunk':      steampunkTheme,
-  'dieselpunk':     dieselpunkTheme,
-  'weird':          weirdTheme,
-  'grimdark':       grimdarkTheme,
+  'apokalypsa':     apokalypsaTheme,
+  'horor':          hororTheme,
+  'mystery':        mysteryTheme,
+  'historie':       historieTheme,
+  'moderni':        moderniTheme,
+  'western':        westernTheme,
 };
 
 export function getTheme(id: string): Theme {

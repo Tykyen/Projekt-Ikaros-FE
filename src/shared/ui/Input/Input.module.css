@@ -55,3 +55,14 @@
   font-size: var(--text-xs);
   color: var(--danger);
 }
+
+/* ── Krok 5.8 — 3D zapuštěné pole, jen uvnitř světa. Platforma plochá. ── */
+[data-world-shell] .input {
+  box-shadow: var(--depth-inset);
+}
+[data-world-shell] .input:focus {
+  box-shadow: var(--depth-inset), 0 0 0 3px var(--accent-soft);
+}
+[data-world-shell] .error .input:focus {
+  box-shadow: var(--depth-inset), 0 0 0 3px var(--danger-focus-ring);
+}

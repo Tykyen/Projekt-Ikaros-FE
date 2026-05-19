@@ -7,6 +7,7 @@ import {
   Users,
   Eye,
   Palette,
+  SlidersHorizontal,
   DoorOpen,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
@@ -22,6 +23,7 @@ const AccessModeTab = lazy(() => import('./tabs/AccessModeTab'));
 const MembersTab = lazy(() => import('./tabs/MembersTab'));
 const AkjTab = lazy(() => import('./tabs/AkjTab'));
 const ThemeTab = lazy(() => import('./tabs/ThemeTab'));
+const MyThemeTab = lazy(() => import('./tabs/MyThemeTab'));
 const MembershipTab = lazy(() => import('./tabs/MembershipTab'));
 
 interface SettingsTab extends TabItem {
@@ -65,6 +67,13 @@ const TABS: SettingsTab[] = [
     icon: <Palette size={18} />,
     minRole: WorldRole.Korektor,
     render: () => <ThemeTab />,
+  },
+  {
+    id: 'muj-vzhled',
+    label: 'Můj vzhled',
+    icon: <SlidersHorizontal size={18} />,
+    minRole: WorldRole.Ctenar,
+    render: () => <MyThemeTab />,
   },
   {
     id: 'clenstvi',

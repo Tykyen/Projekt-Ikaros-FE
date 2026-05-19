@@ -5,7 +5,7 @@ const decor = '/themes/vesmirna-bitva/decor';
 export const vesmirnaBitvaTheme: Theme = {
   id: 'vesmirna-bitva',
   name: 'Vesmírná bitva',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Můstek poškozeného bitevního křižníku v akutním boji — klaxon, červené nouzové LED, pancéřové ocelové desky s nýty a podpálenými hranami, jiskry z rohů. Brutální, nebezpečný, beznadějný.',
   vars: {

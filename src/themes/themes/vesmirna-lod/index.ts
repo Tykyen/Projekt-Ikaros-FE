@@ -5,7 +5,7 @@ const decor = '/themes/vesmirna-lod/decor';
 export const vesmirnaLodTheme: Theme = {
   id: 'vesmirna-lod',
   name: 'Vesmírná loď',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Vojenský hangár vesmírné lodi — cyan + amber dual-tone, plate-metal panely, industrial corner plates, rivety, 7 nav ikon',
   vars: {

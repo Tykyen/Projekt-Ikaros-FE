@@ -2,48 +2,47 @@ import type { Theme } from '@/themes/types';
 import { buildSkinVars } from '../_skinBase';
 
 /**
- * Krok 5.0g — skin „Fantasy" ze starého Matrixu (`.skin-fantasy`).
- * Temná lesní magie: zelený akcent + fialová nadpisová kouzla.
- * Pozadí sdílené s motivem `magie` (věrný port `$skins-bg`).
+ * Krok 5.7b — skin „Fantasy". Vznešená high fantasy: elfí síň za hvězdné
+ * noci — zlatý filigrán a smaragdové světlo na noční smaragdové černi.
  */
 export const fantasyTheme: Theme = {
   id: 'fantasy',
   name: 'Fantasy',
   scope: 'world',
   atmosphere:
-    'Temná lesní magie — zelený svit a fialové kouzlo pod klenbou hvozdu',
+    'Vznešená elfí síň — zlatý filigrán a smaragdové světlo pod hvězdnou klenbou',
   vars: buildSkinVars({
-    bgPrimary: '#06140d',
-    bgSecondary: '#0c2419',
+    bgPrimary: '#0b1510',
+    bgSecondary: '#13251c',
     bgOverlay:
-      'linear-gradient(160deg, rgba(4,16,10,0.55) 0%, rgba(14,8,26,0.78) 100%)',
-    surface: 'rgba(9,26,18,0.74)',
-    surfaceStrong: 'rgba(5,16,12,0.9)',
-    surfaceSoft: 'rgba(18,44,32,0.46)',
-    border: 'rgba(105,240,174,0.5)',
-    borderSoft: 'rgba(105,240,174,0.26)',
-    borderSecondary: 'rgba(179,136,255,0.5)',
-    text: '#e8f5e9',
-    textMuted: '#a6c8b4',
-    textDim: '#5e7a68',
-    heading: '#c8a8ff',
-    accent: '#69f0ae',
-    accentBright: '#9bffc9',
-    accentSecondary: '#b388ff',
-    accentDim: '#1f5a3c',
-    glow: 'rgba(105,240,174,0.42)',
-    glowSecondary: 'rgba(179,136,255,0.4)',
-    navHoverBg: 'rgba(105,240,174,0.09)',
+      'linear-gradient(180deg, rgba(8,18,13,0.15) 0%, rgba(8,18,13,0.45) 100%)',
+    surface: 'rgba(16,32,24,0.74)',
+    surfaceStrong: 'rgba(8,18,13,0.9)',
+    surfaceSoft: 'rgba(28,52,40,0.46)',
+    border: 'rgba(227,198,107,0.5)',
+    borderSoft: 'rgba(227,198,107,0.26)',
+    borderSecondary: 'rgba(111,211,168,0.45)',
+    text: '#f0e8d4',
+    textMuted: '#aebfa8',
+    textDim: '#6a7a68',
+    heading: '#f4dd92',
+    accent: '#e3c66b',
+    accentBright: '#f6e4a0',
+    accentSecondary: '#6fd3a8',
+    accentDim: '#5a4a1e',
+    glow: 'rgba(227,198,107,0.4)',
+    glowSecondary: 'rgba(111,211,168,0.36)',
+    navHoverBg: 'rgba(227,198,107,0.08)',
     navActiveBg:
-      'linear-gradient(90deg, rgba(179,136,255,0.18) 0%, rgba(179,136,255,0) 100%)',
-    textOnAccent: '#04130b',
-    fontLogo: '"Cinzel Decorative", "Cinzel", Georgia, serif',
-    fontDisplay: '"Cinzel", Georgia, serif',
-    fontBody: '"Lora", Georgia, serif',
+      'linear-gradient(90deg, rgba(111,211,168,0.16) 0%, rgba(111,211,168,0) 100%)',
+    textOnAccent: '#0b1510',
+    fontLogo: '"Marcellus", Georgia, serif',
+    fontDisplay: '"Marcellus", Georgia, serif',
+    fontBody: '"Cormorant Garamond", Georgia, serif',
   }),
-  fonts: { logo: 'Cinzel Decorative', display: 'Cinzel', body: 'Lora' },
-  thumbnail: '/themes/thumbnails/magie.webp',
-  background: '/themes/backgrounds/magie.webp',
+  fonts: { logo: 'Marcellus', display: 'Marcellus', body: 'Cormorant Garamond' },
+  thumbnail: '/themes/thumbnails/fantasy.webp',
+  background: '/themes/backgrounds/fantasy.webp',
   decorationsModule: () => import('./decorations.css'),
   reducedMotion: 'safe',
 };

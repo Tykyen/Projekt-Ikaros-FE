@@ -19,7 +19,7 @@ export function WorldAboutPanel({ world }: Props) {
   if (!hasDescription && !hasTones && !hasDice) return null;
 
   return (
-    <details className={s.panel}>
+    <details className={s.panel} data-elev="panel">
       <summary className={s.summary}>
         <span className={s.icon} aria-hidden>
           <Info size={16} />

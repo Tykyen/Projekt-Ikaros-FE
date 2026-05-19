@@ -249,7 +249,7 @@ const PLUS_NEON = svg(`
 export const kyberpunkTheme: Theme = {
   id: 'kyberpunk',
   name: 'Kyberpunk',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Kyberpunk — noční ulice Neo-Akihabary 2099, megalopole + fénix hologram + sparse digital rain + multibarevné neon ceduly + broken neon flicker',
   vars: {

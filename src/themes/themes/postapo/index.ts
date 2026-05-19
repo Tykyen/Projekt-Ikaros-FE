@@ -179,7 +179,7 @@ const RIVET_CORNER = svg(`
 export const postapoTheme: Theme = {
   id: 'postapo',
   name: 'Postapo',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Postapo — Bunkr 7 pod ruinami Zóny 7, korodovaný kov + matná radiace + popel. Jednoduchý, plochý, atmosférický.',
   vars: {

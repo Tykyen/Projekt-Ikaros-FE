@@ -40,7 +40,7 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-05-18.
+          Aktualizováno k 2026-05-19.
         </p>
       </header>
 

@@ -5,7 +5,7 @@ const decor = '/themes/bila/decor';
 export const bilaTheme: Theme = {
   id: 'bila',
   name: 'Bílá',
-  scope: 'both',
+  scope: 'platform',
   atmosphere: 'Éterická mramorová síň — ivory surface + light blue accent + crystal ornaments, light mode (jediné světlé téma kolekce)',
   vars: {
     // ──────────────────────────────────────────────

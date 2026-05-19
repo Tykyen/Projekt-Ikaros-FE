@@ -93,7 +93,7 @@ const FLOURISH_RIGHT =
 export const arabskySvetTheme: Theme = {
   id: 'arabsky-svet',
   name: 'Arabský svět',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Arabský svět — noční komnata sultánova paláce, mašrabíja výhled na zlato-tyrkysovou báň, hedvábí + zlato + kouř + káva + růžové okvětní lístky',
   vars: {

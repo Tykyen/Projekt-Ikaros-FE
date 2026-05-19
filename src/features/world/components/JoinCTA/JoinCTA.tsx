@@ -25,7 +25,7 @@ export function JoinCTA({ world }: Props) {
 
   if (world.accessMode === 'closed') {
     return (
-      <div className={s.card}>
+      <div className={s.card} data-elev="panel">
         <h3 className={s.title}>Uzavřený svět</h3>
         <p className={s.description}>
           Svět je momentálně uzavřený. Nové vstupy nejsou povoleny.
@@ -36,7 +36,7 @@ export function JoinCTA({ world }: Props) {
 
   if (world.accessMode === 'public') {
     return (
-      <div className={s.card}>
+      <div className={s.card} data-elev="panel">
         <h3 className={s.title}>Otevřený svět</h3>
         <p className={s.description}>
           Vstupem se staneš <strong>čtenářem</strong> světa. Uvidíš stránky,
@@ -74,7 +74,7 @@ export function JoinCTA({ world }: Props) {
       : 'Soukromý svět. Pokud jsi sem dostal odkaz, můžeš požádat o vstup. Rozhoduje PJ.';
 
   return (
-    <div className={s.card}>
+    <div className={s.card} data-elev="panel">
       <h3 className={s.title}>{accessLabel}</h3>
       <p className={s.description}>{description}</p>
       <Button

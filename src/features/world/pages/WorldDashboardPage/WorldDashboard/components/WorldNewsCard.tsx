@@ -37,7 +37,7 @@ export function WorldNewsCard({
   const isArchived = !!news.archived;
 
   return (
-    <article className={clsx(s.card, s[news.type])}>
+    <article className={clsx(s.card, s[news.type])} data-elev="card">
       <div className={s.head}>
         <h3 className={s.title}>{news.title}</h3>
         {canManage && (

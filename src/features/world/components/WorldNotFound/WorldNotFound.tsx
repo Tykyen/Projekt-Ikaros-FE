@@ -9,7 +9,7 @@ import s from './WorldNotFound.module.css';
  */
 export function WorldNotFound() {
   return (
-    <section className={s.card}>
+    <section className={s.card} data-elev="panel">
       <div className={s.icon} aria-hidden="true">
         🌌
       </div>

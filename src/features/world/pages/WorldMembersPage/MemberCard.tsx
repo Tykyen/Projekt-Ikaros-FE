@@ -17,7 +17,7 @@ export function MemberCard({ member }: Props) {
   const name = member.user?.username ?? 'Neznámý hráč';
 
   return (
-    <article className={s.card}>
+    <article className={s.card} data-elev="card">
       <UserAvatar src={member.user?.avatarUrl} size="lg" alt={name} />
       <span className={s.name}>{name}</span>
       <WorldRoleChip role={member.role} size="sm" />

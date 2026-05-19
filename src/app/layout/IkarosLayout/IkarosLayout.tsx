@@ -38,7 +38,7 @@ import {
   loginModalOpenAtom,
   registerModalOpenAtom,
 } from '@/shared/store/authStore';
-import { themeAtom } from '../../../themes/state';
+import { themeAtom, platformThemePreviewAtom } from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 import { ThemeSwitcher } from '../../../themes/ThemeSwitcher';
 import { LoginModal } from '@/features/auth/components/LoginModal';
@@ -50,7 +50,12 @@ import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
-import { PendingActionType, UserRole, WorldRole } from '@/shared/types';
+import {
+  PendingActionType,
+  UserRole,
+  WorldRole,
+  type UserThemeSettings,
+} from '@/shared/types';
 
 function PanelCorners() {
   return (
@@ -642,6 +647,21 @@ export function IkarosLayout() {
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);
+  // Krok 5.9 — uživatelské doladění jasu/kontrastu platformy (přístupnost).
+  const platformPreview = useAtomValue(platformThemePreviewAtom);
+  const themeUser = useAtomValue(currentUserAtom);
+  const tsAdjust = (
+    themeUser?.themeSettings as UserThemeSettings | undefined
+  )?.adjust;
+  const adjust = platformPreview ? platformPreview.adjust : tsAdjust;
+  const mainStyle =
+    adjust && (adjust.brightness != null || adjust.contrast != null)
+      ? {
+          filter: `brightness(${adjust.brightness ?? 1}) contrast(${
+            adjust.contrast ?? 1
+          })`,
+        }
+      : undefined;
   const bgStyle = theme.background
     ? {
         backgroundImage: `url(${theme.background})`,
@@ -718,7 +738,10 @@ export function IkarosLayout() {
           />
         </aside>
 
-        <main className={clsx(s.main, isChat && s.mainChat)}>
+        <main
+          className={clsx(s.main, isChat && s.mainChat)}
+          style={mainStyle}
+        >
           <Outlet />
         </main>
 

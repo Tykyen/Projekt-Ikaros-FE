@@ -218,7 +218,7 @@ const EMBER_DOT = svg(`
 export const slunceTheme: Theme = {
   id: 'slunce',
   name: 'Slunce',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Slunce — antický sluneční kult v pouštních ruinách + glassmorphic levitující tlačítka + gold+ember glow + sun corona corner + flame disc s flicker',
   vars: {

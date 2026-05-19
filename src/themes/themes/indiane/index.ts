@@ -21,7 +21,7 @@ const decor = '/themes/indiane/decor';
 export const indianeTheme: Theme = {
   id: 'indiane',
   name: 'Indiánské',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Strážci horizontu — prairie soumrak, patinované dřevo + železné nail studs + tribal cik-cak carving, šamanský buben jako welcome card',
   vars: {

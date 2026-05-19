@@ -25,7 +25,7 @@ export function AccessRequestPending({ worldId, requestedAt }: Props) {
   });
 
   return (
-    <div className={s.card}>
+    <div className={s.card} data-elev="panel">
       <div className={s.icon} aria-hidden="true">
         ⏳
       </div>

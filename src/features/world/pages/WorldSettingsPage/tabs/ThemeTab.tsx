@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSetAtom } from 'jotai';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui';
-import { applyTheme } from '@/themes/applyTheme';
+import { worldThemePreviewAtom } from '@/themes/state';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useUpdateWorld } from '@/features/world/api/useUpdateWorld';
 import { useUploadContentImage } from '@/features/ikaros/api/useUploadContentImage';
@@ -31,28 +32,18 @@ export default function ThemeTab() {
     world?.themeBackgroundUrl,
   );
 
-  // Stav světa při vstupu do tabu — pro obnovu při opuštění bez uložení.
-  const originalRef = useRef({
-    themeId: world?.themeId ?? DEFAULT_THEME_ID,
-    overrides: world?.themeOverrides,
-    backgroundUrl: world?.themeBackgroundUrl,
-  });
+  const setPreview = useSetAtom(worldThemePreviewAtom);
 
-  // Živý náhled — vrství aktuální volbu na :root.
+  // Živý náhled — publikuje volbu editoru do náhledového atomu; `WorldLayout`
+  // ji aplikuje na celý svět (barvy + pozadí + efekt).
   useEffect(() => {
-    void applyTheme(themeId, { overrides, backgroundUrl });
-  }, [themeId, overrides, backgroundUrl]);
+    setPreview({ themeId, overrides, backgroundUrl });
+  }, [themeId, overrides, backgroundUrl, setPreview]);
 
-  // Cleanup — opuštění tabu bez uložení vrátí motiv světa do původního stavu.
+  // Cleanup — opuštění tabu vyčistí náhled (svět zpět podle `World`).
   useEffect(() => {
-    const orig = originalRef.current;
-    return () => {
-      void applyTheme(orig.themeId, {
-        overrides: orig.overrides,
-        backgroundUrl: orig.backgroundUrl,
-      });
-    };
-  }, []);
+    return () => setPreview(null);
+  }, [setPreview]);
 
   if (!world) return null;
 
@@ -76,7 +67,6 @@ export default function ThemeTab() {
         themeOverrides: overrides,
         themeBackgroundUrl: backgroundUrl ?? '',
       });
-      originalRef.current = { themeId, overrides, backgroundUrl };
       toast.success('Vzhled světa uložen.');
     } catch {
       toast.error('Uložení vzhledu selhalo.');

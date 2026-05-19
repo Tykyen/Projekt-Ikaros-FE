@@ -1,0 +1,63 @@
+/* ── Sci-Fi „vesmir" — můstek hvězdné lodi (krok 5.7d) ──
+   Aktivuje se přes [data-theme="vesmir"]. Vše scoped.
+   Signature: pomalá cyan skenovací linka + cyan svit nadpisů.
+   Panely 3D řeší jednotná vrstva (krok 5.8). */
+
+[data-theme='vesmir'] {
+  background-color: #070b12;
+}
+
+/* ── Atmosférický overlay nad pozadím ── */
+[data-theme='vesmir']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--theme-bg-overlay);
+}
+
+/* ── Signature — cyan skenovací linka přejíždějící plochou ── */
+[data-theme='vesmir']::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(79, 212, 228, 0.55) 50%,
+    transparent 100%
+  );
+  animation: vesmir-scan 9s linear infinite;
+}
+
+@keyframes vesmir-scan {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+/* ── Cyan svit nadpisů ── */
+[data-theme='vesmir'] h1,
+[data-theme='vesmir'] h2,
+[data-theme='vesmir'] h3 {
+  text-shadow:
+    0 0 12px var(--theme-glow-gold),
+    0 0 24px rgba(91, 143, 214, 0.22);
+  letter-spacing: 0.05em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='vesmir']::after {
+    animation: none;
+    opacity: 0;
+  }
+}

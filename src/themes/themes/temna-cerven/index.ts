@@ -5,7 +5,7 @@ const decor = '/themes/temna-cerven/decor';
 export const temnaCervenTheme: Theme = {
   id: 'temna-cerven',
   name: 'Temná červeň',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Salón nesmrtelného šlechtice — křižácké železo, baroque tarnishované stříbro, viktoriánský granát a jet-bead smutek, krev jako klenot',
   vars: {

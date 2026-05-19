@@ -79,6 +79,7 @@ export interface User {
   isDeleted?: boolean;
   themeSettings: Record<string, unknown>;
   chatPreferences: Record<string, unknown>;
+  /* themeSettings — viz `UserThemeSettings` (čte se přes cast). */
   favoriteDiscussionIds: string[];
   /** 3.7 — oblíbené (záložky) napříč globálním obsahem */
   favoriteArticleIds?: string[];
@@ -344,6 +345,23 @@ export interface World {
   };
 }
 
+/** Krok 5.9 — uživatelské doladění vzhledu (jas / kontrast / síla pozadí). */
+export interface WorldThemeAdjust {
+  brightness?: number;
+  contrast?: number;
+  bgDim?: number;
+}
+
+/**
+ * Krok 5.9 — obsah `User.themeSettings`: doladění vzhledu platformy Ikaros.
+ * `User.themeSettings` je v typu generický objekt — čte se přes cast.
+ */
+export interface UserThemeSettings {
+  themeId?: string;
+  adjust?: WorldThemeAdjust;
+  overrides?: Record<string, string>;
+}
+
 export interface WorldMembership {
   id: string;
   userId: string;
@@ -354,6 +372,9 @@ export interface WorldMembership {
   group?: string;
   /** 5.3 — AKJ úroveň člena (stupňovaná prověrka viditelnosti stránek). */
   akj?: number;
+  /** Krok 5.9 — per-uživatel per-svět doladění vzhledu (přístupnost). */
+  themeAdjust?: WorldThemeAdjust;
+  themeUserOverrides?: Record<string, string>;
   /** 5.3 — public summary uživatele; populuje `GET /worlds/:id/members`. */
   user?: {
     id: string;

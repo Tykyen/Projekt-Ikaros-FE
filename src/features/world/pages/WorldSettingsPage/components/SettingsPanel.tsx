@@ -15,7 +15,7 @@ interface Props {
  */
 export function SettingsPanel({ title, description, action, children }: Props) {
   return (
-    <section className={s.panel}>
+    <section className={s.panel} data-elev="panel">
       <header className={s.header}>
         <div>
           <h2 className={s.title}>{title}</h2>

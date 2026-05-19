@@ -5,7 +5,7 @@ const decor = '/themes/priroda/decor';
 export const prirodaTheme: Theme = {
   id: 'priroda',
   name: 'Příroda',
-  scope: 'both',
+  scope: 'platform',
   atmosphere:
     'Zakletý prastarý les při západu slunce — dřevo + břečťan + smaragdové krystaly + zlato kaligrafie',
   vars: {
