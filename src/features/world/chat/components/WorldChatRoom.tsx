@@ -16,12 +16,12 @@ import {
   worldChatKeys,
 } from '../api/useWorldChat';
 import { groupColorVar } from '../lib/groupColor';
-import type { ChannelUnread } from '../lib/types';
+import type { ChannelUnread, ChatChannel, ChatGroup } from '../lib/types';
 import { ChannelSidebar } from './ChannelSidebar';
 import { ChannelView } from './ChannelView';
 import { ChannelMemberPanel } from './ChannelMemberPanel';
-import { CreateGroupDialog } from './CreateGroupDialog';
-import { CreateChannelDialog } from './CreateChannelDialog';
+import { GroupDialog } from './GroupDialog';
+import { ChannelDialog } from './ChannelDialog';
 import { ChatSearchModal } from './ChatSearchModal';
 import s from './WorldChatRoom.module.css';
 
@@ -43,11 +43,15 @@ export function WorldChatRoom() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [groupDialog, setGroupDialog] = useState(false);
+  const [groupDialog, setGroupDialog] = useState<{
+    mode: 'create' | 'edit';
+    initial?: ChatGroup;
+  } | null>(null);
   const [channelDialog, setChannelDialog] = useState<{
-    open: boolean;
+    mode: 'create' | 'edit';
+    initial?: ChatChannel;
     groupId: string | null;
-  }>({ open: false, groupId: null });
+  } | null>(null);
 
   const groupList = useMemo(() => groups.data ?? [], [groups.data]);
   const allChannels = useMemo(
@@ -157,9 +161,19 @@ export function WorldChatRoom() {
           unread={unreadMap}
           canManage={isManager}
           onSelectChannel={selectChannel}
-          onAddGroup={() => setGroupDialog(true)}
+          onAddGroup={() => setGroupDialog({ mode: 'create' })}
+          onEditGroup={(group) =>
+            setGroupDialog({ mode: 'edit', initial: group })
+          }
           onAddChannel={(groupId) =>
-            setChannelDialog({ open: true, groupId })
+            setChannelDialog({ mode: 'create', groupId })
+          }
+          onEditChannel={(channel) =>
+            setChannelDialog({
+              mode: 'edit',
+              initial: channel,
+              groupId: channel.groupId,
+            })
           }
         />
       </div>
@@ -221,15 +235,19 @@ export function WorldChatRoom() {
       )}
 
       {groupDialog && (
-        <CreateGroupDialog
+        <GroupDialog
           worldId={worldId}
-          onClose={() => setGroupDialog(false)}
+          mode={groupDialog.mode}
+          initial={groupDialog.initial}
+          onClose={() => setGroupDialog(null)}
         />
       )}
-      {channelDialog.open && (
-        <CreateChannelDialog
+      {channelDialog && (
+        <ChannelDialog
           worldId={worldId}
-          onClose={() => setChannelDialog({ open: false, groupId: null })}
+          mode={channelDialog.mode}
+          initial={channelDialog.initial}
+          onClose={() => setChannelDialog(null)}
           groups={groupList}
           defaultGroupId={channelDialog.groupId}
           currentUserId={user.id}

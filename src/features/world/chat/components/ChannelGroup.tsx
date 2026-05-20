@@ -1,5 +1,5 @@
 import { type CSSProperties } from 'react';
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown, Plus, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import { ChannelItem } from './ChannelItem';
 import type { ChatChannel, ChatGroup } from '../lib/types';
@@ -19,6 +19,8 @@ interface ChannelGroupProps {
   onSelectChannel: (channelId: string) => void;
   onTogglePin: (channelId: string) => void;
   onAddChannel: () => void;
+  onEditGroup: () => void;
+  onEditChannel: (channel: ChatChannel) => void;
 }
 
 /** Kanál v sidebaru (`ChatGroup`) — sbalovací kontejner konverzací. */
@@ -35,6 +37,8 @@ export function ChannelGroup({
   onSelectChannel,
   onTogglePin,
   onAddChannel,
+  onEditGroup,
+  onEditChannel,
 }: ChannelGroupProps) {
   return (
     <section
@@ -60,15 +64,26 @@ export function ChannelGroup({
           <span className={s.name}>{group.name}</span>
         </button>
         {canManage && (
-          <button
-            type="button"
-            className={s.add}
-            onClick={onAddChannel}
-            title="Nová konverzace"
-            aria-label="Nová konverzace"
-          >
-            <Plus size={14} />
-          </button>
+          <>
+            <button
+              type="button"
+              className={s.edit}
+              onClick={onEditGroup}
+              title="Upravit kanál"
+              aria-label="Upravit kanál"
+            >
+              <Settings size={14} />
+            </button>
+            <button
+              type="button"
+              className={s.add}
+              onClick={onAddChannel}
+              title="Nová konverzace"
+              aria-label="Nová konverzace"
+            >
+              <Plus size={14} />
+            </button>
+          </>
         )}
       </div>
 
@@ -82,8 +97,10 @@ export function ChannelGroup({
               unread={unread.get(c.id) ?? 0}
               pinned={pinned.has(c.id)}
               accentColor={color}
+              canManage={canManage}
               onSelect={() => onSelectChannel(c.id)}
               onTogglePin={() => onTogglePin(c.id)}
+              onEdit={() => onEditChannel(c)}
             />
           ))}
           {channels.length === 0 && (

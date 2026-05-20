@@ -39,6 +39,8 @@ export interface ChatChannel {
   lastMessagePreview?: string;
   order: number;
   type: string;
+  /** Obrázek konverzace (Cloudinary URL) — thumbnail v sidebaru. */
+  imageUrl?: string;
 }
 
 /** Položka z `GET /worlds/:id/chat/groups` — kanál se svými konverzacemi. */

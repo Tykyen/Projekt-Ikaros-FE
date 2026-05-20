@@ -283,7 +283,7 @@ const WORLD_PAGES_OK: PageDoc[] = [
     name: 'Světový chat',
     status: 'ok',
     who: 'Členové světa (konverzace podle přístupu)',
-    what: 'Chat uvnitř světa — 3-panelový: vlevo kanály a v nich konverzace, uprostřed zprávy, vpravo (jen pro PJ) seznam přítomných podle role. Konverzace přepínáš, oblíbené si připneš nahoru. U každé konverzace je odznak nepřečtených a náhled poslední zprávy. Globální konverzace jsou pro hráče a výš; PJ a Pomocný PJ zakládají kanály a konverzace (veřejné, podle rolí, nebo soukromé pro vybrané členy — včetně hromadného 1:1 se všemi hráči). Kostky, šepoty, reakce, přílohy a vlastní emotikony přibydou postupně.',
+    what: 'Chat uvnitř světa — 3-panelový: vlevo kanály a v nich konverzace, uprostřed zprávy, vpravo (jen pro PJ) seznam přítomných podle role. Konverzace přepínáš, oblíbené si připneš nahoru. U každé konverzace je odznak nepřečtených a náhled poslední zprávy. Globální konverzace jsou pro hráče a výš; PJ a Pomocný PJ zakládají kanály a konverzace (veřejné, podle rolí, nebo soukromé pro vybrané členy — včetně hromadného 1:1 se všemi hráči). PJ může každý kanál i konverzaci zpětně upravit (ozubené kolečko v sidebaru): přejmenovat, vyměnit obrázek, změnit přístup, přesunout konverzaci do jiného kanálu, smazat (s potvrzením; smazání kanálu kaskáduje na konverzace uvnitř). Kostky, šepoty, reakce, přílohy a vlastní emotikony přibydou postupně.',
   },
 ];
 

@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ChannelSidebar } from './ChannelSidebar';
 import type { GroupWithChannels } from '../lib/types';
 
@@ -29,6 +30,8 @@ const baseProps = {
   onSelectChannel: () => {},
   onAddGroup: () => {},
   onAddChannel: () => {},
+  onEditGroup: () => {},
+  onEditChannel: () => {},
 };
 
 describe('ChannelSidebar', () => {
@@ -58,5 +61,47 @@ describe('ChannelSidebar', () => {
     expect(
       screen.getByRole('button', { name: /Nový kanál/ }),
     ).toBeInTheDocument();
+  });
+
+  it('Settings ikony pro kanál i konverzaci se zobrazí jen pro PJ', () => {
+    render(<ChannelSidebar groups={groups} canManage={false} {...baseProps} />);
+    expect(
+      screen.queryByRole('button', { name: /Upravit kanál/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Upravit konverzaci/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('klik na Settings u kanálu předá konkrétní group do onEditGroup', async () => {
+    const onEditGroup = vi.fn();
+    render(
+      <ChannelSidebar
+        groups={groups}
+        canManage
+        {...baseProps}
+        onEditGroup={onEditGroup}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: /Upravit kanál/ }),
+    );
+    expect(onEditGroup).toHaveBeenCalledWith(groups[0].group);
+  });
+
+  it('klik na Settings u konverzace předá konkrétní channel do onEditChannel', async () => {
+    const onEditChannel = vi.fn();
+    render(
+      <ChannelSidebar
+        groups={groups}
+        canManage
+        {...baseProps}
+        onEditChannel={onEditChannel}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: /Upravit konverzaci/ }),
+    );
+    expect(onEditChannel).toHaveBeenCalledWith(groups[0].channels[0]);
   });
 });

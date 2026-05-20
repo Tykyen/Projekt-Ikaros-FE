@@ -4,7 +4,7 @@ import { usePinnedChannels } from '../api/usePinnedChannels';
 import { groupColorVar } from '../lib/groupColor';
 import { ChannelGroup } from './ChannelGroup';
 import { ChannelItem } from './ChannelItem';
-import type { GroupWithChannels } from '../lib/types';
+import type { ChatChannel, ChatGroup, GroupWithChannels } from '../lib/types';
 import s from './ChannelSidebar.module.css';
 
 interface ChannelSidebarProps {
@@ -15,6 +15,8 @@ interface ChannelSidebarProps {
   onSelectChannel: (channelId: string) => void;
   onAddGroup: () => void;
   onAddChannel: (groupId: string) => void;
+  onEditGroup: (group: ChatGroup) => void;
+  onEditChannel: (channel: ChatChannel) => void;
 }
 
 /** Sidebar světového chatu — připnuté konverzace + kanály → konverzace. */
@@ -26,6 +28,8 @@ export function ChannelSidebar({
   onSelectChannel,
   onAddGroup,
   onAddChannel,
+  onEditGroup,
+  onEditChannel,
 }: ChannelSidebarProps) {
   const { pinned, togglePin } = usePinnedChannels();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -60,8 +64,10 @@ export function ChannelSidebar({
                 unread={unread.get(channel.id) ?? 0}
                 pinned
                 accentColor={color}
+                canManage={canManage}
                 onSelect={() => onSelectChannel(channel.id)}
                 onTogglePin={() => togglePin(channel.id)}
+                onEdit={() => onEditChannel(channel)}
               />
             ))}
           </div>
@@ -84,6 +90,8 @@ export function ChannelSidebar({
             onSelectChannel={onSelectChannel}
             onTogglePin={togglePin}
             onAddChannel={() => onAddChannel(group.id)}
+            onEditGroup={() => onEditGroup(group)}
+            onEditChannel={onEditChannel}
           />
         ))}
 

@@ -135,3 +135,56 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Footer s rozdělením: Smazat vlevo, Zrušit/Uložit vpravo. */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.footerRight {
+  display: flex;
+  gap: var(--sp-2);
+  margin-left: auto;
+}
+
+/* Destructive tlačítko — neutrální stav (před potvrzením). */
+.deleteAction {
+  color: var(--color-danger);
+  border-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+.deleteAction:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+/* Po prvním kliku — výrazné varovné tlačítko. */
+.deleteConfirm {
+  color: var(--text-on-accent);
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+.deleteConfirm:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 80%, black);
+}
+
+/* Mobile fallback — footer skládat pod sebe a Smazat doleva ale na celou šířku. */
+@media (max-width: 480px) {
+  .footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .footerRight {
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+}
