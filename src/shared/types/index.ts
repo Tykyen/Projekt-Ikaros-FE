@@ -39,7 +39,6 @@ export interface User {
   avatarUrl?: string;
   profileImageUrl?: string;
   characterPath?: string;
-  ikarosSkin?: string;
   // 1.3a profil
   city?: string;
   bio?: string;
@@ -259,7 +258,6 @@ export interface UpdateUserRequest {
   displayName?: string;
   avatarUrl?: string;
   characterPath?: string;
-  ikarosSkin?: string;
   username?: string;
   themeSettings?: Record<string, unknown>;
   chatPreferences?: Record<string, unknown>;
@@ -290,7 +288,6 @@ export interface AccessTokenPayload {
   username: string;
   role: UserRole;
   characterPath: string;
-  ikarosSkin: string;
   iat: number;
   exp: number;
 }

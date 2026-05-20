@@ -239,7 +239,7 @@ describe('useAuthBootstrap', () => {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const token = makeJwt({
       sub: '42', email: 'b@b.com', username: 'bob', role: UserRole.Ikarus,
-      characterPath: 'p', ikarosSkin: 'default', exp,
+      characterPath: 'p', exp,
     });
     store.set(accessTokenAtom, token);
 
@@ -269,7 +269,7 @@ describe('useAuthBootstrap', () => {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const token = makeJwt({
       sub: '1', email: 'a@a.com', username: 'alice', role: UserRole.Ikarus,
-      characterPath: '', ikarosSkin: 'default', exp,
+      characterPath: '', exp,
     });
     const existing = {
       id: '1', email: 'a@a.com', username: 'alice', role: UserRole.Ikarus,
