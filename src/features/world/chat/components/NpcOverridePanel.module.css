@@ -1,0 +1,96 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  background: var(--theme-elevated-bg, color-mix(in srgb, var(--theme-surface) 60%, transparent));
+  border-left: 3px solid color-mix(in srgb, var(--ch-accent, var(--theme-accent)) 75%, transparent);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+.icon {
+  color: var(--ch-accent, var(--theme-accent));
+  flex-shrink: 0;
+}
+
+.label {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--theme-text-dim);
+}
+
+.input {
+  flex: 1 1 140px;
+  min-width: 0;
+  padding: 4px 8px;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  border: 1px solid var(--theme-border-soft);
+  border-radius: var(--radius-xs, 4px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  outline: none;
+  transition: border-color 120ms ease-out;
+}
+
+.input:focus {
+  border-color: var(--ch-accent, var(--theme-accent));
+}
+
+.preview {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--theme-border-soft);
+}
+
+.off {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: transparent;
+  color: var(--theme-text-dim);
+  border: 1px solid var(--theme-border-soft);
+  border-radius: var(--radius-xs, 4px);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.off:hover {
+  color: var(--theme-text);
+  border-color: var(--theme-border);
+}
+
+@media (max-width: 480px) {
+  .bar {
+    gap: 6px;
+  }
+  .input {
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes barIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .bar {
+    animation: barIn 160ms ease-out;
+  }
+}

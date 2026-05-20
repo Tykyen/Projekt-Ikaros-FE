@@ -1,0 +1,335 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { HexColorPicker } from 'react-colorful';
+import { X, Undo2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { guardChatColor } from '@/features/chat/lib/chatColorGuard';
+import {
+  CHAT_FONTS,
+  CHAT_FONT_SIZES,
+  getFontStack,
+  getFontSize,
+  type ChatFontCategory,
+} from '../lib/chatFonts';
+import {
+  useMembershipAppearance,
+  useUpdateAppearance,
+} from '../api/useMembershipAppearance';
+import s from './AppearancePopover.module.css';
+
+/**
+ * Krok 6.2f — popover „Vzhled mé zprávy v tomto světě".
+ *
+ * Per-svět color + font + velikost v `WorldMembership.chatColor/chatFont/chatFontSize`.
+ * Reset (Undo2) uloží `null` → BE bere fallback z globálního profilu / system font / 1×.
+ *
+ * Náhled je živý — color/font/size pickery mění mock chat-bubble okamžitě, save
+ * commitne do BE až tlačítkem „Uložit podpis".
+ */
+
+const HEX_RE = /^#[0-9A-Fa-f]{6}$/;
+
+interface Props {
+  worldId: string;
+  surfaceColor: string;
+  onClose: () => void;
+}
+
+const PREVIEW_TEXT =
+  'Tvá zpráva by vypadala takto. Jakou stopu chceš v tomto světě nechat?';
+
+const CATEGORY_ORDER: readonly ChatFontCategory[] = [
+  'Systémové',
+  'Knižní a typografie',
+  'Středověké a epické',
+  'Rukopisy a poznámky',
+  'Stroje a terminály',
+  'Futuristické a cyber',
+];
+
+export function AppearancePopover({ worldId, surfaceColor, onClose }: Props) {
+  const appearance = useMembershipAppearance(worldId);
+  const update = useUpdateAppearance(worldId);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Lokální nepotvrzený stav (živý preview); na uložení se commit do BE.
+  const [color, setColor] = useState<string | null>(null);
+  const [font, setFont] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
+
+  // Seed lokálního stavu z odpovědi BE — jen jednou.
+  useEffect(() => {
+    if (initialized) return;
+    if (!appearance.data) return;
+    setColor(appearance.data.chatColor ?? '#FFFFFF');
+    setFont(appearance.data.chatFont ?? 'system');
+    setFontSize(appearance.data.chatFontSize ?? 'normal');
+    setInitialized(true);
+  }, [appearance.data, initialized]);
+
+  // Outside click → close.
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (!rootRef.current) return;
+      if (!rootRef.current.contains(e.target as Node)) onClose();
+    }
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [onClose]);
+
+  // Esc → close.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const validHex = !!color && HEX_RE.test(color);
+  const guarded = useMemo(
+    () => (validHex ? guardChatColor(color, surfaceColor) : undefined),
+    [color, surfaceColor, validHex],
+  );
+  const contrastWarn =
+    validHex && guarded !== color && guarded !== `var(--theme-text)`;
+
+  // Grupování fontů podle kategorie.
+  const fontsByCategory = useMemo(() => {
+    const map = new Map<ChatFontCategory, typeof CHAT_FONTS>();
+    for (const f of CHAT_FONTS) {
+      const arr = map.get(f.category);
+      if (arr) (arr as ChatFont[]).push(f);
+      else map.set(f.category, [f] as never);
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  type ChatFont = (typeof CHAT_FONTS)[number];
+
+  function handleSave() {
+    update.mutate(
+      {
+        chatColor: validHex ? color : null,
+        chatFont: font,
+        chatFontSize: fontSize,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Vzhled mé zprávy uložen');
+          onClose();
+        },
+        onError: () => {
+          toast.error('Uložení vzhledu selhalo');
+        },
+      },
+    );
+  }
+
+  function handleReset() {
+    update.mutate(
+      { chatColor: null, chatFont: null, chatFontSize: null },
+      {
+        onSuccess: () => {
+          toast.success('Vzhled resetován na výchozí');
+          onClose();
+        },
+      },
+    );
+  }
+
+  function handleHexInput(raw: string) {
+    let v = raw;
+    if (!v.startsWith('#')) v = '#' + v.replace(/^#/, '');
+    if (!/^#[0-9A-Fa-f]{0,6}$/.test(v)) return;
+    setColor(v.toUpperCase());
+  }
+
+  const previewColor = validHex ? (guarded ?? color!) : 'inherit';
+  const previewFont = font ? getFontStack(font) : getFontStack(null);
+  const previewSize = fontSize ? getFontSize(fontSize) : undefined;
+
+  return (
+    <div
+      ref={rootRef}
+      className={s.popover}
+      role="dialog"
+      aria-label="Vzhled mé zprávy v tomto světě"
+    >
+      <header className={s.head}>
+        <span className={s.title}>Vzhled mé zprávy v tomto světě</span>
+        <button
+          type="button"
+          className={s.close}
+          onClick={onClose}
+          aria-label="Zavřít"
+        >
+          <X size={16} />
+        </button>
+      </header>
+
+      {/* Náhled */}
+      <div className={s.previewWrap} aria-label="Náhled zprávy">
+        <div className={s.previewMeta}>Tvé jméno · 14:32</div>
+        <div
+          className={s.previewMsg}
+          style={{
+            color: previewColor,
+            fontFamily: previewFont,
+            fontSize: previewSize,
+          }}
+        >
+          {PREVIEW_TEXT}
+        </div>
+      </div>
+
+      {/* Barva */}
+      <section className={s.section}>
+        <h3 className={s.sectionTitle}>Barva</h3>
+        <HexColorPicker
+          color={validHex ? color : '#FFFFFF'}
+          onChange={(c) => setColor(c.toUpperCase())}
+          className={s.picker}
+        />
+        <div className={s.hexRow}>
+          <span
+            className={s.swatch}
+            style={{ backgroundColor: validHex ? color! : 'transparent' }}
+            aria-hidden="true"
+          />
+          <input
+            type="text"
+            className={s.hex}
+            value={color ?? ''}
+            maxLength={7}
+            onChange={(e) => handleHexInput(e.target.value)}
+            aria-invalid={!validHex}
+            placeholder="#RRGGBB"
+          />
+          <button
+            type="button"
+            className={s.miniReset}
+            onClick={() => setColor('#FFFFFF')}
+            title="Vrátit na bílou"
+          >
+            <Undo2 size={13} />
+          </button>
+        </div>
+        {contrastWarn && (
+          <p className={s.warn}>
+            ⚠ Tato barva je málo čitelná na pozadí konverzace — bude lehce
+            upravena pro kontrast.
+          </p>
+        )}
+      </section>
+
+      {/* Velikost písma */}
+      <section className={s.section}>
+        <h3 className={s.sectionTitle}>Velikost</h3>
+        <div className={s.sizeRow} role="radiogroup" aria-label="Velikost písma">
+          {CHAT_FONT_SIZES.map((sz) => {
+            const checked = fontSize === sz.key;
+            return (
+              <label
+                key={sz.key}
+                className={checked ? `${s.sizeBtn} ${s.sizeBtnActive}` : s.sizeBtn}
+                style={{ fontSize: sz.value }}
+                title={sz.label}
+              >
+                <input
+                  type="radio"
+                  name="chat-font-size"
+                  value={sz.key}
+                  checked={checked}
+                  onChange={() => setFontSize(sz.key)}
+                  className={s.sizeRadio}
+                />
+                <span>Aa</span>
+              </label>
+            );
+          })}
+        </div>
+        <div className={s.sizeLabel}>
+          {CHAT_FONT_SIZES.find((sz) => sz.key === fontSize)?.label ??
+            'Normální (1×)'}
+        </div>
+      </section>
+
+      {/* Font — kategorizovaný */}
+      <section className={s.section}>
+        <h3 className={s.sectionTitle}>Písmo</h3>
+        <div className={s.fontList} role="radiogroup" aria-label="Písmo zprávy">
+          {CATEGORY_ORDER.map((cat) => {
+            const fonts = fontsByCategory.get(cat);
+            if (!fonts || fonts.length === 0) return null;
+            return (
+              <div key={cat} className={s.fontGroup}>
+                <div className={s.fontGroupTitle}>{cat}</div>
+                {fonts.map((f) => {
+                  const checked = font === f.key;
+                  return (
+                    <label
+                      key={f.key}
+                      className={
+                        checked
+                          ? `${s.fontRow} ${s.fontRowActive}`
+                          : s.fontRow
+                      }
+                    >
+                      <input
+                        type="radio"
+                        name="chat-font"
+                        value={f.key}
+                        checked={checked}
+                        onChange={() => setFont(f.key)}
+                        className={s.fontRadio}
+                      />
+                      <span className={s.fontLabel}>{f.label}</span>
+                      <span
+                        className={s.fontSample}
+                        style={{ fontFamily: f.stack }}
+                      >
+                        {f.sample}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Akce */}
+      <footer className={s.foot}>
+        <button
+          type="button"
+          className={s.reset}
+          onClick={handleReset}
+          disabled={update.isPending}
+        >
+          <Undo2 size={13} />
+          <span>Použít výchozí</span>
+        </button>
+        <div className={s.footRight}>
+          <button
+            type="button"
+            className={s.cancel}
+            onClick={onClose}
+            disabled={update.isPending}
+          >
+            Zrušit
+          </button>
+          <button
+            type="button"
+            className={s.saveBtn}
+            onClick={handleSave}
+            disabled={update.isPending || !validHex}
+          >
+            {update.isPending ? 'Ukládám…' : 'Uložit podpis'}
+          </button>
+        </div>
+      </footer>
+    </div>
+  );
+}
