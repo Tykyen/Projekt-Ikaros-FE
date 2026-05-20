@@ -1,0 +1,297 @@
+/* Krok 6.3c — PoolPromptModal. Modal s grid karet typů kostky + steppery. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: backdropIn 180ms ease-out;
+}
+
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: var(--theme-surface-2, rgba(20, 16, 50, 0.98));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.25));
+  border-radius: 16px;
+  width: min(480px, 92vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalIn 220ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+}
+
+.title {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--theme-text, rgba(230, 225, 255, 0.95));
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--theme-text-dim, rgba(180, 170, 220, 0.55));
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.closeBtn:hover {
+  color: #fff;
+  background: rgba(200, 100, 100, 0.15);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--theme-surface, rgba(14, 12, 30, 0.6));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.2));
+  border-radius: 10px;
+  padding: 12px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.cardActive {
+  border-color: var(--ch-accent, #a78bfa);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 8%, transparent);
+  box-shadow: 0 0 0 1px
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 30%, transparent);
+}
+
+.cardDisabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.cardGlyph {
+  font-family: 'Iceland', monospace;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
+  line-height: 1;
+}
+
+.cardActive .cardGlyph {
+  color: var(--ch-accent, #a78bfa);
+}
+
+.cardLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.55));
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.stepBtn {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-surface-2, rgba(40, 30, 80, 0.6));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.2));
+  border-radius: 4px;
+  color: var(--theme-text, #fff);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.stepBtn:hover:not(:disabled) {
+  border-color: var(--ch-accent, #a78bfa);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 16%, transparent);
+}
+
+.stepBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.count {
+  font-family: 'Iceland', monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--theme-text, #fff);
+  min-width: 24px;
+  text-align: center;
+}
+
+.inputs {
+  display: flex;
+  gap: 12px;
+  padding: 0 20px 12px;
+}
+
+.inputRow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inputLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  background: var(--theme-surface, rgba(14, 12, 30, 0.6));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.15));
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--theme-text, #fff);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--ch-accent, #a78bfa);
+}
+
+.modInput {
+  flex: 0 0 56px;
+  text-align: center;
+  font-family: 'Iceland', monospace;
+}
+
+.footer {
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.totalCounter {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
+}
+
+.totalCounter strong {
+  color: var(--theme-text, #fff);
+  font-family: 'Iceland', monospace;
+  font-size: 15px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.2));
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cancelBtn:hover {
+  border-color: var(--theme-text-dim, rgba(220, 215, 255, 0.4));
+  color: var(--theme-text, #fff);
+}
+
+.rollBtn {
+  background: var(--ch-accent, #a78bfa);
+  border: none;
+  color: var(--theme-surface, #0e0c28);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rollBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 40%, transparent);
+}
+
+.rollBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .modal {
+    animation: none;
+  }
+}

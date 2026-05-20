@@ -1,0 +1,269 @@
+/* Krok 6.3a — DicePickerPopover. Anchored pod 🎲 razítkem composeru. */
+
+.popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 1000;
+  width: 320px;
+  background: var(--theme-surface-2, rgba(20, 16, 50, 0.98));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.2));
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: popoverIn 140ms ease-out-cubic;
+  transform-origin: top center;
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.header {
+  padding: 12px 16px 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
+  border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.chip {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border-radius: 50%;
+  background: var(--theme-surface, rgba(14, 12, 30, 0.6));
+  border: 1.5px solid var(--theme-border-soft, rgba(120, 100, 255, 0.25));
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+.chip:hover {
+  border-color: var(--ch-accent, #a78bfa);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 8%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 24%, transparent);
+}
+
+.chip:hover .chipGlyph {
+  color: var(--ch-accent, #a78bfa);
+  animation: chipShake 600ms ease;
+}
+
+@keyframes chipShake {
+  0% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.chipGlyph {
+  font-family: 'Iceland', monospace;
+  font-weight: 600;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.chip_lg .chipGlyph {
+  font-size: 22px;
+}
+
+.chip_md .chipGlyph {
+  font-size: 18px;
+}
+
+.chip_sm .chipGlyph {
+  font-size: 14px;
+}
+
+.chipLabel {
+  position: absolute;
+  bottom: -16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.5));
+  white-space: nowrap;
+}
+
+.divider {
+  height: 1px;
+  background: var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+  margin: 12px 16px 0;
+}
+
+.complexRow {
+  display: flex;
+  gap: 12px;
+  padding: 8px 16px 0;
+  justify-content: space-around;
+}
+
+.complexLink {
+  background: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.65));
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.complexLink:hover {
+  color: var(--ch-accent, #a78bfa);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 8%, transparent);
+}
+
+.inputs {
+  display: flex;
+  gap: 10px;
+  padding: 8px 16px 12px;
+}
+
+.inputRow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inputLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input {
+  background: var(--theme-surface, rgba(14, 12, 30, 0.6));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.15));
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--theme-text, #fff);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: var(--ch-accent, #a78bfa);
+}
+
+.modInput {
+  flex: 0 0 48px;
+  text-align: center;
+  font-family: 'Iceland', monospace;
+}
+
+.footer {
+  padding: 8px 16px 12px;
+  border-top: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+}
+
+.footerLink {
+  background: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.55));
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.footerLink:hover {
+  color: var(--ch-accent, #a78bfa);
+}
+
+.emptyState {
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.emptyText {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
+  margin-bottom: 12px;
+}
+
+.emptyCta {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--ch-accent, #a78bfa);
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid var(--ch-accent, #a78bfa);
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.emptyCta:hover {
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 12%, transparent);
+}
+
+/* Mobile: full-width bottom sheet. */
+@media (max-width: 768px) {
+  .popover {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover {
+    animation: none;
+  }
+  .chip:hover .chipGlyph {
+    animation: none;
+  }
+}

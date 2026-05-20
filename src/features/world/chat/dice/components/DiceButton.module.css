@@ -1,0 +1,39 @@
+/* Krok 6.3a — DiceButton razítko (32×32) v composer toolbaru. */
+
+.btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--theme-text-dim, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn:hover {
+  border-color: var(--theme-border-soft, rgba(255, 255, 255, 0.1));
+  color: var(--theme-text, #fff);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.active {
+  border-color: var(--ch-accent, #a78bfa);
+  color: var(--ch-accent, #a78bfa);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 12%, transparent);
+}
+
+.active:hover {
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 18%, transparent);
+}
