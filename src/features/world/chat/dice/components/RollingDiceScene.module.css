@@ -1,0 +1,69 @@
+/* Krok 6.3d — RollingDie wrapper + cube. */
+
+.wrapper {
+  position: relative;
+  display: inline-block;
+  transform-style: preserve-3d;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.cube {
+  position: relative;
+  transform-style: preserve-3d;
+  overflow: visible;
+  animation: mountFade 220ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  animation-fill-mode: both;
+}
+
+.settled {
+  /* Drobný settle pulse — opakuje se v intervalu 4s pro "živou" kostku */
+  animation:
+    mountFade 220ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    settlePulse 4s ease-in-out 1.4s infinite;
+  animation-fill-mode: both;
+}
+
+/* 6.3 perf — 2D settled snapshot. Drobný brightness pulse stejně jako .settled. */
+.settledStatic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: settlePulse 4s ease-in-out infinite;
+}
+
+@keyframes mountFade {
+  from {
+    opacity: 0;
+    transform: scale(0.65) rotateY(0deg);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes settlePulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cube,
+  .settled {
+    animation: mountFadeReduced 80ms linear !important;
+    animation-fill-mode: both !important;
+  }
+  @keyframes mountFadeReduced {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
