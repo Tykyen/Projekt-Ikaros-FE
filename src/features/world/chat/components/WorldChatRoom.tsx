@@ -15,6 +15,7 @@ import {
   useMarkRead,
   worldChatKeys,
 } from '../api/useWorldChat';
+import { useChannelPresence } from '../api/useChannelPresence';
 import { groupColorVar } from '../lib/groupColor';
 import type { ChannelUnread, ChatChannel, ChatGroup } from '../lib/types';
 import { ChannelSidebar } from './ChannelSidebar';
@@ -39,10 +40,22 @@ export function WorldChatRoom() {
     userRole !== null && userRole >= WorldRole.PomocnyPJ;
 
   const storeKey = `wchat:active:${worldId}`;
+  const membersKey = `wchat:members:${worldId}`;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [membersOpen, setMembersOpen] = useState(false);
+  // Default: zavřeno. PJ si panel otevře přes Users ikonu, badge ho upozorní
+  // na příchody. localStorage drží volbu per world.
+  const [membersOpen, setMembersOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(membersKey) === '1';
+  });
   const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (membersOpen) localStorage.setItem(membersKey, '1');
+    else localStorage.removeItem(membersKey);
+  }, [membersOpen, membersKey]);
   const [groupDialog, setGroupDialog] = useState<{
     mode: 'create' | 'edit';
     initial?: ChatGroup;
@@ -102,6 +115,10 @@ export function WorldChatRoom() {
   // Živá synchronizace unread přes WS.
   useUnreadSync(worldId);
 
+  // Presence aktivní konverzace — volaná na úrovni room, ať badge na ikoně
+  // Přítomní zůstane živý i když je panel zavřený. PJ-only.
+  const presence = useChannelPresence(worldId, activeChannelId, isManager);
+
   // ── Označení přečteno při otevření konverzace ───────────────────────────
   useEffect(() => {
     if (!activeChannelId) return;
@@ -149,7 +166,7 @@ export function WorldChatRoom() {
     <div
       className={clsx(
         s.room,
-        isManager && s.withMembers,
+        isManager && membersOpen && s.withMembers,
         sidebarOpen && s.sidebarOpen,
         membersOpen && s.membersOpen,
       )}
@@ -188,9 +205,11 @@ export function WorldChatRoom() {
             currentUser={user}
             canManage={isManager}
             onOpenSidebar={() => setSidebarOpen(true)}
-            onOpenMembers={
-              isManager ? () => setMembersOpen(true) : undefined
+            onToggleMembers={
+              isManager ? () => setMembersOpen((o) => !o) : undefined
             }
+            membersOpen={membersOpen}
+            presenceCount={isManager ? presence.length : 0}
             onOpenSearch={() => setSearchOpen(true)}
           />
         ) : (
@@ -207,6 +226,7 @@ export function WorldChatRoom() {
           <ChannelMemberPanel
             worldId={worldId}
             channel={active}
+            presence={presence}
             onClose={() => setMembersOpen(false)}
           />
         </div>

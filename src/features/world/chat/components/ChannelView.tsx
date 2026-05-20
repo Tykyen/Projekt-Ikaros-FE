@@ -7,6 +7,7 @@ import {
   type CSSProperties,
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { Menu, Users, Search } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
 import type { User } from '@/shared/types';
@@ -36,9 +37,14 @@ interface ChannelViewProps {
   accentColor: string;
   currentUser: User;
   canManage: boolean;
-  /** Mobil — otevře sidebar / presence sheet. */
+  /** Mobil — otevře sidebar. */
   onOpenSidebar: () => void;
-  onOpenMembers?: () => void;
+  /** Toggle panelu Přítomní (PJ-only). Bez prop tlačítko nezobrazím. */
+  onToggleMembers?: () => void;
+  /** Aktuální stav panelu Přítomní — active styling tlačítka. */
+  membersOpen?: boolean;
+  /** Počet právě přítomných — badge na tlačítku, když je panel zavřený. */
+  presenceCount?: number;
   /** Otevře modal hledání ve zprávách (krok 6.6). */
   onOpenSearch: () => void;
 }
@@ -61,7 +67,9 @@ export function ChannelView({
   currentUser,
   canManage,
   onOpenSidebar,
-  onOpenMembers,
+  onToggleMembers,
+  membersOpen = false,
+  presenceCount = 0,
   onOpenSearch,
 }: ChannelViewProps) {
   const qc = useQueryClient();
@@ -218,14 +226,31 @@ export function ChannelView({
         >
           <Search size={18} />
         </button>
-        {onOpenMembers && (
+        {onToggleMembers && (
           <button
             type="button"
-            className={s.iconBtn}
-            onClick={onOpenMembers}
-            aria-label="Přítomní"
+            className={clsx(
+              s.membersBtn,
+              membersOpen && s.membersBtnActive,
+            )}
+            onClick={onToggleMembers}
+            aria-label={
+              membersOpen
+                ? 'Zavřít panel Přítomní'
+                : presenceCount > 0
+                  ? `Přítomní (${presenceCount} online)`
+                  : 'Přítomní'
+            }
+            title={
+              membersOpen ? 'Zavřít panel Přítomní' : 'Otevřít panel Přítomní'
+            }
           >
             <Users size={18} />
+            {!membersOpen && presenceCount > 0 && (
+              <span className={s.presenceBadge}>
+                {presenceCount > 99 ? '99+' : presenceCount}
+              </span>
+            )}
           </button>
         )}
       </header>

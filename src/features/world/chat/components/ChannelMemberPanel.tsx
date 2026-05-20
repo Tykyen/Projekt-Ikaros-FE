@@ -4,15 +4,16 @@ import clsx from 'clsx';
 import { UserAvatar } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
-import { useChannelPresence } from '../api/useChannelPresence';
 import { formatLastSeen } from '../lib/lastSeen';
-import type { ChatChannel } from '../lib/types';
+import type { ChannelPresenceUser, ChatChannel } from '../lib/types';
 import s from './ChannelMemberPanel.module.css';
 
 interface ChannelMemberPanelProps {
   worldId: string;
   channel: ChatChannel;
-  /** Mobil — panel jako sheet; `onClose` zavře. */
+  /** Živá presence aktivní konverzace — vlastníkem hooku je `WorldChatRoom`. */
+  presence: ChannelPresenceUser[];
+  /** Mobil i desktop — zavře panel; default je zavřeno. */
   onClose?: () => void;
 }
 
@@ -58,10 +59,10 @@ function canAccess(
 export function ChannelMemberPanel({
   worldId,
   channel,
+  presence,
   onClose,
 }: ChannelMemberPanelProps) {
   const members = useWorldMembers(worldId);
-  const presence = useChannelPresence(worldId, channel.id, true);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const onlineIds = useMemo(

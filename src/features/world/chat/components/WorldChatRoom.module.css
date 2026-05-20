@@ -10,7 +10,7 @@
   background: var(--theme-surface, var(--bg-card));
 }
 
-/* 3-panel layout — jen pro PJ/Pomocný PJ (presence panel). */
+/* 3-panel layout — jen když PJ má panel Přítomní otevřený. */
 .withMembers {
   grid-template-columns: 272px 1fr 240px;
 }
@@ -27,6 +27,12 @@
 .membersSlot > * {
   flex: 1;
   min-width: 0;
+}
+
+/* Desktop — panel zavřený = sloupec se schová, chat se roztáhne.
+   `.withMembers` přidává 3. sloupec; bez něj je `.membersSlot` mimo grid. */
+.room:not(.withMembers) .membersSlot {
+  display: none;
 }
 
 .state {
