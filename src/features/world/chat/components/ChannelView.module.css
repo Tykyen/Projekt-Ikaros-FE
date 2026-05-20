@@ -1,0 +1,132 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--theme-surface, var(--bg-card));
+}
+
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--theme-border-soft, var(--border));
+  background: var(--theme-surface-strong, var(--bg-secondary));
+}
+
+/* „Nit kanálu" — podtržení headeru v barvě kanálu konverzace. */
+.header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ch-accent, var(--theme-accent));
+  opacity: 0.75;
+  transition: background var(--transition-slow);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semi, 600);
+  color: var(--theme-heading, var(--accent));
+}
+
+.iconBtn,
+.search,
+.membersBtn {
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+}
+/* Hledání a Přítomní jsou dostupné vždy; sidebar tlačítko jen na mobilu. */
+.search,
+.membersBtn {
+  display: inline-flex;
+  flex-shrink: 0;
+  position: relative;
+}
+.iconBtn {
+  display: none;
+}
+.iconBtn:hover,
+.search:hover,
+.membersBtn:hover {
+  color: var(--theme-heading, var(--accent));
+}
+
+/* Panel Přítomní otevřený — tlačítko v accent stavu. */
+.membersBtnActive {
+  background: var(--theme-nav-active-bg, var(--bg-elev));
+  border-color: var(--theme-accent, var(--accent));
+  color: var(--theme-heading, var(--accent));
+}
+
+/* Badge s počtem online — zelená pilulka v rohu Users ikony. */
+.presenceBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--success);
+  color: var(--text-on-accent);
+  font-size: 0.62rem;
+  font-weight: var(--weight-semi, 600);
+  line-height: 16px;
+  text-align: center;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-muted, var(--text-muted));
+  font-family: var(--font-body);
+}
+
+.foot {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .iconBtn {
+    display: inline-flex;
+  }
+}
+
+/* Mobil — dotykové terče min. 44×44px. */
+@media (max-width: 768px) {
+  .iconBtn,
+  .search,
+  .membersBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
