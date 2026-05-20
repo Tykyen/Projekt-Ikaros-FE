@@ -1,0 +1,19 @@
+/* Krok 6.3d — Scéna kostek v DiceMessage. Layout řeší DiceMessage parent. */
+
+.scene {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px;
+  /* Velikost rezervovaná pro absolute-positioned kostky (D8+ TARGETS jsou
+     v absolute pozici relativně k 3d-modelu). Wrappery RollingDie mají
+     own size + perspective. */
+}
+
+@media (max-width: 768px) {
+  .scene {
+    gap: 14px;
+  }
+}

@@ -1,0 +1,692 @@
+/* ═══════════════════════════════════════════════════════════════
+   Krok 6.3 — 3D CSS kostky (Fate + D4..D20 + D100 desítky)
+
+   Port z `C:/Matrix/Matrix/frontend/src/styles/map.scss` (řádky 884–905,
+   2142–2525). Vanilla CSS, žádný SCSS nesting — třídy zůstávají globální
+   protože modely je sdílí přes className (`<div className="d20-face">`).
+
+   Designové tokeny v `--ch-accent` / `--theme-*` nepřebíráme — kostky mají
+   vlastní paletu odpovídající fyzické kostce. Skin barvy přepíše inline
+   style v modelech.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Fate die 3D cube (FateModel + FateSkinModel parent) ──────── */
+
+.fate-die-3d-wrapper {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  perspective: 600px;
+  overflow: visible;
+}
+
+.fate-die-3d-cube {
+  width: 70px;
+  height: 70px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: none;
+  overflow: visible;
+}
+
+.fate-die-3d-cube.settled {
+  filter: drop-shadow(0 0 18px rgba(120, 100, 255, 0.25));
+}
+
+.fate-die-3d-face {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 900;
+  font-family: 'Iceland', 'Segoe UI', sans-serif;
+  border-radius: 4px;
+  border: 2px solid rgba(100, 100, 180, 0.4);
+  backface-visibility: visible;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 28, 60, 0.95),
+    rgba(16, 14, 40, 0.98)
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.04),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.fate-die-3d-face.front {
+  transform: translateZ(36px);
+}
+.fate-die-3d-face.back {
+  transform: rotateY(180deg) translateZ(36px);
+}
+.fate-die-3d-face.right {
+  transform: rotateY(90deg) translateZ(36px);
+}
+.fate-die-3d-face.left {
+  transform: rotateY(-90deg) translateZ(36px);
+}
+.fate-die-3d-face.top {
+  transform: rotateX(90deg) translateZ(36px);
+}
+.fate-die-3d-face.bottom {
+  transform: rotateX(-90deg) translateZ(36px);
+}
+
+.face-plus {
+  color: #22d3ee; /* Ikaros: cyan místo zelené ze starého Matrixu */
+  text-shadow:
+    0 0 12px rgba(34, 211, 238, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.face-minus {
+  color: #f43f5e; /* Ikaros: rose místo čisté červené */
+  text-shadow:
+    0 0 12px rgba(244, 63, 94, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.face-zero {
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 900;
+  text-shadow:
+    0 0 10px rgba(168, 213, 255, 0.7),
+    0 0 20px rgba(168, 213, 255, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* D6 dot grid (generic, bez skinu — fialová s tečkami) */
+
+.face-dots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.face-dots .dot {
+  width: 12px;
+  height: 12px;
+  background: #eef;
+  border-radius: 50%;
+  margin: auto;
+  box-shadow:
+    inset 0px 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 5px rgba(255, 255, 255, 0.4);
+}
+
+.face-dots.dots-1 .dot:nth-child(1) {
+  grid-column: 2;
+  grid-row: 2;
+  width: 16px;
+  height: 16px;
+}
+.face-dots.dots-2 .dot:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+.face-dots.dots-2 .dot:nth-child(2) {
+  grid-column: 3;
+  grid-row: 3;
+}
+.face-dots.dots-3 .dot:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+.face-dots.dots-3 .dot:nth-child(2) {
+  grid-column: 2;
+  grid-row: 2;
+}
+.face-dots.dots-3 .dot:nth-child(3) {
+  grid-column: 3;
+  grid-row: 3;
+}
+.face-dots.dots-4 .dot:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+.face-dots.dots-4 .dot:nth-child(2) {
+  grid-column: 3;
+  grid-row: 1;
+}
+.face-dots.dots-4 .dot:nth-child(3) {
+  grid-column: 1;
+  grid-row: 3;
+}
+.face-dots.dots-4 .dot:nth-child(4) {
+  grid-column: 3;
+  grid-row: 3;
+}
+.face-dots.dots-5 .dot:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+.face-dots.dots-5 .dot:nth-child(2) {
+  grid-column: 3;
+  grid-row: 1;
+}
+.face-dots.dots-5 .dot:nth-child(3) {
+  grid-column: 2;
+  grid-row: 2;
+}
+.face-dots.dots-5 .dot:nth-child(4) {
+  grid-column: 1;
+  grid-row: 3;
+}
+.face-dots.dots-5 .dot:nth-child(5) {
+  grid-column: 3;
+  grid-row: 3;
+}
+.face-dots.dots-6 .dot:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+.face-dots.dots-6 .dot:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+.face-dots.dots-6 .dot:nth-child(3) {
+  grid-column: 1;
+  grid-row: 3;
+}
+.face-dots.dots-6 .dot:nth-child(4) {
+  grid-column: 3;
+  grid-row: 1;
+}
+.face-dots.dots-6 .dot:nth-child(5) {
+  grid-column: 3;
+  grid-row: 2;
+}
+.face-dots.dots-6 .dot:nth-child(6) {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+.generic-d6-face {
+  background: linear-gradient(
+    135deg,
+    rgba(60, 10, 80, 0.98),
+    rgba(20, 5, 40, 0.98)
+  ) !important;
+  border: 1px solid rgba(140, 50, 200, 0.6) !important;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.9),
+    inset 0 0 8px rgba(180, 80, 255, 0.4) !important;
+}
+
+.generic-d6-face .dot {
+  background: #f4ebff;
+  box-shadow:
+    inset 0px 2px 4px rgba(0, 0, 0, 0.8),
+    0 0 8px rgba(180, 100, 255, 0.8);
+}
+
+/* ─── D4 (tetrahedron) ─────────────────────────────────────────── */
+
+.d4-3d-model {
+  width: 80px;
+  height: 69.28px;
+  position: absolute;
+  transform-style: preserve-3d;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.d4-face {
+  position: absolute;
+  width: 80px;
+  height: 69.28px;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform-origin: 50% 66.666%;
+  background: linear-gradient(
+    135deg,
+    rgba(80, 80, 150, 0.95),
+    rgba(40, 40, 80, 0.95)
+  );
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  backface-visibility: hidden;
+}
+
+.d4-face .d4-num {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 900;
+  font-family: 'Iceland', sans-serif;
+  color: rgba(220, 235, 255, 0.7);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
+}
+
+.d4-face .top-num {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.d4-face .bl-num {
+  bottom: 6px;
+  left: 16px;
+  transform: rotate(120deg);
+}
+.d4-face .br-num {
+  bottom: 6px;
+  right: 16px;
+  transform: rotate(-120deg);
+}
+
+.d4-face .glow-win {
+  color: #fff;
+  font-size: 16px;
+  text-shadow:
+    0 0 8px rgba(168, 213, 255, 1),
+    0 0 15px rgba(100, 150, 255, 0.8);
+  z-index: 10;
+}
+
+.d4-face-1 {
+  transform: rotateY(0deg) rotateX(19.47deg) translateZ(16.33px);
+}
+.d4-face-2 {
+  transform: rotateY(120deg) rotateX(19.47deg) translateZ(16.33px);
+}
+.d4-face-3 {
+  transform: rotateY(-120deg) rotateX(19.47deg) translateZ(16.33px);
+}
+.d4-face-4 {
+  transform: rotateX(-90deg) translateZ(16.33px);
+}
+
+/* ─── D8 ───────────────────────────────────────────────────────── */
+
+.d8-3d-model {
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  transform-style: preserve-3d;
+  left: 50%;
+  top: 50%;
+}
+
+.d8-face {
+  position: absolute;
+  width: 80px;
+  height: 69.28px;
+  left: -40px;
+  top: -69.28px;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform-origin: 50% 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(80, 80, 150, 0.95),
+    rgba(40, 40, 80, 0.95)
+  );
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.d8-face .d8-num {
+  margin-top: 15px;
+  font-size: 22px;
+  font-weight: 900;
+  font-family: 'Iceland', sans-serif;
+  color: rgba(220, 235, 255, 0.7);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
+}
+
+.d8-face .glow-win {
+  color: #fff;
+  font-size: 26px;
+  text-shadow:
+    0 0 8px rgba(168, 213, 255, 1),
+    0 0 15px rgba(100, 150, 255, 0.8);
+  z-index: 10;
+}
+
+.d8-face-1 {
+  transform: rotateY(0deg) translateZ(40px) rotateX(35.26deg);
+}
+.d8-face-2 {
+  transform: rotateY(90deg) translateZ(40px) rotateX(35.26deg);
+}
+.d8-face-3 {
+  transform: rotateY(180deg) translateZ(40px) rotateX(35.26deg);
+}
+.d8-face-4 {
+  transform: rotateY(270deg) translateZ(40px) rotateX(35.26deg);
+}
+.d8-face-5 {
+  transform: rotateY(0deg) translateZ(40px) rotateZ(180deg) rotateX(35.26deg);
+}
+.d8-face-6 {
+  transform: rotateY(90deg) translateZ(40px) rotateZ(180deg) rotateX(35.26deg);
+}
+.d8-face-7 {
+  transform: rotateY(180deg) translateZ(40px) rotateZ(180deg) rotateX(35.26deg);
+}
+.d8-face-8 {
+  transform: rotateY(270deg) translateZ(40px) rotateZ(180deg) rotateX(35.26deg);
+}
+
+/* ─── D10 / D100 (pentagonal trapezohedron) ────────────────────── */
+
+.d10-3d-model {
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  transform-style: preserve-3d;
+  left: 50%;
+  top: 50%;
+}
+
+.d10-face {
+  position: absolute;
+  width: 70px;
+  height: 87px;
+  left: -35px;
+  top: -78.5px;
+  clip-path: polygon(50% 0%, 100% 80.9%, 50% 100%, 0% 80.9%);
+  transform-origin: 50% 78.5px;
+  background: linear-gradient(
+    135deg,
+    rgba(80, 180, 120, 0.95),
+    rgba(40, 90, 60, 0.95)
+  );
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.d10-face .d10-num {
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: 900;
+  font-family: 'Iceland', sans-serif;
+  color: rgba(220, 255, 220, 0.7);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
+}
+
+.d10-face .glow-win {
+  color: #fff;
+  font-size: 28px;
+  text-shadow:
+    0 0 8px rgba(34, 211, 238, 1),
+    0 0 15px rgba(34, 211, 238, 0.8);
+  z-index: 10;
+}
+
+.d10-face-1 {
+  transform: rotateY(0deg) translateZ(54.27px) rotateX(43.68deg);
+}
+.d10-face-2 {
+  transform: rotateY(72deg) translateZ(54.27px) rotateX(43.68deg);
+}
+.d10-face-3 {
+  transform: rotateY(144deg) translateZ(54.27px) rotateX(43.68deg);
+}
+.d10-face-4 {
+  transform: rotateY(216deg) translateZ(54.27px) rotateX(43.68deg);
+}
+.d10-face-5 {
+  transform: rotateY(288deg) translateZ(54.27px) rotateX(43.68deg);
+}
+.d10-face-6 {
+  transform: rotateY(36deg) translateZ(54.27px) rotateZ(180deg) rotateX(43.68deg);
+}
+.d10-face-7 {
+  transform: rotateY(108deg) translateZ(54.27px) rotateZ(180deg)
+    rotateX(43.68deg);
+}
+.d10-face-8 {
+  transform: rotateY(180deg) translateZ(54.27px) rotateZ(180deg)
+    rotateX(43.68deg);
+}
+.d10-face-9 {
+  transform: rotateY(252deg) translateZ(54.27px) rotateZ(180deg)
+    rotateX(43.68deg);
+}
+.d10-face-10 {
+  transform: rotateY(324deg) translateZ(54.27px) rotateZ(180deg)
+    rotateX(43.68deg);
+}
+
+/* ─── D12 ──────────────────────────────────────────────────────── */
+
+.d12-3d-model {
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  transform-style: preserve-3d;
+  left: 50%;
+  top: 50%;
+}
+
+.d12-face {
+  position: absolute;
+  width: 80px;
+  height: 76px;
+  left: -40px;
+  top: -42px;
+  clip-path: polygon(50% 0%, 100% 38.2%, 80.9% 100%, 19.1% 100%, 0% 38.2%);
+  transform-origin: 50% 42px;
+  background: linear-gradient(
+    135deg,
+    rgba(80, 180, 220, 0.95),
+    rgba(40, 90, 120, 0.95)
+  );
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.d12-face .d12-num {
+  margin-top: 5px;
+  font-size: 26px;
+  font-weight: 900;
+  font-family: 'Iceland', sans-serif;
+  color: rgba(220, 240, 255, 0.7);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
+}
+
+.d12-face .glow-win {
+  color: #fff;
+  font-size: 30px;
+  text-shadow:
+    0 0 8px rgba(34, 211, 238, 1),
+    0 0 15px rgba(34, 211, 238, 0.8);
+  z-index: 10;
+}
+
+.d12-face-1 {
+  transform: rotateY(0deg) rotateX(90deg) translateZ(55px);
+}
+.d12-face-2 {
+  transform: rotateY(0deg) rotateX(26.565deg) rotateZ(180deg) translateZ(55px);
+}
+.d12-face-3 {
+  transform: rotateY(72deg) rotateX(26.565deg) rotateZ(180deg) translateZ(55px);
+}
+.d12-face-4 {
+  transform: rotateY(144deg) rotateX(26.565deg) rotateZ(180deg) translateZ(55px);
+}
+.d12-face-5 {
+  transform: rotateY(216deg) rotateX(26.565deg) rotateZ(180deg) translateZ(55px);
+}
+.d12-face-6 {
+  transform: rotateY(288deg) rotateX(26.565deg) rotateZ(180deg) translateZ(55px);
+}
+.d12-face-7 {
+  transform: rotateY(36deg) rotateX(-26.565deg) translateZ(55px);
+}
+.d12-face-8 {
+  transform: rotateY(108deg) rotateX(-26.565deg) translateZ(55px);
+}
+.d12-face-9 {
+  transform: rotateY(180deg) rotateX(-26.565deg) translateZ(55px);
+}
+.d12-face-10 {
+  transform: rotateY(252deg) rotateX(-26.565deg) translateZ(55px);
+}
+.d12-face-11 {
+  transform: rotateY(324deg) rotateX(-26.565deg) translateZ(55px);
+}
+.d12-face-12 {
+  transform: rotateY(0deg) rotateX(-90deg) translateZ(55px);
+}
+
+/* ─── D20 ──────────────────────────────────────────────────────── */
+
+.d20-3d-model {
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  transform-style: preserve-3d;
+  left: 50%;
+  top: 50%;
+}
+
+.d20-face {
+  position: absolute;
+  width: 70px;
+  height: 61px;
+  left: -35px;
+  top: -40.4px;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  transform-origin: 50% 40.4px;
+  background: linear-gradient(
+    135deg,
+    rgba(80, 180, 220, 0.95),
+    rgba(40, 90, 120, 0.95)
+  );
+  box-shadow: inset 0 -15px 15px -15px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 5px;
+}
+
+.d20-face .d20-num {
+  font-size: 20px;
+  font-weight: 900;
+  font-family: 'Iceland', sans-serif;
+  color: rgba(220, 240, 255, 0.7);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
+}
+
+.d20-face .glow-win {
+  color: #fff;
+  font-size: 24px;
+  text-shadow:
+    0 0 8px rgba(34, 211, 238, 1),
+    0 0 15px rgba(34, 211, 238, 0.8);
+  z-index: 10;
+}
+
+.d20-face-1 {
+  transform: rotateY(0deg) rotateX(52.62deg) translateZ(53px);
+}
+.d20-face-2 {
+  transform: rotateY(72deg) rotateX(52.62deg) translateZ(53px);
+}
+.d20-face-3 {
+  transform: rotateY(144deg) rotateX(52.62deg) translateZ(53px);
+}
+.d20-face-4 {
+  transform: rotateY(216deg) rotateX(52.62deg) translateZ(53px);
+}
+.d20-face-5 {
+  transform: rotateY(288deg) rotateX(52.62deg) translateZ(53px);
+}
+.d20-face-6 {
+  transform: rotateY(0deg) rotateX(10.81deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-7 {
+  transform: rotateY(72deg) rotateX(10.81deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-8 {
+  transform: rotateY(144deg) rotateX(10.81deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-9 {
+  transform: rotateY(216deg) rotateX(10.81deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-10 {
+  transform: rotateY(288deg) rotateX(10.81deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-11 {
+  transform: rotateY(36deg) rotateX(-10.81deg) translateZ(53px);
+}
+.d20-face-12 {
+  transform: rotateY(108deg) rotateX(-10.81deg) translateZ(53px);
+}
+.d20-face-13 {
+  transform: rotateY(180deg) rotateX(-10.81deg) translateZ(53px);
+}
+.d20-face-14 {
+  transform: rotateY(252deg) rotateX(-10.81deg) translateZ(53px);
+}
+.d20-face-15 {
+  transform: rotateY(324deg) rotateX(-10.81deg) translateZ(53px);
+}
+.d20-face-16 {
+  transform: rotateY(36deg) rotateX(-52.62deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-17 {
+  transform: rotateY(108deg) rotateX(-52.62deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-18 {
+  transform: rotateY(180deg) rotateX(-52.62deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-19 {
+  transform: rotateY(252deg) rotateX(-52.62deg) rotateZ(180deg) translateZ(53px);
+}
+.d20-face-20 {
+  transform: rotateY(324deg) rotateX(-52.62deg) rotateZ(180deg) translateZ(53px);
+}
+
+/* ─── D100 desítková (sdílí D10 model, override skin barvy) ────── */
+
+.d100-tens-face {
+  background: linear-gradient(
+    135deg,
+    rgba(140, 60, 200, 0.95),
+    rgba(80, 30, 120, 0.95)
+  );
+  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.d100-tens-face .d100-tens-num {
+  font-size: 20px;
+  color: rgba(255, 235, 180, 0.8);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
+}
+
+.d100-tens-face.glow-win-tens {
+  color: #fff;
+  font-size: 24px;
+  text-shadow:
+    0 0 8px rgba(255, 215, 0, 1),
+    0 0 15px rgba(255, 160, 0, 0.8);
+}
