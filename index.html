@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/webp" href="/favicon.webp" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projekt Ikaros</title>
+
+    <!-- Pre-hydration: nastaví data-theme před React render → žádný FOUT -->
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem('ikaros.theme');
+          var id = raw ? JSON.parse(raw) : 'modre-nebe';
+          if (typeof id !== 'string') id = 'modre-nebe';
+          document.documentElement.setAttribute('data-theme', id);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'modre-nebe');
+        }
+      })();
+    </script>
+
+    <!-- Base fonty — Cinzel (display), Cinzel Decorative (logo), Great Vibes (script), Lora (body),
+                       Orbitron + Rajdhani (sci-fi 1.0d).
+         1.0j font diferenciace pergamen / příroda / hospoda:
+           • Pergamen:  UnifrakturMaguntia (display gotický blackletter), EB Garamond (body), IM Fell English (script)
+           • Příroda:   Cormorant Garamond italic (display organic), Crimson Text (body), Tangerine (script)
+           • Hospoda:   Pirata One (display carved tavern sign), Almendra (logo folkový), Henny Penny (atmosféra), Spectral (body)
+         1.0k font diferenciace nemrtví:
+           • Nemrtví:   UnifrakturCook (logo blackletter), New Rocker (display Dark Souls UI), IM Fell DW Pica (body letterpress)
+         1.0l font diferenciace temna-cerven:
+           • Temná červeň: Pirata One (display drippy blackletter — sdíleno s hospodou), Marcellus SC (sub-display name plates), Cormorant Garamond italic (body — sdíleno s přírodou), Italianno (signatura krví — sdíleno s pergamenem)
+         1.0m font diferenciace ctyri-zivly:
+           • Čtyři živly: MedievalSharp (display heraldic gothic-fantasy), Cardo (body Renaissance roman), Pinyon Script (signature copperplate — sdíleno)
+         1.0p font diferenciace indiane:
+           • Indián: Cinzel Decorative (logo ornamentální — sdíleno), Cinzel (display carved — sdíleno), Spectral (body — sdíleno s hospodou), Caveat (signature script italic)
+         1.0q font diferenciace africke:
+           • Africké (Země předků): Allura (logo script — souznění s baked-in script v logo.webp), Yeseva One (display carved-into-stone slab serif), Gentium Plus (body humanistický klid), Italianno (signature italic — sdíleno s pergamenem a temna-cerven)
+         1.0r font diferenciace arabsky-svet:
+           • Arabský svět: Pinyon Script (logo fallback — sdíleno s ctyri-zivly), Cinzel Decorative (display carved palace inscription — sdíleno logo s indián), Cormorant Garamond (body humanistický manuskript — sdíleno s priroda), Tangerine (signature italic — sdíleno s priroda). Kombinace 4 fontů je unikátní pro arabsky-svet.
+         1.0s font diferenciace kyberpunk:
+           • Kyberpunk: Audiowide (logo fallback — kruhové neon-tube křivky, 80s arcade DNA, unikátní), Bebas Neue (display uppercase — condensed graffiti-poster energy, unikátní), Share Tech Mono (body — CRT terminal feel, unikátní). Kombinace 3 fontů je unikátní pro kyberpunk.
+         1.0t font diferenciace postapo:
+           • Postapo: Black Ops One (logo fallback — vojenský stencil, unikátní), Big Shoulders Stencil Display (display uppercase — industrial stencil energy, unikátní), Special Elite (body — typewriter bunker reports, sdíleno potenciálně). Kombinace 3 fontů je unikátní pro postapo.
+         1.0u font diferenciace magie:
+           • Magie a kouzla: Cinzel Decorative (logo fallback — sdíleno, baked do raster loga), Quintessential (display heading — characterful flourish serif, unikátní), Macondo (section accent labels — magical handwriting, unikátní), Sorts Mill Goudy (body — elegant antique book serif, unikátní), Mea Culpa (signature — extra-thin éterický cursive, unikátní). Kombinace 4 unikátních fontů je unikátní pro magie.
+         1.0v font diferenciace mesic:
+           • Měsíc: Great Vibes (logo fallback — sdíleno, baked do raster loga), Eagle Lake (display heading — fairy-tale flourish serif, unikátní), Imperial Script (section accent — ultra-refined cursive, unikátní), Cormorant Infant (body — softer Cormorant variant, unikátní), Sail (signature — distinctive Latin cursive, unikátní). Kombinace 4 unikátních fontů je unikátní pro mesic.
+         1.0w font diferenciace slunce:
+           • Slunce: Diplomata SC (logo fallback — engraved stone small caps, unikátní), Forum (display heading — Trajan-like uppercase Roman, unikátní), Wallpoet (section accent + signature — dystopian distressed display, unikátní), Eczar (body — sharp uncial serif Egyptian feel, unikátní). Kombinace 4 unikátních fontů je unikátní pro slunce. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Allura&family=Almendra:ital,wght@0,400;0,700;1,400&family=Audiowide&family=Bebas+Neue&family=Big+Shoulders+Stencil+Display:wght@400;500;600;700;800;900&family=Black+Ops+One&family=Cardo:ital,wght@0,400;0,700;1,400&family=Caveat:wght@400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600;700&family=Diplomata+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Cormorant+Infant:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Eagle+Lake&family=Eczar:wght@400;500;600&family=Forum&family=Gentium+Plus:ital,wght@0,400;0,700;1,400;1,700&family=Great+Vibes&family=Henny+Penny&family=IBM+Plex+Mono:wght@400;500;700&family=IM+Fell+DW+Pica:ital@0;1&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Iceland&family=Imperial+Script&family=Indie+Flower&family=Inter+Tight:wght@400;500;600;700&family=Italianno&family=JetBrains+Mono:wght@400;500;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Macondo&family=Patrick+Hand&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Satisfy&family=VT323&family=Marcellus+SC&family=Mea+Culpa&family=MedievalSharp&family=New+Rocker&family=Orbitron:wght@400;500;600;700&family=Petit+Formal+Script&family=Pinyon+Script&family=Pirata+One&family=Quintessential&family=Rajdhani:wght@400;500;600;700&family=Saira+Stencil+One&family=Sail&family=Sancreek&family=Share+Tech+Mono&family=Sorts+Mill+Goudy:ital@0;1&family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Special+Elite&family=Tangerine:wght@400;700&family=UnifrakturCook:wght@700&family=UnifrakturMaguntia&family=Wallpoet&family=Yeseva+One&display=swap"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/app/main.tsx"></script>
+  </body>
+</html>

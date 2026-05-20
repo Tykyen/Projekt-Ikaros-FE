@@ -1,0 +1,178 @@
+/* Krok 6.3d — DiceMessage container (tabulka výpočtu inline v zprávě). */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 4%, transparent);
+  border-left: 2px solid
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 35%, transparent);
+  border-radius: var(--radius-md, 8px);
+  margin-top: 4px;
+  /* Necelý max-width — kostky umí přetékat ven, scéna sama overflow řeší */
+  align-items: flex-start;
+}
+
+/* Label chip (Magie +2). */
+.labelChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 10%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 30%, transparent);
+  color: var(--ch-accent, #a78bfa);
+  font-family: 'Cinzel', 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.modifierTag {
+  opacity: 0.9;
+  font-family: 'Iceland', monospace;
+  font-weight: 600;
+}
+
+/* Row: scéna kostek vlevo + total box vpravo. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.sceneWrap {
+  flex: 1 1 auto;
+  min-height: 120px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Total box. Barva přes accent class (positive/negative/zero/neutral). */
+.totalBox {
+  flex-shrink: 0;
+  width: 72px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md, 8px);
+  border: 1.5px solid currentColor;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  font-family: 'Iceland', monospace;
+  margin-left: auto;
+}
+
+.totalValue {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.totalPositive {
+  color: #22d3ee;
+  filter: drop-shadow(
+    0 0 12px color-mix(in srgb, #22d3ee 60%, transparent)
+  );
+}
+
+.totalNegative {
+  color: #f43f5e;
+  filter: drop-shadow(
+    0 0 12px color-mix(in srgb, #f43f5e 60%, transparent)
+  );
+}
+
+.totalZero {
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.5));
+}
+
+.totalNeutral {
+  color: var(--theme-text, #fff);
+}
+
+/* Subtitle. */
+.subtitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-family: 'Iceland', monospace;
+  font-size: 13px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.55));
+}
+
+.subtleSum {
+  letter-spacing: 0.3px;
+}
+
+.overpressure {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ch-accent, #a78bfa);
+  font-weight: 600;
+  animation: overpressurePulse 1.4s ease-in-out infinite;
+}
+
+@keyframes overpressurePulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
+
+/* Legacy content (zpráva bez payloadu — pre-6.3 hod). */
+.legacyContent {
+  margin: 4px 0 0;
+  padding: 8px 12px;
+  background: var(--theme-surface-2, rgba(20, 16, 50, 0.5));
+  border-radius: var(--radius-md, 8px);
+  font-family: 'Iceland', monospace;
+  font-size: 14px;
+  color: var(--theme-text, #fff);
+  white-space: pre-wrap;
+  border-left: 2px solid
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 35%, transparent);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px 12px;
+  }
+
+  .sceneWrap {
+    min-height: 100px;
+  }
+
+  .totalBox {
+    width: 60px;
+    height: 48px;
+  }
+
+  .totalValue {
+    font-size: 26px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .totalPositive,
+  .totalNegative {
+    filter: none;
+  }
+  .overpressure {
+    animation: none;
+  }
+}
