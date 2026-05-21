@@ -1,0 +1,473 @@
+/* Krok 6.3e — SkinPickerPanel. Modal sběratelské karty skinů. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bgFade 200ms ease-out;
+}
+
+@keyframes bgFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: var(--theme-surface-2, rgba(20, 16, 50, 0.98));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.25));
+  border-radius: 16px;
+  width: min(800px, 92vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalIn 240ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.75);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+}
+
+.title {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--theme-text, rgba(230, 225, 255, 0.95));
+  letter-spacing: 0.4px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--theme-text-dim, rgba(180, 170, 220, 0.55));
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.closeBtn:hover {
+  color: #fff;
+  background: rgba(200, 100, 100, 0.15);
+}
+
+/* Top bar: Typy kostek (chips). */
+.typeBar {
+  display: flex;
+  gap: 4px;
+  padding: 10px 20px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+}
+
+.typeChip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--theme-surface, rgba(14, 12, 30, 0.6));
+  border: 1px solid transparent;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.55));
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.typeChip:hover {
+  color: var(--theme-text, #fff);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 8%, transparent);
+}
+
+.typeChipActive {
+  background: var(--ch-accent, #a78bfa);
+  color: var(--theme-surface, #0e0c28);
+  border-color: var(--ch-accent, #a78bfa);
+}
+
+/* Layout: sidebar + grid */
+.layout {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sidebar {
+  width: 140px;
+  flex-shrink: 0;
+  padding: 12px 0;
+  border-right: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+  overflow-y: auto;
+}
+
+.catBtn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  padding: 10px 16px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.55));
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.catBtn:hover {
+  color: var(--theme-text, #fff);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 6%, transparent);
+}
+
+.catBtnActive {
+  border-left-color: var(--ch-accent, #a78bfa);
+  color: var(--theme-text, #fff);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 10%, transparent);
+}
+
+.catCount {
+  font-family: 'Iceland', monospace;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* Krok 6.3 D-NEW-dice-jail — záložka Vězení. Rudý accent místo fialového. */
+.jailBtn {
+  margin-top: 8px;
+  border-top: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+  padding-top: 14px;
+}
+.jailBtn span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #f43f5e;
+}
+.jailBtn.catBtnActive {
+  border-left-color: #f43f5e !important;
+  background: color-mix(in srgb, #f43f5e 8%, transparent) !important;
+}
+
+.grid {
+  flex: 1 1 auto;
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+/* Skin card */
+.card {
+  position: relative;
+  background: var(--theme-surface, rgba(14, 12, 30, 0.6));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.2));
+  border-radius: 12px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 180px;
+  overflow: hidden;
+}
+
+.cardMainBtn {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  flex: 1 1 auto;
+  height: 100%;
+}
+
+.cardMainBtn:disabled {
+  cursor: not-allowed;
+}
+
+/* Krok 6.3 D-NEW-dice-jail — uvězněná karta (zobrazená jen v záložce Vězení). */
+.cardJailed {
+  border-color: #f43f5e;
+  opacity: 0.85;
+  filter: grayscale(0.4);
+}
+
+.cardJailed:hover {
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+/* Toggle uvěznit/omilostnit — pravý dolní roh karty. */
+.jailToggle {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(244, 63, 94, 0.85);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+  z-index: 2;
+}
+
+.card:hover .jailToggle,
+.cardJailed .jailToggle {
+  opacity: 1;
+}
+
+.jailToggle:hover {
+  background: rgba(244, 63, 94, 1);
+}
+
+/* Omilostnit (skin už ve Vězení) — zelený heart místo červené skull. */
+.jailToggleFree {
+  background: rgba(34, 197, 94, 0.85);
+}
+.jailToggleFree:hover {
+  background: rgba(34, 197, 94, 1);
+}
+
+/* Prázdný stav vězení — uprostřed gridu. */
+.jailEmpty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.55));
+  font-family: 'Inter', sans-serif;
+}
+
+.jailEmpty svg {
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.jailEmpty p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.jailEmptyHint {
+  font-size: 12px !important;
+  opacity: 0.7;
+  max-width: 280px;
+}
+
+.card:hover {
+  border-color: var(--ch-accent, #a78bfa);
+  transform: translateY(-3px) rotate(0.6deg);
+  box-shadow: 0 12px 28px
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 22%, transparent);
+}
+
+.cardActive {
+  border-color: var(--ch-accent, #a78bfa);
+  border-width: 2px;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--ch-accent, #a78bfa) 12%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--ch-accent, #a78bfa) 6%, transparent);
+}
+
+.cardActive:hover {
+  transform: translateY(-3px) rotate(0deg);
+}
+
+.preview {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 12px;
+}
+
+/* 6.3 perf — 2D náhled tváře místo 3D modelu. Z 70+ requestů per karta
+   na max 1 lazy-loaded img. Naklonění jen jako CSS efekt, žádné textury
+   navíc. */
+.previewImg {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  box-shadow:
+    inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+  transform: rotate(-4deg);
+  transition: transform 0.2s ease;
+}
+
+.card:hover .previewImg {
+  transform: rotate(0deg) scale(1.06);
+}
+
+.previewFallback {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Iceland', monospace;
+  font-size: 28px;
+  font-weight: 600;
+  border: 2px solid transparent;
+  box-shadow:
+    inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+  transform: rotate(-4deg);
+  transition: transform 0.2s ease;
+}
+
+.card:hover .previewFallback {
+  transform: rotate(0deg) scale(1.06);
+}
+
+.cardFoot {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border-top: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+  background: color-mix(in srgb, var(--theme-surface-2, #14102b) 60%, transparent);
+}
+
+.cardName {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--theme-text, rgba(220, 215, 255, 0.85));
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.cardOrnament {
+  font-size: 14px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.4));
+  line-height: 1;
+}
+
+.medallion {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ch-accent, #a78bfa);
+  color: var(--theme-surface, #0e0c28);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px
+    color-mix(in srgb, var(--ch-accent, #a78bfa) 50%, transparent);
+}
+
+/* Mobile: sidebar zaniká → kategorie horizontální chips nad gridem */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    padding: 8px 16px;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+  }
+
+  .catBtn {
+    flex-shrink: 0;
+    width: auto;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 6px;
+    padding: 6px 12px;
+  }
+
+  .catBtnActive {
+    border-left: none;
+    border-bottom-color: var(--ch-accent, #a78bfa);
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .card {
+    height: 150px;
+  }
+
+  .modal {
+    width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .previewImg,
+  .previewFallback {
+    transform: none !important;
+    transition: none !important;
+  }
+  .card:hover {
+    transform: none;
+  }
+  .modal,
+  .backdrop {
+    animation: none;
+  }
+}
