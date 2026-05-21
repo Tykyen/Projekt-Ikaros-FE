@@ -1,0 +1,53 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-3);
+  width: 100%;
+}
+
+.cell {
+  display: flex;
+}
+
+.uploadTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 180px;
+  padding: var(--sp-3);
+  border: 1px dashed var(--theme-border);
+  background: transparent;
+  color: var(--theme-accent);
+  cursor: pointer;
+  border-radius: 6px;
+  transition:
+    border-style var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.uploadTile:hover {
+  border-style: solid;
+  background: var(--theme-nav-hover-bg, rgba(169, 108, 255, 0.06));
+  box-shadow: 0 0 16px var(--theme-glow);
+}
+
+.uploadLabel {
+  font-family: var(--font-display, 'Orbitron', sans-serif);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-text-muted);
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-2);
+  }
+  .uploadTile {
+    min-height: 160px;
+  }
+}
