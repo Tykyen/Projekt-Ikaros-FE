@@ -1,0 +1,159 @@
+/* Krok 6.3 — Fullscreen 3D dice roll overlay.
+   Port `C:/Matrix/Matrix/frontend/src/styles/map.scss` (.fate-dice-overlay-3d,
+   .fate-roll-result-3d, .fate-roll-equation, .fate-roll-faces-3d, .fate-roll-final,
+   .fate-roll-name-3d, result-pop-3d keyframes). */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  pointer-events: none;
+  perspective: 1200px;
+}
+
+/* Readout pod kostkami. */
+.readout {
+  position: fixed;
+  bottom: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 10001;
+  animation: resultPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: linear-gradient(
+    180deg,
+    rgba(14, 12, 40, 0.95) 0%,
+    rgba(10, 8, 32, 0.98) 100%
+  );
+  border: 1px solid rgba(120, 100, 255, 0.25);
+  border-radius: 14px;
+  padding: 14px 24px;
+  pointer-events: none;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes resultPop {
+  0% {
+    transform: translateX(-50%) scale(0.3);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-50%) scale(1.1);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.facesRow {
+  display: flex;
+  gap: 6px;
+}
+
+.faceBadge {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 900;
+  font-size: 1.1rem;
+  font-family: 'Iceland', monospace;
+  border: 1.5px solid rgba(100, 100, 180, 0.35);
+  background: rgba(14, 12, 40, 0.9);
+}
+
+.facePlus {
+  color: #22d3ee;
+  border-color: rgba(34, 211, 238, 0.5);
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.55);
+}
+
+.faceMinus {
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.5);
+  text-shadow: 0 0 8px rgba(244, 63, 94, 0.55);
+}
+
+.faceZero {
+  color: #fff;
+  border-color: rgba(168, 213, 255, 0.4);
+}
+
+.faceGeneric {
+  color: #fff;
+}
+
+.equation {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-family: 'Cinzel', serif;
+}
+
+.eqSign {
+  color: rgba(150, 180, 255, 0.55);
+  font-weight: 600;
+}
+
+.skillName {
+  color: #fff;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.skillMod {
+  color: rgba(167, 139, 250, 0.9);
+  font-weight: bold;
+  font-family: 'Iceland', monospace;
+}
+
+.totalValue {
+  font-family: 'Iceland', monospace;
+  font-weight: 900;
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+}
+
+.totalPositive {
+  color: #22d3ee;
+  text-shadow:
+    0 0 12px rgba(34, 211, 238, 0.7),
+    0 0 24px rgba(34, 211, 238, 0.4);
+}
+
+.totalNegative {
+  color: #f43f5e;
+  text-shadow:
+    0 0 12px rgba(244, 63, 94, 0.7),
+    0 0 24px rgba(244, 63, 94, 0.4);
+}
+
+.totalNeutral {
+  color: rgba(255, 220, 40, 0.95);
+  text-shadow:
+    0 0 12px rgba(255, 220, 40, 0.6),
+    0 0 24px rgba(255, 220, 40, 0.3);
+}
+
+.rollerName {
+  font-size: 0.78rem;
+  color: rgba(180, 200, 255, 0.55);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .readout {
+    animation: none;
+  }
+}
