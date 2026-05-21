@@ -1,0 +1,117 @@
+.container {
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-overlay, rgba(4, 9, 20, 0.9));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  outline: none;
+}
+
+.container:focus-visible {
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: 2px;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+.image {
+  display: block;
+  max-width: none;
+  transition: transform 80ms ease-out;
+}
+
+.controls {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.5rem;
+  background: rgba(4, 9, 20, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  z-index: 5;
+}
+
+.controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: var(--text-strong, #fff);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+@media (max-width: 640px) {
+  .controls button {
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
+.controls button:hover:not(:disabled) {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.15));
+}
+
+.controls button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.scaleBadge {
+  display: inline-block;
+  min-width: 48px;
+  padding: 0.25rem 0.45rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  color: var(--accent-bright, var(--accent, #78c8ff));
+  font-weight: 600;
+}
+
+.hint {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem;
+  background: rgba(4, 9, 20, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: rgba(220, 230, 255, 0.6);
+  z-index: 5;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .hint {
+    display: none;
+  }
+
+  .controls {
+    top: 8px;
+    left: 8px;
+  }
+}

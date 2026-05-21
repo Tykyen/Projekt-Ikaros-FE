@@ -1,0 +1,80 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.heroFull {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  background: var(--bg-overlay, rgba(0, 0, 0, 0.4));
+}
+
+.heroFull img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 460px;
+  object-fit: cover;
+  filter: saturate(0.95);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 60%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+.metaHud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-left: 3px solid var(--accent, currentColor);
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 0.85rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.75));
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.metaKey {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+}
+
+.metaValue {
+  color: var(--text-strong, #fff);
+  font-weight: 500;
+}
+
+.metaSep {
+  margin-left: 0.6rem;
+  opacity: 0.4;
+}
+
+.proseWrap {
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.prose {
+  background: transparent;
+}

@@ -1,0 +1,42 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.heroWrap {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.proseWrap {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.prose {
+  background: transparent;
+}
+
+.aside {
+  position: sticky;
+  top: calc(var(--header-h, 64px) + 16px);
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .aside {
+    position: static;
+    order: 2;
+  }
+}

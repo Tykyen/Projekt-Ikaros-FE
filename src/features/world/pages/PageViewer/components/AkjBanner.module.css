@@ -1,0 +1,60 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px dashed var(--accent, #ffae00);
+  border-radius: 6px;
+  background: var(--accent-soft, rgba(255, 174, 0, 0.06));
+  color: var(--accent-bright, var(--accent, #ffae00));
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  margin-block: 0 1.25rem;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.label {
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-grow: 1;
+}
+
+.status {
+  font-size: 0.78rem;
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background: var(--accent-soft, rgba(255, 174, 0, 0.12));
+  transform: translateY(-1px);
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .banner {
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .status {
+    width: 100%;
+    text-align: right;
+  }
+}

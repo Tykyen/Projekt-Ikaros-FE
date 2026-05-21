@@ -1,0 +1,50 @@
+.popup {
+  position: fixed;
+  z-index: 9997;
+  display: inline-flex;
+  gap: 0.2rem;
+  padding: 0.3rem;
+  background: var(--bg-panel, #1a1f28);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  animation: fadeUp 140ms ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 6px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.9));
+  font-size: 0.78rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 100ms ease;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.15));
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+@media (max-width: 640px) {
+  /* Na mobilu se nativní browser toolbar překrývá s naším — schováme. */
+  .popup {
+    display: none;
+  }
+}

@@ -1,0 +1,80 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.proseWrap {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+
+.prose {
+  background: transparent;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardBtn {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  padding: 0;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-overlay, rgba(0, 0, 0, 0.4));
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.cardBtn:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: var(--accent, rgba(120, 200, 255, 0.5));
+}
+
+.cardBtn:focus-visible {
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: 2px;
+}
+
+.cardImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardCaption {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.65));
+  line-height: 1.4;
+  text-align: center;
+}
+
+.empty {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+}

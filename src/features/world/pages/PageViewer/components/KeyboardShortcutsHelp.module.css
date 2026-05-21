@@ -1,0 +1,102 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.panel {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-panel, #14181f);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color: var(--text-strong, #fff);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, rgba(255, 255, 255, 0.55));
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  color: var(--text-strong, #fff);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table td {
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.05));
+  font-size: 0.92rem;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.keys {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.keysSep {
+  margin: 0 0.25rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.4));
+}
+
+.kbd {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  border-radius: 4px;
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: var(--text-strong, #fff);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.desc {
+  color: var(--text, rgba(255, 255, 255, 0.85));
+}
+
+.note {
+  margin: 1rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  font-style: italic;
+  text-align: center;
+}
