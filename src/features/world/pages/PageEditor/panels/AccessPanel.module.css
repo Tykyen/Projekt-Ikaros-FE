@@ -1,0 +1,169 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem 0.3rem 0.5rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 999px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  font-size: 0.82rem;
+  color: var(--text-strong, #fff);
+}
+
+.chipStale {
+  border-color: var(--accent-soft, rgba(255, 174, 0, 0.4));
+  background: var(--accent-soft, rgba(255, 174, 0, 0.05));
+}
+
+.chipType {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  font-weight: 600;
+}
+
+.chipValue {
+  color: inherit;
+}
+
+.staleIcon {
+  display: inline-flex;
+  color: var(--accent-bright, #ffae00);
+}
+
+.chipRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: 0.15rem;
+}
+
+.chipRemove:hover {
+  background: rgba(255, 90, 90, 0.15);
+  color: var(--color-danger, rgba(255, 100, 100, 0.85));
+}
+
+.addGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+}
+
+.addGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.addLabel {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.65));
+  font-weight: 600;
+}
+
+.addRow {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.select,
+.searchInput,
+.numericInput {
+  flex-grow: 1;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  color: var(--text-strong, #fff);
+  font-size: 0.88rem;
+}
+
+.select:focus,
+.searchInput:focus,
+.numericInput:focus {
+  outline: none;
+  border-color: var(--accent, currentColor);
+}
+
+.numericInput {
+  width: 80px;
+  flex-grow: 0;
+}
+
+.addNewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--accent, currentColor);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent-bright, var(--accent, #fff));
+  cursor: pointer;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.addNewBtn:hover:not(:disabled) {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.12));
+}
+
+.addNewBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.userList {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.userBtn {
+  display: block;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+  border-radius: 4px;
+  text-align: left;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.userBtn:hover {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.1));
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+@media (max-width: 768px) {
+  .addGrid {
+    grid-template-columns: 1fr;
+  }
+}

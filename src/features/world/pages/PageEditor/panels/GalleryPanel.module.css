@@ -1,0 +1,137 @@
+.uploadRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.uploadBtn,
+.urlBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: 1px solid;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.uploadBtn {
+  border-color: var(--accent, currentColor);
+  background: var(--accent-soft, transparent);
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+.uploadBtn input[type='file'] {
+  display: none;
+}
+
+.uploadBtn:hover {
+  background: var(--accent, rgba(120, 200, 255, 0.18));
+}
+
+.urlBtn {
+  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+}
+
+.urlBtn:hover {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.06));
+}
+
+.uploadStatus {
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  font-style: italic;
+}
+
+.empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+}
+
+.empty p {
+  margin: 0;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+}
+
+.preview {
+  aspect-ratio: 3 / 2;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg-overlay, rgba(0, 0, 0, 0.4));
+}
+
+.preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.captionInput {
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 4px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.2));
+  color: var(--text-strong, #fff);
+  font-size: 0.82rem;
+}
+
+.captionInput:focus {
+  outline: none;
+  border-color: var(--accent, currentColor);
+}
+
+.cardActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.iconBtn:hover:not(:disabled) {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.06));
+  color: var(--text-strong, #fff);
+}
+
+.iconBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

@@ -1,0 +1,129 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  flex-wrap: wrap;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  text-decoration: none;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.back:hover {
+  color: var(--text-strong, #fff);
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-grow: 1;
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  overflow: hidden;
+}
+
+.crumb {
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.crumb:hover {
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+.crumbSep {
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.crumbCurrent {
+  color: var(--text-strong, rgba(255, 255, 255, 0.9));
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.statusDirty {
+  font-size: 0.78rem;
+  color: var(--accent-bright, #ffae00);
+  font-variant-numeric: tabular-nums;
+}
+
+.statusClean {
+  font-size: 0.78rem;
+  color: var(--text-muted, rgba(160, 200, 160, 0.7));
+  font-variant-numeric: tabular-nums;
+}
+
+.previewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.previewBtn:hover {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.1));
+  border-color: var(--accent, rgba(120, 200, 255, 0.4));
+}
+
+.previewActive {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.16));
+  border-color: var(--accent, currentColor);
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+.previewLabel {
+  display: inline-block;
+}
+
+@media (max-width: 1024px) {
+  .previewBtn {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .bar {
+    padding: 0.65rem 1rem;
+  }
+
+  .breadcrumbs {
+    width: 100%;
+    order: 3;
+  }
+
+  .crumb {
+    max-width: 100px;
+  }
+}

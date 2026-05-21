@@ -1,0 +1,71 @@
+.text {
+  margin: 0 0 1rem;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.text p {
+  margin: 0 0 0.75rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-overlay, rgba(255, 174, 0, 0.06));
+  border: 1px solid var(--accent-soft, rgba(255, 174, 0, 0.2));
+  border-radius: 4px;
+  color: var(--text-strong, #fff);
+  font-size: 0.88rem;
+}
+
+.icon {
+  color: var(--accent-bright, #ffae00);
+  flex-shrink: 0;
+}
+
+.hint {
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btnPrimary,
+.btnSecondary {
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: 1px solid;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  border-color: var(--accent, currentColor);
+  background: var(--accent, rgba(120, 200, 255, 0.2));
+  color: var(--text-on-accent, #fff);
+}
+
+.btnSecondary {
+  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+}

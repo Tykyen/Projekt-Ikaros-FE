@@ -1,0 +1,96 @@
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.icon {
+  color: var(--color-danger, rgba(255, 100, 100, 0.9));
+}
+
+.text p {
+  margin: 0;
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.confirm span {
+  font-size: 0.85rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+}
+
+.confirm code {
+  font-family: ui-monospace, monospace;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+.input {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  color: var(--text-strong, #fff);
+  font-size: 0.92rem;
+  font-family: ui-monospace, monospace;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-danger, currentColor);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.btnSecondary,
+.btnDanger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: 1px solid;
+  cursor: pointer;
+}
+
+.btnSecondary {
+  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+}
+
+.btnSecondary:hover {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+}
+
+.btnDanger {
+  border-color: var(--color-danger, rgba(255, 90, 90, 0.6));
+  background: var(--color-danger, rgba(255, 90, 90, 0.2));
+  color: #fff;
+}
+
+.btnDanger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: var(--color-danger, rgba(255, 90, 90, 0.35));
+}

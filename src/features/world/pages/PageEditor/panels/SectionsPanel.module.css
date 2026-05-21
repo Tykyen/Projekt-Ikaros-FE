@@ -1,0 +1,231 @@
+.empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.empty p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.card {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+}
+
+.dragHandle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.4));
+  cursor: grab;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.dragHandle:hover {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.06));
+  color: var(--text-strong, #fff);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.titleInput {
+  flex-grow: 1;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.2));
+  color: var(--text-strong, #fff);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.titleInput:focus {
+  outline: none;
+  border-color: var(--accent, currentColor);
+}
+
+.collapseCheckbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.collapseCheckbox input {
+  accent-color: var(--accent, currentColor);
+}
+
+.removeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.removeBtn:hover {
+  background: rgba(255, 90, 90, 0.1);
+  color: var(--color-danger, rgba(255, 100, 100, 0.85));
+}
+
+.cardBody {
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.editor {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.15));
+  min-height: 120px;
+}
+
+.itemsWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  border-radius: 4px;
+}
+
+.itemsLabel {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  font-weight: 600;
+}
+
+.itemsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: 1fr 70px 1fr 36px;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.itemInput,
+.itemQtyInput,
+.itemNoteInput {
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 4px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.2));
+  color: var(--text-strong, #fff);
+  font-size: 0.85rem;
+}
+
+.itemInput:focus,
+.itemQtyInput:focus,
+.itemNoteInput:focus {
+  outline: none;
+  border-color: var(--accent, currentColor);
+}
+
+.itemsAddBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.18));
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+
+.itemsAddBtn:hover {
+  border-color: var(--accent, currentColor);
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px dashed var(--accent, currentColor);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent-bright, var(--accent, #fff));
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+.addBtn:hover {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.1));
+}
+
+@media (max-width: 640px) {
+  .cardHeader {
+    flex-wrap: wrap;
+  }
+
+  .titleInput {
+    order: -1;
+    width: 100%;
+  }
+
+  .collapseCheckbox {
+    margin-left: auto;
+  }
+
+  .itemRow {
+    grid-template-columns: 1fr;
+    padding: 0.4rem;
+    background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+    border-radius: 4px;
+  }
+}

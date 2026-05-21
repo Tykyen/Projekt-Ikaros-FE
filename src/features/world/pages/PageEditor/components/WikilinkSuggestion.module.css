@@ -1,0 +1,71 @@
+.dropdown {
+  width: 280px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--bg-panel, #14181f);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.empty {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  font-style: italic;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.88rem;
+  transition: background 100ms ease;
+}
+
+.itemActive {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.18));
+  color: var(--accent-bright, var(--accent, #fff));
+}
+
+.itemIcon {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.itemTitle {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemType {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.45));
+  padding: 0.1rem 0.4rem;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  border-radius: 3px;
+  flex-shrink: 0;
+}
