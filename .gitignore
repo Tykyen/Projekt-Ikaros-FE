@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# env (kromě example)
+.env
+.env.local
+.env.development
+.env.production
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*storybook.log
+storybook-static
+
+# Krok 6.3 D-NEW-dice-texture-hosting — dice textury hostované na Cloudinary
+# (folder dice-skins/). Pro lokální dev: scripts/dice-textures-cdn.json drží
+# URL mapping; FE načítá přímo z CDN. Lokální kopii zde můžeš mít fyzicky
+# (offline dev / cache), git je ale netracking.
+public/textures/
