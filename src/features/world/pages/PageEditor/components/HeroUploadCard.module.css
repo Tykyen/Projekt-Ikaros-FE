@@ -1,0 +1,134 @@
+/* 8.3 — HeroUploadCard: drag-card pro nahrání hero obrázku stránky. */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.65));
+  font-weight: 600;
+}
+
+/* Karta — fixní poměr stran, dashed border v prázdném stavu. */
+.card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1.5px dashed var(--border-soft, rgba(120, 140, 180, 0.4));
+  border-radius: 10px;
+  background: var(--surface-1, rgba(20, 25, 40, 0.4));
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--accent-bright, #3b5af6);
+  background: var(--surface-2, rgba(30, 40, 60, 0.5));
+}
+
+.cardDragOver {
+  border-color: var(--accent-bright, #3b5af6);
+  border-style: solid;
+  background: var(--accent-bright-15, rgba(59, 90, 246, 0.18));
+}
+
+/* Po nahrání — solid border, obrázek vyplní kartu. */
+.cardFilled {
+  border-style: solid;
+  border-color: var(--border-soft, rgba(120, 140, 180, 0.3));
+}
+
+.preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Overlay s ikonou + textem. V prázdném stavu vždy vidět;
+   na nahraném obrázku jen na hover. */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.7));
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: opacity 0.15s ease;
+}
+
+.cardFilled .overlay {
+  opacity: 0;
+  background: rgba(8, 10, 20, 0.65);
+  color: rgba(230, 238, 255, 0.95);
+}
+
+.cardFilled:hover .overlay {
+  opacity: 1;
+}
+
+.spin {
+  animation: heroSpin 0.8s linear infinite;
+}
+
+@keyframes heroSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fileInput {
+  display: none;
+}
+
+/* Akce pod kartou — URL fallback + odebrat. */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.urlBtn,
+.removeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.45rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.72rem;
+  transition: color 0.15s ease;
+}
+
+.urlBtn {
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+}
+
+.urlBtn:hover {
+  color: var(--accent-bright, #3b5af6);
+}
+
+.removeBtn {
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+}
+
+.removeBtn:hover {
+  color: var(--accent-danger, #ff5764);
+}

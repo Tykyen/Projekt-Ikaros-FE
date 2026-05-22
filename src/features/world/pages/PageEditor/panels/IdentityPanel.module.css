@@ -1,0 +1,140 @@
+/* 8.3 — split: vlevo pole, vpravo hero karta (věrné starému Matrixu). */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.fields {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.heroCol {
+  min-width: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.65));
+  font-weight: 600;
+}
+
+.warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--accent-bright, #ffae00);
+  font-weight: 500;
+}
+
+.input,
+.select {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  color: var(--text-strong, #fff);
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--accent, currentColor);
+  background: var(--bg-input-focus, rgba(0, 0, 0, 0.4));
+}
+
+.input::placeholder {
+  color: var(--text-muted, rgba(220, 230, 255, 0.4));
+}
+
+.select {
+  cursor: pointer;
+}
+
+.hint {
+  font-size: 0.72rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  line-height: 1.4;
+}
+
+.checkboxRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-top: 0.4rem;
+}
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.checkbox:hover {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  border-color: var(--accent-soft, rgba(120, 200, 255, 0.3));
+}
+
+.checkbox input[type='checkbox'] {
+  margin-top: 0.2rem;
+  accent-color: var(--accent, currentColor);
+  cursor: pointer;
+}
+
+.checkbox span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.88rem;
+}
+
+.checkbox strong {
+  color: var(--text-strong, #fff);
+  font-weight: 500;
+}
+
+/* Mobil — hero karta se přesune pod pole (stack). */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .grid,
+  .checkboxRow {
+    grid-template-columns: 1fr;
+  }
+}
