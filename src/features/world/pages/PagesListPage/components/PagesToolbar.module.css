@@ -1,0 +1,115 @@
+/* 7.3 — toolbar indexu stránek (vzor WorldsToolbar). */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: center;
+  margin-bottom: var(--sp-4);
+  width: 100%;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 220px;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.search {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  transition: border-color var(--transition-fast);
+}
+.search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.chipGroup {
+  display: inline-flex;
+  gap: var(--sp-1);
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 8px 14px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 36px;
+}
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent-bright);
+}
+.chipActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg, var(--bg-base));
+}
+.chipActive:hover {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+  color: var(--accent-fg, var(--bg-base));
+}
+
+.sortWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.sortSelect {
+  padding: 8px 12px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  min-height: 36px;
+}
+.sortSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    gap: var(--sp-2);
+  }
+  .searchWrap {
+    flex: 1 1 100%;
+  }
+  .chip,
+  .sortSelect {
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,107 @@
+/* 7.3 — karta stránky v indexu. */
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: 1;
+  min-width: 0;
+  padding: var(--sp-3);
+  text-decoration: none;
+  color: inherit;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-3, rgba(255, 255, 255, 0.05));
+  color: var(--accent-bright);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semi);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.typeBadge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-3, rgba(255, 255, 255, 0.06));
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.slug {
+  font-family: monospace;
+  font-size: var(--text-xs);
+  color: var(--text-muted, var(--text-secondary));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.star {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  flex-shrink: 0;
+  border: none;
+  border-left: 1px solid var(--frame-border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.star:hover {
+  background: var(--surface-3, rgba(255, 255, 255, 0.05));
+  color: var(--accent-bright);
+}
+
+.starActive {
+  color: var(--accent-bright);
+}
