@@ -1,0 +1,112 @@
+/* 8.1 — sticky lišta režimu úprav detailu postavy. */
+
+.bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: color-mix(in srgb, var(--surface-2) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--frame-border);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--accent-bright);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--accent-bright);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.btnGhost,
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    transform 120ms ease,
+    opacity 120ms ease;
+}
+
+.btnGhost {
+  border: 1px solid var(--frame-border);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btnGhost:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--surface-3, rgba(255, 255, 255, 0.06));
+}
+
+.btnPrimary {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--text-on-accent, #fff);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btnGhost:disabled,
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: edit-bar-spin 1s linear infinite;
+}
+
+@keyframes edit-bar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .bar {
+    padding: var(--sp-2) var(--sp-3);
+  }
+
+  .actions {
+    flex: 1;
+  }
+
+  .btnGhost,
+  .btnPrimary {
+    flex: 1;
+    justify-content: center;
+    min-height: 44px;
+  }
+}
