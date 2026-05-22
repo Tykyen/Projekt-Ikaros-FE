@@ -1,0 +1,155 @@
+.row {
+  display: grid;
+  /* 8.2g — přidán sloupec Postava. */
+  grid-template-columns: 1.8fr 1.1fr 1.1fr 0.9fr 1.4fr auto;
+  gap: 12px;
+  align-items: end;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--frame-border);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cellLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: none;
+}
+
+.select {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 7px 9px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+}
+
+/* 8.2g — buňka Postava: select + tlačítko Vytvořit. */
+.assignCell {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.assignCell .select {
+  flex: 1;
+  min-width: 0;
+}
+
+.createBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-height: 36px;
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.createBtn:hover {
+  color: var(--accent-bright, var(--accent));
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.removeBtn {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--danger, var(--accent));
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  min-height: 36px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.removeBtn:hover:not(:disabled) {
+  border-color: var(--danger, var(--accent));
+  background: color-mix(in srgb, var(--danger, var(--accent)) 10%, transparent);
+}
+
+.removeBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Mobil — řádek se rozpadá na kartu s popisky polí. */
+@media (max-width: 768px) {
+  .row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px 0;
+  }
+
+  .identity {
+    grid-column: 1 / -1;
+  }
+
+  .cellLabel {
+    display: block;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+  }
+
+  .removeBtn {
+    width: 100%;
+  }
+}
