@@ -1,0 +1,62 @@
+/* 8.2 — split: vlevo editor, vpravo StyleRail (toolbar). */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 1rem;
+  align-items: start;
+}
+
+.editorCol {
+  min-width: 0;
+}
+
+/* Mobil — rail se přesune pod editor (stack). */
+@media (max-width: 720px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editorWrap {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.2));
+  min-height: 320px;
+}
+
+.editor {
+  min-height: 320px;
+  background: transparent;
+}
+
+/* Table extension styling — globally pro wiki obsah. */
+.editorWrap :global(.rte-table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+}
+
+.editorWrap :global(.rte-table) td,
+.editorWrap :global(.rte-table) th {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  padding: 0.45rem 0.65rem;
+  vertical-align: top;
+}
+
+.editorWrap :global(.rte-table) th {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  font-weight: 600;
+}
+
+.tip {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+}
+
+.tip code {
+  font-family: ui-monospace, monospace;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+}

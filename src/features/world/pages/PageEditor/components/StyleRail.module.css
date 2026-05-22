@@ -1,0 +1,157 @@
+/* 8.2 — StyleRail: permanentní toolbar „Nástroje" vedle textového editoru. */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  background: var(--surface-1, rgba(20, 25, 40, 0.45));
+  align-self: flex-start;
+}
+
+.railLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  padding-bottom: 0.2rem;
+}
+
+.skeleton {
+  height: 180px;
+  border-radius: 6px;
+  background: var(--surface-2, rgba(30, 40, 60, 0.4));
+  opacity: 0.5;
+}
+
+/* Skupina ikon-tlačítek (řádek, wrapuje). */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.28));
+  border-radius: 6px;
+  background: var(--surface-2, rgba(30, 40, 60, 0.4));
+  color: var(--text-primary, rgba(220, 230, 255, 0.85));
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.iconBtn:hover:not(:disabled) {
+  border-color: var(--accent-bright, #3b5af6);
+  color: var(--accent-bright, #3b5af6);
+}
+
+.iconBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.iconBtnActive {
+  border-color: var(--accent-bright, #3b5af6);
+  background: var(--accent-bright-15, rgba(59, 90, 246, 0.2));
+  color: var(--accent-bright, #3b5af6);
+}
+
+/* Široké tlačítko (Odkaz). */
+.wideBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.45rem;
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.28));
+  border-radius: 6px;
+  background: var(--surface-2, rgba(30, 40, 60, 0.4));
+  color: var(--text-primary, rgba(220, 230, 255, 0.85));
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.12s ease;
+}
+
+.wideBtn:hover {
+  border-color: var(--accent-bright, #3b5af6);
+  color: var(--accent-bright, #3b5af6);
+}
+
+.wideBtnActive {
+  border-color: var(--accent-bright, #3b5af6);
+  background: var(--accent-bright-15, rgba(59, 90, 246, 0.2));
+  color: var(--accent-bright, #3b5af6);
+}
+
+/* Barva textu. */
+.colorRow,
+.blockRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.colorLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+}
+
+.colorControls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.colorInput {
+  width: 44px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.28));
+  border-radius: 6px;
+  background: var(--surface-2, rgba(30, 40, 60, 0.4));
+  cursor: pointer;
+}
+
+/* Blok select. */
+.blockSelect {
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.28));
+  border-radius: 6px;
+  background: var(--surface-2, rgba(30, 40, 60, 0.4));
+  color: var(--text-primary, rgba(220, 230, 255, 0.9));
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.blockSelect:focus {
+  outline: none;
+  border-color: var(--accent-bright, #3b5af6);
+}
+
+/* Mobil — rail se roztáhne na plnou šířku, ikony do gridu. */
+@media (max-width: 720px) {
+  .rail {
+    align-self: stretch;
+  }
+
+  .group {
+    gap: 0.35rem;
+  }
+}
