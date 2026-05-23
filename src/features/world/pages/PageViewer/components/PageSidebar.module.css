@@ -1,0 +1,138 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.mobileToggle {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+  color: var(--text-strong, #fff);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  transition: transform 200ms ease;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.heroWrap {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-overlay, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+}
+
+.hero {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: cover;
+}
+
+.tableWrap {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+}
+
+.tableTitle {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.table tr {
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.05));
+}
+
+.table tr:last-child {
+  border-bottom: none;
+}
+
+.table th {
+  text-align: left;
+  font-weight: 500;
+  padding: 0.45rem 0.75rem 0.45rem 0;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.table td {
+  padding: 0.45rem 0;
+  color: var(--text-strong, #fff);
+  text-align: right;
+  vertical-align: top;
+}
+
+/* 8.5 — buňka tabulky = rich-text HTML s inline odkazy. */
+.cell :global(a) {
+  color: var(--accent-bright, #6f9bff);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.cell :global(a):hover {
+  filter: brightness(1.2);
+}
+
+/* Odkaz na neexistující stránku (useBrokenLinks → .brokenLink).
+   Červený a podtržený — signalizuje „odkaz čeká na vytvoření stránky". */
+.cell :global(a.brokenLink) {
+  color: var(--accent-danger, #ff5764);
+  text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+  .mobileToggle {
+    display: flex;
+  }
+
+  .content {
+    display: none;
+  }
+
+  .contentOpen {
+    display: flex;
+    animation: slideDown 200ms ease;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
