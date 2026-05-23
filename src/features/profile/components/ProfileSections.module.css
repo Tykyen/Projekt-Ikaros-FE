@@ -1,0 +1,460 @@
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.placeholderHint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
+/* Bio / Character textareas */
+.textareaWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.textarea {
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border-radius: 4px;
+  width: 100%;
+  min-height: 120px;
+}
+
+.counter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* Character section */
+.characterEdit {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.editField span {
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.editField em {
+  font-style: normal;
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
+.characterRead {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.characterFields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.characterName {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+/* Header link (e.g. "Zobrazit vše →" in ProfileEventsSection) */
+.headerLink {
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.headerLink:hover {
+  text-decoration: underline;
+}
+
+/* Events list (cross-world game-events) */
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Worlds */
+.worldList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.worldLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text-strong);
+  transition: background-color 0.15s;
+}
+
+.worldLink:hover {
+  background: var(--surface-3, var(--surface-2));
+}
+
+.worldName {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.worldGenre {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* 8.3 / D-075 — Moje postavy (cross-world) */
+.characterList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.characterLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text-strong);
+  transition: background-color 0.15s, border-color 0.15s;
+  min-height: 56px;
+}
+
+.characterLink:hover {
+  background: var(--surface-3, var(--surface-2));
+  border-color: var(--accent);
+}
+
+.characterAvatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-3, var(--surface-2));
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.characterAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.characterMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.characterName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.characterWorld {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .characterList {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Theme + chat color */
+.themeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.swatchRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.swatchLg {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--frame-border);
+  flex-shrink: 0;
+}
+
+.swatchHex {
+  font-family: var(--font-mono, monospace);
+  color: var(--text-strong);
+  font-size: 0.9rem;
+}
+
+.chatPreview {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Disabled fields */
+.disabledField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 1.3b — Username change request */
+.usernameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.usernameCurrent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.usernameCurrentLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.usernameCurrentValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.pendingBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--warning-soft-border);
+  background: var(--warning-soft);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.pendingBannerHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--warning);
+}
+
+.pendingBannerTarget {
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.pendingBannerMeta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.pendingBannerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.cooldownHint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.usernameRequestForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.usernameRequestActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Password form */
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 1.5 D-052 — PrivacySection toggle */
+.toggleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.toggleRow input[type="checkbox"] {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggleLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggleLabelTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.toggleLabelDesc {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 16px;
+  }
+  .characterRead {
+    grid-template-columns: 1fr;
+  }
+  .themeRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

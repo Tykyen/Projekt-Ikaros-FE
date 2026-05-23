@@ -1,0 +1,358 @@
+/* 8.2e — Adresář postav. Kostra dle WorldMembersPage; karty čtvercové
+   (postavy ≠ lidé). Design 8.2 §1. */
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+.pageHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--text-strong, var(--text-primary));
+  letter-spacing: 0.02em;
+}
+
+/* 8.3 — Toolbar (search + group toggle) nad type-filterem. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 36px;
+  padding: 0 32px 0 32px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  transition: border-color 120ms ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.searchInput::-webkit-search-cancel-button {
+  display: none;
+}
+
+.searchClear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 120ms ease, background 120ms ease;
+}
+
+.searchClear:hover {
+  color: var(--text-primary);
+  background: var(--surface-3, var(--surface-2));
+}
+
+.groupPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.groupPill:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.groupPillActive {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .searchWrap {
+    width: 100%;
+  }
+  /* Mobil — větší touch targets. */
+  .searchInput {
+    height: 40px;
+  }
+  .searchClear {
+    width: 28px;
+    height: 28px;
+  }
+  .groupPill {
+    align-self: flex-start;
+    height: 44px;
+    padding: 0 16px;
+  }
+}
+
+/* Filtr typu — pill řada. */
+.filterBar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-5);
+}
+
+.filterPill {
+  padding: 4px 12px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.filterPill:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.filterPillActive {
+  background: var(--accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--accent);
+}
+
+/* Sekce. */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.section {
+  animation: fadeUp 360ms ease both;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.sectionIcon {
+  color: var(--accent);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.sectionCount {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-3, var(--surface-2));
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+}
+
+/* 8.3 — Pod-sekce per herní skupina (jen v PC sekci, když groupBy aktivní). */
+.groupedSections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.groupBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0 0 0 var(--sp-3);
+  border-left: 3px solid var(--group-accent, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.groupCount {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-3, var(--surface-2));
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+}
+
+/* Grid karet. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--sp-3);
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+/* Skeleton — shimmer placeholder při loadingu. */
+.skeletonCard {
+  height: 200px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Prázdné stavy. */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-8) var(--sp-4);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.emptyIcon {
+  color: var(--text-dim, var(--text-muted));
+}
+
+.emptyFilter {
+  margin: 0;
+  padding: var(--sp-4);
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section,
+  .skeletonCard {
+    animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageHead {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .title {
+    text-align: center;
+  }
+}
