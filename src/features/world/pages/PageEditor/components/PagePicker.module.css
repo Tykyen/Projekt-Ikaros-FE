@@ -1,0 +1,186 @@
+/* 7.2 — PagePicker: kompaktní 🔗 tlačítko + popover s výběrem stránky světa. */
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* 🔗 tlačítko — vizuálně shodné s linkBtn ve SmartCellInput. */
+.linkBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.3));
+  border-radius: 5px;
+  background: var(--surface-2, rgba(30, 40, 60, 0.4));
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.linkBtn:hover {
+  border-color: var(--accent-bright, var(--accent, #3b5af6));
+  color: var(--accent-bright, var(--accent, #3b5af6));
+}
+
+.linkBtnActive {
+  border-color: var(--accent-bright, var(--accent, #3b5af6));
+  background: var(--accent-bright-15, rgba(59, 90, 246, 0.22));
+  color: var(--accent-bright, var(--accent, #3b5af6));
+}
+
+
+/* Popover. */
+.picker {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 300px;
+  max-width: 92vw;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.6rem;
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.4));
+  border-radius: 8px;
+  background: var(--surface-popover, rgba(16, 20, 34, 0.98));
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+
+.currentLink {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.45rem;
+  background: var(--accent-bright-15, rgba(59, 90, 246, 0.18));
+  border-radius: 5px;
+  font-size: 0.78rem;
+  color: var(--accent-bright, var(--accent, #6f9bff));
+}
+
+.currentLinkPending {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.12));
+  color: var(--text-primary, rgba(220, 230, 255, 0.85));
+  border: 1px dashed var(--border-soft, rgba(120, 140, 180, 0.4));
+}
+
+.currentLinkText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.currentLinkSlug {
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  opacity: 0.75;
+  margin-left: 0.3rem;
+}
+
+.clearBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.clearBtn:hover {
+  background: rgba(255, 87, 100, 0.25);
+  color: var(--accent-danger, #ff5764);
+}
+
+.search {
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 5px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.3));
+  color: var(--text-strong, #fff);
+  font-family: inherit;
+  font-size: 0.82rem;
+}
+
+.search:focus {
+  outline: none;
+  border-color: var(--accent-bright, var(--accent, #3b5af6));
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.empty {
+  padding: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  text-align: center;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary, rgba(220, 230, 255, 0.9));
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  text-align: left;
+}
+
+.option:hover {
+  background: var(--surface-2, rgba(59, 90, 246, 0.18));
+}
+
+.optionCurrent {
+  background: var(--accent-bright-15, rgba(59, 90, 246, 0.18));
+  color: var(--accent-bright, var(--accent, #6f9bff));
+}
+
+/* Volba „odkázat na zatím neexistující stránku" — vizuálně oddělená. */
+.optionCreate {
+  color: var(--accent-bright, var(--accent, #6f9bff));
+  border-top: 1px solid var(--border-soft, rgba(120, 140, 180, 0.2));
+  margin-top: 0.15rem;
+  padding-top: 0.5rem;
+}
+
+.optionTitle {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.optionSlug {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.45));
+  font-family: ui-monospace, monospace;
+}

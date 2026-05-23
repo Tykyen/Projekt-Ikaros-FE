@@ -1,0 +1,120 @@
+.hint {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  line-height: 1.5;
+}
+
+.hint code {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.78rem;
+}
+
+.empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.empty p {
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.labelInput {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  color: var(--text-strong, #fff);
+  font-size: 0.88rem;
+  min-width: 0;
+}
+
+.labelInput:focus {
+  outline: none;
+  border-color: var(--accent, currentColor);
+}
+
+.actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.55));
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.iconBtn:hover:not(:disabled) {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.06));
+  color: var(--text-strong, #fff);
+}
+
+.iconBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px dashed var(--accent, currentColor);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent-bright, var(--accent, #fff));
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+.addBtn:hover {
+  background: var(--accent-soft, rgba(120, 200, 255, 0.1));
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'label link'
+      'actions actions';
+  }
+
+  .labelInput {
+    grid-area: label;
+  }
+
+  .actions {
+    grid-area: actions;
+    justify-content: flex-end;
+  }
+}
