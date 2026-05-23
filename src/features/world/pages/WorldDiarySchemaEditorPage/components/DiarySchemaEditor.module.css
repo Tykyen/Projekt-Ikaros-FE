@@ -1,0 +1,297 @@
+/* 8.5 — 3-panel layout: Bloky | Konfigurace | Náhled.
+   Mobile (≤ 768 px) → vertikální stack. */
+
+.editor {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: var(--space-md, 16px);
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .editor {
+    grid-template-columns: 240px 1fr;
+  }
+  .previewPanel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .editor {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: var(--surface-1, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: var(--space-sm, 12px);
+  min-height: 200px;
+}
+
+.panelHeader {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, rgba(255, 255, 255, 0.6));
+  margin-bottom: var(--space-sm, 12px);
+}
+
+/* ── BlockList ─────────────────────────────────────────── */
+
+.blockList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.blockRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 120ms,
+    border-color 120ms;
+  user-select: none;
+}
+
+.blockRow:hover {
+  background: var(--surface-3, rgba(255, 255, 255, 0.07));
+}
+
+.blockRow.active {
+  border-color: var(--accent, #a855f7);
+  background: var(--surface-3, rgba(255, 255, 255, 0.07));
+}
+
+.blockRow.dragging {
+  opacity: 0.4;
+}
+
+.grip {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  cursor: grab;
+  touch-action: none;
+}
+
+.grip:active {
+  cursor: grabbing;
+}
+
+.blockLabel {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blockTypeChip {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--surface-3, rgba(255, 255, 255, 0.08));
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+}
+
+.moveButtons {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@media (hover: none) {
+  .moveButtons {
+    display: flex;
+  }
+  .grip {
+    display: none;
+  }
+}
+
+.moveBtn {
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  width: 24px;
+  height: 18px;
+  font-size: 0.7rem;
+  color: var(--text-muted, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+}
+
+.addBlockBtn {
+  margin-top: var(--space-sm, 12px);
+  width: 100%;
+}
+
+/* ── BlockConfigPanel ──────────────────────────────────── */
+
+.configEmpty {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-style: italic;
+  padding: var(--space-md, 16px) 0;
+  text-align: center;
+}
+
+.configForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fieldRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+}
+
+.minMaxGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.optionRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.removeOptionBtn {
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  color: var(--text-muted, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+}
+
+.dangerBtn {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid var(--danger, #ef4444);
+  color: var(--danger, #ef4444);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.dangerBtn:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* ── Preview ───────────────────────────────────────────── */
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.previewEmpty {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-style: italic;
+  padding: var(--space-md, 16px) 0;
+  text-align: center;
+}
+
+/* ── Version Picker ────────────────────────────────────── */
+
+.versionPicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  color: var(--text, #fff);
+  cursor: pointer;
+}
+
+.versionPicker select {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.versionPicker option {
+  color: #000;
+}
+
+.archivedBadge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background: rgba(234, 179, 8, 0.15);
+  color: rgb(234, 179, 8);
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+/* ── Diff panel ────────────────────────────────────────── */
+
+.diffPanel {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.diffPanel h4 {
+  margin: 0 0 6px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, rgba(255, 255, 255, 0.6));
+}
+
+.diffList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.diffAdded {
+  color: rgb(34, 197, 94);
+}
+.diffRemoved {
+  color: rgb(239, 68, 68);
+}
+.diffChanged {
+  color: rgb(234, 179, 8);
+}
