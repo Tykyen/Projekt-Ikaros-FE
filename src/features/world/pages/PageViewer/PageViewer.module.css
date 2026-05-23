@@ -1,0 +1,71 @@
+.article {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.article :global(a.brokenLink) {
+  color: var(--color-danger, rgba(255, 90, 90, 0.9)) !important;
+  text-decoration: underline dotted rgba(255, 90, 90, 0.7) !important;
+}
+
+.article :global(a.brokenLink:hover) {
+  text-decoration-style: solid !important;
+}
+
+@media (max-width: 640px) {
+  .article {
+    padding: 1rem;
+  }
+}
+
+/* 7.1m — Print stylesheet. Skryje UI chrome, rozbalí sekce, zarovná tisk. */
+@media print {
+  .article {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  /* Skryjeme floating UI a navigaci. */
+  :global([class*='PagePalette']),
+  :global([class*='KeyboardShortcutsHelp']),
+  :global([class*='GalleryLightbox']),
+  :global([class*='QuoteSelectionPopup']),
+  :global([class*='AutoTOC']),
+  :global([class*='breadcrumbs']),
+  :global([class*='editBtn']),
+  :global([class*='starBtn']) {
+    display: none !important;
+  }
+
+  /* Sticky pozice rozbalíme. */
+  :global([class*='aside']),
+  :global([class*='menu']) {
+    position: static !important;
+    max-height: none !important;
+  }
+
+  /* Rozbalíme všechny sekce. */
+  :global([class*='PageSections']) [aria-expanded='false'] + * {
+    display: block !important;
+  }
+
+  /* Broken link styling pryč pro tisk. */
+  .article :global(a.brokenLink) {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .article :global(a) {
+    color: inherit !important;
+    text-decoration: underline;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}
