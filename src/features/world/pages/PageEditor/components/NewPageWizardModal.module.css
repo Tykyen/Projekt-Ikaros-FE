@@ -1,0 +1,153 @@
+/* 9.1 — NewPageWizardModal: výběr cesty pro tvorbu nového obsahu. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-overlay, 1000);
+  padding: 1rem;
+  animation: fadeIn 0.12s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dialog {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg-secondary, rgba(16, 20, 34, 0.98));
+  border: 1px solid var(--border, rgba(120, 140, 180, 0.3));
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--border-soft, rgba(120, 140, 180, 0.2));
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-strong, #fff);
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-strong, #fff);
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  padding: 1.25rem;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.3));
+  border-radius: 10px;
+  background: var(--surface-2, rgba(30, 40, 60, 0.4));
+  color: var(--text-strong, #fff);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.card:hover {
+  border-color: var(--accent-bright, var(--accent, #6f9bff));
+  background: var(--accent-bright-15, rgba(59, 90, 246, 0.18));
+  transform: translateY(-1px);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--accent-bright, var(--accent, #6f9bff));
+  outline-offset: 2px;
+}
+
+.cardIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--accent-soft, rgba(120, 200, 255, 0.15));
+  color: var(--accent-bright, var(--accent, #6f9bff));
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.cardSubtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+}
+
+.hint {
+  margin: 0;
+  padding: 0 1.25rem 1.25rem;
+  font-size: 0.78rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  line-height: 1.5;
+}
+
+@media (max-width: 540px) {
+  .dialog {
+    max-width: 100%;
+  }
+  .card {
+    padding: 0.85rem 0.9rem;
+  }
+  .cardIcon {
+    width: 40px;
+    height: 40px;
+  }
+}
