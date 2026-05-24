@@ -1,0 +1,753 @@
+/* 8.1-FIR — Finance/Výbava redesign + sdílené subdoc styly.
+ * Matrix-style 2-sloupcový layout (main / aside), theme-agnostic přes CSS vars.
+ * Žádné inline hexy — komponenty fungují identicky napříč 21 skiny.
+ */
+
+/* ── Společné ─────────────────────────────────────────────────────── */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.empty {
+  margin: 0;
+  padding: var(--sp-4);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-style: italic;
+  text-align: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Aside (sdílená Finance + Výbava) ─────────────────────────────── */
+.asidePortraitWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.asidePortrait {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  object-fit: cover;
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* ── Finance: 2-sloupec ───────────────────────────────────────────── */
+.financeShell {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: var(--sp-5);
+  align-items: start;
+}
+
+.financeMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  min-width: 0;
+}
+
+.financeAside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  position: sticky;
+  top: var(--sp-4);
+}
+
+/* ── Finance: hero karta ──────────────────────────────────────────── */
+.heroCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  border: 1px solid var(--frame-border);
+  border-top: 2px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.heroBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.heroBadge {
+  padding: 4px 10px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.badgeActive {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.heroBalance {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.heroValue {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: var(--weight-semi, 600);
+  color: var(--accent-bright);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.heroCurrency {
+  font-size: 0.55em;
+  color: var(--text-secondary);
+  font-weight: var(--weight-regular, 400);
+  margin-left: 0.2em;
+}
+
+.heroSplit {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: var(--sp-3);
+}
+
+.splitCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--sp-3);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+}
+
+.splitDivider {
+  width: 1px;
+  background: var(--frame-border);
+}
+
+.splitLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.splitValue {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi, 600);
+}
+
+.splitIncome .splitValue {
+  color: var(--accent-bright);
+}
+
+.splitExpense .splitValue {
+  color: var(--accent-danger, #ff5764);
+}
+
+/* ── Finance aside: title + metadata ──────────────────────────────── */
+.asideTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.asideTitleHighlight {
+  display: block;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semi, 600);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--accent-bright);
+  text-shadow: 0 0 12px
+    color-mix(in srgb, var(--accent) 40%, transparent);
+  margin-top: 4px;
+}
+
+.metaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.metaRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px 12px;
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+}
+
+.metaIcon {
+  color: var(--accent);
+}
+
+.metaLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.metaValue {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.disconnectBtn {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.disconnectBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Finance: historie transakcí ──────────────────────────────────── */
+.rowList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 7px var(--sp-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  font-size: var(--text-sm);
+}
+
+.rowAmount {
+  font-weight: var(--weight-semi, 600);
+  white-space: nowrap;
+}
+
+.amountPos {
+  color: var(--accent-bright);
+}
+
+.amountNeg {
+  color: var(--accent-danger, #ff5764);
+}
+
+.rowMeta {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+/* ── „Rozepsané" notes karta (Finance + Výbava) ───────────────────── */
+.notesCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.notesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.notesTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.notesBody {
+  margin-top: var(--sp-2);
+}
+
+.notesCollapsed .notesBody {
+  display: none;
+}
+
+/* ── Výbava: 2-sloupec ────────────────────────────────────────────── */
+.invShell {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  gap: var(--sp-5);
+  align-items: start;
+}
+
+.invMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.invAside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  position: sticky;
+  top: var(--sp-4);
+  text-align: center;
+}
+
+.invAsideName {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--accent-bright);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px
+    color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.invAsideSubtitle {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.invAsideStats {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.invAsideStats strong {
+  color: var(--text-primary);
+}
+
+.invStatsDivider {
+  opacity: 0.4;
+}
+
+/* ── Výbava: collapsible sekce ────────────────────────────────────── */
+.invSectionCard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.invSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  transition: background 120ms ease;
+}
+
+.invSectionHeader:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.invSectionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.invSectionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.invItemCount {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.invSectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-3) var(--sp-3);
+  border-top: 1px solid var(--frame-border);
+}
+
+.invSectionContent {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* ── Výbava: item row + qty stepper ──────────────────────────────── */
+.itemList {
+  list-style: none;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 6px var(--sp-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  font-size: var(--text-sm);
+}
+
+.itemText {
+  color: var(--text-primary);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.itemRight {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  white-space: nowrap;
+}
+
+.itemNote {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-style: italic;
+}
+
+.itemQty {
+  color: var(--accent-bright);
+  font-weight: var(--weight-semi, 600);
+}
+
+.qtyControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-2) 80%, transparent);
+}
+
+.qtyBtn {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: var(--text-md);
+  line-height: 1;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.qtyBtn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.qtyValue {
+  min-width: 24px;
+  text-align: center;
+  font-weight: var(--weight-semi, 600);
+  color: var(--accent-bright);
+}
+
+/* ── Akční tlačítka edit režimu ──────────────────────────────────── */
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.actionBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.actionBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Error state s retry ──────────────────────────────────────────── */
+.errorBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.retryBtn {
+  padding: 8px 16px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.retryBtn:hover {
+  background: var(--accent);
+  color: var(--text-on-accent, #fff);
+}
+
+/* ── Kalendář (z původního souboru, beze změny) ──────────────────── */
+.eventList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.event {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.eventTitle {
+  font-weight: var(--weight-semi, 600);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.eventMeta {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.eventDesc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* ── Finance metadata legacy (zachováno pro CalendarTab apod.) ─── */
+.balance {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.balanceLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.balanceValue {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--accent-bright);
+}
+
+.financeMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* ── Mobil ≤ 768px ────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .financeShell,
+  .invShell {
+    grid-template-columns: 1fr;
+  }
+
+  .financeAside,
+  .invAside {
+    position: static;
+    order: -1; /* aside jde nahoru jako kompakt banner */
+  }
+
+  .asidePortrait {
+    width: 80px;
+    height: 80px;
+    border-width: 2px;
+  }
+
+  .asideTitleHighlight {
+    font-size: var(--text-xl);
+  }
+
+  .invAsideName {
+    font-size: var(--text-lg);
+  }
+
+  .heroValue {
+    font-size: 2rem;
+  }
+
+  .heroSplit {
+    grid-template-columns: 1fr;
+  }
+
+  .splitDivider {
+    display: none;
+  }
+
+  .qtyBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .qtyControl {
+    padding: 4px 8px;
+  }
+
+  .actionBtn {
+    flex: 1;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .disconnectBtn {
+    min-height: 44px;
+  }
+}

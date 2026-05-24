@@ -1,0 +1,175 @@
+/* D-NEW-notes-inline + tužkový zápisník vizuál.
+ * Linkovaný papír background, sépiový tón, handwriting-feel font.
+ * Theme-agnostic — vlastní paleta (papírová) nezávislá na skinu,
+ * protože „zápisník" má vlastní hmatatelnou estetiku, která má
+ * vyniknout nad world themem.
+ */
+
+.notebookShell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.notebookHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-2);
+}
+
+.notebookTitle {
+  margin: 0;
+  font-family: 'Caveat', 'Patrick Hand', 'Permanent Marker', cursive;
+  font-size: 2rem;
+  color: #3a2a1a;
+  letter-spacing: 0.02em;
+  /* Lehký „tužkový" stín */
+  text-shadow: 0 1px 0 rgba(58, 42, 26, 0.1);
+}
+
+.status {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: #8b7355;
+  font-style: italic;
+}
+
+.statusSaved {
+  color: #5a7a3a;
+}
+
+/* ── Papír ────────────────────────────────────────────────────────── */
+
+.paper {
+  position: relative;
+  background-color: #faf6ea;
+  /* Linkovaný papír — horizontální linky každých 32px + červená marginová čára */
+  background-image:
+    linear-gradient(
+      to right,
+      transparent 56px,
+      rgba(185, 60, 60, 0.45) 56px,
+      rgba(185, 60, 60, 0.45) 58px,
+      transparent 58px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgba(70, 100, 180, 0.25) 31px,
+      rgba(70, 100, 180, 0.25) 32px
+    );
+  border: 1px solid #ddd0b3;
+  border-radius: 4px;
+  padding: 32px 28px 32px 80px;
+  min-height: 480px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 8px 20px rgba(50, 30, 10, 0.15),
+    0 2px 4px rgba(50, 30, 10, 0.08);
+  /* Lehká papírová zrnitost — radial highlight pro dojem světla */
+  background-blend-mode: multiply;
+}
+
+.paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      ellipse at top right,
+      rgba(255, 248, 220, 0.4),
+      transparent 60%
+    );
+  border-radius: inherit;
+}
+
+/* RichTextEditor uvnitř — psát "tužkou" */
+.paper :global(.ProseMirror),
+.paper :global([contenteditable]) {
+  font-family: 'Caveat', 'Kalam', 'Patrick Hand', cursive;
+  font-size: 1.25rem;
+  line-height: 32px; /* Sedí na linky 32px */
+  color: #2a2418;
+  background: transparent;
+  min-height: 400px;
+  padding: 0;
+  border: none;
+  outline: none;
+}
+
+/* Posuv kurzoru i v prázdném stavu — kvůli linkám musí být baseline align */
+.paper :global(.ProseMirror p),
+.paper :global([contenteditable] p) {
+  margin: 0;
+  line-height: 32px;
+  min-height: 32px;
+}
+
+.paper :global(.ProseMirror h1),
+.paper :global(.ProseMirror h2),
+.paper :global(.ProseMirror h3) {
+  font-family: 'Caveat', 'Kalam', cursive;
+  color: #1a1410;
+  margin: 0;
+  line-height: 32px;
+}
+
+.paper :global(.ProseMirror h1) {
+  font-size: 1.8rem;
+}
+.paper :global(.ProseMirror h2) {
+  font-size: 1.5rem;
+}
+.paper :global(.ProseMirror h3) {
+  font-size: 1.3rem;
+}
+
+.paper :global(.ProseMirror strong) {
+  color: #1a1410;
+  font-weight: 700;
+}
+
+.paper :global(.ProseMirror em) {
+  font-style: italic;
+}
+
+.paper :global(.ProseMirror ul),
+.paper :global(.ProseMirror ol) {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.paper :global(.ProseMirror ul li),
+.paper :global(.ProseMirror ol li) {
+  line-height: 32px;
+}
+
+.paper :global(.ProseMirror blockquote) {
+  border-left: 3px solid rgba(185, 60, 60, 0.4);
+  padding-left: 12px;
+  color: #5a4a30;
+  margin: 0;
+}
+
+.paper :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  color: #a89880;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Mobil — menší padding, papír zachová proporce */
+@media (max-width: 768px) {
+  .paper {
+    padding: 24px 16px 24px 56px;
+  }
+  .paper :global(.ProseMirror),
+  .paper :global([contenteditable]) {
+    font-size: 1.15rem;
+  }
+}
