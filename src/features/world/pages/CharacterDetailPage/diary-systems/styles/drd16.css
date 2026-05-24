@@ -1,0 +1,606 @@
+/* Dračí doupě 1.6 — Klasická Jeskyně (amber torch-lit dungeon)
+ * 8.7l — přenos z c:/Matrix/Matrix/frontend/src/pages/Ikaros/Drd16Diary.scss
+ */
+
+[data-diary-system='drd16'] .drd16-dashboard {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(20, 14, 8, 0.9);
+  border-radius: 16px;
+  border: 1px solid rgba(180, 120, 50, 0.15);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow:
+    inset 0 0 40px rgba(0, 0, 0, 0.5),
+    0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+
+  --drd-accent-main: #d4892c;
+  --drd-accent-health: #cc3333;
+  --drd-accent-mana: #6b5ce7;
+  --drd-panel-bg: rgba(30, 22, 12, 0.7);
+  --drd-border: rgba(180, 120, 50, 0.15);
+  --drd-glow-main: 0 0 10px rgba(212, 137, 44, 0.25);
+}
+
+[data-diary-system='drd16'] .drd16-dashboard * {
+  box-sizing: border-box;
+}
+
+/* ── Quick PJ bar ──────────────────────────────────────── */
+
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .drd16-quick-pj-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--drd-border);
+  margin-bottom: 8px;
+}
+[data-diary-system='drd16'] .drd16-dashboard .quick-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .quick-stat
+  .qs-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.5);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .quick-stat
+  .qs-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-family: 'Space Mono', monospace;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .quick-stat.health
+  .qs-value {
+  color: var(--drd-accent-health);
+  text-shadow: 0 0 8px rgba(204, 51, 51, 0.4);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .quick-stat.mana
+  .qs-value {
+  color: var(--drd-accent-mana);
+  text-shadow: 0 0 8px rgba(107, 92, 231, 0.4);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .quick-stat.defense
+  .qs-value {
+  color: var(--drd-accent-main);
+  text-shadow: var(--drd-glow-main);
+}
+
+/* ── Main grid ─────────────────────────────────────────── */
+
+[data-diary-system='drd16'] .drd16-dashboard .drd16-grid {
+  display: grid;
+  grid-template-columns: 3fr 5fr 2fr;
+  gap: 20px;
+}
+@media (max-width: 1024px) {
+  [data-diary-system='drd16'] .drd16-dashboard .drd16-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-diary-system='drd16'] .drd16-dashboard .drd16-panel {
+  background: var(--drd-panel-bg);
+  border: 1px solid var(--drd-border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .drd16-panel
+  .panel-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--drd-accent-main);
+  border-bottom: 1px solid rgba(212, 137, 44, 0.2);
+  padding-bottom: 8px;
+  margin: 0;
+}
+
+/* ── Identity card ─────────────────────────────────────── */
+
+[data-diary-system='drd16'] .drd16-dashboard .identity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+[data-diary-system='drd16'] .drd16-dashboard .identity-card input,
+[data-diary-system='drd16'] .drd16-dashboard .identity-card select {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
+  border-bottom: 1px solid var(--drd-border);
+  color: #fff;
+  font-size: 1rem;
+  padding: 8px;
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.2s;
+  width: 100%;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .identity-card
+  input:focus,
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .identity-card
+  select:focus {
+  border-bottom-color: var(--drd-accent-main);
+  background: rgba(212, 137, 44, 0.05);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .identity-card
+  select
+  option {
+  background: #111;
+  color: #fff;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .identity-card
+  .identity-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--drd-accent-main);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ── Stats list ────────────────────────────────────────── */
+
+[data-diary-system='drd16'] .drd16-dashboard .stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .stats-list
+  .stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .stats-list
+  .stat-row
+  p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .stats-list
+  .stat-inputs {
+  display: flex;
+  gap: 8px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .stats-list
+  .stat-inputs
+  input {
+  width: 48px;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--drd-border);
+  color: #fff;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  outline: none;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .stats-list
+  .stat-inputs
+  input:focus {
+  border-color: var(--drd-accent-main);
+  box-shadow: var(--drd-glow-main);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .stats-list
+  .stat-inputs
+  .stat-mod {
+  background: rgba(212, 137, 44, 0.1);
+  color: var(--drd-accent-main);
+  border-color: rgba(212, 137, 44, 0.3);
+}
+
+/* ── Combat table ──────────────────────────────────────── */
+
+[data-diary-system='drd16'] .drd16-dashboard .combat-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+}
+[data-diary-system='drd16'] .drd16-dashboard .combat-table th {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+  text-align: left;
+  padding: 4px 8px;
+}
+[data-diary-system='drd16'] .drd16-dashboard .combat-table td {
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(180, 120, 50, 0.08);
+  border-bottom: 1px solid rgba(180, 120, 50, 0.08);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .combat-table
+  td:first-child {
+  border-left: 1px solid rgba(180, 120, 50, 0.08);
+  border-radius: 6px 0 0 6px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .combat-table
+  td:last-child {
+  border-right: 1px solid rgba(180, 120, 50, 0.08);
+  border-radius: 0 6px 6px 0;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .combat-table
+  td
+  input {
+  width: 100%;
+  min-width: 40px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
+  padding: 8px;
+  text-align: center;
+  outline: none;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .combat-table
+  td
+  input.left-align {
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  min-width: 120px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .combat-table
+  td
+  input:focus {
+  background: rgba(212, 137, 44, 0.05);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .combat-table
+  .delete-btn {
+  background: transparent;
+  border: none;
+  color: rgba(204, 51, 51, 0.6);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 8px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .combat-table
+  .delete-btn:hover {
+  color: rgba(204, 51, 51, 1);
+}
+
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .add-weapon-btn {
+  background: rgba(212, 137, 44, 0.1);
+  color: var(--drd-accent-main);
+  border: 1px dashed rgba(212, 137, 44, 0.3);
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 8px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .add-weapon-btn:hover {
+  background: rgba(212, 137, 44, 0.2);
+}
+
+/* ── Defense box ───────────────────────────────────────── */
+
+[data-diary-system='drd16'] .drd16-dashboard .defense-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(
+    135deg,
+    rgba(212, 137, 44, 0.1) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  border: 1px solid rgba(212, 137, 44, 0.3);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--drd-glow-main);
+  margin-top: auto;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .defense-box
+  .def-label {
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--drd-accent-main);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .defense-box
+  input {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--drd-accent-main);
+  color: #fff;
+  font-size: 2.5rem;
+  font-weight: 800;
+  width: 100px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  outline: none;
+}
+
+/* ── Resource trackers (Health + Mana) ───────────────── */
+
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .resource-trackers {
+  display: flex;
+  gap: 16px;
+  height: 100%;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  padding: 16px 8px;
+  border: 1px solid var(--drd-border);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column.health {
+  border-color: rgba(204, 51, 51, 0.2);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column.mana {
+  border-color: rgba(107, 92, 231, 0.2);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column
+  .tracker-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column.health
+  .tracker-title {
+  color: var(--drd-accent-health);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column.mana
+  .tracker-title {
+  color: var(--drd-accent-mana);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-visual {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  min-height: 200px;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-visual
+  .tracker-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: height 0.3s ease;
+  opacity: 0.6;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column.health
+  .tracker-fill {
+  background: linear-gradient(to top, #cc2222, #ff6655);
+  box-shadow: 0 0 20px rgba(204, 34, 34, 0.5);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-column.mana
+  .tracker-fill {
+  background: linear-gradient(to top, #4b3dbf, #8b7aef);
+  box-shadow: 0 0 20px rgba(107, 92, 231, 0.5);
+}
+
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-controls
+  input {
+  width: 100%;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  outline: none;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .tracker-controls
+  input:focus {
+  border-bottom-color: #fff;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .controls-row {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .controls-row
+  button {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  padding: 8px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 800;
+  transition: all 0.2s;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .controls-row
+  button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .controls-row
+  button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .controls-row
+  button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* ── Bottom zone (textareas) ───────────────────────────── */
+
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .drd16-bottom-zone {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 768px) {
+  [data-diary-system='drd16']
+    .drd16-dashboard
+    .drd16-bottom-zone {
+    grid-template-columns: 1fr;
+  }
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .drd16-bottom-zone
+  textarea {
+  width: 100%;
+  min-height: 250px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--drd-border);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 16px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+}
+[data-diary-system='drd16']
+  .drd16-dashboard
+  .drd16-bottom-zone
+  textarea:focus {
+  border-color: var(--drd-accent-main);
+  box-shadow: inset 0 0 10px rgba(212, 137, 44, 0.05);
+}
+
+/* ── Disabled (view) ─────────────────────────────────── */
+
+[data-diary-system='drd16'] .drd16-dashboard input:disabled,
+[data-diary-system='drd16'] .drd16-dashboard select:disabled,
+[data-diary-system='drd16'] .drd16-dashboard textarea:disabled,
+[data-diary-system='drd16'] .drd16-dashboard button:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
