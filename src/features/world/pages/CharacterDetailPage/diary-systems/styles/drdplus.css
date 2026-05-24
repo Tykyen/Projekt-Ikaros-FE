@@ -1,0 +1,403 @@
+/* DrD+ — Arkanní Svět (Mystical Arcane Theme)
+ * 8.7f — přenos z c:/Matrix/Matrix/frontend/src/styles/DrdPlusDiary.scss
+ */
+
+[data-diary-system='drdplus'] .drdplus-dashboard {
+  color: #c9d1d9;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+[data-diary-system='drdplus'] .drdplus-dashboard ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  ::-webkit-scrollbar-track {
+  background: rgba(10, 8, 18, 0.3);
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  ::-webkit-scrollbar-thumb {
+  background: rgba(124, 92, 191, 0.15);
+  border-radius: 4px;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  ::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 92, 191, 0.3);
+}
+
+/* ── Identity header ───────────────────────────────────────── */
+
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-header {
+  background: rgba(16, 18, 24, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 2px solid rgba(124, 92, 191, 0.6);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-header
+  .identity-block {
+  flex: 1;
+  min-width: 180px;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-header
+  .identity-block
+  label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 6px;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-header
+  .identity-block
+  input,
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-header
+  .identity-block
+  select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 15px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-header
+  .identity-block
+  input:focus,
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-header
+  .identity-block
+  select:focus {
+  outline: none;
+  border-color: rgba(124, 92, 191, 0.6);
+  background: rgba(16, 18, 24, 0.9);
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-header
+  .identity-block
+  select.active-prof {
+  border-bottom: 2px solid #7c5cbf;
+  font-weight: bold;
+}
+
+/* ── Tabs ──────────────────────────────────────────────────── */
+
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-tabs {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 24px;
+  gap: 8px;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-tabs button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-tabs button:hover {
+  color: #fff;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-tabs
+  button.active {
+  color: #7c5cbf;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-tabs
+  button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #7c5cbf;
+  box-shadow: 0 -2px 10px rgba(136, 114, 255, 0.4);
+}
+
+/* ── Content panels ────────────────────────────────────────── */
+
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-tab-content {
+  animation: drdp-fadeIn 0.3s ease-in-out;
+}
+
+@keyframes drdp-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-panel {
+  background: rgba(14, 12, 22, 0.65);
+  border: 1px solid rgba(124, 92, 191, 0.08);
+  border-radius: 8px;
+  padding: 20px;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-panel h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+/* ── Stats grid ────────────────────────────────────────────── */
+
+[data-diary-system='drdplus'] .drdplus-dashboard .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .stat-box {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .stat-box label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #8b949e;
+  margin-bottom: 8px;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .stat-box input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .stat-box input:focus {
+  outline: none;
+  border-bottom-color: #7c5cbf;
+}
+
+/* ── Combat cards ──────────────────────────────────────────── */
+
+[data-diary-system='drdplus'] .drdplus-dashboard .combat-top-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 768px) {
+  [data-diary-system='drdplus'] .drdplus-dashboard .combat-top-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+[data-diary-system='drdplus'] .drdplus-dashboard .combat-card {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 30, 0.8),
+    rgba(15, 15, 20, 0.8)
+  );
+  border: 1px solid rgba(255, 100, 100, 0.15);
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .combat-card h4 {
+  margin: 0;
+  font-size: 12px;
+  color: #ff6b6b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .combat-card input {
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .combat-card input:focus {
+  outline: none;
+}
+
+/* ── Tables ────────────────────────────────────────────────── */
+
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container {
+  overflow-x: auto;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container
+  table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container
+  th {
+  text-align: left;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 8px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container
+  td {
+  padding: 4px;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container
+  td
+  input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container
+  td
+  input:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container
+  .add-row-btn {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 8px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-table-container
+  .add-row-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-diary-system='drdplus'] .drdplus-dashboard .del-btn {
+  background: transparent;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px;
+  opacity: 0.6;
+}
+[data-diary-system='drdplus'] .drdplus-dashboard .del-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ── Textareas ─────────────────────────────────────────────── */
+
+[data-diary-system='drdplus'] .drdplus-dashboard .drdp-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #c9d1d9;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+[data-diary-system='drdplus']
+  .drdplus-dashboard
+  .drdp-textarea:focus {
+  outline: none;
+  border-color: rgba(136, 114, 255, 0.4);
+}
+
+/* ── Disabled states (view mode) ───────────────────────────── */
+
+[data-diary-system='drdplus'] .drdplus-dashboard input:disabled,
+[data-diary-system='drdplus'] .drdplus-dashboard select:disabled,
+[data-diary-system='drdplus'] .drdplus-dashboard textarea:disabled,
+[data-diary-system='drdplus'] .drdplus-dashboard button:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
