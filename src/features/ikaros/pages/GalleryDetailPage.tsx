@@ -1,0 +1,270 @@
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+import { toast } from 'sonner';
+import { ArrowLeft, Check, Pencil, Trash2 } from 'lucide-react';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { UserRole } from '@/shared/types';
+import { Spinner } from '@/shared/ui';
+import {
+  useGalleryImage,
+  useApproveGalleryImage,
+  useRejectGalleryImage,
+  useDeleteGalleryImage,
+  useSubmitGalleryImage,
+  useRateGalleryImage,
+  useToggleFavoriteGallery,
+} from '../api/useGallery';
+import { useGalleryCategories } from '../api/useGalleryCategories';
+import { categoryByKey, formatDateCs, statusColor, statusLabel } from '../lib/gallery';
+import { ReviewsSection } from '../components/ReviewsSection';
+import { RejectReasonModal } from '../components/RejectReasonModal';
+import { FavoriteToggle } from '../components/FavoriteToggle';
+import type { IkarosGalleryItem } from '@/shared/types';
+import s from './GalleryDetailPage.module.css';
+
+const REVIEWER_ROLES: UserRole[] = [
+  UserRole.Superadmin,
+  UserRole.Admin,
+  UserRole.SpravceGalerie,
+];
+
+export default function GalleryDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const { data: image, isLoading, error } = useGalleryImage(id);
+  const { data: categories = [] } = useGalleryCategories();
+
+  if (isLoading) return <Spinner center />;
+  if (error || !image) {
+    return (
+      <div className={s.notFound}>
+        <p>Obrázek nenalezen nebo přístup odepřen.</p>
+        <Link to="/ikaros/galerie" className={s.back}>
+          <ArrowLeft size={14} /> Zpět na galerii
+        </Link>
+      </div>
+    );
+  }
+
+  const cat = categoryByKey(categories, image.category);
+
+  return (
+    <div className={s.page}>
+      <Link to="/ikaros/galerie" className={s.back}>
+        <ArrowLeft size={14} /> Zpět na galerii
+      </Link>
+
+      <div className={s.frame}>
+        <img src={image.imageUrl} alt={image.title} className={s.img} />
+      </div>
+
+      <div className={s.body}>
+        <h1 className={s.title}>{image.title}</h1>
+        <div className={s.meta}>
+          {/* D-040 — disabled link u smazaného autora galerie. */}
+          {image.authorIsDeleted ? (
+            <span className={s.author} style={{ fontStyle: 'italic', opacity: 0.7 }}>
+              Smazaný účet
+            </span>
+          ) : (
+            <Link to={`/ikaros/uzivatel/${image.authorId}`} className={s.author}>
+              {image.authorName}
+            </Link>
+          )}
+          <span className={s.dot}>·</span>
+          <span style={{ color: 'var(--gal-cat-current)' }}>{cat.label}</span>
+          <span className={s.dot}>·</span>
+          <span>
+            {formatDateCs(image.publishedAtUtc ?? image.createdAtUtc)}
+          </span>
+          {image.status !== 'Published' && (
+            <>
+              <span className={s.dot}>·</span>
+              <span style={{ color: statusColor(image.status) }}>
+                {statusLabel(image.status)}
+              </span>
+            </>
+          )}
+        </div>
+
+        <GalleryFavorite image={image} />
+
+        {image.description && <p className={s.desc}>{image.description}</p>}
+
+        {image.status === 'Rejected' && image.rejectReason && (
+          <div className={s.rejectInfo}>
+            <strong>Důvod vrácení:</strong> {image.rejectReason}
+          </div>
+        )}
+
+        {image.status === 'Published' && <Rating image={image} />}
+
+        <OwnerActions image={image} />
+        <AdminActions image={image} />
+      </div>
+    </div>
+  );
+}
+
+// ─── 3.7 — Oblíbené (záložka) ────────────────────────────────────────────
+
+function GalleryFavorite({ image }: { image: IkarosGalleryItem }) {
+  const user = useAtomValue(currentUserAtom);
+  const toggle = useToggleFavoriteGallery();
+  if (!user || image.status !== 'Published') return null;
+  const isFavorite = (user.favoriteGalleryIds ?? []).includes(image.id);
+  return (
+    <div className={s.favoriteBar}>
+      <FavoriteToggle
+        variant="button"
+        isFavorite={isFavorite}
+        pending={toggle.isPending}
+        onToggle={() =>
+          toggle.mutate(image.id, {
+            onSuccess: (res) =>
+              toast.success(
+                res.isFavorite
+                  ? 'Přidáno do oblíbených'
+                  : 'Odebráno z oblíbených',
+              ),
+          })
+        }
+      />
+    </div>
+  );
+}
+
+// ─── Recenze (3.4f) ──────────────────────────────────────────────────────
+
+function Rating({ image }: { image: IkarosGalleryItem }) {
+  const user = useAtomValue(currentUserAtom);
+  const rate = useRateGalleryImage();
+
+  return (
+    <ReviewsSection
+      ratings={image.ratings}
+      averageRating={image.averageRating}
+      canReview={!!user && user.id !== image.authorId}
+      currentUserId={user?.id}
+      isPending={rate.isPending}
+      onSubmit={(stars, text) =>
+        rate.mutate(
+          { id: image.id, stars, text },
+          {
+            onSuccess: () => toast.success('Recenze uložena'),
+            onError: () => toast.error('Nepodařilo se uložit recenzi'),
+          },
+        )
+      }
+    />
+  );
+}
+
+// ─── Akce autora ─────────────────────────────────────────────────────────
+
+function OwnerActions({ image }: { image: IkarosGalleryItem }) {
+  const user = useAtomValue(currentUserAtom);
+  const navigate = useNavigate();
+  const submit = useSubmitGalleryImage();
+  const del = useDeleteGalleryImage();
+
+  if (user?.id !== image.authorId) return null;
+  const editable = image.status === 'Draft' || image.status === 'Rejected';
+  if (!editable) return null;
+
+  function handleDelete() {
+    if (!window.confirm('Opravdu smazat tento obrázek?')) return;
+    del.mutate(image.id, {
+      onSuccess: () => {
+        toast.success('Obrázek smazán');
+        navigate('/ikaros/galerie?tab=moje');
+      },
+      onError: () => toast.error('Nepodařilo se smazat'),
+    });
+  }
+
+  return (
+    <div className={s.actions}>
+      <Link to={`/ikaros/galerie/${image.id}/upravit`} className={s.btnGhost}>
+        <Pencil size={14} /> Upravit
+      </Link>
+      <button
+        type="button"
+        className={s.btnGhost}
+        onClick={() =>
+          submit.mutate(image.id, {
+            onSuccess: () => toast.success('Odesláno ke schválení'),
+            onError: () => toast.error('Nepodařilo se odeslat'),
+          })
+        }
+        disabled={submit.isPending}
+      >
+        <Check size={14} /> Odeslat ke schválení
+      </button>
+      <button
+        type="button"
+        className={s.btnDanger}
+        onClick={handleDelete}
+        disabled={del.isPending}
+      >
+        <Trash2 size={14} /> Smazat
+      </button>
+    </div>
+  );
+}
+
+// ─── Akce schvalovatele ──────────────────────────────────────────────────
+
+function AdminActions({ image }: { image: IkarosGalleryItem }) {
+  const user = useAtomValue(currentUserAtom);
+  const approve = useApproveGalleryImage();
+  const reject = useRejectGalleryImage();
+  const [rejectOpen, setRejectOpen] = useState(false);
+
+  const isReviewer = user && REVIEWER_ROLES.includes(user.role);
+  if (!isReviewer || image.status !== 'Pending') return null;
+
+  return (
+    <div className={s.actions}>
+      <button
+        type="button"
+        className={s.btnApprove}
+        onClick={() =>
+          approve.mutate(image.id, {
+            onSuccess: () => toast.success('Obrázek schválen a publikován'),
+            onError: () => toast.error('Nepodařilo se schválit'),
+          })
+        }
+        disabled={approve.isPending}
+      >
+        <Check size={14} /> Schválit a publikovat
+      </button>
+      <button
+        type="button"
+        className={s.btnGhost}
+        onClick={() => setRejectOpen(true)}
+        disabled={approve.isPending}
+      >
+        Vrátit s poznámkou
+      </button>
+      <RejectReasonModal
+        open={rejectOpen}
+        onClose={() => setRejectOpen(false)}
+        title={`Vrátit obrázek „${image.title}"`}
+        isPending={reject.isPending}
+        onConfirm={(reason) =>
+          reject.mutate(
+            { id: image.id, reason },
+            {
+              onSuccess: () => {
+                toast.success('Obrázek vrácen autorovi s poznámkou');
+                setRejectOpen(false);
+              },
+              onError: () => toast.error('Nepodařilo se vrátit obrázek'),
+            },
+          )
+        }
+      />
+    </div>
+  );
+}

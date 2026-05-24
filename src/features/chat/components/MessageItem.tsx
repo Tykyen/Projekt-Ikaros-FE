@@ -1,0 +1,451 @@
+import { useRef, useState } from 'react';
+import {
+  Trash2,
+  Reply,
+  SmilePlus,
+  CornerUpLeft,
+  Pencil,
+  Theater,
+} from 'lucide-react';
+import clsx from 'clsx';
+import type { ChatMessage } from '../lib/types';
+import { parseEmotes } from '../lib/emotes';
+import { resolveTombstone } from '@/shared/lib/tombstone';
+import { guardChatColor } from '../lib/chatColorGuard';
+import { formatTime } from '../lib/format';
+import { EmojiPickerPopover } from './EmojiPickerPopover';
+import { MessageAttachments } from './MessageAttachments';
+import { DiceMessage } from '@/features/world/chat/dice/components/DiceMessage';
+import s from './MessageItem.module.css';
+
+interface MessageItemProps {
+  message: ChatMessage;
+  currentUserId: string;
+  /** Po sobě jdoucí zpráva téhož autora — skryje hlavičku (jméno + čas). */
+  grouped: boolean;
+  /** Computed `--theme-surface` pro kontrast guard barvy textu. */
+  surfaceColor: string;
+  /** Admin/Superadmin → zobrazí tlačítko smazat. */
+  canDelete: boolean;
+  /** userId → username, pro popisek cíle whisperu. */
+  usersById: Map<string, string>;
+  /** Krátké zvýraznění po skoku z citace na originál (4.3a). */
+  highlighted: boolean;
+  onDelete: (messageId: string) => void;
+  /** Začít odpověď na tuto zprávu. */
+  onReply: (message: ChatMessage) => void;
+  /** Skok na citovaný originál (klik na citaci). */
+  onJumpToMessage: (messageId: string) => void;
+  /** Toggle emoji reakce. */
+  onToggleReaction: (messageId: string, emoji: string) => void;
+  /** Registrace root elementu do mapy `MessageList` (pro scroll-to). */
+  registerRef: (id: string, el: HTMLDivElement | null) => void;
+  /** 6.1 — skryje tlačítko Odpovědět (world chat shell; reply až 6.2). Default true. */
+  allowReply?: boolean;
+  /** 6.1 — skryje přidávání emoji reakcí (reakce až 6.2). Default true. */
+  allowReactions?: boolean;
+  /**
+   * 6.2 — vlastní render funkce obsahu (mention spans, world emote img).
+   * Dostává celou zprávu, ať může číst `mentions[]` pro highlight self.
+   * Globální chat ji nepředává → fallback na `parseEmotes` string transform.
+   */
+  renderContent?: (message: ChatMessage) => React.ReactNode;
+  /**
+   * 6.2c — editace zpráv. `editing` = jsme uvnitř MessageEditInline (composer
+   * překryje obsah). `onStartEdit` schová tlačítko ✎ pokud není předáno.
+   */
+  editing?: boolean;
+  onStartEdit?: (message: ChatMessage) => void;
+  /** 6.2c — render-prop pro inline edit komponentu (pokud `editing === true`). */
+  renderEditor?: (message: ChatMessage) => React.ReactNode;
+  /**
+   * 6.2h — optimistic UI akce pro failed zprávu. Pokud nedodáno, failed bar
+   * se nezobrazí (global chat featurou nezatížen).
+   */
+  onRetry?: (message: ChatMessage) => void;
+  onDiscard?: (message: ChatMessage) => void;
+  /** 6.2d — render RP datum badge (world chat předává RpDateBadge). */
+  renderRpDate?: (rpDate: string) => React.ReactNode;
+  /** 6.2f — resolver per-svět fontu (klíč → CSS font-family stack). */
+  resolveFont?: (key: string | null | undefined) => string | undefined;
+  /** 6.2f — resolver velikosti písma (klíč → CSS rem hodnota). */
+  resolveFontSize?: (key: string | null | undefined) => string | undefined;
+  /**
+   * Avatar fallback. Hierarchie:
+   *   1. `message.overrideAvatarUrl` (NPC mód, 6.2e)
+   *   2. `message.senderAvatarUrl` (membership v daném světě)
+   *   3. tento resolver — typicky globální `User.avatarUrl` ze členů světa
+   *   4. interní fallback — kruh s prvním písmenem
+   * Volá se jen pokud 1 i 2 chybí.
+   */
+  resolveAccountAvatar?: (senderId: string) => string | undefined;
+}
+
+/** Jedna položka výpisu chatu — veřejná zpráva / whisper / smazaná zpráva. */
+export function MessageItem({
+  message,
+  currentUserId,
+  grouped,
+  surfaceColor,
+  canDelete,
+  usersById,
+  highlighted,
+  onDelete,
+  onReply,
+  onJumpToMessage,
+  onToggleReaction,
+  registerRef,
+  allowReply = true,
+  allowReactions = true,
+  renderContent,
+  editing = false,
+  onStartEdit,
+  renderEditor,
+  onRetry,
+  onDiscard,
+  renderRpDate,
+  resolveFont,
+  resolveFontSize,
+  resolveAccountAvatar,
+}: MessageItemProps) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const reactionBtnRef = useRef<HTMLButtonElement>(null);
+  const isSelf = message.senderId === currentUserId;
+  const isWhisper = !!message.visibleTo && message.visibleTo.length > 0;
+  const isNpc = !!message.overrideName;
+  const isPending = message._status === 'pending';
+  const isFailed = message._status === 'failed';
+  const isDice = !!message.isDiceRoll;
+  const time = formatTime(message.createdAt);
+
+  const rawText = message.content ?? '';
+  const content = renderContent
+    ? renderContent(message)
+    : parseEmotes(rawText);
+  const textColor = guardChatColor(message.color, surfaceColor);
+  const reactions = Object.entries(message.reactions ?? {});
+  // Recovery pro historické zprávy: BE měl bug, kdy bez `characterPath` ukládal
+  // `requester.id` (MongoDB ObjectID, 24 hex znaků) jako `senderName`. Pokud
+  // takovou hodnotu vidíme, zkusíme aktuální username z members mapy.
+  const looksLikeObjectId = /^[0-9a-f]{24}$/i.test(message.senderName);
+  const resolvedSenderName =
+    looksLikeObjectId && usersById.get(message.senderId)
+      ? usersById.get(message.senderId)!
+      : message.senderName;
+
+  // D-040 — tombstone overlay pro smazané autory; NPC override (overrideName)
+  // přebíjí tombstone, autor NPC zprávy zůstane v podobě persony.
+  const tombstone = isNpc
+    ? { displayName: message.overrideName!, avatarUrl: message.overrideAvatarUrl, deleted: false }
+    : resolveTombstone({
+        isDeleted: message.senderIsDeleted,
+        displayName: resolvedSenderName,
+        avatarUrl:
+          message.senderAvatarUrl ?? resolveAccountAvatar?.(message.senderId),
+      });
+  const displayName = tombstone.displayName;
+  const isAuthorDeleted = tombstone.deleted;
+
+  // Avatar fallback hierarchie — NPC override → membership → account → initial.
+  // U tombstone autora má `tombstone.avatarUrl === undefined`, takže padá na initial.
+  const avatarUrl = tombstone.avatarUrl || null;
+  const avatarInitial = (displayName || '?').slice(0, 1).toUpperCase();
+
+  // 6.3 — smazané zprávy zachovají avatar + jméno autora, aby uživatel
+  // viděl kdo zprávu napsal. Dice hod navíc zobrazí hint (např. „hod
+  // kostkou +3") pokud BE drží payload i po soft-delete.
+  if (message.isDeleted) {
+    const dicePayload = message.dicePayload as
+      | { total?: number; type?: string }
+      | null
+      | undefined;
+    const diceHint =
+      isDice && dicePayload?.total !== undefined
+        ? ` (hod kostkou ${dicePayload.total > 0 ? '+' : ''}${dicePayload.total})`
+        : isDice
+          ? ' (hod kostkou)'
+          : '';
+    return (
+      <div
+        ref={(el) => registerRef(message.id, el)}
+        className={clsx(s.item, s.deleted, grouped && s.grouped)}
+      >
+        {grouped ? (
+          <div className={s.avatarSlotGrouped} aria-hidden="true" />
+        ) : (
+          <div className={s.avatarSlot}>
+            <span className={s.avatar} title={displayName}>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" loading="lazy" />
+              ) : (
+                avatarInitial
+              )}
+            </span>
+          </div>
+        )}
+        <div className={s.content_col}>
+          {!grouped && (
+            <div className={s.meta}>
+              <span className={s.name}>{displayName}</span>
+              {time && <time className={s.time}>{time}</time>}
+            </div>
+          )}
+          <span className={s.deletedText}>
+            Zpráva byla smazána{diceHint}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Popisek whisperu: odesílatel vidí „→ příjemce", příjemce „od odesílatele".
+  let whisperLabel = '';
+  if (isWhisper) {
+    if (isSelf) {
+      const toId = message.visibleTo!.find((id) => id !== currentUserId);
+      whisperLabel = `→ ${(toId && usersById.get(toId)) || 'někomu'}`;
+    } else {
+      whisperLabel = `od ${displayName}`;
+    }
+  }
+
+  // 6.2c — edit dostupný pro vlastníka (ne dice) nebo pro PJ/Admin moderaci.
+  const canEdit =
+    !!onStartEdit && !isDice && (isSelf || canDelete) && !isPending && !isFailed;
+
+  return (
+    <div
+      ref={(el) => registerRef(message.id, el)}
+      className={clsx(
+        s.item,
+        isWhisper && s.whisper,
+        grouped && s.grouped,
+        highlighted && s.highlighted,
+        isPending && s.pending,
+        isFailed && s.failed,
+      )}
+    >
+      {/* Avatar slot — viditelný jen u první zprávy v skupině, jinak placeholder.
+          Hierarchy: NPC override → membership → account (z resolver) → initial. */}
+      {grouped ? (
+        <div className={s.avatarSlotGrouped} aria-hidden="true" />
+      ) : (
+        <div className={s.avatarSlot}>
+          <span
+            className={clsx(
+              s.avatar,
+              isNpc && s.avatarNpc,
+              isAuthorDeleted && s.avatarDeleted,
+            )}
+            title={
+              isAuthorDeleted
+                ? 'Smazaný účet'
+                : isNpc
+                  ? `NPC: ${displayName}`
+                  : displayName
+            }
+            aria-label={isAuthorDeleted ? 'Smazaný účet' : undefined}
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" loading="lazy" />
+            ) : (
+              avatarInitial
+            )}
+            {/* D-040 — tombstone band přes avatar smazaného autora. */}
+            {isAuthorDeleted && (
+              <span className={s.avatarDeletedBand} aria-hidden="true" />
+            )}
+          </span>
+        </div>
+      )}
+
+      <div className={s.content_col}>
+      {!grouped && message.rpDate && renderRpDate && (
+        <div className={s.rpRow}>{renderRpDate(message.rpDate)}</div>
+      )}
+
+      {!grouped && (
+        <div className={s.meta}>
+          {isPending && <span className={s.pendingDot} aria-hidden="true" />}
+          <span
+            className={s.name}
+            style={isNpc ? { fontStyle: 'italic' } : undefined}
+          >
+            {displayName}
+          </span>
+          {isNpc && (
+            <span
+              className={s.npcTag}
+              title={`NPC napsal ${message.senderName}`}
+            >
+              <Theater size={10} />
+              NPC
+            </span>
+          )}
+          {time && <time className={s.time}>{time}</time>}
+          {message.isEdited && (
+            <span className={s.editedBadge}>(upraveno)</span>
+          )}
+        </div>
+      )}
+
+      {/* Citace zprávy, na kterou se odpovídá (4.3a). */}
+      {message.replyToId && (() => {
+        // Recovery historického ObjectID v `replyToSenderName` přes mapu
+        // usersById (jmen načtených z členů světa). Stejně jako u senderName.
+        const rawReplyName = message.replyToSenderName ?? '';
+        const replyNameIsObjectId = /^[0-9a-f]{24}$/i.test(rawReplyName);
+        const replyName = replyNameIsObjectId
+          ? usersById.get(rawReplyName) ?? rawReplyName
+          : rawReplyName || 'někdo';
+        return (
+          <button
+            type="button"
+            className={s.replyQuote}
+            onClick={() => onJumpToMessage(message.replyToId!)}
+          >
+            <CornerUpLeft size={12} className={s.replyIcon} />
+            <span className={s.replyName}>{replyName}</span>
+            <span className={s.replyPreview}>{message.replyToPreview}</span>
+          </button>
+        );
+      })()}
+
+      <div className={s.body}>
+        {isWhisper && <span className={s.whisperTag}>[šepot {whisperLabel}]</span>}{' '}
+        {editing && renderEditor ? (
+          renderEditor(message)
+        ) : isDice && message.dicePayload ? (
+          // Krok 6.3d — rendering hodu kostkou jako tabulka výpočtu + 3D scéna.
+          <DiceMessage
+            rawPayload={message.dicePayload}
+            skinId={message.diceSkin ?? null}
+            createdAt={message.createdAt}
+            fallbackContent={message.content ?? null}
+          />
+        ) : (
+          <span
+            className={s.content}
+            style={{
+              color: textColor,
+              fontFamily: resolveFont
+                ? resolveFont(message.customFont)
+                : undefined,
+              fontSize: resolveFontSize
+                ? resolveFontSize(message.customFontSize)
+                : undefined,
+            }}
+          >
+            {content}
+          </span>
+        )}
+        {grouped && time && <time className={s.timeHover}>{time}</time>}
+
+        {!editing && (
+          <div className={s.actions}>
+            {allowReply && !isPending && !isFailed && (
+              <button
+                type="button"
+                className={s.action}
+                onClick={() => onReply(message)}
+                title="Odpovědět"
+                aria-label="Odpovědět"
+              >
+                <Reply size={14} />
+              </button>
+            )}
+            {allowReactions && !isPending && !isFailed && (
+              <button
+                ref={reactionBtnRef}
+                type="button"
+                className={s.action}
+                onClick={() => setPickerOpen((v) => !v)}
+                title="Přidat reakci"
+                aria-label="Přidat reakci"
+              >
+                <SmilePlus size={14} />
+              </button>
+            )}
+            {allowReactions && pickerOpen && (
+              <EmojiPickerPopover
+                anchorRef={reactionBtnRef}
+                onSelect={(emoji) => onToggleReaction(message.id, emoji)}
+                onClose={() => setPickerOpen(false)}
+              />
+            )}
+            {canEdit && (
+              <button
+                type="button"
+                className={clsx(s.action, s.edit)}
+                onClick={() => onStartEdit!(message)}
+                title="Upravit zprávu"
+                aria-label="Upravit zprávu"
+              >
+                <Pencil size={13} />
+              </button>
+            )}
+            {canDelete && !isPending && !isFailed && (
+              <button
+                type="button"
+                className={clsx(s.action, s.delete)}
+                onClick={() => onDelete(message.id)}
+                title="Smazat zprávu"
+                aria-label="Smazat zprávu"
+              >
+                <Trash2 size={13} />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Přílohy zprávy (4.3b). */}
+      {message.attachments && message.attachments.length > 0 && (
+        <MessageAttachments attachments={message.attachments} />
+      )}
+
+      {/* Emoji reakce (4.3a). */}
+      {reactions.length > 0 && (
+        <div className={s.reactions}>
+          {reactions.map(([emoji, userIds]) => (
+            <button
+              key={emoji}
+              type="button"
+              className={clsx(
+                s.chip,
+                userIds.includes(currentUserId) && s.chipMine,
+              )}
+              onClick={() => onToggleReaction(message.id, emoji)}
+              aria-label={`Reakce ${emoji}, ${userIds.length}×`}
+            >
+              <span className={s.chipEmoji}>{emoji}</span>
+              <span className={s.chipCount}>{userIds.length}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 6.2h — failed zpráva: inline pruh s Znovu/Smazat. */}
+      {isFailed && onRetry && onDiscard && (
+        <div className={s.failedBar} role="alert">
+          <span>⚠ Nepodařilo se odeslat.</span>
+          <button
+            type="button"
+            className={s.failedAction}
+            onClick={() => onRetry(message)}
+          >
+            Zkusit znovu
+          </button>
+          <button
+            type="button"
+            className={s.failedAction}
+            onClick={() => onDiscard(message)}
+          >
+            Smazat
+          </button>
+        </div>
+      )}
+      </div>
+    </div>
+  );
+}
