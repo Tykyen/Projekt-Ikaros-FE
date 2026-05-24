@@ -1,0 +1,136 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 3rem 1.5rem;
+  max-width: 580px;
+  margin: 4vh auto;
+}
+
+.icon {
+  color: var(--accent, #ffae00);
+  filter: drop-shadow(0 0 12px rgba(255, 174, 0, 0.4));
+  opacity: 0.85;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: var(--text-strong, #fff);
+  letter-spacing: 0.02em;
+}
+
+.text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-muted, rgba(220, 230, 255, 0.7));
+}
+
+.woodWide {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border: 1px dashed var(--accent-soft, rgba(120, 200, 255, 0.4));
+  border-radius: 6px;
+  background: var(--accent-soft, rgba(120, 200, 255, 0.06));
+  color: var(--accent-bright, var(--accent, #78c8ff));
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+/* D-062a — shielded requirements card */
+.shieldedCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--accent-soft, rgba(255, 174, 0, 0.35));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent, #ffae00) 6%, transparent);
+  text-align: left;
+  width: 100%;
+}
+
+.shieldedTitle {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.7));
+  margin: 0;
+}
+
+.shieldedList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.shieldedItem {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.95rem;
+  color: var(--text-strong, #fff);
+}
+
+.shieldedItem svg {
+  color: var(--accent, #ffae00);
+  flex-shrink: 0;
+}
+
+.shieldedHint {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.65));
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.btnPrimary,
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.btnPrimary {
+  border-color: var(--accent, currentColor);
+  background: var(--accent, rgba(120, 200, 255, 0.2));
+  color: var(--text-on-accent, #fff);
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+}
+
+.btnSecondary {
+  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  background: transparent;
+  color: var(--text, rgba(255, 255, 255, 0.85));
+}
+
+.btnSecondary:hover {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+}
