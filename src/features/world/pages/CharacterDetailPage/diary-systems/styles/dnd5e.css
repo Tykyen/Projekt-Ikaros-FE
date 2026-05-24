@@ -1,0 +1,985 @@
+/* ═══════════════════════════════════════════════════════════
+   D&D 5e Character Sheet — "Arcane Parchment" theme
+   8.7d — přenos z c:/Matrix/Matrix/frontend/src/styles/DndDiary.scss
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+
+[data-diary-system='dnd5e'] .dnd-diary {
+  --dnd-bg: #f5f0e8;
+  --dnd-surface: #ffffff;
+  --dnd-surface-alt: #faf7f2;
+  --dnd-border: #d4cbb8;
+  --dnd-border-light: #e8e0d0;
+  --dnd-text: #2c2416;
+  --dnd-text-muted: #78705f;
+  --dnd-accent: #8b2020;
+  --dnd-accent-dark: #6b1818;
+  --dnd-accent-light: #c44040;
+  --dnd-gold: #b8860b;
+  --dnd-gold-light: #daa520;
+  --dnd-blue: #2d5986;
+  --dnd-green: #2d6b3f;
+  --dnd-purple: #5c3d7a;
+
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+  background: var(--dnd-bg);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: var(--dnd-text);
+}
+
+/* ── Tabs ──────────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid var(--dnd-border);
+  padding-bottom: 0;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tab {
+  padding: 10px 22px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tab.active {
+  background: var(--dnd-surface);
+  color: var(--dnd-accent);
+  border-color: var(--dnd-border);
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.04);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tab:hover:not(.active) {
+  color: var(--dnd-text);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tab--toggle {
+  margin-left: auto;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dnd-text-muted);
+  cursor: pointer;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-tab--toggle
+  input[type='checkbox'] {
+  accent-color: var(--dnd-accent);
+  cursor: pointer;
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-header {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-header__name {
+  margin-bottom: 1rem;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-header__name label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--dnd-text-muted);
+  margin-bottom: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-header__name input {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  border: none;
+  border-bottom: 2px solid var(--dnd-border);
+  background: transparent;
+  color: var(--dnd-text);
+  padding: 4px 0;
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-header__name input:focus {
+  border-color: var(--dnd-accent);
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-header__fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 700px) {
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-header__fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hf label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  margin-bottom: 2px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hf input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--dnd-border-light);
+  background: transparent;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: var(--dnd-text);
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hf input:focus {
+  border-color: var(--dnd-gold);
+}
+
+/* ── Main grid ─────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 1000px) {
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-col-left,
+[data-diary-system='dnd5e'] .dnd-diary .dnd-col-center,
+[data-diary-system='dnd5e'] .dnd-diary .dnd-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Abilities ─────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-abilities {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-ability {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-ability:hover {
+  border-color: var(--dnd-gold);
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-ability__label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-ability__mod {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dnd-text);
+  line-height: 1.2;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-ability__score {
+  width: 44px;
+  height: 28px;
+  text-align: center;
+  border: 1px solid var(--dnd-border);
+  border-radius: 50%;
+  background: var(--dnd-surface-alt);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dnd-text);
+  margin-top: 4px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-ability__score::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-ability__score::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-ability__score:focus {
+  border-color: var(--dnd-accent);
+}
+
+/* ── Meta row (inspiration + prof bonus) ───────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-meta-row {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-meta-item__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-meta-item__checkbox-label
+  input {
+  accent-color: var(--dnd-gold);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-meta-item__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dnd-text-muted);
+  flex: 1;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-meta-item__input {
+  width: 42px;
+  text-align: center;
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 3px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  background: var(--dnd-surface-alt);
+  color: var(--dnd-accent);
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-meta-item__input::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-meta-item__input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── Panel ─────────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-panel {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-panel h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dnd-accent);
+  margin: 0 0 10px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--dnd-border-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── Saves ─────────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-save-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-save-row__prof input {
+  accent-color: var(--dnd-accent);
+  cursor: pointer;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-save-row__mod {
+  font-weight: 700;
+  font-size: 0.85rem;
+  width: 28px;
+  text-align: right;
+  color: var(--dnd-blue);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-save-row__name {
+  font-size: 0.8rem;
+  color: var(--dnd-text);
+}
+
+/* ── Skills ────────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2.5px 0;
+  border-bottom: 1px solid rgba(212, 203, 184, 0.4);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row:last-child {
+  border-bottom: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__prof {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--dnd-text-muted);
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__prof.half {
+  color: var(--dnd-accent);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__prof.full {
+  color: var(--dnd-gold);
+  font-weight: bold;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__prof:disabled {
+  cursor: default;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__mod {
+  font-weight: 700;
+  font-size: 0.8rem;
+  width: 28px;
+  text-align: right;
+  color: var(--dnd-blue);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__name {
+  font-size: 0.78rem;
+  color: var(--dnd-text);
+  flex: 1;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__ability {
+  font-size: 0.65rem;
+  color: var(--dnd-text-muted);
+}
+
+/* ── Passive ───────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-passive {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-passive__val {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--dnd-accent);
+  min-width: 32px;
+  text-align: center;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-passive__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dnd-text-muted);
+}
+
+/* ── Combat ────────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-combat {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-combat__stat {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-combat__stat:hover {
+  border-color: var(--dnd-gold);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-combat__label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-combat__val {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--dnd-text);
+  border: none;
+  background: transparent;
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-combat__val::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-combat__val::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-combat__val--computed {
+  color: var(--dnd-accent);
+}
+
+/* ── HP ────────────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hp {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hp__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hp__block label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hp__block input {
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  border: 1px solid var(--dnd-border);
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--dnd-surface-alt);
+  color: var(--dnd-text);
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-hp__block
+  input::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-hp__block
+  input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hp__block input:focus {
+  border-color: var(--dnd-accent);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hp__block--current input {
+  border-color: var(--dnd-accent);
+  color: var(--dnd-accent);
+  background: rgba(139, 32, 32, 0.04);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hp__block--temp input {
+  border-color: var(--dnd-blue);
+  color: var(--dnd-blue);
+  background: rgba(45, 89, 134, 0.04);
+}
+
+/* ── Death saves & hit dice ────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-death-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hitdice {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hitdice label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hitdice input {
+  width: 100%;
+  text-align: center;
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--dnd-surface-alt);
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-hitdice input:focus {
+  border-color: var(--dnd-gold);
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-death-saves {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-death-saves__title {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-death-saves__line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-death-saves__line > span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--dnd-text);
+  width: 65px;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-death-pips {
+  display: flex;
+  gap: 6px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-pip {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--dnd-green);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-pip.filled {
+  background: var(--dnd-green);
+  box-shadow: 0 0 6px rgba(45, 107, 63, 0.4);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-pip.fail {
+  border-color: var(--dnd-accent);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-pip.fail.filled {
+  background: var(--dnd-accent);
+  box-shadow: 0 0 6px rgba(139, 32, 32, 0.4);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-pip:disabled {
+  cursor: default;
+}
+
+/* ── Attacks table ─────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-attacks__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-attacks__table th {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+  padding: 4px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--dnd-border);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-attacks__table td {
+  padding: 3px 4px;
+  border-bottom: 1px solid rgba(212, 203, 184, 0.4);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-attacks__table input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 4px 2px;
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-attacks__table input:focus {
+  border-bottom-color: var(--dnd-gold);
+}
+
+/* ── Shared buttons ────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-x {
+  border: none;
+  background: transparent;
+  color: var(--dnd-accent-light);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0 4px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-x:hover {
+  opacity: 1;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-add {
+  border: 1px dashed var(--dnd-border);
+  background: transparent;
+  color: var(--dnd-text-muted);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.15s;
+  width: 100%;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-add:hover {
+  border-color: var(--dnd-gold);
+  color: var(--dnd-gold);
+  background: rgba(184, 134, 11, 0.04);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-add:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* ── Personality ───────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-personality {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-personality__block {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-personality__block label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dnd-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-personality__block textarea {
+  width: 100%;
+  border: none;
+  background: var(--dnd-surface-alt);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  resize: vertical;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-personality__block
+  textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--dnd-gold);
+}
+
+/* ── Proficiencies & Features ──────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-proficiencies textarea,
+[data-diary-system='dnd5e'] .dnd-diary .dnd-features textarea {
+  width: 100%;
+  border: none;
+  background: var(--dnd-surface-alt);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  resize: vertical;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-proficiencies
+  textarea:focus,
+[data-diary-system='dnd5e'] .dnd-diary .dnd-features textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--dnd-gold);
+}
+
+/* ── Spells tab ────────────────────────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spells {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spells-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+@media (max-width: 700px) {
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-spells-header {
+    grid-template-columns: 1fr;
+  }
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-sh-field label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-sh-field input {
+  width: 100%;
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.95rem;
+  background: var(--dnd-surface-alt);
+  color: var(--dnd-text);
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-sh-field
+  input::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-sh-field
+  input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-sh-field input:focus {
+  border-color: var(--dnd-gold);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-sh-field--accent input {
+  text-align: center;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: var(--dnd-purple);
+  border-color: rgba(92, 61, 122, 0.3);
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-level {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 12px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-level__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--dnd-border-light);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-level__header h4 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dnd-purple);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-slots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-slots label {
+  font-size: 0.7rem;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-slots__total {
+  width: 40px;
+  text-align: center;
+  border: 1px solid var(--dnd-border);
+  border-radius: 4px;
+  padding: 3px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--dnd-surface-alt);
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-slots__total::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-slots__total::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-slots__pips {
+  display: flex;
+  gap: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-slot-pip {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--dnd-purple);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-slot-pip.used {
+  background: var(--dnd-purple);
+  box-shadow: 0 0 6px rgba(92, 61, 122, 0.3);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-slot-pip:disabled {
+  cursor: default;
+}
+
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(212, 203, 184, 0.3);
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-spell-entry:last-of-type {
+  border-bottom: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-prepared {
+  display: flex;
+  align-items: center;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-spell-prepared
+  input {
+  accent-color: var(--dnd-purple);
+  cursor: pointer;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-name {
+  flex: 2;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 4px 2px;
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-name:focus {
+  border-bottom-color: var(--dnd-purple);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-note {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 4px 2px;
+  font-size: 0.78rem;
+  color: var(--dnd-text-muted);
+  font-style: italic;
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-spell-note:focus {
+  border-bottom-color: var(--dnd-gold);
+}
+
+/* ── Disabled states (view mode) ───────────────────────────── */
+
+[data-diary-system='dnd5e'] .dnd-diary input:disabled,
+[data-diary-system='dnd5e'] .dnd-diary textarea:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
