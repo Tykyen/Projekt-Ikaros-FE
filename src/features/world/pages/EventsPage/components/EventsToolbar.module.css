@@ -1,0 +1,82 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: center;
+  margin-bottom: var(--sp-4);
+}
+
+.spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.chipGroup {
+  display: inline-flex;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  background: var(--surface-2);
+}
+
+.chip {
+  padding: var(--sp-2) var(--sp-3);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  min-height: 36px;
+}
+
+.chip:hover {
+  color: var(--text-primary);
+}
+
+.chipActive {
+  background: var(--accent);
+  color: var(--accent-fg, var(--bg-base));
+}
+
+.chipActive:hover {
+  color: var(--accent-fg, var(--bg-base));
+}
+
+.groupFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.groupFilterLabel {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.groupSelect {
+  min-height: 36px;
+  padding: 0 var(--sp-3);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .chip {
+    min-height: 44px;
+    padding: var(--sp-2) var(--sp-4);
+  }
+  .groupSelect {
+    min-height: 44px;
+  }
+}
