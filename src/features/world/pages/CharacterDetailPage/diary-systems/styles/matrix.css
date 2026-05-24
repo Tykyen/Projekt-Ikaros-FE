@@ -1,0 +1,570 @@
+/* Matrix RPG — vlastní herní systém projektu Matrix/Ikaros
+ * 8.7n — přenos z c:/Matrix/Matrix/frontend/src/styles/characterSheet.scss
+ *        + entities.ts (healthPenalty / tirednessPenalty / magic).
+ * Cyberpunk navy + modré akcenty, font Inter + Rajdhani.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+
+[data-diary-system='matrix'] .matrix-sheet {
+  --mx-bg: #030408;
+  --mx-card-bg: rgba(14, 18, 30, 0.9);
+  --mx-card-border: rgba(90, 110, 230, 0.15);
+  --mx-card-highlight: rgba(180, 200, 255, 0.1);
+  --mx-card-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.7),
+    0 10px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  --mx-field-bg: rgba(6, 8, 16, 0.7);
+  --mx-field-border: rgba(80, 100, 220, 0.15);
+  --mx-field-focus: rgba(110, 140, 255, 0.5);
+  --mx-text-main: #e2e8f0;
+  --mx-text-muted: #94a3b8;
+  --mx-text-label: rgba(160, 180, 255, 0.8);
+  --mx-accent: #6b8cff;
+  --mx-accent-glow: rgba(107, 140, 255, 0.25);
+  --mx-danger: #ef4444;
+  --mx-danger-muted: rgba(239, 68, 68, 0.15);
+  --mx-charged: #3b82f6;
+  --mx-charged-bg: rgba(59, 130, 246, 0.15);
+  --mx-amber: #f59e0b;
+  --mx-orange: #f97316;
+  --mx-purple: #a855f7;
+
+  width: min(100%, 1200px);
+  margin-inline: auto;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  background: var(--mx-bg);
+  border-radius: 16px;
+  border: 1px solid rgba(60, 80, 180, 0.15);
+  border-top: 1px solid rgba(100, 120, 220, 0.25);
+  box-shadow:
+    0 35px 60px rgba(0, 0, 0, 0.6),
+    inset 0 0 120px rgba(15, 10, 30, 0.3);
+  color: var(--mx-text-main);
+  font-family: 'Inter', system-ui, sans-serif;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+[data-diary-system='matrix'] .matrix-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(100, 130, 255, 0.015) 0,
+    rgba(100, 130, 255, 0.015) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 0;
+  border-radius: 16px;
+}
+
+[data-diary-system='matrix'] .matrix-sheet * {
+  box-sizing: border-box;
+}
+
+/* ── Card base ─────────────────────────────────────── */
+
+[data-diary-system='matrix'] .mx-card {
+  background: var(--mx-card-bg);
+  border: 1px solid var(--mx-card-border);
+  border-top: 1px solid var(--mx-card-highlight);
+  border-radius: 14px;
+  box-shadow: var(--mx-card-shadow);
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-diary-system='matrix'] .mx-section-title {
+  font-family: 'Rajdhani', 'Inter', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 3px;
+  margin: 0 0 2rem 0;
+  padding-bottom: 1rem;
+  position: relative;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+[data-diary-system='matrix'] .mx-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(130, 160, 255, 0.3) 0,
+    rgba(130, 160, 255, 0) 100%
+  );
+}
+/* Boxed section title (jako Jazyky / Schopnosti / Aspekty) */
+[data-diary-system='matrix'] .mx-section-title--chip {
+  display: inline-block;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  padding: 0.5rem 1rem;
+  background: rgba(107, 140, 255, 0.08);
+  border: 1px solid rgba(107, 140, 255, 0.2);
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  color: var(--mx-accent);
+}
+[data-diary-system='matrix'] .mx-section-title--chip::after {
+  display: none;
+}
+
+/* ── Inputs ────────────────────────────────────────── */
+
+[data-diary-system='matrix'] .mx-input {
+  background: var(--mx-field-bg);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  color: var(--mx-text-main);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.15s;
+  width: 100%;
+}
+[data-diary-system='matrix'] .mx-input:focus {
+  border-color: var(--mx-field-focus);
+  box-shadow: 0 0 0 3px var(--mx-accent-glow);
+  background: rgba(10, 14, 24, 0.9);
+}
+[data-diary-system='matrix'] .mx-input.is-negative {
+  color: var(--mx-danger);
+}
+[data-diary-system='matrix'] .mx-input.is-magic {
+  color: var(--mx-purple);
+}
+[data-diary-system='matrix'] .mx-input:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* ── Buttons ───────────────────────────────────────── */
+
+[data-diary-system='matrix'] .mx-btn {
+  background: rgba(107, 140, 255, 0.1);
+  border: 1px solid rgba(107, 140, 255, 0.25);
+  color: var(--mx-accent);
+  padding: 0.7rem 1.4rem;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+[data-diary-system='matrix'] .mx-btn:hover:not(:disabled) {
+  background: rgba(107, 140, 255, 0.2);
+  border-color: rgba(107, 140, 255, 0.5);
+}
+[data-diary-system='matrix'] .mx-btn--ghost {
+  background: transparent;
+  border-style: dashed;
+}
+[data-diary-system='matrix'] .mx-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+[data-diary-system='matrix'] .mx-icon-btn {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--mx-danger);
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-diary-system='matrix'] .mx-icon-btn:hover:not(:disabled) {
+  background: var(--mx-danger-muted);
+  border-color: var(--mx-danger);
+}
+[data-diary-system='matrix'] .mx-icon-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* ── Overview card (6 fields) ───────────────────────── */
+
+[data-diary-system='matrix'] .mx-overview-card {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+@media (max-width: 700px) {
+  [data-diary-system='matrix'] .mx-overview-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-diary-system='matrix'] .mx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+[data-diary-system='matrix'] .mx-field__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--mx-text-label);
+}
+
+[data-diary-system='matrix'] .mx-stat-capsule {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--mx-field-bg);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 8px;
+  padding: 0.2rem 0.6rem;
+}
+[data-diary-system='matrix'] .mx-stat-capsule input {
+  background: transparent;
+  border: none;
+  text-align: right;
+  font-weight: 700;
+  width: 100%;
+  color: var(--mx-text-main);
+  font-family: inherit;
+  outline: none;
+  padding: 0.4rem 0;
+}
+[data-diary-system='matrix'] .mx-stat-capsule input:disabled {
+  cursor: default;
+}
+[data-diary-system='matrix'] .mx-stat-capsule p {
+  margin: 0;
+  color: var(--mx-text-muted);
+}
+
+/* ── Vitals card ───────────────────────────────────── */
+
+[data-diary-system='matrix'] .mx-vitals-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 700px) {
+  [data-diary-system='matrix'] .mx-vitals-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-diary-system='matrix'] .mx-stat-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+[data-diary-system='matrix'] .mx-stat-tiles {
+  display: flex;
+  gap: 0.75rem;
+}
+[data-diary-system='matrix'] .mx-stat-tile {
+  flex: 1;
+  background: var(--mx-field-bg);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+[data-diary-system='matrix'] .mx-stat-tile__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--mx-accent);
+  background: rgba(107, 140, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+[data-diary-system='matrix'] .mx-stat-tile__label.is-link {
+  cursor: pointer;
+}
+[data-diary-system='matrix'] .mx-stat-tile__value {
+  width: 100%;
+}
+[data-diary-system='matrix'] .mx-stat-tile__value input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.4rem;
+  font-family: inherit;
+  outline: none;
+}
+[data-diary-system='matrix'] .mx-stat-tile__value input:focus {
+  border-color: var(--mx-field-focus);
+}
+[data-diary-system='matrix'] .mx-stat-tile__value input:disabled {
+  cursor: default;
+}
+
+[data-diary-system='matrix'] .mx-penalty-strip {
+  display: flex;
+  gap: 4px;
+  margin-top: 0.4rem;
+}
+[data-diary-system='matrix'] .mx-penalty-segment {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.4rem 0.2rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 4px;
+  color: var(--mx-text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+[data-diary-system='matrix'] .mx-penalty-segment.is-active {
+  background: var(--mx-charged-bg);
+  border-color: var(--mx-charged);
+  color: #fff;
+}
+[data-diary-system='matrix']
+  .mx-penalty-segment.is-active.mx-penalty-segment--amber {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--mx-amber);
+  color: var(--mx-amber);
+}
+[data-diary-system='matrix']
+  .mx-penalty-segment.is-active.mx-penalty-segment--orange {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: var(--mx-orange);
+  color: #fff;
+}
+[data-diary-system='matrix']
+  .mx-penalty-segment.is-active.mx-penalty-segment--danger {
+  background: var(--mx-danger-muted);
+  border-color: var(--mx-danger);
+  color: #fff;
+}
+[data-diary-system='matrix']
+  .mx-penalty-segment.is-active.mx-penalty-segment--purple {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: var(--mx-purple);
+  color: var(--mx-purple);
+}
+
+/* ── Pressure card ─────────────────────────────────── */
+
+[data-diary-system='matrix'] .mx-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 900px) {
+  [data-diary-system='matrix'] .mx-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-diary-system='matrix'] .mx-pressure-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+[data-diary-system='matrix'] .mx-pressure-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--mx-field-bg);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 8px;
+}
+[data-diary-system='matrix'] .mx-pressure-row__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--mx-text-muted);
+  cursor: pointer;
+}
+[data-diary-system='matrix'] .mx-pressure-row__rail {
+  display: flex;
+  gap: 6px;
+}
+[data-diary-system='matrix'] .mx-pressure-segment {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--mx-field-border);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+[data-diary-system='matrix'] .mx-pressure-segment.is-active {
+  background: var(--mx-charged);
+  border-color: var(--mx-charged);
+  box-shadow: 0 0 8px var(--mx-charged);
+}
+[data-diary-system='matrix']
+  .mx-pressure-segment.is-active.is-danger {
+  background: var(--mx-danger);
+  border-color: var(--mx-danger);
+  box-shadow: 0 0 8px var(--mx-danger);
+}
+[data-diary-system='matrix'] .mx-pressure-segment:disabled {
+  cursor: default;
+}
+
+/* ── Data list (Languages / Abilities / Aspects) ───── */
+
+[data-diary-system='matrix'] .mx-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+[data-diary-system='matrix'] .mx-data-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.5rem;
+  background: var(--mx-field-bg);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 6px;
+}
+[data-diary-system='matrix'] .mx-data-row__level {
+  flex-shrink: 0;
+  width: 56px;
+}
+[data-diary-system='matrix'] .mx-data-row__level input {
+  width: 100%;
+  text-align: center;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--mx-field-border);
+  color: #fff;
+  padding: 0.4rem;
+  border-radius: 4px;
+  font-family: inherit;
+  outline: none;
+}
+[data-diary-system='matrix']
+  .mx-data-row__level
+  input:focus {
+  border-color: var(--mx-field-focus);
+}
+[data-diary-system='matrix'] .mx-data-row__value {
+  flex: 1;
+}
+[data-diary-system='matrix'] .mx-data-row__value input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--mx-text-main);
+  font-size: 0.95rem;
+  padding: 0.3rem;
+  outline: none;
+  font-family: inherit;
+}
+
+/* Aspect chip (Nabitý / Vybitý) */
+[data-diary-system='matrix'] .mx-state-chip {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+[data-diary-system='matrix'] .mx-state-chip--charged {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+[data-diary-system='matrix']
+  .mx-state-chip--charged:hover:not(.is-disabled) {
+  background: rgba(34, 197, 94, 0.25);
+}
+[data-diary-system='matrix'] .mx-state-chip--depleted {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--mx-danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+[data-diary-system='matrix']
+  .mx-state-chip--depleted:hover:not(.is-disabled) {
+  background: rgba(239, 68, 68, 0.25);
+}
+[data-diary-system='matrix'] .mx-state-chip.is-disabled {
+  cursor: default;
+}
+
+/* Magic link icon */
+[data-diary-system='matrix'] .mx-magic-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--mx-purple);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+[data-diary-system='matrix'] .mx-magic-link:hover {
+  background: rgba(168, 85, 247, 0.3);
+  color: #fff;
+}
+
+/* ── Inventory editor ──────────────────────────────── */
+
+[data-diary-system='matrix'] .mx-inventory-textarea {
+  width: 100%;
+  min-height: 200px;
+  background: var(--mx-field-bg);
+  border: 1px solid var(--mx-field-border);
+  border-radius: 8px;
+  color: var(--mx-text-main);
+  padding: 1rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+}
+[data-diary-system='matrix'] .mx-inventory-textarea:focus {
+  border-color: var(--mx-field-focus);
+  box-shadow: 0 0 0 3px var(--mx-accent-glow);
+}
