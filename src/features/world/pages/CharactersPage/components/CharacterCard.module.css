@@ -1,0 +1,156 @@
+/* 8.2e — Karta postavy v adresáři. Vzor MemberCard, ale čtvercový avatar
+   (postavy ≠ lidé). Design 8.2 §1.2.
+   9.1 (cleanup) — vlastní `.typeBadge` (PC/NPC) místo importu
+   CharacterTypeBadge — komponenta smazána (Lokace už v adresáři postav). */
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent-soft, rgba(120, 200, 255, 0.18));
+  color: var(--accent-bright, var(--accent, #6f9bff));
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.card {
+  position: relative; /* 8.3 — fav btn overlay */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  text-align: center;
+  text-decoration: none;
+  transition:
+    border-color 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.card:active {
+  transform: scale(0.985);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--frame-border);
+  background: var(--surface-3, var(--surface-2));
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  color: var(--text-secondary);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong, var(--text-primary));
+  letter-spacing: 0.02em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+/* 8.3 — Hvězdička oblíbených. Absolutní overlay, vlastní touch target 32×32.
+   Pozor: tlačítko leží nad <Link>, takže `pointer-events` + `stopPropagation`
+   v handleru drží proklik karty oddělený od toggle hvězdičky. */
+.favBtn {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-dim, var(--text-muted));
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    transform 80ms ease;
+  z-index: 1;
+}
+
+.favBtn:hover {
+  color: var(--accent);
+  background: var(--surface-3, var(--surface-2));
+}
+
+.favBtn:active {
+  transform: scale(0.92);
+}
+
+.favBtnActive {
+  color: var(--accent);
+}
+
+.favBtnActive:hover {
+  color: var(--accent);
+}
+
+/* 8.3 — Mikro chip pro skupinu hráče (jen v group-by režimu). */
+.groupChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--group-accent, var(--frame-border));
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 768px) {
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+  /* Větší tap target pro hvězdičku na mobilu. */
+  .favBtn {
+    width: 36px;
+    height: 36px;
+  }
+}
