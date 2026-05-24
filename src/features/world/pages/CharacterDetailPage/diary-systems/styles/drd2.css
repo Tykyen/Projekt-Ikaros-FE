@@ -1,0 +1,728 @@
+/* DrD2 — Temný Les (Dark Forest Emerald Theme)
+ * 8.7h — přenos z c:/Matrix/Matrix/frontend/src/styles/Drd2Diary.scss
+ */
+
+[data-diary-system='drd2'] .drd2-dashboard {
+  color: #c9d1d9;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+[data-diary-system='drd2'] .drd2-dashboard ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+[data-diary-system='drd2'] .drd2-dashboard ::-webkit-scrollbar-track {
+  background: rgba(5, 15, 8, 0.3);
+}
+[data-diary-system='drd2'] .drd2-dashboard ::-webkit-scrollbar-thumb {
+  background: rgba(80, 200, 120, 0.15);
+  border-radius: 4px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  ::-webkit-scrollbar-thumb:hover {
+  background: rgba(80, 200, 120, 0.3);
+}
+
+[data-diary-system='drd2'] .drd2-dashboard h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .drd2-header {
+  background: rgba(10, 18, 14, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 2px solid rgba(80, 200, 120, 0.6);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-header
+  .identity-block {
+  flex: 1;
+  min-width: 180px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-header
+  .identity-block
+  label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 6px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-header
+  .identity-block
+  input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 15px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-header
+  .identity-block
+  input:focus {
+  outline: none;
+  border-color: rgba(80, 200, 120, 0.6);
+  background: rgba(16, 18, 24, 0.9);
+}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .drd2-tabs {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 24px;
+  gap: 8px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-tabs button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-tabs button:hover {
+  color: #fff;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-tabs
+  button.active {
+  color: #50c878;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-tabs
+  button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #50c878;
+  box-shadow: 0 -2px 10px rgba(80, 200, 120, 0.4);
+}
+
+/* ── Grid ───────────────────────────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .drd2-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-grid > div {
+  background: rgba(10, 18, 14, 0.65);
+  border: 1px solid rgba(80, 200, 120, 0.08);
+  border-radius: 8px;
+  padding: 20px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-4 {
+  grid-column: span 4;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-6 {
+  grid-column: span 6;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-8 {
+  grid-column: span 8;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-12 {
+  grid-column: span 12;
+}
+@media (max-width: 1024px) {
+  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-4 {
+    grid-column: span 6;
+  }
+  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-8 {
+    grid-column: span 12;
+  }
+}
+@media (max-width: 768px) {
+  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-4,
+  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-6,
+  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-8 {
+    grid-column: span 12;
+  }
+}
+
+/* ── Resource cards (3 pilíře) ───────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .resource-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .resource-card .r-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .resource-card .r-header h4 {
+  margin: 0;
+  font-size: 15px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .resource-card .r-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .resource-card
+  .r-inputs
+  input {
+  width: 50px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 4px;
+  border-radius: 4px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .resource-card
+  .r-inputs
+  input:focus {
+  border-color: #50c878;
+  outline: none;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .resource-card
+  .r-inputs
+  span {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 18px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .resource-card
+  .jizvy-inputs
+  input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(255, 100, 100, 0.3);
+  color: #ff8888;
+  padding: 6px 0;
+  font-size: 13px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .resource-card
+  .jizvy-inputs
+  input:focus {
+  outline: none;
+  border-bottom: 1px solid #ff6b6b;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .resource-card
+  .jizvy-inputs
+  input::placeholder {
+  color: rgba(255, 100, 100, 0.2);
+}
+
+/* ── Mega boxes ─────────────────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .mega-box {
+  text-align: center;
+  padding: 24px;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 30, 0.8),
+    rgba(15, 15, 20, 0.8)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box.danger {
+  border-color: rgba(255, 68, 68, 0.3);
+  box-shadow: inset 0 0 40px rgba(255, 0, 0, 0.05);
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box.danger h4 {
+  color: #ff6b6b;
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box.danger input {
+  color: #ff6b6b;
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box.advantage {
+  border-color: rgba(80, 200, 120, 0.3);
+  box-shadow: inset 0 0 40px rgba(80, 200, 120, 0.05);
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box.advantage h4 {
+  color: #50c878;
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box.advantage input {
+  color: #50c878;
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box h4 {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .mega-box input {
+  background: transparent;
+  border: none;
+  font-size: 64px;
+  font-weight: 800;
+  text-align: center;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+}
+
+/* ── Tables ─────────────────────────────────────────── */
+
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container {
+  overflow-x: auto;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container
+  table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container
+  th {
+  text-align: left;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 8px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container
+  td {
+  padding: 4px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container
+  td
+  input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container
+  td
+  input:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container
+  .add-row-btn {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 8px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .drd2-table-container
+  .add-row-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-diary-system='drd2'] .drd2-dashboard .del-btn {
+  background: transparent;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px;
+  opacity: 0.6;
+}
+[data-diary-system='drd2'] .drd2-dashboard .del-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ── Stats grid & textarea ──────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .stat-box {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+[data-diary-system='drd2'] .drd2-dashboard .stat-box label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #8b949e;
+  margin-bottom: 8px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .stat-box input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+}
+[data-diary-system='drd2'] .drd2-dashboard .stat-box input:focus {
+  outline: none;
+  border-bottom-color: #50c878;
+}
+
+[data-diary-system='drd2'] .drd2-dashboard .drd2-textarea {
+  width: 100%;
+  min-height: 80px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #c9d1d9;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+[data-diary-system='drd2'] .drd2-dashboard .drd2-textarea:focus {
+  outline: none;
+  border-color: #50c878;
+}
+
+/* ── Profession cards + level pips ──────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .prof-card {
+  background: rgba(5, 12, 8, 0.7);
+  border: 1px solid rgba(80, 200, 120, 0.1);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+[data-diary-system='drd2'] .drd2-dashboard .prof-card:hover {
+  border-color: rgba(80, 200, 120, 0.25);
+  box-shadow: 0 2px 20px rgba(80, 200, 120, 0.06);
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .prof-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .prof-card__name {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  color: #8872ff;
+  letter-spacing: 0.5px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .prof-card__level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .level-pips {
+  display: flex;
+  gap: 4px;
+}
+[data-diary-system='drd2'] .drd2-dashboard .prof-card .pip {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.2);
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .pip.active {
+  background: rgba(80, 200, 120, 0.25);
+  border-color: rgba(80, 200, 120, 0.5);
+  color: #50c878;
+  box-shadow: 0 0 8px rgba(80, 200, 120, 0.15);
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .pip:hover:not(:disabled) {
+  border-color: rgba(80, 200, 120, 0.4);
+  background: rgba(80, 200, 120, 0.1);
+}
+[data-diary-system='drd2'] .drd2-dashboard .prof-card .pip:disabled {
+  cursor: default;
+}
+
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .prof-card__note
+  textarea {
+  width: 100%;
+  min-height: 40px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #c9d1d9;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  resize: vertical;
+  font-family: inherit;
+  margin-top: 8px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .prof-card
+  .prof-card__note
+  textarea:focus {
+  outline: none;
+  border-color: rgba(80, 200, 120, 0.3);
+}
+
+/* ── Total level badge ───────────────────────────────── */
+
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .total-level-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(80, 200, 120, 0.1);
+  border: 1px solid rgba(80, 200, 120, 0.3);
+  border-radius: 6px;
+  padding: 4px 14px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #50c878;
+  letter-spacing: 1px;
+  min-width: 60px;
+  justify-content: center;
+  text-shadow: 0 0 12px rgba(80, 200, 120, 0.3);
+}
+
+/* ── ZS catalog select ──────────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .prof-select {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(80, 200, 120, 0.2);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+[data-diary-system='drd2'] .drd2-dashboard .prof-select:focus {
+  outline: none;
+  border-color: #50c878;
+}
+[data-diary-system='drd2'] .drd2-dashboard .prof-select option {
+  background: #0a120e;
+  color: #fff;
+}
+
+/* ── ZS card ─────────────────────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard .zs-card {
+  background: rgba(5, 12, 8, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__name
+  input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 2px 4px;
+  width: 100%;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__name
+  input:focus {
+  outline: none;
+  border-color: #50c878;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__meta
+  input,
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__meta
+  select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__meta
+  input:focus,
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__meta
+  select:focus {
+  outline: none;
+  border-color: rgba(80, 200, 120, 0.3);
+}
+[data-diary-system='drd2']
+  .drd2-dashboard
+  .zs-card
+  .zs-card__desc
+  textarea {
+  width: 100%;
+  min-height: 36px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: #c9d1d9;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* ── Disabled (view mode) ─────────────────────────── */
+
+[data-diary-system='drd2'] .drd2-dashboard input:disabled,
+[data-diary-system='drd2'] .drd2-dashboard select:disabled,
+[data-diary-system='drd2'] .drd2-dashboard textarea:disabled,
+[data-diary-system='drd2'] .drd2-dashboard button:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
