@@ -1,0 +1,534 @@
+/* DrdH — Dračí Hlídka (Heroic Golden Theme)
+ * 8.7e — přenos z c:/Matrix/Matrix/frontend/src/styles/DrdhDiary.scss
+ */
+
+[data-diary-system='drdh'] .drdh-dashboard {
+  color: #c9d1d9;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+[data-diary-system='drdh'] .drdh-dashboard ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+[data-diary-system='drdh'] .drdh-dashboard ::-webkit-scrollbar-track {
+  background: rgba(15, 10, 5, 0.3);
+}
+[data-diary-system='drdh'] .drdh-dashboard ::-webkit-scrollbar-thumb {
+  background: rgba(255, 170, 0, 0.15);
+  border-radius: 4px;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 170, 0, 0.3);
+}
+
+[data-diary-system='drdh'] .drdh-dashboard h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* ── Grid layout (3 zones) ─────────────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard .drdh-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  [data-diary-system='drdh'] .drdh-dashboard .drdh-grid-layout {
+    grid-template-columns: 1fr 1.5fr;
+  }
+  [data-diary-system='drdh']
+    .drdh-dashboard
+    .drdh-grid-layout
+    .center-zone {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  [data-diary-system='drdh']
+    .drdh-dashboard
+    .drdh-grid-layout
+    .right-zone {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  [data-diary-system='drdh']
+    .drdh-dashboard
+    .drdh-grid-layout
+    .left-zone {
+    grid-column: span 2;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 800px) {
+  [data-diary-system='drdh'] .drdh-dashboard .drdh-grid-layout {
+    grid-template-columns: 1fr;
+  }
+  [data-diary-system='drdh']
+    .drdh-dashboard
+    .drdh-grid-layout
+    .center-zone,
+  [data-diary-system='drdh']
+    .drdh-dashboard
+    .drdh-grid-layout
+    .right-zone,
+  [data-diary-system='drdh']
+    .drdh-dashboard
+    .drdh-grid-layout
+    .left-zone {
+    grid-column: 1;
+  }
+}
+
+/* ── Common ────────────────────────────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard .drdh-panel {
+  background: rgba(20, 16, 10, 0.75);
+  border: 1px solid rgba(255, 170, 0, 0.1);
+  border-top: 2px solid rgba(255, 170, 0, 0.4);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  margin-bottom: 24px;
+}
+
+[data-diary-system='drdh'] .drdh-dashboard .form-group {
+  margin-bottom: 12px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .form-group label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .form-group input,
+[data-diary-system='drdh'] .drdh-dashboard .form-group select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+[data-diary-system='drdh'] .drdh-dashboard .form-group input:focus,
+[data-diary-system='drdh'] .drdh-dashboard .form-group select:focus {
+  outline: none;
+  border-color: rgba(255, 170, 0, 0.6);
+}
+[data-diary-system='drdh'] .drdh-dashboard .form-group option {
+  background: #111;
+  color: #fff;
+}
+
+[data-diary-system='drdh'] .drdh-dashboard .flex-row {
+  display: flex;
+  gap: 12px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .flex-row > * {
+  flex: 1;
+}
+
+/* ── Mega boxes ────────────────────────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard .combat-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+[data-diary-system='drdh'] .drdh-dashboard .mega-box {
+  flex: 1;
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 30, 0.8),
+    rgba(15, 15, 20, 0.8)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+[data-diary-system='drdh'] .drdh-dashboard .mega-box h4 {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .mega-box input {
+  background: transparent;
+  border: none;
+  font-weight: 800;
+  outline: none;
+  font-family: inherit;
+  padding: 0;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box
+  input::placeholder {
+  color: rgba(255, 255, 255, 0.1);
+}
+
+/* Health */
+[data-diary-system='drdh'] .drdh-dashboard .mega-box.health {
+  border-color: rgba(255, 68, 68, 0.3);
+  border-top: 2px solid #ff4444;
+  box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.05);
+}
+[data-diary-system='drdh'] .drdh-dashboard .mega-box.health h4 {
+  color: #ff6b6b;
+}
+[data-diary-system='drdh'] .drdh-dashboard .mega-box.health .hp-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.health
+  .hp-row
+  input.hp-main {
+  font-size: 42px;
+  color: #ff6b6b;
+  width: 80px;
+  text-align: right;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.health
+  .hp-row
+  span {
+  color: rgba(255, 100, 100, 0.4);
+  font-size: 24px;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.health
+  .hp-row
+  input.hp-max {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.8);
+  width: 60px;
+  text-align: left;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.health
+  .hp-death {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.health
+  .hp-death
+  input {
+  width: 40px;
+  font-size: 12px;
+  padding: 2px;
+}
+
+/* Resource */
+[data-diary-system='drdh'] .drdh-dashboard .mega-box.resource {
+  border-color: rgba(100, 180, 255, 0.3);
+  border-top: 2px solid #64b4ff;
+}
+[data-diary-system='drdh'] .drdh-dashboard .mega-box.resource h4 {
+  color: #64b4ff;
+  margin: 0 0 8px 0;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.resource
+  .res-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.resource
+  .res-inputs
+  input.res-main {
+  font-size: 32px;
+  color: #64b4ff;
+  width: 60px;
+  text-align: center;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.resource
+  .res-inputs
+  input.res-max {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  width: 45px;
+  text-align: center;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.resource
+  .res-sub {
+  margin-top: 8px;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .mega-box.resource
+  .res-sub
+  input {
+  width: 100%;
+  font-size: 11px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  border: none;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Attributes ────────────────────────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard .attrs-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .attr-row {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .attr-row .attr-name {
+  flex: 1;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  font-size: 12px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .attr-row .attr-vals {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .attr-row
+  .attr-vals
+  input {
+  width: 45px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 4px;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .attr-row
+  .attr-vals
+  input:focus {
+  border-color: rgba(255, 170, 0, 0.6);
+  outline: none;
+}
+[data-diary-system='drdh']
+  .drdh-dashboard
+  .attr-row
+  .attr-vals
+  input.attr-mod {
+  color: #ffaa00;
+  font-weight: bold;
+  background: rgba(255, 170, 0, 0.05);
+}
+
+/* ── Tables ────────────────────────────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table {
+  width: 100%;
+  margin-bottom: 16px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px 8px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table td {
+  padding: 4px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table td input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
+  color: #c9d1d9;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table td input:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table td.td-slim {
+  width: 50px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table td.td-mid {
+  width: 80px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table th.td-slim {
+  width: 50px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table th.td-mid {
+  width: 80px;
+}
+
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table .add-btn {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 6px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+[data-diary-system='drdh'] .drdh-dashboard .drdh-table .add-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-diary-system='drdh'] .drdh-dashboard .del-btn {
+  background: transparent;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px;
+  opacity: 0.5;
+}
+[data-diary-system='drdh'] .drdh-dashboard .del-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ── Coins ─────────────────────────────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard .coins-panel {
+  display: flex;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-diary-system='drdh'] .drdh-dashboard .coin {
+  flex: 1;
+  text-align: center;
+}
+[data-diary-system='drdh'] .drdh-dashboard .coin label {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+[data-diary-system='drdh'] .drdh-dashboard .coin input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid;
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  padding-bottom: 4px;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-dashboard .coin.z input {
+  border-color: #ffd700;
+  color: #ffd700;
+}
+[data-diary-system='drdh'] .drdh-dashboard .coin.s input {
+  border-color: #c0c0c0;
+}
+[data-diary-system='drdh'] .drdh-dashboard .coin.m input {
+  border-color: #cd7f32;
+  color: #cd7f32;
+}
+
+/* ── Notes area ────────────────────────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard .notes-area {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+[data-diary-system='drdh'] .drdh-dashboard .notes-area:focus {
+  outline: none;
+  border-color: rgba(255, 170, 0, 0.5);
+}
+
+/* ── Disabled states (view mode) ───────────────────────────── */
+
+[data-diary-system='drdh'] .drdh-dashboard input:disabled,
+[data-diary-system='drdh'] .drdh-dashboard select:disabled,
+[data-diary-system='drdh'] .drdh-dashboard textarea:disabled,
+[data-diary-system='drdh'] .drdh-dashboard button:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
