@@ -1,0 +1,465 @@
+/* ═══════════════════════════════════════════════════════════
+   Jeskyně a Draci (JaD) — Světlé neutrální fantasy (parchment/light)
+   8.7b — přenos z c:/Matrix/Matrix/frontend/src/styles/JadDiary.scss
+   ═══════════════════════════════════════════════════════════ */
+
+[data-diary-system='jad'] .jad-diary {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #2c2925;
+  background: #fdfbf7;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2d9cd;
+
+  --jad-accent: #6b2e1e;
+  --jad-border: #dccdb3;
+  --jad-panel-bg: #f6eedf;
+  --jad-highlight: #ede2cf;
+}
+
+[data-diary-system='jad'] .jad-diary * {
+  box-sizing: border-box;
+}
+
+[data-diary-system='jad'] .jad-diary ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+[data-diary-system='jad'] .jad-diary ::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-diary-system='jad'] .jad-diary ::-webkit-scrollbar-thumb {
+  background: rgba(107, 46, 30, 0.2);
+  border-radius: 4px;
+}
+[data-diary-system='jad'] .jad-diary ::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 46, 30, 0.4);
+}
+
+[data-diary-system='jad'] .jad-diary h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--jad-accent);
+  border-bottom: 2px solid var(--jad-border);
+  margin: 0 0 16px;
+  padding-bottom: 6px;
+}
+
+[data-diary-system='jad'] .jad-diary input,
+[data-diary-system='jad'] .jad-diary textarea,
+[data-diary-system='jad'] .jad-diary select {
+  background: #fff;
+  border: 1px solid var(--jad-border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: #2c2925;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+[data-diary-system='jad'] .jad-diary input:focus,
+[data-diary-system='jad'] .jad-diary textarea:focus,
+[data-diary-system='jad'] .jad-diary select:focus {
+  border-color: var(--jad-accent);
+  box-shadow: 0 0 0 2px rgba(107, 46, 30, 0.1);
+}
+
+[data-diary-system='jad'] .jad-diary input:disabled,
+[data-diary-system='jad'] .jad-diary textarea:disabled,
+[data-diary-system='jad'] .jad-diary select:disabled {
+  background: var(--jad-panel-bg);
+  color: #5c534a;
+  cursor: default;
+}
+
+/* ── Save bar (legacy, neaktivní v Ikarosu) ─────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-save-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-save-bar button {
+  background: var(--jad-accent);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(107, 46, 30, 0.3);
+}
+[data-diary-system='jad'] .jad-diary .jad-save-bar button:hover {
+  background: #522216;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--jad-border);
+}
+
+[data-diary-system='jad'] .jad-diary .jad-tabs button,
+[data-diary-system='jad'] .jad-diary .jad-tabs .jad-tab-toggle {
+  background: transparent;
+  border: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  color: #7b6f5e;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-tabs button.active {
+  color: var(--jad-accent);
+  border-bottom-color: var(--jad-accent);
+}
+[data-diary-system='jad'] .jad-diary .jad-tabs button:hover:not(.active) {
+  color: #4e463a;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-tabs .jad-tab-toggle {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+}
+[data-diary-system='jad'] .jad-diary .jad-tabs .jad-tab-toggle input {
+  margin: 0;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-header {
+  background: var(--jad-panel-bg);
+  border: 1px solid var(--jad-border);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-header-main {
+  flex: 1;
+  min-width: 250px;
+}
+[data-diary-system='jad'] .jad-diary .jad-header-main label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #7b6f5e;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+[data-diary-system='jad'] .jad-diary .jad-header-main input {
+  width: 100%;
+  font-size: 1.5rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  border: none;
+  border-bottom: 2px solid var(--jad-border);
+  background: transparent;
+  padding: 4px 0;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-header-grid {
+  flex: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+[data-diary-system='jad'] .jad-diary .jad-header-grid .jad-field label {
+  display: block;
+  font-size: 0.75rem;
+  color: #7b6f5e;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+[data-diary-system='jad'] .jad-diary .jad-header-grid .jad-field input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--jad-border);
+  background: transparent;
+  padding: 4px;
+  font-weight: 600;
+}
+
+/* ── Main grid ───────────────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-grid {
+  display: grid;
+  grid-template-columns: 2fr 3fr 3fr;
+  gap: 24px;
+}
+
+@media (max-width: 1100px) {
+  [data-diary-system='jad'] .jad-diary .jad-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-diary-system='jad'] .jad-diary .jad-panel {
+  background: #fff;
+  border: 1px solid var(--jad-border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+/* ── COL 1: stats & abilities ────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-stat-box {
+  background: var(--jad-panel-bg);
+  border: 1px solid var(--jad-border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-stat-box span.lbl {
+  font-weight: bold;
+  font-family: 'Cinzel', serif;
+  color: var(--jad-accent);
+  width: 80px;
+}
+[data-diary-system='jad'] .jad-diary .jad-stat-box span.mod {
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 40px;
+  text-align: center;
+}
+[data-diary-system='jad'] .jad-diary .jad-stat-box input {
+  width: 50px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* ── COL 2: combat meta + HP ─────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-top-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-meta-box {
+  flex: 1;
+  background: var(--jad-panel-bg);
+  border: 1px solid var(--jad-accent);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+[data-diary-system='jad'] .jad-diary .jad-meta-box label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--jad-accent);
+  margin-bottom: 8px;
+}
+[data-diary-system='jad'] .jad-diary .jad-meta-box input {
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  border: none;
+  background: transparent;
+}
+[data-diary-system='jad'] .jad-diary .jad-meta-box span.val {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-hp-panel {
+  background: #fff;
+  border: 2px solid var(--jad-accent);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+[data-diary-system='jad'] .jad-diary .jad-hp-panel .hp-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+[data-diary-system='jad'] .jad-diary .jad-hp-panel .hp-box {
+  flex: 1;
+}
+[data-diary-system='jad'] .jad-diary .jad-hp-panel .hp-box label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #7b6f5e;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+[data-diary-system='jad'] .jad-diary .jad-hp-panel .hp-box input {
+  width: 100%;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 12px;
+  background: var(--jad-panel-bg);
+  border-color: var(--jad-border);
+}
+
+/* ── Tables ──────────────────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-diary-system='jad'] .jad-diary .jad-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #7b6f5e;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--jad-border);
+}
+[data-diary-system='jad'] .jad-diary .jad-table td {
+  padding: 4px;
+}
+[data-diary-system='jad'] .jad-diary .jad-table td input {
+  width: 100%;
+}
+[data-diary-system='jad'] .jad-diary .jad-table .del-btn {
+  background: transparent;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  padding: 4px;
+}
+[data-diary-system='jad'] .jad-diary .jad-table .del-btn:hover {
+  color: #c0392b;
+}
+
+[data-diary-system='jad'] .jad-diary .add-link {
+  background: transparent;
+  border: 1px dashed var(--jad-border);
+  color: var(--jad-accent);
+  padding: 8px;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 8px;
+}
+[data-diary-system='jad'] .jad-diary .add-link:hover {
+  background: var(--jad-panel-bg);
+}
+
+/* ── Skills / saves list ─────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-list-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0eae1;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-list-row button.prof {
+  background: #fff;
+  border: 1px solid var(--jad-border);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--jad-accent);
+}
+[data-diary-system='jad'] .jad-diary .jad-list-row button.prof:disabled {
+  cursor: default;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-list-row span.mod {
+  width: 30px;
+  font-weight: bold;
+  text-align: right;
+  margin-right: 12px;
+}
+[data-diary-system='jad'] .jad-diary .jad-list-row span.lbl {
+  flex: 1;
+}
+[data-diary-system='jad'] .jad-diary .jad-list-row span.sub {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+/* ── Spells tab ──────────────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-spells .spell-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: var(--jad-panel-bg);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--jad-border);
+}
+[data-diary-system='jad'] .jad-diary .jad-spells .spell-header div {
+  flex: 1;
+}
+[data-diary-system='jad'] .jad-diary .jad-spells .spell-header div label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--jad-accent);
+  margin-bottom: 4px;
+}
+[data-diary-system='jad'] .jad-diary .jad-spells .spell-header div input {
+  width: 100%;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-spells .spell-level {
+  background: #fff;
+  border: 1px solid var(--jad-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+[data-diary-system='jad'] .jad-diary .jad-spells .sl-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--jad-border);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+[data-diary-system='jad'] .jad-diary .jad-spells .sl-title h4 {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  color: var(--jad-accent);
+  font-size: 1.2rem;
+}

@@ -1,0 +1,490 @@
+/* Call of Cthulhu 7e Character Sheet — Czech Translation
+ * Parchment-inspired dark theme with Lovecraftian aesthetics.
+ * 8.7c — přenos z c:/Matrix/Matrix/frontend/src/styles/CocDiary.scss
+ */
+
+[data-diary-system='coc'] .coc-sheet {
+  color: #d4c9a8;
+  font-family: 'EB Garamond', 'Garamond', 'Georgia', serif;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(30, 25, 18, 0.97),
+    rgba(20, 18, 14, 0.98)
+  );
+  border-radius: 12px;
+  border: 2px solid rgba(180, 150, 100, 0.2);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.6),
+    inset 0 0 80px rgba(0, 0, 0, 0.3);
+  position: relative;
+
+  --coc-accent: #c9a84c;
+  --coc-accent-dim: rgba(201, 168, 76, 0.3);
+  --coc-danger: #a83232;
+  --coc-sanity: #6b5bcd;
+  --coc-panel-bg: rgba(255, 255, 255, 0.025);
+  --coc-border: rgba(180, 150, 100, 0.15);
+  --coc-input-bg: rgba(0, 0, 0, 0.25);
+}
+
+[data-diary-system='coc'] .coc-sheet * {
+  box-sizing: border-box;
+}
+
+[data-diary-system='coc'] .coc-sheet::before,
+[data-diary-system='coc'] .coc-sheet::after {
+  content: '✦';
+  position: absolute;
+  font-size: 24px;
+  color: rgba(201, 168, 76, 0.15);
+  pointer-events: none;
+}
+[data-diary-system='coc'] .coc-sheet::before {
+  top: 8px;
+  left: 12px;
+}
+[data-diary-system='coc'] .coc-sheet::after {
+  bottom: 8px;
+  right: 12px;
+}
+
+/* ── TITLE ─────────────────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: var(--coc-accent);
+  border-bottom: 2px solid var(--coc-accent-dim);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
+}
+
+/* ── HEADER ────────────────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-header {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 16px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: var(--coc-panel-bg);
+  border: 1px solid var(--coc-border);
+  border-radius: 8px;
+}
+
+@media (max-width: 700px) {
+  [data-diary-system='coc'] .coc-sheet .coc-header {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+[data-diary-system='coc'] .coc-sheet .coc-header-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-header-field label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(212, 201, 168, 0.5);
+  font-weight: 600;
+}
+[data-diary-system='coc'] .coc-sheet .coc-header-field input {
+  background: var(--coc-input-bg);
+  border: none;
+  border-bottom: 1px solid rgba(180, 150, 100, 0.2);
+  color: #e8dcc4;
+  padding: 6px 4px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+[data-diary-system='coc'] .coc-sheet .coc-header-field input:focus {
+  border-bottom-color: var(--coc-accent);
+}
+
+/* ── SECTION TITLE ─────────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-section-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--coc-accent);
+  margin: 24px 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--coc-border);
+  font-weight: 700;
+}
+
+/* ── CHARACTERISTICS ───────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-chars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+@media (max-width: 700px) {
+  [data-diary-system='coc'] .coc-sheet .coc-chars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+[data-diary-system='coc'] .coc-sheet .coc-char-box {
+  background: var(--coc-panel-bg);
+  border: 1px solid var(--coc-border);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--coc-accent);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-values {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-values input {
+  width: 42px;
+  text-align: center;
+  background: var(--coc-input-bg);
+  border: 1px solid rgba(180, 150, 100, 0.1);
+  color: #e8dcc4;
+  padding: 4px 2px;
+  border-radius: 3px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-values input:focus {
+  border-color: var(--coc-accent);
+}
+[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-sub {
+  font-size: 8px;
+  color: rgba(212, 201, 168, 0.4);
+  text-align: center;
+  display: block;
+  margin-top: 1px;
+}
+
+/* ── VITALS ────────────────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-vitals-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+@media (max-width: 700px) {
+  [data-diary-system='coc'] .coc-sheet .coc-vitals-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+[data-diary-system='coc'] .coc-sheet .coc-vital-box {
+  background: var(--coc-panel-bg);
+  border: 1px solid var(--coc-border);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-box.is-sanity {
+  border-color: rgba(107, 91, 205, 0.25);
+}
+[data-diary-system='coc']
+  .coc-sheet
+  .coc-vital-box.is-sanity
+  .coc-vital-label {
+  color: var(--coc-sanity);
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-box.is-danger {
+  border-color: rgba(168, 50, 50, 0.25);
+}
+[data-diary-system='coc']
+  .coc-sheet
+  .coc-vital-box.is-danger
+  .coc-vital-label {
+  color: var(--coc-danger);
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--coc-accent);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-pair {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-col span {
+  font-size: 8px;
+  text-transform: uppercase;
+  color: rgba(212, 201, 168, 0.4);
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-col input {
+  width: 44px;
+  text-align: center;
+  background: var(--coc-input-bg);
+  border: 1px solid rgba(180, 150, 100, 0.1);
+  color: #e8dcc4;
+  padding: 5px 2px;
+  border-radius: 3px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-sheet .coc-vital-col input:focus {
+  border-color: var(--coc-accent);
+}
+
+/* ── STATUS CHECKBOXES ─────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 8px 12px;
+  background: var(--coc-panel-bg);
+  border: 1px solid var(--coc-border);
+  border-radius: 6px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-status-row label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: rgba(212, 201, 168, 0.7);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+[data-diary-system='coc']
+  .coc-sheet
+  .coc-status-row
+  label
+  input[type='checkbox'] {
+  accent-color: var(--coc-accent);
+  cursor: pointer;
+}
+[data-diary-system='coc']
+  .coc-sheet
+  .coc-status-row
+  label:has(input:checked) {
+  color: var(--coc-danger);
+  font-weight: 600;
+}
+
+/* ── SKILLS ────────────────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 12px;
+  margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+  [data-diary-system='coc'] .coc-sheet .coc-skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  [data-diary-system='coc'] .coc-sheet .coc-skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-diary-system='coc'] .coc-sheet .coc-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  border-bottom: 1px dotted rgba(180, 150, 100, 0.08);
+  transition: background 0.15s;
+}
+[data-diary-system='coc'] .coc-sheet .coc-skill-row:hover {
+  background: rgba(201, 168, 76, 0.03);
+}
+[data-diary-system='coc'] .coc-sheet .coc-skill-check {
+  accent-color: var(--coc-accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+[data-diary-system='coc'] .coc-sheet .coc-skill-name {
+  font-size: 12px;
+  color: rgba(212, 201, 168, 0.8);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-diary-system='coc'] .coc-sheet .coc-skill-inputs {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+[data-diary-system='coc'] .coc-sheet .coc-skill-inputs input {
+  width: 32px;
+  text-align: center;
+  background: var(--coc-input-bg);
+  border: 1px solid rgba(180, 150, 100, 0.08);
+  color: #e8dcc4;
+  padding: 2px 1px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-sheet .coc-skill-inputs input:focus {
+  border-color: var(--coc-accent);
+}
+
+/* ── COMBAT TABLE ──────────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-combat-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-combat-table th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(212, 201, 168, 0.4);
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--coc-border);
+}
+[data-diary-system='coc'] .coc-sheet .coc-combat-table td {
+  padding: 3px 4px;
+  border-bottom: 1px solid rgba(180, 150, 100, 0.05);
+}
+[data-diary-system='coc'] .coc-sheet .coc-combat-table td input {
+  width: 100%;
+  background: var(--coc-input-bg);
+  border: 1px solid transparent;
+  color: #e8dcc4;
+  padding: 5px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-sheet .coc-combat-table td input:focus {
+  border-color: var(--coc-accent);
+}
+
+/* ── COMBAT DERIVED ────────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-combat-derived {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-derived-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--coc-panel-bg);
+  border: 1px solid var(--coc-border);
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-derived-item span {
+  font-size: 12px;
+  color: rgba(212, 201, 168, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+[data-diary-system='coc'] .coc-sheet .coc-derived-item input {
+  width: 50px;
+  text-align: center;
+  background: var(--coc-input-bg);
+  border: 1px solid rgba(180, 150, 100, 0.1);
+  color: #e8dcc4;
+  padding: 4px 2px;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-sheet .coc-derived-item input:focus {
+  border-color: var(--coc-accent);
+}
+
+/* ── ADD/DEL BUTTONS ───────────────────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet .coc-add-btn {
+  background: transparent;
+  border: 1px dashed var(--coc-border);
+  color: var(--coc-accent);
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  width: 100%;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+[data-diary-system='coc'] .coc-sheet .coc-add-btn:hover {
+  background: rgba(201, 168, 76, 0.05);
+  border-color: rgba(201, 168, 76, 0.3);
+}
+[data-diary-system='coc'] .coc-sheet .coc-add-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+[data-diary-system='coc'] .coc-sheet .coc-del-btn {
+  background: transparent;
+  border: none;
+  color: rgba(168, 50, 50, 0.4);
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+[data-diary-system='coc'] .coc-sheet .coc-del-btn:hover {
+  color: var(--coc-danger);
+}
+
+/* ── DISABLED STATES (view mode) ───────────────────────────── */
+
+[data-diary-system='coc'] .coc-sheet input:disabled,
+[data-diary-system='coc'] .coc-sheet textarea:disabled {
+  cursor: default;
+  opacity: 0.85;
+}

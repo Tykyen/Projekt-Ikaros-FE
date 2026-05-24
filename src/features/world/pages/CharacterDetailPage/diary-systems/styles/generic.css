@@ -1,0 +1,11 @@
+/*
+ * 8.7a — Generic preset styly.
+ *
+ * Záměrně prázdné. Generic deník respektuje aktivní skin platformy
+ * (`data-theme`) bez vlastních přepisů. Selector slouží jen jako
+ * dokumentační hook — pokud někdy chceme jemně doladit generický look
+ * per skin, máme kam zahnízdit.
+ */
+[data-diary-system='generic'] {
+  /* no overrides — uses ambient skin tokens */
+}
