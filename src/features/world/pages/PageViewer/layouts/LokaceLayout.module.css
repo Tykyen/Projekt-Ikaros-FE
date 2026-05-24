@@ -1,0 +1,43 @@
+/* Spec 9.2 — LokaceLayout: Profil/Kalendář taby + edit button bar. */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.editBar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1rem;
+}
+
+.editTabBtn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.15));
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  color: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.editTabBtn:hover {
+  background: var(--bg-overlay-hover, rgba(255, 255, 255, 0.1));
+  border-color: var(--border-strong, rgba(255, 255, 255, 0.3));
+}
+
+.editTabBtn[aria-pressed='true'] {
+  background: var(--color-accent, rgba(120, 80, 200, 0.6));
+  border-color: var(--color-accent-strong, rgba(120, 80, 200, 0.8));
+  color: var(--color-on-accent, #fff);
+}
+
+@media (max-width: 768px) {
+  .editBar {
+    padding: 0 0.5rem;
+  }
+}
