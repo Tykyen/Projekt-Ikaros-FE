@@ -1,0 +1,530 @@
+/* GURPS — Univerzální Systém (Universal Cold-Steel Blue Theme)
+ * 8.7g — přenos z c:/Matrix/Matrix/frontend/src/styles/GurpsDiary.scss
+ */
+
+[data-diary-system='gurps'] .gurps-dashboard {
+  color: #c9d1d9;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+[data-diary-system='gurps'] .gurps-dashboard ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+[data-diary-system='gurps'] .gurps-dashboard ::-webkit-scrollbar-track {
+  background: rgba(8, 12, 18, 0.3);
+}
+[data-diary-system='gurps'] .gurps-dashboard ::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.12);
+  border-radius: 4px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  ::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.25);
+}
+
+[data-diary-system='gurps'] .gurps-dashboard h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard .gurps-header {
+  background: rgba(10, 14, 22, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 2px solid rgba(56, 189, 248, 0.6);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .identity-column {
+  flex: 2;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .identity-column
+  .name-row {
+  display: flex;
+  gap: 12px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .identity-column
+  .name-row
+  input {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .points-column {
+  flex: 1;
+  min-width: 180px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(56, 189, 248, 0.3);
+  padding: 12px;
+  border-radius: 6px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .points-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .points-row
+  label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #38bdf8;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .points-row
+  input {
+  width: 60px;
+  text-align: right;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-header
+  .meta-column {
+  flex: 3;
+  min-width: 300px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+[data-diary-system='gurps'] .gurps-dashboard .gurps-header label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-header input,
+[data-diary-system='gurps'] .gurps-dashboard .gurps-header select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-header input:focus,
+[data-diary-system='gurps'] .gurps-dashboard .gurps-header select:focus {
+  outline: none;
+  border-color: rgba(56, 189, 248, 0.6);
+  background: rgba(15, 17, 23, 0.9);
+}
+
+/* ── Grid ─────────────────────────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard .gurps-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-grid > div {
+  background: rgba(12, 16, 25, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.07);
+  border-radius: 8px;
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-grid .panel-4 {
+  grid-column: span 4;
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-grid .panel-6 {
+  grid-column: span 6;
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-grid .panel-8 {
+  grid-column: span 8;
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-grid .panel-12 {
+  grid-column: span 12;
+}
+@media (max-width: 1024px) {
+  [data-diary-system='gurps'] .gurps-dashboard .gurps-grid .panel-4,
+  [data-diary-system='gurps'] .gurps-dashboard .gurps-grid .panel-6,
+  [data-diary-system='gurps'] .gurps-dashboard .gurps-grid .panel-8 {
+    grid-column: span 12;
+  }
+}
+
+/* ── Core attrs ───────────────────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard .core-attrs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .attr-box {
+  background: linear-gradient(
+    180deg,
+    rgba(30, 35, 45, 0.8) 0%,
+    rgba(15, 17, 23, 0.8) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  text-align: center;
+  padding: 12px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .attr-box label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+[data-diary-system='gurps'] .gurps-dashboard .attr-box input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 36px;
+  font-weight: bold;
+  color: #fff;
+}
+[data-diary-system='gurps'] .gurps-dashboard .attr-box input:focus {
+  outline: none;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+/* ── Sec attrs (HP / FP / …) ──────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard .sec-attrs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .sec-box {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+[data-diary-system='gurps'] .gurps-dashboard .sec-box.vital {
+  border-color: rgba(255, 68, 68, 0.3);
+  border-top: 2px solid #ff4444;
+}
+[data-diary-system='gurps'] .gurps-dashboard .sec-box.fatigue {
+  border-color: rgba(56, 189, 248, 0.3);
+  border-top: 2px solid #38bdf8;
+}
+[data-diary-system='gurps'] .gurps-dashboard .sec-box label {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 6px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .sec-box .h-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .sec-box .h-row input {
+  width: 45px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+[data-diary-system='gurps'] .gurps-dashboard .sec-box .h-row span {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 20px;
+}
+
+/* ── Small grids ──────────────────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard .sm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .lbl-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 6px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .lbl-input label {
+  display: block;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+[data-diary-system='gurps'] .gurps-dashboard .lbl-input input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+}
+
+/* ── Tables ───────────────────────────────────────────────── */
+
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container {
+  overflow-x: auto;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  th {
+  text-align: left;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 8px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  td {
+  padding: 4px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  td
+  input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  td
+  input:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  .td-s {
+  width: 50px;
+  text-align: center;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  .td-m {
+  width: 80px;
+  text-align: center;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  .add-row-btn {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 8px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .gurps-table-container
+  .add-row-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-diary-system='gurps'] .gurps-dashboard .del-btn {
+  background: transparent;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px;
+  opacity: 0.6;
+}
+[data-diary-system='gurps'] .gurps-dashboard .del-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ── Encumbrance table ────────────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard .encumb-table {
+  width: 100%;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  overflow: hidden;
+}
+[data-diary-system='gurps'] .gurps-dashboard .encumb-table .e-row {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .encumb-table
+  .e-row:last-child {
+  border-bottom: none;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .encumb-table
+  .e-row.e-head {
+  background: rgba(0, 0, 0, 0.6);
+  font-weight: bold;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+[data-diary-system='gurps'] .gurps-dashboard .encumb-table .e-cell {
+  padding: 8px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .encumb-table
+  .e-cell.e-fixed {
+  flex: 1.5;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .encumb-table
+  .e-cell
+  input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 4px;
+  padding: 4px;
+}
+[data-diary-system='gurps']
+  .gurps-dashboard
+  .encumb-table
+  .e-cell
+  input:focus {
+  border-color: #38bdf8;
+  outline: none;
+}
+
+/* ── Textarea & traits ────────────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard .gurps-textarea {
+  width: 100%;
+  min-height: 80px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #c9d1d9;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+[data-diary-system='gurps'] .gurps-dashboard .gurps-textarea:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+[data-diary-system='gurps'] .gurps-dashboard .traits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+/* ── Disabled (view mode) ─────────────────────────────────── */
+
+[data-diary-system='gurps'] .gurps-dashboard input:disabled,
+[data-diary-system='gurps'] .gurps-dashboard select:disabled,
+[data-diary-system='gurps'] .gurps-dashboard textarea:disabled,
+[data-diary-system='gurps'] .gurps-dashboard button:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
