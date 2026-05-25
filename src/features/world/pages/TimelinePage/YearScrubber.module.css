@@ -1,0 +1,152 @@
+.sidebar {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 120px);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--frame-border);
+  background: var(--surface-2);
+}
+
+.headerTitle {
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  font-size: var(--text-sm);
+}
+
+.headerCount {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  margin-left: auto;
+}
+
+.closeBtn {
+  /* Drawer close — mobil-only kontext, 44px touch target. */
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.closeBtn:hover {
+  background: var(--surface-3, var(--surface-2));
+  color: var(--text-strong);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: var(--sp-1);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.list li {
+  margin: 0;
+}
+
+.yearBtn {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-default);
+  font-size: var(--text-sm);
+  text-align: left;
+  min-height: 36px;
+}
+
+@media (max-width: 768px) {
+  .yearBtn {
+    /* Mobil drawer = touch a11y, větší padding pro 44px target. */
+    padding: var(--sp-3) var(--sp-3);
+    min-height: 44px;
+    font-size: var(--text-base);
+  }
+}
+
+.yearBtn:hover {
+  background: var(--surface-2);
+  color: var(--text-strong);
+}
+
+.yearBtnActive {
+  background: var(--accent);
+  color: var(--accent-fg, white);
+}
+
+.yearBtnActive:hover {
+  background: var(--accent);
+  color: var(--accent-fg, white);
+}
+
+.yearLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yearCount {
+  color: inherit;
+  opacity: 0.7;
+  font-size: var(--text-xs);
+}
+
+.yearBtnActive .yearCount {
+  opacity: 1;
+}
+
+/* Mobile drawer */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: min(320px, 88vw);
+  background: var(--surface-0, var(--page-bg, white));
+  z-index: 1001;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  /* Na desktopu skryjeme drawer i scrim — sidebar místo. */
+  .scrim,
+  .drawer {
+    display: none;
+  }
+}
