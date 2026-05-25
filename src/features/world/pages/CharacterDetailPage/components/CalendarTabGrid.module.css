@@ -1,0 +1,319 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2, 12px);
+}
+
+.toolbar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+}
+
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  color: var(--theme-text);
+  cursor: pointer;
+}
+
+.navBtn:hover {
+  border-color: var(--theme-accent, #7c5cff);
+}
+
+.monthLabel {
+  flex: 1;
+  font-family: var(--font-display, 'Orbitron', sans-serif);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--theme-heading);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.monthLabel:hover {
+  border-color: var(--theme-accent, #7c5cff);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+}
+
+.jumpPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1, 4px);
+  padding: 8px 10px;
+  background: var(--theme-surface, rgba(20, 10, 40, 0.96));
+  border: 1px solid var(--theme-accent, #7c5cff);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.jumpField {
+  padding: 4px 8px;
+  background: var(--theme-bg, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.jumpYear {
+  width: 90px;
+}
+
+.jumpApply {
+  padding: 4px 12px;
+  background: var(--theme-accent, #7c5cff);
+  border: 1px solid var(--theme-accent, #7c5cff);
+  border-radius: 4px;
+  color: var(--theme-bg, #000);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.todayBtn {
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.todayBtn:hover {
+  border-color: var(--theme-accent, #7c5cff);
+}
+
+.calSelect {
+  padding: 4px 8px;
+  background: var(--theme-bg, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.grid {
+  display: grid;
+  gap: 1px;
+  background: var(--theme-border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.weekday {
+  padding: var(--sp-1);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--theme-text-muted);
+}
+
+.cell {
+  position: relative;
+  min-height: 88px;
+  padding: var(--sp-1);
+  background: var(--theme-bg, rgba(0, 0, 0, 0.2));
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: background 120ms ease;
+}
+
+.cellOutside {
+  opacity: 0.38;
+}
+
+.cellToday {
+  background: var(--theme-accent-soft, rgba(124, 92, 255, 0.14));
+  box-shadow: inset 0 0 0 2px var(--theme-accent, #7c5cff);
+}
+
+.cellToday .dayNum {
+  color: var(--theme-accent, #7c5cff);
+  font-weight: 700;
+}
+
+.cellClickable {
+  cursor: pointer;
+}
+
+.cellClickable:hover {
+  background: var(--theme-surface-hover, rgba(255, 255, 255, 0.07));
+}
+
+.cellClickable:hover .addHint {
+  opacity: 0.5;
+}
+
+.cellClickable:focus-visible {
+  outline: 2px solid var(--theme-accent, #7c5cff);
+  outline-offset: -2px;
+}
+
+.addHint {
+  position: absolute;
+  inset: auto 0 4px 0;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--theme-text-muted);
+  opacity: 0;
+  transition: opacity 120ms ease;
+  pointer-events: none;
+}
+
+.cellHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.dayNum {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--theme-text);
+}
+
+.lunarRow {
+  display: flex;
+  gap: 2px;
+}
+
+.lunarIcon {
+  font-size: 11px;
+  cursor: help;
+}
+
+.eventChip {
+  position: relative;
+  padding: 2px 6px;
+  background: var(--chip-bg, var(--theme-accent-soft, rgba(124, 92, 255, 0.16)));
+  border-left: 3px solid var(--chip-color, var(--theme-accent));
+  border-radius: 3px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background 120ms ease, opacity 120ms ease;
+}
+
+.eventChip:hover {
+  background: var(--chip-color, var(--theme-accent));
+  color: var(--theme-bg);
+}
+
+/* 9.2-FIX3 — multi-day span: chipy se vizuálně spojí v jednu lištu přes
+   buňky. Negative margins kompenzují cell padding (4px) + grid gap (1px). */
+
+.chipSpanStart {
+  margin-right: -5px;
+  border-radius: 3px 0 0 3px;
+  z-index: 1;
+}
+
+.chipSpanMiddle {
+  margin-left: -5px;
+  margin-right: -5px;
+  padding-left: 0;
+  padding-right: 0;
+  border-left: none;
+  border-radius: 0;
+  background: var(--chip-color, var(--theme-accent));
+  opacity: 0.85;
+}
+
+.chipSpanMiddle:hover {
+  opacity: 1;
+  background: var(--chip-color, var(--theme-accent));
+}
+
+.chipSpanEnd {
+  margin-left: -5px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-left: none;
+  border-radius: 0 3px 3px 0;
+  background: var(--chip-color, var(--theme-accent));
+  opacity: 0.85;
+}
+
+.chipSpanEnd:hover {
+  opacity: 1;
+  background: var(--chip-color, var(--theme-accent));
+}
+
+/* Když multi-day chip přejde do nového týdne (pondělí), restartuje vizuálně
+   název: levý border + radius, plný chip styl. Pravá strana zůstává podle
+   pozice (middle = bez right radius, end = pravý radius). */
+.chipSpanRestart {
+  margin-left: 0;
+  padding-left: 6px;
+  border-left: 3px solid var(--chip-color, var(--theme-accent));
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  background: var(--chip-bg, var(--theme-accent-soft, rgba(124, 92, 255, 0.16)));
+  color: var(--theme-text);
+  opacity: 1;
+}
+
+.chipSpanRestart:hover {
+  background: var(--chip-color, var(--theme-accent));
+  color: var(--theme-bg);
+}
+
+.empty {
+  padding: var(--sp-3);
+  text-align: center;
+  color: var(--theme-text-muted);
+}
+
+@media (max-width: 768px) {
+  .cell {
+    min-height: 60px;
+    padding: 4px;
+  }
+  .dayNum {
+    font-size: 11px;
+  }
+  .eventChip {
+    font-size: 10px;
+  }
+}
