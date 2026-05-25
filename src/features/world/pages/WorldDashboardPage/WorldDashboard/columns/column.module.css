@@ -1,0 +1,92 @@
+/* Sdílený stylesheet sloupců dashboardu. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+  padding: 20px 8px;
+  line-height: 1.6;
+}
+
+.more {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--surface-1) 50%, transparent);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.more:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.note {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+
+/* 5.5a — odkaz „na vše" pod sloupcem (vzor globálního dashboardu). */
+.moreLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  font-size: 13px;
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.moreLink:hover {
+  color: var(--accent);
+}
+
+/* 9.1-I follow-up — „+" tlačítko v hlavičce sloupce pro PJ+ (paralela 2.1b). */
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--frame-border);
+  background: color-mix(in srgb, var(--surface-1) 60%, transparent);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+.addBtn:hover,
+.addBtn:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent-bright);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  .addBtn {
+    width: 36px;
+    height: 36px;
+  }
+}
