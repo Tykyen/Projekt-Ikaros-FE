@@ -1,0 +1,107 @@
+/* 9.3 — TimelinePage layout (desktop 2-col, mobil 1-col). */
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+.header {
+  margin-bottom: var(--sp-5);
+}
+
+.title {
+  margin: 0 0 var(--sp-2) 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--text-strong);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.body {
+  display: grid;
+  gap: var(--sp-5);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr) 220px;
+  }
+}
+
+.axisColumn {
+  min-width: 0;
+}
+
+.scrubberColumn {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .scrubberColumn {
+    display: block;
+    position: sticky;
+    top: var(--sp-5);
+    align-self: start;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--surface-1);
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+}
+
+.warningBox {
+  padding: var(--sp-4);
+  background: var(--surface-warning, rgba(255, 200, 80, 0.08));
+  border: 1px solid var(--frame-warning, rgba(255, 200, 80, 0.4));
+  border-radius: var(--radius-md);
+  color: var(--text-strong);
+}
+
+.warningBox p {
+  margin: 0 0 var(--sp-3) 0;
+}
+
+.skeleton {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.skeletonCard {
+  height: 140px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-1) 0%,
+    var(--surface-2) 50%,
+    var(--surface-1) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-md);
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

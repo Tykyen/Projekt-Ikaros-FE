@@ -1,0 +1,72 @@
+/* 9.3 — TimelineToolbar (filter + search + sort + akce). */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-4);
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.label {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.yearInput {
+  width: 84px;
+}
+
+.search {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.sortToggle {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.sortBtn {
+  background: transparent;
+  border: none;
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.sortBtnActive {
+  background: var(--accent);
+  color: var(--accent-fg, white);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.scrubberToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+@media (min-width: 1024px) {
+  .scrubberToggle {
+    display: none;
+  }
+}
