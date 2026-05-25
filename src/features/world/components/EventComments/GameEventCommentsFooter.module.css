@@ -1,0 +1,39 @@
+.footer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  align-self: flex-start;
+  margin-top: var(--sp-2);
+  padding: 6px 12px;
+  min-height: 32px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.footer:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-soft, var(--frame-border));
+}
+
+.footerActive {
+  color: var(--accent-bright);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+@media (max-width: 768px) {
+  .footer {
+    min-height: 44px;
+    padding: 8px 14px;
+  }
+}
