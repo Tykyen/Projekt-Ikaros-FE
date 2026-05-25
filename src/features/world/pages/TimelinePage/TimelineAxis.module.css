@@ -1,0 +1,100 @@
+/* 9.3 — vertikální osa s alternating cards na desktopu, levým rail na mobilu. */
+
+.axis {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+}
+
+/* Centrální čára — pozicovaná absolutně, vede přes celou výšku. */
+.line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--frame-border);
+  left: 16px; /* mobil — levý rail */
+}
+
+@media (min-width: 1024px) {
+  .line {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.node {
+  position: relative;
+  padding-left: 40px; /* mobil — odsazení od levého railu */
+}
+
+@media (min-width: 1024px) {
+  .node {
+    padding-left: 0;
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    align-items: start;
+  }
+}
+
+.dot {
+  position: absolute;
+  left: 10px;
+  top: 24px;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border: 2px solid var(--surface-0, var(--page-bg, white));
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--accent);
+  z-index: 1;
+}
+
+@media (min-width: 1024px) {
+  .dot {
+    position: relative;
+    left: auto;
+    top: 24px;
+    grid-column: 2;
+    justify-self: center;
+  }
+}
+
+.cardWrap {
+  /* mobil — karty vyplňují celou šířku napravo od railu */
+}
+
+@media (min-width: 1024px) {
+  .cardWrap[data-side='left'] {
+    grid-column: 1;
+    padding-right: var(--sp-3);
+  }
+  .cardWrap[data-side='right'] {
+    grid-column: 3;
+    padding-left: var(--sp-3);
+  }
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.loadingMore,
+.endMarker {
+  text-align: center;
+  padding: var(--sp-4);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.endMarker {
+  font-style: italic;
+}
