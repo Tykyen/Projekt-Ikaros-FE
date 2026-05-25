@@ -1,0 +1,121 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.group {
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  padding: var(--sp-2) var(--sp-3);
+  margin: 0;
+}
+
+.groupLabel {
+  padding: 0 var(--sp-2);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: var(--weight-semi);
+}
+
+.list {
+  list-style: none;
+  margin: var(--sp-1) 0 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 32px;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  border-radius: var(--radius-sm);
+}
+
+.row:hover {
+  background: var(--surface-2);
+}
+
+.checkLabel {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 2px var(--sp-2);
+  cursor: pointer;
+  min-width: 0;
+}
+
+.checkLabel input[type='checkbox'] {
+  grid-row: 1 / span 2;
+}
+
+.cellName {
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.cellDesc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  grid-column: 2;
+  grid-row: 2;
+  line-height: 1.3;
+}
+
+.starBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 120ms ease, background 120ms ease;
+}
+
+@media (max-width: 768px) {
+  .starBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.starBtn:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.starBtnActive {
+  color: var(--accent);
+}
+
+.starBtnActive:hover {
+  background: var(--surface-2);
+}
+
+.summary {
+  margin: var(--sp-2) 0 0 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
+}
