@@ -1,0 +1,30 @@
+.select {
+  height: 38px;
+  padding: 0 var(--sp-3);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  appearance: auto; /* native picker je mobile-friendly */
+}
+.select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Krok 5.8 — 3D zapuštění uvnitř světa, jinak ploché. */
+[data-world-shell] .select {
+  box-shadow: var(--depth-inset);
+}
+[data-world-shell] .select:focus {
+  box-shadow: var(--depth-inset), 0 0 0 3px var(--accent-soft);
+}
