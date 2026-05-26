@@ -1,0 +1,15 @@
+/* 9.4 Heat density — gradient overlay přes celou cell. Opacity passed inline.
+   Pozadí používá theme accent s radial gradient pro hladký „heat" vzhled. */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      var(--theme-accent, #7c5cff) 0%,
+      transparent 70%
+    );
+  transition: opacity 180ms ease;
+}
