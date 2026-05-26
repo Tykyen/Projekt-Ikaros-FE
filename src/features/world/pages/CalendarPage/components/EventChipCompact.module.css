@@ -1,0 +1,54 @@
+/* 9.4 Compact density — 4px barevný proužek, multi-day spojitý přes cell gap.
+   Cell padding 6px + grid gap 1px = 7px mezery (stejně jako u .eventChip v Detail). */
+
+.chip {
+  display: block;
+  width: 100%;
+  height: 4px;
+  margin: 0;
+  padding: 0;
+  background: var(--chip-color, var(--theme-accent, #7c5cff));
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: height 120ms ease, opacity 120ms ease;
+  opacity: 0.85;
+}
+
+.chip:hover {
+  height: 8px;
+  opacity: 1;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--theme-accent, #7c5cff);
+  outline-offset: 1px;
+}
+
+.single {
+  border-radius: 2px;
+}
+
+.spanStart {
+  margin-right: -7px;
+  border-radius: 2px 0 0 2px;
+  z-index: 1;
+}
+
+.spanMiddle {
+  margin-left: -7px;
+  margin-right: -7px;
+  border-radius: 0;
+}
+
+.spanEnd {
+  margin-left: -7px;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Restart na pondělí — middle/end proužek se vizuálně chová jako start. */
+.weekRestart {
+  margin-left: 0;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
