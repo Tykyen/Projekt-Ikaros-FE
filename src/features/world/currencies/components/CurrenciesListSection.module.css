@@ -1,0 +1,121 @@
+.section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table thead th {
+  text-align: left;
+  padding: var(--sp-2) var(--sp-3);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+}
+
+.thRate {
+  text-align: right !important;
+}
+
+.thActions {
+  width: 1%;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  color: var(--text-secondary);
+}
+.emptyState p {
+  margin: 0;
+}
+
+/* ── Mobil: tabulka → karty ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .table thead {
+    display: none;
+  }
+  .table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+  .table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'code   actions'
+      'name   name'
+      'meta   meta';
+    gap: var(--sp-1) var(--sp-3);
+    padding: var(--sp-3);
+    background: var(--bg-tertiary, var(--bg-secondary));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .table tr > td {
+    padding: 0 !important;
+  }
+  .table tr > td:nth-child(1) { /* code */
+    grid-area: code;
+  }
+  .table tr > td:nth-child(2) { /* name */
+    grid-area: name;
+    color: var(--text-primary);
+    font-size: var(--text-md);
+  }
+  .table tr > td:nth-child(3) { /* symbol */
+    grid-area: meta;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+  }
+  .table tr > td:nth-child(3)::before {
+    content: 'Symbol: ';
+  }
+  .table tr > td:nth-child(4) { /* rate */
+    grid-area: meta;
+    justify-self: end;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    text-align: right;
+  }
+  .table tr > td:nth-child(4)::before {
+    content: 'Kurz: ';
+  }
+  .table tr > td:nth-child(5) { /* actions */
+    grid-area: actions;
+    justify-self: end;
+  }
+}
