@@ -1,0 +1,241 @@
+/* === WorldWeatherPage =====================================================
+ * Spec 9.4-I §3 + design mockup `c:/tmp/9.4-pocasi-page-design.html`.
+ *
+ * Responsive grid:
+ *  - desktop ≥ 1024px → 3 sloupce
+ *  - tablet 720–1023px → 2 sloupce
+ *  - mobile < 720px → 1 sloupec
+ *
+ * Skin-agnostic — všechny barvy přes CSS proměnné (žádné hardcoded RGB).
+ */
+
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-5);
+  position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--sp-6);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--frame-border);
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.headerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.breadcrumb {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--sp-2);
+}
+
+.breadcrumb span {
+  color: var(--accent);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 36px;
+  letter-spacing: 0.04em;
+  color: var(--text-strong);
+  margin: 0;
+  line-height: 1;
+  text-shadow: 0 0 28px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: var(--sp-2);
+  max-width: 540px;
+}
+
+/* 9.4 dluh #1 — in-game date label v header. */
+.inGameDate {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-top: var(--sp-2);
+  text-transform: uppercase;
+}
+
+.inGameDate strong {
+  color: var(--accent);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  margin-left: var(--sp-1);
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+/* === Grid === */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-5);
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .page {
+    padding: var(--sp-4) var(--sp-3);
+  }
+  .title {
+    font-size: 28px;
+  }
+}
+
+/* === Add-new tile === */
+
+.addTile {
+  position: relative;
+  background: transparent;
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  cursor: pointer;
+  transition: border-color 280ms ease, background 280ms ease, color 280ms ease,
+    box-shadow 280ms ease;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  backdrop-filter: blur(6px);
+  animation: addTileEnter 0.6s ease 0.4s backwards;
+}
+
+.addTile:hover,
+.addTile:focus-visible {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  color: var(--text-strong);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 25%, transparent);
+  outline: none;
+}
+
+@keyframes addTileEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.addPlus {
+  font-size: 44px;
+  font-weight: 200;
+  font-family: var(--font-display);
+  line-height: 1;
+  color: var(--accent);
+}
+
+.addLabel {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.addHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .addTile {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* === Empty + error states === */
+
+.error {
+  padding: var(--sp-8) var(--sp-4);
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+.emptyState {
+  padding: var(--sp-12) var(--sp-5);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.emptyStateIcon {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px dashed var(--frame-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.emptyStateTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+.emptyStateText {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 480px;
+  margin: 0;
+  line-height: 1.5;
+}

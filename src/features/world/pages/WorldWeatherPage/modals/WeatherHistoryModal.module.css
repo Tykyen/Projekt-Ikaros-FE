@@ -1,0 +1,163 @@
+/* 9.4 dluh #2 — WeatherHistoryModal styles. Skin-agnostic přes CSS proměnné. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-height: 200px;
+}
+
+.loading,
+.empty,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  text-align: center;
+  font-style: italic;
+}
+
+.summary {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0 0 var(--sp-1) 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: var(--sp-3);
+  align-items: center;
+  padding: var(--sp-3);
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.row:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--frame-border));
+  background: color-mix(in srgb, var(--accent) 4%, var(--surface-2));
+}
+
+.row[data-trigger='advance-day'] {
+  border-left: 3px solid var(--accent);
+}
+
+.row[data-trigger='manual'] {
+  border-left: 3px solid color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.rowIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+
+.rowMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.rowTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  font-family: var(--font-display);
+}
+
+.rowTemp {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-strong);
+}
+
+.rowType {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.rowMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rowDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.detailChip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.loadMore {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--sp-2);
+}
+
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: 32px 1fr;
+    grid-template-areas:
+      'icon main'
+      'details details';
+  }
+  .rowIcon {
+    grid-area: icon;
+    width: 32px;
+    height: 32px;
+  }
+  .rowMain {
+    grid-area: main;
+  }
+  .rowDetails {
+    grid-area: details;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+}
