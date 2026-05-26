@@ -1,0 +1,252 @@
+/* 8.1 — sdílené styly editorů režimu úprav (info bloky, sekce, schema, přístup). */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+
+/* ── Vstupy ── */
+.field {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-3, rgba(255, 255, 255, 0.06));
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  transition: border-color 120ms ease;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.fieldNum {
+  width: 5.5rem;
+  flex-shrink: 0;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+/* Spec 8.x-prep B2 — header pro EntryList (Popis / Částka labely nad sloupci). */
+.entryHeaderRow {
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--frame-border);
+  margin-bottom: var(--sp-1);
+  align-items: end;
+}
+
+.entryHeaderLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.entryHeaderSpacer {
+  width: 32px;
+  flex-shrink: 0;
+}
+
+/* ── Tlačítka ── */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.iconBtn:hover:not(:disabled) {
+  color: var(--accent-danger, #ff5764);
+  border-color: var(--accent-danger, #ff5764);
+}
+
+.iconBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.moveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 24px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.moveBtn:hover:not(:disabled) {
+  color: var(--accent-bright);
+  border-color: var(--accent);
+}
+
+.moveBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--accent-bright);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.addBtn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* ── Řádky ── */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.rowGrow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Info bloky — mřížka řádků label/value. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--sp-2);
+}
+
+.gridRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--sp-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.gridRowHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+/* ── Karta sekce ── */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.moveGroup {
+  display: flex;
+  gap: 2px;
+}
+
+/* Položka sekce — text / množství / poznámka. */
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+@media (max-width: 640px) {
+  .itemRow {
+    flex-wrap: wrap;
+  }
+
+  .itemRow .fieldNum {
+    width: 4.5rem;
+  }
+}
+
+/* D-DIARY-3 — image schema value editor */
+.imageRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.imagePreview {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--frame-border);
+}
+
+.imagePlaceholder {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+}
+
+.imageActions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
