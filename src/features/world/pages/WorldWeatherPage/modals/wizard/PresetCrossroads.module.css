@@ -1,0 +1,207 @@
+.grid {
+  display: grid;
+  /* 9.4 — 5 karet (custom + set + real + fantasy + scifi). */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1180px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 28px 20px 22px;
+  min-height: 280px;
+  border-radius: 16px;
+  border: 1px solid var(--frame-border, var(--border));
+  background: var(--surface-1);
+  color: var(--text-primary);
+  cursor: pointer;
+  font: inherit;
+  transition: transform var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.35;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
+}
+
+.card:hover:not([data-locked]),
+.card:focus-visible:not([data-locked]) {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--accent) 20%, transparent),
+    0 0 24px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.card:hover:not([data-locked])::before {
+  opacity: 0.6;
+}
+
+/* Decorative themed background per realm — subtle. */
+.card[data-realm='real']::before {
+  background:
+    radial-gradient(ellipse at 30% 60%, color-mix(in srgb, #78c88c 18%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 50% 70%, color-mix(in srgb, #78c88c 10%, transparent) 0%, transparent 60%);
+}
+
+.card[data-realm='fantasy']::before {
+  background:
+    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, color-mix(in srgb, #5028a0 24%, transparent) 0%, transparent 60%);
+}
+
+.card[data-realm='scifi']::before {
+  background:
+    radial-gradient(circle at 20% 30%, color-mix(in srgb, #8cc8ff 18%, transparent) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, color-mix(in srgb, #ffb478 14%, transparent) 0%, transparent 40%);
+}
+
+.card[data-locked] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.card[data-locked]:hover,
+.card[data-locked]:focus-visible {
+  transform: none;
+  border-color: var(--frame-border, var(--border));
+  box-shadow: none;
+}
+
+.lockBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2, var(--bg-card));
+  border: 1px solid var(--frame-border, var(--border));
+  color: var(--text-muted);
+}
+
+.glyph {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 6px;
+  filter: drop-shadow(
+    0 0 20px color-mix(in srgb, var(--accent) 40%, transparent)
+  );
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+}
+
+.tagline {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 240px;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.countBadge {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 6px 12px;
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+}
+
+.card[data-locked] .countBadge {
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+.categories {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Reduced motion — vyřaď transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::before {
+    transition: none;
+  }
+  .card:hover:not([data-locked]),
+  .card:focus-visible:not([data-locked]) {
+    transform: none;
+  }
+}
+
+
+/* 9.4-dluh — Custom realm card empty state — visual hint, ne disable. */
+.card[data-realm='custom'] .glyph {
+  filter: drop-shadow(0 0 14px color-mix(in srgb, #ffd76a 50%, transparent));
+}
+
+.card[data-empty='true'] {
+  opacity: 0.78;
+}
+
+.card[data-empty='true'] .countBadge {
+  border-style: dashed;
+  color: var(--text-muted);
+}
+
+.card[data-realm='custom']::before {
+  background:
+    radial-gradient(ellipse at 30% 40%, color-mix(in srgb, #ffd76a 22%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, color-mix(in srgb, #ff9c5a 16%, transparent) 0%, transparent 60%);
+}
+
+/* 9.4 — Sety realm decorative background (rozdílné od custom, signature). */
+.card[data-realm='set']::before {
+  background:
+    radial-gradient(ellipse at 40% 30%, color-mix(in srgb, #6acfff 22%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, color-mix(in srgb, #5a8cff 16%, transparent) 0%, transparent 60%);
+}
+
+.card[data-realm='set'] .glyph {
+  filter: drop-shadow(0 0 14px color-mix(in srgb, #6acfff 50%, transparent));
+}
