@@ -1,0 +1,206 @@
+/* === Weather atmosphere overlay + particles ============================
+ * Spec 9.4 §3.1.1.
+ *
+ * Skin-agnostic tinty — neukotvujeme se na konkrétní accent skinu (počasí má
+ * vlastní semantiku, jen lehce přimíchaná přes mix-blend-mode: screen aby
+ * nepřebíjelo dark/light skin).
+ *
+ * `prefers-reduced-motion` → particles + lightning vypnuto, tint zůstává.
+ */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  z-index: 1;
+  transition: opacity 600ms ease;
+}
+
+.overlay[data-weather='clear'] {
+  background: radial-gradient(
+    circle at 80% 20%,
+    rgba(255, 209, 102, 0.55) 0%,
+    transparent 50%
+  );
+}
+
+.overlay[data-weather='cloudy'] {
+  background:
+    radial-gradient(
+      ellipse at 20% 10%,
+      rgba(163, 184, 200, 0.4) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 80% 30%,
+      rgba(163, 184, 200, 0.3) 0%,
+      transparent 50%
+    );
+}
+
+.overlay[data-weather='rain'] {
+  background:
+    linear-gradient(180deg, rgba(111, 163, 212, 0.22) 0%, transparent 60%),
+    repeating-linear-gradient(
+      105deg,
+      rgba(111, 163, 212, 0.4) 0px,
+      transparent 1px,
+      transparent 6px
+    );
+  opacity: 0.5;
+}
+
+.overlay[data-weather='storm'] {
+  background:
+    radial-gradient(
+      circle at 40% 30%,
+      rgba(178, 136, 255, 0.55) 0%,
+      transparent 40%
+    ),
+    linear-gradient(180deg, rgba(60, 30, 90, 0.4) 0%, transparent 60%);
+}
+
+.overlay[data-weather='snow'] {
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      rgba(224, 240, 255, 0.45) 0%,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 70% 50%,
+      rgba(224, 240, 255, 0.3) 0%,
+      transparent 30%
+    );
+}
+
+.overlay[data-weather='fog'] {
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    rgba(205, 200, 216, 0.5) 0%,
+    transparent 70%
+  );
+  backdrop-filter: blur(4px);
+}
+
+/* === Rain particles === */
+
+@keyframes rainDrop {
+  from {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  to {
+    transform: translateY(420px);
+    opacity: 0;
+  }
+}
+
+.rainParticles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.rainParticles span {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 18px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(180, 210, 240, 0.75)
+  );
+  animation: rainDrop 1.2s linear infinite;
+}
+
+/* === Snow particles === */
+
+@keyframes snowDrift {
+  from {
+    transform: translateY(-12px) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(420px) translateX(12px);
+    opacity: 0;
+  }
+}
+
+.snowParticles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.snowParticles span {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  filter: blur(0.5px);
+  animation: snowDrift 8s linear infinite;
+}
+
+/* === Storm lightning flash === */
+
+@keyframes lightningFlash {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  93% {
+    opacity: 0.65;
+  }
+  94% {
+    opacity: 0.1;
+  }
+  95% {
+    opacity: 0.55;
+  }
+  96% {
+    opacity: 0;
+  }
+}
+
+.lightning {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(255, 255, 255, 0.6) 0%,
+    transparent 60%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: lightningFlash 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rainParticles,
+  .snowParticles,
+  .lightning {
+    display: none;
+  }
+  .overlay {
+    transition: none;
+  }
+}

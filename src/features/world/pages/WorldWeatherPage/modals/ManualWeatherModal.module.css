@@ -1,0 +1,87 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 560px) {
+  .row {
+    flex-direction: column;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.textarea,
+.select {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.radioGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 42px;
+}
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  background: var(--input-bg, var(--surface-1));
+}
+
+.radio input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--accent);
+  height: 32px;
+}

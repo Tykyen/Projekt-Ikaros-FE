@@ -1,0 +1,259 @@
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 0;
+  min-height: 420px;
+  max-height: 60vh;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr;
+    max-height: none;
+  }
+}
+
+.list {
+  padding: 8px 4px 8px 0;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+@media (max-width: 720px) {
+  .list {
+    max-height: 50vh;
+  }
+}
+
+.searchBanner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  margin-bottom: 8px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.row:hover,
+.row:focus-visible {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border-color: var(--frame-border, var(--border));
+  outline: none;
+}
+
+.rowSelected {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.rowGlyph {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid var(--frame-border, var(--border));
+  flex-shrink: 0;
+}
+
+.rowInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rowName {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowSub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.rowMetrics {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.detail {
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+  border-left: 1px solid var(--frame-border, var(--border));
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+@media (max-width: 720px) {
+  .detail {
+    border-left: none;
+    border-top: 1px solid var(--frame-border, var(--border));
+  }
+}
+
+.detailHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detailGlyph {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.detailName {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+}
+
+.detailSub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.detailSection {
+  border-top: 1px solid var(--frame-border, var(--border-subtle));
+  padding-top: 12px;
+}
+
+.detailLabel {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.detailText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.trialGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.trialCell {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: 8px;
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.trialMonth {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.trialGlyph {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.trialTemp {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.trialDesc {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.detailActions {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--frame-border, var(--border-subtle));
+  display: flex;
+  gap: 8px;
+}
+
+.detailActions > button {
+  flex: 1;
+}
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty p {
+  margin: 0 0 16px;
+}
