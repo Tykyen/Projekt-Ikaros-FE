@@ -1,0 +1,424 @@
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--sp-4) var(--sp-3) var(--sp-6);
+}
+
+.header {
+  margin-bottom: var(--sp-3);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display, 'Orbitron', sans-serif);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--theme-heading);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: var(--sp-3);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    max-height: 50vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+}
+
+.sidebarSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.sidebarHeading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--theme-text-muted);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.toggle:hover {
+  background: var(--theme-surface-hover, rgba(255, 255, 255, 0.06));
+}
+
+.toggleActive {
+  background: var(--theme-accent-soft, rgba(124, 92, 255, 0.16));
+  border-color: var(--theme-accent, #7c5cff);
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.toolbar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  margin-bottom: var(--sp-2);
+}
+
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  color: var(--theme-text);
+  cursor: pointer;
+}
+
+.monthLabel {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--theme-heading);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.monthLabel:hover {
+  border-color: var(--theme-accent, #7c5cff);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+}
+
+.todayBtn {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.todayBtn:hover {
+  border-color: var(--theme-accent, #7c5cff);
+}
+
+.jumpPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--theme-surface, rgba(20, 10, 40, 0.96));
+  border: 1px solid var(--theme-accent, #7c5cff);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.jumpField {
+  padding: 4px 8px;
+  background: var(--theme-bg, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.jumpYear {
+  width: 90px;
+}
+
+.jumpApply {
+  padding: 4px 12px;
+  background: var(--theme-accent, #7c5cff);
+  border: 1px solid var(--theme-accent, #7c5cff);
+  border-radius: 4px;
+  color: var(--theme-bg, #000);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cellToday {
+  background: var(--theme-accent-soft, rgba(124, 92, 255, 0.14)) !important;
+  box-shadow: inset 0 0 0 2px var(--theme-accent, #7c5cff);
+}
+
+.cellToday .dayNum {
+  color: var(--theme-accent, #7c5cff);
+  font-weight: 700;
+}
+
+/* 9.2-FIX3 — multi-day span chipy se vizuálně spojí v jednu lištu.
+   Cell má padding 6px + grid gap 1px = 7px mezery, kterou musí negativní
+   margin pokrýt, aby chip přesahl přes hranici buňky bez viditelné šrámy. */
+
+.chipSpanStart {
+  margin-right: -7px;
+  padding-right: 8px;
+  border-radius: 3px 0 0 3px;
+  z-index: 1;
+}
+
+.chipSpanMiddle {
+  margin-left: -7px;
+  margin-right: -7px;
+  padding-left: 0;
+  padding-right: 0;
+  border-left: none;
+  border-radius: 0;
+  background: var(--chip-color, var(--theme-accent)) !important;
+  opacity: 0.85;
+}
+
+.chipSpanMiddle:hover {
+  opacity: 1;
+}
+
+.chipSpanEnd {
+  margin-left: -7px;
+  padding-left: 8px;
+  padding-right: 4px;
+  border-left: none;
+  border-radius: 0 3px 3px 0;
+  background: var(--chip-color, var(--theme-accent)) !important;
+  opacity: 0.85;
+}
+
+.chipSpanEnd:hover {
+  opacity: 1;
+}
+
+/* Restart na pondělí — middle/end chip se vizuálně chová jako start. */
+.chipSpanRestart {
+  margin-left: 0;
+  padding-left: 6px;
+  border-left: 3px solid var(--chip-color, var(--theme-accent));
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  background: var(--chip-bg, var(--theme-accent-soft, rgba(124, 92, 255, 0.16))) !important;
+  color: var(--theme-text);
+  opacity: 1;
+}
+
+.chipSpanRestart:hover {
+  background: var(--chip-color, var(--theme-accent)) !important;
+  color: var(--theme-bg);
+}
+
+/* Legacy continuation styl — zachovaný pro back-compat, nepoužitý po 9.2-FIX3. */
+.chipContinuation {
+  opacity: 0.72;
+  font-style: italic;
+  background: transparent !important;
+}
+
+.chipContinuation::before {
+  content: '↳ ';
+  opacity: 0.55;
+  font-style: normal;
+}
+
+.calSelect {
+  padding: 6px 10px;
+  background: var(--theme-bg, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--theme-border);
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.grid {
+  display: grid;
+  gap: 1px;
+  background: var(--theme-border);
+  border: 1px solid var(--theme-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.weekday {
+  padding: var(--sp-1);
+  background: var(--theme-surface);
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--theme-text-muted);
+}
+
+.cell {
+  position: relative;
+  min-height: 100px;
+  padding: 6px;
+  background: var(--theme-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cellOutside {
+  opacity: 0.4;
+}
+
+.cellHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.dayNum {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--theme-text);
+}
+
+/* 9.4 Heat density — počet eventů vedle čísla dne. */
+.heatCount {
+  color: var(--theme-text-muted, rgba(255, 255, 255, 0.65));
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cellHeatClickable {
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.cellHeatClickable:hover {
+  transform: scale(1.02);
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cellHeatClickable:focus-visible {
+  outline: 2px solid var(--theme-accent, #7c5cff);
+  outline-offset: -2px;
+  z-index: 2;
+}
+
+.lunarRow {
+  display: flex;
+  gap: 2px;
+}
+
+.lunarIcon {
+  font-size: 11px;
+  cursor: help;
+}
+
+.eventChip {
+  padding: 2px 5px;
+  background: var(--chip-bg);
+  border-left: 3px solid var(--chip-color);
+  border-radius: 2px;
+  color: var(--theme-text);
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eventChip:hover {
+  background: var(--chip-color);
+  color: var(--theme-bg);
+}
+
+/* 9.4 — "+N dalších" link, otevírá DayDetailDrawer. */
+.overflowLink {
+  padding: 1px 6px;
+  margin-top: 2px;
+  background: transparent;
+  border: 1px dashed var(--theme-accent, #7c5cff);
+  border-radius: 3px;
+  color: var(--theme-accent, #7c5cff);
+  font-family: var(--font-body);
+  font-size: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.overflowLink:hover {
+  background: var(--theme-accent, #7c5cff);
+  color: var(--theme-bg, #000);
+}
+
+.overflowLink:focus-visible {
+  outline: 2px solid var(--theme-accent, #7c5cff);
+  outline-offset: 1px;
+}
+
+@media (max-width: 900px) {
+  .cell {
+    min-height: 70px;
+  }
+  .eventChip {
+    font-size: 10px;
+  }
+}
