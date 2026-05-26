@@ -1,0 +1,446 @@
+/* 8.6 — Multi-account FinanceTab — switcher, modaly, settings.
+ * Theme-agnostic přes CSS vars (sdílí stejnou paletu jako subdocs.module.css).
+ */
+
+/* ── Account switcher ─────────────────────────────────────────────── */
+.switcherRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.switcherTabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.switcherTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.switcherTab:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.switcherTabActive {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: var(--accent);
+  color: var(--accent-bright);
+}
+
+.sharedBadge {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.switcherSelect {
+  padding: 6px 12px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  min-width: 240px;
+}
+
+.switcherEmpty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: center;
+  padding: var(--sp-5);
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-md);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.createBtn:hover {
+  background: var(--accent);
+  color: var(--text-on-accent, #fff);
+}
+
+/* ── Summary banner (multi-currency totals) ──────────────────────── */
+.summaryBanner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  margin-bottom: var(--sp-3);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.summaryLabel {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.summaryValue {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  color: var(--accent-bright);
+}
+
+/* ── Modal (Create + Transfer) ────────────────────────────────────── */
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 320px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field > span,
+.fieldLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.input {
+  padding: 8px 10px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-sm);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.warn {
+  color: var(--accent-danger, #ff5764);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.muted {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+
+.transferFrom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--sp-3);
+  border-left: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────── */
+.btnPrimary,
+.btnSecondary,
+.btnDanger {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.btnPrimary {
+  background: var(--accent);
+  color: var(--text-on-accent, #fff);
+  border: 1px solid var(--accent);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  color: var(--text-primary);
+}
+
+.btnSecondary:hover {
+  border-color: var(--accent);
+}
+
+.btnDanger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--accent-danger, #ff5764);
+  color: var(--accent-danger, #ff5764);
+}
+
+.btnDanger:hover {
+  background: var(--accent-danger, #ff5764);
+  color: #fff;
+}
+
+.iconBtn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.iconBtn:hover {
+  border-color: var(--accent-danger, #ff5764);
+  color: var(--accent-danger, #ff5764);
+}
+
+/* ── Settings card (PJ-only) ─────────────────────────────────────── */
+.settingsCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  margin-top: var(--sp-4);
+}
+
+.settingsTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.settingsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+}
+
+.settingsRow {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--sp-3);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+}
+
+.settingsRow dt {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.settingsRow dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.settingsHint {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+.settingsActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Co-owners ────────────────────────────────────────────────────── */
+.coOwners {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--frame-border);
+}
+
+.coOwnerTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.coOwnerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coOwnerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 6px 10px;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  font-size: var(--text-sm);
+}
+
+.primaryBadge {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--text-on-accent, #fff);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.coOwnerAdd {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.coOwnerAdd .input {
+  flex: 1;
+}
+
+.dangerZone {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--frame-border);
+}
+
+/* ── Mobile ≤ 768px ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .switcherTabs {
+    width: 100%;
+  }
+
+  .switcherTab {
+    flex: 1;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .switcherSelect {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .createBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .btnPrimary,
+  .btnSecondary,
+  .btnDanger {
+    min-height: 44px;
+  }
+
+  .settingsRow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .coOwnerAdd {
+    flex-direction: column;
+  }
+}
+
+/* Spec 8.x-prep §4.3 (B3) — allowPlayerSelfAdjust checkbox row. */
+.checkboxRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-weight: normal;
+}
+
+.checkboxRow input[type='checkbox'] {
+  margin-top: 4px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.helperInline {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
