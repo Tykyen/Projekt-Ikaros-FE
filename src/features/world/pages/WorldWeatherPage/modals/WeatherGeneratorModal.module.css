@@ -1,0 +1,369 @@
+.tabPanel {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 560px) {
+  .row {
+    flex-direction: column;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.suffix {
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-muted);
+}
+
+.textarea,
+.textInput,
+.numberInput {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+}
+
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.textarea:focus,
+.textInput:focus,
+.numberInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.radioGroup {
+  display: flex;
+  gap: 8px;
+  height: 42px;
+  align-items: center;
+}
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  background: var(--input-bg, var(--surface-1));
+}
+
+.radio input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.toggleRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggleRow input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  background: color-mix(in srgb, var(--surface-2) 50%, transparent);
+  border: 1px dashed var(--frame-border, var(--border));
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.subsection {
+  padding-top: 12px;
+  border-top: 1px solid var(--frame-border, var(--border-subtle));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subsectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.subsectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.sumBadge {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+
+.sumOk {
+  color: #6cd49b;
+  border-color: color-mix(in srgb, #6cd49b 40%, transparent);
+  background: color-mix(in srgb, #6cd49b 10%, transparent);
+}
+
+.sumWarn {
+  color: #ffd166;
+  border-color: color-mix(in srgb, #ffd166 40%, transparent);
+  background: color-mix(in srgb, #ffd166 10%, transparent);
+}
+
+.weatherList,
+.customFieldList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weatherRow {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 8px;
+  align-items: end;
+  padding: 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-1) 60%, transparent);
+  border: 1px solid var(--frame-border, var(--border-subtle));
+}
+
+@media (max-width: 720px) {
+  .weatherRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.weatherLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.inlineField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.inlineField > input {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg, var(--surface-1));
+  border: 1px solid var(--frame-border, var(--border));
+  border-radius: 6px;
+  padding: 6px 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.customFieldRow {
+  display: grid;
+  grid-template-columns: 1fr 2fr 90px 40px;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 720px) {
+  .customFieldRow {
+    grid-template-columns: 1fr 1fr;
+  }
+  .customFieldRow > input:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+}
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--frame-border, var(--border));
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.removeBtn:hover {
+  color: var(--danger, var(--accent));
+  border-color: var(--danger, var(--accent));
+}
+
+
+/* 9.4-dluh — Inline „Uložit jako preset" form */
+.savePresetForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  margin: 0 0 16px;
+  border: 1px dashed var(--accent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface-1));
+}
+
+.savePresetHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.savePresetHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.savePresetRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .savePresetRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.savePresetActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.savePresetClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.savePresetClose:hover {
+  color: var(--text-primary);
+  background: var(--surface-2);
+}
+
+/* 9.4-J — warning banner: generátor bez klimatického modelu */
+.climateWarning {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 0 0 16px;
+  border-radius: 12px;
+  background: var(--warning-soft, color-mix(in srgb, var(--accent) 8%, var(--surface-1)));
+  border: 1px solid var(--warning-soft-border, var(--accent));
+  color: var(--text-primary);
+}
+
+.climateWarning > svg {
+  flex: 0 0 auto;
+  color: var(--warning, var(--accent));
+}
+
+.climateWarningBody {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+  min-width: 0;
+}
+
+.climateWarningBody strong {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.climateWarningBody span {
+  color: var(--text-muted);
+}
+
+@media (max-width: 600px) {
+  .climateWarning {
+    flex-wrap: wrap;
+  }
+  .climateWarningBody {
+    flex-basis: 100%;
+    order: 2;
+  }
+  .climateWarning > button {
+    margin-left: auto;
+  }
+}
