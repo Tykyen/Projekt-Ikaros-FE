@@ -1,0 +1,42 @@
+/**
+ * 10.2d-prep-A C7 — EntitySchemaForm layout.
+ *
+ * Responzivní: mobil = stacked 1 sloupec, desktop = grid auto-fit
+ * (max 5 sloupců pro číselné staty per Matrix legacy ref).
+ */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  /* Pro sekce s number-heavy (main-stats v DrD2 bestii) → 5 sloupců.
+     Auto-fit handle pokud field má širší label. */
+  .fieldsGrid[data-section-key='main-stats'],
+  .fieldsGrid[data-section-key='combat'],
+  .fieldsGrid[data-section-key='health'] {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+}

@@ -1,0 +1,97 @@
+/**
+ * 10.2d-prep-A C8 — EntityStatbar layout (mirror Matrix legacy side panel).
+ */
+.statbar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(120, 100, 255, 0.15);
+}
+
+.fieldsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.statRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  background: rgba(10, 8, 32, 0.3);
+  border-radius: 4px;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.statValue {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Damageable progress bar — mirror Matrix legacy HP bar layout. */
+.statBar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 6px;
+  background: rgba(10, 8, 32, 0.3);
+  border-radius: 4px;
+}
+
+.statBarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.barTrack {
+  position: relative;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(120, 100, 255, 0.15);
+}
+
+.barFill {
+  height: 100%;
+  transition: width 0.25s ease, background 0.25s ease;
+  border-radius: 4px;
+}
+
+.barFull {
+  background: linear-gradient(90deg, #44ff80, #66dd66);
+}
+.barMid {
+  background: linear-gradient(90deg, #ffd040, #ffa030);
+}
+.barLow {
+  background: linear-gradient(90deg, #ff5060, #ff3050);
+}
