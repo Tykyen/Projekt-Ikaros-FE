@@ -1,0 +1,28 @@
+/**
+ * 10.2a — TacticalMapView container styling.
+ * Full-bleed viewport (parent: WorldLayout `isMapPage` branch řeší padding=0,
+ * overflow hidden). Pointer events na viewport, ne na canvas — pan/zoom hooks
+ * binds přes ref.
+ */
+.viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* 10.2c hotfix — parent `.main` ve WorldLayout má flex:1 ale child Outlet
+     div nemusí předat height; fallback minimum = zbytek viewportu po headeru.
+     Bez tohoto by viewport mohl mít 0 výšku a empty state (inset:0) by byl
+     neviditelný (matrix rain pozadí by prosakovalo). */
+  min-height: calc(100svh - var(--header-h, 60px));
+  overflow: hidden;
+  background: var(--map-canvas-bg);
+  /* Disable browser native gestures (pinch zoom by triggered zoom page-level) */
+  touch-action: none;
+  /* Disable text selection během drag */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.canvasWrapper {
+  position: absolute;
+  inset: 0;
+}
