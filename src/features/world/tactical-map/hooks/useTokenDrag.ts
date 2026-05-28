@@ -1,0 +1,149 @@
+/**
+ * 10.2d-B — drag&drop tokens (pointer down/move/up).
+ *
+ * Drag start: pointerdown na sprite. Window-level pointermove/up pro
+ * continuous tracking i mimo viewport. pointerup: snap-to-hex → callback
+ * `onDrop(tokenId, q, r)`.
+ *
+ * Plán: docs/arch/phase-10/plan-10.2d.md C4.
+ */
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { FederatedPointerEvent } from 'pixi.js';
+import { pixelToAxial } from '../hexUtils';
+import type { HexConfig, MapToken, Point } from '../types';
+
+interface ViewportState {
+  zoom: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+interface Args {
+  viewport: ViewportState;
+  config: HexConfig;
+  onDrop: (tokenId: string, q: number, r: number) => void;
+}
+
+interface DragState {
+  token: MapToken;
+  startQ: number;
+  startR: number;
+  /** Posun v mapa-space od původní pozice (pro live preview). */
+  delta: Point;
+}
+
+export function useTokenDrag({ viewport, config, onDrop }: Args): {
+  dragState: DragState | null;
+  handleTokenPointerDown: (e: FederatedPointerEvent, token: MapToken) => void;
+} {
+  const [dragState, setDragState] = useState<DragState | null>(null);
+  const dragRef = useRef<{
+    token: MapToken;
+    startScreenX: number;
+    startScreenY: number;
+  } | null>(null);
+
+  const screenToMapaDelta = useCallback(
+    (dxScreen: number, dyScreen: number): Point => ({
+      x: dxScreen / viewport.zoom,
+      y: dyScreen / viewport.zoom,
+    }),
+    [viewport.zoom],
+  );
+
+  // Window pointermove / pointerup pro tracking i mimo Pixi canvas.
+  // Listenery jsou trvalé; checkují `dragRef.current` per call (no-op pokud
+  // null = žádný aktivní drag).
+  useEffect(() => {
+    const handleMove = (e: PointerEvent): void => {
+      const start = dragRef.current;
+      if (!start) return;
+      const dx = e.clientX - start.startScreenX;
+      const dy = e.clientY - start.startScreenY;
+      setDragState({
+        token: start.token,
+        startQ: start.token.q,
+        startR: start.token.r,
+        delta: screenToMapaDelta(dx, dy),
+      });
+    };
+    const handleUp = (e: PointerEvent): void => {
+      const start = dragRef.current;
+      dragRef.current = null;
+      if (!start) {
+        setDragState(null);
+        return;
+      }
+      const dx = e.clientX - start.startScreenX;
+      const dy = e.clientY - start.startScreenY;
+      // Pokud minimální posun, treat jako click (no drop).
+      if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
+        setDragState(null);
+        return;
+      }
+      const delta = screenToMapaDelta(dx, dy);
+      // axialToPixel(token.q, token.r) + delta → pixelToAxial.
+      // Pro snap-to-hex spočítáme target pixel pozici:
+      // currentPixel = axialToPixel(start.token.q, start.token.r, config.size)
+      // targetPixel = currentPixel + delta
+      // pixelToAxial(targetPixel.x - originX, targetPixel.y - originY, size)
+      // → q, r
+      // (inline import abychom nezasahovali to useCallback dep)
+      import('../hexUtils').then(({ axialToPixel }) => {
+        const cur = axialToPixel(
+          start.token.q,
+          start.token.r,
+          config.size,
+        );
+        const targetX = cur.x + delta.x;
+        const targetY = cur.y + delta.y;
+        const target = pixelToAxial(targetX, targetY, config.size);
+        setDragState(null);
+        // Pokud cílový hex shodný s původním → neukládat.
+        if (target.q === start.token.q && target.r === start.token.r) return;
+        onDrop(start.token.id, target.q, target.r);
+      });
+    };
+    const handleCancel = (): void => {
+      dragRef.current = null;
+      setDragState(null);
+    };
+    const handleEsc = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') handleCancel();
+    };
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    window.addEventListener('pointercancel', handleCancel);
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+      window.removeEventListener('pointercancel', handleCancel);
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [config.size, onDrop, screenToMapaDelta]);
+
+  const handleTokenPointerDown = useCallback(
+    (e: FederatedPointerEvent, token: MapToken): void => {
+      // 10.2c-edit-9e fix — `e.client.x/y` (window-relative) místo `e.global`
+      // (canvas-relative). Window pointerup používá `e.clientX/Y` (window),
+      // takže předchozí porovnání `clientX - global.x` dalo fake delta =
+      // canvas window offset (typicky ~200px dolů kvůli headeru) → token
+      // skočil dolů při každém kliku.
+      dragRef.current = {
+        token,
+        startScreenX: e.client.x,
+        startScreenY: e.client.y,
+      };
+      setDragState({
+        token,
+        startQ: token.q,
+        startR: token.r,
+        delta: { x: 0, y: 0 },
+      });
+    },
+    [],
+  );
+
+  return { dragState, handleTokenPointerDown };
+}
