@@ -1,0 +1,107 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(10, 8, 32, 0.4);
+  border: 1px solid rgba(120, 100, 255, 0.12);
+  border-radius: 6px;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.item:hover {
+  background: rgba(120, 100, 255, 0.12);
+  border-color: rgba(120, 100, 255, 0.4);
+}
+
+.current {
+  background: rgba(120, 100, 255, 0.18);
+  border-color: rgba(120, 100, 255, 0.5);
+  font-weight: 700;
+}
+
+.name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.editBtn {
+  background: rgba(120, 100, 255, 0.15);
+  color: var(--map-toolbar-text);
+  border: 1px solid rgba(120, 100, 255, 0.3);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.editBtn:hover {
+  background: rgba(120, 100, 255, 0.3);
+  border-color: rgba(120, 100, 255, 0.6);
+}
+
+/* 10.2c-edit-1 — deaktivace scény (scene.deactivate op + cascade unassign) */
+.deactivateBtn {
+  background: rgba(220, 60, 60, 0.12);
+  color: var(--map-toolbar-text, #d8d2ff);
+  border: 1px solid rgba(220, 60, 60, 0.3);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.deactivateBtn:hover {
+  background: rgba(220, 60, 60, 0.28);
+  border-color: rgba(220, 60, 60, 0.6);
+}
+
+/* 10.2c-edit-1 mobil-desktop — touch min 44×44 na touch zařízeních
+   (pointer:coarse). Desktop ponechán kompaktní 28×28. */
+@media (pointer: coarse) {
+  .editBtn,
+  .deactivateBtn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+}
+
+.empty {
+  font-size: 12px;
+  opacity: 0.5;
+  font-style: italic;
+  margin: 0;
+}
