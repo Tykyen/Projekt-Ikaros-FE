@@ -1,0 +1,303 @@
+/**
+ * 10.2c-edit-9g — TokenInfoPanel — 3-mode side panel styling.
+ *
+ * Per-mode pozice:
+ *   - dock: fixed right, full height, width prop driven
+ *   - drag: absolute centered + translate (driven by JS transform)
+ *   - overlay: absolute centered, fixed width, dim backdrop
+ */
+
+.panel {
+  background: linear-gradient(
+    155deg,
+    rgba(20, 14, 50, 0.96),
+    rgba(10, 6, 28, 0.98)
+  );
+  backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(120, 100, 255, 0.32);
+  color: var(--map-toolbar-text, #e8e0ff);
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    -8px 0 32px rgba(0, 0, 0, 0.55),
+    0 0 24px rgba(120, 100, 255, 0.12),
+    inset 1px 0 0 rgba(255, 255, 255, 0.04);
+  /* 10.2c-edit-9g fix — world top nav je `--z-sticky: 200`. Panel musí být
+     NAD ním, jinak nav zakryje vrchní část panelu (mode toggle + close). */
+  z-index: 400;
+  overflow: hidden;
+}
+
+/* ── DOCK MODE — fixed right side, full height MINUS world top nav ── */
+.modeDock {
+  position: fixed;
+  top: var(--header-h, 56px);
+  right: 0;
+  height: calc(100vh - var(--header-h, 56px));
+  height: calc(100dvh - var(--header-h, 56px));
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  border-left: 2px solid rgba(120, 100, 255, 0.4);
+  border-radius: 0;
+}
+
+.resizeHandle {
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  z-index: 1;
+  background: transparent;
+  transition: background 120ms ease;
+}
+
+.resizeHandle:hover {
+  background: rgba(120, 100, 255, 0.35);
+}
+
+.resizeHandle:active {
+  background: rgba(180, 140, 255, 0.55);
+}
+
+/* ── DRAG MODE — absolute centered, JS transform ────────────────── */
+.modeDrag {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 480px;
+  max-width: 92vw;
+  max-height: 85vh;
+  border-radius: 10px;
+}
+
+.dragging {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── OVERLAY MODE — centered modal ──────────────────────────────── */
+.overlayBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 399; /* těsně pod panelem (400) */
+  backdrop-filter: blur(2px);
+}
+
+.modeOverlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 440px;
+  max-width: 94vw;
+  max-height: 88vh;
+  border-radius: 10px;
+}
+
+/* ── HEADER ──────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  /* 10.2c-edit-9g — vyšší kontrast (původní 0.06 bg byl téměř neviditelný).
+     Teď výrazný fialový pruh aby user viděl mode toggle + close. */
+  background: linear-gradient(
+    180deg,
+    rgba(120, 100, 255, 0.22),
+    rgba(120, 100, 255, 0.12)
+  );
+  border-bottom: 1px solid rgba(120, 100, 255, 0.45);
+  flex-shrink: 0;
+  min-height: 52px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(120, 100, 255, 0.16);
+  border: 1px solid rgba(120, 100, 255, 0.45);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(220, 235, 255, 0.95);
+}
+
+.headerSpacer {
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.modeToggle {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(10, 6, 28, 0.75);
+  border: 1px solid rgba(120, 100, 255, 0.55);
+  border-radius: 6px;
+}
+
+.modeBtn {
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+  min-width: 32px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modeBtn:hover {
+  background: rgba(120, 100, 255, 0.18);
+  color: #fff;
+}
+
+.modeBtnActive {
+  background: rgba(120, 100, 255, 0.32);
+  color: #fff;
+}
+
+.closeBtn {
+  padding: 4px 10px;
+  background: transparent;
+  color: rgba(220, 235, 255, 0.7);
+  border: 1px solid rgba(120, 100, 255, 0.2);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 120ms,
+    border-color 120ms;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 80, 96, 0.18);
+  border-color: rgba(255, 80, 96, 0.5);
+  color: #ff9090;
+}
+
+/* ── IDENTITY ROW (avatar + jméno) ─────────────────────────────── */
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-bottom: 1px solid rgba(120, 100, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(20, 14, 50, 0.8);
+  border: 2px solid rgba(120, 100, 255, 0.45);
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(120, 100, 255, 0.18);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.name {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+/* ── BODY (scrollable) ─────────────────────────────────────────── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  /* 10.2c-edit-9g fix — no horizontal overflow (MatrixSheet 2-col layout
+     se musí zúžit místo přetékat). */
+  overflow-x: hidden;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 100, 255, 0.3) transparent;
+}
+
+.body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.body::-webkit-scrollbar-thumb {
+  background: rgba(120, 100, 255, 0.3);
+  border-radius: 4px;
+}
+
+.body::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 100, 255, 0.55);
+}
+
+/* ── Responsive: mobile force overlay ──────────────────────────── */
+@media (max-width: 640px) {
+  .modeDock,
+  .modeDrag {
+    /* Mobile overlay enforce — usePanelMode už forcuje, ale tady fallback. */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    width: 94vw !important;
+    max-height: 88vh;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(120, 100, 255, 0.4);
+  }
+
+  .resizeHandle {
+    display: none;
+  }
+
+  .name {
+    font-size: 18px;
+  }
+
+  .avatar {
+    width: 56px;
+    height: 56px;
+  }
+}
