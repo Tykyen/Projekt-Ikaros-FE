@@ -1,0 +1,135 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.dialog {
+  background: rgba(20, 14, 50, 0.95);
+  color: var(--map-toolbar-text);
+  border: 1px solid rgba(120, 100, 255, 0.4);
+  border-radius: 8px;
+  padding: 20px 22px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.title {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.counts {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.counts li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(10, 8, 32, 0.5);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.label {
+  opacity: 0.85;
+}
+
+.count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(120, 200, 120, 0.95);
+}
+
+.empty {
+  font-size: 13px;
+  opacity: 0.6;
+  font-style: italic;
+  margin: 0 0 14px;
+}
+
+.warn {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  background: rgba(255, 180, 80, 0.12);
+  border: 1px solid rgba(255, 180, 80, 0.35);
+  border-radius: 4px;
+  font-size: 12px;
+  color: rgba(255, 200, 130, 0.95);
+}
+
+.note {
+  margin: 0 0 16px;
+  font-size: 11px;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cancelBtn,
+.confirmBtn {
+  padding: 7px 16px;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 120ms ease;
+}
+
+.cancelBtn {
+  background: rgba(120, 100, 255, 0.1);
+  color: var(--map-toolbar-text);
+  border-color: rgba(120, 100, 255, 0.25);
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: rgba(120, 100, 255, 0.18);
+}
+
+.confirmBtn {
+  background: rgba(255, 80, 100, 0.25);
+  color: #ffd0d6;
+  border-color: rgba(255, 80, 100, 0.6);
+}
+
+.confirmBtn:hover:not(:disabled) {
+  background: rgba(255, 80, 100, 0.4);
+}
+
+.cancelBtn:disabled,
+.confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* mobil — užší modal */
+@media (max-width: 540px) {
+  .dialog {
+    padding: 16px;
+  }
+  .title {
+    font-size: 15px;
+  }
+}
