@@ -1,0 +1,27 @@
+/**
+ * 10.2c-edit-9b — embed container pro DiaryTab uvnitř TokenStatbarModal.
+ * Omezuje výšku + povoluje vertikální scroll. Vlastní layout DiaryTab
+ * zachovaný (sticky bar funguje jako modal-internal sticky).
+ */
+.embed {
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 0 -16px; /* protáhnout přes padding modal body pro full-width sheets */
+  padding: 0 16px;
+}
+
+.embed :global(.diary-edit-sticky-bar),
+.embed :global([class*='EditStickyBar']) {
+  /* Sticky bottom relativní k embed kontejneru, ne window */
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+}
+
+@media (max-width: 640px) {
+  .embed {
+    max-height: 55vh;
+    margin: 0 -10px;
+    padding: 0 10px;
+  }
+}
