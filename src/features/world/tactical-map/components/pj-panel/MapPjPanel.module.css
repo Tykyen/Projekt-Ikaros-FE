@@ -1,0 +1,146 @@
+/**
+ * 10.2c — PJ orchestrator panel (right-side floating).
+ * Sbalitelný — default sbalený, PJ rozbalí kliknutím.
+ */
+.panel {
+  /* 10.2c-edit-4 — přesun z right-top do left-bottom (user feedback).
+     Solid background (žádné průsvitné rgba/blur — user feedback). */
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  background: var(--map-toolbar-bg-solid, #0a0814);
+  color: var(--map-toolbar-text);
+  border: 1px solid rgba(120, 100, 255, 0.45);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 90;
+  pointer-events: auto;
+  overflow: hidden;
+  font-family: var(--font-mono);
+}
+
+/* 10.2c-edit-4 mobil-desktop — na úzkých displejích panel zabere skoro celou
+   šířku ve spodu s 12px paddingem ze stran, hlavička poskytne větší touch target. */
+@media (max-width: 480px) {
+  .panel {
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: calc(100vh - 140px);
+  }
+
+  .header {
+    padding: 14px 16px;
+  }
+
+  .body {
+    padding: 14px 12px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(120, 100, 255, 0.1);
+  border-bottom: 1px solid rgba(120, 100, 255, 0.15);
+  cursor: pointer;
+  user-select: none;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.chevron {
+  font-size: 12px;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px 14px;
+  overflow-y: auto;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 4px;
+}
+
+.newSceneBtn {
+  background: rgba(120, 100, 255, 0.2);
+  color: var(--map-toolbar-text);
+  border: 1px solid rgba(120, 100, 255, 0.4);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.newSceneBtn:hover:not(:disabled) {
+  background: rgba(120, 100, 255, 0.35);
+  border-color: rgba(120, 100, 255, 0.7);
+}
+
+.newSceneBtn:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.error {
+  font-size: 11px;
+  color: #ff7080;
+  margin: 4px 0 0 0;
+  line-height: 1.4;
+}
+
+.empty {
+  font-size: 12px;
+  opacity: 0.5;
+  font-style: italic;
+}

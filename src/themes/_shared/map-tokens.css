@@ -1,0 +1,48 @@
+/* ────────────────────────────────────────────────────────────
+   10.2-prep-4 — Tokeny pro taktickou mapu (`/svet/:worldId/takticka-mapa`).
+
+   Žije v `_shared/` (defaults), protože PixiJS renderer 10.2a čte hodnoty
+   přes `getComputedStyle(document.documentElement)` a webGL plátno není pod
+   CSS cascade. Per-skin overrides patří do `themes/<skin>/index.css` přes
+   `[data-theme="<skin>"]` selector (per memory feedback_theme_isolation).
+
+   Defaultní hodnoty odpovídají skinu „ikaros" (fialové synthwave) —
+   ostatní skiny si je přepíší.
+
+   Spec: docs/takticka-mapa-matrix.md §23.8 (theming via world CSS vars).
+──────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Plátno + grid ─────────────────────────────────────── */
+  --map-canvas-bg: #0a0814;
+  --map-grid-stroke: rgba(180, 120, 255, 0.3);
+  --map-grid-stroke-width: 1px;
+
+  /* ── Tokeny (PC/NPC ringy + HP bar) ────────────────────── */
+  --map-token-ring-default: #3a3550;
+  --map-token-ring-selected: #b48cff;
+  --map-token-ring-active-turn: #ffd700; /* zlatá — combat tracker glow */
+  --map-token-hp-bar-bg: rgba(0, 0, 0, 0.5);
+
+  /* ── Mlha války (PJ vs hráč) ───────────────────────────── */
+  --map-fog-pj-fill: rgba(70, 75, 95, 0.16); /* semi-transparent — PJ */
+  --map-fog-player-fill: rgba(170, 180, 200, 0.94); /* opaque — hráč */
+
+  /* ── Efekty (color/barrier/explosion variants) ─────────── */
+  --map-effect-color-default: rgba(180, 120, 255, 0.35);
+  --map-effect-barrier-fill: rgba(255, 220, 40, 0.35);
+  --map-effect-barrier-glow: rgba(255, 210, 0, 0.8);
+  --map-effect-fire-base: #ff4444;
+  --map-effect-gas-base: #22cc44;
+  --map-effect-smoke-base: #aaaaaa;
+
+  /* ── Ping (dvouklik anywhere) ──────────────────────────── */
+  --map-ping-color: var(--primary, #b48cff);
+
+  /* ── Toolbar chrome (overrides z world theme — fallback inherit) ── */
+  --map-toolbar-bg: var(--surface-2, rgba(10, 8, 32, 0.85));
+  --map-toolbar-text: var(--text-primary, rgba(220, 235, 255, 0.9));
+  /* 10.2c-edit-4 — solid varianta pro PJ panel (overlay nad mapou,
+     průsvitnost ruší čitelnost). Per-skin override v themes/<skin>/. */
+  --map-toolbar-bg-solid: var(--surface-1, #0a0814);
+}
