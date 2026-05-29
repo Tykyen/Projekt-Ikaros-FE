@@ -1,0 +1,493 @@
+/**
+ * 10.2c-edit-9h — GURPS kompaktní bojový panel.
+ *
+ * Vizuální port `C:/Matrix/Matrix/frontend/src/components/Map/
+ * GurpsMapDiaryOverlay.tsx` + `MapDndOverlay.scss` (.mx-map-dnd*,
+ * .gurps-map-table) do Ikaros dark theme.
+ *
+ * Vibe: utilitarian/military — chladná modrá (#38bdf8 = HP/skill accent),
+ * žlutá (#fbbf24 = cena), červená (#ef4444 = damage). Tlumenější paleta
+ * než DnD (žlutě/oranžové) a Matrix (purple synthwave).
+ */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: 'Inter', sans-serif;
+  color: #e2e8f0;
+  width: 100%;
+}
+
+.loading,
+.empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* ─── Sekce ─── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.18);
+  padding-bottom: 4px;
+}
+
+.sectionTitle {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #cbd5e1;
+  margin: 0;
+  font-weight: 700;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  padding-bottom: 4px;
+}
+
+.metaItem {
+  white-space: nowrap;
+}
+
+.metaPoints {
+  margin-left: auto;
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+/* ─── Vitals ─── */
+.vitalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 8px;
+}
+
+.vital {
+  background: rgba(20, 25, 40, 0.6);
+  border: 1px solid rgba(120, 140, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+}
+
+.vitalAccentHp {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(40, 18, 18, 0.55);
+}
+
+.vitalAccentFp {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(18, 28, 40, 0.55);
+}
+
+.vitalLabel {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.vitalValue {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Cinzel', 'Inter', serif;
+  line-height: 1.1;
+}
+
+.vitalInput {
+  width: 48px;
+  text-align: center;
+  background: transparent;
+  border: 1px solid rgba(120, 140, 255, 0.18);
+  border-radius: 4px;
+  color: #fff;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 2px 0;
+  outline: none;
+  appearance: textfield;
+}
+
+.vitalInput::-webkit-inner-spin-button,
+.vitalInput::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.vitalInput:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+.vitalInput:read-only {
+  border-color: transparent;
+}
+
+.vitalMax {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ─── Defenses row (DR / Parry / Block / TL) ─── */
+.defensesRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.defenseCard {
+  flex: 1 1 60px;
+  min-width: 56px;
+  background: rgba(10, 15, 25, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.defenseLabel {
+  display: block;
+  font-size: 0.62rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.defenseValue {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-top: 2px;
+  font-family: monospace;
+}
+
+/* ─── Attributes ─── */
+.attrsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 6px;
+}
+
+.attrCard {
+  background: rgba(10, 15, 25, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.attrCard:hover:not(:disabled) {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
+}
+
+.attrCard:disabled {
+  cursor: default;
+}
+
+.attrLabel {
+  display: block;
+  font-size: 0.62rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.attrValue {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 4px;
+  font-family: 'Cinzel', 'Inter', serif;
+}
+
+/* ─── Derived (BL / Thr / Sw / Speed / Move) ─── */
+.derivedRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.derivedCard {
+  flex: 1 1 70px;
+  min-width: 60px;
+  background: rgba(10, 15, 25, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.derivedLabel {
+  display: block;
+  font-size: 0.6rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.derivedValue {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-top: 2px;
+  font-family: monospace;
+}
+
+/* ─── Initiative button ─── */
+.initiativeBtn {
+  padding: 4px 12px;
+  background: rgba(56, 189, 248, 0.16);
+  color: #bae6fd;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+
+.initiativeBtn:hover {
+  background: rgba(56, 189, 248, 0.28);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+}
+
+.initiativeBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Skills list ─── */
+.skillsList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+@media (max-width: 480px) {
+  .skillsList {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skillRow {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.skillRow:hover:not(:disabled) {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: rgba(0, 229, 255, 0.3);
+}
+
+.skillRow:disabled {
+  cursor: default;
+}
+
+.skillLvl {
+  font-family: monospace;
+  font-weight: 700;
+  color: #38bdf8;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.skillName {
+  font-size: 0.78rem;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skillBase {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.emptyHint {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.78rem;
+  padding: 8px;
+  font-style: italic;
+}
+
+/* ─── Combat tables (melee / ranged / armor) ─── */
+.combatTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.combatTable thead {
+  background: rgba(10, 15, 25, 0.8);
+}
+
+.combatTable th {
+  padding: 6px 6px;
+  color: #cbd5e1;
+  font-weight: 600;
+  border-bottom: 2px solid rgba(0, 229, 255, 0.3);
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.combatTable th:first-child {
+  border-top-left-radius: 6px;
+  text-align: left;
+}
+
+.combatTable th:last-child {
+  border-top-right-radius: 6px;
+}
+
+.combatTable tbody tr {
+  background: rgba(20, 25, 30, 0.4);
+  transition: background 0.2s;
+}
+
+.combatTable tbody tr:nth-child(even) {
+  background: rgba(30, 35, 45, 0.3);
+}
+
+.combatTable tbody tr:hover {
+  background: rgba(0, 229, 255, 0.05);
+}
+
+.combatTable td {
+  padding: 5px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.combatTable td:first-child {
+  text-align: left;
+  font-weight: 500;
+  color: #fff;
+}
+
+.tdDmg {
+  color: #ef4444;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.tdAcc,
+.tdParry {
+  color: #38bdf8;
+  font-family: monospace;
+}
+
+.tdCost {
+  color: #fbbf24;
+  font-family: monospace;
+}
+
+/* Mobile: tabulky scrollují horizontálně, ať nepřetékají */
+.tableScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Encumbrance compact ─── */
+.encumbTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.encumbTable th {
+  padding: 4px 6px;
+  font-size: 0.6rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.encumbTable td {
+  padding: 4px 6px;
+  color: #e2e8f0;
+  font-family: monospace;
+}
+
+.encumbTable td:first-child {
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  color: #cbd5e1;
+}
+
+.encumbDodge {
+  color: #00e5ff;
+  font-weight: 700;
+}
+
+/* ─── Notes ─── */
+.notes {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}

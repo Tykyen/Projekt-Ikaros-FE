@@ -1,0 +1,324 @@
+/**
+ * 10.2c-edit-9g — CoC kompaktní bojový panel.
+ *
+ * Port vizuálu ze starého `C:/Matrix/Matrix/frontend/src/components/Map/
+ * CocMapDiaryOverlay.tsx` (inline styly v `s` objektu). Zachováváme:
+ * - serif font (EB Garamond) pro mystical/horror vibe
+ * - tlumené béžovo-zlaté `#d4c9a8` / `#c9a84c`
+ * - vital boxy s accent rámečky (HP rudý, Sanity fialovo-purpurový)
+ *
+ * Light/dark theme — používá CSS proměnné z Ikaros, nicméně panel je vždy
+ * dark (mapa overlay) → hardcoded gradient/border barvy.
+ */
+
+.root {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #d4c9a8;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loading,
+.empty {
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(212, 201, 168, 0.55);
+}
+
+/* ── Vitals row ──────────────────────────────────────────────────── */
+
+.vitalsRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.vital {
+  flex: 1 1 0;
+  min-width: 70px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(180, 150, 100, 0.15);
+  border-radius: 6px;
+  padding: 6px 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.vitalDanger {
+  border-color: rgba(168, 50, 50, 0.4);
+  background: linear-gradient(
+    180deg,
+    rgba(168, 50, 50, 0.12),
+    rgba(0, 0, 0, 0.25)
+  );
+}
+
+.vitalSanity {
+  border-color: rgba(107, 91, 205, 0.45);
+  background: linear-gradient(
+    180deg,
+    rgba(107, 91, 205, 0.14),
+    rgba(0, 0, 0, 0.25)
+  );
+}
+
+.vitalLabel {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(212, 201, 168, 0.55);
+  font-weight: 600;
+}
+
+.vitalSanity .vitalLabel {
+  color: rgba(170, 150, 235, 0.75);
+}
+
+.vitalInput {
+  width: 44px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(180, 150, 100, 0.18);
+  color: #e8dcc4;
+  padding: 3px;
+  border-radius: 3px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+}
+
+.vitalInput:focus {
+  border-color: rgba(201, 168, 76, 0.55);
+}
+
+.vitalInput:read-only {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.vitalMax {
+  font-size: 0.7rem;
+  color: rgba(180, 150, 100, 0.55);
+}
+
+/* ── Status badges ────────────────────────────────────────────────── */
+
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.statusBadge {
+  padding: 3px 9px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(212, 201, 168, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+
+.statusBadge:disabled {
+  cursor: default;
+}
+
+.statusBadgeActive {
+  background: rgba(168, 50, 50, 0.28);
+  color: #ff8a8a;
+  border-color: rgba(168, 50, 50, 0.5);
+}
+
+/* ── Sections ─────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #c9a84c;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(180, 150, 100, 0.18);
+  padding-bottom: 4px;
+}
+
+/* ── Characteristics grid ─────────────────────────────────────────── */
+
+.charsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+@media (max-width: 480px) {
+  .charsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.charBox {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(180, 150, 100, 0.1);
+  border-radius: 4px;
+  padding: 4px;
+  text-align: center;
+}
+
+.charLabel {
+  font-size: 9px;
+  color: #c9a84c;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.charVal {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e8dcc4;
+}
+
+/* ── Skills list ──────────────────────────────────────────────────── */
+
+.skillsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.skillRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px dotted rgba(180, 150, 100, 0.08);
+}
+
+.skillRow:last-child {
+  border-bottom: none;
+}
+
+.skillName {
+  font-size: 11px;
+  color: rgba(212, 201, 168, 0.78);
+  flex: 1;
+  font-family: inherit;
+}
+
+.skillVal {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e8dcc4;
+  min-width: 30px;
+  text-align: center;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+
+.skillValClickable {
+  cursor: pointer;
+  background: rgba(201, 168, 76, 0.1);
+  border-color: rgba(201, 168, 76, 0.18);
+  transition: all 0.15s;
+}
+
+.skillValClickable:hover {
+  background: rgba(201, 168, 76, 0.22);
+  border-color: rgba(201, 168, 76, 0.4);
+}
+
+/* ── Combat derived row ───────────────────────────────────────────── */
+
+.combatDerived {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.combatDerived .charBox {
+  flex: 1 1 60px;
+  min-width: 60px;
+}
+
+/* ── Weapons ──────────────────────────────────────────────────────── */
+
+.weaponRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(180, 150, 100, 0.1);
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.weaponName {
+  flex: 1;
+  color: #e8dcc4;
+  font-weight: 600;
+}
+
+.weaponSkill {
+  font-weight: 700;
+  color: #c9a84c;
+  min-width: 32px;
+  text-align: center;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.weaponSkill:hover:not(:disabled) {
+  background: rgba(201, 168, 76, 0.25);
+}
+
+.weaponSkill:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.weaponDmg {
+  color: rgba(212, 201, 168, 0.7);
+  font-size: 10px;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ── Mobile tweaks ────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .vital {
+    min-width: 64px;
+  }
+
+  .vitalInput {
+    width: 38px;
+    font-size: 1rem;
+  }
+
+  .skillName {
+    font-size: 10px;
+  }
+}

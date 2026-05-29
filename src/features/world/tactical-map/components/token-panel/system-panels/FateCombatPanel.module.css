@@ -1,0 +1,355 @@
+/**
+ * 10.2c-edit-9h — Fate kompaktní bojový panel.
+ *
+ * Vizuální port `PiDiary.scss` (Matrix legacy, soubor
+ * `C:/Matrix/Matrix/frontend/src/styles/PiDiary.scss` + `chat.scss .pi-*` selectory)
+ * do Ikaros dark theme. Fate = clean modernist, žádné synthwave glow jako Matrix —
+ * jemný akcent v amber/sand (`#bda989`) z původního overlay rolu tlačítka.
+ */
+
+/* ── Root ──────────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: 'Inter', sans-serif;
+  color: #e2e8f0;
+  width: 100%;
+}
+
+.loading,
+.empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* ── Sekce ────────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sectionTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(189, 169, 137, 0.18);
+  margin-bottom: 4px;
+}
+
+.sectionTitle {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(189, 169, 137, 0.85);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.initiativeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(189, 169, 137, 0.15);
+  color: #d9c8a8;
+  border: 1px solid rgba(189, 169, 137, 0.45);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.initiativeBtn:hover {
+  background: rgba(189, 169, 137, 0.25);
+  border-color: rgba(220, 200, 160, 0.6);
+  box-shadow: 0 0 12px rgba(189, 169, 137, 0.15);
+}
+
+.initiativeBtn:focus-visible {
+  outline: 2px solid rgba(220, 200, 160, 0.6);
+  outline-offset: 2px;
+}
+
+/* ── ASPEKTY ──────────────────────────────────────────────────────── */
+
+.aspectsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aspectCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 25, 40, 0.55);
+  border: 1px solid rgba(90, 80, 100, 0.3);
+  border-left: 3px solid rgba(189, 169, 137, 0.55);
+  border-radius: 6px;
+  padding: 8px 12px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.aspectCard:hover {
+  background: rgba(45, 38, 60, 0.55);
+}
+
+.aspectInput {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: rgba(220, 210, 200, 0.95);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  padding: 2px 0;
+}
+
+.aspectInput:disabled {
+  color: rgba(220, 210, 200, 0.85);
+}
+
+.aspectInput::placeholder {
+  color: rgba(160, 150, 140, 0.5);
+}
+
+.delBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 140, 140, 0.55);
+  cursor: pointer;
+  padding: 0 6px;
+  font-size: 0.85rem;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.delBtn:hover {
+  color: #ff8080;
+  background: rgba(255, 80, 80, 0.1);
+}
+
+.addBtn {
+  background: transparent;
+  border: 1px dashed rgba(189, 169, 137, 0.4);
+  color: rgba(189, 169, 137, 0.7);
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.addBtn:hover {
+  background: rgba(189, 169, 137, 0.1);
+  color: #d9c8a8;
+}
+
+/* ── KONFLIKT / Stres ─────────────────────────────────────────────── */
+
+.conflictTrack {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.stressBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.stressBox:disabled {
+  cursor: default;
+}
+
+.stressBox:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.stressNode {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(40, 35, 50, 0.6);
+  border: 1px solid rgba(120, 110, 130, 0.4);
+  transition: all 0.2s;
+}
+
+.stressBoxActive .stressNode {
+  border-color: rgba(220, 200, 160, 0.8);
+  background: rgba(189, 169, 137, 0.85);
+  box-shadow: 0 0 8px rgba(189, 169, 137, 0.35);
+}
+
+.stressBoxActive.warning .stressNode {
+  background: #ffb300;
+  border-color: rgba(255, 179, 0, 0.8);
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
+}
+
+.stressBoxActive.danger .stressNode {
+  background: #ff7a3c;
+  border-color: rgba(255, 122, 60, 0.8);
+  box-shadow: 0 0 8px rgba(255, 122, 60, 0.4);
+}
+
+.stressBoxActive.critical .stressNode {
+  background: #ff5555;
+  border-color: rgba(255, 85, 85, 0.8);
+  box-shadow: 0 0 8px rgba(255, 85, 85, 0.4);
+}
+
+.stressLabel {
+  font-size: 0.65rem;
+  color: rgba(180, 170, 160, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.stressBoxActive .stressLabel {
+  color: rgba(220, 210, 200, 0.95);
+  font-weight: 600;
+}
+
+/* ── DOVEDNOSTI ───────────────────────────────────────────────────── */
+
+.skillsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skillRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 25, 40, 0.45);
+  border: 1px solid rgba(90, 80, 100, 0.25);
+  border-left: 3px solid rgba(120, 180, 120, 0.45);
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: background 0.2s;
+}
+
+.skillRow:hover {
+  background: rgba(45, 38, 60, 0.55);
+}
+
+.skillName {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: rgba(220, 210, 200, 0.95);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skillName:disabled {
+  color: rgba(220, 210, 200, 0.85);
+}
+
+.skillName::placeholder {
+  color: rgba(160, 150, 140, 0.4);
+}
+
+.skillPips {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(40, 35, 50, 0.6);
+  border: 1px solid rgba(120, 110, 130, 0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s;
+}
+
+.pip:disabled {
+  cursor: default;
+}
+
+.pipFilled {
+  background: rgba(120, 200, 120, 0.85);
+  border-color: rgba(140, 220, 140, 0.9);
+  box-shadow: 0 0 4px rgba(120, 200, 120, 0.4);
+}
+
+.rollBtn {
+  background: rgba(120, 200, 120, 0.18);
+  color: #9ddf9d;
+  border: 1px solid rgba(120, 200, 120, 0.5);
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.rollBtn:hover {
+  background: rgba(120, 200, 120, 0.3);
+  border-color: rgba(140, 220, 140, 0.7);
+}
+
+.rollBtn:focus-visible {
+  outline: 2px solid rgba(140, 220, 140, 0.7);
+  outline-offset: 2px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .conflictTrack {
+    gap: 3px;
+  }
+
+  .stressLabel {
+    font-size: 0.55rem;
+  }
+
+  .skillRow {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .skillPips {
+    order: 3;
+  }
+}

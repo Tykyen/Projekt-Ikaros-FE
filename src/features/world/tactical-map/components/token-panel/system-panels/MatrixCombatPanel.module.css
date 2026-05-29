@@ -1,0 +1,502 @@
+/**
+ * 10.2c-edit-9h — Matrix kompaktní bojový panel.
+ *
+ * Vizuální port `chat.scss` selectorů `.char-stats-panel` / `.char-stat-card` /
+ * `.char-penalty-pill` / `.overpressure-row` / `.diary-aspect-card` /
+ * `.diary-skill-card` / `.diary-panel__section` ze starého Matrixu
+ * (`C:/Matrix/Matrix/frontend/src/styles/chat.scss` ~ř.2892, 3700-3920).
+ *
+ * Fallback hex barvy (purple synthwave palette) místo `--mx-diary-*` vars,
+ * které v Ikarosu nejsou globálně definované.
+ */
+
+/* ── Sekce ────────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(120, 90, 240, 0.2);
+  margin-bottom: 6px;
+}
+
+.sectionTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(180, 160, 255, 0.9);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.initiativeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(100, 70, 220, 0.2);
+  color: rgba(220, 210, 255, 0.95);
+  border: 1px solid rgba(140, 110, 255, 0.4);
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.initiativeBtn:hover {
+  background: rgba(120, 90, 240, 0.3);
+  border-color: rgba(160, 130, 255, 0.6);
+  box-shadow: 0 0 16px rgba(120, 90, 255, 0.2);
+}
+
+/* ── STATY grid ───────────────────────────────────────────────────── */
+
+.statsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.statCard {
+  background: rgba(20, 15, 40, 0.6);
+  border: 1px solid rgba(90, 80, 140, 0.3);
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(120, 90, 240, 0.4), transparent);
+}
+
+.statCardHealth {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 15, 40, 0.8) 0%,
+    rgba(30, 20, 60, 0.4) 100%
+  );
+  border-color: rgba(120, 90, 240, 0.5);
+}
+
+.statCardHealth::before {
+  height: 3px;
+  background: linear-gradient(90deg, rgba(120, 90, 240, 0.8), transparent);
+}
+
+.statCardArmor::before {
+  background: linear-gradient(90deg, rgba(100, 160, 255, 0.6), transparent);
+}
+
+.statCardMagic::before {
+  background: linear-gradient(90deg, rgba(180, 100, 255, 0.6), transparent);
+}
+
+.secondaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(160, 150, 200, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.statMain {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.statInputWrap {
+  display: flex;
+  align-items: center;
+}
+
+.statInput {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(120, 90, 240, 0.5);
+  color: rgba(220, 210, 255, 0.95);
+  border-radius: 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  width: 56px;
+  height: 38px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  outline: none;
+  padding: 0;
+  /* skryje krok-up/down nativní kontroly */
+  -moz-appearance: textfield;
+}
+
+.statInput::-webkit-outer-spin-button,
+.statInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.statInput:focus {
+  border-color: rgba(120, 90, 240, 0.8);
+  box-shadow:
+    0 0 10px rgba(120, 90, 240, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.statValue {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: rgba(220, 210, 255, 0.95);
+  min-width: 56px;
+  text-align: center;
+}
+
+.statValueMax {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+/* ── Penalty strip ────────────────────────────────────────────────── */
+
+.penaltyStrip {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.penaltyPill {
+  padding: 0.35rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  background: rgba(15, 12, 30, 0.5);
+  border: 1px solid rgba(90, 80, 140, 0.2);
+  color: rgba(160, 150, 200, 0.85);
+  min-width: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.penaltyPillActive {
+  background: rgba(60, 50, 90, 0.8);
+  border-color: rgba(120, 90, 240, 0.5);
+  color: rgba(220, 210, 255, 0.95);
+  box-shadow: 0 0 10px rgba(120, 90, 240, 0.2);
+  transform: translateY(-2px);
+}
+
+.penaltyPillWarning.penaltyPillActive {
+  background: rgba(255, 170, 0, 0.15);
+  border-color: rgba(255, 170, 0, 0.5);
+  color: #ffb300;
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
+}
+
+.penaltyPillOrange.penaltyPillActive {
+  background: rgba(255, 120, 40, 0.15);
+  border-color: rgba(255, 120, 40, 0.55);
+  color: #ff9a4a;
+  box-shadow: 0 0 10px rgba(255, 120, 40, 0.25);
+}
+
+.penaltyPillPurple.penaltyPillActive {
+  background: rgba(180, 100, 255, 0.15);
+  border-color: rgba(180, 100, 255, 0.55);
+  color: #c98aff;
+  box-shadow: 0 0 10px rgba(180, 100, 255, 0.25);
+}
+
+.penaltyPillDanger.penaltyPillActive {
+  background: rgba(255, 60, 60, 0.15);
+  border-color: rgba(255, 60, 60, 0.5);
+  color: #ff5555;
+  box-shadow: 0 0 10px rgba(255, 60, 60, 0.2);
+}
+
+/* ── DOVEDNOSTI grid ──────────────────────────────────────────────── */
+
+.skillGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+}
+
+.skillCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 25, 60, 0.45);
+  border: 1px solid rgba(90, 80, 140, 0.3);
+  border-left: 3px solid rgba(60, 180, 255, 0.5);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 12px rgba(4, 6, 20, 0.2);
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
+}
+
+.skillCard:hover {
+  background: rgba(45, 35, 90, 0.45);
+  box-shadow: 0 6px 16px rgba(4, 6, 20, 0.3);
+}
+
+.skillLabel {
+  font-size: 0.9rem;
+  color: rgba(220, 210, 255, 0.95);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skillValue {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: rgba(200, 220, 255, 0.9);
+  background: rgba(30, 40, 70, 0.5);
+  border: 1px solid rgba(60, 140, 220, 0.3);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.skillValueAction {
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+  font: inherit;
+  /* button reset */
+  appearance: none;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.skillValueAction:hover {
+  background: rgba(60, 120, 220, 0.3);
+  border-color: rgba(100, 180, 255, 0.6);
+}
+
+.skillValueAction:focus-visible {
+  outline: 2px solid rgba(100, 180, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* ── PŘETLAKY ─────────────────────────────────────────────────────── */
+
+.pressureRow {
+  background: rgba(20, 15, 40, 0.4);
+  border: 1px solid rgba(90, 80, 140, 0.2);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  transition: background 0.2s;
+}
+
+.pressureRow:hover {
+  background: rgba(30, 20, 50, 0.5);
+  border-color: rgba(120, 90, 240, 0.3);
+}
+
+.pressureLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(160, 150, 200, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pressureRail {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(90, 80, 140, 0.15);
+}
+
+.pressureSegment {
+  width: 20px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(40, 35, 60, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+  cursor: pointer;
+  padding: 0;
+  appearance: none;
+}
+
+.pressureSegment:disabled {
+  cursor: default;
+}
+
+.pressureSegmentActive {
+  background: rgba(120, 90, 240, 0.8);
+  border-color: rgba(160, 130, 255, 0.9);
+  box-shadow: 0 0 8px rgba(120, 90, 240, 0.4);
+}
+
+/* ── ASPEKTY ──────────────────────────────────────────────────────── */
+
+.aspectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+}
+
+.aspectCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 25, 60, 0.45);
+  border: 1px solid rgba(90, 80, 140, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 12px rgba(4, 6, 20, 0.2);
+  border-left: 3px solid rgba(120, 90, 240, 0.5);
+  transition:
+    transform 0.2s,
+    background 0.2s;
+}
+
+.aspectCard:hover {
+  background: rgba(45, 35, 90, 0.45);
+}
+
+.aspectCardCharged {
+  border-left-color: #4adb7a;
+}
+
+.aspectCardDepleted {
+  border-left-color: #ff5555;
+}
+
+.aspectLabel {
+  font-size: 0.9rem;
+  color: rgba(220, 210, 255, 0.95);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aspectChip {
+  font-weight: 700;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  background: rgba(20, 15, 40, 0.5);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 8px;
+  cursor: pointer;
+  appearance: none;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.aspectChip:disabled {
+  cursor: default;
+}
+
+.aspectChipCharged {
+  color: #4adb7a;
+  background: rgba(74, 219, 122, 0.12);
+  border: 1px solid rgba(74, 219, 122, 0.45);
+}
+
+.aspectChipDepleted {
+  color: #ff5555;
+  background: rgba(255, 85, 85, 0.12);
+  border: 1px solid rgba(255, 85, 85, 0.45);
+}
+
+/* ── Loading / error ──────────────────────────────────────────────── */
+
+.loading,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: rgba(180, 160, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+.error {
+  color: #ff8080;
+}
+
+/* ── Responsivní ──────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .skillGrid,
+  .aspectGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .secondaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .penaltyStrip {
+    gap: 0.25rem;
+  }
+
+  .penaltyPill {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.7rem;
+    min-width: 26px;
+  }
+}
