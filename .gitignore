@@ -37,3 +37,23 @@ storybook-static
 # URL mapping; FE načítá přímo z CDN. Lokální kopii zde můžeš mít fyzicky
 # (offline dev / cache), git je ale netracking.
 public/textures/
+
+# Master zdroje grafiky (high-res PNG ~550 MB). Z nich se generují
+# optimalizované public/themes/**/*.webp, které jediné používá runtime.
+# Zdroje zůstávají fyzicky na disku, do gitu se netracking (čištění historie).
+assets-source/
+
+# Playwright MCP debug snapshoty (generované při ladění)
+.playwright-mcp/
+
+# Test / coverage výstupy
+coverage/
+test-results/
+playwright-report/
+
+# Build cache
+.vite/
+*.tsbuildinfo
+
+# OS
+Thumbs.db
