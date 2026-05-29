@@ -1,0 +1,74 @@
+.sheet {
+  /* DiaryTab vlastní layout (sticky bar, sections). Container jen reset
+     pro padding-collapse a width 100%. */
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+.bestieNote {
+  padding: 16px;
+  background: rgba(120, 100, 255, 0.08);
+  border: 1px solid rgba(120, 100, 255, 0.22);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.bestieNote p {
+  margin: 0;
+}
+
+/* 10.2c-edit-9g Fáze 9c — bestie panel actions (Iniciativa + Uložit) */
+.bestieWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bestieActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.bestieRollBtn,
+.bestieSaveBtn {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.bestieRollBtn {
+  background: rgba(120, 200, 120, 0.18);
+  color: #9ddf9d;
+  border: 1px solid rgba(120, 200, 120, 0.5);
+}
+
+.bestieRollBtn:hover:not(:disabled) {
+  background: rgba(120, 200, 120, 0.3);
+}
+
+.bestieSaveBtn {
+  background: rgba(120, 100, 255, 0.28);
+  color: #fff;
+  border: 1px solid rgba(120, 100, 255, 0.6);
+}
+
+.bestieSaveBtn:hover:not(:disabled) {
+  background: rgba(120, 100, 255, 0.45);
+}
+
+.bestieRollBtn:disabled,
+.bestieSaveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
