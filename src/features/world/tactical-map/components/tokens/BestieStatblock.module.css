@@ -1,0 +1,116 @@
+.bestieView {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.empty {
+  color: rgba(255, 180, 180, 0.85);
+  font-size: 13px;
+  font-style: italic;
+  margin: 0;
+}
+
+.abilitiesSection {
+  padding: 10px 12px;
+  background: rgba(120, 100, 255, 0.06);
+  border: 1px solid rgba(120, 100, 255, 0.18);
+  border-radius: 6px;
+}
+
+.abilitiesHeading {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgba(200, 180, 255, 0.9);
+}
+
+.abilitiesList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.abilityItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-primary, #e8e0ff);
+}
+
+.abilityRollBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 4px 8px;
+  background: rgba(120, 100, 255, 0.1);
+  border: 1px solid rgba(120, 100, 255, 0.25);
+  border-radius: 5px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.abilityRollBtn:hover:not(:disabled) {
+  background: rgba(120, 100, 255, 0.2);
+  border-color: rgba(150, 130, 255, 0.5);
+}
+
+.abilityRollBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.abilityLabel {
+  font-weight: 600;
+}
+
+.abilityValue {
+  opacity: 0.8;
+  text-align: right;
+}
+
+.notesSection {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: rgba(120, 100, 255, 0.08);
+  border: 1px solid rgba(120, 100, 255, 0.22);
+  border-radius: 6px;
+}
+
+.notesHeading {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgba(200, 180, 255, 0.9);
+}
+
+.notesBody {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: var(--text-primary, #e8e0ff);
+}
+
+.notesHint {
+  margin: 0;
+  font-size: 11px;
+  font-style: italic;
+  opacity: 0.55;
+}
