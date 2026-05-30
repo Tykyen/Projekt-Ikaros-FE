@@ -63,12 +63,19 @@ export function BestiePanelView({
   const handleInitiativeRoll = (): void => {
     const initBase =
       Number(stats['initiative.base'] ?? token.initiativeBase ?? 0) || 0;
-    performSheetRoll({
+    const total = performSheetRoll({
       label: 'Iniciativa',
       modifier: initBase,
       kind: 'fate',
       rollerName: token.instanceName ?? 'Bestie',
     });
+    // 10.2f — propsat hod do token.initiative (iniciativní lišta řadí dle něj)
+    // + lokální statbar („Init aktuální"). systemStats se uloží zvlášť přes
+    // „Uložit statblok"; initiative jde do tokenu hned.
+    if (total !== null) {
+      update.mutate({ tokenId: token.id, patch: { initiative: total } });
+      setStats((s) => ({ ...s, 'initiative.current': total }));
+    }
   };
 
   // Klik na schopnost → roll (parita se starým Matrixem). Hodnota schopnosti
