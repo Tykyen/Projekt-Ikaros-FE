@@ -22,6 +22,7 @@ import { api } from '@/shared/api/client';
 import { postMapOperation } from '../../api/mapApi';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
 import { PaletteSearchInput } from './PaletteSearchInput';
+import { PaletteAvatar } from './PaletteAvatar';
 import { CharacterCatalogModal } from './CharacterCatalogModal';
 import {
   type SpawnPayload,
@@ -185,6 +186,7 @@ export function PcPalette({
                       : `Klikni nebo přetáhni: spawn PC ${c.name} na hex`
                   }
                 >
+                  <PaletteAvatar src={c.imageUrl} name={c.name} />
                   <span className={styles.itemName}>{c.name}</span>
                   <span className={styles.itemAction}>
                     {onScene ? '✓' : '⇢'}
@@ -210,7 +212,11 @@ export function PcPalette({
         <CharacterCatalogModal
           title="Katalog PC postav světa"
           searchPlaceholder="Hledat PC postavu…"
-          items={fullCatalog.map((c) => ({ id: c.id, name: c.name }))}
+          items={fullCatalog.map((c) => ({
+            id: c.id,
+            name: c.name,
+            imageUrl: c.imageUrl,
+          }))}
           activeIds={activeIds}
           onPick={handleAddToActive}
           onClose={() => setShowCatalog(false)}

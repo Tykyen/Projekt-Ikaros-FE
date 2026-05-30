@@ -13,11 +13,14 @@
  */
 import { useMemo, useState } from 'react';
 import { PaletteSearchInput } from './PaletteSearchInput';
+import { PaletteAvatar } from './PaletteAvatar';
 import styles from './CharacterCatalogModal.module.css';
 
 export interface CatalogItem {
   id: string;
   name: string;
+  /** 10.2g — avatar pro rychlé vizuální rozeznání v katalogu. */
+  imageUrl?: string | null;
 }
 
 interface BaseProps {
@@ -134,6 +137,11 @@ export function CharacterCatalogModal(props: Props): React.ReactElement {
                       : `Přidat ${item.name} mezi aktivní`
                   }
                 >
+                  <PaletteAvatar
+                    src={item.imageUrl}
+                    name={item.name}
+                    size={26}
+                  />
                   <span className={styles.itemName}>{item.name}</span>
                   <span className={styles.itemAction}>
                     {already ? '✓' : '+'}

@@ -19,6 +19,7 @@ import { useBestiar } from '@/features/world/bestiar/hooks/useBestiar';
 import { postMapOperation } from '../../api/mapApi';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
 import { PaletteSearchInput } from './PaletteSearchInput';
+import { PaletteAvatar } from './PaletteAvatar';
 import { CharacterCatalogModal } from './CharacterCatalogModal';
 import {
   type SpawnPayload,
@@ -163,6 +164,7 @@ export function BestiePalette({
               disabled={!scene}
               title={`Klikni nebo přetáhni: spawn bestie ${b.name} na hex`}
             >
+              <PaletteAvatar src={b.imageUrl} name={b.name} />
               <span className={styles.itemName}>{b.name}</span>
               <span className={styles.itemAction}>⇢</span>
             </button>
@@ -193,14 +195,17 @@ export function BestiePalette({
             user: (query.data?.user ?? []).map((b) => ({
               id: b.id,
               name: b.name,
+              imageUrl: b.imageUrl,
             })),
             world: (query.data?.world ?? []).map((b) => ({
               id: b.id,
               name: b.name,
+              imageUrl: b.imageUrl,
             })),
             system: (query.data?.system ?? []).map((b) => ({
               id: b.id,
               name: b.name,
+              imageUrl: b.imageUrl,
             })),
           }}
           activeIds={activeIds}

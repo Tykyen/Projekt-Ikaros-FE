@@ -107,6 +107,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 7px 10px;
   background: rgba(10, 8, 32, 0.4);
   color: var(--map-toolbar-text);
@@ -129,12 +130,15 @@
 }
 
 .itemName {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .itemAction {
+  flex: 0 0 auto;
   font-weight: 700;
   font-size: 15px;
   color: rgba(120, 200, 120, 0.8);
