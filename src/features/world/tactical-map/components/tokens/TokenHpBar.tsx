@@ -1,48 +1,48 @@
 /**
- * 10.2e C2 — HP bar v PixiJS pod tokenem (z TokenSprite).
+ * 10.2e C2 / 10.2g — HP bar v PixiJS přes spodní hranu tokenu.
  *
- * Hledá v systemStats damageable pole + matching .max. Tier color:
- *   > 60% → green, > 30% → yellow, ≤ 30% → red.
+ * Render-only: dostane už vyřešené `current/max` + `size` (== tokenSize).
+ * Resolve HP (schéma → fallback na currentHp/maxHp) i visibility řeší volající
+ * (`HpBarForToken` v TokenSprite). Tier barva přes `hpTierHex`.
  *
- * Pokud chybí damageable field nebo current/max → null (no render).
+ * Geometrie proporcionální k `size` (roste se zoomem mapy):
+ *   šířka  = size * 1.5
+ *   výška  = max(3, size * 0.18)
+ *   y      = size * 0.72  (sedí přes spodní hranu tokenu, ne plovoucí pod ním)
  *
- * Plán: docs/arch/phase-10/plan-10.2e.md C2.
+ * Plán: docs/arch/phase-10/plan-10.2g (estetika tokenu).
  */
 import { useCallback } from 'react';
 import type { Graphics as PixiGraphics } from 'pixi.js';
-import type { SystemEntitySchema } from '../../schemas/types';
-import { resolveHp, hpTierHex } from '../../utils/hpTier';
+import { hpTierHex } from '../../utils/hpTier';
 
 interface Props {
-  schema: SystemEntitySchema | null;
-  systemStats: Record<string, unknown>;
-  /** Y offset od centrum tokenu (pod label). */
-  y: number;
+  current: number;
+  max: number;
+  /** Poloměr tokenu (== tokenSize z TokenSprite). Řídí proporce baru. */
+  size: number;
 }
 
-const BAR_WIDTH = 36;
-const BAR_HEIGHT = 4;
-
 export function TokenHpBar({
-  schema,
-  systemStats,
-  y,
+  current,
+  max,
+  size,
 }: Props): React.ReactElement | null {
-  // Hooky musí být před early-returnem (rules-of-hooks). Fallback hodnoty,
-  // když HP nelze vyřešit — komponenta stejně vrátí null níže.
-  const hp = resolveHp(schema, systemStats);
-  const percent = hp?.percent ?? 0;
-  const current = hp?.current ?? 0;
+  const width = size * 1.5;
+  const height = Math.max(3, Math.round(size * 0.18));
+  const radius = height * 0.4;
+  const y = Math.round(size * 0.72);
+  const percent = max > 0 ? Math.max(0, Math.min(1, current / max)) : 0;
   const fillColor = hpTierHex(percent, current);
 
   const drawTrack = useCallback(
     (g: PixiGraphics) => {
       g.clear();
-      g.roundRect(-BAR_WIDTH / 2, 0, BAR_WIDTH, BAR_HEIGHT, 2);
+      g.roundRect(-width / 2, 0, width, height, radius);
       g.fill({ color: 0x000000, alpha: 0.6 });
       g.stroke({ color: 0x222222, width: 1, alpha: 0.8 });
     },
-    [],
+    [width, height, radius],
   );
 
   const drawFill = useCallback(
@@ -50,18 +50,16 @@ export function TokenHpBar({
       g.clear();
       if (percent <= 0) return;
       g.roundRect(
-        -BAR_WIDTH / 2 + 1,
+        -width / 2 + 1,
         1,
-        (BAR_WIDTH - 2) * percent,
-        BAR_HEIGHT - 2,
-        1,
+        (width - 2) * percent,
+        height - 2,
+        Math.max(0, radius - 1),
       );
       g.fill({ color: fillColor, alpha: 0.95 });
     },
-    [percent, fillColor],
+    [percent, fillColor, width, height, radius],
   );
-
-  if (!hp) return null;
 
   return (
     <pixiContainer label="token-hpbar" y={y}>

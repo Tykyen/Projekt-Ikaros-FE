@@ -58,6 +58,35 @@ export function resolveHp(
   return { current, max, percent: Math.max(0, Math.min(1, current / max)) };
 }
 
+/**
+ * 10.2g — resolve HP se zpětným fallbackem. Primárně přes schéma
+ * (`damageable` pole v `systemStats`); když schéma pole nemá, použije přímá
+ * `currentHp/maxHp` z tokenu (ta na `MapToken` existují vždy → HP bar dostanou
+ * i PC/NPC, ne jen bestie se snapshotnutými systemStats).
+ *
+ * `null` = token nemá použitelné HP (ani schéma, ani `maxHp > 0`) → bez baru.
+ */
+export function resolveHpWithFallback(
+  schema: SystemEntitySchema | null,
+  systemStats: Record<string, unknown>,
+  currentHp: number | undefined,
+  maxHp: number | undefined,
+): ResolvedHp | null {
+  // Schéma cesta JEN když systemStats reálně nese damageable hodnotu.
+  // (resolveHp jinak vrací current=0/max=10 → fallback by se nikdy nespustil.)
+  const key = findDamageableField(schema);
+  if (key && typeof systemStats[key] === 'number') {
+    const fromSchema = resolveHp(schema, systemStats);
+    if (fromSchema) return fromSchema;
+  }
+  // Fallback na přímá pole tokenu (vždy na MapToken → i PC/NPC bez systemStats).
+  if (typeof maxHp === 'number' && maxHp > 0) {
+    const current = typeof currentHp === 'number' ? currentHp : 0;
+    return { current, max: maxHp, percent: Math.max(0, Math.min(1, current / maxHp)) };
+  }
+  return null;
+}
+
 /** Tier barva (PIXI hex) z percentu; `current<=0` → dead. */
 export function hpTierHex(percent: number, current: number): number {
   if (current <= 0) return HP_DEAD;

@@ -80,6 +80,11 @@ export interface MapToken {
     name: string;
     imageUrl?: string;
     diaryData: Record<string, unknown>;
+    /**
+     * 10.2g — diary subdoc customData (per-system HP klíče). Doplněno BE
+     * enrichem při GET scény; `resolveCharacterHp` z toho čte HP bar PC/NPC.
+     */
+    customData?: Record<string, unknown>;
   };
 }
 
@@ -311,6 +316,13 @@ export interface HexConfig {
   originY: number;
   /** Render grid? Pokud false, `HexGrid` neRenderuje vůbec nic. */
   showGrid: boolean;
+  /**
+   * 10.2g — per-scéna viditelnost HP barů dle typu tokenu.
+   * Chybí (undefined) = `true` (BC + default zapnuto).
+   */
+  showHpPc?: boolean;
+  showHpNpc?: boolean;
+  showHpBestie?: boolean;
 }
 
 /**

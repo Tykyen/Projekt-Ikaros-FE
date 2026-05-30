@@ -21,6 +21,7 @@
  */
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTick } from '@pixi/react';
+import { Circle } from 'pixi.js';
 import type {
   Graphics as PixiGraphics,
   Container as PixiContainer,
@@ -39,6 +40,9 @@ import { getInitials } from '../../utils/getInitials';
 import { TokenHpBar } from './TokenHpBar';
 import { systemEntitySchemaRegistry } from '../../schemas/registry';
 import { useWorldContext } from '@/features/world/context/WorldContext';
+import { resolveHpWithFallback } from '../../utils/hpTier';
+import { tokenIsBestie } from '../../utils/tokenIsBestie';
+import { resolveCharacterHp } from '../../utils/resolveCharacterHp';
 
 interface Props {
   token: MapToken;
@@ -189,15 +193,19 @@ export function TokenSprite({
   // Matrix proporce: radius * 0.25, offset radius * 0.8.
   const infoBadgeRadius = Math.round(tokenSize * 0.25);
   const infoBadgeOffset = Math.round(tokenSize * 0.8);
+  const infoBadgeHitArea = useMemo(
+    () => new Circle(0, 0, infoBadgeRadius),
+    [infoBadgeRadius],
+  );
 
   // 10.2c-edit-9f — kontrastnější (větší alpha + výraznější border) jako
   // Matrix MapToken.tsx — `rgba(0, 0, 0, 0.7)` + `rgba(29, 78, 216, 0.4)`.
+  // 10.2g — modrý obrys odstraněn (rušil); tmavý chip má sám dost kontrastu.
   const drawInfoBadge = useCallback(
     (g: PixiGraphics) => {
       g.clear();
       g.circle(0, 0, infoBadgeRadius);
       g.fill({ color: 0x000000, alpha: 0.85 });
-      g.stroke({ color: 0x1d4ed8, width: 2, alpha: 1 });
     },
     [infoBadgeRadius],
   );
@@ -208,12 +216,27 @@ export function TokenSprite({
   // byl to drag (cancel select), jinak click (select).
   const downCoordsRef = useRef<{ x: number; y: number } | null>(null);
 
+  // 10.2g — stopPropagation z badge handlerů v této @pixi/react verzi
+  // nezabrání rodičovskému handleru → klik na 'i' jinak spustí i drag.
+  // Deterministická obrana: pokud event vznikl uvnitř info-badge subtree,
+  // rodič ho ignoruje.
+  const isInfoBadgeTarget = (e: FederatedPointerEvent): boolean => {
+    let node = e.target as PixiContainer | null;
+    while (node) {
+      if (node.label === 'token-info-badge') return true;
+      node = node.parent as PixiContainer | null;
+    }
+    return false;
+  };
+
   const handlePointerDown = (e: FederatedPointerEvent): void => {
+    if (isInfoBadgeTarget(e)) return;
     downCoordsRef.current = { x: e.client.x, y: e.client.y };
     if (canDrag && onPointerDown) onPointerDown(e, token);
   };
 
   const handlePointerUp = (e: FederatedPointerEvent): void => {
+    if (isInfoBadgeTarget(e)) return;
     const down = downCoordsRef.current;
     downCoordsRef.current = null;
     if (!down) return;
@@ -224,10 +247,16 @@ export function TokenSprite({
     onSelect(token.id);
   };
 
-  const handleInfoBadgeClick = (e: FederatedPointerEvent): void => {
+  const handleInfoBadgeDown = (e: FederatedPointerEvent): void => {
     // stopPropagation — chceme JEN open modal, ne select / drag start
     e.stopPropagation();
     onOpenInfo(token.id);
+  };
+
+  // 10.2g — pointerup musí taky stopnout propagaci, jinak parent handlePointerUp
+  // / window drag-up dostane event po kliku na badge.
+  const handleInfoBadgeUp = (e: FederatedPointerEvent): void => {
+    e.stopPropagation();
   };
 
   return (
@@ -306,7 +335,9 @@ export function TokenSprite({
         y={-infoBadgeOffset}
         eventMode="static"
         cursor="pointer"
-        onPointerDown={handleInfoBadgeClick}
+        hitArea={infoBadgeHitArea}
+        onPointerDown={handleInfoBadgeDown}
+        onPointerUp={handleInfoBadgeUp}
       >
         <pixiGraphics label="info-badge-bg" draw={drawInfoBadge} />
         <pixiText
@@ -325,26 +356,54 @@ export function TokenSprite({
       {/* 10.2c-edit-9f — jméno tokenu odstraněno (user request).
           Tokeny mají vlastní avatar a jméno se ukáže v info modálu /
           při hover tooltip (TBD). */}
-      <HpBarForToken token={token} y={tokenSize + 8} />
+      <HpBarForToken token={token} config={config} size={tokenSize} />
     </pixiContainer>
   );
 }
 
+/**
+ * 10.2g — resolve HP (schéma → fallback na currentHp/maxHp) + per-scéna
+ * visibility dle typu tokenu. Vrací `null` (bez baru) když token nemá HP
+ * nebo je daný typ v `scene.config` vypnutý. Default (undefined flag) = zobraz.
+ */
 function HpBarForToken({
   token,
-  y,
+  config,
+  size,
 }: {
   token: MapToken;
-  y: number;
+  config: HexConfig;
+  size: number;
 }): React.ReactElement | null {
   const { world } = useWorldContext();
   const systemId = world?.system ?? null;
-  if (!systemId) return null;
-  const schema = systemEntitySchemaRegistry.get(systemId, 'token');
-  // BC: pokud token nemá systemStats (z 8.x), použij fixed pole jako fallback.
-  const stats = token.systemStats ?? {
-    'health.current': token.currentHp,
-    'health.max': token.maxHp,
-  };
-  return <TokenHpBar schema={schema} systemStats={stats} y={y} />;
+  const schema = systemId
+    ? systemEntitySchemaRegistry.get(systemId, 'token')
+    : null;
+  const stats = token.systemStats ?? {};
+  const isBestie = tokenIsBestie(token);
+  let hp = resolveHpWithFallback(schema, stats, token.currentHp, token.maxHp);
+  // PC/NPC nemají systemStats ani token.maxHp — HP žije v deníku postavy
+  // (per-system klíč). Bestie už vyřešené výše ze snapshotnutých systemStats.
+  if (!hp && !isBestie) {
+    const ch = resolveCharacterHp(systemId, token.characterData?.customData);
+    if (ch) {
+      hp = {
+        current: ch.current,
+        max: ch.max,
+        percent: ch.max > 0 ? Math.max(0, Math.min(1, ch.current / ch.max)) : 0,
+      };
+    }
+  }
+  if (!hp) return null;
+
+  // Typ tokenu → odpovídající visibility flag (chybí = true).
+  const visible = isBestie
+    ? config.showHpBestie
+    : token.isNpc
+      ? config.showHpNpc
+      : config.showHpPc;
+  if (visible === false) return null;
+
+  return <TokenHpBar current={hp.current} max={hp.max} size={size} />;
 }

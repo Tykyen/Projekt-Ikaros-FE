@@ -44,6 +44,10 @@ export function EditSceneModal({
       (scene.config as unknown as { backgroundX?: number }).backgroundX ?? 0,
     backgroundY:
       (scene.config as unknown as { backgroundY?: number }).backgroundY ?? 0,
+    // 10.2g — viditelnost HP barů (chybí v configu = default zapnuto).
+    showHpPc: scene.config.showHpPc ?? true,
+    showHpNpc: scene.config.showHpNpc ?? true,
+    showHpBestie: scene.config.showHpBestie ?? true,
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -66,7 +70,10 @@ export function EditSceneModal({
         config.showGrid !== scene.config.showGrid ||
         (config.backgroundScale ?? 1) !== (prevExt.backgroundScale ?? 1) ||
         (config.backgroundX ?? 0) !== (prevExt.backgroundX ?? 0) ||
-        (config.backgroundY ?? 0) !== (prevExt.backgroundY ?? 0);
+        (config.backgroundY ?? 0) !== (prevExt.backgroundY ?? 0) ||
+        (config.showHpPc ?? true) !== (scene.config.showHpPc ?? true) ||
+        (config.showHpNpc ?? true) !== (scene.config.showHpNpc ?? true) ||
+        (config.showHpBestie ?? true) !== (scene.config.showHpBestie ?? true);
       if (configChanged) {
         ops.push({ type: 'scene.config', config: config as HexConfig });
       }
@@ -277,6 +284,42 @@ export function EditSceneModal({
                 }
               />
               Zobrazit grid
+            </label>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h4 className={styles.sectionTitle}>Viditelnost HP</h4>
+          <div className={styles.configGrid}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={config.showHpPc ?? true}
+                onChange={(e) =>
+                  setConfig((c) => ({ ...c, showHpPc: e.target.checked }))
+                }
+              />
+              HP u postav (PC)
+            </label>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={config.showHpNpc ?? true}
+                onChange={(e) =>
+                  setConfig((c) => ({ ...c, showHpNpc: e.target.checked }))
+                }
+              />
+              HP u NPC
+            </label>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={config.showHpBestie ?? true}
+                onChange={(e) =>
+                  setConfig((c) => ({ ...c, showHpBestie: e.target.checked }))
+                }
+              />
+              HP u bestií
             </label>
           </div>
         </section>
