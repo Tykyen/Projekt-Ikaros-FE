@@ -22,6 +22,7 @@ import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdoc
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { performSheetRoll } from '../../utils/rollFromSheet';
 import { useTokenUpdate } from '../../hooks/useTokenUpdate';
+import type { SystemSheetProps } from '@/features/world/pages/CharacterDetailPage/diary-systems/types';
 import type { MapToken } from '../../types';
 import { tokenIsBestie } from '../../utils/tokenIsBestie';
 import { BestiePanelView } from './BestiePanelView';
@@ -39,11 +40,9 @@ interface CombatPanelProps {
   sceneId: string;
   worldId: string;
   canEdit: boolean;
-  onRoll?: (req: {
-    label: string;
-    modifier: number;
-    kind: 'fate' | 'd20' | 'd6' | 'd10';
-  }) => void;
+  // Sdílený tvar s deníkovými sheety (`SystemSheetProps`), ať registry sedí
+  // všem panelům (CoC používá d100, modifier volitelný).
+  onRoll?: SystemSheetProps['onRoll'];
 }
 
 const COMBAT_PANELS: Record<string, ComponentType<CombatPanelProps>> = {
@@ -83,6 +82,10 @@ export function TokenSystemSheet({
     worldId,
   });
 
+  // 10.2f — hod „Iniciativa" z panelu se propíše do token.initiative
+  // (combat tracker / iniciativní lišta). Hook musí být před bestie return.
+  const initiativeUpdate = useTokenUpdate(sceneId, worldId);
+
   if (tokenIsBestie(token)) {
     return (
       <BestiePanelView
@@ -98,13 +101,22 @@ export function TokenSystemSheet({
   const rollerName =
     token.instanceName ?? token.characterData?.name ?? 'Postava';
 
-  const onRoll: NonNullable<CombatPanelProps['onRoll']> = (req) =>
-    performSheetRoll({
+  const onRoll: NonNullable<CombatPanelProps['onRoll']> = (req) => {
+    const total = performSheetRoll({
       label: req.label,
       modifier: req.modifier,
       kind: req.kind,
       rollerName,
     });
+    // 10.2f — hod iniciativy z panelu se propíše do token.initiative
+    // (objeví se v iniciativní liště). Detekce dle labelu „Iniciativa".
+    if (total !== null && /iniciativ/i.test(req.label)) {
+      initiativeUpdate.mutate({
+        tokenId: token.id,
+        patch: { initiative: total },
+      });
+    }
+  };
 
   // 10.2c-edit-9h — per-system kompaktní combat panel (Matrix/DnD/CoC/Drd2/
   // Fate/GURPS). Ostatní systémy fallback na DiaryTab embed (legacy).

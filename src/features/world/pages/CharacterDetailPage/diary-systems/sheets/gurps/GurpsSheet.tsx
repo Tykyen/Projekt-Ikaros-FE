@@ -23,9 +23,8 @@ import {
   type GurpsSkill,
   type GurpsTrait,
 } from './constants';
-import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 
-export function GurpsSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
+export function GurpsSheet({ diary, mode, onChange }: SystemSheetProps) {
   const disabled = mode === 'view';
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'gurps_', onChange);

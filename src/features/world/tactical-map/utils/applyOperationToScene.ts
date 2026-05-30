@@ -243,13 +243,15 @@ export function applyOperationToScene(
         return scene;
       }
       let nextTokenId: string | null = op.tokenId ?? null;
-      let nextRound = combat.round;
+      // 10.2f — `round` override (FE řídí pořadí při živém sortu). Bez něj
+      // legacy auto-next dle order (BC).
+      let nextRound = op.round ?? combat.round;
       if (!nextTokenId) {
         // next in order; po posledním → round++
         const currentIdx = combat.order.indexOf(combat.currentTokenId ?? '');
         const nextIdx = (currentIdx + 1) % combat.order.length;
         nextTokenId = combat.order[nextIdx] ?? null;
-        if (nextIdx === 0) nextRound++;
+        if (op.round === undefined && nextIdx === 0) nextRound++;
       }
       return {
         ...scene,
@@ -263,6 +265,19 @@ export function applyOperationToScene(
 
     case 'combat.end':
       return { ...scene, combat: null };
+
+    case 'combat.reorder': {
+      // 10.2f-2 — přepíše jen order; round + currentTokenId beze změny.
+      const combat = scene.combat;
+      if (!combat?.isActive) {
+        warnUnknown('combat.reorder', 'inactive combat');
+        return scene;
+      }
+      return {
+        ...scene,
+        combat: { ...combat, order: op.orderTokenIds },
+      };
+    }
 
     case 'combat.effect.add': {
       if (!scene.combat?.isActive) {

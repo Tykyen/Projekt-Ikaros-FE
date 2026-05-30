@@ -24,7 +24,11 @@ import axios from 'axios';
 import { getActiveMapScene, getMapOperationsSince } from '../api/mapApi';
 import { applyOperationToScene } from '../utils/applyOperationToScene';
 import { useMapSocket } from './useMapSocket';
-import type { MapScene, MapOperationBroadcast } from '../types';
+import type {
+  MapScene,
+  MapOperationBroadcast,
+  MapSpotlightBroadcast,
+} from '../types';
 
 /** Query key factory — exportováno pro `useReassignmentListener` invalidate. */
 export const mapSceneQueryKey = (worldId: string): QueryKey => [
@@ -32,6 +36,11 @@ export const mapSceneQueryKey = (worldId: string): QueryKey => [
   'active',
   worldId,
 ];
+
+interface UseMapSceneOptions {
+  /** 10.2f-3 — callback při `map:spotlight` (PJ ukázal na token). */
+  onSpotlight?: (tokenId: string) => void;
+}
 
 interface UseMapSceneResult {
   scene: MapScene | null;
@@ -43,9 +52,14 @@ interface UseMapSceneResult {
    * nebo manual reload.
    */
   refetch: () => void;
+  /** 10.2f-3 — PJ emit spotlight (broadcast ostatním na scéně). */
+  emitSpotlight: (tokenId: string) => void;
 }
 
-export function useMapScene(worldId: string | null): UseMapSceneResult {
+export function useMapScene(
+  worldId: string | null,
+  options?: UseMapSceneOptions,
+): UseMapSceneResult {
   const queryClient = useQueryClient();
   const lastSeqRef = useRef<number>(0);
 
@@ -118,9 +132,16 @@ export function useMapScene(worldId: string | null): UseMapSceneResult {
     [worldId, scene, queryClient, query],
   );
 
-  useMapSocket({
+  // Stabilní wrapper, ať se WS listener nereregistruje každý render.
+  const spotlightCb = options?.onSpotlight;
+  const handleSpotlight = useCallback(
+    (p: MapSpotlightBroadcast) => spotlightCb?.(p.tokenId),
+    [spotlightCb],
+  );
+  const { emitSpotlight } = useMapSocket({
     sceneId: scene?.id ?? null,
     onOperation,
+    onSpotlight: spotlightCb ? handleSpotlight : undefined,
   });
 
   return {
@@ -129,5 +150,6 @@ export function useMapScene(worldId: string | null): UseMapSceneResult {
     isError: query.isError,
     error: query.error,
     refetch: () => void query.refetch(),
+    emitSpotlight,
   };
 }

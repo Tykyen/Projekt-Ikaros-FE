@@ -35,7 +35,7 @@ export interface RollRequest {
   rollerName?: string;
 }
 
-export function performSheetRoll(req: RollRequest): void {
+export function performSheetRoll(req: RollRequest): number | null {
   const { label, modifier = 0, kind = 'fate', rollerName = 'Postava' } = req;
 
   let message: string;
@@ -60,12 +60,15 @@ export function performSheetRoll(req: RollRequest): void {
   } else {
     // pool/mixed nepodporováno z deníku v MVP
     toast.error(`Roll kind ${kind} není podporován ze sheet`);
-    return;
+    return null;
   }
 
   // Toast s formátovanou zprávou
   toast.success(message, {
-    description: `Celkem: ${total >= 0 ? '+' : ''}${total}`,
+    description: `${rollerName} — Celkem: ${total >= 0 ? '+' : ''}${total}`,
     duration: 5000,
   });
+  // 10.2f — vrací total, ať volající (token panel) může zapsat hod iniciativy
+  // do `token.initiative` (combat tracker).
+  return total;
 }

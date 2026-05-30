@@ -1,0 +1,65 @@
+.bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 12px;
+  background: linear-gradient(
+    180deg,
+    var(--map-toolbar-bg-solid, #0a0814) 0%,
+    rgba(10, 8, 32, 0.92) 100%
+  );
+  border-bottom: 1px solid rgba(120, 100, 255, 0.18);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  /* nepřekrývej zoom controls / PJ panel pod sebou */
+  pointer-events: auto;
+}
+
+.strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 4px;
+  scrollbar-width: thin;
+}
+
+/* Oddělovač „v boji" | „mimo boj" */
+.divider {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 4px;
+  margin: 0 2px;
+  color: rgba(150, 180, 255, 0.3);
+  border-left: 1px solid rgba(120, 100, 255, 0.18);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.strip::-webkit-scrollbar {
+  height: 6px;
+}
+.strip::-webkit-scrollbar-thumb {
+  background: rgba(180, 140, 255, 0.3);
+  border-radius: 3px;
+}
+
+/* ── Mobil ── PJ ovládání zalomí nad strip */
+@media (max-width: 768px) {
+  .bar {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 5px 8px;
+  }
+  .strip {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+}

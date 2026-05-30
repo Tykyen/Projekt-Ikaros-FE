@@ -11,6 +11,7 @@
 import { useCallback } from 'react';
 import type { Graphics as PixiGraphics } from 'pixi.js';
 import type { SystemEntitySchema } from '../../schemas/types';
+import { resolveHp, hpTierHex } from '../../utils/hpTier';
 
 interface Props {
   schema: SystemEntitySchema | null;
@@ -22,46 +23,17 @@ interface Props {
 const BAR_WIDTH = 36;
 const BAR_HEIGHT = 4;
 
-function findDamageableField(
-  schema: SystemEntitySchema | null,
-): string | null {
-  if (!schema) return null;
-  for (const section of schema.sections) {
-    for (const field of section.fields) {
-      if (field.combatBehavior === 'damageable') return field.key;
-    }
-  }
-  return null;
-}
-
 export function TokenHpBar({
   schema,
   systemStats,
   y,
 }: Props): React.ReactElement | null {
-  const damageableKey = findDamageableField(schema);
-  if (!damageableKey) return null;
-
-  const current =
-    typeof systemStats[damageableKey] === 'number'
-      ? (systemStats[damageableKey] as number)
-      : 0;
-
-  // Najdi matching .max key (např. health.current → health.max).
-  const maxKey = damageableKey.includes('.current')
-    ? damageableKey.replace('.current', '.max')
-    : `${damageableKey}.max`;
-  const max =
-    typeof systemStats[maxKey] === 'number'
-      ? (systemStats[maxKey] as number)
-      : current > 0
-        ? current
-        : 10;
-  if (max <= 0) return null;
-
-  const percent = Math.max(0, Math.min(1, current / max));
-  const fillColor =
-    percent > 0.6 ? 0x44dd66 : percent > 0.3 ? 0xffaa30 : 0xff4060;
+  // Hooky musí být před early-returnem (rules-of-hooks). Fallback hodnoty,
+  // když HP nelze vyřešit — komponenta stejně vrátí null níže.
+  const hp = resolveHp(schema, systemStats);
+  const percent = hp?.percent ?? 0;
+  const current = hp?.current ?? 0;
+  const fillColor = hpTierHex(percent, current);
 
   const drawTrack = useCallback(
     (g: PixiGraphics) => {
@@ -88,6 +60,8 @@ export function TokenHpBar({
     },
     [percent, fillColor],
   );
+
+  if (!hp) return null;
 
   return (
     <pixiContainer label="token-hpbar" y={y}>

@@ -40,7 +40,7 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-05-28 (10.2c-edit-9b/9c — Taktická mapa: token statbar modal teď ukazuje pro PC/NPC tři taby Staty / Deník / Poznámky (deník + poznámky se editují inline a propisují i do detailu postavy); pro bestie jen statblok s aktuálními staty. Hráč na cizí token vidí jen jméno + HP %. + 9a: spawn tokenů na hex pod kurzorem (drag&drop nebo klik+klik, ESC ruší). Předchozí: 10.2c-edit-1+2 — per-player přiřazení scén, security gate, ✕ deaktivace, knihovna map full snapshot s cross-world přenosem.).
+          Aktualizováno k 2026-05-30 (10.2f — Taktická mapa: iniciativa a tracker boje. Horní lišta s pořadím bojovníků a iniciativou, „na tahu" zvýrazněn zlatým prstencem; PJ řídí zahájení boje, tahy a kola, hází iniciativu a může pořadí přeřadit. Klik na bojovníka přiblíží token; PJ klikem token všem na pár vteřin rozsvítí červeným prstencem. Předchozí: 10.2c-edit-9b/9c — token statbar modal s taby Staty / Deník / Poznámky; spawn tokenů na hex pod kurzorem.).
         </p>
       </header>
 

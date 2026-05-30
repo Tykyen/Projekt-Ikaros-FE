@@ -20,7 +20,13 @@
  * Plán: docs/arch/phase-10/plan-10.2d.md C2 + C4; fix-pack 10.2c-edit-9d.
  */
 import { useCallback, useMemo, useRef, useState } from 'react';
-import type { Graphics as PixiGraphics, FederatedPointerEvent } from 'pixi.js';
+import { useTick } from '@pixi/react';
+import type {
+  Graphics as PixiGraphics,
+  Container as PixiContainer,
+  Ticker,
+  FederatedPointerEvent,
+} from 'pixi.js';
 import { axialToPixel } from '../../hexUtils';
 import type {
   HexConfig,
@@ -29,6 +35,7 @@ import type {
   Point,
 } from '../../types';
 import { useTokenTexture } from '../../hooks/useTokenTexture';
+import { getInitials } from '../../utils/getInitials';
 import { TokenHpBar } from './TokenHpBar';
 import { systemEntitySchemaRegistry } from '../../schemas/registry';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -40,6 +47,11 @@ interface Props {
   staggerOffset: Point;
   isSelected: boolean;
   isActiveTurn: boolean;
+  /** 10.2f-3 — PJ na token ukázal (červený spotlight ring, dočasný). */
+  isSpotlight?: boolean;
+  /** Resolvuje obrázek tokenu (bestie z bestiáře přes templateId) — fresh
+   *  při každém renderu, ať bestie obrázek nezmizí kvůli stale memo. */
+  resolveImage?: (token: MapToken) => string | undefined;
   canDrag: boolean;
   /**
    * Klik na token tělo = jen SELECT (highlight ring; click-to-place pattern
@@ -55,15 +67,6 @@ interface Props {
   onPointerDown?: (e: FederatedPointerEvent, token: MapToken) => void;
 }
 
-function getInitials(name: string): string {
-  if (!name) return '?';
-  return name
-    .split(/\s+/)
-    .map((w) => w[0]?.toUpperCase() ?? '')
-    .slice(0, 2)
-    .join('') || '?';
-}
-
 export function TokenSprite({
   token,
   config,
@@ -71,6 +74,8 @@ export function TokenSprite({
   staggerOffset,
   isSelected,
   isActiveTurn,
+  isSpotlight = false,
+  resolveImage,
   canDrag,
   onSelect,
   onOpenInfo,
@@ -84,7 +89,7 @@ export function TokenSprite({
   const x = center.x + config.originX + staggerOffset.x;
   const y = center.y + config.originY + staggerOffset.y;
 
-  const imageUrl = token.characterData?.imageUrl;
+  const imageUrl = resolveImage?.(token) ?? token.characterData?.imageUrl;
   const { texture } = useTokenTexture(imageUrl);
 
   const displayName =
@@ -105,6 +110,44 @@ export function TokenSprite({
     },
     [ringColor, isSelected, tokenSize],
   );
+
+  // 10.2f — „na tahu" glow: dvě širší poloprůhledné vrstvy kolem tokenu
+  // (měkký glow bez filtru). Alpha pulzuje přes useTick (mutace containeru).
+  const drawActiveTurnGlow = useCallback(
+    (g: PixiGraphics) => {
+      g.clear();
+      g.circle(0, 0, tokenSize + 11);
+      g.stroke({ color: theme.tokenRingActiveTurnGlow, width: 7, alpha: 0.5 });
+      g.circle(0, 0, tokenSize + 6);
+      g.stroke({ color: theme.tokenRingActiveTurn, width: 3, alpha: 0.95 });
+    },
+    [theme.tokenRingActiveTurnGlow, theme.tokenRingActiveTurn, tokenSize],
+  );
+
+  // 10.2f-3 — spotlight glow (červený, širší než „na tahu", ať jsou vidět
+  // oba současně když token na tahu + PJ na něj ukáže).
+  const drawSpotlightGlow = useCallback(
+    (g: PixiGraphics) => {
+      g.clear();
+      g.circle(0, 0, tokenSize + 15);
+      g.stroke({ color: theme.tokenRingSpotlightGlow, width: 8, alpha: 0.5 });
+      g.circle(0, 0, tokenSize + 9);
+      g.stroke({ color: theme.tokenRingSpotlight, width: 3, alpha: 0.95 });
+    },
+    [theme.tokenRingSpotlight, theme.tokenRingSpotlightGlow, tokenSize],
+  );
+
+  // Pulse: mutuje alpha glow containerů přímo (žádný React re-render/frame).
+  // Hook se volá vždy (pravidla hooků); když ref null / stav neaktivní, skip.
+  const glowRef = useRef<PixiContainer | null>(null);
+  const spotlightGlowRef = useRef<PixiContainer | null>(null);
+  const pulseTimeRef = useRef(0);
+  useTick((ticker: Ticker) => {
+    pulseTimeRef.current += ticker.deltaMS;
+    const a = 0.55 + 0.45 * Math.sin(pulseTimeRef.current / 360);
+    if (glowRef.current && isActiveTurn) glowRef.current.alpha = a;
+    if (spotlightGlowRef.current && isSpotlight) spotlightGlowRef.current.alpha = a;
+  });
 
   // 10.2c-edit-9d: pozadí kruhu + circle mask pro sprite (matchuje
   // Matrix `clipPath` circle — token musí být kulatý, ne čtvercový sprite).
@@ -197,6 +240,28 @@ export function TokenSprite({
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
     >
+      {/* 10.2f-3 — spotlight glow (červený, úplně vespod); pulzuje. */}
+      {isSpotlight && (
+        <pixiContainer
+          label="token-spotlight-glow"
+          ref={(c: PixiContainer | null) => {
+            spotlightGlowRef.current = c;
+          }}
+        >
+          <pixiGraphics draw={drawSpotlightGlow} />
+        </pixiContainer>
+      )}
+      {/* 10.2f — glow „na tahu" (pod hlavním ringem); pulzuje. */}
+      {isActiveTurn && (
+        <pixiContainer
+          label="token-active-glow"
+          ref={(c: PixiContainer | null) => {
+            glowRef.current = c;
+          }}
+        >
+          <pixiGraphics draw={drawActiveTurnGlow} />
+        </pixiContainer>
+      )}
       <pixiGraphics label="token-ring" draw={drawRing} />
       <pixiGraphics label="token-bg" draw={drawBackground} />
       {texture ? (

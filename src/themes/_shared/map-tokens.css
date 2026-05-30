@@ -21,7 +21,13 @@
   /* ── Tokeny (PC/NPC ringy + HP bar) ────────────────────── */
   --map-token-ring-default: #3a3550;
   --map-token-ring-selected: #b48cff;
-  --map-token-ring-active-turn: #ffd700; /* zlatá — combat tracker glow */
+  --map-token-ring-active-turn: #ffd700; /* zlatá — combat tracker „na tahu" */
+  /* 10.2f — glow kolem tokenu na tahu (širší poloprůhledný ring + pulse),
+     ať je „na tahu" nepřehlédnutelný. */
+  --map-token-ring-active-turn-glow: rgba(255, 215, 0, 0.45);
+  /* 10.2f-3 — spotlight („ukazováček" PJ z iniciativní lišty), broadcast. */
+  --map-token-ring-spotlight: #ff3b3b;
+  --map-token-ring-spotlight-glow: rgba(255, 59, 59, 0.45);
   --map-token-hp-bar-bg: rgba(0, 0, 0, 0.5);
 
   /* ── Mlha války (PJ vs hráč) ───────────────────────────── */

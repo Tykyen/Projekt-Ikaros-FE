@@ -21,6 +21,7 @@ import { resolveWorldTheme } from '../../../themes/worldTheme';
 import { MatrixRain } from '../../../themes/effects/MatrixRain';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
 import { isNavItemHidden } from '@/features/world/lib/worldNavConfig';
+import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 
 /* ── Nav definice ── */
 // `id` na items = klíč pro `WorldSettings.hiddenNavItems` filter (9.3-followup).
@@ -486,7 +487,11 @@ export function WorldLayout() {
         )}
 
         <main className={s.main} style={mainStyle}>
-          <Outlet />
+          {/* Spec 5.1 — když svět po načtení chybí (404 / private bez přístupu),
+              tělo ukáže WorldNotFound místo Outletu. Bez toho dílčí stránky
+              (např. taktická mapa) renderovaly svůj obsah nad neexistujícím
+              světem — hlavička „Svět nenalezen", ale tělo PJ empty state. */}
+          {!loading && !world ? <WorldNotFound /> : <Outlet />}
         </main>
 
         {/* 9.1 — wizard pro tvorbu nového obsahu (Wiki / PC / NPC). */}

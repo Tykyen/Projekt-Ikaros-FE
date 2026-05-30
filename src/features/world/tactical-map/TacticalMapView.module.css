@@ -26,3 +26,13 @@
   position: absolute;
   inset: 0;
 }
+
+/* Ve fullscreenu se viewport stává fullscreen elementem. Bez explicitní výšky
+   se `height: 100%` může počítat vůči původnímu rodiči (kratšímu než obrazovka)
+   → canvas i fit dostanou menší výšku a pod mapou zůstane černý pruh. Vynutíme
+   plnou výšku/šířku obrazovky a vynulujeme header offset z min-height. */
+.viewport:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+}

@@ -14,11 +14,12 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.2.
  */
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { getSocket } from '@/features/chat/api/socket';
 import type {
   MapOperationBroadcast,
   MapReassignedBroadcast,
+  MapSpotlightBroadcast,
 } from '../types';
 
 interface UseMapSocketOptions {
@@ -28,13 +29,21 @@ interface UseMapSocketOptions {
   onOperation?: (payload: MapOperationBroadcast) => void;
   /** Callback při private `map:reassigned` (cross-scene přesun mě). */
   onReassigned?: (payload: MapReassignedBroadcast) => void;
+  /** 10.2f-3 — callback při `map:spotlight` (PJ ukázal na token). */
+  onSpotlight?: (payload: MapSpotlightBroadcast) => void;
+}
+
+export interface UseMapSocketResult {
+  /** 10.2f-3 — PJ emit spotlight (broadcast ostatním na scéně). */
+  emitSpotlight: (tokenId: string) => void;
 }
 
 export function useMapSocket({
   sceneId,
   onOperation,
   onReassigned,
-}: UseMapSocketOptions): void {
+  onSpotlight,
+}: UseMapSocketOptions): UseMapSocketResult {
   useEffect(() => {
     if (!sceneId) return;
     const socket = getSocket();
@@ -67,4 +76,25 @@ export function useMapSocket({
       socket.off('map:reassigned', handler);
     };
   }, [onReassigned]);
+
+  // Listener: map:spotlight (PJ ukázal na token — ephemeral)
+  useEffect(() => {
+    if (!onSpotlight) return;
+    const socket = getSocket();
+    const handler = (payload: MapSpotlightBroadcast): void => onSpotlight(payload);
+    socket.on('map:spotlight', handler);
+    return () => {
+      socket.off('map:spotlight', handler);
+    };
+  }, [onSpotlight]);
+
+  const emitSpotlight = useCallback(
+    (tokenId: string): void => {
+      if (!sceneId) return;
+      getSocket().emit('map:spotlight', { sceneId, tokenId });
+    },
+    [sceneId],
+  );
+
+  return { emitSpotlight };
 }

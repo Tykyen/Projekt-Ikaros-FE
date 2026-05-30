@@ -78,6 +78,20 @@ export interface UseViewportPanZoomResult extends ViewportState {
   onPointerUp: (e: PointerEvent) => void;
   setZoom: (zoom: number) => void;
   resetZoom: () => void;
+  /** Přizpůsobí zoom+offset tak, aby `bounds` (map-space bbox) byl celý vidět
+   *  a vycentrovaný ve viewportu (contain fit). `vw`/`vh` = rozměr viewportu
+   *  (typicky z useViewportSize, ať fit sedí s canvasem); když chybí, čte se
+   *  getBoundingClientRect. No-op pokud chybí rozměry. */
+  fitToViewport: (
+    bounds: { x: number; y: number; width: number; height: number },
+    vw?: number,
+    vh?: number,
+  ) => void;
+  /** 10.2f — vycentruje daný bod (map-space, tj. před transformem) do středu
+   *  viewportu; zoom se nemění. Plynulý ease-out tween (`durationMs`, default
+   *  250); `0` = okamžitý skok. Použito pro klik na iniciativní liště
+   *  (pan-to-token). No-op pokud chybí rozměry viewportu. */
+  centerOnPoint: (mapX: number, mapY: number, durationMs?: number) => void;
 }
 
 export function useViewportPanZoom(
@@ -94,6 +108,16 @@ export function useViewportPanZoom(
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  // 10.2f — pan-to-token tween rAF id (deklarováno nahoře, ať ho user gesta
+  // níže umí zrušit). Cancel = další klik / pan / wheel přeruší animaci.
+  const panAnimRef = useRef<number | null>(null);
+  const cancelPanAnim = useCallback(() => {
+    if (panAnimRef.current !== null) {
+      cancelAnimationFrame(panAnimRef.current);
+      panAnimRef.current = null;
+    }
+  }, []);
 
   // Re-hydrate při změně scény (přepnutí mezi aktivními scénami)
   const lastSceneIdRef = useRef<string | null>(sceneId);
@@ -121,6 +145,7 @@ export function useViewportPanZoom(
     (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
+      cancelPanAnim(); // user gesto přeruší pan-to-token tween
       const ratio = e.deltaY < 0 ? 1.1 : 0.9;
       const current = stateRef.current;
       const newZoom = clampZoom(current.zoom * ratio);
@@ -141,7 +166,7 @@ export function useViewportPanZoom(
         offsetY: screenY - mapY * newZoom,
       });
     },
-    [viewportRef],
+    [viewportRef, cancelPanAnim],
   );
 
   // Pan + pinch state
@@ -177,6 +202,7 @@ export function useViewportPanZoom(
     // Mouse — middle (1) vždy pan; left (0) pan (v dalších krocích bude
     // suppress když je aktivní tool/placement).
     if (e.button === 0 || e.button === 1) {
+      cancelPanAnim(); // user pan přeruší pan-to-token tween
       isPanning.current = true;
       panStart.current = {
         x: e.clientX,
@@ -186,7 +212,7 @@ export function useViewportPanZoom(
       };
       if (e.button === 1) e.preventDefault(); // suppress autoscroll icon
     }
-  }, []);
+  }, [cancelPanAnim]);
 
   const onPointerMove = useCallback(
     (e: PointerEvent) => {
@@ -266,6 +292,72 @@ export function useViewportPanZoom(
     setState({ zoom: 1, offsetX: 0, offsetY: 0 });
   }, []);
 
+  // Contain fit: největší zoom, při kterém je celá mapa vidět, + center offset.
+  // map-root container má x=offsetX, y=offsetY, scale=zoom; background sedí na
+  // (bounds.x, bounds.y) v map-space → screen střed mapy = offset + (bounds
+  // střed)*zoom. Řešíme offset tak, aby = viewport střed.
+  const fitToViewport = useCallback(
+    (
+      bounds: { x: number; y: number; width: number; height: number },
+      vw?: number,
+      vh?: number,
+    ) => {
+      const rect = viewportRef.current?.getBoundingClientRect();
+      const viewW = vw ?? rect?.width ?? 0;
+      const viewH = vh ?? rect?.height ?? 0;
+      if (viewW <= 0 || viewH <= 0 || bounds.width <= 0 || bounds.height <= 0)
+        return;
+      const zoom = clampZoom(
+        Math.min(viewW / bounds.width, viewH / bounds.height),
+      );
+      setState({
+        zoom,
+        offsetX: viewW / 2 - (bounds.x + bounds.width / 2) * zoom,
+        offsetY: viewH / 2 - (bounds.y + bounds.height / 2) * zoom,
+      });
+    },
+    [viewportRef],
+  );
+
+  // 10.2f — pan-to-token tween. Cíl: bod (mapX, mapY) v map-space → střed
+  // viewportu. panAnimRef/cancelPanAnim deklarováno nahoře.
+  const centerOnPoint = useCallback(
+    (mapX: number, mapY: number, durationMs = 250) => {
+      const rect = viewportRef.current?.getBoundingClientRect();
+      const viewW = rect?.width ?? 0;
+      const viewH = rect?.height ?? 0;
+      if (viewW <= 0 || viewH <= 0) return;
+      const start = stateRef.current;
+      const zoom = start.zoom;
+      const targetX = viewW / 2 - mapX * zoom;
+      const targetY = viewH / 2 - mapY * zoom;
+      cancelPanAnim();
+      if (durationMs <= 0) {
+        setState({ zoom, offsetX: targetX, offsetY: targetY });
+        return;
+      }
+      const fromX = start.offsetX;
+      const fromY = start.offsetY;
+      const t0 =
+        typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const tick = (now: number): void => {
+        const p = Math.min(1, (now - t0) / durationMs);
+        const e = 1 - Math.pow(1 - p, 3); // ease-out cubic
+        setState((s) => ({
+          ...s,
+          offsetX: fromX + (targetX - fromX) * e,
+          offsetY: fromY + (targetY - fromY) * e,
+        }));
+        panAnimRef.current = p < 1 ? requestAnimationFrame(tick) : null;
+      };
+      panAnimRef.current = requestAnimationFrame(tick);
+    },
+    [viewportRef, cancelPanAnim],
+  );
+
+  // Zruš tween na unmount.
+  useEffect(() => cancelPanAnim, [cancelPanAnim]);
+
   return {
     ...state,
     onWheel,
@@ -274,5 +366,7 @@ export function useViewportPanZoom(
     onPointerUp,
     setZoom,
     resetZoom,
+    fitToViewport,
+    centerOnPoint,
   };
 }

@@ -13,7 +13,7 @@ import type { SystemSheetProps } from '../types';
 
 interface Props {
   onRoll: NonNullable<SystemSheetProps['onRoll']>;
-  kind?: 'fate' | 'd20' | 'd6' | 'd10';
+  kind?: 'fate' | 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
   modifier?: number;
 }
 

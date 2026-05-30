@@ -62,6 +62,13 @@ function readThemeFromCSS(): MapThemeColors {
     tokenRingDefault: parseHexColor(v('--map-token-ring-default')),
     tokenRingSelected: parseHexColor(v('--map-token-ring-selected')),
     tokenRingActiveTurn: parseHexColor(v('--map-token-ring-active-turn')),
+    tokenRingActiveTurnGlow: parseHexColor(
+      v('--map-token-ring-active-turn-glow'),
+    ),
+    tokenRingSpotlight: parseHexColor(v('--map-token-ring-spotlight')),
+    tokenRingSpotlightGlow: parseHexColor(
+      v('--map-token-ring-spotlight-glow'),
+    ),
     tokenHpBarBg: v('--map-token-hp-bar-bg'),
     fogPjFill: v('--map-fog-pj-fill'),
     fogPlayerFill: v('--map-fog-player-fill'),

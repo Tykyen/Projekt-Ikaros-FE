@@ -19,6 +19,24 @@
 
 ## Otevřené
 
+### D-065 — GurpsSheet deník nemá tlačítko „Iniciativa"
+**Soubor:** `src/features/world/pages/CharacterDetailPage/diary-systems/sheets/gurps/GurpsSheet.tsx`
+**Problém:** Při opravě pre-existujících TS chyb (10.2f) odhaleno: `GurpsSheet` jako jediný per-system deníkový sheet **nezapojuje** `<SheetInitiativeButton>` — importoval ho, ale nepoužíval (TS6133), a `onRoll` prop ignoroval. Ostatní sheety (CoC, …) tlačítko mají. Pro odstranění chyby byl unused import + `onRoll` zatím odebrán, takže GURPS hráč nemá v deníku quick-roll iniciativy.
+**Dopad:** Nízký — GURPS deník bez quick-roll iniciativy; lišta 10.2f funguje nezávisle.
+**Řešení:** Přidat `{onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}` do headeru `GurpsSheet` (vrátit `onRoll` do props), analogicky CoC.
+**Kdy:** Při příští práci na GURPS deníku nebo sjednocení sheetů.
+
+---
+
+### D-064 — Orchestr: vkládání PC z katalogu by chtělo přepracovat (seskupení)
+**Soubor:** `src/features/world/tactical-map/components/pj-panel/` — `CharacterCatalogModal.tsx` / `PcPalette.tsx` (orchestrace spawn PC)
+**Problém:** Vkládání PC z katalogu v PJ orchestru je dnes ploché (token po tokenu). User při 10.2f návrhu poznamenal, že „skupiny" (které do iniciativy nepatří — řeší se orchestrem) by se hodilo v orchestru u PC-katalog vložení **předělat** — pravděpodobně hromadné/skupinové vkládání nebo seskupení vložených tokenů. Přesný rozsah TBD (upřesnit s userem).
+**Dopad:** Nízký — UX vylepšení orchestru, ne blocker.
+**Řešení:** Doptat se na konkrétní představu; navrhnout seskupení / multi-select vložení PC v `CharacterCatalogModal`.
+**Kdy:** Při práci na orchestru PJ panelu nebo až po dotažení 10.2.
+
+---
+
 ### D-react19-strict-cleanup — 44 React 19 strict lint warningy ve 30+ FE souborech
 **Soubory:** Široký scope — viz `npx eslint src` výstup. Hot soubory:
 - `PageEditor/hooks/{useFormDraftAutoSave,useSlugAutoGen}.ts`, `PageEditor/components/AkjCreateModal.tsx`

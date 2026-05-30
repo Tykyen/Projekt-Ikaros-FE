@@ -218,8 +218,12 @@ export type MapOperation =
   | { type: 'sound.playlist'; soundIds: string[] }
   // Combat
   | { type: 'combat.start'; orderTokenIds: string[] }
-  | { type: 'combat.turn'; tokenId?: string }
+  // 10.2f — `round` override: lišta sortuje živě dle initiative, FE řídí
+  // pořadí tahů → posílá explicitní `tokenId` + `round` (wrap → round+1).
+  | { type: 'combat.turn'; tokenId?: string; round?: number }
   | { type: 'combat.end' }
+  // 10.2f-2 — přeřazení order ZA boje (zachová round + currentTokenId)
+  | { type: 'combat.reorder'; orderTokenIds: string[] }
   | { type: 'combat.effect.add'; tokenId: string; effect: Record<string, unknown> }
   | { type: 'combat.effect.remove'; effectId: string }
   // NPC template
@@ -281,6 +285,11 @@ export interface MapReassignedBroadcast {
   newSceneId: string | null;
 }
 
+/** 10.2f-3 — WS `map:spotlight` event (PJ „ukazováček" na token). */
+export interface MapSpotlightBroadcast {
+  tokenId: string;
+}
+
 /** WS `world:operation` event (PJ orchestrator). */
 export interface WorldOperationBroadcast {
   worldId: string;
@@ -340,6 +349,12 @@ export interface MapThemeColors {
   tokenRingSelected: number;
   /** Glow kolem tokenu na řadě v combat (hex). */
   tokenRingActiveTurn: number;
+  /** 10.2f — širší glow ring kolem tokenu na tahu (hex; alpha řeší draw). */
+  tokenRingActiveTurnGlow: number;
+  /** 10.2f-3 — spotlight ring (PJ „ukazováček" z iniciativní lišty), hex. */
+  tokenRingSpotlight: number;
+  /** 10.2f-3 — glow kolem spotlight ringu (hex; alpha řeší draw). */
+  tokenRingSpotlightGlow: number;
   /** HP bar pozadí (rgba string). */
   tokenHpBarBg: string;
   /** Mlha pro PJ — semi-transparent (rgba string). */

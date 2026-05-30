@@ -266,6 +266,49 @@ describe('useViewportPanZoom', () => {
     });
   });
 
+  describe('centerOnPoint (pan-to-token)', () => {
+    it('durationMs=0 → okamžitě vycentruje bod do středu viewportu', () => {
+      // viewport 1000×800, zoom 1, default offset 0/0.
+      // střed = (500, 400); bod (300, 200) → offset = střed - bod*zoom
+      const { result } = setupHook(makeViewport(1000, 800));
+      act(() => result.current.centerOnPoint(300, 200, 0));
+      expect(result.current.offsetX).toBe(200);
+      expect(result.current.offsetY).toBe(200);
+      expect(result.current.zoom).toBe(1); // zoom se nemění
+    });
+
+    it('respektuje aktuální zoom', () => {
+      const { result } = setupHook(makeViewport(1000, 800));
+      act(() => result.current.setZoom(2)); // zoom 2, offset -500/-400
+      act(() => result.current.centerOnPoint(300, 200, 0));
+      // offset = 500 - 300*2 = -100 ; 400 - 200*2 = 0
+      expect(result.current.offsetX).toBe(-100);
+      expect(result.current.offsetY).toBe(0);
+      expect(result.current.zoom).toBe(2);
+    });
+
+    it('no-op když viewport nemá rozměry', () => {
+      const { result } = setupHook(makeViewport(0, 0));
+      act(() => result.current.centerOnPoint(300, 200, 0));
+      expect(result.current.offsetX).toBe(0);
+      expect(result.current.offsetY).toBe(0);
+    });
+
+    it('tween dojede na cílový offset po dokončení animace', () => {
+      // rAF mock zavolá callback s velkým časem → progress = 1 → cíl.
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+        cb(1e9);
+        return 1;
+      });
+      vi.stubGlobal('cancelAnimationFrame', () => {});
+      const { result } = setupHook(makeViewport(1000, 800));
+      act(() => result.current.centerOnPoint(300, 200));
+      expect(result.current.offsetX).toBeCloseTo(200, 5);
+      expect(result.current.offsetY).toBeCloseTo(200, 5);
+      vi.unstubAllGlobals();
+    });
+  });
+
   describe('persist', () => {
     it('persist po debounce do per-scéna JSON klíče', async () => {
       vi.useFakeTimers();

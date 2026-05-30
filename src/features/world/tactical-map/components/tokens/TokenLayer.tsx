@@ -22,6 +22,10 @@ interface Props {
   theme: MapThemeColors;
   selectedTokenId: string | null;
   activeTurnTokenId?: string | null;
+  /** 10.2f-3 — token, na který PJ ukázal (červený spotlight ring). */
+  spotlightTokenId?: string | null;
+  /** Resolvuje obrázek tokenu (bestie přes templateId, fresh každý render). */
+  resolveImage?: (token: MapToken) => string | undefined;
   canDrag: (token: MapToken) => boolean;
   onSelect: (tokenId: string) => void;
   /** 10.2c-edit-9e — 'i' badge → open modal (separate od select highlight). */
@@ -35,6 +39,8 @@ export function TokenLayer({
   theme,
   selectedTokenId,
   activeTurnTokenId,
+  spotlightTokenId,
+  resolveImage,
   canDrag,
   onSelect,
   onOpenInfo,
@@ -52,6 +58,8 @@ export function TokenLayer({
           staggerOffset={offsets[t.id] ?? { x: 0, y: 0 }}
           isSelected={t.id === selectedTokenId}
           isActiveTurn={t.id === activeTurnTokenId}
+          isSpotlight={t.id === spotlightTokenId}
+          resolveImage={resolveImage}
           canDrag={canDrag(t)}
           onSelect={onSelect}
           onOpenInfo={onOpenInfo}

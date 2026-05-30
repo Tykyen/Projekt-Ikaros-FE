@@ -39,7 +39,9 @@ interface Props {
   children: ReactNode;
 }
 
-const MODE_ORDER: PanelMode[] = ['dock', 'drag', 'overlay'];
+// 'overlay' záměrně není v toggle — na desktopu nedává smysl ručně vystředit
+// deník, na mobilu se force-uje automaticky (usePanelMode). Viz user feedback.
+const MODE_ORDER: PanelMode[] = ['dock', 'drag'];
 const MODE_ICON: Record<PanelMode, string> = {
   dock: '📌',
   drag: '🪟',

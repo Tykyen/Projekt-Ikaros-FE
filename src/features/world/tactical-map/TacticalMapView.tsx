@@ -18,6 +18,7 @@
  */
 import { Application, extend } from '@pixi/react';
 import { Container, Graphics, Sprite, Text } from 'pixi.js';
+import type { Application as PixiApplication } from 'pixi.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -38,14 +39,19 @@ import { MapHiddenOverlay } from './components/MapHiddenOverlay';
 import { MapLockedOverlay } from './components/MapLockedOverlay';
 import { MapPjPanel } from './components/pj-panel/MapPjPanel';
 import { TokenLayer } from './components/tokens/TokenLayer';
+import { InitiativeBar } from './components/initiative/InitiativeBar';
 import { TokenInfoPanel } from './components/token-panel/TokenInfoPanel';
 import { TokenSystemSheet } from './components/token-panel/TokenSystemSheet';
 import { useMyCharacterSlugs } from './hooks/useMyCharacterSlugs';
 import { useTokenPermissions } from './hooks/useTokenPermissions';
+import { useTokenUpdate } from './hooks/useTokenUpdate';
 import { useTokenDrag } from './hooks/useTokenDrag';
 import { applyOperationToScene } from './utils/applyOperationToScene';
 import { findFirstFreeHex } from './utils/findFirstFreeHex';
 import { screenToHex } from './utils/screenToHex';
+import { axialToPixel } from './hexUtils';
+import { isPcToken } from './utils/isPcToken';
+import { sortByInitiativeDesc } from './utils/initiativeOrder';
 import {
   readSpawnPayload,
   hasSpawnPayloadType,
@@ -63,7 +69,7 @@ import { toast } from 'sonner';
 import { parseApiError } from '@/shared/api';
 import { bestiarQueryKey } from '@/features/world/bestiar/hooks/useBestiar';
 import type { BestiarResponse, Bestie } from '@/features/world/bestiar/types';
-import type { MapOperation, MapToken } from './types';
+import type { MapOperation, MapToken, MapScene } from './types';
 import styles from './TacticalMapView.module.css';
 
 // PixiJS v8 @pixi/react JSX pragma — extend dovolí použít `pixiContainer`
@@ -82,10 +88,32 @@ export function TacticalMapView(): React.ReactElement {
   const theme = useMapTheme();
   const { width, height } = useViewportSize(viewportRef);
 
+  // 10.2f-3 — spotlight („ukazováček" PJ z iniciativní lišty). Ephemeral
+  // červený ring na tokenu, auto-clear po 3 s. Trigger lokálně (PJ klik) i
+  // z WS (jiný PJ ukázal). Definováno před useMapScene, ať může přijmout cb.
+  const [spotlightTokenId, setSpotlightTokenId] = useState<string | null>(null);
+  const spotlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const triggerSpotlight = useCallback((tokenId: string) => {
+    setSpotlightTokenId(tokenId);
+    if (spotlightTimerRef.current) clearTimeout(spotlightTimerRef.current);
+    spotlightTimerRef.current = setTimeout(
+      () => setSpotlightTokenId(null),
+      3000,
+    );
+  }, []);
+  useEffect(
+    () => () => {
+      if (spotlightTimerRef.current) clearTimeout(spotlightTimerRef.current);
+    },
+    [],
+  );
+
   // 10.2c — scene fetch + WS + cross-scene reassignment listener.
   // POZOR: `useMapScene` musí být před `useViewportPanZoom`, aby hook
   // dostal `scene.id` pro per-scéna LS klíče (10.2c-edit-5).
-  const { scene } = useMapScene(worldId || null);
+  const { scene, emitSpotlight } = useMapScene(worldId || null, {
+    onSpotlight: triggerSpotlight,
+  });
   useReassignmentListener(worldId || null);
 
   const panZoom = useViewportPanZoom(viewportRef, scene?.id ?? null);
@@ -106,15 +134,64 @@ export function TacticalMapView(): React.ReactElement {
     (scene?.config as unknown as { backgroundY?: number })?.backgroundY ?? 0;
   // Derived: pokud scéna nemá imageUrl, ignoruj případné starý mapTextureSize
   // (mohl zůstat z předchozí scény, kde MapBackground volal onLoad před unmount).
-  const mapBounds: MapBounds | null =
-    scene?.imageUrl && mapTextureSize
-      ? {
-          x: backgroundX,
-          y: backgroundY,
-          width: mapTextureSize.width,
-          height: mapTextureSize.height,
-        }
-      : null;
+  // useMemo — stabilní reference pro useEffect dep (mapBoundsRef sync).
+  const mapBounds: MapBounds | null = useMemo(
+    () =>
+      scene?.imageUrl && mapTextureSize
+        ? {
+            x: backgroundX,
+            y: backgroundY,
+            width: mapTextureSize.width,
+            height: mapTextureSize.height,
+          }
+        : null,
+    [scene?.imageUrl, mapTextureSize, backgroundX, backgroundY],
+  );
+
+  // Live ref na mapBounds — fullscreen listener čte aktuální hodnotu bez
+  // re-bindingu (mapBounds se mění s každým renderem).
+  const mapBoundsRef = useRef(mapBounds);
+  useEffect(() => {
+    mapBoundsRef.current = mapBounds;
+  }, [mapBounds]);
+
+  // @pixi/react <Application> nepřekresluje canvas, když se změní width/height
+  // prop (zůstane na velikosti z initu). Při vstupu do fullscreenu se viewport
+  // zvětší, ale canvas ne → sprite je oříznutý a pod ním černo. Imperativně
+  // zvětšíme renderer při každé změně rozměru.
+  const appRef = useRef<PixiApplication | null>(null);
+  useEffect(() => {
+    const app = appRef.current;
+    if (!app?.renderer || width <= 0 || height <= 0) return;
+    app.renderer.resize(width, height);
+  }, [width, height]);
+
+  // Fullscreen flag — měníme přes fullscreenchange event.
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const el = viewportRef.current;
+    const onFsChange = (): void =>
+      setIsFullscreen(document.fullscreenElement === el);
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+
+  // Auto-fit mapy ve fullscreenu. Spustí se při KAŽDÉ změně rozměru viewportu
+  // (vstup do fullscreenu 800→1080, pozdější resize / zavření devtools). Bere
+  // width/height z useViewportSize = přesně rozměr canvasu, takže fit a canvas
+  // se vždy shodují a poslední přepočet vyhraje — žádný timing race ani závislost
+  // na tom, kdy fullscreen geometrie dorazí. Mimo fullscreen = no-op.
+  // fit přes ref — panZoom je nový objekt každý render, jako dep by způsobil
+  // nekonečnou smyčku (fit → setState → re-render → nový panZoom → fit → …).
+  const fitRef = useRef(panZoom.fitToViewport);
+  useEffect(() => {
+    fitRef.current = panZoom.fitToViewport;
+  });
+  useEffect(() => {
+    if (!isFullscreen) return;
+    if (width <= 0 || height <= 0 || !mapBoundsRef.current) return;
+    fitRef.current(mapBoundsRef.current, width, height);
+  }, [isFullscreen, width, height]);
 
   // Bind pointer events. Window-level pointermove/up pro continuous drag
   // i po opuštění viewportu.
@@ -169,6 +246,9 @@ export function TacticalMapView(): React.ReactElement {
     isPj: userRole !== null && userRole >= WorldRole.PomocnyPJ,
     mySlugs,
   });
+
+  // 10.2f — token.update pro „V boji / Mimo boj" toggle v panelu tokenu.
+  const tokenUpdate = useTokenUpdate(scene?.id ?? '', worldId ?? '');
 
   // 10.2d-B — optimistic token.move mutation s rollback.
   const queryClient = useQueryClient();
@@ -252,18 +332,16 @@ export function TacticalMapView(): React.ReactElement {
     [queryClient, worldId, worldSystemId],
   );
 
-  // Bestie tokeny nemají `characterData` (nejsou Page) → na mapě by neměly
-  // obrázek. Doplníme `imageUrl` ze snapshotu bestie (cache přes templateId),
-  // ať TokenSprite vykreslí avatar. Query cache se nemutuje (mapujeme kopii).
-  const enrichedTokens = useMemo(() => {
-    const list = scene?.tokens ?? [];
-    return list.map((t) => {
-      if (!t.templateId || t.characterData?.imageUrl) return t;
-      const img = lookupBestie(t.templateId)?.imageUrl;
-      if (!img) return t;
-      return { ...t, characterData: { ...t.characterData, imageUrl: img } };
-    });
-  }, [scene?.tokens, lookupBestie]);
+  // Bestie tokeny nemají `characterData` (nejsou Page) → obrázek dotahujeme ze
+  // snapshotu bestie (cache přes templateId). Resolvujeme FRESH při každém
+  // renderu (ne přes memo) — jinak obrázek zmizel po refetchi/bestiar load
+  // (stale memo). Stejná cesta jako iniciativní lišta.
+  const resolveTokenImage = useCallback(
+    (t: MapToken): string | undefined =>
+      t.characterData?.imageUrl ??
+      (t.templateId ? lookupBestie(t.templateId)?.imageUrl : undefined),
+    [lookupBestie],
+  );
 
   /**
    * Sjednocený spawn — z drop handleru i z placement-mode klikem.
@@ -345,6 +423,11 @@ export function TacticalMapView(): React.ReactElement {
     (e: React.MouseEvent<HTMLDivElement>): void => {
       if (!scene || !viewportRef.current) return;
       if (e.button !== 0) return;
+      // Reaguj jen na klik přímo na mapový canvas. UI overlaye (placement
+      // banner, PJ panel, deník) jsou děti viewportu a jejich klik sem bublá
+      // taky — bez tohoto guardu Zrušit spawne entitu a zavření panelu pohne
+      // vybraným tokenem.
+      if ((e.target as HTMLElement).tagName !== 'CANVAS') return;
       const rect = viewportRef.current.getBoundingClientRect();
       const target = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
 
@@ -428,6 +511,9 @@ export function TacticalMapView(): React.ReactElement {
             antialias
             autoDensity
             resolution={window.devicePixelRatio || 1}
+            onInit={(app) => {
+              appRef.current = app;
+            }}
           >
             <pixiContainer
               label="map-root"
@@ -462,11 +548,13 @@ export function TacticalMapView(): React.ReactElement {
               <pixiContainer label="layer-tokens">
                 {scene && (
                   <TokenLayer
-                    tokens={enrichedTokens}
+                    tokens={scene.tokens}
                     config={scene.config}
                     theme={theme}
                     selectedTokenId={selectedTokenId}
                     activeTurnTokenId={scene.combat?.currentTokenId ?? null}
+                    spotlightTokenId={spotlightTokenId}
+                    resolveImage={resolveTokenImage}
                     canDrag={canDrag}
                     onSelect={setSelectedTokenId}
                     onOpenInfo={setOpenedTokenId}
@@ -545,7 +633,88 @@ export function TacticalMapView(): React.ReactElement {
                   </>
                 ) : undefined,
               actions: deletable ? (
-                <button
+                <>
+                  {/* 10.2f — „V boji / Mimo boj" toggle (PJ) jen pro NPC/bestie.
+                      PC jsou v boji vždy (nelze vyřadit) → bez toggle. */}
+                  {!isPcToken(openedToken) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const leaving = openedToken.inCombat;
+                      tokenUpdate.mutate({
+                        tokenId: openedToken.id,
+                        patch: { inCombat: !openedToken.inCombat },
+                      });
+                      // 10.2f — vyřazuji-li token, který je zrovna na tahu,
+                      // posuň „na tahu" na dalšího bojovníka (jinak by kolečko
+                      // viselo na nepřítomném tokenu).
+                      const combat = scene.combat;
+                      if (
+                        leaving &&
+                        combat?.isActive &&
+                        combat.currentTokenId === openedToken.id
+                      ) {
+                        const sorted = sortByInitiativeDesc(
+                          scene.tokens.filter(
+                            (t) => isPcToken(t) || t.inCombat,
+                          ),
+                        );
+                        const idx = sorted.findIndex(
+                          (t) => t.id === openedToken.id,
+                        );
+                        let nextId: string | null = null;
+                        for (let i = 1; i <= sorted.length; i++) {
+                          const cand = sorted[(idx + i) % sorted.length];
+                          if (cand.id !== openedToken.id) {
+                            nextId = cand.id;
+                            break;
+                          }
+                        }
+                        if (nextId) {
+                          const op: MapOperation = {
+                            type: 'combat.turn',
+                            tokenId: nextId,
+                            round: combat.round,
+                          };
+                          if (worldId) {
+                            queryClient.setQueryData(
+                              mapSceneQueryKey(worldId),
+                              (prev: MapScene | null | undefined) =>
+                                prev ? applyOperationToScene(prev, op) : prev,
+                            );
+                          }
+                          void postMapOperation(scene.id, op);
+                        }
+                      }
+                    }}
+                    style={{
+                      padding: '5px 12px',
+                      background: openedToken.inCombat
+                        ? 'rgba(255, 215, 0, 0.18)'
+                        : 'rgba(160, 170, 200, 0.12)',
+                      color: openedToken.inCombat ? '#ffd86b' : '#aab0c8',
+                      border: openedToken.inCombat
+                        ? '1px solid rgba(255, 215, 0, 0.5)'
+                        : '1px solid rgba(160, 170, 200, 0.35)',
+                      borderRadius: 5,
+                      font: 'inherit',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.6,
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      marginRight: 8,
+                    }}
+                    title={
+                      openedToken.inCombat
+                        ? 'Vyřadit z boje (zmizí z iniciativní lišty)'
+                        : 'Zařadit do boje (objeví se v iniciativní liště)'
+                    }
+                  >
+                    {openedToken.inCombat ? '⚔ V boji' : 'Mimo boj'}
+                  </button>
+                  )}
+                  <button
                   type="button"
                   onClick={() => {
                     if (!confirm(`Smazat token „${displayName}"?`)) return;
@@ -571,7 +740,8 @@ export function TacticalMapView(): React.ReactElement {
                   title={`Odebrat ${displayName} z mapy (postava v DB zůstane)`}
                 >
                   Odstranit z mapy
-                </button>
+                  </button>
+                </>
               ) : undefined,
               onClose: () => setOpenedTokenId(null),
             }}
@@ -585,6 +755,34 @@ export function TacticalMapView(): React.ReactElement {
           </TokenInfoPanel>
         );
       })()}
+
+      {/* 10.2f — iniciativní lišta (horní full-width). Klik na bojovníka
+          = pan-to-token + select; lišta se sama skryje když nikdo není v boji. */}
+      {scene && worldId && (
+        <InitiativeBar
+          scene={scene}
+          worldId={worldId}
+          systemId={worldSystemId}
+          isPj={isPJ}
+          myCharacterSlugs={mySlugs}
+          resolveTokenImage={resolveTokenImage}
+          onOpenInfo={setOpenedTokenId}
+          onItemClick={(token) => {
+            const p = axialToPixel(token.q, token.r, scene.config.size);
+            panZoom.centerOnPoint(
+              p.x + scene.config.originX,
+              p.y + scene.config.originY,
+            );
+            setSelectedTokenId(token.id);
+            // 10.2f-3 — PJ klik = spotlight (lokálně hned + broadcast ostatním).
+            // Hráč jen pan/select (nebroadcastuje).
+            if (isPJ) {
+              triggerSpotlight(token.id);
+              emitSpotlight(token.id);
+            }
+          }}
+        />
+      )}
 
       <MapZoomControls
         zoom={panZoom.zoom}

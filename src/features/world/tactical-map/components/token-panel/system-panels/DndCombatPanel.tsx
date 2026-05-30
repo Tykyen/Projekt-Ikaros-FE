@@ -48,8 +48,6 @@ interface Props {
   }) => void;
 }
 
-const HP_DEBOUNCE_MS = 500;
-
 const abilityMod = (score: number): number => Math.floor((score - 10) / 2);
 const fmtMod = (m: number): string => (m >= 0 ? `+${m}` : `${m}`);
 
@@ -122,21 +120,8 @@ export function DndCombatPanel({
     if (!tempHpFocusRef.current) setTempHpDraft(beTempHp);
   }, [beTempHp]);
 
-  // ── Debounced save helper ────────────────────────────────────────────
+  // ── Save helper (immediate; HP draft commit na blur) ─────────────────
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const scheduleSave = (patch: Record<string, unknown>): void => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      updateDiary.mutate(
-        { customDataPatch: patch },
-        {
-          onError: () => toast.error('Uložení D&D deníku selhalo'),
-        },
-      );
-      debounceRef.current = null;
-    }, HP_DEBOUNCE_MS);
-  };
-
   const immediateSave = (patch: Record<string, unknown>): void => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);

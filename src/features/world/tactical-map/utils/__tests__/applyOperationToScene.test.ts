@@ -335,6 +335,37 @@ describe('applyOperationToScene — sound + combat', () => {
     const next = applyOperationToScene(scene, { type: 'combat.end' });
     expect(next.combat).toBeNull();
   });
+
+  it('combat.reorder přepíše order, zachová round + currentTokenId', () => {
+    const scene = makeScene({
+      combat: {
+        isActive: true,
+        round: 4,
+        currentTokenId: 't2',
+        order: ['t1', 't2', 't3'],
+        endOfTurnEffects: [],
+      },
+    });
+    const next = applyOperationToScene(scene, {
+      type: 'combat.reorder',
+      orderTokenIds: ['t3', 't1', 't2'],
+    });
+    expect(next.combat?.order).toEqual(['t3', 't1', 't2']);
+    expect(next.combat?.round).toBe(4);
+    expect(next.combat?.currentTokenId).toBe('t2');
+  });
+
+  it('combat.reorder na inactive → warn + scene unchanged', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const scene = makeScene({ combat: null });
+    const next = applyOperationToScene(scene, {
+      type: 'combat.reorder',
+      orderTokenIds: ['t1'],
+    });
+    expect(next).toBe(scene);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });
 
 describe('applyOperationToScene — npcTemplate cascade', () => {
