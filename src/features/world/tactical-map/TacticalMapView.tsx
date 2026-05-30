@@ -30,7 +30,20 @@ import { useViewportSize } from './hooks/useViewportSize';
 import { useMapScene } from './hooks/useMapScene';
 import { useReassignmentListener } from './hooks/useReassignmentListener';
 import { usePlacementMode } from './hooks/usePlacementMode';
+import { useEffectTool } from './hooks/useEffectTool';
+import { useFogTool } from './hooks/useFogTool';
+import { EffectsPalette } from './components/effects/EffectsPalette';
+import { EffectsLayer } from './components/effects/EffectsLayer';
+import { FogLayer } from './components/fog/FogLayer';
+import { FogPalette } from './components/fog/FogPalette';
+import {
+  effectivelyRevealed,
+  fogBrushHexes,
+  isTokenHiddenByFog,
+} from './components/fog/fogUtils';
+import { getHexesInRadius, hexDistance } from './hexUtils';
 import { MapZoomControls } from './components/MapZoomControls';
+import { MapToolDock, MapDockStack } from './components/MapToolDock';
 import { MapEmptyState } from './components/MapEmptyState';
 import { MapPlacementBanner } from './components/MapPlacementBanner';
 import { HexGrid, type MapBounds } from './components/HexGrid';
@@ -80,6 +93,23 @@ import styles from './TacticalMapView.module.css';
 // "Graphics/Sprite is not part of the PIXI namespace".
 extend({ Container, Graphics, Sprite, Text });
 
+/**
+ * 10.2g — pokrývá efekt daný hex? Pro mazání klikem na hex (souřadnicové,
+ * deterministické). `color`/`barrier` = hex je v `hexes`; klik kdekoliv na
+ * bariéře tak smaže celou (je to jeden souvislý objekt). `explosion` =
+ * vzdálenost ≤ max ring radius (mimo excluded).
+ */
+function effectCoversHex(e: MapEffect, q: number, r: number): boolean {
+  if (e.type === 'explosion') {
+    const center = e.hexes[0];
+    if (!center || !e.rings?.length) return false;
+    if (e.excludedHexes?.some((ex) => ex.q === q && ex.r === r)) return false;
+    const maxR = Math.max(...e.rings.map((ri) => ri.radius));
+    return hexDistance(center, { q, r }) <= maxR;
+  }
+  return e.hexes.some((h) => h.q === q && h.r === r);
+}
+
 export function TacticalMapView(): React.ReactElement {
   const { worldId, world, userRole, loading } = useWorldContext();
   const worldSystemId = world?.system ?? 'drd2';
@@ -116,7 +146,26 @@ export function TacticalMapView(): React.ReactElement {
   });
   useReassignmentListener(worldId || null);
 
-  const panZoom = useViewportPanZoom(viewportRef, scene?.id ?? null);
+  // 10.2c-edit-9a — placement mode (klik v paletě → klik na hex).
+  // 10.2g — effect tool state (paleta efektů). Oba deklarovány PŘED panZoom,
+  // ať můžou suppressnout left-pan (kreslení efektu / placement = left-drag
+  // patří nástroji, ne posunu mapy).
+  const placement = usePlacementMode();
+  const effectTool = useEffectTool();
+  // 10.2h — fog tool state (paleta mlhy). Aktivní = left-drag kreslí mlhu.
+  const fogTool = useFogTool();
+  // 10.2h — poslední hex pod fog brushem (dedup při tažení, výkon).
+  const lastFogHexRef = useRef<string | null>(null);
+  // 10.2g — master id rozpracované brush bariéry (jeden tah = jedna bariéra).
+  // Ref (ne state) → synchronní, imunní vůči staleness při rychlém tažení.
+  // Reset na null při pointerup (konec tahu) a změně nástroje.
+  const brushBarrierIdRef = useRef<string | null>(null);
+
+  const panZoom = useViewportPanZoom(
+    viewportRef,
+    scene?.id ?? null,
+    effectTool.activeTool !== null || placement.state.active || fogTool.active,
+  );
 
   // 10.2c-edit-5 — bbox mapy z MapBackground.onLoad. Předáno do HexGrid
   // pro lem hexů kolem mapy (ne přes celý viewport). Reset na null při
@@ -293,6 +342,142 @@ export function TacticalMapView(): React.ReactElement {
     },
   });
 
+  // 10.2g — effect mutace (add / update / remove). Optimistic přes
+  // applyOperationToScene + rollback (pattern moveMutation); WS dorovná
+  // ostatní klienty. Barrier brush spawne desítky ops za tah → optimistic je
+  // nutný, ať PJ vidí čáru hned bez čekání na round-trip.
+  const effectMutation = useMutation({
+    mutationFn: ({ sceneId, op }: { sceneId: string; op: MapOperation }) =>
+      postMapOperation(sceneId, op),
+    onMutate: ({ op }) => {
+      if (!worldId) return { prev: null };
+      // Base = FRESH cache (`prev`), NE closure `scene` — při rychlém brush
+      // tažení se React nestihne re-renderovat, closure scene by byla stale
+      // (bez právě přidané bariéry) → effect.update by ji nenašel a přepsal
+      // cache zpět. Stavění na prev řetězí ops korektně.
+      const prev = queryClient.getQueryData<MapScene>(
+        mapSceneQueryKey(worldId),
+      );
+      if (prev) {
+        queryClient.setQueryData(
+          mapSceneQueryKey(worldId),
+          applyOperationToScene(prev, op),
+        );
+      }
+      return { prev };
+    },
+    onError: (err, _vars, ctx) => {
+      if (worldId && ctx?.prev) {
+        queryClient.setQueryData(mapSceneQueryKey(worldId), ctx.prev);
+      }
+      toast.error(`Efekt selhal: ${parseApiError(err)}`);
+    },
+  });
+
+  // 10.2h — fog mutace (fog.set / fog.brush). Optimistic přes
+  // applyOperationToScene + rollback (stejný pattern jako effectMutation —
+  // brush tažení spawne řadu ops, optimistic je nutný pro plynulé kreslení).
+  // Base = FRESH cache, ne closure scene (staleness při rychlém tažení).
+  const fogMutation = useMutation({
+    mutationFn: ({ sceneId, op }: { sceneId: string; op: MapOperation }) =>
+      postMapOperation(sceneId, op),
+    onMutate: ({ op }) => {
+      if (!worldId) return { prev: null };
+      const prev = queryClient.getQueryData<MapScene>(
+        mapSceneQueryKey(worldId),
+      );
+      if (prev) {
+        queryClient.setQueryData(
+          mapSceneQueryKey(worldId),
+          applyOperationToScene(prev, op),
+        );
+      }
+      return { prev };
+    },
+    onError: (err, _vars, ctx) => {
+      if (worldId && ctx?.prev) {
+        queryClient.setQueryData(mapSceneQueryKey(worldId), ctx.prev);
+      }
+      toast.error(`Mlha selhala: ${parseApiError(err)}`);
+    },
+  });
+
+  // 10.2h — efektivně odhalené hexy = revealedHexes ∪ hexy PC tokenů. Sdíleno
+  // mezi FogLayer (maska) a NPC visibility gate (TokenLayer).
+  const revealedSet = useMemo(
+    () => effectivelyRevealed(scene?.revealedHexes ?? [], scene?.tokens ?? []),
+    [scene?.revealedHexes, scene?.tokens],
+  );
+
+  // 10.2h — fog brush: štětec na hex (reveal/fog dle režimu). Dedup posledního
+  // hexu (výkon při tažení). Jen PJ + aktivní fog tool + zapnutá mlha.
+  const applyFogAtHex = useCallback(
+    (q: number, r: number): void => {
+      if (!scene || !isPJ || !fogTool.active || !scene.fogEnabled) return;
+      const key = `${q},${r}`;
+      if (lastFogHexRef.current === key) return;
+      lastFogHexRef.current = key;
+      fogMutation.mutate({
+        sceneId: scene.id,
+        op: {
+          type: 'fog.brush',
+          mode: fogTool.mode,
+          hexes: fogBrushHexes(q, r, fogTool.brushSize),
+        },
+      });
+    },
+    [scene, isPJ, fogTool.active, fogTool.mode, fogTool.brushSize, fogMutation],
+  );
+
+  // 10.2h — master přepínač mlhy (zachová revealedHexes).
+  const handleToggleFog = useCallback(
+    (enabled: boolean): void => {
+      if (!scene || !isPJ) return;
+      fogMutation.mutate({
+        sceneId: scene.id,
+        op: {
+          type: 'fog.set',
+          enabled,
+          revealedHexes: scene.revealedHexes ?? [],
+        },
+      });
+    },
+    [scene, isPJ, fogMutation],
+  );
+
+  // 10.2h — reset mlhy (zahalit vše = vymaž revealedHexes, mlha zůstává zapnutá).
+  const handleResetFog = useCallback((): void => {
+    if (!scene || !isPJ) return;
+    fogMutation.mutate({
+      sceneId: scene.id,
+      op: { type: 'fog.set', enabled: scene.fogEnabled, revealedHexes: [] },
+    });
+  }, [scene, isPJ, fogMutation]);
+
+  // 10.2h — vzájemné vyloučení: oba kreslí left-dragem, nesmí běžet zároveň.
+  // Akce-based wrappery (ne useEffect — ten by mezi oběma osciloval). Zapnutí
+  // jednoho nástroje vypne druhý.
+  const fogToolForPalette = useMemo(
+    () => ({
+      ...fogTool,
+      setActive: (a: boolean): void => {
+        if (a) effectTool.setTool(null);
+        fogTool.setActive(a);
+      },
+    }),
+    [fogTool, effectTool],
+  );
+  const effectToolForPalette = useMemo(
+    () => ({
+      ...effectTool,
+      setTool: (t: typeof effectTool.activeTool): void => {
+        if (t) fogTool.setActive(false);
+        effectTool.setTool(t);
+      },
+    }),
+    [effectTool, fogTool],
+  );
+
   const handleTokenDrop = (
     tokenId: string,
     q: number,
@@ -314,9 +499,6 @@ export function TacticalMapView(): React.ReactElement {
     config: scene?.config ?? { size: 40, originX: 0, originY: 0, showGrid: true },
     onDrop: handleTokenDrop,
   });
-
-  // 10.2c-edit-9a — placement mode state machine (klik v paletě → klik na hex).
-  const placement = usePlacementMode();
 
   // Lookup bestie ze query cache (BestiePalette zobrazuje aktivní podle ID;
   // payload nese jen ID, pro factory potřebujeme plný snapshot).
@@ -383,6 +565,207 @@ export function TacticalMapView(): React.ReactElement {
     [scene, lookupBestie, spawnMutation],
   );
 
+  /**
+   * 10.2g — aplikace aktivního efekt-nástroje na hex (port Matrix
+   * `handleHexClick` effect větve). `isDrag=true` při tažení (barrier brush,
+   * paint color). Jen PJ; když není aktivní nástroj → no-op.
+   */
+  const applyEffectAtHex = useCallback(
+    (q: number, r: number, isDrag = false): void => {
+      if (!scene || !isPJ || !effectTool.activeTool) return;
+      const newId = (): string =>
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `effect-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      if (effectTool.activeTool === 'color') {
+        effectMutation.mutate({
+          sceneId: scene.id,
+          op: {
+            type: 'effect.add',
+            effect: {
+              id: newId(),
+              type: 'color',
+              hexes: [{ q, r }],
+              color: effectTool.selectedColor,
+            },
+          },
+        });
+        return;
+      }
+
+      if (effectTool.activeTool === 'explosion') {
+        if (effectTool.explosionRings.length === 0 || isDrag) return;
+        effectMutation.mutate({
+          sceneId: scene.id,
+          op: {
+            type: 'effect.add',
+            effect: {
+              id: newId(),
+              type: 'explosion',
+              hexes: [{ q, r }],
+              rings: effectTool.explosionRings,
+              variant: effectTool.explosionVariant,
+            },
+          },
+        });
+        return;
+      }
+
+      if (effectTool.activeTool === 'barrier') {
+        // Kruh — jeden klik, žádný drag spam.
+        if (effectTool.barrierShape === 'circle') {
+          if (isDrag) return;
+          effectMutation.mutate({
+            sceneId: scene.id,
+            op: {
+              type: 'effect.add',
+              effect: {
+                id: newId(),
+                type: 'barrier',
+                hexes: getHexesInRadius(q, r, effectTool.barrierRadius),
+                barrierDC: effectTool.barrierDC,
+              },
+            },
+          });
+          return;
+        }
+        // Brush — append hex do rozpracované bariéry (kontinuita jednoho tahu).
+        // Master = `brushBarrierIdRef` (synchronní, imunní vůči staleness při
+        // rychlém tažení). Fresh scéna z cache (po předchozí optimistic mutaci),
+        // ne closure `scene` — jinak by se hexy přepisovaly.
+        const fresh =
+          (worldId &&
+            queryClient.getQueryData<MapScene>(mapSceneQueryKey(worldId))) ||
+          scene;
+        const activeId = brushBarrierIdRef.current;
+        const active = activeId
+          ? fresh.effects.find((e) => e.id === activeId)
+          : null;
+        if (active) {
+          if (active.hexes.some((h) => h.q === q && h.r === r)) return; // už tam je
+          effectMutation.mutate({
+            sceneId: scene.id,
+            op: {
+              type: 'effect.update',
+              effectId: active.id,
+              patch: {
+                hexes: [...active.hexes, { q, r }],
+                barrierDC: effectTool.barrierDC,
+              },
+            },
+          });
+        } else {
+          const id = newId();
+          brushBarrierIdRef.current = id;
+          effectMutation.mutate({
+            sceneId: scene.id,
+            op: {
+              type: 'effect.add',
+              effect: {
+                id,
+                type: 'barrier',
+                hexes: [{ q, r }],
+                barrierDC: effectTool.barrierDC,
+              },
+            },
+          });
+        }
+      }
+    },
+    [scene, isPJ, effectTool, effectMutation, worldId, queryClient],
+  );
+
+  // 10.2g — smazat efekt podle id.
+  const handleRemoveEffect = useCallback(
+    (effectId: string): void => {
+      if (!scene || !isPJ) return;
+      effectMutation.mutate({
+        sceneId: scene.id,
+        op: { type: 'effect.remove', effectId },
+      });
+    },
+    [scene, isPJ, effectMutation],
+  );
+
+  // 10.2g — souřadnicové mazání: klik na hex v mazacím režimu smaže všechny
+  // efekty, které ten hex pokrývají (color = ten čtvereček, barrier = celá
+  // souvislá bariéra, explosion = celý výbuch). Deterministické — nezávisí na
+  // Pixi hit-testu přes alpha / z-order navrstvených efektů. Fresh scéna z cache.
+  const eraseEffectsAtHex = useCallback(
+    (q: number, r: number): void => {
+      if (!scene || !isPJ) return;
+      const fresh =
+        (worldId &&
+          queryClient.getQueryData<MapScene>(mapSceneQueryKey(worldId))) ||
+        scene;
+      const hits = fresh.effects.filter((e) => effectCoversHex(e, q, r));
+      for (const e of hits) handleRemoveEffect(e.id);
+    },
+    [scene, isPJ, worldId, queryClient, handleRemoveEffect],
+  );
+
+  // 10.2g — smazat všechny efekty najednou (paleta 🗑). Jedna op místo N.
+  const handleClearAllEffects = useCallback((): void => {
+    if (!scene || !isPJ) return;
+    effectMutation.mutate({
+      sceneId: scene.id,
+      op: { type: 'scene.effects.replace', effects: [] },
+    });
+  }, [scene, isPJ, effectMutation]);
+
+  // 10.2g — tažení levým tlačítkem: barrier brush maluje hexy, guma maže.
+  // Ostatní nástroje (color/explosion/circle) jsou single-klik (přes onClick).
+  const handleViewportPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      if (!scene || !isPJ) return;
+      const isBrush =
+        effectTool.activeTool === 'barrier' &&
+        effectTool.barrierShape === 'brush';
+      const isErase = effectTool.activeTool === 'erase';
+      const isFog = fogTool.active && scene.fogEnabled;
+      if (!isBrush && !isErase && !isFog) return;
+      if ((e.buttons & 1) === 0) return; // levé tlačítko drženo
+      if ((e.target as HTMLElement).tagName !== 'CANVAS') return;
+      if (!viewportRef.current) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const target = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
+      if (isFog) {
+        applyFogAtHex(target.q, target.r);
+      } else if (isErase) {
+        eraseEffectsAtHex(target.q, target.r);
+      } else {
+        applyEffectAtHex(target.q, target.r, true);
+      }
+    },
+    [
+      scene,
+      isPJ,
+      effectTool,
+      fogTool.active,
+      panZoom,
+      applyEffectAtHex,
+      eraseEffectsAtHex,
+      applyFogAtHex,
+    ],
+  );
+
+  // Konec tahu → další brush stroke začne novou bariéru / nový fog tah.
+  const handleViewportPointerUp = useCallback((): void => {
+    brushBarrierIdRef.current = null;
+    lastFogHexRef.current = null;
+  }, []);
+
+  // Změna nástroje ukončí rozpracovanou bariéru.
+  useEffect(() => {
+    brushBarrierIdRef.current = null;
+  }, [effectTool.activeTool]);
+
+  // Změna fog režimu/velikosti → resetuj dedup (další hex se zase aplikuje).
+  useEffect(() => {
+    lastFogHexRef.current = null;
+  }, [fogTool.active, fogTool.mode, fogTool.brushSize]);
+
   // 10.2c-edit-9a — HTML5 drop handler (drag&drop z palety na viewport)
   const handleViewportDragOver = useCallback(
     (e: React.DragEvent<HTMLDivElement>): void => {
@@ -431,6 +814,24 @@ export function TacticalMapView(): React.ReactElement {
       const rect = viewportRef.current.getBoundingClientRect();
       const target = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
 
+      // 10.2h — fog brush single-klik (před effect/placement). Tažení řeší
+      // handleViewportPointerMove; tohle pokrývá klik bez pohybu.
+      if (fogTool.active && isPJ && scene.fogEnabled) {
+        lastFogHexRef.current = null; // klik = nový tah
+        applyFogAtHex(target.q, target.r);
+        return;
+      }
+
+      // 10.2g — aktivní efekt-nástroj má NEJVYŠŠÍ prioritu (PJ kreslí / maže).
+      if (effectTool.activeTool && isPJ) {
+        if (effectTool.activeTool === 'erase') {
+          eraseEffectsAtHex(target.q, target.r);
+        } else {
+          applyEffectAtHex(target.q, target.r, false);
+        }
+        return;
+      }
+
       // Placement mode má prioritu (PJ právě spawn-uje z palety)
       if (placement.state.active) {
         spawnTokenAt(placement.state.payload, target.q, target.r);
@@ -472,7 +873,21 @@ export function TacticalMapView(): React.ReactElement {
         setSelectedTokenId(null);
       }
     },
-    [placement, scene, panZoom, spawnTokenAt, selectedTokenId, canDrag, moveMutation],
+    [
+      placement,
+      scene,
+      panZoom,
+      spawnTokenAt,
+      selectedTokenId,
+      canDrag,
+      moveMutation,
+      effectTool.activeTool,
+      isPJ,
+      applyEffectAtHex,
+      eraseEffectsAtHex,
+      fogTool.active,
+      applyFogAtHex,
+    ],
   );
 
   // Empty state: world ready ale scéna chybí (hráč není přiřazený)
@@ -491,10 +906,15 @@ export function TacticalMapView(): React.ReactElement {
       onDragOver={isPJ ? handleViewportDragOver : undefined}
       onDrop={isPJ ? handleViewportDrop : undefined}
       onClick={
-        placement.state.active || selectedTokenId !== null
+        placement.state.active ||
+        selectedTokenId !== null ||
+        effectTool.activeTool !== null ||
+        fogTool.active
           ? handleViewportClick
           : undefined
       }
+      onPointerMove={isPJ ? handleViewportPointerMove : undefined}
+      onPointerUp={isPJ ? handleViewportPointerUp : undefined}
       data-placement-active={placement.state.active ? 'true' : undefined}
     >
       {/* PIXI v8 Application init je async — pokud se mountne bez scény
@@ -544,7 +964,20 @@ export function TacticalMapView(): React.ReactElement {
                   />
                 )}
               </pixiContainer>
-              <pixiContainer label="layer-effects" />
+              <pixiContainer label="layer-effects">
+                {scene && (
+                  // 10.2g — mazání řeší souřadnicově handleViewportClick
+                  // (klik na hex), ne Pixi hit-test → EffectsLayer je čistě
+                  // render (canEdit=false).
+                  <EffectsLayer
+                    effects={scene.effects}
+                    config={scene.config}
+                    theme={theme}
+                    canEdit={false}
+                    onRemoveEffect={handleRemoveEffect}
+                  />
+                )}
+              </pixiContainer>
               <pixiContainer label="layer-tokens">
                 {scene && (
                   <TokenLayer
@@ -556,13 +989,30 @@ export function TacticalMapView(): React.ReactElement {
                     spotlightTokenId={spotlightTokenId}
                     resolveImage={resolveTokenImage}
                     canDrag={canDrag}
+                    isHiddenByFog={(t) =>
+                      isTokenHiddenByFog(t, {
+                        fogEnabled: scene.fogEnabled,
+                        isPJ,
+                        revealedSet,
+                      })
+                    }
                     onSelect={setSelectedTokenId}
                     onOpenInfo={setOpenedTokenId}
                     onTokenPointerDown={handleTokenPointerDown}
                   />
                 )}
               </pixiContainer>
-              <pixiContainer label="layer-fog" />
+              <pixiContainer label="layer-fog">
+                {scene && scene.fogEnabled && (
+                  <FogLayer
+                    revealedSet={revealedSet}
+                    config={scene.config}
+                    mapBounds={mapBounds}
+                    theme={theme}
+                    isPJ={isPJ}
+                  />
+                )}
+              </pixiContainer>
               <pixiContainer label="layer-pings" />
             </pixiContainer>
           </Application>
@@ -784,13 +1234,40 @@ export function TacticalMapView(): React.ReactElement {
         />
       )}
 
-      <MapZoomControls
-        zoom={panZoom.zoom}
-        onZoomIn={() => panZoom.setZoom(panZoom.zoom + 0.1)}
-        onZoomOut={() => panZoom.setZoom(panZoom.zoom - 0.1)}
-        onReset={panZoom.resetZoom}
-        fullscreenTargetRef={viewportRef}
-      />
+      {/* 10.2g — dva oddělené sbalitelné docky vpravo dole (solid pozadí).
+          Kreslení na mapu (efekty, PJ) vs ovládání zobrazení (zoom). Naskládané
+          ve stacku — odsazují se doleva od otevřeného deníku. */}
+      <MapDockStack>
+        {isPJ && scene && (
+          <MapToolDock title="🎨 Efekty" storageKey="effects">
+            <EffectsPalette
+              tool={effectToolForPalette}
+              effectCount={scene.effects.length}
+              onClearAll={handleClearAllEffects}
+            />
+          </MapToolDock>
+        )}
+        {isPJ && scene && (
+          <MapToolDock title="🌫️ Mlha" storageKey="fog">
+            <FogPalette
+              tool={fogToolForPalette}
+              fogEnabled={scene.fogEnabled}
+              onToggleFog={handleToggleFog}
+              revealedCount={scene.revealedHexes?.length ?? 0}
+              onReset={handleResetFog}
+            />
+          </MapToolDock>
+        )}
+        <MapToolDock title="🖥️ Zobrazení" storageKey="view">
+          <MapZoomControls
+            zoom={panZoom.zoom}
+            onZoomIn={() => panZoom.setZoom(panZoom.zoom + 0.1)}
+            onZoomOut={() => panZoom.setZoom(panZoom.zoom - 0.1)}
+            onReset={panZoom.resetZoom}
+            fullscreenTargetRef={viewportRef}
+          />
+        </MapToolDock>
+      </MapDockStack>
     </div>
   );
 }

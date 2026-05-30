@@ -1,0 +1,320 @@
+/**
+ * 10.2g — paleta efektů. Pozice vpravo dole nad zoom controls; odsazuje se
+ * doleva o šířku otevřeného deníku (`--map-dock-width`, nastavuje TokenInfoPanel
+ * v dock módu). Glass-morfismus + fialové akcenty konzistentní s mapou.
+ */
+/* 10.2g — paleta je obsah MapToolDock (sekce „Efekty"). Sama nepozicuje;
+   anchor (relative) jen pro vyjíždějící parametr-panel, který jde doleva
+   ven z docku. */
+.palette {
+  position: relative;
+}
+
+/* ── Toolbar — řádek tlačítek (zalomí se, pokud se nevejde) ───────────────── */
+.toolbar {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 4px;
+}
+
+.toolBtn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(120, 100, 255, 0.15);
+  border-radius: 6px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.toolBtn:hover {
+  background: rgba(120, 100, 255, 0.1);
+  border-color: rgba(120, 100, 255, 0.4);
+}
+
+/* Aktivní nástroj nese svou barvu (--accent) — glow + jemný puls. */
+.toolBtnActive {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 12px color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: toolPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes toolPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px var(--accent),
+      0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px var(--accent),
+      0 0 16px color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+}
+
+.clearBtn {
+  margin-top: 2px;
+  border-top: 1px solid rgba(120, 100, 255, 0.15);
+}
+.clearBtn:hover {
+  background: rgba(255, 80, 96, 0.15);
+  border-color: rgba(255, 80, 96, 0.5);
+}
+
+/* ── Rozbalovací parametr-panel — vyjede vlevo VEN z docku ────────────────── */
+.panel {
+  position: absolute;
+  right: calc(100% + 12px);
+  bottom: 0;
+  width: 210px;
+  padding: 12px;
+  background: var(--map-toolbar-bg-solid, #0a0814);
+  color: var(--map-toolbar-text);
+  border: 1px solid var(--accent, rgba(120, 100, 255, 0.3));
+  border-radius: 10px;
+  box-shadow:
+    var(--shadow-lg, 0 8px 28px rgba(0, 0, 0, 0.5)),
+    0 0 16px color-mix(in srgb, var(--accent, #7864ff) 22%, transparent);
+  animation: panelIn 0.15s ease;
+  z-index: 1;
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.panelClose {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.panelClose:hover {
+  opacity: 1;
+  background: rgba(120, 100, 255, 0.15);
+}
+
+/* ── Barevná mřížka ──────────────────────────────────────────────────────── */
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.swatch {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition:
+    transform 0.12s,
+    border-color 0.12s,
+    box-shadow 0.12s;
+}
+.swatch:hover {
+  transform: scale(1.08);
+}
+.swatchActive {
+  border-color: #b48cff;
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(180, 140, 255, 0.7);
+}
+
+/* ── Konfigurace (bariéra / výbuch) ──────────────────────────────────────── */
+.config {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.segmented {
+  display: flex;
+  gap: 4px;
+}
+.segBtn {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 11px;
+  background: rgba(120, 100, 255, 0.06);
+  border: 1px solid rgba(120, 100, 255, 0.18);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.segBtn:hover {
+  background: rgba(120, 100, 255, 0.14);
+}
+.segBtnActive {
+  background: rgba(120, 100, 255, 0.22);
+  border-color: var(--accent, rgba(120, 100, 255, 0.6));
+  font-weight: 700;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+}
+.field > span {
+  opacity: 0.85;
+}
+.field input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent, #b48cff);
+}
+
+.numInput {
+  width: 56px;
+  padding: 4px 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--accent, rgba(120, 100, 255, 0.35));
+  border-radius: 5px;
+  color: inherit;
+}
+.numInput:focus {
+  outline: none;
+  border-color: var(--accent, #b48cff);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent, #7864ff) 45%, transparent);
+}
+
+/* ── Výbuch — varianty + rings ───────────────────────────────────────────── */
+.variantRow {
+  display: flex;
+  gap: 6px;
+}
+.variantBtn {
+  flex: 1;
+  height: 36px;
+  font-size: 18px;
+  background: rgba(120, 100, 255, 0.06);
+  border: 1px solid rgba(120, 100, 255, 0.18);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.variantBtn:hover {
+  background: rgba(120, 100, 255, 0.14);
+}
+.variantBtnActive {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.ringsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ringRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.ringLabel {
+  min-width: 48px;
+  opacity: 0.85;
+}
+.ringRow .numInput {
+  width: 44px;
+}
+.ringDmg {
+  flex: 1;
+  font-size: 10px;
+  opacity: 0.55;
+}
+.ringRemove {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: #ff9090;
+  cursor: pointer;
+  opacity: 0.7;
+  border-radius: 4px;
+}
+.ringRemove:hover {
+  opacity: 1;
+  background: rgba(255, 80, 96, 0.15);
+}
+
+.addRing {
+  padding: 6px;
+  font-size: 12px;
+  background: rgba(120, 100, 255, 0.1);
+  border: 1px dashed rgba(120, 100, 255, 0.4);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.addRing:hover {
+  background: rgba(120, 100, 255, 0.18);
+}
+
+.hint {
+  margin: 4px 0 0;
+  font-size: 10.5px;
+  line-height: 1.45;
+  opacity: 0.55;
+}
+
+/* ── Mobil ───────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .panel {
+    width: 180px;
+  }
+  /* Touch target min 44×44px na dotyku (mobil-desktop pravidlo). */
+  .toolBtn {
+    width: 44px;
+    height: 44px;
+    font-size: 19px;
+  }
+  .swatch {
+    min-height: 32px;
+  }
+  .variantBtn {
+    height: 42px;
+  }
+}

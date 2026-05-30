@@ -27,6 +27,8 @@ interface Props {
   /** Resolvuje obrázek tokenu (bestie přes templateId, fresh každý render). */
   resolveImage?: (token: MapToken) => string | undefined;
   canDrag: (token: MapToken) => boolean;
+  /** 10.2h — NPC/bestie token skrytý mlhou (hráč v zamlženém hexu). PC vždy. */
+  isHiddenByFog?: (token: MapToken) => boolean;
   onSelect: (tokenId: string) => void;
   /** 10.2c-edit-9e — 'i' badge → open modal (separate od select highlight). */
   onOpenInfo: (tokenId: string) => void;
@@ -42,6 +44,7 @@ export function TokenLayer({
   spotlightTokenId,
   resolveImage,
   canDrag,
+  isHiddenByFog,
   onSelect,
   onOpenInfo,
   onTokenPointerDown,
@@ -49,7 +52,8 @@ export function TokenLayer({
   const offsets = useMemo(() => computeStaggerOffsets(tokens), [tokens]);
   return (
     <pixiContainer label="tokens-layer">
-      {tokens.map((t) => (
+      {tokens.map((t) =>
+        isHiddenByFog?.(t) ? null : (
         <TokenSprite
           key={t.id}
           token={t}
@@ -65,7 +69,8 @@ export function TokenLayer({
           onOpenInfo={onOpenInfo}
           onPointerDown={onTokenPointerDown}
         />
-      ))}
+        ),
+      )}
     </pixiContainer>
   );
 }

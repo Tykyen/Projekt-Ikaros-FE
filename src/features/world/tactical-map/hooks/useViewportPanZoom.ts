@@ -97,11 +97,22 @@ export interface UseViewportPanZoomResult extends ViewportState {
 export function useViewportPanZoom(
   viewportRef: RefObject<HTMLElement | null>,
   sceneId: string | null,
+  /**
+   * 10.2g — když `true`, levé tlačítko myši NEpanuje (PJ kreslí efekty
+   * tažením — left-drag patří nástroji, ne posunu mapy). Prostřední tlačítko
+   * a 2-prsty panují vždy. Čteno přes ref (živá hodnota bez re-bind handlerů).
+   */
+  suppressLeftPan = false,
 ): UseViewportPanZoomResult {
   const [state, setState] = useState<ViewportState>(() => {
     cleanupLegacyKeys();
     return hydrateForScene(sceneId);
   });
+
+  const suppressLeftPanRef = useRef(suppressLeftPan);
+  useEffect(() => {
+    suppressLeftPanRef.current = suppressLeftPan;
+  }, [suppressLeftPan]);
 
   // Live ref pro callbacks bez re-binding
   const stateRef = useRef(state);
@@ -199,8 +210,9 @@ export function useViewportPanZoom(
       }
       return;
     }
-    // Mouse — middle (1) vždy pan; left (0) pan (v dalších krocích bude
-    // suppress když je aktivní tool/placement).
+    // Mouse — middle (1) vždy pan; left (0) pan jen když není suppress
+    // (10.2g: aktivní effect tool kreslí tažením, nesmí panovat).
+    if (e.button === 0 && suppressLeftPanRef.current) return;
     if (e.button === 0 || e.button === 1) {
       cancelPanAnim(); // user pan přeruší pan-to-token tween
       isPanning.current = true;

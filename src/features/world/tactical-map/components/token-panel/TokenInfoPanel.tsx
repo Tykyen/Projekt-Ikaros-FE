@@ -18,7 +18,7 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9g.md §A.
  */
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { usePanelMode, type PanelMode } from '../../hooks/usePanelMode';
 import { usePanelLayout } from '../../hooks/usePanelLayout';
 import styles from './TokenInfoPanel.module.css';
@@ -56,6 +56,21 @@ const MODE_LABEL: Record<PanelMode, string> = {
 export function TokenInfoPanel({ open, header, children }: Props): React.ReactElement | null {
   const { mode, setMode } = usePanelMode();
   const layout = usePanelLayout();
+
+  // 10.2g — v dock módu vystav šířku panelu jako CSS proměnnou na <html>,
+  // aby se floating prvky vpravo (paleta efektů, zoom controls) odsunuly
+  // doleva vedle deníku a zůstaly viditelné. Cleanup → 0px (zavřeno / drag).
+  useEffect(() => {
+    const root = document.documentElement;
+    if (open && mode === 'dock') {
+      root.style.setProperty('--map-dock-width', `${layout.width}px`);
+    } else {
+      root.style.setProperty('--map-dock-width', '0px');
+    }
+    return () => {
+      root.style.setProperty('--map-dock-width', '0px');
+    };
+  }, [open, mode, layout.width]);
 
   if (!open) return null;
 

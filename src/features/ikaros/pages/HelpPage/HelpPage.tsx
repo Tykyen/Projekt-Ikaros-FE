@@ -40,7 +40,7 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-05-30 (10.2f — Taktická mapa: iniciativa a tracker boje. Horní lišta s pořadím bojovníků a iniciativou, „na tahu" zvýrazněn zlatým prstencem; PJ řídí zahájení boje, tahy a kola, hází iniciativu a může pořadí přeřadit. Klik na bojovníka přiblíží token; PJ klikem token všem na pár vteřin rozsvítí červeným prstencem. Předchozí: 10.2c-edit-9b/9c — token statbar modal s taby Staty / Deník / Poznámky; spawn tokenů na hex pod kurzorem.).
+          Aktualizováno k 2026-05-30 (10.2h — Taktická mapa: mlha války. PJ zapne mlhu a štětcem odhaluje/zahaluje oblasti (tři velikosti); hráč vidí jen odhalené, nepřátele v mlze ne, PJ vidí vše a mlhu jen poloprůsvitně. Vlastní postavy hráče jsou viditelné vždy. Předchozí: 10.2g — efekty (barevné zóny, bariéry s DC, výbuchy oheň/plyn/kouř); 10.2f — iniciativa a tracker boje.).
         </p>
       </header>
 

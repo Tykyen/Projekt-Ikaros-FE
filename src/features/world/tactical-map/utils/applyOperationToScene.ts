@@ -67,6 +67,18 @@ export function applyOperationToScene(
 
     // ─── Effect ops ───────────────────────────────────────────────────
     case 'effect.add':
+      // Idempotentní (dedup podle id): FE dělá optimistic effect.add, pak
+      // dorazí WS broadcast TÉŽE op se stejným id → bez dedupu by efekt byl
+      // v cache 2×. Pokud id už existuje, nahraď (broadcast verze je
+      // autoritativní), jinak připoj.
+      if (scene.effects.some((e) => e.id === op.effect.id)) {
+        return {
+          ...scene,
+          effects: scene.effects.map((e) =>
+            e.id === op.effect.id ? op.effect : e,
+          ),
+        };
+      }
       return { ...scene, effects: [...scene.effects, op.effect] };
 
     case 'effect.remove':

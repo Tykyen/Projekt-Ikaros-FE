@@ -1,0 +1,95 @@
+/**
+ * 10.2g — sjednocený dock nástrojů mapy. Solidní pozadí (ne průhledné),
+ * vpravo dole; odsazení doleva o šířku otevřeného deníku (--map-dock-width).
+ */
+/* Stack obou docků — vpravo dole, naskládané pod sebe (flex-column řeší
+   proměnnou výšku při sbalení bez překryvu). Odsazení doleva od deníku. */
+.stack {
+  position: absolute;
+  bottom: 20px;
+  right: calc(20px + var(--map-dock-width, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 100;
+  transition: right 0.12s ease;
+  pointer-events: none;
+}
+.stack > * {
+  pointer-events: auto;
+}
+
+.dock {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  /* Solid pozadí — výrazně méně průhledné než plovoucí toolbary. */
+  background: var(--map-toolbar-bg-solid, #0a0814);
+  color: var(--map-toolbar-text);
+  border: 1px solid rgba(120, 100, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg, 0 8px 28px rgba(0, 0, 0, 0.5));
+  overflow: visible;
+}
+
+/* Sbalený = jen hlavička jako malý úchyt. */
+.dockCollapsed {
+  width: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+}
+.dockCollapsed .header {
+  border-radius: 10px;
+}
+.header:hover {
+  background: rgba(120, 100, 255, 0.1);
+}
+
+.headerLabel {
+  white-space: nowrap;
+}
+
+.chevron {
+  opacity: 0.7;
+  font-size: 11px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  gap: 4px;
+}
+
+/* Oddělení sekcí (efekty / zobrazení / …) jemnou linkou. */
+.body > * + * {
+  border-top: 1px solid rgba(120, 100, 255, 0.14);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .stack {
+    bottom: 12px;
+    right: calc(12px + var(--map-dock-width, 0px));
+  }
+  .dock {
+    width: 200px;
+  }
+}
