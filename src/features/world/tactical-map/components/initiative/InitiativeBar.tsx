@@ -13,9 +13,11 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2f.md (f-1/F).
  */
+import { useMemo } from 'react';
 import { useCombat } from '../../hooks/useCombat';
 import { useTokenUpdate } from '../../hooks/useTokenUpdate';
 import { isPcToken } from '../../utils/isPcToken';
+import { effectivelyRevealed, isTokenHiddenByFog } from '../fog/fogUtils';
 import { InitiativeBarItem } from './InitiativeBarItem';
 import { InitiativeControls } from './InitiativeControls';
 import type { MapScene, MapToken } from '../../types';
@@ -48,11 +50,28 @@ export function InitiativeBar({
   const combat = useCombat(scene, worldId);
   const tokenUpdate = useTokenUpdate(scene.id, worldId);
 
+  // 10.2h — fog gate: hráč nevidí v liště NPC/bestie schované mlhou (ani
+  // bojující — jinak by lišta prozradila skrytého nepřítele). PC vždy, PJ vše.
+  const revealedSet = useMemo(
+    () => effectivelyRevealed(scene.revealedHexes ?? [], scene.tokens),
+    [scene.revealedHexes, scene.tokens],
+  );
+  const isFogHidden = (token: MapToken): boolean =>
+    isTokenHiddenByFog(token, {
+      fogEnabled: scene.fogEnabled,
+      isPJ: isPj,
+      revealedSet,
+    });
+
   // 10.2f — „mimo boj" sekce: PJ vidí všechny, hráč jen PC (spoluhráče).
-  const visibleBench = isPj ? combat.bench : combat.bench.filter(isPcToken);
+  // 10.2h — + odfiltruj mlhou skryté.
+  const visibleCombatants = combat.combatants.filter((t) => !isFogHidden(t));
+  const visibleBench = (
+    isPj ? combat.bench : combat.bench.filter(isPcToken)
+  ).filter((t) => !isFogHidden(t));
 
   // Empty = lišta skrytá (pro danou roli není co zobrazit).
-  if (combat.combatants.length === 0 && visibleBench.length === 0) return null;
+  if (visibleCombatants.length === 0 && visibleBench.length === 0) return null;
 
   const canEditInit = (token: MapToken): boolean =>
     isPj || myCharacterSlugs.includes(token.characterSlug);
@@ -63,7 +82,7 @@ export function InitiativeBar({
         <InitiativeControls
           isActive={combat.isActive}
           round={combat.round}
-          hasCombatants={combat.combatants.length > 0}
+          hasCombatants={visibleCombatants.length > 0}
           isPending={combat.isPending}
           onStart={combat.start}
           onNextTurn={combat.nextTurn}
@@ -72,7 +91,7 @@ export function InitiativeBar({
       )}
 
       <div className={styles.strip}>
-        {combat.combatants.map((token, i) => (
+        {visibleCombatants.map((token, i) => (
           <InitiativeBarItem
             key={token.id}
             token={token}
@@ -92,7 +111,7 @@ export function InitiativeBar({
         ))}
 
         {/* Oddělovač mezi „v boji" a „mimo boj" sekcí */}
-        {combat.combatants.length > 0 && visibleBench.length > 0 && (
+        {visibleCombatants.length > 0 && visibleBench.length > 0 && (
           <div className={styles.divider} aria-hidden="true">
             🕊
           </div>

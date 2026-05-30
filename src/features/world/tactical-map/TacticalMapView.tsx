@@ -414,6 +414,7 @@ export function TacticalMapView(): React.ReactElement {
   const applyFogAtHex = useCallback(
     (q: number, r: number): void => {
       if (!scene || !isPJ || !fogTool.active || !scene.fogEnabled) return;
+      if (effectTool.activeTool) return; // effect tool má v kreslení přednost
       const key = `${q},${r}`;
       if (lastFogHexRef.current === key) return;
       lastFogHexRef.current = key;
@@ -426,7 +427,15 @@ export function TacticalMapView(): React.ReactElement {
         },
       });
     },
-    [scene, isPJ, fogTool.active, fogTool.mode, fogTool.brushSize, fogMutation],
+    [
+      scene,
+      isPJ,
+      fogTool.active,
+      fogTool.mode,
+      fogTool.brushSize,
+      effectTool.activeTool,
+      fogMutation,
+    ],
   );
 
   // 10.2h — master přepínač mlhy (zachová revealedHexes).
@@ -453,30 +462,6 @@ export function TacticalMapView(): React.ReactElement {
       op: { type: 'fog.set', enabled: scene.fogEnabled, revealedHexes: [] },
     });
   }, [scene, isPJ, fogMutation]);
-
-  // 10.2h — vzájemné vyloučení: oba kreslí left-dragem, nesmí běžet zároveň.
-  // Akce-based wrappery (ne useEffect — ten by mezi oběma osciloval). Zapnutí
-  // jednoho nástroje vypne druhý.
-  const fogToolForPalette = useMemo(
-    () => ({
-      ...fogTool,
-      setActive: (a: boolean): void => {
-        if (a) effectTool.setTool(null);
-        fogTool.setActive(a);
-      },
-    }),
-    [fogTool, effectTool],
-  );
-  const effectToolForPalette = useMemo(
-    () => ({
-      ...effectTool,
-      setTool: (t: typeof effectTool.activeTool): void => {
-        if (t) fogTool.setActive(false);
-        effectTool.setTool(t);
-      },
-    }),
-    [effectTool, fogTool],
-  );
 
   const handleTokenDrop = (
     tokenId: string,
@@ -723,7 +708,8 @@ export function TacticalMapView(): React.ReactElement {
         effectTool.activeTool === 'barrier' &&
         effectTool.barrierShape === 'brush';
       const isErase = effectTool.activeTool === 'erase';
-      const isFog = fogTool.active && scene.fogEnabled;
+      const isFog =
+        fogTool.active && scene.fogEnabled && !effectTool.activeTool;
       if (!isBrush && !isErase && !isFog) return;
       if ((e.buttons & 1) === 0) return; // levé tlačítko drženo
       if ((e.target as HTMLElement).tagName !== 'CANVAS') return;
@@ -814,9 +800,9 @@ export function TacticalMapView(): React.ReactElement {
       const rect = viewportRef.current.getBoundingClientRect();
       const target = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
 
-      // 10.2h — fog brush single-klik (před effect/placement). Tažení řeší
-      // handleViewportPointerMove; tohle pokrývá klik bez pohybu.
-      if (fogTool.active && isPJ && scene.fogEnabled) {
+      // 10.2h — fog brush single-klik. Effect tool má přednost (níž), proto
+      // guard !activeTool. Tažení řeší handleViewportPointerMove.
+      if (fogTool.active && isPJ && scene.fogEnabled && !effectTool.activeTool) {
         lastFogHexRef.current = null; // klik = nový tah
         applyFogAtHex(target.q, target.r);
         return;
@@ -1241,7 +1227,7 @@ export function TacticalMapView(): React.ReactElement {
         {isPJ && scene && (
           <MapToolDock title="🎨 Efekty" storageKey="effects">
             <EffectsPalette
-              tool={effectToolForPalette}
+              tool={effectTool}
               effectCount={scene.effects.length}
               onClearAll={handleClearAllEffects}
             />
@@ -1250,7 +1236,7 @@ export function TacticalMapView(): React.ReactElement {
         {isPJ && scene && (
           <MapToolDock title="🌫️ Mlha" storageKey="fog">
             <FogPalette
-              tool={fogToolForPalette}
+              tool={fogTool}
               fogEnabled={scene.fogEnabled}
               onToggleFog={handleToggleFog}
               revealedCount={scene.revealedHexes?.length ?? 0}

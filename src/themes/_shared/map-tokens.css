@@ -31,7 +31,9 @@
   --map-token-hp-bar-bg: rgba(0, 0, 0, 0.5);
 
   /* ── Mlha války (PJ vs hráč) ───────────────────────────── */
-  --map-fog-pj-fill: rgba(70, 75, 95, 0.16); /* semi-transparent — PJ */
+  /* PJ: zřetelný závoj, ale vidí skrz (bez cloud-noise mraků je nutná vyšší
+     alpha než Matrix 0.16, kde hustotu dodávala turbulence). Hráč: téměř opaque. */
+  --map-fog-pj-fill: rgba(70, 75, 95, 0.55); /* semi-transparent — PJ */
   --map-fog-player-fill: rgba(170, 180, 200, 0.94); /* opaque — hráč */
 
   /* ── Efekty (color/barrier/explosion variants) ─────────── */

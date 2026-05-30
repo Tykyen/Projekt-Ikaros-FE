@@ -127,6 +127,32 @@ describe('InitiativeBar', () => {
     expect(screen.queryByText('Duch')).not.toBeInTheDocument();
   });
 
+  it('10.2h fog: hráč nevidí v liště bojujícího NPC schovaného mlhou, PC ano', () => {
+    const s = scene({
+      fogEnabled: true,
+      revealedHexes: [],
+      tokens: [
+        token({ id: 'pc', inCombat: true, isNpc: false, q: 0, r: 0, instanceName: 'Hrdina' }),
+        token({ id: 'npc', inCombat: true, isNpc: true, q: 5, r: 5, characterId: 'c8', instanceName: 'Skřet' }),
+      ],
+    });
+    renderBar({ isPj: false, scene: s });
+    expect(screen.getByText('Hrdina')).toBeInTheDocument(); // PC vždy
+    expect(screen.queryByText('Skřet')).not.toBeInTheDocument(); // NPC v mlze
+  });
+
+  it('10.2h fog: PJ vidí bojujícího NPC v mlze i v liště', () => {
+    const s = scene({
+      fogEnabled: true,
+      revealedHexes: [],
+      tokens: [
+        token({ id: 'npc', inCombat: true, isNpc: true, q: 5, r: 5, characterId: 'c8', instanceName: 'Skřet' }),
+      ],
+    });
+    renderBar({ isPj: true, scene: s });
+    expect(screen.getByText('Skřet')).toBeInTheDocument();
+  });
+
   it('hráč bez bojovníků a bez PC mimo boj → lišta skrytá', () => {
     const { container } = renderBar({
       isPj: false,

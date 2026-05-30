@@ -1,113 +1,14 @@
 /**
- * 10.2h — paleta mlhy. Obsah `MapToolDock` (sekce „🌫️ Mlha"). Sama nepozicuje;
- * anchor (relative) jen pro vyjíždějící panel doleva. Vzor + sdílené hodnoty
- * z EffectsPalette; fog-specifické = master switch, štětec-segmenty, mlhový
- * accent (`#9fb4d4`).
+ * 10.2h — paleta mlhy. Panel je přímo obsah `MapToolDock` (sekce „🌫️ Mlha") —
+ * žádný vnitřní toolbar ani vyjíždějící overlay, jen panel v těle docku.
+ * Mlhový accent (`#9fb4d4`) pro aktivní segmenty.
  */
-.palette {
-  position: relative;
-}
-
-/* ── Toolbar — jediné tlačítko 🌫️ ─────────────────────────────────────────── */
-.toolbar {
-  display: flex;
-}
-.toolBtn {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid rgba(159, 180, 212, 0.18);
-  border-radius: 6px;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
-}
-.toolBtn:hover {
-  background: rgba(159, 180, 212, 0.12);
-  border-color: rgba(159, 180, 212, 0.45);
-}
-.toolBtnActive {
-  border-color: var(--accent);
-  box-shadow:
-    0 0 0 1px var(--accent),
-    0 0 12px color-mix(in srgb, var(--accent) 55%, transparent);
-  animation: fogPulse 1.8s ease-in-out infinite;
-}
-@keyframes fogPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1px var(--accent),
-      0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px var(--accent),
-      0 0 16px color-mix(in srgb, var(--accent) 70%, transparent);
-  }
-}
-
-/* ── Panel — vyjede vlevo VEN z docku ─────────────────────────────────────── */
 .panel {
-  position: absolute;
-  right: calc(100% + 12px);
-  bottom: 0;
-  width: 210px;
-  padding: 12px;
-  background: var(--map-toolbar-bg-solid, #0a0814);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   color: var(--map-toolbar-text);
-  border: 1px solid var(--accent, rgba(159, 180, 212, 0.3));
-  border-radius: 10px;
-  box-shadow:
-    var(--shadow-lg, 0 8px 28px rgba(0, 0, 0, 0.5)),
-    0 0 16px color-mix(in srgb, var(--accent, #9fb4d4) 22%, transparent);
-  animation: panelIn 0.15s ease;
-  z-index: 1;
-}
-@keyframes panelIn {
-  from {
-    opacity: 0;
-    transform: translateX(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.panelHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: 0.3px;
-}
-.panelClose {
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  color: inherit;
-  opacity: 0.6;
-  font-size: 13px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-.panelClose:hover {
-  opacity: 1;
-  background: rgba(159, 180, 212, 0.18);
+  padding: 6px 8px;
 }
 
 /* ── Master switch ────────────────────────────────────────────────────────── */
@@ -118,7 +19,6 @@
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  margin-bottom: 10px;
 }
 .switch {
   width: 16px;
@@ -200,7 +100,6 @@
 
 /* ── Reset ────────────────────────────────────────────────────────────────── */
 .resetBtn {
-  margin-top: 10px;
   width: 100%;
   padding: 7px;
   font-size: 12px;
@@ -220,16 +119,7 @@
   cursor: not-allowed;
 }
 
-/* ── Mobil ────────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .panel {
-    width: 188px;
-  }
-  .toolBtn {
-    width: 44px;
-    height: 44px;
-    font-size: 19px;
-  }
   .brushBtn {
     height: 40px;
   }
