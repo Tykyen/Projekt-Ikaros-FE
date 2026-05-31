@@ -129,8 +129,12 @@ function getTargetForDie(
 ): DiceTarget {
   const lower = dieType.toLowerCase();
   if (lower === 'fate') {
-    const t = FATE_TARGETS[String(faceValue)];
-    return t ?? FATE_TARGETS['0'];
+    // 10.2j fix — Fate kostka usazuje VŽDY čelně ({0,0,0}) a hozenou hodnotu
+    // nese přední tvář (viz renderModelFor faceValue). Dřívější řešení
+    // (dekorativní vzor + rotace na příslušnou tvář) zobrazovalo u '-' (rotace
+    // 180° → zadní tvář) plus místo mínusu — případ '+' (čelní tvář, {0,0,0})
+    // fungoval, tak ho používáme pro všechny hodnoty.
+    return { rx: 0, ry: 0, rz: 0 };
   }
   const rVal =
     typeof faceValue === 'number' ? faceValue : parseInt(String(faceValue), 10);
@@ -172,14 +176,13 @@ function renderModelFor(
   isFirstD100: boolean,
 ) {
   const lower = dieType.toLowerCase();
-  // Pro Fate `<FateSkinModel>` zámerně NEpředáváme faceValue. Tím se
-  // použije default 6-tváří vzor (front=+, back=-, right=+, left=-,
-  // top=0, bottom=0) — jako fyzická Fate kostka. Target rotace
-  // (FATE_TARGETS) pak natočí kostku tak, aby čelně k pozorovateli byla
-  // tvář s vyhozeným symbolem. Kdybychom faceValue předali, všechny
-  // tváře by měly stejný symbol (a u '0' všechny stejnou blank texturu
-  // s alpha kanálem → kostka by byla průhledný tunel).
-  if (lower === 'fate') return <FateSkinModel skin={skin} />;
+  // 10.2j fix — Fate kostce předáváme faceValue → hozená hodnota je na PŘEDNÍ
+  // tváři, ostatní '0'. Spolu s čelním targetem ({0,0,0} v getTargetForDie)
+  // se vždy zobrazí správná tvář. Textury jsou RGB (bez alpha), takže žádný
+  // „průhledný tunel" + vnitřní coreColor jádro kostku uzavírá. Dřívější
+  // dekorativní vzor + rotace zobrazoval u '-' plus místo mínusu.
+  if (lower === 'fate')
+    return <FateSkinModel skin={skin} faceValue={String(faceValue)} />;
   if (lower === 'd4') return <D4Model faceValue={faceValue} skin={skin} />;
   if (lower === 'd6') return <D6Model skin={skin} />;
   if (lower === 'd8') return <D8Model faceValue={faceValue} skin={skin} />;
