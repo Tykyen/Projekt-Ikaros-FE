@@ -1,0 +1,66 @@
+/* 13.3 — Admin nominační panel. */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(10, 8, 32, 0.4);
+  border: 1px solid rgba(255, 210, 80, 0.25);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.meta {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.actions,
+.rejectForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.reasonInput {
+  padding: 6px 10px;
+  background: rgba(20, 14, 50, 0.6);
+  color: var(--text-primary, #fff);
+  border: 1px solid rgba(120, 100, 255, 0.25);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  min-width: 160px;
+}
+
+.reasonInput:focus {
+  outline: none;
+  border-color: rgba(120, 100, 255, 0.7);
+}
+
+.empty {
+  font-size: 13px;
+  opacity: 0.6;
+  font-style: italic;
+  margin: 12px 0;
+}

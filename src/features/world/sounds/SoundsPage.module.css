@@ -1,0 +1,63 @@
+/* 13.3 — SoundsPage. Layout sjednocen s BestiarPage. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid rgba(120, 100, 255, 0.2);
+}
+
+.tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tabActive {
+  color: var(--text-primary, #fff);
+  border-bottom-color: rgba(120, 100, 255, 0.7);
+}
+
+.empty {
+  font-size: 13px;
+  opacity: 0.6;
+  font-style: italic;
+  margin: 16px 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

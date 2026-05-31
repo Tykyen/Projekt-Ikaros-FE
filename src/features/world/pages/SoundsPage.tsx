@@ -1,5 +1,5 @@
-﻿import { WorldStubPage } from './WorldStubPage';
-
-export default function SoundsPage() {
-  return <WorldStubPage area="sounds" />;
-}
+/**
+ * 13.3 — re-export skutečné stránky z `sounds` feature.
+ * (Stub WorldStubPage nahrazen; router cestu nemění.)
+ */
+export { default } from '@/features/world/sounds/SoundsPage';

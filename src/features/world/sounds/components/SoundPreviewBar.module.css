@@ -1,0 +1,122 @@
+/* 13.3 — Náhledový „právě hraje" bar. Cyan zvuková identita. */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: linear-gradient(
+    90deg,
+    rgba(34, 211, 238, 0.12),
+    rgba(10, 8, 32, 0.85)
+  );
+  border: 1px solid var(--sound-accent, #22d3ee);
+  border-radius: 10px;
+  box-shadow: 0 0 16px var(--sound-accent-glow, rgba(34, 211, 238, 0.45));
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--sound-accent, #22d3ee);
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type {
+  font-weight: 400;
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+.volume {
+  width: 100px;
+  accent-color: var(--sound-accent, #22d3ee);
+}
+
+.stop {
+  padding: 6px 12px;
+  background: rgba(20, 14, 50, 0.6);
+  color: rgba(220, 215, 255, 0.9);
+  border: 1px solid rgba(120, 100, 255, 0.3);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.stop:hover {
+  border-color: rgba(255, 100, 100, 0.6);
+  color: #fff;
+}
+
+/* Ekvalizér — 4 sloupce, fázově posunuté. */
+.equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 18px;
+}
+
+.equalizer span {
+  width: 3px;
+  background: var(--sound-accent, #22d3ee);
+  border-radius: 1px;
+  animation: eq 0.9s ease-in-out infinite;
+}
+
+.equalizer span:nth-child(1) {
+  animation-delay: 0s;
+}
+.equalizer span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.equalizer span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.equalizer span:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+@keyframes eq {
+  0%,
+  100% {
+    height: 4px;
+  }
+  50% {
+    height: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .equalizer span {
+    animation: none;
+    height: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .volume {
+    display: none;
+  }
+}
