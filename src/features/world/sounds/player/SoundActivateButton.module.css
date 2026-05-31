@@ -1,0 +1,43 @@
+/* 13.3 — Aktivační tlačítko zvuku. Cyan zvuková identita (--sound-accent). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #06141a;
+  background: var(--sound-accent, #22d3ee);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+  animation: sound-activate-pulse 2s ease-in-out infinite;
+  transition: filter 0.15s ease;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+}
+
+.icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+@keyframes sound-activate-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    animation: none;
+  }
+}

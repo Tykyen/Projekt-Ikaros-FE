@@ -56,6 +56,13 @@
   /* Chladně modrá — odliší počasí od fialového brandu i mlhového #9fb4d4. */
   --map-weather-accent: #7fb8e6;
 
+  /* ── 13.3 — Zvuková identita (stránka Zvuky + ambient na mapě + chat) ──
+     Cyan, mapou nevyužitý (odliší od fog #9fb4d4, weather #7fb8e6, ping
+     fialová). Žije zde v `_shared` :root, ať platí globálně i mimo mapu.
+     Per-skin override patří do themes/<skin>/index.css. */
+  --sound-accent: #22d3ee;
+  --sound-accent-glow: rgba(34, 211, 238, 0.45);
+
   /* ── Toolbar chrome (overrides z world theme — fallback inherit) ── */
   --map-toolbar-bg: var(--surface-2, rgba(10, 8, 32, 0.85));
   --map-toolbar-text: var(--text-primary, rgba(220, 235, 255, 0.9));
