@@ -54,6 +54,7 @@ import {
   NpcOverridePanel,
   type NpcOverrideState,
 } from './NpcOverridePanel';
+import { SoundBroadcastButton } from './SoundBroadcastButton';
 import s from './ChannelComposer.module.css';
 
 /**
@@ -731,6 +732,15 @@ export function ChannelComposer({
           >
             <Theater size={18} />
           </button>
+        )}
+
+        {/* 13.3 — PJ pustí zvuk všem v konverzaci (jen PJ+). */}
+        {canManage && (
+          <SoundBroadcastButton
+            worldId={worldId}
+            channelId={channelId}
+            currentUserId={currentUserId}
+          />
         )}
 
         <div className={s.toolbarPosition}>

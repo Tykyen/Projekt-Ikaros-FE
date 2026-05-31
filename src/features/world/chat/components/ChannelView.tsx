@@ -36,6 +36,7 @@ import { useWorld } from '@/features/world/api/useWorlds';
 import { getFontStack, getFontSize } from '../lib/chatFonts';
 import { renderChatContent, type WorldEmoteSet } from '../lib/renderChatContent';
 import { ChannelComposer, type ComposerSendPayload } from './ChannelComposer';
+import { SoundNowPlayingBanner } from './SoundNowPlayingBanner';
 import { MessageEditInline } from './MessageEditInline';
 import { RpDateBadge } from './RpDateBadge';
 import messageStyles from '@/features/chat/components/MessageItem.module.css';
@@ -449,6 +450,11 @@ export function ChannelView({
       </div>
 
       <div className={s.foot}>
+        <SoundNowPlayingBanner
+          channelId={channelId}
+          currentUserId={currentUser.id}
+          canManage={canManage}
+        />
         <TypingIndicator names={typingNames} />
         <ChannelComposer
           disabled={false}

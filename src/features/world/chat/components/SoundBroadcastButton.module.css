@@ -1,0 +1,150 @@
+/* 13.3 — SoundBroadcastButton (chat). Cyan zvuková identita. */
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--sound-accent, #22d3ee);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn:hover {
+  background: rgba(34, 211, 238, 0.12);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  width: 280px;
+  max-height: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--surface-1, #14102a);
+  border: 1px solid var(--sound-accent, #22d3ee);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.urlRow {
+  display: flex;
+  gap: 6px;
+}
+
+.urlInput {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  background: rgba(20, 14, 50, 0.6);
+  color: var(--text-primary, #fff);
+  border: 1px solid rgba(120, 100, 255, 0.25);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+}
+
+.urlInput:focus {
+  outline: none;
+  border-color: var(--sound-accent, #22d3ee);
+}
+
+.playUrl {
+  flex: 0 0 auto;
+  width: 32px;
+  background: var(--sound-accent, #22d3ee);
+  color: #06141a;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.playUrl:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  max-height: 220px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: rgba(220, 215, 255, 0.85);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+
+.item:hover {
+  background: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+.itemName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemType {
+  flex: 0 0 auto;
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.empty {
+  font-size: 12px;
+  opacity: 0.6;
+  font-style: italic;
+  margin: 6px 2px;
+}
+
+.stop {
+  padding: 7px 10px;
+  background: rgba(20, 14, 50, 0.6);
+  color: rgba(220, 215, 255, 0.9);
+  border: 1px solid rgba(120, 100, 255, 0.3);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stop:hover {
+  border-color: rgba(255, 100, 100, 0.6);
+  color: #fff;
+}
