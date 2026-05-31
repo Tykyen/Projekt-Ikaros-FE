@@ -1,0 +1,52 @@
+/**
+ * 10.2j — DiceRollButton (vlastní hod) na taktické mapě.
+ *
+ * Malý 🎲 trigger sladěný s map dockem. Třídy scoped (žádné globální
+ * selektory) → theme-isolation. Bg/text/accent přes map theme proměnné.
+ */
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--accent, rgba(120, 100, 255, 0.18));
+  background: var(--map-toolbar-bg-solid, rgba(14, 12, 40, 0.94));
+  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn:hover {
+  border-color: var(--accent, rgba(120, 100, 255, 0.4));
+  background: color-mix(
+    in srgb,
+    var(--accent, rgba(120, 100, 255, 1)) 14%,
+    var(--map-toolbar-bg-solid, rgba(14, 12, 40, 0.94))
+  );
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.active {
+  border-color: var(--accent, #a78bfa);
+  color: var(--accent, #a78bfa);
+  background: color-mix(
+    in srgb,
+    var(--accent, #a78bfa) 18%,
+    var(--map-toolbar-bg-solid, rgba(14, 12, 40, 0.94))
+  );
+}
