@@ -1,0 +1,12 @@
+/**
+ * 10.2i — kontejner pro atmosféru počasí. Positioned rodič pro absolute
+ * `.overlay` z WeatherAtmosphere; sám fixovaný k viewportu mapy nad canvasem,
+ * pod UI panely (badge, weather panel, palety).
+ */
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2; /* nad PixiJS canvasem (z-index 0/1), pod UI panely */
+}

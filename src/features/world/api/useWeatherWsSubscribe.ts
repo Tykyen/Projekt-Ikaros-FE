@@ -1,7 +1,8 @@
 /**
- * 9.4-I — WebSocket subscribe na `weather.updated` event.
+ * 9.4-I — WebSocket subscribe na `weather:updated` socket event.
  *
- * BE emituje při broadcast / setCurrent / generate. FE patchne jediný generátor
+ * BE emituje při broadcast (`maps.gateway` @OnEvent('weather.updated') →
+ * socket `weather:updated`). FE patchne jediný generátor
  * v cache (žádný refetch) → karta se okamžitě překreslí v jiném tabu/zařízení.
  *
  * Mount na `WorldWeatherPage`. Cleanup v `useSocketEvent` handle (off na unmount).
@@ -21,7 +22,7 @@ interface WeatherUpdatedPayload {
 export function useWeatherWsSubscribe(worldId: string): void {
   const qc = useQueryClient();
 
-  useSocketEvent<WeatherUpdatedPayload>('weather.updated', (event) => {
+  useSocketEvent<WeatherUpdatedPayload>('weather:updated', (event) => {
     if (!worldId || event.worldId !== worldId) return;
 
     qc.setQueryData<WeatherGenerator[]>(

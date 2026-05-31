@@ -14,19 +14,25 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.2.
  */
-import { useCallback, useEffect } from 'react';
-import { getSocket } from '@/features/chat/api/socket';
+import { useCallback, useEffect } from "react";
+import { getSocket } from "@/features/chat/api/socket";
 import type {
   MapOperationBroadcast,
   MapReassignedBroadcast,
   MapSpotlightBroadcast,
-} from '../types';
+} from "../types";
 
 interface UseMapSocketOptions {
   /** ID scény, na které se klient nachází. `null` → žádný join. */
   sceneId: string | null;
   /** Callback při příchozí `map:operation` (po BE DB commit). */
   onOperation?: (payload: MapOperationBroadcast) => void;
+  /**
+   * 10.2i — callback po WS (re)connectu. Volá se až na socket `connect`
+   * event (ne při initial mountu, pokud je socket už připojený) → typicky
+   * po výpadku. Slouží k forced catch-up zmeškaných operací.
+   */
+  onReconnect?: () => void;
   /** Callback při private `map:reassigned` (cross-scene přesun mě). */
   onReassigned?: (payload: MapReassignedBroadcast) => void;
   /** 10.2f-3 — callback při `map:spotlight` (PJ ukázal na token). */
@@ -41,6 +47,7 @@ export interface UseMapSocketResult {
 export function useMapSocket({
   sceneId,
   onOperation,
+  onReconnect,
   onReassigned,
   onSpotlight,
 }: UseMapSocketOptions): UseMapSocketResult {
@@ -48,21 +55,38 @@ export function useMapSocket({
     if (!sceneId) return;
     const socket = getSocket();
 
-    socket.emit('map:join', sceneId);
+    socket.emit("map:join", sceneId);
 
     return () => {
-      socket.emit('map:leave', sceneId);
+      socket.emit("map:leave", sceneId);
     };
   }, [sceneId]);
+
+  // 10.2i — reconnect: socket.io po (re)connectu má prázdné rooms → musíme
+  // re-join scene room (jinak přestaneme dostávat broadcasty) a spustit
+  // forced catch-up. `connect` se emituje až PO (re)connectu, takže když je
+  // socket při mountu už připojený, initial se nevyvolá (žádný duplicate).
+  useEffect(() => {
+    const socket = getSocket();
+    const handler = (): void => {
+      if (sceneId) socket.emit("map:join", sceneId);
+      onReconnect?.();
+    };
+    socket.on("connect", handler);
+    return () => {
+      socket.off("connect", handler);
+    };
+  }, [sceneId, onReconnect]);
 
   // Listener: map:operation (per-scene broadcast)
   useEffect(() => {
     if (!onOperation) return;
     const socket = getSocket();
-    const handler = (payload: MapOperationBroadcast): void => onOperation(payload);
-    socket.on('map:operation', handler);
+    const handler = (payload: MapOperationBroadcast): void =>
+      onOperation(payload);
+    socket.on("map:operation", handler);
     return () => {
-      socket.off('map:operation', handler);
+      socket.off("map:operation", handler);
     };
   }, [onOperation]);
 
@@ -70,10 +94,11 @@ export function useMapSocket({
   useEffect(() => {
     if (!onReassigned) return;
     const socket = getSocket();
-    const handler = (payload: MapReassignedBroadcast): void => onReassigned(payload);
-    socket.on('map:reassigned', handler);
+    const handler = (payload: MapReassignedBroadcast): void =>
+      onReassigned(payload);
+    socket.on("map:reassigned", handler);
     return () => {
-      socket.off('map:reassigned', handler);
+      socket.off("map:reassigned", handler);
     };
   }, [onReassigned]);
 
@@ -81,17 +106,18 @@ export function useMapSocket({
   useEffect(() => {
     if (!onSpotlight) return;
     const socket = getSocket();
-    const handler = (payload: MapSpotlightBroadcast): void => onSpotlight(payload);
-    socket.on('map:spotlight', handler);
+    const handler = (payload: MapSpotlightBroadcast): void =>
+      onSpotlight(payload);
+    socket.on("map:spotlight", handler);
     return () => {
-      socket.off('map:spotlight', handler);
+      socket.off("map:spotlight", handler);
     };
   }, [onSpotlight]);
 
   const emitSpotlight = useCallback(
     (tokenId: string): void => {
       if (!sceneId) return;
-      getSocket().emit('map:spotlight', { sceneId, tokenId });
+      getSocket().emit("map:spotlight", { sceneId, tokenId });
     },
     [sceneId],
   );

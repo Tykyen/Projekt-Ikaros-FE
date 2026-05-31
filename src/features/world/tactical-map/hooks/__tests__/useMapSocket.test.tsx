@@ -55,3 +55,38 @@ describe('useMapSocket — spotlight (10.2f-3)', () => {
     expect(onSpotlight).toHaveBeenCalledWith({ tokenId: 'tok-3' });
   });
 });
+
+describe('useMapSocket — reconnect (10.2i)', () => {
+  const getConnectHandler = (): (() => void) => {
+    const call = mockSocket.on.mock.calls.find((c) => c[0] === 'connect');
+    expect(call).toBeDefined();
+    return call![1] as () => void;
+  };
+
+  it('registruje listener na socket connect event', () => {
+    renderHook(() => useMapSocket({ sceneId: 'scene-1' }));
+    expect(mockSocket.on).toHaveBeenCalledWith('connect', expect.any(Function));
+  });
+
+  it('na connect re-joinne scene room a zavolá onReconnect', () => {
+    const onReconnect = vi.fn();
+    renderHook(() => useMapSocket({ sceneId: 'scene-1', onReconnect }));
+    mockSocket.emit.mockClear(); // odfiltruj initial map:join
+
+    getConnectHandler()();
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('map:join', 'scene-1');
+    expect(onReconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it('na connect bez sceneId nere-joinne, ale onReconnect se nevolá s null scénou', () => {
+    const onReconnect = vi.fn();
+    renderHook(() => useMapSocket({ sceneId: null, onReconnect }));
+
+    getConnectHandler()();
+
+    expect(mockSocket.emit).not.toHaveBeenCalledWith('map:join', expect.anything());
+    // onReconnect se zavolá (guard scene==null je v useMapScene callbacku, ne tady)
+    expect(onReconnect).toHaveBeenCalledTimes(1);
+  });
+});

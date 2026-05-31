@@ -7,8 +7,8 @@
  * `useReorderGenerators` má optimistic update — drag-to-reorder okamžitě
  * překreslí grid, při BE chybě se rollback (cache snapshot v `onMutate`).
  */
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/shared/api/client';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/shared/api/client";
 import type {
   AdvanceDayResult,
   BroadcastWeatherInput,
@@ -18,11 +18,11 @@ import type {
   WeatherGeneratorConfig,
   WeatherHistoryEntry,
   WeatherResult,
-} from '@/shared/types';
+} from "@/shared/types";
 
 /** Stabilní query key pro list generátorů světa. */
 export const weatherGeneratorsKey = (worldId: string) =>
-  ['weather-generators', worldId] as const;
+  ["weather-generators", worldId] as const;
 
 export function useWeatherGenerators(worldId: string) {
   return useQuery({
@@ -106,11 +106,11 @@ export function useGenerateWeather(worldId: string) {
     mutationFn: ({ id, monthIndex, day, seed }: GenerateWeatherInput) => {
       const params = new URLSearchParams();
       if (monthIndex !== undefined)
-        params.append('monthIndex', String(monthIndex));
-      if (day !== undefined) params.append('day', String(day));
-      if (seed !== undefined) params.append('seed', String(seed));
+        params.append("monthIndex", String(monthIndex));
+      if (day !== undefined) params.append("day", String(day));
+      if (seed !== undefined) params.append("seed", String(seed));
       const qs = params.toString();
-      const url = `/worlds/${worldId}/weather-generators/${id}/generate${qs ? `?${qs}` : ''}`;
+      const url = `/worlds/${worldId}/weather-generators/${id}/generate${qs ? `?${qs}` : ""}`;
       return api.post<WeatherGenerator>(url);
     },
     onSuccess: () =>
@@ -151,6 +151,20 @@ export function useBroadcastWeather(worldId: string) {
 }
 
 /**
+ * 10.2i — PJ vypne počasí na taktické mapě světa
+ * (`DELETE /worlds/:worldId/weather-generators/map-weather/active`).
+ * BE vyčistí `World.activeMapWeather` + vyšle WS `weather:updated` (weather:null).
+ */
+export function useClearMapWeather(worldId: string) {
+  return useMutation({
+    mutationFn: () =>
+      api.delete<void>(
+        `/worlds/${worldId}/weather-generators/map-weather/active`,
+      ),
+  });
+}
+
+/**
  * 9.4 — Set in-game date mutation. PJ explicit vyplní rok/měsíc/den →
  * `PUT /weather-generators/set-in-game-date`. Pokud `regenerateAll: true`,
  * BE vygeneruje weather pro všechny generátory s novým datem.
@@ -165,7 +179,7 @@ export function useSetInGameDate(worldId: string) {
       ),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: weatherGeneratorsKey(worldId) });
-      qc.invalidateQueries({ queryKey: ['worlds', worldId, 'settings'] });
+      qc.invalidateQueries({ queryKey: ["worlds", worldId, "settings"] });
     },
   });
 }
@@ -188,9 +202,9 @@ export function useAdvanceDay(worldId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: weatherGeneratorsKey(worldId) });
       // Také invaliduj all history queries světa
-      qc.invalidateQueries({ queryKey: ['weather-history', worldId] });
+      qc.invalidateQueries({ queryKey: ["weather-history", worldId] });
       // World settings (currentInGameDate) by mělo refreshnout pro header display
-      qc.invalidateQueries({ queryKey: ['worlds', worldId, 'settings'] });
+      qc.invalidateQueries({ queryKey: ["worlds", worldId, "settings"] });
     },
   });
 }
@@ -202,7 +216,7 @@ export const weatherHistoryKey = (
   options: { limit?: number; offset?: number } = {},
 ) =>
   [
-    'weather-history',
+    "weather-history",
     worldId,
     generatorId,
     options.limit ?? 50,

@@ -360,6 +360,8 @@ export interface World {
   defaultCalendarConfigSlug?: string;
   /** 9.2b — společný absDay epoch napříč kalendáři světa. */
   timelineEpoch?: number;
+  /** 10.2i — počasí vyslané PJ na taktickou mapu. `null`/`undefined` = žádné. */
+  activeMapWeather?: ActiveMapWeather | null;
   createdAt: string;
   updatedAt: string;
   /** Spec 2.4 — populated jen při `GET /worlds/:id` / `GET /worlds/slug/:slug`. */
@@ -368,6 +370,18 @@ export interface World {
     username: string;
     avatarUrl?: string;
   };
+}
+
+/**
+ * 10.2i — počasí vyslané PJ na taktickou mapu světa.
+ * `weather` = snapshot generátoru v okamžiku vyslání (drží stav pro pozdější
+ * příchozí; živý WS event jen patchuje). `WeatherResult` definován níže.
+ */
+export interface ActiveMapWeather {
+  generatorId: string;
+  generatorName: string;
+  weather: WeatherResult;
+  setAt: string;
 }
 
 /** Krok 5.9 — uživatelské doladění vzhledu (jas / kontrast / síla pozadí). */

@@ -47,6 +47,15 @@
   /* ── Ping (dvouklik anywhere) ──────────────────────────── */
   --map-ping-color: var(--primary, #b48cff);
 
+  /* ── 10.2i — stav WS spojení (MapConnectionBadge) ──────── */
+  --map-status-ok: #36d399; /* tlumená zelená — online */
+  --map-status-warn: #ffd700; /* zlatá — (re)connect / synchronizuji */
+  --map-status-error: #ff5060; /* červená — odpojeno */
+
+  /* ── 10.2i — počasí na mapě (panel + atmosféra) ────────── */
+  /* Chladně modrá — odliší počasí od fialového brandu i mlhového #9fb4d4. */
+  --map-weather-accent: #7fb8e6;
+
   /* ── Toolbar chrome (overrides z world theme — fallback inherit) ── */
   --map-toolbar-bg: var(--surface-2, rgba(10, 8, 32, 0.85));
   --map-toolbar-text: var(--text-primary, rgba(220, 235, 255, 0.9));

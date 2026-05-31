@@ -14,26 +14,23 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.1, §3.2, §3.3.
  */
-import { useCallback, useRef } from 'react';
-import {
-  useQuery,
-  useQueryClient,
-  type QueryKey,
-} from '@tanstack/react-query';
-import axios from 'axios';
-import { getActiveMapScene, getMapOperationsSince } from '../api/mapApi';
-import { applyOperationToScene } from '../utils/applyOperationToScene';
-import { useMapSocket } from './useMapSocket';
+import { useCallback, useRef } from "react";
+import { useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
+import axios from "axios";
+import { getActiveMapScene } from "../api/mapApi";
+import { applyOperationToScene } from "../utils/applyOperationToScene";
+import { catchUpScene } from "../utils/catchUpScene";
+import { useMapSocket } from "./useMapSocket";
 import type {
   MapScene,
   MapOperationBroadcast,
   MapSpotlightBroadcast,
-} from '../types';
+} from "../types";
 
 /** Query key factory — exportováno pro `useReassignmentListener` invalidate. */
 export const mapSceneQueryKey = (worldId: string): QueryKey => [
-  'map',
-  'active',
+  "map",
+  "active",
   worldId,
 ];
 
@@ -64,7 +61,7 @@ export function useMapScene(
   const lastSeqRef = useRef<number>(0);
 
   const query = useQuery<MapScene | null>({
-    queryKey: worldId ? mapSceneQueryKey(worldId) : ['map', 'active', 'none'],
+    queryKey: worldId ? mapSceneQueryKey(worldId) : ["map", "active", "none"],
     enabled: Boolean(worldId),
     queryFn: async () => {
       if (!worldId) return null;
@@ -107,23 +104,15 @@ export function useMapScene(
       } else if (payload.seqNumber > expectedSeq) {
         // Gap — chyběla mi 1+ ops (WS reorder, krátký disconnect, etc.)
         try {
-          const list = await getMapOperationsSince(
-            scene.id,
-            lastSeqRef.current,
-            500,
-          );
-          let working = scene;
-          for (const entry of list.operations) {
-            working = applyOperationToScene(working, entry.op);
-            lastSeqRef.current = entry.seqNumber;
+          const result = await catchUpScene(scene, lastSeqRef.current);
+          if (result === "too-big") {
+            void query.refetch();
+            return;
           }
-          const finalScene: MapScene = {
-            ...working,
-            lastSeqNumber: list.lastSeqNumber,
-          };
-          queryClient.setQueryData(mapSceneQueryKey(worldId), finalScene);
+          lastSeqRef.current = result.lastSeqNumber;
+          queryClient.setQueryData(mapSceneQueryKey(worldId), result);
         } catch (err) {
-          console.error('[useMapScene] catch-up failed', err);
+          console.error("[useMapScene] catch-up failed", err);
           void query.refetch();
         }
       }
@@ -131,6 +120,27 @@ export function useMapScene(
     },
     [worldId, scene, queryClient, query],
   );
+
+  /**
+   * 10.2i — forced catch-up po WS reconnectu. Socket.io se sám znovupřipojí,
+   * ale když za klidu na scéně nepřijde žádný nový `map:operation`, gap se
+   * nikdy nedetekuje → bez tohoto bych tiše držel zastaralý stav.
+   */
+  const onReconnect = useCallback(async (): Promise<void> => {
+    if (!worldId || !scene) return;
+    try {
+      const result = await catchUpScene(scene, lastSeqRef.current);
+      if (result === "too-big") {
+        void query.refetch();
+        return;
+      }
+      lastSeqRef.current = result.lastSeqNumber;
+      queryClient.setQueryData(mapSceneQueryKey(worldId), result);
+    } catch (err) {
+      console.error("[useMapScene] reconnect catch-up failed", err);
+      void query.refetch();
+    }
+  }, [worldId, scene, queryClient, query]);
 
   // Stabilní wrapper, ať se WS listener nereregistruje každý render.
   const spotlightCb = options?.onSpotlight;
@@ -141,6 +151,7 @@ export function useMapScene(
   const { emitSpotlight } = useMapSocket({
     sceneId: scene?.id ?? null,
     onOperation,
+    onReconnect,
     onSpotlight: spotlightCb ? handleSpotlight : undefined,
   });
 

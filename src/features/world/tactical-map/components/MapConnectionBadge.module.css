@@ -1,0 +1,85 @@
+/**
+ * 10.2i — MapConnectionBadge. Glassmorphism pecka konzistentní s map paletami.
+ * Stavová barva přes --map-status-* tokeny; tečka má glow ve své barvě.
+ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: var(--map-toolbar-bg, rgba(10, 8, 32, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  font-size: 11.5px;
+  font-weight: 600;
+  pointer-events: auto;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+/* connected bez popisku → jen tečka, minimální padding (periferní klid) */
+.badge:not(.hasLabel) {
+  padding: 0 6px;
+  gap: 0;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--tone);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--tone) 70%, transparent);
+}
+
+.text {
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.ok {
+  --tone: var(--map-status-ok, #36d399);
+}
+.warn {
+  --tone: var(--map-status-warn, #ffd700);
+}
+.error {
+  --tone: var(--map-status-error, #ff5060);
+}
+
+/* connecting / error → tečka pulzuje, ať si všimne periferní vidění */
+.warn .dot,
+.error .dot {
+  animation: pulse 1.1s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .warn .dot,
+  .error .dot {
+    animation: none;
+  }
+}
+
+/* mobil: text skryjeme (i u warn/error), necháme jen barevnou tečku */
+@media (max-width: 768px) {
+  .text {
+    display: none;
+  }
+  .badge.hasLabel {
+    padding: 0 6px;
+    gap: 0;
+  }
+}

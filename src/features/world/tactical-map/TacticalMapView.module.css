@@ -27,6 +27,34 @@
   inset: 0;
 }
 
+/* 10.2i — sloty rohových overlay prvků. z-index nad iniciativní lištou (20)
+   i atmosférou (2). pointer-events: none na slotu, auto na obsahu (badge/panel),
+   ať slot neblokuje pan/zoom mimo svůj obsah. */
+.connectionBadgeSlot {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 30;
+  pointer-events: none;
+}
+.weatherSlot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 30;
+  pointer-events: none;
+}
+@media (max-width: 768px) {
+  .connectionBadgeSlot {
+    top: 8px;
+    left: 8px;
+  }
+  .weatherSlot {
+    top: 8px;
+    right: 8px;
+  }
+}
+
 /* Ve fullscreenu se viewport stává fullscreen elementem. Bez explicitní výšky
    se `height: 100%` může počítat vůči původnímu rodiči (kratšímu než obrazovka)
    → canvas i fit dostanou menší výšku a pod mapou zůstane černý pruh. Vynutíme

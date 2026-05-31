@@ -16,74 +16,78 @@
  *   - 10.2b §3.3 (HexGrid render)
  *   - 10.2c §3.1/§3.4/§3.6 (scene load, isHidden/isLocked, background)
  */
-import { Application, extend } from '@pixi/react';
-import { Container, Graphics, Sprite, Text } from 'pixi.js';
-import type { Application as PixiApplication } from 'pixi.js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAtomValue } from 'jotai';
-import { useWorldContext } from '@/features/world/context/WorldContext';
-import { currentUserAtom } from '@/shared/store/authStore';
-import { WorldRole, UserRole } from '@/shared/types';
-import { useMapTheme } from './hooks/useMapTheme';
-import { useViewportPanZoom } from './hooks/useViewportPanZoom';
-import { useViewportSize } from './hooks/useViewportSize';
-import { useMapScene } from './hooks/useMapScene';
-import { useReassignmentListener } from './hooks/useReassignmentListener';
-import { usePlacementMode } from './hooks/usePlacementMode';
-import { useEffectTool } from './hooks/useEffectTool';
-import { useFogTool } from './hooks/useFogTool';
-import { EffectsPalette } from './components/effects/EffectsPalette';
-import { EffectsLayer } from './components/effects/EffectsLayer';
-import { FogLayer } from './components/fog/FogLayer';
-import { FogPalette } from './components/fog/FogPalette';
+import { Application, extend } from "@pixi/react";
+import { Container, Graphics, Sprite, Text } from "pixi.js";
+import type { Application as PixiApplication } from "pixi.js";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAtomValue } from "jotai";
+import { useWorldContext } from "@/features/world/context/WorldContext";
+import { currentUserAtom } from "@/shared/store/authStore";
+import { WorldRole, UserRole } from "@/shared/types";
+import { useMapTheme } from "./hooks/useMapTheme";
+import { useViewportPanZoom } from "./hooks/useViewportPanZoom";
+import { useViewportSize } from "./hooks/useViewportSize";
+import { useMapScene } from "./hooks/useMapScene";
+import { useReassignmentListener } from "./hooks/useReassignmentListener";
+import { usePlacementMode } from "./hooks/usePlacementMode";
+import { useEffectTool } from "./hooks/useEffectTool";
+import { useFogTool } from "./hooks/useFogTool";
+import { EffectsPalette } from "./components/effects/EffectsPalette";
+import { EffectsLayer } from "./components/effects/EffectsLayer";
+import { FogLayer } from "./components/fog/FogLayer";
+import { FogPalette } from "./components/fog/FogPalette";
 import {
   effectivelyRevealed,
   fogBrushHexes,
   isTokenHiddenByFog,
-} from './components/fog/fogUtils';
-import { getHexesInRadius, hexDistance } from './hexUtils';
-import { MapZoomControls } from './components/MapZoomControls';
-import { MapToolDock, MapDockStack } from './components/MapToolDock';
-import { MapEmptyState } from './components/MapEmptyState';
-import { MapPlacementBanner } from './components/MapPlacementBanner';
-import { HexGrid, type MapBounds } from './components/HexGrid';
-import { MapBackground } from './components/MapBackground';
-import { MapHiddenOverlay } from './components/MapHiddenOverlay';
-import { MapLockedOverlay } from './components/MapLockedOverlay';
-import { MapPjPanel } from './components/pj-panel/MapPjPanel';
-import { TokenLayer } from './components/tokens/TokenLayer';
-import { InitiativeBar } from './components/initiative/InitiativeBar';
-import { TokenInfoPanel } from './components/token-panel/TokenInfoPanel';
-import { TokenSystemSheet } from './components/token-panel/TokenSystemSheet';
-import { useMyCharacterSlugs } from './hooks/useMyCharacterSlugs';
-import { useTokenPermissions } from './hooks/useTokenPermissions';
-import { useTokenUpdate } from './hooks/useTokenUpdate';
-import { useTokenDrag } from './hooks/useTokenDrag';
-import { applyOperationToScene } from './utils/applyOperationToScene';
-import { findFirstFreeHex } from './utils/findFirstFreeHex';
-import { screenToHex } from './utils/screenToHex';
-import { axialToPixel } from './hexUtils';
-import { isPcToken } from './utils/isPcToken';
-import { sortByInitiativeDesc } from './utils/initiativeOrder';
+} from "./components/fog/fogUtils";
+import { getHexesInRadius, hexDistance } from "./hexUtils";
+import { MapZoomControls } from "./components/MapZoomControls";
+import { MapToolDock, MapDockStack } from "./components/MapToolDock";
+import { MapEmptyState } from "./components/MapEmptyState";
+import { MapPlacementBanner } from "./components/MapPlacementBanner";
+import { HexGrid, type MapBounds } from "./components/HexGrid";
+import { MapBackground } from "./components/MapBackground";
+import { MapHiddenOverlay } from "./components/MapHiddenOverlay";
+import { MapLockedOverlay } from "./components/MapLockedOverlay";
+import { MapPjPanel } from "./components/pj-panel/MapPjPanel";
+import { TokenLayer } from "./components/tokens/TokenLayer";
+import { InitiativeBar } from "./components/initiative/InitiativeBar";
+import { MapConnectionBadge } from "./components/MapConnectionBadge";
+import { MapWeatherPanel } from "./components/weather/MapWeatherPanel";
+import { MapWeatherAtmosphere } from "./components/weather/MapWeatherAtmosphere";
+import { useMapWeather } from "./hooks/useMapWeather";
+import { TokenInfoPanel } from "./components/token-panel/TokenInfoPanel";
+import { TokenSystemSheet } from "./components/token-panel/TokenSystemSheet";
+import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
+import { useTokenPermissions } from "./hooks/useTokenPermissions";
+import { useTokenUpdate } from "./hooks/useTokenUpdate";
+import { useTokenDrag } from "./hooks/useTokenDrag";
+import { applyOperationToScene } from "./utils/applyOperationToScene";
+import { findFirstFreeHex } from "./utils/findFirstFreeHex";
+import { screenToHex } from "./utils/screenToHex";
+import { axialToPixel } from "./hexUtils";
+import { isPcToken } from "./utils/isPcToken";
+import { sortByInitiativeDesc } from "./utils/initiativeOrder";
 import {
   readSpawnPayload,
   hasSpawnPayloadType,
   type SpawnPayload,
-} from './utils/spawnPayload';
+} from "./utils/spawnPayload";
 import {
   buildBestieToken,
   buildNpcToken,
   buildPcToken,
-} from './utils/buildSpawnToken';
-import { mapSceneQueryKey } from './hooks/useMapScene';
-import { postMapOperation } from './api/mapApi';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { parseApiError } from '@/shared/api';
-import { bestiarQueryKey } from '@/features/world/bestiar/hooks/useBestiar';
-import type { BestiarResponse, Bestie } from '@/features/world/bestiar/types';
-import type { MapOperation, MapToken, MapScene } from './types';
-import styles from './TacticalMapView.module.css';
+} from "./utils/buildSpawnToken";
+import { mapSceneQueryKey } from "./hooks/useMapScene";
+import { postMapOperation } from "./api/mapApi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { parseApiError } from "@/shared/api";
+import { bestiarQueryKey } from "@/features/world/bestiar/hooks/useBestiar";
+import type { BestiarResponse, Bestie } from "@/features/world/bestiar/types";
+import type { MapOperation, MapToken, MapScene } from "./types";
+import styles from "./TacticalMapView.module.css";
 
 // PixiJS v8 @pixi/react JSX pragma — extend dovolí použít `pixiContainer`
 // (lowercase, prefix `pixi`) jako JSX element.
@@ -100,7 +104,7 @@ extend({ Container, Graphics, Sprite, Text });
  * vzdálenost ≤ max ring radius (mimo excluded).
  */
 function effectCoversHex(e: MapEffect, q: number, r: number): boolean {
-  if (e.type === 'explosion') {
+  if (e.type === "explosion") {
     const center = e.hexes[0];
     if (!center || !e.rings?.length) return false;
     if (e.excludedHexes?.some((ex) => ex.q === q && ex.r === r)) return false;
@@ -112,7 +116,7 @@ function effectCoversHex(e: MapEffect, q: number, r: number): boolean {
 
 export function TacticalMapView(): React.ReactElement {
   const { worldId, world, userRole, loading } = useWorldContext();
-  const worldSystemId = world?.system ?? 'drd2';
+  const worldSystemId = world?.system ?? "drd2";
   const currentUser = useAtomValue(currentUserAtom);
   const viewportRef = useRef<HTMLDivElement>(null);
   const theme = useMapTheme();
@@ -146,6 +150,9 @@ export function TacticalMapView(): React.ReactElement {
   });
   useReassignmentListener(worldId || null);
 
+  // 10.2i — počasí na mapě (world-room join + weather:updated listener + FX toggle).
+  const weather = useMapWeather();
+
   // 10.2c-edit-9a — placement mode (klik v paletě → klik na hex).
   // 10.2g — effect tool state (paleta efektů). Oba deklarovány PŘED panZoom,
   // ať můžou suppressnout left-pan (kreslení efektu / placement = left-drag
@@ -170,9 +177,10 @@ export function TacticalMapView(): React.ReactElement {
   // 10.2c-edit-5 — bbox mapy z MapBackground.onLoad. Předáno do HexGrid
   // pro lem hexů kolem mapy (ne přes celý viewport). Reset na null při
   // změně scény, MapBackground volá onLoad(null) na začátku každého loadu.
-  const [mapTextureSize, setMapTextureSize] = useState<
-    { width: number; height: number } | null
-  >(null);
+  const [mapTextureSize, setMapTextureSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   // Background offset v map-space (z scene.config — 10.2c "free positioning").
   // backgroundScale aplikuje MapBackground sám v onLoad (vrací width * scale),
@@ -221,8 +229,8 @@ export function TacticalMapView(): React.ReactElement {
     const el = viewportRef.current;
     const onFsChange = (): void =>
       setIsFullscreen(document.fullscreenElement === el);
-    document.addEventListener('fullscreenchange', onFsChange);
-    return () => document.removeEventListener('fullscreenchange', onFsChange);
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
   }, []);
 
   // Auto-fit mapy ve fullscreenu. Spustí se při KAŽDÉ změně rozměru viewportu
@@ -252,18 +260,18 @@ export function TacticalMapView(): React.ReactElement {
     const move = (e: PointerEvent): void => panZoom.onPointerMove(e);
     const up = (e: PointerEvent): void => panZoom.onPointerUp(e);
 
-    el.addEventListener('wheel', wheel, { passive: false });
-    el.addEventListener('pointerdown', down);
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-    window.addEventListener('pointercancel', up);
+    el.addEventListener("wheel", wheel, { passive: false });
+    el.addEventListener("pointerdown", down);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
 
     return () => {
-      el.removeEventListener('wheel', wheel);
-      el.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-      window.removeEventListener('pointercancel', up);
+      el.removeEventListener("wheel", wheel);
+      el.removeEventListener("pointerdown", down);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
     };
   }, [panZoom]);
 
@@ -297,7 +305,7 @@ export function TacticalMapView(): React.ReactElement {
   });
 
   // 10.2f — token.update pro „V boji / Mimo boj" toggle v panelu tokenu.
-  const tokenUpdate = useTokenUpdate(scene?.id ?? '', worldId ?? '');
+  const tokenUpdate = useTokenUpdate(scene?.id ?? "", worldId ?? "");
 
   // 10.2d-B — optimistic token.move mutation s rollback.
   const queryClient = useQueryClient();
@@ -421,7 +429,7 @@ export function TacticalMapView(): React.ReactElement {
       fogMutation.mutate({
         sceneId: scene.id,
         op: {
-          type: 'fog.brush',
+          type: "fog.brush",
           mode: fogTool.mode,
           hexes: fogBrushHexes(q, r, fogTool.brushSize),
         },
@@ -445,7 +453,7 @@ export function TacticalMapView(): React.ReactElement {
       fogMutation.mutate({
         sceneId: scene.id,
         op: {
-          type: 'fog.set',
+          type: "fog.set",
           enabled,
           revealedHexes: scene.revealedHexes ?? [],
         },
@@ -459,19 +467,15 @@ export function TacticalMapView(): React.ReactElement {
     if (!scene || !isPJ) return;
     fogMutation.mutate({
       sceneId: scene.id,
-      op: { type: 'fog.set', enabled: scene.fogEnabled, revealedHexes: [] },
+      op: { type: "fog.set", enabled: scene.fogEnabled, revealedHexes: [] },
     });
   }, [scene, isPJ, fogMutation]);
 
-  const handleTokenDrop = (
-    tokenId: string,
-    q: number,
-    r: number,
-  ): void => {
+  const handleTokenDrop = (tokenId: string, q: number, r: number): void => {
     if (!scene) return;
     moveMutation.mutate({
       sceneId: scene.id,
-      op: { type: 'token.move', tokenId, q, r },
+      op: { type: "token.move", tokenId, q, r },
     });
   };
 
@@ -481,7 +485,12 @@ export function TacticalMapView(): React.ReactElement {
       offsetX: panZoom.offsetX,
       offsetY: panZoom.offsetY,
     },
-    config: scene?.config ?? { size: 40, originX: 0, originY: 0, showGrid: true },
+    config: scene?.config ?? {
+      size: 40,
+      originX: 0,
+      originY: 0,
+      showGrid: true,
+    },
     onDrop: handleTokenDrop,
   });
 
@@ -527,15 +536,15 @@ export function TacticalMapView(): React.ReactElement {
         : { q: targetQ, r: targetR };
 
       let token: MapToken;
-      if (payload.kind === 'pc') {
+      if (payload.kind === "pc") {
         token = buildPcToken(payload, q, r);
-      } else if (payload.kind === 'npc') {
+      } else if (payload.kind === "npc") {
         token = buildNpcToken(payload, q, r);
       } else {
         const bestie = lookupBestie(payload.bestieId);
         if (!bestie) {
           console.error(
-            '[TacticalMapView] spawn: bestie nenalezena v cache',
+            "[TacticalMapView] spawn: bestie nenalezena v cache",
             payload.bestieId,
           );
           return;
@@ -544,7 +553,7 @@ export function TacticalMapView(): React.ReactElement {
       }
       spawnMutation.mutate({
         sceneId: scene.id,
-        op: { type: 'token.add', token },
+        op: { type: "token.add", token },
       });
     },
     [scene, lookupBestie, spawnMutation],
@@ -559,18 +568,18 @@ export function TacticalMapView(): React.ReactElement {
     (q: number, r: number, isDrag = false): void => {
       if (!scene || !isPJ || !effectTool.activeTool) return;
       const newId = (): string =>
-        typeof crypto !== 'undefined' && crypto.randomUUID
+        typeof crypto !== "undefined" && crypto.randomUUID
           ? crypto.randomUUID()
           : `effect-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-      if (effectTool.activeTool === 'color') {
+      if (effectTool.activeTool === "color") {
         effectMutation.mutate({
           sceneId: scene.id,
           op: {
-            type: 'effect.add',
+            type: "effect.add",
             effect: {
               id: newId(),
-              type: 'color',
+              type: "color",
               hexes: [{ q, r }],
               color: effectTool.selectedColor,
             },
@@ -579,15 +588,15 @@ export function TacticalMapView(): React.ReactElement {
         return;
       }
 
-      if (effectTool.activeTool === 'explosion') {
+      if (effectTool.activeTool === "explosion") {
         if (effectTool.explosionRings.length === 0 || isDrag) return;
         effectMutation.mutate({
           sceneId: scene.id,
           op: {
-            type: 'effect.add',
+            type: "effect.add",
             effect: {
               id: newId(),
-              type: 'explosion',
+              type: "explosion",
               hexes: [{ q, r }],
               rings: effectTool.explosionRings,
               variant: effectTool.explosionVariant,
@@ -597,17 +606,17 @@ export function TacticalMapView(): React.ReactElement {
         return;
       }
 
-      if (effectTool.activeTool === 'barrier') {
+      if (effectTool.activeTool === "barrier") {
         // Kruh — jeden klik, žádný drag spam.
-        if (effectTool.barrierShape === 'circle') {
+        if (effectTool.barrierShape === "circle") {
           if (isDrag) return;
           effectMutation.mutate({
             sceneId: scene.id,
             op: {
-              type: 'effect.add',
+              type: "effect.add",
               effect: {
                 id: newId(),
-                type: 'barrier',
+                type: "barrier",
                 hexes: getHexesInRadius(q, r, effectTool.barrierRadius),
                 barrierDC: effectTool.barrierDC,
               },
@@ -632,7 +641,7 @@ export function TacticalMapView(): React.ReactElement {
           effectMutation.mutate({
             sceneId: scene.id,
             op: {
-              type: 'effect.update',
+              type: "effect.update",
               effectId: active.id,
               patch: {
                 hexes: [...active.hexes, { q, r }],
@@ -646,10 +655,10 @@ export function TacticalMapView(): React.ReactElement {
           effectMutation.mutate({
             sceneId: scene.id,
             op: {
-              type: 'effect.add',
+              type: "effect.add",
               effect: {
                 id,
-                type: 'barrier',
+                type: "barrier",
                 hexes: [{ q, r }],
                 barrierDC: effectTool.barrierDC,
               },
@@ -667,7 +676,7 @@ export function TacticalMapView(): React.ReactElement {
       if (!scene || !isPJ) return;
       effectMutation.mutate({
         sceneId: scene.id,
-        op: { type: 'effect.remove', effectId },
+        op: { type: "effect.remove", effectId },
       });
     },
     [scene, isPJ, effectMutation],
@@ -695,7 +704,7 @@ export function TacticalMapView(): React.ReactElement {
     if (!scene || !isPJ) return;
     effectMutation.mutate({
       sceneId: scene.id,
-      op: { type: 'scene.effects.replace', effects: [] },
+      op: { type: "scene.effects.replace", effects: [] },
     });
   }, [scene, isPJ, effectMutation]);
 
@@ -705,17 +714,23 @@ export function TacticalMapView(): React.ReactElement {
     (e: React.PointerEvent<HTMLDivElement>): void => {
       if (!scene || !isPJ) return;
       const isBrush =
-        effectTool.activeTool === 'barrier' &&
-        effectTool.barrierShape === 'brush';
-      const isErase = effectTool.activeTool === 'erase';
+        effectTool.activeTool === "barrier" &&
+        effectTool.barrierShape === "brush";
+      const isErase = effectTool.activeTool === "erase";
       const isFog =
         fogTool.active && scene.fogEnabled && !effectTool.activeTool;
       if (!isBrush && !isErase && !isFog) return;
       if ((e.buttons & 1) === 0) return; // levé tlačítko drženo
-      if ((e.target as HTMLElement).tagName !== 'CANVAS') return;
+      if ((e.target as HTMLElement).tagName !== "CANVAS") return;
       if (!viewportRef.current) return;
       const rect = viewportRef.current.getBoundingClientRect();
-      const target = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
+      const target = screenToHex(
+        e.clientX,
+        e.clientY,
+        rect,
+        panZoom,
+        scene.config,
+      );
       if (isFog) {
         applyFogAtHex(target.q, target.r);
       } else if (isErase) {
@@ -758,7 +773,7 @@ export function TacticalMapView(): React.ReactElement {
       if (!scene || !isPJ) return;
       if (!hasSpawnPayloadType(e.dataTransfer)) return;
       e.preventDefault();
-      e.dataTransfer.dropEffect = 'copy';
+      e.dataTransfer.dropEffect = "copy";
     },
     [scene, isPJ],
   );
@@ -770,7 +785,13 @@ export function TacticalMapView(): React.ReactElement {
       const payload = readSpawnPayload(e.dataTransfer);
       if (!payload) return;
       const rect = viewportRef.current.getBoundingClientRect();
-      const target = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
+      const target = screenToHex(
+        e.clientX,
+        e.clientY,
+        rect,
+        panZoom,
+        scene.config,
+      );
       spawnTokenAt(payload, target.q, target.r);
       // Drop sice samo nevolá placement.consume(), ale pokud byl placement aktivní
       // (uživatel klikl v paletě a pak místo na hex prostě dragl), ukončíme ho.
@@ -796,13 +817,24 @@ export function TacticalMapView(): React.ReactElement {
       // banner, PJ panel, deník) jsou děti viewportu a jejich klik sem bublá
       // taky — bez tohoto guardu Zrušit spawne entitu a zavření panelu pohne
       // vybraným tokenem.
-      if ((e.target as HTMLElement).tagName !== 'CANVAS') return;
+      if ((e.target as HTMLElement).tagName !== "CANVAS") return;
       const rect = viewportRef.current.getBoundingClientRect();
-      const target = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
+      const target = screenToHex(
+        e.clientX,
+        e.clientY,
+        rect,
+        panZoom,
+        scene.config,
+      );
 
       // 10.2h — fog brush single-klik. Effect tool má přednost (níž), proto
       // guard !activeTool. Tažení řeší handleViewportPointerMove.
-      if (fogTool.active && isPJ && scene.fogEnabled && !effectTool.activeTool) {
+      if (
+        fogTool.active &&
+        isPJ &&
+        scene.fogEnabled &&
+        !effectTool.activeTool
+      ) {
         lastFogHexRef.current = null; // klik = nový tah
         applyFogAtHex(target.q, target.r);
         return;
@@ -810,7 +842,7 @@ export function TacticalMapView(): React.ReactElement {
 
       // 10.2g — aktivní efekt-nástroj má NEJVYŠŠÍ prioritu (PJ kreslí / maže).
       if (effectTool.activeTool && isPJ) {
-        if (effectTool.activeTool === 'erase') {
+        if (effectTool.activeTool === "erase") {
           eraseEffectsAtHex(target.q, target.r);
         } else {
           applyEffectAtHex(target.q, target.r, false);
@@ -847,14 +879,20 @@ export function TacticalMapView(): React.ReactElement {
         // Klik na hex obsazený JINÝM tokenem → noop (user možná chce vybrat
         // jiný token; pixi onSelect na tom druhém token to udělá).
         const blocked = scene.tokens.some(
-          (t) => t.id !== selectedTokenId && t.q === target.q && t.r === target.r,
+          (t) =>
+            t.id !== selectedTokenId && t.q === target.q && t.r === target.r,
         );
         if (blocked) return;
 
         // Move: prázdný hex jiný než current
         moveMutation.mutate({
           sceneId: scene.id,
-          op: { type: 'token.move', tokenId: selectedTokenId, q: target.q, r: target.r },
+          op: {
+            type: "token.move",
+            tokenId: selectedTokenId,
+            q: target.q,
+            r: target.r,
+          },
         });
         setSelectedTokenId(null);
       }
@@ -901,7 +939,7 @@ export function TacticalMapView(): React.ReactElement {
       }
       onPointerMove={isPJ ? handleViewportPointerMove : undefined}
       onPointerUp={isPJ ? handleViewportPointerUp : undefined}
-      data-placement-active={placement.state.active ? 'true' : undefined}
+      data-placement-active={placement.state.active ? "true" : undefined}
     >
       {/* PIXI v8 Application init je async — pokud se mountne bez scény
           (jen podle rozměrů) a scéna dorazí teprve během initu, @pixi/react
@@ -1024,7 +1062,6 @@ export function TacticalMapView(): React.ReactElement {
         />
       )}
 
-
       {placement.state.active && (
         <MapPlacementBanner
           payload={placement.state.payload}
@@ -1033,164 +1070,170 @@ export function TacticalMapView(): React.ReactElement {
         />
       )}
 
-      {openedTokenId && scene && worldId && (() => {
-        const openedToken = scene.tokens.find((t) => t.id === openedTokenId);
-        if (!openedToken) return null;
-        const displayName =
-          openedToken.instanceName ?? openedToken.characterData?.name ?? '?';
-        const editable = canDrag(openedToken);
-        const deletable =
-          isGlobalAdmin || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
-        // Body osudu — Matrix-specific stat. Pro ostatní systémy se badge skryje.
-        const fatePoints =
-          worldSystemId === 'matrix'
-            ? Number(
-                openedToken.characterData?.diaryData?.matrix_fatePoints ?? 0,
-              )
-            : null;
-        return (
-          <TokenInfoPanel
-            open
-            header={{
-              // Bestie token nemá characterData (není Page) → dotáhni obrázek
-              // z bestiar cache přes templateId (snapshot šablony).
-              avatar:
-                openedToken.characterData?.imageUrl ??
-                (openedToken.templateId
-                  ? (lookupBestie(openedToken.templateId)?.imageUrl ??
-                    undefined)
-                  : undefined),
-              name: displayName,
-              badge:
-                fatePoints !== null ? (
+      {openedTokenId &&
+        scene &&
+        worldId &&
+        (() => {
+          const openedToken = scene.tokens.find((t) => t.id === openedTokenId);
+          if (!openedToken) return null;
+          const displayName =
+            openedToken.instanceName ?? openedToken.characterData?.name ?? "?";
+          const editable = canDrag(openedToken);
+          const deletable =
+            isGlobalAdmin ||
+            (userRole !== null && userRole >= WorldRole.PomocnyPJ);
+          // Body osudu — Matrix-specific stat. Pro ostatní systémy se badge skryje.
+          const fatePoints =
+            worldSystemId === "matrix"
+              ? Number(
+                  openedToken.characterData?.diaryData?.matrix_fatePoints ?? 0,
+                )
+              : null;
+          return (
+            <TokenInfoPanel
+              open
+              header={{
+                // Bestie token nemá characterData (není Page) → dotáhni obrázek
+                // z bestiar cache přes templateId (snapshot šablony).
+                avatar:
+                  openedToken.characterData?.imageUrl ??
+                  (openedToken.templateId
+                    ? (lookupBestie(openedToken.templateId)?.imageUrl ??
+                      undefined)
+                    : undefined),
+                name: displayName,
+                badge:
+                  fatePoints !== null ? (
+                    <>
+                      <span>Body osudu:</span>
+                      <strong>{fatePoints}</strong>
+                    </>
+                  ) : undefined,
+                actions: deletable ? (
                   <>
-                    <span>Body osudu:</span>
-                    <strong>{fatePoints}</strong>
+                    {/* 10.2f — „V boji / Mimo boj" toggle (PJ) jen pro NPC/bestie.
+                      PC jsou v boji vždy (nelze vyřadit) → bez toggle. */}
+                    {!isPcToken(openedToken) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const leaving = openedToken.inCombat;
+                          tokenUpdate.mutate({
+                            tokenId: openedToken.id,
+                            patch: { inCombat: !openedToken.inCombat },
+                          });
+                          // 10.2f — vyřazuji-li token, který je zrovna na tahu,
+                          // posuň „na tahu" na dalšího bojovníka (jinak by kolečko
+                          // viselo na nepřítomném tokenu).
+                          const combat = scene.combat;
+                          if (
+                            leaving &&
+                            combat?.isActive &&
+                            combat.currentTokenId === openedToken.id
+                          ) {
+                            const sorted = sortByInitiativeDesc(
+                              scene.tokens.filter(
+                                (t) => isPcToken(t) || t.inCombat,
+                              ),
+                            );
+                            const idx = sorted.findIndex(
+                              (t) => t.id === openedToken.id,
+                            );
+                            let nextId: string | null = null;
+                            for (let i = 1; i <= sorted.length; i++) {
+                              const cand = sorted[(idx + i) % sorted.length];
+                              if (cand.id !== openedToken.id) {
+                                nextId = cand.id;
+                                break;
+                              }
+                            }
+                            if (nextId) {
+                              const op: MapOperation = {
+                                type: "combat.turn",
+                                tokenId: nextId,
+                                round: combat.round,
+                              };
+                              if (worldId) {
+                                queryClient.setQueryData(
+                                  mapSceneQueryKey(worldId),
+                                  (prev: MapScene | null | undefined) =>
+                                    prev
+                                      ? applyOperationToScene(prev, op)
+                                      : prev,
+                                );
+                              }
+                              void postMapOperation(scene.id, op);
+                            }
+                          }
+                        }}
+                        style={{
+                          padding: "5px 12px",
+                          background: openedToken.inCombat
+                            ? "rgba(255, 215, 0, 0.18)"
+                            : "rgba(160, 170, 200, 0.12)",
+                          color: openedToken.inCombat ? "#ffd86b" : "#aab0c8",
+                          border: openedToken.inCombat
+                            ? "1px solid rgba(255, 215, 0, 0.5)"
+                            : "1px solid rgba(160, 170, 200, 0.35)",
+                          borderRadius: 5,
+                          font: "inherit",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: 0.6,
+                          textTransform: "uppercase",
+                          cursor: "pointer",
+                          marginRight: 8,
+                        }}
+                        title={
+                          openedToken.inCombat
+                            ? "Vyřadit z boje (zmizí z iniciativní lišty)"
+                            : "Zařadit do boje (objeví se v iniciativní liště)"
+                        }
+                      >
+                        {openedToken.inCombat ? "⚔ V boji" : "Mimo boj"}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!confirm(`Smazat token „${displayName}"?`)) return;
+                        void postMapOperation(scene.id, {
+                          type: "token.remove",
+                          tokenId: openedToken.id,
+                        });
+                        setOpenedTokenId(null);
+                      }}
+                      style={{
+                        padding: "5px 12px",
+                        background: "rgba(255, 80, 96, 0.18)",
+                        color: "#ff9090",
+                        border: "1px solid rgba(255, 80, 96, 0.45)",
+                        borderRadius: 5,
+                        font: "inherit",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: 0.6,
+                        textTransform: "uppercase",
+                        cursor: "pointer",
+                      }}
+                      title={`Odebrat ${displayName} z mapy (postava v DB zůstane)`}
+                    >
+                      Odstranit z mapy
+                    </button>
                   </>
                 ) : undefined,
-              actions: deletable ? (
-                <>
-                  {/* 10.2f — „V boji / Mimo boj" toggle (PJ) jen pro NPC/bestie.
-                      PC jsou v boji vždy (nelze vyřadit) → bez toggle. */}
-                  {!isPcToken(openedToken) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const leaving = openedToken.inCombat;
-                      tokenUpdate.mutate({
-                        tokenId: openedToken.id,
-                        patch: { inCombat: !openedToken.inCombat },
-                      });
-                      // 10.2f — vyřazuji-li token, který je zrovna na tahu,
-                      // posuň „na tahu" na dalšího bojovníka (jinak by kolečko
-                      // viselo na nepřítomném tokenu).
-                      const combat = scene.combat;
-                      if (
-                        leaving &&
-                        combat?.isActive &&
-                        combat.currentTokenId === openedToken.id
-                      ) {
-                        const sorted = sortByInitiativeDesc(
-                          scene.tokens.filter(
-                            (t) => isPcToken(t) || t.inCombat,
-                          ),
-                        );
-                        const idx = sorted.findIndex(
-                          (t) => t.id === openedToken.id,
-                        );
-                        let nextId: string | null = null;
-                        for (let i = 1; i <= sorted.length; i++) {
-                          const cand = sorted[(idx + i) % sorted.length];
-                          if (cand.id !== openedToken.id) {
-                            nextId = cand.id;
-                            break;
-                          }
-                        }
-                        if (nextId) {
-                          const op: MapOperation = {
-                            type: 'combat.turn',
-                            tokenId: nextId,
-                            round: combat.round,
-                          };
-                          if (worldId) {
-                            queryClient.setQueryData(
-                              mapSceneQueryKey(worldId),
-                              (prev: MapScene | null | undefined) =>
-                                prev ? applyOperationToScene(prev, op) : prev,
-                            );
-                          }
-                          void postMapOperation(scene.id, op);
-                        }
-                      }
-                    }}
-                    style={{
-                      padding: '5px 12px',
-                      background: openedToken.inCombat
-                        ? 'rgba(255, 215, 0, 0.18)'
-                        : 'rgba(160, 170, 200, 0.12)',
-                      color: openedToken.inCombat ? '#ffd86b' : '#aab0c8',
-                      border: openedToken.inCombat
-                        ? '1px solid rgba(255, 215, 0, 0.5)'
-                        : '1px solid rgba(160, 170, 200, 0.35)',
-                      borderRadius: 5,
-                      font: 'inherit',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: 0.6,
-                      textTransform: 'uppercase',
-                      cursor: 'pointer',
-                      marginRight: 8,
-                    }}
-                    title={
-                      openedToken.inCombat
-                        ? 'Vyřadit z boje (zmizí z iniciativní lišty)'
-                        : 'Zařadit do boje (objeví se v iniciativní liště)'
-                    }
-                  >
-                    {openedToken.inCombat ? '⚔ V boji' : 'Mimo boj'}
-                  </button>
-                  )}
-                  <button
-                  type="button"
-                  onClick={() => {
-                    if (!confirm(`Smazat token „${displayName}"?`)) return;
-                    void postMapOperation(scene.id, {
-                      type: 'token.remove',
-                      tokenId: openedToken.id,
-                    });
-                    setOpenedTokenId(null);
-                  }}
-                  style={{
-                    padding: '5px 12px',
-                    background: 'rgba(255, 80, 96, 0.18)',
-                    color: '#ff9090',
-                    border: '1px solid rgba(255, 80, 96, 0.45)',
-                    borderRadius: 5,
-                    font: 'inherit',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: 0.6,
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                  }}
-                  title={`Odebrat ${displayName} z mapy (postava v DB zůstane)`}
-                >
-                  Odstranit z mapy
-                  </button>
-                </>
-              ) : undefined,
-              onClose: () => setOpenedTokenId(null),
-            }}
-          >
-            <TokenSystemSheet
-              token={openedToken}
-              sceneId={scene.id}
-              worldId={worldId}
-              canEdit={editable}
-            />
-          </TokenInfoPanel>
-        );
-      })()}
+                onClose: () => setOpenedTokenId(null),
+              }}
+            >
+              <TokenSystemSheet
+                token={openedToken}
+                sceneId={scene.id}
+                worldId={worldId}
+                canEdit={editable}
+              />
+            </TokenInfoPanel>
+          );
+        })()}
 
       {/* 10.2f — iniciativní lišta (horní full-width). Klik na bojovníka
           = pan-to-token + select; lišta se sama skryje když nikdo není v boji. */}
@@ -1254,6 +1297,30 @@ export function TacticalMapView(): React.ReactElement {
           />
         </MapToolDock>
       </MapDockStack>
+
+      {/* 10.2i — vizuální atmosféra počasí (DOM overlay nad canvasem, pod UI). */}
+      <MapWeatherAtmosphere
+        weather={weather.weather}
+        fxEnabled={weather.fxEnabled}
+      />
+
+      {/* 10.2i — stav WS spojení (levý horní roh). */}
+      <div className={styles.connectionBadgeSlot}>
+        <MapConnectionBadge />
+      </div>
+
+      {/* 10.2i — počasí na mapě (pravý horní roh, otvírací). */}
+      <div className={styles.weatherSlot}>
+        <MapWeatherPanel
+          weather={weather.weather}
+          isPJ={isPJ}
+          fxEnabled={weather.fxEnabled}
+          toggleFx={weather.toggleFx}
+          setWeather={weather.setWeather}
+          clearWeather={weather.clearWeather}
+          isMutating={weather.isMutating}
+        />
+      </div>
     </div>
   );
 }

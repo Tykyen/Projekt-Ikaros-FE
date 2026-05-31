@@ -1,0 +1,250 @@
+/**
+ * 10.2i — MapWeatherPanel. Glassmorphism konzistentní s map paletami;
+ * počasní accent --map-weather-accent (chladně modrá). Pecka → rozbalená karta.
+ */
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  width: max-content;
+  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  pointer-events: auto;
+}
+
+/* ── Pecka (zavřený stav) ─────────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 17px;
+  background: var(--map-toolbar-bg, rgba(10, 8, 32, 0.85));
+  border: 1px solid rgba(127, 184, 230, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.pill:hover {
+  border-color: var(--map-weather-accent, #7fb8e6);
+  box-shadow: 0 0 12px
+    color-mix(in srgb, var(--map-weather-accent, #7fb8e6) 30%, transparent);
+}
+.pillIcon {
+  color: var(--map-weather-accent, #7fb8e6);
+  filter: drop-shadow(
+    0 0 4px
+      color-mix(in srgb, var(--map-weather-accent, #7fb8e6) 55%, transparent)
+  );
+}
+.pillTemp {
+  font-variant-numeric: tabular-nums;
+}
+.chev {
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+.chevOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Tělo (rozbalený stav) ────────────────────────────────────────────────── */
+.body {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--map-toolbar-bg-solid, #0a0814);
+  border: 1px solid rgba(127, 184, 230, 0.2);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  animation: slideIn 0.16s ease;
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .body {
+    animation: none;
+  }
+}
+
+.genName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--map-weather-accent, #7fb8e6);
+}
+
+.baroRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.metrics {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.metricLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+.metricValue {
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.narrative {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  font-style: italic;
+  opacity: 0.8;
+  border-left: 2px solid rgba(127, 184, 230, 0.4);
+  padding-left: 8px;
+}
+.inGame {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  opacity: 0.7;
+}
+.empty {
+  font-size: 12px;
+  opacity: 0.6;
+  text-align: center;
+  padding: 4px 0;
+}
+
+/* ── PJ ovládání ──────────────────────────────────────────────────────────── */
+.pjBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(127, 184, 230, 0.16);
+}
+.select {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 12px;
+  background: rgba(127, 184, 230, 0.06);
+  border: 1px solid rgba(127, 184, 230, 0.22);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+}
+.sendBtn {
+  width: 100%;
+  padding: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  background: color-mix(
+    in srgb,
+    var(--map-weather-accent, #7fb8e6) 22%,
+    transparent
+  );
+  border: 1px solid var(--map-weather-accent, #7fb8e6);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.sendBtn:hover:not(:disabled) {
+  background: color-mix(
+    in srgb,
+    var(--map-weather-accent, #7fb8e6) 34%,
+    transparent
+  );
+  box-shadow: 0 0 10px
+    color-mix(in srgb, var(--map-weather-accent, #7fb8e6) 40%, transparent);
+}
+.sendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.clearBtn {
+  width: 100%;
+  padding: 6px;
+  font-size: 11.5px;
+  background: rgba(255, 80, 96, 0.1);
+  border: 1px solid rgba(255, 80, 96, 0.35);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.clearBtn:hover:not(:disabled) {
+  background: rgba(255, 80, 96, 0.2);
+  border-color: rgba(255, 80, 96, 0.6);
+}
+.clearBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── FX toggle (PJ i hráč) ────────────────────────────────────────────────── */
+.fxRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding-top: 8px;
+  border-top: 1px solid rgba(127, 184, 230, 0.12);
+}
+.fxRow input {
+  accent-color: var(--map-weather-accent, #7fb8e6);
+  cursor: pointer;
+}
+
+/* ── Mobil ────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .body {
+    width: 80vw;
+    max-width: 300px;
+  }
+  /* touch targety ≥ 44px (pohodlný dotyk prstem) */
+  .pill {
+    height: 40px;
+    padding: 0 12px;
+  }
+  .select {
+    padding: 11px 8px;
+  }
+  .sendBtn,
+  .clearBtn {
+    padding: 12px;
+  }
+  .fxRow {
+    padding-top: 12px;
+    min-height: 32px;
+  }
+}

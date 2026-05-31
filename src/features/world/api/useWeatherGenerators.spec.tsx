@@ -444,7 +444,7 @@ describe('useWeatherHistory (9.4 dluh #2)', () => {
 });
 
 describe('useWeatherWsSubscribe', () => {
-  it('patchne currentWeather při weather.updated eventu', async () => {
+  it('patchne currentWeather při weather:updated eventu', async () => {
     const { Wrapper, qc } = makeWrapper();
     const initial = [
       makeGenerator('g1'),
@@ -485,7 +485,7 @@ describe('useWeatherWsSubscribe', () => {
     };
 
     act(() => {
-      emitSocket('weather.updated', {
+      emitSocket('weather:updated', {
         worldId: 'w1',
         generatorId: 'g1',
         weather: updatedWeather,
@@ -508,7 +508,7 @@ describe('useWeatherWsSubscribe', () => {
     renderHook(() => useWeatherWsSubscribe('w1'), { wrapper: Wrapper });
 
     act(() => {
-      emitSocket('weather.updated', {
+      emitSocket('weather:updated', {
         worldId: 'OTHER_WORLD',
         generatorId: 'g1',
         weather: {
