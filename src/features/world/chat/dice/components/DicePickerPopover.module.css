@@ -173,6 +173,20 @@
   font-size: 14px;
 }
 
+/* 10.2j — reprezentativní tvář aktuálního skinu místo glyfu. */
+.chipImg {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  transition: transform 0.2s;
+}
+
+.chip:hover .chipImg {
+  transform: scale(1.06);
+}
+
 .chipLabel {
   position: absolute;
   bottom: -16px;

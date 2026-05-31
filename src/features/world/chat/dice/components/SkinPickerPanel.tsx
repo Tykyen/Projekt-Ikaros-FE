@@ -6,8 +6,9 @@ import {
   CATEGORY_ORDER,
   DEFAULT_SKIN_ID,
   getSkinsByCategory,
+  pickRepresentativeImg,
 } from '../lib/diceSkins';
-import type { FateDiceSkin } from '../lib/diceSkins';
+import type { FateDiceSkin, DiceSkinPreviewType } from '../lib/diceSkins';
 import { useDiceSkinMapping } from '../api/useDiceSkinMapping';
 import styles from './SkinPickerPanel.module.css';
 
@@ -32,38 +33,6 @@ const DICE_TYPES = [
   { key: 'd100', label: 'k%', preview: 'd100' as const },
 ];
 
-type PreviewType = 'fate' | 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
-
-/**
- * Krok 6.3 perf fix — vrátí URL **jediné reprezentativní tváře** skinu pro
- * daný typ kostky (typicky nejvyšší / „hrdinská" hodnota). Náhled v skin
- * kartě je 2D snapshot, ne plný 3D model (drasticky méně HTTP requestů
- * při otevření modalu).
- */
-function pickRepresentativeImg(
-  skin: FateDiceSkin,
-  type: PreviewType,
-): string | undefined {
-  switch (type) {
-    case 'fate':
-      return skin.facePlusImg;
-    case 'd4':
-      return skin.d4_4Img;
-    case 'd6':
-      return skin.d6_6Img;
-    case 'd8':
-      return skin.d8_8Img;
-    case 'd10':
-      return skin.d10_0Img; // 0 = 10
-    case 'd12':
-      return skin.d12_12Img;
-    case 'd20':
-      return skin.d20_20Img;
-    case 'd100':
-      return skin.d100_00Img;
-  }
-}
-
 /**
  * 2D preview tváře — jediný `<img loading="lazy">`. Pokud skin nemá pro
  * daný typ texturu, fallback na CSS gradient + glyf z bgGradient.
@@ -73,7 +42,7 @@ function SkinPreviewFace({
   type,
 }: {
   skin: FateDiceSkin;
-  type: PreviewType;
+  type: DiceSkinPreviewType;
 }) {
   const imgUrl = pickRepresentativeImg(skin, type);
 

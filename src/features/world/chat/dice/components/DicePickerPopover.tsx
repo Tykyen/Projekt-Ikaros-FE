@@ -28,6 +28,8 @@ import {
   DICE_CATALOG,
   resolveDiceKeys,
 } from '../lib/worldDiceCatalog';
+import { getDiceSkin, pickRepresentativeImg } from '../lib/diceSkins';
+import type { DiceSkinPreviewType } from '../lib/diceSkins';
 import styles from './DicePickerPopover.module.css';
 
 export interface DiceRollResult {
@@ -216,6 +218,14 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
           <div className={styles.grid}>
             {allowedKeys.map((key) => {
               const cat = DICE_CATALOG[key];
+              // Aktuálně zvolený skin daného typu (per-uživatel přes
+              // useDiceSkinMapping) → ukaž jeho reprezentativní tvář místo
+              // generického glyfu. Fallback na glyf, když skin texturu nemá.
+              const skin = getDiceSkin(getSkin(cat.rollType));
+              const skinImg = pickRepresentativeImg(
+                skin,
+                cat.rollType as DiceSkinPreviewType,
+              );
               return (
                 <button
                   key={key}
@@ -224,7 +234,18 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
                   onClick={() => performRoll(key)}
                   title={`Hodit ${cat.label}`}
                 >
-                  <span className={styles.chipGlyph}>{cat.glyph}</span>
+                  {skinImg ? (
+                    <img
+                      src={skinImg}
+                      alt={cat.label}
+                      loading="lazy"
+                      decoding="async"
+                      className={styles.chipImg}
+                      style={{ borderRadius: skin.borderRadius || '18%' }}
+                    />
+                  ) : (
+                    <span className={styles.chipGlyph}>{cat.glyph}</span>
+                  )}
                   <span className={styles.chipLabel}>{cat.label}</span>
                 </button>
               );

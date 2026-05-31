@@ -925,6 +925,46 @@ export function getDiceSkin(skinId: string | null | undefined): FateDiceSkin {
 /** @deprecated alias pro `getDiceSkin` z důvodů kompatibility. */
 export const getFateSkin = getDiceSkin;
 
+/** Typy kostek, pro které umíme vrátit reprezentativní 2D tvář skinu. */
+export type DiceSkinPreviewType =
+  | 'fate'
+  | 'd4'
+  | 'd6'
+  | 'd8'
+  | 'd10'
+  | 'd12'
+  | 'd20'
+  | 'd100';
+
+/**
+ * Reprezentativní 2D tvář skinu pro daný typ kostky (náhled v UI — picker,
+ * skin grid). `undefined` = skin pro tento typ texturu nemá → volající si
+ * zvolí fallback (gradient / glyf).
+ */
+export function pickRepresentativeImg(
+  skin: FateDiceSkin,
+  type: DiceSkinPreviewType,
+): string | undefined {
+  switch (type) {
+    case 'fate':
+      return skin.facePlusImg;
+    case 'd4':
+      return skin.d4_4Img;
+    case 'd6':
+      return skin.d6_6Img;
+    case 'd8':
+      return skin.d8_8Img;
+    case 'd10':
+      return skin.d10_0Img; // 0 = 10
+    case 'd12':
+      return skin.d12_12Img;
+    case 'd20':
+      return skin.d20_20Img;
+    case 'd100':
+      return skin.d100_00Img;
+  }
+}
+
 export function getSkinsByCategory(): Record<string, FateDiceSkin[]> {
   const acc: Record<string, FateDiceSkin[]> = {};
   FATE_DICE_SKINS.forEach((skin) => {
