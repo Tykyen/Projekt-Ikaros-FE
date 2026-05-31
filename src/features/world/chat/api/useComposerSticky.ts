@@ -60,9 +60,13 @@ export function useComposerSticky(worldId: string, channelId: string) {
 
   // Při změně klíče (přepnutí konverzace) přečíst znovu. Vstup pak je
   // sticky z minulé návštěvy té konverzace, ne carry-over z předchozí.
-  useEffect(() => {
+  // R19 adjustment-during-render místo useEffect (klíč je primitivní string).
+  const stickyKey = `${worldId}/${channelId}`;
+  const [prevKey, setPrevKey] = useState(stickyKey);
+  if (stickyKey !== prevKey) {
+    setPrevKey(stickyKey);
     setState(read(worldId, channelId));
-  }, [worldId, channelId]);
+  }
 
   // Persist do localStorage při každé změně. Prázdný stav vyhodíme úplně
   // (úklid).

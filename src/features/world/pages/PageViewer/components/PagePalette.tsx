@@ -29,16 +29,21 @@ export function PagePalette({ open, onClose }: Props) {
     [directory, query],
   );
 
-  useEffect(() => {
+  // R19 adjustment-during-render místo useEffect (open/query jsou primitivní).
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setQuery('');
       setHighlightIdx(0);
     }
-  }, [open]);
+  }
 
-  useEffect(() => {
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (query !== prevQuery) {
+    setPrevQuery(query);
     setHighlightIdx(0);
-  }, [query]);
+  }
 
   useEffect(() => {
     if (!open) return;

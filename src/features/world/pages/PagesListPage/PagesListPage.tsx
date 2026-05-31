@@ -32,7 +32,10 @@ export default function PagesListPage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [sort, setSort] = useState<SortValue>('order');
 
-  const favoriteSlugs = world?.favoritePageSlugs ?? [];
+  const favoriteSlugs = useMemo(
+    () => world?.favoritePageSlugs ?? [],
+    [world],
+  );
   const canCreate = (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   const favoriteEntries = useMemo(

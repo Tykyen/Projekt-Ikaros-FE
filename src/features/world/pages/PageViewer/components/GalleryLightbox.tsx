@@ -37,9 +37,12 @@ export function GalleryLightbox({
   const [current, setCurrent] = useState(index ?? 0);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  // Sync prop index → current (R19 adjustment-during-render místo useEffect).
+  const [prevIndex, setPrevIndex] = useState(index);
+  if (index !== prevIndex) {
+    setPrevIndex(index);
     if (index !== null) setCurrent(index);
-  }, [index]);
+  }
 
   const goTo = useCallback(
     (next: number) => {

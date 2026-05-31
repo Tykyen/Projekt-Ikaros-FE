@@ -31,6 +31,22 @@ export function useYoutubePlayer(): YoutubePlayerHandle {
   const volumeRef = useRef(60);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Deklarováno před init-effektem, který ji volá v onReady (R19: žádný
+  // access-before-declared). Closure nad stabilními refy → není potřeba useCallback.
+  const startPlaylist = (videoIds: string[], loop: boolean): void => {
+    const player = playerRef.current;
+    if (!player) return;
+    if (videoIds.length === 0) {
+      player.stopVideo();
+      setIsPlaying(false);
+      return;
+    }
+    player.loadPlaylist({ playlist: videoIds });
+    player.setLoop(loop);
+    player.setVolume(volumeRef.current);
+    player.playVideo();
+  };
+
   // Mount skrytého kontejneru + init playeru jednou.
   useEffect(() => {
     const container = document.createElement('div');
@@ -75,22 +91,7 @@ export function useYoutubePlayer(): YoutubePlayerHandle {
       }
       container.remove();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const startPlaylist = (videoIds: string[], loop: boolean) => {
-    const player = playerRef.current;
-    if (!player) return;
-    if (videoIds.length === 0) {
-      player.stopVideo();
-      setIsPlaying(false);
-      return;
-    }
-    player.loadPlaylist({ playlist: videoIds });
-    player.setLoop(loop);
-    player.setVolume(volumeRef.current);
-    player.playVideo();
-  };
 
   const play = useCallback(
     (videoIds: string[], opts?: { loop?: boolean }) => {

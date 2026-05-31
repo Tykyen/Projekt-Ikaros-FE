@@ -98,6 +98,7 @@ export function usePanelLayout(): {
         return;
       }
       setIsDragging(true);
+      isDraggingRef.current = true;
       dragStartRef.current = { x: e.clientX, y: e.clientY };
       elementStartRef.current = { ...position };
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -139,24 +140,26 @@ export function usePanelLayout(): {
     }
   }, []);
 
-  // Ref pro isDragging — useCallback closure capture
+  // Ref pro isDragging — stabilní callbacky (onDragMove/onDragEnd) čtou aktuální
+  // hodnotu bez re-create. Ref synchronizujeme přímo v event handlerech (povolený
+  // ref-write), ne přes useEffect (R19 react-hooks/immutability).
   const isDraggingRef = useRef(false);
-  useEffect(() => {
-    isDraggingRef.current = isDragging;
-  }, [isDragging]);
 
   const onDragEnd = useCallback((e: React.PointerEvent): void => {
-    if (isDraggingRef.current) {
-      setIsDragging(false);
-      try {
-        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-      } catch {
-        // ignore
-      }
+    // Write-only: setIsDragging(false) je při ne-dragu no-op (bail-out),
+    // releasePointerCapture bez aktivního capture spadne do catch.
+    // Mirror-ref pro stabilní [] callbacky (onDragMove čte aktuální hodnotu bez
+    // re-create). R19 immutability rule reassign `.current` na false hlásí (ale
+    // write `true` na onDragStart ne — nekonzistence rule), pattern je korektní.
+    // eslint-disable-next-line react-hooks/immutability
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore — capture nemusel existovat
     }
-    if (resizeRef.current) {
-      resizeRef.current = null;
-    }
+    resizeRef.current = null;
   }, []);
 
   const onResizeStart = useCallback(

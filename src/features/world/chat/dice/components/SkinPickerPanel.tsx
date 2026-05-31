@@ -136,9 +136,12 @@ export function SkinPickerPanel({
 
   // Při každém otevření nastav počáteční záložku (skiny vs vězení) dle toho,
   // přes kterou ikonu v popoveru uživatel přišel.
-  useEffect(() => {
+  // R19 adjustment-during-render (open je primitivní).
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) setShowingJail(initialJail);
-  }, [open, initialJail]);
+  }
 
   // 6.3 perf — odstraněno: `preloadSkin` v useEffect tahalo všech ~70 textur
   // per skin × 8 skinů = 560 paralelních requestů. Místo toho karta používá

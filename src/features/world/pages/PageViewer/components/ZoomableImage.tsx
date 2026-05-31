@@ -34,6 +34,7 @@ export function ZoomableImage({
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const dragRef = useRef<{ startX: number; startY: number; ox: number; oy: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const clamp = useCallback(
     (v: number) => Math.min(maxScale, Math.max(minScale, v)),
@@ -61,6 +62,7 @@ export function ZoomableImage({
       ox: offset.x,
       oy: offset.y,
     };
+    setIsDragging(true);
     e.preventDefault();
   };
 
@@ -73,6 +75,7 @@ export function ZoomableImage({
     }
     function onUp() {
       dragRef.current = null;
+      setIsDragging(false);
     }
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
@@ -122,7 +125,7 @@ export function ZoomableImage({
       <div
         className={s.canvas}
         onMouseDown={onMouseDown}
-        style={{ cursor: dragRef.current ? 'grabbing' : 'grab' }}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
         <img
           src={src}

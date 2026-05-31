@@ -23,6 +23,7 @@ function makeScene(overrides: Partial<MapScene> = {}): MapScene {
     isActive: true,
     isHidden: false,
     isLocked: false,
+    playerStates: [],
     activeSoundIds: [],
     lastSeqNumber: 0,
     combat: null,
@@ -219,6 +220,52 @@ describe('applyOperationToScene — scene ops', () => {
     });
     expect(next.isHidden).toBe(true);
     expect(next.isLocked).toBe(false); // unchanged
+  });
+
+  // 10.2n — per-hráč override
+  it('scene.playerState: upsert override', () => {
+    const scene = makeScene({ playerStates: [] });
+    const next = applyOperationToScene(scene, {
+      type: 'scene.playerState',
+      userId: 'u1',
+      isHidden: true,
+    });
+    expect(next.playerStates).toEqual([{ userId: 'u1', isHidden: true }]);
+  });
+
+  it('scene.playerState: merge zachová druhé pole', () => {
+    const scene = makeScene({ playerStates: [{ userId: 'u1', isLocked: true }] });
+    const next = applyOperationToScene(scene, {
+      type: 'scene.playerState',
+      userId: 'u1',
+      isHidden: true,
+    });
+    expect(next.playerStates).toEqual([
+      { userId: 'u1', isLocked: true, isHidden: true },
+    ]);
+  });
+
+  it('scene.playerState: null smaže pole, prázdný entry zmizí', () => {
+    const scene = makeScene({ playerStates: [{ userId: 'u1', isHidden: true }] });
+    const next = applyOperationToScene(scene, {
+      type: 'scene.playerState',
+      userId: 'u1',
+      isHidden: null,
+    });
+    expect(next.playerStates).toEqual([]);
+  });
+
+  it('scene.playerState: jiný hráč zůstane nedotčen', () => {
+    const scene = makeScene({
+      playerStates: [{ userId: 'u2', isLocked: true }],
+    });
+    const next = applyOperationToScene(scene, {
+      type: 'scene.playerState',
+      userId: 'u1',
+      isHidden: true,
+    });
+    expect(next.playerStates).toContainEqual({ userId: 'u2', isLocked: true });
+    expect(next.playerStates).toContainEqual({ userId: 'u1', isHidden: true });
   });
 
   it('scene.config replace', () => {

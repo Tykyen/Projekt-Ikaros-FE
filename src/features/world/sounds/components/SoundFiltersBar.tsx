@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- komponenta + EMPTY_FILTERS konstanta záměrně pohromadě; jen DX/HMR */
 /**
  * 13.3 — Filtr bar. Search vždy viditelný; 7 dimenzí pod sbalitelným „Filtry".
  *

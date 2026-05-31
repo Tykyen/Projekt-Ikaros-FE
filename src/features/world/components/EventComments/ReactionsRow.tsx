@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- komponenta + REACTION_EMOJIS konstanta/typ záměrně pohromadě; jen DX/HMR */
 import clsx from 'clsx';
 import s from './ReactionsRow.module.css';
 

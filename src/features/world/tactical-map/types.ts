@@ -150,6 +150,16 @@ export interface CombatState {
 }
 
 /**
+ * 10.2n — per-hráč override skrytí/zámku. Efektivní stav hráče = override ??
+ * scéna-default (`isHidden`/`isLocked`). Pole undefined = bez overrides.
+ */
+export interface ScenePlayerState {
+  userId: string;
+  isHidden?: boolean;
+  isLocked?: boolean;
+}
+
+/**
  * 10.2c — plný `MapScene` mirror BE schema. Naskoupené z
  * `GET /maps/active?worldId=` (per-user resolve) nebo `GET /maps/:id`.
  */
@@ -169,6 +179,11 @@ export interface MapScene {
   isActive: boolean;
   isHidden: boolean;
   isLocked: boolean;
+  /**
+   * 10.2n — per-hráč override skrytí/zámku nad per-scéna defaultem
+   * (`isHidden`/`isLocked`). Efektivní stav hráče = override ?? default.
+   */
+  playerStates: ScenePlayerState[];
   activeSoundIds: string[];
   /** BE Date → JSON string. */
   lastModified?: string;
@@ -212,6 +227,12 @@ export type MapOperation =
   | { type: 'fog.brush'; mode: 'reveal' | 'fog'; hexes: HexCoord[] }
   // Scene
   | { type: 'scene.state'; isHidden?: boolean; isLocked?: boolean }
+  | {
+      type: 'scene.playerState';
+      userId: string;
+      isHidden?: boolean | null;
+      isLocked?: boolean | null;
+    }
   | { type: 'scene.config'; config: HexConfig }
   | { type: 'scene.image'; imageUrl: string }
   | { type: 'scene.name'; name: string }

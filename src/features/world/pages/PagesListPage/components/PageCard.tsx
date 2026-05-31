@@ -32,6 +32,7 @@ export function PageCard({
         aria-label={`Otevřít stránku ${entry.title}`}
       >
         <span className={s.icon}>
+          {/* eslint-disable-next-line react-hooks/static-components -- pageTypeIcon vrací existující Lucide komponentu z mapy, ne novou (R19 false-positive) */}
           <Icon size={20} aria-hidden />
         </span>
         <span className={s.body}>

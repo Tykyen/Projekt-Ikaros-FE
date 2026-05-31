@@ -75,7 +75,9 @@ export function useFormDraftAutoSave(
           ...parsed,
           table: { ...INITIAL_PAGE_STATE.table, ...(parsed.table ?? {}) },
         };
-        if (deepEquals(merged, initialRef.current)) return null;
+        // Lazy init běží na prvním renderu, kdy initialRef.current === state →
+        // čteme parametr state přímo (žádný ref-access-during-render, R19).
+        if (deepEquals(merged, state)) return null;
         return merged;
       } catch {
         return null;

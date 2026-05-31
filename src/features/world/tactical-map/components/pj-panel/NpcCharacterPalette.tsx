@@ -4,7 +4,7 @@
  * Stejný pattern jako PcPalette — viz tam pro docs. NPC má `multi=true`
  * (PJ často spawn více kopií stejného NPC po sobě).
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { postMapOperation } from '../../api/mapApi';
@@ -34,12 +34,15 @@ interface Props {
    * 10.2c-edit-9a — start placement mode. NPC = `multi=true` (multi-spawn).
    */
   onStartPlacement: (payload: SpawnPayload, multi: boolean) => void;
+  /** 10.2n — hlásí počet aktivních do hlavičky accordionu. */
+  onCountChange?: (n: number) => void;
 }
 
 export function NpcCharacterPalette({
   worldId,
   scene,
   onStartPlacement,
+  onCountChange,
 }: Props): React.ReactElement {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
@@ -101,6 +104,10 @@ export function NpcCharacterPalette({
   const fullCatalog = charsQuery.data ?? [];
   const activeIds = new Set(scene?.activeCharacterIds ?? []);
   const activeList = fullCatalog.filter((c) => activeIds.has(c.id));
+
+  useEffect(() => {
+    onCountChange?.(activeList.length);
+  }, [activeList.length, onCountChange]);
 
   const q = search.trim().toLowerCase();
   const filtered = q

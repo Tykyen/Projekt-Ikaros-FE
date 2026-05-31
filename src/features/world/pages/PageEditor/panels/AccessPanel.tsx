@@ -41,7 +41,7 @@ export function AccessPanel({ accessRequirements, onChange }: Props) {
   const { data: settings } = useWorldSettings(worldId);
   const { data: members = [] } = useWorldMembers(worldId);
 
-  const akjTypes = settings?.akjTypes ?? [];
+  const akjTypes = useMemo(() => settings?.akjTypes ?? [], [settings]);
   const validAkjKeys = useMemo(() => new Set(akjTypes.map((a) => a.key)), [akjTypes]);
 
   const [akjModalOpen, setAkjModalOpen] = useState(false);

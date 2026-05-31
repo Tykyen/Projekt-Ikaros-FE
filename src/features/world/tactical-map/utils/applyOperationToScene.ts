@@ -21,6 +21,7 @@ import type {
   HexCoord,
   CombatState,
   MapDiceRoll,
+  ScenePlayerState,
 } from '../types';
 
 /**
@@ -145,6 +146,28 @@ export function applyOperationToScene(
       return next;
     }
 
+    // 10.2n — per-hráč override. Merge nad existujícím entry; `null` smaže pole,
+    // `undefined` nechá beze změny. Prázdný entry se vyřadí. Mirror BE applyAtomic.
+    case 'scene.playerState': {
+      const existing = scene.playerStates?.find((p) => p.userId === op.userId);
+      const merged: ScenePlayerState = { userId: op.userId };
+      if (existing?.isHidden !== undefined) merged.isHidden = existing.isHidden;
+      if (existing?.isLocked !== undefined) merged.isLocked = existing.isLocked;
+      if (op.isHidden === null) delete merged.isHidden;
+      else if (op.isHidden !== undefined) merged.isHidden = op.isHidden;
+      if (op.isLocked === null) delete merged.isLocked;
+      else if (op.isLocked !== undefined) merged.isLocked = op.isLocked;
+      const others = (scene.playerStates ?? []).filter(
+        (p) => p.userId !== op.userId,
+      );
+      const hasOverride =
+        merged.isHidden !== undefined || merged.isLocked !== undefined;
+      return {
+        ...scene,
+        playerStates: hasOverride ? [...others, merged] : others,
+      };
+    }
+
     case 'scene.config':
       return { ...scene, config: op.config };
 
@@ -184,10 +207,6 @@ export function applyOperationToScene(
 
     case 'scene.sounds.set':
       return { ...scene, activeSoundIds: op.activeSoundIds };
-    // 10.2k — runtime ambient playlist (BE map-operations.service mapuje
-    // soundIds → activeSoundIds; FE patcher musí zrcadlit).
-    case 'sound.playlist':
-      return { ...scene, activeSoundIds: op.soundIds };
 
     // 10.2c-edit-7 — vyčistit scénu od všech tokenů + ukončit combat
     case 'scene.tokens.clear':
@@ -236,6 +255,8 @@ export function applyOperationToScene(
       };
 
     // ─── Sound ops ────────────────────────────────────────────────────
+    // 10.2k — runtime ambient playlist (BE mapuje soundIds → activeSoundIds;
+    // FE patcher musí zrcadlit).
     case 'sound.playlist':
       return { ...scene, activeSoundIds: op.soundIds };
 

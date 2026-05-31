@@ -91,6 +91,7 @@ export function NewsFormModal({ open, onClose, mode, initialData }: Props) {
     }
   }, [mode, initialData, open, reset]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- RHF watch() = R19 false positive
   const imageUrl = watch('imageUrl');
 
   function close() {

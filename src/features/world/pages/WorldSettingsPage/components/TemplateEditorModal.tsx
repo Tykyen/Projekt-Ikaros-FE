@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   FileText,
   MapPin,
@@ -112,9 +112,11 @@ export function TemplateEditorModal({
   );
 
   // Hydrate při otevření.
-  useEffect(() => {
-    if (!open) return;
-    if (existing) {
+  // Hydrate při otevření — R19 adjustment-during-render (open je primitivní).
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open && existing) {
       setLabel(existing.label);
       setKeySlug(existing.key);
       setKeyManual(true);
@@ -125,7 +127,7 @@ export function TemplateEditorModal({
           ? existing.headers.map((h) => freshRow(h))
           : [freshRow()],
       );
-    } else {
+    } else if (open) {
       setLabel('');
       setKeySlug('');
       setKeyManual(false);
@@ -133,8 +135,8 @@ export function TemplateEditorModal({
       setIcon('FileText');
       setRows([freshRow()]);
     }
-    setError(null);
-  }, [open, existing]);
+    if (open) setError(null);
+  }
 
   function onLabelChange(v: string) {
     setLabel(v);

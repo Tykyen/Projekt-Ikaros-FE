@@ -41,12 +41,16 @@ export const PoolPromptModal: React.FC<PoolPromptModalProps> = ({
   const totalCount = Object.values(counts).reduce((a, b) => a + b, 0);
   const activeTypeCount = Object.values(counts).filter((n) => n > 0).length;
 
-  useEffect(() => {
-    if (open) return;
-    setCounts({});
-    setLabel('');
-    setModifier('');
-  }, [open]);
+  // R19 adjustment-during-render: reset při zavření (open je primitivní).
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (!open) {
+      setCounts({});
+      setLabel('');
+      setModifier('');
+    }
+  }
 
   useEffect(() => {
     if (!open) return;

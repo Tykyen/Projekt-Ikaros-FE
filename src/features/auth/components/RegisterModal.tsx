@@ -166,6 +166,7 @@ export function RegisterModal() {
 
   return (
     <Modal open={open} onClose={close} title="Registrace" size="md">
+      {/* eslint-disable-next-line react-hooks/refs -- RHF idiom: onSubmit čte captchaRef až při submitu, ne při renderu (R19 false-positive) */}
       <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className={s.fieldWrap}>
           <Input

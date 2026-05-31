@@ -37,11 +37,18 @@ interface UseMapSocketOptions {
   onReassigned?: (payload: MapReassignedBroadcast) => void;
   /** 10.2f-3 — callback při `map:spotlight` (PJ ukázal na token). */
   onSpotlight?: (payload: MapSpotlightBroadcast) => void;
+  /**
+   * 10.2m — callback při `map:pinged` (kdokoli pingnul plochu). Souřadnice
+   * `x`/`y` jsou v mapa-space (transform root). BE emituje poziční argumenty.
+   */
+  onPing?: (x: number, y: number, userName: string) => void;
 }
 
 export interface UseMapSocketResult {
   /** 10.2f-3 — PJ emit spotlight (broadcast ostatním na scéně). */
   emitSpotlight: (tokenId: string) => void;
+  /** 10.2m — emit ping na plochu (mapa-space x/y). Broadcast ostatním na scéně. */
+  emitPing: (x: number, y: number, userName: string) => void;
 }
 
 export function useMapSocket({
@@ -50,6 +57,7 @@ export function useMapSocket({
   onReconnect,
   onReassigned,
   onSpotlight,
+  onPing,
 }: UseMapSocketOptions): UseMapSocketResult {
   useEffect(() => {
     if (!sceneId) return;
@@ -114,6 +122,18 @@ export function useMapSocket({
     };
   }, [onSpotlight]);
 
+  // Listener: map:pinged (kdokoli pingnul — ephemeral). BE posílá poziční args.
+  useEffect(() => {
+    if (!onPing) return;
+    const socket = getSocket();
+    const handler = (x: number, y: number, userName: string): void =>
+      onPing(x, y, userName);
+    socket.on("map:pinged", handler);
+    return () => {
+      socket.off("map:pinged", handler);
+    };
+  }, [onPing]);
+
   const emitSpotlight = useCallback(
     (tokenId: string): void => {
       if (!sceneId) return;
@@ -122,5 +142,13 @@ export function useMapSocket({
     [sceneId],
   );
 
-  return { emitSpotlight };
+  const emitPing = useCallback(
+    (x: number, y: number, userName: string): void => {
+      if (!sceneId) return;
+      getSocket().emit("map:ping", { sceneId, x, y, userName });
+    },
+    [sceneId],
+  );
+
+  return { emitSpotlight, emitPing };
 }

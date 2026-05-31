@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Search, Plus, ShieldAlert } from 'lucide-react';
 import { Modal } from '@/shared/ui';
 import { toast } from 'sonner';
@@ -50,15 +50,17 @@ export function AkjCreateModal({ open, onClose, onSelected }: Props) {
   const [createMetaPage, setCreateMetaPage] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Reset při open
-  useEffect(() => {
+  // Reset při open — R19 adjustment-during-render (open je primitivní).
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setQuery('');
       setName('');
       setLevel(nextLevelDefault);
       setCreateMetaPage(true);
     }
-  }, [open, nextLevelDefault]);
+  }
 
   // Fuzzy match existing (sekce 1)
   const filtered = useMemo(() => {

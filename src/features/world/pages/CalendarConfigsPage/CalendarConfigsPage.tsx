@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Clock, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -60,13 +60,13 @@ export default function CalendarConfigsPage() {
     );
   }
 
-  useEffect(() => {
-    if (!selectedSlug && configs.length > 0) {
-      const initial =
-        configs.find((c) => c.slug === defaultSlug)?.slug ?? configs[0].slug;
-      setSelectedSlug(initial);
-    }
-  }, [configs, selectedSlug, defaultSlug]);
+  // Auto-select default — R19 render-phase setState. Podmínka `!selectedSlug` je
+  // self-limiting (po nastavení už nespustí → žádná smyčka), proto bez useEffect.
+  if (!selectedSlug && configs.length > 0) {
+    const initial =
+      configs.find((c) => c.slug === defaultSlug)?.slug ?? configs[0].slug;
+    setSelectedSlug(initial);
+  }
 
   const selected = configs.find((c) => c.slug === selectedSlug) ?? null;
 

@@ -9,6 +9,7 @@
  */
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
+import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 import {
   GURPS_CORE_ATTRS,
   GURPS_DEFENSES,
@@ -24,7 +25,7 @@ import {
   type GurpsTrait,
 } from './constants';
 
-export function GurpsSheet({ diary, mode, onChange }: SystemSheetProps) {
+export function GurpsSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'gurps_', onChange);
@@ -32,6 +33,7 @@ export function GurpsSheet({ diary, mode, onChange }: SystemSheetProps) {
 
   return (
     <div className="gurps-dashboard">
+      {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}
       {/* ═══ HEADER ═══ */}
       <div className="gurps-header">
         <div className="identity-column">

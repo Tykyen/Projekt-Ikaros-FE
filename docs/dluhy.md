@@ -6,6 +6,34 @@
 
 ---
 
+## Vyřešené 2026-05-31 (sweep dluhů)
+
+- **D-060 — Cross-world kalendář link** ✅ (mrtvý dluh) — předpoklad zmizel. Soubor
+  `DashboardPage/sections/UpcomingEventsSection.tsx` už neexistuje; nahrazen
+  `IkarosEventsSection.tsx`, jehož „Zobrazit vše →" link míří na živou route
+  `/ikaros/akce` (ne na dočasný `/ikaros/vesmiry`). Není co implementovat.
+- **D-065 — GurpsSheet deník: tlačítko „Iniciativa"** ✅ — `GurpsSheet` dostal zpět
+  `onRoll` prop + `<SheetInitiativeButton onRoll={onRoll} kind="d20" />` na začátek
+  dashboardu (analogicky CoC). GURPS init je fakticky Basic Speed, ne kostka, ale
+  quick-roll widget `kind` nepodporuje 3d6 → `d20` dle zadání dluhu. Testy 9/9.
+- **D-NEW-register-captcha-tests** ✅ — globální mock `@marsidev/react-turnstile`
+  v [setup.ts](../src/__tests__/setup.ts) (emituje token přes `onSuccess` na mount).
+  RegisterModal spec **14/14** (byl timeout na disabled submit). Turnstile používá
+  jen RegisterModal → globální mock nikoho jiného neovlivní.
+- **Lint regrese 4 errors → 0** ✅ — dluh `D-react19-strict-cleanup` psal „0 errors",
+  ale mezitím přibyly 4 hard errors. Opraveno: unused `FATE_TARGETS` import
+  (DiceRollOverlay), unused `describe` (diceVisibility.spec), `access-before-declared`
+  `startPlaylist` (useYoutubePlayer — přesun deklarace nad init-effekt),
+  mirror-ref reassign (usePanelLayout — write-only `onDragEnd` + 1 cílený
+  eslint-disable na R19 `immutability` false-friend). Warningy (50) řešeny zvlášť.
+
+- **D-064 — Orchestr: vkládání PC z katalogu** ✅ — vyřešeno v 10.2n přechodem ambient
+  i palet na sdílený `CharacterCatalogModal` se **search + sekvenční multi-add** (klik
+  přidává položky bez zavření modalu, ✓ u už-přidaných). Pokrývá i „bulk" vkládání PC z
+  katalogu při velkém počtu položek. Seskupení vložených tokenů (původní „skupiny") se
+  po dohodě s userem **nepronásleduje** — orchestrace řeší rozmístění per scéna/hráč
+  (sekce „Přístup a viditelnost"). Rozhodnutí user 2026-05-31.
+
 ## Vyřešené 2026-05-24 (po sweepu)
 
 - **D-040-followup customData data loss** 🚨 ✅ — **kritický bug** odhalen při real-world testu (user nahodil DrD16 preset, uložil, switch zpět na Matrix nevyšel). Root cause: `character-diary.repository.update` použil `$set: { customData: {...} }` = REPLACE celého objektu; v kombinaci s read-side coerce (filter customData podle aktivního schématu) způsoboval **data loss** při system switchi:
@@ -19,21 +47,12 @@
 
 ## Otevřené
 
-### D-065 — GurpsSheet deník nemá tlačítko „Iniciativa"
-**Soubor:** `src/features/world/pages/CharacterDetailPage/diary-systems/sheets/gurps/GurpsSheet.tsx`
-**Problém:** Při opravě pre-existujících TS chyb (10.2f) odhaleno: `GurpsSheet` jako jediný per-system deníkový sheet **nezapojuje** `<SheetInitiativeButton>` — importoval ho, ale nepoužíval (TS6133), a `onRoll` prop ignoroval. Ostatní sheety (CoC, …) tlačítko mají. Pro odstranění chyby byl unused import + `onRoll` zatím odebrán, takže GURPS hráč nemá v deníku quick-roll iniciativy.
-**Dopad:** Nízký — GURPS deník bez quick-roll iniciativy; lišta 10.2f funguje nezávisle.
-**Řešení:** Přidat `{onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}` do headeru `GurpsSheet` (vrátit `onRoll` do props), analogicky CoC.
-**Kdy:** Při příští práci na GURPS deníku nebo sjednocení sheetů.
-
----
-
-### D-064 — Orchestr: vkládání PC z katalogu by chtělo přepracovat (seskupení)
-**Soubor:** `src/features/world/tactical-map/components/pj-panel/` — `CharacterCatalogModal.tsx` / `PcPalette.tsx` (orchestrace spawn PC)
-**Problém:** Vkládání PC z katalogu v PJ orchestru je dnes ploché (token po tokenu). User při 10.2f návrhu poznamenal, že „skupiny" (které do iniciativy nepatří — řeší se orchestrem) by se hodilo v orchestru u PC-katalog vložení **předělat** — pravděpodobně hromadné/skupinové vkládání nebo seskupení vložených tokenů. Přesný rozsah TBD (upřesnit s userem).
-**Dopad:** Nízký — UX vylepšení orchestru, ne blocker.
-**Řešení:** Doptat se na konkrétní představu; navrhnout seskupení / multi-select vložení PC v `CharacterCatalogModal`.
-**Kdy:** Při práci na orchestru PJ panelu nebo až po dotažení 10.2.
+### D-066 — Per-token lock (zamčení jednotlivého tokenu)
+**Soubor:** `src/features/world/tactical-map/types.ts` (`MapToken`) + `hooks/useTokenPermissions.ts`
+**Problém:** Roadmapa 10.2m zmiňuje „respekt `isLocked`". Existuje jen `scene.isLocked` (zamkne pohyb tokeny celé scény hráčům). Per-token lock — zamknout konkrétní token, ne celou scénu — chybí: `MapToken` nemá pole `isLocked`, takže PJ nemůže přišpendlit jeden token a nechat ostatní volné.
+**Dopad:** Nízký — scene-level lock pokrývá hlavní use-case (zamknout celou scénu během vyprávění); granularita per-token je nice-to-have.
+**Řešení:** BE: `MapToken.isLocked?: boolean` ve schématu + `token.update` op + `toEntity` mapper. FE: gate v `useTokenPermissions.canDrag` (`token.isLocked && !isPj` → false) + toggle v TokenStatbarModal (PJ-only). BE+FE krok, nemíchat v jedné dávce.
+**Kdy:** Až bude potřeba zamykat jednotlivé tokeny (např. dekorace/objekty na mapě), nebo v navazující map iteraci.
 
 ---
 
@@ -63,7 +82,10 @@
 
 **Kdy:** Mimo feature work. Při příští session zaměřené na perf/quality nebo když lint začne blokovat CI.
 
-**Stav:** Zaznamenáno během 9.4 calendar scalability (2026-05-26). TS errors a 1 hard lint error z téhož sweepu jsou opraveny (commit ef81f03).
+**Stav (2026-05-31):** Lint **errory 4 → 0** opraveny (viz „Vyřešené 2026-05-31"). Zbývá
+**50 warningů** (R19 strict, 0 runtime dopadu): 18× `set-state-in-effect`, 8× `exhaustive-deps`,
+7× `react-refresh/only-export-components`, 6× `static-components`, 4× `incompatible-library`,
+3× `refs`, 4× ostatní. Tento sprint = jen warningy.
 
 ---
 
@@ -93,24 +115,6 @@
 
 ---
 
-### D-NEW-register-captcha-tests — RegisterModal vitest specs padají na disabled submit
-**Soubory:** `src/features/auth/components/RegisterModal.spec.tsx` (6 testů — submit + error mapping scénáře)
-**Stav:** Pre-existing problem z captcha rolloutu (commit `2a2c4bf`, 2026-05-24).
-**Kontext:** Cloudflare Turnstile widget v test prostředí (`@marsidev/react-turnstile` jsdom env) nesimuluje úspěšný challenge → token nikdy nevznikne → submit tlačítko zůstává `disabled` → testy timeoutují. V dev/prod uživatel reálný challenge projde a token přijde z Cloudflare; v testu chybí mock.
-**Řešení:** Buď (a) mock `@marsidev/react-turnstile` v `src/test/setup.ts` (token okamžitě emitovaný), nebo (b) extrahovat captcha komponent za feature flag a v testu ho vypnout. Varianta (a) je menší rozsah.
-**Dopad:** Lokální vitest pro RegisterModal padá, ale ostatní 1147 testů (incl. D-040 změny) zelených. Žádný runtime dopad — captcha v produkci funguje, jen e2e flow má v testech nepokryté větve.
-**Kdy:** Při dalším doteku auth flow nebo když CI začne padat.
-
----
-
-### D-060 — Cross-world kalendář link (2.1 → 9.2)
-**Soubory:** `src/features/ikaros/pages/DashboardPage/sections/UpcomingEventsSection.tsx`
-**Kontext:** Sekce „Blížící se schůzky" má action „Zobrazit vše →", která dnes míří dočasně na `/ikaros/vesmiry`. Cross-world kalendář (`/ikaros/kalendar` nebo equivalent) ještě neexistuje; vznikne s fází 9.2.
-**Řešení:** Po dokončení 9.2 přesměrovat link na novou route.
-**Kdy:** Fáze 9.2.
-
----
-
 ### D-NEW-chat-edit-attachments — Edit zpráv ve světovém chatu neumí měnit přílohy
 **Soubor:** `src/features/world/chat/components/MessageEditInline.tsx`
 **Kontext:** Krok 6.2c implementuje inline edit pouze pro `content`. BE `editMessage` DTO sice umí `attachmentsToAdd`/`attachmentsToRemove`, ale FE UI pro to (drag-add, klik-remove, re-validace limitů) by významně nafouklo modal — vědomě odsunuto.
@@ -129,4 +133,7 @@
 
 ---
 
-**Celkem otevřených dluhů: 4** (1× nový — captcha test mock, 1× čeká na fázi 9.2, 2× defer dokud nepřijde stížnost / multi-instance scale).
+**Celkem otevřených dluhů: 6** — D-066 (per-token lock, BE+FE), D-react19-strict-cleanup
+(50 warningů, řeší se), D-063 (map UI tokeny), D-062c (AKJ listings stub — rozhodnuto
+var. **b**, čeká spec+BE), D-NEW-chat-edit-attachments (defer), D-NEW-chat-presence-scale
+(defer, multi-instance).

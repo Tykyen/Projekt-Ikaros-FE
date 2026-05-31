@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- util soubor: ikony-konstanty + GroupIcon helper záměrně pohromadě; jen DX/HMR */
 /**
  * Curated sada 24 lucide ikon pro `ChatGroup.iconKey` (krok 6.5c).
  *

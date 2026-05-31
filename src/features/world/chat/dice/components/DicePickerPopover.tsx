@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- komponenta + externě volaný helper buildPoolRoll záměrně v jednom souboru; jen DX/HMR, ne runtime */
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ChevronDown,

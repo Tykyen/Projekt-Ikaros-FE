@@ -82,6 +82,7 @@ const WorldSettingsPage  = lazy(() => import('@/features/world/pages/WorldSettin
 const RulesPage          = lazy(() => import('@/features/world/pages/RulesPage'));
 const PagesAdminPage     = lazy(() => import('@/features/world/pages/PagesAdminPage'));
 const WorldDiarySchemaEditorPage = lazy(() => import('@/features/world/pages/WorldDiarySchemaEditorPage'));
+const WorldGmDiaryPage   = lazy(() => import('@/features/world/pages/WorldGmDiaryPage'));
 const WorldEmotesAdminPage = lazy(() => import('@/features/world/pages/WorldEmotesAdminPage/WorldEmotesAdminPage'));
 const CalendarConfigsPage = lazy(() => import('@/features/world/pages/CalendarConfigsPage/CalendarConfigsPage'));
 
@@ -253,6 +254,18 @@ export const router = createBrowserRouter([
       { path: 'nastaveni',              element: memberOnly(p(WorldSettingsPage)) },
       { path: 'hraci',                  element: memberOnly(p(WorldMembersPage)) },
       { path: 'pravidla',               element: memberOnly(p(RulesPage)) },
+      {
+        // 10.2l — deník PJ (world-level poznámky, per-PJ). Mimo mapu, PJ+.
+        path: 'denik-pj',
+        element: (
+          <WorldMembershipGuard
+            minWorldRole={WorldRole.PomocnyPJ}
+            fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
+          >
+            {p(WorldGmDiaryPage)}
+          </WorldMembershipGuard>
+        ),
+      },
       {
         path: 'admin/stranky',
         element: (

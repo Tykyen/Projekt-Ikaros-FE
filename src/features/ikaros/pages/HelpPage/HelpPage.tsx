@@ -40,16 +40,19 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-05-31 (13.3 + 10.2k — Zvuky: nová stránka Zvuková
+          Aktualizováno k 2026-05-31 (10.2n — Orchestrace: spawn palety
+          (PC / NPC / Bestiář) jsou nově sbalitelné s počtem aktivních v hlavičce
+          a panel „Přístup a viditelnost" umožní PJ skrýt mapu nebo zamknout pohyb
+          hráčům — najednou všem na scéně i jednotlivě konkrétnímu hráči. Předchozí:
+          10.2l + 10.2m — Taktická mapa dokončena:
+          deník PJ jako samostatná stránka (Hra → Deník PJ, sdílí obsah s deníkem
+          na mapě) a ping — dvojklikem na plochu pošleš všem na scéně barevný
+          prstenec (označený tvou postavou, u PJ „PJ"). Předchozí: 13.3 + 10.2k — Zvuky: stránka Zvuková
           databáze (knihovna hudby/zvuků světa z YouTube, filtry, správa PJ);
           PJ pouští hudbu na taktickou mapu jako ambient scény i přímo do chatu
-          („pustit zvuk všem“). Předchozí: 10.2j — Taktická mapa: hod kostkou na mapě
-          — vlastní hod 🎲, hod schopnosti a hod iniciativy; log hodů v panelu
-          vlevo s rozpisem výpočtu (schopnost + modifikátor + kostky); deník PJ
-          a poznámkový blok postavy přímo z mapy (tlačítko pod počasím), deník
-          PJ i v menu Hra → Deník PJ; nastavení viditelnosti hodů v Nastavení
-          světa. Předchozí: 10.2i — počasí na mapě; 10.2h — mlha války; 10.2g —
-          efekty; 10.2f — iniciativa a tracker boje.).
+          („pustit zvuk všem“). Předchozí: 10.2j — hod kostkou na mapě; 10.2i —
+          počasí na mapě; 10.2h — mlha války; 10.2g — efekty; 10.2f — iniciativa
+          a tracker boje.).
         </p>
       </header>
 

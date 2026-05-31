@@ -137,13 +137,17 @@ export function GurpsCombatPanel({
     if (!fpFocusRef.current) setFpDraft(getStr(cd, 'gurps_fp', '10'));
   }, [cd]);
 
-  // Cleanup debounce timery při unmount
+  // Cleanup debounce timery při unmount. Cleanup ZÁMĚRNĚ čte aktuální ref.current
+  // (poslední běžící timer), ne kopii z mountu — proto rule false-positive
+  // (copy-to-var by zachytil null a clearTimeout by nic nezrušil).
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     return () => {
       if (hpTimerRef.current) clearTimeout(hpTimerRef.current);
       if (fpTimerRef.current) clearTimeout(fpTimerRef.current);
     };
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const commit = (patchKey: string, value: string): void => {
     updateDiary.mutate(

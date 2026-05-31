@@ -82,8 +82,10 @@ export function MatrixCombatPanel({
 
   // Po úspěšném save (server odpověděl) vyčistíme overlay
   // — server už drží novou pravdu, lokální patch by jinak overshadowed novější změny.
+  // Reakce na async výsledek mutace (server odpověděl) — legitimní effekt.
   useEffect(() => {
     if (updateDiary.isSuccess) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPatch({});
       pendingPatchRef.current = {};
       // reset flag pro další save

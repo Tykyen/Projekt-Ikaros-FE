@@ -215,30 +215,31 @@ function AuthorSidebar({ article }: { article: IkarosArticle }) {
 
   // D-040 — tombstone autora v sidebaru = disabled card, žádný proklik.
   const isDeleted = article.authorIsDeleted;
-  const Wrapper = isDeleted
-    ? ({ children }: { children: React.ReactNode }) => (
-        <div className={s.authorCard} style={{ opacity: 0.6, cursor: 'default' }}>
-          {children}
-        </div>
-      )
-    : ({ children }: { children: React.ReactNode }) => (
-        <Link to={`/ikaros/uzivatel/${article.authorId}`} className={s.authorCard}>
-          {children}
-        </Link>
-      );
+  // Obsah sdílený oběma variantami obalu (R19: žádná inline komponenta v renderu).
+  const cardInner = (
+    <>
+      <div className={s.authorName} style={isDeleted ? { fontStyle: 'italic' } : undefined}>
+        {isDeleted ? 'Smazaný účet' : article.authorName}
+      </div>
+      <div className={s.authorStats}>
+        <span>{authorPublished.length} článků</span>
+        {avgRating > 0 && <span>· ★ {avgRating.toFixed(1)}</span>}
+      </div>
+      {!isDeleted && <span className={s.authorMore}>Profil →</span>}
+    </>
+  );
 
   return (
     <aside className={s.authorSidebar}>
-      <Wrapper>
-        <div className={s.authorName} style={isDeleted ? { fontStyle: 'italic' } : undefined}>
-          {isDeleted ? 'Smazaný účet' : article.authorName}
+      {isDeleted ? (
+        <div className={s.authorCard} style={{ opacity: 0.6, cursor: 'default' }}>
+          {cardInner}
         </div>
-        <div className={s.authorStats}>
-          <span>{authorPublished.length} článků</span>
-          {avgRating > 0 && <span>· ★ {avgRating.toFixed(1)}</span>}
-        </div>
-        {!isDeleted && <span className={s.authorMore}>Profil →</span>}
-      </Wrapper>
+      ) : (
+        <Link to={`/ikaros/uzivatel/${article.authorId}`} className={s.authorCard}>
+          {cardInner}
+        </Link>
+      )}
     </aside>
   );
 }

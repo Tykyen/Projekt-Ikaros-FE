@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- idiomatický Context pattern (Provider + useDiceRollOverlay hook v jednom souboru); jen DX/HMR */
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import type { DicePayload } from '../lib/dicePayload';

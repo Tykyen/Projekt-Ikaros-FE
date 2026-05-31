@@ -36,6 +36,9 @@ import { EffectsPalette } from "./components/effects/EffectsPalette";
 import { EffectsLayer } from "./components/effects/EffectsLayer";
 import { FogLayer } from "./components/fog/FogLayer";
 import { FogPalette } from "./components/fog/FogPalette";
+import { PingsLayer, type PingMarker } from "./components/pings/PingsLayer";
+import { screenToMap } from "./utils/screenToMap";
+import { movedTooFar, isDoubleTap, type TapPoint } from "./utils/doubleTap";
 import {
   effectivelyRevealed,
   fogBrushHexes,
@@ -81,6 +84,7 @@ import { useTokenPermissions } from "./hooks/useTokenPermissions";
 import { useTokenUpdate } from "./hooks/useTokenUpdate";
 import { useTokenDrag } from "./hooks/useTokenDrag";
 import { applyOperationToScene } from "./utils/applyOperationToScene";
+import { effectiveHidden, effectiveLocked } from "./utils/sceneAccess";
 import { findFirstFreeHex } from "./utils/findFirstFreeHex";
 import { screenToHex } from "./utils/screenToHex";
 import { axialToPixel } from "./hexUtils";
@@ -159,6 +163,24 @@ export function TacticalMapView(): React.ReactElement {
     [],
   );
 
+  // 10.2m — pingy (ephemeral „blik" na ploše). Lokální stav markerů; přidání
+  // z double-clicku (vlastní) i z WS `map:pinged` (cizí). `addPing` definováno
+  // před useMapScene, ať může přijmout `onPing` callback. Expiraci řeší
+  // PingsLayer přes TTL (onExpire odebere marker).
+  const [pings, setPings] = useState<PingMarker[]>([]);
+  const addPing = useCallback(
+    (x: number, y: number, userName: string): void => {
+      setPings((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), x, y, userName, born: performance.now() },
+      ]);
+    },
+    [],
+  );
+  const removePing = useCallback((id: string): void => {
+    setPings((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
   // 10.2j G3 — 3D dice overlay (6.3). Lokální state + přímý <DiceRollOverlay>
   // (NE chat DiceRollOverlayProvider — ten wrappuje jen chat stránku, mapu ne;
   // lokální state je robustnější a decoupled). `triggerOverlay` injektujeme do
@@ -207,10 +229,14 @@ export function TacticalMapView(): React.ReactElement {
   // 10.2c — scene fetch + WS + cross-scene reassignment listener.
   // POZOR: `useMapScene` musí být před `useViewportPanZoom`, aby hook
   // dostal `scene.id` pro per-scéna LS klíče (10.2c-edit-5).
-  const { scene, emitSpotlight, rollDice } = useMapScene(worldId || null, {
-    onSpotlight: triggerSpotlight,
-    onLiveDiceRoll: handleLiveDiceRoll,
-  });
+  const { scene, emitSpotlight, emitPing, rollDice } = useMapScene(
+    worldId || null,
+    {
+      onSpotlight: triggerSpotlight,
+      onLiveDiceRoll: handleLiveDiceRoll,
+      onPing: addPing,
+    },
+  );
   useReassignmentListener(worldId || null);
 
   // 10.2j — bestie tokeny dotahují obrázek z bestiar cache (resolveTokenImage →
@@ -375,6 +401,10 @@ export function TacticalMapView(): React.ReactElement {
     currentUser?.displayName ??
     currentUser?.username ??
     "Hráč";
+
+  // 10.2m — herní identita pro ping: NIKDY jméno účtu. PJ ve světě = „PJ"
+  // (priorita role), jinak jméno postavy, kterou hraje (fallback „Hráč").
+  const pingLabel = isPJ ? "PJ" : (character?.name ?? "Hráč");
   const mapDice = useMapDiceRoll({
     viewer: {
       userId: currentUser?.id ?? "",
@@ -402,6 +432,7 @@ export function TacticalMapView(): React.ReactElement {
     isGlobalAdmin,
     isPj: userRole !== null && userRole >= WorldRole.PomocnyPJ,
     mySlugs,
+    userId: currentUser?.id ?? "",
   });
 
   // 10.2j — poznámkový blok na mapě (tlačítko pod počasím). PJ → world gm-notes
@@ -423,8 +454,13 @@ export function TacticalMapView(): React.ReactElement {
   // 10.2f — token.update pro „V boji / Mimo boj" toggle v panelu tokenu.
   const tokenUpdate = useTokenUpdate(scene?.id ?? "", worldId ?? "");
 
+  // 10.2d-B — optimistic token.move mutation s rollback.
+  const queryClient = useQueryClient();
+
   // 10.2k — ambient playlist broadcast (op `sound.playlist`). Optimistic přes
   // applyOperationToScene + rollback (stejný pattern jako effectMutation).
+  // POZOR: musí být AŽ za `const queryClient` (TDZ — jinak runtime
+  // „Cannot access 'queryClient' before initialization").
   const broadcastSounds = useCallback(
     (soundIds: string[]): void => {
       if (!scene || !worldId) return;
@@ -446,9 +482,6 @@ export function TacticalMapView(): React.ReactElement {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scene?.id, worldId, queryClient],
   );
-
-  // 10.2d-B — optimistic token.move mutation s rollback.
-  const queryClient = useQueryClient();
   const moveMutation = useMutation({
     mutationFn: ({ sceneId, op }: { sceneId: string; op: MapOperation }) =>
       postMapOperation(sceneId, op),
@@ -897,6 +930,51 @@ export function TacticalMapView(): React.ReactElement {
     lastFogHexRef.current = null;
   }, []);
 
+  // 10.2m — double-tap kdekoli na ploše = ping (PJ i hráč). Pointer-based
+  // (NE onDoubleClick — ten je na dotyku s `touch-action: none` nespolehlivý).
+  // pointerdown uloží start, pointerup vyhodnotí: tap (malý posun, ne pan) +
+  // navázání na předchozí tap = double-tap → ping přesně pod prstem/kurzorem.
+  const tapDownRef = useRef<{ x: number; y: number } | null>(null);
+  const lastTapRef = useRef<TapPoint | null>(null);
+  const handlePingPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      tapDownRef.current = { x: e.clientX, y: e.clientY };
+    },
+    [],
+  );
+  const handlePingPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      const down = tapDownRef.current;
+      tapDownRef.current = null;
+      if (!scene || !viewportRef.current) return;
+      if ((e.target as HTMLElement).tagName !== "CANVAS") return;
+      // Posunul se → byl to pan/drag, ne tap.
+      if (!down || movedTooFar(down, { x: e.clientX, y: e.clientY })) {
+        lastTapRef.current = null;
+        return;
+      }
+      const tap: TapPoint = { t: performance.now(), x: e.clientX, y: e.clientY };
+      if (isDoubleTap(lastTapRef.current, tap)) {
+        lastTapRef.current = null;
+        const rect = viewportRef.current.getBoundingClientRect();
+        const { x, y } = screenToMap(e.clientX, e.clientY, rect, panZoom);
+        addPing(x, y, pingLabel);
+        emitPing(x, y, pingLabel);
+      } else {
+        lastTapRef.current = tap;
+      }
+    },
+    [scene, panZoom, addPing, emitPing, pingLabel],
+  );
+  // PJ brush-konec + ping detekce v jednom pointerup (ping má všechny role).
+  const handleViewportPointerUpAll = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      if (isPJ) handleViewportPointerUp();
+      handlePingPointerUp(e);
+    },
+    [isPJ, handleViewportPointerUp, handlePingPointerUp],
+  );
+
   // Změna nástroje ukončí rozpracovanou bariéru.
   useEffect(() => {
     brushBarrierIdRef.current = null;
@@ -1057,11 +1135,14 @@ export function TacticalMapView(): React.ReactElement {
   // Empty state: world ready ale scéna chybí (hráč není přiřazený)
   const showEmptyState = !loading && (!worldId || (!scene && !loading));
 
-  // Hidden overlay jen pro hráče (PJ vidí scénu vždy)
-  const showHidden = !!scene && scene.isHidden && !isPJ;
+  // Hidden overlay jen pro hráče (PJ vidí scénu vždy).
+  // 10.2n — efektivní skrytí: per-hráč override ?? per-scéna default.
+  const showHidden =
+    !!scene && !isPJ && effectiveHidden(scene, currentUser?.id ?? "");
 
-  // Locked banner jen pro hráče (PJ může pokračovat)
-  const showLocked = !!scene && scene.isLocked && !isPJ;
+  // Locked banner jen pro hráče (PJ může pokračovat).
+  const showLocked =
+    !!scene && !isPJ && effectiveLocked(scene, currentUser?.id ?? "");
 
   return (
     <div
@@ -1077,8 +1158,9 @@ export function TacticalMapView(): React.ReactElement {
           ? handleViewportClick
           : undefined
       }
+      onPointerDown={handlePingPointerDown}
       onPointerMove={isPJ ? handleViewportPointerMove : undefined}
-      onPointerUp={isPJ ? handleViewportPointerUp : undefined}
+      onPointerUp={handleViewportPointerUpAll}
       data-placement-active={placement.state.active ? "true" : undefined}
     >
       {/* PIXI v8 Application init je async — pokud se mountne bez scény
@@ -1177,7 +1259,16 @@ export function TacticalMapView(): React.ReactElement {
                   />
                 )}
               </pixiContainer>
-              <pixiContainer label="layer-pings" />
+              <pixiContainer label="layer-pings">
+                {scene && (
+                  <PingsLayer
+                    pings={pings}
+                    config={scene.config}
+                    theme={theme}
+                    onExpire={removePing}
+                  />
+                )}
+              </pixiContainer>
             </pixiContainer>
           </Application>
         </div>
@@ -1443,6 +1534,11 @@ export function TacticalMapView(): React.ReactElement {
             fullscreenTargetRef={viewportRef}
           />
         </MapToolDock>
+        {/* 10.2n — ambient ovládání (PJ) pod Zobrazením v pravém dolním stacku.
+            Vlastní sbalitelná hlavička (· vysílá indikátor) + cyan sound-accent. */}
+        {isPJ && scene && (
+          <AmbientSoundPanel scene={scene} onBroadcast={broadcastSounds} />
+        )}
       </MapDockStack>
 
       {/* 10.2i — vizuální atmosféra počasí (DOM overlay nad canvasem, pod UI). */}
@@ -1476,6 +1572,9 @@ export function TacticalMapView(): React.ReactElement {
             onClick={() => setNotebookOpen(true)}
           />
         )}
+        {/* 10.2n — „co hraje" (ambient přehrávač) pod lištou s deníkem/počasím.
+            Sám se skryje, když nic nehraje (vrací null). */}
+        {scene && <SceneSoundPlayer scene={scene} />}
       </div>
 
       {/* 10.2j — overlay přes celý viewport (uvnitř fullscreenu mapy). Mountuje
@@ -1505,9 +1604,6 @@ export function TacticalMapView(): React.ReactElement {
               sceneId={scene.id}
             />
           )}
-          {isPJ && scene && (
-            <AmbientSoundPanel scene={scene} onBroadcast={broadcastSounds} />
-          )}
           {isPJ && (
             <MapPjPanel
               worldId={worldId}
@@ -1521,9 +1617,6 @@ export function TacticalMapView(): React.ReactElement {
 
       {/* 10.2j G3 — fullscreen 3D dice overlay (lokální hod + cizí viditelný). */}
       <DiceRollOverlay roll={diceOverlay} onDone={() => setDiceOverlay(null)} />
-
-      {/* 10.2k — ambient přehrávač scény (PJ i hráč slyší; HUD vlevo nahoře). */}
-      {scene && <SceneSoundPlayer scene={scene} />}
     </div>
   );
 }

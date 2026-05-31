@@ -91,8 +91,13 @@ export function MentionAutocomplete({
     return [...matchedSpecials, ...matchedMembers].slice(0, MAX_VISIBLE);
   }, [members, query]);
 
-  // Reset active při změně filtru.
-  useEffect(() => setActive(0), [query, members]);
+  // Reset active při změně filtru — R19 adjustment-during-render (primitivní klíč).
+  const filterKey = `${query}|${members.length}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setActive(0);
+  }
 
   // Klávesové ovládání: composer drží focus, takže listener na window.
   useEffect(() => {

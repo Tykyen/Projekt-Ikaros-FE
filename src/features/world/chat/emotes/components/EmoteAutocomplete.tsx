@@ -42,7 +42,13 @@ export function EmoteAutocomplete({ query, emotes, onSelect, onClose }: Props) {
     return [...prefix, ...contains].slice(0, MAX_VISIBLE);
   }, [emotes, query]);
 
-  useEffect(() => setActive(0), [query, emotes]);
+  // Reset active při změně filtru — R19 adjustment-during-render (primitivní klíč).
+  const filterKey = `${query}|${emotes.length}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setActive(0);
+  }
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

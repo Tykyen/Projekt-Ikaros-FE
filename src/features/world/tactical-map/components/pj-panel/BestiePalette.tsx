@@ -13,7 +13,7 @@
  * `×` u řádky → `scene.activeBestie.remove`.
  * `+ z katalogu` → CharacterCatalogModal s tabs={MŮJ/SVĚT/SYSTEM}.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBestiar } from '@/features/world/bestiar/hooks/useBestiar';
 import { postMapOperation } from '../../api/mapApi';
@@ -37,6 +37,8 @@ interface Props {
    * 10.2c-edit-9a — start placement mode. Bestie = `multi=true`.
    */
   onStartPlacement: (payload: SpawnPayload, multi: boolean) => void;
+  /** 10.2n — hlásí počet aktivních do hlavičky accordionu. */
+  onCountChange?: (n: number) => void;
 }
 
 export function BestiePalette({
@@ -44,6 +46,7 @@ export function BestiePalette({
   systemId,
   scene,
   onStartPlacement,
+  onCountChange,
 }: Props): React.ReactElement {
   const query = useBestiar(worldId, systemId);
   const queryClient = useQueryClient();
@@ -107,6 +110,10 @@ export function BestiePalette({
   ];
   const activeIds = new Set(scene?.activeBestieIds ?? []);
   const activeList = allBestie.filter((b) => activeIds.has(b.id));
+
+  useEffect(() => {
+    onCountChange?.(activeList.length);
+  }, [activeList.length, onCountChange]);
 
   const q = search.trim().toLowerCase();
   const filtered = q

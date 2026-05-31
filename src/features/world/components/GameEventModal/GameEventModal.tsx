@@ -105,6 +105,7 @@ export function GameEventModal({
     defaultValues,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- RHF watch() = R19 false positive
   const watchedGroup = watch('targetGroup');
 
   function close() {

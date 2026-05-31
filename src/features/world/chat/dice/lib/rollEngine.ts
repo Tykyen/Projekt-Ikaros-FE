@@ -87,7 +87,6 @@ export function secureRandomInt(max: number): number {
   const buf = new Uint32Array(1);
   // Smyčka teoreticky neukončená, prakticky končí po 1 iteraci ve >99,9%
   // případů (limit/range ≈ 1 pro malá max).
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     cryptoApi.getRandomValues(buf);
     if (buf[0] < limit) return buf[0] % max;

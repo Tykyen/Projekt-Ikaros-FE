@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   useMembershipAppearance,
   useUpdateAppearance,
@@ -22,7 +22,8 @@ export function useDiceSkinMapping(worldId: string) {
   const update = useUpdateAppearance(worldId);
 
   const mapping = query.data?.diceSkinMapping ?? null;
-  const jailed = query.data?.jailedDiceSkins ?? [];
+  // useMemo: stabilní reference, jinak `?? []` mění deps downstream useCallbacků každý render.
+  const jailed = useMemo(() => query.data?.jailedDiceSkins ?? [], [query.data]);
 
   const getSkin = useCallback(
     (typeKey: string): string => {

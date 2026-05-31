@@ -190,6 +190,34 @@ const FAQ: FaqItem[] = [
     ),
   },
   {
+    q: 'Jak připravím scénu, aby ji hráči zatím neviděli nebo nehýbali tokeny?',
+    a: (
+      <>
+        <p>
+          V panelu <strong>„⚙ Orchestrace"</strong> je sekce{' '}
+          <strong>„Přístup a viditelnost"</strong>. U každé aktivní scény tam PJ
+          najde dva přepínače:
+        </p>
+        <ul>
+          <li>
+            <strong>👁 / 🚫 — skrýt mapu:</strong> hráč místo mapy uvidí hlášku
+            „Mapa skrytá". Ideální, když si scénu teprve chystáš.
+          </li>
+          <li>
+            <strong>🔓 / 🔒 — zamknout pohyb:</strong> hráč mapu vidí, ale nemůže
+            hýbat tokeny (PJ ano).
+          </li>
+        </ul>
+        <p>
+          Tlačítka <strong>„👁 vše" / „🔒 vše"</strong> přepnou najednou všechny
+          hráče na scéně; přepínače u jednotlivého hráče nastaví jen jeho (a{' '}
+          <strong>přebijí</strong> nastavení scény). Každá scéna má vlastní stav —
+          nezávisle na ostatních.
+        </p>
+      </>
+    ),
+  },
+  {
     q: 'Kde si na taktické mapě vedu poznámky (deník)?',
     a: (
       <>

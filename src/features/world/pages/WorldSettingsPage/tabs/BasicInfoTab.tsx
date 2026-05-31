@@ -87,6 +87,7 @@ export default function BasicInfoTab() {
 
   if (!world) return null;
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- RHF watch() = R19 false positive
   const genre = watch("genre");
   const system = watch("system");
   const imageUrl = watch("imageUrl");

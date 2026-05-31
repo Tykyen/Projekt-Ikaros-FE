@@ -16,7 +16,7 @@
  *   - klik na × u řádky: `scene.activeCharacters.remove`
  *   - klik na položku v modal katalogu: `scene.activeCharacters.add`
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { postMapOperation } from '../../api/mapApi';
@@ -48,12 +48,15 @@ interface Props {
    * `multi=false` pro PC (single spawn, mode se vypne po umístění).
    */
   onStartPlacement: (payload: SpawnPayload, multi: boolean) => void;
+  /** 10.2n — hlásí počet aktivních do hlavičky accordionu. */
+  onCountChange?: (n: number) => void;
 }
 
 export function PcPalette({
   worldId,
   scene,
   onStartPlacement,
+  onCountChange,
 }: Props): React.ReactElement {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
@@ -113,6 +116,10 @@ export function PcPalette({
   const fullCatalog = charsQuery.data ?? [];
   const activeIds = new Set(scene?.activeCharacterIds ?? []);
   const activeList = fullCatalog.filter((c) => activeIds.has(c.id));
+
+  useEffect(() => {
+    onCountChange?.(activeList.length);
+  }, [activeList.length, onCountChange]);
 
   const alreadyOnScene = (slug: string): boolean =>
     !!scene?.tokens.some((t) => t.characterSlug === slug && !t.isNpc);

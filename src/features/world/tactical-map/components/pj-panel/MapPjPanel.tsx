@@ -10,7 +10,7 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2c.md §2 (PJ orchestrator), §5.
  */
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActiveScenes } from '../../hooks/useActiveScenes';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
@@ -21,7 +21,8 @@ import { postWorldOperation } from '../../api/worldOpsApi';
 import { postMapOperation } from '../../api/mapApi';
 import { activeScenesQueryKey } from '../../hooks/useActiveScenes';
 import { ActiveScenesList } from './ActiveScenesList';
-import { MemberAssignmentTable } from './MemberAssignmentTable';
+import { AccessBoard } from './AccessBoard';
+import { PaletteAccordion } from './PaletteAccordion';
 import { BestiePalette } from './BestiePalette';
 import { PcPalette } from './PcPalette';
 import { NpcCharacterPalette } from './NpcCharacterPalette';
@@ -88,6 +89,27 @@ export function MapPjPanel({
    */
   const [pendingClearScene, setPendingClearScene] = useState<MapScene | null>(
     null,
+  );
+  // 10.2n — počty aktivních entit v hlavičkách sbalitelných palet.
+  const [paletteCounts, setPaletteCounts] = useState({
+    pc: 0,
+    npc: 0,
+    bestie: 0,
+  });
+  const setPcCount = useCallback(
+    (n: number) =>
+      setPaletteCounts((c) => (c.pc === n ? c : { ...c, pc: n })),
+    [],
+  );
+  const setNpcCount = useCallback(
+    (n: number) =>
+      setPaletteCounts((c) => (c.npc === n ? c : { ...c, npc: n })),
+    [],
+  );
+  const setBestieCount = useCallback(
+    (n: number) =>
+      setPaletteCounts((c) => (c.bestie === n ? c : { ...c, bestie: n })),
+    [],
   );
   const queryClient = useQueryClient();
   const { scenes: activeScenes } = useActiveScenes(worldId, expanded);
@@ -201,28 +223,31 @@ export function MapPjPanel({
 
       {expanded && (
         <div className={styles.body}>
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h4 className={styles.sectionTitle}>Aktivní scény</h4>
-              <div className={styles.headerActions}>
-                <button
-                  type="button"
-                  className={styles.newSceneBtn}
-                  onClick={() => setShowLibrary(true)}
-                  title="Otevřít knihovnu map (uložit / načíst šablonu)"
-                >
-                  📚 Knihovna
-                </button>
-                <button
-                  type="button"
-                  className={styles.newSceneBtn}
-                  onClick={() => createSceneMutation.mutate()}
-                  disabled={createSceneMutation.isPending}
-                  title="Vytvoří novou scénu, aktivuje ji a přiřadí tě na ni"
-                >
-                  {createSceneMutation.isPending ? '…' : '+ Nová'}
-                </button>
-              </div>
+          {/* 10.2n — i „Aktivní scény" sbalitelné (vše default zavřené).
+              Akce Knihovna / + Nová jsou uvnitř těla accordionu. */}
+          <PaletteAccordion
+            id="scenes"
+            title="Aktivní scény"
+            count={activeScenes.length}
+          >
+            <div className={styles.sceneActions}>
+              <button
+                type="button"
+                className={styles.newSceneBtn}
+                onClick={() => setShowLibrary(true)}
+                title="Otevřít knihovnu map (uložit / načíst šablonu)"
+              >
+                📚 Knihovna
+              </button>
+              <button
+                type="button"
+                className={styles.newSceneBtn}
+                onClick={() => createSceneMutation.mutate()}
+                disabled={createSceneMutation.isPending}
+                title="Vytvoří novou scénu, aktivuje ji a přiřadí tě na ni"
+              >
+                {createSceneMutation.isPending ? '…' : '+ Nová'}
+              </button>
             </div>
             <ActiveScenesList
               scenes={activeScenes}
@@ -240,51 +265,66 @@ export function MapPjPanel({
                   : 'Nepodařilo se vytvořit scénu'}
               </p>
             )}
-          </section>
+          </PaletteAccordion>
 
-          {/* 10.2c-edit-8 — sekce skrytá pokud svět nemá hratelné členy.
-              Loading state zámerně neukazujeme; aby se sekce nezjevila s
-              "Načítání" a pak hned nezmizela, čekáme až query doruří data. */}
+          {/* 10.2n — Přístup a viditelnost (nahradilo Rozmístění hráčů):
+              per-scéna i per-hráč skrytí/zámek + přiřazení. Skryté pokud svět
+              nemá hratelné členy (loading state záměrně neukazujeme). */}
           {(membersQuery.data?.length ?? 0) > 0 && (
-            <section className={styles.section}>
-              <h4 className={styles.sectionTitle}>Rozmístění hráčů</h4>
-              <MemberAssignmentTable
+            <PaletteAccordion
+              id="access"
+              title="Přístup a viditelnost"
+              count={activeScenes.length}
+            >
+              <AccessBoard
+                worldId={worldId}
                 members={membersQuery.data ?? []}
                 activeScenes={activeScenes}
                 onAssign={handleAssign}
                 onUnassign={handleUnassign}
               />
-            </section>
+            </PaletteAccordion>
           )}
 
-          <section className={styles.section}>
-            <h4 className={styles.sectionTitle}>PC tokeny — spawn</h4>
+          {/* 10.2n — spawn palety jako sbalitelné accordiony (default sbalené,
+              počet aktivních v hlavičce) — zvládne 10+ entit bez nekonečného
+              scrollu a vnořených scrollů. */}
+          <PaletteAccordion id="pc" title="PC tokeny" count={paletteCounts.pc}>
             <PcPalette
               worldId={worldId}
               scene={currentScene}
               onStartPlacement={onStartPlacement}
+              onCountChange={setPcCount}
             />
-          </section>
+          </PaletteAccordion>
 
-          <section className={styles.section}>
-            <h4 className={styles.sectionTitle}>NPC postavy — spawn</h4>
+          <PaletteAccordion
+            id="npc"
+            title="NPC postavy"
+            count={paletteCounts.npc}
+          >
             <NpcCharacterPalette
               worldId={worldId}
               scene={currentScene}
               onStartPlacement={onStartPlacement}
+              onCountChange={setNpcCount}
             />
-          </section>
+          </PaletteAccordion>
 
           {systemId && (
-            <section className={styles.section}>
-              <h4 className={styles.sectionTitle}>Bestiář — spawn na mapu</h4>
+            <PaletteAccordion
+              id="bestie"
+              title="Bestiář"
+              count={paletteCounts.bestie}
+            >
               <BestiePalette
                 worldId={worldId}
                 systemId={systemId}
                 scene={currentScene}
                 onStartPlacement={onStartPlacement}
+                onCountChange={setBestieCount}
               />
-            </section>
+            </PaletteAccordion>
           )}
         </div>
       )}

@@ -133,11 +133,15 @@ export function CalendarTabGrid({
   const [jumpMonth, setJumpMonth] = useState(cursor.monthIndex);
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!jumpOpen) return;
-    setJumpYear(cursor.year);
-    setJumpMonth(cursor.monthIndex);
-  }, [jumpOpen, cursor]);
+  // Seed jump popoveru při otevření — R19 adjustment-during-render (jumpOpen primitivní).
+  const [prevJumpOpen, setPrevJumpOpen] = useState(jumpOpen);
+  if (jumpOpen !== prevJumpOpen) {
+    setPrevJumpOpen(jumpOpen);
+    if (jumpOpen) {
+      setJumpYear(cursor.year);
+      setJumpMonth(cursor.monthIndex);
+    }
+  }
 
   useEffect(() => {
     if (!jumpOpen) return;

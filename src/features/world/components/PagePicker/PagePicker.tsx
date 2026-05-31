@@ -39,7 +39,8 @@ export function PagePicker({
   onPick,
 }: Props) {
   const { data, isLoading } = usePagesDirectory(worldId);
-  const pages = data ?? [];
+  // useMemo: stabilní reference, jinak `?? []` mění deps downstream useMemo každý render.
+  const pages = useMemo(() => data ?? [], [data]);
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);

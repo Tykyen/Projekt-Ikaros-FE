@@ -27,7 +27,7 @@ import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 // `id` na items = klíč pro `WorldSettings.hiddenNavItems` filter (9.3-followup).
 // Esenciální (Přehled/Stránky/Novinky/Pravidla) `id` mít nemusí — beztak nelze
 // skrýt (`HIDEABLE_NAV_IDS` whitelist v `worldNavConfig.ts`).
-function buildNav(worldSlug: string, _isPJ: boolean) {
+function buildNav(worldSlug: string, isPJ: boolean) {
   const b = `/svet/${worldSlug}`;
   return [
     {
@@ -56,6 +56,10 @@ function buildNav(worldSlug: string, _isPJ: boolean) {
       label: 'Hra',
       items: [
         { id: 'takticka-mapa', label: 'Taktická mapa', to: `${b}/takticka-mapa` },
+        // 10.2l — deník PJ mimo mapu. PJ-only (hráč ho v menu nevidí).
+        ...(isPJ
+          ? ([{ id: 'denik-pj', label: 'Deník PJ', to: `${b}/denik-pj` }] as const)
+          : ([] as const)),
         { id: 'bestiar', label: 'Bestiář', to: `${b}/bestiar` },
         { id: 'scenare', label: 'Storyboard', to: `${b}/scenare` },
         { id: 'pocasi', label: 'Generátor počasí', to: `${b}/pocasi` },
@@ -213,9 +217,12 @@ export function WorldLayout() {
   // 8.3 — directory pro naplnění `character` slotu (jméno + avatar postavy
   // přihlášeného člena). Sdílí cache s CharactersPage; žádný extra endpoint.
   const { data: directory } = useCharacterDirectory(realWorldId);
+  // 10.2l — PJ flag pro nav: owner / globální Admin+ / world membership
+  // PomocnyPJ+. Dřív chyběl membership → ne-owner PJ neviděl PJ-only položky.
   const isPJForNav =
     world?.ownerId === currentUser?.id ||
-    (currentUser?.role !== undefined && currentUser.role <= 3);
+    (currentUser?.role !== undefined && currentUser.role <= 3) ||
+    (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
   const { data: settings } = useWorldSettings(realWorldId);
   const nav = useMemo(
     () => filterNavByHidden(

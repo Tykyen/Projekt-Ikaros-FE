@@ -28,12 +28,15 @@ export function useSlugAutoGen(title: string, isEdit: boolean, initialSlug = '')
     setSlugInternal(slugify(title));
   }, [title, isEdit]);
 
-  // Init initial slug do internal (edit mode hydrate)
-  useEffect(() => {
+  // Init initial slug do internal (edit mode hydrate, initialSlug může dorazit async).
+  // R19 adjustment-during-render (initialSlug je primitivní string).
+  const [prevInitialSlug, setPrevInitialSlug] = useState(initialSlug);
+  if (initialSlug !== prevInitialSlug) {
+    setPrevInitialSlug(initialSlug);
     if (initialSlug && !slug) {
       setSlugInternal(initialSlug);
     }
-  }, [initialSlug, slug]);
+  }
 
   return {
     slug,

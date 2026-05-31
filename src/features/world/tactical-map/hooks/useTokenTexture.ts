@@ -24,7 +24,6 @@ export function useTokenTexture(imageUrl?: string): {
       return;
     }
     let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState({ texture: null, status: 'loading' });
     Assets.load(imageUrl)
       .then((tex: Texture) => {

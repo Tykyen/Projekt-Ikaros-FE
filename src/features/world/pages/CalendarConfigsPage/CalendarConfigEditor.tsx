@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Plus, Star, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui';
@@ -42,8 +42,11 @@ export function CalendarConfigEditor({
   const [epochOffset, setEpochOffset] = useState(config.epochOffset);
   const [dirty, setDirty] = useState(false);
 
-  // Reset při změně configu (selectedSlug)
-  useEffect(() => {
+  // Reset při změně configu (přepnutí slug) — R19 adjustment-during-render.
+  // Klíč config.slug je primitivní → žádné riziko smyčky z object-ref deps.
+  const [prevSlug, setPrevSlug] = useState(config.slug);
+  if (config.slug !== prevSlug) {
+    setPrevSlug(config.slug);
     setName(config.name);
     setHoursPerDay(config.hoursPerDay);
     setDaysOfWeek(config.daysOfWeek);
@@ -52,7 +55,7 @@ export function CalendarConfigEditor({
     setSeasons(config.seasons);
     setEpochOffset(config.epochOffset);
     setDirty(false);
-  }, [config]);
+  }
 
   const touch = () => setDirty(true);
 

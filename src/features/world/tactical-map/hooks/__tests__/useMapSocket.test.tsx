@@ -56,6 +56,46 @@ describe('useMapSocket — spotlight (10.2f-3)', () => {
   });
 });
 
+describe('useMapSocket — ping (10.2m)', () => {
+  it('emitPing pošle map:ping se sceneId + souřadnicemi + jménem', () => {
+    const { result } = renderHook(() => useMapSocket({ sceneId: 'scene-1' }));
+    result.current.emitPing(120, 80, 'Gandalf');
+    expect(mockSocket.emit).toHaveBeenCalledWith('map:ping', {
+      sceneId: 'scene-1',
+      x: 120,
+      y: 80,
+      userName: 'Gandalf',
+    });
+  });
+
+  it('emitPing je no-op když sceneId == null', () => {
+    const { result } = renderHook(() => useMapSocket({ sceneId: null }));
+    result.current.emitPing(1, 2, 'X');
+    expect(mockSocket.emit).not.toHaveBeenCalledWith(
+      'map:ping',
+      expect.anything(),
+    );
+  });
+
+  it('registruje listener map:pinged a předá poziční args do onPing', () => {
+    const onPing = vi.fn();
+    renderHook(() => useMapSocket({ sceneId: 'scene-1', onPing }));
+    const call = mockSocket.on.mock.calls.find((c) => c[0] === 'map:pinged');
+    expect(call).toBeDefined();
+    const handler = call![1] as (x: number, y: number, n: string) => void;
+    handler(50, 60, 'Bilbo');
+    expect(onPing).toHaveBeenCalledWith(50, 60, 'Bilbo');
+  });
+
+  it('bez onPing listener neregistruje', () => {
+    renderHook(() => useMapSocket({ sceneId: 'scene-1' }));
+    expect(mockSocket.on).not.toHaveBeenCalledWith(
+      'map:pinged',
+      expect.anything(),
+    );
+  });
+});
+
 describe('useMapSocket — reconnect (10.2i)', () => {
   const getConnectHandler = (): (() => void) => {
     const call = mockSocket.on.mock.calls.find((c) => c[0] === 'connect');

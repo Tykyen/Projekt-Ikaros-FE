@@ -1,0 +1,120 @@
+/* 10.2j — sdílený vintage papír poznámkového bloku (overlay na mapě i stránka
+ * deníku PJ). Linkovaný papír + sépiový tón + handwriting font (Caveat).
+ * Theme-agnostic. */
+
+.status {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: #8b7355;
+  font-style: italic;
+}
+
+.statusSaved {
+  color: #5a7a3a;
+}
+
+.paper {
+  position: relative;
+  background-color: #faf6ea;
+  background-image:
+    linear-gradient(
+      to right,
+      transparent 56px,
+      rgba(185, 60, 60, 0.45) 56px,
+      rgba(185, 60, 60, 0.45) 58px,
+      transparent 58px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgba(70, 100, 180, 0.25) 31px,
+      rgba(70, 100, 180, 0.25) 32px
+    );
+  padding: 28px 28px 40px 80px;
+  background-blend-mode: multiply;
+}
+
+.paper :global(.ProseMirror),
+.paper :global([contenteditable]) {
+  font-family: 'Caveat', 'Kalam', 'Patrick Hand', cursive;
+  font-size: 1.25rem;
+  line-height: 32px;
+  color: #2a2418;
+  background: transparent;
+  min-height: 360px;
+  padding: 0;
+  border: none;
+  outline: none;
+}
+
+.paper :global(.ProseMirror p),
+.paper :global([contenteditable] p) {
+  margin: 0;
+  line-height: 32px;
+  min-height: 32px;
+}
+
+.paper :global(.ProseMirror h1),
+.paper :global(.ProseMirror h2),
+.paper :global(.ProseMirror h3) {
+  font-family: 'Caveat', 'Kalam', cursive;
+  color: #1a1410;
+  margin: 0;
+  line-height: 32px;
+}
+
+.paper :global(.ProseMirror h1) {
+  font-size: 1.8rem;
+}
+.paper :global(.ProseMirror h2) {
+  font-size: 1.5rem;
+}
+.paper :global(.ProseMirror h3) {
+  font-size: 1.3rem;
+}
+
+.paper :global(.ProseMirror strong) {
+  color: #1a1410;
+  font-weight: 700;
+}
+
+.paper :global(.ProseMirror em) {
+  font-style: italic;
+}
+
+.paper :global(.ProseMirror ul),
+.paper :global(.ProseMirror ol) {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.paper :global(.ProseMirror ul li),
+.paper :global(.ProseMirror ol li) {
+  line-height: 32px;
+}
+
+.paper :global(.ProseMirror blockquote) {
+  border-left: 3px solid rgba(185, 60, 60, 0.4);
+  padding-left: 12px;
+  color: #5a4a30;
+  margin: 0;
+}
+
+.paper :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  color: #a89880;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .paper {
+    padding: 24px 16px 32px 56px;
+  }
+  .paper :global(.ProseMirror),
+  .paper :global([contenteditable]) {
+    font-size: 1.15rem;
+  }
+}

@@ -1,0 +1,70 @@
+/* 10.2n — sbalitelná spawn paleta. Drží se barevnosti panelu (--map-* tokeny). */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(120, 100, 255, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(120, 100, 255, 0.08);
+  color: var(--map-toolbar-text);
+  border: none;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  /* touch target ≥ 32px (mobil-desktop) */
+  min-height: 36px;
+  text-align: left;
+}
+
+.header:hover {
+  background: rgba(120, 100, 255, 0.16);
+}
+
+.chevron {
+  font-size: 11px;
+  opacity: 0.7;
+  transition: transform 0.18s ease;
+  flex: 0 0 auto;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  opacity: 0.75;
+}
+
+.count {
+  flex: 0 0 auto;
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(120, 100, 255, 0.22);
+  color: var(--map-toolbar-text);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.body {
+  padding: 8px 10px 10px;
+}
+
+.bodyCollapsed {
+  display: none;
+}

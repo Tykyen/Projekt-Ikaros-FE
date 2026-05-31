@@ -92,7 +92,10 @@ export function EmoteUploadDialog(props: EmoteUploadDialogProps) {
     updateWorldEmote.isPending ||
     updateGlobalEmote.isPending;
 
-  // Vytváříme objectURL pro náhled — uvolnit při unmount / new file.
+  // Vytváříme objectURL pro náhled — uvolnit při unmount / new file. Legitimní
+  // effekt (external resource + cleanup revokeObjectURL); setPreviewUrl je jeho
+  // nedílná součást, render-phase by nešlo (potřebuje cleanup).
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!file) {
       setPreviewUrl(null);
@@ -102,6 +105,7 @@ export function EmoteUploadDialog(props: EmoteUploadDialogProps) {
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [file]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Escape zavírá modal.
   useEffect(() => {

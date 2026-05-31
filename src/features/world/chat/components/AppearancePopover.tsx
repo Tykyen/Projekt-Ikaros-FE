@@ -57,15 +57,14 @@ export function AppearancePopover({ worldId, surfaceColor, onClose }: Props) {
   const [fontSize, setFontSize] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  // Seed lokálního stavu z odpovědi BE — jen jednou.
-  useEffect(() => {
-    if (initialized) return;
-    if (!appearance.data) return;
+  // Seed lokálního stavu z odpovědi BE — jen jednou. R19 render-phase setState;
+  // podmínka `!initialized` je self-limiting (po seedu už nespustí → žádná smyčka).
+  if (!initialized && appearance.data) {
     setColor(appearance.data.chatColor ?? '#FFFFFF');
     setFont(appearance.data.chatFont ?? 'system');
     setFontSize(appearance.data.chatFontSize ?? 'normal');
     setInitialized(true);
-  }, [appearance.data, initialized]);
+  }
 
   // Outside click → close.
   useEffect(() => {
@@ -103,7 +102,6 @@ export function AppearancePopover({ worldId, surfaceColor, onClose }: Props) {
       else map.set(f.category, [f] as never);
     }
     return map;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   type ChatFont = (typeof CHAT_FONTS)[number];
 

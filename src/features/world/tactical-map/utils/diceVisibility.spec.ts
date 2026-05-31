@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { it, expect } from 'vitest';
 import { canSeeRoll } from './diceVisibility';
 import type { MapDiceRoll } from '../types';
 import type { WorldDiceVisibility } from '@/shared/types';

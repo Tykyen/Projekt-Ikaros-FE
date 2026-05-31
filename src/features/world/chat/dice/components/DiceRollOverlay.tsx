@@ -8,7 +8,6 @@ import {
   D10_TARGETS,
   D12_TARGETS,
   D20_TARGETS,
-  FATE_TARGETS,
   type DiceTarget,
 } from '../lib/diceTargets';
 import { FateSkinModel } from './models/FateSkinModel';
@@ -278,6 +277,9 @@ export function DiceRollOverlay({ roll, onDone }: DiceRollOverlayProps) {
     });
   }, [roll]);
 
+  // Animační orchestrace (requestAnimationFrame phase machine) — legitimní effekt,
+  // setPhase řídí běh animace, render-phase by nešlo.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!roll) {
       setPhase('hidden');
@@ -370,6 +372,7 @@ export function DiceRollOverlay({ roll, onDone }: DiceRollOverlayProps) {
     return () => cancelAnimationFrame(animRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roll?.timestamp]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (phase === 'hidden' || !roll) return null;
 

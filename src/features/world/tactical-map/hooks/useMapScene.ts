@@ -52,6 +52,11 @@ interface UseMapSceneOptions {
    * záměrně NEvolá → po reconnectu nevlétnou staré kostky.
    */
   onLiveDiceRoll?: (roll: MapDiceRoll) => void;
+  /**
+   * 10.2m — callback při `map:pinged` (kdokoli pingnul plochu). Souřadnice
+   * v map-space. Konzument přidá ephemeral marker do `layer-pings`.
+   */
+  onPing?: (x: number, y: number, userName: string) => void;
 }
 
 interface UseMapSceneResult {
@@ -66,6 +71,8 @@ interface UseMapSceneResult {
   refetch: () => void;
   /** 10.2f-3 — PJ emit spotlight (broadcast ostatním na scéně). */
   emitSpotlight: (tokenId: string) => void;
+  /** 10.2m — emit ping na plochu (map-space x/y). Broadcast ostatním na scéně. */
+  emitPing: (x: number, y: number, userName: string) => void;
   /**
    * 10.2j — persist hodu kostkou jako `dice.roll` op (optimistic + rollback).
    * No-op když chybí aktivní scéna. Overlay spouští volající (F2), tohle jen
@@ -204,11 +211,12 @@ export function useMapScene(
     (p: MapSpotlightBroadcast) => spotlightCb?.(p.tokenId),
     [spotlightCb],
   );
-  const { emitSpotlight } = useMapSocket({
+  const { emitSpotlight, emitPing } = useMapSocket({
     sceneId: scene?.id ?? null,
     onOperation,
     onReconnect,
     onSpotlight: spotlightCb ? handleSpotlight : undefined,
+    onPing: options?.onPing,
   });
 
   return {
@@ -218,6 +226,7 @@ export function useMapScene(
     error: query.error,
     refetch: () => void query.refetch(),
     emitSpotlight,
+    emitPing,
     rollDice: (op) => {
       if (scene) diceMutation.mutate({ sceneId: scene.id, op });
     },

@@ -39,6 +39,40 @@ function fmtDate(iso: string): string {
  * přes checkboxy (hromadné mazání). Na mobilu se tabulka přeskládá do
  * karet (CSS).
  */
+// Extrahováno z renderu PagesAdminTable (R19 static-components): komponenta nesmí
+// vznikat během renderu rodiče. `sort`/`onSortChange` předány jako props.
+function SortHeader({
+  col,
+  label,
+  sort,
+  onSortChange,
+}: {
+  col: SortCol;
+  label: string;
+  sort: Props['sort'];
+  onSortChange: Props['onSortChange'];
+}) {
+  const active = sort.col === col;
+  return (
+    <th>
+      <button
+        type="button"
+        className={s.sortBtn}
+        onClick={() => onSortChange(col)}
+        aria-label={`Řadit dle ${label}`}
+      >
+        {label}
+        {active &&
+          (sort.dir === 'asc' ? (
+            <ChevronUp size={13} aria-hidden />
+          ) : (
+            <ChevronDown size={13} aria-hidden />
+          ))}
+      </button>
+    </th>
+  );
+}
+
 export function PagesAdminTable({
   entries,
   worldSlug,
@@ -50,28 +84,6 @@ export function PagesAdminTable({
   onSortChange,
   onDelete,
 }: Props) {
-  function SortHeader({ col, label }: { col: SortCol; label: string }) {
-    const active = sort.col === col;
-    return (
-      <th>
-        <button
-          type="button"
-          className={s.sortBtn}
-          onClick={() => onSortChange(col)}
-          aria-label={`Řadit dle ${label}`}
-        >
-          {label}
-          {active &&
-            (sort.dir === 'asc' ? (
-              <ChevronUp size={13} aria-hidden />
-            ) : (
-              <ChevronDown size={13} aria-hidden />
-            ))}
-        </button>
-      </th>
-    );
-  }
-
   return (
     <table className={s.table}>
       <thead>
@@ -84,11 +96,11 @@ export function PagesAdminTable({
               aria-label="Vybrat všechny stránky"
             />
           </th>
-          <SortHeader col="title" label="Název" />
-          <SortHeader col="type" label="Typ" />
+          <SortHeader col="title" label="Název" sort={sort} onSortChange={onSortChange} />
+          <SortHeader col="type" label="Typ" sort={sort} onSortChange={onSortChange} />
           <th>Slug</th>
-          <SortHeader col="order" label="Pořadí" />
-          <SortHeader col="updatedAt" label="Upraveno" />
+          <SortHeader col="order" label="Pořadí" sort={sort} onSortChange={onSortChange} />
+          <SortHeader col="updatedAt" label="Upraveno" sort={sort} onSortChange={onSortChange} />
           <th aria-label="Akce" />
         </tr>
       </thead>

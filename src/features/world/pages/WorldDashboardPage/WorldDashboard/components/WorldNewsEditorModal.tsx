@@ -141,6 +141,7 @@ export function WorldNewsEditorModal({
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- RHF watch() = R19 false positive
   const watchedPageSlug = watch('linkPageSlug');
   const watchedLink = watch('link');
   const pageSlugActive = !!(watchedPageSlug && watchedPageSlug.trim());

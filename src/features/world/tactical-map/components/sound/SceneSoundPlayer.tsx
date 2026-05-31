@@ -30,6 +30,7 @@ export function SceneSoundPlayer({ scene }: Props): React.ReactElement | null {
   const { effectiveVolume, muted, setMuted } = useSoundVolume();
 
   const activeIds = scene.activeSoundIds ?? [];
+  const activeIdsKey = activeIds.join(',');
 
   // activeSoundIds → YouTube video ID (zachová pořadí playlistu).
   const videoIds = useMemo(() => {
@@ -40,7 +41,8 @@ export function SceneSoundPlayer({ scene }: Props): React.ReactElement | null {
       .filter((u): u is string => Boolean(u));
     return extractYoutubeIds(urls);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sounds, activeIds.join(',')]);
+  }, [sounds, activeIdsKey]);
+  const videoIdsKey = videoIds.join(',');
 
   // Přehrávání řízené stavem scény + aktivací.
   useEffect(() => {
@@ -50,7 +52,7 @@ export function SceneSoundPlayer({ scene }: Props): React.ReactElement | null {
       player.stop();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoIds.join(','), activated]);
+  }, [videoIdsKey, activated]);
 
   // Hlasitost.
   useEffect(() => {
