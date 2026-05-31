@@ -135,9 +135,12 @@ export function TokenSystemSheet({
     // 10.2f — hod iniciativy z panelu se propíše do token.initiative
     // (objeví se v iniciativní liště). Detekce dle labelu „Iniciativa".
     if (isInit) {
+      // 10.2j — skipInvalidate: běží paralelně s `dice.roll` (onMapRoll výš).
+      // Bez toho invalidate refetch sestřelí ještě nepersistovaný hod z logu.
       initiativeUpdate.mutate({
         tokenId: token.id,
         patch: { initiative: res.total },
+        skipInvalidate: true,
       });
     }
   };

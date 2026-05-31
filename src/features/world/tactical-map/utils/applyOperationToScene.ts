@@ -184,6 +184,10 @@ export function applyOperationToScene(
 
     case 'scene.sounds.set':
       return { ...scene, activeSoundIds: op.activeSoundIds };
+    // 10.2k — runtime ambient playlist (BE map-operations.service mapuje
+    // soundIds → activeSoundIds; FE patcher musí zrcadlit).
+    case 'sound.playlist':
+      return { ...scene, activeSoundIds: op.soundIds };
 
     // 10.2c-edit-7 — vyčistit scénu od všech tokenů + ukončit combat
     case 'scene.tokens.clear':

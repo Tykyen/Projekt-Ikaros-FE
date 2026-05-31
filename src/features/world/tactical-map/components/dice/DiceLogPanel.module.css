@@ -148,6 +148,14 @@
   gap: 6px;
 }
 
+/* 10.2j — rozpis výpočtu (label + modifier + kostky = total), dřív v toastu. */
+.breakdown {
+  font-size: 0.68rem;
+  color: rgba(200, 215, 240, 0.55);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
 .faces {
   display: flex;
   gap: 2px;

@@ -87,6 +87,22 @@ function totalClass(total: number): string {
   return styles.totalNeutral;
 }
 
+/**
+ * 10.2j — rozpis výpočtu hodu (dřív v zeleném toastu): „Magie (+1) − 1 = +0".
+ * `{label} ({modifier}) {±kostky} = {total}`. Zobrazí se jen když má hod
+ * schopnost (label) nebo modifier — holé vlastní hody zůstanou bez rozpisu.
+ */
+function renderBreakdown(p: MapDiceRoll["dicePayload"]): string | null {
+  const mod = p.modifier ?? 0;
+  if (!p.label && mod === 0) return null;
+  const signedMod = mod >= 0 ? `+${mod}` : `${mod}`;
+  const subSign = p.sum >= 0 ? "+" : "−";
+  const subAbs = Math.abs(p.sum);
+  const totalStr = p.total >= 0 ? `+${p.total}` : `${p.total}`;
+  const prefix = p.label ? `${p.label} ` : "";
+  return `${prefix}(${signedMod}) ${subSign} ${subAbs} = ${totalStr}`;
+}
+
 export function DiceLogPanel({
   rolls,
   viewer,
@@ -170,6 +186,7 @@ export function DiceLogPanel({
             visible.map((r) => {
               const recent = now - new Date(r.rolledAt).getTime() < RECENT_MS;
               const total = r.dicePayload.total;
+              const breakdown = renderBreakdown(r.dicePayload);
               return (
                 <div
                   key={r.id}
@@ -192,6 +209,9 @@ export function DiceLogPanel({
                       {total}
                     </span>
                   </div>
+                  {breakdown && (
+                    <div className={styles.breakdown}>{breakdown}</div>
+                  )}
                 </div>
               );
             })

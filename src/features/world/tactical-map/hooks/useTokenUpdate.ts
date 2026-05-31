@@ -14,7 +14,17 @@ import type { MapScene, MapToken } from '../types';
 export function useTokenUpdate(sceneId: string, worldId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { tokenId: string; patch: Partial<MapToken> }) =>
+    mutationFn: (payload: {
+      tokenId: string;
+      patch: Partial<MapToken>;
+      /**
+       * 10.2j — přeskočí `invalidateQueries` po úspěchu. Použij když běží
+       * paralelně jiná optimistická operace na téže scéně (typicky `dice.roll`
+       * u iniciativního hodu) — invalidate refetch by jinak sestřelil ještě
+       * nepersistovaný hod z logu. Optimistic patch + WS broadcast stačí.
+       */
+      skipInvalidate?: boolean;
+    }) =>
       postMapOperation(sceneId, {
         type: 'token.update',
         tokenId: payload.tokenId,
@@ -40,7 +50,8 @@ export function useTokenUpdate(sceneId: string, worldId: string) {
         qc.setQueryData(mapSceneQueryKey(worldId), ctx.prev);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
+      if (vars.skipInvalidate) return;
       void qc.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
     },
   });

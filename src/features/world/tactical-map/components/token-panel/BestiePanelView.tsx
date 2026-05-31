@@ -89,7 +89,13 @@ export function BestiePanelView({
         rollerKind: "bestie",
         rollerName,
       });
-      update.mutate({ tokenId: token.id, patch: { initiative: res.total } });
+      // 10.2j — skipInvalidate: běží paralelně s `dice.roll` (onMapRoll výš).
+      // Bez toho invalidate refetch sestřelí ještě nepersistovaný hod z logu.
+      update.mutate({
+        tokenId: token.id,
+        patch: { initiative: res.total },
+        skipInvalidate: true,
+      });
       setStats((s) => ({ ...s, "initiative.current": res.total }));
     }
   };

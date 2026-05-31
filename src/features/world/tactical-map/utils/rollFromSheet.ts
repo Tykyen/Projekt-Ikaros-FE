@@ -17,10 +17,6 @@ import {
   type RollKind,
 } from "@/features/world/chat/dice/lib/rollEngine";
 import {
-  formatFateMessage,
-  formatGenericDiceMessage,
-} from "@/features/world/chat/dice/lib/formatMessage";
-import {
   buildFatePayload,
   buildGenericPayload,
   type DicePayload,
@@ -36,7 +32,10 @@ export interface RollRequest {
    * generic systémy. Pro nestandartní pool kostky volej rollEngine přímo.
    */
   kind?: RollKind;
-  /** Kdo rolluje — zobrazí se v toast (default „Postava"). */
+  /**
+   * Kdo rolluje. 10.2j — už se nepoužívá (toast zrušen, jméno v logu řeší
+   * `useMapDiceRoll` z vieweru). Ponecháno kvůli zpětné kompatibilitě volajících.
+   */
   rollerName?: string;
 }
 
@@ -51,16 +50,14 @@ export interface SheetRollResult {
 }
 
 export function performSheetRoll(req: RollRequest): SheetRollResult | null {
-  const { label, modifier = 0, kind = "fate", rollerName = "Postava" } = req;
+  const { label, modifier = 0, kind = "fate" } = req;
 
-  let message: string;
   let total: number;
   let dicePayload: DicePayload;
 
   if (kind === "fate") {
     const r = rollFate();
     total = r.sum + modifier;
-    message = formatFateMessage(label, modifier, r);
     dicePayload = buildFatePayload(r, { label, modifier });
   } else if (
     kind === "d4" ||
@@ -73,7 +70,6 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
   ) {
     const r = rollGenericDice(kind);
     total = r.sum + modifier;
-    message = formatGenericDiceMessage(label, modifier, r);
     dicePayload = buildGenericPayload(r, { label, modifier });
   } else {
     // pool/mixed nepodporováno z deníku v MVP
@@ -81,11 +77,8 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
     return null;
   }
 
-  // Toast s formátovanou zprávou
-  toast.success(message, {
-    description: `${rollerName} — Celkem: ${total >= 0 ? "+" : ""}${total}`,
-    duration: 5000,
-  });
+  // 10.2j — žádný toast: hod se ukáže ve 3D overlayi + zapíše do dice logu
+  // (rozpis výpočtu `label (mod) ± kostky = total` renderuje DiceLogPanel).
   // 10.2f/10.2j — vrací total (zápis iniciativy do `token.initiative`) +
   // dicePayload (směrování do map dice overlay / logu přes onMapRoll).
   return { total, dicePayload };

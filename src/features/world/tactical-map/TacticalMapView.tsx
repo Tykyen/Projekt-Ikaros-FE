@@ -70,6 +70,11 @@ import type { DicePayload } from "@/features/world/chat/dice/lib/dicePayload";
 import { TokenInfoPanel } from "./components/token-panel/TokenInfoPanel";
 import { TokenSystemSheet } from "./components/token-panel/TokenSystemSheet";
 import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
+import { MapNotebookButton } from "./components/notebook/MapNotebookButton";
+import { MapNotebookOverlay } from "./components/notebook/MapNotebookOverlay";
+import { useGmNotes, useUpdateGmNotes } from "./api/useGmNotes";
+import { useCharacterNotes } from "@/features/world/pages/api/useCharacterSubdocs";
+import { useUpdateCharacterNotes } from "@/features/world/pages/api/useCharacterMutations";
 import { useTokenPermissions } from "./hooks/useTokenPermissions";
 import { useTokenUpdate } from "./hooks/useTokenUpdate";
 import { useTokenDrag } from "./hooks/useTokenDrag";
@@ -94,7 +99,7 @@ import { postMapOperation } from "./api/mapApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { parseApiError } from "@/shared/api";
-import { bestiarQueryKey } from "@/features/world/bestiar/hooks/useBestiar";
+import { bestiarQueryKey, useBestiar } from "@/features/world/bestiar/hooks/useBestiar";
 import type { BestiarResponse, Bestie } from "@/features/world/bestiar/types";
 import type { MapOperation, MapToken, MapScene, MapDiceRoll } from "./types";
 import styles from "./TacticalMapView.module.css";
@@ -205,6 +210,13 @@ export function TacticalMapView(): React.ReactElement {
     onLiveDiceRoll: handleLiveDiceRoll,
   });
   useReassignmentListener(worldId || null);
+
+  // 10.2j — bestie tokeny dotahují obrázek z bestiar cache (resolveTokenImage →
+  // lookupBestie). Cache jinak plní jen BestiePalette (PJ panel), takže při
+  // sbaleném panelu — a pro hráče, který panel nemá vůbec — bestie ztrácí
+  // obrázek (monogram). Načteme ji tady vždy, když scéna obsahuje bestii.
+  const sceneHasBestie = scene?.tokens.some((t) => !!t.templateId) ?? false;
+  useBestiar(worldId || null, worldSystemId || null, sceneHasBestie);
 
   // 10.2i — počasí na mapě (world-room join + weather:updated listener + FX toggle).
   const weather = useMapWeather();
@@ -389,6 +401,22 @@ export function TacticalMapView(): React.ReactElement {
     isPj: userRole !== null && userRole >= WorldRole.PomocnyPJ,
     mySlugs,
   });
+
+  // 10.2j — poznámkový blok na mapě (tlačítko pod počasím). PJ → world gm-notes
+  // (per-PJ), hráč → notes jeho jediné postavy (propisuje se do tabu Poznámky
+  // na stránce postavy). Oba hooky volány vždy, gated přes `enabled`/slug.
+  const [notebookOpen, setNotebookOpen] = useState(false);
+  const playerSlug = mySlugs[0] ?? "";
+  const gmNotes = useGmNotes(worldId ?? "", isPJ);
+  const gmNotesMut = useUpdateGmNotes(worldId ?? "");
+  const charNotes = useCharacterNotes(worldId ?? "", isPJ ? "" : playerSlug);
+  const charNotesMut = useUpdateCharacterNotes(worldId ?? "", playerSlug);
+  const hasNotebook = isPJ || !!playerSlug;
+  const notebookData = isPJ ? gmNotes.data : charNotes.data;
+  const saveNotebook = (content: string) =>
+    isPJ
+      ? gmNotesMut.mutateAsync(content)
+      : charNotesMut.mutateAsync({ content });
 
   // 10.2f — token.update pro „V boji / Mimo boj" toggle v panelu tokenu.
   const tokenUpdate = useTokenUpdate(scene?.id ?? "", worldId ?? "");
@@ -1413,7 +1441,28 @@ export function TacticalMapView(): React.ReactElement {
           clearWeather={weather.clearWeather}
           isMutating={weather.isMutating}
         />
+        {/* 10.2j — poznámkový blok (pod počasím, ve společném sloupci, aby se
+            držel i při rozbaleném panelu počasí). PJ = deník napříč světem,
+            hráč = poznámky jeho postavy. Hráč bez postavy → skryto. */}
+        {hasNotebook && (
+          <MapNotebookButton
+            label={isPJ ? "Deník" : "Poznámky"}
+            onClick={() => setNotebookOpen(true)}
+          />
+        )}
       </div>
+
+      {/* 10.2j — overlay přes celý viewport (uvnitř fullscreenu mapy). Mountuje
+          se až jsou data načtená, aby initialContent nebyl prázdný. */}
+      {notebookOpen && hasNotebook && notebookData && (
+        <MapNotebookOverlay
+          title={isPJ ? "Deník PJ" : "Poznámky"}
+          subtitle={isPJ ? world?.name : character?.name}
+          initialContent={notebookData.content}
+          onSave={saveNotebook}
+          onClose={() => setNotebookOpen(false)}
+        />
+      )}
 
       {/* 10.2j — sjednocený sloupec vlevo dole: tlačítko „vlastní hod" + log hodů
           + orchestrace (PJ). Log sedí PŘÍMO nad orchestrací a hýbe se s jejím

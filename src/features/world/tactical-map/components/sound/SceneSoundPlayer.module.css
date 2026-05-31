@@ -1,0 +1,81 @@
+/* 10.2k — SceneSoundPlayer: kompaktní indikátor + aktivace/mute. Top-left. */
+.bar {
+  position: absolute;
+  top: 70px; /* pod horní lištou iniciativy */
+  left: 12px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--map-toolbar-bg-solid, rgba(10, 8, 32, 0.94));
+  border: 1px solid var(--sound-accent, #22d3ee);
+  border-radius: 10px;
+  box-shadow: 0 0 14px var(--sound-accent-glow, rgba(34, 211, 238, 0.4));
+  color: rgba(220, 235, 255, 0.9);
+  font-family: var(--font-mono);
+  pointer-events: auto;
+}
+
+.label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--sound-accent, #22d3ee);
+}
+
+.mute {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.equalizer span {
+  width: 3px;
+  background: var(--sound-accent, #22d3ee);
+  border-radius: 1px;
+  animation: scene-eq 0.9s ease-in-out infinite;
+}
+
+.equalizer span:nth-child(2) {
+  animation-delay: 0.25s;
+}
+.equalizer span:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+@keyframes scene-eq {
+  0%,
+  100% {
+    height: 3px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .equalizer span {
+    animation: none;
+    height: 9px;
+  }
+}
+
+@media (max-width: 600px) {
+  .bar {
+    top: auto;
+    bottom: 80px;
+    left: 12px;
+  }
+}
