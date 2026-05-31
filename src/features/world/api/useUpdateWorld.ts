@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { World } from '@/shared/types';
+import type { World, WorldDiceVisibility } from '@/shared/types';
 
 /**
  * 5.3 — částečná aktualizace světa (`PATCH /worlds/:id`). Posílá se jen
@@ -20,6 +20,8 @@ export interface UpdateWorldInput {
   themeOverrides?: Record<string, string>;
   /** D-NEW-theme-bg-empty (2026-05-21) — `null` = clear ($unset na BE). */
   themeBackgroundUrl?: string | null;
+  /** 10.2j — viditelnost hodů na mapě. */
+  diceVisibility?: WorldDiceVisibility;
 }
 
 export function useUpdateWorld(worldId: string) {

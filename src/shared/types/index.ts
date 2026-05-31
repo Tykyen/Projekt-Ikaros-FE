@@ -362,6 +362,8 @@ export interface World {
   timelineEpoch?: number;
   /** 10.2i — počasí vyslané PJ na taktickou mapu. `null`/`undefined` = žádné. */
   activeMapWeather?: ActiveMapWeather | null;
+  /** 10.2j — viditelnost hodů na mapě. */
+  diceVisibility?: WorldDiceVisibility;
   createdAt: string;
   updatedAt: string;
   /** Spec 2.4 — populated jen při `GET /worlds/:id` / `GET /worlds/slug/:slug`. */
@@ -370,6 +372,15 @@ export interface World {
     username: string;
     avatarUrl?: string;
   };
+}
+
+/**
+ * 10.2j — viditelnost hodů kostek na taktické mapě (per-world konfigurace PJ).
+ */
+export interface WorldDiceVisibility {
+  showPjRolls: boolean;
+  showNpcBestieRolls: boolean;
+  showTeammateRolls: boolean;
 }
 
 /**
