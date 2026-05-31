@@ -20,6 +20,7 @@ import type {
   MapSceneNpc,
   HexCoord,
   CombatState,
+  MapDiceRoll,
 } from '../types';
 
 /**
@@ -349,6 +350,18 @@ export function applyOperationToScene(
         ...(op.patch as Partial<MapSceneNpc>),
       };
       return { ...scene, npcTemplates: updated };
+    }
+
+    // ─── Dice ops ─────────────────────────────────────────────────────
+    case 'dice.roll': {
+      const current = scene.diceRolls ?? [];
+      // Idempotent dedup (optimistic + WS broadcast téže op se stejným id).
+      if (current.some((d: MapDiceRoll) => d.id === op.roll.id)) {
+        return scene;
+      }
+      const next = [...current, op.roll];
+      if (next.length > 50) next.splice(0, next.length - 50);
+      return { ...scene, diceRolls: next };
     }
 
     default: {
