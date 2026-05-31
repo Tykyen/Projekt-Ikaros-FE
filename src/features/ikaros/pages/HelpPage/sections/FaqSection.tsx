@@ -318,6 +318,32 @@ const FAQ: FaqItem[] = [
       </p>
     ),
   },
+  {
+    q: 'Jak funguje hudba a zvuky?',
+    a: (
+      <>
+        <p>
+          Každý svět má <strong>Zvukovou databázi</strong> (menu Hra →{' '}
+          <strong>Zvuky</strong>) &mdash; knihovnu hudby a zvuků z YouTube.
+          Slyšet a přehrát si zvuk může každý člen světa; vytvářet a spravovat
+          zvuky může <strong>PJ</strong> (Pomocný PJ a výš).
+        </p>
+        <p>
+          PJ může zvuk <strong>pustit všem</strong> dvěma způsoby: na{' '}
+          <strong>taktické mapě</strong> jako ambientní hudbu scény (panel
+          „🎵 Ambient" &mdash; slyší všichni hráči na scéně), nebo přímo v{' '}
+          <strong>chatu</strong> tlačítkem 🎵 u psaní zprávy (ostatním se ukáže
+          pruh „Právě hraje").
+        </p>
+        <p>
+          Když ti začne hrát cizí zvuk poprvé, prohlížeč tě nejdřív vyzve
+          kliknout na <strong>„Aktivovat zvuk"</strong> &mdash; je to
+          bezpečnostní pravidlo prohlížeče, web nesmí přehrát zvuk bez tvého
+          kliknutí.
+        </p>
+      </>
+    ),
+  },
 ];
 
 export function FaqSection() {
