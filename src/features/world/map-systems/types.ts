@@ -7,26 +7,27 @@
  *
  * Spec: docs/takticka-mapa-matrix.md §23.2.
  */
-import type { ComponentType } from 'react';
-import type { SystemId } from '../pages/CharacterDetailPage/diary-systems/types';
+import type { ComponentType } from "react";
+import type { SystemId } from "../pages/CharacterDetailPage/diary-systems/types";
+import type { DiceRollCategory } from "../tactical-map/types";
 
 // Re-export pro kompaktnost importu v map kódu.
-export type { SystemId } from '../pages/CharacterDetailPage/diary-systems/types';
+export type { SystemId } from "../pages/CharacterDetailPage/diary-systems/types";
 
 /**
  * Typ kostky (sdílený s krokem 6.3 dice engine). Nepoužívá enum aby PJ
  * světa mohl deklarovat libovolný typ ve `world.dice`.
  */
 export type DieTypeId =
-  | 'fate'
-  | 'd4'
-  | 'd6'
-  | 'd8'
-  | 'd10'
-  | 'd12'
-  | 'd20'
-  | 'd100'
-  | 'mixed'
+  | "fate"
+  | "d4"
+  | "d6"
+  | "d8"
+  | "d10"
+  | "d12"
+  | "d20"
+  | "d100"
+  | "mixed"
   | string;
 
 /**
@@ -80,6 +81,12 @@ export interface MapSystemPlugin {
    * v UI dropdownu na mapě (chat 6.3a stejný pattern).
    */
   defaultDice: DieTypeId[];
+
+  /**
+   * 10.2j — povolené kategorie hodů na mapě. Vždy aspoň 'custom'.
+   * FATE/Matrix: skill + initiative + custom.
+   */
+  rollCategories: DiceRollCategory[];
 
   /** NPC edit modal (10.2d). Placeholder v této prep fázi. */
   NpcEditModal?: ComponentType<MapNpcEditModalProps>;

@@ -12,82 +12,95 @@
  *
  * Spec: docs/takticka-mapa-matrix.md §23.2.
  */
-import type { MapSystemPlugin } from './types';
+import type { MapSystemPlugin } from "./types";
 
 export const matrixPlugin: MapSystemPlugin = {
-  id: 'matrix',
-  label: 'Matrix (default)',
-  defaultDice: ['fate'],
+  id: "matrix",
+  label: "Matrix (default)",
+  defaultDice: ["fate"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const cocPlugin: MapSystemPlugin = {
-  id: 'coc',
-  label: 'Call of Cthulhu 7e',
-  defaultDice: ['d100'],
+  id: "coc",
+  label: "Call of Cthulhu 7e",
+  defaultDice: ["d100"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const dnd5ePlugin: MapSystemPlugin = {
-  id: 'dnd5e',
-  label: 'Dungeons & Dragons 5e',
-  defaultDice: ['d20', 'mixed'],
+  id: "dnd5e",
+  label: "Dungeons & Dragons 5e",
+  defaultDice: ["d20", "mixed"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const drd2Plugin: MapSystemPlugin = {
-  id: 'drd2',
-  label: 'Dračí doupě II',
-  defaultDice: ['d6', 'd10'],
+  id: "drd2",
+  label: "Dračí doupě II",
+  defaultDice: ["d6", "d10"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const drd16Plugin: MapSystemPlugin = {
-  id: 'drd16',
-  label: 'Dračí doupě 1.6',
-  defaultDice: ['d6'],
+  id: "drd16",
+  label: "Dračí doupě 1.6",
+  defaultDice: ["d6"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const drdhPlugin: MapSystemPlugin = {
-  id: 'drdh',
-  label: 'Dračí doupě Hrdinové',
-  defaultDice: ['d6'],
+  id: "drdh",
+  label: "Dračí doupě Hrdinové",
+  defaultDice: ["d6"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const drdplusPlugin: MapSystemPlugin = {
-  id: 'drdplus',
-  label: 'Dračí doupě+',
-  defaultDice: ['d6'],
+  id: "drdplus",
+  label: "Dračí doupě+",
+  defaultDice: ["d6"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const fatePlugin: MapSystemPlugin = {
-  id: 'fate',
-  label: 'Fate',
-  defaultDice: ['fate'],
+  id: "fate",
+  label: "Fate",
+  defaultDice: ["fate"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const piPlugin: MapSystemPlugin = {
-  id: 'pi',
-  label: 'Příběhy Impéria',
-  defaultDice: ['fate'],
+  id: "pi",
+  label: "Příběhy Impéria",
+  defaultDice: ["fate"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const gurpsPlugin: MapSystemPlugin = {
-  id: 'gurps',
-  label: 'GURPS',
-  defaultDice: ['d6'], // typicky 3d6, v UI se sčítají
+  id: "gurps",
+  label: "GURPS",
+  defaultDice: ["d6"], // typicky 3d6, v UI se sčítají
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const jadPlugin: MapSystemPlugin = {
-  id: 'jad',
-  label: 'JaD',
-  defaultDice: ['d10'],
+  id: "jad",
+  label: "JaD",
+  defaultDice: ["d10"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const shadowrunPlugin: MapSystemPlugin = {
-  id: 'shadowrun',
-  label: 'Shadowrun',
-  defaultDice: ['d6'],
+  id: "shadowrun",
+  label: "Shadowrun",
+  defaultDice: ["d6"],
+  rollCategories: ["skill", "initiative", "custom"],
 };
 
 export const genericPlugin: MapSystemPlugin = {
-  id: 'generic',
-  label: 'Obecný (custom schema)',
-  defaultDice: ['d20'],
+  id: "generic",
+  label: "Obecný (custom schema)",
+  defaultDice: ["d20"],
+  rollCategories: ["custom"],
 };
