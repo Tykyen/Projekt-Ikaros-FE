@@ -40,11 +40,11 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-05-31 (10.2i — Taktická mapa: počasí na mapě — PJ
-          vyšle počasí z generátoru, všem se zobrazí panel s daty + vizuální
-          atmosféra (déšť/sníh/mlha/bouře, lze vypnout); plus indikátor stavu
-          spojení, který se po výpadku sám dosynchronizuje. Předchozí: 10.2h —
-          mlha války; 10.2g — efekty; 10.2f — iniciativa a tracker boje.).
+          Aktualizováno k 2026-05-31 (10.2j — Taktická mapa: hod kostkou na mapě
+          — vlastní hod 🎲, hod schopnosti a hod iniciativy; log hodů v panelu
+          vlevo; nastavení viditelnosti hodů v Nastavení světa. Předchozí: 10.2i
+          — počasí na mapě; 10.2h — mlha války; 10.2g — efekty; 10.2f —
+          iniciativa a tracker boje.).
         </p>
       </header>
 
