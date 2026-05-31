@@ -15,14 +15,22 @@
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.1, §3.2, §3.3.
  */
 import { useCallback, useRef } from "react";
-import { useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryKey,
+} from "@tanstack/react-query";
 import axios from "axios";
-import { getActiveMapScene } from "../api/mapApi";
+import { toast } from "sonner";
+import { parseApiError } from "@/shared/api";
+import { getActiveMapScene, postMapOperation } from "../api/mapApi";
 import { applyOperationToScene } from "../utils/applyOperationToScene";
 import { catchUpScene } from "../utils/catchUpScene";
 import { useMapSocket } from "./useMapSocket";
 import type {
   MapScene,
+  MapOperation,
   MapOperationBroadcast,
   MapSpotlightBroadcast,
 } from "../types";
@@ -51,6 +59,12 @@ interface UseMapSceneResult {
   refetch: () => void;
   /** 10.2f-3 — PJ emit spotlight (broadcast ostatním na scéně). */
   emitSpotlight: (tokenId: string) => void;
+  /**
+   * 10.2j — persist hodu kostkou jako `dice.roll` op (optimistic + rollback).
+   * No-op když chybí aktivní scéna. Overlay spouští volající (F2), tohle jen
+   * zapíše op do scény + cache (WS dorovná ostatní klienty).
+   */
+  rollDice: (op: Extract<MapOperation, { type: "dice.roll" }>) => void;
 }
 
 export function useMapScene(
@@ -82,6 +96,37 @@ export function useMapScene(
   });
 
   const scene = query.data ?? null;
+
+  /**
+   * 10.2j — `dice.roll` mutace. Optimistic přes `applyOperationToScene` +
+   * rollback (pattern `effectMutation`/`fogMutation` z `TacticalMapView`).
+   * Base = FRESH cache (`prev`), ne closure `scene` (staleness při rychlé
+   * sekvenci hodů). WS broadcast dorovná ostatní klienty; dedup podle roll.id
+   * v patcheru zajistí idempotenci optimistic + broadcast.
+   */
+  const diceMutation = useMutation({
+    mutationFn: ({ sceneId, op }: { sceneId: string; op: MapOperation }) =>
+      postMapOperation(sceneId, op),
+    onMutate: ({ op }) => {
+      if (!worldId) return { prev: null };
+      const prev = queryClient.getQueryData<MapScene>(
+        mapSceneQueryKey(worldId),
+      );
+      if (prev) {
+        queryClient.setQueryData(
+          mapSceneQueryKey(worldId),
+          applyOperationToScene(prev, op),
+        );
+      }
+      return { prev };
+    },
+    onError: (err, _vars, ctx) => {
+      if (worldId && ctx?.prev) {
+        queryClient.setQueryData(mapSceneQueryKey(worldId), ctx.prev);
+      }
+      toast.error(`Hod selhal: ${parseApiError(err)}`);
+    },
+  });
 
   /**
    * WS callback — incoming op patches scénu v cache.
@@ -162,5 +207,8 @@ export function useMapScene(
     error: query.error,
     refetch: () => void query.refetch(),
     emitSpotlight,
+    rollDice: (op) => {
+      if (scene) diceMutation.mutate({ sceneId: scene.id, op });
+    },
   };
 }
