@@ -57,6 +57,16 @@ import { MapConnectionBadge } from "./components/MapConnectionBadge";
 import { MapWeatherPanel } from "./components/weather/MapWeatherPanel";
 import { MapWeatherAtmosphere } from "./components/weather/MapWeatherAtmosphere";
 import { useMapWeather } from "./hooks/useMapWeather";
+import { DiceLogPanel } from "./components/dice/DiceLogPanel";
+import { DiceRollButton } from "./components/dice/DiceRollButton";
+import { useMapDiceRoll } from "./hooks/useMapDiceRoll";
+import { canSeeRoll } from "./utils/diceVisibility";
+import { useDiceSkinMapping } from "@/features/world/chat/dice/api/useDiceSkinMapping";
+import {
+  DiceRollOverlay,
+  type DiceRollEvent,
+} from "@/features/world/chat/dice/components/DiceRollOverlay";
+import type { DicePayload } from "@/features/world/chat/dice/lib/dicePayload";
 import { TokenInfoPanel } from "./components/token-panel/TokenInfoPanel";
 import { TokenSystemSheet } from "./components/token-panel/TokenSystemSheet";
 import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
@@ -86,7 +96,7 @@ import { toast } from "sonner";
 import { parseApiError } from "@/shared/api";
 import { bestiarQueryKey } from "@/features/world/bestiar/hooks/useBestiar";
 import type { BestiarResponse, Bestie } from "@/features/world/bestiar/types";
-import type { MapOperation, MapToken, MapScene } from "./types";
+import type { MapOperation, MapToken, MapScene, MapDiceRoll } from "./types";
 import styles from "./TacticalMapView.module.css";
 
 // PixiJS v8 @pixi/react JSX pragma — extend dovolí použít `pixiContainer`
@@ -115,7 +125,7 @@ function effectCoversHex(e: MapEffect, q: number, r: number): boolean {
 }
 
 export function TacticalMapView(): React.ReactElement {
-  const { worldId, world, userRole, loading } = useWorldContext();
+  const { worldId, world, userRole, loading, character } = useWorldContext();
   const worldSystemId = world?.system ?? "drd2";
   const currentUser = useAtomValue(currentUserAtom);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -142,11 +152,57 @@ export function TacticalMapView(): React.ReactElement {
     [],
   );
 
+  // 10.2j G3 — 3D dice overlay (6.3). Lokální state + přímý <DiceRollOverlay>
+  // (NE chat DiceRollOverlayProvider — ten wrappuje jen chat stránku, mapu ne;
+  // lokální state je robustnější a decoupled). `triggerOverlay` injektujeme do
+  // useMapDiceRoll (vlastní hod) i do onLiveDiceRoll (cizí viditelný hod).
+  const [diceOverlay, setDiceOverlay] = useState<DiceRollEvent | null>(null);
+  const triggerOverlay = useCallback(
+    (payload: DicePayload, skinId: string | null, rollerName: string) =>
+      setDiceOverlay({ payload, skinId, rollerName, timestamp: Date.now() }),
+    [],
+  );
+  const { getSkin } = useDiceSkinMapping(worldId || "");
+
+  // 10.2j G3 — onLiveDiceRoll čte čerstvé `isPJ`/`currentUser`/`diceVisibility`,
+  // které se počítají AŽ pod useMapScene. Ref drží aktuální hodnoty, stabilní
+  // handler tak nere-subscribuje WS listener každý render.
+  const liveDiceCtxRef = useRef({
+    userId: currentUser?.id ?? "",
+    isPj: false,
+    visibility: world?.diceVisibility,
+  });
+  const handleLiveDiceRoll = useCallback(
+    (roll: MapDiceRoll): void => {
+      const ctx = liveDiceCtxRef.current;
+      if (!ctx.userId) return;
+      if (roll.byUserId === ctx.userId) return; // vlastní už spustil lokálně
+      // Anti-stale: po reconnectu by catch-up nevolal, ale chrání i proti
+      // opožděnému live eventu (WS lag) — staré hody nepřehráváme.
+      if (Date.now() - new Date(roll.rolledAt).getTime() > 10_000) return;
+      if (
+        !canSeeRoll(
+          roll,
+          { userId: ctx.userId, isPj: ctx.isPj },
+          ctx.visibility,
+        )
+      )
+        return;
+      triggerOverlay(
+        roll.dicePayload,
+        getSkin(roll.dicePayload.type),
+        roll.rollerName,
+      );
+    },
+    [triggerOverlay, getSkin],
+  );
+
   // 10.2c — scene fetch + WS + cross-scene reassignment listener.
   // POZOR: `useMapScene` musí být před `useViewportPanZoom`, aby hook
   // dostal `scene.id` pro per-scéna LS klíče (10.2c-edit-5).
-  const { scene, emitSpotlight } = useMapScene(worldId || null, {
+  const { scene, emitSpotlight, rollDice } = useMapScene(worldId || null, {
     onSpotlight: triggerSpotlight,
+    onLiveDiceRoll: handleLiveDiceRoll,
   });
   useReassignmentListener(worldId || null);
 
@@ -285,6 +341,36 @@ export function TacticalMapView(): React.ReactElement {
     currentUser?.role === UserRole.Admin;
   const isPJ =
     isGlobalAdmin || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
+
+  // 10.2j G3 — drž ref pro onLiveDiceRoll aktuální (počítá se pod useMapScene).
+  // Sync v effectu (ne za renderu) — `handleLiveDiceRoll` ref čte až ve WS
+  // callbacku, takže effect-timed update je dost čerstvý a splňuje lint.
+  useEffect(() => {
+    liveDiceCtxRef.current = {
+      userId: currentUser?.id ?? "",
+      isPj: isPJ,
+      visibility: world?.diceVisibility,
+    };
+  }, [currentUser?.id, isPJ, world?.diceVisibility]);
+
+  // 10.2j G3 — orchestrace hodu (F2). Spojuje persist (rollDice z useMapScene)
+  // + lokální overlay + skin resolver. Display name = postava ve světě, jinak
+  // displayName / username účtu (fallback).
+  const diceRollerName =
+    character?.name ??
+    currentUser?.displayName ??
+    currentUser?.username ??
+    "Hráč";
+  const mapDice = useMapDiceRoll({
+    viewer: {
+      userId: currentUser?.id ?? "",
+      isPj: isPJ,
+      displayName: diceRollerName,
+    },
+    rollDice,
+    triggerOverlay,
+    getSkin,
+  });
 
   // 10.2d — selection state (UI-only, lokální).
   // 10.2c-edit-9e — rozděleno na 2 nezávislé states:
@@ -1321,6 +1407,34 @@ export function TacticalMapView(): React.ReactElement {
           isMutating={weather.isMutating}
         />
       </div>
+
+      {/* 10.2j G3 — kostky vlevo dole: tlačítko „vlastní hod" nad logem hodů.
+          Cluster nad PJ orchestračním panelem (MapPjPanel bottom:20px), aby ho
+          nepřekrýval. Vpravo dole sedí dock nástrojů → kostky jsou vlevo. */}
+      {scene && currentUser && (
+        <div className={`${styles.diceSlot} ${isPJ ? styles.diceSlotPj : ""}`}>
+          <div className={styles.diceButtonRow}>
+            <DiceRollButton
+              worldId={worldId ?? ""}
+              worldSlug={world?.slug ?? ""}
+              worldDice={world?.dice ?? []}
+              canManageWorld={isPJ}
+              onRoll={(dicePayload) =>
+                mapDice.roll({ category: "custom", dicePayload })
+              }
+            />
+          </div>
+          <DiceLogPanel
+            rolls={scene.diceRolls ?? []}
+            viewer={{ userId: currentUser.id, isPj: isPJ }}
+            visibility={world?.diceVisibility}
+            sceneId={scene.id}
+          />
+        </div>
+      )}
+
+      {/* 10.2j G3 — fullscreen 3D dice overlay (lokální hod + cizí viditelný). */}
+      <DiceRollOverlay roll={diceOverlay} onDone={() => setDiceOverlay(null)} />
     </div>
   );
 }

@@ -64,3 +64,36 @@
   height: 100vh;
   min-height: 100vh;
 }
+
+/* 10.2j G3 — cluster kostek vlevo dole (tlačítko „vlastní hod" nad logem hodů).
+   Default (hráč): bottom:20px. PJ: nad MapPjPanelem (bottom:20px) → posuneme
+   výš o jeho přibližnou výšku. Offset 360px je odhad (PJ panel je dynamický);
+   limitace zdokumentována v plánu. Mobilní fallback: nahoru, ať nepřekrývá
+   PJ panel zabírající dolní lištu. */
+.diceSlot {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  pointer-events: auto;
+}
+.diceSlotPj {
+  bottom: 360px;
+}
+.diceButtonRow {
+  display: flex;
+}
+@media (max-width: 480px) {
+  .diceSlot {
+    left: 12px;
+    bottom: 12px;
+  }
+  .diceSlotPj {
+    bottom: auto;
+    top: 64px;
+  }
+}

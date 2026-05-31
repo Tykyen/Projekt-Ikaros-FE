@@ -6,10 +6,11 @@
  * theme-isolation. Panel bg/text/accent přes map theme proměnné, semantické
  * barvy výsledku (zelená/červená/jantar) literal rgba.
  */
+/* 10.2j G3 — panel se NEumisťuje sám; pozici řídí rodič (slot v
+   TacticalMapView, vlevo dole nad PJ panelem). Self-positioning (bottom-right)
+   z G1 kolidovalo s dockem nástrojů. */
 .panel {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
+  position: relative;
   min-width: 180px;
   max-width: 300px;
   max-height: calc(100vh - 200px);
@@ -35,9 +36,6 @@
 
 @media (max-width: 480px) {
   .panel {
-    bottom: 12px;
-    right: 12px;
-    left: auto;
     max-width: calc(100vw - 24px);
     max-height: calc(100vh - 140px);
   }
