@@ -16,6 +16,13 @@
   transform-origin: top center;
 }
 
+/* 10.2j — na mapě (pravý dock) otevírá doleva, ať popover neutíká za pravý
+   okraj. Mobilní fullscreen fallback (media query níže) tohle přebije. */
+.alignRight {
+  left: auto;
+  right: 0;
+}
+
 @keyframes popoverIn {
   from {
     opacity: 0;

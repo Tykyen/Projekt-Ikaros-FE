@@ -85,10 +85,6 @@
 .bottomLeftStack > * {
   pointer-events: auto;
 }
-.diceButtonRow {
-  display: flex;
-  align-self: flex-start;
-}
 @media (max-width: 480px) {
   .bottomLeftStack {
     left: 12px;

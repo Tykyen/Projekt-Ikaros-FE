@@ -1349,6 +1349,17 @@ export function TacticalMapView(): React.ReactElement {
           Kreslení na mapu (efekty, PJ) vs ovládání zobrazení (zoom). Naskládané
           ve stacku — odsazují se doleva od otevřeného deníku. */}
       <MapDockStack>
+        {scene && currentUser && worldId && (
+          <DiceRollButton
+            worldId={worldId}
+            worldSlug={world?.slug ?? ""}
+            worldDice={world?.dice ?? []}
+            canManageWorld={isPJ}
+            onRoll={(dicePayload) =>
+              mapDice.roll({ category: "custom", dicePayload })
+            }
+          />
+        )}
         {isPJ && scene && (
           <MapToolDock title="🎨 Efekty" storageKey="effects">
             <EffectsPalette
@@ -1412,25 +1423,12 @@ export function TacticalMapView(): React.ReactElement {
       {worldId && currentUser && (scene || isPJ) && (
         <div className={styles.bottomLeftStack}>
           {scene && (
-            <>
-              <div className={styles.diceButtonRow}>
-                <DiceRollButton
-                  worldId={worldId}
-                  worldSlug={world?.slug ?? ""}
-                  worldDice={world?.dice ?? []}
-                  canManageWorld={isPJ}
-                  onRoll={(dicePayload) =>
-                    mapDice.roll({ category: "custom", dicePayload })
-                  }
-                />
-              </div>
-              <DiceLogPanel
-                rolls={scene.diceRolls ?? []}
-                viewer={{ userId: currentUser.id, isPj: isPJ }}
-                visibility={world?.diceVisibility}
-                sceneId={scene.id}
-              />
-            </>
+            <DiceLogPanel
+              rolls={scene.diceRolls ?? []}
+              viewer={{ userId: currentUser.id, isPj: isPJ }}
+              visibility={world?.diceVisibility}
+              sceneId={scene.id}
+            />
           )}
           {isPJ && (
             <MapPjPanel

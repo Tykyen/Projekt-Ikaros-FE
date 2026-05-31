@@ -47,6 +47,12 @@ interface DicePickerPopoverProps {
   onOpenPoolPrompt: (kind: 'pool' | 'mixed') => void;
   /** Finální send hodu. Picker se po sendu automaticky zavře. */
   onRoll: (result: DiceRollResult) => void;
+  /**
+   * Horizontální zarovnání popoveru vůči anchoru. `'left'` (default, chat
+   * composer) otevírá doprava; `'right'` (mapa, pravý dock) otevírá doleva, aby
+   * popover neutekl mimo pravý okraj obrazovky.
+   */
+  align?: 'left' | 'right';
 }
 
 /**
@@ -73,6 +79,7 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
   onOpenSkinPicker,
   onOpenPoolPrompt,
   onRoll,
+  align = 'left',
 }) => {
   const popoverRef = useRef<HTMLDivElement>(null);
   const [label, setLabel] = useState('');
@@ -139,7 +146,11 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
   };
 
   return (
-    <div className={styles.popover} ref={popoverRef} role="dialog">
+    <div
+      className={`${styles.popover} ${align === 'right' ? styles.alignRight : ''}`}
+      ref={popoverRef}
+      role="dialog"
+    >
       <div className={styles.header}>Hod kostkou</div>
 
       {allowedKeys.length === 0 ? (

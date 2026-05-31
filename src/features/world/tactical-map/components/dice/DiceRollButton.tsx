@@ -70,6 +70,7 @@ export function DiceRollButton({
         onOpenSkinPicker={() => setSkinPickerOpen(true)}
         onOpenPoolPrompt={(kind) => setPoolPrompt(kind)}
         onRoll={handleRoll}
+        align="right"
       />
 
       {poolPrompt && (
