@@ -35,13 +35,66 @@
 }
 
 .header {
-  padding: 12px 16px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px 8px 16px;
   font-family: 'Cinzel', serif;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.5px;
   color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
   border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
+}
+
+.headerGear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.55));
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.headerGear:hover {
+  color: var(--ch-accent, #a78bfa);
+  background: color-mix(in srgb, var(--ch-accent, #a78bfa) 12%, transparent);
+}
+
+/* Rozbalovací „Možnosti" — schovává Pool/Mixed + Popis/Mod (šetří místo). */
+.advancedToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--theme-text-dim, rgba(220, 215, 255, 0.6));
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.advancedToggle:hover {
+  color: var(--ch-accent, #a78bfa);
+}
+
+.advancedChevron {
+  transition: transform 0.2s ease;
+}
+
+.advancedChevronOpen {
+  transform: rotate(180deg);
 }
 
 .grid {
@@ -164,9 +217,15 @@
 
 .inputRow {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+/* Mod = úzký fixní sloupec (jinak přetékal přes okraj popoveru). */
+.inputRowMod {
+  flex: 0 0 72px;
 }
 
 .inputLabel {
@@ -181,6 +240,9 @@
 }
 
 .input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   background: var(--theme-surface, rgba(14, 12, 30, 0.6));
   border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.15));
   border-radius: 6px;
@@ -197,7 +259,6 @@
 }
 
 .modInput {
-  flex: 0 0 48px;
   text-align: center;
   font-family: 'Iceland', monospace;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Layers, Plus, Sliders, Settings } from 'lucide-react';
+import { ChevronDown, Layers, Plus, Sliders, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   rollFate,
@@ -84,6 +84,9 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [label, setLabel] = useState('');
   const [modifier, setModifier] = useState('');
+  // Pool/Mixed + Popis/Mod schované za „Možnosti", rozbalí se na vyžádání
+  // (šetří místo — platí pro chat i mapu).
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const allowedKeys = resolveDiceKeys(worldDice);
 
@@ -151,7 +154,21 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
       ref={popoverRef}
       role="dialog"
     >
-      <div className={styles.header}>Hod kostkou</div>
+      <div className={styles.header}>
+        <span className={styles.headerTitle}>Hod kostkou</span>
+        <button
+          type="button"
+          className={styles.headerGear}
+          title="Vzhled mých kostek"
+          aria-label="Vzhled mých kostek"
+          onClick={() => {
+            onOpenSkinPicker();
+            onClose();
+          }}
+        >
+          <Settings size={15} aria-hidden="true" />
+        </button>
+      </div>
 
       {allowedKeys.length === 0 ? (
         <div className={styles.emptyState}>
@@ -190,77 +207,81 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
 
           <div className={styles.divider} />
 
-          <div className={styles.complexRow}>
-            <button
-              type="button"
-              className={styles.complexLink}
-              onClick={() => {
-                onOpenPoolPrompt('pool');
-                onClose();
-              }}
-            >
-              <Plus size={14} aria-hidden="true" />
-              Pool…
-            </button>
-            <button
-              type="button"
-              className={styles.complexLink}
-              onClick={() => {
-                onOpenPoolPrompt('mixed');
-                onClose();
-              }}
-            >
-              <Layers size={14} aria-hidden="true" />
-              Mixed…
-            </button>
-          </div>
+          <button
+            type="button"
+            className={styles.advancedToggle}
+            onClick={() => setAdvancedOpen((v) => !v)}
+            aria-expanded={advancedOpen}
+          >
+            <span>Možnosti — pool, mixed, popis, mod</span>
+            <ChevronDown
+              size={14}
+              aria-hidden="true"
+              className={`${styles.advancedChevron} ${
+                advancedOpen ? styles.advancedChevronOpen : ''
+              }`}
+            />
+          </button>
 
-          <div className={styles.divider} />
+          {advancedOpen && (
+            <>
+              <div className={styles.complexRow}>
+                <button
+                  type="button"
+                  className={styles.complexLink}
+                  onClick={() => {
+                    onOpenPoolPrompt('pool');
+                    onClose();
+                  }}
+                >
+                  <Plus size={14} aria-hidden="true" />
+                  Pool…
+                </button>
+                <button
+                  type="button"
+                  className={styles.complexLink}
+                  onClick={() => {
+                    onOpenPoolPrompt('mixed');
+                    onClose();
+                  }}
+                >
+                  <Layers size={14} aria-hidden="true" />
+                  Mixed…
+                </button>
+              </div>
 
-          <div className={styles.inputs}>
-            <label className={styles.inputRow}>
-              <span className={styles.inputLabel}>Popis</span>
-              <input
-                type="text"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                maxLength={64}
-                placeholder="Magie / Vnímání…"
-                className={styles.input}
-              />
-            </label>
-            <label className={styles.inputRow}>
-              <span className={styles.inputLabel}>
-                <Sliders size={12} aria-hidden="true" /> Mod
-              </span>
-              <input
-                type="text"
-                value={modifier}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (/^[+-]?\d*$/.test(v)) setModifier(v);
-                }}
-                placeholder="+0"
-                className={`${styles.input} ${styles.modInput}`}
-              />
-            </label>
-          </div>
+              <div className={styles.inputs}>
+                <label className={styles.inputRow}>
+                  <span className={styles.inputLabel}>Popis</span>
+                  <input
+                    type="text"
+                    value={label}
+                    onChange={(e) => setLabel(e.target.value)}
+                    maxLength={64}
+                    placeholder="Magie / Vnímání…"
+                    className={styles.input}
+                  />
+                </label>
+                <label className={`${styles.inputRow} ${styles.inputRowMod}`}>
+                  <span className={styles.inputLabel}>
+                    <Sliders size={12} aria-hidden="true" /> Mod
+                  </span>
+                  <input
+                    type="text"
+                    value={modifier}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (/^[+-]?\d*$/.test(v)) setModifier(v);
+                    }}
+                    placeholder="+0"
+                    className={`${styles.input} ${styles.modInput}`}
+                  />
+                </label>
+              </div>
+            </>
+          )}
         </>
       )}
-
-      <div className={styles.footer}>
-        <button
-          type="button"
-          className={styles.footerLink}
-          onClick={() => {
-            onOpenSkinPicker();
-            onClose();
-          }}
-        >
-          <Settings size={12} aria-hidden="true" />
-          Vzhled mých kostek
-        </button>
-      </div>
     </div>
   );
 };
