@@ -33,6 +33,7 @@ import type {
   MapOperation,
   MapOperationBroadcast,
   MapSpotlightBroadcast,
+  MapDiceRoll,
 } from "../types";
 
 /** Query key factory — exportováno pro `useReassignmentListener` invalidate. */
@@ -45,6 +46,12 @@ export const mapSceneQueryKey = (worldId: string): QueryKey => [
 interface UseMapSceneOptions {
   /** 10.2f-3 — callback při `map:spotlight` (PJ ukázal na token). */
   onSpotlight?: (tokenId: string) => void;
+  /**
+   * 10.2j — notifikace o LIVE hodu kostkou (jen happy-path seq, NE catch-up replay).
+   * Konzument (TacticalMapView) spustí overlay viditelným hodům. Catch-up větev
+   * záměrně NEvolá → po reconnectu nevlétnou staré kostky.
+   */
+  onLiveDiceRoll?: (roll: MapDiceRoll) => void;
 }
 
 interface UseMapSceneResult {
@@ -73,6 +80,7 @@ export function useMapScene(
 ): UseMapSceneResult {
   const queryClient = useQueryClient();
   const lastSeqRef = useRef<number>(0);
+  const onLiveDiceRoll = options?.onLiveDiceRoll;
 
   const query = useQuery<MapScene | null>({
     queryKey: worldId ? mapSceneQueryKey(worldId) : ["map", "active", "none"],
@@ -146,6 +154,9 @@ export function useMapScene(
         };
         lastSeqRef.current = payload.seqNumber;
         queryClient.setQueryData(mapSceneQueryKey(worldId), next);
+        if (payload.op.type === "dice.roll") {
+          onLiveDiceRoll?.(payload.op.roll);
+        }
       } else if (payload.seqNumber > expectedSeq) {
         // Gap — chyběla mi 1+ ops (WS reorder, krátký disconnect, etc.)
         try {
@@ -163,7 +174,7 @@ export function useMapScene(
       }
       // payload.seqNumber < expectedSeq → duplicate/stale, ignorujeme
     },
-    [worldId, scene, queryClient, query],
+    [worldId, scene, queryClient, query, onLiveDiceRoll],
   );
 
   /**
