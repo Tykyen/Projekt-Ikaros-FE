@@ -1,38 +1,45 @@
-import { useRef } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
-import { Button } from '@/shared/ui';
-import { useWorldContext } from '@/features/world/context/WorldContext';
+import { useRef } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Button } from "@/shared/ui";
+import { useWorldContext } from "@/features/world/context/WorldContext";
 import {
   useUpdateWorld,
   type UpdateWorldInput,
-} from '@/features/world/api/useUpdateWorld';
-import { useUploadImage } from '@/shared/api';
-import { PillChips } from '@/features/ikaros/pages/CreateWorldPage/components/PillChips';
+} from "@/features/world/api/useUpdateWorld";
+import { useUploadImage } from "@/shared/api";
+import { PillChips } from "@/features/ikaros/pages/CreateWorldPage/components/PillChips";
 import {
   GENRES,
   GENRE_CUSTOM_LABEL,
-} from '@/features/ikaros/pages/CreateWorldPage/constants/genres';
+} from "@/features/ikaros/pages/CreateWorldPage/constants/genres";
 import {
   RPG_SYSTEMS,
   SYSTEM_CUSTOM_ID,
-} from '@/features/ikaros/pages/CreateWorldPage/constants/systems';
+} from "@/features/ikaros/pages/CreateWorldPage/constants/systems";
 import {
   DICE,
   DICE_DESCRIPTIONS,
-} from '@/features/ikaros/pages/CreateWorldPage/constants/dice';
-import sec from '@/features/ikaros/pages/CreateWorldPage/components/sections.module.css';
-import { SettingsPanel } from '../components/SettingsPanel';
+} from "@/features/ikaros/pages/CreateWorldPage/constants/dice";
+import sec from "@/features/ikaros/pages/CreateWorldPage/components/sections.module.css";
+import { SettingsPanel } from "../components/SettingsPanel";
 import {
   basicInfoSchema,
   type BasicInfoForm,
-} from '../lib/worldSettingsSchema';
-import s from './BasicInfoTab.module.css';
+} from "../lib/worldSettingsSchema";
+import s from "./BasicInfoTab.module.css";
 
 function sameArray(a: string[], b: string[]): boolean {
   return a.length === b.length && a.every((v) => b.includes(v));
 }
+
+/** 10.2j — výchozí viditelnost hodů: hráči vidí jen hody spoluhráčů. */
+const DEFAULT_DICE_VISIBILITY = {
+  showPjRolls: false,
+  showNpcBestieRolls: false,
+  showTeammateRolls: true,
+};
 
 /**
  * 5.3a — formulář metadat světa. Reuse `sections.module.css` + constants
@@ -40,12 +47,13 @@ function sameArray(a: string[], b: string[]): boolean {
  */
 export default function BasicInfoTab() {
   const { world } = useWorldContext();
-  const mutation = useUpdateWorld(world?.id ?? '');
+  const mutation = useUpdateWorld(world?.id ?? "");
   const upload = useUploadImage();
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Genre/system: pokud hodnota světa není v presetech → režim „Vlastní".
-  const genreInList = !!world?.genre && GENRES.some((g) => g.label === world.genre);
+  const genreInList =
+    !!world?.genre && GENRES.some((g) => g.label === world.genre);
   const systemInList =
     !!world && RPG_SYSTEMS.some((sys) => sys.id === world.system);
 
@@ -59,32 +67,37 @@ export default function BasicInfoTab() {
   } = useForm<BasicInfoForm>({
     resolver: zodResolver(basicInfoSchema),
     defaultValues: {
-      name: world?.name ?? '',
-      description: world?.description ?? '',
-      genre: genreInList ? world!.genre! : world?.genre ? GENRE_CUSTOM_LABEL : '',
-      customGenre: genreInList ? '' : (world?.genre ?? ''),
+      name: world?.name ?? "",
+      description: world?.description ?? "",
+      genre: genreInList
+        ? world!.genre!
+        : world?.genre
+          ? GENRE_CUSTOM_LABEL
+          : "",
+      customGenre: genreInList ? "" : (world?.genre ?? ""),
       system: systemInList ? world!.system : SYSTEM_CUSTOM_ID,
-      customSystem: systemInList ? '' : (world?.system ?? ''),
+      customSystem: systemInList ? "" : (world?.system ?? ""),
       dice: world?.dice ?? [],
       maxPlayers: world?.maxPlayers ?? null,
-      playersWanted: world?.playersWanted ?? '',
-      imageUrl: world?.imageUrl ?? '',
+      playersWanted: world?.playersWanted ?? "",
+      imageUrl: world?.imageUrl ?? "",
+      diceVisibility: world?.diceVisibility ?? DEFAULT_DICE_VISIBILITY,
     },
   });
 
   if (!world) return null;
 
-  const genre = watch('genre');
-  const system = watch('system');
-  const imageUrl = watch('imageUrl');
+  const genre = watch("genre");
+  const system = watch("system");
+  const imageUrl = watch("imageUrl");
 
   async function handleFile(file: File) {
     try {
       const res = await upload.mutateAsync(file);
-      setValue('imageUrl', res.url, { shouldDirty: true });
-      toast.success('Obrázek nahrán.');
+      setValue("imageUrl", res.url, { shouldDirty: true });
+      toast.success("Obrázek nahrán.");
     } catch {
-      toast.error('Nahrání obrázku selhalo.');
+      toast.error("Nahrání obrázku selhalo.");
     }
   }
 
@@ -101,26 +114,33 @@ export default function BasicInfoTab() {
     const patch: UpdateWorldInput = {};
     if (values.name.trim() !== world.name) patch.name = values.name.trim();
     const desc = values.description.trim();
-    if (desc !== (world.description ?? '')) patch.description = desc;
-    if (finalGenre !== (world.genre ?? '')) patch.genre = finalGenre;
+    if (desc !== (world.description ?? "")) patch.description = desc;
+    if (finalGenre !== (world.genre ?? "")) patch.genre = finalGenre;
     if (finalSystem !== world.system) patch.system = finalSystem;
     if (!sameArray(values.dice, world.dice ?? [])) patch.dice = values.dice;
     if (values.maxPlayers !== (world.maxPlayers ?? null))
       patch.maxPlayers = values.maxPlayers;
     const pw = values.playersWanted.trim();
-    if (pw !== (world.playersWanted ?? '')) patch.playersWanted = pw;
-    if (values.imageUrl !== (world.imageUrl ?? ''))
+    if (pw !== (world.playersWanted ?? "")) patch.playersWanted = pw;
+    if (values.imageUrl !== (world.imageUrl ?? ""))
       patch.imageUrl = values.imageUrl;
+    const dv = world.diceVisibility ?? DEFAULT_DICE_VISIBILITY;
+    if (
+      values.diceVisibility.showPjRolls !== dv.showPjRolls ||
+      values.diceVisibility.showNpcBestieRolls !== dv.showNpcBestieRolls ||
+      values.diceVisibility.showTeammateRolls !== dv.showTeammateRolls
+    )
+      patch.diceVisibility = values.diceVisibility;
 
     if (Object.keys(patch).length === 0) {
-      toast.info('Žádné změny k uložení.');
+      toast.info("Žádné změny k uložení.");
       return;
     }
     try {
       await mutation.mutateAsync(patch);
-      toast.success('Změny uloženy.');
+      toast.success("Změny uloženy.");
     } catch {
-      toast.error('Uložení selhalo. Zkus to znovu.');
+      toast.error("Uložení selhalo. Zkus to znovu.");
     }
   });
 
@@ -142,9 +162,9 @@ export default function BasicInfoTab() {
           <input
             id="ws-name"
             type="text"
-            className={`${sec.input} ${errors.name ? sec.inputError : ''}`}
+            className={`${sec.input} ${errors.name ? sec.inputError : ""}`}
             maxLength={60}
-            {...register('name')}
+            {...register("name")}
           />
           {errors.name && <p className={sec.error}>{errors.name.message}</p>}
         </div>
@@ -174,7 +194,7 @@ export default function BasicInfoTab() {
             className={sec.textarea}
             rows={4}
             maxLength={1000}
-            {...register('description')}
+            {...register("description")}
           />
         </div>
 
@@ -182,7 +202,7 @@ export default function BasicInfoTab() {
           <label htmlFor="ws-genre" className={sec.label}>
             Žánr
           </label>
-          <select id="ws-genre" className={sec.select} {...register('genre')}>
+          <select id="ws-genre" className={sec.select} {...register("genre")}>
             <option value="" disabled>
               -- Vyberte žánr --
             </option>
@@ -199,7 +219,7 @@ export default function BasicInfoTab() {
               className={`${sec.input} ${sec.customInput}`}
               maxLength={40}
               placeholder="Pojmenuj vlastní žánr…"
-              {...register('customGenre')}
+              {...register("customGenre")}
             />
           )}
           <p className={sec.helper}>
@@ -217,7 +237,7 @@ export default function BasicInfoTab() {
               className={sec.textarea}
               rows={3}
               maxLength={500}
-              {...register('playersWanted')}
+              {...register("playersWanted")}
             />
           </div>
           <div className={sec.field}>
@@ -234,15 +254,13 @@ export default function BasicInfoTab() {
                   className={sec.input}
                   min={1}
                   max={999}
-                  value={field.value ?? ''}
+                  value={field.value ?? ""}
                   onChange={(e) => {
                     const raw = e.target.value;
-                    if (raw === '') return field.onChange(null);
+                    if (raw === "") return field.onChange(null);
                     const n = Number(raw);
                     if (Number.isFinite(n))
-                      field.onChange(
-                        Math.min(999, Math.max(1, Math.floor(n))),
-                      );
+                      field.onChange(Math.min(999, Math.max(1, Math.floor(n))));
                   }}
                 />
               )}
@@ -255,11 +273,7 @@ export default function BasicInfoTab() {
           <label htmlFor="ws-system" className={`${sec.label} ${sec.required}`}>
             Herní systém
           </label>
-          <select
-            id="ws-system"
-            className={sec.select}
-            {...register('system')}
-          >
+          <select id="ws-system" className={sec.select} {...register("system")}>
             {RPG_SYSTEMS.map((sys) => (
               <option key={sys.id} value={sys.id}>
                 {sys.label}
@@ -272,7 +286,7 @@ export default function BasicInfoTab() {
               className={`${sec.input} ${sec.customInput}`}
               maxLength={60}
               placeholder="Pojmenuj svůj systém…"
-              {...register('customSystem')}
+              {...register("customSystem")}
             />
           )}
         </div>
@@ -295,10 +309,71 @@ export default function BasicInfoTab() {
         </div>
 
         <div className={sec.field}>
+          <span className={sec.label}>Viditelnost hodů na mapě</span>
+          <Controller
+            name="diceVisibility"
+            control={control}
+            render={({ field }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <label
+                  style={{ display: "flex", alignItems: "center", gap: 8 }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={field.value.showPjRolls}
+                    onChange={(e) =>
+                      field.onChange({
+                        ...field.value,
+                        showPjRolls: e.target.checked,
+                      })
+                    }
+                  />
+                  Hráči vidí PJ hody
+                </label>
+                <label
+                  style={{ display: "flex", alignItems: "center", gap: 8 }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={field.value.showNpcBestieRolls}
+                    onChange={(e) =>
+                      field.onChange({
+                        ...field.value,
+                        showNpcBestieRolls: e.target.checked,
+                      })
+                    }
+                  />
+                  Hráči vidí hody NPC a bestií
+                </label>
+                <label
+                  style={{ display: "flex", alignItems: "center", gap: 8 }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={field.value.showTeammateRolls}
+                    onChange={(e) =>
+                      field.onChange({
+                        ...field.value,
+                        showTeammateRolls: e.target.checked,
+                      })
+                    }
+                  />
+                  Hráči vidí hody spoluhráčů
+                </label>
+              </div>
+            )}
+          />
+        </div>
+
+        <div className={sec.field}>
           <span className={sec.label}>Hero obrázek</span>
           <div className={s.heroRow}>
             {imageUrl ? (
-              <img src={imageUrl} alt="Náhled hero obrázku" className={s.heroPreview} />
+              <img
+                src={imageUrl}
+                alt="Náhled hero obrázku"
+                className={s.heroPreview}
+              />
             ) : (
               <div className={s.heroEmpty}>Bez obrázku</div>
             )}
@@ -311,7 +386,7 @@ export default function BasicInfoTab() {
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (f) handleFile(f);
-                  e.target.value = '';
+                  e.target.value = "";
                 }}
               />
               <Button
@@ -329,7 +404,7 @@ export default function BasicInfoTab() {
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    setValue('imageUrl', '', { shouldDirty: true })
+                    setValue("imageUrl", "", { shouldDirty: true })
                   }
                 >
                   Odebrat
