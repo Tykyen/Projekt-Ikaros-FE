@@ -190,6 +190,31 @@ const FAQ: FaqItem[] = [
     ),
   },
   {
+    q: 'Kde si na taktické mapě vedu poznámky (deník)?',
+    a: (
+      <>
+        <p>
+          Na taktické mapě je <strong>pod panelem počasí</strong> (vpravo
+          nahoře) tlačítko poznámkového bloku. Otevře se přes celou plochu mapy
+          jako otevřený zápisník a obsah se průběžně sám ukládá.
+        </p>
+        <ul>
+          <li>
+            <strong>PJ</strong> (Pán jeskyně i Pomocný PJ) má vlastní{' '}
+            <strong>Deník PJ</strong> — poznámky k příběhu platné pro celý svět,
+            soukromé pro každého PJ zvlášť. Stejný deník otevřeš i mimo mapu z
+            menu světa → sekce <strong>Hra → Deník PJ</strong>.
+          </li>
+          <li>
+            <strong>Hráč</strong> má tlačítko taky — otevře{' '}
+            <strong>Poznámky jeho postavy</strong>. Co napíšeš na mapě, najdeš i
+            na stránce postavy v tabu <strong>Poznámky</strong> a naopak.
+          </li>
+        </ul>
+      </>
+    ),
+  },
+  {
     q: 'Jak funguje Pošta a kdo mi může psát?',
     a: (
       <>
