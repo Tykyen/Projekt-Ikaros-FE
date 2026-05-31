@@ -46,13 +46,34 @@ interface Props {
   onStartPlacement: (payload: SpawnPayload, multi: boolean) => void;
 }
 
+const PJ_PANEL_OPEN_KEY = 'ikr-map-pj-panel-open';
+
 export function MapPjPanel({
   worldId,
   currentScene,
   currentUserId,
   onStartPlacement,
 }: Props): React.ReactElement {
-  const [expanded, setExpanded] = useState(true);
+  // 10.2j — persistované sbalení (default zavřeno po refreshi, stejně jako log
+  // hodů). Otevřeno jen pokud uživatel explicitně rozbalil (uloženo "1").
+  const [expanded, setExpanded] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(PJ_PANEL_OPEN_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+  const toggleExpanded = (): void => {
+    setExpanded((v) => {
+      const next = !v;
+      try {
+        localStorage.setItem(PJ_PANEL_OPEN_KEY, next ? '1' : '0');
+      } catch {
+        /* private mode — collapse je čistě UI, ignoruj */
+      }
+      return next;
+    });
+  };
   const [editingScene, setEditingScene] = useState<MapScene | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
   /**
@@ -161,14 +182,14 @@ export function MapPjPanel({
     <aside className={styles.panel}>
       <header
         className={styles.header}
-        onClick={() => setExpanded((v) => !v)}
+        onClick={toggleExpanded}
         role="button"
         tabIndex={0}
         aria-expanded={expanded}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setExpanded((v) => !v);
+            toggleExpanded();
           }
         }}
       >
