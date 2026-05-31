@@ -4,41 +4,41 @@
  * PJ vybere zvuky z knihovny světa → „Vysílat" nastaví `scene.activeSoundIds`
  * (op `sound.playlist`) → všem na scéně začne hrát (SceneSoundPlayer). „Zastavit"
  * vyšle prázdný playlist. Vzhled sjednocen s DiceLogPanel (solid, sbalitelný).
+ *
+ * Mutaci řídí rodič (TacticalMapView) přes `onBroadcast` — stejný pattern jako
+ * MapPjPanel/efekty (optimistic přes applyOperationToScene + postMapOperation).
  */
 import { useMemo, useState } from 'react';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSounds } from '@/features/world/sounds/hooks/useSounds';
 import { useSoundActivation } from '@/features/world/sounds/player/soundActivation';
 import { MEDIA_TYPE_LABELS } from '@/features/world/sounds/lib/soundEnums';
-import type { MapScene, MapOperation } from '../../types';
-import type { MapConnection } from '../../hooks/useMapScene';
+import type { MapScene } from '../../types';
 import styles from './AmbientSoundPanel.module.css';
 
 interface Props {
   scene: MapScene;
-  connection: MapConnection;
-  dispatchLocal: (op: MapOperation) => void;
+  /** Broadcast nového playlistu (op `sound.playlist`) — řeší rodič. */
+  onBroadcast: (soundIds: string[]) => void;
 }
 
 export function AmbientSoundPanel({
   scene,
-  connection,
-  dispatchLocal,
+  onBroadcast,
 }: Props): React.ReactElement {
   const { worldId } = useWorldContext();
-  const { data: sounds } = useWorldSounds(worldId);
-  const { activate } = useSoundActivation();
   const [open, setOpen] = useState(false);
+  const { data: sounds } = useWorldSounds(open ? worldId : null);
+  const { activate } = useSoundActivation();
 
   // Draft playlist (lokální výběr PJ); init ze scény.
   const [draft, setDraft] = useState<string[]>(scene.activeSoundIds ?? []);
 
-  const activeList = scene.activeSoundIds ?? [];
-  const playing = activeList.length > 0;
+  const playing = (scene.activeSoundIds ?? []).length > 0;
   const library = sounds ?? [];
 
   const byId = useMemo(
-    () => new Map(library.map((s) => [s.id, s])),
+    () => new Map(library.map((sound) => [sound.id, sound])),
     [library],
   );
 
@@ -55,19 +55,13 @@ export function AmbientSoundPanel({
       return next;
     });
 
-  const broadcast = (soundIds: string[]) => {
-    const op: MapOperation = { type: 'sound.playlist', soundIds };
-    dispatchLocal(op);
-    void connection.emitOperation(op);
-  };
-
   const handlePlay = () => {
     activate(); // PJ klik = gesto → vlastní přehrávač smí hrát
-    broadcast(draft);
+    onBroadcast(draft);
   };
 
   const handleStop = () => {
-    broadcast([]);
+    onBroadcast([]);
   };
 
   return (
@@ -92,21 +86,21 @@ export function AmbientSoundPanel({
           ) : (
             <>
               <div className={styles.picker}>
-                {library.map((s) => {
-                  const idx = draft.indexOf(s.id);
+                {library.map((sound) => {
+                  const idx = draft.indexOf(sound.id);
                   const selected = idx >= 0;
                   return (
                     <button
-                      key={s.id}
+                      key={sound.id}
                       type="button"
                       className={`${styles.item} ${selected ? styles.itemOn : ''}`}
-                      onClick={() => toggle(s.id)}
-                      title={MEDIA_TYPE_LABELS[s.mediaType]}
+                      onClick={() => toggle(sound.id)}
+                      title={MEDIA_TYPE_LABELS[sound.mediaType]}
                     >
                       <span className={styles.itemOrder}>
                         {selected ? idx + 1 : '+'}
                       </span>
-                      <span className={styles.itemName}>{s.name}</span>
+                      <span className={styles.itemName}>{sound.name}</span>
                     </button>
                   );
                 })}
@@ -115,11 +109,11 @@ export function AmbientSoundPanel({
               {draft.length > 0 && (
                 <div className={styles.order}>
                   {draft.map((id) => {
-                    const s = byId.get(id);
-                    if (!s) return null;
+                    const sound = byId.get(id);
+                    if (!sound) return null;
                     return (
                       <div key={id} className={styles.orderRow}>
-                        <span className={styles.orderName}>{s.name}</span>
+                        <span className={styles.orderName}>{sound.name}</span>
                         <button
                           type="button"
                           className={styles.tiny}

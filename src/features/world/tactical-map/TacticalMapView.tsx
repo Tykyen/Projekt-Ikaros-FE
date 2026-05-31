@@ -59,6 +59,8 @@ import { MapWeatherAtmosphere } from "./components/weather/MapWeatherAtmosphere"
 import { useMapWeather } from "./hooks/useMapWeather";
 import { DiceLogPanel } from "./components/dice/DiceLogPanel";
 import { DiceRollButton } from "./components/dice/DiceRollButton";
+import { AmbientSoundPanel } from "./components/sound/AmbientSoundPanel";
+import { SceneSoundPlayer } from "./components/sound/SceneSoundPlayer";
 import { useMapDiceRoll } from "./hooks/useMapDiceRoll";
 import { canSeeRoll } from "./utils/diceVisibility";
 import { useDiceSkinMapping } from "@/features/world/chat/dice/api/useDiceSkinMapping";
@@ -420,6 +422,30 @@ export function TacticalMapView(): React.ReactElement {
 
   // 10.2f — token.update pro „V boji / Mimo boj" toggle v panelu tokenu.
   const tokenUpdate = useTokenUpdate(scene?.id ?? "", worldId ?? "");
+
+  // 10.2k — ambient playlist broadcast (op `sound.playlist`). Optimistic přes
+  // applyOperationToScene + rollback (stejný pattern jako effectMutation).
+  const broadcastSounds = useCallback(
+    (soundIds: string[]): void => {
+      if (!scene || !worldId) return;
+      const op: MapOperation = { type: "sound.playlist", soundIds };
+      const prev = queryClient.getQueryData<MapScene>(
+        mapSceneQueryKey(worldId),
+      );
+      if (prev) {
+        queryClient.setQueryData(
+          mapSceneQueryKey(worldId),
+          applyOperationToScene(prev, op),
+        );
+      }
+      void postMapOperation(scene.id, op).catch((err) => {
+        if (prev) queryClient.setQueryData(mapSceneQueryKey(worldId), prev);
+        toast.error(`Hudba selhala: ${parseApiError(err)}`);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [scene?.id, worldId, queryClient],
+  );
 
   // 10.2d-B — optimistic token.move mutation s rollback.
   const queryClient = useQueryClient();
@@ -1479,6 +1505,9 @@ export function TacticalMapView(): React.ReactElement {
               sceneId={scene.id}
             />
           )}
+          {isPJ && scene && (
+            <AmbientSoundPanel scene={scene} onBroadcast={broadcastSounds} />
+          )}
           {isPJ && (
             <MapPjPanel
               worldId={worldId}
@@ -1492,6 +1521,9 @@ export function TacticalMapView(): React.ReactElement {
 
       {/* 10.2j G3 — fullscreen 3D dice overlay (lokální hod + cizí viditelný). */}
       <DiceRollOverlay roll={diceOverlay} onDone={() => setDiceOverlay(null)} />
+
+      {/* 10.2k — ambient přehrávač scény (PJ i hráč slyší; HUD vlevo nahoře). */}
+      {scene && <SceneSoundPlayer scene={scene} />}
     </div>
   );
 }
