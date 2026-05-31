@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Check, Skull, Heart } from 'lucide-react';
 import {
   CATEGORY_LABELS,
@@ -170,7 +171,10 @@ export function SkinPickerPanel({
 
   const activeSkinId = getSkin(activeType) || DEFAULT_SKIN_ID;
 
-  return (
+  // Portál do body — `position: fixed` backdrop se jinak vztahuje k předkovi s
+  // `transform` (mapa pan/zoom container), takže modal skončil nalepený nahoře
+  // pod lištou místo vystředění přes celý viewport.
+  return createPortal(
     <div className={styles.backdrop} onClick={onClose}>
       <div
         className={styles.modal}
@@ -319,6 +323,7 @@ export function SkinPickerPanel({
           </main>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

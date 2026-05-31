@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Minus, Plus } from 'lucide-react';
 import { DICE_CATALOG, resolveDiceKeys } from '../lib/worldDiceCatalog';
 import { buildPoolRoll, type DiceRollResult } from './DicePickerPopover';
@@ -96,7 +97,9 @@ export const PoolPromptModal: React.FC<PoolPromptModalProps> = ({
     onClose();
   };
 
-  return (
+  // Portál do body — stejný důvod jako u SkinPickerPanel: `fixed` backdrop se
+  // jinak vztahuje k předkovi s `transform` (mapa) a modal skončí mimo střed.
+  return createPortal(
     <div className={styles.backdrop} onClick={onClose}>
       <div
         className={styles.modal}
@@ -208,6 +211,7 @@ export const PoolPromptModal: React.FC<PoolPromptModalProps> = ({
           </div>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
