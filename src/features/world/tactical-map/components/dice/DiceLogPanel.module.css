@@ -11,9 +11,8 @@
    z G1 kolidovalo s dockem nástrojů. */
 .panel {
   position: relative;
-  min-width: 180px;
-  max-width: 300px;
-  max-height: calc(100vh - 200px);
+  width: 100%;
+  max-height: 32vh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(
@@ -36,8 +35,7 @@
 
 @media (max-width: 480px) {
   .panel {
-    max-width: calc(100vw - 24px);
-    max-height: calc(100vh - 140px);
+    max-height: 28vh;
   }
 }
 
@@ -60,6 +58,12 @@
   color: rgba(180, 165, 255, 0.8);
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .clear {
   background: none;
   border: none;
@@ -73,6 +77,18 @@
 
 .clear:hover {
   color: rgba(255, 100, 100, 0.8);
+}
+
+/* Chevron sjednocený s orchestrací (MapPjPanel) — ▾ dole = sbaleno, rotace
+   180° = rozbaleno. */
+.chevron {
+  font-size: 12px;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
 }
 
 .body {

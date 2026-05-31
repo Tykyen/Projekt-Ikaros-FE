@@ -140,18 +140,26 @@ export function DiceLogPanel({
         }}
       >
         <span className={styles.title}>Hody</span>
-        <button
-          type="button"
-          className={styles.clear}
-          aria-label="Vymazat hody"
-          title="Vymazat hody z mého panelu"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClear();
-          }}
-        >
-          ✕
-        </button>
+        <div className={styles.headerActions}>
+          <button
+            type="button"
+            className={styles.clear}
+            aria-label="Vymazat hody"
+            title="Vymazat hody z mého panelu"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClear();
+            }}
+          >
+            ✕
+          </button>
+          <span
+            className={`${styles.chevron} ${open ? styles.chevronOpen : ""}`}
+            aria-hidden
+          >
+            ▾
+          </span>
+        </div>
       </header>
 
       {open && (

@@ -65,35 +65,36 @@
   min-height: 100vh;
 }
 
-/* 10.2j G3 — cluster kostek vlevo dole (tlačítko „vlastní hod" nad logem hodů).
-   Default (hráč): bottom:20px. PJ: nad MapPjPanelem (bottom:20px) → posuneme
-   výš o jeho přibližnou výšku. Offset 360px je odhad (PJ panel je dynamický);
-   limitace zdokumentována v plánu. Mobilní fallback: nahoru, ať nepřekrývá
-   PJ panel zabírající dolní lištu. */
-.diceSlot {
+/* 10.2j — sloupec vlevo dole: tlačítko „vlastní hod" + log hodů + orchestrace.
+   Kontejner je ukotvený k bottom:20px, výška je dána obsahem → s rozbalením
+   orchestrace roste vzhůru, takže log zůstává PŘÍMO nad orchestrací a hýbe se
+   s ní (žádný fixní offset). Šířka 320px = shodná s orchestračním panelem.
+   pointer-events:none na kontejneru + auto na dětech → mezery nechytají klik. */
+.bottomLeftStack {
   position: absolute;
   left: 20px;
   bottom: 20px;
-  z-index: 95;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  z-index: 90;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  align-items: flex-start;
-  pointer-events: auto;
+  pointer-events: none;
 }
-.diceSlotPj {
-  bottom: 360px;
+.bottomLeftStack > * {
+  pointer-events: auto;
 }
 .diceButtonRow {
   display: flex;
+  align-self: flex-start;
 }
 @media (max-width: 480px) {
-  .diceSlot {
+  .bottomLeftStack {
     left: 12px;
+    right: 12px;
     bottom: 12px;
-  }
-  .diceSlotPj {
-    bottom: auto;
-    top: 64px;
+    width: auto;
+    max-width: none;
   }
 }

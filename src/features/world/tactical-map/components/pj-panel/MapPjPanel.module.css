@@ -3,13 +3,11 @@
  * Sbalitelný — default sbalený, PJ rozbalí kliknutím.
  */
 .panel {
-  /* 10.2c-edit-4 — přesun z right-top do left-bottom (user feedback).
-     Solid background (žádné průsvitné rgba/blur — user feedback). */
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  width: 320px;
-  max-width: calc(100vw - 24px);
+  /* 10.2c-edit-4 — left-bottom, solid background (user feedback).
+     10.2j — už se nepozicuje sám; sedí in-flow ve společném `bottomLeftStack`
+     (TacticalMapView) pod logem hodů. Šířku/pozici řídí kontejner. */
+  position: relative;
+  width: 100%;
   max-height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
@@ -18,7 +16,6 @@
   border: 1px solid rgba(120, 100, 255, 0.45);
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
-  z-index: 90;
   pointer-events: auto;
   overflow: hidden;
   font-family: var(--font-mono);
@@ -28,10 +25,6 @@
    šířku ve spodu s 12px paddingem ze stran, hlavička poskytne větší touch target. */
 @media (max-width: 480px) {
   .panel {
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    width: auto;
     max-height: calc(100vh - 140px);
   }
 

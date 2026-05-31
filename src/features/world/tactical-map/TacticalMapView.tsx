@@ -1139,15 +1139,6 @@ export function TacticalMapView(): React.ReactElement {
       {showHidden && <MapHiddenOverlay />}
       {showLocked && <MapLockedOverlay />}
 
-      {isPJ && worldId && currentUser && (
-        <MapPjPanel
-          worldId={worldId}
-          currentScene={scene}
-          currentUserId={currentUser.id}
-          onStartPlacement={placement.start}
-        />
-      )}
-
       {placement.state.active && (
         <MapPlacementBanner
           payload={placement.state.payload}
@@ -1413,28 +1404,42 @@ export function TacticalMapView(): React.ReactElement {
         />
       </div>
 
-      {/* 10.2j G3 — kostky vlevo dole: tlačítko „vlastní hod" nad logem hodů.
-          Cluster nad PJ orchestračním panelem (MapPjPanel bottom:20px), aby ho
-          nepřekrýval. Vpravo dole sedí dock nástrojů → kostky jsou vlevo. */}
-      {scene && currentUser && (
-        <div className={`${styles.diceSlot} ${isPJ ? styles.diceSlotPj : ""}`}>
-          <div className={styles.diceButtonRow}>
-            <DiceRollButton
-              worldId={worldId ?? ""}
-              worldSlug={world?.slug ?? ""}
-              worldDice={world?.dice ?? []}
-              canManageWorld={isPJ}
-              onRoll={(dicePayload) =>
-                mapDice.roll({ category: "custom", dicePayload })
-              }
+      {/* 10.2j — sjednocený sloupec vlevo dole: tlačítko „vlastní hod" + log hodů
+          + orchestrace (PJ). Log sedí PŘÍMO nad orchestrací a hýbe se s jejím
+          rozbalením (společný bottom-anchored flex kontejner). Kostky vyžadují
+          aktivní scénu; orchestrace se zobrazí i bez ní (PJ přes ni scény
+          aktivuje), proto je kontejner podmíněn `scene || isPJ`. */}
+      {worldId && currentUser && (scene || isPJ) && (
+        <div className={styles.bottomLeftStack}>
+          {scene && (
+            <>
+              <div className={styles.diceButtonRow}>
+                <DiceRollButton
+                  worldId={worldId}
+                  worldSlug={world?.slug ?? ""}
+                  worldDice={world?.dice ?? []}
+                  canManageWorld={isPJ}
+                  onRoll={(dicePayload) =>
+                    mapDice.roll({ category: "custom", dicePayload })
+                  }
+                />
+              </div>
+              <DiceLogPanel
+                rolls={scene.diceRolls ?? []}
+                viewer={{ userId: currentUser.id, isPj: isPJ }}
+                visibility={world?.diceVisibility}
+                sceneId={scene.id}
+              />
+            </>
+          )}
+          {isPJ && (
+            <MapPjPanel
+              worldId={worldId}
+              currentScene={scene}
+              currentUserId={currentUser.id}
+              onStartPlacement={placement.start}
             />
-          </div>
-          <DiceLogPanel
-            rolls={scene.diceRolls ?? []}
-            viewer={{ userId: currentUser.id, isPj: isPJ }}
-            visibility={world?.diceVisibility}
-            sceneId={scene.id}
-          />
+          )}
         </div>
       )}
 
