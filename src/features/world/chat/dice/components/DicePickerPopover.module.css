@@ -48,6 +48,12 @@
   border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.1));
 }
 
+.headerActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .headerGear {
   display: inline-flex;
   align-items: center;

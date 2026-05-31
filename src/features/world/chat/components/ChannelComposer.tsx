@@ -153,6 +153,7 @@ export function ChannelComposer({
   const [dicePickerOpen, setDicePickerOpen] = useState(false);
   const [poolPrompt, setPoolPrompt] = useState<'pool' | 'mixed' | null>(null);
   const [skinPickerOpen, setSkinPickerOpen] = useState(false);
+  const [skinPickerJail, setSkinPickerJail] = useState(false);
   const diceBtnRef = useRef<HTMLButtonElement>(null);
   const { getSkin } = useDiceSkinMapping(worldId);
   const diceOverlay = useDiceRollOverlay();
@@ -707,7 +708,14 @@ export function ChannelComposer({
             worldSlug={worldSlug}
             canManageWorld={canManage}
             getSkin={getSkin}
-            onOpenSkinPicker={() => setSkinPickerOpen(true)}
+            onOpenSkinPicker={() => {
+              setSkinPickerJail(false);
+              setSkinPickerOpen(true);
+            }}
+            onOpenJail={() => {
+              setSkinPickerJail(true);
+              setSkinPickerOpen(true);
+            }}
             onOpenPoolPrompt={(kind) => setPoolPrompt(kind)}
             onRoll={sendDiceRoll}
           />
@@ -982,6 +990,7 @@ export function ChannelComposer({
         open={skinPickerOpen}
         onClose={() => setSkinPickerOpen(false)}
         worldId={worldId}
+        initialJail={skinPickerJail}
       />
     </div>
   );

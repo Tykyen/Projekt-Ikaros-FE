@@ -36,6 +36,7 @@ export function DiceRollButton({
 }: DiceRollButtonProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [skinPickerOpen, setSkinPickerOpen] = useState(false);
+  const [skinPickerJail, setSkinPickerJail] = useState(false);
   const [poolPrompt, setPoolPrompt] = useState<"pool" | "mixed" | null>(null);
   const anchorRef = useRef<HTMLButtonElement>(null);
   const { getSkin } = useDiceSkinMapping(worldId);
@@ -67,7 +68,14 @@ export function DiceRollButton({
         worldSlug={worldSlug}
         canManageWorld={canManageWorld}
         getSkin={getSkin}
-        onOpenSkinPicker={() => setSkinPickerOpen(true)}
+        onOpenSkinPicker={() => {
+          setSkinPickerJail(false);
+          setSkinPickerOpen(true);
+        }}
+        onOpenJail={() => {
+          setSkinPickerJail(true);
+          setSkinPickerOpen(true);
+        }}
         onOpenPoolPrompt={(kind) => setPoolPrompt(kind)}
         onRoll={handleRoll}
         align="right"
@@ -88,6 +96,7 @@ export function DiceRollButton({
         open={skinPickerOpen}
         onClose={() => setSkinPickerOpen(false)}
         worldId={worldId}
+        initialJail={skinPickerJail}
       />
     </div>
   );

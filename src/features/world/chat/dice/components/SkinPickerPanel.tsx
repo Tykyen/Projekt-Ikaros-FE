@@ -15,6 +15,8 @@ interface SkinPickerPanelProps {
   open: boolean;
   onClose: () => void;
   worldId: string;
+  /** Otevřít rovnou na záložce „Vězení" (rychlý přístup z popoveru). */
+  initialJail?: boolean;
 }
 
 /** Typ kostky pro top chips. `default` = fallback pro všechny typy. */
@@ -126,6 +128,7 @@ export function SkinPickerPanel({
   open,
   onClose,
   worldId,
+  initialJail = false,
 }: SkinPickerPanelProps) {
   const { getSkin, setSkin, jailed, toggleJail, isJailed } =
     useDiceSkinMapping(worldId);
@@ -161,6 +164,12 @@ export function SkinPickerPanel({
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
+
+  // Při každém otevření nastav počáteční záložku (skiny vs vězení) dle toho,
+  // přes kterou ikonu v popoveru uživatel přišel.
+  useEffect(() => {
+    if (open) setShowingJail(initialJail);
+  }, [open, initialJail]);
 
   // 6.3 perf — odstraněno: `preloadSkin` v useEffect tahalo všech ~70 textur
   // per skin × 8 skinů = 560 paralelních requestů. Místo toho karta používá

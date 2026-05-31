@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Layers, Plus, Sliders, Settings } from 'lucide-react';
+import {
+  ChevronDown,
+  Layers,
+  Plus,
+  Skull,
+  Sliders,
+  Settings,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   rollFate,
@@ -41,8 +48,10 @@ interface DicePickerPopoverProps {
   canManageWorld: boolean;
   /** Aktivní skin pro daný typ kostky (vrací `useDiceSkinMapping.getSkin`). */
   getSkin: (typeKey: string) => string;
-  /** Otevře `SkinPickerPanel` (renderovaný výš). */
+  /** Otevře `SkinPickerPanel` (renderovaný výš) na záložce skinů. */
   onOpenSkinPicker: () => void;
+  /** Otevře `SkinPickerPanel` rovnou na záložce „Vězení". Bez něj se ikona vězení neukáže. */
+  onOpenJail?: () => void;
   /** Otevře `PoolPromptModal` v Pool / Mixed režimu. */
   onOpenPoolPrompt: (kind: 'pool' | 'mixed') => void;
   /** Finální send hodu. Picker se po sendu automaticky zavře. */
@@ -77,6 +86,7 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
   canManageWorld,
   getSkin,
   onOpenSkinPicker,
+  onOpenJail,
   onOpenPoolPrompt,
   onRoll,
   align = 'left',
@@ -156,18 +166,34 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
     >
       <div className={styles.header}>
         <span className={styles.headerTitle}>Hod kostkou</span>
-        <button
-          type="button"
-          className={styles.headerGear}
-          title="Vzhled mých kostek"
-          aria-label="Vzhled mých kostek"
-          onClick={() => {
-            onOpenSkinPicker();
-            onClose();
-          }}
-        >
-          <Settings size={15} aria-hidden="true" />
-        </button>
+        <div className={styles.headerActions}>
+          {onOpenJail && (
+            <button
+              type="button"
+              className={styles.headerGear}
+              title="Vězení kostek"
+              aria-label="Vězení kostek"
+              onClick={() => {
+                onOpenJail();
+                onClose();
+              }}
+            >
+              <Skull size={15} aria-hidden="true" />
+            </button>
+          )}
+          <button
+            type="button"
+            className={styles.headerGear}
+            title="Vzhled mých kostek"
+            aria-label="Vzhled mých kostek"
+            onClick={() => {
+              onOpenSkinPicker();
+              onClose();
+            }}
+          >
+            <Settings size={15} aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       {allowedKeys.length === 0 ? (
