@@ -1,3 +1,5 @@
+import type { DicePayload } from '@/features/world/chat/dice/lib/dicePayload';
+
 /**
  * 10.2a — typy pro renderer jádro taktické mapy.
  *
@@ -16,6 +18,22 @@
 export interface ExplosionRing {
   radius: number;
   damage: number;
+}
+
+export type DiceRollerKind = 'pc' | 'pj' | 'npc' | 'bestie';
+export type DiceRollCategory = 'skill' | 'initiative' | 'custom';
+
+export interface MapDiceRoll {
+  id: string;
+  /** ISO timestamp. */
+  rolledAt: string;
+  byUserId: string;
+  rollerName: string;
+  rollerKind: DiceRollerKind;
+  category: DiceRollCategory;
+  /** Token, za který se hází (skill/init); chybí u custom. */
+  tokenId?: string;
+  dicePayload: DicePayload;
 }
 
 export interface MapEffect {
@@ -158,6 +176,8 @@ export interface MapScene {
   lastSeqNumber: number;
   /** Combat subdoc (10.2f); `null`/undefined = boj neaktivní. */
   combat?: CombatState | null;
+  /** 10.2j — persistovaná historie hodů (cap 50, nejnovější na konci). */
+  diceRolls?: MapDiceRoll[];
   /**
    * 10.2c-edit-7 — per-scéna whitelist Character.id (PC + NPC).
    * Spawn z palety jen z tohoto setu. Default `[]`.
@@ -234,7 +254,9 @@ export type MapOperation =
   // NPC template
   | { type: 'npcTemplate.add'; template: MapSceneNpc }
   | { type: 'npcTemplate.remove'; templateId: string }
-  | { type: 'npcTemplate.update'; templateId: string; patch: Partial<MapSceneNpc> };
+  | { type: 'npcTemplate.update'; templateId: string; patch: Partial<MapSceneNpc> }
+  // Dice (10.2j)
+  | { type: 'dice.roll'; roll: MapDiceRoll };
 
 /** Cross-scene operace (member.* assignment). Mirror BE `WorldOperationPayload`. */
 export type WorldOperation =
