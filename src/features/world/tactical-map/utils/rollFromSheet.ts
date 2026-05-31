@@ -10,16 +10,21 @@
  *
  * Format zpráv mirror Matrix old `formatFateMessage`.
  */
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import {
   rollFate,
   rollGenericDice,
   type RollKind,
-} from '@/features/world/chat/dice/lib/rollEngine';
+} from "@/features/world/chat/dice/lib/rollEngine";
 import {
   formatFateMessage,
   formatGenericDiceMessage,
-} from '@/features/world/chat/dice/lib/formatMessage';
+} from "@/features/world/chat/dice/lib/formatMessage";
+import {
+  buildFatePayload,
+  buildGenericPayload,
+  type DicePayload,
+} from "@/features/world/chat/dice/lib/dicePayload";
 
 export interface RollRequest {
   /** Lidský label (jméno dovednosti / „Iniciativa"). */
@@ -35,28 +40,41 @@ export interface RollRequest {
   rollerName?: string;
 }
 
-export function performSheetRoll(req: RollRequest): number | null {
-  const { label, modifier = 0, kind = 'fate', rollerName = 'Postava' } = req;
+/**
+ * 10.2j Task H — vedle `total` vrací i strukturovaný `dicePayload`, aby
+ * volající (token panel) mohl hod nasměrovat do map dice systému
+ * (`useMapDiceRoll.roll` → 3D overlay + persist do map dice logu).
+ */
+export interface SheetRollResult {
+  total: number;
+  dicePayload: DicePayload;
+}
+
+export function performSheetRoll(req: RollRequest): SheetRollResult | null {
+  const { label, modifier = 0, kind = "fate", rollerName = "Postava" } = req;
 
   let message: string;
   let total: number;
+  let dicePayload: DicePayload;
 
-  if (kind === 'fate') {
+  if (kind === "fate") {
     const r = rollFate();
     total = r.sum + modifier;
     message = formatFateMessage(label, modifier, r);
+    dicePayload = buildFatePayload(r, { label, modifier });
   } else if (
-    kind === 'd4' ||
-    kind === 'd6' ||
-    kind === 'd8' ||
-    kind === 'd10' ||
-    kind === 'd12' ||
-    kind === 'd20' ||
-    kind === 'd100'
+    kind === "d4" ||
+    kind === "d6" ||
+    kind === "d8" ||
+    kind === "d10" ||
+    kind === "d12" ||
+    kind === "d20" ||
+    kind === "d100"
   ) {
     const r = rollGenericDice(kind);
     total = r.sum + modifier;
     message = formatGenericDiceMessage(label, modifier, r);
+    dicePayload = buildGenericPayload(r, { label, modifier });
   } else {
     // pool/mixed nepodporováno z deníku v MVP
     toast.error(`Roll kind ${kind} není podporován ze sheet`);
@@ -65,10 +83,10 @@ export function performSheetRoll(req: RollRequest): number | null {
 
   // Toast s formátovanou zprávou
   toast.success(message, {
-    description: `${rollerName} — Celkem: ${total >= 0 ? '+' : ''}${total}`,
+    description: `${rollerName} — Celkem: ${total >= 0 ? "+" : ""}${total}`,
     duration: 5000,
   });
-  // 10.2f — vrací total, ať volající (token panel) může zapsat hod iniciativy
-  // do `token.initiative` (combat tracker).
-  return total;
+  // 10.2f/10.2j — vrací total (zápis iniciativy do `token.initiative`) +
+  // dicePayload (směrování do map dice overlay / logu přes onMapRoll).
+  return { total, dicePayload };
 }

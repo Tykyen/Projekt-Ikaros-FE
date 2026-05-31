@@ -16,23 +16,24 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9g.md §B; rozšíření 9h.
  */
-import { useEffect, useRef, type ComponentType } from 'react';
-import { DiaryTab } from '@/features/world/pages/CharacterDetailPage/components/DiaryTab';
-import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
-import { useWorldContext } from '@/features/world/context/WorldContext';
-import { performSheetRoll } from '../../utils/rollFromSheet';
-import { useTokenUpdate } from '../../hooks/useTokenUpdate';
-import type { SystemSheetProps } from '@/features/world/pages/CharacterDetailPage/diary-systems/types';
-import type { MapToken } from '../../types';
-import { tokenIsBestie } from '../../utils/tokenIsBestie';
-import { BestiePanelView } from './BestiePanelView';
-import { MatrixCombatPanel } from './system-panels/MatrixCombatPanel';
-import { DndCombatPanel } from './system-panels/DndCombatPanel';
-import { CocCombatPanel } from './system-panels/CocCombatPanel';
-import { Drd2CombatPanel } from './system-panels/Drd2CombatPanel';
-import { FateCombatPanel } from './system-panels/FateCombatPanel';
-import { GurpsCombatPanel } from './system-panels/GurpsCombatPanel';
-import styles from './TokenSystemSheet.module.css';
+import { useEffect, useRef, type ComponentType } from "react";
+import { DiaryTab } from "@/features/world/pages/CharacterDetailPage/components/DiaryTab";
+import { useCharacterDiary } from "@/features/world/pages/api/useCharacterSubdocs";
+import { useWorldContext } from "@/features/world/context/WorldContext";
+import { performSheetRoll } from "../../utils/rollFromSheet";
+import { useTokenUpdate } from "../../hooks/useTokenUpdate";
+import type { SystemSheetProps } from "@/features/world/pages/CharacterDetailPage/diary-systems/types";
+import type { MapToken } from "../../types";
+import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
+import { tokenIsBestie } from "../../utils/tokenIsBestie";
+import { BestiePanelView } from "./BestiePanelView";
+import { MatrixCombatPanel } from "./system-panels/MatrixCombatPanel";
+import { DndCombatPanel } from "./system-panels/DndCombatPanel";
+import { CocCombatPanel } from "./system-panels/CocCombatPanel";
+import { Drd2CombatPanel } from "./system-panels/Drd2CombatPanel";
+import { FateCombatPanel } from "./system-panels/FateCombatPanel";
+import { GurpsCombatPanel } from "./system-panels/GurpsCombatPanel";
+import styles from "./TokenSystemSheet.module.css";
 
 /** Per-system kompaktní combat panel registry. Klíč = `world.system`. */
 interface CombatPanelProps {
@@ -42,7 +43,7 @@ interface CombatPanelProps {
   canEdit: boolean;
   // Sdílený tvar s deníkovými sheety (`SystemSheetProps`), ať registry sedí
   // všem panelům (CoC používá d100, modifier volitelný).
-  onRoll?: SystemSheetProps['onRoll'];
+  onRoll?: SystemSheetProps["onRoll"];
 }
 
 const COMBAT_PANELS: Record<string, ComponentType<CombatPanelProps>> = {
@@ -60,6 +61,12 @@ interface Props {
   worldId: string;
   canEdit: boolean;
   onDirtyChange?: (dirty: boolean) => void;
+  /**
+   * 10.2j Task H — směruje sheet hody (skill + iniciativa) do map dice
+   * systému (3D overlay + persist do map dice logu). Pokud chybí (CHAT /
+   * CharacterDetailPage embed), hod se chová po staru (jen toast).
+   */
+  onMapRoll?: (req: MapRollRequest) => void;
 }
 
 export function TokenSystemSheet({
@@ -68,6 +75,7 @@ export function TokenSystemSheet({
   worldId,
   canEdit,
   onDirtyChange,
+  onMapRoll,
 }: Props): React.ReactElement {
   const { world } = useWorldContext();
   // 10.2c-edit-9g Fáze E — Matrix-specific sync diary → token. Když user
@@ -76,7 +84,7 @@ export function TokenSystemSheet({
   // ostatní hráči vidí přes WS broadcast). Reverse sync (token → diary)
   // defer na BE 10.2i (žádný WS pro character diary).
   useMatrixDiaryToTokenSync({
-    enabled: world?.system === 'matrix' && canEdit,
+    enabled: world?.system === "matrix" && canEdit,
     token,
     sceneId,
     worldId,
@@ -92,37 +100,51 @@ export function TokenSystemSheet({
         token={token}
         sceneId={sceneId}
         worldId={worldId}
-        systemId={world?.system ?? 'generic'}
+        systemId={world?.system ?? "generic"}
         canEdit={canEdit}
+        onMapRoll={onMapRoll}
       />
     );
   }
 
   const rollerName =
-    token.instanceName ?? token.characterData?.name ?? 'Postava';
+    token.instanceName ?? token.characterData?.name ?? "Postava";
+  // 10.2j Task H — token je tady vždy ne-bestie (bestie větev vrací výše).
+  // Rozlišíme NPC vs PC dle `isNpc` discriminatoru (stejný jako spawn/HP).
+  const rollerKind: NonNullable<MapRollRequest["rollerKind"]> = token.isNpc
+    ? "npc"
+    : "pc";
 
-  const onRoll: NonNullable<CombatPanelProps['onRoll']> = (req) => {
-    const total = performSheetRoll({
+  const onRoll: NonNullable<CombatPanelProps["onRoll"]> = (req) => {
+    const res = performSheetRoll({
       label: req.label,
       modifier: req.modifier,
       kind: req.kind,
       rollerName,
     });
+    if (!res) return;
+    const isInit = /iniciativ/i.test(req.label);
+    // 10.2j Task H — hod nasměruj do map dice systému (3D overlay + map log).
+    onMapRoll?.({
+      category: isInit ? "initiative" : "skill",
+      dicePayload: res.dicePayload,
+      tokenId: token.id,
+      rollerKind,
+      rollerName,
+    });
     // 10.2f — hod iniciativy z panelu se propíše do token.initiative
     // (objeví se v iniciativní liště). Detekce dle labelu „Iniciativa".
-    if (total !== null && /iniciativ/i.test(req.label)) {
+    if (isInit) {
       initiativeUpdate.mutate({
         tokenId: token.id,
-        patch: { initiative: total },
+        patch: { initiative: res.total },
       });
     }
   };
 
   // 10.2c-edit-9h — per-system kompaktní combat panel (Matrix/DnD/CoC/Drd2/
   // Fate/GURPS). Ostatní systémy fallback na DiaryTab embed (legacy).
-  const SystemPanel = world?.system
-    ? COMBAT_PANELS[world.system]
-    : undefined;
+  const SystemPanel = world?.system ? COMBAT_PANELS[world.system] : undefined;
 
   if (SystemPanel) {
     return (
@@ -142,7 +164,7 @@ export function TokenSystemSheet({
     <div className={styles.sheet}>
       <DiaryTab
         slug={token.characterSlug}
-        mode={canEdit ? 'edit' : 'view'}
+        mode={canEdit ? "edit" : "view"}
         onExitEdit={() => {
           /* panel close = exit */
         }}
@@ -186,9 +208,8 @@ function useMatrixDiaryToTokenSync({
   useEffect(() => {
     if (!enabled || !diary) return;
     const cd = diary.customData ?? {};
-    const matrixHealth =
-      parseInt(String(cd.matrix_health ?? '5'), 10) || 0;
-    const matrixArmor = parseInt(String(cd.matrix_armor ?? '0'), 10) || 0;
+    const matrixHealth = parseInt(String(cd.matrix_health ?? "5"), 10) || 0;
+    const matrixArmor = parseInt(String(cd.matrix_armor ?? "0"), 10) || 0;
 
     // První render = baseline, žádný push (token už má serverové hodnoty)
     if (lastSyncedRef.current === null) {
@@ -213,4 +234,3 @@ function useMatrixDiaryToTokenSync({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, diary, token.id]);
 }
-

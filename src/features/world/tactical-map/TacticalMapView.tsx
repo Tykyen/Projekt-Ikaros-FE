@@ -1316,6 +1316,11 @@ export function TacticalMapView(): React.ReactElement {
                 sceneId={scene.id}
                 worldId={worldId}
                 canEdit={editable}
+                // 10.2j Task H — sheet hody (skill + iniciativa) směruj do map
+                // dice systému (3D overlay + map log). Gate dle `editable`
+                // (= canDrag: PJ na všechno, hráč jen vlastní token) → hráč
+                // nehází za cizí token (BE authorizer by to stejně 403).
+                onMapRoll={editable ? mapDice.roll : undefined}
               />
             </TokenInfoPanel>
           );

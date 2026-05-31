@@ -10,29 +10,38 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9bc.md §3.2.
  */
-import { DiaryTab } from '@/features/world/pages/CharacterDetailPage/components/DiaryTab';
-import styles from './TokenDiaryTab.module.css';
+import { DiaryTab } from "@/features/world/pages/CharacterDetailPage/components/DiaryTab";
+import type { SystemSheetProps } from "@/features/world/pages/CharacterDetailPage/diary-systems/types";
+import styles from "./TokenDiaryTab.module.css";
 
 interface Props {
   characterSlug: string;
   canEdit: boolean;
   onDirtyChange: (dirty: boolean) => void;
+  /**
+   * 10.2j Task H — forward sheet roll handler do embedded DiaryTab, ať klik
+   * na dovednost/iniciativu v deníku zamíří do map dice systému. Bez něj
+   * deníkové rolly na mapě no-opovaly (bug fix).
+   */
+  onRoll?: SystemSheetProps["onRoll"];
 }
 
 export function TokenDiaryTab({
   characterSlug,
   canEdit,
   onDirtyChange,
+  onRoll,
 }: Props): React.ReactElement {
   return (
     <div className={styles.embed}>
       <DiaryTab
         slug={characterSlug}
-        mode={canEdit ? 'edit' : 'view'}
+        mode={canEdit ? "edit" : "view"}
         onExitEdit={() => {
           /* Modal close = exit; in-tab toggle disabled */
         }}
         onDirtyChange={onDirtyChange}
+        onRoll={onRoll}
       />
     </div>
   );

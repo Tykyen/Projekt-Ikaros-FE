@@ -7,13 +7,14 @@
  * Bestie nemá Character record / deník — jen statblok (per-system schema)
  * + `bestie.notes` z bestiarQueryKey cache (PJ-only).
  */
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { BestieStatblock } from '../tokens/BestieStatblock';
-import { useTokenUpdate } from '../../hooks/useTokenUpdate';
-import { performSheetRoll } from '../../utils/rollFromSheet';
-import type { MapToken } from '../../types';
-import styles from './TokenSystemSheet.module.css';
+import { useState } from "react";
+import { toast } from "sonner";
+import { BestieStatblock } from "../tokens/BestieStatblock";
+import { useTokenUpdate } from "../../hooks/useTokenUpdate";
+import { performSheetRoll } from "../../utils/rollFromSheet";
+import type { MapToken } from "../../types";
+import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
+import styles from "./TokenSystemSheet.module.css";
 
 interface Props {
   token: MapToken;
@@ -21,6 +22,11 @@ interface Props {
   worldId: string;
   systemId: string;
   canEdit: boolean;
+  /**
+   * 10.2j Task H — směruje bestie hody (statblok schopnosti + iniciativa)
+   * do map dice systému (3D overlay + map log). Bez něj jen toast.
+   */
+  onMapRoll?: (req: MapRollRequest) => void;
 }
 
 export function BestiePanelView({
@@ -29,19 +35,20 @@ export function BestiePanelView({
   worldId,
   systemId,
   canEdit,
+  onMapRoll,
 }: Props): React.ReactElement {
   // BC fallback: pokud systemStats prázdné, mapuj z fixed pole.
   const initialStats =
     token.systemStats && Object.keys(token.systemStats).length > 0
       ? token.systemStats
       : {
-          'health.current': token.currentHp,
-          'health.max': token.maxHp,
+          "health.current": token.currentHp,
+          "health.max": token.maxHp,
           armor: token.armor,
           injury: token.injury,
           movement: token.movement,
-          'initiative.current': token.initiative,
-          'initiative.base': token.initiativeBase,
+          "initiative.current": token.initiative,
+          "initiative.base": token.initiativeBase,
         };
 
   const [stats, setStats] = useState<Record<string, unknown>>(initialStats);
@@ -51,10 +58,10 @@ export function BestiePanelView({
     update.mutate(
       { tokenId: token.id, patch: { systemStats: stats } },
       {
-        onSuccess: () => toast.success('Statblok uložen'),
+        onSuccess: () => toast.success("Statblok uložen"),
         onError: (e) =>
           toast.error(
-            `Save selhal: ${e instanceof Error ? e.message : 'neznámá chyba'}`,
+            `Save selhal: ${e instanceof Error ? e.message : "neznámá chyba"}`,
           ),
       },
     );
@@ -62,19 +69,28 @@ export function BestiePanelView({
 
   const handleInitiativeRoll = (): void => {
     const initBase =
-      Number(stats['initiative.base'] ?? token.initiativeBase ?? 0) || 0;
-    const total = performSheetRoll({
-      label: 'Iniciativa',
+      Number(stats["initiative.base"] ?? token.initiativeBase ?? 0) || 0;
+    const rollerName = token.instanceName ?? "Bestie";
+    const res = performSheetRoll({
+      label: "Iniciativa",
       modifier: initBase,
-      kind: 'fate',
-      rollerName: token.instanceName ?? 'Bestie',
+      kind: "fate",
+      rollerName,
     });
     // 10.2f — propsat hod do token.initiative (iniciativní lišta řadí dle něj)
     // + lokální statbar („Init aktuální"). systemStats se uloží zvlášť přes
     // „Uložit statblok"; initiative jde do tokenu hned.
-    if (total !== null) {
-      update.mutate({ tokenId: token.id, patch: { initiative: total } });
-      setStats((s) => ({ ...s, 'initiative.current': total }));
+    if (res) {
+      // 10.2j Task H — hod do map dice systému (overlay + map log).
+      onMapRoll?.({
+        category: "initiative",
+        dicePayload: res.dicePayload,
+        tokenId: token.id,
+        rollerKind: "bestie",
+        rollerName,
+      });
+      update.mutate({ tokenId: token.id, patch: { initiative: res.total } });
+      setStats((s) => ({ ...s, "initiative.current": res.total }));
     }
   };
 
@@ -84,12 +100,23 @@ export function BestiePanelView({
     label: string;
     value: string;
   }): void => {
-    performSheetRoll({
+    const rollerName = token.instanceName ?? "Bestie";
+    const res = performSheetRoll({
       label: ability.label,
       modifier: parseInt(ability.value, 10) || 0,
-      kind: 'fate',
-      rollerName: token.instanceName ?? 'Bestie',
+      kind: "fate",
+      rollerName,
     });
+    // 10.2j Task H — hod do map dice systému (overlay + map log).
+    if (res) {
+      onMapRoll?.({
+        category: "skill",
+        dicePayload: res.dicePayload,
+        tokenId: token.id,
+        rollerKind: "bestie",
+        rollerName,
+      });
+    }
   };
 
   return (
@@ -122,7 +149,7 @@ export function BestiePanelView({
             onClick={handleSave}
             disabled={update.isPending}
           >
-            {update.isPending ? 'Ukládám…' : '💾 Uložit statblok'}
+            {update.isPending ? "Ukládám…" : "💾 Uložit statblok"}
           </button>
         </div>
       )}
