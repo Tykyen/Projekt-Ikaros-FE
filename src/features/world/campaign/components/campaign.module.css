@@ -295,6 +295,12 @@
   gap: var(--sp-3);
   align-items: start;
 }
+.linkyLayout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+}
 .rail,
 .main,
 .detailPanel {
@@ -616,7 +622,7 @@
   .subjektyLayout {
     grid-template-columns: 220px minmax(0, 1fr);
   }
-  .detailPanel {
+  .subjektyLayout .detailPanel {
     grid-column: 1 / -1;
   }
 }
@@ -625,7 +631,8 @@
   .root {
     padding: var(--sp-3);
   }
-  .subjektyLayout {
+  .subjektyLayout,
+  .linkyLayout {
     grid-template-columns: 1fr;
   }
   .rail,

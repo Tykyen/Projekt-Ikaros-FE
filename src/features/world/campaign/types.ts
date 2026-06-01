@@ -141,6 +141,21 @@ export interface CampaignStoryline {
   updatedAt: string;
 }
 
+export interface CreateStorylineInput {
+  title: string;
+  level?: CampaignStorylineLevel;
+  status?: CampaignStorylineStatus;
+  summary?: string;
+  whatHappened?: string;
+  truth?: string;
+  playersBelief?: string;
+  gmIntent?: string;
+  nextStep?: string;
+  subjectIds?: string[];
+  relationshipIds?: string[];
+  isShared?: boolean;
+}
+
 // ── Rychlé poznámky (v 11.1 jen čteno — připnuté v dashboardu) ───────────────
 
 export interface CampaignQuickNote {

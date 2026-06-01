@@ -1,5 +1,7 @@
 import type {
   CampaignRelationshipStatus,
+  CampaignStorylineLevel,
+  CampaignStorylineStatus,
   CampaignSubjectStatus,
   CampaignSubjectType,
 } from './types';
@@ -40,6 +42,34 @@ export const REL_STATUSES: CampaignRelationshipStatus[] = [
   'active',
   'dormant',
   'crisis',
+  'closed',
+];
+
+export const STORYLINE_LEVEL_LABELS: Record<CampaignStorylineLevel, string> = {
+  macro: 'Makro',
+  mid: 'Střední',
+  micro: 'Mikro',
+};
+
+export const STORYLINE_STATUS_LABELS: Record<CampaignStorylineStatus, string> = {
+  active: 'Aktivní',
+  dormant: 'Spící',
+  escalating: 'Eskalace',
+  climax: 'Vyvrcholení',
+  closed: 'Uzavřená',
+};
+
+export const STORYLINE_LEVELS: CampaignStorylineLevel[] = [
+  'macro',
+  'mid',
+  'micro',
+];
+
+export const STORYLINE_STATUSES: CampaignStorylineStatus[] = [
+  'active',
+  'dormant',
+  'escalating',
+  'climax',
   'closed',
 ];
 

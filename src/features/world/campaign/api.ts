@@ -14,6 +14,7 @@ import type {
   CampaignStoryline,
   CampaignSubject,
   CreateRelationshipInput,
+  CreateStorylineInput,
   CreateSubjectInput,
 } from './types';
 
@@ -167,6 +168,39 @@ export function useDeleteRelationship(worldId: string) {
   return useMutation({
     mutationFn: (id: string) =>
       api.delete<void>(`/campaign/relationships/${id}?worldId=${worldId}`),
+    onSuccess: () => invalidateCampaign(qc, worldId),
+  });
+}
+
+export function useCreateStoryline(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateStorylineInput) =>
+      api.post<CampaignStoryline>(
+        `/campaign/storylines?worldId=${worldId}`,
+        input,
+      ),
+    onSuccess: () => invalidateCampaign(qc, worldId),
+  });
+}
+
+export function useUpdateStoryline(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: CreateStorylineInput }) =>
+      api.put<CampaignStoryline>(
+        `/campaign/storylines/${id}?worldId=${worldId}`,
+        input,
+      ),
+    onSuccess: () => invalidateCampaign(qc, worldId),
+  });
+}
+
+export function useDeleteStoryline(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.delete<void>(`/campaign/storylines/${id}?worldId=${worldId}`),
     onSuccess: () => invalidateCampaign(qc, worldId),
   });
 }

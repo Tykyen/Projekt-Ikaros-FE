@@ -225,7 +225,7 @@ const SOON_WORLD: PageDoc[] = [
     status: "soon",
     fáze: "Fáze 11.2–11.3",
     who: "PJ (PomocnyPJ na úrovni čtení)",
-    what: "Příběhové linky a scénáře, rychlé poznámky a obchod světa — navážou na Pavučinu (11.1, už funguje).",
+    what: "Scénáře (delší rozpracované příběhy), rychlé poznámky a obchod světa. Příběhové linky už fungují v Pavučině (záložka Linky).",
   },
 ];
 
@@ -390,7 +390,7 @@ const WORLD_PAGES_OK: PageDoc[] = [
     name: "Pavučina",
     status: "ok",
     who: "Členové světa (každý má vlastní Pavučinu; PJ navíc vidí Pavučinu každého hráče jen pro čtení)",
-    what: 'Vztahový graf kampaně. **Každý má svou vlastní Pavučinu** — síť subjektů (Postava, CP, Frakce, Organizace, Stát, Lokace, Ostatní) a **oboustranných vztahů** mezi nimi. PJ má svou pracovní vrstvu a přepínačem nahoře si zobrazí Pavučinu kteréhokoli hráče (jen pro čtení — needituje ji, ale jednotlivé subjekty si může tlačítkem 📋 zkopírovat do své vrstvy). Vztah má **dvě nezávislé strany** (A může milovat, B nenávidět): u každé strany zvolíš pojmenovanou emoci (paleta se liší pro osoby vs. organizace/státy), sílu 1–10 a valenci −3…+3 (nenávist ↔ láska / válka ↔ spojenectví); PJ má navíc tajná pole (záměr, pozadí), která hráč nevidí. Tři záložky: **◉ Dnes** (vztahy v krizi, aktivní linky, poslední změny), **Subjekty** (3-panel — seznam, vztahy vybraného subjektu, detail) a **Síť** — 2D silový graf, kde uzly mají barvu dle typu a hrany barvu dle emoce (červená nepřátelství → zelená přátelství) a tloušťku dle síly. V grafu klikni na uzel pro **fokus** (zvýrazní jeho okolí, zbytek ztlumí), filtruj dle typu/emoce nebo hledej a vycentruj. Příběhové linky a poznámky (fáze 11.2–11.3) se do Pavučiny postupně napojí.',
+    what: 'Vztahový graf kampaně. **Každý má svou vlastní Pavučinu** — síť subjektů (Postava, CP, Frakce, Organizace, Stát, Lokace, Ostatní) a **oboustranných vztahů** mezi nimi. PJ má svou pracovní vrstvu a přepínačem nahoře si zobrazí Pavučinu kteréhokoli hráče (jen pro čtení — needituje ji, ale jednotlivé subjekty si může tlačítkem 📋 zkopírovat do své vrstvy). Vztah má **dvě nezávislé strany** (A může milovat, B nenávidět): u každé strany zvolíš pojmenovanou emoci (paleta se liší pro osoby vs. organizace/státy), sílu 1–10 a valenci −3…+3 (nenávist ↔ láska / válka ↔ spojenectví); PJ má navíc tajná pole (záměr, pozadí), která hráč nevidí. Tři záložky: **◉ Dnes** (vztahy v krizi, aktivní linky, poslední změny), **Subjekty** (3-panel — seznam, vztahy vybraného subjektu, detail) a **Síť** — 2D silový graf, kde uzly mají barvu dle typu a hrany barvu dle emoce (červená nepřátelství → zelená přátelství) a tloušťku dle síly. V grafu klikni na uzel pro **fokus** (zvýrazní jeho okolí, zbytek ztlumí), filtruj dle typu/emoce nebo hledej a vycentruj. Záložka **Linky** = příběhové linky kampaně: úroveň (makro/střední/mikro), status, shrnutí, co se stalo, co si myslí hráči, další krok a zapojené subjekty (hledatelný výběr); PJ má navíc tajná pole (pravda, záměr). Aktivní linky se ukazují v „Dnes". Poznámky a scénáře přijdou v dalších krocích.',
   },
 ];
 

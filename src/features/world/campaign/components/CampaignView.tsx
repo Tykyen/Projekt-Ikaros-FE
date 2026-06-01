@@ -14,11 +14,12 @@ import type { CampaignRelationship } from '../types';
 import { LayerSwitcher } from './LayerSwitcher';
 import { DnesTab } from './DnesTab';
 import { SubjektyTab } from './SubjektyTab';
+import { LinkyTab } from './LinkyTab';
 import { PavucinaGraph } from './PavucinaGraph';
 import '../campaign.tokens.css';
 import s from './campaign.module.css';
 
-type TabId = 'dnes' | 'subjekty' | 'sit';
+type TabId = 'dnes' | 'subjekty' | 'linky' | 'sit';
 
 /** Orchestrátor Pavučiny — vrstvy, taby, sdílený výběr subjektu/vztahu. */
 export function CampaignView() {
@@ -68,6 +69,7 @@ export function CampaignView() {
   const tabs: TabItem[] = [
     { id: 'dnes', label: '◉ Dnes' },
     { id: 'subjekty', label: 'Subjekty' },
+    { id: 'linky', label: 'Linky' },
     { id: 'sit', label: 'Síť' },
   ];
 
@@ -121,6 +123,15 @@ export function CampaignView() {
             selRelId={selRelId}
             setSelRelId={setSelRelId}
             onSwitchToMine={() => setLayer('mine')}
+          />
+        ) : tab === 'linky' ? (
+          <LinkyTab
+            worldId={worldId}
+            storylines={storylines}
+            subjects={subjects}
+            readOnly={readOnly}
+            isPJ={isPJ}
+            onGoSubject={gotoSubject}
           />
         ) : (
           <PavucinaGraph
