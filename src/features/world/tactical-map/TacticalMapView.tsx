@@ -107,7 +107,13 @@ import { toast } from "sonner";
 import { parseApiError } from "@/shared/api";
 import { bestiarQueryKey, useBestiar } from "@/features/world/bestiar/hooks/useBestiar";
 import type { BestiarResponse, Bestie } from "@/features/world/bestiar/types";
-import type { MapOperation, MapToken, MapScene, MapDiceRoll } from "./types";
+import type {
+  MapOperation,
+  MapToken,
+  MapScene,
+  MapDiceRoll,
+  MapEffect,
+} from "./types";
 import styles from "./TacticalMapView.module.css";
 
 // PixiJS v8 @pixi/react JSX pragma — extend dovolí použít `pixiContainer`

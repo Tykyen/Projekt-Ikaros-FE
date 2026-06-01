@@ -6,7 +6,9 @@ import { render, screen } from '@testing-library/react';
 import { WorldGmDiaryPage } from '../WorldGmDiaryPage';
 
 const mockUseGmNotes = vi.fn();
-const mockUseUpdateGmNotes = vi.fn(() => ({ mutateAsync: vi.fn() }));
+const mockUseUpdateGmNotes = vi.fn((..._a: unknown[]) => ({
+  mutateAsync: vi.fn(),
+}));
 
 vi.mock('@/features/world/context/WorldContext', () => ({
   useWorldContext: () => ({ worldId: 'w1', world: { name: 'Aerie' } }),

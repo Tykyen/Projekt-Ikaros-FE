@@ -15,7 +15,7 @@ function tok(partial: Partial<MapToken>): MapToken {
     q: partial.q ?? 0,
     r: partial.r ?? 0,
     isNpc: partial.isNpc ?? false,
-  } as MapToken;
+  } as unknown as MapToken;
 }
 
 describe('fogBrushHexes', () => {

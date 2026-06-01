@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { catchUpScene } from './catchUpScene';
 import { getMapOperationsSince } from '../api/mapApi';
 import { applyOperationToScene } from './applyOperationToScene';
-import type { MapScene, MapOperation } from '../types';
+import type { MapScene, MapOperation, MapOperationLogEntry } from '../types';
 
 vi.mock('../api/mapApi', () => ({ getMapOperationsSince: vi.fn() }));
 vi.mock('./applyOperationToScene', () => ({
@@ -12,9 +12,11 @@ vi.mock('./applyOperationToScene', () => ({
 
 const baseScene = { id: 'scene1', lastSeqNumber: 5 } as unknown as MapScene;
 
-const entry = (seqNumber: number): { seqNumber: number; op: MapOperation } => ({
+const entry = (seqNumber: number): MapOperationLogEntry => ({
   seqNumber,
   op: { type: 'token.move', tokenId: `t${seqNumber}` } as unknown as MapOperation,
+  byUserId: 'u1',
+  appliedAt: '2026-05-31T08:00:00.000Z',
 });
 
 beforeEach(() => {

@@ -20,6 +20,7 @@ import { SoundCard } from './components/SoundCard';
 import {
   SoundFiltersBar,
   EMPTY_FILTERS,
+  type SoundFilters,
 } from './components/SoundFiltersBar';
 import { applyFilters, hasActiveFilters } from './lib/applyFilters';
 import { SoundFormModal } from './components/SoundFormModal';
