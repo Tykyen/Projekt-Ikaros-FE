@@ -19,6 +19,7 @@ import { toChatItems } from '@/features/chat/lib/chatItems';
 import type {
   ChatMessage,
   ChatItem,
+  ChatAttachment,
 } from '@/features/chat/lib/types';
 import {
   useChannelMessages,
@@ -337,9 +338,16 @@ export function ChannelView({
   const cancelEdit = useCallback(() => setEditingId(null), []);
 
   const saveEdit = useCallback(
-    async (messageId: string, content: string) => {
+    async (
+      messageId: string,
+      payload: {
+        content?: string;
+        attachmentsToAdd: ChatAttachment[];
+        attachmentsToRemove: string[];
+      },
+    ) => {
       try {
-        await editMutation.mutateAsync({ messageId, content });
+        await editMutation.mutateAsync({ messageId, ...payload });
         setEditingId(null);
       } catch {
         // toast handled by mutation wrapper if needed; keep edit open.
@@ -351,12 +359,14 @@ export function ChannelView({
   const renderEditor = useCallback(
     (m: ChatMessage) => (
       <MessageEditInline
+        worldId={worldId}
         initialContent={m.content ?? ''}
-        onSave={(c) => saveEdit(m.id, c)}
+        initialAttachments={m.attachments ?? []}
+        onSave={(payload) => saveEdit(m.id, payload)}
         onCancel={cancelEdit}
       />
     ),
-    [saveEdit, cancelEdit],
+    [worldId, saveEdit, cancelEdit],
   );
 
   return (
