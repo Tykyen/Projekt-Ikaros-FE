@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Search, FileText } from 'lucide-react';
+import { Search, FileText, Lock } from 'lucide-react';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { usePagesDirectory } from '../../api/usePagesDirectory';
 import { fuzzyRank } from '../lib/fuzzyMatch';
@@ -94,25 +94,35 @@ export function PagePalette({ open, onClose }: Props) {
           </p>
         ) : (
           <ul className={s.list}>
-            {ranked.map((p, i) => (
-              <li key={p.slug}>
-                <button
-                  type="button"
-                  className={`${s.item} ${
-                    i === highlightIdx ? s.itemActive : ''
-                  }`}
-                  onMouseEnter={() => setHighlightIdx(i)}
-                  onClick={() => {
-                    navigate(`/svet/${worldSlug}/${p.slug}`);
-                    onClose();
-                  }}
-                >
-                  <FileText size={14} aria-hidden className={s.itemIcon} />
-                  <span className={s.itemTitle}>{p.title}</span>
-                  <span className={s.itemMeta}>{p.type}</span>
-                </button>
-              </li>
-            ))}
+            {ranked.map((p, i) => {
+              // D-062c — utajená stránka (bez klíče): zámek + „utajeno" místo typu.
+              const shielded = (p.shieldedBy?.length ?? 0) > 0;
+              return (
+                <li key={p.slug}>
+                  <button
+                    type="button"
+                    className={`${s.item} ${
+                      i === highlightIdx ? s.itemActive : ''
+                    }`}
+                    onMouseEnter={() => setHighlightIdx(i)}
+                    onClick={() => {
+                      navigate(`/svet/${worldSlug}/${p.slug}`);
+                      onClose();
+                    }}
+                  >
+                    {shielded ? (
+                      <Lock size={14} aria-hidden className={s.itemIcon} />
+                    ) : (
+                      <FileText size={14} aria-hidden className={s.itemIcon} />
+                    )}
+                    <span className={s.itemTitle}>{p.title}</span>
+                    <span className={s.itemMeta}>
+                      {shielded ? '🔒 utajeno' : p.type}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
 

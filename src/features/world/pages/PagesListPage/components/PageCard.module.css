@@ -83,6 +83,31 @@
   white-space: nowrap;
 }
 
+/* D-062c — AKJ-chráněná stránka bez klíče: ztlumená karta + zámkový badge. */
+.shielded {
+  opacity: 0.82;
+  border-style: dashed;
+}
+
+.shielded .icon {
+  color: var(--text-muted, var(--text-secondary));
+}
+
+.shieldedBadge {
+  flex-shrink: 1;
+  min-width: 0;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-3, rgba(255, 255, 255, 0.06));
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: 0.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .star {
   display: flex;
   align-items: center;

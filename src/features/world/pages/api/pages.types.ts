@@ -6,6 +6,7 @@
  * mapper ho zatím přehlížejí (viz dluh D-072). Pro 7.1 viewer neblokuje, jen
  * čteme z `findBySlugAndWorld` (runtime hodnota je správná, typescript zužuje).
  */
+import type { ShieldedRequirement } from './usePageMeta';
 
 export const PAGE_TYPES = {
   Lokace: 'Lokace',
@@ -145,6 +146,12 @@ export interface PageDirectoryEntry {
   // 9.1 — pro CharactersPage karty (PostavaHrace/NPC).
   imageUrl?: string;
   ownerUserId?: string;
+  /**
+   * D-062c — pokud má current user nesplněné AKJ/Role requirementy, listing
+   * renderuje stub kartu „🔒 AKJ: N — Název" místo normální. Prázdné/undefined =
+   * má přístup. Raw accessRequirements se nevrací (privacy).
+   */
+  shieldedBy?: ShieldedRequirement[];
 }
 
 /** Backlink karta — `GET /worlds/:worldId/pages/:slug/backlinks` (BE 7.1l). */
