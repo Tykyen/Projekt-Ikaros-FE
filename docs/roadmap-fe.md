@@ -1814,21 +1814,23 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 
 **Pořadí stavby:** 11.4 → 11.1 → 11.2 → 11.3 *(měny první — shop je potřebuje; pak pavučina jako základ, na který se vážou storyliny i poznámky).*
 
-### - [ ] 11.1 Pavučina (`/svet/:worldId/pavucina`)
+### - [x] 11.1 Pavučina (`/svet/:worldId/pavucina`) ✅ (2026-06-01)
 
-*Vztahový graf kampaně + PJ dashboard. Jádro kampaňových nástrojů.*
+**Spec:** `docs/arch/phase-11/spec-11.1.md` ✅ schváleno · **Plán:** `docs/arch/phase-11/plan-11.1.md` ✅
 
-- [ ] **11.1a — Subjekty:** `CampaignSubject` CRUD — typy (PC / NPC / FACTION / ORG / LOCATION / OTHER), avatar, tagy, status; vazba na wiki stránku (`linkedPageSlug`) a postavu (`linkedCharacterSlug`)
-- [ ] **11.1b — Vztahy:** `CampaignRelationship` CRUD — asymetrické strany `sideA` / `sideB` (tón, chování, záměr PJ, síla 1–10), sdílené pole (`whatHappened` veřejné × `behindTheScenes` tajné), status (active / dormant / crisis / closed), priorita 1–5
-- [ ] **11.1c — 2D force graph:** vizualizace — uzly barevně dle typu, hrany dle statusu, drag uzlů, pan/zoom, fokus na uzel, filtr dle storyline
-- [ ] **11.1d — Dashboard „Dnes":** `GET /campaign/dashboard` — krizové vztahy, aktivní storyliny, připnuté poznámky, poslední změny (`CampaignChangeLog`, TTL 90 dní)
-- [ ] **11.1e — Moje / sdílené:** přepínání vlastní vs sdílené kampaňové vrstvy (`isShared`); `mobil-desktop` audit
+*Vztahový graf kampaně + PJ dashboard. Jádro kampaňových nástrojů. Záložky: Dnes / Subjekty / Linky / Síť.*
 
-### - [ ] 11.2 Storylines & Scénáře (`/svet/:worldId/scenare`)
+- [x] **11.1a — Subjekty:** `CampaignSubject` CRUD — typy (PC / NPC / FACTION / ORG / LOCATION / **STATE** / OTHER — `STATE`+`OTHER` přidány do BE enumu), avatar, tagy, status, vazba na wiki stránku/postavu. **Navíc:** našeptávač jména z adresáře světa (persona + pages) → výběr doplní slug, typ i **avatar z napojené stránky**; „CP" label přejmenován na „NPC".
+- [x] **11.1b — Vztahy:** `CampaignRelationship` CRUD — asymetrické strany A/B, sdílené `whatHappened`/`behindTheScenes` (tajné jen PJ), status, priorita. **Emoční model navíc:** per-strana `valence` (−3..+3) + `emotionTag` (type-aware paleta) + síla 1–10; druhý subjekt = hledatelný combobox. *(BE patch: `valence`/`emotionTag` do `toEntity` passthrough — jinak GET tiše zahazoval.)*
+- [x] **11.1c — Force graph (Síť):** „hvězdná mapa" na canvasu — uzly s avatarem + neon glow dle typu, krizové pulzují; hrany = energetické paprsky (gradient valence A→B, tok částic), zakřivené; focus na uzel (ego-síť), filtry **Subjekty / Vztahy / Linky** (oddělené skupiny), hledání→center, pan/zoom; vesmírné pozadí + skleněné panely.
+- [x] **11.1d — Dashboard „Dnes":** krizové vztahy, aktivní linky, poslední změny — počítáno klientsky per-vrstva (funguje i pro PJ read-only náhled hráče). *(Připnuté poznámky = až 11.3.)*
+- [x] **11.1e — Moje / hráči:** vrstvy přes FE partitioning dle `ownerId` — každý má svou Pavučinu, PJ vidí Pavučinu každého hráče **read-only** (+ „📋 Kopírovat do mé vrstvy"); `mobil-desktop` audit ✓.
+
+### - [ ] 11.2 Storylines & Scénáře (`/svet/:worldId/scenare`) — *11.2a hotovo, zbytek čeká*
 
 *Příběhové linie a strom scén. Editor PJ-only.*
 
-- [ ] **11.2a — Storyliny:** `CampaignStoryline` — úroveň (macro / mid / micro), status, fáze, shrnutí, `whatHappened` / `truth` / `playersBelief` / `gmIntent` / `nextStep`; vazby na subjekty a vztahy
+- [x] **11.2a — Storyliny:** ✅ (2026-06-01, předtaženo do Pavučiny jako záložka **Linky**) — `CampaignStoryline` CRUD: úroveň (macro/mid/micro), status, shrnutí, `whatHappened` / `truth` / `playersBelief` (tajná pole jen PJ) / `gmIntent` / `nextStep`; zapojené subjekty = **hledatelný multi-výběr**; filtr dle úrovně/statusu; aktivní linky se propisují do „Dnes" a jdou použít jako **filtr grafu** (Síť ukáže jen subjekty + vztahy té linky). BE CRUD už existoval.
 - [ ] **11.2b — Strom scénářů:** `CampaignScenario` jako strom — parent-child, `branchLabel` (větvení dle voleb hráčů), status (draft / active / optional / resolved), pořadí
 - [ ] **11.2c — Editor scénáře:** `RichTextEditor` (TipTap obsah + obrázky), tajné `gmNotes`, cíl / výsledek scény
 - [ ] **11.2d — Provázání assetů:** scénář ↔ mapy (`MapScene`, krok 10.2), lokace (wiki stránky, krok 7), subjekty, storyliny
