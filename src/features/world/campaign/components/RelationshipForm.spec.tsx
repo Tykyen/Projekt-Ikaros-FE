@@ -36,11 +36,11 @@ describe('RelationshipForm', () => {
         onSubmit={onSubmit}
       />,
     );
-    // druhý subjekt nesmí nabízet A
-    const bSelect = screen.getByLabelText('Druhý subjekt') as HTMLSelectElement;
-    const optionValues = Array.from(bSelect.options).map((o) => o.value);
-    expect(optionValues).not.toContain('a');
-    fireEvent.change(bSelect, { target: { value: 'b' } });
+    // druhý subjekt = hledatelný; nabídka nesmí obsahovat A (Aragorn)
+    const bInput = screen.getByLabelText('Druhý subjekt');
+    fireEvent.focus(bInput);
+    expect(screen.queryByRole('option', { name: /Aragorn/ })).toBeNull();
+    fireEvent.mouseDown(screen.getByRole('option', { name: /Boromir/ }));
 
     // emoce strany A → nenávist → valence -3
     fireEvent.change(screen.getByLabelText('Emoce strany A'), {

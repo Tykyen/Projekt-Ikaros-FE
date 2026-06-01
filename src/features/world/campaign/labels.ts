@@ -6,7 +6,7 @@ import type {
 
 export const TYPE_LABELS: Record<CampaignSubjectType, string> = {
   PC: 'Postava',
-  NPC: 'CP',
+  NPC: 'NPC',
   FACTION: 'Frakce',
   ORG: 'Organizace',
   STATE: 'Stát',

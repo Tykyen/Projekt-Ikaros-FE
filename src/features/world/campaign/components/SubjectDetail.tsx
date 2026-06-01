@@ -1,4 +1,6 @@
+import { Link } from 'react-router-dom';
 import { Badge, Button } from '@/shared/ui';
+import { useWorldContext } from '@/features/world/context/WorldContext';
 import { SUBJECT_STATUS_LABELS, TYPE_LABELS } from '../labels';
 import { typeCssVar } from '../campaignColors';
 import type { CampaignSubject } from '../types';
@@ -9,20 +11,23 @@ import s from './campaign.module.css';
 export function SubjectDetail({
   subject,
   readOnly,
+  imageFor,
   onEdit,
   onDelete,
   onCopy,
 }: {
   subject: CampaignSubject;
   readOnly: boolean;
+  imageFor: (s: CampaignSubject) => string | undefined;
   onEdit: () => void;
   onDelete: () => void;
   onCopy: () => void;
 }) {
+  const { worldSlug } = useWorldContext();
   return (
     <div className={s.detail}>
       <div className={s.detailHead}>
-        <SubjectAvatar subject={subject} size={48} />
+        <SubjectAvatar subject={subject} size={48} imageUrl={imageFor(subject)} />
         <div>
           <div className={s.detailTitle}>{subject.name}</div>
           <div className={s.detailMeta}>
@@ -52,9 +57,12 @@ export function SubjectDetail({
       )}
 
       {subject.linkedPageSlug && (
-        <a className={s.link} href={`/${subject.linkedPageSlug}`}>
+        <Link
+          className={s.link}
+          to={`/svet/${worldSlug}/${subject.linkedPageSlug}`}
+        >
           → Wiki stránka
-        </a>
+        </Link>
       )}
 
       <div className={s.detailActions}>

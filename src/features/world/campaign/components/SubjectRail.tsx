@@ -12,12 +12,14 @@ export function SubjectRail({
   subjects,
   selectedId,
   canAdd,
+  imageFor,
   onSelect,
   onAdd,
 }: {
   subjects: CampaignSubject[];
   selectedId: string | null;
   canAdd: boolean;
+  imageFor: (s: CampaignSubject) => string | undefined;
   onSelect: (id: string) => void;
   onAdd: () => void;
 }) {
@@ -79,7 +81,7 @@ export function SubjectRail({
             className={clsx(s.railItem, selectedId === x.id && s.railItemOn)}
             onClick={() => onSelect(x.id)}
           >
-            <SubjectAvatar subject={x} size={32} />
+            <SubjectAvatar subject={x} size={32} imageUrl={imageFor(x)} />
             <span className={s.railItemBody}>
               <span className={s.railItemName}>{x.name}</span>
               <Badge style={{ color: typeCssVar(x.type) }}>

@@ -10,6 +10,7 @@ import {
   useUpdateSubject,
 } from '../api';
 import { parseApiError } from '@/shared/api/client';
+import { useSubjectImages } from '../useSubjectImages';
 import type {
   CampaignRelationship,
   CampaignSubject,
@@ -54,6 +55,7 @@ export function SubjektyTab({
   setSelRelId: (id: string | null) => void;
   onSwitchToMine: () => void;
 }) {
+  const imageFor = useSubjectImages(worldId);
   const createSubject = useCreateSubject(worldId);
   const updateSubject = useUpdateSubject(worldId);
   const deleteSubject = useDeleteSubject(worldId);
@@ -169,6 +171,7 @@ export function SubjektyTab({
         subjects={subjects}
         selectedId={selSubjectId}
         canAdd={!readOnly}
+        imageFor={imageFor}
         onSelect={(id) => {
           setSelSubjectId(id);
           setSelRelId(null);
@@ -207,6 +210,7 @@ export function SubjektyTab({
                 selectedSubjectId={selSubjectId!}
                 subjects={subjects}
                 selected={selRelId === r.id}
+                imageFor={imageFor}
                 onClick={() => setSelRelId(r.id)}
               />
             ))
@@ -228,6 +232,7 @@ export function SubjektyTab({
           <SubjectDetail
             subject={selectedSubject}
             readOnly={readOnly}
+            imageFor={imageFor}
             onEdit={() =>
               setSubjectForm({ open: true, editing: selectedSubject })
             }
@@ -242,6 +247,7 @@ export function SubjektyTab({
       <SubjectForm
         key={`subj-${subjectForm.open ? subjectForm.editing?.id ?? 'new' : 'closed'}`}
         open={subjectForm.open}
+        worldId={worldId}
         initial={subjectForm.editing}
         isPending={createSubject.isPending || updateSubject.isPending}
         onClose={() => setSubjectForm({ open: false })}

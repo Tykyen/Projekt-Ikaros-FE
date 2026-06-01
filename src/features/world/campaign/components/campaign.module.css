@@ -110,6 +110,79 @@
   border-radius: var(--radius-md);
   opacity: 0.8;
 }
+
+/* ── Našeptávač jména (existující stránky světa) ── */
+.autocomplete {
+  position: relative;
+}
+.acDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin-top: 2px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--surface-3);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--depth-card);
+}
+.acOption {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  background: transparent;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.acOption:hover {
+  background: var(--surface-2);
+}
+.acTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.acType {
+  font-size: var(--text-xs);
+  opacity: 0.6;
+  flex: none;
+}
+.pickedRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+}
+.pickedName {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+}
+.pickedClear {
+  flex: none;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: var(--text-sm);
+}
+.pickedClear:hover {
+  opacity: 1;
+}
 .formActions {
   display: flex;
   justify-content: flex-end;

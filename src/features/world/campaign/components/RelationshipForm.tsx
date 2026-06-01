@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Button, Modal } from '@/shared/ui';
 import { clampValence, defaultValenceFor, emotionsFor } from '../emotions';
-import { REL_STATUSES, REL_STATUS_LABELS } from '../labels';
+import { REL_STATUSES, REL_STATUS_LABELS, TYPE_LABELS } from '../labels';
 import type {
   CampaignRelationship,
   CampaignRelationshipStatus,
@@ -181,7 +181,17 @@ export function RelationshipForm({
     [subjectA?.type, subjectB?.type],
   );
 
-  const bOptions = subjects.filter((x) => x.id !== subjectAId);
+  // Druhý subjekt = hledatelný (u PJ jich mohou být stovky).
+  const [bQuery, setBQuery] = useState('');
+  const [bOpen, setBOpen] = useState(false);
+  const bResults = useMemo(() => {
+    const pool = subjects.filter((x) => x.id !== subjectAId);
+    const q = bQuery.trim().toLocaleLowerCase('cs');
+    const filtered = q
+      ? pool.filter((x) => x.name.toLocaleLowerCase('cs').includes(q))
+      : pool;
+    return filtered.slice(0, 8);
+  }, [subjects, subjectAId, bQuery]);
 
   function submit() {
     if (!subjectBId) {
@@ -227,19 +237,61 @@ export function RelationshipForm({
           </label>
           <label className={s.field}>
             <span className={s.fieldLabel}>Druhý subjekt</span>
-            <select
-              className={s.select}
-              value={subjectBId}
-              onChange={(e) => setSubjectBId(e.target.value)}
-              aria-label="Druhý subjekt"
-            >
-              <option value="">— vyber —</option>
-              {bOptions.map((x) => (
-                <option key={x.id} value={x.id}>
-                  {x.name}
-                </option>
-              ))}
-            </select>
+            {subjectB ? (
+              <div className={s.pickedRow}>
+                <span className={s.pickedName}>{subjectB.name}</span>
+                <button
+                  type="button"
+                  className={s.pickedClear}
+                  aria-label="Zrušit výběr"
+                  onClick={() => {
+                    setSubjectBId('');
+                    setBQuery('');
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div className={s.autocomplete}>
+                <input
+                  className={s.input}
+                  placeholder="Hledat subjekt…"
+                  value={bQuery}
+                  aria-label="Druhý subjekt"
+                  autoComplete="off"
+                  onChange={(e) => {
+                    setBQuery(e.target.value);
+                    setBOpen(true);
+                  }}
+                  onFocus={() => setBOpen(true)}
+                  onBlur={() =>
+                    window.setTimeout(() => setBOpen(false), 150)
+                  }
+                />
+                {bOpen && bResults.length > 0 && (
+                  <div className={s.acDropdown} role="listbox">
+                    {bResults.map((x) => (
+                      <button
+                        key={x.id}
+                        type="button"
+                        role="option"
+                        aria-selected="false"
+                        className={s.acOption}
+                        onMouseDown={() => {
+                          setSubjectBId(x.id);
+                          setError('');
+                          setBOpen(false);
+                        }}
+                      >
+                        <span className={s.acTitle}>{x.name}</span>
+                        <span className={s.acType}>{TYPE_LABELS[x.type]}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </label>
         </div>
         {error && <div className={s.formError}>{error}</div>}

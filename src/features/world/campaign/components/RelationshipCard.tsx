@@ -19,12 +19,14 @@ export function RelationshipCard({
   selectedSubjectId,
   subjects,
   selected,
+  imageFor,
   onClick,
 }: {
   rel: CampaignRelationship;
   selectedSubjectId: string;
   subjects: CampaignSubject[];
   selected: boolean;
+  imageFor: (s: CampaignSubject) => string | undefined;
   onClick: () => void;
 }) {
   const isA = rel.subjectAId === selectedSubjectId;
@@ -40,7 +42,9 @@ export function RelationshipCard({
       onClick={onClick}
     >
       <div className={s.relCardHead}>
-        {other && <SubjectAvatar subject={other} size={32} />}
+        {other && (
+          <SubjectAvatar subject={other} size={32} imageUrl={imageFor(other)} />
+        )}
         <span className={s.relCardName}>{other?.name ?? 'Neznámý'}</span>
         <Badge variant={STATUS_VARIANT[rel.status] ?? 'default'}>
           {REL_STATUS_LABELS[rel.status]}

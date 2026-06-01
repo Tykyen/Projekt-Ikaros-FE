@@ -6,12 +6,16 @@ import s from './campaign.module.css';
 export function SubjectAvatar({
   subject,
   size = 36,
+  imageUrl,
 }: {
   subject: CampaignSubject;
   size?: number;
+  /** Resolvnutý obrázek z napojené stránky (viz `useSubjectImages`). */
+  imageUrl?: string;
 }) {
   const color = typeCssVar(subject.type);
   const letter = subject.name.charAt(0).toUpperCase() || '?';
+  const src = subject.avatarUrl || imageUrl;
   return (
     <span
       className={s.avatar}
@@ -24,8 +28,8 @@ export function SubjectAvatar({
       }}
       aria-hidden
     >
-      {subject.avatarUrl ? (
-        <img src={subject.avatarUrl} alt="" className={s.avatarImg} loading="lazy" />
+      {src ? (
+        <img src={src} alt="" className={s.avatarImg} loading="lazy" />
       ) : (
         letter
       )}
