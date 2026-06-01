@@ -20,4 +20,8 @@
   --cmp-val-neg: var(--news-warning); /* červená — nepřátelství/nenávist */
   --cmp-val-zero: var(--role-world-reader); /* šedá — neutrál */
   --cmp-val-pos: var(--news-system); /* zelená — sympatie/láska */
+
+  /* Hvězdná mapa (graf) */
+  --cmp-space-disc: var(--surface-3); /* podklad pod iniciálou v uzlu */
+  --cmp-star: color-mix(in srgb, var(--text) 65%, transparent); /* hvězdy v pozadí */
 }

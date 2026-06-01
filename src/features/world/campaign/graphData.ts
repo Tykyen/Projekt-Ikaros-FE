@@ -9,6 +9,8 @@ export interface GraphNode {
   id: string;
   name: string;
   type: CampaignSubject['type'];
+  /** Obrázek napojené stránky (avatar v uzlu); doplňuje se ve view. */
+  img?: string;
   /** Force-graph dopisuje za běhu pozice. */
   x?: number;
   y?: number;

@@ -11,6 +11,7 @@ import {
   useCampaignSubjects,
 } from '../api';
 import type { CampaignRelationship } from '../types';
+import { useSubjectImages } from '../useSubjectImages';
 import { LayerSwitcher } from './LayerSwitcher';
 import { DnesTab } from './DnesTab';
 import { SubjektyTab } from './SubjektyTab';
@@ -39,6 +40,7 @@ export function CampaignView() {
   const relsQ = useCampaignRelationships(worldId);
   const storiesQ = useCampaignStorylines(worldId);
   const playersQ = useCampaignPlayers(worldId, isPJ);
+  const imageFor = useSubjectImages(worldId);
 
   const ownerId = layer === 'mine' ? myUserId : layer;
   const readOnly = layer !== 'mine';
@@ -145,6 +147,7 @@ export function CampaignView() {
             storylines={storylines}
             storylineFilter={graphStoryline}
             onStorylineFilter={setGraphStoryline}
+            imageFor={imageFor}
             onOpenSubject={gotoSubject}
           />
         )}
