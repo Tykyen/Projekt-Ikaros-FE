@@ -1,0 +1,23 @@
+/**
+ * Krok 11.1 — barevné tokeny Pavučiny.
+ *
+ * Scoped na `.campaign-root` (žádný globální leak, žádný shared theme edit).
+ * Hodnoty = `var()` reference na existující design tokeny → themeable, žádný
+ * hardcoded hex (lint:colors clean). Témata override podkladové tokeny.
+ */
+
+.campaign-root {
+  /* Subjekt-typy */
+  --cmp-pc: var(--news-system); /* zelená — hráčská postava */
+  --cmp-npc: var(--accent, var(--news-info)); /* brand fialová — CP */
+  --cmp-faction: var(--role-world-applicant); /* jantarová — frakce/národ */
+  --cmp-org: var(--role-world-player); /* modrá — organizace */
+  --cmp-state: var(--role-world-pj); /* purpurová — stát */
+  --cmp-location: var(--role-spravce-clanku-bg); /* oranžová — lokace */
+  --cmp-other: var(--role-world-reader); /* šedá — ostatní */
+
+  /* Valence hran (emoce) */
+  --cmp-val-neg: var(--news-warning); /* červená — nepřátelství/nenávist */
+  --cmp-val-zero: var(--role-world-reader); /* šedá — neutrál */
+  --cmp-val-pos: var(--news-system); /* zelená — sympatie/láska */
+}
