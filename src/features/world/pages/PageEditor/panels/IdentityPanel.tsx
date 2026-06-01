@@ -40,7 +40,6 @@ export function IdentityPanel({
   imageUrl,
   bigImage,
   isWoodWide,
-  order,
   existingPageTitle,
   onChange,
   onTypeChangeRequest,
@@ -104,19 +103,6 @@ export function IdentityPanel({
                   <strong>nezobrazí</strong> v paletě postav na taktické mapě.
                 </small>
               )}
-            </label>
-
-            <label className={s.field}>
-              <span className={s.label}>Pořadí v adresáři</span>
-              <input
-                type="number"
-                value={order}
-                onChange={(e) =>
-                  onChange({ order: Math.max(0, Number(e.target.value) || 0) })
-                }
-                min={0}
-                className={s.input}
-              />
             </label>
           </div>
 
