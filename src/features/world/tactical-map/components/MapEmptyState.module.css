@@ -43,9 +43,9 @@
   pointer-events: auto;
   margin-top: 12px;
   padding: 10px 22px;
-  background: rgba(120, 100, 255, 0.2);
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
   color: var(--map-toolbar-text);
-  border: 1px solid rgba(120, 100, 255, 0.5);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.5);
   border-radius: 8px;
   font-family: var(--font-mono);
   font-size: 13px;
@@ -57,8 +57,8 @@
 }
 
 .cta:hover:not(:disabled) {
-  background: rgba(120, 100, 255, 0.35);
-  border-color: rgba(120, 100, 255, 0.8);
+  background: rgb(var(--map-ui-accent-rgb) / 0.35);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.8);
 }
 
 .cta:disabled {
@@ -68,7 +68,7 @@
 
 .error {
   font-size: 12px;
-  color: #ff7080;
+  color: var(--map-ui-danger-solid);
   margin: 4px 0 0 0;
   max-width: 320px;
 }
@@ -106,8 +106,8 @@
   align-items: center;
   gap: 6px;
   padding: 10px 8px;
-  background: rgba(10, 8, 32, 0.4);
-  border: 1px solid rgba(120, 100, 255, 0.18);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.4);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
   border-radius: 8px;
 }
 
@@ -117,7 +117,7 @@
   height: 56px;
   border-radius: 50%;
   object-fit: cover;
-  background: rgba(120, 100, 255, 0.1);
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,9 +164,9 @@
   gap: 12px;
   width: 100%;
   padding: 12px 16px;
-  background: rgba(120, 100, 255, 0.14);
-  color: var(--map-toolbar-text, #e8e0ff);
-  border: 1px solid rgba(120, 100, 255, 0.42);
+  background: rgb(var(--map-ui-accent-rgb) / 0.14);
+  color: var(--map-toolbar-text, var(--map-ui-accent-text));
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.42);
   border-radius: 6px;
   font: inherit;
   font-size: 14px;
@@ -180,8 +180,8 @@
 }
 
 .sceneItem:hover:not(:disabled) {
-  background: rgba(120, 100, 255, 0.28);
-  border-color: rgba(180, 140, 255, 0.7);
+  background: rgb(var(--map-ui-accent-rgb) / 0.28);
+  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.7);
 }
 
 .sceneItem:active:not(:disabled) {
@@ -194,7 +194,7 @@
 }
 
 .sceneItemArrow {
-  color: rgba(180, 140, 255, 0.95);
+  color: rgb(var(--map-ui-accent-bright-rgb) / 0.95);
   font-weight: 700;
   font-size: 18px;
 }

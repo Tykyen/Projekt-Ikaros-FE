@@ -11,10 +11,10 @@
   transition: background 0.15s ease;
 }
 .item:hover {
-  background: rgba(180, 140, 255, 0.1);
+  background: rgb(var(--map-ui-accent-bright-rgb) / 0.1);
 }
 .item:focus-visible {
-  outline: 2px solid var(--map-token-ring-selected, #b48cff);
+  outline: 2px solid var(--map-token-ring-selected, var(--map-ui-accent-solid));
   outline-offset: 1px;
 }
 
@@ -28,12 +28,12 @@
 
 /* „na tahu" — zlatý highlight + glow */
 .current {
-  background: rgba(255, 215, 0, 0.12);
+  background: rgb(var(--map-ui-gold-rgb) / 0.12);
 }
 .current .avatarWrap {
   box-shadow:
-    0 0 0 2px var(--map-token-ring-active-turn, #ffd700),
-    0 0 12px var(--map-token-ring-active-turn-glow, rgba(255, 215, 0, 0.45));
+    0 0 0 2px var(--map-token-ring-active-turn, var(--map-ui-gold-solid)),
+    0 0 12px var(--map-token-ring-active-turn-glow, rgb(var(--map-ui-gold-rgb) / 0.45));
 }
 
 .avatarWrap {
@@ -41,8 +41,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 2px solid var(--map-token-ring-default, #3a3550);
-  background: rgba(4, 6, 18, 0.9);
+  border: 2px solid var(--map-token-ring-default, var(--map-token-ring-default));
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.9);
   overflow: visible;
 }
 
@@ -61,8 +61,8 @@
 .initials {
   font-weight: 700;
   font-size: 0.95rem;
-  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
-  background: rgba(42, 31, 85, 0.85);
+  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.85);
 }
 
 .badge {
@@ -73,8 +73,8 @@
   height: 18px;
   padding: 0 3px;
   border-radius: 9px;
-  border: 1px solid rgba(0, 0, 0, 0.6);
-  color: #000;
+  border: 1px solid rgb(var(--map-ui-shadow-rgb) / 0.6);
+  color: rgb(var(--map-ui-shadow-rgb) / 1);
   font-size: 0.65rem;
   font-weight: 700;
   display: flex;
@@ -90,9 +90,9 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1px solid rgba(80, 130, 220, 0.6);
-  background: rgba(0, 0, 0, 0.85);
-  color: #aeccff;
+  border: 1px solid rgb(var(--map-ui-blue-rgb) / 0.6);
+  background: rgb(var(--map-ui-shadow-rgb) / 0.85);
+  color: var(--map-ui-info-light);
   font-style: italic;
   font-weight: 700;
   font-size: 0.7rem;
@@ -102,7 +102,7 @@
   z-index: 2;
 }
 .infoBtn:hover {
-  background: rgba(29, 78, 216, 0.5);
+  background: rgb(var(--map-ui-blue-rgb) / 0.5);
 }
 
 .meta {
@@ -115,7 +115,7 @@
 .name {
   max-width: 100%;
   font-size: 0.7rem;
-  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -130,16 +130,16 @@
   width: 22px;
   height: 24px;
   border-radius: 4px;
-  border: 1px solid rgba(180, 140, 255, 0.35);
-  background: rgba(0, 0, 0, 0.35);
-  color: var(--map-token-ring-active-turn, #ffd700);
+  border: 1px solid rgb(var(--map-ui-accent-bright-rgb) / 0.35);
+  background: rgb(var(--map-ui-shadow-rgb) / 0.35);
+  color: var(--map-token-ring-active-turn, var(--map-ui-gold-solid));
   font-size: 0.75rem;
   line-height: 1;
   cursor: pointer;
   padding: 0;
 }
 .jumpBtn:hover {
-  border-color: var(--map-token-ring-active-turn, #ffd700);
+  border-color: var(--map-token-ring-active-turn, var(--map-ui-gold-solid));
 }
 
 /* ── Mobil ── */

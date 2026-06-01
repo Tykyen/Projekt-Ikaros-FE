@@ -27,6 +27,8 @@ export function useTokenPermissions({
   return useCallback(
     (token: MapToken) => {
       if (!scene) return false;
+      // D-066 — per-token lock (PJ-only). Zamčený token hráč nepohne.
+      if (token.isLocked && !isPj && !isGlobalAdmin) return false;
       // 10.2n — efektivní zámek (per-hráč override ?? per-scéna default).
       if (effectiveLocked(scene, userId) && !isPj && !isGlobalAdmin)
         return false;

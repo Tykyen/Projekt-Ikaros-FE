@@ -3,7 +3,7 @@
  * v iniciativní liště). Jeden zdroj pravdy, ať se barvy nerozcházejí.
  *
  * Tier barvy převzaty ze starého Matrixu (MapToken.tsx):
- *   green #4CAF50 / yellow #ffb300 / red #d32f2f / dead #555.
+ *   green #4CAF50 / yellow #ffb300 / red #d32f2f / dead #555. // lint-colors-ignore
  */
 import type { SystemEntitySchema } from '../schemas/types';
 
@@ -12,10 +12,10 @@ export const HP_YELLOW = 0xffb300;
 export const HP_RED = 0xd32f2f;
 export const HP_DEAD = 0x555555;
 
-export const HP_GREEN_CSS = '#4CAF50';
-export const HP_YELLOW_CSS = '#ffb300';
-export const HP_RED_CSS = '#d32f2f';
-export const HP_DEAD_CSS = '#555555';
+export const HP_GREEN_CSS = '#4CAF50'; // lint-colors-ignore
+export const HP_YELLOW_CSS = '#ffb300'; // lint-colors-ignore
+export const HP_RED_CSS = '#d32f2f'; // lint-colors-ignore
+export const HP_DEAD_CSS = '#555555'; // lint-colors-ignore
 
 /** Najde klíč pole označeného `combatBehavior: 'damageable'`. */
 export function findDamageableField(

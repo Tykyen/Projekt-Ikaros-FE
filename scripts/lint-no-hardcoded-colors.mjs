@@ -9,9 +9,15 @@ const ALLOW = [
   'src/__tests__/',               // testy
   'src/themes/__tests__/',
   '.spec.',                       // test fixtures (mock data, default values)
+  '.test.',                       // test fixtures (vitest .test.* — mock barvy)
+  '/tactical-map/components/token-panel/system-panels/', // D-063 — per-system combat
+                                  // panely (Matrix neon, CoC parchment, GURPS steel…)
+                                  // mají záměrnou systémovou identitu, ne chrome drift.
 ];
 const HEX_RE = /(?<!var\(--[\w-]*?:\s*?)#[0-9a-fA-F]{3,8}\b/g;
-const RGB_RE = /\b(rgb|rgba|hsl|hsla)\s*\(/g;
+// `rgb(var(--token) / alpha)` (CSS Color 4) je token-based, ne hardcoded — negative
+// lookahead na `var(` ho povolí (jinak nelze mít alpha varianty jednoho RGB tokenu).
+const RGB_RE = /\b(rgb|rgba|hsl|hsla)\s*\(\s*(?!var\()/g;
 const COLOR_NAME_RE = /\b(?:background|color|border)\s*:\s*(red|blue|green|black|white|gray|grey)\b/gi;
 
 async function* walk(dir) {

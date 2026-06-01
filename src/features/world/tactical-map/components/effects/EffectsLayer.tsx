@@ -52,7 +52,7 @@ function ColorEffect({
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
-      const fill = effect.color ?? 'rgba(255,255,0,0.3)';
+      const fill = effect.color ?? 'rgba(255,255,0,0.3)'; // lint-colors-ignore
       for (const hex of effect.hexes) {
         const c = hexCenter(hex.q, hex.r, config);
         g.poly(getHexPolyPoints(c, config.size * 0.95));

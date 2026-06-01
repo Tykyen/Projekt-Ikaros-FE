@@ -1391,12 +1391,12 @@ export function TacticalMapView(): React.ReactElement {
                         style={{
                           padding: "5px 12px",
                           background: openedToken.inCombat
-                            ? "rgba(255, 215, 0, 0.18)"
-                            : "rgba(160, 170, 200, 0.12)",
-                          color: openedToken.inCombat ? "#ffd86b" : "#aab0c8",
+                            ? "rgb(var(--map-ui-gold-rgb) / 0.18)"
+                            : "rgb(var(--map-ui-muted-rgb) / 0.12)",
+                          color: openedToken.inCombat ? "var(--map-ui-gold-text)" : "var(--map-ui-muted-solid)",
                           border: openedToken.inCombat
-                            ? "1px solid rgba(255, 215, 0, 0.5)"
-                            : "1px solid rgba(160, 170, 200, 0.35)",
+                            ? "1px solid rgb(var(--map-ui-gold-rgb) / 0.5)"
+                            : "1px solid rgb(var(--map-ui-muted-rgb) / 0.35)",
                           borderRadius: 5,
                           font: "inherit",
                           fontSize: 11,
@@ -1415,6 +1415,42 @@ export function TacticalMapView(): React.ReactElement {
                         {openedToken.inCombat ? "⚔ V boji" : "Mimo boj"}
                       </button>
                     )}
+                    {/* D-066 — per-token lock toggle (PJ). Zamčený token hráč
+                      nemůže táhnout (nezávisle na zámku scény). */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        tokenUpdate.mutate({
+                          tokenId: openedToken.id,
+                          patch: { isLocked: !openedToken.isLocked },
+                        })
+                      }
+                      style={{
+                        padding: "5px 12px",
+                        background: openedToken.isLocked
+                          ? "rgb(var(--map-ui-locked-rgb) / 0.18)"
+                          : "rgb(var(--map-ui-muted-rgb) / 0.12)",
+                        color: openedToken.isLocked ? "var(--map-ui-locked-solid)" : "var(--map-ui-muted-solid)",
+                        border: openedToken.isLocked
+                          ? "1px solid rgb(var(--map-ui-locked-rgb) / 0.5)"
+                          : "1px solid rgb(var(--map-ui-muted-rgb) / 0.35)",
+                        borderRadius: 5,
+                        font: "inherit",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: 0.6,
+                        textTransform: "uppercase",
+                        cursor: "pointer",
+                        marginRight: 8,
+                      }}
+                      title={
+                        openedToken.isLocked
+                          ? "Odemknout token (hráč jím opět může pohnout)"
+                          : "Zamknout token (hráč jím nepohne, jen PJ)"
+                      }
+                    >
+                      {openedToken.isLocked ? "🔒 Zamčen" : "🔓 Zamknout"}
+                    </button>
                     <button
                       type="button"
                       onClick={() => {
@@ -1427,9 +1463,9 @@ export function TacticalMapView(): React.ReactElement {
                       }}
                       style={{
                         padding: "5px 12px",
-                        background: "rgba(255, 80, 96, 0.18)",
-                        color: "#ff9090",
-                        border: "1px solid rgba(255, 80, 96, 0.45)",
+                        background: "rgb(var(--map-ui-danger-rgb) / 0.18)",
+                        color: "var(--map-ui-danger-solid)",
+                        border: "1px solid rgb(var(--map-ui-danger-rgb) / 0.45)",
                         borderRadius: 5,
                         font: "inherit",
                         fontSize: 11,

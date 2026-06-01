@@ -16,9 +16,9 @@ export function hexKey(q: number, r: number): string {
 }
 
 /**
- * Vytáhne alpha složku z `rgba(r,g,b,a)` stringu (theme fog fill). `parseHexColor`
+ * Vytáhne alpha složku z `rgba(r,g,b,a)` stringu (theme fog fill). `parseHexColor` // lint-colors-ignore
  * z `useMapTheme` alpha zahazuje — fog ji potřebuje pro průhlednost overlaye.
- * Fallback 1 (plná) pro rgb()/hex/nevalidní vstup.
+ * Fallback 1 (plná) pro rgb()/hex/nevalidní vstup. // lint-colors-ignore
  */
 export function parseAlpha(value: string): number {
   const m = /rgba?\([^)]*?,[^)]*?,[^)]*?,\s*([\d.]+)\s*\)/.exec(value ?? '');

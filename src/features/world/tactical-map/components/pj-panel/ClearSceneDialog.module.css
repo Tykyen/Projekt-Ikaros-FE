@@ -1,7 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(var(--map-ui-shadow-rgb) / 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,14 +10,14 @@
 }
 
 .dialog {
-  background: rgba(20, 14, 50, 0.95);
+  background: rgb(var(--map-ui-panel-rgb) / 0.95);
   color: var(--map-toolbar-text);
-  border: 1px solid rgba(120, 100, 255, 0.4);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.4);
   border-radius: 8px;
   padding: 20px 22px;
   max-width: 420px;
   width: 100%;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 40px rgb(var(--map-ui-shadow-rgb) / 0.5);
 }
 
 .title {
@@ -41,7 +41,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 10px;
-  background: rgba(10, 8, 32, 0.5);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.5);
   border-radius: 4px;
   font-size: 13px;
 }
@@ -53,7 +53,7 @@
 .count {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: rgba(120, 200, 120, 0.95);
+  color: rgb(var(--map-ui-success-rgb) / 0.95);
 }
 
 .empty {
@@ -66,11 +66,11 @@
 .warn {
   margin: 0 0 10px;
   padding: 8px 10px;
-  background: rgba(255, 180, 80, 0.12);
-  border: 1px solid rgba(255, 180, 80, 0.35);
+  background: rgb(var(--map-ui-gold-rgb) / 0.12);
+  border: 1px solid rgb(var(--map-ui-gold-rgb) / 0.35);
   border-radius: 4px;
   font-size: 12px;
-  color: rgba(255, 200, 130, 0.95);
+  color: rgb(var(--map-ui-gold-rgb) / 0.95);
 }
 
 .note {
@@ -99,23 +99,23 @@
 }
 
 .cancelBtn {
-  background: rgba(120, 100, 255, 0.1);
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
   color: var(--map-toolbar-text);
-  border-color: rgba(120, 100, 255, 0.25);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.25);
 }
 
 .cancelBtn:hover:not(:disabled) {
-  background: rgba(120, 100, 255, 0.18);
+  background: rgb(var(--map-ui-accent-rgb) / 0.18);
 }
 
 .confirmBtn {
-  background: rgba(255, 80, 100, 0.25);
-  color: #ffd0d6;
-  border-color: rgba(255, 80, 100, 0.6);
+  background: rgb(var(--map-ui-danger-rgb) / 0.25);
+  color: var(--map-ui-danger-solid);
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.6);
 }
 
 .confirmBtn:hover:not(:disabled) {
-  background: rgba(255, 80, 100, 0.4);
+  background: rgb(var(--map-ui-danger-rgb) / 0.4);
 }
 
 .cancelBtn:disabled,

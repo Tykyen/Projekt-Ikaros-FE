@@ -2,7 +2,7 @@
 .accordion {
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(120, 100, 255, 0.15);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -13,7 +13,7 @@
   gap: 8px;
   width: 100%;
   padding: 8px 10px;
-  background: rgba(120, 100, 255, 0.08);
+  background: rgb(var(--map-ui-accent-rgb) / 0.08);
   color: var(--map-toolbar-text);
   border: none;
   font: inherit;
@@ -28,7 +28,7 @@
 }
 
 .header:hover {
-  background: rgba(120, 100, 255, 0.16);
+  background: rgb(var(--map-ui-accent-rgb) / 0.16);
 }
 
 .chevron {
@@ -53,7 +53,7 @@
   min-width: 20px;
   padding: 1px 7px;
   border-radius: 999px;
-  background: rgba(120, 100, 255, 0.22);
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
   color: var(--map-toolbar-text);
   font-size: 10px;
   font-weight: 700;

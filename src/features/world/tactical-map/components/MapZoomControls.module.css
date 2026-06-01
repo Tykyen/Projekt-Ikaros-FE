@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1px solid rgba(120, 100, 255, 0.15);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
   border-radius: 6px;
   color: inherit;
   font-family: var(--font-mono);
@@ -28,12 +28,12 @@
 }
 
 .btn:hover {
-  background: rgba(120, 100, 255, 0.1);
-  border-color: rgba(120, 100, 255, 0.4);
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.4);
 }
 
 .btn:active {
-  background: rgba(120, 100, 255, 0.2);
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
 }
 
 .btnReset {

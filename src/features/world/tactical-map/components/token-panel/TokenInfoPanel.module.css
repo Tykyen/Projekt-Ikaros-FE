@@ -10,18 +10,18 @@
 .panel {
   background: linear-gradient(
     155deg,
-    rgba(20, 14, 50, 0.96),
-    rgba(10, 6, 28, 0.98)
+    rgb(var(--map-ui-panel-rgb) / 0.96),
+    rgb(var(--map-ui-panel-deep-rgb) / 0.98)
   );
   backdrop-filter: blur(14px) saturate(150%);
-  border: 1px solid rgba(120, 100, 255, 0.32);
-  color: var(--map-toolbar-text, #e8e0ff);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.32);
+  color: var(--map-toolbar-text, var(--map-ui-accent-text));
   display: flex;
   flex-direction: column;
   box-shadow:
-    -8px 0 32px rgba(0, 0, 0, 0.55),
-    0 0 24px rgba(120, 100, 255, 0.12),
-    inset 1px 0 0 rgba(255, 255, 255, 0.04);
+    -8px 0 32px rgb(var(--map-ui-shadow-rgb) / 0.55),
+    0 0 24px rgb(var(--map-ui-accent-rgb) / 0.12),
+    inset 1px 0 0 rgb(var(--map-ui-light-rgb) / 0.04);
   /* 10.2c-edit-9g fix — world top nav je `--z-sticky: 200`. Panel musí být
      NAD ním, jinak nav zakryje vrchní část panelu (mode toggle + close). */
   z-index: 400;
@@ -38,7 +38,7 @@
   border-right: none;
   border-top: none;
   border-bottom: none;
-  border-left: 2px solid rgba(120, 100, 255, 0.4);
+  border-left: 2px solid rgb(var(--map-ui-accent-rgb) / 0.4);
   border-radius: 0;
 }
 
@@ -55,11 +55,11 @@
 }
 
 .resizeHandle:hover {
-  background: rgba(120, 100, 255, 0.35);
+  background: rgb(var(--map-ui-accent-rgb) / 0.35);
 }
 
 .resizeHandle:active {
-  background: rgba(180, 140, 255, 0.55);
+  background: rgb(var(--map-ui-accent-bright-rgb) / 0.55);
 }
 
 /* ── DRAG MODE — absolute centered, JS transform ────────────────── */
@@ -82,7 +82,7 @@
 .overlayBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgb(var(--map-ui-shadow-rgb) / 0.65);
   z-index: 399; /* těsně pod panelem (400) */
   backdrop-filter: blur(2px);
 }
@@ -108,10 +108,10 @@
      Teď výrazný fialový pruh aby user viděl mode toggle + close. */
   background: linear-gradient(
     180deg,
-    rgba(120, 100, 255, 0.22),
-    rgba(120, 100, 255, 0.12)
+    rgb(var(--map-ui-accent-rgb) / 0.22),
+    rgb(var(--map-ui-accent-rgb) / 0.12)
   );
-  border-bottom: 1px solid rgba(120, 100, 255, 0.45);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.45);
   flex-shrink: 0;
   min-height: 52px;
 }
@@ -121,14 +121,14 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: rgba(120, 100, 255, 0.16);
-  border: 1px solid rgba(120, 100, 255, 0.45);
+  background: rgb(var(--map-ui-accent-rgb) / 0.16);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.45);
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: rgba(220, 235, 255, 0.95);
+  color: rgb(var(--map-ui-text-on-dark-rgb) / 0.95);
 }
 
 .headerSpacer {
@@ -145,8 +145,8 @@
   display: flex;
   gap: 2px;
   padding: 3px;
-  background: rgba(10, 6, 28, 0.75);
-  border: 1px solid rgba(120, 100, 255, 0.55);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.75);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.55);
   border-radius: 6px;
 }
 
@@ -154,7 +154,7 @@
   padding: 4px 10px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgb(var(--map-ui-light-rgb) / 0.85);
   font: inherit;
   font-size: 15px;
   cursor: pointer;
@@ -170,20 +170,20 @@
 }
 
 .modeBtn:hover {
-  background: rgba(120, 100, 255, 0.18);
-  color: #fff;
+  background: rgb(var(--map-ui-accent-rgb) / 0.18);
+  color: var(--map-ui-text);
 }
 
 .modeBtnActive {
-  background: rgba(120, 100, 255, 0.32);
-  color: #fff;
+  background: rgb(var(--map-ui-accent-rgb) / 0.32);
+  color: var(--map-ui-text);
 }
 
 .closeBtn {
   padding: 4px 10px;
   background: transparent;
-  color: rgba(220, 235, 255, 0.7);
-  border: 1px solid rgba(120, 100, 255, 0.2);
+  color: rgb(var(--map-ui-text-on-dark-rgb) / 0.7);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.2);
   border-radius: 6px;
   font: inherit;
   font-size: 18px;
@@ -197,9 +197,9 @@
 }
 
 .closeBtn:hover {
-  background: rgba(255, 80, 96, 0.18);
-  border-color: rgba(255, 80, 96, 0.5);
-  color: #ff9090;
+  background: rgb(var(--map-ui-danger-rgb) / 0.18);
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.5);
+  color: var(--map-ui-danger-solid);
 }
 
 /* ── IDENTITY ROW (avatar + jméno) ─────────────────────────────── */
@@ -208,7 +208,7 @@
   align-items: center;
   gap: 14px;
   padding: 16px;
-  border-bottom: 1px solid rgba(120, 100, 255, 0.12);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.12);
   flex-shrink: 0;
 }
 
@@ -217,10 +217,10 @@
   height: 72px;
   border-radius: 50%;
   overflow: hidden;
-  background: rgba(20, 14, 50, 0.8);
-  border: 2px solid rgba(120, 100, 255, 0.45);
+  background: rgb(var(--map-ui-panel-rgb) / 0.8);
+  border: 2px solid rgb(var(--map-ui-accent-rgb) / 0.45);
   flex-shrink: 0;
-  box-shadow: 0 0 16px rgba(120, 100, 255, 0.18);
+  box-shadow: 0 0 16px rgb(var(--map-ui-accent-rgb) / 0.18);
 }
 
 .avatar img {
@@ -237,7 +237,7 @@
   justify-content: center;
   font-size: 24px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgb(var(--map-ui-light-rgb) / 0.7);
 }
 
 .name {
@@ -256,7 +256,7 @@
   overflow-x: hidden;
   padding: 16px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(120, 100, 255, 0.3) transparent;
+  scrollbar-color: rgb(var(--map-ui-accent-rgb) / 0.3) transparent;
 }
 
 .body::-webkit-scrollbar {
@@ -264,12 +264,12 @@
 }
 
 .body::-webkit-scrollbar-thumb {
-  background: rgba(120, 100, 255, 0.3);
+  background: rgb(var(--map-ui-accent-rgb) / 0.3);
   border-radius: 4px;
 }
 
 .body::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 100, 255, 0.55);
+  background: rgb(var(--map-ui-accent-rgb) / 0.55);
 }
 
 /* ── Responsive: mobile force overlay ──────────────────────────── */
@@ -285,7 +285,7 @@
     max-height: 88vh;
     height: auto;
     border-radius: 10px;
-    border: 1px solid rgba(120, 100, 255, 0.4);
+    border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.4);
   }
 
   .resizeHandle {

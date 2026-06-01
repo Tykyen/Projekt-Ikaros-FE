@@ -11,11 +11,11 @@
   height: 34px;
   padding: 0 12px;
   border-radius: 17px;
-  background: var(--map-toolbar-bg, rgba(10, 8, 32, 0.85));
-  border: 1px solid rgba(214, 185, 127, 0.28);
+  background: var(--map-toolbar-bg, rgb(var(--map-ui-panel-deep-rgb) / 0.85));
+  border: 1px solid rgb(var(--map-ui-parchment-border-rgb) / 0.28);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: var(--map-toolbar-text, rgba(228, 220, 200, 0.92));
+  color: var(--map-toolbar-text, rgb(var(--map-ui-parchment-bg-rgb) / 0.92));
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -25,12 +25,12 @@
     box-shadow 0.15s;
 }
 .pill:hover {
-  border-color: #d6b97f;
-  box-shadow: 0 0 12px color-mix(in srgb, #d6b97f 30%, transparent);
+  border-color: var(--map-ui-parchment-border);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--map-ui-parchment-border) 30%, transparent);
 }
 .pillIcon {
-  color: #d6b97f;
-  filter: drop-shadow(0 0 4px color-mix(in srgb, #d6b97f 55%, transparent));
+  color: var(--map-ui-parchment-border);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--map-ui-parchment-border) 55%, transparent));
 }
 .pillLabel {
   white-space: nowrap;
@@ -45,7 +45,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(8, 6, 16, 0.62);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.62);
   backdrop-filter: blur(3px);
   animation: fadeIn 0.16s ease-out;
 }
@@ -64,12 +64,12 @@
   flex-direction: column;
   width: min(900px, 100%);
   max-height: 100%;
-  background-color: #f3ecd8;
-  border: 1px solid #c9b78f;
+  background-color: var(--map-ui-parchment-bg-light);
+  border: 1px solid var(--map-ui-parchment-border);
   border-radius: 8px;
   box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.5),
-    0 2px 0 rgba(255, 255, 255, 0.4) inset;
+    0 24px 60px rgb(var(--map-ui-shadow-rgb) / 0.5),
+    0 2px 0 rgb(var(--map-ui-light-rgb) / 0.4) inset;
   overflow: hidden;
   animation: bookIn 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
@@ -91,8 +91,8 @@
   justify-content: space-between;
   gap: var(--sp-2);
   padding: 12px 16px;
-  background: linear-gradient(180deg, #e7dcc0, #ddd0ac);
-  border-bottom: 1px solid #c9b78f;
+  background: linear-gradient(180deg, var(--map-ui-parchment-bg), var(--map-ui-parchment-bg));
+  border-bottom: 1px solid var(--map-ui-parchment-border);
 }
 
 .titleWrap {
@@ -107,8 +107,8 @@
   font-family: 'Caveat', 'Patrick Hand', 'Permanent Marker', cursive;
   font-size: 1.9rem;
   line-height: 1.1;
-  color: #3a2a1a;
-  text-shadow: 0 1px 0 rgba(58, 42, 26, 0.1);
+  color: var(--map-ui-parchment-deep);
+  text-shadow: 0 1px 0 rgb(var(--map-ui-parchment-deep-rgb) / 0.1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -117,7 +117,7 @@
 .subtitle {
   font-family: 'Caveat', cursive;
   font-size: 1.15rem;
-  color: #8b7355;
+  color: var(--map-ui-parchment-ink);
   font-style: italic;
   white-space: nowrap;
 }
@@ -135,10 +135,10 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid #c9b78f;
+  border: 1px solid var(--map-ui-parchment-border);
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.35);
-  color: #5a4a30;
+  background: rgb(var(--map-ui-light-rgb) / 0.35);
+  color: var(--map-ui-parchment-ink);
   cursor: pointer;
   transition:
     background 0.12s,
@@ -146,8 +146,8 @@
 }
 
 .closeBtn:hover {
-  background: rgba(185, 60, 60, 0.15);
-  color: #8a2a2a;
+  background: rgb(var(--map-ui-danger-rgb) / 0.15);
+  color: var(--map-ui-danger-solid);
 }
 
 /* Papír uvnitř knihy scrolluje, kniha drží max-height. */

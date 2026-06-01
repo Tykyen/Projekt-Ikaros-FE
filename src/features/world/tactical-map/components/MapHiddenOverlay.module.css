@@ -10,8 +10,8 @@
   justify-content: center;
   gap: 18px;
   text-align: center;
-  background: rgba(5, 3, 12, 0.96);
-  color: rgba(220, 235, 255, 0.85);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.96);
+  color: rgb(var(--map-ui-text-on-dark-rgb) / 0.85);
   font-family: var(--font-mono);
   /* Block všechny eventy — PJ pause, hráč nemůže klikat na nic za clonou */
   pointer-events: all;
@@ -21,7 +21,7 @@
 .icon {
   font-size: 64px;
   opacity: 0.75;
-  filter: drop-shadow(0 0 12px rgba(255, 100, 100, 0.4));
+  filter: drop-shadow(0 0 12px rgb(var(--map-ui-danger-rgb) / 0.4));
 }
 
 .title {

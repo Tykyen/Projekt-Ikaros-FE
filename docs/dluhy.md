@@ -6,6 +6,44 @@
 
 ---
 
+## Vyřešené 2026-06-01 (D-063 — map UI tokeny)
+
+- **D-063 — Tactical-map UI chrome → `--map-ui-*` tokeny** ✅ (varianta A2 — plná konsolidace).
+  **492 hardcoded barev ve 39 chrome module.css + TSX inline** sjednoceno do **~30
+  sémantických `--map-ui-*` tokenů** v [map-tokens.css](../src/themes/_shared/map-tokens.css).
+  - **Trik na 8 opacit:** RGB triplety (`--map-ui-accent-rgb: 120 100 255`) +
+    `rgb(var(--x) / <alpha>)` (CSS Color 4) → jeden token pokryje všechny průhlednosti.
+  - **Konsolidace:** ~216 unikátních odstínů (copy-paste drift) sjednoceno na kanonické
+    hodnoty → **drobný záměrný drift** u near-duplikátů (oprava drift chaosu).
+  - **Vyloučeno (záměrná identita, ne chrome drift):** 6 `system-panels/*` combat panelů
+    (Matrix neon, CoC parchment, GURPS steel…) → přidáno do `lint:colors` ALLOW.
+    Canvas/PIXI data (effectColors, hpTier) → `lint-colors-ignore` (čte WebGL, ne CSS).
+  - **Lint fix:** `RGB_RE` negative lookahead na `var(` (token-based `rgb(var()/a)` není
+    hardcoded) + `.test.` do ALLOW.
+  - **Výsledek:** `lint:colors` **0 v tactical-map** (z ~56), eslint 0, tsc 0, build 0,
+    157 testů zelených. ⚠️ Vizuální drift review (běžící mapa) doporučen uživateli.
+
+## Vyřešené 2026-06-01 (D-066 + D-062c)
+
+- **D-066 — Per-token lock** ✅ — PJ může zamknout jednotlivý token (ne celou scénu).
+  **BE** (`400e7b6`): `MapToken += isLocked?: boolean` (interface); op aplikace generic
+  (`token.update` patch loop), authorizer gate by default (`isLocked` ∉
+  `allowedPlayerFields` → hráč 403) + test. **FE**: `MapToken += isLocked`,
+  `useTokenPermissions` gate (`token.isLocked && !isPj → false`), PJ toggle
+  „🔓 Zamknout/🔒 Zamčen" v TokenInfoPanel header, 🔒 badge na zamčeném spritu
+  (top-right). Spec: [spec-D-066-per-token-lock.md](arch/phase-10/spec-D-066-per-token-lock.md).
+  Testy: BE maps 144 zelených (+1), FE tactical-map 123 zelených.
+- **D-062c — AKJ stub karty v listings (var. b)** ✅ — stránka bez AKJ klíče se v adresáři
+  i page-search zobrazí jako stub „🔒 AKJ: N — Název"; klik → AccessDenied (D-062a).
+  **BE** (`2b9e8b8`): `GET /pages/directory` vrací per-entry `shieldedBy` (nesplněné
+  AKJ/Role pro current usera); raw `accessRequirements` se NEvrací (privacy — UserId).
+  `computeShieldedBy` refaktorován na čistou DB-free `shieldedFromRequirements`;
+  directory načte membership+akjSettings JEDNOU (ne N+1 per stránka). **FE**:
+  `PageDirectoryEntry += shieldedBy`, `PageCard` stub varianta (Lock ikona + ztlumená
+  dashed karta + AKJ label), `PagePalette` 🔒 indikátor. Bezpečnost beze změny —
+  directory už dřív vracel chráněné s title (jen vizuální indikace). Testy: BE pages 44
+  (+2), FE 8 zelených.
+
 ## Vyřešené 2026-05-31 (sweep dluhů)
 
 - **D-060 — Cross-world kalendář link** ✅ (mrtvý dluh) — předpoklad zmizel. Soubor
@@ -20,12 +58,28 @@
   v [setup.ts](../src/__tests__/setup.ts) (emituje token přes `onSuccess` na mount).
   RegisterModal spec **14/14** (byl timeout na disabled submit). Turnstile používá
   jen RegisterModal → globální mock nikoho jiného neovlivní.
-- **Lint regrese 4 errors → 0** ✅ — dluh `D-react19-strict-cleanup` psal „0 errors",
-  ale mezitím přibyly 4 hard errors. Opraveno: unused `FATE_TARGETS` import
-  (DiceRollOverlay), unused `describe` (diceVisibility.spec), `access-before-declared`
-  `startPlaylist` (useYoutubePlayer — přesun deklarace nad init-effekt),
-  mirror-ref reassign (usePanelLayout — write-only `onDragEnd` + 1 cílený
-  eslint-disable na R19 `immutability` false-friend). Warningy (50) řešeny zvlášť.
+- **D-react19-strict-cleanup — KOMPLETNĚ vyřešeno** ✅ — `npx eslint src` **0 errors,
+  0 warnings** (z 4 errors + 50 warningů). Ověřeno: tsc 0 errors, **2320/2320 FE testů
+  zelených** (294 souborů), žádná regrese.
+  - **4 errory**: unused `FATE_TARGETS` (DiceRollOverlay), unused `describe`
+    (diceVisibility.spec), `access-before-declared` `startPlaylist` (useYoutubePlayer
+    → přesun deklarace nad init-effekt), mirror-ref reassign (usePanelLayout
+    → write-only `onDragEnd` + 1 cílený eslint-disable na R19 `immutability` false-friend).
+  - **50 warningů per-case**: `unused-disable` (4× odebráno), `incompatible-library`
+    watch() (4× cílený disable — RHF false positive), `react-refresh/only-export`
+    (7× file-level disable — DX/HMR, util/Context soubory), `exhaustive-deps`
+    (8× → `useMemo` wrap stabilizace `?? []` referencí + timer-cleanup disable),
+    `refs` (3× → `isDragging` state v ZoomableImage + lazy-init param v useFormDraftAutoSave
+    + RHF disable RegisterModal), `static-components` (6× → SortHeader extrakce ven,
+    ArticleDetail Wrapper → sdílený `cardInner`, PageCard Icon disable),
+    `set-state-in-effect` (18× **per-case**: adjustment-during-render pro primitivní
+    deps — GalleryLightbox/useComposerSticky/PagePalette/PoolPrompt/AkjCreate/SkinPicker/
+    TemplateEditor/CalendarTabGrid/useSlugAutoGen/Mention+Emote autocomplete; render-phase
+    self-limiting pro CalendarConfigsPage+AppearancePopover; cílený disable pro legit
+    external/async/animaci — EmoteUploadDialog objectURL, DiceRollOverlay rAF,
+    MatrixCombatPanel async mutace).
+  - **Princip**: array/object deps NIKDY adjustment (riziko smyčky) → primitivní klíč
+    nebo disable; primitivní deps adjustment (skutečná oprava, ne potlačení).
 
 - **D-064 — Orchestr: vkládání PC z katalogu** ✅ — vyřešeno v 10.2n přechodem ambient
   i palet na sdílený `CharacterCatalogModal` se **search + sekvenční multi-add** (klik
@@ -47,71 +101,12 @@
 
 ## Otevřené
 
-### D-066 — Per-token lock (zamčení jednotlivého tokenu)
-**Soubor:** `src/features/world/tactical-map/types.ts` (`MapToken`) + `hooks/useTokenPermissions.ts`
-**Problém:** Roadmapa 10.2m zmiňuje „respekt `isLocked`". Existuje jen `scene.isLocked` (zamkne pohyb tokeny celé scény hráčům). Per-token lock — zamknout konkrétní token, ne celou scénu — chybí: `MapToken` nemá pole `isLocked`, takže PJ nemůže přišpendlit jeden token a nechat ostatní volné.
-**Dopad:** Nízký — scene-level lock pokrývá hlavní use-case (zamknout celou scénu během vyprávění); granularita per-token je nice-to-have.
-**Řešení:** BE: `MapToken.isLocked?: boolean` ve schématu + `token.update` op + `toEntity` mapper. FE: gate v `useTokenPermissions.canDrag` (`token.isLocked && !isPj` → false) + toggle v TokenStatbarModal (PJ-only). BE+FE krok, nemíchat v jedné dávce.
-**Kdy:** Až bude potřeba zamykat jednotlivé tokeny (např. dekorace/objekty na mapě), nebo v navazující map iteraci.
-
----
-
-### D-react19-strict-cleanup — 44 React 19 strict lint warningy ve 30+ FE souborech
-**Soubory:** Široký scope — viz `npx eslint src` výstup. Hot soubory:
-- `PageEditor/hooks/{useFormDraftAutoSave,useSlugAutoGen}.ts`, `PageEditor/components/AkjCreateModal.tsx`
-- `WorldSettingsPage/{components/TemplateEditorModal.tsx, tabs/BasicInfoTab.tsx}`
-- `WorldDashboardPage/.../WorldNewsEditorModal.tsx`, `CharacterDetailPage/components/CalendarTab.tsx`
-- `NPCDirectoryPage/components/NpcTemplateModal.tsx`, `CalendarConfigsPage/CalendarConfigEditor.tsx`
-- chat: `useComposerSticky.ts`, `AppearancePopover.tsx`, `MentionAutocomplete.tsx`, `EmoteAutocomplete.tsx`, dice komponenty
-- ostatní: `RegisterModal`, `ArticleDetailPage`, `GalleryLightbox`, `PagePalette`, `GameEventModal`, `PagePicker`
-
-**Kategorie warningů (44):**
-- `react-hooks/set-state-in-effect` (~25) — fix pattern "adjustment during render" (React 19), použito už ve `useDensity.ts` a `CalendarPage.tsx` jumpOpen jako vzor.
-- `react-hooks/incompatible-library` (~6) — `watch()` z react-hook-form je **false positive** (knihovní API problém, vyžaduje upgrade lib nebo eslint-disable s odkazem).
-- `react-hooks/refs` (~3) — access ref během renderu.
-- `react-hooks/static-components` (~5) — komponenty deklarované uvnitř renderu, vyžaduje extrahovat ven.
-- `react-hooks/exhaustive-deps` (~5) — drobné memo dependencies.
-- 1× unused eslint-disable directive.
-
-**Dopad:** Nízký — build prochází (TS 0 errors, lint 0 errors), runtime bug pozorován **nebyl**. Jde o R19 strict checks doporučující refactor patternů, ne reálné bugy. Riziko: některé `set-state-in-effect` mohou v krajních případech způsobovat cascading renders (perf), v praxi neviditelné.
-
-**Řešení:** Samostatný sprint „react-19-strict-cleanup", ~1-2h. Postup:
-1. Hromadně `set-state-in-effect` → pattern adjustment during render
-2. Jednotlivě `refs` a `static-components` (vyžaduje extrakci komponent)
-3. `incompatible-library` → eslint-disable s komentem dokud lib nevyřeší
-
-**Kdy:** Mimo feature work. Při příští session zaměřené na perf/quality nebo když lint začne blokovat CI.
-
-**Stav (2026-05-31):** Lint **errory 4 → 0** opraveny (viz „Vyřešené 2026-05-31"). Zbývá
-**50 warningů** (R19 strict, 0 runtime dopadu): 18× `set-state-in-effect`, 8× `exhaustive-deps`,
-7× `react-refresh/only-export-components`, 6× `static-components`, 4× `incompatible-library`,
-3× `refs`, 4× ostatní. Tento sprint = jen warningy.
-
----
-
-### D-063 — Tactical-map UI chrome modules používají hardcoded barvy místo `--map-*` tokenů
-**Soubor:** `src/features/world/tactical-map/components/**/*.module.css` (15+ souborů: MapPjPanel, BestiePalette, ActiveScenesList, EditSceneModal, MapLibraryModal, ClearSceneDialog, CharacterCatalogModal, MapEmptyState, MapHiddenOverlay, MapLockedOverlay, MapZoomControls, PaletteSearchInput, MemberAssignmentTable, MapPlacementBanner, TokenStatbarModal, …)
-**Problém:** UI chrome panely v taktické mapě (PJ panel, palety, modaly, banner) používají hardcoded `rgba(120, 100, 255, …)`, `rgba(20, 14, 50, …)`, `#fff`, `#ffb4b4` apod. `lint:colors` reportuje ~2800 globálně, z toho významný podíl z tactical-map. Existující `--map-*` vars v [_shared/map-tokens.css](src/themes/_shared/map-tokens.css) pokrývají jen render layer (canvas-bg, grid-stroke, token-ring, fog), nikoli UI chrome (panel-bg, panel-border, button-purple, button-purple-hover, danger-bg, danger-fg, accent-strong, …).
-**Dopad:** Nízký — funkčně OK, ale nepodporuje theming map UI per skin (10.2 princip 8 — theming via world CSS vars). Při přidání nového map skinu bude třeba per-soubor overrides místo theme-level varů.
-**Řešení:** Rozšířit `--map-*` token sadu o UI chrome layer (~10-15 nových vars: `--map-panel-bg`, `--map-panel-border`, `--map-accent`, `--map-accent-hover`, `--map-danger-bg`, `--map-danger-fg`, …). Refactor 15+ module.css na `var(--map-…)`. Riziko: vizuální drift, takže per-soubor screen review po refaktoru.
-**Kdy:** Před 10.2j (skin-specific effects) nebo při zavedení druhého map skinu — pak teprve var() vrstva dává smysl. Do té doby konzistence s existujícími sourozenci > pedantská čistota.
-
----
-
-### D-062c — Listings: AKJ-chráněné stránky bez indikátoru v adresáři / vyhledávání
-**Soubor:** `GET /pages` + `GET /pages/directory` v BE; `CharacterDirectory.tsx` + listing komponenty v FE
-**Problém:** `GET /pages` a `/pages/directory` aktuálně vrací AKJ-chráněné stránky **bez filtru a bez indikátoru**. User v adresáři vidí plný název, klik → AccessDenied (D-062a vyřešil zobrazení úrovně, ale nekonzistence zůstává). Listings by měly buď AKJ-chráněné stránky úplně filtrovat (jako backlinks dnes), nebo zobrazit stub kartu („🔒 AKJ: 3 — Tajný spis") podle Matrix vzoru.
-**Dopad:** Nízký až Střední — UX nekonzistence. Bez D-062c je informace o existenci „nakopnutá" pouze přes AccessDenied screen (klik), ne v běžném pohledu na svět.
-**Řešení:** Spec + plán samostatně. Klíčové rozhodnutí: ukazovat stub vždy / podle nastavení světa / podle role uživatele. Plus inline badge na hlavičce stránky (`AKJ: 3 W`) podle Matrix vzoru.
-**Kdy:** Po dotazu uživatele (chce vidět existenci v adresáři / search?). Vychází z legacy Matrix (`C:/Matrix/Matrix/frontend/src/pages/Page.tsx:640` PJ container badgy).
-
----
-
 ### D-062 (původní) — IMPLEMENTOVÁNO 2026-05-24
 Část a+b realizována jako [spec-akj-shielded-existence.md](arch/_side-tasks/spec-akj-shielded-existence.md).
 - **D-062a (AccessDenied):** klik na AKJ-zamčený link → screen s konkrétní úrovní AKJ + jméno klíče + Wood-Wide hint.
 - **D-062b (AkjDecryptedBanner):** otevřená AKJ-chráněná stránka má nahoře banner „UTAJENÝ ARCHIV [AKJ: N — Name] / Úspěšně dešifrováno" (theme variants přes CSS `[data-theme]`).
-- **D-062c:** zbývající — listings stub + inline header badge — viz nahoře.
+- **D-062c (listings stub):** ✅ vyřešeno 2026-06-01 — viz „Vyřešené 2026-06-01". Inline header
+  badge na hlavičce stránky je pokryt D-062b bannerem; samostatný „AKJ: N W" chip se nedělá.
 
 ---
 
@@ -133,7 +128,6 @@
 
 ---
 
-**Celkem otevřených dluhů: 6** — D-066 (per-token lock, BE+FE), D-react19-strict-cleanup
-(50 warningů, řeší se), D-063 (map UI tokeny), D-062c (AKJ listings stub — rozhodnuto
-var. **b**, čeká spec+BE), D-NEW-chat-edit-attachments (defer), D-NEW-chat-presence-scale
-(defer, multi-instance).
+**Celkem otevřených dluhů: 2** — D-NEW-chat-edit-attachments (defer, čeká na stížnost),
+D-NEW-chat-presence-scale (defer, multi-instance BE). Oba vědomě odložené s konkrétním
+triggerem.

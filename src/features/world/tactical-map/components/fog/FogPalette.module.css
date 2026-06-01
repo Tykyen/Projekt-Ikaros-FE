@@ -1,7 +1,7 @@
 /**
  * 10.2h — paleta mlhy. Panel je přímo obsah `MapToolDock` (sekce „🌫️ Mlha") —
  * žádný vnitřní toolbar ani vyjíždějící overlay, jen panel v těle docku.
- * Mlhový accent (`#9fb4d4`) pro aktivní segmenty.
+ * Mlhový accent (`var(--map-ui-blue-solid)`) pro aktivní segmenty.
  */
 .panel {
   display: flex;
@@ -23,7 +23,7 @@
 .switch {
   width: 16px;
   height: 16px;
-  accent-color: var(--accent, #9fb4d4);
+  accent-color: var(--accent, var(--map-ui-blue-solid));
   cursor: pointer;
 }
 
@@ -33,7 +33,7 @@
   flex-direction: column;
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid rgba(159, 180, 212, 0.14);
+  border-top: 1px solid rgb(var(--map-ui-blue-rgb) / 0.14);
 }
 .disabled {
   opacity: 0.4;
@@ -48,35 +48,35 @@
   flex: 1;
   padding: 6px 4px;
   font-size: 11px;
-  background: rgba(159, 180, 212, 0.06);
-  border: 1px solid rgba(159, 180, 212, 0.18);
+  background: rgb(var(--map-ui-blue-rgb) / 0.06);
+  border: 1px solid rgb(var(--map-ui-blue-rgb) / 0.18);
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
   transition: all 0.12s;
 }
 .segBtn:hover:not(:disabled) {
-  background: rgba(159, 180, 212, 0.14);
+  background: rgb(var(--map-ui-blue-rgb) / 0.14);
 }
 .brushBtn {
   flex: 1;
   height: 34px;
   font-size: 16px;
-  background: rgba(159, 180, 212, 0.06);
-  border: 1px solid rgba(159, 180, 212, 0.18);
+  background: rgb(var(--map-ui-blue-rgb) / 0.06);
+  border: 1px solid rgb(var(--map-ui-blue-rgb) / 0.18);
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
   transition: all 0.12s;
 }
 .brushBtn:hover:not(:disabled) {
-  background: rgba(159, 180, 212, 0.14);
+  background: rgb(var(--map-ui-blue-rgb) / 0.14);
 }
 .segBtnActive {
-  background: rgba(159, 180, 212, 0.22);
-  border-color: var(--accent, rgba(159, 180, 212, 0.6));
+  background: rgb(var(--map-ui-blue-rgb) / 0.22);
+  border-color: var(--accent, rgb(var(--map-ui-blue-rgb) / 0.6));
   font-weight: 700;
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent, #9fb4d4) 45%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent, var(--map-ui-blue-solid)) 45%, transparent);
 }
 
 .label {
@@ -103,16 +103,16 @@
   width: 100%;
   padding: 7px;
   font-size: 12px;
-  background: rgba(255, 80, 96, 0.1);
-  border: 1px solid rgba(255, 80, 96, 0.35);
+  background: rgb(var(--map-ui-danger-rgb) / 0.1);
+  border: 1px solid rgb(var(--map-ui-danger-rgb) / 0.35);
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
   transition: all 0.12s;
 }
 .resetBtn:hover:not(:disabled) {
-  background: rgba(255, 80, 96, 0.2);
-  border-color: rgba(255, 80, 96, 0.6);
+  background: rgb(var(--map-ui-danger-rgb) / 0.2);
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.6);
 }
 .resetBtn:disabled {
   opacity: 0.35;

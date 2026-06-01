@@ -214,6 +214,14 @@ const FAQ: FaqItem[] = [
           <strong>přebijí</strong> nastavení scény). Každá scéna má vlastní stav —
           nezávisle na ostatních.
         </p>
+        <p>
+          Chceš zamknout jen <strong>jeden konkrétní token</strong> (třeba
+          dekoraci nebo objekt), a ostatní nechat volné? Otevři jeho info panel
+          (klik na <strong>„i"</strong> u tokenu) a klikni na{' '}
+          <strong>„🔓 Zamknout"</strong>. Zamčený token má na mapě malý{' '}
+          <strong>🔒</strong> a hráči s ním nepohnou (jen PJ) — nezávisle na zámku
+          celé scény.
+        </p>
       </>
     ),
   },

@@ -9,11 +9,11 @@
   height: 24px;
   padding: 0 8px;
   border-radius: 12px;
-  background: var(--map-toolbar-bg, rgba(10, 8, 32, 0.85));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--map-toolbar-bg, rgb(var(--map-ui-panel-deep-rgb) / 0.85));
+  border: 1px solid rgb(var(--map-ui-light-rgb) / 0.08);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
   font-size: 11.5px;
   font-weight: 600;
   pointer-events: auto;
@@ -41,13 +41,13 @@
 }
 
 .ok {
-  --tone: var(--map-status-ok, #36d399);
+  --tone: var(--map-status-ok, var(--map-status-ok));
 }
 .warn {
-  --tone: var(--map-status-warn, #ffd700);
+  --tone: var(--map-status-warn, var(--map-ui-gold-solid));
 }
 .error {
-  --tone: var(--map-status-error, #ff5060);
+  --tone: var(--map-status-error, var(--map-ui-danger-solid));
 }
 
 /* connecting / error → tečka pulzuje, ať si všimne periferní vidění */

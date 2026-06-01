@@ -25,11 +25,11 @@
   display: flex;
   flex-direction: column;
   /* Solid pozadí — výrazně méně průhledné než plovoucí toolbary. */
-  background: var(--map-toolbar-bg-solid, #0a0814);
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
   color: var(--map-toolbar-text);
-  border: 1px solid rgba(120, 100, 255, 0.3);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.3);
   border-radius: 10px;
-  box-shadow: var(--shadow-lg, 0 8px 28px rgba(0, 0, 0, 0.5));
+  box-shadow: var(--shadow-lg, 0 8px 28px rgb(var(--map-ui-shadow-rgb) / 0.5));
   overflow: visible;
 }
 
@@ -58,7 +58,7 @@
   border-radius: 10px;
 }
 .header:hover {
-  background: rgba(120, 100, 255, 0.1);
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
 }
 
 .headerLabel {
@@ -79,7 +79,7 @@
 
 /* Oddělení sekcí (efekty / zobrazení / …) jemnou linkou. */
 .body > * + * {
-  border-top: 1px solid rgba(120, 100, 255, 0.14);
+  border-top: 1px solid rgb(var(--map-ui-accent-rgb) / 0.14);
   padding-top: 6px;
   margin-top: 2px;
 }

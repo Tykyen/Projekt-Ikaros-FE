@@ -61,7 +61,8 @@
      fialová). Žije zde v `_shared` :root, ať platí globálně i mimo mapu.
      Per-skin override patří do themes/<skin>/index.css. */
   --sound-accent: #22d3ee;
-  --sound-accent-glow: rgba(34, 211, 238, 0.45);
+  --sound-accent-rgb: 34 211 238;
+  --sound-accent-glow: rgb(var(--sound-accent-rgb) / 0.45);
 
   /* ── Toolbar chrome (overrides z world theme — fallback inherit) ── */
   --map-toolbar-bg: var(--surface-2, rgba(10, 8, 32, 0.85));
@@ -69,4 +70,60 @@
   /* 10.2c-edit-4 — solid varianta pro PJ panel (overlay nad mapou,
      průsvitnost ruší čitelnost). Per-skin override v themes/<skin>/. */
   --map-toolbar-bg-solid: var(--surface-1, #0a0814);
+
+  /* ── D-063 — UI chrome (panely, palety, modaly, banner, lišty) ──────────
+     Konsolidace driftnutých odstínů do sémantické sady. RGB triplety →
+     rgb(var(--x) / <alpha>) pokryjí všechny průhlednosti jedním tokenem;
+     blízké odstíny sjednoceny na kanonickou hodnotu. NEPLATÍ pro per-system
+     combat panely (system-panels/* mají vlastní identitu). Per-skin override
+     patří do themes/<skin>/index.css. */
+
+  /* Fialový brand accent (dominantní — 160+ výskytů) */
+  --map-ui-accent-rgb: 120 100 255;
+  --map-ui-accent-bright-rgb: 180 140 255; /* světlejší highlight / hover */
+  --map-ui-accent-solid: #b48cff;
+  --map-ui-accent-text: #c9b8ff; /* fialový text na tmavém */
+
+  /* Tmavé pozadí panelů / modalů / overlay */
+  --map-ui-panel-rgb: 14 12 40;
+  --map-ui-panel-deep-rgb: 10 8 32; /* hlubší (modaly, dialog backdrop) */
+  --map-ui-shadow-rgb: 0 0 0;
+
+  /* Světlo — bílé bordery, dividery, text */
+  --map-ui-light-rgb: 255 255 255;
+  --map-ui-text: #fff;
+  --map-ui-text-soft: #e2e8f0;
+  --map-ui-text-muted: #94a3b8;
+  --map-ui-text-dim: #64748b;
+  --map-ui-text-on-dark-rgb: 220 235 255;
+
+  /* Stavové barvy (RGB triplet → libovolná alfa) */
+  --map-ui-danger-rgb: 255 80 96;
+  --map-ui-danger-solid: #ff7080;
+  --map-ui-success-rgb: 80 200 120;
+  --map-ui-success-solid: #50c878;
+  --map-ui-gold-rgb: 255 215 0;
+  --map-ui-gold-solid: #fcd34d;
+  --map-ui-locked-rgb: 255 160 64; /* D-066 per-token lock */
+  --map-ui-locked-solid: #ffba73; /* zámek — text/ikona */
+  --map-ui-muted-solid: #aab0c8; /* tlumený text tlačítek */
+  --map-ui-gold-text: #ffd86b; /* zlatý text „v boji" */
+  --map-ui-info-solid: #38bdf8; /* modrá info (i-badge, odkazy) */
+
+  /* Modré (fog paleta, počasí panel, info badge) — sjednocené odstíny */
+  --map-ui-blue-rgb: 159 180 212;
+  --map-ui-blue-bright-rgb: 180 200 255;
+  --map-ui-blue-solid: #9fb4d4;
+  --map-ui-info-light: #aeccff; /* světlý info text/odkaz */
+  --map-ui-muted-rgb: 200 200 220; /* tlumené šedo-fialové */
+
+  /* Pergamen — deník/poznámky na mapě (MapNotebook má záměrný papírový vzhled) */
+  --map-ui-parchment-bg: #e7dcc0;
+  --map-ui-parchment-bg-light: #f3ecd8;
+  --map-ui-parchment-border: #d6b97f;
+  --map-ui-parchment-ink: #5a4a30;
+  --map-ui-parchment-deep: #3a2a1a;
+  --map-ui-parchment-bg-rgb: 228 220 200;
+  --map-ui-parchment-border-rgb: 214 185 127;
+  --map-ui-parchment-deep-rgb: 58 42 26;
 }

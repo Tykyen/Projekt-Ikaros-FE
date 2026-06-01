@@ -18,7 +18,7 @@
   opacity: 0.7;
   margin: 0;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(120, 100, 255, 0.15);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
 }
 
 .label {
@@ -29,14 +29,14 @@
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  color: var(--text-secondary, rgb(var(--map-ui-light-rgb) / 0.7));
 }
 
 .input {
   padding: 6px 10px;
-  background: rgba(20, 14, 50, 0.6);
-  color: var(--text-primary, #fff);
-  border: 1px solid rgba(120, 100, 255, 0.25);
+  background: rgb(var(--map-ui-panel-rgb) / 0.6);
+  color: var(--text-primary, var(--map-ui-text));
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
   border-radius: 4px;
   font: inherit;
   font-size: 13px;
@@ -46,7 +46,7 @@
 
 .input:focus {
   outline: none;
-  border-color: rgba(120, 100, 255, 0.7);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.7);
 }
 
 .imageRow {
@@ -61,8 +61,8 @@
   height: 90px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(120, 100, 255, 0.25);
-  background: rgba(10, 8, 32, 0.6);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.6);
 }
 
 .imagePreview img {
@@ -94,9 +94,9 @@
   align-items: center;
   justify-content: center;
   padding: 6px 12px;
-  background: rgba(120, 100, 255, 0.2);
-  color: var(--text-primary, #fff);
-  border: 1px solid rgba(120, 100, 255, 0.4);
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
+  color: var(--text-primary, var(--map-ui-text));
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.4);
   border-radius: 4px;
   font: inherit;
   font-size: 12px;
@@ -106,7 +106,7 @@
 }
 
 .uploadBtn:hover {
-  background: rgba(120, 100, 255, 0.35);
+  background: rgb(var(--map-ui-accent-rgb) / 0.35);
 }
 
 .configGrid {
@@ -125,7 +125,7 @@
 
 .error {
   font-size: 12px;
-  color: #ff7080;
+  color: var(--map-ui-danger-solid);
   margin: 0;
 }
 

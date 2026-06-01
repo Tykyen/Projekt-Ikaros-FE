@@ -21,7 +21,7 @@
   opacity: 0.5;
   margin: 0;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(120, 100, 255, 0.15);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
 }
 
 .fieldsList {
@@ -36,7 +36,7 @@
   justify-content: space-between;
   gap: 8px;
   padding: 4px 6px;
-  background: rgba(10, 8, 32, 0.3);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.3);
   border-radius: 4px;
 }
 
@@ -60,7 +60,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 4px 6px;
-  background: rgba(10, 8, 32, 0.3);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.3);
   border-radius: 4px;
 }
 
@@ -74,10 +74,10 @@
 .barTrack {
   position: relative;
   height: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(var(--map-ui-light-rgb) / 0.05);
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid rgba(120, 100, 255, 0.15);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
 }
 
 .barFill {
@@ -87,11 +87,11 @@
 }
 
 .barFull {
-  background: linear-gradient(90deg, #44ff80, #66dd66);
+  background: linear-gradient(90deg, var(--map-ui-success-solid), var(--map-ui-success-solid));
 }
 .barMid {
-  background: linear-gradient(90deg, #ffd040, #ffa030);
+  background: linear-gradient(90deg, var(--map-ui-gold-solid), var(--map-ui-gold-solid));
 }
 .barLow {
-  background: linear-gradient(90deg, #ff5060, #ff3050);
+  background: linear-gradient(90deg, var(--map-ui-danger-solid), var(--map-ui-danger-solid));
 }

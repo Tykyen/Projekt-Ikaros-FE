@@ -82,13 +82,13 @@ export function EffectsPalette({
   // Akcentová barva aktivního nástroje (pro glow toolbar tlačítka).
   const accent =
     activeTool === 'barrier'
-      ? '#ffd200'
+      ? 'var(--map-ui-gold-solid)'
       : activeTool === 'explosion'
         ? currentVariant.color
         : activeTool === 'color'
-          ? '#b48cff'
+          ? 'var(--map-ui-accent-solid)'
           : activeTool === 'erase'
-            ? '#ff7090'
+            ? 'var(--map-ui-danger-solid)'
             : undefined;
 
   return (
@@ -267,7 +267,7 @@ export function EffectsPalette({
           className={`${styles.toolBtn} ${activeTool === 'color' ? styles.toolBtnActive : ''}`}
           style={
             activeTool === 'color'
-              ? ({ '--accent': '#b48cff' } as React.CSSProperties)
+              ? ({ '--accent': 'var(--map-ui-accent-solid)' } as React.CSSProperties)
               : undefined
           }
           onClick={() => handleToolClick('color')}
@@ -280,7 +280,7 @@ export function EffectsPalette({
           className={`${styles.toolBtn} ${activeTool === 'barrier' ? styles.toolBtnActive : ''}`}
           style={
             activeTool === 'barrier'
-              ? ({ '--accent': '#ffd200' } as React.CSSProperties)
+              ? ({ '--accent': 'var(--map-ui-gold-solid)' } as React.CSSProperties)
               : undefined
           }
           onClick={() => handleToolClick('barrier')}
@@ -306,7 +306,7 @@ export function EffectsPalette({
           className={`${styles.toolBtn} ${activeTool === 'erase' ? styles.toolBtnActive : ''}`}
           style={
             activeTool === 'erase'
-              ? ({ '--accent': '#ff7090' } as React.CSSProperties)
+              ? ({ '--accent': 'var(--map-ui-danger-solid)' } as React.CSSProperties)
               : undefined
           }
           onClick={() => handleToolClick('erase')}

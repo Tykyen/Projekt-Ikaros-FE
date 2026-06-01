@@ -13,8 +13,8 @@
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  background: rgba(10, 8, 32, 0.4);
-  border: 1px solid rgba(120, 100, 255, 0.12);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.4);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.12);
   border-radius: 6px;
   color: inherit;
   font: inherit;
@@ -25,13 +25,13 @@
 }
 
 .item:hover {
-  background: rgba(120, 100, 255, 0.12);
-  border-color: rgba(120, 100, 255, 0.4);
+  background: rgb(var(--map-ui-accent-rgb) / 0.12);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.4);
 }
 
 .current {
-  background: rgba(120, 100, 255, 0.18);
-  border-color: rgba(120, 100, 255, 0.5);
+  background: rgb(var(--map-ui-accent-rgb) / 0.18);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.5);
   font-weight: 700;
 }
 
@@ -54,9 +54,9 @@
 }
 
 .editBtn {
-  background: rgba(120, 100, 255, 0.15);
+  background: rgb(var(--map-ui-accent-rgb) / 0.15);
   color: var(--map-toolbar-text);
-  border: 1px solid rgba(120, 100, 255, 0.3);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.3);
   border-radius: 4px;
   width: 28px;
   height: 28px;
@@ -66,15 +66,15 @@
 }
 
 .editBtn:hover {
-  background: rgba(120, 100, 255, 0.3);
-  border-color: rgba(120, 100, 255, 0.6);
+  background: rgb(var(--map-ui-accent-rgb) / 0.3);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.6);
 }
 
 /* 10.2c-edit-1 — deaktivace scény (scene.deactivate op + cascade unassign) */
 .deactivateBtn {
-  background: rgba(220, 60, 60, 0.12);
-  color: var(--map-toolbar-text, #d8d2ff);
-  border: 1px solid rgba(220, 60, 60, 0.3);
+  background: rgb(var(--map-ui-danger-rgb) / 0.12);
+  color: var(--map-toolbar-text, var(--map-ui-accent-text));
+  border: 1px solid rgb(var(--map-ui-danger-rgb) / 0.3);
   border-radius: 4px;
   width: 28px;
   height: 28px;
@@ -84,8 +84,8 @@
 }
 
 .deactivateBtn:hover {
-  background: rgba(220, 60, 60, 0.28);
-  border-color: rgba(220, 60, 60, 0.6);
+  background: rgb(var(--map-ui-danger-rgb) / 0.28);
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.6);
 }
 
 /* 10.2c-edit-1 mobil-desktop — touch min 44×44 na touch zařízeních

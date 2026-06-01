@@ -199,7 +199,7 @@ export function TokenSprite({
   );
 
   // 10.2c-edit-9f — kontrastnější (větší alpha + výraznější border) jako
-  // Matrix MapToken.tsx — `rgba(0, 0, 0, 0.7)` + `rgba(29, 78, 216, 0.4)`.
+  // Matrix MapToken.tsx — `rgba(0, 0, 0, 0.7)` + `rgba(29, 78, 216, 0.4)`. // lint-colors-ignore
   // 10.2g — modrý obrys odstraněn (rušil); tmavý chip má sám dost kontrastu.
   const drawInfoBadge = useCallback(
     (g: PixiGraphics) => {
@@ -352,6 +352,27 @@ export function TokenSprite({
           }}
         />
       </pixiContainer>
+
+      {/* D-066 — per-token lock badge (top-right). Jen vizuální indikace, že
+          token je zamčený (hráč jím nepohne). Reuse tmavého chip pozadí. */}
+      {token.isLocked && (
+        <pixiContainer
+          label="token-lock-badge"
+          x={infoBadgeOffset}
+          y={-infoBadgeOffset}
+        >
+          <pixiGraphics label="lock-badge-bg" draw={drawInfoBadge} />
+          <pixiText
+            text="🔒"
+            anchor={0.5}
+            style={{
+              fontFamily: 'sans-serif',
+              fontSize: Math.max(9, Math.round(infoBadgeRadius * 1.3)),
+              fill: 0xffba73,
+            }}
+          />
+        </pixiContainer>
+      )}
 
       {/* 10.2c-edit-9f — jméno tokenu odstraněno (user request).
           Tokeny mají vlastní avatar a jméno se ukáže v info modálu /

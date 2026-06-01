@@ -7,8 +7,8 @@
 
 .bestieNote {
   padding: 16px;
-  background: rgba(120, 100, 255, 0.08);
-  border: 1px solid rgba(120, 100, 255, 0.22);
+  background: rgb(var(--map-ui-accent-rgb) / 0.08);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.22);
   border-radius: 6px;
   font-size: 13px;
   line-height: 1.5;
@@ -48,23 +48,23 @@
 }
 
 .bestieRollBtn {
-  background: rgba(120, 200, 120, 0.18);
-  color: #9ddf9d;
-  border: 1px solid rgba(120, 200, 120, 0.5);
+  background: rgb(var(--map-ui-success-rgb) / 0.18);
+  color: var(--map-ui-success-solid);
+  border: 1px solid rgb(var(--map-ui-success-rgb) / 0.5);
 }
 
 .bestieRollBtn:hover:not(:disabled) {
-  background: rgba(120, 200, 120, 0.3);
+  background: rgb(var(--map-ui-success-rgb) / 0.3);
 }
 
 .bestieSaveBtn {
-  background: rgba(120, 100, 255, 0.28);
-  color: #fff;
-  border: 1px solid rgba(120, 100, 255, 0.6);
+  background: rgb(var(--map-ui-accent-rgb) / 0.28);
+  color: var(--map-ui-text);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.6);
 }
 
 .bestieSaveBtn:hover:not(:disabled) {
-  background: rgba(120, 100, 255, 0.45);
+  background: rgb(var(--map-ui-accent-rgb) / 0.45);
 }
 
 .bestieRollBtn:disabled,

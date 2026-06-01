@@ -1,9 +1,9 @@
 .input {
   width: 36px;
   padding: 3px 2px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(180, 140, 255, 0.35);
-  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  background: rgb(var(--map-ui-shadow-rgb) / 0.35);
+  border: 1px solid rgb(var(--map-ui-accent-bright-rgb) / 0.35);
+  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
   border-radius: 4px;
   text-align: center;
   font-weight: 700;
@@ -14,8 +14,8 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--map-token-ring-selected, #b48cff);
-  box-shadow: 0 0 0 2px rgba(180, 140, 255, 0.25);
+  border-color: var(--map-token-ring-selected, var(--map-ui-accent-solid));
+  box-shadow: 0 0 0 2px rgb(var(--map-ui-accent-bright-rgb) / 0.25);
 }
 
 .input:disabled {

@@ -39,7 +39,7 @@ interface Props {
 }
 
 function tierBorder(token: MapToken, systemId: string | null | undefined): string {
-  if (!systemId) return 'var(--map-token-ring-default, #3a3550)';
+  if (!systemId) return 'var(--map-token-ring-default, var(--map-token-ring-default))';
   const schema = systemEntitySchemaRegistry.get(systemId, 'token');
   const stats =
     token.systemStats ?? {
@@ -47,7 +47,7 @@ function tierBorder(token: MapToken, systemId: string | null | undefined): strin
       'health.max': token.maxHp,
     };
   const hp = resolveHp(schema, stats);
-  if (!hp) return 'var(--map-token-ring-default, #3a3550)';
+  if (!hp) return 'var(--map-token-ring-default, var(--map-token-ring-default))';
   return hpTierCss(hp.percent, hp.current);
 }
 

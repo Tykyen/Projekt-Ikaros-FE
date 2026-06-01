@@ -1,7 +1,7 @@
 /**
  * 10.2h — paleta nástroje mlhy (PJ). Obsah docku „🌫️ Mlha" (MapToolDock) —
  * panel je přímo uvnitř docku (jediná otvíračka = hlavička docku, žádné vnitřní
- * tlačítko). Mlhový accent `#9fb4d4` (chladná stříbrno-modrá — odliší mlhu od
+ * tlačítko). Mlhový accent `var(--map-ui-blue-solid)` (chladná stříbrno-modrá — odliší mlhu od
  * teplých/fialových efektů).
  *
  * Kreslicí režim: dokud je dock otevřený (paleta mountovaná) A mlha zapnutá,
@@ -18,7 +18,7 @@ import { ConfirmDialog } from '@/shared/ui';
 import type { FogToolState, FogBrushSize } from '../../hooks/useFogTool';
 import styles from './FogPalette.module.css';
 
-const FOG_ACCENT = '#9fb4d4';
+const FOG_ACCENT = 'var(--map-ui-blue-solid)';
 
 const BRUSH_OPTIONS: { size: FogBrushSize; glyph: string; hexes: number }[] = [
   { size: 0, glyph: '●', hexes: 1 },

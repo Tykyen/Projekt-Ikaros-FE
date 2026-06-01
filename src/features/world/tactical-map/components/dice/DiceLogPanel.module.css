@@ -17,16 +17,16 @@
   flex-direction: column;
   background: linear-gradient(
     180deg,
-    var(--map-toolbar-bg-solid, rgba(14, 12, 40, 0.94)) 0%,
-    var(--map-toolbar-bg-solid, rgba(10, 8, 32, 0.96)) 100%
+    var(--map-toolbar-bg-solid, rgb(var(--map-ui-panel-rgb) / 0.94)) 0%,
+    var(--map-toolbar-bg-solid, rgb(var(--map-ui-panel-deep-rgb) / 0.96)) 100%
   );
-  border: 1px solid var(--accent, rgba(120, 100, 255, 0.15));
+  border: 1px solid var(--accent, rgb(var(--map-ui-accent-rgb) / 0.15));
   border-radius: 12px;
   backdrop-filter: blur(16px);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(140, 170, 255, 0.04);
-  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+    0 8px 32px rgb(var(--map-ui-shadow-rgb) / 0.4),
+    inset 0 1px 0 rgb(var(--map-ui-blue-bright-rgb) / 0.04);
+  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
   z-index: 90;
   pointer-events: auto;
   overflow: hidden;
@@ -45,7 +45,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-bottom: 1px solid var(--accent, rgba(120, 100, 255, 0.1));
+  border-bottom: 1px solid var(--accent, rgb(var(--map-ui-accent-rgb) / 0.1));
   cursor: pointer;
   user-select: none;
 }
@@ -55,7 +55,7 @@
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgba(180, 165, 255, 0.8);
+  color: rgb(var(--map-ui-accent-bright-rgb) / 0.8);
 }
 
 .headerActions {
@@ -70,13 +70,13 @@
   padding: 2px 4px;
   font-size: 0.8rem;
   line-height: 1;
-  color: rgba(180, 200, 255, 0.35);
+  color: rgb(var(--map-ui-blue-bright-rgb) / 0.35);
   cursor: pointer;
   transition: color 0.15s ease;
 }
 
 .clear:hover {
-  color: rgba(255, 100, 100, 0.8);
+  color: rgb(var(--map-ui-danger-rgb) / 0.8);
 }
 
 /* Chevron sjednocený s orchestrací (MapPjPanel) — ▾ dole = sbaleno, rotace
@@ -99,7 +99,7 @@
 .empty {
   padding: 6px 0;
   font-size: 0.72rem;
-  color: rgba(180, 200, 255, 0.35);
+  color: rgb(var(--map-ui-blue-bright-rgb) / 0.35);
   font-style: italic;
 }
 
@@ -109,7 +109,7 @@
   gap: 1px;
   padding: 4px 0;
   font-size: 0.78rem;
-  border-bottom: 1px solid rgba(100, 100, 180, 0.08);
+  border-bottom: 1px solid rgb(var(--map-ui-blue-rgb) / 0.08);
 }
 
 .entry.recent {
@@ -123,7 +123,7 @@
 }
 
 .name {
-  color: rgba(200, 215, 240, 0.7);
+  color: rgb(var(--map-ui-blue-bright-rgb) / 0.7);
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -137,8 +137,8 @@
   text-transform: uppercase;
   padding: 1px 5px;
   border-radius: 6px;
-  background: rgba(120, 100, 255, 0.14);
-  color: rgba(180, 165, 255, 0.85);
+  background: rgb(var(--map-ui-accent-rgb) / 0.14);
+  color: rgb(var(--map-ui-accent-bright-rgb) / 0.85);
   white-space: nowrap;
 }
 
@@ -151,7 +151,7 @@
 /* 10.2j — rozpis výpočtu (label + modifier + kostky = total), dřív v toastu. */
 .breakdown {
   font-size: 0.68rem;
-  color: rgba(200, 215, 240, 0.55);
+  color: rgb(var(--map-ui-blue-bright-rgb) / 0.55);
   font-variant-numeric: tabular-nums;
   line-height: 1.3;
 }
@@ -164,19 +164,19 @@
 }
 
 .faceNum {
-  color: rgba(200, 215, 240, 0.85);
+  color: rgb(var(--map-ui-blue-bright-rgb) / 0.85);
 }
 
 .facePlus {
-  color: rgba(60, 220, 80, 0.9);
+  color: rgb(var(--map-ui-success-rgb) / 0.9);
 }
 
 .faceMinus {
-  color: rgba(255, 60, 60, 0.9);
+  color: rgb(var(--map-ui-danger-rgb) / 0.9);
 }
 
 .faceZero {
-  color: rgba(150, 150, 180, 0.7);
+  color: rgb(var(--map-ui-muted-rgb) / 0.7);
 }
 
 .total {
@@ -185,21 +185,21 @@
 }
 
 .totalPositive {
-  color: rgba(60, 220, 80, 0.9);
-  text-shadow: 0 0 6px rgba(60, 220, 80, 0.3);
+  color: rgb(var(--map-ui-success-rgb) / 0.9);
+  text-shadow: 0 0 6px rgb(var(--map-ui-success-rgb) / 0.3);
 }
 
 .totalNegative {
-  color: rgba(255, 60, 60, 0.9);
+  color: rgb(var(--map-ui-danger-rgb) / 0.9);
 }
 
 .totalNeutral {
-  color: rgba(255, 220, 40, 0.9);
+  color: rgb(var(--map-ui-gold-rgb) / 0.9);
 }
 
 @keyframes log-flash {
   0% {
-    background: rgba(120, 100, 255, 0.1);
+    background: rgb(var(--map-ui-accent-rgb) / 0.1);
   }
   100% {
     background: transparent;

@@ -84,6 +84,11 @@ export interface MapToken {
   personalDiarySchema?: Record<string, unknown>[];
   customData: Record<string, unknown>;
   /**
+   * D-066 — per-token lock (PJ-only). Zamčený token hráč nemůže táhnout,
+   * nezávisle na scene.isLocked / playerStates. Vynuceno BE authorizerem.
+   */
+  isLocked?: boolean;
+  /**
    * 10.2d-prep-A — per-system staty token instance (schema-driven storage).
    * Klíče = dot-path (`health.current`, `armor`, ...). BE validuje proti
    * `(world.system, 'token')` schema při token.add / token.update.

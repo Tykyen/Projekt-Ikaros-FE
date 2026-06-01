@@ -8,7 +8,7 @@
   align-items: flex-end;
   gap: 6px;
   width: max-content;
-  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
   pointer-events: auto;
 }
 
@@ -20,8 +20,8 @@
   height: 34px;
   padding: 0 10px;
   border-radius: 17px;
-  background: var(--map-toolbar-bg, rgba(10, 8, 32, 0.85));
-  border: 1px solid rgba(127, 184, 230, 0.22);
+  background: var(--map-toolbar-bg, rgb(var(--map-ui-panel-deep-rgb) / 0.85));
+  border: 1px solid rgb(var(--map-ui-blue-rgb) / 0.22);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: inherit;
@@ -33,15 +33,15 @@
     box-shadow 0.15s;
 }
 .pill:hover {
-  border-color: var(--map-weather-accent, #7fb8e6);
+  border-color: var(--map-weather-accent, var(--map-weather-accent));
   box-shadow: 0 0 12px
-    color-mix(in srgb, var(--map-weather-accent, #7fb8e6) 30%, transparent);
+    color-mix(in srgb, var(--map-weather-accent, var(--map-weather-accent)) 30%, transparent);
 }
 .pillIcon {
-  color: var(--map-weather-accent, #7fb8e6);
+  color: var(--map-weather-accent, var(--map-weather-accent));
   filter: drop-shadow(
     0 0 4px
-      color-mix(in srgb, var(--map-weather-accent, #7fb8e6) 55%, transparent)
+      color-mix(in srgb, var(--map-weather-accent, var(--map-weather-accent)) 55%, transparent)
   );
 }
 .pillTemp {
@@ -63,9 +63,9 @@
   gap: 10px;
   padding: 12px;
   border-radius: 12px;
-  background: var(--map-toolbar-bg-solid, #0a0814);
-  border: 1px solid rgba(127, 184, 230, 0.2);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  border: 1px solid rgb(var(--map-ui-blue-rgb) / 0.2);
+  box-shadow: 0 8px 28px rgb(var(--map-ui-shadow-rgb) / 0.45);
   animation: slideIn 0.16s ease;
 }
 @keyframes slideIn {
@@ -87,7 +87,7 @@
 .genName {
   font-size: 13px;
   font-weight: 700;
-  color: var(--map-weather-accent, #7fb8e6);
+  color: var(--map-weather-accent, var(--map-weather-accent));
 }
 
 .baroRow {
@@ -127,7 +127,7 @@
   line-height: 1.5;
   font-style: italic;
   opacity: 0.8;
-  border-left: 2px solid rgba(127, 184, 230, 0.4);
+  border-left: 2px solid rgb(var(--map-ui-blue-rgb) / 0.4);
   padding-left: 8px;
 }
 .inGame {
@@ -148,14 +148,14 @@
   flex-direction: column;
   gap: 6px;
   padding-top: 10px;
-  border-top: 1px solid rgba(127, 184, 230, 0.16);
+  border-top: 1px solid rgb(var(--map-ui-blue-rgb) / 0.16);
 }
 .select {
   width: 100%;
   padding: 6px 8px;
   font-size: 12px;
-  background: rgba(127, 184, 230, 0.06);
-  border: 1px solid rgba(127, 184, 230, 0.22);
+  background: rgb(var(--map-ui-blue-rgb) / 0.06);
+  border: 1px solid rgb(var(--map-ui-blue-rgb) / 0.22);
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
@@ -167,10 +167,10 @@
   font-weight: 700;
   background: color-mix(
     in srgb,
-    var(--map-weather-accent, #7fb8e6) 22%,
+    var(--map-weather-accent, var(--map-weather-accent)) 22%,
     transparent
   );
-  border: 1px solid var(--map-weather-accent, #7fb8e6);
+  border: 1px solid var(--map-weather-accent, var(--map-weather-accent));
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
@@ -179,11 +179,11 @@
 .sendBtn:hover:not(:disabled) {
   background: color-mix(
     in srgb,
-    var(--map-weather-accent, #7fb8e6) 34%,
+    var(--map-weather-accent, var(--map-weather-accent)) 34%,
     transparent
   );
   box-shadow: 0 0 10px
-    color-mix(in srgb, var(--map-weather-accent, #7fb8e6) 40%, transparent);
+    color-mix(in srgb, var(--map-weather-accent, var(--map-weather-accent)) 40%, transparent);
 }
 .sendBtn:disabled {
   opacity: 0.4;
@@ -193,16 +193,16 @@
   width: 100%;
   padding: 6px;
   font-size: 11.5px;
-  background: rgba(255, 80, 96, 0.1);
-  border: 1px solid rgba(255, 80, 96, 0.35);
+  background: rgb(var(--map-ui-danger-rgb) / 0.1);
+  border: 1px solid rgb(var(--map-ui-danger-rgb) / 0.35);
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
   transition: all 0.12s;
 }
 .clearBtn:hover:not(:disabled) {
-  background: rgba(255, 80, 96, 0.2);
-  border-color: rgba(255, 80, 96, 0.6);
+  background: rgb(var(--map-ui-danger-rgb) / 0.2);
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.6);
 }
 .clearBtn:disabled {
   opacity: 0.4;
@@ -218,10 +218,10 @@
   font-weight: 600;
   cursor: pointer;
   padding-top: 8px;
-  border-top: 1px solid rgba(127, 184, 230, 0.12);
+  border-top: 1px solid rgb(var(--map-ui-blue-rgb) / 0.12);
 }
 .fxRow input {
-  accent-color: var(--map-weather-accent, #7fb8e6);
+  accent-color: var(--map-weather-accent, var(--map-weather-accent));
   cursor: pointer;
 }
 

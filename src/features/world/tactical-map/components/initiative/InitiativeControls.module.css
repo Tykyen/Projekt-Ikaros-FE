@@ -16,9 +16,9 @@
   justify-content: center;
   font-weight: 800;
   font-size: 0.9rem;
-  color: #0a0814;
-  background: var(--map-token-ring-active-turn, #ffd700);
-  box-shadow: 0 0 8px var(--map-token-ring-active-turn-glow, rgba(255, 215, 0, 0.45));
+  color: var(--map-canvas-bg);
+  background: var(--map-token-ring-active-turn, var(--map-ui-gold-solid));
+  box-shadow: 0 0 8px var(--map-token-ring-active-turn-glow, rgb(var(--map-ui-gold-rgb) / 0.45));
 }
 
 /* „Další tah" + „Ukončit" pod sebou */
@@ -34,9 +34,9 @@
   gap: 4px;
   padding: 6px 10px;
   border-radius: 6px;
-  border: 1px solid rgba(180, 140, 255, 0.3);
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--map-toolbar-text, rgba(220, 235, 255, 0.9));
+  border: 1px solid rgb(var(--map-ui-accent-bright-rgb) / 0.3);
+  background: rgb(var(--map-ui-shadow-rgb) / 0.3);
+  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
@@ -46,8 +46,8 @@
     border-color 0.15s ease;
 }
 .btn:hover:not(:disabled) {
-  background: rgba(180, 140, 255, 0.18);
-  border-color: rgba(180, 140, 255, 0.55);
+  background: rgb(var(--map-ui-accent-bright-rgb) / 0.18);
+  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.55);
 }
 .btn:disabled {
   opacity: 0.45;
@@ -55,11 +55,11 @@
 }
 
 .primary {
-  border-color: var(--map-token-ring-selected, #b48cff);
-  background: rgba(180, 140, 255, 0.22);
+  border-color: var(--map-token-ring-selected, var(--map-ui-accent-solid));
+  background: rgb(var(--map-ui-accent-bright-rgb) / 0.22);
 }
 .primary:hover:not(:disabled) {
-  background: rgba(180, 140, 255, 0.34);
+  background: rgb(var(--map-ui-accent-bright-rgb) / 0.34);
 }
 
 @media (max-width: 768px) {

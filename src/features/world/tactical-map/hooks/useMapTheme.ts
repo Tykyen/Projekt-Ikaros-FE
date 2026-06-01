@@ -18,7 +18,7 @@ import type { MapThemeColors } from '../types';
  * Podporované formáty:
  * - `#rrggbb` → 0xrrggbb
  * - `#rgb` → 0xrrggbb (expanze)
- * - `rgb(r, g, b)` / `rgba(r, g, b, a)` → 0xrrggbb (alpha dropped)
+ * - `rgb(r, g, b)` / `rgba(r, g, b, a)` → 0xrrggbb (alpha dropped) // lint-colors-ignore
  *
  * Fallback (neznámý formát) → `0x000000`.
  */

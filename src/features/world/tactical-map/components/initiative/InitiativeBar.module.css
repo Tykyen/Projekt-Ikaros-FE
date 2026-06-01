@@ -10,11 +10,11 @@
   padding: 6px 12px;
   background: linear-gradient(
     180deg,
-    var(--map-toolbar-bg-solid, #0a0814) 0%,
-    rgba(10, 8, 32, 0.92) 100%
+    var(--map-toolbar-bg-solid, var(--map-canvas-bg)) 0%,
+    rgb(var(--map-ui-panel-deep-rgb) / 0.92) 100%
   );
-  border-bottom: 1px solid rgba(120, 100, 255, 0.18);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
+  box-shadow: 0 4px 18px rgb(var(--map-ui-shadow-rgb) / 0.4);
   backdrop-filter: blur(10px);
   /* nepřekrývej zoom controls / PJ panel pod sebou */
   pointer-events: auto;
@@ -38,8 +38,8 @@
   align-self: stretch;
   padding: 0 4px;
   margin: 0 2px;
-  color: rgba(150, 180, 255, 0.3);
-  border-left: 1px solid rgba(120, 100, 255, 0.18);
+  color: rgb(var(--map-ui-blue-bright-rgb) / 0.3);
+  border-left: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
   font-size: 0.9rem;
   flex-shrink: 0;
 }
@@ -47,7 +47,7 @@
   height: 6px;
 }
 .strip::-webkit-scrollbar-thumb {
-  background: rgba(180, 140, 255, 0.3);
+  background: rgb(var(--map-ui-accent-bright-rgb) / 0.3);
   border-radius: 3px;
 }
 

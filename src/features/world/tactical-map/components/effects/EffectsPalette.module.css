@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1px solid rgba(120, 100, 255, 0.15);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
   border-radius: 6px;
   font-size: 18px;
   line-height: 1;
@@ -36,8 +36,8 @@
 }
 
 .toolBtn:hover {
-  background: rgba(120, 100, 255, 0.1);
-  border-color: rgba(120, 100, 255, 0.4);
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.4);
 }
 
 /* Aktivní nástroj nese svou barvu (--accent) — glow + jemný puls. */
@@ -65,11 +65,11 @@
 
 .clearBtn {
   margin-top: 2px;
-  border-top: 1px solid rgba(120, 100, 255, 0.15);
+  border-top: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
 }
 .clearBtn:hover {
-  background: rgba(255, 80, 96, 0.15);
-  border-color: rgba(255, 80, 96, 0.5);
+  background: rgb(var(--map-ui-danger-rgb) / 0.15);
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.5);
 }
 
 /* ── Rozbalovací parametr-panel — vyjede vlevo VEN z docku ────────────────── */
@@ -79,13 +79,13 @@
   bottom: 0;
   width: 210px;
   padding: 12px;
-  background: var(--map-toolbar-bg-solid, #0a0814);
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
   color: var(--map-toolbar-text);
-  border: 1px solid var(--accent, rgba(120, 100, 255, 0.3));
+  border: 1px solid var(--accent, rgb(var(--map-ui-accent-rgb) / 0.3));
   border-radius: 10px;
   box-shadow:
-    var(--shadow-lg, 0 8px 28px rgba(0, 0, 0, 0.5)),
-    0 0 16px color-mix(in srgb, var(--accent, #7864ff) 22%, transparent);
+    var(--shadow-lg, 0 8px 28px rgb(var(--map-ui-shadow-rgb) / 0.5)),
+    0 0 16px color-mix(in srgb, var(--accent, var(--map-ui-accent-solid)) 22%, transparent);
   animation: panelIn 0.15s ease;
   z-index: 1;
 }
@@ -127,7 +127,7 @@
 }
 .panelClose:hover {
   opacity: 1;
-  background: rgba(120, 100, 255, 0.15);
+  background: rgb(var(--map-ui-accent-rgb) / 0.15);
 }
 
 /* ── Barevná mřížka ──────────────────────────────────────────────────────── */
@@ -140,7 +140,7 @@
 .swatch {
   aspect-ratio: 1;
   border-radius: 6px;
-  border: 2px solid rgba(255, 255, 255, 0.12);
+  border: 2px solid rgb(var(--map-ui-light-rgb) / 0.12);
   cursor: pointer;
   transition:
     transform 0.12s,
@@ -151,9 +151,9 @@
   transform: scale(1.08);
 }
 .swatchActive {
-  border-color: #b48cff;
+  border-color: var(--map-ui-accent-solid);
   transform: scale(1.1);
-  box-shadow: 0 0 8px rgba(180, 140, 255, 0.7);
+  box-shadow: 0 0 8px rgb(var(--map-ui-accent-bright-rgb) / 0.7);
 }
 
 /* ── Konfigurace (bariéra / výbuch) ──────────────────────────────────────── */
@@ -171,19 +171,19 @@
   flex: 1;
   padding: 6px 4px;
   font-size: 11px;
-  background: rgba(120, 100, 255, 0.06);
-  border: 1px solid rgba(120, 100, 255, 0.18);
+  background: rgb(var(--map-ui-accent-rgb) / 0.06);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
   transition: all 0.12s;
 }
 .segBtn:hover {
-  background: rgba(120, 100, 255, 0.14);
+  background: rgb(var(--map-ui-accent-rgb) / 0.14);
 }
 .segBtnActive {
-  background: rgba(120, 100, 255, 0.22);
-  border-color: var(--accent, rgba(120, 100, 255, 0.6));
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
+  border-color: var(--accent, rgb(var(--map-ui-accent-rgb) / 0.6));
   font-weight: 700;
 }
 
@@ -198,7 +198,7 @@
 }
 .field input[type='range'] {
   width: 100%;
-  accent-color: var(--accent, #b48cff);
+  accent-color: var(--accent, var(--map-ui-accent-solid));
 }
 
 .numInput {
@@ -207,15 +207,15 @@
   font-family: var(--font-mono);
   font-size: 13px;
   text-align: center;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--accent, rgba(120, 100, 255, 0.35));
+  background: rgb(var(--map-ui-shadow-rgb) / 0.3);
+  border: 1px solid var(--accent, rgb(var(--map-ui-accent-rgb) / 0.35));
   border-radius: 5px;
   color: inherit;
 }
 .numInput:focus {
   outline: none;
-  border-color: var(--accent, #b48cff);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--accent, #7864ff) 45%, transparent);
+  border-color: var(--accent, var(--map-ui-accent-solid));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent, var(--map-ui-accent-solid)) 45%, transparent);
 }
 
 /* ── Výbuch — varianty + rings ───────────────────────────────────────────── */
@@ -227,14 +227,14 @@
   flex: 1;
   height: 36px;
   font-size: 18px;
-  background: rgba(120, 100, 255, 0.06);
-  border: 1px solid rgba(120, 100, 255, 0.18);
+  background: rgb(var(--map-ui-accent-rgb) / 0.06);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.12s;
 }
 .variantBtn:hover {
-  background: rgba(120, 100, 255, 0.14);
+  background: rgb(var(--map-ui-accent-rgb) / 0.14);
 }
 .variantBtnActive {
   border-color: var(--accent);
@@ -269,28 +269,28 @@
   height: 20px;
   background: transparent;
   border: none;
-  color: #ff9090;
+  color: var(--map-ui-danger-solid);
   cursor: pointer;
   opacity: 0.7;
   border-radius: 4px;
 }
 .ringRemove:hover {
   opacity: 1;
-  background: rgba(255, 80, 96, 0.15);
+  background: rgb(var(--map-ui-danger-rgb) / 0.15);
 }
 
 .addRing {
   padding: 6px;
   font-size: 12px;
-  background: rgba(120, 100, 255, 0.1);
-  border: 1px dashed rgba(120, 100, 255, 0.4);
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border: 1px dashed rgb(var(--map-ui-accent-rgb) / 0.4);
   border-radius: 6px;
   color: inherit;
   cursor: pointer;
   transition: all 0.12s;
 }
 .addRing:hover {
-  background: rgba(120, 100, 255, 0.18);
+  background: rgb(var(--map-ui-accent-rgb) / 0.18);
 }
 
 .hint {
