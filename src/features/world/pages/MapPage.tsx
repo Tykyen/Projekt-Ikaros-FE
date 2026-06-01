@@ -1,5 +1,6 @@
-﻿import { WorldStubPage } from './WorldStubPage';
+import { UniverseMapView } from '../universe/UniverseMapView';
 
+// 10.1 — Universe mapa 3D (`/svet/:worldSlug/mapa`).
 export default function MapPage() {
-  return <WorldStubPage area="map" />;
+  return <UniverseMapView />;
 }

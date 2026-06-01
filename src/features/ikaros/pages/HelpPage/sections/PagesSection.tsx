@@ -213,14 +213,6 @@ const SOON_IKAROS: PageDoc[] = [
 
 const SOON_WORLD: PageDoc[] = [
   {
-    path: "/svet/:slug/mapa",
-    name: "Universe mapa lokací",
-    status: "soon",
-    fáze: "Fáze 10.1",
-    who: "Členové světa",
-    what: "3D / 2D mapa lokací světa (planeta, kontinenty, města) — pro orientaci v geografii, ne pro boj.",
-  },
-  {
     path: "/svet/:slug/pocasi",
     name: "Generátor počasí",
     status: "ok",
@@ -239,6 +231,13 @@ const SOON_WORLD: PageDoc[] = [
 
 // 5.5 — světové stránky, které už reálně fungují.
 const WORLD_PAGES_OK: PageDoc[] = [
+  {
+    path: "/svet/:slug/mapa",
+    name: "Mapa vesmíru",
+    status: "ok",
+    who: "Členové světa (PJ+ editace)",
+    what: "3D graf lokací světa — tělesa (planeta, hvězda, mlhovina, asteroid, měsíc, černá díra) propojená cestami, rozmístěná fyzikální simulací (po ustálení se zastaví kvůli úspoře výkonu). Klik na těleso = přiblížení kamery + detailní panel: frakce, seznam spojení (proklikem přeskočíš na sousední těleso) a odkaz na jeho wiki stránku. Vyhledávání tělesa podle jména, tlačítko „Zobrazit vše“ oddálí na celou mapu. Viditelnost: hráč vidí jen tělesa, která PJ zveřejnil — buď veřejně, nebo jmenovitě konkrétním hráčům; skrytá tělesa i jejich spojení backend hráči vůbec nepošle. PJ může z detailu jedním tlačítkem těleso rychle skrýt/zveřejnit. Editační režim (PJ, 🛠️): přidat/upravit/smazat těleso (jméno, typ, barva, velikost, frakce, prsten, obrázek, odkaz na wiki stránku, viditelnost), přidat/smazat spojení (volitelně oběžná dráha = kratší spojnice), tělesa lze v tomto režimu táhnout a rozmístit; 💾 uloží celou mapu. Pravý klik na těleso v editaci ho smaže. Změny se přes WebSocket propíšou ostatním v reálném čase — v editačním režimu má ale tvůj rozpracovaný stav přednost a dostaneš jen upozornění, že někdo mapu mezitím změnil (uložením jeho změny přepíšeš).",
+  },
   {
     path: "/svet/:slug",
     name: "Přehled světa",

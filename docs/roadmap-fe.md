@@ -1727,14 +1727,16 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 
 **Pořadí stavby:** 10.1 → 10.3 → 10.2 *(Dungeon Builder produkuje podklady taktické mapy; taktická mapa jako poslední — je nejnáročnější).*
 
-### - [ ] 10.1 Universe mapa 3D (`/svet/:worldId/mapa`)
+### - [x] 10.1 Universe mapa 3D (`/svet/:worldSlug/mapa`) — 2026-06-01
 
 *3D graf lokací světa. BE `universe` kompletní. `three` + `react-force-graph-3d` (WebGL).*
 
-- [ ] **10.1a — 3D force graph:** uzly = lokace (planet / star / nebula / asteroid / moon / blackhole), hrany = cesty (`isOrbit`); render dle typu uzlu; pozastavení force simulace po ustálení (úspora CPU)
-- [ ] **10.1b — Viditelnost:** `isPublic` + `visibleToPlayerIds` — PJ vidí vše, hráč jen povolené; editor viditelnosti uzlů (PJ)
-- [ ] **10.1c — Detail lokace:** klik na uzel → zoom + panel; odkaz na wiki stránku lokace (krok 7); editor uzlů/hran (PJ) — `PUT /universe`
-- [ ] **10.1d — Real-time:** WS `universe:updated`; `mobil-desktop` audit
+- [x] **10.1a — 3D force graph:** uzly = lokace (planet / star / nebula / asteroid / moon / blackhole), hrany = cesty (`isOrbit`); render dle typu uzlu; pozastavení force simulace po ustálení (úspora CPU)
+- [x] **10.1b — Viditelnost:** `isPublic` + `visibleToPlayerIds` — PJ vidí vše, hráč jen povolené; editor viditelnosti uzlů (PJ)
+- [x] **10.1c — Detail lokace:** klik na uzel → zoom + panel; odkaz na wiki stránku lokace (krok 7); editor uzlů/hran (PJ) — `PUT /universe`
+- [x] **10.1d — Real-time:** WS `universe:updated`; `mobil-desktop` audit
+
+> **10.1 hotovo (2026-06-01)** — FE feature `src/features/world/universe/` (15 souborů, 53 testů). `react-force-graph-3d` + `three` (lazy, MapPage chunk ~1.37 MB jen na téhle route). Per-typ tělesa v `nodeObjects.ts` (čisté factory, bez hardcode Asgard/Svar → `hasRing`). Edit draft → full `PUT`; rychlé skrýt/odhalit → per-node `PATCH`. Real-time `universe:updated` = **signál `{worldId}` bez dat** (BE gateway neposílá mapu po drátě → hráč v world roomu nevidí skrytá tělesa; klient si dotáhne server-side filtrovaný `GET`), FE invaliduje query; edit draft má přednost (badge „mezitím změněno"). Wiki ref přes explicitní `pageSlug` (PagePicker, ne hádání ze jména), obrázky Cloudinary (`useUploadImage`). 2 volná pole `pageSlug`/`hasRing` bez BE migrace. Panel desktop-left / mobil bottom-sheet. Nápověda přesunuta `soon`→`ok`. **Mimochodem opraven pre-existující rozbitý `tsc -b`** (6 cizích souborů z fáze 10.2: `SoundsPage`/`TacticalMapView` chybějící typové importy `SoundFilters`/`MapEffect` + 4 zastaralé test fixtures `HexConfig`/`MapScene.playerStates`/`MapOperationLogEntry`/`MapToken`) — `npm run build` nyní zelený. Spec: `phase-10/spec-10.1.md`, plán: `phase-10/plan-10.1.md`.
 
 ### - [x] 10.2 Taktická mapa (`/svet/:worldId/takticka-mapa`) — 2026-05-31
 
