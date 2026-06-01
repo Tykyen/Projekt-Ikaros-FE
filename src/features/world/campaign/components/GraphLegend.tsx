@@ -7,6 +7,7 @@ export function GraphLegend() {
   return (
     <div className={s.legend}>
       <div className={s.legendGroup}>
+        <span className={s.legendGroupLabel}>Subjekty:</span>
         {SUBJECT_TYPES.map((t) => (
           <span key={t} className={s.legendItem}>
             <span
@@ -18,6 +19,7 @@ export function GraphLegend() {
         ))}
       </div>
       <div className={s.legendGroup}>
+        <span className={s.legendGroupLabel}>Vztahy:</span>
         <span className={s.legendItem}>
           <span
             className={s.legendDot}

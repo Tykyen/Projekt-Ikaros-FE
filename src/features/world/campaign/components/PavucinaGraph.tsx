@@ -171,38 +171,73 @@ export function PavucinaGraph({
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && runSearch()}
         />
-        <div className={s.graphFilters}>
-          {(['all', 'crisis', 'positive', 'negative'] as ValenceFilter[]).map(
-            (f) => (
+        <div className={s.filterGroup}>
+          <span className={s.filterGroupLabel}>Subjekty (uzly)</span>
+          <div className={s.graphFilters}>
+            {SUBJECT_TYPES.map((t) => (
               <button
-                key={f}
+                key={t}
                 type="button"
-                className={clsx(s.chip, valFilter === f && s.chipOn)}
-                onClick={() => setValFilter(f)}
+                className={clsx(s.chip, typeFilter.has(t) && s.chipOn)}
+                onClick={() => toggleType(t)}
               >
-                {f === 'all'
-                  ? 'Vše'
-                  : f === 'crisis'
-                    ? 'Krize'
-                    : f === 'positive'
-                      ? 'Kladné'
-                      : 'Záporné'}
+                {TYPE_LABELS[t]}
               </button>
-            ),
-          )}
+            ))}
+          </div>
         </div>
-        <div className={s.graphFilters}>
-          {SUBJECT_TYPES.map((t) => (
-            <button
-              key={t}
-              type="button"
-              className={clsx(s.chip, typeFilter.has(t) && s.chipOn)}
-              onClick={() => toggleType(t)}
-            >
-              {TYPE_LABELS[t]}
-            </button>
-          ))}
+
+        <div className={s.filterGroup}>
+          <span className={s.filterGroupLabel}>Vztahy (hrany)</span>
+          <div className={s.graphFilters}>
+            {(['all', 'crisis', 'positive', 'negative'] as ValenceFilter[]).map(
+              (f) => (
+                <button
+                  key={f}
+                  type="button"
+                  className={clsx(s.chip, valFilter === f && s.chipOn)}
+                  onClick={() => setValFilter(f)}
+                >
+                  {f === 'all'
+                    ? 'Vše'
+                    : f === 'crisis'
+                      ? 'Krize'
+                      : f === 'positive'
+                        ? 'Kladné'
+                        : 'Záporné'}
+                </button>
+              ),
+            )}
+          </div>
         </div>
+
+        {storylines.length > 0 && (
+          <div className={`${s.filterGroup} ${s.filterGroupStory}`}>
+            <span className={s.filterGroupLabel}>Linky (příběhové)</span>
+            <div className={s.graphFilters}>
+              <button
+                type="button"
+                className={clsx(s.chip, !storylineFilter && s.chipOn)}
+                onClick={() => onStorylineFilter(null)}
+              >
+                Vše
+              </button>
+              {storylines.map((sl) => (
+                <button
+                  key={sl.id}
+                  type="button"
+                  className={clsx(s.chip, storylineFilter === sl.id && s.chipOn)}
+                  onClick={() =>
+                    onStorylineFilter(storylineFilter === sl.id ? null : sl.id)
+                  }
+                >
+                  ◆ {sl.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {focusId && (
           <button
             type="button"
@@ -211,29 +246,6 @@ export function PavucinaGraph({
           >
             ✕ Zrušit fokus
           </button>
-        )}
-        {storylines.length > 0 && (
-          <div className={s.graphFilters}>
-            <button
-              type="button"
-              className={clsx(s.chip, !storylineFilter && s.chipOn)}
-              onClick={() => onStorylineFilter(null)}
-            >
-              Vše linky
-            </button>
-            {storylines.map((sl) => (
-              <button
-                key={sl.id}
-                type="button"
-                className={clsx(s.chip, storylineFilter === sl.id && s.chipOn)}
-                onClick={() =>
-                  onStorylineFilter(storylineFilter === sl.id ? null : sl.id)
-                }
-              >
-                ◆ {sl.title}
-              </button>
-            ))}
-          </div>
         )}
       </div>
 

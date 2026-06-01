@@ -596,6 +596,27 @@ button.tag:hover {
   color: var(--text);
   font-size: var(--text-sm);
 }
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 3px var(--sp-2);
+  background: color-mix(in srgb, var(--surface-1) 78%, transparent);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+}
+.filterGroupLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  white-space: nowrap;
+  padding-right: var(--sp-1);
+  border-right: 1px solid var(--frame-border);
+}
+.filterGroupStory {
+  border-color: var(--accent);
+}
 .legend {
   position: absolute;
   bottom: var(--sp-2);
@@ -613,6 +634,12 @@ button.tag:hover {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
+}
+.legendGroupLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
 }
 .legendItem {
   display: inline-flex;
