@@ -39,6 +39,7 @@ export function LinkyTab({
   readOnly,
   isPJ,
   onGoSubject,
+  onShowInGraph,
 }: {
   worldId: string;
   storylines: CampaignStoryline[];
@@ -46,6 +47,7 @@ export function LinkyTab({
   readOnly: boolean;
   isPJ: boolean;
   onGoSubject: (id: string) => void;
+  onShowInGraph: (storylineId: string) => void;
 }) {
   const createStoryline = useCreateStoryline(worldId);
   const updateStoryline = useUpdateStoryline(worldId);
@@ -192,18 +194,27 @@ export function LinkyTab({
             </div>
 
             {selected.subjectIds.length > 0 && (
-              <div className={s.tagRow}>
-                {selected.subjectIds.map((id) => (
-                  <button
-                    key={id}
-                    type="button"
-                    className={s.tag}
-                    onClick={() => onGoSubject(id)}
-                  >
-                    {nameOf(id)}
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className={s.tagRow}>
+                  {selected.subjectIds.map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      className={s.tag}
+                      onClick={() => onGoSubject(id)}
+                    >
+                      {nameOf(id)}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className={s.link}
+                  onClick={() => onShowInGraph(selected.id)}
+                >
+                  → Zobrazit síť této linky
+                </button>
+              </>
             )}
 
             {selected.summary && (

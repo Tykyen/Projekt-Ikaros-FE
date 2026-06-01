@@ -454,10 +454,19 @@
   gap: var(--sp-1);
 }
 .tag {
+  font: inherit;
   font-size: var(--text-xs);
   padding: 2px var(--sp-2);
   border-radius: var(--radius-full);
   background: var(--surface-3);
+  color: var(--text);
+  border: 1px solid var(--frame-border);
+}
+button.tag {
+  cursor: pointer;
+}
+button.tag:hover {
+  border-color: var(--accent);
 }
 .section {
   display: flex;
@@ -482,9 +491,18 @@
   color: color-mix(in srgb, var(--accent) 70%, var(--text));
 }
 .link {
+  align-self: flex-start;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font: inherit;
   font-size: var(--text-sm);
   color: var(--accent);
   text-decoration: none;
+  cursor: pointer;
+}
+.link:hover {
+  text-decoration: underline;
 }
 
 /* ── Dashboard ── */

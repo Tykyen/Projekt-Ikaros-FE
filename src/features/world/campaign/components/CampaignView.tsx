@@ -33,6 +33,7 @@ export function CampaignView() {
   const [tab, setTab] = useState<TabId>('dnes');
   const [selSubjectId, setSelSubjectId] = useState<string | null>(null);
   const [selRelId, setSelRelId] = useState<string | null>(null);
+  const [graphStoryline, setGraphStoryline] = useState<string | null>(null);
 
   const subjectsQ = useCampaignSubjects(worldId);
   const relsQ = useCampaignRelationships(worldId);
@@ -132,11 +133,18 @@ export function CampaignView() {
             readOnly={readOnly}
             isPJ={isPJ}
             onGoSubject={gotoSubject}
+            onShowInGraph={(id) => {
+              setGraphStoryline(id);
+              setTab('sit');
+            }}
           />
         ) : (
           <PavucinaGraph
             subjects={subjects}
             relationships={relationships}
+            storylines={storylines}
+            storylineFilter={graphStoryline}
+            onStorylineFilter={setGraphStoryline}
             onOpenSubject={gotoSubject}
           />
         )}

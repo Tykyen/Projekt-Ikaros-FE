@@ -16,7 +16,11 @@ import {
   type GraphNode,
   type ValenceFilter,
 } from '../graphData';
-import type { CampaignRelationship, CampaignSubject } from '../types';
+import type {
+  CampaignRelationship,
+  CampaignStoryline,
+  CampaignSubject,
+} from '../types';
 import { GraphLegend } from './GraphLegend';
 import s from './campaign.module.css';
 
@@ -47,10 +51,16 @@ interface ResolvedColors {
 export function PavucinaGraph({
   subjects,
   relationships,
+  storylines,
+  storylineFilter,
+  onStorylineFilter,
   onOpenSubject,
 }: {
   subjects: CampaignSubject[];
   relationships: CampaignRelationship[];
+  storylines: CampaignStoryline[];
+  storylineFilter: string | null;
+  onStorylineFilter: (id: string | null) => void;
   onOpenSubject: (id: string) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -99,6 +109,13 @@ export function PavucinaGraph({
     });
   }, []);
 
+  // Subjekty vybrané linky (filtr „jak vše se vším souvisí" v rámci linky).
+  const storylineSubjectIds = useMemo(() => {
+    if (!storylineFilter) return null;
+    const sl = storylines.find((x) => x.id === storylineFilter);
+    return sl ? new Set(sl.subjectIds) : null;
+  }, [storylineFilter, storylines]);
+
   const neighbors = useMemo(
     () => (focusId ? neighborIds(focusId, data.links) : null),
     [focusId, data.links],
@@ -106,17 +123,18 @@ export function PavucinaGraph({
 
   function nodeVisible(id: string, type: string): boolean {
     if (typeFilter.size > 0 && !typeFilter.has(type)) return false;
+    if (storylineSubjectIds && !storylineSubjectIds.has(id)) return false;
     if (neighbors && !neighbors.has(id)) return false;
     return true;
   }
 
   function linkVisible(link: GraphLink): boolean {
     if (!linkPassesFilter(link, valFilter)) return false;
-    if (neighbors) {
-      const sid = typeof link.source === 'string' ? link.source : (link.source as GraphNode).id;
-      const tid = typeof link.target === 'string' ? link.target : (link.target as GraphNode).id;
-      if (!neighbors.has(sid) || !neighbors.has(tid)) return false;
-    }
+    const sid = typeof link.source === 'string' ? link.source : (link.source as GraphNode).id;
+    const tid = typeof link.target === 'string' ? link.target : (link.target as GraphNode).id;
+    if (storylineSubjectIds && (!storylineSubjectIds.has(sid) || !storylineSubjectIds.has(tid)))
+      return false;
+    if (neighbors && (!neighbors.has(sid) || !neighbors.has(tid))) return false;
     return true;
   }
 
@@ -193,6 +211,29 @@ export function PavucinaGraph({
           >
             ✕ Zrušit fokus
           </button>
+        )}
+        {storylines.length > 0 && (
+          <div className={s.graphFilters}>
+            <button
+              type="button"
+              className={clsx(s.chip, !storylineFilter && s.chipOn)}
+              onClick={() => onStorylineFilter(null)}
+            >
+              Vše linky
+            </button>
+            {storylines.map((sl) => (
+              <button
+                key={sl.id}
+                type="button"
+                className={clsx(s.chip, storylineFilter === sl.id && s.chipOn)}
+                onClick={() =>
+                  onStorylineFilter(storylineFilter === sl.id ? null : sl.id)
+                }
+              >
+                ◆ {sl.title}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
