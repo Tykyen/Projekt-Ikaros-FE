@@ -1,5 +1,6 @@
 // 10.1c — formulář přidání/úpravy uzlu. Pracuje nad draftem (orchestrátor).
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useUploadImage } from '@/shared/api';
 import { PagePicker } from '@/features/world/components/PagePicker/PagePicker';
 import { UNIVERSE_NODE_TYPES } from '../types';
@@ -44,8 +45,12 @@ export function NodeEditorForm({
   const patch = (p: Partial<UniverseNode>) => setForm((f) => ({ ...f, ...p }));
 
   const handleUpload = async (file: File) => {
-    const res = await upload.mutateAsync(file);
-    patch({ img: res.url });
+    try {
+      const res = await upload.mutateAsync(file);
+      patch({ img: res.url });
+    } catch {
+      toast.error('Nepodařilo se nahrát obrázek.');
+    }
   };
 
   const submit = () => {

@@ -1,7 +1,7 @@
 // 10.1c — správa hran (cest mezi tělesy). Pracuje nad draftem.
 import { useState } from 'react';
 import type { UniverseNode, UniverseLink } from '../types';
-import { sortedByName } from '../universeSelectors';
+import { sortedByName, linkEndId } from '../universeSelectors';
 import styles from './UniversePanel.module.css';
 
 interface Props {
@@ -76,27 +76,31 @@ export function LinkEditorForm({
 
       {links.length > 0 && (
         <ul className={styles.connList}>
-          {links.map((l, i) => (
-            <li
-              key={`${l.source}-${l.target}-${i}`}
-              className={styles.formRow}
-              style={{ alignItems: 'center' }}
-            >
-              <span style={{ flex: 1, fontSize: '0.85rem' }}>
-                {nameById.get(l.source) ?? l.source} →{' '}
-                {nameById.get(l.target) ?? l.target}
-                {l.isOrbit ? ' (orbit)' : ''}
-              </span>
-              <button
-                type="button"
-                className={`${styles.iconBtn} ${styles.btnDanger}`}
-                title="Smazat spojení"
-                onClick={() => onRemoveLink(l.source, l.target)}
+          {links.map((l, i) => {
+            // force-graph mohl source/target přepsat na node objekt → normalizuj
+            const sId = linkEndId(l.source);
+            const tId = linkEndId(l.target);
+            return (
+              <li
+                key={`${sId}-${tId}-${i}`}
+                className={styles.formRow}
+                style={{ alignItems: 'center' }}
               >
-                ✕
-              </button>
-            </li>
-          ))}
+                <span style={{ flex: 1, fontSize: '0.85rem' }}>
+                  {nameById.get(sId) ?? sId} → {nameById.get(tId) ?? tId}
+                  {l.isOrbit ? ' (orbit)' : ''}
+                </span>
+                <button
+                  type="button"
+                  className={`${styles.iconBtn} ${styles.btnDanger}`}
+                  title="Smazat spojení"
+                  onClick={() => onRemoveLink(sId, tId)}
+                >
+                  ✕
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

@@ -1,6 +1,7 @@
 // 10.1 — orchestrátor Universe mapy. Spojuje graf + panel, drží edit draft,
 // real-time sync (s předností draftu v edit módu) a PJ mutace.
 import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import {
   useUniverse,
@@ -15,6 +16,7 @@ import {
 } from './components/UniverseGraph';
 import { flyToNode } from './components/graphCamera';
 import { UniversePanel } from './components/UniversePanel';
+import { sanitizeForSave } from './universeSelectors';
 import { UniverseSearch } from './components/UniverseSearch';
 import { UniverseDetail } from './components/UniverseDetail';
 import { NodeEditorForm } from './components/NodeEditorForm';
@@ -73,13 +75,17 @@ export function UniverseMapView() {
 
   const save = async () => {
     if (!draft.draft) return;
-    await updateUniverse.mutateAsync({
-      nodes: draft.draft.nodes,
-      links: draft.draft.links,
-    });
-    setEditMode(false);
-    setEditingId(null);
-    clearStale();
+    try {
+      // sanitizace: force-graph mutuje nodes/links (přidá __threeObj + textury,
+      // přepíše link.source/target na objekty) → bez očištění 413 Payload Too Large.
+      await updateUniverse.mutateAsync(sanitizeForSave(draft.draft));
+      toast.success('Mapa uložena.');
+      setEditMode(false);
+      setEditingId(null);
+      clearStale();
+    } catch {
+      toast.error('Uložení mapy selhalo.');
+    }
   };
 
   const handleNodeClick = (node: UniverseNode) => {

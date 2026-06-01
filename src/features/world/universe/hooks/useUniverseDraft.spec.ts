@@ -61,6 +61,20 @@ describe('useUniverseDraft', () => {
     expect(result.current.draft?.links).toHaveLength(0);
   });
 
+  it('removeNode kaskáda funguje i s hranami zmutovanými force-graphem (object source)', () => {
+    const hook = renderHook(() => useUniverseDraft());
+    const dirty = {
+      id: 'm',
+      worldId: 'w',
+      nodes: [n('a'), n('b')],
+      // force-graph přepsal source/target na node objekty:
+      links: [{ source: n('a'), target: n('b'), isOrbit: false }],
+    } as unknown as UniverseMap;
+    act(() => hook.result.current.reset(dirty));
+    act(() => hook.result.current.removeNode('b'));
+    expect(hook.result.current.draft?.links).toHaveLength(0);
+  });
+
   it('addLink přidá hranu, duplicitní (i obrácenou) ignoruje', () => {
     const { result } = setup();
     act(() => result.current.addLink({ source: 'a', target: 'c', isOrbit: false }));

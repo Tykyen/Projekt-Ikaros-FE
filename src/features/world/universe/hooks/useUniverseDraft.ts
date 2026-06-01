@@ -2,9 +2,12 @@
 // mutují draft; „Uložit" pošle celý draft jako full PUT.
 import { useCallback, useRef, useState } from 'react';
 import type { UniverseMap, UniverseNode, UniverseLink } from '../types';
+import { linkEndId } from '../universeSelectors';
 
 function linkTouchesNode(link: UniverseLink, nodeId: string): boolean {
-  return link.source === nodeId || link.target === nodeId;
+  return (
+    linkEndId(link.source) === nodeId || linkEndId(link.target) === nodeId
+  );
 }
 
 export interface UseUniverseDraftResult {
@@ -72,11 +75,14 @@ export function useUniverseDraft(): UseUniverseDraftResult {
   const addLink = useCallback(
     (link: UniverseLink) =>
       mutate((m) => {
-        const exists = m.links.some(
-          (l) =>
-            (l.source === link.source && l.target === link.target) ||
-            (l.source === link.target && l.target === link.source),
-        );
+        const exists = m.links.some((l) => {
+          const s = linkEndId(l.source);
+          const t = linkEndId(l.target);
+          return (
+            (s === link.source && t === link.target) ||
+            (s === link.target && t === link.source)
+          );
+        });
         return exists ? m : { ...m, links: [...m.links, link] };
       }),
     [mutate],
@@ -87,7 +93,8 @@ export function useUniverseDraft(): UseUniverseDraftResult {
       mutate((m) => ({
         ...m,
         links: m.links.filter(
-          (l) => !(l.source === source && l.target === target),
+          (l) =>
+            !(linkEndId(l.source) === source && linkEndId(l.target) === target),
         ),
       })),
     [mutate],
