@@ -5,14 +5,11 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { toast } from 'sonner';
 import { Button, ImageLightbox } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { useUploadImage } from '@/shared/api';
-import { createSceneFromImage } from '@/features/world/tactical-map/api/mapApi';
-import { useUpdateScenario } from '../api';
 import {
   useSaveScenarioTemplate,
   toTemplateContentData,
@@ -195,35 +192,6 @@ export function ScenarioEditor({
       toast.error('Nahrání selhalo');
     }
   }
-
-  // C (11.2-ext): vytvoř taktickou scénu z mapy-podkladu + propoj zpět.
-  const updateScenario = useUpdateScenario(scenario.worldId);
-  const createScene = useMutation({
-    mutationFn: () =>
-      createSceneFromImage(
-        scenario.worldId,
-        scenario.title || 'Scéna',
-        draft.mapImageUrl,
-      ),
-    onSuccess: (created) => {
-      updateScenario.mutate({
-        id: scenario.id,
-        input: {
-          title: scenario.title,
-          images: scenario.images,
-          linkedPageSlug: scenario.linkedPageSlug,
-          subjectIds: scenario.subjectIds,
-          storylineIds: scenario.storylineIds,
-          isShared: scenario.isShared,
-          contentData: mergeMeta(scenario, {
-            mapSceneIds: [...meta.mapSceneIds, created.id],
-          }),
-        },
-      });
-      toast.success('Taktická scéna vytvořena — aktivuj ji na mapě.');
-    },
-    onError: () => toast.error('Vytvoření scény selhalo'),
-  });
 
   function setLegend(idx: number, patch: Partial<LegendRow>) {
     set(
@@ -485,18 +453,6 @@ export function ScenarioEditor({
             )}
           </div>
 
-          {!readOnly && draft.mapImageUrl && (
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={createScene.isPending}
-              onClick={() => createScene.mutate()}
-            >
-              {createScene.isPending
-                ? 'Vytvářím…'
-                : '🗺 Vytvořit taktickou scénu z této mapy'}
-            </Button>
-          )}
         </section>
       )}
 
