@@ -7,7 +7,8 @@ import {
   useCampaignScenarios,
   useCampaignSubjects,
 } from '@/features/world/campaign/api';
-import { getMeta } from '@/features/world/campaign/scenarioMeta';
+import { getMeta, mergeMeta } from '@/features/world/campaign/scenarioMeta';
+import { campaignKeys } from '@/features/world/campaign/api';
 import { postWorldOperation } from '../../api/worldOpsApi';
 import { postMapOperation } from '../../api/mapApi';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
@@ -146,6 +147,24 @@ export function LoadPreparationDialog({
         userId: currentUserId,
         sceneId: created.id,
       });
+
+      // 5) Provázání scénář→scéna (D-076): doplň `mapSceneIds` o novou scénu.
+      // Read-merge-write contentData (BE dělá $set celého contentData).
+      const scenario = scenarios.find((sc) => sc.id === scenarioId);
+      if (scenario) {
+        const meta = getMeta(scenario);
+        await api.put(`/campaign/scenarios/${scenario.id}?worldId=${worldId}`, {
+          title: scenario.title,
+          images: scenario.images,
+          linkedPageSlug: scenario.linkedPageSlug,
+          subjectIds: scenario.subjectIds,
+          storylineIds: scenario.storylineIds,
+          isShared: scenario.isShared,
+          contentData: mergeMeta(scenario, {
+            mapSceneIds: [...meta.mapSceneIds, created.id],
+          }),
+        });
+      }
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
@@ -155,6 +174,10 @@ export function LoadPreparationDialog({
         queryKey: ['worlds', worldId, 'members'],
       });
       void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
+      // Promítni doplněné `mapSceneIds` do campaign scénářů.
+      void queryClient.invalidateQueries({
+        queryKey: campaignKeys.scenarios(worldId),
+      });
       toast.success(
         `Scéna „${plan.title}" vytvořena: ${plan.characterIds.length} postav, ` +
           `${plan.bestieIds.length} bestií` +

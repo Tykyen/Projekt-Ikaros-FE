@@ -8,14 +8,7 @@
 
 ## Otevřené
 
-### D-076 — „Načíst přípravu" nepropojuje scénář ↔ vytvořenou scénu (mapSceneIds)
-**Soubor:** FE `src/features/world/tactical-map/components/pj-panel/LoadPreparationDialog.tsx`
-**Problém:** Po vytvoření scény ze scénáře se nedoplní `scenario.meta.mapSceneIds` o id nové scény (spec 11.2-ext C počítala s provázáním tam i zpět). Bez toho neexistuje navigace scénář→vytvořená scéna.
-**Dopad:** Nízký — hlavní funkce (vytvoř scénu + podklad + entity) funguje; chybí jen zpětný odkaz.
-**Řešení:** Po `apply` zapsat `mergeMeta(scenario, { mapSceneIds: [...stávající, created.id] })` přes campaign update (PUT scénáře) — pozor na read-merge-write contentData.
-**Kdy:** Až bude potřeba navigace scénář↔scéna, nebo při dalším doladění Storyboardu.
-
----
+_Žádné._ 🎉
 
 ---
 

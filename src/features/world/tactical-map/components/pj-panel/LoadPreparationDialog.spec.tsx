@@ -3,14 +3,20 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoadPreparationDialog } from './LoadPreparationDialog';
 
-const { postOp, postWorldOp, apiPost, apiClientPost } = vi.hoisted(() => ({
-  postOp: vi.fn<
-    (sceneId: string, op: { type: string; [k: string]: unknown }) => Promise<void>
-  >(() => Promise.resolve()),
-  postWorldOp: vi.fn(() => Promise.resolve()),
-  apiPost: vi.fn(() => Promise.resolve({ id: 'newscene' })),
-  apiClientPost: vi.fn(() => Promise.resolve({})),
-}));
+const { postOp, postWorldOp, apiPost, apiPut, apiClientPost } = vi.hoisted(
+  () => ({
+    postOp: vi.fn<
+      (
+        sceneId: string,
+        op: { type: string; [k: string]: unknown },
+      ) => Promise<void>
+    >(() => Promise.resolve()),
+    postWorldOp: vi.fn(() => Promise.resolve()),
+    apiPost: vi.fn(() => Promise.resolve({ id: 'newscene' })),
+    apiPut: vi.fn(() => Promise.resolve({})),
+    apiClientPost: vi.fn(() => Promise.resolve({})),
+  }),
+);
 
 vi.mock('../../api/mapApi', () => ({ postMapOperation: postOp }));
 vi.mock('../../api/worldOpsApi', () => ({ postWorldOperation: postWorldOp }));
@@ -22,11 +28,15 @@ vi.mock('@/shared/api/client', () => ({
         : Promise.resolve([]),
     ),
     post: apiPost,
+    put: apiPut,
   },
   apiClient: { post: apiClientPost },
   parseApiError: () => 'err',
 }));
 vi.mock('@/features/world/campaign/api', () => ({
+  campaignKeys: {
+    scenarios: (w: string) => ['campaign', w, 'scenarios'],
+  },
   useCampaignScenarios: () => ({
     data: [
       {
@@ -75,6 +85,7 @@ describe('LoadPreparationDialog', () => {
     postOp.mockClear();
     postWorldOp.mockClear();
     apiPost.mockClear();
+    apiPut.mockClear();
     apiClientPost.mockClear();
     renderDialog();
 
@@ -115,5 +126,14 @@ describe('LoadPreparationDialog', () => {
       userId: 'me',
       sceneId: 'newscene',
     });
+
+    // D-076 — provázání scénář→scéna: PUT doplní mapSceneIds o novou scénu.
+    await waitFor(() => expect(apiPut).toHaveBeenCalled());
+    const putUrl = apiPut.mock.calls[0][0] as string;
+    const putBody = apiPut.mock.calls[0][1] as {
+      contentData: { storyTree: { mapSceneIds: string[] } };
+    };
+    expect(putUrl).toContain('/campaign/scenarios/s1');
+    expect(putBody.contentData.storyTree.mapSceneIds).toContain('newscene');
   });
 });
