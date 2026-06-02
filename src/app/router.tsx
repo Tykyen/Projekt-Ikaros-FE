@@ -247,7 +247,19 @@ export const router = createBrowserRouter([
       { path: 'akce',                   element: memberOnly(p(EventsPage)) },
       { path: 'sprava-udalosti',        element: <Navigate to="../akce" replace /> },
       { path: 'pavucina',               element: memberOnly(p(CampaignPage)) },
-      { path: 'scenare',                element: memberOnly(p(StorylinesPage)) },
+      {
+        // 11.2 — Storyboard (scénáře) je PJ-nástroj: PJ + PomocnyPJ daného světa,
+        // Sa/Admin bypass. Hráč/Čtenář nemá přístup ani přes přímou URL.
+        path: 'scenare',
+        element: (
+          <WorldMembershipGuard
+            minWorldRole={WorldRole.PomocnyPJ}
+            fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
+          >
+            {p(StorylinesPage)}
+          </WorldMembershipGuard>
+        ),
+      },
       { path: 'obchod',                 element: memberOnly(p(ShopPage)) },
       { path: 'zvuky',                  element: memberOnly(p(SoundsPage)) },
       { path: 'prevodnik-men',          element: memberOnly(p(CurrencyPage)) },

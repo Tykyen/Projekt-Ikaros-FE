@@ -61,7 +61,10 @@ function buildNav(worldSlug: string, isPJ: boolean) {
           ? ([{ id: 'denik-pj', label: 'Deník PJ', to: `${b}/denik-pj` }] as const)
           : ([] as const)),
         { id: 'bestiar', label: 'Bestiář', to: `${b}/bestiar` },
-        { id: 'scenare', label: 'Storyboard', to: `${b}/scenare` },
+        // 11.2 — Storyboard je PJ-nástroj (PJ + PomocnyPJ); hráč ho v menu nevidí.
+        ...(isPJ
+          ? ([{ id: 'scenare', label: 'Storyboard', to: `${b}/scenare` }] as const)
+          : ([] as const)),
         { id: 'pocasi', label: 'Generátor počasí', to: `${b}/pocasi` },
         { id: 'prevodnik-men', label: 'Převodník měn', to: `${b}/prevodnik-men` },
         { id: 'zvuky', label: 'Zvuková databáze', to: `${b}/zvuky` },
