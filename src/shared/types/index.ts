@@ -461,7 +461,6 @@ export interface AkjType {
  * (ten je vždy povinný a v tomto seznamu se neukládá).
  */
 export type CharacterTabId =
-  | 'soukrome'
   | 'denik'
   | 'finance'
   | 'vybava'
@@ -469,7 +468,6 @@ export type CharacterTabId =
   | 'poznamky';
 
 export const CHARACTER_TAB_IDS: readonly CharacterTabId[] = [
-  'soukrome',
   'denik',
   'finance',
   'vybava',

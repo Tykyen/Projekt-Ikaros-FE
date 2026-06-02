@@ -16,7 +16,7 @@ import { GalleryPanel } from './panels/GalleryPanel';
 import { VideosPanel } from './panels/VideosPanel';
 import { MenuPanel } from './panels/MenuPanel';
 import { CustomDataPanel } from './panels/CustomDataPanel';
-import { AccessPanel } from './panels/AccessPanel';
+import { AkjTabsPanel } from './panels/AkjTabsPanel';
 import { PostavaPanel } from './panels/PostavaPanel';
 import { TypeSwitchWarningModal } from './components/TypeSwitchWarningModal';
 import { LivePreviewPane } from './components/LivePreviewPane';
@@ -187,12 +187,8 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
             accessRequirements: state.accessRequirements,
             expectedUpdatedAt: state.expectedUpdatedAt ?? undefined,
             // 9.1 — PC/NPC pole; pro ostatní typy zůstanou prázdné/undefined.
-            privateContent: state.privateContent || undefined,
-            privateInfoBlocks:
-              state.privateInfoBlocks.length > 0
-                ? state.privateInfoBlocks
-                : undefined,
             ownerUserId: state.ownerUserId || undefined,
+            akjTabs: state.akjTabs,
           },
         });
         clearLocalDraft();
@@ -217,12 +213,8 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
           customData: state.customData,
           accessRequirements: state.accessRequirements,
           // 9.1 — PC/NPC pole; pro ostatní typy zůstanou prázdné/undefined.
-          privateContent: state.privateContent || undefined,
-          privateInfoBlocks:
-            state.privateInfoBlocks.length > 0
-              ? state.privateInfoBlocks
-              : undefined,
           ownerUserId: state.ownerUserId || undefined,
+          akjTabs: state.akjTabs,
         });
         clearLocalDraft();
         toast.success('Stránka vytvořena');
@@ -268,12 +260,8 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
           customData: state.customData,
           accessRequirements: state.accessRequirements,
           // 9.1 — PC/NPC pole.
-          privateContent: state.privateContent || undefined,
-          privateInfoBlocks:
-            state.privateInfoBlocks.length > 0
-              ? state.privateInfoBlocks
-              : undefined,
           ownerUserId: state.ownerUserId || undefined,
+          akjTabs: state.akjTabs,
           // expectedUpdatedAt vynechán — vědomé přepsání z režimu tvorby.
         },
       });
@@ -426,15 +414,7 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
             <PostavaPanel
               type={state.type}
               ownerUserId={state.ownerUserId}
-              privateContent={state.privateContent}
-              privateInfoBlocks={state.privateInfoBlocks}
               onOwnerChange={(userId) => setField('ownerUserId', userId)}
-              onPrivateContentChange={(html) =>
-                setField('privateContent', html)
-              }
-              onPrivateInfoBlocksChange={(blocks) =>
-                setField('privateInfoBlocks', blocks)
-              }
             />
           )}
 
@@ -448,9 +428,9 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
             onChange={(sections) => setField('sections', sections)}
           />
 
-          <AccessPanel
-            accessRequirements={state.accessRequirements}
-            onChange={(reqs) => setField('accessRequirements', reqs)}
+          <AkjTabsPanel
+            akjTabs={state.akjTabs}
+            onChange={(tabs) => setField('akjTabs', tabs)}
           />
         </div>
         </main>

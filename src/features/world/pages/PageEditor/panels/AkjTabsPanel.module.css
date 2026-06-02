@@ -1,0 +1,209 @@
+.hint {
+  font-size: 0.82rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  margin: 0 0 0.85rem;
+  line-height: 1.45;
+}
+
+.addRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 8px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  color: var(--text-strong, #fff);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  border-color: var(--accent, rgba(168, 130, 255, 0.5));
+}
+
+.card {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  padding: 0.85rem;
+  margin-bottom: 0.85rem;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 8px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  color: var(--text-strong, #fff);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.iconBtn,
+.removeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  cursor: pointer;
+}
+
+.iconBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.removeBtn:hover {
+  border-color: var(--color-danger, rgba(255, 100, 100, 0.6));
+  color: var(--color-danger, rgba(255, 100, 100, 0.9));
+}
+
+.access {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  padding: 0.7rem;
+  margin: 0 0 0.7rem;
+}
+
+.legend {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+  font-weight: 600;
+  padding: 0 0.35rem;
+}
+
+.accessGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.fieldLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.65));
+}
+
+.subHint {
+  font-size: 0.74rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  margin: 0.15rem 0 0.5rem;
+}
+
+/* Uploader v šířce jako hlavní obrázek stránky (280px sloupec) — stejný
+   poměr a velikost, jen ne přes celou kartu. */
+.imageWrap {
+  max-width: 280px;
+  margin-bottom: 0.75rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 7px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  color: var(--text-strong, #fff);
+  font-size: 0.85rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.4rem 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.4rem 0.25rem 0.55rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 999px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  font-size: 0.8rem;
+  color: var(--text-strong, #fff);
+}
+
+.chip button {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, rgba(220, 230, 255, 0.5));
+  cursor: pointer;
+  padding: 0;
+}
+
+.chip button:hover {
+  color: var(--color-danger, rgba(255, 100, 100, 0.9));
+}
+
+.userList {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.userList button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: transparent;
+  color: var(--text-strong, #fff);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.userList button:hover {
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.06));
+}
+
+/* Mobil — clearance/role pod sebe. */
+@media (max-width: 768px) {
+  .accessGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -44,8 +44,6 @@ export interface UpdateCharacterInput {
   imageUrl?: string;
   publicBio?: string;
   publicInfoBlocks?: InfoBlock[];
-  privateBio?: string;
-  privateInfoBlocks?: InfoBlock[];
   /** BE dělá shallow-merge kořenových klíčů (`characters.service.ts`). */
   diaryData?: Record<string, unknown>;
   extraBlocks?: SchemaBlock[];

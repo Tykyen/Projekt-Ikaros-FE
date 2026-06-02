@@ -40,7 +40,6 @@ describe('getVisibleTabs', () => {
     });
     expect(result.has('denik')).toBe(true);
     expect(result.has('finance')).toBe(true);
-    expect(result.has('soukrome')).toBe(false);
     expect(result.has('poznamky')).toBe(false);
   });
 

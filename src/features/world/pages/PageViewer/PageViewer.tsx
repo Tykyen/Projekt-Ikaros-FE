@@ -4,6 +4,7 @@ import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldRole } from '@/shared/types';
 import { PageHeader } from './components/PageHeader';
 import { AkjDecryptedBanner } from './components/AkjDecryptedBanner';
+import { WithAkjTabs } from './components/WithAkjTabs';
 import { GalleryLightbox } from './components/GalleryLightbox';
 import { QuoteSelectionPopup } from './components/QuoteSelectionPopup';
 import { PagePalette } from './components/PagePalette';
@@ -109,6 +110,12 @@ export function PageViewer({ page }: Props) {
   const closeHelp = useCallback(() => setHelpOpen(false), []);
 
   const Layout = LAYOUTS[page.type] ?? OstatniLayout;
+  // Lokace/Postava/NPC vsazují AKJ záložky do vlastní lišty (vedle Kalendáře);
+  // ostatní (flat) typy obalíme univerzálním WithAkjTabs.
+  const handlesOwnAkjTabs =
+    page.type === 'Lokace' ||
+    page.type === 'Postava hráče' ||
+    page.type === 'NPC';
 
   return (
     <>
@@ -119,7 +126,13 @@ export function PageViewer({ page }: Props) {
           accessRequirements={page.accessRequirements}
           isWoodWide={page.isWoodWide}
         />
-        <Layout page={page} />
+        {handlesOwnAkjTabs ? (
+          <Layout page={page} />
+        ) : (
+          <WithAkjTabs page={page}>
+            <Layout page={page} />
+          </WithAkjTabs>
+        )}
         <BacklinksPanel pageSlug={page.slug} />
         <GalleryLightbox
           images={inlineLightbox.images}

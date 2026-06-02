@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
   UserCircle,
-  Lock,
   BookOpen,
   Coins,
   Backpack,
@@ -23,7 +22,6 @@ import { SettingsPanel } from '../components/SettingsPanel';
 import s from './CharacterTabsVisibilityTab.module.css';
 
 const TAB_LABELS: Record<CharacterTabId, string> = {
-  soukrome: 'Soukromé',
   denik: 'Deník',
   finance: 'Finance',
   vybava: 'Výbava',
@@ -32,7 +30,6 @@ const TAB_LABELS: Record<CharacterTabId, string> = {
 };
 
 const TAB_ICONS: Record<CharacterTabId, React.ReactElement> = {
-  soukrome: <Lock size={14} aria-hidden />,
   denik: <BookOpen size={14} aria-hidden />,
   finance: <Coins size={14} aria-hidden />,
   vybava: <Backpack size={14} aria-hidden />,

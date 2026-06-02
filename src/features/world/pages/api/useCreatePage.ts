@@ -3,8 +3,8 @@ import { api } from '@/shared/api/client';
 import { pagesQueryKey } from './usePage';
 import type {
   AccessRequirement,
+  AkjTab,
   GalleryImage,
-  InfoBlock,
   InstructionalVideo,
   MenuItem,
   Page,
@@ -34,9 +34,9 @@ export interface CreatePageInput {
   customData?: Record<string, string>;
   order?: number;
   // 9.1 — pro type ∈ {PostavaHrace, NPC}. BE persistuje jen pokud relevantní.
-  privateContent?: string;
-  privateInfoBlocks?: InfoBlock[];
   ownerUserId?: string;
+  /** AKJ chráněné záložky (spec-akj-protected-tabs). */
+  akjTabs?: AkjTab[];
 }
 
 /**

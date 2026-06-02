@@ -258,14 +258,12 @@ export function WorldLayout() {
     if (!path || !directory) return null;
     const entry = directory.find((e) => e.slug === path);
     if (!entry) return null;
-    // 9.1 (cleanup) — avatarUrl už není v CharacterDirectoryEntry (BE jen
-    // legacy redukovaný shape). PostavaLayout / PageEditor drží imageUrl
-    // v Page entity; pokud chceme slot postavy zobrazit s avatarem, musíme
-    // ho dotáhnout přes /pages/<slug>. Zatím undefined → fallback ikona.
+    // World-scoped avatar = obrázek postavy ve světě (directory nese imageUrl).
+    // Když postava obrázek nemá, header fallbackuje na globální účet (řádek ~345).
     return {
       characterPath: entry.slug,
       name: entry.name,
-      avatarUrl: undefined,
+      avatarUrl: entry.imageUrl,
     };
   }, [membership, directory]);
 

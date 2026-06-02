@@ -37,6 +37,7 @@ import type {
   ChatMessage,
 } from '@/features/chat/lib/types';
 import type { WorldMembership } from '@/shared/types';
+import { worldMemberAvatar } from '@/features/world/lib/worldMemberAvatar';
 import { extractMentionUsernames } from '../lib/parseMentions';
 import { resolveDisplayName } from '../lib/resolveDisplayName';
 import { useComposerSticky } from '../api/useComposerSticky';
@@ -260,7 +261,7 @@ export function ChannelComposer({
           userId: m.userId,
           username: m.user?.username ?? m.characterPath ?? m.userId.slice(0, 6),
           characterPath: m.characterPath,
-          avatarUrl: m.user?.avatarUrl,
+          avatarUrl: worldMemberAvatar(m),
         })),
     [members, currentUserId],
   );

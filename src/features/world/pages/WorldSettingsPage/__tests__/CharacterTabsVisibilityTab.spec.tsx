@@ -55,11 +55,11 @@ describe('CharacterTabsVisibilityTab', () => {
 
   // DOM obsahuje desktop matrix + mobile sections současně (CSS media query
   // řídí viditelnost). Test musí počítat se zdvojeným renderem: 2× (1 disabled
-  // Profil + 6 togglů) × 2 layouty = 28 checkboxů.
+  // Profil + 5 togglů) × 2 layouty = 24 checkboxů.
   it('výchozí stav = všechny taby zaškrtnuté (kromě profilu, který je vždy disabled)', () => {
     render(<CharacterTabsVisibilityTab />);
     const allCheckboxes = screen.getAllByRole('checkbox');
-    expect(allCheckboxes).toHaveLength(28);
+    expect(allCheckboxes).toHaveLength(24);
 
     const disabled = allCheckboxes.filter((c) => c.hasAttribute('disabled'));
     expect(disabled).toHaveLength(4); // 2× Profil × 2 layouty
@@ -118,7 +118,7 @@ describe('CharacterTabsVisibilityTab', () => {
     const arg = mutateAsync.mock.calls[0][0];
     expect(arg.characterTabVisibility.PostavaHrace).not.toContain('denik');
     expect(arg.characterTabVisibility.PostavaHrace).toContain('finance');
-    expect(arg.characterTabVisibility.NPC).toHaveLength(6);
+    expect(arg.characterTabVisibility.NPC).toHaveLength(5);
     expect(toastSuccess).toHaveBeenCalledWith('Nastavení uloženo');
   });
 

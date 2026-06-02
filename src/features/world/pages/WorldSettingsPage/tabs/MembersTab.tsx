@@ -67,8 +67,12 @@ export default function MembersTab() {
   }
 
   function handleAssignCharacter(membershipId: string, characterPath?: string) {
+    // World-scoped avatar = obrázek přiřazené postavy (z directory).
+    const avatarUrl = characterPath
+      ? (directoryQ.data ?? []).find((c) => c.slug === characterPath)?.imageUrl
+      : undefined;
     updateMemberCharacter.mutate(
-      { membershipId, characterPath },
+      { membershipId, characterPath, avatarUrl },
       {
         onSuccess: () =>
           toast.success(
@@ -79,8 +83,11 @@ export default function MembersTab() {
     );
   }
 
-  // 9.1 (cleanup) — isLocation odebráno z Character; PC = !isNpc.
-  const pcCharacters = (directoryQ.data ?? []).filter((c) => !c.isNpc);
+  // PC = postava hráče: ne NPC a ne Lokace (Lokace má taky Character
+  // s kind='location', ale jako postavu hráče ji přiřadit nelze).
+  const pcCharacters = (directoryQ.data ?? []).filter(
+    (c) => !c.isNpc && c.kind !== 'location',
+  );
 
   const settings = settingsQ.data ?? null;
   const customGroups = settings?.customGroups ?? [];

@@ -251,6 +251,34 @@ const FAQ: FaqItem[] = [
     ),
   },
   {
+    q: 'Co jsou zamčené (AKJ) záložky na stránce a proč některé nevidím?',
+    a: (
+      <>
+        <p>
+          Stránka ve světě (postava, lokace, NPC…) může mít vedle běžných
+          záložek (Profil, Kalendář) i <strong>chráněné záložky</strong> se
+          zámkem. Každou takovou záložku vidí jen ten, komu k ní{' '}
+          <strong>PJ dal přístup</strong> — buď podle úrovně utajení (AKJ), nebo
+          tě k ní přidá jmenovitě. Co na záložku napíše, vidí jen ti s přístupem.
+        </p>
+        <p>
+          Pokud k záložce přístup <strong>nemáš, vůbec ji neuvidíš</strong> — ani
+          nevíš, že existuje. Když na takový odkaz náhodou klikneš, objeví se
+          „Stránka je zašifrovaná". <strong>PJ</strong> (a Pomocný PJ, kterému to
+          PJ povolí) vidí záložky, na které má přístup; <strong>PJ světa</strong>{' '}
+          vidí všechny.
+        </p>
+        <p>
+          Tvoří se v <strong>editoru stránky</strong> (Pomocný PJ a výš) → panel{' '}
+          <strong>„Chráněné záložky (AKJ)"</strong>: přidáš záložku, nastavíš kdo
+          ji vidí a volitelně přepíšeš obrázek a text (jinak se dědí ze základní
+          stránky). Jedním klikem přidáš i záložku <strong>„PJ informace"</strong>{' '}
+          jen pro PJ.
+        </p>
+      </>
+    ),
+  },
+  {
     q: 'Jak funguje Pošta a kdo mi může psát?',
     a: (
       <>

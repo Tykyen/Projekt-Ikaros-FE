@@ -1,8 +1,8 @@
 import { useReducer, useCallback } from 'react';
 import type {
   AccessRequirement,
+  AkjTab,
   GalleryImage,
-  InfoBlock,
   InstructionalVideo,
   MenuItem,
   Page,
@@ -36,9 +36,9 @@ export interface PageEditorFormState {
   /** 7.2k — token pro optimistic concurrency check; null v new mode. */
   expectedUpdatedAt: string | null;
   // 9.1 — pro typ PostavaHrace / NPC. Pro ostatní typy zůstávají prázdné.
-  privateContent: string;
-  privateInfoBlocks: InfoBlock[];
   ownerUserId: string;
+  /** AKJ chráněné záložky (spec-akj-protected-tabs). */
+  akjTabs: AkjTab[];
 }
 
 export const INITIAL_PAGE_STATE: PageEditorFormState = {
@@ -57,9 +57,8 @@ export const INITIAL_PAGE_STATE: PageEditorFormState = {
   customData: {},
   accessRequirements: [],
   expectedUpdatedAt: null,
-  privateContent: '',
-  privateInfoBlocks: [],
   ownerUserId: '',
+  akjTabs: [],
 };
 
 export function pageToFormState(page: Page): PageEditorFormState {
@@ -84,9 +83,8 @@ export function pageToFormState(page: Page): PageEditorFormState {
     customData: page.customData ?? {},
     accessRequirements: page.accessRequirements,
     expectedUpdatedAt: page.updatedAt,
-    privateContent: page.privateContent ?? '',
-    privateInfoBlocks: page.privateInfoBlocks ?? [],
     ownerUserId: page.ownerUserId ?? '',
+    akjTabs: page.akjTabs ?? [],
   };
 }
 

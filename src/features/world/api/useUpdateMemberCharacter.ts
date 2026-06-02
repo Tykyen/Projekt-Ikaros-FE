@@ -11,6 +11,8 @@ import type { WorldMembership } from '@/shared/types';
 export interface UpdateMemberCharacterPayload {
   membershipId: string;
   characterPath?: string;
+  /** Obrázek přiřazené postavy → world-scoped avatar člena. */
+  avatarUrl?: string;
 }
 
 export function useUpdateMemberCharacter(worldId: string) {
@@ -19,7 +21,11 @@ export function useUpdateMemberCharacter(worldId: string) {
     mutationFn: (payload: UpdateMemberCharacterPayload) =>
       api.patch<WorldMembership>(
         `/worlds/${worldId}/members/${payload.membershipId}/character`,
-        { characterPath: payload.characterPath },
+        // null (ne undefined) — undefined by JSON zahodil a BE by neodpojil.
+        {
+          characterPath: payload.characterPath ?? null,
+          avatarUrl: payload.avatarUrl ?? null,
+        },
       ),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['worlds', worldId, 'members'] });

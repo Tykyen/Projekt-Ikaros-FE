@@ -51,6 +51,8 @@ export interface CharacterDirectoryEntry {
   slug: string;
   name: string;
   isNpc: boolean;
+  /** Spec 9.2 — 'location' (Lokace) / 'persona'. Lokace se nenabízí jako postava hráče. */
+  kind: 'persona' | 'location';
   imageUrl?: string;
   /** Přiřazený hráč (jen PC) — pro zobrazení jména hráče na kartě. */
   userId?: string;

@@ -40,9 +40,11 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-02 (12.1 — Správa platformy: nový admin hub
-          `/admin` se statistikami, správou uživatelů a audit logem; adresář
-          uživatelů zúžen na komunitní část. Plus 11.3 — Obchod světa: zboží, typy/skupiny,
+          Aktualizováno k 2026-06-02 (AKJ — chráněné záložky stránek: stránka
+          může mít vedle Profilu zamčené záložky, které vidí jen ti s přístupem
+          (PJ uděluje podle úrovně utajení nebo jmenovitě). Plus 12.1 — Správa
+          platformy: nový admin hub `/admin` se statistikami, správou uživatelů
+          a audit logem; adresář uživatelů zúžen na komunitní část. Plus 11.3 — Obchod světa: zboží, typy/skupiny,
           slevy, nákup do vybavení postavy s odečtem z účtu a možností vrácení.
           Plus 11.2 — Storyboard jako spustitelná příprava: strom scénářů,
           mapa-podklad s legendou, galerie s odesláním/naplánováním do chatu,

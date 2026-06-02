@@ -1,6 +1,7 @@
 import type { WorldMembership } from '@/shared/types';
 import { UserAvatar } from '@/shared/ui';
 import { WorldRoleChip } from '@/features/world/components/WorldRoleChip';
+import { worldMemberAvatar } from '@/features/world/lib/worldMemberAvatar';
 import s from './MemberCard.module.css';
 
 interface Props {
@@ -18,7 +19,7 @@ export function MemberCard({ member }: Props) {
 
   return (
     <article className={s.card} data-elev="card">
-      <UserAvatar src={member.user?.avatarUrl} size="lg" alt={name} />
+      <UserAvatar src={worldMemberAvatar(member)} size="lg" alt={name} />
       <span className={s.name}>{name}</span>
       <WorldRoleChip role={member.role} size="sm" />
     </article>

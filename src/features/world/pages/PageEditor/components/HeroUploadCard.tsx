@@ -8,6 +8,9 @@ interface Props {
   /** Aktuální URL hero obrázku (prázdné = žádný). */
   value: string;
   onChange: (url: string) => void;
+  /** Skryje vlastní label „Hlavní obrázek" — pro vnořené použití (např. AKJ
+   *  záložka), kde label řeší rodič. Velikost řídí šířka kontejneru. */
+  compact?: boolean;
 }
 
 const MAX_MB = 10;
@@ -19,7 +22,7 @@ const MAX_MB = 10;
  * Po nahrání preview + hover overlay „Změnit". URL fallback (prompt) pro
  * externí obrázky, které nejdou nahrát jako soubor.
  */
-export function HeroUploadCard({ value, onChange }: Props) {
+export function HeroUploadCard({ value, onChange, compact = false }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const upload = useUploadImage();
   const [dragOver, setDragOver] = useState(false);
@@ -69,7 +72,7 @@ export function HeroUploadCard({ value, onChange }: Props) {
 
   return (
     <div className={s.wrap}>
-      <span className={s.label}>Hlavní obrázek</span>
+      {!compact && <span className={s.label}>Hlavní obrázek</span>}
 
       <button
         type="button"

@@ -5,6 +5,7 @@ import { WorldRole, type AkjType, type WorldMembership } from '@/shared/types';
 import type { UpdateMemberPayload } from '@/features/world/api/useUpdateMember';
 import type { CharacterDirectoryEntry } from '../../api/characters.types';
 import { ROLE_LABEL, ROLE_ICON_KEY, ALL_ROLES } from '../lib/worldRoles';
+import { worldMemberAvatar } from '@/features/world/lib/worldMemberAvatar';
 import s from './MemberRow.module.css';
 
 interface Props {
@@ -76,7 +77,7 @@ export function MemberRow({
   return (
     <div className={s.row}>
       <div className={s.identity}>
-        <UserAvatar src={membership.user?.avatarUrl} size="sm" alt={name} />
+        <UserAvatar src={worldMemberAvatar(membership)} size="sm" alt={name} />
         <span className={s.name}>{name}</span>
         <WorldRoleIcon role={ROLE_ICON_KEY[membership.role]} size="sm" />
       </div>

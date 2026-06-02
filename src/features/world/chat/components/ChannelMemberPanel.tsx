@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { UserAvatar } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
+import { worldMemberAvatar } from '@/features/world/lib/worldMemberAvatar';
 import { formatLastSeen } from '../lib/lastSeen';
 import type { ChannelPresenceUser, ChatChannel } from '../lib/types';
 import s from './ChannelMemberPanel.module.css';
@@ -76,7 +77,7 @@ export function ChannelMemberPanel({
       .map((m) => ({
         userId: m.userId,
         username: m.user!.username,
-        avatarUrl: m.user!.avatarUrl,
+        avatarUrl: worldMemberAvatar(m),
         worldRole: m.role,
         online: onlineIds.has(m.userId),
         lastSeenAt: m.user!.lastSeenAt,

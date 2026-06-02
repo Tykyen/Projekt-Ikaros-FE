@@ -27,7 +27,8 @@ import { NotesTab } from '../../CharacterDetailPage/components/NotesTab';
 import { CalendarTab } from '../../CharacterDetailPage/components/CalendarTab';
 import { useCharacter } from '../../api/useCharacter';
 import { AkjBanner } from '../components/AkjBanner';
-import { SoukromeTab } from './SoukromeTab';
+import { OstatniLayout } from './OstatniLayout';
+import { resolveAkjTabPage, sortedAkjTabs } from '../lib/resolveAkjTab';
 import type { Page, InfoBlock } from '../../api/pages.types';
 import s from './PostavaLayout.module.css';
 
@@ -141,11 +142,6 @@ export function PostavaLayout({ page }: Props) {
   // role guardu; pro hráče/Korektora nemá efekt (subdoc taby tu stejně nejsou).
   const tabs: TabItem[] = [
     { id: 'profil', label: 'Profil', icon: <UserCircle size={16} /> },
-    // D-NEW-soukrome-tab — privátní bio + privateInfoBlocks vlastní záložka.
-    // Vidí jen PJ/PomocnyPJ/vlastník postavy.
-    ...(canSeePrivate && visibleTabs.has('soukrome')
-      ? [{ id: 'soukrome', label: 'Soukromé', icon: <Lock size={16} /> }]
-      : []),
     ...(character && canSeePrivate
       ? ([
           visibleTabs.has('denik') && {
@@ -175,12 +171,23 @@ export function PostavaLayout({ page }: Props) {
           },
         ].filter(Boolean) as TabItem[])
       : []),
+    // AKJ chráněné záložky — vedle ostatních, viditelné komukoli (BE už
+    // odfiltroval nedostupné). Read-only render přes OstatniLayout.
+    ...sortedAkjTabs(page).map((t) => ({
+      id: t.id,
+      label: t.name,
+      icon: <Lock size={16} />,
+    })),
   ];
+  const akjTabs = sortedAkjTabs(page);
+  const activeAkjTab = akjTabs.find((t) => t.id === activeTab);
 
-  // Auto-switch: pokud PJ schoval aktuální tab, přesuň se na Profil
+  // Auto-switch: pokud PJ schoval aktuální subdoc tab, přesuň se na Profil
   // (render-phase, React doc pattern „Adjusting state when something changes").
+  // AKJ záložky vynech — nejsou CharacterTabId a visibleTabs je nezná.
   if (
     activeTab !== 'profil' &&
+    !activeAkjTab &&
     !visibleTabs.has(activeTab as CharacterTabId)
   ) {
     setActiveTab('profil');
@@ -210,16 +217,6 @@ export function PostavaLayout({ page }: Props) {
         orientation="horizontal"
       >
         {activeTab === 'profil' && <BioTab page={page} />}
-
-        {activeTab === 'soukrome' && canSeePrivate && (
-          <SoukromeTab
-            page={page}
-            worldId={worldId}
-            worldSlug={worldSlug}
-            canEdit={canEdit}
-            onDirtyChange={setActiveTabDirty}
-          />
-        )}
 
         {activeTab === 'denik' && character && canSeePrivate && (
           <DiaryTab
@@ -262,6 +259,10 @@ export function PostavaLayout({ page }: Props) {
             onExitEdit={handleExitEdit}
             onDirtyChange={setActiveTabDirty}
           />
+        )}
+
+        {activeAkjTab && (
+          <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
         )}
       </Tabs>
 

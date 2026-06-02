@@ -102,6 +102,29 @@ export interface PageTable {
   values?: string[];
 }
 
+/**
+ * AKJ chráněná záložka stránky (spec-akj-protected-tabs.md). Zobrazí se v liště
+ * vedle Profil/Kalendář jen tomu, kdo splní `access` (OR logika). Obsah dědí ze
+ * základní stránky; `contentOverride` je sparse — vyplněné pole přepíše základ.
+ * BE záložky filtruje — FE dostane jen ty, na které má viewer přístup.
+ */
+export interface AkjTabContentOverride {
+  imageUrl?: string;
+  content?: string;
+  /** Atributy & metadata (sidebar „boxy"). Záložka dědí ze základu, nebo přepíše. */
+  table?: PageTable;
+}
+
+export interface AkjTab {
+  id: string;
+  name: string;
+  order: number;
+  /** Podmínky viditelnosti (OR). Clearance = { type:'AKJ', value }, konkrétní
+   *  hráč = { type:'UserId' }, role práh = { type:'Role' }. Prázdné = jen PJ. */
+  access: AccessRequirement[];
+  contentOverride?: AkjTabContentOverride;
+}
+
 export interface Page {
   id: string;
   slug: string;
@@ -124,14 +147,12 @@ export interface Page {
   createdAt: string;
   updatedAt: string;
   // 9.1 — pole pro typ PostavaHrace/NPC. Pro ostatní typy zůstávají undefined.
-  /** PJ-only obsah (mirror character.privateBio); BE posílá jen PJ + ownerUserId. */
-  privateContent?: string;
-  /** PJ-only strukturovaná metadata (rasa, povolání, …); BE posílá jen PJ + ownerUserId. */
-  privateInfoBlocks?: InfoBlock[];
   /** Pro type=PostavaHrace: přiřazený hráč. */
   ownerUserId?: string;
   /** Pro type ∈ {PostavaHrace, NPC}: link na character entity (5 subdokumentů — diary/calendar/finance/inventory/notes). */
   characterRef?: { characterId: string };
+  /** AKJ chráněné záložky — BE-filtrované (viewer dostane jen dostupné). */
+  akjTabs?: AkjTab[];
 }
 
 /** Lehká položka pro `GET /worlds/:worldId/pages/directory`. */

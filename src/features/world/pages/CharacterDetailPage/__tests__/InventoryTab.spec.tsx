@@ -37,7 +37,6 @@ const PAGE: Page = {
   category: 'Postavy',
   content: '',
   publicInfoBlocks: [],
-  privateInfoBlocks: [],
   imageUrl: '',
   accessRequirements: [],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
