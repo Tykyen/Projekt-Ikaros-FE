@@ -102,10 +102,14 @@ export function StoryboardView() {
   const ownerId = layer === 'mine' ? myUserId : layer;
   const readOnly = layer !== 'mine';
 
-  const scenarios = useMemo(
-    () => (scenariosQ.data ?? []).filter((x) => x.ownerId === ownerId),
-    [scenariosQ.data, ownerId],
-  );
+  const scenarios = useMemo(() => {
+    const all = scenariosQ.data ?? [];
+    // PJ má vrstvy (LayerSwitcher) → filtruje dle zvolené vrstvy (ownerId).
+    if (isPJ) return all.filter((x) => x.ownerId === ownerId);
+    // PomocnyPJ nemá vrstvy → vidí svoje + scénáře, které mu PJ sdílel.
+    // (BE mu stejně jiné nevrací — resolveScope: ownerId === já || isShared.)
+    return all.filter((x) => x.ownerId === myUserId || x.isShared);
+  }, [scenariosQ.data, ownerId, isPJ, myUserId]);
   const subjects = useMemo(
     () => (subjectsQ.data ?? []).filter((x) => x.ownerId === ownerId),
     [subjectsQ.data, ownerId],
@@ -275,6 +279,7 @@ export function StoryboardView() {
               scenario={selected}
               isPJ={isGm}
               readOnly={readOnly}
+              canShare={isGm && selected.ownerId === myUserId}
               isSaving={update.isPending}
               onSave={handleSave}
               linksPanel={

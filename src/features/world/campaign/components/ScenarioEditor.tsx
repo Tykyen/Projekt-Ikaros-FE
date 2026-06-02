@@ -45,6 +45,8 @@ interface Draft {
   mapImageUrl: string;
   mapNumberedUrl: string;
   mapLegend: LegendRow[];
+  /** Sdílení s PomocnyPJ (PJ rozhoduje; BE: PomocnyPJ pak smí číst i upravovat). */
+  isShared: boolean;
 }
 
 function toDraft(scenario: CampaignScenario): Draft {
@@ -61,6 +63,7 @@ function toDraft(scenario: CampaignScenario): Draft {
     mapImageUrl: m.mapPrep?.imageUrl ?? '',
     mapNumberedUrl: m.mapPrep?.numberedImageUrl ?? '',
     mapLegend: m.mapPrep?.legend ?? [],
+    isShared: scenario.isShared ?? false,
   };
 }
 
@@ -77,6 +80,7 @@ export function ScenarioEditor({
   isPJ,
   readOnly,
   isSaving,
+  canShare = false,
   linksPanel,
   onSave,
 }: {
@@ -84,6 +88,8 @@ export function ScenarioEditor({
   isPJ: boolean;
   readOnly: boolean;
   isSaving: boolean;
+  /** Vlastník scénáře může přepnout sdílení s PomocnyPJ (PJ rozhoduje). */
+  canShare?: boolean;
   /** Panel provázání (Step 4) — vkládá orchestrátor. */
   linksPanel?: ReactNode;
   onSave: (input: CreateScenarioInput) => void;
@@ -152,7 +158,7 @@ export function ScenarioEditor({
       linkedPageSlug: scenario.linkedPageSlug,
       subjectIds: scenario.subjectIds,
       storylineIds: scenario.storylineIds,
-      isShared: scenario.isShared,
+      isShared: draft.isShared,
       // mergeMeta zachová meta provázání (pageSlugs/bestieIds/mapSceneIds) i
       // neměněná pole — chrání proti `$set` přepisu.
       contentData: mergeMeta(scenario, {
@@ -286,6 +292,17 @@ export function ScenarioEditor({
               placeholder="např. pokud hráči zradí"
               disabled={readOnly}
               onChange={(e) => set('branchLabel', e.target.value)}
+            />
+          </label>
+        )}
+        {canShare && (
+          <label className={s.fieldInline} title="Zpřístupní scénář pomocnému PJ (smí ho pak číst i upravovat)">
+            <span className={s.fieldLabel}>Sdílet s pomocným PJ</span>
+            <input
+              type="checkbox"
+              checked={draft.isShared}
+              disabled={readOnly}
+              onChange={(e) => set('isShared', e.target.checked)}
             />
           </label>
         )}
