@@ -13,6 +13,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Modal, Button } from '@/shared/ui';
 import { useUploadImage } from '@/shared/api/useUploadImage';
 import { postMapOperation } from '../../api/mapApi';
+import { SceneAccessSection } from './SceneAccessSection';
 import type { MapScene, MapOperation, HexConfig } from '../../types';
 import styles from './EditSceneModal.module.css';
 
@@ -322,6 +323,17 @@ export function EditSceneModal({
               HP u bestií
             </label>
           </div>
+        </section>
+
+        {/* 10.2o — Přístup hráčů (přesunuto z orchestračního panelu).
+            Pozn.: tato sekce se ukládá OKAMŽITĚ (na rozdíl od zbytku modalu,
+            který čeká na „Uložit"). */}
+        <section className={styles.section}>
+          <h4 className={styles.sectionTitle}>
+            Přístup hráčů{' '}
+            <span className={styles.sectionHint}>(změny se projeví ihned)</span>
+          </h4>
+          <SceneAccessSection worldId={scene.worldId} sceneId={scene.id} />
         </section>
 
         {error && (

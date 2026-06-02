@@ -14,20 +14,19 @@ import { useCallback, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActiveScenes } from '../../hooks/useActiveScenes';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
-import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { api, apiClient } from '@/shared/api/client';
 import { ConfirmDialog } from '@/shared/ui';
 import { postWorldOperation } from '../../api/worldOpsApi';
 import { postMapOperation } from '../../api/mapApi';
 import { activeScenesQueryKey } from '../../hooks/useActiveScenes';
 import { ActiveScenesList } from './ActiveScenesList';
-import { AccessBoard } from './AccessBoard';
 import { PaletteAccordion } from './PaletteAccordion';
 import { BestiePalette } from './BestiePalette';
 import { PcPalette } from './PcPalette';
 import { NpcCharacterPalette } from './NpcCharacterPalette';
 import { EditSceneModal } from './EditSceneModal';
 import { MapLibraryModal } from './MapLibraryModal';
+import { LoadPreparationDialog } from './LoadPreparationDialog';
 import { ClearSceneDialog } from './ClearSceneDialog';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import type { SpawnPayload } from '../../utils/spawnPayload';
@@ -76,7 +75,17 @@ export function MapPjPanel({
     });
   };
   const [editingScene, setEditingScene] = useState<MapScene | null>(null);
+  // 10.2o — která paleta je rozevřená do boku (flyout). Jen jedna naráz.
+  const [openFlyout, setOpenFlyout] = useState<'pc' | 'npc' | 'bestie' | null>(
+    null,
+  );
+  const toggleFlyout = useCallback(
+    (key: 'pc' | 'npc' | 'bestie') =>
+      setOpenFlyout((cur) => (cur === key ? null : key)),
+    [],
+  );
   const [showLibrary, setShowLibrary] = useState(false);
+  const [showLoadPrep, setShowLoadPrep] = useState(false);
   /**
    * 10.2c-edit-1 — sceneId pro pending deactivate confirm dialog. null =
    * dialog zavřený. Po confirm → spustí deactivateMutation → set zpět null.
@@ -113,7 +122,6 @@ export function MapPjPanel({
   );
   const queryClient = useQueryClient();
   const { scenes: activeScenes } = useActiveScenes(worldId, expanded);
-  const membersQuery = useWorldMembers(worldId);
   const { world } = useWorldContext();
   const systemId = world?.system ?? null;
 
@@ -192,14 +200,6 @@ export function MapPjPanel({
     },
   });
 
-  const handleAssign = (userId: string, sceneId: string): void => {
-    mutation.mutate({ type: 'member.assignToScene', userId, sceneId });
-  };
-
-  const handleUnassign = (userId: string): void => {
-    mutation.mutate({ type: 'member.unassign', userId });
-  };
-
   return (
     <aside className={styles.panel}>
       <header
@@ -248,6 +248,15 @@ export function MapPjPanel({
               >
                 {createSceneMutation.isPending ? '…' : '+ Nová'}
               </button>
+              <button
+                type="button"
+                className={styles.newSceneBtn}
+                onClick={() => setShowLoadPrep(true)}
+                disabled={!currentScene}
+                title="Vlož předpřipravené postavy a bestie ze scénáře (Storyboard)"
+              >
+                🎬 Načíst přípravu
+              </button>
             </div>
             <ActiveScenesList
               scenes={activeScenes}
@@ -267,66 +276,146 @@ export function MapPjPanel({
             )}
           </PaletteAccordion>
 
-          {/* 10.2n — Přístup a viditelnost (nahradilo Rozmístění hráčů):
-              per-scéna i per-hráč skrytí/zámek + přiřazení. Skryté pokud svět
-              nemá hratelné členy (loading state záměrně neukazujeme). */}
-          {(membersQuery.data?.length ?? 0) > 0 && (
-            <PaletteAccordion
-              id="access"
-              title="Přístup a viditelnost"
-              count={activeScenes.length}
-            >
-              <AccessBoard
-                worldId={worldId}
-                members={membersQuery.data ?? []}
-                activeScenes={activeScenes}
-                onAssign={handleAssign}
-                onUnassign={handleUnassign}
-              />
-            </PaletteAccordion>
-          )}
+          {/* 10.2o — Přístup a viditelnost přesunut do nastavení scény (⚙ →
+              EditSceneModal, sekce „Přístup hráčů"). Tady už není. */}
 
-          {/* 10.2n — spawn palety jako sbalitelné accordiony (default sbalené,
-              počet aktivních v hlavičce) — zvládne 10+ entit bez nekonečného
-              scrollu a vnořených scrollů. */}
-          <PaletteAccordion id="pc" title="PC tokeny" count={paletteCounts.pc}>
-            <PcPalette
-              worldId={worldId}
-              scene={currentScene}
-              onStartPlacement={onStartPlacement}
-              onCountChange={setPcCount}
-            />
-          </PaletteAccordion>
-
-          <PaletteAccordion
-            id="npc"
-            title="NPC postavy"
-            count={paletteCounts.npc}
+          {/* 10.2o — palety PC/NPC/Bestiář se rozevírají do boku (flyout), ne
+              dolů. Trigger = řádek v panelu; obsah žije v plovoucím sloupci
+              vpravo (viz `flyoutPanels` níže). Hledání + „+ z katalogu" jsou
+              uvnitř flyoutu, seznam připravených tam má vlastní scroll. */}
+          <button
+            type="button"
+            className={`${styles.flyoutTrigger} ${openFlyout === 'pc' ? styles.flyoutTriggerActive : ''}`}
+            onClick={() => toggleFlyout('pc')}
+            aria-expanded={openFlyout === 'pc'}
           >
-            <NpcCharacterPalette
-              worldId={worldId}
-              scene={currentScene}
-              onStartPlacement={onStartPlacement}
-              onCountChange={setNpcCount}
-            />
-          </PaletteAccordion>
+            <span className={styles.flyoutTriggerChevron} aria-hidden>
+              ▸
+            </span>
+            <span className={styles.flyoutTriggerTitle}>PC tokeny</span>
+            <span className={styles.flyoutTriggerCount}>{paletteCounts.pc}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.flyoutTrigger} ${openFlyout === 'npc' ? styles.flyoutTriggerActive : ''}`}
+            onClick={() => toggleFlyout('npc')}
+            aria-expanded={openFlyout === 'npc'}
+          >
+            <span className={styles.flyoutTriggerChevron} aria-hidden>
+              ▸
+            </span>
+            <span className={styles.flyoutTriggerTitle}>NPC postavy</span>
+            <span className={styles.flyoutTriggerCount}>{paletteCounts.npc}</span>
+          </button>
 
           {systemId && (
-            <PaletteAccordion
-              id="bestie"
-              title="Bestiář"
-              count={paletteCounts.bestie}
+            <button
+              type="button"
+              className={`${styles.flyoutTrigger} ${openFlyout === 'bestie' ? styles.flyoutTriggerActive : ''}`}
+              onClick={() => toggleFlyout('bestie')}
+              aria-expanded={openFlyout === 'bestie'}
             >
-              <BestiePalette
-                worldId={worldId}
-                systemId={systemId}
-                scene={currentScene}
-                onStartPlacement={onStartPlacement}
-                onCountChange={setBestieCount}
-              />
-            </PaletteAccordion>
+              <span className={styles.flyoutTriggerChevron} aria-hidden>
+                ▸
+              </span>
+              <span className={styles.flyoutTriggerTitle}>Bestiář</span>
+              <span className={styles.flyoutTriggerCount}>
+                {paletteCounts.bestie}
+              </span>
+            </button>
           )}
         </div>
+      )}
+
+      {/* 10.2o — flyout sloupce palet (vpravo od panelu na desktopu, bottom
+          sheet na mobilu). Mountované vždy (když je panel rozbalený), aby
+          palety hlásily count do triggerů i když nejsou viditelné — viditelný
+          je jen aktivní (`flyoutHidden` na ostatních). */}
+      {expanded && (
+        <>
+          <div
+            className={`${styles.flyout} ${openFlyout === 'pc' ? '' : styles.flyoutHidden}`}
+          >
+            <div className={styles.flyoutHeader}>
+              <span className={styles.flyoutTitle}>PC tokeny</span>
+              <button
+                type="button"
+                className={styles.flyoutClose}
+                onClick={() => setOpenFlyout(null)}
+                aria-label="Zavřít"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.flyoutScroll}>
+              <PcPalette
+                worldId={worldId}
+                scene={currentScene}
+                onStartPlacement={onStartPlacement}
+                onCountChange={setPcCount}
+              />
+            </div>
+          </div>
+
+          <div
+            className={`${styles.flyout} ${openFlyout === 'npc' ? '' : styles.flyoutHidden}`}
+          >
+            <div className={styles.flyoutHeader}>
+              <span className={styles.flyoutTitle}>NPC postavy</span>
+              <button
+                type="button"
+                className={styles.flyoutClose}
+                onClick={() => setOpenFlyout(null)}
+                aria-label="Zavřít"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.flyoutScroll}>
+              <NpcCharacterPalette
+                worldId={worldId}
+                scene={currentScene}
+                onStartPlacement={onStartPlacement}
+                onCountChange={setNpcCount}
+              />
+            </div>
+          </div>
+
+          {systemId && (
+            <div
+              className={`${styles.flyout} ${openFlyout === 'bestie' ? '' : styles.flyoutHidden}`}
+            >
+              <div className={styles.flyoutHeader}>
+                <span className={styles.flyoutTitle}>Bestiář</span>
+                <button
+                  type="button"
+                  className={styles.flyoutClose}
+                  onClick={() => setOpenFlyout(null)}
+                  aria-label="Zavřít"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className={styles.flyoutScroll}>
+                <BestiePalette
+                  worldId={worldId}
+                  systemId={systemId}
+                  scene={currentScene}
+                  onStartPlacement={onStartPlacement}
+                  onCountChange={setBestieCount}
+                />
+              </div>
+            </div>
+          )}
+        </>
+      )}
+      {showLoadPrep && currentScene && (
+        <LoadPreparationDialog
+          worldId={worldId}
+          scene={currentScene}
+          onClose={() => setShowLoadPrep(false)}
+        />
       )}
       {showLibrary && (
         <MapLibraryModal

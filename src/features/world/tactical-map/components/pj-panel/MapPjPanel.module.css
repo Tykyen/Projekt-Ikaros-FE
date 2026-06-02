@@ -5,10 +5,13 @@
 .panel {
   /* 10.2c-edit-4 — left-bottom, solid background (user feedback).
      10.2j — už se nepozicuje sám; sedí in-flow ve společném `bottomLeftStack`
-     (TacticalMapView) pod logem hodů. Šířku/pozici řídí kontejner. */
+     (TacticalMapView) pod logem hodů. Šířku/pozici řídí kontejner.
+     10.2o — výšku stropu řídí `bottomLeftStack` (max-height); panel se v něm
+     smršťuje a tělo scrolluje. `overflow:visible`, aby flyout palety mohl
+     přetéct vpravo mimo panel (jinak by ho `overflow:hidden` ořízl). */
   position: relative;
   width: 100%;
-  max-height: calc(100vh - 200px);
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
@@ -17,17 +20,13 @@
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
   pointer-events: auto;
-  overflow: hidden;
+  overflow: visible;
   font-family: var(--font-mono);
 }
 
 /* 10.2c-edit-4 mobil-desktop — na úzkých displejích panel zabere skoro celou
    šířku ve spodu s 12px paddingem ze stran, hlavička poskytne větší touch target. */
 @media (max-width: 480px) {
-  .panel {
-    max-height: calc(100vh - 140px);
-  }
-
   .header {
     padding: 14px 16px;
   }
@@ -44,6 +43,8 @@
   padding: 10px 14px;
   background: rgb(var(--map-ui-accent-rgb) / 0.1);
   border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+  /* 10.2o — panel má overflow:visible, header musí sám clipovat horní rohy. */
+  border-radius: 12px 12px 0 0;
   cursor: pointer;
   user-select: none;
 }
@@ -66,11 +67,14 @@
 }
 
 .body {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   padding: 12px 14px;
   overflow-y: auto;
+  border-radius: 0 0 12px 12px;
 }
 
 .section {
@@ -144,4 +148,167 @@
   font-size: 12px;
   opacity: 0.5;
   font-style: italic;
+}
+
+/* ── 10.2o — palety PC/NPC/Bestiář: trigger v panelu + flyout do boku ─────── */
+
+/* Trigger = řádek v panelu (chevron + název + count). Klik = otevři flyout. */
+.flyoutTrigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.08);
+  color: var(--map-toolbar-text);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.flyoutTrigger:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.16);
+}
+.flyoutTriggerActive {
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.55);
+}
+.flyoutTriggerChevron {
+  flex: 0 0 auto;
+  font-size: 11px;
+  opacity: 0.7;
+  transition: transform 0.18s ease;
+}
+.flyoutTriggerActive .flyoutTriggerChevron {
+  transform: rotate(90deg);
+}
+.flyoutTriggerTitle {
+  flex: 1;
+  min-width: 0;
+  opacity: 0.8;
+}
+.flyoutTriggerCount {
+  flex: 0 0 auto;
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Flyout = plovoucí sloupec vpravo od panelu (desktop). Vlastní výška + scroll. */
+.flyout {
+  position: absolute;
+  left: calc(100% + 8px);
+  bottom: 0;
+  z-index: 100;
+  width: 300px;
+  max-height: min(70vh, 560px);
+  display: flex;
+  flex-direction: column;
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  color: var(--map-toolbar-text);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.45);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-mono);
+  animation: flyoutIn 160ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes flyoutIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.flyoutHeader {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+  border-radius: 12px 12px 0 0;
+}
+.flyoutTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.flyoutClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--map-toolbar-text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.flyoutClose:hover {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.6);
+  background: rgb(var(--map-ui-accent-rgb) / 0.12);
+}
+
+/* Jediný scroll flyoutu — sem teče seznam připravených entit. */
+.flyoutScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+}
+
+/* Skryté, ale namountované palety (kvůli hlášení count do triggeru). */
+.flyoutHidden {
+  display: none;
+}
+
+/* ── Mobil (≤ 768px): flyout = bottom sheet přes celou šířku ─────────────── */
+@media (max-width: 768px) {
+  .flyout {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    max-height: 60vh;
+    border-radius: 12px 12px 0 0;
+    animation: sheetIn 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes sheetIn {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  .flyoutClose {
+    width: 44px;
+    height: 44px;
+  }
+  .flyoutTrigger {
+    min-height: 44px;
+  }
 }
