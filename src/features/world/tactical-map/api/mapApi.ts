@@ -34,26 +34,6 @@ export function listMapScenes(worldId: string): Promise<MapScene[]> {
   return api.get<MapScene[]>('/maps', { worldId });
 }
 
-/**
- * 11.2-ext C — vytvoří novou (neaktivní) scénu s daným obrázkem podkladu.
- * PJ ji pak aktivuje/přiřadí ručně na mapě. Vrací id nové scény.
- */
-export async function createSceneFromImage(
-  worldId: string,
-  name: string,
-  imageUrl?: string,
-): Promise<{ id: string }> {
-  const scene = await api.post<{ id: string }>('/maps', {
-    worldId,
-    name,
-    config: { size: 40, originX: 0, originY: 0, showGrid: true },
-  });
-  if (imageUrl) {
-    await postMapOperation(scene.id, { type: 'scene.image', imageUrl });
-  }
-  return scene;
-}
-
 /** List jen aktivních scén — PJ orchestrator panel. */
 export function listActiveMapScenes(worldId: string): Promise<MapScene[]> {
   return api.get<MapScene[]>('/maps', { worldId, isActive: 'true' });

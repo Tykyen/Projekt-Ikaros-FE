@@ -33,13 +33,6 @@ vi.mock('./SendImageToChatDialog', () => ({
   SendImageToChatDialog: () => null,
 }));
 
-// C (vytvoření taktické scény) má vlastní testy; tady jen editor logika.
-vi.mock('../api', () => ({
-  useUpdateScenario: () => ({ mutate: vi.fn(), isPending: false }),
-}));
-vi.mock('@/features/world/tactical-map/api/mapApi', () => ({
-  createSceneFromImage: vi.fn(),
-}));
 
 function scen(meta: Partial<ScenarioMeta> = {}): CampaignScenario {
   return {
