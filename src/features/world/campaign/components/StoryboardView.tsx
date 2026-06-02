@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
@@ -62,8 +62,28 @@ export function StoryboardView() {
   const worldSystem = world?.system ?? '';
 
   const [layer, setLayer] = useState('mine');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Poslední otevřený scénář se pamatuje per-svět (přežije odchod/refresh) →
+  // po návratu do Storyboardu se znovu otevře.
+  const selKey = `ikr-storyboard-sel-${worldId}`;
+  const [selectedId, setSelectedId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(selKey);
+    } catch {
+      return null;
+    }
+  });
   const [del, setDel] = useState<TreeNode | null>(null);
+
+  // Persistuj jen platnou volbu (null = např. po přepnutí vrstvy nemažeme
+  // poslední výběr, ať se po návratu na „moji vrstvu" zase otevře).
+  useEffect(() => {
+    if (!selectedId) return;
+    try {
+      localStorage.setItem(selKey, selectedId);
+    } catch {
+      /* private mode — pamatování je UI komfort, ignoruj */
+    }
+  }, [selectedId, selKey]);
 
   const scenariosQ = useCampaignScenarios(worldId);
   const subjectsQ = useCampaignSubjects(worldId);
