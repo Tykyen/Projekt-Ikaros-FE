@@ -1,5 +1,5 @@
-﻿import { WorldStubPage } from './WorldStubPage';
+import { ShopView } from '@/features/world/shop/components/ShopView';
 
 export default function ShopPage() {
-  return <WorldStubPage area="shop" />;
+  return <ShopView />;
 }
