@@ -8,7 +8,23 @@
 
 ## Otevřené
 
-_Žádné._ 🎉
+### D-074 — EmbeddingSearchService padá při initu ONNX modelů
+**Soubor:** BE `src/modules/search/model-runtime.ts:35` — `ModelRuntime.initialize`, voláno z `embedding-search.service.ts:90` (`onModuleInit`)
+**Problém:** Při startu BE hází `TypeError: Ctor is not a constructor` pro každý model (granite-107, granite-278, …). Embedding/search se neinicializuje. Chyba je odchycená (BE doběhne a port 3000 naběhne), ale sémantické vyhledávání nefunguje. Pravděpodobně nekompatibilní verze / špatný import konstruktoru `onnxruntime-node` nebo `@xenova/transformers` (CJS/ESM default export).
+**Dopad:** Střední — BE běží, ale search/embedding feature je mrtvá; log se plní chybami při každém startu.
+**Řešení:** Ověřit verzi a způsob importu ONNX/transformers v `model-runtime.ts:35` (default vs named export, `new` na něčem co není třída). Porovnat s funkční verzí v package-lock.
+**Kdy:** Před prací na vyhledávání / když je potřeba embedding search.
+
+---
+
+### D-075 — Redis ECONNREFUSED spamuje log při startu BE
+**Soubor:** BE — `ioredis` klient (RedisModule / socket-io.adapter)
+**Problém:** Při startu se `ioredis` opakovaně pokouší připojit na Redis a hází `AggregateError [ECONNREFUSED]` / `[Redis] connection error` ve smyčce. V dev dockeru běží jen `matrix-mongodb-dev`, Redis container ne. Nefatální (BE běží), ale zaplavuje log a vypíná funkce závislé na Redis.
+**Dopad:** Nízký — dev setup; v single-instance režimu je Redis stejně opt-in (viz D-NEW-chat-presence-scale, `SOCKET_IO_REDIS`).
+**Řešení:** Buď spustit Redis v docker-compose pro dev, nebo zajistit, aby se klient bez `SOCKET_IO_REDIS`/konfigurace vůbec nepřipojoval (lazy/guard) a netočil reconnect smyčku.
+**Kdy:** Až bude vadit šum v logu, nebo při zavádění Redis-závislých funkcí.
+
+---
 
 ---
 
