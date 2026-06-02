@@ -252,8 +252,7 @@ export function MapPjPanel({
                 type="button"
                 className={styles.newSceneBtn}
                 onClick={() => setShowLoadPrep(true)}
-                disabled={!currentScene}
-                title="Vlož předpřipravené postavy a bestie ze scénáře (Storyboard)"
+                title="Vytvoří novou scénu ze scénáře (Storyboard): podklad mapy + připravené postavy a bestie"
               >
                 🎬 Načíst přípravu
               </button>
@@ -410,10 +409,10 @@ export function MapPjPanel({
           )}
         </>
       )}
-      {showLoadPrep && currentScene && (
+      {showLoadPrep && (
         <LoadPreparationDialog
           worldId={worldId}
-          scene={currentScene}
+          currentUserId={currentUserId}
           onClose={() => setShowLoadPrep(false)}
         />
       )}

@@ -61,28 +61,34 @@ mapSceneIds: string[];        // ZŮSTÁVÁ — odkaz na vytvořené taktické s
 
 ---
 
-## 4. D — Taktická mapa: „Načíst přípravu" (1–2 kliky vlož CP/NPC/Bestie)
+## 4. D+C — Taktická mapa: „Načíst přípravu" = vytvoř scénu z přípravy
 
-**Rozsah:** modul `tactical-map` (FE; operace už existují — bez BE). **Hlavní urychlení.**
+> **Revize (impl):** D a C sjednoceny do jedné akce. „Načíst přípravu" už NEvkládá
+> do aktivní scény — **vytvoří novou scénu** ze scénáře (podklad mapy + entity)
+> a přepne na ni PJ. Řeší to i prázdný svět (žádná aktivní scéna není potřeba).
 
-**Reuse (ověřeno):** operace `scene.activeCharacters.add {characterId}`, `scene.activeBestie.add {bestieId}` (per-scéna whitelist); `postMapOperation(sceneId, op)`. Batch = sekvenčně.
+**Rozsah:** modul `tactical-map` (FE; operace i `POST /maps` už existují — bez BE).
 
-**UI:** v `MapPjPanel` tlačítko **„Načíst přípravu"** → vybere scénář (campaign scenarios světa) → naimportuje jeho předpřipravené entity do whitelistu aktivní scény:
-- `bestieIds` → `scene.activeBestie.add` (přímé, `Bestie.id` ✅).
-- subjekty/PC/NPC → potřebují `Character.id`. ⚠️ **Resolve:** scénář drží `subjectIds` (Pavučina subjekt → `linkedCharacterSlug`) a `pageSlugs` (PC/NPC stránky → slug). Nutný překlad slug → `characterId`. **K dořešení ve spec D před impl:** kde vzít mapu slug→characterId (pravděpodobně `/worlds/:id/characters` directory). Pokud subjekt nemá napojenou postavu, přeskočí se (hlášení „X bez postavy nešlo vložit").
-- Výsledek: toast „Vloženo: N postav, M bestií".
+**Reuse (ověřeno):** `POST /maps` (create) + `POST /maps/:id/active` (aktivace) —
+stejný pattern jako `createSceneMutation` v `MapPjPanel`. Operace `scene.image`,
+`scene.activeCharacters.add {characterId}`, `scene.activeBestie.add {bestieId}`;
+`postMapOperation(sceneId, op)`; `member.assignToScene` (self) přes `postWorldOperation`.
 
-**Acceptance D:** z aktivní taktické scény jedním tlačítkem + výběrem scénáře se předpřipravené bestie a postavy objeví ve whitelistu (palety) připravené ke spawnu.
+**UI:** v `MapPjPanel` tlačítko **„Načíst přípravu"** (nevyžaduje aktivní scénu) →
+vybere scénář → `LoadPreparationDialog`:
+1. `POST /maps` — nová scéna, `name = scénář.title`, default hex config.
+2. **Podklad** = `mapPrep.imageUrl` (ZÁKLADNÍ, ne `numberedImageUrl`) přes `scene.image`. Když scénář mapu nemá, scéna zůstane bez podkladu.
+3. `bestieIds` → `scene.activeBestie.add` (přímé, `Bestie.id`).
+4. subjekty/PC/NPC → `characterId` přes slug→id z `/worlds/:id/characters(/players)`. Subjekt bez napojené postavy se přeskočí (hlášení).
+5. `POST /maps/:id/active` + `member.assignToScene` (self) → PJ scénu rovnou vidí.
+- Výsledek: toast „Scéna „<název>" vytvořena: N postav, M bestií (+ podklad mapy)".
 
----
+**Acceptance:** výběrem scénáře vznikne nová aktivní taktická scéna s jeho podkladem
+(základní mapou) a předpřipravené bestie/postavy jsou ve whitelistu (palety) ke spawnu;
+PJ je na scénu rovnou přepnut.
 
-## 5. C — Vytvořit taktickou scénu z mapy-podkladu
-
-**Rozsah:** `tactical-map` (+ BE?). ⚠️ **Ověřit před impl:** existuje FE mutace / BE endpoint `POST /maps` (create scene)? Rešerše našla `MapLibraryModal` a `EditSceneModal`, ne explicitní create. **Dořešit ve spec C.**
-
-**UI:** ve Storyboardu (sekce mapa) i/nebo na mapě tlačítko „Vytvořit taktickou scénu" → nová `MapScene` s `imageUrl = mapPrep.imageUrl`, `name = scénář.title`; po vytvoření doplní `mapSceneIds` scénáře (provázání tam i zpět). Navazuje na D (rovnou nabídne „načíst přípravu").
-
-**Acceptance C:** z mapy-podkladu vznikne taktická scéna s tím obrázkem, propojená se scénářem.
+**TODO (mimo tento krok):** doplnit `mapSceneIds` scénáře po vytvoření (provázání
+scénář↔scéna zpět) — zatím neimplementováno.
 
 ---
 
