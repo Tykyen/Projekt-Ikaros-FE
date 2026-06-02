@@ -58,7 +58,11 @@ export function StoryboardView() {
   const me = useAtomValue(currentUserAtom);
   const myUserId = me?.id ?? '';
   const viewerRole = userRole ?? WorldRole.Zadatel;
+  // `isPJ` = plný PJ → přepínač vrstev (BE mu vrací scénáře všech hráčů).
   const isPJ = viewerRole >= WorldRole.PJ;
+  // `isGm` = PJ i PomocnyPJ → plná GM editace včetně tajných polí (gmNotes/cíl/
+  // výsledek). PomocnyPJ smí upravovat svoje + sdílené scénáře (BE canModify).
+  const isGm = viewerRole >= WorldRole.PomocnyPJ;
   const worldSystem = world?.system ?? '';
 
   const [layer, setLayer] = useState('mine');
@@ -269,7 +273,7 @@ export function StoryboardView() {
             <ScenarioEditor
               key={selected.id}
               scenario={selected}
-              isPJ={isPJ}
+              isPJ={isGm}
               readOnly={readOnly}
               isSaving={update.isPending}
               onSave={handleSave}
