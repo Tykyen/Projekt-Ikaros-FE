@@ -12,9 +12,15 @@ const { postOp, postWorldOp, apiPost, apiPut, apiClientPost } = vi.hoisted(
       ) => Promise<void>
     >(() => Promise.resolve()),
     postWorldOp: vi.fn(() => Promise.resolve()),
-    apiPost: vi.fn(() => Promise.resolve({ id: 'newscene' })),
-    apiPut: vi.fn(() => Promise.resolve({})),
-    apiClientPost: vi.fn(() => Promise.resolve({})),
+    apiPost: vi.fn<(url: string, body?: unknown) => Promise<{ id: string }>>(
+      () => Promise.resolve({ id: 'newscene' }),
+    ),
+    apiPut: vi.fn<(url: string, body?: unknown) => Promise<unknown>>(() =>
+      Promise.resolve({}),
+    ),
+    apiClientPost: vi.fn<(url: string, body?: unknown) => Promise<unknown>>(
+      () => Promise.resolve({}),
+    ),
   }),
 );
 

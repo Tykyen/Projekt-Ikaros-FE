@@ -13,8 +13,6 @@ import {
 import { FriendsTab } from '../components/tabs/FriendsTab/FriendsTab';
 import { UsersTab } from '../components/tabs/UsersTab/UsersTab';
 import { ZpracovatTab } from '../components/tabs/ZpracovatTab/ZpracovatTab';
-import { AuditTab } from '../components/tabs/AuditTab/AuditTab';
-import { FriendshipDebugTab } from '../components/tabs/FriendshipDebugTab/FriendshipDebugTab';
 import { usePendingActionsCount } from '../api/usePendingActions';
 import s from './UsersPage.module.css';
 
@@ -22,14 +20,12 @@ const TAB_TITLES: Record<UsersPageTab, string> = {
   pratele: 'Přátelé',
   uzivatele: 'Uživatelé',
   zpracovat: 'Zpracovat',
-  audit: 'Audit log',
-  'friendship-debug': 'Friendship debug',
 };
 
 /**
- * Spec 1.4 — sjednocená stránka `/ikaros/uzivatele` se 4 (admin) /
- * 2 (ostatní) taby. Role-aware visibility, default tab podle role,
- * silent redirect na default při pokusu o nedostupný tab.
+ * 12.1 — `/ikaros/uzivatele` zúženo na komunitní taby (Přátelé / Uživatelé /
+ * Zpracovat) pro všechny role. Hloubková admin správa + Audit log se
+ * přesunuly pod `/admin`. Role-aware visibility, default tab, silent redirect.
  */
 export default function UsersPage() {
   const me = useAtomValue(currentUserAtom);
@@ -92,8 +88,6 @@ export default function UsersPage() {
       {tab === 'pratele' && <FriendsTab />}
       {tab === 'uzivatele' && <UsersTab />}
       {tab === 'zpracovat' && <ZpracovatTab />}
-      {tab === 'audit' && <AuditTab />}
-      {tab === 'friendship-debug' && <FriendshipDebugTab />}
     </div>
   );
 }

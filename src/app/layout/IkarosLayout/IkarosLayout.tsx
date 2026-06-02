@@ -18,6 +18,7 @@ import {
   Signpost,
   Settings,
   Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
 import { pendingTooltip } from './pendingBadge';
@@ -434,6 +435,14 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
               </span>
             )}
           </Link>
+          {isAdmin && (
+            <Link to="/admin" className={s.navItem} onClick={onNav}>
+              <span className={s.navItemIcon}>
+                <ShieldCheck size={18} />
+              </span>
+              <span className={s.navItemLabel}>Správa platformy</span>
+            </Link>
+          )}
           {isAdmin && (
             <Link
               to="/ikaros/admin/emotes"

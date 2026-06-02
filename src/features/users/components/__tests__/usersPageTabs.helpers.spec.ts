@@ -5,76 +5,49 @@ import {
   visibleTabsForRole,
 } from '../usersPageTabs.helpers';
 
-describe('visibleTabsForRole', () => {
-  it('Admin: vidí všech 5 tabů (Audit + Friendship debug, bez Novinky)', () => {
-    expect(visibleTabsForRole(UserRole.Admin)).toEqual([
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-      'audit',
-      'friendship-debug',
-    ]);
+const ALL_ROLES = [
+  UserRole.Superadmin,
+  UserRole.Admin,
+  UserRole.Ikarus,
+  UserRole.SpravceClanku,
+  UserRole.SpravceGalerie,
+  UserRole.SpravceDiskuzi,
+  undefined,
+];
+
+describe('visibleTabsForRole (12.1 — zúženo na komunitní taby)', () => {
+  it('každá role vidí 3 komunitní taby: Přátelé / Uživatelé / Zpracovat', () => {
+    for (const role of ALL_ROLES) {
+      const tabs = visibleTabsForRole(role);
+      expect(tabs).toContain('pratele');
+      expect(tabs).toContain('uzivatele');
+      expect(tabs).toContain('zpracovat');
+    }
   });
 
-  it('Superadmin: vidí všech 5 tabů (Audit + Friendship debug, bez Novinky)', () => {
-    expect(visibleTabsForRole(UserRole.Superadmin)).toEqual([
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-      'audit',
-      'friendship-debug',
-    ]);
+  it('Audit log už NENÍ na /ikaros/uzivatele (přesun pod /admin)', () => {
+    for (const role of ALL_ROLES) {
+      expect(visibleTabsForRole(role)).not.toContain('audit');
+    }
   });
 
-  it('Ikarus: Přátelé + Uživatelé + Zpracovat (Audit skryt)', () => {
-    expect(visibleTabsForRole(UserRole.Ikarus)).toEqual([
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-    ]);
+  it('friendship-debug už NENÍ na /ikaros/uzivatele (přesun pod /admin)', () => {
+    for (const role of ALL_ROLES) {
+      expect(visibleTabsForRole(role)).not.toContain('friendship-debug');
+    }
   });
 
-  it('SpravceClanku: Přátelé + Uživatelé + Zpracovat', () => {
-    expect(visibleTabsForRole(UserRole.SpravceClanku)).toEqual([
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-    ]);
-  });
-
-  it('SpravceGalerie: Přátelé + Uživatelé + Zpracovat', () => {
-    expect(visibleTabsForRole(UserRole.SpravceGalerie)).toEqual([
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-    ]);
-  });
-
-  it('SpravceDiskuzi: Přátelé + Uživatelé + Zpracovat', () => {
-    expect(visibleTabsForRole(UserRole.SpravceDiskuzi)).toEqual([
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-    ]);
-  });
-
-  it('undefined role (anon edge case): default jako Ikarus', () => {
-    expect(visibleTabsForRole(undefined)).toEqual([
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-    ]);
+  it('všechny role vidí přesně 3 taby', () => {
+    for (const role of ALL_ROLES) {
+      expect(visibleTabsForRole(role)).toHaveLength(3);
+    }
   });
 });
 
 describe('defaultTabForRole', () => {
-  it('všichni: default tab = Uživatelé (přehled adresáře jako vstupní brána)', () => {
-    expect(defaultTabForRole(UserRole.Admin)).toBe('uzivatele');
-    expect(defaultTabForRole(UserRole.Superadmin)).toBe('uzivatele');
-    expect(defaultTabForRole(UserRole.Ikarus)).toBe('uzivatele');
-    expect(defaultTabForRole(UserRole.SpravceClanku)).toBe('uzivatele');
-    expect(defaultTabForRole(UserRole.SpravceGalerie)).toBe('uzivatele');
-    expect(defaultTabForRole(UserRole.SpravceDiskuzi)).toBe('uzivatele');
-    expect(defaultTabForRole(undefined)).toBe('uzivatele');
+  it('všichni: default tab = Uživatelé', () => {
+    for (const role of ALL_ROLES) {
+      expect(defaultTabForRole(role)).toBe('uzivatele');
+    }
   });
 });

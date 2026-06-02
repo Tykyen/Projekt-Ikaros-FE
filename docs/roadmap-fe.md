@@ -28,7 +28,7 @@
 | 9 | Svět — herní nástroje | Svět | ⬜ |
 | 10 | Svět — mapy | Svět | ⬜ |
 | 11 | Svět — kampaně | Svět | ⬜ |
-| 12 | Admin & nastavení | Ikaros + Svět | ⬜ |
+| 12 | Admin & nastavení | Ikaros + Svět | 🟡 (12.1 hotovo) |
 | 13 | Pokročilé funkce | Ikaros + Svět | ⬜ |
 
 > Legenda: ✅ Hotovo &nbsp;|&nbsp; 🟡 Rozpracováno &nbsp;|&nbsp; ⬜ Čeká
@@ -1846,14 +1846,16 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 - [x] **E — Knihovna scén (šablony):** BE entita `ScenarioTemplate` (per-PJ cross-world, vzor MapTemplate); FE „📑 Šablona" (uložit) + „📑 Z šablony" (vložit). Snapshot bez per-svět ref.
 - [x] **F — Naplánované zprávy do chatu:** BE `ScheduledMessage` + `@Cron` worker (každou minutu odešle due přes `ChatService.sendMessage` jménem ownera) + CRUD; FE volba „Naplánovat na" v dialogu. BE +15 testů (9 scenario-template + 6 scheduled).
 
-### - [ ] 11.3 QuickNotes & Shop (`/svet/:worldId/obchod`)
+### - [x] 11.3 Obchod (`/svet/:worldId/obchod`) ✅ (2026-06-02)
 
-*Rychlé poznámky PJ + obchod světa.*
+*Obchod světa.* **Spec:** `docs/arch/phase-11/spec-11.3.md` ✅ · **Plán:** `docs/arch/phase-11/plan-11.3.md` ✅
 
-- [ ] **11.3a — QuickNotes:** `CampaignQuickNote` — pin/unpin, status (open / done), vazby na subjekty a storyliny; připnuté se zobrazují v dashboardu 11.1d
-- [ ] **11.3b — Shop:** `CampaignShopItem` — skupina / podskupina, cena + `currencyCode`, „doporučeno" badge, „často kupováno s" (`linkedItemIds`), `referenceLink`
-- [ ] **11.3c — Filtry + cena v měně:** hledání, filtr dle skupiny, řazení; zobrazení ceny v hráčem zvolené měně (převod přes 11.4)
-- [ ] **11.3d — `mobil-desktop` audit**
+*Shop hotový vč. nákupní/storno vrstvy nad rámec roadmapy. QuickNotes (původní 11.3a) zrušeny — rychlé poznámky pokrývá Storyboard + Deník PJ; nový obsah by jen tříštil. BE entita `CampaignQuickNote` zůstává nepoužitá (neškodný dead code, ke smazání při úklidu modulu campaign).*
+
+- [x] **11.3b — Shop:** `CampaignShopItem` — položky + **typy/skupiny jako entita** (`CampaignShopGroup`, 2 úrovně), cena + `currencyCode`, **slevy %** (na věc i skupinu, věc přebíjí), „doporučeno", „často kupováno s", `referenceLink` přes PagePicker (wiki překlik). ✅ (2026-06-02)
+- [x] **11.3c — Filtry + cena v měně:** hledání, filtr dle skupiny, řazení dle převedené ceny; cena v hráčově preferované měně (převod přes 11.4) + zobrazení slevy. ✅ (2026-06-02)
+- [x] **11.3-N (navíc) — Nákupní vrstva:** BE `CampaignPurchase` (purchase log) + atomický nákup/storno přes účet (8.6) ↔ vybavení (`CharacterInventory`); FE peněženka v headeru, „nakupuji pro" (jen PC), dialog se zůstatkem před→po, množství, panel „Nákupy" se stornem. Role: hráč své postavě se self-adjust účtem, PJ komukoli. BE +13 testů, FE +23. ✅ (2026-06-02)
+- [x] **11.3d — `mobil-desktop` audit + `napoveda`** ✅ (2026-06-02)
 
 ### - [x] 11.4 Měny a převodník (`/svet/:worldId/prevodnik-men`) ✅ (2026-05-26)
 
@@ -1904,16 +1906,16 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 
 **Pořadí stavby:** 12.1 → 12.2.
 
-### - [ ] 12.1 Platform admin (`/admin`)
+### - [x] 12.1 Platform admin (`/admin`) ✅ (2026-06-02)
 
-*Nahrazuje stub `PlatformAdminPage`. Superadmin / Admin. Většina FE dílů existuje — jde hlavně o zapojení a konsolidaci.*
+*Nahradil stub `PlatformAdminPage`. Superadmin / Admin. Spec: `docs/arch/phase-12/spec-12.1.md`, plán: `plan-12.1.md`. Stavěno ve 4 fázích (A BE endpoint → B hub+dashboard → C relokace+úklid → D testy). Realita oproti odhadu: admin nástroje (tabulka/bulk/ban/audit) už byly živé na `/ikaros/uzivatele` přes sdílené `features/admin/users/` — krok byl tedy **relokace** pod `/admin` + smazání 3 redundantních sirotků, ne zapojení od nuly.*
 
-- [ ] **12.1a — Admin hub + dashboard:** stránka `/admin`, platformové statistiky (počet uživatelů / světů / článků / galerie…) — **vyžaduje nový BE endpoint** (jediná BE dostavba fáze 12)
-- [ ] **12.1b — Správa uživatelů:** zapojit hotové komponenty (`AdminUsersPage`, `UsersTab`) — seznam + filtry, změna role (hierarchie), ban / unban, plánované smazání (30denní hold)
-- [ ] **12.1c — Admin permissions:** granular oprávnění (`canManageAdmins` / `canModerateContent` / `canEditPlatformPages`) — Superadmin only
-- [ ] **12.1d — Bulk akce:** hromadný ban / unban / role-change (BE hotové, FE `BulkToolbar` dotáhnout)
-- [ ] **12.1e — Username requests + audit log:** schvalování username (`RequestsTab`), audit log admin akcí (`AuditLogTab`) — zapojit pod `/admin`
-- [ ] **12.1f — Konsolidace + úklid:** odstranit dvojkolejnost správy uživatelů (viz nesrovnalost výše); `mobil-desktop` audit, `napoveda`
+- [x] **12.1a — Admin hub + dashboard:** stránka `/admin` (3 taby Přehled/Uživatelé/Audit), dashboard se statistikami přes nový BE `GET /api/admin/stats/overview` (`AdminStatsService`, robustní per-metrika fallback 0, +`countAll`/`countCreatedSince`/`countPendingDeletion` repo metody)
+- [x] **12.1b — Správa uživatelů:** `UsersAdminTab` pod `/admin` (reuse `UsersTable` + `UsersFilters` + `useAdminUsers`) — seznam + filtry, role (hierarchie), ban/unban, plánované smazání
+- [x] **12.1c — Admin permissions:** granular oprávnění už v kebabu `UsersTable` — dostupné na `/admin` Uživatelé (Superadmin only)
+- [x] **12.1d — Bulk akce:** `BulkToolbar` (součást `UsersTable`) — hromadný ban/unban/role-change
+- [x] **12.1e — Audit log + username requests:** `AuditLogTab` přesunut pod `/admin`. **Odchylka od roadmapy:** username requests NEdostaly samostatný admin tab — schvalování je kanonicky ve „Zpracovat" queue (`UsernameRequestRenderer`); dashboard na něj odkazuje s počtem. Redundantní `RequestsTable` smazán.
+- [x] **12.1f — Konsolidace + úklid:** `/ikaros/uzivatele` zúženo na komunitní taby (Přátelé / Uživatelé-karty / Zpracovat) pro všechny role; smazáni sirotci `AdminUsersPage`, `RequestsTable`, `ViewToggle`, `AuditTab` re-export; nav odkaz „Správa platformy" pro Admin+; `mobil-desktop` (CSS audit) + `napoveda` ✓
 - *Schvalování obsahu (články / galerie / diskuze) — hotové přes „Zpracovat" tab (krok 3.x), mimo rozsah fáze 12.*
 
 ### - [ ] 12.2 World admin — headline / menu builder

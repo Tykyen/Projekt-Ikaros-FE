@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Modal, Button } from '@/shared/ui';
 import { useAdminRejectUsernameRequest } from '../../api/useAdminUsers';
 import type { AdminUsernameRequestListItem } from '@/shared/types';
-import s from './RequestsTable.module.css';
+import s from './RejectRequestModal.module.css';
 
 interface Props {
   target: AdminUsernameRequestListItem | null;

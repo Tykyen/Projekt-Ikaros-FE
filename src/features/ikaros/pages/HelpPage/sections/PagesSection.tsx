@@ -53,8 +53,15 @@ const IKAROS_PAGES: PageDoc[] = [
     path: "/ikaros/uzivatele",
     name: "Adresář uživatelů",
     status: "ok",
-    who: "Přihlášený (Admin/Superadmin vidí navíc tab Audit)",
-    what: 'Taby Přátelé, Uživatelé, Zpracovat (univerzální fronta žádostí napříč moduly — žádosti o přátelství, změnu přezdívky a postupně i další), Audit log. Tab Přátelé: mřížka přijatých přátel + sbalitelná sekce „Odeslané žádosti". Tab Uživatelé: mřížka karet pro hráče, admin navíc přepínač Karty/Tabulka a „Zobrazit smazané". Admin/Superadmin navíc vidí Audit.',
+    who: "Přihlášený",
+    what: 'Komunitní část — taby Přátelé, Uživatelé, Zpracovat. Tab Přátelé: mřížka přijatých přátel + sbalitelná sekce „Odeslané žádosti". Tab Uživatelé: mřížka karet všech uživatelů (procházení adresáře, žádost o přátelství) se search a řazením. Tab Zpracovat: univerzální fronta žádostí napříč moduly — žádosti o přátelství, změnu přezdívky a postupně i další (Admin tu schvaluje i žádosti o přezdívku). Hloubková správa uživatelů (role, ban, mazání, audit) se přesunula na samostatnou stránku Správa platformy.',
+  },
+  {
+    path: "/admin",
+    name: "Správa platformy",
+    status: "ok",
+    who: "Admin a Superadmin",
+    what: 'Platformový admin hub se třemi taby. Přehled: dashboard se statistikami (počet uživatelů — celkem / aktivní za 24 h / noví za 7 dní / čekající na smazání, počet světů, počet článků / obrázků / diskuzí, čekající žádosti o přezdívku) + rychlé odkazy. Uživatelé: plná správa — vyhledávání a filtry, změna role (v rámci hierarchie), ban / odbanování (i dočasný), naplánování smazání účtu (30denní lhůta), hromadné akce a u Superadmina granular oprávnění adminů. Audit log: read-only historie admin akcí s filtry. Stránku otevřeš v pravém panelu odkazem „Správa platformy" (jen Admin+).',
   },
   {
     path: "/ikaros/uzivatel/:id",
@@ -219,18 +226,17 @@ const SOON_WORLD: PageDoc[] = [
     who: "Členové světa (Hráč read-only, PomocnyPJ+ create/edit/generate/broadcast, PJ+ delete)",
     what: '📦 Sety (page header tlačítko): 14 globálních batch-create balíčků — Svět komplet (8 metropolí 6 kontinentů), Evropa (9), Asie (8), Afrika (6), Severní/Jižní Amerika (6+5), Oceánie (4), Česko (5), Vysokohorská kampaň, Mořeplavecká, Mars expedice (3 lokace), Vesmírná stanice (ISS+interiéry), Vesmírná loď komplet (10 per-room), Solar System tour (8 těles). Klik na set → confirm dialog → vytvoří se najednou 3-10 generátorů. Plus custom sety per-world (PJ+ uloží šablonu globálního setu jako vlastní, příště rovnou aplikuje). Multi-generator grid karet — PJ může mít víc generátorů pro různé regiony světa (sever, jih, hlavní město). Každá karta: hero teplota, instruments (vítr/vlhkost/update), barometr SVG, narrative text, hazards, anomaly chip (🔥 vlna veder / 🥶 mrazivá vlna). Atmospheric overlay per weather type (déšť → rain particles, sníh → snow drift, bouře → lightning flash). Drag-to-reorder (PomocnyPJ+). ⭐ Hvězda = oblíbený generátor (favorited karty sortují nahoru, per-user × per-world v localStorage). Tlačítko „+ Nový generátor" otevře wizard se 4 rozcestími karet (~960 presetů celkem): 🌍 Reálný svět ~840 (Země/města + Köppen klimatické zóny + Mořská prostředí + Reálné extrémy), 🐉 Fantasy & mytologie 53 (literární světy Středozem/Westeros/Faerůn/Witcher/Tamriel, mytologie Olymp/Asgard/Helheim/Hádes/Duat/Avalon, prehistorická prostředí, steampunk, horror/Lovecraft, vzdušné/létající, magické), 🚀 Sci-fi & vesmír 45 (reálná planetární tělesa Mars/Luna/Venuš/Titan/Europa/Pluto/Jupiter, exoplanety, cyberpunk, vesmírné stanice ISS/Mir/Skylab/O\'Neill cylinder, lodní interiéry per-room, typy lodí, EVA exteriéry), ⭐ Mé presety (per-svět custom presety uložené z generator modal pro znovupoužití). Fuzzy search napříč všemi presety, naposledy použité chipsy, 3 trial rolly náhledu (přes world calendar nebo Gregorian fallback). Variance model: Gaussian variance per měsíc + Markov persistence weather type + 5% extrémy. Generování může explicitně zadat měsíc (PJ z UI) nebo BE použije real-world current month. Auto-advance: tlačítka „+1 den" / „+7 dní" v header posunou in-game date a auto-vygenerují počasí pro všechny generátory. Historie počasí: kebab menu „Historie" otevře modal s posledních N snapshots per generátor. WS live update: jiný PJ broadcastuje → ostatní vidí okamžitě. 🌡️ Climate epoch (paleoclimate / IPCC): kebab „Vygenerovat pro datum…" otevře modal s rokem (−25000 až +3000), měsícem a dnem. Live detekce klimatické éry (LGM −5°C, Středověké optimum +0.7°C, Malá doba ledová −0.7°C, Blízká budoucnost +1.2°C, far-future +4.5°C…) — generátor přizpůsobí teploty vědeckým paleoclimate/IPCC datům (Clark 2009, Mann 2009, IPCC AR6 SSP scénáře). Karta po vygenerování zobrazí chip s názvem éry, rokem a offsetem °C. 9.4-J — repair klimatu: pokud generátor produkuje nelogický rozptyl teplot (např. 3°C i 20°C v poledne), chybí mu klimatický model. Edit modal zobrazí žlutý banner „Generátor nemá klimatický model" s tlačítkem „Opravit klimat" — vyber preset/archetyp a klimat se doplní (monthlyTemps + Köppen σ + zóna) bez přepsání ostatních polí (název, weatherTypes, custom fields). Nový generátor bez vybraného presetu nelze uložit — buď vyber preset, nebo vědomě klikni „Prázdný formulář" v Preset tabu.',
   },
-  {
-    path: "/svet/:slug/obchod",
-    name: "Poznámky a obchod",
-    status: "soon",
-    fáze: "Fáze 11.3",
-    who: "PJ (PomocnyPJ na úrovni čtení)",
-    what: "Rychlé poznámky PJ (připnutelné, propojené se subjekty a linkami) a obchod světa (zboží, ceny v měnách světa). Scénáře už fungují (záložka Scénáře), příběhové linky v Pavučině (záložka Linky).",
-  },
 ];
 
 // 5.5 — světové stránky, které už reálně fungují.
 const WORLD_PAGES_OK: PageDoc[] = [
+  {
+    path: "/svet/:slug/obchod",
+    name: "Obchod",
+    status: "ok",
+    who: "Všichni členové (Hráč prohlíží a nakupuje své postavě; PomocnyPJ/PJ spravují katalog a nakupují komukoli)",
+    what: "Obchod světa s kartami zboží. PJ/PomocnyPJ zakládá položky i typy/skupiny (2 úrovně) a může dát slevu na jednotlivou věc i na celou skupinu (sleva na věc má přednost). Ceny se zadávají v měnách světa a každý je vidí ve své preferované měně (převod přes Převodník měn). Položku lze propojit s wiki stránkou světa (např. popis zbraně). Filtrování podle skupiny, hledání, řazení dle ceny. Nákup: v hlavičce je peněženka cílové postavy se zůstatkem; PJ volí „nakupuji pro“ (jen postavy hráčů), hráč nakupuje své postavě. Tlačítko Koupit otevře dialog se zůstatkem před a po nákupu, množstvím a slevou. Po koupi věc přibude do vybavení postavy (sekce „Nakoupeno z obchodu“) a cena se odečte z vybraného účtu. Hráč může nakupovat jen z účtu, kde mu to PJ povolil. Panel „Nákupy“ ukazuje historii a umožní nákup vrátit (peníze zpět na účet, věc zmizí z vybavení).",
+  },
   {
     path: "/svet/:slug/scenare",
     name: "Scénáře (Storyboard)",

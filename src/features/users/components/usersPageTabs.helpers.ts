@@ -1,29 +1,16 @@
 import { UserRole } from '@/shared/types';
 
-export type UsersPageTab =
-  | 'pratele'
-  | 'uzivatele'
-  | 'zpracovat'
-  | 'audit'
-  | 'friendship-debug';
+export type UsersPageTab = 'pratele' | 'uzivatele' | 'zpracovat';
 
 /**
- * Spec 1.4 (+ side-task „uzivatele-tab-ikarus" + D-056 friendship debug)
- * — role-aware viditelnost tabů. 3.1b: tab „Novinky" odstraněn — správa
- * novinek je nyní na veřejné stránce `/ikaros/novinky` (hub).
- *  - Admin/Superadmin: 5 tabů (Přátelé / Uživatelé / Zpracovat / Audit / Friendship debug)
- *  - ostatní role: 3 taby (Přátelé / Uživatelé / Zpracovat) — Audit/Friendship debug admin-only.
+ * 12.1 — `/ikaros/uzivatele` je komunitní stránka pro VŠECHNY role:
+ * Přátelé / Uživatelé (veřejné karty) / Zpracovat (osobní fronta žádostí).
+ * Hloubková správa uživatelů, Audit log i dev nástroj Friendship debug
+ * žijí pod `/admin` (PlatformAdminPage). „Zpracovat" zůstává i tady —
+ * je to osobní fronta každého uživatele, ne admin nástroj.
  */
 export function visibleTabsForRole(role: UserRole | undefined): UsersPageTab[] {
-  if (role === UserRole.Superadmin || role === UserRole.Admin) {
-    return [
-      'pratele',
-      'uzivatele',
-      'zpracovat',
-      'audit',
-      'friendship-debug',
-    ];
-  }
+  void role;
   return ['pratele', 'uzivatele', 'zpracovat'];
 }
 

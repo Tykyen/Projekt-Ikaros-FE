@@ -15,7 +15,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 /**
- * Role, které se zobrazí v dropdown role-change v AdminUsersPage (a v role-filtru
+ * Role, které se zobrazí v dropdown role-change v `/admin` Uživatelé (a v role-filtru
  * a bulk role-change modalu). Záměrně **jen globální** role — world role
  * (PJ / Korektor / Hráč / Čtenář / Žadatel) patří do správy konkrétního světa,
  * nikoli do platformního adminu (viz D-054).

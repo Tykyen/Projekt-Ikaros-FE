@@ -1,0 +1,86 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
+  padding: var(--sp-5);
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--depth-card);
+  text-decoration: none;
+  color: var(--text);
+  position: relative;
+  overflow: hidden;
+  animation: stat-in var(--transition-slow) ease both;
+  animation-delay: calc(var(--stat-index, 0) * 60ms);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: var(--sp-1);
+  color: var(--theme-accent, var(--text-strong));
+  opacity: 0.85;
+}
+
+.value {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--text-strong);
+}
+
+.label {
+  font-size: var(--text-sm);
+  color: var(--text);
+  opacity: 0.7;
+}
+
+/* Akcent — nenulová fronta apod. */
+.accent {
+  border-color: var(--theme-accent, var(--frame-border));
+}
+.accent .value {
+  color: var(--theme-accent, var(--text-strong));
+}
+
+/* Klikací karta — hover lift. */
+.clickable {
+  cursor: pointer;
+  transition:
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+}
+.clickable:hover {
+  box-shadow: var(--depth-card-hover);
+  transform: translateY(-2px);
+}
+.clickable:focus-visible {
+  outline: 2px solid var(--theme-accent, var(--text-strong));
+  outline-offset: 2px;
+}
+
+@keyframes stat-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+  .clickable:hover {
+    transform: none;
+  }
+}

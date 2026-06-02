@@ -1,0 +1,34 @@
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.modalField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.modalField span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.modalTextarea {
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border-radius: 4px;
+  width: 100%;
+  min-height: 80px;
+}
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
