@@ -1,0 +1,23 @@
+/* 11.2-ext D — dialog „Načíst přípravu". Layout only, žádné barvy (lint:colors). */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.note {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

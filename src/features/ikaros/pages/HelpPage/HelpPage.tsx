@@ -40,11 +40,11 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-01 (11.1 + 11.2a — Pavučina: vztahový graf
-          kampaně. Každý člen světa má vlastní síť subjektů a oboustranných
-          vztahů s emocí (nenávist ↔ láska); PJ vidí Pavučinu každého hráče jen
-          pro čtení. Záložky Dnes / Subjekty / Linky (příběhové linky) / Síť
-          (2D graf). Předchozí: 10.2n —
+          Aktualizováno k 2026-06-02 (11.2 + rozšíření — Storyboard jako
+          spustitelná příprava: strom scénářů, mapa-podklad s legendou, galerie
+          s odesláním/naplánováním do chatu, knihovna šablon scén a „Načíst
+          přípravu" na taktické mapě. Plus 11.1 — Pavučina: vztahový graf
+          kampaně. Předchozí: 10.2n —
           Orchestrace: spawn palety
           (PC / NPC / Bestiář) jsou nově sbalitelné s počtem aktivních v hlavičce
           a panel „Přístup a viditelnost" umožní PJ skrýt mapu nebo zamknout pohyb

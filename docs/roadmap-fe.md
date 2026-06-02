@@ -1826,15 +1826,25 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 - [x] **11.1d — Dashboard „Dnes":** krizové vztahy, aktivní linky, poslední změny — počítáno klientsky per-vrstva (funguje i pro PJ read-only náhled hráče). *(Připnuté poznámky = až 11.3.)*
 - [x] **11.1e — Moje / hráči:** vrstvy přes FE partitioning dle `ownerId` — každý má svou Pavučinu, PJ vidí Pavučinu každého hráče **read-only** (+ „📋 Kopírovat do mé vrstvy"); `mobil-desktop` audit ✓.
 
-### - [ ] 11.2 Storylines & Scénáře (`/svet/:worldId/scenare`) — *11.2a hotovo, zbytek čeká*
+### - [x] 11.2 Storylines & Scénáře (`/svet/:worldId/scenare`) ✅ (2026-06-01)
 
-*Příběhové linie a strom scén. Editor PJ-only.*
+**Spec:** `docs/arch/phase-11/spec-11.2.md` ✅ · **Plán:** `docs/arch/phase-11/plan-11.2.md` ✅
+
+*Příběhové linie a strom scén = Storyboard. Editor PJ-only. **Strom + metadata uloženy do schemaless `CampaignScenario.contentData.storyTree` → 0 BE změn** (vzor 11.1 `sideA`).*
 
 - [x] **11.2a — Storyliny:** ✅ (2026-06-01, předtaženo do Pavučiny jako záložka **Linky**) — `CampaignStoryline` CRUD: úroveň (macro/mid/micro), status, shrnutí, `whatHappened` / `truth` / `playersBelief` (tajná pole jen PJ) / `gmIntent` / `nextStep`; zapojené subjekty = **hledatelný multi-výběr**; filtr dle úrovně/statusu; aktivní linky se propisují do „Dnes" a jdou použít jako **filtr grafu** (Síť ukáže jen subjekty + vztahy té linky). BE CRUD už existoval.
-- [ ] **11.2b — Strom scénářů:** `CampaignScenario` jako strom — parent-child, `branchLabel` (větvení dle voleb hráčů), status (draft / active / optional / resolved), pořadí
-- [ ] **11.2c — Editor scénáře:** `RichTextEditor` (TipTap obsah + obrázky), tajné `gmNotes`, cíl / výsledek scény
-- [ ] **11.2d — Provázání assetů:** scénář ↔ mapy (`MapScene`, krok 10.2), lokace (wiki stránky, krok 7), subjekty, storyliny
-- [ ] **11.2e — `mobil-desktop` audit**
+- [x] **11.2b — Strom scénářů:** ✅ `kind: folder|scene` (volný strom, libovolná hloubka), `parentId`, `branchLabel` (větvení dle voleb hráčů), status (draft/active/optional/resolved), pořadí v `meta.order` (ne first-class — BE PUT DTO `order` nemá). Drag-reorder **i re-parent** (HTML5 DnD) + „přesunout pod…" dialog (touch/přístupnost). Klientský `buildTree` s cyklus-guardem + osiření na kořen.
+- [x] **11.2c — Editor scénáře:** ✅ `RichTextEditor` (TipTap obsah + obrázky), tajná PJ zóna („za oponou") `gmNotes` + cíl/výsledek, galerie obrázků scény, explicit „Uložit" + dirty guard (`mergeMeta` chrání proti `$set` přepisu).
+- [x] **11.2d — Provázání assetů (6 sekcí):** ✅ místo (`linkedPageSlug`), **wiki stránky libovolného typu** (`pageSlugs` — PC/NPC/Noviny/Lokace s filtrem typu), **bestiář** (`bestieIds` přes `useBestiar`), mapy (`mapSceneIds`), subjekty, storyliny. „Zobrazit v síti" → Pavučina předfiltrovaná (`?storyline=`).
+- [x] **11.2e — `mobil-desktop` audit + `napoveda`:** ✅ desktop 2-panel / mobil strom→editor stack, provázání sbalitelné, tajná zóna 1-sloupec.
+
+**11.2-ext — Storyboard jako spustitelná příprava ✅ (2026-06-02)** · spec `spec-11.2-ext.md`:
+- [x] **A — Galerie scény:** lightbox + kopírovat odkaz + **poslat do chatu** (výběr kanálu, příloha) + **naplánovat** odeslání (viz F).
+- [x] **B — Mapa-podklad scény:** podkladový obrázek + **očíslovaná verze + legenda** (číslo→popis); nahradilo matoucí ruční výběr scén.
+- [x] **C — Vytvořit taktickou scénu z mapy-podkladu:** `POST /maps` + `scene.image` op, propojení zpět (`mapSceneIds`). FE-only.
+- [x] **D — „Načíst přípravu" na taktické mapě:** `MapPjPanel` tlačítko → ze scénáře batch vloží předpřipravené bestie (`activeBestie.add`) + postavy (subjekt→`linkedCharacterSlug`→`characterId`, `activeCharacters.add`).
+- [x] **E — Knihovna scén (šablony):** BE entita `ScenarioTemplate` (per-PJ cross-world, vzor MapTemplate); FE „📑 Šablona" (uložit) + „📑 Z šablony" (vložit). Snapshot bez per-svět ref.
+- [x] **F — Naplánované zprávy do chatu:** BE `ScheduledMessage` + `@Cron` worker (každou minutu odešle due přes `ChatService.sendMessage` jménem ownera) + CRUD; FE volba „Naplánovat na" v dialogu. BE +15 testů (9 scenario-template + 6 scheduled).
 
 ### - [ ] 11.3 QuickNotes & Shop (`/svet/:worldId/obchod`)
 

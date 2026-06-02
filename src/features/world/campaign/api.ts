@@ -11,9 +11,11 @@ import type {
   CampaignDashboard,
   CampaignPlayer,
   CampaignRelationship,
+  CampaignScenario,
   CampaignStoryline,
   CampaignSubject,
   CreateRelationshipInput,
+  CreateScenarioInput,
   CreateStorylineInput,
   CreateSubjectInput,
 } from './types';
@@ -34,6 +36,7 @@ export const campaignKeys = {
   relationships: (worldId: string) =>
     ['campaign', worldId, 'relationships'] as const,
   storylines: (worldId: string) => ['campaign', worldId, 'storylines'] as const,
+  scenarios: (worldId: string) => ['campaign', worldId, 'scenarios'] as const,
   dashboard: (worldId: string) => ['campaign', worldId, 'dashboard'] as const,
   players: (worldId: string) => ['campaign', worldId, 'players'] as const,
 };
@@ -67,6 +70,17 @@ export function useCampaignStorylines(worldId: string) {
     queryKey: campaignKeys.storylines(worldId),
     queryFn: () =>
       api.get<CampaignStoryline[]>('/campaign/storylines', wq(worldId)),
+    enabled: !!token && !!worldId,
+    staleTime: 60_000,
+  });
+}
+
+export function useCampaignScenarios(worldId: string) {
+  const token = useAtomValue(accessTokenAtom);
+  return useQuery({
+    queryKey: campaignKeys.scenarios(worldId),
+    queryFn: () =>
+      api.get<CampaignScenario[]>('/campaign/scenarios', wq(worldId)),
     enabled: !!token && !!worldId,
     staleTime: 60_000,
   });
@@ -201,6 +215,63 @@ export function useDeleteStoryline(worldId: string) {
   return useMutation({
     mutationFn: (id: string) =>
       api.delete<void>(`/campaign/storylines/${id}?worldId=${worldId}`),
+    onSuccess: () => invalidateCampaign(qc, worldId),
+  });
+}
+
+// ── Scénáře / Storyboard (11.2) ──────────────────────────────────────────────
+
+export function useCreateScenario(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateScenarioInput) =>
+      api.post<CampaignScenario>(
+        `/campaign/scenarios?worldId=${worldId}`,
+        input,
+      ),
+    onSuccess: () => invalidateCampaign(qc, worldId),
+  });
+}
+
+export function useUpdateScenario(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: CreateScenarioInput }) =>
+      api.put<CampaignScenario>(
+        `/campaign/scenarios/${id}?worldId=${worldId}`,
+        input,
+      ),
+    onSuccess: () => invalidateCampaign(qc, worldId),
+  });
+}
+
+export function useDeleteScenario(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.delete<void>(`/campaign/scenarios/${id}?worldId=${worldId}`),
+    onSuccess: () => invalidateCampaign(qc, worldId),
+  });
+}
+
+/**
+ * Batch update více scénářů (drag-reorder / re-parent / osiření).
+ * Sekvenčně (objem malý, vyhneme se závodění o `$set` contentData),
+ * invalidace až po dokončení všech.
+ */
+export function useReorderScenarios(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (
+      updates: Array<{ id: string; input: CreateScenarioInput }>,
+    ) => {
+      for (const u of updates) {
+        await api.put<CampaignScenario>(
+          `/campaign/scenarios/${u.id}?worldId=${worldId}`,
+          u.input,
+        );
+      }
+    },
     onSuccess: () => invalidateCampaign(qc, worldId),
   });
 }

@@ -1,0 +1,866 @@
+/* Krok 11.2 — Storyboard. Vizuál „vlákno příběhu". Vše var()/color-mix, žádný hex. */
+
+/* ── Layout stránky ─────────────────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 1rem;
+  align-items: start;
+  min-height: 60vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.headerTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.root {
+  position: relative;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.readonlyBadge {
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.editorEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  color: var(--text-muted);
+  background: var(--surface-1);
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+}
+
+.netLink {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-2));
+  border: 1px solid var(--sb-secret-border);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.netLink:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── Strom ──────────────────────────────────────────────────────────────── */
+.tree {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--depth-panel);
+  padding: 0.75rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.treeHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.treeTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.treeHeadActions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.treeBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.treeEmpty {
+  padding: 1.5rem 0.75rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ── Uzel ───────────────────────────────────────────────────────────────── */
+.nodeRow {
+  --sb-depth: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+  padding-left: calc(var(--sb-depth) * 1.1rem);
+  border-radius: var(--radius-md);
+  transition: background 0.12s ease;
+}
+
+.nodeRow:hover {
+  background: var(--surface-2);
+}
+
+.nodeRowOn {
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface-2));
+}
+
+/* Svislé vlákno spojnice (slábne s hloubkou) */
+.thread {
+  position: absolute;
+  left: calc(var(--sb-depth) * 1.1rem + 0.3rem);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--sb-thread),
+    var(--sb-thread-soft)
+  );
+  opacity: calc(1 - var(--sb-depth) * 0.12);
+  pointer-events: none;
+}
+
+.nodeRow:first-child .thread {
+  display: none;
+}
+
+.nodeMain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.4rem 0.5rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  z-index: 1;
+}
+
+.nodeStatus {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 6px 1px currentColor;
+}
+.status_draft {
+  color: var(--sb-status-draft);
+  background: var(--sb-status-draft);
+}
+.status_active {
+  color: var(--sb-status-active);
+  background: var(--sb-status-active);
+  animation: sbPulse 2.4s ease-in-out infinite;
+}
+.status_optional {
+  color: var(--sb-status-optional);
+  background: var(--sb-status-optional);
+}
+.status_resolved {
+  color: var(--sb-status-resolved);
+  background: var(--sb-status-resolved);
+  box-shadow: none;
+}
+
+@keyframes sbPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 4px 0 currentColor;
+  }
+  50% {
+    box-shadow: 0 0 9px 2px currentColor;
+  }
+}
+
+.nodeIcon {
+  flex: none;
+  font-size: 0.95rem;
+}
+
+.nodeText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nodeTitle {
+  font-size: 0.92rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.branchLabel {
+  font-size: 0.74rem;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nodeKebab {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  z-index: 1;
+}
+.nodeKebab:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+/* Drop náznaky */
+.nodeDropInside {
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
+  border-radius: var(--radius-md);
+}
+.nodeDropBefore {
+  box-shadow: inset 0 2px 0 0 var(--accent);
+}
+.nodeDropAfter {
+  box-shadow: inset 0 -2px 0 0 var(--accent);
+}
+
+.rootDropZone {
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+}
+.rootDropOn {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* MoveDialog */
+.moveList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.moveItem {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.moveItem:hover {
+  background: var(--surface-2);
+}
+
+.templateRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.templatePick {
+  flex: 1;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.templatePick:hover {
+  background: var(--surface-2);
+}
+
+/* ── Editor ─────────────────────────────────────────────────────────────── */
+.editor {
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--depth-panel);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.editorHeadRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.editorTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--text);
+  padding: 0.2rem 0;
+}
+.editorTitle:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.editorSaveBox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: none;
+}
+
+.dirtyDot {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  box-shadow: 0 0 6px 1px var(--accent);
+}
+
+.editorMetaRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.field,
+.fieldInline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.fieldInline {
+  min-width: 160px;
+}
+
+.fieldLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.select,
+.input,
+.textarea {
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  padding: 0.45rem 0.6rem;
+  font-size: 0.9rem;
+}
+.textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+.select:focus,
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.editorSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sectionLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* Tajná PJ zóna — „za oponou" */
+.secretZone {
+  background: var(--sb-secret-bg);
+  border: 1px solid var(--sb-secret-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+.secretHead {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.secretGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* Galerie */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.galleryGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.galleryItem {
+  position: relative;
+  width: 110px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--frame-border);
+}
+.galleryItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.galleryRemove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface-1) 80%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+.galleryAdd {
+  width: 110px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+.galleryAdd:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.galleryAdd input {
+  display: none;
+}
+
+.galleryActions {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  display: flex;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.galleryItem:hover .galleryActions,
+.galleryItem:focus-within .galleryActions {
+  opacity: 1;
+}
+.galleryAction {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--radius-sm, 4px);
+  background: color-mix(in srgb, var(--surface-1) 75%, transparent);
+  cursor: pointer;
+  font-size: 0.78rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.galleryAction:hover {
+  background: var(--accent);
+}
+
+/* Mapa-podklad scény */
+.mapSlots {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.mapSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 180px;
+}
+.mapSlotImgWrap {
+  position: relative;
+}
+.mapSlotOpen {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  cursor: zoom-in;
+  overflow: hidden;
+}
+.mapSlotImg {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+}
+.mapUpload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.mapUpload:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mapUpload input {
+  display: none;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+.legendRow {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+.legendLabel {
+  flex: none;
+  width: 56px;
+  text-align: center;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  padding: 0.4rem;
+  font-size: 0.85rem;
+}
+.legendText {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  /* Auto-grow (výška řídí JS dle obsahu) — dlouhý text je celý vidět, žádný
+     vnitřní scroll, zalamuje na další řádky. */
+  resize: none;
+  overflow: hidden;
+  min-height: 2.2rem;
+  line-height: 1.4;
+  font-family: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.legendLabel:focus,
+.legendText:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.legendRemove {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  border-radius: var(--radius-md);
+}
+.legendRemove:hover {
+  color: var(--news-warning);
+  background: var(--surface-3);
+}
+
+/* Send-to-chat dialog */
+.sendDialog {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.sendPreview {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--frame-border);
+  align-self: center;
+}
+.sendActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* ── Provázání ──────────────────────────────────────────────────────────── */
+.linksPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  /* ŽÁDNÝ overflow:hidden — ořízl by absolutně pozicované dropdowny sekcí. */
+}
+
+.linkSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.7rem 0.85rem;
+}
+.linkSection + .linkSection {
+  border-top: 1px solid var(--frame-border);
+}
+
+.linkSectionHead {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.linkSectionHint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-top: -0.2rem;
+}
+
+.linkHint {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.linkChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.linkChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+}
+
+.linkChipImg {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.linkChipText {
+  color: var(--text);
+  text-decoration: none;
+}
+a.linkChipText:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.linkChipRemove {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+}
+.linkChipRemove:hover {
+  color: var(--news-warning);
+}
+
+.linkEmpty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.linkSearch {
+  position: relative;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.linkSearchInput {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+.linkSearchInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.linkTypeFilter {
+  flex: none;
+  max-width: 130px;
+}
+
+.linkDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  /* surface-3 = nejméně průhledná vrstva; navíc podložíme page bg, aby obsah
+     pod dropdownem neprosvítal (glass skiny mají surface alfa). */
+  background: var(--bg-secondary, var(--surface-3));
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  box-shadow: var(--depth-panel);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.linkOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.linkOption:hover {
+  background: var(--surface-2);
+}
+
+.linkOptionBadge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Responzivita ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .tree {
+    position: static;
+  }
+  .editor {
+    padding: 1rem;
+  }
+  .editorHeadRow {
+    flex-wrap: wrap;
+  }
+  .editorTitle {
+    font-size: 1.25rem;
+  }
+  .secretGrid {
+    grid-template-columns: 1fr;
+  }
+  .linkSearch {
+    flex-wrap: wrap;
+  }
+  .linkTypeFilter {
+    max-width: none;
+    width: 100%;
+  }
+}

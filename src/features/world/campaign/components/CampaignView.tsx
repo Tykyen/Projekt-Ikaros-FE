@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
@@ -30,11 +31,18 @@ export function CampaignView() {
   const viewerRole = userRole ?? WorldRole.Zadatel;
   const isPJ = viewerRole >= WorldRole.PJ;
 
+  // 11.2 — příchod ze Storyboardu „Zobrazit v síti": ?storyline=<id> předfiltruje
+  // graf a otevře tab Síť.
+  const [searchParams] = useSearchParams();
+  const initialStoryline = searchParams.get('storyline');
+
   const [layer, setLayer] = useState('mine');
-  const [tab, setTab] = useState<TabId>('dnes');
+  const [tab, setTab] = useState<TabId>(initialStoryline ? 'sit' : 'dnes');
   const [selSubjectId, setSelSubjectId] = useState<string | null>(null);
   const [selRelId, setSelRelId] = useState<string | null>(null);
-  const [graphStoryline, setGraphStoryline] = useState<string | null>(null);
+  const [graphStoryline, setGraphStoryline] = useState<string | null>(
+    initialStoryline,
+  );
 
   const subjectsQ = useCampaignSubjects(worldId);
   const relsQ = useCampaignRelationships(worldId);

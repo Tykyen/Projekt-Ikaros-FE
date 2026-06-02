@@ -1,5 +1,5 @@
-﻿import { WorldStubPage } from './WorldStubPage';
+﻿import { StoryboardView } from '@/features/world/campaign';
 
 export default function StorylinesPage() {
-  return <WorldStubPage area="storylines" />;
+  return <StoryboardView />;
 }

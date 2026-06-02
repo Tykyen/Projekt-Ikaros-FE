@@ -156,6 +156,43 @@ export interface CreateStorylineInput {
   isShared?: boolean;
 }
 
+// ── Scénáře / Storyboard (11.2) ──────────────────────────────────────────────
+
+/**
+ * Zrcadlo BE `CampaignScenario`
+ * (`backend/src/modules/campaign/interfaces/campaign-scenario.interface.ts`).
+ *
+ * Stromová metadata (parentId, kind, status, body, gmNotes, …) žijí ve
+ * schemaless `contentData.storyTree` — viz `scenarioMeta.ts`. Tady jen
+ * first-class BE pole. `contentData` je proto volný objekt.
+ */
+export interface CampaignScenario {
+  id: string;
+  worldId: string;
+  ownerId: string;
+  isShared: boolean;
+  title: string;
+  contentData?: Record<string, unknown>;
+  order: number;
+  linkedPageSlug?: string;
+  subjectIds: string[];
+  storylineIds: string[];
+  images: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Vstup pro create i update (BE `CreateCampaignScenarioDto` — bez `order`). */
+export interface CreateScenarioInput {
+  title: string;
+  contentData?: Record<string, unknown>;
+  linkedPageSlug?: string;
+  subjectIds?: string[];
+  storylineIds?: string[];
+  images?: string[];
+  isShared?: boolean;
+}
+
 // ── Rychlé poznámky (v 11.1 jen čteno — připnuté v dashboardu) ───────────────
 
 export interface CampaignQuickNote {

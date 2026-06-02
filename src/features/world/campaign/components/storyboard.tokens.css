@@ -1,0 +1,23 @@
+/**
+ * Krok 11.2 — Storyboard barevné tokeny.
+ *
+ * Scoped na `.storyboard-root` (žádný globální leak, žádný shared theme edit).
+ * Hodnoty = `var()` reference na existující design tokeny → themeable, žádný
+ * hardcoded hex (lint:colors clean). Vizuální koncept: „vlákno příběhu".
+ */
+
+.storyboard-root {
+  /* Status uzlů (glow tečka) */
+  --sb-status-draft: var(--role-world-reader); /* šedá — koncept */
+  --sb-status-active: var(--news-system); /* zelená — aktivní */
+  --sb-status-optional: var(--role-world-player); /* modrá — volitelná */
+  --sb-status-resolved: color-mix(in srgb, var(--text) 35%, transparent); /* tlumená */
+
+  /* Vlákno (spojnice stromu) */
+  --sb-thread: color-mix(in srgb, var(--accent) 55%, transparent);
+  --sb-thread-soft: color-mix(in srgb, var(--accent) 20%, transparent);
+
+  /* Tajná PJ zóna („za oponou") */
+  --sb-secret-bg: color-mix(in srgb, var(--accent) 8%, var(--surface-2));
+  --sb-secret-border: color-mix(in srgb, var(--accent) 30%, transparent);
+}

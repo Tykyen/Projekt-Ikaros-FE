@@ -13,6 +13,22 @@ export const HISTORY_LIMIT = 50;
 
 const base = (worldId: string) => `/worlds/${worldId}/chat`;
 
+/** 11.2-ext F — naplánovaná zpráva do chatu (cron ji odešle v `sendAt`). */
+export interface ScheduleMessagePayload {
+  channelId: string;
+  content?: string;
+  attachments?: ChatAttachment[];
+  /** ISO datetime v budoucnosti. */
+  sendAt: string;
+}
+
+export function useScheduleMessage(worldId: string) {
+  return useMutation({
+    mutationFn: (dto: ScheduleMessagePayload) =>
+      api.post(`${base(worldId)}/scheduled`, dto),
+  });
+}
+
 /** Query klíče světového chatu — sdílené s WS cache mutacemi. */
 export const worldChatKeys = (worldId: string) =>
   ({
