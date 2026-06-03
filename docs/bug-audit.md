@@ -9,9 +9,9 @@
 
 ## TL;DR (2026-06-03)
 
-> **Stav: 30 nálezů opraveno** (+ D-029), commitnuto + pushnuto na main (BE i FE).
-> Nově: N-12 (diskuze paginace), N-33 (events invalidace BE+FE), N-18 (membership worldId URL), N-14 (FE reviewers sjednoceno s BE).
-> **N-17 → by-design** (Zadatel=member je explicitní záměr spec 2.4, potvrzeno uživatelem).
+> **Stav: 32 nálezů opraveno** (+ D-029) + 2 ze 4 N-6b features, commitnuto + pushnuto na main.
+> Nově: N-12 (paginace), N-33 (events), N-18 (membership worldId), N-14 (reviewers), **N-6b username-request** (BE doplněno), **N-6b admin-friendships** (mapping bez schema migrace).
+> **N-17 → by-design** (Zadatel=member, spec 2.4). Zbývá N-6b self-deletion (celá 1.3c, samostatný spec), N-8/27, N-11, N-23, N-34.
 > 1 by-design (N-40), 2 false-positive (N-39 + kandidáti C-10/C-12).
 > Baseline: BE 1836 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~58 nových regresních testů.
 >
@@ -278,8 +278,8 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 
 ### 📋 N-6b — průběžný stav (po dílčí implementaci)
 - ✅ **username-request** (POST/GET/DELETE base) — DOPLNĚNO (repo logika už byla; service+controller+DTO+7 testů). Route audit FE↔BE sedí.
-- ⚠️ **admin-friendships** — **NE jen chybějící endpointy, ale schema drift.** FE `AdminFriendshipView` čeká 1.8-design (`userAId/userBId` kanonický, `declined`/`blocked`, `lastDeclinedAt/ById`, `blockedById`, `createdAt/updatedAt`), ale BE `Friendship` entity má jen `requesterId/recipientId` + `pending/accepted/rejected` + `rejectedAt`. → vyžaduje **rozhodnutí**: BE schema upgrade na 1.8 design (větší migrace), nebo upravit FE view na jednodušší BE shape. Lossy mapping = dluh, nedělat.
-- ⚠️ **self-deletion + reaktivace** — **kompletně chybí v BE** (žádné deletion/reactivate endpointy ani service). Nejcitlivější (mazání účtů, GDPR, soft-delete hold, PJ handover, vazba na N-3 cron). → **vlastní spec→souhlas**, ne narychlo.
+- ✅ **admin-friendships** — DOPLNĚNO **mappingem** (řešení schema driftu bez migrace): BE `Friendship`+`FriendBlock` → FE `AdminFriendshipView` (rejected→declined, blok→blocked, requester=A/recipient=B, dates→ISO). `AdminFriendshipsService` + `repo.findAllForUser` + 3 routes (AdminGuard) + 6 testů. DI bootstrap OK, route audit sedí.
+- 📋 **self-deletion + reaktivace** — **celá 1.3c funkcionalita chybí v BE** (ne jen endpoint: soft-delete pole na User, 30denní hold, tombstone, PJ handover, `requestSelfDeletion`/`reactivate` service, mailer notif, **vazba na N-3 cron** — taky chybí). Nejcitlivější (mazání účtů, GDPR, ztráta dat při chybě). → **samostatný spec→souhlas, ne v rámci bug-audit session.**
 
 ### 📋 N-6b — implementační spec (k provedení po souhlasu)
 Chybějící BE endpointy (FE je už volá — viz N-6 mapa). Pořadí dle hodnoty/rizika:
