@@ -26,9 +26,13 @@ import {
 import type { IkarosArticle } from '@/shared/types';
 import s from './ArticleDetailPage.module.css';
 
+// N-14 — sjednoceno s BE `ADMIN_ROLES` (ikaros-articles.service): globální
+// `UserRole.PJ` (=3) je platformová role a smí schvalovat články. FE ho dřív
+// v reviewerech vynechával → PJ schválil přes API, ale tlačítko neviděl.
 const REVIEWER_ROLES: UserRole[] = [
   UserRole.Superadmin,
   UserRole.Admin,
+  UserRole.PJ,
   UserRole.SpravceClanku,
 ];
 

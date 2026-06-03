@@ -9,8 +9,9 @@
 
 ## TL;DR (2026-06-03)
 
-> **Stav: 29 nálezů opraveno** (+ D-029), commitnuto + pushnuto na main (BE i FE).
-> Nově: N-12 (diskuze paginace), N-33 (events invalidace BE+FE), N-18 (membership worldId URL).
+> **Stav: 30 nálezů opraveno** (+ D-029), commitnuto + pushnuto na main (BE i FE).
+> Nově: N-12 (diskuze paginace), N-33 (events invalidace BE+FE), N-18 (membership worldId URL), N-14 (FE reviewers sjednoceno s BE).
+> **N-17 → by-design** (Zadatel=member je explicitní záměr spec 2.4, potvrzeno uživatelem).
 > 1 by-design (N-40), 2 false-positive (N-39 + kandidáti C-10/C-12).
 > Baseline: BE 1836 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~58 nových regresních testů.
 >
