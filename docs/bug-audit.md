@@ -11,12 +11,12 @@
 
 > **Stav: 32 nálezů opraveno** (+ D-029) + **4 ze 4 N-6b features + N-3**, commitnuto + pushnuto na main.
 > Nově: N-12 (paginace), N-33 (events), N-18 (membership worldId), N-14 (reviewers), **N-6b username-request** (BE doplněno), **N-6b admin-friendships** (mapping bez schema migrace), **N-6b self-deletion + reaktivace** (celá 1.3c BE), **N-3 cron hard-cleanup** (GDPR anonymizace).
-> **N-17 → by-design** (Zadatel=member, spec 2.4). Zbývá N-8/27, N-11, N-23, N-34.
+> **N-17 → by-design** (Zadatel=member, spec 2.4). **Technické dotaženo (N-12/23/33/34).** Zbývá už jen 5 nálezů k ROZHODNUTÍ (N-8/27, N-11, N-14, N-17, N-18) + N-2 (barvy) + infra-trigger dluhy.
 > 1 by-design (N-40), 2 false-positive (N-39 + kandidáti C-10/C-12).
 > Baseline: BE 1879 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~77 nových regresních testů · `nest start` DI graf OK.
 >
 > **Zbývá ~10 nálezů + 2 přehodnocené jako by-design/sporné:**
-> - 🟠 technické (spolehlivě opravitelné): N-12 (diskuze paginace), N-18 (worldId URL konzistence), N-23 (refund tlačítko gating), N-33 (events invalidace BE+FE), N-34 (mail race)
+> - ✅ technické dotaženo: N-12 (paginace), N-23 (refund gating), N-33 (events invalidace), N-34 (mail race) — viz tabulka
 > - 🟠 vyžaduje rozmyšlení: N-8/N-27 (weather room — sdílená BaseGateway), N-11 (themeId IsIn — potřebuje sdílený theme registry FE↔BE)
 > - ⚖️ **k rozhodnutí (NE jasné bugy):** N-14 (`UserRole.PJ=3` je GLOBÁLNÍ role, ne world PJ → možná legitimní v ADMIN_ROLES), N-17 (Zadatel=member — komentář spec 2.4 říká záměr)
 > - ✅ **přehodnoceno → by-design:** N-10 (kalendář Lokace) — komentář `characters.service.ts:140-143`: 8.1-FIR (2026-05-24) **záměrně** přebilo spec 9.2, lokace subdoc vidí jen PomocnyPJ+
@@ -151,7 +151,7 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 |---|---|---|---|---|
 | N-10 | `assertSubdocAccess` ignoruje `_options.action` → hráč 403 i na GET kalendáře Lokace (spec 9.2 nesplněn) | `characters.service.ts:127` | 🟠 | použít `action` v rozhodování (read→member, write→PomocnyPJ+) |
 | N-11 | `themeId` bez `@IsIn` → uloží libovolný string | `update-user.dto.ts:37` | 🟡 | `@IsIn(THEME_IDS)` (seznam sdílet/exportovat z FE) |
-| N-12 | Diskuze paginace `total` (DB count) ≠ vrácené `items` (po access filtru) → špatný počet stránek | `ikaros-discussions.service.ts:209-215` | 🟡 | filtrovat v DB query, nebo dopočítat total po filtru |
+| N-12 | Diskuze paginace `total` (DB count) ≠ vrácené `items` (po access filtru) → špatný počet stránek | `ikaros-discussions.service.ts:209-215` | ✅ | `total = accessible.length` po filtru; + regresní test |
 | N-13 | Embedding ignoruje `sections[].content` → semantic search nevidí obsah sekcí; změna sekce ani nere-indexuje | `embedding-search.service.ts:307-333` | 🟡 | přidat `sections[].content` do `buildChunks` + `computePageHash` |
 | N-14 | PJ (world role) v BE `ADMIN_ROLES` článků (platformový obsah) → wrong-layer; PJ schválí přes API | `ikaros-articles.service.ts:26` | 🟡 | odebrat PJ z ADMIN_ROLES (články = jen globální role) |
 
@@ -183,7 +183,7 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 | ID | Nález | Soubor | Záv. |
 |---|---|---|---|
 | N-22 | **Obchod prázdný pro hráče** — `resolveScope` vrací hráči `{worldId, ownerId:self}`, ale shop items vlastní PJ → hráč nevidí žádné položky, nemůže nakupovat ✓ | `campaign.service.ts:84` | 🔴 |
-| N-23 | Refund: FE vždy zobrazí „Vrátit", ale `adjust`→`assertCanAdjust` dá hráči 403 pokud `allowPlayerSelfAdjust=false` → němá chyba | `campaign-purchase.service.ts:240` | 🟠 |
+| N-23 | Refund: FE vždy zobrazí „Vrátit", ale `adjust`→`assertCanAdjust` dá hráči 403 pokud `allowPlayerSelfAdjust=false` → němá chyba | `MyPurchasesPanel.tsx` | ✅ | gating dle `isStaff \|\| account.allowPlayerSelfAdjust`; hráč bez práva vidí „storno u PJ"; +4 testy |
 | N-24 | `listPurchases` pro hráče volá `findByUserAndWorld` (`findOne`) → hráč s víc postavami vidí nákupy jen jedné, ostatní nelze stornovat | `campaign-purchase.service.ts:283` | 🟠 |
 
 ### Svět — taktická mapa (11)
@@ -207,8 +207,8 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 | N-30 | `GET /global-chat/rooms/presence` má controller-level `JwtAuthGuard`, ale FE ho volá i pro anonyma (sidebar) → 401 spam, badge se nenačte | `global-chat.controller.ts:71` × `useGlobalChat.ts:59`, `IkarosLayout.tsx:189` | 🔴 |
 | N-31 | Whisper jde přes WS do `user:{id}` roomu; FE `handleMessage` nekontroluje `channelId` → šeptaná zpráva se zobrazí ve špatně otevřené místnosti (sdílený socket) | `global-chat.gateway.ts:402` × `ChatRoom.tsx:124` | 🔴 |
 | N-32 | `handlePresence` leave filtruje `userId !== e.userId && username !== e.username` → odejde i nevinný uživatel se stejným jménem / ghost po přejmenování | `ChatRoom.tsx:188` | 🟠 |
-| N-33 | `useEvents` invaliduje cache při **každém** `ikaros:new-message` (i běžná pošta) → zbytečné refetchy/blikání záložky Události | `useEvents.ts:24` | 🟠 |
-| N-34 | Race: kořen vlákna uložen s `conversationId=''`, pak update → mezi tím může `MailDetail` načíst prázdný `conversationId` → vlákno se nedotáhne | `ikaros-messages.service.ts:80` × `MailDetail.tsx:32` | 🟡 |
+| N-33 | `useEvents` invaliduje cache při **každém** `ikaros:new-message` (i běžná pošta) → zbytečné refetchy/blikání záložky Události | `useEvents.ts:24` | ✅ | payload `system:boolean` (producer→gateway→FE); invaliduje jen na systémové poště |
+| N-34 | Race: kořen vlákna uložen s `conversationId=''`, pak update → mezi tím může `MailDetail` načíst prázdný `conversationId` → vlákno se nedotáhne | `ikaros-messages.service.ts:80` × `MailDetail.tsx:32` | ✅ | předgenerovaný `_id` = `conversationId` v 1 zápisu (žádné okno) |
 
 ### Svět — stránky / search (08)
 | ID | Nález | Soubor | Záv. |

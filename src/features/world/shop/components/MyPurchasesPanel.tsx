@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui/Button/Button';
 import { ConfirmDialog } from '@/shared/ui';
 import { formatCurrency } from '@/features/world/currencies/shared/convertAmount';
 import type { WorldCurrencyItem } from '@/features/world/currencies/types';
+import { useCharacterAccounts } from '@/features/world/pages/api/useCharacterAccounts';
 import { usePurchases, useRefund } from '../api';
 import type { Purchase } from '../types';
 import s from './shop.module.css';
@@ -12,8 +13,11 @@ import s from './shop.module.css';
 interface MyPurchasesPanelProps {
   worldId: string;
   characterId: string;
+  characterSlug: string;
   characterName: string;
   currencyItems: WorldCurrencyItem[];
+  /** PJ/PomocnyPJ — obchází `allowPlayerSelfAdjust` (storno smí vždy). */
+  isStaff: boolean;
   onClose: () => void;
 }
 
@@ -21,16 +25,28 @@ interface MyPurchasesPanelProps {
 export function MyPurchasesPanel({
   worldId,
   characterId,
+  characterSlug,
   characterName,
   currencyItems,
+  isStaff,
   onClose,
 }: MyPurchasesPanelProps) {
   const { data: purchases = [], isLoading } = usePurchases(
     worldId,
     characterId,
   );
+  // N-23 — storno volá BE `adjust` (`assertCanAdjust`): hráč smí jen pokud
+  // má účet `allowPlayerSelfAdjust`. Bez tohoto gatingu FE zobrazil „Vrátit"
+  // vždy → 403 → němá chyba. Účty mapujeme přes accountId nákupu.
+  const { data: accounts = [] } = useCharacterAccounts(worldId, characterSlug);
   const refundM = useRefund(worldId);
   const [toRefund, setToRefund] = useState<Purchase | null>(null);
+
+  const canRefund = (p: Purchase): boolean => {
+    if (isStaff) return true;
+    const account = accounts.find((a) => a.id === p.accountId);
+    return !!account?.allowPlayerSelfAdjust;
+  };
 
   function refund() {
     if (!toRefund) return;
@@ -78,7 +94,7 @@ export function MyPurchasesPanel({
               </span>
               {p.status === 'refunded' ? (
                 <span className={s.dim}>vráceno</span>
-              ) : (
+              ) : canRefund(p) ? (
                 <button
                   type="button"
                   className={s.iconBtn}
@@ -87,6 +103,10 @@ export function MyPurchasesPanel({
                 >
                   ↩ Vrátit
                 </button>
+              ) : (
+                <span className={s.dim} title="Storno smí provést jen PJ">
+                  storno u PJ
+                </span>
               )}
             </div>
           ))

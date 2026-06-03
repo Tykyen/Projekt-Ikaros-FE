@@ -360,8 +360,10 @@ export function ShopView() {
         <MyPurchasesPanel
           worldId={worldId}
           characterId={targetCharacter.id}
+          characterSlug={targetCharacter.slug}
           characterName={targetCharacter.name}
           currencyItems={currencyItems}
+          isStaff={canManage}
           onClose={() => setPurchasesOpen(false)}
         />
       )}
