@@ -9,18 +9,18 @@
 
 ## TL;DR (2026-06-03)
 
-> **Stav: 32 nálezů opraveno** (+ D-029) + 2 ze 4 N-6b features, commitnuto + pushnuto na main.
-> Nově: N-12 (paginace), N-33 (events), N-18 (membership worldId), N-14 (reviewers), **N-6b username-request** (BE doplněno), **N-6b admin-friendships** (mapping bez schema migrace).
-> **N-17 → by-design** (Zadatel=member, spec 2.4). Zbývá N-6b self-deletion (celá 1.3c, samostatný spec), N-8/27, N-11, N-23, N-34.
+> **Stav: 32 nálezů opraveno** (+ D-029) + **4 ze 4 N-6b features + N-3**, commitnuto + pushnuto na main.
+> Nově: N-12 (paginace), N-33 (events), N-18 (membership worldId), N-14 (reviewers), **N-6b username-request** (BE doplněno), **N-6b admin-friendships** (mapping bez schema migrace), **N-6b self-deletion + reaktivace** (celá 1.3c BE), **N-3 cron hard-cleanup** (GDPR anonymizace).
+> **N-17 → by-design** (Zadatel=member, spec 2.4). Zbývá N-8/27, N-11, N-23, N-34.
 > 1 by-design (N-40), 2 false-positive (N-39 + kandidáti C-10/C-12).
-> Baseline: BE 1836 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~58 nových regresních testů.
+> Baseline: BE 1879 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~77 nových regresních testů · `nest start` DI graf OK.
 >
 > **Zbývá ~10 nálezů + 2 přehodnocené jako by-design/sporné:**
 > - 🟠 technické (spolehlivě opravitelné): N-12 (diskuze paginace), N-18 (worldId URL konzistence), N-23 (refund tlačítko gating), N-33 (events invalidace BE+FE), N-34 (mail race)
 > - 🟠 vyžaduje rozmyšlení: N-8/N-27 (weather room — sdílená BaseGateway), N-11 (themeId IsIn — potřebuje sdílený theme registry FE↔BE)
 > - ⚖️ **k rozhodnutí (NE jasné bugy):** N-14 (`UserRole.PJ=3` je GLOBÁLNÍ role, ne world PJ → možná legitimní v ADMIN_ROLES), N-17 (Zadatel=member — komentář spec 2.4 říká záměr)
 > - ✅ **přehodnoceno → by-design:** N-10 (kalendář Lokace) — komentář `characters.service.ts:140-143`: 8.1-FIR (2026-05-24) **záměrně** přebilo spec 9.2, lokace subdoc vidí jen PomocnyPJ+
-> - 📋 N-6b (4 chybějící BE features — spec níže) · N-2 (colors), N-3 (cron) = vědomé dluhy
+> - ✅ N-6b (4/4 BE features hotovo) · ✅ N-3 (cron hard-cleanup hotovo) · N-2 (colors) = zbývající dluh
 >
 > ⚠️ **Pozn. k rozboru:** N-10 a N-14 byly v 1. kole označeny jako bugy, ale při ověření jde o
 > záměrné chování / globální roli. Lekce: u „access/role" nálezů vždy ověřit komentář + enum,
@@ -40,7 +40,7 @@
 - 🔴 **Bezpečnost / leaky:** N-7 (members leak), N-8/N-27 (room:join bez membership → počasí), N-9 (sound spoof), N-35 (AKJ leak v search), N-36 (favorite cizího světa), N-37 (AKJ leak slugů)
 - 🔴 **Chybějící WS / kontrakt:** N-4/N-5 (friendship+presence WS mrtvé), N-6 (auth/account contract drift — verify/change/delete/reactivate nefungují), N-15/N-19/N-20/N-30/N-31 (membership undefined, unread, kanály, presence auth, whisper leak)
 - 🟠🟡 **Ostatní (~20):** access politika, validace, paginace, embedding, kalendář leap, stale cache, konzistence
-- 🟠 **N-3** — account-cleanup cron stub (GDPR hard-delete nefunguje) — impl. plán níže
+- ✅ **N-3** — account-cleanup cron stub → **opraveno** (GDPR hard-delete + avatar cleanup, viz N-3 sekce)
 
 **Pokrytí:** hloubkově prověřeno všech 14 oblastí (BE+FE), ~1200 kontrolních bodů, 3 kola bug-huntingu + route audit + verifikace kandidátů.
 
@@ -56,9 +56,10 @@
 | `eslint .` | FE | ✅ čistý | 0 chyb/varování |
 | `lint:colors` | FE | ⚠️ 207 souborů / 2704 barev | konzistenční dluh, ne bug — viz N-2 |
 | `vitest run` (unit) | FE | ✅ 2473/2473 | `--project '!storybook'` (browser projekt visí) |
-| `tsc --noEmit` | BE | ✅ čistý | cron spec excluded → díra schovaná (N-3) |
+| `tsc --noEmit` | BE | ✅ čistý | cron spec **zařazen zpět** (N-3 opraveno) |
 | `eslint` | BE | ✅ čistý | |
-| `jest` | BE | 🐛→✅ 2 faily opraveny | viz N-1 |
+| `jest` | BE | ✅ 1879/1879 | +N-1 fix, +77 regresních (N-6b/N-3) |
+| `nest start` | BE | ✅ DI graf OK | ověřen po N-6b/N-3 (žádný cyklus) |
 
 Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` napříč 64 soubory — orientační, převážně legit, neřeší se plošně.
 
@@ -78,18 +79,17 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 - **Posouzení:** velká část legit (fyzické barvy 3D kostek `dice/models/*`, barvy kalendářů jako data v `calendarEngine/presets/*`). Appka funguje, jen obchází `var(--token)` → riziko pro theme isolaci u skutečných UI komponent.
 - **Stav:** k vyhodnocení — oddělit legit data od skutečných UI úniků. Není blocker.
 
-### N-3 — BE account-cleanup cron je stub 🔴 FUNKČNÍ DÍRA (známý dluh)
+### N-3 — BE account-cleanup cron je stub ✅ OPRAVENO (2026-06-03)
 - **Soubor:** `backend/src/modules/users/services/account-cleanup.cron.ts`
-- **Symptom:** cron běží jako prázdný `void` stub → soft-deleted účty se po 30 dnech **fyzicky nemažou** (GDPR). Spec test vyřazen z tsconfigu → typecheck díru schovává.
-- **Stav:** plánovaná plná implementace. **NEDĚLÁNO autonomně** — dotýká se DI grafu + schématu, reálný cyklus by se projevil až při `nest start` (neověřitelné v noci jen jestem).
-- **Implementační plán (zjištěno auditem, k provedení po schválení):**
-  1. `User` entity: přidat `deletedAt?: Date` (interface + `user.schema.ts` `@Prop` + `users.repository.ts` toEntity mapper — pozor field-drift checklist).
-  2. `IUsersRepository` + `MongoUsersRepository`: `findExpiredTombstones(cutoff): Promise<User[]>` (`isDeleted=true AND deletedAt < cutoff`).
-  3. `IFriendshipsRepository` + repo: ověřit/doplnit `deleteAllByUser(userId): Promise<number>` (spec ho volá; v interface zřejmě chybí).
-  4. `users.module`: registrovat `AccountCleanupCron` v `providers` (teď tam vůbec není) + doplnit DI: `IRefreshTokenRepository` (z auth modulu — **⚠️ riziko cyklu auth↔users**, řešit forwardRef nebo přesunem cronu do vlastního modulu / exportem refresh repo jako @Global), `UploadService`/`UserBanCacheService`/`IFriendshipsRepository`/`ConfigService`/`EventEmitter2` (většina už v module dostupná).
-  5. Implementovat 3 metody dle existujícího spec (`removeExpiredTombstones`, `removeTombstoneOne`, `hardDeleteOne`).
-  6. `tsconfig.json`: odebrat `account-cleanup.cron.spec.ts` z `exclude`.
-  7. Ověřit: **celý** `jest` + reálný `nest start` (kvůli DI cyklu — jest s mocky to neodhalí).
+- **Byl symptom:** cron běžel jako prázdný `void` stub → soft-deleted účty se po 30 dnech **fyzicky nemazaly** (GDPR). Spec test vyřazen z tsconfigu → typecheck díru schovával.
+- **Oprava (jako součást N-6b self-deletion):**
+  - `sweep()` (denně 03:00 Europe/Prague, spec 1.3c ř.393): `findExpiredPendingDeletion(now−30d)` → pro každý `anonymizeForHardDelete` + emit `user.deletion.hardDeleted`.
+  - `anonymizeForHardDelete` (repo, `$unset` PII — `$set:undefined` by nemazal): email→`deleted-<id>@deleted.local`, passwordHash='', bio/lastLoginAt/city/avatarUrl/characterAvatarUrl/profileImageUrl pryč, isDeleted+deletedAt. Zachová username/displayName/chatColor/defaultAvatarType (tombstone).
+  - **GDPR avatar soubory:** `UploadService.@OnEvent('user.deletion.hardDeleted')` → smaže Cloudinary avatar+character složky (event-driven, **žádný DI cron→upload cyklus**).
+  - Audit log: `admin.service.@OnEvent('user.deletion.hardDeleted')` (už existoval).
+  - `tsconfig.json` + `jest.config.ts`: spec **zařazen zpět** (přepsán na reálný scope; testoval odložené D-041/D-043).
+- **Mimo scope (zůstává dluh):** D-041 friendship cleanup (spec ř.901, odloženo po 3.5), D-043 tombstone retention (ř.903, samostatný spec), T-24h reminder mail.
+- **Ověřeno:** tsc 0, cron+upload testy zelené, **`nest start` DI graf OK** (žádný cyklus).
 
 ### N-4 — Friendship real-time WS most chybí 🐛 POTVRZENO (z C-01)
 - **Soubory:** BE `friendships.service.ts` (emit), FE `features/friendships/hooks/useFriendshipsSocket.ts`
@@ -279,7 +279,14 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 ### 📋 N-6b — průběžný stav (po dílčí implementaci)
 - ✅ **username-request** (POST/GET/DELETE base) — DOPLNĚNO (repo logika už byla; service+controller+DTO+7 testů). Route audit FE↔BE sedí.
 - ✅ **admin-friendships** — DOPLNĚNO **mappingem** (řešení schema driftu bez migrace): BE `Friendship`+`FriendBlock` → FE `AdminFriendshipView` (rejected→declined, blok→blocked, requester=A/recipient=B, dates→ISO). `AdminFriendshipsService` + `repo.findAllForUser` + 3 routes (AdminGuard) + 6 testů. DI bootstrap OK, route audit sedí.
-- 📋 **self-deletion + reaktivace** — **celá 1.3c funkcionalita chybí v BE** (ne jen endpoint: soft-delete pole na User, 30denní hold, tombstone, PJ handover, `requestSelfDeletion`/`reactivate` service, mailer notif, **vazba na N-3 cron** — taky chybí). Nejcitlivější (mazání účtů, GDPR, ztráta dat při chybě). → **samostatný spec→souhlas, ne v rámci bug-audit session.**
+- ✅ **self-deletion + reaktivace** — DOPLNĚNO (celá 1.3c BE, spec `plan-N6b-self-deletion.md`):
+  - `User.deletedAt` pole (interface+schema+mapper).
+  - `users.service`: `requestSelfDeletion` (validace USER_NOT_FOUND/ALREADY_DELETED/ALREADY_PENDING/USERNAME_MISMATCH/SOLE_PJ_BLOCK, PJ handover, dryRun preview, emit revoke+mail), `getSelfDeletionStatus`, `cancelSelfDeletion`.
+  - `users.controller`: `POST/GET/DELETE me/deletion-request` (GET+DELETE `@AllowPendingDeletion`).
+  - `auth.service`: login `deletion_pending` return path + `DELETED` 401, `reactivateDeletion` + `POST auth/reactivate-deletion`, `@OnEvent('user.deletion.requested')` → revoke refresh tokenů (event-driven, **vyhne se DI cyklu** auth↔users).
+  - `JwtAuthGuard`: **per-request gate** na `isDeleted`/`deletionRequestedAt` (access token žije 7 d → login-only reject nestačí) + `@AllowPendingDeletion` decorator pro status/cancel routy.
+  - **N-3 cron** napojen (viz N-3 sekce).
+  - **19 nových testů**, DI bootstrap ověřen, route audit FE↔BE sedí.
 
 ### 📋 N-6b — implementační spec (k provedení po souhlasu)
 Chybějící BE endpointy (FE je už volá — viz N-6 mapa). Pořadí dle hodnoty/rizika:
