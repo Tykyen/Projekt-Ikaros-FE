@@ -13,11 +13,16 @@
 > 1 by-design (N-40), 2 false-positive (N-39 + kandidáti C-10/C-12).
 > Baseline: BE 1836 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~58 nových regresních testů.
 >
-> **Zbývá ~12 nálezů:**
-> - 🟠 N-8/N-27 (weather room — návrh), N-18 (worldId URL konzistence), N-23 (refund tlačítko gating)
-> - 🟡 N-10 (subdoc access politika), N-11 (themeId IsIn — sdílený registry), N-12 (diskuze paginace), N-14 (PJ wrong-layer — politika), N-33 (events invalidace BE+FE), N-34 (mail race)
-> - ⚖️ N-17 (Zadatel=member) → **k posouzení** (komentář spec 2.4 říká záměr)
+> **Zbývá ~10 nálezů + 2 přehodnocené jako by-design/sporné:**
+> - 🟠 technické (spolehlivě opravitelné): N-12 (diskuze paginace), N-18 (worldId URL konzistence), N-23 (refund tlačítko gating), N-33 (events invalidace BE+FE), N-34 (mail race)
+> - 🟠 vyžaduje rozmyšlení: N-8/N-27 (weather room — sdílená BaseGateway), N-11 (themeId IsIn — potřebuje sdílený theme registry FE↔BE)
+> - ⚖️ **k rozhodnutí (NE jasné bugy):** N-14 (`UserRole.PJ=3` je GLOBÁLNÍ role, ne world PJ → možná legitimní v ADMIN_ROLES), N-17 (Zadatel=member — komentář spec 2.4 říká záměr)
+> - ✅ **přehodnoceno → by-design:** N-10 (kalendář Lokace) — komentář `characters.service.ts:140-143`: 8.1-FIR (2026-05-24) **záměrně** přebilo spec 9.2, lokace subdoc vidí jen PomocnyPJ+
 > - 📋 N-6b (4 chybějící BE features — spec níže) · N-2 (colors), N-3 (cron) = vědomé dluhy
+>
+> ⚠️ **Pozn. k rozboru:** N-10 a N-14 byly v 1. kole označeny jako bugy, ale při ověření jde o
+> záměrné chování / globální roli. Lekce: u „access/role" nálezů vždy ověřit komentář + enum,
+> ne věřit prvnímu dojmu agenta.
 
 **Opravené nálezy (26):** N-1, N-4, N-5, N-6a, N-7, N-9, N-13, N-15, N-16, N-19, N-20, N-21, N-22, N-24, N-25, N-26, N-28, N-29, N-30, N-31, N-32, N-35, N-36, N-37, N-38, N-41 + D-029.
 
