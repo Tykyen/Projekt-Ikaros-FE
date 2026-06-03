@@ -1410,7 +1410,6 @@ export function TacticalMapView(): React.ReactElement {
                           letterSpacing: 0.6,
                           textTransform: "uppercase",
                           cursor: "pointer",
-                          marginRight: 8,
                         }}
                         title={
                           openedToken.inCombat
@@ -1447,7 +1446,6 @@ export function TacticalMapView(): React.ReactElement {
                         letterSpacing: 0.6,
                         textTransform: "uppercase",
                         cursor: "pointer",
-                        marginRight: 8,
                       }}
                       title={
                         openedToken.isLocked

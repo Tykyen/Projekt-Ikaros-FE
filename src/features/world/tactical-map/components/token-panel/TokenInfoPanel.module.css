@@ -135,10 +135,20 @@
   flex: 1;
 }
 
-.actions {
+/* Akční pruh pod ovládacím headerem — zalomí na úzkém panelu místo přetékání. */
+.actionBar {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+  padding: 10px 14px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.06);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
+  flex-shrink: 0;
+}
+
+.actionBar:empty {
+  display: none;
 }
 
 .modeToggle {

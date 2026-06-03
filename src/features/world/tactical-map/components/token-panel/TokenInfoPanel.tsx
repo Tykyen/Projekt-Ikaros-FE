@@ -134,11 +134,6 @@ export function TokenInfoPanel({ open, header, children }: Props): React.ReactEl
           {/* Spacer push */}
           <div className={styles.headerSpacer} />
 
-          {/* Actions */}
-          {header.actions && (
-            <div className={styles.actions} data-no-drag>{header.actions}</div>
-          )}
-
           {/* Mode toggle */}
           <div className={styles.modeToggle} data-no-drag>
             {MODE_ORDER.map((m) => (
@@ -168,6 +163,13 @@ export function TokenInfoPanel({ open, header, children }: Props): React.ReactEl
             ×
           </button>
         </header>
+
+        {/* Akční pruh — oddělený od ovládacího headeru, aby ✕ a mode toggle
+            zůstaly vždy v pravém horním rohu a akce mohly zalomit (flex-wrap)
+            místo přetékání mimo úzký dock panel. */}
+        {header.actions && (
+          <div className={styles.actionBar} data-no-drag>{header.actions}</div>
+        )}
 
         {/* Avatar + jméno blok pod headerem */}
         <div className={styles.identity}>
