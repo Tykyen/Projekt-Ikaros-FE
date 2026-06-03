@@ -21,8 +21,10 @@ export function useEvents(enabled = true) {
   const qc = useQueryClient();
 
   // Nová systémová zpráva (schválení, přiřazení) přijde stejným WS jako pošta.
-  useSocketEvent('ikaros:new-message', () => {
-    void qc.invalidateQueries({ queryKey: eventsKeys.all });
+  // N-33 — invaliduj jen při SYSTÉMOVÉ poště; běžná pošta od přátel záložku
+  // „Události" (filtr `system=true`) neovlivní → žádné zbytečné refetchy/blikání.
+  useSocketEvent<{ system?: boolean }>('ikaros:new-message', (p) => {
+    if (p?.system) void qc.invalidateQueries({ queryKey: eventsKeys.all });
   });
 
   return useInfiniteQuery({
