@@ -123,12 +123,16 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   // ── WS listenery — mutují React Query cache, resp. lokální UI stav ─────
   const handleMessage = useCallback(
     (m: ChatMessage) => {
+      // N-31 — whisper přichází přes `user:{id}` room do VŠECH otevřených
+      // místností (sdílený socket). Přidej zprávu jen pokud patří TÉTO
+      // konverzaci, jinak se whisper zobrazí v cizí místnosti.
+      if (channelId && m.channelId && m.channelId !== channelId) return;
       qc.setQueryData<ChatMessage[]>(keys.messages, (old) => {
         const list = old ?? [];
         return list.some((x) => x.id === m.id) ? list : [...list, m];
       });
     },
-    [qc, keys.messages],
+    [qc, keys.messages, channelId],
   );
 
   const handleDeleted = useCallback(

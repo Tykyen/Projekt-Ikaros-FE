@@ -9,10 +9,17 @@
 
 ## TL;DR (2026-06-03)
 
-> **Stav: 27 ze 41 opraveno** (commitnuto + pushnuto na main, BE i FE). 1 vyhodnoceno jako
-> by-design (N-40), 3 false-positive (N-39, C-10, C-12). **Zbývá 13** — z toho N-6b = 4 chybějící
-> BE features (samostatná session, spec výše), N-8/27 + N-33 (návrhy připravené).
+> **Stav: 22 nálezů opraveno** (+ D-029), commitnuto + pushnuto na main (BE i FE).
+> 1 by-design (N-40), 2 false-positive (N-39 + kandidáti C-10/C-12).
 > Baseline: BE 1836 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~55 nových regresních testů.
+>
+> **⚠️ Zbývá ~16 potvrzených nálezů** (dříve podhodnoceno):
+> - 🔴 **N-19** (Čtenář fantomové unread), **N-20** (PomocnyPJ vyhozen z kanálů), **N-31** (whisper cross-room leak)
+> - 🟠 N-8/N-27 (weather room), N-17 (Zadatel=member), N-18 (worldId URL), N-23 (refund tlačítko)
+> - 🟡 N-10 (subdoc access), N-11 (themeId IsIn), N-12 (paginace), N-13 (embedding sekce), N-14 (PJ wrong-layer), N-33 (events), N-34 (mail race)
+> - 📋 N-6b (4 chybějící BE features — spec níže) · N-2 (colors), N-3 (cron) = vědomé dluhy
+
+**Opravené nálezy (22):** N-1, N-4, N-5, N-6a, N-7, N-9, N-15, N-16, N-21, N-22, N-24, N-25, N-26, N-28, N-29, N-30, N-32, N-35, N-36, N-37, N-38, N-41 + D-029.
 
 **Hotovo a ověřeno:**
 - ✅ Baseline zelený: FE 2473 + BE 1815 testů, tsc+eslint obojí čisté
