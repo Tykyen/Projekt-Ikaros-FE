@@ -276,6 +276,11 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 - **N-8/N-27** weather room membership — zásah do sdílené `BaseGateway` (auth do base nebo dedikovaný membership-aware handler pro `world:*` join). Návrh: přidat `world:join` handler do `maps.gateway` (membership Čtenář+) + překlopit `useMapWeather` z obecného `room:join` na něj.
 - **N-33** events invalidace — rozšířit BE `ikaros:new-message` payload o `system: boolean` (z `senderId === 'system'`) → FE `useEvents` invaliduje jen při systémové poště. Malé BE+FE.
 
+### 📋 N-6b — průběžný stav (po dílčí implementaci)
+- ✅ **username-request** (POST/GET/DELETE base) — DOPLNĚNO (repo logika už byla; service+controller+DTO+7 testů). Route audit FE↔BE sedí.
+- ⚠️ **admin-friendships** — **NE jen chybějící endpointy, ale schema drift.** FE `AdminFriendshipView` čeká 1.8-design (`userAId/userBId` kanonický, `declined`/`blocked`, `lastDeclinedAt/ById`, `blockedById`, `createdAt/updatedAt`), ale BE `Friendship` entity má jen `requesterId/recipientId` + `pending/accepted/rejected` + `rejectedAt`. → vyžaduje **rozhodnutí**: BE schema upgrade na 1.8 design (větší migrace), nebo upravit FE view na jednodušší BE shape. Lossy mapping = dluh, nedělat.
+- ⚠️ **self-deletion + reaktivace** — **kompletně chybí v BE** (žádné deletion/reactivate endpointy ani service). Nejcitlivější (mazání účtů, GDPR, soft-delete hold, PJ handover, vazba na N-3 cron). → **vlastní spec→souhlas**, ne narychlo.
+
 ### 📋 N-6b — implementační spec (k provedení po souhlasu)
 Chybějící BE endpointy (FE je už volá — viz N-6 mapa). Pořadí dle hodnoty/rizika:
 1. **`POST /auth/email-verify` alias** — *hotovo přes N-6a* (FE přesměrován na `verify-email`). ✅
