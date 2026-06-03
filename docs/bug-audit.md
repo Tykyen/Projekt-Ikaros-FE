@@ -7,7 +7,12 @@
 
 ---
 
-## TL;DR (noční běh 2026-06-03)
+## TL;DR (2026-06-03)
+
+> **Stav: 27 ze 41 opraveno** (commitnuto + pushnuto na main, BE i FE). 1 vyhodnoceno jako
+> by-design (N-40), 3 false-positive (N-39, C-10, C-12). **Zbývá 13** — z toho N-6b = 4 chybějící
+> BE features (samostatná session, spec výše), N-8/27 + N-33 (návrhy připravené).
+> Baseline: BE 1836 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~55 nových regresních testů.
 
 **Hotovo a ověřeno:**
 - ✅ Baseline zelený: FE 2473 + BE 1815 testů, tsc+eslint obojí čisté
@@ -242,18 +247,29 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 - **N-5** `PresenceGateway` — in-memory registry + idle + snapshot (`presence:*`) + 7 testů
 - **Ověřeno:** `audit:ws` **čistý** (0 mrtvých listenerů, 0 zahozených emitů), DI bootstrap OK (forwardRef bez cyklu), full BE jest 1835 ✓
 
-### ✅ Opraveno — drobné
+### ✅ Opraveno — drobné + N-35
 - **N-21** FE `ChatGroup` typ doplněn o `linkedWorldGroup` (BE pole se zahazovalo)
 - **N-24** `listPurchases` — hráč vidí nákupy všech svých postav (+ repo `findManyByUserAndWorld`)
 - **N-38** `useUpdatePage` — `previousSlug` z callera (úklid staré cache po rename)
 - **N-41** `SetInGameDateModal` Únor leap-aware (gregoriánský fallback)
+- **N-35** AKJ leak v search — `pages.service.findVisibleSlugs` + filtr ve `search.controller` (DI bez cyklu, bootstrap ověřen) + regresní test
 
-### ⏳ Zbývá (velké / k posouzení)
-- **N-35** AKJ search filtr (forwardRef PagesService→Search) — velké
-- **N-6b** chybějící BE endpointy (self-delete, reactivate, username-request, admin-friendships) — features, citlivé
-- **N-8/N-27** weather room membership — architektonický návrh (sdílená BaseGateway, riziko)
-- **N-40** kalendář: hráč nevidí historické události — možná by-design (archive policy 24h), k posouzení
-- **N-33** events invalidace — vyžaduje rozšířit BE `ikaros:new-message` payload (BE+FE)
+### ✅ / ⚠️ Vyhodnoceno bez opravy
+- **N-40** → **by-design.** BE archive policy (9.1-I, cut-off 24h) záměrně omezuje hráče (`role < PomocnyPJ`) na nedávné/nadcházející události; archiv je PJ-only. FE komentář „5.5c minulé i budoucí" je zastaralý (předchází policy). Pokud má hráč vidět historii v kalendáři = **produktové rozhodnutí o archive policy**, ne technický bug.
+
+### ⏳ Zbývá — k samostatnému řešení
+- **N-6b** chybějící BE features — **spec níže** (self-delete, reactivace, username-request base, admin-friendships). Velké + citlivé (mazání účtů) → samostatná session, spec→souhlas.
+- **N-8/N-27** weather room membership — zásah do sdílené `BaseGateway` (auth do base nebo dedikovaný membership-aware handler pro `world:*` join). Návrh: přidat `world:join` handler do `maps.gateway` (membership Čtenář+) + překlopit `useMapWeather` z obecného `room:join` na něj.
+- **N-33** events invalidace — rozšířit BE `ikaros:new-message` payload o `system: boolean` (z `senderId === 'system'`) → FE `useEvents` invaliduje jen při systémové poště. Malé BE+FE.
+
+### 📋 N-6b — implementační spec (k provedení po souhlasu)
+Chybějící BE endpointy (FE je už volá — viz N-6 mapa). Pořadí dle hodnoty/rizika:
+1. **`POST /auth/email-verify` alias** — *hotovo přes N-6a* (FE přesměrován na `verify-email`). ✅
+2. **username-request** (`GET/POST/DELETE /users/me/username-request`) — BE má jen sub-routy (`…/last-unseen-decided`, `…/:id/seen`). Doplnit base CRUD nad `UsernameChangeRequest` (entita existuje). Střední, low-risk.
+3. **admin-friendships** (`GET /admin/friendships`, `…/by-pair`, `POST …/:id/reset-cooldown`) — nový read+reset modul nad `friendships` repo (cooldown logika existuje). Střední.
+4. **self-deletion + reaktivace** (`GET/POST users/me/deletion-request`, `POST auth/reactivate-deletion`) — **nejcitlivější** (mazání účtů, GDPR, soft-delete hold, PJ handover). Vyžaduje: soft-delete pole na User, `requestSelfDeletion`/`reactivate` service, mailer notif, cron napojení (souvisí s **N-3 cron**!). Vlastní spec→souhlas.
+
+> Pozn.: položky 2–4 znamenají implementovat **chybějící funkcionalitu**, ne opravit překlep. FE je očekává, ale je legitimní je zatím skrýt na FE (feature-flag), dokud BE nedožene — to je tvé produktové rozhodnutí.
 
 ### ⏳ Vyžaduje tvé rozhodnutí (nedělám naslepo)
 - **N-35** AKJ leak v search — oprava potřebuje page-level access filtr; architektura: injektovat PagesService do SearchModule (riziko DI cyklu pages↔search). Návrh: `pages.service.findVisibleSlugs(worldId, requester)` + filtr výsledků.
