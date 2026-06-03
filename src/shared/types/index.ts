@@ -897,6 +897,8 @@ export interface IkarosEvent {
 // Ikaros Messages (pošta — 3.5)
 export interface UnreadCountResponse {
   unreadCount: number;
+  /** 13.2b — nepřečtená systémová oznámení (záložka „Události" v centru). */
+  systemUnread?: number;
 }
 
 export interface IkarosMessage {

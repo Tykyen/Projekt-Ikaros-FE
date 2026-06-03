@@ -40,7 +40,10 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-03 (13.1 — Hledání ve světě: pole „Hledat…"
+          Aktualizováno k 2026-06-03 (13.2 — Notifikační centrum: zvonek
+          v hlavičce otevře souhrn zpráv ze všech tvých světů, záložku Události
+          (co ti schválili / přiřazení postavy) a Ke zpracování (pro
+          schvalovatele). Plus 13.1 — Hledání ve světě: pole „Hledat…"
           v hlavičce světa (Ctrl+K), prohledá stránky aktuálního světa. Plus
           Taktická mapa — bestie na mapě jsou
           samostatné instance: PJ upravuje jejich schopnosti i poznámky přímo

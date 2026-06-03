@@ -1,0 +1,319 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: flex-end;
+  animation: fade 0.15s ease;
+}
+
+.panel {
+  width: min(400px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary, #14101e);
+  border-left: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.25));
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+  animation: slideIn 0.18s ease;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2, 8px);
+  padding: var(--sp-3, 12px) var(--sp-4, 16px);
+  border-bottom: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.2));
+  background: var(--header-bg, rgba(255, 255, 255, 0.02));
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: var(--text-sm, 0.95rem);
+  font-weight: var(--weight-semi, 600);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary, #ece7f5);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-1, 4px);
+  border: none;
+  background: transparent;
+  color: var(--text-primary, #ece7f5);
+  cursor: pointer;
+  border-radius: var(--radius-md, 8px);
+  transition: background var(--transition-fast, 0.12s) ease;
+}
+.close:hover {
+  background: var(--bg-card-hover, rgba(255, 255, 255, 0.06));
+}
+
+/* ── Záložky ────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 var(--sp-2, 8px);
+  border-bottom: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.2));
+  overflow-x: auto;
+}
+.tab {
+  flex: 0 0 auto;
+  padding: var(--sp-2, 10px) var(--sp-3, 12px);
+  border: none;
+  background: transparent;
+  color: var(--text-muted, rgba(236, 231, 245, 0.55));
+  font-size: var(--text-sm, 0.85rem);
+  font-weight: var(--weight-semi, 600);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color var(--transition-fast, 0.12s) ease;
+}
+.tab:hover {
+  color: var(--text-primary, #ece7f5);
+}
+.tabActive {
+  color: var(--accent-bright, #c89bff);
+  border-bottom-color: var(--accent-bright, #c89bff);
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-2, 8px);
+}
+
+/* Nepřečtená tečka u události. */
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--accent-bright, #c89bff);
+  vertical-align: middle;
+}
+
+/* ── Ke zpracování ──────────────────────────────────────────────────────── */
+.pendingWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3, 12px);
+  padding: var(--sp-2, 8px);
+}
+.pendingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2, 8px);
+  padding: var(--sp-2, 8px) var(--sp-3, 12px);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card-hover, rgba(255, 255, 255, 0.04));
+}
+.pendingLabel {
+  font-size: var(--text-sm, 0.88rem);
+  color: var(--text-primary, #ece7f5);
+}
+.pendingCount {
+  flex-shrink: 0;
+  min-width: 22px;
+  padding: 1px 7px;
+  text-align: center;
+  border-radius: var(--radius-full, 999px);
+  background: var(--accent, #7c4dff);
+  color: #fff;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-bold, 700);
+}
+
+/* ── Feed ───────────────────────────────────────────────────────────────── */
+.feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  gap: var(--sp-2, 8px);
+  padding: var(--sp-2, 8px) var(--sp-3, 12px);
+  border-radius: var(--radius-md, 8px);
+  transition: background var(--transition-fast, 0.12s) ease;
+}
+.item:hover {
+  background: var(--bg-card-hover, rgba(255, 255, 255, 0.05));
+}
+
+.itemBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2, 8px);
+}
+
+.sender {
+  font-weight: var(--weight-semi, 600);
+  font-size: var(--text-sm, 0.9rem);
+  color: var(--text-primary, #ece7f5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.when {
+  flex-shrink: 0;
+  font-size: var(--text-xs, 0.72rem);
+  color: var(--text-muted, rgba(236, 231, 245, 0.5));
+}
+
+.loc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs, 0.72rem);
+  color: var(--accent-bright, #c89bff);
+  margin-bottom: 2px;
+}
+.world {
+  font-weight: var(--weight-semi, 600);
+}
+.sep {
+  opacity: 0.5;
+}
+.channel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content {
+  font-size: var(--text-sm, 0.85rem);
+  color: var(--text-secondary, rgba(236, 231, 245, 0.8));
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* ── Stavy ──────────────────────────────────────────────────────────────── */
+.muted,
+.empty {
+  padding: var(--sp-4, 16px);
+  text-align: center;
+  font-size: var(--text-sm, 0.9rem);
+  color: var(--text-muted, rgba(236, 231, 245, 0.55));
+}
+
+.moreRow {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-3, 12px);
+}
+.more {
+  padding: var(--sp-2, 6px) var(--sp-4, 16px);
+  border: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.3));
+  background: transparent;
+  color: var(--accent-bright, #c89bff);
+  border-radius: var(--radius-full, 999px);
+  font-size: var(--text-xs, 0.78rem);
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.12s) ease;
+}
+.more:hover:not(:disabled) {
+  background: var(--accent-soft, rgba(180, 130, 255, 0.15));
+}
+.more:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Push patička ───────────────────────────────────────────────────────── */
+.pushBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2, 8px);
+  padding: var(--sp-2, 10px) var(--sp-4, 16px);
+  border-top: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.2));
+  background: var(--header-bg, rgba(255, 255, 255, 0.02));
+}
+.pushLabel {
+  font-size: var(--text-xs, 0.78rem);
+  color: var(--text-secondary, rgba(236, 231, 245, 0.8));
+}
+.pushHint {
+  font-size: var(--text-xs, 0.72rem);
+  color: var(--text-muted, rgba(236, 231, 245, 0.5));
+}
+.pushBtn {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.3));
+  background: transparent;
+  color: var(--accent-bright, #c89bff);
+  border-radius: var(--radius-full, 999px);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-semi, 600);
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.12s) ease;
+}
+.pushBtn:hover:not(:disabled) {
+  background: var(--accent-soft, rgba(180, 130, 255, 0.15));
+}
+.pushBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideIn {
+  from {
+    transform: translateX(16px);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ── Mobil ──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .panel {
+    width: 100%;
+    border-left: none;
+  }
+  /* Dotykový cíl pro zavření — min 44×44px (mobil). */
+  .close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  /* Položky pohodlnější na prst. */
+  .item {
+    padding: var(--sp-3, 12px);
+  }
+}

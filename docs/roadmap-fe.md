@@ -1971,15 +1971,19 @@ Spec: `docs/arch/phase-13/spec-13.1.md`. **Per-world hotovo 2026-06-03.***
 - [ ] **13.1a — Globální search (`IkarosLayout`):** cross-world search napříč platformou (volitelné rozšíření; BE access kontrola hotová). Per-world pokrývá hlavní use-case.
 - [x] `mobil-desktop` audit (per-world)
 
-### - [ ] 13.2 Push notifikace (PWA)
+### - [x] 13.2 Notifikační centrum *(2026-06-03; redefinováno — viz `phase-13/spec-13.2.md`)*
 
-*BE `push` modul kompletní (game-events už push posílají). FE staví PWA infrastrukturu od nuly.*
+*Původně „Push notifikace (PWA)". Po brainstormingu s uživatelem (2026-06-03)
+předěláno na **notifikační centrum** = jedno místo s děním relevantním pro
+uživatele jako příjemce. Centrum = drawer + zvonek v headeru, záložky:
+**Chaty** (souhrn zpráv napříč mými světy) · **Události** (co mně schválili +
+přiřazení postavy) · **Ke zpracování** (podmíněně PJ/admin, reuse pending-actions).
+PWA push odsunut jako pozdější vrstva navrch (13.2c).*
 
-- [ ] **13.2a — PWA infrastruktura:** `vite-plugin-pwa`, service worker, `manifest.webmanifest`, PWA meta tagy, registrace SW v `main.tsx`
-- [ ] **13.2b — Push subscription:** VAPID flow — `GET /push/vapid-public-key` → `pushManager.subscribe` → `POST /push/subscribe`; permission dialog (povolení), `unsubscribe`
-- [ ] **13.2c — Příjem notifikace:** SW handlery `push` + `notificationclick`, deep-link na URL z payloadu
-- [ ] **13.2d — Správa zařízení:** uživatel vidí svá zařízení / subscriptions, může je odebrat; zap / vyp notifikací
-- [ ] `mobil-desktop` audit
+- [x] **13.2a — Souhrn chatů (pilíř B):** `GET /chat/feed` (cross-world agregace, access-safe: membership + channel access + whisper `visibleTo`), WS `chat:feed:bump` (leak-safe signál do user roomů → live refetch). FE: notifikační centrum (drawer) + zvonek badge v headeru + záložka „Chaty" (`useChatFeed`, infinite paginace, `useChatFeedLive`). Persona = hráč/PJ světa, ne admin dohled. *(2026-06-03; 5 BE access testů + 9 FE testů)*
+- [x] **13.2b — Události + Ke zpracování (pilíře C + A):** *(2026-06-03; varianta A — reuse Pošty, BEZ nového modelu).* BE: `GET /ikaros-messages/inbox?system=true` (systémová oznámení) + `systemUnread` v unread-count; `SystemEventsListener` doplnil systémovou zprávu pro **schválení světa** (`world.access.approved`) a **přiřazení postavy** (nový event `world.character.assigned`) — schválení článku/galerie/diskuze ji posílaly už dřív. FE: záložka „Události" (`useEvents`) + podmíněná „Ke zpracování" (reuse `pending-actions`, jen role se schvalovacími právy) + tab bar + složený badge (chat + systémové). Testy: BE 110 (ikaros-messages+worlds) zelené.
+- [x] **13.2c — PWA push:** *(2026-06-03)* `manifest.webmanifest` + vanilla service worker (`public/sw.js` — `push` + `notificationclick` deep-link) místo `vite-plugin-pwa` (Vite 8 kompatibilita + neověřitelný install; offline precache vynechán vědomě). VAPID flow `usePush` (`GET /push/vapid-public-key` → `pushManager.subscribe` → `POST /push/subscribe` / `unsubscribe`), SW registrace v `main.tsx`, `<PushToggle>` v patičce centra (zap/vyp na zařízení). ⚠️ Reálné doručení push vyžaduje HTTPS/server — lokálně neověřitelné. Dluhy: PWA ikony (favicon placeholder), seznam zařízení (BE chybí endpoint).
+- [x] `mobil-desktop` audit (13.2a drawer, 13.2b tab bar, 13.2c toggle) + `auth-policy` + `socket-contract`
 
 ### - [x] 13.3 Zvuková databáze (`/svet/:worldId/zvuky`) *(2026-05-31)*
 

@@ -1,0 +1,25 @@
+{
+  "name": "Projekt Ikaros",
+  "short_name": "Ikaros",
+  "description": "Platforma pro hraní RPG světů — wiki, chat, taktická mapa.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#14101e",
+  "theme_color": "#7c4dff",
+  "lang": "cs",
+  "icons": [
+    {
+      "src": "/favicon.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}

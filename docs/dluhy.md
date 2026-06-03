@@ -8,6 +8,24 @@
 
 ## Otevřené
 
+### D-029 — PWA ikony jsou placeholder (favicon)
+**Soubor:** `public/manifest.webmanifest` — 13.2c PWA push
+**Problém:** Ikony pro `192x192` i `512x512` ukazují na `/favicon.webp`, který tu velikost reálně nemá. Instalace PWA funguje, ale ikona na ploše/launcheru bude rozmazaná a chybí dedikovaná `maskable` varianta.
+**Dopad:** Nízký — kosmetika instalované appky, neblokuje push ani funkci.
+**Řešení:** Vyrobit `icon-192.png` + `icon-512.png` (+ maskable s safe-zone paddingem) z brandového loga a zapsat je do manifestu.
+**Kdy:** Před produkčním nasazením PWA (spolu s ostrým VAPID na serveru).
+
+---
+
+### D-030 — Správa push zařízení jen pro aktuální zařízení
+**Soubor:** `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx` — 13.2c
+**Problém:** `PushToggle` umí jen zapnout/vypnout push na **právě používaném** zařízení. Roadmapa 13.2d chtěla „uživatel vidí svá zařízení / subscriptions a může je odebrat" — to chybí, protože BE `push` modul nemá endpoint pro výpis subscriptions uživatele (jen subscribe/unsubscribe dle endpointu).
+**Dopad:** Nízký — hlavní use-case (zapnout na svém zařízení) funguje; chybí jen přehled/úklid cizích zařízení.
+**Řešení:** BE `GET /push/subscriptions` (vlastní, bez endpointů jiných uživatelů) + FE seznam s tlačítkem „Odhlásit zařízení". Volitelně metadata (user-agent, datum) pro rozlišení.
+**Kdy:** Až bude push reálně nasazený a uživatelé budou mít víc zařízení.
+
+---
+
 <!--
   Vyřešeno 2026-06-03 (13.1 search):
   - D-NEW-global-search-access-leak → opraveno: search vyžaduje worldId +

@@ -300,6 +300,41 @@ const FAQ: FaqItem[] = [
     ),
   },
   {
+    q: 'K čemu je zvonek v hlavičce (notifikační centrum)?',
+    a: (
+      <>
+        <p>
+          <strong>Zvonek</strong> (ikona v hlavičce vedle Pošty) otevře panel se{' '}
+          <strong>souhrnem chatů</strong> &mdash; nejnovější zprávy ze{' '}
+          <strong>všech tvých světů</strong> na jednom místě. Nemusíš obcházet
+          svět po světě, abys věděl/a, kde se zrovna mluví. U každé zprávy vidíš,
+          ze kterého světa a kanálu je.
+        </p>
+        <p>
+          Vidíš jen zprávy z kanálů, kam <strong>máš přístup</strong> (stejně
+          jako v samotném chatu) &mdash; jako hráč své kanály, jako PJ kanály
+          svého světa. Odznak u zvonku ukazuje, kolik nového přibylo od
+          posledního otevření; nová zpráva se v panelu objeví živě.
+        </p>
+        <p>
+          Panel má i záložku <strong>Události</strong> &mdash; co se týká přímo
+          tebe: schválení tvého <strong>vstupu do světa</strong>, tvého{' '}
+          <strong>článku</strong>, <strong>obrázku</strong> či{' '}
+          <strong>diskuze</strong>, nebo že ti PJ <strong>přiřadil postavu</strong>.
+          (Stejná oznámení najdeš i v Poště.) Pokud něco schvaluješ (PJ, správce
+          článků/diskuzí…), přibude záložka <strong>Ke zpracování</strong>{' '}
+          s přehledem čekajících položek a prokliku.
+        </p>
+        <p>
+          Dole v panelu si můžeš <strong>zapnout upozornění na tomto zařízení</strong>{' '}
+          &mdash; po povolení ti chodí systémové notifikace (i když Ikara nemáš
+          otevřenou). Funguje na zařízeních a prohlížečích, které to podporují;
+          povolení můžeš kdykoliv vypnout.
+        </p>
+      </>
+    ),
+  },
+  {
     q: 'Co znamená Motiv (theme) a kolik jich je?',
     a: (
       <p>

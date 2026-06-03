@@ -4,6 +4,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { toast } from 'sonner';
 import clsx from 'clsx';
 import {
+  Bell,
   Mail,
   Users,
   User as UserIcon,
@@ -53,6 +54,12 @@ import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
+import {
+  NotificationCenter,
+  useChatFeedLive,
+  centerOpenAtom,
+  chatFeedUnseenAtom,
+} from '@/features/notifications';
 import {
   PendingActionType,
   UserRole,
@@ -607,6 +614,10 @@ function HeaderLoggedIn() {
   const user = useAtomValue(currentUserAtom);
   const { data: unread } = useUnreadCount();
   const totalUnread = unread?.unreadCount ?? 0;
+  const chatUnseen = useAtomValue(chatFeedUnseenAtom);
+  const setCenterOpen = useSetAtom(centerOpenAtom);
+  // Badge zvonku = nové chat zprávy + nepřečtená systémová oznámení (Události).
+  const centerBadge = chatUnseen + (unread?.systemUnread ?? 0);
   const startLogout = useLogout();
 
   if (!user) return null;
@@ -621,6 +632,14 @@ function HeaderLoggedIn() {
 
   return (
     <nav className={s.headerNav}>
+      <HeaderButton
+        onClick={() => setCenterOpen(true)}
+        icon={<Bell size={16} />}
+        label="Notifikace"
+        badge={centerBadge}
+        title="Notifikační centrum"
+      />
+
       <HeaderButton
         to="/ikaros/posta"
         icon={<Mail size={16} />}
@@ -680,6 +699,8 @@ export function IkarosLayout() {
   // D-8.6-transfer-notification — globální subscriber na WS event
   // `account:transfer:received` (toast + cache invalidate).
   useAccountTransferNotifications();
+  // 13.2a — „Souhrn chatů" živě: badge u zvonku tiká na `chat:feed:bump`.
+  useChatFeedLive();
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);
@@ -811,6 +832,7 @@ export function IkarosLayout() {
       <LoginModal />
       <RegisterModal />
       <ForgotPasswordModal />
+      {isAuthenticated && <NotificationCenter />}
     </div>
   );
 }
