@@ -160,6 +160,27 @@
   color: var(--text-secondary);
 }
 
+/* 12.3 — rozbalovací „Skupiny" uvnitř dropdownu (accordion) */
+.subGroup {
+  display: flex;
+  flex-direction: column;
+}
+.subToggle {
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  text-align: left;
+  justify-content: space-between;
+}
+.dropdownSubItem {
+  padding-left: var(--sp-6);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
 @keyframes dropIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -314,14 +335,24 @@
   margin-bottom: var(--sp-2);
 }
 
-.drawerSectionTitle {
+/* 12.3 — sbalovací nadpis sekce draweru (nahradil statický drawerSectionTitle) */
+.drawerSectionToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px; /* touch target */
+  padding: var(--sp-2) var(--sp-2);
+  background: none;
+  border: none;
+  cursor: pointer;
   font-size: var(--text-xs);
   font-weight: var(--weight-semi);
   color: var(--text-secondary);
   letter-spacing: .08em;
   text-transform: uppercase;
-  padding: var(--sp-2) 0 var(--sp-1);
 }
+.drawerSectionToggle:hover { color: var(--text-primary); }
 
 .drawerLink {
   display: flex;
@@ -336,6 +367,26 @@
   transition: background var(--transition-fast);
 }
 .drawerLink:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+/* 12.3 — vnořené „Skupiny" v mobilním draweru (otvírací accordion) */
+.drawerSubGroup {
+  display: flex;
+  flex-direction: column;
+}
+.drawerSubToggle {
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: inherit;
+  cursor: pointer;
+  text-align: left;
+  justify-content: space-between;
+}
+.drawerSubLink {
+  padding-left: var(--sp-5);
+}
 
 /* ── Responsive ── */
 /* Spec 5.1 — search se vejde komfortně až na desktopu; na užším headeru

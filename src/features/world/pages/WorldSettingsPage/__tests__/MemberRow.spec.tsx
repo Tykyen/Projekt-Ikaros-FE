@@ -23,7 +23,7 @@ const PC_LIST = [
     slug: 'medak',
     name: 'Měďák',
     isNpc: false,
-    isLocation: false,
+    kind: 'persona' as const,
     userId: 'u1',
   },
   {
@@ -31,7 +31,7 @@ const PC_LIST = [
     slug: 'samvis',
     name: 'Samvís',
     isNpc: false,
-    isLocation: false,
+    kind: 'persona' as const,
     userId: 'u2',
   },
 ];

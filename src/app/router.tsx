@@ -85,6 +85,8 @@ const WorldDiarySchemaEditorPage = lazy(() => import('@/features/world/pages/Wor
 const WorldGmDiaryPage   = lazy(() => import('@/features/world/pages/WorldGmDiaryPage'));
 const WorldEmotesAdminPage = lazy(() => import('@/features/world/pages/WorldEmotesAdminPage/WorldEmotesAdminPage'));
 const CalendarConfigsPage = lazy(() => import('@/features/world/pages/CalendarConfigsPage/CalendarConfigsPage'));
+const WorldHeadlineAdminPage = lazy(() => import('@/features/world/pages/WorldHeadlineAdminPage'));
+const GroupMembersPage   = lazy(() => import('@/features/world/pages/GroupMembersPage'));
 
 // ── Suspense wrapper ──────────────────────────────────────────────────────
 function p(Comp: LazyExoticComponent<ComponentType>) {
@@ -266,6 +268,8 @@ export const router = createBrowserRouter([
       { path: 'nastaveni',              element: memberOnly(p(WorldSettingsPage)) },
       { path: 'hraci',                  element: memberOnly(p(WorldMembersPage)) },
       { path: 'pravidla',               element: memberOnly(p(RulesPage)) },
+      // 12.3 — autogenerovaná stránka skupiny (záložka „Informace").
+      { path: 'skupina/:groupKey',      element: memberOnly(p(GroupMembersPage)) },
       {
         // 10.2l — deník PJ (world-level poznámky, per-PJ). Mimo mapu, PJ+.
         path: 'denik-pj',
@@ -323,6 +327,18 @@ export const router = createBrowserRouter([
             fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
           >
             {p(CalendarConfigsPage)}
+          </WorldMembershipGuard>
+        ),
+      },
+      {
+        // 12.2 — Hlavní lišta světa: headline / menu builder (PJ+).
+        path: 'admin/headline',
+        element: (
+          <WorldMembershipGuard
+            minWorldRole={WorldRole.PJ}
+            fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
+          >
+            {p(WorldHeadlineAdminPage)}
           </WorldMembershipGuard>
         ),
       },

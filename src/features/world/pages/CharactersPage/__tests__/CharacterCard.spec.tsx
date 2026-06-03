@@ -8,7 +8,7 @@ const baseEntry = {
   slug: 'frodo',
   name: 'Frodo',
   isNpc: false,
-  isLocation: false,
+  kind: 'persona' as const,
 };
 
 function renderCard(props: Parameters<typeof CharacterCard>[0]) {

@@ -1,0 +1,18 @@
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+.cta:hover {
+  background: var(--surface-1);
+  border-color: var(--text-muted);
+}

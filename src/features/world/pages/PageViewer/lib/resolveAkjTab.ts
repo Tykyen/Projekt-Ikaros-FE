@@ -29,7 +29,9 @@ export function resolveAkjTabPage(basicPage: Page, tab: AkjTab): Page {
     // Dědí, když je override pole bezobsažné (ne jen undefined) — prázdná
     // tabulka / prázdný text / smazaný obrázek nesmí přepsat zdroj prázdnem.
     imageUrl: co?.imageUrl?.trim() ? co.imageUrl : basicPage.imageUrl,
-    content: hasHtmlContent(co?.content) ? co!.content : basicPage.content,
+    content: hasHtmlContent(co?.content)
+      ? (co!.content ?? basicPage.content)
+      : basicPage.content,
     table: tableHasContent(co?.table) ? co!.table : basicPage.table,
     accessRequirements: tab.access,
     akjTabs: undefined,

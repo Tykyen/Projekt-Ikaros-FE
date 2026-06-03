@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import s from "../HelpPage.module.css";
 
 type PageStatus = "ok" | "soon";
@@ -350,6 +350,13 @@ const WORLD_PAGES_OK: PageDoc[] = [
     what: 'Multi-kalendář per svět — můžeš vytvořit víc souběžných kalendářů (Lidský, Elfí, Drowí…). Vlevo seznam kalendářů, hvězda ⭐ označuje výchozí (dashboardy a novinky), hodiny 🕐 označují kalendář aktivní pro **časovou osu** — historii světa. Najet myší nad řádek a kliknout na 🕐 = přepneš timeline kalendář (nezávisle na výchozím). Editor má 6 sekcí: Identita (slug, název), Hodiny (počet hodin v dni), Týden (libovolný počet dnů s vlastními názvy), Měsíce (počet, název, délka), Nebeská tělesa (orbita, barva, ikona — engine spočítá 8 fází), Sezóny (počátek = měsíc + den, barva, ikona). Smazat lze jen ne-výchozí kalendář. **Tlačítko „+ Přidat kalendář" otevře 2-step wizard:** krok 1 = výběr šablony („Prázdný" nahoře, nebo z databáze 14 historických kalendářů). Solární / lunární s pevnou strukturou: Gregoriánský, Juliánský, Perský (Solar Hidžra), Indický Saka, Etiopský, Koptský, Buddhistický thajský, Staroegyptský civilní, Holocénní, Islámský/Hidžra. **Lunisolární (s přestupným měsícem v Metonic 19-letém cyklu):** Židovský (adar I), Čínský (zjednodušený 13. měsíc), Babylonský (addaru II), Řecký Attický (poseideón II). Šablona pre-fillne kompletní config (měsíce, dny v týdnu, nebeská tělesa, sezóny, přestupné/lunisolární pravidlo). Krok 2 = identita (název + slug se pre-fillne z preset, slug se auto-přejmenuje pokud konflikt — např. `gregorian-2`). Nový svět dostane podle volby v Tvorbě světa — defaultně Gregoriánský s reálným Měsícem.',
   },
   {
+    path: "/svet/:slug/admin/headline",
+    name: "Hlavní lišta světa",
+    status: "ok",
+    who: "PJ (Admin/Superadmin bypass)",
+    what: 'Editor horní lišty světa s živým náhledem (vpravo na počítači, nahoře na mobilu). Čtyři sekce: **Viditelnost modulů** — zaškrtáváním skryješ z lišty moduly, které svět nepoužívá (Mapa vesmíru, Pavučina, Obchod, Bestiář, …); esenciály (Přehled, Stránky, Novinky, Pravidla) skrýt nelze a skrytá stránka zůstává dostupná přes URL. **Vlastní navigace** — postavíš si vlastní skupiny (rozbalovací menu) a odkazy, které se přidají za systémovou navigaci; každý odkaz míří na stránku světa (vyhledávání) nebo na vlastní URL, řadíš je šipkami ▲/▼. **Šablony menu** — pojmenované sady odkazů, které jedním klikem („Vložit") rozbalíš jako novou skupinu do vlastní navigace. **„Last info" box** — krátké oznámení pro členy (např. termín sezení) zobrazené jako proužek pod hlavičkou světa; člen ho může zavřít, ale po změně textu se objeví znovu. Vše uložíš jedním tlačítkem Uložit. Stránku otevřeš i z Nastavení světa → záložka Hlavní lišta.',
+  },
+  {
     path: "/svet/:slug/timeline",
     name: "Časová osa světa",
     status: "ok",
@@ -369,6 +376,20 @@ const WORLD_PAGES_OK: PageDoc[] = [
     status: "ok",
     who: "Členové světa",
     what: "Adresář členů světa. Nahoře vedení — Pán jeskyně a Pomocní PJ —, pod tím skupiny a jejich členové, nakonec členové bez skupiny. Každý člen má kartu s avatarem, jménem a rolí. Otevřeš ji i kliknutím na dlaždici Hráčů na přehledu světa. Odkaz na stránku postavy a deníky přibude s krokem postav.",
+  },
+  {
+    path: "/svet/:slug/skupina/:skupina",
+    name: "Skupina (seznam hráčů)",
+    status: "ok",
+    who: "Členové světa",
+    what: "Stránka jedné skupiny, dostupná z horní lišty: záložka Informace → rozbalovací Skupiny → konkrétní skupina (skupiny si pojmenuje Pán jeskyně, např. Lumíci / Evropani) nebo Nezařazení. Zobrazí se hráči té skupiny s avatarem a jménem postavy; karta vede na stránku postavy. Ukazují se jen členové, kteří mají přiřazenou postavu (role Hráč a výš); Pán jeskyně a Pomocný PJ bez postavy se nezobrazují. Nezařazení = hrající členové bez skupiny. Seznam se automaticky mění podle přiřazení postav a skupin.",
+  },
+  {
+    path: "/svet/:slug/pravidla",
+    name: "Pravidla světa",
+    status: "ok",
+    who: "Členové světa (úpravy: Pomocný PJ a výš)",
+    what: "Pravidla světa jako wiki stránka — příručka, kterou si Pán jeskyně (a Pomocný PJ) sám napíše a kdykoli upraví stejným editorem jako ostatní wiki stránky (text, obrázky, sekce). Otevřeš z horní lišty: Informace → Pravidla. Dokud nejsou nastavena, Pomocný PJ a výš uvidí tlačítko pro vytvoření pravidel, ostatní hlášku, že zatím nejsou nastavena.",
   },
   {
     path: "/svet/:slug/postavy",

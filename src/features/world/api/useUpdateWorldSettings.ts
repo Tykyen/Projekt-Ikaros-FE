@@ -1,6 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { CharacterTabVisibility, WorldSettings } from '@/shared/types';
+import type {
+  CharacterTabVisibility,
+  HeadlineNode,
+  MenuTemplate,
+  WorldSettings,
+} from '@/shared/types';
 
 /**
  * 5.3c — uložení nastavení světa (`PUT /worlds/:worldId/settings`).
@@ -16,6 +21,12 @@ export interface UpdateWorldSettingsInput {
   timelineCalendarSlug?: string | null;
   /** 9.3-followup — PJ skryje volitelné top-nav položky (whitelist `HIDEABLE_NAV_IDS`). */
   hiddenNavItems?: string[];
+  /** 12.2 — vlastní navigace světa (strom skupin + odkazů). */
+  customHeadline?: HeadlineNode[];
+  /** 12.2 — šablony menu. */
+  menuTemplates?: MenuTemplate[];
+  /** 12.2 — „Last info" box. `null` = smazat; `updatedAt` plní server. */
+  lastInfo?: { text: string; visible: boolean } | null;
 }
 
 export function useUpdateWorldSettings(worldId: string) {

@@ -10,6 +10,13 @@
  *  - checkbox seznam v `NavVisibilityTab`
  */
 
+import type { HeadlineNode } from '@/shared/types';
+import {
+  headlineToNavGroups,
+  type NavNode,
+} from './headlineNav';
+import { buildGroupNavEntries } from './groupMembers';
+
 export interface HideableNavItem {
   id: string;
   label: string;
@@ -112,4 +119,111 @@ export function isNavItemHidden(
   if (!id) return false;
   if (!HIDEABLE_NAV_IDS.has(id)) return false; // esenciál nelze skrýt
   return !!hiddenNavItems?.includes(id);
+}
+
+/* ── Systémová navigace světa (SSOT pro WorldLayout i náhled v 12.2) ── */
+
+/**
+ * Sestaví systémovou horní nav světa. `id` na položkách = klíč pro
+ * `hiddenNavItems` filtr; esenciály (Stránky) `id` nemají — skrýt je nelze.
+ * PJ-only položky (Deník PJ, Storyboard) jen pro `isPJ`.
+ *
+ * 12.3 — „Informace" obsahuje podseznam skupin (z `groups` = `customGroups`) +
+ * Nezařazení + Pravidla. Přehled je přes název světa, Novinky/Akce na úvodní
+ * stránce (spec 12.3 R1/R2).
+ */
+export function buildWorldNav(
+  worldSlug: string,
+  isPJ: boolean,
+  groups: readonly string[] = [],
+): NavNode[] {
+  const b = `/svet/${worldSlug}`;
+  return [
+    {
+      label: 'Informace',
+      items: [
+        {
+          // 12.3 — rozbalovací „Skupiny" → jednotlivé skupiny + Nezařazení.
+          label: 'Skupiny',
+          children: buildGroupNavEntries(groups).map((g) => ({
+            label: g.label,
+            to: `${b}/skupina/${g.key}`,
+          })),
+        },
+        { label: 'Pravidla', to: `${b}/pravidla` },
+      ],
+    },
+    {
+      label: 'Svět',
+      items: [
+        { label: 'Stránky', to: `${b}/stranky` },
+        { id: 'timeline', label: 'Časová osa', to: `${b}/timeline` },
+        { id: 'mapa', label: 'Mapa vesmíru', to: `${b}/mapa` },
+        { id: 'pavucina', label: 'Pavučina', to: `${b}/pavucina` },
+        { id: 'obchod', label: 'Obchod', to: `${b}/obchod` },
+      ],
+    },
+    {
+      label: 'Hra',
+      items: [
+        { id: 'takticka-mapa', label: 'Taktická mapa', to: `${b}/takticka-mapa` },
+        ...(isPJ
+          ? [{ id: 'denik-pj', label: 'Deník PJ', to: `${b}/denik-pj` }]
+          : []),
+        { id: 'bestiar', label: 'Bestiář', to: `${b}/bestiar` },
+        ...(isPJ
+          ? [{ id: 'scenare', label: 'Storyboard', to: `${b}/scenare` }]
+          : []),
+        { id: 'pocasi', label: 'Generátor počasí', to: `${b}/pocasi` },
+        { id: 'prevodnik-men', label: 'Převodník měn', to: `${b}/prevodnik-men` },
+        { id: 'zvuky', label: 'Zvuková databáze', to: `${b}/zvuky` },
+        {
+          id: 'dungeon-builder',
+          label: 'Tvorba podzemí',
+          to: `/admin/dungeon-builder`,
+          external: true,
+        },
+      ],
+    },
+    { id: 'kalendar', label: 'Kalendář', to: `${b}/kalendar` },
+  ];
+}
+
+/**
+ * Odfiltruje skryté položky podle `hiddenNavItems`. Skupina s prázdnými `items`
+ * po filtru se vyřadí (skryje celý dropdown). Esenciály (bez `id`) projdou vždy.
+ */
+export function filterNavByHidden(
+  nav: readonly NavNode[],
+  hiddenNavItems: readonly string[] | undefined,
+): NavNode[] {
+  const out: NavNode[] = [];
+  for (const group of nav) {
+    if (group.items) {
+      const items = group.items.filter(
+        (item) => !isNavItemHidden(item.id, hiddenNavItems),
+      );
+      if (items.length > 0) out.push({ label: group.label, items });
+    } else if (!isNavItemHidden(group.id, hiddenNavItems)) {
+      out.push(group);
+    }
+  }
+  return out;
+}
+
+/**
+ * Plná nav světa = systémová (po skrytí) + vlastní navigace (aditivně za ní).
+ * Jediný vstup pro `WorldLayout` i náhled v 12.2.
+ */
+export function buildFullWorldNav(
+  worldSlug: string,
+  isPJ: boolean,
+  hiddenNavItems: readonly string[] | undefined,
+  customHeadline: readonly HeadlineNode[] | undefined,
+  groups: readonly string[] = [],
+): NavNode[] {
+  return [
+    ...filterNavByHidden(buildWorldNav(worldSlug, isPJ, groups), hiddenNavItems),
+    ...headlineToNavGroups(customHeadline),
+  ];
 }

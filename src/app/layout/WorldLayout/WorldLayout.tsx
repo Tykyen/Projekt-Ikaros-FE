@@ -20,116 +20,133 @@ import { applyTheme } from '../../../themes/applyTheme';
 import { resolveWorldTheme } from '../../../themes/worldTheme';
 import { MatrixRain } from '../../../themes/effects/MatrixRain';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
-import { isNavItemHidden } from '@/features/world/lib/worldNavConfig';
+import { buildFullWorldNav } from '@/features/world/lib/worldNavConfig';
+import type { NavNode, NavLinkItem } from '@/features/world/lib/headlineNav';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
+import { LastInfoBar } from '@/features/world/components/LastInfoBar';
 
-/* ── Nav definice ── */
-// `id` na items = klíč pro `WorldSettings.hiddenNavItems` filter (9.3-followup).
-// Esenciální (Přehled/Stránky/Novinky/Pravidla) `id` mít nemusí — beztak nelze
-// skrýt (`HIDEABLE_NAV_IDS` whitelist v `worldNavConfig.ts`).
-function buildNav(worldSlug: string, isPJ: boolean) {
-  const b = `/svet/${worldSlug}`;
-  return [
-    {
-      label: 'Informace',
-      items: [
-        { label: 'Přehled', to: b },
-        { label: 'Novinky', to: `${b}/novinky` },
-        { label: 'Pravidla', to: `${b}/pravidla` },
-      ],
-    },
-    {
-      // 9.x — „Svět" je obsah světa (stránky + historie + místa + ekonomika + vztahy).
-      label: 'Svět',
-      items: [
-        { label: 'Stránky', to: `${b}/stranky` },
-        { id: 'timeline', label: 'Časová osa', to: `${b}/timeline` },
-        { id: 'mapa', label: 'Mapa vesmíru', to: `${b}/mapa` },
-        { id: 'pavucina', label: 'Pavučina', to: `${b}/pavucina` },
-        { id: 'obchod', label: 'Obchod', to: `${b}/obchod` },
-      ],
-    },
-    {
-      // 9.x — „Hra" je aktivní použití u stolu (souboj, scéna, pomůcky).
-      // Skupiny vyhozeny (stub, duplikuje 5.3 Členové). NPC šablony /
-      // Šablona deníku / Kalendáře přesunuty do ⚙ Nastavení tabů.
-      label: 'Hra',
-      items: [
-        { id: 'takticka-mapa', label: 'Taktická mapa', to: `${b}/takticka-mapa` },
-        // 10.2l — deník PJ mimo mapu. PJ-only (hráč ho v menu nevidí).
-        ...(isPJ
-          ? ([{ id: 'denik-pj', label: 'Deník PJ', to: `${b}/denik-pj` }] as const)
-          : ([] as const)),
-        { id: 'bestiar', label: 'Bestiář', to: `${b}/bestiar` },
-        // 11.2 — Storyboard je PJ-nástroj (PJ + PomocnyPJ); hráč ho v menu nevidí.
-        ...(isPJ
-          ? ([{ id: 'scenare', label: 'Storyboard', to: `${b}/scenare` }] as const)
-          : ([] as const)),
-        { id: 'pocasi', label: 'Generátor počasí', to: `${b}/pocasi` },
-        { id: 'prevodnik-men', label: 'Převodník měn', to: `${b}/prevodnik-men` },
-        { id: 'zvuky', label: 'Zvuková databáze', to: `${b}/zvuky` },
-        // Globální route — vede mimo svět (vizuálně označeno ↗).
-        { id: 'dungeon-builder', label: 'Tvorba podzemí', to: `/admin/dungeon-builder`, external: true },
-      ],
-    },
-    { id: 'kalendar', label: 'Kalendář', to: `${b}/kalendar` },
-  ] as const;
+/* ── Nav ── */
+// Systémová nav + filtrace + vlastní headline (12.2) žijí v `worldNavConfig.ts`
+// (SSOT sdílený s náhledem na `/admin/headline`). `NavNode` = render tvar.
+
+/* ── Rozbalovací položka uvnitř dropdownu (12.3 — „Skupiny") ── */
+function DropdownAccordion({
+  item,
+  onPick,
+}: {
+  item: NavLinkItem;
+  onPick: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={s.subGroup}>
+      <button
+        type="button"
+        className={clsx(s.dropdownItem, s.subToggle)}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
+        {item.label}
+        <span className={clsx(s.chevron, open && s.chevronOpen)}>▾</span>
+      </button>
+      {open &&
+        (item.children ?? []).map((child) => (
+          <NavLink
+            key={child.to}
+            to={child.to ?? '#'}
+            className={clsx(s.dropdownItem, s.dropdownSubItem)}
+            onClick={onPick}
+          >
+            {child.label}
+          </NavLink>
+        ))}
+    </div>
+  );
 }
 
-/**
- * 9.3-followup — odfiltruje skryté položky podle `WorldSettings.hiddenNavItems`.
- * Group s prázdnými `items` po filtru se vyřadí (skryje celý dropdown).
- * Esenciální items (bez `id`) projdou vždy.
- */
-function filterNavByHidden(
-  nav: ReturnType<typeof buildNav>,
-  hiddenNavItems: readonly string[] | undefined,
-) {
-  return nav
-    .map((group) => {
-      if (!('items' in group)) {
-        // Top-level (Kalendář) — skryt pokud match.
-        return isNavItemHidden(
-          (group as { id?: string }).id,
-          hiddenNavItems,
-        )
-          ? null
-          : group;
-      }
-      const items = group.items.filter(
-        (item) =>
-          !isNavItemHidden((item as { id?: string }).id, hiddenNavItems),
-      );
-      if (items.length === 0) return null;
-      return { ...group, items };
-    })
-    .filter((g): g is NonNullable<typeof g> => g !== null);
+/* ── Sbalovací sekce mobilního draweru (Informace / Svět / Hra) ── */
+function DrawerSection({
+  group,
+  onNavigate,
+}: {
+  group: Extract<NavNode, { items: ReadonlyArray<NavLinkItem> }>;
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={s.drawerSection}>
+      <button
+        type="button"
+        className={s.drawerSectionToggle}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
+        {group.label}
+        <span className={clsx(s.chevron, open && s.chevronOpen)}>▾</span>
+      </button>
+      {open &&
+        group.items.map((item) =>
+          item.children ? (
+            <DrawerSubGroup
+              key={item.label}
+              item={item}
+              onNavigate={onNavigate}
+            />
+          ) : (
+            <NavLink
+              key={item.to}
+              to={item.to ?? '#'}
+              className={s.drawerLink}
+              onClick={onNavigate}
+            >
+              {item.label}
+              {item.external && (
+                <span className={s.externalIcon} aria-label="otevře mimo svět">↗</span>
+              )}
+            </NavLink>
+          ),
+        )}
+    </div>
+  );
 }
 
-// NavGroup widened (items = ReadonlyArray, ne tuple) — drží shape z buildNav
-// ale snese .filter/.map widening v filterNavByHidden bez TS errors.
-type NavGroupItem = {
-  readonly label: string;
-  readonly to: string;
-  readonly id?: string;
-  readonly external?: boolean;
-};
-type NavGroup =
-  | {
-      readonly label: string;
-      readonly items: ReadonlyArray<NavGroupItem>;
-      readonly id?: undefined;
-      readonly to?: undefined;
-    }
-  | {
-      readonly id: string;
-      readonly label: string;
-      readonly to: string;
-      readonly items?: undefined;
-    };
+/* ── Rozbalovací „Skupiny" v mobilním draweru (12.3) ── */
+function DrawerSubGroup({
+  item,
+  onNavigate,
+}: {
+  item: NavLinkItem;
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={s.drawerSubGroup}>
+      <button
+        type="button"
+        className={clsx(s.drawerLink, s.drawerSubToggle)}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
+        {item.label}
+        <span className={clsx(s.chevron, open && s.chevronOpen)}>▾</span>
+      </button>
+      {open &&
+        (item.children ?? []).map((child) => (
+          <NavLink
+            key={child.to}
+            to={child.to ?? '#'}
+            className={clsx(s.drawerLink, s.drawerSubLink)}
+            onClick={onNavigate}
+          >
+            {child.label}
+          </NavLink>
+        ))}
+    </div>
+  );
+}
 
 /* ── Dropdown komponenta ── */
-function NavDropdown({ group, onClose }: { group: NavGroup; onClose: () => void }) {
+function NavDropdown({ group, onClose }: { group: NavNode; onClose: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -165,19 +182,27 @@ function NavDropdown({ group, onClose }: { group: NavGroup; onClose: () => void 
       </button>
       {open && (
         <div className={s.dropdown}>
-          {(group.items ?? []).map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={s.dropdownItem}
-              onClick={() => { setOpen(false); onClose(); }}
-            >
-              {item.label}
-              {'external' in item && item.external && (
-                <span className={s.externalIcon} aria-label="otevře mimo svět">↗</span>
-              )}
-            </NavLink>
-          ))}
+          {(group.items ?? []).map((item) =>
+            item.children ? (
+              <DropdownAccordion
+                key={item.label}
+                item={item}
+                onPick={() => { setOpen(false); onClose(); }}
+              />
+            ) : (
+              <NavLink
+                key={item.to}
+                to={item.to ?? '#'}
+                className={s.dropdownItem}
+                onClick={() => { setOpen(false); onClose(); }}
+              >
+                {item.label}
+                {item.external && (
+                  <span className={s.externalIcon} aria-label="otevře mimo svět">↗</span>
+                )}
+              </NavLink>
+            ),
+          )}
         </div>
       )}
     </div>
@@ -228,11 +253,21 @@ export function WorldLayout() {
     (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
   const { data: settings } = useWorldSettings(realWorldId);
   const nav = useMemo(
-    () => filterNavByHidden(
-      buildNav(worldSlug, isPJForNav),
+    () =>
+      buildFullWorldNav(
+        worldSlug,
+        isPJForNav,
+        settings?.hiddenNavItems,
+        settings?.customHeadline,
+        settings?.customGroups,
+      ),
+    [
+      worldSlug,
+      isPJForNav,
       settings?.hiddenNavItems,
-    ),
-    [worldSlug, isPJForNav, settings?.hiddenNavItems],
+      settings?.customHeadline,
+      settings?.customGroups,
+    ],
   );
 
   const isPJ =
@@ -440,6 +475,11 @@ export function WorldLayout() {
           )}
         </header>
 
+        {/* 12.2 — „Last info" proužek (oznámení PJ) pod hlavičkou, jen pro membery */}
+        {showFullNav && (
+          <LastInfoBar worldId={realWorldId} lastInfo={settings?.lastInfo} />
+        )}
+
         {/* Mobile drawer (zprava) — jen pro membery */}
         {showFullNav && (
           <>
@@ -460,26 +500,16 @@ export function WorldLayout() {
                   + Nová stránka
                 </button>
               )}
-              {nav.map((group) => (
-                <div key={group.label} className={s.drawerSection}>
-                  {'items' in group ? (
-                    <>
-                      <div className={s.drawerSectionTitle}>{group.label}</div>
-                      {group.items.map((item) => (
-                        <NavLink
-                          key={item.to}
-                          to={item.to}
-                          className={s.drawerLink}
-                          onClick={() => setDrawerOpen(false)}
-                        >
-                          {item.label}
-                          {'external' in item && item.external && (
-                            <span className={s.externalIcon} aria-label="otevře mimo svět">↗</span>
-                          )}
-                        </NavLink>
-                      ))}
-                    </>
-                  ) : (
+              {nav.map((group) =>
+                group.items ? (
+                  // 12.3 — celá sekce (Informace / Svět / Hra) = sbalovací accordion.
+                  <DrawerSection
+                    key={group.label}
+                    group={group}
+                    onNavigate={() => setDrawerOpen(false)}
+                  />
+                ) : (
+                  <div key={group.label} className={s.drawerSection}>
                     <NavLink
                       to={group.to}
                       className={s.drawerLink}
@@ -487,9 +517,9 @@ export function WorldLayout() {
                     >
                       {group.label}
                     </NavLink>
-                  )}
-                </div>
-              ))}
+                  </div>
+                ),
+              )}
             </div>
           </>
         )}

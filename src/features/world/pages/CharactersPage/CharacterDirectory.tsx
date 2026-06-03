@@ -68,6 +68,7 @@ function pageEntryToCharacterEntry(p: PageDirectoryEntry): CharacterDirectoryEnt
     name: p.title,
     imageUrl: p.imageUrl,
     isNpc: p.type === 'NPC',
+    kind: p.type === 'Lokace' ? 'location' : 'persona',
     userId: p.ownerUserId,
   };
 }

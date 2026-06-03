@@ -40,7 +40,11 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-02 (AKJ — chráněné záložky stránek: stránka
+          Aktualizováno k 2026-06-03 (12.3 — záložka Informace: rozbalovací
+          Skupiny (každá skupina má stránku se seznamem hrajících členů) +
+          Pravidla světa jako editovatelná wiki stránka. Plus 12.2 — Hlavní lišta světa: PJ skryje
+          nepoužívané moduly, postaví vlastní navigaci a šablony menu a nastaví
+          „Last info" oznámení pro členy. Plus AKJ — chráněné záložky stránek: stránka
           může mít vedle Profilu zamčené záložky, které vidí jen ti s přístupem
           (PJ uděluje podle úrovně utajení nebo jmenovitě). Plus 12.1 — Správa
           platformy: nový admin hub `/admin` se statistikami, správou uživatelů

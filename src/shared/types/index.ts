@@ -420,6 +420,12 @@ export interface WorldMembership {
   joinedAt: string;
   characterPath?: string;
   group?: string;
+  /**
+   * World-scoped avatar člena = obrázek přiřazené postavy v tomto světě. BE ho
+   * plní z postavy a při odpojení `$unset`-ne; když chybí, `worldMemberAvatar`
+   * fallbackuje na `user.avatarUrl`. Viz `worldMemberAvatar.ts`.
+   */
+  avatarUrl?: string;
   /** 5.3 — AKJ úroveň člena (stupňovaná prověrka viditelnosti stránek). */
   akj?: number;
   /** Krok 5.9 — per-uživatel per-svět doladění vzhledu (přístupnost). */
@@ -484,12 +490,50 @@ export interface CharacterTabVisibility {
  * 5.3 — nastavení světa (`GET /worlds/:worldId/settings`). FE čte zejména
  * `customGroups`, `groupColors` (tab Členové) a `akjTypes` (tab AKJ úrovně).
  */
+/**
+ * 12.2 — uzel vlastní navigace světa (headline builder). `isGroup` rozlišuje
+ * dropdown skupinu (`children`) od přímého odkazu (`to`). Max 1 úroveň zanoření.
+ */
+export interface HeadlineNode {
+  id: string;
+  label: string;
+  isGroup: boolean;
+  to?: string;
+  children?: HeadlineNode[];
+}
+
+/** 12.2 — položka šablony menu. */
+export interface MenuTemplateItem {
+  label: string;
+  href: string;
+  order?: number;
+}
+
+/** 12.2 — pojmenovaná sada odkazů pro rychlé vložení do vlastní navigace. */
+export interface MenuTemplate {
+  name: string;
+  items: MenuTemplateItem[];
+}
+
+/** 12.2 — „Last info" box: oznámení PJ členům světa. `updatedAt` plní server (ISO). */
+export interface LastInfo {
+  text: string;
+  visible: boolean;
+  updatedAt: string;
+}
+
 export interface WorldSettings {
   id: string;
   worldId: string;
   hiddenNavItems: string[];
   customGroups: string[];
   groupColors: Record<string, string>;
+  /** 12.2 — vlastní navigace světa (strom skupin + odkazů), aditivní k systémové. */
+  customHeadline?: HeadlineNode[];
+  /** 12.2 — šablony menu (sady odkazů pro vkládání do navigace). */
+  menuTemplates?: MenuTemplate[];
+  /** 12.2 — „Last info" box (oznámení PJ). `null` = nenastaveno. */
+  lastInfo?: LastInfo | null;
   akjTypes: AkjType[];
   hideDefaultWeather: boolean;
   /** Side-task character-tab-visibility — pokud chybí, FE považuje vše za viditelné. */

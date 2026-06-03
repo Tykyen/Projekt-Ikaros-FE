@@ -1918,14 +1918,24 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 - [x] **12.1f — Konsolidace + úklid:** `/ikaros/uzivatele` zúženo na komunitní taby (Přátelé / Uživatelé-karty / Zpracovat) pro všechny role; smazáni sirotci `AdminUsersPage`, `RequestsTable`, `ViewToggle`, `AuditTab` re-export; nav odkaz „Správa platformy" pro Admin+; `mobil-desktop` (CSS audit) + `napoveda` ✓
 - *Schvalování obsahu (články / galerie / diskuze) — hotové přes „Zpracovat" tab (krok 3.x), mimo rozsah fáze 12.*
 
-### - [ ] 12.2 World admin — headline / menu builder
+### - [x] 12.2 World admin — headline / menu builder ✅ (2026-06-03)
 
-*Jediný zbylý světový admin nástroj — ostatní správa světa je v krocích 5.3 / 6.5 / 7.4 / 8.4 / 9.x / 11.4.*
+*Jediný zbylý světový admin nástroj — ostatní správa světa je v krocích 5.3 / 6.5 / 7.4 / 8.4 / 9.x / 11.4. Spec: `docs/arch/phase-12/spec-12.2.md`, plán: `plan-12.2.md`.*
 
-- [ ] **Headline / menu builder** (`/svet/:worldId/admin/headline`, PJ+) — PJ skrývá systémové moduly (`hiddenNavItems`) a staví vlastní navigaci světa (`customHeadline` — strom uzlů: skupiny + odkazy na stránky), `menuTemplates`; „Last info" box
-- [ ] Ukládá `PUT /worlds/:worldId/settings`; promítne se do nav ve `WorldLayout` (krok 5.1)
-- [ ] `mobil-desktop` audit, `napoveda`
+- [x] **Headline / menu builder** (`/svet/:worldSlug/admin/headline`, PJ+) — PJ skrývá systémové moduly (`hiddenNavItems`) a staví vlastní navigaci světa (`customHeadline` — strom uzlů: skupiny + odkazy na stránky), `menuTemplates`; „Last info" box (nové BE pole `lastInfo` + proužek pod hlavičkou ve `WorldLayout`)
+- [x] Ukládá `PUT /worlds/:worldId/settings`; promítne se do nav ve `WorldLayout` (krok 5.1). **customHeadline aditivní** (přidá za systémovou nav). Konsolidace: skrývání modulů přesunuto sem z `NavVisibilityTab` (starý tab v Nastavení = rozcestník). Nav SSOT (`buildWorldNav`/`filterNavByHidden`/`buildFullWorldNav` v `worldNavConfig.ts`) sdílí WorldLayout i živý náhled.
+- [x] `mobil-desktop` audit (náhled stack na mobilu, dotykové cíle ≥40px), `napoveda` (nová PJ stránka „Hlavní lišta světa")
+- *BE patch:* DTO doplněn o `customHeadline` (dřív tiše zahazován whitelist ValidationPipe) + nové pole `lastInfo` (server plní `updatedAt`); repository `toEntity` mapuje `lastInfo`. Testy: BE +4 (lastInfo set/clear/no-op/403), FE +23 (headlineNav tree ops + buildFullWorldNav + LastInfoBar dismiss).
 - ~~`/admin/meny`~~ → krok **11.4a** &nbsp;·&nbsp; ~~`/admin/nastaveni-kalendare`~~ → krok **9.2d** &nbsp;·&nbsp; ~~`/admin/emotes`~~ → krok **6.4**
+
+### - [x] 12.3 Záložka „Informace": Skupiny + editovatelná Pravidla ✅ (2026-06-03)
+
+*Přestavba dropdownu „Informace" v horní liště. Spec: `docs/arch/phase-12/spec-12.3.md`.*
+
+- [x] **„Informace" dropdown** = rozbalovací **Skupiny** (accordion → jednotlivé skupiny z `customGroups` + „Nezařazení") + **Pravidla**. Přehled (klik na název světa) a Novinky/Akce (úvodní stránka) odebrány z dropdownu.
+- [x] **Stránka skupiny** (`/svet/:worldSlug/skupina/:groupKey`) — autogenerovaný seznam hrajících členů skupiny (postava + avatar, proklik na postavu). Zobrazí jen členy **s přiřazenou postavou** a rolí **Hráč+** (PJ/PomocnyPJ bez postavy ne; Čtenář/Žadatel nikdy). „Nezařazení" = hrající bez skupiny. Logika v `lib/groupMembers.ts` (SSOT, testováno).
+- [x] **Pravidla = editovatelná wiki** (rezervovaný slug `pravidla`): `RulesPage` ze stubu na wiki-loader — existuje → `PageViewer` (Upravit přes PageEditor, PomocnyPJ+); 404 → create CTA pro PomocnyPJ+, jinak empty state.
+- [x] `mobil-desktop` audit (grid karet, nested drawer), `napoveda` (Skupina + Pravidla světa funkční). Testy: FE +16 (groupMembers 13 + nav struktura + RulesPage 3).
 
 ---
 

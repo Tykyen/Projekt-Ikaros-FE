@@ -35,7 +35,7 @@ const PageTemplatesTab = lazy(() => import('./tabs/PageTemplatesTab'));
 const CharacterTabsVisibilityTab = lazy(
   () => import('./tabs/CharacterTabsVisibilityTab'),
 );
-const NavVisibilityTab = lazy(() => import('./tabs/NavVisibilityTab'));
+const HeadlineLinkTab = lazy(() => import('./tabs/HeadlineLinkTab'));
 // Přesun z world nav (2026-05-25): admin nástroje do Nastavení tabů.
 const CalendarConfigsPage = lazy(
   () => import('@/features/world/pages/CalendarConfigsPage/CalendarConfigsPage'),
@@ -93,14 +93,13 @@ const TABS: SettingsTab[] = [
     render: () => <CharacterTabsVisibilityTab />,
   },
   {
-    // 9.3-followup — PJ skryje volitelné top-nav položky (Mapa vesmíru,
-    // Pavučina, Časová osa, …). Esenciál (Přehled/Stránky/Novinky/Pravidla)
-    // vždy viditelný. Hráč může na skrytou stránku přes URL — jen z nav mizí.
+    // 12.2 — správa navigace přesunuta na dedikovanou stránku „Hlavní lišta"
+    // (/admin/headline). Tento tab je rozcestník (konsolidace dvojkolejnosti).
     id: 'navigace',
-    label: 'Navigace',
+    label: 'Hlavní lišta',
     icon: <Navigation size={18} />,
     minRole: WorldRole.PJ,
-    render: () => <NavVisibilityTab />,
+    render: () => <HeadlineLinkTab />,
   },
   {
     id: 'sablony',
