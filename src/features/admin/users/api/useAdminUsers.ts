@@ -176,7 +176,7 @@ export function useAdminRequestDeletion() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
-      api.post<{ user: User }>(`/admin/users/${userId}/deletion-request`, {
+      api.post<{ user: User }>(`/admin/users/${userId}/request-deletion`, {
         reason,
       }),
     onSuccess: () => {
@@ -193,7 +193,7 @@ export function useAdminCancelDeletion() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) =>
-      api.delete<{ user: User }>(`/admin/users/${userId}/deletion-request`),
+      api.post<{ user: User }>(`/admin/users/${userId}/cancel-deletion`, {}),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'users'] });
       toast.success('Plánované smazání zrušeno');
@@ -220,7 +220,7 @@ export function useAdminSetAdminPermissions() {
       userId: string;
       permissions: AdminPermissionsPatch;
     }) =>
-      api.post<{ user: User }>(
+      api.patch<{ user: User }>(
         `/admin/users/${userId}/admin-permissions`,
         permissions,
       ),

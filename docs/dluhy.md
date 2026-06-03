@@ -8,14 +8,11 @@
 
 ## Otevřené
 
-### D-029 — PWA ikony jsou placeholder (favicon)
-**Soubor:** `public/manifest.webmanifest` — 13.2c PWA push
-**Problém:** Ikony pro `192x192` i `512x512` ukazují na `/favicon.webp`, který tu velikost reálně nemá. Instalace PWA funguje, ale ikona na ploše/launcheru bude rozmazaná a chybí dedikovaná `maskable` varianta.
-**Dopad:** Nízký — kosmetika instalované appky, neblokuje push ani funkci.
-**Řešení:** Vyrobit `icon-192.png` + `icon-512.png` (+ maskable s safe-zone paddingem) z brandového loga a zapsat je do manifestu.
-**Kdy:** Před produkčním nasazením PWA (spolu s ostrým VAPID na serveru).
-
----
+> **2026-06-03 — bug audit:** Hloubková kontrola BE+FE (viz [`bug-audit.md`](bug-audit.md))
+> našla **14 potvrzených nálezů** (N-1 až N-14). Hlavní: systémový FE↔BE contract drift
+> (N-6: auth/account endpointy), chybějící WS gateways (N-4 friendship, N-5 presence),
+> 3 bezpečnostní (N-7 members leak, N-8 room:join leak, N-9 sound spoof). Detaily, důkazy
+> a návrhy řešení v `bug-audit.md`. Opraveno během auditu: N-1 (test mock), D-029 (PWA ikony).
 
 ### D-030 — Správa push zařízení jen pro aktuální zařízení
 **Soubor:** `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx` — 13.2c

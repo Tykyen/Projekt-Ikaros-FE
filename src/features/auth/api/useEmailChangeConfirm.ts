@@ -4,6 +4,6 @@ import { api } from '@/shared/api/client';
 export function useEmailChangeConfirm() {
   return useMutation({
     mutationFn: (token: string) =>
-      api.post<{ ok: true }>('/auth/email-change-confirm', { token }),
+      api.post<{ ok: true }>('/auth/confirm-email-change', { token }),
   });
 }

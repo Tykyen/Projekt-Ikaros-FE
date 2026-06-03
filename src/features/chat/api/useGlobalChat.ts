@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { api, apiClient } from '@/shared/api/client';
+import { accessTokenAtom } from '@/shared/store/authStore';
 import { useSocketEvent } from './useSocket';
 import { getSocket } from './socket';
 import type {
@@ -58,10 +60,13 @@ const ROOM_PRESENCE_COUNTS_KEY = ['global-chat', 'room-presence-counts'] as cons
  */
 export function useRoomPresenceCounts(): RoomPresenceCounts | undefined {
   const qc = useQueryClient();
+  // N-30 — endpoint je za JwtAuthGuard; bez tohoto guardu anon (sidebar v public
+  // shellu) pálil 401 a badge se nenačetl. Presence počty potřebuje jen logged-in.
+  const token = useAtomValue(accessTokenAtom);
   const query = useQuery({
     queryKey: ROOM_PRESENCE_COUNTS_KEY,
-    queryFn: () =>
-      api.get<RoomPresenceCounts>('/global-chat/rooms/presence'),
+    queryFn: () => api.get<RoomPresenceCounts>('/global-chat/rooms/presence'),
+    enabled: !!token,
   });
   useSocketEvent<RoomPresenceCounts>('chat:rooms:presence', (counts) => {
     qc.setQueryData(ROOM_PRESENCE_COUNTS_KEY, counts);

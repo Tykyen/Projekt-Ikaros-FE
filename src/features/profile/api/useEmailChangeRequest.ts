@@ -10,7 +10,7 @@ export function useEmailChangeRequest() {
   return useMutation({
     mutationFn: (dto: { newEmail: string; currentPassword: string }) =>
       api.post<EmailChangeRequestResponse>(
-        '/users/me/email-change-request',
+        '/users/me/request-email-change',
         dto,
       ),
   });

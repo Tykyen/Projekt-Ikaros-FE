@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
@@ -206,7 +206,12 @@ describe('useGlobalChat', () => {
 });
 
 describe('useRoomPresenceCounts (4.2c §4)', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // N-30 — query je nově enabled jen pro přihlášené (accessTokenAtom).
+    localStorage.setItem('ikaros.jwt', JSON.stringify('test-token'));
+  });
+  afterEach(() => localStorage.removeItem('ikaros.jwt'));
 
   const zero: RoomPresenceCounts = {
     hospoda: 0,

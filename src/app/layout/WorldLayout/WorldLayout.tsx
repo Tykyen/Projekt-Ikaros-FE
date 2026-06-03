@@ -287,9 +287,13 @@ export function WorldLayout() {
     ],
   );
 
+  // N-16 — isPJ musí (stejně jako isPJForNav) zahrnout world membership
+  // PomocnyPJ+, jinak ne-owner PomocnyPJ viděl isPJ=false a mizelo mu PJ UI
+  // (tlačítko „Nová stránka", editace).
   const isPJ =
     world?.ownerId === currentUser?.id ||
-    (currentUser?.role !== undefined && currentUser.role <= 3); // Admin, PJ, Superadmin
+    (currentUser?.role !== undefined && currentUser.role <= 3) || // Admin, PJ, Superadmin
+    (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
   const isGlobalAdmin =
     currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
 

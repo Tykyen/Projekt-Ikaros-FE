@@ -5,7 +5,7 @@ export function useEmailVerify() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (token: string) =>
-      api.post<{ ok: true }>('/auth/email-verify', { token }),
+      api.post<{ ok: true }>('/auth/verify-email', { token }),
     onSuccess: () => {
       // Pokud je user přihlášený, refresh /users/me aby se badge přepl na "ověřeno"
       qc.invalidateQueries({ queryKey: ['users', 'me'] });
@@ -16,6 +16,6 @@ export function useEmailVerify() {
 export function useEmailVerifyResend() {
   return useMutation({
     mutationFn: () =>
-      api.post<{ ok: true }>('/auth/email-verify/resend', {}),
+      api.post<{ ok: true }>('/auth/resend-verification', {}),
   });
 }

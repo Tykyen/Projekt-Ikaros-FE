@@ -185,9 +185,10 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
         }
         return {
           ...old,
-          users: old.users.filter(
-            (u) => u.userId !== e.userId && u.username !== e.username,
-          ),
+          // N-32 — filtruj výhradně podle userId. Dřívější `&& username !==`
+          // odstranilo i nevinného uživatele se stejným jménem a nechalo ghost
+          // viset, když si odcházející mezitím změnil přezdívku.
+          users: old.users.filter((u) => u.userId !== e.userId),
         };
       });
     },
