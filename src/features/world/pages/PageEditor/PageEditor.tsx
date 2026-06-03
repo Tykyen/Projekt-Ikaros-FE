@@ -169,6 +169,7 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
       if (isEdit && page) {
         const updated = await update.mutateAsync({
           id: page.id,
+          previousSlug: page.slug, // N-38 — pro úklid staré cache po rename
           input: {
             slug: slug.slug,
             title: state.title,

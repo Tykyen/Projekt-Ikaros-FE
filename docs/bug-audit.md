@@ -242,11 +242,18 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 - **N-5** `PresenceGateway` — in-memory registry + idle + snapshot (`presence:*`) + 7 testů
 - **Ověřeno:** `audit:ws` **čistý** (0 mrtvých listenerů, 0 zahozených emitů), DI bootstrap OK (forwardRef bez cyklu), full BE jest 1835 ✓
 
-### ⏳ Zbývá
+### ✅ Opraveno — drobné
+- **N-21** FE `ChatGroup` typ doplněn o `linkedWorldGroup` (BE pole se zahazovalo)
+- **N-24** `listPurchases` — hráč vidí nákupy všech svých postav (+ repo `findManyByUserAndWorld`)
+- **N-38** `useUpdatePage` — `previousSlug` z callera (úklid staré cache po rename)
+- **N-41** `SetInGameDateModal` Únor leap-aware (gregoriánský fallback)
+
+### ⏳ Zbývá (velké / k posouzení)
 - **N-35** AKJ search filtr (forwardRef PagesService→Search) — velké
 - **N-6b** chybějící BE endpointy (self-delete, reactivate, username-request, admin-friendships) — features, citlivé
 - **N-8/N-27** weather room membership — architektonický návrh (sdílená BaseGateway, riziko)
-- **Drobné:** N-21, N-24, N-33, N-38, N-40, N-41
+- **N-40** kalendář: hráč nevidí historické události — možná by-design (archive policy 24h), k posouzení
+- **N-33** events invalidace — vyžaduje rozšířit BE `ikaros:new-message` payload (BE+FE)
 
 ### ⏳ Vyžaduje tvé rozhodnutí (nedělám naslepo)
 - **N-35** AKJ leak v search — oprava potřebuje page-level access filtr; architektura: injektovat PagesService do SearchModule (riziko DI cyklu pages↔search). Návrh: `pages.service.findVisibleSlugs(worldId, requester)` + filtr výsledků.

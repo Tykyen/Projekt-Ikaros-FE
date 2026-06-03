@@ -26,6 +26,9 @@ export interface ChatGroup {
   color?: string;
   /** Krok 6.5c — PJ ikona: klíč z mapy `GROUP_ICONS`. `undefined` = bez ikony. */
   iconKey?: string;
+  /** N-21 — slug navázané světové družiny (auto-kanál); BE pole, FE ho dříve
+   *  nedeklaroval → tiše se zahazovalo při destructuringu. `undefined` = ruční. */
+  linkedWorldGroup?: string;
 }
 
 /** Konverzace — chatovací místnost uvnitř kanálu (BE `ChatChannel`). */

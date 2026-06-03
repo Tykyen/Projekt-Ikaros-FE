@@ -23,16 +23,25 @@ export type UpdatePageInput = Partial<CreatePageInput> & {
 export function useUpdatePage(worldId: string, worldSlug: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdatePageInput }) =>
-      api.patch<Page>(`/worlds/${worldId}/pages/${id}`, input),
+    mutationFn: ({
+      id,
+      input,
+    }: {
+      id: string;
+      input: UpdatePageInput;
+      /** N-38 — původní slug stránky (před případným rename). */
+      previousSlug?: string;
+    }) => api.patch<Page>(`/worlds/${worldId}/pages/${id}`, input),
     onSuccess: (page, vars) => {
       void qc.invalidateQueries({
         queryKey: pagesQueryKey.directory(worldId),
       });
       // Refresh detail s novými daty (slug mohl se změnit)
       qc.setQueryData(pagesQueryKey.detail(worldId, page.slug), page);
-      // Pokud slug se změnil, smaž starou detail cache
-      const previousSlug = vars.input.slug;
+      // N-38 — původní slug bereme z callera (`vars.previousSlug`); dřív se
+      // bral `vars.input.slug`, což je NOVÝ slug → po rename se podmínka nikdy
+      // nesplnila a stará detail cache zůstala stale.
+      const previousSlug = vars.previousSlug;
       if (previousSlug && previousSlug !== page.slug) {
         qc.removeQueries({
           queryKey: pagesQueryKey.detail(worldId, previousSlug),

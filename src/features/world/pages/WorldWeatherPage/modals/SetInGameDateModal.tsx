@@ -55,6 +55,11 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, Math.round(value)));
 }
 
+/** N-41 — gregoriánská přestupnost (Únor 29 vs 28). */
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
 export function SetInGameDateModal({ open, onClose, worldId }: Props) {
   const setDate = useSetInGameDate(worldId);
   const { data: settings } = useWorldSettings(worldId);
@@ -133,7 +138,13 @@ export function SetInGameDateModal({ open, onClose, worldId }: Props) {
   }, [open, persistedISO, calendarSlug]);
 
   // Clamp day když změna měsíce ukáže shorter month (Únor po Lednu z dne 31).
-  const dayMax = monthsList[monthIndex]?.daysCount ?? 31;
+  // N-41 — gregoriánský Únor je leap-aware (jinak by 29.2 v nepřestupném roce
+  // BE `setUTCFullYear` tiše přeroloval na 1.3).
+  const usingGregorian = !activeCalendar || activeCalendar.months.length === 0;
+  const dayMax =
+    usingGregorian && monthIndex === 1 && !isLeapYear(year)
+      ? 28
+      : (monthsList[monthIndex]?.daysCount ?? 31);
   const clampedDay = day > dayMax ? dayMax : day;
 
   async function handleSubmit() {
