@@ -224,4 +224,31 @@ Hráč nemá `Smazat token` tlačítko — `canDelete = isPJ`. ✓ (zachováno z
 
 - WS broadcast pro `character.diary.update` (defer 10.2i)
 - Bidirectional sync token ↔ character (existing — token.update → character sync na BE pro `systemStats`, ale ne pro `diary.customData`)
-- Edit bestie šablony z tokenu (PJ může editovat v Bestiar page, ne v token modal — bestie token = instance snapshot, edit šablony tady by porušil snapshot semantics)
+- ~~Edit bestie šablony z tokenu~~ → viz §8 (per-instance, NE šablona)
+
+---
+
+## 8 — Dodatek (2026-06-03): bestie token = nezávislá instance
+
+Původní §3.3 + §7 držely bestie statblok jako **read-only snapshot** a schopnosti/
+poznámky četly **živě z katalogu Bestie** přes `templateId`. Důsledek: dvě
+instance téže bestie sdílely schopnosti i poznámky (vypadalo to jako
+„propisování" mezi duplikáty). Tímto se bod „edit šablony z tokenu = porušení
+snapshot semantics" **nemění** (šablonu pořád needitujeme), ale **instance se
+stává plně nezávislou** — edituje vlastní kopii, ne šablonu:
+
+- **Schopnosti** — editor v `BestieStatblock` (přidat/smazat/hod) nad
+  `token.abilities` snapshotem, NE nad katalogem. Save přes `token.update`.
+- **Poznámky instance** — nové pole `MapToken.notes` (BE interface + `toToken`
+  whitelist mapper; `TokenPayloadDto` index-signatura už arbitrary klíče
+  propouští). Textarea v panelu, PJ-only. Šablonové `bestie.notes` zůstávají
+  read-only vedle (společný lore).
+- **HP** — `buildBestieToken` seeduje `systemStats['health.current'] =
+  health.max` (bestie schema definuje jen max) → HP pole se naplní a damage
+  (`combatBehavior: damageable`) funguje. BC normalizace pro staré tokeny v
+  `BestiePanelView`.
+- **Base HP** — odebráno z `matrix/token.json` (Matrix ho nepoužívá; DrD2 si
+  health.base ponechává). `pnpm export-schemas` sync do BE.
+- **Anti-kolize ID** — `pendingId` dostal náhodný suffix (multi-placement ve
+  stejné ms už nedá dvěma tokenům stejné id; BE `token.add` je `$push` bez
+  přidělení UUID).

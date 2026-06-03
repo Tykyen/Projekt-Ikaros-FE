@@ -10,8 +10,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { BestieStatblock } from "../tokens/BestieStatblock";
+import type { AbilityDraft } from "../tokens/BestieStatblock";
 import { useTokenUpdate } from "../../hooks/useTokenUpdate";
 import { performSheetRoll } from "../../utils/rollFromSheet";
+import { systemEntitySchemaRegistry } from "../../schemas/registry";
 import type { MapToken } from "../../types";
 import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
 import styles from "./TokenSystemSheet.module.css";
@@ -38,9 +40,9 @@ export function BestiePanelView({
   onMapRoll,
 }: Props): React.ReactElement {
   // BC fallback: pokud systemStats prázdné, mapuj z fixed pole.
-  const initialStats =
+  const baseStats =
     token.systemStats && Object.keys(token.systemStats).length > 0
-      ? token.systemStats
+      ? { ...token.systemStats }
       : {
           "health.current": token.currentHp,
           "health.max": token.maxHp,
@@ -50,13 +52,52 @@ export function BestiePanelView({
           "initiative.current": token.initiative,
           "initiative.base": token.initiativeBase,
         };
+  // BC normalizace: staré bestie snapshoty držely jen `health.max` (žádné
+  // `health.current`) → HP pole se nenaplnilo. Dopočítej z max / currentHp.
+  if (baseStats["health.current"] === undefined) {
+    baseStats["health.current"] =
+      baseStats["health.max"] ?? token.currentHp ?? token.maxHp ?? 0;
+  }
 
-  const [stats, setStats] = useState<Record<string, unknown>>(initialStats);
+  const [stats, setStats] = useState<Record<string, unknown>>(baseStats);
+  // Schopnosti instance — z token snapshotu ({name,description}), v UI {label,value}.
+  const [abilities, setAbilities] = useState<AbilityDraft[]>(
+    (token.abilities ?? []).map((a) => ({
+      label: a.name,
+      value: a.description,
+    })),
+  );
+  const [notes, setNotes] = useState<string>(token.notes ?? "");
   const update = useTokenUpdate(sceneId, worldId);
 
   const handleSave = (): void => {
+    // Sanitizace systemStats na klíče známé schématu. BE `validateForPatch` je
+    // STRICT — odmítne neznámý klíč. Starší tokeny mají v systemStats legacy
+    // smetí (zaseknuté `abilities`, odebrané `health.base`) → bez filtru by save
+    // spadl na „Unknown field". Filtr drží jen pole z `<system>:token` schématu.
+    const schema = systemEntitySchemaRegistry.get(systemId, "token");
+    const knownKeys = new Set(
+      schema?.sections.flatMap((s) => s.fields.map((f) => f.key)) ?? [],
+    );
+    const cleanStats =
+      knownKeys.size > 0
+        ? Object.fromEntries(
+            Object.entries(stats).filter(([k]) => knownKeys.has(k)),
+          )
+        : stats;
+
     update.mutate(
-      { tokenId: token.id, patch: { systemStats: stats } },
+      {
+        tokenId: token.id,
+        patch: {
+          systemStats: cleanStats,
+          // Zpět na token tvar {name,description}; prázdné řádky vyhoď.
+          abilities: abilities
+            .filter((a) => a.label.trim())
+            .map((a) => ({ name: a.label.trim(), description: a.value })),
+          notes,
+        },
+      },
       {
         onSuccess: () => toast.success("Statblok uložen"),
         onError: (e) =>
@@ -134,6 +175,10 @@ export function BestiePanelView({
         canEdit={canEdit}
         stats={stats}
         onStatsChange={setStats}
+        abilities={abilities}
+        onAbilitiesChange={setAbilities}
+        notes={notes}
+        onNotesChange={setNotes}
         disabled={update.isPending}
         onRollAbility={handleAbilityRoll}
       />

@@ -24,7 +24,7 @@ describe('buildSpawnToken — PC', () => {
     expect(t.instanceName).toBe('Jan');
     expect(t.q).toBe(3);
     expect(t.r).toBe(-2);
-    expect(t.id).toMatch(/^_pending_\d+_jan$/);
+    expect(t.id).toMatch(/^_pending_\d+_[a-z0-9]+_jan$/);
     expect(t.currentHp).toBe(0); // fixed default — BE doplní z Character
   });
 });
@@ -78,11 +78,32 @@ describe('buildSpawnToken — Bestie', () => {
     expect(t.isNpc).toBe(true);
   });
 
-  it('snapshot systemStats kopíruje (ne shared reference)', () => {
+  it('snapshot systemStats kopíruje (ne shared reference) + seeduje health.current', () => {
     const bestie = makeBestie();
     const t = buildBestieToken(bestie, 0, 0);
-    expect(t.systemStats).toEqual(bestie.systemStats);
+    // health.current seedováno z health.max (bestie schema má jen max).
+    expect(t.systemStats).toEqual({
+      ...bestie.systemStats,
+      'health.current': 12,
+    });
     expect(t.systemStats).not.toBe(bestie.systemStats); // copy, ne ref
+  });
+
+  it('dvě instance téže bestie dostanou různé id (anti-kolize)', () => {
+    const bestie = makeBestie();
+    const a = buildBestieToken(bestie, 0, 0);
+    const b = buildBestieToken(bestie, 1, 1);
+    expect(a.id).not.toBe(b.id);
+  });
+
+  it('notes = snapshot bestie.notes (instanční default)', () => {
+    const t = buildBestieToken(makeBestie({ notes: 'Nemrtvý' }), 0, 0);
+    expect(t.notes).toBe('Nemrtvý');
+  });
+
+  it('chybějící health.max → health.current seed z defaultu (10)', () => {
+    const t = buildBestieToken(makeBestie({ systemStats: {} }), 0, 0);
+    expect(t.systemStats?.['health.current']).toBe(10);
   });
 
   it('fixed pole se vypočítají z systemStats', () => {

@@ -14,7 +14,15 @@ import type { SpawnPayload } from './spawnPayload';
 import type { Bestie } from '@/features/world/bestiar/types';
 
 function pendingId(prefix: string): string {
-  return `_pending_${Date.now()}_${prefix}`;
+  // Náhodný suffix proti kolizi ID: multi-placement bestií ve stejné
+  // milisekundě by jinak dal dvěma tokenům stejné `_pending_<ts>_<id>` →
+  // BE token.add je `$push` bez přidělení UUID → sdílené id → token.update
+  // by zasáhl/překreslil oba (vypadalo to jako „propisování" mezi duplikáty).
+  const rand =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID().slice(0, 8)
+      : Math.random().toString(36).slice(2, 10);
+  return `_pending_${Date.now()}_${rand}_${prefix}`;
 }
 
 /**
@@ -94,7 +102,10 @@ export function buildBestieToken(
     q,
     r,
     instanceName: bestie.name,
-    systemStats: { ...bestie.systemStats },
+    // Seed `health.current` = `health.max` (bestie schema definuje jen max).
+    // Bez toho zůstane HP pole v token panelu nenaplněné → nesedí MAX a damage
+    // (combatBehavior `damageable` visí na health.current) nemá co snižovat.
+    systemStats: { ...bestie.systemStats, 'health.current': hp },
     currentHp: hp,
     maxHp: hp,
     baseHp: hp,
@@ -109,6 +120,8 @@ export function buildBestieToken(
       name: a.label,
       description: a.value,
     })),
+    // Instanční poznámky = snapshot šablony; dál editovatelné nezávisle.
+    notes: bestie.notes,
     customData: {},
   } as MapToken;
 }

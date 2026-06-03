@@ -81,6 +81,13 @@ export interface MapToken {
   inCombat: boolean;
   movement: number;
   abilities: MapTokenAbility[];
+  /**
+   * Per-instance poznámky tokenu (bestie). Snapshot z `bestie.notes` při
+   * spawnu, dál editovatelné nezávisle na šabloně. Write přes
+   * `token.update {notes}`. Šablonové poznámky (`bestie.notes`) zůstávají
+   * read-only vedle těchto.
+   */
+  notes?: string;
   personalDiarySchema?: Record<string, unknown>[];
   customData: Record<string, unknown>;
   /**

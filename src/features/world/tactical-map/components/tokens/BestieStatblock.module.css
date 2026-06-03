@@ -83,6 +83,125 @@
   text-align: right;
 }
 
+/* ── Editor schopností (PJ) ─────────────────────────────────────────── */
+.emptyAbilities {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.abilityEditRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.abilityInput,
+.abilityValueInput {
+  min-width: 0;
+  padding: 5px 8px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.08);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  border-radius: 5px;
+  color: var(--text-primary, var(--map-ui-accent-text));
+  font: inherit;
+  font-size: 13px;
+}
+
+.abilityInput {
+  flex: 1 1 auto;
+}
+
+.abilityValueInput {
+  flex: 0 0 4.5rem;
+  width: 4.5rem;
+  text-align: center;
+}
+
+.abilityInput:focus,
+.abilityValueInput:focus,
+.notesTextarea:focus {
+  outline: none;
+  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.6);
+  background: rgb(var(--map-ui-accent-rgb) / 0.14);
+}
+
+.abilityIconBtn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  border-radius: 5px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.abilityIconBtn:hover:not(:disabled) {
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
+  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.5);
+}
+
+.abilityIconBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.abilityRemoveBtn:hover:not(:disabled) {
+  background: rgb(var(--map-ui-danger-rgb) / 0.2);
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.55);
+}
+
+.addAbilityBtn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.12);
+  border: 1px dashed rgb(var(--map-ui-accent-rgb) / 0.4);
+  border-radius: 5px;
+  color: rgb(var(--map-ui-accent-bright-rgb) / 0.95);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.addAbilityBtn:hover:not(:disabled) {
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
+  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.6);
+}
+
+.addAbilityBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notesTextarea {
+  width: 100%;
+  padding: 7px 9px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.06);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  border-radius: 5px;
+  color: var(--text-primary, var(--map-ui-accent-text));
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 56px;
+}
+
 .notesSection {
   margin-top: 8px;
   padding: 10px 12px;
