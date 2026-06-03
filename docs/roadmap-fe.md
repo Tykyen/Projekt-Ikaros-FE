@@ -1961,12 +1961,15 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 
 ### - [ ] 13.1 Vyhledávání
 
-*Globální search. BE `search` kompletní — hybridní fulltext + sémantické.*
+*Per-world search hotový. BE `search` kompletní — hybridní fulltext + sémantické.
+Spec: `docs/arch/phase-13/spec-13.1.md`. **Per-world hotovo 2026-06-03.***
 
-- [ ] **13.1a — Search UI:** funkční search bar v headeru (`IkarosLayout` i `WorldLayout` — dnes jen statický `<div>Hledat…</div>`), zkratka Ctrl+K, modal / dropdown s výsledky, debounce
-- [ ] **13.1b — Výsledky + provideri:** `GET /search?q=&provider=&worldId=` — výběr provideru (Combined / fulltext / sémantický), skóre, proklik na výsledek
-- [ ] **13.1c — Index monitoring (admin):** stav indexace, rebuild / reindex (`stats` modul) — zapojit do admin hubu (fáze 12)
-- [ ] `mobil-desktop` audit
+- [x] **13.1a/b — Per-world search (`WorldLayout`):** funkční pole „Hledat…" v hlavičce světa (klik + `Ctrl/Cmd+K`), `WorldSearchModal` (debounce 300 ms, keyboard nav ↑/↓+Enter), výběr provideru (default Combined), skóre, proklik na stránku. `GET /search?q=&provider=&worldId=` s `worldId` filtrem → izolace světů. Mobil: hledání v draweru.
+- [x] **Infrastruktura:** MeiliSearch přidán do `docker-compose.yml` (fulltext provider); BE auto-rebuild indexu při startu. Bez něj search vracel prázdno.
+- [x] **Security (BE):** `worldId` povinný + access check (`findByIdForRequester`, 404 u cizího privátního světa); mutační search/stats endpointy gated `AdminGuard`.
+- [x] **13.1c — Index monitoring (admin):** tab „Search index" v `/admin` — stav indexace (status, vektory, progress) + tlačítko rebuild (`GET /stats/search`, `POST /stats/search/rebuild`).
+- [ ] **13.1a — Globální search (`IkarosLayout`):** cross-world search napříč platformou (volitelné rozšíření; BE access kontrola hotová). Per-world pokrývá hlavní use-case.
+- [x] `mobil-desktop` audit (per-world)
 
 ### - [ ] 13.2 Push notifikace (PWA)
 

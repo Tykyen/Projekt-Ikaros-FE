@@ -213,6 +213,25 @@
 }
 .searchBar:hover { border-color: var(--border); }
 
+/* 13.1 — text + kbd uvnitř search tlačítka */
+.searchBarText {
+  flex: 1;
+  text-align: left;
+}
+.searchKbd {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  font-size: var(--text-xs);
+  font-family: inherit;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+/* 13.1 — kompaktní lupa pro tablet/mobil (≤1024px), na desktopu skrytá */
+.searchIconBtn { display: none; }
+
 .actionBtn {
   display: flex;
   align-items: center;
@@ -331,6 +350,24 @@
   margin-bottom: var(--sp-2);
 }
 
+/* 13.1 — hledání v draweru (neutrální surface, ne accent jako Nová stránka) */
+.drawerSearch {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px; /* touch target — base.md */
+  padding: var(--sp-3) var(--sp-2);
+  border-radius: var(--radius-md);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  margin-bottom: var(--sp-2);
+}
+
 .drawerSection {
   margin-bottom: var(--sp-2);
 }
@@ -393,6 +430,8 @@
    (tablet) by se tlačil s „+ Nová stránka". Funkce hledání = fáze 13.1. */
 @media (max-width: 1024px) {
   .searchBar { display: none; }
+  /* 13.1 — místo plného pole se ukáže kompaktní lupa */
+  .searchIconBtn { display: flex; }
 }
 
 /* Hamburger od 1200px. Nav má 4 skupiny (Informace ▾, Svět, Nástroje ▾,
@@ -407,6 +446,9 @@
 
 @media (max-width: 768px) {
   .header { gap: var(--sp-2); }
+  /* 13.1 — na mobilu se lupa z headeru schová (tlačila by ostatní akce);
+     hledání je dostupné z draweru (drawerSearch) */
+  .searchIconBtn { display: none; }
   /* Spec 5.1 — na mobilu slot postavy jen avatar (jméno by tlačilo header) */
   .personaName { display: none; }
   .persona { max-width: none; }

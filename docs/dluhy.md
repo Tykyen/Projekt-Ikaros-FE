@@ -8,6 +8,15 @@
 
 ## Otevřené
 
+<!--
+  Vyřešeno 2026-06-03 (13.1 search):
+  - D-NEW-global-search-access-leak → opraveno: search vyžaduje worldId +
+    access check (worldsService.findByIdForRequester, 404 u cizího privátního
+    světa); mutační search/stats endpointy dostaly AdminGuard.
+  - D-NEW-search-index-monitoring → implementováno: admin tab „Search index"
+    (/admin?tab=search-index) — stav indexace + rebuild.
+-->
+
 ### D-NEW-shop-purchase-atomicity — Nákup v obchodě bez Mongo transakce
 **Soubory:** BE `campaign/services/campaign-purchase.service.ts` (`purchase` / `refund`)
 **Problém:** Nákup mění dva nezávislé subdokumenty — `CharacterInventory` (přidání položky)

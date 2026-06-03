@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { NavLink, Outlet, Link, useParams, useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import {
   NewPageWizardModal,
   type NewPageChoice,
 } from '@/features/world/pages/PageEditor/components/NewPageWizardModal';
+import { WorldSearchModal } from '@/features/world/search/components/WorldSearchModal';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 import s from './WorldLayout.module.css';
@@ -216,6 +218,8 @@ export function WorldLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   // 9.1 — wizard pro tvorbu nového obsahu (Wiki / PC / NPC).
   const [wizardOpen, setWizardOpen] = useState(false);
+  // 13.1 — vyhledávací modal světa (otevírá pole „Hledat…" i Ctrl/Cmd+K).
+  const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
 
   function handleWizardChoice(choice: NewPageChoice) {
@@ -240,6 +244,19 @@ export function WorldLayout() {
   const { data: world, isLoading } = useWorld(worldSlug);
   // Reálné ObjectId — pro membership lookup i BE volání downstream.
   const realWorldId = world?.id ?? '';
+
+  // 13.1 — Ctrl/Cmd+K otevře vyhledávání světa (jen když je svět načtený).
+  useEffect(() => {
+    if (!realWorldId) return;
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [realWorldId]);
   const { status, membership, isLoading: statusLoading } =
     useWorldStatus(realWorldId);
   // 8.3 — directory pro naplnění `character` slotu (jméno + avatar postavy
@@ -424,7 +441,25 @@ export function WorldLayout() {
               </nav>
 
               <div className={s.actions}>
-                <div className={s.searchBar}>Hledat...</div>
+                {/* 13.1 — desktop: plné pole; ≤1024px: kompaktní lupa */}
+                <button
+                  type="button"
+                  className={s.searchBar}
+                  onClick={() => setSearchOpen(true)}
+                >
+                  <Search size={16} aria-hidden="true" />
+                  <span className={s.searchBarText}>Hledat…</span>
+                  <kbd className={s.searchKbd}>Ctrl K</kbd>
+                </button>
+                <button
+                  type="button"
+                  className={clsx(s.actionBtn, s.searchIconBtn)}
+                  onClick={() => setSearchOpen(true)}
+                  title="Hledat"
+                  aria-label="Hledat"
+                >
+                  <Search size={16} aria-hidden="true" />
+                </button>
                 {isPJ && (
                   <button
                     type="button"
@@ -488,6 +523,18 @@ export function WorldLayout() {
               onClick={() => setDrawerOpen(false)}
             />
             <div className={clsx(s.drawer, drawerOpen && s.drawerOpen)}>
+              {/* 13.1 — hledání v draweru (na mobilu není lupa v headeru) */}
+              <button
+                type="button"
+                className={s.drawerSearch}
+                onClick={() => {
+                  setDrawerOpen(false);
+                  setSearchOpen(true);
+                }}
+              >
+                <Search size={16} aria-hidden="true" />
+                Hledat ve světě
+              </button>
               {isPJ && (
                 <button
                   type="button"
@@ -539,6 +586,17 @@ export function WorldLayout() {
           onChoose={handleWizardChoice}
           canUseBestiary={isPJ}
         />
+
+        {/* 13.1 — vyhledávání stránek světa (worldId filtr = izolace světů).
+            Mountuje se až při otevření → search hooky neběží zbytečně. */}
+        {realWorldId && searchOpen && (
+          <WorldSearchModal
+            open
+            onClose={() => setSearchOpen(false)}
+            worldId={realWorldId}
+            worldSlug={worldSlug}
+          />
+        )}
       </div>
     </WorldContext.Provider>
   );

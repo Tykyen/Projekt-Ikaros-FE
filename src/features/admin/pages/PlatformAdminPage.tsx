@@ -1,13 +1,19 @@
 import { useSearchParams } from 'react-router-dom';
-import { LayoutDashboard, Users, ClipboardList, Bug } from 'lucide-react';
+import { LayoutDashboard, Users, ClipboardList, Bug, Search } from 'lucide-react';
 import { Tabs, type TabItem } from '@/shared/ui/Tabs/Tabs';
 import { OverviewTab } from '../components/OverviewTab/OverviewTab';
 import { UsersAdminTab } from '../components/UsersAdminTab/UsersAdminTab';
 import { AuditLogTab } from '../users/components/AuditLogTab/AuditLogTab';
+import { SearchIndexTab } from '../components/SearchIndexTab/SearchIndexTab';
 import { FriendshipDebugTab } from '@/features/users/components/tabs/FriendshipDebugTab/FriendshipDebugTab';
 import s from './PlatformAdminPage.module.css';
 
-type AdminTab = 'prehled' | 'uzivatele' | 'audit' | 'friendship-debug';
+type AdminTab =
+  | 'prehled'
+  | 'uzivatele'
+  | 'audit'
+  | 'search-index'
+  | 'friendship-debug';
 
 const IS_DEV = import.meta.env.DEV;
 
@@ -15,6 +21,7 @@ const TABS: TabItem[] = [
   { id: 'prehled', label: 'Přehled', icon: <LayoutDashboard size={18} /> },
   { id: 'uzivatele', label: 'Uživatelé', icon: <Users size={18} /> },
   { id: 'audit', label: 'Audit log', icon: <ClipboardList size={18} /> },
+  { id: 'search-index', label: 'Search index', icon: <Search size={18} /> },
   // Dev-only nástroj — na produkci se nezobrazí.
   ...(IS_DEV
     ? [
@@ -31,6 +38,7 @@ const VALID = new Set<AdminTab>([
   'prehled',
   'uzivatele',
   'audit',
+  'search-index',
   ...(IS_DEV ? (['friendship-debug'] as AdminTab[]) : []),
 ]);
 
@@ -69,6 +77,7 @@ export default function PlatformAdminPage() {
         {tab === 'prehled' && <OverviewTab />}
         {tab === 'uzivatele' && <UsersAdminTab />}
         {tab === 'audit' && <AuditLogTab />}
+        {tab === 'search-index' && <SearchIndexTab />}
         {tab === 'friendship-debug' && IS_DEV && <FriendshipDebugTab />}
       </Tabs>
     </div>

@@ -408,6 +408,25 @@ const FAQ: FaqItem[] = [
       </>
     ),
   },
+  {
+    q: 'Jak hledám stránky ve světě?',
+    a: (
+      <>
+        <p>
+          V hlavičce světa je pole <strong>„Hledat…"</strong>. Klikni na něj
+          (nebo stiskni <strong>Ctrl+K</strong>, na Macu <strong>⌘ K</strong>) a
+          otevře se okno hledání. Jak píšeš, ukazují se nalezené stránky &mdash;
+          klikni na výsledek nebo vyber šipkami{' '}
+          <strong>↑ / ↓</strong> a potvrď <strong>Enter</strong>.
+        </p>
+        <p>
+          Hledání prohledává <strong>jen stránky aktuálního světa</strong> &mdash;
+          výsledky z jiných světů se nemíchají. Na mobilu najdeš{' '}
+          <strong>„Hledat ve světě"</strong> v menu (hamburger vpravo nahoře).
+        </p>
+      </>
+    ),
+  },
 ];
 
 export function FaqSection() {

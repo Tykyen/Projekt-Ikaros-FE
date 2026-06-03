@@ -40,7 +40,11 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-03 (12.3 — záložka Informace: rozbalovací
+          Aktualizováno k 2026-06-03 (13.1 — Hledání ve světě: pole „Hledat…"
+          v hlavičce světa (Ctrl+K), prohledá stránky aktuálního světa. Plus
+          Taktická mapa — bestie na mapě jsou
+          samostatné instance: PJ upravuje jejich schopnosti i poznámky přímo
+          u tokenu a každá si drží vlastní životy. Plus 12.3 — záložka Informace: rozbalovací
           Skupiny (každá skupina má stránku se seznamem hrajících členů) +
           Pravidla světa jako editovatelná wiki stránka. Plus 12.2 — Hlavní lišta světa: PJ skryje
           nepoužívané moduly, postaví vlastní navigaci a šablony menu a nastaví
