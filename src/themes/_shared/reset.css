@@ -41,5 +41,57 @@ select option {
   color: var(--theme-text, var(--text-primary, #fff));
 }
 
+/* ── Nativní form controls — sjednocení se synthwave tématem ─────────────────
+   Globální normalizace nativních prvků, které jinak OS vykresluje mimo téma.
+   Dřív řešeno per-komponenta a nekonzistentně (některé inputy spinner měly,
+   jiné ne — viz INIT BASE). Jedno místo = všechny formuláře najednou.
+   Specificity je záměrně nízká (element selektory), aby komponenty s vlastním
+   stylingem (CreateWorld gradient-šipka, CurrencySelect) tato pravidla přebily. */
+
+/* Number — skrýt nativní krok-šipky (vzhled mimo téma, viz INIT BASE pole). */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Checkbox / radio / range — obarvit nativní prvek akcentem aktivního tématu.
+   `accent-color` themuje zaškrtnutí/puntík/track jedním řádkem napříč browsery. */
+input[type='checkbox'],
+input[type='radio'],
+input[type='range'] {
+  accent-color: var(--accent, #8a6aff);
+}
+
+/* Select — skrýt nativní šipku a dosadit vlastní chevron v lavender odstínu
+   (ladí se synthwave napříč skiny na tmavém pozadí). Rozbalený option-list
+   zůstává OS-nativní (CSS ho nestyluje), barvy sjednocuje `select option` výše.
+
+   Specificity 0,1,1 (`:not([attr])`) záměrně přebíjí modulové `.select` třídy
+   (0,1,0) ve VŠECH vlastnostech (appearance / šipka / padding-right) — proto
+   nejsou potřeba per-komponentní úpravy a šipka nezmizí ani u selectů, které
+   ruší background/padding shorthandem (např. obchod). Opt-out: přidej atribut
+   `data-native-select` na select, který má zůstat nativní / má vlastní šipku. */
+select:not([data-native-select]) {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5L6 8.5L10 4.5' stroke='%23a89fd6' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 0.7rem;
+  padding-right: 2rem;
+}
+
+/* Range — sjednotit výšku tracku napříč browsery (accent-color obarví zbytek). */
+input[type='range'] {
+  height: 1.1rem;
+  cursor: pointer;
+}
+
 /* Theme decorations — gated displej, theme-specific decorations.css je zviditelní */
 [data-theme-decoration] { display: none; }
