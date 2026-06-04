@@ -21,7 +21,10 @@ export function getSocket(): Socket {
     auth: token ? { token } : undefined,
     withCredentials: true,
     autoConnect: true,
-    transports: ['websocket'],
+    // W-8 — `polling` jako fallback: za striktní proxy/firewallem bez WS
+    // upgrade by čistě `websocket` spojení nikdy nenavázalo a celá real-time
+    // vrstva by tiše nefungovala. Socket.io po připojení upgraduje na WS.
+    transports: ['websocket', 'polling'],
   });
 
   const store = getDefaultStore();

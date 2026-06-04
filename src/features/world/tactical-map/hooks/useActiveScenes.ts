@@ -18,6 +18,7 @@ import {
   type QueryKey,
 } from '@tanstack/react-query';
 import { getSocket } from '@/features/chat/api/socket';
+import { useSocketReconnect } from '@/features/chat/api/useSocket';
 import { listActiveMapScenes } from '../api/mapApi';
 import type { MapScene, WorldOperationBroadcast } from '../types';
 
@@ -69,6 +70,12 @@ export function useActiveScenes(
       socket.emit('map:leave-world', worldId);
     };
   }, [worldId, enabled, queryClient]);
+
+  // W-7 — re-join world scenes roomu po reconnectu. Bez toho PJ orchestrátor po
+  // výpadku přestane dostávat member operace a seznam aktivních scén zamrzne.
+  useSocketReconnect(() => {
+    if (worldId && enabled) getSocket().emit('map:join-world', worldId);
+  });
 
   return {
     scenes: query.data ?? [],

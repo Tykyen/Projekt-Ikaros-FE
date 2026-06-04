@@ -27,6 +27,11 @@ vi.mock('@/features/world/pages/api/useCharacterDirectory', () => ({
 vi.mock('@/features/world/api/useWorldSettings', () => ({
   useWorldSettings: () => ({ data: undefined, isLoading: false }),
 }));
+// W-9 — useWorldSocket (WS room + listenery) volá useQueryClient; layout test
+// ho neověřuje → no-op stub, aby nepotřeboval QueryClientProvider.
+vi.mock('@/features/world/hooks/useWorldSocket', () => ({
+  useWorldSocket: () => undefined,
+}));
 
 const fakeWorld: World = {
   id: 'w1',

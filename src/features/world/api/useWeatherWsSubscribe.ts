@@ -14,9 +14,10 @@ import { weatherGeneratorsKey } from './useWeatherGenerators';
 
 interface WeatherUpdatedPayload {
   worldId: string;
-  generatorId: string;
-  generatorName?: string;
-  weather: WeatherResult;
+  // W-6 — BE u clear (PJ vypnul počasí na mapě, 10.2i) posílá null.
+  generatorId: string | null;
+  generatorName?: string | null;
+  weather: WeatherResult | null;
 }
 
 export function useWeatherWsSubscribe(worldId: string): void {
@@ -24,15 +25,17 @@ export function useWeatherWsSubscribe(worldId: string): void {
 
   useSocketEvent<WeatherUpdatedPayload>('weather:updated', (event) => {
     if (!worldId || event.worldId !== worldId) return;
+    // Clear (`generatorId`/`weather` = null) se týká mapové atmosféry, ne karet
+    // generátorů (N-39) → karty nech beze změny.
+    if (!event.generatorId || !event.weather) return;
+    const { generatorId, weather } = event;
 
     qc.setQueryData<WeatherGenerator[]>(
       weatherGeneratorsKey(worldId),
       (old) => {
         if (!old) return old;
         return old.map((g) =>
-          g.id === event.generatorId
-            ? { ...g, currentWeather: event.weather }
-            : g,
+          g.id === generatorId ? { ...g, currentWeather: weather } : g,
         );
       },
     );

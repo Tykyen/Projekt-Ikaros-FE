@@ -39,6 +39,31 @@ export function useSocket(): Socket {
   return getSocket();
 }
 
+/**
+ * W-7 — spustí `onReconnect` po každém (re)connectu socketu. Socket.IO po
+ * reconnectu zahodí VŠECHNY rooms; ruční `room:join` se sám neobnoví, takže
+ * bez tohoto by listenery žily, ale server by do roomu nic neposílal (klient
+ * „oslepne"). Použij pro re-emit `room:join` / `map:join-world` apod.
+ *
+ * `connect` se emituje až PO (re)connectu — když je socket při mountu už
+ * připojený, initial se nevyvolá (žádný duplicate s mount-join useEffectem).
+ */
+export function useSocketReconnect(onReconnect: () => void): void {
+  const ref = useRef(onReconnect);
+  useEffect(() => {
+    ref.current = onReconnect;
+  }, [onReconnect]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    const handler = (): void => ref.current();
+    socket.on('connect', handler);
+    return () => {
+      socket.off('connect', handler);
+    };
+  }, []);
+}
+
 /** Přihlásí se k socket eventu a odhlásí při unmount. */
 export function useSocketEvent<T = unknown>(
   event: string,

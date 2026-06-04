@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import s from './WorldLayout.module.css';
 import { WorldContext, type WorldContextValue, type WorldCharacterSlot } from '@/features/world/context/WorldContext';
 import { useWorld } from '@/features/world/api/useWorlds';
+import { useWorldSocket } from '@/features/world/hooks/useWorldSocket';
 import { useWorldStatus } from '@/features/world/api/useWorldStatus';
 import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -244,6 +245,10 @@ export function WorldLayout() {
   const { data: world, isLoading } = useWorld(worldSlug);
   // Reálné ObjectId — pro membership lookup i BE volání downstream.
   const realWorldId = world?.id ?? '';
+
+  // W-9 — world-level real-time (world:updated/deleted/membership). Jediný
+  // vlastník `world:{id}` roomu pro celý svět; drží i reconnect re-join.
+  useWorldSocket(realWorldId || null);
 
   // 13.1 — Ctrl/Cmd+K otevře vyhledávání světa (jen když je svět načtený).
   useEffect(() => {

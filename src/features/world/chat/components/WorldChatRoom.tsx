@@ -6,7 +6,6 @@ import { Spinner } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { useWorldContext } from '@/features/world/context/WorldContext';
-import { getSocket } from '@/features/chat/api/socket';
 import { useSocketEvent } from '@/features/chat/api/useSocket';
 import {
   useChatGroups,
@@ -111,16 +110,11 @@ export function WorldChatRoom() {
     return allChannels[0].id;
   }, [selectedId, allChannels, storeKey]);
 
-  // ── WS: world room + živé aktualizace kanálů/konverzací/unread ──────────
-  useEffect(() => {
-    if (!worldId) return;
-    const socket = getSocket();
-    socket.emit('room:join', `world:${worldId}`);
-    return () => {
-      socket.emit('room:leave', `world:${worldId}`);
-    };
-  }, [worldId]);
-
+  // ── WS: živé aktualizace kanálů/konverzací/unread ───────────────────────
+  // `world:{id}` room joinuje WorldLayout (`useWorldSocket`) pro CELÝ svět —
+  // jediný vlastník (W-7/W-9). Kdyby ho držel i WorldChatRoom, přechod
+  // chat→jiná stránka by `room:leave` vykopl i WorldLayout. Tady jen
+  // posloucháme structure eventy (room + reconnect re-join řeší WorldLayout).
   const invalidateGroups = useCallback(() => {
     void qc.invalidateQueries({ queryKey: worldChatKeys(worldId).groups });
   }, [qc, worldId]);

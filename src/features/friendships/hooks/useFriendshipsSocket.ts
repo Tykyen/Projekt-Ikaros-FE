@@ -14,9 +14,15 @@ interface AcceptedPayload {
   friendshipId: string;
   by: { username: string };
 }
+// W-2 — declined/canceled/removed handlery payload nečtou (jen invalidace),
+// a canceled/removed `by` ani neemitují → typ zúžen na to, co opravdu chodí.
 interface SimplePayload {
   friendshipId: string;
-  by: { username: string };
+}
+// W-1 — blokace (ruší přátelství). Obě strany refetchnou seznam přátel.
+interface BlockedPayload {
+  blockerId: string;
+  blockedId: string;
 }
 
 /**
@@ -57,5 +63,13 @@ export function useFriendshipsSocket(): void {
   useSocketEvent<SimplePayload>('friend:removed', () => {
     qc.invalidateQueries({ queryKey: ['friends'] });
     qc.invalidateQueries({ queryKey: ['friendship-status'] });
+  });
+
+  // W-1 — blokace zruší přátelství; tichá invalidace bez toastu (blokovanému
+  // se „byl jsi zablokován" záměrně nepushuje).
+  useSocketEvent<BlockedPayload>('friend:blocked', () => {
+    qc.invalidateQueries({ queryKey: ['friends'] });
+    qc.invalidateQueries({ queryKey: ['friendship-status'] });
+    qc.invalidateQueries({ queryKey: ['pending-actions'] });
   });
 }

@@ -12,7 +12,7 @@ import { Menu, Users, Search } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
 import type { User } from '@/shared/types';
 import { getSocket } from '@/features/chat/api/socket';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 import { MessageList } from '@/features/chat/components/MessageList';
 import { TypingIndicator } from '@/features/chat/components/TypingIndicator';
 import { toChatItems } from '@/features/chat/lib/chatItems';
@@ -211,6 +211,19 @@ export function ChannelView({
     // markRead je stable per worldId — schválně mimo deps (jinak loop).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId, currentUser.id, currentUser.username, currentUser.avatarUrl]);
+
+  // W-7 — re-join chat roomu + presence po reconnectu. Bez toho po výpadku sítě
+  // přestanou chodit zprávy/typing/presence a hráč zmizí z PJ panelu přítomných.
+  useSocketReconnect(() => {
+    const socket = getSocket();
+    socket.emit('room:join', `chat:${channelId}`);
+    socket.emit('chat:channel:join', {
+      channelId,
+      userId: currentUser.id,
+      username: currentUser.username,
+      avatarUrl: currentUser.avatarUrl,
+    });
+  });
 
   useEffect(() => {
     const timers = typingTimers.current;
