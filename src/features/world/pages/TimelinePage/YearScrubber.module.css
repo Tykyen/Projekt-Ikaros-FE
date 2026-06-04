@@ -125,7 +125,7 @@
 .scrim {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(var(--black-rgb) / 0.5);
   z-index: 1000;
 }
 
@@ -137,7 +137,7 @@
   width: min(320px, 88vw);
   background: var(--surface-0, var(--page-bg, white));
   z-index: 1001;
-  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.2);
+  box-shadow: -2px 0 12px rgb(var(--black-rgb) / 0.2);
   overflow: hidden;
   display: flex;
   flex-direction: column;

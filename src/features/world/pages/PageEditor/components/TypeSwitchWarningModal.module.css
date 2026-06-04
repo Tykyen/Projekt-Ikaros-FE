@@ -1,6 +1,6 @@
 .text {
   margin: 0 0 1rem;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
   font-size: 0.92rem;
   line-height: 1.6;
 }
@@ -65,7 +65,7 @@
 }
 
 .btnSecondary {
-  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  border-color: var(--border, rgb(var(--white-rgb) / 0.15));
   background: transparent;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
 }

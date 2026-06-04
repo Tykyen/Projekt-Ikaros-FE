@@ -123,7 +123,7 @@
   border-radius: 50%;
   border: 2px solid var(--img-marker-border, #fff);
   background: color-mix(in srgb, var(--accent) 70%, transparent);
-  box-shadow: var(--img-marker-shadow, 0 2px 8px rgba(0, 0, 0, 0.5));
+  box-shadow: var(--img-marker-shadow, 0 2px 8px rgb(var(--black-rgb) / 0.5));
   transform: translate(-50%, -50%);
   pointer-events: none;
   transition:
@@ -145,7 +145,7 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: var(--img-ctrl-bg, rgba(0, 0, 0, 0.55));
+  background: var(--img-ctrl-bg, rgb(var(--black-rgb) / 0.55));
   color: var(--img-ctrl-fg, #fff);
   display: flex;
   align-items: center;
@@ -153,5 +153,5 @@
   cursor: pointer;
 }
 .removeImage:hover {
-  background: var(--img-ctrl-bg-strong, rgba(0, 0, 0, 0.75));
+  background: var(--img-ctrl-bg-strong, rgb(var(--black-rgb) / 0.75));
 }

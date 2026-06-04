@@ -9,7 +9,7 @@
   border-radius: var(--radius-sm, 6px);
   border: 1px solid transparent;
   background: transparent;
-  color: var(--theme-text-dim, rgba(255, 255, 255, 0.6));
+  color: var(--theme-text-dim, rgb(var(--white-rgb) / 0.6));
   cursor: pointer;
   transition:
     background 0.15s ease,
@@ -19,7 +19,7 @@
 }
 
 .btn:hover {
-  border-color: var(--theme-border-soft, rgba(255, 255, 255, 0.1));
+  border-color: var(--theme-border-soft, rgb(var(--white-rgb) / 0.1));
   color: var(--theme-text, #fff);
 }
 

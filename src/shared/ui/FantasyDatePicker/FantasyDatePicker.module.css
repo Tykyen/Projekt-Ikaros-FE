@@ -7,8 +7,8 @@
 
 .field {
   padding: 4px 8px;
-  background: var(--theme-bg, rgba(0, 0, 0, 0.2));
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  background: var(--theme-bg, rgb(var(--black-rgb) / 0.2));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.12));
   border-radius: 4px;
   color: var(--theme-text);
   font-family: var(--font-body, 'Rajdhani', sans-serif);

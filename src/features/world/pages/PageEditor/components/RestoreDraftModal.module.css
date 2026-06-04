@@ -1,6 +1,6 @@
 .text {
   margin: 0 0 1rem;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
   line-height: 1.6;
   font-size: 0.92rem;
 }
@@ -11,8 +11,8 @@
   gap: 0.55rem;
   margin-bottom: 1.25rem;
   padding: 0.85rem 1rem;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 6px;
 }
 
@@ -67,12 +67,12 @@
 }
 
 .btnSecondary {
-  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  border-color: var(--border, rgb(var(--white-rgb) / 0.15));
   background: transparent;
-  color: var(--text-muted, rgba(255, 255, 255, 0.75));
+  color: var(--text-muted, rgb(var(--white-rgb) / 0.75));
 }
 
 .btnSecondary:hover {
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
   color: var(--text-strong, #fff);
 }

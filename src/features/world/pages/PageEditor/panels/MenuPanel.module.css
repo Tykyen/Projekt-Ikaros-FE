@@ -6,7 +6,7 @@
 }
 
 .hint code {
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
   padding: 0.05rem 0.3rem;
   border-radius: 3px;
   font-size: 0.78rem;
@@ -16,7 +16,7 @@
   padding: 1.5rem;
   text-align: center;
   color: var(--text-muted, rgba(220, 230, 255, 0.55));
-  border: 1px dashed var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px dashed var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 6px;
   margin-bottom: 1rem;
 }
@@ -43,9 +43,9 @@
 
 .labelInput {
   padding: 0.5rem 0.7rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 6px;
-  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  background: var(--bg-input, rgb(var(--black-rgb) / 0.25));
   color: var(--text-strong, #fff);
   font-size: 0.88rem;
   min-width: 0;
@@ -67,7 +67,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   background: transparent;
   color: var(--text-muted, rgba(220, 230, 255, 0.55));
   border-radius: 4px;
@@ -75,7 +75,7 @@
 }
 
 .iconBtn:hover:not(:disabled) {
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.06));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.06));
   color: var(--text-strong, #fff);
 }
 

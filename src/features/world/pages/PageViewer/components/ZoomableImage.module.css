@@ -4,7 +4,7 @@
   border-radius: 10px;
   overflow: hidden;
   background: var(--bg-overlay, rgba(4, 9, 20, 0.9));
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.06));
   outline: none;
 }
 
@@ -37,7 +37,7 @@
   background: rgba(4, 9, 20, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.1));
   border-radius: 8px;
   z-index: 5;
 }
@@ -48,7 +48,7 @@
   justify-content: center;
   min-width: 36px;
   height: 36px;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   background: transparent;
   color: var(--text-strong, #fff);
   border-radius: 4px;

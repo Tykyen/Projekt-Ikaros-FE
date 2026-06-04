@@ -17,9 +17,9 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.4rem 0.7rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.14));
   border-radius: 8px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
   color: var(--text-strong, #fff);
   font-size: 0.85rem;
   cursor: pointer;
@@ -30,11 +30,11 @@
 }
 
 .card {
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 10px;
   padding: 0.85rem;
   margin-bottom: 0.85rem;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.03));
 }
 
 .cardHead {
@@ -48,9 +48,9 @@
   flex: 1;
   min-width: 0;
   padding: 0.4rem 0.6rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.14));
   border-radius: 8px;
-  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  background: var(--bg-input, rgb(var(--black-rgb) / 0.25));
   color: var(--text-strong, #fff);
   font-size: 0.9rem;
   font-weight: 600;
@@ -69,7 +69,7 @@
   justify-content: center;
   width: 30px;
   height: 30px;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 7px;
   background: transparent;
   color: var(--text-muted, rgba(220, 230, 255, 0.6));
@@ -87,7 +87,7 @@
 }
 
 .access {
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.1));
   border-radius: 8px;
   padding: 0.7rem;
   margin: 0 0 0.7rem;
@@ -136,9 +136,9 @@
 .input {
   width: 100%;
   padding: 0.4rem 0.55rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.14));
   border-radius: 7px;
-  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  background: var(--bg-input, rgb(var(--black-rgb) / 0.25));
   color: var(--text-strong, #fff);
   font-size: 0.85rem;
 }
@@ -155,9 +155,9 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.4rem 0.25rem 0.55rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.14));
   border-radius: 999px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
   font-size: 0.8rem;
   color: var(--text-strong, #fff);
 }
@@ -180,7 +180,7 @@
   list-style: none;
   margin: 0.35rem 0 0;
   padding: 0;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 7px;
   overflow: hidden;
 }
@@ -198,7 +198,7 @@
 }
 
 .userList button:hover {
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.06));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.06));
 }
 
 /* Mobil — clearance/role pod sebe. */

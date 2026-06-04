@@ -11,8 +11,8 @@
   align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-1) var(--sp-2);
-  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+  background: var(--theme-surface, rgb(var(--white-rgb) / 0.04));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.08));
   border-radius: 6px;
 }
 
@@ -23,7 +23,7 @@
   width: 28px;
   height: 28px;
   background: transparent;
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.12));
   border-radius: 4px;
   color: var(--theme-text);
   cursor: pointer;
@@ -51,7 +51,7 @@
 
 .monthLabel:hover {
   border-color: var(--theme-accent, #7c5cff);
-  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+  background: var(--theme-surface, rgb(var(--white-rgb) / 0.04));
 }
 
 .jumpPopover {
@@ -67,13 +67,13 @@
   background: var(--theme-surface, rgba(20, 10, 40, 0.96));
   border: 1px solid var(--theme-accent, #7c5cff);
   border-radius: 6px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 20px rgb(var(--black-rgb) / 0.45);
 }
 
 .jumpField {
   padding: 4px 8px;
-  background: var(--theme-bg, rgba(0, 0, 0, 0.3));
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  background: var(--theme-bg, rgb(var(--black-rgb) / 0.3));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.12));
   border-radius: 4px;
   color: var(--theme-text);
   font-family: var(--font-body);
@@ -99,7 +99,7 @@
 .todayBtn {
   padding: 4px 12px;
   background: transparent;
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.12));
   border-radius: 4px;
   color: var(--theme-text);
   font-family: var(--font-body);
@@ -113,8 +113,8 @@
 
 .calSelect {
   padding: 4px 8px;
-  background: var(--theme-bg, rgba(0, 0, 0, 0.2));
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+  background: var(--theme-bg, rgb(var(--black-rgb) / 0.2));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.12));
   border-radius: 4px;
   color: var(--theme-text);
   font-family: var(--font-body);
@@ -124,15 +124,15 @@
 .grid {
   display: grid;
   gap: 1px;
-  background: var(--theme-border, rgba(255, 255, 255, 0.08));
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+  background: var(--theme-border, rgb(var(--white-rgb) / 0.08));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.08));
   border-radius: 6px;
   overflow: hidden;
 }
 
 .weekday {
   padding: var(--sp-1);
-  background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+  background: var(--theme-surface, rgb(var(--white-rgb) / 0.04));
   text-align: center;
   font-family: var(--font-body);
   font-size: 11px;
@@ -145,7 +145,7 @@
   position: relative;
   min-height: 88px;
   padding: var(--sp-1);
-  background: var(--theme-bg, rgba(0, 0, 0, 0.2));
+  background: var(--theme-bg, rgb(var(--black-rgb) / 0.2));
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -171,7 +171,7 @@
 }
 
 .cellClickable:hover {
-  background: var(--theme-surface-hover, rgba(255, 255, 255, 0.07));
+  background: var(--theme-surface-hover, rgb(var(--white-rgb) / 0.07));
 }
 
 .cellClickable:hover .addHint {

@@ -85,7 +85,7 @@
   border: 2px solid white;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 1px rgb(var(--black-rgb) / 0.4);
   pointer-events: none;
 }
 
@@ -96,7 +96,7 @@
   /* Desktop kompakt, mobil zvětší na 44px (touch a11y). */
   width: 32px;
   height: 32px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(var(--black-rgb) / 0.6);
   color: white;
   border: none;
   border-radius: 50%;

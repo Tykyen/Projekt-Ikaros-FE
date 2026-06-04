@@ -109,7 +109,7 @@
   height: 16px;
   border: none;
   border-radius: 50%;
-  background: var(--theme-shadow, rgba(0, 0, 0, 0.6));
+  background: var(--theme-shadow, rgb(var(--black-rgb) / 0.6));
   color: white;
   cursor: pointer;
   display: inline-flex;

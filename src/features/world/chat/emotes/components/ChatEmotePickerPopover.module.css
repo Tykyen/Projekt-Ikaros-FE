@@ -15,7 +15,7 @@
   border: 1px solid var(--theme-border);
   border-radius: 8px;
   box-shadow:
-    0 -8px 40px rgba(0, 0, 0, 0.5),
+    0 -8px 40px rgb(var(--black-rgb) / 0.5),
     0 0 60px rgba(169, 108, 255, 0.12);
   overflow: hidden;
   color: var(--theme-text);

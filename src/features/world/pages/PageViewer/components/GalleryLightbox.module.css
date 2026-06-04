@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.92);
+  background: rgb(var(--black-rgb) / 0.92);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   z-index: 9999;
@@ -37,11 +37,11 @@
   max-height: 80vh;
   object-fit: contain;
   border-radius: 6px;
-  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 12px 60px rgb(var(--black-rgb) / 0.6);
 }
 
 .caption {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgb(var(--white-rgb) / 0.85);
   font-size: 0.92rem;
   line-height: 1.5;
   text-align: center;
@@ -52,7 +52,7 @@
 .counter {
   font-variant-numeric: tabular-nums;
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgb(var(--white-rgb) / 0.55);
 }
 
 .closeBtn,
@@ -63,8 +63,8 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgb(var(--white-rgb) / 0.15);
+  background: rgb(var(--black-rgb) / 0.5);
   color: #fff;
   border-radius: 50%;
   cursor: pointer;
@@ -73,7 +73,7 @@
 
 .closeBtn:hover,
 .navBtn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgb(var(--white-rgb) / 0.12);
   transform: scale(1.05);
 }
 

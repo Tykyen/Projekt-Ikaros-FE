@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
   font-size: 0.92rem;
   line-height: 1.55;
 }
@@ -30,7 +30,7 @@
 
 .confirm code {
   font-family: ui-monospace, monospace;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
   padding: 0.1rem 0.4rem;
   border-radius: 3px;
   color: var(--accent-bright, var(--accent, #fff));
@@ -38,9 +38,9 @@
 
 .input {
   padding: 0.55rem 0.75rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 6px;
-  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  background: var(--bg-input, rgb(var(--black-rgb) / 0.25));
   color: var(--text-strong, #fff);
   font-size: 0.92rem;
   font-family: ui-monospace, monospace;
@@ -71,13 +71,13 @@
 }
 
 .btnSecondary {
-  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  border-color: var(--border, rgb(var(--white-rgb) / 0.15));
   background: transparent;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
 }
 
 .btnSecondary:hover {
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
 }
 
 .btnDanger {

@@ -6,7 +6,7 @@
   background: var(--bg-panel, rgba(20, 25, 35, 0.92));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-top: 1px solid var(--border, rgb(var(--white-rgb) / 0.1));
 }
 
 .actions {

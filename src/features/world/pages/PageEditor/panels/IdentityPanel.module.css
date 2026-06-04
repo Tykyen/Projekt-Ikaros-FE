@@ -55,9 +55,9 @@
 .input,
 .select {
   padding: 0.55rem 0.75rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 6px;
-  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  background: var(--bg-input, rgb(var(--black-rgb) / 0.25));
   color: var(--text-strong, #fff);
   font-size: 0.92rem;
   font-family: inherit;
@@ -68,7 +68,7 @@
 .select:focus {
   outline: none;
   border-color: var(--accent, currentColor);
-  background: var(--bg-input-focus, rgba(0, 0, 0, 0.4));
+  background: var(--bg-input-focus, rgb(var(--black-rgb) / 0.4));
 }
 
 .input::placeholder {
@@ -97,15 +97,15 @@
   align-items: flex-start;
   gap: 0.6rem;
   padding: 0.65rem 0.85rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 6px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.02));
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
 }
 
 .checkbox:hover {
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
   border-color: var(--accent-soft, rgba(120, 200, 255, 0.3));
 }
 

@@ -18,7 +18,7 @@
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  color: var(--text-secondary, rgb(var(--white-rgb) / 0.7));
 }
 
 .input,

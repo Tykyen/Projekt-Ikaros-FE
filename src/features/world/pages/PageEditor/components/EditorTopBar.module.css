@@ -4,8 +4,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1.25rem;
-  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  border-bottom: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.02));
   flex-wrap: wrap;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .crumbCurrent {
-  color: var(--text-strong, rgba(255, 255, 255, 0.9));
+  color: var(--text-strong, rgb(var(--white-rgb) / 0.9));
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -83,9 +83,9 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.4rem 0.7rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.15));
   background: transparent;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.82rem;

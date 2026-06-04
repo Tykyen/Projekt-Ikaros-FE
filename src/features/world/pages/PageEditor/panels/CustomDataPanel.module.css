@@ -27,9 +27,9 @@
 
 .input {
   padding: 0.55rem 0.75rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 6px;
-  background: var(--bg-input, rgba(0, 0, 0, 0.25));
+  background: var(--bg-input, rgb(var(--black-rgb) / 0.25));
   color: var(--text-strong, #fff);
   font-size: 0.92rem;
   font-family: inherit;

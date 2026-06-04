@@ -16,8 +16,8 @@
 .editTabBtn {
   padding: 0.4rem 0.9rem;
   border-radius: 6px;
-  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.15));
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-default, rgb(var(--white-rgb) / 0.15));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
   color: inherit;
   font-size: 0.85rem;
   font-weight: 500;
@@ -26,8 +26,8 @@
 }
 
 .editTabBtn:hover {
-  background: var(--bg-overlay-hover, rgba(255, 255, 255, 0.1));
-  border-color: var(--border-strong, rgba(255, 255, 255, 0.3));
+  background: var(--bg-overlay-hover, rgb(var(--white-rgb) / 0.1));
+  border-color: var(--border-strong, rgb(var(--white-rgb) / 0.3));
 }
 
 .editTabBtn[aria-pressed='true'] {

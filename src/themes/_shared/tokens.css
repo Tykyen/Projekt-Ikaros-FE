@@ -106,6 +106,12 @@
   /* Scrim / overlay — semi-transparent backdrop nad obsahem (drag&drop, modaly) */
   --scrim: rgb(0 0 0 / 0.55);
 
+  /* N-2 — univerzální RGB konstanty pro alpha overlaye (bílá/černá nejsou
+     theme-variabilní). Použití: rgb(var(--white-rgb) / 0.08). Žádné téma
+     je nepřepisuje — jsou to fyzikální konstanty, ne designové tokeny. */
+  --white-rgb: 255 255 255;
+  --black-rgb: 0 0 0;
+
   /* Z-index */
   --z-base: 0;
   --z-dropdown: 100;

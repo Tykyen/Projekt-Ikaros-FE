@@ -9,7 +9,7 @@
   background: var(--theme-surface-2, rgba(20, 16, 50, 0.98));
   border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.2));
   border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 20px 60px rgb(var(--black-rgb) / 0.55);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   animation: popoverIn 140ms ease-out-cubic;

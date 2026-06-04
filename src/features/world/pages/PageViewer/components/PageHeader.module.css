@@ -29,7 +29,7 @@
 }
 
 .crumbCurrent {
-  color: var(--text-strong, rgba(255, 255, 255, 0.9));
+  color: var(--text-strong, rgb(var(--white-rgb) / 0.9));
   font-weight: 500;
 }
 
@@ -159,7 +159,7 @@
   letter-spacing: 0.05em;
   font-size: 0.72rem;
   padding: 0.15rem 0.45rem;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
   border-radius: 4px;
 }
 

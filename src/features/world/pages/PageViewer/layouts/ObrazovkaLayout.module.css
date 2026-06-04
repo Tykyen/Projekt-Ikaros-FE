@@ -9,9 +9,9 @@
   position: sticky;
   top: calc(var(--header-h, 64px) + 16px);
   padding: 1rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 8px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.03));
   max-height: calc(100vh - var(--header-h, 64px) - 32px);
   overflow-y: auto;
 }
@@ -43,7 +43,7 @@
   background: transparent;
   border-left: 3px solid transparent;
   border-radius: 0 4px 4px 0;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
   cursor: pointer;
   text-align: left;
   font-size: 0.9rem;
@@ -51,7 +51,7 @@
 }
 
 .menuItem:hover {
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
   border-left-color: var(--accent-soft, rgba(120, 200, 255, 0.4));
 }
 
@@ -87,7 +87,7 @@
   background: #000;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
 }
 
 .iframe {
@@ -119,9 +119,9 @@
   gap: 1rem;
   padding: 4rem 1.5rem;
   text-align: center;
-  border: 1px dashed var(--border, rgba(255, 255, 255, 0.1));
+  border: 1px dashed var(--border, rgb(var(--white-rgb) / 0.1));
   border-radius: 10px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.02));
   color: var(--text-muted, rgba(220, 230, 255, 0.55));
 }
 

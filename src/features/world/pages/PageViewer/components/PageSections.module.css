@@ -6,9 +6,9 @@
 }
 
 .card {
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 8px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.02));
   overflow: hidden;
 }
 
@@ -53,7 +53,7 @@
 .content {
   font-size: 0.95rem;
   line-height: 1.65;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
 }
 
 .content :global(p) {
@@ -79,13 +79,13 @@
   gap: 0.5rem;
   padding: 0.4rem 0.55rem;
   border-radius: 4px;
-  background: var(--bg-overlay, rgba(0, 0, 0, 0.2));
+  background: var(--bg-overlay, rgb(var(--black-rgb) / 0.2));
   font-size: 0.9rem;
 }
 
 .itemText {
   flex-grow: 1;
-  color: var(--text, rgba(255, 255, 255, 0.9));
+  color: var(--text, rgb(var(--white-rgb) / 0.9));
 }
 
 .itemQty {

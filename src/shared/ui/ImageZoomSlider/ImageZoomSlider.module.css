@@ -41,7 +41,7 @@
   background: var(--accent);
   border: 2px solid var(--bg-base, #fff);
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgb(var(--black-rgb) / 0.3);
   transition: background var(--transition-fast);
 }
 .slider::-webkit-slider-thumb:hover {
@@ -55,7 +55,7 @@
   background: var(--accent);
   border: 2px solid var(--bg-base, #fff);
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgb(var(--black-rgb) / 0.3);
 }
 
 .value {

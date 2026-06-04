@@ -5,9 +5,9 @@
   gap: 0.2rem;
   padding: 0.3rem;
   background: var(--bg-panel, #1a1f28);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 24px rgb(var(--black-rgb) / 0.45);
   animation: fadeUp 140ms ease;
 }
 
@@ -29,7 +29,7 @@
   padding: 0.4rem 0.6rem;
   border: none;
   background: transparent;
-  color: var(--text, rgba(255, 255, 255, 0.9));
+  color: var(--text, rgb(var(--white-rgb) / 0.9));
   font-size: 0.78rem;
   border-radius: 4px;
   cursor: pointer;

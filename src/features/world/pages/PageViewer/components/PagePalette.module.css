@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgb(var(--black-rgb) / 0.55);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 9998;
@@ -15,9 +15,9 @@
   width: 100%;
   max-width: 560px;
   background: var(--bg-panel, #14181f);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
   border-radius: 10px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 24px 60px rgb(var(--black-rgb) / 0.55);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@
   align-items: center;
   gap: 0.65rem;
   padding: 0.95rem 1rem;
-  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
 }
 
 .searchIcon {
@@ -66,7 +66,7 @@
   padding: 0.6rem 0.75rem;
   border: none;
   background: transparent;
-  color: var(--text, rgba(255, 255, 255, 0.85));
+  color: var(--text, rgb(var(--white-rgb) / 0.85));
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
@@ -98,7 +98,7 @@
   letter-spacing: 0.06em;
   color: var(--text-muted, rgba(220, 230, 255, 0.45));
   padding: 0.15rem 0.4rem;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.05));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.05));
   border-radius: 3px;
 }
 
@@ -115,7 +115,7 @@
   justify-content: center;
   gap: 1rem;
   padding: 0.6rem 1rem;
-  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  border-top: 1px solid var(--border, rgb(var(--white-rgb) / 0.06));
   font-size: 0.75rem;
   color: var(--text-muted, rgba(220, 230, 255, 0.4));
 }
@@ -124,9 +124,9 @@
   display: inline-block;
   margin-right: 0.25rem;
   padding: 0.05rem 0.3rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.15));
   border-radius: 3px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
   font-family: ui-monospace, monospace;
   font-size: 0.72rem;
 }

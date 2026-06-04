@@ -11,9 +11,9 @@
   justify-content: space-between;
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 8px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.03));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.03));
   color: var(--text-strong, #fff);
   font-size: 0.9rem;
   font-weight: 500;
@@ -35,8 +35,8 @@
   width: 100%;
   border-radius: 10px;
   overflow: hidden;
-  background: var(--bg-overlay, rgba(0, 0, 0, 0.3));
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  background: var(--bg-overlay, rgb(var(--black-rgb) / 0.3));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.06));
 }
 
 .hero {
@@ -48,10 +48,10 @@
 }
 
 .tableWrap {
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 8px;
   padding: 1rem 1.1rem;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.02));
 }
 
 .tableTitle {
@@ -69,7 +69,7 @@
 }
 
 .table tr {
-  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.05));
+  border-bottom: 1px solid var(--border, rgb(var(--white-rgb) / 0.05));
 }
 
 .table tr:last-child {

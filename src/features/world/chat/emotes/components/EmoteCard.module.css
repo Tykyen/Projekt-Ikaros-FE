@@ -136,7 +136,7 @@
 
 .actionBtn:hover {
   color: var(--theme-accent-bright, #c9a4ff);
-  background: var(--theme-nav-hover-bg, rgba(255, 255, 255, 0.04));
+  background: var(--theme-nav-hover-bg, rgb(var(--white-rgb) / 0.04));
 }
 
 @media (max-width: 768px) {

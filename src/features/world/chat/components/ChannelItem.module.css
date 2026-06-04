@@ -34,10 +34,10 @@
   transition: background var(--transition-fast);
 }
 .main:hover {
-  background: var(--theme-nav-hover-bg, rgba(255, 255, 255, 0.04));
+  background: var(--theme-nav-hover-bg, rgb(var(--white-rgb) / 0.04));
 }
 .active .main {
-  background: var(--theme-nav-active-bg, rgba(255, 255, 255, 0.06));
+  background: var(--theme-nav-active-bg, rgb(var(--white-rgb) / 0.06));
 }
 
 .row1 {
@@ -165,7 +165,7 @@
   height: 100%;
   border-radius: var(--radius-sm);
   object-fit: cover;
-  background: var(--theme-bg-elev, rgba(0, 0, 0, 0.2));
+  background: var(--theme-bg-elev, rgb(var(--black-rgb) / 0.2));
 }
 .thumbAccess {
   position: absolute;

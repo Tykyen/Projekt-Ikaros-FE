@@ -34,7 +34,7 @@
   pointer-events: none;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 16px 60px rgb(var(--black-rgb) / 0.55);
 }
 
 @keyframes resultPop {
@@ -147,7 +147,7 @@
 .rollerName {
   font-size: 0.78rem;
   color: rgba(180, 200, 255, 0.55);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 6px rgb(var(--black-rgb) / 0.9);
   font-family: 'Cinzel', serif;
   letter-spacing: 1px;
 }

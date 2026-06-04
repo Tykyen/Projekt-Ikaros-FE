@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--z-modal, 1000);
-  background: rgba(0, 0, 0, 0.55);
+  background: rgb(var(--black-rgb) / 0.55);
   display: flex;
   justify-content: flex-end;
   animation: fade 0.15s ease;
@@ -15,7 +15,7 @@
   flex-direction: column;
   background: var(--bg-primary, #14101e);
   border-left: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.25));
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+  box-shadow: -8px 0 32px rgb(var(--black-rgb) / 0.4);
   animation: slideIn 0.18s ease;
 }
 
@@ -26,7 +26,7 @@
   gap: var(--sp-2, 8px);
   padding: var(--sp-3, 12px) var(--sp-4, 16px);
   border-bottom: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.2));
-  background: var(--header-bg, rgba(255, 255, 255, 0.02));
+  background: var(--header-bg, rgb(var(--white-rgb) / 0.02));
 }
 
 .title {
@@ -52,7 +52,7 @@
   transition: background var(--transition-fast, 0.12s) ease;
 }
 .close:hover {
-  background: var(--bg-card-hover, rgba(255, 255, 255, 0.06));
+  background: var(--bg-card-hover, rgb(var(--white-rgb) / 0.06));
 }
 
 /* ── Záložky ────────────────────────────────────────────────────────────── */
@@ -115,7 +115,7 @@
   gap: var(--sp-2, 8px);
   padding: var(--sp-2, 8px) var(--sp-3, 12px);
   border-radius: var(--radius-md, 8px);
-  background: var(--bg-card-hover, rgba(255, 255, 255, 0.04));
+  background: var(--bg-card-hover, rgb(var(--white-rgb) / 0.04));
 }
 .pendingLabel {
   font-size: var(--text-sm, 0.88rem);
@@ -151,7 +151,7 @@
   transition: background var(--transition-fast, 0.12s) ease;
 }
 .item:hover {
-  background: var(--bg-card-hover, rgba(255, 255, 255, 0.05));
+  background: var(--bg-card-hover, rgb(var(--white-rgb) / 0.05));
 }
 
 .itemBody {
@@ -252,7 +252,7 @@
   gap: var(--sp-2, 8px);
   padding: var(--sp-2, 10px) var(--sp-4, 16px);
   border-top: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.2));
-  background: var(--header-bg, rgba(255, 255, 255, 0.02));
+  background: var(--header-bg, rgb(var(--white-rgb) / 0.02));
 }
 .pushLabel {
   font-size: var(--text-xs, 0.78rem);

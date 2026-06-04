@@ -37,10 +37,10 @@
   width: 100%;
   aspect-ratio: 3 / 2;
   padding: 0;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 8px;
   overflow: hidden;
-  background: var(--bg-overlay, rgba(0, 0, 0, 0.4));
+  background: var(--bg-overlay, rgb(var(--black-rgb) / 0.4));
   cursor: pointer;
   transition: transform 160ms ease, border-color 160ms ease;
 }
@@ -74,7 +74,7 @@
   padding: 3rem 1.5rem;
   text-align: center;
   color: var(--text-muted, rgba(220, 230, 255, 0.55));
-  border: 1px dashed var(--border, rgba(255, 255, 255, 0.1));
+  border: 1px dashed var(--border, rgb(var(--white-rgb) / 0.1));
   border-radius: 8px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.02));
 }

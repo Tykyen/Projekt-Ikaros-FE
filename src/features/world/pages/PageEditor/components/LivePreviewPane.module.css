@@ -2,8 +2,8 @@
   position: sticky;
   top: 0;
   height: calc(100vh - 56px);
-  border-left: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  background: var(--bg-overlay, rgba(0, 0, 0, 0.15));
+  border-left: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
+  background: var(--bg-overlay, rgb(var(--black-rgb) / 0.15));
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@
   gap: 0.5rem;
   padding: 0.55rem 1rem;
   background: var(--bg-panel, rgba(20, 25, 35, 0.7));
-  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-muted, rgba(220, 230, 255, 0.65));

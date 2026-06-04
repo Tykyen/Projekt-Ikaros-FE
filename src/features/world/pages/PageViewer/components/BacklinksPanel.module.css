@@ -1,9 +1,9 @@
 .wrap {
   margin-top: 2.5rem;
   padding: 1.25rem 1.5rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 10px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.02));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.02));
 }
 
 .header {
@@ -41,11 +41,11 @@
   align-items: center;
   gap: 0.55rem;
   padding: 0.6rem 0.85rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 6px;
   background: var(--bg-panel, rgba(20, 25, 35, 0.4));
   text-decoration: none;
-  color: var(--text, rgba(255, 255, 255, 0.88));
+  color: var(--text, rgb(var(--white-rgb) / 0.88));
   font-size: 0.9rem;
   transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
@@ -74,7 +74,7 @@
   letter-spacing: 0.06em;
   color: var(--text-muted, rgba(220, 230, 255, 0.4));
   padding: 0.1rem 0.4rem;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
   border-radius: 3px;
   flex-shrink: 0;
 }
@@ -82,7 +82,7 @@
 .skeleton {
   height: 38px;
   border-radius: 6px;
-  background: var(--bg-overlay, rgba(255, 255, 255, 0.04));
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
   animation: pulse 1.5s ease-in-out infinite;
 }
 

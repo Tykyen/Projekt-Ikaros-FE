@@ -18,8 +18,8 @@
   grid-template-columns: repeat(6, 1fr);
   gap: var(--sp-2);
   padding: var(--sp-2);
-  background: var(--theme-surface-2, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+  background: var(--theme-surface-2, rgb(var(--white-rgb) / 0.04));
+  border: 1px solid var(--theme-border, rgb(var(--white-rgb) / 0.08));
   border-radius: var(--radius-sm);
 }
 
@@ -65,7 +65,7 @@
   padding: var(--sp-1) var(--sp-2);
   align-self: flex-start;
   background: transparent;
-  border: 1px dashed var(--theme-border, rgba(255, 255, 255, 0.12));
+  border: 1px dashed var(--theme-border, rgb(var(--white-rgb) / 0.12));
   border-radius: var(--radius-sm);
   color: var(--theme-text-dim, var(--text-muted));
   font-size: var(--text-xs);
