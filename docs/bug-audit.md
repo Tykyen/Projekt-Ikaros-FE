@@ -11,16 +11,17 @@
 
 > **Stav: 32 nálezů opraveno** (+ D-029) + **4 ze 4 N-6b features + N-3**, commitnuto + pushnuto na main.
 > Nově: N-12 (paginace), N-33 (events), N-18 (membership worldId), N-14 (reviewers), **N-6b username-request** (BE doplněno), **N-6b admin-friendships** (mapping bez schema migrace), **N-6b self-deletion + reaktivace** (celá 1.3c BE), **N-3 cron hard-cleanup** (GDPR anonymizace).
-> **N-17 → by-design** (Zadatel=member, spec 2.4). **Technické dotaženo (N-12/23/33/34).** Zbývá už jen 5 nálezů k ROZHODNUTÍ (N-8/27, N-11, N-14, N-17, N-18) + N-2 (barvy) + infra-trigger dluhy.
+> **Všechny otevřené nálezy vyřešené nebo rozhodnuté (2026-06-04).** Zbývá už jen **N-2 (barvy)** = velký konzistenční dluh + infra-trigger dluhy.
 > 1 by-design (N-40), 2 false-positive (N-39 + kandidáti C-10/C-12).
-> Baseline: BE 1879 + FE 2473 testů zelené · `audit:routes` + `audit:ws` čisté · ~77 nových regresních testů · `nest start` DI graf OK.
+> Baseline: BE 1882 + FE 2477 testů zelené · `audit:routes` + `audit:ws` čisté · ~85 nových regresních testů · `nest start` DI graf OK.
 >
-> **Zbývá ~10 nálezů + 2 přehodnocené jako by-design/sporné:**
-> - ✅ technické dotaženo: N-12 (paginace), N-23 (refund gating), N-33 (events invalidace), N-34 (mail race) — viz tabulka
-> - 🟠 vyžaduje rozmyšlení: N-8/N-27 (weather room — sdílená BaseGateway), N-11 (themeId IsIn — potřebuje sdílený theme registry FE↔BE)
-> - ⚖️ **k rozhodnutí (NE jasné bugy):** N-14 (`UserRole.PJ=3` je GLOBÁLNÍ role, ne world PJ → možná legitimní v ADMIN_ROLES), N-17 (Zadatel=member — komentář spec 2.4 říká záměr)
-> - ✅ **přehodnoceno → by-design:** N-10 (kalendář Lokace) — komentář `characters.service.ts:140-143`: 8.1-FIR (2026-05-24) **záměrně** přebilo spec 9.2, lokace subdoc vidí jen PomocnyPJ+
-> - ✅ N-6b (4/4 BE features hotovo) · ✅ N-3 (cron hard-cleanup hotovo) · N-2 (colors) = zbývající dluh
+> **Finální vypořádání zbylých nálezů (2026-06-04):**
+> - ✅ technické dotaženo: N-12 (paginace), N-23 (refund gating), N-33 (events invalidace), N-34 (mail race), N-11 (themeId `@IsIn`)
+> - ✅ N-14 — PJ odebrán z článkových `ADMIN_ROLES` (PJ je role ve světě, ne platformě — sjednoceno s diskuze/galerie)
+> - ✅ N-18 — už opraveno (`assertMembershipInWorld`); ✅ N-27 — funkčně OK (počasí dorazí přes `room:join world:{id}`)
+> - ⚖️ N-17 — by-design (spec 2.4 Zadatel=člen); ⚖️ N-8 — **přijaté riziko** (PJ: weather leak kosmetický, neřešit)
+> - ✅ N-10 → by-design (8.1-FIR záměrně přebilo spec 9.2)
+> - ✅ N-6b (4/4) · ✅ N-3 (cron) · 🟣 **N-2 (barvy) = jediný zbývající kódový dluh** + infra-trigger
 >
 > ⚠️ **Pozn. k rozboru:** N-10 a N-14 byly v 1. kole označeny jako bugy, ale při ověření jde o
 > záměrné chování / globální roli. Lekce: u „access/role" nálezů vždy ověřit komentář + enum,
@@ -133,11 +134,11 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 - **Dopad:** únik členské základny privátních světů bez přihlášení. Auth-leak (porušení auth-leak-policy).
 - **Návrh:** `@UseGuards(JwtAuthGuard)` + v service ověřit přístup (member nebo Sa/Admin; public/open svět dle politiky). **Rozhodnutí o politice (kdo smí vidět členy) → ráno.**
 
-### N-8 — 🔴 BEZPEČNOST: `room:join` bez membership checku 🐛 POTVRZENO (C-04)
+### N-8 — ⚖️ BEZPEČNOST: `room:join` bez membership checku → PŘIJATÉ RIZIKO (rozhodnutí 2026-06-04)
 - **Soubor:** `backend/.../app.gateway.ts:12-22` (`@SubscribeMessage('room:join')`)
-- **Důkaz:** handler validuje jen regex formátu `^[a-z]+:[a-zA-Z0-9]+$`, pak `joinRoom` bez kontroly. Klient joinne `world:{cizíId}` a dostává weather/world eventy cizího světa. Kontrast: `maps.gateway.ts:146` `map:join-world` membership správně ověřuje.
-- **Dopad:** únik real-time eventů (počasí, world signály) napříč světy bez členství.
-- **Návrh:** v `room:join` ověřit membership pro `world:*` roomy (injektovat membership repo, async check), nebo směrovat přes ověřený handler. **Architektonická změna → ráno.**
+- **Důkaz:** handler validuje jen regex formátu `^[a-z]+:[a-zA-Z0-9]+$`, pak `joinRoom` bez kontroly. Klient joinne `world:{cizíId}` a dostává weather eventy cizího světa.
+- **Dopad:** únik real-time **počasí** napříč světy bez členství (žádná herní/citlivá data — počasí je kosmetika).
+- **Rozhodnutí (PJ):** **neřešit** — „že někdo nabourá/změní počasí málokomu vadí". Riziko je kosmetické (cizí počasí), náklad opravy (membership async check do sdílené `BaseGateway`) je nepoměrný. Pokud se sem v budoucnu přidají citlivější world eventy, přehodnotit.
 
 ### N-9 — 🟠 BEZPEČNOST: `sound:play` důvěřuje `userId` z payloadu 🐛 POTVRZENO (C-11)
 - **Soubor:** `backend/.../chat.gateway.ts:181-203`
@@ -150,10 +151,10 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 | ID | Nález | Soubor | Závaž. | Návrh |
 |---|---|---|---|---|
 | N-10 | `assertSubdocAccess` ignoruje `_options.action` → hráč 403 i na GET kalendáře Lokace (spec 9.2 nesplněn) | `characters.service.ts:127` | 🟠 | použít `action` v rozhodování (read→member, write→PomocnyPJ+) |
-| N-11 | `themeId` bez `@IsIn` → uloží libovolný string | `update-user.dto.ts:37` | 🟡 | `@IsIn(THEME_IDS)` (seznam sdílet/exportovat z FE) |
+| N-11 | `themeId` bez `@IsIn` → uloží libovolný string | `update-user.dto.ts:37` | ✅ | `@IsIn(THEME_IDS)` (BE konstanta = kopie FE registry, sync komentář); +4 testy |
 | N-12 | Diskuze paginace `total` (DB count) ≠ vrácené `items` (po access filtru) → špatný počet stránek | `ikaros-discussions.service.ts:209-215` | ✅ | `total = accessible.length` po filtru; + regresní test |
 | N-13 | Embedding ignoruje `sections[].content` → semantic search nevidí obsah sekcí; změna sekce ani nere-indexuje | `embedding-search.service.ts:307-333` | 🟡 | přidat `sections[].content` do `buildChunks` + `computePageHash` |
-| N-14 | PJ (world role) v BE `ADMIN_ROLES` článků (platformový obsah) → wrong-layer; PJ schválí přes API | `ikaros-articles.service.ts:26` | 🟡 | odebrat PJ z ADMIN_ROLES (články = jen globální role) |
+| N-14 | PJ (world role) v BE `ADMIN_ROLES` článků (platformový obsah) → wrong-layer; PJ schválí přes API | `ikaros-articles.service.ts:26` | ✅ | PJ odebrán z ADMIN_ROLES (sjednoceno s diskuze/galerie — PJ je role ve světě, ne platformě); test obrácen + 30 zelené |
 
 **Nejasné / neověřené:** C-17 (SVG upload bez sanitizace potvrzen, XSS dopad závisí na FE renderu — doověřit FE), C-18 (`map:reassigned` double-listener), C-19 (`enrichTokens` N+1) — neověřeno, nižší priorita.
 
@@ -169,8 +170,8 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 |---|---|---|---|
 | N-15 | Po `transferOwnership` se emituje `world.membership.changed` **bez** `membership` → gateway pošle `undefined` klientům | `worlds.service.ts:1691` × `worlds.gateway.ts:47` | 🔴 |
 | N-16 | `isPJ` ve `WorldContext` nezahrnuje `membership.role >= PomocnyPJ` (na rozdíl od `isPJForNav`) → PomocnyPJ vidí `isPJ=false`, mizí mu PJ UI (tlačítko „Nová stránka") | `WorldLayout.tsx:290` | 🔴 |
-| N-17 | `Zadatel` (role=0) má membership → `useWorldStatus` ho vyhodnotí jako `'member'` → vidí plný dashboard, akce pak BE 403 | `useWorldStatus.ts:30` | 🟠 |
-| N-18 | `worldId` v URL membership endpointů (`leave`/`role`/`group`/`akj`) BE vůbec nevaliduje — dekorativní param, narušená multi-tenant konzistence | `worlds.controller.ts:299,363` | 🟠 |
+| N-17 | `Zadatel` (role=0) má membership → `useWorldStatus` ho vyhodnotí jako `'member'` → vidí plný dashboard, akce pak BE 403 | `useWorldStatus.ts:30` | ⚖️ | **by-design** (spec 2.4: Zadatel je člen, vidí dashboard; herní akce gated dle role = záměr) |
+| N-18 | `worldId` v URL membership endpointů (`leave`/`role`/`group`/`akj`) BE vůbec nevaliduje — dekorativní param, narušená multi-tenant konzistence | `worlds.controller.ts:299,363` | ✅ | **už opraveno** — `assertMembershipInWorld(membershipId, worldId)` validuje (komentáře N-18 v kódu) |
 
 ### Svět — chat (07)
 | ID | Nález | Soubor | Záv. |
@@ -191,7 +192,7 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 |---|---|---|---|
 | N-25 | **`diceRolls` chybí v `toEntity`** mapperu (je ve schématu) → log hodů na mapě se po každém reloadu/refetchi smaže ✓ | `maps.repository.ts` toEntity × `map-scene.schema.ts:42` | 🔴 |
 | N-26 | **Hráč nemůže nastavit iniciativu vlastního tokenu** — `allowedPlayerFields={currentHp,injury}` bez `initiative`, ale FE `InitiativeBar` ji posílá → 403 ✓ | `operations-authorizer.service.ts:135` × `InitiativeBar.tsx:108` | 🔴 |
-| N-27 | `useMapWeather` emituje `room:join`, ale `maps.gateway` nemá `room:join` handler → hráč nedostane live počasí na mapě (jen initial load). Souvisí s N-8 | `useMapWeather.ts:82` | 🔴 |
+| N-27 | `useMapWeather` emituje `room:join`, ale `maps.gateway` nemá `room:join` handler → hráč nedostane live počasí na mapě (jen initial load). Souvisí s N-8 | `useMapWeather.ts:82` | ✅ | funkčně OK — `app.gateway` joinne `world:{id}`, `maps.gateway:347` tam broadcastuje `weather:updated` → live počasí dorazí |
 | N-28 | `map:leave-world` — BE handler neexistuje → socket zůstane v world roomu po opuštění panelu (overhead, stale eventy) | `useActiveScenes.ts:69` | 🟠 |
 | N-29 | `token.update` authorizer nekontroluje per-token `isLocked` → hráč může editovat HP zamčeného tokenu (nesoulad s FE gatingem) | `operations-authorizer.service.ts:120` | 🟠 |
 
