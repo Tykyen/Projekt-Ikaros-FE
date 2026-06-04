@@ -271,7 +271,7 @@ export function WorldLayout() {
   // PomocnyPJ+. Dřív chyběl membership → ne-owner PJ neviděl PJ-only položky.
   const isPJForNav =
     world?.ownerId === currentUser?.id ||
-    (currentUser?.role !== undefined && currentUser.role <= 3) ||
+    (currentUser?.role !== undefined && currentUser.role <= UserRole.Admin) ||
     (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
   const { data: settings } = useWorldSettings(realWorldId);
   const nav = useMemo(
@@ -297,7 +297,9 @@ export function WorldLayout() {
   // (tlačítko „Nová stránka", editace).
   const isPJ =
     world?.ownerId === currentUser?.id ||
-    (currentUser?.role !== undefined && currentUser.role <= 3) || // Admin, PJ, Superadmin
+    // R-01 — dřív `<= 3` (globální PJ); D-053 globální PJ zrušil (→Ikarus 9),
+    // FE enum hodnotu 3 nezná. `<= UserRole.Admin` = Superadmin(1)/Admin(2).
+    (currentUser?.role !== undefined && currentUser.role <= UserRole.Admin) ||
     (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
   const isGlobalAdmin =
     currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;

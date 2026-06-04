@@ -102,10 +102,13 @@ function p(Comp: LazyExoticComponent<ComponentType>) {
  * pending-access se redirectne na index detail-page (`/svet/:worldSlug`), kde
  * si vybere Vstoupit / Požádat. Sa/Admin bypass přes globální role.
  */
-function memberOnly(element: ReactNode): ReactNode {
+function memberOnly(
+  element: ReactNode,
+  minWorldRole: WorldRole = WorldRole.Ctenar,
+): ReactNode {
   return (
     <WorldMembershipGuard
-      minWorldRole={WorldRole.Ctenar}
+      minWorldRole={minWorldRole}
       fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
       redirectTo="/svet/:worldSlug"
     >
@@ -243,7 +246,9 @@ export const router = createBrowserRouter([
       { path: 'takticka-mapa',          element: memberOnly(p(TacticalMapPage)) },
       { path: 'bestiar',                element: memberOnly(p(BestiarPage)) },
       { path: 'kalendar',               element: memberOnly(p(CalendarPage)) },
-      { path: 'timeline',               element: memberOnly(p(TimelinePage)) },
+      // R-06 — timeline read = Hrac+ (BE `timeline.assertMember`); gate Ctenar
+      // už na route, ať nenarazí na 403 na načtené stránce.
+      { path: 'timeline',               element: memberOnly(p(TimelinePage), WorldRole.Hrac) },
       { path: 'pocasi',                 element: memberOnly(p(WeatherPage)) },
       // 9.1-I — game events. Hlavní route /akce, /sprava-udalosti je legacy redirect (1 měsíc).
       { path: 'akce',                   element: memberOnly(p(EventsPage)) },

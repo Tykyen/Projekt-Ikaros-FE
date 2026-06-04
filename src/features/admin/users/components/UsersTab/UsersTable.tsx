@@ -86,6 +86,12 @@ export function UsersTable({
   }
 
   const isSuperadmin = currentUser?.role === UserRole.Superadmin;
+  // R-05 (A) — Admin s canManageAdmins smí delegovat moderaci obsahu jiným
+  // Adminům; mintit další managery (canManageAdmins) smí jen Superadmin.
+  const viewerManagesAdmins =
+    currentUser?.role === UserRole.Admin &&
+    currentUser?.adminPermissions?.canManageAdmins === true;
+  const canSeePerms = isSuperadmin || viewerManagesAdmins;
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   if (isLoading) {
@@ -290,25 +296,28 @@ export function UsersTable({
                           </button>
                         ))}
 
-                      {isSuperadmin && u.role === UserRole.Admin && !isSelf && (
+                      {canSeePerms && u.role === UserRole.Admin && !isSelf && (
                         <div className={s.permissionsGroup}>
-                          <label className={s.filterCheckbox}>
-                            <input
-                              type="checkbox"
-                              checked={!!u.adminPermissions?.canManageAdmins}
-                              onChange={(e) =>
-                                setPerms.mutate({
-                                  userId: u.id,
-                                  permissions: {
-                                    canManageAdmins: e.target.checked,
-                                  },
-                                })
-                              }
-                              disabled={setPerms.isPending}
-                              title="Smí měnit role / banovat jiné Adminy"
-                            />
-                            Správa adminů
-                          </label>
+                          {/* R-05 (A) — mintit admin-managery smí jen Superadmin */}
+                          {isSuperadmin && (
+                            <label className={s.filterCheckbox}>
+                              <input
+                                type="checkbox"
+                                checked={!!u.adminPermissions?.canManageAdmins}
+                                onChange={(e) =>
+                                  setPerms.mutate({
+                                    userId: u.id,
+                                    permissions: {
+                                      canManageAdmins: e.target.checked,
+                                    },
+                                  })
+                                }
+                                disabled={setPerms.isPending}
+                                title="Smí spravovat oprávnění jiných Adminů"
+                              />
+                              Správa adminů
+                            </label>
+                          )}
                           <label className={s.filterCheckbox}>
                             <input
                               type="checkbox"
@@ -326,25 +335,8 @@ export function UsersTable({
                             />
                             Moderace obsahu
                           </label>
-                          <label className={s.filterCheckbox}>
-                            <input
-                              type="checkbox"
-                              checked={
-                                !!u.adminPermissions?.canEditPlatformPages
-                              }
-                              onChange={(e) =>
-                                setPerms.mutate({
-                                  userId: u.id,
-                                  permissions: {
-                                    canEditPlatformPages: e.target.checked,
-                                  },
-                                })
-                              }
-                              disabled={setPerms.isPending}
-                              title="Editace statických stránek platformy"
-                            />
-                            Stránky platformy
-                          </label>
+                          {/* R-05 (A) — `canEditPlatformPages` toggle skryt: BE
+                              flag nikde nevynucuje (žádná editace platform stránek). */}
                         </div>
                       )}
                     </div>
