@@ -55,7 +55,7 @@
 |---|---|---|---|
 | `tsc --noEmit` | FE | ✅ čistý | žádný TS drift |
 | `eslint .` | FE | ✅ čistý | 0 chyb/varování |
-| `lint:colors` | FE | ⚠️ 207 souborů / 2704 barev | konzistenční dluh, ne bug — viz N-2 |
+| `lint:colors` | FE | ⚠️ 2296 barev (z 2704, −408) | konzistenční dluh, ne bug — bílá/černá hotová, zbytek viz N-2 |
 | `vitest run` (unit) | FE | ✅ 2473/2473 | `--project '!storybook'` (browser projekt visí) |
 | `tsc --noEmit` | BE | ✅ čistý | cron spec **zařazen zpět** (N-3 opraveno) |
 | `eslint` | BE | ✅ čistý | |
@@ -75,10 +75,12 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 - **Fix:** mock přepsán na named export `SentencePieceProcessor` + `encodeIds`. BE testy 1815/1815 ✅.
 - **Dopad:** žádný v provozu (jen test schovával zelenou); ale maskoval by reálnou regresi embeddings.
 
-### N-2 — FE 2704 hardcoded barev (207 souborů) ⚠️ KONZISTENČNÍ DLUH
+### N-2 — FE hardcoded barev ⚠️ KONZISTENČNÍ DLUH (částečně dotaženo 2026-06-04)
 - **Symptom:** `lint:colors` selhává; barvy mimo theme tokeny.
-- **Posouzení:** velká část legit (fyzické barvy 3D kostek `dice/models/*`, barvy kalendářů jako data v `calendarEngine/presets/*`). Appka funguje, jen obchází `var(--token)` → riziko pro theme isolaci u skutečných UI komponent.
-- **Stav:** k vyhodnocení — oddělit legit data od skutečných UI úniků. Není blocker.
+- **Posouzení:** velká část legit (fyzické barvy 3D kostek `dice/models/*`, barvy kalendářů jako data v `calendarEngine/presets/*`, allowlisted system-panels). Appka funguje, jen obchází `var(--token)` → riziko pro theme isolaci u skutečných UI komponent.
+- **Hotovo (bezpečná část):** bílé/černé alfa-overlaye (408×) → `var(--white-rgb)`/`var(--black-rgb)` (fyzikální konstanty, 1:1 beze změny vzhledu). **lint:colors 2704 → 2296.**
+- **Zbývá (~2296):** designové barvy (akcenty, modrý text, panely) — patří na **theme-aware** tokeny, ne na konstanty → vyžadují **vizuální projití** napříč tématy (oko u browseru). Mapa + postup: **[`n2-color-mapping.md`](n2-color-mapping.md)**.
+- **Stav:** bezpečný kus dotažen autonomně; zbytek je vizuální práce pro browser (mimo „bez člověka" mandát). Není blocker.
 
 ### N-3 — BE account-cleanup cron je stub ✅ OPRAVENO (2026-06-03)
 - **Soubor:** `backend/src/modules/users/services/account-cleanup.cron.ts`
