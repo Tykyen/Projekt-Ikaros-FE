@@ -1,0 +1,95 @@
+name: Deploy to Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+
+env:
+  DEPLOY_PATH: /opt/projekt-ikaros-fe
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment directory
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "mkdir -p ${{ env.DEPLOY_PATH }}"
+
+      - name: Copy files to server
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p ${{ vars.SERVER_PORT }}" \
+            --exclude '.git' \
+            --exclude 'node_modules' \
+            --exclude 'dist' \
+            --exclude '.env' \
+            ./ ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/
+
+      - name: Create .env file on server
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "cat > ${{ env.DEPLOY_PATH }}/.env << 'EOF'
+          FRONTEND_PORT=${{ vars.FRONTEND_PORT }}
+          VITE_API_URL=${{ vars.VITE_API_URL }}
+          VITE_TURNSTILE_SITE_KEY=${{ vars.VITE_TURNSTILE_SITE_KEY }}
+          EOF"
+
+      - name: Build images
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+            set -e
+            cd ${{ env.DEPLOY_PATH }}
+            docker image prune -f
+            docker compose build --no-cache
+          '
+
+      - name: Deploy
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+            set -e
+            cd ${{ env.DEPLOY_PATH }}
+            docker compose down --remove-orphans || true
+            docker compose up -d
+            docker compose ps
+          '
+
+      - name: Verify deployment
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+            set -e
+            cd ${{ env.DEPLOY_PATH }}
+            sleep 5
+            docker compose ps
+            TOTAL=$(docker compose ps -q | wc -l)
+            RUNNING=$(docker compose ps --status running -q | wc -l)
+            if [ "$TOTAL" -ne "$RUNNING" ]; then
+              docker compose logs --tail=50
+              exit 1
+            fi
+          '
+
+      - name: Cleanup old Docker images
+        if: always()
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker image prune -f"

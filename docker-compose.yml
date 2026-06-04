@@ -1,0 +1,13 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+        VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:-}
+    container_name: projekt-ikaros-fe
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8081}:80"
+
