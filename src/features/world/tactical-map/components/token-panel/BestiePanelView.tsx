@@ -40,7 +40,7 @@ export function BestiePanelView({
   onMapRoll,
 }: Props): React.ReactElement {
   // BC fallback: pokud systemStats prázdné, mapuj z fixed pole.
-  const baseStats =
+  const baseStats: Record<string, unknown> =
     token.systemStats && Object.keys(token.systemStats).length > 0
       ? { ...token.systemStats }
       : {

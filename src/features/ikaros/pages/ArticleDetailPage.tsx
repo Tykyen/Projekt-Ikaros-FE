@@ -29,10 +29,11 @@ import s from './ArticleDetailPage.module.css';
 // N-14 — sjednoceno s BE `ADMIN_ROLES` (ikaros-articles.service): globální
 // `UserRole.PJ` (=3) je platformová role a smí schvalovat články. FE ho dřív
 // v reviewerech vynechával → PJ schválil přes API, ale tlačítko neviděl.
+const LEGACY_PJ_ROLE = 3 as UserRole;
 const REVIEWER_ROLES: UserRole[] = [
   UserRole.Superadmin,
   UserRole.Admin,
-  UserRole.PJ,
+  LEGACY_PJ_ROLE,
   UserRole.SpravceClanku,
 ];
 
