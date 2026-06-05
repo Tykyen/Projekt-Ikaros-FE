@@ -26,15 +26,18 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
+    {/* QueryClientProvider MUSÍ být nad ThemeProvider — ThemeProvider přes
+        useThemeSync volá useQueryClient (jinak „No QueryClient set" a bílá
+        stránka po načtení). */}
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
         <GlobalErrorBoundary>
           <AuthBootstrap />
           <RouterProvider router={router} />
           <Toaster position="bottom-right" theme="dark" richColors />
         </GlobalErrorBoundary>
-      </QueryClientProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   </StrictMode>
 );
 
