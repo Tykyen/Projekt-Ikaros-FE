@@ -97,7 +97,9 @@ export function LokaceLayout({ page }: { page: Page }) {
   const akjTabs = sortedAkjTabs(page);
   const tabs: TabItem[] = [
     { id: 'profil', label: 'Profil', icon: <MapPin size={16} /> },
-    ...(character
+    // R-14 — Lokace kalendář (subdoc) je BE staff-only (PomocnyPJ+; 8.1-FIR
+    // vědomě přebíjí spec 9.2). Dřív tab viděl každý člen → 403 na obsahu.
+    ...(character && canEdit
       ? [
           {
             id: 'kalendar',

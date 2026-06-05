@@ -29,6 +29,7 @@ import { MapLibraryModal } from './MapLibraryModal';
 import { LoadPreparationDialog } from './LoadPreparationDialog';
 import { ClearSceneDialog } from './ClearSceneDialog';
 import { useWorldContext } from '@/features/world/context/WorldContext';
+import { WorldRole } from '@/shared/types';
 import type { SpawnPayload } from '../../utils/spawnPayload';
 import type { MapScene, WorldOperation } from '../../types';
 import styles from './MapPjPanel.module.css';
@@ -122,8 +123,12 @@ export function MapPjPanel({
   );
   const queryClient = useQueryClient();
   const { scenes: activeScenes } = useActiveScenes(worldId, expanded);
-  const { world } = useWorldContext();
+  const { world, userRole } = useWorldContext();
   const systemId = world?.system ?? null;
+  // R-17 — tvorba/aktivace/mazání scény je na BE PJ(5) (`maps.assertCanManage`).
+  // Panel se zobrazuje PomocnyPJ+, ale scene-create akce gatujeme na PJ, ať
+  // PomocnyPJ nevidí tlačítka, co skončí 403. (Přiřazení/edit scény = PomocnyPJ.)
+  const isPjStrict = (userRole ?? -1) >= WorldRole.PJ;
 
   const mutation = useMutation({
     mutationFn: (op: WorldOperation) => postWorldOperation(worldId, op),
@@ -230,33 +235,36 @@ export function MapPjPanel({
             title="Aktivní scény"
             count={activeScenes.length}
           >
-            <div className={styles.sceneActions}>
-              <button
-                type="button"
-                className={styles.newSceneBtn}
-                onClick={() => setShowLibrary(true)}
-                title="Otevřít knihovnu map (uložit / načíst šablonu)"
-              >
-                📚 Knihovna
-              </button>
-              <button
-                type="button"
-                className={styles.newSceneBtn}
-                onClick={() => createSceneMutation.mutate()}
-                disabled={createSceneMutation.isPending}
-                title="Vytvoří novou scénu, aktivuje ji a přiřadí tě na ni"
-              >
-                {createSceneMutation.isPending ? '…' : '+ Nová'}
-              </button>
-              <button
-                type="button"
-                className={styles.newSceneBtn}
-                onClick={() => setShowLoadPrep(true)}
-                title="Vytvoří novou scénu ze scénáře (Storyboard): podklad mapy + připravené postavy a bestie"
-              >
-                🎬 Načíst přípravu
-              </button>
-            </div>
+            {/* R-17 — scene-create akce = BE PJ(5); PomocnyPJ je nevidí. */}
+            {isPjStrict && (
+              <div className={styles.sceneActions}>
+                <button
+                  type="button"
+                  className={styles.newSceneBtn}
+                  onClick={() => setShowLibrary(true)}
+                  title="Otevřít knihovnu map (uložit / načíst šablonu)"
+                >
+                  📚 Knihovna
+                </button>
+                <button
+                  type="button"
+                  className={styles.newSceneBtn}
+                  onClick={() => createSceneMutation.mutate()}
+                  disabled={createSceneMutation.isPending}
+                  title="Vytvoří novou scénu, aktivuje ji a přiřadí tě na ni"
+                >
+                  {createSceneMutation.isPending ? '…' : '+ Nová'}
+                </button>
+                <button
+                  type="button"
+                  className={styles.newSceneBtn}
+                  onClick={() => setShowLoadPrep(true)}
+                  title="Vytvoří novou scénu ze scénáře (Storyboard): podklad mapy + připravené postavy a bestie"
+                >
+                  🎬 Načíst přípravu
+                </button>
+              </div>
+            )}
             <ActiveScenesList
               scenes={activeScenes}
               currentSceneId={currentScene?.id ?? null}

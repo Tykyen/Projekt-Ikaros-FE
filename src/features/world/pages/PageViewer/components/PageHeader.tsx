@@ -72,27 +72,32 @@ export function PageHeader({ page, readTimeMinutes }: Props) {
               <span className={s.woodWideText}>Wood-Wide</span>
             </span>
           )}
-          <button
-            type="button"
-            className={`${s.starBtn} ${isFavorite ? s.starActive : ''}`}
-            onClick={() =>
-              favoriteMutation.mutate({
-                slug: page.slug,
-                nextState: !isFavorite,
-              })
-            }
-            aria-label={
-              isFavorite ? 'Odebrat z oblíbených' : 'Přidat do oblíbených'
-            }
-            aria-pressed={isFavorite}
-            disabled={favoriteMutation.isPending}
-          >
-            <Star
-              size={20}
-              aria-hidden
-              fill={isFavorite ? 'currentColor' : 'none'}
-            />
-          </button>
+          {/* R-16 — favorite = sdílený kurátorský seznam světa → BE gate
+              `assertCanWrite` (PomocnyPJ+). Dřív se hvězda ukazovala všem
+              členům → Ctenar klikl → 403 + tichý rollback. Gate na canEdit. */}
+          {canEdit && (
+            <button
+              type="button"
+              className={`${s.starBtn} ${isFavorite ? s.starActive : ''}`}
+              onClick={() =>
+                favoriteMutation.mutate({
+                  slug: page.slug,
+                  nextState: !isFavorite,
+                })
+              }
+              aria-label={
+                isFavorite ? 'Odebrat z oblíbených' : 'Přidat do oblíbených'
+              }
+              aria-pressed={isFavorite}
+              disabled={favoriteMutation.isPending}
+            >
+              <Star
+                size={20}
+                aria-hidden
+                fill={isFavorite ? 'currentColor' : 'none'}
+              />
+            </button>
+          )}
           <button
             type="button"
             className={s.starBtn}

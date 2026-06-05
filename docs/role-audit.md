@@ -9,12 +9,20 @@
 
 ## TL;DR (2026-06-04)
 
-> **Stav: rozjeto.** Plán [`role-plan/`](role-plan/README.md) — 10 oblastí, páteř = **matice
-> role × akce** (prázdná buňka = nepokrytá kombinace). Cíl: maximalizovat `[auto]` pokrytí, ať
-> lidská testovací skupina dostane co nejčistší stav.
+> **Stav: 100% sweep DOKONČEN + všechny nálezy opraveny (2026-06-05).** Plán [`role-plan/`](role-plan/README.md)
+> — 10 oblastí, ~200 bodů projito (1. cílená vlna + 2. hloubkový sweep všech ⬜ bodů přes 10 paralelních
+> agentů, verdikty proti reálnému kódu). **19 nálezů (R-01…R-19) + area00-K2 — VŠECHNY opraveny + ověřeny;**
+> 7 položek zaevidováno jako přijatý dluh (low/by-design). Sweep odhalil **3 kritické/vysoké bezpečnostní
+> díry, které cílená 1. vlna minula** (R-07 mrtvý account-state gate, R-08 nevynucený ban, R-11 neautentizovaný
+> dump mapy) — proto měl 100% smysl. BE: tsc 0, **plný jest ~1909/1909**. FE: tsc 0, eslint čistý.
 >
 > | ID | Závažnost | Oblast | Podstata | Stav |
 > |---|---|---|---|---|
+> | **R-11** | 🔴🔴 KRITICKÁ | 07 | `GET /maps?worldId=` **bez `@UseGuards`** → anonymní dump celé taktické mapy (tokeny, HP, pozice, fog, kostky) jakéhokoli světa | ✅ opraveno (+2 testy) |
+> | **R-07** | 🔴🔴 KRITICKÁ | 01 | Account-state gate v `JwtAuthGuard` je **mrtvý kód** (`request.user?.sub`, ale strategy vrací `.id`) → smazaný/pending účet s 7d tokenem projde na vše | ✅ opraveno (+ spec mock fix) |
+> | **R-08** | 🔴 vysoká | 01 | **Ban se nikde nevynucuje** — `bannedAt` se nastaví, ale login ani guard ho nečtou → zabanovaný uživatel dál pracuje; FE `BANNED` handler mrtvý | ✅ opraveno (+1 test) |
+> | **R-09** | 🟠 střední | 04 | `GET /pages` (`findByWorld`) neaplikuje page-level `assertAccess` → vrací obsah AKJ-chráněných stránek (latentní — bez FE konzumenta) | 🐛 potvrzeno |
+> | **R-10** | 🟡 nízká | 02 | FE `ArticleDetailPage` REVIEWER_ROLES obsahuje neexistující `UserRole.PJ` (N-14 regrese; runtime neškodné, ale drift + build chyba) | 🐛 potvrzeno |
 > | **R-04** | 🔴 vysoká | 08/09 | Restricted world chat zprávy tečou přes WS `room:join` (jen regex) bez access checku — REST gated, WS ne (PC leak) | ✅ opraveno (+5 testů) |
 > | **R-03** | 🔴 vysoká | 03 | `updateMemberRole` nemá strop — PomocnyPJ povýší sebe/kohokoli na PJ a demotuje PJ/ownera (vertikální eskalace, insider) | ✅ opraveno (+3 testy) |
 > | **R-02** | 🟡 nízká | 05 | Account permission vrstva (`isWorldStaff`) bez GlobalAdmin bypassu — platform Admin non-member dostane 403, jinde projde | ✅ opraveno (+3 testy) |
@@ -33,6 +41,44 @@
 > **SM-06 / K-R2** (moderace AR owner-only · AKJ tab filtr BE-autoritativní — obojí konzistentní).
 >
 > **Kandidáti z inventury (k ověření):** viz sekce níže.
+
+---
+
+## Vlna 2 — hloubkový 100% sweep (10 oblastí, 10 agentů) — zbylé nálezy
+
+> Plný sweep všech ⬜ bodů napříč 00–09 (paralelní agenti, verdikty proti reálnému kódu). Kritické
+> (R-07/R-08/R-11) výše. Zde **zbylé** potvrzené + kandidátní. `[ja]` = ověřeno mnou čtením,
+> `[agent]` = z agenta s `soubor:řádek`, k doověření při opravě.
+
+**🟠 STŘEDNÍ (leak / herní bloker):**
+- **R-12** ✅ **opraveno** — `dungeon-maps` `findByWorld`/`findById` read-gate (PJ, `assertCanManage`) + threading user; +2 testy.
+- **R-13** ✅ **opraveno** — `world:operation` přesunut do PJ-only roomu `world-ops:{id}` (pomlčka rozbije regex generického `room:join`); join/leave/emit, FE beze změny.
+- **R-09** ✅ **opraveno** — `GET /pages` (`findByWorld`) doplněn per-page `assertAccess` filtr (+ threading role); listing už neleakuje obsah chráněných stránek.
+- **R-14** ⚖️→🟡 **přeřazeno** — BE `assertSubdocAccess` Lokace = PomocnyPJ+ je **ZÁMĚR** (8.1-FIR 2026-05-24 vědomě přebíjí spec 9.2, [characters.service.ts:148](../Projekt-ikaros/backend/src/modules/characters/characters.service.ts#L148)). Ne bug; zbývá jen FE: skrýt Lokace kalendář tab non-staff (nízká UX).
+- **R-15** ✅ **opraveno** — mrtvý globální `role > UserRole.PJ(3)` gate odstraněn ze `scenario-templates`+`map-templates` (per-owner privátní knihovna, owner checks zůstávají); specs aktualizovány. ⚠️ mírné uvolnění práva (PJ-only→přihlášený), flagnuto.
+
+**🟡 NÍZKÉ (parity / UX / drift) — ✅ FE várka DOTAŽENA:**
+- **R-19** ✅ owner self-leave kód `WORLD_OWNER_CANNOT_LEAVE` (BE).
+- **R-10** ✅ FE `ArticleDetailPage` REVIEWER_ROLES bez `UserRole.PJ`.
+- **R-16** ✅ favorite hvězda gate na PomocnyPJ+ (`PageHeader.tsx`).
+- **R-17** ✅ scene-create buttony (Knihovna/Nová/Načíst) gate na PJ(5) (`MapPjPanel.tsx`) — align FE→BE.
+- **R-18** ✅ route prahy `/kalendar`→PomocnyPJ, `/pocasi`→Hrac (`router.tsx`).
+- **R-14** ✅ Lokace kalendář tab skryt non-staff (`LokaceLayout.tsx`); BE staff-only = záměr 8.1-FIR.
+- **area00-K2** ✅ mrtvá `@Roles(…UserRole.PJ)` z `recent-pages` odstraněna.
+
+**Přijatý dluh (low / by-design / k rozhodnutí — NEopraveno, zaevidováno):**
+- WR-09-B — `worlds.gateway` emituje plný `membership` objekt do `world:{id}` místo `{worldId}` signálu (leak-safe konzistence, nízká).
+- WR-08 — `map:join` jen membership, ne scene-assignment (marginální; závisí, zda REST scény gatuje stejně).
+- PO-14 — `POST shopitems` bez role-gate (ale per-owner privátní, FE skrývá; by-design jako ostatní campaign entity).
+- PO-10 — primary-owner delete účtu UI skryto <PomocnyPJ (možná záměr 8.6 Q8.4).
+- area00-K3 — `?? WorldRole.Zadatel(0)` fallback v 5 FE souborech (latentní, dnes neškodné).
+- area00-K4 — WeatherSetsModal `isGlobalAdmin || true` (FE DD gap, BE autoritativní).
+- D-MAP-D — žádné per-role utajení HP (`enrichTokens` posílá HP všem; chybějící featura, ne bug).
+- **Drobné/dluh:** D-MAP-D (žádné per-role utajení HP — `enrichTokens` posílá HP všem), WR-09-B (plný membership objekt do `world:{id}` místo signálu), WR-08 (`map:join` bez scene-assignment checku), PO-14 (`POST shopitems` bez role-gate, ale privátní), PO-10 (primary-owner delete UI skryto), area00-K3 (`?? Zadatel(0)` fallback), area00-K4 (WeatherSetsModal `||true`), area00-K2 (mrtvé legacy `@Roles(…PJ)`).
+
+**📝 Doc fixy (kód OK, plán/matice nepřesné):** SP-07/PL-16/PL-17 (403 vs 404 — kód dle auth-leak-policy správně, plán chce 404), PO-17 (Zadatel měny **čte**), C08-1 (`all` kanál = Hrac+, ne Ctenar), MA-10/MA-14 (fog=PomocnyPJ, scene-log hráč vlastní scénu).
+
+**✅ Ověřeno bez díry (vlna 2, výběr):** WS identita z JWT napříč 12 gatewayi (WR-01..05), whisper izolace (WR-12), leak-safe signály (WR-10), chat accessMode/sound N-9/emote prahy (CH-01..19), bestiae 3-scope (PO-18..20), game-events groupOnly **404** anti-leak (HN-03), deník PJ per-PJ izolace (HN-17), timeline/weather prahy, RolesGuard sweep (žádný bez @Roles, RM-15).
 
 ---
 
@@ -76,6 +122,53 @@
 - **Dopad:** Žádný v provozu (nikdo nemá globální roli 3). **Latentní past:** kdyby kdokoli v budoucnu přiřadil globální roli na hodnotu 3, tiše dostane PJ-nav bez membershipu. Čitelnost: práh `<= 3` mate (vypadá, že 3 něco znamená).
 - **Návrh:** Nahradit magický `<= 3` explicitním `role <= UserRole.Admin` (= `<= 2`); odstranit komentářovou zmínku o PJ. Volitelně: BE vyčistit legacy enum hodnoty 3–7 (ponechat `Zakaz`). Kosmetické + obrana proti budoucí pasti.
 - **Stav:** ✅ **opraveno** — [WorldLayout.tsx:274,300](../Projekt-ikaros-FE/src/app/layout/WorldLayout/WorldLayout.tsx#L274) `<= 3` → `<= UserRole.Admin` (oba `isPJForNav` i `isPJ`), komentář opraven. Behavior-identical (nikdo nemá globální roli 3). BE legacy enum (3–8) **ponechán** — `Zakaz(8)` se aktivně přiřazuje při banu, mazat 3–7 je samostatný cleanup mimo rozsah. Ověřeno: FE tsc 0, eslint čistý, WorldLayout 5/5.
+
+### R-11 — `GET /maps?worldId=` je neautentizovaný → anonymní dump taktické mapy 🐛🔴🔴 (KRITICKÁ — leak)
+- **Oblast / bod:** [07](role-plan/07-svet-mapa.md) MA-01..03 (přístupová vrstva)
+- **Soubor:** [maps.controller.ts:56-63](../Projekt-ikaros/backend/src/modules/maps/maps.controller.ts#L56) (`@Get() findByWorld` — **žádný `@UseGuards`**, třída `@Controller('maps')` taky bez class-guardu) — kontrast hned **další** endpoint [:71-72](../Projekt-ikaros/backend/src/modules/maps/maps.controller.ts#L71) `@Get('active')` má `@UseGuards(JwtAuthGuard)`
+- **Symptom:** `GET /maps?worldId=<id>` (i `?isActive=true` → `findActiveScenes`) je **bez autentizace**. `toEntity` mapper vrací plné scény: tokeny (`currentHp/maxHp`, pozice, `notes`), `revealedHexes` (fog), NPC šablony, `diceRolls`. → kdokoli bez přihlášení stáhne kompletní taktickou mapu jakéhokoli světa jen podle worldId.
+- **Dopad:** Neautentizovaný únik veškerého herního stavu mapy (skryté pozice nepřátel, fog, HP, poznámky). Nejde jen o membership — je to úplně otevřené. Závažné.
+- **Root cause:** Endpoint zřejmě vznikl před zavedením auth guardů a nikdy nedostal `@UseGuards`; sousední `active` ho má → kopírovací opomenutí.
+- **Osa:** `LK` — neautentizovaný leak
+- **Návrh:** Přidat `@UseGuards(JwtAuthGuard)` na `findByWorld` (nebo class-level) + membership read-check (`assertCanReadScene`/member-of-world) jako u ostatních map endpointů. **Pozor na FE konzumenty** (`useActiveScenes`/orchestrátor) — ověřit, že posílají token (měli by, jsou za login). Malá, kritická oprava.
+- **Stav:** ✅ **opraveno** — `findByWorld` dostal `@UseGuards(JwtAuthGuard)` + `@CurrentUser`; service `findByWorld`/`findActiveScenes` přes `assertStaff` (GlobalAdmin || PomocnyPJ+). `getScenes` (all) nemá FE konzumenta, `getActiveScenes` jen PJ orchestrátor → bez dopadu. +2 testy (hráč→403, admin→OK). Plný jest 1908/1908.
+
+### R-07 — Account-state gate v `JwtAuthGuard` je mrtvý kód (`sub` vs `id`) 🐛🔴🔴 (KRITICKÁ — auth bypass)
+- **Oblast / bod:** [01](role-plan/01-auth-ucet-guest.md) AU-08/AU-09 (RA-1)
+- **Soubor:** [jwt-auth.guard.ts:30](../Projekt-ikaros/backend/src/common/guards/jwt-auth.guard.ts#L30) (`const userId = request.user?.sub`) ↔ [jwt.strategy.ts:19-27](../Projekt-ikaros/backend/src/modules/auth/strategies/jwt.strategy.ts#L19) (`validate` vrací `{ id: payload.sub, … }` — **bez `sub`**)
+- **Symptom:** Passport ukládá návratovou hodnotu `validate()` do `request.user`, tj. `{ id, email, username, role, characterPath }`. Guard ale čte `request.user?.sub` → **vždy `undefined`** → celý blok `if (userId) { … }` (řádky 31-55: kontrola `isDeleted`→401 DELETED, `deletionRequestedAt`→401 DELETION_PENDING, `updateLastSeen`) se **nikdy neprovede**.
+- **Dopad:** Per-request account-state gate je **mrtvý**. Uživatel, který má platný access token (TTL **7 dní**, `auth.module.ts`) a pak se **smaže** (self-delete) nebo je **naplánován ke smazání**, projde na **každý** `@UseGuards(JwtAuthGuard)` endpoint celý týden. Přesně scénář, kvůli kterému gate vznikl (paměť `project_self_deletion_architecture`: „gate v JwtAuthGuard ne JwtStrategy, 7d token"). Login sám smazaný účet blokuje ([auth.service.ts:165](../Projekt-ikaros/backend/src/modules/auth/auth.service.ts#L165)), ale **už vydaný token** ne.
+- **Root cause:** Drift `sub`/`id`. `@CurrentUser` i controllery čtou správně `.id`; jen guard zůstal na `.sub`. Test maskoval mockem `makeContext({ sub })`, který reálná strategy nikdy nevyrobí (mock drift — zelený test, mrtvá produkce).
+- **Osa:** `ST` `LK` — eskalace/bypass
+- **Návrh:** [jwt-auth.guard.ts:30](../Projekt-ikaros/backend/src/common/guards/jwt-auth.guard.ts#L30) `request.user?.sub` → `request.user?.id` (+ opravit typovou anotaci `{ sub?: string }` → `{ id?: string }`). Opravit spec mock na `{ id }`, jinak drift zůstane skrytý. **1 řádek, ale kritický.**
+- **Stav:** ✅ **opraveno** — [jwt-auth.guard.ts:30](../Projekt-ikaros/backend/src/common/guards/jwt-auth.guard.ts#L30) `request.user?.sub` → `.id` (+ typ + komentář); spec mock `{ sub }` → `{ id }` (jinak by drift zůstal skrytý). Gate teď reálně blokuje smazaný/pending. Plný jest 1908/1908.
+
+### R-08 — Ban se nikde nevynucuje (`bannedAt` set, nikdy nečten) 🐛🔴 (VYSOKÁ — banned user dál pracuje)
+- **Oblast / bod:** [01](role-plan/01-auth-ucet-guest.md) AU-10
+- **Soubor:** [admin.service.ts:379](../Projekt-ikaros/backend/src/modules/admin/admin.service.ts#L379) (ban **nastaví** `bannedAt`) ↔ login [auth.service.ts:164-186](../Projekt-ikaros/backend/src/modules/auth/auth.service.ts#L164) (čte jen `isDeleted`+`deletionRequestedAt`, **ne `bannedAt`**) ↔ `JwtAuthGuard`/`JwtStrategy` (ban nekontrolují) ↔ FE [client.ts:46](../Projekt-ikaros-FE/src/shared/api/client.ts#L46) (handler kódu `BANNED`, který BE nikdy nepošle)
+- **Symptom:** Grep `bannedAt`/`'BANNED'`/`banCache.get` v BE: `bannedAt` se jen **zapisuje** (ban/unban v admin.service) a kontroluje na konflikt; **nikde se nečte pro blok přístupu**. `banCache.get()` se nevolá vůbec. Zabanovaný uživatel (`bannedAt` set, `isDeleted=false`) se **přihlásí** (login ban neřeší) a s tokenem dál používá celou platformu.
+- **Dopad:** Celá ban funkcionalita (admin UI, `UserBanCacheService`, FE `BANNED` handler) je **bez efektu**. Admin „zabanuje", uživatel nepozná rozdíl. Bezpečnostní/moderátorská díra.
+- **Root cause:** Ban enforcement nebyl nikdy zapojen do login flow ani do account-state gate (který je navíc mrtvý — R-07).
+- **Osa:** `ST` `LK`
+- **Návrh:** (1) login [auth.service.ts:164](../Projekt-ikaros/backend/src/modules/auth/auth.service.ts#L164) — po `isDeleted` přidat `if (user.bannedAt) → 401 BANNED`; (2) po opravě R-07 přidat ban check i do `JwtAuthGuard` (per-request, kvůli 7d tokenu — banned za běhu) → 401 `BANNED`. Pak FE `client.ts` handler ožije.
+- **Stav:** ✅ **opraveno** — ban check v login ([auth.service.ts:171](../Projekt-ikaros/backend/src/modules/auth/auth.service.ts#L171)) i per-request v `JwtAuthGuard` (po R-07) → 401 `BANNED`; FE handler ožil. +1 guard test.
+
+### R-09 — `GET /pages` (`findByWorld`) neaplikuje page-level `assertAccess` 🐛 (střední — leak, latentní)
+- **Oblast / bod:** [04](role-plan/04-svet-stranky-akj.md) SP-10
+- **Soubor:** [pages.service.ts:100-114](../Projekt-ikaros/backend/src/modules/pages/pages.service.ts#L100) (`findByWorld` volá jen `filterAkjTabsForViewer`, ne `assertAccess`) vs [pages.service.ts:128](../Projekt-ikaros/backend/src/modules/pages/pages.service.ts#L128) (`findBySlug` `assertAccess` má)
+- **Symptom:** `findByWorld(worldId, type, userId)` ořízne jen AKJ **taby**, ale **nefiltruje page-level** `accessRequirements` → vrací plné `content`/`plainText`/`title` i u stránek chráněných page-level AKJ. Každý člen světa přes `GET /worlds/:id/pages` dostane obsah chráněných stránek.
+- **Dopad:** Přímý API leak page-level chráněného obsahu. **Latentní** — FE listingy volají `/directory` (stub bez obsahu), plný `GET /pages` žádný FE konzument nepoužívá; riziko je přímé volání API tokenem.
+- **Osa:** `LK` `PC` `DD`
+- **Návrh:** Ve `findByWorld` při zadaném `userId` silent-skip stránek, kde `assertAccess` selže (vzor `findVisibleSlugs`/`findBacklinks`). Sjednotí 6. „dveře" listingu se zbytkem.
+- **Stav:** 🐛 potvrzeno.
+
+### R-10 — FE `ArticleDetailPage` REVIEWER_ROLES obsahuje neexistující `UserRole.PJ` 🐛 (nízká — drift / N-14 regrese)
+- **Oblast / bod:** [02](role-plan/02-platforma-admin.md) PL-11/PL-14
+- **Soubor:** [ArticleDetailPage.tsx:32-37](../Projekt-ikaros-FE/src/features/ikaros/pages/ArticleDetailPage.tsx#L32) (`REVIEWER_ROLES` = `[Superadmin, Admin, UserRole.PJ, SpravceClanku]`) ↔ FE enum [index.ts:6-13](../Projekt-ikaros-FE/src/shared/types/index.ts#L6) (PJ **neexistuje**) ↔ BE [ikaros-articles.service.ts:28](../Projekt-ikaros/backend/src/modules/ikaros/ikaros-articles.service.ts#L28) (`ADMIN_ROLES` = `[Superadmin, Admin, SpravceClanku]`, bez PJ)
+- **Symptom:** FE má v reviewerech navíc `UserRole.PJ`, který globální FE enum nedefinuje → `UserRole.PJ === undefined` → REVIEWER_ROLES = `[1,2,undefined,10]`. Runtime neškodné (`undefined` nematchne žádnou roli), ale: (a) drift vůči BE (BE PJ nepovoluje), (b) komentář ř.29-31 lže („PJ smí schvalovat"), (c) `UserRole.PJ` je TS chyba pod app tsconfigem (můj `tsc --noEmit` to minul kvůli project references — pre-existing build dluh). Galerie/diskuze čisté = vzor.
+- **Osa:** `EN` `PA` — N-14 (globální PJ do platformy nepatří)
+- **Návrh:** Smazat `UserRole.PJ` z REVIEWER_ROLES + opravit komentář. Triviální.
+- **Stav:** 🐛 potvrzeno.
 
 ### R-04 — Restricted world chat: zprávy tečou přes WS `room:join` bez access checku 🐛🔴 (VYSOKÁ — PC leak)
 - **Oblast / bod:** [08](role-plan/08-svet-chat-zvuky.md) CH-17 · [09](role-plan/09-ws-role-gating.md) WR-07

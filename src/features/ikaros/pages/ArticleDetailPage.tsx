@@ -26,14 +26,16 @@ import {
 import type { IkarosArticle } from '@/shared/types';
 import s from './ArticleDetailPage.module.css';
 
-// N-14 — sjednoceno s BE `ADMIN_ROLES` (ikaros-articles.service): globální
-// `UserRole.PJ` (=3) je platformová role a smí schvalovat články. FE ho dřív
-// v reviewerech vynechával → PJ schválil přes API, ale tlačítko neviděl.
-const LEGACY_PJ_ROLE = 3 as UserRole;
+// R-10 / N-14 — revieweři článků = sjednoceno s BE `ADMIN_ROLES`
+// (ikaros-articles.service): Superadmin, Admin, SpravceClanku. Globální PJ
+// NEEXISTUJE (D-053 ho zrušil, FE enum ho nezná) — dřív tu byl `UserRole.PJ`
+// = `undefined` v poli + TS chyba pod app configem. PJ je world role, do
+// schvalování platformových článků nepatří (sjednoceno s galerie/diskuze).
+// (Rebase 2026-06-05: remote „Fix code build errors" obešel TS chybu castem
+// `3 as UserRole` = PJ ponechán; já odebírám pro paritu s BE ADMIN_ROLES.)
 const REVIEWER_ROLES: UserRole[] = [
   UserRole.Superadmin,
   UserRole.Admin,
-  LEGACY_PJ_ROLE,
   UserRole.SpravceClanku,
 ];
 

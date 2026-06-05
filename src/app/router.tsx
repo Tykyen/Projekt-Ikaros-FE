@@ -245,11 +245,13 @@ export const router = createBrowserRouter([
       { path: 'mapa',                   element: memberOnly(p(MapPage)) },
       { path: 'takticka-mapa',          element: memberOnly(p(TacticalMapPage)) },
       { path: 'bestiar',                element: memberOnly(p(BestiarPage)) },
-      { path: 'kalendar',               element: memberOnly(p(CalendarPage)) },
+      // R-18 — kalendář = „PJ pohled" (BE aggregate PomocnyPJ+); gate dřív na route.
+      { path: 'kalendar',               element: memberOnly(p(CalendarPage), WorldRole.PomocnyPJ) },
       // R-06 — timeline read = Hrac+ (BE `timeline.assertMember`); gate Ctenar
       // už na route, ať nenarazí na 403 na načtené stránce.
       { path: 'timeline',               element: memberOnly(p(TimelinePage), WorldRole.Hrac) },
-      { path: 'pocasi',                 element: memberOnly(p(WeatherPage)) },
+      // R-18 — počasí read = Hrac+ (BE `world-weather.assertMember`).
+      { path: 'pocasi',                 element: memberOnly(p(WeatherPage), WorldRole.Hrac) },
       // 9.1-I — game events. Hlavní route /akce, /sprava-udalosti je legacy redirect (1 měsíc).
       { path: 'akce',                   element: memberOnly(p(EventsPage)) },
       { path: 'sprava-udalosti',        element: <Navigate to="../akce" replace /> },
