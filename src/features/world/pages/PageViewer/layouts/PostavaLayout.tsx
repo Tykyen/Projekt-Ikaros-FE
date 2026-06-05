@@ -20,6 +20,7 @@ import { currentUserAtom } from '@/shared/store/authStore';
 import { WorldRole, type CharacterTabId } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
+import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { getVisibleTabs } from '@/features/world/lib/characterTabVisibility';
 import { DiaryTab } from '../../CharacterDetailPage/components/DiaryTab';
 import { FinanceTab } from '../../CharacterDetailPage/components/FinanceTab';
@@ -75,6 +76,14 @@ export function PostavaLayout({ page }: Props) {
   // Aplikuje se na PJ/PomocnyPJ/vlastníka PC; hráč/Korektor sem nikdy nedoputuje
   // (canSeePrivate je false → subdoc taby v `tabs` array vůbec nejsou).
   const { data: worldSettings } = useWorldSettings(worldId);
+
+  // „Hraje:" musí ukázat přezdívku hráče, ne jeho userId. Dohledá se přes
+  // členy světa (stejný zdroj jako adresář postav).
+  const { data: members } = useWorldMembers(worldId);
+  const playerName = page.ownerUserId
+    ? members?.find((m) => m.userId === page.ownerUserId)?.user?.username
+    : undefined;
+
   const visibleTabs = useMemo(
     () => getVisibleTabs(page.type, worldSettings ?? undefined),
     [page.type, worldSettings],
@@ -202,6 +211,7 @@ export function PostavaLayout({ page }: Props) {
     <div className={s.layout}>
       <PostavaHero
         page={page}
+        playerName={playerName}
         canEdit={canEdit && activeTab === 'profil'}
         showEditBtn={subdocTabActive && canEdit}
         editMode={editMode}
@@ -285,6 +295,7 @@ export function PostavaLayout({ page }: Props) {
 
 function PostavaHero({
   page,
+  playerName,
   canEdit,
   showEditBtn,
   editMode,
@@ -292,6 +303,7 @@ function PostavaHero({
   worldSlug,
 }: {
   page: Page;
+  playerName?: string;
   canEdit: boolean;
   showEditBtn: boolean;
   editMode: boolean;
@@ -335,7 +347,10 @@ function PostavaHero({
         <h1 className={s.title}>{page.title}</h1>
         {isPC && page.ownerUserId && (
           <p className={s.owner}>
-            Hraje: <span className={s.ownerName}>{page.ownerUserId}</span>
+            Hraje:{' '}
+            <span className={s.ownerName}>
+              {playerName ?? 'Neznámý hráč'}
+            </span>
           </p>
         )}
       </div>
