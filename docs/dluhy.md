@@ -14,6 +14,15 @@
 > 3 bezpečnostní (N-7 members leak, N-8 room:join leak, N-9 sound spoof). Detaily, důkazy
 > a návrhy řešení v `bug-audit.md`. Opraveno během auditu: N-1 (test mock), D-029 (PWA ikony).
 
+### D-031 — Storybook stories padají na chybějící export useSocketReconnect
+**Soubor:** `src/features/chat/index.ts` (chybí export), konzumenti `*.stories.tsx` (vč. `src/features/users/components/tabs/ZpracovatTab/PendingActionCard.stories.tsx`)
+**Problém:** 3 storybook `.stories.tsx` soubory importují `useSocketReconnect` z `@/features/chat`, ale `features/chat/index.ts` ten symbol neexportuje → `vitest run` hlásí 3 failed test files (import error). Reálné testy běží v pořádku (2543 passed); padá pouze import storybook souborů. Pre-existing (nesouvisí s focal prací 2026-06-05).
+**Dopad:** Nízký — netýká se runtime ani unit testů; rozbitý je jen storybook build / story import.
+**Řešení:** Doplnit `export { useSocketReconnect } from './hooks/useSocketReconnect'` (nebo správná cesta) do `features/chat/index.ts`, nebo opravit importy ve stories na přímou cestu. Ověřit, že symbol existuje a kde.
+**Kdy:** Při nejbližší práci v chat featuře nebo storybooku.
+
+---
+
 ### D-030 — Správa push zařízení jen pro aktuální zařízení
 **Soubor:** `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx` — 13.2c
 **Problém:** `PushToggle` umí jen zapnout/vypnout push na **právě používaném** zařízení. Roadmapa 13.2d chtěla „uživatel vidí svá zařízení / subscriptions a může je odebrat" — to chybí, protože BE `push` modul nemá endpoint pro výpis subscriptions uživatele (jen subscribe/unsubscribe dle endpointu).
