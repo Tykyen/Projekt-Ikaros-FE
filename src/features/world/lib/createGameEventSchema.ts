@@ -25,7 +25,11 @@ export const createGameEventSchema = z
       .max(5000, 'Maximálně 5000 znaků')
       .optional()
       .or(z.literal('')),
-    targetGroup: z.string().nullable().optional(),
+    targetGroup: z
+      .string()
+      .max(64, 'Maximálně 64 znaků')
+      .nullable()
+      .optional(),
     groupOnly: z.boolean().default(false),
     confirmable: z.boolean().default(true),
   })

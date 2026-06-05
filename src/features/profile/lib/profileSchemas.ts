@@ -12,7 +12,7 @@ export const characterSchema = z.object({
 });
 
 export const headerSchema = z.object({
-  displayName: z.string().max(64, 'Maximálně 64 znaků').optional(),
+  displayName: z.string().max(32, 'Maximálně 32 znaků').optional(),
   city: z.string().max(100, 'Maximálně 100 znaků').optional(),
 });
 
@@ -34,7 +34,10 @@ export const passwordSchema = z
     message: 'Nové heslo se musí lišit od současného',
   });
 
-// 1.3b — žádost o změnu username (přísnější regex shodný s BE: /^[a-z0-9-]{3,32}$/)
+// 1.3b — žádost o změnu username.
+// Pozn.: FE je ZÁMĚRNĚ přísnější než BE. BE `RequestUsernameChangeDto` validuje
+// jen `/^[^@]+$/` (povolí mezery i velká písmena), FE zde vynucuje slug formát
+// `/^[a-z0-9-]+$/` (jen malá písmena, číslice, pomlčky) — lepší pro username.
 export const usernameRequestSchema = z.object({
   requestedUsername: z
     .string()

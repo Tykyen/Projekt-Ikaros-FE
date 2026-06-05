@@ -58,18 +58,6 @@ export interface CharacterDirectoryEntry {
   userId?: string;
 }
 
-/** 8.2 — Vstup tvorby postavy (`POST .../characters`). Typ je v UI vybrán
- *  jako PC/NPC/Lokace a přeložen do trojice `isNpc`/`isLocation`/`userId`. */
-export interface CreateCharacterInput {
-  name: string;
-  slug: string;
-  isNpc: boolean;
-  isLocation: boolean;
-  userId?: string;
-  imageUrl?: string;
-  publicBio?: string;
-}
-
 /** 8.2 — Vstup convertu (`PATCH .../convert`). `userId` → PC, prázdné → NPC. */
 export interface ConvertCharacterInput {
   userId?: string;

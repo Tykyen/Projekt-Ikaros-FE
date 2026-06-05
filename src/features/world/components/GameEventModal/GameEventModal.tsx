@@ -10,7 +10,9 @@ import {
   useCreateGameEvent,
   useUpdateGameEvent,
 } from '@/features/world/api/useGameEvents';
-import { useUploadImage } from '@/features/ikaros/api/useUploadImage';
+// Světový obsah → content-image upload (PomocnyPJ+ není globální Admin, takže
+// admin-gated /upload/image vracel 403). Modal je gated na world roli.
+import { useUploadImage } from '@/shared/api/useUploadImage';
 import {
   createGameEventSchema,
   type CreateGameEventFormValues,

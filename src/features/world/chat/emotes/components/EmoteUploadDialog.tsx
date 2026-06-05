@@ -10,7 +10,9 @@ import {
 import { UploadCloud, X } from 'lucide-react';
 import { toast } from 'sonner';
 import clsx from 'clsx';
-import { useUploadImage } from '@/features/ikaros/api/useUploadImage';
+// Světový obsah → content-image upload (PomocnyPJ+ není globální Admin, takže
+// admin-gated /upload/image vracel 403). Dialog je gated na world roli.
+import { useUploadImage } from '@/shared/api/useUploadImage';
 import { useCreateEmote } from '../api/useCreateEmote';
 import { useCreateGlobalEmote } from '../api/useCreateGlobalEmote';
 import { useUpdateEmote } from '../api/useUpdateEmote';

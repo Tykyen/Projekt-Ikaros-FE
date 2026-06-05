@@ -30,7 +30,9 @@ export function useRequestUsernameChange() {
     mutationFn: (requestedUsername: string) =>
       api.post<{ request: UsernameChangeRequest }>(
         '/users/me/username-request',
-        { requestedUsername },
+        // F-27 — BE `RequestUsernameChangeDto` očekává `newUsername` (ne
+        // `requestedUsername`). Bez mapování whitelist pole zahodí → 400.
+        { newUsername: requestedUsername },
       ),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['users', 'me', 'username-request'] });

@@ -21,7 +21,13 @@ export interface ResetPasswordResponse {
  */
 export function useResetPassword() {
   return useMutation({
+    // F-01 — BE `auth/reset-password.dto` očekává pole `password` (ne `newPassword`,
+    // se kterým pracuje FE formulář). Bez mapování by `whitelist:true` `newPassword`
+    // tiše zahodil → `password` chybí → 400. Mapujeme na BE kontrakt.
     mutationFn: (dto: { token: string; newPassword: string }) =>
-      api.post<ResetPasswordResponse>('/auth/reset-password', dto),
+      api.post<ResetPasswordResponse>('/auth/reset-password', {
+        token: dto.token,
+        password: dto.newPassword,
+      }),
   });
 }

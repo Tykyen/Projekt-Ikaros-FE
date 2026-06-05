@@ -14,6 +14,8 @@ interface Props {
   onSave?: () => void | Promise<unknown>;
   onCancel?: () => void;
   isSaving?: boolean;
+  /** Zakáže tlačítko „Uložit" (např. neplatný vstup). */
+  saveDisabled?: boolean;
   /** Disabled — sekce „Připravujeme" (1.3b/c) */
   disabled?: boolean;
   disabledReason?: string;
@@ -33,6 +35,7 @@ export function EditCard({
   onSave,
   onCancel,
   isSaving,
+  saveDisabled,
   disabled,
   disabledReason,
 }: Props) {
@@ -78,7 +81,7 @@ export function EditCard({
             type="button"
             variant="primary"
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || saveDisabled}
           >
             {isSaving ? 'Ukládám…' : 'Uložit'}
           </Button>

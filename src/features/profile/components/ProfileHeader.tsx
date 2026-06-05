@@ -191,7 +191,7 @@ export function ProfileHeader({ user }: Props) {
                 <span>Jméno</span>
                 <Input
                   type="text"
-                  maxLength={64}
+                  maxLength={32}
                   {...form.register('displayName')}
                 />
                 {form.formState.errors.displayName && (

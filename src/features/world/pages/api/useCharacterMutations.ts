@@ -8,7 +8,6 @@ import {
   type CharacterFinance,
   type CharacterInventory,
   type CharacterNotes,
-  type CreateCharacterInput,
   type ConvertCharacterInput,
   type InfoBlock,
   type SchemaBlock,
@@ -111,26 +110,6 @@ export function useUpdateCharacter(worldId: string, slug: string) {
       void qc.invalidateQueries({
         queryKey: charactersQueryKey.directory(worldId),
       });
-    },
-  });
-}
-
-/** 8.2 — Tvorba postavy (`POST .../characters`). BE po vytvoření synchronně
- *  dotvoří subdokumenty (kaskáda) — odpověď přijde až s kompletní postavou. */
-export function useCreateCharacter(worldId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: CreateCharacterInput) =>
-      api.post<Character>(`/worlds/${worldId}/characters`, input),
-    onSuccess: (character) => {
-      qc.setQueryData(
-        charactersQueryKey.detail(worldId, character.slug),
-        character,
-      );
-      void qc.invalidateQueries({
-        queryKey: charactersQueryKey.directory(worldId),
-      });
-      void qc.invalidateQueries({ queryKey: membersQueryKey(worldId) });
     },
   });
 }

@@ -45,7 +45,16 @@ export function AppearanceSection({ user }: Props) {
   const adjustDirty =
     brightness !== 1 || contrast !== 1 || Object.keys(overrides).length > 0;
 
+  // F-28 — BE vyžaduje úplný 6-místný hex (`@Matches(/^#[0-9a-fA-F]{6}$/)`).
+  // Ruční HEX input může pustit neúplný hex (`#ABC`, `#`) → bez gate by BE
+  // vrátil 400. Drag picker emituje vždy úplný hex, ten projde.
+  const isValidChatColor = /^#[0-9A-Fa-f]{6}$/.test(color);
+
   async function saveColor() {
+    if (!isValidChatColor) {
+      toast.error('Zadej úplnou barvu ve formátu #RRGGBB.');
+      return;
+    }
     await update.mutateAsync({ chatColor: color });
     setEditingColor(false);
   }
@@ -163,6 +172,7 @@ export function AppearanceSection({ user }: Props) {
         onSave={saveColor}
         onCancel={cancelColor}
         isSaving={update.isPending}
+        saveDisabled={!isValidChatColor}
         editView={<ChatColorPicker value={color} onChange={setColor} />}
       >
         <div className={styles.swatchRow}>
