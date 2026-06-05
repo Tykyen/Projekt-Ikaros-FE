@@ -510,6 +510,29 @@ export function TacticalMapView(): React.ReactElement {
     },
   });
 
+  // C-24 — smazání tokenu: optimistic patch + rollback + toast (stejný pattern
+  // jako moveMutation). Dřív raw post bez efektu → token držel na ploše do WS
+  // echa a selhání bylo tiché (modal se zavřel = dojem „smazáno").
+  const removeMutation = useMutation({
+    mutationFn: ({ sceneId, op }: { sceneId: string; op: MapOperation }) =>
+      postMapOperation(sceneId, op),
+    onMutate: ({ op }) => {
+      if (!worldId || !scene) return { prev: null };
+      const prev = queryClient.getQueryData(mapSceneQueryKey(worldId));
+      queryClient.setQueryData(
+        mapSceneQueryKey(worldId),
+        applyOperationToScene(scene, op),
+      );
+      return { prev };
+    },
+    onError: (err, _vars, ctx) => {
+      if (worldId && ctx?.prev) {
+        queryClient.setQueryData(mapSceneQueryKey(worldId), ctx.prev);
+      }
+      toast.error(`Smazání tokenu selhalo: ${parseApiError(err)}`);
+    },
+  });
+
   // 10.2c-edit-9a — spawn mutation (token.add). Žádný optimistic — BE
   // přepíše pending ID UUID-em, optimistic by způsobil flicker. WS broadcast
   // přijde za pár ms a applyOperationToScene token přidá pro všechny.
@@ -1459,9 +1482,13 @@ export function TacticalMapView(): React.ReactElement {
                       type="button"
                       onClick={() => {
                         if (!confirm(`Smazat token „${displayName}"?`)) return;
-                        void postMapOperation(scene.id, {
-                          type: "token.remove",
-                          tokenId: openedToken.id,
+                        // C-24 — optimistic remove + rollback (viz removeMutation).
+                        removeMutation.mutate({
+                          sceneId: scene.id,
+                          op: {
+                            type: "token.remove",
+                            tokenId: openedToken.id,
+                          },
                         });
                         setOpenedTokenId(null);
                       }}

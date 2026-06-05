@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api, parseApiError, parseApiErrorCode } from '@/shared/api/client';
+import { adminKeys } from '../../api/adminKeys';
 import type {
   AdminFriendshipByPairResponse,
   AdminFriendshipsListResponse,
@@ -19,7 +20,7 @@ export function useAdminFriendshipByPair(
 ) {
   const enabled = !!userA && !!userB && userA !== userB;
   return useQuery({
-    queryKey: ['admin', 'friendships', 'by-pair', userA, userB],
+    queryKey: [...adminKeys.friendships, 'by-pair', userA, userB],
     queryFn: () =>
       api.get<AdminFriendshipByPairResponse>('/admin/friendships/by-pair', {
         userA: userA!,
@@ -33,7 +34,7 @@ export function useAdminFriendshipByPair(
 /** D-056 — Seznam friendships konkrétního usera. */
 export function useAdminFriendshipsByUser(userId: string | null) {
   return useQuery({
-    queryKey: ['admin', 'friendships', 'by-user', userId],
+    queryKey: [...adminKeys.friendships, 'by-user', userId],
     queryFn: () =>
       api.get<AdminFriendshipsListResponse>('/admin/friendships', {
         userId: userId!,
@@ -54,8 +55,8 @@ export function useAdminResetCooldown() {
         `/admin/friendships/${friendshipId}/reset-cooldown`,
       ),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'friendships'] });
-      qc.invalidateQueries({ queryKey: ['admin', 'audit-log'] });
+      qc.invalidateQueries({ queryKey: adminKeys.friendships });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
       toast.success('Cooldown resetován');
     },
     onError: (err) => {

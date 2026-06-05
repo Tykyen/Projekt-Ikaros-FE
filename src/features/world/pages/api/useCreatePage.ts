@@ -55,6 +55,11 @@ export function useCreatePage(worldId: string, worldSlug: string) {
       void qc.invalidateQueries({
         queryKey: pagesQueryKey.directory(worldId),
       });
+      // C-15 — postava/NPC se zakládá přes Page; obnov i legacy character
+      // directory (sidebar nav slot, MembersTab, mapa spawn, TransferModal).
+      void qc.invalidateQueries({
+        queryKey: ['characters', worldId, 'directory'],
+      });
       void qc.invalidateQueries({
         queryKey: ['worlds', 'slug', worldSlug],
       });

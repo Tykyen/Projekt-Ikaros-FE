@@ -34,6 +34,8 @@ export function useUpdateMember(worldId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['worlds', worldId, 'members'] });
+      // C-03 — změna vlastní role se promítá do useMyWorlds (WorldContext role/slot).
+      qc.invalidateQueries({ queryKey: ['worlds', 'my'] });
     },
   });
 }

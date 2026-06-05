@@ -46,7 +46,11 @@ export function useCreateCalendarConfig(worldId: string | undefined) {
     mutationFn: (dto: CreateCalendarConfigDto) =>
       api.post<CalendarConfig>(`/worlds/${worldId}/calendar-configs`, dto),
     onSuccess: () => {
-      if (worldId) qc.invalidateQueries({ queryKey: calendarConfigsKey(worldId) });
+      if (worldId) {
+        qc.invalidateQueries({ queryKey: calendarConfigsKey(worldId) });
+        // C-11 — agregátní kalendář (PJ view) je samostatný namespace.
+        qc.invalidateQueries({ queryKey: ['calendars-aggregate', worldId] });
+      }
     },
   });
 }
@@ -74,7 +78,11 @@ export function useUpdateCalendarConfig(worldId: string | undefined) {
         dto,
       ),
     onSuccess: () => {
-      if (worldId) qc.invalidateQueries({ queryKey: calendarConfigsKey(worldId) });
+      if (worldId) {
+        qc.invalidateQueries({ queryKey: calendarConfigsKey(worldId) });
+        // C-11 — agregátní kalendář (PJ view) je samostatný namespace.
+        qc.invalidateQueries({ queryKey: ['calendars-aggregate', worldId] });
+      }
     },
   });
 }
@@ -85,7 +93,11 @@ export function useDeleteCalendarConfig(worldId: string | undefined) {
     mutationFn: (slug: string) =>
       api.delete<void>(`/worlds/${worldId}/calendar-configs/${slug}`),
     onSuccess: () => {
-      if (worldId) qc.invalidateQueries({ queryKey: calendarConfigsKey(worldId) });
+      if (worldId) {
+        qc.invalidateQueries({ queryKey: calendarConfigsKey(worldId) });
+        // C-11 — agregátní kalendář (PJ view) je samostatný namespace.
+        qc.invalidateQueries({ queryKey: ['calendars-aggregate', worldId] });
+      }
     },
   });
 }
@@ -106,6 +118,7 @@ export function useUpdateCalendarDefaults(worldId: string | undefined) {
     onSuccess: () => {
       if (!worldId) return;
       qc.invalidateQueries({ queryKey: calendarConfigsKey(worldId) });
+      qc.invalidateQueries({ queryKey: ['calendars-aggregate', worldId] }); // C-11
       // 9.3-F-II FIX (2026-05-26) — `useWorld(slug|id)` má queryKey
       // ['worlds', 'slug'|'id', key], NE singular ['world', worldId].
       // Broad invalidate, ať se ⭐ default ikona okamžitě překreslí

@@ -136,6 +136,8 @@ export function MapPjPanel({
       // Invalidate members (refresh currentSceneId-y) + mou scénu (pokud se self switch)
       void queryClient.invalidateQueries({ queryKey: ['worlds', worldId, 'members'] });
       void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
+      // C-25 — PJ list aktivních scén (REST fallback k WS).
+      void queryClient.invalidateQueries({ queryKey: activeScenesQueryKey(worldId) });
     },
   });
 
@@ -199,8 +201,9 @@ export function MapPjPanel({
       void queryClient.invalidateQueries({
         queryKey: ['worlds', worldId, 'members'],
       });
+      // C-26 — byl tu dead key ['map','world-scenes',…,'active']; správný factory.
       void queryClient.invalidateQueries({
-        queryKey: ['map', 'world-scenes', worldId, 'active'],
+        queryKey: activeScenesQueryKey(worldId),
       });
     },
   });

@@ -54,6 +54,9 @@ export function useUpdateCurrencies(worldId: string) {
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: key });
+      // D-05-2 — account currency dropdown čte přes ['worlds',w,'currencies']
+      // (worldCurrenciesQueryKey v characters.types) — jiný klíč, týž endpoint.
+      qc.invalidateQueries({ queryKey: ['worlds', worldId, 'currencies'] });
     },
   });
 }

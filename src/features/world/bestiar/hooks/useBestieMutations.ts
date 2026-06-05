@@ -10,7 +10,6 @@ import {
   cloneBestie,
   restoreBestie,
 } from '../api/bestiarApi';
-import { bestiarQueryKey } from './useBestiar';
 import type {
   CreateBestiePayload,
   UpdateBestiePayload,
@@ -22,8 +21,14 @@ export function useBestieMutations(
   systemId: string | null,
 ) {
   const queryClient = useQueryClient();
+  // C-33 — system/user-scope bestie jsou cross-world; klíč ['bestiar', worldId,
+  // systemId] nese worldId, takže přesný klíč by minul ostatní otevřené světy se
+  // stejnými globálními/uživatelskými bestiemi. Invaliduj všechny světy téhož systému.
   const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: bestiarQueryKey(worldId, systemId) });
+    queryClient.invalidateQueries({
+      predicate: (q) =>
+        q.queryKey[0] === 'bestiar' && q.queryKey[2] === (systemId ?? 'none'),
+    });
 
   return {
     create: useMutation({

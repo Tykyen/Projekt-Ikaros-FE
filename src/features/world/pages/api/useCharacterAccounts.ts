@@ -97,15 +97,9 @@ export function useUpdateAccount(worldId: string, accountId: string) {
         charactersQueryKey.accountDetail(worldId, accountId),
         account,
       );
-      // Invalidovat všechny owner-listy, kde se účet objeví (shared accounts).
-      for (const ownerCharId of account.ownerCharacterIds) {
-        void qc.invalidateQueries({
-          queryKey: ['characters', worldId, 'detail'],
-          predicate: (q) =>
-            q.queryKey[3] === ownerCharId || q.queryKey.includes(ownerCharId),
-        });
-      }
-      // Fallback — invalidovat celý character cluster.
+      // C-21 — broad invalidace obnoví VŠECHNY owner-listy (vč. shared účtů
+      // u co-ownerů). Dřívější per-owner predikát byl dead: `queryKey[3]` je
+      // slug, `ownerCharId` ObjectId → nikdy nematchnul (past id_vs_character_id).
       void qc.invalidateQueries({ queryKey: ['characters', worldId] });
     },
   });
@@ -117,6 +111,11 @@ export function useDeleteAccount(worldId: string, accountId: string) {
     mutationFn: () =>
       api.delete<{ ok: true }>(`/worlds/${worldId}/accounts/${accountId}`),
     onSuccess: () => {
+      // D-05-1 — accountDetail je vlastní namespace ['accounts',…], který broad
+      // ['characters',w] netrefí; remove (ne invalidate) ať se nerefetchne 404.
+      qc.removeQueries({
+        queryKey: charactersQueryKey.accountDetail(worldId, accountId),
+      });
       void qc.invalidateQueries({ queryKey: ['characters', worldId] });
     },
   });

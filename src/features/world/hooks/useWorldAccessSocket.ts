@@ -53,7 +53,8 @@ export function useWorldAccessSocket(): void {
   useSocketEvent<AccessApprovedPayload>('world:access-approved', (p) => {
     qc.invalidateQueries({ queryKey: ['worlds', 'my-access-requests'] });
     qc.invalidateQueries({ queryKey: ['worlds', 'my'] });
-    qc.invalidateQueries({ queryKey: ['worlds', p.worldId] });
+    // C-01 — broad ['worlds'] (ne ['worlds',worldId]) ať se obnoví i world detail.
+    qc.invalidateQueries({ queryKey: ['worlds'] });
     toast.success(`Tvá žádost o vstup do „${p.worldName}" byla přijata.`);
   });
 

@@ -85,7 +85,11 @@ export function useDeleteArticle() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`${PREFIX}/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ARTICLES_KEY }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ARTICLES_KEY });
+      // C-42 — smazání Published článku mění počet nepřečtených (badge).
+      qc.invalidateQueries({ queryKey: ['article-reads', 'unread-count'] });
+    },
   });
 }
 
@@ -108,6 +112,8 @@ export function useApproveArticle() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ARTICLES_KEY });
       qc.invalidateQueries({ queryKey: ['pending-actions'] });
+      // C-38 — approve = nový Published článek → badge nepřečtených ho započte.
+      qc.invalidateQueries({ queryKey: ['article-reads', 'unread-count'] });
     },
   });
 }
@@ -140,8 +146,11 @@ export function useRateArticle() {
         `${PREFIX}/${id}/rate`,
         { stars, text },
       ),
-    onSuccess: (_, { id }) =>
-      qc.invalidateQueries({ queryKey: [...ARTICLES_KEY, 'detail', id] }),
+    onSuccess: (_, { id }) => {
+      qc.invalidateQueries({ queryKey: [...ARTICLES_KEY, 'detail', id] });
+      // C-39 — průměr hvězdiček je i na kartách v Přehledu + author sidebaru.
+      qc.invalidateQueries({ queryKey: ARTICLES_KEY });
+    },
   });
 }
 

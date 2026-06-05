@@ -6,7 +6,6 @@
  */
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { Button, Spinner } from '@/shared/ui';
@@ -42,7 +41,6 @@ export default function EmailChangeConfirmPage() {
   const [params] = useSearchParams();
   const token = params.get('token');
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const confirm = useEmailChangeConfirm();
   const [state, setState] = useState<State>(token ? 'verifying' : 'failed');
   const [errorCode, setErrorCode] = useState<string | null>(
@@ -55,7 +53,7 @@ export default function EmailChangeConfirmPage() {
       .mutateAsync(token)
       .then(() => {
         setState('success');
-        qc.invalidateQueries({ queryKey: ['users', 'me'] });
+        // C-30 — invalidace ['users','me'] je v useEmailChangeConfirm.onSuccess.
         toast.success('E-mail byl úspěšně změněn.');
       })
       .catch((err) => {

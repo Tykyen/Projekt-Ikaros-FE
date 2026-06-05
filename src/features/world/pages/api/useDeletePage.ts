@@ -21,6 +21,16 @@ export function useDeletePage(worldId: string, worldSlug: string) {
       qc.removeQueries({
         queryKey: pagesQueryKey.backlinks(worldId, vars.slug),
       });
+      // C-17 — meta cache smazané stránky (parita s backlinks remove).
+      qc.removeQueries({
+        queryKey: pagesQueryKey.meta(worldId, vars.slug),
+      });
+      // C-16 — backlinks cílů, na které mazaná odkazovala (FE je nezná) → broad.
+      void qc.invalidateQueries({ queryKey: ['pages', worldId, 'backlinks'] });
+      // C-15 — postava mohla být smazána přes Page → obnov character directory.
+      void qc.invalidateQueries({
+        queryKey: ['characters', worldId, 'directory'],
+      });
       // Favorite slug může obsahovat smazanou stránku — invalidovat world cache
       void qc.invalidateQueries({
         queryKey: ['worlds', 'slug', worldSlug],

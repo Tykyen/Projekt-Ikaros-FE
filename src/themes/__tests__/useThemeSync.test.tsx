@@ -1,5 +1,6 @@
 ﻿import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider as JotaiProvider, createStore } from 'jotai';
 import type { PropsWithChildren } from 'react';
 import { useThemeSync } from '../useThemeSync';
@@ -16,8 +17,11 @@ vi.mock('@/shared/api/client', () => ({
 }));
 
 function makeWrapper(store = createStore()) {
+  const qc = new QueryClient();
   return ({ children }: PropsWithChildren) => (
-    <JotaiProvider store={store}>{children}</JotaiProvider>
+    <QueryClientProvider client={qc}>
+      <JotaiProvider store={store}>{children}</JotaiProvider>
+    </QueryClientProvider>
   );
 }
 

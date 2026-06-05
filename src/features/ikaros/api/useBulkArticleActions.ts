@@ -22,7 +22,8 @@ export function useBulkApproveArticles() {
       api.post<BulkResult>('/ikaros-articles/bulk/approve', { ids }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['articles'] });
-      void qc.invalidateQueries({ queryKey: ['articles', 'pending'] });
+      // C-37 — dead key ['articles','pending'] nahrazen review frontou + badge.
+      void qc.invalidateQueries({ queryKey: ['pending-actions'] });
     },
   });
 }
@@ -34,7 +35,8 @@ export function useBulkRejectArticles() {
       api.post<BulkResult>('/ikaros-articles/bulk/reject', { ids, reason }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['articles'] });
-      void qc.invalidateQueries({ queryKey: ['articles', 'pending'] });
+      // C-37 — dead key ['articles','pending'] nahrazen review frontou + badge.
+      void qc.invalidateQueries({ queryKey: ['pending-actions'] });
     },
   });
 }

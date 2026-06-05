@@ -48,6 +48,7 @@ export function useFriendshipsSocket(): void {
   useSocketEvent<AcceptedPayload>('friend:request:accepted', (p) => {
     qc.invalidateQueries({ queryKey: ['friends'] });
     qc.invalidateQueries({ queryKey: ['friendship-status'] });
+    qc.invalidateQueries({ queryKey: ['pending-actions'] }); // C-13 — badge žádostí
     toastFriendRequestAccepted(p.by);
   });
 
@@ -58,11 +59,13 @@ export function useFriendshipsSocket(): void {
 
   useSocketEvent<SimplePayload>('friend:request:canceled', () => {
     qc.invalidateQueries({ queryKey: ['pending-actions'] });
+    qc.invalidateQueries({ queryKey: ['friendship-status'] }); // C-13 — tlačítko na profilu
   });
 
   useSocketEvent<SimplePayload>('friend:removed', () => {
     qc.invalidateQueries({ queryKey: ['friends'] });
     qc.invalidateQueries({ queryKey: ['friendship-status'] });
+    qc.invalidateQueries({ queryKey: ['pending-actions'] }); // C-13 — badge žádostí
   });
 
   // W-1 — blokace zruší přátelství; tichá invalidace bez toastu (blokovanému
@@ -71,5 +74,12 @@ export function useFriendshipsSocket(): void {
     qc.invalidateQueries({ queryKey: ['friends'] });
     qc.invalidateQueries({ queryKey: ['friendship-status'] });
     qc.invalidateQueries({ queryKey: ['pending-actions'] });
+  });
+
+  // C-31 — admin změnil identitu (role/ban/unban/username); BE pushuje do
+  // user:{id} roomu. Obnov vlastní profil i veřejný profil (role chip / overlay).
+  useSocketEvent<{ kind: string }>('user:identity:changed', () => {
+    qc.invalidateQueries({ queryKey: ['users', 'me'] });
+    qc.invalidateQueries({ queryKey: ['public-user-profile'] });
   });
 }

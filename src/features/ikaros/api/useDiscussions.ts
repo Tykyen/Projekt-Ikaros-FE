@@ -133,6 +133,7 @@ export function useDeletePost() {
 }
 
 export function useReportPost() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
@@ -143,6 +144,10 @@ export function useReportPost() {
       postId: string;
       reason: string;
     }) => api.post(`${PREFIX}/${id}/posts/${postId}/report`, { reason }),
+    onSuccess: () => {
+      // C-41 — nahlášení se musí objevit v moderátorské frontě + badge.
+      qc.invalidateQueries({ queryKey: ['pending-actions'] });
+    },
   });
 }
 

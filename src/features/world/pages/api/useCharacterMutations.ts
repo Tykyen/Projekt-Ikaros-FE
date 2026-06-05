@@ -110,6 +110,8 @@ export function useUpdateCharacter(worldId: string, slug: string) {
       void qc.invalidateQueries({
         queryKey: charactersQueryKey.directory(worldId),
       });
+      // C-20 — primární grid postav je servírovaný z Page projekce (persona).
+      void qc.invalidateQueries({ queryKey: ['pages', worldId, 'directory'] });
     },
   });
 }
@@ -129,6 +131,8 @@ export function useDeleteCharacter(worldId: string) {
         queryKey: charactersQueryKey.directory(worldId),
       });
       void qc.invalidateQueries({ queryKey: membersQueryKey(worldId) });
+      // C-20 — persona grid (Page projekce).
+      void qc.invalidateQueries({ queryKey: ['pages', worldId, 'directory'] });
     },
   });
 }
@@ -154,6 +158,12 @@ export function useConvertCharacter(worldId: string, slug: string) {
         queryKey: charactersQueryKey.directory(worldId),
       });
       void qc.invalidateQueries({ queryKey: membersQueryKey(worldId) });
+      // C-20 — persona grid (Page projekce).
+      void qc.invalidateQueries({ queryKey: ['pages', worldId, 'directory'] });
+      // D-05-3 — convert může měnit viditelnost účtů (PC↔NPC).
+      void qc.invalidateQueries({
+        queryKey: charactersQueryKey.accountsByCharacter(worldId, slug),
+      });
     },
   });
 }
@@ -190,6 +200,8 @@ export function useUpdateCharacterCalendar(worldId: string, slug: string) {
         charactersQueryKey.subdoc(worldId, slug, 'calendar'),
         calendar,
       );
+      // C-22 — agregátní kalendář (PJ view) je samostatný namespace.
+      void qc.invalidateQueries({ queryKey: ['calendars-aggregate', worldId] });
     },
   });
 }

@@ -11,9 +11,10 @@ export function useJoinWorld() {
   return useMutation({
     mutationFn: (worldId: string) =>
       api.post<WorldMembership>(`/worlds/${worldId}/join`),
-    onSuccess: (_data, worldId) => {
-      qc.invalidateQueries({ queryKey: ['worlds', worldId] });
-      qc.invalidateQueries({ queryKey: ['worlds', 'my'] });
+    onSuccess: () => {
+      // C-01 — broad ['worlds'] prefixuje VŠECHNY world dotazy vč. detailu
+      // ['worlds','id'|'slug',key]; ['worlds',worldId] detail netrefí (segment [1]).
+      qc.invalidateQueries({ queryKey: ['worlds'] });
     },
   });
 }
@@ -62,8 +63,11 @@ export function useApproveAccessRequest() {
       api.post<{ ok: true; membership: WorldMembership }>(
         `/worlds/${worldId}/access-requests/${requestId}/approve`,
       ),
-    onSuccess: () => {
+    onSuccess: (_data, { worldId }) => {
       qc.invalidateQueries({ queryKey: ['pending-actions'] });
+      // C-02 — REST fallback k WS world:membership:changed: obnov seznam členů
+      // i bez socketu (jinak PJ nového člena neuvidí, dokud nedorazí WS echo).
+      qc.invalidateQueries({ queryKey: ['worlds', worldId, 'members'] });
     },
   });
 }

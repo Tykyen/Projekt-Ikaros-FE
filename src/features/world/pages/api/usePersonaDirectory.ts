@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
+import { pagesQueryKey } from './usePage';
 import type { PageDirectoryEntry } from './pages.types';
 
 /**
@@ -14,7 +15,7 @@ import type { PageDirectoryEntry } from './pages.types';
  */
 export function usePersonaDirectory(worldId: string) {
   return useQuery({
-    queryKey: ['pages', worldId, 'directory', 'persona'] as const,
+    queryKey: pagesQueryKey.personaDirectory(worldId), // C-19 — drift-safe factory
     queryFn: () =>
       api.get<PageDirectoryEntry[]>(
         `/worlds/${worldId}/pages/directory?type=${encodeURIComponent('Postava hráče')},NPC`,

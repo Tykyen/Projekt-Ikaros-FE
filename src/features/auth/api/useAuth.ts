@@ -31,12 +31,16 @@ const LOGOUT_UNDO_MS = 5000;
  * dle `result.status` před navigací / toast.
  */
 export function useLogin() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: LoginRequest) =>
       api.post<LoginResponse>('/auth/login', dto),
     onSuccess: (result) => {
       if (result.status !== 'ok') return; // deletion_pending řeší caller
       const store = getDefaultStore();
+      // C-29 — vyčisti RQ cache PŘED nasazením nové identity, ať se neobjeví
+      // data předchozího uživatele (account switch ve stejném tabu bez reloadu).
+      qc.clear();
       store.set(accessTokenAtom, result.accessToken);
       store.set(refreshTokenAtom, result.refreshToken);
       store.set(currentUserAtom, result.user);
@@ -54,11 +58,13 @@ export function useLogin() {
  * má přístup k useNavigate.
  */
 export function useRegister() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: RegisterRequest) =>
       api.post<AuthResponse>('/auth/register', dto),
     onSuccess: ({ accessToken, refreshToken, user }) => {
       const store = getDefaultStore();
+      qc.clear(); // C-29 — čistá cache pro nově registrovaného uživatele.
       store.set(accessTokenAtom, accessToken);
       store.set(refreshTokenAtom, refreshToken);
       store.set(currentUserAtom, user);
@@ -76,6 +82,7 @@ export function useRegister() {
  */
 export function useLogout() {
   const setPendingLogout = useSetAtom(pendingLogoutAtom);
+  const qc = useQueryClient();
 
   return function logout(): () => void {
     const store = getDefaultStore();
@@ -91,6 +98,8 @@ export function useLogout() {
       store.set(refreshTokenAtom, null);
       store.set(currentUserAtom, null);
       store.set(pendingLogoutAtom, null);
+      // C-29 — vyčisti RQ cache (jinak osobní data přežijí pro dalšího uživatele).
+      qc.clear();
     }, LOGOUT_UNDO_MS);
 
     return function cancel() {

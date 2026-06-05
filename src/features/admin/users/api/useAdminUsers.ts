@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api, parseApiError } from '@/shared/api/client';
+import { adminKeys } from '../../api/adminKeys';
 import type {
   AdminAuditAction,
   AdminAuditLogEntry,
@@ -105,7 +106,7 @@ export function useAdminUsers(query: AdminUsersQuery, enabled = true) {
   if (query.role !== undefined) params.role = query.role;
   if (query.hasPendingRequest) params.hasPendingRequest = 'true';
   return useQuery({
-    queryKey: ['admin', 'users', query],
+    queryKey: [...adminKeys.users, query],
     queryFn: () =>
       api.get<{ items: AdminUsersListItem[]; total: number }>(
         '/admin/users',
@@ -121,7 +122,13 @@ export function useAdminUpdateRole() {
     mutationFn: ({ userId, role }: { userId: string; role: UserRole }) =>
       api.patch<User>(`/admin/users/${userId}/role`, { role }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — role/ban/deletion se zobrazují i na veřejném profilu/adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      // C-51/C-52 — obnov i dashboard county a audit-log (akce jsou auditované).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
       toast.success('Role aktualizována');
     },
     onError: (err) => {
@@ -148,7 +155,13 @@ export function useAdminBanUser() {
         durationDays,
       }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — role/ban/deletion se zobrazují i na veřejném profilu/adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      // C-51/C-52 — obnov i dashboard county a audit-log (akce jsou auditované).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
       toast.success('Uživatel zabanován');
     },
     onError: (err) => {
@@ -163,7 +176,13 @@ export function useAdminUnbanUser() {
     mutationFn: (userId: string) =>
       api.post<{ user: User }>(`/admin/users/${userId}/unban`),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — role/ban/deletion se zobrazují i na veřejném profilu/adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      // C-51/C-52 — obnov i dashboard county a audit-log (akce jsou auditované).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
       toast.success('Uživatel odbanován');
     },
     onError: (err) => {
@@ -182,7 +201,13 @@ export function useAdminRequestDeletion() {
         reason,
       }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — role/ban/deletion se zobrazují i na veřejném profilu/adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      // C-51/C-52 — obnov i dashboard county a audit-log (akce jsou auditované).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
       toast.success('Účet naplánován na smazání (30denní hold)');
     },
     onError: (err) => {
@@ -197,7 +222,13 @@ export function useAdminCancelDeletion() {
     mutationFn: (userId: string) =>
       api.post<{ user: User }>(`/admin/users/${userId}/cancel-deletion`, {}),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — role/ban/deletion se zobrazují i na veřejném profilu/adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      // C-51/C-52 — obnov i dashboard county a audit-log (akce jsou auditované).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
       toast.success('Plánované smazání zrušeno');
     },
     onError: (err) => {
@@ -227,7 +258,13 @@ export function useAdminSetAdminPermissions() {
         permissions,
       ),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — role/ban/deletion se zobrazují i na veřejném profilu/adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      // C-51/C-52 — obnov i dashboard county a audit-log (akce jsou auditované).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
       toast.success('Oprávnění upraveno');
     },
     onError: (err) => {
@@ -244,7 +281,7 @@ export function useAdminUsernameRequests(query: {
   limit?: number;
 }) {
   return useQuery({
-    queryKey: ['admin', 'username-requests', query],
+    queryKey: [...adminKeys.usernameRequests, query],
     queryFn: () =>
       api.get<{ items: AdminUsernameRequestListItem[]; total: number }>(
         '/admin/username-requests',
@@ -261,8 +298,16 @@ export function useAdminApproveUsernameRequest() {
         `/admin/username-requests/${requestId}/approve`,
       ),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'username-requests'] });
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.usernameRequests });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — role/ban/deletion se zobrazují i na veřejném profilu/adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      // C-51/C-52 — obnov i dashboard county a audit-log (akce jsou auditované).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
+      // C-45 — UsernameRequest je pending-action → obnov bell/nav/panel badge.
+      qc.invalidateQueries({ queryKey: ['pending-actions'] });
       toast.success('Žádost schválena');
     },
     onError: (err) => {
@@ -297,7 +342,11 @@ export function useAdminBulkBan() {
       durationDays?: number;
     }) => api.post<BulkResult>('/admin/users/bulk-ban', body),
     onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      qc.invalidateQueries({ queryKey: ['public-users'] }); // C-12
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] }); // C-12
+      qc.invalidateQueries({ queryKey: adminKeys.stats }); // C-51
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog }); // C-52
       bulkResultToast(data, 'Bulk ban');
     },
     onError: (err) => toast.error(parseApiError(err)),
@@ -310,7 +359,11 @@ export function useAdminBulkUnban() {
     mutationFn: (userIds: string[]) =>
       api.post<BulkResult>('/admin/users/bulk-unban', { userIds }),
     onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      qc.invalidateQueries({ queryKey: ['public-users'] }); // C-12
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] }); // C-12
+      qc.invalidateQueries({ queryKey: adminKeys.stats }); // C-51
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog }); // C-52
       bulkResultToast(data, 'Bulk unban');
     },
     onError: (err) => toast.error(parseApiError(err)),
@@ -323,7 +376,11 @@ export function useAdminBulkRoleChange() {
     mutationFn: ({ userIds, role }: { userIds: string[]; role: UserRole }) =>
       api.post<BulkResult>('/admin/users/bulk-role-change', { userIds, role }),
     onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      qc.invalidateQueries({ queryKey: ['public-users'] }); // C-12
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] }); // C-12
+      qc.invalidateQueries({ queryKey: adminKeys.stats }); // C-51
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog }); // C-52
       bulkResultToast(data, 'Bulk role change');
     },
     onError: (err) => toast.error(parseApiError(err)),
@@ -347,7 +404,7 @@ export function useAdminAuditLog(query: {
   if (query.actorId) params.actorId = query.actorId;
   if (query.targetId) params.targetId = query.targetId;
   return useQuery({
-    queryKey: ['admin', 'audit-log', query],
+    queryKey: [...adminKeys.auditLog, query],
     queryFn: () =>
       api.get<{ items: AdminAuditLogEntry[]; total: number }>(
         '/admin/audit-log',
@@ -371,7 +428,11 @@ export function useAdminRejectUsernameRequest() {
         { reason },
       ),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin', 'username-requests'] });
+      qc.invalidateQueries({ queryKey: adminKeys.usernameRequests });
+      qc.invalidateQueries({ queryKey: adminKeys.users }); // C-45 bonus — sloupec pending v listu
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog }); // C-52
+      // C-45 — UsernameRequest je pending-action → obnov bell/nav/panel badge.
+      qc.invalidateQueries({ queryKey: ['pending-actions'] });
       toast.success('Žádost odmítnuta');
     },
     onError: (err) => {

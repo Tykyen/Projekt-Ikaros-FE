@@ -3,6 +3,7 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
+  type InfiniteData,
 } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
@@ -121,9 +122,17 @@ export function useDeleteMessage() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete<void>(`/ikaros-messages/${id}`),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: mailKeys.inbox });
-      void qc.invalidateQueries({ queryKey: mailKeys.sent });
+    onSuccess: (_data, id) => {
+      // C-08 — surgical removal z infinite cache (zachová scroll pozici místo
+      // refetch všech stránek). Unread badge dál invalidujeme (počet z BE).
+      const removeFromPages = (
+        old: InfiniteData<IkarosMessage[]> | undefined,
+      ): InfiniteData<IkarosMessage[]> | undefined =>
+        old
+          ? { ...old, pages: old.pages.map((p) => p.filter((m) => m.id !== id)) }
+          : old;
+      qc.setQueryData(mailKeys.inbox, removeFromPages);
+      qc.setQueryData(mailKeys.sent, removeFromPages);
       void qc.invalidateQueries({ queryKey: mailKeys.unread });
     },
   });

@@ -46,6 +46,14 @@ export function useWorldSocket(worldId: string | null): void {
     void qc.invalidateQueries({ queryKey: ['worlds'] });
   });
 
+  // C-04 — world news real-time (BE world:news:changed → world:{id}). Cizí PJ
+  // přidá/upraví oznámení → dashboard widget se obnoví bez čekání na staleTime.
+  useSocketEvent('world:news:changed', () => {
+    if (worldId) {
+      void qc.invalidateQueries({ queryKey: ['world-news', worldId] });
+    }
+  });
+
   // Členství se změnilo / bylo odebráno → refetch seznamu členů světa.
   const invalidateMembers = (): void => {
     if (worldId) {

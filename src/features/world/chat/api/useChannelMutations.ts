@@ -21,9 +21,13 @@ export interface CreateGroupInput {
 
 /** Vytvoření kanálu (`ChatGroup`) — PJ/Pomocný PJ. */
 export function useCreateGroup(worldId: string) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateGroupInput) =>
       api.post<ChatGroup>(`${base(worldId)}/groups`, dto),
+    // C-06 — self-invalidace sidebaru (REST fallback k WS echu chat:group:*).
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: worldChatKeys(worldId).groups }),
   });
 }
 
@@ -39,17 +43,23 @@ export interface UpdateGroupInput {
 
 /** Úprava kanálu (`ChatGroup`) — přejmenování, výměna obrázku. */
 export function useUpdateGroup(worldId: string) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ groupId, ...dto }: UpdateGroupInput) =>
       api.patch<ChatGroup>(`${base(worldId)}/groups/${groupId}`, dto),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: worldChatKeys(worldId).groups }), // C-06
   });
 }
 
 /** Smazání kanálu (`ChatGroup`) — kaskáduje na konverzace + zprávy. */
 export function useDeleteGroup(worldId: string) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (groupId: string) =>
       api.delete<void>(`${base(worldId)}/groups/${groupId}`),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: worldChatKeys(worldId).groups }), // C-06
   });
 }
 
@@ -64,12 +74,15 @@ export interface CreateChannelInput {
 
 /** Vytvoření konverzace (`ChatChannel`) uvnitř kanálu — PJ/Pomocný PJ. */
 export function useCreateChannel(worldId: string) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ groupId, ...dto }: CreateChannelInput) =>
       api.post<ChatChannel>(
         `${base(worldId)}/groups/${groupId}/channels`,
         dto,
       ),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: worldChatKeys(worldId).groups }), // C-06
   });
 }
 
@@ -86,17 +99,23 @@ export interface UpdateChannelInput {
 
 /** Úprava konverzace (`ChatChannel`) — rename, přístup, obrázek, přesun. */
 export function useUpdateChannel(worldId: string) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ channelId, ...dto }: UpdateChannelInput) =>
       api.patch<ChatChannel>(`${base(worldId)}/channels/${channelId}`, dto),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: worldChatKeys(worldId).groups }), // C-06
   });
 }
 
 /** Smazání konverzace (`ChatChannel`) — soft-deletuje zprávy. */
 export function useDeleteChannel(worldId: string) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (channelId: string) =>
       api.delete<void>(`${base(worldId)}/channels/${channelId}`),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: worldChatKeys(worldId).groups }), // C-06
   });
 }
 
@@ -139,6 +158,12 @@ export function useReorderGroups(worldId: string) {
         queryClient.setQueryData(worldChatKeys(worldId).groups, ctx.prev);
       }
     },
+    onSettled: () => {
+      // C-06 — resync server-truth pořadí (BE může order normalizovat).
+      void queryClient.invalidateQueries({
+        queryKey: worldChatKeys(worldId).groups,
+      });
+    },
   });
 }
 
@@ -175,6 +200,11 @@ export function useReorderChannels(worldId: string) {
       if (ctx?.prev) {
         queryClient.setQueryData(worldChatKeys(worldId).groups, ctx.prev);
       }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({
+        queryKey: worldChatKeys(worldId).groups,
+      }); // C-06
     },
   });
 }

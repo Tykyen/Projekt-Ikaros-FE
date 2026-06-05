@@ -1,13 +1,16 @@
 ﻿import { useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAtom, useAtomValue } from 'jotai';
 import { themeAtom } from './state';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { api } from '@/shared/api/client';
 import type { ThemeId } from './types';
+import type { User } from '@/shared/types';
 
 export function useThemeSync(): void {
   const user = useAtomValue(currentUserAtom);
   const [themeId, setThemeId] = useAtom(themeAtom);
+  const qc = useQueryClient();
   const previous = useRef<ThemeId | null>(null);
   const initialSynced = useRef(false);
 
@@ -65,11 +68,20 @@ export function useThemeSync(): void {
 
     const handle = setTimeout(() => {
       // 1.3a: posíláme nové explicitní `themeId`. BE DTO ho akceptuje.
-      api.patch('/users/me', { themeId }).catch((err: unknown) => {
-        console.warn('[theme] BE sync failed:', err);
-      });
+      api
+        .patch('/users/me', { themeId })
+        .then(() => {
+          // C-28 — promítni změnu i do ['users','me'] cache → ProfileHeader
+          // „Globální motiv" + currentUserAtom (přes hydration bridge).
+          qc.setQueryData<User>(['users', 'me'], (old) =>
+            old ? { ...old, themeId } : old,
+          );
+        })
+        .catch((err: unknown) => {
+          console.warn('[theme] BE sync failed:', err);
+        });
     }, 500);
 
     return () => clearTimeout(handle);
-  }, [themeId, user]);
+  }, [themeId, user, qc]);
 }

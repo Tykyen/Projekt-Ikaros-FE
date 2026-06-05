@@ -96,12 +96,10 @@ export function useToggleRsvp() {
     mutationFn: (eventId: string) =>
       api.post<void>(`/game-events/${eventId}/confirm`),
     onSuccess: (_, eventId) => {
-      qc.invalidateQueries({ queryKey: ['game-events', 'upcoming-mine'] });
-      qc.invalidateQueries({ queryKey: ['game-events', 'upcoming-world'] });
-      qc.invalidateQueries({ queryKey: ['game-events', 'archive-world'] });
-      // 9.1-I — invalidate i existing dashboard query (5.2)
-      qc.invalidateQueries({ queryKey: ['game-events', 'world'] });
-      void eventId;
+      // C-09 — RSVP musí obnovit i kalendář (world-all) a otevřený detail.
+      // Dílčí seznam míval prefix-miss ('world' ≠ 'world-all') + chybějící detail.
+      invalidateGameEvents(qc);
+      qc.invalidateQueries({ queryKey: ['game-events', 'detail', eventId] });
     },
   });
 }
@@ -167,7 +165,11 @@ export function useUpdateGameEvent() {
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateGameEventDto }) =>
       api.put<GameEvent>(`/game-events/${id}`, dto),
-    onSuccess: () => invalidateGameEvents(qc),
+    onSuccess: (_data, { id }) => {
+      invalidateGameEvents(qc);
+      // C-10 — obnov i otevřený detail eventu (titul/datum/popis/obrázek).
+      qc.invalidateQueries({ queryKey: ['game-events', 'detail', id] });
+    },
   });
 }
 
@@ -175,7 +177,11 @@ export function useDeleteGameEvent() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete<void>(`/game-events/${id}`),
-    onSuccess: () => invalidateGameEvents(qc),
+    onSuccess: (_data, id) => {
+      // C-10/DEL — removeQueries (ne invalidate) detailu, ať se nerefetchne 404.
+      qc.removeQueries({ queryKey: ['game-events', 'detail', id] });
+      invalidateGameEvents(qc);
+    },
   });
 }
 

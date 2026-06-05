@@ -2,7 +2,7 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
-import { useSocketEvent } from '@/features/chat';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat';
 import { centerOpenAtom, chatFeedUnseenAtom } from '../model/centerStore';
 import type { ChatFeedItem } from '../types';
 
@@ -47,5 +47,9 @@ export function useChatFeedLive() {
   useSocketEvent('chat:feed:bump', () => {
     void qc.invalidateQueries({ queryKey: chatFeedKeys.all });
     if (!open) setUnseen((n) => n + 1);
+  });
+  // C-46 — po reconnectu refetch feed (WS mohl během výpadku zmeškat bumpy).
+  useSocketReconnect(() => {
+    void qc.invalidateQueries({ queryKey: chatFeedKeys.all });
   });
 }

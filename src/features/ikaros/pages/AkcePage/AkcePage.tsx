@@ -38,7 +38,11 @@ export function AkcePage() {
     year: today.getFullYear(),
     month: today.getMonth(),
   }));
-  const [selected, setSelected] = useState<IkarosEvent | null>(null);
+  // C-40 — drž jen ID; čerstvý event derivuj z query, ať RSVP/edit/delete
+  // obnoví otevřený modal (dřív statický snapshot, který se po mutaci nehnul).
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected: IkarosEvent | null =
+    selectedId !== null ? (events.find((e) => e.id === selectedId) ?? null) : null;
   const [createOpen, setCreateOpen] = useState(false);
 
   const grid = useMemo(
@@ -159,7 +163,7 @@ export function AkcePage() {
                       key={ev.id}
                       type="button"
                       className={s.eventChip}
-                      onClick={() => setSelected(ev)}
+                      onClick={() => setSelectedId(ev.id)}
                       title={ev.title}
                     >
                       <span className={s.chipTime}>{formatTime(ev.date)}</span>
@@ -193,7 +197,7 @@ export function AkcePage() {
       {selected && (
         <Modal
           open
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedId(null)}
           title="Detail akce"
           size="md"
         >

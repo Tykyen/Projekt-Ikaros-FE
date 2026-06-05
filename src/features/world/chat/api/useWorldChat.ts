@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 import type { ChatMessage, ChatAttachment } from '@/features/chat/lib/types';
 import type {
   GroupWithChannels,
@@ -210,5 +210,9 @@ export function useUnreadSync(
       worldChatKeys(worldId).unread,
       (old) => applyUnreadEvent(old ?? [], e, activeChannelId),
     );
+  });
+  // C-07 — po reconnectu refetch unread seed (WS mohl během výpadku zmeškat eventy).
+  useSocketReconnect(() => {
+    void qc.invalidateQueries({ queryKey: worldChatKeys(worldId).unread });
   });
 }

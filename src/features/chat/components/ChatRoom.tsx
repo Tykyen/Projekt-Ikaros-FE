@@ -14,7 +14,7 @@ import clsx from 'clsx';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { Spinner } from '@/shared/ui';
-import { useSocketEvent } from '../api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '../api/useSocket';
 import { getSocket } from '../api/socket';
 import {
   chatQueryKeys,
@@ -237,6 +237,27 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   useSocketEvent<ReactionEvent>('chat:message:reaction', handleReaction);
   useSocketEvent<PresenceEvent>('chat:presence', handlePresence);
   useSocketEvent<TypingEvent>('chat:typing', handleTyping);
+
+  // C-05 — po reconnectu socket ztratí room membership; re-join + refetch
+  // history, ať se doplní zprávy zmeškané během výpadku (jako ChannelView).
+  useSocketReconnect(() => {
+    if (!channelId || !user) return;
+    const socket = getSocket();
+    socket.emit('room:join', `chat:${channelId}`);
+    if (room === 'hospoda') {
+      socket.emit('chat:hospoda:join', {
+        username: user.username,
+        userId: user.id,
+      });
+    } else {
+      socket.emit('chat:room:join', {
+        room,
+        username: user.username,
+        userId: user.id,
+      });
+    }
+    void qc.invalidateQueries({ queryKey: keys.messages });
+  });
 
   // Vstup do místnosti — vyčleněno z effectu, ať ho lze zavolat i ručně
   // po auto-odhlášení („Vrátit se"). Hospoda jede na `chat:hospoda:*` (4.1),

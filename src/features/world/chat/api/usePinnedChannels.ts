@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAtomValue, getDefaultStore } from 'jotai';
 import { api } from '@/shared/api/client';
 import { currentUserAtom } from '@/shared/store/authStore';
+import type { User } from '@/shared/types';
 
 /**
  * Připnuté konverzace (krok 6.1c) — per-user, uložené v
@@ -21,6 +23,7 @@ export function usePinnedChannels(): {
     [user?.chatPreferences],
   );
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const qc = useQueryClient();
 
   const togglePin = useCallback((channelId: string) => {
     const store = getDefaultStore();
@@ -37,11 +40,16 @@ export function usePinnedChannels(): {
     };
     // Optimisticky hned — UI reaguje okamžitě.
     store.set(currentUserAtom, { ...cur, chatPreferences });
+    // C-58 — drž ['users','me'] cache v sync s atomem, ať ji refetch /users/me
+    // (hydration bridge) nepřepíše zpět na stav bez pinu.
+    qc.setQueryData<User>(['users', 'me'], (old) =>
+      old ? { ...old, chatPreferences } : old,
+    );
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       void api.patch('/users/me', { chatPreferences });
     }, 600);
-  }, []);
+  }, [qc]);
 
   return {
     pinned,

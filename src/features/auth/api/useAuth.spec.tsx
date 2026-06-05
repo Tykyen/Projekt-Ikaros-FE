@@ -192,14 +192,14 @@ describe('useLogout', () => {
   });
 
   it('nastaví pendingLogoutAtom okamžitě', () => {
-    const { result } = renderHook(() => useLogout());
+    const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper() });
     act(() => { result.current(); });
     expect(store.get(pendingLogoutAtom)).not.toBeNull();
   });
 
   it('po 5s smaže tokeny + user a zavolá BE /auth/logout', () => {
     vi.mocked(api.post).mockResolvedValue({});
-    const { result } = renderHook(() => useLogout());
+    const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper() });
     act(() => { result.current(); });
 
     act(() => { vi.advanceTimersByTime(5000); });
@@ -214,7 +214,7 @@ describe('useLogout', () => {
   });
 
   it('cancel funkce zruší timer a obnoví UI', () => {
-    const { result } = renderHook(() => useLogout());
+    const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper() });
     let cancel: () => void;
     act(() => { cancel = result.current(); });
 

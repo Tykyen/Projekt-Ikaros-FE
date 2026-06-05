@@ -2,7 +2,7 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
-import { useSocketEvent } from '@/features/chat';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat';
 import type { IkarosMessage } from '@/shared/types';
 
 const PAGE_SIZE = 30;
@@ -25,6 +25,10 @@ export function useEvents(enabled = true) {
   // „Události" (filtr `system=true`) neovlivní → žádné zbytečné refetchy/blikání.
   useSocketEvent<{ system?: boolean }>('ikaros:new-message', (p) => {
     if (p?.system) void qc.invalidateQueries({ queryKey: eventsKeys.all });
+  });
+  // C-46 — po reconnectu refetch (WS mohl během výpadku zmeškat systémové zprávy).
+  useSocketReconnect(() => {
+    void qc.invalidateQueries({ queryKey: eventsKeys.all });
   });
 
   return useInfiniteQuery({

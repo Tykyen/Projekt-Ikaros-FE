@@ -36,6 +36,16 @@ export function useUpdatePage(worldId: string, worldSlug: string) {
       void qc.invalidateQueries({
         queryKey: pagesQueryKey.directory(worldId),
       });
+      // C-15 — postava/NPC editovaná přes Page → obnov i character directory.
+      void qc.invalidateQueries({
+        queryKey: ['characters', worldId, 'directory'],
+      });
+      // C-16 — backlinks cílových stránek (FE nezná cíle wikilinků) → broad.
+      void qc.invalidateQueries({ queryKey: ['pages', worldId, 'backlinks'] });
+      // C-17 — meta této stránky (AKJ shield na AccessDenied) po změně accessRequirements.
+      void qc.invalidateQueries({
+        queryKey: pagesQueryKey.meta(worldId, page.slug),
+      });
       // Refresh detail s novými daty (slug mohl se změnit)
       qc.setQueryData(pagesQueryKey.detail(worldId, page.slug), page);
       // N-38 — původní slug bereme z callera (`vars.previousSlug`); dřív se

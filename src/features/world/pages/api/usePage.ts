@@ -9,7 +9,7 @@ import type { Page } from './pages.types';
  */
 export function usePage(worldId: string, slug: string) {
   return useQuery({
-    queryKey: ['pages', worldId, 'detail', slug],
+    queryKey: pagesQueryKey.detail(worldId, slug),
     queryFn: () => api.get<Page>(`/worlds/${worldId}/pages/${slug}`),
     enabled: !!worldId && !!slug,
     staleTime: 30_000,
@@ -30,4 +30,7 @@ export const pagesQueryKey = {
     ['pages', worldId, 'meta', slug] as const,
   backlinks: (worldId: string, slug: string) =>
     ['pages', worldId, 'backlinks', slug] as const,
+  // C-19 — persona varianta directory (PC/NPC grid); drží prefix vztah k directory.
+  personaDirectory: (worldId: string) =>
+    ['pages', worldId, 'directory', 'persona'] as const,
 };

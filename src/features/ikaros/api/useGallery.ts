@@ -153,8 +153,11 @@ export function useRateGalleryImage() {
         `${PREFIX}/${id}/rate`,
         { stars, text },
       ),
-    onSuccess: (_, { id }) =>
-      qc.invalidateQueries({ queryKey: [...GALLERY_KEY, 'detail', id] }),
+    onSuccess: (_, { id }) => {
+      qc.invalidateQueries({ queryKey: [...GALLERY_KEY, 'detail', id] });
+      // C-39 — průměr hvězdiček je i na kartách v Galerii přehledu.
+      qc.invalidateQueries({ queryKey: GALLERY_KEY });
+    },
   });
 }
 

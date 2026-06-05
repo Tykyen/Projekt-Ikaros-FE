@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
+import { useSocketEvent } from '@/features/chat';
 import { accessTokenAtom } from '@/shared/store/authStore';
 import type { IkarosEvent } from '@/shared/types';
 
@@ -8,6 +9,11 @@ const KEY = ['ikaros-events'];
 
 export function useIkarosEvents() {
   const token = useAtomValue(accessTokenAtom);
+  const qc = useQueryClient();
+  // C-47 — BE broadcastuje ikaros:events:changed všem klientům (platform-wide).
+  useSocketEvent('ikaros:events:changed', () => {
+    void qc.invalidateQueries({ queryKey: KEY });
+  });
   return useQuery({
     queryKey: KEY,
     queryFn: () => api.get<IkarosEvent[]>('/ikaros-events'),

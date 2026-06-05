@@ -19,7 +19,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiClient } from '@/shared/api/client';
 import { postWorldOperation } from '../api/worldOpsApi';
 import { mapSceneQueryKey } from '../hooks/useMapScene';
-import { useActiveScenes } from '../hooks/useActiveScenes';
+import { useActiveScenes, activeScenesQueryKey } from '../hooks/useActiveScenes';
 import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
 import type { MapScene } from '../types';
 import styles from './MapEmptyState.module.css';
@@ -82,6 +82,10 @@ export function MapEmptyState({
         void queryClient.invalidateQueries({
           queryKey: ['worlds', worldId, 'members'],
         });
+        // C-25 — PJ orchestrator list aktivních scén (REST fallback k WS).
+        void queryClient.invalidateQueries({
+          queryKey: activeScenesQueryKey(worldId),
+        });
       }
     },
   });
@@ -118,6 +122,10 @@ export function MapEmptyState({
         void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
         void queryClient.invalidateQueries({
           queryKey: ['worlds', worldId, 'members'],
+        });
+        // C-25 — PJ orchestrator list aktivních scén (REST fallback k WS).
+        void queryClient.invalidateQueries({
+          queryKey: activeScenesQueryKey(worldId),
         });
       }
     },

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
+import { adminKeys } from './adminKeys';
 import type { AdminStatsOverview } from './adminStats.types';
 
 /**
@@ -8,7 +9,7 @@ import type { AdminStatsOverview } from './adminStats.types';
  */
 export function useAdminStats(enabled = true) {
   return useQuery({
-    queryKey: ['admin', 'stats', 'overview'],
+    queryKey: [...adminKeys.stats, 'overview'],
     queryFn: () => api.get<AdminStatsOverview>('/admin/stats/overview'),
     enabled,
     staleTime: 60_000,
