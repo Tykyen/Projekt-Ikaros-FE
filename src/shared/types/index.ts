@@ -437,6 +437,14 @@ export interface WorldMembership {
    * (PJ-only kromě hráčova self-unassign).
    */
   currentSceneId?: string | null;
+  /**
+   * 6.7b — osobní pořadí kanálů (`groupId[]`) a konverzací (`groupId → channelId[]`)
+   * v sidebaru chatu, per hráč. Chybí = fallback na globální pořadí.
+   */
+  chatGroupOrder?: string[];
+  chatChannelOrder?: Record<string, string[]>;
+  /** 6.7c — `groupId` rozbalených kanálů v sidebaru (default: vše sbalené). */
+  chatExpandedGroups?: string[];
   /** 5.3 — public summary uživatele; populuje `GET /worlds/:id/members`. */
   user?: {
     id: string;

@@ -98,26 +98,50 @@
   background: transparent;
   color: var(--theme-text-dim, var(--text-muted));
   cursor: pointer;
-  opacity: 0;
-  transition: color var(--transition-fast), opacity var(--transition-fast);
+  transition: color var(--transition-fast), opacity var(--transition-fast),
+    background var(--transition-fast);
 }
-.header:hover .add,
+/*
+ * `+` (Nová konverzace) = primární akce → trvale viditelná, akcentová barva
+ * s jemným kruhovým pozadím (vzor `.iconWrap`), ať je objevitelná. Dřív byla
+ * `opacity: 0` (hover-only) a snadno se přehlédla.
+ */
+.add {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin-right: var(--sp-1);
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--g-color, var(--theme-accent));
+  background: color-mix(
+    in srgb,
+    var(--g-color, var(--theme-accent)) 12%,
+    transparent
+  );
+}
+.add:hover {
+  background: color-mix(
+    in srgb,
+    var(--g-color, var(--theme-accent)) 24%,
+    transparent
+  );
+}
+/* `⚙` (úprava kanálu) = sekundární → tlumená, zvýrazní se na hover hlavičky. */
+.edit {
+  opacity: 0.5;
+}
 .header:hover .edit {
   opacity: 1;
 }
-.add:hover,
 .edit:hover {
   color: var(--g-color, var(--theme-accent));
 }
-.add {
-  padding-right: var(--sp-2);
-}
 
-/* Dotyková zařízení — ikony vždy viditelné. */
+/* Dotyková zařízení — sekundární ikona plně viditelná (není hover). */
 @media (hover: none) {
-  .add,
   .edit {
-    opacity: 0.7;
+    opacity: 0.8;
   }
 }
 

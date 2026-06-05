@@ -40,7 +40,10 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-05 (Hlavní obrázek stránky/postavy má
+          Aktualizováno k 2026-06-05 (Chat světa: kanál Postavy je soukromý —
+          přidělená postava ti automaticky založí privátní konverzaci s vedením;
+          pořadí kanálů i konverzací si každý řadí sám a kanály jsou defaultně
+          sbalené. Plus hlavní obrázek stránky/postavy má
           nastavitelný výřez — focal point, přiblížení a režim vyplnit/vidět
           celý, stejně jako u akcí. Zprávu napíšeš i přímo z osobní karty
           uživatele. Na stránce „Hráči světa" klik na hráče otevře jeho osobní

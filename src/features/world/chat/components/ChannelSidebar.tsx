@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Plus, Pin } from 'lucide-react';
 import {
   DndContext,
@@ -17,10 +17,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { usePinnedChannels } from '../api/usePinnedChannels';
-import {
-  useReorderGroups,
-  useReorderChannels,
-} from '../api/useChannelMutations';
+import { useChatPrefs } from '../api/useChatPrefs';
+import { applyOrder } from '../lib/applyOrder';
 import { groupColorVarFor } from '../lib/groupColor';
 import { ChannelItem } from './ChannelItem';
 import {
@@ -61,10 +59,16 @@ export function ChannelSidebar({
   onEditChannel,
 }: ChannelSidebarProps) {
   const { pinned, togglePin } = usePinnedChannels();
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const pinnedSet = useMemo(() => new Set(pinned), [pinned]);
-  const reorderGroups = useReorderGroups(worldId);
-  const reorderChannels = useReorderChannels(worldId);
+  // 6.7b/c — osobní pořadí + sbalení (per hráč, ne globální PJ reorder).
+  const {
+    groupOrder,
+    channelOrder,
+    expandedGroups,
+    setGroupOrder,
+    setChannelOrder,
+    toggleExpanded,
+  } = useChatPrefs(worldId);
   // Drag handle activation — touch má long-press (chrání scroll), myš jen distance.
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -89,15 +93,34 @@ export function ChannelSidebar({
     return out;
   }, [groups, pinnedSet]);
 
-  const groupIds = useMemo(() => groups.map((g) => g.group.id), [groups]);
+  // Osobní pořadí kanálů; nově vzniklé padají na konec dle globálního order.
+  const orderedGroups = useMemo(
+    () => applyOrder(groups, groupOrder, (g) => g.group.id),
+    [groups, groupOrder],
+  );
+  const groupIds = useMemo(
+    () => orderedGroups.map((g) => g.group.id),
+    [orderedGroups],
+  );
 
   const handleGroupsDragEnd = (e: DragEndEvent) => {
     if (!e.over || e.active.id === e.over.id) return;
     const oldIdx = groupIds.indexOf(String(e.active.id));
     const newIdx = groupIds.indexOf(String(e.over.id));
     if (oldIdx < 0 || newIdx < 0) return;
-    const reordered = arrayMove(groupIds, oldIdx, newIdx);
-    reorderGroups.mutate(reordered.map((id, i) => ({ id, order: i })));
+    setGroupOrder(arrayMove(groupIds, oldIdx, newIdx));
+  };
+
+  /**
+   * 6.7c — default sbalené; rozbalené když je v `expandedGroups` NEBO obsahuje
+   * aktivní konverzaci (override, ať uživatel vidí, kde právě je).
+   */
+  const isCollapsed = (groupId: string, list: ChatChannel[]): boolean => {
+    if (expandedGroups.includes(groupId)) return false;
+    if (activeChannelId && list.some((c) => c.id === activeChannelId)) {
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -134,28 +157,28 @@ export function ChannelSidebar({
             items={groupIds}
             strategy={verticalListSortingStrategy}
           >
-            {groups.map(({ group, channels }) => {
+            {orderedGroups.map(({ group, channels }) => {
               const color = groupColorVarFor(group);
-              const channelIds = channels.map((c) => c.id);
+              const orderedChannels = applyOrder(
+                channels,
+                channelOrder[group.id] ?? [],
+                (c) => c.id,
+              );
+              const channelIds = orderedChannels.map((c) => c.id);
               return (
                 <SortableChannelGroup
                   key={group.id}
                   group={group}
-                  channels={channels}
+                  channels={orderedChannels}
                   color={color}
-                  collapsed={!!collapsed[group.id]}
+                  collapsed={isCollapsed(group.id, channels)}
                   activeChannelId={activeChannelId}
                   unread={unread}
                   mentionCounts={mentionCounts}
                   pinned={pinnedSet}
                   canManage={canManage}
-                  disabled={reorderGroups.isPending || !canManage}
-                  onToggleCollapse={() =>
-                    setCollapsed((c) => ({
-                      ...c,
-                      [group.id]: !c[group.id],
-                    }))
-                  }
+                  disabled={false}
+                  onToggleCollapse={() => toggleExpanded(group.id)}
                   onSelectChannel={onSelectChannel}
                   onTogglePin={togglePin}
                   onAddChannel={() => onAddChannel(group.id)}
@@ -170,11 +193,10 @@ export function ChannelSidebar({
                         const oldIdx = channelIds.indexOf(String(e.active.id));
                         const newIdx = channelIds.indexOf(String(e.over.id));
                         if (oldIdx < 0 || newIdx < 0) return;
-                        const reordered = arrayMove(channelIds, oldIdx, newIdx);
-                        reorderChannels.mutate({
-                          groupId: group.id,
-                          items: reordered.map((id, i) => ({ id, order: i })),
-                        });
+                        setChannelOrder(
+                          group.id,
+                          arrayMove(channelIds, oldIdx, newIdx),
+                        );
                       }}
                     >
                       <SortableContext
@@ -190,9 +212,7 @@ export function ChannelSidebar({
                             pinned={pinnedSet.has(c.id)}
                             accentColor={color}
                             canManage={canManage}
-                            disabled={
-                              reorderChannels.isPending || !canManage
-                            }
+                            disabled={false}
                             onSelect={() => onSelectChannel(c.id)}
                             onTogglePin={() => togglePin(c.id)}
                             onEdit={() => onEditChannel(c)}
