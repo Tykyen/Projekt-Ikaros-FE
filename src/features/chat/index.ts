@@ -1,1 +1,6 @@
-export { useSocketInit, useSocket, useSocketEvent } from './api/useSocket';
+export {
+  useSocketInit,
+  useSocket,
+  useSocketEvent,
+  useSocketReconnect,
+} from './api/useSocket';

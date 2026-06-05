@@ -17,7 +17,9 @@ import type {
 } from '../types';
 
 export function useBestieMutations(
-  worldId: string | null,
+  // C-33 — worldId se po přechodu na predicate-invalidaci už nečte, ale necháváme
+  // ho v signatuře (volající ho předávají pozicně). Prefix `_` = záměrně nepoužité.
+  _worldId: string | null,
   systemId: string | null,
 ) {
   const queryClient = useQueryClient();
