@@ -40,7 +40,11 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-03 (13.2 — Notifikační centrum: zvonek
+          Aktualizováno k 2026-06-05 (Hlavní obrázek stránky/postavy má
+          nastavitelný výřez — focal point, přiblížení a režim vyplnit/vidět
+          celý, stejně jako u akcí. Zprávu napíšeš i přímo z osobní karty
+          uživatele. Na stránce „Hráči světa" klik na hráče otevře jeho osobní
+          kartu. Plus 13.2 — Notifikační centrum: zvonek
           v hlavičce otevře souhrn zpráv ze všech tvých světů, záložku Události
           (co ti schválili / přiřazení postavy) a Ke zpracování (pro
           schvalovatele). Plus 13.1 — Hledání ve světě: pole „Hledat…"

@@ -95,6 +95,63 @@
   display: none;
 }
 
+/* Focal overlay — klik nastavuje střed výřezu nad nahraným obrázkem. */
+.focalOverlay {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  cursor: crosshair;
+  padding: 0;
+}
+
+.focalMarker {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--accent-bright, #3b5af6);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(8, 10, 20, 0.6),
+    0 0 8px rgba(59, 90, 246, 0.7);
+  pointer-events: none;
+}
+
+/* „Změnit" tlačítko v rohu (focal mód — karta není upload-button). */
+.changeBtn {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: rgba(230, 238, 255, 0.95);
+  background: rgba(8, 10, 20, 0.7);
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.4));
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.changeBtn:hover {
+  border-color: var(--accent-bright, #3b5af6);
+}
+
+.focalControls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.focalHint {
+  font-size: 0.72rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.6));
+}
+
 /* Akce pod kartou — URL fallback + odebrat. */
 .actions {
   display: flex;

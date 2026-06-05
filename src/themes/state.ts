@@ -28,3 +28,15 @@ export interface PlatformThemePreview {
   adjust?: { brightness?: number; contrast?: number; bgDim?: number };
 }
 export const platformThemePreviewAtom = atom<PlatformThemePreview | null>(null);
+
+/**
+ * „Kdo vlastní `:root`" — `true`, dokud je mountnutý `WorldLayout`.
+ *
+ * Theme na `:root` aplikují dva nezávislé zdroje: `ThemeProvider` (globální
+ * motiv) a `WorldLayout` (skin světa). Při odchodu z profilu do světa vynulování
+ * `platformThemePreviewAtom` znovu spustí `ThemeProvider.applyTheme(globální)`,
+ * který by jako poslední přepsal world skin (race → svět dostal globální barvy).
+ * Dokud je tento flag `true`, `ThemeProvider` globální `applyTheme` přeskočí —
+ * `:root` vlastní výhradně svět.
+ */
+export const worldThemeActiveAtom = atom(false);

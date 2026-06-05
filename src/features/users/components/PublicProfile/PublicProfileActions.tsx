@@ -184,14 +184,19 @@ export function PublicProfileActions({
             )}
           </div>
         )}
-        <Button
-          className={s.actionBtn}
-          variant="secondary"
-          disabled
-          title="Připravujeme — krok 3.5"
-        >
-          <Mail size={14} aria-hidden="true" /> Napsat zprávu
-        </Button>
+        {!isSelf && (
+          <Button
+            className={s.actionBtn}
+            variant="secondary"
+            onClick={() =>
+              navigate(
+                `/ikaros/posta?komu=${profileId}&komuJmeno=${encodeURIComponent(username)}`,
+              )
+            }
+          >
+            <Mail size={14} aria-hidden="true" /> Napsat zprávu
+          </Button>
+        )}
         {showAdminAction && (
           <Button
             className={s.actionBtn}

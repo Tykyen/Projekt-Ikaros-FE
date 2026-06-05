@@ -2,6 +2,7 @@ import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { AkjBanner } from '../components/AkjBanner';
 import { PageSections } from '../components/PageSections';
 import type { Page } from '../../api/pages.types';
+import { getImageStyle } from '@/shared/lib/imageStyle';
 import s from './NovinyLayout.module.css';
 
 interface Props {
@@ -40,7 +41,17 @@ export function NovinyLayout({ page }: Props) {
     <div className={s.layout}>
       {page.imageUrl && (
         <div className={s.heroFull}>
-          <img src={page.imageUrl} alt={page.title} loading="lazy" />
+          <img
+            src={page.imageUrl}
+            alt={page.title}
+            loading="lazy"
+            style={getImageStyle(
+              page.imageFocalX,
+              page.imageFocalY,
+              page.imageZoom,
+              page.imageFit,
+            )}
+          />
           <div className={s.heroOverlay} aria-hidden />
         </div>
       )}

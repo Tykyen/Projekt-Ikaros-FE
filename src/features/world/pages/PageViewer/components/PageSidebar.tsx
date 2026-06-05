@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useBrokenLinks } from '../hooks/useBrokenLinks';
 import type { Page } from '../../api/pages.types';
+import { getImageStyle } from '@/shared/lib/imageStyle';
 import s from './PageSidebar.module.css';
 
 interface Props {
@@ -53,6 +54,12 @@ export function PageSidebar({ page }: Props) {
               alt={page.title}
               className={s.hero}
               loading="lazy"
+              style={getImageStyle(
+                page.imageFocalX,
+                page.imageFocalY,
+                page.imageZoom,
+                page.imageFit,
+              )}
             />
           </div>
         )}

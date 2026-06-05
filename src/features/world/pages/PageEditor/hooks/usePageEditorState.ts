@@ -24,6 +24,11 @@ export interface PageEditorFormState {
   content: string;
   imageUrl: string;
   bigImage: boolean;
+  // Parita s GameEvent — výřez hlavního obrázku (focal/zoom/fit). null = default.
+  imageFocalX: number | null;
+  imageFocalY: number | null;
+  imageZoom: number | null;
+  imageFit: 'cover' | 'contain' | null;
   isWoodWide: boolean;
   order: number;
   sections: PageSection[];
@@ -47,6 +52,10 @@ export const INITIAL_PAGE_STATE: PageEditorFormState = {
   content: '',
   imageUrl: '',
   bigImage: false,
+  imageFocalX: null,
+  imageFocalY: null,
+  imageZoom: null,
+  imageFit: null,
   isWoodWide: false,
   order: 0,
   sections: [],
@@ -68,6 +77,10 @@ export function pageToFormState(page: Page): PageEditorFormState {
     content: page.content,
     imageUrl: page.imageUrl ?? '',
     bigImage: page.bigImage ?? false,
+    imageFocalX: page.imageFocalX ?? null,
+    imageFocalY: page.imageFocalY ?? null,
+    imageZoom: page.imageZoom ?? null,
+    imageFit: page.imageFit ?? null,
     isWoodWide: page.isWoodWide,
     order: page.order,
     sections: page.sections,

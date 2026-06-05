@@ -24,6 +24,11 @@ export interface CreatePageInput {
   content?: string;
   imageUrl?: string;
   bigImage?: boolean;
+  // Parita s GameEvent — výřez hlavního obrázku (focal/zoom/fit). null = clear.
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: 'cover' | 'contain' | null;
   sections?: PageSection[];
   galleryImages?: GalleryImage[];
   videos?: InstructionalVideo[];

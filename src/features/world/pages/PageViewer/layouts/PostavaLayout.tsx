@@ -14,6 +14,7 @@ import {
   Pencil,
 } from 'lucide-react';
 import { Tabs, type TabItem, ConfirmDialog } from '@/shared/ui';
+import { getImageStyle } from '@/shared/lib/imageStyle';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { WorldRole, type CharacterTabId } from '@/shared/types';
@@ -307,6 +308,12 @@ function PostavaHero({
           src={page.imageUrl}
           alt={page.title}
           loading="lazy"
+          style={getImageStyle(
+            page.imageFocalX,
+            page.imageFocalY,
+            page.imageZoom,
+            page.imageFit,
+          )}
         />
       ) : (
         <div className={s.avatarFallback} aria-hidden>

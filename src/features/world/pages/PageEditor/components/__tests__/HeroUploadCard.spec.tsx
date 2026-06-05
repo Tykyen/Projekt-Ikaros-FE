@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HeroUploadCard } from '../HeroUploadCard';
+
+const FOCAL_LABEL = 'Klikni kam má být střed výřezu obrázku';
 
 const mutateAsync = vi.fn();
 const toastError = vi.fn();
@@ -74,6 +76,53 @@ describe('HeroUploadCard', () => {
     expect(
       screen.queryByRole('button', { name: /Odebrat/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it('bez focal props — žádný focal overlay (čistý uploader, beze změny)', () => {
+    render(<HeroUploadCard value="https://cdn/x.png" onChange={() => {}} />);
+    expect(screen.queryByLabelText(FOCAL_LABEL)).not.toBeInTheDocument();
+    expect(screen.getByText('Změnit obrázek')).toBeInTheDocument();
+  });
+
+  it('focal mód — klik na obrázek přepočítá střed výřezu na procenta', () => {
+    const onFocalChange = vi.fn();
+    render(
+      <HeroUploadCard
+        value="https://cdn/x.png"
+        onChange={() => {}}
+        focal={{ x: 50, y: 50 }}
+        onFocalChange={onFocalChange}
+      />,
+    );
+    const overlay = screen.getByLabelText(FOCAL_LABEL);
+    vi.spyOn(overlay, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 200,
+      height: 100,
+      right: 200,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    } as DOMRect);
+    fireEvent.click(overlay, { clientX: 100, clientY: 25 });
+    expect(onFocalChange).toHaveBeenCalledWith({ x: 50, y: 25 });
+  });
+
+  it('focal mód — zobrazí fit toggle a zoom slider', () => {
+    render(
+      <HeroUploadCard
+        value="https://cdn/x.png"
+        onChange={() => {}}
+        focal={{ x: 50, y: 50 }}
+        onFocalChange={() => {}}
+      />,
+    );
+    expect(
+      screen.getByRole('group', { name: /Režim zobrazení obrázku/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Přiblížení obrázku')).toBeInTheDocument();
   });
 
   it('drop souboru na kartu spustí upload', async () => {

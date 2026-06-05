@@ -151,7 +151,8 @@ const FAQ: FaqItem[] = [
       <>
         <p>
           Otevři jeho <strong>veřejný profil</strong> (klikni na avatar / kartu
-          v adresáři) a stiskni <strong>„Přidat do přátel"</strong>. Druhá strana
+          v adresáři, nebo na hráče na stránce <strong>Hráči světa</strong>) a
+          stiskni <strong>„Přidat do přátel"</strong>. Druhá strana
           dostane žádost ve svém tabu <strong>Zpracovat</strong> a může ji
           přijmout nebo odmítnout.
         </p>
@@ -279,6 +280,26 @@ const FAQ: FaqItem[] = [
     ),
   },
   {
+    q: 'Jak nastavím, co je vidět na hlavním obrázku stránky nebo postavy?',
+    a: (
+      <>
+        <p>
+          V <strong>editoru stránky</strong> (Pomocný PJ a výš) u{' '}
+          <strong>Hlavního obrázku</strong> klikni přímo do obrázku tam, kde má
+          být <strong>střed výřezu</strong> — značka ukáže zvolený bod. Pod
+          obrázkem si navíc nastavíš <strong>přiblížení</strong> a režim{' '}
+          <strong>Vyplnit</strong> (obrázek vyplní plochu, okraje se můžou
+          oříznout) / <strong>Vidět celý</strong> (vejde se celý, můžou vzniknout
+          pruhy).
+        </p>
+        <p>
+          Funguje to stejně jako u <strong>akcí</strong> a platí to pro avatar
+          postavy, kartu v adresáři i hero obrázek na stránce.
+        </p>
+      </>
+    ),
+  },
+  {
     q: 'Jak funguje Pošta a kdo mi může psát?',
     a: (
       <>
@@ -291,7 +312,9 @@ const FAQ: FaqItem[] = [
         </p>
         <p>
           Novou zprávu napíšeš komukoliv — příjemce vybereš našeptávačem podle
-          přezdívky. Pokud si ale v <strong>profilu → Soukromí</strong> zapneš{' '}
+          přezdívky, nebo otevři jeho <strong>osobní kartu</strong> a klikni na{' '}
+          <strong>„Napsat zprávu"</strong> (příjemce se předvyplní). Pokud si ale
+          v <strong>profilu → Soukromí</strong> zapneš{' '}
           <strong>„Jen pro přátele"</strong>, napsat ti jako první může jen tvůj
           přítel (a administrátor). Na zprávu, kterou jsi sám/sama poslal/a, ti
           druhá strana může odpovědět vždy.

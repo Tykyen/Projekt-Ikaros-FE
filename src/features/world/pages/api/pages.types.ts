@@ -134,6 +134,12 @@ export interface Page {
   content: string;
   imageUrl?: string;
   bigImage?: boolean;
+  // Parita s GameEvent — výřez hlavního obrázku. null = default (focal 50/50,
+  // zoom 100, fit cover); render řeší getImageStyle().
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: 'cover' | 'contain' | null;
   table?: PageTable;
   sections: PageSection[];
   galleryImages: GalleryImage[];
@@ -166,6 +172,11 @@ export interface PageDirectoryEntry {
   updatedAt: string;
   // 9.1 — pro CharactersPage karty (PostavaHrace/NPC).
   imageUrl?: string;
+  // Parita s GameEvent — focal/zoom/fit pro výřez avataru v kartě adresáře.
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: 'cover' | 'contain' | null;
   ownerUserId?: string;
   /**
    * D-062c — pokud má current user nesplněné AKJ/Role requirementy, listing

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { User, Skull, Star } from 'lucide-react';
 import type { CharacterDirectoryEntry } from '../../api/characters.types';
+import { getImageStyle } from '@/shared/lib/imageStyle';
 import s from './CharacterCard.module.css';
 
 interface Props {
@@ -61,7 +62,17 @@ export function CharacterCard({
       )}
       <div className={s.avatar}>
         {entry.imageUrl ? (
-          <img src={entry.imageUrl} alt="" loading="lazy" />
+          <img
+            src={entry.imageUrl}
+            alt=""
+            loading="lazy"
+            style={getImageStyle(
+              entry.imageFocalX,
+              entry.imageFocalY,
+              entry.imageZoom,
+              entry.imageFit,
+            )}
+          />
         ) : (
           <User size={36} aria-hidden className={s.avatarPlaceholder} />
         )}

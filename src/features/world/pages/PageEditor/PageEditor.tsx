@@ -177,6 +177,10 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
             content: state.content,
             imageUrl: state.imageUrl || undefined,
             bigImage: state.bigImage,
+            imageFocalX: state.imageFocalX,
+            imageFocalY: state.imageFocalY,
+            imageZoom: state.imageZoom,
+            imageFit: state.imageFit,
             isWoodWide: state.isWoodWide,
             order: state.order,
             sections: state.sections,
@@ -204,6 +208,10 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
           content: state.content,
           imageUrl: state.imageUrl || undefined,
           bigImage: state.bigImage,
+          imageFocalX: state.imageFocalX,
+          imageFocalY: state.imageFocalY,
+          imageZoom: state.imageZoom,
+          imageFit: state.imageFit,
           isWoodWide: state.isWoodWide,
           order: state.order,
           sections: state.sections,
@@ -251,6 +259,10 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
           content: state.content,
           imageUrl: state.imageUrl || undefined,
           bigImage: state.bigImage,
+          imageFocalX: state.imageFocalX,
+          imageFocalY: state.imageFocalY,
+          imageZoom: state.imageZoom,
+          imageFit: state.imageFit,
           isWoodWide: state.isWoodWide,
           order: state.order,
           sections: state.sections,
@@ -310,6 +322,10 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
           content: state.content,
           imageUrl: state.imageUrl || undefined,
           bigImage: state.bigImage,
+          imageFocalX: state.imageFocalX,
+          imageFocalY: state.imageFocalY,
+          imageZoom: state.imageZoom,
+          imageFit: state.imageFit,
           isWoodWide: state.isWoodWide,
           order: state.order,
           sections: state.sections,
@@ -360,6 +376,10 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
             type={state.type}
             imageUrl={state.imageUrl}
             bigImage={state.bigImage}
+            imageFocalX={state.imageFocalX}
+            imageFocalY={state.imageFocalY}
+            imageZoom={state.imageZoom}
+            imageFit={state.imageFit}
             isWoodWide={state.isWoodWide}
             order={state.order}
             existingPageTitle={existingPage?.title}

@@ -14,6 +14,8 @@ interface Props {
   meId: string;
   /** Vyplněno → modal je odpověď ve vlákně. */
   replyTo?: IkarosMessage | null;
+  /** Předvyplněný příjemce nové zprávy (deep-link „Napsat zprávu" z profilu). */
+  prefillRecipient?: UserLookupItem | null;
 }
 
 function prefixRe(subject: string): string {
@@ -21,7 +23,13 @@ function prefixRe(subject: string): string {
   return next.slice(0, 200);
 }
 
-export function ComposeModal({ open, onClose, meId, replyTo }: Props) {
+export function ComposeModal({
+  open,
+  onClose,
+  meId,
+  replyTo,
+  prefillRecipient,
+}: Props) {
   const isReply = !!replyTo;
   const send = useSendMessage();
 
@@ -34,7 +42,9 @@ export function ComposeModal({ open, onClose, meId, replyTo }: Props) {
 
   // Stav se inicializuje z props — rodič komponentu při každém otevření
   // remountuje přes `key`, takže initializery běží s aktuálním `replyTo`.
-  const [recipient, setRecipient] = useState<UserLookupItem | null>(replyOther);
+  const [recipient, setRecipient] = useState<UserLookupItem | null>(
+    replyOther ?? prefillRecipient ?? null,
+  );
   const [subject, setSubject] = useState(
     replyTo ? prefixRe(replyTo.subject) : '',
   );

@@ -10,6 +10,10 @@ interface Props {
   type: PageType;
   imageUrl: string;
   bigImage: boolean;
+  imageFocalX: number | null;
+  imageFocalY: number | null;
+  imageZoom: number | null;
+  imageFit: 'cover' | 'contain' | null;
   isWoodWide: boolean;
   order: number;
   /** Název existující stránky se stejným slugem (režim tvorby, kolize). */
@@ -19,6 +23,10 @@ interface Props {
     type: PageType;
     imageUrl: string;
     bigImage: boolean;
+    imageFocalX: number | null;
+    imageFocalY: number | null;
+    imageZoom: number | null;
+    imageFit: 'cover' | 'contain' | null;
     isWoodWide: boolean;
     order: number;
   }>) => void;
@@ -39,6 +47,10 @@ export function IdentityPanel({
   type,
   imageUrl,
   bigImage,
+  imageFocalX,
+  imageFocalY,
+  imageZoom,
+  imageFit,
   isWoodWide,
   existingPageTitle,
   onChange,
@@ -141,7 +153,28 @@ export function IdentityPanel({
         <div className={s.heroCol}>
           <HeroUploadCard
             value={imageUrl}
-            onChange={(url) => onChange({ imageUrl: url })}
+            onChange={(url) =>
+              onChange(
+                url
+                  ? { imageUrl: url }
+                  : {
+                      // Odebrání obrázku vynuluje i výřez (ValidateIf null-clear na BE).
+                      imageUrl: '',
+                      imageFocalX: null,
+                      imageFocalY: null,
+                      imageZoom: null,
+                      imageFit: null,
+                    },
+              )
+            }
+            focal={{ x: imageFocalX ?? 50, y: imageFocalY ?? 50 }}
+            onFocalChange={(f) =>
+              onChange({ imageFocalX: f.x, imageFocalY: f.y })
+            }
+            zoom={imageZoom}
+            onZoomChange={(z) => onChange({ imageZoom: z })}
+            fit={imageFit}
+            onFitChange={(f) => onChange({ imageFit: f })}
           />
         </div>
       </div>

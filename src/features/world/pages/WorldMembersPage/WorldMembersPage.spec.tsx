@@ -1,8 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, type RenderResult } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import type { ReactElement } from 'react';
 import { WorldRole, type WorldMembership } from '@/shared/types';
 import WorldMembersPage from './WorldMembersPage';
 import { MemberCard } from './MemberCard';
+
+// MemberCard renderuje <Link> → potřebuje router context.
+const renderR = (ui: ReactElement): RenderResult =>
+  render(<MemoryRouter>{ui}</MemoryRouter>);
 
 const membersData = vi.hoisted(() => ({ items: [] as WorldMembership[] }));
 const settingsData = vi.hoisted(() => ({
@@ -40,7 +46,7 @@ function makeMember(over: Partial<WorldMembership> = {}): WorldMembership {
 
 describe('MemberCard', () => {
   it('vykreslí jméno a roli', () => {
-    render(
+    renderR(
       <MemberCard
         member={makeMember({
           role: WorldRole.PJ,
@@ -50,6 +56,18 @@ describe('MemberCard', () => {
     );
     expect(screen.getByText('Tyky')).toBeInTheDocument();
     expect(screen.getByText('PJ')).toBeInTheDocument();
+  });
+
+  it('odkazuje na osobní kartu hráče (/ikaros/uzivatel/:userId)', () => {
+    renderR(
+      <MemberCard
+        member={makeMember({ userId: 'u42', user: { id: 'u42', username: 'Hráč' } })}
+      />,
+    );
+    expect(screen.getByRole('link')).toHaveAttribute(
+      'href',
+      '/ikaros/uzivatel/u42',
+    );
   });
 });
 
@@ -63,7 +81,7 @@ describe('WorldMembersPage', () => {
       }),
     ];
     settingsData.customGroups = [];
-    render(<WorldMembersPage />);
+    renderR(<WorldMembersPage />);
     expect(screen.getByText('Pán jeskyně')).toBeInTheDocument();
     expect(screen.getByText('Pomocní PJ')).toBeInTheDocument();
     expect(screen.getByText('Pán')).toBeInTheDocument();
@@ -84,7 +102,7 @@ describe('WorldMembersPage', () => {
     ];
     settingsData.customGroups = ['Družina'];
     settingsData.groupColors = { Družina: '#88aa44' };
-    render(<WorldMembersPage />);
+    renderR(<WorldMembersPage />);
     expect(screen.getByText('Družina')).toBeInTheDocument();
     expect(screen.getByText('Bez skupiny')).toBeInTheDocument();
     expect(screen.getByText('Aragorn')).toBeInTheDocument();
@@ -99,7 +117,7 @@ describe('WorldMembersPage', () => {
       }),
     ];
     settingsData.customGroups = [];
-    render(<WorldMembersPage />);
+    renderR(<WorldMembersPage />);
     expect(screen.queryByText('Čekatel')).not.toBeInTheDocument();
     expect(screen.getByText('Svět zatím nemá žádné členy.')).toBeInTheDocument();
   });

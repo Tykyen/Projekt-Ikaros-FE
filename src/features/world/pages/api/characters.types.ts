@@ -54,6 +54,11 @@ export interface CharacterDirectoryEntry {
   /** Spec 9.2 — 'location' (Lokace) / 'persona'. Lokace se nenabízí jako postava hráče. */
   kind: 'persona' | 'location';
   imageUrl?: string;
+  // Parita s GameEvent — výřez avataru v kartě adresáře.
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: 'cover' | 'contain' | null;
   /** Přiřazený hráč (jen PC) — pro zobrazení jména hráče na kartě. */
   userId?: string;
 }

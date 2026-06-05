@@ -4,6 +4,7 @@ import { AkjBanner } from '../components/AkjBanner';
 import { PageSections } from '../components/PageSections';
 import { PageSidebar } from '../components/PageSidebar';
 import type { Page } from '../../api/pages.types';
+import { getImageStyle } from '@/shared/lib/imageStyle';
 import s from './OstatniLayout.module.css';
 
 interface Props {
@@ -36,6 +37,12 @@ export function OstatniLayout({ page }: Props) {
               src={page.imageUrl}
               alt={page.title}
               loading="lazy"
+              style={getImageStyle(
+                page.imageFocalX,
+                page.imageFocalY,
+                page.imageZoom,
+                page.imageFit,
+              )}
             />
           </div>
         )}

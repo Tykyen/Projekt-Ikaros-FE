@@ -6,7 +6,7 @@ import {
   type NewPageChoice,
 } from '@/features/world/pages/PageEditor/components/NewPageWizardModal';
 import { WorldSearchModal } from '@/features/world/search/components/WorldSearchModal';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import clsx from 'clsx';
 import s from './WorldLayout.module.css';
 import { WorldContext, type WorldContextValue, type WorldCharacterSlot } from '@/features/world/context/WorldContext';
@@ -17,7 +17,11 @@ import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDi
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, WorldRole } from '@/shared/types';
 import { UserAvatar } from '@/shared/ui';
-import { themeAtom, worldThemePreviewAtom } from '../../../themes/state';
+import {
+  themeAtom,
+  worldThemePreviewAtom,
+  worldThemeActiveAtom,
+} from '../../../themes/state';
 import { getTheme } from '../../../themes/registry';
 import { applyTheme } from '../../../themes/applyTheme';
 import { resolveWorldTheme } from '../../../themes/worldTheme';
@@ -381,6 +385,15 @@ export function WorldLayout() {
   useEffect(() => {
     globalThemeIdRef.current = globalThemeId;
   }, [globalThemeId]);
+
+  // `:root` po dobu existence světa vlastní WorldLayout — `ThemeProvider`
+  // globální `applyTheme` přeskočí (jinak by ho race po opuštění profilu
+  // přepsal globálním motivem, viz worldThemeActiveAtom).
+  const setWorldThemeActive = useSetAtom(worldThemeActiveAtom);
+  useEffect(() => {
+    setWorldThemeActive(true);
+    return () => setWorldThemeActive(false);
+  }, [setWorldThemeActive]);
 
   // Apply motiv světa na `:root` (až po načtení světa — během loadingu
   // zůstává globální motiv).
