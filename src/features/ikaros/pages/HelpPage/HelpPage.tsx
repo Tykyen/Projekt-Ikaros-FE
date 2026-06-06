@@ -40,10 +40,10 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-05 (Chat světa: kanál Postavy je soukromý —
+          Aktualizováno k 2026-06-06 (Chat světa: kanál Postavy je soukromý —
           přidělená postava ti automaticky založí privátní konverzaci s vedením;
-          pořadí kanálů i konverzací si každý řadí sám a kanály jsou defaultně
-          sbalené. Plus hlavní obrázek stránky/postavy má
+          pořadí kanálů i konverzací si každý řadí sám — přetažením úchopky
+          (⋮⋮) vlevo od názvu — a kanály jsou defaultně sbalené. Plus hlavní obrázek stránky/postavy má
           nastavitelný výřez — focal point, přiblížení a režim vyplnit/vidět
           celý, stejně jako u akcí. Zprávu napíšeš i přímo z osobní karty
           uživatele. Na stránce „Hráči světa" klik na hráče otevře jeho osobní
@@ -56,7 +56,9 @@ export default function HelpPage() {
           samostatné instance: PJ upravuje jejich schopnosti i poznámky přímo
           u tokenu a každá si drží vlastní životy. Plus 12.3 — záložka Informace: rozbalovací
           Skupiny (každá skupina má stránku se seznamem hrajících členů) +
-          Pravidla světa jako editovatelná wiki stránka. Plus 12.2 — Hlavní lišta světa: PJ skryje
+          tři referenční wiki stránky každého světa — Pravidla, Magický systém a
+          Technologie (PJ Magický systém i Technologii může z menu skrýt v
+          Nastavení → Viditelnost modulů). Plus 12.2 — Hlavní lišta světa: PJ skryje
           nepoužívané moduly, postaví vlastní navigaci a šablony menu a nastaví
           „Last info" oznámení pro členy. Plus AKJ — chráněné záložky stránek: stránka
           může mít vedle Profilu zamčené záložky, které vidí jen ti s přístupem
