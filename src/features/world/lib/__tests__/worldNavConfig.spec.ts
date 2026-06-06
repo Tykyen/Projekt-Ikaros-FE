@@ -22,17 +22,26 @@ describe('buildWorldNav', () => {
     expect(idsP).not.toContain('scenare');
   });
 
-  it('esenciály nemají id → nelze skrýt', () => {
+  it('Skupiny + Pravidla esenciální (bez id), referenční stránky skrývatelné', () => {
     const nav = buildWorldNav('a', true);
     const info = nav.find((g) => g.label === 'Informace')!;
-    expect(info.items!.every((i) => i.id === undefined)).toBe(true);
+    const byLabel = (l: string) => info.items!.find((i) => i.label === l)!;
+    expect(byLabel('Skupiny').id).toBeUndefined();
+    expect(byLabel('Pravidla').id).toBeUndefined();
+    expect(byLabel('Magický systém').id).toBe('magicky-system');
+    expect(byLabel('Technologie').id).toBe('technologie');
   });
 
-  it('„Informace" = rozbalovací Skupiny + Pravidla (bez Přehled/Novinky)', () => {
+  it('„Informace" = Skupiny + Pravidla + Magický systém + Technologie (bez Přehled/Novinky)', () => {
     const nav = buildWorldNav('a', true, ['Lumíci', 'Evropani']);
     const info = nav.find((g) => g.label === 'Informace')!;
     const labels = info.items!.map((i) => i.label);
-    expect(labels).toEqual(['Skupiny', 'Pravidla']);
+    expect(labels).toEqual([
+      'Skupiny',
+      'Pravidla',
+      'Magický systém',
+      'Technologie',
+    ]);
     expect(labels).not.toContain('Přehled');
     expect(labels).not.toContain('Novinky');
 
@@ -64,6 +73,15 @@ describe('filterNavByHidden', () => {
   it('skryje top-level Kalendář', () => {
     const out = filterNavByHidden(buildWorldNav('a', false), ['kalendar']);
     expect(out.find((g) => g.label === 'Kalendář')).toBeUndefined();
+  });
+
+  it('skryje referenční stránku Informace, esenciály zůstanou', () => {
+    const out = filterNavByHidden(buildWorldNav('a', false), ['technologie']);
+    const info = out.find((g) => g.label === 'Informace')!;
+    const labels = info.items!.map((i) => i.label);
+    expect(labels).not.toContain('Technologie');
+    expect(labels).toContain('Magický systém');
+    expect(labels).toContain('Pravidla'); // esenciál nelze skrýt
   });
 
   it('esenciál bez id se nikdy neskryje', () => {

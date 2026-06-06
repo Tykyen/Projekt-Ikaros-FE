@@ -7,6 +7,7 @@ import {
 import s from './NavVisibilitySection.module.css';
 
 const GROUP_LABELS: Record<HideableNavItem['group'], string> = {
+  informace: 'Skupina „Informace"',
   svet: 'Skupina „Svět"',
   hra: 'Skupina „Hra"',
   top: 'Hlavní lišta',
@@ -24,7 +25,12 @@ interface Props {
  */
 export function NavVisibilitySection({ value, onChange }: Props) {
   const hiddenSet = new Set(value);
-  const groups: HideableNavItem['group'][] = ['svet', 'hra', 'top'];
+  const groups: HideableNavItem['group'][] = [
+    'informace',
+    'svet',
+    'hra',
+    'top',
+  ];
 
   function toggle(id: string) {
     onChange(

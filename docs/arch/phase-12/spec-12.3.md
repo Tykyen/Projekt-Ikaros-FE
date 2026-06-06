@@ -31,6 +31,12 @@ Přestavět dropdown **„Informace"** v horní liště světa:
 ### R1 — „Informace" obsah
 Dropdown „Informace" = **dynamický seznam skupin** + „Nezařazení" + **Pravidla**. Přehled a Novinky se z dropdownu **odebírají**.
 
+### R1b — Referenční stránky (dotaženo 2026-06-06)
+Vedle Pravidel ukazuje „Informace" i další dvě **referenční wiki stránky** seedované při tvorbě světa (BE `pages-world-seed.listener`): **Magický systém** (`/magicky-system`) a **Technologie** (`/technologie`). Důvod: tři základní reference každé hry (jak se hraje / jak funguje magie / pokročilost techniky) mají hráči hned k ruce.
+- **Pravidla** zůstávají **esenciální** (bez `id`, nelze skrýt) — páteř světa.
+- **Magický systém + Technologie** jsou **skrývatelné** (`id: 'magicky-system' | 'technologie'`, skupina `informace` v `HIDEABLE_NAV_ITEMS`). PJ je odebere z menu v *Nastavení světa → Viditelnost modulů*; stránka zůstává dostupná přes URL (`filterNavByHidden` semantika, shodně s moduly Svět/Hra).
+- Stránky existují prakticky ve všech světech (seed od commitu 4c36412). Smazaná/chybějící → `PageViewerPage` ukáže `PageNotFound` (žádný pád).
+
 ### R2 — Přehled / Novinky ✅ (potvrzeno 2026-06-03)
 - **Přehled** dostupný klikem na **název světa** (už funguje v `WorldLayout`).
 - **Novinky a Akce jsou na úvodní stránce** (Přehled) → odebrání z „Informace" je OK, přístup se neztrácí. Žádný samostatný odkaz netřeba.

@@ -20,12 +20,26 @@ import { buildGroupNavEntries } from './groupMembers';
 export interface HideableNavItem {
   id: string;
   label: string;
-  group: 'svet' | 'hra' | 'top';
+  group: 'informace' | 'svet' | 'hra' | 'top';
   /** Krátký popis pro Settings UI. */
   hint?: string;
 }
 
 export const HIDEABLE_NAV_ITEMS: readonly HideableNavItem[] = [
+  // Skupina „Informace" — referenční stránky seedované při tvorbě světa
+  // (BE pages-world-seed). Default viditelné, PJ je může z menu odebrat.
+  {
+    id: 'magicky-system',
+    label: 'Magický systém',
+    group: 'informace',
+    hint: 'Seedovaná wiki stránka o magii světa (lze skrýt i vyplnit).',
+  },
+  {
+    id: 'technologie',
+    label: 'Technologie',
+    group: 'informace',
+    hint: 'Seedovaná wiki stránka o technologiích světa (lze skrýt i vyplnit).',
+  },
   // Skupina „Svět"
   {
     id: 'timeline',
@@ -151,6 +165,14 @@ export function buildWorldNav(
           })),
         },
         { label: 'Pravidla', to: `${b}/pravidla` },
+        // Referenční stránky seedované při tvorbě světa — k ruce hráčům.
+        // Mají `id` → skrývatelné v Nastavení (HIDEABLE_NAV_ITEMS „informace").
+        {
+          id: 'magicky-system',
+          label: 'Magický systém',
+          to: `${b}/magicky-system`,
+        },
+        { id: 'technologie', label: 'Technologie', to: `${b}/technologie` },
       ],
     },
     {
