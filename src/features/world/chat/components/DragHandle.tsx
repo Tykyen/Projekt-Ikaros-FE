@@ -1,13 +1,14 @@
 /**
- * Drag handle pro kanály a konverzace (krok 6.5a/b, design audit §1).
+ * Drag handle pro kanály a konverzace (krok 6.5a/b; 6.7b zviditelnění).
  *
- * Vizuál = 3 puntíky (pro kanál) / 2 puntíky (pro konverzaci) přes CSS `::before`
- * — méně vizuálního šumu než `GripVertical` z lucide. Vlastní 2×2 px puntíky
- * s box-shadow trikem pro řadu.
+ * Vizuál = lucide `GripVertical` (⋮⋮), 16 px pro kanál / 14 px pro konverzaci.
+ * Trvale viditelný (opacity v CSS, ne hover-only) — pro objevitelnost u hráčů;
+ * nese accent barvu svého kanálu (`--g-color` / `--ch-accent`).
  *
  * Forwarded ref + spread `attributes` / `listeners` z `useSortable` (dnd-kit).
  */
 import { forwardRef } from 'react';
+import { GripVertical } from 'lucide-react';
 import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core';
 import clsx from 'clsx';
 import s from './DragHandle.module.css';
@@ -33,7 +34,7 @@ export const DragHandle = forwardRef<HTMLButtonElement, DragHandleProps>(
         {...attributes}
         {...listeners}
       >
-        <span className={s.dots} aria-hidden="true" />
+        <GripVertical size={kind === 'group' ? 16 : 14} aria-hidden="true" />
       </button>
     );
   },

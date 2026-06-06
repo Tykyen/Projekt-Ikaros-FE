@@ -63,7 +63,9 @@ export function SortableChannelGroup(props: SortableChannelGroupProps) {
     position: 'relative',
   };
 
-  const handle = props.canManage ? (
+  // 6.7b — osobní pořadí řadí KAŽDÝ hráč, ne jen PJ (spec-6.7 §6.7b/R5).
+  // Proto handle bez `canManage` gate; PJ-only zůstávají jen edit/„+" tlačítka.
+  const handle = (
     <DragHandle
       kind="group"
       ref={setActivatorNodeRef}
@@ -71,7 +73,7 @@ export function SortableChannelGroup(props: SortableChannelGroupProps) {
       listeners={listeners}
       label={`Přesunout kanál ${props.group.name}`}
     />
-  ) : null;
+  );
 
   return (
     <div ref={setNodeRef} style={style} data-over={isOver || undefined}>
@@ -133,7 +135,8 @@ export function SortableChannelItem(props: SortableChannelItemProps) {
     position: 'relative',
   };
 
-  const handle = props.canManage ? (
+  // 6.7b — osobní pořadí řadí KAŽDÝ hráč (viz SortableChannelGroup).
+  const handle = (
     <DragHandle
       kind="channel"
       ref={setActivatorNodeRef}
@@ -141,7 +144,7 @@ export function SortableChannelItem(props: SortableChannelItemProps) {
       listeners={listeners}
       label={`Přesunout konverzaci ${props.channel.name}`}
     />
-  ) : null;
+  );
 
   return (
     <div ref={setNodeRef} style={style} data-over={isOver || undefined}>

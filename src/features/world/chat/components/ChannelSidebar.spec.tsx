@@ -35,7 +35,9 @@ const groups: GroupWithChannels[] = [
 
 const baseProps = {
   worldId: 'w1',
-  activeChannelId: null,
+  // 6.7c — kanály jsou defaultně sbalené; aktivní konverzace svůj kanál rozbalí,
+  // takže testy závislé na viditelnosti konverzací drží `c1` jako aktivní.
+  activeChannelId: 'c1',
   unread: new Map<string, number>(),
   onSelectChannel: () => {},
   onAddGroup: () => {},
@@ -129,19 +131,20 @@ describe('ChannelSidebar', () => {
     expect(onEditChannel).toHaveBeenCalledWith(groups[0].channels[0]);
   });
 
-  // Krok 6.5a/b — drag handle viditelnost
-  it('drag handle se nezobrazuje pro ne-PJ', () => {
+  // 6.7b — osobní reorder řadí KAŽDÝ hráč → handle se zobrazí i ne-PJ
+  // (dřív 6.5a/b gated na canManage; spec-6.7 §6.7b/R5 to ruší).
+  it('drag handle se zobrazí i pro ne-PJ (osobní reorder)', () => {
     render(
       wrap(
         <ChannelSidebar groups={groups} canManage={false} {...baseProps} />,
       ),
     );
     expect(
-      screen.queryByRole('button', { name: /Přesunout kanál/ }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: /Přesunout kanál Globální/ }),
+    ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Přesunout konverzaci/ }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: /Přesunout konverzaci obecný/ }),
+    ).toBeInTheDocument();
   });
 
   it('drag handle pro kanál i konverzaci se zobrazí PJ', () => {

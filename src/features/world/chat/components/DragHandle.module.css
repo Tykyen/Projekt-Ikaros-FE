@@ -1,41 +1,50 @@
 /**
- * Drag handle (krok 6.5a/b, design audit §1) — „cestičkové puntíky".
+ * Drag handle (krok 6.5a/b; 6.7b zviditelnění) — lucide `GripVertical`.
  *
- * Base stav (desktop): opacity 0, ale zachované rozměry (žádné re-layoutování).
- * Hover na rodiči (.group nebo .item — `:hover *`): opacity 0.5.
- * Hover na handle samotném: opacity 1, barva = barva kanálu (--g-color / --ch-accent).
- * Mobil: opacity 0.5 stále, touch terč ≥ 44 px.
+ * Klidový stav: trvale viditelný (opacity 0.5) v accent barvě kanálu — affordance
+ * „chyť mě" pro KAŽDÉHO hráče (dřív opacity:0 hover-only → hráč neobjevil).
+ * Hover handle: plná barva + synthwave glow. Active: lehké scale + grabbing.
+ * Mobil: opacity 0.6, touch terč ≥ 44 px.
  *
- * Puntíky vlastní CSS přes box-shadow — 3 puntíky pro kanál (kind='group'),
- * 2 puntíky pro konverzaci (kind='channel' → .small).
+ * Barva kaskáduje z rodiče: kanál `--g-color` (.group), konverzace `--ch-accent`
+ * (.item) → každá úchopka ladí s identitou svého kanálu.
  */
 
 .handle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 18px;
+  width: 16px;
+  height: 22px;
   flex-shrink: 0;
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--theme-text-dim, var(--text-muted));
+  color: var(--g-color, var(--ch-accent, var(--theme-accent)));
   cursor: grab;
-  opacity: 0;
+  opacity: 0.5;
   transition:
     opacity var(--transition-fast),
-    color var(--transition-fast);
+    filter var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-/* Skryté ale udržuje místo — hover rodiče zobrazí. */
+.handle.small {
+  width: 14px;
+  height: 20px;
+}
+
+/* Hover přímo na handle — plná barva + glow v accentu kanálu. */
 .handle:hover {
   opacity: 1;
-  color: var(--g-color, var(--ch-accent, var(--theme-accent)));
+  filter: drop-shadow(
+    0 0 5px var(--g-color, var(--ch-accent, var(--theme-accent)))
+  );
 }
 
 .handle:active {
   cursor: grabbing;
+  transform: scale(0.92);
 }
 
 .handle:focus-visible {
@@ -44,44 +53,11 @@
   opacity: 1;
 }
 
-/* Při hoveru rodiče (`.header` u kanálu, `.item` u konverzace) zviditelnit. */
-:global(.header):hover .handle,
-:global(.item):hover .handle {
-  opacity: 0.5;
-}
-
-/* Puntíky — 3 puntíky pro group (větší rozteč), 2 pro channel (menší). */
-.dots {
-  position: relative;
-  display: inline-block;
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow:
-    0 5px 0 currentColor,
-    0 10px 0 currentColor;
-  margin: 4px 0;
-}
-
-.small .dots {
-  height: 1px;
-  width: 1px;
-  box-shadow:
-    0 4px 0 currentColor,
-    0 8px 0 currentColor;
-  margin: 3px 0;
-}
-
-/* Mobil — handle stále viditelný, ≥ 44×44 px touch terč (spec §5). */
+/* Mobil — handle viditelnější, ≥ 44×44 px touch terč (spec §5). */
 @media (hover: none) {
-  .handle {
-    opacity: 0.5;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-  }
+  .handle,
   .handle.small {
+    opacity: 0.6;
     width: 44px;
     height: 44px;
     min-width: 44px;

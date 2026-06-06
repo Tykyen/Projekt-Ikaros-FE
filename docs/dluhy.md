@@ -14,6 +14,15 @@
 > 3 bezpečnostní (N-7 members leak, N-8 room:join leak, N-9 sound spoof). Detaily, důkazy
 > a návrhy řešení v `bug-audit.md`. Opraveno během auditu: N-1 (test mock), D-029 (PWA ikony).
 
+### D-032 — Připnuté konverzace nejdou přehazovat drag&drop
+**Soubor:** `src/features/world/chat/components/ChannelSidebar.tsx` — sekce „Připnuté" (`s.pinned`)
+**Problém:** Připnuté konverzace se renderují plochým `.map` bez `DndContext`/`SortableContext`/handle, na rozdíl od kanálů a konverzací uvnitř kanálů (6.7b osobní reorder). Starý Matrix (`ChatSidebar.tsx`, `handlePinnedDrop`) reorder připnutých uměl (persist do `chatPreferences`).
+**Dopad:** Nízký — UX nekonzistence: konverzace v kanálu jdou řadit, v sekci Připnuté ne.
+**Řešení:** Obalit `pinnedChannels` do vlastního `DndContext`+`SortableContext`, přidat osobní pole `chatPinnedOrder` do `my-prefs` (nebo řadit dle pořadí připínání).
+**Kdy:** Až bude prostor na doladění chat sidebaru; nízká priorita.
+
+---
+
 ### D-030 — Správa push zařízení jen pro aktuální zařízení
 **Soubor:** `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx` — 13.2c
 **Problém:** `PushToggle` umí jen zapnout/vypnout push na **právě používaném** zařízení. Roadmapa 13.2d chtěla „uživatel vidí svá zařízení / subscriptions a může je odebrat" — to chybí, protože BE `push` modul nemá endpoint pro výpis subscriptions uživatele (jen subscribe/unsubscribe dle endpointu).

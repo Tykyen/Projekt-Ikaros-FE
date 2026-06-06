@@ -77,6 +77,7 @@ Guard: `JwtAuthGuard` + member světa (libovolná role ≥ Hráč). Žádný PJ 
 - Drag-drop v `ChannelSidebar` přestane být gated na `canManage` — řadí **každý**.
 - Ukládá přes nový hook `useUpdateChatPrefs` (optimistic + debounce ~400 ms) místo `useReorderGroups/Channels` (globální PJ endpointy — zůstanou nepoužité, příp. smazat).
 - Sidebar aplikuje osobní pořadí (merge: známá ID dle prefs, ostatní na konec dle globálního order).
+- **Drag handle viditelnost (6.7b dotažení):** handle je **trvale viditelný** — lucide `GripVertical` (⋮⋮) v accent barvě kanálu (`--g-color` / `--ch-accent`), opacity 0.5 v klidu → 1 + synthwave glow na hover; mobil 0.6 / 44px terč. Nahrazuje původní `opacity:0` hover-only z 6.5 (hráč handle neobjevil). Render **bez `canManage`** i pro ne-PJ. Pozn.: starý selektor `:global(.header):hover .handle` nikdy nefungoval — `.header` je hashovaná CSS-module třída, `:global` ji nematchne.
 
 > ⚠️ **Změna oproti 6.5:** drag-drop už nemění globální pořadí pro všechny. PJ řadí jen sobě. Globální `order` (z 6.5) zůstává jako výchozí pro nové členy. Pokud chceš zachovat i „PJ nastaví výchozí pořadí všem" → samostatná položka, viz Otevřené otázky.
 
