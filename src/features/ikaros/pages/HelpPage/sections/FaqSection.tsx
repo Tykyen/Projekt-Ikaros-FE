@@ -15,6 +15,32 @@ interface FaqItem {
 const FAQ: FaqItem[] = [
   {
     cat: 'obecne',
+    q: 'Kde najdu nápovědu přímo ve světě?',
+    a: (
+      <>
+        <p>
+          Nemusíš chodit sem — pomoc je i <strong>přímo v kontextu</strong>:
+        </p>
+        <ul>
+          <li>
+            Na <strong>úvodní straně světa</strong> je panel{' '}
+            <strong>„Co máš po ruce"</strong> — rozcestník nástrojů; klik na dlaždici
+            tě vezme rovnou tam.
+          </li>
+          <li>
+            V <strong>taktické mapě</strong> a v <strong>chatu</strong> je tlačítko{' '}
+            <strong>„?"</strong> — otevře stručný tahák k ovládání.
+          </li>
+        </ul>
+        <p>
+          Co vidíš, se řídí tvou rolí ve světě (PJ má víc nástrojů než hráč). Tahle
+          stránka zůstává úplným přehledem.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'obecne',
     q: 'Co najdu na úvodní stránce po přihlášení?',
     a: (
       <>

@@ -1,7 +1,6 @@
-// 13.5 — sdílená paleta barevných akcentů bloků nápovědy.
-// Klíč → CSS proměnná (theme-aware token). Komponenty ji vkládají do
-// inline `--acc`, takže jedna CSS třída pokryje libovolnou barvu bez
-// hardcode (lint:colors clean). Barvy z role tokenů + semantických tokenů.
+// Sdílená paleta barevných akcentů bloků nápovědy (spec 13.5 → shared 13.6).
+// Klíč → CSS proměnná (theme-aware token). Komponenty ji vkládají do inline
+// `--acc`, takže jedna CSS třída pokryje libovolnou barvu bez hardcode.
 
 export type HelpAccent =
   | 'accent'

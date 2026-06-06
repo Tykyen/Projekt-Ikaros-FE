@@ -1,0 +1,79 @@
+/* 13.6 — in-situ nápověda ve světě. Token-only. */
+
+/* Ikonové tlačítko „?" — jednotné napříč mapou a chatem. */
+.helpBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+  transition:
+    color var(--transition-base),
+    border-color var(--transition-base),
+    background var(--transition-base);
+}
+
+.helpBtn:hover {
+  color: var(--theme-accent, var(--accent));
+  border-color: var(--theme-accent, var(--accent));
+  background: color-mix(in srgb, var(--theme-accent, var(--accent)) 12%, transparent);
+}
+
+.helpBtn:focus-visible {
+  outline: 2px solid var(--theme-accent, var(--accent));
+  outline-offset: 2px;
+}
+
+/* Odkaz na plnou nápovědu v patičce modalu. */
+.fullLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--theme-accent, var(--accent));
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+.fullLink:hover {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--theme-accent, var(--accent)) 55%, transparent);
+}
+
+/* Úvodní věta v modalu (komu je nápověda). */
+.intro {
+  margin: 0 0 var(--sp-3);
+  color: var(--theme-text-muted, var(--text-muted));
+  font-size: var(--text-sm);
+}
+
+/* Nadpis role-skupiny uvnitř modalu (Pro hráče / Pro Pána jeskyně). */
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.03em;
+  color: var(--theme-heading, var(--text-strong));
+}
+
+.sectionTitle:first-child {
+  margin-top: 0;
+}
+
+.sectionTitle svg {
+  color: var(--theme-accent, var(--accent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helpBtn {
+    transition: none;
+  }
+}

@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
-import s from '../HelpPage.module.css';
+import s from './Help.module.css';
 
 export type TermItem = { term: ReactNode; desc: ReactNode };
 

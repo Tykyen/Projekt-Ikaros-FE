@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { ACCENT_VAR, type HelpAccent } from './accents';
-import s from '../HelpPage.module.css';
+import s from './Help.module.css';
 
 type InfoCardProps = {
   /** Ikona vlevo (lucide). */
@@ -15,7 +15,7 @@ type InfoCardProps = {
   children: ReactNode;
 };
 
-/** Barevná karta „co nástroj umí v kostce". Vizuál sdílí s roleCard. */
+/** Barevná karta „co nástroj umí v kostce". */
 export function InfoCard({ icon, title, accent = 'accent', interactive, children }: InfoCardProps) {
   const cls = interactive ? `${s.infoCard} ${s.infoCardInteractive}` : s.infoCard;
   const style = { ['--acc' as string]: ACCENT_VAR[accent] } as CSSProperties;

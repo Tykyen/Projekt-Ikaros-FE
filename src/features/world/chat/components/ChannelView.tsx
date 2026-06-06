@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Menu, Users, Search } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
+import { WorldHelpButton, WorldHelpModal, ChatHelp } from '@/features/world/help';
 import type { User } from '@/shared/types';
 import { getSocket } from '@/features/chat/api/socket';
 import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
@@ -112,6 +113,7 @@ export function ChannelView({
   });
 
   const [typingNames, setTypingNames] = useState<string[]>([]);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [surfaceColor, setSurfaceColor] = useState('');
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -407,6 +409,8 @@ export function ChannelView({
         >
           <Search size={18} />
         </button>
+        {/* 13.6 — in-situ nápověda k chatu (role-aware cheat-sheet). */}
+        <WorldHelpButton label="Nápověda k chatu" onClick={() => setHelpOpen(true)} />
         {onToggleMembers && (
           <button
             type="button"
@@ -435,6 +439,16 @@ export function ChannelView({
           </button>
         )}
       </header>
+
+      {/* 13.6 — modal s nápovědou k chatu. */}
+      <WorldHelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        title="Nápověda — Chat světa"
+        size="md"
+      >
+        <ChatHelp audience={canManage ? 'pj' : 'hrac'} />
+      </WorldHelpModal>
 
       <div className={s.body}>
         {history.isLoading ? (

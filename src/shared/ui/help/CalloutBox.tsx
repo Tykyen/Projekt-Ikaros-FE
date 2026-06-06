@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Lightbulb, AlertTriangle, Code2, type LucideIcon } from 'lucide-react';
-import s from '../HelpPage.module.css';
+import s from './Help.module.css';
 
 export type CalloutVariant = 'tip' | 'pozor' | 'priklad';
 

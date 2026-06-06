@@ -8,6 +8,7 @@ import { WorldAboutPanel } from '@/features/world/components/WorldAboutPanel';
 import { JoinCTA } from '@/features/world/components/JoinCTA';
 import { AccessRequestPending } from '@/features/world/components/AccessRequestPending';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
+import { WorldToolboxPanel } from '@/features/world/help';
 import { WorldDashboard } from './WorldDashboard';
 import s from './WorldDashboardPage.module.css';
 
@@ -43,6 +44,7 @@ export default function WorldDashboardPage() {
       <article className={s.page}>
         <WorldDetailHero world={world} />
         <WorldDashboard world={world} />
+        <WorldToolboxPanel />
         <WorldAboutPanel world={world} />
       </article>
     );

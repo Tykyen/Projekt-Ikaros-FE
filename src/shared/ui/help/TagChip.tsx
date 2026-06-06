@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import s from '../HelpPage.module.css';
+import s from './Help.module.css';
 
 // Audience / role / stav. Barva z role tokenů kde dává smysl; ok/soon
 // reuse statusPill sémantiky (✅ Funguje / 🚧 Připravujeme).

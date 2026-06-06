@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { ACCENT_VAR, type HelpAccent } from './accents';
-import s from '../HelpPage.module.css';
+import s from './Help.module.css';
 
 type CommonProps = {
   /** Ikona vlevo (lucide). */

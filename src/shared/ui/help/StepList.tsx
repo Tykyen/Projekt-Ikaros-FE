@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import s from '../HelpPage.module.css';
+import s from './Help.module.css';
 
 /** Číslovaný návod „jak na to" (1→N). Čísla v barevných kroužcích. */
 export function StepList({ steps }: { steps: ReactNode[] }) {

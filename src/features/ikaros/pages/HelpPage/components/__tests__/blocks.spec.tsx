@@ -9,12 +9,15 @@ vi.mock('../../media', () => ({
   },
 }));
 
-import { HelpAccordion, HelpSubAccordion } from '../HelpAccordion';
-import { InfoCard } from '../InfoCard';
-import { TagChip } from '../TagChip';
-import { TermGrid } from '../TermGrid';
-import { CalloutBox } from '../CalloutBox';
-import { StepList } from '../StepList';
+import {
+  HelpAccordion,
+  HelpSubAccordion,
+  InfoCard,
+  TagChip,
+  TermGrid,
+  CalloutBox,
+  StepList,
+} from '@/shared/ui/help';
 import { PermissionTable } from '../PermissionTable';
 import { ScreenshotSlot } from '../ScreenshotSlot';
 import { IllustrationSlot } from '../IllustrationSlot';

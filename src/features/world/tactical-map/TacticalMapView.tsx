@@ -77,6 +77,7 @@ import { TokenSystemSheet } from "./components/token-panel/TokenSystemSheet";
 import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
 import { MapNotebookButton } from "./components/notebook/MapNotebookButton";
 import { MapNotebookOverlay } from "./components/notebook/MapNotebookOverlay";
+import { WorldHelpButton, WorldHelpModal, TacticalMapHelp } from "@/features/world/help";
 import { useGmNotes, useUpdateGmNotes } from "./api/useGmNotes";
 import { useCharacterNotes } from "@/features/world/pages/api/useCharacterSubdocs";
 import { useUpdateCharacterNotes } from "@/features/world/pages/api/useCharacterMutations";
@@ -445,6 +446,7 @@ export function TacticalMapView(): React.ReactElement {
   // (per-PJ), hráč → notes jeho jediné postavy (propisuje se do tabu Poznámky
   // na stránce postavy). Oba hooky volány vždy, gated přes `enabled`/slug.
   const [notebookOpen, setNotebookOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const playerSlug = mySlugs[0] ?? "";
   const gmNotes = useGmNotes(worldId ?? "", isPJ);
   const gmNotesMut = useUpdateGmNotes(worldId ?? "");
@@ -1642,7 +1644,19 @@ export function TacticalMapView(): React.ReactElement {
         {/* 10.2n — „co hraje" (ambient přehrávač) pod lištou s deníkem/počasím.
             Sám se skryje, když nic nehraje (vrací null). */}
         {scene && <SceneSoundPlayer scene={scene} />}
+        {/* 13.6 — in-situ nápověda (cheat-sheet ovládání mapy, role-aware). */}
+        <WorldHelpButton label="Nápověda k mapě" onClick={() => setHelpOpen(true)} />
       </div>
+
+      {/* 13.6 — modal s nápovědou k taktické mapě. */}
+      <WorldHelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        title="Nápověda — Taktická mapa"
+        size="lg"
+      >
+        <TacticalMapHelp audience={isPJ ? "pj" : "hrac"} />
+      </WorldHelpModal>
 
       {/* 10.2j — overlay přes celý viewport (uvnitř fullscreenu mapy). Mountuje
           se až jsou data načtená, aby initialContent nebyl prázdný. */}
