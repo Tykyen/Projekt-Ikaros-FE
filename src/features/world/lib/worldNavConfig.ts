@@ -54,6 +54,12 @@ export const HIDEABLE_NAV_ITEMS: readonly HideableNavItem[] = [
     hint: '3D mapa lokací (fáze 10.1).',
   },
   {
+    id: 'mapy',
+    label: 'Mapy',
+    group: 'svet',
+    hint: 'Atlas obrázkových map s per-mapa viditelností (13.4).',
+  },
+  {
     id: 'pavucina',
     label: 'Pavučina',
     group: 'svet',
@@ -181,6 +187,7 @@ export function buildWorldNav(
         { label: 'Stránky', to: `${b}/stranky` },
         { id: 'timeline', label: 'Časová osa', to: `${b}/timeline` },
         { id: 'mapa', label: 'Mapa vesmíru', to: `${b}/mapa` },
+        { id: 'mapy', label: 'Mapy', to: `${b}/mapy` },
         { id: 'pavucina', label: 'Pavučina', to: `${b}/pavucina` },
         { id: 'obchod', label: 'Obchod', to: `${b}/obchod` },
       ],

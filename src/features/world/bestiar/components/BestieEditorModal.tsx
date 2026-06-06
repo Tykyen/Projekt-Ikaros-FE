@@ -3,17 +3,20 @@
  *
  * Form pole:
  * - name (text)
- * - imageUrl (text — pro MVP, upload defer)
+ * - imageUrl (upload souboru přes <HeroUploadCard>, jako u postav/stránek;
+ *   fallback „Vložit URL ručně" zachován)
  * - scope (jen při create; user/world)
  * - systemStats (přes <EntitySchemaForm schema={bestieSchema}>)
  * - notes (textarea)
  *
- * BE volá `create` / `update` mutation. Pro mvp žádný image upload — text URL.
+ * BE volá `create` / `update` mutation. Obrázek se nahrává přes sdílený
+ * `useUploadImage` (uvnitř HeroUploadCard); ukládá se jen výsledná URL.
  */
 import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
 import { EntitySchemaForm } from '@/features/world/tactical-map/components/schema-form/EntitySchemaForm';
+import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/HeroUploadCard';
 import { Modal, Button } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
@@ -155,16 +158,13 @@ export function BestieEditorModal({
         </div>
 
         <div className={styles.row}>
-          <label className={styles.label}>
-            Obrázek (URL)
-            <input
-              type="text"
-              className={styles.input}
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://… nebo path"
-            />
-          </label>
+          <span className={styles.label}>Obrázek</span>
+          <HeroUploadCard
+            value={imageUrl}
+            onChange={setImageUrl}
+            compact
+            uploadCta="Nahrát obrázek"
+          />
         </div>
 
         {!existing && (

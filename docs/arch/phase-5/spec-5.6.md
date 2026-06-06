@@ -85,6 +85,8 @@ Data: `useWorldMembers(worldId)` + `useWorldSettings()`. Rozdělení členů:
 3. **Bez skupiny** — členové mimo vedení bez `group` (role `Ctenar` / `Hrac` / `Korektor`).
 4. **Zadatelé** (`role === Zadatel`, pending vstup) — **nezobrazují se** (nejsou plnými členy).
 
+> **Revize 2026-06-06:** adresář nezobrazuje všechny členy kromě žadatelů, ale jen „hráče" dle sdíleného predikátu [`isWorldPlayer`](../../src/features/world/lib/isWorldPlayer.ts) — má postavu (`characterPath`) **nebo** je staff (role ≥ Korektor). Vypadli tím i čtenáři a hráči **bez** přiřazené postavy (dřív se zobrazovali v „Bez skupiny"). Důvod: počet na dlaždici „Hráči" (5.2) musí sedět s počtem karet v adresáři. Správa těchto členů zůstává v `WorldSettingsPage`. Empty text „…žádné členy" → „…žádné hráče".
+
 Loading → `Spinner`; prázdný svět → kultivovaný empty stav.
 
 ### 4.4 `MemberCard`

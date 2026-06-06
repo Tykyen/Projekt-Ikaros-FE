@@ -56,13 +56,23 @@ interface Props {
    * v edit mode i pro non-PC typy.
    */
   initialOwnerUserId?: string;
+  /**
+   * 7.1 — New mode: předvyplněný název (z `?slug=` na 404 „Vytvořit").
+   * Slug se z něj auto-generuje zpět. Ignoruje se v edit mode.
+   */
+  initialTitle?: string;
 }
 
 /**
  * 7.2 — Presenter. Spravuje form state, draft auto-save, save flow.
  * 9.1 — `initialType` z wizardu (new mode) předvyplní type ve formuláři.
  */
-export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
+export function PageEditor({
+  page,
+  initialType,
+  initialOwnerUserId,
+  initialTitle,
+}: Props) {
   const navigate = useNavigate();
   const user = useAtomValue(currentUserAtom);
   const { worldId, worldSlug } = useWorldContext();
@@ -75,6 +85,7 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
         : {
             ...INITIAL_PAGE_STATE,
             type: initialType ?? INITIAL_PAGE_STATE.type,
+            title: initialTitle ?? INITIAL_PAGE_STATE.title,
             // C — předvyplnit owner jen pokud type=PostavaHrace
             ownerUserId:
               initialType === 'Postava hráče' && initialOwnerUserId
@@ -95,7 +106,7 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
                   ]
                 : INITIAL_PAGE_STATE.akjTabs,
           },
-    [page, initialType, initialOwnerUserId],
+    [page, initialType, initialOwnerUserId, initialTitle],
   );
   const { state, setField, patch, reset } = usePageEditorState(initialState);
 

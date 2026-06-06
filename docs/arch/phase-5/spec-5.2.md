@@ -132,6 +132,8 @@ Pod hero + info:
 
 3 stat panely (grid `repeat(3,1fr)`): **Hráčů** (`useWorldMembers().length`), **Nadcházejících akcí** (`useWorldGameEvents().length`), **Novinek** (`useWorldNews().length`). Číslo + ikona + popisek (dle Matrixu).
 
+> **Revize 2026-06-06:** počet „Hráči" už není `members.length` (všichni členové), ale `members.filter(isWorldPlayer).length`. Hráč = má přiřazenou postavu (`characterPath`) **nebo** je staff (role ≥ Korektor: Korektor, PomocnyPJ, PJ). Žadatelé, čtenáři a hráči bez postavy se nepočítají. Predikát [`isWorldPlayer`](../../src/features/world/lib/isWorldPlayer.ts) (sdílený s adresářem 5.6).
+
 ### 4.7 Vizuální vrstva — směr „Nástěnka světa"
 
 Design audit (`frontend-design`, 2026-05-17). Dashboard žije uvnitř světového motivu — barevnost dědí z aktivního theme, audit řeší **strukturu a charakter**. Navazuje na jazyk panelů z 5.3 (`SettingsPanel`) a starého Matrixu.

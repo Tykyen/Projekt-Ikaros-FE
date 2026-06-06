@@ -494,6 +494,10 @@ Pulse animace `@keyframes shimmer` (1.5s).
 - [ ] Skeleton loader během fetch
 - [ ] 403 → AccessDenied screen s isWoodWide hint
 - [ ] 404 → PageNotFound screen
+  - **Revize 2026-06-06:** „Vytvořit" na 404 už předávalo `?slug=` do editoru,
+    ale `PageEditorPage` ten param zahazovalo (dead param). Doplněno: editor
+    `?slug=` přečte a přes `slugToTitle` předvyplní pole NÁZEV (slug se z názvu
+    auto-generuje zpět). Diakritiku slug nenese → název bez háčků, uživatel doladí.
 - [ ] AKJ banner na stránkách s AKJ requirement, theme-aware
 - [ ] Favorite hvězda toggle s optimistic update
 - [ ] Breadcrumbs 4-level, klikatelné kromě posledního

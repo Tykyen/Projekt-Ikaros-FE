@@ -34,6 +34,14 @@ describe('HeroUploadCard', () => {
     expect(screen.getByText('Nahrát hero obrázek')).toBeInTheDocument();
   });
 
+  it('uploadCta přepíše text výzvy (znovupoužití mimo hero kontext)', () => {
+    render(
+      <HeroUploadCard value="" onChange={() => {}} uploadCta="Nahrát obrázek" />,
+    );
+    expect(screen.getByText('Nahrát obrázek')).toBeInTheDocument();
+    expect(screen.queryByText('Nahrát hero obrázek')).not.toBeInTheDocument();
+  });
+
   it('s hodnotou — zobrazí preview obrázku', () => {
     render(
       <HeroUploadCard value="https://cdn/x.png" onChange={() => {}} />,

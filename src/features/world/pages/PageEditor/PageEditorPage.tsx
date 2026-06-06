@@ -5,7 +5,7 @@ import { WorldRole } from '@/shared/types';
 import { usePage } from '../api/usePage';
 import { PageEditor } from './PageEditor';
 import { PageEditorSkeleton } from './PageEditorSkeleton';
-import { resolvePageTypeFromUrl } from '../api/pages.types';
+import { resolvePageTypeFromUrl, slugToTitle } from '../api/pages.types';
 
 /**
  * 7.2 — Entry. Routes `/svet/:worldSlug/nova-stranka` + `/edit/:slug`.
@@ -38,11 +38,14 @@ export default function PageEditorPage() {
   // 9.1 C — `?owner=<userId>` předvyplní ownerUserId pro PC (typicky
   // z WorldSettings → Členové → „Vytvořit postavu pro hráče").
   const initialOwnerUserId = searchParams.get('owner') ?? undefined;
+  // 7.1 — `?slug=<X>` z 404 „Vytvořit" předvyplní NÁZEV (odvozený ze slugu).
+  const initialTitle = slugToTitle(searchParams.get('slug') ?? '') || undefined;
 
   return (
     <PageEditor
       initialType={initialType}
       initialOwnerUserId={initialOwnerUserId}
+      initialTitle={initialTitle}
     />
   );
 }

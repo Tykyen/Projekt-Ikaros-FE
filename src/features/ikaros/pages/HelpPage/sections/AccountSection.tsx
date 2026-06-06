@@ -1,121 +1,127 @@
 import { Link } from 'react-router-dom';
+import {
+  UserCircle,
+  AtSign,
+  KeyRound,
+  ImagePlus,
+  Drama,
+  EyeOff,
+  Trash2,
+  Globe2,
+} from 'lucide-react';
+import { HelpAccordion, StepList, CalloutBox, TermGrid } from '../components';
 
 export function AccountSection() {
   return (
     <>
       <p>
-        Všechna nastavení účtu jsou na <Link to="/ikaros/profil">stránce
-        Profil</Link>. Profil má sedm sekcí — popis níže.
+        Všechna nastavení účtu jsou na <Link to="/ikaros/profil">stránce Profil</Link>{' '}
+        (po přihlášení). Rozbal si oblast, kterou řešíš.
       </p>
 
-      <h2>1. Hlavička karty</h2>
-      <p>
-        Tvůj avatar, přezdívka, město, datum založení účtu, poslední přihlášení,
-        zvolená barva chatu a aktuální motiv. Většinu polí (město, displayName)
-        upravíš přes tlačítko <strong>Upravit</strong>.
-      </p>
-      <p>
-        Vedle e-mailu vidíš odznak <strong>✓ Ověřeno</strong> nebo{' '}
-        <strong>⚠ Neověřeno</strong>. Pokud ti e-mail nedorazil, klikni na{' '}
-        <strong>„Poslat znovu"</strong> a zkontroluj i složku Spam. E-mail
-        změníš tlačítkem <strong>Změnit</strong>: zadáš novou adresu a aktuální
-        heslo, na novou adresu ti pošleme potvrzovací link — po kliknutí se
-        adresa přepne. Na starou adresu zároveň dorazí informativní e-mail
-        (signál proti zneužití).
-      </p>
+      <HelpAccordion icon={<UserCircle size={20} />} title="Hlavička & něco o mně" accent="accent" defaultOpen>
+        <p>
+          V hlavičce karty je avatar, přezdívka, město, datum založení, poslední
+          přihlášení, barva chatu a motiv. Většinu polí (město, zobrazované jméno)
+          upravíš tlačítkem <strong>Upravit</strong>.
+        </p>
+        <p>
+          <strong>Něco o mně</strong> = volný text o tobě (max 1000 znaků),
+          zobrazuje se na veřejném profilu.
+        </p>
+      </HelpAccordion>
 
-      <h2>2. Něco o mně</h2>
-      <p>
-        Volný text o tobě (max 1000 znaků). Zobrazuje se na tvém veřejném profilu.
-      </p>
+      <HelpAccordion icon={<Drama size={20} />} title="Postava v Rozcestí" accent="player">
+        <p>
+          Jméno, krátké bio a <strong>samostatný avatar</strong> pro tvoji
+          platformovou „postavu" — personu, pod kterou se objevíš v chatech a
+          komunitě Ikaru. Je nezávislá na herních postavách uvnitř světů.
+        </p>
+      </HelpAccordion>
 
-      <h2>3. Postava v Rozcestí</h2>
-      <p>
-        Jméno, krátký bio a <strong>samostatný avatar</strong> pro tvoji
-        platformovou „postavu" &mdash; persona, pod kterou se objevíš v chatech a
-        komunitě Ikaru.
-      </p>
+      <HelpAccordion icon={<AtSign size={20} />} title="Přezdívka & e-mail" accent="info">
+        <p>
+          Vedle e-mailu vidíš odznak <strong>✓ Ověřeno</strong> nebo{' '}
+          <strong>⚠ Neověřeno</strong>. Pokud e-mail nedorazil, klikni „Poslat znovu"
+          (max 3× za 15 min) a zkontroluj Spam.
+        </p>
+        <p><strong>Změna e-mailu</strong> (tlačítko Změnit u hlavičky):</p>
+        <StepList
+          steps={[
+            'Zadáš novou adresu a aktuální heslo.',
+            'Na novou adresu přijde potvrzovací odkaz (platí 1 hodinu).',
+            'Po kliknutí se adresa přepne; na starou dorazí informativní e-mail.',
+          ]}
+        />
+        <p><strong>Změna přezdívky</strong> (Bezpečnost → „Požádat o změnu přezdívky"):</p>
+        <StepList
+          steps={[
+            'Zadáš novou variantu — schvaluje administrátor.',
+            'Žádost můžeš stáhnout, dokud čeká; o rozhodnutí přijde e-mail.',
+            'Po schválení platí cooldown 30 dní, kdy nelze žádat znovu.',
+          ]}
+        />
+      </HelpAccordion>
 
-      <h2>4. Moje světy</h2>
-      <p>
-        Read-only seznam světů, ve kterých jsi členem. Klikneš a skočíš do
-        světového layoutu.
-      </p>
+      <HelpAccordion icon={<KeyRound size={20} />} title="Heslo & reset" accent="warning">
+        <p>
+          <strong>Změna hesla</strong> vyžaduje staré heslo. Po úspěšné změně se
+          odhlásí všechna ostatní zařízení.
+        </p>
+        <p><strong>Zapomenuté heslo</strong>:</p>
+        <StepList
+          steps={[
+            <>V přihlašovacím dialogu klikni „Zapomněl/a jsi heslo?".</>,
+            <>Zadáš e-mail → přijde odkaz na reset (platí 1 hodinu, na jedno použití).</>,
+            <>Nastavíš nové heslo a znovu se přihlásíš (žádný auto-login).</>,
+          ]}
+        />
+        <CalloutBox variant="tip">
+          Pokud měl účet naplánované smazání, reset hesla ho současně zruší a účet
+          obnoví.
+        </CalloutBox>
+      </HelpAccordion>
 
-      <h2>5. Komunitní stopa</h2>
-      <p>
-        Tři placeholdery: Moje diskuze, Moje články, Moje galerie. Naplní se s
-        fází 3.x.
-      </p>
+      <HelpAccordion icon={<ImagePlus size={20} />} title="Avatar" accent="corrector">
+        <p>
+          Pokud nenahraješ vlastní avatar, použije se <strong>default</strong> —
+          muž, žena nebo „bytost"; typ si vybíráš v profilu.
+        </p>
+      </HelpAccordion>
 
-      <h2>6. Soukromí</h2>
-      <ul>
-        <li>
-          <strong>Neviditelný mód</strong> — checkbox skryje tvůj online stav
-          před ostatními. Tvá zelená/žlutá tečka u jména v adresáři, na profilu
-          a v chatu zmizí. Ty vidíš ostatní beze změny. Vlastní online tečku ve
-          své hlavičce uvidíš až po zrušení tohoto módu.
-        </li>
-      </ul>
+      <HelpAccordion icon={<EyeOff size={20} />} title="Soukromí" accent="info">
+        <TermGrid
+          items={[
+            { term: 'Neviditelný mód', desc: 'Skryje tvůj online stav — zelená/žlutá tečka u jména zmizí ostatním. Ty vidíš ostatní beze změny.' },
+            { term: 'Pošta jen pro přátele', desc: 'Napsat ti jako první může jen přítel (a administrátor); na tvou zprávu ti odpoví kdokoli.' },
+          ]}
+        />
+      </HelpAccordion>
 
-      <h2>7. Bezpečnost</h2>
-      <ul>
-        <li>
-          <strong>Změna hesla</strong> — vyžaduje staré heslo. Po úspěšné změně
-          se odhlásí všechna ostatní zařízení.
-        </li>
-        <li>
-          <strong>Zapomenuté heslo</strong> — v přihlašovacím modalu klikni na{' '}
-          „Zapomněl/a jsi heslo?". Pošleme ti link na reset (platnost 1 hodina).
-          Po nastavení nového hesla se musíš znovu přihlásit (žádný auto-login,
-          bezpečnostní standard). Pokud měl tvůj účet naplánované smazání,
-          reset hesla ho současně zruší.
-        </li>
-        <li>
-          <strong>Žádost o změnu přezdívky</strong> — schvaluje administrátor. Po
-          schválení následuje cooldown 30 dní, kdy nelze žádat znovu. Žádost
-          můžeš stáhnout, dokud je „pending". O rozhodnutí ti přijde e-mail.
-        </li>
-      </ul>
+      <HelpAccordion icon={<Globe2 size={20} />} title="Moje světy & komunitní stopa" accent="success">
+        <p>
+          <strong>Moje světy</strong> = seznam světů, kterých jsi členem (klik tě
+          přenese do světa). <strong>Moje akce ve světech</strong> agregují blížící
+          se herní akce napříč světy. Komunitní stopa (diskuze, články, galerie) se
+          plní postupně.
+        </p>
+      </HelpAccordion>
 
-      <h2>8. Účet</h2>
-      <p>
-        Smazání účtu funguje v <strong>30denním hold režimu</strong>:
-      </p>
-      <ul>
-        <li>Klikneš na „Smazat účet", potvrdíš opsáním přezdívky.</li>
-        <li>
-          Účet jde do stavu <em>deletion pending</em>. Tvůj obsah (chat, články,
-          diskuze) zůstává, ale tvé jméno se v UI překrývá tombstone páskou.
-        </li>
-        <li>
-          Pokud se během 30 dní přihlásíš, nabídneme ti{' '}
-          <strong>reaktivaci</strong>.
-        </li>
-        <li>
-          Po 30 dnech nightly cron provede hard delete: avatary smaže (GDPR
-          right-to-erasure), autorství obsahu nahradí trvalým „Smazaný účet"
-          tombstonem.
-        </li>
-        <li>
-          Pokud jsi jediný PJ světa, který má Pomocného PJ, ten se
-          <strong> automaticky povýší</strong> na PJ při tvém smazání.
-        </li>
-      </ul>
-
-      <h2>Default avatary</h2>
-      <p>
-        Pokud nenahraješ vlastní avatar, použije se <strong>default</strong>:
-        muž, žena nebo „bytost". Typ si vybíráš v profilu.
-      </p>
-
-      <h2>Tombstone</h2>
-      <p>
-        Smazaný účet zachová obsah (chat, články, diskuze), ale autora vizuálně
-        překrývá <strong>černá diagonální páska</strong> a šedá maska. Cíl: tvůj
-        obsah neřízne komunitu, ale tvá identita zmizí. Stav je nevratný po
-        cleanup cronu.
-      </p>
+      <HelpAccordion icon={<Trash2 size={20} />} title="Smazání účtu (tombstone)" accent="warning">
+        <p>Smazání účtu funguje v <strong>30denním hold režimu</strong>:</p>
+        <StepList
+          steps={[
+            'Klikneš „Smazat účet", potvrdíš opsáním přezdívky.',
+            <>Účet jde do stavu <em>čeká na smazání</em>. Tvůj obsah (chat, články, diskuze) zůstává, ale jméno se v UI překrývá tombstone páskou.</>,
+            'Pokud se během 30 dní přihlásíš, nabídneme reaktivaci.',
+            'Po 30 dnech proběhne anonymizace: avatary se smažou (GDPR), autorství nahradí trvalý „Smazaný účet".',
+          ]}
+        />
+        <CalloutBox variant="pozor">
+          Pokud jsi jediný PJ světa, který má Pomocného PJ, ten se při tvém smazání{' '}
+          <strong>automaticky povýší na PJ</strong>. Tombstone je po cleanupu nevratný.
+        </CalloutBox>
+      </HelpAccordion>
     </>
   );
 }

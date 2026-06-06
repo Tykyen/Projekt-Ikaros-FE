@@ -40,6 +40,20 @@ export function resolvePageTypeFromUrl(token: string): PageType | undefined {
   return (PAGE_TYPES as Record<string, PageType>)[token];
 }
 
+/**
+ * Lidský název odvozený ze slugu — pro předvyplnění pole NÁZEV při tvorbě
+ * stránky z 404 („Vytvořit" s `?slug=`). Pomlčky → mezery, první písmeno velké.
+ *
+ * ⚠️ Slug nenese diakritiku (slugify ji odstraní), takže výsledek je bez háčků
+ * (`kralovna-vil` → „Kralovna vil") — uživatel ji v editoru doladí. Round-trip
+ * přes `slugify` dá zpět původní slug.
+ */
+export function slugToTitle(slug: string): string {
+  const words = slug.replace(/-+/g, ' ').trim();
+  if (!words) return '';
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 export interface AccessRequirement {
   type: 'UserId' | 'AKJ' | 'Role' | 'AKJType';
   value: string;

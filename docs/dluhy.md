@@ -14,6 +14,15 @@
 > 3 bezpečnostní (N-7 members leak, N-8 room:join leak, N-9 sound spoof). Detaily, důkazy
 > a návrhy řešení v `bug-audit.md`. Opraveno během auditu: N-1 (test mock), D-029 (PWA ikony).
 
+### D-034 — Universe mapa GET filtruje i pro world PJ (jen globální role)
+**Soubor:** `backend/src/modules/universe/universe.controller.ts` (`findByWorld`) + `universe.service.ts` (`findByWorld`)
+**Problém:** GET `/api/universe` počítá `isPjOrAdmin` jen z **globální** role (`user.role <= UserRole.Admin`), nebere v potaz **world roli**. World PJ, který není globální Admin, tak dostane **filtrovanou** vesmírnou mapu (jen public uzly + ty, kde je v `visibleToPlayerIds`) místo všech. Pro editaci (FE edit mód potřebuje všechny uzly + spoje) by PJ neviděl/nemohl editovat skryté uzly.
+**Dopad:** Střední — PJ editace universe mapy. Pravděpodobnost závisí na tom, zda FE edit mód nefetchuje jinak / zda PJ není vždy v `visibleToPlayerIds` — **ověřit reálné chování**.
+**Řešení:** GET má přes `membershipRepo` zjistit i world PJ roli (vzor: `world-maps.service.canManage` ze spec 13.4 — global Admin+ NEBO world `>= PJ`), ne jen globální. Pak `findByWorld(..., isPjOrAdmin=true)` pro world PJ.
+**Kdy:** Při příští práci na Mapě vesmíru / universe editaci. Nalezeno 2026-06-06 při implementaci spec 13.4 (Mapy atlas).
+
+---
+
 ### D-033 — Vitest neběží: storybook addon-vitest projekt padá při načtení configu
 **Soubor:** `vitest.config.ts` — druhý projekt `storybook` (`@storybook/addon-vitest` + `storybookTest({ configDir: .storybook })`)
 **Problém:** `npx vitest run` skončí na `CriticalPresetLoadError` / `ERR_INTERNAL_ASSERTION: Unexpected module status 0. Cannot require() ES Module storybook/dist/core-server/index.js` (ESM/CJS race v `@chromatic-com/storybook` presetu). Chyba je při vyhodnocení configu, takže ji neobejde ani `--project` filtr → **nespustí se ani unit testy**. Pravděpodobně neúplně nainstalované storybook deps (souvisí s SSL npm install, viz `NODE_OPTIONS=--use-system-ca`) nebo verzový clash storybook × Node.

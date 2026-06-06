@@ -6,6 +6,7 @@ import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
 import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
+import { isWorldPlayer } from '@/features/world/lib/isWorldPlayer';
 import { MemberCard } from './MemberCard';
 import s from './WorldMembersPage.module.css';
 
@@ -94,8 +95,9 @@ export default function WorldMembersPage() {
   }
 
   const all = membersQuery.data ?? [];
-  // Zadatelé (pending vstup) nejsou plnými členy → skrýt.
-  const members = all.filter((m) => m.role !== WorldRole.Zadatel);
+  // „Hráč" = má přiřazenou postavu NEBO je staff (Korektor+). Žadatelé,
+  // čtenáři a hráči bez postavy do adresáře nepatří (viz isWorldPlayer).
+  const members = all.filter(isWorldPlayer);
 
   const pj = members.filter((m) => m.role === WorldRole.PJ);
   const pomocni = members.filter((m) => m.role === WorldRole.PomocnyPJ);
@@ -124,7 +126,7 @@ export default function WorldMembersPage() {
       </header>
 
       {isEmpty ? (
-        <p className={s.empty}>Svět zatím nemá žádné členy.</p>
+        <p className={s.empty}>Svět zatím nemá žádné hráče.</p>
       ) : (
         <div className={s.sections}>
           <Section

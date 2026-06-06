@@ -2,6 +2,7 @@ import { Users, MessageSquare } from 'lucide-react';
 import type { World } from '@/shared/types';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { useWorldChatUnread } from '@/features/world/api/useWorldChat';
+import { isWorldPlayer } from '@/features/world/lib/isWorldPlayer';
 import { EventsColumn } from './columns/EventsColumn';
 import { NewsColumn } from './columns/NewsColumn';
 import { FavoritePagesColumn } from './columns/FavoritePagesColumn';
@@ -28,7 +29,7 @@ export function WorldDashboard({ world }: Props) {
         icon={<Users size={20} />}
         label="Hráči"
         to={`/svet/${world.slug}/hraci`}
-        value={members.data?.length ?? 0}
+        value={members.data?.filter(isWorldPlayer).length ?? 0}
       />
       <DashTile
         className={`${s.cell} ${s.tileChat}`}

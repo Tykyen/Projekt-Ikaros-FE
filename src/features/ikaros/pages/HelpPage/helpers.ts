@@ -1,11 +1,13 @@
-export const HELP_TABS = ['start', 'stranky', 'ucet', 'role', 'faq'] as const;
+// 13.5 — 6 tabů nápovědy (onboarding pro nového hráče).
+export const HELP_TABS = ['start', 'platforma', 'svet', 'role', 'ucet', 'faq'] as const;
 export type HelpTab = (typeof HELP_TABS)[number];
 
 export const TAB_LABELS: Record<HelpTab, string> = {
   start: 'Začni tady',
-  stranky: 'Stránky',
-  ucet: 'Účet & profil',
+  platforma: 'Platforma',
+  svet: 'Svět',
   role: 'Role & oprávnění',
+  ucet: 'Účet & profil',
   faq: 'FAQ',
 };
 

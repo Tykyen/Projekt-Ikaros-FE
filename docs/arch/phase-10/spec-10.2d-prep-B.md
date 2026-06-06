@@ -1,6 +1,8 @@
 # Spec 10.2d-prep-B — Bestiář (refactor 8.4 NpcTemplate → 3-scope Bestie)
 
 **Status:** ✅ HOTOVO (2026-05-27) — **pivot vůči původnímu spec'u**: místo refactoru 8.4 implementováno jako **standalone modul `bestiae` vedle existujícího 8.4 `npc-templates`**. 8.4 zůstává pro NPC postava šablony (s deníkem); bestie je separate koncept (jen statblok, žádný deník).
+
+> **Revize 2026-06-06:** obrázek bestie v `BestieEditorModal` dostal upload souboru (§5 počítala se `useUploadImage`, ale MVP to odložilo na text URL). Nově přes sdílenou `HeroUploadCard` (compact, bez výřezu/focal) — klik/drag&drop nahraje soubor přes `useUploadImage`, fallback „Vložit URL ručně" zachován. `imageUrl` zůstává string → žádná BE/schema změna. `HeroUploadCard` dostala aditivní prop `uploadCta` (default beze změny).
 **Modul:** bestiář / standalone vedle 8.4
 **Velikost:** **M-L** (2 BE commity + 1 FE commit — viz git log)
 **Závisí na:** 10.2d-prep-A (per-system schema engine, `SystemStatsValidator`, DrD2 bestie schema)

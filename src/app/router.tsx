@@ -67,6 +67,7 @@ const CharactersPage     = lazy(() => import('@/features/world/pages/CharactersP
 const CharacterDetailRoute = lazy(() => import('@/features/world/pages/CharacterDetailPage/CharacterDetailRoute'));
 const MyCharacterPage    = lazy(() => import('@/features/world/pages/MyCharacterPage'));
 const MapPage            = lazy(() => import('@/features/world/pages/MapPage'));
+const WorldMapsPage      = lazy(() => import('@/features/world/maps'));
 const TacticalMapPage    = lazy(() => import('@/features/world/pages/TacticalMapPage'));
 const BestiarPage        = lazy(() => import('@/features/world/bestiar/BestiarPage'));
 const CalendarPage       = lazy(() => import('@/features/world/pages/CalendarPage'));
@@ -243,6 +244,7 @@ export const router = createBrowserRouter([
       { path: 'postava/:slug',          element: memberOnly(p(CharacterDetailRoute)) },
       { path: 'moje-postava',           element: memberOnly(p(MyCharacterPage)) },
       { path: 'mapa',                   element: memberOnly(p(MapPage)) },
+      { path: 'mapy',                   element: memberOnly(p(WorldMapsPage)) },
       { path: 'takticka-mapa',          element: memberOnly(p(TacticalMapPage)) },
       { path: 'bestiar',                element: memberOnly(p(BestiarPage)) },
       // R-18 — kalendář = „PJ pohled" (BE aggregate PomocnyPJ+); gate dřív na route.

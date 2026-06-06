@@ -120,10 +120,12 @@ describe('WorldMembersPage', () => {
       makeMember({
         role: WorldRole.Hrac,
         group: 'Družina',
+        characterPath: 'aragorn',
         user: { id: 'c', username: 'Aragorn' },
       }),
       makeMember({
         role: WorldRole.Hrac,
+        characterPath: 'tulak',
         user: { id: 'd', username: 'Tulák' },
       }),
     ];
@@ -146,6 +148,36 @@ describe('WorldMembersPage', () => {
     settingsData.customGroups = [];
     renderR(<WorldMembersPage />);
     expect(screen.queryByText('Čekatel')).not.toBeInTheDocument();
-    expect(screen.getByText('Svět zatím nemá žádné členy.')).toBeInTheDocument();
+    expect(screen.getByText('Svět zatím nemá žádné hráče.')).toBeInTheDocument();
+  });
+
+  it('hráč/čtenář BEZ postavy se nezobrazí', () => {
+    membersData.items = [
+      makeMember({
+        role: WorldRole.Hrac,
+        user: { id: 'f', username: 'BezPostavy' },
+      }),
+      makeMember({
+        role: WorldRole.Ctenar,
+        user: { id: 'g', username: 'Čtenář' },
+      }),
+    ];
+    settingsData.customGroups = [];
+    renderR(<WorldMembersPage />);
+    expect(screen.queryByText('BezPostavy')).not.toBeInTheDocument();
+    expect(screen.queryByText('Čtenář')).not.toBeInTheDocument();
+    expect(screen.getByText('Svět zatím nemá žádné hráče.')).toBeInTheDocument();
+  });
+
+  it('Korektor se zobrazí i bez postavy (staff)', () => {
+    membersData.items = [
+      makeMember({
+        role: WorldRole.Korektor,
+        user: { id: 'h', username: 'Opravář' },
+      }),
+    ];
+    settingsData.customGroups = [];
+    renderR(<WorldMembersPage />);
+    expect(screen.getByText('Opravář')).toBeInTheDocument();
   });
 });

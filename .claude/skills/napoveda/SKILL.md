@@ -23,34 +23,49 @@ Nespouštěj při:
 
 ## Struktura HelpPage — kam co patří
 
+> Redesign 13.5 (2026-06-06): nápověda má **6 tabů** a staví na **sadě
+> znovupoužitelných bloků** (`components/`). Stará `PagesSection.tsx` (ploché
+> `PageDoc` pole) **už neexistuje** — rozdělena na `PlatformSection` + `WorldSection`.
+
 ```
 src/features/ikaros/pages/HelpPage/
-├── HelpPage.tsx                       # datum „Aktualizováno k YYYY-MM-DD" (lead)
-├── helpers.ts                         # HELP_TABS + TAB_LABELS (přidání tabu = velký redesign)
+├── HelpPage.tsx                       # 6 tabů + datum „Aktualizováno k YYYY-MM-DD" (lead)
+├── helpers.ts                         # HELP_TABS (start/platforma/svet/role/ucet/faq) + TAB_LABELS
+├── media.ts                           # registr obrázků/screenshotů: klíč → {src?,alt,caption}
+├── components/                        # sada bloků (REUSE, nepiš nové ad-hoc):
+│   │                                  #   HelpAccordion (+Sub), InfoCard (+InfoGrid), TagChip,
+│   │                                  #   TermGrid, CalloutBox, StepList, PermissionTable,
+│   │                                  #   ScreenshotSlot, IllustrationSlot; accenty v accents.ts
+│   └── ...
 └── sections/
-    ├── StartSection.tsx               # onboarding intro — mění se málo
-    ├── PagesSection.tsx               # ⬅ NEJČASTĚJI editovaná
-    ├── AccountSection.tsx             # ⬅ 7 podsekcí profilu + tombstone
-    ├── RolesSection.tsx               # ⬅ globální + světové tabulky + akční matice
-    └── FaqSection.tsx                 # ⬅ Q&A array
+    ├── StartSection.tsx               # onboarding: hero, první kroky, orientace, slovníček (TermGrid)
+    ├── PlatformSection.tsx            # ⬅ nástroje platformy (Ikaros-level), <Tool> ve skupinách
+    ├── WorldSection.tsx               # ⬅ nástroje světa, vč. taktické mapy (<MapFeature> pod-pod-sekce)
+    ├── RolesSection.tsx               # ⬅ collapsible globální + světové role + PermissionTable
+    ├── AccountSection.tsx             # ⬅ harmonika profilu (HelpAccordion bloky) + tombstone
+    └── FaqSection.tsx                 # ⬅ FAQ pole s `cat`, seskupené do kategorií (HelpAccordion)
 ```
+
+Stránky se v Platform/World sekcích reprezentují lokálním helperem `<Tool>`
+(= `HelpSubAccordion` s audience `TagChip` v hlavičce). Audience štítek nahrazuje
+staré `who`; bohatý popis jde do těla (odstavce + `CalloutBox`/`StepList`/`TermGrid`).
+Status stránky (✅/🚧) piš slovy v textu — ploché `PageDoc.status` pole už není.
 
 ### Mapování změna → sekce
 
 | Typ změny | Cíl |
 |-----------|-----|
-| Nová route / stránka (i stub) | `PagesSection.tsx` → `SOON_IKAROS` nebo `SOON_WORLD` |
-| Stub stránka se naplnila | Přesuň položku z `SOON_*` → `IKAROS_PAGES`, změň `status: 'ok'`, doplň `what` reálným popisem |
-| Změna funkčnosti funkční stránky | `IKAROS_PAGES[].what` / `.who` |
-| Nová globální role | `RolesSection.tsx` → tabulka „Globální role" + případně akční matice |
-| Změna admin permission / hierarchie | `RolesSection.tsx` → sekce „Hierarchie a omezení adminů" |
-| Nová světová role | `RolesSection.tsx` → tabulka „Světové role" |
-| Nová sekce profilu | `AccountSection.tsx` → přidej `<h2>` blok s číslem |
-| Změna profilového flow (heslo, username, smazání) | `AccountSection.tsx` → relevantní podsekce |
-| Nový queue typ (Zpracovat tab) | `FaqSection.tsx` → odpověď „Co je Zpracovat" |
-| Nový koncept / terminologie | `FaqSection.tsx` → přidej Q&A |
-| Reset hesla začal fungovat | `StartSection.tsx` (warning blok) + `FaqSection.tsx` |
-| Nová fáze ve struktuře layoutu | `StartSection.tsx` → „Orientace v rozhraní" |
+| Nová/změněná platformní stránka | `PlatformSection.tsx` → přidej/uprav `<Tool>` ve vhodné `HelpAccordion` skupině |
+| Nová/změněná světová stránka | `WorldSection.tsx` → `<Tool>` ve skupině |
+| Nová funkce taktické mapy | `WorldSection.tsx` → `<MapFeature>` uvnitř „Taktická mapa" |
+| Stub → funkční | uprav text `<Tool>` na reálný popis (štítky stavu jen ✅/🚧) |
+| Nová globální role | `RolesSection.tsx` → `GLOBAL_CARDS` + `GLOBAL_COLUMNS`/`GLOBAL_ROWS` |
+| Nová světová role | `RolesSection.tsx` → `WORLD_CARDS` + `WORLD_COLUMNS`/`WORLD_ROWS` |
+| Změna admin hierarchie | `RolesSection.tsx` → skupina „Globální role" → „Hierarchie a omezení adminů" |
+| Nová sekce profilu | `AccountSection.tsx` → přidej `HelpAccordion` blok |
+| Změna profilového flow (heslo, username, smazání) | `AccountSection.tsx` → relevantní blok (často `StepList`) |
+| Nový queue typ / koncept / pojem | `FaqSection.tsx` → přidej do `FAQ` s `cat`; pojem i do `StartSection` slovníčku (`TermGrid`) |
+| Nový screenshot k doplnění | `media.ts` (nový klíč) + `<ScreenshotSlot media="…">` v sekci + řádek v `docs/arch/phase-13/napoveda-screenshoty.md` |
 
 ## Postup
 
@@ -59,26 +74,27 @@ src/features/ikaros/pages/HelpPage/
 2. **Klasifikuj** dle tabulky výše. Pokud změn je víc, projdi je jednu po druhé.
 
 3. **Otevři příslušnou sekci** v `src/features/ikaros/pages/HelpPage/sections/` a najdi relevantní místo:
-   - **`PagesSection`** — pole `IKAROS_PAGES` / `SOON_IKAROS` / `SOON_WORLD` (typovaný `PageDoc`).
-   - **`RolesSection`** — tabulky `<table>` v `tableWrap`; akční matice.
-   - **`AccountSection`** — `<h2>` bloky 1–7.
-   - **`FaqSection`** — pole `FAQ` (objekty `{ q, a }`).
+   - **`PlatformSection` / `WorldSection`** — `<Tool>` (= `HelpSubAccordion` + audience `TagChip`) uvnitř `HelpAccordion` skupiny; taktická mapa má `<MapFeature>`.
+   - **`RolesSection`** — data pole `GLOBAL_CARDS`/`WORLD_CARDS` + `*_COLUMNS`/`*_ROWS` pro `PermissionTable`; akční tabulka „Co kdo smí" je `<table>` v `tableWrap`.
+   - **`AccountSection`** — `HelpAccordion` bloky (akce přes `StepList`).
+   - **`FaqSection`** — pole `FAQ` (objekty `{ cat, q, a }`), `cat` ∈ ucet/komunita/svet/obecne.
+   - **`StartSection`** — slovníček je `TermGrid`.
 
 4. **Aplikuj edit** přesně dle stylu okolního obsahu:
    - Píš česky, jednoduchými větami.
-   - Reuse stávající strukturu (žádné nové komponenty ad-hoc).
-   - U 🚧 položek vždy uveď fázi (např. `fáze: 'Fáze 2.3'`).
-   - U ✅ položek nech `path` jako reálnou URL (s `:param` pokud má).
+   - **Reuse bloky z `components/`** — žádné nové ad-hoc komponenty.
+   - Status stránky vyjádři slovy / `TagChip` — štítky stavu jen ✅/🚧.
    - Externí dokumentaci (specs, plans) neodkazuj — nápověda je pro hráče, ne pro AI agenta.
 
 5. **Aktualizuj datum** v `HelpPage.tsx` v lead odstavci („Aktualizováno k YYYY-MM-DD") — vždy dnešní datum.
 
 6. **Verifikace:**
    ```bash
-   npx vitest run src/features/ikaros/pages/HelpPage
+   npm run test:run -- src/features/ikaros/pages/HelpPage
    npm run lint:colors
    ```
-   Pokud test krytí spadlo (např. změna struktury sekce), uprav `__tests__/HelpPage.spec.tsx`.
+   (NE `npx vitest run` — flaky „failed to find current suite".) Pokud test krytí spadlo
+   (např. změna struktury sekce), uprav `__tests__/HelpPage.spec.tsx`.
 
 7. **Krátký report uživateli** — 1–2 věty: co jsi v nápovědě upravil a kde.
 

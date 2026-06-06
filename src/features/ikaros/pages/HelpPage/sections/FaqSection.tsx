@@ -1,514 +1,374 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { UserCircle, Users, Swords, HelpCircle } from 'lucide-react';
+import { HelpAccordion } from '../components';
 import s from '../HelpPage.module.css';
 
+type FaqCat = 'ucet' | 'komunita' | 'svet' | 'obecne';
+
 interface FaqItem {
+  cat: FaqCat;
   q: string;
-  a: React.ReactNode;
+  a: ReactNode;
 }
 
 const FAQ: FaqItem[] = [
   {
+    cat: 'obecne',
     q: 'Co najdu na úvodní stránce po přihlášení?',
     a: (
       <>
-        <p>
-          Úvodní stránka <Link to="/">/</Link> je tvůj rozcestník. Postupně
-          vidíš tři sekce:
-        </p>
-        <ul>
-          <li>
-            <strong>Moje světy</strong> — karty světů, kterých jsi členem;
-            klik na kartu nebo tlačítko „Vstoupit do světa" tě přesune do
-            světa. U každého světa vidíš svou roli (PJ, Hráč, …) a počet
-            hráčů. Pokud ještě nejsi v žádném světě, ukáže se výzva s
-            tlačítky „Prozkoumat světy" a „Vytvořit svět".
-          </li>
-          <li>
-            <strong>Akce</strong> — 5 nejbližších herních
-            událostí napříč všemi tvými světy, seřazené podle data. U
-            každé akce můžeš kliknout na „Půjdu" a přihlásit se. Klik
-            na řádek tě přesune do konkrétního světa.
-          </li>
-          <li>
-            <strong>Novinky</strong> — platformové novinky, které píše
-            administrátor.
-          </li>
-        </ul>
+        <p>Úvodní stránka <Link to="/">/</Link> je tvůj rozcestník — Moje světy, nejbližší Akce napříč světy a platformové Novinky.</p>
       </>
     ),
   },
   {
+    cat: 'ucet',
     q: 'Jak si změním přezdívku?',
     a: (
       <>
         <p>
-          Otevři <Link to="/ikaros/profil">Profil</Link> → sekce
-          <strong> Bezpečnost</strong> → tlačítko „Požádat o změnu přezdívky".
-          Zadáš novou variantu a administrátor ji schválí (obvykle do několika
-          dní).
+          Otevři <Link to="/ikaros/profil">Profil</Link> → sekce <strong>Bezpečnost</strong>{' '}
+          → „Požádat o změnu přezdívky". Zadáš novou variantu a administrátor ji schválí.
         </p>
-        <p>
-          Po úspěšné změně platí <strong>cooldown 30 dní</strong> &mdash; další
-          žádost přijmeme až po něm.
-        </p>
+        <p>Po úspěšné změně platí <strong>cooldown 30 dní</strong>.</p>
       </>
     ),
   },
   {
+    cat: 'ucet',
     q: 'Co dělat, když jsem zapomněl heslo?',
     a: (
       <>
         <p>
           V přihlašovacím dialogu klikni na <strong>„Zapomněl/a jsi heslo?"</strong>.
-          Zadáš e-mail a my ti pošleme link na nastavení nového hesla. Link platí
-          jednu hodinu a lze ho použít jen jednou.
+          Zadáš e-mail a přijde ti odkaz na nové heslo (platí 1 hodinu, na jedno použití).
         </p>
         <p>
-          Po úspěšném resetu se musíš znovu přihlásit (žádný auto-login —
-          bezpečnostní standard). Pokud měl tvůj účet naplánované smazání, reset
-          hesla ho současně zruší a účet se obnoví.
+          Po resetu se musíš znovu přihlásit. Pokud měl účet naplánované smazání, reset
+          ho zruší a účet obnoví.
         </p>
       </>
     ),
   },
   {
+    cat: 'ucet',
     q: 'Jak si změním e-mail?',
     a: (
       <>
         <p>
-          V <Link to="/ikaros/profil">Profilu</Link> → karta Hlavička je vedle
-          e-mailu tlačítko <strong>Změnit</strong>. Zadáš novou adresu a aktuální
-          heslo. Na nový e-mail dostaneš potvrzovací link (platnost 1 hodina) —
-          po kliknutí se adresa přepne. Na původní adresu zároveň přijde
-          informativní e-mail (pokud o tom nevíš, někdo má přístup k tvému účtu
-          a měl/a bys hned změnit heslo).
+          V <Link to="/ikaros/profil">Profilu</Link> → hlavička je vedle e-mailu
+          tlačítko <strong>Změnit</strong>. Zadáš novou adresu a aktuální heslo, na
+          nový e-mail přijde potvrzovací odkaz (platí 1 hodinu). Na původní adresu
+          dorazí informativní e-mail.
         </p>
-        <p>
-          Vedle e-mailu v profilu vidíš odznak{' '}
-          <strong>✓ Ověřeno / ⚠ Neověřeno</strong>. Pokud verifikační e-mail
-          nedorazí, klikni na <strong>„Poslat znovu"</strong> (max 3× za 15 min).
-        </p>
+        <p>Odznak <strong>✓ Ověřeno / ⚠ Neověřeno</strong> ukazuje stav; „Poslat znovu" max 3× za 15 min.</p>
       </>
     ),
   },
   {
+    cat: 'ucet',
     q: 'Jak smažu účet?',
     a: (
       <>
+        <p><Link to="/ikaros/profil">Profil</Link> → sekce <strong>Účet</strong> → „Smazat účet". Potvrdíš opsáním přezdívky.</p>
         <p>
-          <Link to="/ikaros/profil">Profil</Link> → sekce <strong>Účet</strong>{' '}
-          → „Smazat účet". Potvrdíš opsáním přezdívky a souhlasem.
-        </p>
-        <p>
-          Účet jde do 30denního hold režimu. Pokud se během něj přihlásíš,
-          nabídneme reaktivaci. Po 30 dnech proběhne anonymizace (autorství
-          obsahu se přepíše tombstonem). Pokud jsi jediný PJ světa s Pomocným
-          PJ, ten se automaticky povýší.
+          Účet jde do 30denního hold režimu (mezitím lze reaktivovat přihlášením). Po
+          30 dnech proběhne anonymizace. Pokud jsi jediný PJ světa s Pomocným PJ, ten
+          se automaticky povýší.
         </p>
       </>
     ),
   },
   {
+    cat: 'ucet',
+    q: 'Co je tombstone?',
+    a: (
+      <p>
+        Vizuální stav smazaného účtu: <strong>černá diagonální páska</strong> přes
+        avatar a šedá maska „Smazaný účet". Obsah (chat, články) zůstává v komunitě,
+        ale identita autora je nevratně skryta.
+      </p>
+    ),
+  },
+  {
+    cat: 'komunita',
     q: 'Co je „Zpracovat" v adresáři uživatelů?',
     a: (
       <>
-        <p>
-          Univerzální fronta akcí, které vyžadují tvé rozhodnutí. Dnes obsahuje:
-        </p>
+        <p>Univerzální fronta akcí, které vyžadují tvé rozhodnutí — dnes obsahuje:</p>
         <ul>
-          <li>žádosti o přátelství (přicházejí, když ti někdo pošle pozvánku)</li>
+          <li>žádosti o přátelství</li>
           <li>žádosti o změnu přezdívky (jen Admin/Superadmin)</li>
           <li>žádosti o vstup do uzavřeného světa (pro PJ světa)</li>
-          <li>
-            články čekající na schválení (pro Správce článků a
-            Admin/Superadmin) — schválíš je, nebo vrátíš autorovi s poznámkou
-          </li>
-          <li>
-            obrázky čekající na schválení (pro Správce galerie a
-            Admin/Superadmin) — schválíš je, nebo vrátíš autorovi s poznámkou
-          </li>
-          <li>
-            diskuze čekající na schválení a nahlášené příspěvky (pro Správce
-            diskuzí a Admin/Superadmin)
-          </li>
-          <li>
-            žádosti o přidání do uzamčené diskuze (pro správce té diskuze)
-          </li>
+          <li>články / obrázky / diskuze čekající na schválení (pro příslušné správce)</li>
         </ul>
-        <p>
-          Číslo u záložky „Zpracovat" v pravém panelu ukazuje, kolik položek
-          čeká na tvé rozhodnutí. Pokud schvaluješ obsah, vidíš počet
-          čekajících položek i jako číslo přímo vedle <strong>Diskuze</strong>,
-          {' '}<strong>Články</strong> a <strong>Galerie</strong> v levé
-          navigaci — víš tak rovnou, kde něco čeká.
-        </p>
+        <p>Číslo u záložky „Zpracovat" ukazuje počet čekajících položek.</p>
       </>
     ),
   },
   {
+    cat: 'komunita',
     q: 'Jak si přidám přítele?',
     a: (
       <>
         <p>
-          Otevři jeho <strong>veřejný profil</strong> (klikni na avatar / kartu
-          v adresáři, nebo na hráče na stránce <strong>Hráči světa</strong>) a
-          stiskni <strong>„Přidat do přátel"</strong>. Druhá strana
-          dostane žádost ve svém tabu <strong>Zpracovat</strong> a může ji
-          přijmout nebo odmítnout.
+          Otevři jeho <strong>veřejný profil</strong> (klik na kartu v adresáři nebo
+          na hráče na stránce Hráči světa) a stiskni <strong>„Přidat do přátel"</strong>.
+          Druhá strana žádost najde v tabu <strong>Zpracovat</strong>.
         </p>
-        <p>
-          Po přijetí se přítel objeví v tabu <strong>Přátelé</strong> u obou.
-          Odebrání je možné kdykoliv (kebab menu na kartě „Odebrat z přátel").
-          Pokud druhá strana žádost odmítne, můžeš ji znovu poslat až za{' '}
-          <strong>24 hodin</strong> (anti-spam pojistka).
-        </p>
+        <p>Při odmítnutí pošleš novou žádost až za 24 hodin (anti-spam).</p>
       </>
     ),
   },
   {
+    cat: 'komunita',
     q: 'Jak někoho zablokovat?',
     a: (
       <>
-        <p>
-          Ve veřejném profilu uživatele klikni vpravo na <strong>„…"</strong>{' '}
-          (kebab menu) → <strong>„Blokovat uživatele"</strong>. Potvrdíš dialog a:
-        </p>
+        <p>Ve veřejném profilu klikni na <strong>„…"</strong> → <strong>„Blokovat uživatele"</strong>. Pak:</p>
         <ul>
-          <li>Existující přátelství zmizí.</li>
-          <li>Pending žádost (od kterékoliv strany) se zruší.</li>
-          <li>Nepošlete si novou žádost o přátelství, dokud blok neukončíš.</li>
-          <li>
-            Druhá strana <strong>nedostane žádné upozornění</strong>
-            {' '}(anti-stalk).
-          </li>
+          <li>Existující přátelství zmizí a pending žádost se zruší.</li>
+          <li>Nepošlete si novou žádost, dokud blok neukončíš.</li>
+          <li>Druhá strana nedostane žádné upozornění (anti-stalk).</li>
         </ul>
-        <p>
-          Své zablokované najdeš v tabu <strong>Přátelé</strong> → sbalitelná
-          sekce <strong>„Zablokovaní"</strong> (default zavřená). Odblokuješ je
-          jedním klikem.
-        </p>
+        <p>Zablokované najdeš v tabu <strong>Přátelé</strong> → sekce „Zablokovaní".</p>
       </>
     ),
   },
   {
-    q: 'Jak připravím scénu, aby ji hráči zatím neviděli nebo nehýbali tokeny?',
-    a: (
-      <>
-        <p>
-          V panelu <strong>„⚙ Orchestrace"</strong> je sekce{' '}
-          <strong>„Přístup a viditelnost"</strong>. U každé aktivní scény tam PJ
-          najde dva přepínače:
-        </p>
-        <ul>
-          <li>
-            <strong>👁 / 🚫 — skrýt mapu:</strong> hráč místo mapy uvidí hlášku
-            „Mapa skrytá". Ideální, když si scénu teprve chystáš.
-          </li>
-          <li>
-            <strong>🔓 / 🔒 — zamknout pohyb:</strong> hráč mapu vidí, ale nemůže
-            hýbat tokeny (PJ ano).
-          </li>
-        </ul>
-        <p>
-          Tlačítka <strong>„👁 vše" / „🔒 vše"</strong> přepnou najednou všechny
-          hráče na scéně; přepínače u jednotlivého hráče nastaví jen jeho (a{' '}
-          <strong>přebijí</strong> nastavení scény). Každá scéna má vlastní stav —
-          nezávisle na ostatních.
-        </p>
-        <p>
-          Chceš zamknout jen <strong>jeden konkrétní token</strong> (třeba
-          dekoraci nebo objekt), a ostatní nechat volné? Otevři jeho info panel
-          (klik na <strong>„i"</strong> u tokenu) a klikni na{' '}
-          <strong>„🔓 Zamknout"</strong>. Zamčený token má na mapě malý{' '}
-          <strong>🔒</strong> a hráči s ním nepohnou (jen PJ) — nezávisle na zámku
-          celé scény.
-        </p>
-      </>
-    ),
-  },
-  {
-    q: 'Kde si na taktické mapě vedu poznámky (deník)?',
-    a: (
-      <>
-        <p>
-          Na taktické mapě je <strong>pod panelem počasí</strong> (vpravo
-          nahoře) tlačítko poznámkového bloku. Otevře se přes celou plochu mapy
-          jako otevřený zápisník a obsah se průběžně sám ukládá.
-        </p>
-        <ul>
-          <li>
-            <strong>PJ</strong> (Pán jeskyně i Pomocný PJ) má vlastní{' '}
-            <strong>Deník PJ</strong> — poznámky k příběhu platné pro celý svět,
-            soukromé pro každého PJ zvlášť. Stejný deník otevřeš i mimo mapu z
-            menu světa → sekce <strong>Hra → Deník PJ</strong>.
-          </li>
-          <li>
-            <strong>Hráč</strong> má tlačítko taky — otevře{' '}
-            <strong>Poznámky jeho postavy</strong>. Co napíšeš na mapě, najdeš i
-            na stránce postavy v tabu <strong>Poznámky</strong> a naopak.
-          </li>
-        </ul>
-      </>
-    ),
-  },
-  {
-    q: 'Co jsou zamčené (AKJ) záložky na stránce a proč některé nevidím?',
-    a: (
-      <>
-        <p>
-          Stránka ve světě (postava, lokace, NPC…) může mít vedle běžných
-          záložek (Profil, Kalendář) i <strong>chráněné záložky</strong> se
-          zámkem. Každou takovou záložku vidí jen ten, komu k ní{' '}
-          <strong>PJ dal přístup</strong> — buď podle úrovně utajení (AKJ), nebo
-          tě k ní přidá jmenovitě. Co na záložku napíše, vidí jen ti s přístupem.
-        </p>
-        <p>
-          U <strong>své vlastní postavy</strong> ale chráněné záložky{' '}
-          <strong>vidíš automaticky</strong> — PJ ti tam může nechat soukromý
-          vzkaz, aniž by tě musel zvlášť přidávat (toto právo ti u konkrétní
-          záložky umí odebrat). Nová postava proto rovnou dostane připravenou
-          záložku <strong>„Soukromé"</strong>, kterou vidíš jen ty a PJ.
-        </p>
-        <p>
-          Pokud k záložce přístup <strong>nemáš, vůbec ji neuvidíš</strong> — ani
-          nevíš, že existuje. Když na takový odkaz náhodou klikneš, objeví se
-          „Stránka je zašifrovaná". <strong>PJ</strong> (a Pomocný PJ, kterému to
-          PJ povolí) vidí záložky, na které má přístup; <strong>PJ světa</strong>{' '}
-          vidí všechny.
-        </p>
-        <p>
-          Tvoří se v <strong>editoru stránky</strong> (Pomocný PJ a výš) → panel{' '}
-          <strong>„Chráněné záložky (AKJ)"</strong>: přidáš záložku, nastavíš kdo
-          ji vidí a volitelně přepíšeš obrázek a text (jinak se dědí ze základní
-          stránky). Jedním klikem přidáš i záložku <strong>„PJ informace"</strong>{' '}
-          (jen pro PJ tým) nebo u postavy <strong>„Soukromé"</strong> (PJ
-          a vlastník). U postavy navíc přepínač{' '}
-          <strong>„Vlastník postavy vidí"</strong> určuje, jestli záložku uvidí
-          i hráč té postavy.
-        </p>
-      </>
-    ),
-  },
-  {
-    q: 'Jak nastavím, co je vidět na hlavním obrázku stránky nebo postavy?',
-    a: (
-      <>
-        <p>
-          V <strong>editoru stránky</strong> (Pomocný PJ a výš) u{' '}
-          <strong>Hlavního obrázku</strong> klikni přímo do obrázku tam, kde má
-          být <strong>střed výřezu</strong> — značka ukáže zvolený bod. Pod
-          obrázkem si navíc nastavíš <strong>přiblížení</strong> a režim{' '}
-          <strong>Vyplnit</strong> (obrázek vyplní plochu, okraje se můžou
-          oříznout) / <strong>Vidět celý</strong> (vejde se celý, můžou vzniknout
-          pruhy).
-        </p>
-        <p>
-          Funguje to stejně jako u <strong>akcí</strong> a platí to pro avatar
-          postavy, kartu v adresáři i hero obrázek na stránce.
-        </p>
-      </>
-    ),
-  },
-  {
+    cat: 'komunita',
     q: 'Jak funguje Pošta a kdo mi může psát?',
     a: (
       <>
         <p>
-          <strong>Pošta</strong> (ikona v hlavičce) jsou soukromé zprávy mezi
-          uživateli. Máš složky <strong>Doručené</strong> a{' '}
-          <strong>Odeslané</strong>; po otevření zprávy ji čteš jako vlákno
-          konverzace a můžeš rovnou <strong>Odpovědět</strong>. Odznak u ikony
-          ukazuje počet nepřečtených.
+          <strong>Pošta</strong> (ikona v hlavičce) jsou soukromé zprávy. Složky
+          Doručené / Odeslané, zpráva se čte jako vlákno a jde Odpovědět; odznak
+          ukazuje nepřečtené.
         </p>
         <p>
-          Novou zprávu napíšeš komukoliv — příjemce vybereš našeptávačem podle
-          přezdívky, nebo otevři jeho <strong>osobní kartu</strong> a klikni na{' '}
-          <strong>„Napsat zprávu"</strong> (příjemce se předvyplní). Pokud si ale
-          v <strong>profilu → Soukromí</strong> zapneš{' '}
-          <strong>„Jen pro přátele"</strong>, napsat ti jako první může jen tvůj
-          přítel (a administrátor). Na zprávu, kterou jsi sám/sama poslal/a, ti
-          druhá strana může odpovědět vždy.
+          Novou napíšeš komukoli (našeptávač podle přezdívky nebo „Napsat zprávu" z
+          osobní karty). Pokud máš v Soukromí zapnuté <strong>„Jen pro přátele"</strong>,
+          první ti napíše jen přítel (a administrátor).
         </p>
       </>
     ),
   },
   {
+    cat: 'komunita',
     q: 'K čemu je zvonek v hlavičce (notifikační centrum)?',
     a: (
       <>
         <p>
-          <strong>Zvonek</strong> (ikona v hlavičce vedle Pošty) otevře panel se{' '}
-          <strong>souhrnem chatů</strong> &mdash; nejnovější zprávy ze{' '}
-          <strong>všech tvých světů</strong> na jednom místě. Nemusíš obcházet
-          svět po světě, abys věděl/a, kde se zrovna mluví. U každé zprávy vidíš,
-          ze kterého světa a kanálu je.
+          <strong>Zvonek</strong> otevře souhrn chatů ze <strong>všech tvých světů</strong>{' '}
+          (jen z kanálů, kam máš přístup). Odznak ukazuje, kolik nového přibylo.
         </p>
         <p>
-          Vidíš jen zprávy z kanálů, kam <strong>máš přístup</strong> (stejně
-          jako v samotném chatu) &mdash; jako hráč své kanály, jako PJ kanály
-          svého světa. Odznak u zvonku ukazuje, kolik nového přibylo od
-          posledního otevření; nová zpráva se v panelu objeví živě.
-        </p>
-        <p>
-          Panel má i záložku <strong>Události</strong> &mdash; co se týká přímo
-          tebe: schválení tvého <strong>vstupu do světa</strong>, tvého{' '}
-          <strong>článku</strong>, <strong>obrázku</strong> či{' '}
-          <strong>diskuze</strong>, nebo že ti PJ <strong>přiřadil postavu</strong>.
-          (Stejná oznámení najdeš i v Poště.) Pokud něco schvaluješ (PJ, správce
-          článků/diskuzí…), přibude záložka <strong>Ke zpracování</strong>{' '}
-          s přehledem čekajících položek a prokliku.
-        </p>
-        <p>
-          Dole v panelu si můžeš <strong>zapnout upozornění na tomto zařízení</strong>{' '}
-          &mdash; po povolení ti chodí systémové notifikace (i když Ikara nemáš
-          otevřenou). Funguje na zařízeních a prohlížečích, které to podporují;
-          povolení můžeš kdykoliv vypnout.
+          Záložka <strong>Události</strong> = co se týká přímo tebe (schválený vstup,
+          článek, přiřazená postava); pro schvalovatele přibude <strong>Ke zpracování</strong>.
+          Dole jde zapnout systémová upozornění na zařízení.
         </p>
       </>
     ),
   },
   {
-    q: 'Co znamená Motiv (theme) a kolik jich je?',
+    cat: 'svet',
+    q: 'Jak připravím scénu, aby ji hráči zatím neviděli nebo nehýbali tokeny?',
     a: (
-      <p>
-        Motiv = globální vizuální styl Ikaru. Existuje <strong>21 motivů</strong>{' '}
-        &mdash; od neutrální Modré nebe přes Kyberpunk, Pergamen, Nemrtví,
-        Arabský svět až po Bílou. Přepínáš v theme switcheru (hlavička +
-        Administrace v pravém panelu). Volba se ukládá k účtu.
-      </p>
+      <>
+        <p>V panelu <strong>„⚙ Orchestrace"</strong> → sekce <strong>„Přístup a viditelnost"</strong> má každá scéna dva přepínače:</p>
+        <ul>
+          <li><strong>👁 / 🚫 skrýt mapu</strong> — hráč uvidí „Mapa skrytá".</li>
+          <li><strong>🔓 / 🔒 zamknout pohyb</strong> — hráč mapu vidí, ale nehýbe tokeny.</li>
+        </ul>
+        <p>
+          „👁 vše" / „🔒 vše" přepnou všechny najednou; per-hráč nastavení přebíjí
+          scénu. Jednotlivý token zamkneš přes jeho info panel → „🔓 Zamknout".
+        </p>
+      </>
     ),
   },
   {
+    cat: 'svet',
+    q: 'Kde si na taktické mapě vedu poznámky (deník)?',
+    a: (
+      <>
+        <p>Na taktické mapě je pod panelem počasí tlačítko poznámkového bloku; obsah se průběžně ukládá.</p>
+        <ul>
+          <li><strong>PJ</strong> má <strong>Deník PJ</strong> — poznámky pro celý svět, soukromé per PJ (i z menu Hra → Deník PJ).</li>
+          <li><strong>Hráč</strong> otevře <strong>Poznámky své postavy</strong> (najdeš je i na stránce postavy v tabu Poznámky).</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
+    q: 'Co jsou zamčené (AKJ) záložky na stránce a proč některé nevidím?',
+    a: (
+      <>
+        <p>
+          Stránka (postava, lokace, NPC…) může mít vedle běžných záložek i{' '}
+          <strong>chráněné záložky</strong> se zámkem. Vidí je jen ten, komu PJ dal
+          přístup (podle úrovně utajení AKJ, nebo jmenovitě).
+        </p>
+        <p>
+          U <strong>vlastní postavy</strong> je vidíš automaticky — PJ ti tam nechá
+          soukromý vzkaz. Nová postava proto rovnou dostane záložku „Soukromé".
+        </p>
+        <p>Pokud přístup nemáš, záložku vůbec neuvidíš; na přímý odkaz se objeví „Stránka je zašifrovaná".</p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
+    q: 'Jak nastavím, co je vidět na hlavním obrázku stránky nebo postavy?',
+    a: (
+      <>
+        <p>
+          V <strong>editoru stránky</strong> (Pomocný PJ a výš) klikni přímo do
+          Hlavního obrázku tam, kde má být <strong>střed výřezu</strong>. Pod
+          obrázkem nastavíš <strong>přiblížení</strong> a režim <strong>Vyplnit</strong>{' '}
+          / <strong>Vidět celý</strong>.
+        </p>
+        <p>Funguje to stejně u akcí i avataru postavy.</p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Má svět vlastní vzhled a můžu si ho upravit?',
     a: (
       <>
         <p>
-          Každý svět má <strong>vlastní vzhled</strong>, nezávislý na platformě.
-          Určuje ho <strong>PJ</strong> v Nastavení světa (odvozuje se ze žánru,
-          PJ ho může přepsat a doladit) &mdash; tento vzhled vidí všichni
-          členové stejně.
+          Každý svět má <strong>vlastní vzhled</strong> nezávislý na platformě —
+          určuje ho <strong>PJ</strong> v Nastavení světa; tento vzhled vidí všichni členové.
         </p>
         <p>
-          Ty si můžeš <strong>pro sebe</strong> doladit barvy, jas a kontrast
-          kvůli čitelnosti &mdash; v Nastavení světa → tab{' '}
-          <strong>„Můj vzhled"</strong>. Skin a písmo zůstávají, měníš jen
-          barevnou vrstvu. Vzhled platformy Ikaros si doladíš obdobně v{' '}
-          <Link to="/ikaros/profil">Profilu</Link> → sekce{' '}
-          <strong>Doladění vzhledu</strong>.
+          Sobě si můžeš doladit barvy/jas/kontrast v Nastavení světa → tab{' '}
+          <strong>„Můj vzhled"</strong>; vzhled platformy obdobně v{' '}
+          <Link to="/ikaros/profil">Profilu</Link> → Doladění vzhledu.
         </p>
       </>
     ),
   },
   {
-    q: 'Co je tombstone?',
-    a: (
-      <p>
-        Vizuální stav smazaného účtu: <strong>černá diagonální páska</strong>{' '}
-        přes avatar a šedá maska s nápisem „Smazaný účet". Cíl: obsah (chat,
-        články) zůstává v komunitě, ale identita autora je nevratně skryta.
-      </p>
-    ),
-  },
-  {
-    q: 'Můžu jako Admin banovat jiného Admina?',
-    a: (
-      <p>
-        Standardně <strong>ne</strong>. Admin smí jen Hráče a PJ. K akcím proti
-        jinému Adminovi musíš mít flag <code>canManageAdmins</code> (uděluje
-        Superadmin). Banovat Superadmina nesmí <em>nikdo</em>.
-      </p>
-    ),
-  },
-  {
-    q: 'Funguje to na mobilu?',
-    a: (
-      <p>
-        Ano, celá platforma je responzivní. Sidebar se na mobilu skrývá do
-        hamburger menu vlevo nahoře. Tabulky a horní taby v této nápovědě
-        scrolují horizontálně.
-      </p>
-    ),
-  },
-  {
-    q: 'Kde nahlásit chybu nebo navrhnout vylepšení?',
-    a: (
-      <p>
-        E-mailem na adresu uvedenou v{' '}
-        <Link to="/podminky">podmínkách použití</Link>. Stručný popis + jak
-        chybu vyvolat + screenshot významně urychlí opravu.
-      </p>
-    ),
-  },
-  {
-    q: 'Jaký je rozdíl mezi globální a světovou rolí?',
-    a: (
-      <p>
-        Globální role (např. Admin, Hráč) platí napříč celou platformou.
-        Světová role (PJ, Pomocný PJ, Hráč ve světě) platí jen v daném světě
-        &mdash; v jednom světě můžeš být PJ, v jiném jen Hráč. Detail v tabu{' '}
-        <strong>Role &amp; oprávnění</strong>.
-      </p>
-    ),
-  },
-  {
+    cat: 'svet',
     q: 'Jak funguje hudba a zvuky?',
     a: (
       <>
         <p>
-          Každý svět má <strong>Zvukovou databázi</strong> (menu Hra →{' '}
-          <strong>Zvuky</strong>) &mdash; knihovnu hudby a zvuků z YouTube.
-          Slyšet a přehrát si zvuk může každý člen světa; vytvářet a spravovat
-          zvuky může <strong>PJ</strong> (Pomocný PJ a výš).
+          Každý svět má <strong>Zvukovou databázi</strong> (menu Hra → Zvuky) —
+          knihovnu hudby z YouTube. Přehrát může každý člen, spravovat PJ.
         </p>
         <p>
-          PJ může zvuk <strong>pustit všem</strong> dvěma způsoby: na{' '}
-          <strong>taktické mapě</strong> jako ambientní hudbu scény (panel
-          „🎵 Ambient" &mdash; slyší všichni hráči na scéně), nebo přímo v{' '}
-          <strong>chatu</strong> tlačítkem 🎵 u psaní zprávy (ostatním se ukáže
-          pruh „Právě hraje").
-        </p>
-        <p>
-          Když ti začne hrát cizí zvuk poprvé, prohlížeč tě nejdřív vyzve
-          kliknout na <strong>„Aktivovat zvuk"</strong> &mdash; je to
-          bezpečnostní pravidlo prohlížeče, web nesmí přehrát zvuk bez tvého
-          kliknutí.
+          PJ pustí zvuk všem na <strong>taktické mapě</strong> (ambient scény) nebo v{' '}
+          <strong>chatu</strong> (🎵). Při prvním cizím zvuku tě prohlížeč vyzve
+          kliknout „Aktivovat zvuk".
         </p>
       </>
     ),
   },
   {
+    cat: 'svet',
     q: 'Jak hledám stránky ve světě?',
     a: (
       <>
         <p>
-          V hlavičce světa je pole <strong>„Hledat…"</strong>. Klikni na něj
-          (nebo stiskni <strong>Ctrl+K</strong>, na Macu <strong>⌘ K</strong>) a
-          otevře se okno hledání. Jak píšeš, ukazují se nalezené stránky &mdash;
-          klikni na výsledek nebo vyber šipkami{' '}
-          <strong>↑ / ↓</strong> a potvrď <strong>Enter</strong>.
+          V hlavičce světa je pole <strong>„Hledat…"</strong> (nebo <strong>Ctrl+K</strong>,
+          na Macu <strong>⌘ K</strong>). Jak píšeš, ukazují se nalezené stránky;
+          potvrdíš klikem nebo Enter.
         </p>
-        <p>
-          Hledání prohledává <strong>jen stránky aktuálního světa</strong> &mdash;
-          výsledky z jiných světů se nemíchají. Na mobilu najdeš{' '}
-          <strong>„Hledat ve světě"</strong> v menu (hamburger vpravo nahoře).
-        </p>
+        <p>Hledání prohledává <strong>jen aktuální svět</strong>. Na mobilu „Hledat ve světě" v menu.</p>
       </>
     ),
   },
+  {
+    cat: 'obecne',
+    q: 'Co znamená Motiv (theme)?',
+    a: (
+      <p>
+        Motiv = globální vizuální styl Ikaru (desítky variant — Modré nebe,
+        Kyberpunk, Pergamen, Nemrtví, Arabský svět…). Přepínáš v přepínači motivů
+        (hlavička / pravý panel); volba se ukládá k účtu.
+      </p>
+    ),
+  },
+  {
+    cat: 'obecne',
+    q: 'Můžu jako Admin banovat jiného Admina?',
+    a: (
+      <p>
+        Standardně <strong>ne</strong>. Admin smí jen Hráče a PJ. K akcím proti
+        jinému Adminovi potřebuješ zvláštní oprávnění od Superadmina. Banovat
+        Superadmina nesmí <em>nikdo</em>.
+      </p>
+    ),
+  },
+  {
+    cat: 'obecne',
+    q: 'Jaký je rozdíl mezi globální a světovou rolí?',
+    a: (
+      <p>
+        Globální role (Admin, Hráč…) platí napříč celou platformou. Světová role
+        (PJ, Pomocný PJ, Hráč ve světě) platí jen v daném světě — jinde můžeš mít
+        roli jinou. Detail v tabu <strong>Role &amp; oprávnění</strong>.
+      </p>
+    ),
+  },
+  {
+    cat: 'obecne',
+    q: 'Funguje to na mobilu?',
+    a: (
+      <p>
+        Ano, celá platforma je responzivní. Sidebar se na mobilu skrývá do hamburger
+        menu vlevo nahoře; tabulky a horní taby scrolují horizontálně.
+      </p>
+    ),
+  },
+  {
+    cat: 'obecne',
+    q: 'Kde nahlásit chybu nebo navrhnout vylepšení?',
+    a: (
+      <p>
+        E-mailem na adresu uvedenou v <Link to="/podminky">podmínkách použití</Link>.
+        Stručný popis + jak chybu vyvolat + screenshot urychlí opravu.
+      </p>
+    ),
+  },
+];
+
+const CATS: { key: FaqCat; label: string; icon: ReactNode; accent: 'accent' | 'player' | 'pj' | 'info' }[] = [
+  { key: 'ucet', label: 'Účet', icon: <UserCircle size={20} />, accent: 'accent' },
+  { key: 'komunita', label: 'Komunita', icon: <Users size={20} />, accent: 'player' },
+  { key: 'svet', label: 'Svět & hra', icon: <Swords size={20} />, accent: 'pj' },
+  { key: 'obecne', label: 'Obecné', icon: <HelpCircle size={20} />, accent: 'info' },
 ];
 
 export function FaqSection() {
   return (
     <>
-      <p>Krátké odpovědi na časté otázky. Kliknutím na otázku se rozbalí.</p>
-      <div className={s.faqList}>
-        {FAQ.map((item, idx) => (
-          <details key={idx} className={s.faqItem}>
-            <summary>{item.q}</summary>
-            <div className={s.faqAnswer}>{item.a}</div>
-          </details>
-        ))}
-      </div>
+      <p>Krátké odpovědi na časté otázky, seskupené do kategorií. Rozbal kategorii a klikni na otázku.</p>
+      {CATS.map((cat, i) => {
+        const items = FAQ.filter((f) => f.cat === cat.key);
+        return (
+          <HelpAccordion
+            key={cat.key}
+            icon={cat.icon}
+            title={cat.label}
+            accent={cat.accent}
+            defaultOpen={i === 0}
+          >
+            <div className={s.faqList}>
+              {items.map((item, idx) => (
+                <details key={idx} className={s.faqItem}>
+                  <summary>{item.q}</summary>
+                  <div className={s.faqAnswer}>{item.a}</div>
+                </details>
+              ))}
+            </div>
+          </HelpAccordion>
+        );
+      })}
     </>
   );
 }

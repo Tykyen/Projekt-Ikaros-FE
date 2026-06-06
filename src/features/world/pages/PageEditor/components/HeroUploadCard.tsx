@@ -13,6 +13,9 @@ interface Props {
   /** Skryje vlastní label „Hlavní obrázek" — pro vnořené použití (např. AKJ
    *  záložka), kde label řeší rodič. Velikost řídí šířka kontejneru. */
   compact?: boolean;
+  /** Text výzvy k nahrání v prázdném stavu (default „Nahrát hero obrázek").
+   *  Pro znovupoužití mimo hero kontext (např. obrázek bestie). */
+  uploadCta?: string;
   /**
    * Výřez obrázku (parita s GameEvent). Focal UI (klik-overlay + zoom + fit)
    * se vykreslí jen když je předán `onFocalChange` a je nahraný obrázek;
@@ -40,6 +43,7 @@ export function HeroUploadCard({
   value,
   onChange,
   compact = false,
+  uploadCta = 'Nahrát hero obrázek',
   focal,
   onFocalChange,
   zoom,
@@ -176,7 +180,7 @@ export function HeroUploadCard({
             ) : (
               <>
                 <ImagePlus size={26} aria-hidden />
-                <span>{value ? 'Změnit obrázek' : 'Nahrát hero obrázek'}</span>
+                <span>{value ? 'Změnit obrázek' : uploadCta}</span>
               </>
             )}
           </div>
