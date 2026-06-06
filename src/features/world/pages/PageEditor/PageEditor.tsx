@@ -80,6 +80,20 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
               initialType === 'Postava hráče' && initialOwnerUserId
                 ? initialOwnerUserId
                 : INITIAL_PAGE_STATE.ownerUserId,
+            // spec-akj-owner-visibility — nové PC dostanou předpřipravenou
+            // záložku „Soukromé" (vidí PJ + vlastník), kam PJ píše soukromé bio.
+            akjTabs:
+              initialType === 'Postava hráče'
+                ? [
+                    {
+                      id: crypto.randomUUID(),
+                      name: 'Soukromé',
+                      order: 0,
+                      access: [],
+                      ownerHidden: false,
+                    },
+                  ]
+                : INITIAL_PAGE_STATE.akjTabs,
           },
     [page, initialType, initialOwnerUserId],
   );
@@ -452,6 +466,7 @@ export function PageEditor({ page, initialType, initialOwnerUserId }: Props) {
           <AkjTabsPanel
             akjTabs={state.akjTabs}
             onChange={(tabs) => setField('akjTabs', tabs)}
+            ownerControlled={state.type === 'Postava hráče'}
           />
         </div>
         </main>

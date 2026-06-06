@@ -42,9 +42,11 @@ type PendingNav = { type: 'tab'; id: string } | { type: 'exit' };
 
 /**
  * 9.1 — Layout pro typ `PostavaHrace` (PC) a `NPC`. Page-driven viewer
- * se 6 taby:
+ * se 6 taby + případnými AKJ chráněnými záložkami:
  *
- *   • Profil (Bio) — z `Page.content` + `Page.table` + (PJ/owner) `privateContent`/`privateInfoBlocks`
+ *   • Profil (Bio) — z `Page.content` + `Page.table` (veřejné). Soukromý obsah
+ *     řeší AKJ chráněné záložky (`Page.akjTabs`, vč. presetu „Soukromé" pro
+ *     vlastníka, spec-akj-owner-visibility); pole privateContent byla zrušena.
  *   • Deník/Finance/Výbava/Kalendář/Poznámky — z `Character` entity (přes
  *     `characterRef.characterId` → subdoc API). Edit mode toggle, discard
  *     guard pro neuložené změny.

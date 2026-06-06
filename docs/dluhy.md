@@ -14,6 +14,16 @@
 > 3 bezpečnostní (N-7 members leak, N-8 room:join leak, N-9 sound spoof). Detaily, důkazy
 > a návrhy řešení v `bug-audit.md`. Opraveno během auditu: N-1 (test mock), D-029 (PWA ikony).
 
+### D-033 — Vitest neběží: storybook addon-vitest projekt padá při načtení configu
+**Soubor:** `vitest.config.ts` — druhý projekt `storybook` (`@storybook/addon-vitest` + `storybookTest({ configDir: .storybook })`)
+**Problém:** `npx vitest run` skončí na `CriticalPresetLoadError` / `ERR_INTERNAL_ASSERTION: Unexpected module status 0. Cannot require() ES Module storybook/dist/core-server/index.js` (ESM/CJS race v `@chromatic-com/storybook` presetu). Chyba je při vyhodnocení configu, takže ji neobejde ani `--project` filtr → **nespustí se ani unit testy**. Pravděpodobně neúplně nainstalované storybook deps (souvisí s SSL npm install, viz `NODE_OPTIONS=--use-system-ca`) nebo verzový clash storybook × Node.
+**Dopad:** Vysoký — standardní `vitest run` nejde spustit; ověření FE testů vyžaduje workaround (dočasný config bez storybook projektu). Riziko pro CI i ostatní vývojáře.
+**Řešení:** Buď přeinstalovat/srovnat storybook deps (peer verze, `@chromatic-com/storybook`), nebo storybook test projekt z `vitest.config.ts` oddělit do samostatného configu (`vitest.storybook.config.ts`) a default `vitest run` nechat jen unit projekt.
+**Kdy:** Před prvním ostrým CI během testů / při příští údržbě test infrastruktury.
+**✅ Vyřešeno 2026-06-06:** Storybook projekt odebrán z `vitest.config.ts` → default `vitest run` = jen unit (storybook zůstává jako vizuální katalog přes `npm run storybook`). Odhalil se druhý, dosud maskovaný problém: při default discovery vitest auto-merguje root `vite.config.ts` a duplicitní `react()` plugin (v obou configech) rozbíjel test context (`Failed to find the current suite` → 0 testů). Fix: `vitest.config.ts` `react()` plugin NEuvádí (dědí z vite.config merge), `resolve.alias` ponechán. Ověřeno: `vitest run` = **327 souborů / 2499 testů zelené**. Pozn.: přes `-c <jméno>` problém nebyl (merge se chová jinak) — past při diagnostice.
+
+---
+
 ### D-032 — Připnuté konverzace nejdou přehazovat drag&drop
 **Soubor:** `src/features/world/chat/components/ChannelSidebar.tsx` — sekce „Připnuté" (`s.pinned`)
 **Problém:** Připnuté konverzace se renderují plochým `.map` bez `DndContext`/`SortableContext`/handle, na rozdíl od kanálů a konverzací uvnitř kanálů (6.7b osobní reorder). Starý Matrix (`ChatSidebar.tsx`, `handlePinnedDrop`) reorder připnutých uměl (persist do `chatPreferences`).

@@ -263,6 +263,13 @@ const FAQ: FaqItem[] = [
           tě k ní přidá jmenovitě. Co na záložku napíše, vidí jen ti s přístupem.
         </p>
         <p>
+          U <strong>své vlastní postavy</strong> ale chráněné záložky{' '}
+          <strong>vidíš automaticky</strong> — PJ ti tam může nechat soukromý
+          vzkaz, aniž by tě musel zvlášť přidávat (toto právo ti u konkrétní
+          záložky umí odebrat). Nová postava proto rovnou dostane připravenou
+          záložku <strong>„Soukromé"</strong>, kterou vidíš jen ty a PJ.
+        </p>
+        <p>
           Pokud k záložce přístup <strong>nemáš, vůbec ji neuvidíš</strong> — ani
           nevíš, že existuje. Když na takový odkaz náhodou klikneš, objeví se
           „Stránka je zašifrovaná". <strong>PJ</strong> (a Pomocný PJ, kterému to
@@ -274,7 +281,10 @@ const FAQ: FaqItem[] = [
           <strong>„Chráněné záložky (AKJ)"</strong>: přidáš záložku, nastavíš kdo
           ji vidí a volitelně přepíšeš obrázek a text (jinak se dědí ze základní
           stránky). Jedním klikem přidáš i záložku <strong>„PJ informace"</strong>{' '}
-          jen pro PJ.
+          (jen pro PJ tým) nebo u postavy <strong>„Soukromé"</strong> (PJ
+          a vlastník). U postavy navíc přepínač{' '}
+          <strong>„Vlastník postavy vidí"</strong> určuje, jestli záložku uvidí
+          i hráč té postavy.
         </p>
       </>
     ),

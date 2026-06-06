@@ -40,7 +40,9 @@ export default function HelpPage() {
         <h1>Nápověda</h1>
         <p className={s.lead}>
           Co stránky umí, kdo má jaká práva, jak na účet a kam se obrátit.
-          Aktualizováno k 2026-06-06 (Chat světa: kanál Postavy je soukromý —
+          Aktualizováno k 2026-06-06 (Postava: u vlastní postavy vidíš chráněné
+          (AKJ) záložky automaticky a nová postava dostane připravenou záložku
+          „Soukromé" pro soukromý vzkaz od Pána jeskyně. Plus Chat světa: kanál Postavy je soukromý —
           přidělená postava ti automaticky založí privátní konverzaci s vedením;
           pořadí kanálů i konverzací si každý řadí sám — přetažením úchopky
           (⋮⋮) vlevo od názvu — a kanály jsou defaultně sbalené. Plus hlavní obrázek stránky/postavy má

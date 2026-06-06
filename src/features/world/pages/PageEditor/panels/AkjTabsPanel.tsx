@@ -1,5 +1,13 @@
 import { useMemo, useState } from 'react';
-import { Lock, Plus, X, ShieldPlus, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  Lock,
+  Plus,
+  X,
+  ShieldPlus,
+  ChevronUp,
+  ChevronDown,
+  User,
+} from 'lucide-react';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { WorldRole } from '@/shared/types';
@@ -24,6 +32,9 @@ const EMPTY_TABLE: PageTable = {
 interface Props {
   akjTabs: AkjTab[];
   onChange: (next: AkjTab[]) => void;
+  /** Stránka je PC (má ownerUserId) → zobraz preset „Soukromé" a přepínač
+   *  „Vlastník vidí". Mimo PC nemá owner-výjimka smysl. */
+  ownerControlled?: boolean;
 }
 
 const WORLD_ROLE_LABELS: Record<number, string> = {
@@ -51,13 +62,26 @@ function setSingle(
   return value ? [...without, { type, value }] : without;
 }
 
-function freshTab(preset?: 'pj'): AkjTab {
+function freshTab(preset?: 'pj' | 'soukrome'): AkjTab {
   if (preset === 'pj') {
     return {
       id: crypto.randomUUID(),
       name: 'PJ informace',
       order: 0,
       access: [{ type: 'Role', value: String(WorldRole.PomocnyPJ) }],
+      // Jen PJ tým — vlastník postavy ji NEvidí (na rozdíl od ostatních AKJ
+      // záložek, které vlastník PC defaultně vidí).
+      ownerHidden: true,
+    };
+  }
+  if (preset === 'soukrome') {
+    return {
+      id: crypto.randomUUID(),
+      name: 'Soukromé',
+      order: 0,
+      // Bez grantu — vlastníka pustí owner-výjimka, PJ bypass, ostatní ne.
+      access: [],
+      ownerHidden: false,
     };
   }
   return { id: crypto.randomUUID(), name: 'Nová AKJ záložka', order: 0, access: [] };
@@ -68,8 +92,12 @@ function freshTab(preset?: 'pj'): AkjTab {
  * pravidlo viditelnosti (clearance / role / konkrétní hráči, OR) a volitelný
  * override obrázku + textu (jinak dědí ze základní stránky).
  */
-export function AkjTabsPanel({ akjTabs, onChange }: Props) {
-  function add(preset?: 'pj') {
+export function AkjTabsPanel({
+  akjTabs,
+  onChange,
+  ownerControlled = false,
+}: Props) {
+  function add(preset?: 'pj' | 'soukrome') {
     onChange([...akjTabs, { ...freshTab(preset), order: akjTabs.length }]);
   }
   function update(id: string, patch: Partial<AkjTab>) {
@@ -105,6 +133,15 @@ export function AkjTabsPanel({ akjTabs, onChange }: Props) {
         <button type="button" className={s.addBtn} onClick={() => add()}>
           <Plus size={14} aria-hidden /> AKJ záložka
         </button>
+        {ownerControlled && (
+          <button
+            type="button"
+            className={s.addBtn}
+            onClick={() => add('soukrome')}
+          >
+            <User size={14} aria-hidden /> Soukromé
+          </button>
+        )}
         <button type="button" className={s.addBtn} onClick={() => add('pj')}>
           <ShieldPlus size={14} aria-hidden /> PJ informace
         </button>
@@ -114,6 +151,7 @@ export function AkjTabsPanel({ akjTabs, onChange }: Props) {
         <AkjTabCard
           key={tab.id}
           tab={tab}
+          ownerControlled={ownerControlled}
           isFirst={i === 0}
           isLast={i === akjTabs.length - 1}
           onUpdate={(patch) => update(tab.id, patch)}
@@ -127,6 +165,7 @@ export function AkjTabsPanel({ akjTabs, onChange }: Props) {
 
 function AkjTabCard({
   tab,
+  ownerControlled,
   isFirst,
   isLast,
   onUpdate,
@@ -134,6 +173,7 @@ function AkjTabCard({
   onMove,
 }: {
   tab: AkjTab;
+  ownerControlled: boolean;
   isFirst: boolean;
   isLast: boolean;
   onUpdate: (patch: Partial<AkjTab>) => void;
@@ -211,6 +251,16 @@ function AkjTabCard({
       {/* Kdo vidí */}
       <fieldset className={s.access}>
         <legend className={s.legend}>Kdo vidí</legend>
+        {ownerControlled && (
+          <label className={s.ownerToggle}>
+            <input
+              type="checkbox"
+              checked={!tab.ownerHidden}
+              onChange={(e) => onUpdate({ ownerHidden: !e.target.checked })}
+            />
+            <span>Vlastník postavy vidí tuto záložku</span>
+          </label>
+        )}
         <div className={s.accessGrid}>
           <label className={s.field}>
             <span className={s.fieldLabel}>Globální úroveň (clearance)</span>
