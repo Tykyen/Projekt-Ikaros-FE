@@ -51,6 +51,15 @@ describe('ReactionsRow', () => {
     expect(onToggle).toHaveBeenCalledWith('😂');
   });
 
+  it('reactions undefined (legacy komentář) → nespadne, 6 ghost chipů', () => {
+    // Regrese: legacy komentář bez pole `reactions` shazoval celou stránku akce
+    // (`Cannot read properties of undefined (reading '👍')`).
+    render(
+      <ReactionsRow reactions={undefined} currentUserId="u1" onToggle={vi.fn()} />,
+    );
+    expect(screen.getAllByRole('button')).toHaveLength(REACTION_EMOJIS.length);
+  });
+
   it('hidden=true → render null', () => {
     const { container } = render(
       <ReactionsRow

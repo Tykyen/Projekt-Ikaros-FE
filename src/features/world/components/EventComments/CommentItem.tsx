@@ -218,7 +218,7 @@ export function CommentItem({
             <p className={s.content}>{comment.content}</p>
 
             <ReactionsRow
-              reactions={comment.reactions}
+              reactions={comment.reactions ?? {}}
               currentUserId={currentUserId}
               onToggle={handleReactionToggle}
               pending={reactMut.isPending}

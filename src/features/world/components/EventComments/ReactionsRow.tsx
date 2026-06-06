@@ -10,7 +10,12 @@ export const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🎉'
 export type ReactionEmoji = (typeof REACTION_EMOJIS)[number];
 
 interface Props {
-  reactions: Record<string, string[]>;
+  /**
+   * emoji → userIds. Volitelné: legacy komentáře z DB (z doby před reakcemi)
+   * pole `reactions` nemají → bez defaultu by `reactions['👍']` spadlo a shodilo
+   * celou stránku akce. Default `{}` to drží crash-proof.
+   */
+  reactions?: Record<string, string[]>;
   currentUserId: string | null;
   onToggle: (emoji: string) => void;
   /** Pending stav během mutace — chip disabled. */
@@ -24,7 +29,7 @@ interface Props {
  * Aktivní reakce (currentUser ji dal) má border accent.
  */
 export function ReactionsRow({
-  reactions,
+  reactions = {},
   currentUserId,
   onToggle,
   pending = false,
@@ -35,7 +40,7 @@ export function ReactionsRow({
   return (
     <div className={s.row} role="group" aria-label="Reakce">
       {REACTION_EMOJIS.map((emoji) => {
-        const userIds = reactions[emoji] ?? [];
+        const userIds = reactions?.[emoji] ?? [];
         const count = userIds.length;
         const isActive =
           !!currentUserId && userIds.includes(currentUserId);
