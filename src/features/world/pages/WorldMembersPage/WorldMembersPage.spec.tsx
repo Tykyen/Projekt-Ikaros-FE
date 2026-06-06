@@ -17,7 +17,11 @@ const settingsData = vi.hoisted(() => ({
 }));
 
 vi.mock('@/features/world/context/WorldContext', () => ({
-  useWorldContext: () => ({ worldId: 'w1', loading: false }),
+  useWorldContext: () => ({
+    worldId: 'w1',
+    worldSlug: 'svet-vil',
+    loading: false,
+  }),
 }));
 vi.mock('@/features/world/api/useWorldMembers', () => ({
   useWorldMembers: () => ({ data: membersData.items, isLoading: false }),
@@ -29,6 +33,9 @@ vi.mock('@/features/world/api/useWorldSettings', () => ({
       groupColors: settingsData.groupColors,
     },
   }),
+}));
+vi.mock('@/features/world/pages/api/useCharacterDirectory', () => ({
+  useCharacterDirectory: () => ({ data: [], isLoading: false }),
 }));
 
 function makeMember(over: Partial<WorldMembership> = {}): WorldMembership {
@@ -68,6 +75,26 @@ describe('MemberCard', () => {
       'href',
       '/ikaros/uzivatel/u42',
     );
+  });
+
+  it('„Hraje za" odkazuje na postavu, když má characterPath + character', () => {
+    renderR(
+      <MemberCard
+        member={makeMember({ characterPath: 'aragorn' })}
+        worldSlug="svet-vil"
+        character={{ name: 'Aragorn' }}
+      />,
+    );
+    expect(screen.getByText('Aragorn')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Otevřít postavu Aragorn/ }),
+    ).toHaveAttribute('href', '/svet/svet-vil/aragorn');
+  });
+
+  it('bez character nemá odkaz na postavu (jen profil)', () => {
+    renderR(<MemberCard member={makeMember({ characterPath: 'aragorn' })} />);
+    // worldSlug+character chybí → žádný „Hraje za" odkaz, jen profilový.
+    expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 });
 

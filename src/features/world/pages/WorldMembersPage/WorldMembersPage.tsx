@@ -1,12 +1,16 @@
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { Crown, Shield, Users } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
 import { WorldRole, type WorldMembership } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
+import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
 import { MemberCard } from './MemberCard';
 import s from './WorldMembersPage.module.css';
+
+/** Postava per slug (jméno + avatar) — pro „Hraje za" na kartě hráče. */
+type CharBySlug = Map<string, { name: string; imageUrl?: string }>;
 
 interface SectionProps {
   icon: ReactNode;
@@ -15,9 +19,19 @@ interface SectionProps {
   color?: string;
   members: WorldMembership[];
   delayMs: number;
+  worldSlug?: string;
+  charBySlug: CharBySlug;
 }
 
-function Section({ icon, title, color, members, delayMs }: SectionProps) {
+function Section({
+  icon,
+  title,
+  color,
+  members,
+  delayMs,
+  worldSlug,
+  charBySlug,
+}: SectionProps) {
   if (members.length === 0) return null;
   return (
     <section
@@ -40,7 +54,14 @@ function Section({ icon, title, color, members, delayMs }: SectionProps) {
       </header>
       <div className={s.grid}>
         {members.map((m) => (
-          <MemberCard key={m.id} member={m} />
+          <MemberCard
+            key={m.id}
+            member={m}
+            worldSlug={worldSlug}
+            character={
+              m.characterPath ? charBySlug.get(m.characterPath) : undefined
+            }
+          />
         ))}
       </div>
     </section>
@@ -54,9 +75,19 @@ function Section({ icon, title, color, members, delayMs }: SectionProps) {
  * správa rolí/skupin je v nastavení světa.
  */
 export default function WorldMembersPage() {
-  const { worldId, loading } = useWorldContext();
+  const { worldId, worldSlug, loading } = useWorldContext();
   const membersQuery = useWorldMembers(worldId);
   const settingsQuery = useWorldSettings(worldId);
+  const directoryQuery = useCharacterDirectory(worldId);
+
+  // characterPath (slug) → jméno + avatar postavy (pro „Hraje za" na kartě).
+  const charBySlug = useMemo<CharBySlug>(() => {
+    const map: CharBySlug = new Map();
+    for (const e of directoryQuery.data ?? []) {
+      map.set(e.slug, { name: e.name, imageUrl: e.imageUrl });
+    }
+    return map;
+  }, [directoryQuery.data]);
 
   if (loading || membersQuery.isLoading) {
     return <Spinner center />;
@@ -101,12 +132,16 @@ export default function WorldMembersPage() {
             title="Pán jeskyně"
             members={pj}
             delayMs={0}
+            worldSlug={worldSlug}
+            charBySlug={charBySlug}
           />
           <Section
             icon={<Shield size={18} />}
             title="Pomocní PJ"
             members={pomocni}
             delayMs={80}
+            worldSlug={worldSlug}
+            charBySlug={charBySlug}
           />
           {groupSections.map((g, i) => (
             <Section
@@ -116,6 +151,8 @@ export default function WorldMembersPage() {
               color={g.color}
               members={g.members}
               delayMs={160 + i * 80}
+              worldSlug={worldSlug}
+              charBySlug={charBySlug}
             />
           ))}
           <Section
@@ -123,6 +160,8 @@ export default function WorldMembersPage() {
             title="Bez skupiny"
             members={ungrouped}
             delayMs={160 + groupSections.length * 80}
+            worldSlug={worldSlug}
+            charBySlug={charBySlug}
           />
         </div>
       )}

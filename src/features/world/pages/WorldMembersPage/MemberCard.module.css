@@ -3,27 +3,37 @@
 .card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--sp-2);
+  align-items: stretch;
   padding: var(--sp-4);
   border: 1px solid var(--frame-border);
   border-radius: 12px;
   background: var(--surface-2);
   box-shadow: var(--shadow-md);
-  text-align: center;
-  /* Karta je odkaz (<a>) — zruš výchozí styl odkazu. */
-  text-decoration: none;
-  color: inherit;
   transition: border-color var(--transition-fast),
     transform var(--transition-fast);
-}
-.card:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 .card:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
+}
+.card:focus-within {
+  border-color: var(--accent);
+}
+
+/* Hlavní část karty = odkaz na osobní kartu hráče. */
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+}
+.main:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
 }
 
 .name {
@@ -34,6 +44,50 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+
+/* Řádek postavy = samostatný odkaz na stránku postavy ve světě. */
+.charRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--frame-border);
+  text-decoration: none;
+  color: inherit;
+}
+.charRow:hover .charName {
+  color: var(--accent);
+}
+.charRow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.charText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+.charLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.charName {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  transition: color var(--transition-fast);
 }
 
 @media (prefers-reduced-motion: reduce) {
