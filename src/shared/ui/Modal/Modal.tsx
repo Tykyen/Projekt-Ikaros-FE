@@ -136,6 +136,9 @@ export function Modal({
         {footer && <div className={s.footer}>{footer}</div>}
       </div>
     </div>,
-    document.body,
+    // Když je aktivní nativní fullscreen (např. taktická mapa), prohlížeč
+    // vykresluje jen fullscreen element a jeho potomky — portal do document.body
+    // by byl neviditelný. Proto míříme do fullscreen elementu, jinak do body.
+    document.fullscreenElement ?? document.body,
   );
 }

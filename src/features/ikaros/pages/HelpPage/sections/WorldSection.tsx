@@ -206,20 +206,21 @@ export function WorldSection() {
             smazat, pořadí).
           </p>
         </Tool>
+      </HelpAccordion>
 
-        {/* Taktická mapa — s pod-pod-sekcemi */}
-        <HelpSubAccordion
-          icon={<Swords size={16} />}
-          title="Taktická mapa"
-          accent="pj"
-          tag={<TagChip kind="hrac" label="Hráč + PJ" />}
-        >
-          <p>
-            Hex-grid prostor pro boj a scény. PJ vytvoří scénu (pozadí + grid + tokeny
-            + efekty), přiřadí na ni hráče a ti se připojí v reálném čase. Rozbal si
-            jednotlivé funkce:
-          </p>
-          <ScreenshotSlot media="svet.takticka-mapa" />
+      {/* ── Taktická mapa (samostatná sekce — klíčový a obsáhlý nástroj) ── */}
+      <HelpAccordion
+        icon={<Swords size={20} />}
+        title="Taktická mapa"
+        accent="pj"
+        tag={<TagChip kind="hrac" label="Hráč + PJ" />}
+      >
+        <p>
+          Hex-grid prostor pro boj a scény. PJ vytvoří scénu (pozadí + grid + tokeny
+          + efekty), přiřadí na ni hráče a ti se připojí v reálném čase. Rozbal si
+          jednotlivé funkce:
+        </p>
+        <ScreenshotSlot media="svet.takticka-mapa" />
 
           <MapFeature icon={<Footprints size={15} />} title="Hráčské postavy (PC)">
             <p>
@@ -302,7 +303,6 @@ export function WorldSection() {
               „Aktivovat zvuk" (pravidlo prohlížeče).
             </p>
           </MapFeature>
-        </HelpSubAccordion>
       </HelpAccordion>
 
       {/* ── Příběhové nástroje (PJ) ────────────────────────────────────── */}
