@@ -15,6 +15,8 @@ import type {
 export interface UpdateWorldSettingsInput {
   customGroups?: string[];
   groupColors?: Record<string, string>;
+  /** Znak skupiny (emblém): název skupiny → url. Ikona linkovaného chat kanálu. */
+  groupImages?: Record<string, string>;
   /** Side-task character-tab-visibility — per-typ whitelist viditelných tabů. */
   characterTabVisibility?: CharacterTabVisibility;
   /** 9.3 — slug CalendarConfig pro timeline (null = fallback první). */

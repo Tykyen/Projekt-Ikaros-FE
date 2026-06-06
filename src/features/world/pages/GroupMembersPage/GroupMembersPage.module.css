@@ -22,11 +22,61 @@
   flex-shrink: 0;
 }
 
+/* Znak skupiny — kruhový erb 48px s prstencem v barvě skupiny. */
+.emblem {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--g-ring, var(--frame-border));
+  background: var(--surface-1);
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  padding: 0;
+}
+
+.emblemImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* PJ varianta — celý erb je label/upload terč; overlay „změnit" na hover. */
+.emblemEdit {
+  cursor: pointer;
+}
+
+.emblemOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--black-rgb, 0 0 0) / 0.5);
+  color: rgb(var(--white-rgb, 255 255 255) / 0.95);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.emblemEdit:hover .emblemOverlay,
+.emblemEdit:focus-within .emblemOverlay {
+  opacity: 1;
+}
+
 .title {
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
   color: var(--text-strong);
   margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .count {
@@ -35,6 +85,7 @@
   background: var(--surface-2);
   border-radius: var(--radius-sm);
   padding: 2px var(--sp-2);
+  flex-shrink: 0;
 }
 
 .empty {

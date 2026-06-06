@@ -536,6 +536,8 @@ export interface WorldSettings {
   hiddenNavItems: string[];
   customGroups: string[];
   groupColors: Record<string, string>;
+  /** Znak skupiny (emblém): název skupiny → url. Zrcadlí se do ikony chat kanálu. */
+  groupImages?: Record<string, string>;
   /** 12.2 — vlastní navigace světa (strom skupin + odkazů), aditivní k systémové. */
   customHeadline?: HeadlineNode[];
   /** 12.2 — šablony menu (sady odkazů pro vkládání do navigace). */

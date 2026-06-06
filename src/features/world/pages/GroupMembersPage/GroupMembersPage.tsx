@@ -1,10 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { useParams } from 'react-router-dom';
-import { Users } from 'lucide-react';
+import { Users, ImagePlus } from 'lucide-react';
+import { toast } from 'sonner';
 import { Spinner } from '@/shared/ui';
+import { WorldRole } from '@/shared/types';
+import { useUploadImage } from '@/shared/api';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
+import { useUpdateWorldSettings } from '@/features/world/api/useUpdateWorldSettings';
 import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
 import { worldMemberAvatar } from '@/features/world/lib/worldMemberAvatar';
 import {
@@ -22,17 +26,42 @@ import s from './GroupMembersPage.module.css';
  */
 export default function GroupMembersPage() {
   const { groupKey = '' } = useParams<{ groupKey: string }>();
-  const { worldId, worldSlug, loading } = useWorldContext();
+  const { worldId, worldSlug, userRole, loading } = useWorldContext();
   const membersQuery = useWorldMembers(worldId);
   const settingsQuery = useWorldSettings(worldId);
   const directoryQuery = useCharacterDirectory(worldId);
+  const updateSettings = useUpdateWorldSettings(worldId);
+  const uploadImage = useUploadImage();
+  const [uploading, setUploading] = useState(false);
 
   const groupName = decodeGroupKey(groupKey);
   const title = groupName ?? UNGROUPED_LABEL;
 
   const customGroups = settingsQuery.data?.customGroups ?? [];
   const groupColors = settingsQuery.data?.groupColors ?? {};
+  const groupImages = settingsQuery.data?.groupImages ?? {};
   const color = groupName ? groupColors[groupName] : undefined;
+  const emblem = groupName ? groupImages[groupName] : undefined;
+  // Znak může nahrát jen PJ (BE `updateSettings` = canAdminWorld ≥ PJ) a jen
+  // pro reálnou skupinu (ne „Nezařazení", které kanál ani znak nemá). Var. B.
+  const canEditEmblem =
+    groupName !== null && (userRole ?? -1) >= WorldRole.PJ;
+
+  async function pickEmblem(file: File | undefined) {
+    if (!file || !groupName) return;
+    setUploading(true);
+    try {
+      const { url } = await uploadImage.mutateAsync(file);
+      await updateSettings.mutateAsync({
+        groupImages: { ...groupImages, [groupName]: url },
+      });
+      toast.success('Znak skupiny uložen.');
+    } catch {
+      toast.error('Uložení znaku selhalo.');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   // characterPath (slug) → entry postavy (jméno + obrázek).
   const charBySlug = useMemo(() => {
@@ -54,10 +83,42 @@ export default function GroupMembersPage() {
   return (
     <article className={s.page}>
       <header className={s.head}>
-        {color && (
-          <span className={s.dot} style={{ background: color }} aria-hidden />
+        {canEditEmblem ? (
+          <label
+            className={`${s.emblem} ${s.emblemEdit}`}
+            style={{ '--g-ring': color } as CSSProperties}
+            title={emblem ? 'Změnit znak skupiny' : 'Nahrát znak skupiny'}
+            aria-label={emblem ? 'Změnit znak skupiny' : 'Nahrát znak skupiny'}
+          >
+            {emblem ? (
+              <img className={s.emblemImg} src={emblem} alt="" />
+            ) : (
+              <Users size={22} aria-hidden />
+            )}
+            <span className={s.emblemOverlay} aria-hidden>
+              <ImagePlus size={18} />
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              disabled={uploading}
+              onChange={(e) => pickEmblem(e.target.files?.[0])}
+            />
+          </label>
+        ) : (
+          <span
+            className={s.emblem}
+            style={{ '--g-ring': color } as CSSProperties}
+            aria-hidden
+          >
+            {emblem ? (
+              <img className={s.emblemImg} src={emblem} alt="" />
+            ) : (
+              <Users size={22} />
+            )}
+          </span>
         )}
-        <Users size={20} className={s.icon} aria-hidden />
         <h1 className={s.title}>{title}</h1>
         <span className={s.count}>{members.length}</span>
       </header>
