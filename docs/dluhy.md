@@ -8,36 +8,8 @@
 
 ## Otevřené
 
-> **2026-06-03 — bug audit:** Hloubková kontrola BE+FE (viz [`bug-audit.md`](bug-audit.md))
-> našla **14 potvrzených nálezů** (N-1 až N-14). Hlavní: systémový FE↔BE contract drift
-> (N-6: auth/account endpointy), chybějící WS gateways (N-4 friendship, N-5 presence),
-> 3 bezpečnostní (N-7 members leak, N-8 room:join leak, N-9 sound spoof). Detaily, důkazy
-> a návrhy řešení v `bug-audit.md`. Opraveno během auditu: N-1 (test mock), D-029 (PWA ikony).
 
-<!--
-  Vyřešeno 2026-06-06 (dávka dluhů D-034 / D-033 / D-032 / D-030):
-  - D-034 universe GET visibility → BE počítá Pj/Admin přes world roli
-    (helper UniverseService.resolveIsWorldPjOrAdmin: global Admin+ NEBO world
-    PJ+); controller předává userRole, ne předpočítaný bool. World PJ tak dostane
-    plnou mapu (edit mód už neztratí skryté uzly). PUT/PATCH guardy byly OK.
-  - D-033 vitest storybook config → vyřešeno už dřív (storybook projekt odebrán
-    z vitest.config.ts; default `vitest run` = jen unit).
-  - D-032 reorder připnutých → FE pinned sekce obalena DndContext/SortableContext
-    (reuse SortableChannelItem); osobní pořadí `chatPinnedOrder` per svět
-    (WorldMembership + my-prefs DTO/service).
-  - D-030 správa push zařízení → BE GET /push/subscriptions (summary bez klíčů)
-    + DELETE /push/subscriptions/:id (jen vlastníkem); schema +userAgent/lastUsedAt;
-    FE usePushSubscriptions + PushDevicesList v notifikačním centru.
--->
 
-<!--
-  Vyřešeno 2026-06-03 (13.1 search):
-  - D-NEW-global-search-access-leak → opraveno: search vyžaduje worldId +
-    access check (worldsService.findByIdForRequester, 404 u cizího privátního
-    světa); mutační search/stats endpointy dostaly AdminGuard.
-  - D-NEW-search-index-monitoring → implementováno: admin tab „Search index"
-    (/admin?tab=search-index) — stav indexace + rebuild.
--->
 
 ### D-NEW-shop-purchase-atomicity — Nákup v obchodě bez Mongo transakce
 **Soubory:** BE `campaign/services/campaign-purchase.service.ts` (`purchase` / `refund`)
