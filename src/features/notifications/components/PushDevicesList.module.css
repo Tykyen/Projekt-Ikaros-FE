@@ -1,0 +1,101 @@
+.wrap {
+  padding: var(--sp-2, 8px) var(--sp-4, 16px) var(--sp-3, 12px);
+  border-top: 1px solid var(--accent-soft, rgba(180, 130, 255, 0.2));
+  background: var(--header-bg, rgb(var(--white-rgb) / 0.02));
+}
+
+.head {
+  font-size: var(--text-xs, 0.72rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, rgba(236, 231, 245, 0.5));
+  margin-bottom: var(--sp-2, 8px);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1, 4px);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2, 8px);
+  padding: var(--sp-2, 6px) var(--sp-2, 8px);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card-hover, rgb(var(--white-rgb) / 0.03));
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: var(--text-sm, 0.85rem);
+  color: var(--text-primary, #ece7f5);
+  font-weight: var(--weight-semi, 600);
+}
+
+.badge {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--accent-soft, rgba(180, 130, 255, 0.18));
+  color: var(--accent-bright, #c89bff);
+  font-size: 0.62rem;
+  font-weight: var(--weight-semi, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.meta {
+  font-size: var(--text-xs, 0.7rem);
+  color: var(--text-muted, rgba(236, 231, 245, 0.5));
+}
+
+.hint {
+  flex-shrink: 0;
+  font-size: var(--text-xs, 0.68rem);
+  color: var(--text-muted, rgba(236, 231, 245, 0.45));
+}
+
+.removeBtn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 1px solid var(--danger-soft-border, rgba(240, 96, 96, 0.3));
+  background: transparent;
+  color: var(--danger, #f06060);
+  border-radius: var(--radius-full, 999px);
+  font-size: var(--text-xs, 0.72rem);
+  font-weight: var(--weight-semi, 600);
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.12s) ease;
+}
+.removeBtn:hover:not(:disabled) {
+  background: var(--danger-soft, rgba(240, 96, 96, 0.15));
+}
+.removeBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Mobil ──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Dotykový cíl min. 44px (Odhlásit). */
+  .removeBtn {
+    min-height: 44px;
+    padding: 6px 16px;
+  }
+}

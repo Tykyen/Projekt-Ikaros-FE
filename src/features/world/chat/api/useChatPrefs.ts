@@ -8,6 +8,7 @@ export interface ChatPrefsPatch {
   groupOrder?: string[];
   channelOrder?: Record<string, string[]>;
   expandedGroups?: string[];
+  pinnedOrder?: string[];
 }
 
 const MY_WORLDS_KEY = ['worlds', 'my'] as const;
@@ -39,6 +40,10 @@ export function useChatPrefs(worldId: string) {
   );
   const expandedGroups = useMemo(
     () => membership?.chatExpandedGroups ?? [],
+    [membership],
+  );
+  const pinnedOrder = useMemo(
+    () => membership?.chatPinnedOrder ?? [],
     [membership],
   );
 
@@ -82,6 +87,9 @@ export function useChatPrefs(worldId: string) {
                   ...(patch.expandedGroups !== undefined && {
                     chatExpandedGroups: patch.expandedGroups,
                   }),
+                  ...(patch.pinnedOrder !== undefined && {
+                    chatPinnedOrder: patch.pinnedOrder,
+                  }),
                 },
               },
         ),
@@ -123,13 +131,19 @@ export function useChatPrefs(worldId: string) {
     },
     [apply, expandedGroups],
   );
+  const setPinnedOrder = useCallback(
+    (order: string[]) => apply({ pinnedOrder: order }),
+    [apply],
+  );
 
   return {
     groupOrder,
     channelOrder,
     expandedGroups,
+    pinnedOrder,
     setGroupOrder,
     setChannelOrder,
     toggleExpanded,
+    setPinnedOrder,
   };
 }

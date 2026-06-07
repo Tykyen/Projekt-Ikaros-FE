@@ -9,10 +9,12 @@ import {
   chatFeedUnseenAtom,
   type NotificationTab,
 } from '../model/centerStore';
+import { usePush } from '../api/usePush';
 import { ChatFeedTab } from './ChatFeedTab';
 import { EventsTab } from './EventsTab';
 import { PendingTab } from './PendingTab';
 import { PushToggle } from './PushToggle';
+import { PushDevicesList } from './PushDevicesList';
 import s from './NotificationCenter.module.css';
 
 /**
@@ -27,6 +29,8 @@ export function NotificationCenter() {
   const setUnseen = useSetAtom(chatFeedUnseenAtom);
   const { data: pending } = usePendingActionsCount();
   const hasPending = (pending?.total ?? 0) > 0;
+  // D-030 — jeden zdroj pravdy o push pro přepínač i seznam zařízení.
+  const push = usePush();
 
   // Otevření = „viděno" → vynuluj chat badge.
   useEffect(() => {
@@ -101,7 +105,8 @@ export function NotificationCenter() {
           {tab === 'todo' && hasPending && <PendingTab />}
         </div>
 
-        <PushToggle />
+        <PushDevicesList currentEndpoint={push.currentEndpoint} />
+        <PushToggle push={push} />
       </aside>
     </div>
   );

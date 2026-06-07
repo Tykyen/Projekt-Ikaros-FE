@@ -20,7 +20,6 @@ import { usePinnedChannels } from '../api/usePinnedChannels';
 import { useChatPrefs } from '../api/useChatPrefs';
 import { applyOrder } from '../lib/applyOrder';
 import { groupColorVarFor } from '../lib/groupColor';
-import { ChannelItem } from './ChannelItem';
 import {
   SortableChannelGroup,
   SortableChannelItem,
@@ -65,9 +64,11 @@ export function ChannelSidebar({
     groupOrder,
     channelOrder,
     expandedGroups,
+    pinnedOrder,
     setGroupOrder,
     setChannelOrder,
     toggleExpanded,
+    setPinnedOrder,
   } = useChatPrefs(worldId);
   // Drag handle activation — touch má long-press (chrání scroll), myš jen distance.
   const sensors = useSensors(
@@ -92,6 +93,24 @@ export function ChannelSidebar({
     }
     return out;
   }, [groups, pinnedSet]);
+
+  // D-032 — osobní pořadí připnutých; nově připnuté padají na konec.
+  const orderedPinned = useMemo(
+    () => applyOrder(pinnedChannels, pinnedOrder, (p) => p.channel.id),
+    [pinnedChannels, pinnedOrder],
+  );
+  const pinnedIds = useMemo(
+    () => orderedPinned.map((p) => p.channel.id),
+    [orderedPinned],
+  );
+
+  const handlePinnedDragEnd = (e: DragEndEvent) => {
+    if (!e.over || e.active.id === e.over.id) return;
+    const oldIdx = pinnedIds.indexOf(String(e.active.id));
+    const newIdx = pinnedIds.indexOf(String(e.over.id));
+    if (oldIdx < 0 || newIdx < 0) return;
+    setPinnedOrder(arrayMove(pinnedIds, oldIdx, newIdx));
+  };
 
   // Osobní pořadí kanálů; nově vzniklé padají na konec dle globálního order.
   const orderedGroups = useMemo(
@@ -126,25 +145,37 @@ export function ChannelSidebar({
   return (
     <nav className={s.sidebar} aria-label="Kanály a konverzace">
       <div className={s.scroll}>
-        {pinnedChannels.length > 0 && (
+        {orderedPinned.length > 0 && (
           <div className={s.pinned}>
             <div className={s.pinnedHead}>
               <Pin size={11} aria-hidden="true" /> Připnuté
             </div>
-            {pinnedChannels.map(({ channel, color }) => (
-              <ChannelItem
-                key={channel.id}
-                channel={channel}
-                active={channel.id === activeChannelId}
-                unread={unread.get(channel.id) ?? 0}
-                pinned
-                accentColor={color}
-                canManage={canManage}
-                onSelect={() => onSelectChannel(channel.id)}
-                onTogglePin={() => togglePin(channel.id)}
-                onEdit={() => onEditChannel(channel)}
-              />
-            ))}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handlePinnedDragEnd}
+            >
+              <SortableContext
+                items={pinnedIds}
+                strategy={verticalListSortingStrategy}
+              >
+                {orderedPinned.map(({ channel, color }) => (
+                  <SortableChannelItem
+                    key={channel.id}
+                    channel={channel}
+                    active={channel.id === activeChannelId}
+                    unread={unread.get(channel.id) ?? 0}
+                    pinned
+                    accentColor={color}
+                    canManage={canManage}
+                    disabled={false}
+                    onSelect={() => onSelectChannel(channel.id)}
+                    onTogglePin={() => togglePin(channel.id)}
+                    onEdit={() => onEditChannel(channel)}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         )}
 

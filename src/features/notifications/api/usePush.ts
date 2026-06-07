@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
+import { pushDeviceKeys } from './usePushSubscriptions';
 
 /** VAPID base64url → Uint8Array (formát pro `applicationServerKey`). */
 function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
@@ -27,11 +29,14 @@ const pushSupported =
  * (permission, subscription objekt, volání API).
  */
 export function usePush() {
+  const qc = useQueryClient();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [denied, setDenied] = useState(
     pushSupported && Notification.permission === 'denied',
   );
+  // D-030 — endpoint aktuální subscription; pro označení „toto zařízení" v seznamu.
+  const [currentEndpoint, setCurrentEndpoint] = useState<string | null>(null);
 
   useEffect(() => {
     if (!pushSupported) return;
@@ -39,7 +44,10 @@ export function usePush() {
     void navigator.serviceWorker.ready
       .then((reg) => reg.pushManager.getSubscription())
       .then((sub) => {
-        if (!cancelled) setIsSubscribed(!!sub);
+        if (!cancelled) {
+          setIsSubscribed(!!sub);
+          setCurrentEndpoint(sub?.endpoint ?? null);
+        }
       })
       .catch(() => {});
     return () => {
@@ -71,10 +79,12 @@ export function usePush() {
         auth: json.keys?.auth ?? '',
       });
       setIsSubscribed(true);
+      setCurrentEndpoint(sub.endpoint);
+      void qc.invalidateQueries({ queryKey: pushDeviceKeys.all });
     } finally {
       setBusy(false);
     }
-  }, [busy]);
+  }, [busy, qc]);
 
   const disable = useCallback(async () => {
     if (!pushSupported || busy) return;
@@ -89,10 +99,20 @@ export function usePush() {
         await sub.unsubscribe();
       }
       setIsSubscribed(false);
+      setCurrentEndpoint(null);
+      void qc.invalidateQueries({ queryKey: pushDeviceKeys.all });
     } finally {
       setBusy(false);
     }
-  }, [busy]);
+  }, [busy, qc]);
 
-  return { supported: pushSupported, isSubscribed, busy, denied, enable, disable };
+  return {
+    supported: pushSupported,
+    isSubscribed,
+    busy,
+    denied,
+    currentEndpoint,
+    enable,
+    disable,
+  };
 }

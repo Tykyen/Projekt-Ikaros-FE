@@ -418,8 +418,9 @@ export function WorldSection() {
             Chat uvnitř světa — vlevo kanály a v nich konverzace, uprostřed zprávy,
             vpravo (PJ) panel Přítomní. Kanál <strong>Postavy</strong> je soukromý:
             přiřazená postava ti automaticky založí privátní konverzaci s vedením.
-            Pořadí kanálů i konverzací si každý řadí sám přetažením úchopky (⋮⋮);
-            kanály jsou defaultně sbalené.
+            Pořadí kanálů, konverzací i připnutých si každý řadí sám přetažením
+            úchopky (⋮⋮); kanály jsou defaultně sbalené. Připnuté konverzace
+            (sekce nahoře) máš ve svém pořadí v každém světě zvlášť.
           </p>
           <ScreenshotSlot media="svet.chat" />
           <CalloutBox variant="tip">

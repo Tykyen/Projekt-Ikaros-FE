@@ -1,12 +1,17 @@
-import { usePush } from '../api/usePush';
+import type { usePush } from '../api/usePush';
 import s from './NotificationCenter.module.css';
+
+interface PushToggleProps {
+  /** Sdílený push stav z `usePush` (zvednutý v NotificationCenter). */
+  push: ReturnType<typeof usePush>;
+}
 
 /**
  * Spec 13.2c — přepínač push notifikací na tomto zařízení (patička centra).
  * Skryje se na zařízeních bez podpory push.
  */
-export function PushToggle() {
-  const { supported, isSubscribed, busy, denied, enable, disable } = usePush();
+export function PushToggle({ push }: PushToggleProps) {
+  const { supported, isSubscribed, busy, denied, enable, disable } = push;
 
   if (!supported) return null;
 

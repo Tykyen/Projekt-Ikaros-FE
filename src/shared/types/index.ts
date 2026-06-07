@@ -445,6 +445,8 @@ export interface WorldMembership {
   chatChannelOrder?: Record<string, string[]>;
   /** 6.7c — `groupId` rozbalených kanálů v sidebaru (default: vše sbalené). */
   chatExpandedGroups?: string[];
+  /** D-032 — osobní pořadí připnutých konverzací (`channelId[]`), per svět. */
+  chatPinnedOrder?: string[];
   /** 5.3 — public summary uživatele; populuje `GET /worlds/:id/members`. */
   user?: {
     id: string;

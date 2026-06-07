@@ -192,7 +192,8 @@ const FAQ: FaqItem[] = [
         <p>
           Záložka <strong>Události</strong> = co se týká přímo tebe (schválený vstup,
           článek, přiřazená postava); pro schvalovatele přibude <strong>Ke zpracování</strong>.
-          Dole jde zapnout systémová upozornění na zařízení.
+          Dole jde zapnout systémová upozornění na zařízení a v sekci „Tvá zařízení"
+          spravovat (odhlásit) svá ostatní přihlášená zařízení.
         </p>
       </>
     ),

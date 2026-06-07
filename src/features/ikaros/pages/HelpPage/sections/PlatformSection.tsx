@@ -113,7 +113,9 @@ export function PlatformSection() {
             na jednom místě (jen z kanálů, kam máš přístup). Záložka <strong>Události</strong>{' '}
             = co se týká přímo tebe (schválený vstup, článek, přiřazená postava),
             záložka <strong>Ke zpracování</strong> pro schvalovatele. Dole jde
-            zapnout systémová upozornění na zařízení.
+            zapnout systémová upozornění na zařízení; v sekci <strong>Tvá
+            zařízení</strong> vidíš všechna přihlášená zařízení a ta vzdálená
+            můžeš odhlásit (aktuální se ovládá přepínačem).
           </p>
         </Tool>
         <Tool icon={<MessagesSquare size={16} />} title="Diskuze" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
