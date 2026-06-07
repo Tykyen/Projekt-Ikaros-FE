@@ -22,6 +22,8 @@ import {
   DICE,
   DICE_DESCRIPTIONS,
 } from "@/features/ikaros/pages/CreateWorldPage/constants/dice";
+import { applySystemChange } from "@/features/ikaros/pages/CreateWorldPage/constants/systemDicePresets";
+import { DicePresetResetLink } from "@/features/ikaros/pages/CreateWorldPage/components/DicePresetResetLink";
 import sec from "@/features/ikaros/pages/CreateWorldPage/components/sections.module.css";
 import { SettingsPanel } from "../components/SettingsPanel";
 import {
@@ -63,6 +65,7 @@ export default function BasicInfoTab() {
     control,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<BasicInfoForm>({
     resolver: zodResolver(basicInfoSchema),
@@ -274,13 +277,33 @@ export default function BasicInfoTab() {
           <label htmlFor="ws-system" className={`${sec.label} ${sec.required}`}>
             Herní systém
           </label>
-          <select id="ws-system" className={sec.select} {...register("system")}>
-            {RPG_SYSTEMS.map((sys) => (
-              <option key={sys.id} value={sys.id}>
-                {sys.label}
-              </option>
-            ))}
-          </select>
+          <Controller
+            name="system"
+            control={control}
+            render={({ field }) => (
+              <select
+                id="ws-system"
+                className={sec.select}
+                value={field.value}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  // 2.3b — smart-replace kostek při ruční změně systému.
+                  setValue(
+                    "dice",
+                    applySystemChange(field.value, next, getValues("dice")),
+                    { shouldDirty: true },
+                  );
+                  field.onChange(next);
+                }}
+              >
+                {RPG_SYSTEMS.map((sys) => (
+                  <option key={sys.id} value={sys.id}>
+                    {sys.label}
+                  </option>
+                ))}
+              </select>
+            )}
+          />
           {system === SYSTEM_CUSTOM_ID && (
             <input
               type="text"
@@ -306,6 +329,11 @@ export default function BasicInfoTab() {
                 descriptions={DICE_DESCRIPTIONS}
               />
             )}
+          />
+          <DicePresetResetLink
+            system={system}
+            dice={watch("dice")}
+            onApply={(d) => setValue("dice", d, { shouldDirty: true })}
           />
         </div>
 

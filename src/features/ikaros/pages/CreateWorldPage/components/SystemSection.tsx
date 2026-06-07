@@ -1,6 +1,7 @@
 import { DICE, DICE_DESCRIPTIONS } from '../constants/dice';
 import { RPG_SYSTEMS, SYSTEM_CUSTOM_ID } from '../constants/systems';
 import { PillChips } from './PillChips';
+import { DicePresetResetLink } from './DicePresetResetLink';
 import { SectionCard } from './SectionCard';
 import s from './sections.module.css';
 
@@ -62,8 +63,7 @@ export function SystemSection({
       <div className={s.field}>
         <span className={s.label}>Kostky / mechaniky</span>
         <p className={s.helper}>
-          Zaškrtněte, jaké kostky nebo mechaniky se budou ve světě uplatňovat.
-          Nepovinné.
+          Předvyplněno podle systému — uprav podle libosti. Nepovinné.
         </p>
         <PillChips
           options={DICE}
@@ -71,6 +71,11 @@ export function SystemSection({
           onChange={onDiceChange}
           ariaLabel="Kostky a mechaniky"
           descriptions={DICE_DESCRIPTIONS}
+        />
+        <DicePresetResetLink
+          system={system}
+          dice={dice}
+          onApply={onDiceChange}
         />
       </div>
     </SectionCard>

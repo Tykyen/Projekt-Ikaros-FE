@@ -9,7 +9,7 @@ export interface RpgSystem {
 }
 
 export const RPG_SYSTEMS: RpgSystem[] = [
-  { id: 'matrix',          label: 'Matrix (Klasická TTRPG Pravidla)' },
+  { id: 'matrix',          label: 'Ikaros pravidla' },
   { id: 'dnd5e',           label: 'Dungeons & Dragons 5e' },
   { id: 'jad',             label: 'Jeskyně a Draci' },
   { id: 'drd16',           label: 'Dračí Doupě 1.6' },

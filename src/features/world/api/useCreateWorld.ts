@@ -16,6 +16,11 @@ export interface CreateWorldInput {
   accessMode: WorldAccessMode;
   system: string;
   dice?: string[];
+  /** 2.3d — technologické pásmo světa (TÚ 0–14); seeduje stránku Technologie. */
+  techLevelMin?: number;
+  techLevelMax?: number;
+  /** 2.3e — tradice magie světa; seeduje stránku Magický systém. */
+  magicTraditions?: string[];
   /** 5.0 — motiv světa zvolený ve wizardu. */
   themeId?: string;
   /**

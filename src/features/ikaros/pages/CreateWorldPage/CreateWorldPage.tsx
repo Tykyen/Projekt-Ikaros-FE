@@ -13,10 +13,17 @@ import { GenreSection } from './components/GenreSection';
 import { PlayersSection } from './components/PlayersSection';
 import { AccessModeSection } from './components/AccessModeSection';
 import { SystemSection } from './components/SystemSection';
+import { TechnologySection } from './components/TechnologySection';
+import { MagicSection } from './components/MagicSection';
 import { ThemeSection } from './components/ThemeSection';
 import { CalendarsSection } from './components/CalendarsSection';
 import { GENRE_CUSTOM_LABEL, themeForGenre } from './constants/genres';
 import { DEFAULT_SYSTEM, SYSTEM_CUSTOM_ID } from './constants/systems';
+import { getDicePreset, applySystemChange } from './constants/systemDicePresets';
+import {
+  DEFAULT_TECH_MIN,
+  DEFAULT_TECH_MAX,
+} from './constants/technologyLevels';
 import { useWorldSlug } from './hooks/useWorldSlug';
 import s from './CreateWorldPage.module.css';
 
@@ -41,7 +48,23 @@ export default function CreateWorldPage() {
 
   const [system, setSystem] = useState(DEFAULT_SYSTEM);
   const [customSystem, setCustomSystem] = useState('');
-  const [dice, setDice] = useState<string[]>([]);
+  // 2.3b — start s presetem default systému; smart-replace při změně.
+  const [dice, setDice] = useState<string[]>(() =>
+    getDicePreset(DEFAULT_SYSTEM),
+  );
+
+  // 2.3b — změna systému přednastaví kostky, ale nepřepíše ruční úpravy.
+  function handleSystemChange(next: string) {
+    setDice((prev) => applySystemChange(system, next, prev));
+    setSystem(next);
+  }
+
+  // 2.3d — technologické pásmo světa (seeduje stránku Technologie).
+  const [techMin, setTechMin] = useState(DEFAULT_TECH_MIN);
+  const [techMax, setTechMax] = useState(DEFAULT_TECH_MAX);
+
+  // 2.3e — tradice magie světa (seeduje stránku Magický systém).
+  const [magicTraditions, setMagicTraditions] = useState<string[]>([]);
 
   // 5.0 — motiv světa se odvozuje ze žánru; `themeOverride` = ruční přepis PJ
   // (null = odvozeno).
@@ -126,6 +149,9 @@ export default function CreateWorldPage() {
         accessMode,
         system: finalSystem,
         dice: dice.length ? dice : undefined,
+        techLevelMin: techMin,
+        techLevelMax: techMax,
+        magicTraditions: magicTraditions.length ? magicTraditions : undefined,
         themeId: effectiveTheme,
         calendars: calendarsPayload,
         ...(defaultCalendarSlug && selectedCalendarSlugs.has(defaultCalendarSlug)
@@ -190,9 +216,19 @@ export default function CreateWorldPage() {
           system={system}
           customSystem={customSystem}
           dice={dice}
-          onSystemChange={setSystem}
+          onSystemChange={handleSystemChange}
           onCustomSystemChange={setCustomSystem}
           onDiceChange={setDice}
+        />
+        <TechnologySection
+          min={techMin}
+          max={techMax}
+          onMinChange={setTechMin}
+          onMaxChange={setTechMax}
+        />
+        <MagicSection
+          traditions={magicTraditions}
+          onChange={setMagicTraditions}
         />
         <ThemeSection
           genre={finalGenre}

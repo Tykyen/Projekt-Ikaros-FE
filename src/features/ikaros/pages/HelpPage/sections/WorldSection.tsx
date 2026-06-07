@@ -141,6 +141,15 @@ export function WorldSection() {
             upravuje je PJ stejným editorem jako ostatní stránky. Magický systém a
             Technologii může PJ z menu skrýt v Nastavení → Viditelnost modulů.
           </p>
+          <CalloutBox variant="tip" title="Předvyplněno při založení světa">
+            Nový svět dostane tyhle stránky rovnou s orientačním textem podle
+            voleb z formuláře tvorby: <strong>Pravidla</strong> podle herního
+            systému, <strong>Technologie</strong> podle zvoleného pásma
+            vyspělosti (TÚ 0–14) a <strong>Magický systém</strong> podle
+            zatržených tradic magie. Je to jen startovní bod — PJ text libovolně
+            přepíše. Tahle pásma a tradice se volí jen při tvorbě světa, ne
+            později v Nastavení.
+          </CalloutBox>
         </Tool>
         <Tool icon={<Users size={16} />} title="Hráči světa" audience={{ kind: 'vse', label: 'Členové' }}>
           <p>

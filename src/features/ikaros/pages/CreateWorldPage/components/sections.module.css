@@ -115,14 +115,43 @@
   gap: 16px;
 }
 
+.evenCols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
 @media (max-width: 768px) {
   .twoCol {
+    grid-template-columns: 1fr;
+  }
+
+  .evenCols {
     grid-template-columns: 1fr;
   }
 }
 
 .customInput {
   margin-top: 8px;
+}
+
+/* 2.3b — odkaz „Obnovit doporučené kostky pro systém". */
+.resetLink {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 6px 2px;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.resetLink:hover {
+  color: var(--text-primary);
 }
 
 .accessOption {

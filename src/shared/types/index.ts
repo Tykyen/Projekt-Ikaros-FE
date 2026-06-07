@@ -343,6 +343,11 @@ export interface World {
   /** 2.3 — multi-select kostek/mechanik (z `CreateWorldPage`). */
   dice?: string[];
   system: string;
+  /** 2.3d — technologické pásmo světa (TÚ 0–14); seeduje stránku Technologie. */
+  techLevelMin?: number | null;
+  techLevelMax?: number | null;
+  /** 2.3e — tradice magie světa; seeduje stránku Magický systém. */
+  magicTraditions?: string[];
   ownerId: string;
   isActive: boolean;
   accessMode: 'public' | 'private' | 'open' | 'closed';
