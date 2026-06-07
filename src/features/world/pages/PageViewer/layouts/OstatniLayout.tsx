@@ -3,6 +3,7 @@ import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { AkjBanner } from '../components/AkjBanner';
 import { PageSections } from '../components/PageSections';
 import { PageSidebar } from '../components/PageSidebar';
+import { QuickRef } from '../components/QuickRef';
 import type { Page } from '../../api/pages.types';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import s from './OstatniLayout.module.css';
@@ -61,6 +62,7 @@ export function OstatniLayout({ page }: Props) {
       </main>
 
       <aside className={s.aside}>
+        <QuickRef value={page.quickRef} />
         <PageSidebar page={page} />
         <div className={s.tocWrap}>
           <AutoTOC html={page.content} />

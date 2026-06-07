@@ -18,6 +18,7 @@ import { GalerieLayout } from './layouts/GalerieLayout';
 import { RodokmenLayout } from './layouts/RodokmenLayout';
 import { ObrazovkaLayout } from './layouts/ObrazovkaLayout';
 import { PostavaLayout } from './layouts/PostavaLayout';
+import { RulebookHub } from './layouts/RulebookHub';
 import { useBrokenLinks } from './hooks/useBrokenLinks';
 import { useInlineImageLightbox } from './hooks/useInlineImageLightbox';
 import {
@@ -109,7 +110,15 @@ export function PageViewer({ page }: Props) {
   const closePalette = useCallback(() => setPaletteOpen(false), []);
   const closeHelp = useCallback(() => setHelpOpen(false), []);
 
-  const Layout = LAYOUTS[page.type] ?? OstatniLayout;
+  // Pravidlová kniha — hub Pravidla (matrix) dostane „kodex" layout místo
+  // generického SeznamLayoutu. Kapitoly jedou přes OstatniLayout (+ QuickRef HUD).
+  const isRulebookHub =
+    world?.system === 'matrix' &&
+    page.slug === 'pravidla' &&
+    page.type === 'Seznam';
+  const Layout = isRulebookHub
+    ? RulebookHub
+    : (LAYOUTS[page.type] ?? OstatniLayout);
   // Lokace/Postava/NPC vsazují AKJ záložky do vlastní lišty (vedle Kalendáře);
   // ostatní (flat) typy obalíme univerzálním WithAkjTabs.
   const handlesOwnAkjTabs =

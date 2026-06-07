@@ -1,0 +1,38 @@
+.hud {
+  border: 1px solid var(--accent, rgb(var(--white-rgb) / 0.25));
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-overlay, rgb(var(--black-rgb) / 0.4));
+  box-shadow:
+    0 0 0 1px var(--border, transparent),
+    0 12px 40px rgb(var(--black-rgb) / 0.4);
+}
+
+.head {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border, rgb(var(--white-rgb) / 0.1));
+  background: var(--accent-soft, rgb(var(--white-rgb) / 0.06));
+}
+
+.tag {
+  font-family: var(--font-display, inherit);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-bright, var(--accent, #fff));
+  font-weight: 700;
+}
+
+.tag::before {
+  content: '// ';
+  opacity: 0.6;
+}
+
+.body {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text, rgb(var(--white-rgb) / 0.9));
+  font-variant-numeric: tabular-nums;
+}

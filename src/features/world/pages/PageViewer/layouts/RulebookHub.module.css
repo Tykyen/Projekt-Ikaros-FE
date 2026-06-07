@@ -1,0 +1,103 @@
+.hub {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.intro {
+  max-width: 70ch;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-muted, rgb(var(--white-rgb) / 0.7));
+}
+
+.prose {
+  background: transparent;
+}
+
+.grid {
+  display: grid;
+  /* Fluid: 1 sloupec na mobilu (≤~440px), 2+ od tabletu, víc na desktopu. */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.12));
+  border-radius: 14px;
+  padding: 1.3rem 1.2rem 1.2rem;
+  background: var(--bg-overlay, rgb(var(--black-rgb) / 0.3));
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    140px 90px at 90% 0,
+    var(--accent, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent, rgb(var(--white-rgb) / 0.35));
+  box-shadow: 0 14px 40px rgb(var(--black-rgb) / 0.5);
+}
+
+.card:hover::before {
+  opacity: 0.22;
+}
+
+.num {
+  position: relative;
+  display: block;
+  font-family: var(--font-display, inherit);
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent, #fff);
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover .num {
+  opacity: 1;
+}
+
+.cardTitle {
+  position: relative;
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-strong, #fff);
+}
+
+.arrow {
+  position: absolute;
+  top: 1.3rem;
+  right: 1.2rem;
+  font-family: var(--font-display, inherit);
+  color: var(--text-muted, rgb(var(--white-rgb) / 0.5));
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card:hover .arrow {
+  color: var(--accent-bright, var(--accent, #fff));
+  transform: translateX(3px);
+}
