@@ -30,15 +30,16 @@ GitHub Actions workflow v **BE repu** `.github/workflows/import-matrix-*.yml`:
 | F4a | Lore stránky 1643 (Lokace/Ostatní/Seznam/Rodokmen) | `import-matrix-pages.yml` | `_mig:f4a` | vloženo 1643 |
 | F4b | NPC stránky 1075 (napojené characterRef; 177 karet dovytvořeno) | `import-matrix-npc.yml` | `_mig:f4b` | vloženo 1075 |
 | F4c | PC subdocs 49 (výbava 17 / finance 15 / poznámky 17) | `import-matrix-subdocs.yml` | `_mig:f4c` | zpracováno 49 |
+| F4-cleanup | smazáno 7 (4 dup karty přezdívek + Lotri NPC karta/stránka + Myra Ostatní); záloha v `*_mig_trash` | `cleanup-matrix-dupes.yml` | trash | smazáno 7 |
+| F4b-2 | PC veřejné stránky **20** (`Postava hráče`, `characterRef` za běhu, `ownerUserId`); slug=char slug, obsah z Postava-page | `import-matrix-pc-pages.yml` | `_mig:f4b2` | vloženo 20 |
 
-**Stav newmatrix:** ~**1120 postav** + ~**2718 stránek** + PC subdocs (výbava vč. Měďák 59 položek).
+**Stav newmatrix:** ~**1116 postav** (1120 − 4 dup) + ~**2737 stránek** (+20 PC −1 Myra) + PC subdocs (výbava vč. Měďák 59 položek). Dílčí spec F4b-2: [`f4b2-pc-pages.md`](./f4b2-pc-pages.md).
 
 ## ZBÝVÁ 🔜 (pořadí + návod)
-1. **F4b-2 — PC veřejné stránky (17).** Postava-pages (CSV podtyp `Postava`) → Page `type:'Postava hráče'`, **`slug = char slug (base)`**, `characterRef→F3 char`, `ownerUserId`. ⚠️ slug remap: char slug=`helsing`, obsah z Postava-page `jesse-helsing` (hub `helsing`=Tajné→AKJ). Link přes `vlastnik_cil`→jméno→F3 slug (+reverse rename Zara Hawke→`zara`).
-2. **F4d — AKJ záložky (velký, ~760).** 415 „AKJ N cíl" + 348 AKJ-Ostatní (podtyp) + PC Tajné + PC AKJ + PC Kontakty(rozhodnutí A). → `akjTabs` na cílovou stránku (cíl přes `vlastnik_cil`/parse „AKJ N <cíl>"). **Chybí-cíl → vygeneruj host stub stránku** (veřejně jen hláška „Obsah jen v AKJ", bez textu/obrázku) + připoj záložku. `akjTab = {id,name,order,access:[{type:'AKJ',value:'N'}],ownerHidden:false,contentOverride:{content,imageUrl,table}}`. Práva: staré `{type:2,value:'Player'}`→`{type:'Role',...}`, `{type:0,value:oldUserId}`→`{type:'UserId',value:<F1 nové id>}`.
-3. **F5 — Odkazy:** auto-link výskyty jmen stránek v obsahu vč. českého skloňování (Londýna→Londýn); report nevyřešených.
-4. **F12 — Obrázky:** `imageUrl`/`bigImage` = **Google Drive ID** → rehost do Ikaros Cloudinary (konverze webp). Obrázkové karty (Vzhled/Mapa) **zůstávají viditelné + propojené s vlastníkem** (NE mazat/slučovat). **Mapy → Atlas (Mapy)** + vložené u stránky vlastníka.
-5. **F6** Pavučina (Universes+`isWoodWide`), **F7** kalendáře (Calenders→character calendar subdoc), **F8** timeline (97)+zvuky (9), **F9** akce (GameEvents 15), **F10** obchod (výbava s `DO_OBCHODU`), **F11** chat 1:1 (ChatMessages/Channels/chatGroups).
+1. **F4d — AKJ záložky (velký, ~760).** 415 „AKJ N cíl" + 348 AKJ-Ostatní (podtyp) + PC Tajné + PC AKJ + PC Kontakty(rozhodnutí A). → `akjTabs` na cílovou stránku (cíl přes `vlastnik_cil`/parse „AKJ N <cíl>"). **Chybí-cíl → vygeneruj host stub stránku** (veřejně jen hláška „Obsah jen v AKJ", bez textu/obrázku) + připoj záložku. `akjTab = {id,name,order,access:[{type:'AKJ',value:'N'}],ownerHidden:false,contentOverride:{content,imageUrl,table}}`. Práva: staré `{type:2,value:'Player'}`→`{type:'Role',...}`, `{type:0,value:oldUserId}`→`{type:'UserId',value:<F1 nové id>}`.
+2. **F5 — Odkazy:** auto-link výskyty jmen stránek v obsahu vč. českého skloňování (Londýna→Londýn); report nevyřešených.
+3. **F12 — Obrázky:** `imageUrl`/`bigImage` = **Google Drive ID** → rehost do Ikaros Cloudinary (konverze webp). Obrázkové karty (Vzhled/Mapa) **zůstávají viditelné + propojené s vlastníkem** (NE mazat/slučovat). **Mapy → Atlas (Mapy)** + vložené u stránky vlastníka.
+4. **F6** Pavučina (Universes+`isWoodWide`), **F7** kalendáře (Calenders→character calendar subdoc), **F8** timeline (97)+zvuky (9), **F9** akce (GameEvents 15), **F10** obchod (výbava s `DO_OBCHODU`), **F11** chat 1:1 (ChatMessages/Channels/chatGroups).
 
 ## Závazná pravidla / gotchas (detail ve specu)
 - **`Page.slug === Character.slug`** (FE hledá `useCharacter(slug)`). Subdoc kolekce keyed `characterId` (unique).
