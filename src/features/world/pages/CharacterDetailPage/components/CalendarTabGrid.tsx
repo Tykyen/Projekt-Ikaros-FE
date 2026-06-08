@@ -14,6 +14,7 @@ import {
   type FantasyDate,
 } from '@/shared/lib/calendarEngine';
 import type { CalendarEvent } from '../../api/characters.types';
+import { usePersistedCalendarCursor } from '@/features/world/hooks/usePersistedCalendarCursor';
 import s from './CalendarTabGrid.module.css';
 
 interface Props {
@@ -26,6 +27,8 @@ interface Props {
   onEventClick?: (event: CalendarEvent) => void;
   /** Klik na prázdné místo v buňce → create flow s preset datem. */
   onDayClick?: (date: FantasyDate) => void;
+  /** 9.2-followup — localStorage klíč pro persistenci pozice (null = bez persistence). */
+  cursorStorageKey?: string | null;
 }
 
 type EventPosition = 'start' | 'middle' | 'end' | 'single';
@@ -71,7 +74,9 @@ export function CalendarTabGrid({
   onConfigChange,
   onEventClick,
   onDayClick,
+  cursorStorageKey,
 }: Props) {
+  // Fallback pozice (když není uložená): první event, jinak dnešek.
   const initialCursor = useMemo<{ year: number; monthIndex: number }>(() => {
     const firstEventDate = events.find((e) => e.start)?.start;
     if (firstEventDate)
@@ -81,7 +86,11 @@ export function CalendarTabGrid({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [cursor, setCursor] = useState(initialCursor);
+  // 9.2-followup — pozice se pamatuje per entita (přes refresh).
+  const [cursor, setCursor] = usePersistedCalendarCursor(
+    cursorStorageKey ?? null,
+    () => initialCursor,
+  );
   const today = useMemo(() => todayInConfig(config), [config]);
 
   const grid = useMemo(
@@ -394,7 +403,8 @@ function DayCell({
             className={chipClasses}
             style={{
               ['--chip-color' as string]: eventColor,
-              ['--chip-bg' as string]: `${eventColor}24`,
+              // color-mix → funguje s var(--chat-group-N) i HEX (alpha nelze appendovat k var()).
+              ['--chip-bg' as string]: `color-mix(in srgb, ${eventColor} 14%, transparent)`,
             }}
             onClick={(e) => {
               e.stopPropagation();

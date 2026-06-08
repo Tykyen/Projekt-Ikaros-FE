@@ -19,6 +19,10 @@ import {
   useCalendarsAggregate,
   type AggregatedCalendarEvent,
 } from '@/features/world/api/useCalendarsAggregate';
+import { useSetCalendarColor } from '@/features/world/pages/api/useCharacterMutations';
+import { usePersistedCalendarCursor } from '@/features/world/hooks/usePersistedCalendarCursor';
+import { resolveCalendarColor } from '@/shared/lib/calendarColor';
+import { GroupColorPicker } from '@/features/world/chat/components/GroupColorPicker';
 import type { GameEvent } from '@/shared/types';
 import { useDensity } from './CalendarPage/hooks/useDensity';
 import { EventDensityToggle } from './CalendarPage/components/EventDensityToggle';
@@ -56,6 +60,17 @@ export default function CalendarPage() {
   const { data: gameEvents = [] } = useAllWorldGameEvents(worldId);
   const { data: aggregate } = useCalendarsAggregate(worldId);
   const { data: configs = [] } = useCalendarConfigs(worldId);
+  const setColor = useSetCalendarColor(worldId);
+
+  // 9.2-followup — entita, jejíž barvu PJ právě edituje (swatch v sidebaru).
+  const [colorEntry, setColorEntry] = useState<{
+    id: string;
+    slug: string;
+    name: string;
+  } | null>(null);
+  const colorEntryRaw = colorEntry
+    ? (aggregate?.characters.find((c) => c.characterId === colorEntry.id)?.color ?? '')
+    : '';
 
   const defaultSlug = world?.defaultCalendarConfigSlug ?? 'gregorian';
   const [displaySlug, setDisplaySlug] = useState<string | null>(null);
@@ -102,7 +117,9 @@ export default function CalendarPage() {
     return fromAbsDay(toAbsDay(greg, GREGORIAN_DEFAULT_CONFIG), displayConfig);
   }, [displayConfig]);
 
-  const [cursor, setCursor] = useState(() => {
+  // 9.2-followup — pozice se pamatuje per svět v localStorage (přes refresh).
+  const STORAGE_CURSOR_KEY = worldId ? `calendar-cursor-${worldId}` : null;
+  const [cursor, setCursor] = usePersistedCalendarCursor(STORAGE_CURSOR_KEY, () => {
     const now = new Date();
     return { year: now.getFullYear(), monthIndex: now.getMonth() };
   });
@@ -147,7 +164,7 @@ export default function CalendarPage() {
           title: `${ev.name}: ${ev.title}`,
           date: displayDate,
           endDate: displayEnd,
-          color: ev.color,
+          color: resolveCalendarColor(ev.characterId, ev.color),
           origin: { kind: 'character', raw: ev },
         });
       }
@@ -322,6 +339,14 @@ export default function CalendarPage() {
     });
   }
 
+  const handleEntityColorClick = useCallback(
+    (entry: { id: string; slug?: string; name: string }) => {
+      if (!entry.slug) return; // gameEvents nemají kalendář k obarvení
+      setColorEntry({ id: entry.id, slug: entry.slug, name: entry.name });
+    },
+    [],
+  );
+
   const toggleEntity = useCallback((entityId: string) => {
     setHiddenEntities((prev) => {
       const next = new Set(prev);
@@ -373,6 +398,7 @@ export default function CalendarPage() {
               index={entityIndex}
               hiddenEntities={hiddenEntities}
               onToggleEntity={toggleEntity}
+              onEntityColorClick={handleEntityColorClick}
               onHideAll={handleHideAll}
               onReset={handleResetFilter}
               expandedGroups={expandedGroups}
@@ -568,6 +594,26 @@ export default function CalendarPage() {
           />
         );
       })()}
+
+      {colorEntry && (
+        <Modal
+          open
+          onClose={() => setColorEntry(null)}
+          title={`Barva v kalendáři — ${colorEntry.name}`}
+          size="sm"
+        >
+          <p className={s.colorHint}>
+            Vyber barvu této entity, nebo „Auto" pro automatické přiřazení podle názvu.
+          </p>
+          <GroupColorPicker
+            value={colorEntryRaw}
+            onChange={(slot) => {
+              setColor.mutate({ slug: colorEntry.slug, color: slot ?? '' });
+              setColorEntry(null);
+            }}
+          />
+        </Modal>
+      )}
     </article>
   );
 }

@@ -161,7 +161,8 @@ function CalendarCellImpl({
                 className={chipClasses}
                 style={{
                   ['--chip-color' as string]: ev.color,
-                  ['--chip-bg' as string]: `${ev.color}24`,
+                  // color-mix → funguje s var(--chat-group-N) i HEX.
+                  ['--chip-bg' as string]: `color-mix(in srgb, ${ev.color} 14%, transparent)`,
                 }}
                 onClick={() => onSelectEvent(ev.id)}
                 title={ev.title}

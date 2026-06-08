@@ -29,6 +29,9 @@ vi.mock('@/features/world/api/useCalendarsAggregate', () => ({
     isLoading: false,
   }),
 }));
+vi.mock('@/features/world/pages/api/useCharacterMutations', () => ({
+  useSetCalendarColor: () => ({ mutate: vi.fn(), isPending: false }),
+}));
 
 describe('CalendarPage (9.2d aggregate)', () => {
   beforeEach(() => {

@@ -414,6 +414,14 @@
   outline-offset: 1px;
 }
 
+/* 9.2-followup — hint nad color pickerem v modalu. */
+.colorHint {
+  margin: 0 0 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--theme-text-muted, rgb(var(--white-rgb) / 0.6));
+}
+
 @media (max-width: 900px) {
   .cell {
     min-height: 70px;

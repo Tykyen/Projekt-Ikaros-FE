@@ -194,9 +194,33 @@
 
 .entitySwatch {
   flex-shrink: 0;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
+  box-shadow: 0 0 0 1px rgb(var(--white-rgb) / 0.15);
+}
+
+/* 9.2-followup — klikatelný swatch (PJ změna barvy). Padding = hit area. */
+.entitySwatchBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  margin: -7px 2px -7px -3px; /* hit area bez zvětšení řádku */
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.entitySwatchBtn:hover .entitySwatch {
+  transform: scale(1.3);
+}
+
+.entitySwatchBtn:focus-visible {
+  outline: 2px solid var(--theme-accent, var(--chat-group-1));
+  outline-offset: 1px;
 }
 
 .entityName {
@@ -253,6 +277,10 @@
   .groupLabel,
   .entityLabel {
     padding: 8px 6px; /* touch target */
+  }
+  .entitySwatchBtn {
+    padding: 11px; /* větší tap target na mobilu */
+    margin: -11px 2px -11px -5px;
   }
   .bulkBtn {
     padding: 10px 12px;

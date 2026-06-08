@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { resolveCalendarColor } from '@/shared/lib/calendarColor';
 
 export type EntityGroup = 'gameEvents' | 'players' | 'npcs' | 'locations';
 
@@ -7,8 +8,10 @@ export interface EntityIndexEntry {
   id: string;
   /** Display name. */
   name: string;
-  /** Barva pro swatch. */
+  /** Vyřešená CSS barva pro swatch (auto-paleta nebo override). */
   color: string;
+  /** Slug pro color mutaci (jen character entity; gameEvents undefined). */
+  slug?: string;
   /** Group affiliation. */
   group: EntityGroup;
   /** Lowercased name pro fast search. */
@@ -28,7 +31,7 @@ export interface EntityIndex {
 interface InputEvent {
   origin:
     | { kind: 'gameEvent' }
-    | { kind: 'character'; raw: { characterId: string; name: string; color: string; kind: 'persona' | 'location'; isNpc: boolean } };
+    | { kind: 'character'; raw: { characterId: string; slug: string; name: string; color: string; kind: 'persona' | 'location'; isNpc: boolean } };
 }
 
 /**
@@ -74,7 +77,8 @@ export function useEntityIndex(events: ReadonlyArray<InputEvent>): EntityIndex {
         groups[group].set(ch.characterId, {
           id: ch.characterId,
           name: ch.name,
-          color: ch.color,
+          color: resolveCalendarColor(ch.characterId, ch.color),
+          slug: ch.slug,
           group,
           searchKey: ch.name.toLowerCase(),
           eventCount: 1,

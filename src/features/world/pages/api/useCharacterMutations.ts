@@ -206,6 +206,27 @@ export function useUpdateCharacterCalendar(worldId: string, slug: string) {
   });
 }
 
+/**
+ * 9.2 follow-up — color-only update kalendáře (PJ swatch v agregaci).
+ * BE `$set` je částečný → posíláme jen `{color}`, events zůstávají netknuté.
+ */
+export function useSetCalendarColor(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ slug, color }: { slug: string; color: string }) =>
+      api.put<CharacterCalendar>(
+        `/worlds/${worldId}/characters/${slug}/calendar`,
+        { color },
+      ),
+    onSuccess: (_calendar, { slug }) => {
+      void qc.invalidateQueries({ queryKey: ['calendars-aggregate', worldId] });
+      void qc.invalidateQueries({
+        queryKey: charactersQueryKey.subdoc(worldId, slug, 'calendar'),
+      });
+    },
+  });
+}
+
 export function useUpdateCharacterFinance(worldId: string, slug: string) {
   const qc = useQueryClient();
   return useMutation({

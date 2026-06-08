@@ -8,6 +8,8 @@ import {
 import type { CalendarConfig, FantasyDate } from '@/shared/lib/calendarEngine';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useCalendarConfigs } from '@/features/world/api/useCalendarConfigs';
+import { resolveCalendarColor } from '@/shared/lib/calendarColor';
+import { GroupColorPicker } from '@/features/world/chat/components/GroupColorPicker';
 import { useCharacterCalendar } from '../../api/useCharacterSubdocs';
 import { useUpdateCharacterCalendar } from '../../api/useCharacterMutations';
 import type {
@@ -64,6 +66,8 @@ export function CalendarTab({ slug, mode, onExitEdit, onDirtyChange }: Props) {
     return <p className={s.empty}>Kalendář se nepodařilo načíst.</p>;
   }
 
+  const cursorStorageKey = `calendar-cursor-${worldId}-${data.characterId}`;
+
   if (mode === 'edit') {
     return (
       <CalendarTabEdit
@@ -72,6 +76,7 @@ export function CalendarTab({ slug, mode, onExitEdit, onDirtyChange }: Props) {
         configs={configs}
         worldId={worldId}
         slug={slug}
+        cursorStorageKey={cursorStorageKey}
         onConfigChange={setActiveSlug}
         onExitEdit={onExitEdit}
         onDirtyChange={onDirtyChange}
@@ -83,6 +88,7 @@ export function CalendarTab({ slug, mode, onExitEdit, onDirtyChange }: Props) {
       calendar={data}
       config={activeConfig}
       configs={configs}
+      cursorStorageKey={cursorStorageKey}
       onConfigChange={setActiveSlug}
     />
   );
@@ -94,6 +100,7 @@ interface ViewProps {
   calendar: CharacterCalendar;
   config: CalendarConfig;
   configs: CalendarConfig[];
+  cursorStorageKey: string;
   onConfigChange: (slug: string) => void;
 }
 
@@ -101,6 +108,7 @@ function CalendarTabView({
   calendar,
   config,
   configs,
+  cursorStorageKey,
   onConfigChange,
 }: ViewProps) {
   const [detail, setDetail] = useState<CalendarEvent | null>(null);
@@ -109,8 +117,9 @@ function CalendarTabView({
       <CalendarTabGrid
         events={calendar.events}
         config={config}
-        color={calendar.color}
+        color={resolveCalendarColor(calendar.characterId, calendar.color)}
         availableConfigs={configs.length > 1 ? configs : undefined}
+        cursorStorageKey={cursorStorageKey}
         onConfigChange={onConfigChange}
         onEventClick={setDetail}
       />
@@ -150,6 +159,7 @@ interface EditProps {
   configs: CalendarConfig[];
   worldId: string;
   slug: string;
+  cursorStorageKey: string;
   onConfigChange: (slug: string) => void;
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
@@ -172,6 +182,7 @@ function CalendarTabEdit({
   configs,
   worldId,
   slug,
+  cursorStorageKey,
   onConfigChange,
   onExitEdit,
   onDirtyChange,
@@ -179,7 +190,8 @@ function CalendarTabEdit({
   const mutation = useUpdateCharacterCalendar(worldId, slug);
 
   const [events, setEvents] = useState<CalendarEvent[]>(() => calendar.events);
-  const [color, setColor] = useState(calendar.color || '#3b82f6');
+  // 9.2-followup — color = slot '0'..'11' / legacy HEX / '' (auto). GroupColorPicker.
+  const [color, setColor] = useState(calendar.color ?? '');
   const [defaultView, setDefaultView] = useState(
     calendar.displaySettings?.defaultView ?? 'month',
   );
@@ -266,18 +278,13 @@ function CalendarTabEdit({
         <h2 className={s.sectionTitle}>Nastavení</h2>
         <div className={ed.row}>
           <div className={ed.stack}>
-            <label className={ed.label} htmlFor="cal-color">
-              Barva kalendáře
-            </label>
-            <input
-              id="cal-color"
-              type="color"
+            <span className={ed.label}>Barva v kalendáři</span>
+            <GroupColorPicker
               value={color}
-              onChange={(e) => {
-                setColor(e.target.value);
+              onChange={(slot) => {
+                setColor(slot ?? '');
                 setDirty(true);
               }}
-              title="Barva platí pro všechny události této postavy/NPC/Lokace"
             />
           </div>
           <div className={`${ed.stack} ${ed.rowGrow}`}>
@@ -304,8 +311,9 @@ function CalendarTabEdit({
       <CalendarTabGrid
         events={events}
         config={config}
-        color={color}
+        color={resolveCalendarColor(calendar.characterId, color)}
         availableConfigs={configs.length > 1 ? configs : undefined}
+        cursorStorageKey={cursorStorageKey}
         onConfigChange={onConfigChange}
         onEventClick={openEdit}
         onDayClick={openCreate}

@@ -13,6 +13,8 @@ interface Props {
   index: EntityIndex;
   hiddenEntities: Set<string>;
   onToggleEntity: (id: string) => void;
+  /** 9.2-followup — PJ klik na swatch → editace barvy entity (jen character entity se slugem). */
+  onEntityColorClick: (entry: EntityIndexEntry) => void;
   onHideAll: () => void;
   onReset: () => void;
   expandedGroups: Set<EntityGroup>;
@@ -42,6 +44,7 @@ export function EntityFilterTree({
   index,
   hiddenEntities,
   onToggleEntity,
+  onEntityColorClick,
   onHideAll,
   onReset,
   expandedGroups,
@@ -167,11 +170,31 @@ export function EntityFilterTree({
                           onChange={() => onToggleEntity(e.id)}
                           aria-label={`${hiddenEntities.has(e.id) ? 'Zobrazit' : 'Skrýt'} ${e.name}`}
                         />
-                        <span
-                          className={s.entitySwatch}
-                          style={{ background: e.color }}
-                          aria-hidden
-                        />
+                        {e.slug ? (
+                          <button
+                            type="button"
+                            className={s.entitySwatchBtn}
+                            onClick={(ev) => {
+                              ev.preventDefault();
+                              ev.stopPropagation();
+                              onEntityColorClick(e);
+                            }}
+                            aria-label={`Změnit barvu — ${e.name}`}
+                            title="Změnit barvu entity"
+                          >
+                            <span
+                              className={s.entitySwatch}
+                              style={{ background: e.color }}
+                              aria-hidden
+                            />
+                          </button>
+                        ) : (
+                          <span
+                            className={s.entitySwatch}
+                            style={{ background: e.color }}
+                            aria-hidden
+                          />
+                        )}
                         <span className={s.entityName}>{e.name}</span>
                         <span className={s.entityCount} aria-label={`${e.eventCount} eventů`}>
                           {e.eventCount}
