@@ -1,7 +1,7 @@
 # F7 — Kalendáře (události entit) Matrix → Ikaros
 
 > Migrace světa **matrix**. Kontext: [`HANDOFF.md`](./HANDOFF.md), [`index.md`](./index.md). Paměť: `project_matrix_full_migration`.
-> Stav: **HOTOVO (impl) — čeká na commit BE repu + spuštění workflow (dry-run → ostře).** Build: 21 entit / 1205 ev. Mock test (idempotence/merge/rollback) prošel.
+> Stav: **✅ HOTOVO — živé v newmatrix (2026-06-08).** Naimportováno 1205 událostí na 21 entit (21/21 nalezeno, 0 chyb). Předkrok `fix-location-characters` vytvořil 497 lokacím možnost kalendáře (493 nových Characterů + 4 reuse).
 
 ## Klíčové zjištění (oprava HANDOFF předpokladu)
 HANDOFF čekal „mapovat staré kalendáře na Ikaros calendar engine" (presety měsíců/přestupných roků). **Realita:** kolekce `Calenders` **nejsou definice kalendářních systémů**, ale **události vázané na entitu** (`characterSlug` → `events[]`). Staré datumy jsou **gregoriánské ISO** (`2038-01-05T00:00:00.000Z`).
