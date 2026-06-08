@@ -20,6 +20,7 @@ import { ObrazovkaLayout } from './layouts/ObrazovkaLayout';
 import { PostavaLayout } from './layouts/PostavaLayout';
 import { RulebookHub } from './layouts/RulebookHub';
 import { useBrokenLinks } from './hooks/useBrokenLinks';
+import { useAutoLink } from './hooks/useAutoLink';
 import { useInlineImageLightbox } from './hooks/useInlineImageLightbox';
 import {
   useKeyboardShortcut,
@@ -84,6 +85,10 @@ export function PageViewer({ page }: Props) {
     }, 50);
     return () => clearTimeout(t);
   }, [page.slug]);
+
+  // F5 (migrace) — auto-link zmínek entit (běží před broken-links, který pak
+  // vloženým odkazům dodá SPA navigaci)
+  useAutoLink(containerRef, worldId, worldSlug, page.slug, page.content);
 
   // 7.1d — broken-link detekce
   useBrokenLinks(containerRef, worldId, worldSlug, page.content);
