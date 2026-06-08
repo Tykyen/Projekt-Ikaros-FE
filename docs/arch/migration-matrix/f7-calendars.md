@@ -86,6 +86,26 @@ Per entry `{slug, events}`:
 - `displaySettings`, `color` per entita (necháme default; PJ si doladí v UI).
 - `test` kalendář, prázdné kalendáře, placeholder events.
 
-## Otevřené body (vyřeší dry-run, ne blokující)
-1. worldId typ v `characters` — viz výše.
-2. Entita bez Character v prod DB → workflow ji jen nahlásí (skip), dořeší se ručně.
+## Dodatek — zjištění z dry-run (2026-06-08)
+Dry-run odhalil 2 věci (worldId je **string** `6d61…`, párování OK):
+
+**1. Slug-drift (3 entity)** — staré `Calenders` mají krátký slug, produkční Page přejmenovaná:
+| starý | produkční | typ |
+|---|---|---|
+| john | **john-willscar** | NPC |
+| kraven | **pumi-stin** | PC (Pumí stín) |
+| mingguo | **li-mingguo** | PC |
+
+→ `ALIAS` mapa v `f7-build.mjs` (přemapuje při buildu). Workflow pak najde přes Page.characterRef.
+
+**2. Lokace bez kalendáře (oprava F4)** — `type:Lokace` celkem **497, z toho 497 bez `characterRef`**. Žádná lokace neměla možnost kalendáře (F4 jim nevytvořila lokační Character). PJ požadavek: všechny lokace mají mít kalendář.
+
+→ **Nový předkrok `fix-location-characters.yml`** (3 režimy): pro každou Page `type:Lokace` bez characterRef vytvoří Character `{kind:'location', isNpc:false}` + `Page.characterRef` + prázdný `character_calendars`. Existující Character se stejným slug → reuse (ne duplikát). Markery `_mig:'f7loc'` (chars+calendars) + `_migF7LocRef` (pages). Idempotentní, rollback maže f7loc + odpojí characterRef.
+
+## Pořadí spuštění (POVINNÉ)
+1. **`fix-location-characters`** dry-run → import (confirm IMPORT). Vytvoří 497 lokačním stránkám možnost kalendáře.
+2. **`import-matrix-calendars`** dry-run → import. Teď už 7 zemí má characterRef → kalendáře se naimportují (mělo by být `nalezeno: 21, nenalezeno: 0`).
+
+## Otevřené body
+1. ~~worldId typ~~ → ověřeno string.
+2. `Page.type` má i `"Ostatni"` (45) vedle `"Ostatní"` (1035) — diakritický drift, **mimo F7** (zapsáno do dluhů).
