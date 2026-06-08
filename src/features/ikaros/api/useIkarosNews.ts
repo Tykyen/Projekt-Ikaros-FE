@@ -46,12 +46,12 @@ export function useIkarosNewsList(params: ListParams) {
   return useQuery({
     queryKey: [...NEWS_KEY, 'list', params],
     queryFn: () =>
+      // RAW params — api.get sám obaluje do {params}. Vnořené {params} by se
+      // neodeslalo (scope/limit/offset by BE ignoroval).
       api.get<IkarosNews[]>('/IkarosNews', {
-        params: {
-          scope: params.scope,
-          limit: params.limit,
-          offset: params.offset,
-        },
+        scope: params.scope,
+        limit: params.limit,
+        offset: params.offset,
       }),
     placeholderData: [],
   });
@@ -66,7 +66,7 @@ export function useIkarosNewsCount(scope: IkarosNewsScope, enabled = true) {
   return useQuery({
     queryKey: [...NEWS_KEY, 'count', scope],
     queryFn: () =>
-      api.get<{ total: number }>('/IkarosNews/count', { params: { scope } }),
+      api.get<{ total: number }>('/IkarosNews/count', { scope }),
     enabled,
   });
 }

@@ -39,8 +39,12 @@ describe('useWorldNewsList', () => {
       { wrapper: makeWrapper() },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    // RAW params (ne {params}) — api.get sám obaluje; jinak worldId leakne všechny světy.
     expect(api.get).toHaveBeenCalledWith('/world-news', {
-      params: { worldId: 'w1', scope: 'archived', limit: 10, offset: 20 },
+      worldId: 'w1',
+      scope: 'archived',
+      limit: 10,
+      offset: 20,
     });
   });
 });
@@ -54,7 +58,8 @@ describe('useWorldNewsCount', () => {
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/world-news/count', {
-      params: { worldId: 'w1', scope: 'active' },
+      worldId: 'w1',
+      scope: 'active',
     });
   });
 

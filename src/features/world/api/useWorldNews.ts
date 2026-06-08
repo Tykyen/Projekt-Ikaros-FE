@@ -10,9 +10,9 @@ export function useWorldNews(worldId: string, limit = 20) {
   return useQuery({
     queryKey: ['world-news', worldId],
     queryFn: () =>
-      api.get<WorldNewsItem[]>('/world-news', {
-        params: { worldId, limit },
-      }),
+      // api.get obaluje 2. arg do {params} — předáváme RAW (ne {params}),
+      // jinak worldId skončí jako ?params[worldId] a BE ho nevidí → leak všech světů.
+      api.get<WorldNewsItem[]>('/world-news', { worldId, limit }),
     enabled: !!worldId,
     staleTime: 60_000,
   });
@@ -34,12 +34,10 @@ export function useWorldNewsList(params: WorldNewsListParams) {
     queryKey: ['world-news', params.worldId, 'list', params],
     queryFn: () =>
       api.get<WorldNewsItem[]>('/world-news', {
-        params: {
-          worldId: params.worldId,
-          scope: params.scope,
-          limit: params.limit,
-          offset: params.offset,
-        },
+        worldId: params.worldId,
+        scope: params.scope,
+        limit: params.limit,
+        offset: params.offset,
       }),
     enabled: !!params.worldId,
     placeholderData: [],
@@ -58,9 +56,7 @@ export function useWorldNewsCount(
   return useQuery({
     queryKey: ['world-news', worldId, 'count', scope],
     queryFn: () =>
-      api.get<{ total: number }>('/world-news/count', {
-        params: { worldId, scope },
-      }),
+      api.get<{ total: number }>('/world-news/count', { worldId, scope }),
     enabled: enabled && !!worldId,
   });
 }
