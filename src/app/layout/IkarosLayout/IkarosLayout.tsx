@@ -165,7 +165,14 @@ type SidebarWorld = {
   slug: string;
   name: string;
   isPJ: boolean;
+  /** ISO — pro řazení „nejnovější vytvořené první". */
+  createdAt: string;
 };
+
+/** Seřadí světy podle data vytvoření, nejnovější první (ISO string desc). */
+function byNewest(a: SidebarWorld, b: SidebarWorld): number {
+  return b.createdAt.localeCompare(a.createdAt);
+}
 
 function SidebarContent({
   isAuthenticated,
@@ -177,14 +184,15 @@ function SidebarContent({
   // Levý panel = objevování: poslední vytvořené veřejné světy (public/open),
   // stejně pro anon i přihlášené. Osobní „Moje světy" žijí v pravém panelu.
   const publicWorldsQuery = usePublicWorlds();
-  const worlds: SidebarWorld[] | undefined = publicWorldsQuery.data?.map(
-    (w) => ({
+  const worlds: SidebarWorld[] | undefined = publicWorldsQuery.data
+    ?.map((w) => ({
       id: w.id,
       slug: w.slug,
       name: w.name,
       isPJ: false,
-    }),
-  );
+      createdAt: w.createdAt,
+    }))
+    .sort(byNewest);
   // 4.2c §4 — počet přítomných per místnost (REST seed + WS živá aktualizace).
   const roomCounts = useRoomPresenceCounts();
   // D-069 — nadpis sekce „Chat" ukazuje počet lidí přítomných v chatu
@@ -383,14 +391,15 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
     isLoading: worldsLoading,
     isError: worldsError,
   } = useMyWorlds();
-  const worlds: SidebarWorld[] | undefined = myWorlds?.map(
-    ({ world, membership }) => ({
+  const worlds: SidebarWorld[] | undefined = myWorlds
+    ?.map(({ world, membership }) => ({
       id: world.id,
       slug: world.slug,
       name: world.name,
       isPJ: membership.role === WorldRole.PJ,
-    }),
-  );
+      createdAt: world.createdAt,
+    }))
+    .sort(byNewest);
   const isAdmin =
     currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
   const { data: pendingCount } = usePendingActionsCount(!!currentUser);
