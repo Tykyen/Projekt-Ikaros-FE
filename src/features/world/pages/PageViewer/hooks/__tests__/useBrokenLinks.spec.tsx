@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import { useRef } from 'react';
 import { useBrokenLinks } from '../useBrokenLinks';
 
@@ -94,5 +94,19 @@ describe('useBrokenLinks — F5 world-scope rewrite', () => {
     const a = renderHtml('<a href="svedsko">Švédsko</a>');
     fireEvent.click(a, { ctrlKey: true });
     expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('odkaz přidaný do DOM až po renderu (async obsah) se přepíše přes MutationObserver', async () => {
+    // simuluje TipTap/async render: container je při běhu efektu prázdný,
+    // odkaz se objeví později → bez observeru by zůstal nepřepsaný (404 po refreshi).
+    const { container } = render(<Harness html="<p>zatím bez odkazů</p>" />);
+    const div = container.querySelector('div') as HTMLDivElement;
+    const a = document.createElement('a');
+    a.setAttribute('href', 'svedsko');
+    a.textContent = 'Švédsko';
+    div.appendChild(a);
+    await waitFor(() =>
+      expect(a.getAttribute('href')).toBe('/svet/matrix/svedsko'),
+    );
   });
 });

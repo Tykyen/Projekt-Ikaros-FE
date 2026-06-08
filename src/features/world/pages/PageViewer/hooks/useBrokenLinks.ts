@@ -13,8 +13,13 @@ import { usePagesDirectory } from '../../api/usePagesDirectory';
  *     které jednosvětový systém ukládal bez world prefixu → jinak 404.
  *   - **rozbitý** (slug neexistuje) → `.brokenLink` class + blokace kliku.
  *
- * Spouští se znovu při změně obsahu nebo dat directory (collapsed sekce
- * mohou expandovat po user actionu — proto deps zahrnují i `revision`).
+ * ⚠️ Obsah (RichTextEditor/TipTap, datová tabulka) se do DOM vykresluje
+ * ASYNCHRONNĚ — useEffect proto často proběhne dřív, než tam odkazy jsou
+ * (typicky při tvrdém načtení / F5). Bez ošetření je výsledek nahodilý
+ * ("u Caela funguje, po refreshi ne"). Řešení: po initial průchodu hook
+ * sleduje container `MutationObserver`em a přepis spustí znovu, jakmile se
+ * obsah objeví/změní. Přepis mění jen atributy/classy/listenery (ne childList)
+ * → neretriggeruje observer → žádná smyčka.
  *
  * Detekuje 3 tvary interních linků:
  *   1. `/svet/<worldSlug>/<slug>` — absolutní cesta z URL
@@ -22,8 +27,7 @@ import { usePagesDirectory } from '../../api/usePagesDirectory';
  *   3. `<slug>` — holý slug (RichTextEditor TipTap link extension / migrace)
  *
  * Skipuje navigační routy (breadcrumb, nav menu) — viz `WORLD_RESERVED` /
- * vícesegmentové targety. Bez toho hook křičel „neexistuje" i na `Stránky`
- * nebo `Matrix` v breadcrumbu.
+ * vícesegmentové targety.
  */
 
 /** Reserved world-level slugy = routy, ne page slugy. */
@@ -82,14 +86,14 @@ export function useBrokenLinks(
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
     if (directory.length === 0) return;
 
     const slugSet = new Set(directory.map((d) => d.slug));
-    const links = containerRef.current.querySelectorAll('a[href]');
     const worldPrefix = `/svet/${worldSlug}/`;
 
-    links.forEach((linkEl) => {
+    const processLink = (linkEl: Element): void => {
       const href = linkEl.getAttribute('href') ?? '';
       if (!href || /^(https?:|mailto:|tel:|#)/i.test(href)) return;
 
@@ -108,8 +112,7 @@ export function useBrokenLinks(
       const suffix = m?.[2] ?? '';
 
       if (!target) return;
-      // Vícesegmentové cesty (admin/stranky, postava/abc, …) jsou navigační
-      // routy, ne wikilinky. Skip.
+      // Vícesegmentové cesty (admin/stranky, postava/abc, …) = navigační routy.
       if (target.includes('/')) return;
       // Rezervované world routy (stranky, hraci, chat, …) — taky navigace.
       if (WORLD_RESERVED.has(target)) return;
@@ -146,20 +149,36 @@ export function useBrokenLinks(
         // ── interní rozbitý → broken (beze změny chování) ──
         anchor.classList.add('brokenLink');
         unbindNav(anchor);
-        // Bez native `title` atributu — způsoboval, že browser tooltip
-        // přesahoval viewport, dočasně vyvolával horizontální scrollbar
-        // a layout sidebaru se cukal. Vizuální cue (červená + dotted
-        // underline) stačí.
         anchor.removeAttribute('title');
         // Blokace kliku — jinak browser zkusí navigovat na relativní href
         // (např. `londyn`), React Router skočí na 404 a layout se zacuká.
-        // Idempotent přes dataset flag, ať se handler nezakládá vícekrát.
         if (!anchor.dataset.brokenBound) {
           anchor.dataset.brokenBound = '1';
           anchor.__brokenHandler = (e: Event) => e.preventDefault();
           anchor.addEventListener('click', anchor.__brokenHandler);
         }
       }
-    });
+    };
+
+    const processAll = (): void => {
+      container.querySelectorAll('a[href]').forEach(processLink);
+    };
+
+    // Initial průchod + sledování async-renderovaného obsahu.
+    processAll();
+    const observer = new MutationObserver(() => processAll());
+    observer.observe(container, { childList: true, subtree: true });
+
+    // Back/forward přes bfcache obnoví zmražený DOM bez re-runu efektu →
+    // přepis spustíme znovu při `pageshow` (persisted = obnoveno z cache).
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) processAll();
+    };
+    window.addEventListener('pageshow', onPageShow);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('pageshow', onPageShow);
+    };
   }, [containerRef, directory, worldSlug, revision, navigate]);
 }
