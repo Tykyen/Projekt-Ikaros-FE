@@ -350,6 +350,9 @@ export interface World {
   magicTraditions?: string[];
   ownerId: string;
   isActive: boolean;
+  /** Soft-delete: !=null = svět je v 30denním okně pro obnovu (Admin). */
+  deletedAt?: string | null;
+  deletedBy?: string | null;
   accessMode: 'public' | 'private' | 'open' | 'closed';
   playerCount: number;
   /** 2.2 — volitelná max kapacita pro sort "volná místa" + 2.3 wizard. */

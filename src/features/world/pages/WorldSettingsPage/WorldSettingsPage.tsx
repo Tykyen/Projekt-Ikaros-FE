@@ -14,6 +14,7 @@ import {
   Calendar,
   BookText,
   Navigation,
+  Trash2,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -36,6 +37,7 @@ const CharacterTabsVisibilityTab = lazy(
   () => import('./tabs/CharacterTabsVisibilityTab'),
 );
 const HeadlineLinkTab = lazy(() => import('./tabs/HeadlineLinkTab'));
+const DeleteWorldTab = lazy(() => import('./tabs/DeleteWorldTab'));
 // Přesun z world nav (2026-05-25): admin nástroje do Nastavení tabů.
 const CalendarConfigsPage = lazy(
   () => import('@/features/world/pages/CalendarConfigsPage/CalendarConfigsPage'),
@@ -146,6 +148,14 @@ const TABS: SettingsTab[] = [
     icon: <DoorOpen size={18} />,
     minRole: WorldRole.Ctenar,
     render: () => <MembershipTab />,
+  },
+  {
+    // Soft-delete světa (PJ vlastník + Admin). Obnova do 30 dní jen Admin.
+    id: 'smazat',
+    label: 'Smazat svět',
+    icon: <Trash2 size={18} />,
+    minRole: WorldRole.PJ,
+    render: () => <DeleteWorldTab />,
   },
 ];
 
