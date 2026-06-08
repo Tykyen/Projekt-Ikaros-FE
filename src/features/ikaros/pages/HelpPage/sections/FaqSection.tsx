@@ -263,6 +263,25 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Smazal jsem svět (nebo ho chci zpět) — jde to vrátit?',
+    a: (
+      <>
+        <p>
+          Ano. Smazání světa je <strong>vratné po dobu 30 dní</strong>. Svět zmizí
+          z provozu, ale všechna data (stránky, postavy, chat, mapy) zůstanou
+          uložená.
+        </p>
+        <p>
+          Obnovit svět může <strong>jen administrátor</strong> (v Administraci →
+          Smazané světy). Pokud jsi svět smazal omylem nebo ho chceš převzít,
+          <strong> napiš administrátorovi</strong> co nejdřív — po 30 dnech se svět
+          i s daty smaže natrvalo a vrátit už nepůjde.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Má svět vlastní vzhled a můžu si ho upravit?',
     a: (
       <>

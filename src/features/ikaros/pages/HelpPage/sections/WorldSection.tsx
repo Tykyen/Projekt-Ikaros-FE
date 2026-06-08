@@ -372,6 +372,13 @@ export function WorldSection() {
             seznamem eventů dne a filtrovací strom v sidebaru. V buňkách fáze měsíců a
             barva sezóny. Hráč vidí jen veřejné zdroje.
           </p>
+          <p>
+            Každá postava, NPC i lokace má v kalendáři <strong>vlastní barvu</strong> —
+            automaticky přidělenou, ale nastavitelnou: PJ klikem na barevný puntík u
+            entity ve filtru, hráč u své postavy v záložce Kalendář. Kalendář si také
+            pamatuje, na kterém měsíci jsi naposledy skončil, a vrátí tě tam i po obnovení
+            stránky.
+          </p>
           <ScreenshotSlot media="svet.kalendar" />
         </Tool>
         <Tool icon={<CalendarDays size={16} />} title="Správa kalendářů" audience={{ kind: 'pj', label: 'Jen PJ' }} accent="warning">
@@ -455,8 +462,17 @@ export function WorldSection() {
             Konfigurace světa v tabech: Základní info (název, systém, viditelnost hodů),
             Vzhled (motiv, vlastní pozadí), Členové (skupiny + barvy, role), AKJ úrovně,
             Postavy &amp; NPC (matice typ × tab), Šablony stránek, Přístup světa,
-            Členství (odejít / předat svět). Tab „Můj vzhled" = osobní override motivu.
+            Členství (odejít / předat svět), Smazat svět. Tab „Můj vzhled" = osobní
+            override motivu.
           </p>
+          <CalloutBox variant="pozor" title="Smazání světa je vratné (30 dní)">
+            Svět smaže PJ (vlastník) nebo administrátor přes tab <strong>Smazat
+            svět</strong>. Svět zmizí z provozu, ale <strong>data zůstanou</strong>.
+            Obnovit ho může <strong>do 30 dní jen administrátor</strong> — pokud ho
+            chceš zpět, napiš mu. Po 30 dnech se svět i s daty <strong>trvale
+            smaže</strong>. (Stejná pojistka platí, když je smazán účet PJ — jeho
+            světy nezmizí hned.)
+          </CalloutBox>
         </Tool>
         <Tool icon={<Settings size={16} />} title="Hlavní lišta světa" audience={{ kind: 'pj', label: 'Jen PJ' }} accent="pjasst">
           <p>
