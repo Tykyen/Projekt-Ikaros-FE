@@ -57,16 +57,16 @@ jobs:
 
       - name: Build images
         run: |
-          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
             set -e
             cd ${{ env.DEPLOY_PATH }}
             docker image prune -f
-            docker compose build --no-cache
+            docker compose build
           '
 
       - name: Deploy
         run: |
-          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
             set -e
             cd ${{ env.DEPLOY_PATH }}
             docker compose down --remove-orphans || true
