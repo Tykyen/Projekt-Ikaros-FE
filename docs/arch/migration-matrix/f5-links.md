@@ -60,7 +60,7 @@ Audit obsahu (`C:\tmp\f5-audit.js`): **14 745 odkazů, 531 broken (3,7 %)**. Roz
 - **~157 long-tail** (skloňování, překlepy, nevzniklé) → ponechat broken (červené = „doplň stránku").
 
 **Mapa** (`C:\tmp\f5-links-gen.js` → ověří new existuje + old je broken): 14 mapování / 76 odkazů, `migration/f5-links.json.gz`.
-**Workflow** `fix-matrix-links.yml` (BE): regex `("href":"/?)<old>"` → `$1<new>"` v `Page.content` (filtr `_mig`), zachová `/` prefix, kratší slug netknut (uzavírací uvozovka). Idempotent, záloha `_migF5Before`, flag `_migF5Links`, rollback. Mock test 4/4 OK.
+**Workflow** `fix-matrix-links.yml` (BE): regex `(href="/?)<old>"` → `$1<new>"` v `Page.content` (filtr `_mig`), zachová `/` prefix, kratší slug netknut (uzavírací uvozovka). Idempotent, záloha `_migF5Before`, flag `_migF5Links`, rollback. Mock test na konvertovaném HTML: 48 stránek / 76 odkazů. ⚠️ **PAST:** živý `content` je **HTML** (po opravě #2 fix-content-html), NE TipTap JSON jako lokální `.json` mocky — regex proto cílí HTML atribut `href="..."`, ne `"href":"..."`. První dry-run vrátil 0, než se to opravilo.
 **Vynecháno** (zůstává broken): `eva` (2 Evy — ambiguita), `juan-romano-jr` (junior≠senior), `magie-tela`/`polsko-litevske-uzemi` (jiné entity).
 
 > 💡 Slug-mismatch se generuje ze `slugify(jméno postavy)` == broken slug → jistota, že je to táž postava (ne náhodná prefix-shoda jako `magie-tela`→`magie`).
