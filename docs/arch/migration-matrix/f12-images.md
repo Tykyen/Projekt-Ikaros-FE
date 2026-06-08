@@ -1,60 +1,92 @@
-# F12 — Rehost obrázků GDrive → Cloudinary (PODKLADY pro novou diskusi)
+# F12 — Rehost obrázků GDrive → Cloudinary (webp)
 
-> Brief pro novou konverzaci. Kontext: [`HANDOFF.md`](./HANDOFF.md), [`index.md`](./index.md). Paměť: `project_matrix_full_migration`.
-> Stav: **NEZAČATO — sběr podkladů hotový, čeká na diskusi → spec → souhlas → impl.**
+> Migrace světa **matrix**. Kontext: [`HANDOFF.md`](./HANDOFF.md), [`index.md`](./index.md). Paměť: `project_matrix_full_migration`.
+> Stav: **SPEC SCHVÁLENA — čeká na impl plán → kód.**
 
-## Proč to řešíme
-Starý Matrix ukládal obrázky postav/stránek jako **Google Drive file ID** v poli `Page.imageUrl`. Ikaros FE ho používá přímo jako `<img src>` (žádná GDrive konverze v kódu — ověřeno, `resolveImage` util neexistuje). → **obrázky jsou teď rozbité** (GDrive ID není platná URL). F12 je **oprava**, ne optimalizace.
+## Cíl
+Opravit rozbité obrázky: starý Matrix uložil do `Page.imageUrl` **Google Drive file ID** (33 znaků), Ikaros FE ho cpe rovnou do `<img src>` → rozbité. F12 nahradí ID veřejnou **Cloudinary webp URL**. Oprava, ne optimalizace.
 
-## Rozsah (audit migračních dat, `C:\tmp\f4*-*.json`)
-| Kde | Počet | Poznámka |
+## Rozsah — ⚠️ z RAW zdroje, ne z transformovaných f4*
+Podklady (revize <2026-06-08) počítaly rozsah z **poškozených transformovaných dat** (`f4a/f4b`), kde krok F4 u 236 map/nákresů zahodil GDrive ID a zapsal string `"true"`. **Zdroj pravdy pro F12 = raw export.**
+
+| Zdroj | Počet | Poznámka |
 |---|---|---|
-| `Page.imageUrl` = GDrive ID | **2389** | všechny **délka 33 znaků** (konzistentní), vzorek `1KTA515jElXiqm6U2nE18SLgX7qKpz_42` |
-| `Page.imageUrl` = `true` (boolean!) | 236 | artefakt, NE obrázek — ⚠️ vyřešit (ignorovat? mají obrázek jinde?) |
-| `Page.imageUrl` prázdné | 113 | bez obrázku |
-| `Page.bigImage` | 0 reálných | jen prázdné/boolean — neřešit |
-| inline `<img>` v `content` | 0 | TipTap obsah nemá vložené obrázky |
-| `f3-characters` customData obrázky | 0 | postavy nemají obrázek v subdocu |
-| `worldsettings.groupImages` (znaky frakcí) | 3 | Evropani/Lumíci/MI6 = GDrive ID (z F-membership, viz handoff) |
+| `imageUrl` = GDrive ID (raw) | **3402 stránek** | **3338 unikátních ID** (64 sdílených) |
+| z toho dříve „rozbité na `true`" | 236 | raw má platné ID — opraví se jako každé jiné |
+| duplicitní slug | 1 (`staty-espada`) | párovat přes gdriveId, ne slug |
+| znaky frakcí (`worldsettings.groupImages`) | 3 | Evropani / Lumíci / MI6 |
+| **CELKEM k rehostu** | **~3341** | sedí k ~4200 souborů na GDrive (zbytek = avatary/staré verze/nevyužité) |
 
-**Hlavní práce: 2389 imageUrl + 3 znaky frakcí = ~2392 obrázků k rehostu.**
+**Mimo rozsah:** `galleryImages` (vždy prázdné), `bigImage` (jen boolean flag), inline v `content`/`table` (0 — jen odkazy-slugy), avatary uživatelů, přesun map do Atlasu (separátní feature).
 
-## Zdroj — Google Drive
-- Formát: 33-znakové file ID (`[A-Za-z0-9_-]`).
-- Veřejná URL (pokud sdílené): `https://drive.google.com/uc?export=download&id=<ID>` nebo `https://drive.google.com/uc?id=<ID>`.
-- ⚠️ **KLÍČOVÁ OTÁZKA: jsou obrázky veřejně sdílené?** Pokud ano → Cloudinary umí upload přímo z URL. Pokud ne → nutný GDrive API + service account (složitější). **Nutno ověřit na vzorku.**
+## Zdroj pravdy
+`C:\tmp\matrix-pages-raw.json` (3540 stránek) → pole `slug` + `imageUrl`. Vyextrahovaný čistý seznam: `C:\tmp\f12-pages.json` = `[{slug, gdriveId}]` (3402).
+⚠️ **GDrive ID = stejný tvar jako slug** (33 znaků `[A-Za-z0-9_-]`) → ID brát **jen z hodnoty pole `imageUrl`**, nikdy regexem přes dokument.
 
-## Cíl — Cloudinary (jak Ikaros hostí, `backend/.../upload/upload.service.ts`)
-- `.env CLOUDINARY_URL` = `cloudinary://key:secret@cloud`. SDK `cloudinary.uploader`.
-- Upload vrací `secure_url` (`https://res.cloudinary.com/<cloud>/...`) → uloží se do `imageUrl`, + `public_id`.
-- 🔴 **POVINNĚ webp** — bez konverze budou obrázky (originály z GDrive: JPG/PNG) **obrovské** = pomalé načítání + drahý traffic. Cloudinary konvertuje při uploadu: `format: 'webp'`. **Nedělat rehost bez webp.** Zvážit i `quality: 'auto'` a horní limit šířky (resize) — viz otázka #3.
-- Avatary už vzor mají: `format:'webp'` + `{crop:'fill', gravity:'auto'}` (viz `uploadUserImage`).
-- **Cloudinary umí upload z URL přímo:** `cloudinary.uploader.upload('https://drive.google.com/uc?id=<ID>', {folder, format:'webp', quality:'auto'})` → Cloudinary si obrázek stáhne, zkonvertuje na webp a vrátí `secure_url`. Odpadá lokální stahování i konverze.
+## GDrive dostupnost — OVĚŘENO
+10/10 vzorků = `HTTP 200` + `image/png` (20 KB–3.3 MB). Obrázky veřejně sdílené → Cloudinary `upload(url)` si je stáhne sám. **Žádný GDrive API / service account.**
+- URL: `https://drive.google.com/uc?export=download&id=<ID>`
 
-## Mechanika — ⚠️ JINÁ než dosavadní workflowy
-Dosavadní migrace = mongosh přes SSH (jen DB). **F12 potřebuje Node + cloudinary SDK + síť na GDrive/Cloudinary** — mongosh to neumí. Návrh:
-- **GitHub Action s Node krokem**: pro každý GDrive ID → `cloudinary.uploader.upload(driveUrl, {folder:'matrix/<...>', format:'webp'})` → posbírat mapu `{oldGDriveId → secure_url}` → mongosh update `Page.imageUrl`.
-- Nebo **lokální Node skript** (má cloudinary creds z .env) → vyprodukuje mapu → workflow aplikuje na DB (jako F5 links: gz mapa + mongosh replace).
-- **Idempotence**: tag `_migF12` / přeskočit už-Cloudinary URL. **Rollback**: záloha původního imageUrl (`_migImgBefore`).
+## Mechanika — 2 fáze (vzor F5: lokální skript → workflow)
 
-## Otevřené otázky k diskusi
-1. **Veřejnost GDrive** (viz výše) — upload z URL vs GDrive API. **Nejdřív otestovat 1 vzorek.**
-2. **Folder strategie** v Cloudinary: `matrix/pages/<slug>`? jeden folder? deterministický `public_id` (idempotence + cleanup)?
-3. **webp = DÁNO** (povinné, viz výše). K rozhodnutí už jen: `quality:'auto'`? horní limit šířky (resize na např. 1200px)? Jaké rozměry karty reálně potřebují (avatar vs. velký obrázek)?
-4. **236× `imageUrl=true`** — co s tím (vyčistit na prázdné? mají obrázek jinde?).
-5. **Mechanika** — GitHub Action Node krok vs lokální skript (kde běží cloudinary upload, kde jsou creds bezpečně).
-6. **Rate limity / čas** — 2389 uploadů z URL přes Cloudinary; dávkování, retry, timeout.
-7. **Mapy → Atlas** (handoff: „Vzhled/Mapa karty zůstávají; mapy→Atlas") — kde jsou mapové obrázky, souvisí s F12 nebo zvlášť? **Nutno dohledat** (zatím nenalezeny v page datech).
-8. **Znaky frakcí (3)** — rehostovat v rámci F12 (`worldsettings.groupImages`).
+### Fáze A — lokální Node skript `migration/f12-upload.mjs`
+- Creds z `backend/.env` (`CLOUDINARY_URL` → `new URL()` parse → `cloudinary.config({cloud_name,api_key,api_secret,secure:true})`, vzor [`upload.service.ts`](../../../../Projekt-ikaros/backend/src/modules/upload/upload.service.ts)).
+- Pro každé `{slug, gdriveId}` z `f12-pages.json`:
+  ```
+  cloudinary.uploader.upload('https://drive.google.com/uc?export=download&id=<ID>', {
+    folder: 'matrix/pages',
+    public_id: <gdriveId>,        // deterministický → idempotence + cleanup
+    overwrite: true,
+    format: 'webp',
+    quality: 'auto:good',
+    width: 4096, crop: 'limit',   // strop pro rodokmeny/mapy; běžné netknuté
+  })
+  ```
+- Concurrency **6**, retry **3×** s backoff, timeout **60 s**/kus.
+- **Resume:** průběžně appenduje výsledky → re-run přeskočí hotové (i přes `overwrite` šetří čas).
+- Výstup: `migration/f12-map.json` = `[{slug, gdriveId, secure_url, public_id, width, height}]` (+ `.gz`).
+- **3 znaky frakcí** zvlášť → `folder:'matrix/groups'`, public_id = gdriveId.
 
-## Závazná fakta / gotchas (z dosavadní migrace)
-- `worldId` v DB = string `"6d6174726978000000000001"` (ne slug, ne ObjectId-typ).
-- Server `content`/data = HTML (po opravě #2); obrázky jsou ale v `imageUrl` poli, ne v HTML.
-- Workflow: 3 režimy (dry-run/import/rollback), gz data v `migration/`, idempotent + tag, **commit+push já, spouští uživatel**.
-- FE deploy: bez `--no-cache`, nginx no-cache index (vyřešeno v F5).
-- ⚠️ Mongosh gotcha #3: logiku do IIFE. Mongosh neumí síť → upload musí proběhnout v Node kroku.
+### Fáze B — mongosh přes SSH (workflow `fix-matrix-images.yml`, 3 režimy)
+`dry-run` / `import` / `rollback`. Načte `f12-map.json`. Per Ikaros `page` (worldId `6d6174726978000000000001`):
+1. Urči `gdriveId`: validní 33-znak `page.imageUrl` → ten; jinak (`"true"` apod.) → lookup `slug → gdriveId` z mapy.
+2. `secure_url = map[gdriveId]`; chybí → log skip.
+3. Záloha `_migImgBefore = imageUrl` (jen poprvé, idempotent guard) → `imageUrl = secure_url`, `_migF12 = true`.
+- **Idempotence:** skip pokud `imageUrl` už cloudinary URL. **Rollback:** `imageUrl = _migImgBefore`.
+- Znaky frakcí: `worldsettings.groupImages.<frakce>` → secure_url z `matrix/groups` mapy.
+- Logika do IIFE (mongosh gotcha).
 
-## První akce v nové konverzaci
-1. **Otestovat veřejnost GDrive**: vzít 1 vzorek ID, zkusit `https://drive.google.com/uc?id=<ID>` + Cloudinary upload z URL. Podle výsledku zvolit cestu (URL vs GDrive API).
-2. Rozhodnout folder/public_id strategii + transformace.
-3. Spec → souhlas → impl plán → workflow + Node upload.
+## Transformace — rozhodnuto
+`format:'webp'` (povinné — originály PNG až 3.3 MB) + `quality:'auto:good'` (méně artefaktů na textu map/rodokmenů) + `width:4096, crop:'limit'` (ostré rodokmeny/mapy do 4K, běžné portréty `limit` nezvětší). Po nasazení lze konkrétnímu rodokmenu >4096 px dát výjimku.
+
+## Gotchas
+- ⚠️ mongosh neumí síť → upload **musí** v Node fázi A.
+- ⚠️ GDrive 429 při 3338 requestech ze stejného Cloudinary IP → pokryje retry.
+- ⚠️ `staty-espada` 2× v raw → ve fázi B párovat primárně přes gdriveId z `page.imageUrl`.
+- FE deploy: nginx no-cache index (vyřešeno F5); commit+push já, **spouští uživatel**.
+
+## Provedení fáze A (hotovo)
+- Síť: **`NODE_OPTIONS=--use-system-ca`** povinné (proxy s vlastní CA, jinak `UNABLE_TO_VERIFY_LEAF_SIGNATURE`).
+- Plný běh: **3339 obrázků** (3336 stránek + 3 frakce), 0 nevyřešených failů, ~21 min.
+- ⚠️ Cloudinary free **limit 10 MB** na upload z URL → 3 velké originály (11–15 MB) padly. **Fallback v skriptu:** GDrive thumbnail API `?sz=w2560` (extrém ak-47 přes `w1600`) → zmenšený náhled pod limit.
+- Úspora webp: 76–94 % (např. 2.8 MB → 323 KB).
+- Výstup: `migration/f12-map.json.gz` (167 KB).
+
+## Rozšíření za běhu (objeveno při nasazení)
+- **Rozsah z DB, ne z raw:** raw `matrix-pages-raw.json` (3402 stránek) ≠ produkční DB. Filtr fáze B cílí podle **tvaru `imageUrl`** (GDrive ID / "true"), ne `_mig` markeru (ten chytal jen základní pages). DB má 2441 matrix stránek s GDrive obrázkem.
+- **NOMAP 2. kolo:** 60 stránek mělo v DB GDrive ID mimo raw (NPC/PC/lokace) → vytaženo z DB (`NOMAP=` diag výpis) a doupploadováno (`--input`). Mapa 3339 → 3398.
+- **AKJ záložky:** `Page.akjTabs[].contentOverride.imageUrl` (811 tabů, 646 unik ID) — fáze B původně nesahala. Filtr rozšířen na `$or: [imageUrl, akjTabs.0]` (AKJ-only stub má `imageUrl` prázdné). Doupload 11 → mapa 3409.
+- **AKJ "true" záchrana:** 42 AKJ tabů mělo `imageUrl="true"` (bez ID). 10 zachráněno přes `slugify(název)` → stejnojmenná stránka (Zubní víly → zubni-vily).
+
+## Výsledek (nasazeno, fix HOTOVO)
+- **Stránky:** 2441 opraveno (jen `mapa-sveta` zbývá — `"true"` bez ID).
+- **AKJ:** 811 tabů + 10 "true" zachráněno; 32 zbývá (`"true"` lokační „Utajený archiv", bez ID).
+- **Frakce:** 3.
+- **K ručnímu úklidu (33):** seznam `migration/f12-zbyva-rucne.txt` (vč. `rodokmen-madregal`). `imageUrl="true"` bez GDrive ID nikde — buď dohledat ve starém Matrixu, nebo vyčistit na prázdné.
+
+## Roadmapa
+- [x] A: `migration/f12-upload.mjs` + běh → `f12-map.json.gz` (3409 obrázků)
+- [x] B: `migration/f12-images.js` + workflow `fix-matrix-images.yml` (stránky + AKJ + frakce)
+- [x] Znaky frakcí (3), NOMAP 2. kolo, AKJ záložky, AKJ-true záchrana
+- [x] **Nasazeno přes workflow `fix` — 2441 stránek + 821 AKJ tabů + 3 frakce**
+- [ ] (volitelně, uživatel ručně) 33 zbylých `"true"` — dohledat/vyčistit dle `f12-zbyva-rucne.txt`
