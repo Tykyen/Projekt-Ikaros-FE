@@ -60,7 +60,11 @@ Audit obsahu (`C:\tmp\f5-audit.js`): **14 745 odkazů, 531 broken (3,7 %)**. Roz
 - **~157 long-tail** (skloňování, překlepy, nevzniklé) → ponechat broken (červené = „doplň stránku").
 
 **Mapa** (`C:\tmp\f5-links-gen.js` → ověří new existuje + old je broken): 14 mapování / 76 odkazů, `migration/f5-links.json.gz`.
-**Workflow** `fix-matrix-links.yml` (BE): regex `(href="/?)<old>"` → `$1<new>"` v `Page.content` (filtr `_mig`), zachová `/` prefix, kratší slug netknut (uzavírací uvozovka). Idempotent, záloha `_migF5Before`, flag `_migF5Links`, rollback. Mock test na konvertovaném HTML: 48 stránek / 76 odkazů. ⚠️ **PAST:** živý `content` je **HTML** (po opravě #2 fix-content-html), NE TipTap JSON jako lokální `.json` mocky — regex proto cílí HTML atribut `href="..."`, ne `"href":"..."`. První dry-run vrátil 0, než se to opravilo.
+**Workflow** `fix-matrix-links.yml` + `migration/f5-fix.js` (BE): regex `(href="/?)<old>"` → `$1<new>"`, zachová `/` prefix, kratší slug netknut (uzavírací uvozovka). ⚠️ Mismatch odkazy jsou na **3 místech** — workflow opravuje všechna: `Page.content` (74), `Page.table` headers+values (~33, datové tabulky v sidebaru), `Page.akjTabs[].contentOverride.content` (~41, F4d záložky). Per-pole záloha (`_migF5Before`/`_migF5TableBefore`/`_migF5AkjBefore`) jen jednou → idempotentní i napříč běhy. Flag `_migF5Links`, rollback vrací vše. Mock: fix+idempotence+rollback OK.
+
+> ⚠️ **Dvě pasti, na které se přišlo až za běhu:**
+> 1. Živý `content` je **HTML** (po opravě #2), NE TipTap JSON jako lokální `.json` mocky → regex cílí atribut `href="..."`, ne `"href":"..."`. (První dry-run vrátil 0.)
+> 2. Odkazy nejsou jen v `content` — i v `table` a `akjTabs`. První běh (jen content) je minul. Vždy auditovat VŠECHNA pole nesoucí HTML.
 **Vynecháno** (zůstává broken): `eva` (2 Evy — ambiguita), `juan-romano-jr` (junior≠senior), `magie-tela`/`polsko-litevske-uzemi` (jiné entity).
 
 > 💡 Slug-mismatch se generuje ze `slugify(jméno postavy)` == broken slug → jistota, že je to táž postava (ne náhodná prefix-shoda jako `magie-tela`→`magie`).
