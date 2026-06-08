@@ -1,55 +1,71 @@
-# HANDOFF — Migrace Matrix → Ikaros (stav 2026-06-07)
+# HANDOFF — Migrace Matrix → Ikaros (stav 2026-06-08)
 
-> **Start here pro novou konverzaci.** Plný plán: [`index.md`](./index.md). Paměť: `project_matrix_full_migration.md`.
-> Přečti tenhle soubor + `index.md` celý, pak pokračuj fází podle „ZBÝVÁ".
+> **Start here pro novou konverzaci.** Plný plán: [`index.md`](./index.md). Dílčí specy: [`f4b2-pc-pages.md`](./f4b2-pc-pages.md), [`f4d-akj-tabs.md`](./f4d-akj-tabs.md). Paměť: `project_matrix_full_migration.md`.
+> Přečti tenhle soubor celý, pak pokračuj podle „🔴 KRITICKÉ" → „ZBÝVÁ".
 
 ## Co to je
 Jednorázová **transformační** migrace obsahu ze starého .NET Matrixu do Ikaros světa `matrix` na **newmatrix**. NE kopie — staré ploché jednosvětové schéma → Ikaros world-scoped.
 
 ## Prostředí (klíčové cesty)
 - **Zdrojový dump:** `C:\Matrix\dump\MatrixDatabase` (28 kolekcí, čteno **Node + balík `bson` z `backend/node_modules`**, NE mongorestore).
-- **Cíl:** Ikaros `https://newmatrix.patrikzplzne.cz` = server `oak.server.leafhost.cz:11122`, `/opt/projekt-ikaros-be`, mongo container `mongo`, DB `ikaros`, replicaSet `rs0`. ⚠️ **Starý Matrix běží pro hráče na `https://www.projekt-ikaros.com` — NESAHAT.**
-- **BE repo** (sem jdou import workflowy + data): `Tykyen/Projekt-ikaros` = `C:\Matrix\ProjektIkaros\Projekt-ikaros`. **FE repo** (sem jde spec/docs): `Tykyen/Projekt-Ikaros-FE` = pracovní adresář.
-- **Ručně revidovaná klasifikace stránek:** `C:\Users\arafo\Downloads\f2-klasifikace.csv` (3625 řádků; sloupce `slug;titul;kategorie;podtyp;vlastnik_cil;clearance;jistota;duvod;DO_OBCHODU;TVE_ROZHODNUTI;POZNAMKA`). **Toto je pravda pro kategorie/vazby.** Parsovat robustním CSV parserem (pole mají `;` a `\n` uvnitř).
-- **F1 user mapa:** `C:\tmp\f1-user-map.json` (old ObjectId → Ikaros _id). **F3 postavy:** `C:\tmp\f3-characters.json`. Generátory: `C:\tmp\f{1,2,3,4a,4b-npc,4c}-*.js`.
+- **Cíl:** Ikaros `https://newmatrix.patrikzplzne.cz` = server `oak.server.leafhost.cz:11122`, `/opt/projekt-ikaros-be`, mongo container `mongo`, DB `ikaros`, replicaSet `rs0`. URL světa = `/svet/matrix` (slug routing). ⚠️ **Starý Matrix běží pro hráče na `https://www.projekt-ikaros.com` — NESAHAT.**
+- **BE repo** (import workflowy + data): `Tykyen/Projekt-ikaros` = `C:\Matrix\ProjektIkaros\Projekt-ikaros`. **FE repo** (spec/docs): `Tykyen/Projekt-Ikaros-FE` = pracovní adresář.
+- **Ručně revidovaná klasifikace:** `C:\Users\arafo\Downloads\f2-klasifikace.csv` (3625 ř., `slug;titul;kategorie;podtyp;vlastnik_cil;clearance;…;DO_OBCHODU;…;POZNAMKA`). **Pravda pro kategorie/vazby.** Robustní CSV parser (pole mají `;` a `\n`).
+- **Generátory + mapy:** `C:\tmp\f*.js`, `C:\tmp\f1-user-map.json`, `C:\tmp\f3-characters.json`, `C:\tmp\f-groups.json`, `C:\tmp\f-membership.json`. Konvertor TipTap→HTML: `C:\tmp\tiptap2html.js` (+ mongosh verze `Projekt-ikaros/migration/tiptap2html-mongo.js`).
 
-## Mechanika importu (vzor — kopíruj ho)
-GitHub Actions workflow v **BE repu** `.github/workflows/import-matrix-*.yml`:
-- 3 režimy: `dry-run` (default, jen počítá), `import` (confirm `IMPORT`), `rollback` (confirm `ROLLBACK`).
-- Data **gzip** v `migration/*.json.gz`, workflow `gunzip -c` → mongosh skript přes `ssh ... docker compose exec -T mongo mongosh '...ikaros?replicaSet=rs0' --quiet`.
-- **Idempotentní** (skip/upsert dle slug nebo characterId), každý dokument **tag `_mig:'fXX'`** → čistý rollback.
-- **Workflow commituju+pushuju já**, **spouští ho uživatel ručně** na webu (Actions → workflow → Run). Vždy: napřed dry-run → ověřit číslo → import.
-- **Před spuštěním vždy lokálně ověřit** skript: `node --check` + mock běh (mock `db`).
-- ⚠️ **Bash classifier občas vypadává** (`claude-opus-4-8 temporarily unavailable`) → retry (po vlnách naběhne), nebo `dangerouslyDisableSandbox:true`.
+## ⚠️ KRITICKÉ TECHNICKÉ POZNATKY (jinak rozbiješ data)
+1. **`worldId` = ObjectId `6d6174726978000000000001`** (= „matrix" v hexu, ze seedu `matrix-world.seed.ts`), **NE slug „matrix"**! Ikaros dělá `new Types.ObjectId(worldId)` (emotes/počasí) → slug „matrix" crashne. Migrace omylem sypala slug → **fix-matrix-world to přemapovává**. Všechny BUDOUCÍ workflow musí používat ObjectId.
+2. **`Page.content` = HTML**, NE TipTap JSON! `RichTextEditor`/`AutoTOC` čekají HTML; JSON string se vykreslí doslova. Stará `paragraphs` (TipTap JSON) → konvertuj `tiptapToHtml()`. Konvertor pokrývá node/mark typy v datech (doc/paragraph/heading/lists/hr/blockquote + bold/italic/underline/link/textStyle/fontSize).
+3. **mongosh vyhodnocuje skript PO PŘÍKAZECH** → top-level `if(){}else{}` přes víc echo řádků se rozbije (`else{` osiří). **Obal logiku do IIFE** `(function(){ … })();`.
+4. **Kolekce:** `worldmemberships`, `worldsettings` (jedno slovo!), `pages`, `characters`. NE `world_memberships`.
+5. **mongosh `updateMany` není atomický** — unique-index kolize (E11000) ho zastaví uprostřed → částečný stav. Před přemapováním řešit kolize (dedup).
+6. **`characterPath`** (membership) = slug postavy = napojení hráč→postava. `membership.group` = frakce.
+
+## Mechanika importu (vzor)
+GitHub Actions workflow v BE repu `.github/workflows/*.yml`:
+- 3 režimy: `dry-run` (default), `import`/`fix` (confirm `IMPORT`/`FIX`), `rollback` (confirm `ROLLBACK`).
+- Data **gzip** v `migration/*.json.gz`, `gunzip -c` → mongosh přes `ssh … docker compose exec -T mongo mongosh '…ikaros?replicaSet=rs0' --quiet`.
+- **Idempotentní**, tag `_mig:'fXX'` → rollback. **Workflow commituju+pushuju já, spouští uživatel ručně** (dry-run → ověřit číslo → ostře).
+- **Vždy lokálně ověřit** mock běh (in-memory `db`). ⚠️ Bash classifier občas vypadne → retry / `dangerouslyDisableSandbox:true`.
+
+## 🔴 KRITICKÉ OPRAVY — workflow HOTOVÉ, ČEKAJÍ SPUŠTĚNÍ uživatelem
+Odhaleno při kontrole světa (svět se nezobrazoval, text byl syrový JSON, žádní hráči). **Spustit v pořadí:**
+| # | Workflow | režim | Co opraví |
+|---|---|---|---|
+| 1 | `fix-matrix-world.yml` | `fix`/FIX | worldId slug→ObjectId (2781 pages + 1115 chars) + Tyky PJ membership + dedup kolize `pravidla`. ⚠️ Předchozí běh proběhl ČÁSTEČNĚ (1605/2781 pages, membership ✓) — opravený workflow (IIFE+dedup) dorovná zbytek. |
+| 2 | `fix-content-html.yml` | `fix`/FIX | content TipTap JSON→HTML, 2324 stránek (dry-run potvrzen, vzorek summit-v-nice OK). Záloha `_migContentJson`. |
+| 3 | `import-matrix-membership.yml` | `import`/IMPORT | 22 členů (Tyky PJ, JohnAdmin PomocnyPJ, 20 hráčů Korektor) + characterPath (19) + 3 frakce (Evropani/Lumíci/MI6, 15 hráčů, znaky GDrive→F12) do worldsettings. |
 
 ## HOTOVO ✅ (živé v newmatrix)
-| Fáze | Co | Workflow | tag | Výsledek |
-|---|---|---|---|---|
-| F1 | Účty (24, už byly migrované dřív) | export-ikaros-users | — | mapa hotová |
-| F3 | Postavy 943 (24 PC + 919 NPC) + diáře | `import-matrix-characters.yml` | `_mig:f3` | vloženo 943 |
-| F4a | Lore stránky 1643 (Lokace/Ostatní/Seznam/Rodokmen) | `import-matrix-pages.yml` | `_mig:f4a` | vloženo 1643 |
-| F4b | NPC stránky 1075 (napojené characterRef; 177 karet dovytvořeno) | `import-matrix-npc.yml` | `_mig:f4b` | vloženo 1075 |
-| F4c | PC subdocs 49 (výbava 17 / finance 15 / poznámky 17) | `import-matrix-subdocs.yml` | `_mig:f4c` | zpracováno 49 |
-| F4-cleanup | smazáno 7 (4 dup karty přezdívek + Lotri NPC karta/stránka + Myra Ostatní); záloha v `*_mig_trash` | `cleanup-matrix-dupes.yml` | trash | smazáno 7 |
-| F4b-2 | PC veřejné stránky **20** (`Postava hráče`, `characterRef` za běhu, `ownerUserId`); slug=char slug, obsah z Postava-page | `import-matrix-pc-pages.yml` | `_mig:f4b2` | vloženo 20 |
+| Fáze | Co | Workflow | tag |
+|---|---|---|---|
+| F1 | Účty 24 | export-ikaros-users | — |
+| F3 | Postavy 943 (24 PC/919 NPC) | `import-matrix-characters.yml` | `_mig:f3` |
+| F4a | Lore stránky 1643 | `import-matrix-pages.yml` | `_mig:f4a` |
+| F4b | NPC stránky 1075 | `import-matrix-npc.yml` | `_mig:f4b` |
+| F4c | PC subdocs 49 | `import-matrix-subdocs.yml` | `_mig:f4c` |
+| F4-cleanup | smazáno 7 (dup karty + Lotri/Myra mis-import) | `cleanup-matrix-dupes.yml` | trash |
+| F4b-2 | PC veřejné stránky 20 | `import-matrix-pc-pages.yml` | `_mig:f4b2` |
 
-**Stav newmatrix:** ~**1116 postav** (1120 − 4 dup) + ~**2737 stránek** (+20 PC −1 Myra) + PC subdocs (výbava vč. Měďák 59 položek). Dílčí spec F4b-2: [`f4b2-pc-pages.md`](./f4b2-pc-pages.md).
+⚠️ **ALE všechna data mají worldId=slug + content=JSON** → po kritických opravách (#1,#2) budou OK.
 
-## ZBÝVÁ 🔜 (pořadí + návod)
-1. **F4d — AKJ záložky (velký, ~760).** 415 „AKJ N cíl" + 348 AKJ-Ostatní (podtyp) + PC Tajné + PC AKJ + PC Kontakty(rozhodnutí A). → `akjTabs` na cílovou stránku (cíl přes `vlastnik_cil`/parse „AKJ N <cíl>"). **Chybí-cíl → vygeneruj host stub stránku** (veřejně jen hláška „Obsah jen v AKJ", bez textu/obrázku) + připoj záložku. `akjTab = {id,name,order,access:[{type:'AKJ',value:'N'}],ownerHidden:false,contentOverride:{content,imageUrl,table}}`. Práva: staré `{type:2,value:'Player'}`→`{type:'Role',...}`, `{type:0,value:oldUserId}`→`{type:'UserId',value:<F1 nové id>}`.
-2. **F5 — Odkazy:** auto-link výskyty jmen stránek v obsahu vč. českého skloňování (Londýna→Londýn); report nevyřešených.
-3. **F12 — Obrázky:** `imageUrl`/`bigImage` = **Google Drive ID** → rehost do Ikaros Cloudinary (konverze webp). Obrázkové karty (Vzhled/Mapa) **zůstávají viditelné + propojené s vlastníkem** (NE mazat/slučovat). **Mapy → Atlas (Mapy)** + vložené u stránky vlastníka.
-4. **F6** Pavučina (Universes+`isWoodWide`), **F7** kalendáře (Calenders→character calendar subdoc), **F8** timeline (97)+zvuky (9), **F9** akce (GameEvents 15), **F10** obchod (výbava s `DO_OBCHODU`), **F11** chat 1:1 (ChatMessages/Channels/chatGroups).
+## ZBÝVÁ 🔜
+1. **F4d — AKJ záložky (925 záznamů, workflow `import-matrix-akj.yml` HOTOVÝ ale NEBĚŽEL).** ⚠️ **PŘED spuštěním REGENEROVAT:** (a) `contentOverride.content` je TipTap JSON → aplikovat `tiptapToHtml` v generátoru `C:\tmp\f4d-generate.js`; (b) workflow + data musí cílit na **worldId ObjectId**, ne slug. Obsahuje **leak fix 193 stránek** (number-type práva = veřejné → stub+záložka). Spec [`f4d-akj-tabs.md`](./f4d-akj-tabs.md).
+2. **Propadlé subdocy (2):** `poznamky-mingguo`→character_notes(li-mingguo), `vybava-edmund`→Edmund (NPC?). Audit `C:\tmp\f4-subdoc-propadle.js`.
+3. **F5 — Odkazy:** obsah má staré `/slug` odkazy (zachované v HTML) — ověřit že fungují / auto-link nevyřešených.
+4. **F12 — Obrázky:** `imageUrl`/`bigImage`/znaky frakcí = **GDrive ID** → rehost Cloudinary (webp). Vzhled/Mapa karty zůstávají; mapy→Atlas.
+5. **F6** Pavučina, **F7** kalendáře, **F8** timeline(97)+zvuky(9), **F9** akce(GameEvents 15), **F10** obchod, **F11** chat (ChatMessages 1506/Channels 43/chatGroups 7).
 
-## Závazná pravidla / gotchas (detail ve specu)
-- **`Page.slug === Character.slug`** (FE hledá `useCharacter(slug)`). Subdoc kolekce keyed `characterId` (unique).
-- **Klasifikace = CSV `kategorie`/`podtyp`**; vazby = CSV `vlastnik_cil` (uživatel ručně vyplnil cílovou postavu/stránku). 6 import pravidel: spec sekce 2d. Párování PC: spec 2f.
-- **Jméno postavy** = čisté z CSV (NE „X Deník"); **rename** = změň jméno, ale link klíč/slug nech původní (Zara Hawke→slug `zara`, jméno „Zara Villiam").
-- `-denik` = PC, `-denik-pj` = NPC (jen 7 mají dvojče = PC tajné). „Vymazat není potřeba" → neimportovat.
-- **`plainText` prázdné ≠ prázdné** — obsah je v `paragraphs` (TipTap), strukturovaná data v `sections` (výbava, 16 PC) / `table` (finance) / `accountTable`. Obrázkové (Rodokmen/Mapa/Vzhled) mají jen image.
-- **Stará Page pole:** `paragraphs`(TipTap str→`content`), `plainText`, `table`{hasTable,headers,values}, `accountTable`(finance), `sections`[{_id,title,content,isCollapsed,order,items:[{_id,text,quantity,note}]}], `videos`, `imageUrl`(GDrive), `bigImage`, `accessRequirements`[{type:0=UserId/2=Role,value}], `isWoodWide`.
-- **AKJ model (potvrzeno uživatelem):** AKJ obsah (text i obrázek) **jen v záložce**, nikdy veřejně; číslo = clearance; char AKJ = vlastník+PJ vždy vidí, ostatní po projití čísla.
-- Ikaros subdoc tvary: `character_inventories{sections[]≈staré sections 1:1 _id→id, notes}`, `character_finances{balance,accountType,accessLocation,currency,lastSyncDate,entries[],transactions[],notes}`, `character_notes{content}`, `character_diaries{customData['matrix_*']}` (preset `MatrixSheet`).
+## Závazná pravidla / gotchas
+- **`Page.slug === Character.slug`**. Subdoc kolekce keyed `characterId`.
+- Klasifikace = CSV `kategorie`/`podtyp`; vazby = `vlastnik_cil`. Rename: jméno změň, slug/klíč nech (Zara Hawke→`zara`).
+- **24 char = 20 hráčů** (4 přezdívky-dup smazány v cleanupu). Párování PC: jen na 20 kanonických, klíče vlastnik_cil→titul→slug + reverse-rename + diakritika-fold.
+- **Skupiny/frakce** = seznamové stránky (Evropani/Lumíci/MI6), členové v `plainText`/odkazech, znak v `imageUrl`. 5 hráčů bez frakce (sion/pythia/jorgen/da-shi/archie).
+- **Práva:** staré `{type:1}`=AKJ clearance, `{type:0}`=UserId(→F1 mapa), `{type:2}`=Role. Role mapování: Player+User→Hráč(2), PJ→PJ(5), Korektor→Korektor(3), JohnAdmin→PomocnyPJ(4). WorldRole enum: Zadatel0/Ctenar1/Hrac2/Korektor3/PomocnyPJ4/PJ5.
+- **AKJ access** = OR (`shieldedFromRequirements`): clearance NEBO grant NEBO vlastník(ownerHidden:false) NEBO PJ.
+- **Archie** = volná postava (starý deník na účtu „Test"), bez hráče.
 
 ## První akce v nové konverzaci
-Pokračovat **F4b-2** (PC veřejné stránky) — postavit generátor podle vzoru `C:\tmp\f4b-npc-generate.js`, ověřit, commit do BE repa, uživatel pustí dry-run→import. Pak **F4d**.
+1. Ověř, jestli uživatel spustil **3 kritické opravy** (#1 fix-world, #2 content-html, #3 membership) — zeptej se / nech ukázat svět. Pokud ne, naveď ho.
+2. **F4d: regeneruj** `C:\tmp\f4d-generate.js` s `tiptapToHtml` na contentOverride + uprav `import-matrix-akj.yml` na worldId ObjectId, znovu gzip+commit. Pak dry-run→import.
+3. Pak propadlé subdocy → F5 → F12 → F6-F11.
