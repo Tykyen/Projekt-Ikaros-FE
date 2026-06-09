@@ -3,7 +3,10 @@
 > Migrace světa **matrix**. Kontext: [`HANDOFF.md`](./HANDOFF.md), [`index.md`](./index.md). Paměť: `project_matrix_full_migration`.
 > Stav: **✅ HOTOVO — živé v newmatrix (2026-06-09).** Naimportováno **255 položek obchodu** (ceny GBP 249 / USD 6 z ručního ceníku, popisy ze stránek, referenceLink, isShared=true). 5 ne-zboží stránek (kategorie/lokace) vyřazeno uživatelem. PJ doplní skupiny/slevy v UI. Cílová feature existuje (`campaignShopItems`, fáze 9, route `/svet/:w/obchod`).
 >
-> **Soubory (BE repo):** `migration/f10-build.mjs` (ceník+texty), `f10-data.json(.gz)`, `f10-import.js`, workflow `import-matrix-shop.yml` (3 režimy, `_mig:'f10'`, upsert podle `_id`=page._id). Ceník `C:\Users\arafo\Downloads\f10-obchod-cenik.csv` (uživatel vyplnil ceny).
+> **Soubory (BE repo):** `migration/f10-build.mjs` (ceník+texty), `f10-data.json(.gz)`, `f10-import.js`, workflow `import-matrix-shop.yml` (3 režimy, `_mig:'f10'`, upsert podle `_id`=page._id). Ceník `C:\Users\arafo\Downloads\f10-obchod-cenik.csv` (uživatel vyplnil ceny + sloupec **Typ**=skupina).
+>
+> **Skupiny (follow-up, live 2026-06-09):** 19 jednoúrovňových skupin z ceníkového sloupce „Typ" (Praktická výbava 38, Technická výbava 31, Pistole 28, Útočné pušky 23…) → `campaignShopGroups`, 255 položek zařazeno (`groupId`). Soubory `f10-groups-{build.mjs,data.json.gz,import.js}` + workflow `import-matrix-shop-groups.yml` (`_mig:'f10g'`, deterministické `_id`, položka→groupId podle referenceLink=slug).
+> **Měny:** položky v GBP/USD; PJ musí v Měnách světa (`world_currencies`) přidat měny s kódem `GBP`+`USD` (matrix seed má jen CR/NUSD), jinak nákup zablokován (chybějící kurz). Řeší uživatel v UI.
 
 ## Klíčové zjištění
 - **Obchod EXISTUJE** (campaign modul, fáze 9) → F10 je čistá migrace, NE FE feature (na rozdíl od gating obavy).
