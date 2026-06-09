@@ -61,6 +61,20 @@ function mdToHtml(lines) {
   flushAll();
   return out.join('');
 }
+// rozdělí tělo typu magie na popis (před **Stupně**) a stupně (texty bez čísla)
+function splitLevels(lines) {
+  const si = lines.findIndex((l) => /^\*\*Stupně\*\*\s*$/.test(l.trim()));
+  if (si < 0) return { desc: lines, levels: [] };
+  const desc = lines.slice(0, si);
+  const stripMd = (t) => t.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').replace(/`([^`]+)`/g, '$1');
+  const levels = [];
+  for (const l of lines.slice(si + 1)) {
+    const m = l.trim().match(/^[-*]\s+(?:\d+\s*[—–-]\s*)?(.+)/);
+    if (m && m[1]) levels.push(stripMd(m[1].trim()));
+  }
+  return { desc, levels };
+}
+
 // první věta plain textu (pro QuickRef)
 function firstSentence(lines) {
   for (const l of lines) {
@@ -99,7 +113,9 @@ let order = 10;
   pages.push({ slug: 'magicka-pravidla', title: 'Magická pravidla', type: 'Seznam', order: order++, imageUrl: '/rulebook/magicka-pravidla.webp', content: mdToHtml(intro), menu });
   sections.forEach((sec) => {
     const slug = fold(sec.title);
-    const p = { slug, title: sec.title, type: 'Ostatní', order: order++, content: mdToHtml(sec.lines), quickRef: firstSentence(sec.lines) };
+    const { desc, levels } = splitLevels(sec.lines);
+    const p = { slug, title: sec.title, type: 'Ostatní', order: order++, content: mdToHtml(desc), quickRef: firstSentence(desc) };
+    if (levels.length) p.customData = { magicLevels: JSON.stringify(levels) };
     const img = imgFor(slug); if (img) p.imageUrl = img;
     pages.push(p);
   });
@@ -135,8 +151,12 @@ const hub = pages.find((p) => p.slug === 'magicka-pravidla');
 console.log('magie sub-hub menu:', hub.menu.length, 'typů | s obrázkem:', hub.menu.filter((m) => m.imageUrl).length);
 const noImg = pages.filter((p) => p.type === 'Ostatní' && !p.imageUrl).map((p) => p.slug);
 console.log('typy bez obrázku:', noImg.length ? noImg.join(', ') : '(žádné)');
+const withLevels = pages.filter((p) => p.customData && p.customData.magicLevels);
+console.log('typy s LevelSpine stupni:', withLevels.length, '/ 21');
 console.log('\nVzorek typu (Alchymie):');
 const al = pages.find((p) => p.slug === 'alchymie');
 console.log('  img:', al.imageUrl, '| quickRef:', al.quickRef);
-console.log('  content start:', al.content.slice(0, 160));
+console.log('  stupně (LevelSpine):', al.customData ? JSON.parse(al.customData.magicLevels).length : 0);
+console.log('  stupeň 1:', al.customData ? JSON.parse(al.customData.magicLevels)[0] : '-');
+console.log('  content start:', al.content.slice(0, 120));
 console.log('\nVystup:', OUT);

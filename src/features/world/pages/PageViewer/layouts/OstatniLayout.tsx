@@ -1,6 +1,7 @@
 import { AutoTOC } from '@/features/ikaros/components/AutoTOC';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { AkjBanner } from '../components/AkjBanner';
+import { LevelSpine } from '../components/LevelSpine';
 import { PageSections } from '../components/PageSections';
 import { PageSidebar } from '../components/PageSidebar';
 import { QuickRef } from '../components/QuickRef';
@@ -10,6 +11,18 @@ import s from './OstatniLayout.module.css';
 
 interface Props {
   page: Page;
+}
+
+/** Stupně magie (kódex páteř) z customData.magicLevels (JSON pole textů). */
+function readMagicLevels(page: Page): string[] | null {
+  const raw = page.customData?.magicLevels;
+  if (!raw) return null;
+  try {
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) && arr.length ? arr.map(String) : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -29,6 +42,7 @@ interface Props {
  * ZoomableImage napojíme ve Fázi 2 přes RodokmenLayout/wrapper).
  */
 export function OstatniLayout({ page }: Props) {
+  const magicLevels = readMagicLevels(page);
   return (
     <div className={s.layout}>
       <main className={s.main}>
@@ -57,6 +71,13 @@ export function OstatniLayout({ page }: Props) {
             className={s.prose}
           />
         </div>
+
+        {magicLevels && (
+          <div className={s.spineWrap}>
+            <h3 className={s.spineHeading}>Stupně</h3>
+            <LevelSpine levels={magicLevels} />
+          </div>
+        )}
 
         <PageSections sections={page.sections} />
       </main>

@@ -1,0 +1,65 @@
+/* Stupňová páteř magie (kódex) — 1:1 dle prototypu rulebook-prototype.html. */
+.spine {
+  margin: 1.75rem 0 0;
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.lvl {
+  position: relative;
+  padding: 0 0 1.5rem 3.4rem;
+}
+
+/* gradient linka mezi nody (barva stupně -> barva dalšího) */
+.lvl::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 0.5rem;
+  bottom: -0.4rem;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--c, var(--accent, #a96cff)),
+    var(--c2, var(--border, rgb(var(--white-rgb) / 0.2)))
+  );
+}
+
+.lvl:last-child::before {
+  display: none;
+}
+
+/* svítící node s číslem stupně */
+.node {
+  position: absolute;
+  left: 0;
+  top: -0.15rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display, inherit);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #0a0618;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--c, var(--accent, #a96cff)));
+  box-shadow:
+    0 0 22px var(--c, var(--glow, rgba(169, 108, 255, 0.42))),
+    0 0 0 4px rgb(var(--white-rgb) / 0.06);
+}
+
+.text {
+  font-family: var(--font-prose, var(--font-body, inherit));
+  font-size: 1.06rem;
+  line-height: 1.55;
+  color: var(--text-strong, var(--text, #fff));
+}
+
+.text b {
+  font-family: var(--font-body, inherit);
+  color: var(--c, var(--accent-bright, var(--accent, #c9a4ff)));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
