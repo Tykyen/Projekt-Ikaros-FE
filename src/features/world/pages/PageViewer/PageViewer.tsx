@@ -119,8 +119,8 @@ export function PageViewer({ page }: Props) {
   // generického SeznamLayoutu. Kapitoly jedou přes OstatniLayout (+ QuickRef HUD).
   const isRulebookHub =
     world?.system === 'matrix' &&
-    page.slug === 'pravidla' &&
-    page.type === 'Seznam';
+    page.type === 'Seznam' &&
+    (page.slug === 'pravidla' || page.slug === 'magicka-pravidla');
   const Layout = isRulebookHub
     ? RulebookHub
     : (LAYOUTS[page.type] ?? OstatniLayout);

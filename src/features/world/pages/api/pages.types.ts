@@ -102,6 +102,8 @@ export interface MenuItem {
   label: string;
   href: string;
   order: number;
+  /** Volitelný obrázek dlaždice (sub-hub kapitol, např. typy magie). */
+  imageUrl?: string;
 }
 
 export interface PageTable {

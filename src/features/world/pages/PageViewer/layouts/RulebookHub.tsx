@@ -30,8 +30,13 @@ export function RulebookHub({ page }: Props) {
           <Link
             key={it.href}
             to={`/svet/${worldSlug}/${it.href}`}
-            className={s.card}
+            className={`${s.card} ${it.imageUrl ? s.hasMedia : ''}`}
           >
+            {it.imageUrl && (
+              <span className={s.media} aria-hidden>
+                <img src={it.imageUrl} alt="" loading="lazy" />
+              </span>
+            )}
             <span className={s.num}>{String(i + 1).padStart(2, '0')}</span>
             <span className={s.arrow} aria-hidden>
               →
