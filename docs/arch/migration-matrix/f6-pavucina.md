@@ -1,10 +1,10 @@
 # F6 — Pavučina (vztahy/subjekty/příběhové linky) Matrix → Ikaros
 
 > Migrace světa **matrix**. Kontext: [`HANDOFF.md`](./HANDOFF.md), [`index.md`](./index.md). Paměť: `project_matrix_full_migration`.
-> Stav: **🔧 WORKFLOW HOTOVÝ — čeká dry-run + import (spouští uživatel).** Schváleno 2026-06-08 (vč. rozhodnutí 2). Build + workflow + import logika hotová, lokálně otestováno (mock: stop bez Tyky / dry-run počty / import / idempotence re-run — vše OK). Cílová feature existuje (Ikaros fáze 11.1 „Pavučina").
+> Stav: **✅ HOTOVO — živé v newmatrix (2026-06-09).** Naimportováno **99 subjektů + 113 vztahů + 15 linek + 1 quick-note**. Vlastnictví zachováno: Tyky 201 / Willscar 11 / FOksiGen 8 / Mandloň 8 záznamů (ověřeno v dry-run, všichni 4 existují v users). Cílová feature existuje (Ikaros fáze 11.1 „Pavučina").
 >
-> **Soubory (BE repo):** `migration/f6-build.mjs` (build), `migration/f6-campaign.json(.gz)` (data), `migration/f6-import.js` (mongosh logika), `.github/workflows/import-matrix-campaign.yml` (3 režimy).
-> **Pořadí spuštění:** dry-run (ověř slug-check + že campaign\* prázdné) → doplnit ALIAS dle „NESEDI" výpisu → re-build → import (confirm IMPORT). Rollback: confirm ROLLBACK.
+> **Soubory (BE repo):** `migration/f6-build.mjs` (build), `migration/f6-campaign.json(.gz)` (data), `migration/f6-import.js` (mongosh logika), `.github/workflows/import-matrix-campaign.yml` (3 režimy). Marker `_mig:'f6'`, upsert podle `_id` (idempotent), rollback `deleteMany({_mig:'f6'})`.
+> **Úklid (PJ):** Tyky vlastní 21 bez-owner záznamů (artefakt postava→NPC) — ručně vyčistit/přerozdělit. zubni-vily = AKJ (broken proklik dokud nevznikne stránka).
 
 ## Klíčové zjištění (oprava HANDOFF předpokladu)
 HANDOFF u F6 varoval: *„NEJDŘÍV ověřit, zda Ikaros FE má cílovou featuru (relationship graph). Pokud ne, je to FE feature PŘED migrací."*
