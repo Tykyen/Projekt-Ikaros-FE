@@ -19,14 +19,20 @@ vi.mock('@/features/world/pages/api/usePagesDirectory', () => ({
   usePagesDirectory: () => ({ data: dirState.current }),
 }));
 
-function Harness({ html }: { html: string }) {
+function Harness({
+  html,
+  worldSlug = 'matrix',
+}: {
+  html: string;
+  worldSlug?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
-  useBrokenLinks(ref, 'w1', 'matrix', html);
+  useBrokenLinks(ref, 'w1', worldSlug, html);
   return <div ref={ref} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function renderHtml(html: string) {
-  const { container } = render(<Harness html={html} />);
+function renderHtml(html: string, worldSlug?: string) {
+  const { container } = render(<Harness html={html} worldSlug={worldSlug} />);
   return container.querySelector('a') as HTMLAnchorElement;
 }
 
@@ -108,5 +114,67 @@ describe('useBrokenLinks — F5 world-scope rewrite', () => {
     await waitFor(() =>
       expect(a.getAttribute('href')).toBe('/svet/matrix/svedsko'),
     );
+  });
+});
+
+describe('useBrokenLinks — F5 krok 3 (Matrix legacy odkazy)', () => {
+  beforeEach(() => {
+    dirState.current = [{ slug: 'svedsko' }, { slug: 'londyn' }, { slug: 'abi' }];
+  });
+
+  it('A1: absolutní odkaz na starý web s existujícím cílem → world-scoped href + SPA navigace', () => {
+    const a = renderHtml(
+      '<a href="https://www.projekt-ikaros.com/svedsko" target="_self">Švédsko</a>',
+    );
+    expect(a.getAttribute('href')).toBe('/svet/matrix/svedsko');
+    expect(a.getAttribute('target')).toBeNull();
+    expect(a.classList.contains('brokenLink')).toBe(false);
+    fireEvent.click(a);
+    expect(navigateSpy).toHaveBeenCalledWith('/svet/matrix/svedsko');
+  });
+
+  it('A1: bez www i přes http → také se zachytí', () => {
+    const a = renderHtml('<a href="http://projekt-ikaros.com/londyn">Londýn</a>');
+    expect(a.getAttribute('href')).toBe('/svet/matrix/londyn');
+  });
+
+  it('A1: starý web s propadlým cílem → .brokenLink + klik blokován (neotevře starý web)', () => {
+    const a = renderHtml(
+      '<a href="https://www.projekt-ikaros.com/boj-s-programy">Boj s programy</a>',
+    );
+    expect(a.classList.contains('brokenLink')).toBe(true);
+    fireEvent.click(a);
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('A1: hash za absolutním odkazem se zachová', () => {
+    const a = renderHtml(
+      '<a href="https://www.projekt-ikaros.com/svedsko#dejiny">Dějiny</a>',
+    );
+    expect(a.getAttribute('href')).toBe('/svet/matrix/svedsko#dejiny');
+  });
+
+  it('A2: přejmenovaný slug (přezdívka) přes starý web → kanonický cíl', () => {
+    const a = renderHtml(
+      '<a href="https://www.projekt-ikaros.com/abigail-wattson">Abi</a>',
+    );
+    expect(a.getAttribute('href')).toBe('/svet/matrix/abi');
+    fireEvent.click(a);
+    expect(navigateSpy).toHaveBeenCalledWith('/svet/matrix/abi');
+  });
+
+  it('A2: přejmenovaný slug i v holé formě → kanonický cíl', () => {
+    const a = renderHtml('<a href="abigail-wattson">Abi</a>');
+    expect(a.getAttribute('href')).toBe('/svet/matrix/abi');
+  });
+
+  it('jiný svět: shim se neaplikuje, odkaz na starý web zůstane externí', () => {
+    const a = renderHtml(
+      '<a href="https://www.projekt-ikaros.com/svedsko" target="_blank">x</a>',
+      'jiny-svet',
+    );
+    expect(a.getAttribute('href')).toBe('https://www.projekt-ikaros.com/svedsko');
+    expect(a.getAttribute('target')).toBe('_blank');
+    expect(a.classList.contains('brokenLink')).toBe(false);
   });
 });

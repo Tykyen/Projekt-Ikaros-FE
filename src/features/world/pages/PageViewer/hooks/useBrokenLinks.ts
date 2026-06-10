@@ -1,6 +1,11 @@
 import { useEffect, type RefObject } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePagesDirectory } from '../../api/usePagesDirectory';
+import {
+  isLegacyWorld,
+  remapLegacySlug,
+  stripLegacyDomain,
+} from './matrixLegacyLinks';
 
 /**
  * 7.1d — Broken-link detekce + F5 (migrace) world-scope rewrite.
@@ -92,9 +97,16 @@ export function useBrokenLinks(
 
     const slugSet = new Set(directory.map((d) => d.slug));
     const worldPrefix = `/svet/${worldSlug}/`;
+    // Migrace Matrix (F5 krok 3): jen pro svět `matrix` přepisujeme absolutní
+    // odkazy na starý web + přejmenované slugy. Jinde se shim neaplikuje.
+    const legacy = isLegacyWorld(worldSlug);
 
     const processLink = (linkEl: Element): void => {
-      const href = linkEl.getAttribute('href') ?? '';
+      const rawHref = linkEl.getAttribute('href') ?? '';
+      // A1: `https://www.projekt-ikaros.com/<slug>` → `/<slug>`, aby odkaz spadl
+      // do interní větve (jinak by ho external-guard níž propustil ven na starý
+      // web). Ostatní hrefy zůstávají beze změny.
+      const href = legacy ? stripLegacyDomain(rawHref) : rawHref;
       if (!href || /^(https?:|mailto:|tel:|#)/i.test(href)) return;
 
       // Odkaz na samotnou úvodní stránku světa — navigace, neověřujeme.
@@ -108,14 +120,17 @@ export function useBrokenLinks(
 
       // Oddělit slug od ?query / #hash (kotvy na nadpisy se musí zachovat).
       const m = raw.match(/^([^?#]*)([?#].*)?$/);
-      const target = m?.[1] ?? '';
+      const rawTarget = m?.[1] ?? '';
       const suffix = m?.[2] ?? '';
 
-      if (!target) return;
+      if (!rawTarget) return;
       // Vícesegmentové cesty (admin/stranky, postava/abc, …) = navigační routy.
-      if (target.includes('/')) return;
+      if (rawTarget.includes('/')) return;
       // Rezervované world routy (stranky, hraci, chat, …) — taky navigace.
-      if (WORLD_RESERVED.has(target)) return;
+      if (WORLD_RESERVED.has(rawTarget)) return;
+
+      // A2: přejmenovaný slug (přezdívka → kanonický) → cílíme na živou stránku.
+      const target = legacy ? remapLegacySlug(rawTarget) : rawTarget;
 
       const anchor = linkEl as ManagedAnchor;
 
