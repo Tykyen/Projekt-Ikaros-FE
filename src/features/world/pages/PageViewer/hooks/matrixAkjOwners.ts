@@ -1,7 +1,8 @@
 /**
  * Generovaná mapa: starý AKJ slug → vlastník (stránka, na kterou se AKJ záložka
- * při migraci F4d připnula). Zdroj: F4d `tab.id = "mig-"+slug` → `targetSlug`.
- * Generuje `C:\tmp\f5-gen-report.js`; 446 záznamů. Migrační shim — smazatelný.
+ * při migraci F4d připnula; fallback = názvová konvence `akj-<N>-<živý-cíl>`).
+ * Zdroj: F4d `tab.id="mig-"+slug`→`targetSlug` + heuristika nad živými slugy.
+ * Generuje analytický skript; 463 záznamů. Migrační shim — smazatelný.
  * Spec: `docs/arch/migration-matrix/f5-links.md` (krok 3b / A3).
  */
 const AKJ_OWNERS: Record<string, string> = {
@@ -34,10 +35,12 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-10-radyn-opan": "radyn-opan",
   "akj-10-rebecca-zero": "rebecca-zero",
   "akj-10-simkontur": "simkontur",
+  "akj-10-sion": "sion",
   "akj-10-tiamat": "tiamat",
   "akj-10-zoltan-feher": "zoltan-feher",
   "akj-11-cif": "cerny-investicni-fond",
   "akj-12-allison-pill": "allison-pill",
+  "akj-12-alzahir": "alzahir",
   "akj-12-andele": "andele",
   "akj-12-antonie-grey": "antonie-grey",
   "akj-12-bathrat-leon": "bathrat-leon",
@@ -66,10 +69,16 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-12-zion": "zion-corporation",
   "akj-14-vrchni-mag": "vrchni-mag",
   "akj-15-benedict-hunter": "benedict-hunter",
+  "akj-15-hvelgermir": "hvelgermir",
+  "akj-15-lechesis": "lechesis",
+  "akj-15-mimismundr": "mimismundr",
+  "akj-15-nav": "nav",
   "akj-15-nordove": "nordove",
   "akj-15-pan-x": "pan-x",
   "akj-15-rebecca-zero": "rebecca-zero",
   "akj-15-strazci-bran": "strazci-bran",
+  "akj-15-tim": "tim",
+  "akj-15-undarbunndr": "undarbunndr",
   "akj-2-alfi-stin": "alfi-stin",
   "akj-2-bratva": "bratva",
   "akj-2-chose-bianco": "chose-bianco",
@@ -127,6 +136,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-4-antonia-pink": "antonia-pink",
   "akj-4-ashler-easton": "ashler-easton",
   "akj-4-bahadur": "bahadur-sah-iv",
+  "akj-4-bar-bratrstva": "bar-bratrstva",
   "akj-4-bar-bratrstvo": "bar-bratrstva",
   "akj-4-bathrat-leon": "bathrat-leon",
   "akj-4-bautaf-liko": "bautaf-liko",
@@ -147,6 +157,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-4-darling": "darling-113",
   "akj-4-dmitrij-ivanov": "dmitrij-ivanov",
   "akj-4-elizabeth-harrington": "elizabeth-harrington",
+  "akj-4-elliot-drake": "elliot-drake",
   "akj-4-erythros": "erythros",
   "akj-4-frederic-scheer": "frederic-scheer",
   "akj-4-freeport": "freeport",
@@ -156,6 +167,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-4-home-depot": "home-depot",
   "akj-4-hrad-dunnottar": "hrad-dunnottar",
   "akj-4-inari": "inari",
+  "akj-4-ishida-uriu": "ishida-uriu",
   "akj-4-isla-phillips": "isla-phillips",
   "akj-4-joseph-brousard": "joseph-broussard",
   "akj-4-juan-luciano": "juan-luciano",
@@ -165,6 +177,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-4-konohana-sakuya-hime": "konohana-sakuya-hime",
   "akj-4-kristian-astra": "kristian-astra",
   "akj-4-latelia-clark": "latelia-clark",
+  "akj-4-leona-falco": "leona-falco",
   "akj-4-liana": "liana",
   "akj-4-liana-morino": "liana-morino",
   "akj-4-lin-mei": "lin-mei",
@@ -224,6 +237,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-5-5682": "5682",
   "akj-5-ai-liang": "zhao-liang",
   "akj-5-alexis-bledel": "alexis-bledel",
+  "akj-5-chan-ho-yin": "chan-ho-yin",
   "akj-5-frederic-scheer": "frederic-scheer",
   "akj-5-jean-arist": "jean-arist",
   "akj-5-mateo-greco": "mateo-greco",
@@ -258,6 +272,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-6-dra": "reditelstvi-pro-revitalizaci-aciv",
   "akj-6-duse": "duse",
   "akj-6-dusevni-svet": "dusevni-svet",
+  "akj-6-elliot-drake": "elliot-drake",
   "akj-6-emeth-brown": "emeth-brown",
   "akj-6-gabriel-montague": "gabriel-montague",
   "akj-6-gig": "cerny-investicni-fond",
@@ -270,6 +285,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-6-imris-quitu": "imris-quitu",
   "akj-6-indianske-spolecenstvi": "indianske-spolecenstvi",
   "akj-6-ira": "ira",
+  "akj-6-ishida-uriu": "ishida-uriu",
   "akj-6-iwlf": "odboj",
   "akj-6-jagar-midgarson": "jagar-midgarson",
   "akj-6-jp-morgan-chase": "jp-morgan-chase",
@@ -279,6 +295,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-6-kyle-staite": "kyle-staite",
   "akj-6-lana-lang": "lana-lang",
   "akj-6-latelia-clark": "latelia-clark",
+  "akj-6-leona-falco": "leona-falco",
   "akj-6-liana": "liana",
   "akj-6-mafianske-rodiny": "mafianske-rodiny",
   "akj-6-magicke-havy": "magicke-havy",
@@ -379,6 +396,7 @@ const AKJ_OWNERS: Record<string, string> = {
   "akj-9-0026": "oliver-brown",
   "akj-9-amira-al-saud": "amira-al-saud",
   "akj-9-biotop": "biotop",
+  "akj-9-elliot-drake": "elliot-drake",
   "akj-9-hlucna-voda": "hlucna-voda",
   "akj-9-martin-tennant": "martin-tennant",
   "akj-9-nathaniel-liang": "nathaniel-liang",

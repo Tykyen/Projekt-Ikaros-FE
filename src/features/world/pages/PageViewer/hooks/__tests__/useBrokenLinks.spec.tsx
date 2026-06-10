@@ -124,6 +124,7 @@ describe('useBrokenLinks — F5 krok 3 (Matrix legacy odkazy)', () => {
       { slug: 'londyn' },
       { slug: 'abi' },
       { slug: 'jakuza' },
+      { slug: 'undarbunndr' },
     ];
   });
 
@@ -185,6 +186,11 @@ describe('useBrokenLinks — F5 krok 3 (Matrix legacy odkazy)', () => {
       '<a href="https://www.projekt-ikaros.com/akj-8-jakuza">Jakuza</a>',
     );
     expect(a.getAttribute('href')).toBe('/svet/matrix/jakuza');
+  });
+
+  it('A3: AKJ bez F4d záznamu, ale s živým cílem v názvu → fallback heuristika', () => {
+    const a = renderHtml('<a href="akj-15-undarbunndr">Undarbunndr AKJ</a>');
+    expect(a.getAttribute('href')).toBe('/svet/matrix/undarbunndr');
   });
 
   it('A3: AKJ bez dohledaného vlastníka (gm01) → zůstane broken', () => {

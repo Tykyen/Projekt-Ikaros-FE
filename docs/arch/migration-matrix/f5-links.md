@@ -95,11 +95,13 @@ aplikovaný jen pro svět `matrix` (gate `isLegacyWorld`):
   `.brokenLink` + blokace kliku (NE otevření starého webu).
 - **A2 `remapLegacySlug`:** 14 přejmenování z `migration/f5-links.json`
   (`abigail-wattson`→`abi`…), aplikováno po stripu i na holé formě.
-- **A3 AKJ → vlastník:** 446 starých AKJ slugů (`akj-8-jakuza`, `gm01`…) →
-  stránka, na kterou se záložka při F4d připnula (`tab.id="mig-"+slug` →
-  `targetSlug`). Mapa `matrixAkjOwners.ts` (generovaná, smazatelná) napojená do
-  `remapLegacySlug`. Pokrývá 690/773 odkazů; ~14 GM master bez vlastníka zůstává
-  broken (červené). Multi-vlastník (47) → primární.
+- **A3 AKJ → vlastník:** 463 starých AKJ slugů (`akj-8-jakuza`…) → stránka, na
+  kterou se záložka při F4d připnula (`tab.id="mig-"+slug` → `targetSlug`);
+  fallback = názvová konvence `akj-<N>-<živý-cíl>` (+17). Mapa
+  `matrixAkjOwners.ts` (generovaná, smazatelná) napojená do `remapLegacySlug`.
+  **Pokrývá 707/773 odkazů.** Multi-vlastník (47) → primární. Zbytek 66 odkazů:
+  ~31 GM master (`gm01/02/03…`, bez veřejné stránky) + ~35 orphan (cíl AKJ je
+  sám propadlý — číselné ID / nemigrovaný NPC) → zůstává červené.
 
 Jádro hooku beze změny: `legacy ? strip(href) : href` na vstupu, `legacy ?
 remap(target) : target` u cíle. Idempotentní (world-scoped href se podruhé
