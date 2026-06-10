@@ -1018,6 +1018,8 @@ export interface PublicUserProfile {
   createdAt: string;
   /** 1.5 D-050 — kdy byl naposledy aktivní. `null` pro hiddenPresence/tombstone. */
   lastSeenAt: string | null;
+  /** 1.4 §15 — poslední přihlášení; přijde JEN platformovému Adminovi. */
+  lastLoginAt?: string | null;
   pendingDeletion?: boolean;
   deleted?: boolean;
 }

@@ -5,6 +5,7 @@ import { Spinner } from '@/shared/ui';
 import { UserRole } from '@/shared/types';
 import { usePublicUserProfile } from '../api/usePublicUserProfile';
 import { PublicProfileHeader } from '../components/PublicProfile/PublicProfileHeader';
+import { PublicProfileCard } from '../components/PublicProfile/PublicProfileCard';
 import { PublicBioSection } from '../components/PublicProfile/PublicBioSection';
 import { PublicCharacterSection } from '../components/PublicProfile/PublicCharacterSection';
 import { PublicProfileActions } from '../components/PublicProfile/PublicProfileActions';
@@ -62,6 +63,7 @@ export default function PublicUserProfilePage() {
         <TombstoneBanner variant={tombstoneVariant} />
       )}
       <PublicProfileHeader profile={profile} />
+      <PublicProfileCard profile={profile} />
       <PublicBioSection bio={profile.bio} />
       <PublicCharacterSection profile={profile} />
       <PublicProfileActions

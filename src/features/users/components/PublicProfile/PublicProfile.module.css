@@ -235,3 +235,34 @@
     text-align: center;
   }
 }
+
+/* 1.4 §15 — datová karta cizího profilu (grid label/value). */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--sp-3) var(--sp-5);
+  margin: 0;
+}
+
+.cardField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.cardFieldLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.cardFieldValue {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--theme-text, var(--text-strong));
+  word-break: break-word;
+}

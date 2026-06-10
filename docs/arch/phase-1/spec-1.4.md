@@ -611,3 +611,38 @@ Co se mění mimo `AdminUsersPage`:
 3. Až poté: frontend-design audit → impl. plán 1.4 → kód.
 
 Po schválení specu spustím **frontend-design audit** (vizuální návrh karty + role chipů + kebab menu + Zpracovat karta + public profilu), poté předložím **impl. plán 1.4** a paralelně **diff roadmapy/hlavního plánu** k odsouhlasení.
+
+---
+
+## 15 — Follow-up: Detailní karta na veřejném profilu (2026-06-10)
+
+> Doplněno po testování. PJ/Admin chce u cizího uživatele vidět strukturovanou „kartu" s detaily, ne jen strohou hlavičku.
+
+### Účel
+`/ikaros/uzivatel/:id` dnes ukazuje jen `PublicProfileHeader` (avatar + jméno + meta řádek) + akce. Přidat pod hlavičku **datovou kartu** se strukturovaným gridem polí (vzor `ProfileHeader` „OSOBNÍ KARTA", ale read-only a jen veřejná pole).
+
+### Rozsah
+Nová komponenta **`PublicProfileCard`** na `PublicUserProfilePage` (pod hlavičkou):
+- **Veřejná pole (všem):** uživatelské jméno, přezdívka, město, role, počet světů, člen od, naposledy online.
+- **Admin-only:** poslední přihlášení (`lastLoginAt`).
+
+### BE
+- `PublicUserProfile` interface + `lastLoginAt?: string | null`.
+- `users.service.publicProfileV14`: v existujícím `isAdmin` bloku nastavit `lastLoginAt = user.lastLoginAt?.toISOString() ?? null`. Ne-adminovi se pole vůbec neposílá (undefined).
+- **E-mail se NEPŘIDÁVÁ** — zůstává soukromé pole (jen vlastní OSOBNÍ KARTA).
+
+### FE
+- FE `PublicUserProfile` typ + `lastLoginAt?: string | null`.
+- `PublicProfileCard` — grid label/value (reuse vzhledu `ProfileHeader` gridu); řádek „Poslední přihlášení" jen když `profile.lastLoginAt` existuje (BE ho posílá jen Adminovi → FE jen zobrazí, co dostane).
+- Vložit do `PublicUserProfilePage` mezi hlavičku a bio/postavu.
+
+### Privacy / role
+- `lastLoginAt` gated na **platformového Admina/Superadmina** (ne world PJ — veřejný profil je platformový obsah, konzistentní s `feedback_platform_vs_world_roles`). Rozhoduje BE, FE jen renderuje.
+- E-mail cizího uživatele se nikde nezobrazuje.
+
+### Acceptance
+- [ ] Cizí profil má pod hlavičkou kartu s veřejnými detaily.
+- [ ] Admin/Superadmin navíc vidí „Poslední přihlášení".
+- [ ] Ne-admin „Poslední přihlášení" nevidí (BE neposílá).
+- [ ] E-mail cizího uživatele se nikde nezobrazí.
+- [ ] mobil/desktop OK.
