@@ -164,14 +164,22 @@ export function ChannelView({
   // Portrét postavy podle hráče (PC) — single source z adresáře postav. Řeší
   // migrované zprávy, které nemají uložený `senderAvatarUrl` (avatar se per
   // zprávu nemigroval) → jinak by hráč spadl na iniciálu místo portrétu.
+  // ⚠️ BE adresář NEvrací `userId` (jen slug+imageUrl) → join přes
+  // `member.characterPath → directory.slug → imageUrl` (stejně jako BE enrich).
   const { data: directory } = useCharacterDirectory(worldId);
   const characterAvatarByUser = useMemo(() => {
-    const m = new Map<string, string>();
+    const imageBySlug = new Map<string, string>();
     for (const c of directory ?? []) {
-      if (!c.isNpc && c.userId && c.imageUrl) m.set(c.userId, c.imageUrl);
+      if (!c.isNpc && c.imageUrl) imageBySlug.set(c.slug, c.imageUrl);
+    }
+    const m = new Map<string, string>();
+    for (const member of members) {
+      if (!member.characterPath) continue;
+      const url = imageBySlug.get(member.characterPath);
+      if (url) m.set(member.userId, url);
     }
     return m;
-  }, [directory]);
+  }, [directory, members]);
 
   // Avatar fallback — když zpráva ani NPC override nemají obrázek. Priorita:
   // portrét postavy (adresář) → membership avatar → globální účtový avatar.
