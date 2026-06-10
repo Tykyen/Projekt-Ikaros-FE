@@ -6,6 +6,7 @@
 > **Soubory (BE repo):** `migration/f10-build.mjs` (ceník+texty), `f10-data.json(.gz)`, `f10-import.js`, workflow `import-matrix-shop.yml` (3 režimy, `_mig:'f10'`, upsert podle `_id`=page._id). Ceník `C:\Users\arafo\Downloads\f10-obchod-cenik.csv` (uživatel vyplnil ceny + sloupec **Typ**=skupina).
 >
 > **Skupiny (follow-up, live 2026-06-09):** 19 jednoúrovňových skupin z ceníkového sloupce „Typ" (Praktická výbava 38, Technická výbava 31, Pistole 28, Útočné pušky 23…) → `campaignShopGroups`, 255 položek zařazeno (`groupId`). Soubory `f10-groups-{build.mjs,data.json.gz,import.js}` + workflow `import-matrix-shop-groups.yml` (`_mig:'f10g'`, deterministické `_id`, položka→groupId podle referenceLink=slug).
+> **Programy (follow-up, 2026-06-10):** dalších **57 položek** (51 stránek typu „programy" + 6 cenových variant) + **5 skupin** ze sloupce „Skupina". Viz sekce [Programy follow-up](#programy-follow-up) níže.
 > **Měny:** položky v GBP/USD; PJ musí v Měnách světa (`world_currencies`) přidat měny s kódem `GBP`+`USD` (matrix seed má jen CR/NUSD), jinak nákup zablokován (chybějící kurz). Řeší uživatel v UI.
 
 ## Klíčové zjištění
@@ -61,3 +62,25 @@ Parsuje `f2-klasifikace.csv` (robustní CSV parser), vyfiltruje `DO_OBCHODU="Obc
 1. Potvrdit rozhodnutí (price 0 + bez skupin + isShared=true).
 2. ALIAS slug-drift se finalizuje po dry-run.
 3. `description` prázdné vs krátký výňatek z `plainText` stránky — navrhuji prázdné (referenceLink dá plný popis).
+
+---
+
+## Programy follow-up
+> Stav: **build hotový (2026-06-10), čeká dry-run + import.** Rozšíření obchodu o programy, které už mají stránky.
+
+**Zdroj:** `C:\Users\arafo\Downloads\Programy ceník.csv` (`Skupina;slug;titul;Cena;Měna`), 57 řádků. Slugy odkazují na existující stránky typu „programy" (F4). Žádný se nepřekrývá s 255 položkami zboží (ověřeno).
+
+**Odlišnosti od základního F10 (proč vlastní skripty, ne reuse f10-import):**
+1. **Varianty = N položek : 1 stránka.** 4 slugy mají víc cen (turistico ×2, šatna ×3, n-klíč ×3, překladač ×2 → +6 položek). Každá varianta = samostatná položka se **stejným `referenceLink`**, rozlišení v `name`. → základní F10 klíč `_id = page._id` NELZE (kolize). Místo něj **deterministické `_id = md5(world|f10p|slug|název).slice(0,24)`**.
+2. **`_id` ≠ page._id** → workflow resolvuje live Page jen kvůli **ověření existence + `referenceLink`** (chybí stránka → skip+log).
+3. **5 skupin ze sloupce „Skupina"** (Antikontrolní program 11, Kontrolní programy 15, Obranný program 9, Uživatelský program 13, Viry 9) → `campaignShopGroups`, deterministické `_id = md5(world|grp|název)` (stejný vzor jako f10-groups), `order = 100+i` (za stávajících 19). Žádný název nekoliduje s F10 skupinami.
+
+**Shodné s F10:** `name`=titul, `price`/jednotka z `parsePrice` (`💷 Cena: X GBP za Y` u 7 jednotkových cen), `description`=`plainText` stránky (51/51 mají), `currencyCode`=GBP (kurz už v obchodě), `ownerId`=Tyky, `isShared=true`.
+
+**Marker `_mig:'f10p'`** (separátní rollback — nedotkne se 255 zboží ani 19 skupin).
+
+**Soubory (BE repo):** `migration/f10-programy-{build.mjs,data.json,data.json.gz,import.js}` + workflow `import-matrix-shop-programs.yml` (3 režimy; rollback maže `_mig:'f10p'` z items i groups).
+
+**Build výstup (2026-06-10):** 57 položek, 57 unikátních `_id` (varianty OK), 7 jednotkových cen, 0 bez textu, vše GBP, 5 skupin (11/15/9/13/9).
+
+**Postup:** build (hotovo) → workflow `dry-run` (ověří 51 slugů → live Page) → `import` → ALIAS pro případné chybějící slugy.
