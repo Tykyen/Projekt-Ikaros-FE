@@ -22,6 +22,7 @@ export function WorldToolboxPanel() {
       title={title}
       accent={isPJ ? 'pj' : 'player'}
       defaultOpen
+      persistKey={`ikaros:world-toolbox-open:${worldSlug}`}
     >
       <p className={s.intro}>
         Rychlý rozcestník nástrojů světa — klikni na dlaždici a skoč rovnou tam.
