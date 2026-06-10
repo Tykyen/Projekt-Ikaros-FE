@@ -1,0 +1,2147 @@
+# Propadle odkazy — vypis cilu a zdrojovych stranek
+
+> Stav 2026-06-10. Zdroj = **dump** `MatrixDatabase` (puvodni odkazy). ⚠️ Prezdivkove cile jsou v zive DB z F5-1b uz premapovane — v reportu zustavaji pro uplnost. Kompletni strojovy vypis vsech zdroju u kazdeho cile: `PROPADLE-ODKAZY.json`.
+
+**Formy odkazu:** `A` = absolutni URL na stary web (`projekt-ikaros.com/<slug>`) · `B` = interni holy slug (dnes uz cervene).
+
+## Souhrn podle kategorie
+
+| Kategorie | Propadlych cilu | Odkazu (zdroju) | Akce |
+|---|---:|---:|---|
+| Pravidlovy obsah (Pravidlova kniha) | 203 | 899 | nasmerovat do Pravidlove knihy |
+| Neni v klasifikaci | 141 | 147 | nechat cervene nebo zalozit stranku |
+| Prezdivka postavy (zive opraveno) | 14 | 123 | zadna (zive opraveno) |
+| AKJ bez verejne stranky | 500 | 773 | PREMAPOVAT na vlastnika AKJ zalozky (z F4d), ne vytvaret novou stranku |
+| Ciselne stare ID | 67 | 175 | nechat cervene / proverit |
+| Smazano (nemigrovat) | 17 | 17 | nechat cervene |
+| Jine — proverit | 87 | 143 | rucni provereni (resi PJ) |
+
+**Celkem:** 1029 propadlych cilu, 2277 odkazu.
+
+## Cile podle kategorie (razeno dle poctu odkazujicich stranek)
+
+### Pravidlovy obsah (Pravidlova kniha)
+
+- **`jazykove-rodiny`** (234× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `britanie`, `evropska-unie`, `pravidla`, `amazonska-magicka-rise`, `nusa`, `aliance-muslimskych-zemi`, `rusko`, `sabska-rise`, `cina`, `indie`, `samansky-stat`, `belfast`, `bristol`, `canberra`, `dublin`, `edinburg`, `londyn`, `manchester`, `melbourne`, `montreal`, `newport`, `ottawa`, `sydney`, `tokyo`, `toronto`, `vencouver`, `winnipeg`, `york`, `atlanta`, `austin` … +204 (viz JSON)
+- **`jazykova-politika`** (35× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`, `nigerie`, `cambridge`, `morie`, `brusel`, `miami`, `bukurest`, `vijayawada`, `buffalo`, `chiriri`, `istanbul`, `mauritanie`, `mali`, `senegal`, `guinea`, `pobrezi-slonoviny`, `bentago`, `niger`, `ghana`, `libye`, `tunisko`, `alzirsko`, `maroko`, `gabon`, `cad`, `stredoafricka-republika`, `kamerun`, `helsinky`, `bagdad`, `kinshasa` … +5 (viz JSON)
+- **`obranna-magie`** (24× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `hinduisticka-vetev`, `zaroastricka-vetev`, `severska-vetev`, `jihoevropska-vetev`, `staroafricka-vetev`, `izraelska-vetev`, `druidska-vetev`, `islamska-vetev`, `svobodni-zednari`, `sintoisticka-vetev`, `katolicka-vetev`, `stara-indianska-vetev`, `lamaisticka-vetev`, `nova-egyptska-vetev`, `novoindianska-vetev`, `budhisticka-vetev`, `cinska-vetev`, `maorska-vetev`, `staroegyptska-vetev`, `vestecka-vetev`, `paladinove`, `belehradska-stredni-skola`, `magicke-havy`
+- **`antimagie`** (23× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `exorcismus`, `ovladani-magie`, `zaroastricka-vetev`, `izraelska-vetev`, `joe-smith`, `aaron-smith`, `elizabeth-harrington`, `edward-harrington`, `amanda-toy`, `lili-toy`, `natalie-dodwell`, `matthew-fiddler`, `klara-dolezalova`, `vincent-donovan`, `dmitrij-orlov`, `michael-cherney`, `patrik-dodwell`, `ivan-cernovski`, `petr-semjonov`, `maxmilien-duval`, `mareike-van-heeren`, `chen-hao`
+- **`vestecka-magie`** (17× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `hinduisticka-vetev`, `zaroastricka-vetev`, `severska-vetev`, `jihoevropska-vetev`, `staroafricka-vetev`, `druidska-vetev`, `islamska-vetev`, `svobodni-zednari`, `sintoisticka-vetev`, `katolicka-vetev`, `stara-indianska-vetev`, `lamaisticka-vetev`, `cinska-vetev`, `jihoamericka-vetev`, `staroegyptska-vetev`, `vestecka-vetev`
+- **`magie-tela`** (15× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `hinduisticka-vetev`, `zaroastricka-vetev`, `izraelska-vetev`, `islamska-vetev`, `sintoisticka-vetev`, `katolicka-vetev`, `novoindianska-vetev`, `budhisticka-vetev`, `cinska-vetev`, `nova-jihoamericka-vetev`, `svetlo-budoucnosti`, `darth-sun`, `australska-magicka-univerzita`, `magicke-havy`
+- **`morigan`** (15× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `eva`, `pj-morigan`, `staty-morigan`, `akj-12-true-leaks`, `akj-12-vishra-tech`, `galactic-investments-group`, `novy-pocitacovy-virus-morigan-ochromil-matrix`, `akj-12-nsb`, `0015`, `loki`, `ddo-m`, `akj-10-ast`, `oznameni-matrixovych-programatoru`, `k82`
+- **`kontrolni-programy`** (15× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `fakemark`, `ucetni`, `hlidka`, `scai`, `lakmus`, `hound`, `knihovnik`, `amu`, `alarm`, `oko`, `pavouk`, `spy`, `odklon`, `velky-bratr`, `programy`
+- **`uzivatelske-programy`** (15× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `ddo`, `program-sherlock`, `prekladac`, `rozhrani-alexandrijska-knihovna`, `encyklopedie`, `holograficky-ucitel`, `katalog-lodi`, `katalog-map`, `program-obr`, `reproset`, `program-ride`, `program-satna`, `program-turistico`, `ddo-m`, `programy`
+- **`svobodny-matrix`** (14× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `britanie`, `hybridni-programy`, `octopus`, `pani-jezera`, `tron`, `morigan`, `dublin`, `svetsky-parlament`, `stanford`, `ministerstvo-matrixu`, `bar-ajc`, `bridged-johnson`, `jose-romano`, `matrix-informace`
+- **`obranne-programy`** (14× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `hybridni-programy`, `agent`, `bankai`, `drony`, `kicune`, `kontrolor`, `silove-pole`, `shikai`, `tsui`, `turrety`, `vojaci`, `amico`, `nemico`, `programy`
+- **`lecebna-magie`** (13× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `leceni-a-zraneni`, `magicka-pravidla`, `exorcismus`, `magie-tela`, `staroafricka-vetev`, `druidska-vetev`, `lamaisticka-vetev`, `budhisticka-vetev`, `maorska-vetev`, `staroegyptska-vetev`, `paladinove`, `australska-magicka-univerzita`, `belehradska-stredni-skola`
+- **`antikontrolni-programy`** (13× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `fakemark`, `falesne-mid`, `falesne-aroma`, `invisible`, `knihomol`, `mlha`, `n-klic`, `rrh`, `silencio`, `stin`, `zmizik`, `zrcadlovy-obraz`, `programy`
+- **`ohniva-magie`** (12× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `zaroastricka-vetev`, `jihoevropska-vetev`, `islamska-vetev`, `katolicka-vetev`, `nova-egyptska-vetev`, `cinska-vetev`, `jihoamericka-vetev`, `nova-jihoamericka-vetev`, `maorska-vetev`, `staroegyptska-vetev`, `svetlo-budoucnosti`
+- **`viry`** (12× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `systemova-obrana`, `shikai`, `vojaci`, `amico`, `espada`, `hollow`, `impro`, `infiltrator`, `nemico`, `vampir`, `zombie`, `programy`
+- **`alchymie`** (11× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `exorcismus`, `dublin`, `severska-vetev`, `jihoevropska-vetev`, `svobodni-zednari`, `cinska-vetev`, `paladinove`, `australska-magicka-univerzita`, `kent`, `magicke-runy`
+- **`demonologie`** (11× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `exorcismus`, `zaroastricka-vetev`, `jihoevropska-vetev`, `izraelska-vetev`, `islamska-vetev`, `katolicka-vetev`, `nova-egyptska-vetev`, `magicke-havy`, `ikononat-masu`, `povolani-demona`
+- **`samanska-magie`** (11× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `hinduisticka-vetev`, `staroafricka-vetev`, `sintoisticka-vetev`, `stara-indianska-vetev`, `lamaisticka-vetev`, `novoindianska-vetev`, `budhisticka-vetev`, `jihoamericka-vetev`, `nova-jihoamericka-vetev`, `maorska-vetev`
+- **`vodni-magie`** (11× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `severska-vetev`, `jihoevropska-vetev`, `sintoisticka-vetev`, `stara-indianska-vetev`, `lamaisticka-vetev`, `nova-egyptska-vetev`, `cinska-vetev`, `jihoamericka-vetev`, `nova-jihoamericka-vetev`, `maorska-vetev`
+- **`shikai`** (11× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `alarm`, `bankai`, `staty-shikai`, `vojaci`, `amico`, `espada`, `impro`, `vampir`, `staty-vampiri`, `zombie`
+- **`ovladani-magie`** (10× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `exorcismus`, `hinduisticka-vetev`, `izraelska-vetev`, `svobodni-zednari`, `cinska-vetev`, `staroegyptska-vetev`, `vestecka-vetev`, `svetlo-budoucnosti`, `magicke-havy`
+- **`psionika`** (10× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `severska-vetev`, `jihoevropska-vetev`, `svobodni-zednari`, `lamaisticka-vetev`, `nova-egyptska-vetev`, `novoindianska-vetev`, `budhisticka-vetev`, `nova-jihoamericka-vetev`, `vestecka-vetev`
+- **`bankai`** (10× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `alarm`, `staty-bankai`, `tsui`, `vojaci`, `amico`, `espada`, `impro`, `vampir`, `staty-vampiri`
+- **`stinova-magie`** (9× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `zaroastricka-vetev`, `severska-vetev`, `staroegyptska-vetev`, `svetlo-budoucnosti`, `kazachske-kozacke-bratrstvo-magickych-lupicu`, `kult-persefony`, `darth-sun`, `magicke-havy`
+- **`rostlinna-magie`** (8× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `staroafricka-vetev`, `druidska-vetev`, `stara-indianska-vetev`, `cinska-vetev`, `jihoamericka-vetev`, `nova-jihoamericka-vetev`, `australska-magicka-univerzita`
+- **`zemni-magie`** (8× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `nova-egyptska-vetev`, `novoindianska-vetev`, `cinska-vetev`, `jihoamericka-vetev`, `nova-jihoamericka-vetev`, `maorska-vetev`, `staroegyptska-vetev`
+- **`zvireci-magie`** (8× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `jihoevropska-vetev`, `staroafricka-vetev`, `druidska-vetev`, `stara-indianska-vetev`, `novoindianska-vetev`, `jihoamericka-vetev`, `australska-magicka-univerzita`
+- **`falesne-mid`** (7× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-falesne-mid`, `basic-mid`, `medium-mid`, `hard-mid`, `vb-mid`, `zbrane-mid`
+- **`eva`** (7× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hybridni-programy`, `staty-eva`, `morigan`, `centralni-polska-skola-pro-nadane`, `novy-pocitacovy-virus-morigan-ochromil-matrix`, `amanda-toy`, `piotr-zielinski`
+- **`agent`** (7× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `tron`, `staty-agent`, `tsui`, `amico`, `vampir`, `silicon-valley`
+- **`nekromancie`** (6× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `nova-egyptska-vetev`, `staroegyptska-vetev`, `sedmy-zivel`, `svetlo-budoucnosti`, `kult-persefony`
+- **`teleportacni-magie`** (6× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `severska-vetev`, `cinska-vetev`, `vestecka-vetev`, `paladinove`, `australska-magicka-univerzita`
+- **`vzdusna-magie`** (6× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `severska-vetev`, `sintoisticka-vetev`, `nova-egyptska-vetev`, `cinska-vetev`, `maorska-vetev`
+- **`pavouk`** (6× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `systemova-obrana`, `kontrolni-programy`, `fakemark`, `stin`, `pavouk`, `staty-pavouk`
+- **`tron`** (6× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hybridni-programy`, `staty-tron`, `scai`, `zombie`, `svet-demonu`, `akj-6-ptppb`
+- **`oko`** (6× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `mlha`, `stin`, `staty-oko`, `pakistan`, `leona-falco`
+- **`hybridni-programy`** (6× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `adonis`, `katara`, `pani-jezera`, `tron`, `loki`, `programy`
+- **`druidska-magie`** (5× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `bhutan`, `druidska-vetev`, `australska-magicka-univerzita`, `eliezer-cohen`
+- **`velky-bratr`** (5× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `oko`, `spy`, `staty-velky-bratr`, `tiang-su`
+- **`vojaci`** (5× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `staty-vojaci`, `amico`, `vampir`, `zombie`
+- **`hollow`** (5× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `espada`, `staty-hollow`, `nemico`, `zombie`
+- **`zombie`** (5× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `espada`, `nemico`, `vampir`, `staty-zombie`
+- **`exorcismus`** (4× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicka-pravidla`, `izraelska-vetev`, `islamska-vetev`, `katolicka-vetev`
+- **`hound`** (4× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `falesne-aroma`, `staty-hound`, `knihovnik`
+- **`espada`** (4× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `staty-espada`, `nemico`, `staty-vampiri`
+- **`mlha`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-mlha`, `stin`
+- **`stin`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `mlha`, `staty-stin`
+- **`hlidka`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `falesne-mid`, `staty-hlidka`
+- **`scai`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `staty-scai`, `velky-bratr`
+- **`lakmus`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `staty-lakmus`, `knihovnik`
+- **`knihovnik`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `staty-knihovnik`, `amu`
+- **`amu`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `staty-amu`, `velky-bratr`
+- **`spy`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `fakemark`, `staty-spy`
+- **`vampir`** (3× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `espada`, `staty-vampiri`
+- **`programovani-akj`** (2× · A+B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`, `matrix-informace`
+- **`magicke-runy`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magie`, `alchymie`
+- **`fakemark`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-fakemark`
+- **`falesne-aroma`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-falesne-aroma`
+- **`invisible`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-invisible`
+- **`knihomol`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-knihomol`
+- **`n-klic`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-n-klic`
+- **`rrh`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-rrh`
+- **`silencio`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-silencio`
+- **`zmizik`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-zmizik`
+- **`zrcadlovy-obraz`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `antikontrolni-programy`, `staty-zrcadlovy-obraz`
+- **`adonis`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hybridni-programy`, `staty-adonis`
+- **`katara`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hybridni-programy`, `staty-katara`
+- **`octopus`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hybridni-programy`, `staty-octopus`
+- **`pani-jezera`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hybridni-programy`, `staty-pani-jezera`
+- **`ucetni`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `rrh`
+- **`alarm`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `staty-alarm`
+- **`odklon`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolni-programy`, `staty-odklon`
+- **`drony`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `staty-drony`
+- **`kicune`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `staty-kicune`
+- **`kontrolor`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `staty-kontrolor`
+- **`silove-pole`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `staty-silove-pole`
+- **`tsui`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `staty-tsui`
+- **`turrety`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `obranne-programy`, `staty-turrety`
+- **`ddo-m`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`, `seznam-ddo-m`
+- **`encyklopedie`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`, `rozhrani-alexandrijska-knihovna`
+- **`program-sherlock`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`, `rozhrani-alexandrijska-knihovna`
+- **`program-turistico`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`, `joe-smith`
+- **`amico`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `staty-amico`
+- **`impro`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `staty-impro`
+- **`infiltrator`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `staty-infiltrator`
+- **`nemico`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `viry`, `staty-nemico`
+- **`runa-ochranne-bariery`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`, `znehybneni-osoby`
+- **`protimagicky-obranny-kriz`** (2× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`, `protiteleportacni-obranny-kriz`
+- **`tvorba-postav`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`aspekty`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`body-osudu`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`sazky`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`iniciativa`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`uroven-sil`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`pretlak`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`unava`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`leceni-a-zraneni`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pravidla`
+- **`rozhrani-alexandrijska-knihovna`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`holograficky-ucitel`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`katalog-lodi`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`katalog-map`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`prekladac`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`program-obr`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`reproset`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`program-ride`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`program-satna`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `uzivatelske-programy`
+- **`staty-fakemark`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `fakemark`
+- **`staty-falesne-mid`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `falesne-mid`
+- **`basic-mid`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `falesne-mid`
+- **`medium-mid`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `falesne-mid`
+- **`hard-mid`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `falesne-mid`
+- **`vb-mid`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `falesne-mid`
+- **`zbrane-mid`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `falesne-mid`
+- **`staty-falesne-aroma`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `falesne-aroma`
+- **`staty-invisible`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `invisible`
+- **`staty-knihomol`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `knihomol`
+- **`staty-mlha`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `mlha`
+- **`staty-n-klic`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `n-klic`
+- **`staty-rrh`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `rrh`
+- **`staty-silencio`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `silencio`
+- **`staty-stin`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `stin`
+- **`staty-zmizik`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `zmizik`
+- **`staty-zrcadlovy-obraz`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `zrcadlovy-obraz`
+- **`staty-adonis`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `adonis`
+- **`staty-eva`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `eva`
+- **`staty-katara`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katara`
+- **`staty-octopus`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `octopus`
+- **`staty-pani-jezera`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `pani-jezera`
+- **`staty-tron`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `tron`
+- **`staty-ucetni`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `ucetni`
+- **`staty-hlidka`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hlidka`
+- **`staty-scai`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `scai`
+- **`staty-lakmus`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `lakmus`
+- **`staty-hound`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hound`
+- **`staty-knihovnik`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `knihovnik`
+- **`staty-amu`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `amu`
+- **`staty-alarm`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `alarm`
+- **`staty-oko`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `oko`
+- **`staty-spy`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `spy`
+- **`staty-odklon`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `odklon`
+- **`staty-velky-bratr`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `velky-bratr`
+- **`staty-agent`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `agent`
+- **`staty-bankai`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `bankai`
+- **`staty-drony`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `drony`
+- **`staty-kicune`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kicune`
+- **`staty-kontrolor`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `kontrolor`
+- **`staty-silove-pole`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `silove-pole`
+- **`staty-shikai`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `shikai`
+- **`staty-tsui`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `tsui`
+- **`staty-turrety`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `turrety`
+- **`staty-vojaci`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `vojaci`
+- **`staty-amico`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `amico`
+- **`staty-espada`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `espada`
+- **`staty-hollow`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `hollow`
+- **`staty-impro`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `impro`
+- **`staty-infiltrator`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `infiltrator`
+- **`staty-morigan`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `morigan`
+- **`pj-morigan`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `morigan`
+- **`staty-nemico`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `nemico`
+- **`staty-vampiri`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `vampir`
+- **`staty-zombie`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `zombie`
+- **`abi-magie`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `abi`
+- **`zname-alchymisticke-pomucky`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicke-runy`
+- **`jihoevropske-runy`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicke-runy`
+- **`katolicke-runy`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicke-runy`
+- **`severske-runy`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicke-runy`
+- **`sintoisticke-runy`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `magicke-runy`
+- **`kratkodoba-runa-neviditelnosti`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`dlouhodoba-runa-neviditelnosti`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`odraz-duse`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`runa-klidne-mysli`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`runa-odkloneni-utoku`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`znehybneni-osoby`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`zrcadlove-vezeni`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`runa-volani-a-odvraceni-vln`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `sintoisticke-runy`
+- **`hledani-magicke-stopy`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`niceni-nemrtvych`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`plamena-runa`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`portal-do-demonicke-sfery`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`povolani-demona`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`runa-rychleho-ruseni-magie`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`protipsionisticka-runa`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`protiteleportacni-obranny-kriz`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`ruseni-nebo-vytvareni-magicke-stopy`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`spojeni-magie`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`spoutani-magie`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`stitova-runa`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`ukladaci-runa`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`vypusteni-andela`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `katolicke-runy`
+- **`ochrana-pred-fyzickym-zranenim`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`ochrana-pred-magickym-zranenim`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`ochrana-pred-napadenim-mysli`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`ochrana-pred-smrti`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`regenerace`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`regulace-teploty`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`unik`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`zdroj-energie-sily`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`zmateni-smeru`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`navrat`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `severske-runy`
+- **`runa-privolani`** (1× · B) — pravidlovy obsah -> Pravidlova kniha
+  - `jihoevropske-runy`
+- **`boj-s-programy`** (1× · A) — pravidlovy obsah -> Pravidlova kniha
+  - `matrix-informace`
+- **`druhy-pripojeni`** (1× · A) — pravidlovy obsah -> Pravidlova kniha
+  - `matrix-informace`
+- **`systemova-obrana`** (1× · A) — pravidlovy obsah -> Pravidlova kniha
+  - `matrix-informace`
+
+### Neni v klasifikaci
+
+- **`luisa-madregal`** (3× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `julieta-madregal`, `isabella-madregal`, `mirabel-madregal`
+- **`carska-zpravodajska-sluzba`** (2× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `uralsky-okruh`, `severokavkazky-okruh`
+- **`abrham-void`** (2× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `recka-alchymisticka-rodina`, `projekt-medea`
+- **`juan-romano-jr`** (2× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `rodina-romano`, `jose-romano`
+- **`Cailleah`** (2× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `li-mingguo`, `mingguo`
+- **`jjs`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `test`
+- **`test-denik`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `test`
+- **`test-x`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `test`
+- **`fsdfhs`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `test`
+- **`Elisabet-iii.`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `londyn`
+- **`francouzstina`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `montreal`
+- **`kanady`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `toronto`
+- **`soukroma-magicka-skola-jamese-cooka`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `burns-harbor`
+- **`visegratske-uskupeni`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `budapest`
+- **`nejvyssi-urad-pro-problematiku-aciv`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `budapest`
+- **`evropske-unie`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `neapole`
+- **`university-of-naples-federico-ii.`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `neapole`
+- **`luise-durand`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `neuvilly`
+- **`vlkodlaci`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-3-nou-sasesc`
+- **`prazske-arcibiskupstvi`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `praha`
+- **`polsko-litevske-uzemi`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `varsava`
+- **`statni-skola-grigorije-rasputina`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `petrohrad`
+- **`14h`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `sangaj`
+- **`dharavi-reborn`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `bombaj`
+- **`gregory-of-lindsey`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `skotsko`
+- **`luise-i.`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `irsko`
+- **`Elisabeth-iii.`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `irsko`
+- **`buddhisticka-vetev`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `port-of-britany`
+- **`mapa-ukrajina`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `ukrajina`
+- **`nicola-drakovic`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `jugoslavie`
+- **`jack-whisky`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `jugoslavie`
+- **`smj`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `jugoslavie`
+- **`alianci-muslimskych-zemi`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `bulharsko`
+- **`konstantinopol`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `turecko`
+- **`abdalah-iii`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `jordansko`
+- **`buddhismticka-vetev`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `tibet`
+- **`teorie-demonu`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `skupina-lambda`
+- **`xuarid-macho`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `islamska-vetev`
+- **`alfsky-stin`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `nova-jihoamericka-vetev`
+- **`venusia-messina`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `haitska-alchymisticka-rodina`
+- **`boris-berezovskij`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `mongolska-alchymisticka-rodina`
+- **`anastasiya-scerbakovova`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `mongolska-alchymisticka-rodina`
+- **`ekaterina-sokovjolova`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `mongolska-alchymisticka-rodina`
+- **`elena-rodionovna`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `mongolska-alchymisticka-rodina`
+- **`ju-wu`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `cinska-alchymisticka-rodina`
+- **`ilia-chen`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `cinska-alchymisticka-rodina`
+- **`evropa`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `zaklinaci`
+- **`kult-persefona`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `clenove-kultu-persefony`
+- **`jarago-maki`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-4-projekt-saman`
+- **`layla-mustafa`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `albanska-vysoka-skola-pro-nadane`
+- **`polska-narodni-katolicka-rada`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `univerzita-jana-pavla-ii`
+- **`vzhle-univerzita-proroka-mohameda`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `univerzita-proroka-mohameda`
+- **`stonehenge`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `ministerstvo-matrixu`
+- **`muhammad-uld-ghazuani`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `mezinarodni-magicka-rada`
+- **`rodina-gustranskych`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `kanadska-sprava`
+- **`robert-sheer`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `operace-mengele`
+- **`nadace-svobodne-budoucnosti`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `srdce-pro-afriku`
+- **`dzenan-mustafa`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `belehradska-stredni-skola`
+- **`elizabeth-brooks`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `kongres`
+- **`svitky-z-irabasu`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `malske-narodni-muzeum`
+- **`nuku-reha`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `malske-narodni-muzeum`
+- **`malcolm-borasa`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `crann-na-beatha`
+- **`vanirové`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `strazci-bran`
+- **`rodina-huckerberry`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `anakonda`
+- **`nova-egyptska-myslenka`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-6-stara-egyptska-myslenka`
+- **`amtrak-konkurence`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `amtrak`
+- **`tomas-randal`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `eli-lilly`
+- **`upside-food`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `upside-foods-konkurence`
+- **`mysteres-baroyues`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `vzhled-mysteres-baroques`
+- **`ncim`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `njamm-corporation`
+- **`acs-konkurence`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `acs`
+- **`su-steel-konkurence`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `us-steel`
+- **`john-anderso`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `yasac`
+- **`martin-tennant-tara-venus`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `galactic-investments-group`
+- **`yalana-zandzani`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `galerie-ck-livingstone`
+- **`qianxun`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `galerie-ck-livingstone`
+- **`laszlo-kovac`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `madarske-cistky-v-jugoslavii`
+- **`skandinavie`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `mladen-gavrilov`
+- **`souleyman-abdoulaye`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-4-vily`
+- **`filippo-bellini`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `sofia-bellini`
+- **`chose-romano`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `rodina-bianco`
+- **`new-yorku`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `new-jersey`
+- **`aci`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `new-jersey`
+- **`noureddin-bongo-valentin`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `yalana-zandzanih`
+- **`glorie-madregal`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `luise-madregal`
+- **`marta-madrigal`** (1× · A) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `frederico-madregal`
+- **`dylan-tylor`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `marcus-johnson`
+- **`anthonius-von-bismarck`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `abi-magie`
+- **`frederik-scheer`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-2-latelia-clark`
+- **`lybie`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `filip-mochac`
+- **`anastasyia-sokovjol`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `ivan-scerbakov`
+- **`elena-sokovjolova`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `nadezda-scerbakovova`
+- **`reka-kovacsova`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `daniel-veres`
+- **`lauren-whitmore`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `phillip-armstrong`
+- **`bill-wattson`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `yuki-yuguchi`
+- **`otec-augustus`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `otec-benedikt-xv`
+- **`carlos-navarra`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `elena-morales`
+- **`alexander-fraser`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `rebecca-walsh`
+- **`natalie-koczmarek`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `zofia-kowalska`
+- **`exsa`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `fritz-sanger`
+- **`inakj-8-isabella-grant`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `isabella-grant`
+- **`afghanistan`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `raman-abrugi`
+- **`rathal-nawel`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-6-rodice-nawel`
+- **`elena-luca`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `tomas-hruby`
+- **`amazonske-magicke-rise`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `fabricio-fashion`
+- **`new-industries-company-matrix`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `shiro-waki`
+- **`dolores-scholz`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `anton-sholz`
+- **`berlin`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `dolores-sholz`
+- **`omano-dango`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `gabon`
+- **`fredrika-moyana`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `kamerun`
+- **`delta`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `ibul-an-haban`
+- **`Pythia`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `gm01`
+- **`hunsui-kyoraku`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-1-shunsui-kyoraku`
+- **`ishira-quitu`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `cornelia-mihantu`
+- **`antorias-xasa`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-10-antorias-xasa`
+- **`ryuichi-takeda`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `ryuichi`
+- **`samanska-rise`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `spiritweave`
+- **`bar-bratrstvo`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-4-bar-bratrstvo`
+- **`edward-oconell`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `glenfaran`
+- **`bitop`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `akj-9-biotop`
+- **`australska-magicka-skola`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `australska-magicka-skola-studium`
+- **`wrs-ttik`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-bipm`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-mwo`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-ats`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-zzh`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-bes`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-mzm`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-aes`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-zam`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-bti`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-mav`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-atm`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-zlbm`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-bmm`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-mlm`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`wrs-abm`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `westminster-school-royal-college-studium`
+- **`takara-abigail-yuguchi-wattson`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `mladi-absolventi-ve-vede-a-technice`
+- **`lyssandra-z-lindisfarne`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `gm07`
+- **`živly démonů`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `cailleah`
+- **`Vrany`** (1× · B) — neni v klasifikaci (sklonovani/preklep/nevzniklo) -> nechat cervene nebo zalozit
+  - `nina-zuzanovna`
+
+### Prezdivka postavy (zive opraveno)
+
+- **`abigail-wattson`** (33× · A+B) — -> `abi` (prezdivka, F5-1b — zive uz opraveno)
+  - `akj-5-projekt-mag`, `soukroma-skola-pro-m-nadane`, `abigail`, `abi`, `poznamky-sion`, `b11`, `arano-yuguchi`, `kenji-yuguchi`, `emiko-yuguchi`, `niboru-yuguchi`, `yuki-yuguchi`, `akeno-yuguchi`, `akj-6-akeno-yuguchi`, `gregory-johnson`, `sin-vzpominek`, `quentin-twist`, `billy-wattson`, `kim-omosaki`, `shen-omosaki`, `alex-garfin`, `cedric-waltham`, `eleanor-green`, `gm02`, `akj-8-abi`, `adrian-lefevre`, `akj-9-biotop`, `zradce-vedy-zemrel-v-exilu`, `hope-yuguchi`, `arthurien-yuguchi`, `takara-fashion` … +3 (viz JSON)
+- **`gabriel-patrik-dodwell`** (17× · A+B) — -> `medak` (prezdivka, F5-1b — zive uz opraveno)
+  - `ministerstvo-lasky`, `medak`, `zara-hawke`, `poznamky-sion`, `samuel-dodwell`, `akj-6-clenove-huckerbery`, `akj-4-latelia-clark`, `amanda-toy`, `lili-toy`, `natalie-dodwell`, `emili-key`, `sin-vzpominek`, `natalie-aldridge`, `robert-dodwell`, `abrham-dodwell`, `gm05`, `akj-8-medak`
+- **`myra-rosier`** (14× · A+B) — -> `myra` (prezdivka, F5-1b — zive uz opraveno)
+  - `svedsky-kralovsky-institut-pro-nadane`, `myra`, `zara-hawke`, `poznamky-sion`, `kavin-haze`, `matt-rosier`, `evelin-rosier`, `sin-vzpominek`, `sarah-robin`, `ibul-an-haban`, `atsu-nuru`, `atsaro-nuru`, `gm05`, `akj-8-myra`
+- **`archibald-of-lindsay`** (14× · A+B) — -> `archie` (prezdivka, F5-1b — zive uz opraveno)
+  - `archie`, `nsb`, `akj-10-archie-identita`, `sin-vzpominek`, `rodina-lindsay`, `winston-of-lindsay`, `harry-of-lindsay`, `microft-of-lindsay`, `gregory-of-lindsay`, `alena-of-lindsay`, `gm02`, `akj-8-archie`, `akj-8-archibald-of-lindsey`, `akj-10-damascus`
+- **`zara-hawke`** (13× · A+B) — -> `zara` (prezdivka, F5-1b — zive uz opraveno)
+  - `zara`, `poznamky-sion`, `akj-8-zara-hawke`, `luke-villiam`, `sin-vzpominek`, `gm05`, `isabelle-cypher`, `akj-8-zara`, `sestra-kristyna`, `sestra-jasmina`, `0432`, `akj-7-0432`, `h-k-e-studio`
+- **`neville-mousesack`** (8× · A+B) — -> `neville` (prezdivka, F5-1b — zive uz opraveno)
+  - `clenove-kultu-persefony`, `neville`, `sin-vzpominek`, `projekt-eden`, `elanius-reynolds`, `ismi-nuluel`, `gm02`, `akj-8-neville`
+- **`kuro-noir`** (6× · B) — -> `kuro` (prezdivka, F5-1b — zive uz opraveno)
+  - `akj-2-magicke-havy`, `kuro`, `sin-vzpominek`, `gm02`, `akj-8-kuro`, `akj-9-biotop`
+- **`katerina`** (6× · B) — -> `katerina-penkavova` (prezdivka, F5-1b — zive uz opraveno)
+  - `mi6`, `katerina-penkavova`, `kontakty-katerina`, `vybava-katerina`, `poznamky-katerina`, `finance-katerina`
+- **`lotri-spielmann`** (5× · A+B) — -> `lo3` (prezdivka, F5-1b — zive uz opraveno)
+  - `lo3`, `akj-12-lotri`, `sin-vzpominek`, `gm02`, `akj-8-lotri`
+- **`sion-edwards`** (3× · B) — -> `sion` (prezdivka, F5-1b — zive uz opraveno)
+  - `sion`, `sin-vzpominek`, `akj-8-apex-corp`
+- **`cael-aurion`** (1× · B) — -> `cael` (prezdivka, F5-1b — zive uz opraveno)
+  - `lumici`
+- **`pvh`** (1× · B) — -> `pvh-corp` (prezdivka, F5-1b — zive uz opraveno)
+  - `usa-fashion`
+- **`njamm`** (1× · B) — -> `njamm-corporation` (prezdivka, F5-1b — zive uz opraveno)
+  - `mike-broke`
+- **`julieta`** (1× · B) — -> `julieta-madregal` (prezdivka, F5-1b — zive uz opraveno)
+  - `isabella-madregal`
+
+### AKJ bez verejne stranky
+
+- **`akj-4-lykantropove`** (19× · B) — -> vlastnik AKJ: `lykantropove`
+  - `lykantropove`, `raika-linsdarf`, `rogan-rei`, `albert-aka`, `rahila-umaru`, `rafael-ruhal`, `rebecca-walsh`, `emil-constantinescu`, `vlci-vyti`, `rihai-dumitrescu`, `ana-ionescu`, `nicolae-constantin`, `khalid-ibn-rashid`, `kaido-chopp`, `ibul-an-haban`, `aschar-duar`, `freya-rihul`, `mihu-jasa`, `grun-valko`
+- **`akj-4-clenove-huckerbery`** (17× · B) — -> vlastnik AKJ: `rodina-huckerbery`
+  - `kajetan-kalinowski`, `rodina-huckerbery`, `kenneth-johnson`, `mason-huckerbery`, `ava-huckerbery`, `franklin-oreilly`, `daniel-darcy`, `walter-bishop`, `thomas-bishop`, `patrick-gallagher`, `erin-gallagher`, `dominic-russo`, `nathan-russo`, `isabelle-fournier`, `elise-moreau`, `lily-carter`, `ryan-donovan`
+- **`akj-6-clenove-huckerbery`** (14× · B) — -> vlastnik AKJ: `rodina-huckerbery`
+  - `gabriel-patrik-dodwell`, `medak`, `rodina-huckerbery`, `rachel-huckerbery`, `gabriela-fox`, `natalie-dodwell`, `margaret-black`, `elena-morales`, `carlos-navarro`, `lily-senders`, `liam-gallagher`, `brandon-cole`, `aidan-blake`, `sophia-wright`
+- **`akj-4-clenove-greco`** (14× · B) — -> vlastnik AKJ: `rodina-greco`
+  - `rodina-greco`, `vincenzo-ferrero`, `fillipo-bellini`, `antonio-lucchese`, `matteo-conti`, `adriana-conti`, `anna-gatti`, `daniela-morelli`, `francesca-de-santis`, `isabella-lorenzi`, `lucia-bellucci`, `sabrina-caruso`, `nicolo-greco`, `riccardo-lombardi`
+- **`akj-8-clenove-huckerbery`** (11× · B) — -> vlastnik AKJ: `rodina-huckerbery`
+  - `rodina-huckerbery`, `ruth-mckenna`, `vincent-huckerbery`, `frederic-scheer`, `robert-fox`, `peter-zulinsky`, `jim-toy`, `dijon-perez`, `sam-darcy`, `clara-winters`, `sion-jireman`
+- **`akj-6-clenove-greco`** (10× · B) — -> vlastnik AKJ: `rodina-greco`
+  - `rodina-greco`, `salvatore-bellini`, `fabio-conti`, `marco-gatti`, `enrico-damiani`, `sofia-neri`, `luca-verona`, `alessia-marconi`, `lorenzo-greco`, `angelo-ferrante`
+- **`gm01`** (9× · A+B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `tymy-gmoi`, `akj-9-gm01`, `akj-12-gm01`, `jorgen-jorgerson`, `pythia-delfska`, `rajesh-koothrappali`, `redneck-baldwin`, `bathrat-leon`, `pythia`
+- **`akj-4-vily`** (8× · B) — -> vlastnik AKJ: `vily`
+  - `vily`, `nina-patelova`, `emiko-yuguchi`, `margaret-cruely`, `ida-northam`, `hvezdny-prach`, `milena-kralickova`, `nafisou-diallo`
+- **`akj-2-zna`** (8× · B) — -> vlastnik AKJ: `zoldacka-najemni-agentura`
+  - `zoldacka-najemni-agentura`, `adam-kowalski`, `ramal-ajul`, `jason-godwil`, `sarah-jung`, `hans-schmidt`, `jack-harris`, `antoine-lefevre`
+- **`akj-2-svobodni-zednari`** (7× · B) — -> vlastnik AKJ: `svobodni-zednari`
+  - `svobodni-zednari`, `miki-asada`, `ronegald-trump`, `natalie-trump`, `britany-hole`, `kabir-shankar`, `rafael-orozco`
+- **`akj-5-miteh`** (7× · B) — -> vlastnik AKJ: `projekt-miteh`
+  - `projekt-miteh`, `frederic-scheer-jr`, `robert-scheer`, `gabriela-fox`, `gabriel-mason`, `benedict-hunter`, `katerin-bortson`
+- **`gm03`** (7× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `mi6`, `tymy-gmoi`, `li-mingguo`, `mingguo`, `katerina`, `kraven`, `severan`
+- **`clenove-noveho-mysleni`** (6× · B) — -> vlastnik AKJ: `nove-mysleni`
+  - `nove-mysleni`, `liv-ibuka`, `elena-ramirez`, `ali-rafi`, `maui-haleakala`, `havran`
+- **`akj-4-bratrstvo`** (6× · B) — -> vlastnik AKJ: `bratrstvo`
+  - `bratrstvo`, `quentin-twist`, `bridged-johnson`, `eva-lambert`, `yuki-yunoichi`, `rhys-vaughan`
+- **`akj-2-bratva`** (6× · B) — -> vlastnik AKJ: `bratva`
+  - `bratva`, `sergej-petrov`, `michael-cherney`, `viktor-petrovich-kalashnikov`, `alexej-mikhailov`, `leonid-petrov`
+- **`akj-12-gm01`** (6× · A+B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `gm01`, `akj-12-jorgen-jorgerson`, `akj-12-pythia`, `akj-12-rajesh-koothrappali`, `akj-12-redneck-baldwin`, `akj-12-bathrat-leon`
+- **`akj-8-clenove-greco`** (5× · B) — -> vlastnik AKJ: `rodina-greco`
+  - `rodina-greco`, `giuseppe-moretti`, `eleonora-vitale`, `caterina-rizzo`, `mateo-greco`
+- **`akj-10-andele`** (5× · B) — -> vlastnik AKJ: `andele`
+  - `andele`, `elizabeth-johnson`, `lucius-apuleius`, `ledova-joana`, `aurora-essentials`
+- **`b7`** (4× · B) — -> vlastnik AKJ: `britany-hole`
+  - `akj-5-projekt-mag`, `projekt-ikaros`, `regulus-grey`, `britany-hole`
+- **`akj-8-jakuza`** (4× · A+B) — -> vlastnik AKJ: `jakuza`
+  - `jakuza`, `hanako-ishikawa`, `daisuke-kuroda`, `senji-ishikawa`
+- **`akj-8-apex-corp`** (4× · B) — -> vlastnik AKJ: `apex-corporation`
+  - `john-willscar`, `sion-edwards`, `nikolaj-cathal`, `apex-corporation`
+- **`akj-8-clenove-notte`** (4× · B) — -> vlastnik AKJ: `rodina-notte`
+  - `rodina-notte`, `arisa-notte`, `emiko-sato`, `anastasia-volkova`
+- **`gm04`** (4× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `tymy-gmoi`, `alexander-mcallister`, `shunsui-kyoraku`, `petr-semjonov`
+- **`rodice-miari-madar`** (3× · B) — -> vlastnik AKJ: `miari-madar`
+  - `saomi-madar`, `miari-madar`, `vrchni-mag`
+- **`clenove-tibetskeho-magickeho-odboje`** (3× · B) — -> vlastnik AKJ: `tibetsky-magicky-odboj`
+  - `tibetsky-magicky-odboj`, `ami-kapur`, `cheng-long`
+- **`akj-8-bratrstvo`** (3× · B) — -> vlastnik AKJ: `bratrstvo`
+  - `bratrstvo`, `liana`, `akj-6-liana`
+- **`akj-2-magicke-havy`** (3× · B) — -> vlastnik AKJ: `magicke-havy`
+  - `magicke-havy`, `leopold-draven`, `yolanda-ara`
+- **`b11`** (3× · B) — -> vlastnik AKJ: `abi`
+  - `abigail-wattson`, `abi`, `regulus-grey`
+- **`vzhled-dzinky-lampy`** (3× · B) — -> vlastnik AKJ: `dzinka`
+  - `john`, `vnitrek-dzinky-lampa`, `dzinka`
+- **`akj-8-clenove-bianco`** (3× · B) — -> vlastnik AKJ: `rodina-bianco`
+  - `rodina-bianco`, `paul-bianco-jr`, `chose-bianco`
+- **`akj-4-sumika-no-kami`** (3× · B) — -> vlastnik AKJ: `sumika-no-kami`
+  - `kim-omosaki`, `shen-omosaki`, `sumika-no-kami`
+- **`akj-15-nordove`** (2× · B) — -> vlastnik AKJ: `nordove`
+  - `nordove`, `nordske-planety`
+- **`akj-10-nove-mysleni`** (2× · B) — -> vlastnik AKJ: `nove-mysleni`
+  - `nove-mysleni`, `martin-tennant`
+- **`clenove-kultu-persefony`** (2× · B) — -> vlastnik AKJ: `kult-persefony`
+  - `kult-persefony`, `edward-hyde`
+- **`darth-sun`** (2× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `sithsky-rad`, `aurelia-valerina`
+- **`clenove-sithskeho-radu`** (2× · B) — -> vlastnik AKJ: `sithsky-rad`
+  - `sithsky-rad`, `laura-neith`
+- **`akj-4-projekt-saman`** (2× · B) — -> vlastnik AKJ: `projekt-saman`
+  - `projekt-saman`, `kamerunsky-vyzkumny-institut`
+- **`akj-10-fillip-sitt`** (2× · B) — -> vlastnik AKJ: `fillip-skitt`
+  - `wesr`, `fillip-skitt`
+- **`akj-10-jla`** (2× · B) — -> vlastnik AKJ: `jednotky-likvidace-aciv`
+  - `jednotky-likvidace-aciv`, `sarah-jung`
+- **`akj-8-projekt-ikaros`** (2× · B) — -> vlastnik AKJ: `projekt-ikaros`
+  - `projekt-ikaros`, `akj-5-projekt-ikaros`
+- **`akj-4-zna`** (2× · B) — -> vlastnik AKJ: `zoldacka-najemni-agentura`
+  - `zoldacka-najemni-agentura`, `zita-akande`
+- **`akj-2-snf`** (2× · B) — -> vlastnik AKJ: `statni-narodni-fronta`
+  - `statni-narodni-fronta`, `hadrian-muwuela`
+- **`akj-10-cif`** (2× · B) — -> vlastnik AKJ: `cerny-investicni-fond`
+  - `cerny-investicni-fond`, `robert-brigard`
+- **`akj-2-alfi-stin`** (2× · B) — -> vlastnik AKJ: `alfi-stin`
+  - `alfi-stin`, `arainot-rako`
+- **`capo-di-tutti-capi`** (2× · B) — -> vlastnik AKJ: `mafianske-rodiny`
+  - `mafianske-rodiny`, `michael-cherney`
+- **`pobocnik-mafianu`** (2× · B) — -> vlastnik AKJ: `mafianske-rodiny`
+  - `mafianske-rodiny`, `amelie-greco`
+- **`zastupce-mafianu`** (2× · B) — -> vlastnik AKJ: `mafianske-rodiny`
+  - `mafianske-rodiny`, `frederic-scheer`
+- **`akj-12-antonie-grey`** (2× · B) — -> vlastnik AKJ: `antonie-grey`
+  - `0041`, `antonie-grey`
+- **`akj-6-zlaty-drak`** (2× · B) — -> vlastnik AKJ: `zlaty-drak`
+  - `zlaty-drak`, `zung-tu`
+- **`akj-2-zlaty-drak`** (2× · B) — -> vlastnik AKJ: `zlaty-drak`
+  - `zlaty-drak`, `jiang-to`
+- **`akj-2-dockers`** (2× · B) — -> vlastnik AKJ: `motorkarsky-gang-dockers`
+  - `motorkarsky-gang-dockers`, `james-kid`
+- **`akj-4-sede-noze`** (2× · B) — -> vlastnik AKJ: `sede-noze`
+  - `sede-noze`, `james-cook`
+- **`akj-4-protikatolicka-liga`** (2× · B) — -> vlastnik AKJ: `protikatolicka-liga`
+  - `protikatolicka-liga`, `bertrand-delacroix`
+- **`akj-2-protikatolicka-liga`** (2× · B) — -> vlastnik AKJ: `protikatolicka-liga`
+  - `protikatolicka-liga`, `elara-martelli`
+- **`akj-4-sun-yee-on`** (2× · B) — -> vlastnik AKJ: `sun-yee-on`
+  - `sun-yee-on`, `liu-xiang`
+- **`akj-2-sun-yee-on`** (2× · B) — -> vlastnik AKJ: `sun-yee-on`
+  - `sun-yee-on`, `jet-li`
+- **`akj-8-spolecnost-m`** (2× · B) — -> vlastnik AKJ: `spolecnost-m`
+  - `spolecnost-m`, `ravi-nwosu`
+- **`akj-4-bratva`** (2× · B) — -> vlastnik AKJ: `bratva`
+  - `bratva`, `michael-cherney`
+- **`akj-4-moskovskij-extravaganza`** (2× · A+B) — -> vlastnik AKJ: `moskovskij-extravaganza`
+  - `bratva`, `moskovskij-extravaganza`
+- **`akj-4-magicke-havy`** (2× · B) — -> vlastnik AKJ: `magicke-havy`
+  - `magicke-havy`, `ahmed-al-masri`
+- **`akj-8-abi`** (2× · B) — -> vlastnik AKJ: `abi`
+  - `abigail-wattson`, `ava-parker`
+- **`gm05`** (2× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `evropani`, `tymy-gmoi`
+- **`gm02`** (2× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `lumici`, `tymy-gmoi`
+- **`akj-8-neville`** (2× · B) — -> vlastnik AKJ: `neville`
+  - `neville-mousesack`, `wade-wilson`
+- **`akj-8-kuro`** (2× · B) — -> vlastnik AKJ: `kuro`
+  - `kuro-noir`, `kyle-hardensson`
+- **`akj-10-zoltan-feher`** (2× · A+B) — -> vlastnik AKJ: `zoltan-feher`
+  - `kuro-noir`, `zoltan-feher`
+- **`akj-10-archie-identita`** (2× · B) — -> vlastnik AKJ: `ethan-patriot`
+  - `archibald-of-lindsay`, `ethan-patriot`
+- **`akj-8-archie`** (2× · B) — -> vlastnik AKJ: `archie`
+  - `archibald-of-lindsay`, `blackwell-inc`
+- **`akj-8-archibald-of-lindsey`** (2× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `archibald-of-lindsay`, `nathan-blackwell`
+- **`akj-10-damascus`** (2× · B) — -> vlastnik AKJ: `damascus`
+  - `archibald-of-lindsay`, `damascus`
+- **`akj-10-apex-corp`** (2× · B) — -> vlastnik AKJ: `apex-corporation`
+  - `jesse-helsing`, `apex-corporation`
+- **`helsinguv-stin`** (2× · B) — -> vlastnik AKJ: `kha-saw-skia`
+  - `helsing`, `kha-saw-skia`
+- **`akj-10-john`** (2× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `john-willscar`, `conri-tirre`
+- **`akj-10-nikolaj`** (2× · B) — -> vlastnik AKJ: `nikolaj-cathal`
+  - `nikolaj-cathal`, `theodor-wick`
+- **`akj-8-myra`** (2× · B) — -> vlastnik AKJ: `myra`
+  - `myra-rosier`, `evelyn-blackwood`
+- **`akj-6-clenove-notte`** (2× · B) — -> vlastnik AKJ: `rodina-notte`
+  - `kajetan-kalinowski`, `rodina-notte`
+- **`akj-6-jagar-midgarson`** (2× · B) — -> vlastnik AKJ: `jagar-midgarson`
+  - `midgardsormr`, `jagar-midgarson`
+- **`akj-6-cyberdyne-corporation`** (2× · B) — -> vlastnik AKJ: `cyberdyne-corporation`
+  - `cyberdyne-corporation`, `akj-4-cang-tien`
+- **`akj-9-tesla`** (2× · B) — -> vlastnik AKJ: `tesla`
+  - `tesla`, `jeffrey-bezos`
+- **`akj-8-sophia-smith`** (2× · B) — -> vlastnik AKJ: `sophia-smith`
+  - `camilla-wells`, `sophia-smith`
+- **`akj-8-sourozenci-willetovi`** (2× · A) — -> vlastnik AKJ: `christos-willet`
+  - `anna-willet`, `christos-willet`
+- **`akj-12-loki-syn-farbautuv`** (2× · B) — -> vlastnik AKJ: `loki-syn-farbautuv`
+  - `loki-syn-farbautuv`, `bautaf-liko`
+- **`akj-4-frederic-scheer`** (2× · B) — -> vlastnik AKJ: `frederic-scheer`
+  - `frederic-scheer`, `amanda-wrist`
+- **`akj-2-laura-zola`** (2× · B) — -> vlastnik AKJ: `laura-zola`
+  - `laura-zola`, `colleman-patrik`
+- **`akj-8-lotri`** (2× · B) — -> vlastnik AKJ: `lo3`
+  - `lilian-deveroux`, `lotri-spielmann`
+- **`identita-fenix`** (2× · B) — -> vlastnik AKJ: `fenix`
+  - `fenix`, `jan-cermak`
+- **`akj-3-xiu-lian`** (2× · B) — -> vlastnik AKJ: `xiu-lian`
+  - `zhang-xian`, `xiu-lian`
+- **`akj-4-konohana-sakuya-hime`** (2× · B) — -> vlastnik AKJ: `konohana-sakuya-hime`
+  - `yumi-otsuka`, `konohana-sakuya-hime`
+- **`akj-4-takeminakata-ml`** (2× · B) — -> vlastnik AKJ: `takeminakata-ml`
+  - `ken-jinai`, `takeminakata-ml`
+- **`akj-4-noctuaire`** (2× · B) — -> vlastnik AKJ: `noctuaire`
+  - `selena-moreau`, `noctuaire`
+- **`akj-2-lykonia`** (2× · B) — -> vlastnik AKJ: `lykonia`
+  - `lykonia`, `raika-linsdarf`
+- **`akj-6-emeth-brown`** (2× · B) — -> vlastnik AKJ: `emeth-brown`
+  - `emeth-brown`, `elowen-brown`
+- **`akj-10-rebecca-zero`** (2× · B) — -> vlastnik AKJ: `rebecca-zero`
+  - `rebecca-zero`, `rebecca-two`
+- **`akj-4-yami-no-kagami`** (2× · B) — -> vlastnik AKJ: `yami-no-kagami`
+  - `rebecca-sajlanom`, `yami-no-kagami`
+- **`akj-4-amorganc-tualf`** (2× · B) — -> vlastnik AKJ: `amorganc-tualf`
+  - `amorganc-tualf`, `nitika`
+- **`akj-6-rodice-nawel`** (2× · B) — -> vlastnik AKJ: `rahtal-nawel`
+  - `orwalt-nawel`, `rahtal-nawel`
+- **`akj-4-rahtal-nawel`** (2× · B) — -> vlastnik AKJ: `rahtal-nawel`
+  - `rahtal-nawel`, `lilith`
+- **`dxm`** (2× · B) — -> vlastnik AKJ: `duhova-boure`
+  - `margaret-cruely`, `duhova-boure`
+- **`akj-4-nordlux`** (2× · B) — -> vlastnik AKJ: `nordlux`
+  - `liana`, `nordlux`
+- **`akj-10-eliezer-cohen`** (2× · B) — -> vlastnik AKJ: `eliezer-cohen`
+  - `eliezer-cohen`, `jezis-nazaretsky`
+- **`akj-4-otec-archibald`** (2× · B) — -> vlastnik AKJ: `otec-archibald`
+  - `otec-archibald`, `cassiel`
+- **`akj-4-wladyslaw-zuziak`** (2× · B) — -> vlastnik AKJ: `wladyslaw-zuziak`
+  - `wladyslaw-zuziak`, `malahidael`
+- **`akj-4-khent-amentu-ra`** (2× · B) — -> vlastnik AKJ: `khent-amentu-ra`
+  - `hatalid-kajid`, `khent-amentu-ra`
+- **`akj-4-vlci-vyti`** (2× · B) — -> vlastnik AKJ: `vlci-vyti`
+  - `vlci-vyti`, `pimikiw`
+- **`akj-2-thomas-door`** (2× · B) — -> vlastnik AKJ: `thomas-door`
+  - `thomas-door`, `azharael`
+- **`akj-7-eleanor-green`** (2× · B) — -> vlastnik AKJ: `eleanor-green`
+  - `billy-wattson`, `eleanor-green`
+- **`akj-4-antonia-pink`** (2× · B) — -> vlastnik AKJ: `antonia-pink`
+  - `antonia-pink`, `gregory-of-lindsay`
+- **`akj-4-velis-mortem`** (2× · B) — -> vlastnik AKJ: `velis-mortem`
+  - `ignac-grouvs`, `velis-mortem`
+- **`akj-4-sylvara`** (2× · B) — -> vlastnik AKJ: `sylvara`
+  - `katerina-penkavova`, `sylvara`
+- **`akj-4-silquas`** (2× · B) — -> vlastnik AKJ: `silquas`
+  - `azach-kozlov`, `silquas`
+- **`akj-8-zoe-knight`** (2× · B) — -> vlastnik AKJ: `zoe-knight`
+  - `zoe-knight`, `lyssandra-of-lindisfarne`
+- **`akj-4-dante-moreau`** (2× · B) — -> vlastnik AKJ: `dante-moreau`
+  - `dante-moreau`, `sanguis-gemini`
+- **`akj-4-miravael`** (2× · A+B) — -> vlastnik AKJ: `miravael`
+  - `jorgen-jorgerson`, `miravael`
+- **`akj-12-pythia`** (2× · A+B) — -> vlastnik AKJ: `pythia-delfska`
+  - `pythia-delfska`, `pythia`
+- **`akj-15-pan-x`** (2× · B) — -> vlastnik AKJ: `pan-x`
+  - `pan-x`, `antorias-xandrius-xasa`
+- **`akj-10-antorias-xasa`** (2× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `antorias-xandrius-xasa`, `baal`
+- **`akj-10-tiamat`** (2× · B) — -> vlastnik AKJ: `tiamat`
+  - `tiamat`, `tamara-north`
+- **`akj-12-andele`** (2× · B) — -> vlastnik AKJ: `andele`
+  - `andele`, `aurora-angel`
+- **`akj-4-crvedracul`** (2× · B) — -> vlastnik AKJ: `crvedracul`
+  - `elizabeth-johnson`, `crvedracul`
+- **`akj-4-erythros`** (2× · B) — -> vlastnik AKJ: `erythros`
+  - `lucius-apuleius`, `erythros`
+- **`akj-4-xytherion`** (2× · B) — -> vlastnik AKJ: `xytherion`
+  - `thovt`, `xytherion`
+- **`akj-8-havran`** (2× · B) — -> vlastnik AKJ: `havran`
+  - `havran`, `corvax`
+- **`akj-4-inari`** (2× · B) — -> vlastnik AKJ: `inari`
+  - `mihu-jasa`, `inari`
+- **`akj-10-daniel-wox`** (2× · B) — -> vlastnik AKJ: `daniel-wox`
+  - `daniel-wox`, `ewan-mcarthur`
+- **`akj-10-ast`** (2× · A+B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `the-steel-angels`, `akj-4-the-steel-angels`
+- **`akj-6-black-static-arcade`** (2× · B) — -> vlastnik AKJ: `black-static-arcade`
+  - `black-static-arcade`, `senji-ishikawa`
+- **`akj-3-nou-sasesc`** (1× · B) — -> vlastnik AKJ: `nou-sasesc`
+  - `nou-sasesc`
+- **`akj-7-falklandy`** (1× · B) — -> vlastnik AKJ: `falklandy`
+  - `falklandy`
+- **`akj-4-cisarovna-aiko`** (1× · B) — -> vlastnik AKJ: `cisarovna-aiko`
+  - `cisarovna-aiko`
+- **`akj-8-ylva-brodin`** (1× · B) — -> vlastnik AKJ: `ylva-brodin`
+  - `ylva-brodin`
+- **`akj-4-ylva-brodin`** (1× · B) — -> vlastnik AKJ: `ylva-brodin`
+  - `ylva-brodin`
+- **`akj-2-ylva-brodin`** (1× · B) — -> vlastnik AKJ: `ylva-brodin`
+  - `ylva-brodin`
+- **`akj-10-island`** (1× · B) — -> vlastnik AKJ: `island`
+  - `island`
+- **`akj-10-lucius-v`** (1× · B) — -> vlastnik AKJ: `lucius-v`
+  - `lucius-v`
+- **`akj-8-lucius-v`** (1× · B) — -> vlastnik AKJ: `lucius-v`
+  - `lucius-v`
+- **`akj-4-lucius-v`** (1× · B) — -> vlastnik AKJ: `lucius-v`
+  - `lucius-v`
+- **`akj-8-roman-putin`** (1× · B) — -> vlastnik AKJ: `roman-putin`
+  - `roman-putin`
+- **`akj-6-roman-putin`** (1× · B) — -> vlastnik AKJ: `roman-putin`
+  - `roman-putin`
+- **`akj-12-saomi-madar`** (1× · B) — -> vlastnik AKJ: `saomi-madar`
+  - `saomi-madar`
+- **`akj-8-saomi-madar`** (1× · B) — -> vlastnik AKJ: `saomi-madar`
+  - `saomi-madar`
+- **`akj-12-miari-madar`** (1× · B) — -> vlastnik AKJ: `miari-madar`
+  - `miari-madar`
+- **`akj-8-miari-madar`** (1× · B) — -> vlastnik AKJ: `miari-madar`
+  - `miari-madar`
+- **`akj-15-undarbunndr`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `akj-15-nordove`
+- **`akj-15-hvelgermir`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `akj-15-nordove`
+- **`akj-15-lechesis`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `akj-15-nordove`
+- **`akj-15-nav`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `akj-15-nordove`
+- **`akj-15-tim`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `akj-15-nordove`
+- **`akj-15-mimismundr`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `akj-15-nordove`
+- **`akj-3-ronin`** (1× · B) — -> vlastnik AKJ: `ronin`
+  - `ronin`
+- **`akj-3-sedmy-zivel`** (1× · B) — -> vlastnik AKJ: `sedmy-zivel`
+  - `sedmy-zivel`
+- **`akj-3-zaklinaci`** (1× · B) — -> vlastnik AKJ: `zaklinaci`
+  - `zaklinaci`
+- **`akj-6-nove-mysleni`** (1× · B) — -> vlastnik AKJ: `nove-mysleni`
+  - `nove-mysleni`
+- **`akj-6-kult-persefony`** (1× · B) — -> vlastnik AKJ: `kult-persefony`
+  - `kult-persefony`
+- **`akj-5-projekt-mag`** (1× · B) — -> vlastnik AKJ: `projekt-mag`
+  - `projekt-mag`
+- **`akj-6-projekt-merlin`** (1× · B) — -> vlastnik AKJ: `projekt-merlin`
+  - `projekt-merlin`
+- **`akj-2-institut-catholique-de-paris`** (1× · B) — -> vlastnik AKJ: `institut-catholique-de-paris`
+  - `institut-catholique-de-paris`
+- **`akj-4-beninsky-magicky-institut`** (1× · B) — -> vlastnik AKJ: `beninsky-magicky-institut`
+  - `beninsky-magicky-institut`
+- **`akj-6-dra`** (1× · B) — -> vlastnik AKJ: `reditelstvi-pro-revitalizaci-aciv`
+  - `reditelstvi-pro-revitalizaci-aciv`
+- **`akj-12-projekt-ikaros`** (1× · B) — -> vlastnik AKJ: `projekt-ikaros`
+  - `projekt-ikaros`
+- **`akj-4-srdce-pro-afriku`** (1× · B) — -> vlastnik AKJ: `srdce-pro-afriku`
+  - `srdce-pro-afriku`
+- **`akj-10-ptppb`** (1× · B) — -> vlastnik AKJ: `pobocka-technicke-podpory-pro-benelux`
+  - `pobocka-technicke-podpory-pro-benelux`
+- **`kresla-kongres`** (1× · B) — -> vlastnik AKJ: `kongres`
+  - `kongres`
+- **`akj-4-upiri`** (1× · B) — -> vlastnik AKJ: `upiri`
+  - `upiri`
+- **`akj-15-strazci-bran`** (1× · B) — -> vlastnik AKJ: `strazci-bran`
+  - `strazci-bran`
+- **`clenove-stinove-rady`** (1× · B) — -> vlastnik AKJ: `stinova-rada`
+  - `stinova-rada`
+- **`nadrizeny-zoldacka-najemna-agentura`** (1× · B) — -> vlastnik AKJ: `zoldacka-najemni-agentura`
+  - `zoldacka-najemni-agentura`
+- **`akj-6-snf`** (1× · B) — -> vlastnik AKJ: `statni-narodni-fronta`
+  - `statni-narodni-fronta`
+- **`akj-11-cif`** (1× · B) — -> vlastnik AKJ: `cerny-investicni-fond`
+  - `cerny-investicni-fond`
+- **`akj-6-alfi-stin`** (1× · B) — -> vlastnik AKJ: `alfi-stin`
+  - `alfi-stin`
+- **`akj-6-mafianske-rodiny`** (1× · B) — -> vlastnik AKJ: `mafianske-rodiny`
+  - `mafianske-rodiny`
+- **`akj-8-anakonda`** (1× · B) — -> vlastnik AKJ: `anakonda`
+  - `anakonda`
+- **`akj-6-odboj`** (1× · B) — -> vlastnik AKJ: `odboj`
+  - `odboj`
+- **`akj-9-0041`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0041`
+- **`akj-9-0011`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0011`
+- **`akj-9-0016`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0016`
+- **`akj-9-0045`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0045`
+- **`akj-7-0104`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0104`
+- **`akj-7-0112`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0112`
+- **`akj-7-0152`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0152`
+- **`akj-7-0176`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0176`
+- **`akj-7-0423`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0423`
+- **`akj-7-0489`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0489`
+- **`akj-7-0553`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0553`
+- **`akj-7-0567`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0567`
+- **`akj-7p-0567`** (1× · B) — -> vlastnik AKJ: `5682`
+  - `0567`
+- **`akj-5-3672`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `3672`
+- **`akj-6-indianske-spolecenstvi`** (1× · B) — -> vlastnik AKJ: `indianske-spolecenstvi`
+  - `indianske-spolecenstvi`
+- **`akj-8-dockers`** (1× · B) — -> vlastnik AKJ: `motorkarsky-gang-dockers`
+  - `motorkarsky-gang-dockers`
+- **`akj-3-dockers`** (1× · B) — -> vlastnik AKJ: `motorkarsky-gang-dockers`
+  - `motorkarsky-gang-dockers`
+- **`akj-2-ocas-draka`** (1× · B) — -> vlastnik AKJ: `ocas-draka`
+  - `ocas-draka`
+- **`akj-6-sede-noze`** (1× · B) — -> vlastnik AKJ: `sede-noze`
+  - `sede-noze`
+- **`akj-6-bratrstvo`** (1× · B) — -> vlastnik AKJ: `bratrstvo`
+  - `bratrstvo`
+- **`akj-6-ira`** (1× · B) — -> vlastnik AKJ: `ira`
+  - `ira`
+- **`akj-6-protikatolicka-liga`** (1× · B) — -> vlastnik AKJ: `protikatolicka-liga`
+  - `protikatolicka-liga`
+- **`akj-6-recky-odboj`** (1× · B) — -> vlastnik AKJ: `recky-odboj`
+  - `recky-odboj`
+- **`akj-6-spolecnost-m`** (1× · B) — -> vlastnik AKJ: `spolecnost-m`
+  - `spolecnost-m`
+- **`akj-6-pravi-soudci`** (1× · B) — -> vlastnik AKJ: `pravi-soudci`
+  - `pravi-soudci`
+- **`akj-6-nch`** (1× · B) — -> vlastnik AKJ: `narodni-carske-hnuti`
+  - `narodni-carske-hnuti`
+- **`akj-6-duse`** (1× · B) — -> vlastnik AKJ: `duse`
+  - `duse`
+- **`akj-4-hasasini`** (1× · B) — -> vlastnik AKJ: `hasasini`
+  - `hasasini`
+- **`akj-6-magicke-havy`** (1× · B) — -> vlastnik AKJ: `magicke-havy`
+  - `magicke-havy`
+- **`akj-6-stara-egyptska-myslenka`** (1× · B) — -> vlastnik AKJ: `stara-egyptska-myslenka`
+  - `stara-egyptska-myslenka`
+- **`akj-6-dusevni-svet`** (1× · B) — -> vlastnik AKJ: `dusevni-svet`
+  - `dusevni-svet`
+- **`akj-12-true-leaks`** (1× · B) — -> vlastnik AKJ: `true-leaks`
+  - `true-leaks`
+- **`akj-4-wartech-london`** (1× · B) — -> vlastnik AKJ: `wartech-london`
+  - `wartech-london`
+- **`akj-6-wartech-london`** (1× · B) — -> vlastnik AKJ: `wartech-london`
+  - `wartech-london`
+- **`adm-konkurence`** (1× · B) — -> vlastnik AKJ: `adm`
+  - `adm`
+- **`akj-4-amtrak`** (1× · B) — -> vlastnik AKJ: `amtrak`
+  - `amtrak`
+- **`konkurence-berkshire-hathaway`** (1× · B) — -> vlastnik AKJ: `berkshire-hathaway`
+  - `berkshire-hathaway`
+- **`konkurence-boing`** (1× · B) — -> vlastnik AKJ: `boing`
+  - `boing`
+- **`akj-4-boing`** (1× · B) — -> vlastnik AKJ: `boing`
+  - `boing`
+- **`konkurence-colt`** (1× · B) — -> vlastnik AKJ: `colt`
+  - `colt`
+- **`zubni-vily`** (1× · B) — -> vlastnik AKJ: `kuro`
+  - `kuro`
+- **`kontakty-john`** (1× · B) — -> vlastnik AKJ: `john-willscar`
+  - `john`
+- **`akj-10-sion`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `sion-edwards`
+- **`akj-8-zara-hawke`** (1× · B) — -> vlastnik AKJ: `zara`
+  - `zara-hawke`
+- **`akj-8-zara`** (1× · B) — -> vlastnik AKJ: `zara`
+  - `zara-hawke`
+- **`zara-rodina`** (1× · B) — -> vlastnik AKJ: `zara`
+  - `zara`
+- **`vnitrek-dzinky-lampa`** (1× · B) — -> vlastnik AKJ: `dzinka`
+  - `vzhled-dzinky-lampy`
+- **`eli-lilly-konkurence`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `eli-lilly`
+- **`konkurence-ford`** (1× · B) — -> vlastnik AKJ: `ford`
+  - `ford`
+- **`general-dynamic-konkurence`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `general-dynamic`
+- **`home-depot-konkurence`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `home-depot`
+- **`akj-4-home-depot`** (1× · B) — -> vlastnik AKJ: `home-depot`
+  - `home-depot`
+- **`johnson-and-johnson-konkurence`** (1× · B) — -> vlastnik AKJ: `johnson-and-johnson`
+  - `johnson-and-johnson`
+- **`pfizer-konkurence`** (1× · B) — -> vlastnik AKJ: `pfizer`
+  - `pfizer`
+- **`pvh-corp-konkurence`** (1× · B) — -> vlastnik AKJ: `pvh-corp`
+  - `pvh-corp`
+- **`raytheon-konkurence`** (1× · B) — -> vlastnik AKJ: `raytheon`
+  - `raytheon`
+- **`turner-corporation-konkurence`** (1× · B) — -> vlastnik AKJ: `turner-corporation`
+  - `turner-corporation`
+- **`upside-foods-konkurence`** (1× · B) — -> vlastnik AKJ: `upside-foods`
+  - `upside-foods`
+- **`usa-building-direct-konkurence`** (1× · B) — -> vlastnik AKJ: `usa-building-direct`
+  - `usa-building-direct`
+- **`akj-4-usa-building-direct`** (1× · B) — -> vlastnik AKJ: `usa-building-direct`
+  - `usa-building-direct`
+- **`usa-fashion-konkurence`** (1× · B) — -> vlastnik AKJ: `usa-fashion`
+  - `usa-fashion`
+- **`whiskas-konkurence`** (1× · B) — -> vlastnik AKJ: `whiskas`
+  - `whiskas`
+- **`akj-10-cyberdyne`** (1× · B) — -> vlastnik AKJ: `cyberdyne-corporation`
+  - `cyberdyne-corporation`
+- **`microsoft-konkurence`** (1× · B) — -> vlastnik AKJ: `microsoft`
+  - `microsoft`
+- **`akj-4-microsoft`** (1× · B) — -> vlastnik AKJ: `microsoft`
+  - `microsoft`
+- **`njamm-konkurence`** (1× · B) — -> vlastnik AKJ: `njamm-corporation`
+  - `njamm-corporation`
+- **`silicon-valley-konkurence`** (1× · B) — -> vlastnik AKJ: `silicon-valley`
+  - `silicon-valley`
+- **`akj-12-vishra-tech`** (1× · B) — -> vlastnik AKJ: `vishra-tech`
+  - `vishra-tech`
+- **`akj-12-bifrost-corporation`** (1× · B) — -> vlastnik AKJ: `bifrost-corporation`
+  - `bifrost-corporation`
+- **`burns-harbor-corp-akj-4`** (1× · B) — -> vlastnik AKJ: `burns-harbor-corp`
+  - `burns-harbor-corp`
+- **`chevron-konkurence`** (1× · B) — -> vlastnik AKJ: `chevron`
+  - `chevron`
+- **`dow-chemical-konkurence`** (1× · B) — -> vlastnik AKJ: `dow-chemical`
+  - `dow-chemical`
+- **`dupont-konkurence`** (1× · B) — -> vlastnik AKJ: `dupont`
+  - `dupont`
+- **`exxonmobil-konkurence`** (1× · B) — -> vlastnik AKJ: `exxonmobil`
+  - `exxonmobil`
+- **`freeport-konkurence`** (1× · B) — -> vlastnik AKJ: `freeport`
+  - `freeport`
+- **`akj-4-freeport`** (1× · B) — -> vlastnik AKJ: `freeport`
+  - `freeport`
+- **`akj-8-freeport`** (1× · B) — -> vlastnik AKJ: `freeport`
+  - `freeport`
+- **`murray-energy-konkurence`** (1× · B) — -> vlastnik AKJ: `murray-energy`
+  - `murray-energy`
+- **`phelps-dodge-konkurence`** (1× · B) — -> vlastnik AKJ: `phelps-dodge`
+  - `phelps-dodge`
+- **`tesla-konkurence`** (1× · B) — -> vlastnik AKJ: `tesla`
+  - `tesla`
+- **`yip-konkurence`** (1× · B) — -> vlastnik AKJ: `yip`
+  - `yip`
+- **`akj-8-zion`** (1× · B) — -> vlastnik AKJ: `zion-corporation`
+  - `zion-corporation`
+- **`akj-12-zion`** (1× · B) — -> vlastnik AKJ: `zion-corporation`
+  - `zion-corporation`
+- **`amazon-konkurence`** (1× · B) — -> vlastnik AKJ: `amazon`
+  - `amazon`
+- **`aos-konkurence`** (1× · B) — -> vlastnik AKJ: `americka-obchodni-spolecnost`
+  - `americka-obchodni-spolecnost`
+- **`babicciny-drobnosti-konkurence`** (1× · B) — -> vlastnik AKJ: `babicciny-drobnosti`
+  - `babicciny-drobnosti`
+- **`boa-konkurence`** (1× · B) — -> vlastnik AKJ: `bank-of-america`
+  - `bank-of-america`
+- **`akj-6-bank-of-america`** (1× · B) — -> vlastnik AKJ: `bank-of-america`
+  - `bank-of-america`
+- **`historicka-spolecnost-konkurence`** (1× · B) — -> vlastnik AKJ: `historicka-spolecnost`
+  - `historicka-spolecnost`
+- **`illuminati-konkurence`** (1× · B) — -> vlastnik AKJ: `illuminati`
+  - `illuminati`
+- **`jp-morgan-chase-konkurence`** (1× · B) — -> vlastnik AKJ: `jp-morgan-chase`
+  - `jp-morgan-chase`
+- **`akj-6-jp-morgan-chase`** (1× · B) — -> vlastnik AKJ: `jp-morgan-chase`
+  - `jp-morgan-chase`
+- **`lucas-film-konkurence`** (1× · B) — -> vlastnik AKJ: `lucas-film`
+  - `lucas-film`
+- **`soukroma-konklava-konkurence`** (1× · B) — -> vlastnik AKJ: `soukroma-konklava`
+  - `soukroma-konklava`
+- **`spolecnost-predku-konkurence`** (1× · B) — -> vlastnik AKJ: `spolecnost-predku`
+  - `spolecnost-predku`
+- **`visa-konkurence`** (1× · B) — -> vlastnik AKJ: `visa`
+  - `visa`
+- **`akj-6-visa`** (1× · B) — -> vlastnik AKJ: `visa`
+  - `visa`
+- **`disney-konkurence`** (1× · B) — -> vlastnik AKJ: `walt-disney`
+  - `walt-disney`
+- **`akj-6-parcel-indastries`** (1× · B) — -> vlastnik AKJ: `parcel-indastries`
+  - `parcel-indastries`
+- **`akj-10-prehistoric-park`** (1× · B) — -> vlastnik AKJ: `prehistoric-park`
+  - `prehistoric-park`
+- **`akj-6-ku-fung`** (1× · B) — -> vlastnik AKJ: `ku-fung`
+  - `ku-fung`
+- **`akj-6-gig`** (1× · B) — -> vlastnik AKJ: `cerny-investicni-fond`
+  - `galactic-investments-group`
+- **`akj-6-karova-kralovna`** (1× · B) — -> vlastnik AKJ: `karova-kralovna`
+  - `karova-kralovna`
+- **`akj-6-bar-merlin`** (1× · B) — -> vlastnik AKJ: `bar-merlin`
+  - `bar-merlin`
+- **`akj-12-nsb`** (1× · B) — -> vlastnik AKJ: `nsb`
+  - `nsb`
+- **`akj-4-choppau`** (1× · B) — -> vlastnik AKJ: `choppau`
+  - `choppau`
+- **`akj-8-choppau`** (1× · B) — -> vlastnik AKJ: `choppau`
+  - `choppau`
+- **`akj-4-prava-indianu-za-svobodu`** (1× · B) — -> vlastnik AKJ: `prava-indianu-za-svobodu`
+  - `prava-indianu-za-svobodu`
+- **`akj-3-laura-richardsonova`** (1× · B) — -> vlastnik AKJ: `laura-richardsonova`
+  - `laura-richardsonova`
+- **`akj-12-elisabeth-iii`** (1× · B) — -> vlastnik AKJ: `elisabeth-iii`
+  - `elisabeth-iii`
+- **`akj-8-camilla-wells`** (1× · B) — -> vlastnik AKJ: `camilla-wells`
+  - `camilla-wells`
+- **`akj-6-claudia-eco`** (1× · B) — -> vlastnik AKJ: `claudia-eco`
+  - `claudia-eco`
+- **`akj-4-juan-luciano`** (1× · B) — -> vlastnik AKJ: `juan-luciano`
+  - `juan-luciano`
+- **`akj-3-juan-luciano`** (1× · B) — -> vlastnik AKJ: `juan-luciano`
+  - `juan-luciano`
+- **`akj-6-riana-base`** (1× · B) — -> vlastnik AKJ: `riana-base`
+  - `riana-base`
+- **`akj-8-riana-base`** (1× · B) — -> vlastnik AKJ: `riana-base`
+  - `riana-base`
+- **`akj-4-katarzyna-wisniewska`** (1× · B) — -> vlastnik AKJ: `katarzyna-wisniewska`
+  - `katarzyna-wisniewska`
+- **`akj-5-rodina-rossi`** (1× · B) — -> vlastnik AKJ: `rodina-rossi`
+  - `rodina-rossi`
+- **`akj-4-daniel-cole`** (1× · B) — -> vlastnik AKJ: `daniel-cole`
+  - `daniel-cole`
+- **`akj-5-yalana-zandzanih`** (1× · B) — -> vlastnik AKJ: `yalana-zandzanih`
+  - `yalana-zandzanih`
+- **`akj-2-leilan-vuniwa`** (1× · B) — -> vlastnik AKJ: `leilan-vuniwa`
+  - `leilan-vuniwa`
+- **`akj-12-vrchni-mag`** (1× · B) — -> vlastnik AKJ: `vrchni-mag`
+  - `vrchni-mag`
+- **`akj-14-vrchni-mag`** (1× · B) — -> vlastnik AKJ: `vrchni-mag`
+  - `vrchni-mag`
+- **`akj-3-claudia-bellandi`** (1× · B) — -> vlastnik AKJ: `claudia-bellandi`
+  - `claudia-bellandi`
+- **`akj-2-leonard-williams`** (1× · B) — -> vlastnik AKJ: `leonard-williams`
+  - `leonard-williams`
+- **`akj-12-luise-of-cambridge`** (1× · B) — -> vlastnik AKJ: `luise-of-cambridge`
+  - `luise-of-cambridge`
+- **`akj-4-harry-windsor`** (1× · B) — -> vlastnik AKJ: `harry-windsor`
+  - `harry-windsor`
+- **`akj-8-iva-allerton`** (1× · B) — -> vlastnik AKJ: `iva-allerton`
+  - `iva-allerton`
+- **`akj-6-svatba`** (1× · B) — -> vlastnik AKJ: `frederic-scheer-jr`
+  - `ava-huckerbery`
+- **`akj-6-ray-reynolds`** (1× · B) — -> vlastnik AKJ: `ray-reynolds`
+  - `ray-reynolds`
+- **`akj-8-bautaf-liko`** (1× · B) — -> vlastnik AKJ: `bautaf-liko`
+  - `bautaf-liko`
+- **`akj-6-bautaf-liko`** (1× · B) — -> vlastnik AKJ: `bautaf-liko`
+  - `bautaf-liko`
+- **`akj-4-bautaf-liko`** (1× · B) — -> vlastnik AKJ: `bautaf-liko`
+  - `bautaf-liko`
+- **`akj-7-bautaf-liko`** (1× · B) — -> vlastnik AKJ: `bautaf-liko`
+  - `bautaf-liko`
+- **`akj-9-martin-tennant`** (1× · B) — -> vlastnik AKJ: `martin-tennant`
+  - `martin-tennant`
+- **`akj-8-martin-tennant`** (1× · B) — -> vlastnik AKJ: `martin-tennant`
+  - `martin-tennant`
+- **`akj-6-martin-tennant`** (1× · B) — -> vlastnik AKJ: `martin-tennant`
+  - `martin-tennant`
+- **`akj-3-martin-tennant`** (1× · B) — -> vlastnik AKJ: `martin-tennant`
+  - `martin-tennant`
+- **`akj-2-tomas-holub`** (1× · B) — -> vlastnik AKJ: `tomas-holub`
+  - `tomas-holub`
+- **`akj-5-nathaniel-jackson`** (1× · B) — -> vlastnik AKJ: `nathaniel-jackson`
+  - `nathaniel-jackson`
+- **`akj-7-nathaniel-jackson`** (1× · B) — -> vlastnik AKJ: `nathaniel-jackson`
+  - `nathaniel-jackson`
+- **`akj-7-0226`** (1× · B) — -> vlastnik AKJ: `emily-brown`
+  - `emily-brown`
+- **`akj-7p-0226`** (1× · B) — -> vlastnik AKJ: `emily-brown`
+  - `emily-brown`
+- **`akj-9-0026`** (1× · B) — -> vlastnik AKJ: `oliver-brown`
+  - `oliver-brown`
+- **`akj-8-latelia-clark`** (1× · B) — -> vlastnik AKJ: `latelia-clark`
+  - `latelia-clark`
+- **`akj-6-latelia-clark`** (1× · B) — -> vlastnik AKJ: `latelia-clark`
+  - `latelia-clark`
+- **`akj-4-latelia-clark`** (1× · B) — -> vlastnik AKJ: `latelia-clark`
+  - `latelia-clark`
+- **`akj-2-latelia-clark`** (1× · B) — -> vlastnik AKJ: `latelia-clark`
+  - `latelia-clark`
+- **`akj-7-latelia-clark`** (1× · B) — -> vlastnik AKJ: `latelia-clark`
+  - `latelia-clark`
+- **`akj-5-frederic-scheer`** (1× · B) — -> vlastnik AKJ: `frederic-scheer`
+  - `frederic-scheer`
+- **`ledovy-dum`** (1× · B) — -> vlastnik AKJ: `abi-demon`
+  - `abi-demon`
+- **`akj-4-ryan-grey`** (1× · B) — -> vlastnik AKJ: `ryan-grey`
+  - `ryan-grey`
+- **`akj-5-ai-liang`** (1× · B) — -> vlastnik AKJ: `zhao-liang`
+  - `zhao-liang`
+- **`akj-4-amaratesu`** (1× · B) — -> vlastnik AKJ: `amaratesu`
+  - `amaratesu`
+- **`akj-6-ishida-uriu`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `ishida-uriu`
+- **`akj-4-ishida-uriu`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `ishida-uriu`
+- **`akj-6-arthurien-morph`** (1× · B) — -> vlastnik AKJ: `arthurien-morph`
+  - `arthurien-morph`
+- **`akj-8-arthurien-morph`** (1× · B) — -> vlastnik AKJ: `arthurien-morph`
+  - `arthurien-morph`
+- **`akj-10-arthurien-morph`** (1× · B) — -> vlastnik AKJ: `arthurien-morph`
+  - `arthurien-morph`
+- **`balicek-joana-fortnar`** (1× · B) — -> vlastnik AKJ: `joana-fortnar`
+  - `joana-fortnar`
+- **`akj-8-joana-fortnar`** (1× · B) — -> vlastnik AKJ: `joana-fortnar`
+  - `joana-fortnar`
+- **`akj-6-leona-falco`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `leona-falco`
+- **`akj-4-leona-falco`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `leona-falco`
+- **`akj-6-elliot-drake`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `elliot-drake`
+- **`akj-4-elliot-drake`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `elliot-drake`
+- **`akj-9-elliot-drake`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `elliot-drake`
+- **`akj-4-anthony-wilkins`** (1× · B) — -> vlastnik AKJ: `anthony-wilkins`
+  - `anthony-wilkins`
+- **`akj-9-0033`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0033`
+- **`akj-5-projekt-ikaros`** (1× · B) — -> vlastnik AKJ: `projekt-ikaros`
+  - `anna-kretinska`
+- **`akj-4-hrad-dunnottar`** (1× · B) — -> vlastnik AKJ: `hrad-dunnottar`
+  - `hrad-dunnottar`
+- **`akj-4-zung-tu`** (1× · B) — -> vlastnik AKJ: `zung-tu`
+  - `zung-tu`
+- **`akj-4-xue-jing`** (1× · B) — -> vlastnik AKJ: `xue-jing`
+  - `xue-jing`
+- **`akj-4-cang-tien`** (1× · B) — -> vlastnik AKJ: `cang-tien`
+  - `cang-tien`
+- **`akj-8-ino-tin`** (1× · B) — -> vlastnik AKJ: `ino-tin`
+  - `ino-tin`
+- **`akj-3-anthony-bradford`** (1× · B) — -> vlastnik AKJ: `anthony-bradford`
+  - `anthony-bradford`
+- **`akj-4-joseph-brousard`** (1× · B) — -> vlastnik AKJ: `joseph-broussard`
+  - `joseph-broussard`
+- **`akj-6-andre-washington`** (1× · B) — -> vlastnik AKJ: `andre-washington`
+  - `andre-washington`
+- **`akj-4-ashler-easton`** (1× · B) — -> vlastnik AKJ: `ashler-easton`
+  - `ashler-easton`
+- **`akj-6-railey-gips`** (1× · B) — -> vlastnik AKJ: `railey-gips`
+  - `railey-gips`
+- **`akj-4-piper-cage`** (1× · B) — -> vlastnik AKJ: `piper-cage`
+  - `piper-cage`
+- **`akj-15-benedict-hunter`** (1× · B) — -> vlastnik AKJ: `benedict-hunter`
+  - `benedict-hunter`
+- **`akj-7-benedict-hunter`** (1× · B) — -> vlastnik AKJ: `benedict-hunter`
+  - `benedict-hunter`
+- **`akj-6-yuki-yuguchi`** (1× · B) — -> vlastnik AKJ: `yuki-yuguchi`
+  - `yuki-yuguchi`
+- **`akj-4-akeno-yuguchi`** (1× · B) — -> vlastnik AKJ: `akeno-yuguchi`
+  - `akeno-yuguchi`
+- **`akj-6-akeno-yuguchi`** (1× · B) — -> vlastnik AKJ: `akeno-yuguchi`
+  - `akeno-yuguchi`
+- **`akj-3-lykonia`** (1× · B) — -> vlastnik AKJ: `lykonia`
+  - `lykonia`
+- **`akj-6-mark-edmonson`** (1× · B) — -> vlastnik AKJ: `mark-edmonson`
+  - `mark-edmonson`
+- **`akj-6-britany-majer`** (1× · B) — -> vlastnik AKJ: `britany-majer`
+  - `britany-majer`
+- **`akj-4-lindrid-mark`** (1× · B) — -> vlastnik AKJ: `lindrid-mark`
+  - `lindrid-mark`
+- **`akj-4-isla-phillips`** (1× · B) — -> vlastnik AKJ: `isla-phillips`
+  - `isla-phillips`
+- **`akj-4-henry-viga`** (1× · B) — -> vlastnik AKJ: `henry-viga`
+  - `henry-viga`
+- **`akj-6-henry-viga`** (1× · B) — -> vlastnik AKJ: `henry-viga`
+  - `henry-viga`
+- **`akj-12-minerva-strong`** (1× · B) — -> vlastnik AKJ: `minerva-strong`
+  - `minerva-strong`
+- **`akj-4-rebecca-zero`** (1× · B) — -> vlastnik AKJ: `rebecca-zero`
+  - `rebecca-zero`
+- **`akj-15-rebecca-zero`** (1× · B) — -> vlastnik AKJ: `rebecca-zero`
+  - `rebecca-zero`
+- **`akj-8-brian-stealth`** (1× · B) — -> vlastnik AKJ: `brian-stealth`
+  - `brian-stealth`
+- **`akj-6-gregory-johnson`** (1× · B) — -> vlastnik AKJ: `gregory-johnson`
+  - `gregory-johnson`
+- **`akj-12-lotri`** (1× · B) — -> vlastnik AKJ: `lo3`
+  - `lotri-spielmann`
+- **`akj-6-gabriel-montague`** (1× · B) — -> vlastnik AKJ: `gabriel-montague`
+  - `gabriel-montague`
+- **`akj-3-jack-smith`** (1× · B) — -> vlastnik AKJ: `jack-smith`
+  - `jack-smith`
+- **`akj-4-elizabeth-harrington`** (1× · B) — -> vlastnik AKJ: `elizabeth-harrington`
+  - `elizabeth-harrington`
+- **`akj-4-matteo-garcia`** (1× · B) — -> vlastnik AKJ: `matteo-garcia`
+  - `matteo-garcia`
+- **`akj-4-terezie-swing`** (1× · B) — -> vlastnik AKJ: `terezie-swing`
+  - `terezie-swing`
+- **`akj-6-alan-torres`** (1× · B) — -> vlastnik AKJ: `alan-torres`
+  - `alan-torres`
+- **`akj-6-gina-torres`** (1× · B) — -> vlastnik AKJ: `gina-torres`
+  - `gina-torres`
+- **`akj-6-kyle-staite`** (1× · B) — -> vlastnik AKJ: `kyle-staite`
+  - `kyle-staite`
+- **`akj-4-bar-bratrstva`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `quentin-twist`
+- **`akj-5-5682`** (1× · B) — -> vlastnik AKJ: `5682`
+  - `5682`
+- **`akj-6-morie`** (1× · B) — -> vlastnik AKJ: `morie`
+  - `morie`
+- **`akj-6-hard-spencer`** (1× · B) — -> vlastnik AKJ: `hard-spencer`
+  - `hard-spencer`
+- **`akj-4-bahadur`** (1× · B) — -> vlastnik AKJ: `bahadur-sah-iv`
+  - `bahadur-sah-iv`
+- **`akj-4-andrei-rasputin`** (1× · B) — -> vlastnik AKJ: `andrei-alexeevic-rasputin`
+  - `andrei-alexeevic-rasputin`
+- **`akj-6-dmitrij-ivanov`** (1× · B) — -> vlastnik AKJ: `dmitrij-ivanov`
+  - `dmitrij-ivanov`
+- **`akj-4-dmitrij-ivanov`** (1× · B) — -> vlastnik AKJ: `dmitrij-ivanov`
+  - `dmitrij-ivanov`
+- **`akj-6-mistr-popravci`** (1× · B) — -> vlastnik AKJ: `candala-marulf`
+  - `candala-marulf`
+- **`akj-6-aramander`** (1× · B) — -> vlastnik AKJ: `aramander`
+  - `aramander`
+- **`akj-10-aramander`** (1× · B) — -> vlastnik AKJ: `aramander`
+  - `aramander`
+- **`akj-6-imris-quitu`** (1× · B) — -> vlastnik AKJ: `imris-quitu`
+  - `imris-quitu`
+- **`akj-8-imris-quitu`** (1× · B) — -> vlastnik AKJ: `imris-quitu`
+  - `imris-quitu`
+- **`akj-6-gimdle-amdlang`** (1× · B) — -> vlastnik AKJ: `gimdle-amdlang`
+  - `gimdle-amdlang`
+- **`akj-8-gimdle-amdlang`** (1× · B) — -> vlastnik AKJ: `gimdle-amdlang`
+  - `gimdle-amdlang`
+- **`akj-6-yolanda-ara`** (1× · B) — -> vlastnik AKJ: `yolanda-ara`
+  - `yolanda-ara`
+- **`akj-4-mravenci-kolonie`** (1× · B) — -> vlastnik AKJ: `mravenci-kolonie`
+  - `mravenci-kolonie`
+- **`akj-2-yomi-yoko`** (1× · B) — -> vlastnik AKJ: `yomi-yoko`
+  - `yomi-yoko`
+- **`akj-4-liana`** (1× · B) — -> vlastnik AKJ: `liana`
+  - `liana`
+- **`akj-6-liana`** (1× · B) — -> vlastnik AKJ: `liana`
+  - `liana`
+- **`akj-5-nikita-romanov`** (1× · B) — -> vlastnik AKJ: `nikita-romanov`
+  - `nikita-romanov`
+- **`akj-5-jean-arist`** (1× · B) — -> vlastnik AKJ: `jean-arist`
+  - `jean-arist`
+- **`akj-4-kristian-astra`** (1× · B) — -> vlastnik AKJ: `kristian-astra`
+  - `kristian-astra`
+- **`akj-9-hlucna-voda`** (1× · B) — -> vlastnik AKJ: `hlucna-voda`
+  - `hlucna-voda`
+- **`akj-4-thomas-door`** (1× · B) — -> vlastnik AKJ: `thomas-door`
+  - `thomas-door`
+- **`akj-3-thomas-door`** (1× · B) — -> vlastnik AKJ: `thomas-door`
+  - `thomas-door`
+- **`akj-5-thomas-door`** (1× · B) — -> vlastnik AKJ: `thomas-door`
+  - `thomas-door`
+- **`akj-5-alexis-bledel`** (1× · B) — -> vlastnik AKJ: `alexis-bledel`
+  - `alexis-bledel`
+- **`akj-4-kim-omosaki`** (1× · B) — -> vlastnik AKJ: `kim-omosaki`
+  - `kim-omosaki`
+- **`akj-10-helel-ben-sachar`** (1× · B) — -> vlastnik AKJ: `helel-ben-sachar`
+  - `helel-ben-sachar`
+- **`akj-4-nyota-dynamics`** (1× · B) — -> vlastnik AKJ: `nyota-dynamics`
+  - `nyota-dynamics`
+- **`akj-8-nyota-dynamics`** (1× · B) — -> vlastnik AKJ: `nyota-dynamics`
+  - `nyota-dynamics`
+- **`akj-10-simkontur`** (1× · B) — -> vlastnik AKJ: `simkontur`
+  - `simkontur`
+- **`akj-4-simkontur`** (1× · B) — -> vlastnik AKJ: `simkontur`
+  - `simkontur`
+- **`akj-4-darling`** (1× · B) — -> vlastnik AKJ: `darling-113`
+  - `darling-113`
+- **`akj-8-patrik-colleman`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `colleman-patrik`
+- **`akj-4-tara-venus`** (1× · B) — -> vlastnik AKJ: `tara-venus`
+  - `tara-venus`
+- **`akj-6-tara-venus`** (1× · B) — -> vlastnik AKJ: `tara-venus`
+  - `tara-venus`
+- **`akj-12-tara-venus`** (1× · B) — -> vlastnik AKJ: `tara-venus`
+  - `tara-venus`
+- **`akj-6-lana-lang`** (1× · B) — -> vlastnik AKJ: `lana-lang`
+  - `lana-lang`
+- **`akj-3-john-anderson`** (1× · B) — -> vlastnik AKJ: `john-anderson`
+  - `john-anderson`
+- **`akj-8-abraham-void`** (1× · B) — -> vlastnik AKJ: `abraham-void`
+  - `abraham-void`
+- **`akj-2-elise-moreau`** (1× · B) — -> vlastnik AKJ: `elise-moreau`
+  - `elise-moreau`
+- **`akj-2-isabella-lorenzi`** (1× · B) — -> vlastnik AKJ: `isabella-lorenzi`
+  - `isabella-lorenzi`
+- **`akj-4-amelie-greco`** (1× · B) — -> vlastnik AKJ: `amelie-greco`
+  - `amelie-greco`
+- **`akj-8-gregory-of-lindsay`** (1× · B) — -> vlastnik AKJ: `gregory-of-lindsay`
+  - `gregory-of-lindsay`
+- **`akj-12-mia-tindall`** (1× · B) — -> vlastnik AKJ: `mia-tindall`
+  - `mia-tindall`
+- **`akj-12-eugenie-york`** (1× · B) — -> vlastnik AKJ: `eugenie-york`
+  - `eugenie-york`
+- **`akj-2-chose-bianco`** (1× · B) — -> vlastnik AKJ: `chose-bianco`
+  - `chose-bianco`
+- **`akj-4-chose-bianco`** (1× · B) — -> vlastnik AKJ: `chose-bianco`
+  - `chose-bianco`
+- **`akj-4-valentina-rossi`** (1× · B) — -> vlastnik AKJ: `valentina-rossi`
+  - `valentina-rossi`
+- **`akj-3-mateo-greco`** (1× · B) — -> vlastnik AKJ: `mateo-greco`
+  - `mateo-greco`
+- **`akj-5-mateo-greco`** (1× · B) — -> vlastnik AKJ: `mateo-greco`
+  - `mateo-greco`
+- **`akj-2-liana-morino`** (1× · B) — -> vlastnik AKJ: `liana-morino`
+  - `liana-morino`
+- **`akj-4-liana-morino`** (1× · B) — -> vlastnik AKJ: `liana-morino`
+  - `liana-morino`
+- **`akj-4-carmen-romano`** (1× · B) — -> vlastnik AKJ: `carmen-romano`
+  - `carmen-romano`
+- **`akj-3-alex-garfin`** (1× · B) — -> vlastnik AKJ: `alex-garfin`
+  - `alex-garfin`
+- **`akj-10-radyn-opan`** (1× · B) — -> vlastnik AKJ: `radyn-opan`
+  - `radyn-opan`
+- **`akj-5-chan-ho-yin`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `chan-ho-yin`
+- **`akj-4-mary-smith`** (1× · B) — -> vlastnik AKJ: `mary-smith`
+  - `mary-smith`
+- **`akj-12-mary-smith`** (1× · B) — -> vlastnik AKJ: `mary-smith`
+  - `mary-smith`
+- **`akj-12-leonard-skyre`** (1× · B) — -> vlastnik AKJ: `leonard-skyre`
+  - `leonard-skyre`
+- **`akj-3-aissata-tcherno`** (1× · B) — -> vlastnik AKJ: `aissata-tcherno`
+  - `aissata-tcherno`
+- **`akj-9-amira-al-saud`** (1× · B) — -> vlastnik AKJ: `amira-al-saud`
+  - `amira-al-saud`
+- **`akj-4-amira-al-saud`** (1× · B) — -> vlastnik AKJ: `amira-al-saud`
+  - `amira-al-saud`
+- **`akj-12-allison-pill`** (1× · B) — -> vlastnik AKJ: `allison-pill`
+  - `allison-pill`
+- **`akj-10-allison-pill`** (1× · B) — -> vlastnik AKJ: `allison-pill`
+  - `allison-pill`
+- **`akj-8-allison-pill`** (1× · B) — -> vlastnik AKJ: `allison-pill`
+  - `allison-pill`
+- **`platy-gmoi`** (1× · B) — -> vlastnik AKJ: `globalni-magicka-obranna-iniciativa`
+  - `globalni-magicka-obranna-iniciativa`
+- **`akj-7-gmoi`** (1× · B) — -> vlastnik AKJ: `globalni-magicka-obranna-iniciativa`
+  - `globalni-magicka-obranna-iniciativa`
+- **`akj-9-gm01`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `gm01`
+- **`akj-1-shunsui-kyoraku`** (1× · B) — -> vlastnik AKJ: `shunsui-kyoraku`
+  - `shunsui-kyoraku`
+- **`akj-4-shunsui-kyoraku`** (1× · B) — -> vlastnik AKJ: `shunsui-kyoraku`
+  - `shunsui-kyoraku`
+- **`akj-12-jorgen-jorgerson`** (1× · B) — -> vlastnik AKJ: `jorgen-jorgerson`
+  - `jorgen-jorgerson`
+- **`akj-12-rajesh-koothrappali`** (1× · B) — -> vlastnik AKJ: `rajesh-koothrappali`
+  - `rajesh-koothrappali`
+- **`akj-12-redneck-baldwin`** (1× · B) — -> vlastnik AKJ: `redneck-baldwin`
+  - `redneck-baldwin`
+- **`akj-4-redneck-baldwin`** (1× · B) — -> vlastnik AKJ: `redneck-baldwin`
+  - `redneck-baldwin`
+- **`akj-2-redneck-baldwin`** (1× · B) — -> vlastnik AKJ: `redneck-baldwin`
+  - `redneck-baldwin`
+- **`akj-4-bathrat-leon`** (1× · B) — -> vlastnik AKJ: `bathrat-leon`
+  - `bathrat-leon`
+- **`akj-12-bathrat-leon`** (1× · B) — -> vlastnik AKJ: `bathrat-leon`
+  - `bathrat-leon`
+- **`akj-8-medak`** (1× · B) — -> vlastnik AKJ: `medak`
+  - `maxmilien-duval`
+- **`akj-10-larius-jagato`** (1× · B) — -> vlastnik AKJ: `larius-jagato`
+  - `larius-jagato`
+- **`akj-12-alzahir`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `alzahir`
+- **`akj-10-edward-hyde`** (1× · B) — -> vlastnik AKJ: `edward-hyde`
+  - `edward-hyde`
+- **`akj-7-0432`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0432`
+- **`akj-2-projekt-ragnarok`** (1× · B) — -> vlastnik AKJ: `projekt-ragnarok`
+  - `projekt-ragnarok`
+- **`akj-6-projekt-ragnarok`** (1× · B) — -> vlastnik AKJ: `projekt-ragnarok`
+  - `projekt-ragnarok`
+- **`zadni-cast-bar-bratrstva`** (1× · B) — -> vlastnik AKJ: `bar-bratrstva`
+  - `bar-bratrstva`
+- **`akj-4-bar-bratrstvo`** (1× · B) — -> vlastnik AKJ: `bar-bratrstva`
+  - `bar-bratrstva`
+- **`akj-6-rovnopravna-amerika`** (1× · B) — -> vlastnik AKJ: `rovnopravna-amerika`
+  - `rovnopravna-amerika`
+- **`akj-5-2843`** (1× · B) — -> vlastnik AKJ: `2843`
+  - `2843`
+- **`akj-7-0352`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0352`
+- **`akj-7p-0352`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0352`
+- **`akj-9-0018`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0018`
+- **`akj-6-daniel-wox`** (1× · B) — -> vlastnik AKJ: `daniel-wox`
+  - `daniel-wox`
+- **`akj-9-0055`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0055`
+- **`akj-6-iwlf`** (1× · B) — -> vlastnik AKJ: `odboj`
+  - `hnuti-svobodnych-delniku-irska`
+- **`akj-9-0058`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0058`
+- **`akj-9-0048`** (1× · B) — -> vlastnik nedohledan (rucne — napr. GM master)
+  - `0048`
+- **`akj-9-biotop`** (1× · B) — -> vlastnik AKJ: `biotop`
+  - `biotop`
+- **`akj-4-the-steel-angels`** (1× · B) — -> vlastnik AKJ: `the-steel-angels`
+  - `the-steel-angels`
+- **`akj-2-li-mingguo`** (1× · B) — -> vlastnik AKJ: `li-mingguo`
+  - `li-mingguo`
+- **`akj-4-lin-mei`** (1× · B) — -> vlastnik AKJ: `lin-mei`
+  - `lin-mei`
+- **`akj-4-nie-zhilan`** (1× · B) — -> vlastnik AKJ: `nie-zhilan`
+  - `nie-zhilan`
+- **`akj-6-siena`** (1× · B) — -> vlastnik AKJ: `siena`
+  - `siena`
+- **`prizemi`** (1× · B) — -> vlastnik AKJ: `hlavni-dum`
+  - `bunkr-pod-hlavnim-domem`
+- **`level-1`** (1× · B) — -> vlastnik AKJ: `hlavni-dum`
+  - `bunkr-pod-hlavnim-domem`
+- **`level-2`** (1× · B) — -> vlastnik AKJ: `hlavni-dum`
+  - `bunkr-pod-hlavnim-domem`
+- **`level-3`** (1× · B) — -> vlastnik AKJ: `hlavni-dum`
+  - `bunkr-pod-hlavnim-domem`
+- **`level-4`** (1× · B) — -> vlastnik AKJ: `hlavni-dum`
+  - `bunkr-pod-hlavnim-domem`
+- **`akj-4-tamara-north`** (1× · B) — -> vlastnik AKJ: `tamara-north`
+  - `tamara-north`
+- **`akj-4-xinyi-systems`** (1× · B) — -> vlastnik AKJ: `xinyi-systems`
+  - `xinyi-systems`
+- **`akj-6-xinyi-systems`** (1× · B) — -> vlastnik AKJ: `xinyi-systems`
+  - `xinyi-systems`
+- **`akj-6-cerny-drak`** (1× · B) — -> vlastnik AKJ: `cerny-drak`
+  - `cerny-drak`
+- **`akj-9-nathaniel-liang`** (1× · B) — -> vlastnik AKJ: `nathaniel-liang`
+  - `nathaniel-liang`
+- **`akj-6-nathaniel-liang`** (1× · B) — -> vlastnik AKJ: `nathaniel-liang`
+  - `nathaniel-liang`
+- **`akj-10-nathaniel-liang`** (1× · B) — -> vlastnik AKJ: `nathaniel-liang`
+  - `nathaniel-liang`
+- **`akj-8-black-static-arcade`** (1× · B) — -> vlastnik AKJ: `black-static-arcade`
+  - `black-static-arcade`
+- **`akj-10-aurora-angel`** (1× · B) — -> vlastnik AKJ: `aurora-angel`
+  - `aurora-angel`
+- **`akj-8-aurora-essentials`** (1× · B) — -> vlastnik AKJ: `aurora-essentials`
+  - `aurora-essentials`
+- **`akj-6-modra-vrba`** (1× · B) — -> vlastnik AKJ: `modra-vrba`
+  - `modra-vrba`
+- **`akj-6-home`** (1× · B) — -> vlastnik AKJ: `home`
+  - `home`
+
+### Ciselne stare ID
+
+- **`0567`** (6× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `karl-forst`, `vyssi-clenove-odboj-05`, `akj-5-5682`, `akj-7p-0567`, `akj-7-0567`, `akj-9-0058`
+- **`0011`** (5× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `mia-willow`, `veleni-odboj-001`, `akj-7-0152`, `akj-7-0176`, `akj-9-0011`
+- **`0352`** (5× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `vyssi-clenove-odboj-03`, `akj-5-3672`, `akj-7p-0352`, `akj-7-0352`, `akj-9-0033`
+- **`0432`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `zara-hawke`, `vyssi-clenove-odboj-04`, `akj-7-0432`, `akj-9-0041`
+- **`0104`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `charles-pierse`, `vyssi-clenove-odboj-01`, `akj-7-0104`, `akj-9-0016`
+- **`0041`** (4× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `antonie-grey`, `veleni-odboj-004`, `akj-7-0432`, `akj-9-0041`
+- **`0033`** (4× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `konrad-jefferson`, `veleni-odboj-003`, `akj-7-0352`, `akj-9-0033`
+- **`0045`** (4× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `jan-osullivan`, `veleni-odboj-004`, `akj-7-0423`, `akj-9-0045`
+- **`0176`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `victoria-stanton`, `vyssi-clenove-odboj-01`, `akj-7-0176`, `akj-9-0011`
+- **`0152`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `robert-stanton`, `vyssi-clenove-odboj-01`, `akj-7-0152`, `akj-9-0011`
+- **`0112`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `james-kid`, `vyssi-clenove-odboj-01`, `akj-7-0112`, `akj-9-0018`
+- **`3672`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `logan-miller`, `bezni-clenove-odboj-3`, `akj-5-3672`, `akj-7p-0352`
+- **`0423`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `monika-oniell`, `vyssi-clenove-odboj-04`, `akj-7-0423`, `akj-9-0045`
+- **`0016`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `archibald-drake`, `veleni-odboj-001`, `akj-7-0104`, `akj-9-0016`
+- **`0489`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `alexandr-fraser`, `vyssi-clenove-odboj-04`, `akj-7-0489`, `akj-9-0048`
+- **`0553`** (4× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `takumi-saito`, `vyssi-clenove-odboj-05`, `akj-7-0553`, `akj-9-0055`
+- **`0018`** (4× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `elizabeth-green`, `veleni-odboj-001`, `akj-7-0112`, `akj-9-0018`
+- **`0055`** (4× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-005`, `malcolm-fraser`, `akj-7-0553`, `akj-9-0055`
+- **`0058`** (4× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-005`, `aileen-murphyova`, `akj-7-0567`, `akj-9-0058`
+- **`0000`** (3× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `seda-liska`, `ishida-uriu`, `akj-6-ishida-uriu`
+- **`0048`** (3× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-004`, `akj-7-0489`, `akj-9-0048`
+- **`0031`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `cisarovna-aiko`, `veleni-odboj-003`
+- **`0001`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `luise-i`, `nejvyssi-veleni-odboj`
+- **`0002`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `luke-villiam`, `nejvyssi-veleni-odboj`
+- **`0030`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `arla-strenge`, `veleni-odboj-003`
+- **`0023`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `zilian-zorda-jr`, `veleni-odboj-002`
+- **`0003`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `0023`, `nejvyssi-veleni-odboj`
+- **`0005`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `laura-zola`, `nejvyssi-veleni-odboj`
+- **`0029`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `leona-falco`, `veleni-odboj-002`
+- **`0004`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `joe-smith`, `nejvyssi-veleni-odboj`
+- **`0022`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `will-kein`, `veleni-odboj-002`
+- **`0027`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `joanna-drozda`, `veleni-odboj-002`
+- **`0049`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `grzegorz-brzeczyszczykiewicz`, `veleni-odboj-004`
+- **`0020`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `mako-komuro`, `veleni-odboj-002`
+- **`0042`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `benedict-hunter`, `veleni-odboj-004`
+- **`0028`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `benjamin-dodwell`, `veleni-odboj-002`
+- **`0015`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `elowen-brown`, `veleni-odboj-001`
+- **`0056`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `alan-estik`, `veleni-odboj-005`
+- **`0043`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `mark-edmonson`, `veleni-odboj-004`
+- **`0051`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `lindrid-mark`, `veleni-odboj-005`
+- **`0013`** (2× · A+B) — stare ciselne ID -> nechat cervene / proverit
+  - `james-rutherford`, `veleni-odboj-001`
+- **`0014`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `reneta-inivova`, `veleni-odboj-001`
+- **`0044`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `yukana-ono`, `veleni-odboj-004`
+- **`0047`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `jennifer-brown`, `veleni-odboj-004`
+- **`0035`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `vincent-donovan`, `veleni-odboj-003`
+- **`0024`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `liam-oreilly`, `veleni-odboj-002`
+- **`0046`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `sarah-robin`, `veleni-odboj-004`
+- **`0019`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `vincent-bouchard`, `veleni-odboj-001`
+- **`0054`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `microft-of-lindsay`, `veleni-odboj-005`
+- **`0050`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `woltr-dudly`, `veleni-odboj-005`
+- **`0038`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `shunsui-kyoraku`, `veleni-odboj-003`
+- **`0010`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-001`, `alastair-fairburn`
+- **`0012`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-001`, `markus-reinhardt`
+- **`0017`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-001`, `alistair-jameson`
+- **`0021`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-002`, `carlos-alvarez`
+- **`0032`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-003`, `kaelan-tavita`
+- **`0034`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-003`, `patrik-frost`
+- **`0036`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-003`, `colonel-mckenna`
+- **`0052`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-005`, `alaric-mortimer`
+- **`0053`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-005`, `stuart-dunthorne`
+- **`0057`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-005`, `theresa-lowell`
+- **`0059`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-005`, `oswin-caldicott`
+- **`0040`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-004`, `daniel-wox`
+- **`0219`** (2× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `vyssi-clenove-odboj-02`, `isabella-jefferson`
+- **`0025`** (1× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-002`
+- **`0037`** (1× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-003`
+- **`0039`** (1× · B) — stare ciselne ID -> nechat cervene / proverit
+  - `veleni-odboj-003`
+
+### Smazano (nemigrovat)
+
+- **`mi6-poznamky`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `mi6`
+- **`abi-modelka`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `abi`
+- **`kontakty-archie`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `archie`
+- **`bezzubka`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `archie`
+- **`poznamky-archie`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `archie`
+- **`vlci-zbrane`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `john`
+- **`denik-john`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `john`
+- **`vybava-john`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `john`
+- **`poznamky-john`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `john`
+- **`kontakty-nikolaj`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `nikolaj`
+- **`vybava-nikolaj`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `nikolaj`
+- **`poznamky-nikolaj`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `nikolaj`
+- **`kontakty-arthur`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `arthur`
+- **`vybava-arthur`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `arthur`
+- **`poznamky-arthur`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `arthur`
+- **`kontakty-edmund`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `edmund`
+- **`poznamky-edmund`** (1× · B) — oznaceno k smazani (nemigrovat)
+  - `edmund`
+
+### Jine — proverit
+
+- **`jesse-helsing`** (18× · A+B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `helsing`, `rafael-santiago`, `sin-vzpominek`, `isabella-grant`, `mara-helsing`, `van-helsinguv-rodinny-statek`, `lucas-wainwright`, `leonid-petrov`, `akj-10-apex-corp`, `amelia-stone`, `ethan-frost`, `felix-morgan`, `dante-moreau`, `jack-harris`, `gm03`, `hope-yuguchi`, `arthurien-yuguchi`, `home`
+- **`john`** (8× · B) — klasifikovano „Lokace" ale nemigrovano -> proverit
+  - `john-willscar`, `kontakty-john`, `vlci-zbrane`, `vzhled-dzinky-lampy`, `denik-john`, `vybava-john`, `poznamky-john`, `john-finance`
+- **`mingguo`** (6× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `mi6`, `li-mingguo`, `finance-mingguo`, `kontakty-mingguo`, `vybava-mingguo`, `poznamky-mingguo`
+- **`kraven`** (6× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `pumi-stin`, `pumi-stin-finance`, `pumi-stin-vybava`, `pumi-stin-poznamky`, `stillwater-ridge`, `skryta-mytinka`
+- **`nikolaj`** (5× · B) — klasifikovano „NPC" ale nemigrovano -> proverit
+  - `nikolaj-cathal`, `kontakty-nikolaj`, `vybava-nikolaj`, `poznamky-nikolaj`, `nikolaj-finance`
+- **`arthur`** (5× · B) — klasifikovano „NPC" ale nemigrovano -> proverit
+  - `arthurio-de-malevere-tenzo`, `kontakty-arthur`, `vybava-arthur`, `poznamky-arthur`, `arthur-finance`
+- **`severan`** (5× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `skarn-rudvik`, `severan-kontakty`, `severan-finance`, `severan-vybava`, `severan-poznamky`
+- **`edmund`** (4× · B) — klasifikovano „NPC" ale nemigrovano -> proverit
+  - `edmund-blackwood`, `kontakty-edmund`, `vybava-edmund`, `poznamky-edmund`
+- **`theodor-wick`** (3× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `nikolaj`, `gm03`, `akj-10-nikolaj`
+- **`shiro-yamada`** (3× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `gm05`, `yamada-shiro`, `shiro-finance`
+- **`buddha`** (2× · B) — klasifikovano „NPC" ale nemigrovano -> proverit
+  - `budhisticka-vetev`, `ali-rafi`
+- **`kontakty-kuro`** (2× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kuro`, `shiro-blanc`
+- **`genom-ruvik`** (2× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `skarn-rudvik`, `severan`
+- **`vybava-kuro`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kuro`
+- **`poznamky-kuro`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kuro`
+- **`kuro-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kuro`
+- **`poznamky-evropani`** (1× · B) — klasifikovano „Ostatní" ale nemigrovano -> proverit
+  - `evropani`
+- **`poznamky-lumici`** (1× · B) — klasifikovano „Ostatní" ale nemigrovano -> proverit
+  - `lumici`
+- **`kontakty-abi`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `abi`
+- **`vybava-abi`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `abi`
+- **`poznamky-abi`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `abi`
+- **`abi-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `abi`
+- **`kontakty-neville`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `neville`
+- **`cypher`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `neville`
+- **`mazlicek`** (1× · B) — klasifikovano „NPC" ale nemigrovano -> proverit
+  - `neville`
+- **`vybava-neville`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `neville`
+- **`poznamky-neville`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `neville`
+- **`neville-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `neville`
+- **`neville-premeny`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `neville`
+- **`vybava-archie`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `archie`
+- **`kontakty-lotri`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `lo3`
+- **`zprava-lo3`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `lo3`
+- **`vybava-lotri`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `lo3`
+- **`poznamky-lotri`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `lo3`
+- **`kontakty-helsing`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `helsing`
+- **`vybava-helsing`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `helsing`
+- **`poznamky-helsing`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `helsing`
+- **`helsing-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `helsing`
+- **`john-finance`** (1× · B) — klasifikovano „NPC" ale nemigrovano -> proverit
+  - `john`
+- **`kontakty-sion`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `sion`
+- **`vybava-sion`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `sion`
+- **`poznamky-sion`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `sion`
+- **`sion-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `sion`
+- **`nikolaj-finance`** (1× · B) — klasifikovano „NPC" ale nemigrovano -> proverit
+  - `nikolaj`
+- **`arthur-finance`** (1× · B) — klasifikovano „Ostatní" ale nemigrovano -> proverit
+  - `arthur`
+- **`kontakty-medak`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `medak`
+- **`medakovo-vnucky-fotka`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `medak`
+- **`vybava-medak`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `medak`
+- **`poznamky-medak`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `medak`
+- **`medak-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `medak`
+- **`kontakty-myra`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `myra`
+- **`vybava-myra`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `myra`
+- **`poznamky-myra`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `myra`
+- **`myra-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `myra`
+- **`kontakty-zara`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `zara`
+- **`temna-zara`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `zara`
+- **`vybava-zara`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `zara`
+- **`poznamky-zara`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `zara`
+- **`zara-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `zara`
+- **`mapa-vesmir`** (1× · B) — klasifikovano „Pavučina" ale nemigrovano -> proverit
+  - `planety`
+- **`kontakty-shiro`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `yamada-shiro`
+- **`shiro-vybava`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `yamada-shiro`
+- **`shiro-poznamky`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `yamada-shiro`
+- **`shiro-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `yamada-shiro`
+- **`ryuichi-kontakty`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `ryuichi`
+- **`ryuichi-poznamky`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `ryuichi`
+- **`ryuichi-vybava`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `ryuichi`
+- **`ryuichi-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `ryuichi`
+- **`cael-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `cael-aurion`
+- **`cael-vybava`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `cael`
+- **`cael-poznamky`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `cael`
+- **`staty-loki`** (1× · B) — klasifikovano „Ostatní" ale nemigrovano -> proverit
+  - `loki`
+- **`kontakty-mingguo`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `mingguo`
+- **`finance-mingguo`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `mingguo`
+- **`vybava-mingguo`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `mingguo`
+- **`kontakty-katerina`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `katerina`
+- **`vybava-katerina`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `katerina`
+- **`poznamky-katerina`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `katerina`
+- **`finance-katerina`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `katerina`
+- **`pumi-stin-kontakty`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kraven`
+- **`pumi-stin-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kraven`
+- **`pumi-stin-vybava`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kraven`
+- **`pumi-stin-poznamky`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `kraven`
+- **`severan-kontakty`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `severan`
+- **`severan-finance`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `severan`
+- **`severan-vybava`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `severan`
+- **`severan-poznamky`** (1× · B) — klasifikovano „PC" ale nemigrovano -> proverit
+  - `severan`
+
+## Stranky s nejvic propadlymi odkazy (kde uklizet)
+
+| Stranka | Title | # propadlych odkazu |
+|---|---|---:|
+| `magicka-pravidla` | Magická pravidla | 21 |
+| `westminster-school-royal-college-studium` | Westminster school royal college studium | 16 |
+| `katolicke-runy` | Katolické runy | 15 |
+| `kontrolni-programy` | Kontrolní programy | 13 |
+| `uzivatelske-programy` | Uživatelské programy | 13 |
+| `pravidla` | Pravidla | 12 |
+| `antikontrolni-programy` | Antikontrolní programy | 12 |
+| `cinska-vetev` | Čínská větev | 11 |
+| `sin-vzpominek` | Síň vzpomínek | 10 |
+| `obranne-programy` | Obranné programy | 10 |
+| `veleni-odboj-001` | Velení Odboj 001 | 10 |
+| `veleni-odboj-004` | Velení Odboj 004 | 10 |
+| `veleni-odboj-003` | Velení Odboj 003 | 10 |
+| `veleni-odboj-005` | Velení Odboj 005 | 10 |
+| `severske-runy` | Severské runy | 10 |
+| `viry` | Viry | 9 |
+| `veleni-odboj-002` | Velení Odboj 002 | 9 |
+| `sintoisticke-runy` | Šintoistické runy | 9 |
+| `abi` | Abi | 8 |
+| `severska-vetev` | Severská větev | 8 |
+| `jihoevropska-vetev` | Jihoevropská větev | 8 |
+| `nova-egyptska-vetev` | Nová egyptská větev | 8 |
+| `staroegyptska-vetev` | Staroegyptská větev | 8 |
+| `magicke-havy` | Magické hávy | 8 |
+| `nova-jihoamericka-vetev` | Nová jihoamerická větev | 8 |
+| `hybridni-programy` | Hybridní programy | 8 |
+| `falesne-mid` | Falešné MID | 8 |
+| `neville` | Neville | 8 |
+| `zaroastricka-vetev` | Zaroastrická větev | 7 |
+| `islamska-vetev` | Islámská větev | 7 |
+| `maorska-vetev` | Maorská větev | 7 |
+| `jihoamericka-vetev` | Jihoamerická větev | 7 |
+| `medak` | Měďák | 7 |
+| `australska-magicka-univerzita` | Australská magická univerzita | 7 |
+| `amico` | Amico | 7 |
+| `zara` | Zara | 7 |
+| `espada` | Espáda | 7 |
+| `vampir` | Vampír | 7 |
+| `john` | John | 7 |
+| `staroafricka-vetev` | Staroafrická větev | 6 |
+
+_(Uplny seznam zdroj->cile v `PROPADLE-ODKAZY.json`.)_

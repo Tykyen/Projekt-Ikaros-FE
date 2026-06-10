@@ -71,5 +71,41 @@ Audit obsahu (`C:\tmp\f5-audit.js`): **14 745 odkazů, 531 broken (3,7 %)**. Roz
 
 ## Stav
 - ✅ Krok 1a (runtime rewrite hook) — implementováno, tsc 0, 8/8 testů, build OK.
-- 🔜 Krok 1b (broken-fix workflow) — připraveno, čeká dry-run → fix.
-- 🔜 Krok 2 (auto-link vlastních jmen) — po kroku 1; audit varuje před obecnými slovy (`Nebo` = spojka 1468×).
+- ✅ Krok 1b (broken-fix workflow) — `_migF5Links`.
+- ✅ Krok 2 (auto-link vlastních jmen) — `useAutoLink`.
+- ✅ Krok 3 (A1+A2 starý web + přejmenované slugy) — implementováno, build OK, 16/16 testů. Viz níže.
+
+---
+
+## Krok 3 — odkazy na starý web + přejmenované slugy (runtime, hook)
+
+### Problém
+Část migrovaného obsahu má odkazy uložené jako **absolutní URL na starý web**
+`https://www.projekt-ikaros.com/<slug>` (**482 odkazů / 196 stránek**, audit
+`C:\tmp\f5-report-propadle.js`, report `PROPADLE-ODKAZY.md`). Krok 1a je minul,
+protože je hook klasifikoval jako `http(s):` → externí → ponechal `target` →
+klik otevře **brzy vypnutý** starý web místo migrované stránky. Navíc absolutní
+formu přejmenovaných slugů (přezdívky z kroku 1b) data-fix neopravil.
+
+### Řešení
+Izolovaný modul [`matrixLegacyLinks.ts`](../../../src/features/world/pages/PageViewer/hooks/matrixLegacyLinks.ts),
+aplikovaný jen pro svět `matrix` (gate `isLegacyWorld`):
+- **A1 `stripLegacyDomain`:** `https://(www.)?projekt-ikaros.com/<slug>` → `/<slug>`
+  → spadne do interní větve hooku. Existující cíl = SPA navigace; propadlý =
+  `.brokenLink` + blokace kliku (NE otevření starého webu).
+- **A2 `remapLegacySlug`:** 14 přejmenování z `migration/f5-links.json`
+  (`abigail-wattson`→`abi`…), aplikováno po stripu i na holé formě.
+
+Jádro hooku beze změny: `legacy ? strip(href) : href` na vstupu, `legacy ?
+remap(target) : target` u cíle. Idempotentní (world-scoped href se podruhé
+nezachytí). **Po vypnutí `projekt-ikaros.com` + doplnění propadlých stránek lze
+modul smazat.**
+
+### Dotčené soubory
+- `matrixLegacyLinks.ts` (nový, smazatelný shim).
+- `useBrokenLinks.ts` (3 minimální úpravy: import, `legacy` gate, strip+remap).
+- `__tests__/useBrokenLinks.spec.tsx` (+7 případů: A1 existující/propadlý/bez-www/hash, A2 absolutní/holá, jiný svět neaplikuje).
+
+### Mimo rozsah
+- Vícesegmentové oldsite cesty (~4) — ponechány.
+- A3 (AKJ → vlastník) + propadlé cíle „Pravidla B" — samostatné kroky. Viz `PROPADLE-ODKAZY.md`.
