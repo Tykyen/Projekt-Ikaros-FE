@@ -147,7 +147,9 @@ export function PageViewer({ page }: Props) {
             <Layout page={page} />
           </WithAkjTabs>
         )}
-        <BacklinksPanel pageSlug={page.slug} />
+        {/* „Odkazuje sem" = PJ nástroj pro správu lore — skryté hráčům/čtenářům
+            (může prozradit meta-vazby). Viditelné jen PomocnyPJ+ (canEdit). */}
+        {canEdit && <BacklinksPanel pageSlug={page.slug} />}
         <GalleryLightbox
           images={inlineLightbox.images}
           index={inlineLightbox.index}
