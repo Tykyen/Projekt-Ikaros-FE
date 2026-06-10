@@ -81,12 +81,16 @@
   text-underline-offset: 3px;
 }
 
-/* 7.2m — propadlý odkaz (decoration z useBrokenLinkDecoration). Shodné se
-   zvýrazněním v read mode (PageViewer.module.css), aby editor signalizoval
-   stejné odkazy. Vyšší specificita než holé `a` → bez !important. */
-.content :global(.ProseMirror a.brokenLink) {
-  color: var(--color-danger, rgba(255, 90, 90, 0.9));
-  text-decoration: underline dotted rgba(255, 90, 90, 0.7);
+/* 7.2m — propadlý odkaz. ProseMirror inline decoration class `brokenLink`
+   může přistát na obalovacím <span>, ne přímo na <a> (proto původní
+   `a.brokenLink` nezabíralo a editor zůstával fialový). Pokrýváme oba případy
+   + vnořený <a>; `!important` přebije barvu `.ProseMirror a`. Shodné s read
+   mode (PageViewer.module.css). */
+.content :global(.ProseMirror a.brokenLink),
+.content :global(.ProseMirror .brokenLink),
+.content :global(.ProseMirror .brokenLink a) {
+  color: var(--color-danger, rgba(255, 90, 90, 0.9)) !important;
+  text-decoration: underline dotted rgba(255, 90, 90, 0.7) !important;
 }
 
 /* 3.3x — vložený obrázek (TipTap Image extension). */
