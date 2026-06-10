@@ -43,7 +43,10 @@ export function FriendsTab() {
   // D-055 — default collapsed, citlivý seznam neměl by být primárně visible.
   const [blockedExpanded, setBlockedExpanded] = useState(false);
 
-  const friends = friendsQuery.data?.items ?? [];
+  // Pojistka: záznam bez protějšku (`friend`) by shodil `toPublicUserListItem`.
+  // BE teď protějška vždy dohledá (i placeholder „neznámý"), tohle je jen
+  // poslední záchrana proti neúplným datům.
+  const friends = (friendsQuery.data?.items ?? []).filter((f) => f.friend);
   const outgoing = outgoingQuery.data?.items ?? [];
   const blocked = blockedQuery.data?.items ?? [];
   const isLoading =
