@@ -190,6 +190,7 @@ Pořadí podle závislostí. Každá fáze = vlastní dílčí spec + souhlas + 
 | **F2** ✅ | Klasifikace stránek | Pages | **HOTOVO:** ruční revize uživatele `Downloads/f2-klasifikace.csv` (3625 ř., finální kategorie + akční značky) | F0 |
 | **F3** ✅ | Postavy | Characters | **NAIMPORTOVÁNO na newmatrix (943, preskoceno 0)** přes workflow `import-matrix-characters.yml` (tag `_mig:f3`, idempotentní, rollback k dispozici). 24 PC / 919 NPC. | F1 |
 | **F4a** ✅ | Stránky — samostatné | Pages + CSV | **NAIMPORTOVÁNO (1643, preskoceno 0)** — Lokace/Ostatní/Seznam/Rodokmen, `import-matrix-pages.yml`, tag `_mig:f4a` | F2 |
+| **F-Seznam** | Seznam: odkazy → `menu` | Seznam stránky (F4a) | extrakce odkazů z `content` do `page.menu` (95/123 str., 721 pol.), `extract-seznam-menu.yml`, flag `_migSeznamMenu`. Spec [`f-seznam-menu.md`](./f-seznam-menu.md) | F4a, F5 |
 | **F4b** ✅ | NPC stránky → postavy | Pages | **NAIMPORTOVÁNO (1075: napojeno 898, dovytvořeno 177 karet, skip 0)** `import-matrix-npc.yml` `_mig:f4b`. PC stránky → F4b-2/c/d | F2, F3, F4a |
 | **F4c** ✅ | PC výbava/finance/poznámky | Pages | **NAIMPORTOVÁNO** (49: inv 17 / fin 15 / notes 17, Měďák 59 ✓) `import-matrix-subdocs.yml` `_mig:f4c`. (Kontakty→F4d) | F3 |
 | **F4b-2** 🔜 | PC veřejné stránky | Pages | Postava (17) → Page `Postava hráče` + characterRef + ownerUserId (slug=char slug) | F3 |
