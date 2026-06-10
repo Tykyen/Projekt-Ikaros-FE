@@ -4,8 +4,10 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Link2 } from 'lucide-react';
 import { LinkPickerPopover } from '@/shared/ui/LinkPicker';
+import { useWorldContext } from '@/features/world/context/WorldContext';
 import type { PageDirectoryEntry } from '../../api/pages.types';
 import { slugify } from '../lib/slugify';
+import { useBrokenLinkDecoration } from '../hooks/useBrokenLinkDecoration';
 import s from './SmartCellInput.module.css';
 
 interface Props {
@@ -38,32 +40,37 @@ export function SmartCellInput({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [initialQuery, setInitialQuery] = useState('');
   const linkBtnRef = useRef<HTMLButtonElement>(null);
+  const { worldSlug } = useWorldContext();
+  // 7.2m — propadlé odkazy v buňce červeně (parita s read mode i ostatními editory).
+  const brokenExt = useBrokenLinkDecoration(directory, worldSlug);
 
-  const editor = useEditor({
-    extensions: [
-      // Minimální sada — jen text + odkazy (žádné nadpisy/seznamy/marky).
-      StarterKit.configure({
-        heading: false,
-        bulletList: false,
-        orderedList: false,
-        listItem: false,
-        blockquote: false,
-        codeBlock: false,
-        code: false,
-        horizontalRule: false,
-        strike: false,
-        bold: false,
-        italic: false,
-        link: {
-          openOnClick: false,
-          autolink: false,
-          HTMLAttributes: { rel: null, target: null },
-        },
-      }),
-      Placeholder.configure({ placeholder: placeholder ?? 'Hodnota' }),
-    ],
-    content: value || '',
-    immediatelyRender: false,
+  const editor = useEditor(
+    {
+      extensions: [
+        // Minimální sada — jen text + odkazy (žádné nadpisy/seznamy/marky).
+        StarterKit.configure({
+          heading: false,
+          bulletList: false,
+          orderedList: false,
+          listItem: false,
+          blockquote: false,
+          codeBlock: false,
+          code: false,
+          horizontalRule: false,
+          strike: false,
+          bold: false,
+          italic: false,
+          link: {
+            openOnClick: false,
+            autolink: false,
+            HTMLAttributes: { rel: null, target: null },
+          },
+        }),
+        Placeholder.configure({ placeholder: placeholder ?? 'Hodnota' }),
+        brokenExt,
+      ],
+      content: value || '',
+      immediatelyRender: false,
     editorProps: {
       attributes: { class: s.editor },
       // Single-line — Enter nevkládá nový odstavec.
@@ -75,8 +82,12 @@ export function SmartCellInput({
         return false;
       },
     },
-    onUpdate: ({ editor: e }) => onChange(cleanHtml(e.getHTML())),
-  });
+      onUpdate: ({ editor: e }) => onChange(cleanHtml(e.getHTML())),
+    },
+    // Re-init když dorazí directory (jinak by broken ext měl prázdný slug index
+    // a všechny odkazy by svítily červeně).
+    [brokenExt],
+  );
 
   // Sync externí změny hodnoty (hydratace z BE, aplikace šablony).
   useEffect(() => {

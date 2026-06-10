@@ -17,6 +17,7 @@ import { HeroUploadCard } from '../components/HeroUploadCard';
 import { TablePanel } from './TablePanel';
 import { usePagesDirectory } from '../../api/usePagesDirectory';
 import { slugify } from '../lib/slugify';
+import { useBrokenLinkDecoration } from '../hooks/useBrokenLinkDecoration';
 import type {
   AccessRequirement,
   AkjTab,
@@ -182,9 +183,10 @@ function AkjTabCard({
   onRemove: () => void;
   onMove: (dir: -1 | 1) => void;
 }) {
-  const { worldId } = useWorldContext();
+  const { worldId, worldSlug } = useWorldContext();
   const { data: members = [] } = useWorldMembers(worldId);
   const { data: directory = [] } = usePagesDirectory(worldId);
+  const brokenExt = useBrokenLinkDecoration(directory, worldSlug);
   const [userSearch, setUserSearch] = useState('');
 
   const grantedUserIds = userIdsOf(tab.access);
@@ -376,6 +378,7 @@ function AkjTabCard({
           placeholder="Text, který uvidí jen ti s přístupem…"
           linkDirectory={directory}
           linkMakeSlug={slugify}
+          additionalExtensions={[brokenExt]}
         />
 
         <span className={s.fieldLabel}>Atributy &amp; metadata (boxy)</span>

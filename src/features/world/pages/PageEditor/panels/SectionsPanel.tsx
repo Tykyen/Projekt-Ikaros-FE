@@ -23,9 +23,11 @@ import {
   GripVertical,
 } from 'lucide-react';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { useWorldContext } from '@/features/world/context/WorldContext';
 import { CollapsiblePanel } from '../components/CollapsiblePanel';
 import type { PageSection, PageDirectoryEntry } from '../../api/pages.types';
 import { slugify } from '../lib/slugify';
+import { useBrokenLinkDecoration } from '../hooks/useBrokenLinkDecoration';
 import s from './SectionsPanel.module.css';
 
 interface Props {
@@ -141,6 +143,8 @@ function SortableSectionCard({
   onRemove: () => void;
   directory?: PageDirectoryEntry[];
 }) {
+  const { worldSlug } = useWorldContext();
+  const brokenExt = useBrokenLinkDecoration(directory ?? [], worldSlug);
   const {
     attributes,
     listeners,
@@ -201,6 +205,7 @@ function SortableSectionCard({
           placeholder="Obsah sekce…"
           linkDirectory={directory}
           linkMakeSlug={slugify}
+          additionalExtensions={[brokenExt]}
           className={s.editor}
         />
         <SectionItems
