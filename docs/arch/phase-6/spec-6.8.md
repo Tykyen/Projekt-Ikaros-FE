@@ -44,6 +44,14 @@ Sekce v **Nastavení světa → Chat** (nebo nejbližší existující záložka
 3. Jméno default „PJ", per svět přejmenovatelné.
 4. Avatar zvolí uživatel (PJ), aplikuje se zpětně automaticky.
 
+## 6.8b — Portrét postavy jako avatar v chatu (follow-up, 2026-06-10)
+Související problém odhalený na migrovaných datech: zprávy hráčů ukazovaly **iniciálu** místo portrétu postavy. Příčina: migrované zprávy nemají `senderAvatarUrl` (per-zpráva se nemigroval) a `membership.avatarUrl` je u migrovaných prázdný (migrace přes mongosh → eventy `character.*` nevystřelily).
+
+**Řešení (render-time, single source = `Character.imageUrl` z adresáře):**
+- **Avatar zprávy** (`ChannelView`): `resolveAccountAvatar` dohledá portrét přes `useCharacterDirectory` (userId→imageUrl), priorita portrét postavy → `membership.avatarUrl` → účtový avatar → iniciála.
+- **Ikona character kanálu „Postavy"** (sidebar): **BE read-time enrich** v `getGroupsWithChannels` — `linkedMemberUserId → membership.characterPath → imageUrl` z `charactersService.getDirectory`. Stejný vzor jako znak skupiny (`groupImages`). `CharactersService` injektován `forwardRef` (cyklus Chat↔Characters). Adresář (BE) nenese `userId` → join přes membership.
+- BE: `chat.service.ts` (+ `chat.module.ts` forwardRef + `chat.service.spec.ts` mock). FE: `ChannelView.tsx`.
+
 ## Otevřené / mimo rozsah
 - Per-message opt-out („tahle zpráva pod mým jménem") — neřešíme (NPC override pokrývá potřebu mluvit jinak).
 - Sjednocení barvy/fontu PJ persony — mimo rozsah (jen jméno+avatar).
