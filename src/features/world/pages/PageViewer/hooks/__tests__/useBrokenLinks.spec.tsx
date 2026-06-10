@@ -119,7 +119,12 @@ describe('useBrokenLinks — F5 world-scope rewrite', () => {
 
 describe('useBrokenLinks — F5 krok 3 (Matrix legacy odkazy)', () => {
   beforeEach(() => {
-    dirState.current = [{ slug: 'svedsko' }, { slug: 'londyn' }, { slug: 'abi' }];
+    dirState.current = [
+      { slug: 'svedsko' },
+      { slug: 'londyn' },
+      { slug: 'abi' },
+      { slug: 'jakuza' },
+    ];
   });
 
   it('A1: absolutní odkaz na starý web s existujícím cílem → world-scoped href + SPA navigace', () => {
@@ -166,6 +171,27 @@ describe('useBrokenLinks — F5 krok 3 (Matrix legacy odkazy)', () => {
   it('A2: přejmenovaný slug i v holé formě → kanonický cíl', () => {
     const a = renderHtml('<a href="abigail-wattson">Abi</a>');
     expect(a.getAttribute('href')).toBe('/svet/matrix/abi');
+  });
+
+  it('A3: starý AKJ slug → přesměruje na vlastníka záložky (holá forma)', () => {
+    const a = renderHtml('<a href="akj-8-jakuza">Jakuza AKJ</a>');
+    expect(a.getAttribute('href')).toBe('/svet/matrix/jakuza');
+    fireEvent.click(a);
+    expect(navigateSpy).toHaveBeenCalledWith('/svet/matrix/jakuza');
+  });
+
+  it('A3: starý AKJ slug i přes absolutní odkaz na starý web', () => {
+    const a = renderHtml(
+      '<a href="https://www.projekt-ikaros.com/akj-8-jakuza">Jakuza</a>',
+    );
+    expect(a.getAttribute('href')).toBe('/svet/matrix/jakuza');
+  });
+
+  it('A3: AKJ bez dohledaného vlastníka (gm01) → zůstane broken', () => {
+    const a = renderHtml('<a href="gm01">GM</a>');
+    expect(a.classList.contains('brokenLink')).toBe(true);
+    fireEvent.click(a);
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 
   it('jiný svět: shim se neaplikuje, odkaz na starý web zůstane externí', () => {

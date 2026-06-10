@@ -14,6 +14,7 @@
  *
  * Spec: `docs/arch/migration-matrix/f5-links.md` (krok 3).
  */
+import AKJ_OWNERS from './matrixAkjOwners';
 
 /** Slug světa, na který se migrační pravidla vztahují. */
 const LEGACY_WORLD_SLUG = 'matrix';
@@ -57,7 +58,12 @@ export function stripLegacyDomain(href: string): string {
   return m ? `/${m[1]}` : href;
 }
 
-/** A2: přemapuje přejmenovaný slug na kanonický (jinak vrací vstup beze změny). */
+/**
+ * A2 + A3: přemapuje migrační slug na živý cíl (jinak vrací vstup beze změny):
+ * - **A2** přejmenované slugy (přezdívky, `LEGACY_SLUG_REMAP`),
+ * - **A3** staré AKJ slugy → vlastník záložky (`AKJ_OWNERS`, `staty-x` styl
+ *   odkazů na info, které dnes žije jako AKJ záložka cílové stránky).
+ */
 export function remapLegacySlug(slug: string): string {
-  return LEGACY_SLUG_REMAP[slug] ?? slug;
+  return LEGACY_SLUG_REMAP[slug] ?? AKJ_OWNERS[slug] ?? slug;
 }

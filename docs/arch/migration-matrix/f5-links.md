@@ -73,7 +73,7 @@ Audit obsahu (`C:\tmp\f5-audit.js`): **14 745 odkazů, 531 broken (3,7 %)**. Roz
 - ✅ Krok 1a (runtime rewrite hook) — implementováno, tsc 0, 8/8 testů, build OK.
 - ✅ Krok 1b (broken-fix workflow) — `_migF5Links`.
 - ✅ Krok 2 (auto-link vlastních jmen) — `useAutoLink`.
-- ✅ Krok 3 (A1+A2 starý web + přejmenované slugy) — implementováno, build OK, 16/16 testů. Viz níže.
+- ✅ Krok 3 (A1+A2 starý web + přejmenované slugy, A3 AKJ→vlastník) — implementováno, build OK, 19/19 testů. Viz níže.
 
 ---
 
@@ -95,6 +95,11 @@ aplikovaný jen pro svět `matrix` (gate `isLegacyWorld`):
   `.brokenLink` + blokace kliku (NE otevření starého webu).
 - **A2 `remapLegacySlug`:** 14 přejmenování z `migration/f5-links.json`
   (`abigail-wattson`→`abi`…), aplikováno po stripu i na holé formě.
+- **A3 AKJ → vlastník:** 446 starých AKJ slugů (`akj-8-jakuza`, `gm01`…) →
+  stránka, na kterou se záložka při F4d připnula (`tab.id="mig-"+slug` →
+  `targetSlug`). Mapa `matrixAkjOwners.ts` (generovaná, smazatelná) napojená do
+  `remapLegacySlug`. Pokrývá 690/773 odkazů; ~14 GM master bez vlastníka zůstává
+  broken (červené). Multi-vlastník (47) → primární.
 
 Jádro hooku beze změny: `legacy ? strip(href) : href` na vstupu, `legacy ?
 remap(target) : target` u cíle. Idempotentní (world-scoped href se podruhé
@@ -102,10 +107,11 @@ nezachytí). **Po vypnutí `projekt-ikaros.com` + doplnění propadlých stráne
 modul smazat.**
 
 ### Dotčené soubory
-- `matrixLegacyLinks.ts` (nový, smazatelný shim).
+- `matrixLegacyLinks.ts` (nový, smazatelný shim) + `matrixAkjOwners.ts` (generovaná mapa 446).
 - `useBrokenLinks.ts` (3 minimální úpravy: import, `legacy` gate, strip+remap).
-- `__tests__/useBrokenLinks.spec.tsx` (+7 případů: A1 existující/propadlý/bez-www/hash, A2 absolutní/holá, jiný svět neaplikuje).
+- `__tests__/useBrokenLinks.spec.tsx` (+10 případů: A1 existující/propadlý/bez-www/hash, A2 absolutní/holá, A3 AKJ holá/absolutní/bez-vlastníka, jiný svět neaplikuje).
 
 ### Mimo rozsah
 - Vícesegmentové oldsite cesty (~4) — ponechány.
-- A3 (AKJ → vlastník) + propadlé cíle „Pravidla B" — samostatné kroky. Viz `PROPADLE-ODKAZY.md`.
+- AKJ odkazy uvnitř `akjTabs` (ne v hlavním obsahu) — runtime hook je nezpracovává (fallback = datový workflow, kdyby bylo potřeba).
+- Propadlé cíle „Pravidla B" (programy/staty/magie/jazyky) — samostatná migrace. Viz `PROPADLE-ODKAZY.md` + `PRAVIDLA-B-WORKSHEET.md`.
