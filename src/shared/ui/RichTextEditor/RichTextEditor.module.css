@@ -81,6 +81,14 @@
   text-underline-offset: 3px;
 }
 
+/* 7.2m — propadlý odkaz (decoration z useBrokenLinkDecoration). Shodné se
+   zvýrazněním v read mode (PageViewer.module.css), aby editor signalizoval
+   stejné odkazy. Vyšší specificita než holé `a` → bez !important. */
+.content :global(.ProseMirror a.brokenLink) {
+  color: var(--color-danger, rgba(255, 90, 90, 0.9));
+  text-decoration: underline dotted rgba(255, 90, 90, 0.7);
+}
+
 /* 3.3x — vložený obrázek (TipTap Image extension). */
 .content :global(.ProseMirror img) {
   display: block;

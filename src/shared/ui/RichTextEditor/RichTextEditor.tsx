@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { getExtensions } from './extensions';
 import { RTEBubbleMenu } from './BubbleMenu';
 import { RTEToolbar } from './RTEToolbar';
+import type { LinkSuggestion } from '@/shared/ui/LinkPicker';
 import s from './RichTextEditor.module.css';
 
 export interface RichTextEditorProps {
@@ -41,6 +42,13 @@ export interface RichTextEditorProps {
    * Volá se s instancí jakmile je editor ready, a s `null` při unmountu.
    */
   onEditorReady?: (editor: Editor | null) => void;
+  /**
+   * 7.2n — Adresář stránek světa pro link picker v bubble menu. Bez něj
+   * picker degraduje na URL režim (články/novinky nemají stránky světa).
+   */
+  linkDirectory?: LinkSuggestion[];
+  /** Odvození slugu pro „zatím neexistuje" volbu (typicky `slugify`). */
+  linkMakeSlug?: (query: string) => string;
   className?: string;
 }
 
@@ -63,6 +71,8 @@ export function RichTextEditor({
   enableTable,
   additionalExtensions,
   onEditorReady,
+  linkDirectory,
+  linkMakeSlug,
   className,
 }: RichTextEditorProps) {
   const editor = useEditor({
@@ -118,7 +128,13 @@ export function RichTextEditor({
       {!readOnly && onImageUpload && (
         <RTEToolbar editor={editor} onImageUpload={onImageUpload} />
       )}
-      {!readOnly && <RTEBubbleMenu editor={editor} />}
+      {!readOnly && (
+        <RTEBubbleMenu
+          editor={editor}
+          linkDirectory={linkDirectory}
+          makeSlug={linkMakeSlug}
+        />
+      )}
       <EditorContent editor={editor} className={s.content} />
     </div>
   );

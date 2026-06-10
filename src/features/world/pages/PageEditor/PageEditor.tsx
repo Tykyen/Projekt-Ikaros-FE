@@ -472,6 +472,7 @@ export function PageEditor({
           <SectionsPanel
             sections={state.sections}
             onChange={(sections) => setField('sections', sections)}
+            directory={directory}
           />
 
           <AkjTabsPanel

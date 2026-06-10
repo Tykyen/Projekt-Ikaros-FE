@@ -8,6 +8,8 @@ import { usePagesDirectory } from '../../api/usePagesDirectory';
 import { CollapsiblePanel } from '../components/CollapsiblePanel';
 import { StyleRail } from '../components/StyleRail';
 import { useWikilinkExtension } from '../hooks/useWikilinkExtension';
+import { useBrokenLinkDecoration } from '../hooks/useBrokenLinkDecoration';
+import { slugify } from '../lib/slugify';
 import s from './ContentPanel.module.css';
 
 interface Props {
@@ -26,10 +28,12 @@ const MAX_CONTENT = 100_000;
  * Bubble menu zůstává — doplňuje rail rychlým formátem v selekci.
  */
 export function ContentPanel({ content, onChange }: Props) {
-  const { worldId } = useWorldContext();
+  const { worldId, worldSlug } = useWorldContext();
   const uploadImage = useUploadImage();
   const { data: directory = [] } = usePagesDirectory(worldId);
   const wikilinkExt = useWikilinkExtension(directory);
+  // 7.2m — propadlé odkazy v editoru červeně (parita s read mode).
+  const brokenLinkExt = useBrokenLinkDecoration(directory, worldSlug);
   const [editor, setEditor] = useState<Editor | null>(null);
 
   return (
@@ -46,11 +50,13 @@ export function ContentPanel({ content, onChange }: Props) {
               onChange={onChange}
               maxLength={MAX_CONTENT}
               enableTable
-              additionalExtensions={[wikilinkExt]}
+              additionalExtensions={[wikilinkExt, brokenLinkExt]}
               onImageUpload={async (file) =>
                 (await uploadImage.mutateAsync(file)).url
               }
               onEditorReady={setEditor}
+              linkDirectory={directory}
+              linkMakeSlug={slugify}
               placeholder="Začni psát obsah stránky… (B/I/H2/H3/seznamy/citace/tabulky, [[ wikilink)"
               className={s.editor}
             />
@@ -60,7 +66,7 @@ export function ContentPanel({ content, onChange }: Props) {
           </p>
         </div>
 
-        <StyleRail editor={editor} />
+        <StyleRail editor={editor} directory={directory} makeSlug={slugify} />
       </div>
     </CollapsiblePanel>
   );

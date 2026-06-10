@@ -467,6 +467,108 @@ Error → toast + scroll na první invalid panel.
 - ~~AKJ duplicity~~ → **7.2e** rozšířen o existence handling
 - ~~AKJ slug collision~~ → **7.2e** auto-suffix logika
 
+## 20 — 7.2m Zvýraznění propadlých odkazů v editoru (follow-up)
+
+> Doplněno 2026-06-10 po testování. Parita editoru s read-mode broken-link detekcí (7.1d).
+
+### Problém
+
+Read mode označí odkaz na neexistující stránku červeně (`useBrokenLinks` → class `.brokenLink`, [PageViewer.module.css](../../../src/features/world/pages/PageViewer/PageViewer.module.css)). V **editoru** (TipTap) tahle detekce nikdy neběžela → všechny odkazy fialové. PJ při editaci nepozná, který odkaz je propadlý a má ho opravit. Konkrétní nález: stránka „Pravidla B / magie", odkaz „Ovládání energie" je v zobrazení červený, v editoru ne.
+
+### Řešení
+
+ProseMirror **Decoration plugin** (TipTap extension) registrovaný do editoru pages obsahu (`ContentPanel`, vedle wikilink extension). Plugin projde link marky dokumentu, propadlé označí inline decoration s class `.brokenLink`.
+
+📚 *Decoration = vizuální overlay nad dokumentem (přidá CSS class), nemění uložená data. Class `.brokenLink` se nikdy nezapíše do uloženého HTML — je čistě nápověda v editoru.*
+
+### Klíčová rozhodnutí
+
+1. **Sdílená klasifikace href → stav.** Logika „je tento odkaz propadlý?" se vyčlení z `useBrokenLinks` do čisté funkce použité na obou místech. Cíl: červená v editoru === červená v read mode (jinak nekonzistence = větší zmatek). Funkce řeší i 3 tvary linku, `WORLD_RESERVED` skip a matrix legacy-remap (přejmenované slugy + AKJ vlastníci) — tj. remapovaný odkaz (např. `abigail-wattson` → `abi`) **není** propadlý ani v editoru, protože v read mode funguje.
+2. **Jen vizuál, žádná změna obsahu.** Decoration nepřepisuje href (na rozdíl od read-mode hooku, který validní odkazy přepisuje na world-scoped a věší SPA listener — to v editoru nechceme, obsah se ukládá tak jak je napsaný).
+3. **Live přepočet.** Plugin se přepočítá při každé změně dokumentu i při dotečení directory → jakmile PJ odkaz opraví na existující stránku, červená zmizí.
+4. **Rozsah = jen červená.** Žádný tooltip ani počítadlo propadlých (potvrzeno s PJ — minimální oprava parity).
+
+### Mimo rozsah
+
+- Tooltip / počítadlo propadlých odkazů v editoru (lze doplnit později).
+- Broken detekce v `SmartCellInput` (datová tabulka / atributy) — řeší vlastní render, samostatný follow-up pokud bude potřeba.
+
+### Acceptance criteria
+
+- [x] V editoru stránky je odkaz na neexistující slug červený (stejně jako read mode).
+- [x] Odkaz na existující stránku zůstává fialový (neoznačený).
+- [x] Matrix legacy-remap: přejmenovaný/AKJ odkaz není označen jako propadlý.
+- [x] Externí (`https://`, `mailto:`) a navigační (`stranky`, `chat`, …) odkazy nejsou označeny.
+- [x] Po opravě propadlého odkazu na existující stránku červená živě zmizí (ProseMirror přepočítá `decorations` při změně dokumentu).
+- [x] Read mode i editor klasifikují stejný odkaz identicky (sdílená `classifyPageLink`, žádný drift).
+
+**Implementováno 2026-06-10.** Soubory: `classifyPageLink.ts` (sdílené jádro), `useBrokenLinkDecoration.ts` (editor plugin), refactor `useBrokenLinks.ts`, zapojení `ContentPanel.tsx` + CSS `RichTextEditor.module.css`. Testy: `classifyPageLink.spec.ts` (24), `useBrokenLinkDecoration.spec.ts` (5), regrese `useBrokenLinks.spec.tsx` zelená. Build čistý.
+
+## 21 — 7.2n Sjednocený LinkPicker pro vkládání odkazů (follow-up)
+
+> Doplněno 2026-06-10 po testování. Odstranit nativní `window.prompt` u všech odkazů, sjednotit na popover ze SmartCellInput (Atributy & metadata).
+
+### Problém
+
+Vkládání odkazu má dnes **tři různé implementace** s nekonzistentní UX:
+
+| Místo | Implementace | UX |
+|---|---|---|
+| [StyleRail](../../../src/features/world/pages/PageEditor/components/StyleRail.tsx) „ODKAZ" + [BubbleMenu](../../../src/shared/ui/RichTextEditor/BubbleMenu.tsx) | **nativní `window.prompt`** | ošklivý, bez nabídky stránek |
+| [SmartCellInput](../../../src/features/world/pages/PageEditor/components/SmartCellInput.tsx) (Atributy) | inline picker | autocomplete + „zatím neexistuje" + URL |
+| [PagePicker](../../../src/features/world/pages/PageEditor/components/PagePicker.tsx) (Seznam/menu) | inline picker | autocomplete + „zatím neexistuje" (bez URL) |
+
+Navíc oba hezké pickery jsou `position: absolute` uvnitř panelu → když je položka dole, popover **přeteče a zaleze za sousední sekci** (nález PJ na typu Seznam: picker schovaný za „Textový obsah"). Rodičovský `overflow` ho ořízne.
+
+Cíl (požadavek PJ): **jeden picker pro všechny odkazy**, vizuálně shodný se SmartCellInput, a hlavně **bez zalézání**.
+
+### Řešení
+
+**Konsolidovat 3 → 1.** Sdílená komponenta **`LinkPickerPopover`** (`shared/ui/LinkPicker/`) drží UI (search, seznam stránek, „zatím neexistuje", volitelně URL fallback, current link + odebrání) **i pozicování přes React Portal**. Konzumenti jsou tencí adaptéry, které jen namapují výsledek:
+
+- **Editor-based** (StyleRail, BubbleMenu, SmartCellInput) → `onPick(href)` zavolá `editor.chain().extendMarkRange('link').setLink({ href })`.
+- **Value-based** (PagePicker/MenuPanel) → `onPick(slug, title)` zavolá `onChange` (href celé položky).
+
+📚 *Proč popover, ne 3 kopie: search/list/create/URL logika je všude stejná, liší se jen „kam výsledek zapsat". Společné UI = jedna oprava pozice opraví všechna místa.*
+
+### Klíčová rozhodnutí
+
+1. **Pozicování přes React Portal — řeší zalézání.** Popover se renderuje `createPortal` do `document.body`, `position: fixed`, souřadnice z `getBoundingClientRect()` anchoru. **Flip nahoru**, když pod tlačítkem není dost místa (typicky položka u dolního okraje panelu). Tím ho neořízne `overflow` panelu ani nepřekryje sousední sekce. Reflow na scroll/resize, zavření klikem mimo + `Esc`.
+   🔀 *Alternativa tippy.js (v deps): imperativní + React obsah přes ReactRenderer — těžkopádné pro stavový popover s inputy. Volím nativní Portal (žádná nová závislost, plná React kontrola stavu).*
+2. **Adresář je volitelný.**
+   - **S adresářem** → autocomplete stránek + „zatím neexistuje" (slug přes injektovaný `makeSlug`) + (volitelně) URL fallback. Vložený odkaz = holý slug → konzistentní s wikilinkem i broken-link detekcí (7.2m): dokud stránka neexistuje, svítí červeně.
+   - **Bez adresáře** (články/novinky — platformový obsah, žádné stránky světa) → degraduje na **URL popover** (jen URL input). Pořád nahrazuje nativní prompt.
+3. **Vrstvení.** `LinkPickerPopover` v `shared/ui` → **nesmí** importovat z `features`. Adresář přijímá jako generický `LinkSuggestion = { id; title; slug }` (volající mapuje z `PageDirectoryEntry`), `slugify` jako callback `makeSlug?`, URL sekci přes `allowUrl?` (menu = jen stránky, `allowUrl=false`).
+4. **Průchod adresáře k editoru.** `RichTextEditor` dostane volitelnou prop `linkDirectory?` + `makeSlug?` a prošle do `BubbleMenu`. Předají editory stránek (ContentPanel, SectionsPanel, AkjTabsPanel); ostatní (články/novinky, deníky) ne → URL-only.
+5. **Předvyplnění.** Otevření nad selekcí předvyplní hledání označeným textem (vzor SmartCellInput).
+
+### Rozsah
+
+- **Nová `LinkPickerPopover`** (UI + Portal pozice) — sdílené jádro.
+- **PagePicker** (MenuPanel/Seznam) → refactor na `LinkPickerPopover` (value-based adaptér, `allowUrl=false`).
+- **SmartCellInput** (Atributy) → refactor (editor adaptér, `allowUrl=true`).
+- **StyleRail** „ODKAZ" + **BubbleMenu** → `window.prompt` nahrazen `LinkPickerPopover`.
+- **RichTextEditor** → nová prop `linkDirectory?`/`makeSlug?`, prošle do BubbleMenu.
+- Editory stránek (ContentPanel, SectionsPanel, AkjTabsPanel) předají adresář; ostatní RTE konzumenti → URL-only.
+
+### Mimo rozsah
+
+- Autocomplete jiných entit než stránky (postavy, články).
+- Náhled cíle / validace URL.
+
+### Acceptance criteria
+
+- [x] Popover se **nezaleze** za sousední sekce ani když je položka u dolního okraje panelu (Portal do `body` + flip nahoru + clamp do viewportu). *Staticky ověřeno; živé potvrzení na typu Seznam doporučeno.*
+- [x] „ODKAZ" (rail) i plovoucí lišta v editoru stránky otevřou picker, ne nativní prompt.
+- [x] Picker v editoru/menu stránky nabízí stránky světa + „zatím neexistuje"; v textu navíc URL fallback.
+- [x] Odkaz na neexistující stránku → broken (červený, 7.2m) dokud stránka nevznikne (vkládá holý slug).
+- [x] Editor článku/novinky: „ODKAZ"/lišta otevře URL popover (bez nabídky stránek), ne nativní prompt.
+- [x] Existující odkaz lze upravit i odebrat (current link + ✕).
+- [x] SmartCellInput i PagePicker/MenuPanel funkčně beze změny (refactor; regrese kryté testy).
+- [x] Zavře se klikem mimo i `Esc`; max-width chrání na mobilu.
+
+**Implementováno 2026-06-10.** Nové: `shared/ui/LinkPicker/` (LinkPickerPopover + useAnchoredPosition + types). Refactor: PagePicker, SmartCellInput, StyleRail, BubbleMenu, RichTextEditor (prop `linkDirectory`/`linkMakeSlug`); adresář předaly ContentPanel, SectionsPanel, AkjTabsPanel. CSS popoveru konsolidováno (mrtvé třídy v PagePicker/SmartCellInput odstraněny). Testy: LinkPickerPopover.spec (7) + aktualizovaný SmartCellInput.spec; 62 testů RTE/LinkPicker/PageEditor zelených, build čistý.
+
 ## 19 — Závislosti
 
 - **3.2** — RichTextEditor, useDraftAutoSave, useUploadContentImage → potvrzeno hotové

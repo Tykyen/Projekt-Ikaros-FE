@@ -1,11 +1,7 @@
 import { useEffect, type RefObject } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePagesDirectory } from '../../api/usePagesDirectory';
-import {
-  isLegacyWorld,
-  remapLegacySlug,
-  stripLegacyDomain,
-} from './matrixLegacyLinks';
+import { classifyPageLink } from './classifyPageLink';
 
 /**
  * 7.1d — Broken-link detekce + F5 (migrace) world-scope rewrite.
@@ -26,37 +22,11 @@ import {
  * obsah objeví/změní. Přepis mění jen atributy/classy/listenery (ne childList)
  * → neretriggeruje observer → žádná smyčka.
  *
- * Detekuje 3 tvary interních linků:
- *   1. `/svet/<worldSlug>/<slug>` — absolutní cesta z URL
- *   2. `/<slug>` — relativní k current světu
- *   3. `<slug>` — holý slug (RichTextEditor TipTap link extension / migrace)
- *
- * Skipuje navigační routy (breadcrumb, nav menu) — viz `WORLD_RESERVED` /
- * vícesegmentové targety.
+ * Klasifikaci href → stav (validní / rozbitý / ignorovat), 3 tvary linku,
+ * reserved routy i Matrix legacy shim drží sdílená čistá funkce
+ * `classifyPageLink` (sdílí ji editor — 7.2m). Tady zůstává jen DOM aplikace
+ * stavu (href rewrite, listenery, `.brokenLink` class).
  */
-
-/** Reserved world-level slugy = routy, ne page slugy. */
-const WORLD_RESERVED = new Set([
-  'stranky',
-  'postavy',
-  'postava',
-  'hraci',
-  'chat',
-  'nastaveni',
-  'moje-postava',
-  'admin',
-  'pravidla',
-  'mapa',
-  'timeline',
-  'kalendar',
-  'pocasi',
-  'events',
-  'pavucina',
-  'obchod',
-  'zvuky',
-  'meny',
-  'skupiny',
-]);
 
 type ManagedAnchor = HTMLAnchorElement & {
   __brokenHandler?: (e: Event) => void;
@@ -97,44 +67,15 @@ export function useBrokenLinks(
 
     const slugSet = new Set(directory.map((d) => d.slug));
     const worldPrefix = `/svet/${worldSlug}/`;
-    // Migrace Matrix (F5 krok 3): jen pro svět `matrix` přepisujeme absolutní
-    // odkazy na starý web + přejmenované slugy. Jinde se shim neaplikuje.
-    const legacy = isLegacyWorld(worldSlug);
 
     const processLink = (linkEl: Element): void => {
       const rawHref = linkEl.getAttribute('href') ?? '';
-      // A1: `https://www.projekt-ikaros.com/<slug>` → `/<slug>`, aby odkaz spadl
-      // do interní větve (jinak by ho external-guard níž propustil ven na starý
-      // web). Ostatní hrefy zůstávají beze změny.
-      const href = legacy ? stripLegacyDomain(rawHref) : rawHref;
-      if (!href || /^(https?:|mailto:|tel:|#)/i.test(href)) return;
-
-      // Odkaz na samotnou úvodní stránku světa — navigace, neověřujeme.
-      if (href === `/svet/${worldSlug}` || href === worldPrefix) return;
-
-      // Raw cíl podle 3 podporovaných tvarů.
-      let raw: string;
-      if (href.startsWith(worldPrefix)) raw = href.slice(worldPrefix.length);
-      else if (href.startsWith('/')) raw = href.slice(1);
-      else raw = href;
-
-      // Oddělit slug od ?query / #hash (kotvy na nadpisy se musí zachovat).
-      const m = raw.match(/^([^?#]*)([?#].*)?$/);
-      const rawTarget = m?.[1] ?? '';
-      const suffix = m?.[2] ?? '';
-
-      if (!rawTarget) return;
-      // Vícesegmentové cesty (admin/stranky, postava/abc, …) = navigační routy.
-      if (rawTarget.includes('/')) return;
-      // Rezervované world routy (stranky, hraci, chat, …) — taky navigace.
-      if (WORLD_RESERVED.has(rawTarget)) return;
-
-      // A2: přejmenovaný slug (přezdívka → kanonický) → cílíme na živou stránku.
-      const target = legacy ? remapLegacySlug(rawTarget) : rawTarget;
+      const cls = classifyPageLink(rawHref, { slugSet, worldSlug });
+      if (cls.kind === 'ignore') return;
 
       const anchor = linkEl as ManagedAnchor;
 
-      if (slugSet.has(target)) {
+      if (cls.kind === 'internal') {
         // ── F5: interní validní → world-scoped href + SPA navigace ──
         anchor.classList.remove('brokenLink');
         unbindBroken(anchor);
@@ -142,7 +83,7 @@ export function useBrokenLinks(
         // Přepiš href na world-scoped tvar (idempotentní) a sjednoť cíl
         // do stejného okna — `target="_blank"` z extensions otevíral kartu
         // na holém `/svedsko` → 404.
-        anchor.setAttribute('href', `${worldPrefix}${target}${suffix}`);
+        anchor.setAttribute('href', `${worldPrefix}${cls.target}${cls.suffix}`);
         anchor.removeAttribute('target');
         anchor.removeAttribute('rel');
 

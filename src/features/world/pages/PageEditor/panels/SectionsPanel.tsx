@@ -24,12 +24,15 @@ import {
 } from 'lucide-react';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { CollapsiblePanel } from '../components/CollapsiblePanel';
-import type { PageSection } from '../../api/pages.types';
+import type { PageSection, PageDirectoryEntry } from '../../api/pages.types';
+import { slugify } from '../lib/slugify';
 import s from './SectionsPanel.module.css';
 
 interface Props {
   sections: PageSection[];
   onChange: (sections: PageSection[]) => void;
+  /** Adresář stránek světa pro link picker v editoru sekce. */
+  directory?: PageDirectoryEntry[];
 }
 
 /**
@@ -39,7 +42,7 @@ interface Props {
  * Items v sekci editujeme jako prostý seznam (text + qty + note); reorder items
  * v sekci je low-priority (PJ obvykle nemá 20 items v sekci) → vynecháno v MVP.
  */
-export function SectionsPanel({ sections, onChange }: Props) {
+export function SectionsPanel({ sections, onChange, directory }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -112,6 +115,7 @@ export function SectionsPanel({ sections, onChange }: Props) {
                   section={sec}
                   onUpdate={(patch) => updateSection(sec.id, patch)}
                   onRemove={() => removeSection(sec.id)}
+                  directory={directory}
                 />
               ))}
             </div>
@@ -130,10 +134,12 @@ function SortableSectionCard({
   section,
   onUpdate,
   onRemove,
+  directory,
 }: {
   section: PageSection;
   onUpdate: (patch: Partial<PageSection>) => void;
   onRemove: () => void;
+  directory?: PageDirectoryEntry[];
 }) {
   const {
     attributes,
@@ -193,6 +199,8 @@ function SortableSectionCard({
           value={section.content}
           onChange={(html) => onUpdate({ content: html })}
           placeholder="Obsah sekce…"
+          linkDirectory={directory}
+          linkMakeSlug={slugify}
           className={s.editor}
         />
         <SectionItems

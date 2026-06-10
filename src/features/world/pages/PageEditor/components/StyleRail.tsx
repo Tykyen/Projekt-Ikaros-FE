@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { type Editor, useEditorState } from '@tiptap/react';
 import {
   Bold,
@@ -13,12 +14,17 @@ import {
   Undo2,
   RotateCcw,
 } from 'lucide-react';
+import { LinkPickerPopover, type LinkSuggestion } from '@/shared/ui/LinkPicker';
 import s from './StyleRail.module.css';
 
 interface Props {
   /** Editor instance z `RichTextEditor` (přes `onEditorReady`). Null = ještě
    *  nehydratovaný → rail je disabled. */
   editor: Editor | null;
+  /** Adresář stránek světa pro link picker (bez něj = jen URL režim). */
+  directory?: LinkSuggestion[];
+  /** Odvození slugu pro „zatím neexistuje" volbu (typicky `slugify`). */
+  makeSlug?: (query: string) => string;
 }
 
 const DEFAULT_COLOR = '#dce6ff';
@@ -30,7 +36,11 @@ const DEFAULT_COLOR = '#dce6ff';
  * změně selekce/transakce, takže tlačítka korektně svítí. Bez něj by rail
  * zamrzl (TipTap editor je mutable, React o změnách neví).
  */
-export function StyleRail({ editor }: Props) {
+export function StyleRail({ editor, directory, makeSlug }: Props) {
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkQuery, setLinkQuery] = useState('');
+  const linkBtnRef = useRef<HTMLButtonElement>(null);
+
   const state = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
@@ -75,17 +85,29 @@ export function StyleRail({ editor }: Props) {
     }
   }
 
-  function promptLink() {
-    const prev =
-      (editor!.getAttributes('link').href as string | undefined) ?? '';
-    const url = window.prompt('URL odkazu:', prev);
-    if (url === null) return;
-    if (url === '') {
-      chain().extendMarkRange('link').unsetLink().run();
-      return;
+  // Arrow (ne function declaration) → drží narrowing editor/state z guardu výše.
+  const openLink = () => {
+    // Předvyplň hledání označeným textem (pokud nestojíme na existujícím odkazu).
+    if (!state.link) {
+      const { from, to } = editor.state.selection;
+      setLinkQuery(editor.state.doc.textBetween(from, to).trim());
+    } else {
+      setLinkQuery('');
     }
-    chain().extendMarkRange('link').setLink({ href: url }).run();
+    setLinkOpen(true);
+  };
+
+  function applyLink(href: string) {
+    if (!href) return;
+    chain().extendMarkRange('link').setLink({ href }).run();
   }
+
+  function removeLink() {
+    chain().extendMarkRange('link').unsetLink().run();
+  }
+
+  const currentHref =
+    (editor.getAttributes('link').href as string | undefined) ?? '';
 
   return (
     <div className={s.rail}>
@@ -149,13 +171,27 @@ export function StyleRail({ editor }: Props) {
 
       {/* Odkaz. */}
       <button
+        ref={linkBtnRef}
         type="button"
         className={`${s.wideBtn} ${state.link ? s.wideBtnActive : ''}`}
-        onClick={promptLink}
+        onClick={() => (linkOpen ? setLinkOpen(false) : openLink())}
         title="Odkaz (⌘K)"
+        aria-expanded={linkOpen}
       >
         <Link2 size={14} aria-hidden /> Odkaz
       </button>
+      <LinkPickerPopover
+        anchorRef={linkBtnRef}
+        open={linkOpen}
+        onClose={() => setLinkOpen(false)}
+        onPick={applyLink}
+        onRemove={state.link ? removeLink : undefined}
+        directory={directory}
+        makeSlug={makeSlug}
+        allowUrl
+        currentHref={state.link ? currentHref : undefined}
+        initialQuery={linkQuery}
+      />
 
       {/* Akce. */}
       <div className={s.group}>

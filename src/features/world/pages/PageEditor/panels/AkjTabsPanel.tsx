@@ -15,6 +15,8 @@ import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { CollapsiblePanel } from '../components/CollapsiblePanel';
 import { HeroUploadCard } from '../components/HeroUploadCard';
 import { TablePanel } from './TablePanel';
+import { usePagesDirectory } from '../../api/usePagesDirectory';
+import { slugify } from '../lib/slugify';
 import type {
   AccessRequirement,
   AkjTab,
@@ -182,6 +184,7 @@ function AkjTabCard({
 }) {
   const { worldId } = useWorldContext();
   const { data: members = [] } = useWorldMembers(worldId);
+  const { data: directory = [] } = usePagesDirectory(worldId);
   const [userSearch, setUserSearch] = useState('');
 
   const grantedUserIds = userIdsOf(tab.access);
@@ -371,6 +374,8 @@ function AkjTabCard({
           value={tab.contentOverride?.content ?? ''}
           onChange={(html) => setOverride({ content: html })}
           placeholder="Text, který uvidí jen ti s přístupem…"
+          linkDirectory={directory}
+          linkMakeSlug={slugify}
         />
 
         <span className={s.fieldLabel}>Atributy &amp; metadata (boxy)</span>

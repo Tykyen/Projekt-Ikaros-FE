@@ -53,7 +53,7 @@ describe('SmartCellInput (8.5 — mini rich-text)', () => {
     });
   });
 
-  it('🔗 tlačítko bez označeného textu ukáže nápovědu', async () => {
+  it('🔗 tlačítko bez označeného textu picker neotevře (není co odkazovat)', async () => {
     render(
       <SmartCellInput value="text" onChange={() => {}} directory={DIRECTORY} />,
     );
@@ -61,7 +61,8 @@ describe('SmartCellInput (8.5 — mini rich-text)', () => {
       expect(document.querySelector('.ProseMirror')).toBeTruthy(),
     );
     await userEvent.click(screen.getByRole('button', { name: 'Odkaz' }));
-    expect(screen.getByText(/Nejdřív označ kus textu/)).toBeInTheDocument();
+    // Bez selekce a bez aktivního odkazu se popover neotevře (title napovídá).
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('prázdná hodnota → placeholder', async () => {
