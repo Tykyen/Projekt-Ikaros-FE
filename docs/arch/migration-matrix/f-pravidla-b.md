@@ -31,14 +31,13 @@ Pro každý řádek `db.pages.findOne({worldId, slug})`:
   - `tab = {id:'mig-'+slug, name:'Staty', order, access:[{type:'Role',value:'PJ'}], ownerHidden:false, contentOverride:{content:HTML, imageUrl, table}}` (staré `accessRequirements {type:2,'PJ'}` = PJ-only → Role PJ).
   - Dedup: `staty-espada` je v datech 2×.
 
-## Rulebook (20) — fill-if-exists, jinak skip
-NEvytváříme rulebook strukturu. Dle existence živé stránky se stejným slugem:
-- **jazyky** (`jazykove-rodiny` 234 odkazů!, `jazykova-politika`): stránka **existuje** (seed) → **vyplnit obsah z dumpu** (uživatel potvrdil „obsahy jdou sem").
-- **magie** (16): cílí na stránky magie v rulebooku (stejný slug, registr 21 škol). Zatím **neseedováno** → **skip**, odkaz se rozsvítí, až rulebook školy naseeduje (jeho task).
-- **programovani-akj**: existuje „Programování" v pravidlech → odkaz se napojí, **neimportovat**.
-- **svobodny-matrix**: rulebook → skip (dokud rulebook nemá slug).
+## Rulebook (19) — VŽDY skip (nikdy nevyplňovat)
+NEvytváříme ani neplníme rulebook obsah. Workflow rulebook řádek **vždy přeskočí** (jen nahlásí, které neexistují = čekají na seed).
+- **magie** (16): jsou to **reálné rulebook stránky** (ověřeno živě — `antimagie`, `ohniva-magie`, `zvireci-magie`, `nekromancie`…). Obsah žije v `customData`/LevelSpine, ne v `content` → placeholder-heuristika by je dle krátkého `content` omylem přepsala starým dumpem. **NESAHAT.** Link se rozsvítí, protože stránka existuje (stejný slug).
+- **programovani-akj**: existuje „Programování" v pravidlech → odkaz se napojí, neimportovat.
+- **svobodny-matrix**: rulebook → skip.
 
-→ Workflow řeší jednotně: rulebook řádek → fill-if-exists, jinak skip+report. Žádné zvláštní větve dle slugu.
+⚠️ **`jazykove-rodiny` přeřazeno na `stranka`** (ne rulebook) — je to běžná seedovaná reference (typ Ostatní, ne rulebook), uživatel chce vyplnit její placeholder. `jazykova-politika` zůstává rulebook (už má reálný obsah → skip).
 
 ## Workflow (BE repo, vzor F4a/F12)
 `migration/f-pravidla-b.js` + `.github/workflows/import-matrix-pravidla-b.yml`, data `migration/f-pravidla-b-data.json.gz` (generováno lokálně z dumpu + Excel rozhodnutí).
