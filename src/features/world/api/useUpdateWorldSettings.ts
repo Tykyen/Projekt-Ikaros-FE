@@ -4,6 +4,7 @@ import type {
   CharacterTabVisibility,
   HeadlineNode,
   MenuTemplate,
+  PjChatPersona,
   WorldSettings,
 } from '@/shared/types';
 
@@ -29,6 +30,8 @@ export interface UpdateWorldSettingsInput {
   menuTemplates?: MenuTemplate[];
   /** 12.2 — „Last info" box. `null` = smazat; `updatedAt` plní server. */
   lastInfo?: { text: string; visible: boolean } | null;
+  /** 6.8 — PJ persona v chatu. `null` = reset na výchozí. */
+  pjChatPersona?: PjChatPersona | null;
 }
 
 export function useUpdateWorldSettings(worldId: string) {

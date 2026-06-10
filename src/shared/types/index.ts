@@ -540,6 +540,17 @@ export interface LastInfo {
   updatedAt: string;
 }
 
+/**
+ * 6.8 — PJ persona v chatu. Vedení (role ≥ PomocnyPJ) vystupuje pod jednotnou
+ * identitou místo přihlašovacího jména. `name=null` → label „PJ";
+ * `avatarUrl=null` → fallback iniciála. Render-time, neukládá se do zpráv.
+ */
+export interface PjChatPersona {
+  enabled: boolean;
+  name: string | null;
+  avatarUrl: string | null;
+}
+
 export interface WorldSettings {
   id: string;
   worldId: string;
@@ -554,6 +565,8 @@ export interface WorldSettings {
   menuTemplates?: MenuTemplate[];
   /** 12.2 — „Last info" box (oznámení PJ). `null` = nenastaveno. */
   lastInfo?: LastInfo | null;
+  /** 6.8 — PJ persona v chatu. `null`/`undefined` = nenastaveno (default „PJ"). */
+  pjChatPersona?: PjChatPersona | null;
   akjTypes: AkjType[];
   hideDefaultWeather: boolean;
   /** Side-task character-tab-visibility — pokud chybí, FE považuje vše za viditelné. */

@@ -79,6 +79,17 @@ interface MessageItemProps {
    * Volá se jen pokud 1 i 2 chybí.
    */
   resolveAccountAvatar?: (senderId: string) => string | undefined;
+  /**
+   * 6.8 — PJ persona. Pokud je odesílatel vedení světa (role ≥ PomocnyPJ) a
+   * zpráva NENÍ NPC override, zobrazí jednotnou identitu „PJ" + per-svět avatar
+   * místo přihlašovacího jména. `null` = běžné jméno/avatar. Předává jen world
+   * chat (role jsou world-scoped). Priorita: NPC override > PJ persona > jméno.
+   */
+  resolvePjDisplay?: (
+    senderId: string,
+  ) => { name: string; avatarUrl: string | null } | null;
+  /** 6.8 — jméno PJ persony pro citaci odpovědi (`replyToId` → „PJ"). */
+  resolveReplyPjName?: (replyToId: string) => string | null;
 }
 
 /** Jedna položka výpisu chatu — veřejná zpráva / whisper / smazaná zpráva. */
@@ -107,6 +118,8 @@ export function MessageItem({
   resolveFont,
   resolveFontSize,
   resolveAccountAvatar,
+  resolvePjDisplay,
+  resolveReplyPjName,
 }: MessageItemProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const reactionBtnRef = useRef<HTMLButtonElement>(null);
@@ -133,16 +146,24 @@ export function MessageItem({
       ? usersById.get(message.senderId)!
       : message.senderName;
 
+  // 6.8 — PJ persona (jen world chat). Vedení vystupuje jako „PJ" + per-svět
+  // avatar. NPC override má přednost (PJ mluvící za bytost zůstává bytostí).
+  const pjDisplay =
+    !isNpc && resolvePjDisplay ? resolvePjDisplay(message.senderId) : null;
+
   // D-040 — tombstone overlay pro smazané autory; NPC override (overrideName)
-  // přebíjí tombstone, autor NPC zprávy zůstane v podobě persony.
+  // přebíjí tombstone, autor NPC zprávy zůstane v podobě persony. PJ persona
+  // (6.8) přebíjí i tombstone — identita vedení se schovává záměrně.
   const tombstone = isNpc
     ? { displayName: message.overrideName!, avatarUrl: message.overrideAvatarUrl, deleted: false }
-    : resolveTombstone({
-        isDeleted: message.senderIsDeleted,
-        displayName: resolvedSenderName,
-        avatarUrl:
-          message.senderAvatarUrl ?? resolveAccountAvatar?.(message.senderId),
-      });
+    : pjDisplay
+      ? { displayName: pjDisplay.name, avatarUrl: pjDisplay.avatarUrl ?? undefined, deleted: false }
+      : resolveTombstone({
+          isDeleted: message.senderIsDeleted,
+          displayName: resolvedSenderName,
+          avatarUrl:
+            message.senderAvatarUrl ?? resolveAccountAvatar?.(message.senderId),
+        });
   const displayName = tombstone.displayName;
   const isAuthorDeleted = tombstone.deleted;
 
@@ -295,9 +316,13 @@ export function MessageItem({
         // usersById (jmen načtených z členů světa). Stejně jako u senderName.
         const rawReplyName = message.replyToSenderName ?? '';
         const replyNameIsObjectId = /^[0-9a-f]{24}$/i.test(rawReplyName);
-        const replyName = replyNameIsObjectId
-          ? usersById.get(rawReplyName) ?? rawReplyName
-          : rawReplyName || 'někdo';
+        // 6.8 — pokud citovaná zpráva je od vedení, zobraz „PJ" personu.
+        const pjReplyName = resolveReplyPjName?.(message.replyToId!);
+        const replyName =
+          pjReplyName ??
+          (replyNameIsObjectId
+            ? usersById.get(rawReplyName) ?? rawReplyName
+            : rawReplyName || 'někdo');
         return (
           <button
             type="button"

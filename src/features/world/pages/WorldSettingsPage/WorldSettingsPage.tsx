@@ -15,6 +15,7 @@ import {
   BookText,
   Navigation,
   Trash2,
+  Theater,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -37,6 +38,7 @@ const CharacterTabsVisibilityTab = lazy(
   () => import('./tabs/CharacterTabsVisibilityTab'),
 );
 const HeadlineLinkTab = lazy(() => import('./tabs/HeadlineLinkTab'));
+const PjChatTab = lazy(() => import('./tabs/PjChatTab'));
 const DeleteWorldTab = lazy(() => import('./tabs/DeleteWorldTab'));
 // Přesun z world nav (2026-05-25): admin nástroje do Nastavení tabů.
 const CalendarConfigsPage = lazy(
@@ -109,6 +111,14 @@ const TABS: SettingsTab[] = [
     icon: <LayoutTemplate size={18} />,
     minRole: WorldRole.Korektor,
     render: () => <PageTemplatesTab />,
+  },
+  {
+    // 6.8 — PJ identita v chatu (jméno + avatar persony „PJ").
+    id: 'pj-chat',
+    label: 'PJ v chatu',
+    icon: <Theater size={18} />,
+    minRole: WorldRole.PJ,
+    render: () => <PjChatTab />,
   },
   {
     // 9.2b — multi-config kalendáře světa (PJ+). Přesun z world nav 2026-05-25.

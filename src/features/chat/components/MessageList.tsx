@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ChatItem, ChatMessage } from '../lib/types';
 import { MessageItem } from './MessageItem';
 import { formatTime } from '../lib/format';
@@ -39,6 +39,10 @@ interface MessageListProps {
   resolveFont?: (key: string | null | undefined) => string | undefined;
   resolveFontSize?: (key: string | null | undefined) => string | undefined;
   resolveAccountAvatar?: (senderId: string) => string | undefined;
+  /** 6.8 — PJ persona resolver (jen world chat). Viz `MessageItem`. */
+  resolvePjDisplay?: (
+    senderId: string,
+  ) => { name: string; avatarUrl: string | null } | null;
 }
 
 const isWhisper = (m: ChatMessage) => !!m.visibleTo && m.visibleTo.length > 0;
@@ -67,6 +71,7 @@ export function MessageList({
   resolveFont,
   resolveFontSize,
   resolveAccountAvatar,
+  resolvePjDisplay,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -96,6 +101,23 @@ export function MessageList({
   }, []);
 
   useEffect(() => () => clearTimeout(highlightTimer.current), []);
+
+  // 6.8 — mapa id zprávy → senderId, ať citace odpovědi umí dohledat, zda
+  // citovaná zpráva je od vedení (→ zobrazit „PJ" místo uloženého jména).
+  const senderById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const it of items)
+      if (it.kind === 'message') m.set(it.message.id, it.message.senderId);
+    return m;
+  }, [items]);
+  const resolveReplyPjName = useCallback(
+    (replyToId: string): string | null => {
+      if (!resolvePjDisplay) return null;
+      const sid = senderById.get(replyToId);
+      return sid ? resolvePjDisplay(sid)?.name ?? null : null;
+    },
+    [resolvePjDisplay, senderById],
+  );
 
   // Sleduje poslední viděné ID zprávy — pro detekci „přibyla nová".
   const lastSeenIdRef = useRef<string | null>(null);
@@ -179,6 +201,8 @@ export function MessageList({
             resolveFont={resolveFont}
             resolveFontSize={resolveFontSize}
             resolveAccountAvatar={resolveAccountAvatar}
+            resolvePjDisplay={resolvePjDisplay}
+            resolveReplyPjName={resolveReplyPjName}
           />
         );
       })}

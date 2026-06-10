@@ -444,6 +444,13 @@ export function WorldSection() {
             zmínka <code>@jméno</code>, herní datum, PJ NPC mód a hod kostkou (🎲) se
             30 skiny. Vzhled svých zpráv i kostek si nastavíš zvlášť pro každý svět.
           </CalloutBox>
+          <p>
+            Vedení světa (PJ i Pomocný PJ) vystupuje v chatu pod jednotnou
+            identitou <strong>„PJ"</strong> místo přihlašovacího jména — kvůli
+            tajemství. PJ si jméno a avatar persony nastaví v Nastavení světa →{' '}
+            <strong>PJ v chatu</strong> a projeví se i na starších zprávách.
+            Když PJ píše „za bytost" (NPC mód), zůstává tou bytostí.
+          </p>
         </Tool>
         <Tool icon={<Music size={16} />} title="Zvuky (jukebox)" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="info">
           <p>
@@ -461,9 +468,9 @@ export function WorldSection() {
           <p>
             Konfigurace světa v tabech: Základní info (název, systém, viditelnost hodů),
             Vzhled (motiv, vlastní pozadí), Členové (skupiny + barvy, role), AKJ úrovně,
-            Postavy &amp; NPC (matice typ × tab), Šablony stránek, Přístup světa,
-            Členství (odejít / předat svět), Smazat svět. Tab „Můj vzhled" = osobní
-            override motivu.
+            Postavy &amp; NPC (matice typ × tab), Šablony stránek, <strong>PJ v chatu</strong>{' '}
+            (jak vystupuje vedení), Přístup světa, Členství (odejít / předat svět),
+            Smazat svět. Tab „Můj vzhled" = osobní override motivu.
           </p>
           <CalloutBox variant="pozor" title="Smazání světa je vratné (30 dní)">
             Svět smaže PJ (vlastník) nebo administrátor přes tab <strong>Smazat

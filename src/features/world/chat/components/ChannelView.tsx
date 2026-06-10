@@ -35,6 +35,9 @@ import { useMembershipAppearance } from '../api/useMembershipAppearance';
 import { useOptimisticSend } from '../api/useOptimisticSend';
 import { useChannelMembers } from '../api/useChannelMembers';
 import { useWorld } from '@/features/world/api/useWorlds';
+import { useWorldSettings } from '@/features/world/api/useWorldSettings';
+import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
+import { makePjDisplayResolver } from '../lib/pjPersona';
 import { getFontStack, getFontSize } from '../lib/chatFonts';
 import { renderChatContent, type WorldEmoteSet } from '../lib/renderChatContent';
 import { ChannelComposer, type ComposerSendPayload } from './ChannelComposer';
@@ -158,20 +161,41 @@ export function ChannelView({
     [],
   );
 
-  // Avatar fallback (account-level) — když membership a NPC override nemají
-  // obrázek, použij globální profilový avatar uživatele.
+  // Portrét postavy podle hráče (PC) — single source z adresáře postav. Řeší
+  // migrované zprávy, které nemají uložený `senderAvatarUrl` (avatar se per
+  // zprávu nemigroval) → jinak by hráč spadl na iniciálu místo portrétu.
+  const { data: directory } = useCharacterDirectory(worldId);
+  const characterAvatarByUser = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const c of directory ?? []) {
+      if (!c.isNpc && c.userId && c.imageUrl) m.set(c.userId, c.imageUrl);
+    }
+    return m;
+  }, [directory]);
+
+  // Avatar fallback — když zpráva ani NPC override nemají obrázek. Priorita:
+  // portrét postavy (adresář) → membership avatar → globální účtový avatar.
   const accountAvatarById = useMemo(() => {
     const m = new Map<string, string>();
     for (const member of members) {
-      const url = member.user?.avatarUrl;
+      const url = member.avatarUrl ?? member.user?.avatarUrl;
       if (url) m.set(member.userId, url);
     }
     return m;
   }, [members]);
 
   const resolveAccountAvatar = useCallback(
-    (senderId: string) => accountAvatarById.get(senderId),
-    [accountAvatarById],
+    (senderId: string) =>
+      characterAvatarByUser.get(senderId) ?? accountAvatarById.get(senderId),
+    [characterAvatarByUser, accountAvatarById],
+  );
+
+  // 6.8 — PJ persona: vedení (role ≥ PomocnyPJ) vystupuje jako „PJ" + per-svět
+  // avatar. Resolver předáváme jen ve world chatu (role jsou world-scoped).
+  const { data: worldSettings } = useWorldSettings(worldId);
+  const resolvePjDisplay = useMemo(
+    () => makePjDisplayResolver(members, worldSettings?.pjChatPersona),
+    [members, worldSettings?.pjChatPersona],
   );
 
   const renderContent = useCallback(
@@ -477,6 +501,7 @@ export function ChannelView({
             resolveFont={resolveFont}
             resolveFontSize={resolveFontSize}
             resolveAccountAvatar={resolveAccountAvatar}
+            resolvePjDisplay={resolvePjDisplay}
             onDelete={(id) => deleteMutation.mutate(id)}
             onReply={setReplyTo}
             onToggleReaction={(messageId, emoji) =>
