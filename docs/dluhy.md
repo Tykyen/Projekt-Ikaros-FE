@@ -8,12 +8,23 @@
 
 ## Otevřené
 
-### D-029 — Page.type diakritický drift „Ostatní" vs „Ostatni" (matrix svět)
-**Soubor:** matrix svět, kolekce `pages` (data, ne kód) — odhaleno při F7 dry-run (`Page.type` distribuce)
-**Problém:** `type:Lokace` ✓, ale `type` má dvě varianty bez/s diakritikou: `"Ostatní"` (1035) i `"Ostatni"` (45). Drift z migrace F4 (mapování starého `type` enumu).
-**Dopad:** Nízký–Střední — stránky s `"Ostatni"` mohou být nekonzistentně filtrované/zobrazené proti kanonickému `"Ostatní"` (např. menu, search facety, type-based dotazy).
-**Řešení:** Jednorázový mongosh update `db.pages.updateMany({type:"Ostatni"},{$set:{type:"Ostatní"}})` ve worldu matrix; ověřit, že FE/BE nikde nepíše „Ostatni" bez diakritiky.
-**Kdy:** Při dalším migračním úklidu matrix světa (mimo F7 scope).
+---
+
+### D-NEW-friends-counterpart-drift — Neúplný protějšek v žádostech o přátelství
+**Soubory:** BE `friendships/friendships.service.ts` (`listOutgoing`, `listBlocks`),
+`friendships/friendships-pending-action.provider.ts` (`listForUser` — incoming)
+**Problém:** Tyto endpointy vrací protějška (`counterpart` / `user`) jen jako
+`{ id, username, avatarUrl }`, ale FE typy (`FriendRequestListItem.counterpart`,
+blocked/outgoing karty) čekají i `displayName`, `defaultAvatarType`, `role`. Stejný
+contract drift jako už opravený `GET /friends` (kde chybějící `friend` shazoval celou
+záložku). Tady to **nepadá** — jen avatary/jména spadnou na default fallback.
+**Dopad:** Nízký — kosmetické (špatný default avatar / chybějící role badge v sekcích
+Odeslané / Zpracovat / Zablokovaní). Žádný crash.
+**Řešení:** Sjednotit enrichment na plný `PublicUserListItem`-like tvar i v outgoing /
+incoming / blocked (vzor `listForUser` z téhož modulu po opravě GET /friends). Zvážit
+sdílený helper `usersService.toPublicListItem`.
+**Kdy:** Až se bude sahat na friendships UI, nebo když uživatel nahlásí špatné avatary
+v žádostech.
 
 ---
 
