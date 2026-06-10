@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Link2 } from 'lucide-react';
@@ -96,22 +96,32 @@ export function SmartCellInput({
     editor.commands.setContent(value || '', { emitUpdate: false });
   }, [editor, value]);
 
-  const linkActive = editor?.isActive('link') ?? false;
-  const hasSelection = editor ? !editor.state.selection.empty : false;
-  const currentHref =
-    (editor?.getAttributes('link').href as string | undefined) ?? '';
+  // Reaktivní stav výběru — TipTap nehlásí Reactu změnu selekce přes onUpdate,
+  // takže bez `useEditorState` by `hasSelection` zůstal zaseknutý na hodnotě
+  // z posledního renderu (uživatel označí text → klik 🔗 → „nic neoznačeno").
+  const editorState = useEditorState({
+    editor,
+    selector: ({ editor: e }) => ({
+      linkActive: e?.isActive('link') ?? false,
+      hasSelection: e ? !e.state.selection.empty : false,
+      currentHref: (e?.getAttributes('link').href as string | undefined) ?? '',
+    }),
+  });
+  const linkActive = editorState?.linkActive ?? false;
+  const hasSelection = editorState?.hasSelection ?? false;
+  const currentHref = editorState?.currentHref ?? '';
 
   function openPicker() {
     if (!editor) return;
-    // Odkaz potřebuje text — bez selekce a bez aktivního odkazu nemáme co
-    // označit (title tlačítka napovídá). Předvyplň hledání označeným textem.
-    if (!linkActive && !hasSelection) return;
-    if (!linkActive) {
-      const { from, to } = editor.state.selection;
-      setInitialQuery(editor.state.doc.textBetween(from, to).trim());
-    } else {
-      setInitialQuery('');
-    }
+    // Čteme selekci živě z editoru (ne z render-state) — jistota, že po
+    // designaci textu klik picker otevře i kdyby React ještě nepřekreslil.
+    const linkNow = editor.isActive('link');
+    const { from, to, empty } = editor.state.selection;
+    // Odkaz potřebuje text — bez selekce a bez aktivního odkazu není co označit.
+    if (!linkNow && empty) return;
+    setInitialQuery(
+      linkNow ? '' : editor.state.doc.textBetween(from, to).trim(),
+    );
     setPickerOpen(true);
   }
 
