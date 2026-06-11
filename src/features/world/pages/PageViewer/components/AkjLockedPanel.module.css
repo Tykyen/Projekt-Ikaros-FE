@@ -1,0 +1,105 @@
+/* spec-akj-locked-tabs-visible — „zašifrovaná" záložka (viewer bez přístupu).
+   Centrovaný panel, theme variants přes [data-theme] na rootu (zrcadlo k
+   AkjDecryptedBanner). */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1.25rem;
+  margin: 0.5rem auto;
+  max-width: 32rem;
+  border: 1px solid color-mix(in srgb, var(--accent, #78c8ff) 35%, transparent);
+  background: color-mix(in srgb, var(--accent, #78c8ff) 6%, transparent);
+  border-radius: 12px;
+  color: var(--text, #fff);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent, #78c8ff) 16%, transparent);
+  color: var(--accent, #78c8ff);
+  margin-bottom: 0.25rem;
+}
+
+.title {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--text-strong, var(--text, #fff));
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.7));
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  max-width: 26rem;
+  color: var(--text-muted, rgba(220, 230, 255, 0.7));
+  line-height: 1.5;
+}
+
+/* Theme variants — fantasy = zlatý 📜 */
+:global([data-theme='fantasy']) .wrap,
+:global([data-theme='magic']) .wrap,
+:global([data-theme='indian']) .wrap {
+  border-color: rgba(212, 175, 55, 0.45);
+  background: rgba(212, 175, 55, 0.06);
+}
+:global([data-theme='fantasy']) .icon,
+:global([data-theme='magic']) .icon,
+:global([data-theme='indian']) .icon {
+  background: rgba(212, 175, 55, 0.18);
+  color: #d4af37;
+}
+
+/* Theme variants — dark = červený ☠ */
+:global([data-theme='steampunk']) .wrap,
+:global([data-theme='undead']) .wrap,
+:global([data-theme='postapo']) .wrap {
+  border-color: rgba(255, 80, 80, 0.45);
+  background: rgba(255, 80, 80, 0.06);
+}
+:global([data-theme='steampunk']) .icon,
+:global([data-theme='undead']) .icon,
+:global([data-theme='postapo']) .icon {
+  background: rgba(255, 80, 80, 0.18);
+  color: #ff5050;
+}
+
+/* Theme variants — light = bronzový 🗝 */
+:global([data-theme='tavern']) .wrap,
+:global([data-theme='sun']) .wrap {
+  border-color: rgba(205, 127, 50, 0.45);
+  background: rgba(205, 127, 50, 0.06);
+}
+:global([data-theme='tavern']) .icon,
+:global([data-theme='sun']) .icon {
+  background: rgba(205, 127, 50, 0.18);
+  color: #cd7f32;
+}
+
+/* Mobil */
+@media (max-width: 768px) {
+  .wrap {
+    padding: 2rem 1rem;
+  }
+  .icon {
+    width: 52px;
+    height: 52px;
+  }
+}

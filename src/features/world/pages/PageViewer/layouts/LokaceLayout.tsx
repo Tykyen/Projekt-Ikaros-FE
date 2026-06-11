@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useBlocker } from 'react-router-dom';
-import { MapPin, CalendarDays, Lock } from 'lucide-react';
+import { MapPin, CalendarDays, Lock, Unlock } from 'lucide-react';
 import { Tabs, type TabItem, ConfirmDialog } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { CalendarTab } from '../../CharacterDetailPage/components/CalendarTab';
 import { useCharacter } from '../../api/useCharacter';
+import { AkjLockedPanel } from '../components/AkjLockedPanel';
 import { OstatniLayout } from './OstatniLayout';
 import { resolveAkjTabPage, sortedAkjTabs } from '../lib/resolveAkjTab';
 import type { Page } from '../../api/pages.types';
@@ -111,7 +112,8 @@ export function LokaceLayout({ page }: { page: Page }) {
     ...akjTabs.map((t) => ({
       id: t.id,
       label: t.name,
-      icon: <Lock size={16} />,
+      // locked = bez přístupu → zavřený zámek; jinak odemčený (spec-akj-locked-tabs-visible)
+      icon: t.locked ? <Lock size={16} /> : <Unlock size={16} />,
     })),
   ];
   const activeAkjTab = akjTabs.find((t) => t.id === activeTab);
@@ -151,9 +153,16 @@ export function LokaceLayout({ page }: { page: Page }) {
           />
         )}
 
-        {activeAkjTab && (
-          <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
-        )}
+        {activeAkjTab &&
+          (activeAkjTab.locked ? (
+            <AkjLockedPanel
+              worldId={worldId}
+              accessRequirements={activeAkjTab.access}
+              isWoodWide={page.isWoodWide}
+            />
+          ) : (
+            <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
+          ))}
       </Tabs>
 
       <ConfirmDialog

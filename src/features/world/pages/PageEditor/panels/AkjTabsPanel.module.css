@@ -119,17 +119,11 @@
   cursor: pointer;
 }
 
-.accessGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
-  margin-bottom: 0.6rem;
-}
-
 .field {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  margin-bottom: 0.6rem;
 }
 
 .fieldLabel {
@@ -218,9 +212,3 @@
   background: var(--bg-overlay, rgb(var(--white-rgb) / 0.06));
 }
 
-/* Mobil — clearance/role pod sebe. */
-@media (max-width: 768px) {
-  .accessGrid {
-    grid-template-columns: 1fr;
-  }
-}

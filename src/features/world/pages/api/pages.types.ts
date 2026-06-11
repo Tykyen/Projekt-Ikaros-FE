@@ -142,6 +142,10 @@ export interface AkjTab {
    *  = false = vlastník PC ji vidí i bez grantu. Mimo PC bez efektu. */
   ownerHidden?: boolean;
   contentOverride?: AkjTabContentOverride;
+  /** Runtime-only z BE (per viewer, NEukládá se). `true` = viewer nemá přístup
+   *  → vidí jen zamčenou záložku (jméno + úroveň, `access` má jen AKJ, obsah
+   *  chybí). `false`/`undefined` = plný přístup. Viz spec-akj-locked-tabs-visible. */
+  locked?: boolean;
 }
 
 export interface Page {

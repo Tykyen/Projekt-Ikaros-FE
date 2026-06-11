@@ -91,7 +91,7 @@ export function StartSection() {
             { term: 'NPC', desc: 'Postava řízená PJ (vedlejší charakter), ne hráčem.' },
             { term: 'Bestie', desc: 'Statblok nepřítele/tvora pro taktickou mapu (HP, zbroj, schopnosti) — bez deníku.' },
             { term: 'Token', desc: 'Figurka postavy nebo bestie na taktické mapě, se kterou se pohybuje.' },
-            { term: 'AKJ', desc: 'Stupeň utajení stránky/záložky. Bez přístupu daný obsah vůbec neuvidíš.' },
+            { term: 'AKJ', desc: 'Stupeň utajení stránky/záložky. Bez přístupu uvidíš jen zamčenou záložku, ne její obsah.' },
             { term: 'Motiv (theme)', desc: 'Vizuální styl — platforma má vlastní, každý svět taky svůj.' },
             { term: 'Rozcestí', desc: 'Atmosférické roleplay místnosti pro hru na jeden večer bez mechanik.' },
             { term: 'Hospoda', desc: 'Globální chat pro celou platformu napříč světy.' },

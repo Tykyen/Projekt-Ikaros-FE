@@ -505,13 +505,18 @@ export function WorldSection() {
         </Tool>
         <Tool icon={<Lock size={16} />} title="AKJ — zamčené záložky" audience={{ kind: 'pjasst', label: 'PJ / Pomocný PJ' }} accent="pjasst">
           <p>
-            Stránka může mít vedle Profilu chráněné záložky se zámkem — vidí je jen ten,
-            komu PJ dal přístup (podle úrovně utajení AKJ, nebo jmenovitě). Tvoří se v
-            editoru stránky → panel „Chráněné záložky (AKJ)".
+            Stránka může mít vedle Profilu chráněné záložky se zámkem. Záložku s číslem
+            utajení (AKJ) vidí v liště <strong>i hráči bez přístupu — zamčenou, včetně
+            názvu</strong>; obsah se jim ale neposílá. Jakmile hráč dosáhne potřebné
+            úrovně (nebo ho přidáš jmenovitě), zámek se odemkne a obsah se zobrazí.
+            Tvoří se v editoru stránky → panel „Chráněné záložky (AKJ)"; přístup řídíš
+            číslem clearance (a jmenovitými hráči). <strong>Pojmenuj záložku tak, aby
+            název nic neprozradil.</strong>
           </p>
           <CalloutBox variant="tip" title="U vlastní postavy">
             Chráněné záložky své postavy vidíš automaticky — PJ ti tam nechá soukromý
-            vzkaz. Nová postava proto rovnou dostane záložku „Soukromé".
+            vzkaz. Nová postava proto rovnou dostane záložku „Soukromé". Záložky „PJ
+            informace" a „Soukromé" zůstávají ostatním hráčům úplně skryté.
           </CalloutBox>
         </Tool>
       </HelpAccordion>

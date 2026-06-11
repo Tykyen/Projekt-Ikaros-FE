@@ -1,7 +1,9 @@
 import { useState, type ReactNode } from 'react';
-import { FileText, Lock } from 'lucide-react';
+import { FileText, Lock, Unlock } from 'lucide-react';
 import { Tabs, type TabItem } from '@/shared/ui';
+import { useWorldContext } from '@/features/world/context/WorldContext';
 import { OstatniLayout } from '../layouts/OstatniLayout';
+import { AkjLockedPanel } from './AkjLockedPanel';
 import { resolveAkjTabPage, sortedAkjTabs } from '../lib/resolveAkjTab';
 import type { Page } from '../../api/pages.types';
 
@@ -23,6 +25,7 @@ const BASE_ID = '__base';
  * AKJ záložky si vsazují přímo vedle Kalendáře.
  */
 export function WithAkjTabs({ page, children }: Props) {
+  const { worldId } = useWorldContext();
   const akjTabs = sortedAkjTabs(page);
   const [activeId, setActiveId] = useState(BASE_ID);
 
@@ -33,7 +36,8 @@ export function WithAkjTabs({ page, children }: Props) {
     ...akjTabs.map((t) => ({
       id: t.id,
       label: t.name,
-      icon: <Lock size={16} />,
+      // locked = bez přístupu → zavřený zámek; jinak odemčený (spec-akj-locked-tabs-visible)
+      icon: t.locked ? <Lock size={16} /> : <Unlock size={16} />,
     })),
   ];
 
@@ -47,9 +51,16 @@ export function WithAkjTabs({ page, children }: Props) {
       orientation="horizontal"
     >
       {activeId === BASE_ID && children}
-      {activeTab && (
-        <OstatniLayout page={resolveAkjTabPage(page, activeTab)} />
-      )}
+      {activeTab &&
+        (activeTab.locked ? (
+          <AkjLockedPanel
+            worldId={worldId}
+            accessRequirements={activeTab.access}
+            isWoodWide={page.isWoodWide}
+          />
+        ) : (
+          <OstatniLayout page={resolveAkjTabPage(page, activeTab)} />
+        ))}
     </Tabs>
   );
 }

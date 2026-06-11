@@ -230,19 +230,25 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
-    q: 'Co jsou zamčené (AKJ) záložky na stránce a proč některé nevidím?',
+    q: 'Co jsou zamčené (AKJ) záložky na stránce a co znamená zámek?',
     a: (
       <>
         <p>
           Stránka (postava, lokace, NPC…) může mít vedle běžných záložek i{' '}
-          <strong>chráněné záložky</strong> se zámkem. Vidí je jen ten, komu PJ dal
-          přístup (podle úrovně utajení AKJ, nebo jmenovitě).
+          <strong>chráněné záložky</strong>. Záložku se stupněm utajení (AKJ) vidíš
+          v liště, i když k ní zatím nemáš přístup — má <strong>zavřený zámek 🔒</strong>{' '}
+          a klik ukáže jen „zašifrováno" a potřebnou úroveň, ne obsah.
         </p>
         <p>
-          U <strong>vlastní postavy</strong> je vidíš automaticky — PJ ti tam nechá
-          soukromý vzkaz. Nová postava proto rovnou dostane záložku „Soukromé".
+          Jakmile ti PJ přístup dá (zvedne ti úroveň utajení, nebo tě přidá
+          jmenovitě), zámek se <strong>odemkne 🔓</strong> a uvidíš celý obsah —
+          text, obrázek i vše ostatní.
         </p>
-        <p>Pokud přístup nemáš, záložku vůbec neuvidíš; na přímý odkaz se objeví „Stránka je zašifrovaná".</p>
+        <p>
+          U <strong>vlastní postavy</strong> své chráněné záložky vidíš automaticky
+          — PJ ti tam nechá soukromý vzkaz. Nová postava proto rovnou dostane
+          záložku „Soukromé".
+        </p>
       </>
     ),
   },

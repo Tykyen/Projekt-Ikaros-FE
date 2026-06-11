@@ -5,6 +5,7 @@ import {
   User,
   Skull,
   Lock,
+  Unlock,
   UserCircle,
   BookOpen,
   Coins,
@@ -29,6 +30,7 @@ import { NotesTab } from '../../CharacterDetailPage/components/NotesTab';
 import { CalendarTab } from '../../CharacterDetailPage/components/CalendarTab';
 import { useCharacter } from '../../api/useCharacter';
 import { AkjBanner } from '../components/AkjBanner';
+import { AkjLockedPanel } from '../components/AkjLockedPanel';
 import { OstatniLayout } from './OstatniLayout';
 import { resolveAkjTabPage, sortedAkjTabs } from '../lib/resolveAkjTab';
 import type { Page, InfoBlock } from '../../api/pages.types';
@@ -183,12 +185,13 @@ export function PostavaLayout({ page }: Props) {
           },
         ].filter(Boolean) as TabItem[])
       : []),
-    // AKJ chráněné záložky — vedle ostatních, viditelné komukoli (BE už
-    // odfiltroval nedostupné). Read-only render přes OstatniLayout.
+    // AKJ chráněné záložky — vedle ostatních. Dostupné se renderují přes
+    // OstatniLayout, nedostupné „in-fiction" se ukážou zamčené (locked, BE
+    // poslal jen jméno+úroveň) — spec-akj-locked-tabs-visible.
     ...sortedAkjTabs(page).map((t) => ({
       id: t.id,
       label: t.name,
-      icon: <Lock size={16} />,
+      icon: t.locked ? <Lock size={16} /> : <Unlock size={16} />,
     })),
   ];
   const akjTabs = sortedAkjTabs(page);
@@ -274,9 +277,16 @@ export function PostavaLayout({ page }: Props) {
           />
         )}
 
-        {activeAkjTab && (
-          <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
-        )}
+        {activeAkjTab &&
+          (activeAkjTab.locked ? (
+            <AkjLockedPanel
+              worldId={worldId}
+              accessRequirements={activeAkjTab.access}
+              isWoodWide={page.isWoodWide}
+            />
+          ) : (
+            <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
+          ))}
       </Tabs>
 
       <ConfirmDialog

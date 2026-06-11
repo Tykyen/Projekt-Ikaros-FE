@@ -40,19 +40,9 @@ interface Props {
   ownerControlled?: boolean;
 }
 
-const WORLD_ROLE_LABELS: Record<number, string> = {
-  [WorldRole.Ctenar]: 'Čtenář',
-  [WorldRole.Hrac]: 'Hráč',
-  [WorldRole.Korektor]: 'Korektor',
-  [WorldRole.PomocnyPJ]: 'Pomocný PJ',
-  [WorldRole.PJ]: 'Pán jeskyně',
-};
-
-/* ── access[] helpery — clearance/role drží max 1 záznam, hráči N ── */
+/* ── access[] helpery — clearance drží max 1 záznam, hráči N ── */
 const clearanceOf = (a: AccessRequirement[]) =>
   a.find((r) => r.type === 'AKJ')?.value ?? '';
-const roleOf = (a: AccessRequirement[]) =>
-  a.find((r) => r.type === 'Role')?.value ?? '';
 const userIdsOf = (a: AccessRequirement[]) =>
   a.filter((r) => r.type === 'UserId').map((r) => r.value);
 
@@ -127,9 +117,11 @@ export function AkjTabsPanel({
       badge={akjTabs.length > 0 ? `${akjTabs.length}` : undefined}
     >
       <p className={s.hint}>
-        Každá záložka se zobrazí v liště jen tomu, kdo splní aspoň jednu
-        podmínku. PJ vidí vše, pomocný PJ jen co mu povolíš. Obrázek a text se
-        dají přepsat — co necháš prázdné, dědí ze základní stránky.
+        Záložku s číslem clearance uvidí v liště <strong>i hráči bez přístupu
+        — zamčenou, včetně názvu</strong> (obsah se jim neposílá). Pojmenuj ji
+        tak, aby název nic neprozradil. „PJ informace" a „Soukromé" zůstávají
+        hráčům úplně skryté. Obrázek a text se dají přepsat — co necháš
+        prázdné, dědí ze základní stránky.
       </p>
 
       <div className={s.addRow}>
@@ -266,38 +258,23 @@ function AkjTabCard({
             <span>Vlastník postavy vidí tuto záložku</span>
           </label>
         )}
-        <div className={s.accessGrid}>
-          <label className={s.field}>
-            <span className={s.fieldLabel}>Globální úroveň (clearance)</span>
-            <input
-              type="number"
-              min={0}
-              className={s.input}
-              value={clearanceOf(tab.access)}
-              placeholder="—"
-              onChange={(e) =>
-                setAccess(setSingle(tab.access, 'AKJ', e.target.value))
-              }
-            />
-          </label>
-          <label className={s.field}>
-            <span className={s.fieldLabel}>Minimální role</span>
-            <select
-              className={s.input}
-              value={roleOf(tab.access)}
-              onChange={(e) =>
-                setAccess(setSingle(tab.access, 'Role', e.target.value))
-              }
-            >
-              <option value="">—</option>
-              {Object.entries(WORLD_ROLE_LABELS).map(([level, label]) => (
-                <option key={level} value={level}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <label className={s.field}>
+          <span className={s.fieldLabel}>Globální úroveň (clearance)</span>
+          <input
+            type="number"
+            min={0}
+            className={s.input}
+            value={clearanceOf(tab.access)}
+            placeholder="—"
+            onChange={(e) =>
+              setAccess(setSingle(tab.access, 'AKJ', e.target.value))
+            }
+          />
+          <span className={s.subHint}>
+            Hráč záložku odemkne, když má v nastavení AKJ ≥ tohle číslo. Prázdné
+            = jen jmenovití hráči níže (a tým PJ).
+          </span>
+        </label>
 
         <span className={s.fieldLabel}>Konkrétní hráči</span>
         {grantedUserIds.length > 0 && (
