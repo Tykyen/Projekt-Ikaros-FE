@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { FileText, Search, X } from 'lucide-react';
 import clsx from 'clsx';
 import { usePagesDirectory } from '@/features/world/pages/api/usePagesDirectory';
+import { rankPageSuggestions, useAnchoredPosition } from '@/shared/ui/LinkPicker';
 import s from './PagePicker.module.css';
 
 interface Props {
@@ -15,19 +17,18 @@ interface Props {
   onPick?: () => void;
 }
 
-const MAX_RESULTS = 8;
-
 /**
  * 9.5 — autocomplete pro výběr wiki stránky světa (use case: link u
- * světové novinky, budoucí use cases sdílené).
+ * světové novinky, vlastní navigace světa).
  *
  * Zdroj dat: `usePagesDirectory(worldId)` — cache TanStack 5 min,
  * sdílená napříč konzumenty.
  *
  * UX:
  * - `value !== null` → chip s názvem stránky + clear button (`×`).
- * - `value === null` → input s search; on focus dropdown s max 8 výsledky.
- * - Search: case-insensitive substring na `title` + `slug` (cs locale).
+ * - `value === null` → input s search; on focus dropdown (scroll, viz CSS).
+ * - Hledání + relevance řazení sdílí `rankPageSuggestions` se sdíleným
+ *   `LinkPickerPopover` → jedna logika napříč všemi pickery odkazů.
  * - Esc / click outside zavře dropdown.
  */
 export function PagePicker({
@@ -45,6 +46,21 @@ export function PagePicker({
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  // Anchor = input wrapper; dropdown se renderuje přes Portal do body a kotví se
+  // k němu přes `useAnchoredPosition` (position: fixed) → neuvězní ho stacking
+  // context panelu (SettingsPanel má opacity-animaci) ani overflow sekce.
+  const anchorRef = useRef<HTMLDivElement | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const dropdownOpen = open && !disabled;
+  const pos = useAnchoredPosition(anchorRef, dropdownRef, dropdownOpen);
+  // Šířka dropdownu = šířka inputu (hook zarovná pravý okraj → levý sedí k anchoru).
+  const [anchorWidth, setAnchorWidth] = useState(0);
+  useLayoutEffect(() => {
+    if (dropdownOpen && anchorRef.current) {
+      setAnchorWidth(anchorRef.current.offsetWidth);
+    }
+  }, [dropdownOpen]);
 
   // Najít již vybranou stránku pro chip render
   const selected = useMemo(
@@ -52,28 +68,24 @@ export function PagePicker({
     [pages, value],
   );
 
-  const results = useMemo(() => {
-    if (!query.trim()) return pages.slice(0, MAX_RESULTS);
-    const q = query.trim().toLocaleLowerCase('cs');
-    return pages
-      .filter(
-        (p) =>
-          p.title.toLocaleLowerCase('cs').includes(q) ||
-          p.slug.toLocaleLowerCase('cs').includes(q),
-      )
-      .slice(0, MAX_RESULTS);
-  }, [pages, query]);
+  const results = useMemo(
+    () => rankPageSuggestions(pages, query),
+    [pages, query],
+  );
 
-  // Click outside → zavřít
+  // Click outside → zavřít. Dropdown je v Portálu (mimo wrapRef), proto se
+  // kontroluje i `dropdownRef` zvlášť — jinak by mousedown na položku zavřel
+  // dropdown dřív, než proběhne click → výběr by se ztratil.
   useEffect(() => {
     if (!open) return;
-    function onDocClick(e: MouseEvent) {
-      if (!wrapRef.current?.contains(e.target as Node)) {
-        setOpen(false);
-      }
+    function onDocPointer(e: MouseEvent) {
+      const t = e.target as Node;
+      if (wrapRef.current?.contains(t)) return;
+      if (dropdownRef.current?.contains(t)) return;
+      setOpen(false);
     }
-    document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
+    document.addEventListener('mousedown', onDocPointer);
+    return () => document.removeEventListener('mousedown', onDocPointer);
   }, [open]);
 
   function handlePick(slug: string) {
@@ -124,10 +136,13 @@ export function PagePicker({
     );
   }
 
-  // Vybráno NEní — input + dropdown
+  // Vybráno NEní — input + dropdown (Portal)
   return (
     <div className={s.wrap} ref={wrapRef}>
-      <div className={clsx(s.inputWrap, disabled && s.disabled)}>
+      <div
+        ref={anchorRef}
+        className={clsx(s.inputWrap, disabled && s.disabled)}
+      >
         <Search size={14} aria-hidden="true" className={s.icon} />
         <input
           type="text"
@@ -141,32 +156,43 @@ export function PagePicker({
         />
       </div>
 
-      {open && !disabled && (
-        <div className={s.dropdown} role="listbox">
-          {isLoading ? (
-            <p className={s.empty}>Načítám…</p>
-          ) : results.length === 0 ? (
-            <p className={s.empty}>
-              {query ? 'Žádná stránka neodpovídá hledání.' : 'Tento svět nemá žádné stránky.'}
-            </p>
-          ) : (
-            results.map((p) => (
-              <button
-                key={p.slug}
-                type="button"
-                role="option"
-                aria-selected="false"
-                className={s.option}
-                onClick={() => handlePick(p.slug)}
-              >
-                <FileText size={14} aria-hidden="true" />
-                <span className={s.optionTitle}>{p.title}</span>
-                <span className={s.optionType}>{p.type}</span>
-              </button>
-            ))
-          )}
-        </div>
-      )}
+      {dropdownOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className={s.dropdown}
+            role="listbox"
+            style={
+              pos
+                ? { left: pos.left, top: pos.top, width: anchorWidth || undefined }
+                : { left: 0, top: 0, visibility: 'hidden' }
+            }
+          >
+            {isLoading ? (
+              <p className={s.empty}>Načítám…</p>
+            ) : results.length === 0 ? (
+              <p className={s.empty}>
+                {query ? 'Žádná stránka neodpovídá hledání.' : 'Tento svět nemá žádné stránky.'}
+              </p>
+            ) : (
+              results.map((p) => (
+                <button
+                  key={p.slug}
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  className={s.option}
+                  onClick={() => handlePick(p.slug)}
+                >
+                  <FileText size={14} aria-hidden="true" />
+                  <span className={s.optionTitle}>{p.title}</span>
+                  <span className={s.optionType}>{p.type}</span>
+                </button>
+              ))
+            )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

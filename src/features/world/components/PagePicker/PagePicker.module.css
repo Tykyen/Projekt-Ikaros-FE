@@ -44,12 +44,11 @@
   color: var(--text-secondary);
 }
 
+/* Renderován přes Portal do body → position: fixed, souřadnice + šířka inline
+   z useAnchoredPosition. z-index nad world obsahem, pod modaly (--z-modal 400). */
 .dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: 100;
+  position: fixed;
+  z-index: 350;
   max-height: 320px;
   overflow-y: auto;
   background: var(--surface-2);

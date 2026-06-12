@@ -8,6 +8,7 @@ import {
 import { createPortal } from 'react-dom';
 import { FileText, FilePlus2, ExternalLink, X } from 'lucide-react';
 import { useAnchoredPosition } from './useAnchoredPosition';
+import { rankPageSuggestions } from './rankSuggestions';
 import type { LinkSuggestion } from './types';
 import s from './LinkPickerPopover.module.css';
 
@@ -33,16 +34,6 @@ export interface LinkPickerPopoverProps {
   currentHref?: string;
   /** Předvyplnění hledání (např. označený text). */
   initialQuery?: string;
-}
-
-/** Strop zobrazených návrhů; seznam scrolluje (CSS max-height + overflow). */
-const MAX_RESULTS = 30;
-
-function normalize(str: string): string {
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
 }
 
 /**
@@ -104,30 +95,10 @@ export function LinkPickerPopover({
   }, [open, onClose, anchorRef]);
 
   const dir = directory ?? [];
-  const matches = useMemo(() => {
-    const q = normalize(query.trim());
-    if (!q) return dir.slice(0, MAX_RESULTS);
-
-    // Relevance skóre (nižší = lepší). Řadí přesnou shodu a shodu na začátku
-    // názvu/slova nad shodu „někde uprostřed" → „Magické organizace" vyplave
-    // nahoru místo aby se pohřbila mezi desítkami konkrétních položek.
-    function score(d: LinkSuggestion): number | null {
-      const title = normalize(d.title);
-      if (title === q) return 0;
-      if (title.startsWith(q)) return 1;
-      if (title.split(/\s+/).some((w) => w.startsWith(q))) return 2;
-      if (title.includes(q)) return 3;
-      if (normalize(d.slug).includes(q)) return 4;
-      return null; // bez shody
-    }
-
-    return dir
-      .map((d) => ({ d, sc: score(d) }))
-      .filter((x): x is { d: LinkSuggestion; sc: number } => x.sc !== null)
-      .sort((a, b) => a.sc - b.sc) // stabilní → při shodě skóre drží pořadí adresáře
-      .slice(0, MAX_RESULTS)
-      .map((x) => x.d);
-  }, [dir, query]);
+  const matches = useMemo(
+    () => rankPageSuggestions(dir, query),
+    [dir, query],
+  );
 
   const trimmedQuery = query.trim();
   const newPageSlug = makeSlug ? makeSlug(trimmedQuery) : '';
