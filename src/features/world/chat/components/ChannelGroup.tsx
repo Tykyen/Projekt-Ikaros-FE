@@ -59,6 +59,10 @@ export function ChannelGroup({
     0,
   );
   const showHeaderBadge = totalUnread > 0;
+  // 6.7c revize — sbalený kanál ukáže JEN aktivní konverzaci (Matrix styl).
+  const activeChannel = collapsed
+    ? channels.find((c) => c.id === activeChannelId)
+    : undefined;
   return (
     <section
       className={s.group}
@@ -119,30 +123,47 @@ export function ChannelGroup({
         )}
       </div>
 
-      {!collapsed && (
-        <div className={s.channels}>
-          {renderChannelList
-            ? renderChannelList(channels)
-            : channels.map((c) => (
-                <ChannelItem
-                  key={c.id}
-                  channel={c}
-                  active={c.id === activeChannelId}
-                  unread={unread.get(c.id) ?? 0}
-                  mentionCount={mentionCounts?.get(c.id) ?? 0}
-                  pinned={pinned.has(c.id)}
-                  accentColor={color}
-                  canManage={canManage}
-                  onSelect={() => onSelectChannel(c.id)}
-                  onTogglePin={() => onTogglePin(c.id)}
-                  onEdit={() => onEditChannel(c)}
-                />
-              ))}
-          {channels.length === 0 && (
-            <p className={s.emptyGroup}>Žádné konverzace</p>
-          )}
-        </div>
-      )}
+      {collapsed
+        ? // Sbaleno → jen aktivní konverzace (pokud v tomto kanálu je), bez reorderu.
+          activeChannel && (
+            <div className={s.channels}>
+              <ChannelItem
+                channel={activeChannel}
+                active
+                unread={unread.get(activeChannel.id) ?? 0}
+                mentionCount={mentionCounts?.get(activeChannel.id) ?? 0}
+                pinned={pinned.has(activeChannel.id)}
+                accentColor={color}
+                canManage={canManage}
+                onSelect={() => onSelectChannel(activeChannel.id)}
+                onTogglePin={() => onTogglePin(activeChannel.id)}
+                onEdit={() => onEditChannel(activeChannel)}
+              />
+            </div>
+          )
+        : // Rozbaleno → všechny konverzace (sortable reorder).
+          <div className={s.channels}>
+            {renderChannelList
+              ? renderChannelList(channels)
+              : channels.map((c) => (
+                  <ChannelItem
+                    key={c.id}
+                    channel={c}
+                    active={c.id === activeChannelId}
+                    unread={unread.get(c.id) ?? 0}
+                    mentionCount={mentionCounts?.get(c.id) ?? 0}
+                    pinned={pinned.has(c.id)}
+                    accentColor={color}
+                    canManage={canManage}
+                    onSelect={() => onSelectChannel(c.id)}
+                    onTogglePin={() => onTogglePin(c.id)}
+                    onEdit={() => onEditChannel(c)}
+                  />
+                ))}
+            {channels.length === 0 && (
+              <p className={s.emptyGroup}>Žádné konverzace</p>
+            )}
+          </div>}
     </section>
   );
 }

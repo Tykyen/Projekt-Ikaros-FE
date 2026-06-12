@@ -131,16 +131,12 @@ export function ChannelSidebar({
   };
 
   /**
-   * 6.7c — default sbalené; rozbalené když je v `expandedGroups` NEBO obsahuje
-   * aktivní konverzaci (override, ať uživatel vidí, kde právě je).
+   * 6.7c (revize 2026-06-12) — sbalení řídí čistě `expandedGroups`, BEZ override
+   * aktivní konverzací. Sbalený kanál s aktivní konverzací ji ukáže sám (viz
+   * `ChannelGroup`, Matrix styl) → kanál jde vždy zavřít.
    */
-  const isCollapsed = (groupId: string, list: ChatChannel[]): boolean => {
-    if (expandedGroups.includes(groupId)) return false;
-    if (activeChannelId && list.some((c) => c.id === activeChannelId)) {
-      return false;
-    }
-    return true;
-  };
+  const isCollapsed = (groupId: string): boolean =>
+    !expandedGroups.includes(groupId);
 
   return (
     <nav className={s.sidebar} aria-label="Kanály a konverzace">
@@ -202,7 +198,7 @@ export function ChannelSidebar({
                   group={group}
                   channels={orderedChannels}
                   color={color}
-                  collapsed={isCollapsed(group.id, channels)}
+                  collapsed={isCollapsed(group.id)}
                   activeChannelId={activeChannelId}
                   unread={unread}
                   mentionCounts={mentionCounts}

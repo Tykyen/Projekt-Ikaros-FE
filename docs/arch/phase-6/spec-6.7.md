@@ -91,13 +91,17 @@ chatExpandedGroups?: string[]   // groupId, které jsou ROZBALENÉ (default: vš
 ```
 
 ### Chování
-- **Default:** kanál sbalený. Výjimka — kanál obsahující **aktivní** konverzaci je vždy rozbalený (override, nezávisle na uloženém stavu).
+- **Default:** kanál sbalený. Stav otevřeno/zavřeno řídí čistě `chatExpandedGroups` — **žádný auto-override aktivní konverzací** (revize 2026-06-12, viz níže).
+- **Sbalený kanál s aktivní konverzací** zobrazí **jen tu jednu aktivní konverzaci** (ostatní skryté, bez reorderu) — replikace starého Matrixu: hráč vidí, kde právě je, i po sbalení. Rozbalený = všechny konverzace (s drag&drop reorderem).
 - **Toggle** rozbalí/sbalí → zapíše do `chatExpandedGroups` přes stejný `my-prefs` endpoint (optimistic + debounce).
 - Přežije refresh i jiné zařízení.
 
 ### FE
 - `ChannelSidebar` nahradí `useState<Record<string,boolean>>({})` za stav inicializovaný z `membership.chatExpandedGroups`.
-- Init: `collapsed = !(expandedGroups.includes(group.id) || group obsahuje aktivní konverzaci)`.
+- Init: `collapsed = !expandedGroups.includes(group.id)` (bez override).
+- `ChannelGroup` ve sbaleném stavu renderuje jen konverzaci s `id === activeChannelId` (přes `ChannelItem` bez drag handle); rozbaleno = `renderChannelList` (sortable).
+
+> **Revize 2026-06-12 (FE-only):** zrušen původní override „kanál s aktivní konverzací vždy rozbalený" — bránil sbalení kanálu, ve kterém máš otevřenou konverzaci. Nahrazeno chováním starého Matrixu: sbalený kanál ukáže jen aktivní konverzaci. BE pole `chatExpandedGroups` beze změny.
 
 ---
 
