@@ -11,7 +11,7 @@ Jednorázová **transformační migrace** obsahu ze starého .NET Matrixu do nov
 
 - **Zdroj:** `C:\Matrix\dump\MatrixDatabase` — čerstvý živý `mongodump` (k 2026-06-07, 28 kolekcí). Čteno Node skriptem přes balík `bson` z `backend/node_modules` (žádný mongorestore).
 - **Cíl:** Ikaros singleton svět `matrix` (už obsahuje Pravidlovou knihu + seed referenční stránky; účty už migrované).
-- **Cílové prostředí:** importujeme do Ikara na **`https://newmatrix.patrikzplzne.cz`** (náš server — vše postavené, sem přijde svět). **Starý Matrix pro hráče běží dál na `https://www.projekt-ikaros.com` — na ten NESAHÁME.** Zdrojový dump je z něj. Výsledek = **„vylepšený otisk"**. Dedup + idempotence platí (Ikaros už má rulebook/účty).
+- **Cílové prostředí:** ⚠️ **AKTUALIZACE 2026-06-12 — PROHOZENÍ SERVERŮ:** nový Ikaros (migrovaný svět) **TEĎ běží na `https://www.projekt-ikaros.com`** = aktuální produkční cíl pro další importy + deploy; **`newmatrix.patrikzplzne.cz` má od teď starou .NET Matrix DB** (= zdroj). — *Původní stav (do 2026-06-11, podle něj čti historické statusy „živé v newmatrix" níže): importovali jsme na `newmatrix.patrikzplzne.cz`, na živý starý Matrix `www.projekt-ikaros.com` se NESAHALO.* Zdrojový dump: `C:\Matrix\dump\MatrixDatabase`. Výsledek = **„vylepšený otisk"**. Dedup + idempotence platí.
 - **Povaha:** NE kopie. Starý systém je **plochý jednosvětový** s jiným stylem (.NET PascalCase, číselné `type`, `accessRequirements` role-list). Ikaros je **world-scoped** s jiným modelem práv (AKJ/viditelnost) → každá kolekce se **překládá**.
 
 ⚠️ Záloha starého únorového snapshotu: `C:\Matrix\dump-2026-02`.

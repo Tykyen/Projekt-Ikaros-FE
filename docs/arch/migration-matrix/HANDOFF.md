@@ -1,5 +1,7 @@
 # HANDOFF — Migrace Matrix → Ikaros (stav 2026-06-09, **MIGRACE KOMPLETNÍ** — F11 chat live)
 
+> ⚠️ **2026-06-12 PROHOZENÍ SERVERŮ (čti první):** nový Ikaros (migrovaný svět + účty + rulebook) **TEĎ běží na `https://www.projekt-ikaros.com`** = nový produkční cíl pro další importy + deploy. **`newmatrix.patrikzplzne.cz` má od teď starou .NET Matrix DB.** Pravidlo „cíl=newmatrix, projekt-ikaros NESAHAT" níže je **invertované**; statusy „živé v newmatrix" = data dnes fyzicky na projekt-ikaros.com (historii neměnit). Paměť: `project_server_swap`.
+
 > **🏁 VŠECHNY F BODY HOTOVÉ.** F11 chat **live (2026-06-09)**: 1506 zpráv / 42 kanálů / 7 skupin / 281 readStatus / 1 emote, skip=0. Spec [`f11-chat.md`](./f11-chat.md). Bug chycený naživo: `chatmessages` sparse-unique `{channelId,clientNonce}` → fix `clientNonce='mig-'+_id`. **Zbývají jen drobné RUČNÍ úklidy (viz „ZBÝVÁ").**
 >
 > **Rozdělané (mimo migraci): Rulebook grafika** — kapitoly 10-13 + LevelSpine (barevné stupně magie) implementováno a pushnuto (FE `c8ba5ac9` + BE `import-matrix-rulebook.yml`). **Čeká: spustit import workflow + nasadit FE (`deploy.yml`).** Spec `docs/arch/phase-2/rulebook-graficke-zpracovani.md`, prototyp `C:\tmp\rulebook-prototype.html`.
