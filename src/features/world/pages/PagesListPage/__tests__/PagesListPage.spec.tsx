@@ -14,20 +14,23 @@ const DIRECTORY: PageDirectoryEntry[] = [
 
 let mockDirectory: PageDirectoryEntry[] = [];
 let mockRole: WorldRole = WorldRole.Hrac;
-let mockFavorites: string[] = [];
-const favoriteMutate = vi.fn();
+let mockFavoriteOrder: string[] = [];
+const favoriteToggle = vi.fn();
 
 vi.mock('../../api/usePagesDirectory', () => ({
   usePagesDirectory: () => ({ data: mockDirectory, isLoading: false }),
 }));
-vi.mock('../../api/useFavoritePage', () => ({
-  useFavoritePage: () => ({ mutate: favoriteMutate }),
-  isPageFavorite: (slugs: string[] | undefined, slug: string) =>
-    (slugs ?? []).includes(slug),
+vi.mock('../../api/useFavoritePages', () => ({
+  useFavoritePages: () => ({
+    order: mockFavoriteOrder,
+    isFavorite: (slug: string) => mockFavoriteOrder.includes(slug),
+    toggle: favoriteToggle,
+    reorder: vi.fn(),
+  }),
 }));
 vi.mock('@/features/world/context/WorldContext', () => ({
   useWorldContext: () => ({
-    world: { id: 'w1', favoritePageSlugs: mockFavorites },
+    world: { id: 'w1' },
     worldId: 'w1',
     worldSlug: 'matrix',
     userRole: mockRole,
@@ -47,8 +50,8 @@ describe('PagesListPage', () => {
   beforeEach(() => {
     mockDirectory = DIRECTORY;
     mockRole = WorldRole.Hrac;
-    mockFavorites = [];
-    favoriteMutate.mockClear();
+    mockFavoriteOrder = [];
+    favoriteToggle.mockClear();
   });
 
   it('vykreslí seznam stránek', () => {
@@ -99,7 +102,7 @@ describe('PagesListPage', () => {
   });
 
   it('oblíbené stránky se zobrazí v samostatné sekci', () => {
-    mockFavorites = ['aralion'];
+    mockFavoriteOrder = ['aralion'];
     renderPage();
     expect(screen.getByText('Oblíbené')).toBeInTheDocument();
     expect(screen.getByText('Všechny stránky')).toBeInTheDocument();
@@ -111,9 +114,6 @@ describe('PagesListPage', () => {
       name: 'Přidat do oblíbených',
     });
     await userEvent.click(stars[0]);
-    expect(favoriteMutate).toHaveBeenCalledWith({
-      slug: 'aralion',
-      nextState: true,
-    });
+    expect(favoriteToggle).toHaveBeenCalledWith('aralion');
   });
 });

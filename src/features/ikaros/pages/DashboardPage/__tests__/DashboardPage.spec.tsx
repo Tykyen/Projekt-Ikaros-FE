@@ -74,7 +74,6 @@ beforeEach(() => {
             isActive: true,
             accessMode: 'private',
             system: 'D&D 5e',
-            favoritePageSlugs: [],
             createdAt: '',
             updatedAt: '',
           },

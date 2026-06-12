@@ -1,14 +1,31 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FilePlus2, Star, FileText } from 'lucide-react';
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
 import { Spinner } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { usePagesDirectory } from '../api/usePagesDirectory';
-import { useFavoritePage, isPageFavorite } from '../api/useFavoritePage';
+import { useFavoritePages } from '../api/useFavoritePages';
 import type { PageDirectoryEntry } from '../api/pages.types';
 import { PagesToolbar, type SortValue, type TypeFilter } from './components/PagesToolbar';
 import { PageCard } from './components/PageCard';
+import { SortablePageCard } from './components/SortablePageCard';
 import s from './PagesListPage.module.css';
 
 function normalize(str: string): string {
@@ -24,24 +41,23 @@ function normalize(str: string): string {
  * stránka".
  */
 export default function PagesListPage() {
-  const { world, worldId, worldSlug, userRole, loading } = useWorldContext();
+  const { worldId, worldSlug, userRole, loading } = useWorldContext();
   const { data: directory = [], isLoading } = usePagesDirectory(worldId);
-  const favorite = useFavoritePage(worldId, worldSlug);
+  const favorites = useFavoritePages(worldId);
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [sort, setSort] = useState<SortValue>('order');
 
-  const favoriteSlugs = useMemo(
-    () => world?.favoritePageSlugs ?? [],
-    [world],
-  );
   const canCreate = (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
-  const favoriteEntries = useMemo(
-    () => directory.filter((e) => favoriteSlugs.includes(e.slug)),
-    [directory, favoriteSlugs],
-  );
+  // Osobní oblíbené v uživatelově pořadí (read-only; reorder je na dashboardu).
+  const favoriteEntries = useMemo(() => {
+    const bySlug = new Map(directory.map((e) => [e.slug, e]));
+    return favorites.order
+      .map((slug) => bySlug.get(slug))
+      .filter((e): e is PageDirectoryEntry => !!e);
+  }, [directory, favorites.order]);
 
   const visibleEntries = useMemo(() => {
     const q = normalize(search.trim());
@@ -60,11 +76,28 @@ export default function PagesListPage() {
     return list;
   }, [directory, search, typeFilter, sort]);
 
+  // Touch má long-press (chrání scroll), myš jen distance (vzor ChannelSidebar).
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
   function toggleFavorite(entry: PageDirectoryEntry) {
-    favorite.mutate({
-      slug: entry.slug,
-      nextState: !isPageFavorite(favoriteSlugs, entry.slug),
-    });
+    favorites.toggle(entry.slug);
+  }
+
+  function handleFavReorder(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = favorites.order.indexOf(String(active.id));
+    const newIndex = favorites.order.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
+    favorites.reorder(arrayMove(favorites.order, oldIndex, newIndex));
   }
 
   if (loading) return <Spinner center />;
@@ -117,17 +150,27 @@ export default function PagesListPage() {
               <h2 className={s.sectionTitle}>
                 <Star size={16} aria-hidden /> Oblíbené
               </h2>
-              <div className={s.grid}>
-                {favoriteEntries.map((entry) => (
-                  <PageCard
-                    key={entry.id}
-                    entry={entry}
-                    worldSlug={worldSlug}
-                    isFavorite
-                    onToggleFavorite={() => toggleFavorite(entry)}
-                  />
-                ))}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleFavReorder}
+              >
+                <SortableContext
+                  items={favoriteEntries.map((e) => e.slug)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className={s.grid}>
+                    {favoriteEntries.map((entry) => (
+                      <SortablePageCard
+                        key={entry.id}
+                        entry={entry}
+                        worldSlug={worldSlug}
+                        onToggleFavorite={() => toggleFavorite(entry)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </section>
           )}
 
@@ -146,7 +189,7 @@ export default function PagesListPage() {
                     key={entry.id}
                     entry={entry}
                     worldSlug={worldSlug}
-                    isFavorite={isPageFavorite(favoriteSlugs, entry.slug)}
+                    isFavorite={favorites.isFavorite(entry.slug)}
                     onToggleFavorite={() => toggleFavorite(entry)}
                   />
                 ))}

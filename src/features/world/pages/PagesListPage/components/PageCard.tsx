@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Lock } from 'lucide-react';
 import clsx from 'clsx';
@@ -11,6 +12,8 @@ interface Props {
   worldSlug: string;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  /** 5.2-followup — volitelný drag handle (oblíbená sekce → reorder). */
+  dragHandle?: ReactNode;
 }
 
 /**
@@ -49,12 +52,14 @@ export function PageCard({
   worldSlug,
   isFavorite,
   onToggleFavorite,
+  dragHandle,
 }: Props) {
   const Icon = pageTypeIcon(entry.type);
   const shielded = (entry.shieldedBy?.length ?? 0) > 0;
 
   return (
     <div className={clsx(s.card, shielded && s.shielded)}>
+      {dragHandle}
       <Link
         to={`/svet/${worldSlug}/${entry.slug}`}
         className={s.link}

@@ -12,7 +12,6 @@ function makeWorld(overrides: Partial<World> = {}): World {
     isActive: true,
     accessMode: 'private',
     playerCount: 0,
-    favoritePageSlugs: [],
     createdAt: '2026-05-17',
     updatedAt: '2026-05-17',
     ...overrides,

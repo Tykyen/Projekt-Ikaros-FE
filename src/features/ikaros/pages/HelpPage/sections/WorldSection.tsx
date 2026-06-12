@@ -87,8 +87,9 @@ export function WorldSection() {
         <Tool icon={<LayoutDashboard size={16} />} title="Přehled světa" audience={{ kind: 'vse', label: 'Členové' }}>
           <p>
             Vstupní strana světa ve 3 sloupcích: vlevo nadcházející herní{' '}
-            <strong>Akce</strong>, uprostřed <strong>Novinky</strong> světa, vpravo{' '}
-            <strong>Oblíbené stránky</strong>. PJ má v hlavičkách sekcí tlačítko +.
+            <strong>Akce</strong>, uprostřed <strong>Novinky</strong> světa, vpravo tvoje{' '}
+            <strong>Oblíbené stránky</strong> — osobní seznam, který si každý člen tvoří
+            sám (hvězdičkou u stránek) a může v něm přetahováním měnit pořadí.
             Anonym a Žadatel vidí pre-join verzi s tlačítkem Vstoupit / Požádat.
           </p>
           <ScreenshotSlot media="svet.prehled" />
@@ -103,8 +104,9 @@ export function WorldSection() {
         <Tool icon={<FileText size={16} />} title="Wiki stránky — čtení" audience={{ kind: 'vse', label: 'Členové' }} accent="corrector">
           <p>
             Encyklopedie světa — lokace, lore, novinky, galerie, rodokmen. Layout se
-            mění podle typu stránky. V hlavičce drobečky, hvězdička oblíbených a
-            (s oprávněním) Upravit; pravý panel má profilový obrázek, datovou tabulku
+            mění podle typu stránky. V hlavičce drobečky, hvězdička pro přidání do tvých
+            <strong> oblíbených</strong> (klávesa <code>f</code>) a (s oprávněním) Upravit;
+            pravý panel má profilový obrázek, datovou tabulku
             a obsah z nadpisů. V textu fungují odkazy mezi stránkami a klik na obrázek
             ho otevře na celou obrazovku. <code>Ctrl+K</code> = rychlé hledání, <code>Ctrl+P</code> = tisk.
           </p>
@@ -127,7 +129,8 @@ export function WorldSection() {
         <Tool icon={<FileText size={16} />} title="Index a Správa stránek" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="corrector">
           <p>
             <strong>Index stránek</strong> = přehled encyklopedie s kartami, hledáním,
-            filtrem typu a sekcí Oblíbené. <strong>Správa stránek</strong> (PJ) =
+            filtrem typu a sekcí <strong>Oblíbené</strong> (tvoje osobní, s pořadím přes
+            přetahování). <strong>Správa stránek</strong> (PJ) =
             tabulková správa s řazením, hledáním, mazáním jednotlivým i hromadným.
           </p>
         </Tool>

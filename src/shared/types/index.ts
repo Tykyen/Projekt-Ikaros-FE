@@ -91,6 +91,8 @@ export interface User {
   pinnedGalleryIds?: string[];
   /** 8.3 / D-074 — oblíbené postavy v adresáři per svět. `worldId → slug[]`. */
   favoriteCharacters?: Record<string, string[]>;
+  /** 5.2-followup — osobní oblíbené stránky per svět. `worldId → slug[]`, pořadí významné. */
+  favoritePageSlugs?: Record<string, string[]>;
   isOnline: boolean;
   lastSeenAt: string;
   createdAt: string;
@@ -357,7 +359,6 @@ export interface World {
   playerCount: number;
   /** 2.2 — volitelná max kapacita pro sort "volná místa" + 2.3 wizard. */
   maxPlayers?: number | null;
-  favoritePageSlugs: string[];
   /** 5.0 — id sdíleného základu světového motivu (preset nebo 'matrix'). */
   themeId?: string;
   /** 5.0 — custom theme: mapa CSS token → hodnota nad `themeId`. */

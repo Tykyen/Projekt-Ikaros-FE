@@ -26,7 +26,7 @@ import {
   useKeyboardShortcut,
   useKeyboardSequence,
 } from './hooks/useKeyboardShortcut';
-import { useFavoritePage, isPageFavorite } from '../api/useFavoritePage';
+import { useFavoritePages } from '../api/useFavoritePages';
 import type { Page, PageType } from '../api/pages.types';
 import s from './PageViewer.module.css';
 
@@ -59,8 +59,7 @@ export function PageViewer({ page }: Props) {
   const navigate = useNavigate();
   const { worldId, worldSlug, world, userRole } = useWorldContext();
   const containerRef = useRef<HTMLElement>(null);
-  const favoriteMutation = useFavoritePage(worldId, worldSlug);
-  const isFavorite = isPageFavorite(world?.favoritePageSlugs, page.slug);
+  const favorites = useFavoritePages(worldId);
   const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -101,9 +100,7 @@ export function PageViewer({ page }: Props) {
     e.preventDefault();
     setPaletteOpen(true);
   }, { ctrl: true });
-  useKeyboardShortcut('f', () =>
-    favoriteMutation.mutate({ slug: page.slug, nextState: !isFavorite }),
-  );
+  useKeyboardShortcut('f', () => favorites.toggle(page.slug));
   useKeyboardShortcut('e', () => {
     if (canEdit) navigate(`/svet/${worldSlug}/edit/${page.slug}`);
   });

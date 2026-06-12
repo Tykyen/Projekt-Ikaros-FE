@@ -53,7 +53,6 @@ describe('CreateWorldPage', () => {
       isActive: true,
       accessMode: 'private',
       playerCount: 0,
-      favoritePageSlugs: [],
       createdAt: '',
       updatedAt: '',
     });
@@ -148,7 +147,6 @@ describe('CreateWorldPage', () => {
       isActive: true,
       accessMode: 'private',
       playerCount: 0,
-      favoritePageSlugs: [],
       createdAt: '',
       updatedAt: '',
     });

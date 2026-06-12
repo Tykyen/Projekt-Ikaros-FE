@@ -10,12 +10,21 @@ import { EventsColumn } from '../columns/EventsColumn';
 const ctx = vi.hoisted(() => ({ role: 2 as number })); // WorldRole.Hrac
 const newsData = vi.hoisted(() => ({ items: [] as WorldNewsItem[] }));
 const eventsData = vi.hoisted(() => ({ items: [] as GameEvent[] }));
+const favData = vi.hoisted(() => ({ order: [] as string[] }));
 
 vi.mock('@/features/world/context/WorldContext', () => ({
   useWorldContext: () => ({ userRole: ctx.role, worldSlug: 'svet' }),
 }));
 vi.mock('../../../api/usePagesDirectory', () => ({
   usePagesDirectory: () => ({ data: [], isLoading: false }),
+}));
+vi.mock('../../../api/useFavoritePages', () => ({
+  useFavoritePages: () => ({
+    order: favData.order,
+    isFavorite: (slug: string) => favData.order.includes(slug),
+    toggle: vi.fn(),
+    reorder: vi.fn(),
+  }),
 }));
 vi.mock('@/features/world/api/useWorldNews', () => ({
   useWorldNews: () => ({ data: newsData.items, isLoading: false }),
@@ -53,7 +62,6 @@ function makeWorld(over: Partial<World> = {}): World {
     isActive: true,
     accessMode: 'private',
     playerCount: 0,
-    favoritePageSlugs: [],
     createdAt: '',
     updatedAt: '',
     ...over,
@@ -92,24 +100,24 @@ function makeEvent(id: string): GameEvent {
 }
 
 describe('FavoritePagesColumn', () => {
-  it('prázdné favoritePageSlugs → empty stav', () => {
+  it('prázdné → empty stav', () => {
+    favData.order = [];
     renderWithRouter(<FavoritePagesColumn world={makeWorld()} />);
     expect(
       screen.getByText(/Zatím žádné oblíbené stránky/),
     ).toBeInTheDocument();
   });
 
-  it('limit 10 — z 12 slugů zobrazí 10 (fallback na slug bez titulu)', () => {
-    const slugs = Array.from({ length: 12 }, (_, i) => `str-${i}`);
-    renderWithRouter(
-      <FavoritePagesColumn world={makeWorld({ favoritePageSlugs: slugs })} />,
-    );
+  it('zobrazí osobní oblíbené v uživatelově pořadí (fallback na slug bez titulu)', () => {
+    favData.order = ['str-2', 'str-0', 'str-1'];
+    renderWithRouter(<FavoritePagesColumn world={makeWorld()} />);
+    expect(screen.getByText('str-2')).toBeInTheDocument();
     expect(screen.getByText('str-0')).toBeInTheDocument();
-    expect(screen.getByText('str-9')).toBeInTheDocument();
-    expect(screen.queryByText('str-10')).not.toBeInTheDocument();
+    expect(screen.getByText('str-1')).toBeInTheDocument();
   });
 
   it('tlačítko „Všechny stránky" odkazuje na /svet/svet/stranky', () => {
+    favData.order = [];
     renderWithRouter(<FavoritePagesColumn world={makeWorld()} />);
     expect(
       screen.getByRole('link', { name: /Všechny stránky/ }),

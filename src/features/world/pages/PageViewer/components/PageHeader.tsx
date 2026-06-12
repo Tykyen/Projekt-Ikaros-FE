@@ -9,7 +9,7 @@ import {
 import { toast } from 'sonner';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldRole } from '@/shared/types';
-import { useFavoritePage, isPageFavorite } from '../../api/useFavoritePage';
+import { useFavoritePages } from '../../api/useFavoritePages';
 import type { Page } from '../../api/pages.types';
 import s from './PageHeader.module.css';
 
@@ -30,8 +30,8 @@ interface Props {
  */
 export function PageHeader({ page, readTimeMinutes }: Props) {
   const { worldSlug, worldId, world, userRole } = useWorldContext();
-  const favoriteMutation = useFavoritePage(worldId, worldSlug);
-  const isFavorite = isPageFavorite(world?.favoritePageSlugs, page.slug);
+  const favorites = useFavoritePages(worldId);
+  const isFavorite = favorites.isFavorite(page.slug);
   const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   function handleCopyUrl() {
@@ -72,32 +72,23 @@ export function PageHeader({ page, readTimeMinutes }: Props) {
               <span className={s.woodWideText}>Wood-Wide</span>
             </span>
           )}
-          {/* R-16 — favorite = sdílený kurátorský seznam světa → BE gate
-              `assertCanWrite` (PomocnyPJ+). Dřív se hvězda ukazovala všem
-              členům → Ctenar klikl → 403 + tichý rollback. Gate na canEdit. */}
-          {canEdit && (
-            <button
-              type="button"
-              className={`${s.starBtn} ${isFavorite ? s.starActive : ''}`}
-              onClick={() =>
-                favoriteMutation.mutate({
-                  slug: page.slug,
-                  nextState: !isFavorite,
-                })
-              }
-              aria-label={
-                isFavorite ? 'Odebrat z oblíbených' : 'Přidat do oblíbených'
-              }
-              aria-pressed={isFavorite}
-              disabled={favoriteMutation.isPending}
-            >
-              <Star
-                size={20}
-                aria-hidden
-                fill={isFavorite ? 'currentColor' : 'none'}
-              />
-            </button>
-          )}
+          {/* 5.2-followup — osobní oblíbené: hvězda VŠEM členům (ne jen PJ).
+              Ukládá do User.favoritePageSlugs per svět, izolované per uživatel. */}
+          <button
+            type="button"
+            className={`${s.starBtn} ${isFavorite ? s.starActive : ''}`}
+            onClick={() => favorites.toggle(page.slug)}
+            aria-label={
+              isFavorite ? 'Odebrat z oblíbených' : 'Přidat do oblíbených'
+            }
+            aria-pressed={isFavorite}
+          >
+            <Star
+              size={20}
+              aria-hidden
+              fill={isFavorite ? 'currentColor' : 'none'}
+            />
+          </button>
           <button
             type="button"
             className={s.starBtn}

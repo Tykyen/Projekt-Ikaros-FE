@@ -26,7 +26,6 @@ function makeWorld(id: string, overrides: Record<string, unknown> = {}) {
     isActive: true,
     accessMode: 'public',
     system: 'D&D',
-    favoritePageSlugs: [],
     createdAt: '2026-01-01',
     updatedAt: '2026-01-01',
     ...overrides,

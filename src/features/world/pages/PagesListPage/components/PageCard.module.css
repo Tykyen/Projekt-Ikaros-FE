@@ -15,6 +15,29 @@
   transform: translateY(-1px);
 }
 
+/* 5.2-followup — drag activator pro reorder oblíbených. `touch-action: none`
+   nutné, jinak touch sensor kolize se scrollem. */
+.dragHandle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px 0 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragHandle:hover {
+  color: var(--accent-bright);
+}
+
 .link {
   display: flex;
   align-items: center;

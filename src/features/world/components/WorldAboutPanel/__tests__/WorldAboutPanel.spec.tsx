@@ -13,7 +13,6 @@ function makeWorld(over: Partial<World> = {}): World {
     isActive: true,
     accessMode: 'private',
     playerCount: 0,
-    favoritePageSlugs: [],
     createdAt: '',
     updatedAt: '',
     ...over,
