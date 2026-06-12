@@ -9,6 +9,7 @@ export interface ChatPrefsPatch {
   channelOrder?: Record<string, string[]>;
   expandedGroups?: string[];
   pinnedOrder?: string[];
+  lastActiveChannelId?: string;
 }
 
 const MY_WORLDS_KEY = ['worlds', 'my'] as const;
@@ -44,6 +45,10 @@ export function useChatPrefs(worldId: string) {
   );
   const pinnedOrder = useMemo(
     () => membership?.chatPinnedOrder ?? [],
+    [membership],
+  );
+  const lastActiveChannelId = useMemo(
+    () => membership?.chatLastActiveChannelId ?? null,
     [membership],
   );
 
@@ -90,6 +95,9 @@ export function useChatPrefs(worldId: string) {
                   ...(patch.pinnedOrder !== undefined && {
                     chatPinnedOrder: patch.pinnedOrder,
                   }),
+                  ...(patch.lastActiveChannelId !== undefined && {
+                    chatLastActiveChannelId: patch.lastActiveChannelId,
+                  }),
                 },
               },
         ),
@@ -135,15 +143,24 @@ export function useChatPrefs(worldId: string) {
     (order: string[]) => apply({ pinnedOrder: order }),
     [apply],
   );
+  const setLastActiveChannel = useCallback(
+    (channelId: string) => apply({ lastActiveChannelId: channelId }),
+    [apply],
+  );
 
   return {
     groupOrder,
     channelOrder,
     expandedGroups,
     pinnedOrder,
+    lastActiveChannelId,
+    // Settled (success i error) — gate pro „čekej na server seed, ať default
+    // nepřebije cross-device poslední konverzaci" ve WorldChatRoom.
+    prefsLoaded: !myWorlds.isLoading,
     setGroupOrder,
     setChannelOrder,
     toggleExpanded,
     setPinnedOrder,
+    setLastActiveChannel,
   };
 }

@@ -456,6 +456,8 @@ export interface WorldMembership {
   chatExpandedGroups?: string[];
   /** D-032 — osobní pořadí připnutých konverzací (`channelId[]`), per svět. */
   chatPinnedOrder?: string[];
+  /** Poslední otevřená konverzace (cross-device seed). `channelId`. */
+  chatLastActiveChannelId?: string;
   /** 5.3 — public summary uživatele; populuje `GET /worlds/:id/members`. */
   user?: {
     id: string;

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Minus, Plus, Maximize, RefreshCcw } from 'lucide-react';
+import { Minus, Plus, Maximize, Minimize2, Move, RefreshCcw } from 'lucide-react';
+import clsx from 'clsx';
 import s from './ZoomableImage.module.css';
 
 interface Props {
@@ -35,6 +36,7 @@ export function ZoomableImage({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const dragRef = useRef<{ startX: number; startY: number; ox: number; oy: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const clamp = useCallback(
     (v: number) => Math.min(maxScale, Math.max(minScale, v)),
@@ -85,6 +87,32 @@ export function ZoomableImage({
     };
   }, []);
 
+  // Kolečko myši = zoom k pozici kurzoru (jako mapy). Native listener s
+  // `passive: false`, aby šlo zabránit scrollu stránky. Re-registruje se jen
+  // při změně scale (setOffset je funkční → offset v deps není potřeba).
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      const delta = e.deltaY < 0 ? step : -step;
+      const next = clamp(Math.round((scale + delta) * 100) / 100);
+      if (next === scale) return;
+      // Drž bod pod kurzorem na místě: posuň offset úměrně změně scale.
+      const ratio = next / scale;
+      setOffset((o) => ({
+        x: cx - (cx - o.x) * ratio,
+        y: cy - (cy - o.y) * ratio,
+      }));
+      setScale(next);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [scale, step, clamp]);
+
   // Klávesnice: + / -, šipky, 0 = reset. Aktivní jen pokud container má focus.
   const onKey = (e: React.KeyboardEvent) => {
     const k = e.key;
@@ -109,16 +137,20 @@ export function ZoomableImage({
     } else if (k === 'ArrowDown') {
       setOffset((o) => ({ ...o, y: o.y - 40 }));
       e.preventDefault();
+    } else if (k === 'Escape' && isFullscreen) {
+      setIsFullscreen(false);
+      e.preventDefault();
     }
   };
 
   return (
     <div
       ref={containerRef}
-      className={s.container}
-      style={{ height }}
+      className={clsx(s.container, isFullscreen && s.fullscreen)}
+      style={{ height: isFullscreen ? '100dvh' : height }}
       tabIndex={0}
       onKeyDown={onKey}
+      data-no-lightbox
       role="region"
       aria-label={`Zoomovatelný obrázek: ${alt}`}
     >
@@ -161,9 +193,22 @@ export function ZoomableImage({
         <button type="button" onClick={reset} aria-label="Reset zoomu">
           <RefreshCcw size={14} aria-hidden />
         </button>
+        <button
+          type="button"
+          onClick={() => setIsFullscreen((f) => !f)}
+          aria-label={
+            isFullscreen ? 'Zavřít celou obrazovku' : 'Celá obrazovka'
+          }
+        >
+          {isFullscreen ? (
+            <Minimize2 size={16} aria-hidden />
+          ) : (
+            <Maximize size={16} aria-hidden />
+          )}
+        </button>
       </div>
       <div className={s.hint}>
-        <Maximize size={12} aria-hidden /> Drag k posunu • +/− zoom • 0 reset
+        <Move size={12} aria-hidden /> Táhni / kolečko • +/− zoom • 0 reset
       </div>
     </div>
   );

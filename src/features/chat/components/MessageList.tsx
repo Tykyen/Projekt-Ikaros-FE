@@ -74,8 +74,12 @@ export function MessageList({
   resolvePjDisplay,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const didInit = useRef(false);
+  // Jsme „přilepení" u dna? Řídí, zda po nárůstu výšky obsahu (dokreslení
+  // obrázku přílohy) doskrollovat na konec. Čtení historie ho shodí na false.
+  const stickRef = useRef(true);
   // ID zprávy → její root element (pro skok z citace na originál, 4.3a).
   const itemRefs = useRef(new Map<string, HTMLDivElement>());
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
@@ -152,13 +156,36 @@ export function MessageList({
     }
   }, [items, currentUserId]);
 
+  // Aktualizuj „stick to bottom" při ručním scrollu uživatele.
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    stickRef.current =
+      el.scrollHeight - el.scrollTop - el.clientHeight < STICK_THRESHOLD_PX;
+  }, []);
+
+  // Drž scroll u dna i když obsah povyroste PO scrollu — typicky dokreslení
+  // obrázku přílohy (výšku zná prohlížeč až po stažení; `.single` náhled má
+  // `aspect-ratio: auto`, takže do té doby zabírá ~0 px). Bez toho scroll
+  // „uskočí" nad zvětšenou poslední zprávu. Respektuje čtení historie.
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    const ro = new ResizeObserver(() => {
+      if (stickRef.current) endRef.current?.scrollIntoView({ behavior: 'auto' });
+    });
+    ro.observe(content);
+    return () => ro.disconnect();
+  }, []);
+
   if (items.length === 0) {
     return <div className={s.empty}>{emptyText}</div>;
   }
 
   return (
-    <div className={s.scroll} ref={scrollRef}>
-      {items.map((item, i) => {
+    <div className={s.scroll} ref={scrollRef} onScroll={handleScroll}>
+      <div className={s.content} ref={contentRef}>
+        {items.map((item, i) => {
         if (item.kind === 'system') {
           return (
             <div key={item.id} className={s.system}>
@@ -206,7 +233,8 @@ export function MessageList({
           />
         );
       })}
-      <div ref={endRef} />
+        <div ref={endRef} />
+      </div>
     </div>
   );
 }

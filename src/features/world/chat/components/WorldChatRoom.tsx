@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
@@ -15,6 +16,7 @@ import {
   worldChatKeys,
 } from '../api/useWorldChat';
 import { useChannelPresence } from '../api/useChannelPresence';
+import { useChatPrefs } from '../api/useChatPrefs';
 import { useWorldEmotes } from '../emotes/api/useWorldEmotes';
 import { useGlobalEmotes } from '../emotes/api/useGlobalEmotes';
 import { mergeEmoteSets } from '../emotes/lib/mergeEmoteSets';
@@ -37,6 +39,10 @@ export function WorldChatRoom() {
   const groups = useChatGroups(worldId);
   const unread = useUnread(worldId);
   const markRead = useMarkRead(worldId);
+  // Cross-device poslední konverzace (server) + deep-link z push notifikace.
+  const { lastActiveChannelId, setLastActiveChannel, prefsLoaded } =
+    useChatPrefs(worldId);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Krok 6.4b — custom emoty (per-svět + globální). Mapa pro `renderChatContent`.
   const worldEmotesQ = useWorldEmotes(worldId);
@@ -52,6 +58,15 @@ export function WorldChatRoom() {
   const storeKey = `wchat:active:${worldId}`;
   const membersKey = `wchat:members:${worldId}`;
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Deep-link z push notifikace (`?konverzace={channelId}`) → vyber konverzaci.
+  // Adjustment-during-render (ne effect) — reaguje i na opakovaný deep-link bez
+  // remountu, bez cascading renderu. Platnost ID řeší `activeChannelId` níž.
+  const deepLinkParam = searchParams.get('konverzace');
+  const [lastDeepLink, setLastDeepLink] = useState<string | null>(null);
+  if (deepLinkParam && deepLinkParam !== lastDeepLink) {
+    setLastDeepLink(deepLinkParam);
+    setSelectedId(deepLinkParam);
+  }
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // Default: zavřeno. PJ si panel otevře přes Users ikonu, badge ho upozorní
   // na příchody. localStorage drží volbu per world.
@@ -107,8 +122,44 @@ export function WorldChatRoom() {
     }
     const stored = localStorage.getItem(storeKey);
     if (stored && allChannels.some((c) => c.id === stored)) return stored;
+    if (
+      lastActiveChannelId &&
+      allChannels.some((c) => c.id === lastActiveChannelId)
+    ) {
+      return lastActiveChannelId;
+    }
+    // Server seed ještě nedorazil → počkej, ať default „první kanál"
+    // nepřebije cross-device poslední konverzaci (race kanály × prefs).
+    if (!prefsLoaded) return null;
     return allChannels[0].id;
-  }, [selectedId, allChannels, storeKey]);
+  }, [selectedId, allChannels, storeKey, lastActiveChannelId, prefsLoaded]);
+
+  // Persist poslední aktivní konverzace (per svět) — i tu default-zobrazenou,
+  // ať se po refreshi / reorderu kanálů vrátíme přesně sem, ne na první kanál.
+  // Vedlejší efekt: neplatné uložené ID (smazaný kanál) se přepíše fallbackem.
+  // Server (cross-device) se ukládá jen při vědomé volbě (selectChannel /
+  // deep-link), ne tady — default by jinak přebil seed z jiného zařízení.
+  useEffect(() => {
+    if (!activeChannelId) return;
+    localStorage.setItem(storeKey, activeChannelId);
+  }, [activeChannelId, storeKey]);
+
+  // Po vybrání deep-linku (adjustment výše) ho ulož na server jako vědomou
+  // volbu (cross-device) a vyčisti param z URL (replace), ať refresh nezůstane
+  // zaseklý. Čeká na načtení kanálů, ať na server ukládáme jen platné ID.
+  useEffect(() => {
+    if (!deepLinkParam || allChannels.length === 0) return;
+    if (allChannels.some((c) => c.id === deepLinkParam)) {
+      setLastActiveChannel(deepLinkParam);
+    }
+    setSearchParams(
+      (prev) => {
+        prev.delete('konverzace');
+        return prev;
+      },
+      { replace: true },
+    );
+  }, [deepLinkParam, allChannels, setSearchParams, setLastActiveChannel]);
 
   // ── WS: živé aktualizace kanálů/konverzací/unread ───────────────────────
   // `world:{id}` room joinuje WorldLayout (`useWorldSocket`) pro CELÝ svět —
@@ -157,11 +208,13 @@ export function WorldChatRoom() {
 
   const selectChannel = useCallback(
     (id: string) => {
+      // localStorage řeší effect na `activeChannelId`; server (cross-device)
+      // ukládáme jen tady při vědomé volbě — default nepřepisuje seed.
       setSelectedId(id);
-      localStorage.setItem(storeKey, id);
+      setLastActiveChannel(id);
       setSidebarOpen(false);
     },
-    [storeKey],
+    [setLastActiveChannel],
   );
 
   // ── Render ──────────────────────────────────────────────────────────────

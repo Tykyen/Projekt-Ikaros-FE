@@ -27,6 +27,7 @@ import { useSocketInit } from '@/features/chat/api/useSocket';
 import { useAccountTransferNotifications } from '@/features/world/pages/api/useAccountTransferNotifications';
 import { usePresenceHeartbeat } from '@/features/chat/api/usePresenceHeartbeat';
 import { useRoomPresenceCounts } from '@/features/chat/api/useGlobalChat';
+import { myRoomsAtom } from '@/features/chat/store/roomsStore';
 import type { RoomKey } from '@/features/chat/lib/types';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
 import { useUnreadCount } from '@/features/ikaros/api/useMail';
@@ -195,10 +196,18 @@ function SidebarContent({
     .sort(byNewest);
   // 4.2c §4 — počet přítomných per místnost (REST seed + WS živá aktualizace).
   const roomCounts = useRoomPresenceCounts();
-  // D-069 — nadpis sekce „Chat" ukazuje počet lidí přítomných v chatu
-  // (součet místností), ne nepřečtenou poštu.
+  // Badge/nadpis počítají jen OSTATNÍ (bez tebe) — jinak místnost, kde jsi sám,
+  // svítí „1" a multi-room členství (4.2d) tě „rozmnoží" do všech proklikaných.
+  const myRooms = useAtomValue(myRoomsAtom);
+  const othersInRoom = (rk: RoomKey) =>
+    Math.max(0, (roomCounts?.[rk] ?? 0) - (myRooms.has(rk) ? 1 : 0));
+  // D-069 — nadpis sekce „Chat" = počet ostatních lidí přítomných v chatu
+  // (součet místností bez tebe), ne nepřečtená pošta.
   const chatPresence = roomCounts
-    ? Object.values(roomCounts).reduce((sum, n) => sum + n, 0)
+    ? (Object.keys(roomCounts) as RoomKey[]).reduce(
+        (sum, rk) => sum + othersInRoom(rk),
+        0,
+      )
     : 0;
   // Spec 3.8 — sdílená query s pravým panelem (`['pending-actions','count']`),
   // druhé volání nestojí extra request. Pro anon disabled → žádný badge.
@@ -259,7 +268,7 @@ function SidebarContent({
                 </span>
               );
             }
-            const count = roomCounts?.[room.roomKey] ?? 0;
+            const count = othersInRoom(room.roomKey);
             return (
               <NavLink
                 key={room.key}
@@ -283,8 +292,8 @@ function SidebarContent({
                     s.roomCount,
                     count > 0 && s.roomCountActive,
                   )}
-                  aria-label={`${count} přítomných`}
-                  title={`Přítomných: ${count}`}
+                  aria-label={`${count} dalších přítomných`}
+                  title={`Další přítomní: ${count}`}
                 >
                   {count}
                 </span>

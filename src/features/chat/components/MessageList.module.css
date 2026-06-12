@@ -24,6 +24,13 @@
   background: var(--theme-heading, var(--accent));
 }
 
+/* Obsahový wrapper — cíl ResizeObserveru (kontejner `.scroll` velikost
+   nemění, obsah uvnitř ano). Zachovává původní flex-column tok zpráv. */
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
 .empty {
   flex: 1;
   display: flex;

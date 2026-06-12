@@ -41,6 +41,7 @@ import { worldMemberAvatar } from '@/features/world/lib/worldMemberAvatar';
 import { extractMentionUsernames } from '../lib/parseMentions';
 import { resolveDisplayName } from '../lib/resolveDisplayName';
 import { useComposerSticky } from '../api/useComposerSticky';
+import { useComposerDraftAttachments } from '../api/useComposerDraftAttachments';
 import { ChatEmotePickerPopover } from '../emotes/components/ChatEmotePickerPopover';
 import { EmoteAutocomplete } from '../emotes/components/EmoteAutocomplete';
 import { useWorldEmotes } from '../emotes/api/useWorldEmotes';
@@ -72,13 +73,6 @@ import s from './ChannelComposer.module.css';
  * Optimistic insert + clientNonce drží `useOptimisticSend` (vyšší vrstva),
  * tento komponent jen volá `onSend` s kompletním payloadem.
  */
-
-interface PickedFile {
-  id: string;
-  file: File;
-  kind: 'image' | 'document';
-  previewUrl: string | null;
-}
 
 export interface ComposerSendPayload {
   content?: string;
@@ -144,8 +138,7 @@ export function ChannelComposer({
   onTypingStart,
   onTypingStop,
 }: Props) {
-  const [text, setText] = useState('');
-  const [picked, setPicked] = useState<PickedFile[]>([]);
+  const [picked, setPicked] = useComposerDraftAttachments(worldId, channelId);
   const [uploading, setUploading] = useState(false);
   const [whisperTo, setWhisperTo] = useState<string>('');
   const [rpPopOpen, setRpPopOpen] = useState(false);
@@ -169,6 +162,14 @@ export function ChannelComposer({
     name: sticky.npcName,
     avatarUrl: sticky.npcAvatarUrl,
   };
+  // Rozepsaná zpráva (draft) jako sticky pole — text přežije přepnutí
+  // konverzace i refresh. Wrapper podporuje hodnotu i updater funkci `(t)=>…`.
+  const text = sticky.draft;
+  const setText = (v: string | ((prev: string) => string)) =>
+    setSticky((p) => ({
+      ...p,
+      draft: typeof v === 'function' ? v(p.draft) : v,
+    }));
   const setRpDate = (v: string) => setSticky((p) => ({ ...p, rpDate: v }));
   const setNpcActive = (next: boolean | ((prev: boolean) => boolean)) =>
     setSticky((p) => ({
@@ -238,11 +239,12 @@ export function ChannelComposer({
     ta.style.height = `${Math.min(ta.scrollHeight, 160)}px`;
   }, [text]);
 
-  // Cleanup pri unmount — typing stop + revoke object URLs.
+  // Cleanup pri unmount — jen typing stop. Blob náhledy příloh ZÁMĚRNĚ
+  // nerevokujeme: draft příloh přežívá přepnutí konverzace (in-memory store),
+  // revoke řeší až odebrání (removePicked) / odeslání (clearPicked).
   useEffect(
     () => () => {
       stopTyping();
-      picked.forEach((p) => p.previewUrl && URL.revokeObjectURL(p.previewUrl));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],

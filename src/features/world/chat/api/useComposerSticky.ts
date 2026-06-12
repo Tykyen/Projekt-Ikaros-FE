@@ -12,6 +12,10 @@ import { useEffect, useState } from 'react';
  *
  * Reset: jen explicitně klikem × OFF (NPC) / × na RP chipu / × na whisper chipu.
  *
+ * `draft` (rozepsaná zpráva) sdílí storage, ale má JINOU reset sémantiku:
+ * přežívá přepnutí konverzace i refresh (pokračovat v psaní), ale po odeslání
+ * zprávy se vymaže (textarea je prázdná).
+ *
  * Storage je per (worldId × channelId), per browser. Synchronizace mezi zařízeními
  * by vyžadovala BE persistenci (`User.chatPreferences.composerStickyByChannel`)
  * — out of scope, dluh.
@@ -22,6 +26,8 @@ export interface ComposerStickyState {
   npcActive: boolean;
   npcName: string;
   npcAvatarUrl: string;
+  /** Rozepsaná (neodeslaná) zpráva. Reset po odeslání (viz JSDoc nahoře). */
+  draft: string;
 }
 
 const EMPTY: ComposerStickyState = {
@@ -29,6 +35,7 @@ const EMPTY: ComposerStickyState = {
   npcActive: false,
   npcName: '',
   npcAvatarUrl: '',
+  draft: '',
 };
 
 function storageKey(worldId: string, channelId: string): string {
@@ -46,6 +53,7 @@ function read(worldId: string, channelId: string): ComposerStickyState {
       npcName: typeof parsed.npcName === 'string' ? parsed.npcName : '',
       npcAvatarUrl:
         typeof parsed.npcAvatarUrl === 'string' ? parsed.npcAvatarUrl : '',
+      draft: typeof parsed.draft === 'string' ? parsed.draft : '',
     };
   } catch {
     return EMPTY;
@@ -77,7 +85,8 @@ export function useComposerSticky(worldId: string, channelId: string) {
         !state.rpDate &&
         !state.npcActive &&
         !state.npcName &&
-        !state.npcAvatarUrl;
+        !state.npcAvatarUrl &&
+        !state.draft;
       if (isEmpty) {
         localStorage.removeItem(k);
       } else {

@@ -14,8 +14,9 @@ interface InlineLightboxState {
  * obalí každý do click-handleru, který otevře GalleryLightbox s konkrétním
  * indexem.
  *
- * Edge case: pokud `<img>` je už uvnitř `<a>` (link), inline lightbox se nezapne
- * (uctíme původní link behavior).
+ * Edge case: pokud `<img>` je už uvnitř `<a>` (link) nebo `[data-no-lightbox]`
+ * (např. `ZoomableImage` rodokmenu — má vlastní pan/zoom), inline lightbox se
+ * nezapne (jinak by klik otevíral lightbox místo posunu obrázku).
  */
 export function useInlineImageLightbox(
   containerRef: RefObject<HTMLElement | null>,
@@ -28,7 +29,7 @@ export function useInlineImageLightbox(
     if (!containerRef.current) return;
     const imgs = Array.from(
       containerRef.current.querySelectorAll<HTMLImageElement>('img'),
-    ).filter((img) => !img.closest('a'));
+    ).filter((img) => !img.closest('a') && !img.closest('[data-no-lightbox]'));
 
     if (imgs.length === 0) {
       setImages([]);
