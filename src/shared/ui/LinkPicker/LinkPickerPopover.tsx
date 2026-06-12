@@ -35,6 +35,9 @@ export interface LinkPickerPopoverProps {
   initialQuery?: string;
 }
 
+/** Strop zobrazených návrhů; seznam scrolluje (CSS max-height + overflow). */
+const MAX_RESULTS = 30;
+
 function normalize(str: string): string {
   return str
     .toLowerCase()
@@ -103,12 +106,27 @@ export function LinkPickerPopover({
   const dir = directory ?? [];
   const matches = useMemo(() => {
     const q = normalize(query.trim());
-    const list = q
-      ? dir.filter(
-          (d) => normalize(d.title).includes(q) || normalize(d.slug).includes(q),
-        )
-      : dir;
-    return list.slice(0, 8);
+    if (!q) return dir.slice(0, MAX_RESULTS);
+
+    // Relevance skóre (nižší = lepší). Řadí přesnou shodu a shodu na začátku
+    // názvu/slova nad shodu „někde uprostřed" → „Magické organizace" vyplave
+    // nahoru místo aby se pohřbila mezi desítkami konkrétních položek.
+    function score(d: LinkSuggestion): number | null {
+      const title = normalize(d.title);
+      if (title === q) return 0;
+      if (title.startsWith(q)) return 1;
+      if (title.split(/\s+/).some((w) => w.startsWith(q))) return 2;
+      if (title.includes(q)) return 3;
+      if (normalize(d.slug).includes(q)) return 4;
+      return null; // bez shody
+    }
+
+    return dir
+      .map((d) => ({ d, sc: score(d) }))
+      .filter((x): x is { d: LinkSuggestion; sc: number } => x.sc !== null)
+      .sort((a, b) => a.sc - b.sc) // stabilní → při shodě skóre drží pořadí adresáře
+      .slice(0, MAX_RESULTS)
+      .map((x) => x.d);
   }, [dir, query]);
 
   const trimmedQuery = query.trim();

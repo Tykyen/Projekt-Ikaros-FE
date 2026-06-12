@@ -70,6 +70,27 @@ describe('LinkPickerPopover', () => {
     expect(onPick).toHaveBeenCalledWith('nove-misto', 'Nové Místo');
   });
 
+  it('řadí podle relevance — shoda na začátku slova nad shodu uprostřed', () => {
+    const dir: LinkSuggestion[] = [
+      { id: 'a', title: 'Britské státní organizace', slug: 'britske-statni-organizace' },
+      { id: 'b', title: 'Magické organizace', slug: 'magicke-organizace' },
+      { id: 'c', title: 'Organizace', slug: 'organizace' },
+    ];
+    render(<Harness directory={dir} makeSlug={slugify} />);
+    fireEvent.change(screen.getByPlaceholderText(/Hledat stránku/), {
+      target: { value: 'organizace' },
+    });
+    const titles = screen
+      .getAllByText(/organizace/i)
+      .filter((el) => el.className.includes('optionTitle'))
+      .map((el) => el.textContent);
+    // přesná shoda „Organizace" první, pak „Britské státní…" (slovo začíná) /
+    // „Magické…" — všechny tři se zobrazí (žádný strop neořezává)
+    expect(titles[0]).toBe('Organizace');
+    expect(titles).toContain('Magické organizace');
+    expect(titles).toContain('Britské státní organizace');
+  });
+
   it('allowUrl → URL fallback aplikuje zadanou adresu', () => {
     const onPick = vi.fn();
     render(
