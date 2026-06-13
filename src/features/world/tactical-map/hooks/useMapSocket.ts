@@ -15,6 +15,7 @@
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.2.
  */
 import { useCallback, useEffect } from "react";
+import { toast } from "sonner";
 import { getSocket } from "@/features/chat/api/socket";
 import type {
   MapOperationBroadcast,
@@ -85,6 +86,20 @@ export function useMapSocket({
       socket.off("connect", handler);
     };
   }, [sceneId, onReconnect]);
+
+  // S-02 — BE MapsGateway posílá `error` při selhání operace (forbidden /
+  // scéna neexistuje / neautentizováno). Bez listeneru byla akce tichý no-op
+  // bez zpětné vazby; toast dá uživateli vědět, že operace neprošla.
+  useEffect(() => {
+    const socket = getSocket();
+    const handler = (payload: { code?: string; message?: string }): void => {
+      toast.error(payload?.message ?? "Operace na mapě se nezdařila.");
+    };
+    socket.on("error", handler);
+    return () => {
+      socket.off("error", handler);
+    };
+  }, []);
 
   // Listener: map:operation (per-scene broadcast)
   useEffect(() => {

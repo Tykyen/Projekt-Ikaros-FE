@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 import {
   toastFriendRequestAccepted,
   toastIncomingFriendRequest,
@@ -81,5 +81,14 @@ export function useFriendshipsSocket(): void {
   useSocketEvent<{ kind: string }>('user:identity:changed', () => {
     qc.invalidateQueries({ queryKey: ['users', 'me'] });
     qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+  });
+
+  // S-05 — friend eventy jdou do user:{id} (server re-joinne sám), ale vyslané
+  // během výpadku jsou pryč → po reconnectu refetch dotčených seznamů + badge.
+  useSocketReconnect(() => {
+    qc.invalidateQueries({ queryKey: ['friends'] });
+    qc.invalidateQueries({ queryKey: ['friendship-status'] });
+    qc.invalidateQueries({ queryKey: ['pending-actions'] });
+    qc.invalidateQueries({ queryKey: ['users', 'me'] });
   });
 }

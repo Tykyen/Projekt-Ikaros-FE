@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 
 interface TransferReceivedPayload {
   fromAccountId: string;
@@ -44,4 +44,12 @@ export function useAccountTransferNotifications(): void {
       });
     },
   );
+
+  // S-03 — transfer doručený během WS výpadku je pryč (event se neopakuje):
+  // po reconnectu refetch účtů, jinak toast nedorazí a zůstatek zůstane stale.
+  useSocketReconnect(() => {
+    void qc.invalidateQueries({
+      predicate: (q) => q.queryKey[0] === 'accounts',
+    });
+  });
 }

@@ -60,6 +60,9 @@ export function useWorldSocket(worldId: string | null): void {
       void qc.invalidateQueries({
         queryKey: ['worlds', worldId, 'members'],
       });
+      // S-06 — moje role žije v ['worlds','my'] (useWorldStatus→WorldContext);
+      // bez tohoto se po změně role PJ UI / gate neobnoví (staleTime 5min).
+      void qc.invalidateQueries({ queryKey: ['worlds', 'my'] });
     }
   };
   useSocketEvent('world:membership:changed', invalidateMembers);

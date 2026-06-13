@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import { useSocketEvent } from '@/features/chat';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat';
 import type { IkarosNews, IkarosNewsScope, IkarosNewsType } from '@/shared/types';
 
 /** Spec 3.1b — payload polí novinky sdílený create/update mutacemi. */
@@ -22,6 +22,11 @@ export function useIkarosNews() {
   const qc = useQueryClient();
   // C-47 — BE broadcastuje ikaros:news:changed všem klientům (platform-wide).
   useSocketEvent('ikaros:news:changed', () => {
+    void qc.invalidateQueries({ queryKey: NEWS_KEY });
+  });
+  // S-04 — broadcast vyslaný během výpadku je pryč (re-join nepomůže); po
+  // reconnectu refetch, jinak novinky stale až do 5min staleTime.
+  useSocketReconnect(() => {
     void qc.invalidateQueries({ queryKey: NEWS_KEY });
   });
   return useQuery({
