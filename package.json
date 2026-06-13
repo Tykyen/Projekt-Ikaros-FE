@@ -15,6 +15,7 @@
     "defaults:optimize": "node scripts/optimize-default-avatars.mjs",
     "pwa:icons": "node scripts/generate-pwa-icons.mjs",
     "audit:routes": "node scripts/route-audit.mjs",
+    "audit:nav": "node scripts/nav-audit.mjs",
     "audit:ws": "node scripts/ws-audit.mjs",
     "lint:colors": "node scripts/lint-no-hardcoded-colors.mjs",
     "audit:contrast": "node scripts/audit-theme-contrast.mjs",

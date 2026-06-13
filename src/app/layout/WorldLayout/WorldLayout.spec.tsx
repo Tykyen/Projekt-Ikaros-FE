@@ -84,7 +84,9 @@ describe('WorldLayout — plný header (member)', () => {
     // „Informace" je v desktop nav i v mobile draweru → query v rámci <nav>
     const nav = screen.getByRole('navigation');
     expect(within(nav).getByText('Informace')).toBeInTheDocument();
-    expect(within(nav).getByText('Kalendář')).toBeInTheDocument();
+    // N-04 — „Kalendář" je memberOnly(PomocnyPJ); Čtenář (role 1) ho v navu
+    // nevidí (dřív se ukazoval a klik vedl na tichý redirect na dashboard).
+    expect(within(nav).queryByText('Kalendář')).not.toBeInTheDocument();
   });
 });
 

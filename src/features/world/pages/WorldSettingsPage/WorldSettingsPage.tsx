@@ -1,6 +1,5 @@
 import { lazy, Suspense, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAtomValue } from 'jotai';
 import {
   Settings,
   ShieldHalf,
@@ -16,10 +15,10 @@ import {
   Navigation,
   Trash2,
   Theater,
+  Smile,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
-import { currentUserAtom } from '@/shared/store/authStore';
-import { UserRole, WorldRole } from '@/shared/types';
+import { WorldRole } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 import { SYSTEM_CUSTOM_ID } from '@/features/ikaros/pages/CreateWorldPage/constants/systems';
@@ -46,6 +45,9 @@ const CalendarConfigsPage = lazy(
 );
 const WorldDiarySchemaEditorPage = lazy(
   () => import('@/features/world/pages/WorldDiarySchemaEditorPage'),
+);
+const WorldEmotesAdminPage = lazy(
+  () => import('@/features/world/pages/WorldEmotesAdminPage/WorldEmotesAdminPage'),
 );
 
 interface SettingsTab extends TabItem {
@@ -121,6 +123,15 @@ const TABS: SettingsTab[] = [
     render: () => <PjChatTab />,
   },
   {
+    // 6.4c — custom emoty světa (PomocnyPJ+). N-03: přesun z orphan routy
+    // admin/emotes na záložku (jediný přístup, dřív nedosažitelné z UI).
+    id: 'emotes',
+    label: 'Emoty světa',
+    icon: <Smile size={18} />,
+    minRole: WorldRole.PomocnyPJ,
+    render: () => <WorldEmotesAdminPage />,
+  },
+  {
     // 9.2b — multi-config kalendáře světa (PJ+). Přesun z world nav 2026-05-25.
     id: 'kalendare',
     label: 'Kalendáře',
@@ -170,20 +181,18 @@ const TABS: SettingsTab[] = [
 ];
 
 /**
- * 5.3 — Nastavení světa. Tabová stránka; viditelnost tabů řízena rolí
- * (globální Admin/Superadmin = jako PJ). Aktivní tab drží URL hash.
+ * 5.3 — Nastavení světa. Tabová stránka; viditelnost tabů řízena JEN skutečnou
+ * world rolí (R-20 — platform Admin tu nemá governance moc). Aktivní tab drží URL hash.
  */
 export default function WorldSettingsPage() {
   const { world, userRole, loading } = useWorldContext();
-  const currentUser = useAtomValue(currentUserAtom);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isGlobalAdmin =
-    currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
-  const effectiveRole: WorldRole = isGlobalAdmin
-    ? WorldRole.PJ
-    : (userRole ?? WorldRole.Zadatel);
+  // R-20 (role-audit) — platformový Admin/Superadmin NEMÁ governance moc ve světě
+  // → settings taby řídí JEN skutečná world role (admin bez staff role = žádný
+  // tab). Admin pojistka (obnova opuštěného světa) žije v Admin panelu, ne tady.
+  const effectiveRole: WorldRole = userRole ?? WorldRole.Zadatel;
 
   const visibleTabs = useMemo(
     () =>

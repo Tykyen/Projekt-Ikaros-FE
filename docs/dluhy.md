@@ -8,44 +8,8 @@
 
 ## Otevřené
 
----
-
-### D-NEW-friends-counterpart-drift — Neúplný protějšek v žádostech o přátelství
-**Soubory:** BE `friendships/friendships.service.ts` (`listOutgoing`, `listBlocks`),
-`friendships/friendships-pending-action.provider.ts` (`listForUser` — incoming)
-**Problém:** Tyto endpointy vrací protějška (`counterpart` / `user`) jen jako
-`{ id, username, avatarUrl }`, ale FE typy (`FriendRequestListItem.counterpart`,
-blocked/outgoing karty) čekají i `displayName`, `defaultAvatarType`, `role`. Stejný
-contract drift jako už opravený `GET /friends` (kde chybějící `friend` shazoval celou
-záložku). Tady to **nepadá** — jen avatary/jména spadnou na default fallback.
-**Dopad:** Nízký — kosmetické (špatný default avatar / chybějící role badge v sekcích
-Odeslané / Zpracovat / Zablokovaní). Žádný crash.
-**Řešení:** Sjednotit enrichment na plný `PublicUserListItem`-like tvar i v outgoing /
-incoming / blocked (vzor `listForUser` z téhož modulu po opravě GET /friends). Zvážit
-sdílený helper `usersService.toPublicListItem`.
-**Kdy:** Až se bude sahat na friendships UI, nebo když uživatel nahlásí špatné avatary
-v žádostech.
-
----
-
-### D-NEW-shop-purchase-atomicity — Nákup v obchodě bez Mongo transakce
-**Soubory:** BE `campaign/services/campaign-purchase.service.ts` (`purchase` / `refund`)
-**Problém:** Nákup mění dva nezávislé subdokumenty — `CharacterInventory` (přidání položky)
-a `CharacterAccount` (odečet přes `adjust`). Není to v Mongo session/transakci. Pořadí je
-(1) inventář → (2) odečet z účtu; při selhání kroku 2 se inventář kompenzuje (odebrání
-položky). Pokud ale selže i kompenzace (např. DB výpadek mezi tím), zůstane položka ve
-vybavení bez zaplacení. Storno navíc odebírá položku z inventáře **tolerantně** — když ji
-hráč mezitím ručně smazal, peníze se vrátí, ale nesoulad (vrácená věc, kterou hráč už
-nemá) se nikam nezaznamená.
-**Dopad:** Nízký — okno selhání je úzké (single-instance BE, rychlá kompenzace), částka i
-položka dohledatelné v `CampaignPurchase` logu. Pro reálnou hru postačuje.
-**Řešení:** Až bude replica set jistě dostupný, zabalit `purchase`/`refund` do
-`session.withTransaction()` (vzor `character-accounts.service.transfer`). Případně doplnit
-audit záznam při tolerantním refundu chybějící položky.
-**Kdy:** Při přechodu na replica set / multi-instance BE, nebo když se objeví reálný
-půlnákup v provozu.
-
----
+> _(Žádné otevřené dluhy. Shop-purchase atomicita přesunuta jako `FA` cíl do
+> [`seed-scenario-plan/00-cross-cutting.md`](seed-scenario-plan/00-cross-cutting.md) — opraví se tam s důkazem rollbacku.)_
 
 ---
 

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { HeadlineNode } from '@/shared/types';
+import { WorldRole } from '@/shared/types';
 import {
   buildWorldNav,
   filterNavByHidden,
@@ -56,6 +57,37 @@ describe('buildWorldNav', () => {
   });
 });
 
+describe('buildWorldNav — role gating položek (N-04/05)', () => {
+  const allIds = (nav: ReturnType<typeof buildWorldNav>) =>
+    nav.flatMap((g) => (g.items ? g.items.map((i) => i.id) : [g.id]));
+
+  it('default (canAccess ukaž vše) → timeline/pocasi/kalendar přítomné', () => {
+    const ids = allIds(buildWorldNav('a', false));
+    expect(ids).toContain('timeline');
+    expect(ids).toContain('pocasi');
+    expect(ids).toContain('kalendar');
+  });
+
+  it('Čtenář (< Hrac) → timeline/pocasi/kalendar skryté, mapa (Ctenar) zůstává', () => {
+    const ids = allIds(
+      buildWorldNav('a', false, [], (min) => WorldRole.Ctenar >= min),
+    );
+    expect(ids).not.toContain('timeline');
+    expect(ids).not.toContain('pocasi');
+    expect(ids).not.toContain('kalendar');
+    expect(ids).toContain('mapa');
+  });
+
+  it('Hráč (Hrac, ne PomocnyPJ) → timeline/pocasi ano, kalendar ne', () => {
+    const ids = allIds(
+      buildWorldNav('a', false, [], (min) => WorldRole.Hrac >= min),
+    );
+    expect(ids).toContain('timeline');
+    expect(ids).toContain('pocasi');
+    expect(ids).not.toContain('kalendar');
+  });
+});
+
 describe('filterNavByHidden', () => {
   it('skryje položku a vyřadí prázdnou skupinu', () => {
     const nav = buildWorldNav('a', false);
@@ -63,6 +95,7 @@ describe('filterNavByHidden', () => {
     const out = filterNavByHidden(nav, [
       'timeline',
       'mapa',
+      'mapy',
       'pavucina',
       'obchod',
     ]);

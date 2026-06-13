@@ -277,6 +277,12 @@ export function WorldLayout() {
     world?.ownerId === currentUser?.id ||
     (currentUser?.role !== undefined && currentUser.role <= UserRole.Admin) ||
     (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
+  // N-04/05 — nav položku ukaž jen když na ni uživatel reálně dosáhne (parita
+  // s route guardem: Sa/Admin + owner bypass, jinak membership >= min role).
+  const navBypass =
+    world?.ownerId === currentUser?.id ||
+    (currentUser?.role !== undefined && currentUser.role <= UserRole.Admin);
+  const navRole = membership?.role ?? -1;
   const { data: settings } = useWorldSettings(realWorldId);
   const nav = useMemo(
     () =>
@@ -286,10 +292,13 @@ export function WorldLayout() {
         settings?.hiddenNavItems,
         settings?.customHeadline,
         settings?.customGroups,
+        (min) => navBypass || navRole >= min,
       ),
     [
       worldSlug,
       isPJForNav,
+      navBypass,
+      navRole,
       settings?.hiddenNavItems,
       settings?.customHeadline,
       settings?.customGroups,

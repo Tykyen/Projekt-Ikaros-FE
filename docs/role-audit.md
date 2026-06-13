@@ -29,10 +29,36 @@
 > | **R-06** | 🟡 nízká | 06 | FE timeline route povoluje Ctenar, BE vyžaduje Hrac → Ctenar dostal 403 na načtené stránce + matoucí kód | ✅ opraveno (FE+BE) |
 > | **R-05** | 🟡 nízká | 02 | Granular `adminPermissions`: `canManageAdmins` + `canEditPlatformPages` se v UI přepínají, ale BE je nevynucuje (jen `canModerateContent` funguje) — klamavé toggly | ✅ opraveno (A, +5 testů) |
 > | **R-01** | 🟡 nízká | 00 | FE prahy `role <= 3` cílí na globálního PJ(3), který FE enum nezná (D-053 ho zrušila) — vestigiální past | ✅ opraveno |
+> | **R-20** | ⚖️ politika | 03 | Platformový Admin/Superadmin **vyřazen z governance světů** (rozhodnutí uživatele 2026-06-13); pojistka = jen `restore` opuštěného světa | ✅ aplikováno (+6 testů) |
 >
 > **2. audit vlna (2026-06-04):** K-R5 → **R-05 ✅ opraveno (varianta A)** (canManageAdmins wired: gatuje admin-permissions endpoint, Admin-manager smí delegovat moderaci; canEditPlatformPages skryt — mrtvý) · HN-10 → **R-06 ✅ opraveno** (FE route Hrac práh + BE rozlišený kód) · **SM-06 ✅ konzistentní** (moderace AR owner-only) · **K-R2 ✅ konzistentní** (PomocnyPJ tab-filter BE-autoritativní).
 >
 > **Stav oprav (2026-06-04):** **VŠECH 6 nálezů opraveno + ověřeno** (R-01…R-06). BE: tsc 0, **plný jest 1905/1905** (115 suites, +16 nových testů). FE: tsc 0, eslint čistý, WorldLayout 5/5. Runtime (real-time R-04, `nest start` DI) = lidský/dev test. Git neřešen (commituje uživatel).
+>
+> ---
+>
+> **Doplněk 2026-06-13 — R-20 (politická změna, ne bug): platformový Admin/Superadmin vyřazen z governance světů.**
+> Rozhodnutí uživatele: svět je doména PJ; Admin do něj nesahá (kromě obnovy opuštěného světa). BE [`worlds.service`](../Projekt-ikaros/backend/src/modules/worlds/worlds.service.ts) —
+> odebrán admin bypass ze **4 bran**:
+> - `assertCanModerateAccessRequests` → přijetí/odmítnutí žádosti **vlastník NEBO člen role PJ** (co-PJ; dřív owner|admin, PomocnyPJ ne). Brána je nově `async` (dotahuje membership).
+> - `canAdminWorld` → **jen world PJ** (dřív admin|PJ); kaskáduje na: nastavení světa, soft-delete, **správa členů**
+>   (přes `canManageMembers`), **update světa** name/žánr/systém (přes `canEditWorldData`).
+> - `transferOwnership` → **jen vlastník**. · `updateCalendarDefaults` → **PomocnyPJ+**.
+>
+> **Ponecháno jako pojistka (admin-only, beze změny):** `restore` + `listDeleted`. Admin smí obnovit **JEN**
+> soft-smazaný svět (po zániku účtu PJ se world auto-soft-smaže `owner-safeguard` listenerem `user.deletion.hardDeleted`)
+> v 30denním okně + dosadit nového PJ (`restore(newOwnerId)`). Na živém světě `restore` hodí „svět není smazán" →
+> admin nula moci. Admin si ponechává **read** viditelnost (`applyDetailScope`/`assertMember`) — musí svět vidět, aby ho obnovil.
+>
+> **Ověřeno:** BE tsc 0, **plný jest 1997 pass** (1 fail = pre-existing rulebook seed `pages-world-seed`, mimo), eslint čistý.
+> 2 testy obráceny (admin už nesmí update/reject) + 3 admin-Forbidden (approve/role/transfer) + 1 co-PJ-smí-moderovat. **Necommitnuto (git ručně).**
+> **Rozsah:** jen `worlds.service` governance; admin bypassy v jiných modulech (pages/chat/maps **obsah**) = samostatný budoucí průchod.
+>
+> **FE (2026-06-13) — sjednoceno s BE:** odebrána admin→PJ inflace ze 2 governance komponent:
+> [`WorldSettingsPage`](../Projekt-ikaros-FE/src/features/world/pages/WorldSettingsPage/WorldSettingsPage.tsx) (`effectiveRole`) a
+> [`MembersTab`](../Projekt-ikaros-FE/src/features/world/pages/WorldSettingsPage/tabs/MembersTab.tsx) (`viewerRole`) → platform admin bez world-staff role **nevidí** management taby ani role/odebrání/skupiny → žádné 403 tlačítko.
+> **Ponecháno:** `showFullNav`/`isGlobalAdmin` ve `WorldLayout` (admin **vidí** svět = read) a `isPJ`/`isPJForNav` (obsah: Nová stránka, Deník PJ — BE pages adminovi pořád dovolí, jiný scope). Approve/reject žádostí žije v inboxu „Zpracovat" (`WorldAccessRequestRenderer`) — gatuje BE doručením majiteli/PJ, ne admin flag → beze změny.
+> FE build (tsc -b) 0, eslint čistý, 8/8 WorldSettingsPage+MemberRow specs zelené (1 nesouvisející pre-existing fail `worldNavConfig` — Mapy nav).
 >
 > **Ověřeno vzorně (bez díry):** MA-06/07/08/09 (`operations-authorizer` field-level/isLocked/ownership/dice
 > spoof — vše drží, L2) · PO-09 (write-settings staff-only, controller volá assert před update) ·

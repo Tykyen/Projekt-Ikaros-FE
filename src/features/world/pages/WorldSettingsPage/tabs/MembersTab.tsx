@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Spinner, ConfirmDialog } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
 import {
-  UserRole,
   WorldRole,
   type WorldMembership,
   type WorldSettings,
@@ -53,11 +52,9 @@ export default function MembersTab() {
 
   if (!world) return null;
 
-  const isGlobalAdmin =
-    currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
-  const viewerRole: WorldRole = isGlobalAdmin
-    ? WorldRole.PJ
-    : (userRole ?? WorldRole.Zadatel);
+  // R-20 (role-audit) — platform Admin nemá governance moc; viewerRole = skutečná
+  // world role (admin bez staff role nevidí PJ akce: role, odebrání, skupiny).
+  const viewerRole: WorldRole = userRole ?? WorldRole.Zadatel;
 
   function handleUpdate(payload: UpdateMemberPayload) {
     updateMember.mutate(payload, {

@@ -11,6 +11,7 @@
  */
 
 import type { HeadlineNode } from '@/shared/types';
+import { WorldRole } from '@/shared/types';
 import {
   headlineToNavGroups,
   type NavNode,
@@ -156,6 +157,10 @@ export function buildWorldNav(
   worldSlug: string,
   isPJ: boolean,
   groups: readonly string[] = [],
+  // N-04/05 — položky vázané na world roli routy: zobraz jen když na ně
+  // uživatel reálně dosáhne (jinak klik = tichý redirect na index). Default
+  // „ukaž vše" zachovává náhled 12.2 i testy.
+  canAccess: (min: WorldRole) => boolean = () => true,
 ): NavNode[] {
   const b = `/svet/${worldSlug}`;
   return [
@@ -185,7 +190,10 @@ export function buildWorldNav(
       label: 'Svět',
       items: [
         { label: 'Stránky', to: `${b}/stranky` },
-        { id: 'timeline', label: 'Časová osa', to: `${b}/timeline` },
+        // route `timeline` = memberOnly(Hrac) → skryj Čtenáři (N-05).
+        ...(canAccess(WorldRole.Hrac)
+          ? [{ id: 'timeline', label: 'Časová osa', to: `${b}/timeline` }]
+          : []),
         { id: 'mapa', label: 'Mapa vesmíru', to: `${b}/mapa` },
         { id: 'mapy', label: 'Mapy', to: `${b}/mapy` },
         { id: 'pavucina', label: 'Pavučina', to: `${b}/pavucina` },
@@ -203,7 +211,10 @@ export function buildWorldNav(
         ...(isPJ
           ? [{ id: 'scenare', label: 'Storyboard', to: `${b}/scenare` }]
           : []),
-        { id: 'pocasi', label: 'Generátor počasí', to: `${b}/pocasi` },
+        // route `pocasi` = memberOnly(Hrac) → skryj Čtenáři (N-05).
+        ...(canAccess(WorldRole.Hrac)
+          ? [{ id: 'pocasi', label: 'Generátor počasí', to: `${b}/pocasi` }]
+          : []),
         { id: 'prevodnik-men', label: 'Převodník měn', to: `${b}/prevodnik-men` },
         { id: 'zvuky', label: 'Zvuková databáze', to: `${b}/zvuky` },
         {
@@ -214,7 +225,10 @@ export function buildWorldNav(
         },
       ],
     },
-    { id: 'kalendar', label: 'Kalendář', to: `${b}/kalendar` },
+    // route `kalendar` = memberOnly(PomocnyPJ) „PJ pohled" → skryj hráčům (N-04).
+    ...(canAccess(WorldRole.PomocnyPJ)
+      ? [{ id: 'kalendar', label: 'Kalendář', to: `${b}/kalendar` }]
+      : []),
   ];
 }
 
@@ -250,9 +264,13 @@ export function buildFullWorldNav(
   hiddenNavItems: readonly string[] | undefined,
   customHeadline: readonly HeadlineNode[] | undefined,
   groups: readonly string[] = [],
+  canAccess: (min: WorldRole) => boolean = () => true,
 ): NavNode[] {
   return [
-    ...filterNavByHidden(buildWorldNav(worldSlug, isPJ, groups), hiddenNavItems),
+    ...filterNavByHidden(
+      buildWorldNav(worldSlug, isPJ, groups, canAccess),
+      hiddenNavItems,
+    ),
     ...headlineToNavGroups(customHeadline),
   ];
 }

@@ -82,9 +82,7 @@ const CurrencyPage       = lazy(() => import('@/features/world/pages/CurrencyPag
 const WorldSettingsPage  = lazy(() => import('@/features/world/pages/WorldSettingsPage'));
 const RulesPage          = lazy(() => import('@/features/world/pages/RulesPage'));
 const PagesAdminPage     = lazy(() => import('@/features/world/pages/PagesAdminPage'));
-const WorldDiarySchemaEditorPage = lazy(() => import('@/features/world/pages/WorldDiarySchemaEditorPage'));
 const WorldGmDiaryPage   = lazy(() => import('@/features/world/pages/WorldGmDiaryPage'));
-const WorldEmotesAdminPage = lazy(() => import('@/features/world/pages/WorldEmotesAdminPage/WorldEmotesAdminPage'));
 const CalendarConfigsPage = lazy(() => import('@/features/world/pages/CalendarConfigsPage/CalendarConfigsPage'));
 const WorldHeadlineAdminPage = lazy(() => import('@/features/world/pages/WorldHeadlineAdminPage'));
 const GroupMembersPage   = lazy(() => import('@/features/world/pages/GroupMembersPage'));
@@ -303,30 +301,10 @@ export const router = createBrowserRouter([
           </WorldMembershipGuard>
         ),
       },
-      {
-        // 8.5 — editor šablony deníku světa (PJ+).
-        path: 'admin/sablona-deniku',
-        element: (
-          <WorldMembershipGuard
-            minWorldRole={WorldRole.PJ}
-            fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
-          >
-            {p(WorldDiarySchemaEditorPage)}
-          </WorldMembershipGuard>
-        ),
-      },
-      {
-        path: 'admin/emotes',
-        element: (
-          // 6.4c — PJ + PomocnýPJ DANÉHO světa povoleni, Sa/Admin bypass.
-          <WorldMembershipGuard
-            minWorldRole={WorldRole.PomocnyPJ}
-            fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
-          >
-            {p(WorldEmotesAdminPage)}
-          </WorldMembershipGuard>
-        ),
-      },
+      // N-02/03 — `admin/sablona-deniku` a `admin/emotes` byly orphan routy
+      // (žádný odkaz v UI); sablona-deniku navíc obcházela `minSystem=custom`
+      // gate Settings tabu. Kanonický přístup = záložky v Nastavení světa
+      // (WorldSettingsPage TABS: „Šablona deníku", „Emoty světa").
       {
         path: 'admin/kalendare',
         element: (

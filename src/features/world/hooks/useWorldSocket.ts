@@ -72,6 +72,6 @@ export function useWorldSocket(worldId: string | null): void {
   useSocketEvent<WorldDeletedPayload>('world:deleted', (p) => {
     if (p?.worldId !== worldId) return;
     toast.warning('Tento svět byl právě smazán.');
-    navigate('/ikaros/svety');
+    navigate('/ikaros/vesmiry');
   });
 }
