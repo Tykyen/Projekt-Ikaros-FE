@@ -10,10 +10,7 @@ import { Spinner, Button, ConfirmDialog, ImageLightbox } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMaps } from './api/useWorldMaps';
 import { useWorldMapFolders } from './api/useWorldMapFolders';
-import {
-  useDeleteWorldMap,
-  useReorderWorldMaps,
-} from './api/useWorldMapMutations';
+import { useDeleteWorldMap } from './api/useWorldMapMutations';
 import { useDeleteWorldMapFolder } from './api/useWorldMapFolderMutations';
 import { MapCard } from './components/MapCard';
 import { MapEditorModal } from './components/MapEditorModal';
@@ -34,7 +31,6 @@ export default function WorldMapsPage() {
   const { data: folders = [], isLoading: foldersLoading } =
     useWorldMapFolders(worldId);
   const del = useDeleteWorldMap(worldId);
-  const reorder = useReorderWorldMaps(worldId);
   const delFolder = useDeleteWorldMapFolder(worldId);
 
   const [editMode, setEditMode] = useState(false);
@@ -59,16 +55,21 @@ export default function WorldMapsPage() {
   const q = search.trim().toLowerCase();
 
   // Hledání = ploché napříč všemi mapami; jinak obsah aktuální složky.
-  const visibleMaps = searching
-    ? maps.filter(
-        (m) =>
-          m.title.toLowerCase().includes(q) ||
-          m.description.toLowerCase().includes(q),
-      )
-    : maps.filter((m) => (m.folderId ?? null) === currentFolderId);
-  const subfolders = searching
-    ? []
-    : folders.filter((f) => (f.parentId ?? null) === currentFolderId);
+  // Řazení vždy abecedně (locale `cs` kvůli diakritice).
+  const visibleMaps = (
+    searching
+      ? maps.filter(
+          (m) =>
+            m.title.toLowerCase().includes(q) ||
+            m.description.toLowerCase().includes(q),
+        )
+      : maps.filter((m) => (m.folderId ?? null) === currentFolderId)
+  ).sort((a, b) => a.title.localeCompare(b.title, 'cs'));
+  const subfolders = (
+    searching
+      ? []
+      : folders.filter((f) => (f.parentId ?? null) === currentFolderId)
+  ).sort((a, b) => a.name.localeCompare(b.name, 'cs'));
 
   // Breadcrumb cesta od kořene k aktuální složce.
   const byId = new Map(folders.map((f) => [f.id, f]));
@@ -83,14 +84,6 @@ export default function WorldMapsPage() {
     url: m.imageUrl,
     alt: m.title,
   }));
-
-  function move(idx: number, dir: -1 | 1) {
-    const target = idx + dir;
-    if (target < 0 || target >= visibleMaps.length) return;
-    const next = [...visibleMaps];
-    [next[idx], next[target]] = [next[target], next[idx]];
-    reorder.mutate(next.map((m) => m.id));
-  }
 
   async function confirmDeleteMap() {
     if (!deleteMapTarget) return;
@@ -223,17 +216,13 @@ export default function WorldMapsPage() {
                   key={m.id}
                   map={m}
                   isPJ={isPJ}
-                  editMode={editMode && !searching}
+                  editMode={editMode}
                   onOpen={() => setLightboxIndex(i)}
                   onEdit={() => {
                     setEditingMap(m);
                     setMapEditorOpen(true);
                   }}
                   onDelete={() => setDeleteMapTarget(m)}
-                  onMoveUp={() => move(i, -1)}
-                  onMoveDown={() => move(i, 1)}
-                  canMoveUp={i > 0}
-                  canMoveDown={i < visibleMaps.length - 1}
                 />
               ))}
             </div>

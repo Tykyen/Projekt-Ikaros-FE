@@ -1,12 +1,4 @@
-import {
-  Globe,
-  Lock,
-  Pencil,
-  Trash2,
-  ArrowUp,
-  ArrowDown,
-  ZoomIn,
-} from 'lucide-react';
+import { Globe, Lock, Pencil, Trash2, ZoomIn } from 'lucide-react';
 import type { WorldMapEntry } from '../types';
 import s from './MapCard.module.css';
 
@@ -17,10 +9,6 @@ interface Props {
   onOpen: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
 }
 
 /** 13.4 — karta mapy v atlasu. Náhled + název + popis; PJ vidí chip viditelnosti
@@ -32,10 +20,6 @@ export function MapCard({
   onOpen,
   onEdit,
   onDelete,
-  onMoveUp,
-  onMoveDown,
-  canMoveUp,
-  canMoveDown,
 }: Props) {
   const visCount = map.visibleToPlayerIds.length;
 
@@ -82,22 +66,6 @@ export function MapCard({
 
       {isPJ && editMode && (
         <div className={s.actions}>
-          <button
-            type="button"
-            onClick={onMoveUp}
-            disabled={!canMoveUp}
-            aria-label="Posunout nahoru"
-          >
-            <ArrowUp size={14} aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={onMoveDown}
-            disabled={!canMoveDown}
-            aria-label="Posunout dolů"
-          >
-            <ArrowDown size={14} aria-hidden />
-          </button>
           <button type="button" onClick={onEdit} aria-label="Upravit mapu">
             <Pencil size={14} aria-hidden />
           </button>
