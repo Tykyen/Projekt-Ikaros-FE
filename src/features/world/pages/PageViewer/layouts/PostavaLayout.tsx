@@ -218,7 +218,7 @@ export function PostavaLayout({ page }: Props) {
         page={page}
         playerName={playerName}
         canEdit={canEdit && activeTab === 'profil'}
-        showEditBtn={subdocTabActive && canEdit}
+        showEditBtn={subdocTabActive && !activeAkjTab && canEdit}
         editMode={editMode}
         onToggleEdit={requestToggleEdit}
         worldSlug={worldSlug}
