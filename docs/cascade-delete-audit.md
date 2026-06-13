@@ -8,8 +8,9 @@
 > Výhradně pro **integritu mazání**: zmizí po smazání entity celý závislý strom (žádný orphan, dangling
 > ref, leaklý blob) — a **jen** on (žádné over-cascade na sdílený zdroj)?
 >
-> **Stav: 2026-06-13 — KOMPLETNÍ. 9 nálezů: 6 opraveno (CD-01/02/03/04/08/09), 3 by-design/mitigováno
-> (CD-05 guard, CD-06 self-heal, CD-07 FE-ošetřeno). K-CD10 PII zbývá ověřit.** Orphan-scan (M-SCAN,
+> **Stav: 2026-06-13 — KOMPLETNÍ + UZAVŘENO. 9 nálezů: 6 opraveno (CD-01/02/03/04/08/09), 3 by-design
+> (CD-05 guard, CD-06 self-heal, CD-07 FE-ošetřeno); K-CD10 GDPR ✅ ověřeno (identity PII anonymizováno,
+> zbytek vědomý tombstone). Opravy commitnuty (FE 6f4dab5b, BE 4bb65b0).** Orphan-scan (M-SCAN,
 > L4 reálná čísla z DB) připraven [`tools/orphan-scan.md`](cascade-delete-plan/tools/orphan-scan.md), čeká na DB connection (volitelné).
 
 ---
@@ -126,7 +127,7 @@
 
 ## Zbývá ověřit
 
-- **K-CD10** `GD` — uživatel: anonymizace čistí user dokument, owner safeguard soft-maže světy. Ověřit, že PII **nepřežije** v: `chatmessage.authorId` (alias OK?), `mail.*Id`, friendship recordy, audit log. Oblast 06.
+- **K-CD10 → ✅ ověřeno (GDPR OK, by-design).** Anonymizace ([`anonymizeForHardDelete`](../Projekt-ikaros/backend/src/modules/users/users.repository.ts#L208)) `$unset`-ne identity PII (email, bio, avatar, lastLoginAt, city, emailVerifiedAt). `user.deletion.hardDeleted` → 3 listenery (audit log, owner safeguard, blob cleanup). **Co přežívá je vědomé:** (1) `displayName`/`username` zachováno pro tombstone/@mentions (spec 1.3c); (2) **friendship** nese jen `requesterId`/`recipientId` → **nula PII**; (3) mail `senderName` = totéž zachované `displayName` (konzistentní), `body` je i příjemcova konverzace (nelze jednostranně smazat). Žádný kritický leak. ⚠️ Drobnost (low/produktové): striktní „right to erasure" by chtěl redakci `senderName` + tombstone jména — ale to je právní/produktové rozhodnutí, ne cascade bug.
 - **L4 orphan-scan** — spustit [`tools/orphan-scan.md`](cascade-delete-plan/tools/orphan-scan.md) proti DB → reálná čísla (kolik orphans/dangling/blobů teď existuje). Tvrdý důkaz dopadu.
 - **CC úplnost world cascade** — ověřit, že `WORLD_SCOPED_COLLECTIONS` (40) pokrývá **všechny** world-scoped kolekce (žádný nový modul nezapomenut). M-GRAPH.
 
