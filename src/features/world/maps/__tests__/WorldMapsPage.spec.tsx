@@ -23,10 +23,19 @@ vi.mock('../api/useWorldMapMutations', () => ({
   useDeleteWorldMap: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useReorderWorldMaps: () => ({ mutate: vi.fn(), isPending: false }),
 }));
+vi.mock('../api/useWorldMapFolders', () => ({
+  useWorldMapFolders: () => ({ data: [], isLoading: false }),
+}));
+vi.mock('../api/useWorldMapFolderMutations', () => ({
+  useCreateWorldMapFolder: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useUpdateWorldMapFolder: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useDeleteWorldMapFolder: () => ({ mutateAsync: vi.fn(), isPending: false }),
+}));
 
 function makeMap(over: Partial<WorldMapEntry> = {}): WorldMapEntry {
   return {
     id: `m-${Math.random()}`,
+    folderId: null,
     title: 'Mapa',
     description: '',
     imageUrl: 'https://cdn/m.png',
@@ -45,18 +54,21 @@ describe('WorldMapsPage', () => {
     mapsData.items = [];
   });
 
-  it('PJ: prázdný atlas → tlačítko Upravit; po kliknutí se objeví „Přidat mapu"', () => {
+  it('PJ: prázdný atlas → Upravit; po kliknutí se objeví „Mapa" a „Složka"', () => {
     render(<WorldMapsPage />);
     const editBtn = screen.getByRole('button', { name: 'Upravit' });
     fireEvent.click(editBtn);
-    expect(screen.getAllByText('Přidat mapu').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: 'Mapa' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Složka' }),
+    ).toBeInTheDocument();
   });
 
   it('hráč: prázdný atlas → hláška, žádné „Upravit"', () => {
     ctx.isPJ = false;
     render(<WorldMapsPage />);
     expect(
-      screen.getByText('Zatím tu nejsou žádné mapy pro tebe.'),
+      screen.getByText('Zatím tu pro tebe nic není.'),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Upravit' }),

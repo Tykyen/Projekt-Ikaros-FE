@@ -1,77 +1,85 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Modal, Button } from '@/shared/ui';
-import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/HeroUploadCard';
 import {
-  useCreateWorldMap,
-  useUpdateWorldMap,
-} from '../api/useWorldMapMutations';
-import type { WorldMapEntry, WorldMapFolder } from '../types';
+  useCreateWorldMapFolder,
+  useUpdateWorldMapFolder,
+} from '../api/useWorldMapFolderMutations';
 import { MapVisibilityField } from './MapVisibilityField';
+import type { WorldMapFolder } from '../types';
 import s from './MapEditorModal.module.css';
 
 interface Props {
   open: boolean;
   worldId: string;
-  /** Editovaná mapa; null = nová. */
-  editing?: WorldMapEntry | null;
+  /** Editovaná složka; null = nová. */
+  editing?: WorldMapFolder | null;
   folders: WorldMapFolder[];
-  /** Složka pro novou mapu (= aktuálně otevřená složka). */
-  defaultFolderId: string | null;
+  /** Rodič pro novou složku (= aktuálně otevřená složka). */
+  defaultParentId: string | null;
   onClose: () => void;
 }
 
-/** 13.4 — modal pro přidání / úpravu mapy v atlasu (PJ+). */
-export function MapEditorModal({
+/** 13.4b — modal pro vytvoření / úpravu složky atlasu (PJ+). */
+export function FolderEditorModal({
   open,
   worldId,
   editing,
   folders,
-  defaultFolderId,
+  defaultParentId,
   onClose,
 }: Props) {
   const isEdit = !!editing;
-  const create = useCreateWorldMap(worldId);
-  const update = useUpdateWorldMap(worldId);
+  const create = useCreateWorldMapFolder(worldId);
+  const update = useUpdateWorldMapFolder(worldId);
 
-  const [title, setTitle] = useState(editing?.title ?? '');
-  const [description, setDescription] = useState(editing?.description ?? '');
-  const [imageUrl, setImageUrl] = useState(editing?.imageUrl ?? '');
+  const [name, setName] = useState(editing?.name ?? '');
+  const [parentId, setParentId] = useState<string | null>(
+    editing?.parentId ?? defaultParentId ?? null,
+  );
   const [isPublic, setIsPublic] = useState(editing?.isPublic ?? false);
   const [visibleToPlayerIds, setVisibleToPlayerIds] = useState<string[]>(
     editing?.visibleToPlayerIds ?? [],
   );
-  const [folderId, setFolderId] = useState<string | null>(
-    editing?.folderId ?? defaultFolderId ?? null,
-  );
 
   const pending = create.isPending || update.isPending;
-  const canSave = title.trim().length > 0 && imageUrl.length > 0;
+  const canSave = name.trim().length > 0;
+
+  // Zakázat sebe + potomky jako rodiče (cyklus) — BE chrání taky.
+  const blocked = new Set<string>();
+  if (editing) {
+    const stack: string[] = [editing.id];
+    while (stack.length > 0) {
+      const id = stack.pop();
+      if (id === undefined) break;
+      blocked.add(id);
+      for (const f of folders) if (f.parentId === id) stack.push(f.id);
+    }
+  }
+  const parentOptions = folders.filter((f) => !blocked.has(f.id));
 
   async function handleSave() {
     if (!canSave) {
-      toast.error('Vyplň název a nahraj obrázek mapy.');
+      toast.error('Vyplň název složky.');
       return;
     }
     const payload = {
-      title: title.trim(),
-      description: description.trim(),
-      imageUrl,
+      name: name.trim(),
+      parentId,
       isPublic,
       visibleToPlayerIds: isPublic ? [] : visibleToPlayerIds,
-      folderId,
     };
     try {
       if (isEdit && editing) {
         await update.mutateAsync({ id: editing.id, patch: payload });
-        toast.success('Mapa upravena.');
+        toast.success('Složka upravena.');
       } else {
         await create.mutateAsync(payload);
-        toast.success('Mapa přidána.');
+        toast.success('Složka vytvořena.');
       }
       onClose();
     } catch {
-      toast.error('Uložení mapy selhalo.');
+      toast.error('Uložení složky selhalo.');
     }
   }
 
@@ -79,8 +87,8 @@ export function MapEditorModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? 'Upravit mapu' : 'Nová mapa'}
-      size="lg"
+      title={isEdit ? 'Upravit složku' : 'Nová složka'}
+      size="md"
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={pending}>
@@ -91,55 +99,34 @@ export function MapEditorModal({
             loading={pending}
             disabled={!canSave || pending}
           >
-            {isEdit ? 'Uložit' : 'Přidat'}
+            {isEdit ? 'Uložit' : 'Vytvořit'}
           </Button>
         </>
       }
     >
       <div className={s.body}>
-        <div className={s.row}>
-          <span className={s.label}>Obrázek mapy *</span>
-          <HeroUploadCard
-            value={imageUrl}
-            onChange={setImageUrl}
-            compact
-            uploadCta="Nahrát mapu"
-          />
-        </div>
-
         <label className={s.row}>
           <span className={s.label}>Název *</span>
           <input
             type="text"
             className={s.input}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             maxLength={200}
             autoFocus
           />
         </label>
 
         <label className={s.row}>
-          <span className={s.label}>Popis</span>
-          <textarea
-            className={s.textarea}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            maxLength={2000}
-          />
-        </label>
-
-        <label className={s.row}>
-          <span className={s.label}>Složka</span>
+          <span className={s.label}>Nadřazená složka</span>
           <select
             className={s.input}
-            value={folderId ?? ''}
-            onChange={(e) => setFolderId(e.target.value || null)}
+            value={parentId ?? ''}
+            onChange={(e) => setParentId(e.target.value || null)}
             data-native-select
           >
             <option value="">Kořen (Atlas)</option>
-            {folders.map((f) => (
+            {parentOptions.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name}
               </option>

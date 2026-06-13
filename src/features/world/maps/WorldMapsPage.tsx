@@ -1,120 +1,244 @@
 import { useState } from 'react';
-import { Plus, Map as MapIcon } from 'lucide-react';
+import {
+  Plus,
+  Map as MapIcon,
+  FolderPlus,
+  Search,
+  ChevronRight,
+} from 'lucide-react';
 import { Spinner, Button, ConfirmDialog, ImageLightbox } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMaps } from './api/useWorldMaps';
+import { useWorldMapFolders } from './api/useWorldMapFolders';
 import {
   useDeleteWorldMap,
   useReorderWorldMaps,
 } from './api/useWorldMapMutations';
+import { useDeleteWorldMapFolder } from './api/useWorldMapFolderMutations';
 import { MapCard } from './components/MapCard';
 import { MapEditorModal } from './components/MapEditorModal';
-import type { WorldMapEntry } from './types';
+import { FolderCard } from './components/FolderCard';
+import { FolderEditorModal } from './components/FolderEditorModal';
+import type { WorldMapEntry, WorldMapFolder } from './types';
 import s from './WorldMapsPage.module.css';
 
 /**
- * 13.4 — Mapy: obrázkový atlas světa. Mřížka karet + lightbox. PJ má edit
- * mód (přidat / upravit / smazat / přesun) a per-mapa viditelnost. Hráč vidí
- * jen mapy, na které má přístup (BE filtr).
+ * 13.4 / 13.4b — Mapy: atlas se složkami (vnořený strom). Navigace do hloubky
+ * přes breadcrumb, hledání napříč. PJ má edit mód (složky/mapy CRUD) a
+ * viditelnost per mapa i složka. Hráč vidí jen to, na co má přístup (BE filtr,
+ * kaskáda složek).
  */
 export default function WorldMapsPage() {
   const { worldId, isPJ, loading } = useWorldContext();
-  const { data: maps = [], isLoading } = useWorldMaps(worldId);
+  const { data: maps = [], isLoading: mapsLoading } = useWorldMaps(worldId);
+  const { data: folders = [], isLoading: foldersLoading } =
+    useWorldMapFolders(worldId);
   const del = useDeleteWorldMap(worldId);
   const reorder = useReorderWorldMaps(worldId);
+  const delFolder = useDeleteWorldMapFolder(worldId);
 
   const [editMode, setEditMode] = useState(false);
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editing, setEditing] = useState<WorldMapEntry | null>(null);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [mapEditorOpen, setMapEditorOpen] = useState(false);
+  const [editingMap, setEditingMap] = useState<WorldMapEntry | null>(null);
+  const [folderEditorOpen, setFolderEditorOpen] = useState(false);
+  const [editingFolder, setEditingFolder] = useState<WorldMapFolder | null>(
+    null,
+  );
+  const [deleteMapTarget, setDeleteMapTarget] = useState<WorldMapEntry | null>(
+    null,
+  );
+  const [deleteFolderTarget, setDeleteFolderTarget] =
+    useState<WorldMapFolder | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<WorldMapEntry | null>(null);
 
-  if (loading || isLoading) return <Spinner center />;
+  if (loading || mapsLoading || foldersLoading) return <Spinner center />;
 
-  const lightboxImages = maps.map((m) => ({ url: m.imageUrl, alt: m.title }));
+  const searching = search.trim().length > 0;
+  const q = search.trim().toLowerCase();
 
-  function openCreate() {
-    setEditing(null);
-    setEditorOpen(true);
+  // Hledání = ploché napříč všemi mapami; jinak obsah aktuální složky.
+  const visibleMaps = searching
+    ? maps.filter(
+        (m) =>
+          m.title.toLowerCase().includes(q) ||
+          m.description.toLowerCase().includes(q),
+      )
+    : maps.filter((m) => (m.folderId ?? null) === currentFolderId);
+  const subfolders = searching
+    ? []
+    : folders.filter((f) => (f.parentId ?? null) === currentFolderId);
+
+  // Breadcrumb cesta od kořene k aktuální složce.
+  const byId = new Map(folders.map((f) => [f.id, f]));
+  const crumbs: WorldMapFolder[] = [];
+  let cursor = currentFolderId ? byId.get(currentFolderId) : undefined;
+  while (cursor) {
+    crumbs.unshift(cursor);
+    cursor = cursor.parentId ? byId.get(cursor.parentId) : undefined;
   }
-  function openEdit(m: WorldMapEntry) {
-    setEditing(m);
-    setEditorOpen(true);
-  }
+
+  const lightboxImages = visibleMaps.map((m) => ({
+    url: m.imageUrl,
+    alt: m.title,
+  }));
 
   function move(idx: number, dir: -1 | 1) {
     const target = idx + dir;
-    if (target < 0 || target >= maps.length) return;
-    const next = [...maps];
+    if (target < 0 || target >= visibleMaps.length) return;
+    const next = [...visibleMaps];
     [next[idx], next[target]] = [next[target], next[idx]];
     reorder.mutate(next.map((m) => m.id));
   }
 
-  async function confirmDelete() {
-    if (!deleteTarget) return;
+  async function confirmDeleteMap() {
+    if (!deleteMapTarget) return;
     try {
-      await del.mutateAsync(deleteTarget.id);
+      await del.mutateAsync(deleteMapTarget.id);
     } finally {
-      setDeleteTarget(null);
+      setDeleteMapTarget(null);
+    }
+  }
+  async function confirmDeleteFolder() {
+    if (!deleteFolderTarget) return;
+    try {
+      await delFolder.mutateAsync(deleteFolderTarget.id);
+    } finally {
+      setDeleteFolderTarget(null);
     }
   }
 
-  const empty = maps.length === 0;
+  const nothing = subfolders.length === 0 && visibleMaps.length === 0;
 
   return (
     <article className={s.page}>
       <header className={s.head}>
         <h1 className={s.title}>Mapy</h1>
-        {isPJ && (
-          <div className={s.headActions}>
-            {editMode && (
-              <Button variant="ghost" onClick={openCreate}>
-                <Plus size={16} aria-hidden /> Přidat mapu
-              </Button>
-            )}
-            <Button
-              variant={editMode ? 'primary' : 'ghost'}
-              onClick={() => setEditMode((v) => !v)}
-            >
-              {editMode ? 'Hotovo' : 'Upravit'}
-            </Button>
+        <div className={s.headActions}>
+          <div className={s.searchBox}>
+            <Search size={16} aria-hidden />
+            <input
+              className={s.searchInput}
+              type="search"
+              placeholder="Hledat mapu…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-        )}
+          {isPJ && (
+            <>
+              {editMode && (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setEditingFolder(null);
+                      setFolderEditorOpen(true);
+                    }}
+                  >
+                    <FolderPlus size={16} aria-hidden /> Složka
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setEditingMap(null);
+                      setMapEditorOpen(true);
+                    }}
+                  >
+                    <Plus size={16} aria-hidden /> Mapa
+                  </Button>
+                </>
+              )}
+              <Button
+                variant={editMode ? 'primary' : 'ghost'}
+                onClick={() => setEditMode((v) => !v)}
+              >
+                {editMode ? 'Hotovo' : 'Upravit'}
+              </Button>
+            </>
+          )}
+        </div>
       </header>
 
-      {empty && !editMode ? (
+      {!searching && (
+        <nav className={s.breadcrumb} aria-label="Cesta ve složkách">
+          <button
+            type="button"
+            className={s.crumb}
+            onClick={() => setCurrentFolderId(null)}
+          >
+            Atlas
+          </button>
+          {crumbs.map((f) => (
+            <span key={f.id} className={s.crumbItem}>
+              <ChevronRight size={14} aria-hidden />
+              <button
+                type="button"
+                className={s.crumb}
+                onClick={() => setCurrentFolderId(f.id)}
+              >
+                {f.name}
+              </button>
+            </span>
+          ))}
+        </nav>
+      )}
+
+      {nothing ? (
         <div className={s.empty}>
           <MapIcon size={40} aria-hidden />
           <p>
-            {isPJ
-              ? 'Atlas je prázdný. Zapni „Upravit" a přidej první mapu.'
-              : 'Zatím tu nejsou žádné mapy pro tebe.'}
+            {searching
+              ? 'Nic nenalezeno.'
+              : isPJ
+                ? 'Tady zatím nic není. Zapni „Upravit" a přidej složku nebo mapu.'
+                : 'Zatím tu pro tebe nic není.'}
           </p>
         </div>
       ) : (
-        <div className={s.grid}>
-          {maps.map((m, i) => (
-            <MapCard
-              key={m.id}
-              map={m}
-              isPJ={isPJ}
-              editMode={editMode}
-              onOpen={() => setLightboxIndex(i)}
-              onEdit={() => openEdit(m)}
-              onDelete={() => setDeleteTarget(m)}
-              onMoveUp={() => move(i, -1)}
-              onMoveDown={() => move(i, 1)}
-              canMoveUp={i > 0}
-              canMoveDown={i < maps.length - 1}
-            />
-          ))}
-          {isPJ && editMode && (
-            <button type="button" className={s.addTile} onClick={openCreate}>
-              <Plus size={28} aria-hidden />
-              <span>Přidat mapu</span>
-            </button>
+        <>
+          {subfolders.length > 0 && (
+            <div className={s.folderGrid}>
+              {subfolders.map((f) => (
+                <FolderCard
+                  key={f.id}
+                  folder={f}
+                  isPJ={isPJ}
+                  editMode={editMode}
+                  onOpen={() => setCurrentFolderId(f.id)}
+                  onEdit={() => {
+                    setEditingFolder(f);
+                    setFolderEditorOpen(true);
+                  }}
+                  onDelete={() => setDeleteFolderTarget(f)}
+                />
+              ))}
+            </div>
           )}
-        </div>
+          {visibleMaps.length > 0 && (
+            <div className={s.grid}>
+              {visibleMaps.map((m, i) => (
+                <MapCard
+                  key={m.id}
+                  map={m}
+                  isPJ={isPJ}
+                  editMode={editMode && !searching}
+                  onOpen={() => setLightboxIndex(i)}
+                  onEdit={() => {
+                    setEditingMap(m);
+                    setMapEditorOpen(true);
+                  }}
+                  onDelete={() => setDeleteMapTarget(m)}
+                  onMoveUp={() => move(i, -1)}
+                  onMoveDown={() => move(i, 1)}
+                  canMoveUp={i > 0}
+                  canMoveDown={i < visibleMaps.length - 1}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {lightboxIndex !== null && (
@@ -126,25 +250,48 @@ export default function WorldMapsPage() {
         />
       )}
 
-      {editorOpen && (
+      {mapEditorOpen && (
         <MapEditorModal
-          open={editorOpen}
+          open={mapEditorOpen}
           worldId={worldId}
-          editing={editing}
-          onClose={() => setEditorOpen(false)}
+          editing={editingMap}
+          folders={folders}
+          defaultFolderId={currentFolderId}
+          onClose={() => setMapEditorOpen(false)}
+        />
+      )}
+      {folderEditorOpen && (
+        <FolderEditorModal
+          open={folderEditorOpen}
+          worldId={worldId}
+          editing={editingFolder}
+          folders={folders}
+          defaultParentId={currentFolderId}
+          onClose={() => setFolderEditorOpen(false)}
         />
       )}
 
       <ConfirmDialog
-        open={!!deleteTarget}
+        open={!!deleteMapTarget}
         title="Smazat mapu?"
-        message={`Opravdu smazat mapu „${deleteTarget?.title ?? ''}"? Tuto akci nelze vrátit.`}
+        message={`Opravdu smazat mapu „${deleteMapTarget?.title ?? ''}"? Tuto akci nelze vrátit.`}
         confirmLabel="Smazat"
         cancelLabel="Zrušit"
         confirmVariant="danger"
-        onConfirm={() => void confirmDelete()}
-        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => void confirmDeleteMap()}
+        onClose={() => setDeleteMapTarget(null)}
         isPending={del.isPending}
+      />
+      <ConfirmDialog
+        open={!!deleteFolderTarget}
+        title="Smazat složku?"
+        message={`Smazat složku „${deleteFolderTarget?.name ?? ''}"? Mapy a podsložky se přesunou o úroveň výš, nesmažou se.`}
+        confirmLabel="Smazat"
+        cancelLabel="Zrušit"
+        confirmVariant="danger"
+        onConfirm={() => void confirmDeleteFolder()}
+        onClose={() => setDeleteFolderTarget(null)}
+        isPending={delFolder.isPending}
       />
     </article>
   );

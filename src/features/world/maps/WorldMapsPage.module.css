@@ -59,3 +59,59 @@
   text-align: center;
   color: var(--text-muted);
 }
+
+/* ── Hledání ── */
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  color: var(--text-muted);
+}
+.searchInput {
+  min-width: 140px;
+  padding: var(--sp-2) 0;
+  border: none;
+  background: none;
+  color: var(--text-strong);
+  font-size: var(--text-sm);
+  outline: none;
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: var(--sp-3);
+  font-size: var(--text-sm);
+}
+.crumbItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-muted);
+}
+.crumb {
+  padding: 2px 4px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.crumb:hover {
+  color: var(--text-strong);
+  background: rgb(var(--white-rgb) / 0.06);
+}
+
+/* ── Mřížka složek ── */
+.folderGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
