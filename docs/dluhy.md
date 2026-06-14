@@ -8,12 +8,9 @@
 
 ## Otevřené
 
-### D-NEW-matrix-seed-pravidla-test — seed test čeká prázdná Pravidla, seed vrací FATE
-**Soubor:** BE `backend/src/modules/pages/pages-world-seed.listener.spec.ts:61`
-**Problém:** Test „matrix (zatím bez dodaných dat) → prázdná Pravidla" očekává prázdný `content` stránky Pravidla, ale seed listener pro matrix svět vrací FATE obsah (`<p>Vítej v pravidlech světa Projekt Ikaros. Systém vychází z FATE…</p>`). Pre-existující — selhává i bez nesouvisejících změn (ověřeno `git stash` pages.service.ts → test stále červený). Nalezeno při ověřování upload/media auditu (jediný BE test fail mimo audit).
-**Dopad:** Nízký — 1 BE test červený, produkční seed funguje (matrix Pravidla dostane). Kazí čistotu `jest` běhu.
-**Řešení:** Rozhodnout záměr vs bug. Buď matrix **má** mít FATE Pravidla → aktualizovat test (`expect` FATE obsah místo `''`); nebo seed **nemá** pro matrix vracet FATE default → opravit listener.
-**Kdy:** Při příští práci na seedu světů / Pravidlové knize (matrix), nebo úklidu BE testů.
+> _(Žádné otevřené dluhy — D-NEW-matrix-seed-pravidla-test vyřešen 2026-06-14:
+> test byl zastaralý, matrix svět správně dostává Pravidla z Pravidlové knihy
+> (F1), test aktualizován. BE suite 2009/2009 zelená.)_
 
 ---
 
@@ -35,6 +32,12 @@
 **Stav:** Upload routy mají rate-limit (`@Throttle` 20/min/IP — UM-10, 2026-06-14), což brání rychlému spamu. Chybí ale **kumulativní per-user kvóta** (celková velikost nahraného obsahu) → trpělivý uživatel může postupně zaplnit Cloudinary úložiště.
 **Trigger:** Cloudinary se blíží limitu free/placeného tieru, nebo komerční provoz s neznámými uživateli.
 **Co bude potřeba:** sledovat součet `size` per uživatel (kolekce/agregace), gate v upload service při překročení.
+
+### D-NEW-PC21-embedding-model-host — Embedding modely fyzicky hostovat (zbývá OPS krok)
+**Soubor:** BE `backend/src/modules/search/embedding-search.service.ts:370-396` + `docker-compose.prod.yml` + `.env.example`
+**Stav:** Production-config audit **PC-21 — konfigurační část HOTOVÁ:** model URL (granite107/278 ONNX+tokenizer) jsou teď explicitní a přepsatelné přes env (`EMBEDDING_GRANITE*_ONNX_URL`/`_TOKENIZER_URL`) v compose i `.env.example` (default = `www.patrikzplzne.cz`). Skrytá závislost zviditelněna. **Zbývá jen OPS krok** (mimo kód): nahrát model soubory na vlastní hosting (Cloudinary/S3/BE image) a přepsat ty env vars — to nelze udělat bez přístupu k souborům modelů.
+**Trigger:** příprava ostrého provozu se sémantickým search, nebo nedostupnost `patrikzplzne.cz` ([[project_server_swap]] — sourozenec `newmatrix.patrikzplzne.cz` je mrtvý).
+**Co bude potřeba:** stáhnout 4 model soubory, nahrát na vlastní úložiště, nastavit 4 env vars v GitHub vars / serverovém `.env`.
 
 ### D-NEW-chat-presence-scale — In-memory presence světového chatu × více instancí BE
 **Soubory:** BE `chat/chat-presence.service.ts`

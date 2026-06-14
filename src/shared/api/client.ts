@@ -62,20 +62,16 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
       const store = getDefaultStore();
-      const refreshToken = store.get(refreshTokenAtom);
-
-      if (!refreshToken) {
-        logoutAndRedirectToLogin();
-        return Promise.reject(error);
-      }
 
       try {
+        // PC-18: refresh token je v httpOnly cookie → prázdné body + withCredentials.
+        // Cookie rozhoduje (po reloadu žádný token v JS, cookie přesto platí).
         const { data: refreshData } = await axios.post<RefreshResponse>(
           `${apiBase}/api/auth/refresh`,
-          { refreshToken },
+          {},
+          { withCredentials: true },
         );
         store.set(accessTokenAtom, refreshData.accessToken);
-        store.set(refreshTokenAtom, refreshData.refreshToken);
         original.headers = original.headers ?? {};
         original.headers.Authorization = `Bearer ${refreshData.accessToken}`;
         return apiClient(original);

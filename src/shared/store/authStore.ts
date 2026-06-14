@@ -3,7 +3,9 @@ import { atomWithStorage } from 'jotai/utils';
 import type { User } from '@/shared/types';
 
 export const accessTokenAtom = atomWithStorage<string | null>('ikaros.jwt', null);
-export const refreshTokenAtom = atomWithStorage<string | null>('ikaros.rt', null);
+// PC-18: refresh token žije v httpOnly cookie (mimo dosah XSS), NE v localStorage.
+// Atom je už jen in-memory (nepersistuje) — refresh běží přes cookie (viz client.ts).
+export const refreshTokenAtom = atom<string | null>(null);
 export const currentUserAtom = atomWithStorage<User | null>('ikaros.user', null);
 
 // 5s undo logout — když je nastavený, UI se chová jako logged-out

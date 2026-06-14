@@ -89,11 +89,9 @@ export function useLogout() {
     setPendingLogout({ startedAt: Date.now() });
 
     const timerId = window.setTimeout(() => {
-      const refreshToken = store.get(refreshTokenAtom);
-      if (refreshToken) {
-        // Fire-and-forget — BE invalidace, ale FE čistí store i kdyby selhalo
-        api.post('/auth/logout', { refreshToken }).catch(() => {});
-      }
+      // PC-18: refresh token v httpOnly cookie → logout bez body (cookie se pošle).
+      // Fire-and-forget — BE invalidace + clear cookie, FE čistí store i kdyby selhalo.
+      api.post('/auth/logout', {}).catch(() => {});
       store.set(accessTokenAtom, null);
       store.set(refreshTokenAtom, null);
       store.set(currentUserAtom, null);

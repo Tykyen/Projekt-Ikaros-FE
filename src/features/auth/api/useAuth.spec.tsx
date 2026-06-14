@@ -208,9 +208,8 @@ describe('useLogout', () => {
     expect(store.get(refreshTokenAtom)).toBeNull();
     expect(store.get(currentUserAtom)).toBeNull();
     expect(store.get(pendingLogoutAtom)).toBeNull();
-    expect(api.post).toHaveBeenCalledWith('/auth/logout', {
-      refreshToken: 'refresh-token',
-    });
+    // PC-18: logout bez body (refresh token v httpOnly cookie).
+    expect(api.post).toHaveBeenCalledWith('/auth/logout', {});
   });
 
   it('cancel funkce zruší timer a obnoví UI', () => {
