@@ -1,4 +1,5 @@
 ﻿import axios, { type AxiosError } from 'axios';
+import { toast } from 'sonner';
 import { getDefaultStore } from 'jotai';
 import { router } from '@/app/router';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
@@ -76,6 +77,8 @@ apiClient.interceptors.response.use(
         original.headers.Authorization = `Bearer ${refreshData.accessToken}`;
         return apiClient(original);
       } catch {
+        // EC-09 (F6): dej uživateli vědět, proč ho to odhlásilo (dřív tichý redirect).
+        toast.info('Přihlášení vypršelo, přihlas se prosím znovu.');
         logoutAndRedirectToLogin();
         return Promise.reject(error);
       }
@@ -89,9 +92,11 @@ export function parseApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiError | undefined;
     const msg = data?.error?.message;
-    if (msg) {
-      return Array.isArray(msg) ? msg[0] : msg;
-    }
+    const first = Array.isArray(msg) ? msg[0] : msg;
+    // EC-12 (F6): vynuť string. Primitiva převeď, objekt/null/prázdné → fallback
+    // (String(objekt) by dalo „[object Object]", což je horší než axios message).
+    if (typeof first === 'string' && first !== '') return first;
+    if (typeof first === 'number' || typeof first === 'boolean') return String(first);
     return error.message;
   }
   return 'Neznámá chyba';
@@ -102,7 +107,8 @@ export function parseApiError(error: unknown): string {
 export function parseApiErrorCode(error: unknown): string | null {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiError | undefined;
-    return data?.error?.code ?? null;
+    const code = data?.error?.code;
+    return code != null ? String(code) : null; // EC-12: vynuť string
   }
   return null;
 }

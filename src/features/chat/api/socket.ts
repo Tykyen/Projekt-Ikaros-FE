@@ -31,6 +31,12 @@ export function getSocket(): Socket {
   socket.on('connect', () => store.set(socketStatusAtom, 'connected'));
   socket.on('disconnect', () => store.set(socketStatusAtom, 'disconnected'));
   socket.on('connect_error', () => store.set(socketStatusAtom, 'error'));
+  // F5 (EC-06) — globální záchyt server-push `error` eventů. Bez něj se chyba
+  // z gateway bez vlastního listeneru tiše ztratí (dřív řešila jen taktická mapa).
+  // Komponenty s vlastním UX (mapa: toast) si event navíc odchytí samy.
+  socket.on('error', (payload: unknown) => {
+    console.error('[socket] server error event', payload);
+  });
 
   store.set(socketStatusAtom, 'connecting');
   return socket;

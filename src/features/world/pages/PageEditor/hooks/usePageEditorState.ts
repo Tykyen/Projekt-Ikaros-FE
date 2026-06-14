@@ -97,7 +97,10 @@ export function pageToFormState(page: Page): PageEditorFormState {
     accessRequirements: page.accessRequirements,
     expectedUpdatedAt: page.updatedAt,
     ownerUserId: page.ownerUserId ?? '',
-    akjTabs: page.akjTabs ?? [],
+    // `locked` je read-time enrich ze serveru (zámek pro hráče bez přístupu) —
+    // do editoru ani uložení nepatří; jinak PATCH spadne na forbidNonWhitelisted
+    // („akjTabs.N.property locked should not exist"). Strip při načtení.
+    akjTabs: (page.akjTabs ?? []).map(({ locked: _locked, ...t }) => t),
   };
 }
 

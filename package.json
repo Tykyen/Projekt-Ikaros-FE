@@ -18,6 +18,7 @@
     "audit:nav": "node scripts/nav-audit.mjs",
     "audit:ws": "node scripts/ws-audit.mjs",
     "audit:config": "node scripts/prod-config-scan.mjs",
+    "audit:errors": "node scripts/error-contract-scan.mjs --contract",
     "lint:colors": "node scripts/lint-no-hardcoded-colors.mjs",
     "audit:contrast": "node scripts/audit-theme-contrast.mjs",
     "export-schemas": "node scripts/export-schemas.mjs",

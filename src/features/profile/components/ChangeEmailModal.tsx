@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { parseApiErrorCode } from '@/shared/api';
 import { Modal, Input, Button } from '@/shared/ui';
 import {
   emailChangeSchema,
@@ -10,11 +11,6 @@ import {
 } from '../lib/emailChangeSchema';
 import { useEmailChangeRequest } from '../api/useEmailChangeRequest';
 import s from './ChangeEmailModal.module.css';
-
-interface ApiError {
-  code?: string;
-  message?: string;
-}
 
 interface Props {
   open: boolean;
@@ -56,8 +52,9 @@ export function ChangeEmailModal({ open, onClose, currentEmail }: Props) {
       close();
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        const data = err.response?.data as ApiError | undefined;
-        const code = data?.code;
+        // EC-08 fix: čteme přes parseApiErrorCode (wrapped `data.error.code`).
+        // Dřív lokální flat typ `data.code` → vždy undefined → field-mapping mrtvý.
+        const code = parseApiErrorCode(err);
         if (code === 'INVALID_PASSWORD') {
           setError('currentPassword', { message: 'Heslo nesouhlasí' });
           return;

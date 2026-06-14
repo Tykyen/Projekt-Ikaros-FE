@@ -174,14 +174,16 @@ export function WorldSection() {
             Seznam postav světa ve třech sekcích — Postavy hráčů, NPC a Lokace — s
             filtrem typu. Karta ukazuje avatar, jméno a typ. PJ má Nová postava (typ,
             jméno, slug, avatar, popis; u hráčské výběr hráče); po vytvoření vznikne
-            deník, kalendář a podle typu finance s výbavou.
+            deník a kalendář. Finance a Výbavu mají <strong>jen postavy hráčů</strong>
+            {' '}(PC) — NPC a Lokace je nemají.
           </p>
         </Tool>
         <Tool icon={<FileText size={16} />} title="Detail postavy" audience={{ kind: 'vse', label: 'Členové (úpravy PJ/vlastník)' }}>
           <p>
             Karta postavy se šesti záložkami: <strong>Profil</strong> (veřejný) a pět
             soukromých — <strong>Deník, Finance, Výbava, Kalendář, Poznámky</strong>{' '}
-            (vidí PJ, Pomocný PJ a vlastník). Postava může mít chráněné (AKJ) záložky;
+            (vidí PJ, Pomocný PJ a vlastník). Finance a Výbavu mají jen postavy hráčů;
+            u NPC a Lokací se tyto dvě záložky nezobrazí. Postava může mít chráněné (AKJ) záložky;
             nová rovnou dostane záložku „Soukromé". Deník vypadá podle herního systému
             světa (12 dedikovaných šablon, jinak generická).
           </p>

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { toast } from 'sonner';
-import axios from 'axios';
+import { parseApiErrorCode } from '@/shared/api';
 import { Input, Button } from '@/shared/ui';
 import {
   resetPasswordSchema,
@@ -15,19 +15,6 @@ import { PasswordStrengthIndicator } from '../components/PasswordStrengthIndicat
 import { openForgotPasswordModalAtom } from '@/shared/store/authStore';
 import s from './ResetPasswordPage.module.css';
 
-interface ApiError {
-  code?: string;
-  message?: string;
-}
-
-function extractCode(err: unknown): string | null {
-  if (axios.isAxiosError(err)) {
-    const data = err.response?.data as ApiError | undefined;
-    return data?.code ?? null;
-  }
-  return null;
-}
-
 function codeToMessage(code: string | null): string {
   switch (code) {
     case 'INVALID_TOKEN':
@@ -36,8 +23,8 @@ function codeToMessage(code: string | null): string {
       return 'Reset link vypršel. Požádej o nový.';
     case 'ALREADY_USED':
       return 'Reset link byl už použit. Požádej o nový.';
-    case 'WEAK_PASSWORD':
-      return 'Heslo nesplňuje minimální požadavky.';
+    // (WEAK_PASSWORD odstraněn — BE ho nehází; slabé heslo blokne client-side zod,
+    //  případně BE vrátí VALIDATION → default hláška. EC-contract: mrtvá větev.)
     default:
       return 'Reset hesla se nezdařil. Zkus to znovu.';
   }
@@ -115,7 +102,7 @@ export default function ResetPasswordPage() {
       }
       navigate('/?openLogin=1');
     } catch (err) {
-      setErrorCode(extractCode(err) ?? 'UNKNOWN');
+      setErrorCode(parseApiErrorCode(err) ?? 'UNKNOWN'); // EC-08 fix: wrapped data.error.code
     }
   }
 
