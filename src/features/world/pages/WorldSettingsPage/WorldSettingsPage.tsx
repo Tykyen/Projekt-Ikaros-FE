@@ -132,11 +132,12 @@ const TABS: SettingsTab[] = [
     render: () => <WorldEmotesAdminPage />,
   },
   {
-    // 9.2b — multi-config kalendáře světa (PJ+). Přesun z world nav 2026-05-25.
+    // 9.2b — multi-config kalendáře světa. N-08: PomocnyPJ (parita s BE
+    // calendar-config write floor). Přesun z world nav 2026-05-25.
     id: 'kalendare',
     label: 'Kalendáře',
     icon: <Calendar size={18} />,
-    minRole: WorldRole.PJ,
+    minRole: WorldRole.PomocnyPJ,
     render: () => <CalendarConfigsPage />,
   },
   {

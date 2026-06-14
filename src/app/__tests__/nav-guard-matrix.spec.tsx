@@ -128,11 +128,11 @@ const CONFIGS: Cfg[] = [
   // router.tsx:251 — kalendar
   { name: 'memberOnly(PomocnyPJ) [kalendar]', make: memberOnly(WorldRole.PomocnyPJ),
     exp: ['r', 'p', 'p', 'r', 'r', 'r', 'r', 'r', 'p', 'p'] },
-  // router.tsx:264/284/319 — scenare, denik-pj, admin/emotes (bez redirectu → 403)
-  { name: 'WMG(PomocnyPJ) [scenare/denik-pj/admin-emotes]', make: wmg(WorldRole.PomocnyPJ),
+  // scenare, denik-pj, admin/stranky (N-07), admin/kalendare (N-08) — bez redirectu → 403
+  { name: 'WMG(PomocnyPJ) [scenare/denik-pj/admin-stranky/admin-kalendare]', make: wmg(WorldRole.PomocnyPJ),
     exp: ['f', 'p', 'p', 'f', 'f', 'f', 'f', 'f', 'p', 'p'] },
-  // router.tsx:295.. — admin/stranky|sablona-deniku|kalendare|headline
-  { name: 'WMG(PJ) [admin/*]', make: wmg(WorldRole.PJ),
+  // admin/headline (admin/emotes a sablona-deniku jsou nově Settings taby, ne routy)
+  { name: 'WMG(PJ) [admin/headline]', make: wmg(WorldRole.PJ),
     exp: ['f', 'p', 'p', 'f', 'f', 'f', 'f', 'f', 'f', 'p'] },
   // router.tsx:194/203/214 — /admin, dungeon-builder, ikaros/admin/emotes
   { name: 'RoleGuard[Sa,Admin]', make: roleGuard(SA_ADMIN),

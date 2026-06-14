@@ -292,9 +292,10 @@ export const router = createBrowserRouter([
       {
         path: 'admin/stranky',
         element: (
-          // D-053b — membership-based: PJ DANÉHO světa povolen, Sa/Admin bypass.
+          // D-053b — membership-based, Sa/Admin bypass. N-07: PomocnyPJ (parita
+          // s BE `pages.assertCanWrite` = PomocnyPJ; PJ-only by lhalo o přístupu).
           <WorldMembershipGuard
-            minWorldRole={WorldRole.PJ}
+            minWorldRole={WorldRole.PomocnyPJ}
             fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
           >
             {p(PagesAdminPage)}
@@ -308,9 +309,10 @@ export const router = createBrowserRouter([
       {
         path: 'admin/kalendare',
         element: (
-          // 9.2b — Multi-config kalendáře (PJ+).
+          // 9.2b — Multi-config kalendáře. N-08: PomocnyPJ (parita s BE
+          // `world-calendar-config.assertCanWrite` = PomocnyPJ).
           <WorldMembershipGuard
-            minWorldRole={WorldRole.PJ}
+            minWorldRole={WorldRole.PomocnyPJ}
             fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
           >
             {p(CalendarConfigsPage)}
