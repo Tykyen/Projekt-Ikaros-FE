@@ -51,12 +51,16 @@ describe('WorldSettingsPage — gating tabů dle role', () => {
     ]);
   });
 
-  it('PomocnyPJ vidí navíc Členy a AKJ úrovně (8 tabů)', () => {
+  it('PomocnyPJ vidí navíc Členy, AKJ úrovně a PJ v chatu (11 tabů)', () => {
     renderWithRole(WorldRole.PomocnyPJ);
-    expect(screen.getAllByRole('tab')).toHaveLength(8);
+    expect(screen.getAllByRole('tab')).toHaveLength(11);
     expect(screen.getByRole('tab', { name: /Členové/ })).toBeInTheDocument();
     expect(
       screen.getByRole('tab', { name: /AKJ úrovně/ }),
+    ).toBeInTheDocument();
+    // 6.8-followup — „PJ v chatu" snížen na PomocnyPJ (self „Můj obrázek vedení").
+    expect(
+      screen.getByRole('tab', { name: /PJ v chatu/ }),
     ).toBeInTheDocument();
   });
 

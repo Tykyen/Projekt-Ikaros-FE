@@ -134,3 +134,63 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* 6.8-followup — přepínač režimu vedení (Anonymně / Rozpoznatelně). */
+.modeGroup {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.modeCard {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1px solid var(--frame-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.modeCard:hover {
+  border-color: var(--accent);
+}
+.modeCardActive {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.modeName {
+  font-weight: 600;
+  font-size: 14px;
+}
+.modeDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Poznámka u režimu Rozpoznatelně / pod self-editorem. */
+.note {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  border-left: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Nadpis self-editoru „Můj obrázek vedení". */
+.subheading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}

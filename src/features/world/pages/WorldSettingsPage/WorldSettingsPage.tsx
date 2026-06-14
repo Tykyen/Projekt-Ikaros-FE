@@ -115,11 +115,12 @@ const TABS: SettingsTab[] = [
     render: () => <PageTemplatesTab />,
   },
   {
-    // 6.8 — PJ identita v chatu (jméno + avatar persony „PJ").
+    // 6.8 / 6.8-followup — PJ identita v chatu i headeru. Viditelný od PomocnyPJ
+    // (kvůli self-service „Můj obrázek vedení"); přepínač režimu uvnitř je PJ-only.
     id: 'pj-chat',
     label: 'PJ v chatu',
     icon: <Theater size={18} />,
-    minRole: WorldRole.PJ,
+    minRole: WorldRole.PomocnyPJ,
     render: () => <PjChatTab />,
   },
   {

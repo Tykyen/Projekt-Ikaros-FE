@@ -190,7 +190,9 @@ export function WorldSection() {
           <CalloutBox variant="tip" title="Finance">
             Postava má až 20 účtů (osobní/společné/tajné), historii transakcí a
             převody. PJ může hráči povolit samostatný vklad/výběr. „Zaúčtovat měsíc"
-            pracuje s herním datem světa.
+            pracuje s herním datem světa. Když PJ změní měnu účtu, může ji nechat{' '}
+            <strong>přepočítat kurzem</strong> (zůstatek i historii), nebo jen
+            přeznačit.
           </CalloutBox>
         </Tool>
         <Tool icon={<Backpack size={16} />} title="Osobní výbava" audience={{ kind: 'hrac', label: 'Hráč + PJ' }}>
@@ -450,11 +452,14 @@ export function WorldSection() {
             30 skiny. Vzhled svých zpráv i kostek si nastavíš zvlášť pro každý svět.
           </CalloutBox>
           <p>
-            Vedení světa (PJ i Pomocný PJ) vystupuje v chatu pod jednotnou
-            identitou <strong>„PJ"</strong> místo přihlašovacího jména — kvůli
-            tajemství. PJ si jméno a avatar persony nastaví v Nastavení světa →{' '}
-            <strong>PJ v chatu</strong> a projeví se i na starších zprávách.
-            Když PJ píše „za bytost" (NPC mód), zůstává tou bytostí.
+            Vedení světa (PJ i Pomocný PJ) může v chatu vystupovat{' '}
+            <strong>anonymně</strong> (všichni jako jedno „PJ" — kvůli tajemství),
+            nebo <strong>rozpoznatelně</strong> (každý se svým obrázkem a svou rolí,
+            takže poznáš, který PJ ti píše). Režim přepíná PJ v Nastavení světa →{' '}
+            <strong>PJ v chatu</strong>; vlastní obrázek vedení si v režimu
+            „rozpoznatelně" nastaví každý PJ i Pomocný PJ sám (tamtéž, „Můj obrázek
+            vedení"). Projeví se zpětně i na starších zprávách. Když PJ píše „za
+            bytost" (NPC mód), zůstává tou bytostí.
           </p>
         </Tool>
         <Tool icon={<Music size={16} />} title="Zvuky (jukebox)" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="info">

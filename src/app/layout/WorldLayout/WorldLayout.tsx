@@ -31,6 +31,7 @@ import { buildFullWorldNav } from '@/features/world/lib/worldNavConfig';
 import type { NavNode, NavLinkItem } from '@/features/world/lib/headlineNav';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
+import { resolvePersona } from './resolvePersona';
 
 /* ── Nav ── */
 // Systémová nav + filtrace + vlastní headline (12.2) žijí v `worldNavConfig.ts`
@@ -418,17 +419,21 @@ export function WorldLayout() {
     };
   }, []);
 
-  // Spec 5.1 — slot „aktuální přihlášená postava". Fáze 8 dotáhne reálnou
-  // postavu; do té doby fallback na username účtu. Neklikatelné.
-  const personaName =
-    ctxValue.character?.name ??
-    currentUser?.username ??
-    'Účet';
-  const personaAvatar =
-    ctxValue.character?.avatarUrl ??
-    currentUser?.profileImageUrl ??
-    currentUser?.avatarUrl ??
-    null;
+  // 6.8-followup / 5.1 — persona slot headeru. Vedení (PJ/Pomocný PJ) → role +
+  // persona avatar (klik → deník PJ); hráč s postavou → postava (klik → profil);
+  // jinak username (neklik). Větvení drží `resolvePersona` (čistý, testovatelný).
+  const persona = resolvePersona({
+    worldSlug,
+    role: (membership?.role ?? null) as WorldRole | null,
+    character: ctxValue.character,
+    pjPersonaAvatarUrl: membership?.pjPersonaAvatarUrl,
+    pjMode: settings?.pjChatPersona?.mode ?? 'unified',
+    sharedPjAvatar: settings?.pjChatPersona?.avatarUrl ?? null,
+    account: {
+      username: currentUser?.username,
+      avatarUrl: currentUser?.profileImageUrl ?? currentUser?.avatarUrl ?? null,
+    },
+  });
 
   return (
     <WorldContext.Provider value={ctxValue}>
@@ -520,16 +525,33 @@ export function WorldLayout() {
                   ⚙
                 </Link>
 
-                {/* Spec 5.1 — slot postavy (fallback na účet), neklikatelné */}
-                <div className={s.persona} title={personaName}>
-                  <UserAvatar
-                    src={personaAvatar}
-                    defaultType={currentUser?.defaultAvatarType}
-                    size="sm"
-                    alt={personaName}
-                  />
-                  <span className={s.personaName}>{personaName}</span>
-                </div>
+                {/* 6.8-followup — persona slot: postava (klik→profil) / vedení
+                    (klik→deník PJ) / username (neklik). */}
+                {persona.to ? (
+                  <Link
+                    to={persona.to}
+                    className={clsx(s.persona, s.personaLink)}
+                    title={persona.name}
+                  >
+                    <UserAvatar
+                      src={persona.avatarUrl}
+                      defaultType={currentUser?.defaultAvatarType}
+                      size="sm"
+                      alt={persona.name}
+                    />
+                    <span className={s.personaName}>{persona.name}</span>
+                  </Link>
+                ) : (
+                  <div className={s.persona} title={persona.name}>
+                    <UserAvatar
+                      src={persona.avatarUrl}
+                      defaultType={currentUser?.defaultAvatarType}
+                      size="sm"
+                      alt={persona.name}
+                    />
+                    <span className={s.personaName}>{persona.name}</span>
+                  </div>
+                )}
               </div>
 
               <button

@@ -14,6 +14,7 @@ import {
 } from '../../../api/useCharacterAccounts';
 import type { CharacterAccount } from '../../../api/characters.types';
 import { CurrencySelect } from '@/features/world/currencies/shared';
+import { ChangeCurrencyDialog } from './ChangeCurrencyDialog';
 import s from './accounts.module.css';
 
 interface Props {
@@ -47,6 +48,7 @@ export function SettingsAccountSection({ account, onDeleted }: Props) {
   );
   const [coOwnerToAdd, setCoOwnerToAdd] = useState('');
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [currencyDialogOpen, setCurrencyDialogOpen] = useState(false);
 
   const characters = directory.data ?? [];
   const currencyList = currencies.data?.items ?? [];
@@ -58,18 +60,30 @@ export function SettingsAccountSection({ account, onDeleted }: Props) {
     allowPlayerSelfAdjust !== (account.allowPlayerSelfAdjust ?? false);
 
   function handleSaveSettings() {
-    update.mutate(
-      {
-        accountType,
-        accessLocationCharacterId: accessLocId || null,
-        currency,
-        allowPlayerSelfAdjust,
-      },
-      {
-        onSuccess: () => toast.success('Nastavení uloženo'),
-        onError: () => toast.error('Uložení selhalo'),
-      },
-    );
+    // 8.x currency-conversion — měna jde přes dedikovaný dialog (přepočet kurzem
+    // vs jen přeznačit), ne tichým uložením. Ostatní settings uloží rovnou.
+    const currencyChanged = currency !== account.currency;
+    const othersChanged =
+      accountType !== account.accountType ||
+      accessLocId !== (account.accessLocation?.characterId ?? '') ||
+      allowPlayerSelfAdjust !== (account.allowPlayerSelfAdjust ?? false);
+
+    if (othersChanged) {
+      update.mutate(
+        {
+          accountType,
+          accessLocationCharacterId: accessLocId || null,
+          allowPlayerSelfAdjust,
+        },
+        {
+          onSuccess: () => {
+            if (!currencyChanged) toast.success('Nastavení uloženo');
+          },
+          onError: () => toast.error('Uložení selhalo'),
+        },
+      );
+    }
+    if (currencyChanged) setCurrencyDialogOpen(true);
   }
 
   function handleAddCoOwner() {
@@ -297,6 +311,20 @@ export function SettingsAccountSection({ account, onDeleted }: Props) {
         onConfirm={handleDelete}
         isPending={deleteMut.isPending}
       />
+
+      {currencyDialogOpen && (
+        <ChangeCurrencyDialog
+          worldId={worldId}
+          account={account}
+          targetCurrency={currency}
+          items={currencyList}
+          onClose={() => {
+            setCurrencyDialogOpen(false);
+            setCurrency(account.currency);
+          }}
+          onDone={() => setCurrencyDialogOpen(false)}
+        />
+      )}
     </section>
   );
 }

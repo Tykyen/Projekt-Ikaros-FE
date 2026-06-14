@@ -105,6 +105,33 @@ export function useUpdateAccount(worldId: string, accountId: string) {
   });
 }
 
+/**
+ * 8.x currency-conversion — změna měny účtu. `convert:true` přepočítá kurzem
+ * (zůstatek + historie + šablony), `convert:false` jen přeznačí kód.
+ */
+export interface ChangeCurrencyInput {
+  currency: string;
+  convert: boolean;
+}
+
+export function useChangeAccountCurrency(worldId: string, accountId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: ChangeCurrencyInput) =>
+      api.patch<CharacterAccount>(
+        `/worlds/${worldId}/accounts/${accountId}/currency`,
+        input,
+      ),
+    onSuccess: (account) => {
+      qc.setQueryData(
+        charactersQueryKey.accountDetail(worldId, accountId),
+        account,
+      );
+      void qc.invalidateQueries({ queryKey: ['characters', worldId] });
+    },
+  });
+}
+
 export function useDeleteAccount(worldId: string, accountId: string) {
   const qc = useQueryClient();
   return useMutation({

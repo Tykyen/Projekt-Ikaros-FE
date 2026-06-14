@@ -248,7 +248,7 @@
 }
 .actionBtn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
 
-/* ── Slot postavy (Spec 5.1) — neklikatelné, fallback na účet ── */
+/* ── Persona slot (Spec 5.1 / 6.8-followup) — postava / vedení / účet ── */
 .persona {
   display: flex;
   align-items: center;
@@ -258,6 +258,24 @@
   border-radius: 999px;
   max-width: 180px;
   flex-shrink: 0;
+}
+
+/* 6.8-followup — klikatelná varianta slotu (postava → profil, vedení → deník PJ). */
+.personaLink {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.personaLink:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+}
+.personaLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .personaName {
@@ -451,7 +469,13 @@
   .searchIconBtn { display: none; }
   /* Spec 5.1 — na mobilu slot postavy jen avatar (jméno by tlačilo header) */
   .personaName { display: none; }
-  .persona { max-width: none; }
+  /* 6.8-followup — touch target ≥ 44px (slot je klikatelný). */
+  .persona {
+    max-width: none;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
   /* Spec 5.1 — „Nová stránka" je na mobilu v draweru (drawerNewPage) */
   .newPageBtn { display: none; }
   /* Krok 5.7a — touch target ikon (pošta, nastavení) ≥ 44px na mobilu */

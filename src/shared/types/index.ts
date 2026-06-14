@@ -435,6 +435,11 @@ export interface WorldMembership {
    * fallbackuje na `user.avatarUrl`. Viz `worldMemberAvatar.ts`.
    */
   avatarUrl?: string;
+  /**
+   * 6.8-followup — per-člen avatar vedení. V režimu `individual` vystupuje
+   * PJ/Pomocný PJ v chatu i headeru s tímto obrázkem; chybí → fallback na účet.
+   */
+  pjPersonaAvatarUrl?: string;
   /** 5.3 — AKJ úroveň člena (stupňovaná prověrka viditelnosti stránek). */
   akj?: number;
   /** Krok 5.9 — per-uživatel per-svět doladění vzhledu (přístupnost). */
@@ -552,6 +557,12 @@ export interface PjChatPersona {
   enabled: boolean;
   name: string | null;
   avatarUrl: string | null;
+  /**
+   * 6.8-followup — režim vystupování vedení. `unified` = jednotná anonymní „PJ"
+   * (default), `individual` = každý PJ/Pomocný PJ pod svou rolí + vlastním avatarem.
+   * `undefined` (stará cache) → resolver bere jako `unified`.
+   */
+  mode?: 'unified' | 'individual';
 }
 
 export interface WorldSettings {
