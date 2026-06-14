@@ -12,7 +12,7 @@ import type { ChatMessage } from '../lib/types';
 import { parseEmotes } from '../lib/emotes';
 import { resolveTombstone } from '@/shared/lib/tombstone';
 import { guardChatColor } from '../lib/chatColorGuard';
-import { formatTime } from '../lib/format';
+import { formatTime, formatChatStamp, formatChatFull } from '../lib/format';
 import { EmojiPickerPopover } from './EmojiPickerPopover';
 import { MessageAttachments } from './MessageAttachments';
 import { DiceMessage } from '@/features/world/chat/dice/components/DiceMessage';
@@ -130,6 +130,9 @@ export function MessageItem({
   const isFailed = message._status === 'failed';
   const isDice = !!message.isDiceRoll;
   const time = formatTime(message.createdAt);
+  // Datum-aware štítek (stáří příspěvku) + plný tooltip; sdílí oba chaty.
+  const stamp = formatChatStamp(message.createdAt);
+  const stampFull = formatChatFull(message.createdAt);
 
   const rawText = message.content ?? '';
   const content = renderContent
@@ -208,7 +211,7 @@ export function MessageItem({
           {!grouped && (
             <div className={s.meta}>
               <span className={s.name}>{displayName}</span>
-              {time && <time className={s.time}>{time}</time>}
+              {stamp && <time className={s.time} title={stampFull}>{stamp}</time>}
             </div>
           )}
           <span className={s.deletedText}>
@@ -303,7 +306,7 @@ export function MessageItem({
               NPC
             </span>
           )}
-          {time && <time className={s.time}>{time}</time>}
+          {stamp && <time className={s.time} title={stampFull}>{stamp}</time>}
           {message.isEdited && (
             <span className={s.editedBadge}>(upraveno)</span>
           )}
@@ -364,7 +367,7 @@ export function MessageItem({
             {content}
           </span>
         )}
-        {grouped && time && <time className={s.timeHover}>{time}</time>}
+        {grouped && time && <time className={s.timeHover} title={stampFull}>{time}</time>}
 
         {!editing && (
           <div className={s.actions}>

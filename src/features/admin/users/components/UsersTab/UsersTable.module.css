@@ -106,6 +106,19 @@
 
 .actionsCell {
   text-align: right;
+  /* R1 — akce zůstanou připnuté vpravo i při horiz. scrollu úzkého desktopu
+     (769–~900px), takže tlačítka nikdy nezmizí za okrajem. */
+  position: sticky;
+  right: 0;
+  z-index: 1;
+}
+
+.table tbody td.actionsCell {
+  background: var(--surface-1);
+}
+
+.table tbody tr:hover td.actionsCell {
+  background: var(--surface-2);
 }
 
 .actionsButton {
@@ -300,5 +313,11 @@
   }
   .actionsCell {
     text-align: left;
+    position: static; /* R1 — sticky jen na desktopu (na mobilu jsou karty) */
+  }
+  /* R2 — dotykové cíle min 44px na mobilu */
+  .actionsButton,
+  .roleSelect {
+    min-height: 44px;
   }
 }

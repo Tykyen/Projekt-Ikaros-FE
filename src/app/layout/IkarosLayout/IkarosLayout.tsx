@@ -692,8 +692,12 @@ export function IkarosLayout() {
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
   // Hospoda (`/chat*`) běží bez pravého panelu — viz spec-chat-hide-right-panel.
-  const isChat = useLocation().pathname.startsWith('/chat');
-  const showRightPanel = isAuthenticated && !isChat;
+  const pathname = useLocation().pathname;
+  const isChat = pathname.startsWith('/chat');
+  // Administrace = široká správní tabulka → skryj pravý panel (Moje světy /
+  // Oblíbené) pro plnou šířku main, stejně jako chat (focus mód).
+  const isAdmin = pathname.startsWith('/admin');
+  const showRightPanel = isAuthenticated && !isChat && !isAdmin;
 
   function openLeftDrawer() {
     setRightDrawerOpen(false);
@@ -792,7 +796,7 @@ export function IkarosLayout() {
         {isAuthenticated ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </header>
 
-      <div className={clsx(s.body, isChat && s.bodyNoRight)}>
+      <div className={clsx(s.body, (isChat || isAdmin) && s.bodyNoRight)}>
         <aside className={s.sidebar} data-frame-panel="sidebar">
           <PanelCorners />
           <SidebarContent isAuthenticated={isAuthenticated} />
