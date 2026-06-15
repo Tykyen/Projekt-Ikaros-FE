@@ -23,6 +23,7 @@
     "lint:colors": "node scripts/lint-no-hardcoded-colors.mjs",
     "audit:contrast": "node scripts/audit-theme-contrast.mjs",
     "audit:regression": "node scripts/anti-regression-scan.mjs",
+    "audit:census": "node scripts/full-audit-census.mjs",
     "export-schemas": "node scripts/export-schemas.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
