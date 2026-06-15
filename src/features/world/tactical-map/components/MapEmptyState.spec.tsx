@@ -1,14 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import { MapEmptyState } from './MapEmptyState';
+import { api, apiClient } from '@/shared/api/client';
+import { postWorldOperation } from '../api/worldOpsApi';
 
 // Mock useCharacterDirectory — vrátíme controlovaný dataset per test
 const mockDirectory = vi.fn();
 vi.mock('@/features/world/pages/api/useCharacterDirectory', () => ({
   useCharacterDirectory: (worldId: string) => mockDirectory(worldId),
 }));
+// Mock useActiveScenes — komponenta jen čte `scenes`; klíč factory ponecháme reálný.
+vi.mock('../hooks/useActiveScenes', async (orig) => {
+  const actual = await orig<typeof import('../hooks/useActiveScenes')>();
+  return {
+    ...actual,
+    useActiveScenes: () => ({ scenes: [], isLoading: false, refetch: vi.fn() }),
+  };
+});
+vi.mock('@/shared/api/client', () => ({
+  api: { post: vi.fn() },
+  apiClient: { post: vi.fn() },
+}));
+vi.mock('../api/worldOpsApi', () => ({ postWorldOperation: vi.fn() }));
 
 function makeWrapper() {
   const qc = new QueryClient({
@@ -17,6 +32,16 @@ function makeWrapper() {
   return ({ children }: PropsWithChildren) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
+}
+
+function makeWrapperWithQc() {
+  const qc = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  const wrapper = ({ children }: PropsWithChildren) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  return { wrapper, qc };
 }
 
 beforeEach(() => {
@@ -136,5 +161,27 @@ describe('MapEmptyState', () => {
     });
     // Fallback emoji 👤
     expect(screen.getByText('👤')).toBeInTheDocument();
+  });
+
+  // C-25 — po vytvoření scény (PJ CTA) musí mutace invalidovat list aktivních
+  // scén (REST fallback k WS), jinak PJ orchestrátor ukazuje prázdno.
+  it('C-25 — "Vytvořit první scénu" invaliduje activeScenes list', async () => {
+    vi.mocked(api.post).mockResolvedValue({
+      id: 's1',
+      name: 'Nová scéna',
+      worldId: 'w1',
+    } as never);
+    vi.mocked(apiClient.post).mockResolvedValue({} as never);
+    vi.mocked(postWorldOperation).mockResolvedValue(undefined as never);
+    const { wrapper, qc } = makeWrapperWithQc();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    render(<MapEmptyState isPJ worldId="w1" currentUserId="pj1" />, {
+      wrapper,
+    });
+    fireEvent.click(screen.getByText(/Vytvořit první scénu/i));
+    await waitFor(() => {
+      const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
+      expect(keys).toContainEqual(['map', 'world-active-scenes', 'w1']);
+    });
   });
 });

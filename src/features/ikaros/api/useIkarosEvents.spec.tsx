@@ -16,6 +16,20 @@ vi.mock('@/shared/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn(), delete: vi.fn() },
 }));
 
+// S-04 — zachytíme WS event handler i reconnect callback (oba mají
+// invalidovat ['ikaros-events']). Reálné WS hooky netřeba, testujeme
+// jen kontrakt „event/reconnect → invalidace".
+let eventsChangedHandler: (() => void) | undefined;
+let eventsReconnectCb: (() => void) | undefined;
+vi.mock('@/features/chat', () => ({
+  useSocketEvent: (event: string, handler: () => void) => {
+    if (event === 'ikaros:events:changed') eventsChangedHandler = handler;
+  },
+  useSocketReconnect: (cb: () => void) => {
+    eventsReconnectCb = cb;
+  },
+}));
+
 function makeWrapper(token: string | null = 'token-x') {
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -48,6 +62,30 @@ const mockEvent = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  eventsChangedHandler = undefined;
+  eventsReconnectCb = undefined;
+});
+
+describe('useIkarosEvents — WS sync (S-04)', () => {
+  it('S-04 — reconnect callback invaliduje ikaros-events (broadcast za výpadku je pryč)', () => {
+    const { Wrapper, qc } = makeWrapper();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    renderHook(() => useIkarosEvents(), { wrapper: Wrapper });
+
+    expect(eventsReconnectCb).toBeDefined();
+    eventsReconnectCb!();
+    expect(spy).toHaveBeenCalledWith({ queryKey: ['ikaros-events'] });
+  });
+
+  it('S-04 — ikaros:events:changed handler invaliduje ikaros-events', () => {
+    const { Wrapper, qc } = makeWrapper();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    renderHook(() => useIkarosEvents(), { wrapper: Wrapper });
+
+    expect(eventsChangedHandler).toBeDefined();
+    eventsChangedHandler!();
+    expect(spy).toHaveBeenCalledWith({ queryKey: ['ikaros-events'] });
+  });
 });
 
 describe('useIkarosEvents', () => {

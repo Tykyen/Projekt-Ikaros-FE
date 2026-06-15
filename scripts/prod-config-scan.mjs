@@ -9,9 +9,12 @@
 //   4. COMPOSE    — docker-compose(.prod).yml = co se injektuje do kontejneru
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const FE = 'c:/Matrix/ProjektIkaros/Projekt-ikaros-FE';
-const BE = 'c:/Matrix/ProjektIkaros/Projekt-ikaros';
+// Portabilní cesty (AR-09): relativně od scripts/ + env override pro CI multi-repo.
+const FE = path.resolve(__dirname, '..');
+const BE = process.env.IKAROS_BE_ROOT || path.resolve(__dirname, '../../Projekt-ikaros');
 
 // ── soubory 4 zdrojů ──
 const SRC_DIRS = [`${FE}/src`, `${BE}/backend/src`];

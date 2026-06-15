@@ -11,6 +11,11 @@ vi.mock('@/features/chat/api/socket', () => ({
   getSocket: () => mockSocket,
 }));
 
+// S-02 — listener na server-push `error` event volá toast.error; mockujeme
+// sonner, ať ověříme zpětnou vazbu bez reálného UI.
+const toastError = vi.fn();
+vi.mock('sonner', () => ({ toast: { error: (msg: string) => toastError(msg) } }));
+
 beforeEach(() => vi.clearAllMocks());
 
 describe('useMapSocket — spotlight (10.2f-3)', () => {
@@ -93,6 +98,34 @@ describe('useMapSocket — ping (10.2m)', () => {
       'map:pinged',
       expect.anything(),
     );
+  });
+});
+
+describe('useMapSocket — server error (S-02)', () => {
+  const getErrorHandler = (): ((p: {
+    code?: string;
+    message?: string;
+  }) => void) => {
+    const call = mockSocket.on.mock.calls.find((c) => c[0] === 'error');
+    expect(call).toBeDefined();
+    return call![1] as (p: { code?: string; message?: string }) => void;
+  };
+
+  it('S-02 — registruje listener na socket error event', () => {
+    renderHook(() => useMapSocket({ sceneId: 'scene-1' }));
+    expect(mockSocket.on).toHaveBeenCalledWith('error', expect.any(Function));
+  });
+
+  it('S-02 — error event s message zobrazí toast.error s textem ze serveru', () => {
+    renderHook(() => useMapSocket({ sceneId: 'scene-1' }));
+    getErrorHandler()({ code: 'forbidden', message: 'Nemáš oprávnění.' });
+    expect(toastError).toHaveBeenCalledWith('Nemáš oprávnění.');
+  });
+
+  it('S-02 — error event bez message má fallback hlášku (operace tichý no-op fix)', () => {
+    renderHook(() => useMapSocket({ sceneId: 'scene-1' }));
+    getErrorHandler()({});
+    expect(toastError).toHaveBeenCalledWith('Operace na mapě se nezdařila.');
   });
 });
 

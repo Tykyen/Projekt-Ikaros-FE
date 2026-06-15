@@ -11,6 +11,8 @@ import type { ReactNode } from 'react';
 import {
   useReorderGroups,
   useReorderChannels,
+  useCreateGroup,
+  type CreateGroupInput,
 } from './useChannelMutations';
 import { worldChatKeys } from './useWorldChat';
 import type { GroupWithChannels } from '../lib/types';
@@ -166,5 +168,31 @@ describe('useReorderChannels', () => {
       '/worlds/w1/chat/channels/reorder',
       { items: [{ id: 'c2', order: 0 }, { id: 'c1', order: 1 }] },
     );
+  });
+});
+
+describe('useCreateGroup', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // C-06 — kanál/skupina CRUD musí self-invalidovat sidebar (REST fallback k WS
+  // echu chat:group:*). Bez self-invalidace sidebar po vlastní akci zůstal stale.
+  it('C-06 — create skupiny self-invaliduje sidebar (groups)', async () => {
+    const qc = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    (api.post as ReturnType<typeof vi.fn>).mockResolvedValue({ id: 'g9' });
+
+    const { result } = renderHook(() => useCreateGroup('w1'), {
+      wrapper: mkWrapper(qc),
+    });
+    await act(async () => {
+      await result.current.mutateAsync({ name: 'Nová' } as CreateGroupInput);
+    });
+
+    const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
+    expect(keys).toContainEqual(worldChatKeys('w1').groups);
   });
 });

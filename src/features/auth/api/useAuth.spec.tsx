@@ -49,6 +49,35 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+describe('useLogout', () => {
+  // C-29 — po uplynutí undo okna logout vyčistí RQ cache (`qc.clear()`), jinak
+  // osobní data (pošta/postavy/profil) přežijí v cache pro dalšího uživatele.
+  // Bezpečnostně relevantní. Regresní guard přes fake timers.
+  it('C-29 — logout po undo okně vyčistí RQ cache', async () => {
+    vi.useFakeTimers();
+    try {
+      const qc = new QueryClient({
+        defaultOptions: { mutations: { retry: false } },
+      });
+      const clearSpy = vi.spyOn(qc, 'clear');
+      vi.mocked(api.post).mockResolvedValue({} as never);
+      const wrapper = ({ children }: PropsWithChildren) => (
+        <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+      );
+      const { result } = renderHook(() => useLogout(), { wrapper });
+      act(() => {
+        result.current();
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5000);
+      });
+      expect(clearSpy).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe('useLogin', () => {
   it('po úspěchu zapíše tokeny + user do store', async () => {
     const mockUser = { id: '1', username: 'alice', role: UserRole.Ikarus };

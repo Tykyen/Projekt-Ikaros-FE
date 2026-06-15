@@ -7,12 +7,13 @@ import {
   useUpcomingEventsMine,
   useToggleRsvp,
   useAllWorldGameEvents,
+  useUpdateGameEvent,
 } from './useGameEvents';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
 
 vi.mock('@/shared/api/client', () => ({
-  api: { get: vi.fn(), post: vi.fn() },
+  api: { get: vi.fn(), post: vi.fn(), put: vi.fn() },
 }));
 
 function makeWrapper(token: string | null) {
@@ -26,6 +27,21 @@ function makeWrapper(token: string | null) {
       <QueryClientProvider client={qc}>{children}</QueryClientProvider>
     </JotaiProvider>
   );
+}
+
+// jako makeWrapper, ale vrací i `qc` — pro spy na invalidateQueries (cache regrese)
+function makeWrapperWithQc(token: string | null) {
+  const qc = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  const store = createStore();
+  store.set(accessTokenAtom, token);
+  const wrapper = ({ children }: PropsWithChildren) => (
+    <JotaiProvider store={store}>
+      <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+    </JotaiProvider>
+  );
+  return { wrapper, qc };
 }
 
 beforeEach(() => {
@@ -97,5 +113,37 @@ describe('useToggleRsvp', () => {
       await result.current.mutateAsync('event-1');
     });
     expect(api.post).toHaveBeenCalledWith('/game-events/event-1/confirm');
+  });
+
+  // C-09 regrese: RSVP toggle musel invalidovat i kalendářní `world-all` seznam
+  // (prefix-miss 'world'≠'world-all') A otevřený detail eventu. Bez té invalidace
+  // zůstal kalendář/detail stale. Tenhle test zčervená, když fix zmizí.
+  it('C-09 — RSVP invaliduje world-all seznam i otevřený detail', async () => {
+    vi.mocked(api.post).mockResolvedValue(undefined);
+    const { wrapper, qc } = makeWrapperWithQc('token123');
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    const { result } = renderHook(() => useToggleRsvp(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync('event-1');
+    });
+    const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
+    expect(keys).toContainEqual(['game-events', 'world-all']);
+    expect(keys).toContainEqual(['game-events', 'detail', 'event-1']);
+  });
+});
+
+describe('useUpdateGameEvent', () => {
+  // C-10 regrese: update eventu musel invalidovat i otevřený detail
+  // (titul/datum/popis/obrázek), ne jen seznamy.
+  it('C-10 — update invaliduje otevřený detail eventu', async () => {
+    vi.mocked(api.put).mockResolvedValue({ id: 'event-1' });
+    const { wrapper, qc } = makeWrapperWithQc('token123');
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    const { result } = renderHook(() => useUpdateGameEvent(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync({ id: 'event-1', dto: { title: 'X' } });
+    });
+    const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
+    expect(keys).toContainEqual(['game-events', 'detail', 'event-1']);
   });
 });

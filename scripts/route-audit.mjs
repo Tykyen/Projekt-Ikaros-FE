@@ -1,10 +1,14 @@
 // FE↔BE kontraktní audit: porovná BE routes vs FE api volání.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const readFileSync = fs.readFileSync;
 
-const BE = 'c:/Matrix/ProjektIkaros/Projekt-ikaros/backend/src';
-const FE = 'c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src';
+// Portabilní cesty (AR-09): relativně od scripts/ + env override pro CI multi-repo.
+const BE_ROOT = process.env.IKAROS_BE_ROOT || path.resolve(__dirname, '../../Projekt-ikaros');
+const BE = path.resolve(BE_ROOT, 'backend/src');
+const FE = path.resolve(__dirname, '..', 'src');
 
 function walk(dir, pred) {
   const out = [];

@@ -9,8 +9,11 @@
 //     Reálné OR riziko = ambiguita (2 bare-dynamic sourozenci / duplicitní path), to hlídáme.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const FE = 'c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src';
+// Portabilní cesta (AR-09): relativně od scripts/ (FE-only scanner).
+const FE = path.resolve(__dirname, '..', 'src');
 const ROUTER = path.join(FE, 'app', 'router.tsx');
 
 function walk(dir, pred) {

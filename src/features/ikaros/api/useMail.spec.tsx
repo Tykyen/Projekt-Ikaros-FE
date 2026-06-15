@@ -1,9 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider as JotaiProvider, createStore } from 'jotai';
 import type { PropsWithChildren } from 'react';
-import { useUnreadCount, useInbox, useSendMessage } from './useMail';
+import {
+  useUnreadCount,
+  useInbox,
+  useSendMessage,
+  useDeleteMessage,
+  mailKeys,
+} from './useMail';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
 
@@ -84,5 +90,40 @@ describe('useMail', () => {
       '/ikaros-messages',
       expect.objectContaining({ subject: 'Ahoj', recipientId: 'r' }),
     );
+  });
+
+  // C-08 — delete dělá surgical removal z infinite cache (setQueryData), ne
+  // refetch všech stránek. Zachová scroll pozici; ostatní zprávy zůstanou.
+  it('C-08 — delete surgical removal z infinite cache (setQueryData inbox/sent)', async () => {
+    vi.mocked(api.delete).mockResolvedValue(undefined as never);
+    const qc = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+    const store = createStore();
+    store.set(accessTokenAtom, 'tok');
+    const Wrapper = ({ children }: PropsWithChildren) => (
+      <JotaiProvider store={store}>
+        <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+      </JotaiProvider>
+    );
+    const other = { ...mockMsg, id: 'm2' };
+    qc.setQueryData(mailKeys.inbox, {
+      pages: [[mockMsg, other]],
+      pageParams: [undefined],
+    });
+    const setSpy = vi.spyOn(qc, 'setQueryData');
+    const { result } = renderHook(() => useDeleteMessage(), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      await result.current.mutateAsync('m1');
+    });
+    const setKeys = setSpy.mock.calls.map((c) => c[0]);
+    expect(setKeys).toContainEqual(mailKeys.inbox);
+    expect(setKeys).toContainEqual(mailKeys.sent);
+    const inbox = qc.getQueryData(mailKeys.inbox) as {
+      pages: { id: string }[][];
+    };
+    expect(inbox.pages[0].map((m) => m.id)).toEqual(['m2']);
   });
 });

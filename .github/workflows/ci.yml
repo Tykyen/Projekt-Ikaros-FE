@@ -1,0 +1,96 @@
+name: CI
+
+# 16. audit (anti-regression), Fáze B1: první živá CI síť pro FE.
+# Dosud FE nemělo ŽÁDNÝ CI ani precommit → build/lint/test nikdo nehlídal na PR (AR-04).
+#
+# Co ZATÍM NENÍ:
+#  - cross-repo scannery (routes/ws/config/errors/logs): potřebují BE checkout → job audit-crossrepo
+#    níže (zakomentován — čeká na název BE repo + token, AR-10).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend-build:
+    name: Frontend build, lint & nav audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (tsc -b + vite)
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Nav audit (FE-only scanner)
+        run: npm run audit:nav
+
+  frontend-test:
+    name: Frontend tests (vitest)
+    runs-on: ubuntu-latest
+    # 348 souborů / 2729 testů sériově (fileParallelism:false) → ~18 min; timeout s rezervou.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run vitest
+        run: npm run test:run
+
+  # --- Cross-repo scannery (AR-10): FE↔BE kontrakt; BE checkout vedle (Tykyen/Projekt-ikaros je public → bez tokenu) ---
+  audit-crossrepo:
+    name: FE↔BE contract scanners
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4                    # FE do ./
+
+      - uses: actions/checkout@v4                    # BE vedle
+        with:
+          repository: Tykyen/Projekt-ikaros
+          path: be-repo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Contract scanners (routes/ws/config/errors/logs)
+        env:
+          IKAROS_BE_ROOT: ${{ github.workspace }}/be-repo
+        run: |
+          npm run audit:routes
+          npm run audit:ws
+          npm run audit:config
+          npm run audit:errors
+          npm run audit:logs
+
+      # B4 — anti-regression guard: opravený důležitý nález nesmí ztratit živou pojistku.
+      - name: Anti-regression guard
+        env:
+          IKAROS_BE_ROOT: ${{ github.workspace }}/be-repo
+        run: npm run audit:regression -- --ci

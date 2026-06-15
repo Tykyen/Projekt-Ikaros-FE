@@ -1,0 +1,1867 @@
+{
+  "_doc": "Ruční mapa nález→pojistka (16. audit). class+severity+status z konsolidace 4 čtecích agentů + override (auto-discovered test ⇒ fixed; W-7/W-10 ověřeno fixed; PC dle paměti). guards=[] → pojistku řeší scanner dynamicky (auto-discovery testů + class-scanner).",
+  "findings": {
+    "N-1": {
+      "class": "other",
+      "severity": "",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-2": {
+      "class": "config",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED: hardcoded barvy — velký samostatný design dluh; bezpečná část (bílá/černá) dotažena, zbytek mimo rozsah anti-regression auditu.",
+      "guards": []
+    },
+    "N-3": {
+      "class": "config",
+      "severity": "",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-4": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-5": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-6": {
+      "class": "contract",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-7": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-8": {
+      "class": "authz",
+      "severity": "high",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "N-9": {
+      "class": "authz",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-10": {
+      "class": "authz",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "N-11": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-12": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-13": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-14": {
+      "class": "role",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-15": {
+      "class": "realtime",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-16": {
+      "class": "ui",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-17": {
+      "class": "authz",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "N-18": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-19": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-20": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-21": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-22": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-23": {
+      "class": "ui",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-24": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-25": {
+      "class": "data",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-26": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-27": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-28": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-29": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-30": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-31": {
+      "class": "realtime",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-32": {
+      "class": "ui",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-33": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-34": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-35": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-36": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-37": {
+      "class": "authz",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-38": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "N-39": {
+      "class": "ui",
+      "severity": "crit",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "N-40": {
+      "class": "other",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "N-41": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-01": {
+      "class": "role",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-02": {
+      "class": "role",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-03": {
+      "class": "role",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-04": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-05": {
+      "class": "role",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-06": {
+      "class": "authz",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-07": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-08": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-09": {
+      "class": "authz",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-10": {
+      "class": "role",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-11": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-12": {
+      "class": "authz",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-13": {
+      "class": "authz",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-14": {
+      "class": "authz",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "R-15": {
+      "class": "role",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-16": {
+      "class": "ui",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-17": {
+      "class": "ui",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-18": {
+      "class": "ui",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-19": {
+      "class": "authz",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "R-20": {
+      "class": "role",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-01": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-02": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-03": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-04": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-05": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): WS reconnect handler v ChatRoom komponentě — kryto component/e2e, unit test křehký",
+      "guards": []
+    },
+    "C-06": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-07": {
+      "class": "cache",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): WS reconnect refetch v useUnreadSync — reconnect callback, kryto e2e",
+      "guards": []
+    },
+    "C-08": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-09": {
+      "class": "cache",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-10": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-11": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-12": {
+      "class": "authz",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-13": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-14": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-15": {
+      "class": "cache",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-16": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-17": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-18": {
+      "class": "cache",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): read-side factory key (usePage) — žádná mutace k otestování",
+      "guards": []
+    },
+    "C-19": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-20": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-21": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-22": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-23": {
+      "class": "cache",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "C-24": {
+      "class": "cache",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): inline optimistic v 1500-řádkové TacticalMapView — neizolovatelné, klíč pokryt jinde",
+      "guards": []
+    },
+    "C-25": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-26": {
+      "class": "cache",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): inline scéna mutace v MapPjPanel — klíč activeScenes pokryt C-25",
+      "guards": []
+    },
+    "C-27": {
+      "class": "cache",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): jotai hydration most — ⚖️ by-design, žádná invalidace",
+      "guards": []
+    },
+    "C-28": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-29": {
+      "class": "authz",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-30": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-31": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): WS identita push — kryto WS gateway/e2e",
+      "guards": []
+    },
+    "C-32": {
+      "class": "cache",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "C-33": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-34": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-35": {
+      "class": "cache",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "C-37": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-38": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-39": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-40": {
+      "class": "cache",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): render-time derivace z query (AkcePage) — žádná cache mutace",
+      "guards": []
+    },
+    "C-41": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-42": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-45": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-46": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): WS reconnect (bell feed) v komponentě — component-level",
+      "guards": []
+    },
+    "C-47": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-51": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-52": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-53": {
+      "class": "cache",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "C-54": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "C-55": {
+      "class": "cache",
+      "severity": "high",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "C-56": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "C-57": {
+      "class": "cache",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "C-58": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-01": {
+      "class": "validace",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-02": {
+      "class": "data",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "OPRAVENO v timeline.service.ts (NE game-events): sanitizeRichText při create(163)+update(205)+read-time(93). AR-12 byl můj omyl (hledal špatný modul).",
+      "guards": []
+    },
+    "F-03": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-04": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-05": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-06": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-07": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-08": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "AR-13 opraveno: @IsOptional odebrán, @ValidateIf řídí; null odmítnut. Regresní test create-game-event.dto.spec AR-13.",
+      "guards": []
+    },
+    "F-09": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-10": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-11": {
+      "class": "validace",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): DB default (schema @Prop default:true), ne DTO validační pravidlo — netestovatelné na DTO úrovni",
+      "guards": []
+    },
+    "F-12": {
+      "class": "validace",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED: YouTube URL BC-risk — přísnější BE regex by odmítl existující validní odkazy; vědomě ponecháno.",
+      "guards": []
+    },
+    "F-13": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-14": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-15": {
+      "class": "validace",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED: isCollapsed legacy default latentní (low), bez aktivního dopadu.",
+      "guards": []
+    },
+    "F-16": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-17": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "F-18": {
+      "class": "cache",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED: by-design — Mongoose strict drop legacy polí, žádný runtime dopad.",
+      "guards": []
+    },
+    "F-19": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "F-20": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "F-21": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "F-22": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "F-23": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "F-24": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-25": {
+      "class": "config",
+      "severity": "",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "F-26": {
+      "class": "cache",
+      "severity": "",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "F-27": {
+      "class": "validace",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "F-28": {
+      "class": "validace",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-01": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-02": {
+      "class": "data",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-03": {
+      "class": "config",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-04": {
+      "class": "config",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-05": {
+      "class": "config",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-06": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-07": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-08": {
+      "class": "log",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-09": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-10": {
+      "class": "contract",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-11": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-12": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-13": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-14": {
+      "class": "authz",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "PC-15": {
+      "class": "config",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-16": {
+      "class": "config",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-17": {
+      "class": "config",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "PC-18": {
+      "class": "config",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-19": {
+      "class": "authz",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "PC-20": {
+      "class": "config",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "PC-21": {
+      "class": "config",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED: OPS task — nahrát embedding modely, ať nezávisí na starém webu; není kódová změna, na provozovateli.",
+      "guards": []
+    },
+    "PC-22": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-23": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "PC-24": {
+      "class": "config",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-01": {
+      "class": "contract",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-02": {
+      "class": "contract",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-03": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-04": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-05": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-06": {
+      "class": "contract",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-07": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-08": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-09": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-10": {
+      "class": "contract",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-11": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "EC-12": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-01": {
+      "class": "log",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-02": {
+      "class": "log",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-03": {
+      "class": "log",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-04": {
+      "class": "log",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-05": {
+      "class": "log",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-06": {
+      "class": "log",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-07": {
+      "class": "log",
+      "severity": "",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "LH-08": {
+      "class": "log",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "LH-09": {
+      "class": "log",
+      "severity": "",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "LH-10": {
+      "class": "log",
+      "severity": "",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "LH-11": {
+      "class": "log",
+      "severity": "",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "LH-12": {
+      "class": "log",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-01": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-02": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-03": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-04": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-05": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-06": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-07": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-08": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "NAV-09": {
+      "class": "nav",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-E1": {
+      "class": "money",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-E2": {
+      "class": "money",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-E3": {
+      "class": "money",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-E4": {
+      "class": "money",
+      "severity": "high",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "RC-E5": {
+      "class": "money",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "RC-E6": {
+      "class": "money",
+      "severity": "high",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "RC-P1": {
+      "class": "data",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-P2": {
+      "class": "data",
+      "severity": "high",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "RC-P3": {
+      "class": "data",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "RC-P4": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-R1": {
+      "class": "role",
+      "severity": "high",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "RC-R2": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-R3": {
+      "class": "authz",
+      "severity": "high",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "RC-R4": {
+      "class": "authz",
+      "severity": "",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "RC-R5": {
+      "class": "authz",
+      "severity": "",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "RC-D1": {
+      "class": "data",
+      "severity": "high",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "RC-D2": {
+      "class": "data",
+      "severity": "high",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "RC-D3": {
+      "class": "data",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "RC-D4": {
+      "class": "data",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "RC-D6": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "W-1": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-2": {
+      "class": "contract",
+      "severity": "",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "W-3": {
+      "class": "authz",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-4": {
+      "class": "contract",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-5": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-6": {
+      "class": "contract",
+      "severity": "",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "W-7": {
+      "class": "realtime",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-8": {
+      "class": "config",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-9": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-10": {
+      "class": "authz",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "W-11": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "S-01": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): removal — smazány redundantní BE emity, žádné nové testovatelné chování",
+      "guards": []
+    },
+    "S-02": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "S-03": {
+      "class": "realtime",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "S-04": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "S-05": {
+      "class": "realtime",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "S-06": {
+      "class": "cache",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-01": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-02": {
+      "class": "media",
+      "severity": "high",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "UM-03": {
+      "class": "media",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-04": {
+      "class": "media",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-05": {
+      "class": "media",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-06": {
+      "class": "media",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-07": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-08": {
+      "class": "authz",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-09": {
+      "class": "media",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "UM-10": {
+      "class": "authz",
+      "severity": "high",
+      "status": "accepted",
+      "note": "ACCEPTED (jiný typ pojistky): @Throttle decorator guard na /upload — ověřeno staticky, ne falešný unit test",
+      "guards": []
+    },
+    "UM-11": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "UM-12": {
+      "class": "contract",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED: fragmentace limitů — drift vyvrácen, limity konzistentní.",
+      "guards": []
+    },
+    "UM-13": {
+      "class": "contract",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED: dva useUploadImage (shared vs legacy) — vyvráceno, oba legitimní.",
+      "guards": []
+    },
+    "UM-14": {
+      "class": "validace",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "UM-15": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
+      "guards": []
+    },
+    "UM-16": {
+      "class": "media",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "CD-01": {
+      "class": "media",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "CD-02": {
+      "class": "media",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "CD-03": {
+      "class": "media",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "CD-04": {
+      "class": "data",
+      "severity": "crit",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "CD-05": {
+      "class": "data",
+      "severity": "high",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "CD-06": {
+      "class": "data",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "CD-07": {
+      "class": "nav",
+      "severity": "med",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "CD-08": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "CD-09": {
+      "class": "data",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "DI-01": {
+      "class": "config",
+      "severity": "med",
+      "status": "accepted",
+      "note": "ACCEPTED: custom_emotes ObjectId FK — konvenční odchylka; oprava rizikovější než problém (registr).",
+      "guards": []
+    },
+    "DI-02": {
+      "class": "validace",
+      "severity": "",
+      "status": "bydesign",
+      "note": "",
+      "guards": []
+    },
+    "DI-03": {
+      "class": "validace",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "DI-04": {
+      "class": "data",
+      "severity": "high",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "DI-05": {
+      "class": "cache",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    },
+    "SS-01": {
+      "class": "data",
+      "severity": "med",
+      "status": "fixed",
+      "note": "",
+      "guards": []
+    }
+  }
+}

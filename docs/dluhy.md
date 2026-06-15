@@ -8,9 +8,7 @@
 
 ## Otevřené
 
-> _(Žádné otevřené dluhy — D-NEW-matrix-seed-pravidla-test vyřešen 2026-06-14:
-> test byl zastaralý, matrix svět správně dostává Pravidla z Pravidlové knihy
-> (F1), test aktualizován. BE suite 2009/2009 zelená.)_
+> _(Žádné otevřené dluhy.)_
 
 ---
 

@@ -9,6 +9,19 @@ vi.mock('@/shared/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn() },
 }));
 
+// S-04 — zachytíme WS event handler i reconnect callback (oba invalidují
+// ['ikaros-news']). Testujeme kontrakt „event/reconnect → invalidace".
+let newsChangedHandler: (() => void) | undefined;
+let newsReconnectCb: (() => void) | undefined;
+vi.mock('@/features/chat', () => ({
+  useSocketEvent: (event: string, handler: () => void) => {
+    if (event === 'ikaros:news:changed') newsChangedHandler = handler;
+  },
+  useSocketReconnect: (cb: () => void) => {
+    newsReconnectCb = cb;
+  },
+}));
+
 function makeWrapper() {
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -21,6 +34,30 @@ function makeWrapper() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  newsChangedHandler = undefined;
+  newsReconnectCb = undefined;
+});
+
+describe('useIkarosNews — WS sync (S-04)', () => {
+  it('S-04 — reconnect callback invaliduje ikaros-news (broadcast za výpadku je pryč)', () => {
+    const { Wrapper, qc } = makeWrapper();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    renderHook(() => useIkarosNews(), { wrapper: Wrapper });
+
+    expect(newsReconnectCb).toBeDefined();
+    newsReconnectCb!();
+    expect(spy).toHaveBeenCalledWith({ queryKey: ['ikaros-news'] });
+  });
+
+  it('S-04 — ikaros:news:changed handler invaliduje ikaros-news', () => {
+    const { Wrapper, qc } = makeWrapper();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    renderHook(() => useIkarosNews(), { wrapper: Wrapper });
+
+    expect(newsChangedHandler).toBeDefined();
+    newsChangedHandler!();
+    expect(spy).toHaveBeenCalledWith({ queryKey: ['ikaros-news'] });
+  });
 });
 
 describe('useIkarosNews', () => {
