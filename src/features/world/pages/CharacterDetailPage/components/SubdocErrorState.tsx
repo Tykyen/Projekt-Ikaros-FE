@@ -1,6 +1,20 @@
 import axios from 'axios';
 import { parseApiErrorCode } from '@/shared/api';
+import type { ApiError } from '@/shared/types';
 import s from './subdocs.module.css';
+
+/**
+ * Vrátí vlídnou serverovou `message` (HttpExceptionFilter shape), nebo `null`
+ * když server žádnou nepošle. Narozdíl od `parseApiError` nepodstrkuje
+ * technický axios fallback — volající si zvolí vlastní vlídný fallback.
+ */
+function serverMessageOf(error: unknown): string | null {
+  if (!axios.isAxiosError(error)) return null;
+  const data = error.response?.data as ApiError | undefined;
+  const msg = data?.error?.message;
+  const first = Array.isArray(msg) ? msg[0] : msg;
+  return typeof first === 'string' && first !== '' ? first : null;
+}
 
 interface Props {
   error: unknown;
@@ -30,7 +44,14 @@ export function SubdocErrorState({ error, resourceLabel, onRetry }: Props) {
   }
 
   if (status === 403) {
-    return <p className={s.empty}>Soukromé — vidí jen PJ a vlastník.</p>;
+    // Přednost má vlídná serverová message (friendly-messaging policy),
+    // fallback když server žádnou nepošle.
+    const serverMessage = serverMessageOf(error);
+    return (
+      <p className={s.empty}>
+        {serverMessage ?? 'Soukromé — vidí jen vlastník postavy a PJ.'}
+      </p>
+    );
   }
 
   return (

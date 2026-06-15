@@ -86,7 +86,8 @@ export function DeletedWorldsTab() {
             await restore.mutateAsync({ worldId: toRestore.id });
             toast.success(`Svět „${toRestore.name}" obnoven.`);
           } catch {
-            toast.error('Obnova se nezdařila (možná vypršelo 30denní okno).');
+            // Server hlášku ukáže onError v useRestoreWorld (parseApiError) —
+            // tady jen zabráníme unhandled rejection. Žádný druhý toast.
           }
           setToRestore(null);
         }}

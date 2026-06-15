@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { api } from '@/shared/api/client';
+import { toast } from 'sonner';
+import { api, parseApiError } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
 import type { World } from '@/shared/types';
 
@@ -16,6 +17,7 @@ export function useDeleteWorld() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['worlds'] });
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -51,5 +53,6 @@ export function useRestoreWorld() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['worlds'] });
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }

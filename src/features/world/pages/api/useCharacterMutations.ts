@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/shared/api/client';
+import { toast } from 'sonner';
+import { api, parseApiError } from '@/shared/api/client';
 import {
   charactersQueryKey,
   type Character,
@@ -113,6 +114,7 @@ export function useUpdateCharacter(worldId: string, slug: string) {
       // C-20 — primární grid postav je servírovaný z Page projekce (persona).
       void qc.invalidateQueries({ queryKey: ['pages', worldId, 'directory'] });
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -134,6 +136,7 @@ export function useDeleteCharacter(worldId: string) {
       // C-20 — persona grid (Page projekce).
       void qc.invalidateQueries({ queryKey: ['pages', worldId, 'directory'] });
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -165,6 +168,7 @@ export function useConvertCharacter(worldId: string, slug: string) {
         queryKey: charactersQueryKey.accountsByCharacter(worldId, slug),
       });
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -184,6 +188,7 @@ export function useUpdateCharacterDiary(worldId: string, slug: string) {
         diary,
       );
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -203,6 +208,7 @@ export function useUpdateCharacterCalendar(worldId: string, slug: string) {
       // C-22 — agregátní kalendář (PJ view) je samostatný namespace.
       void qc.invalidateQueries({ queryKey: ['calendars-aggregate', worldId] });
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -224,6 +230,7 @@ export function useSetCalendarColor(worldId: string) {
         queryKey: charactersQueryKey.subdoc(worldId, slug, 'calendar'),
       });
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -241,6 +248,7 @@ export function useUpdateCharacterFinance(worldId: string, slug: string) {
         finance,
       );
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -258,6 +266,7 @@ export function useFinanceAddMonthly(worldId: string, slug: string) {
         finance,
       );
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -275,6 +284,7 @@ export function useFinanceUndo(worldId: string, slug: string) {
         finance,
       );
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -292,6 +302,7 @@ export function useUpdateCharacterInventory(worldId: string, slug: string) {
         inventory,
       );
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
 
@@ -309,5 +320,6 @@ export function useUpdateCharacterNotes(worldId: string, slug: string) {
         notes,
       );
     },
+    onError: (err) => toast.error(parseApiError(err)),
   });
 }
