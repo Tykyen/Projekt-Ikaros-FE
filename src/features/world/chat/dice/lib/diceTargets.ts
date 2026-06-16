@@ -1,14 +1,22 @@
 /**
- * Krok 6.3d — TARGETS rotace per tvář kostky (slerp cíle).
+ * Krok 6.3d / 6.3-fix — TARGETS rotace per tvář kostky (cíl dosednutí).
  *
- * Port `C:/Matrix/Matrix/frontend/src/components/Map/Dice/DiceLogic.ts`.
  * Modely v `models/*.tsx` mapují `faceValue` na index TARGETS pole; rolling
- * scéna interpoluje aktuální quaternion směrem k cílovému, aby výsledná
- * kostka ukázala správnou tvář odpovídající `payload.faces[i]`.
+ * scéna i overlay interpolují kostku do cílové rotace, aby ukázala správnou
+ * tvář odpovídající `payload.faces[i]`.
  *
- * Rotace v stupních (rx/ry/rz). Komponenty modelů si je převedou na
- * radiány a quaterniony při použití.
+ * 6.3-fix: cílová rotace je nově **přesná inverze** rotace tváře
+ * (`invertFaceToEuler`), odvozená z jednoho zdroje geometrie
+ * `faceRotations.ts`. Dřív ručně psané hodnoty u tváří s `rotateZ(180)`
+ * (D12, D20) nebyly inverzí → kostka dosedala nakloněná až o 158°
+ * (viz [spec-6.3-fix-dice-orientation.md]). Aplikace `rotateX·rotateY·rotateZ`
+ * v konzumentech se nemění — opravily se jen hodnoty.
+ *
+ * Rotace v stupních (rx/ry/rz), aplikované v pořadí X→Y→Z.
  */
+
+import { FACE_ROTATIONS, type DiceGeoType } from './faceRotations';
+import { invertFaceToEuler } from './rotationMath';
 
 export interface DiceTarget {
   rx: number;
@@ -16,6 +24,16 @@ export interface DiceTarget {
   rz: number;
 }
 
+/** Odvodí TARGETS daného typu jako inverzi rotace každé tváře. */
+function deriveTargets(type: DiceGeoType): DiceTarget[] {
+  return FACE_ROTATIONS[type].map(invertFaceToEuler);
+}
+
+/**
+ * D4 (tetraedr) — vlastní geometrie. Tetraedr se nečte „tváří čelem", ale
+ * stojící na podstavě s číslem u vrcholu, takže metrika inverze tváře sem
+ * nepatří. Ponecháno z původního portu (vizuálně OK).
+ */
 export const D4_TARGETS: DiceTarget[] = [
   { rx: 0, ry: 0, rz: 0 },
   { rx: -109.5, ry: 60, rz: 0 },
@@ -23,15 +41,16 @@ export const D4_TARGETS: DiceTarget[] = [
   { rx: -109.5, ry: 180, rz: 0 },
 ];
 
-export const D6_TARGETS: DiceTarget[] = [
-  { rx: 0, ry: 0, rz: 0 },
-  { rx: 0, ry: 180, rz: 0 },
-  { rx: 0, ry: -90, rz: 0 },
-  { rx: 0, ry: 90, rz: 0 },
-  { rx: -90, ry: 0, rz: 0 },
-  { rx: 90, ry: 0, rz: 0 },
-];
+export const D6_TARGETS: DiceTarget[] = deriveTargets('d6');
+export const D8_TARGETS: DiceTarget[] = deriveTargets('d8');
+export const D10_TARGETS: DiceTarget[] = deriveTargets('d10');
+export const D12_TARGETS: DiceTarget[] = deriveTargets('d12');
+export const D20_TARGETS: DiceTarget[] = deriveTargets('d20');
 
+/**
+ * Fate — usazuje se čelně ({0,0,0}) a hozenou hodnotu nese přední tvář
+ * (viz `FateSkinModel` + `renderModelFor`). Ponecháno beze změny.
+ */
 export const FATE_TARGETS: Record<string, DiceTarget> = {
   '+': { rx: 0, ry: 0, rz: 0 },
   '1': { rx: 0, ry: 0, rz: 0 },
@@ -39,68 +58,6 @@ export const FATE_TARGETS: Record<string, DiceTarget> = {
   '-1': { rx: 0, ry: 180, rz: 0 },
   '0': { rx: -90, ry: 0, rz: 0 },
 };
-
-export const D8_TARGETS: DiceTarget[] = [
-  { rx: -35.26, ry: 0, rz: 0 },
-  { rx: -35.26, ry: -90, rz: 0 },
-  { rx: -35.26, ry: -180, rz: 0 },
-  { rx: -35.26, ry: -270, rz: 0 },
-  { rx: 144.74, ry: 180, rz: 0 },
-  { rx: 144.74, ry: 90, rz: 0 },
-  { rx: 144.74, ry: 0, rz: 0 },
-  { rx: 144.74, ry: -90, rz: 0 },
-];
-
-export const D10_TARGETS: DiceTarget[] = [
-  { rx: -43.68, ry: 0, rz: 0 },
-  { rx: -43.68, ry: -72, rz: 0 },
-  { rx: -43.68, ry: -144, rz: 0 },
-  { rx: -43.68, ry: -216, rz: 0 },
-  { rx: -43.68, ry: -288, rz: 0 },
-  { rx: 136.32, ry: 144, rz: 0 },
-  { rx: 136.32, ry: 72, rz: 0 },
-  { rx: 136.32, ry: 0, rz: 0 },
-  { rx: 136.32, ry: -72, rz: 0 },
-  { rx: 136.32, ry: -144, rz: 0 },
-];
-
-export const D12_TARGETS: DiceTarget[] = [
-  { rx: -90, ry: 0, rz: 0 },
-  { rx: -26.565, ry: 0, rz: 180 },
-  { rx: -26.565, ry: -72, rz: 180 },
-  { rx: -26.565, ry: -144, rz: 180 },
-  { rx: -26.565, ry: -216, rz: 180 },
-  { rx: -26.565, ry: -288, rz: 180 },
-  { rx: 26.565, ry: -36, rz: 0 },
-  { rx: 26.565, ry: -108, rz: 0 },
-  { rx: 26.565, ry: -180, rz: 0 },
-  { rx: 26.565, ry: -252, rz: 0 },
-  { rx: 26.565, ry: -324, rz: 0 },
-  { rx: 90, ry: 0, rz: 0 },
-];
-
-export const D20_TARGETS: DiceTarget[] = [
-  { rx: -52.62, ry: 0, rz: 0 },
-  { rx: -52.62, ry: -72, rz: 0 },
-  { rx: -52.62, ry: -144, rz: 0 },
-  { rx: -52.62, ry: -216, rz: 0 },
-  { rx: -52.62, ry: -288, rz: 0 },
-  { rx: -10.81, ry: 0, rz: 180 },
-  { rx: -10.81, ry: -72, rz: 180 },
-  { rx: -10.81, ry: -144, rz: 180 },
-  { rx: -10.81, ry: -216, rz: 180 },
-  { rx: -10.81, ry: -288, rz: 180 },
-  { rx: 10.81, ry: -36, rz: 0 },
-  { rx: 10.81, ry: -108, rz: 0 },
-  { rx: 10.81, ry: -180, rz: 0 },
-  { rx: 10.81, ry: -252, rz: 0 },
-  { rx: 10.81, ry: -324, rz: 0 },
-  { rx: 52.62, ry: -36, rz: 180 },
-  { rx: 52.62, ry: -108, rz: 180 },
-  { rx: 52.62, ry: -180, rz: 180 },
-  { rx: 52.62, ry: -252, rz: 180 },
-  { rx: 52.62, ry: -324, rz: 180 },
-];
 
 /** Pomocí `faceValue` (1..N) vybrat TARGETS index. */
 export function targetForGeneric(

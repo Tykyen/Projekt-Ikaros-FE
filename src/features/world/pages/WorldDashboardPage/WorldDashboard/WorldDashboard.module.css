@@ -76,14 +76,14 @@
   }
 }
 
-/* Mobil — 1 sloupec, páry Hráči→Akce, Chat→Novinky pohromadě. */
+/* Mobil — 1 sloupec; Chat hned pod Hráči (obě dlaždice nad fold), pak boxy. */
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: 1fr;
     grid-template-areas:
       'hraci'
-      'akce'
       'chat'
+      'akce'
       'novinky'
       'oblibene';
   }

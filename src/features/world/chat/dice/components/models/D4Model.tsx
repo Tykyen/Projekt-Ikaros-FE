@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FateDiceSkin } from '../../lib/diceSkins';
+import { DieFaceTexture } from './DieFaceTexture';
 
 interface D4ModelProps {
   faceValue: string | number;
@@ -29,11 +30,9 @@ const Face: React.FC<{
 
   const faceStyle: React.CSSProperties = skin
     ? {
-        background: faceImg
-          ? `url(${faceImg}) center/cover no-repeat`
-          : skin.materialImg
-            ? `url(${skin.materialImg}) center/cover no-repeat`
-            : skin.bgGradient || undefined,
+        background: skin.materialImg
+          ? `url(${skin.materialImg}) center/cover no-repeat`
+          : skin.bgGradient || undefined,
         borderColor: skin.borderColor,
         boxShadow: skin.coreColor
           ? `inset 0 0 10px ${skin.coreColor}`
@@ -49,28 +48,25 @@ const Face: React.FC<{
 
   return (
     <div className={`d4-face d4-face-${idx}`} style={faceStyle}>
-      {!faceImg && (
-        <>
-          <div
-            className={`d4-num top-num ${top === target ? 'glow-win' : ''}`}
-            style={textStyle}
-          >
-            {top}
-          </div>
-          <div
-            className={`d4-num bl-num ${bl === target ? 'glow-win' : ''}`}
-            style={textStyle}
-          >
-            {bl}
-          </div>
-          <div
-            className={`d4-num br-num ${br === target ? 'glow-win' : ''}`}
-            style={textStyle}
-          >
-            {br}
-          </div>
-        </>
-      )}
+      <div
+        className={`d4-num top-num ${top === target ? 'glow-win' : ''}`}
+        style={textStyle}
+      >
+        {top}
+      </div>
+      <div
+        className={`d4-num bl-num ${bl === target ? 'glow-win' : ''}`}
+        style={textStyle}
+      >
+        {bl}
+      </div>
+      <div
+        className={`d4-num br-num ${br === target ? 'glow-win' : ''}`}
+        style={textStyle}
+      >
+        {br}
+      </div>
+      <DieFaceTexture src={faceImg} />
     </div>
   );
 };

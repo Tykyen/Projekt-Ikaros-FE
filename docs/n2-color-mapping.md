@@ -5,6 +5,41 @@
 > **Zbývá:** ~2296 (lint:colors). Tento soubor je mapa, jak na ně — **vyžadují vizuální
 > projití** (oko u browseru napříč tématy), proto nejsou v automatickém commitu.
 
+## ⚑ Aktualizace 2026-06-16 — KLÍČOVÉ: většina „dluhu" je datová identita, ne chrome
+
+`lint:colors` hlásí **2340**, ALE rozbor (per soubor + typ) ukázal, že to jsou
+**dvě úplně různé věci**:
+
+| Kategorie | Počet | Co s tím |
+|---|---|---|
+| **Datové identity** | **1271** | **NEtokenizovat → patří do ALLOW** (jako už vyňatý `tactical-map/system-panels`) |
+| └ kostkové skiny (`/chat/dice/`) | 454 | `diceSkins.ts` (165) = palety 30 skinů; `components/models/*` + `polyhedralDice.css` = 3D render. Záměrně fixní napříč tématy. |
+| └ herní systémy (`/diary-systems/`) | 817 | `styles/*.css` (drd2, shadowrun, gurps, matrix…) + `sheets/*.tsx` = identita systému, ne chrome. |
+| **Skutečný chrome drift** | **1069** | tokenizovat (theme-aware) — viz mapa níž. 160 souborů, max 34/soubor, dlouhý chvost. |
+
+**Typy z 2340:** rgba 1233, hex 1096, rgb 7, color-name 3, hsl 1.
+
+**Doporučený první krok (bezpečný, bez vizuálu):** rozšířit `ALLOW` v
+`scripts/lint-no-hardcoded-colors.mjs` o čistě datové cesty — tím spadne číslo
+2340 → ~1069 a zůstane jen skutečný chrome:
+- `/chat/dice/lib/` + `/chat/dice/components/models/` + `polyhedralDice.css`
+- `/diary-systems/styles/` + `/diary-systems/sheets/`
+- ⚠️ pozn.: dice **UI pickery** (`SkinPickerPanel`/`PoolPromptModal`/`DicePickerPopover`/
+  `DiceRollOverlay` `.module.css`) jsou chrome okolo kostek — ty do ALLOW **ne**,
+  patří do tokenizace.
+
+**Top chrome soubory (cíle tokenizace, sestupně):** `TemplateEditorModal.module.css`
+(34), `NotificationCenter.module.css` (28), `PostavaLayout.module.css` (27),
+`DataTemplatePanel` (26), `StyleRail` (26), `HeroUploadCard` (23),
+`LinkPickerPopover` (22), `WeatherGeneratorCard`/`AkjLockedPanel` (20).
+
+**Tokeny, na které mapovat** (z [tokens.css](../src/themes/_shared/tokens.css)):
+stíny `--shadow-sm/md/lg/xl` + `--depth-*`; overlaye `rgb(var(--white-rgb)/α)` /
+`rgb(var(--black-rgb)/α)`; scrim `--scrim`; povrchy `--surface-1/2/3` /
+`--theme-surface*`; okraje `--frame-border` / `--theme-border*`; sémantika
+`--danger`/`--info`/`--warning`; role `--role-*`; novinky `--news-*`; presence
+`--presence-*`. Bílá/černá konstanty `--white-rgb`/`--black-rgb`.
+
 ## Proč zbytek nejde automaticky
 
 Bílá/černá byly **fyzikální konstanty** (255/0 jsou stejné v každém tématu) → tokenizace 1:1

@@ -10,6 +10,17 @@
    style v modelech.
    ═══════════════════════════════════════════════════════════════ */
 
+/* ─── Textura tváře (overlay nad CSS číslem; 6.3-fix nález 1) ──── */
+
+.die-face-tex {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
 /* ─── Fate die 3D cube (FateModel + FateSkinModel parent) ──────── */
 
 .fate-die-3d-wrapper {

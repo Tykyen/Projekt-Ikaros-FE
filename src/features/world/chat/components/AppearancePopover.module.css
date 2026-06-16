@@ -28,6 +28,17 @@
   }
 }
 
+/* Varianta „dolů" — kotva nahoře v hlavičce konverzace. Jen desktop;
+   na mobilu drží spodní sheet z media query výš (min-width gate brání kolizi). */
+@media (min-width: 769px) {
+  .popover.down {
+    top: calc(100% + 6px);
+    bottom: auto;
+    left: auto;
+    right: 0;
+  }
+}
+
 .head {
   display: flex;
   align-items: center;

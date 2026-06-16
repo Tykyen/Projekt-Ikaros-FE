@@ -72,10 +72,19 @@
 }
 
 /* Panel Přítomní otevřený — tlačítko v accent stavu. */
-.membersBtnActive {
+.membersBtnActive,
+.searchActive {
   background: var(--theme-nav-active-bg, var(--bg-elev));
   border-color: var(--theme-accent, var(--accent));
   color: var(--theme-heading, var(--accent));
+}
+
+/* 6.2f-followup — kotva pro popover paletky „Vzhled" v hlavičce. Relative,
+   aby se popover (position:absolute, placement='down') ukotvil k tlačítku. */
+.appearanceAnchor {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
 }
 
 /* Badge s počtem online — zelená pilulka v rohu Users ikony. */

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FateDiceSkin } from '../../lib/diceSkins';
+import { DieFaceTexture } from './DieFaceTexture';
 
 interface D10ModelProps {
   faceValue: string | number;
@@ -39,11 +40,9 @@ const Face: React.FC<{
 
   const faceStyle: React.CSSProperties = skin
     ? {
-        background: faceImg
-          ? `url(${faceImg}) center/cover no-repeat`
-          : skin.materialImg
-            ? `url(${skin.materialImg}) center/cover no-repeat`
-            : skin.bgGradient || undefined,
+        background: skin.materialImg
+          ? `url(${skin.materialImg}) center/cover no-repeat`
+          : skin.bgGradient || undefined,
         borderColor: skin.borderColor,
         boxShadow: skin.coreColor
           ? `inset 0 0 10px ${skin.coreColor}`
@@ -59,14 +58,13 @@ const Face: React.FC<{
 
   return (
     <div className={`d10-face d10-face-${idx}`} style={faceStyle}>
-      {!faceImg && (
-        <div
-          className={`d10-num ${idx === target ? 'glow-win' : ''}`}
-          style={textStyle}
-        >
-          {displayValue}
-        </div>
-      )}
+      <div
+        className={`d10-num ${idx === target ? 'glow-win' : ''}`}
+        style={textStyle}
+      >
+        {displayValue}
+      </div>
+      <DieFaceTexture src={faceImg} />
     </div>
   );
 };

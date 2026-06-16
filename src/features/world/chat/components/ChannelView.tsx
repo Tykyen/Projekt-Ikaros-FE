@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Menu, Users, Search } from 'lucide-react';
+import { Menu, Users, Search, Palette } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
 import { WorldHelpButton, WorldHelpModal, ChatHelp } from '@/features/world/help';
 import type { User } from '@/shared/types';
@@ -41,6 +41,7 @@ import { makePjDisplayResolver } from '../lib/pjPersona';
 import { getFontStack, getFontSize } from '../lib/chatFonts';
 import { renderChatContent, type WorldEmoteSet } from '../lib/renderChatContent';
 import { ChannelComposer, type ComposerSendPayload } from './ChannelComposer';
+import { AppearancePopover } from './AppearancePopover';
 import { SoundNowPlayingBanner } from './SoundNowPlayingBanner';
 import { MessageEditInline } from './MessageEditInline';
 import { RpDateBadge } from './RpDateBadge';
@@ -117,6 +118,9 @@ export function ChannelView({
 
   const [typingNames, setTypingNames] = useState<string[]>([]);
   const [helpOpen, setHelpOpen] = useState(false);
+  // 6.2f-followup — paletka „Vzhled mé zprávy" přesunuta z composeru sem do
+  // hlavičky (líp dosažitelná, odlehčí přeplněný toolbar composeru).
+  const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [surfaceColor, setSurfaceColor] = useState('');
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -443,6 +447,27 @@ export function ChannelView({
         </button>
         {/* 13.6 — in-situ nápověda k chatu (role-aware cheat-sheet). */}
         <WorldHelpButton label="Nápověda k chatu" onClick={() => setHelpOpen(true)} />
+        {/* 6.2f-followup — „Vzhled mé zprávy" (barva/font/velikost) přesunuto
+            sem z composeru. Popover se otevírá dolů (placement='down'). */}
+        <div className={s.appearanceAnchor}>
+          <button
+            type="button"
+            className={clsx(s.search, appearanceOpen && s.searchActive)}
+            onClick={() => setAppearanceOpen((v) => !v)}
+            aria-label="Vzhled mé zprávy"
+            title="Vzhled mé zprávy"
+          >
+            <Palette size={18} />
+          </button>
+          {appearanceOpen && (
+            <AppearancePopover
+              worldId={worldId}
+              surfaceColor={surfaceColor}
+              placement="down"
+              onClose={() => setAppearanceOpen(false)}
+            />
+          )}
+        </div>
         {onToggleMembers && (
           <button
             type="button"
@@ -532,7 +557,6 @@ export function ChannelView({
           currentUserId={currentUser.id}
           members={members}
           canManage={canManage}
-          surfaceColor={surfaceColor}
           worldId={worldId}
           worldDice={worldDice}
           worldSlug={worldSlug}

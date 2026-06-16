@@ -12,7 +12,6 @@ import {
   Paperclip,
   Theater,
   Calendar,
-  Palette,
   AtSign,
   FileText,
   Smile,
@@ -42,12 +41,12 @@ import { extractMentionUsernames } from '../lib/parseMentions';
 import { resolveDisplayName } from '../lib/resolveDisplayName';
 import { useComposerSticky } from '../api/useComposerSticky';
 import { useComposerDraftAttachments } from '../api/useComposerDraftAttachments';
+import { useCoarsePointer } from '../lib/useCoarsePointer';
 import { ChatEmotePickerPopover } from '../emotes/components/ChatEmotePickerPopover';
 import { EmoteAutocomplete } from '../emotes/components/EmoteAutocomplete';
 import { useWorldEmotes } from '../emotes/api/useWorldEmotes';
 import { useGlobalEmotes } from '../emotes/api/useGlobalEmotes';
 import type { WorldEmote } from '../emotes/lib/types';
-import { AppearancePopover } from './AppearancePopover';
 import {
   MentionAutocomplete,
   type MentionCandidate,
@@ -98,8 +97,6 @@ interface Props {
   members: WorldMembership[];
   /** PJ+ → razítko NPC viditelné. */
   canManage: boolean;
-  /** Surface barva pro AppearancePopover kontrast guard. */
-  surfaceColor: string;
   worldId: string;
   /** Krok 6.3a — `World.dice` whitelist (typy kostek dovolené v tomto světě). */
   worldDice: string[];
@@ -126,7 +123,6 @@ export function ChannelComposer({
   currentUserId,
   members,
   canManage,
-  surfaceColor,
   worldId,
   worldDice,
   worldSlug,
@@ -142,7 +138,6 @@ export function ChannelComposer({
   const [uploading, setUploading] = useState(false);
   const [whisperTo, setWhisperTo] = useState<string>('');
   const [rpPopOpen, setRpPopOpen] = useState(false);
-  const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
   // Krok 6.3a/c/e — dice picker popover + pool modal + skin picker stav.
   const [dicePickerOpen, setDicePickerOpen] = useState(false);
@@ -152,6 +147,8 @@ export function ChannelComposer({
   const diceBtnRef = useRef<HTMLButtonElement>(null);
   const { getSkin } = useDiceSkinMapping(worldId);
   const diceOverlay = useDiceRollOverlay();
+  // Mobil (dotyk): Enter dělá odstavec, ne odeslání — viz onKeyDown níž.
+  const isCoarsePointer = useCoarsePointer();
 
   // 6.2d + 6.2e — sticky stav per (worldId × channelId) přes localStorage:
   // RP datum + NPC mód přežívají odeslání, přepnutí konverzace i refresh.
@@ -784,24 +781,8 @@ export function ChannelComposer({
           )}
         </div>
 
-        <div className={s.toolbarPosition}>
-          <button
-            type="button"
-            className={clsx(s.stamp, appearanceOpen && s.stampActive)}
-            onClick={() => setAppearanceOpen((v) => !v)}
-            title="Vzhled mé zprávy"
-            aria-label="Vzhled mé zprávy"
-          >
-            <Palette size={18} />
-          </button>
-          {appearanceOpen && (
-            <AppearancePopover
-              worldId={worldId}
-              surfaceColor={surfaceColor}
-              onClose={() => setAppearanceOpen(false)}
-            />
-          )}
-        </div>
+        {/* 6.2f-followup — paletka „Vzhled mé zprávy" přesunuta do hlavičky
+            konverzace (ChannelView header). Toolbar composeru ji už nedrží. */}
 
         {/* 6.2 — emoji picker do textu zprávy. */}
         <div className={s.toolbarPosition}>
@@ -913,9 +894,13 @@ export function ChannelComposer({
           }}
           onBlur={() => stopTyping()}
           onKeyDown={(e) => {
+            // Desktop: Enter odešle, Shift+Enter = nový řádek.
+            // Mobil (dotyk): Enter = nový řádek (odstavec) — telefon nemá Shift,
+            // odeslání jde výhradně přes tlačítko Odeslat.
             if (
               e.key === 'Enter' &&
               !e.shiftKey &&
+              !isCoarsePointer &&
               !mentionState.open &&
               !emoteState.open
             ) {

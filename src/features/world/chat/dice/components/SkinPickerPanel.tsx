@@ -9,6 +9,7 @@ import {
   pickRepresentativeImg,
 } from '../lib/diceSkins';
 import type { FateDiceSkin, DiceSkinPreviewType } from '../lib/diceSkins';
+import { cdnSized } from '../lib/cdnImage';
 import { useDiceSkinMapping } from '../api/useDiceSkinMapping';
 import styles from './SkinPickerPanel.module.css';
 
@@ -44,7 +45,7 @@ function SkinPreviewFace({
   skin: FateDiceSkin;
   type: DiceSkinPreviewType;
 }) {
-  const imgUrl = pickRepresentativeImg(skin, type);
+  const imgUrl = cdnSized(pickRepresentativeImg(skin, type));
 
   if (imgUrl) {
     return (

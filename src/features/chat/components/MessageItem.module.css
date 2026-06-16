@@ -79,12 +79,41 @@
 @media (max-width: 480px) {
   .avatarSlot,
   .avatarSlotGrouped {
-    width: 28px;
+    width: 32px;
   }
   .avatar {
-    width: 28px;
-    height: 28px;
-    font-size: var(--text-xs);
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-sm);
+  }
+}
+
+/* Mobil (portrait / úzký) — výchozí desktop velikosti jsou na telefonu v ruce
+   titěrné, hlavně meta (jméno + šedý čas). Zvětšujeme text i meta a přidáváme
+   vzdušnost. Landscape telefonu (>768px) bere desktop styly, ten vyhovuje,
+   proto cílíme jen úzký viewport. */
+@media (max-width: 768px) {
+  .item {
+    font-size: 17px;
+    line-height: var(--leading-loose);
+    padding: 2px var(--sp-2);
+  }
+  .name {
+    font-size: 15px;
+  }
+  .time,
+  .timeHover {
+    font-size: 13px;
+  }
+  .meta {
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+  .deletedText {
+    font-size: 15px;
+  }
+  .whisperTag {
+    font-size: 13px;
   }
 }
 

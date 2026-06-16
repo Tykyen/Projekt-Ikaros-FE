@@ -23,8 +23,10 @@ self.addEventListener('push', (event) => {
   const title = payload.title || 'Ikaros';
   const options = {
     body: payload.body || '',
-    icon: payload.icon || '/favicon.webp',
-    badge: '/favicon.webp',
+    // Velká ikona v těle notifikace — Ikaros logo (barevné).
+    icon: payload.icon || '/icons/icon-192.png',
+    // Badge = monochromní silueta ve stavové liště (Android bere jen alfu).
+    badge: '/icons/badge-96.png',
     data: { url: payload.url || '/' },
   };
   event.waitUntil(self.registration.showNotification(title, options));

@@ -448,8 +448,11 @@ export function WorldSection() {
           <ScreenshotSlot media="svet.chat" />
           <CalloutBox variant="tip">
             U zpráv funguje odpověď s citací, emoji reakce, šepot, přílohy, editace,
-            zmínka <code>@jméno</code>, herní datum, PJ NPC mód a hod kostkou (🎲) se
-            30 skiny. Vzhled svých zpráv i kostek si nastavíš zvlášť pro každý svět.
+            <strong>smazání vlastní zprávy</strong>, zmínka <code>@jméno</code>, herní
+            datum, PJ NPC mód a hod kostkou (🎲) se 30 skiny. Vzhled svých zpráv i
+            kostek si nastavíš přes paletku 🎨 v <strong>hlavičce konverzace</strong>,
+            zvlášť pro každý svět. Na mobilu klávesa <strong>Enter</strong> dělá nový
+            řádek (odstavec) — zprávu odešleš tlačítkem.
           </CalloutBox>
           <p>
             Vedení světa (PJ i Pomocný PJ) může v chatu vystupovat{' '}

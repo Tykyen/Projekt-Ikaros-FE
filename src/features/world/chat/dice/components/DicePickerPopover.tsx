@@ -30,6 +30,7 @@ import {
   resolveDiceKeys,
 } from '../lib/worldDiceCatalog';
 import { getDiceSkin, pickRepresentativeImg } from '../lib/diceSkins';
+import { cdnSized } from '../lib/cdnImage';
 import type { DiceSkinPreviewType } from '../lib/diceSkins';
 import styles from './DicePickerPopover.module.css';
 
@@ -223,9 +224,11 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
               // useDiceSkinMapping) → ukaž jeho reprezentativní tvář místo
               // generického glyfu. Fallback na glyf, když skin texturu nemá.
               const skin = getDiceSkin(getSkin(cat.rollType));
-              const skinImg = pickRepresentativeImg(
-                skin,
-                cat.rollType as DiceSkinPreviewType,
+              const skinImg = cdnSized(
+                pickRepresentativeImg(
+                  skin,
+                  cat.rollType as DiceSkinPreviewType,
+                ),
               );
               return (
                 <button

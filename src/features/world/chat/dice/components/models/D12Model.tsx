@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FateDiceSkin } from '../../lib/diceSkins';
+import { DieFaceTexture } from './DieFaceTexture';
 
 interface D12ModelProps {
   faceValue: string | number;
@@ -48,23 +49,17 @@ const Face: React.FC<{
   const faceImg = skin ? getD12FaceImg(skin, idx) : undefined;
 
   const faceStyle = skin
-    ? faceImg
-      ? {
-          background: `url(${faceImg}) center/cover no-repeat`,
-          borderColor: skin.borderColor,
-          boxShadow: `inset 0 0 10px rgba(0,0,0,0.7)`,
-        }
-      : {
-          background: skin.materialImg
-            ? `url(${skin.materialImg})`
-            : skin.bgGradient || undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          borderColor: skin.borderColor,
-          boxShadow: skin.coreColor
-            ? `inset 0 0 10px ${skin.coreColor}`
-            : undefined,
-        }
+    ? {
+        background: skin.materialImg
+          ? `url(${skin.materialImg})`
+          : skin.bgGradient || undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        borderColor: skin.borderColor,
+        boxShadow: skin.coreColor
+          ? `inset 0 0 10px ${skin.coreColor}`
+          : undefined,
+      }
     : undefined;
 
   const textStyle = skin
@@ -76,14 +71,13 @@ const Face: React.FC<{
 
   return (
     <div className={`d12-face d12-face-${idx}`} style={faceStyle}>
-      {!faceImg && (
-        <div
-          className={`d12-num ${idx === target ? 'glow-win' : ''}`}
-          style={textStyle}
-        >
-          {idx}
-        </div>
-      )}
+      <div
+        className={`d12-num ${idx === target ? 'glow-win' : ''}`}
+        style={textStyle}
+      >
+        {idx}
+      </div>
+      <DieFaceTexture src={faceImg} />
     </div>
   );
 };

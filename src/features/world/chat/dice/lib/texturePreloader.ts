@@ -1,4 +1,5 @@
 import { FATE_DICE_SKINS, getDiceSkin } from './diceSkins';
+import { cdnSized } from './cdnImage';
 import type { FateDiceSkin } from './diceSkins';
 
 const preloadedSkinIds = new Set<string>();
@@ -11,7 +12,15 @@ function collectSkinUrls(skin: FateDiceSkin): string[] {
   const urls: string[] = [];
   for (const key of Object.keys(skin) as (keyof FateDiceSkin)[]) {
     const v = skin[key];
-    if (typeof v === 'string' && v.startsWith(TEXTURE_PREFIX)) urls.push(v);
+    // 6.3-fix nález 3 — preloaduj lokální (`/textures/`) i vzdálené (cloudinary
+    // `http(s)://`) textury. Dřív se sbíraly jen lokální → default cloudinary
+    // skin se nepreloadl vůbec (záblesk prázdných kostek u prvního hodu).
+    if (
+      typeof v === 'string' &&
+      (v.startsWith(TEXTURE_PREFIX) || v.startsWith('http'))
+    ) {
+      urls.push(v);
+    }
   }
   return urls;
 }
@@ -65,7 +74,10 @@ export function preloadSkin(skinId: string): void {
   const urls = collectSkinUrls(skin);
   scheduleIdle(() => {
     urls.forEach((u) => {
-      void preloadOne(u);
+      // 6.3-fix2 — preloaduj STEJNOU (transformovanou) URL jako render,
+      // jinak by se přednačetla plná velikost a render stáhl malou (2× stažení).
+      const sized = cdnSized(u);
+      if (sized) void preloadOne(sized);
     });
   });
 }

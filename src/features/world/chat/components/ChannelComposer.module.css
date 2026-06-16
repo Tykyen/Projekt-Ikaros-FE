@@ -294,6 +294,19 @@
   cursor: not-allowed;
 }
 
+/* Mobil (portrait / úzký) — psací pole bývá titěrné a font < 16px navíc
+   spouští na iOS auto-zoom při focusu. Zvětšujeme vstup i tlačítko Odeslat. */
+@media (max-width: 768px) {
+  .input {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .send {
+    font-size: 15px;
+    padding: 8px 16px;
+  }
+}
+
 .modesBar {
   display: flex;
   flex-wrap: wrap;

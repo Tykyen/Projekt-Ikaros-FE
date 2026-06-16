@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FateDiceSkin } from '../../lib/diceSkins';
+import { DieFaceTexture } from './DieFaceTexture';
 
 interface D100TensModelProps {
   /** Hodnota desítkové kostky: '0', '10', '20', ..., '90'. */
@@ -41,11 +42,9 @@ const Face: React.FC<{
 
   const faceStyle: React.CSSProperties = skin
     ? {
-        background: faceImg
-          ? `url(${faceImg}) center/cover no-repeat`
-          : skin.materialImg
-            ? `url(${skin.materialImg}) center/cover no-repeat`
-            : skin.bgGradient || undefined,
+        background: skin.materialImg
+          ? `url(${skin.materialImg}) center/cover no-repeat`
+          : skin.bgGradient || undefined,
         borderColor: skin.borderColor,
         boxShadow: skin.coreColor
           ? `inset 0 0 10px ${skin.coreColor}`
@@ -64,14 +63,13 @@ const Face: React.FC<{
       className={`d10-face d10-face-${idx} d100-tens-face`}
       style={faceStyle}
     >
-      {!faceImg && (
-        <div
-          className={`d10-num d100-tens-num ${isWinner ? 'glow-win glow-win-tens' : ''}`}
-          style={textStyle}
-        >
-          {displayValue}
-        </div>
-      )}
+      <div
+        className={`d10-num d100-tens-num ${isWinner ? 'glow-win glow-win-tens' : ''}`}
+        style={textStyle}
+      >
+        {displayValue}
+      </div>
+      <DieFaceTexture src={faceImg} />
     </div>
   );
 };

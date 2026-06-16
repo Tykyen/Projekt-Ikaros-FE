@@ -412,7 +412,10 @@ export function MessageItem({
                 <Pencil size={13} />
               </button>
             )}
-            {canDelete && !isPending && !isFailed && (
+            {/* Mazání: vlastník smí mazat vlastní NE-dice zprávy (BE
+                chat.service.deleteMessage to povoluje), dice hod jen
+                PJ/Admin (canDelete) — shoda s BE dice guardem. */}
+            {(canDelete || (isSelf && !isDice)) && !isPending && !isFailed && (
               <button
                 type="button"
                 className={clsx(s.action, s.delete)}

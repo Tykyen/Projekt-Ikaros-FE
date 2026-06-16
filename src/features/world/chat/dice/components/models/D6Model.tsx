@@ -1,5 +1,6 @@
 import React, { useRef, useLayoutEffect, useState } from 'react';
 import type { FateDiceSkin } from '../../lib/diceSkins';
+import { DieFaceTexture } from './DieFaceTexture';
 
 const RenderDots: React.FC<{
   n: number;
@@ -92,9 +93,7 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: overrideImg
-        ? `url(${overrideImg}) center/cover`
-        : skin.bgGradient,
+      background: skin.bgGradient,
       border: overrideImg ? 'none' : `${sz * 0.05}px solid ${skin.borderColor}`,
       borderRadius: '4px',
       boxShadow: overrideImg
@@ -104,14 +103,14 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
     };
   };
 
-  const hasOverride = (val: number): boolean => {
-    if (val === 1 && skin.d6_1Img) return true;
-    if (val === 2 && skin.d6_2Img) return true;
-    if (val === 3 && skin.d6_3Img) return true;
-    if (val === 4 && skin.d6_4Img) return true;
-    if (val === 5 && skin.d6_5Img) return true;
-    if (val === 6 && skin.d6_6Img) return true;
-    return false;
+  const faceImgFor = (val: number): string | undefined => {
+    if (val === 1 && skin.d6_1Img) return skin.d6_1Img;
+    if (val === 2 && skin.d6_2Img) return skin.d6_2Img;
+    if (val === 3 && skin.d6_3Img) return skin.d6_3Img;
+    if (val === 4 && skin.d6_4Img) return skin.d6_4Img;
+    if (val === 5 && skin.d6_5Img) return skin.d6_5Img;
+    if (val === 6 && skin.d6_6Img) return skin.d6_6Img;
+    return skin.faceBlankImg || undefined;
   };
 
   return (
@@ -164,13 +163,12 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
           transform: `rotateY(0deg) translateZ(${halfSize + 0.5}px)`,
         }}
       >
-        {!hasOverride(1) && (
-          <RenderDots
-            n={1}
-            color={skin.symbolColor}
-            shadowColor={skin.symbolShadow}
-          />
-        )}
+        <RenderDots
+          n={1}
+          color={skin.symbolColor}
+          shadowColor={skin.symbolShadow}
+        />
+        <DieFaceTexture src={faceImgFor(1)} />
       </div>
       <div
         style={{
@@ -178,13 +176,12 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
           transform: `rotateY(180deg) translateZ(${halfSize + 0.5}px)`,
         }}
       >
-        {!hasOverride(2) && (
-          <RenderDots
-            n={2}
-            color={skin.symbolColor}
-            shadowColor={skin.symbolShadow}
-          />
-        )}
+        <RenderDots
+          n={2}
+          color={skin.symbolColor}
+          shadowColor={skin.symbolShadow}
+        />
+        <DieFaceTexture src={faceImgFor(2)} />
       </div>
       <div
         style={{
@@ -192,13 +189,12 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
           transform: `rotateY(90deg) translateZ(${halfSize + 0.5}px)`,
         }}
       >
-        {!hasOverride(3) && (
-          <RenderDots
-            n={3}
-            color={skin.symbolColor}
-            shadowColor={skin.symbolShadow}
-          />
-        )}
+        <RenderDots
+          n={3}
+          color={skin.symbolColor}
+          shadowColor={skin.symbolShadow}
+        />
+        <DieFaceTexture src={faceImgFor(3)} />
       </div>
       <div
         style={{
@@ -206,13 +202,12 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
           transform: `rotateY(-90deg) translateZ(${halfSize + 0.5}px)`,
         }}
       >
-        {!hasOverride(4) && (
-          <RenderDots
-            n={4}
-            color={skin.symbolColor}
-            shadowColor={skin.symbolShadow}
-          />
-        )}
+        <RenderDots
+          n={4}
+          color={skin.symbolColor}
+          shadowColor={skin.symbolShadow}
+        />
+        <DieFaceTexture src={faceImgFor(4)} />
       </div>
       <div
         style={{
@@ -220,13 +215,12 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
           transform: `rotateX(90deg) translateZ(${halfSize + 0.5}px)`,
         }}
       >
-        {!hasOverride(5) && (
-          <RenderDots
-            n={5}
-            color={skin.symbolColor}
-            shadowColor={skin.symbolShadow}
-          />
-        )}
+        <RenderDots
+          n={5}
+          color={skin.symbolColor}
+          shadowColor={skin.symbolShadow}
+        />
+        <DieFaceTexture src={faceImgFor(5)} />
       </div>
       <div
         style={{
@@ -234,13 +228,12 @@ export const D6Model: React.FC<D6ModelProps> = ({ skin }) => {
           transform: `rotateX(-90deg) translateZ(${halfSize + 0.5}px)`,
         }}
       >
-        {!hasOverride(6) && (
-          <RenderDots
-            n={6}
-            color={skin.symbolColor}
-            shadowColor={skin.symbolShadow}
-          />
-        )}
+        <RenderDots
+          n={6}
+          color={skin.symbolColor}
+          shadowColor={skin.symbolShadow}
+        />
+        <DieFaceTexture src={faceImgFor(6)} />
       </div>
     </div>
   );

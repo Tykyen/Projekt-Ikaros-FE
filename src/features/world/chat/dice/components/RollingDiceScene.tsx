@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import type { FateDiceSkin } from '../lib/diceSkins';
+import { cdnSized } from '../lib/cdnImage';
 import { targetForFate, targetForGeneric } from '../lib/diceTargets';
 import type { DiceTarget } from '../lib/diceTargets';
 import { D4Model } from './models/D4Model';
@@ -146,6 +147,19 @@ function pickFaceImg(
  * stačí jeden lazy-loaded `<img>` místo full 3D modelu se všemi tvářemi.
  * Fallback na 3D model jen pokud skin nemá texturu pro danou tvář.
  */
+/** Textový popisek tváře pro fallback, když textura nenačte (6.3-fix nález 1). */
+function faceLabel(type: DieType, faceValue: number | '+' | '-' | '0'): string {
+  if (type === 'fate') {
+    if (faceValue === '+' || faceValue === 1) return '+';
+    if (faceValue === '-' || faceValue === -1) return '−';
+    return '0';
+  }
+  const num = Number(faceValue);
+  if (type === 'd100tens') return num === 0 ? '00' : String(num);
+  if (type === 'd10') return String(num === 10 ? 0 : num);
+  return String(faceValue);
+}
+
 function SettledDieFace({
   type,
   faceValue,
@@ -157,29 +171,59 @@ function SettledDieFace({
   skin: FateDiceSkin;
   size: number;
 }) {
-  const imgUrl = pickFaceImg(type, faceValue, skin);
+  const imgUrl = cdnSized(pickFaceImg(type, faceValue, skin));
 
   if (imgUrl) {
+    const radius = skin.borderRadius || '14%';
     return (
-      <img
-        src={imgUrl}
-        alt=""
-        loading="lazy"
-        decoding="async"
+      <span
         style={{
+          position: 'relative',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           width: size,
           height: size,
-          objectFit: 'cover',
-          borderRadius: skin.borderRadius || '14%',
+          borderRadius: radius,
           border: `1px solid ${skin.borderColor || 'transparent'}`,
           boxShadow:
             'inset 0 -3px 6px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.35)',
+          background: skin.bgGradient,
+          overflow: 'hidden',
         }}
-      />
+      >
+        {/* Fallback číslo/symbol pod texturou — odkryje se, když se textura
+            nenačte. Kostka tak nikdy nezůstane prázdná. */}
+        <span
+          aria-hidden
+          style={{
+            color: skin.symbolColor || '#fff',
+            textShadow: skin.symbolShadow || '0 1px 3px rgba(0,0,0,0.7)',
+            fontSize: size * 0.42,
+            fontWeight: 900,
+            fontFamily: skin.fontFamily || 'inherit',
+            lineHeight: 1,
+          }}
+        >
+          {faceLabel(type, faceValue)}
+        </span>
+        <img
+          src={imgUrl}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          decoding="async"
+          className="die-face-tex"
+          style={{ borderRadius: radius }}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      </span>
     );
   }
 
-  // Fallback — žádná textura, render 3D model (původní cesta).
+  // Fallback — skin texturu pro tuto tvář vůbec nemá: render 3D model.
   return <>{renderModel(type, faceValue, skin, size)}</>;
 }
 

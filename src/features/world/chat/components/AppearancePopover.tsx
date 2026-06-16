@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { X, Undo2 } from 'lucide-react';
+import clsx from 'clsx';
 import { toast } from 'sonner';
 import { guardChatColor } from '@/features/chat/lib/chatColorGuard';
 import {
@@ -32,6 +33,13 @@ interface Props {
   worldId: string;
   surfaceColor: string;
   onClose: () => void;
+  /**
+   * Směr otevření na desktopu:
+   *  - 'up' (default) — kotva dole (composer toolbar), popover nahoru.
+   *  - 'down' — kotva nahoře (hlavička konverzace), popover dolů + vpravo.
+   * Na mobilu je v obou případech spodní sheet (řeší CSS media query).
+   */
+  placement?: 'up' | 'down';
 }
 
 const PREVIEW_TEXT =
@@ -46,7 +54,12 @@ const CATEGORY_ORDER: readonly ChatFontCategory[] = [
   'Futuristické a cyber',
 ];
 
-export function AppearancePopover({ worldId, surfaceColor, onClose }: Props) {
+export function AppearancePopover({
+  worldId,
+  surfaceColor,
+  onClose,
+  placement = 'up',
+}: Props) {
   const appearance = useMembershipAppearance(worldId);
   const update = useUpdateAppearance(worldId);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -150,7 +163,7 @@ export function AppearancePopover({ worldId, surfaceColor, onClose }: Props) {
   return (
     <div
       ref={rootRef}
-      className={s.popover}
+      className={clsx(s.popover, placement === 'down' && s.down)}
       role="dialog"
       aria-label="Vzhled mé zprávy v tomto světě"
     >

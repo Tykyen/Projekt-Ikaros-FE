@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DicePayload } from '../lib/dicePayload';
 import { getDiceSkin } from '../lib/diceSkins';
+import { cdnSized } from '../lib/cdnImage';
 import {
   D4_TARGETS,
   D6_TARGETS,
@@ -396,13 +397,15 @@ export function DiceRollOverlay({ roll, onDone }: DiceRollOverlayProps) {
         const die = dies[i];
         const isFirstD100 = die.dieType.toLowerCase() === 'd100' && i === 0;
         const isFate = die.dieType.toLowerCase() === 'fate';
-        const fateImgSrc = isFate
-          ? die.faceValue === '+'
-            ? skin.facePlusImg
-            : die.faceValue === '-'
-              ? skin.faceMinusImg
-              : skin.faceBlankImg
-          : undefined;
+        const fateImgSrc = cdnSized(
+          isFate
+            ? die.faceValue === '+'
+              ? skin.facePlusImg
+              : die.faceValue === '-'
+                ? skin.faceMinusImg
+                : skin.faceBlankImg
+            : undefined,
+        );
         return (
           <div
             key={i}

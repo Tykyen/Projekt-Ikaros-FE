@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FateDiceSkin } from '../../lib/diceSkins';
+import { DieFaceTexture } from './DieFaceTexture';
 
 export interface FateSkinModelProps {
   skin: FateDiceSkin;
@@ -42,6 +43,13 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
 
   const halfSize = size / 2;
 
+  const faceImgFor = (fVal: string): string | undefined => {
+    if (fVal === '+') return skin.facePlusImg;
+    if (fVal === '-') return skin.faceMinusImg;
+    if (fVal === '0') return skin.faceBlankImg;
+    return undefined;
+  };
+
   // Matrix verze rozšířena o dva fallbacky pro robustnost:
   // 1. Layered background — pokud texture URL silently selže (CORS,
   //    mixed content, transient network), pod ní je `bgGradient` jako
@@ -66,9 +74,7 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: overrideImg
-        ? `url(${overrideImg}) center/cover, ${skin.bgGradient || '#1a1a1a'}`
-        : skin.bgGradient,
+      background: skin.bgGradient,
       border: overrideImg
         ? `${size * 0.025}px solid ${skin.borderColor || 'rgba(100,100,180,0.5)'}`
         : `${size * 0.05}px solid ${skin.borderColor}`,
@@ -76,11 +82,10 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
       boxShadow: overrideImg
         ? `inset 0 0 ${size * 0.2}px rgba(0,0,0,0.9)`
         : `inset 0 0 ${size * 0.125}px ${skin.shadowColor}, inset 0 0 2px rgba(255,255,255,0.2)`,
-      color: overrideImg ? 'transparent' : skin.symbolColor,
-      textShadow: overrideImg
-        ? 'none'
-        : skin.symbolShadow ||
-          '0px 1px 2px rgba(0,0,0,0.8), inset 0px 1px 1px rgba(0,0,0,0.5)',
+      color: skin.symbolColor,
+      textShadow:
+        skin.symbolShadow ||
+        '0px 1px 2px rgba(0,0,0,0.8), inset 0px 1px 1px rgba(0,0,0,0.5)',
       fontSize: `${size * 0.35}px`,
       fontWeight: 900,
       fontFamily: skin.fontFamily || 'monospace',
@@ -128,6 +133,10 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
         }}
       >
         {getSymbol(faces.front)}
+        <DieFaceTexture
+          src={faceImgFor(faces.front)}
+          borderRadius={skin.borderRadius || '20%'}
+        />
       </div>
       <div
         style={{
@@ -136,6 +145,10 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
         }}
       >
         {getSymbol(faces.right)}
+        <DieFaceTexture
+          src={faceImgFor(faces.right)}
+          borderRadius={skin.borderRadius || '20%'}
+        />
       </div>
       <div
         style={{
@@ -144,6 +157,10 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
         }}
       >
         {getSymbol(faces.back)}
+        <DieFaceTexture
+          src={faceImgFor(faces.back)}
+          borderRadius={skin.borderRadius || '20%'}
+        />
       </div>
       <div
         style={{
@@ -152,6 +169,10 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
         }}
       >
         {getSymbol(faces.left)}
+        <DieFaceTexture
+          src={faceImgFor(faces.left)}
+          borderRadius={skin.borderRadius || '20%'}
+        />
       </div>
       <div
         style={{
@@ -160,6 +181,10 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
         }}
       >
         {getSymbol(faces.top)}
+        <DieFaceTexture
+          src={faceImgFor(faces.top)}
+          borderRadius={skin.borderRadius || '20%'}
+        />
       </div>
       <div
         style={{
@@ -168,6 +193,10 @@ export const FateSkinModel: React.FC<FateSkinModelProps> = ({
         }}
       >
         {getSymbol(faces.bottom)}
+        <DieFaceTexture
+          src={faceImgFor(faces.bottom)}
+          borderRadius={skin.borderRadius || '20%'}
+        />
       </div>
     </div>
   );
