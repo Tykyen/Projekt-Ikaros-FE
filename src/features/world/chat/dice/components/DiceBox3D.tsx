@@ -135,7 +135,7 @@ export default function DiceBox3D({
       // víc místa od okraje, krajní kostky (Fate hází 4) neuletí ze stolu.
       gravity_multiplier: 500,
       baseScale: 85,
-      strength: 1.0,
+      strength: 0.85,
       onRollComplete: () => {
         if (!cancelled) cbRef.current.onComplete();
       },

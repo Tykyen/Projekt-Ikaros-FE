@@ -7,8 +7,11 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(72vw, 860px);
-  height: min(62vh, 600px);
+  /* Menší, zhruba čtvercová aréna — větší/širší box nutí kameru se oddálit
+     za clamp (depth < minDist −100) → viditelná oblast < fyzikální a kostky
+     uvíznou na kraji mimo záběr. Tahle velikost se vejde bez clampu. */
+  width: min(52vw, 560px);
+  height: min(56vh, 520px);
   z-index: 5000;
   pointer-events: none;
 }
