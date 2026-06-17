@@ -154,11 +154,17 @@
 }
 
 .chipGlyph {
+  position: relative;
+  z-index: 2;
   font-family: 'Iceland', monospace;
-  font-weight: 600;
-  color: var(--theme-text-dim, rgba(220, 215, 255, 0.7));
+  font-weight: 700;
+  color: #fff;
   line-height: 1;
   transition: color 0.2s;
+  /* čitelnost glyfu na světlém i tmavém materiálu */
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.95),
+    0 0 8px rgba(0, 0, 0, 0.85);
 }
 
 .chip_lg .chipGlyph {
@@ -173,18 +179,36 @@
   font-size: 14px;
 }
 
-/* 10.2j — reprezentativní tvář aktuálního skinu místo glyfu. */
-.chipImg {
-  width: 42px;
-  height: 42px;
+/* 6.3-fix4 — podkres = swatch materiálu přes celou dlaždici, glyf typu navrch. */
+.chipMat {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  display: block;
+  border-radius: 50%;
   pointer-events: none;
   transition: transform 0.2s;
 }
 
-.chip:hover .chipImg {
+.chip:hover .chipMat {
   transform: scale(1.06);
+}
+
+/* jemný tmavý scrim pod glyfem (pod glyfem z-index 2, nad materiálem) */
+.chip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    transparent 72%
+  );
+  pointer-events: none;
 }
 
 .chipLabel {

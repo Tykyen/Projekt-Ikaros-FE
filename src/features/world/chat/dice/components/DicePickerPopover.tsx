@@ -29,9 +29,7 @@ import {
   DICE_CATALOG,
   resolveDiceKeys,
 } from '../lib/worldDiceCatalog';
-import { getDiceSkin, pickRepresentativeImg } from '../lib/diceSkins';
-import { cdnSized } from '../lib/cdnImage';
-import type { DiceSkinPreviewType } from '../lib/diceSkins';
+import { materialPreviewUrl } from '../lib/dice3dMaterials';
 import styles from './DicePickerPopover.module.css';
 
 export interface DiceRollResult {
@@ -220,16 +218,9 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
           <div className={styles.grid}>
             {allowedKeys.map((key) => {
               const cat = DICE_CATALOG[key];
-              // Aktuálně zvolený skin daného typu (per-uživatel přes
-              // useDiceSkinMapping) → ukaž jeho reprezentativní tvář místo
-              // generického glyfu. Fallback na glyf, když skin texturu nemá.
-              const skin = getDiceSkin(getSkin(cat.rollType));
-              const skinImg = cdnSized(
-                pickRepresentativeImg(
-                  skin,
-                  cat.rollType as DiceSkinPreviewType,
-                ),
-              );
+              // Podkres = aktuálně zvolený materiál daného typu (swatch),
+              // navrch glyf typu kostky → vidět materiál i typ zároveň.
+              const matImg = materialPreviewUrl(getSkin(cat.rollType));
               return (
                 <button
                   key={key}
@@ -238,18 +229,17 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
                   onClick={() => performRoll(key)}
                   title={`Hodit ${cat.label}`}
                 >
-                  {skinImg ? (
+                  {matImg && (
                     <img
-                      src={skinImg}
-                      alt={cat.label}
+                      src={matImg}
+                      alt=""
+                      aria-hidden
                       loading="lazy"
                       decoding="async"
-                      className={styles.chipImg}
-                      style={{ borderRadius: skin.borderRadius || '18%' }}
+                      className={styles.chipMat}
                     />
-                  ) : (
-                    <span className={styles.chipGlyph}>{cat.glyph}</span>
                   )}
+                  <span className={styles.chipGlyph}>{cat.glyph}</span>
                   <span className={styles.chipLabel}>{cat.label}</span>
                 </button>
               );
