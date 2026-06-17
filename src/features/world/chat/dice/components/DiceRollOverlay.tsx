@@ -61,20 +61,21 @@ export function DiceRollOverlay({ roll, onDone }: DiceRollOverlayProps) {
       setPhase('idle');
       return;
     }
-    if (can3d) {
-      setMount3d(true);
-      setUse3dThisRoll(true);
-      setPhase('rolling');
-      // 'result' nastaví onComplete z DiceBox3D.
-      return;
-    }
-    // Fallback (fate / no-WebGL) — krátká pauza, pak výsledek.
-    setUse3dThisRoll(false);
+    if (can3d) setMount3d(true);
+    setUse3dThisRoll(can3d);
     setPhase('rolling');
-    const t = window.setTimeout(() => setPhase('result'), FALLBACK_DELAY_MS);
-    return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roll?.timestamp]);
+
+  // Strop fáze 'rolling' → výsledek se ukáže VŽDY (je z payloadu), i kdyby 3D
+  // onComplete nepřišel (hang/chyba). 3D normálně doběhne ~2–3 s; 6 s je jen
+  // pojistka. Bez 3D (fate fallback) jen krátká pauza pro efekt.
+  useEffect(() => {
+    if (phase !== 'rolling') return;
+    const ms = use3dThisRoll ? 6000 : FALLBACK_DELAY_MS;
+    const t = window.setTimeout(() => setPhase('result'), ms);
+    return () => window.clearTimeout(t);
+  }, [phase, use3dThisRoll]);
 
   // Po zobrazení výsledku držet a dokončit.
   useEffect(() => {

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
 import DiceBox from '@drdreo/dice-box-threejs';
 import { materialTextureDescriptor } from '../lib/dice3dThemes';
 import type { Dice3dTheme } from '../lib/dice3dThemes';
@@ -63,6 +62,9 @@ export default function DiceBox3D({
   const hostRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<DiceBoxInstance | null>(null);
   const [ready, setReady] = useState(false);
+  // Naposled aplikovaný materiál — `updateConfig` (async reload textury) voláme
+  // jen při změně, jinak hodíme rovnou (méně race → spolehlivější render).
+  const lastMaterialRef = useRef<string | null>(null);
   // Vždy nejnovější hodnoty (rollNow čte z refs, ne ze zastaralého closure).
   const latestRef = useRef({ notation, active, theme });
   latestRef.current = { notation, active, theme };
@@ -80,16 +82,33 @@ export default function DiceBox3D({
       // takže při prvním hodu (host se právě zobrazil) můžou být 0 → kostka by
       // padla mimo viewport. Tímto je scéna/svět vždy správně velká.
       if (host && host.clientWidth) {
-        box.setDimensions(new THREE.Vector2(host.clientWidth, host.clientHeight));
+        // Prostý {x,y} — NE three.Vector2 z appky (knihovna má vlastní baked
+        // three; míchání instancí rozbíjí render). Knihovna čte jen .x/.y.
+        box.setDimensions({
+          x: host.clientWidth,
+          y: host.clientHeight,
+        } as Parameters<DiceBoxInstance['setDimensions']>[0]);
       }
       box.clearDice();
-      void box
-        .updateConfig({
-          theme_customColorset: theme.colorset,
-          theme_material: theme.material,
-        })
-        .then(() => box.roll(notation))
-        .catch(() => cbRef.current.onError());
+      const matId = theme.colorset.name;
+      const fire = () => {
+        box.clearDice();
+        void box.roll(notation).catch(() => cbRef.current.onError());
+      };
+      if (matId !== lastMaterialRef.current) {
+        // Materiál se změnil → reload tématu (async), pak hod.
+        lastMaterialRef.current = matId;
+        void box
+          .updateConfig({
+            theme_customColorset: theme.colorset,
+            theme_material: theme.material,
+          })
+          .then(fire)
+          .catch(() => cbRef.current.onError());
+      } else {
+        // Stejný materiál → hodit rovnou (žádný async reload = míň race).
+        fire();
+      }
     } catch {
       cbRef.current.onError();
     }
@@ -112,9 +131,11 @@ export default function DiceBox3D({
       light_intensity: 1.2,
       shadows: true,
       sounds: false,
-      gravity_multiplier: 400,
-      baseScale: 100,
-      strength: 1.3,
+      // Vyšší gravitace = rychlejší usazení; menší kostka + mírnější hod =
+      // víc místa od okraje, krajní kostky (Fate hází 4) neuletí ze stolu.
+      gravity_multiplier: 500,
+      baseScale: 85,
+      strength: 1.0,
       onRollComplete: () => {
         if (!cancelled) cbRef.current.onComplete();
       },
@@ -128,10 +149,14 @@ export default function DiceBox3D({
       .then(() => {
         if (cancelled) return;
         boxRef.current = box;
+        // Materiál z init configu už je aplikovaný → první hod stejného
+        // materiálu nemusí volat updateConfig.
+        lastMaterialRef.current = theme.colorset.name;
         try {
-          // Průhledné pozadí + ploché bílé ambientní světlo (zachová sytost).
+          // Průhledné pozadí scény. (Vlastní světla NEpřidáváme — musela by
+          // být z knihovní three; vibrance řeší CSS filtr na canvasu + config
+          // color_spotlight/light_intensity.)
           box.scene.background = null;
-          box.scene.add(new THREE.AmbientLight(0xffffff, 1.4));
         } catch {
           /* defenzivní */
         }
@@ -175,12 +200,5 @@ export default function DiceBox3D({
     }
   }, [active, ready]);
 
-  return (
-    <div
-      ref={hostRef}
-      className={styles.host}
-      style={{ display: active ? 'block' : 'none' }}
-      aria-hidden
-    />
-  );
+  return <div ref={hostRef} className={styles.host} aria-hidden />;
 }

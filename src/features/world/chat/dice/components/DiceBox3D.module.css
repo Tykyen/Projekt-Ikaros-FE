@@ -1,7 +1,14 @@
-/* Krok 6.3-fix4 — host pro 3D dice canvas (přes celou plochu, za readoutem). */
+/* Krok 6.3-fix4 — host pro 3D dice canvas.
+   Vystředěný box uprostřed viewportu (ne celá plocha) → kostky dopadají tam,
+   kam se hráč dívá, a nepadají za boční panely / mimo obraz. Stěny fyzikálního
+   boxu se odvozují z rozměru hostu, takže menší host = pevnější mantinely. */
 .host {
   position: fixed;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(72vw, 860px);
+  height: min(62vh, 600px);
   z-index: 5000;
   pointer-events: none;
 }
