@@ -81,7 +81,7 @@ export default function DiceBox3D({
       // Bílé, silnější světlo — výchozí krémové (0xefdfd5) + nízká intenzita
       // kalí barvy materiálu. Bílé světlo = živé pravé barvy.
       color_spotlight: 0xffffff,
-      light_intensity: 1.1,
+      light_intensity: 2.0,
       shadows: true,
       sounds: false,
       gravity_multiplier: 400,
@@ -146,6 +146,20 @@ export default function DiceBox3D({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nonce]);
+
+  // Po dokončení hodu (overlay schován → active=false) uklidit kostky,
+  // ať nezůstanou viset do dalšího hodu.
+  useEffect(() => {
+    if (active) return;
+    const box = boxRef.current;
+    if (box && readyRef.current) {
+      try {
+        box.clearDice();
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [active]);
 
   return (
     <div

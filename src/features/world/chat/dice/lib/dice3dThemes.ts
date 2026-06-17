@@ -75,7 +75,9 @@ export function materialTextureDescriptor(
     name,
     composite: 'multiply',
     source: m.source,
-    source_bump: m.source,
+    // Bump vypnutý — barevný obrázek jako bump kalí povrch. Pravé šedotónové
+    // bump mapy lze dodat zvlášť (zatím čistá barva = živější materiál).
+    source_bump: '',
   };
 }
 
