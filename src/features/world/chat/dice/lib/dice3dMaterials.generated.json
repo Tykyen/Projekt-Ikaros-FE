@@ -1,0 +1,485 @@
+[
+  {
+    "id": "bezne-bambus",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Bambus",
+    "source": "textures/skins/bezne/bambus.webp"
+  },
+  {
+    "id": "bezne-barevne-sklo",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Barevné sklo",
+    "source": "textures/skins/bezne/barevne-sklo.webp"
+  },
+  {
+    "id": "bezne-buk",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Buk",
+    "source": "textures/skins/bezne/buk.webp"
+  },
+  {
+    "id": "bezne-dub",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Dub",
+    "source": "textures/skins/bezne/dub.webp"
+  },
+  {
+    "id": "bezne-jantar",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Jantar",
+    "source": "textures/skins/bezne/jantar.webp"
+  },
+  {
+    "id": "bezne-javor",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "javor",
+    "source": "textures/skins/bezne/javor.webp"
+  },
+  {
+    "id": "bezne-keramika",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Keramika",
+    "source": "textures/skins/bezne/keramika.webp"
+  },
+  {
+    "id": "bezne-kost",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Kost",
+    "source": "textures/skins/bezne/kost.webp"
+  },
+  {
+    "id": "bezne-kuze",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Kůže",
+    "source": "textures/skins/bezne/kuze.webp"
+  },
+  {
+    "id": "bezne-orech",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Ořech",
+    "source": "textures/skins/bezne/orech.webp"
+  },
+  {
+    "id": "bezne-palena-hlina",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Pálená hlína",
+    "source": "textures/skins/bezne/palena-hlina.webp"
+  },
+  {
+    "id": "bezne-parohovina",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Parohovina",
+    "source": "textures/skins/bezne/parohovina.webp"
+  },
+  {
+    "id": "bezne-perlet",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Perleť",
+    "source": "textures/skins/bezne/perlet.webp"
+  },
+  {
+    "id": "bezne-pryskyrice",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Pryskyřice",
+    "source": "textures/skins/bezne/pryskyrice.webp"
+  },
+  {
+    "id": "bezne-rohovina",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Rohovina",
+    "source": "textures/skins/bezne/rohovina.webp"
+  },
+  {
+    "id": "bezne-sklo",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Sklo",
+    "source": "textures/skins/bezne/sklo.webp"
+  },
+  {
+    "id": "bezne-slonovina",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "Slonovina",
+    "source": "textures/skins/bezne/slonovina.webp"
+  },
+  {
+    "id": "bezne-vosk",
+    "group": "Běžné",
+    "groupSlug": "bezne",
+    "name": "vosk",
+    "source": "textures/skins/bezne/vosk.webp"
+  },
+  {
+    "id": "draci-bily",
+    "group": "Dračí",
+    "groupSlug": "draci",
+    "name": "Bílý",
+    "source": "textures/skins/draci/bily.webp"
+  },
+  {
+    "id": "draci-cerny",
+    "group": "Dračí",
+    "groupSlug": "draci",
+    "name": "Černý",
+    "source": "textures/skins/draci/cerny.webp"
+  },
+  {
+    "id": "draci-modry",
+    "group": "Dračí",
+    "groupSlug": "draci",
+    "name": "Modrý",
+    "source": "textures/skins/draci/modry.webp"
+  },
+  {
+    "id": "draci-rudy",
+    "group": "Dračí",
+    "groupSlug": "draci",
+    "name": "Rudý",
+    "source": "textures/skins/draci/rudy.webp"
+  },
+  {
+    "id": "draci-zeleny",
+    "group": "Dračí",
+    "groupSlug": "draci",
+    "name": "Zelený",
+    "source": "textures/skins/draci/zeleny.webp"
+  },
+  {
+    "id": "element-boure",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Bouře",
+    "source": "textures/skins/element/boure.webp"
+  },
+  {
+    "id": "element-koren",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Kořen",
+    "source": "textures/skins/element/koren.webp"
+  },
+  {
+    "id": "element-lava",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Láva",
+    "source": "textures/skins/element/lava.webp"
+  },
+  {
+    "id": "element-led",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Led",
+    "source": "textures/skins/element/led.webp"
+  },
+  {
+    "id": "element-more",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Moře",
+    "source": "textures/skins/element/more.webp"
+  },
+  {
+    "id": "element-popel",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Popel",
+    "source": "textures/skins/element/popel.webp"
+  },
+  {
+    "id": "element-poust",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Poušť",
+    "source": "textures/skins/element/poust.webp"
+  },
+  {
+    "id": "element-sul",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Sůl",
+    "source": "textures/skins/element/sul.webp"
+  },
+  {
+    "id": "element-vitr",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Vítr",
+    "source": "textures/skins/element/vitr.webp"
+  },
+  {
+    "id": "element-zeme",
+    "group": "Element",
+    "groupSlug": "element",
+    "name": "Země",
+    "source": "textures/skins/element/zeme.webp"
+  },
+  {
+    "id": "kamen-achat",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Achát",
+    "source": "textures/skins/kamen/achat.webp"
+  },
+  {
+    "id": "kamen-ametyst",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Ametyst",
+    "source": "textures/skins/kamen/ametyst.webp"
+  },
+  {
+    "id": "kamen-cedic",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Čedič",
+    "source": "textures/skins/kamen/cedic.webp"
+  },
+  {
+    "id": "kamen-hematit",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Hematit",
+    "source": "textures/skins/kamen/hematit.webp"
+  },
+  {
+    "id": "kamen-jadeit",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Jadeit",
+    "source": "textures/skins/kamen/jadeit.webp"
+  },
+  {
+    "id": "kamen-jaspis",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Jaspis",
+    "source": "textures/skins/kamen/jaspis.webp"
+  },
+  {
+    "id": "kamen-kristal",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Křišťál",
+    "source": "textures/skins/kamen/kristal.webp"
+  },
+  {
+    "id": "kamen-lapis",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Lapis",
+    "source": "textures/skins/kamen/lapis.webp"
+  },
+  {
+    "id": "kamen-malachit",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Malachit",
+    "source": "textures/skins/kamen/malachit.webp"
+  },
+  {
+    "id": "kamen-mramor",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Mramor",
+    "source": "textures/skins/kamen/mramor.webp"
+  },
+  {
+    "id": "kamen-obsidian",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Obsidián",
+    "source": "textures/skins/kamen/obsidian.webp"
+  },
+  {
+    "id": "kamen-onyx",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Onyx",
+    "source": "textures/skins/kamen/onyx.webp"
+  },
+  {
+    "id": "kamen-piskovec",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Pískovec",
+    "source": "textures/skins/kamen/piskovec.webp"
+  },
+  {
+    "id": "kamen-pyrit",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Pyrit",
+    "source": "textures/skins/kamen/pyrit.webp"
+  },
+  {
+    "id": "kamen-zula",
+    "group": "Kámen",
+    "groupSlug": "kamen",
+    "name": "Žula",
+    "source": "textures/skins/kamen/zula.webp"
+  },
+  {
+    "id": "kov-bronz",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "bronz",
+    "source": "textures/skins/kov/bronz.webp"
+  },
+  {
+    "id": "kov-cerna-ocel",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "černá ocel",
+    "source": "textures/skins/kov/cerna-ocel.webp"
+  },
+  {
+    "id": "kov-med",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "Měď",
+    "source": "textures/skins/kov/med.webp"
+  },
+  {
+    "id": "kov-meteorologicka-ocel",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "Meteorologická ocel",
+    "source": "textures/skins/kov/meteorologicka-ocel.webp"
+  },
+  {
+    "id": "kov-ocel",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "ocel",
+    "source": "textures/skins/kov/ocel.webp"
+  },
+  {
+    "id": "kov-platina",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "platina",
+    "source": "textures/skins/kov/platina.webp"
+  },
+  {
+    "id": "kov-stribro",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "stříbro",
+    "source": "textures/skins/kov/stribro.webp"
+  },
+  {
+    "id": "kov-wolfram",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "Wolfram",
+    "source": "textures/skins/kov/wolfram.webp"
+  },
+  {
+    "id": "kov-zlato",
+    "group": "Kov",
+    "groupSlug": "kov",
+    "name": "zlato",
+    "source": "textures/skins/kov/zlato.webp"
+  },
+  {
+    "id": "mysticke-alchymisticke-zlato",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Alchymistické zlato",
+    "source": "textures/skins/mysticke/alchymisticke-zlato.webp"
+  },
+  {
+    "id": "mysticke-demonicka-rohovina",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Démonická rohovina",
+    "source": "textures/skins/mysticke/demonicka-rohovina.webp"
+  },
+  {
+    "id": "mysticke-etericke-sklo",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Etérické sklo",
+    "source": "textures/skins/mysticke/etericke-sklo.webp"
+  },
+  {
+    "id": "mysticke-hvezdny-kristal",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Hvězdný křišťál",
+    "source": "textures/skins/mysticke/hvezdny-kristal.webp"
+  },
+  {
+    "id": "mysticke-krvavy-kamen",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Krvavý kámen",
+    "source": "textures/skins/mysticke/krvavy-kamen.webp"
+  },
+  {
+    "id": "mysticke-magit",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Magit",
+    "source": "textures/skins/mysticke/magit.webp"
+  },
+  {
+    "id": "mysticke-mesicni-kamen",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Měsíční kámen",
+    "source": "textures/skins/mysticke/mesicni-kamen.webp"
+  },
+  {
+    "id": "mysticke-nebesky-opal",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Nebeský opál",
+    "source": "textures/skins/mysticke/nebesky-opal.webp"
+  },
+  {
+    "id": "mysticke-popel-zatracenych",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Popel zatracených",
+    "source": "textures/skins/mysticke/popel-zatracenych.webp"
+  },
+  {
+    "id": "mysticke-proklety-onyx",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Prokletý onyx",
+    "source": "textures/skins/mysticke/proklety-onyx.webp"
+  },
+  {
+    "id": "mysticke-runove-stribro",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Runové stříbro",
+    "source": "textures/skins/mysticke/runove-stribro.webp"
+  },
+  {
+    "id": "mysticke-stara-kost",
+    "group": "Mystické",
+    "groupSlug": "mysticke",
+    "name": "Stará kost",
+    "source": "textures/skins/mysticke/stara-kost.webp"
+  }
+]

@@ -1,0 +1,13 @@
+/* Krok 6.3-fix4 — host pro 3D dice canvas (přes celou plochu, za readoutem). */
+.host {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  pointer-events: none;
+}
+
+.host canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}

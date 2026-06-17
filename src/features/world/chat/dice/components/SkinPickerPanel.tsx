@@ -2,14 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Check, Skull, Heart } from 'lucide-react';
 import {
-  CATEGORY_LABELS,
-  CATEGORY_ORDER,
-  DEFAULT_SKIN_ID,
-  getSkinsByCategory,
-  pickRepresentativeImg,
-} from '../lib/diceSkins';
-import type { FateDiceSkin, DiceSkinPreviewType } from '../lib/diceSkins';
-import { cdnSized } from '../lib/cdnImage';
+  GROUP_ORDER,
+  GROUP_LABELS,
+  DEFAULT_MATERIAL_ID,
+  getMaterialsByGroup,
+  materialPreviewUrl,
+} from '../lib/dice3dMaterials';
 import { useDiceSkinMapping } from '../api/useDiceSkinMapping';
 import styles from './SkinPickerPanel.module.css';
 
@@ -17,82 +15,33 @@ interface SkinPickerPanelProps {
   open: boolean;
   onClose: () => void;
   worldId: string;
-  /** Otevřít rovnou na záložce „Vězení" (rychlý přístup z popoveru). */
+  /** Otevřít rovnou na záložce „Vězení". */
   initialJail?: boolean;
 }
 
 /** Typ kostky pro top chips. `default` = fallback pro všechny typy. */
 const DICE_TYPES = [
-  { key: 'default', label: 'Výchozí', preview: 'd20' as const },
-  { key: 'fate', label: 'Fate', preview: 'fate' as const },
-  { key: 'd4', label: 'k4', preview: 'd4' as const },
-  { key: 'd6', label: 'k6', preview: 'd6' as const },
-  { key: 'd8', label: 'k8', preview: 'd8' as const },
-  { key: 'd10', label: 'k10', preview: 'd10' as const },
-  { key: 'd12', label: 'k12', preview: 'd12' as const },
-  { key: 'd20', label: 'k20', preview: 'd20' as const },
-  { key: 'd100', label: 'k%', preview: 'd100' as const },
+  { key: 'default', label: 'Výchozí' },
+  { key: 'fate', label: 'Fate' },
+  { key: 'd4', label: 'k4' },
+  { key: 'd6', label: 'k6' },
+  { key: 'd8', label: 'k8' },
+  { key: 'd10', label: 'k10' },
+  { key: 'd12', label: 'k12' },
+  { key: 'd20', label: 'k20' },
+  { key: 'd100', label: 'k%' },
 ];
 
 /**
- * 2D preview tváře — jediný `<img loading="lazy">`. Pokud skin nemá pro
- * daný typ texturu, fallback na CSS gradient + glyf z bgGradient.
- */
-function SkinPreviewFace({
-  skin,
-  type,
-}: {
-  skin: FateDiceSkin;
-  type: DiceSkinPreviewType;
-}) {
-  const imgUrl = cdnSized(pickRepresentativeImg(skin, type));
-
-  if (imgUrl) {
-    return (
-      <img
-        src={imgUrl}
-        alt={skin.name}
-        loading="lazy"
-        decoding="async"
-        className={styles.previewImg}
-        style={{
-          borderRadius: skin.borderRadius || '14%',
-          borderColor: skin.borderColor,
-        }}
-      />
-    );
-  }
-
-  // Skin pro daný typ nemá texturu — CSS fallback s gradientem.
-  return (
-    <div
-      className={styles.previewFallback}
-      style={{
-        background: skin.bgGradient,
-        color: skin.symbolColor || '#fff',
-        textShadow: skin.symbolShadow,
-        borderColor: skin.borderColor,
-        borderRadius: skin.borderRadius || '14%',
-      }}
-    >
-      {skin.ornamentChar || '?'}
-    </div>
-  );
-}
-
-/**
- * Krok 6.3e — Modal pro výběr skinu kostek.
+ * Krok 6.3-fix4 — Výběr materiálu 3D kostek.
  *
- * Top: chips „Typ kostky" (Výchozí + Fate + k4..k%). Aktivní chip určuje
- *   pro který typ uživatel nastavuje skin (ukládá do `WorldMembership.
- *   diceSkinMapping`).
- * Sidebar (desktop): kategorie skinů (Základní / Živelné / Dračí /
- *   Nemrtví / Přírodní).
- * Main: grid karet (140×180) s 3D cube náhledem dle aktivního typu.
- *   Aktivní skin = ✓ medallion + accent border.
+ * Top: chips „Typ kostky" (Výchozí + Fate + k4..k%) — pro který typ se
+ *   materiál nastavuje (ukládá do `WorldMembership.diceSkinMapping`).
+ * Sidebar: skupiny materiálů (Běžné / Kámen / Kov / Dračí / Element / Mystické).
+ * Main: grid karet s náhledem povrchu materiálu (webp swatch). Aktivní = ✓.
  *
- * Mobile (≤ 768): sidebar zaniká, kategorie jako horizontální chips
- * nad gridem. Skin karty se zužují.
+ * Číslo na kostce kreslí 3D engine — materiál nese jen povrch, proto je
+ * náhled stejný pro všechny typy kostek.
  */
 export function SkinPickerPanel({
   open,
@@ -103,28 +52,15 @@ export function SkinPickerPanel({
   const { getSkin, setSkin, jailed, toggleJail, isJailed } =
     useDiceSkinMapping(worldId);
   const [activeType, setActiveType] = useState<string>('default');
-  const [activeCategory, setActiveCategory] = useState<string>('core');
-  // Krok 6.3 D-NEW-dice-jail — záložka „Vězení" je separátní view skinů,
-  // které uživatel uvěznil. Není mezi kategoriemi, žije jako vlastní pseudo-cat.
+  const [activeGroup, setActiveGroup] = useState<string>(GROUP_ORDER[0]);
   const [showingJail, setShowingJail] = useState(false);
 
-  const grouped = useMemo(() => getSkinsByCategory(), []);
-  const allSkins = useMemo(
-    () => Object.values(grouped).flat(),
-    [grouped],
-  );
-  const skinsInCategory = useMemo(() => {
-    if (showingJail) {
-      return allSkins.filter((s) => jailed.includes(s.id));
-    }
-    // Hlavní grid skrývá uvězněné skiny — najdou se jen v záložce „Vězení".
-    return (grouped[activeCategory] ?? []).filter(
-      (s) => !jailed.includes(s.id),
-    );
-  }, [showingJail, allSkins, grouped, activeCategory, jailed]);
-
-  const previewType =
-    DICE_TYPES.find((t) => t.key === activeType)?.preview ?? 'd20';
+  const grouped = useMemo(() => getMaterialsByGroup(), []);
+  const allMaterials = useMemo(() => Object.values(grouped).flat(), [grouped]);
+  const materialsInGroup = useMemo(() => {
+    if (showingJail) return allMaterials.filter((m) => jailed.includes(m.id));
+    return (grouped[activeGroup] ?? []).filter((m) => !jailed.includes(m.id));
+  }, [showingJail, allMaterials, grouped, activeGroup, jailed]);
 
   useEffect(() => {
     if (!open) return;
@@ -135,27 +71,16 @@ export function SkinPickerPanel({
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  // Při každém otevření nastav počáteční záložku (skiny vs vězení) dle toho,
-  // přes kterou ikonu v popoveru uživatel přišel.
-  // R19 adjustment-during-render (open je primitivní).
   const [prevOpen, setPrevOpen] = useState(open);
   if (open !== prevOpen) {
     setPrevOpen(open);
     if (open) setShowingJail(initialJail);
   }
 
-  // 6.3 perf — odstraněno: `preloadSkin` v useEffect tahalo všech ~70 textur
-  // per skin × 8 skinů = 560 paralelních requestů. Místo toho karta používá
-  // `<img loading="lazy">` na jednu reprezentativní tvář, browser sám
-  // odhadne kdy stáhnout. Z 560 → max 8 requestů na otevření modalu.
-
   if (!open) return null;
 
-  const activeSkinId = getSkin(activeType) || DEFAULT_SKIN_ID;
+  const activeMaterialId = getSkin(activeType) || DEFAULT_MATERIAL_ID;
 
-  // Portál do body — `position: fixed` backdrop se jinak vztahuje k předkovi s
-  // `transform` (mapa pan/zoom container), takže modal skončil nalepený nahoře
-  // pod lištou místo vystředění přes celý viewport.
   return createPortal(
     <div className={styles.backdrop} onClick={onClose}>
       <div
@@ -191,39 +116,36 @@ export function SkinPickerPanel({
 
         <div className={styles.layout}>
           <aside className={styles.sidebar}>
-            {CATEGORY_ORDER.map((cat) => {
-              // Spočítat nezavřené skiny v kategorii (do counts).
-              const skinsInCat = grouped[cat] ?? [];
-              const free = skinsInCat.filter(
-                (s) => !jailed.includes(s.id),
+            {GROUP_ORDER.map((slug) => {
+              const free = (grouped[slug] ?? []).filter(
+                (m) => !jailed.includes(m.id),
               ).length;
               return (
                 <button
-                  key={cat}
+                  key={slug}
                   type="button"
                   className={`${styles.catBtn} ${
-                    !showingJail && activeCategory === cat
+                    !showingJail && activeGroup === slug
                       ? styles.catBtnActive
                       : ''
                   }`}
                   onClick={() => {
                     setShowingJail(false);
-                    setActiveCategory(cat);
+                    setActiveGroup(slug);
                   }}
                 >
-                  <span>{CATEGORY_LABELS[cat]}</span>
+                  <span>{GROUP_LABELS[slug] ?? slug}</span>
                   <span className={styles.catCount}>({free})</span>
                 </button>
               );
             })}
-            {/* D-NEW-dice-jail — tab Vězení, zobrazený vždy (i prázdný). */}
             <button
               type="button"
               className={`${styles.catBtn} ${styles.jailBtn} ${
                 showingJail ? styles.catBtnActive : ''
               }`}
               onClick={() => setShowingJail(true)}
-              title="Skiny, které jste poslal do vězení za smolné hody"
+              title="Materiály, které jste poslal do vězení za smolné hody"
             >
               <span>
                 <Skull size={12} aria-hidden="true" /> Vězení
@@ -238,62 +160,63 @@ export function SkinPickerPanel({
                 <Skull size={32} aria-hidden="true" />
                 <p>Vězení je prázdné.</p>
                 <p className={styles.jailEmptyHint}>
-                  Klikni na ☠ u libovolné karty pro uvěznění skinu, který
+                  Klikni na ☠ u libovolné karty pro uvěznění materiálu, který
                   ti vyhodil smolný hod.
                 </p>
               </div>
             )}
-            {skinsInCategory.map((skin) => {
-              const isActive = skin.id === activeSkinId;
-              const jailedSkin = isJailed(skin.id);
+            {materialsInGroup.map((mat) => {
+              const isActive = mat.id === activeMaterialId;
+              const jailedMat = isJailed(mat.id);
               return (
                 <div
-                  key={skin.id}
-                  className={`${styles.card} ${isActive ? styles.cardActive : ''} ${jailedSkin ? styles.cardJailed : ''}`}
-                  title={skin.name}
+                  key={mat.id}
+                  className={`${styles.card} ${isActive ? styles.cardActive : ''} ${jailedMat ? styles.cardJailed : ''}`}
+                  title={mat.name}
                 >
                   <button
                     type="button"
                     className={styles.cardMainBtn}
                     onClick={() => {
-                      if (jailedSkin) return; // ve Vězení nelze vybírat
-                      setSkin(activeType, skin.id);
+                      if (jailedMat) return;
+                      setSkin(activeType, mat.id);
                     }}
-                    disabled={jailedSkin && !showingJail}
+                    disabled={jailedMat && !showingJail}
                   >
                     <div className={styles.preview}>
-                      <SkinPreviewFace skin={skin} type={previewType} />
+                      <img
+                        src={materialPreviewUrl(mat.id)}
+                        alt={mat.name}
+                        loading="lazy"
+                        decoding="async"
+                        className={styles.previewImg}
+                        style={{ borderRadius: '14%' }}
+                      />
                     </div>
                     <div className={styles.cardFoot}>
-                      <span className={styles.cardName}>{skin.name}</span>
-                      {skin.ornamentChar && (
-                        <span className={styles.cardOrnament}>
-                          {skin.ornamentChar}
-                        </span>
-                      )}
+                      <span className={styles.cardName}>{mat.name}</span>
                     </div>
                   </button>
-                  {isActive && !jailedSkin && (
+                  {isActive && !jailedMat && (
                     <span className={styles.medallion} aria-hidden="true">
                       <Check size={12} />
                     </span>
                   )}
-                  {/* Krok 6.3 D-NEW-dice-jail — toggle uvězněn/omilostněn. */}
                   <button
                     type="button"
-                    className={`${styles.jailToggle} ${jailedSkin ? styles.jailToggleFree : ''}`}
+                    className={`${styles.jailToggle} ${jailedMat ? styles.jailToggleFree : ''}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleJail(skin.id);
+                      toggleJail(mat.id);
                     }}
-                    title={jailedSkin ? 'Omilostnit' : 'Uvěznit'}
+                    title={jailedMat ? 'Omilostnit' : 'Uvěznit'}
                     aria-label={
-                      jailedSkin
-                        ? `Omilostnit skin ${skin.name}`
-                        : `Uvěznit skin ${skin.name}`
+                      jailedMat
+                        ? `Omilostnit materiál ${mat.name}`
+                        : `Uvěznit materiál ${mat.name}`
                     }
                   >
-                    {jailedSkin ? (
+                    {jailedMat ? (
                       <Heart size={12} aria-hidden="true" />
                     ) : (
                       <Skull size={12} aria-hidden="true" />

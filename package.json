@@ -32,6 +32,7 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@drdreo/dice-box-threejs": "^1.1.0",
     "@fontsource-variable/crimson-pro": "^5.2.8",
     "@fontsource-variable/fraunces": "^5.2.9",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
@@ -55,6 +56,7 @@
     "@tiptap/starter-kit": "^3.23.4",
     "@tiptap/suggestion": "^3.23.4",
     "axios": "^1.16.0",
+    "cannon-es": "^0.20.0",
     "clsx": "^2.1.1",
     "frimousse": "^0.3.0",
     "jotai": "^2.20.0",
@@ -113,5 +115,10 @@
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10",
     "vitest": "^4.1.5"
+  },
+  "overrides": {
+    "@drdreo/dice-box-threejs": {
+      "three": "$three"
+    }
   }
 }

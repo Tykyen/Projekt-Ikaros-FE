@@ -3,7 +3,7 @@ import {
   useMembershipAppearance,
   useUpdateAppearance,
 } from '../../api/useMembershipAppearance';
-import { DEFAULT_SKIN_ID } from '../lib/diceSkins';
+import { DEFAULT_MATERIAL_ID } from '../lib/dice3dMaterials';
 
 /**
  * Krok 6.3e — hook nad `WorldMembership.diceSkinMapping`.
@@ -28,7 +28,7 @@ export function useDiceSkinMapping(worldId: string) {
   const getSkin = useCallback(
     (typeKey: string): string => {
       return (
-        mapping?.[typeKey] ?? mapping?.default ?? DEFAULT_SKIN_ID
+        mapping?.[typeKey] ?? mapping?.default ?? DEFAULT_MATERIAL_ID
       );
     },
     [mapping],
