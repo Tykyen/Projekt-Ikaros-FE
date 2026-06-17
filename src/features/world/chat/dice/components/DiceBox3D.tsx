@@ -78,6 +78,10 @@ export default function DiceBox3D({
       theme_material: theme.material,
       theme_texture: '',
       theme_surface: 'green-felt',
+      // Bílé, silnější světlo — výchozí krémové (0xefdfd5) + nízká intenzita
+      // kalí barvy materiálu. Bílé světlo = živé pravé barvy.
+      color_spotlight: 0xffffff,
+      light_intensity: 1.1,
       shadows: true,
       sounds: false,
       gravity_multiplier: 400,

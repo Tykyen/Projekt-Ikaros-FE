@@ -9,8 +9,7 @@
  *   d100 tens80 ones7 → "1d100@80+1d10@7"
  *   mixed d20+d6      → "1d20@13+1d6@4"
  *
- * Fate vrací `null` — Fudge kostku engine nemá, řeší se 2D fallbackem
- * (viz spec 6.3-fix4 §3.5).
+ * Fate = Fudge kostka (`4df@1,-1,0,...`) — engine ji umí (symboly −/0/+).
  */
 import type { DicePayload } from './dicePayload';
 
@@ -42,7 +41,13 @@ function group(sides: number, faces: number[]): string {
  * (fate) — volající pak použije 2D fallback.
  */
 export function payloadToNotation(payload: DicePayload): string | null {
-  if (payload.type === 'fate') return null;
+  if (payload.type === 'fate') {
+    // Fudge kostka (`df`): hodnoty −1/0/+1, symboly −/0/+ kreslí engine.
+    const vals = payload.faces
+      .map((f) => (f === '+' ? 1 : f === '-' ? -1 : 0))
+      .join(',');
+    return `${payload.faces.length}df@${vals}`;
+  }
 
   if (payload.type === 'd100') {
     const tens = Math.round(payload.tens); // 0,10,..,90
