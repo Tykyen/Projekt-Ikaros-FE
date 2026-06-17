@@ -200,6 +200,43 @@
   text-transform: uppercase;
 }
 
+/* Přátelé — kompaktní chipy (avatar + jméno) ve flow, klik na profil. */
+.friendList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.friendChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px 5px 5px;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-full, 9999px);
+  text-decoration: none;
+  color: var(--text-strong);
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.friendChip:hover {
+  background: var(--surface-3, var(--surface-2));
+  border-color: var(--accent);
+}
+
+.friendName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* 8.3 / D-075 — Moje postavy (cross-world) */
 .characterList {
   list-style: none;

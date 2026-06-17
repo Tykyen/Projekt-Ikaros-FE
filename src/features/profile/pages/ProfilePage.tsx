@@ -8,7 +8,7 @@ import { CharacterSection } from '../components/CharacterSection';
 import { WorldsSection } from '../components/WorldsSection';
 import { MyCharactersSection } from '../components/MyCharactersSection';
 import { ProfileEventsSection } from '../components/ProfileEventsSection';
-import { FriendsPlaceholder } from '../components/FriendsPlaceholder';
+import { FriendsSection } from '../components/FriendsSection';
 import { CommunityPlaceholders } from '../components/CommunityPlaceholders';
 import { AppearanceSection } from '../components/AppearanceSection';
 import { PrivacySection } from '../components/PrivacySection';
@@ -63,7 +63,7 @@ export default function ProfilePage() {
           characterAvatarUrl={user.characterAvatarUrl}
         />
 
-        <FriendsPlaceholder />
+        <FriendsSection />
 
         <WorldsSection />
 

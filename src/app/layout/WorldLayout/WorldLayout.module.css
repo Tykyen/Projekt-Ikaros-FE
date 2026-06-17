@@ -1,6 +1,9 @@
 /* ── Shell ── */
 .shell {
-  min-height: 100svh;
+  /* dvh (ne svh) — sleduje viewport při skrývání/odkrývání URL baru na mobilu.
+     Musí ladit s `.room` chatu (taky dvh), jinak chat buď přeteče (mizící
+     header) nebo nedosáhne na dno (prázdný pruh). */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);

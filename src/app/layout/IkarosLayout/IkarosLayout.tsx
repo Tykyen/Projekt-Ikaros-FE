@@ -17,7 +17,6 @@ import {
   HelpCircle,
   Beer,
   Signpost,
-  Settings,
   Sparkles,
   ShieldCheck,
 } from 'lucide-react';
@@ -766,6 +765,18 @@ export function IkarosLayout() {
           ☰
         </button>
 
+        {/* Administrace (pravý drawer) — přesunuto vlevo hned vedle hamburgeru,
+            ikona hvězdy místo ozubeného kolečka. Mobil-only (viz CSS). */}
+        {showRightPanel && (
+          <button
+            className={s.rightHamburger}
+            onClick={openRightDrawer}
+            aria-label="Otevřít administraci"
+          >
+            <Sparkles size={20} />
+          </button>
+        )}
+
         <Link to="/" className={s.logo} aria-label="Projekt Ikaros — domů">
           <span className={s.logoImg} aria-hidden="true" />
           <span className={s.logoFallback}>Projekt Ikaros</span>
@@ -782,16 +793,6 @@ export function IkarosLayout() {
             </svg>
           </span>
         </div>
-
-        {showRightPanel && (
-          <button
-            className={s.rightHamburger}
-            onClick={openRightDrawer}
-            aria-label="Otevřít administraci"
-          >
-            <Settings size={20} />
-          </button>
-        )}
 
         {isAuthenticated ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </header>

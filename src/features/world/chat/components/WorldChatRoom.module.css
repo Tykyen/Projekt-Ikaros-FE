@@ -1,5 +1,7 @@
 .room {
   position: relative;
+  /* dvh — laděno se `.shell` (taky dvh). Obě jednotky sledují viewport
+     společně, takže chat ani nepřeteče (mizící header), ani nenechá pruh dole. */
   height: calc(100dvh - var(--header-h, 88px) - var(--sp-5));
   min-height: 440px;
   display: grid;

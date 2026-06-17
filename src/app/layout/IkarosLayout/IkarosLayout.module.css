@@ -134,8 +134,7 @@
 .hamburger:hover,
 .rightHamburger:hover { background: var(--bg-card-hover); }
 
-/* Pravý hamburger se tlačí doprava (vlevo od headerNav) */
-.rightHamburger { margin-left: auto; }
+/* Administrace (hvězda) sedí vlevo hned vedle hamburgeru — žádné margin-left:auto. */
 
 /* ── 3-column body ── */
 .body {
