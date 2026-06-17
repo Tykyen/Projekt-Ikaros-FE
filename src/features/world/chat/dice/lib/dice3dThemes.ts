@@ -50,12 +50,15 @@ const GROUP_MATERIAL: Record<string, string> = {
 export function getDice3dTheme(materialId: string | null | undefined): Dice3dTheme {
   const id = resolveMaterialId(materialId);
   const m = getMaterial(id) as DiceMaterial;
+  // Barva čísla dle světlosti materiálu: tmavé číslo + světlý obrys na světlém
+  // povrchu, světlé číslo + tmavý obrys na tmavém. Obrys = opačný → čitelnost.
+  const light = m.light === true;
   return {
     colorset: {
       name: id,
-      foreground: '#f4f8ff',
+      foreground: light ? '#16181f' : '#f4f8ff',
       background: '#ffffff',
-      outline: '#0a0c14',
+      outline: light ? '#ffffff' : '#0a0c14',
       texture: id,
     },
     material: GROUP_MATERIAL[m.groupSlug] ?? 'plastic',

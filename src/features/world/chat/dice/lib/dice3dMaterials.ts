@@ -18,6 +18,10 @@ export interface DiceMaterial {
   name: string;
   /** Cesta textury relativně k `assetPath` (`/dice-box/`). */
   source: string;
+  /** Světlý povrch (průměrný jas > práh) → tmavé číslo na kostce. */
+  light?: boolean;
+  /** Průměrný jas 0..255 (diagnostika). */
+  lum?: number;
 }
 
 export const DICE_MATERIALS: DiceMaterial[] = rawManifest as DiceMaterial[];

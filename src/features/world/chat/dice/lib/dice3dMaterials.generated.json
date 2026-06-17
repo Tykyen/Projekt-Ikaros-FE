@@ -4,482 +4,620 @@
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Bambus",
-    "source": "textures/skins/bezne/bambus.webp"
+    "source": "textures/skins/bezne/bambus.webp",
+    "light": true,
+    "lum": 177
   },
   {
     "id": "bezne-barevne-sklo",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Barevné sklo",
-    "source": "textures/skins/bezne/barevne-sklo.webp"
+    "source": "textures/skins/bezne/barevne-sklo.webp",
+    "light": false,
+    "lum": 37
   },
   {
     "id": "bezne-buk",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Buk",
-    "source": "textures/skins/bezne/buk.webp"
+    "source": "textures/skins/bezne/buk.webp",
+    "light": true,
+    "lum": 164
   },
   {
     "id": "bezne-dub",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Dub",
-    "source": "textures/skins/bezne/dub.webp"
+    "source": "textures/skins/bezne/dub.webp",
+    "light": false,
+    "lum": 62
   },
   {
     "id": "bezne-jantar",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Jantar",
-    "source": "textures/skins/bezne/jantar.webp"
+    "source": "textures/skins/bezne/jantar.webp",
+    "light": false,
+    "lum": 118
   },
   {
     "id": "bezne-javor",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "javor",
-    "source": "textures/skins/bezne/javor.webp"
+    "source": "textures/skins/bezne/javor.webp",
+    "light": true,
+    "lum": 205
   },
   {
     "id": "bezne-keramika",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Keramika",
-    "source": "textures/skins/bezne/keramika.webp"
+    "source": "textures/skins/bezne/keramika.webp",
+    "light": true,
+    "lum": 211
   },
   {
     "id": "bezne-kost",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Kost",
-    "source": "textures/skins/bezne/kost.webp"
+    "source": "textures/skins/bezne/kost.webp",
+    "light": true,
+    "lum": 208
   },
   {
     "id": "bezne-kuze",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Kůže",
-    "source": "textures/skins/bezne/kuze.webp"
+    "source": "textures/skins/bezne/kuze.webp",
+    "light": false,
+    "lum": 36
   },
   {
     "id": "bezne-orech",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Ořech",
-    "source": "textures/skins/bezne/orech.webp"
+    "source": "textures/skins/bezne/orech.webp",
+    "light": false,
+    "lum": 52
   },
   {
     "id": "bezne-palena-hlina",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Pálená hlína",
-    "source": "textures/skins/bezne/palena-hlina.webp"
+    "source": "textures/skins/bezne/palena-hlina.webp",
+    "light": false,
+    "lum": 105
   },
   {
     "id": "bezne-parohovina",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Parohovina",
-    "source": "textures/skins/bezne/parohovina.webp"
+    "source": "textures/skins/bezne/parohovina.webp",
+    "light": true,
+    "lum": 169
   },
   {
     "id": "bezne-perlet",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Perleť",
-    "source": "textures/skins/bezne/perlet.webp"
+    "source": "textures/skins/bezne/perlet.webp",
+    "light": true,
+    "lum": 213
   },
   {
     "id": "bezne-pryskyrice",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Pryskyřice",
-    "source": "textures/skins/bezne/pryskyrice.webp"
+    "source": "textures/skins/bezne/pryskyrice.webp",
+    "light": true,
+    "lum": 196
   },
   {
     "id": "bezne-rohovina",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Rohovina",
-    "source": "textures/skins/bezne/rohovina.webp"
+    "source": "textures/skins/bezne/rohovina.webp",
+    "light": false,
+    "lum": 56
   },
   {
     "id": "bezne-sklo",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Sklo",
-    "source": "textures/skins/bezne/sklo.webp"
+    "source": "textures/skins/bezne/sklo.webp",
+    "light": true,
+    "lum": 195
   },
   {
     "id": "bezne-slonovina",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "Slonovina",
-    "source": "textures/skins/bezne/slonovina.webp"
+    "source": "textures/skins/bezne/slonovina.webp",
+    "light": true,
+    "lum": 222
   },
   {
     "id": "bezne-vosk",
     "group": "Běžné",
     "groupSlug": "bezne",
     "name": "vosk",
-    "source": "textures/skins/bezne/vosk.webp"
+    "source": "textures/skins/bezne/vosk.webp",
+    "light": true,
+    "lum": 184
   },
   {
     "id": "draci-bily",
     "group": "Dračí",
     "groupSlug": "draci",
     "name": "Bílý",
-    "source": "textures/skins/draci/bily.webp"
+    "source": "textures/skins/draci/bily.webp",
+    "light": true,
+    "lum": 223
   },
   {
     "id": "draci-cerny",
     "group": "Dračí",
     "groupSlug": "draci",
     "name": "Černý",
-    "source": "textures/skins/draci/cerny.webp"
+    "source": "textures/skins/draci/cerny.webp",
+    "light": false,
+    "lum": 20
   },
   {
     "id": "draci-modry",
     "group": "Dračí",
     "groupSlug": "draci",
     "name": "Modrý",
-    "source": "textures/skins/draci/modry.webp"
+    "source": "textures/skins/draci/modry.webp",
+    "light": false,
+    "lum": 56
   },
   {
     "id": "draci-rudy",
     "group": "Dračí",
     "groupSlug": "draci",
     "name": "Rudý",
-    "source": "textures/skins/draci/rudy.webp"
+    "source": "textures/skins/draci/rudy.webp",
+    "light": false,
+    "lum": 40
   },
   {
     "id": "draci-zeleny",
     "group": "Dračí",
     "groupSlug": "draci",
     "name": "Zelený",
-    "source": "textures/skins/draci/zeleny.webp"
+    "source": "textures/skins/draci/zeleny.webp",
+    "light": false,
+    "lum": 44
   },
   {
     "id": "element-boure",
     "group": "Element",
     "groupSlug": "element",
     "name": "Bouře",
-    "source": "textures/skins/element/boure.webp"
+    "source": "textures/skins/element/boure.webp",
+    "light": false,
+    "lum": 81
   },
   {
     "id": "element-koren",
     "group": "Element",
     "groupSlug": "element",
     "name": "Kořen",
-    "source": "textures/skins/element/koren.webp"
+    "source": "textures/skins/element/koren.webp",
+    "light": false,
+    "lum": 81
   },
   {
     "id": "element-lava",
     "group": "Element",
     "groupSlug": "element",
     "name": "Láva",
-    "source": "textures/skins/element/lava.webp"
+    "source": "textures/skins/element/lava.webp",
+    "light": false,
+    "lum": 29
   },
   {
     "id": "element-led",
     "group": "Element",
     "groupSlug": "element",
     "name": "Led",
-    "source": "textures/skins/element/led.webp"
+    "source": "textures/skins/element/led.webp",
+    "light": true,
+    "lum": 198
   },
   {
     "id": "element-more",
     "group": "Element",
     "groupSlug": "element",
     "name": "Moře",
-    "source": "textures/skins/element/more.webp"
+    "source": "textures/skins/element/more.webp",
+    "light": false,
+    "lum": 99
   },
   {
     "id": "element-popel",
     "group": "Element",
     "groupSlug": "element",
     "name": "Popel",
-    "source": "textures/skins/element/popel.webp"
+    "source": "textures/skins/element/popel.webp",
+    "light": false,
+    "lum": 92
   },
   {
     "id": "element-poust",
     "group": "Element",
     "groupSlug": "element",
     "name": "Poušť",
-    "source": "textures/skins/element/poust.webp"
+    "source": "textures/skins/element/poust.webp",
+    "light": true,
+    "lum": 161
   },
   {
     "id": "element-sul",
     "group": "Element",
     "groupSlug": "element",
     "name": "Sůl",
-    "source": "textures/skins/element/sul.webp"
+    "source": "textures/skins/element/sul.webp",
+    "light": true,
+    "lum": 219
   },
   {
     "id": "element-vitr",
     "group": "Element",
     "groupSlug": "element",
     "name": "Vítr",
-    "source": "textures/skins/element/vitr.webp"
+    "source": "textures/skins/element/vitr.webp",
+    "light": true,
+    "lum": 209
   },
   {
     "id": "element-zeme",
     "group": "Element",
     "groupSlug": "element",
     "name": "Země",
-    "source": "textures/skins/element/zeme.webp"
+    "source": "textures/skins/element/zeme.webp",
+    "light": false,
+    "lum": 43
   },
   {
     "id": "kamen-achat",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Achát",
-    "source": "textures/skins/kamen/achat.webp"
+    "source": "textures/skins/kamen/achat.webp",
+    "light": false,
+    "lum": 143
   },
   {
     "id": "kamen-ametyst",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Ametyst",
-    "source": "textures/skins/kamen/ametyst.webp"
+    "source": "textures/skins/kamen/ametyst.webp",
+    "light": false,
+    "lum": 106
   },
   {
     "id": "kamen-cedic",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Čedič",
-    "source": "textures/skins/kamen/cedic.webp"
+    "source": "textures/skins/kamen/cedic.webp",
+    "light": false,
+    "lum": 57
   },
   {
     "id": "kamen-hematit",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Hematit",
-    "source": "textures/skins/kamen/hematit.webp"
+    "source": "textures/skins/kamen/hematit.webp",
+    "light": false,
+    "lum": 91
   },
   {
     "id": "kamen-jadeit",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Jadeit",
-    "source": "textures/skins/kamen/jadeit.webp"
+    "source": "textures/skins/kamen/jadeit.webp",
+    "light": true,
+    "lum": 150
   },
   {
     "id": "kamen-jaspis",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Jaspis",
-    "source": "textures/skins/kamen/jaspis.webp"
+    "source": "textures/skins/kamen/jaspis.webp",
+    "light": false,
+    "lum": 85
   },
   {
     "id": "kamen-kristal",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Křišťál",
-    "source": "textures/skins/kamen/kristal.webp"
+    "source": "textures/skins/kamen/kristal.webp",
+    "light": true,
+    "lum": 212
   },
   {
     "id": "kamen-lapis",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Lapis",
-    "source": "textures/skins/kamen/lapis.webp"
+    "source": "textures/skins/kamen/lapis.webp",
+    "light": false,
+    "lum": 58
   },
   {
     "id": "kamen-malachit",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Malachit",
-    "source": "textures/skins/kamen/malachit.webp"
+    "source": "textures/skins/kamen/malachit.webp",
+    "light": false,
+    "lum": 92
   },
   {
     "id": "kamen-mramor",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Mramor",
-    "source": "textures/skins/kamen/mramor.webp"
+    "source": "textures/skins/kamen/mramor.webp",
+    "light": true,
+    "lum": 221
   },
   {
     "id": "kamen-obsidian",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Obsidián",
-    "source": "textures/skins/kamen/obsidian.webp"
+    "source": "textures/skins/kamen/obsidian.webp",
+    "light": false,
+    "lum": 17
   },
   {
     "id": "kamen-onyx",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Onyx",
-    "source": "textures/skins/kamen/onyx.webp"
+    "source": "textures/skins/kamen/onyx.webp",
+    "light": false,
+    "lum": 27
   },
   {
     "id": "kamen-piskovec",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Pískovec",
-    "source": "textures/skins/kamen/piskovec.webp"
+    "source": "textures/skins/kamen/piskovec.webp",
+    "light": true,
+    "lum": 175
   },
   {
     "id": "kamen-pyrit",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Pyrit",
-    "source": "textures/skins/kamen/pyrit.webp"
+    "source": "textures/skins/kamen/pyrit.webp",
+    "light": false,
+    "lum": 96
   },
   {
     "id": "kamen-zula",
     "group": "Kámen",
     "groupSlug": "kamen",
     "name": "Žula",
-    "source": "textures/skins/kamen/zula.webp"
+    "source": "textures/skins/kamen/zula.webp",
+    "light": false,
+    "lum": 131
   },
   {
     "id": "kov-bronz",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "bronz",
-    "source": "textures/skins/kov/bronz.webp"
+    "source": "textures/skins/kov/bronz.webp",
+    "light": false,
+    "lum": 110
   },
   {
     "id": "kov-cerna-ocel",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "černá ocel",
-    "source": "textures/skins/kov/cerna-ocel.webp"
+    "source": "textures/skins/kov/cerna-ocel.webp",
+    "light": false,
+    "lum": 51
   },
   {
     "id": "kov-med",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "Měď",
-    "source": "textures/skins/kov/med.webp"
+    "source": "textures/skins/kov/med.webp",
+    "light": false,
+    "lum": 138
   },
   {
     "id": "kov-meteorologicka-ocel",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "Meteorologická ocel",
-    "source": "textures/skins/kov/meteorologicka-ocel.webp"
+    "source": "textures/skins/kov/meteorologicka-ocel.webp",
+    "light": false,
+    "lum": 89
   },
   {
     "id": "kov-ocel",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "ocel",
-    "source": "textures/skins/kov/ocel.webp"
+    "source": "textures/skins/kov/ocel.webp",
+    "light": true,
+    "lum": 163
   },
   {
     "id": "kov-platina",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "platina",
-    "source": "textures/skins/kov/platina.webp"
+    "source": "textures/skins/kov/platina.webp",
+    "light": true,
+    "lum": 219
   },
   {
     "id": "kov-stribro",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "stříbro",
-    "source": "textures/skins/kov/stribro.webp"
+    "source": "textures/skins/kov/stribro.webp",
+    "light": true,
+    "lum": 206
   },
   {
     "id": "kov-wolfram",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "Wolfram",
-    "source": "textures/skins/kov/wolfram.webp"
+    "source": "textures/skins/kov/wolfram.webp",
+    "light": false,
+    "lum": 66
   },
   {
     "id": "kov-zlato",
     "group": "Kov",
     "groupSlug": "kov",
     "name": "zlato",
-    "source": "textures/skins/kov/zlato.webp"
+    "source": "textures/skins/kov/zlato.webp",
+    "light": true,
+    "lum": 169
   },
   {
     "id": "mysticke-alchymisticke-zlato",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Alchymistické zlato",
-    "source": "textures/skins/mysticke/alchymisticke-zlato.webp"
+    "source": "textures/skins/mysticke/alchymisticke-zlato.webp",
+    "light": false,
+    "lum": 132
   },
   {
     "id": "mysticke-demonicka-rohovina",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Démonická rohovina",
-    "source": "textures/skins/mysticke/demonicka-rohovina.webp"
+    "source": "textures/skins/mysticke/demonicka-rohovina.webp",
+    "light": false,
+    "lum": 41
   },
   {
     "id": "mysticke-etericke-sklo",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Etérické sklo",
-    "source": "textures/skins/mysticke/etericke-sklo.webp"
+    "source": "textures/skins/mysticke/etericke-sklo.webp",
+    "light": true,
+    "lum": 190
   },
   {
     "id": "mysticke-hvezdny-kristal",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Hvězdný křišťál",
-    "source": "textures/skins/mysticke/hvezdny-kristal.webp"
+    "source": "textures/skins/mysticke/hvezdny-kristal.webp",
+    "light": false,
+    "lum": 35
   },
   {
     "id": "mysticke-krvavy-kamen",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Krvavý kámen",
-    "source": "textures/skins/mysticke/krvavy-kamen.webp"
+    "source": "textures/skins/mysticke/krvavy-kamen.webp",
+    "light": false,
+    "lum": 24
   },
   {
     "id": "mysticke-magit",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Magit",
-    "source": "textures/skins/mysticke/magit.webp"
+    "source": "textures/skins/mysticke/magit.webp",
+    "light": false,
+    "lum": 78
   },
   {
     "id": "mysticke-mesicni-kamen",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Měsíční kámen",
-    "source": "textures/skins/mysticke/mesicni-kamen.webp"
+    "source": "textures/skins/mysticke/mesicni-kamen.webp",
+    "light": true,
+    "lum": 202
   },
   {
     "id": "mysticke-nebesky-opal",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Nebeský opál",
-    "source": "textures/skins/mysticke/nebesky-opal.webp"
+    "source": "textures/skins/mysticke/nebesky-opal.webp",
+    "light": true,
+    "lum": 218
   },
   {
     "id": "mysticke-popel-zatracenych",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Popel zatracených",
-    "source": "textures/skins/mysticke/popel-zatracenych.webp"
+    "source": "textures/skins/mysticke/popel-zatracenych.webp",
+    "light": false,
+    "lum": 55
   },
   {
     "id": "mysticke-proklety-onyx",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Prokletý onyx",
-    "source": "textures/skins/mysticke/proklety-onyx.webp"
+    "source": "textures/skins/mysticke/proklety-onyx.webp",
+    "light": false,
+    "lum": 22
   },
   {
     "id": "mysticke-runove-stribro",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Runové stříbro",
-    "source": "textures/skins/mysticke/runove-stribro.webp"
+    "source": "textures/skins/mysticke/runove-stribro.webp",
+    "light": false,
+    "lum": 142
   },
   {
     "id": "mysticke-stara-kost",
     "group": "Mystické",
     "groupSlug": "mysticke",
     "name": "Stará kost",
-    "source": "textures/skins/mysticke/stara-kost.webp"
+    "source": "textures/skins/mysticke/stara-kost.webp",
+    "light": false,
+    "lum": 136
   }
 ]

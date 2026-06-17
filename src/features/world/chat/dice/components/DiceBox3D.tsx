@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import DiceBox from '@drdreo/dice-box-threejs';
 import { materialTextureDescriptor } from '../lib/dice3dThemes';
@@ -62,10 +62,38 @@ export default function DiceBox3D({
 }: DiceBox3DProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<DiceBoxInstance | null>(null);
-  const readyRef = useRef(false);
-  // Drž nejnovější callbacky bez re-init efektu.
+  const [ready, setReady] = useState(false);
+  // Vždy nejnovější hodnoty (rollNow čte z refs, ne ze zastaralého closure).
+  const latestRef = useRef({ notation, active, theme });
+  latestRef.current = { notation, active, theme };
   const cbRef = useRef({ onComplete, onError });
   cbRef.current = { onComplete, onError };
+
+  /** Spustí hod z aktuálního stavu — voláno po `ready` i při změně `nonce`. */
+  const rollNow = useCallback(() => {
+    const box = boxRef.current;
+    const host = hostRef.current;
+    const { notation, active, theme } = latestRef.current;
+    if (!box || !active || !notation) return;
+    try {
+      // Dorovnat rozměry z reálného hostu — konstruktor je čte při vytvoření,
+      // takže při prvním hodu (host se právě zobrazil) můžou být 0 → kostka by
+      // padla mimo viewport. Tímto je scéna/svět vždy správně velká.
+      if (host && host.clientWidth) {
+        box.setDimensions(new THREE.Vector2(host.clientWidth, host.clientHeight));
+      }
+      box.clearDice();
+      void box
+        .updateConfig({
+          theme_customColorset: theme.colorset,
+          theme_material: theme.material,
+        })
+        .then(() => box.roll(notation))
+        .catch(() => cbRef.current.onError());
+    } catch {
+      cbRef.current.onError();
+    }
+  }, []);
 
   // Init jednou.
   useEffect(() => {
@@ -79,8 +107,7 @@ export default function DiceBox3D({
       theme_material: theme.material,
       theme_texture: '',
       theme_surface: 'green-felt',
-      // Bílé, silnější světlo — výchozí krémové (0xefdfd5) + nízká intenzita
-      // kalí barvy materiálu. Bílé světlo = živé pravé barvy.
+      // Bílé silnější světlo — výchozí krémové (0xefdfd5) kalí barvy materiálu.
       color_spotlight: 0xffffff,
       light_intensity: 1.2,
       shadows: true,
@@ -101,18 +128,14 @@ export default function DiceBox3D({
       .then(() => {
         if (cancelled) return;
         boxRef.current = box;
-        readyRef.current = true;
-        // Průhledné pozadí scény — vidět má být jen kostka + stín.
         try {
+          // Průhledné pozadí + ploché bílé ambientní světlo (zachová sytost).
           box.scene.background = null;
-          // Ploché bílé ambientní světlo → rovnoměrně nasvítí všechny stěny a
-          // zachová sytost barev materiálu (bodové světlo barvy desaturuje).
           box.scene.add(new THREE.AmbientLight(0xffffff, 1.4));
         } catch {
           /* defenzivní */
         }
-        // Pokud byl hod zadán dřív, než engine doběhl init — spusť teď.
-        if (active && notation) void box.roll(notation);
+        setReady(true);
       })
       .catch(() => {
         if (!cancelled) cbRef.current.onError();
@@ -127,43 +150,30 @@ export default function DiceBox3D({
       }
       if (host) host.innerHTML = '';
       boxRef.current = null;
-      readyRef.current = false;
+      setReady(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Nový hod při změně nonce.
+  // Hod: po dokončení initu (ready) i při každé změně nonce.
   useEffect(() => {
-    const box = boxRef.current;
-    if (!box || !readyRef.current || !active || !notation) return;
-    try {
-      box.clearDice();
-      void box
-        .updateConfig({
-          theme_customColorset: theme.colorset,
-          theme_material: theme.material,
-        })
-        .then(() => box.roll(notation))
-        .catch(() => cbRef.current.onError());
-    } catch {
-      cbRef.current.onError();
-    }
+    if (!ready) return;
+    rollNow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nonce]);
+  }, [ready, nonce]);
 
-  // Po dokončení hodu (overlay schován → active=false) uklidit kostky,
-  // ať nezůstanou viset do dalšího hodu.
+  // Po dokončení hodu (overlay schován → active=false) uklidit kostky.
   useEffect(() => {
-    if (active) return;
+    if (active || !ready) return;
     const box = boxRef.current;
-    if (box && readyRef.current) {
+    if (box) {
       try {
         box.clearDice();
       } catch {
         /* ignore */
       }
     }
-  }, [active]);
+  }, [active, ready]);
 
   return (
     <div
