@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
 import DiceBox from '@drdreo/dice-box-threejs';
 import { materialTextureDescriptor } from '../lib/dice3dThemes';
 import type { Dice3dTheme } from '../lib/dice3dThemes';
@@ -81,7 +82,7 @@ export default function DiceBox3D({
       // Bílé, silnější světlo — výchozí krémové (0xefdfd5) + nízká intenzita
       // kalí barvy materiálu. Bílé světlo = živé pravé barvy.
       color_spotlight: 0xffffff,
-      light_intensity: 2.0,
+      light_intensity: 1.2,
       shadows: true,
       sounds: false,
       gravity_multiplier: 400,
@@ -104,6 +105,9 @@ export default function DiceBox3D({
         // Průhledné pozadí scény — vidět má být jen kostka + stín.
         try {
           box.scene.background = null;
+          // Ploché bílé ambientní světlo → rovnoměrně nasvítí všechny stěny a
+          // zachová sytost barev materiálu (bodové světlo barvy desaturuje).
+          box.scene.add(new THREE.AmbientLight(0xffffff, 1.4));
         } catch {
           /* defenzivní */
         }

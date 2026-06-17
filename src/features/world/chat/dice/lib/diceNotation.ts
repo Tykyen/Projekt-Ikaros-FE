@@ -50,10 +50,10 @@ export function payloadToNotation(payload: DicePayload): string | null {
   }
 
   if (payload.type === 'd100') {
-    // Dvě viditelné d10: desítková číslice + jednotky (engine renderuje obě).
+    // Dvě viditelné d10 v jedné skupině (`2d10`) — desítková číslice + jednotky.
     const tensDigit = Math.round(payload.tens / 10) % 10; // 0..9
     const ones = Math.round(payload.ones); // 0..9
-    return `1d10@${tensDigit}+1d10@${ones}`;
+    return `2d10@${tensDigit},${ones}`;
   }
 
   if (payload.type === 'mixed') {

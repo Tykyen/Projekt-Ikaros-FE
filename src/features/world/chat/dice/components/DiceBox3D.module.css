@@ -10,4 +10,7 @@
   width: 100% !important;
   height: 100% !important;
   display: block;
+  /* Post-processing 3D výstupu — vrátí materiálu sytost a šťávu, kterou
+     3D nasvícení sebere (kostka pak vypadá blíž swatchi). */
+  filter: saturate(1.45) contrast(1.12) brightness(1.1);
 }
