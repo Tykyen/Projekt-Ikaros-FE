@@ -4,147 +4,158 @@
     <h2>Fáze 17 — Vlajkové funkce</h2>
   </div>
 
-  <p class="lead">Tahle fáze je „wow" vlna platformy. Zatímco předchozí kroky stavěly pojistku, rychlé výhry a unikátní český příkop, Fáze 17 cílí na funkce, které se ukazují na první pohled a kvůli kterým si lidé řeknou „tohle chci". Jsou dražší na vývoj nebo závisejí na tom, co bylo postaveno dřív — proto přicházejí až na pevném základu. Jejich smyslem je dotáhnout Projekt Ikaros z „funkční platformy" na „plnohodnotný český herní stůl", který se nemusí stydět vedle nejlepších světových nástrojů.</p>
+  <p class="lead">Tohle je vlna, kvůli které si lidé řeknou „tohle chci". Předchozí fáze postavily pojistku, rychlé výhry a unikátní český příkop — Fáze 17 přidává funkce, které jsou vidět na první pohled a kvůli kterým se z Projektu Ikaros stává <strong>plnohodnotný český herní stůl</strong>, co se nemusí stydět vedle nejlepších světových nástrojů. Pro tebe jako hráče i vypravěče to znamená jediné: víc toho, co můžeš dělat, méně práce s přípravou a hraní, které vypadá profesionálně. Vše níže je plán — píšeme o směru, ne o pevném termínu.</p>
 
   <div class="callout cyan">
     <div class="t">Jak číst tuto kapitolu</div>
-    Každá funkce má tři otázky: <strong>Cíl</strong> (co konkrétně přibude), <strong>Proč</strong> (jaký problém to řeší a komu pomáhá) a <strong>Co přidá</strong> (jak se to projeví v každodenním hraní). Vše níže je plán, ne hotový stav — píšeme o směru, ne o závazku k pevnému termínu. Pořadí se řídí logikou „nejdřív základ, pak nadstavba": některé vlajky stojí na schopnostech z dřívějších fází.
+    U každé vlajkové funkce najdeš dvojici: <strong>Co to je</strong> (co konkrétně přibude) a <strong>Co ti to přinese</strong> (jak ti to reálně pomůže v každodenním hraní). Vlajky nejsou náhodný seznam — stavějí jedna na druhé. Volba mřížky na mapě z dřívější fáze je předpoklad pro automatické osvětlení i pro import hotových map; veřejná výloha světa je základ pro pozdější vyhledatelnost na Googlu. Proto narazíš na poznámky „dělat až po…" — aby každá funkce stála na hotovém podloží.
   </div>
-
-  <h3>Proč právě tyto funkce a v jakém pořadí</h3>
-
-  <p>Vlajkové funkce nejsou náhodný seznam. Stavějí jedna na druhé. Volba mřížky na mapě (z dřívější fáze) je předpoklad pro automatické osvětlení i pro import hotových map. Veřejná prezentace světa je zase základ pro pozdější vyhledatelnost na Googlu a pro úvodní stránku, která má co ukázat. Proto v této kapitole narazíte na poznámky typu „dělat až po…" — nejde o byrokracii, ale o to, aby každá funkce stála na hotovém podloží a nemusela se předělávat.</p>
 
   <div class="phase">
     <div class="num flag">17</div>
-    <div class="body"><b>Vlajková vlna.</b> Funkce s vysokou viditelností a vyšší cenou. Cíl: parita s živým herním stolem plus věci, které konkurence neumí nebo dělá špatně. Stavíme na pevném jádru předchozích fází.</div>
+    <div class="body"><b>Vlajková vlna.</b> Vysoká viditelnost, vyšší cena. Cíl: parita s živým herním stolem plus věci, které konkurence neumí nebo dělá špatně. Stavíme na pevném jádru předchozích fází.</div>
   </div>
+
+  <h3>Co z téhle fáze budeš mít</h3>
+
+  <p>Dvanáct vlajkových funkcí lze rozdělit podle toho, komu nejvíc pomohou. Vypravěč dostane <strong>automatické osvětlení, hotové mapy jedním nahráním, ukotvitelné panely a vysílací režim</strong> — méně dřiny, plynulejší vedení hry, reklama zdarma. Hráč dostane <strong>plné dotykové ovládání mapy, telefon jako živý deník postavy a živou příběhovou mapu</strong>, na které vidí, kde zrovna je. Celá komunita dostane <strong>veřejnou výlohu světů, sdílení a klonování obsahu a hlas přímo v okně</strong> — snazší objevování, sdílení a společné hraní. Pojďme po jedné.</p>
 
   <h3>Dynamické světlo a linie pohledu</h3>
 
-  <p><strong>Cíl.</strong> Figurka na mapě uvidí automaticky jen tam, kam reálně dohlédne — přes zdi nevidí, do tmy nevidí dál než kam dosáhne světlo pochodně. Platforma sama spočítá, co je z pohledu dané postavy viditelné, a zbytek mapy nechá zahalený.</p>
+  <div class="feat">
+    <h4>Automatické osvětlení a viditelnost <span class="pill cyan">vlajka</span></h4>
+    <ul>
+      <li><b>Co to je:</b> Figurka na mapě uvidí automaticky jen tam, kam reálně dohlédne — přes zdi nevidí, do tmy nedohlédne dál, než kam dosáhne světlo pochodně. Platforma sama spočítá, co je z pohledu dané postavy viditelné, zbytek nechá zahalený.</li>
+      <li><b>Co ti to přinese:</b> Jako vypravěč přestaneš ručně odkrývat zamlženou mapu štětcem — obtáhneš zdi a rozmístíš zdroje světla a od té chvíle se o viditelnost stará platforma. Jako hráč zažiješ napínavější hru: do rohu místnosti opravdu nevidíš, za zavřenými dveřmi netušíš, co tě čeká. Hra je atmosféričtější a o úroveň blíž tomu, co umí špičkové světové nástroje.</li>
+    </ul>
+  </div>
 
-  <p><strong>Proč.</strong> Dnes funguje zamlžování mapy ručně — vypravěč štětcem odkrývá, co družina vidí. To je pracné a snadno se na něco zapomene. Automatické osvětlení a výpočet viditelnosti je úplně jiná liga: hra je atmosféričtější, napínavější (do rohu místnosti opravdu nevidíte) a vypravěč se nemusí o nic starat. Je to jedna z nejvíce „vlajkových" schopností nejlepších světových nástrojů.</p>
-
-  <p><strong>Co přidá.</strong> Vypravěč obtáhne na mapě zdi a překážky a rozmístí zdroje světla (lucerny, ohně, kouzla). Od té chvíle každá figurka „vidí" sama za sebe — hráč na druhé straně dveří netuší, co je za nimi, dokud je neotevře. Plynule to navazuje na existující zamlžování, jen ho povyšuje z ruční práce na automatiku. Protože jde o náročnou funkci, vznikne nejdřív prototyp a teprve po něm plná verze; ideálně až po importu hotových map, který dodá zdi „zadarmo".</p>
-
-  <figure class="shot">
-    <div class="ph">Koncept / vizualizace</div>
-    <figcaption>Figurka v jeskyni vidí jen kruh kolem své pochodně; zbytek chodby mizí ve tmě a za rohem není vidět nic.</figcaption>
-  </figure>
+  <p>Jde o náročnou funkci, proto vznikne nejdřív prototyp a teprve po něm plná verze — ideálně až po importu hotových map, který dodá zakreslené zdi „zadarmo".</p>
 
   <h3>Import hotových map</h3>
 
-  <p><strong>Cíl.</strong> Vypravěč nahraje soubor mapy ve standardním formátu, který se používá napříč oborem (nese v sobě nejen obrázek, ale i zakreslené zdi, světla a velikost mřížky), a platforma z něj během chvíle postaví hotovou bojovou scénu.</p>
-
-  <p><strong>Proč.</strong> Kolem her na hrdiny existuje obrovský ekosystém hotových, krásně nakreslených map. Jejich autoři je sdílejí v jednotném formátu právě proto, aby se daly snadno použít kdekoli. Když je Ikaros umí načíst, vypravěč nemusí nic kreslit — vezme hotovou mapu a může hrát.</p>
-
-  <p><strong>Co přidá.</strong> Jedním nahráním vznikne scéna připravená i pro automatické osvětlení z předchozí funkce — protože importovaný soubor už nese zakreslené zdi a zdroje světla. Z týdne příprav se stane pět minut. Tahle funkce přímo „krmí" tu předchozí: čím víc hotových map se naimportuje, tím víc scén umí automaticky osvětlit, aniž by někdo musel obtahovat zdi ručně.</p>
+  <div class="feat">
+    <h4>Mapa hotová jedním nahráním</h4>
+    <ul>
+      <li><b>Co to je:</b> Nahraješ soubor mapy ve standardním oborovém formátu, který v sobě nese nejen obrázek, ale i zakreslené zdi, světla a velikost mřížky — a platforma z něj během chvíle postaví hotovou bojovou scénu.</li>
+      <li><b>Co ti to přinese:</b> Z týdne příprav se stane pět minut. Kolem her na hrdiny existuje obří ekosystém krásně nakreslených map, které autoři sdílejí právě v tomhle jednotném formátu. Nemusíš nic kreslit — vezmeš hotovou mapu a hraješ. Navíc importovaná scéna už nese zdi i světla, takže je rovnou připravená i pro automatické osvětlení z předchozí funkce.</li>
+    </ul>
+  </div>
 
   <h3>Veřejná výkladní skříň světa</h3>
 
-  <p><strong>Cíl.</strong> Vypravěč zapne přepínač „veřejná prezentace" a vybrané stránky, mapa nebo časová osa jeho světa se zpřístupní i lidem bez účtu — jako veřejná výloha, do které se může každý podívat.</p>
-
-  <p><strong>Proč.</strong> Dnes si zájemce o platformu nemá kde prohlédnout, jak vypadá pořádně vybudovaný svět — a právě taková ukázka je to, co nového člověka chytne. Veřejná prezentace je zároveň marketing („podívejte, co se tu dá vytvořit"), pýcha autora (chce svou práci ukázat) a první krok cesty nového uživatele od „náhodný návštěvník" k „registrovaný hráč".</p>
-
-  <p><strong>Co přidá.</strong> Autor světa si sám vybere, co zveřejní a co zůstane skryté — vše ostatní zůstává soukromé a bezpečně oddělené. Stránka funguje i bez přihlášení a má pěkné náhledové karty pro sdílení na sociálních sítích. Tahle funkce je základem pro pozdější vyhledatelnost na Googlu a pro úvodní stránku platformy, která konečně bude mít co reálného ukázat místo prázdných slibů.</p>
+  <div class="feat">
+    <h4>Veřejná prezentace tvého světa</h4>
+    <ul>
+      <li><b>Co to je:</b> Přepínač „veřejná prezentace" — vybrané stránky, mapa nebo časová osa tvého světa se zpřístupní i lidem bez účtu, jako veřejná výloha, do které se může každý podívat.</li>
+      <li><b>Co ti to přinese:</b> Konečně máš kam ukázat svou práci. Tvůj pečlivě vybudovaný svět se stane vábničkou pro nové hráče i zdrojem pýchy — pošleš odkaz a kamarád vidí ukázku, na kterou se chytne, ještě než se zaregistruje. Sám si vybereš, co zveřejníš a co zůstane skryté; vše ostatní zůstává soukromé a bezpečně oddělené. Stránka funguje i bez přihlášení a má pěkné náhledové karty pro sdílení na sítích.</li>
+    </ul>
+  </div>
 
   <div class="callout gold">
     <div class="t">Důležitý princip: veřejnost je dobrovolná</div>
-    Platforma umí být veřejná a aktivně nabírat nové lidi, <strong>ale zároveň hostit zcela uzavřené, soukromé skupiny vedle sebe</strong>. Zveřejnění je vždy volba — zapíná se u konkrétního světa nebo stránky. Soukromé světy zůstávají skryté a chráněné, ať se kolem děje cokoli.
+    Platforma umí být veřejná a aktivně nabírat nové lidi, <strong>ale zároveň hostit zcela uzavřené, soukromé skupiny vedle sebe</strong>. Zveřejnění je vždy tvoje volba — zapíná se u konkrétního světa nebo stránky. Soukromé světy zůstávají skryté a chráněné, ať se kolem děje cokoli. Tahle výloha je navíc základ pro pozdější vyhledatelnost na Googlu a pro úvodní stránku, která konečně bude mít co reálného ukázat.
   </div>
 
   <h3>Doladění mobilní hry na mapě</h3>
 
-  <p><strong>Cíl.</strong> Plné ovládání bojové mapy prstem na telefonu — přiblížení dvěma prsty, tažení figurek, výběr cílů — pohodlně i na malém displeji.</p>
-
-  <p><strong>Proč.</strong> Čeští hráči hrají hodně z mobilu. Ovládání mapy dotykem bývá u podobných nástrojů bolavé místo — co se na počítači myší dělá snadno, je na telefonu často frustrující. Platforma má jako jedno ze svých pravidel, že vše musí fungovat na mobilu i počítači, takže tohle není nadstandard, ale závazek.</p>
-
-  <p><strong>Co přidá.</strong> Gesta na míru dotyku, dostatečně velké ovládací prvky pro prst, sbalitelné panely, aby na malé obrazovce zbylo místo na samotnou mapu, a plynulý výkon. Hráč na telefonu už nebude druhořadý.</p>
+  <div class="feat">
+    <h4>Plné ovládání mapy prstem <span class="pill cyan">mobil</span></h4>
+    <ul>
+      <li><b>Co to je:</b> Plné dotykové ovládání bojové mapy na telefonu — přiblížení dvěma prsty, tažení figurek, výběr cílů — pohodlně i na malém displeji.</li>
+      <li><b>Co ti to přinese:</b> Jako hráč na mobilu už nebudeš druhořadý. Co se na počítači dělá myší snadno, půjde stejně pohodlně i prstem: gesta na míru dotyku, dost velké ovládací prvky, sbalitelné panely, aby na obrazovce zbylo místo na samotnou mapu, a plynulý výkon. Český hráč hraje hodně z mobilu — tohle není nadstandard, ale závazek platformy „mobil i počítač".</li>
+    </ul>
+  </div>
 
   <h3>Sdílení a klonování světů a šablon</h3>
 
-  <p><strong>Cíl.</strong> Tlačítko „publikovat jako šablonu" u světa, scény nebo příšery → vznikne veřejný katalog, ze kterého si kdokoli daný obsah naklonuje do svého světa.</p>
-
-  <p><strong>Proč.</strong> Obsah přitahuje obsah. Jeden dobře udělaný statblok příšery nebo připravená bojová scéna poslouží stovkám dalších vypravěčů. Sdílení buduje síťový efekt — čím víc lidí přispívá, tím cennější platforma je, a tím spíš na ní lidé zůstanou. Dnes existuje jen soukromá knihovna map; chybí veřejné sdílení.</p>
-
-  <p><strong>Co přidá.</strong> Veřejný katalog šablon, ze kterého stačí kliknout a obsah se naklonuje k vám. Při klonování se chytře nese jen to, co má — třeba osobní figurky hráčů zůstanou stranou. Buduje to společný poklad obsahu, na který může komunita růst (a navazuje na pozdější fázi komunitní tvorby).</p>
+  <div class="feat">
+    <h4>Publikuj jako šablonu, klonuj k sobě</h4>
+    <ul>
+      <li><b>Co to je:</b> Tlačítko „publikovat jako šablonu" u světa, scény nebo příšery → vznikne veřejný katalog, ze kterého si kdokoli daný obsah jedním kliknutím naklonuje do svého světa.</li>
+      <li><b>Co ti to přinese:</b> Tvůj jeden dobře udělaný statblok příšery nebo připravená bojová scéna poslouží stovkám dalších vypravěčů — a naopak ty čerpáš ze společného pokladu, místo abys vše vymýšlel sám. Při klonování se chytře nese jen to, co má (osobní figurky hráčů zůstanou stranou). Obsah přitahuje obsah: čím víc lidí přispívá, tím cennější platforma je.</li>
+    </ul>
+  </div>
 
   <h3>Integrace hlasu</h3>
 
-  <p><strong>Cíl.</strong> Možnost přidat ke scéně nebo světu „hlasovou místnost" a tlačítko „připojit se k hlasu" — ve dvou úrovních: nejdřív prostý odkaz na hlasovou službu, později vestavění hlasové místnosti přímo do okna platformy, aby bylo „vše na jednom místě".</p>
-
-  <p><strong>Proč.</strong> Skupiny chtějí při hraní mluvit. Stavět vlastní hlasový systém od nuly je drahé a křehké — to záměrně neděláme. Existuje ale otevřené, zdarma dostupné řešení (Jitsi Meet), které se dá vestavět přímo do platformy. „Vše v jednom okně" tedy jde i bez peněz — placené by bylo jen budovat vlastní hlasový systém, ne využít cizí.</p>
-
-  <p><strong>Co přidá.</strong> Družina se připojí k hlasu jedním kliknutím, aniž by opouštěla mapu a postavy. Začíná se jednoduchým odkazem, cílem je vestavěná místnost rovnou v okně. Pro maximální soukromí lze později rozjet vlastní hlasový server, ale to je nadstavba, ne podmínka.</p>
+  <div class="feat">
+    <h4>Hlasová místnost přímo v okně <span class="pill green">zdarma</span></h4>
+    <ul>
+      <li><b>Co to je:</b> Ke scéně nebo světu přidáš „hlasovou místnost" a tlačítko „připojit se k hlasu" — ve dvou úrovních: nejdřív prostý odkaz na hlasovou službu, později vestavěná hlasová místnost přímo v okně platformy.</li>
+      <li><b>Co ti to přinese:</b> Družina se připojí k hlasu jedním kliknutím, aniž by opouštěla mapu a postavy — „vše na jednom místě". A jde to i zdarma: využíváme hotové otevřené řešení, které se dá vestavět přímo dovnitř. Vlastní hlasový systém od nuly je drahý a křehký — ten záměrně neděláme, ale na využití cizího zdarma nic neplatíš. Pro maximální soukromí lze později rozjet vlastní hlasový server, to je ale nadstavba, ne podmínka.</li>
+    </ul>
+  </div>
 
   <h3>Rodokmeny</h3>
 
-  <p><strong>Cíl.</strong> Vizuální strom rodinných vztahů — rodič, dítě, sňatek — pro postavy a rody ve světě.</p>
-
-  <p><strong>Proč.</strong> Fanoušci dlouhých ság a dynastických příběhů rodokmeny milují a u konkurence je běžně najdou. Platforma už umí zobrazovat obecné vztahy mezi postavami v „pavučině", ale dedikovaný rodový strom je přehlednější a hezčí pro tenhle konkrétní účel. Jde o volitelnou, nižší prioritu.</p>
-
-  <p><strong>Co přidá.</strong> Speciální zobrazení nad existujícími vztahy postav, které je vykreslí jako genealogický strom. Buď jako samostatná funkce, nebo jako nový pohled v současné pavučině vztahů.</p>
+  <div class="feat">
+    <h4>Vizuální rodový strom <span class="pill">volitelné</span></h4>
+    <ul>
+      <li><b>Co to je:</b> Vizuální strom rodinných vztahů — rodič, dítě, sňatek — pro postavy a rody ve světě.</li>
+      <li><b>Co ti to přinese:</b> Pokud miluješ dlouhé ságy a dynastické příběhy, dostaneš přehledné a hezké zobrazení rodu na první pohled. Platforma už umí zobrazit obecné vztahy postav v „pavučině"; tohle k tomu přidává dedikovaný genealogický strom — buď jako samostatnou funkci, nebo jako nový pohled v současné pavučině. Jde o volitelnou, nižší prioritu.</li>
+    </ul>
+  </div>
 
   <h3>Přístupnost</h3>
 
-  <p><strong>Cíl.</strong> Ovládání z klávesnice a popisky pro odečítače obrazovky u tlačítek bez textu — aby platformu zvládli i lidé se zrakovým či pohybovým omezením.</p>
-
-  <p><strong>Proč.</strong> Rozšiřuje to okruh lidí, kteří můžou hrát, a je to prostě správně. Kontrolu barevného kontrastu už platforma průběžně provádí; tohle ji doplňuje o ovládání bez myši a o srozumitelnost pro pomocné technologie.</p>
-
-  <p><strong>Co přidá.</strong> Jasně viditelné zvýraznění toho, kde je „kurzor" při ovládání klávesnicí, slovní popisky u ikonových tlačítek a možnost obsloužit chat i menu bez myši. Zavádí se postupně, kousek po kousku.</p>
+  <div class="feat">
+    <h4>Ovládání z klávesnice a pro odečítače</h4>
+    <ul>
+      <li><b>Co to je:</b> Ovládání z klávesnice a slovní popisky pro odečítače obrazovky u tlačítek bez textu.</li>
+      <li><b>Co ti to přinese:</b> Platformu zvládnou i lidé se zrakovým či pohybovým omezením — jasně viditelné zvýraznění, kde je „kurzor" při ovládání klávesnicí, popisky u ikonových tlačítek a možnost obsloužit chat i menu bez myši. Rozšiřuje to okruh lidí, kteří můžou hrát, a je to prostě správně. Kontrolu barevného kontrastu už platforma průběžně provádí; tohle ji doplňuje. Zavádí se postupně.</li>
+    </ul>
+  </div>
 
   <h3>Streamer režim pro vysílání</h3>
 
-  <p><strong>Cíl.</strong> Zvláštní zobrazení, které skryje všechna okna, menu a lišty a nechá jen čistou mapu s průhledným pozadím — připravené pro vysílací software, aby si streamer mapu poskládal do svého obrazu.</p>
-
-  <p><strong>Proč.</strong> Sledování her na hrdiny živě na internetu je dnes jeden z hlavních způsobů, jak se k tomuto koníčku dostávají noví lidé. Když platforma nabídne krásný nástroj pro lidi, kteří hraní vysílají, je to vlastně reklama zdarma — a navíc exponenciální, protože každý divák je potenciální nový hráč. Z konkurence to dnes umí jen málokdo.</p>
-
-  <p><strong>Co přidá.</strong> Jedním přepnutím se schová celé uživatelské rozhraní a zůstane jen herní plocha na průhledném pozadí, kterou vysílací program snadno použije. Volitelně se dá nastavit, co všechno se skryje a co naopak zůstane (třeba ukazatel iniciativy).</p>
-
-  <figure class="shot">
-    <div class="ph">Koncept / vizualizace</div>
-    <figcaption>Vysílací režim: žádná menu ani lišty, jen čistá bojová mapa na průhledném pozadí připravená do živého streamu.</figcaption>
-  </figure>
+  <div class="feat">
+    <h4>Čistá mapa pro živé vysílání</h4>
+    <ul>
+      <li><b>Co to je:</b> Zvláštní zobrazení, které skryje všechna okna, menu a lišty a nechá jen čistou mapu na průhledném pozadí — připravené pro vysílací software.</li>
+      <li><b>Co ti to přinese:</b> Pokud hraní vysíláš, dostaneš krásný nástroj zdarma: jedním přepnutím zmizí celé rozhraní a zůstane jen herní plocha, kterou si snadno poskládáš do svého obrazu. Volitelně nastavíš, co všechno se skryje a co zůstane (třeba ukazatel iniciativy). Pro celou platformu je to reklama zdarma — a navíc exponenciální, protože každý divák je potenciální nový hráč. Z konkurence to dnes umí jen málokdo.</li>
+    </ul>
+  </div>
 
   <h3>Pracovní plocha s ukotvitelnými panely</h3>
 
-  <p><strong>Cíl.</strong> Encyklopedie nebo karta příšery se při hře otevře jako posuvný boční panel nebo plovoucí okno (které lze zmenšit do lišty a zase vyvolat) — místo aby člověk musel opustit mapu. K tomu kontextové menu po kliknutí pravým tlačítkem a malé palety nástrojů přímo u místa, kam ukazuje kurzor.</p>
-
-  <p><strong>Proč.</strong> Vypravěč během boje neustále překlikává mezi okny — pravidla, statistiky příšery, poznámky, mapa. Každé takové přepnutí trhá plynulost hry. Nejlepší webové aplikace dnes fungují spíš jako operační systém, kde si uživatel okna rozmístí, než jako jediná statická stránka.</p>
-
-  <p><strong>Co přidá.</strong> Vypravěč si odsune kartu příšery na bok a má ji při ruce, aniž by ztratil mapu z očí. Začíná se jednodušším bočním panelem, plně plovoucí okna přijdou později (jsou náročnější na zvládnutí stavu). Cílem je plynulé vedení hry bez neustálého ztrácení kontextu.</p>
+  <div class="feat">
+    <h4>Panely a okna místo překlikávání</h4>
+    <ul>
+      <li><b>Co to je:</b> Encyklopedie nebo karta příšery se při hře otevře jako posuvný boční panel nebo plovoucí okno (zmenšitelné do lišty a zase vyvolatelné) — místo aby ses musel přepínat pryč z mapy. K tomu menu po kliknutí pravým tlačítkem a malé palety nástrojů přímo u kurzoru.</li>
+      <li><b>Co ti to přinese:</b> Jako vypravěč přestaneš během boje trhat plynulost hry neustálým přeskakováním mezi pravidly, statistikami příšery, poznámkami a mapou. Kartu příšery si odsuneš na bok a máš ji při ruce, aniž bys ztratil mapu z očí. Začíná se jednodušším bočním panelem, plně plovoucí okna přijdou později — nejlepší webové aplikace dnes fungují spíš jako operační systém než jako jediná statická stránka.</li>
+    </ul>
+  </div>
 
   <h3>Mobilní společník — telefon jako deník postavy</h3>
 
-  <p><strong>Cíl.</strong> Na telefonu se platforma během hry přepne do role osobního asistenta hráče: místo obří mapy ukáže velký, přehledný deník postavy — záložky, velké ukazatele zdraví, masivní tlačítka útoků a hodů, které pošlou výsledek na hlavní mapu (třeba sdílenou na televizi u stolu). Komunita a pošta vypadají jako v běžné chatovací aplikaci se spodní lištou.</p>
-
-  <p><strong>Proč.</strong> Vtěsnat velkou bojovou mapu na šestipalcový displej je chyba — telefon na to není stavěný. Telefon je osobní deník hráče. Když rozdělíme zážitek podle zařízení (velká obrazovka = mapa, telefon = deník), dostane každý to, k čemu se hodí. Čeští hráči hrají hodně z mobilu, takže to není okrajová věc. Rozšiřuje to předchozí doladění mobilní mapy o úplně jiný, pro telefon přirozenější způsob hraní.</p>
-
-  <p><strong>Co přidá.</strong> Hráč u stolu drží telefon jako svůj „herní list naživo" — kliká na útoky, sleduje zdraví, hází kostkami, a výsledky se objevují na společné mapě. Sdílí se vnitřní logika s počítačovou verzí, liší se jen vzhled přizpůsobený malé obrazovce.</p>
-
-  <figure class="shot">
-    <div class="ph">Koncept / vizualizace</div>
-    <figcaption>Telefon v ruce hráče: velký deník postavy s ukazatelem zdraví a tlačítky útoků; výsledek hodu skočí na sdílenou mapu.</figcaption>
-  </figure>
+  <div class="feat">
+    <h4>Telefon jako tvůj živý herní list <span class="pill cyan">mobil</span></h4>
+    <ul>
+      <li><b>Co to je:</b> Na telefonu se platforma během hry přepne do role tvého osobního asistenta: místo obří mapy ukáže velký přehledný deník postavy — záložky, velké ukazatele zdraví, masivní tlačítka útoků a hodů, jejichž výsledek skočí na hlavní mapu (třeba sdílenou na televizi u stolu). Komunita a pošta vypadají jako v běžné chatovací aplikaci se spodní lištou.</li>
+      <li><b>Co ti to přinese:</b> Telefon konečně dělá to, k čemu se hodí — je tvůj „herní list naživo". Klikáš na útoky, sleduješ zdraví, házíš kostkami a výsledky se objevují na společné mapě. Velká obrazovka zůstává pro mapu, telefon pro deník — každé zařízení k tomu, v čem je dobré. Pro českého hráče, který hraje hodně z mobilu, je to zásadní rozdíl. Vnitřní logika je sdílená s počítačovou verzí, liší se jen vzhled.</li>
+    </ul>
+  </div>
 
   <h3>Živá příběhová mapa napojená na hru</h3>
 
-  <p><strong>Cíl.</strong> U velkých her vidí hráči mapu světa, která je propojená s probíhající hrou — ať už s příběhovým kanálem v chatu, nebo přímo s bojovou scénou. Mapa se „rozsvítí" u místa, které hra zrovna řeší, takže hráč vždy ví, kde se v příběhu právě nachází.</p>
-
-  <p><strong>Proč.</strong> Spojuje příběh s geografií živě. V dlouhé sáze hráč snadno ztratí přehled, kde družina je a kam míří; živý ukazatel „tady právě jste" tohle řeší a posiluje vtažení do příběhu. Staví na interaktivní mapě s body odkazujícími na stránky a propojuje ji se stavem hry.</p>
-
-  <p><strong>Co přidá.</strong> Jak se hra posouvá, posouvá se i světélkující bod na mapě světa. Hráč nemusí nic dělat, jen se podívá a vidí celý kontext příběhu. Poloha se může nastavovat ručně vypravěčem, nebo se odvozovat automaticky z toho, která scéna či kanál je zrovna aktivní.</p>
+  <div class="feat">
+    <h4>„Tady právě jste" na mapě světa</h4>
+    <ul>
+      <li><b>Co to je:</b> U velkých her vidíš mapu světa propojenou s probíhající hrou — s příběhovým kanálem v chatu nebo přímo s bojovou scénou. Mapa se „rozsvítí" u místa, které hra zrovna řeší.</li>
+      <li><b>Co ti to přinese:</b> V dlouhé sáze nikdy neztratíš přehled, kde družina je a kam míří — světélkující bod „tady právě jste" se posouvá, jak se posouvá hra. Nemusíš nic dělat, jen se podíváš a vidíš celý kontext příběhu. Posiluje to vtažení do děje a spojuje příběh s geografií naživo. Poloha se může nastavovat ručně vypravěčem, nebo se odvozovat automaticky z aktivní scény či kanálu. Staví to na interaktivní mapě s body z dřívější fáze.</li>
+    </ul>
+  </div>
 
   <div class="stats">
-    <div><b>12</b> vlajkových funkcí</div>
+    <div><b>12</b> vlajkových funkcí, co posílí hru</div>
     <div><b>3</b> stojí na mřížce mapy z předchozí fáze</div>
     <div><b>2</b> míří přímo na mobilního hráče</div>
-    <div><b>0</b> Kč navíc za hlas (vestavění otevřeného řešení)</div>
+    <div><b>0</b> Kč navíc za hlas v okně</div>
   </div>
 
   <div class="callout">
     <div class="t">Shrnutí Fáze 17</div>
-    Vlajková vlna posouvá platformu na úroveň plnohodnotného herního stolu: automatické osvětlení a hotové mapy pro „wow" efekt, veřejná výloha a vysílací režim jako motor přílivu nováčků, hlas a ukotvitelné panely pro plynulé hraní, a dvě mobilní funkce, které z telefonu udělají hráčova nejlepšího společníka. Vše stojí na pevném základu předchozích fází a vše respektuje pravidlo „mobil i počítač".
+    Vlajková vlna posouvá platformu na úroveň plnohodnotného herního stolu — a vše je rámováno tím, co z toho máš ty. Automatické osvětlení a hotové mapy ubírají vypravěči práci a přidávají hře „wow". Veřejná výloha a vysílací režim přivádějí nové lidi. Hlas v okně a ukotvitelné panely dělají hraní plynulejší. A dvě mobilní funkce mění telefon z nepoužitelně malé mapy na hráčova nejlepšího společníka. Vše stojí na pevném základu předchozích fází a vše respektuje pravidlo „mobil i počítač".
   </div>
 </section>

@@ -4,156 +4,140 @@
     <h2>Mapy &amp; nástroje hry: vesmír, atlas, bojiště a zvuky</h2>
   </div>
 
-  <p class="lead">Tohle je vlajková kapitola platformy. Projekt Ikaros nenabízí jen jednu mapu — nabízí tři různé, každou pro jiný účel: <b>vesmírnou mapu</b> jako interaktivní graf světa, <b>obrázkový atlas</b> jako galerii nakreslených map, a hlavně <b>taktickou bojovou mapu</b> — plnohodnotné virtuální herní plátno, kde se odehrávají souboje s figurkami, mlhou války a sledováním iniciativy. K tomu přidává zvukovou databázi pro atmosféru a soukromý deník vypravěče.</p>
+  <p class="lead">Tohle je vlajková kapitola. Když si představíš hraní na hrdiny u stolu — figurky na podložce, mapa rozbalená přes půl stolu, vypravěč, který odhaluje jen kus jeskyně — pak právě tohle ti Projekt Ikaros přinese na obrazovku, ať sedíš v jednom pokoji nebo na opačných koncích republiky. A nedostaneš jen jednu mapu. Dostaneš <b>tři</b>, každou pro jiný účel: <b>vesmírnou mapu</b> jako živý graf vztahů ve světě, <b>obrázkový atlas</b> jako galerii ručně nakreslených map, a hlavně <b>taktickou bojovou mapu</b> — plnohodnotný virtuální herní stůl s figurkami, mlhou války a sledováním iniciativy v reálném čase. K tomu zvuková databáze pro atmosféru a soukromý deník vypravěče. To všechno bez instalace, jen v prohlížeči.</p>
 
   <div class="callout cyan">
-    <div class="t">Tři mapy, ať se v nich neztratíte</div>
-    <p><b>Vesmírná mapa</b> = mapa vztahů ve světě (planety, soustavy, lokace a jejich propojení) zobrazená jako pohyblivý graf. <b>Atlas map</b> = galerie statických obrázkových map seřazených do složek. <b>Taktická bojová mapa</b> = interaktivní herní plátno s figurkami, na kterém se hraje boj a scény. Každá slouží něčemu jinému.</p>
+    <div class="t">Tři mapy, ať se v nich neztratíš</div>
+    <p><b>Vesmírná mapa</b> = mapa vztahů ve světě (planety, soustavy, lokace a jejich propojení) zobrazená jako pohyblivý graf. <b>Atlas map</b> = galerie statických obrázkových map seřazených do složek. <b>Taktická bojová mapa</b> = interaktivní herní plátno s figurkami, na kterém se hraje boj a scény. Každá slouží něčemu jinému — a používáš je podle toho, co zrovna potřebuješ: zorientovat se, ukázat mapu, nebo hrát.</p>
   </div>
 
-  <p>Do všech tří se dostane jen člen světa — nečlena platforma přesměruje pryč.</p>
-
-  <hr>
-
-  <h3>Obrázkový atlas „Mapy"</h3>
-  <p>Atlas je galerie nakreslených map světa — mapa kontinentu, plán města, půdorys hradu. Mapy se organizují do <b>stromu složek</b>, takže si vypravěč udrží pořádek i u rozsáhlého světa. Není to interaktivní bojiště, slouží k prohlížení a sdílení.</p>
-
-  <div class="feat">
-    <h4>Správa atlasu</h4>
-    <p>Knihovna vizuálních podkladů světa, přehledně ve složkách.</p>
-    <ul>
-      <li><b>Kdo:</b> spravovat (přidávat, upravovat, mazat, řadit mapy i složky) může vypravěč světa a platformový správce. Prohlížet může každý člen — ale jen to, co je pro něj viditelné.</li>
-      <li><b>Co jde dělat:</b> vytvořit mapu s titulkem, popisem, obrázkem a nastavením viditelnosti. Vytvořit a vnořovat složky. Procházet atlas přes drobečkovou navigaci. Vyhledávat napříč celým atlasem podle názvu i popisu. Otevřít mapu ve zvětšeném prohlížeči (lightbox).</li>
-      <li><b>Zvláštnosti:</b> smazání složky nesmaže její obsah — mapy a podsložky se jen posunou o úroveň výš. Mazání mapy uklidí i její obrázek z úložiště.</li>
-    </ul>
-  </div>
-
-  <div class="callout gold">
-    <div class="t">Viditelnost, která neprozradí tajemství</div>
-    <p>Každá mapa i složka má řízenou viditelnost — buď veřejná pro hráče, nebo jen pro vybrané. Pojistka: hráč mapu uvidí, jen když je viditelná ona <b>i celá cesta složek</b> k ní. Skrytá nadřazená složka skryje vše uvnitř. Hráči se navíc nikdy nedozví, komu je co viditelné — vidí jen to, co smí. Vypravěč tak může připravit mapy dopředu, aniž by je hráči objevili předčasně.</p>
-  </div>
-
-  <hr>
-
-  <h3>Vesmírná mapa „Mapa"</h3>
-  <p>Vesmírná mapa zobrazuje svět jako <b>pohyblivý graf</b> — uzly (planety, hvězdné soustavy, lokace) a vazby mezi nimi. Rozprostře se sama (uzly se rozmístí silovým rozložením) a dá se v ní pohybovat, přibližovat a hledat.</p>
-  <div class="feat">
-    <h4>Procházení a editace vesmíru</h4>
-    <p>Mapa propojení míst ve světě — kdo s kým a co s čím souvisí.</p>
-    <ul>
-      <li><b>Kdo:</b> prohlížet může každý člen (s ohledem na viditelnost uzlů); upravovat vypravěč.</li>
-      <li><b>Co jde dělat:</b> procházet graf, vyhledat uzel a kamerou k němu „doletět", otevřít jeho detail. V režimu úprav přidat či upravit uzel a vazbu mezi uzly, nastavit viditelnost uzlu a uložit.</li>
-      <li><b>Zvláštnosti:</b> mapa se aktualizuje živě — když ji někdo z vedení změní, ostatním se obnoví. Úpravy probíhají nad pracovní kopií, takže rozpracovaná změna nemizí.</li>
-    </ul>
-  </div>
+  <p>Do všech tří se dostane jen člen světa — nezvanému návštěvníkovi se neukážou vůbec. Tvůj připravovaný obsah tak zůstává tvůj, dokud ho sám nesdílíš.</p>
 
   <hr>
 
   <h3>Taktická bojová mapa — srdce hraní u virtuálního stolu</h3>
-  <p>Tohle je nejkomplexnější nástroj celé platformy a přímý protějšek profesionálních „virtuálních stolů" pro hraní na hrdiny. Je to interaktivní plátno s hexagonovou mřížkou, na které se rozmísťují figurky postav a nestvůr, kreslí se mlha války, řídí se souboj a hraje se scéna v reálném čase — všichni hráči vidí totéž ve stejný okamžik.</p>
+  <p>Začněme tím nejdůležitějším. Taktická mapa je nejkomplexnější nástroj celé platformy a přímý protějšek placených „virtuálních stolů" pro hraní na hrdiny. Je to interaktivní plátno s hexagonovou mřížkou, na kterém rozmísťuješ figurky postav a nestvůr, kreslíš mlhu války, řídíš souboj a hraješ scénu v reálném čase. Všichni u stolu vidí totéž ve stejný okamžik — když vypravěč pohne nepřítelem, hráči to uvidí okamžitě, bez obnovování stránky.</p>
 
   <figure class="shot">
-    <div class="ph">Náhled obrazovky</div>
-    <figcaption>Taktická bojová mapa: hexagonová mřížka s figurkami postav a nestvůr, mlha války, nahoře iniciativní lišta s pořadím soubojového kola.</figcaption>
+    <img src="img/mapa-boj-1.jpg" alt="Taktická bojová mapa s hexagonovou mřížkou, figurkami a iniciativní lištou">
+    <figcaption>Taktická bojová mapa: hexagonová mřížka s figurkami postav a nestvůr, mlha války, nahoře iniciativní lišta s pořadím soubojového kola. Celé bojiště běží živě v prohlížeči.</figcaption>
   </figure>
 
+  <div class="callout gold">
+    <div class="t">Proč to chceš</div>
+    <p>Odpadá pořizování a vožení figurek, kreslení map na čtverečky, ruční počítání iniciativy na papírku i dohadování „kdo kde stojí". Vypravěč připraví scénu dopředu, na sezení ji jedním kliknutím spustí, a hráči se připojí odkudkoli. Vzdálená hra vypadá a hraje se stejně dobře jako u stolu — a místní hra dostane nástroje, které u stolu nikdy neměla (chytrá mlha, automatická iniciativa, krok zpět).</p>
+  </div>
+
   <h4>Figurky (tokeny): postava, nestvůra, bestie</h4>
-  <p>Na mapě se pohybují tři druhy figurek a platforma mezi nimi důsledně rozlišuje:</p>
+  <p>Na mapě se pohybují tři druhy figurek a platforma mezi nimi důsledně rozlišuje — proto se nikdy nestane, že hráč omylem pohne nepřítelem nebo uvidí, co nemá.</p>
   <div class="grid2">
     <div class="card">
       <h4>Hráčská postava</h4>
-      <p class="small">Figurka, kterou ovládá hráč. Hýbe jen se svou vlastní. V boji je vždy.</p>
+      <p class="small">Figurka, kterou ovládáš jako hráč. Hýbeš jen svou vlastní. V boji je vždy — nemůžeš na ni „zapomenout".</p>
     </div>
     <div class="card">
       <h4>Nestvůra (NPC)</h4>
-      <p class="small">Postava řízená vypravěčem — spojenec, padouch, vedlejší role. Má vlastní deník.</p>
+      <p class="small">Postava řízená vypravěčem — spojenec, padouch, vedlejší role. Má vlastní deník a příběh.</p>
     </div>
     <div class="card">
       <h4>Bestie</h4>
-      <p class="small">Tvor z bestiáře (příšery, zvířata). Vypravěč jich může nasadit víc najednou (např. pět banditů za sebou). Každá nasazená bestie je samostatná, nezávislá instance.</p>
+      <p class="small">Tvor z bestiáře (příšery, zvířata, vojáci). Vypravěč jich může nasadit víc najednou (např. pět banditů za sebou). Každá nasazená bestie je samostatná, nezávislá instance — zranění jedné neovlivní ostatní.</p>
     </div>
   </div>
 
   <div class="feat">
-    <h4>Nasazování a pohyb figurek</h4>
-    <p>Přesné rozmístění a tahy na mřížce, intuitivně myší i na dotyku.</p>
+    <h4>Nasazování a pohyb figurek <span class="pill cyan">myš i dotyk</span></h4>
+    <p>Přesné rozmístění a tahy na mřížce, intuitivně myší i prstem.</p>
     <ul>
-      <li><b>Kdo:</b> nasazovat a hýbat libovolnou figurkou může vypravěč; hráč hýbe jen svou postavou.</li>
-      <li><b>Co jde dělat:</b> nasadit figurku přetažením z palety na plátno, nebo „režimem umístění" (klik v paletě → klik na políčko). Figurka se objeví <b>přesně tam, kam míříte</b> — když je políčko obsazené, najde se nejbližší volné v okolí (nikdy ne automaticky do rohu). Pohybovat figurkou přetažením nebo systémem „vyber a klepni na cílové políčko".</li>
-      <li><b>Zvláštnosti:</b> každá figurka má statistiku dosahu pohybu (jak daleko se v jednom tahu dostane). Vypravěč může figurku <b>zamknout</b> — pak s ní hráč nehne ani jí nezmění životy.</li>
+      <li><b>Co získáš:</b> figurky stojí přesně tam, kam chceš, a hra plyne bez zdržování. Žádné „posuň to o kousek vedle" ani figurka, která sama skočí do rohu.</li>
+      <li><b>Jak to funguje:</b> figurku nasadíš přetažením z palety na plátno, nebo „režimem umístění" (klik v paletě → klik na políčko). Objeví se <b>přesně tam, kam míříš</b> — když je políčko obsazené, najde se nejbližší volné v okolí. Pohybuješ jí přetažením nebo systémem „vyber a klepni na cílové políčko".</li>
+      <li><b>Pro koho:</b> vypravěč hýbe libovolnou figurkou; hráč jen svou postavou. Každá figurka má statistiku dosahu pohybu (jak daleko se v jednom tahu dostane). Vypravěč může figurku <b>zamknout</b> — pak s ní hráč nehne ani jí nezmění životy.</li>
     </ul>
   </div>
 
-  <h4>Karta figurky (info panel)</h4>
-  <p>Klepnutím na figurku se otevře boční panel s jejími informacemi. Lze ho mít <b>ukotvený vpravo</b>, <b>volně přesouvatelný</b> nebo <b>vystředěný</b> (na mobilu se vystředí automaticky). Obsah panelu se přizpůsobuje typu figurky i hernímu systému světa — každý herní systém (D&D, Dračí doupě, Call of Cthulhu, Fate, GURPS a další) má vlastní bojový list. Přímo z panelu jsou dostupné deník a poznámky postavy.</p>
-  <p>V hlavičce panelu má vypravěč rychlé akce: zařadit figurku „do boje" nebo „mimo boj" (u nestvůr a bestií — postavy jsou v boji vždy), zamknout/odemknout a odebrat figurku z mapy (postava v databázi přitom zůstane).</p>
+  <div class="shotgrid">
+    <figure>
+      <img src="img/mapa-boj-2.jpg" alt="Taktická mapa — pohled na figurky a vypravěčské nástroje">
+      <figcaption>Vypravěčské nástroje na taktické mapě: paleta mlhy a štětce, efekty, ovládání iniciativy.</figcaption>
+    </figure>
+    <figure>
+      <img src="img/mapa-boj-3.jpg" alt="Taktická mapa — pohled na scénu s mlhou války a kartou figurky">
+      <figcaption>Karta figurky a panel scén přiřazených hráčům — vše v jednom rozhraní bojiště.</figcaption>
+    </figure>
+  </div>
+
+  <h4>Karta figurky (info panel) <span class="pill">přizpůsobí se systému</span></h4>
+  <p>Klepnutím na figurku se otevře boční panel s jejími informacemi. Lze ho mít <b>ukotvený vpravo</b>, <b>volně přesouvatelný</b> nebo <b>vystředěný</b> (na mobilu se vystředí automaticky, aby ses na malém displeji neproklikával). Obsah panelu se přizpůsobuje typu figurky i hernímu systému světa — každý systém (D&amp;D, Dračí doupě, Call of Cthulhu, Fate, GURPS a další) má vlastní bojový list s tím, co je pro něj důležité. Přímo z panelu jsou po ruce deník a poznámky postavy, takže nemusíš nikam odbíhat.</p>
+  <p>V hlavičce panelu má vypravěč rychlé akce: zařadit figurku „do boje" nebo „mimo boj" (u nestvůr a bestií — postavy jsou v boji vždy), zamknout/odemknout a odebrat figurku z mapy (postava v databázi přitom zůstane, mizí jen z plátna).</p>
 
   <h4>Životy (HP) přímo na mapě</h4>
-  <p>Pod každou figurkou je proužek životů, jehož barva napovídá stav (zdravý / raněný / kritický). Hráč smí upravovat jen životy a zranění své vlastní (a nezamčené) figurky. Vypravěč může také <b>skrýt nebo zobrazit</b> proužky životů pro danou scénu — třeba aby hráči neviděli, jak je na tom tajemný protivník.</p>
+  <p>Pod každou figurkou je proužek životů, jehož barva napovídá stav (zdravý / raněný / kritický) — na první pohled vidíš, kdo je v úzkých. Jako hráč smíš upravovat jen životy a zranění své vlastní (a nezamčené) figurky, takže si nikdo „nepřičaruje" zdraví cizí postavě. Vypravěč může proužky životů pro danou scénu <b>skrýt nebo zobrazit</b> — třeba aby hráči nevěděli, kolik vydrží tajemný protivník, a souboj měl napětí.</p>
 
   <div class="feat">
-    <h4>Mlha války</h4>
+    <h4>Mlha války <span class="pill cyan">chytrá</span></h4>
     <p>Zahalená mapa, kterou hráči odkrývají postupně, jak postupují dál.</p>
     <ul>
-      <li><b>Kdo:</b> ovládá ji výhradně vypravěč; hráči vidí jen odhalené části.</li>
-      <li><b>Co jde dělat:</b> zapnout/vypnout mlhu pro scénu, odkrývat a zahalovat políčka štětcem (s nastavitelnou velikostí), jedním tlačítkem zahalit vše a začít znovu.</li>
-      <li><b>Zvláštnosti:</b> mlha je „chytrá" — kromě ručně odhalených políček vidí hráč vždy i okolí svých postav. Nestvůry skryté v mlze hráč nevidí; vypravěč vidí vše.</li>
+      <li><b>Co získáš:</b> objevování jeskyně, hradu nebo lesa se napětím — hráči vidí jen tam, kam došli, a každý další krok odhaluje nové. Žádné nakukování dopředu.</li>
+      <li><b>Jak to funguje:</b> mlhu pro scénu zapneš/vypneš, políčka odkrýváš a zahaluješ štětcem (s nastavitelnou velikostí), jedním tlačítkem zahalíš vše a začneš znovu. Mlha je „chytrá" — kromě ručně odhalených políček vidí hráč vždy i okolí svých postav.</li>
+      <li><b>Pro koho:</b> ovládá ji výhradně vypravěč; hráči vidí jen odhalené části. Nestvůry skryté v mlze hráč nevidí; vypravěč vidí vše.</li>
     </ul>
   </div>
 
   <h4>Efekty na mapě</h4>
-  <p>Vypravěč může kreslit vizuální efekty: obarvit políčko, vyznačit explozi (soustředné kruhy), nakreslit bariéru (kruh nebo tah štětcem). Mazání je přesné — klik na políčko smaže efekty, které ho pokrývají. K dispozici je i tlačítko „smazat vše".</p>
-
-  <figure class="shot">
-    <div class="ph">Náhled obrazovky</div>
-    <figcaption>Vypravěčské nástroje na taktické mapě: paleta mlhy a štětce, efekty, ovládání iniciativy a panel scén přiřazených hráčům.</figcaption>
-  </figure>
+  <p>Vypravěč může kreslit vizuální efekty: obarvit políčko (vyznačit jed, oheň, území), vyznačit explozi soustřednými kruhy, nakreslit bariéru (kruh nebo tah štětcem). Mazání je přesné — klik na políčko smaže efekty, které ho pokrývají; je tu i tlačítko „smazat vše". Díky tomu jasně ukážeš, kde hoří země nebo kam dosáhne kouzlo, aniž bys to musel popisovat slovy.</p>
 
   <div class="feat">
-    <h4>Sledování iniciativy a soubojové kolo</h4>
-    <p>Pořadí postav v souboji vždy aktuální — žádné papírové seznamy.</p>
+    <h4>Sledování iniciativy a soubojové kolo <span class="pill green">živé řazení</span></h4>
+    <p>Pořadí postav v souboji vždy aktuální — žádné papírové seznamy, žádné přepisování.</p>
     <ul>
-      <li><b>Kdo:</b> souboj řídí vypravěč; pořadí vidí všichni.</li>
-      <li><b>Co jde dělat:</b> zahájit boj, posouvat tahy mezi bojovníky, ukončit boj. Lišta nahoře ukazuje pořadí a <b>řadí se živě</b> podle hodnoty iniciativy — když se hodnota změní, pořadí se hned přerovná. Hráčské postavy jsou v boji vždy; nestvůry a bestie se přidávají a odebírají tlačítkem.</li>
-      <li><b>Zvláštnosti:</b> klepnutí na bojovníka v liště k němu posune mapu a vybere ho; vypravěč ho navíc může na chvíli „nasvítit" (zvýraznit všem). Sledují se i efekty trvající do konce tahu a počítadlo kol.</li>
+      <li><b>Co získáš:</b> souboj plyne. Vždy je jasné, kdo je na tahu, a pořadí se samo srovná, když se něco změní. Konec škrtání a přepisování jmen na papírku.</li>
+      <li><b>Jak to funguje:</b> zahájíš boj, posouváš tahy mezi bojovníky, ukončíš boj. Lišta nahoře ukazuje pořadí a <b>řadí se živě</b> podle hodnoty iniciativy — když se hodnota změní, pořadí se hned přerovná. Sledují se i efekty trvající do konce tahu a počítadlo kol.</li>
+      <li><b>Pro koho:</b> souboj řídí vypravěč; pořadí vidí všichni. Hráčské postavy jsou v boji vždy; nestvůry a bestie se přidávají a odebírají tlačítkem. Klepnutí na bojovníka v liště k němu posune mapu a vybere ho; vypravěč ho navíc může na chvíli „nasvítit" všem.</li>
     </ul>
   </div>
 
   <div class="callout cyan">
-    <div class="t">Vrácení akcí (krok zpět)</div>
-    <p>Veškeré změny scény se dějí přes jednotný systém operací, který si u každé akce počítá, jak ji vzít zpět. Vypravěč tak může omylem provedenou změnu vrátit. Systém zároveň zvládá výpadky spojení: po obnovení připojení se chybějící změny dopočítají, takže všichni vidí stejnou, aktuální scénu.</p>
+    <div class="t">Vrácení akcí — když uděláš chybu, neztratíš večer</div>
+    <p>Veškeré změny scény se dějí přes jednotný systém, který si u každé akce počítá, jak ji vzít zpět. Omylem smazaná figurka, špatně tažený efekt — vypravěč to vrátí. Systém zároveň zvládá výpadky spojení: po obnovení připojení se chybějící změny dopočítají, takže když ti vypadne wi-fi, po návratu vidíš stejnou, aktuální scénu jako ostatní — nemusíš nic obnovovat ani se ptát „co jsem zmeškal".</p>
   </div>
 
-  <h4>Scény přiřazené jednotlivým hráčům</h4>
-  <p>Může běžet víc scén současně. Každý hráč má přiřazenou svou scénu a vidí jen ji. Vypravěč funguje jako dirigent: hráče na scény <b>přiřazuje a přesouvá</b>. Při přesunu hráče na jinou scénu jeho figurka z původní scény sama zmizí. Hráč ze své scény dostane novou rovnou na obrazovku, aniž by cokoli hledal. Pojistka soukromí: hráč nahlédne jen do scény, která mu patří — cizí scény jsou pro něj nedostupné. Vypravěč vidí všechny.</p>
+  <div class="feat">
+    <h4>Scény přiřazené jednotlivým hráčům</h4>
+    <p>Více scén najednou — vypravěč jako dirigent, který hráče přepíná mezi situacemi.</p>
+    <ul>
+      <li><b>Co získáš:</b> rozdělíš družinu, aniž bys přišel o přehled. Jedna polovina řeší souboj, druhá vyjednává v jiné scéně — každý vidí jen svou, ty vidíš všechno.</li>
+      <li><b>Jak to funguje:</b> hráče na scény přiřazuješ a přesouváš. Při přesunu hráče na jinou scénu jeho figurka z původní scény sama zmizí. Hráč svou novou scénu dostane rovnou na obrazovku, aniž by cokoli hledal.</li>
+      <li><b>Pro koho:</b> dirigování je věc vypravěče. Pojistka soukromí: hráč nahlédne jen do scény, která mu patří — cizí scény jsou pro něj nedostupné, takže se nepřipraví o překvapení.</li>
+    </ul>
+  </div>
 
   <div class="feat">
-    <h4>Knihovna map (šablony scén)</h4>
-    <p>Připravené mapy k opakovanému použití napříč světy.</p>
+    <h4>Knihovna map (šablony scén) <span class="pill">napříč světy</span></h4>
+    <p>Připravené mapy k opakovanému použití — připrav jednou, použij kdykoli.</p>
     <ul>
-      <li><b>Kdo:</b> vlastní knihovna každého vypravěče (soukromá).</li>
-      <li><b>Co jde dělat:</b> uložit aktuální scénu jako šablonu a později ji načíst na novou scénu — i v <b>jiném světě</b>. Šablona si pamatuje obrázek pozadí, nastavení mřížky, mlhu, efekty i nasazené nestvůry.</li>
-      <li><b>Zvláštnosti:</b> šablona <b>neukládá hráčské postavy</b> (kvůli soukromí), jen prostředí a vypravěčské figurky.</li>
+      <li><b>Co získáš:</b> oblíbenou hospodu, kobku nebo bitevní pole připravíš jednou a vytáhneš znovu za pár vteřin — i v úplně jiném světě. Příprava na sezení se zkrátí z hodin na minuty.</li>
+      <li><b>Jak to funguje:</b> aktuální scénu uložíš jako šablonu a později ji načteš na novou scénu. Šablona si pamatuje obrázek pozadí, nastavení mřížky, mlhu, efekty i nasazené nestvůry.</li>
+      <li><b>Pro koho:</b> knihovna je soukromá pro každého vypravěče. Šablona <b>neukládá hráčské postavy</b> (kvůli soukromí), jen prostředí a vypravěčské figurky.</li>
     </ul>
   </div>
 
   <h4>Počasí přímo na mapě</h4>
-  <p>Vypravěč může nad plátno zapnout vizuální atmosféru počasí (déšť, sníh a další) — překryv přes celé plátno plus malý panel v rohu. Hráči ho vidí a mohou si efekty lokálně přepnout. Počasí přitéká ze samostatného generátoru počasí (viz kapitola Čas &amp; příběh) a doručuje se hráčům bezpečně, aniž by prozradilo cokoli skrytého.</p>
+  <p>Vypravěč může nad plátno zapnout vizuální atmosféru počasí (déšť, sníh a další) — překryv přes celé plátno plus malý panel v rohu. Hráči ho vidí a mohou si efekty lokálně přepnout. Počasí přitéká ze samostatného generátoru počasí (viz kapitola Čas &amp; příběh), takže ladí s ročním obdobím a regionem světa — a doručuje se bezpečně, aniž by prozradilo cokoli skrytého.</p>
 
   <h4>Kostky na mapě</h4>
-  <p>Přímo na mapě se dají házet 3D kostky (sdílí jádro s kostkami v chatu) s logem posledních hodů. Platforma hlídá, aby nikdo neházel cizím jménem ani za cizí figurku, a viditelnost hodů se řídí nastavením světa (skryté / veřejné hody).</p>
+  <p>Přímo na mapě házíš 3D kostky (sdílí jádro s kostkami v chatu) a vidíš log posledních hodů. Platforma hlídá, aby nikdo neházel cizím jménem ani za cizí figurku — hody jsou důvěryhodné. Viditelnost hodů se řídí nastavením světa (skryté vypravěčské hody nebo veřejné hody pro všechny), takže si vypravěč může nechat svá čísla pro sebe.</p>
 
   <h4>Atmosférické zvuky na mapě</h4>
-  <p>Vypravěč může spustit hudbu a zvukové kulisy přímo do scény — hráči je uslyší. Zvuky se berou ze zvukové databáze světa (viz níže).</p>
+  <p>Vypravěč spustí hudbu a zvukové kulisy přímo do scény — hráči je uslyší. Praskání ohně v hospodě, vítr na pláni, zvuk bitvy. Zvuky se berou ze zvukové databáze světa (viz níže) a vtáhnou hráče do děje líp než jakýkoli popis.</p>
 
   <h4>Pingy a nasvícení</h4>
-  <p>Dvojím klepnutím kamkoli na plátno udělá kdokoli (vypravěč i hráč) „ping" — krátké zvýraznění místa, které vidí všichni. Je spolehlivý i na dotykových obrazovkách. Vypravěč navíc umí „nasvítit" konkrétního bojovníka z iniciativní lišty. Identita pingu je herní: vypravěč jako „PJ", hráč jménem postavy — nikdy účtem.</p>
+  <p>Dvojím klepnutím kamkoli na plátno udělá kdokoli (vypravěč i hráč) „ping" — krátké zvýraznění místa, které vidí všichni. Funguje spolehlivě i na dotyku. Vypravěč navíc umí „nasvítit" konkrétního bojovníka z iniciativní lišty. Identita pingu je herní: vypravěč jako „PJ", hráč jménem postavy — nikdy účtem, takže se nenaruší ponoření do hry.</p>
 
   <h4>Přizpůsobení hernímu systému</h4>
-  <p>Herní systém světa určuje vzhled bojových listů, deníkových karet i statistik figurek pro <b>všechny</b> hráče naráz. Změna systému přepne rozložení celé mapy. Podporováno je 13+ herních systémů.</p>
+  <p>Herní systém světa určuje vzhled bojových listů, deníkových karet i statistik figurek pro <b>všechny</b> hráče naráz. Hraješ-li Dračí doupě, vidíš listy Dračího doupěte; přepneš svět na D&amp;D, přepne se celá mapa. Podporováno je 13+ herních systémů, takže si nemusíš ohýbat platformu na svou hru — platforma se ohne na tebe.</p>
 
   <h4>Skrytí a zamčení scény</h4>
-  <p>Scénu lze schovat (hráč uvidí jen nápis „Scéna není připravena") nebo zamknout (hráč s ní nehne) — a to buď celkově, nebo jednotlivě pro konkrétního hráče. Vypravěč scénu vidí vždy.</p>
+  <p>Scénu lze schovat (hráč uvidí jen nápis „Scéna není připravena") nebo zamknout (hráč s ní nehne) — a to buď celkově, nebo jednotlivě pro konkrétního hráče. Vypravěč scénu vidí vždy. Takhle si připravíš příští souboj, zatímco se ještě hraje ten současný, a hráči nic nezahlédnou.</p>
 
   <div class="stats">
     <div class="stat"><div class="n">3</div><div class="l">typy figurek (postava / nestvůra / bestie)</div></div>
@@ -164,29 +148,74 @@
 
   <hr>
 
-  <h3>Zvuková databáze „Zvuky"</h3>
-  <p>Knihovna zvukových stop pro atmosféru hry — kulisy, ruchy, hudba. Zvuky jsou odkazy na videoslužbu (YouTube), takže nezatěžují úložiště, a mají bohatá metadata (typ, prostředí, emoční tón, intenzita, smyčka a další), aby se daly snadno najít. Slouží jako zdroj atmosférických zvuků pro taktickou mapu.</p>
+  <h3>Vesmírná mapa — orientace ve světě jediným pohledem</h3>
+  <p>Velké světy bývají spletité: planety, soustavy, města, frakce a jejich propojení. Vesmírná mapa to ukáže jako <b>pohyblivý graf</b> — uzly (planety, hvězdné soustavy, lokace) a vazby mezi nimi. Rozprostře se sama (uzly se rozmístí silovým rozložením) a dá se v ní pohybovat, přibližovat a hledat. Místo dlouhého textu „kdo s kým souvisí" to vidíš na jeden pohled.</p>
+
+  <figure class="shot">
+    <img src="img/vesmir.jpg" alt="Vesmírná mapa jako interaktivní graf uzlů a vazeb">
+    <figcaption>Vesmírná mapa: svět jako živý graf planet, soustav a lokací s vazbami mezi nimi. Uzel vyhledáš a kamera k němu „doletí".</figcaption>
+  </figure>
+
   <div class="feat">
-    <h4>Práce se zvuky</h4>
-    <p>Tříúrovňová sbírka: zvuky světa, globální katalog a nominace.</p>
+    <h4>Procházení a editace vesmíru</h4>
+    <p>Mapa propojení míst ve světě — kdo s kým a co s čím souvisí.</p>
     <ul>
-      <li><b>Kdo:</b> poslechnout si zvuk může každý člen. Spravovat zvuky světa a importovat je do něj může vedení (pomocný vypravěč a výš). Schvalovat zvuky do globálního katalogu může jen platformový správce.</li>
-      <li><b>Co jde dělat:</b> přehrát si náhled, filtrovat podle metadat. Vedení: zakládat, upravovat a mazat zvuky svého světa; importovat schválený zvuk z globálního katalogu do svého světa; navrhnout vlastní zvuk do globálního katalogu (nominace). Správce: nominace schválit či zamítnout a zakládat globální zvuky přímo.</li>
-      <li><b>Zvláštnosti:</b> náhled je lokální (neslyší ho ostatní); skutečné vysílání hráčům probíhá až přes panel zvuků na taktické mapě.</li>
+      <li><b>Co získáš:</b> okamžitou orientaci v rozsáhlém světě a snadný způsob, jak hráčům ukázat strukturu vesmíru, aniž bys ji vypisoval do tabulek.</li>
+      <li><b>Jak to funguje:</b> procházíš graf, vyhledáš uzel a kamerou k němu „doletíš", otevřeš jeho detail. V režimu úprav přidáš či upravíš uzel a vazbu mezi uzly, nastavíš viditelnost uzlu a uložíš.</li>
+      <li><b>Pro koho:</b> prohlížet může každý člen (s ohledem na viditelnost uzlů — co nemáš vidět, neuvidíš); upravovat vypravěč. Mapa se aktualizuje živě a úpravy probíhají nad pracovní kopií, takže rozpracovaná změna nemizí.</li>
     </ul>
   </div>
 
   <hr>
 
-  <h3>Deník vypravěče</h3>
-  <p>Soukromý poznámkový blok vedení světa. Je vázaný na svět a <b>na konkrétního vypravěče</b> — každý člen vedení má vlastní obsah, který ostatní nevidí. Slouží k vlastním přípravám, tajným poznámkám a plánům.</p>
+  <h3>Obrázkový atlas „Mapy" — galerie nakreslených map</h3>
+  <p>Ne všechno je bojiště. Mapa kontinentu, plán města, půdorys hradu, ručně malovaná krajina — to jsou statické obrázky, které chceš mít po ruce a hezky uspořádané. Atlas je galerie těchto map, organizovaná do <b>stromu složek</b>, takže si i u rozsáhlého světa udržíš pořádek.</p>
+
+  <figure class="shot">
+    <img src="img/atlas.jpg" alt="Obrázkový atlas map světa uspořádaný do složek">
+    <figcaption>Atlas map: galerie nakreslených map ve složkách. Klik otevře mapu ve zvětšeném prohlížeči, hledání projde celý atlas.</figcaption>
+  </figure>
+
+  <div class="feat">
+    <h4>Správa atlasu</h4>
+    <p>Knihovna vizuálních podkladů světa, přehledně ve složkách.</p>
+    <ul>
+      <li><b>Co získáš:</b> všechny mapy světa na jednom místě, uspořádané a vyhledatelné — místo hledání v cizích diskových složkách nebo přílohách chatu.</li>
+      <li><b>Jak to funguje:</b> vytvoříš mapu s titulkem, popisem, obrázkem a nastavením viditelnosti. Vytváříš a vnořuješ složky. Procházíš atlas přes drobečkovou navigaci a hledáš napříč celým atlasem podle názvu i popisu. Mapu otevřeš ve zvětšeném prohlížeči (lightbox).</li>
+      <li><b>Pro koho:</b> spravovat může vypravěč světa a platformový správce; prohlížet každý člen — ale jen to, co je pro něj viditelné. Smazání složky nesmaže její obsah (mapy a podsložky se posunou o úroveň výš), mazání mapy uklidí i její obrázek z úložiště.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Viditelnost, která neprozradí tajemství</div>
+    <p>Každá mapa i složka má řízenou viditelnost — buď veřejná pro hráče, nebo jen pro vybrané. Pojistka: hráč mapu uvidí, jen když je viditelná ona <b>i celá cesta složek</b> k ní. Skrytá nadřazená složka skryje vše uvnitř. Hráči se navíc nikdy nedozví, komu je co viditelné — vidí jen to, co smí. Můžeš tak připravit celý atlas dopředu, aniž by hráči objevili mapy, které mají potkat až za tři sezení.</p>
+  </div>
+
+  <hr>
+
+  <h3>Zvuková databáze „Zvuky" — atmosféra na jedno kliknutí</h3>
+  <p>Zvuk dělá scénu. Knihovna zvukových stop ti dává kulisy, ruchy a hudbu k atmosféře hry. Zvuky jsou odkazy na videoslužbu (YouTube), takže nezatěžují úložiště a nemusíš nic nahrávat, a mají bohatá metadata (typ, prostředí, emoční tón, intenzita, smyčka a další), abys rychle našel přesně to, co scéna potřebuje. Slouží jako zdroj atmosférických zvuků pro taktickou mapu.</p>
+  <div class="feat">
+    <h4>Práce se zvuky</h4>
+    <p>Tříúrovňová sbírka: zvuky světa, globální katalog a nominace.</p>
+    <ul>
+      <li><b>Co získáš:</b> připravenou zvukovou paletu pro každou náladu — hospoda, bouře, bitva, chrám — bez stahování souborů a bez plnění disku. A roste se zapojením celé komunity.</li>
+      <li><b>Jak to funguje:</b> přehraješ si náhled, filtruješ podle metadat. Zakládáš, upravuješ a mažeš zvuky svého světa; importuješ schválený zvuk z globálního katalogu; navrhneš vlastní zvuk do globálního katalogu (nominace).</li>
+      <li><b>Pro koho:</b> poslechnout si zvuk může každý člen; spravovat zvuky světa a importovat je vedení (pomocný vypravěč a výš); schvalovat zvuky do globálního katalogu platformový správce. Náhled je lokální (neslyší ho ostatní) — skutečné vysílání hráčům probíhá až přes panel zvuků na taktické mapě.</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <h3>Deník vypravěče — tvoje tajné poznámky vždy po ruce</h3>
+  <p>Každý vypravěč si vede přípravy, tahy, tajné plány a poznámky „pro sebe". Deník vypravěče je na to: soukromý poznámkový blok vázaný na svět a <b>na konkrétního vypravěče</b> — každý člen vedení má vlastní obsah, který ostatní nevidí. A máš ho po ruce i během hry.</p>
   <div class="feat">
     <h4>Soukromé poznámky vedení</h4>
     <p>Zápisník po ruce — z menu i přímo z taktické mapy.</p>
     <ul>
-      <li><b>Kdo:</b> vedení světa (pomocný vypravěč a výš). Hráč deník vypravěče nemá.</li>
-      <li><b>Co jde dělat:</b> číst a editovat vlastní poznámky pro daný svět; dostupné z menu i jako překryv přímo během hraní na taktické mapě.</li>
-      <li><b>Zvláštnosti:</b> u hráče na mapě stejné tlačítko otevírá místo deníku <b>poznámky jeho postavy</b>, které se propisují na stránku postavy. Hráč bez postavy tlačítko nemá.</li>
+      <li><b>Co získáš:</b> jedno místo na všechny tajné přípravy, dostupné i uprostřed souboje — nemusíš přepínat do jiné aplikace ani hledat papírový sešit.</li>
+      <li><b>Jak to funguje:</b> čteš a edituješ vlastní poznámky pro daný svět; deník otevřeš z menu i jako překryv přímo během hraní na taktické mapě.</li>
+      <li><b>Pro koho:</b> vedení světa (pomocný vypravěč a výš). Hráč deník vypravěče nemá — u něj stejné tlačítko na mapě otevírá <b>poznámky jeho postavy</b>, které se propisují na stránku postavy. Hráč bez postavy tlačítko nemá.</li>
     </ul>
   </div>
 </section>
