@@ -1,0 +1,225 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Co umíme</div>
+    <h2>Platformová administrace</h2>
+  </div>
+
+  <p class="lead">Za každou živou komunitou stojí nástroje, kterými ji lze spravovat. Projekt Ikaros má centrální administrátorský panel pro správce platformy, propracovaný systém globálních rolí a granulárních oprávnění, kompletní správu uživatelů (od změny role přes dočasné i trvalé zablokování až po mazání účtů), provázané vyhledávání kombinující fulltext se sémantikou, katalog sedmnácti herních systémů a správu globálních emotů. Tato kapitola popisuje, co všechno správce platformy umí — a hlavně, kdo na co má právo.</p>
+
+  <div class="callout cyan">
+    <div class="t">Globální správa, ne správa světa</div>
+    <p>Tato kapitola se týká výhradně <b>platformové</b> (globální) administrace. Vedení uvnitř jednotlivých světů — role PJ, Pomocný PJ a další — je samostatná věc a patří do kapitol o světech. Důležité je, že správce platformy <b>nemá</b> automatickou moc uvnitř cizího světa; tam vládne PJ daného světa.</p>
+  </div>
+
+  <h3>Globální role</h3>
+  <p class="lead">Každý uživatel platformy má jednu globální roli, která určuje jeho platformová oprávnění. Rolí je šest a jasně se dělí na správce, běžné uživatele a správce konkrétního druhu obsahu.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Správci platformy</h4>
+      <p class="small">Mají přístup do administrátorského panelu.</p>
+      <ul>
+        <li><b>Superadmin</b> — nejvyšší role, smí cokoli.</li>
+        <li><b>Admin</b> — správce platformy s rozsahem daným jeho oprávněními.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Uživatelé a správci obsahu</h4>
+      <p class="small">Bez přístupu do administrátorského panelu.</p>
+      <ul>
+        <li><b>Ikarus</b> — běžný přihlášený uživatel.</li>
+        <li><b>Správce článků</b> — schvaluje příspěvky v sekci Články.</li>
+        <li><b>Správce galerie</b> — schvaluje obrázky v Galerii.</li>
+        <li><b>Správce diskuzí</b> — schvaluje příspěvky v Diskuzích.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Správci obsahu nejsou administrátoři</div>
+    <p>Správce článků, galerie a diskuzí jsou obsahové role — vidí jen svou frontu „Ke zpracování" a schvalují příspěvky daného druhu. <b>Do administrátorského panelu se nedostanou.</b> Role PJ a hráč existují vždy jen uvnitř konkrétního světa, ne na úrovni platformy.</p>
+  </div>
+
+  <h3>Granulární oprávnění administrátorů</h3>
+  <p class="lead">Role Admin není „všechno nebo nic". Superadmin může každému Adminovi přidělit nebo odebrat konkrétní pravomoci, takže lze mít Admina s omezenou působností.</p>
+
+  <table>
+    <thead>
+      <tr><th>Oprávnění</th><th class="us">Co umožňuje</th><th>Kdo smí přidělit</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Správa adminů</td>
+        <td class="us">Admin smí spravovat oprávnění jiných administrátorů</td>
+        <td>jen Superadmin</td>
+      </tr>
+      <tr>
+        <td>Moderace obsahu</td>
+        <td class="us">Admin smí smazat nebo obnovit cizí účet</td>
+        <td>Superadmin, nebo Admin se Správou adminů</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="feat">
+    <h4>Přidělování oprávnění</h4>
+    <p>Oprávnění se nastavují přímo u uživatele v záložce Uživatelé administrátorského panelu.</p>
+    <ul>
+      <li><b>Kdo:</b> Superadmin smí měnit kterékoli oprávnění. Admin smí měnit oprávnění jiných Adminů, jen pokud má sám pravomoc „Správa adminů" — a to navíc smí delegovat pouze „Moderaci obsahu", nikdy ne „Správu adminů" (aby se právo nešířilo řetězově).</li>
+      <li><b>Co jde dělat:</b> Zaškrtnutím přepnout jednotlivá oprávnění u Admina. Oprávnění mají smysl jen u uživatelů s rolí Admin.</li>
+      <li><b>Zvláštnosti:</b> Nikdo nesmí měnit oprávnění sám sobě. Každá změna oprávnění se zaznamená do auditního logu.</li>
+    </ul>
+  </div>
+
+  <h3>Administrátorský panel</h3>
+  <p class="lead">Administrátorský panel je centrální rozcestník správy platformy. Je dostupný jen Adminům a Superadminům a sdružuje pět hlavních záložek.</p>
+
+  <div class="feat">
+    <h4>Záložka Přehled</h4>
+    <p>Úvodní dashboard se snímkem klíčových metrik platformy a rychlými odkazy.</p>
+    <ul>
+      <li><b>Kdo:</b> Admin a Superadmin.</li>
+      <li><b>Co ukazuje:</b>
+        <ul>
+          <li><b>Uživatelé:</b> celkový počet, počet aktivních (nedávno online), počet nově registrovaných za posledních 7 dní a kolik účtů čeká na smazání.</li>
+          <li><b>Světy:</b> celkový počet.</li>
+          <li><b>Obsah:</b> počet článků, obrázků v galerii a diskuzí.</li>
+          <li><b>Fronta:</b> kolik žádostí o přezdívku čeká na vyřízení.</li>
+          <li><b>Rychlé odkazy</b> na správu uživatelů, audit log, frontu ke zpracování a index vyhledávání.</li>
+        </ul>
+      </li>
+      <li><b>Zvláštnosti:</b> Každá metrika se počítá odolně — pokud by jeden zdroj selhal, dashboard se nezhroutí, jen u dané hodnoty ukáže nulu.</li>
+    </ul>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Úvodní dashboard administrátorského panelu se statistickými kartami uživatelů, světů a obsahu.</figcaption>
+  </figure>
+
+  <div class="feat">
+    <h4>Záložka Uživatelé</h4>
+    <p>Filtrovatelná tabulka všech uživatelů s akcemi po jednom i hromadně.</p>
+    <ul>
+      <li><b>Kdo:</b> Admin a Superadmin (s respektováním hierarchie níže).</li>
+      <li><b>Co jde dělat u jednoho uživatele:</b>
+        <ul>
+          <li><b>Změnit roli</b> — vybrat z šesti globálních rolí.</li>
+          <li><b>Zablokovat (ban) / odblokovat</b> — ban má povinný důvod a volitelné trvání; bez trvání je <b>trvalý</b>, s trváním je <b>dočasný</b> a po vypršení sám pomine. Zablokování okamžitě odhlásí uživatele ze všech zařízení.</li>
+          <li><b>Smazat účet / obnovit mazání</b> — smazání spustí 30denní ochrannou lhůtu s povinným důvodem; během ní lze mazání zrušit.</li>
+          <li><b>Nastavit granulární oprávnění</b> — u uživatelů s rolí Admin zaškrtnout „Správa adminů" (jen Superadmin) a „Moderace obsahu".</li>
+        </ul>
+      </li>
+      <li><b>Co jde dělat hromadně:</b> hromadně zablokovat (s volbou trvání trvale / 1 / 7 / 30 / 90 dní a důvodem), hromadně odblokovat a hromadně změnit roli. Hromadná akce je „nejlepší možný výsledek" — když selže u jednoho uživatele, ostatní se přesto provedou a panel ukáže, co prošlo a co ne.</li>
+      <li><b>Filtry:</b> podle přezdívky, podle role a podle toho, zda uživatel čeká na schválení přezdívky.</li>
+      <li><b>Zvláštnosti:</b> U Admina s pravomocí „Správa adminů" se zobrazuje zvláštní odznak. Řádek vlastního účtu má akce zamčené. Všechny akce se zaznamenávají do auditního logu.</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Hierarchie — kdo na koho smí</div>
+    <p>Pravidla zabraňují zneužití: nikdo nesmí měnit nebo moderovat <b>sám sebe</b>. Superadmin smí cokoli (kromě sebe). Admin <b>nesmí</b> měnit roli ani moderovat jiného Admina nebo Superadmina, ani nikoho povýšit na administrátorskou roli. Mazání a obnova účtů navíc vyžadují oprávnění „Moderace obsahu".</p>
+  </div>
+
+  <div class="feat">
+    <h4>Záložka Smazané světy</h4>
+    <p>Seznam soft-smazaných světů s možností obnovy během 30denní lhůty.</p>
+    <ul>
+      <li><b>Kdo:</b> Admin a Superadmin.</li>
+      <li><b>Co jde dělat:</b> <b>Obnovit svět</b> — vrátí jeho stránky, postavy i chat a vlastník znovu získá přístup. U každého světa je vidět, kolik dní zbývá do trvalého smazání (dny pod hranicí pěti jsou zvýrazněné).</li>
+      <li><b>Zvláštnosti:</b> Obnova světa je jediný případ, kdy správce platformy smí zasáhnout do dění uvnitř světa — zachrání opuštěný svět a dosadí mu vedení. Po uplynutí 30 dní platforma svět automaticky a trvale smaže.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Záložka Audit log</h4>
+    <p>Záznam moderátorských akcí pro dohledatelnost a zpětnou kontrolu.</p>
+    <ul>
+      <li><b>Kdo:</b> Admin a Superadmin. Pouze ke čtení.</li>
+      <li><b>Co jde dělat:</b> procházet záznamy s informací, kdo akci provedl, koho se týkala, jaká to byla akce, jaký byl stav před a po, jaký byl důvod a kdy se to stalo. Záznamy lze filtrovat podle typu akce a stránkovat.</li>
+      <li><b>Co se zaznamenává:</b> změna role, založení uživatele, schválení i zamítnutí žádosti o přezdívku, zablokování i odblokování, smazání i obnova účtu, žádost o smazání i její zrušení (i samotným uživatelem), trvalé smazání účtu, změna oprávnění administrátora, hromadné zablokování / odblokování / změna role a archivace, obnova i smazání platformových novinek.</li>
+      <li><b>Zvláštnosti:</b> Zápis do auditu nikdy neblokuje samotnou akci — když by se nepovedlo zapsat záznam, akce přesto proběhne.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Záložka Index vyhledávání</h4>
+    <p>Monitoring stavu vyhledávacího indexu a jeho ruční přebudování.</p>
+    <ul>
+      <li><b>Kdo:</b> Admin a Superadmin.</li>
+      <li><b>Co jde dělat:</b> zobrazit stav indexu — který vyhledávací nástroj se používá, kolik stránek je zaindexovaných, kolik je vytvořených vektorů pro sémantické hledání, kolik je zpracováno z celku, kolik čeká na zpracování a kdy proběhlo poslední zpracování — a tlačítkem <b>Přebudovat index</b> spustit kompletní přeindexování (s potvrzovacím dialogem, protože jde o náročnou operaci).</li>
+    </ul>
+  </div>
+
+  <h3>Vyhledávání</h3>
+  <p class="lead">Vyhledávání pomáhá najít stránky v rámci jednoho světa. Kombinuje dva přístupy najednou: klasický fulltext a sémantické (významové) hledání, takže najde i to, co uživatel popsal jinými slovy než autor.</p>
+
+  <div class="feat">
+    <h4>Provázané vyhledávání</h4>
+    <p>Hledá se vždy v rámci jednoho konkrétního světa.</p>
+    <ul>
+      <li><b>Kdo:</b> Každý <b>přihlášený</b> uživatel může vyhledávat ve světech, ke kterým má přístup.</li>
+      <li><b>Co jde dělat:</b> zadat dotaz a dostat výsledky, které vznikají složením dvou zdrojů: <b>fulltextového</b> vyhledávání (hledá doslovné výskyty) a <b>sémantického</b> vyhledávání (hledá podle významu pomocí jazykového modelu). Oba výsledky se chytře proloží do jednoho seznamu bez duplicit.</li>
+      <li><b>Zvláštnosti:</b> Vyhledávání je <b>bezpečné</b> — výsledky se vždy omezí na stránky, které smíte vidět. Stránky chráněné přístupovými právy ani názvy stránek z cizích soukromých světů se nikdy neobjeví. Z jednoho dotazu se záměrně nehledá napříč více světy.</li>
+    </ul>
+  </div>
+
+  <h3>Katalog herních systémů</h3>
+  <p class="lead">Platforma má vestavěný katalog herních systémů i s jejich datovými šablonami. Podle zvoleného systému se řídí, jak vypadají karty postav a záznamy v bestiáři daného světa.</p>
+
+  <div class="feat">
+    <h4>Sedmnáct herních systémů</h4>
+    <p>Referenční katalog dostupný napříč platformou.</p>
+    <ul>
+      <li><b>Kdo:</b> Katalog je veřejný — přečíst si seznam systémů i jejich šablonu může kdokoli.</li>
+      <li><b>Co obsahuje:</b> Call of Cthulhu, Dungeons &amp; Dragons 2. edice, Dungeons &amp; Dragons 3. edice a novější, Dungeons &amp; Dragons 5. edice, Dračí doupě (hrdinská varianta), pět povolání pro Dračí doupě 1.6 (alchymista, hraničář, zloděj, válečník, kouzelník), Fate, GURPS, JaD, vlastní systém Matrix, vlastní systém Projekt Ikaros a Shadowrun.</li>
+      <li><b>Co jde dělat:</b> číst seznam systémů a jejich plné datové šablony, které pak řídí podobu postav a bestiáře v jednotlivých světech.</li>
+    </ul>
+  </div>
+
+  <h3>Globální emoty</h3>
+  <p class="lead">Vedle vlastních emotů jednotlivých světů existují i globální obrázkové emoty dostupné ve všech světech najednou. Spravuje je správce platformy.</p>
+
+  <div class="feat">
+    <h4>Správa globálních emotů</h4>
+    <p>Centrální správa obrázkových emotů platných napříč všemi světy.</p>
+    <ul>
+      <li><b>Kdo:</b> Vytvářet, upravovat a mazat globální emoty smí Admin nebo Superadmin. Číst (a používat) je smí každý přihlášený uživatel ve všech světech.</li>
+      <li><b>Co jde dělat:</b> vytvořit nový globální emote (název, zkratka, obrázek), upravit existující a smazat ho. Změny se okamžitě promítnou všem.</li>
+      <li><b>Zvláštnosti:</b> Globální emoty jsou nezávislé na emotech jednotlivých světů, které spravuje vedení daného světa. Globální emote vidí a může použít každý uživatel v kterémkoli světě.</li>
+    </ul>
+  </div>
+
+  <h3>Žádosti o přezdívku a další nástroje správce</h3>
+  <p class="lead">Kromě hlavních záložek panelu má správce platformy k dispozici další dílčí nástroje.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Žádosti o přezdívku</h4>
+      <p class="small">Schvalování změn přezdívek.</p>
+      <ul>
+        <li>Procházet žádosti uživatelů o novou přezdívku.</li>
+        <li><b>Schválit</b> nebo <b>zamítnout</b> žádost.</li>
+        <li>Žadatel dostane o výsledku oznámení.</li>
+        <li>Vyřizuje se z osobní fronty „Ke zpracování".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Moderace obsahu</h4>
+      <p class="small">Schvalování komunitních příspěvků.</p>
+      <ul>
+        <li>Články schvalují Superadmin, Admin a Správce článků.</li>
+        <li>Galerii schvalují Superadmin, Admin a Správce galerie.</li>
+        <li>Diskuze schvalují Superadmin, Admin a Správce diskuzí.</li>
+        <li>Schvalování probíhá ve frontě „Ke zpracování", ne v administrátorském panelu.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">6</div><div class="l">globálních rolí na platformě</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">hlavních záložek administrátorského panelu</div></div>
+    <div class="stat"><div class="n">17</div><div class="l">podporovaných herních systémů</div></div>
+    <div class="stat"><div class="n">30</div><div class="l">dní na obnovu smazaného světa</div></div>
+  </div>
+</section>

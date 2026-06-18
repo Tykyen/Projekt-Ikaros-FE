@@ -1,0 +1,250 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Co umíme</div>
+    <h2>Stránky, wiki a utajení</h2>
+  </div>
+
+  <p class="lead">Srdcem každého světa je jeho encyklopedie — systém stránek, kde žije veškerý obsah: popisy míst, frakcí, postav, historie, pravidla i tajemství. Funguje jako wiki s plnohodnotným editorem, vzájemnými odkazy a obrázky. Nad tím vším stojí jedinečná funkce <b>utajených záložek</b>, díky které jedna a tatáž stránka může každému čtenáři ukázat jiný díl pravdy podle jeho prověrky. To je věc, kterou běžné wiki nástroje neumí a která dělá z platformy mocný vypravěčský nástroj.</p>
+
+  <div class="callout cyan">
+    <div class="t">Co je „stránka" a proč je univerzální</div>
+    <p>Stránka je základní stavební kámen obsahu světa. Jedna jednotná entita umí být čímkoli — popisem lokace, novinovým článkem, rozcestníkem odkazů, galerií, rodokmenem, video-obrazovkou, ale i profilem hráčské postavy nebo NPC. Díky tomu se s veškerým obsahem pracuje stejně: stejný editor, stejné odkazování, stejné vyhledávání. Postavy a lokace jsou jen zvláštní druhy stránek, ke kterým se navíc připojí herní data (deník, kalendář, finance).</p>
+  </div>
+
+  <h3>1. Typy stránek</h3>
+
+  <p>Při zakládání stránky se volí její typ. Ten určuje, jak stránka vypadá a co umí.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Ostatní</h4>
+      <p class="small">Univerzální stránka — popis, text, obrázky. Výchozí volba pro většinu obsahu (frakce, historie, pojmy).</p>
+    </div>
+    <div class="card">
+      <h4>Lokace</h4>
+      <p class="small">Místo ve světě. Navíc si nese vlastní kalendář událostí a může vystupovat na taktické mapě.</p>
+    </div>
+    <div class="card">
+      <h4>Noviny</h4>
+      <p class="small">Novinový článek s vlastními metadaty — pro vnitroherní zpravodajství.</p>
+    </div>
+    <div class="card">
+      <h4>Seznam</h4>
+      <p class="small">Rozcestník odkazů — přehledová stránka, která vede jinam. Hodí se na obsah pravidel.</p>
+    </div>
+    <div class="card">
+      <h4>Galerie</h4>
+      <p class="small">Obrázková galerie s lightboxem pro prohlížení.</p>
+    </div>
+    <div class="card">
+      <h4>Rodokmen</h4>
+      <p class="small">Speciální zobrazení rodových a příbuzenských vztahů.</p>
+    </div>
+    <div class="card">
+      <h4>Obrazovka</h4>
+      <p class="small">Stránka s vloženými videi (například z YouTube) — promítací plátno světa.</p>
+    </div>
+    <div class="card">
+      <h4>Postava hráče</h4>
+      <p class="small">Profil hráčské postavy — má vlastníka (hráče) a připojený deník, finance, výbavu, kalendář a poznámky.</p>
+    </div>
+    <div class="card">
+      <h4>NPC</h4>
+      <p class="small">Postava řízená vypravěčem (nehráčská) — má deník, kalendář a poznámky, ale bez vlastníka.</p>
+    </div>
+  </div>
+
+  <h3>2. Encyklopedie světa — seznam stránek</h3>
+
+  <p>Vstupní brána ke všemu obsahu. Přehledná stránka s kartami všech stránek světa.</p>
+
+  <div class="feat">
+    <h4>Seznam stránek</h4>
+    <p>Index celé encyklopedie světa.</p>
+    <ul>
+      <li><b>Kdo:</b> každý člen světa (Čtenář a výše). Tlačítko „Nová stránka" se ukáže od role Pomocný PJ.</li>
+      <li><b>Co jde dělat:</b> fulltextově hledat podle názvu (zvládá i diakritiku), filtrovat podle typu stránky, řadit (výchozí pořadí, abecedně, podle typu), nahoře pracovat se sekcí „Oblíbené" včetně přetahování pro změnu pořadí (i na dotyku), prokliknout kartu na stránku a hvězdičkou přepínat oblíbené. Pokud svět ještě stránky nemá, tvůrci se nabídne „Vytvořit první stránku".</li>
+      <li><b>Zvláštnosti:</b> seznam je plochý — filtruje se chipy podle typu, nemá složkovou hierarchii. Stránky chráněné přístupem se nečlenům do seznamu vůbec nezařadí, takže se ani neprozradí jejich existence.</li>
+    </ul>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Encyklopedie světa — vyhledávání, filtry podle typu, sekce oblíbených a mřížka karet stránek.</figcaption>
+  </figure>
+
+  <h3>3. Čtení stránky</h3>
+
+  <p>Při otevření stránky si systém podle jejího typu vybere vhodné zobrazení a doplní řadu pomocníků pro pohodlné čtení.</p>
+
+  <div class="feat">
+    <h4>Prohlížeč stránky</h4>
+    <p>Bohatě vybavené čtecí rozhraní.</p>
+    <ul>
+      <li><b>Kdo:</b> každý člen světa s přístupem k dané stránce.</li>
+      <li><b>Co jde dělat:</b> číst obsah v zobrazení přizpůsobeném typu stránky; používat lištu utajených záložek; vidět odhad doby čtení; přecházet přímo na nadpisy přes odkaz s kotvou; automaticky se proklikávat na zmíněné entity (auto-odkazy), přičemž nefunkční odkazy se zvýrazní červeně; otevřít obrázek ve velkém (lightbox); vyznačit text a citovat ho. K dispozici jsou klávesové zkratky: paleta příkazů, přepnutí oblíbené, vstup do editoru, nápověda a návrat na seznam.</li>
+      <li><b>Zvláštnosti:</b> vedení má navíc panel „Odkazuje sem" se zpětnými odkazy — přehled, odkud se na stránku míří.</li>
+    </ul>
+  </div>
+
+  <h3>4. Editor stránky</h3>
+
+  <p>Plnohodnotný nástroj pro tvorbu a úpravu obsahu, rozdělený do logických panelů. Pracovat s ním smí Pomocný PJ a výše.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Identita stránky</h4>
+      <p class="small">Název, typ (s upozorněním na možnou ztrátu dat při změně), hlavní obrázek s výřezem a přiblížením, velký obrázek a pořadí v seznamu.</p>
+    </div>
+    <div class="card">
+      <h4>Datová šablona</h4>
+      <p class="small">Karty připravených šablon atributových tabulek (například „Postava", „Stát") — kliknutím se naplní hlavičky a výchozí titulek.</p>
+    </div>
+    <div class="card">
+      <h4>Atributová tabulka</h4>
+      <p class="small">Strukturovaná tabulka vlastností s hlavičkami a hodnotami; do buněk lze psát formátovaný text a odkazy.</p>
+    </div>
+    <div class="card">
+      <h4>Obsah (textový editor)</h4>
+      <p class="small">Bohatý textový editor: tučné, kurzíva, podtržení, přeškrtnutí, horní a dolní index, nadpisy, seznamy, citace, tabulky, barvy a bloky. Vkládání odkazů na jiné stránky přes zápis dvěma hranatými závorkami i přes pohodlný vyhledávač odkazů; nahrávání obrázků přímo do textu.</p>
+    </div>
+    <div class="card">
+      <h4>Galerie a videa</h4>
+      <p class="small">Pro typy Galerie a Obrazovka — správa obrázků nebo vložených videí.</p>
+    </div>
+    <div class="card">
+      <h4>Rozcestník a metadata</h4>
+      <p class="small">Pro typ Seznam editace odkazů menu, pro Noviny vlastní metadata.</p>
+    </div>
+    <div class="card">
+      <h4>Profil postavy</h4>
+      <p class="small">Pro hráčské postavy a NPC výběr vlastníka a správa utajených záložek.</p>
+    </div>
+    <div class="card">
+      <h4>Sekce a utajené záložky</h4>
+      <p class="small">Strukturované rozbalovací sekce a panel chráněných záložek (popsáno dále).</p>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Bezpečné ukládání a ochrana práce</div>
+    <p>Editor automaticky průběžně ukládá rozpracovaný koncept do prohlížeče, takže o práci nepřijdete ani při zavření okna. Při uložení hlídá souběžné úpravy — pokud mezitím stránku změnil někdo jiný, nabídne volbu obnovit cizí verzi nebo přepsat. Veškerý vložený obsah se na pozadí čistí, aby do něj nešlo propašovat nebezpečný kód.</p>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Editor stránky s panely vlevo, textovým editorem uprostřed a živým náhledem výsledku.</figcaption>
+  </figure>
+
+  <h3>5. Utajené záložky (AKJ) — vlajková funkce</h3>
+
+  <p>Toto je jedna z nejsilnějších a nejosobitějších funkcí platformy. Stojí za to ji vysvětlit do hloubky, protože nic podobného běžné wiki nástroje nenabízejí.</p>
+
+  <div class="callout gold">
+    <div class="t">Co jsou utajené záložky a proč jsou výjimečné</div>
+    <p>Představte si stránku o tajné organizaci. Pro běžného čtenáře je to jen nenápadná firma. Ale člen s patřičnou <b>prověrkou</b> uvidí na téže stránce navíc záložky s pravým posláním organizace, jmény agentů a plány. A nejvyšší prověrka odhalí ještě hlubší vrstvu. <b>Jedna stránka, mnoho vrstev pravdy</b> — každý čtenář vidí přesně tolik, kolik mu náleží. Vypravěč tak řídí informace s chirurgickou přesností a buduje napětí a tajemství přímo v encyklopedii světa, aniž by musel udržovat několik verzí téže stránky.</p>
+  </div>
+
+  <h4>Jak prověrky fungují</h4>
+  <p>Vypravěč si v nastavení světa nadefinuje vlastní stupně utajení (například „Důvěrné", „Tajné", „Přísně tajné") a přidělí je jednotlivým členům. Ke každé záložce stránky pak určí, kdo ji smí vidět — buď podle prověrkové úrovně, nebo jmenovitě konkrétním hráčům.</p>
+
+  <h4>Zamčené versus odemčené záložky</h4>
+  <p>Záložky se chovají chytře, aby zároveň lákaly i chránily.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Zamčená záložka 🔒</h4>
+      <p class="small">Pokud je záložka vázaná na prověrkovou úroveň, čtenář bez přístupu ji vidí jako <b>zamčenou</b> — pozná její jméno a požadovanou úroveň, ale obsah ani citlivé detaily nikoli. Vidí, že „něco tají", což buduje napětí a motivaci. Jakmile prověrku získá, záložka se <b>odemkne 🔓</b> a obsah se odhalí.</p>
+    </div>
+    <div class="card">
+      <h4>Úplně skrytá záložka</h4>
+      <p class="small">Záložky vyhrazené jen vedení (například „PJ informace") nebo čistě soukromé zůstávají pro nepovolané <b>úplně skryté</b> — neprozradí ani svou existenci. Hodí se na poznámky vypravěče, které nikdo jiný nemá ani tušit.</p>
+    </div>
+  </div>
+
+  <div class="feat">
+    <h4>Správa utajených záložek (v editoru)</h4>
+    <p>Nástroj vypravěče pro vrstvení informací.</p>
+    <ul>
+      <li><b>Kdo:</b> Vypravěč a vedení; vidět odemčené má vždy PJ. Vlastník hráčské postavy vidí utajené záložky své postavy, dokud mu je Vypravěč nezamkne.</li>
+      <li><b>Co jde dělat:</b> přidat záložku, pojmenovat ji, seřadit; určit „kdo vidí" — prověrkovou úroveň nebo jmenovité hráče; použít připravené předvolby „PJ informace" a „Soukromé"; vyplnit vlastní obsah záložky (obrázek, text, tabulka) — nevyplněné části zdědí ze základní stránky; u hráčských postav přepnout, zda vlastník postavy svou utajenou záložku vidí.</li>
+      <li><b>Zvláštnosti:</b> kdo má přístup je vynucováno na serveru — utajený obsah se k nepovolanému vůbec neodešle, takže neexistuje cesta, jak ho obejít. Toto není jen vizuální skrytí.</li>
+    </ul>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Stránka se zamčenou utajenou záložkou (zámek a název) vedle běžně dostupného obsahu.</figcaption>
+  </figure>
+
+  <h3>6. Ochrana celé stránky</h3>
+
+  <p>Vedle utajení jednotlivých záložek lze chránit i celou stránku. Vypravěč nastaví pravidla přístupu, která mohou kombinovat čtyři kritéria: konkrétní jmenovitě uvedené hráče, prověrkovou úroveň, minimální roli ve světě a pojmenovaný stupeň utajení. Stačí splnit jedno z nich. Chráněná stránka se nepovolaným ani neobjeví v seznamu ani ve vyhledávání — tedy ani jejich existence se neprozradí.</p>
+
+  <h3>7. Šablony stránek</h3>
+
+  <div class="feat">
+    <h4>Datové šablony</h4>
+    <p>Připravené kostry atributových tabulek pro opakované použití.</p>
+    <ul>
+      <li><b>Kdo:</b> spravuje Korektor a výše; používá kdokoli, kdo edituje stránku.</li>
+      <li><b>Co jde dělat:</b> založit šablonu s názvem, ikonou, sadou hlaviček tabulky a výchozím titulkem. V editoru stránky se pak nabízí jako karta k jednomu kliknutí — třeba jednotná šablona „Postava" nebo „Stát" pro celý svět.</li>
+      <li><b>Zvláštnosti:</b> šablona plní jen kostru tabulky, ne celý obsah stránky. Světy s herním systémem „matrix" dostanou několik výchozích šablon hned při založení.</li>
+    </ul>
+  </div>
+
+  <h3>8. Hromadná správa stránek</h3>
+
+  <div class="feat">
+    <h4>Administrace stránek</h4>
+    <p>Tabulkový přehled všech stránek pro správce obsahu.</p>
+    <ul>
+      <li><b>Kdo:</b> Pomocný PJ a výše.</li>
+      <li><b>Co jde dělat:</b> zobrazit všechny stránky v tabulce (název, typ, datum úpravy, pořadí) s řazením podle sloupců, hledat, filtrovat podle typu, mazat jednotlivě i hromadně přes zaškrtávací políčka, prokliknout do editoru nebo založit novou stránku.</li>
+      <li><b>Zvláštnosti:</b> mazání nemá krok zpět; při smazání se zároveň uklidí navázané obrázky a odebere stránka z oblíbených u všech členů.</li>
+    </ul>
+  </div>
+
+  <h3>9. Referenční stránky: Pravidla, Magie, Technologie</h3>
+
+  <p>Při založení světa se automaticky vytvoří sada klíčových referenčních stránek, jejichž obsah se přizpůsobí volbám světa (herní systém, magické tradice, úroveň technologie).</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Pravidla</h4>
+      <p class="small">Hlavní pravidlová stránka světa, dostupná i samostatným odkazem. Obsah se předvyplní podle zvoleného herního systému. Tuto stránku nelze z menu skrýt — je nezbytná.</p>
+    </div>
+    <div class="card">
+      <h4>Magický systém</h4>
+      <p class="small">Univerzální škála magické úrovně a popis zvolených magických tradic světa. Lze skrýt z menu, pokud svět magii nepoužívá.</p>
+    </div>
+    <div class="card">
+      <h4>Technologie</h4>
+      <p class="small">Škála technologické úrovně a rozsah technologií světa. Také lze z menu skrýt.</p>
+    </div>
+    <div class="card">
+      <h4>Další referenční</h4>
+      <p class="small">Zakládá se i stránka častých dotazů a video-stránka. Světy se systémem „matrix" dostanou místo toho ucelenou Pravidlovou knihu s kapitolami.</p>
+    </div>
+  </div>
+
+  <h3>10. Oblíbené stránky</h3>
+
+  <div class="feat">
+    <h4>Oblíbené stránky</h4>
+    <p>Osobní rychlý přístup k tomu, co používáte nejvíc.</p>
+    <ul>
+      <li><b>Kdo:</b> každý člen, pro každý svět zvlášť.</li>
+      <li><b>Co jde dělat:</b> přepínat oblíbené hvězdičkou (na kartě i ve čtení, případně klávesou), měnit jejich pořadí přetahováním a vidět je v sekci oblíbených na seznamu stránek i v pravém sloupci úvodního dashboardu světa.</li>
+      <li><b>Zvláštnosti:</b> oblíbené jsou osobní a vázané na konkrétní svět — nesdílí se mezi členy. Při smazání stránky se automaticky odeberou z oblíbených u všech.</li>
+    </ul>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">9</div><div class="l">typů stránek</div></div>
+    <div class="stat"><div class="n">∞</div><div class="l">vrstev utajení na jedné stránce</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">kritéria ochrany celé stránky</div></div>
+    <div class="stat"><div class="n">🔒</div><div class="l">zamčené záložky lákají, neprozradí</div></div>
+  </div>
+
+</section>

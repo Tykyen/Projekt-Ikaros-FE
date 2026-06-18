@@ -1,0 +1,137 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Co umíme</div>
+    <h2>Pod kapotou: kvalita, výkon a identita</h2>
+  </div>
+
+  <p class="lead">Předchozí kapitoly ukázaly, co platforma umí. Tahle ukazuje, proč je to postavené solidně. Projekt Ikaros má promyšlený systém rolí a oprávnění, chytré vyhledávání kombinující klíčová slova i význam, vše běží v reálném čase, nabízí přes 30 přepínatelných vzhledů s vlastní výraznou identitou, funguje stejně dobře na mobilu i počítači a jeho kvalita se průběžně ověřuje sadou 16 systematických kontrol. Navíc je celý navržený tak, aby nikdy neprozradil to, co prozradit nemá.</p>
+
+  <hr>
+
+  <h3>Role a oprávnění — kdo smí co</h3>
+  <p>Bezpečnost a pořádek stojí na dvouúrovňovém systému rolí. <b>Globální role</b> platí na celé platformě, <b>světové role</b> platí zvlášť uvnitř každého světa. Tytéž role se nikdy nemíchají — člověk může být na platformě běžný uživatel, ale ve svém světě plnohodnotný vypravěč.</p>
+
+  <h4>Globální role (platforma)</h4>
+  <table>
+    <thead><tr><th>Role</th><th>Co znamená</th></tr></thead>
+    <tbody>
+      <tr><td>Superadmin</td><td>Plná moc nad platformou. Jediný může obnovit opuštěný svět a mazat kategorie.</td></tr>
+      <tr><td>Admin</td><td>Platformová správa — uživatelé, moderace účtů, smazané světy, index vyhledávání.</td></tr>
+      <tr><td>Ikarus</td><td>Běžný registrovaný uživatel.</td></tr>
+      <tr><td>Správce článků</td><td>Schvaluje a spravuje články.</td></tr>
+      <tr><td>Správce galerie</td><td>Schvaluje a spravuje galerii.</td></tr>
+      <tr><td>Správce diskuzí</td><td>Moderuje diskuze.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Světové role (uvnitř každého světa zvlášť)</h4>
+  <table>
+    <thead><tr><th>Role</th><th>Co znamená</th></tr></thead>
+    <tbody>
+      <tr><td>Žadatel</td><td>Požádal o vstup do světa a čeká na schválení.</td></tr>
+      <tr><td>Čtenář</td><td>Čte obsah světa.</td></tr>
+      <tr><td>Hráč</td><td>Hraje — má postavu, vidí časovou osu, počasí i akce.</td></tr>
+      <tr><td>Korektor</td><td>Smí editovat data světa (např. téma, šablony).</td></tr>
+      <tr><td>Pomocný vypravěč</td><td>Většina správy obsahu — stránky, kalendáře, chat, postavy, mapa.</td></tr>
+      <tr><td>Vypravěč (PJ)</td><td>Vlastník světa s plnou správou — nastavení, mazání, předání světa, přidělování rolí.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Vypravěč je pán svého světa</div>
+    <p>Důležité pravidlo: ani platformový správce nemá moc zasahovat dovnitř cizího světa — řízení světa patří jeho vypravěči. Jediná výjimka je záchranná: obnovení opuštěného, smazaného světa v 30denním okně. Tím je zaručeno, že vypravěč má nad svým příběhem skutečnou kontrolu.</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Rozhoduje server, ne prohlížeč</div>
+    <p>Skrytí tlačítka v prohlížeči je jen pohodlí. O tom, kdo co skutečně smí, rozhoduje vždy server. I kdyby si někdo zkusil obejít rozhraní, server žádost odmítne. Oprávnění jsou tak vynucena na autoritativní úrovni, ne jen kosmeticky.</p>
+  </div>
+
+  <hr>
+
+  <h3>Vyhledávání — klíčová slova i význam</h3>
+  <p>Každý svět má vlastní fulltextové vyhledávání napříč svými stránkami. Není to ale jen prosté hledání slov — platforma kombinuje dva přístupy: <b>klasický fulltext</b> (najde přesná slova) a <b>sémantické vyhledávání</b> (rozumí významu, takže najde i obsah s jiným, ale příbuzným zněním). Výsledky obou se spojí, takže hráč najde, co hledá, i když nezná přesné slovo.</p>
+  <div class="feat">
+    <h4>Hledání ve světě</h4>
+    <p>Rychlý přístup k jakékoli informaci světa, klávesovou zkratkou nebo z menu.</p>
+    <ul>
+      <li><b>Kdo:</b> každý člen světa hledá ve svém světě; výsledky jsou izolované jen na daný svět.</li>
+      <li><b>Co jde dělat:</b> otevřít vyhledávání klávesovou zkratkou nebo přes nabídku (na mobilu v zásuvce), zadat dotaz a skočit přímo na nalezenou stránku.</li>
+      <li><b>Zvláštnosti:</b> výsledky jednoho světa nikdy neuniknou do jiného. Správce má přehled o stavu indexace a může jej přebudovat.</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <h3>Vše v reálném čase</h3>
+  <p>Platforma drží s prohlížečem trvalé spojení (WebSocket), takže se obsah aktualizuje sám, bez obnovování stránky — nová zpráva v chatu, tah na bojové mapě, změna počasí, nová novinka, online/offline stav. Když spojení vypadne, po obnovení se chybějící změny dopočítají a všichni zase vidí totéž.</p>
+  <div class="callout cyan">
+    <div class="t">Bezpečné doručování změn</div>
+    <p>Identita u každé real-time akce se ověřuje ze zabezpečeného přihlášení, ne z toho, co pošle prohlížeč. Změny na úrovni světa se přitom rozesílají jako pouhý „signál" — klient si pak sám stáhne jen to, co skutečně smí vidět. Díky tomu se přes real-time kanál nikdy nepošle obsah někomu, kdo na něj nemá nárok.</p>
+  </div>
+
+  <hr>
+
+  <h3>Více než 30 přepínatelných vzhledů</h3>
+  <p>Platforma nabízí přes 30 hotových vizuálních motivů (skinů), kterými si lze obarvit celé prostředí — a svět může mít vlastní motiv odlišný od zbytku platformy. Pokrývají nejrůznější žánry, takže se vzhled přizpůsobí náladě světa.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Žánrová pestrost</h4>
+      <p class="small">Fantasy, temná fantasy, sci-fi, vesmírná loď i vesmírná bitva, kyberpunk, steampunk, horor, nemrtví, postapokalypsa, mystery, historie, příroda, čtyři živly, severské runy, arabský svět, africké motivy, indiánské motivy, western, hospoda, magie, měsíc, slunce, vesmír, pergamen, modré nebe, moderní a další — plus čisté světlé i tmavé varianty.</p>
+    </div>
+    <div class="card">
+      <h4>Vlastní identita „Ikaros"</h4>
+      <p class="small">Výchozí motiv platformy je fialová synthwave estetika — hvězdná fialová obloha, neonové město, perspektivní mřížka a signature efekt „fialového deště padajících znaků". To je vlastní značková tvář platformy, ne náhodná šablona.</p>
+    </div>
+  </div>
+  <p>O barevný „kořen" stránky se vždy stará jediný správce vzhledu — buď globální, nebo ten pro daný svět — takže se motivy nepřebíjejí a přepnutí je čisté.</p>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Galerie motivů: přes 30 přepínatelných vzhledů od fantasy po sci-fi, s výchozí fialovou synthwave identitou platformy.</figcaption>
+  </figure>
+
+  <hr>
+
+  <h3>Mobil i počítač — všude doma</h3>
+  <p>Každá obrazovka, komponenta i nástroj jsou navržené tak, aby fungovaly stejně dobře na telefonu i na počítači. Náročnější nástroje (například karta figurky na taktické mapě nebo vyhledávání) se na malých displejích přizpůsobí rozložením a ovládáním — třeba vystředěné panely místo bočních a zásuvky místo lišt. Dotykové ovládání je plnohodnotné: pohyb figurek, pingy i kreslení fungují prstem stejně jako myší.</p>
+
+  <hr>
+
+  <h3>Kvalita ověřená 16 systematickými kontrolami</h3>
+  <p>Aby platforma zůstala spolehlivá i s tím, jak roste, prochází pravidelně sadou 16 odlišných stylů systematických kontrol kvality. Každý z nich se dívá na jiný typ rizika — od bezpečnosti přes výkon až po konzistenci dat. To je nad rámec běžného testování a je to záruka, že nové funkce nerozbijí ty staré.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Bezpečnost a oprávnění</h4>
+      <p class="small">Kontrola rolí a přístupů, ochrana proti úniku obsahu mezi světy, prověření přihlašování a účtů, správné zpracování chyb a chování v reálném čase.</p>
+    </div>
+    <div class="card">
+      <h4>Konzistence dat</h4>
+      <p class="small">Kontrola, že se po smazání entity uklidí celý strom (žádné osiřelé záznamy), že stav databáze drží pohromadě, a že obnova ze záloh i celé scénáře projdou bez chyby.</p>
+    </div>
+    <div class="card">
+      <h4>Spolehlivost rozhraní</h4>
+      <p class="small">Soulad mezi rozhraním a serverem, správné obnovování dat po změnách, kompletní navigace bez slepých odkazů, jednotné tvary formulářů i chyb.</p>
+    </div>
+    <div class="card">
+      <h4>Provoz a obsah</h4>
+      <p class="small">Kontrola produkčního nastavení, zacházení s nahranými soubory a obrázky, barevná konzistence a ochrana proti návratu už opravených chyb.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>Navrženo tak, aby neprozradilo tajemství</h3>
+  <p>Vypravěč připravuje obsah dopředu — skryté mapy, tajné scény, nestvůry v mlze, soukromé poznámky. Platforma je celá postavená tak, aby tyto věci hráč nezahlédl dřív, než má. Skryté věci se hráči vůbec neukáží (často ani jejich existence), a u řady prvků platí kaskádové pravidlo: stačí skrýt nadřazenou položku a vše uvnitř zmizí s ní. I chybové hlášky jsou navržené tak, aby neprozradily, co existuje a co ne.</p>
+  <div class="callout gold">
+    <div class="t">Soft-delete: smazat neznamená ztratit</div>
+    <p>Mazání světa probíhá jako 30denní „koš" s možností obnovy, a řada dalších entit má místo nenávratného smazání právě takový koš. Omyl se dá vrátit a nic důležitého se neztratí jediným kliknutím.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">6 + 6</div><div class="l">globálních a světových rolí</div></div>
+    <div class="stat"><div class="n">30+</div><div class="l">přepínatelných vzhledů</div></div>
+    <div class="stat"><div class="n">16</div><div class="l">systematických kontrol kvality</div></div>
+    <div class="stat"><div class="n">30 dní</div><div class="l">okno pro obnovu smazaného světa</div></div>
+  </div>
+</section>

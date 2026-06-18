@@ -1,0 +1,243 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Co umíme</div>
+    <h2>Účet, přihlášení &amp; bezpečnost</h2>
+  </div>
+
+  <p class="lead">Brána do celé platformy. Tato kapitola popisuje vše, co se týká identity uživatele: jak se zaregistruje, jak se přihlásí, jak si chrání účet dvoufaktorovým ověřením, jak obnoví zapomenuté heslo, jak změní e-mail a co se stane, když se rozhodne účet zrušit. Bezpečnost není doplněk — je vetkaná do každého kroku: kapesní ochrana proti robotům, omezení frekvence pokusů (rate-limiting), jednorázové tokeny, šifrované tajné klíče a tichá obrana proti sledování.</p>
+
+  <div class="callout cyan">
+    <div class="t">Co znamenají pojmy v této kapitole</div>
+    <p><strong>Token</strong> = digitální „klíček", kterým prohlížeč prokazuje, že je přihlášený. <strong>Access token</strong> je krátkodobý průkaz pro každý požadavek, <strong>refresh token</strong> je dlouhodobý klíč pro vystavení nového průkazu. <strong>2FA / TOTP</strong> = dvoufaktorové ověření pomocí jednorázových kódů z aplikace v telefonu. <strong>Captcha</strong> = test, který odliší člověka od robota. <strong>Throttling / rate-limit</strong> = strop, kolik pokusů smí kdo za minutu provést.</p>
+  </div>
+
+  <h3>Přehled v číslech</h3>
+  <div class="stats">
+    <div class="stat"><div class="n">6</div><div class="l">znaků min. heslo při registraci</div></div>
+    <div class="stat"><div class="n">8</div><div class="l">znaků min. heslo při změně/resetu</div></div>
+    <div class="stat"><div class="n">10</div><div class="l">jednorázových záložních kódů 2FA</div></div>
+    <div class="stat"><div class="n">30 dní</div><div class="l">platnost důvěryhodného zařízení</div></div>
+    <div class="stat"><div class="n">30 dní</div><div class="l">ochranná lhůta po žádosti o smazání</div></div>
+    <div class="stat"><div class="n">5/min</div><div class="l">limit pokusů o přihlášení</div></div>
+  </div>
+
+  <h3>Vstup do platformy</h3>
+  <p>Registrace i přihlášení probíhají v elegantním vyskakovacím okně přímo nad úvodní stránkou — uživatel neztratí kontext, kde právě je. Pokud se anonym pokusí otevřít chráněnou stránku, platforma si zapamatuje, kam chtěl jít, a po přihlášení ho tam automaticky pošle (tzv. „login intent" — přesměrování podle záměru). Nikdo se tak po přihlášení neztratí na neutrálním rozcestí.</p>
+
+  <div class="feat">
+    <h4>Registrace nového účtu</h4>
+    <p>Vytvoření účtu ve vyskakovacím okně nad úvodníkem. Po úspěšném odeslání platforma rovnou vrátí přihlašovací klíče i údaje uživatele, takže je nový člen okamžitě přihlášen — bez nutnosti zvlášť se přihlašovat.</p>
+    <ul>
+      <li><b>Kdo:</b> Kdokoli (anonymní návštěvník), bez jakéhokoli oprávnění.</li>
+      <li><b>Co jde dělat:</b> Vyplnit e-mail, přezdívku, heslo a jeho potvrzení; zaškrtnout souhlas s podmínkami (s odkazem na stránku podmínek); projít kontrolou Cloudflare Turnstile (captcha). Platforma během psaní živě kontroluje, zda je přezdívka i e-mail volný (ukazuje ikonu dostupnosti), zobrazuje indikátor síly hesla a umožňuje přepnout zobrazení hesla. Tlačítko „Vytvořit účet" je neaktivní, dokud captcha nepotvrdí, že jde o člověka, a dokud nejsou přezdívka i e-mail volné.</li>
+      <li><b>Zvláštnosti:</b> Souhlas s podmínkami je povinný a platforma si ukládá jeho čas i verzi podmínek (kvůli GDPR). Skrytý „honeypot" prvek tiše chytá automatické roboty. V produkci je captcha nastavená tak, že bez jejího úspěšného ověření registrace neprojde. Po registraci se na pozadí odešle ověřovací e-mail — pokud by se odeslání nepovedlo, registraci to nezhatí.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Přihlášení</h4>
+    <p>Přihlášení e-mailem nebo přezdívkou. Po úspěchu nasadí přihlašovací klíče a uvítá uživatele zpět.</p>
+    <ul>
+      <li><b>Kdo:</b> Kdokoli (anonymní návštěvník).</li>
+      <li><b>Co jde dělat:</b> Zadat „e-mail nebo přezdívku" a heslo (s možností přepnout zobrazení). K dispozici jsou odkazy „Zapomněl/a jsi heslo?" a „Zaregistruj se". Po přihlášení se objeví uvítací hláška a uživatel je přesměrován tam, kam původně mířil, nebo na úvodník.</li>
+      <li><b>Zvláštnosti:</b> Přihlášení rozumí třem situacím — běžné přihlášení, účet naplánovaný ke smazání (nabídne obnovení) a účet chráněný dvoufaktorovým ověřením (vyžádá druhý krok). Přihlašovací klíč se vydá jen u běžného úspěchu. Při přihlášení se vyčistí veškerá dočasná data v prohlížeči, takže při přepnutí účtu ve stejné záložce nikdy neprosákne nic z předchozího uživatele. Účet zablokovaný správcem nebo smazaný se přihlásit nedokáže.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Odhlášení (s pětivteřinovým „Vrátit")</h4>
+    <p>Odhlášení s pojistkou proti omylu — pět vteřin lze akci vzít zpět.</p>
+    <ul>
+      <li><b>Kdo:</b> Přihlášený uživatel.</li>
+      <li><b>Co jde dělat:</b> Kliknout na odhlášení; po dobu pěti vteřin je k dispozici tlačítko „Vrátit". Po vypršení se relace ukončí, klíče se smažou a dočasná data se vyčistí.</li>
+      <li><b>Zvláštnosti:</b> Odhlášení je idempotentní — funguje vždy bez chyby, i kdyby byl klíč už neplatný. Týká se konkrétní relace; existuje i samostatný mechanismus „odhlásit ze všech zařízení", který se navíc spustí automaticky při změně hesla.</li>
+    </ul>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Přihlašovací a registrační okno nad úvodní stránkou — kontrola dostupnosti přezdívky, indikátor síly hesla, captcha.</figcaption>
+  </figure>
+
+  <h3>Obnova a správa přihlašovacích údajů</h3>
+
+  <div class="feat">
+    <h4>Reset zapomenutého hesla</h4>
+    <p>E-mailový postup obnovy hesla pro toho, kdo se nemůže přihlásit.</p>
+    <ul>
+      <li><b>Kdo:</b> Kdokoli (anonymní návštěvník).</li>
+      <li><b>Co jde dělat:</b> V okně „Zapomenuté heslo" zadat e-mail a požádat o odkaz. Platforma vždy zobrazí stejnou hlášku „Pokud e-mail existuje, poslali jsme odkaz" — záměrně, aby nešlo zjistit, které e-maily jsou registrované. Po kliknutí na odkaz z e-mailu se na stránce resetu zadá nové heslo s potvrzením, indikátorem síly a přepínáním zobrazení. Pokud odkaz chybí nebo je neplatný/prošlý/už použitý, platforma to srozumitelně vysvětlí a nabídne vyžádání nového.</li>
+      <li><b>Zvláštnosti:</b> Odkaz platí jednu hodinu a vždy je aktivní jen jeden — nový si vyžádá zneplatnost předchozího. Úspěšný reset zároveň odhlásí všechna ostatní zařízení a zruší všechna důvěryhodná zařízení. Pokud měl uživatel účet naplánovaný ke smazání, úspěšný reset ho zároveň obnoví.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Ověření e-mailu</h4>
+    <p>Potvrzení, že e-mailová adresa skutečně patří uživateli, pomocí jednorázového odkazu z e-mailu.</p>
+    <ul>
+      <li><b>Kdo:</b> Kdokoli (ověření přes odkaz) i přihlášený (vyžádání nového odkazu).</li>
+      <li><b>Co jde dělat:</b> Po kliknutí na odkaz z e-mailu se ověření provede automaticky a zobrazí výsledek (probíhá → úspěch / neúspěch). Při neúspěchu si přihlášený uživatel může nechat poslat nový odkaz. V profilu je viditelný odznak „Ověřeno" / „Neověřeno" s tlačítkem „Poslat znovu".</li>
+      <li><b>Zvláštnosti:</b> Ověřovací odkaz platí 24 hodin. Ověřovací odkaz se vydává automaticky už při registraci. Ověření e-mailu je informativní odznak — neblokuje žádnou funkci.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Změna e-mailu</h4>
+    <p>Bezpečná výměna e-mailové adresy s potvrzením na novou adresu a upozorněním na starou.</p>
+    <ul>
+      <li><b>Kdo:</b> Přihlášený (žádost), kdokoli (potvrzení přes odkaz).</li>
+      <li><b>Co jde dělat:</b> V okně změny e-mailu uživatel vidí svůj současný e-mail (jen ke čtení), zadá nový e-mail a pro jistotu i aktuální heslo (opětovné ověření totožnosti). Po odeslání obdrží potvrzovací odkaz na novou adresu; po kliknutí se změna dokončí.</li>
+      <li><b>Zvláštnosti:</b> Platforma posílá dva e-maily — potvrzovací na novou adresu a oznamovací na starou (kdyby šlo o neoprávněný pokus). Pokud by mezitím novou adresu zabral někdo jiný, platforma to při potvrzení odmítne. Chyby jako „špatné heslo", „stejný e-mail" nebo „e-mail je obsazený" se zobrazí přímo u příslušného pole.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Změna hesla (přihlášený)</h4>
+    <p>Změna hesla přímo v profilu, v sekci Bezpečnost, se zadáním stávajícího hesla.</p>
+    <ul>
+      <li><b>Kdo:</b> Přihlášený, vlastní účet.</li>
+      <li><b>Co jde dělat:</b> Zadat současné heslo, nové heslo a jeho potvrzení. Platforma kontroluje, že nové heslo není shodné se starým a má alespoň 8 znaků. Při špatném současném hesle se chyba zobrazí u pole.</li>
+      <li><b>Zvláštnosti:</b> Po úspěšné změně se všechna ostatní zařízení automaticky odhlásí a všechna důvěryhodná zařízení se zruší — kdo ukradl přihlášení, ztratí přístup.</li>
+    </ul>
+  </div>
+
+  <h3>Dvoufaktorové ověření a důvěryhodná zařízení</h3>
+  <p>Dvoufaktorové ověření (2FA) přidává k heslu druhý zámek — jednorázový kód z aplikace v telefonu (Google Authenticator, Authy a podobné). I kdyby někdo znal heslo, bez kódu se nepřihlásí. Pro pohodlí lze vlastní zařízení označit jako důvěryhodné a 2FA se na něm 30 dní přeskakuje.</p>
+
+  <div class="feat">
+    <h4>Zapnutí a správa 2FA (TOTP)</h4>
+    <p>Druhý faktor TOTP plus sada jednorázových záložních kódů pro případ ztráty telefonu.</p>
+    <ul>
+      <li><b>Kdo:</b> Přihlášený (správa probíhá v profilu, sekce Bezpečnost).</li>
+      <li><b>Co jde dělat:</b> <b>Zapnutí</b> průvodcem — platforma vygeneruje tajný klíč i QR kód, uživatel jej naskenuje aplikací (nebo opíše tajný klíč ručně), opíše vygenerovaný šestimístný kód a potvrdí. Po aktivaci dostane <b>10 jednorázových záložních kódů</b>, které se zobrazí jen jednou a je nutné potvrdit jejich uložení. <b>Přihlášení s 2FA</b> — po zadání hesla platforma vyžádá šestimístný kód nebo (přepínačem) některý ze záložních kódů, s volbou „Důvěřovat tomuto zařízení 30 dní". <b>Vypnutí 2FA</b> — vyžaduje opětovné zadání hesla a zruší všechna důvěryhodná zařízení. <b>Vygenerování nových záložních kódů</b> — opět s heslem; nová sada nahradí starou.</li>
+      <li><b>Zvláštnosti:</b> Podporováno je TOTP (kódy z aplikace) — nikoli SMS ani e-mail. Záložních kódů je 10 a každý funguje jen jednou; po vyčerpání je vhodné vygenerovat nové. Tajný klíč je v databázi šifrovaný a nikdy se neposílá zpět v datech profilu. Kód při překlepu nezmaří probíhající přihlášení — spotřebuje se až správný kód, a před hádáním kódů chrání omezení frekvence pokusů.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Důvěryhodná zařízení</h4>
+    <p>Seznam zařízení, na kterých se 2FA na 30 dní přeskočí.</p>
+    <ul>
+      <li><b>Kdo:</b> Přihlášený s aktivním 2FA (karta se objeví jen tehdy).</li>
+      <li><b>Co jde dělat:</b> Prohlédnout výpis zařízení s orientačním popiskem (např. „Chrome · Windows") a datem posledního použití; aktuální zařízení je označeno. Odvolat jedno konkrétní zařízení nebo odvolat všechna najednou.</li>
+      <li><b>Zvláštnosti:</b> Popisek je hrubý odhad z údajů prohlížeče (žádné IP adresy ani geolokace). Platnost důvěry je 30 dní. V databázi se uchovává jen zašifrovaná stopa, ne samotný klíč. Změna hesla i vypnutí 2FA všechna zařízení automaticky odvolá.</li>
+    </ul>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Sekce Bezpečnost v profilu — průvodce zapnutím 2FA s QR kódem, panel záložních kódů a seznam důvěryhodných zařízení.</figcaption>
+  </figure>
+
+  <h3>Životní cyklus účtu</h3>
+
+  <div class="feat">
+    <h4>Smazání účtu s 30denní ochrannou lhůtou</h4>
+    <p>Uživatelem vyžádané zrušení účtu s možností si to do 30 dní rozmyslet a účet obnovit.</p>
+    <ul>
+      <li><b>Kdo:</b> Přihlášený, vlastní účet (z profilu, sekce Účet).</li>
+      <li><b>Co jde dělat:</b> Při otevření okna platforma nejdřív nezávazně spočítá a ukáže <b>plán předání světů</b> — co se stane s herními světy, kde je uživatel vypravěčem (PJ). Pokud je v některém světě jediným vypravěčem bez zástupce (Pomocného PJ), smazání je zablokované a platforma vypíše seznam takových světů (nejdřív je třeba předat vedení). V ostatních případech platforma zobrazí plán povýšení Pomocných PJ na plnohodnotné PJ, vyžádá opsání vlastní přezdívky a zaškrtnutí potvrzení — pak teprve provede ostrou žádost. Po odeslání je uživatel automaticky odhlášen.</li>
+      <li><b>Zvláštnosti:</b> <b>Obnovení účtu</b> — po dobu 30 dní stačí se přihlásit (platforma nabídne obnovu) nebo si resetovat heslo; účet se reaktivuje. Stav i zrušení žádosti lze řešit i samostatně. Po 30 dnech proběhne <b>anonymizace</b>, ne fyzické smazání řádku — osobní údaje se přepíší, ale komunitní příspěvky (chat, články, galerie, diskuze) zůstanou zachované pod anonymním („zesnulým") autorem, aby se nerozpadly diskuze ostatních.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <div class="t">Proč anonymizace a ne úplné smazání</div>
+    <p>Kdyby se účet fyzicky vymazal i s příspěvky, rozpadly by se cizí diskuze, komentáře a herní záznamy, na které ostatní navazují. Anonymizace splní právo na zapomnění (osobní údaje zmizí), ale zachová celistvost komunitního obsahu — místo jména se zobrazí neutrální „zesnulý" autor.</p>
+  </div>
+
+  <div class="feat">
+    <h4>Trvalá kontrola stavu účtu při každém požadavku</h4>
+    <p>Tichá pojistka, která hlídá stav účtu nejen při přihlášení, ale při každém jednotlivém požadavku.</p>
+    <ul>
+      <li><b>Kdo:</b> Interní bezpečnostní mechanismus, týká se všech přihlášených.</li>
+      <li><b>Co jde dělat:</b> U každého chráněného požadavku platforma znovu ověří aktuální stav účtu — smazaný účet, zablokovaný (zabanovaný) účet i účet naplánovaný ke smazání jsou odmítnuty na místě.</li>
+      <li><b>Zvláštnosti:</b> Protože dlouhodobý přihlašovací klíč může žít několik dní, kontrola probíhá průběžně, ne jen jednou při přihlášení. Zákaz tak platí okamžitě, i kdyby měl uživatel ještě platný klíč.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Export vlastních dat (GDPR)</h4>
+    <p>Možnost stáhnout si vlastní data ve strukturovaném formátu podle GDPR.</p>
+    <ul>
+      <li><b>Kdo:</b> Přihlášený, vlastní účet.</li>
+      <li><b>Co jde dělat:</b> Vyžádat strojově čitelný export vlastních dat na straně platformy.</li>
+      <li><b>Zvláštnosti:</b> Schopnost je připravena na straně serveru; její zapojení do uživatelského rozhraní je plánováno jako navazující krok.</li>
+    </ul>
+  </div>
+
+  <h3>Granulární práva a obrana platformy</h3>
+  <p>Platforma rozlišuje <strong>globální role</strong> (napříč celou platformou) a <strong>světové role</strong> (jen uvnitř konkrétního herního světa). Globální role pokrývají správu platformy a komunitního obsahu, světové role řídí dění uvnitř hry. Tyto dva světy se zásadně nemíchají.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Globální role</h4>
+      <p class="small">Pravomoci napříč celou platformou.</p>
+      <ul>
+        <li><strong>Superadmin</strong> — nejvyšší správce platformy.</li>
+        <li><strong>Admin</strong> — správce platformy.</li>
+        <li><strong>Ikarus</strong> — privilegovaný komunitní účet.</li>
+        <li><strong>Správce článků</strong> — schvaluje a spravuje články.</li>
+        <li><strong>Správce galerie</strong> — schvaluje a spravuje galerii.</li>
+        <li><strong>Správce diskuzí</strong> — schvaluje a moderuje diskuze.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Světové role</h4>
+      <p class="small">Pravomoci jen uvnitř konkrétního herního světa.</p>
+      <ul>
+        <li><strong>Žadatel</strong> — čeká na schválení vstupu.</li>
+        <li><strong>Čtenář</strong> — smí číst veřejný obsah světa.</li>
+        <li><strong>Hráč</strong> — aktivní účastník hry.</li>
+        <li><strong>Korektor</strong> — pomáhá s obsahem.</li>
+        <li><strong>Pomocný PJ</strong> — zástupce vypravěče.</li>
+        <li><strong>PJ</strong> — pán jeskyně / vypravěč, vede svět.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="feat">
+    <h4>Captcha (Cloudflare Turnstile)</h4>
+    <p>Ochrana registrace proti automatickým robotům.</p>
+    <ul>
+      <li><b>Kdo:</b> Týká se každého při registraci.</li>
+      <li><b>Co jde dělat:</b> Widget v registračním okně potvrdí, že jde o člověka; bez tohoto potvrzení tlačítko registrace nereaguje.</li>
+      <li><b>Zvláštnosti:</b> V produkci je nastavena tak, že bez úspěšného ověření registrace neprojde. Doplňuje ji skrytý „honeypot" prvek, který tiše chytá roboty. Přihlášení a reset hesla captchu nepoužívají — ty chrání omezení frekvence pokusů.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Omezení frekvence pokusů (rate-limiting)</h4>
+    <p>Stropy, kolik pokusů smí kdo provést za minutu, na všech citlivých místech.</p>
+    <ul>
+      <li><b>Kdo:</b> Týká se všech, neviditelně.</li>
+      <li><b>Co jde dělat:</b> Tlumí útoky hrubou silou i zahlcení. Hodnoty (za minutu): registrace 10, přihlášení 5, druhý krok 2FA při přihlášení 5, obnovení účtu 5, žádost i reset hesla po 5, ověření e-mailu 30, opětovné zaslání ověření 3, potvrzení změny e-mailu 5, kontrola dostupnosti přezdívky i e-mailu po 60, správa 2FA 15, žádost o změnu e-mailu 5.</li>
+      <li><b>Zvláštnosti:</b> Limity jsou nastavené tak, aby nepřekážely běžnému uživateli, ale zastavily robota.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Rotace přihlašovacích klíčů a detekce zneužití</h4>
+    <p>Dlouhodobý přihlašovací klíč se při každém použití obměňuje a platforma pozná, když ho někdo ukradne.</p>
+    <ul>
+      <li><b>Kdo:</b> Interní bezpečnostní mechanismus.</li>
+      <li><b>Co jde dělat:</b> Při obnově relace se vystaví nový klíč a starý se zneplatní. Pokud by se někdo pokusil použít už zneplatněný (ukradený) klíč, platforma zruší celou „rodinu" klíčů a vyžádá nové přihlášení.</li>
+      <li><b>Zvláštnosti:</b> Dlouhodobý klíč standardně platí 30 dní a je uložen v bezpečné podobě (httpOnly cookie), kam nemá přístup žádný skript v prohlížeči.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Jednorázové bezpečnostní tokeny</h4>
+    <p>Sdílený mechanismus jednorázových klíčků pro reset hesla, ověření a změnu e-mailu i druhý krok 2FA.</p>
+    <ul>
+      <li><b>Kdo:</b> Interní mechanismus, bez vlastní obrazovky.</li>
+      <li><b>Co jde dělat:</b> Vystaví jednorázový klíček s omezenou platností; v databázi je vždy jen jeho zašifrovaná stopa, ne samotný klíč. Vždy je aktivní jen jeden klíč daného typu. Při použití rozliší, zda je klíč neplatný, už použitý nebo prošlý, a typy jsou navzájem oddělené (klíč na reset hesla nelze použít k ověření e-mailu).</li>
+      <li><b>Zvláštnosti:</b> U druhého kroku 2FA umí klíč ověřit bez spotřebování, takže překlep nezmaří celé přihlášení.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Shrnutí kapitoly</div>
+    <p>Účet na Projektu Ikaros je chráněný na všech úrovních: vstup hlídá captcha a omezení frekvence pokusů, identitu lze zamknout dvoufaktorovým ověřením se záložními kódy a důvěryhodnými zařízeními, citlivé operace vyžadují opětovné zadání hesla, přihlašovací klíče se obměňují a hlídají proti krádeži a zrušení účtu je vratné po dobu 30 dní s následnou anonymizací, která chrání soukromí i celistvost komunity. Vše je provázané s důsledným oddělením globálních a světových rolí.</p>
+  </div>
+</section>

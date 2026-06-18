@@ -1,0 +1,219 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Co umíme</div>
+    <h2>Postavy, bestiář a ekonomika</h2>
+  </div>
+
+  <p class="lead">Postavy jsou srdcem každé hry na hrdiny. Platforma rozlišuje tři druhy herních bytostí — hráčské postavy, postavy řízené vypravěčem a katalogové tvory — a každé dává přesně to, co potřebuje. K postavám se pojí deníkové listy přizpůsobené třinácti herním systémům, bohatý bestiář tvorů, obchod napojený na peníze postav a převodník měn. Tato kapitola popisuje celý tento provázaný ekosystém: kdo, co a jak.</p>
+
+  <div class="callout cyan">
+    <div class="t">Tři druhy herních bytostí</div>
+    <p>Aby se v tom nikdo neztratil, platforma jasně odlišuje <b>hráčskou postavu (PC)</b>, <b>NPC</b> a <b>bestii</b>. Hráčská postava patří hráči a aktivně se s ní hraje. NPC je plnohodnotná postava řízená vypravěčem — má svůj deník a vystupuje v příběhu. Bestie je katalogová šablona tvora či nepřítele se statistikami, určená pro hromadné soupeře. Rozdíl mezi NPC a bestií je zásadní: NPC je „někdo" s příběhem, bestie je „něco" ze zvířetníku.</p>
+  </div>
+
+  <h3>1. Tři druhy bytostí podrobně</h3>
+
+  <table>
+    <thead>
+      <tr><th>Vlastnost</th><th>Hráčská postava (PC)</th><th>NPC</th><th class="us">Bestie</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Patří</td><td>hráči</td><td>nikomu (řídí vypravěč)</td><td class="us">uživateli, světu nebo systému</td></tr>
+      <tr><td>Deník</td><td><span class="yes">ano</span></td><td><span class="yes">ano</span></td><td class="us"><span class="no">ne</span></td></tr>
+      <tr><td>Finance a výbava</td><td><span class="yes">ano</span></td><td><span class="no">ne</span></td><td class="us"><span class="no">ne</span></td></tr>
+      <tr><td>Kalendář a poznámky</td><td><span class="yes">ano</span></td><td><span class="yes">ano</span></td><td class="us"><span class="no">ne</span></td></tr>
+      <tr><td>Statistiky (listina)</td><td><span class="yes">ano</span></td><td><span class="yes">ano</span></td><td class="us"><span class="yes">ano</span></td></tr>
+      <tr><td>Kde se tvoří</td><td>adresář postav</td><td>adresář postav</td><td class="us">bestiář</td></tr>
+      <tr><td>Na taktické mapě</td><td>žeton hráče</td><td>žeton NPC</td><td class="us">samostatná instance (kopie)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">NPC versus bestie — proč na tom záleží</div>
+    <p>NPC je <b>plnohodnotná postava</b> s vyprávěcím deníkem, kalendářem a poznámkami — vystupuje ve fikci jako konkrétní osoba (král, obchodník, padouch). Bestie je <b>katalogová šablona</b> statistik pro hromadné tvory a nepřátele (smečka vlků, oddíl vojáků) — nemá deník ani příběh, jen čísla. Když vypravěč potřebuje deset stejných goblinů do boje, sáhne po bestii; když potřebuje záhadného mága s tajnou minulostí, vytvoří NPC.</p>
+  </div>
+
+  <p>Existuje i čtvrtá, příbuzná varianta — <b>Lokace</b>. Je to vlastně stránka místa, ke které se pojí jen kalendář událostí. Lokace patří mezi stránky, ne do adresáře postav.</p>
+
+  <h3>2. Adresář postav</h3>
+
+  <div class="feat">
+    <h4>Adresář postav</h4>
+    <p>Přehled všech postav světa rozdělený na hráčské a NPC.</p>
+    <ul>
+      <li><b>Kdo:</b> vidí každý člen světa. Tlačítko „Nová postava" jen Vypravěč (PJ).</li>
+      <li><b>Co jde dělat:</b> filtrovat podle typu (vše / hráčské / NPC), fulltextově hledat podle jména postavy, adresy i jména hráče (zvládá diakritiku), zapnout seskupení podle herních skupin s barvami družin, označovat oblíbené postavy a založit novou postavu průvodcem — hráčskou, NPC nebo „NPC z bestiáře".</li>
+      <li><b>Zvláštnosti:</b> postava se nevytváří přímo zde, ale průvodce vás navede do editoru. Seskupení podle skupin funguje jen u hráčských postav (NPC nemají vlastníka ani družinu). Které karty postav uvidíte, řídí přístupová pravidla stránek — postava na skryté stránce se v adresáři neobjeví.</li>
+    </ul>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Adresář postav — karty rozdělené do sekcí hráčských postav a NPC, s vyhledáváním a filtry.</figcaption>
+  </figure>
+
+  <h4>Moje postava — rychlá zkratka</h4>
+  <p>Každý člen má zkratku ke své postavě. Pokud postavu má, dostane se na ni jedním kliknutím. Pokud ještě nemá, nabídne se mu adresář (a Vypravěči navíc možnost postavu rovnou vytvořit).</p>
+
+  <h3>3. Profil postavy a jeho záložky</h3>
+
+  <p>Postava je po sjednocení obsahu vlastně stránka (s biografií, obrázkem a přístupovými pravidly), ke které se připojuje až pět <b>herních záložek</b>. Profil (biografie) vidí každý, kdo má na stránku přístup. Herní záložky vidí jen vedení a vlastník postavy.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Deník</h4>
+      <p class="small">Vyprávěcí deník postavy plus herní listina (statistiky) podle systému světa. Vlastní bloky, postupné ukládání po částech, u vedení i hromadné přejmenování polí napříč postavami.</p>
+    </div>
+    <div class="card">
+      <h4>Finance</h4>
+      <p class="small">Měsíční bilance — příjmy a výdaje, zůstatek, transakce, tlačítko „přičíst měsíční" a vrácení poslední transakce. Jen u hráčských postav.</p>
+    </div>
+    <div class="card">
+      <h4>Výbava</h4>
+      <p class="small">Inventář v sekcích s položkami. Nákup z obchodu sem položku automaticky přidá. Jen u hráčských postav.</p>
+    </div>
+    <div class="card">
+      <h4>Kalendář</h4>
+      <p class="small">Herní události vázané na postavu. Číst ho mohou i běžní členové (mírnější přístup).</p>
+    </div>
+    <div class="card">
+      <h4>Poznámky</h4>
+      <p class="small">Volné poznámky a dohody s vypravěčem.</p>
+    </div>
+    <div class="card">
+      <h4>Profil (biografie)</h4>
+      <p class="small">Veřejná část — popis, vzhled, obrázek. Upravuje se v editoru stránky postavy.</p>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Kdo vidí herní záložky</div>
+    <p>Herní záložky (Deník, Finance, Výbava, Kalendář, Poznámky) jsou citlivé — vidí je <b>vedení světa</b> (Pomocný PJ a výše) a <b>vlastník dané postavy</b>. Ostatní vidí jen veřejnou biografii. Vypravěč navíc může jednotlivé záložky pro celý svět skrýt v nastavení. Přístup je vynucen na serveru — skrytí není jen kosmetické.</p>
+  </div>
+
+  <h3>4. Deníkové listy pro 13 herních systémů</h3>
+
+  <p>Tohle je jedna z technicky nejnáročnějších předností platformy. Listina postavy (její statistiky a herní hodnoty) vypadá u každého herního systému jinak — jiné atributy, jiné dovednosti, jiné rozložení. Platforma proto nabízí <b>dedikovaný deníkový list pro 13 různých systémů</b>, takže každý svět má listinu šitou na míru svým pravidlům.</p>
+
+  <div class="callout gold">
+    <div class="t">Třináct podporovaných herních systémů</div>
+    <p>Platforma má připravené listiny pro tyto systémy: <b>Obecný</b> (univerzální), <b>Matrix</b>, <b>Volání Cthulhu</b>, <b>Dungeons &amp; Dragons 5. edice</b>, <b>Dračí doupě II</b>, <b>Dračí doupě 1.6</b>, <b>Dračí doupě Hobit</b>, <b>DrD Plus</b>, <b>Fate</b>, <b>GURPS</b>, <b>Jeskyně a draci</b>, <b>Příběhy Impéria</b> a <b>Shadowrun</b>. Pokud svět používá jiný či neznámý systém, automaticky se nasadí univerzální „Obecný" list, takže nic nikdy nespadne.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>List na míru systému</h4>
+      <p class="small">Každý systém má vlastní vizuální podobu listiny s těmi správnými poli, atributy a dovednostmi. Vypravěč nemusí nic stavět — stačí zvolit systém světa.</p>
+    </div>
+    <div class="card">
+      <h4>Vlastní úpravy</h4>
+      <p class="small">U světů s vlastním systémem si Vypravěč navrhne strukturu listu sám. Jednotlivá postava může mít i osobní úpravu schématu nad rámec světového.</p>
+    </div>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Deníkový list postavy přizpůsobený konkrétnímu hernímu systému s atributy a dovednostmi.</figcaption>
+  </figure>
+
+  <h3>5. Bestiář</h3>
+
+  <p>Katalog tvorů a nepřátel se statistikami podle herního systému. Bestiář je rozdělený do tří úrovní dosahu, aby vypravěči mohli sdílet a opakovaně používat své tvory.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Moje bestie</h4>
+      <p class="small">Osobní bestie uživatele, které si nese napříč všemi svými světy (váží se jen na systém). Soukromá knihovna vypravěče.</p>
+    </div>
+    <div class="card">
+      <h4>Bestie tohoto světa</h4>
+      <p class="small">Tvorové patřící konkrétnímu světu; spravuje je vedení světa (Pomocný PJ a výše).</p>
+    </div>
+    <div class="card">
+      <h4>Systémové bestie</h4>
+      <p class="small">Globální katalog tvorů pro daný herní systém, dostupný všem ke čtení. Vytváří ho jen správa platformy.</p>
+    </div>
+  </div>
+
+  <div class="feat">
+    <h4>Práce s bestiářem</h4>
+    <p>Správa katalogu tvorů.</p>
+    <ul>
+      <li><b>Kdo:</b> číst může každý člen (a systémové bestie i veřejně); vytvářet a upravovat bestie světa smí vedení (Pomocný PJ a výše), osobní bestie jejich vlastník, systémové jen správa platformy.</li>
+      <li><b>Co jde dělat:</b> procházet seznam ve třech úrovních, otevírat detail, vytvářet, upravovat, mazat do koše a obnovovat z koše, a <b>klonovat</b> bestii z libovolné úrovně do své osobní nebo světové knihovny (přenese statistiky, schopnosti i obrázek). Změny se ostatním propíší v reálném čase.</li>
+      <li><b>Zvláštnosti:</b> bestie má jen statistiky, schopnosti a poznámky — žádný deník, finance ani výbavu.</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Bestie na taktické mapě = nezávislá kopie</div>
+    <p>Když vypravěč „vyvolá" bestii na taktickou mapu, vznikne z ní <b>nezávislá instance</b> — vlastní žeton s vlastními body života a kopií statistik. Pozdější úprava bestie v katalogu už tuto konkrétní instanci na mapě neovlivní. Vypravěč tedy může z jednoho katalogového záznamu „vlka" rozmístit celou smečku, kde každý vlk žije svým vlastním životem.</p>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Bestiář se třemi záložkami dosahu (moje / svět / systém) a kartami tvorů se statistikami.</figcaption>
+  </figure>
+
+  <h3>6. Obchod</h3>
+
+  <p>Plnohodnotný herní obchod — katalog zboží napojený přímo na peníze a výbavu postav. Nákup automaticky odečte peníze z účtu postavy a přidá předmět do její výbavy.</p>
+
+  <div class="feat">
+    <h4>Katalog a nákup v obchodě</h4>
+    <p>Zboží, slevy, měny a nakupování pro postavy.</p>
+    <ul>
+      <li><b>Kdo:</b> nakupovat může každý hráč pro svou postavu; vedení může nakupovat pro libovolnou postavu („Nakupuji pro"). Spravovat katalog (přidávat, upravovat, mazat zboží i typy) smí Pomocný PJ a výše.</li>
+      <li><b>Co jde dělat:</b> spravovat položky (název, cena, měna, sleva, skupina a podskupina, doporučení, odkaz, sdílení mezi světy), členit zboží do dvou úrovní skupin s vlastními slevami, nakupovat zboží v množství s přepočtem do měny účtu a kontrolou dostatku peněz, stornovat nákup (vrátí peníze a odebere předmět) a procházet historii nákupů.</li>
+      <li><b>Zvláštnosti:</b> slevy se nesčítají — platí ta nejkonkrétnější (položka před podskupinou před skupinou). Nákup probíhá ve třech provázaných krocích (přidat do výbavy, odečíst peníze, zapsat do historie) tak, aby se za žádných okolností nemohly ztratit peníze. Nakupovat lze jen pro hráčské postavy.</li>
+    </ul>
+  </div>
+
+  <figure class="shot">
+    <div class="ph">Náhled obrazovky</div>
+    <figcaption>Obchod — katalog zboží se skupinami, slevami, výběrem postavy pro nákup a zůstatkem účtu.</figcaption>
+  </figure>
+
+  <h3>7. Měny a převodník</h3>
+
+  <div class="feat">
+    <h4>Převodník měn a měny světa</h4>
+    <p>Definice měn a kalkulačka přepočtu.</p>
+    <ul>
+      <li><b>Kdo:</b> převodník používá každý člen. Upravit kurz, název nebo symbol existující měny smí Pomocný PJ a výše. Přidat nebo smazat měnu může jen Vypravěč.</li>
+      <li><b>Co jde dělat:</b> spravovat seznam měn (kód, název, symbol, kurz vztažený k základní měně), nastavit základní měnu a přepočítávat částky mezi měnami kalkulačkou.</li>
+      <li><b>Zvláštnosti:</b> měny se zakládají automaticky při vzniku světa podle žánru — fantasy dostane Zlaťák, Stříbrňák a Měďák; kyberpunk Kredit a dolar; vesmír Kredit a Krystal; postapokalypsa Zátku a Příděl. Měny pohánějí i obchod a finanční účty postav. Kurzy jsou pevné (bez živých burzovních dat).</li>
+    </ul>
+  </div>
+
+  <h3>8. Finanční účty postav</h3>
+
+  <p>Nad rámec jednoduché měsíční bilance má každá postava i plnohodnotné <b>bankovní účty</b>, které pohánějí finance i nákupy. Jsou propracovanější, než by se dalo čekat.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Více účtů a měn</h4>
+      <p class="small">Postava může mít více účtů, každý ve své měně. Měnu účtu lze změnit s přepočtem kurzem, nebo jen přeznačit.</p>
+    </div>
+    <div class="card">
+      <h4>Sdílení a převody</h4>
+      <p class="small">Účet může mít spoluvlastníky (nastaví vypravěč), hlavní vlastnictví lze předat a mezi účty převádět peníze.</p>
+    </div>
+    <div class="card">
+      <h4>Pohyby a koš zpět</h4>
+      <p class="small">Vklady a výběry, vrácení poslední operace, „přičíst měsíční bilanci" a vedení transakcí s herním datem.</p>
+    </div>
+    <div class="card">
+      <h4>Kdo spravuje</h4>
+      <p class="small">Vedení může spravovat účty vždy; hráč-vlastník jen tehdy, pokud mu to vypravěč povolí přepínačem.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">3</div><div class="l">druhy bytostí: PC, NPC, bestie</div></div>
+    <div class="stat"><div class="n">13</div><div class="l">herních systémů s vlastní listinou</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">herních záložek hráčské postavy</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">úrovně dosahu bestiáře</div></div>
+  </div>
+
+</section>

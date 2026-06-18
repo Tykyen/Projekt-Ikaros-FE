@@ -1,0 +1,98 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část IV — Vize (Etapa II)</div>
+    <h2>Fáze 14 — Bezpečnost &amp; provozní odolnost</h2>
+  </div>
+
+  <p class="lead">První vlna Etapy II je <strong>pojistka</strong>. Nepřidává nápadné nové funkce — místo toho chrání všechno, co už platforma má. Je levná, má vysoký dopad a jde proto úplně první, nezávisle na čemkoli jiném. Logika je prostá: stovky hodin tvůrčí práce ve světech a důvěra celé komunity stojí na tom, že o data ani účty nikdo nepřijde. Ztráta dat je jediná chyba, ze které se komunita nevzpamatuje — a proto má bezpečnost přednost před parádou.</p>
+
+  <p>Tato vlna nemá žádné blokující závislosti — dá se na ní pracovat okamžitě. Skládá se z devíti kroků, od dvoufaktorového přihlášení (které je už hotové) přes automatické zálohy a ochranné hlavičky až po odstřižení od dosluhujícího starého webu. Některé jsou neviditelné a tiché; jejich hodnota se pozná až ve chvíli, kdy by jinak přišla katastrofa.</p>
+
+  <div class="callout">
+    <div class="t">Proč zrovna pojistka jako první</div>
+    Efektní funkce přilákají lidi, ale ztracená data je odeženou navždy. Bezpečnostní vlna je vědomě „nudná" — nepřinese chlubivé snímky obrazovky, zato znamená, že na platformě, kterou doporučíte kamarádům, se nikdy nestane to nejhorší. Je to investice do <strong>klidu a důvěry</strong>, ne do efektu.
+  </div>
+
+  <h3>14.1 — Dvoufaktorové přihlášení <span class="pill">hotovo</span></h3>
+
+  <p><strong>Cíl.</strong> Druhý zámek u přihlášení: kromě hesla i jednorázový kód z aplikace v mobilu, plus sada záložních kódů pro případ ztráty telefonu.</p>
+
+  <p><strong>Proč.</strong> Uniklé heslo je nejčastější příčina ztráty účtu. Druhý faktor blokuje drtivou většinu takových útoků — i kdyby někdo heslo získal, bez kódu z vašeho telefonu se dovnitř nedostane. Kritické je to zejména u vypravěče, který ovládá celý svět, a u správců platformy.</p>
+
+  <p><strong>Co přidá.</strong> V profilu v sekci bezpečnosti si uživatel naskenuje QR kód do aplikace jako Google Authenticator, opíše ověřovací kód a dostane deset jednorázových záložních kódů pro případ nouze. Při dalším přihlášení pak po heslu zadá aktuální kód. Důvěryhodné zařízení si lze zapamatovat, aby se kód nevyžadoval pokaždé — a tuto důvěru kdykoli odvolat. Při změně hesla nebo vypnutí dvoufaktoru se zapamatovaná zařízení automaticky zruší.</p>
+
+  <div class="callout cyan">
+    <div class="t">Stav: implementováno a běží</div>
+    Dvoufaktorové přihlášení je hotové a nasazené. Tajný klíč je šifrovaný, přihlášení je navržené tak, že před úspěšným ověřením druhého faktoru nevznikne žádný platný přístupový lístek, a důvěra zařízení se drží v bezpečné podobě. Funkce je dobrovolná pro všechny. Jako budoucí doplňky jsou v záloze ještě e-mailový jednorázový kód jako slabší alternativa a možnost vynutit druhý faktor povinně pro správce platformy.
+  </div>
+
+  <h3>14.2 — Oprava ochrany proti robotům (captcha)</h3>
+
+  <p><strong>Cíl.</strong> Když ochranná služba proti automatickým robotům vypadne, musí se požadavek <strong>zablokovat</strong>, ne tiše propustit.</p>
+
+  <p><strong>Proč.</strong> Bezpečnostní prvek, který se při potížích sám vypne, není ochrana — je to falešný pocit bezpečí. Captcha brání tomu, aby roboti hromadně zakládali falešné účty nebo zkoušeli hesla. Pokud při výpadku služby všechno propustí, díra je dokořán právě ve chvíli, kdy je nejhůř.</p>
+
+  <p><strong>Co přidá.</strong> Logika se přepne do bezpečného režimu „při pochybnostech zablokuj", doplní se upozornění správcům, sjednotí se nastavení s dokumentací a vybere se konkrétní poskytovatel ochrany. Uživatel při blokaci uvidí srozumitelnou hlášku, ne záhadné tiché selhání formuláře.</p>
+
+  <h3>14.3 — Bezpečnostní hlavičky prohlížeče</h3>
+
+  <p><strong>Cíl.</strong> Poslat prohlížeči sadu pravidel, která zneškodní celou třídu útoků přes vložený cizí kód a vynutí vždy šifrované spojení.</p>
+
+  <p><strong>Proč.</strong> Platforma je plná uživatelského textu — chat, životopisy postav, články, encyklopedické stránky. To je přirozený cíl útoků, kdy někdo zkusí do textu propašovat škodlivý kód. Bezpečnostní pravidla pro prohlížeč fungují jako záchranná síť: i kdyby selhala kontrola obsahu, prohlížeč škodlivý kód odmítne spustit. Šifrované spojení se navíc vynutí natvrdo, aby nikdo nemohl odposlouchávat.</p>
+
+  <p><strong>Co přidá.</strong> Server začne ke každé stránce přikládat sadu ochranných pravidel — seznam povolených zdrojů obsahu, zákaz vkládání stránky do cizích rámů, vynucení šifrovaného spojení a opatrné zacházení s odkazujícími adresami. Pro uživatele je to neviditelné; mění se jen úroveň ochrany na pozadí. Nasazení proběhne opatrně, nejprve v režimu sběru, aby se neporušilo nic legitimního.</p>
+
+  <h3>14.4 — Zálohy &amp; plán obnovy <span class="pill">👑 provoz</span></h3>
+
+  <p><strong>Cíl.</strong> Automatická noční záloha celé databáze, ukládaná na oddělené úložiště s rozumnou rotací, pravidelně ověřená zkušební obnovou a doprovázená jednostránkovým návodem „co dělat, když spadne server".</p>
+
+  <p><strong>Proč.</strong> Tohle je nejdůležitější jediný krok celé vlny. Tichá ztráta dat je <strong>jediná chyba, ze které se komunita nevzpamatuje</strong> — ve světech jsou stovky hodin tvůrčí práce, celé příběhy, postavy a mapy. Záloha, kterou nikdo nikdy nevyzkoušel obnovit, navíc není záloha, ale naděje. Proto je součástí cíle i pravidelný zkušební test obnovy.</p>
+
+  <p><strong>Co přidá.</strong> Každou noc se automaticky pořídí kopie dat a uloží se mimo hlavní server — na nezávislé úložiště, aby ji nezasáhl týž problém jako produkci. Kopie se uchovávají v rotaci (například několik denních a několik týdenních). Obrázky a média jsou drženy v cloudové službě zvlášť. K tomu vznikne stručný provozní návod, aby případné obnovení proběhlo rychle a bez paniky. Pro uživatele je vše neviditelné — dokud nepřijde den, kdy ho to zachrání.</p>
+
+  <h3>14.5 — Automatická kontrola před nasazením</h3>
+
+  <p><strong>Cíl.</strong> Před každým zveřejněním nové verze webové části automaticky proběhne sada kontrol — kontrola typů, kontrola stylu kódu, testy a jeden ucelený průchod od přihlášení až po otevření mapy.</p>
+
+  <p><strong>Proč.</strong> Jeden chybný úprava může shodit web bez varování. Automatická brána funguje jako rozumný vrátný: zachytí zjevné problémy dřív, než se dostanou k uživatelům. Nástroj pro tyto ucelené průchodové testy je už připravený, jen se naplno nevyužívá.</p>
+
+  <p><strong>Co přidá.</strong> Vznikne automatizovaný pracovní postup, který při každé změně spustí kompletní kontrolu a první ucelený test reálného scénáře (přihlášení → vstup do světa → otevření mapy). Uživatel z toho přímo nic nevidí, ale dostává spolehlivější web s menším rizikem, že ho výpadek zastihne uprostřed hry.</p>
+
+  <h3>14.6 — Hlídání zranitelných součástí &amp; příprava na škálu</h3>
+
+  <p><strong>Cíl.</strong> Automaticky hlídat, zda některá z použitých softwarových knihoven nemá známou zranitelnost, a připravit ochranu proti přetížení tak, aby fungovala i při běhu na více serverech.</p>
+
+  <p><strong>Proč.</strong> Zranitelnost v cizí knihovně je jeden z nejčastějších vstupů útoku — a objevují se průběžně, takže ruční hlídání nestačí. Zároveň současná ochrana proti záplavě požadavků funguje jen v rámci jediného serveru; jakmile platforma poroste a poběží na více strojích, je potřeba ochranu sdílet napříč nimi.</p>
+
+  <p><strong>Co přidá.</strong> Zapne se automatické skenování závislostí, které upozorní na nově objevené zranitelnosti. A připraví se varianta ochrany proti přetížení, která drží počítadlo požadavků centrálně, takže platí i při běhu na více serverech současně. Pro uživatele neviditelné, pro odolnost platformy zásadní.</p>
+
+  <h3>14.7 — Export celého světa nebo kampaně</h3>
+
+  <p><strong>Cíl.</strong> Výrazné tlačítko „Exportovat / Zálohovat vše" v nastavení světa, které stáhne kompletní data světa — strukturu v čitelném datovém formátu, balíček médií a přehledné PDF.</p>
+
+  <p><strong>Proč.</strong> Zkušení vypravěči jsou — právem — opatrní ohledně svých dat. I když naprostá většina tlačítko nikdy nepoužije, už samotný fakt, že ho vidí, <strong>odstraňuje strach z uvíznutí na jedné platformě</strong>. Je to přímá páka na důvěru: „moje data jsou opravdu moje a kdykoli si je odnesu." Doplňuje to serverové zálohy o vlastní kopii v rukou uživatele.</p>
+
+  <p><strong>Co přidá.</strong> V nastavení světa přibude tlačítko, které spustí přípravu kompletního balíčku — všechen text a struktura světa, k tomu obrázky a navíc čitelné PDF pro lidské oko. U velkých světů se balíček připravuje na pozadí s ukazatelem průběhu, aby to nezatížilo server. Tato funkce zároveň přinese chybějící obrazovku pro stažení vlastních osobních dat, kterou žádá ochrana soukromí.</p>
+
+  <h3>14.8 — Odstřižení od dosluhujícího starého webu</h3>
+
+  <p><strong>Cíl.</strong> Odstranit poslední závislosti na umírajícím starém webu — přesunout model pro vyhledávání na vlastní hosting, posílat e-maily (například reset hesla) přes vlastní poštovní bránu a ověřit upozornění na reálném telefonu.</p>
+
+  <p><strong>Proč.</strong> Dokud něco visí na dosluhujícím starém webu, hrozí, že až jednoho dne zhasne, něco na Ikaru tiše přestane fungovat — a nikdo nebude vědět proč. Proto tento krok patří do <strong>pojistky</strong>, ne až do fáze růstu. Je to odstranění skrytého rizika z minulosti.</p>
+
+  <p><strong>Co přidá.</strong> Vyhledávací model se nahraje na vlastní hosting nezávislý na starém webu. Odesílání e-mailů se přepne na vlastní poštovní bránu a otestuje v ostrém provozu. A push upozornění se ověří na skutečném telefonu (na iPhonu je nutné mít web nainstalovaný na ploše — to se propojuje s instalací aplikace v další vlně). Výsledkem je platforma, která nestojí na ničem cizím, co může kdykoli spadnout.</p>
+
+  <h3>14.9 — Dokončení probíhajících auditů kvality</h3>
+
+  <p><strong>Cíl.</strong> Dotáhnout do konce rozběhnuté kontrolní průchody platformou — ověřit, že se po smazání věcí uklidí celý jejich strom, že je databáze vnitřně konzistentní, že existuje jeden spustitelný ucelený scénář a že navigace nikam nevede do slepé uličky.</p>
+
+  <p><strong>Proč.</strong> Jak kód roste, hrozí, že tiše ztratí data nebo zavede uživatele do mrtvé cesty. Tyto kontrolní průchody hlídají právě to. Je to levná pojistka proti tichému zhoršování a navazuje na celou řadu už dokončených kontrolních stylů, kterými platforma průběžně prošla.</p>
+
+  <p><strong>Co přidá.</strong> Pokračuje se v existujících plánech kontrol — úklid po mazání, vnitřní konzistence dat, ucelený scénář, navigace — a otevřené nálezy se po schválení opraví. Pro uživatele se to projeví jako menší množství skrytých chyb, mrtvých odkazů a osiřelých dat. Tichá, ale důležitá údržba zdraví celé platformy.</p>
+
+  <div class="callout gold">
+    <div class="t">Shrnutí vlny 14</div>
+    Bezpečnostní vlna nepřidá ani jeden chlubivý snímek obrazovky — a přesto je to nejdůležitější investice celé Etapy II. Druhý zámek u přihlášení (hotový), automatické zálohy s ověřenou obnovou, ochranné hlavičky, export vlastních dat a odstřižení od starého webu dohromady znamenají, že na platformě, kterou doporučíte, se <strong>nikdy nestane to nejhorší</strong>. Teprve na téhle pevné půdě má smysl stavět všechno ostatní — počínaje rychlými výhrami v následující vlně.
+  </div>
+
+</section>
