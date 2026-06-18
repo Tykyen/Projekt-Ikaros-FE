@@ -8,7 +8,8 @@ import { useDeleteWorld } from '@/features/world/api/useWorldLifecycle';
 import s from './DeleteWorldTab.module.css';
 
 /**
- * Smazání světa (soft-delete). PJ vlastník i Admin. Data zůstávají — obnovit
+ * Smazání světa (soft-delete). Mazat smí jen PJ vlastník světa (R-20 —
+ * platform Admin nemá governance uvnitř světa). Data zůstávají — obnovit
  * do 30 dní může jen administrátor. Po 30 dnech trvalé smazání.
  */
 export default function DeleteWorldTab() {

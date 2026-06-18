@@ -1,0 +1,264 @@
+# 08 — Platformová administrace
+
+Kódem ověřená inventura platformové administrace Projektu Ikaros. Pokrývá globální role, granulární admin oprávnění (D-033), admin panel (`/admin`) a všechny jeho taby, správu uživatelů, search index, dungeon builder, globální emoty, GDPR export, systémové presety.
+
+> Rozsah = jen GLOBÁLNÍ (platformová) administrace. Světové role (PJ / PomocnýPJ / Korektor / Hráč / Čtenář / Žadatel) jsou mimo tuto kapitolu.
+
+---
+
+## Role model (globální `UserRole`)
+
+FE enum (`Projekt-ikaros-FE/src/shared/types/index.ts:6`) — po D-053 zúžen na 6 globálních rolí:
+
+| Hodnota | Role | Popisek (CZ) |
+|---|---|---|
+| 1 | `Superadmin` | Superadmin |
+| 2 | `Admin` | Admin |
+| 9 | `Ikarus` | Ikarus (běžný uživatel) |
+| 10 | `SpravceClanku` | Správce článků |
+| 11 | `SpravceGalerie` | Správce galerie |
+| 12 | `SpravceDiskuzi` | Správce diskuzí |
+
+- **Platform-admin gate** = `role <= UserRole.Admin`, tj. jen role 1 a 2 (Superadmin, Admin). Vidět `AdminGuard` (`backend/src/common/guards/admin.guard.ts:17`).
+- **Pořadí čísel je významné**: nižší číslo = vyšší moc. Proto `role > UserRole.Admin` = NENÍ admin.
+- **Správci obsahu** (Clánky/Galerie/Diskuze) jsou globální obsahové role, ne admini — vidí jen svou frontu „Zpracovat", nemají přístup do `/admin`.
+- **Ikarus** = běžný přihlášený uživatel. PJ/hráč jsou role uvnitř konkrétního světa (WorldRole), ne globální.
+
+### ⚠️ Drift FE vs. BE enum
+BE enum (`backend/src/modules/users/interfaces/user.interface.ts:1`) STÁLE obsahuje legacy world role `PJ=3, Korektor=4, Hrac=5, Ctenar=6, Zadatel=7, Zakaz=8`. FE je z enumu vyhodil. Migrace `migrate:d053` přemapuje historické DB hodnoty 3–7 na 9 (Ikarus). Žádný živý uživatel by tyto globální hodnoty mít neměl, ale enum drift je k vyčištění (dluh).
+
+---
+
+## Granulární admin oprávnění (D-033)
+
+### Model
+Definice `AdminPermissions` (`Projekt-ikaros-FE/src/shared/types/index.ts:21`, BE zrcadlo `backend/src/modules/users/interfaces/user.interface.ts:16`). Tři boolean flagy, default všechny `false`:
+
+| Flag | Co umožňuje | Kde se VYNUCUJE |
+|---|---|---|
+| `canManageAdmins` | Admin smí spravovat oprávnění JINÝCH Adminů | `admin.service.ts:614` (setAdminPermissions) |
+| `canModerateContent` | Admin smí DELETE / UNDELETE cizí účet | `hierarchy.ts:99` (assertCanModerate) |
+| `canEditPlatformPages` | (zamýšleno: editace platform stránek) | **NIKDE — mrtvý flag** |
+
+### Jak se přidělují
+- Endpoint `PATCH /admin/users/:id/admin-permissions` (`admin.controller.ts:195`), gate `@Roles(Superadmin, Admin)`.
+- Smí měnit: **Superadmin** vždy; **Admin** jen pokud má sám `canManageAdmins`.
+- **Flag `canManageAdmins` smí přepnout JEN Superadmin** — Admin-manager smí delegovat jen `canModerateContent` (brání řetězovému šíření manage-práva, R-05). Viz `admin.service.ts:626`.
+- Cíl musí mít roli `Admin` (jinak `NOT_ADMIN` 400). Granulární práva nemají smysl pro non-adminy.
+- Nelze upravit sám sebe (`SELF_FORBIDDEN` 400).
+- Merge je delta: aplikují se jen pole přítomná v requestu, ostatní zůstanou (`admin.service.ts:653`).
+- Každá změna se auditi (`ADMIN_PERMISSIONS_CHANGE`).
+
+### Hranice / pasti
+- `canEditPlatformPages` se ukládá i posílá, ale BE ho nikde nevynucuje (žádná editace platform stránek neexistuje) → FE checkbox je záměrně skrytý (`UsersTable.tsx:338`).
+- `canModerateContent` NEgatuje obsahovou moderaci (články/galerie/diskuze) — ta jede přes obsahové ROLE (viz níže), ne přes tento flag. Flag řídí JEN admin delete účtu.
+
+---
+
+## Platform Admin panel (`/admin`)
+
+### Co to je
+Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
+- **Kde:** route `/admin`, `Projekt-ikaros-FE/src/features/admin/pages/PlatformAdminPage.tsx`. Tab se drží v URL `?tab=`.
+- **Kdo:** FE `RoleGuard roles={[Superadmin, Admin]}` (router.tsx:195). BE jednotlivé endpointy `AdminGuard` (role ≤ Admin).
+- **Stav:** ✅
+
+### Taby
+1. **Přehled** (`?tab=prehled`) — dashboard se stat-kartami.
+2. **Uživatelé** (`?tab=uzivatele`) — správa uživatelů.
+3. **Smazané světy** (`?tab=smazane-svety`) — recovery soft-smazaných světů.
+4. **Audit log** (`?tab=audit`) — moderátorský audit.
+5. **Search index** (`?tab=search-index`) — monitoring + rebuild vyhledávání.
+6. **Friendship debug** (`?tab=friendship-debug`) — **jen v DEV buildu** (`import.meta.env.DEV`), na produkci se tab vůbec nevykreslí.
+
+> Pozn.: „Zpracovat" frontu (schvalování username/obsahu) panel ZÁMĚRNĚ neobsahuje — je to osobní fronta na `/ikaros/uzivatele?tab=zpracovat`, ne admin nástroj.
+
+---
+
+### Tab Přehled (dashboard)
+- **Co to je:** snapshot platformových metrik ve 4 sekcích + rozcestník.
+- **Kde:** `components/OverviewTab/OverviewTab.tsx`. Data z `GET /admin/stats/overview`.
+- **Kdo:** FE pod RoleGuardem. BE `admin.controller.ts:58` `@UseGuards(AdminGuard)`.
+- **Co ukazuje:**
+  - Uživatelé: Celkem / Aktivní (online v okně `PRESENCE_THRESHOLD_HOURS`, default 25 h — pozor, karta tvrdí „24 h") / Noví (7 dní) / Čeká na smazání.
+  - Světy: Celkem.
+  - Obsah: Články / Obrázky v galerii / Diskuze.
+  - Fronta: Žádosti o username (link na `/ikaros/uzivatele?tab=zpracovat`).
+  - Rychlé odkazy: Správa uživatelů, Audit log, Zpracovat frontu, „Index vyhledávání" (DISABLED placeholder „Připravujeme fáze 13.1", i když search-index tab už funguje — kosmetický dluh).
+- **Zvláštnosti:** každá metrika běží přes `safe()` — rozbitý modul vrátí 0 a zaloguje warning, dashboard nikdy nespadne (`admin-stats.service.ts:106`).
+- **Stav:** ✅
+- **Kód:** FE `components/OverviewTab/OverviewTab.tsx`, BE `admin-stats.service.ts:46`.
+
+---
+
+### Tab Uživatelé (správa)
+- **Co to je:** filtrovatelná tabulka uživatelů + per-řádek a bulk akce.
+- **Kde:** `components/UsersAdminTab/UsersAdminTab.tsx` → `users/components/UsersTab/UsersTable.tsx`. Data `GET /admin/users`.
+- **Kdo:** FE RoleGuard. BE všechny endpointy `AdminGuard`; navíc per-akce hierarchy check.
+- **Co jde dělat (per řádek):**
+  - **Změna role** (dropdown, jen 6 globálních rolí `ASSIGNABLE_ROLES`). `PATCH /admin/users/:id/role`.
+  - **Ban / Odbanovat** — `POST /admin/users/:id/ban` + `/unban`. Ban má důvod + trvání (modal); 0/undefined = trvalý, jinak timed (`bannedUntil`). Ban revokuje všechny refresh tokeny → force logout, invaliduje ban cache, emit `user.identity.changed`.
+  - **Smazat účet / Obnovit smazání** — `POST /admin/users/:id/request-deletion` (30denní soft-delete hold, povinný důvod) + `/cancel-deletion`. Vyžaduje `canModerateContent` (pro Admina). Spustí PJ handover (viz níže).
+  - **Granulární oprávnění** (jen u cílů s rolí Admin, jen pro Superadmina / Admin-managera) — checkboxy „Správa adminů" (Superadmin-only) a „Moderace obsahu".
+- **Co jde dělat (bulk, `BulkToolbar.tsx`):**
+  - Bulk Banovat (trvání permanent/1/7/30/90 dní + důvod), Bulk Odbanovat, Bulk Změnit roli.
+  - Best-effort: server vrací `{ successful[], failed[] }`, per-user hierarchy check; selhání jednoho neshodí dávku.
+- **Filtry:** username (text), role, „má pending username request".
+- **Hierarchy pravidla (`helpers/hierarchy.ts`):**
+  - Nikdo nesmí měnit/moderovat sám sebe (`SELF_MODIFICATION`).
+  - Superadmin smí cokoli (kromě sebe).
+  - Admin NESMÍ měnit roli ani moderovat jiného Admina/Superadmina; nesmí povyšovat na admin role.
+  - DELETE/UNDELETE navíc vyžaduje `canModerateContent`.
+- **Hranice / co neumí:**
+  - **Reset hesla NENÍ v admin UI.** BE endpoint `PUT /users/:id/reset-password` (Superadmin-only, `users.controller.ts:537`) existuje, ale FE pro něj nemá žádné tlačítko ani hook → de facto nedostupné z UI.
+  - **Vytvoření uživatele adminem NENÍ v UI.** BE `POST /admin/users` (`admin.controller.ts:113`) funguje, ale FE nemá `useAdminCreateUser` hook ani formulář.
+  - **Změna emailu uživatele adminem neexistuje.** Email mění jen sám uživatel (`POST /users/me/request-email-change`). Admin cizí email změnit přes UI nemůže (existuje jen ops/skript `set-user-email`).
+  - Filtry `includeDeleted` / `hasPendingDeletion` BE umí, ale `getUsers` je řeší in-memory po vytažení stránky (nekonzistentní paginace u tombstone řádků — dluh, `admin.service.ts:120`).
+- **Zvláštnosti:** `A+` badge u Admina = má `canManageAdmins`. Self řádek je v akcích zamčený. Veškeré akce auditovány + invalidují stats/audit/public-profile cache.
+- **Stav:** ✅ (s chybějícím reset hesla / create user / set email v UI)
+- **Kód:** FE `users/components/UsersTab/UsersTable.tsx`, `BulkToolbar.tsx`, hooky `users/api/useAdminUsers.ts`; BE `admin.controller.ts:71`, `admin.service.ts`, `helpers/hierarchy.ts`.
+
+---
+
+### Tab Smazané světy (recovery)
+- **Co to je:** seznam soft-smazaných světů s možností obnovy do 30 dní.
+- **Kde:** `components/DeletedWorldsTab/DeletedWorldsTab.tsx`. Data `useDeletedWorlds`, akce `POST /worlds/:id/restore`.
+- **Kdo:** FE RoleGuard (Superadmin/Admin). BE = worlds modul (restore je jediná pojistka, kde platform admin smí zasáhnout do světa, viz R-20 governance — obnova opuštěného světa + dosazení PJ).
+- **Co jde dělat:** Obnovit svět (vrátí stránky/postavy/chat, vlastník zase získá přístup). Zobrazuje zbývající dny do trvalého smazání cronem (zvýraznění ≤ 5 dní).
+- **Hranice:** po 30 dnech cron svět trvale smaže (hard delete ~40 kolekcí). Z tohoto tabu nelze trvale smazat ručně.
+- **Stav:** ✅
+- **Kód:** FE `components/DeletedWorldsTab/DeletedWorldsTab.tsx`.
+
+---
+
+### Tab Audit log
+- **Co to je:** log moderátorských akcí s filtrací.
+- **Kde:** `users/components/AuditLogTab/AuditLogTab.tsx`. Data `GET /admin/audit-log`.
+- **Kdo:** FE RoleGuard. BE `admin.controller.ts:315` `AdminGuard`.
+- **Co jde dělat:** procházet záznamy (actor, cíl, akce, before/after JSON, důvod, čas), filtr podle akce + stránkování. Read-only.
+- **Auditované akce (`admin-audit-log.interface.ts:1`):** ROLE_CHANGE, USER_CREATE, USERNAME_REQUEST_APPROVED/REJECTED, BAN, UNBAN, DELETE/UNDELETE, ACCOUNT_DELETE_REQUEST/CANCEL, ACCOUNT_SELF_DELETE_REQUEST, ACCOUNT_SELF_REACTIVATE, ACCOUNT_HARD_DELETE (system cron actor), ADMIN_PERMISSIONS_CHANGE, BULK_BAN/UNBAN/ROLE_CHANGE, IKAROS_NEWS_ARCHIVE/UNARCHIVE/DELETE (D-067).
+- **Zvláštnosti:** audit je best-effort — selhání zápisu nikdy neblokuje business akci (`admin.service.ts:104`).
+- **⚠️ Drift:** FE `AuditLogTab.tsx:7` mapuje label `FRIENDSHIP_COOLDOWN_RESET`, který v BE `AdminAuditAction` typu není; naopak řadu BE akcí (DELETE/UNDELETE/HARD_DELETE/BULK_*) FE label mapa neuvádí → u nich padne na fallback. K sjednocení.
+- **Stav:** ✅ (s label driftem)
+- **Kód:** FE `users/components/AuditLogTab/AuditLogTab.tsx`, BE `admin.controller.ts:315`, `repositories/admin-audit-log.repository.ts`.
+
+---
+
+### Tab Search index
+- **Co to je:** monitoring stavu fulltextového/embedding indexu + ruční rebuild.
+- **Kde:** `components/SearchIndexTab/SearchIndexTab.tsx`. Data `GET /stats/search`, akce `POST /stats/search/rebuild`.
+- **Kdo:** FE RoleGuard. BE celý `StatsController` je `@UseGuards(JwtAuthGuard, AdminGuard)` (`stats.controller.ts:30`) — rebuild je drahá operace / DoS riziko.
+- **Co jde dělat:** zobrazit stav (provider, zaindexované stránky, vektory/embeddingy, zpracováno/celkem, čeká na zpracování, čas posledního embeddingu) + tlačítko Přebudovat index (s confirm dialogem).
+- **Hranice:** žádné per-stránkové ovládání z UI — jen full rebuild. Reindex jednotlivé stránky existuje jako endpoint (`POST /stats/search/reindex`, `/search/reindex`), ale UI ho nevolá.
+- **Stav:** ✅
+- **Kód:** FE `components/SearchIndexTab/SearchIndexTab.tsx`, `api/useSearchIndex.ts`; BE `stats.controller.ts`.
+
+---
+
+## Vyhledávání (search modul)
+
+- **Co to je:** vyhledávání stránek v rámci JEDNOHO světa, kombinace dvou providerů.
+- **Kde:** `GET /search?q=...&worldId=...&count=...&provider=...` (`backend/src/modules/search/search.controller.ts`).
+- **Kdo:** běžný vyhledávací endpoint = `JwtAuthGuard` (přihlášený). Indexovací endpointy (`/search/created|updated|deleted|reindex|rebuild`) = `AdminGuard`.
+- **Provideři (`search.module.ts`):**
+  1. **MeiliSearch** (`meili-search.service.ts`) — fulltext. Host `MEILI_HOST` (default `http://localhost:7700`), `MEILI_API_KEY`.
+  2. **EmbeddingSearchService** (`embedding-search.service.ts`) — sémantické embeddingy (ONNX model + vptree), Mongo `PageEmbedding`.
+  - `SearchCoordinator` výsledky obou interleavuje (round-robin dedupe podle slug/id).
+- **Bezpečnost (klíčové):**
+  - `worldId` je POVINNÝ (`WORLD_ID_REQUIRED`) — globální search bez něj by leakoval názvy stránek privátních světů (D-NEW-global-search-access-leak).
+  - Access check: `worldsService.findByIdForRequester` → 404 u privátního světa bez membershipu.
+  - Page-level filtr: výsledky se protnou s `findVisibleSlugs` → AKJ/access-chráněné stránky se neleaknou (N-35).
+- **Hranice / zvláštnosti:**
+  - **MeiliSearch je POVINNÝ infra prvek (Docker).** Bez běžícího MeiliSearchu provider tiše vrátí prázdno (chyby jsou jen logované jako warning, `meili-search.service.ts:62`) → fulltext mlčky nefunguje, žádná tvrdá chyba.
+  - Index se konfiguruje a rebuilduje při startu modulu (`onModuleInit`).
+  - Nelze hledat napříč světy z jednoho dotazu (záměrné, leak-safe).
+- **Stav:** ✅ (provoz závislý na Docker MeiliSearch + ONNX modelu)
+- **Kód:** BE `modules/search/*`, `modules/stats/stats.controller.ts`.
+
+---
+
+## Dungeon Builder (`/admin/dungeon-builder`)
+
+- **Co to je:** zamýšlený platformový nástroj na tile-based dungeony.
+- **Kde:** route `/admin/dungeon-builder`, FE `pages/DungeonBuilderPage.tsx`.
+- **Kdo:** FE `RoleGuard roles={[Superadmin, Admin]}` (router.tsx:206).
+- **Stav:** ⚠️ **STUB.** FE stránka je doslova `<div>[stub] Dungeon builder</div>` (`DungeonBuilderPage.tsx:2`).
+- **Hranice:** FE žádná funkčnost.
+- **Zvláštnosti / BE pozadí:** BE modul `dungeon-maps` EXISTUJE a je funkční, ale je **per-world PJ tool, NE platform-admin nástroj.** Endpointy `/dungeon-maps` (`dungeon-maps.controller.ts`) gatuje `assertCanManage`: `role <= Admin` projde (platform admin bypass), jinak musí být PJ daného světa (`NOT_WORLD_PJ`). Umí CRUD dungeonu + export jako MapTemplate / MapScene. Tento BE modul ale FE stub stránka nepoužívá — jsou rozpojené.
+- **Kód:** FE `pages/DungeonBuilderPage.tsx` (stub), BE `modules/dungeon-maps/dungeon-maps.controller.ts` (funkční, ale jinde napojený).
+
+---
+
+## Globální emoty (`/ikaros/admin/emotes`)
+
+- **Co to je:** správa custom emotů dostupných napříč VŠEMI světy.
+- **Kde:** route `/ikaros/admin/emotes`, FE `features/ikaros/pages/IkarosEmotesAdminPage/IkarosEmotesAdminPage.tsx`.
+- **Kdo:** FE `RoleGuard roles={[Superadmin, Admin]}` (router.tsx:216). BE `assertGlobalCanManage`: `role > Admin` → `NOT_PLATFORM_ADMIN` 403 (`emotes.service.ts:67`).
+- **Co jde dělat:** vytvořit / upravit (name, shortcode, image) / smazat globální emote.
+  - `GET /emotes/global` (čte každý přihlášený), `POST /emotes/global` (Admin+), `PATCH /emotes/global/:id` (Admin+), `DELETE /emotes/global/:id` (Admin+).
+- **Hranice:** limit globálních emotů `EMOTE_LIMIT_GLOBAL = 200` (FE konstanta). Mazání bez soft-delete (potvrzení jen přes `confirm()`).
+- **Zvláštnosti:** per-world emoty jsou jiná věc (PJ světa, `POST /emotes/:worldId`); admin globální emoty vidí všichni uživatelé ve všech světech. Real-time broadcast přes `emotes.gateway.ts`.
+- **Stav:** ✅
+- **Kód:** FE `IkarosEmotesAdminPage.tsx` + `features/world/chat/emotes/*` (sdílené komponenty/hooky), BE `modules/emotes/emotes.controller.ts`.
+
+---
+
+## Export dat / GDPR (data-export modul)
+
+- **Co to je:** GDPR export VLASTNÍCH dat uživatele do JSON.
+- **Kde:** `GET /data-export/me` (`backend/src/modules/data-export/data-export.controller.ts`).
+- **Kdo:** `JwtAuthGuard` — **jakýkoli přihlášený uživatel exportuje JEN svá data** (`user.id` z tokenu). Žádný admin override.
+- **Co exportuje (`data-export.service.ts`):** profil (email, username, displayName, avatar, role, theme/chat preferences, email verified, timestampy), world memberships, friendships (accepted + pending obousměr), friend blocks, pending username request, posledních 100 admin audit záznamů kde je uživatel cílem. Formát JSON `version 1.0`.
+- **Hranice / co neumí:**
+  - **NENÍ admin nástroj** — admin nemůže exportovat cizí účet.
+  - **NEMÁ ŽÁDNÝ FE consumer** — v celém FE neexistuje volání `/data-export/me` (žádný hook ani tlačítko). Endpoint je BE-only, z UI nedostupný → de facto dormantní.
+  - Neobsahuje obsah stránek/postav/chatových zpráv, jen metadata vztahů.
+- **Stav:** ⚠️ (BE funkční, FE chybí napojení).
+- **Kód:** BE `modules/data-export/*`.
+
+---
+
+## Systémové presety / herní systémy (system-presets modul)
+
+- **Co to je:** katalog herních systémů platformy + jejich datová schémata (pro postavy/bestiář per systém).
+- **Kde:** `GET /system-presets` (seznam meta), `GET /system-presets/:system` (plné schema) — `backend/src/modules/system-presets/system-presets.controller.ts`.
+- **Kdo:** **bez guardu — ANONYMNÍ** (žádný `@UseGuards`). Presety jsou statická referenční data, ne citlivá.
+- **Dostupné systémy (`presets/index.ts`):** call-of-cthulhu, dnd2e, dnd3plus, dnd5e, drd-hero, drd16 (alchemy/ranger/thief/warrior/wizard), fate, gurps, jad, matrix-custom, pi (Projekt Ikaros), shadowrun.
+- **Co jde dělat:** jen číst (seznam + detail se schema). Schémata jsou hardcoded v BE (`SYSTEM_PRESETS` konstanta).
+- **Hranice / co neumí:**
+  - **Žádné CRUD z UI ani API** — systémy se nepřidávají/needitují za běhu, jen kódem (BE preset soubory). Není admin tab.
+  - Canonical zdroj schémat je dle paměti na FE (`export-schemas` do BE); BE presety jsou statický seznam.
+- **Stav:** ✅ (read-only katalog, žádná admin správa)
+- **Kód:** BE `modules/system-presets/system-presets.service.ts`, `presets/*`.
+
+---
+
+## Další admin/superadmin endpointy (mimo panel taby)
+
+- **Username change requests** — `GET /admin/username-requests`, `/approve`, `/reject` (`admin.controller.ts:220`), `AdminGuard`. FE je obsluhuje ve frontě „Zpracovat" (`/ikaros/uzivatele?tab=zpracovat`), ne v `/admin` panelu. Approve/reject auditováno + posílá notifikační mail žadateli.
+- **Recent pages** — `GET /admin/recent-pages` (`admin.controller.ts:343`), gate `@Roles(Superadmin, Admin)`. Nedávno upravené stránky napříč platformou.
+- **Admin friendships (D-056)** — `GET /admin/friendships`, `/friendships/by-pair`, `POST /friendships/:id/reset-cooldown` (`admin.controller.ts:365`), `AdminGuard`. Lookup přátelství usera + reset cooldownu. FE má jen DEV-only „Friendship debug" tab.
+- **Obsahová moderace (Zpracovat)** — schvalování článků/galerie/diskuzí je gatováno OBSAHOVÝMI ROLEMI, ne admin flagy:
+  - Články: `Superadmin, Admin, SpravceClanku` (`ikaros-articles/article-review.provider.ts:8`).
+  - Galerie: `Superadmin, Admin, SpravceGalerie` (`ikaros-gallery/gallery-review.provider.ts:9`).
+  - Diskuze: `Superadmin, Admin, SpravceDiskuzi`.
+  - Tito správci se NEdostanou do `/admin`, vidí jen svou frontu „Zpracovat".
+
+---
+
+## ⚠️ Nesrovnalosti & dluhy (k ověření)
+
+1. **Reset hesla bez UI** — BE `PUT /users/:id/reset-password` (Superadmin-only) funguje, ale v admin panelu chybí jakékoli tlačítko/hook. Superadmin nemůže resetovat heslo z webu. (`users.controller.ts:537`)
+2. **Create user adminem bez UI** — BE `POST /admin/users` funguje, FE nemá hook ani formulář. (`admin.controller.ts:113`)
+3. **Admin nemůže měnit cizí email** — žádný endpoint ani UI; jen self-service `request-email-change` + ops skript `set-user-email`.
+4. **Data export bez FE consumera** — `GET /data-export/me` nikde ve FE nevoláno → GDPR export z UI nedostupný. (`data-export.controller.ts:21`)
+5. **DungeonBuilderPage = stub** — route `/admin/dungeon-builder` vykreslí jen text `[stub]`. BE `dungeon-maps` modul existuje, ale je per-world PJ tool, není napojený na tuto stránku. (`DungeonBuilderPage.tsx`)
+6. **`canEditPlatformPages` = mrtvý flag** — ukládá se a posílá, ale BE ho nikde nevynucuje; FE checkbox záměrně skryt. (`UsersTable.tsx:338`)
+7. **`canModerateContent` ≠ obsahová moderace** — flag gatuje JEN admin delete/undelete účtu. Schvalování článků/galerie/diskuzí jede přes obsahové role. Název flagu mate.
+8. **Audit-log label drift** — FE `AuditLogTab` zná `FRIENDSHIP_COOLDOWN_RESET` (v BE typu chybí) a naopak neumí labelovat DELETE/UNDELETE/HARD_DELETE/BULK_*. (`AuditLogTab.tsx:7` vs `admin-audit-log.interface.ts:1`)
+9. ✅ OPRAVENO 2026-06-18 — **Overview „Index vyhledávání" placeholder** — rychlý odkaz je DISABLED s textem „Připravujeme (fáze 13.1)", ačkoli search-index tab už funguje. Kosmetický drift. (`OverviewTab.tsx:150`)
+10. ✅ OPRAVENO 2026-06-18 (BE default práh = 24 h) — **Overview „Aktivní (24 h)"** — karta tvrdí 24 h, ale práh je `PRESENCE_THRESHOLD_HOURS` default 25 h. (`admin-stats.service.ts:40`)
+11. **BE enum legacy role** — `UserRole` v BE stále drží PJ/Korektor/Hrac/Ctenar/Zadatel/Zakaz (3–8), FE je vyhodil. Drift po D-053 k vyčištění. (`user.interface.ts:1`)
+12. **`getUsers` in-memory filtr** — `includeDeleted`/`hasPendingDeletion` se filtruje až po vytažení stránky → nekonzistentní paginace. (`admin.service.ts:120`)
+13. **MeiliSearch tichý fail** — bez běžícího Docker MeiliSearchu fulltext vrací prázdno bez tvrdé chyby (jen warning v logu). Provozní past. (`meili-search.service.ts:62`)
+14. ✅ OPRAVENO 2026-06-18 — **Stale komentář** — `article-review.provider.ts:11` tvrdí, že BE enum má „dvojité uu" v `SpravceClanku`; reálně je BE i FE shodně `SpravceClanku`. Komentář je zastaralý.

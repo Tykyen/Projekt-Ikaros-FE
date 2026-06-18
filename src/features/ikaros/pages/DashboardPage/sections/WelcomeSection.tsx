@@ -1,7 +1,9 @@
 import { IkarosCard } from '@/shared/ui';
-import s from './AnonWelcomeSection.module.css';
+import s from './WelcomeSection.module.css';
 
-export function AnonWelcomeSection() {
+// Uvítací karta úvodní stránky. Zobrazuje se VŠEM (anon i přihlášeným) —
+// generický pozdrav. Personalizovaná varianta pro přihlášené = roadmap2 15.7.
+export function WelcomeSection() {
   return (
     <IkarosCard
       variant="welcome"

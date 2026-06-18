@@ -17,6 +17,73 @@
 
 ---
 
+> **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
+
+### D-NEW-INV-SEC — Inventura: bezpečnostní nálezy účtu/světa
+**Soubory:** auth `register.dto.ts` (heslo `@MinLength(6)` vs reset/změna 8); `users.controller` nechráněný `GET /users/profile/:id`; `worlds.service.ts` `updateMyTheme` (sanitizace `themeUserOverrides`); `campaign.controller` `POST /scenarios`; chat persona render-time (FE) vs push/feed payload.
+**Problém:** drobné, ale reálné mezery — nekonzistentní min. délka hesla; veřejný profil endpoint bez friend-only/tombstone gate (možný leak); `themeUserOverrides` bez serverové sanitizace; storyboard scénář vytvoří i hráč přímým POST (chybí role-floor); render-time PJ persona může mimo chat (push/feed/export) odhalit reálné jméno.
+**Dopad:** Nízký–střední; část je leak k ověření.
+**Řešení:** heslo sjednotit na 8; ověřit a případně zavřít/sloučit veřejný profil endpoint; sanitizovat overrides na BE; role-floor scénářům; aplikovat personu i na serverové cesty.
+**Kdy:** Fáze 14. Zdroj: `docs/funkce/` kap. 01/02/10/13/15.
+
+### D-NEW-INV-PUSH — Inventura: web push spam + chybějící deep-link
+**Soubory:** BE `global-chat.service.ts` (`notifyAll` na každou zprávu), `ikaros-news.service` (`notifyAll` bez `url`), `push.service`; FE `public/sw.js` (deep-link připraven); pošta `ikaros-messages` (bez push).
+**Problém:** globální chat pushuje **každou** zprávu **všem** (spam-vektor, bez throttlingu/opt-out/exclude odesílatele); push payloady nemají `url` → klik otevře jen `/` místo cílové místnosti/novinky; pošta nepushuje vůbec; jediný přepínač zapne/vypne vše (žádné per-typ předvolby).
+**Dopad:** Střední — push prakticky nepoužitelný pro aktivní uživatele.
+**Řešení:** `url` do payloadu; throttle + opt-out + vyloučit odesílatele u chatu; push i pro poštu; per-typ předvolby.
+**Kdy:** Fáze 14.8 / 15.1 (PWA). Zdroj: kap. 04/05. Souvisí [[project_web_push_chat_status]].
+
+### D-NEW-INV-ADMIN-UI — Inventura: BE endpointy bez FE (admin/účet)
+**Soubory:** BE `users.controller` reset-password (Superadmin), `admin.controller` `POST /admin/users`, `data-export.controller` `/me`, `auth` `logout-all`; FE chybí.
+**Problém:** funkční BE endpointy nemají FE: admin reset hesla, založení uživatele, GDPR export vlastních dat, „odhlásit všechna zařízení". Změna cizího e-mailu adminem neexistuje vůbec.
+**Dopad:** Střední — GDPR export z UI nedostupný; admin operace jen přes API/skripty.
+**Řešení:** doplnit FE konzumenty + admin formuláře; zvážit endpoint pro adminskou změnu e-mailu.
+**Kdy:** Fáze 14.7 (export) / 20.2 (GDPR). Zdroj: kap. 01/08.
+
+### D-NEW-INV-PROFILE — Inventura: profil & seznam uživatelů
+**Soubory:** FE profil „Moje diskuze/články/galerie" (stub „fáze 3"), `usersTabs` `visibleTabsForRole`/`defaultTabForRole` (`void role`), `displayName` validace, `FriendsTab` `worldsCount=0`.
+**Problém:** komunitní sekce profilu jsou prázdné placeholdery, ač moduly jinde fungují; per-role taby `/ikaros/uzivatele` ignorují roli (mrtvý param); `displayName` bez min/regex; počet světů u přátel natvrdo 0.
+**Dopad:** Nízký — kosmetika + nedotažená featura.
+**Řešení:** napojit sekce na existující moduly; implementovat per-role taby nebo odstranit mrtvý param; validace displayName; doplnit worldsCount do friend shape.
+**Kdy:** Fáze 15.6 / 16.4. Zdroj: kap. 02.
+
+### D-NEW-INV-WIKI — Inventura: tabulky ve vieweru + seed↔menu
+**Soubory:** FE `OstatniLayout.tsx` (readonly `RichTextEditor` bez `enableTable`) a další read layouty; BE seed referenčních stránek vs. FE `buildWorldNav` (hardcoded „Informace").
+**Problém:** inline `<table>` v `page.content` se ve čtení zahodí (editor je umí, viewer ne) → PJ vloží tabulku, hráč ji nevidí; smazaná seedovaná stránka (`pravidla`/`magicky-system`/`technologie`) zůstává jako mrtvý odkaz v menu „Informace" (seed a menu jsou 2 nepropojené vrstvy).
+**Dopad:** Střední — ztráta obsahu při čtení.
+**Řešení:** přidat `enableTable` do readonly vieweru (nebo zakázat v editoru / převést na sekce); ošetřit smazanou seed-stránku v menu. Pozn.: [[project_page_content_no_tables]] to dnes drží jako vědomý stav.
+**Kdy:** Fáze 15.5. Zdroj: kap. 11.
+
+### D-NEW-INV-DATA-SYNC — Inventura: konzistence dat postav/měn
+**Soubory:** BE `map-operations.service.ts` (token→Character sync TODO), `world-currencies` `updateCurrencies` (full-replace), `character-subdocs.service.ts` (finance/inventory create vs. read), `characters.repository.ts` (legacy `/characters/directory`).
+**Problém:** staty/HP tokenu PC/NPC se z mapy nepropíšou do listiny postavy (žijí v `diary.customData`); `updateCurrencies` přepisuje celou sadu (riziko ztráty měn bez delta merge); subdoc finance/výbava se zakládají i pro NPC/Lokaci, ale `getFinance`/`getInventory` je pro ně blokuje 404 → orphan data; legacy adresářový endpoint zůstává vedle Pages directory (dvojí zdroj).
+**Dopad:** Střední — tichá nekonzistence.
+**Řešení:** dotáhnout token↔Character sync; delta merge měn; nezakládat nepoužitelné subdoky (nebo je zpřístupnit); odstranit legacy directory.
+**Kdy:** Fáze 16.2. Zdroj: kap. 12/14.
+
+### D-NEW-INV-MAPS — Inventura: taktická mapa nedotažené
+**Soubory:** BE `maps`/`map-operations` (undo `inverse=null` u `scene.deactivate`, `member.bulkAssignToScene`; combat order), `world-maps.service.ts:47` (role práh PJ).
+**Problém:** undo neúplné (některé operace nelze vrátit); role-prahy nejednotné (atlas „Mapy" = PJ, ale taktická mapa/zvuky/deník = PomocnyPJ); combat order má dvojí zdroj pravdy (`scene.combat.order` vs. live-sort dle initiative); „A* pohyb" reálně jen dosah, ne pathfinding přes překážky.
+**Dopad:** Nízký–střední — UX pasti pro PJ.
+**Řešení:** doplnit inverse pro chybějící operace; sjednotit role-prahy; vyjasnit jediný zdroj combat order; pathfinding buď doplnit (17.x), nebo opravit spec (rychlý fix).
+**Kdy:** Fáze 17.x. Zdroj: kap. 14.
+
+### D-NEW-INV-CASCADE — Inventura: kaskády & čas
+**Soubory:** BE `world-calendar-config` delete (nečistí timeline/akce), `game-events` soft-delete (bez cleanup jobu), Počasí in-game datum vs. `/kalendar`; FE nav (chybí `/akce`), legacy `/sprava-udalosti` redirect + `LegacyCalendersController` `/calenders` (překlep).
+**Problém:** mazání kalendářového configu nechá orphan timeline/akce události; soft-deleted akce zůstávají bez retence/cleanup; in-game datum (advance-day v Počasí) se nepromítne do „Dnes" v `/kalendar`; `/akce` není v hlavní nav; prošlý legacy redirect a překlepová route k odstranění.
+**Dopad:** Nízký–střední — orphan data + UX.
+**Řešení:** cascade cleanup configů/akcí (provázat s cascade-delete auditem); sjednotit zdroj in-game data; doplnit nav; odstranit legacy redirect + překlep route.
+**Kdy:** Fáze 14.9 (audity). Zdroj: kap. 15.
+
+### D-NEW-INV-CLEANUP — Inventura: úklid kódu (drift & mrtvé)
+**Soubory:** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní), `AuditLogTab.tsx` vs `admin-audit-log.interface.ts` (label drift).
+**Problém:** BE `UserRole` stále drží legacy world role (3–8), FE už vyhodil (drift po D-053); `canEditPlatformPages` se ukládá, ale nikde nevynucuje; admin bypass přes username `=== 'Tyky'`; `getUsers` filtruje až po vytažení stránky (nekonzistentní paginace); MeiliSearch bez Dockeru vrací prázdno bez chyby; favorites toggle zkopírovaný v 3 modulech; audit-log labely se rozcházejí FE↔BE.
+**Dopad:** Nízký — maintainability + 1 provozní past (Meili).
+**Řešení:** vyčistit BE enum; odstranit mrtvý flag; bypass přes roli/flag; paginace v DB dotazu; surface Meili health/chybu; centralizovat favorites; sjednotit audit-log labely.
+**Kdy:** Fáze 14.9. Zdroj: kap. 02/06/08.
+
+---
+
 ---
 
 > _(Shop-purchase atomicita přesunuta jako `FA` cíl do

@@ -147,14 +147,10 @@ export function OverviewTab() {
             <Tag className={s.linkIcon} aria-hidden />
             <span>Zpracovat frontu</span>
           </Link>
-          <span
-            className={`${s.linkCard} ${s.linkDisabled}`}
-            aria-disabled="true"
-            title="Připravujeme (fáze 13.1)"
-          >
+          <Link to="/admin?tab=search-index" className={s.linkCard}>
             <Search className={s.linkIcon} aria-hidden />
             <span>Index vyhledávání</span>
-          </span>
+          </Link>
         </div>
       </section>
     </div>

@@ -7,7 +7,7 @@ import {
   registerModalOpenAtom,
   forgotPasswordModalOpenAtom,
 } from '@/shared/store/authStore';
-import { AnonWelcomeSection } from './sections/AnonWelcomeSection';
+import { WelcomeSection } from './sections/WelcomeSection';
 import { IkarosEventsSection } from './sections/IkarosEventsSection';
 import { PlatformNewsSection } from './sections/PlatformNewsSection';
 import s from './DashboardPage.module.css';
@@ -46,7 +46,7 @@ export default function DashboardPage() {
 
   return (
     <div className={s.page}>
-      <AnonWelcomeSection />
+      <WelcomeSection />
       <div className={s.twoCol}>
         {isAuthenticated && <IkarosEventsSection />}
         <PlatformNewsSection />

@@ -44,7 +44,7 @@ const FAQ: FaqItem[] = [
     q: 'Co najdu na úvodní stránce po přihlášení?',
     a: (
       <>
-        <p>Úvodní stránka <Link to="/">/</Link> je tvůj rozcestník — Moje světy, nejbližší Akce napříč světy a platformové Novinky.</p>
+        <p>Úvodní stránka <Link to="/">/</Link> ukazuje uvítací kartu, nejbližší platformové <strong>Akce</strong> (po přihlášení) a poslední <strong>Novinky</strong>. <strong>Moje světy</strong> a herní akce napříč světy nenajdeš tady, ale ve svém <Link to="/ikaros/profil">profilu</Link> a v pravém panelu.</p>
       </>
     ),
   },

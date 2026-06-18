@@ -1,0 +1,224 @@
+# 14 — Mapy & nástroje hry
+
+Hloubková, kódem ověřená inventura. Pokrývá tři různé „mapy", zvukovou databázi a deník PJ.
+
+> **Role:** Globální `Superadmin`/`Admin` (číselně 1/2, „≤ Admin" = bypass všeho). Světové (vzestupně) `Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ`. „PJ práva" v této kapitole = `>= PomocnyPJ` (asistent řídí mapu/zvuky stejně jako PJ), pokud není uvedeno jinak. `Admin`/`Sa` mají všude bypass.
+
+> **Tři mapy — vyjasnění** (router `src/app/router.tsx:244-246`):
+> | Route | FE komponenta | Co to je | BE modul |
+> |---|---|---|---|
+> | `/svet/:slug/mapa` | `MapPage` → `UniverseMapView` | **Vesmírná mapa** = 3D/force-graph uzlů a vazeb (planety, lokace), NE bojiště | `modules/universe` |
+> | `/svet/:slug/mapy` | `WorldMapsPage` (`features/world/maps`) | **Obrázkový atlas** = galerie statických map ve složkách | `modules/world-maps` |
+> | `/svet/:slug/takticka-mapa` | `TacticalMapPage` → `TacticalMapView` | **Taktická bojová mapa** = PixiJS plátno s tokeny, mlhou, bojem | `modules/maps` |
+>
+> Modul `modules/dungeon-maps` je **Dungeon Builder** (samostatný nástroj, patří do kap. 08) — generuje obrázek + config a umí ho exportovat jako scénu/šablonu do taktické mapy (`exportScene`/`exportTemplate`).
+
+Všechny tři routy jsou `memberOnly` — vyžadují členství (Čtenář+). Nečlen je přesměrován.
+
+---
+
+## 14.1 — Obrázkový atlas „Mapy" (`/mapy`)
+
+### Atlas map se složkami
+- **Co to je:** Statická galerie obrázkových map světa, organizovaná do vnořeného stromu složek (13.4/13.4b). Není interaktivní — slouží k prohlížení (lightbox).
+- **Kde:** FE `src/features/world/maps/WorldMapsPage.tsx`. BE `modules/world-maps`.
+- **Kdo:**
+  - Čtení: každý člen, ale s **leak-safe visibility filtrem** (viz níže).
+  - Správa (přidat/upravit/smazat mapu i složku, řadit): **PJ** světa (`canManage` = `>= WorldRole.PJ`, NE PomocnyPJ!) nebo global Admin+. FE gate `isPJ` zobrazí tlačítka „Upravit / Složka / Mapa". BE `WorldMapsService.assertCanManage` (`world-maps.service.ts:50`).
+- **Co jde dělat (vše):**
+  - PJ: vytvořit mapu (titulek, popis, `imageUrl`, viditelnost), upravit, smazat, přeřadit (`reorder`).
+  - PJ: vytvořit/upravit/smazat/přeřadit složku; vnořovat (parentId), ochrana proti cyklu (`updateFolder` `world-maps.service.ts:238`).
+  - Smazání složky **nemaže obsah** — mapy a podsložky se přesunou o úroveň výš (`removeFolder` → `reparentChildren`+`reparentMaps`, `:284`).
+  - Navigace přes breadcrumb („Atlas" → složka → podsložka).
+  - Hledání napříč celým atlasem (ploché, ignoruje strom; podle titulku + popisu).
+  - Prohlížení mapy v `ImageLightbox` (klik na kartu).
+- **Viditelnost (leak-safe):** Každá mapa i složka má `isPublic` + `visibleToPlayerIds`. Hráč vidí mapu, jen když je viditelná **a zároveň** je viditelná **celá cesta složek k rootu** (kaskáda, memoizovaná `visibleFolderIds` `world-maps.service.ts:68`). Hráčská odpověď má `visibleToPlayerIds` vyprázdněné (`:116`) — hráč nezjistí, komu je co viditelné. PJ/Admin dostane vše.
+- **Zvláštnosti:** Orphan blob cleanup — při změně/smazání `imageUrl` se emituje `media.orphaned` (`:169`,`:186`, audit UM-03/UM-05).
+- **Hranice / co NEumí:** Žádné anotace, kreslení, pinning ani propojení s taktickou mapou. Mapy jsou jen obrázky. Nelze hromadný upload. Žádná real-time aktualizace (TanStack Query, ne WS).
+- **Stav:** ✅ hotové.
+- **Kód:** FE `maps/WorldMapsPage.tsx`, `maps/types.ts`, `maps/api/*`, `maps/components/{MapCard,FolderCard,MapEditorModal,FolderEditorModal,MapVisibilityField}.tsx`. BE `world-maps/world-maps.controller.ts`, `world-maps.service.ts`.
+
+---
+
+## 14.2 — Vesmírná mapa „Mapa" (`/mapa`)
+
+### Universe — graf uzlů a vazeb
+- **Co to je:** Interaktivní graf vesmíru světa (10.1) — uzly (planety, soustavy, lokace) + vazby mezi nimi, renderovaný jako force-directed graf (`UniverseGraph`, knihovna `react-force-graph`). Toto je „mapa" v menu světa; **není to bojová mapa**.
+- **Kde:** FE `pages/MapPage.tsx` (1řádkový wrapper) → `features/world/universe/UniverseMapView.tsx`. BE `modules/universe`.
+- **Kdo:** Čtení člen (s visibility filtrem uzlů). Editace `isPJ` (edit mód s draftem).
+- **Co jde dělat:**
+  - Prohlížet graf, vyhledávat uzel (`UniverseSearch`), kliknout → `flyToNode` (kamera) + detail (`UniverseDetail`).
+  - PJ edit mód: snapshot serveru do draftu, přidat/upravit uzel (`NodeEditorForm`) a vazbu (`LinkEditorForm`), nastavit viditelnost uzlu (`updateNodeVisibility`), uložit (sanitizace kvůli mutaci force-graphem — jinak 413).
+  - Real-time: `useUniverseSocket` → signál `universe:updated {worldId}` bez dat (leak-safe), klient refetchuje filtrovaný GET; v edit módu má draft přednost (`staleFromRemote` indikace).
+- **Hranice / co NEumí:** Není to taktická vrstva — žádné tokeny, boj, mlha. Souřadnice uzlů řídí force layout, ne přesné umístění. Edit je draft-based (concurrent edit = poslední uložení vyhrává, jen indikace „stale").
+- **Stav:** ✅ funkční (10.1).
+- **Kód:** FE `universe/UniverseMapView.tsx`, `universe/components/*`, `universe/hooks/useUniverseSocket.ts`. BE `modules/universe/*`.
+
+> **Nejistota:** Tato kapitola se soustředí na herní nástroje; Universe je tu zahrnuta jen kvůli vyjasnění tří map. Detail Universe patří spíš do samostatné kapitoly.
+
+---
+
+## 14.3 — Taktická bojová mapa (`/takticka-mapa`)
+
+Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-time přes Socket.IO operation model, per-system layout.
+
+### Architektura render (PIXI)
+- **Co to je:** `<Application>` (PixiJS v8) s 6 vrstvami v pevném z-orderu: `background → grid → effects → tokens → fog → pings`. Wrapper div drží pointer/drag/drop/wheel handlery.
+- **Zvláštnost PIXI:** `@pixi/react` v8 vyžaduje `extend({Container,Graphics,Sprite,Text})`. Init je **async** — `<Application>` se mountuje **až když jsou rozměry I scéna ready** (`width>0 && height>0 && scene`, `TacticalMapView.tsx:1202`), jinak prázdné plátno bez chyby. Fullscreen vyžaduje imperativní `renderer.resize` (`:323`) + auto-fit (`:350`).
+- **Kód:** `TacticalMapView.tsx` (~1700 řádků), `hexUtils.ts`, `components/{HexGrid,MapBackground}.tsx`.
+
+### Mřížka a viewport
+- Hexová mřížka (`HexGrid`) + pan/zoom (`useViewportPanZoom`, per-scéna persistence pozice v LS), zoom controls + fullscreen. `screenToHex`/`screenToMap` převody. Lem hexů jen kolem mapy (mapBounds z `MapBackground.onLoad`).
+- Souřadnice = axiální hex (`{q,r}`). Config: `{size, originX, originY, showGrid}`.
+
+### Tokeny (PC / NPC / Bestie)
+- **Co to je:** Tři typy tokenů — hráčská postava (PC), NPC postava (Character `isNpc`), a Bestie (z bestiáře). Rozlišení 3-tier (memory `npc_vs_bestie`).
+- **Spawn (PJ):** drag&drop z palety na plátno **NEBO** placement mode (klik v paletě → klik na hex). Spawn jde **přesně tam, kam míří kurzor** (`spawnTokenAt` `:732`); pokud je hex obsazený, spirálový BFS od cíleného hexu (`findFirstFreeHex`), NE do (0,0). Bestie = multi-spawn (5 banditů po sobě). Op `token.add`.
+- **Pohyb:**
+  - PJ kohokoli, hráč jen vlastní token (`useTokenPermissions` / BE `token.characterId === user.id`).
+  - Dvě cesty: drag tokenu (`useTokenDrag`) nebo click-to-place (vybrat token → klik na prázdný hex = move). Op `token.move`, optimistic + rollback + toast.
+  - **„A* pohyb":** `movement` stat určuje jen **dosah** pohybu (range), `schemas/types.ts:59`. **Není to pathfinding přes překážky** — bariéry pohyb fyzicky neblokují, jen vizuál. (Viz Nesrovnalosti.)
+- **Lock:** per-token `isLocked` (PJ toggle v panelu) → hráč tokenem nepohne, ani needituje HP (BE `operations-authorizer.ts:136`, N-29). Nezávislé na zámku scény.
+- **Smazání:** PJ kohokoli, hráč vlastní; optimistic remove + rollback (C-24). „Odstranit z mapy" — postava v DB zůstává.
+- **Obrázek:** PC/NPC z `characterData.imageUrl`; Bestie nemá characterData → dotahuje se z bestiar cache přes `templateId` (snapshot), fresh resolve každý render (`resolveTokenImage` `:719`).
+- **Kód:** `components/tokens/{TokenLayer,TokenHpBar,TokenDiaryTab,TokenNotesTab}.tsx`, `hooks/{useTokenDrag,useTokenUpdate,useTokenPermissions}.ts`, `utils/buildSpawnToken.ts`.
+
+### Token modal / panel (3 varianty × view módy)
+- **Panel:** `TokenInfoPanel` — boční panel se 3 zobrazovacími módy: `dock` (ukotvený vpravo, resize), `drag` (volně přesouvatelný), `overlay` (vystředěný, force na mobilu). Otevírá se přes „i" badge tokenu (`openedTokenId`); nezávislé na výběru (`selectedTokenId`).
+- **Obsah (3 varianty dle typu tokenu):** `TokenSystemSheet` přepíná layout dle `world.system` (per-system bojové panely: `CocCombatPanel`, `DndCombatPanel`, `Drd2CombatPanel`, `FateCombatPanel`, `GurpsCombatPanel`, `MatrixCombatPanel`). Bestie má `BestiePanelView`. Deník/poznámky se **embedují** (reuse `TokenDiaryTab`/`TokenNotesTab`, ne kopie).
+- **View módy přístupu:** PJ vidí/edituje vše; vlastník PC vidí/edituje svůj; ostatní limited. Akce v hlavičce (PJ): „V boji / Mimo boj" (jen NPC/bestie — PC jsou v boji vždy), „Zamknout/Odemknout", „Odstranit z mapy".
+- **Body osudu** badge jen pro systém `matrix`.
+- **Kód:** `components/token-panel/{TokenInfoPanel,TokenSystemSheet,BestiePanelView}.tsx`, `system-panels/*`.
+
+### HP (per-system, visibility toggle)
+- **Co to je:** HP bar pod tokenem (PixiJS). Architektura per-typ: Bestie = snapshot ze `systemStats`; PC/NPC = z deníkového subdokumentu (`customData` per-system klíč) přes enrich (memory `token_hp_architecture`).
+- HP bar render-only (`TokenHpBar`), resolve current/max + tier barva řeší volající; per-scéna visibility toggle.
+- Hráč smí editovat jen `currentHp`, `injury`, `initiative` vlastního (a neodemčeného) tokenu (BE whitelist `operations-authorizer.ts:145`).
+- **Kód:** `components/tokens/TokenHpBar.tsx`, `utils/hpTier.ts`.
+
+### Fog of war (hybrid)
+- **Co to je:** Mlha války. `fogEnabled` master přepínač (PJ). `revealedHexes` = odhalené hexy. Efektivně odhalené = `revealedHexes ∪ hexy PC tokenů` (`effectivelyRevealed`, hybrid — PC vždy vidí kolem sebe).
+- **Ovládání (PJ):** paleta „🌫️ Mlha" — zapnout/vypnout, reveal/fog brush (velikost štětce), reset (zahalit vše). Op `fog.set` (BE `$set`), `fog.brush` (BE `$addToSet`/`$pullAll` `:692`).
+- NPC token skrytý mlhou pro hráče (`isTokenHiddenByFog`). PJ vidí vše.
+- **Kód:** `components/fog/{FogLayer,FogPalette,fogUtils}.tsx`, `hooks/useFogTool.ts`.
+
+### Efekty
+- PJ paleta „🎨 Efekty": barva hexu (`color`), exploze (kruhové prstence, varianty), bariéra (kruh / brush tah). Mazání souřadnicové (klik na hex smaže efekty, které ho pokrývají — deterministické, ne Pixi hit-test). „Smazat vše". Optimistic + rollback. Op `effect.add/update/remove`, `scene.effects.replace`.
+- Bariéra má `barrierDC` (info), pohyb **fyzicky neblokuje**.
+- **Kód:** `components/effects/*`, `hooks/useEffectTool.ts`.
+
+### Combat tracker + iniciativa (live sort)
+- **Co to je:** Iniciativní lišta (horní full-width) + bojové kolo. Op `combat.start/turn/end/reorder`, `combat.effect.add/remove`.
+- **Live sort:** lišta řadí **živě podle `initiative`** tokenů, NE podle uloženého `combat.order` snapshotu (memory `iniciativa_live_sort`; `combat.turn` bere `tokenId` z FE, BE ověří jen existenci na scéně `:988`). PC jsou v boji vždy; NPC/bestie přes „V boji/Mimo boj" toggle.
+- Klik na bojovníka v liště = pan-to-token + select; PJ navíc spotlight (ephemeral ring, broadcast).
+- `combat.round` override z FE, end-of-turn efekty per token.
+- **Kód:** `components/initiative/{InitiativeBar,InitiativeControls,InitiativeInput}.tsx`, `hooks/useCombat.ts`, BE `map-operations.service.ts:933-1096`.
+
+### Operation model + undo + real-time
+- **Co to je:** Veškeré změny scény jdou přes `POST /maps/:id/operations` (op typovaný). Server: validace → load snapshot → autorizace → výpočet inverse → atomic Mongo update → alokace `seqNumber` (`$inc`) → append do logu → WS broadcast `map:operation`.
+- **Undo:** každá op počítá **inverse** ze snapshotu (`computeInverse` `:176`). Některé op undo nemají (`scene.deactivate`, bulk assign → inverse `null`, MVP limitace).
+- **Catch-up:** `GET /maps/:id/operations?since=seq` (cap 1000). Po WS reconnectu forced catch-up (`onReconnect` `useMapScene.ts:192`); když gap moc velký → full refetch.
+- **WS:** `MapsGateway` (`maps.gateway.ts`). JWT v handshake (`handleConnection`). Roomy: `map:join` (scéna, member-gated), `map:join-world`/`world-ops:{id}` (PJ orchestrátor, **PJ-only** room s pomlčkou aby tam neprosákl běžný člen), `user:{id}` (private `map:reassigned`). Eventy: `map:operation`, `world:operation`, `map:reassigned`, `map:ping`/`map:pinged`, `map:spotlight`. Legacy relay handlery odstraněny (W-5).
+- **Kód:** BE `maps/maps.controller.ts`, `operations/{map-operations,world-operations,operations-authorizer,operation-payload-validator}.service.ts`. FE `hooks/{useMapScene,useMapSocket}.ts`, `api/{mapApi,worldOpsApi}.ts`, `utils/{applyOperationToScene,catchUpScene}.ts`.
+
+### Per-player scene assignment (currentSceneId)
+- **Co to je:** Více scén může běžet paralelně. Každý hráč má `WorldMembership.currentSceneId` — vidí jen svou scénu (`GET /maps/active`). PJ orchestrátor přiřazuje hráče na scény.
+- **Operace (cross-scene, PJ):** `member.assignToScene`, `member.unassign`, `member.bulkAssignToScene`. Při přesunu **cascade `token.remove`** z původní scény (token auto-mizí, memory `takticka_mapa_assignment`). Deaktivace scény cascade unassign všech přiřazených.
+- Hráč smí jen self-`member.unassign` (graceful leave). Změnu dostane private `map:reassigned` → autoload nové scény (`useReassignmentListener`).
+- **Read gate:** hráč GETne jen scénu s `currentSceneId === scene.id`, jinak 403 `MAP_FORBIDDEN_OTHER_SCENE` (anti-enumerace). PJ vidí vše, orchestrátor read `?isActive=true` je PomocnyPJ+ (R-11 — dřív anonymní dump).
+- **Kód:** BE `operations/world-operations.service.ts`, `operations-authorizer.ts:242`. FE `components/pj-panel/{MapPjPanel,ActiveScenesList,AccessBoard}.tsx`, `hooks/{useActiveScenes,useReassignmentListener}.ts`.
+
+### Knihovna map (per-PJ, cross-world)
+- **Co to je:** Šablony scén — znovupoužitelné mapy. **Per-PJ privátní** (`ownerId` server-enforced), **cross-world** (template nemá worldId, lze aplikovat v jiném světě). Full snapshot **kromě PC tokenů** (server-side `filterOutPcTokens` — jinak by leakl cizí `characterId`).
+- PJ uloží aktuální scénu jako šablonu, načte šablonu na scénu (sekvence ops: image+config+fog+effects+npc...). Admin+ vidí všechny.
+- **Kód:** FE `components/pj-panel/MapLibraryModal.tsx`. BE `maps/map-templates.controller.ts`, `repositories/map-templates.repository.ts`.
+
+### Počasí na mapě
+- **Co to je:** Vizuální atmosféra počasí (déšť/sníh...) jako DOM overlay nad plátnem + panel v rohu. PJ nastaví/vypne, hráč jen vidí + toggle FX lokálně.
+- **Zvláštnost:** mapa dostává world-level event `weather:updated` přes **neutrální room** (`world:{id}` z `weather.updated` `OnEvent`, `maps.gateway.ts:238`), ne PJ-only room (memory `map_world_room_join`) — leak-safe.
+- **Kód:** FE `components/weather/{MapWeatherPanel,MapWeatherAtmosphere}.tsx`, `hooks/useMapWeather.ts`. BE `world-weather` + gateway.
+
+### Kostky na mapě
+- 3D dice overlay (sdílí jádro s chatem), log hodů (cap 50, persist v `scene.diceRolls`). Op `dice.roll` — BE kontroluje spoofing (`byUserId === user.id`) a házení za cizí token (`operations-authorizer.ts:160`). Viditelnost hodů dle `world.diceVisibility` + `canSeeRoll`.
+- **Kód:** `components/dice/{DiceLogPanel,DiceRollButton}.tsx`, `hooks/useMapDiceRoll.ts`, `utils/diceVisibility.ts`.
+
+### Ambient zvuky na mapě
+- PJ vysílá playlist (op `sound.playlist` / `scene.sounds.set`) → hráči slyší (`SceneSoundPlayer`). Čerpá ze zvukové databáze (14.4).
+- **Kód:** `components/sound/{AmbientSoundPanel,SceneSoundPlayer}.tsx`.
+
+### Pingy a spotlight
+- Double-tap kdekoli na ploše = ping (PJ i hráč), broadcast `map:ping`→`map:pinged`. Pointer-based (ne onDoubleClick — nespolehlivý na dotyku). Herní identita: PJ = „PJ", jinak jméno postavy (nikdy účet).
+- Spotlight = PJ „ukazováček" z iniciativní lišty (ephemeral ring, auto-clear 3 s), PJ-only broadcast.
+- **Kód:** `components/pings/PingsLayer.tsx`, `utils/doubleTap.ts`.
+
+### Multi-system layout
+- `world.system` (drd2 default) přepíná layout VŠEM: per-system bojové panely, deníkové sheety, schémata tokenů (`schemas/{coc,dnd5e,drd2,fate,generic,gurps,matrix}`). Změna systému přepne layout všem (memory `takticka_mapa_multi_system`). systemStats validovány proti per-system schématu (soft mode — chybí schema → skip).
+
+### Skrytí / zámek scény
+- `isHidden` (hráč vidí overlay „Scéna není připravena"), `isLocked` (hráč nemůže hýbat). Per-scéna default + **per-hráč override** (`playerStates`, op `scene.playerState`, 10.2n). PJ vidí scénu vždy. BE autoritativní (`effLocked` `:93`).
+
+### Hranice taktické mapy / co NEumí
+- **Žádný skutečný pathfinding** — bariéry/efekty pohyb fyzicky neblokují, `movement` je jen dosah (range). „A*" v kódu = dosahový výpočet, ne hledání cesty kolem překážek.
+- **Sprite atlas** — token obrázky se resolvují jednotlivě (texture cache `useTokenTexture`), není zmíněn jeden bundled atlas; viz princip 10.2 vs. realita.
+- Undo nepokrývá vše (`scene.deactivate`, bulk assign nemají inverse — MVP).
+- Combat `order` snapshot je v DB, ale lišta ho ignoruje (live sort) — potenciální dvojí zdroj pravdy.
+- Token sync token→Character (HP do DB postavy) je odložen (soft mode, TODO `map-operations.service.ts:630`) — HP změny tokenu se zatím nepropisují do listu postavy automaticky.
+- `seqNumber` může mít gap, když apply uspěje ale alokace selže (akceptováno).
+- **Stav:** ✅ rozsáhle funkční (fáze 10.2a–n), s vědomými MVP limitacemi výše.
+
+---
+
+## 14.4 — Zvuková databáze „Zvuky" (`/zvuky`)
+
+### Zvuky (YouTube-based ambient/SFX)
+- **Co to je:** Databáze zvukových stop (13.3). Zvuky jsou **odkazy na YouTube** (`youtubeUrl`), ne nahrávané soubory. Bohatá metadata (typ média, prostředí, emoční tón, intenzita, loop, tech/magic level...). Slouží jako zdroj pro ambient na taktické mapě.
+- **Kde:** FE `features/world/sounds/SoundsPage.tsx` (route přes `pages/SoundsPage.tsx` re-export). BE `modules/sounds`.
+- **Kdo (ovládání):**
+  - Náhled/přehrání: každý člen (lokální YT přehrávač, hlasitost dle user nastavení).
+  - Create/edit/delete/nominate/import do světa: **PJ práva** (`>= PomocnyPJ`, FE `isPjInWorld`, BE `assertCanManageWorld` `sounds.service.ts:25`).
+  - Schválit/zamítnout nominaci do globálu: **jen Admin+** (`assertIsAdmin`, tab „Nominace").
+- **Co jde dělat:**
+  - Taby „Svět" / „Globální" (+ „Nominace" pro Admin). Filtry (`SoundFiltersBar`).
+  - Svět: CRUD vlastních zvuků světa.
+  - Globální katalog: import schváleného globálního zvuku do svého světa (`importToWorld`).
+  - Nominace: PJ navrhne svůj světový zvuk do globálu (`nominateToGlobal`, dedup kontrola); Admin schválí/zamítne (`approveNomination`/`rejectNomination`).
+  - Globální zvuky přímo (`createGlobalSound`) — Admin.
+- **Hranice / co NEumí:** Není upload audio souborů (jen YT odkazy). Náhled se nepřenáší na ostatní (lokální). Skutečné vysílání hráčům je až přes ambient panel taktické mapy (14.3), ne z této stránky.
+- **Stav:** ✅ hotové.
+- **Kód:** FE `sounds/SoundsPage.tsx`, `sounds/components/*`, `sounds/player/*`, `sounds/hooks/*`. BE `sounds/sounds.controller.ts`, `world-sounds.controller.ts`, `sounds.service.ts`.
+
+---
+
+## 14.5 — Deník PJ (`/denik-pj`)
+
+### Deník PJ (world-level, per-PJ)
+- **Co to je:** Poznámkový blok pro vedení světa — world-level, **per-PJ** (každý PJ má vlastní obsah pro daný svět). Sdílí notebook jádro s hráčovým `CharacterNotes` (na mapě se zobrazí to či ono dle role).
+- **Kde:** FE `pages/WorldGmDiaryPage/WorldGmDiaryPage.tsx` (route `/denik-pj`) **a zároveň** uvnitř taktické mapy jako „Deník" tlačítko. BE `modules/world-gm-notes` (`worlds/:worldId/gm-notes`).
+- **Kdo:** **PJ práva** (`>= PomocnyPJ`) nebo Admin+. Route guard `WorldMembershipGuard minWorldRole=PomocnyPJ` (router `:282`). BE `assertPj` → hráč 403 `INSUFFICIENT_WORLD_ROLE` (`world-gm-notes.service.ts:40`).
+- **Co jde dělat:** Číst a editovat vlastní PJ poznámky pro svět (`GET`/`PATCH`, `findOrCreate` při prvním otevření). Přístup z menu i přímo z taktické mapy (overlay `MapNotebookOverlay`).
+- **Vztah k hráči:** Hráč nemá deník PJ; na mapě má místo něj tlačítko „Poznámky" → poznámky **jeho jediné postavy** (`CharacterNotes`), které se propisují do tabu Poznámky na stránce postavy (`TacticalMapView.tsx:445-460`). Hráč bez postavy → tlačítko skryto (memory `gm_diary_architecture`).
+- **Hranice / co NEumí:** Per-PJ izolace — PJ nevidí poznámky jiného PJ. Není sdílení/kolaborace na jednom deníku. Není verzování.
+- **Stav:** ✅ hotové (10.2j/10.2l).
+- **Kód:** FE `pages/WorldGmDiaryPage/*`, `tactical-map/components/notebook/{MapNotebookButton,MapNotebookOverlay}.tsx`, `tactical-map/api/useGmNotes.ts`. BE `world-gm-notes/world-gm-notes.{controller,service}.ts`.
+
+---
+
+## ⚠️ Nesrovnalosti & dluhy (k ověření)
+
+1. 🚧 ČÁSTEČNĚ 2026-06-18 (spec/doc opraven; pathfinding zbývá = D-NEW-INV-MAPS) — **„A* pohyb" = jen dosah, ne pathfinding.** Princip 10.2 sliboval A* hledání cesty; v kódu `movement` stat určuje pouze range (`schemas/types.ts:59`) a bariéry pohyb fyzicky neblokují. Buď doplnit skutečné pathfinding, nebo upravit dokumentaci/spec (nelhat o feature).
+
+2. **Dvě role-úrovně správy map.** Atlas „Mapy" (`world-maps`) vyžaduje k editaci **plné PJ** (`>= WorldRole.PJ`, `world-maps.service.ts:47`), ale taktická mapa, zvuky, deník PJ a dungeon (kromě dungeon = PJ) běží na `>= PomocnyPJ`. PomocnyPJ tedy řídí bojiště, ale **nemůže** spravovat obrázkový atlas. Ověřit, zda je to záměr — působí nekonzistentně.
+
+3. **Dungeon-maps čtení = PJ-only, write = PJ-only**, ale taktická mapa write = PomocnyPJ. `DungeonMapsService.assertCanManage` je `>= WorldRole.PJ` (R-12). Nejednotné s ostatními herními nástroji.
+
+4. **Combat order dvojí zdroj pravdy.** `scene.combat.order` se ukládá, ale iniciativní lišta ho ignoruje (live sort dle `initiative`). Snapshot může zastarat (test `useCombat.test.tsx:78` „zastaralý snapshot — ignoruje se"). Riziko zmatení při undo `combat.reorder`.
+
+5. **Token HP → Character sync odložen.** `map-operations.service.ts:617-634` má TODO: HP/systemStats změny tokenu se nepropisují do `Character` (soft mode). Hráč musí list postavy obnovit ručně; po smazání tokenu se změny ztratí.
+
+6. **Undo neúplné.** `scene.deactivate` a `member.bulkAssignToScene` mají `inverse = null` (MVP). PJ musí undo dělat ručně po krocích — uživatelská past.
+
+7. **Sprite atlas neověřen.** Princip 10.2 zmiňuje sprite atlas; v kódu jen per-token texture cache (`useTokenTexture`). Ověřit, zda jde o dluh nebo o splněný princip jinou cestou.
+
+8. **`seqNumber` gap.** Vědomě akceptovaný: apply uspěje, alokace seq selže → díra v sekvenci (`map-operations.service.ts:128`). Catch-up to obchází (cap), ale stojí za poznámku pro budoucí audit konzistence logu.
+
+9. ✅ OPRAVENO 2026-06-18 (label „Mapy" → „Atlas map") — **Vesmírná mapa „Mapa" vs. atlas „Mapy"** — názvy se liší jen koncovkou „a/y", což je v menu matoucí pro uživatele. Zvážit přejmenování pro budoucího průvodce (např. „Vesmír" vs. „Atlas map").

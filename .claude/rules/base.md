@@ -7,3 +7,4 @@ Když najdeš chybu, dluh, riziko nebo nesrovnalost, kterou hned neopravuješ, p
 Před jakoukoli implementací komponenty nebo featury bezpodmínečně aktivuj skill `spec-driven-development`.
 při úpravě grafického designu před napsáním spec plánu použij skill `frontend-design`.
 Po dokončení implementace nové stránky, role/oprávnění nebo změně funkčnosti spusť skill `napoveda` — aktualizuje stránku Nápověda (`/ikaros/napoveda`) tak, aby zůstala v souladu se stavem platformy.
+Při každé změně funkčnosti (nová stránka/route, stub→funkční, změna chování, změna role/oprávnění, nová BE schopnost, vyřešený/nový dluh) spusť skill `funkce` — udržuje kódem ověřenou inventuru `docs/funkce/` v souladu s realitou kódu, aby zůstalo mapování celé platformy aktuální. `funkce` je hluboký zdroj pravdy, `napoveda` je jeho mělký hráčský výtah — měň oba.

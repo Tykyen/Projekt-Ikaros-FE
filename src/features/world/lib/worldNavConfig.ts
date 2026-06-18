@@ -56,7 +56,7 @@ export const HIDEABLE_NAV_ITEMS: readonly HideableNavItem[] = [
   },
   {
     id: 'mapy',
-    label: 'Mapy',
+    label: 'Atlas map',
     group: 'svet',
     hint: 'Atlas obrázkových map s per-mapa viditelností (13.4).',
   },
@@ -195,7 +195,7 @@ export function buildWorldNav(
           ? [{ id: 'timeline', label: 'Časová osa', to: `${b}/timeline` }]
           : []),
         { id: 'mapa', label: 'Mapa vesmíru', to: `${b}/mapa` },
-        { id: 'mapy', label: 'Mapy', to: `${b}/mapy` },
+        { id: 'mapy', label: 'Atlas map', to: `${b}/mapy` },
         { id: 'pavucina', label: 'Pavučina', to: `${b}/pavucina` },
         { id: 'obchod', label: 'Obchod', to: `${b}/obchod` },
       ],

@@ -5,6 +5,7 @@
 **Stav:** návrh k diskuzi (nic z Etapy II nezačato)
 **Vznik:** 2026-06-14, odvozeno z *Hloubkové strategické analýzy* (PDF v `~/Downloads/Ikaros-hloubkova-analyza.pdf` + `Ikaros-analyza-vylepseni.pdf`)
 **Revize:** 2026-06-15 — sladěno s master-planem *Návrh budoucích změn* (6 horizontů H0–H5, ~50 karet). Doplněny mezery (SEO, export, homepage, prázdné stavy, streamer overlay, docking), opravena nesrovnalost Dungeon Builderu, přidána křížová tabulka H0–H5 ↔ fáze, rozpad systémů (16.2) per systém a, b, c…, appendixy KPI a Vizuální design systém.
+**Revize:** 2026-06-18 — doplněn **Průřez Ú (Úklid dluhů & nesrovnalostí)** z kódem ověřené inventury funkcí [`docs/funkce/`](funkce/00-prehled.md); cíl Etapy II = 0 otevřených nesrovnalostí v inventuře. 9 nových seskupených dluhů D-NEW-INV-* v `docs/dluhy.md`.
 **Navazuje na:** `docs/roadmap-fe.md` (Etapa I, fáze 0–13 — jádro platformy)
 **Repo:** FE `Projekt-ikaros-FE` · BE `Projekt-ikaros`
 
@@ -136,6 +137,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **BE:** serializace stromu světa + balíček médií; export job (stream, ať nezatíží server).
 **FE:** tlačítko v nastavení světa + indikátor průběhu + download.
 **Otevřené otázky:** Co všechno do exportu (jen lore, nebo i chat/mapy/kampaně)? Kdo smí exportovat (PJ vs. členové)? Import zpět (obnova z exportu) teď, nebo později?
+> 🔗 Kryje i **D-NEW-INV-ADMIN-UI** (Průřez Ú): GDPR `GET /data-export/me` je dnes BE-only bez FE konzumenta — sem patří uživatelské stažení vlastních dat.
 
 ### - [ ] 14.8 Odstřižení od starého webu (SMTP + embedding model) — [H0-08 · dopad střední · náklad střední] 🔁 *(přesun z 19.3)*
 **Cíl:** Žádná závislost na umírajícím `patrikzplzne.cz` — přesun embedding modelu vyhledávání na vlastní hosting, maily přes vlastní SMTP do produkce, ověřit web push na reálném telefonu (iPhone PWA na plochu).
@@ -514,6 +516,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Cíl:** Stránka zásad ochrany údajů + ohledy pro nezletilé hráče.
 **Proč:** V ČR/EU platí GDPR; máme self-delete s anonymizací a data-export modul — doplnit transparentnost a souhlas. Dluh **D-010** (GDPR souhlas).
 **Otevřené otázky:** Věková hranice/souhlas rodičů? Co vše zveřejnit v zásadách?
+> 🔗 **Podmínky užití:** pracovní **verze 1.0** vydaná 2026-06-18 (FE `TermsPage`, BE `TERMS_VERSION='1.0'`). Zbývá **finální právní revize (advokát)** po beta — to je tady. Před veřejným nasazením blokující.
 
 ### - [ ] 20.3 Obsah & autorská práva (upload, AI art) — [Příloha C]
 **Cíl:** Pravidla pro nahraný obsah (cizí autorská práva) a označování AI obsahu.
@@ -560,6 +563,28 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Cíl:** Schvalování, hodnocení a atribuce sdíleného obsahu (items/bestie/mapy/generátorové tabulky).
 **Proč:** Komunitní obsah potřebuje kvalitu a moderaci; 🔁 schvalovací toky, co už máme (články/galerie), + role správců.
 **Otevřené otázky:** Pre-moderace (schválit před zveřejněním) vs. post (nahlásit)? Kdo kurátoruje (noví správci)?
+
+---
+
+## Průřez Ú — Úklid dluhů & nesrovnalostí z inventury funkcí (docs/funkce)
+
+> **Vznik:** 2026-06-18, z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md) (16 kapitol, snímek k 2026-06-18). Každá kapitola má sekci „⚠️ Nesrovnalosti & dluhy".
+> **Cíl Etapy II:** na konci Etapy II = **0 otevřených** „⚠️ Nesrovnalostí" v `docs/funkce/`. Skill `funkce` drží inventuru živou; tahle tabulka drží úklid.
+> **Dva koše:** **(1) rychlé fixy** — chybný text v nápovědě / komentáři / labelu („máme to lepší") — se řeší **mimo roadmapu** jako průběžný úklid (soupis vede Claude, dohodnuto 2026-06-18). **(2) reálná práce** níže, namapovaná na fáze + dluhy v `docs/dluhy.md`.
+
+| Téma | Co dotáhnout (reálná práce) | Fáze | Dluh |
+|---|---|---|---|
+| **Bezpečnost účtu/světa** | Sjednotit min. délku hesla (registrace 6 → 8); ověřit/zavřít nechráněný `GET /users/profile/:id` (možný leak — bez friend-only/tombstone gate); sanitizovat `themeUserOverrides` v `updateMyTheme`; doplnit role-floor na `POST /campaign/scenarios` (storyboard tvoří i hráč); ověřit únik reálného jména přes render-time PJ persona v push/feed/exportu | 14 | D-NEW-INV-SEC |
+| **Push & notifikace** | `url` do push payloadu (deep-link novinky + chat — SW připraven, payload prázdný); throttle/opt-out + vyloučit odesílatele u globálního chatu (dnes push na **každou** zprávu všem); push i pro poštu; per-typ předvolby místo jediného přepínače | 14.8 / 15.1 | D-NEW-INV-PUSH |
+| **Chybějící admin/účet UI** | FE pro existující BE endpointy: reset hesla uživatele, založení uživatele adminem, změna cizího e-mailu; konzument GDPR `GET /data-export/me`; „odhlásit všechna zařízení" (logout-all) | 14.7 / 20.2 | D-NEW-INV-ADMIN-UI |
+| **Profil & uživatelé** | Napojit „Moje diskuze / články / galerie" (dnes stub „dostupné ve fázi 3"); per-role taby `/ikaros/uzivatele` (implementovat, nebo odstranit mrtvý `role` param); validace `displayName` (min/regex); `worldsCount` u karet přátel (dnes 0) | 15.6 / 16.4 | D-NEW-INV-PROFILE |
+| **Stránky & wiki** | Tabulky v `page.content` se ve vieweru zahazují (read layouty bez `enableTable`) → přidat do readonly vieweru, nebo v editoru zakázat / převést na sekce; smazaná seedovaná stránka (`pravidla`/`magicky-system`/`technologie`) → mrtvý odkaz v menu „Informace" (2 nepropojené vrstvy) | 15.5 | D-NEW-INV-WIKI |
+| **Data konzistence** | Staty/HP tokenu PC/NPC se z taktické mapy nepropisují do listiny postavy (TODO v `map-operations`); `updateCurrencies` full-replace → delta merge (riziko ztráty měn); subdoc finance/výbava se zakládají i pro NPC/Lokaci, ale nejdou přečíst (orphan data); odstranit legacy `GET /characters/directory` | 16.2 | D-NEW-INV-DATA-SYNC |
+| **Mapy & nástroje** | Dokončit undo (`scene.deactivate`, `member.bulkAssignToScene` mají `inverse=null`); sjednotit role-prahy (atlas „Mapy" = PJ vs. ostatní nástroje = PomocnyPJ); combat order dvojí zdroj pravdy (`scene.combat.order` vs. live-sort); pozn.: „A* pohyb" reálně jen dosah — buď doplnit pathfinding (velká featura, → 17.x), nebo opravit spec (rychlý fix) | 17.x | D-NEW-INV-MAPS |
+| **Čas & kaskády** | Mazání kalendářového configu nečistí navázané timeline/akce (cascade); soft-delete akcí bez cleanup jobu; in-game datum (modul Počasí) vs. „Dnes" v `/kalendar` z reálného data; `/akce` chybí v hlavní nav liště; odstranit prošlý legacy redirect `/sprava-udalosti` + překlep route `/calenders` | 14.9 | D-NEW-INV-CASCADE |
+| **Úklid kódu** | Vyhodit legacy world role z BE `UserRole` (3–8, FE už nemá); mrtvý flag `canEditPlatformPages`; `Tyky` hardcoded admin bypass (3× service) → role/flag; in-memory paginace `getUsers`; tichý fail MeiliSearche → health/chyba místo prázdna; centralizovat duplikovaný favorites toggle; sync audit-log labelů FE↔BE | 14.9 | D-NEW-INV-CLEANUP |
+
+> **Záměrné chování (NE dluh — jen zdokumentováno v inventuře, neopravuje se):** R-20 (platform Admin „nahlíží", nespravuje cizí svět), `assertMember` práh = Hrac, AKJ vs. page-level bypass PomocnyPJ, finance/výbava 404 pro NPC/Lokaci, soft-mode validace statů bez schématu, názvosloví „kanál/konverzace" a `public`/`open`. Tyhle se jen drží v průvodci jasně vysvětlené.
 
 ---
 
@@ -636,6 +661,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 - *Hloubková strategická analýza* (2026-06-14) — `~/Downloads/Ikaros-hloubkova-analyza.pdf`, `~/Downloads/Ikaros-analyza-vylepseni.pdf` (mapování bodů A1–F3, profily konkurence, trendy, český rozbor).
 - Etapa I — `docs/roadmap-fe.md` (fáze 0–13).
 - Navázané dluhy: PC-01 (captcha), PC-02/PC-21 (starý web), D-011 (captcha provider), D-010 (GDPR), D-028 (Redis throttler), D-NEW-UM10 (storage kvóta), D-031 (granular permissions).
+- Dluhy z inventury funkcí (Průřez Ú): D-NEW-INV-SEC, D-NEW-INV-PUSH, D-NEW-INV-ADMIN-UI, D-NEW-INV-PROFILE, D-NEW-INV-WIKI, D-NEW-INV-DATA-SYNC, D-NEW-INV-MAPS, D-NEW-INV-CASCADE, D-NEW-INV-CLEANUP (zdroj: `docs/funkce/`).
 - Navázané audity: prod-config, log-hygiene, error-contract, nav, ws, cascade-delete, db-integrity (viz `docs/`).
 
 > **Tento dokument je živý návrh.** Po společné diskuzi se upraví priority, rozsah a otevřené otázky se rozhodnou. Teprve pak vzniká per-featura spec a plán.
