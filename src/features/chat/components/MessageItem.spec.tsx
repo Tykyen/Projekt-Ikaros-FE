@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { MessageItem } from './MessageItem';
 import type { ChatMessage } from '../lib/types';
 
@@ -127,5 +128,39 @@ describe('MessageItem', () => {
     );
     expect(screen.queryByLabelText('Odpovědět')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Reakce 👍, 1×')).not.toBeInTheDocument();
+  });
+
+  // 6.2-followup — maska s vazbou na kartu = klikací jméno.
+  it('NPC s overridePageSlug + resolverem má klikací jméno (world chat)', () => {
+    render(
+      <MemoryRouter>
+        <MessageItem
+          {...baseProps}
+          message={makeMsg({
+            overrideName: 'Starý kovář',
+            overridePageSlug: 'stary-kovar',
+          })}
+          resolveOverrideHref={(slug) => `/svet/matrix/postava/${slug}`}
+        />
+      </MemoryRouter>,
+    );
+    const link = screen.getByRole('link', { name: /Starý kovář/ });
+    expect(link).toHaveAttribute('href', '/svet/matrix/postava/stary-kovar');
+  });
+
+  it('NPC bez resolveru má jméno jako prostý text (globální chat)', () => {
+    render(
+      <MessageItem
+        {...baseProps}
+        message={makeMsg({
+          overrideName: 'Starý kovář',
+          overridePageSlug: 'stary-kovar',
+        })}
+      />,
+    );
+    expect(
+      screen.queryByRole('link', { name: /Starý kovář/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Starý kovář')).toBeInTheDocument();
   });
 });

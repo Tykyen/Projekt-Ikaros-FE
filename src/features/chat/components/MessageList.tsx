@@ -43,6 +43,8 @@ interface MessageListProps {
   resolvePjDisplay?: (
     senderId: string,
   ) => { name: string; avatarUrl: string | null } | null;
+  /** 6.2-followup — slug masky → href karty (jen world chat). Viz `MessageItem`. */
+  resolveOverrideHref?: (slug: string) => string;
 }
 
 const isWhisper = (m: ChatMessage) => !!m.visibleTo && m.visibleTo.length > 0;
@@ -72,6 +74,7 @@ export function MessageList({
   resolveFontSize,
   resolveAccountAvatar,
   resolvePjDisplay,
+  resolveOverrideHref,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -230,6 +233,7 @@ export function MessageList({
             resolveAccountAvatar={resolveAccountAvatar}
             resolvePjDisplay={resolvePjDisplay}
             resolveReplyPjName={resolveReplyPjName}
+            resolveOverrideHref={resolveOverrideHref}
           />
         );
       })}

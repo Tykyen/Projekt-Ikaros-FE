@@ -55,6 +55,7 @@ export function useOptimisticSend({
         senderAvatarUrl: user.avatarUrl,
         overrideName: payload.overrideName,
         overrideAvatarUrl: payload.overrideAvatarUrl,
+        overridePageSlug: payload.overridePageSlug,
         content: payload.content ?? null,
         color: payload.color ?? appearance?.chatColor ?? user.chatColor ?? null,
         customFont: payload.customFont ?? appearance?.chatFont ?? null,
@@ -154,6 +155,7 @@ export function useOptimisticSend({
         visibleTo: message.visibleTo,
         overrideName: message.overrideName,
         overrideAvatarUrl: message.overrideAvatarUrl,
+        overridePageSlug: message.overridePageSlug,
         rpDate: message.rpDate,
       };
       void submit(message.clientNonce, payload);

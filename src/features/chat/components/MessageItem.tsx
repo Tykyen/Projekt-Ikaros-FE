@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Trash2,
   Reply,
@@ -90,6 +91,12 @@ interface MessageItemProps {
   ) => { name: string; avatarUrl: string | null } | null;
   /** 6.8 — jméno PJ persony pro citaci odpovědi (`replyToId` → „PJ"). */
   resolveReplyPjName?: (replyToId: string) => string | null;
+  /**
+   * 6.2-followup — maska s vazbou na kartu. Pokud zpráva má `overridePageSlug`
+   * a tento resolver je dodán (jen world chat), jméno NPC je odkaz na kartu.
+   * Globální chat resolver nepředá → jméno zůstává prostý text.
+   */
+  resolveOverrideHref?: (slug: string) => string;
 }
 
 /** Jedna položka výpisu chatu — veřejná zpráva / whisper / smazaná zpráva. */
@@ -120,12 +127,19 @@ export function MessageItem({
   resolveAccountAvatar,
   resolvePjDisplay,
   resolveReplyPjName,
+  resolveOverrideHref,
 }: MessageItemProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const reactionBtnRef = useRef<HTMLButtonElement>(null);
   const isSelf = message.senderId === currentUserId;
   const isWhisper = !!message.visibleTo && message.visibleTo.length > 0;
   const isNpc = !!message.overrideName;
+  // 6.2-followup — maska napojená na kartu → klikací jméno (jen world chat,
+  // kde je `resolveOverrideHref` dodán). Smazaná/přesunutá karta = friendly 404.
+  const overrideHref =
+    isNpc && message.overridePageSlug && resolveOverrideHref
+      ? resolveOverrideHref(message.overridePageSlug)
+      : null;
   const isPending = message._status === 'pending';
   const isFailed = message._status === 'failed';
   const isDice = !!message.isDiceRoll;
@@ -295,7 +309,17 @@ export function MessageItem({
             className={s.name}
             style={isNpc ? { fontStyle: 'italic' } : undefined}
           >
-            {displayName}
+            {overrideHref ? (
+              <Link
+                to={overrideHref}
+                className={s.nameLink}
+                title={`Otevřít kartu: ${displayName}`}
+              >
+                {displayName}
+              </Link>
+            ) : (
+              displayName
+            )}
           </span>
           {isNpc && (
             <span

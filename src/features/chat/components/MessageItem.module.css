@@ -135,6 +135,19 @@
   color: var(--theme-heading, var(--accent));
 }
 
+/* 6.2-followup — klikací jméno NPC s vazbou na kartu. Dědí styl jména,
+   podtržení až na hover (ať nepůsobí jako odkaz uprostřed věty). */
+.nameLink {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nameLink:hover,
+.nameLink:focus-visible {
+  text-decoration: underline;
+}
+
 .time {
   font-family: var(--font-mono);
   font-size: var(--text-xs);

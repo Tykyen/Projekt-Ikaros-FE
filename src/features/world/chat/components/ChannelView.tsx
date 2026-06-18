@@ -369,6 +369,7 @@ export function ChannelView({
       visibleTo: payload.visibleTo,
       overrideName: payload.overrideName,
       overrideAvatarUrl: payload.overrideAvatarUrl,
+      overridePageSlug: payload.overridePageSlug,
       rpDate: payload.rpDate,
       color: appearance.data?.chatColor ?? undefined,
       customFont: appearance.data?.chatFont ?? undefined,
@@ -535,6 +536,9 @@ export function ChannelView({
             resolveFontSize={resolveFontSize}
             resolveAccountAvatar={resolveAccountAvatar}
             resolvePjDisplay={resolvePjDisplay}
+            resolveOverrideHref={(slug) =>
+              `/svet/${worldSlug}/postava/${slug}`
+            }
             onDelete={(id) => deleteMutation.mutate(id)}
             onReply={setReplyTo}
             onToggleReaction={(messageId, emoji) =>

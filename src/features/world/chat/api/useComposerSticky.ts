@@ -26,6 +26,8 @@ export interface ComposerStickyState {
   npcActive: boolean;
   npcName: string;
   npcAvatarUrl: string;
+  /** 6.2-followup — slug karty vybrané z adresáře (klikací jméno). '' = ad-hoc. */
+  npcSlug: string;
   /** Rozepsaná (neodeslaná) zpráva. Reset po odeslání (viz JSDoc nahoře). */
   draft: string;
 }
@@ -35,6 +37,7 @@ const EMPTY: ComposerStickyState = {
   npcActive: false,
   npcName: '',
   npcAvatarUrl: '',
+  npcSlug: '',
   draft: '',
 };
 
@@ -53,6 +56,7 @@ function read(worldId: string, channelId: string): ComposerStickyState {
       npcName: typeof parsed.npcName === 'string' ? parsed.npcName : '',
       npcAvatarUrl:
         typeof parsed.npcAvatarUrl === 'string' ? parsed.npcAvatarUrl : '',
+      npcSlug: typeof parsed.npcSlug === 'string' ? parsed.npcSlug : '',
       draft: typeof parsed.draft === 'string' ? parsed.draft : '',
     };
   } catch {
@@ -86,6 +90,7 @@ export function useComposerSticky(worldId: string, channelId: string) {
         !state.npcActive &&
         !state.npcName &&
         !state.npcAvatarUrl &&
+        !state.npcSlug &&
         !state.draft;
       if (isEmpty) {
         localStorage.removeItem(k);

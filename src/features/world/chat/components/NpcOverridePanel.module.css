@@ -24,6 +24,19 @@
   color: var(--theme-text-dim);
 }
 
+/* 6.2-followup — wrapper pole jména (relativní kotva pro našeptávač). */
+.nameWrap {
+  position: relative;
+  display: flex;
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.nameWrap .input {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
 .input {
   flex: 1 1 140px;
   min-width: 0;
@@ -74,7 +87,8 @@
   .bar {
     gap: 6px;
   }
-  .input {
+  .input,
+  .nameWrap {
     flex-basis: 100%;
   }
 }

@@ -79,6 +79,8 @@ export interface SendWorldMessagePayload {
   /** NPC mód (6.2e) — jen PJ+; BE validuje canManageChat. */
   overrideName?: string;
   overrideAvatarUrl?: string;
+  /** 6.2-followup — slug karty vybrané z adresáře (klikací jméno v chatu). */
+  overridePageSlug?: string;
   /** RP datum (6.2d) — `YYYY-MM-DD`. */
   rpDate?: string;
   /** Idempotentní retry (6.2h) — UUID v4 z FE. */

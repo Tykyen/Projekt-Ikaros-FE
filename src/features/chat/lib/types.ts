@@ -50,6 +50,8 @@ export interface ChatMessage {
   /** NPC mód (6.2e) — overrideName se zobrazí místo `senderName`. */
   overrideName?: string;
   overrideAvatarUrl?: string;
+  /** 6.2-followup — slug karty (Page) NPC/postavy → klikací jméno v world chatu. */
+  overridePageSlug?: string;
   content: string | null;
   /** Hex barva textu (chatColor odesílatele); `null` = výchozí. */
   color: string | null;

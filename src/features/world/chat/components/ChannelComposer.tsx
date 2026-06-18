@@ -80,6 +80,8 @@ export interface ComposerSendPayload {
   visibleTo?: string[];
   overrideName?: string;
   overrideAvatarUrl?: string;
+  /** 6.2-followup — slug karty vybrané z adresáře (klikací jméno v chatu). */
+  overridePageSlug?: string;
   rpDate?: string;
   /** Krok 6.3d — strukturovaná data hodu kostkou. */
   dicePayload?: Record<string, unknown>;
@@ -158,6 +160,7 @@ export function ChannelComposer({
   const npcState: NpcOverrideState = {
     name: sticky.npcName,
     avatarUrl: sticky.npcAvatarUrl,
+    slug: sticky.npcSlug || undefined,
   };
   // Rozepsaná zpráva (draft) jako sticky pole — text přežije přepnutí
   // konverzace i refresh. Wrapper podporuje hodnotu i updater funkci `(t)=>…`.
@@ -178,14 +181,16 @@ export function ChannelComposer({
       ...p,
       npcName: next.name,
       npcAvatarUrl: next.avatarUrl,
+      npcSlug: next.slug ?? '',
     }));
-  // Atomic clear — vypne NPC a vyprázdní jméno/avatar jedním setSticky callem.
+  // Atomic clear — vypne NPC a vyprázdní jméno/avatar/slug jedním setSticky callem.
   const clearNpc = () =>
     setSticky((p) => ({
       ...p,
       npcActive: false,
       npcName: '',
       npcAvatarUrl: '',
+      npcSlug: '',
     }));
   const [mentionState, setMentionState] = useState<{
     open: boolean;
@@ -501,6 +506,10 @@ export function ChannelComposer({
     if (npcActive && (npcState.name || npcState.avatarUrl)) {
       if (npcState.name) payload.overrideName = npcState.name;
       if (npcState.avatarUrl) payload.overrideAvatarUrl = npcState.avatarUrl;
+      // Vazba na kartu jen pod jménem (BE ji stejně bez overrideName zahodí).
+      if (npcState.name && npcState.slug) {
+        payload.overridePageSlug = npcState.slug;
+      }
     }
 
     onSend(payload);
@@ -667,6 +676,7 @@ export function ChannelComposer({
       {npcActive && canManage && (
         <NpcOverridePanel
           state={npcState}
+          worldId={worldId}
           onChange={setNpcState}
           onTurnOff={clearNpc}
         />
