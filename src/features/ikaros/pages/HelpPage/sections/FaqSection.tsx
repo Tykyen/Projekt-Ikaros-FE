@@ -188,6 +188,7 @@ const FAQ: FaqItem[] = [
         <p>
           <strong>Zvonek</strong> otevře souhrn chatů ze <strong>všech tvých světů</strong>{' '}
           (jen z kanálů, kam máš přístup). Odznak ukazuje, kolik nového přibylo.
+          Kliknutím na zprávu se dostaneš přímo do dané konverzace na ten příspěvek.
         </p>
         <p>
           Záložka <strong>Události</strong> = co se týká přímo tebe (schválený vstup,

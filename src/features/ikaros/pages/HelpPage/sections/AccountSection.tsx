@@ -37,6 +37,8 @@ export function AccountSection() {
           Jméno, krátké bio a <strong>samostatný avatar</strong> pro tvoji
           platformovou „postavu" — personu, pod kterou se objevíš v chatech a
           komunitě Ikaru. Je nezávislá na herních postavách uvnitř světů.
+          V <strong>Rozcestí</strong> pod ní vystupuješ přímo u zpráv (tvé jméno
+          a obrázek postavy); v Hospodě se ukazuje účet.
         </p>
       </HelpAccordion>
 

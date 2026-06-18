@@ -10,6 +10,13 @@
   gap: 4px;
 }
 
+/* Obrázek bestie — náhled `HeroUploadCard` se škáluje šířkou kontejneru.
+   V širokém `lg` modalu by byl obří (portrétní bestie), proto ho zúžíme.
+   Scoped jen na bestiář — sdílená karta jinde (hero stránek/akcí) beze změny. */
+.imageWrap {
+  max-width: 240px;
+}
+
 .label {
   display: flex;
   flex-direction: column;

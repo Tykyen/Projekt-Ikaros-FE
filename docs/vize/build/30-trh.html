@@ -36,7 +36,40 @@
   </div>
 
   <figure class="shot">
-    <div class="ph">Náhled / graf — křivka růstu trhu TTRPG 2024→2035 (sloupcový/plošný graf, pásmo konzervativní vs. optimistický scénář)</div>
+    <svg viewBox="0 0 920 420" role="img" aria-label="Křivka růstu trhu TTRPG 2024 až 2035">
+      <defs>
+        <linearGradient id="band1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#27d3ee" stop-opacity="0.40"/>
+          <stop offset="1" stop-color="#ff3d92" stop-opacity="0.28"/>
+        </linearGradient>
+      </defs>
+      <g stroke="#ffffff" stroke-opacity="0.10" stroke-width="1">
+        <line x1="55" y1="103" x2="890" y2="103"/>
+        <line x1="55" y1="189" x2="890" y2="189"/>
+        <line x1="55" y1="274" x2="890" y2="274"/>
+        <line x1="55" y1="360" x2="890" y2="360" stroke-opacity="0.28"/>
+      </g>
+      <g fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="13" text-anchor="end">
+        <text x="46" y="107">6</text><text x="46" y="193">4</text><text x="46" y="278">2</text><text x="46" y="364">0</text>
+      </g>
+      <text x="18" y="210" fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="12" text-anchor="middle" transform="rotate(-90 18 210)">mld USD</text>
+      <path d="M55,274 L207,253 L359,228 L510,195 L662,155 L814,105 L890,76 L890,133 L814,153 L662,188 L510,217 L359,242 L207,262 L55,279 Z" fill="url(#band1)"/>
+      <polyline points="55,279 207,262 359,242 510,217 662,188 814,153 890,133" fill="none" stroke="#ff3d92" stroke-width="2.5" stroke-linejoin="round"/>
+      <polyline points="55,274 207,253 359,228 510,195 662,155 814,105 890,76" fill="none" stroke="#27d3ee" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="890" cy="76" r="4.5" fill="#27d3ee"/>
+      <circle cx="890" cy="133" r="4.5" fill="#ff3d92"/>
+      <text x="884" y="63" fill="#27d3ee" font-family="Segoe UI, Inter, sans-serif" font-size="14" font-weight="700" text-anchor="end">≈ 6,6 mld $</text>
+      <text x="884" y="150" fill="#ff7ab8" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700" text-anchor="end">≈ 5,3 mld $</text>
+      <text x="64" y="266" fill="#c2bbe0" font-family="Segoe UI, Inter, sans-serif" font-size="13">≈ 2 mld $ (2024)</text>
+      <text x="440" y="205" fill="#e8e3f7" font-family="Segoe UI, Inter, sans-serif" font-size="15" font-weight="700" text-anchor="middle" transform="rotate(-18 440 205)">CAGR ≈ 12 % ročně</text>
+      <g fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="13" text-anchor="middle">
+        <text x="55" y="382">2024</text><text x="283" y="382">2027</text><text x="510" y="382">2030</text><text x="738" y="382">2033</text><text x="890" y="382">2035</text>
+      </g>
+      <g font-family="Segoe UI, Inter, sans-serif" font-size="13">
+        <rect x="55" y="22" width="14" height="6" rx="3" fill="#27d3ee"/><text x="76" y="29" fill="#c2bbe0">Optimistický scénář</text>
+        <rect x="240" y="22" width="14" height="6" rx="3" fill="#ff3d92"/><text x="261" y="29" fill="#c2bbe0">Konzervativní scénář</text>
+      </g>
+    </svg>
     <figcaption>Trh roste setrvale dvouciferným tempem; rozptyl scénářů je dán metodikou, ne pochybností o směru.</figcaption>
   </figure>
 

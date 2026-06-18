@@ -12,6 +12,7 @@
 import type { MapToken } from '../types';
 import type { SpawnPayload } from './spawnPayload';
 import type { Bestie } from '@/features/world/bestiar/types';
+import { getBestieAbilities } from '@/features/world/bestiar/lib/bestieAbilities';
 
 function pendingId(prefix: string): string {
   // Náhodný suffix proti kolizi ID: multi-placement bestií ve stejné
@@ -116,7 +117,7 @@ export function buildBestieToken(
     initiativeBase: initBase,
     inCombat: false,
     movement,
-    abilities: bestie.abilities.map((a) => ({
+    abilities: getBestieAbilities(bestie).map((a) => ({
       name: a.label,
       description: a.value,
     })),

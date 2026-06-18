@@ -68,6 +68,8 @@ interface ChannelViewProps {
   onOpenSearch: () => void;
   /** Krok 6.4 — sjednocená sada custom emotů (per-svět + globální). */
   worldEmotes?: WorldEmoteSet;
+  /** Deep-link z notifikačního feedu (13.2a) — po načtení doscrollovat na zprávu. */
+  jumpToMessageId?: string | null;
 }
 
 interface TypingEvent {
@@ -93,6 +95,7 @@ export function ChannelView({
   presenceCount = 0,
   onOpenSearch,
   worldEmotes,
+  jumpToMessageId,
 }: ChannelViewProps) {
   const qc = useQueryClient();
   const channelId = channel.id;
@@ -536,6 +539,7 @@ export function ChannelView({
             resolveFontSize={resolveFontSize}
             resolveAccountAvatar={resolveAccountAvatar}
             resolvePjDisplay={resolvePjDisplay}
+            jumpToMessageId={jumpToMessageId}
             resolveOverrideHref={(slug) =>
               `/svet/${worldSlug}/postava/${slug}`
             }

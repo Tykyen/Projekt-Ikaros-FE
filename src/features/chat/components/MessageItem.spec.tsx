@@ -41,6 +41,41 @@ describe('MessageItem', () => {
     expect(screen.getByText('ahoj')).toBeInTheDocument();
   });
 
+  // 4.2e §2 — avatar fallback hierarchie: snapshot > resolver > iniciála.
+  it('snapshot senderAvatarUrl má přednost před resolverem', () => {
+    const { container } = render(
+      <MessageItem
+        {...baseProps}
+        message={makeMsg({ senderAvatarUrl: 'snap.webp' })}
+        resolveAccountAvatar={() => 'live.webp'}
+      />,
+    );
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(
+      'snap.webp',
+    );
+  });
+
+  it('bez snapshotu padne na resolveAccountAvatar', () => {
+    const { container } = render(
+      <MessageItem
+        {...baseProps}
+        message={makeMsg()}
+        resolveAccountAvatar={() => 'live.webp'}
+      />,
+    );
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(
+      'live.webp',
+    );
+  });
+
+  it('bez avataru i resolveru ukáže iniciálu (žádný img)', () => {
+    const { container } = render(
+      <MessageItem {...baseProps} message={makeMsg()} />,
+    );
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.getByText('G')).toBeInTheDocument();
+  });
+
   it('nahradí emote shortcode', () => {
     render(<MessageItem {...baseProps} message={makeMsg({ content: 'dáme :beer:' })} />);
     expect(screen.getByText('dáme 🍺')).toBeInTheDocument();

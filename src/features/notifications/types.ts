@@ -7,5 +7,7 @@ import type { ChatMessage } from '@/features/chat/lib/types';
  */
 export interface ChatFeedItem extends ChatMessage {
   worldName: string;
+  /** Slug světa — deep-link na `/svet/:slug/chat` při kliku na položku feedu. */
+  worldSlug: string;
   channelName: string;
 }

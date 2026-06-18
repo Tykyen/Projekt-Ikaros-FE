@@ -99,6 +99,7 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - **Structure:** `chat:channel:created/updated/deleted`, `chat:group:created/updated/deleted`, `chat:groups:reordered`, `chat:channels:reordered` → FE invalidate groups query.
 - **Whisper zprávy** se emitují do `user:{id}` roomů adresátů (ne do channel roomu) — `chat.gateway.ts:241`.
 - **Push notifikace:** chat notifikace chodí na telefon přes web-push (notifyUsers), deep-link `?konverzace={channelId}` vybere konverzaci (adjustment-during-render) a uloží jako poslední aktivní (`WorldChatRoom.tsx:61-162`).
+- **Deep-link na zprávu (13.2a):** `?zprava={messageId}` (z notifikačního feedu „Chaty") → po otevření konverzace `MessageList` na zprávu doscrolluje + zvýrazní (reuse `handleJump` skoku z citace). Předává se jen konverzaci, na kterou link mířil (`active.id === lastDeepLink`); zpráva mimo načtené okno = no-op. Param se po použití uklidí z URL.
 
 ---
 

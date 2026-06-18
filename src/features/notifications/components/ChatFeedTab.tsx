@@ -1,5 +1,8 @@
+import { Link } from 'react-router-dom';
+import { useSetAtom } from 'jotai';
 import { UserAvatar } from '@/shared/ui';
 import { useChatFeed } from '../api/useChatFeed';
+import { centerOpenAtom } from '../model/centerStore';
 import { preview, formatWhen } from '../lib/feedFormat';
 import s from './NotificationCenter.module.css';
 
@@ -16,6 +19,7 @@ export function ChatFeedTab() {
     hasNextPage,
     isFetchingNextPage,
   } = useChatFeed();
+  const setOpen = useSetAtom(centerOpenAtom);
 
   const items = data?.pages.flat() ?? [];
 
@@ -30,8 +34,8 @@ export function ChatFeedTab() {
         const name = m.senderIsDeleted
           ? 'Smazaný účet'
           : (m.overrideName ?? m.senderName);
-        return (
-          <li key={m.id} className={s.item}>
+        const inner = (
+          <>
             <UserAvatar
               src={m.overrideAvatarUrl ?? m.senderAvatarUrl}
               size="sm"
@@ -50,6 +54,22 @@ export function ChatFeedTab() {
               </div>
               <div className={s.content}>{preview(m)}</div>
             </div>
+          </>
+        );
+        return (
+          <li key={m.id}>
+            {m.worldSlug ? (
+              // Klik → otevři konverzaci a skoč na tuto zprávu; zavři centrum.
+              <Link
+                to={`/svet/${m.worldSlug}/chat?konverzace=${m.channelId}&zprava=${m.id}`}
+                className={s.item}
+                onClick={() => setOpen(false)}
+              >
+                {inner}
+              </Link>
+            ) : (
+              <div className={s.item}>{inner}</div>
+            )}
           </li>
         );
       })}

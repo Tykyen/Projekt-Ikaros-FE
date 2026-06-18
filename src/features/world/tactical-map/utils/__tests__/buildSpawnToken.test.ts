@@ -56,7 +56,6 @@ describe('buildSpawnToken — Bestie', () => {
       systemId: 'drd2',
       name: 'Skřet',
       notes: '',
-      abilities: [{ label: 'Útok', value: '3' }],
       systemStats: {
         'health.max': 12,
         armor: 2,
@@ -115,9 +114,29 @@ describe('buildSpawnToken — Bestie', () => {
     expect(t.initiativeBase).toBe(1);
   });
 
-  it('abilities mapping label/value → name/description', () => {
+  it('schopnosti ze systemStats.abilities → token.abilities (label/value → name/description)', () => {
+    const t = buildBestieToken(
+      makeBestie({
+        systemStats: {
+          'health.max': 12,
+          abilities: [
+            { label: 'Nemrtvá síla', value: '2' },
+            { label: 'Ledový dotek', value: '4' },
+          ],
+        },
+      }),
+      0,
+      0,
+    );
+    expect(t.abilities).toEqual([
+      { name: 'Nemrtvá síla', description: '2' },
+      { name: 'Ledový dotek', description: '4' },
+    ]);
+  });
+
+  it('bez schopností → prázdné token.abilities', () => {
     const t = buildBestieToken(makeBestie(), 0, 0);
-    expect(t.abilities).toEqual([{ name: 'Útok', description: '3' }]);
+    expect(t.abilities).toEqual([]);
   });
 
   it('chybějící systemStats fields → defaults', () => {

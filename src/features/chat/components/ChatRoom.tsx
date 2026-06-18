@@ -37,6 +37,7 @@ import type {
   TypingEvent,
 } from '../lib/types';
 import { presentUsers } from '../lib/presenceUsers';
+import { roomAvatarFor } from '../lib/roomAvatar';
 import { toChatItems } from '../lib/chatItems';
 import { myRoomsAtom } from '../store/roomsStore';
 import { MessageList } from './MessageList';
@@ -105,6 +106,24 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   const usersById = useMemo(
     () => new Map(users.map((u) => [u.userId, u.username])),
     [users],
+  );
+
+  // 4.2e §2 — avatar zprávy dle místnosti: Hospoda účet, Rozcestí postava
+  // (fallback účet). Zdroj = živá presence. Je to fallback pro zprávy BEZ
+  // snapshotu `senderAvatarUrl` (odeslané před BE deployem) od přítomných
+  // autorů; v `MessageItem` má snapshot přednost (`senderAvatarUrl ?? …`).
+  const avatarByUserId = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const u of users) {
+      const url = roomAvatarFor(room, u);
+      if (url) m.set(u.userId, url);
+    }
+    return m;
+  }, [users, room]);
+
+  const resolveAccountAvatar = useCallback(
+    (senderId: string) => avatarByUserId.get(senderId),
+    [avatarByUserId],
   );
 
   // Pozn.: ChatRoom se při přepnutí místnosti vždy remountuje (`RozcestiRoom`
@@ -434,6 +453,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
             surfaceColor={surfaceColor}
             canDelete={canDelete}
             usersById={usersById}
+            resolveAccountAvatar={resolveAccountAvatar}
             onDelete={(id) => deleteMutation.mutate(id)}
             onReply={setReplyTo}
             onToggleReaction={toggleReaction}

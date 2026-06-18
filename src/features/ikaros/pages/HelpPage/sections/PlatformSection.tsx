@@ -93,9 +93,11 @@ export function PlatformSection() {
           <p>
             Tři atmosférické roleplay místnosti — hra na jeden večer bez kostek.
             Každá má prostředí (styl + jedna z 20 lokací s ilustrací na pozadí).
-            Stejné chatovací funkce jako Hospoda, ale v seznamu přítomných vidíš{' '}
-            <strong>postavu</strong> (jméno a obrázek z profilu), ne účet. Klik na
-            osobu otevře kartu její postavy.
+            Stejné chatovací funkce jako Hospoda, ale <strong>u zpráv i v seznamu
+            přítomných</strong> vystupuješ jako svoje <strong>postava</strong>{' '}
+            (jméno a obrázek z profilu „Postava v Rozcestí"), ne jako účet. Kdo
+            postavu nevyplnil, zobrazí se účtem. Klik na osobu otevře kartu její
+            postavy.
           </p>
         </Tool>
         <Tool icon={<Mail size={16} />} title="Pošta" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
@@ -110,7 +112,8 @@ export function PlatformSection() {
         <Tool icon={<Bell size={16} />} title="Notifikační centrum (zvonek)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>
             Zvonek v hlavičce otevře souhrn zpráv ze <strong>všech tvých světů</strong>{' '}
-            na jednom místě (jen z kanálů, kam máš přístup). Záložka <strong>Události</strong>{' '}
+            na jednom místě (jen z kanálů, kam máš přístup). <strong>Klik na zprávu</strong>{' '}
+            tě přenese rovnou do té konverzace a doscrolluje na ni. Záložka <strong>Události</strong>{' '}
             = co se týká přímo tebe (schválený vstup, článek, přiřazená postava),
             záložka <strong>Ke zpracování</strong> pro schvalovatele. Dole jde
             zapnout systémová upozornění na zařízení; v sekci <strong>Tvá

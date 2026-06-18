@@ -67,6 +67,16 @@ export function WorldChatRoom() {
     setLastDeepLink(deepLinkParam);
     setSelectedId(deepLinkParam);
   }
+  // Deep-link na konkrétní zprávu (`?zprava={messageId}`, z notifikačního feedu)
+  // → po otevření konverzace na ni `MessageList` doscrolluje. Drží se ve stavu,
+  // ať skok přežije úklid URL paramu (skok proběhne až po načtení historie).
+  const jumpParam = searchParams.get('zprava');
+  const [lastJump, setLastJump] = useState<string | null>(null);
+  const [jumpToMessageId, setJumpToMessageId] = useState<string | null>(null);
+  if (jumpParam && jumpParam !== lastJump) {
+    setLastJump(jumpParam);
+    setJumpToMessageId(jumpParam);
+  }
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // Default: zavřeno. PJ si panel otevře přes Users ikonu, badge ho upozorní
   // na příchody. localStorage drží volbu per world.
@@ -155,6 +165,7 @@ export function WorldChatRoom() {
     setSearchParams(
       (prev) => {
         prev.delete('konverzace');
+        prev.delete('zprava');
         return prev;
       },
       { replace: true },
@@ -288,6 +299,9 @@ export function WorldChatRoom() {
             presenceCount={isManager ? presence.length : 0}
             onOpenSearch={() => setSearchOpen(true)}
             worldEmotes={emoteSet}
+            jumpToMessageId={
+              active.id === lastDeepLink ? jumpToMessageId : null
+            }
           />
         ) : (
           <div className={s.state}>

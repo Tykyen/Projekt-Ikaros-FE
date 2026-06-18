@@ -6,6 +6,7 @@ import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schema
 import { EntityStatbar } from '@/features/world/tactical-map/components/schema-form/EntityStatbar';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import type { Bestie } from '../types';
+import { getBestieAbilities } from '../lib/bestieAbilities';
 import styles from './BestieCard.module.css';
 
 interface Props {
@@ -34,6 +35,7 @@ export function BestieCard({
   onDelete,
 }: Props): React.ReactElement {
   const schema = systemEntitySchemaRegistry.get(bestie.systemId, 'bestie');
+  const abilities = getBestieAbilities(bestie);
   return (
     <article className={styles.card}>
       <div className={styles.avatar}>
@@ -57,9 +59,9 @@ export function BestieCard({
         {schema && (
           <EntityStatbar schema={schema} value={bestie.systemStats} compact />
         )}
-        {bestie.abilities.length > 0 && (
+        {abilities.length > 0 && (
           <ul className={styles.abilities} aria-label="Schopnosti">
-            {bestie.abilities.map((a, i) => (
+            {abilities.map((a, i) => (
               <li key={i} className={styles.ability}>
                 <span className={styles.abilityLabel}>{a.label}</span>
                 {a.value && (

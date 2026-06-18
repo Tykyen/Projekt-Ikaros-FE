@@ -154,6 +154,7 @@
   figure.shot .ph::before{content:"▣  ";opacity:.7;}
   figure.shot figcaption{font-size:8.8pt;color:var(--muted);font-style:italic;margin-top:2mm;text-align:center;}
   figure.shot img{width:100%;display:block;border:1px solid var(--line2);border-radius:10px;}
+  figure.shot svg{width:100%;height:auto;display:block;border:1px solid var(--line2);border-radius:10px;background:var(--panel);padding:4mm;}
   .shotgrid{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:5mm 0;break-inside:avoid;}
   .shotgrid.three{grid-template-columns:1fr 1fr 1fr;}
   .shotgrid figure{margin:0;}
@@ -3488,7 +3489,40 @@
   </div>
 
   <figure class="shot">
-    <div class="ph">Náhled / graf — křivka růstu trhu TTRPG 2024→2035 (sloupcový/plošný graf, pásmo konzervativní vs. optimistický scénář)</div>
+    <svg viewBox="0 0 920 420" role="img" aria-label="Křivka růstu trhu TTRPG 2024 až 2035">
+      <defs>
+        <linearGradient id="band1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#27d3ee" stop-opacity="0.40"/>
+          <stop offset="1" stop-color="#ff3d92" stop-opacity="0.28"/>
+        </linearGradient>
+      </defs>
+      <g stroke="#ffffff" stroke-opacity="0.10" stroke-width="1">
+        <line x1="55" y1="103" x2="890" y2="103"/>
+        <line x1="55" y1="189" x2="890" y2="189"/>
+        <line x1="55" y1="274" x2="890" y2="274"/>
+        <line x1="55" y1="360" x2="890" y2="360" stroke-opacity="0.28"/>
+      </g>
+      <g fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="13" text-anchor="end">
+        <text x="46" y="107">6</text><text x="46" y="193">4</text><text x="46" y="278">2</text><text x="46" y="364">0</text>
+      </g>
+      <text x="18" y="210" fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="12" text-anchor="middle" transform="rotate(-90 18 210)">mld USD</text>
+      <path d="M55,274 L207,253 L359,228 L510,195 L662,155 L814,105 L890,76 L890,133 L814,153 L662,188 L510,217 L359,242 L207,262 L55,279 Z" fill="url(#band1)"/>
+      <polyline points="55,279 207,262 359,242 510,217 662,188 814,153 890,133" fill="none" stroke="#ff3d92" stroke-width="2.5" stroke-linejoin="round"/>
+      <polyline points="55,274 207,253 359,228 510,195 662,155 814,105 890,76" fill="none" stroke="#27d3ee" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="890" cy="76" r="4.5" fill="#27d3ee"/>
+      <circle cx="890" cy="133" r="4.5" fill="#ff3d92"/>
+      <text x="884" y="63" fill="#27d3ee" font-family="Segoe UI, Inter, sans-serif" font-size="14" font-weight="700" text-anchor="end">≈ 6,6 mld $</text>
+      <text x="884" y="150" fill="#ff7ab8" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700" text-anchor="end">≈ 5,3 mld $</text>
+      <text x="64" y="266" fill="#c2bbe0" font-family="Segoe UI, Inter, sans-serif" font-size="13">≈ 2 mld $ (2024)</text>
+      <text x="440" y="205" fill="#e8e3f7" font-family="Segoe UI, Inter, sans-serif" font-size="15" font-weight="700" text-anchor="middle" transform="rotate(-18 440 205)">CAGR ≈ 12 % ročně</text>
+      <g fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="13" text-anchor="middle">
+        <text x="55" y="382">2024</text><text x="283" y="382">2027</text><text x="510" y="382">2030</text><text x="738" y="382">2033</text><text x="890" y="382">2035</text>
+      </g>
+      <g font-family="Segoe UI, Inter, sans-serif" font-size="13">
+        <rect x="55" y="22" width="14" height="6" rx="3" fill="#27d3ee"/><text x="76" y="29" fill="#c2bbe0">Optimistický scénář</text>
+        <rect x="240" y="22" width="14" height="6" rx="3" fill="#ff3d92"/><text x="261" y="29" fill="#c2bbe0">Konzervativní scénář</text>
+      </g>
+    </svg>
     <figcaption>Trh roste setrvale dvouciferným tempem; rozptyl scénářů je dán metodikou, ne pochybností o směru.</figcaption>
   </figure>
 
@@ -3789,7 +3823,28 @@
   <p class="small">Poznámka k částečným hodnocením (<span class="partial">~</span>): Roll20/Foundry mají útržky správy obsahu, ne plnohodnotný worldbuilding. Foundry/Kanka mají dílčí komunitní lokalizace, ne ucelenou českou verzi. World Anvil/Kanka mají diskuzní vlákna, ne živý chat ani play-by-post engine. Žádný z konkurentů neobsluhuje české herní systémy a žádný nesjednocuje všechny tři vrstvy pod jeden účet.</p>
 
   <figure class="shot">
-    <div class="ph">Náhled / graf — „mapa pokrytí": tři vrstvy (stůl / svět / komunita) jako tři kruhy; konkurenti pokrývají vždy jen jeden, Ikaros leží v průniku všech tří</div>
+    <svg viewBox="0 0 920 450" role="img" aria-label="Mapa pokrytí: stůl, svět, komunita a Ikaros v průniku">
+      <g fill-opacity="0.15" stroke-width="2">
+        <circle cx="360" cy="200" r="170" fill="#27d3ee" stroke="#27d3ee"/>
+        <circle cx="560" cy="200" r="170" fill="#ff3d92" stroke="#ff3d92"/>
+        <circle cx="460" cy="325" r="170" fill="#9a6bff" stroke="#9a6bff"/>
+      </g>
+      <g font-family="Segoe UI, Inter, sans-serif" font-weight="800" font-size="21">
+        <text x="240" y="72" fill="#27d3ee" text-anchor="middle">STŮL</text>
+        <text x="680" y="72" fill="#ff3d92" text-anchor="middle">SVĚT</text>
+        <text x="460" y="440" fill="#b79cff" text-anchor="middle">KOMUNITA</text>
+      </g>
+      <g font-family="Segoe UI, Inter, sans-serif" font-size="13" fill="#c2bbe0" text-anchor="middle">
+        <text x="232" y="205">Foundry · Roll20</text>
+        <text x="232" y="225">Owlbear Rodeo</text>
+        <text x="688" y="205">World Anvil</text>
+        <text x="688" y="225">Kanka · LegendKeeper</text>
+        <text x="460" y="388">Discord</text>
+      </g>
+      <circle cx="460" cy="242" r="50" fill="#0d0a1e" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.5"/>
+      <text x="460" y="238" fill="#ffffff" font-family="Segoe UI, Inter, sans-serif" font-weight="800" font-size="17" text-anchor="middle">IKAROS</text>
+      <text x="460" y="257" fill="#27d3ee" font-family="Segoe UI, Inter, sans-serif" font-size="11" text-anchor="middle">v průniku všech tří</text>
+    </svg>
     <figcaption>Vennův diagram pokrytí: každá rodina nástrojů obsadila jeden kruh. Průnik všech tří — kompletní zážitek — je dnes prázdný. Tam stojí Ikaros.</figcaption>
   </figure>
 
@@ -3931,7 +3986,30 @@
   </div>
 
   <figure class="shot">
-    <div class="ph">Náhled / graf — „od archipelu k jednomu ostrovu": vlevo roztříštěná mapa služeb (fórum + Discord + Roll20 + wiki), vpravo jediná platforma Ikaros</div>
+    <svg viewBox="0 0 920 360" role="img" aria-label="Od roztříštěných služeb k jedné platformě">
+      <defs><linearGradient id="ik3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d3bd6"/><stop offset="1" stop-color="#ff3d92"/></linearGradient></defs>
+      <text x="205" y="38" fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="14" text-anchor="middle" font-weight="700">DNES — pět nástrojů zvlášť</text>
+      <g stroke="#ff3d92" stroke-opacity="0.40" stroke-width="1.5" stroke-dasharray="4 4" fill="none">
+        <path d="M180,103 L240,133"/><path d="M200,180 L262,156"/><path d="M300,156 L312,210"/><path d="M150,226 L165,270"/>
+      </g>
+      <g font-family="Segoe UI, Inter, sans-serif" font-size="14" fill="#c2bbe0" text-anchor="middle">
+        <g><rect x="60" y="80" width="120" height="46" rx="9" fill="#181237" stroke="#ffffff" stroke-opacity="0.18"/><text x="120" y="108">Fórum</text></g>
+        <g><rect x="240" y="110" width="120" height="46" rx="9" fill="#181237" stroke="#ffffff" stroke-opacity="0.18"/><text x="300" y="138">Discord</text></g>
+        <g><rect x="80" y="180" width="120" height="46" rx="9" fill="#181237" stroke="#ffffff" stroke-opacity="0.18"/><text x="140" y="208">Roll20</text></g>
+        <g><rect x="252" y="210" width="120" height="46" rx="9" fill="#181237" stroke="#ffffff" stroke-opacity="0.18"/><text x="312" y="238">Wiki</text></g>
+        <g><rect x="120" y="270" width="135" height="46" rx="9" fill="#181237" stroke="#ffffff" stroke-opacity="0.18"/><text x="187" y="298">Tabulka HP</text></g>
+      </g>
+      <text x="460" y="178" fill="#27d3ee" font-family="Segoe UI, Inter, sans-serif" font-size="34" font-weight="800" text-anchor="middle">&#8594;</text>
+      <text x="460" y="208" fill="#8e86b0" font-family="Segoe UI, Inter, sans-serif" font-size="12" text-anchor="middle">jeden účet</text>
+      <text x="725" y="38" fill="#27d3ee" font-family="Segoe UI, Inter, sans-serif" font-size="14" text-anchor="middle" font-weight="700">IKAROS — vše pohromadě</text>
+      <rect x="560" y="80" width="320" height="220" rx="16" fill="url(#ik3)" fill-opacity="0.18" stroke="#ff3d92" stroke-opacity="0.6" stroke-width="2"/>
+      <text x="720" y="150" fill="#ffffff" font-family="Segoe UI, Inter, sans-serif" font-size="24" font-weight="800" text-anchor="middle">IKAROS</text>
+      <g font-family="Segoe UI, Inter, sans-serif" font-size="14" fill="#e8e3f7" text-anchor="middle">
+        <text x="720" y="188">Stůl · Svět · Komunita</text>
+        <text x="720" y="214">Postavy · Mapy · Chat</text>
+        <text x="720" y="244">česky · zdarma · jeden účet</text>
+      </g>
+    </svg>
     <figcaption>Příkop vizuálně: dnešní česká scéna je archipel nepropojených ostrovů; Ikaros je most i pevnina v jednom.</figcaption>
   </figure>
 

@@ -21,6 +21,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Zprávy mizí po 1 hodině** — TTL `MESSAGE_TTL_MS = HOUR_MS` (`global-chat.service.ts:42`/`:233`); historie se navíc načítá omezeně (limit ≤ 100) a cron `EVERY_2_HOURS` fyzicky maže expirované (`clean-messages.job.ts`).
   - Žádné trvalé vlákno/archiv, žádné kategorie. Mazání jen Admin+ (uživatel nesmaže ani vlastní).
 - **Zvláštnosti:**
+  - **Identita autora zprávy = účet** (`username` + `avatarUrl`). Od **4.2e** se ukládá jako **snapshot** při odeslání (`resolveSenderIdentity` → `senderName`/`senderAvatarUrl`, `global-chat.service.ts`) — zpráva si jméno+avatar pamatuje natrvalo. FE má navíc fallback resolver z presence pro zprávy bez snapshotu (`roomAvatarFor`). Dřív zprávy ukazovaly jen iniciálu (avatar se neplnil).
   - **Každá odeslaná zpráva spustí web push `notifyAll` na všechna zařízení** (fire-and-forget, `global-chat.service.ts:242`) — i lidem, co v chatu nejsou. Payload bez `url` → bublina otevře jen `/`.
   - Presence je per-socket multi-room; socket je sdílený celou appkou (pošta, online stav, přátelé) — proto se při opuštění chatu neodpojuje, jen odebere z presence. Heartbeat `chat:heartbeat` udržuje „naživu", neaktivita → auto-odhlášení z presence.
 - **Stav:** ✅
@@ -35,11 +36,14 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Změna prostředí** scény = jen role s platformovou funkcí: `Superadmin`, `Admin`, `SpravceClanku`, `SpravceGalerie`, `SpravceDiskuzi` (`ROOM_STAFF_ROLES` / `RolesGuard`, `global-chat.controller.ts:46`; FE `STAFF_ROLES` v `RozcestiPage.tsx:22`).
 - **Co jde dělat:**
   - Vše jako v Hospodě (psát, reply, reakce, přílohy, šepty, presence).
+  - **Vystupovat za postavu** — na rozdíl od Hospody nese zpráva i panel přítomných **jméno + avatar postavy** z profilu („Postava v Rozcestí": `characterName`/`characterAvatarUrl`), ne účet. Kdo postavu nevyplnil → fallback na účet.
   - Staff: vybrat **styl** (např. `fantasy`) + **lokaci** (place) — `PUT /global-chat/rooms/:room/environment`; změna se přes WS `chat:room:environment` rozešle všem v místnosti a nastaví pozadí + popis scény (`RozcestiHeader`/`RozcestiDescription`).
-- **Hranice / co neumí:** prostředí je **sdílené pro celou místnost** (ne osobní), výběr jen z předdefinovaných stylů/míst (`rozcestiPlaces` na FE). Žádné per-postava avatary specifické jen pro Rozcestí (používá se účet + případně postava jako v Hospodě). Stejné 1h TTL zpráv.
-- **Zvláštnosti:** přepnutí mezi Rozcestími dělá čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická lokální změna), aby se neduplikovalo do useState.
+- **Hranice / co neumí:** prostředí je **sdílené pro celou místnost** (ne osobní), výběr jen z předdefinovaných stylů/míst (`rozcestiPlaces` na FE). Postava je **globální** (jedna napříč všemi Rozcestími, z profilu) — ne per-místnost. **Jméno** ve zprávě se opraví až novým snapshotem; staré zprávy (před 4.2e) ukazují `username` do vypršení 1h TTL (FE řeší jen avatar, ne jméno). Stejné 1h TTL zpráv.
+- **Zvláštnosti:**
+  - **Identita postavy = snapshot při odeslání** (4.2e): zpráva si pamatuje, za kterou postavu byla psána, i když hráč postavu/avatar později změní (záměr pro roleplay — opak render-time PJ persony ve světovém chatu). `resolveSenderIdentity(room≠hospoda)` v `global-chat.service.ts`; FE pravidlo `roomAvatarFor` + panel `UserList` mode `character`.
+  - Přepnutí mezi Rozcestími dělá čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická lokální změna), aby se neduplikovalo do useState.
 - **Stav:** ✅
-- **Kód:** FE `src/features/chat/pages/RozcestiPage.tsx`, `components/RozcestiHeader.tsx`, `RozcestiDescription.tsx`, `lib/rozcestiRooms.ts`, `lib/rozcestiPlaces.ts`. BE `global-chat.controller.ts:179`, `global-chat.gateway.ts:175`.
+- **Kód:** FE `src/features/chat/pages/RozcestiPage.tsx`, `components/ChatRoom.tsx`, `lib/roomAvatar.ts`, `components/RozcestiHeader.tsx`, `RozcestiDescription.tsx`, `lib/rozcestiRooms.ts`, `lib/rozcestiPlaces.ts`. BE `global-chat.service.ts` (`resolveSenderIdentity`/`sendMessage`/`sendWhisper`), `global-chat.controller.ts:179`, `global-chat.gateway.ts:175`. Spec `docs/arch/phase-4/spec-4.2e.md`.
 
 ---
 
@@ -71,7 +75,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Kde:** `NotificationCenter` v `IkarosLayout` (zvonek v hlavičce). Taby: **Chaty**, **Události**, **Ke zpracování** (poslední jen když je co řešit).
 - **Kdo:** přihlášený. Tab „Ke zpracování" se zobrazí jen těm, kdo mají pending položky (PendingActions providery — recenzenti článků/galerie/diskuzí, PJ světa apod.).
 - **Co jde dělat:**
-  - **Chaty** (`ChatFeedTab`) — souhrn nepřečtených zpráv **napříč všemi mými světy** (cross-world feed `GET /chat/feed`, cursor paginace; access-safe), s odkazem do dané konverzace.
+  - **Chaty** (`ChatFeedTab`) — souhrn nepřečtených zpráv **napříč všemi mými světy** (cross-world feed `GET /chat/feed`, cursor paginace; access-safe). **Klik na položku** otevře daný svět + konverzaci a doscrolluje/zvýrazní konkrétní zprávu (deep-link `/svet/:slug/chat?konverzace=&zprava=`; feed nese `worldSlug`). Zpráva mimo načtené okno historie (~50) → konverzace se otevře, ale skok je no-op.
   - **Události** (`EventsTab`) — co mi schválili / přiřazení postavy apod.
   - **Ke zpracování** (`PendingTab`) — fronta schvalování (články/galerie/diskuze, …) přes `usePendingActionsCount`.
   - Patička: **přepínač web push** na tomto zařízení (`PushToggle`).

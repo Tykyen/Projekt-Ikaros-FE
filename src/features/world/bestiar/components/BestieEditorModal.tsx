@@ -95,8 +95,9 @@ export function BestieEditorModal({
     }
 
     const hasImage = !!imageUrl.trim();
+    // `systemId` (+ scope/worldId) jsou immutable — patří JEN do create.
+    // BE `UpdateBestieDto` je nezná a `forbidNonWhitelisted` by PATCH 400nul.
     const payload = {
-      systemId,
       name: name.trim(),
       imageUrl: imageUrl.trim() || undefined,
       // Výřez dává smysl jen s obrázkem — bez něj null (jako GameEvent/WorldNews).
@@ -121,6 +122,7 @@ export function BestieEditorModal({
       create.mutate(
         {
           ...payload,
+          systemId,
           scope,
           worldId: scope === 'world' ? worldId : undefined,
         },
@@ -177,18 +179,20 @@ export function BestieEditorModal({
 
         <div className={styles.row}>
           <span className={styles.label}>Obrázek</span>
-          <HeroUploadCard
-            value={imageUrl}
-            onChange={setImageUrl}
-            compact
-            uploadCta="Nahrát obrázek"
-            focal={focal}
-            onFocalChange={setFocal}
-            zoom={imageZoom}
-            onZoomChange={setImageZoom}
-            fit={imageFit}
-            onFitChange={setImageFit}
-          />
+          <div className={styles.imageWrap}>
+            <HeroUploadCard
+              value={imageUrl}
+              onChange={setImageUrl}
+              compact
+              uploadCta="Nahrát obrázek"
+              focal={focal}
+              onFocalChange={setFocal}
+              zoom={imageZoom}
+              onZoomChange={setImageZoom}
+              fit={imageFit}
+              onFitChange={setImageFit}
+            />
+          </div>
         </div>
 
         {!existing && (

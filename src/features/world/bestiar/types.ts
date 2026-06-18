@@ -19,7 +19,9 @@ export interface Bestie {
   imageZoom?: number | null;
   imageFit?: ImageFit | null;
   notes: string;
-  abilities: Array<{ label: string; value: string }>;
+  // Schopnosti žijí v `systemStats.abilities` (per-system schéma, sekce
+  // „Schopnosti"). Dřív existovalo i mrtvé top-level pole `abilities` — odebráno
+  // (D-NEW-BESTIE-ABILITIES-DUP), editor do něj nikdy nepsal.
   systemStats: Record<string, unknown>;
   clonedFromId?: string;
   deletedAt?: string | null;
@@ -44,7 +46,6 @@ export interface CreateBestiePayload {
   imageZoom?: number | null;
   imageFit?: ImageFit | null;
   notes?: string;
-  abilities?: Array<{ label: string; value: string }>;
   systemStats: Record<string, unknown>;
 }
 
@@ -56,7 +57,6 @@ export interface UpdateBestiePayload {
   imageZoom?: number | null;
   imageFit?: ImageFit | null;
   notes?: string;
-  abilities?: Array<{ label: string; value: string }>;
   systemStats?: Record<string, unknown>;
 }
 

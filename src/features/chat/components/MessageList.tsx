@@ -45,6 +45,9 @@ interface MessageListProps {
   ) => { name: string; avatarUrl: string | null } | null;
   /** 6.2-followup — slug masky → href karty (jen world chat). Viz `MessageItem`. */
   resolveOverrideHref?: (slug: string) => string;
+  /** 13.2a — deep-link z notifikačního feedu: po načtení doscrolluj + zvýrazni
+   *  tuto zprávu. Pokud není v načteném okně, no-op (jako skok z citace). */
+  jumpToMessageId?: string | null;
 }
 
 const isWhisper = (m: ChatMessage) => !!m.visibleTo && m.visibleTo.length > 0;
@@ -75,6 +78,7 @@ export function MessageList({
   resolveAccountAvatar,
   resolvePjDisplay,
   resolveOverrideHref,
+  jumpToMessageId,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -158,6 +162,19 @@ export function MessageList({
       endRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [items, currentUserId]);
+
+  // 13.2a — deep-link skok z notifikačního feedu na konkrétní zprávu. Běží AŽ PO
+  // auto-scrollu na konec (effect výše), takže ho přebije a doscrolluje na cíl.
+  // Jednorázově per id (ref-guard) — highlight nebliká při každém novém příspěvku.
+  // Když zpráva není v načteném okně (`itemRefs` ji nezná), no-op a zkusí to
+  // znovu při případném donačtení.
+  const jumpedToRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!jumpToMessageId || jumpedToRef.current === jumpToMessageId) return;
+    if (!itemRefs.current.has(jumpToMessageId)) return;
+    jumpedToRef.current = jumpToMessageId;
+    handleJump(jumpToMessageId);
+  }, [jumpToMessageId, items, handleJump]);
 
   // Aktualizuj „stick to bottom" při ručním scrollu uživatele.
   const handleScroll = useCallback(() => {
