@@ -12,7 +12,7 @@
  * Pozice: `axialToPixel(token.q, token.r) + origin + stagger`.
  *
  * 10.2c-edit-9d (2026-05-28): port klíčových UX prvků ze starého Matrixu:
- *   - TOKEN_SIZE dynamic = `config.size * 0.82` (vepsaná kružnice hexu; ne
+ *   - TOKEN_SIZE dynamic = vepsaná kružnice hexu (√3/2·size ≈ 0.866; ne
  *     fixed 28; reaguje na změnu hex size přes zoom palety)
  *   - sprite clipped do kruhu (matchuje Matrix `clipPath` circle)
  *   - 'i' badge top-left tokenu pro otevření deníku/info
@@ -85,10 +85,10 @@ export function TokenSprite({
   onOpenInfo,
   onPointerDown,
 }: Props): React.ReactElement {
-  // Token radius derivovaný z hex velikosti. 0.82 ≈ vepsaná kružnice
-  // flat-top hexu (√3/2·size ≈ 0.866·size) mínus tenký okraj na ring/glow,
-  // takže token hex vyplní, ale nepřeteče přes hrany.
-  const tokenSize = Math.round(config.size * 0.82);
+  // Token radius = vepsaná kružnice flat-top hexu (apotéma = √3/2·size
+  // ≈ 0.866·size). Dotkne se vnitřních stěn hexu, ale nepřeteče přes ně.
+  // Ring se kreslí dovnitř (alignment:1 v drawRing), takže ani obrys nevyleze.
+  const tokenSize = Math.round(config.size * (Math.sqrt(3) / 2));
 
   const center = axialToPixel(token.q, token.r, config.size);
   const x = center.x + config.originX + staggerOffset.x;
@@ -110,8 +110,15 @@ export function TokenSprite({
   const drawRing = useCallback(
     (g: PixiGraphics) => {
       g.clear();
-      g.circle(0, 0, tokenSize + 2);
-      g.stroke({ color: ringColor, width: isSelected ? 3 : 2, alpha: 1 });
+      g.circle(0, 0, tokenSize);
+      // alignment:1 = stroke roste DOVNITŘ kružnice → obrys nepřesáhne
+      // tokenSize (= stěnu hexu). Centrovaný stroke by jinak vylezl ven.
+      g.stroke({
+        color: ringColor,
+        width: isSelected ? 3 : 2,
+        alpha: 1,
+        alignment: 1,
+      });
     },
     [ringColor, isSelected, tokenSize],
   );
