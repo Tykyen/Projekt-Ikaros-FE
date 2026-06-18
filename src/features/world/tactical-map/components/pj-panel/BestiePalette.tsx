@@ -171,7 +171,14 @@ export function BestiePalette({
               disabled={!scene}
               title={`Klikni nebo přetáhni: spawn bestie ${b.name} na hex`}
             >
-              <PaletteAvatar src={b.imageUrl} name={b.name} />
+              <PaletteAvatar
+                src={b.imageUrl}
+                name={b.name}
+                focalX={b.imageFocalX}
+                focalY={b.imageFocalY}
+                zoom={b.imageZoom}
+                fit={b.imageFit}
+              />
               <span className={styles.itemName}>{b.name}</span>
               <span className={styles.itemAction}>⇢</span>
             </button>

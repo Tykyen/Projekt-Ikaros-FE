@@ -20,6 +20,7 @@ import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/Her
 import { Modal, Button } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
+import type { ImageFit } from '@/shared/lib/imageStyle';
 import { useBestieMutations } from '../hooks/useBestieMutations';
 import { validateForCreate } from '@/features/world/tactical-map/utils/validateSystemStats';
 import type { Bestie, BestieScope } from '../types';
@@ -52,6 +53,17 @@ export function BestieEditorModal({
 
   const [name, setName] = useState(existing?.name ?? '');
   const [imageUrl, setImageUrl] = useState(existing?.imageUrl ?? '');
+  // Výřez obrázku (parity s GameEvent): focal bod + zoom + fit.
+  const [focal, setFocal] = useState<{ x: number; y: number }>({
+    x: existing?.imageFocalX ?? 50,
+    y: existing?.imageFocalY ?? 50,
+  });
+  const [imageZoom, setImageZoom] = useState<number | null>(
+    existing?.imageZoom ?? null,
+  );
+  const [imageFit, setImageFit] = useState<ImageFit | null>(
+    existing?.imageFit ?? null,
+  );
   const [notes, setNotes] = useState(existing?.notes ?? '');
   const [scope, setScope] = useState<BestieScope>(
     existing ? existing.scope : defaultScope,
@@ -82,10 +94,16 @@ export function BestieEditorModal({
       return;
     }
 
+    const hasImage = !!imageUrl.trim();
     const payload = {
       systemId,
       name: name.trim(),
       imageUrl: imageUrl.trim() || undefined,
+      // Výřez dává smysl jen s obrázkem — bez něj null (jako GameEvent/WorldNews).
+      imageFocalX: hasImage ? focal.x : null,
+      imageFocalY: hasImage ? focal.y : null,
+      imageZoom: hasImage ? imageZoom : null,
+      imageFit: hasImage ? imageFit : null,
       notes: notes.trim(),
       systemStats: validation.filled,
     };
@@ -164,6 +182,12 @@ export function BestieEditorModal({
             onChange={setImageUrl}
             compact
             uploadCta="Nahrát obrázek"
+            focal={focal}
+            onFocalChange={setFocal}
+            zoom={imageZoom}
+            onZoomChange={setImageZoom}
+            fit={imageFit}
+            onFitChange={setImageFit}
           />
         </div>
 

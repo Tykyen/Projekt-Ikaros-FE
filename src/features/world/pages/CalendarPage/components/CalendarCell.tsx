@@ -102,12 +102,27 @@ function CalendarCellImpl({
     >
       {isHeatMode && <CellHeatLayer eventCount={dayEvents.length} />}
       <div className={s.cellHeader}>
-        <span className={s.dayNum}>
-          {cell.date.day}.
-          {isHeatMode && dayEvents.length > 0 && (
+        {!isHeatMode && dayEvents.length > 0 ? (
+          // Klik na číslo dne → Day Drawer se VŠEMI akcemi dne (Detail i Compact,
+          // kde „+N dalších" nemusí vzniknout). Počet akcí signalizuje klikatelnost.
+          <button
+            type="button"
+            className={`${s.dayNum} ${s.dayNumBtn}`}
+            onClick={() => onExpandDay(cell.date)}
+            aria-label={`Zobrazit všechny události dne (${dayEvents.length})`}
+            title="Všechny události dne"
+          >
+            {cell.date.day}.
             <span className={s.heatCount}> · {dayEvents.length}</span>
-          )}
-        </span>
+          </button>
+        ) : (
+          <span className={s.dayNum}>
+            {cell.date.day}.
+            {isHeatMode && dayEvents.length > 0 && (
+              <span className={s.heatCount}> · {dayEvents.length}</span>
+            )}
+          </span>
+        )}
         {lunar.length > 0 && (
           <div className={s.lunarRow}>
             {lunar.map((info) => (

@@ -1,6 +1,7 @@
 /**
  * 10.2d-prep-B — Bestiar typy (FE mirror BE Bestie interface).
  */
+import type { ImageFit } from '@/shared/lib/imageStyle';
 
 export type BestieScope = 'system' | 'user' | 'world';
 
@@ -12,6 +13,11 @@ export interface Bestie {
   worldId?: string;
   name: string;
   imageUrl?: string;
+  /** Výřez obrázku — parity s Page/GameEvent/WorldNews (focal point + zoom + fit). */
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: ImageFit | null;
   notes: string;
   abilities: Array<{ label: string; value: string }>;
   systemStats: Record<string, unknown>;
@@ -33,6 +39,10 @@ export interface CreateBestiePayload {
   worldId?: string;
   name: string;
   imageUrl?: string;
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: ImageFit | null;
   notes?: string;
   abilities?: Array<{ label: string; value: string }>;
   systemStats: Record<string, unknown>;
@@ -41,6 +51,10 @@ export interface CreateBestiePayload {
 export interface UpdateBestiePayload {
   name?: string;
   imageUrl?: string;
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: ImageFit | null;
   notes?: string;
   abilities?: Array<{ label: string; value: string }>;
   systemStats?: Record<string, unknown>;

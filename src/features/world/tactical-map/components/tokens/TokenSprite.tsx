@@ -43,6 +43,48 @@ import { useWorldContext } from '@/features/world/context/WorldContext';
 import { resolveHpWithFallback } from '../../utils/hpTier';
 import { tokenIsBestie } from '../../utils/tokenIsBestie';
 import { resolveCharacterHp } from '../../utils/resolveCharacterHp';
+import type { ImageFit } from '@/shared/lib/imageStyle';
+
+/** Výřez obrázku tokenu (bestie focal/zoom/fit z bestiáře). */
+export interface TokenImageCrop {
+  focalX?: number | null;
+  focalY?: number | null;
+  zoom?: number | null;
+  fit?: ImageFit | null;
+}
+
+/**
+ * Transform spritu do kruhové masky o průměru `diameter`. Bez `crop` =
+ * původní chování (roztažení textury na kruh). S `crop` = cover/contain dle
+ * aspectu textury + zoom + posun focal bodu do středu masky (parita s CSS
+ * object-position, jen v canvasu přes scale + position místo object-position).
+ */
+function getSpriteTransform(
+  texW: number,
+  texH: number,
+  diameter: number,
+  crop: TokenImageCrop | undefined,
+):
+  | { width: number; height: number }
+  | { scale: number; x: number; y: number } {
+  if (!crop || texW <= 0 || texH <= 0) {
+    return { width: diameter, height: diameter };
+  }
+  const fit = crop.fit ?? 'cover';
+  const base =
+    fit === 'contain'
+      ? Math.min(diameter / texW, diameter / texH)
+      : Math.max(diameter / texW, diameter / texH);
+  const scale = base * (Math.max(100, crop.zoom ?? 100) / 100);
+  const fx = (crop.focalX ?? 50) / 100;
+  const fy = (crop.focalY ?? 50) / 100;
+  // anchor=0.5 → posun spritu tak, aby focal bod obrázku byl ve středu masky.
+  return {
+    scale,
+    x: (0.5 - fx) * texW * scale,
+    y: (0.5 - fy) * texH * scale,
+  };
+}
 
 interface Props {
   token: MapToken;
@@ -56,6 +98,8 @@ interface Props {
   /** Resolvuje obrázek tokenu (bestie z bestiáře přes templateId) — fresh
    *  při každém renderu, ať bestie obrázek nezmizí kvůli stale memo. */
   resolveImage?: (token: MapToken) => string | undefined;
+  /** Výřez obrázku (bestie focal/zoom/fit). Bez něj = roztažení na kruh. */
+  resolveImageCrop?: (token: MapToken) => TokenImageCrop | undefined;
   canDrag: boolean;
   /**
    * Klik na token tělo = jen SELECT (highlight ring; click-to-place pattern
@@ -80,6 +124,7 @@ export function TokenSprite({
   isActiveTurn,
   isSpotlight = false,
   resolveImage,
+  resolveImageCrop,
   canDrag,
   onSelect,
   onOpenInfo,
@@ -95,6 +140,7 @@ export function TokenSprite({
   const y = center.y + config.originY + staggerOffset.y;
 
   const imageUrl = resolveImage?.(token) ?? token.characterData?.imageUrl;
+  const imageCrop = resolveImageCrop?.(token);
   const { texture } = useTokenTexture(imageUrl);
 
   const displayName =
@@ -314,10 +360,14 @@ export function TokenSprite({
           />
           <pixiSprite
             texture={texture}
-            width={tokenSize * 2}
-            height={tokenSize * 2}
             anchor={0.5}
             mask={spriteMask ?? undefined}
+            {...getSpriteTransform(
+              texture.width,
+              texture.height,
+              tokenSize * 2,
+              imageCrop,
+            )}
           />
         </>
       ) : (

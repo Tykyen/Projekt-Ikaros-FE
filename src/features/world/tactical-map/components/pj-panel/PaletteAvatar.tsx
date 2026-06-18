@@ -8,6 +8,7 @@
  * Reuse pattern z BestieCard, jen kompaktnější (list-item velikost).
  */
 import { getInitials } from '../../utils/getInitials';
+import { getImageStyle, type ImageFit } from '@/shared/lib/imageStyle';
 import styles from './PaletteAvatar.module.css';
 
 interface Props {
@@ -16,12 +17,21 @@ interface Props {
   name: string;
   /** Průměr v px (default 24). */
   size?: number;
+  /** Výřez obrázku (bestie focal/zoom/fit). Bez něj = cover 50/50 (beze změny). */
+  focalX?: number | null;
+  focalY?: number | null;
+  zoom?: number | null;
+  fit?: ImageFit | null;
 }
 
 export function PaletteAvatar({
   src,
   name,
   size = 24,
+  focalX,
+  focalY,
+  zoom,
+  fit,
 }: Props): React.ReactElement {
   return (
     <span
@@ -30,7 +40,12 @@ export function PaletteAvatar({
       aria-hidden="true"
     >
       {src ? (
-        <img src={src} alt="" className={styles.img} />
+        <img
+          src={src}
+          alt=""
+          className={styles.img}
+          style={getImageStyle(focalX, focalY, zoom, fit)}
+        />
       ) : (
         <span className={styles.fallback}>{getInitials(name)}</span>
       )}

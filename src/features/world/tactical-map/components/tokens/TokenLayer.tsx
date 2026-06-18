@@ -9,7 +9,7 @@
 import { useMemo } from 'react';
 import type { FederatedPointerEvent } from 'pixi.js';
 import { computeStaggerOffsets } from '../../utils/tokenStaggerOffset';
-import { TokenSprite } from './TokenSprite';
+import { TokenSprite, type TokenImageCrop } from './TokenSprite';
 import type {
   HexConfig,
   MapThemeColors,
@@ -26,6 +26,8 @@ interface Props {
   spotlightTokenId?: string | null;
   /** Resolvuje obrázek tokenu (bestie přes templateId, fresh každý render). */
   resolveImage?: (token: MapToken) => string | undefined;
+  /** Výřez obrázku tokenu (bestie focal/zoom/fit). */
+  resolveImageCrop?: (token: MapToken) => TokenImageCrop | undefined;
   canDrag: (token: MapToken) => boolean;
   /** 10.2h — NPC/bestie token skrytý mlhou (hráč v zamlženém hexu). PC vždy. */
   isHiddenByFog?: (token: MapToken) => boolean;
@@ -43,6 +45,7 @@ export function TokenLayer({
   activeTurnTokenId,
   spotlightTokenId,
   resolveImage,
+  resolveImageCrop,
   canDrag,
   isHiddenByFog,
   onSelect,
@@ -64,6 +67,7 @@ export function TokenLayer({
           isActiveTurn={t.id === activeTurnTokenId}
           isSpotlight={t.id === spotlightTokenId}
           resolveImage={resolveImage}
+          resolveImageCrop={resolveImageCrop}
           canDrag={canDrag(t)}
           onSelect={onSelect}
           onOpenInfo={onOpenInfo}

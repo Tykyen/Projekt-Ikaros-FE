@@ -55,6 +55,7 @@ import { MapHiddenOverlay } from "./components/MapHiddenOverlay";
 import { MapLockedOverlay } from "./components/MapLockedOverlay";
 import { MapPjPanel } from "./components/pj-panel/MapPjPanel";
 import { TokenLayer } from "./components/tokens/TokenLayer";
+import type { TokenImageCrop } from "./components/tokens/TokenSprite";
 import { InitiativeBar } from "./components/initiative/InitiativeBar";
 import { MapConnectionBadge } from "./components/MapConnectionBadge";
 import { MapWeatherPanel } from "./components/weather/MapWeatherPanel";
@@ -723,6 +724,23 @@ export function TacticalMapView(): React.ReactElement {
     [lookupBestie],
   );
 
+  // D-NEW-BESTIE-FOCAL — výřez obrázku jen pro bestie tokeny (obrázek z
+  // bestiáře). characterData (PC/NPC) focal nenese → undefined = původní render.
+  const resolveTokenImageCrop = useCallback(
+    (t: MapToken): TokenImageCrop | undefined => {
+      if (t.characterData?.imageUrl) return undefined;
+      const b = t.templateId ? lookupBestie(t.templateId) : undefined;
+      if (!b) return undefined;
+      return {
+        focalX: b.imageFocalX,
+        focalY: b.imageFocalY,
+        zoom: b.imageZoom,
+        fit: b.imageFit,
+      };
+    },
+    [lookupBestie],
+  );
+
   /**
    * Sjednocený spawn — z drop handleru i z placement-mode klikem.
    * Volá `token.add` op s tokenem postaveným factory dle payload.kind.
@@ -1265,6 +1283,7 @@ export function TacticalMapView(): React.ReactElement {
                     activeTurnTokenId={scene.combat?.currentTokenId ?? null}
                     spotlightTokenId={spotlightTokenId}
                     resolveImage={resolveTokenImage}
+                    resolveImageCrop={resolveTokenImageCrop}
                     canDrag={canDrag}
                     isHiddenByFog={(t) =>
                       isTokenHiddenByFog(t, {

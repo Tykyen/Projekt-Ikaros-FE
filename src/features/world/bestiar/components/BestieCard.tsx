@@ -4,6 +4,7 @@
 import { Button } from '@/shared/ui';
 import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
 import { EntityStatbar } from '@/features/world/tactical-map/components/schema-form/EntityStatbar';
+import { getImageStyle } from '@/shared/lib/imageStyle';
 import type { Bestie } from '../types';
 import styles from './BestieCard.module.css';
 
@@ -37,7 +38,16 @@ export function BestieCard({
     <article className={styles.card}>
       <div className={styles.avatar}>
         {bestie.imageUrl ? (
-          <img src={bestie.imageUrl} alt={bestie.name} />
+          <img
+            src={bestie.imageUrl}
+            alt={bestie.name}
+            style={getImageStyle(
+              bestie.imageFocalX,
+              bestie.imageFocalY,
+              bestie.imageZoom,
+              bestie.imageFit,
+            )}
+          />
         ) : (
           <div className={styles.fallback}>{getInitials(bestie.name)}</div>
         )}

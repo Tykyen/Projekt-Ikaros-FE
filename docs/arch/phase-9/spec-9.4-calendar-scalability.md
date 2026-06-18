@@ -80,7 +80,13 @@ Fallback se zobrazí jako informační badge v toolbaru: „Detail → automatic
 
 ## 4 — Day Detail Drawer
 
-**Trigger:** klik na cell (Heat mode) nebo na „+N dalších" odkaz (Detail/Kompakt)
+**Trigger:** klik na cell (Heat mode), na „+N dalších" odkaz (Detail/Kompakt),
+nebo na **číslo dne** (Detail/Kompakt, když má den ≥1 akci).
+
+> **Amend (2026-06-18):** „+N dalších" vzniká až při přetečení limitu (Detail >4,
+> Compact >20). Při 8–20 akcích/den v compactu žádný spouštěč nevznikl → drawer
+> byl nedostupný. Fix: číslo dne je v Detail/Compact tlačítko (`.dayNumBtn`) a
+> vedle data je počet akcí (`12. · 5`) jako signál klikatelnosti.
 
 **Layout:** Side panel zprava, 380px desktop / 100vw mobile, slide animation 180ms.
 
