@@ -17,6 +17,7 @@ import {
   openForgotPasswordModalAtom,
 } from '@/shared/store/authStore';
 import { ReactivateAccountModal } from './ReactivateAccountModal';
+import { TotpVerifyStep } from './TotpVerifyStep';
 import s from './LoginModal.module.css';
 
 // 1.3c — když /auth/login vrátí deletion_pending, LoginModal switchne na
@@ -49,6 +50,9 @@ export function LoginModal() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [deletionContext, setDeletionContext] =
     useState<DeletionPendingContext | null>(null);
+  // 14.1 — když /auth/login vrátí totp_required, držíme challengeId a switchneme
+  // na TotpVerifyStep (druhý faktor). null = jsme na kroku hesla.
+  const [totpChallengeId, setTotpChallengeId] = useState<string | null>(null);
   const navigate = useNavigate();
   const login = useLogin();
 
@@ -69,6 +73,7 @@ export function LoginModal() {
     setSubmitError(null);
     setShowPassword(false);
     setDeletionContext(null);
+    setTotpChallengeId(null);
     reset();
   }
 
@@ -102,6 +107,12 @@ export function LoginModal() {
         return; // nezavírat LoginModal — overlay ReactivateAccountModal převezme
       }
 
+      // 14.1 — 2FA: heslo OK, vyžádej druhý faktor (žádný token zatím)
+      if (result.status === 'totp_required') {
+        setTotpChallengeId(result.challengeId);
+        return; // overlay TotpVerifyStep převezme
+      }
+
       const intent = consumeLoginIntent();
       const username = result.user.displayName ?? result.user.username;
       toast.success(`Vítej zpět, ${username}!`);
@@ -111,6 +122,18 @@ export function LoginModal() {
     } catch (err) {
       setSubmitError(mapErrorToMessage(err));
     }
+  }
+
+  // 14.1 — overlay TotpVerifyStep (druhý faktor). „Zpět" jen zruší 2FA krok a
+  // vrátí na formulář s heslem (LoginModal zůstává otevřený).
+  if (totpChallengeId) {
+    return (
+      <TotpVerifyStep
+        open
+        challengeId={totpChallengeId}
+        onCancel={() => setTotpChallengeId(null)}
+      />
+    );
   }
 
   // 1.3c — overlay ReactivateAccountModal nad zavřeným LoginModalem.

@@ -3,6 +3,7 @@ import {
   UserCircle,
   AtSign,
   KeyRound,
+  ShieldCheck,
   ImagePlus,
   Drama,
   EyeOff,
@@ -79,6 +80,39 @@ export function AccountSection() {
         <CalloutBox variant="tip">
           Pokud měl účet naplánované smazání, reset hesla ho současně zruší a účet
           obnoví.
+        </CalloutBox>
+      </HelpAccordion>
+
+      <HelpAccordion icon={<ShieldCheck size={20} />} title="Dvoufaktorové ověření (2FA)" accent="success">
+        <p>
+          Druhý zámek u přihlášení — <strong>dobrovolný</strong>. K heslu přidáš
+          jednorázový kód z aplikace v mobilu (Google Authenticator, Authy…). I
+          když ti někdo uhodne heslo, bez telefonu se dovnitř nedostane.
+        </p>
+        <p><strong>Zapnutí</strong> (Bezpečnost → „Zapnout 2FA"):</p>
+        <StepList
+          steps={[
+            'Naskenuješ QR kód v authenticator aplikaci.',
+            'Opíšeš vygenerovaný 6místný kód.',
+            <>
+              Dostaneš <strong>10 záložních kódů</strong> — ulož si je. Každý
+              funguje jednou a pomůže, když nemáš po ruce telefon.
+            </>,
+          ]}
+        />
+        <p>
+          <strong>Přihlášení s 2FA</strong>: po heslu zadáš kód z aplikace (nebo
+          jeden záložní kód). Můžeš zaškrtnout{' '}
+          <strong>„Důvěřovat tomuto zařízení 30 dní"</strong> — pak se na něm 2FA
+          příště nezeptá.
+        </p>
+        <p>
+          <strong>Důvěryhodná zařízení</strong> si zobrazíš a odvoláš v
+          Bezpečnosti. Vypnutí 2FA i změna hesla je všechna automaticky odvolá.
+        </p>
+        <CalloutBox variant="tip">
+          Vypnout 2FA nebo vygenerovat nové záložní kódy lze kdykoli — vždy po
+          potvrzení heslem.
         </CalloutBox>
       </HelpAccordion>
 

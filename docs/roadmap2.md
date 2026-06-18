@@ -82,13 +82,15 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Závislosti:** žádné blokující — lze začít okamžitě.
 
-### - [ ] 14.1 Dvoufaktorové přihlášení (2FA / TOTP) — [A1 · dopad vysoký · náklad malý]
+### - [x] 14.1 Dvoufaktorové přihlášení (2FA / TOTP) — [A1 · dopad vysoký · náklad malý] ✅ *(2026-06-18)*
 **Cíl:** Druhý zámek u přihlášení — jednorázový kód z aplikace v mobilu + záložní kódy.
 **Proč:** Uniklé heslo je nejčastější ztráta účtu; 2FA blokuje ~99,9 % případů. Kritické u PJ, který ovládá celý svět, a u adminů.
 **Návrh přípravy:** rešerše knihovny (`otplib`/`speakeasy`), rozhodnout default (povinné pro Admin/Superadmin, dobrovolné jinak), spec na recovery flow (ztráta telefonu → záložní kódy).
 **BE:** 🔁 reuse `security-tokens` + `auth` modulu — TOTP secret per user, verifikace při loginu, záložní kódy (hash v DB), nová pole na `User`. Endpoints: setup/enable/disable/verify.
 **FE:** 🔁 reuse sekce „Tvá zařízení"/Bezpečnost v profilu — QR pro spárování, zadání kódu, výpis záložních kódů; krok navíc v `LoginModal`.
 **Otevřené otázky:** Povinné pro koho? Povolit i e-mailový druhý faktor jako alternativu? Pamatovat zařízení na X dní?
+**✅ Implementováno (2026-06-18, `spec-14.1`):** TOTP (QR spárování) + 10 jednorázových záložních kódů + **remember-device včetně revokace** (rozhodnuto vzít do V1). Dobrovolné pro všechny. Secret šifrovaný (AES-256-GCM, `TOTP_ENC_KEY`), challenge-based login (žádný token před ověřením 2FA), trust cookie httpOnly, auto-revoke při změně hesla / vypnutí 2FA. BE 91 testů, FE build+smoke zelené.
+**Follow-upy (mimo V1):** **14.1-a** e-mailový OTP jako volitelná *slabší* metoda (nesmí sdílet kanál s resetem hesla) · **14.1-c** vynucení 2FA pro Admin/Superadmin + admin „odemkni uživatele" (lockout recovery).
 
 ### - [ ] 14.2 Oprava captcha „fail-open" — [A2 · dopad vysoký · náklad malý] 🔁
 **Cíl:** Při výpadku captcha služby request **zablokovat**, ne propustit; sjednotit s dokumentací.

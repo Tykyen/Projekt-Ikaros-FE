@@ -49,8 +49,18 @@ export const usernameRequestSchema = z.object({
     ),
 });
 
+// 14.1 — 2FA
+export const totpCodeSchema = z.object({
+  code: z.string().regex(/^\d{6}$/, 'Zadej 6 číslic'),
+});
+export const totpDisableSchema = z.object({
+  password: z.string().min(1, 'Zadej heslo'),
+});
+
 export type BioForm = z.infer<typeof bioSchema>;
 export type CharacterForm = z.infer<typeof characterSchema>;
 export type HeaderForm = z.infer<typeof headerSchema>;
 export type PasswordForm = z.infer<typeof passwordSchema>;
 export type UsernameRequestForm = z.infer<typeof usernameRequestSchema>;
+export type TotpCodeForm = z.infer<typeof totpCodeSchema>;
+export type TotpDisableForm = z.infer<typeof totpDisableSchema>;

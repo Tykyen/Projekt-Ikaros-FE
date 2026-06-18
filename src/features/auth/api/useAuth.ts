@@ -15,6 +15,7 @@ import type {
   AuthResponse,
   LoginRequest,
   LoginResponse,
+  LoginTotpRequest,
   RegisterRequest,
   User,
 } from '@/shared/types';
@@ -46,6 +47,28 @@ export function useLogin() {
       store.set(currentUserAtom, result.user);
       store.set(loginModalOpenAtom, false);
       // Pokud byl spuštěný pending logout, zruš ho — uživatel se přihlásil znovu
+      store.set(pendingLogoutAtom, null);
+    },
+  });
+}
+
+/**
+ * 14.1 — dokončení loginu druhým faktorem. Stejné nasazení tokenů jako useLogin
+ * (po úspěchu), jen volá /auth/login/totp s challengeId + kódem.
+ */
+export function useLoginTotp() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: LoginTotpRequest) =>
+      api.post<LoginResponse>('/auth/login/totp', dto),
+    onSuccess: (result) => {
+      if (result.status !== 'ok') return;
+      const store = getDefaultStore();
+      qc.clear();
+      store.set(accessTokenAtom, result.accessToken);
+      store.set(refreshTokenAtom, result.refreshToken);
+      store.set(currentUserAtom, result.user);
+      store.set(loginModalOpenAtom, false);
       store.set(pendingLogoutAtom, null);
     },
   });

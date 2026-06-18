@@ -5,6 +5,8 @@ import { isAxiosError } from 'axios';
 import { Clock } from 'lucide-react';
 import { Button, Input } from '@/shared/ui';
 import { EditCard } from './EditCard';
+import { TotpCard } from './TotpCard';
+import { TrustedDevicesCard } from './TrustedDevicesCard';
 import { useMyProfile } from '@/features/auth/api/useAuth';
 import { useChangePassword } from '@/features/profile/api/useProfile';
 import {
@@ -274,6 +276,9 @@ export function SecuritySection({ username }: { username: string }) {
           Po změně hesla budou ostatní zařízení odhlášena.
         </p>
       </EditCard>
+
+      <TotpCard />
+      <TrustedDevicesCard />
     </>
   );
 }

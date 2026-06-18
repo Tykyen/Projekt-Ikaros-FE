@@ -51,6 +51,9 @@ export interface User {
   emailVerified: boolean;
   /** 1.7 — kdy byl e-mail naposledy ověřen (po kliku na verifikační link). */
   emailVerifiedAt?: string;
+  /** 14.1 — 2FA stav (secret + záložní kódy se na FE NIKDY neposílají). */
+  totpEnabled?: boolean;
+  twoFactorMethod?: string;
   /** 1.5 D-052 — privacy „neviditelný" mód (skrýt online stav před ostatními). */
   hiddenPresence?: boolean;
   /** D-045 — privacy „skrýt mě v adresáři uživatelů". Admin vidí všechny. */
@@ -271,7 +274,37 @@ export interface LoginDeletionPendingResponse {
   scheduledHardDeleteAt: string;
   deletionReason: string | null;
 }
-export type LoginResponse = LoginOkResponse | LoginDeletionPendingResponse;
+// 14.1 — 2FA: heslo OK, ale chybí druhý faktor (žádný token, jen challengeId).
+export interface LoginTotpRequiredResponse {
+  status: 'totp_required';
+  challengeId: string;
+}
+export type LoginResponse =
+  | LoginOkResponse
+  | LoginDeletionPendingResponse
+  | LoginTotpRequiredResponse;
+
+// 14.1 — 2FA payloady
+export interface LoginTotpRequest {
+  challengeId: string;
+  /** 6místný TOTP kód NEBO jednorázový záložní kód. */
+  code: string;
+  trustDevice?: boolean;
+}
+export interface TotpSetupResponse {
+  qrDataUrl: string;
+  secret: string;
+}
+export interface TotpEnableResponse {
+  backupCodes: string[];
+}
+export interface TrustedDeviceView {
+  id: string;
+  label: string;
+  lastUsedAt: string;
+  createdAt: string;
+  current: boolean;
+}
 
 export interface RefreshResponse {
   accessToken: string;
