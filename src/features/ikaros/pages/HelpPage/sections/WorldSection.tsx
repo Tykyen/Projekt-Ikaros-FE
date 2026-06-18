@@ -462,8 +462,15 @@ export function WorldSection() {
             <strong>PJ v chatu</strong>; vlastní obrázek vedení si v režimu
             „rozpoznatelně" nastaví každý PJ i Pomocný PJ sám (tamtéž, „Můj obrázek
             vedení"). Projeví se zpětně i na starších zprávách. Když PJ píše „za
-            bytost" (NPC mód), zůstává tou bytostí.
+            bytost" (NPC mód, razítko 🎭), zůstává tou bytostí.
           </p>
+          <CalloutBox variant="tip">
+            Jméno bytosti v masce PJ buď napíše ručně, nebo ji vybere z{' '}
+            <strong>našeptávače</strong> existujících postav a NPC světa (stačí
+            psát část jména). Výběrem se k masce rovnou napojí{' '}
+            <strong>obrázek z karty</strong> a jméno bytosti v chatu se stane{' '}
+            <strong>klikací</strong> — kdokoli si přes něj otevře její kartu.
+          </CalloutBox>
         </Tool>
         <Tool icon={<Music size={16} />} title="Zvuky (jukebox)" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="info">
           <p>
