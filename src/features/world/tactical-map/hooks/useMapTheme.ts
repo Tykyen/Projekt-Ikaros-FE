@@ -25,13 +25,18 @@ import type { MapThemeColors } from '../types';
 export function parseHexColor(value: string): number {
   const trimmed = value.trim();
   if (trimmed.startsWith('#')) {
-    const hex = trimmed.slice(1);
-    if (hex.length === 3) {
-      // Expand #rgb → #rrggbb
+    let hex = trimmed.slice(1);
+    // #rgb / #rgba → expand RGB nibbles na #rrggbb (alfu řeší parseAlpha).
+    if (hex.length === 3 || hex.length === 4) {
       const r = hex[0];
       const g = hex[1];
       const b = hex[2];
-      return parseInt(`${r}${r}${g}${g}${b}${b}`, 16) || 0;
+      hex = `${r}${r}${g}${g}${b}${b}`;
+    } else if (hex.length === 8) {
+      // #rrggbbaa → jen RRGGBB. CSS minifikace (cssnano) převede
+      // rgba(r,g,b,a) na 8místný hex; bez ořezu by parseInt vrátil 32bit
+      // číslo > 0xFFFFFF a PIXI spadne ("Unable to convert color").
+      hex = hex.slice(0, 6);
     }
     return parseInt(hex, 16) || 0;
   }

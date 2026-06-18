@@ -88,9 +88,19 @@ describe('parseAlpha', () => {
     expect(parseAlpha('rgba(70, 75, 95, 0.16)')).toBeCloseTo(0.16);
     expect(parseAlpha('rgba(170, 180, 200, 0.94)')).toBeCloseTo(0.94);
   });
-  it('rgb / hex / nevalidní → 1', () => {
+  it('rgb / 6místný hex / nevalidní → 1', () => {
     expect(parseAlpha('rgb(70, 75, 95)')).toBe(1);
     expect(parseAlpha('#0a0814')).toBe(1);
     expect(parseAlpha('')).toBe(1);
+  });
+
+  it('vytáhne alfu z 8místného #rrggbbaa (cssnano output)', () => {
+    // rgba(70,75,95,0.55) → cssnano → #464b5f8c (0x8c = 140/255 ≈ 0.55)
+    expect(parseAlpha('#464b5f8c')).toBeCloseTo(140 / 255, 2);
+    expect(parseAlpha('#000000ff')).toBe(1);
+  });
+
+  it('vytáhne alfu z #rgba shorthandu', () => {
+    expect(parseAlpha('#fff8')).toBeCloseTo(0x88 / 255, 2);
   });
 });

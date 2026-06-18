@@ -12,8 +12,8 @@
  * Pozice: `axialToPixel(token.q, token.r) + origin + stagger`.
  *
  * 10.2c-edit-9d (2026-05-28): port klíčových UX prvků ze starého Matrixu:
- *   - TOKEN_SIZE dynamic = `config.size * 0.75` (ne fixed 28; reaguje na
- *     změnu hex size přes zoom palety)
+ *   - TOKEN_SIZE dynamic = `config.size * 0.82` (vepsaná kružnice hexu; ne
+ *     fixed 28; reaguje na změnu hex size přes zoom palety)
  *   - sprite clipped do kruhu (matchuje Matrix `clipPath` circle)
  *   - 'i' badge top-left tokenu pro otevření deníku/info
  *
@@ -85,9 +85,10 @@ export function TokenSprite({
   onOpenInfo,
   onPointerDown,
 }: Props): React.ReactElement {
-  // 10.2c-edit-9d: token radius derivovaný z hex velikosti (matrix uzanc:
-  // gridSize * 0.75 — viz C:/Matrix/Matrix/frontend/src/components/Map/MapToken.tsx:71).
-  const tokenSize = Math.round(config.size * 0.75);
+  // Token radius derivovaný z hex velikosti. 0.82 ≈ vepsaná kružnice
+  // flat-top hexu (√3/2·size ≈ 0.866·size) mínus tenký okraj na ring/glow,
+  // takže token hex vyplní, ale nepřeteče přes hrany.
+  const tokenSize = Math.round(config.size * 0.82);
 
   const center = axialToPixel(token.q, token.r, config.size);
   const x = center.x + config.originX + staggerOffset.x;

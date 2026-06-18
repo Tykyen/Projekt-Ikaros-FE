@@ -24,6 +24,16 @@ describe('parseHexColor', () => {
     expect(parseHexColor('rgba(180, 120, 255, 0.3)')).toBe(0xb478ff);
   });
 
+  it('ořízne alfu z 8místného #rrggbbaa (cssnano output)', () => {
+    // rgba(70,75,95,0.55) → cssnano → #464b5f8c; bez ořezu PIXI spadne
+    expect(parseHexColor('#464b5f8c')).toBe(0x464b5f);
+    expect(parseHexColor('#ff00aaff')).toBe(0xff00aa);
+  });
+
+  it('expanduje #rgba na #rrggbb (alfa pryč)', () => {
+    expect(parseHexColor('#fab8')).toBe(0xffaabb);
+  });
+
   it('trimuje whitespace', () => {
     expect(parseHexColor('  #ff00aa  ')).toBe(0xff00aa);
   });

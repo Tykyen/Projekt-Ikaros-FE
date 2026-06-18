@@ -21,9 +21,22 @@ export function hexKey(q: number, r: number): string {
  * Fallback 1 (plná) pro rgb()/hex/nevalidní vstup. // lint-colors-ignore
  */
 export function parseAlpha(value: string): number {
-  const m = /rgba?\([^)]*?,[^)]*?,[^)]*?,\s*([\d.]+)\s*\)/.exec(value ?? '');
+  const v = (value ?? '').trim();
+  // Hex se zabudovanou alfou: CSS minifikace převede rgba(...) na #rrggbbaa
+  // (resp. #rgba). parseHexColor alfu ořízne → musíme ji vytáhnout zde.
+  if (v.startsWith('#')) {
+    const hex = v.slice(1);
+    if (hex.length === 8) return clamp01(parseInt(hex.slice(6, 8), 16) / 255);
+    if (hex.length === 4) return clamp01(parseInt(hex[3] + hex[3], 16) / 255);
+    return 1; // #rgb / #rrggbb — bez alfy
+  }
+  const m = /rgba?\([^)]*?,[^)]*?,[^)]*?,\s*([\d.]+)\s*\)/.exec(v);
   if (!m) return 1;
-  const a = parseFloat(m[1]);
+  return clamp01(parseFloat(m[1]));
+}
+
+/** Ořež do [0,1]; NaN/nekonečno → 1 (plná, bezpečný fallback). */
+function clamp01(a: number): number {
   return Number.isFinite(a) ? Math.min(1, Math.max(0, a)) : 1;
 }
 
