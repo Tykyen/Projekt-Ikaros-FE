@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<title>Projekt Ikaros — Vize platformy, Část I</title>
+<style>
+  :root {
+    --ink: #1b1726;
+    --ink-soft: #3b3550;
+    --muted: #6b6580;
+    --violet: #7c3aed;
+    --violet-deep: #4c1d95;
+    --violet-night: #190b2e;
+    --cyan: #06b6d4;
+    --gold: #d9a441;
+    --tint: #f5f2fc;
+    --tint-line: #e7e0f7;
+    --good: #15803d;
+    --bad: #b42318;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-size: 11.2pt;
+    line-height: 1.62;
+    background: #fff;
+  }
+
+  h1, h2, h3, h4, .display {
+    font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  p { margin: 0 0 0.7em; }
+  strong { color: var(--ink); }
+  a { color: var(--violet-deep); text-decoration: none; }
+  /* tučné na tmavém pozadí musí být světlé (cover, závěrečný box, hlavičky sekcí) */
+  .cover strong, .closing strong, .section-head strong { color: #fff; }
+
+  @page { size: A4; margin: 17mm 16mm 16mm; }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    position: relative;
+    height: 262mm;
+    margin: -17mm -16mm 0;
+    padding: 38mm 22mm 0;
+    background:
+      radial-gradient(120% 80% at 80% 8%, rgba(6,182,212,0.22), transparent 55%),
+      radial-gradient(120% 90% at 5% 100%, rgba(124,58,237,0.55), transparent 60%),
+      linear-gradient(150deg, #150827 0%, #2c1259 48%, #4c1d95 100%);
+    color: #fff;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .cover::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 16mm 16mm;
+    mask-image: linear-gradient(to bottom, #000 30%, transparent 92%);
+  }
+  .cover > * { position: relative; }
+  .cover .eyebrow {
+    font-family: "Segoe UI", Inter, sans-serif;
+    text-transform: uppercase; letter-spacing: 0.32em;
+    font-size: 10pt; font-weight: 600;
+    color: #c9b8f5;
+  }
+  .cover h1 {
+    font-size: 56pt; line-height: 1.0; margin: 12mm 0 0; color: #fff;
+    font-weight: 800; letter-spacing: -0.02em;
+  }
+  .cover h1 .glow { color: #d6c6ff; text-shadow: 0 0 26px rgba(124,58,237,0.9); }
+  .cover .sub {
+    font-family: "Segoe UI", Inter, sans-serif;
+    font-size: 16.5pt; line-height: 1.45; font-weight: 400;
+    color: # e8e2fb; color: #e8e2fb; margin: 9mm 0 0; max-width: 150mm;
+  }
+  .cover .rule { width: 46mm; height: 3px; margin: 11mm 0 0;
+    background: linear-gradient(90deg, var(--cyan), var(--violet)); border-radius: 2px; }
+  .cover .tagline {
+    font-family: "Segoe UI", Inter, sans-serif;
+    margin: 8mm 0 0; font-size: 12pt; color: #cfc2f0; max-width: 150mm; font-style: italic;
+  }
+  .cover .meta {
+    position: absolute; left: 22mm; right: 22mm; bottom: 24mm;
+    display: flex; justify-content: space-between; align-items: end;
+    font-family: "Segoe UI", Inter, sans-serif; font-size: 10.5pt; color: #b9a9e6;
+    border-top: 1px solid rgba(255,255,255,0.18); padding-top: 5mm;
+  }
+  .cover .meta strong { color: #fff; }
+
+  /* ---------- TOC ---------- */
+  .toc { page-break-after: always; padding-top: 4mm; }
+  .toc ol { list-style: none; counter-reset: t; padding: 0; margin: 6mm 0 0; }
+  .toc li {
+    counter-increment: t;
+    display: flex; align-items: baseline; gap: 5mm;
+    font-family: "Segoe UI", Inter, sans-serif; font-size: 13pt;
+    padding: 4.5mm 0; border-bottom: 1px solid var(--tint-line);
+  }
+  .toc li::before {
+    content: counter(t);
+    font-weight: 800; color: var(--violet);
+    font-size: 15pt; min-width: 10mm;
+  }
+  .toc li .d { color: var(--muted); font-size: 10.5pt; margin-left: auto; font-style: italic; }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section { page-break-before: always; }
+  .section-head {
+    margin: 0 0 7mm; padding: 7mm 8mm; border-radius: 8px;
+    background: linear-gradient(125deg, var(--violet-night), var(--violet-deep) 92%);
+    color: #fff;
+  }
+  .section-head .kicker {
+    font-family: "Segoe UI", Inter, sans-serif; text-transform: uppercase;
+    letter-spacing: 0.26em; font-size: 9pt; color: #c9b8f5; font-weight: 600;
+  }
+  .section-head h2 { color: #fff; font-size: 25pt; margin: 3mm 0 0; line-height: 1.08; }
+
+  h2 { font-size: 19pt; margin: 9mm 0 3mm; }
+  h3 {
+    font-size: 13.5pt; margin: 7mm 0 2mm; color: var(--violet-deep);
+    border-left: 3px solid var(--violet); padding-left: 3mm;
+  }
+  h4 { font-size: 11.5pt; margin: 4mm 0 1mm; color: var(--ink); }
+
+  ul, ol { margin: 0 0 0.7em; padding-left: 6mm; }
+  li { margin: 0.18em 0; }
+
+  .lead { font-size: 12.5pt; color: var(--ink-soft); }
+
+  /* ---------- COMPONENTS ---------- */
+  .callout {
+    border-left: 4px solid var(--violet);
+    background: var(--tint);
+    padding: 4mm 5mm; border-radius: 0 6px 6px 0; margin: 4mm 0;
+    break-inside: avoid;
+  }
+  .callout.cyan { border-color: var(--cyan); background: #eefbfd; }
+  .callout.gold { border-color: var(--gold); background: #fbf6ea; }
+  .callout .t { font-family: "Segoe UI", Inter, sans-serif; font-weight: 700; font-size: 10.5pt;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--violet-deep); margin-bottom: 1.5mm; }
+  .callout.cyan .t { color: #0e7490; }
+  .callout.gold .t { color: #92660a; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin: 4mm 0; }
+  .card {
+    border: 1px solid var(--tint-line); border-radius: 8px; padding: 4mm 5mm;
+    break-inside: avoid; background: #fff;
+  }
+  .card h4 { margin-top: 0; color: var(--violet-deep); }
+  .card .small { font-size: 10pt; color: var(--muted); }
+  .card ul { padding-left: 5mm; margin-bottom: 0; }
+  .card li { font-size: 10.3pt; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 5mm 0; }
+  .stat { text-align: center; border: 1px solid var(--tint-line); border-radius: 8px; padding: 4mm 2mm; break-inside: avoid; }
+  .stat .n { font-family: "Segoe UI", Inter, sans-serif; font-weight: 800; font-size: 22pt;
+    color: var(--violet); line-height: 1; }
+  .stat .l { font-size: 9.3pt; color: var(--muted); margin-top: 1.5mm; }
+
+  table { width: 100%; border-collapse: collapse; margin: 4mm 0; font-size: 10pt; break-inside: avoid; }
+  th, td { padding: 2.6mm 3mm; text-align: left; border-bottom: 1px solid var(--tint-line); vertical-align: top; }
+  thead th {
+    background: var(--violet-deep); color: #fff; font-family: "Segoe UI", Inter, sans-serif;
+    font-size: 9.4pt; font-weight: 600;
+  }
+  th.us, td.us { background: rgba(124,58,237,0.10); font-weight: 600; }
+  thead th.us { background: var(--violet); }
+  .yes { color: var(--good); font-weight: 700; }
+  .no { color: var(--bad); font-weight: 700; }
+  .partial { color: var(--gold); font-weight: 700; }
+  tbody tr:nth-child(even) td { background: #faf8fe; }
+  tbody tr:nth-child(even) td.us { background: rgba(124,58,237,0.13); }
+
+  .phase { display: flex; gap: 4mm; margin: 3mm 0; break-inside: avoid; align-items: flex-start; }
+  .phase .num {
+    font-family: "Segoe UI", Inter, sans-serif; font-weight: 800; font-size: 12pt;
+    color: #fff; background: var(--violet); border-radius: 6px;
+    min-width: 13mm; text-align: center; padding: 2mm 1mm; line-height: 1.15;
+  }
+  .phase .num.flag { background: linear-gradient(135deg, var(--gold), #b9831f); }
+  .phase .body { flex: 1; }
+  .phase .body b { font-family: "Segoe UI", Inter, sans-serif; }
+
+  .pill { display: inline-block; font-family: "Segoe UI", Inter, sans-serif; font-size: 8.6pt;
+    font-weight: 600; padding: 0.7mm 2.2mm; border-radius: 20px; background: var(--tint);
+    color: var(--violet-deep); border: 1px solid var(--tint-line); }
+
+  .sources { font-size: 9pt; color: var(--muted); }
+  .sources li { margin: 0.6mm 0; word-break: break-all; }
+
+  .closing {
+    margin-top: 6mm; padding: 7mm 8mm; border-radius: 10px;
+    background: linear-gradient(125deg, var(--violet-night), var(--violet-deep));
+    color: #fff; break-inside: avoid;
+  }
+  .closing h3 { color: #fff; border: 0; padding: 0; font-size: 15pt; }
+  .closing p { color: #e9e3fb; }
+  .closing .sig { font-style: italic; color: #cfc2f0; margin-top: 4mm; }
+
+  .foot { margin-top: 4mm; font-size: 8.6pt; color: var(--muted); font-family: "Segoe UI", Inter, sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<section class="cover">
+  <div class="eyebrow">Vize platformy · Část I</div>
+  <h1>Projekt <span class="glow">Ikaros</span></h1>
+  <div class="sub">Český domov pro hraní rolí — kde se <strong>stůl</strong>, <strong>svět</strong>
+    a <strong>komunita</strong> potkávají na jednom místě a v jednom jazyce.</div>
+  <div class="rule"></div>
+  <div class="tagline">Od fanoušků pro fanoušky. Nezisková platforma s ambicí trumfnout všechny.</div>
+  <div class="meta">
+    <div>Kdo jsme · Co umíme · Kde je trh · Kam míříme</div>
+    <div><strong>18. června 2026</strong><br>Strategický a prezentační dokument</div>
+  </div>
+</section>
+
+<!-- ===================== TOC ===================== -->
+<section class="toc">
+  <h2>Obsah</h2>
+  <ol>
+    <li>Co jsme a co chceme <span class="d">identita, mise, ambice</span></li>
+    <li>Etapa I — co všechno umíme a dokážeme <span class="d">hotová platforma</span></li>
+    <li>Naše konkurence a trh <span class="d">svět i Česko</span></li>
+    <li>Naše vize — Etapa II <span class="d">kam stavíme</span></li>
+    <li>Shrnutí <span class="d">proč na nás záleží</span></li>
+  </ol>
+  <div class="callout">
+    <div class="t">Jak číst tento dokument</div>
+    Je to <strong>mapa toho, kdo jsme a kam jdeme</strong> — ne technická příručka. Část „co umíme" stojí na
+    kódem ověřené inventuře funkcí platformy. Část „kam jdeme" vychází z naší strategické roadmapy. Část „trh"
+    je doložená veřejnými daty (zdroje na konci).
+  </div>
+</section>
+
+<!-- ===================== 1. CO JSME A CO CHCEME ===================== -->
+<section class="section">
+  <div class="section-head">
+    <div class="kicker">Kapitola první</div>
+    <h2>Co jsme a co chceme</h2>
+  </div>
+
+  <p class="lead">Projekt Ikaros je <strong>česká komunitní platforma pro hraní rolí</strong> (RPG —
+  hry na hrdiny). Vznikl jako hobby projekt, žije z nadšení a nestaví na zisku: děláme ho
+  <strong>od fanoušků pro fanoušky</strong>. Naším měřítkem úspěchu není obrat, ale to, jestli má česká
+  RPG scéna konečně <em>domov</em>, ze kterého nemá důvod odcházet.</p>
+
+  <h3>Kdo jsme</h3>
+  <p>Hraní rolí je společné vyprávění příběhu: hráči se vžijí do postav, vypravěč (PJ) vede svět a
+  pravidla dávají rozhodnutím váhu. Kolem stolu — fyzického i online — se dělají tři různé věci, které
+  dnes řeší tři různé nástroje:</p>
+  <div class="grid2">
+    <div class="card"><h4>Stůl</h4><div class="small">Vlastní hra — mapy, postavy, kostky, souboj.</div></div>
+    <div class="card"><h4>Svět</h4><div class="small">Worldbuilding — lore, wiki, historie, vztahy, mapy světa.</div></div>
+    <div class="card"><h4>Komunita</h4><div class="small">Lidé — chat, příběhy mezi sezeními, nábory, sdílení.</div></div>
+    <div class="card"><h4>Česky</h4><div class="small">Vlastní jazyk i podpora českých herních systémů.</div></div>
+  </div>
+  <p><strong>Ikaros tyhle čtyři věci spojuje na jednom účtu a v jednom jazyce.</strong> To je naše DNA —
+  a zároveň mezera, kterou na trhu nikdo jiný nezaplňuje (viz kapitola 3).</p>
+
+  <h3>Co chceme — tři stupně ambice</h3>
+  <p>Naši budoucnost čteme ve třech scénářích. Každý je sám o sobě hodnotný cíl; jdou po sobě a stojí
+  jeden na druhém.</p>
+  <div class="phase"><div class="num">A</div><div class="body"><b>Domov komunity.</b>
+    Bezpečné, příjemné místo, které zvládne i nováček a ze kterého nikdo nemá důvod odejít.</div></div>
+  <div class="phase"><div class="num">B</div><div class="body"><b>„Fórovka 2.0" pro Česko.</b>
+    Moderní náhrada českých RPG fórovek — výchozí volba pro novou textovou hru, kterou Discord dělá špatně.</div></div>
+  <div class="phase"><div class="num">C</div><div class="body"><b>Český all‑in‑one stůl.</b>
+    Plnohodnotná česká alternativa velkých nástrojů (Foundry, Roll20) — s komunitou navrch.</div></div>
+  <div class="callout gold">
+    <div class="t">Cíl je dojít až na C — a trumfnout všechny</div>
+    A+B je začátek (domov a nenahraditelnost pro českou scénu). Jakmile to stojí pevně, doháníme i živý stůl.
+    Ne kvůli penězům — abychom <strong>dokázali, že na to máme</strong>, a posunuli komunitu na novou úroveň.
+  </div>
+
+  <h3>Čemu věříme — naše principy</h3>
+  <ul>
+    <li><strong>Bezpečnost a data mají přednost</strong> — pojistka (zálohy, 2FA) před parádou. Ztráta dat je jediná nevratná chyba.</li>
+    <li><strong>Hobby charakter zůstává</strong> — žádný povinný placený obsah; štědrý free základ je naše výhoda.</li>
+    <li><strong>Čeština a komunita jsou jádro</strong> — globální ambice a angličtinu vědomě odkládáme.</li>
+    <li><strong>AI jen volitelně, transparentně, s limity</strong> — nikdy vnucené; část komunity ji odmítá a to respektujeme.</li>
+    <li><strong>Udržitelné tempo</strong> — vlny po sobě, ne vše naráz; chrání to data i lidi za projektem.</li>
+    <li><strong>Obsah dělá komunita</strong> — platforma dává nástroje, generátory a sdílené knihovny; hráči je plní.</li>
+  </ul>
+</section>
+
+<!-- ===================== 2. ETAPA I — CO UMÍME ===================== -->
+<section class="section">
+  <div class="section-head">
+    <div class="kicker">Kapitola druhá</div>
+    <h2>Etapa I — co všechno umíme a dokážeme</h2>
+  </div>
+
+  <p class="lead">Etapa I postavila <strong>funkční platformu</strong>. Tohle není seznam přání — je to
+  přehled toho, co dnes reálně běží, ověřený přímo v kódu. Od přihlášení přes celé světy až po bojovou
+  mapu a kalendáře.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">17</div><div class="l">herních systémů v katalogu</div></div>
+    <div class="stat"><div class="n">13</div><div class="l">deníkových listů per systém</div></div>
+    <div class="stat"><div class="n">6 + 6</div><div class="l">rolí (světové + globální)</div></div>
+    <div class="stat"><div class="n">21+</div><div class="l">přepínatelných motivů</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">druhy map (vesmír, atlas, bojiště)</div></div>
+    <div class="stat"><div class="n">16</div><div class="l">stylů kontroly kvality kódu</div></div>
+  </div>
+
+  <h3>Účet, identita a bezpečnost</h3>
+  <ul>
+    <li>Registrace a přihlášení, <strong>dvoufázové ověření (2FA/TOTP)</strong> se záložními kódy a zapamatováním zařízení.</li>
+    <li>Reset hesla, ověření a změna e‑mailu — vše přes bezpečné odkazy s omezenou platností.</li>
+    <li><strong>GDPR‑friendly smazání účtu</strong> — 30denní ochranná lhůta, pak nevratná anonymizace; příspěvky zůstávají, autorství se nahradí „tombstone". Export vlastních dat.</li>
+    <li>Granulární admin práva, přívětivé hlášky 403/404, ochrana proti zneužití.</li>
+  </ul>
+
+  <h3>Komunita platformy</h3>
+  <div class="grid2">
+    <div class="card"><h4>Profily &amp; přátelství</h4><ul>
+      <li>Veřejný profil postavy i hráče, soukromí „jen pro přátele"</li>
+      <li>Žádosti o přátelství, blokace</li></ul></div>
+    <div class="card"><h4>Obsah komunity</h4><ul>
+      <li>Články (s kategoriemi), galerie, diskuze, novinky</li>
+      <li>Schvalovací role (správci článků / galerie / diskuzí)</li></ul></div>
+    <div class="card"><h4>Komunikace</h4><ul>
+      <li>Globální chat „Hospoda" + atmosférická Rozcestí</li>
+      <li>Soukromá pošta, notifikace + <strong>web push na telefon</strong>, vlastní emoty</li></ul></div>
+    <div class="card"><h4>Objevování</h4><ul>
+      <li>Seznam veřejných světů (leak‑safe), kalendář akcí</li>
+      <li>Oblíbené / záložky napříč obsahem, nápověda</li></ul></div>
+  </div>
+
+  <h3>Světy — vlastní herní vesmíry</h3>
+  <ul>
+    <li><strong>Průvodce tvorbou světa</strong>: volba systému (17 v katalogu), magie, technologické úrovně; automaticky se naseedují měny, počasí, kalendáře a referenční stránky.</li>
+    <li><strong>Členství a role uvnitř světa</strong> (Žadatel → Čtenář → Hráč → Korektor → Pomocný PJ → PJ) s žádostmi o vstup a schvalováním; veřejné / poloveřejné / soukromé režimy.</li>
+    <li><strong>Governance</strong>: vypravěč je pánem svého světa; platformový admin do něj nezasahuje (jen obnova omylem smazaného světa do 30 dní).</li>
+    <li>Skupiny/družiny se znakem a barvami, <strong>vlastní vzhled světa</strong> (per‑svět téma) a stavitel hlavního menu.</li>
+  </ul>
+
+  <h3>Obsah světa — wiki, stránky, utajení</h3>
+  <ul>
+    <li>Bohatý <strong>wiki/stránkový systém</strong> (formátovaný editor, odkazy, obrázky) — lokace, frakce, osoby, lore.</li>
+    <li><strong>Utajené záložky (AKJ)</strong>: PJ uzamkne části stránky podle „prověření" hráče — zamčené se ukáží jako 🔒 (jméno + úroveň), po udělení přístupu se odemknou. Vynuceno na serveru, ne jen schované v UI.</li>
+    <li>Referenční stránky (Pravidla, Magický systém, Technologie), šablony, oblíbené stránky.</li>
+  </ul>
+
+  <h3>Postavy, bestiář a ekonomika</h3>
+  <ul>
+    <li><strong>Trojí model</strong>: hráčská postava (PC) / NPC s deníkem / Bestie (statbloky pro spawn na mapu).</li>
+    <li><strong>Deníkové listy podle systému</strong> — 13 dedikovaných listů (Matrix, D&amp;D 5e, Dračí doupě, Dračí hlídka, Jeskyně a draci, Příběhy impéria, Call of Cthulhu, Fate, GURPS, Shadowrun…) + univerzální fallback.</li>
+    <li><strong>Bestiář</strong> ve třech úrovních (systémový / uživatelský / světový) se „snapshotem" při vyvolání na mapu.</li>
+    <li>Obchod a převodník měn světa.</li>
+  </ul>
+
+  <h3>Mapy a nástroje hry</h3>
+  <div class="grid2">
+    <div class="card"><h4>Vesmírná 3D mapa</h4><div class="small">Prostorová mapa lokací světa.</div></div>
+    <div class="card"><h4>Obrázkový atlas</h4><div class="small">Galerie map s viditelností per mapa (leak‑safe).</div></div>
+    <div class="card"><h4>Taktická bojová mapa</h4><div class="small">Tokeny PC/NPC/Bestie, mlha války, živá iniciativa, scény per hráč, knihovna map, kostky, počasí na mapě, vrácení akcí.</div></div>
+    <div class="card"><h4>Zvuky &amp; Deník PJ</h4><div class="small">Zvuková kulisa; soukromé poznámky vypravěče dostupné z mapy i menu.</div></div>
+  </div>
+
+  <h3>Čas a příběh</h3>
+  <ul>
+    <li><strong>Herní kalendáře</strong> — 14 presetů (i přestupné roky a lunisolární cykly), časová osa světa, události s barvami.</li>
+    <li><strong>Počasí</strong> — ruční i automatická simulace navázaná na herní datum, promítá se do chatu i mapy.</li>
+    <li><strong>Herní akce</strong>, <strong>Pavučina</strong> (graf vztahů postav), <strong>Storyboard</strong> (scénáře a příběhové linie).</li>
+  </ul>
+
+  <h3>Pod kapotou</h3>
+  <ul>
+    <li><strong>Vyhledávání</strong> napříč světem (fulltext + sémantické embeddingy).</li>
+    <li><strong>Real‑time</strong> přes WebSocket (chat, mapa, počasí, přítomnost) — leak‑safe návrhem.</li>
+    <li><strong>21+ přepínatelných motivů</strong> (vlastní fialová synthwave identita), funkční na <strong>mobilu i počítači</strong>.</li>
+    <li><strong>16 stylů průběžných auditů kódu</strong> (bezpečnost, integrita dat, role, navigace, kaskádové mazání…) — kvalita jako návyk, ne výjimka.</li>
+  </ul>
+
+  <div class="callout cyan">
+    <div class="t">Co z toho plyne</div>
+    Na rozdíl od typického hobby webu už dnes Ikaros zvládá <strong>celý životní cyklus hry</strong>: založ svět →
+    pozvi lidi → napiš lore → vytvoř postavy → veď kalendář a příběh → odehraj souboj na mapě → komunikuj mezi sezeními.
+    A to celé česky.
+  </div>
+</section>
+
+<!-- ===================== 3. KONKURENCE A TRH ===================== -->
+<section class="section">
+  <div class="section-head">
+    <div class="kicker">Kapitola třetí</div>
+    <h2>Naše konkurence a trh — svět i Česko</h2>
+  </div>
+
+  <p class="lead">Trh s hraním rolí roste a stěhuje se online. Velcí hráči jsou ale <strong>hluboce
+  specializovaní každý v jedné disciplíně</strong> — a žádný z nich nemluví česky ani nezná české systémy.
+  Tam je naše příležitost.</p>
+
+  <h3>Trh v číslech</h3>
+  <div class="stats">
+    <div class="stat"><div class="n">~2 mld $</div><div class="l">velikost TTRPG trhu (2024–25)</div></div>
+    <div class="stat"><div class="n">~12 %</div><div class="l">roční růst (CAGR)</div></div>
+    <div class="stat"><div class="n">44 %</div><div class="l">hráčů používá virtuální stůl (VTT)</div></div>
+    <div class="stat"><div class="n">28 %</div><div class="l">podíl Evropy na trhu</div></div>
+    <div class="stat"><div class="n">62 %</div><div class="l">kampaní vede sama komunita</div></div>
+    <div class="stat"><div class="n">29 %</div><div class="l">hráčů streamuje hru</div></div>
+  </div>
+  <p>Online a hybridní hraní je trvalá součást oboru, ne pandemická epizoda. Roste poptávka po
+  digitálním obsahu, indie systémech a hraní vedeném hráči — přesně to, co umí dělat komunita kolem platformy.</p>
+
+  <h3>Tři kategorie nástrojů — a jejich lídři</h3>
+
+  <h4>Virtuální stůl (VTT) — „kde se hraje souboj"</h4>
+  <ul>
+    <li><strong>Roll20</strong> — nejdostupnější (v prohlížeči, hra do 15 minut), největší nabídka oficiálního D&amp;D obsahu; ale jen základní osvětlení, na velkých scénách laguje, model předplatného.</li>
+    <li><strong>Foundry VTT</strong> — jednorázová licence (~$50), 2000+ modulů, dynamické světlo a efekty, výkon; za cenu strmé křivky učení a nutnosti se o hosting starat.</li>
+    <li><strong>Fantasy Grounds</strong> — nejlepší automatizace pravidel (skoro simulátor), ale složitější a dražší.</li>
+  </ul>
+
+  <h4>Worldbuilding / wiki — „kde žije svět"</h4>
+  <ul>
+    <li><strong>World Anvil</strong> — články, mapy, časové osy, nástěnky; míří hlavně na spisovatele a vyprávění.</li>
+    <li><strong>Kanka</strong> — štědrý free plán, postavy, organizace, mapy, kalendáře s počasím; nejblíž TTRPG.</li>
+    <li><strong>LegendKeeper</strong> (~$9/měs) — nejhladší rozhraní, interaktivní mapy s body, nejsilnější sdílení s hráči (co vidí PJ vs. hráč).</li>
+  </ul>
+
+  <h4>Komunita — „kde se lidé potkávají"</h4>
+  <ul>
+    <li><strong>Discord</strong> je de‑facto standard. Ale <strong>není stavěný na strukturované dlouhé hraní</strong>: textové hraní (play‑by‑post) je pomalé, sledování HP/kouzel/stavů po týdnech je chaos, hra vázne na jednom hráči. „Forum" kanály jsou jen obejití problému, ne řešení.</li>
+  </ul>
+
+  <h3>Srovnání — kdo umí co</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Schopnost</th>
+        <th>Roll20</th>
+        <th>Foundry</th>
+        <th>World&nbsp;Anvil</th>
+        <th>Kanka</th>
+        <th>Discord</th>
+        <th class="us">Ikaros</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Bojová mapa (stůl)</td><td class="yes">ano</td><td class="yes">ano</td><td class="no">ne</td><td class="no">ne</td><td class="no">ne</td><td class="us yes">ano</td></tr>
+      <tr><td>Worldbuilding / wiki (svět)</td><td class="partial">slabě</td><td class="partial">moduly</td><td class="yes">ano</td><td class="yes">ano</td><td class="no">ne</td><td class="us yes">ano</td></tr>
+      <tr><td>Komunita / chat / příběhy</td><td class="partial">základ</td><td class="no">ne</td><td class="partial">fóra</td><td class="partial">základ</td><td class="yes">ano</td><td class="us yes">ano</td></tr>
+      <tr><td>Čeština</td><td class="no">ne</td><td class="partial">moddy</td><td class="no">ne</td><td class="partial">částečně</td><td class="yes">ano</td><td class="us yes">rodně</td></tr>
+      <tr><td>České herní systémy</td><td class="no">ne</td><td class="no">ne</td><td class="no">ne</td><td class="no">ne</td><td class="no">ne</td><td class="us yes">ano</td></tr>
+      <tr><td>Vše na jednom účtu</td><td class="no">ne</td><td class="no">ne</td><td class="no">ne</td><td class="no">ne</td><td class="no">ne</td><td class="us yes">ano</td></tr>
+      <tr><td>Cena pro hráče</td><td>předplatné</td><td>$50 jednorázově</td><td>freemium</td><td>free / $5</td><td>free</td><td class="us">zdarma</td></tr>
+    </tbody>
+  </table>
+  <p class="foot">slabě / částečně / moduly = existuje, ale není to hlavní silná stránka, nebo to vyžaduje doplňky.</p>
+
+  <h3>Český trh — roztříštěný a bez domova</h3>
+  <p>Česká scéna je živá, ale rozsypaná po nástrojích, které spolu nemluví. Lidé lepí dohromady
+  <strong>Roll20 + Discord + fórum + tabulku</strong>:</p>
+  <ul>
+    <li><strong>RPG Fórum</strong>, <strong>d20.cz</strong> — diskuze, seznamky „hledám hráče / vypravěče", textové hraní.</li>
+    <li><strong>Andor.cz / Aragorn.cz / DraciDoupe.cz</strong> — dlouholeté weby pro hraní Dračího doupěte online.</li>
+    <li><strong>Discord servery</strong> (např. „Krotitelé draků") — nábory a hraní.</li>
+  </ul>
+  <p>Žádný z nich není <strong>český all‑in‑one</strong>. A globální nástroje českou scénu neobsluhují:
+  neumí češtinu ani <strong>české systémy</strong> — Dračí doupě (první české RPG z 90. let), jeho nástupce
+  <strong>Dračí hlídku</strong>, oficiální české D&amp;D <strong>Jeskyně a draci</strong> (nová éra českých RPG),
+  Dračí doupě II/plus, Příběhy impéria.</p>
+
+  <div class="callout gold">
+    <div class="t">Náš příkop</div>
+    Nejsme nejhlubší v žádné jednotlivé disciplíně — a nemusíme být. Jsme <strong>jediní, kdo spojí stůl + svět +
+    komunitu, česky, s podporou českých systémů, a zdarma</strong>. To je obrana, kterou globální konkurence
+    lokálně nedokáže snadno překonat, a kterou Discord ze své podstaty neumí.
+  </div>
+</section>
+
+<!-- ===================== 4. VIZE — ETAPA II ===================== -->
+<section class="section">
+  <div class="section-head">
+    <div class="kicker">Kapitola čtvrtá</div>
+    <h2>Naše vize — Etapa II</h2>
+  </div>
+
+  <p class="lead">Etapa I udělala platformu <em>funkční</em>. Etapa II ji má proměnit ve
+  <strong>vyspělou, bezpečnou a pro českou scénu nenahraditelnou</strong>. Ne přetlačit Foundry v jeho hře —
+  ale vyhrát tam, kde nikdo jiný nehraje.</p>
+
+  <h3>Osm vln, jeden směr</h3>
+  <div class="phase"><div class="num">14</div><div class="body"><b>Bezpečnost &amp; provozní odolnost.</b>
+    Zálohy a obnova, 2FA, bezpečnostní hlavičky, CI brána, export světa. Pojistka před parádou — jde první. <span class="pill">probíhá</span></div></div>
+  <div class="phase"><div class="num">15</div><div class="body"><b>Rychlé výhry &amp; parita stolu.</b>
+    Instalace jako appka (PWA), čtvercová/bezmřížková mapa, měření a šablony kouzel, prázdné stavy s výzvou, role‑based homepage.</div></div>
+  <div class="phase"><div class="num">15B</div><div class="body"><b>SEO &amp; objevitelnost.</b>
+    Aby Google viděl veřejné světy, články a profily — nejlevnější akvizice pro českou scénu.</div></div>
+  <div class="phase"><div class="num flag">16</div><div class="body"><b>Český příkop. 👑</b>
+    Dlouhé příběhy ve světovém chatu, <strong>hloubková podpora českých systémů</strong> (deník + bestiář + dodatky pravidel), migrace obsahu ze starých fórovek, onboarding + demo svět, interaktivní mapa s body na stránky.</div></div>
+  <div class="phase"><div class="num">17</div><div class="body"><b>Vlajkové funkce.</b>
+    Dynamické světlo a linie pohledu, import hotových map, veřejná „výkladní skříň" světa, integrace hlasu, streamer overlay, mobilní companion režim.</div></div>
+  <div class="phase"><div class="num">18</div><div class="body"><b>AI asistence.</b>
+    Volitelné, transparentní, s limity — generátor NPC, shrnutí dlouhých příběhů. AI jen jako chytřejší vrstva nad procedurálními generátory zdarma.</div></div>
+  <div class="phase"><div class="num">19</div><div class="body"><b>Růst, metriky &amp; udržitelnost.</b>
+    Měření aktivace a návratnosti, kvóty a limity nákladů, dobrovolná podpora (dary), nábory „hledám hru".</div></div>
+  <div class="phase"><div class="num">20</div><div class="body"><b>Governance, právo &amp; moderace.</b>
+    Pravidla komunity a nahlašování, zásady ochrany údajů, autorská práva, udržitelné tempo proti vyhoření.</div></div>
+  <div class="phase"><div class="num">21</div><div class="body"><b>Komunitní tvorba &amp; sdílený obsah.</b>
+    Sdílené knihovny (předměty, bestie, kouzla, šablony), procedurální generátory zdarma, stavitel podzemí, kurátorství.</div></div>
+
+  <h3>Kdybychom měli udělat jen tři věci</h3>
+  <div class="grid2">
+    <div class="card"><h4>① Zálohy + 2FA</h4><div class="small">Ztráta dat a účtů je nevratná. Bez pojistky se komunita nevzpamatuje.</div></div>
+    <div class="card"><h4>② Příběhový / fórovkový mód</h4><div class="small">Jediné, co Discord dělá špatně a co zavírá českou díru.</div></div>
+    <div class="card"><h4>③ Onboarding + demo svět</h4><div class="small">Jinak třetina nováčků odejde první týden.</div></div>
+    <div class="card"><h4>Obsah = komunita</h4><div class="small">Generátory a knihovny; hráči a PJ je plní. Nejudržitelnější zdroj obsahu.</div></div>
+  </div>
+
+  <div class="callout">
+    <div class="t">Co vědomě NEDĚLÁME</div>
+    Plnou automatizaci pravidel à la Foundry (bezedná údržba), vlastní video/hlasový stack, marketplace s prodejem
+    obsahu, angličtinu/i18n a AI „na sílu". Držíme rozsah, ať projekt zvládneme a zůstane věrný své povaze.
+  </div>
+</section>
+
+<!-- ===================== 5. SHRNUTÍ ===================== -->
+<section class="section">
+  <div class="section-head">
+    <div class="kicker">Kapitola pátá</div>
+    <h2>Shrnutí</h2>
+  </div>
+
+  <p class="lead">Projekt Ikaros je <strong>nezisková česká platforma pro hraní rolí</strong>, která jako
+  jediná spojuje stůl, svět a komunitu na jednom místě — a dělá to česky, včetně českých systémů.</p>
+
+  <h3>Kde stojíme</h3>
+  <ul>
+    <li><strong>Máme hotovou platformu</strong> (Etapa I): účty a bezpečnost, komunita, celé světy, wiki s utajením, postavy a bestiář pro 13 systémů, tři druhy map včetně bojiště, kalendáře, počasí, příběhové nástroje, vyhledávání, real‑time, 21+ motivů — funkční na mobilu i počítači.</li>
+    <li><strong>Známe trh</strong>: roste (~12 % ročně), stěhuje se online, ale je rozdělený mezi specialisty (VTT vs. worldbuilding vs. Discord), kteří neumí česky ani české systémy.</li>
+    <li><strong>Máme příkop</strong>: jsme jediný český all‑in‑one — celistvost a jazyk, který globální konkurence lokálně nepřebije.</li>
+    <li><strong>Víme, kam jdeme</strong> (Etapa II): od pojistky (zálohy, 2FA) přes parita stolu a SEO k českému příkopu, vlajkovým funkcím a komunitní tvorbě — scénáře A → B → C.</li>
+  </ul>
+
+  <h3>Proč na nás záleží</h3>
+  <p>Česká RPG scéna roky lepí dohromady cizí nástroje, které spolu nemluví a které ji neberou vážně.
+  Ikaros jí dává <strong>domov</strong> — bezpečný, štědře zdarma, v jejím jazyce, kde obsah tvoří sama
+  komunita. Neděláme to pro zisk. Děláme to proto, že to <em>jde</em> udělat líp — a chceme dokázat, že na to máme.</p>
+
+  <div class="closing">
+    <h3>Naše vize</h3>
+    <p>Postavit místo, kde má česká komunita hráčů a vypravěčů konečně všechno pod jednou střechou —
+    příběh, svět i stůl — a kde nováček i veterán najdou důvod zůstat. Začínáme jako domov.
+    Míříme na to být <strong>českým all‑in‑one stolem, který trumfne všechny</strong>.</p>
+    <div class="sig">Projekt Ikaros — od fanoušků pro fanoušky.</div>
+  </div>
+
+  <h3 style="margin-top:9mm">Zdroje (kapitola 3)</h3>
+  <ul class="sources">
+    <li>Tabletop RPG Market Size &amp; Forecast — industryresearch.biz, globalgrowthinsights.com, businessresearchinsights.com (2024–2025)</li>
+    <li>Worldwide TTRPG Market 2024 — rpgdrop.com/worldwide-ttrpg-market-in-2024-industry-analysis</li>
+    <li>VTT srovnání — scriptoriumgm.com/blog/best-virtual-tabletop-vtt-systems-2025; myvtt.games (Foundry vs Roll20, 2025); playtools.top/vtt-comparison-guide</li>
+    <li>Worldbuilding nástroje — legendkeeper.com/best-world-anvil-alternatives; kanka.io/kanka-vs-worldanvil</li>
+    <li>Discord &amp; play‑by‑post — medium.com (John F. Marion), enworld.org (Play‑By‑Post Tips), startplaying.games</li>
+    <li>Česká scéna — rpgforum.cz, d20.cz, andor.cz, dracidoupe.cz; české systémy — imago.cz (Jeskyně a draci), dracihlidka.cz, cc.cz (CzechCrunch)</li>
+  </ul>
+  <p class="foot">Tržní čísla jsou orientační (různé analytické zdroje se liší v metodice); slouží k řádové orientaci, ne jako auditovaná data. Dokument: Projekt Ikaros — Vize platformy, Část I · 18. 6. 2026.</p>
+</section>
+
+</body>
+</html>
