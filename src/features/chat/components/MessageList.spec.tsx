@@ -56,13 +56,12 @@ const renderList = (jumpToMessageId?: string | null) =>
   );
 
 /** Skok = scrollIntoView s `block: 'center'` (auto-scroll na konec ho nemá). */
-const jumpCalled = (spy: ReturnType<typeof vi.spyOn>) =>
-  spy.mock.calls.some(
-    ([arg]) =>
-      typeof arg === 'object' && arg !== null && 'block' in arg
-        ? (arg as ScrollIntoViewOptions).block === 'center'
-        : false,
-  );
+function jumpCalled(spy: { mock: { calls: unknown[][] } }): boolean {
+  return spy.mock.calls.some((call) => {
+    const arg = call[0] as ScrollIntoViewOptions | boolean | undefined;
+    return typeof arg === 'object' && arg !== null && arg.block === 'center';
+  });
+}
 
 describe('MessageList — deep-link skok na zprávu (13.2a)', () => {
   it('doscrolluje na zprávu z jumpToMessageId (block: center)', () => {
