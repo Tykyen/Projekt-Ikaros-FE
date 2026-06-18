@@ -36,6 +36,13 @@ interface DiceRollOverlayProps {
   roll: DiceRollEvent | null;
   /** Volá se po doběhnutí (readout odzobrazen) — kontext nastaví `roll = null`. */
   onDone: () => void;
+  /**
+   * Přednahřeje 3D engine hned při mountu (skrytě, bez hodu) — první reálný hod
+   * pak netrefí studený engine (jinak se „ztratí", engine se teprve inicializuje
+   * → uživatel musí hodit dvakrát). Zapíná jen taktická mapa; chat = default off
+   * (žádný eager WebGL pro běžné uživatele).
+   */
+  warmup?: boolean;
 }
 
 type Phase = 'idle' | 'rolling' | 'result';
@@ -45,12 +52,18 @@ const RESULT_HOLD_MS = 2400;
 /** Pauza fallbacku (fate / no-WebGL) než ukáže výsledek (ms). */
 const FALLBACK_DELAY_MS = 650;
 
-export function DiceRollOverlay({ roll, onDone }: DiceRollOverlayProps) {
+export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) {
   const [webgl] = useState(isWebGLAvailable);
   const [phase, setPhase] = useState<Phase>('idle');
   // Jednou nasazený 3D host žije dál (lazy instance se nereinicializuje).
   const [mount3d, setMount3d] = useState(false);
   const [use3dThisRoll, setUse3dThisRoll] = useState(false);
+
+  // Warmup: předmountuj engine při prvním renderu (active=false → jen init,
+  // žádný hod). První reálný hod pak trefí už nahřátý engine → zobrazí se napoprvé.
+  useEffect(() => {
+    if (warmup && webgl) setMount3d(true);
+  }, [warmup, webgl]);
 
   const notation = roll ? payloadToNotation(roll.payload) : null;
   const can3d = !!roll && webgl && notation !== null;

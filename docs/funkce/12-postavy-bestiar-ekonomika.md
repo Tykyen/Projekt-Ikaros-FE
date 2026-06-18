@@ -182,6 +182,8 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Co jde dělat (vše):** list (3-scope filtrovaný `findVisible`), detail, create, update, soft-delete (koš), restore, **clone** (libovolný scope → user/world; přenese staty, schopnosti, obrázek, `clonedFromId`). WS signál `bestiar:changed` (scope-routed, leak-safe) → klient refetchne; invaliduje cross-world stejného systému. (`bestiae.service.ts:185-217`, `useBestiar.ts:20-25`)
 
+**Obrázek + výřez:** editor (`BestieEditorModal`) nahrává obrázek přes sdílenou `HeroUploadCard` a umožňuje zvolit **výřez** — focal bod (klik do obrázku), zoom 100–400 %, fit cover/contain (parity s akcemi/stránkami/novinkami). Pole `imageFocalX/Y`, `imageZoom`, `imageFit` napříč FE (`bestiar/types.ts`) i BE (interface/schema/Create+Update DTO/`toEntity`); default null = cover 50/50. Výřez se projeví v katalogu (`BestieCard` přes `getImageStyle`), na **tokenu taktické mapy** (`TokenSprite` `getSpriteTransform` — cover/focal/zoom posunem+scale spritu v kruhové masce; opravilo i dřívější roztažení na čtverec) i v paletě (`PaletteAvatar`). PC/NPC tokeny focal nenesou (`characterData` bez focal) → původní render. (`BestieEditorModal.tsx`, `bestiae/dto/*`)
+
 **Snapshot semantics při spawn:** Bestie spawnutá na taktickou mapu = **nezávislá instance** (token), ne read-only odkaz do katalogu. Token dostane `characterId` ve tvaru `bestie:<id>`, kopii `systemStats`/`abilities`/`notes` a vlastní `health.current`. Pozdější změna katalogu instanci na mapě neovlivní; per-scéna whitelist přes `scene.activeBestieIds`. (`map-operations.service.ts:507-525,618-631`)
 
 **Hranice:**

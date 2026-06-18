@@ -329,7 +329,9 @@ export function WorldSection() {
             systémové staty a schopnosti. Tři rozsahy: <strong>Můj</strong> (osobní,
             napříč světy), <strong>Tohoto světa</strong> (PJ tým) a <strong>Systémové</strong>{' '}
             (globální pro herní systém). Vytvoříš, upravíš nebo naklonuješ; mazání je
-            do koše. Spawnují se na mapu z palety orchestrace.
+            do koše. Spawnují se na mapu z palety orchestrace. U obrázku můžeš zvolit{' '}
+            <strong>výřez</strong> — klikem vybereš, která část bude vidět (plus
+            přiblížení), aby token na mapě i náhled v katalogu ukazovaly to podstatné.
           </p>
           <ScreenshotSlot media="svet.bestiar" />
         </Tool>
@@ -375,9 +377,11 @@ export function WorldSection() {
         <Tool icon={<CalendarDays size={16} />} title="Kalendář světa" audience={{ kind: 'vse', label: 'Členové (PJ vidí vše)' }} accent="warning">
           <p>
             Sjednocený měsíční kalendář — akce světa, kalendáře postav, NPC i lokací v
-            jedné mřížce. Hustota zobrazení (Detail / Kompakt / Heat), boční panel se
-            seznamem eventů dne a filtrovací strom v sidebaru. V buňkách fáze měsíců a
-            barva sezóny. Hráč vidí jen veřejné zdroje.
+            jedné mřížce. Hustota zobrazení (Detail / Kompakt / Heat) a filtrovací strom
+            v sidebaru. V buňkách fáze měsíců a barva sezóny. <strong>Klikni na číslo
+            dne</strong> (vedle je počet akcí) a otevře se boční panel s čitelným seznamem
+            všech akcí toho dne — užitečné, když je akcí moc a do buňky se nevejdou. Hráč
+            vidí jen veřejné zdroje.
           </p>
           <p>
             Každá postava, NPC i lokace má v kalendáři <strong>vlastní barvu</strong> —

@@ -18,7 +18,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - **Filtr entit** (sidebar strom): typy akce / postavy / NPC / Lokace + per-entita zaškrtnutí; „Skrýt vše" / „Reset". Persistuje rozbalené skupiny v `localStorage` per svět; skryté entity jen session.
   - **Barva entity v kalendáři** — klik na swatch otevře `GroupColorPicker`, uloží `PATCH /worlds/:id/calendars/:slug/settings` (color / Auto dle názvu). gameEvents nemají vlastní barvu (fixní `#7c5cff`).
   - **Hustota (density)** — compact / detail toggle s auto-fallbackem podle max událostí na den; perzistováno per svět.
-  - **Den detail drawer** (`+N dalších` / heat cell) + **modal detailu** události (datum, kalendář, vlastník, popis). Buňky mají overlay lunárních fází a sezónní tint borderu.
+  - **Den detail drawer** se VŠEMI akcemi dne (čitelný seznam: čas, název, typ, entita) — otevře ho **klik na číslo dne** (Detail i Compact mód, když má den ≥1 akci; u data je počet akcí `12. · 5` jako signál klikatelnosti), odkaz `+N dalších`, nebo klik na buňku v Heat módu. Plus **modal detailu** jedné události (datum, kalendář, vlastník, popis). Buňky mají overlay lunárních fází a sezónní tint borderu.
   - **Pozice (rok/měsíc) se pamatuje** per svět v `localStorage` přes refresh (`usePersistedCalendarCursor`).
 - **Hranice / co neumí:**
   - Je to **read+filter dashboard PJ**, ne editor — nové události se z této stránky **nepřidávají** (akce se tvoří v /akce, kalendářové subdoc události na postavě/NPC/lokaci).
@@ -27,7 +27,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - „Dnes" se mapuje z reálného gregoriánského data přes absDay — **žádný posun in-game času** se zde nepromítá (in-game datum řeší modul Počasí).
 - **Zvláštnosti:** Agregát filtruje skryté kalendáře (`displaySettings.isHiddenInAggregate`). `kind`/`isNpc` se enrichuje z `Characters` adresáře (Lokace = `kind:'location'`).
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/CalendarPage.tsx:58`, hooks `CalendarPage/hooks/useDensity.ts`, `hooks/useEntityIndex.ts`, `hooks/usePersistedCalendarCursor.ts`. BE controller `backend/src/modules/calendars/calendars.controller.ts:13`, service `calendars.service.ts:39` (`aggregate`/`updateSettings`/`assertCanModerate`). Engine `src/shared/lib/calendarEngine/`.
+- **Kód:** FE `src/features/world/pages/CalendarPage.tsx:58`, buňka `CalendarPage/components/CalendarCell.tsx` (klik na číslo dne → `onExpandDay`), drawer `components/DayDetailDrawer.tsx`, hooks `CalendarPage/hooks/useDensity.ts`, `hooks/useEntityIndex.ts`, `hooks/usePersistedCalendarCursor.ts`. BE controller `backend/src/modules/calendars/calendars.controller.ts:13`, service `calendars.service.ts:39` (`aggregate`/`updateSettings`/`assertCanModerate`). Engine `src/shared/lib/calendarEngine/`.
 
 ---
 

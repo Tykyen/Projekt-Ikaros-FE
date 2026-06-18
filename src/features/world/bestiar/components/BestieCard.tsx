@@ -57,6 +57,18 @@ export function BestieCard({
         {schema && (
           <EntityStatbar schema={schema} value={bestie.systemStats} compact />
         )}
+        {bestie.abilities.length > 0 && (
+          <ul className={styles.abilities} aria-label="Schopnosti">
+            {bestie.abilities.map((a, i) => (
+              <li key={i} className={styles.ability}>
+                <span className={styles.abilityLabel}>{a.label}</span>
+                {a.value && (
+                  <span className={styles.abilityValue}>{a.value}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
         {bestie.notes && (
           <p className={styles.notes} title={bestie.notes}>
             {bestie.notes}

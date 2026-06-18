@@ -48,6 +48,35 @@
   font-weight: 700;
 }
 
+.abilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ability {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgb(var(--white-rgb) / 0.06);
+  border: 1px solid rgba(120, 100, 255, 0.2);
+}
+
+.abilityLabel {
+  font-weight: 600;
+}
+
+.abilityValue {
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
 .notes {
   font-size: 12px;
   opacity: 0.6;

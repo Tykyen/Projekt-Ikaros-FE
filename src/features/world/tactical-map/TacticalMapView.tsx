@@ -1363,6 +1363,11 @@ export function TacticalMapView(): React.ReactElement {
               : null;
           return (
             <TokenInfoPanel
+              // Klíč = id tokenu → při přepnutí na jiný token se panel REMOUNTuje
+              // a vnitřní stav (BestiePanelView/combat sheety drží useState ze
+              // snapshotu tokenu) se reinicializuje. Bez toho ukazoval pořád
+              // prvního (musel se zavřít a otevřít znovu).
+              key={openedToken.id}
               open
               header={{
                 // Bestie token nemá characterData (není Page) → dotáhni obrázek
@@ -1715,8 +1720,14 @@ export function TacticalMapView(): React.ReactElement {
         </div>
       )}
 
-      {/* 10.2j G3 — fullscreen 3D dice overlay (lokální hod + cizí viditelný). */}
-      <DiceRollOverlay roll={diceOverlay} onDone={() => setDiceOverlay(null)} />
+      {/* 10.2j G3 — fullscreen 3D dice overlay (lokální hod + cizí viditelný).
+          warmup: přednahřeje 3D engine při otevření mapy → první hod se zobrazí
+          napoprvé (jinak studený engine spolkne první hod, viz „hodit dvakrát"). */}
+      <DiceRollOverlay
+        warmup
+        roll={diceOverlay}
+        onDone={() => setDiceOverlay(null)}
+      />
     </div>
   );
 }

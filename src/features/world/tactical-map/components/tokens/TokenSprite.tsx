@@ -345,7 +345,6 @@ export function TokenSprite({
           <pixiGraphics draw={drawActiveTurnGlow} />
         </pixiContainer>
       )}
-      <pixiGraphics label="token-ring" draw={drawRing} />
       <pixiGraphics label="token-bg" draw={drawBackground} />
       {texture ? (
         <>
@@ -385,6 +384,11 @@ export function TokenSprite({
           />
         </>
       )}
+
+      {/* Ring NAD spritem — jinak ho sprite (kruh radius tokenSize) překryje
+          a fialový selection ring zmizí. alignment:1 (v drawRing) drží obrys
+          dovnitř tokenSize → je vidět, ale nepřeteče přes stěnu hexu. */}
+      <pixiGraphics label="token-ring" draw={drawRing} />
 
       {/* 10.2c-edit-9d — 'i' info badge top-left, klikatelný */}
       <pixiContainer
