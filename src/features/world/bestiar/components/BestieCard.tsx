@@ -77,7 +77,7 @@ export function BestieCard({
           </p>
         )}
       </div>
-      <div className={styles.actions}>
+      <div className={`${styles.actions} print-hide`}>
         {canEdit && (
           <Button variant="secondary" size="sm" onClick={onEdit}>
             Upravit

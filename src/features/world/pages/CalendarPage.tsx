@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Modal, Spinner } from '@/shared/ui';
+import { PrintButton, usePrintMode } from '@/features/world/export/print';
 import {
   GREGORIAN_DEFAULT_CONFIG,
   expandEventDays,
@@ -55,6 +56,25 @@ interface UnifiedEvent {
  * Sidebar filter: typy (akce/postavy/NPC/Lokace) + per-entita toggle.
  * Cell overlay: lunar fáze ikony + sezóna top-border tint.
  */
+/** Posun {year, monthIndex} o `delta` měsíců s přetečením roku. */
+function addMonthsTo(
+  c: { year: number; monthIndex: number },
+  delta: number,
+  monthCount: number,
+): { year: number; monthIndex: number } {
+  let m = c.monthIndex + delta;
+  let y = c.year;
+  while (m < 0) {
+    m += monthCount;
+    y--;
+  }
+  while (m >= monthCount) {
+    m -= monthCount;
+    y++;
+  }
+  return { year: y, monthIndex: m };
+}
+
 export default function CalendarPage() {
   const { worldId, world, loading } = useWorldContext();
   const { data: gameEvents = [] } = useAllWorldGameEvents(worldId);
@@ -123,6 +143,10 @@ export default function CalendarPage() {
     const now = new Date();
     return { year: now.getFullYear(), monthIndex: now.getMonth() };
   });
+
+  // 14.7b — tisk kalendáře s rozsahem: kolik měsíců od aktuálního vytisknout.
+  const printMode = usePrintMode();
+  const [printMonths, setPrintMonths] = useState(1);
 
   // Všechny eventy bez filtru (pro entity index → checkbox seznam v sidebaru).
   const allEvents = useMemo<UnifiedEvent[]>(() => {
@@ -382,16 +406,63 @@ export default function CalendarPage() {
 
   const monthName = displayConfig.months[cursor.monthIndex]?.name ?? '';
 
+  // Render jednoho měsíce — reuse pro normální (1) i tiskový (N pod sebou) režim.
+  const renderMonth = (year: number, monthIndex: number) => {
+    const g = generateMonthGrid(year, monthIndex, displayConfig);
+    const mName = displayConfig.months[monthIndex]?.name ?? '';
+    return (
+      <div key={`${year}-${monthIndex}`} className="print-month">
+        {printMode && (
+          <h2 className="print-month-title">
+            {mName} {year}
+          </h2>
+        )}
+        <div
+          className={s.grid}
+          style={{
+            gridTemplateColumns: `repeat(${displayConfig.daysOfWeek.length}, 1fr)`,
+          }}
+          role="grid"
+          aria-label={`Kalendář ${mName} ${year}`}
+        >
+          {displayConfig.daysOfWeek.map((w) => (
+            <div key={w} className={s.weekday}>
+              {w}
+            </div>
+          ))}
+          {g.map((cell) => {
+            const k = fantasyDayKey(cell.date);
+            const dayEvents = eventsByDay.get(k) ?? [];
+            return (
+              <CalendarCell
+                key={k}
+                cell={cell}
+                dayEvents={dayEvents}
+                density={densityCtl.effectiveDensity}
+                today={today}
+                config={displayConfig}
+                detailVisibleLimit={DETAIL_VISIBLE_LIMIT}
+                compactVisibleLimit={COMPACT_VISIBLE_LIMIT}
+                onSelectEvent={handleSelectByEventId}
+                onExpandDay={setExpandedDay}
+              />
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   if (loading) return <Spinner center />;
 
   return (
-    <article className={s.page}>
+    <article className={s.page} data-print-scope>
       <header className={s.header}>
         <h1 className={s.title}>Kalendář světa — PJ pohled</h1>
       </header>
 
       <div className={s.layout}>
-        <aside className={s.sidebar}>
+        <aside className={`${s.sidebar} print-hide`}>
           <div className={s.sidebarSection}>
             <h3 className={s.sidebarHeading}>Filtr entit</h3>
             <EntityFilterTree
@@ -408,7 +479,7 @@ export default function CalendarPage() {
         </aside>
 
         <section>
-          <div className={s.toolbar}>
+          <div className={`${s.toolbar} print-hide`}>
             <button
               type="button"
               className={s.navBtn}
@@ -508,40 +579,37 @@ export default function CalendarPage() {
                 </button>
               </div>
             )}
+            <label
+              className="print-hide"
+              style={{
+                marginLeft: 'auto',
+                display: 'inline-flex',
+                gap: '0.35rem',
+                alignItems: 'center',
+                fontSize: '0.85rem',
+              }}
+            >
+              Tisk:
+              <select
+                value={printMonths}
+                onChange={(e) => setPrintMonths(Number(e.target.value))}
+                aria-label="Rozsah tisku (počet měsíců)"
+              >
+                <option value={1}>1 měsíc</option>
+                <option value={3}>3 měsíce</option>
+                <option value={6}>6 měsíců</option>
+                <option value={12}>12 měsíců</option>
+              </select>
+            </label>
+            <PrintButton title="Vytisknout kalendář (zvolený rozsah)" />
           </div>
 
-          <div
-            className={s.grid}
-            style={{
-              gridTemplateColumns: `repeat(${displayConfig.daysOfWeek.length}, 1fr)`,
-            }}
-            role="grid"
-            aria-label={`Kalendář ${monthName} ${cursor.year}`}
-          >
-            {displayConfig.daysOfWeek.map((w) => (
-              <div key={w} className={s.weekday}>
-                {w}
-              </div>
-            ))}
-            {grid.map((cell) => {
-              const k = fantasyDayKey(cell.date);
-              const dayEvents = eventsByDay.get(k) ?? [];
-              return (
-                <CalendarCell
-                  key={k}
-                  cell={cell}
-                  dayEvents={dayEvents}
-                  density={densityCtl.effectiveDensity}
-                  today={today}
-                  config={displayConfig}
-                  detailVisibleLimit={DETAIL_VISIBLE_LIMIT}
-                  compactVisibleLimit={COMPACT_VISIBLE_LIMIT}
-                  onSelectEvent={handleSelectByEventId}
-                  onExpandDay={setExpandedDay}
-                />
-              );
-            })}
-          </div>
+          {printMode
+            ? Array.from({ length: printMonths }, (_, i) => {
+                const d = addMonthsTo(cursor, i, displayConfig.months.length);
+                return renderMonth(d.year, d.monthIndex);
+              })
+            : renderMonth(cursor.year, cursor.monthIndex)}
         </section>
       </div>
 

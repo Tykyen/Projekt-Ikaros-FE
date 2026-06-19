@@ -16,6 +16,7 @@ import {
   Trash2,
   Theater,
   Smile,
+  Download,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
@@ -39,6 +40,7 @@ const CharacterTabsVisibilityTab = lazy(
 const HeadlineLinkTab = lazy(() => import('./tabs/HeadlineLinkTab'));
 const PjChatTab = lazy(() => import('./tabs/PjChatTab'));
 const DeleteWorldTab = lazy(() => import('./tabs/DeleteWorldTab'));
+const ExportTab = lazy(() => import('./tabs/ExportTab'));
 // Přesun z world nav (2026-05-25): admin nástroje do Nastavení tabů.
 const CalendarConfigsPage = lazy(
   () => import('@/features/world/pages/CalendarConfigsPage/CalendarConfigsPage'),
@@ -171,6 +173,14 @@ const TABS: SettingsTab[] = [
     icon: <DoorOpen size={18} />,
     minRole: WorldRole.Ctenar,
     render: () => <MembershipTab />,
+  },
+  {
+    // 14.7c — export / záloha celého světa (ZIP). Jen PJ (BE pj-full).
+    id: 'export',
+    label: 'Export / Záloha',
+    icon: <Download size={18} />,
+    minRole: WorldRole.PJ,
+    render: () => <ExportTab />,
   },
   {
     // Soft-delete světa (PJ vlastník + Admin). Obnova do 30 dní jen Admin.

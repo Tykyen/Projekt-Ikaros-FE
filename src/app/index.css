@@ -10,6 +10,8 @@
 @import '../themes/_shared/world-depth.css';
 /* 10.2-prep-4 — mapové CSS proměnné (PixiJS čte přes getComputedStyle v 10.2a). */
 @import '../themes/_shared/map-tokens.css';
+/* 14.7a — tiskový stylesheet (pilíř A): izolace [data-print-root], černá na bílé. */
+@import '../features/world/export/print/print.css';
 
 /* 3.2 — self-hostované prose fonty (latin-ext subset, variable). */
 @import '@fontsource-variable/fraunces/wght.css';

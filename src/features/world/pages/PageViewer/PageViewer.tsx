@@ -130,7 +130,7 @@ export function PageViewer({ page }: Props) {
 
   return (
     <>
-      <article ref={containerRef} className={s.article}>
+      <article ref={containerRef} className={s.article} data-print-scope>
         <PageHeader page={page} readTimeMinutes={readTimeMinutes} />
         <AkjDecryptedBanner
           worldId={worldId}

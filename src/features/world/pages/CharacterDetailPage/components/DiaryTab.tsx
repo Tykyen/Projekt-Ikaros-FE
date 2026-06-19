@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Spinner, Button, Modal, ConfirmDialog, Badge } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { PrintButton } from '@/features/world/export/print';
 import { parseApiError } from '@/shared/api';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useCharacterDiary } from '../../api/useCharacterSubdocs';
@@ -88,14 +89,19 @@ export function DiaryTab({ slug, mode, onExitEdit, onDirtyChange, onRoll }: Prop
           onRoll={onRoll}
         />
       ) : (
-        <DiaryTabView
-          diary={diary}
-          worldId={worldId}
-          worldSlug={worldSlug}
-          characterSlug={slug}
-          effectiveBlocks={effectiveBlocks}
-          onRoll={onRoll}
-        />
+        <div data-print-scope>
+          <div className="print-hide" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <PrintButton title="Vytisknout / uložit deník jako PDF" />
+          </div>
+          <DiaryTabView
+            diary={diary}
+            worldId={worldId}
+            worldSlug={worldSlug}
+            characterSlug={slug}
+            effectiveBlocks={effectiveBlocks}
+            onRoll={onRoll}
+          />
+        </div>
       )}
     </DiarySystemProvider>
   );

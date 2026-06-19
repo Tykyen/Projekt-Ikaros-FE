@@ -255,6 +255,44 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Co všechno si můžu vytisknout nebo uložit jako PDF?',
+    a: (
+      <>
+        <p>
+          Skoro všechno, co ve světě vidíš — hledej tlačítko{' '}
+          <strong>tiskárny 🖨 / „Tisk / PDF"</strong>:
+        </p>
+        <ul>
+          <li>
+            <strong>stránku</strong> (ikona v hlavičce), <strong>deník</strong> a{' '}
+            <strong>záložky postavy/NPC</strong> (kalendář volitelně zaškrtneš),
+          </li>
+          <li>
+            <strong>kalendář</strong> (vybereš rozsah 1–12 měsíců),{' '}
+            <strong>bestiář</strong>, <strong>obchod</strong> (ceník),
+          </li>
+          <li>
+            <strong>mapy</strong> (atlas), <strong>hvězdnou mapu</strong> (seznam
+            těles), <strong>pavučinu</strong> vztahů a <strong>scénář</strong>.
+          </li>
+        </ul>
+        <p>
+          Otevře se dialog prohlížeče — buď <strong>vytiskneš</strong>, nebo zvolíš{' '}
+          <strong>„Uložit jako PDF"</strong>. Vytiskne se jen samotný obsah (bez menu),
+          sbalené sekce i odemčené chráněné záložky se <strong>rozbalí</strong>, a vždy
+          jen to, co <strong>sám vidíš</strong>.
+        </p>
+        <p>
+          <strong>PJ</strong> navíc může v <strong>Nastavení světa → Export / Záloha</strong>{' '}
+          stáhnout <strong>celý svět</strong> jedním tlačítkem (ZIP se všemi daty —
+          stránky, postavy, kampaň…). 🚧 Stahování obrázků přímo do zálohy a obnova
+          ze zálohy zpět se připravují.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Jak nastavím, co je vidět na hlavním obrázku stránky nebo postavy?',
     a: (
       <>

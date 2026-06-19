@@ -22,50 +22,7 @@
   }
 }
 
-/* 7.1m — Print stylesheet. Skryje UI chrome, rozbalí sekce, zarovná tisk. */
-@media print {
-  .article {
-    max-width: 100%;
-    padding: 0;
-  }
-
-  /* Skryjeme floating UI a navigaci. */
-  :global([class*='PagePalette']),
-  :global([class*='KeyboardShortcutsHelp']),
-  :global([class*='GalleryLightbox']),
-  :global([class*='QuoteSelectionPopup']),
-  :global([class*='AutoTOC']),
-  :global([class*='breadcrumbs']),
-  :global([class*='editBtn']),
-  :global([class*='starBtn']) {
-    display: none !important;
-  }
-
-  /* Sticky pozice rozbalíme. */
-  :global([class*='aside']),
-  :global([class*='menu']) {
-    position: static !important;
-    max-height: none !important;
-  }
-
-  /* Rozbalíme všechny sekce. */
-  :global([class*='PageSections']) [aria-expanded='false'] + * {
-    display: block !important;
-  }
-
-  /* Broken link styling pryč pro tisk. */
-  .article :global(a.brokenLink) {
-    color: inherit !important;
-    text-decoration: none !important;
-  }
-
-  .article :global(a) {
-    color: inherit !important;
-    text-decoration: underline;
-  }
-
-  body {
-    background: #fff !important;
-    color: #000 !important;
-  }
-}
+/* 7.1m → 14.7a: tiskové styly přesunuty do globálního print.css
+ * (src/features/world/export/print/print.css). Izolace přes [data-print-root]
+ * + rozbalení collapsed sekcí / odemčených AKJ záložek řeší print mód (JS),
+ * ne křehké matchování class-names. */

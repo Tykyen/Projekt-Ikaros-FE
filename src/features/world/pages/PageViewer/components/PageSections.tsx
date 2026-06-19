@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { usePrintMode } from '@/features/world/export/print';
 import type { PageSection } from '../../api/pages.types';
 import s from './PageSections.module.css';
 
@@ -30,6 +31,9 @@ export function PageSections({ sections }: Props) {
 
 function SectionCard({ section }: { section: PageSection }) {
   const [collapsed, setCollapsed] = useState(section.isCollapsed);
+  const printMode = usePrintMode();
+  // Tisk rozbalí všechny sekce (jinak by se vytiskl jen vizuálně otevřený obsah).
+  const showBody = printMode || !collapsed;
   const hasContent =
     section.content.trim().length > 0 || section.items.length > 0;
   if (!hasContent) return null;
@@ -46,10 +50,10 @@ function SectionCard({ section }: { section: PageSection }) {
         <ChevronDown
           size={16}
           aria-hidden
-          className={collapsed ? '' : s.chevronOpen}
+          className={`print-hide ${collapsed ? '' : s.chevronOpen}`}
         />
       </button>
-      {!collapsed && (
+      {showBody && (
         <div className={s.body}>
           {section.content.trim().length > 0 && (
             <div

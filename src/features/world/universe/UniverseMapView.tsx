@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useWorldContext } from '@/features/world/context/WorldContext';
+import { PrintButton, usePrintMode } from '@/features/world/export/print';
 import {
   useUniverse,
   useUpdateUniverse,
@@ -25,6 +26,15 @@ import type { UniverseMap, UniverseNode } from './types';
 import styles from './UniverseMapView.module.css';
 import panel from './components/UniversePanel.module.css';
 
+const NODE_TYPE_LABEL: Record<string, string> = {
+  planet: 'Planeta',
+  star: 'Hvězda',
+  nebula: 'Mlhovina',
+  asteroid: 'Asteroid',
+  moon: 'Měsíc',
+  blackhole: 'Černá díra',
+};
+
 const EMPTY_MAP = (worldId: string): UniverseMap => ({
   id: '',
   worldId,
@@ -35,6 +45,7 @@ const EMPTY_MAP = (worldId: string): UniverseMap => ({
 export function UniverseMapView() {
   const { worldId, worldSlug, isPJ } = useWorldContext();
   const fgRef = useRef<UniverseGraphHandle | undefined>(undefined);
+  const printMode = usePrintMode();
 
   const { data: serverMap, isLoading } = useUniverse(worldId);
   const draft = useUniverseDraft();
@@ -117,15 +128,45 @@ export function UniverseMapView() {
   };
 
   return (
-    <div className={styles.viewport}>
-      <UniverseGraph
-        data={map}
-        editMode={editMode}
-        fgRef={fgRef}
-        onNodeClick={handleNodeClick}
-        onNodeRightClick={handleNodeRightClick}
-        onNodeMoved={draft.moveNode}
-      />
+    <div className={styles.viewport} data-print-scope>
+      <div
+        className="print-hide"
+        style={{ position: 'absolute', top: 8, right: 8, zIndex: 20 }}
+      >
+        <PrintButton title="Vytisknout hvězdnou mapu (seznam těles)" />
+      </div>
+
+      {/* Tisk: WebGL graf nejde spolehlivě snapshotovat (prázdný drawing
+          buffer) → tiskneme čitelný seznam těles místo obrázku grafu. */}
+      {printMode && (
+        <div className="print-universe-list">
+          <h2>Mapa vesmíru</h2>
+          {map.nodes.length === 0 ? (
+            <p>Žádná viditelná tělesa.</p>
+          ) : (
+            <ul>
+              {map.nodes.map((n) => (
+                <li key={n.id}>
+                  <strong>{n.name}</strong>
+                  {n.type ? ` — ${NODE_TYPE_LABEL[n.type] ?? n.type}` : ''}
+                  {n.alliance ? ` (${n.alliance})` : ''}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {!printMode && (
+        <>
+          <UniverseGraph
+            data={map}
+            editMode={editMode}
+            fgRef={fgRef}
+            onNodeClick={handleNodeClick}
+            onNodeRightClick={handleNodeRightClick}
+            onNodeMoved={draft.moveNode}
+          />
 
       <UniversePanel
         title="Mapa vesmíru"
@@ -236,6 +277,8 @@ export function UniverseMapView() {
           </>
         )}
       </UniversePanel>
+        </>
+      )}
     </div>
   );
 }

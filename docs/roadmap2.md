@@ -141,8 +141,9 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Návrh přípravy:** definovat serializovatelný strom světa (existuje datový model); rozhodnout formáty (JSON vždy, ZIP médií, PDF přes Chrome headless — 🔁 vzor `project_pdf_generation`); u velkých světů streamovat/dávkovat.
 **BE:** serializace stromu světa + balíček médií; export job (stream, ať nezatíží server).
 **FE:** tlačítko v nastavení světa + indikátor průběhu + download.
-**Otevřené otázky:** Co všechno do exportu (jen lore, nebo i chat/mapy/kampaně)? Kdo smí exportovat (PJ vs. členové)? Import zpět (obnova z exportu) teď, nebo později?
+**Otevřené otázky:** ~~Co všechno do exportu~~ → vše viditelné lore, chat volitelný blok (default off). ~~Kdo smí exportovat~~ → každý člen svůj viditelný scope (PJ=full, hráč=partial). ~~Import teď, nebo později~~ → **teď, společně** (round-trip ověření; import jen z `pj-full`).
 > 🔗 Kryje i **D-NEW-INV-ADMIN-UI** (Průřez Ú): GDPR `GET /data-export/me` je dnes BE-only bez FE konzumenta — sem patří uživatelské stažení vlastních dat.
+> 🚧 **Rozpracováno (2026-06-19):** spec [spec-14.7.md](arch/phase-14/spec-14.7.md) schválena — 2 pilíře: **A** FE tisk/PDF přes `window.print()` (body 2–14) · **B** BE ZIP záloha (jeden svět) + import. **Pilíř A hotový — 14.7a** (framework + stránka + deník) **i 14.7b** (záložky, kalendář s rozsahem, bestiář, mapy, hvězdná=seznam, pavučina, storyboard, obchod). **Pilíř B — 14.7c export HOTOVÝ**: BE modul `world-export` (ZIP celého lore stromu, PJ/Admin) + FE tab „Export / Záloha". **Import ODLOŽEN** (formát import-ready). Mimo V1: binárky médií do ZIP, chat. Reálný tisk i download neověřeny v prohlížeči (čeká uživatel) · **po BE změně restart**.
 
 ### - [ ] 14.8 Odstřižení od starého webu (SMTP + embedding model) — [H0-08 · dopad střední · náklad střední] 🔁 *(přesun z 19.3)*
 **Cíl:** Žádná závislost na umírajícím `patrikzplzne.cz` — přesun embedding modelu vyhledávání na vlastní hosting, maily přes vlastní SMTP do produkce, ověřit web push na reálném telefonu (iPhone PWA na plochu).

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import clsx from 'clsx';
+import { PrintButton } from '@/features/world/export/print';
 import { SUBJECT_TYPES, TYPE_LABELS } from '../labels';
 import {
   STATUS_EDGE_STYLE,
@@ -214,8 +215,8 @@ export function PavucinaGraph({
     });
 
   return (
-    <div className={s.graphWrap} ref={wrapRef}>
-      <div className={s.graphControls}>
+    <div className={s.graphWrap} ref={wrapRef} data-print-scope>
+      <div className={`${s.graphControls} print-hide`}>
         <input
           className={s.graphSearch}
           placeholder="Hledat uzel…"
@@ -299,6 +300,7 @@ export function PavucinaGraph({
             ✕ Zrušit fokus
           </button>
         )}
+        <PrintButton title="Vytisknout pavučinu (aktuální pohled)" />
       </div>
 
       <GraphLegend />

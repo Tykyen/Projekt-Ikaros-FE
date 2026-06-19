@@ -158,6 +158,42 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 
 ---
 
+## Export / Záloha světa (14.7c)
+
+### Co to je
+Stažení kompletních dat jednoho světa do ZIP (JSON strom). Pilíř B spec-14.7 — uživatelova vlastní záloha proti vendor lock-inu.
+
+### Kde
+- FE tab „Export / Záloha" v `WorldSettingsPage` (`tabs/ExportTab.tsx`), JEN PJ.
+- BE `GET /worlds/:worldId/export?chat=` → `world-export.service.streamExport` (`modules/world-export/`).
+
+### Kdo
+- FE: tab `minRole: WorldRole.PJ`.
+- BE: `resolveScope` — platform Admin/Superadmin nebo `WorldRole.PJ` → `pj-full`; hráč/PomocnyPJ → 403 `EXPORT_VIEWER_PARTIAL_NOT_READY` (hráčský oříznutý export se zatím nestaví).
+
+### Co jde dělat
+- Stáhnout ZIP `svet-<slug>-<datum>.zip` = `manifest.json` (version/scope/counts) + `data.json` (celý lore strom).
+- Obsah: world+settings+members, pages, characters + **všechny subdocs** (deník/finance/výbava/poznámky/kalendář/účty), kalendáře, taktické scény, atlas map+složky, hvězdná mapa, timeline, události, bestiář světa, kampaň (subjekty/vztahy/storylines/scénáře/quick-notes/obchod).
+
+### Hranice — co neumí
+- **Jen `pj-full`** (PJ/Admin); hráčský `viewer-partial` export zatím 403.
+- **Média jako URL** — binárky se nestahují do ZIP (obrázky odkazem; offline média = follow-up).
+- **Mimo export:** per-PJ poznámky (`WorldGmNotes` — chybí `findByWorldId`), chat (volitelný, zatím no-op), campaign purchase/changeLog/scenarioTemplate.
+- **Import zpět ODLOŽEN** — formát je import-ready (stabilní ID + `version` + `scope`), import se nestaví.
+- Timeline limit 500 událostí; velké světy = přímý stream (sledovat timeout).
+
+### Zvláštnosti
+- `pj-full` čte celý strom přímo z repozitářů (PJ vidí vše → bez filtrů). Kvůli tomu přidány `exports:` repo tokenů do 6 modulů (campaign/world-maps/universe/timeline/game-events/character-subdocs).
+- `archiver` 8 = `new ZipArchive()` (ne factory `archiver()`).
+
+### Stav
+🚧 částečné — export ✅ (lore strom, PJ); média-binárky / gm-notes / chat / import zbývají. Reálný download neověřen v prohlížeči, **čeká BE restart**.
+
+### Kód
+FE `WorldSettingsPage/tabs/ExportTab.tsx`; BE `modules/world-export/{world-export.controller,world-export.service,world-export.module}.ts`.
+
+---
+
 ## Per-svět téma / skin (jak se aplikuje)
 
 - **Co to je:** svět má vlastní skin (`themeId`), barevné overrides, pozadí. Tyto se aplikují na celý shell světa i na `:root` (kvůli portálům — modaly žijí mimo `.shell`).

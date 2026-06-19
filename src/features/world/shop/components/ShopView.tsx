@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { Spinner, Button, ConfirmDialog } from '@/shared/ui';
+import { PrintButton } from '@/features/world/export/print';
 import { WorldRole } from '@/shared/types';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -165,12 +166,12 @@ export function ShopView() {
   const loading = itemsQ.isLoading || groupsQ.isLoading;
 
   return (
-    <div className={s.root}>
+    <div className={s.root} data-print-scope>
       <header className={s.topbar}>
         <h1 className={s.pageTitle}>🛒 Obchod</h1>
 
         {canManage && personaList.length > 0 && (
-          <label className={s.fieldLabel}>
+          <label className={`${s.fieldLabel} print-hide`}>
             Nakupuji pro
             <select
               className={s.buyerSelect}
@@ -194,23 +195,28 @@ export function ShopView() {
               characterName={targetCharacter.name}
               currencyItems={currencyItems}
             />
-            <Button variant="ghost" onClick={() => setPurchasesOpen(true)}>
+            <Button
+              variant="ghost"
+              className="print-hide"
+              onClick={() => setPurchasesOpen(true)}
+            >
               🛒 Nákupy
             </Button>
           </>
         )}
 
         {canManage && (
-          <div className={s.headerActions}>
+          <div className={`${s.headerActions} print-hide`}>
             <Button variant="secondary" onClick={() => setGroupsOpen(true)}>
               Spravovat typy
             </Button>
             <Button onClick={openAdd}>+ Položka</Button>
           </div>
         )}
+        <PrintButton title="Vytisknout ceník (zobrazené položky)" />
       </header>
 
-      <div className={s.filters}>
+      <div className={`${s.filters} print-hide`}>
         <input
           className={s.searchInput}
           placeholder="Hledat…"

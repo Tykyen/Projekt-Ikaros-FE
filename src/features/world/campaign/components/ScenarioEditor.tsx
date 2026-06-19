@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { toast } from 'sonner';
 import { Button, ImageLightbox } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { PrintButton } from '@/features/world/export/print';
 import { useUploadImage } from '@/shared/api';
 import {
   useSaveScenarioTemplate,
@@ -201,7 +202,7 @@ export function ScenarioEditor({
   }
 
   return (
-    <div className={s.editor}>
+    <div className={s.editor} data-print-scope>
       <div className={s.editorHeadRow}>
         <input
           className={s.editorTitle}
@@ -210,8 +211,9 @@ export function ScenarioEditor({
           disabled={readOnly}
           onChange={(e) => set('title', e.target.value)}
         />
+        <PrintButton title="Vytisknout scénář" />
         {!readOnly && (
-          <div className={s.editorSaveBox}>
+          <div className={`${s.editorSaveBox} print-hide`}>
             {dirty && <span className={s.dirtyDot} title="Neuložené změny" />}
             {!isFolder && (
               <Button

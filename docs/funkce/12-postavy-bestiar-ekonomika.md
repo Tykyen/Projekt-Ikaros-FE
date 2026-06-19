@@ -122,6 +122,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - **Výbava:** sekce + položky; atomický append (nákup z obchodu přes `appendItemToSection` `$push`).
 - **Kalendář:** events postavy; `read` action umožní i ne-staff členům číst (mírnější gate).
 - **Poznámky:** volný text.
+- **Tisk deníku (14.7a):** záložka Deník (view) → tlačítko „Tisk / PDF" → `window.print()` jen nad deníkem (framework pilíř A, viz kap. 11 „Tisk / PDF"). 🚧 reálný tisk v prohlížeči neověřen.
 
 **Lazy-create / self-healing:** Subdocy se vytvoří při `character.created` eventu (kaskáda). Legacy postavy bez subdocu se uzdraví prvním GET (lazy-create) s RC-D1 rollbackem, pokud se rodičovská postava mezitím smaže (orphan guard, `character-subdocs.service.ts:75-87`).
 

@@ -54,7 +54,7 @@ export function ShopItemCard({
           {item.name}
         </button>
         {canManage && (
-          <span className={s.cardActions}>
+          <span className={`${s.cardActions} print-hide`}>
             <button
               type="button"
               className={s.iconBtn}
@@ -115,7 +115,7 @@ export function ShopItemCard({
         {onBuy && (
           <button
             type="button"
-            className={s.buyBtn}
+            className={`${s.buyBtn} print-hide`}
             onClick={() => onBuy(item)}
           >
             🛒 Koupit

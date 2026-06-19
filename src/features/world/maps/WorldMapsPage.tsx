@@ -7,6 +7,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Spinner, Button, ConfirmDialog, ImageLightbox } from '@/shared/ui';
+import { PrintButton } from '@/features/world/export/print';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMaps } from './api/useWorldMaps';
 import { useWorldMapFolders } from './api/useWorldMapFolders';
@@ -105,10 +106,11 @@ export default function WorldMapsPage() {
   const nothing = subfolders.length === 0 && visibleMaps.length === 0;
 
   return (
-    <article className={s.page}>
+    <article className={s.page} data-print-scope>
       <header className={s.head}>
         <h1 className={s.title}>Mapy</h1>
-        <div className={s.headActions}>
+        <PrintButton title="Vytisknout zobrazené mapy" />
+        <div className={`${s.headActions} print-hide`}>
           <div className={s.searchBox}>
             <Search size={16} aria-hidden />
             <input

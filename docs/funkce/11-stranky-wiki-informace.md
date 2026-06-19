@@ -94,6 +94,7 @@ Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read
 - Inline image lightbox, citační popup pro výběr textu (`QuoteSelectionPopup`).
 - Klávesové zkratky: `Ctrl+K` paleta, `f` toggle oblíbené, `e` editor (jen canEdit), `Shift+?` nápověda, `g s` zpět na seznam.
 - Panel „Odkazuje sem" (backlinks) — JEN PomocnyPJ+ (`canEdit`, řádek 149).
+- **Tisk / PDF** (14.7a) — ikona 🖨 v hlavičce (`PageHeader.tsx`) → `window.print()` jen nad obsahem stránky (viz `## Tisk / PDF` níže).
 
 ### Hranice — co neumí
 - **Tabulky v `content` se ve vieweru ZAHODÍ.** `OstatniLayout` renderuje `<RichTextEditor readOnly>` BEZ `enableTable` (`OstatniLayout.tsx:67`), zatímco editor `ContentPanel` má `enableTable` (`ContentPanel.tsx:52`). TipTap bez table extension `<table>` při parse zahodí → PJ napíše tabulku v editoru, ale hráč ji ve čtení neuvidí. (Atributová `table` mimo `content` se renderuje normálně přes `PageSidebar` — týká se to jen inline tabulek vloženého HTML obsahu.)
@@ -108,6 +109,51 @@ Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read
 
 ### Kód
 FE `PageViewer/PageViewer.tsx:58`, `layouts/OstatniLayout.tsx:67`; BE `pages.service.ts:168`.
+
+---
+
+## Tisk / PDF (pilíř A — 14.7a)
+
+### Co to je
+Tisk entity přes `window.print()` (prohlížeč nabídne i „Uložit jako PDF") — pilíř A spec-14.7, bez serverového PDF. Sdílený FE framework; „co vidíš, to vytiskneš" (data z viditelných GETů → filtrace zdarma).
+
+### Kde
+- Framework FE `features/world/export/print/`: `printMode.ts` (jotai `printModeAtom` + `usePrint().triggerPrint(target)`), `PrintButton.tsx`, globální `print.css` (import v `app/index.css`).
+- Spouště: ikona 🖨 v hlavičce stránky (`PageHeader.tsx`), tlačítko „Tisk / PDF" v záložce Deník (`DiaryTab.tsx` view) — kap. 12.
+
+### Kdo
+- Kdokoli, kdo entitu vidí. Tisk NEbere širší data než zobrazení (žádný export-only endpoint) — filtraci řeší stávající brány (`assertAccess`/`filterAkjTabsForViewer`).
+
+### Co jde dělat (14.7a + 14.7b)
+- Wiki stránka (11) — obsah + sekce + odemčené AKJ záložky.
+- Deník PC/NPC (2, 5) a **záložky postavy/NPC mimo kalendář** (3, 6) — v print módu se vyrenderují všechny subdoc taby + odemčené AKJ lineárně; kalendář **opt-in** (checkbox). Viz kap. 12.
+- **Kalendář** s výběrem rozsahu (1/3/6/12 měsíců), respektuje filtr entit → pokrývá i konkrétní postavu/NPC/lokaci (4, kap. 15).
+- **Bestiář** + **obchod** (ceník) — tiskne zobrazené (scope/složka/search = „celý" i „určité"; 7, 8, 14; kap. 12).
+- **Mapy atlas** (9, kap. 14) — obrázky aktuální složky / výsledku hledání.
+- **Storyboard** — vybraný scénář (13, kap. 15).
+- **Pavučina** (12, kap. 15) — snapshot 2D grafu. **Hvězdná mapa** (10, kap. 14) — seznam těles (WebGL graf nejde snapshotovat).
+
+### Jak funguje (mechanismus)
+- Tlačítko najde nejbližší `[data-print-scope]` (`closest`) → `triggerPrint` mu nastaví `data-print-root`, `html[data-printing]` a `printModeAtom=true`.
+- Print mód rozbalí collapsed sekce (`PageSections`) a vykreslí odemčené AKJ záložky lineárně místo lišty (`WithAkjTabs`); zamčené (`locked`) se NEtisknou.
+- 2× `requestAnimationFrame` (re-render rozbaleného obsahu) → `window.print()`; po `afterprint` cleanup (fallback timeout 60 s).
+- `print.css` (`@media print`): izolace `[data-print-root]`, černá na bílé, `print-color-adjust:exact`, `.print-hide` skryje tlačítka.
+- **Canvas grafy:** `triggerPrint` před tiskem najde `<canvas>` ve scope a vloží `<img>` snapshot (`toDataURL`), živý canvas skryje (`data-print-hide-canvas`). Funguje pro 2D (pavučina). WebGL 3D (hvězdná) má prázdný buffer → tam místo snapshotu tiskneme DOM seznam.
+
+### Hranice — co neumí
+- **Hromadná ZIP záloha celého světa + import** → **14.7c** (zatím jen per-entita tisk/PDF, pilíř A).
+- **Hvězdná mapa**: WebGL graf nejde snapshotovat (prázdný buffer) → tiskne se jen **seznam těles**, ne obrázek mapy.
+- **Cross-origin obrázky** (Cloudinary bez CORS) v canvasu → snapshot může selhat („tainted canvas") → ten graf se nevytiskne.
+- **Storyboard** tiskne jen **vybraný scénář**, ne celý strom najednou.
+- **Mapy/bestiář** „určité" = přes filtr/složku/search, ne multi-select.
+- **Reálný tisk v prohlížeči zatím NEOVĚŘEN** — unit testy (jsdom) `@media print`/izolaci/canvas snapshot nepokryjí.
+- Tisk je černobílý (theme-neutrální) — barevné prvky (deníkové bary) ztrácejí výplň.
+
+### Stav
+🚧 částečné — 14.7a + 14.7b hotovo (tisk všech entit, body 2–14), zbývá **14.7c** (ZIP záloha + import). Reálný tisk v prohlížeči neověřen.
+
+### Kód
+FE `features/world/export/print/{printMode.ts,PrintButton.tsx,print.css}`; integrace `PageHeader.tsx`, `PageSections.tsx`, `WithAkjTabs.tsx`, `layouts/PostavaLayout.tsx`, `CharacterDetailPage/components/DiaryTab.tsx`, `bestiar/BestiarPage.tsx`, `shop/components/ShopView.tsx`, `maps/WorldMapsPage.tsx`, `campaign/components/{PavucinaGraph,ScenarioEditor}.tsx`, `universe/UniverseMapView.tsx`, `pages/CalendarPage.tsx`.
 
 ---
 

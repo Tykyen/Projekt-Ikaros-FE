@@ -15,6 +15,7 @@ import {
   Pencil,
 } from 'lucide-react';
 import { Tabs, type TabItem, ConfirmDialog } from '@/shared/ui';
+import { PrintButton, usePrintMode } from '@/features/world/export/print';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -97,6 +98,9 @@ export function PostavaLayout({ page }: Props) {
   const [editMode, setEditMode] = useState(false);
   const [activeTabDirty, setActiveTabDirty] = useState(false);
   const [pendingNav, setPendingNav] = useState<PendingNav | null>(null);
+  const printMode = usePrintMode();
+  const [printIncludeCalendar, setPrintIncludeCalendar] = useState(false);
+  const noop = () => {};
 
   const blocker = useBlocker(editMode && activeTabDirty);
   const guardOpen = pendingNav !== null || blocker.state === 'blocked';
@@ -213,7 +217,7 @@ export function PostavaLayout({ page }: Props) {
   const subdocTabActive = activeTab !== 'profil';
 
   return (
-    <div className={s.layout}>
+    <div className={s.layout} data-print-scope>
       <PostavaHero
         page={page}
         playerName={playerName}
@@ -226,68 +230,157 @@ export function PostavaLayout({ page }: Props) {
 
       <AkjBanner accessRequirements={page.accessRequirements} />
 
-      <Tabs
-        items={tabs}
-        activeId={activeTab}
-        onChange={requestTabChange}
-        orientation="horizontal"
+      {/* 14.7b — tisk záložek postavy/NPC. Kalendář opt-in (default vypnuto). */}
+      <div
+        className="print-hide"
+        style={{
+          display: 'flex',
+          gap: '0.75rem',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          marginBottom: '0.5rem',
+        }}
       >
-        {activeTab === 'profil' && <BioTab page={page} />}
-
-        {activeTab === 'denik' && character && canSeePrivate && (
-          <DiaryTab
-            slug={page.slug}
-            mode={tabMode}
-            onExitEdit={handleExitEdit}
-            onDirtyChange={setActiveTabDirty}
-          />
-        )}
-        {activeTab === 'finance' && character && canSeePrivate && (
-          <FinanceTab
-            page={page}
-            mode={tabMode}
-            onExitEdit={handleExitEdit}
-            onDirtyChange={setActiveTabDirty}
-            onBackToProfil={() => setActiveTab('profil')}
-          />
-        )}
-        {activeTab === 'vybava' && character && canSeePrivate && (
-          <InventoryTab
-            page={page}
-            mode={tabMode}
-            onExitEdit={handleExitEdit}
-            onDirtyChange={setActiveTabDirty}
-            canEdit={canEdit}
-          />
-        )}
-        {activeTab === 'kalendar' && character && canSeePrivate && (
-          <CalendarTab
-            slug={page.slug}
-            mode={tabMode}
-            onExitEdit={handleExitEdit}
-            onDirtyChange={setActiveTabDirty}
-          />
-        )}
-        {activeTab === 'poznamky' && character && canSeePrivate && (
-          <NotesTab
-            slug={page.slug}
-            mode={tabMode}
-            onExitEdit={handleExitEdit}
-            onDirtyChange={setActiveTabDirty}
-          />
-        )}
-
-        {activeAkjTab &&
-          (activeAkjTab.locked ? (
-            <AkjLockedPanel
-              worldId={worldId}
-              accessRequirements={activeAkjTab.access}
-              isWoodWide={page.isWoodWide}
+        {character && canSeePrivate && visibleTabs.has('kalendar') && (
+          <label
+            style={{
+              display: 'inline-flex',
+              gap: '0.35rem',
+              alignItems: 'center',
+              fontSize: '0.85rem',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={printIncludeCalendar}
+              onChange={(e) => setPrintIncludeCalendar(e.target.checked)}
             />
-          ) : (
-            <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
-          ))}
-      </Tabs>
+            Přidat kalendář do tisku
+          </label>
+        )}
+        <PrintButton title="Vytisknout / uložit záložky postavy jako PDF" />
+      </div>
+
+      {printMode ? (
+        /* Tisk: všechny záložky lineárně (kromě kalendáře, ten jen opt-in). */
+        <div>
+          <BioTab page={page} />
+          {character && canSeePrivate && (
+            <>
+              {visibleTabs.has('denik') && (
+                <DiaryTab
+                  slug={page.slug}
+                  mode="view"
+                  onExitEdit={noop}
+                  onDirtyChange={noop}
+                />
+              )}
+              {visibleTabs.has('finance') && (
+                <FinanceTab
+                  page={page}
+                  mode="view"
+                  onExitEdit={noop}
+                  onDirtyChange={noop}
+                  onBackToProfil={noop}
+                />
+              )}
+              {visibleTabs.has('vybava') && (
+                <InventoryTab
+                  page={page}
+                  mode="view"
+                  onExitEdit={noop}
+                  onDirtyChange={noop}
+                  canEdit={false}
+                />
+              )}
+              {visibleTabs.has('poznamky') && (
+                <NotesTab
+                  slug={page.slug}
+                  mode="view"
+                  onExitEdit={noop}
+                  onDirtyChange={noop}
+                />
+              )}
+              {printIncludeCalendar && visibleTabs.has('kalendar') && (
+                <CalendarTab
+                  slug={page.slug}
+                  mode="view"
+                  onExitEdit={noop}
+                  onDirtyChange={noop}
+                />
+              )}
+            </>
+          )}
+          {sortedAkjTabs(page)
+            .filter((t) => !t.locked)
+            .map((t) => (
+              <OstatniLayout key={t.id} page={resolveAkjTabPage(page, t)} />
+            ))}
+        </div>
+      ) : (
+        <Tabs
+          items={tabs}
+          activeId={activeTab}
+          onChange={requestTabChange}
+          orientation="horizontal"
+        >
+          {activeTab === 'profil' && <BioTab page={page} />}
+
+          {activeTab === 'denik' && character && canSeePrivate && (
+            <DiaryTab
+              slug={page.slug}
+              mode={tabMode}
+              onExitEdit={handleExitEdit}
+              onDirtyChange={setActiveTabDirty}
+            />
+          )}
+          {activeTab === 'finance' && character && canSeePrivate && (
+            <FinanceTab
+              page={page}
+              mode={tabMode}
+              onExitEdit={handleExitEdit}
+              onDirtyChange={setActiveTabDirty}
+              onBackToProfil={() => setActiveTab('profil')}
+            />
+          )}
+          {activeTab === 'vybava' && character && canSeePrivate && (
+            <InventoryTab
+              page={page}
+              mode={tabMode}
+              onExitEdit={handleExitEdit}
+              onDirtyChange={setActiveTabDirty}
+              canEdit={canEdit}
+            />
+          )}
+          {activeTab === 'kalendar' && character && canSeePrivate && (
+            <CalendarTab
+              slug={page.slug}
+              mode={tabMode}
+              onExitEdit={handleExitEdit}
+              onDirtyChange={setActiveTabDirty}
+            />
+          )}
+          {activeTab === 'poznamky' && character && canSeePrivate && (
+            <NotesTab
+              slug={page.slug}
+              mode={tabMode}
+              onExitEdit={handleExitEdit}
+              onDirtyChange={setActiveTabDirty}
+            />
+          )}
+
+          {activeAkjTab &&
+            (activeAkjTab.locked ? (
+              <AkjLockedPanel
+                worldId={worldId}
+                accessRequirements={activeAkjTab.access}
+                isWoodWide={page.isWoodWide}
+              />
+            ) : (
+              <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
+            ))}
+        </Tabs>
+      )}
 
       <ConfirmDialog
         open={guardOpen}
@@ -366,7 +459,7 @@ function PostavaHero({
           </p>
         )}
       </div>
-      <div className={s.heroActions}>
+      <div className={`${s.heroActions} print-hide`}>
         {canEdit && (
           <Link
             to={`/svet/${worldSlug}/edit/${page.slug}`}

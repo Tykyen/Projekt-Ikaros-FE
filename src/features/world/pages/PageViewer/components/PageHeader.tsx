@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Star,
@@ -5,11 +6,13 @@ import {
   Globe2,
   ChevronRight,
   Link as LinkIcon,
+  Printer,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldRole } from '@/shared/types';
 import { useFavoritePages } from '../../api/useFavoritePages';
+import { usePrint } from '@/features/world/export/print';
 import type { Page } from '../../api/pages.types';
 import s from './PageHeader.module.css';
 
@@ -33,6 +36,16 @@ export function PageHeader({ page, readTimeMinutes }: Props) {
   const favorites = useFavoritePages(worldId);
   const isFavorite = favorites.isFavorite(page.slug);
   const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Postava/NPC mají vlastní tlačítko tisku v PostavaLayout (s volbou kalendáře)
+  // → hlavičkové 🖨 tam skryjeme, ať nejsou dvě.
+  const isCharacterPage = page.type === 'Postava hráče' || page.type === 'NPC';
+  const { triggerPrint } = usePrint();
+  const printRef = useRef<HTMLButtonElement>(null);
+
+  function handlePrint() {
+    const scope = printRef.current?.closest('[data-print-scope]');
+    triggerPrint(scope instanceof HTMLElement ? scope : null);
+  }
 
   function handleCopyUrl() {
     void navigator.clipboard.writeText(window.location.href);
@@ -98,6 +111,18 @@ export function PageHeader({ page, readTimeMinutes }: Props) {
           >
             <LinkIcon size={18} aria-hidden />
           </button>
+          {!isCharacterPage && (
+            <button
+              ref={printRef}
+              type="button"
+              className={`${s.starBtn} print-hide`}
+              onClick={handlePrint}
+              aria-label="Vytisknout stránku"
+              title="Vytisknout / uložit jako PDF"
+            >
+              <Printer size={18} aria-hidden />
+            </button>
+          )}
           {canEdit && (
             <Link
               to={`/svet/${worldSlug}/edit/${page.slug}`}

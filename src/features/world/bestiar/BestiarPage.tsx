@@ -7,6 +7,7 @@
 import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { Button } from '@/shared/ui';
+import { PrintButton } from '@/features/world/export/print';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, WorldRole } from '@/shared/types';
@@ -77,18 +78,23 @@ export default function BestiarPage(): React.ReactElement {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-print-scope>
       <header className={styles.header}>
         <h1 className={styles.title}>Bestiář</h1>
         {/* System scope smí tvořit jen Admin/Superadmin; user/world PJ+. */}
         {(tab === 'system' ? isGlobalAdmin : isPjInWorld) && (
-          <Button variant="primary" onClick={() => setEditing('new')}>
+          <Button
+            variant="primary"
+            className="print-hide"
+            onClick={() => setEditing('new')}
+          >
             + Nová bestie
           </Button>
         )}
+        <PrintButton title="Vytisknout zobrazené bestie" />
       </header>
 
-      <div className={styles.tabs}>
+      <div className={`${styles.tabs} print-hide`}>
         {(['user', 'world', 'system'] as const).map((t) => (
           <button
             key={t}
@@ -103,7 +109,7 @@ export default function BestiarPage(): React.ReactElement {
 
       <input
         type="search"
-        className={styles.search}
+        className={`${styles.search} print-hide`}
         placeholder="Hledat podle jména…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}

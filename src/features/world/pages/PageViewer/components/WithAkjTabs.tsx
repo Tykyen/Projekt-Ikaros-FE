@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { FileText, Lock, Unlock } from 'lucide-react';
 import { Tabs, type TabItem } from '@/shared/ui';
+import { usePrintMode } from '@/features/world/export/print';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { OstatniLayout } from '../layouts/OstatniLayout';
 import { AkjLockedPanel } from './AkjLockedPanel';
@@ -28,8 +29,24 @@ export function WithAkjTabs({ page, children }: Props) {
   const { worldId } = useWorldContext();
   const akjTabs = sortedAkjTabs(page);
   const [activeId, setActiveId] = useState(BASE_ID);
+  const printMode = usePrintMode();
 
   if (akjTabs.length === 0) return <>{children}</>;
+
+  // Tisk: místo lišty vykreslíme Obsah + všechny ODEMČENÉ záložky pod sebe
+  // (zamčené hráč nevidí → vynecháme). Jinak by se vytiskla jen aktivní záložka.
+  if (printMode) {
+    return (
+      <>
+        {children}
+        {akjTabs
+          .filter((t) => !t.locked)
+          .map((t) => (
+            <OstatniLayout key={t.id} page={resolveAkjTabPage(page, t)} />
+          ))}
+      </>
+    );
+  }
 
   const items: TabItem[] = [
     { id: BASE_ID, label: 'Obsah', icon: <FileText size={16} /> },
