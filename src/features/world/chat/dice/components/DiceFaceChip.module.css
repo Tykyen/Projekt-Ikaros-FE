@@ -1,0 +1,53 @@
+/* Krok 6.3-fix6 — 2D placka hozené kostky. Vizuál sjednocen s picker chipem
+   (DicePickerPopover .chip): materiál pozadí + radiální scrim + glyf. */
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--theme-surface, rgb(var(--black-rgb) / 0.4));
+  border: 1.5px solid var(--theme-border-soft, rgb(var(--white-rgb) / 0.12));
+}
+
+/* Materiál přes celou placku (stejný zdroj jako 3D overlay). */
+.mat {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Tmavý radiální scrim pod glyfem → číslo čitelné na světlém i tmavém
+   materiálu (k10 stříbro / k12 zlato i kamen-obsidian). */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgb(var(--black-rgb) / 0.5) 0%,
+    rgb(var(--black-rgb) / 0.2) 50%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+.glyph {
+  position: relative;
+  z-index: 2;
+  font-family: 'Iceland', monospace;
+  font-weight: 700;
+  line-height: 1;
+  color: rgb(var(--white-rgb));
+  text-shadow:
+    0 1px 3px rgb(var(--black-rgb) / 0.95),
+    0 0 8px rgb(var(--black-rgb) / 0.85);
+}

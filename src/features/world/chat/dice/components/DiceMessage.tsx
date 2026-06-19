@@ -56,7 +56,6 @@ export function DiceMessage({
   // moment hodu pro celou obrazovku. V `MessageItem` v chatu drží
   // `DiceMessage` jen 2D snapshot (perf, čistá historie). Live moment
   // se odehrává v overlay nad chatem.
-  const rolling = false;
 
   const totalSign = payload.total > 0 ? '+' : payload.total < 0 ? '' : '';
   const totalClass =
@@ -86,11 +85,7 @@ export function DiceMessage({
         <div className={styles.sceneWrap}>
           {/* Pokud renderingu zabrání chyba, vyřeší ji ErrorBoundary výš.
               Lokálně přepínáme jen statickou cestu. */}
-          <DiceMessageScene
-            payload={payload}
-            skinId={skinId}
-            rolling={rolling}
-          />
+          <DiceMessageScene payload={payload} skinId={skinId} />
         </div>
 
         <div className={`${styles.totalBox} ${totalClass}`}>

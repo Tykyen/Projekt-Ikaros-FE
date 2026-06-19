@@ -1,42 +1,39 @@
 import type { DicePayload } from '../lib/dicePayload';
-import { getDiceSkin } from '../lib/diceSkins';
-import { RollingDie } from './RollingDiceScene';
-import type { DieType } from './RollingDiceScene';
+import { resolveMaterialId } from '../lib/dice3dMaterials';
+import { DiceFaceChip } from './DiceFaceChip';
+import type { DieType } from './DiceFaceChip';
 import styles from './DiceMessageScene.module.css';
 
 interface DiceMessageSceneProps {
   payload: DicePayload;
+  /** `ChatMessage.diceSkin` = materiál ID (`dice3dMaterials`); legacy/null → default. */
   skinId: string | null;
-  /** Zdali přehrát rolling (čerstvý hod) nebo rovnou settled. */
-  rolling: boolean;
 }
 
 /**
- * Krok 6.3d — Scéna kostek pro inline render v `MessageItem`.
+ * Krok 6.3d / 6.3-fix6 — Scéna kostek pro inline render v `MessageItem`.
  *
- * Renderuje 1..N kostek v řadě dle `payload.type`. Stagger animace
- * (delay 80 ms per kostka) v rolling fázi. Pro mixed/d100 vykreslí
- * smíšené modely podle `faceTypes` / pevně `d10` + `d10` (d100 = 2 desítky).
+ * Renderuje 1..N **materiálových placek** (`DiceFaceChip`) v řadě dle
+ * `payload.type`. Materiál = `resolveMaterialId(skinId)` → stejný jako 3D
+ * overlay i picker chip (žádný drift). Pro mixed/d100 vykreslí placky podle
+ * `faceTypes` / pevně `d100tens` + `d10` (d100 = 2 desítky).
  */
 export const DiceMessageScene: React.FC<DiceMessageSceneProps> = ({
   payload,
   skinId,
-  rolling,
 }) => {
-  const skin = getDiceSkin(skinId);
+  const materialId = resolveMaterialId(skinId);
   const dies = buildDieDefs(payload);
 
   return (
     <div className={styles.scene}>
       {dies.map((d, i) => (
-        <RollingDie
+        <DiceFaceChip
           key={i}
           type={d.type}
           faceValue={d.faceValue}
-          skin={skin}
+          materialId={materialId}
           size={d.size}
-          delayMs={rolling ? i * 80 : 0}
-          animate={rolling}
         />
       ))}
     </div>
