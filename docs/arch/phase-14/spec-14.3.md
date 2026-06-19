@@ -1,6 +1,6 @@
 # Spec 14.3 — Bezpečnostní hlavičky (CSP, HSTS, helmet)
 
-**Status:** ✅ Implementováno (2026-06-19) — report-only fáze proběhla na produkci, allowlist doladěn z reálných nálezů (viz §5.2). **Enforce je teď produkční default** (`CSP_HEADER_NAME` v Dockerfile/compose); rollback na report-only přes GitHub var. Zbývá provoz: redeploy + smoke neprozkoumaných stránek.
+**Status:** ✅ Hotovo + **enforce LIVE na produkci** (2026-06-19). Report-only fáze proběhla, allowlist doladěn z reálných nálezů (viz §5.2). Ověřeno curlem: `Content-Security-Policy` (bez `-Report-Only`) + na taktické mapě (nejnáročnější stránka: 3D dice/mapa/YT) **0 CSP violations**. BE helmet živý (`default-src 'none'` na `/api`). Rollback na report-only přes GitHub var `CSP_HEADER_NAME`. Zbývá jen smoke méně častých stránek (galerie/postavy/kalendář/admin/motivy).
 **Rozsah:** FE (nginx, jádro) + BE (helmet, API hardening) — žádná aplikační logika, jen HTTP hlavičky a konfigurace
 **Repo:** `Projekt-ikaros-FE` (nginx.conf, docker-compose, deploy.yml) + `Projekt-ikaros` (BE main.ts, env validace)
 **Velikost:** malá — odhad ~6–8 souborů (FE ~4, BE ~3)
