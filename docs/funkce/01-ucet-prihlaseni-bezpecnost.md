@@ -15,14 +15,14 @@
   - Live kontrola dostupnosti přezdívky i e-mailu (ikona) přes `GET /auth/check-username?u=` a `/auth/check-email?e=` (debounce, throttle 60/min).
   - Indikátor síly hesla (`PasswordStrengthIndicator`).
   - Toggle zobrazení hesla.
-  - Skrytý honeypot field `hp` (anti-bot, max 0 znaků).
+  - Skrytý honeypot field `hp` (anti-bot, max 0 znaků). Vynucený na **obou** stranách: FE zod `max(0)` + BE `RegisterDto.hp` `@MaxLength(0)` — prázdné (reálný uživatel) projde, vyplněné (bot) → 400. *(BE `hp` doplněno 2026-06-19 — dřív chybělo, `forbidNonWhitelisted` PC-07 odmítal `hp:''` → registrace rozbitá.)*
   - Tlačítko „Vytvořit účet" je disabled dokud captcha nedá token nebo je username/email obsazený.
 - **Hranice / co neumí:**
   - Heslo min **6** znaků (FE i BE `RegisterDto`), což je MÉNĚ než u změny/resetu hesla (min 8) — nekonzistence.
   - Indikátor síly hesla je čistě vizuální, slabé heslo registraci neblokuje.
   - Bez ověření e-mailu lze účet plně používat (verify je nepovinný, jen badge v profilu).
 - **Zvláštnosti:**
-  - Captcha fail-closed v produkci (bez `TURNSTILE_SECRET` → 400 `CAPTCHA_FAILED`), v dev/test bez secretu projde (warning). Test site key default `1x00000000000000000000AA`.
+  - Captcha fail-closed na **obou** stranách. BE: bez `TURNSTILE_SECRET` v prod → 400 `CAPTCHA_FAILED` (dev/test bez secretu projde s warningem). FE: bez `VITE_TURNSTILE_SITE_KEY` v **prod buildu** → widget se nerenderuje, místo něj hláška + submit blokován (už NEpřepadá tiše na test key — 14.2). Test site key `1x00000000000000000000AA` jen jako dev fallback.
   - GDPR: BE vynucuje `acceptedTerms===true` (jinak `TERMS_NOT_ACCEPTED`), ukládá `acceptedTermsAt` + `termsVersion` (`2026-06-05`).
   - Po registraci BE fire-and-forget pošle verifikační e-mail (selhání mailu registraci nezboří).
   - Throttle `POST /auth/register` = 10/min.
@@ -226,9 +226,9 @@
 - **Kde:** RegisterModal (widget) + BE `CaptchaService`.
 - **Co jde dělat:** Widget vrátí token → posílá se v `register` body → BE verify přes Cloudflare siteverify.
 - **Hranice / co neumí:** Používá se JEN při registraci (login/reset captchu nemají — chrání je throttling).
-- **Zvláštnosti:** Fail-closed v produkci (PC-01 historicky fail-open, nyní opraveno). Honeypot `hp` jako doplněk.
+- **Zvláštnosti:** Fail-closed na BE (PC-01 historicky fail-open, opraveno) i FE (prod bez site key → widget nahrazen hláškou, 14.2). Honeypot `hp` jako doplněk — BE-enforced přes `RegisterDto.hp @MaxLength(0)` (od 2026-06-19). Provider ověřen živě: prod site key reálný (`0x…`), BE secret odmítá fake token.
 - **Stav:** ✅ funguje.
-- **Kód:** FE `RegisterModal.tsx:280`, BE `captcha.service.ts:38`.
+- **Kód:** FE `RegisterModal.tsx` (`TURNSTILE_SITE_KEY` konst. + widget), BE `captcha.service.ts:38`, `dto/register.dto.ts` (`hp`).
 
 ---
 

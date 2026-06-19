@@ -93,13 +93,15 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **✅ Implementováno (2026-06-18, `spec-14.1`):** TOTP (QR spárování) + 10 jednorázových záložních kódů + **remember-device včetně revokace** (rozhodnuto vzít do V1). Dobrovolné pro všechny. Secret šifrovaný (AES-256-GCM, `TOTP_ENC_KEY`), challenge-based login (žádný token před ověřením 2FA), trust cookie httpOnly, auto-revoke při změně hesla / vypnutí 2FA. BE 91 testů, FE build+smoke zelené.
 **Follow-upy (mimo V1):** **14.1-a** e-mailový OTP jako volitelná *slabší* metoda (nesmí sdílet kanál s resetem hesla) · **14.1-c** vynucení 2FA pro Admin/Superadmin + admin „odemkni uživatele" (lockout recovery).
 
-### - [ ] 14.2 Oprava captcha „fail-open" — [A2 · dopad vysoký · náklad malý] 🔁
+### - [x] 14.2 Oprava captcha „fail-open" — [A2 · dopad vysoký · náklad malý] 🔁 ✅ *(2026-06-19)*
 **Cíl:** Při výpadku captcha služby request **zablokovat**, ne propustit; sjednotit s dokumentací.
 **Proč:** Bezpečnostní prvek, který se při potížích vypne, není ochrana. Známý nález **PC-01** z prod-config auditu.
 **Návrh přípravy:** ověřit aktuální chování `captcha.service.ts`, rozhodnout fail-closed + alerting, dotáhnout dluh **D-011** (captcha provider).
 **BE:** přepnout logiku na fail-closed + log/alert; sladit `.env` a dokumentaci.
 **FE:** ověřit chování registračního/login formuláře při blokaci (jasná hláška, ne tichý fail).
 **Otevřené otázky:** Který provider (hCaptcha/Turnstile/reCAPTCHA)? Práh, kdy captcha vyžadovat (vždy vs. po N pokusech)?
+**✅ Implementováno (2026-06-19):** Prošetření ukázalo, že **BE captcha už byla fail-closed** (PC-01 opraveno 2026-06-14): prázdný token / prod bez secretu / síťová chyba → `false`. Provider = **Cloudflare Turnstile** + honeypot (otevřené otázky zodpovězeny: práh = vždy při registraci). Live probe na produkci potvrdil reálný site key (`0x…`) i funkční BE secret (fake token → `CAPTCHA_FAILED`, ne propuštěn). **Dotaženo:** (B) FE `RegisterModal` už tiše nepřepadá na test key v prod buildu → fail-closed (bez klíče widget nahrazen hláškou, submit blokován); (C) sladěn zavádějící komentář `captcha.service.ts` s `env.validation` (RECOMMENDED/warn, ne boot-fatal). **Login captchu nemá záměrně** (anti-bot na registraci; login chrání rate-limit 429).
+> 🔴 **Vedlejší kritický nález (opraveno):** probe odhalil, že **registrace na produkci byla rozbitá** — FE honeypot `hp` se posílal, ale `RegisterDto` ho neměl → `forbidNonWhitelisted` (PC-07) → 400 „Neznámé pole hp". Příčina: honeypot byl jen na FE; PC-07 změnil tichý drop na tvrdý 400. Fix: `hp?` přidán do `RegisterDto` (`@MaxLength(0)` = symetrie s FE zod) → prázdné projde, vyplněné (bot) → 400. BE e2e regrese test přidán (13/13). **Vyžaduje BE restart + redeploy.**
 
 ### - [ ] 14.3 Bezpečnostní hlavičky (CSP, HSTS, helmet) — [A3 · dopad vysoký · náklad malý]
 **Cíl:** Prohlížeč dostane pravidla, která zneutralizují XSS (CSP) a vynutí HTTPS (HSTS).

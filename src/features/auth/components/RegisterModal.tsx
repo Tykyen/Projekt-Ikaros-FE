@@ -47,9 +47,21 @@ function deriveStatus(
   return 'idle';
 }
 
-// D-011 — Cloudflare Turnstile site key (test key default — produkce přepíše v `.env`).
-const TURNSTILE_SITE_KEY =
-  import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
+// D-011 — Cloudflare Turnstile site key.
+// DEV bez env → test key (vždy projde, pohodlné pro vývoj).
+// PROD bez env → null = fail-closed: NErenderujeme widget a NEpřepadneme tiše na
+// test key (jinak by captcha přestala chránit, aniž si toho kdo všiml — 14.2).
+const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
+const TURNSTILE_SITE_KEY: string | null =
+  import.meta.env.VITE_TURNSTILE_SITE_KEY ??
+  (import.meta.env.PROD ? null : TURNSTILE_TEST_SITE_KEY);
+
+if (TURNSTILE_SITE_KEY === null) {
+  // Viditelné v prod logu — captcha je nakonfigurovaná špatně, registrace nepojede.
+  console.error(
+    '[captcha] VITE_TURNSTILE_SITE_KEY chybí v produkčním buildu — registrace zablokována (fail-closed).',
+  );
+}
 
 export function RegisterModal() {
   const [open, setOpen] = useAtom(registerModalOpenAtom);
@@ -277,14 +289,21 @@ export function RegisterModal() {
         )}
 
         <div style={{ display: 'flex', justifyContent: 'center', margin: '12px 0' }}>
-          <Turnstile
-            ref={captchaRef}
-            siteKey={TURNSTILE_SITE_KEY}
-            onSuccess={(token) => setCaptchaToken(token)}
-            onError={() => setCaptchaToken(null)}
-            onExpire={() => setCaptchaToken(null)}
-            options={{ theme: 'auto' }}
-          />
+          {TURNSTILE_SITE_KEY === null ? (
+            <div className={s.banner} role="alert" aria-live="polite">
+              Ověření „nejsi robot" je dočasně nedostupné. Registrace teď
+              nefunguje, zkus to prosím později.
+            </div>
+          ) : (
+            <Turnstile
+              ref={captchaRef}
+              siteKey={TURNSTILE_SITE_KEY}
+              onSuccess={(token) => setCaptchaToken(token)}
+              onError={() => setCaptchaToken(null)}
+              onExpire={() => setCaptchaToken(null)}
+              options={{ theme: 'auto' }}
+            />
+          )}
         </div>
 
         <Button
