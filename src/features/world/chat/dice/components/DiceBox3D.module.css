@@ -16,6 +16,13 @@
   pointer-events: none;
 }
 
+/* 6.3-fix5 — skrytý host pro warmup/ghost roll. `opacity:0` (NE display:none)
+   nechá WebGL canvas dál renderovat, takže se ghost reálně protočí, ale není
+   vidět. pointer-events už blokuje .host. */
+.hidden {
+  opacity: 0;
+}
+
 .host canvas {
   width: 100% !important;
   height: 100% !important;

@@ -111,6 +111,7 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
             theme={getDice3dTheme(roll?.skinId ?? null)}
             nonce={roll?.timestamp ?? 0}
             active={use3dThisRoll && phase !== 'idle'}
+            warmup={warmup}
             onComplete={handle3dComplete}
             onError={handle3dError}
           />
