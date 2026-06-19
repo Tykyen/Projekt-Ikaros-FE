@@ -71,6 +71,7 @@ Každá funkce má jednotnou strukturu:
 - **Témata / skiny:** `:root` vlastní buď globální ThemeProvider, nebo WorldLayout (per-svět téma) přes gate atom — nikdy ne třetí aplikátor.
 - **AKJ chráněné záložky:** obsah na stránkách lze zamknout podle „clearance" + „grant"; zamčené záložky se hráči ukazují jako 🔒 (jméno + úroveň, bez obsahu), po přístupu 🔓 + obsah.
 - **Soft-delete:** mazání světa = 30denní recovery; řada entit má koš místo tvrdého smazání.
+- **Bezpečnostní HTTP hlavičky (14.3):** HTML dokument servíruje **FE nginx** (`default.conf.template` `location /`) — sem patří hlavní **XSS-CSP** (allowlist skriptů/stylů/spojení: self + Cloudflare Turnstile + Google Fonts + Cloudinary + `BACKEND_HOST` přes nginx envsubst), HSTS, Referrer-Policy, Permissions-Policy. **BE** vrací jen JSON/obrázky → `helmet()` jako API hardening (`default-src 'none'`, HSTS, nosniff, `frame-ancestors 'none'`; `crossOriginResourcePolicy:false` aby nerozbil PixiJS `/static/` textury) — `main.ts` za `enableCors`. Inline pre-hydration theme skript povolen přes **SHA-256 hash** + build guard (`scripts/check-csp-hash.mjs`, drift = build fail). **Stav: 🚧 kód hotový, nasazeno report-only** (`CSP_HEADER_NAME` přepínač) → enforce po sběru porušení. Past: TipTap/PixiJS/dice WASM mohou v report-only vyžádat `style-src 'unsafe-inline'` / `script-src 'wasm-unsafe-eval'`.
 
 ---
 

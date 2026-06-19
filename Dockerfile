@@ -28,7 +28,15 @@ RUN npm run build
 FROM docker.io/library/nginx:alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# 14.3 — config jako envsubst TEMPLATE: nginx:alpine entrypoint nahradí
+# ${BACKEND_HOST} a ${CSP_HEADER_NAME} z prostředí a zapíše do conf.d/default.conf.
+# NGINX_ENVSUBST_FILTER omezí substituci jen na tyto dvě proměnné → nginx $uri ap. zůstanou.
+# Defaulty (fail-safe, ať nginx nepadne, když compose env zapomene):
+#   CSP_HEADER_NAME → report-only; BACKEND_HOST → prázdný (compose ho dodá z VITE_API_URL).
+COPY default.conf.template /etc/nginx/templates/default.conf.template
+ENV NGINX_ENVSUBST_FILTER="^(BACKEND_HOST|CSP_HEADER_NAME)$" \
+    CSP_HEADER_NAME="Content-Security-Policy-Report-Only" \
+    BACKEND_HOST=""
 
 EXPOSE 80
 

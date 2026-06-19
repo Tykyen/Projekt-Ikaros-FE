@@ -8,6 +8,12 @@ services:
         VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:-}
     container_name: projekt-ikaros-fe
     restart: unless-stopped
+    # 14.3 — runtime env pro nginx CSP (envsubst v default.conf.template):
+    #   BACKEND_HOST    = holý host backendu (connect-src/img-src), odvozeno z VITE_API_URL při deployi
+    #   CSP_HEADER_NAME = report-only (default) ↔ enforce; přepíná se GitHub var + redeploy
+    environment:
+      BACKEND_HOST: ${BACKEND_HOST:-}
+      CSP_HEADER_NAME: ${CSP_HEADER_NAME:-Content-Security-Policy-Report-Only}
     ports:
       - "${FRONTEND_PORT:-8081}:80"
 

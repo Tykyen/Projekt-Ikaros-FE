@@ -47,12 +47,23 @@ jobs:
             --exclude '.env' \
             ./ ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/
 
+      # 14.3 — BACKEND_HOST pro nginx CSP (connect-src/img-src): holý host
+      # odvozený z VITE_API_URL (jeden zdroj pravdy) — strip schématu + cesty.
+      # Host bez schématu kryje v connect-src https (REST/polling) i wss (Socket.IO).
+      - name: Derive BACKEND_HOST from VITE_API_URL
+        id: backend
+        run: |
+          HOST=$(printf '%s' "${{ vars.VITE_API_URL }}" | sed -E 's#^[a-z]+://##; s#/.*$##')
+          echo "host=$HOST" >> "$GITHUB_OUTPUT"
+
       - name: Create .env file on server
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "cat > ${{ env.DEPLOY_PATH }}/.env << 'EOF'
           FRONTEND_PORT=${{ vars.FRONTEND_PORT }}
           VITE_API_URL=${{ vars.VITE_API_URL }}
           VITE_TURNSTILE_SITE_KEY=${{ vars.VITE_TURNSTILE_SITE_KEY }}
+          BACKEND_HOST=${{ steps.backend.outputs.host }}
+          CSP_HEADER_NAME=${{ vars.CSP_HEADER_NAME }}
           EOF"
 
       - name: Build images
