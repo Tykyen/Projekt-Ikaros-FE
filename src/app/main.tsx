@@ -46,6 +46,11 @@ createRoot(document.getElementById("root")!).render(
 // takže je bezpečný i v dev. Reálné doručení push vyžaduje HTTPS/server.
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    void navigator.serviceWorker.register("/sw.js").catch(() => {});
+    // SW běží mimo bundler (nemá `import.meta.env`) → BE origin mu předáme query
+    // parametrem. Potřebuje ho při `pushsubscriptionchange` k re-subscribe
+    // (fetch VAPID klíče), když se odběr zrotuje bez otevřené appky.
+    const apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+    const swUrl = `/sw.js?api=${encodeURIComponent(apiBase)}`;
+    void navigator.serviceWorker.register(swUrl).catch(() => {});
   });
 }

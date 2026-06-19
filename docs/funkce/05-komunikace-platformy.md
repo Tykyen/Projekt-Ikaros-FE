@@ -90,19 +90,22 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Kdo:** přihlášený, na zařízení s podporou push. Bez role-gate.
 - **Co jde dělat:**
   - Získat veřejný klíč (`GET /push/vapid-public-key`, veřejné), **přihlásit** zařízení (`POST /push/subscribe`, upsert dle endpointu, ukládá user-agent), **odhlásit** (`/unsubscribe` dle endpointu nebo `DELETE /subscriptions/:id`), vypsat **vlastní zařízení** (`GET /push/subscriptions`, bez klíčů).
-  - SW zobrazí notifikaci z payloadu `{title, body, icon?, url?}` a na klik naviguje na `url` (deep-link), jinak na `/` (`sw.js:35`).
+  - SW zobrazí notifikaci z payloadu `{title, body, icon?, url?, tag?}` a na klik naviguje na `url` (deep-link), jinak na `/` (`sw.js`). `tag` slučuje bubliny stejné konverzace (`renotify:true` znovu upozorní).
 - **Co reálně pushuje:**
   - **Nová platformová novinka** → `notifyAll` (kap. 04).
   - **Každá zpráva v globálním chatu** → `notifyAll` (viz výše).
-  - **Chat ve světě** → `notifyUsers` cílově (mimo tuto kapitolu).
+  - **Chat ve světě** → `notifyUsers` cílově, s `tag`/`topic = chat-{channelId}` (mimo tuto kapitolu; viz [spec-13.2c-push-delivery](../arch/phase-13/spec-13.2c-push-delivery.md)).
+- **Doručovací politika (13.2c-push-delivery, 2026-06-19):** každý push nese **TTL** (default 4 h, konst. `DEFAULT_TTL_SECONDS`) — provider po vypršení notifikaci zahodí, takže offline telefon už nedostane **dny staré** zprávy. Validní **`topic`** (server-side collapse, RFC 8030) navíc nahradí předchozí nedoručenou ve frontě → jen poslední, ne hromada. (`push.service.ts` `sendToSubscriptions`.)
 - **Hranice / co neumí:**
   - **Pošta nepushuje** (jen WS) — soukromá zpráva na telefon nedorazí jako push.
   - **Žádné per-typ předvolby** — jediný přepínač zapne/vypne push na zařízení; nelze si zvolit „jen pošta, ne chat".
-  - **`notifyAll` payloady nemají `url`** → deep-link se u novinek a globálního chatu nevyužije, bublina otevře `/`.
+  - **`notifyAll` payloady nemají `url`** → deep-link se u novinek a globálního chatu nevyužije, bublina otevře `/`. (Nemají ani `tag`/`topic` → broadcast push se neslučuje.)
   - iOS vyžaduje PWA přidanou na plochu (standardní omezení Safari pro Web Push).
-- **Zvláštnosti:** neplatné subscription (HTTP 404/410) se automaticky promazávají (`push.service.ts:105`). VAPID klíče z env (`VAPID_SUBJECT/PUBLIC_KEY/PRIVATE_KEY`); chybí-li, modul při startu spadne na `!` non-null assertu.
-- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup), ale dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push nejsou naplněné.
-- **Kód:** FE `src/features/notifications/lib/usePush`, `components/PushToggle.tsx`, `PushDevicesList.tsx`, `public/sw.js`. BE `backend/src/modules/push/push.controller.ts`, `push.service.ts`.
+- **Zvláštnosti:**
+  - Neplatné subscription (HTTP 404/410) se automaticky promazávají (`push.service.ts`). VAPID klíče z env (`VAPID_SUBJECT/PUBLIC_KEY/PRIVATE_KEY`); chybí-li, modul při startu spadne na `!` non-null assertu.
+  - **Úklid rotovaných odběrů (13.2c-push-delivery):** SW má `pushsubscriptionchange` handler → re-subscribe (auth není v SW dostupný, BE origin dostává query `?api=` z `main.tsx`). Nahlášení nového endpointu řeší FE `usePush` autentizovaně — na mountu porovná endpoint s `localStorage['push:endpoint']`, při změně pošle `POST /push/subscribe` s `oldEndpoint` → BE starý smaže (`subscribe` v `push.service.ts`). Bez toho se mrtvé endpointy hromadily → **duplicitní push na jedno zařízení**.
+- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), ale dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push nejsou naplněné.
+- **Kód:** FE `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx`, `PushDevicesList.tsx`, `public/sw.js`, `src/app/main.tsx`. BE `backend/src/modules/push/push.controller.ts`, `push.service.ts`, `dto/subscribe.dto.ts`; chat push `backend/src/modules/chat/chat.service.ts`.
 
 ---
 

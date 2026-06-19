@@ -20,6 +20,9 @@ const pushSupported =
   'PushManager' in window &&
   'Notification' in window;
 
+/** Poslední endpoint nahlášený BE — detekce rotace odběru (viz `enable`/mount). */
+const PUSH_ENDPOINT_KEY = 'push:endpoint';
+
 /**
  * Spec 13.2c — správa push notifikací na **tomto zařízení**: zjištění stavu,
  * zapnutí (permission → `pushManager.subscribe` → `POST /push/subscribe`),
@@ -43,10 +46,35 @@ export function usePush() {
     let cancelled = false;
     void navigator.serviceWorker.ready
       .then((reg) => reg.pushManager.getSubscription())
-      .then((sub) => {
-        if (!cancelled) {
-          setIsSubscribed(!!sub);
-          setCurrentEndpoint(sub?.endpoint ?? null);
+      .then(async (sub) => {
+        if (cancelled) return;
+        setIsSubscribed(!!sub);
+        setCurrentEndpoint(sub?.endpoint ?? null);
+        if (!sub) return;
+        // Detekce rotace odběru: SW při `pushsubscriptionchange` re-subscribne,
+        // ale nový endpoint nenahlásí na BE (nemá Bearer token). Tady to dohnáme
+        // autentizovaně — pošleme nový endpoint + starý (ke smazání), ať se na
+        // BE nehromadí mrtvé subscriptions stejného zařízení (= duplicitní push).
+        const stored = localStorage.getItem(PUSH_ENDPOINT_KEY);
+        if (stored === sub.endpoint) return;
+        if (!stored) {
+          // První záznam (migrace / subscribe z jiné session) — jen zapamatuj.
+          localStorage.setItem(PUSH_ENDPOINT_KEY, sub.endpoint);
+          return;
+        }
+        try {
+          const json = sub.toJSON() as {
+            keys?: { p256dh?: string; auth?: string };
+          };
+          await api.post('/push/subscribe', {
+            endpoint: sub.endpoint,
+            p256dh: json.keys?.p256dh ?? '',
+            auth: json.keys?.auth ?? '',
+            oldEndpoint: stored,
+          });
+          localStorage.setItem(PUSH_ENDPOINT_KEY, sub.endpoint);
+        } catch {
+          // best-effort — zkusí se znovu při příštím mountu / otevření appky.
         }
       })
       .catch(() => {});
@@ -78,6 +106,7 @@ export function usePush() {
         p256dh: json.keys?.p256dh ?? '',
         auth: json.keys?.auth ?? '',
       });
+      localStorage.setItem(PUSH_ENDPOINT_KEY, sub.endpoint);
       setIsSubscribed(true);
       setCurrentEndpoint(sub.endpoint);
       void qc.invalidateQueries({ queryKey: pushDeviceKeys.all });
@@ -98,6 +127,7 @@ export function usePush() {
           .catch(() => {});
         await sub.unsubscribe();
       }
+      localStorage.removeItem(PUSH_ENDPOINT_KEY);
       setIsSubscribed(false);
       setCurrentEndpoint(null);
       void qc.invalidateQueries({ queryKey: pushDeviceKeys.all });
