@@ -233,10 +233,11 @@
 ---
 
 ### Rate-limiting / throttling (auth)
-- **Co to je:** `@nestjs/throttler` limity na citlivých endpointech.
+- **Co to je:** `@nestjs/throttler` limity na citlivých endpointech (default 100/min/IP + per-endpoint `@Throttle`).
 - **Hodnoty (ověřeno):** register 10/min, login 5/min, login/totp 5/min, reactivate-deletion 5/min, refresh 30/min, forgot/reset 5/min, verify-email 30/min, resend-verification 3/min, confirm-email-change 5/min, check-username/check-email 60/min, 2FA kontroler 15/min, request-email-change 5/min.
-- **Stav:** ✅ funguje.
-- **Kód:** BE `auth.controller.ts` (jednotlivé `@Throttle`), `two-factor.controller.ts:29`.
+- **Storage (14.6):** přepínatelné. Default in-memory (single-instance — správné, nulový overhead). `THROTTLER_REDIS=1` + dostupný `REDIS_URL` → sdílený counter přes Redis (`@nest-lab/throttler-storage-redis`) pro 2+ replik BE; boot-time probe, při nedostupném Redisu fallback in-memory + warn. Limity beze změny. Vzor `SOCKET_IO_REDIS=1`. (Uzavřelo BE dluh D-028.)
+- **Stav:** ✅ funguje (Redis storage opt-in, zatím nezapnutý — single-instance deploy).
+- **Kód:** BE `auth.controller.ts` (jednotlivé `@Throttle`), `two-factor.controller.ts:29`, `common/throttler/throttler.config.ts`, `app.module.ts` (`ThrottlerModule.forRootAsync`).
 
 ---
 
