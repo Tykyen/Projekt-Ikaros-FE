@@ -248,6 +248,11 @@ export default function DiceBox3D({
       runGhostRoll();
       return;
     }
+    // 6.3-fix7 — `nonce === 0` = sentinel „není co házet" (overlay se zhasíná,
+    // `roll → null`). Bez tohoto by změna nonce T→0 spustila rollNow, který
+    // v mezi-renderu (`active` ještě true, notation default `1d6@1`) hodil
+    // přízračnou kostku „1". Reálný hod má vždy nonce = timestamp > 0.
+    if (nonce === 0) return;
     rollNow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, nonce]);
