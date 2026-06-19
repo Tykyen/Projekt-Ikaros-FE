@@ -8,6 +8,15 @@
 
 ## Otevřené
 
+### D-NEW-WS-UPGRADE — WebSocket upgrade na /socket.io padá na edge proxy (real-time běží na pollingu)
+**Soubor:** edge reverse proxy na hostu (systémový nginx / Cloudflare před kontejnery) — **mimo repo**; konzument `src/features/chat/api/socket.ts` (Socket.IO klient, `transports: ['websocket','polling']`)
+**Problém:** Upgrade polling→websocket na `wss://www.projekt-ikaros.com/socket.io` selhává (`WebSocket is closed before the connection is established`). Backend Socket.IO **běží** a upgrade nabízí (curl polling handshake → `0{…,"upgrades":["websocket"]}`); náš FE nginx `/socket.io` neproxuje (odklání edge proxy na backend). Příčina: edge proxy postrádá WS upgrade direktivy (`proxy_http_version 1.1` + `Upgrade`/`Connection`) na `/socket.io`. **NENÍ způsobeno 14.3** (objeveno při jeho report-only diagnostice; CSP report-only neblokuje, helmet na WS handshake neběží).
+**Dopad:** Nízký–střední — appka funguje (Socket.IO fallback na polling; chat ověřeně jede), ale polling = vyšší latence + větší zátěž serveru + horší škálování než WS. `SOCKET_IO_REDIS` adapter je připraven na multi-instance, bez WS je ale výhoda omezená.
+**Řešení:** Na edge nginx `location /socket.io` doplnit `proxy_http_version 1.1; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection "upgrade";` (a `proxy_read_timeout` zvýšit). U Cloudflare ověřit povolený WS. Ops úkol na hostu. Po fixu ověřit v DevTools, že transport upgraduje na `websocket`.
+**Kdy:** Brzy — degraduje výkon real-time napříč platformou (chat, presence, mapa, notifikace). Neblokující, ale levný a citelný fix.
+
+---
+
 ### D-NEW-SYS-DIARY-DRIFT — Dračí Hlídka: nesladěné id mezi nabídkou systémů a deníkem
 **Soubor:** `src/features/ikaros/pages/CreateWorldPage/constants/systems.ts` (RPG_SYSTEMS) ↔ `src/features/world/pages/CharacterDetailPage/diary-systems/registry.ts` + `presets/drdh.ts`
 **Problém:** **Jeden systém (Dračí Hlídka) má dvě různá id.** Nabídka při vytvoření světa ho ukládá jako `world.system = 'draci-hlidka'`, ale jeho deník je registrovaný pod klíčem **`drdh`** (`drdh.ts`: `id: 'drdh'`, `name: 'Dračí Hlídka'`; `types.ts` whitelist zná jen `drdh`). Diary registry nezná `draci-hlidka` → **svět vytvořený jako Dračí Hlídka svůj deník nenajde a dostane prázdné/generic schema.** (Žádný samostatný „Dračí Doupě Hero" neexistuje — `drdh` JE Dračí Hlídka.)

@@ -145,6 +145,8 @@ upgrade-insecure-requests;
 | `style-src` | `'unsafe-inline'` | **(report-only)** knihovny (router ap.) injektují inline `<style>` |
 | `frame-src` | `https://www.youtube.com` `https://www.youtube-nocookie.com` | **(report-only)** YT přehrávač + video embedy |
 | `img-src` | `https://i.ytimg.com` | **(report-only)** YT náhledy |
+| `worker-src` | `blob:` | **(report-only)** knihovna (3D dice na chatu) vytváří Web Worker z `blob:` |
+| `connect-src` | `data:` | **(report-only)** `fetch()` na `data:` URL (base64→blob konverze) |
 
 ✅ **Vyřešeno report-only fází (2026-06-19):** `style-src 'unsafe-inline'` **nutné** (inline styly z knihoven). `'unsafe-eval'` **nutné** kvůli YouTube `www-widgetapi` (3rd-party, CSP nemá per-doménový eval → globální; skripty jinak tvrdé hash+self). Mírnící fakt: `'unsafe-eval'` sám XSS neumožní (injekci pořád blokuje `script-src 'self'`+hash). Follow-up **14.3-b**: nahradit YT IFrame API lite-embedem bez JS API → odpadne `'unsafe-eval'`.
 
