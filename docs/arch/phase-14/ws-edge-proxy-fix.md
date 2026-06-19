@@ -1,7 +1,13 @@
 # Fix: WebSocket upgrade na edge proxy (dluh D-NEW-WS-UPGRADE)
 
+> ✅ **VYŘEŠENO 2026-06-19 — WS na produkci funguje, dluh zavřen.**
+> Ověřeno WS upgrade handshake na `wss://www.projekt-ikaros.com/socket.io/?EIO=4&transport=websocket`:
+> server vrátil **`HTTP/1.1 101 Switching Protocols`** (`Server: Caddy`, `Sec-WebSocket-Accept`, engine.io session
+> `{"sid":...,"upgrades":[]}`), spojení zůstalo otevřené. = Krok 1 níže → **WS jede, browser warning byl benigní**,
+> Caddy `reverse_proxy` upgrade přeposílá sám. Žádný zásah do Caddyfile nebyl potřeba. Záznam zůstává jako reference.
+
 **Edge proxy = Caddy** (zjištěno z `Via: 1.1 Caddy` na `/api` i `/socket.io`). Aplikace je na **hostu**, mimo git repo.
-**Souvisí:** `docs/dluhy.md` → D-NEW-WS-UPGRADE.
+**Souvisí:** `docs/dluhy.md` → D-NEW-WS-UPGRADE (zavřen).
 
 ## Problém
 

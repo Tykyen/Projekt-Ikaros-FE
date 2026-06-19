@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config';
+import { configDefaults } from 'vitest/config';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
@@ -27,6 +28,10 @@ export default defineConfig({
           environment: 'jsdom',
           setupFiles: ['./src/__tests__/setup.ts'],
           css: false,
+          // 14.5 — `e2e/` jsou Playwright testy (`*.spec.ts` importující
+          // @playwright/test). Vitest by je jinak scrapnul a spadl. Ponecháme
+          // defaultní exclude (node_modules/dist/…) + přidáme e2e.
+          exclude: [...configDefaults.exclude, 'e2e/**'],
           // 2026-05-25: 6 testů flaky v parallel mode kvůli sdíleným globálům
           // (jotai default store, vi.mock state). Serial běh garantuje stabilitu;
           // ztráta výkonu ~30 % (1315 testů, ~2 min serial vs ~1 min parallel)

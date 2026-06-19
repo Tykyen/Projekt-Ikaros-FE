@@ -119,12 +119,13 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **BE/Ops:** `mongodump` cron + upload na oddělené úložiště; média drží Cloudinary; runbook „co dělat, když spadne server".
 **Otevřené otázky:** Kam zálohovat (jiný cloud/region)? Jak dlouho držet? Šifrovat zálohy? Kdo má k nim přístup?
 
-### - [ ] 14.5 FE CI brána + E2E smoke — [A5 · dopad střední · náklad střední]
+### - [x] 14.5 FE CI brána + E2E smoke — [A5 · dopad střední · náklad střední] ✅ *(2026-06-19)*
 **Cíl:** Před nasazením FE automaticky proběhne typecheck + lint + testy + jeden E2E happy-path.
 **Proč:** FE dnes jen deployuje (BE bránu má); jeden chybný commit může shodit web bez varování. Playwright je nainstalovaný, jen nevyužitý.
 **Návrh přípravy:** GitHub Actions workflow zrcadlící BE `ci.yml`; vybrat 1 kritický scénář (login → vstup do světa → otevření mapy).
 **FE:** workflow + první Playwright test; volitelně FE pre-commit hook (pozor: FE bez prettieru — viz `feedback_fe_no_prettier`).
 **Otevřené otázky:** Blokovat merge, nebo jen varovat zpočátku? Spouštět E2E na každý push, nebo nightly?
+**✅ Implementováno (2026-06-19, [spec-14.5](arch/phase-14/spec-14.5.md)):** Klíčová oprava zadání: **CI brána už existovala** — [ci.yml](../.github/workflows/ci.yml) (vznikla při 16. auditu, fáze B1) dělá build `tsc -b` + lint + nav audit + vitest + cross-repo kontraktní scannery + anti-regression guard. Zbýval **jen E2E smoke**. Architektura: **Playwright FE-only, BE mockovaný** přes `page.route('**/api/**')` ([e2e/mock-api.ts](../e2e/mock-api.ts)) + abort socket.io — rychlé (~13 s), deterministické, žádný backend/DB. (Zváženo a zamítnuto: plný stack v CI = pro sólo projekt křehké; kontraktní drift hlídají cross-repo scannery.) Happy-path [e2e/smoke.spec.ts](../e2e/smoke.spec.ts): login (UI formulář) → `/ikaros/vesmiry` → klik na kartu světa → `/svet/:slug/takticka-mapa`, assert že PIXI `<canvas>` naběhl (chytí runtime crash, který tsc/unit nezachytí). Nový **blokující** job `frontend-e2e` v ci.yml (na každý push/PR na `main`). Otevřené otázky zodpovězeny: **blokovat** (deterministické, ne flaky) + **na každý PR** (rychlé). Jediný dotek prod kódu = `data-testid="tactical-map-viewport"`. Vitest `e2e/**` exclude (jinak by scrapnul Playwright `*.spec.ts`). FE pre-commit hook vědomě vynechán (FE bez prettieru, necháno na CI).
 
 ### - [ ] 14.6 SCA (skenování závislostí) + rate-limit pro škálu — [A6 · dopad střední · náklad malý]
 **Cíl:** Automatické hlídání zranitelných balíčků; připravený Redis-backed rate-limit pro multi-instance.

@@ -1197,6 +1197,7 @@ export function TacticalMapView(): React.ReactElement {
     <div
       ref={viewportRef}
       className={styles.viewport}
+      data-testid="tactical-map-viewport"
       onDragOver={isPJ ? handleViewportDragOver : undefined}
       onDrop={isPJ ? handleViewportDrop : undefined}
       onClick={

@@ -8,15 +8,6 @@
 
 ## Otevřené
 
-### D-NEW-WS-UPGRADE — WebSocket upgrade na /socket.io padá na edge proxy (real-time běží na pollingu)
-**Soubor:** edge reverse proxy na hostu = **Caddy** (`Via: 1.1 Caddy`) — Caddyfile **mimo repo**; konzument `src/features/chat/api/socket.ts` (Socket.IO klient, `transports: ['websocket','polling']`)
-**Problém:** Upgrade na websocket na `wss://www.projekt-ikaros.com/socket.io` hlásí `WebSocket is closed before the connection is established`. Backend Socket.IO **běží** a upgrade nabízí (curl polling handshake → `0{…,"upgrades":["websocket"]}`). **NENÍ způsobeno 14.3** (objeveno při jeho report-only diagnostice; CSP report-only neblokuje, helmet na WS handshake neběží).
-**Dopad:** Nízký–střední — appka funguje (Socket.IO fallback na polling; chat ověřeně jede). Pokud WS opravdu nejede, polling = vyšší latence + zátěž serveru. **Pozor: nutno nejdřív ověřit, zda WS skutečně nejede** (Caddy v2 přeposílá WS automaticky → warning může být benigní z prvního pokusu).
-**Řešení:** Postup v `docs/arch/phase-14/ws-edge-proxy-fix.md`. Krok 1 = DevTools → Network → WS → status `101 Switching Protocols`? Ano → WS jede, warning benigní, **dluh zavřít**. Ne → příčina v Caddyfile (Cloudflare-před-Caddy WS=ON / žádná `header_up -Connection`/`-Upgrade` manipulace / `/socket.io/*` matcher míří na backend `reverse_proxy`). Ops na hostu.
-**Kdy:** Brzy — degraduje výkon real-time napříč platformou (chat, presence, mapa, notifikace). Neblokující, ale levný a citelný fix.
-
----
-
 ### D-NEW-SYS-DIARY-DRIFT — Dračí Hlídka: nesladěné id mezi nabídkou systémů a deníkem
 **Soubor:** `src/features/ikaros/pages/CreateWorldPage/constants/systems.ts` (RPG_SYSTEMS) ↔ `src/features/world/pages/CharacterDetailPage/diary-systems/registry.ts` + `presets/drdh.ts`
 **Problém:** **Jeden systém (Dračí Hlídka) má dvě různá id.** Nabídka při vytvoření světa ho ukládá jako `world.system = 'draci-hlidka'`, ale jeho deník je registrovaný pod klíčem **`drdh`** (`drdh.ts`: `id: 'drdh'`, `name: 'Dračí Hlídka'`; `types.ts` whitelist zná jen `drdh`). Diary registry nezná `draci-hlidka` → **svět vytvořený jako Dračí Hlídka svůj deník nenajde a dostane prázdné/generic schema.** (Žádný samostatný „Dračí Doupě Hero" neexistuje — `drdh` JE Dračí Hlídka.)
