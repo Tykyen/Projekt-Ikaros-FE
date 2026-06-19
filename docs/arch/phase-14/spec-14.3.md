@@ -138,10 +138,15 @@ upgrade-insecure-requests;
 | `img-src` | `data:` `blob:` | PixiJS WebGL textury / canvas / avatar blob |
 | `connect-src` | `${BACKEND_HOST}` | REST `/api` + Socket.IO (wss + polling — holý host kryje obojí) |
 | `connect-src` | `https://challenges.cloudflare.com` | Turnstile validace |
+| `connect-src` | `https://res.cloudinary.com` | **(report-only)** 3D dice textury se fetchují, ne `<img>` |
 | `worker-src` | `'self'` | service worker `/sw.js` (push/PWA) |
 | `manifest-src` | `'self'` | `manifest.webmanifest` (PWA) |
+| `script-src` | `'unsafe-eval'` `https://www.youtube.com` | **(report-only)** YT IFrame API ([youtubeApi.ts:41](../../../src/features/world/sounds/player/youtubeApi.ts#L41)) — zvuky světa + embedy; `www-widgetapi` volá `eval` |
+| `style-src` | `'unsafe-inline'` | **(report-only)** knihovny (router ap.) injektují inline `<style>` |
+| `frame-src` | `https://www.youtube.com` `https://www.youtube-nocookie.com` | **(report-only)** YT přehrávač + video embedy |
+| `img-src` | `https://i.ytimg.com` | **(report-only)** YT náhledy |
 
-⚠️ **Otevřené k ověření v report-only:** zda TipTap/ProseMirror nebo jiná knihovna injektuje `<style>` (→ případně `'unsafe-inline'` jen pro `style-src`). Zda Turnstile potřebuje i jinou subdoménu než `challenges.cloudflare.com`.
+✅ **Vyřešeno report-only fází (2026-06-19):** `style-src 'unsafe-inline'` **nutné** (inline styly z knihoven). `'unsafe-eval'` **nutné** kvůli YouTube `www-widgetapi` (3rd-party, CSP nemá per-doménový eval → globální; skripty jinak tvrdé hash+self). Mírnící fakt: `'unsafe-eval'` sám XSS neumožní (injekci pořád blokuje `script-src 'self'`+hash). Follow-up **14.3-b**: nahradit YT IFrame API lite-embedem bez JS API → odpadne `'unsafe-eval'`.
 
 ---
 

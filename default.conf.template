@@ -39,9 +39,12 @@ server {
     #     pre-hydration theme setter v index.html (statický → hash; CI guard
     #     scripts/check-csp-hash.mjs hlídá, že hash sedí se skriptem).
     #     Externí povolení: challenges.cloudflare.com (Turnstile), fonts.google*
-    #     (fonty), res.cloudinary.com (obrázky), ${BACKEND_HOST} (API+WS+/static).
-    #     style-src zatím BEZ 'unsafe-inline' — report-only fáze ukáže, jestli
-    #     ho některá knihovna (TipTap/PixiJS/dice WASM) potřebuje.
+    #     (fonty), res.cloudinary.com (obrázky+dice textury fetch), www.youtube.com
+    #     + i.ytimg.com (YT IFrame API: zvuky světa + video embedy), ${BACKEND_HOST}.
+    #     Ústupky doložené report-only fází (2026-06-19):
+    #       'unsafe-inline' v style-src — knihovny (router ap.) injektují inline <style>.
+    #       'unsafe-eval' v script-src — YouTube www-widgetapi volá eval (3rd party,
+    #         CSP nemá per-doménový eval → musí být globální). Skripty jinak tvrdé.
     #   • HSTS: vynutí HTTPS (ctěno jen po HTTPS; preload zatím NE — nevratné).
     #   • X-XSS-Protection "0": legacy auditor je deprecated + děravý; CSP ho nahrazuje.
     location / {
@@ -53,6 +56,6 @@ server {
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         add_header Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" always;
-        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST}; connect-src 'self' ${BACKEND_HOST} https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests" always;
+        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' 'unsafe-eval' https://challenges.cloudflare.com https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST} https://i.ytimg.com; connect-src 'self' ${BACKEND_HOST} https://res.cloudinary.com https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests" always;
     }
 }
