@@ -143,7 +143,19 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **FE:** tlačítko v nastavení světa + indikátor průběhu + download.
 **Otevřené otázky:** ~~Co všechno do exportu~~ → vše viditelné lore, chat volitelný blok (default off). ~~Kdo smí exportovat~~ → každý člen svůj viditelný scope (PJ=full, hráč=partial). ~~Import teď, nebo později~~ → **teď, společně** (round-trip ověření; import jen z `pj-full`).
 > 🔗 Kryje i **D-NEW-INV-ADMIN-UI** (Průřez Ú): GDPR `GET /data-export/me` je dnes BE-only bez FE konzumenta — sem patří uživatelské stažení vlastních dat.
-> 🚧 **Rozpracováno (2026-06-19):** spec [spec-14.7.md](arch/phase-14/spec-14.7.md) schválena — 2 pilíře: **A** FE tisk/PDF přes `window.print()` (body 2–14) · **B** BE ZIP záloha (jeden svět) + import. **Pilíř A hotový — 14.7a** (framework + stránka + deník) **i 14.7b** (záložky, kalendář s rozsahem, bestiář, mapy, hvězdná=seznam, pavučina, storyboard, obchod). **Pilíř B — 14.7c export HOTOVÝ**: BE modul `world-export` (ZIP celého lore stromu, PJ/Admin) + FE tab „Export / Záloha". **Import ODLOŽEN** (formát import-ready). Mimo V1: binárky médií do ZIP, chat. Reálný tisk i download neověřeny v prohlížeči (čeká uživatel) · **po BE změně restart**.
+> 🚧 **Stav 14.7 (2026-06-19)** — spec [spec-14.7.md](arch/phase-14/spec-14.7.md). Dva pilíře: **A** FE tisk/PDF (`window.print()`, body 2–14) · **B** BE ZIP záloha (bod 1) + import.
+>
+> **Pilíř A — tisk/PDF (body 2–14): ✅ HOTOVO**
+> - ✅ 14.7a — framework (`window.print`) + tisk stránky a deníku PC/NPC
+> - ✅ 14.7b — záložky postavy/NPC, kalendář s rozsahem, bestiář, mapy-atlas, hvězdná (seznam), pavučina, storyboard, obchod
+>
+> **Pilíř B — záloha (bod 1):**
+> - ✅ 14.7c export — BE `world-export` (ZIP celého lore stromu, PJ/Admin) + FE tab „Export / Záloha"; **pushnuto** (po BE změně **restart**)
+> - 🔲 binárky médií do ZIP (teď jen URL v datech) · 🔲 hráčský `viewer-partial` export (teď jen PJ) · 🔲 gm-notes + chat do zálohy
+> - ⏸️ **import** (obnova ze zálohy) — ODLOŽEN; formát je import-ready
+>
+> **🧪 Neověřeno (na uživateli):** reálný tisk + stažení ZIP v prohlížeči.
+> Checkbox `[ ]` zůstává, dokud nejsou dotaženy zbývající 🔲 mezery (rozhodnuto je dodělat).
 
 ### - [ ] 14.8 Odstřižení od starého webu (SMTP + embedding model) — [H0-08 · dopad střední · náklad střední] 🔁 *(přesun z 19.3)*
 **Cíl:** Žádná závislost na umírajícím `patrikzplzne.cz` — přesun embedding modelu vyhledávání na vlastní hosting, maily přes vlastní SMTP do produkce, ověřit web push na reálném telefonu (iPhone PWA na plochu).

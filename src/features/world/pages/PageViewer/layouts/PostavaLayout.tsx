@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useBlocker } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import {
@@ -13,9 +13,10 @@ import {
   StickyNote,
   CalendarDays,
   Pencil,
+  Printer,
 } from 'lucide-react';
-import { Tabs, type TabItem, ConfirmDialog } from '@/shared/ui';
-import { PrintButton, usePrintMode } from '@/features/world/export/print';
+import { Tabs, type TabItem, ConfirmDialog, Button } from '@/shared/ui';
+import { usePrint, usePrintMode } from '@/features/world/export/print';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -99,8 +100,23 @@ export function PostavaLayout({ page }: Props) {
   const [activeTabDirty, setActiveTabDirty] = useState(false);
   const [pendingNav, setPendingNav] = useState<PendingNav | null>(null);
   const printMode = usePrintMode();
+  const { triggerPrint } = usePrint();
   const [printIncludeCalendar, setPrintIncludeCalendar] = useState(false);
+  // „Tisk všech záložek" = LOKÁLNÍ přepnutí (ne globální printMode). Tisk
+  // jednoho subdocu (deník má vlastní tlačítko) tak nepřepne celý strom a
+  // neodmountuje jeho data-print-root → jinak by vyšly prázdné stránky.
+  const [printAllTabs, setPrintAllTabs] = useState(false);
+  const layoutRef = useRef<HTMLDivElement>(null);
   const noop = () => {};
+
+  // Nejdřív vyrenderuj všechny taby (printAllTabs), pak teprve tiskni.
+  useEffect(() => {
+    if (printAllTabs) triggerPrint(layoutRef.current);
+  }, [printAllTabs, triggerPrint]);
+  // Po dotištění (printMode zhasne) vrať PostavaLayout zpět na záložky.
+  useEffect(() => {
+    if (!printMode) setPrintAllTabs(false);
+  }, [printMode]);
 
   const blocker = useBlocker(editMode && activeTabDirty);
   const guardOpen = pendingNav !== null || blocker.state === 'blocked';
@@ -217,7 +233,7 @@ export function PostavaLayout({ page }: Props) {
   const subdocTabActive = activeTab !== 'profil';
 
   return (
-    <div className={s.layout} data-print-scope>
+    <div className={s.layout} data-print-scope ref={layoutRef}>
       <PostavaHero
         page={page}
         playerName={playerName}
@@ -258,10 +274,18 @@ export function PostavaLayout({ page }: Props) {
             Přidat kalendář do tisku
           </label>
         )}
-        <PrintButton title="Vytisknout / uložit záložky postavy jako PDF" />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="print-hide"
+          onClick={() => setPrintAllTabs(true)}
+          title="Vytisknout / uložit všechny záložky postavy jako PDF"
+        >
+          <Printer size={16} aria-hidden /> Tisk všech záložek
+        </Button>
       </div>
 
-      {printMode ? (
+      {printAllTabs ? (
         /* Tisk: všechny záložky lineárně (kromě kalendáře, ten jen opt-in). */
         <div>
           <BioTab page={page} />
