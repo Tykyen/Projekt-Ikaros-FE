@@ -1,0 +1,5 @@
+# 14.3 — CSP hash inline pre-hydration skriptu závisí na PŘESNÝCH bajtech
+# index.html. Vite zachovává line-endings ze source → na Windows (CRLF) vznikne
+# jiný hash než na Linux serveru (LF), CSP pak zablokuje vlastní skript.
+# Vynutit LF napříč platformami (repo i working tree), ať hash sedí všude.
+index.html text eol=lf

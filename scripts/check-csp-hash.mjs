@@ -34,7 +34,12 @@ if (!m) {
   console.error('check-csp-hash: inline <script> v dist/index.html nenalezen.');
   process.exit(1);
 }
-const expected = `sha256-${createHash('sha256').update(m[1], 'utf8').digest('base64')}`;
+// CRLF→LF normalizace: hash musí být platformně stabilní. Produkce (Linux
+// nginx) servíruje LF; bez normalizace by Windows build (CRLF) spočítal jiný
+// hash a guard by falešně selhal (resp. CSP by v prod blokovala skript).
+// .gitattributes navíc drží index.html jako LF i v repu — tohle je pojistka.
+const scriptBody = m[1].replace(/\r\n/g, '\n');
+const expected = `sha256-${createHash('sha256').update(scriptBody, 'utf8').digest('base64')}`;
 
 if (process.argv.includes('--print')) {
   console.log(expected);
