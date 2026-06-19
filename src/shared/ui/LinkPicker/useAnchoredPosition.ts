@@ -58,7 +58,7 @@ export function useAnchoredPosition(
     }
 
     compute();
-    window.addEventListener('scroll', compute, true);
+    window.addEventListener('scroll', compute, { capture: true, passive: true });
     window.addEventListener('resize', compute);
     return () => {
       window.removeEventListener('scroll', compute, true);

@@ -21,10 +21,13 @@ export function getSocket(): Socket {
     auth: token ? { token } : undefined,
     withCredentials: true,
     autoConnect: true,
-    // W-8 — `polling` jako fallback: za striktní proxy/firewallem bez WS
-    // upgrade by čistě `websocket` spojení nikdy nenavázalo a celá real-time
-    // vrstva by tiše nefungovala. Socket.io po připojení upgraduje na WS.
-    transports: ['websocket', 'polling'],
+    // W-8 / D-NEW-WS-UPGRADE — polling-first (default Socket.IO pořadí).
+    // Začni pollingem (projde přes každou proxy), pak engine.io upgraduje na WS.
+    // Pozor: websocket-first ('websocket' jako první) hází za proxy do konzole
+    // „WebSocket is closed before the connection is established" — failnutý
+    // přímý WS handshake, po kterém teprve spadne na polling. Polling-first
+    // je tišší a proxy-friendly; když WS upgrade nejde, real-time jede dál na pollingu.
+    transports: ['polling', 'websocket'],
   });
 
   const store = getDefaultStore();

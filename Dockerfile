@@ -32,10 +32,12 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # ${BACKEND_HOST} a ${CSP_HEADER_NAME} z prostředí a zapíše do conf.d/default.conf.
 # NGINX_ENVSUBST_FILTER omezí substituci jen na tyto dvě proměnné → nginx $uri ap. zůstanou.
 # Defaulty (fail-safe, ať nginx nepadne, když compose env zapomene):
-#   CSP_HEADER_NAME → report-only; BACKEND_HOST → prázdný (compose ho dodá z VITE_API_URL).
+#   CSP_HEADER_NAME → enforce (cílový stav 14.3 po doladění report-only fází);
+#     dočasný rollback na report-only = var CSP_HEADER_NAME=Content-Security-Policy-Report-Only.
+#   BACKEND_HOST → prázdný (compose ho dodá z VITE_API_URL).
 COPY default.conf.template /etc/nginx/templates/default.conf.template
 ENV NGINX_ENVSUBST_FILTER="^(BACKEND_HOST|CSP_HEADER_NAME)$" \
-    CSP_HEADER_NAME="Content-Security-Policy-Report-Only" \
+    CSP_HEADER_NAME="Content-Security-Policy" \
     BACKEND_HOST=""
 
 EXPOSE 80

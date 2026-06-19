@@ -1,6 +1,6 @@
 # Spec 14.3 — Bezpečnostní hlavičky (CSP, HSTS, helmet)
 
-**Status:** 🚧 Kód hotový (2026-06-19) — FE build+lint+CSP guard+envsubst sim zelené, BE build+lint zelené. Nasazeno jako **report-only**; čeká: deploy + BE restart + sběr porušení → enforce (přepnout `CSP_HEADER_NAME`).
+**Status:** ✅ Implementováno (2026-06-19) — report-only fáze proběhla na produkci, allowlist doladěn z reálných nálezů (viz §5.2). **Enforce je teď produkční default** (`CSP_HEADER_NAME` v Dockerfile/compose); rollback na report-only přes GitHub var. Zbývá provoz: redeploy + smoke neprozkoumaných stránek.
 **Rozsah:** FE (nginx, jádro) + BE (helmet, API hardening) — žádná aplikační logika, jen HTTP hlavičky a konfigurace
 **Repo:** `Projekt-ikaros-FE` (nginx.conf, docker-compose, deploy.yml) + `Projekt-ikaros` (BE main.ts, env validace)
 **Velikost:** malá — odhad ~6–8 souborů (FE ~4, BE ~3)
