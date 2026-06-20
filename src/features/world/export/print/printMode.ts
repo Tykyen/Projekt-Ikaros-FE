@@ -97,15 +97,28 @@ export function usePrint(): {
             );
             win.document.close();
 
+            // Počkat na načtení VŠECH obrázků v novém okně, teprve pak tisk
+            // (jinak by se tisklo dřív, než se stáhnou → chybí obrázky).
             const doPrint = () => {
-              win.focus();
-              win.print();
+              const imgs = Array.from(win.document.images);
+              void Promise.all(
+                imgs.map((img) =>
+                  img.complete
+                    ? Promise.resolve()
+                    : new Promise<void>((res) => {
+                        img.onload = () => res();
+                        img.onerror = () => res();
+                      }),
+                ),
+              ).then(() => {
+                win.focus();
+                win.print();
+              });
             };
-            // Počkat na načtení (obrázky), pak tisk.
             if (win.document.readyState === 'complete') {
-              window.setTimeout(doPrint, 300);
+              doPrint();
             } else {
-              win.onload = () => window.setTimeout(doPrint, 150);
+              win.onload = doPrint;
             }
           } finally {
             setPrintMode(false);
