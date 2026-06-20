@@ -99,3 +99,9 @@
 - 🔴 kritická · 🟠 střední · 🟡 nízká · ⚪ kosmetika · ⚖️ by-design / přijatý dluh
 - 🐛 potvrzeno · ✅ opraveno/vyvráceno · ⬜ k ověření · `K-SSx` seed kandidát (hypotéza)
 - **Úrovně:** L2 smoke (průchod) · L3 side-effect+negativ · L4 DB-introspekce+cleanup · L5-infra (blob) · L5-teeth (mutation)
+
+---
+
+## Plný audit RUN 2026-06-20 (FE 2a6c8e1c / BE 9cf98be)
+
+- **SS-RUN-01 ♻️ regrese 🟠 ✅ OPRAVENO** — 14.7 world-export (`import { ZipArchive } from 'archiver'`, archiver v8 `type:module`) rozbil **celou BE e2e sadu** (21/21 fail): `app.module` načítá world-export.module → ts-jest (`allowJs:false`, `module:nodenext`) ESM netranspiluje → `Cannot use import statement outside a module`. **Prod NEohrožen** (reálný Node `require('archiver')` funguje, ověřeno). Fix (test-only): `test/mocks/archiver.stub.ts` + `moduleNameMapper ^archiver$` v `jest-e2e.json`. Pojistka G≥2: e2e sada sama (21/21 zelená po fixu). Páteř + SE/IN/AC opět ověřeno.

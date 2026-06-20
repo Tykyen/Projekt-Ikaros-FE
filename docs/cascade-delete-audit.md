@@ -137,3 +137,17 @@
 
 - 🔴 kritická · 🟠 střední · 🟡 nízká · ⚪ kosmetika · ⚖️ by-design / přijatý dluh
 - 🐛 potvrzeno · ✅ opraveno/vyvráceno · ⬜ k ověření · `K-CDx` seed kandidát (hypotéza)
+
+---
+
+## Plný audit RUN 2026-06-20 (FE 2a6c8e1c / BE 9cf98be)
+
+Sweep nového povrchu (timeline, trusted-devices, ikaros-*) — nové moduly nedostaly jednotný delete-cleanup vzor (`media.orphaned` / `@OnEvent`), který CD-01..04 zavedly pro stránku/postavu/svět/scénu.
+
+- **CD-RUN-1 🟡 `EX` ✅ OPRAVENO** — timeline event blob leak (delete i replace). `timeline.service.ts` neinjektoval `EventEmitter2`. Fix: inject + emit `media.orphaned` v `delete`/`update`. Pojistka: `timeline.service.spec.ts` „CD-RUN-1" (2 testy).
+- **CD-RUN-2 🟡 `DR` ✅ OPRAVENO** (14.9 priorita #1) — smazání kalendářového configu nečistilo `worldSettings.timelineCalendarSlug` (dangling, self-heal přes fallback, NE crash). Fix: `world-calendar-config.service.ts remove` nulluje slug. Pojistka: `world-calendar-config.service.spec.ts` „CD-RUN-2" (2 testy).
+- **CD-RUN-3 🟡 `OR` ✅ OPRAVENO** — trusted devices se neuklidily při hard-delete uživatele (TTL 30d jen mírnil). Fix: `@OnEvent('user.deletion.hardDeleted')` → `revokeAllForUser`. Pojistka: `trusted-devices.service.spec.ts` „handleAccountHardDeleted".
+- **CD-RUN-4 🟡 `EX` ✅ OPRAVENO (ikaros-news)** — ikaros-news (hard delete) blob leak. Fix: emit `media.orphaned`. Pojistka: `ikaros-news.service.spec.ts` „CD-RUN-4" (2 testy).
+- **CD-RUN-4b 🟡 `EX` ⬜ REVIEW (ikaros-events)** — `delete` = **softDelete** (zotavitelný) + **žádný purge cron**. Orphan na soft-delete by rozbil obnovu → potřeba rozhodnutí: purge job (čistí blob) vs. ponechat soft-deleted akce indefinitně. NEopraveno.
+- **VYVRÁCENO:** „soft-delete akcí (game-events) bez cleanup" — game-events maže **tvrdě** + `media.orphaned`, čistý vzor. „dungeon-maps blob leak" — schema nemá blob pole (false-positive, zaměněno s `exportTemplate` param).
+- ⏭️ L4 orphan-scan (reálné dangling/leak counts) vyžaduje `+db`.

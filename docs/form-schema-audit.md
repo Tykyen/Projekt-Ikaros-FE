@@ -197,3 +197,12 @@
 > - **Rozpor:** co se liší a co se reálně stane (400 / tichý drop / uložení nevalidní hodnoty)
 > - **Dopad na existující data:** je nějaký dokument v produkční DB po opravě nevalidní? → migrace ano/ne
 > - **Návrh:** … · **Stav:** ⬜
+
+---
+
+## Plný audit RUN 2026-06-20 (FE 2a6c8e1c / BE 9cf98be)
+
+Nový povrch TOTP/password DTO (`enable-totp`, `login-totp`, `password-confirm`) — **čistý** (FE↔DTO názvy sedí, žádný NM/WL drift).
+
+- **F-RUN-01 🟡 `WL` ⬜ REVIEW (doc drift)** — plán+registr tvrdí „bez `forbidNonWhitelisted`", ale `backend/src/main.ts:50-55` má `forbidNonWhitelisted:true` (potvrzeno PC-07). Model auditu je invertovaný: třída „tichý drop pole" zanikla → nahradila ji **400** na přejmenovaném/extra poli. Akce na ráno: překlasifikovat osy `WL`/`NM` + aktualizovat `00-cross-cutting.md` (XC-01/XC-D2) a delta-poznámky oblastí. Dopad na data: žádný.
+- **F-24 ✅ SJEDNOCENO** — claim „FE max(64) ↔ BE 32" už neplatí: `profileSchemas.ts:15` má `max(32)` = shoda s `update-user.dto @MaxLength(32)`. Zbýval jen zavádějící test „> 64" (projde i při rozbití limitu). Fix: test hlídá přesně hranici 32. Pojistka: `profileSchemas.spec.ts` „akceptuje == 32" / „odmítne > 32".

@@ -43,9 +43,16 @@ describe('headerSchema', () => {
       false,
     );
   });
-  it('odmítne displayName > 64', () => {
+  // F-24 — FE i BE (update-user.dto @MaxLength(32)) shodně 32; test hlídá
+  // přesně hranici 32 (dřív „> 64" → projde i při rozbití limitu zpět na 64).
+  it('akceptuje displayName == 32', () => {
     expect(
-      headerSchema.safeParse({ displayName: 'y'.repeat(65) }).success,
+      headerSchema.safeParse({ displayName: 'y'.repeat(32) }).success,
+    ).toBe(true);
+  });
+  it('odmítne displayName > 32', () => {
+    expect(
+      headerSchema.safeParse({ displayName: 'y'.repeat(33) }).success,
     ).toBe(false);
   });
 });

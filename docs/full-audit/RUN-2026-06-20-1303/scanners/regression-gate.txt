@@ -1,0 +1,30 @@
+
+=== M-TRACE — Anti-regression traceability ===
+
+Audit            | nál | 🔴 | 🟠 | 🟡 | opr | otv | b-d | G0
+-----------------|-----|----|----|----|-----|-----|-----|----
+bug              |  41 | 13 |  6 | 20 |  35 |   0 |   5 |  0
+cache            |  52 |  2 | 31 | 19 |  36 |   0 |   7 | 16
+cascade-delete   |   9 |  4 |  2 |  3 |   6 |   0 |   3 |  3
+db-integrity     |   5 |  0 |  2 |  2 |   3 |   0 |   1 |  2
+error-contract   |  12 |  0 |  4 |  8 |  12 |   0 |   0 |  0
+form-schema      |  28 |  5 |  6 | 15 |  23 |   0 |   1 |  8
+log-hygiene      |  12 |  0 |  2 |  6 |   8 |   0 |   4 |  0
+nav              |   9 |  1 |  8 |  0 |   9 |   0 |   0 |  0
+prod-config      |  24 |  2 |  9 | 13 |  19 |   0 |   4 |  0
+race-condition   |  20 |  3 | 10 |  5 |  14 |   0 |   6 |  2
+role             |  20 |  5 |  0 | 15 |  19 |   0 |   1 |  0
+seed-scenario    |   1 |  0 |  0 |  1 |   1 |   0 |   0 |  0
+state-consist    |   6 |  0 |  2 |  4 |   5 |   0 |   0 |  1
+upload-media     |  16 |  0 | 10 |  6 |  11 |   0 |   2 |  5
+ws               |  11 |  2 |  2 |  5 |  11 |   0 |   0 |  0
+
+--- Σ -------------
+Nálezů celkem: 266
+Stupně G: G0=37 G1=0 G2=85 G3=144 G4=0
+Důležitých nálezů: 131; z toho bez živé pojistky (G<2): 11
+🔴 Opravené nálezy bez JAKÉKOLI pojistky (fixed & G0 — můžou se tiše vrátit): 3
+Auto-discovery: 144 nálezů má BE/FE test citující ID (cílený); 85 jen class-scanner (G1)
+Pojistek v ruční mapě: 266
+
+✅ Žádná regrese: každý opravený důležitý nález má živou pojistku (G≥2).

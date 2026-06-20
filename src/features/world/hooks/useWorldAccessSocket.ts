@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 
 interface AccessRequestedPayload {
   accessRequestId: string;
@@ -65,5 +65,16 @@ export function useWorldAccessSocket(): void {
 
   useSocketEvent<AccessCancelledPayload>('world:access-cancelled', () => {
     qc.invalidateQueries({ queryKey: ['pending-actions'] });
+  });
+
+  // S-RUN-01 — access eventy jdou do user:{id} (server re-joinne sám), ale
+  // vyslané během výpadku jsou pryč → po reconnectu refetch dotčených klíčů
+  // (vzor S-05 z useFriendshipsSocket). Bez toho PJ neuvidí novou žádost ani
+  // žadatel schválení, dokud něco neudělá / nezmáčkne F5.
+  useSocketReconnect(() => {
+    qc.invalidateQueries({ queryKey: ['pending-actions'] });
+    qc.invalidateQueries({ queryKey: ['worlds', 'my-access-requests'] });
+    qc.invalidateQueries({ queryKey: ['worlds', 'my'] });
+    qc.invalidateQueries({ queryKey: ['worlds'] });
   });
 }

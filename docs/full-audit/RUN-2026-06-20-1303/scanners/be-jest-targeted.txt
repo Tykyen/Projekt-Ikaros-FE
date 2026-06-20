@@ -1,0 +1,8 @@
+[32m[Nest] 36020  - [39m20. 06. 2026 13:38:56 [32m    LOG[39m [38;5;3m[TrustedDevicesService] [39m[32mPassword changed (userId=u1) — revokuji důvěryhodná zařízení.[39m
+[32m[Nest] 36020  - [39m20. 06. 2026 13:38:56 [32m    LOG[39m [38;5;3m[TrustedDevicesService] [39m[32mAccount hard-deleted (userId=u1) — revokuji důvěryhodná zařízení.[39m
+
+Test Suites: 4 passed, 4 total
+Tests:       131 passed, 131 total
+Snapshots:   0 total
+Time:        2.631 s
+Ran all test suites matching (timeline\.service|world-calendar-config\.service|trusted-devices\.service|ikaros-news\.service)\.spec.

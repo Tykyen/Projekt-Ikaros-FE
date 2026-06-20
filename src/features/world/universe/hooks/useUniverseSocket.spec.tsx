@@ -80,4 +80,32 @@ describe('useUniverseSocket', () => {
     act(() => result.current.clearStale());
     expect(result.current.staleFromRemote).toBe(false);
   });
+
+  // S-RUN-03 — re-join sám nestačí; signál zmeškaný za výpadku je pryč → po
+  // reconnectu (connect handler) musí hook refetchnout (mimo edit mód).
+  it('S-RUN-03 — reconnect (connect) invaliduje query, když není suspended', () => {
+    const { wrapper, qc } = makeWrapper();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    renderHook(() => useUniverseSocket('w1', false), { wrapper });
+    const onConnect = getHandler('connect') as unknown as (() => void) | undefined;
+    expect(onConnect).toBeDefined();
+    spy.mockClear();
+    act(() => onConnect!());
+    expect(spy).toHaveBeenCalledWith({ queryKey: universeQueryKey('w1') });
+    // re-join roomu po reconnectu zůstává
+    expect(mockSocket.emit).toHaveBeenCalledWith('room:join', 'world:w1');
+  });
+
+  it('S-RUN-03 — reconnect v edit módu (suspended) jen rozsvítí stale, neinvaliduje', () => {
+    const { wrapper, qc } = makeWrapper();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    const { result } = renderHook(() => useUniverseSocket('w1', true), {
+      wrapper,
+    });
+    const onConnect = getHandler('connect') as unknown as (() => void) | undefined;
+    spy.mockClear();
+    act(() => onConnect!());
+    expect(spy).not.toHaveBeenCalled();
+    expect(result.current.staleFromRemote).toBe(true);
+  });
 });

@@ -149,3 +149,15 @@
 - 🔴 kritická · 🟠 střední · 🟡 nízká · ⚪ kosmetika · ⚖️ by-design / přijatý dluh
 - 🐛 potvrzeno · ✅ opraveno/vyvráceno · ⬜ k ověření · `K-DIx` seed kandidát (hypotéza)
 - **Patro:** 1 strukturální · 2 sémantické · 3 reprezentační
+
+---
+
+## Plný audit RUN 2026-06-20 (FE 2a6c8e1c / BE 9cf98be)
+
+Sweep 80 `@Schema` (+6 vs plán). `trusted_devices` schema **čisté** (userId string konzistentní, tokenHash unique, TTL expiresAt). DI-01..05 beze změny (čekají `+db`).
+
+- **DI-RUN-IDX 🟡 `IDX` ✅ OPRAVENO** — duplicitní index (`@Prop unique` + explicitní `.index()`) → mongoose „Duplicate schema index" warning na **6 schématech**: CharacterNotes, CharacterCalendar, CharacterDiary, CharacterFinance, CharacterInventory (`characterId`) + UniverseMap (`worldId`). Fix: odstraněn redundantní `.index()` (ponechán `@Prop unique`). Pojistka: e2e seed-scenario boot bez warningu (ověřeno — 0 dup warningů).
+- **DI-RUN-06 🟡 `RR/WV` ⬜** — `campaignQuickNotes.subjectIds[]/storylineIds[]` nevalidované (rozšíření DI-02 vzoru, by-design accepted).
+- **DI-RUN-07 🟡 `RR/OR` ⬜** — `ikaros_discussion_posts/reports` string FK bez constraintu (nová oblast 3.4). Reálné counts ⏭️ `+db`.
+- **DI-RUN-08 🟡 `SET` ⬜** — `game_events.comments[].parentId` self-ref bez cyklus/dangling guardu (write-path validace → review). ⏭️ `+db`.
+- ⏭️ M-SCAN/M-TYPE (orphan/dup/type counts, DI-01/03/05/06/07/08 kvantifikace + 3 backfilly) vyžaduje `+db` (Docker dole).

@@ -1,0 +1,8 @@
+=== FE poslouchá event, který BE NEEMITUJE (mrtvý listener) ===
+  ✓ žádný
+
+=== FE emituje event, který BE NEMÁ handler (zahozený emit) ===
+  ✓ žádný
+
+FE listens: 61, FE emits: 21, BE emits: 116, BE handlers: 23
+Nálezy: 0 mrtvých listenerů, 0 zahozených emitů.

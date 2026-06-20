@@ -17,11 +17,20 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getSocket } from '@/features/chat/api/socket';
+import { useSocketReconnect } from '@/features/chat/api/useSocket';
 import { mapSceneQueryKey } from './useMapScene';
 import type { MapReassignedBroadcast } from '../types';
 
 export function useReassignmentListener(worldId: string | null): void {
   const queryClient = useQueryClient();
+
+  // S-RUN-02 — `map:reassigned` jde do user:{id} (server re-joinne sám), ale
+  // event vyslaný během výpadku je pryč → po reconnectu refetch aktivní scény,
+  // jinak hráč zůstane na staré/neexistující scéně do mount-refetche.
+  useSocketReconnect(() => {
+    if (!worldId) return;
+    void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
+  });
 
   useEffect(() => {
     if (!worldId) return;

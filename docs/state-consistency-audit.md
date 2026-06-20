@@ -142,3 +142,14 @@
 
 - 🔴 kritická · 🟠 střední · 🟡 nízká · ⚪ kosmetika · ⚖️ by-design / přijatý dluh
 - 🐛 potvrzeno · ✅ opraveno / vyvráceno · ⬜ k ověření · `K-Sx` seed kandidát (hypotéza)
+
+---
+
+## Plný audit RUN 2026-06-20 (FE 2a6c8e1c / BE 9cf98be)
+
+Re-sweep: S-01..06 drží, žádná regrese. 3 nové nálezy stejné třídy `RJ` (reconnect bez refetch) — všechny OPRAVENY vzorem `useSocketReconnect` + invalidate (jako S-05).
+
+- **S-RUN-01 🟡 `RJ` ✅ OPRAVENO** — `useWorldAccessSocket` (žádost/schválení vstupu) bez reconnect refetch. Fix: `useSocketReconnect` → invalidate `pending-actions`/`worlds,my-access-requests`/`worlds,my`/`worlds`. Pojistka: `useWorldAccessSocket.spec.tsx`.
+- **S-RUN-02 🟡 `RJ` ✅ OPRAVENO** — `useReassignmentListener` (`map:reassigned`) bez reconnect refetch. Fix: `useSocketReconnect` → invalidate `mapSceneQueryKey`. Pojistka: `useReassignmentListener.spec.tsx`.
+- **S-RUN-03 🟡 `RJ` ✅ OPRAVENO** — `useUniverseSocket` re-join bez refetch (zmeškaný `universe:updated` za výpadku). Fix: onConnect invaliduje (mimo edit mód → stale badge). Pojistka: `useUniverseSocket.spec.tsx` (2 testy).
+- ⏭️ L8 TLC (mimo ověřený MapReconnect) vyžaduje `+formal`.

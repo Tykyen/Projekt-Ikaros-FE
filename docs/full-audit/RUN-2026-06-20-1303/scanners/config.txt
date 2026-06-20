@@ -1,0 +1,82 @@
+═══════════════════════════════════════════════════════════════
+ PRODUCTION CONFIG SCAN — M-ENV + M-FALLBACK
+═══════════════════════════════════════════════════════════════
+
+Kód čte: 42 env · example: 34 · deploy: 32 · compose: 37
+
+── (a) ČTENO V KÓDU, ALE NEPŘEDÁNO (deploy+compose) — prod použije fallback (10) ──
+  🔴 EMBEDDING_CHUNK_OVERLAP      ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:63
+  🔴 EMBEDDING_CHUNK_SIZE         ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:62
+  🔴 EMBEDDING_GRANITE107_DIMENSION ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:383
+  🔴 EMBEDDING_GRANITE107_SEQUENCE_LENGTH ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:387
+  🔴 EMBEDDING_GRANITE278_DIMENSION ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:405
+  🔴 EMBEDDING_GRANITE278_SEQUENCE_LENGTH ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:409
+  🔴 EMBEDDING_MODEL_CACHE_DIR    ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:58
+  🔴 PRESENCE_THRESHOLD_HOURS     ../Projekt-ikaros/backend/src/modules/presence/presence.service.ts:14
+  🔴 THROTTLER_REDIS              ../Projekt-ikaros/backend/src/common/throttler/throttler.config.ts:31
+  🔴 TOTP_ENC_KEY                 ../Projekt-ikaros/backend/src/modules/auth/services/totp-crypto.service.ts:26
+
+── (b) PŘEDÁNO (deploy/compose), ALE NEČTENO V KÓDU — mrtvé/přejmenované (10) ──
+  🟡 BACKEND_HOST                 deploy:true compose:true
+  🟡 BACKEND_PORT                 deploy:true compose:true
+  🟡 CSP_HEADER_NAME              deploy:true compose:true
+  🟡 FRONTEND_PORT                deploy:true compose:true
+  🟡 HOST                         deploy:true compose:false
+  🟡 MEILI_MASTER_KEY             deploy:true compose:true
+  🟡 SERVER_HOST                  deploy:true compose:false
+  🟡 SERVER_PORT                  deploy:true compose:false
+  🟡 SSH_PRIVATE_KEY              deploy:true compose:false
+  🟡 SSH_USER                     deploy:true compose:false
+
+── (c) V .env.example, ALE NEČTENO V KÓDU — zavádějící dokumentace (1) ──
+  🟡 TURNSTILE_SITE_KEY
+
+── (d) ČTENO V KÓDU, ALE CHYBÍ V .env.example — nezdokumentováno pro vývojáře (9) ──
+  🟠 EMBEDDING_CHUNK_OVERLAP      ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:63
+  🟠 EMBEDDING_CHUNK_SIZE         ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:62
+  🟠 EMBEDDING_GRANITE107_DIMENSION ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:383
+  🟠 EMBEDDING_GRANITE107_SEQUENCE_LENGTH ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:387
+  🟠 EMBEDDING_GRANITE278_DIMENSION ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:405
+  🟠 EMBEDDING_GRANITE278_SEQUENCE_LENGTH ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:409
+  🟠 EMBEDDING_MODEL_CACHE_DIR    ../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:58
+  🟠 PRESENCE_THRESHOLD_HOURS     ../Projekt-ikaros/backend/src/modules/presence/presence.service.ts:14
+  🟠 TOTP_ENC_KEY                 ../Projekt-ikaros/backend/src/modules/auth/services/totp-crypto.service.ts:26
+
+── COMPOSE fail-fast (${VAR:?required}) — jen tyto mají pojistku (3) ──
+  JWT_REFRESH_SECRET, JWT_SECRET, MEILI_MASTER_KEY
+
+── M-FALLBACK: katalog dev defaultů (30) ──
+  ⚠️ VITE_API_URL             ?? "http://localhost:3000"  (src/shared/api/client.ts:9)
+  ⚠️ VITE_API_URL             ?? "http://localhost:3000"  (src/features/chat/api/socket.ts:6)
+  ⚠️ VITE_API_URL             ?? "http://localhost:3000"  (src/app/main.tsx:52)
+  ⚠️ BACKEND_BASE_URL         ?? "http://localhost:3000"  (../Projekt-ikaros/backend/src/modules/upload/upload.service.ts:452)
+  ⚠️ EMBEDDING_GRANITE107_ONNX_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_107/model.onnx"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:375)
+  ⚠️ EMBEDDING_GRANITE107_TOKENIZER_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_107/sentencepiece.bpe.model"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:379)
+  ⚠️ EMBEDDING_GRANITE278_ONNX_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_278/model.onnx"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:397)
+  ⚠️ EMBEDDING_GRANITE278_TOKENIZER_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_278/sentencepiece.bpe.model"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:401)
+  ⚠️ MEILI_HOST               ?? "http://localhost:7700"  (../Projekt-ikaros/backend/src/modules/search/meili-search.service.ts:31)
+  ⚠️ MEILI_API_KEY            ?? ""  (../Projekt-ikaros/backend/src/modules/search/meili-search.service.ts:32)
+  ⚠️ FRONTEND_URL             ?? "http://localhost:5173"  (../Projekt-ikaros/backend/src/modules/mailer/providers/smtp-mailer.provider.ts:43)
+  ⚠️ CLOUDINARY_CLOUD_NAME    ?? ""  (../Projekt-ikaros/backend/src/modules/images/images.controller.ts:13)
+  ⚠️ REDIS_URL                ?? "redis://localhost:6379"  (../Projekt-ikaros/backend/src/common/redis/redis.module.ts:20)
+  ⚠️ FRONTEND_URL             ?? "http://localhost:5173"  (../Projekt-ikaros/backend/src/common/config/origins.ts:10)
+  ⚠️ FRONTEND_URL             ?? "http://localhost:5173"  (../Projekt-ikaros/backend/src/common/config/origins.ts:20)
+     PORT                     ?? "3000"  (../Projekt-ikaros/backend/src/main.ts:123)
+     EMBEDDING_MODEL_CACHE_DIR ?? "data/model_cache"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:58)
+     EMBEDDING_CHUNK_SIZE     ?? "750"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:62)
+     EMBEDDING_CHUNK_OVERLAP  ?? "250"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:63)
+     EMBEDDING_GRANITE107_DIMENSION ?? "384"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:383)
+     EMBEDDING_GRANITE107_SEQUENCE_LENGTH ?? "128"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:387)
+     EMBEDDING_GRANITE278_DIMENSION ?? "768"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:405)
+     EMBEDDING_GRANITE278_SEQUENCE_LENGTH ?? "128"  (../Projekt-ikaros/backend/src/modules/search/embedding-search.service.ts:409)
+     PRESENCE_THRESHOLD_HOURS ?? "25"  (../Projekt-ikaros/backend/src/modules/presence/presence.service.ts:14)
+     SMTP_PORT                ?? "587"  (../Projekt-ikaros/backend/src/modules/mailer/providers/smtp-mailer.provider.ts:36)
+     MAIL_FROM                ?? "Projekt Ikaros <${user}>"  (../Projekt-ikaros/backend/src/modules/mailer/providers/smtp-mailer.provider.ts:40)
+     JWT_EXPIRES_IN           ?? "1d"  (../Projekt-ikaros/backend/src/modules/auth/auth.module.ts:37)
+     JWT_REFRESH_TTL_DAYS     ?? "30"  (../Projekt-ikaros/backend/src/modules/auth/auth.service.ts:660)
+     PRESENCE_THRESHOLD_HOURS ?? "24"  (../Projekt-ikaros/backend/src/modules/admin/admin-stats.service.ts:42)
+     JWT_REFRESH_TTL_DAYS     ?? "30"  (../Projekt-ikaros/backend/src/common/utils/auth-cookie.ts:21)
+
+═══════════════════════════════════════════════════════════════
+ Legenda: (a)=riziko prod degrade  (d)=doc gap  ⚠️=localhost/http/prázdný fallback
+═══════════════════════════════════════════════════════════════

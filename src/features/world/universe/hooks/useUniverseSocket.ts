@@ -43,13 +43,23 @@ export function useUniverseSocket(
     socket.emit('room:join', room);
     const onConnect = (): void => {
       socket.emit('room:join', room);
+      // S-RUN-03 — re-join sám nestačí: signál `universe:updated` zmeškaný
+      // během výpadku je pryč → po reconnectu refetch (mimo edit mód, kde má
+      // draft přednost a jen rozsvítíme badge „mapa byla mezitím změněna").
+      if (suspendedRef.current) {
+        setStaleFromRemote(true);
+      } else {
+        void queryClient.invalidateQueries({
+          queryKey: universeQueryKey(worldId),
+        });
+      }
     };
     socket.on('connect', onConnect);
     return () => {
       socket.emit('room:leave', room);
       socket.off('connect', onConnect);
     };
-  }, [worldId]);
+  }, [worldId, queryClient]);
 
   // listener
   useEffect(() => {

@@ -1,0 +1,40 @@
+(node:41176) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 connection listeners added to [Namespace]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13396) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 connection listeners added to [Namespace]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13396) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterDiarySchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:13396) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterCalendarSchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:41176) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterDiarySchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:41176) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterCalendarSchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:13396) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterFinanceSchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:41176) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterFinanceSchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:13396) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterInventorySchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:41176) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"characterId":1} for model "CharacterInventorySchemaClass". This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:13396) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:13396) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:13396) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'before'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'before'` instead.
+(node:13396) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:13396) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:13396) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:13396) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'before'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:41176) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+
+Test Suites: 2 passed, 2 total
+Tests:       21 passed, 21 total
+Snapshots:   0 total
+Time:        10.044 s, estimated 16 s
+Ran all test suites matching seed-scenario.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
