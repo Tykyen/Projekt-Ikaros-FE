@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-013.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-014.**
 
 ## Jak je deník členěný
 
@@ -38,3 +38,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-011](audit.md#ch-011--gate-v-service-volané-i-interně--403-regrese-chat-kanálů--2026-06-20) | audit/BE | gate v `getDirectory()` (volané i interně z chat.service) → 403 regrese chat kanálů; před guardem do service zgrepuj VŠECHNY konzumenty | bisekce git-stash+e2e, „nevolaná metoda" mýtus |
 | [⚠️ POKUS](fe.md#️-pokus-nezabral--fix8-první-3d-animace-hodu-kostkou-na-taktické-mapě--2026-06-20) | fe | fix8 (ghost vždy první + fronta) **NEZABRAL** — timing race nebyl kořen; 1. 3D animace dál chybí, 2.+ jede | série kostky fix4/5/7 + ~13 commitů |
 | [CH-012](fe.md#ch-012--předčasné--řešení--skrytý-ghost-nezahřívá-jako-reálný-hod--2026-06-20) | fe/proces | předčasné `✅ ŘEŠENÍ` (build≠ověření WebGL/timing); skrytý ghost nezahřívá jako reálný hod — nejspíš studený 1. `updateConfig` (skin), ne `roll()` | zkouším další variaci warmupu bez dat z konzole |
+| [CH-013](fe.md#ch-013--hypotéza-studený-updateconfig-fix9-vyvrácena-daty-z-konzole--2026-06-20) | fe | hypotéza updateConfig (fix9) vyvrácena DATY: logy ukázaly, že `box.roll` reálného hodu se vůbec nespustil → kořen = render-race `nonce`×`active`; logy nasadit DŘÍV než hypotézové fixy | warmup variace, ale `box.roll` v logu chybí |
+| [✅ ŘEŠENÍ](fe.md#-řešení--první-3d-animace-hodu-kostkou-fix10-hod-effekt-na-active--dedupe-nonce--2026-06-20) | fe | **VYŘEŠENO (fix10):** hod-effekt navázán i na `active` + dedupe nonce → 1. 3D animace naběhne; potvrzeno hráčem na live | — |

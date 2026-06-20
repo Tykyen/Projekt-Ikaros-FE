@@ -130,19 +130,10 @@ export default function DiceBox3D({
       box.clearDice();
       const matId = theme.colorset.name;
       const needsReload = matId !== lastMaterialRef.current;
-      console.info(
-        '[dice3d] real roll: active=', active,
-        'via=', needsReload ? 'updateConfig' : 'direct',
-        'mat=', matId, 'last=', lastMaterialRef.current,
-      ); // DIAG fix9
       const fire = () => {
         box.clearDice();
         cbRef.current.onRollStart?.();
-        console.info('[dice3d] box.roll fired', notation); // DIAG fix9
-        void box.roll(notation).catch((e) => {
-          console.warn('[dice3d] box.roll rejected', e); // DIAG fix9
-          cbRef.current.onError();
-        });
+        void box.roll(notation).catch(() => cbRef.current.onError());
       };
       if (needsReload) {
         // Materiál se změnil → reload tématu (async), pak hod.
@@ -153,16 +144,12 @@ export default function DiceBox3D({
             theme_material: theme.material,
           })
           .then(fire)
-          .catch((e) => {
-            console.warn('[dice3d] updateConfig rejected', e); // DIAG fix9
-            cbRef.current.onError();
-          });
+          .catch(() => cbRef.current.onError());
       } else {
         // Stejný materiál → hodit rovnou (žádný async reload = míň race).
         fire();
       }
-    } catch (e) {
-      console.warn('[dice3d] rollNow threw', e); // DIAG fix9
+    } catch {
       cbRef.current.onError();
     }
   }, []);
@@ -204,10 +191,7 @@ export default function DiceBox3D({
       box.clearDice();
       const { theme } = latestRef.current;
       // 6.3-fix9 — ghost protáhne i `updateConfig` (async reload tématu), ne jen
-      // `roll()`. První reálný hod skoro vždy přepíná na hráčův skin → spustí
-      // PRVNÍ `updateConfig`, a to je nejspíš ta studená/flaky operace, co spolkne
-      // 1. animaci (ghost ji jinak nikdy neprošel). Po ghostu je už zahřátá.
-      console.info('[dice3d] ghost: updateConfig+roll warmup start'); // DIAG fix9
+      // `roll()` — zahřeje obě cesty knihovny při otevření mapy.
       void box
         .updateConfig({
           theme_customColorset: theme.colorset,
@@ -249,7 +233,6 @@ export default function DiceBox3D({
         if (isGhostRef.current) {
           isGhostRef.current = false;
           ghostWarmRef.current = true; // engine zahřátý → reálné hody smí ven
-          console.info('[dice3d] ghost complete → engine warm'); // DIAG fix9
           try {
             box.clearDice();
           } catch {
@@ -260,7 +243,6 @@ export default function DiceBox3D({
           flushPendingRoll();
           return;
         }
-        console.info('[dice3d] real roll complete (onComplete)'); // DIAG fix9
         cbRef.current.onComplete();
       },
     });
@@ -273,7 +255,6 @@ export default function DiceBox3D({
       .then(() => {
         if (cancelled) return;
         boxRef.current = box;
-        console.info('[dice3d] engine ready (fix9 diag live)'); // DIAG fix9
         // Materiál z init configu už je aplikovaný → první hod stejného
         // materiálu nemusí volat updateConfig.
         lastMaterialRef.current = theme.colorset.name;
@@ -308,10 +289,6 @@ export default function DiceBox3D({
   // Hod: po dokončení initu (ready), při změně nonce I při přepnutí `active`.
   useEffect(() => {
     if (!ready) return;
-    console.info(
-      '[dice3d] hod effect: nonce=', nonce, 'active=', active,
-      'ghostWarm=', ghostWarmRef.current, 'lastRolled=', lastRolledNonceRef.current,
-    ); // DIAG fix10
     // 6.3-fix8 — ghost-warmup spustíme VŽDY hned po `ready` (ODPOJENO od `active`).
     // Knihovní flaky první roll() tak vždy padne na neviditelný ghost. Pokud už
     // čeká reálný hod (hráč hodil DŘÍV, než engine dojel init), zařadíme jeho

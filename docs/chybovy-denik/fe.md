@@ -30,3 +30,20 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak cyklení:** zkouším další variaci „warmup ghostu", aniž bych měl z konzole potvrzeno, jestli ghost vůbec běží a jestli 1. reálný hod jde přes `updateConfig`.
 
 ---
+
+### CH-013 — hypotéza „studený updateConfig" (fix9) vyvrácena daty z konzole · 2026-06-20
+**Kontext:** Po CH-012 jsem vsadil na fix9 = ghost protáhne i `updateConfig` (warmup textur skinu) + přidal diagnostické `[dice3d]` logy do konzole. Hráč deploynul a poslal screenshot konzole.
+**Co jsem udělal špatně:** Postavil jsem fix9 na hypotéze „první `updateConfig` je ta studená flaky operace", aniž bych ji měl potvrzenou. Logy ji rovnou vyvrátily.
+**Proč to nefungovalo (a co logy ukázaly):** Pořadí logů u 1. hodu: `engine ready` → `ghost: updateConfig+roll warmup start` → `ghost complete → engine warm` → `overlay new roll: can3d=true … skin=element-boure` → **a PAK NIC.** Chyběly `real roll:`, `box.roll fired`, `real roll complete`. Tzn. ghost `updateConfig` ZAHŘÁL (hypotéza fix9 lichá), ale **`rollNow` reálného hodu vůbec nespustil `box.roll()`** — spadl tiše na guardu `if (!box || !active || !notation) return`. **Skutečný kořen = render-race `nonce` × `active`:** overlay nastaví `nonce` (timestamp) hned, ale `active` (host viditelný, přes `phase`/`use3dThisRoll`) až o render později → hod-effekt (`[ready, nonce]`) se spustí v renderu, kdy je `active` ještě false → rollNow tiše vypadne, a protože se `nonce` už nemění, effekt se znovu nespustí → hod ztracen. (Pozn.: tahle race byla v kódu už PŘED mými fixy; můj ghost ji jen odhalil/nepokryl.)
+**Poučení:** Diagnostické logy v cílovém prostředí = nejlevnější cesta k pravdě, měl jsem je nasadit DŘÍV než 2 hypotézové fixy (fix8, fix9). „Číslo naskočí, animace ne" + chybějící `box.roll` log = hod se vůbec nespustil, ne že 3D selhalo při renderu. Když efekt závisí na dvou stavech, co se aktualizují v různých renderech, navázat ho na OBA (+ dedupe), ne jen na jeden.
+**Příznak cyklení:** přidávám warmup variace, ale `box.roll` se v logu vůbec neobjevuje (hod se nespouští — řeším špatnou vrstvu).
+
+---
+
+### ✅ ŘEŠENÍ — první 3D animace hodu kostkou (fix10: hod-effekt na `active` + dedupe nonce) · 2026-06-20
+**Co nakonec zabralo:** `DiceBox3D` hod-effekt deps `[ready, nonce]` → `[ready, nonce, active]`; reálný hod vystřelí, AŽ `active` naběhne na true (`if (!active) return`), a každý nonce hodí PRÁVĚ JEDNOU (`lastRolledNonceRef`, guard i ve `flushPendingRoll`). Tím se ruší render-race z [CH-013]: `nonce` se mění o render dřív než `active`, takže rollNow se dřív volal s `active=false`, tiše spadl na guardu a už se nezopakoval.
+**Proč to je správně (a ne další warmup variace):** Logy z live ukázaly, že kořen NEBYL warmup (ghost běžel i `updateConfig` a engine byl warm) — chyběl úplně `box.roll()` reálného hodu. Problém byl ve VRSTVĚ SPOUŠTĚNÍ hodu, ne v zahřátí enginu. Navázání na `active` + dedupe trefuje přesně tu vrstvu.
+**Jak ověřeno:** Hráč potvrdil na live „spravil jsi to" + screenshot konzole s plnou sekvencí 1. hodu: `hod effect … active=false` → `hod effect … active=true` → `real roll: active=true via=updateConfig` → `box.roll fired 4df@…` → `real roll complete`. 3D animace naběhla u PRVNÍHO hodu. Pak `npm run build` ✓ po odstranění diagnostických logů.
+**Zhodnocení:** Zabralo. Cesta k němu byla ale dlouhá a zbytečně klikatá — 2 hypotézové fixy (fix8 timing, fix9 updateConfig) mimo, než jsem nasadil DIAGNOSTICKÉ LOGY, které kořen ukázaly za jeden deploy. **Klíčové poučení: u tiché chyby v cílovém prostředí nasadit logy DŘÍV než hypotézové fixy.** Ghost-warmup (fix8/9) v kódu zůstal — neškodí, ale nebyl to ten fix; PRIMÁRNÍ oprava je fix10. Diagnostické `[dice3d]` logy odstraněny.
+
+---

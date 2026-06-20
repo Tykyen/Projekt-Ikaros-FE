@@ -87,11 +87,6 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
       setPhase('idle');
       return;
     }
-    // DIAG fix9 — co overlay rozhodne o 1. hodu (3D vs fallback).
-    console.info(
-      '[dice3d] overlay new roll: can3d=', can3d,
-      'webgl=', webgl, 'notation=', notation, 'skin=', roll.skinId,
-    );
     if (can3d) setMount3d(true);
     setUse3dThisRoll(can3d);
     setRealRollStartedAt(0); // DiceBox3D ohlásí start reálného hodu přes onRollStart
