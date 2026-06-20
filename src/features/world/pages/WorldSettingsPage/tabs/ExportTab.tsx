@@ -49,14 +49,20 @@ export default function ExportTab() {
         světa a celá kampaň (pavučina, scénáře, obchod). Tvoje vlastní záložní
         kopie — nezávislá na platformě.
       </p>
-      <p style={{ margin: 0, lineHeight: 1.5, fontSize: '0.9rem', opacity: 0.8 }}>
-        Obrázky zůstávají odkazem (URL) v datech. Stahování obrázků přímo do ZIP
-        a import zpět ze zálohy se připravují.
+      <p style={{ margin: 0, lineHeight: 1.5, fontSize: '0.9rem', opacity: 0.85 }}>
+        ⚠️ Stahují se i všechny obrázky, takže u větších světů může příprava
+        zálohy trvat <strong>i několik minut</strong>. Po kliknutí nech stránku
+        otevřenou, dokud se soubor nestáhne.
       </p>
       <div>
         <Button onClick={() => void handleExport()} loading={busy}>
           <Download size={16} aria-hidden /> Exportovat / Zálohovat vše
         </Button>
+        {busy && (
+          <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', opacity: 0.8 }}>
+            Připravuji zálohu… může to trvat několik minut, neopouštěj stránku.
+          </p>
+        )}
       </div>
     </section>
   );

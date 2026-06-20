@@ -2,8 +2,11 @@
  * 14.7a — Tiskový stylesheet (pilíř A spec-14.7). Globální a theme-neutrální
  * (tisk není skin → černá na bílé, nezávisle na motivu světa).
  *
- * Mechanismus: `usePrint()` za běhu nastaví `html[data-printing]` a označí
- * tisknutý podstrom `[data-print-root]`. Při tisku se schová vše kromě něj.
+ * Mechanismus (14.7b-fix): `usePrint()` vloží KLON tisknutého podstromu přímo
+ * do <body> jako [data-print-root] a nastaví html[data-printing]. Ostatní děti
+ * <body> (#root) skryjeme přes display:none → tiskne se jen klon, a to
+ * v NORMÁLNÍM flow (obsah se láme přes stránky). `print-color-adjust:exact`
+ * vynutí obrázky/pozadí, které by prohlížeč v tisku jinak zahodil.
  */
 @media print {
   /* Tlačítka tisku a floating UI se nikdy netisknou. */
@@ -12,34 +15,28 @@
     display: none !important;
   }
 
-  /* Izolace — vidět jen aktivní tiskový kořen a jeho obsah. */
-  html[data-printing] body * {
-    visibility: hidden;
+  /* Izolace — zobraz jen tiskový kořen, zbytek <body> skryj. */
+  html[data-printing] body > *:not([data-print-root]) {
+    display: none !important;
   }
-  html[data-printing] [data-print-root],
-  html[data-printing] [data-print-root] * {
-    visibility: visible;
-  }
+
   html[data-printing] [data-print-root] {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    max-width: 100%;
     margin: 0;
     padding: 1rem;
     background: rgb(var(--white-rgb)) !important;
     color: rgb(var(--black-rgb)) !important;
-    /* Mapy/obrázky (14.7b) potřebují přesné barvy; bez něj je prohlížeč zahodí. */
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
-  /* Theme-neutrální obsah: černá na bílé, bez stínů. */
+  /* Theme-neutrální obsah: černá na bílé, bez stínů; obrázky na pozadí vynutit. */
   html[data-printing] [data-print-root] * {
     color: rgb(var(--black-rgb)) !important;
     background-color: transparent !important;
     box-shadow: none !important;
     text-shadow: none !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
   html[data-printing] [data-print-root] a {
@@ -56,16 +53,6 @@
   /* Nadpisy nezůstávají osamělé na konci stránky. */
   html[data-printing] [data-print-root] :is(h1, h2, h3, h4) {
     break-after: avoid;
-  }
-
-  /* 14.7b — canvas grafy (pavučina/hvězdná): tiskneme <img> snapshot,
-     živý canvas na dobu tisku skryjeme (usePrint je vkládá za běhu). */
-  [data-print-hide-canvas] {
-    display: none !important;
-  }
-  .print-canvas-snapshot {
-    display: block !important;
-    margin: 0 auto;
   }
 
   /* 14.7b — kalendář: každý měsíc na vlastní stránku (poslední bez zlomu). */

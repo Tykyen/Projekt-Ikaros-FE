@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useBlocker } from 'react-router-dom';
+import { useIsFetching } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import {
   User,
@@ -16,7 +17,7 @@ import {
   Printer,
 } from 'lucide-react';
 import { Tabs, type TabItem, ConfirmDialog, Button } from '@/shared/ui';
-import { usePrint, usePrintMode } from '@/features/world/export/print';
+import { usePrint } from '@/features/world/export/print';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -99,7 +100,6 @@ export function PostavaLayout({ page }: Props) {
   const [editMode, setEditMode] = useState(false);
   const [activeTabDirty, setActiveTabDirty] = useState(false);
   const [pendingNav, setPendingNav] = useState<PendingNav | null>(null);
-  const printMode = usePrintMode();
   const { triggerPrint } = usePrint();
   const [printIncludeCalendar, setPrintIncludeCalendar] = useState(false);
   // „Tisk všech záložek" = LOKÁLNÍ přepnutí (ne globální printMode). Tisk
@@ -109,14 +109,32 @@ export function PostavaLayout({ page }: Props) {
   const layoutRef = useRef<HTMLDivElement>(null);
   const noop = () => {};
 
-  // Nejdřív vyrenderuj všechny taby (printAllTabs), pak teprve tiskni.
+  // „Tisk všech záložek": subdoc taby (deník/finance/výbava/poznámky) si po
+  // mountu samy dotahují data. Počkáme, až VŠECHNY fetche doběhnou
+  // (`useIsFetching`), teprve pak tiskneme — jinak by se vytiskl loading/prázdno.
+  const isFetching = useIsFetching();
+  const sawFetchRef = useRef(false);
   useEffect(() => {
-    if (printAllTabs) triggerPrint(layoutRef.current);
-  }, [printAllTabs, triggerPrint]);
-  // Po dotištění (printMode zhasne) vrať PostavaLayout zpět na záložky.
-  useEffect(() => {
-    if (!printMode) setPrintAllTabs(false);
-  }, [printMode]);
+    if (!printAllTabs) {
+      sawFetchRef.current = false;
+      return;
+    }
+    if (isFetching > 0) {
+      sawFetchRef.current = true; // fetche běží — počkej
+      return;
+    }
+    // isFetching === 0 → fetche doběhly (krátký delay), nebo data v cache /
+    // fetch ještě nestartoval (delší fallback, ať dostane šanci začít).
+    const delay = sawFetchRef.current ? 150 : 500;
+    const id = window.setTimeout(() => {
+      triggerPrint(layoutRef.current);
+      // Po zavření tiskového dialogu vrať PostavaLayout zpět na záložky.
+      window.addEventListener('afterprint', () => setPrintAllTabs(false), {
+        once: true,
+      });
+    }, delay);
+    return () => window.clearTimeout(id);
+  }, [printAllTabs, isFetching, triggerPrint]);
 
   const blocker = useBlocker(editMode && activeTabDirty);
   const guardOpen = pendingNav !== null || blocker.state === 'blocked';
