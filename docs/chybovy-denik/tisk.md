@@ -79,3 +79,22 @@ Detaily chyb z práce na tisku (pilíř A 14.7). Přehled v [README](README.md).
 ### CH-META — Tisk přes klonování živého DOMu je principiálně křehký · 2026-06-20
 **Souhrn:** Celý pilíř A (tisk přes `window.print` + manipulace s živým DOMem/CSS appky) = dlouhá série dílčích selhání (CH-001…008), lokálně neověřitelná (headless) → ladění přes deploy+test na produkci.
 **Poučení do budoucna:** Na věrný tisk je robustnější **serverové PDF** (headless Chrome 1:1) nebo **dedikovaná tisková šablona** (vlastní layout per entita), ne klonování živého aplikačního DOMu. Rozhodnout PŘÍSTUP dřív, než se utopím v CSS detailech.
+
+---
+
+### ✅ ŘEŠENÍ — CH-META uzavřena: tisk = čistý dokument, ne klon živé appky · 2026-06-20
+**Co nakonec zabralo:** Přestat kopírovat CSS appky do tiskového okna. Tiskne se holý semantický klon JEN na čistém dokumentovém CSS (`src/features/world/export/print/printDoc.css`). Tím v jednom kroku odpadl SPA layout (prázdné listy, CH-007) i potřeba hrubých resetů (rozbité obrázky, CH-008) — kořen většiny série.
+**Proč to je správně (a ne 9. variace):** CH-001…008 honily 1:1 vizuál klonem živé appky → přidávaly hacky. Řešení šlo OPAČNÝM směrem: **ubrat**, ne přidat. Tisk má vypadat jako dokument, ne jako webová appka. Tím se kořen rozpustil, místo aby se přebíjel dalším CSS.
+**Jak ověřeno (a proč to zlomilo deploy-test smyčku CH-004):** Postaven offline náhled `scripts/print-preview/` (Playwright `emulateMedia('print')` → PDF) sdílející TÝŽ `printDoc.css` přes `?raw`. Ladění tiskového CSS je od teď lokální a deterministické, ne přes produkci.
+**Zhodnocení:** Dobře — zabralo napoprvé, bez cyklení. Reálný test na produkci potvrdil: prázdné listy pryč, obrázky se tisknou. Zbylá práce (rozpady gridů, staty deníku) je doladění VZHLEDU, ne boj se základem. Klíč byl: po 8 selháních v jedné třídě řešení změnit třídu, ne detail.
+
+---
+
+### CH-009 — Collapsed sekce (výbava) se v tisku nevytiskla: obsah není v DOM · 2026-06-20
+**Kontext:** Tisk postavy „všechny záložky". Výbava vyšla jen jako hlavičky sekcí, obsah (položky) chyběl.
+**Co jsem udělal špatně:** Při návrhu tisku jsem ošetřil rozbalení collapsed sekcí jen u `PageSections`. Neověřil jsem VŠECHNY collapsible komponenty — `InventoryTab` (`CollapsibleSection`/`CollapsibleNotes`) má vlastní `useState(true)` a render `{!collapsed && …}`.
+**Proč to nefungovalo:** `{!collapsed && body}` znamená, že obsah zavřené sekce NENÍ v DOM (ne jen skrytý CSS). Klon pro tisk tedy nemá co vytisknout. **Tisk ukáže jen to, co v DOM reálně je.**
+**Poučení:** Každá komponenta s collapsed/podmíněným renderem, co se má tisknout, musí v `printMode` renderovat rozbaleně (`showBody = printMode || !collapsed`). Při práci na tisku projít VŠECHNY collapsible/conditional rendery, ne jeden vzor. Pozor i na header jako `<button>` (v tisku skrytý `button{display:none}`) → doplnit tiskový nadpis (`{printMode && <h3 className="print-section-title">}`).
+**Příznak cyklení:** V tisku chybí obsah, který JE vidět po kliknutí (rozbalení) na obrazovce — a já ladím CSS viditelnosti místo DOM přítomnosti.
+
+---

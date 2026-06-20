@@ -304,59 +304,75 @@ export function PostavaLayout({ page }: Props) {
       </div>
 
       {printAllTabs ? (
-        /* Tisk: všechny záložky lineárně (kromě kalendáře, ten jen opt-in). */
+        /* Tisk: všechny záložky lineárně (kromě kalendáře, ten jen opt-in).
+           Každá záložka = `.print-page` → vlastní strana (první sdílí list
+           s hero/profilem). */
         <div>
-          <BioTab page={page} />
+          <div className="print-page">
+            <BioTab page={page} />
+          </div>
           {character && canSeePrivate && (
             <>
               {visibleTabs.has('denik') && (
-                <DiaryTab
-                  slug={page.slug}
-                  mode="view"
-                  onExitEdit={noop}
-                  onDirtyChange={noop}
-                />
+                <div className="print-page">
+                  <DiaryTab
+                    slug={page.slug}
+                    mode="view"
+                    onExitEdit={noop}
+                    onDirtyChange={noop}
+                  />
+                </div>
               )}
               {visibleTabs.has('finance') && (
-                <FinanceTab
-                  page={page}
-                  mode="view"
-                  onExitEdit={noop}
-                  onDirtyChange={noop}
-                  onBackToProfil={noop}
-                />
+                <div className="print-page">
+                  <FinanceTab
+                    page={page}
+                    mode="view"
+                    onExitEdit={noop}
+                    onDirtyChange={noop}
+                    onBackToProfil={noop}
+                  />
+                </div>
               )}
               {visibleTabs.has('vybava') && (
-                <InventoryTab
-                  page={page}
-                  mode="view"
-                  onExitEdit={noop}
-                  onDirtyChange={noop}
-                  canEdit={false}
-                />
+                <div className="print-page">
+                  <InventoryTab
+                    page={page}
+                    mode="view"
+                    onExitEdit={noop}
+                    onDirtyChange={noop}
+                    canEdit={false}
+                  />
+                </div>
               )}
               {visibleTabs.has('poznamky') && (
-                <NotesTab
-                  slug={page.slug}
-                  mode="view"
-                  onExitEdit={noop}
-                  onDirtyChange={noop}
-                />
+                <div className="print-page">
+                  <NotesTab
+                    slug={page.slug}
+                    mode="view"
+                    onExitEdit={noop}
+                    onDirtyChange={noop}
+                  />
+                </div>
               )}
               {printIncludeCalendar && visibleTabs.has('kalendar') && (
-                <CalendarTab
-                  slug={page.slug}
-                  mode="view"
-                  onExitEdit={noop}
-                  onDirtyChange={noop}
-                />
+                <div className="print-page">
+                  <CalendarTab
+                    slug={page.slug}
+                    mode="view"
+                    onExitEdit={noop}
+                    onDirtyChange={noop}
+                  />
+                </div>
               )}
             </>
           )}
           {sortedAkjTabs(page)
             .filter((t) => !t.locked)
             .map((t) => (
-              <OstatniLayout key={t.id} page={resolveAkjTabPage(page, t)} />
+              <div className="print-page" key={t.id}>
+                <OstatniLayout page={resolveAkjTabPage(page, t)} />
+              </div>
             ))}
         </div>
       ) : (
@@ -463,7 +479,7 @@ function PostavaHero({
     <div className={s.heroRow}>
       {page.imageUrl ? (
         <img
-          className={s.avatar}
+          className={`${s.avatar} print-portrait`}
           src={page.imageUrl}
           alt={page.title}
           loading="lazy"

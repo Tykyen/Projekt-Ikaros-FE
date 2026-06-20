@@ -5,8 +5,8 @@
 
 <!-- Hero -->
 <div class="_heroRow_a1">
-  <!-- velký portrét: bez stropu zabral celou stránku -->
-  <img class="_avatar_a2" alt="Zara Villiam"
+  <!-- velký portrét: cílená třída print-portrait → menší strop -->
+  <img class="_avatar_a2 print-portrait" alt="Zara Villiam"
     src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='900'%3E%3Crect width='600' height='900' fill='%232a2a33'/%3E%3Ccircle cx='300' cy='330' r='150' fill='%23c98a6a'/%3E%3Crect x='150' y='520' width='300' height='380' rx='60' fill='%23111'/%3E%3C/svg%3E" />
   <div class="_identity_a3">
     <span class="_typeBadge_a4">Postava hráče</span>
@@ -23,7 +23,8 @@
   <button type="button">Tisk všech záložek</button>
 </div>
 
-<!-- Bio / profil (definiční seznam) -->
+<!-- Bio / profil (definiční seznam) — první print-page (sdílí list s hero) -->
+<div class="print-page">
 <div class="_tabContent_b1">
   <section class="_bioSection_b2">
     <dl class="_blocks_b3">
@@ -39,8 +40,10 @@
     </div>
   </section>
 </div>
+</div>
 
-<!-- Výbava: rozbalená v tisku, header-button skryt, nahrazen tiskovým nadpisem -->
+<!-- Výbava: druhá print-page → nová strana -->
+<div class="print-page">
 <div class="_invShell_c1">
   <div class="_invMain_c2">
     <div class="_invSectionCard_c3">
@@ -77,4 +80,5 @@
     <h2>Zara Villiam</h2>
     <div>Osobní výbava</div>
   </aside>
+</div>
 </div>

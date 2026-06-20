@@ -65,18 +65,26 @@ blockquote {
 }
 
 /* — Obrázky a figury: nelámat přes stránku, rozumný strop výšky —
-     portréty (vysoké) bez stropu zabraly celou stránku; max-height je drží na
-     ~polovině listu a poměr stran zachová (width:auto). Mapy/široké obrázky
-     omezuje max-width:100 %. */
+     obsahové obrázky/mapy drží max-width:100 % + strop výšky; poměr stran
+     zachová width:auto. */
 img {
   max-width: 100% !important;
-  max-height: 12cm;
+  max-height: 9cm;
   width: auto;
   height: auto !important;
   break-inside: avoid;
 }
 figure { margin: 0.8em 0; break-inside: avoid; }
 figcaption { font-size: 0.85rem; font-style: italic; margin-top: 0.3em; }
+
+/* — Portrét postavy (hero/aside): menší než obsahové obrázky, ať nezabere
+     půl stránky. Cílená třída — obecné `img` (mapy, ilustrace) zůstává větší. */
+.print-portrait { max-height: 6cm !important; }
+
+/* — Tisk „všech záložek": každá záložka na vlastní stránce (kromě první,
+     která sdílí list s hero/profilem). */
+.print-page { break-before: page; }
+.print-page:first-child { break-before: auto; }
 
 /* — Definiční seznamy (profil postavy, atributy): „Label: hodnota" na řádku.
      Bez CSS appky se `dt`/`dd` rozpadají pod sebe (label nad hodnotou). */
