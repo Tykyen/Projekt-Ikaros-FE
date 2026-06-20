@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8">
+<title>Tisk — náhled</title><style>/*
+ * 14.7 pilíř A — tiskové CSS pro samostatné tiskové okno (viz usePrint).
+ *
+ * Princip (po sérii selhání CH-001…008, viz docs/chybovy-denik/tisk.md):
+ * tiskne se ČISTÝ dokument na holém semantickém HTML klonu. CSS appky se do
+ * okna ZÁMĚRNĚ NEkopíruje → odpadá SPA layout (height:100vh/overflow → prázdné
+ * listy) i potřeba hrubých resetů (které rozbíjely obrázky). Stačí
+ * element-level styl níže.
+ *
+ * Tento soubor je jediný zdroj pravdy: printMode.ts ho bere přes `?raw`,
+ * offline náhled (scripts/print-preview) čte týž soubor → náhled = produkce.
+ *
+ * Černobíle (úspora toneru, čitelnost): barvu i pozadí srovnáme; hierarchii
+ * nese velikost, tučnost a kurzíva, ne barva.
+ */
+
+/* — Reset na tisk: žádné barvy/pozadí/stíny zděděné z obsahu — */
+* {
+  color: #000 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* — Stránka — */
+body {
+  font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  font-size: 11.5pt;
+  line-height: 1.5;
+  color: #000;
+  background: #fff;
+  margin: 0;
+}
+
+/* — Nadpisy: hierarchie velikostí, drží se u následujícího obsahu — */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Fraunces', Georgia, serif;
+  line-height: 1.18;
+  break-after: avoid;
+  page-break-after: avoid;
+  margin: 1.1em 0 0.4em;
+}
+h1 { font-size: 1.9rem; margin-top: 0; }
+h2 { font-size: 1.4rem; border-bottom: 1px solid #ccc; padding-bottom: 0.15em; }
+h3 { font-size: 1.15rem; }
+h4 { font-size: 1rem; }
+
+p { margin: 0.55em 0; orphans: 2; widows: 2; }
+
+/* — Seznamy — */
+ul, ol { padding-left: 1.5rem; margin: 0.5em 0; }
+li { margin: 0.2rem 0; }
+
+/* — Odkazy: bez modré, jen podtržení (tisk) — */
+a { color: #000; text-decoration: underline; }
+
+/* — Citace: vizuálně odlišená i bez barvy (levý pruh + kurzíva) — */
+blockquote {
+  margin: 0.8em 0;
+  padding: 0.2em 0 0.2em 1rem;
+  border-left: 3px solid #999;
+  font-style: italic;
+  break-inside: avoid;
+}
+
+/* — Obrázky a figury: nelámat přes stránku — */
+img { max-width: 100% !important; height: auto !important; break-inside: avoid; }
+figure { margin: 0.8em 0; break-inside: avoid; }
+figcaption { font-size: 0.85rem; font-style: italic; margin-top: 0.3em; }
+
+/* — Tabulky — */
+table { border-collapse: collapse; width: 100%; margin: 0.6em 0; break-inside: avoid; }
+caption { font-weight: 600; text-align: left; margin-bottom: 0.3em; }
+th, td { border: 1px solid #999; padding: 4px 9px; text-align: left; vertical-align: top; }
+thead { display: table-header-group; } /* hlavička se opakuje na každé stránce */
+
+hr { border: none; border-top: 1px solid #bbb; margin: 1em 0; }
+
+/* — Tiskem skrývané prvky + interaktivní ovládání — */
+.print-hide, [data-print-hide], button, input, select, textarea {
+  display: none !important;
+}
+
+/* — Kalendář: každý měsíc na vlastní stránku (z 14.7b) — */
+.print-month { break-after: page; }
+.print-month:last-child { break-after: auto; }
+
+/* — Volitelná tisková utilita: mřížku karet (atributy bestie/postavy) lze
+     v tisku zachovat přidáním stabilní třídy `print-cols` do komponenty
+     (CSS-module hash třídy v tisku nestylují). Bez ní obsah teče lineárně. */
+.print-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem 1rem;
+}
+.print-cols > * { break-inside: avoid; }
+</style></head>
+<body><!-- Fixture: innerHTML scope stránky (PageViewer > article[data-print-scope]).
+     Reprezentuje PageHeader + TipTap RichText obsah. Class names jsou
+     CSS-module hashe z appky — v tisku NEstylují (CSS appky se nekopíruje),
+     proto je sem dávám schválně: ověřuju, že holý semantický HTML vypadá dobře
+     jen na element-level tiskovém CSS. -->
+<div class="_print-hide_x print-hide" style="display:flex;justify-content:flex-end;gap:.5rem">
+  <button type="button">Tisk / PDF</button>
+  <button type="button">Upravit</button>
+</div>
+
+<header class="_header_a1b2c">
+  <h1 class="_title_d3e4f">Pád Hvězdné brány</h1>
+  <p class="_meta_g5h6i" style="color:#888;font-size:.85rem">
+    Lokace · 4 min čtení · aktualizováno 18. 6. 2026
+  </p>
+</header>
+
+<div class="_content_j7k8l">
+  <p>
+    <strong>Hvězdná brána</strong> stála na okraji Sutinového pole po tři sta let,
+    než ji <em>Řád Popela</em> v jediné noci proměnil v kráter. To, co po ní
+    zbylo, dnes místní nazývají prostě <a href="#">Jizva</a>.
+  </p>
+
+  <figure>
+    <img alt="Vyobrazení brány"
+      src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='260'%3E%3Crect width='480' height='260' fill='%23dcdce6'/%3E%3Cpath d='M80 220 L240 40 L400 220 Z' fill='none' stroke='%23555' stroke-width='6'/%3E%3Ccircle cx='240' cy='150' r='44' fill='none' stroke='%23555' stroke-width='6'/%3E%3C/svg%3E" />
+    <figcaption style="font-size:.85rem;color:#777">Brána před zničením (rekonstrukce).</figcaption>
+  </figure>
+
+  <h2>Historie</h2>
+  <p>
+    Postavena byla v éře, kdy ještě putovaly karavany mezi světy. Každý z
+    pilířů nesl jméno jednoho ze <strong>sedmi zakladatelů</strong>:
+  </p>
+  <ul>
+    <li>Ваэрин Tichý — strážce východního pilíře</li>
+    <li>Mor­wenna z Hloubky — kartografka cest</li>
+    <li>bratři Halloranové — kováři ukotvení</li>
+  </ul>
+
+  <h3>Co se stalo oné noci</h3>
+  <ol>
+    <li>Stráže ohlásily rudou záři nad obzorem.</li>
+    <li>Pilíře se rozezněly tónem, který nikdo nepřežil bez ochrany.</li>
+    <li>Do svítání zbyla jen tavenina a ticho.</li>
+  </ol>
+
+  <blockquote>
+    „Neviděl jsem oheň. Viděl jsem, jak svět zapomíná, že tu brána kdy byla."
+    <br />— deník hraničáře Kesta
+  </blockquote>
+
+  <hr />
+
+  <h2>Současný stav</h2>
+  <p>
+    Jizva je dnes neprůchodná. Magické pozadí je tu stále zvýšené a kompasy
+    ukazují ke středu kráteru. Řád Popela přístup hlídá a vstup bez glejtu
+    trestá vyhoštěním.
+  </p>
+</div>
+</body></html>

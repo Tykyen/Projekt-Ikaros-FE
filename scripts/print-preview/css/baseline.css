@@ -1,0 +1,30 @@
+/* BASELINE — současné PRINT_DOC_CSS z printMode.ts (stav 2026-06-20).
+   Slouží jen pro srovnání „před/po". Needituj — je to snímek. */
+* { color: #000 !important; background: transparent !important;
+    box-shadow: none !important; text-shadow: none !important; }
+body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.55;
+  color: #000; background: #fff; margin: 0 auto; padding: 1.5rem; max-width: 820px; }
+img { max-width: 100% !important; height: auto !important; break-inside: avoid; }
+h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; line-height: 1.2; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.15rem 0; }
+a { color: #000; text-decoration: underline; }
+table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
+td, th { border: 1px solid #999; padding: 4px 8px; text-align: left; }
+hr { border: none; border-top: 1px solid #ccc; margin: 0.8rem 0; }
+.print-hide, [data-print-hide], button { display: none !important; }
+.print-month { break-after: page; }
+.print-month:last-child { break-after: auto; }
+@media print {
+  html, body {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  body * {
+    overflow: visible !important;
+    max-height: none !important;
+    min-height: 0 !important;
+  }
+}

@@ -163,7 +163,9 @@ function DiaryTabView({
       {blocks.length > 0 && (
         <section className={s.section}>
           <h2 className={s.sectionTitle}>Atributy</h2>
-          <div className={s.blockGrid}>
+          {/* `print-cols` = stabilní tisková třída: CSS-module grid v tisku
+              nestyluje (hash), tahle drží mřížku i v tiskovém okně (printDoc.css). */}
+          <div className={`${s.blockGrid} print-cols`}>
             {blocks.map((block) => (
               <DiaryBlockView
                 key={block.id}

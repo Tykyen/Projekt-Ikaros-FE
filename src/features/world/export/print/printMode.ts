@@ -1,5 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
+import printDocCss from './printDoc.css?raw';
 
 /**
  * 14.7a — Globální příznak „probíhá tisk". Komponenty ho čtou přes
@@ -13,50 +14,15 @@ export function usePrintMode(): boolean {
   return useAtomValue(printModeAtom);
 }
 
-/** Minimální čitelné tiskové styly pro samostatné tiskové okno. */
-const PRINT_DOC_CSS = `
-  * { color: #000 !important; background: transparent !important;
-      box-shadow: none !important; text-shadow: none !important; }
-  body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.55;
-    color: #000; background: #fff; margin: 0 auto; padding: 1.5rem; max-width: 820px; }
-  img { max-width: 100% !important; height: auto !important; break-inside: avoid; }
-  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; line-height: 1.2; }
-  ul, ol { padding-left: 1.4rem; }
-  li { margin: 0.15rem 0; }
-  a { color: #000; text-decoration: underline; }
-  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
-  td, th { border: 1px solid #999; padding: 4px 8px; text-align: left; }
-  hr { border: none; border-top: 1px solid #ccc; margin: 0.8rem 0; }
-  .print-hide, [data-print-hide], button { display: none !important; }
-  .print-month { break-after: page; }
-  .print-month:last-child { break-after: auto; }
-  /* Styly appky nesou SPA layout (100vh výšky, overflow:hidden, sticky) —
-     v tisku rozhází stránkování (prázdné listy). V print je vyresetujeme,
-     ať obsah teče v normálním flow. */
-  @media print {
-    html, body {
-      height: auto !important;
-      min-height: 0 !important;
-      max-height: none !important;
-      overflow: visible !important;
-    }
-    body * {
-      overflow: visible !important;
-      max-height: none !important;
-      min-height: 0 !important;
-      position: static !important;
-    }
-  }
-`;
-
 /**
  * Spustí tisk vybraného podstromu.
  *
- * Mechanismus (14.7b-fix2): tiskne se v **samostatném okně** (`window.open`).
- * Obsah cíle se naklonuje (s rozbaleným stavem), canvas se nahradí snapshotem,
- * a vloží do nového dokumentu s vlastním tiskovým CSS. Čistý kontext bez
- * dědění theme/visibility z hlavní appky → spolehlivé (klon do <body> dědil
- * skrytí a tiskl prázdno).
+ * Mechanismus: tiskne se v **samostatném okně** (`window.open`). Obsah cíle se
+ * naklonuje (s rozbaleným stavem), canvas se nahradí snapshotem, a vloží do
+ * nového dokumentu jen s čistým dokumentovým CSS (`printDoc.css`). CSS appky se
+ * ZÁMĚRNĚ nepřebírá — to dřív táhlo SPA layout (prázdné listy) a hrubé resety
+ * rozbíjely obrázky (chybový deník CH-007/008). Holý semantický klon na
+ * element-level CSS tiskne spolehlivě.
  *
  * - Zapne `printMode` → komponenty v ORIGINÁLU rozbalí skrytý obsah; po 2
  *   snímcích (re-render) se teprve klonuje a otevírá okno.
@@ -107,34 +73,15 @@ export function usePrint(): {
             const win = window.open('', '_blank', 'width=900,height=1000');
             if (!win) return; // popup blokován
 
-            // Zkopírovat stylesheets appky (CSS moduly = layout/styling deníku),
-            // pak PRINT_DOC_CSS jako override (černobílé, skrýt tlačítka).
-            const appStyles = [
-              ...document.querySelectorAll('link[rel="stylesheet"]'),
-            ]
-              .map(
-                (l) =>
-                  `<link rel="stylesheet" href="${(l as HTMLLinkElement).href}">`,
-              )
-              .join('');
-            const inlineStyles = [...document.querySelectorAll('style')]
-              .map((s) => s.outerHTML)
-              .join('');
-            // data-theme/world-shell na body, ať platí theme-scoped CSS moduly.
-            const shellAttrs = document
-              .querySelector('[data-world-shell]')
-              ?.getAttributeNames()
-              .filter((n) => n.startsWith('data-'))
-              .map(
-                (n) =>
-                  `${n}="${document.querySelector('[data-world-shell]')?.getAttribute(n) ?? ''}"`,
-              )
-              .join(' ');
+            // ZÁMĚRNĚ se NEkopíruje CSS appky. To dřív táhlo SPA layout
+            // (height:100vh/overflow → prázdné listy, CH-007) a vynucovalo hrubé
+            // resety, co rozbíjely obrázky (CH-008). Tiskne se holý semantický
+            // klon jen na čistém dokumentovém CSS (printDoc.css).
             win.document.write(
               `<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8">` +
-                `<title>Tisk — Projekt Ikaros</title>${appStyles}${inlineStyles}` +
-                `<style>${PRINT_DOC_CSS}</style></head>` +
-                `<body ${shellAttrs ?? ''}>${clone.innerHTML}</body></html>`,
+                `<title>Tisk — Projekt Ikaros</title>` +
+                `<style>${printDocCss}</style></head>` +
+                `<body>${clone.innerHTML}</body></html>`,
             );
             win.document.close();
 

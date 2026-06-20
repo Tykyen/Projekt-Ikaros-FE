@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8">
+<title>Tisk — náhled</title><style>/*
+ * 14.7 pilíř A — tiskové CSS pro samostatné tiskové okno (viz usePrint).
+ *
+ * Princip (po sérii selhání CH-001…008, viz docs/chybovy-denik/tisk.md):
+ * tiskne se ČISTÝ dokument na holém semantickém HTML klonu. CSS appky se do
+ * okna ZÁMĚRNĚ NEkopíruje → odpadá SPA layout (height:100vh/overflow → prázdné
+ * listy) i potřeba hrubých resetů (které rozbíjely obrázky). Stačí
+ * element-level styl níže.
+ *
+ * Tento soubor je jediný zdroj pravdy: printMode.ts ho bere přes `?raw`,
+ * offline náhled (scripts/print-preview) čte týž soubor → náhled = produkce.
+ *
+ * Černobíle (úspora toneru, čitelnost): barvu i pozadí srovnáme; hierarchii
+ * nese velikost, tučnost a kurzíva, ne barva.
+ */
+
+/* — Reset na tisk: žádné barvy/pozadí/stíny zděděné z obsahu — */
+* {
+  color: #000 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* — Stránka — */
+body {
+  font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  font-size: 11.5pt;
+  line-height: 1.5;
+  color: #000;
+  background: #fff;
+  margin: 0;
+}
+
+/* — Nadpisy: hierarchie velikostí, drží se u následujícího obsahu — */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Fraunces', Georgia, serif;
+  line-height: 1.18;
+  break-after: avoid;
+  page-break-after: avoid;
+  margin: 1.1em 0 0.4em;
+}
+h1 { font-size: 1.9rem; margin-top: 0; }
+h2 { font-size: 1.4rem; border-bottom: 1px solid #ccc; padding-bottom: 0.15em; }
+h3 { font-size: 1.15rem; }
+h4 { font-size: 1rem; }
+
+p { margin: 0.55em 0; orphans: 2; widows: 2; }
+
+/* — Seznamy — */
+ul, ol { padding-left: 1.5rem; margin: 0.5em 0; }
+li { margin: 0.2rem 0; }
+
+/* — Odkazy: bez modré, jen podtržení (tisk) — */
+a { color: #000; text-decoration: underline; }
+
+/* — Citace: vizuálně odlišená i bez barvy (levý pruh + kurzíva) — */
+blockquote {
+  margin: 0.8em 0;
+  padding: 0.2em 0 0.2em 1rem;
+  border-left: 3px solid #999;
+  font-style: italic;
+  break-inside: avoid;
+}
+
+/* — Obrázky a figury: nelámat přes stránku — */
+img { max-width: 100% !important; height: auto !important; break-inside: avoid; }
+figure { margin: 0.8em 0; break-inside: avoid; }
+figcaption { font-size: 0.85rem; font-style: italic; margin-top: 0.3em; }
+
+/* — Tabulky — */
+table { border-collapse: collapse; width: 100%; margin: 0.6em 0; break-inside: avoid; }
+caption { font-weight: 600; text-align: left; margin-bottom: 0.3em; }
+th, td { border: 1px solid #999; padding: 4px 9px; text-align: left; vertical-align: top; }
+thead { display: table-header-group; } /* hlavička se opakuje na každé stránce */
+
+hr { border: none; border-top: 1px solid #bbb; margin: 1em 0; }
+
+/* — Tiskem skrývané prvky + interaktivní ovládání — */
+.print-hide, [data-print-hide], button, input, select, textarea {
+  display: none !important;
+}
+
+/* — Kalendář: každý měsíc na vlastní stránku (z 14.7b) — */
+.print-month { break-after: page; }
+.print-month:last-child { break-after: auto; }
+
+/* — Volitelná tisková utilita: mřížku karet (atributy bestie/postavy) lze
+     v tisku zachovat přidáním stabilní třídy `print-cols` do komponenty
+     (CSS-module hash třídy v tisku nestylují). Bez ní obsah teče lineárně. */
+.print-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem 1rem;
+}
+.print-cols > * { break-inside: avoid; }
+</style></head>
+<body><!-- Fixture: innerHTML scope deníku (DiaryTab > div[data-print-scope]).
+     Atributy (blockGrid = karty label/value) + sekce „Zápisky" (h2 + RichText
+     + itemList). Karty jsou CSS-module grid → v tisku bez gridu: schválně tu,
+     ať vidím, jak holé karty dopadnou a kde dopsat cílenou tiskovou třídu. -->
+<div class="_print-hide_x print-hide" style="display:flex;justify-content:flex-end">
+  <button type="button">Tisk / PDF</button>
+</div>
+
+<div class="_wrap_a1">
+  <section class="_section_b2">
+    <h2 class="_sectionTitle_c3">Atributy</h2>
+    <!-- `print-cols` = stabilní tisková třída (přidaná do DiaryTab); drží
+         mřížku i v tisku, kde CSS-module grid (hash) nestyluje. -->
+    <div class="_blockGrid_d4 print-cols">
+      <div class="_block_e5"><span class="_label_h">Síla</span><div class="_val_i">14</div></div>
+      <div class="_block_e5"><span class="_label_h">Obratnost</span><div class="_val_i">12</div></div>
+      <div class="_block_e5"><span class="_label_h">Odolnost</span><div class="_val_i">15</div></div>
+      <div class="_block_e5"><span class="_label_h">Inteligence</span><div class="_val_i">11</div></div>
+      <div class="_block_e5"><span class="_label_h">Charisma</span><div class="_val_i">13</div></div>
+      <div class="_block_e5"><span class="_label_h">Životy</span><div class="_val_i">28 / 28</div></div>
+    </div>
+  </section>
+
+  <section class="_section_b2">
+    <h2 class="_sectionTitle_c3">Zápisky z cesty</h2>
+    <div class="_entry_f6">
+      <p>
+        <strong>Den 3.</strong> Dorazili jsme k Jizvě za soumraku. Kest měl
+        pravdu — kompas se tu zbláznil. Tábor jsme rozbili kus od okraje.
+      </p>
+      <p>
+        Ráno přišel posel Řádu Popela. Glejt jsme neměli, tak nás <em>nepustili
+        dál</em>. Mám podezření, že tu něco hlídají víc než jen kráter.
+      </p>
+    </div>
+    <ul class="_itemList_g7">
+      <li>získáno: měděný glejt (padělek)</li>
+      <li>ztraceno: 2 dny zásob</li>
+      <li>poznámka: vrátit se s pravým glejtem od Mor­wenny</li>
+    </ul>
+  </section>
+
+  <section class="_section_b2">
+    <h2 class="_sectionTitle_c3">Inventář</h2>
+    <table>
+      <thead><tr><th>Předmět</th><th>Počet</th><th>Stav</th></tr></thead>
+      <tbody>
+        <tr><td>Hraničářský luk</td><td>1</td><td>dobrý</td></tr>
+        <tr><td>Šípy</td><td>23</td><td>—</td></tr>
+        <tr><td>Léčivý lektvar</td><td>2</td><td>zapečetěný</td></tr>
+        <tr><td>Měděný glejt</td><td>1</td><td>padělek</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+</body></html>

@@ -1,0 +1,55 @@
+<!-- Fixture: innerHTML scope deníku (DiaryTab > div[data-print-scope]).
+     Atributy (blockGrid = karty label/value) + sekce „Zápisky" (h2 + RichText
+     + itemList). Karty jsou CSS-module grid → v tisku bez gridu: schválně tu,
+     ať vidím, jak holé karty dopadnou a kde dopsat cílenou tiskovou třídu. -->
+<div class="_print-hide_x print-hide" style="display:flex;justify-content:flex-end">
+  <button type="button">Tisk / PDF</button>
+</div>
+
+<div class="_wrap_a1">
+  <section class="_section_b2">
+    <h2 class="_sectionTitle_c3">Atributy</h2>
+    <!-- `print-cols` = stabilní tisková třída (přidaná do DiaryTab); drží
+         mřížku i v tisku, kde CSS-module grid (hash) nestyluje. -->
+    <div class="_blockGrid_d4 print-cols">
+      <div class="_block_e5"><span class="_label_h">Síla</span><div class="_val_i">14</div></div>
+      <div class="_block_e5"><span class="_label_h">Obratnost</span><div class="_val_i">12</div></div>
+      <div class="_block_e5"><span class="_label_h">Odolnost</span><div class="_val_i">15</div></div>
+      <div class="_block_e5"><span class="_label_h">Inteligence</span><div class="_val_i">11</div></div>
+      <div class="_block_e5"><span class="_label_h">Charisma</span><div class="_val_i">13</div></div>
+      <div class="_block_e5"><span class="_label_h">Životy</span><div class="_val_i">28 / 28</div></div>
+    </div>
+  </section>
+
+  <section class="_section_b2">
+    <h2 class="_sectionTitle_c3">Zápisky z cesty</h2>
+    <div class="_entry_f6">
+      <p>
+        <strong>Den 3.</strong> Dorazili jsme k Jizvě za soumraku. Kest měl
+        pravdu — kompas se tu zbláznil. Tábor jsme rozbili kus od okraje.
+      </p>
+      <p>
+        Ráno přišel posel Řádu Popela. Glejt jsme neměli, tak nás <em>nepustili
+        dál</em>. Mám podezření, že tu něco hlídají víc než jen kráter.
+      </p>
+    </div>
+    <ul class="_itemList_g7">
+      <li>získáno: měděný glejt (padělek)</li>
+      <li>ztraceno: 2 dny zásob</li>
+      <li>poznámka: vrátit se s pravým glejtem od Mor­wenny</li>
+    </ul>
+  </section>
+
+  <section class="_section_b2">
+    <h2 class="_sectionTitle_c3">Inventář</h2>
+    <table>
+      <thead><tr><th>Předmět</th><th>Počet</th><th>Stav</th></tr></thead>
+      <tbody>
+        <tr><td>Hraničářský luk</td><td>1</td><td>dobrý</td></tr>
+        <tr><td>Šípy</td><td>23</td><td>—</td></tr>
+        <tr><td>Léčivý lektvar</td><td>2</td><td>zapečetěný</td></tr>
+        <tr><td>Měděný glejt</td><td>1</td><td>padělek</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>

@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8">
+<title>Tisk — náhled</title><style>/* BASELINE — současné PRINT_DOC_CSS z printMode.ts (stav 2026-06-20).
+   Slouží jen pro srovnání „před/po". Needituj — je to snímek. */
+* { color: #000 !important; background: transparent !important;
+    box-shadow: none !important; text-shadow: none !important; }
+body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.55;
+  color: #000; background: #fff; margin: 0 auto; padding: 1.5rem; max-width: 820px; }
+img { max-width: 100% !important; height: auto !important; break-inside: avoid; }
+h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; line-height: 1.2; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.15rem 0; }
+a { color: #000; text-decoration: underline; }
+table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
+td, th { border: 1px solid #999; padding: 4px 8px; text-align: left; }
+hr { border: none; border-top: 1px solid #ccc; margin: 0.8rem 0; }
+.print-hide, [data-print-hide], button { display: none !important; }
+.print-month { break-after: page; }
+.print-month:last-child { break-after: auto; }
+@media print {
+  html, body {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  body * {
+    overflow: visible !important;
+    max-height: none !important;
+    min-height: 0 !important;
+  }
+}
+</style></head>
+<body><!-- Fixture: innerHTML scope stránky (PageViewer > article[data-print-scope]).
+     Reprezentuje PageHeader + TipTap RichText obsah. Class names jsou
+     CSS-module hashe z appky — v tisku NEstylují (CSS appky se nekopíruje),
+     proto je sem dávám schválně: ověřuju, že holý semantický HTML vypadá dobře
+     jen na element-level tiskovém CSS. -->
+<div class="_print-hide_x print-hide" style="display:flex;justify-content:flex-end;gap:.5rem">
+  <button type="button">Tisk / PDF</button>
+  <button type="button">Upravit</button>
+</div>
+
+<header class="_header_a1b2c">
+  <h1 class="_title_d3e4f">Pád Hvězdné brány</h1>
+  <p class="_meta_g5h6i" style="color:#888;font-size:.85rem">
+    Lokace · 4 min čtení · aktualizováno 18. 6. 2026
+  </p>
+</header>
+
+<div class="_content_j7k8l">
+  <p>
+    <strong>Hvězdná brána</strong> stála na okraji Sutinového pole po tři sta let,
+    než ji <em>Řád Popela</em> v jediné noci proměnil v kráter. To, co po ní
+    zbylo, dnes místní nazývají prostě <a href="#">Jizva</a>.
+  </p>
+
+  <figure>
+    <img alt="Vyobrazení brány"
+      src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='260'%3E%3Crect width='480' height='260' fill='%23dcdce6'/%3E%3Cpath d='M80 220 L240 40 L400 220 Z' fill='none' stroke='%23555' stroke-width='6'/%3E%3Ccircle cx='240' cy='150' r='44' fill='none' stroke='%23555' stroke-width='6'/%3E%3C/svg%3E" />
+    <figcaption style="font-size:.85rem;color:#777">Brána před zničením (rekonstrukce).</figcaption>
+  </figure>
+
+  <h2>Historie</h2>
+  <p>
+    Postavena byla v éře, kdy ještě putovaly karavany mezi světy. Každý z
+    pilířů nesl jméno jednoho ze <strong>sedmi zakladatelů</strong>:
+  </p>
+  <ul>
+    <li>Ваэрин Tichý — strážce východního pilíře</li>
+    <li>Mor­wenna z Hloubky — kartografka cest</li>
+    <li>bratři Halloranové — kováři ukotvení</li>
+  </ul>
+
+  <h3>Co se stalo oné noci</h3>
+  <ol>
+    <li>Stráže ohlásily rudou záři nad obzorem.</li>
+    <li>Pilíře se rozezněly tónem, který nikdo nepřežil bez ochrany.</li>
+    <li>Do svítání zbyla jen tavenina a ticho.</li>
+  </ol>
+
+  <blockquote>
+    „Neviděl jsem oheň. Viděl jsem, jak svět zapomíná, že tu brána kdy byla."
+    <br />— deník hraničáře Kesta
+  </blockquote>
+
+  <hr />
+
+  <h2>Současný stav</h2>
+  <p>
+    Jizva je dnes neprůchodná. Magické pozadí je tu stále zvýšené a kompasy
+    ukazují ke středu kráteru. Řád Popela přístup hlídá a vstup bez glejtu
+    trestá vyhoštěním.
+  </p>
+</div>
+</body></html>
