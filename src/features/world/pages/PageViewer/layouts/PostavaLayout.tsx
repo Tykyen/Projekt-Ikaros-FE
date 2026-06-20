@@ -128,10 +128,10 @@ export function PostavaLayout({ page }: Props) {
     const delay = sawFetchRef.current ? 150 : 500;
     const id = window.setTimeout(() => {
       triggerPrint(layoutRef.current);
-      // Po zavření tiskového dialogu vrať PostavaLayout zpět na záložky.
-      window.addEventListener('afterprint', () => setPrintAllTabs(false), {
-        once: true,
-      });
+      // Tisk běží v samostatném okně → afterprint hlavního okna se nevystřelí.
+      // Klon je pořízen do ~1 snímku; vrátíme lištu záložek po krátké prodlevě
+      // (kdyby zůstalo true, záložky by zmizely natrvalo).
+      window.setTimeout(() => setPrintAllTabs(false), 800);
     }, delay);
     return () => window.clearTimeout(id);
   }, [printAllTabs, isFetching, triggerPrint]);

@@ -90,10 +90,34 @@ export function usePrint(): {
             const win = window.open('', '_blank', 'width=900,height=1000');
             if (!win) return; // popup blokován
 
+            // Zkopírovat stylesheets appky (CSS moduly = layout/styling deníku),
+            // pak PRINT_DOC_CSS jako override (černobílé, skrýt tlačítka).
+            const appStyles = [
+              ...document.querySelectorAll('link[rel="stylesheet"]'),
+            ]
+              .map(
+                (l) =>
+                  `<link rel="stylesheet" href="${(l as HTMLLinkElement).href}">`,
+              )
+              .join('');
+            const inlineStyles = [...document.querySelectorAll('style')]
+              .map((s) => s.outerHTML)
+              .join('');
+            // data-theme/world-shell na body, ať platí theme-scoped CSS moduly.
+            const shellAttrs = document
+              .querySelector('[data-world-shell]')
+              ?.getAttributeNames()
+              .filter((n) => n.startsWith('data-'))
+              .map(
+                (n) =>
+                  `${n}="${document.querySelector('[data-world-shell]')?.getAttribute(n) ?? ''}"`,
+              )
+              .join(' ');
             win.document.write(
               `<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8">` +
-                `<title>Tisk — Projekt Ikaros</title><style>${PRINT_DOC_CSS}</style>` +
-                `</head><body>${clone.innerHTML}</body></html>`,
+                `<title>Tisk — Projekt Ikaros</title>${appStyles}${inlineStyles}` +
+                `<style>${PRINT_DOC_CSS}</style></head>` +
+                `<body ${shellAttrs ?? ''}>${clone.innerHTML}</body></html>`,
             );
             win.document.close();
 
