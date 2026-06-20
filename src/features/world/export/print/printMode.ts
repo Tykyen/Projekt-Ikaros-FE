@@ -77,6 +77,8 @@ export function usePrint(): {
             // Klon cíle do samostatného kořene v <body> (normální flow).
             printContainer = document.createElement('div');
             printContainer.setAttribute(PRINT_ROOT_ATTR, '');
+            printContainer.style.color = 'black';
+            printContainer.style.background = 'white';
             const clone = target.cloneNode(true) as HTMLElement;
 
             // Canvas (pavučina/hvězdná) klon nezachytí jako bitmapu →

@@ -23,15 +23,15 @@
   html[data-printing] [data-print-root] {
     margin: 0;
     padding: 1rem;
-    background: rgb(var(--white-rgb)) !important;
-    color: rgb(var(--black-rgb)) !important;
+    background: white !important;
+    color: black !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
   /* Theme-neutrální obsah: černá na bílé, bez stínů; obrázky na pozadí vynutit. */
   html[data-printing] [data-print-root] * {
-    color: rgb(var(--black-rgb)) !important;
+    color: black !important;
     background-color: transparent !important;
     box-shadow: none !important;
     text-shadow: none !important;
@@ -40,7 +40,7 @@
   }
 
   html[data-printing] [data-print-root] a {
-    color: rgb(var(--black-rgb)) !important;
+    color: black !important;
     text-decoration: underline;
   }
 
