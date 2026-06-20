@@ -135,7 +135,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Otevřené otázky:** Práh závažnosti, který blokuje build? Zapínat Redis throttler hned, nebo až při škálování?
 **✅ Implementováno (2026-06-19, [spec-14.6](arch/phase-14/spec-14.6.md)):** Klíčový nález — krok nebyl „malý": měření `npm audit` odhalilo **existující neopravené high zranitelnosti v obou repo** (hlavně `ws` DoS/memory-disclosure přes socket.io, BE navíc `multer` DoS + `nodemailer` raw-option SSRF). Pořadí proto **úklid → brána**. **A1 úklid:** `npm audit fix` (semver-safe) + BE cílené opravy — `multer` override `^2.2.0` (spravil i kaskádu 8 NestJS „high"), `nodemailer` 8→9 (naše použití `createTransport`/`sendMail` bez `raw` = bezpečné). Po úklidu **prod high+critical = 0** v obou repo. **A2 brána:** krok `npm audit --omit=dev --audit-level=high` (blokuje jen runtime high+critical; dev toolchain jako vitest/esbuild critical řeší jen Dependabot) v obou [ci.yml](../.github/workflows/ci.yml) + `dependabot.yml` (npm + github-actions, weekly, grouped minor/patch). **B throttler:** opt-in přepínač `THROTTLER_REDIS=1` (`@nest-lab/throttler-storage-redis` v1.2.0, `ThrottlerModule.forRootAsync` + boot-time probe fallback na in-memory) — vzor `SOCKET_IO_REDIS=1`, default in-memory beze změny. **Uzavírá D-028.** Otevřené otázky zodpovězeny: práh = **high na prod**; throttler = **opt-in, nezapínat hned** (single-instance ho nepotřebuje). Ověřeno: FE build + 2812 unit + e2e; BE 2163 testů (vč. 4 throttler větve). **ZBÝVÁ ops:** BE restart/redeploy; `THROTTLER_REDIS` zapnout až při 2+ replikách.
 
-### - [ ] 14.7 Export světa / kampaně (ZIP · JSON · PDF) — [H0-06 · dopad střední · náklad střední]
+### - [x] 14.7 Export světa / kampaně (ZIP · JSON · PDF) — [H0-06 · dopad střední · náklad střední]
 **Cíl:** Výrazné tlačítko „Exportovat / Zálohovat vše" v nastavení světa → kompletní data světa ke stažení (struktura JSON + média ZIP + čitelné PDF).
 **Proč:** Zkušení PJ jsou (právem) paranoidní o svá data. I když 90 % tlačítko nikdy nepoužije, samotný fakt, že ho vidí, **odstraňuje strach z vendor lock-inu** → přímá důvěrová páka, proč zůstat. Doplňuje serverové zálohy (14.4) o uživatelovu vlastní kopii.
 **Návrh přípravy:** definovat serializovatelný strom světa (existuje datový model); rozhodnout formáty (JSON vždy, ZIP médií, PDF přes Chrome headless — 🔁 vzor `project_pdf_generation`); u velkých světů streamovat/dávkovat.
@@ -148,14 +148,14 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 > **Pilíř A — tisk/PDF (body 2–14): ✅ HOTOVO**
 > - ✅ 14.7a — framework (`window.print`) + tisk stránky a deníku PC/NPC
 > - ✅ 14.7b — záložky postavy/NPC, kalendář s rozsahem, bestiář, mapy-atlas, hvězdná (seznam), pavučina, storyboard, obchod
+> - ✅ 14.7-fix (2026-06-20) — **přepis mechanismu:** tiskne se čistý dokument (`printDoc.css`), NE klon CSS appky (kořen série selhání, viz [chybový deník/tisk](chybovy-denik/tisk.md)); všech **12 diary sheetů** tiskový render; reálné nálezy opraveny (obrázky/page-break/profil/výbava/lokace pořadí/bestiář mezery/kalendář akce+mřížka); offline náhled `scripts/print-preview`
 >
 > **Pilíř B — záloha (bod 1):**
-> - ✅ 14.7c export — BE `world-export` (ZIP celého lore stromu, PJ/Admin) + FE tab „Export / Záloha"; **pushnuto** (po BE změně **restart**)
-> - 🔲 binárky médií do ZIP (teď jen URL v datech) · 🔲 hráčský `viewer-partial` export (teď jen PJ) · 🔲 gm-notes + chat do zálohy
+> - ✅ 14.7c export — BE `world-export` (ZIP celého lore stromu, PJ/Admin) + FE tab „Export / Záloha"; binárky médií → `media/` (graceful skip propadlých) · gm-notes vždy · chat opt-in — **vše v kódu hotové** (po BE změně **restart**)
+> - ⛔ hráčský `viewer-partial` export — **VĚDOMĚ MIMO SCOPE (2026-06-20):** zůstává 403. Důvod: poměr riziko/hodnota — leak-safe filtrace přes ~15 modulů (každý = potenciální leak PJ dat), ale hráč svůj viditelný obsah už dostane **tiskem (pilíř A)**; ZIP je PJ nástroj pro zálohu celého světa, který hráč nepotřebuje. Lze přidat později (vlastní spec) bez ztráty.
 > - ⏸️ **import** (obnova ze zálohy) — ODLOŽEN; formát je import-ready
 >
-> **🧪 Neověřeno (na uživateli):** reálný tisk + stažení ZIP v prohlížeči.
-> Checkbox `[ ]` zůstává, dokud nejsou dotaženy zbývající 🔲 mezery (rozhodnuto je dodělat).
+> **✅ Hotovo 2026-06-20:** tisk reálně ověřen na hlavních entitách (postava/stránka/lokace/bestiář/kalendář/Matrix deník). **🧪 Zbývá user-ověřit:** reálné stažení ZIP (zkontrolovat `media/` + chat uvnitř).
 
 ### - [ ] 14.8 Odstřižení od starého webu (SMTP + embedding model) — [H0-08 · dopad střední · náklad střední] 🔁 *(přesun z 19.3)*
 **Cíl:** Žádná závislost na umírajícím `patrikzplzne.cz` — přesun embedding modelu vyhledávání na vlastní hosting, maily přes vlastní SMTP do produkce, ověřit web push na reálném telefonu (iPhone PWA na plochu).

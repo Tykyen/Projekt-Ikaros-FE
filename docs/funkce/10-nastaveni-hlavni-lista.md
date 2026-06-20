@@ -169,25 +169,26 @@ Stažení kompletních dat jednoho světa do ZIP (JSON strom). Pilíř B spec-14
 
 ### Kdo
 - FE: tab `minRole: WorldRole.PJ`.
-- BE: `resolveScope` — platform Admin/Superadmin nebo `WorldRole.PJ` → `pj-full`; hráč/PomocnyPJ → 403 `EXPORT_VIEWER_PARTIAL_NOT_READY` (hráčský oříznutý export se zatím nestaví).
+- BE: `resolveScope` — platform Admin/Superadmin nebo `WorldRole.PJ` → `pj-full`; hráč/PomocnyPJ → 403 `EXPORT_PJ_ONLY`. Hráčský `viewer-partial` je **vědomě mimo scope** (viz Hranice).
 
 ### Co jde dělat
-- Stáhnout ZIP `svet-<slug>-<datum>.zip` = `manifest.json` (version/scope/counts) + `data.json` (celý lore strom).
-- Obsah: world+settings+members, pages, characters + **všechny subdocs** (deník/finance/výbava/poznámky/kalendář/účty), kalendáře, taktické scény, atlas map+složky, hvězdná mapa, timeline, události, bestiář světa, kampaň (subjekty/vztahy/storylines/scénáře/quick-notes/obchod).
+- Stáhnout ZIP `svet-<slug>-<datum>.zip` = `manifest.json` (version/scope/counts) + `data.json` (celý lore strom) + **`media/`** (stažené binárky obrázků) + `media-manifest.json` (URL → soubor).
+- Obsah: world+settings+members, pages, characters + **všechny subdocs** (deník/finance/výbava/poznámky/kalendář/účty), kalendáře, taktické scény, atlas map+složky, hvězdná mapa, timeline, události, bestiář světa, kampaň (subjekty/vztahy/storylines/scénáře/quick-notes/obchod), **per-PJ poznámky** (`gmNotes`).
+- **Chat opt-in** (`?chat=1`) → přidá skupiny + kanály + zprávy (limit 2000/kanál).
 
 ### Hranice — co neumí
-- **Jen `pj-full`** (PJ/Admin); hráčský `viewer-partial` export zatím 403.
-- **Média jako URL** — binárky se nestahují do ZIP (obrázky odkazem; offline média = follow-up).
-- **Mimo export:** per-PJ poznámky (`WorldGmNotes` — chybí `findByWorldId`), chat (volitelný, zatím no-op), campaign purchase/changeLog/scenarioTemplate.
+- **Jen `pj-full`** (PJ/Admin). Hráčský `viewer-partial` export = **VĚDOMĚ MIMO SCOPE (2026-06-20)**: leak-safe filtrace přes ~15 modulů má špatný poměr riziko/hodnota a hráč svůj viditelný obsah dostane **tiskem** (pilíř A); ZIP je PJ nástroj pro zálohu celého světa. Lze přidat později (vlastní spec).
+- **Média graceful skip** — propadlé/cizí/relativní URL se nestáhnou (zůstávají jen jako URL v datech).
 - **Import zpět ODLOŽEN** — formát je import-ready (stabilní ID + `version` + `scope`), import se nestaví.
 - Timeline limit 500 událostí; velké světy = přímý stream (sledovat timeout).
 
 ### Zvláštnosti
 - `pj-full` čte celý strom přímo z repozitářů (PJ vidí vše → bez filtrů). Kvůli tomu přidány `exports:` repo tokenů do 6 modulů (campaign/world-maps/universe/timeline/game-events/character-subdocs).
 - `archiver` 8 = `new ZipArchive()` (ne factory `archiver()`).
+- Média: `collectMediaUrls` rekurzivně projde JSON strom, `fetch` → `media/N.<ext>` + mapa do `media-manifest.json` (pro budoucí import re-upload).
 
 ### Stav
-🚧 částečné — export ✅ (lore strom, PJ); média-binárky / gm-notes / chat / import zbývají. Reálný download neověřen v prohlížeči, **čeká BE restart**.
+✅ funguje (export) — `pj-full` ZIP kompletní vč. **médií / gm-notes / chatu**; `viewer-partial` vědomě mimo scope; **import odložen**. Reálné stažení v prohlížeči zatím user-neověřeno (zkontrolovat `media/` + chat), **čeká BE restart**.
 
 ### Kód
 FE `WorldSettingsPage/tabs/ExportTab.tsx`; BE `modules/world-export/{world-export.controller,world-export.service,world-export.module}.ts`.

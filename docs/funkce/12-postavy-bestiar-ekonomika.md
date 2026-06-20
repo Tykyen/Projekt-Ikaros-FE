@@ -122,7 +122,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - **Výbava:** sekce + položky; atomický append (nákup z obchodu přes `appendItemToSection` `$push`).
 - **Kalendář:** events postavy; `read` action umožní i ne-staff členům číst (mírnější gate).
 - **Poznámky:** volný text.
-- **Tisk deníku (14.7a):** záložka Deník (view) → tlačítko „Tisk / PDF" → `window.print()` jen nad deníkem (framework pilíř A, viz kap. 11 „Tisk / PDF"). 🚧 reálný tisk v prohlížeči neověřen.
+- **Tisk deníku / postavy (14.7):** „Tisk / PDF" v záložce Deník + „Tisk všech záložek" u postavy → tisk v samostatném okně (pilíř A, kap. 11). Diary sheet má v `printMode` **statický tiskový render** (hodnoty z `<input>` jako text, pips/tracky `●●●○○`) — všech 12 systémů (matrix/coc/dnd5e/drd*/fate/gurps/jad/pi/shadowrun). Výbava (`InventoryTab`) se v tisku rozbalí; bestie staty mají mezeru (`print-stat`). ✅ reálně ověřeno (Matrix deník 2026-06-20); ostatní sheety přes vzor + testy.
 
 **Lazy-create / self-healing:** Subdocy se vytvoří při `character.created` eventu (kaskáda). Legacy postavy bez subdocu se uzdraví prvním GET (lazy-create) s RC-D1 rollbackem, pokud se rodičovská postava mezitím smaže (orphan guard, `character-subdocs.service.ts:75-87`).
 

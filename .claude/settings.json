@@ -12,6 +12,12 @@
             "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \".claude/hooks/denik-reminder.ps1\"",
             "timeout": 10,
             "statusMessage": "Kontrola chyboveho deniku"
+          },
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \".claude/hooks/glossary-reminder.ps1\"",
+            "timeout": 10,
+            "statusMessage": "Kontrola slovnicku pojmu"
           }
         ]
       }

@@ -1,0 +1,4 @@
+Marker poslední revize slovníčku (mtime = kdy naposledy proběhla kontrola pojmů).
+Hook .claude/hooks/glossary-reminder.ps1 porovnává tento mtime vs. nejnovější
+docs/funkce + docs/arch. Po revizi slovníčku tento soubor touchni (přepiš/ulož),
+aby se připomínka utišila do další změny funkčnosti. NEMAŽ.

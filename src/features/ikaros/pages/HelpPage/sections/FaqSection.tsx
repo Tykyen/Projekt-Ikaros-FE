@@ -284,9 +284,9 @@ const FAQ: FaqItem[] = [
         </p>
         <p>
           <strong>PJ</strong> navíc může v <strong>Nastavení světa → Export / Záloha</strong>{' '}
-          stáhnout <strong>celý svět</strong> jedním tlačítkem (ZIP se všemi daty —
-          stránky, postavy, kampaň…). 🚧 Stahování obrázků přímo do zálohy a obnova
-          ze zálohy zpět se připravují.
+          stáhnout <strong>celý svět</strong> jedním tlačítkem — ZIP se všemi daty
+          (stránky, postavy, kampaň…) i <strong>staženými obrázky</strong>, chat
+          volitelně. 🚧 Obnova ze zálohy zpět (import) se připravuje.
         </p>
       </>
     ),

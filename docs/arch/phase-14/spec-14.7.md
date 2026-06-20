@@ -1,7 +1,7 @@
 # Spec 14.7 — Export / záloha světa + import (Tisk/PDF · ZIP · round-trip)
 
 > Fáze 14 · krok 14.7 · [H0-06 · dopad střední · náklad střední]
-> Status: **🟡 spec ke schválení** (2026-06-19)
+> Status: **✅ HOTOVO (2026-06-20)** — pilíř A tisk (přepsán na čistý dokument, viz [chybový deník/tisk](../../chybovy-denik/tisk.md)) + pilíř B `pj-full` export (vč. médií/gm-notes/chat). **`viewer-partial` VĚDOMĚ MIMO SCOPE** (riziko/hodnota — hráč exportuje tiskem; ZIP je PJ-only) · **import ODLOŽEN** (formát import-ready).
 > Repozitáře: **oba** (FE `Projekt-ikaros-FE`, BE `Projekt-ikaros/backend`)
 > Kryje i dluh **D-NEW-INV-ADMIN-UI** (FE konzument GDPR `GET /data-export/me`).
 

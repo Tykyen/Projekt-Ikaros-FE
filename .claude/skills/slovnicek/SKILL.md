@@ -37,6 +37,15 @@ Nespouštěj při:
 4. **Po souhlasu zapiš** soubor `docs/glossary/<slug>.md` + **aktualizuj index** v `docs/glossary/README.md` (kategorie + abecední seznam).
 5. **Update existujícího hesla:** přečti, navrhni změny diffem, po souhlasu zapiš. Pokud se mění `name` nebo přibývá alias, projdi a updatuj `related` odkazy v ostatních heslech.
 6. **Když souvisí s UI**, který hráč uvidí, **připomeň `napoveda`** — možná je třeba doplnit i nápovědu.
+7. **Na konci revize touchni `docs/glossary/.reviewed`** (přepiš/ulož) — utiší to auto-připomínku (viz níže) do další změny funkčnosti. **Platí i když nic nepřidáváš** — pokud po prověření žádný nový pojem nevznikl, stejně touchni `.reviewed`, ať hook nehlásí dokola.
+
+## Auto-připomínka (hook)
+
+Stop hook [`.claude/hooks/glossary-reminder.ps1`](../../hooks/glossary-reminder.ps1) (registrovaný v `settings.json`) po každém turnu porovná mtime nejnovějšího `.md` v `docs/funkce` / `docs/arch` (kde vznikají pojmy) vs. marker `docs/glossary/.reviewed`. Když je funkčnost novější → vypíše měkkou připomínku, ať spustíš tenhle skill.
+
+- **Self-resolving:** po revizi touchni `.reviewed` → marker je nejnovější → ticho.
+- **Záměrně NEhlídá `src/`** (to dělá `denik-reminder`) ani celé `docs/` (audit dokumenty se mění furt → alarm fatigue).
+- **Limit:** nechytí pojem, co padl jen v chatu a ještě není v docs — to zůstává na auto-detekci výše a na „přidej do slovníčku X".
 
 ## Kategorie (rozvržení)
 
