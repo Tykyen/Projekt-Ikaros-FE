@@ -30,6 +30,23 @@ const PRINT_DOC_CSS = `
   .print-hide, [data-print-hide], button { display: none !important; }
   .print-month { break-after: page; }
   .print-month:last-child { break-after: auto; }
+  /* Styly appky nesou SPA layout (100vh výšky, overflow:hidden, sticky) —
+     v tisku rozhází stránkování (prázdné listy). V print je vyresetujeme,
+     ať obsah teče v normálním flow. */
+  @media print {
+    html, body {
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    body * {
+      overflow: visible !important;
+      max-height: none !important;
+      min-height: 0 !important;
+      position: static !important;
+    }
+  }
 `;
 
 /**
