@@ -64,10 +64,40 @@ blockquote {
   break-inside: avoid;
 }
 
-/* — Obrázky a figury: nelámat přes stránku — */
-img { max-width: 100% !important; height: auto !important; break-inside: avoid; }
+/* — Obrázky a figury: nelámat přes stránku, rozumný strop výšky —
+     portréty (vysoké) bez stropu zabraly celou stránku; max-height je drží na
+     ~polovině listu a poměr stran zachová (width:auto). Mapy/široké obrázky
+     omezuje max-width:100 %. */
+img {
+  max-width: 100% !important;
+  max-height: 12cm;
+  width: auto;
+  height: auto !important;
+  break-inside: avoid;
+}
 figure { margin: 0.8em 0; break-inside: avoid; }
 figcaption { font-size: 0.85rem; font-style: italic; margin-top: 0.3em; }
+
+/* — Definiční seznamy (profil postavy, atributy): „Label: hodnota" na řádku.
+     Bez CSS appky se `dt`/`dd` rozpadají pod sebe (label nad hodnotou). */
+dl { margin: 0.6em 0; }
+dl > div { display: flex; gap: 0.5rem; align-items: baseline; margin: 0.18rem 0; break-inside: avoid; }
+dt { font-weight: 600; }
+dt::after { content: ':'; }
+dd { margin: 0; }
+
+/* — Tiskový nadpis sekce: collapsible header je <button> (skrytý v tisku),
+     tohle ho nahrazuje jako čitelný nadpis (viz InventoryTab printMode). */
+.print-section-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.15rem;
+  margin: 0.9em 0 0.3em;
+  break-after: avoid;
+}
+.print-section-meta { font-size: 0.85rem; font-weight: 400; }
+
+/* — Řádek s hodnotou vpravo (položka výbavy: název ⟷ ×N) — */
+.print-row { display: flex; justify-content: space-between; gap: 1rem; }
 
 /* — Tabulky — */
 table { border-collapse: collapse; width: 100%; margin: 0.6em 0; break-inside: avoid; }

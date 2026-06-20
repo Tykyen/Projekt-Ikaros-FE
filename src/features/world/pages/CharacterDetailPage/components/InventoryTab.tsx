@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { Spinner } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { usePrintMode } from '@/features/world/export/print';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useCharacterInventory } from '../../api/useCharacterSubdocs';
 import { useUpdateCharacterInventory } from '../../api/useCharacterMutations';
@@ -87,7 +88,9 @@ function InventoryAside({
     0,
   );
   return (
-    <aside className={s.invAside}>
+    // V tisku skryté — portrét i jméno už nese hero PostavaLayoutu (jinak by
+    // aside vytiskl skoro prázdnou stránku navíc).
+    <aside className={`${s.invAside} print-hide`}>
       {page.imageUrl && (
         <div className={s.asidePortraitWrap}>
           <img
@@ -126,6 +129,9 @@ function CollapsibleSection({
 }) {
   // Matrix-style: default collapsed, klikem se otevře.
   const [collapsed, setCollapsed] = useState(true);
+  // Tisk rozbalí všechny sekce (jinak by obsah nebyl v DOM → nevytiskl se).
+  const printMode = usePrintMode();
+  const showBody = printMode || !collapsed;
   const totalQty =
     section.items?.reduce((c, i) => c + (i.quantity ?? 1), 0) ?? 0;
 
@@ -152,7 +158,16 @@ function CollapsibleSection({
         <span className={s.invItemCount}>{totalQty} položek</span>
       </button>
 
-      {!collapsed && (
+      {/* Header je <button> → v tisku se skryje. Nadpis sekce proto duplikujeme
+          jako tiskový text (jen v printMode). */}
+      {printMode && (
+        <h3 className="print-section-title">
+          {section.title || 'Bez názvu'}{' '}
+          <span className="print-section-meta">— {totalQty} položek</span>
+        </h3>
+      )}
+
+      {showBody && (
         <div className={s.invSectionBody}>
           {section.content?.trim() && (
             <div className={s.invSectionContent}>
@@ -164,7 +179,7 @@ function CollapsibleSection({
           ) : (
             <ul className={s.itemList}>
               {section.items.map((item) => (
-                <li key={item.id} className={s.itemRow}>
+                <li key={item.id} className={`${s.itemRow} print-row`}>
                   <span className={s.itemText}>{item.text}</span>
                   <span className={s.itemRight}>
                     {item.note && (
@@ -206,6 +221,8 @@ function CollapsibleSection({
 
 function CollapsibleNotes({ notes }: { notes: string }) {
   const [collapsed, setCollapsed] = useState(true);
+  const printMode = usePrintMode();
+  const showBody = printMode || !collapsed;
   return (
     <div className={`${s.notesCard} ${collapsed ? s.notesCollapsed : ''}`}>
       <button
@@ -221,7 +238,8 @@ function CollapsibleNotes({ notes }: { notes: string }) {
           <ChevronUp size={16} aria-hidden />
         )}
       </button>
-      {!collapsed && (
+      {printMode && <h3 className="print-section-title">Rozepsané</h3>}
+      {showBody && (
         <div className={s.notesBody}>
           <RichTextEditor value={notes} readOnly />
         </div>

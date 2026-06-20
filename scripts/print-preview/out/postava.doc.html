@@ -1,4 +1,5 @@
-/*
+<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8">
+<title>Tisk — náhled</title><style>/*
  * 14.7 pilíř A — tiskové CSS pro samostatné tiskové okno (viz usePrint).
  *
  * Princip (po sérii selhání CH-001…008, viz docs/chybovy-denik/tisk.md):
@@ -124,3 +125,85 @@ hr { border: none; border-top: 1px solid #bbb; margin: 1em 0; }
   gap: 0.5rem 1rem;
 }
 .print-cols > * { break-inside: avoid; }
+</style></head>
+<body><!-- Fixture: innerHTML scope postavy (PostavaLayout > div[data-print-scope] v
+     režimu „Tisk všech záložek"). Reprezentuje stav PO opravách:
+     hero portrét (velký → strop max-height), profil <dl> (label: hodnota),
+     výbava rozbalená s tiskovým nadpisem `.print-section-title`. -->
+
+<!-- Hero -->
+<div class="_heroRow_a1">
+  <!-- velký portrét: bez stropu zabral celou stránku -->
+  <img class="_avatar_a2" alt="Zara Villiam"
+    src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='900'%3E%3Crect width='600' height='900' fill='%232a2a33'/%3E%3Ccircle cx='300' cy='330' r='150' fill='%23c98a6a'/%3E%3Crect x='150' y='520' width='300' height='380' rx='60' fill='%23111'/%3E%3C/svg%3E" />
+  <div class="_identity_a3">
+    <span class="_typeBadge_a4">Postava hráče</span>
+    <h1 class="_title_a5">Zara Villiam</h1>
+    <p class="_owner_a6">Hraje: <span>Zara</span></p>
+  </div>
+  <div class="_heroActions_a7 print-hide">
+    <a href="#">Upravit Bio</a>
+  </div>
+</div>
+
+<!-- print-hide toolbar -->
+<div class="print-hide" style="display:flex;justify-content:flex-end">
+  <button type="button">Tisk všech záložek</button>
+</div>
+
+<!-- Bio / profil (definiční seznam) -->
+<div class="_tabContent_b1">
+  <section class="_bioSection_b2">
+    <dl class="_blocks_b3">
+      <div class="_blockRow_b4"><dt>Jméno</dt><dd>Zara Villiam</dd></div>
+      <div class="_blockRow_b4"><dt>Národnost</dt><dd>Francie</dd></div>
+      <div class="_blockRow_b4"><dt>Věk</dt><dd>nar. 2008</dd></div>
+      <div class="_blockRow_b4"><dt>Povolání</dt><dd>Podnikatelka</dd></div>
+      <div class="_blockRow_b4"><dt>Magický gen</dt><dd>Ano</dd></div>
+    </dl>
+    <div class="_proseWrap_b5">
+      <p>Zara přišla do města za obchodem a zůstala kvůli dluhu, který nikdy
+         neuzavřela. Pod maskou podnikatelky vede tichou síť informátorů.</p>
+    </div>
+  </section>
+</div>
+
+<!-- Výbava: rozbalená v tisku, header-button skryt, nahrazen tiskovým nadpisem -->
+<div class="_invShell_c1">
+  <div class="_invMain_c2">
+    <div class="_invSectionCard_c3">
+      <button type="button" class="_invSectionHeader_c4">
+        <span>▾ U sebe</span><span>5 položek</span>
+      </button>
+      <h3 class="print-section-title">U sebe <span class="print-section-meta">— 5 položek</span></h3>
+      <div class="_invSectionBody_c5">
+        <ul class="_itemList_c6">
+          <li class="_itemRow_c7 print-row"><span>Revolver (rodinný)</span><span>×1</span></li>
+          <li class="_itemRow_c7 print-row"><span>Náboje .38</span><span>×24</span></li>
+          <li class="_itemRow_c7 print-row"><span>Šifrovaný telefon</span><span>×1</span></li>
+          <li class="_itemRow_c7 print-row"><span>Svazek klíčů</span><span>×1</span></li>
+          <li class="_itemRow_c7 print-row"><span>Hotovost</span><span>×1</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="_invSectionCard_c3">
+      <button type="button" class="_invSectionHeader_c4">
+        <span>▾ Úkryt</span><span>8 položek</span>
+      </button>
+      <h3 class="print-section-title">Úkryt <span class="print-section-meta">— 8 položek</span></h3>
+      <div class="_invSectionBody_c5">
+        <ul class="_itemList_c6">
+          <li class="_itemRow_c7 print-row"><span>Záložní pas</span><span>×3</span></li>
+          <li class="_itemRow_c7 print-row"><span>Zlaté mince</span><span>×40</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="_invAside_c8 print-hide">
+    <img class="_asidePortrait_c9" alt="Zara"
+      src="data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width='200' height='260'%3E%3Crect width='200' height='260' fill='%23333'/%3E%3C/svg%3E" />
+    <h2>Zara Villiam</h2>
+    <div>Osobní výbava</div>
+  </aside>
+</div>
+</body></html>
