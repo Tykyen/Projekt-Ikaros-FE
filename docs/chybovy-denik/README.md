@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-012.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-013.**
 
 ## Jak je deník členěný
 
@@ -36,4 +36,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](tisk.md#-řešení--tiskový-režim-zbývajících-11-diary-sheetů-replikace-vzoru--2026-06-20) | tisk | 11 diary sheetů přes 4 paralelní agenty (PrintView dle vzoru); ověřeno build+133 testů; vizuál per-sheet čeká reálný test | — |
 | [✅ ŘEŠENÍ](audit.md#-řešení--plný-audit-run-2026-06-20-1621-16-stylů--103-oblastí--6-oprav--2026-06-20) | audit | plný audit fan-out 103 oblastí + 6 bezpečných oprav; **verifikace nálezu čtením chytila false-positive** (banUser revokuje tokeny); agentní TL;DR = hypotéza, ne fakt | — |
 | [CH-011](audit.md#ch-011--gate-v-service-volané-i-interně--403-regrese-chat-kanálů--2026-06-20) | audit/BE | gate v `getDirectory()` (volané i interně z chat.service) → 403 regrese chat kanálů; před guardem do service zgrepuj VŠECHNY konzumenty | bisekce git-stash+e2e, „nevolaná metoda" mýtus |
-| [✅ ŘEŠENÍ](fe.md#-řešení--první-3d-animace-hodu-kostkou-na-taktické-mapě-fix8--2026-06-20) | fe | první 3D animace kostky chyběla (číslo ano, animace ne); kořen = warmup ghost se přeskočil, když hráč hodil dřív než dojel init → fix8 ghost vždy první + fronta reálného hodu | série kostky fix4/5/7 + ~13 commitů |
+| [⚠️ POKUS](fe.md#️-pokus-nezabral--fix8-první-3d-animace-hodu-kostkou-na-taktické-mapě--2026-06-20) | fe | fix8 (ghost vždy první + fronta) **NEZABRAL** — timing race nebyl kořen; 1. 3D animace dál chybí, 2.+ jede | série kostky fix4/5/7 + ~13 commitů |
+| [CH-012](fe.md#ch-012--předčasné--řešení--skrytý-ghost-nezahřívá-jako-reálný-hod--2026-06-20) | fe/proces | předčasné `✅ ŘEŠENÍ` (build≠ověření WebGL/timing); skrytý ghost nezahřívá jako reálný hod — nejspíš studený 1. `updateConfig` (skin), ne `roll()` | zkouším další variaci warmupu bez dat z konzole |
