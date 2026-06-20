@@ -47,11 +47,14 @@ export function usePrint(): {
       const cleanup = () => {
         setPrintMode(false);
         document.documentElement.removeAttribute(PRINTING_ATTR);
-        printContainer?.remove();
+        // [PRINT-DEBUG] dočasně NEodstraňujeme klon, ať ho jde prohlédnout.
+        // printContainer?.remove();
         printContainer = null;
         window.removeEventListener('afterprint', cleanup);
         window.clearTimeout(fallback);
       };
+      // [PRINT-DEBUG]
+      console.log('[PRINT] triggerPrint target=', target, 'scope=', target?.getAttribute?.('data-print-scope'));
       window.addEventListener('afterprint', cleanup);
       fallback = window.setTimeout(cleanup, 120_000);
 
@@ -95,6 +98,21 @@ export function usePrint(): {
 
             printContainer.appendChild(clone);
             document.body.appendChild(printContainer);
+            // [PRINT-DEBUG]
+            (window as unknown as { __pc?: HTMLElement }).__pc = printContainer;
+            console.log(
+              '[PRINT] klon childCount=',
+              clone.childElementCount,
+              'textLen=',
+              clone.textContent?.length ?? 0,
+              'inBody=',
+              document.body.contains(printContainer),
+              'rootCount=',
+              document.querySelectorAll('[data-print-root]').length,
+            );
+          } else {
+            // [PRINT-DEBUG]
+            console.warn('[PRINT] target je NULL — closest nenašel data-print-scope');
           }
           window.print();
         }),
