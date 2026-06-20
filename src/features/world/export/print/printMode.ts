@@ -13,24 +13,38 @@ export function usePrintMode(): boolean {
   return useAtomValue(printModeAtom);
 }
 
-const PRINT_ROOT_ATTR = 'data-print-root';
-const PRINTING_ATTR = 'data-printing';
+/** Minimální čitelné tiskové styly pro samostatné tiskové okno. */
+const PRINT_DOC_CSS = `
+  * { color: #000 !important; background: transparent !important;
+      box-shadow: none !important; text-shadow: none !important; }
+  body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.55;
+    color: #000; background: #fff; margin: 0 auto; padding: 1.5rem; max-width: 820px; }
+  img { max-width: 100% !important; height: auto !important; break-inside: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; line-height: 1.2; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: 0.15rem 0; }
+  a { color: #000; text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
+  td, th { border: 1px solid #999; padding: 4px 8px; text-align: left; }
+  hr { border: none; border-top: 1px solid #ccc; margin: 0.8rem 0; }
+  .print-hide, [data-print-hide], button { display: none !important; }
+  .print-month { break-after: page; }
+  .print-month:last-child { break-after: auto; }
+`;
 
 /**
- * Spustí `window.print()` nad vybraným podstromem.
+ * Spustí tisk vybraného podstromu.
  *
- * Mechanismus (14.7b-fix): tiskne se **klon** cíle vložený přímo do `<body>`
- * jako `[data-print-root]`. `print.css` skryje ostatní děti `<body>` →
- * vytiskne se jen klon, a to v NORMÁLNÍM flow (obsah se láme přes stránky;
- * dřívější `position:absolute` ořezával dlouhý obsah na jednu stránku).
+ * Mechanismus (14.7b-fix2): tiskne se v **samostatném okně** (`window.open`).
+ * Obsah cíle se naklonuje (s rozbaleným stavem), canvas se nahradí snapshotem,
+ * a vloží do nového dokumentu s vlastním tiskovým CSS. Čistý kontext bez
+ * dědění theme/visibility z hlavní appky → spolehlivé (klon do <body> dědil
+ * skrytí a tiskl prázdno).
  *
  * - Zapne `printMode` → komponenty v ORIGINÁLU rozbalí skrytý obsah; po 2
- *   snímcích (re-render) se teprve klonuje rozbalený stav.
- * - Lazy obrázky se vynutí `eager` a počká se na jejich dekódování.
- * - `<canvas>` (grafy) se v klonu nahradí `<img>` snapshotem (`toDataURL`).
- * - Po `afterprint` se klon odstraní; fallback timeout pro jistotu.
- *
- * Dialog prohlížeče nabízí „Tisk" i „Uložit jako PDF" → jedna cesta.
+ *   snímcích (re-render) se teprve klonuje a otevírá okno.
+ * - Lazy obrázky se odberou `loading` → v novém okně se načtou.
+ * - Dialog prohlížeče nabízí „Tisk" i „Uložit jako PDF".
  */
 export function usePrint(): {
   triggerPrint: (target: HTMLElement | null) => void;
@@ -39,47 +53,22 @@ export function usePrint(): {
 
   const triggerPrint = useCallback(
     (target: HTMLElement | null) => {
-      document.documentElement.setAttribute(PRINTING_ATTR, '');
       setPrintMode(true);
 
-      let printContainer: HTMLElement | null = null;
-      let fallback = 0;
-      const cleanup = () => {
-        setPrintMode(false);
-        document.documentElement.removeAttribute(PRINTING_ATTR);
-        // [PRINT-DEBUG] dočasně NEodstraňujeme klon, ať ho jde prohlédnout.
-        // printContainer?.remove();
-        printContainer = null;
-        window.removeEventListener('afterprint', cleanup);
-        window.clearTimeout(fallback);
-      };
-      // [PRINT-DEBUG]
-      console.log('[PRINT] triggerPrint target=', target, 'scope=', target?.getAttribute?.('data-print-scope'));
-      window.addEventListener('afterprint', cleanup);
-      fallback = window.setTimeout(cleanup, 120_000);
-
-      // 2× rAF — počkat na re-render rozbaleného obsahu, pak připravit klon.
       requestAnimationFrame(() =>
-        requestAnimationFrame(async () => {
-          if (target) {
-            // Lazy obrázky se v tisku jinak nenačtou (hero Lokace aj.) →
-            // vynutit eager a počkat na dekódování.
-            const imgs = Array.from(target.querySelectorAll('img'));
-            for (const img of imgs) {
-              if (img.loading === 'lazy') img.loading = 'eager';
-            }
-            await Promise.all(
-              imgs.map((img) =>
-                img.complete ? null : img.decode().catch(() => undefined),
-              ),
-            );
+        requestAnimationFrame(() => {
+          try {
+            if (!target) return;
 
-            // Klon cíle do samostatného kořene v <body> (normální flow).
-            printContainer = document.createElement('div');
-            printContainer.setAttribute(PRINT_ROOT_ATTR, '');
-            printContainer.style.color = 'black';
-            printContainer.style.background = 'white';
             const clone = target.cloneNode(true) as HTMLElement;
+            // Tiskem skrývané prvky a interaktivní tlačítka pryč.
+            clone
+              .querySelectorAll('.print-hide, [data-print-hide]')
+              .forEach((el) => el.remove());
+            // Lazy obrázky → ať se v novém okně načtou.
+            clone
+              .querySelectorAll('img')
+              .forEach((img) => img.removeAttribute('loading'));
 
             // Canvas (pavučina/hvězdná) klon nezachytí jako bitmapu →
             // nahradit <img> snapshotem z originálu (WebGL prázdný → necháme).
@@ -98,25 +87,29 @@ export function usePrint(): {
               }
             });
 
-            printContainer.appendChild(clone);
-            document.body.appendChild(printContainer);
-            // [PRINT-DEBUG]
-            (window as unknown as { __pc?: HTMLElement }).__pc = printContainer;
-            console.log(
-              '[PRINT] klon childCount=',
-              clone.childElementCount,
-              'textLen=',
-              clone.textContent?.length ?? 0,
-              'inBody=',
-              document.body.contains(printContainer),
-              'rootCount=',
-              document.querySelectorAll('[data-print-root]').length,
+            const win = window.open('', '_blank', 'width=900,height=1000');
+            if (!win) return; // popup blokován
+
+            win.document.write(
+              `<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8">` +
+                `<title>Tisk — Projekt Ikaros</title><style>${PRINT_DOC_CSS}</style>` +
+                `</head><body>${clone.innerHTML}</body></html>`,
             );
-          } else {
-            // [PRINT-DEBUG]
-            console.warn('[PRINT] target je NULL — closest nenašel data-print-scope');
+            win.document.close();
+
+            const doPrint = () => {
+              win.focus();
+              win.print();
+            };
+            // Počkat na načtení (obrázky), pak tisk.
+            if (win.document.readyState === 'complete') {
+              window.setTimeout(doPrint, 300);
+            } else {
+              win.onload = () => window.setTimeout(doPrint, 150);
+            }
+          } finally {
+            setPrintMode(false);
           }
-          window.print();
         }),
       );
     },

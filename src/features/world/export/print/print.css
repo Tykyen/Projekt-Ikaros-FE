@@ -1,65 +1,12 @@
 /*
- * 14.7a — Tiskový stylesheet (pilíř A spec-14.7). Globální a theme-neutrální
- * (tisk není skin → černá na bílé, nezávisle na motivu světa).
- *
- * Mechanismus (14.7b-fix): `usePrint()` vloží KLON tisknutého podstromu přímo
- * do <body> jako [data-print-root] a nastaví html[data-printing]. Ostatní děti
- * <body> (#root) skryjeme přes display:none → tiskne se jen klon, a to
- * v NORMÁLNÍM flow (obsah se láme přes stránky). `print-color-adjust:exact`
- * vynutí obrázky/pozadí, které by prohlížeč v tisku jinak zahodil.
+ * 14.7a — Tiskové prvky na hlavní stránce. Samotný tisk obsahu jde od
+ * 14.7b-fix2 přes samostatné okno (viz usePrint v printMode.ts) s vlastním
+ * tiskovým CSS. Zde už jen skrýváme tisková tlačítka, kdyby uživatel použil
+ * nativní Ctrl+P na hlavní stránce.
  */
 @media print {
-  /* Tlačítka tisku a floating UI se nikdy netisknou. */
   [data-print-hide],
   .print-hide {
     display: none !important;
-  }
-
-  /* Izolace — zobraz jen tiskový kořen, zbytek <body> skryj. */
-  html[data-printing] body > *:not([data-print-root]) {
-    display: none !important;
-  }
-
-  html[data-printing] [data-print-root] {
-    margin: 0;
-    padding: 1rem;
-    background: white !important;
-    color: black !important;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-  }
-
-  /* Theme-neutrální obsah: černá na bílé, bez stínů; obrázky na pozadí vynutit. */
-  html[data-printing] [data-print-root] * {
-    color: black !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-  }
-
-  html[data-printing] [data-print-root] a {
-    color: black !important;
-    text-decoration: underline;
-  }
-
-  /* Obrázky nepřetečou stránku a nelámou se uprostřed. */
-  html[data-printing] [data-print-root] img {
-    max-width: 100% !important;
-    break-inside: avoid;
-  }
-
-  /* Nadpisy nezůstávají osamělé na konci stránky. */
-  html[data-printing] [data-print-root] :is(h1, h2, h3, h4) {
-    break-after: avoid;
-  }
-
-  /* 14.7b — kalendář: každý měsíc na vlastní stránku (poslední bez zlomu). */
-  html[data-printing] [data-print-root] .print-month {
-    break-after: page;
-  }
-  html[data-printing] [data-print-root] .print-month:last-child {
-    break-after: auto;
   }
 }
