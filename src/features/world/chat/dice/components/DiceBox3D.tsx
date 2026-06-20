@@ -54,6 +54,12 @@ interface DiceBox3DProps {
   onComplete: () => void;
   /** Init/roll selhal (např. WebGL) → overlay přepne na 2D fallback. */
   onError: () => void;
+  /**
+   * 6.3-fix8 — REÁLNÝ (ne-ghost) hod právě začal kutálení. Overlay od tohoto
+   * okamžiku počítá svůj animační strop, takže pomalý warmup/ghost před prvním
+   * hodem neukrojí z animačního okna.
+   */
+  onRollStart?: () => void;
 }
 
 type DiceBoxInstance = InstanceType<typeof DiceBox>;
@@ -69,6 +75,7 @@ export default function DiceBox3D({
   warmup,
   onComplete,
   onError,
+  onRollStart,
 }: DiceBox3DProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<DiceBoxInstance | null>(null);
@@ -79,13 +86,21 @@ export default function DiceBox3D({
   // Vždy nejnovější hodnoty (rollNow čte z refs, ne ze zastaralého closure).
   const latestRef = useRef({ notation, active, theme });
   latestRef.current = { notation, active, theme };
-  const cbRef = useRef({ onComplete, onError });
-  cbRef.current = { onComplete, onError };
-  // 6.3-fix5 — ghost-warmup stav. `isGhost` = právě běžící roll je neviditelný
-  // ghost (onRollComplete ho zahodí, nepropaguje ven). `ghostDone` = ghost už
-  // proběhl (max jednou na životnost enginu).
+  const cbRef = useRef({ onComplete, onError, onRollStart });
+  cbRef.current = { onComplete, onError, onRollStart };
+  // Ghost-warmup stav (6.3-fix5 + fix8):
+  //   isGhost      = právě běžící roll je neviditelný ghost (onRollComplete ho
+  //                  zahodí, nepropaguje ven).
+  //   ghostStarted = ghost už byl odpálen (max jednou na životnost enginu).
+  //   ghostWarm    = ghost DOběhl → engine je zahřátý, reálné hody smí ven.
+  //   pendingNonce = reálný hod, který dorazil DŘÍV, než ghost doběhl → vystřelí
+  //                  se z onRollComplete ghostu. Bez fronty by tenhle hod byl ta
+  //                  flaky první roll() knihovny a animace by se ztratila (= kořen
+  //                  „první 3D animace chybí"). 0 = nic nečeká.
   const isGhostRef = useRef(false);
-  const ghostDoneRef = useRef(false);
+  const ghostStartedRef = useRef(false);
+  const ghostWarmRef = useRef(false);
+  const pendingNonceRef = useRef(0);
 
   /** Spustí hod z aktuálního stavu — voláno po `ready` i při změně `nonce`. */
   const rollNow = useCallback(() => {
@@ -113,6 +128,7 @@ export default function DiceBox3D({
       const matId = theme.colorset.name;
       const fire = () => {
         box.clearDice();
+        cbRef.current.onRollStart?.();
         void box.roll(notation).catch(() => cbRef.current.onError());
       };
       if (matId !== lastMaterialRef.current) {
@@ -134,15 +150,30 @@ export default function DiceBox3D({
     }
   }, []);
 
+  /** 6.3-fix8 — vystřel reálný hod, který čekal za ghostem (0 = nic nečeká). */
+  const flushPendingRoll = useCallback(() => {
+    if (pendingNonceRef.current > 0) {
+      pendingNonceRef.current = 0;
+      rollNow();
+    }
+  }, [rollNow]);
+
   /** 6.3-fix5 — neviditelný ghost hod (spustí se max jednou po `ready` ve
    *  warmup módu). Host je v té chvíli skrytý (`active=false` → opacity 0),
    *  takže kostka se protočí mimo zrak. */
   const runGhostRoll = useCallback(() => {
     const box = boxRef.current;
     const host = hostRef.current;
-    if (!box || ghostDoneRef.current) return;
-    ghostDoneRef.current = true;
+    if (!box || ghostStartedRef.current) return;
+    ghostStartedRef.current = true;
     isGhostRef.current = true;
+    // 6.3-fix8 — když ghost selže (reject/throw), engine prohlásíme za „zahřátý"
+    // a hned vystřelíme čekající reálný hod, ať neuvázne ve frontě.
+    const onGhostFail = (): void => {
+      isGhostRef.current = false;
+      ghostWarmRef.current = true;
+      flushPendingRoll();
+    };
     try {
       if (host && host.clientWidth) {
         box.setDimensions({
@@ -151,13 +182,11 @@ export default function DiceBox3D({
         } as Parameters<DiceBoxInstance['setDimensions']>[0]);
       }
       box.clearDice();
-      void box.roll(GHOST_NOTATION).catch(() => {
-        isGhostRef.current = false;
-      });
+      void box.roll(GHOST_NOTATION).catch(onGhostFail);
     } catch {
-      isGhostRef.current = false;
+      onGhostFail();
     }
-  }, []);
+  }, [flushPendingRoll]);
 
   // Init jednou.
   useEffect(() => {
@@ -187,11 +216,15 @@ export default function DiceBox3D({
         // ven (žádný readout/onDone). Reálný hod propaguje normálně.
         if (isGhostRef.current) {
           isGhostRef.current = false;
+          ghostWarmRef.current = true; // engine zahřátý → reálné hody smí ven
           try {
             box.clearDice();
           } catch {
             /* ignore */
           }
+          // 6.3-fix8 — reálný hod čekal za ghostem → teď ho vystřel na zahřátém
+          // enginu (latestRef má aktuální notaci/aktivitu/téma).
+          flushPendingRoll();
           return;
         }
         cbRef.current.onComplete();
@@ -240,11 +273,14 @@ export default function DiceBox3D({
   // Hod: po dokončení initu (ready) i při každé změně nonce.
   useEffect(() => {
     if (!ready) return;
-    // 6.3-fix5 — engine je ready, ale ještě neběží reálný hod (active=false)
-    // → protoč jeden neviditelný ghost, ať flaky-first padne na něj, ne na
-    // hráčův první hod. `active` čteme z refu (mimo deps), ať ghost nestartuje
-    // omylem při reálném hodu.
-    if (warmup && !latestRef.current.active && !ghostDoneRef.current) {
+    // 6.3-fix8 — ghost-warmup spustíme VŽDY hned po `ready` (ODPOJENO od `active`).
+    // Knihovní flaky první roll() tak vždy padne na neviditelný ghost. Pokud už
+    // čeká reálný hod (hráč hodil DŘÍV, než engine dojel init), zařadíme jeho
+    // nonce do fronty — vystřelí se z onRollComplete ghostu. První reálný hod tak
+    // NIKDY není ten studený. (Předchozí fix5 ghost přeskočil, když hráč hodil
+    // před `ready`, protože `active` už byl true → kořen „první animace chybí".)
+    if (warmup && !ghostStartedRef.current) {
+      if (nonce > 0) pendingNonceRef.current = nonce;
       runGhostRoll();
       return;
     }
@@ -253,6 +289,11 @@ export default function DiceBox3D({
     // v mezi-renderu (`active` ještě true, notation default `1d6@1`) hodil
     // přízračnou kostku „1". Reálný hod má vždy nonce = timestamp > 0.
     if (nonce === 0) return;
+    // Ghost ještě běží → reálný hod počká za ním (vystřelí ho onRollComplete).
+    if (warmup && !ghostWarmRef.current) {
+      pendingNonceRef.current = nonce;
+      return;
+    }
     rollNow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, nonce]);

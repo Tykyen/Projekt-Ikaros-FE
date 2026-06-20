@@ -51,6 +51,15 @@ type Phase = 'idle' | 'rolling' | 'result';
 const RESULT_HOLD_MS = 2400;
 /** Pauza fallbacku (fate / no-WebGL) než ukáže výsledek (ms). */
 const FALLBACK_DELAY_MS = 650;
+/** 3D animační strop, počítaný OD startu reálného hodu (onRollStart). */
+const ROLL_CAP_MS = 6000;
+/**
+ * 6.3-fix8 — pojistka, dokud reálný 3D hod vůbec nezačne (warmup ghost + pomalý
+ * init). Musí pohodlně překlenout init+ghost, ať se readout nezobrazí dřív, než
+ * se kostka rozkutálí. Hází jen když engine selže úplně (jinak ho nahradí
+ * ROLL_CAP_MS od onRollStart).
+ */
+const COLD_START_CAP_MS = 12000;
 
 export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) {
   const [webgl] = useState(isWebGLAvailable);
@@ -58,6 +67,10 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
   // Jednou nasazený 3D host žije dál (lazy instance se nereinicializuje).
   const [mount3d, setMount3d] = useState(false);
   const [use3dThisRoll, setUse3dThisRoll] = useState(false);
+  // 6.3-fix8 — kdy REÁLNÝ 3D hod opravdu začal kutálet (0 = ještě ne). Od tohoto
+  // okamžiku běží ROLL_CAP_MS; do té doby drží COLD_START_CAP_MS (warmup/ghost).
+  const [realRollStartedAt, setRealRollStartedAt] = useState(0);
+  const handleRollStart = useCallback(() => setRealRollStartedAt(Date.now()), []);
 
   // Warmup: předmountuj engine při prvním renderu (active=false → jen init,
   // žádný hod). První reálný hod pak trefí už nahřátý engine → zobrazí se napoprvé.
@@ -76,6 +89,7 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
     }
     if (can3d) setMount3d(true);
     setUse3dThisRoll(can3d);
+    setRealRollStartedAt(0); // DiceBox3D ohlásí start reálného hodu přes onRollStart
     setPhase('rolling');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roll?.timestamp]);
@@ -85,10 +99,17 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
   // pojistka. Bez 3D (fate fallback) jen krátká pauza pro efekt.
   useEffect(() => {
     if (phase !== 'rolling') return;
-    const ms = use3dThisRoll ? 6000 : FALLBACK_DELAY_MS;
+    // 6.3-fix8 — u 3D počítáme strop od chvíle, kdy REÁLNÝ hod opravdu začal
+    // (po případném warmup ghostu), ne od kliknutí. Pomalý init/ghost jinak
+    // ukrojí z animačního okna a kostka by „zmizela" pod brzkým readoutem.
+    const ms = use3dThisRoll
+      ? realRollStartedAt
+        ? ROLL_CAP_MS
+        : COLD_START_CAP_MS
+      : FALLBACK_DELAY_MS;
     const t = window.setTimeout(() => setPhase('result'), ms);
     return () => window.clearTimeout(t);
-  }, [phase, use3dThisRoll]);
+  }, [phase, use3dThisRoll, realRollStartedAt]);
 
   // Po zobrazení výsledku držet a dokončit.
   useEffect(() => {
@@ -112,6 +133,7 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
             nonce={roll?.timestamp ?? 0}
             active={use3dThisRoll && phase !== 'idle'}
             warmup={warmup}
+            onRollStart={handleRollStart}
             onComplete={handle3dComplete}
             onError={handle3dError}
           />
