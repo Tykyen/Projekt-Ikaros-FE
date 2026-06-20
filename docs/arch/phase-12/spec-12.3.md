@@ -39,7 +39,8 @@ Vedle Pravidel ukazuje „Informace" i další dvě **referenční wiki stránky
 
 ### R2 — Přehled / Novinky ✅ (potvrzeno 2026-06-03)
 - **Přehled** dostupný klikem na **název světa** (už funguje v `WorldLayout`).
-- **Novinky a Akce jsou na úvodní stránce** (Přehled) → odebrání z „Informace" je OK, přístup se neztrácí. Žádný samostatný odkaz netřeba.
+- **Novinky a Akce jsou na úvodní stránce** (Přehled) → odebrání z „Informace" je OK, přístup se neztrácí.
+- **Aktualizace 2026-06-20 (plný audit):** „Akce" dostaly **navíc** vlastní položku v menu „Svět" (`id: 'akce'`, skrývatelná, `buildWorldNav`) kvůli objevitelnosti — dashboard widget se snadno přehlédl. Akce zůstávají i na úvodní stránce; položka je `memberOnly(Ctenar+)`, bez role-gate. „Novinky" zůstávají bez samostatného odkazu (jen úvodní strana).
 
 ### R3 — Stránka skupiny = autogenerovaná
 Routa `/svet/:worldSlug/skupina/:groupKey`. Obsah = **automaticky generovaný seznam členů** skupiny (žádný ruční wiki text v MVP). Vizuál ve stylu wiki/člen-karet (reuse `WorldMembersPage` member karty). `groupKey` = URL-encoded název skupiny; „Nezařazení" = rezervovaný klíč `__none__`.

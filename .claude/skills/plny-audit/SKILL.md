@@ -1,210 +1,227 @@
 ---
 name: plny-audit
-description: Orchestruje všech 16 auditních stylů projektu proti AKTUÁLNÍMU kódu BE+FE. Audity 1-15 znovu DETEKUJÍ (8 deterministických scannerů + paralelní read-only sub-agenti) na plnou hloubku z plánů, 16. (anti-regression) je závěrečná brána. Navíc census hlídá, jestli kód PŘERostl rozsah auditů (coverage drift) a kde kontrolu rozšířit. Spusť na vyžádání ("plný audit", "/plny-audit") pro kompletní revizi nebo po velké změně. NEopravuje bez souhlasu.
+description: Závěrečná HLOUBKOVÁ brána kvality — projede každou oblast (00→X) všech 16 auditních stylů proti AKTUÁLNÍMU kódu BE+FE do PLNÉ cílové hloubky (statika L1-L3 + proof-vrstvy +db/+e2e/+teeth/+formal). Nejdřív self-maintenance (ověří/doplní, že plány sedí na HEAD), pak vyčerpávající průchod píď po pídi s maximálním fan-outem agentů (1 agent = 1 oblast), pak proof-vrstvy, brána a report. Běh klidně dny. Resumable. Spustit na konci 14.9 a na konci Etapy II, kdy je cílem doložit, že nezůstala ani nejmenší chyba. NEopravuje bez souhlasu.
 ---
 
-# Skill: plný audit
+# Skill: plný audit (hloubková závěrečná brána)
 
-Orchestrátor, **ne 17. audit**. Věrně přehraje 16 existujících auditních metodik proti živému kódu,
-paralelizuje detekci přes sub-agenty, hlídá růst kódu vůči rozsahu auditů, a nahlásí nálezy k opravě.
+**NE rychlý orchestrátor.** Tohle je **závěrečná hloubková brána** spouštěná v klíčových bodech
+. Cíl: projít **každý kousek** webu **píď po pídi, oblast po
+oblasti** přes všech 16 auditních stylů a doložit **maximální dosažitelnou jistotu, že nezůstala ani
+nejmenší chyba**. Hloubka před rychlostí — běh **klidně dny**. Rychlost se získává **paralelizací**
+(masivní fan-out agentů po oblastech), NE zkracováním hloubky.
+
+> Historie: dřív byl tento skill „rychlý orchestrátor L1-L2". To byla vada návrhu — 16 auditů bylo
+> stavěno jako **extrémně hloubkové** (dny běhu, záměr). Skill je teď přehrává v plné hloubce.
 
 ## Co dělá / NEdělá
 
 | Dělá | NEdělá |
 |---|---|
-| znovu **detekuje** všech 16 stylů proti aktuálnímu BE+FE | nevymýšlí nové osy/styly — přehrává existující |
-| čte hloubku/postup **live z plánů** (future-proof) | **nezmrazuje** metodiku do skillu |
-| **auto-discovery** auditů z `docs/*-plan/` ↔ `docs/*-audit.md` | nepřehlíží nové audity |
-| **census** = detekuje růst povrchu → kde rozšířit kontrolu | nepředstírá pokrytí, co neproběhlo |
-| hlasitě hlásí `⏭️ blokováno` u vrstev bez infry | tiše nezezelená |
+| projede **každou oblast 00→X** každého auditu do **plné cílové hloubky** | nestrop­uje na L1-L2 / nešidí hloubku kvůli času |
+| **self-maintenance**: ověří + doplní, že plány sedí na aktuální HEAD | nepouští audit proti zastaralému plánu (tichý drift) |
+| **maximální fan-out** agentů (1 agent = 1 oblast), ve vlnách | nehrne vše jedním sériovým průchodem |
+| **infra je default ON** (+db/+e2e/+teeth/+formal); chybí → hlasitě stojí | netváří se „hotovo", když proof-vrstva neproběhla |
+| **resumable** (per-oblast checkpoint) — dlouhý běh přežije přerušení | nezačíná po přerušení od nuly |
 | 16. (anti-regression) jako **závěrečná brána** | neopravuje automaticky / bez souhlasu |
 
 ## Argumenty
 
 | Arg | Význam |
 |---|---|
-| _(bez)_ | full-depth detekce dosažitelná bez infry (scannery + statické sweepy L1-L2) + census + brána |
-| `+db` | live DB scany (orphan-scan, integrity-scan, M-TYPE) → tier C/D na L4 |
-| `+e2e` | BE jest e2e (race-condition, seed-scenario) — ⚠️ seed-scenario chce replSet harness (viz Pasti) |
-| `+teeth` | Stryker mutace (L5-teeth) — desítky minut až hodiny |
-| `+formal` | TLA+ TLC model-check (L8) |
-| `diff <ref>` | jen audity dotčené git diffem proti `<ref>` (default `main`) |
-| `<a,b,...>` | jen vyjmenované audity (názvy plán-dirů bez `-plan`) |
-| `--update-baseline` | po běhu uloží aktuální census jako nový coverage baseline |
+| _(bez)_ | **plná hloubka, vše ON** — freshness + vyčerpávající průchod 00→X + všechny proof-vrstvy + brána |
+| `--resume` | pokračuj z checkpointů (přeskoč už hotové oblasti) |
+| `--audit <a,b,…>` | jen vyjmenované audity (názvy plán-dirů bez `-plan`), pořád plná hloubka |
+| `--area <NN>` | jen oblast(i) daného čísla (ladění jedné oblasti) |
+| `diff <ref>` | jen audity/oblasti dotčené git diffem proti `<ref>` (rychlý mezikrok, NE závěrečná brána) |
+| `--no-db` / `--no-e2e` / `--no-teeth` / `--no-formal` | **opt-OUT** proof-vrstvy (vědomě nižší hloubka — do reportu jako ⏭️) |
+| `--update-baseline` | po běhu ulož census jako nový coverage baseline |
 
-> Default schválen uživatelem: scannery + statické sweepy + census + META brána; `+db/+e2e/+teeth/+formal`
-> odemykají hloubkové vrstvy. Drahé proofs (teeth/formal) se mezi běhy nemění — default je **ověří přes
-> G-matici** (16. brána) a nabídne re-běh příznakem.
+> **Inverze proti staré verzi:** hloubka je **default**, infra se odpojuje opt-outem. Bez příznaku =
+> nejhlubší možný běh. Opt-out se v reportu objeví jako vědomá mezera, ne ticho.
 
 ---
 
-## Fáze 0 — Příprava
+## Fáze 0 — Příprava + infra (nic se nesmí tiše ošidit)
 
-1. **Git HEAD** obou repo (`git rev-parse HEAD` ve FE i BE) → do reportu (odlišení „co je nové").
-2. **Auto-discovery auditů:** vyjmenuj `docs/*-plan/` a spáruj s `docs/<name>-audit.md`. Každý pár =
-   jeden audit. Runner odvoď z mapy níže (z názvu nejde). Nový audit v repu → automaticky v běhu.
-3. **Rozsah** z argumentů (full / `diff` / výběr).
-4. **Infra** dle hloubky: `+db`/`+e2e` → ověř/nastartuj Mongo (BE `docker-compose` nebo
-   `MongoMemoryReplSet`); `+teeth` → `@stryker-mutator/core`; `+formal` → TLC. Chybí-li → vrstvu označ
-   `⏭️ blokováno` (NE skip bez záznamu).
-5. Založ `docs/full-audit/RUN-<YYYY-MM-DD-HHmm>/` (+ podsložku `scanners/`).
+1. **Git HEAD** obou repo (`git rev-parse HEAD` ve FE i BE) → do reportu.
+2. **Auto-discovery + manifest oblastí:** vyjmenuj `docs/*-plan/` ↔ `docs/<name>-audit.md`. Pro každý
+   audit naglobuj **oblasti**: `docs/<audit>-plan/[0-9][0-9]-*.md` (00, 01, … X) + README.
+   Výsledek = **manifest jednotek** `(audit, oblast)` — celý pracovní seznam (~150-200 jednotek).
+   Oblast uvedená v README, ale **bez souboru** → zaznamenej jako mezeru pro Fázi A (audituje se
+   z popisu v README).
+3. **Infra bring-up / verify (default ON):**
+   - **Mongo** (`+db`): nastartuj/ověř dev nebo staging Mongo (BE `docker-compose` nebo
+     `MongoMemoryReplSet`). **Produkční DB jen read-only a jen s EXPLICITNÍM souhlasem uživatele**
+     ([project_server_swap]). Chybí → vrstvu označ a **hlasitě stůj**, ne tichý L2.
+   - **Stryker** (`+teeth`): `@stryker-mutator/core` (BE i FE `stryker.conf.json`).
+   - **TLC** (`+formal`): `tla2tools.jar` + Java. (Pozn.: bývá v `c:/tmp/tla2tools.jar`.)
+   - **e2e** (`+e2e`): BE jest e2e harness (`MongoMemoryReplSet`).
+   - Cokoli chybí a není opt-outnuto → **STOP s instrukcí, jak odblokovat** (ne tiché snížení hloubky).
+4. **RUN složka:** `docs/full-audit/RUN-<YYYY-MM-DD-HHmm>/` + `scanners/` + **`checkpoints/`**
+   (per-jednotka `<audit>__<oblast>.md` → resumability) + `proof/` (výstupy proof-vrstev).
 
-### Mapa audit → runner (fallback k auto-discovery)
+### Mapa audit → scanner + proof-vrstvy (per oblast čti cílovou L z plánu)
 
-| Plán dir | Registr (prefix) | Runner | Repo | Hloubka navíc |
+| Plán dir | Registr (prefix) | Scanner (podpora Fáze A) | Repo | Proof-vrstvy (Fáze C) |
 |---|---|---|---|---|
-| `bug-plan` | `bug-audit.md` (`N-`) | `npm run audit:routes` | FE↔BE | — |
-| `role-plan` | `role-audit.md` (`R-`) | `npm run audit:routes` (sdílený) | FE↔BE | — |
-| `nav-plan` | `nav-audit.md` (`NAV-`) | `npm run audit:nav` | FE↔BE | — |
-| `ws-contract-plan` | `ws-audit.md` (`W-`) | `npm run audit:ws` | BE | — |
+| `bug-plan` | `bug-audit.md` (`N-`) | `npm run audit:routes` | FE↔BE | e2e |
+| `role-plan` | `role-audit.md` (`R-`) | `npm run audit:routes` | FE↔BE | e2e |
+| `nav-plan` | `nav-audit.md` (`NAV-`) | `npm run audit:nav` | FE↔BE | e2e/crawl |
+| `ws-contract-plan` | `ws-audit.md` (`W-`) | `npm run audit:ws` | BE | e2e |
 | `prod-config-plan` | `prod-config-audit.md` (`PC-`) | `npm run audit:config` | BE+FE | — |
-| `error-contract-plan` | `error-contract-audit.md` (`EC-`) | `npm run audit:errors` | FE+BE | e2e probe `+e2e` |
-| `log-hygiene-plan` | `log-hygiene-audit.md` (`LH-`) | `npm run audit:logs` | BE | runtime `+e2e` |
-| `form-schema-plan` | `form-schema-audit.md` (`F-`) | **SWEEP** (sub-agent) | FE↔BE | — |
-| `cache-plan` | `cache-audit.md` (`C-`) | **SWEEP** | FE | round-trip `+e2e` |
-| `upload-media-plan` | `upload-media-audit.md` (`UM-`) | **SWEEP** | BE | L5 `+e2e/+db` |
-| `state-consistency-plan` | `state-consistency-audit.md` (`S-`) | **SWEEP** | FE+BE | L8 `+formal` |
-| `cascade-delete-plan` | `cascade-delete-audit.md` (`CD-`) | **SWEEP** | BE | orphan-scan `+db` |
-| `db-integrity-plan` | `db-integrity-audit.md` (`DI-`) | **SWEEP** | BE | integrity-scan/M-TYPE `+db` |
-| `race-condition-plan` | `race-condition-audit.md` (`RC-`) | **BE jest e2e** `+e2e` | BE | — |
-| `seed-scenario-plan` | `seed-scenario-audit.md` (`SS-`) | **BE jest e2e** `+e2e` | BE | ⚠️ replSet bloker |
+| `error-contract-plan` | `error-contract-audit.md` (`EC-`) | `npm run audit:errors` | FE+BE | e2e probe |
+| `log-hygiene-plan` | `log-hygiene-audit.md` (`LH-`) | `npm run audit:logs` | BE | runtime e2e |
+| `form-schema-plan` | `form-schema-audit.md` (`F-`) | — | FE↔BE | e2e round-trip |
+| `cache-plan` | `cache-audit.md` (`C-`) | — | FE | e2e round-trip |
+| `upload-media-plan` | `upload-media-audit.md` (`UM-`) | — | BE | +db + e2e (probe) |
+| `state-consistency-plan` | `state-consistency-audit.md` (`S-`) | — | FE+BE | +formal (TLC) |
+| `cascade-delete-plan` | `cascade-delete-audit.md` (`CD-`) | — | BE | +db (orphan/blob-scan) |
+| `db-integrity-plan` | `db-integrity-audit.md` (`DI-`) | — | BE | +db (integrity-scan/M-TYPE) |
+| `race-condition-plan` | `race-condition-audit.md` (`RC-`) | — | BE | +e2e + +formal (TLC) |
+| `seed-scenario-plan` | `seed-scenario-audit.md` (`SS-`) | — | BE | +e2e (replSet) |
 | `anti-regression-plan` | `anti-regression-audit.md` (`AR-`) | `npm run audit:regression -- --ci` | META | **běží POSLEDNÍ** |
+| _(všechny)_ | — | — | — | `+teeth` (Stryker) ověří sílu testů |
 
 ---
 
-## Fáze 1 — Scannery (tier A, deterministické)
+## Fáze A — Freshness / self-maintenance (plány MUSÍ sedět na HEAD)
 
-Z FE rootu pusť každý runnable scanner, stdout ulož do `RUN/scanners/<audit>.txt`:
+> Bez tohoto by se hloubkový průchod opřel o zastaralou inventuru a tiše minul nový kód.
 
-```
-npm run audit:routes
-npm run audit:nav
-npm run audit:ws
-npm run audit:config
-npm run audit:errors
-npm run audit:logs
-```
+1. `npm run audit:census -- --json` + spusť podpůrné scannery (`audit:routes/nav/ws/config/errors/logs`)
+   do `scanners/` — živý povrch.
+2. **Per audit** porovnej plán (oblasti 00→X + jejich inventury) s aktuálním kódem:
+   - nový povrch (kolekce/route/listener/DTO/upload/delete-cesta/env…) z census → patří do oblasti?
+   - chybí soubor oblasti, který README slibuje?
+   - sedí „zamrzlé" počty v plánu („~70 kolekcí" apod.) na realitu?
+3. **Self-doplnění (rozhodnutí #4):** zastaralou inventuru / chybějící položku oblasti **doplň přímo do
+   plánu** (`docs/<audit>-plan/…`), označ datem `(plný audit RUN <datum>)`. Nedestruktivně — přidávej,
+   historii needituj.
+4. **Brána A:** report „všech 16 plánů aktuální vůči HEAD <git>". Teprve pak Fáze B. Doplněné oblasti
+   vstupují do manifestu Fáze B.
 
-Scannery vyjmenovávají **živý povrch** a diffují → nové routy/eventy/env/throw/logger uvidí samy.
-Tvrdé nálezy bez agenta. Nenulový exit / nové řádky = nález do reportu.
+---
 
-## Fáze 1b — Coverage drift (census) — „přerostl kód rozsah auditů?"
+## Fáze B — Vyčerpávající průchod oblastí (MAX paralelně, rozhodnutí #2)
 
-1. `npm run audit:census -- --json` → živý povrch (kolekce, listenery, query-keys, upload sites,
-   delete cesty, transakce, env, …) s počty + jmény + cílovým auditem.
-2. Skript **diffuje vs baseline** (`docs/full-audit/coverage-baseline.json`). Lidský běh `npm run audit:census`
-   vypíše čitelně „📈 přibylo / 📉 ubylo" po kategoriích.
-3. **Capability-routing:** každá kategorie má přiřazený audit (viz skript). Nový povrch ve sweep-auditech
-   (db-integrity, cascade, state, cache, form-schema, upload) = **coverage gap** → zařaď nové položky do
-   **scope příslušného sub-agenta v této Fázi 2** (proauditovat hned) A nahlas „rozšiř inventuru v plánu".
-4. Do reportu sekce **📈 Rozšíření kontroly**.
+Pracovní seznam = všechny `(audit, oblast)` z manifestu. S `--resume` přeskoč jednotky, co už mají
+hotový checkpoint.
 
-> ⚠️ Scannery (tier A) se rozšiřují samy; **sweepy mají v plánech zamrzlou inventuru** („70 kolekcí",
-> „~40 listenerů") — census je jediný způsob, jak chytit, že je kód přerostl. Bez něj audity tiše stárnou.
+### Vlnový fan-out (jádro rychlosti)
+- Dispatchuj **co nejvíc agentů souběžně** — v jednom message tolik `Agent` volání, kolik harness
+  unese; jak agenti dojíždějí, **doplňuj další jednotky** (drž pool nasycený na max).
+- Agenti jsou **read-only** → paralelizace bezpečná. (Opravy ve Fázi E se neparalelizují a BE+FE se
+  nemíchá — [feedback_no_mixed_be_fe_batch].)
+- Po každé vlně **zapiš checkpoint** každé hotové jednotky → resumability (rozhodnutí #1).
 
-## Fáze 2 — Sweepy (sub-agenti, paralelně, READ-ONLY)
+### Prompt agenta oblasti (vyplň `<…>`)
 
-Pro každý audit označený **SWEEP** (po případném zúžení rozsahem) dispatch **jednoho** sub-agenta.
-Všechny dispatchni **v jednom messagu** (paralelní běh). Read-only — agent needituje kód.
+> Jsi hloubkový auditor **oblasti `<NN-název>`** stylu **`<audit>`**. READ-ONLY — nepiš kód, jen čti a hlas.
+> Tvůj záběr je JEN tato oblast, ale v ní **vyčerpávající** — píď po pídi.
+> 1. Přečti **celý** soubor oblasti `docs/<audit>-plan/<NN-…>.md` + plán README (osy, perspektivy P*,
+>    M-metody, úrovně jistoty L*, **Cílová hloubka pro tuto oblast**, „Pracovní postup", pasti) +
+>    relevantní část registru `docs/<audit>-audit.md` (známé nálezy + stav).
+> 2. Projdi **VEŠKERÝ** kód v záběru této oblasti podle „Pracovní postup" — **každý** dotčený soubor/
+>    symbol, **každou osu**, **každou M-metodu dosažitelnou staticky**. Cíl = plná statická hloubka
+>    (L1-L3: čtení + cross-ref + strukturální důkaz), ne L2 strop.
+> 3. Vrstvy, co potřebují živou infru (DB/e2e/Stryker/TLC), **NEoznačuj za hotové** — místo toho vydej
+>    **PROOF-REQUEST**: přesně co spustit (`+db` integrity/orphan na kolekci X · `+e2e` která sada ·
+>    `+teeth` Stryker na modul Y · `+formal` TLC na Z.tla) a co to má dokázat.
+> 4. Vrať: (a) **čerstvé nálezy** ve formátu registru, klasifikuj `🆕 nový`/`♻️ regrese`/`🔓 otevřený`,
+>    formát `<PREFIX>-RUN — [osa] popis · Kde: soubor:řádek · Dopad · Návrh · dosažená L<n>`;
+>    (b) **pokrytí**: které soubory/osy/M-metody jsi reálně prošel; (c) **dosažená L vs cílová L**
+>    oblasti; (d) seznam **PROOF-REQUEST** pro Fázi C.
+> Stručně, česky, žádné slepé výpisy souborů. Když nic čerstvého: „bez nových nálezů, prošel jsem
+> <co>, dosažená L<n>".
 
-> ⚠️ Sweepy jsou čtení → paralelizace v pořádku. Opravy (Fáze 5) se NEparalelizují a BE+FE se nemíchá
-> v jedné dávce ([feedback_no_mixed_be_fe_batch]).
+Posbírej výstupy → zapiš checkpointy → pokračuj další vlnou, dokud manifest není hotový.
 
-### Prompt sub-agenta (vyplň `<…>`)
+---
 
-> Jsi auditor stylu **`<audit>`**. NEpiš kód, jen čti a hlas.
-> 1. Přečti `docs/<audit>-plan/README.md` (osy, perspektivy P*, M-metody, úrovně jistoty L*, **Cílová
->    hloubka per oblast**, **Pracovní postup**, pasti) + číslované oblasti + registr `docs/<audit>-audit.md`
->    (známé nálezy + jejich stav).
-> 2. Projeď **aktuální kód** v záběru auditu podle „Pracovní postup". Dosáhni hloubky, jaká jde **bez
->    živé infry** (statické L1-L2: čtení + cross-ref os + census). Vrstvy potřebující DB/e2e/Stryker/TLC
->    **neoznačuj za hotové** — uveď `⏭️ L<n> vyžaduje <+db/+e2e/+teeth/+formal>`.
-> 3. **Nový povrch z census** (předám seznam): proauditovat jako součást záběru.
-> 4. Vrať **JEN čerstvé nálezy** ve formátu registru. Každý klasifikuj:
->    `🆕 nový` / `♻️ regrese` (dřív opravený, zase rozbitý) / `🔓 stále otevřený` (z registru, pořád platí).
->    Formát: `<PREFIX>-RUN — [osa] popis · Kde: soubor:řádek · Dopad · Návrh · dosažená úroveň L<n>`.
-> 5. Na konci uveď **dosaženou hloubku vs cílová** (z plánu) a co zbývá pro plnou hloubku.
-> Stručně, česky, žádné výpisy souborů. Pokud nic čerstvého: „bez nových nálezů, L<n>".
+## Fáze C — Proof-vrstvy (centrálně, jednou, paralelně kde to jde)
 
-Posbírej výstupy agentů.
+Agreguj **PROOF-REQUESTy** ze všech oblastí a pusť těžké důkazy **jednou** (ne per agent):
 
-## Fáze 3 — Hloubkové vrstvy (gated příznaky)
+- **`+db`** (read-only, nejdřív dev/staging/`matrix`; prod jen s explicitním souhlasem):
+  `db-integrity-plan/tools/integrity-scan` (TYPE/OR/RR/DUP/INV…) + `cascade-delete-plan/tools/orphan-scan`
+  + blob-audit (Cloudinary vs DB URL). Skripty materializuj z `.md` do `proof/`, spusť s `MONGO_URI`.
+- **`+e2e`**: BE jest e2e (`--maxWorkers=2`, [project_be_test_mongo_flaky]) — seed-scenario (replSet),
+  race-condition, error/log runtime probe. `test/race/` + `seed-scenario`.
+- **`+teeth`**: Stryker **per modul** (= další paralelizace) — měří, jestli testy chytí umělé mutace.
+  Dlouhé; běž na pozadí.
+- **`+formal`**: TLC per `.tla` (`state-consistency-plan/tla/`, `race-condition-plan/tla/`) s `tla2tools.jar`.
+- **Mapuj výsledky zpět na oblasti**: každý PROOF-REQUEST dostane výsledek → oblast finalizuje
+  `dosažená L = cílová L`, nebo (opt-out/chybí infra) hlasitě `⏭️ blokováno + jak odblokovat`.
 
-- **`+db`** — pusť DB scany: `db-integrity-plan/tools/integrity-scan` (M-SCAN + M-TYPE),
-  `cascade-delete-plan/tools/orphan-scan`. Read-only, NE na ostrý provoz (nejdřív dev/staging/`matrix`
-  — [project_server_swap]).
-- **`+e2e`** — BE jest e2e: `race-condition.e2e-spec.ts`, `seed-scenario.*` (⚠️ seed-scenario FA/RC chce
-  `MongoMemoryReplSet` — bez něj jen happy-path L2, zbytek `⏭️ blokováno`). Použij `--maxWorkers=2`
-  ([project_be_test_mongo_flaky]).
-- **`+teeth`** — Stryker (BE i FE). Dlouhé. Jinak: ověř existenci teeth guardů přes G-matici.
-- **`+formal`** — TLC nad `state-consistency-plan/tla/` + `race-condition-plan/tla/`.
-- _Bez příznaku:_ proof-vrstvy se **ověří přes G-matici** v bráně (žije odvozený guard G≥3/G4?), neběží znovu.
+---
 
-## Fáze 4 — Konsolidace + META brána (16. audit)
+## Fáze D — Konsolidace + META brána + report
 
-1. Slož `RUN/report.md` (šablona níže) ze scannerů + sweepů + census + hloubkových vrstev.
-2. **Brána:** `npm run audit:regression -- --ci`. Ověří, že každý opravený důležitý nález má živou
-   pojistku (G≥2) — „je vše v pořádku". Nenulový exit = regrese-riziko → do reportu jako 🔴.
-3. **TL;DR uživateli:** kolik 🆕/♻️/🔓 nálezů, kolik 🔴, coverage drift souhrn, stav brány, **návrh
-   pořadí oprav**. Čekej na pokyn.
+1. `RUN/report.md` (šablona níže): **per-oblast matice** (každá `00→X`: cílová vs dosažená L, nálezy,
+   proof výsledek) + souhrn za audit.
+2. **Brána:** `npm run audit:regression -- --ci` (běží POSLEDNÍ). Nenulový exit = regrese-riziko → 🔴.
+3. **TL;DR uživateli:** kolik oblastí dosáhlo cílové L / kolik blokováno · nálezy 🆕/♻️/🔓 · 🔴 · stav
+   brány · coverage drift z Fáze A · návrh pořadí oprav. **Pak teprve člověk kontroluje.**
 
-## Fáze 5 — Opravy (GATED — workflow projektu)
+## Fáze E — Opravy (GATED)
 
-NEopravuj automaticky. Předlož plán oprav, čekej na souhlas ([feedback_workflow]). Při opravách:
-
-- **Nemíchat BE+FE** v jedné paralelní dávce ([feedback_no_mixed_be_fe_batch]).
-- Po BE změně **restart** (`nest --watch` drží starý bundle) ([feedback_be_restart_required]).
-- FE **nikdy prettierem** → `eslint --fix` ([feedback_fe_no_prettier]); ověř `npm run build`
-  ([project_fe_build_preexisting_errors]).
-- BE jest **`--maxWorkers=2`** ([project_be_test_mongo_flaky]); BE precommit = typecheck+lint, testy ručně
-  ([feedback_be_precommit_prettier]).
-- Ke každé opravě **doplň pojistku G≥2** (test/scanner), ať brána nezčervená.
-- Aktualizuj příslušný `docs/<audit>-audit.md` (stav nálezu) a **inventuru v plánu** u coverage gapů.
-- Git **na uživateli** ([feedback_git_manual]).
+NEopravuj bez souhlasu ([feedback_workflow]). Při opravách: **BE+FE nemíchat** v jedné dávce
+([feedback_no_mixed_be_fe_batch]); po BE změně **restart** ([feedback_be_restart_required]); FE **nikdy
+prettierem** → `eslint --fix` + `npm run build` ([feedback_fe_no_prettier], [project_fe_build_preexisting_errors]);
+BE jest `--maxWorkers=2` + precommit typecheck+lint, testy ručně ([feedback_be_precommit_prettier]); ke
+každé opravě **pojistka G≥2**; aktualizuj `docs/<audit>-audit.md` + inventuru plánu; git **na uživateli**
+([feedback_git_manual]).
 
 ---
 
 ## Šablona reportu (`RUN/report.md`)
 
 ```markdown
-# Plný audit — RUN <datum> (FE <head> / BE <head>)
+# Plný audit (hloubková brána) — RUN <datum> (FE <head> / BE <head>)
 
 ## TL;DR
-- Čerstvé nálezy: <n> (🆕 <x> / ♻️ <y> / 🔓 <z>) · 🔴 <k>
-- Coverage drift: +<a> kategorií přerostlo audit (detail ↓)
-- META brána (audit:regression --ci): ✅ / ❌ <m> regrese-rizik
-- Rozsah: <full/diff/výběr> · hloubka: <bez infry / +db / +e2e / …>
+- Oblastí celkem: <N> · dosáhlo cílové L: <x> · ⏭️ blokováno: <y>
+- Nálezy: <n> (🆕 <a> / ♻️ <b> / 🔓 <c>) · 🔴 <k>
+- Freshness (Fáze A): <z> plánů doplněno na HEAD · coverage drift souhrn
+- META brána (audit:regression --ci): ✅ / ❌
+- Rozsah: <full/diff/výběr> · proof-vrstvy: <db/e2e/teeth/formal — ON/opt-out>
 
-## Per audit
-| Audit | Runner | 🆕 | ♻️ | 🔓 | 🔴 | Dosažená L | Pozn. |
-|---|---|---|---|---|---|---|---|
+## Per oblast (matice)
+| Audit | Oblast | Cílová L | Dosažená L | 🆕 | ♻️ | 🔓 | 🔴 | Proof | Pozn. |
+|---|---|---|---|---|---|---|---|---|---|
 
-## 📈 Rozšíření kontroly (coverage drift)
-| Kategorie | Audit | Bylo | Teď | Nové položky | Akce |
-|---|---|---|---|---|---|
+## 📈 Freshness / coverage drift (Fáze A)
+| Audit | Co bylo zastaralé | Doplněno do plánu |
+|---|---|---|
 
 ## Detail nálezů
 ### <PREFIX>-RUN — …
 
-## ⏭️ Neproběhlé vrstvy (vyžadují infru)
-| Audit | Vrstva | Příznak/prerekvizit |
+## ⏭️ Neproběhlé vrstvy (opt-out / chybí infra)
+| Audit/oblast | Vrstva | Důvod | Jak odblokovat |
 ```
 
 ## Pravidla a hranice
 
-- **Future-proof:** hloubku/postup čti vždy z plánů live; nikdy je nehardcoduj do skillu.
-- **Hlasité mezery:** vrstva bez infry = `⏭️ blokováno + důvod + jak odblokovat`, ne tichý skip.
-- **Nedestruktivně:** RUN report je nový soubor; historii registrů `*-audit.md` nepřepisuj — jen
-  přidávej nové nálezy / měň stav existujících.
-- **Coverage = měřitelné:** nový povrch ve sweep-auditu je nález („rozšiř kontrolu"), ne ticho.
-- **Opravy jen po souhlasu**, podle pravidel Fáze 5.
+- **Hloubka je default.** Nikdy ji tiše nesnižuj kvůli času — paralelizuj, nebo hlasitě nahlas opt-out/blok.
+- **Future-proof:** cílovou hloubku/postup oblasti čti vždy **live z plánu**; nikdy nehardcoduj do skillu.
+- **Self-maintenance napřed:** plány musí sedět na HEAD, než začne hloubkový průchod.
+- **Resumable:** každá hotová oblast = checkpoint; `--resume` neopakuje hotové.
+- **Nedestruktivně:** RUN report je nový soubor; registry/plány jen doplňuj, historii nepřepisuj.
+- **Opravy jen po souhlasu** (Fáze E).
 
 ## Pasti prostředí (z paměti)
 
-- `audit:ws/config/errors/logs` žijí ve FE `scripts/`, ale čtou BE přes `IKAROS_BE_ROOT`
-  (default `../../Projekt-ikaros`). Spustitelné z FE rootu.
-- Seed-scenario: `backend/test/helpers/db.ts` je standalone Mongo → FA/RC tx neběží; pro plnou hloubku
-  povýšit na `MongoMemoryReplSet` ([project_seed_scenario_audit]).
-- BE jest plný paralelně flaky → `--maxWorkers=2` ([project_be_test_mongo_flaky]).
-- Produkční cíl je `www.projekt-ikaros.com`; DB scany jen read-only a nejdřív dev/staging/`matrix`
-  ([project_server_swap]).
+- `audit:ws/config/errors/logs` žijí ve FE `scripts/`, čtou BE přes `IKAROS_BE_ROOT` (default
+  `../../Projekt-ikaros`). Spustitelné z FE rootu.
+- BE e2e harness boot: `archiver` v8 je ESM → jest mock přes `moduleNameMapper` (`test/mocks/archiver.stub.ts`),
+  jinak padá celá e2e sada (SS-RUN-01).
+- Seed-scenario FA/RC tx potřebují `MongoMemoryReplSet`; bez něj jen happy-path L2.
+- BE jest plně paralelně flaky → `--maxWorkers=2` ([project_be_test_mongo_flaky]).
+- `+db` skripty (`integrity-scan`/`orphan-scan`) jsou v `.md` → materializuj do `proof/*.mjs`, spusť z BE
+  (kvůli `mongodb` driveru), `MONGO_URI` z BE `.env` (hodnotu netiskni). Produkční cíl
+  `www.projekt-ikaros.com` — read-only + explicitní souhlas ([project_server_swap]).
+- `tla2tools.jar` bývá v `c:/tmp/`; Java přítomná (1.8).
+- Stryker config: `backend/stryker.conf.json` + FE `stryker.conf.json`.
+- Harness pustí omezený počet agentů naráz → fan-out po **vlnách**, pool drž nasycený.

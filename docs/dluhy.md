@@ -68,12 +68,15 @@
 **Řešení:** doplnit inverse pro chybějící operace; sjednotit role-prahy; vyjasnit jediný zdroj combat order; pathfinding buď doplnit (17.x), nebo opravit spec (rychlý fix).
 **Kdy:** Fáze 17.x. Zdroj: kap. 14.
 
-### D-NEW-INV-CASCADE — Inventura: kaskády & čas
-**Soubory:** BE `world-calendar-config` delete (nečistí timeline/akce), `game-events` soft-delete (bez cleanup jobu), Počasí in-game datum vs. `/kalendar`; FE nav (chybí `/akce`), legacy `/sprava-udalosti` redirect + `LegacyCalendersController` `/calenders` (překlep).
-**Problém:** mazání kalendářového configu nechá orphan timeline/akce události; soft-deleted akce zůstávají bez retence/cleanup; in-game datum (advance-day v Počasí) se nepromítne do „Dnes" v `/kalendar`; `/akce` není v hlavní nav; prošlý legacy redirect a překlepová route k odstranění.
-**Dopad:** Nízký–střední — orphan data + UX.
-**Řešení:** cascade cleanup configů/akcí (provázat s cascade-delete auditem); sjednotit zdroj in-game data; doplnit nav; odstranit legacy redirect + překlep route.
-**Kdy:** Fáze 14.9 (audity). Zdroj: kap. 15.
+### D-NEW-INV-CASCADE — Inventura: kaskády & čas — ✅ z větší části VYŘEŠENO 2026-06-20
+**✅ Opraveno (plný audit 14.9, 2026-06-20):**
+- `world-calendar-config` delete nulluje dangling `worldSettings.timelineCalendarSlug` (CD-RUN-2).
+- `ikaros-events` soft-delete (`isActive=false`, **bez jakékoli obnovy**) → **hard delete + `media.orphaned`** (CD-RUN-4b); `game-events` delete byl už čistý (tvrdé + blob cleanup) — „soft-delete akcí bez cleanup" se týkal jen ikaros-events.
+- `/akce` přidáno do menu „Svět" (skrývatelné `id:'akce'`, spec 12.3 R2 akt.).
+- legacy `/sprava-udalosti` redirect **smazán** (expiroval); `LegacyCalendersController` `/calenders` překlep **smazán** (eventy přes character-subdocs `PUT calendar`).
+**Otevřené (zbytek, mimo 14.9):** in-game datum (advance-day v Počasí) se nepromítne do „Dnes" v `/kalendar` — sjednotit zdroj in-game data.
+**Dopad:** Nízký — zbývá jen UX (in-game datum).
+**Kdy:** zbytek mimo 14.9. Zdroj: kap. 15.
 
 ### D-NEW-INV-CLEANUP — Inventura: úklid kódu (drift & mrtvé)
 **Soubory:** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní), `AuditLogTab.tsx` vs `admin-audit-log.interface.ts` (label drift).

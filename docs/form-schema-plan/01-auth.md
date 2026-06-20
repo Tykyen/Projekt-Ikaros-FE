@@ -85,7 +85,7 @@ component state (captcha). Heslo nikdy neukládáme v plaintextu — DB drží `
 
 ## Delta parity (plní sweep)
 
-> Sweep 2026-06-05. ValidationPipe = `whitelist: true, transform: true` **bez `forbidNonWhitelisted`** (`backend/src/main.ts:15`) → neznámá pole se **tiše dropnou** (ne 400). Required pole, které v body chybí, ale stále spadne na svém validátoru.
+> Sweep 2026-06-05 (akt. 2026-06-20). ValidationPipe = `whitelist:true, **forbidNonWhitelisted:true**, transform:true` (`backend/src/main.ts:53-56`, PC-07) → neznámá/přejmenovaná pole vrátí **400** (NE tichý drop). Required pole chybějící v body spadne na svém validátoru → 400.
 
 **AU-D2** (🔴 K-F7 potvrzeno) `newPassword` vs `password` (reset z emailu) — FE: `POST /auth/reset-password` posílá `{ token, newPassword }` (`src/features/auth/api/useResetPassword.ts:24-25`, pole z `resetPasswordSchema.ts:5`) · BE DTO: `auth/reset-password.dto.ts:15` má pole **`password`** (`@IsString @MinLength(8) @MaxLength(128)`), `newPassword` nezná; controller `auth.controller.ts:156` čte `dto.password` · DB: `passwordHash` (N/A) · **rozpor:** `newPassword` se přes whitelist **tiše zahodí**, `password` v body chybí → `@IsString @MinLength(8)` selže → **400 Bad Request**. Reset hesla z emailu je **úplně rozbitý** (ne tichý drop hesla — tvrdá 400). Pozn.: druhé DTO `users/reset-password.dto.ts:4` MÁ pole `newPassword`, ale to obsluhuje admin-flow `PUT /users/:id/reset-password` (`users.controller.ts:511`), ne self-reset z emailu. · **dopad na data:** žádné nevalidní dokumenty (reset nikdy neproběhne); migrace ne. · **návrh:** sjednotit název — buď FE posílat `password`, nebo přejmenovat pole v `auth/reset-password.dto.ts` na `newPassword` (+ controller). FE→`password` je menší změna a drží konzistenci s `auth` flow.
 

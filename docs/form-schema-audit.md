@@ -36,9 +36,10 @@
 > - **Ponecháno (🟣 vědomý dluh):** **F-12** (sound `youtubeUrl` BE regex — riziko false-reject validních YT variant) · **F-15** (sections `isCollapsed` default — latentní, FE vždy posílá; změna by ovlivnila jen legacy doc). **F-26** = ⚖️ by-design (generic fallback). **F-25** byl už opraven dříve.
 > - **Rozhodnutí „za uživatele" (k revizi):** F-03 `termsVersion='2026-06-05'` (konstanta) · F-07 `imageUrl` clear přes `@ValidateIf(v!==''&&v!==null)+@IsUrl` (zachová URL guard pro neprázdné) · F-11 game-event `confirmable` DB default `false→true` (align na FE/UI) · F-23 username change regex **ponechán** přísnější slug (jen opraven lživý komentář; kanonické sjednocení register↔change je větší rozhodnutí).
 >
-> ⚠️ **Kontext deploymentu:** Ikaros teď běží na serveru → drift tvaru dat = **reálné riziko ztráty
-> dat uživatelů** (whitelist drop) nebo 400 pro živé requesty. Proto má tenhle audit prioritu na osách
-> `WL`/`NM` (tichá ztráta) před kosmetickými drifty. Opravy DB modelu nutno koordinovat s migrací.
+> ⚠️ **Kontext deploymentu:** Ikaros běží na serveru → drift tvaru dat = reálné riziko. **AKT. 2026-06-20
+> (F-RUN-01):** `forbidNonWhitelisted:true` je zapnuto (PC-07) → drift názvu pole = **400 na živém
+> requestu** (NE tichá ztráta dat — ta třída zanikla). Audit má prioritu na osách `WL`/`NM` (teď „400 na
+> driftu") před kosmetikou. Opravy DB modelu nutno koordinovat s migrací.
 
 | ID | Záv. | Oblast | Podstata | Stav |
 |---|---|---|---|---|
@@ -204,5 +205,5 @@
 
 Nový povrch TOTP/password DTO (`enable-totp`, `login-totp`, `password-confirm`) — **čistý** (FE↔DTO názvy sedí, žádný NM/WL drift).
 
-- **F-RUN-01 🟡 `WL` ⬜ REVIEW (doc drift)** — plán+registr tvrdí „bez `forbidNonWhitelisted`", ale `backend/src/main.ts:50-55` má `forbidNonWhitelisted:true` (potvrzeno PC-07). Model auditu je invertovaný: třída „tichý drop pole" zanikla → nahradila ji **400** na přejmenovaném/extra poli. Akce na ráno: překlasifikovat osy `WL`/`NM` + aktualizovat `00-cross-cutting.md` (XC-01/XC-D2) a delta-poznámky oblastí. Dopad na data: žádný.
+- **F-RUN-01 🟡 `WL` ✅ OPRAVENO (doc drift, 2026-06-20)** — plán+registr tvrdily „bez `forbidNonWhitelisted`", ale `backend/src/main.ts:53-56` má `forbidNonWhitelisted:true` (PC-07). Model osy `WL`/`NM` invertován: „tichý drop pole" → **400** na přejmenovaném/extra poli. **Opraveno:** `00-cross-cutting.md` (XC-01 banner + TL;DR + XC-D2), per-oblast „Sweep note" (01-auth/02-user-profile/03-worlds/04-pages/05-characters), `README.md` a tato prioritizace. Jednotlivé finding-řádky psané před 2026-06-20 mohou v *mechanismu* psát „tiše dropne", ale jejich **závěr (400) platí**. Dopad na data: žádný.
 - **F-24 ✅ SJEDNOCENO** — claim „FE max(64) ↔ BE 32" už neplatí: `profileSchemas.ts:15` má `max(32)` = shoda s `update-user.dto @MaxLength(32)`. Zbýval jen zavádějící test „> 64" (projde i při rozbití limitu). Fix: test hlídá přesně hranici 32. Pojistka: `profileSchemas.spec.ts` „akceptuje == 32" / „odmítne > 32".

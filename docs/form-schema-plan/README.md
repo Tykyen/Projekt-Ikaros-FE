@@ -191,7 +191,7 @@ na **L3+**; kritická (data uživatelů na živém serveru) přes round-trip **M
 
 ⚠️ **Pasti prostředí (z paměti):**
 - **Po BE změně DTO/schema nutný restart** (`nest --watch`) — FE refresh nestačí, drží starý bundle (`feedback_be_restart_required`).
-- **`whitelist:true` tiše dropuje** neznámá pole — bez `forbidNonWhitelisted` žádná 400, jen ticho.
+- **`forbidNonWhitelisted:true`** (PC-07, `main.ts:55`, akt. 2026-06-20) → neznámá/přejmenovaná pole vrátí **400** (NE tichý drop). `whitelist:true` tedy už nedropuje tiše.
 - FE `tsc -b` rozbitý → `tsc --noEmit` (`project_fe_build_preexisting_errors`).
 - FE vitest `--project '!storybook'`; FE **nikdy prettierem** (`feedback_fe_no_prettier`).
 - Změna FE per-system JSON bez `export-schemas` → BE validuje proti staré kopii.

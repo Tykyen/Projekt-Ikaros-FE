@@ -117,7 +117,7 @@ v `CreateWorldPage` / tabu, `payload` = jen v `CreateWorldInput`/`UpdateWorldInp
 
 ## Delta parity (plní sweep)
 
-> Sweep 2026-06-05. ValidationPipe = `whitelist: true, transform: true` **bez `forbidNonWhitelisted`** (`backend/src/main.ts:15`).
+> Sweep 2026-06-05 (akt. 2026-06-20). ValidationPipe = `whitelist:true, **forbidNonWhitelisted:true**, transform:true` (`backend/src/main.ts:53-56`, PC-07) → neznámá/přejmenovaná pole vrátí **400** (NE tichý drop).
 
 **WO-D1** (🟠 K-F12 potvrzeno) create↔update DTO délkový drift (`name`/`description`/`playersWanted`) — FE: settings tab validuje přes `basicInfoSchema` (`worldSettingsSchema.ts:9-21` `name min2/max60`, `description max1000`, `playersWanted max500`) · BE DTO: `create-world.dto.ts:20-26` má `@MaxLength` (name 60, description 1000, playersWanted 500), ale `update-world.dto.ts:26,27,31` má **jen `@IsString` bez `@MaxLength`** · DB: `world.schema.ts:8,16,20` bez `maxlength` · **rozpor:** přímý `PATCH /worlds/:id` (nebo klient mimo FE) s `name`/`description`/`playersWanted` přes limit **projde a uloží se** — server délku na update nevynucuje (FE tab ano, ale jen FE). Žádná 400, žádný drop — uloží se nadlimitní hodnota. · **dopad na data:** v produkční DB mohou existovat nadlimitní hodnoty, pokud někdo poslal PATCH mimo FE; po přidání limitu na update DTO je nutné ověřit existující dokumenty (název >60 atd.); migrace ano (kontrola/ořez). · **návrh:** doplnit `@MaxLength` na `update-world.dto.ts` shodně s create (name 2-60, description 1000, playersWanted 500); ideálně i `min` na name.
 

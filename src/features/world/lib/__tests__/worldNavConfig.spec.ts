@@ -23,6 +23,16 @@ describe('buildWorldNav', () => {
     expect(idsP).not.toContain('scenare');
   });
 
+  it('Akce v menu „Svět" pro člena (Ctenar+), skrývatelná (2026-06-20)', () => {
+    const player = buildWorldNav('a', false);
+    const svet = player.find((g) => g.label === 'Svět')!;
+    const akce = svet.items!.find((i) => i.id === 'akce')!;
+    expect(akce).toBeDefined();
+    expect(akce.to).toBe('/svet/a/akce');
+    // skrývatelná → respektuje hiddenNavItems
+    expect(isNavItemHidden('akce', ['akce'])).toBe(true);
+  });
+
   it('Skupiny + Pravidla esenciální (bez id), referenční stránky skrývatelné', () => {
     const nav = buildWorldNav('a', true);
     const info = nav.find((g) => g.label === 'Informace')!;
@@ -98,6 +108,7 @@ describe('filterNavByHidden', () => {
       'mapy',
       'pavucina',
       'obchod',
+      'akce',
     ]);
     const svet = out.find((g) => g.label === 'Svět')!;
     expect(svet.items!.map((i) => i.label)).toEqual(['Stránky']);

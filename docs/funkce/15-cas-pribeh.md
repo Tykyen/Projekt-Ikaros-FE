@@ -105,7 +105,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 
 ### Herní akce (events)
 - **Co to je:** Nadcházející herní akce světa + **archiv** proběhlých, s RSVP účastí, komentáři (vlákna 1 úroveň) a reakcemi, push notifikacemi.
-- **Kde:** route `/svet/:slug/akce` (`EventsPage`); legacy redirect `/sprava-udalosti` → `../akce` (1 měsíc). Vstup hlavně přes **úvodní stránku světa** (levý sloupec „Akce" + footer „Všechny akce →") — `/akce` **není** v hlavní nav liště. BE `@Controller('game-events')` s `worldId` v query.
+- **Kde:** route `/svet/:slug/akce` (`EventsPage`); od **2026-06-20** v menu „Svět" (skrývatelné `id:'akce'`) i na úvodní stránce (levý sloupec „Akce" + footer „Všechny akce →"). Legacy redirect `/sprava-udalosti` **smazán 2026-06-20** (expiroval). BE `@Controller('game-events')` s `worldId` v query; smazání akce = **hard delete + `media.orphaned`** (CD-RUN-4b; dřív soft-delete bez obnovy).
 - **Kdo:**
   - FE — route `memberOnly` (Hrac+ implicitně). Tab „Archiv" a tlačítko „Nová akce" jen **PomocnyPJ+** (`viewerRole >= PomocnyPJ`); hráč při `?view=archive` → silent redirect na upcoming.
   - BE — read = člen ≥ Hrac (Zadatel → prázdno/false). **Archiv** (date < cutoff 24 h) = jen **PomocnyPJ+** (jinak 403 `ARCHIVE_PJ_ONLY`); hráč bez `fromDate` dostane auto-clamp na cutoff (vidí jen nadcházející). Mutace eventu = **PomocnyPJ+** (`assertManage`). Komentář/RSVP/reakce = každý, kdo event vidí (`canView`, respektuje groupOnly). Editace komentáře = jen autor; mazání = autor nebo PJ-mod.
@@ -178,10 +178,10 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
 - **Terminologie „kalendář" je přetížená trojmo:** (1) `/kalendar` = sjednocený PJ pohled (akce+postavy), (2) `/admin/kalendare` = databáze configů (měsíce/sezóny), (3) character-subdoc calendar (události na postavě). Pro průvodce nutno jasně rozlišit — uživatel snadno zamění.
-- **Dvě „Akce":** světové herní akce (`/svet/:slug/akce`, game-events) vs. platformové akce (`/ikaros/akce`, ikaros-events, kap. 06). Stejný název, jiný modul. FE legacy redirect `/sprava-udalosti` je deklarovaný „na 1 měsíc" — ověřit, zda se má odstranit.
-- **`/akce` chybí v hlavní nav liště** — dostupné jen přes dashboard widget (EventsColumn) a přímou URL. Záměr? Pokud ano, zdokumentovat; jinak možná chybějící nav položka.
-- **Pavučina i Storyboard sdílí jeden BE modul `campaign`** s `worldId` v **query** (ne v path) — odlišné od většiny world modulů (`worlds/:id/...`). `LegacyCalendersController` (`/calenders`, překlep) je další path-styl odchylka. Pro konzistenci kontraktu vhodné poznamenat.
-- **Mazání kalendářového configu nečistí navázané timeline/akce události** (`calendarConfigId`/timeline `getTimelineConfig` jen fallbackuje) — riziko orphan/zobrazení v jiném kalendáři. Patří nejspíš do cascade-delete auditu.
+- **Dvě „Akce":** světové herní akce (`/svet/:slug/akce`, game-events) vs. platformové akce (`/ikaros/akce`, ikaros-events, kap. 06). Stejný název, jiný modul. (FE legacy redirect `/sprava-udalosti` **smazán 2026-06-20** po expiraci.)
+- **`/akce` v nav liště** — přidáno do menu „Svět" (2026-06-20, skrývatelné `id:'akce'`, `memberOnly(Ctenar+)`); zároveň zůstává na úvodní stránce (spec 12.3 R2). Vyřešeno.
+- **Pavučina i Storyboard sdílí jeden BE modul `campaign`** s `worldId` v **query** (ne v path) — odlišné od většiny world modulů (`worlds/:id/...`). Pro konzistenci kontraktu vhodné poznamenat. (Pozn.: legacy `LegacyCalendersController` / `/calenders` překlep **SMAZÁN 2026-06-20** — eventy jedou přes `worlds/:worldId/characters/:slug/calendar` (character-subdocs); definice přes `/worlds/:worldId/calendar-configs`.)
+- **Mazání kalendářového configu** — **OPRAVENO** (2026-06-20, CD-RUN-2): `remove` nulluje dangling `worldSettings.timelineCalendarSlug` (fallback v `getTimelineConfig` ponechán jako druhá pojistka). Soft-delete timeline/akce viz cascade-delete audit.
 - **Storyboard scénáře nemají vlastní role floor na BE** (gate jen členství + scope + FE PomocnyPJ guard) — člen-hráč by přes přímé `POST /campaign/scenarios` mohl vytvořit vlastní (neviditelný) scénář. Ověřit, zda je to zamýšlené (vlastní data hráče) nebo má být blokováno.
 - **In-game datum žije v modulu Počasí**, ale `/kalendar` „Dnes" se počítá z reálného gregoriánského data — tj. posun in-game času (advance-day) se v sjednoceném kalendáři **nepromítne**. Možný UX rozpor k vyjasnění.
 - **Oblíbené generátory počasí jsou jen localStorage** (FE-only, per zařízení) — nepřežijí přihlášení z jiného zařízení; uvést jako limit, ne bug.

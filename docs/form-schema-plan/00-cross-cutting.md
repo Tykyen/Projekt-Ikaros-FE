@@ -7,8 +7,10 @@
 > **Osy:** `WL` `NM` `SAN` `NL` `TY` `EN` · perspektivy **P1 P3 P5**.
 > Nálezy → [`../form-schema-audit.md`](../form-schema-audit.md) (`F-xx`). Stav: ✅ **sweep proběhl 2026-06-05** (XC-01, XC-02, XC-04, XC-05 ověřeny čtením; ostatní body metodicky potvrzeny).
 
-> ✅ **Sweep výsledek (TL;DR):** **XC-01 ValidationPipe** = `{ whitelist:true, transform:true }`, **bez**
-> `forbidNonWhitelisted` — přesně dle plánu ([main.ts:15](../../../Projekt-ikaros/backend/src/main.ts)).
+> ✅ **Sweep výsledek (TL;DR):** **XC-01 ValidationPipe** = `{ whitelist:true, forbidNonWhitelisted:true,
+> transform:true }` ([main.ts:53-56](../../../Projekt-ikaros/backend/src/main.ts)). ⚠️ `forbidNonWhitelisted`
+> **přidán PC-07** (2026-06-20) → neznámá/přejmenovaná pole vrátí **400**, NE tichý drop. Dřívější znění
+> „bez forbidNonWhitelisted / tiše zmizí" je zastaralé (viz XC-01 banner).
 > Jediná lokální výjimka: `OperationPayloadValidator` (maps ops) explicitně `whitelist:false` (forward-compat,
 > by-design). **XC-02 export-schemas SYNC = ✅ 100 %** — všech **17 párů** FE JSON ↔ BE `assets/schemas/`
 > je **obsahově identických** (hash-porovnání po normalizaci CRLF; viz `XC-D1`). Žádný desync. **XC-04**
@@ -28,18 +30,27 @@ oblast naráz), proto se kontroluje zvlášť a **jako první** (je to baseline 
 
 ## Kontrolní body
 
-### XC-01 — ValidationPipe: `whitelist:true`, `transform:true`, **bez** `forbidNonWhitelisted` · osa `WL`/`NM`
+### XC-01 — ValidationPipe: `whitelist:true`, `forbidNonWhitelisted:true`, `transform:true` · osa `WL`/`NM`
 
-- **Kde:** [`backend/src/main.ts:15`](../../../Projekt-ikaros/backend/src/main.ts) —
-  `app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))`.
-- **Co dělá:** `whitelist:true` **tiše zahodí** každé pole requestu, které nemá class-validator dekorátor
-  v cílovém DTO. `forbidNonWhitelisted` **není** zapnuto → extra/přejmenované pole **nevrátí 400, jen
-  zmizí**. `transform:true` → coercion typů (viz XC-07).
-- **Riziko driftu:** FE pošle `displayName`, DTO má jen `name` → hodnota zmizí **bez chyby** (🔴 tichá
-  ztráta). Jakýkoli název pole, který nesedí přesně na dekorátor DTO, padá do téhle díry.
+> ⚠️ **AKTUALIZACE 2026-06-20 (plný audit F-RUN-01):** `forbidNonWhitelisted:true` **JE** zapnuto
+> (PC-07 z prod-config auditu, `main.ts:55`). Dřívější znění tohoto bodu tvrdilo „bez
+> forbidNonWhitelisted / tichý drop" — to už **neplatí**. Model osy `WL`/`NM` se tím **invertuje**:
+> dřív „tichá ztráta pole", teď **tvrdé 400**.
+
+- **Kde:** [`backend/src/main.ts:53-56`](../../../Projekt-ikaros/backend/src/main.ts) —
+  `new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })`.
+- **Co dělá:** `forbidNonWhitelisted:true` → každé pole requestu **bez** class-validator dekorátoru
+  v cílovém DTO **vrátí 400** (`whitelistValidation → „Neznámé pole"`, viz `validation-exception.factory.ts`).
+  `whitelist:true` tedy už nedropuje tiše — neznámé pole celý request **odmítne**. `transform:true` →
+  coercion typů (viz XC-07).
+- **Riziko driftu (NOVÉ těžiště):** FE pošle `displayName`, DTO má jen `name` → **400 BadRequest**
+  (ne tichá ztráta). Dopad se přesunul: (a) tichá ztráta dat **zmizela** (dobře), (b) **rozšířil se
+  povrch 400** — každé místo, kde FE pošle pole navíc (typicky „pošlu zpět celý objekt do PATCH"),
+  teď **padá 400** místo dřív benigního dropu.
 - **Co ověřit při sweepu (P3):** pro **každé** pole z 01–09 ověř, že FE klíč == DTO property == Mongoose
-  `@Prop` == mapper. Red-team (M5): pošli pole navíc / s překlepem → sleduj, jestli **zmizí** (drop) vs
-  400. Past z paměti (`feedback_be_restart_required`): po změně DTO nutný **restart BE** (`nest --watch`),
+  `@Prop` == mapper. Red-team (M5): pošli pole navíc / s překlepem → sleduj, jestli vrátí **400**
+  (očekávané) — a hlavně najdi reálné FE flowy, co posílají tlustý objekt zpět do PATCH (= 400 regrese).
+  Past z paměti (`feedback_be_restart_required`): po změně DTO nutný **restart BE** (`nest --watch`),
   FE refresh nestačí — jinak whitelist drží starý seznam povolených polí.
 
 ### XC-02 — export-schemas pipeline (FE JSON → BE assets) · osa pozn. (oblast 10)
@@ -168,7 +179,7 @@ FE validace **není jednotná** — tři styly, různá míra type-safety. Inlin
 | ID | Bod | Osa | Δ | Dopad / pozn. |
 |---|---|---|---|---|
 | XC-D1 | XC-02 export-schemas sync | `WL`/all | ✅ **SYNC** | **Všech 17 párů** FE JSON (`src/features/world/tactical-map/schemas/<system>/*.json`) ↔ BE kopie (`backend/assets/schemas/<system>-<entity>.json`) **obsahově identických** (sha256 po normalizaci CRLF — viz tabulka níže). FE NEbyl změněn bez exportu. Ověřeno čtením (drd2-bestie byte-identical) + hash všech párů. **Dopad:** žádný desync → BE validuje proti aktuální FE kopii. |
-| XC-D2 | XC-01 ValidationPipe | `WL`/`NM` | ✅ shoda | `main.ts:15` = `{ whitelist:true, transform:true }`, **bez** `forbidNonWhitelisted` → extra/přejmenované pole **tiše zmizí** (drop, ne 400). Přesně dle plánu. Jediná výjimka: `operation-payload-validator.service.ts:54-57` má `whitelist:false, forbidNonWhitelisted:false` pro maps ops (forward-compat, by-design — viz [08-maps Delta MP-D*](08-maps.md#delta-parity-plní-sweep)). |
+| XC-D2 | XC-01 ValidationPipe | `WL`/`NM` | ⚠️ AKTUALIZOVÁNO 2026-06-20 | `main.ts:53-56` = `{ whitelist:true, **forbidNonWhitelisted:true**, transform:true }` (PC-07) → extra/přejmenované pole vrátí **400** (`„Neznámé pole"`), NE tichý drop. (Dřívější znění „bez forbidNonWhitelisted → tiše zmizí" je zastaralé.) Jediná výjimka: `operation-payload-validator.service.ts:54-57` má `whitelist:false, forbidNonWhitelisted:false` pro maps ops (forward-compat, by-design — viz [08-maps Delta MP-D*](08-maps.md#delta-parity-plní-sweep)). |
 | XC-D3 | XC-04 sanitizace rich-text | `SAN` | ✅ přítomno | `sanitizeRichText` volání **přítomna** v `pages.service.ts` (table headers/values [:47,50], content [:253], sections.content [:258]). Mechanismus ověřen. Pozn.: konkrétní řádky v plánu mírně driftly, ale logika sedí. Pole **bez** sanitizace (ikaros news, timeline) = kandidát K-F9, řeší oblast 09. |
 | XC-D4 | XC-05 optimistic lock | `WL` | ✅ přítomno | `pages.service.ts`: 409 `PAGE_CONFLICT` při `expectedUpdatedAt !== serverUpdatedAt` [:236-248], pole **odstraněno destrukturou** `const { expectedUpdatedAt: _ignored, ...persistDto } = dto` [:261] **před** persistem → nepersistuje. Mechanismus ověřen (řádky posunuté driftem). |
 | XC-D5 | XC-02 komentář drift | pozn. | 🟡 ⚖️ | `schema-registry.service.ts:1-9` komentář mluví o `shared/schemas/` + `pnpm export-schemas`, reálná cesta je `assets/schemas/` ([schema-registry.service.ts:28] `process.cwd()/assets/schemas`) + `npm run export-schemas`. **Jen komentář**, kód správně. FE `registry.ts:11` má stejný zastaralý komentář (`shared/schemas/` + `pnpm`). **Dopad:** matoucí dokumentace, ne funkční. **Návrh:** opravit oba komentáře. |

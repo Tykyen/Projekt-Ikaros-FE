@@ -6,7 +6,7 @@ import {
   type LazyExoticComponent,
   type ReactNode,
 } from 'react';
-import { createBrowserRouter, Navigate, redirect, type LoaderFunctionArgs } from 'react-router-dom';
+import { createBrowserRouter, redirect, type LoaderFunctionArgs } from 'react-router-dom';
 import { IkarosLayout, WorldLayout } from './layout';
 import { Spinner } from '@/shared/ui';
 import { RoleGuard } from '@/features/admin/components/RoleGuard';
@@ -252,9 +252,9 @@ export const router = createBrowserRouter([
       { path: 'timeline',               element: memberOnly(p(TimelinePage), WorldRole.Hrac) },
       // R-18 — počasí read = Hrac+ (BE `world-weather.assertMember`).
       { path: 'pocasi',                 element: memberOnly(p(WeatherPage), WorldRole.Hrac) },
-      // 9.1-I — game events. Hlavní route /akce, /sprava-udalosti je legacy redirect (1 měsíc).
+      // 9.1-I — game events. Legacy redirect /sprava-udalosti odstraněn 2026-06-20
+      // (zaveden 2026-05-25 „na 1 měsíc", expirováno).
       { path: 'akce',                   element: memberOnly(p(EventsPage)) },
-      { path: 'sprava-udalosti',        element: <Navigate to="../akce" replace /> },
       { path: 'pavucina',               element: memberOnly(p(CampaignPage)) },
       {
         // 11.2 — Storyboard (scénáře) je PJ-nástroj: PJ + PomocnyPJ daného světa,

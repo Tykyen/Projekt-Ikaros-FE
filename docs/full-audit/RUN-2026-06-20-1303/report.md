@@ -29,7 +29,8 @@ Rozsah: **všech 16 stylů** · hloubka: scannery + statické sweepy L1-L2 + cen
 - NAV `/sprava-udalosti` → **NEuděláno**: redirect zaveden 2026-05-25 „na 1 měsíc", vyprší ~25.6. — dnes ještě platí.
 - CD-RUN-4 `dungeon-maps` = false-positive (schema nemá blob pole); `ikaros-events` = soft-delete bez purge → review.
 
-**🛑 Review pile (ráno):** NAV `/akce` (spec), NAV `/sprava-udalosti` (po 25.6.), `/calenders` BE controller, ikaros-events purge job, DI-01/03/04/05/RUN-06/07/08 (většina `+db`), F-RUN-01 doc model, D-NEW-INV-CLEANUP.
+**🛑 Review pile:** ✅ **VYŘEŠENO 2026-06-20 (společně):** `/akce` do menu „Svět" + spec 12.3 (#1) · legacy `/calenders` controller smazán (#2) · `/sprava-udalosti` redirect smazán (#3) · F-RUN-01 form-schema doc model opraven (#4) · ikaros-events soft→**hard delete + blob cleanup** (#5, CD-RUN-4b). Vše ověřeno (FE build+vitest / BE typecheck+jest+eslint), NEcommitnuto.
+**Stále zbývá:** DI-01/03/04/05/RUN-06/07/08 (kvantifikace přes `+db`), D-NEW-INV-CLEANUP (legacy UserRole / Tyky bypass / getUsers paginace / …), in-game datum (Počasí) vs „Dnes" v `/kalendar`.
 
 ## Per audit
 | Audit | Runner | 🆕 | ♻️ | 🔓 | 🔴 | Dosažená L | Pozn. |

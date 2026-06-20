@@ -72,6 +72,12 @@ export const HIDEABLE_NAV_ITEMS: readonly HideableNavItem[] = [
     group: 'svet',
     hint: 'Obchod světa (fáze 11.3).',
   },
+  {
+    id: 'akce',
+    label: 'Akce',
+    group: 'svet',
+    hint: 'Seznam herních akcí světa (i na úvodní stránce; 2026-06-20).',
+  },
   // Skupina „Hra"
   {
     id: 'takticka-mapa',
@@ -150,8 +156,9 @@ export function isNavItemHidden(
  * PJ-only položky (Deník PJ, Storyboard) jen pro `isPJ`.
  *
  * 12.3 — „Informace" obsahuje podseznam skupin (z `groups` = `customGroups`) +
- * Nezařazení + Pravidla. Přehled je přes název světa, Novinky/Akce na úvodní
- * stránce (spec 12.3 R1/R2).
+ * Nezařazení + Pravidla. Přehled je přes název světa, Novinky na úvodní stránce
+ * (spec 12.3 R1/R2). „Akce" má od 2026-06-20 navíc položku v menu „Svět"
+ * (objevitelnost), zároveň zůstává na úvodní stránce.
  */
 export function buildWorldNav(
   worldSlug: string,
@@ -190,6 +197,10 @@ export function buildWorldNav(
       label: 'Svět',
       items: [
         { label: 'Stránky', to: `${b}/stranky` },
+        // 2026-06-20 — „Akce" do menu (objevitelnost); route `akce` = memberOnly
+        // (Ctenar+), takže bez role-gate. Skrývatelná (id). Akce zůstávají i na
+        // úvodní stránce (spec 12.3 R2).
+        { id: 'akce', label: 'Akce', to: `${b}/akce` },
         // route `timeline` = memberOnly(Hrac) → skryj Čtenáři (N-05).
         ...(canAccess(WorldRole.Hrac)
           ? [{ id: 'timeline', label: 'Časová osa', to: `${b}/timeline` }]
