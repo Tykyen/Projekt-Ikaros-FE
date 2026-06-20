@@ -138,66 +138,68 @@ hr { border: none; border-top: 1px solid #bbb; margin: 1em 0; }
 }
 .print-cols > * { break-inside: avoid; }
 </style></head>
-<body><!-- Fixture: innerHTML scope stránky (PageViewer > article[data-print-scope]).
-     Reprezentuje PageHeader + TipTap RichText obsah. Class names jsou
-     CSS-module hashe z appky — v tisku NEstylují (CSS appky se nekopíruje),
-     proto je sem dávám schválně: ověřuju, že holý semantický HTML vypadá dobře
-     jen na element-level tiskovém CSS. -->
-<div class="_print-hide_x print-hide" style="display:flex;justify-content:flex-end;gap:.5rem">
-  <button type="button">Tisk / PDF</button>
-  <button type="button">Upravit</button>
-</div>
+<body><!-- Fixture: MatrixPrintView output (diary sheet „matrix" v printMode).
+     Odpovídá statickému tiskovému renderu MatrixSheet.tsx — hodnoty jako text,
+     přetlaky jako pips ●●●○○. Reálná data ze screenshotu postavy Zara. -->
+<div class="matrix-print">
+  <dl>
+    <div><dt>Jméno</dt><dd>Zara Villiam</dd></div>
+    <div><dt>Stát</dt><dd>Francie</dd></div>
+    <div><dt>Magický gen</dt><dd>—</dd></div>
+    <div><dt>Poslední úprava</dt><dd>—</dd></div>
+    <div><dt>Body schopností</dt><dd>0 / 73</dd></div>
+    <div><dt>Body osudu</dt><dd>2</dd></div>
+  </dl>
 
-<header class="_header_a1b2c">
-  <h1 class="_title_d3e4f">Pád Hvězdné brány</h1>
-  <p class="_meta_g5h6i" style="color:#888;font-size:.85rem">
-    Lokace · 4 min čtení · aktualizováno 18. 6. 2026
-  </p>
-</header>
+  <h2>Fyzický stav</h2>
+  <dl class="print-cols">
+    <div><dt>Životy</dt><dd>4</dd></div>
+    <div><dt>Runa</dt><dd>0</dd></div>
+    <div><dt>Vesta</dt><dd>1</dd></div>
+    <div><dt>Únava</dt><dd>0</dd></div>
+  </dl>
 
-<div class="_content_j7k8l">
-  <p>
-    <strong>Hvězdná brána</strong> stála na okraji Sutinového pole po tři sta let,
-    než ji <em>Řád Popela</em> v jediné noci proměnil v kráter. To, co po ní
-    zbylo, dnes místní nazývají prostě <a href="#">Jizva</a>.
-  </p>
-
-  <figure>
-    <img alt="Vyobrazení brány"
-      src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='260'%3E%3Crect width='480' height='260' fill='%23dcdce6'/%3E%3Cpath d='M80 220 L240 40 L400 220 Z' fill='none' stroke='%23555' stroke-width='6'/%3E%3Ccircle cx='240' cy='150' r='44' fill='none' stroke='%23555' stroke-width='6'/%3E%3C/svg%3E" />
-    <figcaption style="font-size:.85rem;color:#777">Brána před zničením (rekonstrukce).</figcaption>
-  </figure>
-
-  <h2>Historie</h2>
-  <p>
-    Postavena byla v éře, kdy ještě putovaly karavany mezi světy. Každý z
-    pilířů nesl jméno jednoho ze <strong>sedmi zakladatelů</strong>:
-  </p>
-  <ul>
-    <li>Ваэрин Tichý — strážce východního pilíře</li>
-    <li>Mor­wenna z Hloubky — kartografka cest</li>
-    <li>bratři Halloranové — kováři ukotvení</li>
+  <h2>Přetlaky</h2>
+  <ul class="matrix-print__plain">
+    <li class="print-row"><span>Fyzický</span><span>●●●●●</span></li>
+    <li class="print-row"><span>Magický</span><span>●●●●●</span></li>
+    <li class="print-row"><span>Diplomatický</span><span>●●●●●</span></li>
+    <li class="print-row"><span>Technický</span><span>●●●●●</span></li>
   </ul>
 
-  <h3>Co se stalo oné noci</h3>
-  <ol>
-    <li>Stráže ohlásily rudou záři nad obzorem.</li>
-    <li>Pilíře se rozezněly tónem, který nikdo nepřežil bez ochrany.</li>
-    <li>Do svítání zbyla jen tavenina a ticho.</li>
-  </ol>
+  <h3>Jazyky</h3>
+  <ul class="matrix-print__plain">
+    <li class="print-row"><span>Angličtina</span><span>C2</span></li>
+    <li class="print-row"><span>Francouzština</span><span>C2</span></li>
+    <li class="print-row"><span>Esperanto</span><span>C2</span></li>
+  </ul>
 
-  <blockquote>
-    „Neviděl jsem oheň. Viděl jsem, jak svět zapomíná, že tu brána kdy byla."
-    <br />— deník hraničáře Kesta
-  </blockquote>
+  <h3>Schopnosti</h3>
+  <ul class="matrix-print__plain">
+    <li class="print-row"><span>Hacker (magická)</span><span>5</span></li>
+    <li class="print-row"><span>Kouzlo šarmu</span><span>4</span></li>
+    <li class="print-row"><span>V podsvětí jako doma</span><span>3</span></li>
+    <li class="print-row"><span>Plížení a vloupání</span><span>4</span></li>
+    <li class="print-row"><span>Ostrostřelec</span><span>4</span></li>
+    <li class="print-row"><span>Vyznám se v technologiích</span><span>3</span></li>
+    <li class="print-row"><span>Intuice nebezpečí</span><span>2</span></li>
+    <li class="print-row"><span>Moje hlava!</span><span>1</span></li>
+  </ul>
 
-  <hr />
+  <h3>Aspekty</h3>
+  <ul class="matrix-print__plain">
+    <li class="print-row"><span>Věřím v zákon, ale ne vždy v systém</span><span>Vybitý</span></li>
+    <li class="print-row"><span>Holka z ulice</span><span>Vybitý</span></li>
+    <li class="print-row"><span>Ostré oči a vřelé srdce</span><span>Vybitý</span></li>
+    <li class="print-row"><span>Hraní na hraně je moje druhé já</span><span>Vybitý</span></li>
+    <li class="print-row"><span>(Vodní) záchranář</span><span>Vybitý</span></li>
+  </ul>
 
-  <h2>Současný stav</h2>
-  <p>
-    Jizva je dnes neprůchodná. Magické pozadí je tu stále zvýšené a kompasy
-    ukazují ke středu kráteru. Řád Popela přístup hlídá a vstup bez glejtu
-    trestá vyhoštěním.
-  </p>
+  <h2>Výbava a poznámky</h2>
+  <p style="white-space:pre-wrap">1. Hacker (Specializace na Matrix): Umožní jí ovládat virtuální svět a získávat důležité informace.
+
+2. Kouzlo šarmu: Schopnost využít jejího vzhledu k získání výhod v sociálních interakcích.
+
+3. V podsvětí jako doma: Dává jí silné kontakty v podsvětí.</p>
 </div>
 </body></html>

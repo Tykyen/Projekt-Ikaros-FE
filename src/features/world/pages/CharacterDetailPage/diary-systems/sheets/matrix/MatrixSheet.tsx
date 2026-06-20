@@ -16,6 +16,7 @@
  *   D) Schopnosti (TagValue + magic ★) + Aspekty (TagValue + chip)
  *   E) Výbava (textarea / RichText prozatím plain)
  */
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
@@ -28,8 +29,15 @@ import {
 
 export function MatrixSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'matrix_', onChange);
+
+  // Tisk: interaktivní sheet (inputy/pips přes barvu) je netisknutelný —
+  // hodnoty jsou v `<input value>` (replaced element), stav v barvě. Proto
+  // v printMode vyrenderujeme oddělený statický čitelný dokument (viz
+  // chybový deník: ✅ ŘEŠENÍ-diagnóza tisk diary sheetů).
+  if (printMode) return <MatrixPrintView cda={cda} />;
 
   return (
     <div className="matrix-sheet">
@@ -637,6 +645,151 @@ function InventoryCard({ cda, disabled }: SubProps) {
         placeholder="Výbava postavy, poznámky, vztahy, RP detaily..."
         aria-label="Výbava a poznámky"
       />
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `matrix_*` data)
+// ════════════════════════════════════════════════════════════════
+
+/** Přetlak 0..4 jako ●●●○○ (vždy 5 znaků); -1 = žádný → 5× prázdné. */
+function pressurePips(cur: number): string {
+  const filled = Math.max(0, cur + 1);
+  return '●'.repeat(filled) + '○'.repeat(5 - filled);
+}
+
+function MatrixPrintView({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const abilities = cda.parseJsonArr<MatrixTagValue>('abilities');
+  const languages = cda.parseJsonArr<MatrixTagValue>('languages');
+  const aspects = cda.parseJsonArr<MatrixTagValue>('aspects');
+
+  // Body schopností — stejný výpočet jako OverviewCard.
+  const abilityPoints = parseInt(g('abilityPoints', '0'), 10) || 0;
+  const usedPoints = abilities.reduce((sum, ab) => {
+    const v = parseInt(ab.value, 10) || 0;
+    let s = 0;
+    for (let i = 1; i <= v; i++) s += i;
+    return sum + s;
+  }, 0);
+  const extraAspectsCost = Math.max(0, (aspects.length - 3) * 6);
+  const remaining = abilityPoints - (usedPoints + extraAspectsCost);
+
+  const inventory = g('inventory').trim();
+
+  return (
+    <div className="matrix-print">
+      <dl>
+        <div>
+          <dt>Jméno</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Stát</dt>
+          <dd>{g('bornWhere') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Magický gen</dt>
+          <dd>{g('magicGene') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Poslední úprava</dt>
+          <dd>{g('lastFatePointModification') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Body schopností</dt>
+          <dd>
+            {remaining} / {abilityPoints}
+          </dd>
+        </div>
+        <div>
+          <dt>Body osudu</dt>
+          <dd>{g('fatePoints', '0')}</dd>
+        </div>
+      </dl>
+
+      <h2>Fyzický stav</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Životy</dt>
+          <dd>{g('health', '0')}</dd>
+        </div>
+        <div>
+          <dt>Runa</dt>
+          <dd>{g('magicHealth', '0')}</dd>
+        </div>
+        <div>
+          <dt>Vesta</dt>
+          <dd>{g('armor', '0')}</dd>
+        </div>
+        <div>
+          <dt>Únava</dt>
+          <dd>{g('tiredness', '0')}</dd>
+        </div>
+      </dl>
+
+      <h2>Přetlaky</h2>
+      <ul className="matrix-print__plain">
+        {MATRIX_PRESSURE_TYPES.map((p) => (
+          <li key={p.key} className="print-row">
+            <span>{p.label}</span>
+            <span>{pressurePips(parseInt(g(`pressure_${p.key}`, '-1'), 10))}</span>
+          </li>
+        ))}
+      </ul>
+
+      {languages.length > 0 && (
+        <>
+          <h3>Jazyky</h3>
+          <ul className="matrix-print__plain">
+            {languages.map((l, i) => (
+              <li key={i} className="print-row">
+                <span>{l.label || '—'}</span>
+                <span>{l.value}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {abilities.length > 0 && (
+        <>
+          <h3>Schopnosti</h3>
+          <ul className="matrix-print__plain">
+            {abilities.map((a, i) => (
+              <li key={i} className="print-row">
+                <span>
+                  {a.label || '—'}
+                  {MATRIX_MAGIC.includes(a.label) ? ' (magická)' : ''}
+                </span>
+                <span>{a.value}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {aspects.length > 0 && (
+        <>
+          <h3>Aspekty</h3>
+          <ul className="matrix-print__plain">
+            {aspects.map((a, i) => (
+              <li key={i} className="print-row">
+                <span>{a.label || '—'}</span>
+                <span>{a.value}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {inventory && (
+        <>
+          <h2>Výbava a poznámky</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{inventory}</p>
+        </>
+      )}
     </div>
   );
 }

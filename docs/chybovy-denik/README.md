@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-010.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-011.**
 
 ## Jak je deník členěný
 
@@ -27,3 +27,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-META](tisk.md#ch-meta) | tisk | klonování živého DOMu na tisk je principiálně křehké | dlouhá série dílčích „fixů" jedné featury |
 | [✅ ŘEŠENÍ](tisk.md#-řešení--ch-meta-uzavřena-tisk--čistý-dokument-ne-klon-živé-appky--2026-06-20) | tisk | CH-META uzavřena: tisk = čistý dokument (zahodit CSS appky) + offline náhled (Playwright→PDF) | — (zabralo napoprvé) |
 | [CH-009](tisk.md#ch-009) | tisk | collapsed sekce (výbava) se v tisku nevytiskla — obsah `{!collapsed && …}` není v DOM | v tisku chybí obsah viditelný po kliknutí; ladím CSS místo DOM |
+| [✅ ŘEŠENÍ](tisk.md#-řešení--doladění-vzhledu-tisku-postavy-vlna-2--2026-06-20) | tisk | doladění vzhledu postavy: obrázky strop/portrét, záložky na nové strany, profil dl, aside skryt, qty | — |
+| [✅ ŘEŠENÍ](tisk.md#-řešení-diagnóza--zvolený-směr--tisk-diary-sheetů-nejde-přes-css--2026-06-20) | tisk | tisk diary sheetů NEJDE přes CSS (hodnoty v inputech, stav v barvách) → nutný tiskový render v komponentě | ladím printDoc.css na deník, hodnoty/pips se netisknou |
+| [CH-010](proces.md#ch-010) | proces | nezapisoval jsem řešení do deníku průběžně (i po nastavení pravidla) | uživatel se ptá „proč jsi nevyužil deník" |
+| [✅ ŘEŠENÍ](tisk.md#-řešení--tiskový-render-matrix-deníku-vzor-pro-ostatní-sheety--2026-06-20) | tisk | Matrix deník: oddělený statický `MatrixPrintView` v printMode (text místo inputů, pips ●●●○○); past = emoji v tisku | — |

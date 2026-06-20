@@ -98,3 +98,31 @@ Detaily chyb z práce na tisku (pilíř A 14.7). Přehled v [README](README.md).
 **Příznak cyklení:** V tisku chybí obsah, který JE vidět po kliknutí (rozbalení) na obrazovce — a já ladím CSS viditelnosti místo DOM přítomnosti.
 
 ---
+
+### ✅ ŘEŠENÍ — doladění vzhledu tisku postavy (vlna 2) · 2026-06-20
+**Co se ladilo (po uzavření CH-META, dle reálných screenshotů od uživatele):**
+- Obrázky obří → strop `img { max-height: 9cm }` + portrét postavy cílená třída `.print-portrait` (6 cm); mapy/ilustrace zůstávají větší.
+- Záložky postavy se v „tisku všech" slévaly → každá obalena `.print-page` (`break-before: page`; první `:first-child` sdílí list s hero/profilem).
+- Profil (definiční seznam) se rozpadal „label nad hodnotou" → element-level `dl/dt/dd` (label: hodnota na řádku).
+- Aside výbavy (portrét+jméno) tiskl skoro prázdnou stránku navíc (duplikát hero) → `.print-hide`.
+- Položky výbavy „název×N" nalepené → `.print-row` (název ⟷ ×N).
+**Jak ověřeno:** offline náhled `scripts/print-preview` (fixtura postava) + reálný tisk na produkci (uživatel) + build + 16/16 testů.
+**Zhodnocení:** Výsledek dobrý, ale PROCES špatně — tyhle úpravy jsem zapsal až zpětně na výtku uživatele (viz CH-010). Jednotlivě „drobné", dohromady = postup, který do deníku patří.
+
+---
+
+### ✅ ŘEŠENÍ (DIAGNÓZA + zvolený směr) — tisk diary sheetů NEJDE přes CSS · 2026-06-20
+**Co se zjistilo:** Tisk Matrix deníku (a obecně 12 systémových diary sheetů) vyšel prázdný/rozpadlý. Příčina: sheet renderuje VŠECHNY hodnoty přes `<input>`/`<textarea>` (i ve view módu = `disabled` inputy), pips/tracky přes obarvené `<button>`/`<div>`.
+**Proč to NEjde přes CSS:** `<input value>` je replaced element — `value` není textový uzel, nejde vytisknout stylem (`display:none` skryje hodnotu, `display:inline` ukáže prázdné políčko). Stav nesený BARVOU tisk srovnává na černou → pips/tracky zmizí.
+**Zvolený směr:** Tiskový render MUSÍ řešit komponenta (sheet), ne CSS — v `printMode` statická čitelná verze (hodnota jako text, pips `●●●○○`, track „Únava 0/25"). Začít `MatrixSheet` jako vzor, pak replikovat. **NEpokoušet se to spravit přes `printDoc.css` — slepá ulička.**
+**Příznak cyklení:** Ladím `printDoc.css` na deník a hodnoty/pips se pořád netisknou.
+
+---
+
+### ✅ ŘEŠENÍ — tiskový render Matrix deníku (vzor pro ostatní sheety) · 2026-06-20
+**Co nakonec zabralo:** `MatrixSheet` v `printMode` vrací **oddělený statický view** `MatrixPrintView` (čte stejná `matrix_*` data), místo aby se hackovaly inputy. Hodnoty jako text (`dl/dt/dd`), staty `print-cols` mřížka, přetlaky pips `●●●○○` (`pressurePips`), jazyky/schopnosti/aspekty `print-row` řádky, výbava text (`white-space:pre-wrap`).
+**Proč to je správně:** Navazuje na diagnózu výše — tisk diary sheetu NEJDE přes CSS, řeší to komponenta. Oddělený view je čistší než `usePrintMode` podmínky u každého inputu/pip.
+**Jak ověřeno:** offline náhled `scripts/print-preview` (fixtura `matrix-denik`) → čitelný dokument 1:1 se strukturou appky; build + 16/16 testů MatrixSheet.
+**Zhodnocení:** Dobře. Past: **emoji v tisku** (`📘`) se vykreslí jako prázdný obdélník → nahrazeno textem `(magická)`. Vzor je přenositelný na ostatních 11 diary sheetů (každý dostane svůj `*PrintView`). ZBÝVÁ: 11 sheetů + ověřit Matrix naživo + zakotvit hlídání (hook na `diary-systems/**` změny — viz `feedback_chybovy_denik_deník_práce`).
+
+---
