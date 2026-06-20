@@ -101,6 +101,9 @@ export default function DiceBox3D({
   const ghostStartedRef = useRef(false);
   const ghostWarmRef = useRef(false);
   const pendingNonceRef = useRef(0);
+  // 6.3-fix10 — poslední nonce, který už byl reálně hozen. Brání dvojímu hodu,
+  // když hod-effekt běží víckrát (změna nonce → pak změna active).
+  const lastRolledNonceRef = useRef(0);
 
   /** Spustí hod z aktuálního stavu — voláno po `ready` i při změně `nonce`. */
   const rollNow = useCallback(() => {
@@ -166,8 +169,11 @@ export default function DiceBox3D({
 
   /** 6.3-fix8 — vystřel reálný hod, který čekal za ghostem (0 = nic nečeká). */
   const flushPendingRoll = useCallback(() => {
-    if (pendingNonceRef.current > 0) {
+    const n = pendingNonceRef.current;
+    if (n > 0) {
       pendingNonceRef.current = 0;
+      if (lastRolledNonceRef.current === n) return; // už hozeno effektem (fix10)
+      lastRolledNonceRef.current = n;
       rollNow();
     }
   }, [rollNow]);
@@ -299,33 +305,43 @@ export default function DiceBox3D({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Hod: po dokončení initu (ready) i při každé změně nonce.
+  // Hod: po dokončení initu (ready), při změně nonce I při přepnutí `active`.
   useEffect(() => {
     if (!ready) return;
+    console.info(
+      '[dice3d] hod effect: nonce=', nonce, 'active=', active,
+      'ghostWarm=', ghostWarmRef.current, 'lastRolled=', lastRolledNonceRef.current,
+    ); // DIAG fix10
     // 6.3-fix8 — ghost-warmup spustíme VŽDY hned po `ready` (ODPOJENO od `active`).
     // Knihovní flaky první roll() tak vždy padne na neviditelný ghost. Pokud už
     // čeká reálný hod (hráč hodil DŘÍV, než engine dojel init), zařadíme jeho
-    // nonce do fronty — vystřelí se z onRollComplete ghostu. První reálný hod tak
-    // NIKDY není ten studený. (Předchozí fix5 ghost přeskočil, když hráč hodil
-    // před `ready`, protože `active` už byl true → kořen „první animace chybí".)
+    // nonce do fronty — vystřelí se z onRollComplete ghostu.
     if (warmup && !ghostStartedRef.current) {
       if (nonce > 0) pendingNonceRef.current = nonce;
       runGhostRoll();
       return;
     }
     // 6.3-fix7 — `nonce === 0` = sentinel „není co házet" (overlay se zhasíná,
-    // `roll → null`). Bez tohoto by změna nonce T→0 spustila rollNow, který
-    // v mezi-renderu (`active` ještě true, notation default `1d6@1`) hodil
-    // přízračnou kostku „1". Reálný hod má vždy nonce = timestamp > 0.
+    // `roll → null`). Reálný hod má vždy nonce = timestamp > 0.
     if (nonce === 0) return;
     // Ghost ještě běží → reálný hod počká za ním (vystřelí ho onRollComplete).
     if (warmup && !ghostWarmRef.current) {
       pendingNonceRef.current = nonce;
       return;
     }
+    // 6.3-fix10 — KOŘEN „první animace chybí": `active` (host viditelný) přepne na
+    // true až O RENDER POZDĚJI než se změní `nonce` (overlay nastaví phase/
+    // use3dThisRoll v effectu). Kdybychom házeli hned na změnu nonce, rollNow
+    // trefí `active=false`, spadne na guardu (tiše) a protože se nonce už nemění,
+    // effect se znovu nespustí → hod se ztratí. Proto závisíme i na `active` a
+    // každý nonce hodíme PRÁVĚ JEDNOU — hod vystřelí přesně ve chvíli, kdy
+    // `active` naběhne na true.
+    if (!active) return;
+    if (lastRolledNonceRef.current === nonce) return;
+    lastRolledNonceRef.current = nonce;
     rollNow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, nonce]);
+  }, [ready, nonce, active]);
 
   // Po dokončení hodu (overlay schován → active=false) uklidit kostky.
   useEffect(() => {
