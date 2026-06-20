@@ -54,6 +54,13 @@ export function useSocketReconnect(onReconnect: () => void): void {
     ref.current = onReconnect;
   }, [onReconnect]);
 
+  // S-RUN-04 (plný audit 2026-06-20) — sledujeme `socketStatusAtom` (stejně jako
+  // useSocketEvent): po `reconnectSocket()` (toggle neviditelnosti v Soukromí)
+  // vznikne NOVÁ socket instance. S prázdnými deps by handler zůstal viset na
+  // staré odpojené instanci a re-join callbacky (~14 call-sites: world chat,
+  // ChannelView, mapy, friendships, events…) by se po reconnectu nespustily →
+  // real-time slepota do F5. Re-registrací na změnu stavu se obnoví.
+  const status = useAtomValue(socketStatusAtom);
   useEffect(() => {
     const socket = getSocket();
     const handler = (): void => ref.current();
@@ -61,7 +68,7 @@ export function useSocketReconnect(onReconnect: () => void): void {
     return () => {
       socket.off('connect', handler);
     };
-  }, []);
+  }, [status]);
 }
 
 /** Přihlásí se k socket eventu a odhlásí při unmount. */

@@ -1,0 +1,11 @@
+PATH-SET: 64 rout (root+world) · catch-all '*': ano
+LINK-SET: 229 odkazů, 65 unikátních (norm)
+
+=== DEAD LINKS — odkaz nematchne žádnou routu (0) ===
+
+=== ORPHAN ROUTY — routa bez vstupního odkazu (0) ===
+
+=== AMBIGUITA — stejný vzor v jednom shellu (0) ===
+  bare-dynamic world sourozenci (1): :slug
+
+✅ OK — dead:0 orphan:0 ambiguita:0

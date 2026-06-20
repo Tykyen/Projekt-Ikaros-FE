@@ -7,6 +7,7 @@ import { parseApiErrorCode, parseApiError } from '@/shared/api/client';
 import {
   useRequestSelfDeletion,
   type DeletionPreview,
+  type DeletionBlocking,
 } from '../api/useDeleteAccount';
 import styles from './DeleteAccountModal.module.css';
 
@@ -31,9 +32,7 @@ export function DeleteAccountModal({ onClose }: Props) {
 
   const [preview, setPreview] = useState<DeletionPreview | null>(null);
   const [previewLoading, setPreviewLoading] = useState(true);
-  const [blocking, setBlocking] = useState<DeletionPreview['blocking'] | null>(
-    null,
-  );
+  const [blocking, setBlocking] = useState<DeletionBlocking[] | null>(null);
   const [typedUsername, setTypedUsername] = useState('');
   const [acknowledged, setAcknowledged] = useState(false);
   const ackId = useId();
@@ -48,7 +47,8 @@ export function DeleteAccountModal({ onClose }: Props) {
       {
         onSuccess: (data) => {
           if (cancelled) return;
-          setPreview(data.preview);
+          // N-RUN-01 — BE vrací plochý objekt (ne { preview }).
+          setPreview(data);
           setPreviewLoading(false);
         },
         onError: (err) => {
@@ -56,7 +56,7 @@ export function DeleteAccountModal({ onClose }: Props) {
           setPreviewLoading(false);
           const code = parseApiErrorCode(err);
           if (code === 'SOLE_PJ_BLOCK') {
-            const payload = (err as { response?: { data?: { error?: { worlds?: DeletionPreview['blocking'] } } } }).response?.data?.error;
+            const payload = (err as { response?: { data?: { error?: { worlds?: DeletionBlocking[] } } } }).response?.data?.error;
             setBlocking(payload?.worlds ?? []);
           } else {
             toast.error(parseApiError(err));

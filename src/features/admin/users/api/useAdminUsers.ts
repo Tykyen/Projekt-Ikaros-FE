@@ -104,7 +104,9 @@ export function useAdminUsers(query: AdminUsersQuery, enabled = true) {
   };
   if (query.username) params.username = query.username;
   if (query.role !== undefined) params.role = query.role;
-  if (query.hasPendingRequest) params.hasPendingRequest = 'true';
+  // N-AD-02 (plný audit 2026-06-20) — BE čte ?hasPendingDeletion= (ne
+  // ?hasPendingRequest=), jinak filtr „čeká na smazání" nikdy nefunguje.
+  if (query.hasPendingRequest) params.hasPendingDeletion = 'true';
   return useQuery({
     queryKey: [...adminKeys.users, query],
     queryFn: () =>

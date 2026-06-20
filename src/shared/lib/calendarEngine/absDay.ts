@@ -111,6 +111,10 @@ export function daysInMonth(
   year: number,
   config: CalendarConfig,
 ): number {
+  // N-SHG-01 (plný audit 2026-06-20) — prázdné `months` → mod(n, 0) = NaN →
+  // config.months[NaN] = undefined → TypeError (crash FantasyDatePicker).
+  // Defenzivně degradujeme na 0 dní místo pádu.
+  if (!config.months || config.months.length === 0) return 0;
   const normalizedMonth = mod(monthIndex, config.months.length);
   if (isGregorianLike(config) && normalizedMonth === 1) {
     return isGregorianLeapYear(year) ? 29 : 28;

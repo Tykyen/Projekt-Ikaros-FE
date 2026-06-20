@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
+import { getDefaultStore } from 'jotai';
 import { useSocketReconnect } from './useSocket';
+import { socketStatusAtom } from '../store/socketStore';
 
 /**
  * W-7 — `useSocketReconnect` re-emituje room joiny po (re)connectu. Jádro
  * opravy reconnect-oslepnutí (world chat / PJ orchestrátor). L4 pojistka.
+ * S-RUN-04 (plný audit 2026-06-20) — navíc přeregistrace na změnu socket stavu.
  */
 const handlers: Record<string, () => void> = {};
 const mockSocket = {
@@ -15,13 +18,13 @@ const mockSocket = {
 };
 
 vi.mock('./socket', () => ({ getSocket: () => mockSocket }));
-// useSocketReconnect importuje i jotai/atom přes useSocket modul — neřešíme tu.
-vi.mock('../store/socketStore', () => ({ socketStatusAtom: { init: 'idle' } }));
+// socketStatusAtom je reálný jotai atom (useSocketReconnect ho čte přes useAtomValue).
 
-describe('useSocketReconnect (W-7)', () => {
+describe('useSocketReconnect (W-7 / S-RUN-04)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     for (const k of Object.keys(handlers)) delete handlers[k];
+    getDefaultStore().set(socketStatusAtom, 'connected');
   });
 
   it('zavolá onReconnect při socket connect eventu', () => {
@@ -49,7 +52,23 @@ describe('useSocketReconnect (W-7)', () => {
     handlers.connect();
     expect(first).not.toHaveBeenCalled();
     expect(second).toHaveBeenCalledTimes(1);
-    // Listener se registruje jen jednou (deps []), ne při každém renderu.
+    // Status se nezměnil → registrace effect se neopakuje (jen 1×).
     expect(mockSocket.on).toHaveBeenCalledTimes(1);
+  });
+
+  // S-RUN-04 — po reconnectSocket() (změna socketStatusAtom) se handler
+  // přeregistruje na novou instanci (jinak by visel na staré odpojené).
+  it('přeregistruje connect handler při změně socket stavu', () => {
+    renderHook(() => useSocketReconnect(vi.fn()));
+    expect(mockSocket.on).toHaveBeenCalledTimes(1);
+    // simulace reconnectSocket: disconnected → connected (nová instance)
+    act(() => {
+      getDefaultStore().set(socketStatusAtom, 'disconnected');
+    });
+    act(() => {
+      getDefaultStore().set(socketStatusAtom, 'connected');
+    });
+    expect(mockSocket.off).toHaveBeenCalled(); // odregistrace ze staré
+    expect(mockSocket.on.mock.calls.length).toBeGreaterThan(1); // re-registrace
   });
 });

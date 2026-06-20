@@ -14,7 +14,9 @@ export function usePublicUsers(query: PublicUsersQuery, enabled = true) {
     page: query.page ?? 1,
     limit: query.limit ?? 24,
   };
-  if (query.search) params.search = query.search;
+  // N-RUN-01 (plný audit 2026-06-20) — BE GET /users čte ?q= (ne ?search=),
+  // jinak hledání uživatelů v tabu Uživatelé nikdy nefiltruje.
+  if (query.search) params.q = query.search;
   if (query.sort) params.sort = query.sort;
   if (query.includeDeleted) params.includeDeleted = '1';
 

@@ -47,6 +47,14 @@ describe('isGregorianLike', () => {
 });
 
 describe('daysInMonth', () => {
+  // N-SHG-01 (plný audit 2026-06-20) — regrese: prázdné months nesmí způsobit
+  // mod(n,0)=NaN → undefined.isIntercalary TypeError (crash FantasyDatePicker).
+  it('nespadne na prázdném months (degraduje na 0)', () => {
+    const emptyConfig: CalendarConfig = { ...fantasyConfig, months: [] };
+    expect(() => daysInMonth(0, 1, emptyConfig)).not.toThrow();
+    expect(daysInMonth(0, 1, emptyConfig)).toBe(0);
+  });
+
   it('Únor 28 pro non-leap rok', () => {
     expect(daysInMonth(1, 2023, GREGORIAN_DEFAULT_CONFIG)).toBe(28);
   });

@@ -233,7 +233,14 @@ Statický sweep: FE 73 / BE 9 výskytů `TODO`/`@ts-ignore`/`eslint-disable` nap
 
 ---
 
-**CELKEM POTVRZENÝCH NÁLEZŮ: 41 (N-1…N-41)** + 3 false-positive + ~5 drobných/neověřených.
+### Theming (oblast 13)
+| ID | Nález | Soubor | Záv. | Návrh |
+|---|---|---|---|---|
+| N-42 | `modre-nebe` má `@keyframes modre-nebe-nav-shimmer` (hover animace) bez `@media (prefers-reduced-motion: reduce)` guardu — WCAG 2.3.3 porušení na výchozím motivu platformy | `modre-nebe/decorations.css:248-254` | 🟡 | přidat `@media (prefers-reduced-motion: reduce) { [data-theme="modre-nebe"] [class*="navItem"]::after { animation: none; } }` |
+
+---
+
+**CELKEM POTVRZENÝCH NÁLEZŮ: 42 (N-1…N-42)** + 3 false-positive + ~5 drobných/neověřených.
 
 ### ✅ Opraveno (necommitnuto)
 - **N-1** test mock · **D-029** PWA ikony

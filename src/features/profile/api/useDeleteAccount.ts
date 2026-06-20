@@ -29,20 +29,23 @@ export interface DeletionBlocking {
   worldName: string;
 }
 
+// N-RUN-01 (plný audit 2026-06-20) — BE vrací PLOCHÝ objekt (žádný
+// `{ preview, state }` wrapper). Dřív FE četlo `data.preview` → undefined →
+// PJ-handover promotions se v modalu nikdy nezobrazily. `blocking` přichází
+// zvlášť přes SOLE_PJ_BLOCK error (DeletionBlocking), ne v tomto payloadu.
 export interface DeletionPreview {
   promotions: DeletionPromotion[];
-  blocking: DeletionBlocking[];
+  deletionRequestedAt: string | null;
+  scheduledHardDeleteAt: string | null;
 }
 
+export type DeletionResponse = DeletionPreview;
+
+/** Stav pending soft-delete — vrací GET /users/me/deletion-request (info endpoint). */
 export interface DeletionState {
   deletionRequestedAt: string;
   scheduledHardDeleteAt: string;
   deletionReason: string | null;
-}
-
-export interface DeletionResponse {
-  preview: DeletionPreview;
-  state: DeletionState | null;
 }
 
 interface RequestSelfDeletionArgs {
