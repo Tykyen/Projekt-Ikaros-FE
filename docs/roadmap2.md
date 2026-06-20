@@ -164,12 +164,11 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Ops/BE:** nahrát model na vlastní hosting; dokončit SMTP přepnutí + deploy + test; push test.
 **Otevřené otázky:** Kam hostovat model? Termín, než starý web definitivně padne?
 
-### - [ ] 14.9 Dokončit běžící audity kvality — [H0-07 · dopad střední · náklad střední] 🚧
+### - [x] 14.9 Dokončit běžící audity kvality — [H0-07 · dopad střední · náklad střední] ✅
 **Cíl:** Dotáhnout rozběhnuté auditní sweepy: cascade-delete, db-integrity, seed-scenario gauntlet, navigace — opravit otevřené nálezy.
 **Proč:** Audity hlídají, že rostoucí kód tiše neztrácí data ani nevede uživatele do slepých uliček. Levná pojistka proti regresi; navazuje na 12+ hotových auditních stylů (viz `docs/`).
-**Návrh přípravy:** pokračovat dle existujících plánů (`docs/cascade-delete-*`, `db-integrity-*`, `seed-scenario-*`, `nav-*`); nálezy řešit gated, po souhlasu.
-**BE/FE:** dokončit sweepy + opravy.
-**Otevřené otázky:** Které nálezy jsou blokující vs. odložitelné do dluhů?
+**✅ Hotovo (plný audit RUN-2026-06-20-1621, viz `docs/full-audit/`):** skill `plny-audit` projel **všech 16 stylů × 103 oblastí** do plné hloubky (fan-out 1 agent = 1 oblast, statika L1-L3 + e2e proof). Opraveno **~20 nálezů** (stored XSS, addPost authz bypass, admin moderation 403, map:join/ping leak, world-sounds/characters world-gate, cascade blob leak + WORLD_SCOPED, RC-D7 restore-race, WS leak-safe signály, hiddenPresence, reconnectSocket, getStatus, daysInMonth, search `?q=`, hasPendingDeletion, **Tyky backdoor**) + TOTP_ENC_KEY deploy. Ověřeno: BE jest 2187/2187, e2e seed+isolation/race/lifecycle, META brána 0 regresí. BE pushnuto (`252f840`). Vlastní regrese CH-011 zachycena+opravena.
+**↪️ Zbývá jako dluh (architektonické úklidy, ne auditní nálezy):** `D-NEW-INV-CLEANUP` — legacy `UserRole` 3-8 v BE, mrtvý `canEditPlatformPages`, in-memory paginace `getUsers`, tichý fail MeiliSearche, centralizace favorites toggle, sync audit-log labelů FE↔BE; `+db` DI-* kvantifikace (prod Mongo v interní docker síti). Nálezy identifikované, počty/úklidy odložené.
 
 ---
 

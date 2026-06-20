@@ -81,6 +81,11 @@ Spuštěno přes skill `plny-audit` na čistý běh „od začátku" (na žádos
 
 **Celkem opraveno: 22 nálezů + 3 deploy/OPS místa. Vlastní regrese CH-011 zachycena+opravena.**
 
+### Uzavření (2026-06-20)
+- **BE commitnuto + pushnuto na main** (`252f840`, 27 souborů) → trigger deploy.
+- **TOTP_ENC_KEY** GitHub secret nastaven uživatelem ✅ (2FA prod se zprovozní deployem).
+- **+db DI-* kvantifikace: volba A** — ponecháno ⏭️. Prod Mongo běží v interní docker síti (`mongodb://mongo:27017`), zvenčí nedostupná; nálezy jsou staticky identifikované (které kolekce), chybí jen počty pro prioritizaci. Skripty připravené v `proof/` pro budoucí běh na serveru.
+
 ### Odloženo do skupiny B (nuance / BE+FE koordinace / architektura)
 - **getStatus friendshipId** — BE return rozšíření + FE konzument (koordinace).
 - **DeleteAccountModal preview** — celý kontrakt-redesign (FE typ `{preview,state}` × BE plochý `{promotions,...}`; tvar nesedí ani v polích).
