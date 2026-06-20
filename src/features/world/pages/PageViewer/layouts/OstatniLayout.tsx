@@ -1,9 +1,10 @@
 import { AutoTOC } from '@/features/ikaros/components/AutoTOC';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { usePrintMode } from '@/features/world/export/print';
 import { AkjBanner } from '../components/AkjBanner';
 import { LevelSpine } from '../components/LevelSpine';
 import { PageSections } from '../components/PageSections';
-import { PageSidebar } from '../components/PageSidebar';
+import { PageSidebar, PageDataTable } from '../components/PageSidebar';
 import { QuickRef } from '../components/QuickRef';
 import type { Page } from '../../api/pages.types';
 import { getImageStyle } from '@/shared/lib/imageStyle';
@@ -43,6 +44,47 @@ function readMagicLevels(page: Page): string[] | null {
  */
 export function OstatniLayout({ page }: Props) {
   const magicLevels = readMagicLevels(page);
+  const printMode = usePrintMode();
+
+  const hasTable =
+    page.table?.hasTable === true && (page.table.headers?.length ?? 0) > 0;
+
+  // Tisk: lineární pořadí dle požadavku — obrázek nahoře → datová tabulka
+  // (boxík) → text → sekce. Na obrazovce je obrázek+tabulka v bočním sidebaru
+  // (vpravý sloupec) → v tisku by spadly za text; tady je explicitně vepředu.
+  // AutoTOC/QuickRef (navigace) se netiskne.
+  if (printMode) {
+    return (
+      <div>
+        {page.imageUrl && (
+          <img
+            className="print-hero"
+            src={page.imageUrl}
+            alt={page.title}
+            style={getImageStyle(
+              page.imageFocalX,
+              page.imageFocalY,
+              page.imageZoom,
+              page.imageFit,
+            )}
+          />
+        )}
+        {hasTable && page.table && <PageDataTable table={page.table} />}
+        <AkjBanner accessRequirements={page.accessRequirements} />
+        <div className={s.proseWrap} data-article-content>
+          <RichTextEditor value={page.content} readOnly className={s.prose} />
+        </div>
+        {magicLevels && (
+          <div className={s.spineWrap}>
+            <h3 className={s.spineHeading}>Stupně</h3>
+            <LevelSpine levels={magicLevels} />
+          </div>
+        )}
+        <PageSections sections={page.sections} />
+      </div>
+    );
+  }
+
   return (
     <div className={s.layout}>
       <main className={s.main}>

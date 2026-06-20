@@ -75,7 +75,7 @@ function StatField({ field, value }: StatFieldProps): React.ReactElement {
   if (field.type === 'computed' && field.formula) {
     const computed = evaluateFormula(field.formula, value);
     return (
-      <div className={styles.statRow}>
+      <div className={`${styles.statRow} print-stat`}>
         <span className={styles.statLabel}>{field.label}</span>
         <span className={styles.statValue}>{computed === null ? '—' : computed}</span>
       </div>
@@ -94,7 +94,7 @@ function StatField({ field, value }: StatFieldProps): React.ReactElement {
       percent > 60 ? styles.barFull : percent > 30 ? styles.barMid : styles.barLow;
     return (
       <div className={styles.statBar}>
-        <div className={styles.statBarHeader}>
+        <div className={`${styles.statBarHeader} print-stat`}>
           <span className={styles.statLabel}>{field.label}</span>
           <span className={styles.statValue}>
             {current} / {maxValue}

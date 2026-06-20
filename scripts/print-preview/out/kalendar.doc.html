@@ -179,68 +179,46 @@ hr { border: none; border-top: 1px solid #bbb; margin: 1em 0; }
 }
 .print-cols > * { break-inside: avoid; }
 </style></head>
-<body><!-- Fixture: MatrixPrintView output (diary sheet „matrix" v printMode).
-     Odpovídá statickému tiskovému renderu MatrixSheet.tsx — hodnoty jako text,
-     přetlaky jako pips ●●●○○. Reálná data ze screenshotu postavy Zara. -->
-<div class="matrix-print">
-  <dl>
-    <div><dt>Jméno</dt><dd>Zara Villiam</dd></div>
-    <div><dt>Stát</dt><dd>Francie</dd></div>
-    <div><dt>Magický gen</dt><dd>—</dd></div>
-    <div><dt>Poslední úprava</dt><dd>—</dd></div>
-    <div><dt>Body schopností</dt><dd>0 / 73</dd></div>
-    <div><dt>Body osudu</dt><dd>2</dd></div>
-  </dl>
+<body><!-- Fixture: CalendarPage printMode (1 týden výřez). Ověřuje: mřížka (grid se
+     v tisku obnoví print-cal-grid) + akce mají NÁZEV (print-event přebíjí
+     button{display:none}; dřív jen prázdné barevné proužky). -->
+<div class="print-month">
+  <h2 class="print-month-title">Březen 2039</h2>
+  <div class="_grid_x print-cal-grid" style="grid-template-columns: repeat(7, 1fr)" role="grid">
+    <div class="_weekday_w">Po</div>
+    <div class="_weekday_w">Út</div>
+    <div class="_weekday_w">St</div>
+    <div class="_weekday_w">Čt</div>
+    <div class="_weekday_w">Pá</div>
+    <div class="_weekday_w">So</div>
+    <div class="_weekday_w">Ne</div>
 
-  <h2>Fyzický stav</h2>
-  <dl class="print-cols">
-    <div><dt>Životy</dt><dd>4</dd></div>
-    <div><dt>Runa</dt><dd>0</dd></div>
-    <div><dt>Vesta</dt><dd>1</dd></div>
-    <div><dt>Únava</dt><dd>0</dd></div>
-  </dl>
-
-  <h2>Přetlaky</h2>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Fyzický</span><span>●●●●●</span></li>
-    <li class="print-row"><span>Magický</span><span>●●●●●</span></li>
-    <li class="print-row"><span>Diplomatický</span><span>●●●●●</span></li>
-    <li class="print-row"><span>Technický</span><span>●●●●●</span></li>
-  </ul>
-
-  <h3>Jazyky</h3>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Angličtina</span><span>C2</span></li>
-    <li class="print-row"><span>Francouzština</span><span>C2</span></li>
-    <li class="print-row"><span>Esperanto</span><span>C2</span></li>
-  </ul>
-
-  <h3>Schopnosti</h3>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Hacker (magická)</span><span>5</span></li>
-    <li class="print-row"><span>Kouzlo šarmu</span><span>4</span></li>
-    <li class="print-row"><span>V podsvětí jako doma</span><span>3</span></li>
-    <li class="print-row"><span>Plížení a vloupání</span><span>4</span></li>
-    <li class="print-row"><span>Ostrostřelec</span><span>4</span></li>
-    <li class="print-row"><span>Vyznám se v technologiích</span><span>3</span></li>
-    <li class="print-row"><span>Intuice nebezpečí</span><span>2</span></li>
-    <li class="print-row"><span>Moje hlava!</span><span>1</span></li>
-  </ul>
-
-  <h3>Aspekty</h3>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Věřím v zákon, ale ne vždy v systém</span><span>Vybitý</span></li>
-    <li class="print-row"><span>Holka z ulice</span><span>Vybitý</span></li>
-    <li class="print-row"><span>Ostré oči a vřelé srdce</span><span>Vybitý</span></li>
-    <li class="print-row"><span>Hraní na hraně je moje druhé já</span><span>Vybitý</span></li>
-    <li class="print-row"><span>(Vodní) záchranář</span><span>Vybitý</span></li>
-  </ul>
-
-  <h2>Výbava a poznámky</h2>
-  <p style="white-space:pre-wrap">1. Hacker (Specializace na Matrix): Umožní jí ovládat virtuální svět a získávat důležité informace.
-
-2. Kouzlo šarmu: Schopnost využít jejího vzhledu k získání výhod v sociálních interakcích.
-
-3. V podsvětí jako doma: Dává jí silné kontakty v podsvětí.</p>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">5.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#7c5cff">Pán Jeskyně: Karneval v Benátkách</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">6.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#7c5cff">Karneval — pokračování</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">7.</span></div>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">8.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#3cc46a">Schůzka u Kardinála</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">9.</span></div>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">10.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#e0a020">Trh ve Florencii</button>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#c0392b">Přepadení karavany</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">11.</span></div>
+    </div>
+  </div>
 </div>
 </body></html>

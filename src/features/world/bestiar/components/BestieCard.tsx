@@ -62,7 +62,7 @@ export function BestieCard({
         {abilities.length > 0 && (
           <ul className={styles.abilities} aria-label="Schopnosti">
             {abilities.map((a, i) => (
-              <li key={i} className={styles.ability}>
+              <li key={i} className={`${styles.ability} print-stat`}>
                 <span className={styles.abilityLabel}>{a.label}</span>
                 {a.value && (
                   <span className={styles.abilityValue}>{a.value}</span>

@@ -10,8 +10,9 @@
  * Mapový overlay (Sanity tracker s draft state, d100 roller) je v Matrix/Matrix
  * v `CocMapDiaryOverlay.tsx` — patří k iteraci 10.2l (mapa); nepřenášíme teď.
  */
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
-import { makeCdAccess } from '../../_shared/cdAccess';
+import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 import {
   COC_CHARS,
@@ -24,13 +25,19 @@ import {
 
 export function CocSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
-  const { g, bool, set, parseJsonArr, updateArr, addArr, removeArr } =
-    makeCdAccess(cd, 'coc_', onChange);
+  const cda = makeCdAccess(cd, 'coc_', onChange);
+  const { g, bool, set, parseJsonArr, updateArr, addArr, removeArr } = cda;
 
   // `g` použijeme s logickými klíči (např. `name`, `hp_cur`), helper auto-prefix.
   // Pro klíče typu `wpn0_name` (default Brawl row) i `sk_<skill>_reg` (dovednosti)
   // bereme suffix přímo.
+
+  // Tisk: interaktivní sheet (inputy/checkboxy) je netisknutelný — hodnoty
+  // jsou v `<input value>` (replaced element). V printMode vyrenderujeme
+  // oddělený statický čitelný dokument (viz vzor MatrixPrintView).
+  if (printMode) return <CocPrintView cda={cda} />;
 
   return (
     <div className="coc-sheet">
@@ -604,6 +611,221 @@ function VitalBox({
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `coc_*` data)
+// ════════════════════════════════════════════════════════════════
+
+/** Vlastnost s mezivýpočty „zákl / pol / pět" — zobrazí jen vyplněné. */
+function charLine(cda: CdAccess, key: string): string {
+  const reg = cda.g(`${key}_reg`).trim();
+  const half = cda.g(`${key}_half`).trim();
+  const fifth = cda.g(`${key}_fifth`).trim();
+  if (!reg && !half && !fifth) return '—';
+  return `${reg || '—'} / ${half || '—'} / ${fifth || '—'}`;
+}
+
+function CocPrintView({ cda }: { cda: CdAccess }) {
+  const { g, bool, parseJsonArr } = cda;
+
+  const customSkills = parseJsonArr<CocCustomSkill>('custom_skills');
+  const weapons = parseJsonArr<CocWeapon>('weapons');
+  const activeFlags = COC_STATUS_FLAGS.filter((f) =>
+    bool(f.key.replace(/^coc_/, '')),
+  );
+
+  return (
+    <div className="coc-print">
+      <h2>Vyšetřovatel – 20. léta</h2>
+
+      {/* ═══ Identita ═══ */}
+      <dl>
+        {COC_HEADER_FIELDS.map((f) => {
+          const k = f.key.replace(/^coc_/, '');
+          return (
+            <div key={f.key}>
+              <dt>{f.label}</dt>
+              <dd>{g(k) || '—'}</dd>
+            </div>
+          );
+        })}
+      </dl>
+
+      {/* ═══ Vlastnosti (zákl / pol / pět) ═══ */}
+      <h3>Vlastnosti</h3>
+      <ul className="matrix-print__plain">
+        {COC_CHARS.map((c) => (
+          <li key={c.key} className="print-row">
+            <span>{c.label}</span>
+            <span>{charLine(cda, c.key)}</span>
+          </li>
+        ))}
+        <li className="print-row">
+          <span>Nápad (INT×3)</span>
+          <span>{g('idea') || '—'}</span>
+        </li>
+        <li className="print-row">
+          <span>Znalosti (VZD×5)</span>
+          <span>{g('know') || '—'}</span>
+        </li>
+      </ul>
+
+      {/* ═══ Vitalita ═══ */}
+      <h3>Stav</h3>
+      <ul className="matrix-print__plain">
+        <li className="print-row">
+          <span>Životy (akt. / max.)</span>
+          <span>
+            {g('hp_cur') || '—'} / {g('hp_max') || '—'}
+          </span>
+        </li>
+        <li className="print-row">
+          <span>Body magie (akt. / max.)</span>
+          <span>
+            {g('mp_cur') || '—'} / {g('mp_max') || '—'}
+          </span>
+        </li>
+        <li className="print-row">
+          <span>Štěstí (akt. / poč.)</span>
+          <span>
+            {g('luck_cur') || '—'} / {g('luck_start') || '—'}
+          </span>
+        </li>
+        <li className="print-row">
+          <span>Příčetnost (akt. / poč.)</span>
+          <span>
+            {g('san_cur') || '—'} / {g('san_start') || '—'}
+          </span>
+        </li>
+      </ul>
+
+      {activeFlags.length > 0 && (
+        <>
+          <h3>Stavové příznaky</h3>
+          <ul className="matrix-print__plain">
+            {activeFlags.map((f) => (
+              <li key={f.key} className="print-row">
+                <span>{f.label}</span>
+                <span>(ano)</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* ═══ Dovednosti (44 default; ★ = vylepšená) ═══ */}
+      <h3>Dovednosti</h3>
+      <ul className="matrix-print__plain">
+        {DEFAULT_SKILLS.map((sk) => {
+          const reg = g(`sk_${sk.key}_reg`).trim();
+          const half = g(`sk_${sk.key}_half`).trim();
+          const fifth = g(`sk_${sk.key}_fifth`).trim();
+          const improved = bool(`sk_${sk.key}_chk`);
+          const val =
+            reg || half || fifth
+              ? `${reg || '—'} / ${half || '—'} / ${fifth || '—'}`
+              : sk.base;
+          return (
+            <li key={sk.key} className="print-row">
+              <span>
+                {improved ? '(vylepšená) ' : ''}
+                {sk.name}
+              </span>
+              <span>{val}</span>
+            </li>
+          );
+        })}
+      </ul>
+
+      {customSkills.length > 0 && (
+        <>
+          <h3>Další dovednosti</h3>
+          <ul className="matrix-print__plain">
+            {customSkills.map((row, i) => {
+              const improved = row.chk === 'true';
+              const reg = (row.reg || '').trim();
+              const half = (row.half || '').trim();
+              const fifth = (row.fifth || '').trim();
+              return (
+                <li key={i} className="print-row">
+                  <span>
+                    {improved ? '(vylepšená) ' : ''}
+                    {row.name || '—'}
+                  </span>
+                  <span>
+                    {reg || half || fifth
+                      ? `${reg || '—'} / ${half || '—'} / ${fifth || '—'}`
+                      : '—'}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+
+      {/* ═══ Boj ═══ */}
+      <h3>Boj</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Zbraň</th>
+            <th>Dovednost</th>
+            <th>Zranění</th>
+            <th>Počet útoků</th>
+            <th>Dostřel</th>
+            <th>Munice</th>
+            <th>Selhání</th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* Default Brawl row (coc_wpn0_*) */}
+          <tr>
+            <td>{g('wpn0_name') || 'Rvačka'}</td>
+            <td>{g('wpn0_skill') || '—'}</td>
+            <td>{g('wpn0_dmg') || '1K3 + BZ'}</td>
+            <td>{g('wpn0_attacks') || '1'}</td>
+            <td>{g('wpn0_range') || '–'}</td>
+            <td>{g('wpn0_ammo') || '–'}</td>
+            <td>{g('wpn0_malf') || '–'}</td>
+          </tr>
+          {weapons.map((w, i) => (
+            <tr key={i}>
+              <td>{w.name || '—'}</td>
+              <td>{w.skill || '—'}</td>
+              <td>{w.dmg || '—'}</td>
+              <td>{w.attacks || '—'}</td>
+              <td>{w.range || '—'}</td>
+              <td>{w.ammo || '—'}</td>
+              <td>{w.malf || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* ═══ Bojové odvozené ═══ */}
+      <h3>Bojové statistiky</h3>
+      <ul className="matrix-print__plain">
+        <li className="print-row">
+          <span>Pohyb</span>
+          <span>{g('move') || '—'}</span>
+        </li>
+        <li className="print-row">
+          <span>Stavba</span>
+          <span>{g('build') || '—'}</span>
+        </li>
+        <li className="print-row">
+          <span>Úhyb (zákl / pol / pět)</span>
+          <span>{charLine(cda, 'dodge')}</span>
+        </li>
+        <li className="print-row">
+          <span>Bonus ke zranění (BZ)</span>
+          <span>{g('damage_bonus') || '—'}</span>
+        </li>
+      </ul>
     </div>
   );
 }

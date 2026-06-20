@@ -11,6 +11,7 @@
  * Data v `diary.customData` s prefixem `sr_*` (1:1 vůči legacy).
  */
 import { useState } from 'react';
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import { SR_CORE_ATTRS, SR_SPECIAL_ATTRS } from './constants';
@@ -23,11 +24,16 @@ export function ShadowrunSheet({
   onChange,
 }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'sr_', onChange);
   const { g, set } = cda;
 
   const [tab, setTab] = useState<Tab>('core');
+
+  // Tisk: inputy/tracky (barva)/taby jsou netisknutelné — vyrenderujeme
+  // statický čitelný dokument; oba taby najednou (tisk nezná aktivní tab).
+  if (printMode) return <ShadowrunPrintView cda={cda} />;
 
   return (
     <div className="sr-dashboard">
@@ -966,6 +972,296 @@ function SrTable({
         >
           {addLabel}
         </button>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `sr_*` data)
+// ════════════════════════════════════════════════════════════════
+
+const SR_HEADER_FIELDS: { key: string; label: string }[] = [
+  { key: 'name', label: 'Alias / Jméno' },
+  { key: 'player', label: 'Hráč' },
+  { key: 'role_note', label: 'Poznámka (Role)' },
+  { key: 'race', label: 'Metarasa' },
+  { key: 'ethnicity', label: 'Etnicita' },
+  { key: 'notoriety', label: 'Hledanost' },
+  { key: 'rep', label: 'Pověst' },
+  { key: 'karma', label: 'Zbývá Karma' },
+  { key: 'karma_total', label: 'Celkem Karma' },
+];
+
+/** Tiskové sloupce odpovídají `cols` v SrTable (field, label). */
+type SrPrintCol = [string, string];
+
+function SrPrintTable({
+  cda,
+  arrKey,
+  cols,
+}: {
+  cda: CdAccess;
+  arrKey: string;
+  cols: SrPrintCol[];
+}) {
+  const rows = cda.parseJsonArr<Record<string, string>>(arrKey);
+  if (rows.length === 0) return <p>—</p>;
+  return (
+    <table>
+      <thead>
+        <tr>
+          {cols.map(([k, label]) => (
+            <th key={k}>{label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i}>
+            {cols.map(([k]) => (
+              <td key={k}>{row[k] || '—'}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function ShadowrunPrintView({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const physCur = parseInt(g('cond_phys'), 10) || 0;
+  const physMax = parseInt(g('cond_phys_max', '10'), 10) || 10;
+  const stunCur = parseInt(g('cond_stun'), 10) || 0;
+  const stunMax = parseInt(g('cond_stun_max', '10'), 10) || 10;
+  const matDmg = parseInt(g('mat_dmg'), 10) || 0;
+  const notes = g('notes').trim();
+  const ecoSins = g('eco_sins').trim();
+
+  return (
+    <div className="sr-print">
+      <dl>
+        {SR_HEADER_FIELDS.map((f) => (
+          <div key={f.key}>
+            <dt>{f.label}</dt>
+            <dd>{g(f.key) || '—'}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2>Atributy (Základní)</h2>
+      <dl className="print-cols">
+        {SR_CORE_ATTRS.map((a) => (
+          <div key={a.key}>
+            <dt>{a.label}</dt>
+            <dd>{g(`attr_${a.key}`) || '—'}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2>Speciální &amp; Odvozené</h2>
+      <dl className="print-cols">
+        {SR_SPECIAL_ATTRS.map((a) => (
+          <div key={a.key}>
+            <dt>{a.label}</dt>
+            <dd>{g(`attr_${a.key}`) || '—'}</dd>
+          </div>
+        ))}
+        <div>
+          <dt>Hodnocení Obrany (HO)</dt>
+          <dd>{g('attr_def') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h2>Záznamník zranění</h2>
+      <ul className="matrix-print__plain">
+        <li className="print-row">
+          <span>Fyzický záznamník</span>
+          <span>
+            {physCur} / {physMax} (penalty -{Math.floor(physCur / 3)})
+          </span>
+        </li>
+        <li className="print-row">
+          <span>Záznamník omráčení (Stun)</span>
+          <span>
+            {stunCur} / {stunMax} (penalty -{Math.floor(stunCur / 3)})
+          </span>
+        </li>
+      </ul>
+
+      <h2>Finance &amp; Životní styl</h2>
+      <dl>
+        <div>
+          <dt>Nuyeny (Hotovost / Účty)</dt>
+          <dd>{g('eco_nuyen') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Primární životní styl</dt>
+          <dd>{g('eco_lifestyle') || '—'}</dd>
+        </div>
+      </dl>
+      {ecoSins && (
+        <>
+          <h3>Falešné SIN a Licence</h3>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{ecoSins}</p>
+        </>
+      )}
+
+      <h2>Dovednosti</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="skills"
+        cols={[
+          ['name', 'Dovednost'],
+          ['val', 'Hodn.'],
+          ['attr', 'Atr'],
+          ['type', 'Typ (A/Z/K)'],
+        ]}
+      />
+
+      <h2>Kvality</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="qualities"
+        cols={[
+          ['name', 'Kvalita'],
+          ['type', 'Typ'],
+          ['note', 'Poznámka'],
+        ]}
+      />
+
+      <h2>Kontakty</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="contacts"
+        cols={[
+          ['name', 'Jméno / Spojka'],
+          ['loy', 'Loaj'],
+          ['con', 'Konx'],
+        ]}
+      />
+
+      <h2>Matrix a Zařízení</h2>
+      <dl>
+        <div>
+          <dt>Komlink / Cyberdeck</dt>
+          <dd>{g('mat_device') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Hodnocení</dt>
+          <dd>{g('mat_dev_rating') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Útok (A)</dt>
+          <dd>{g('mat_atk') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Maskování (S)</dt>
+          <dd>{g('mat_slz') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Zpracování (D)</dt>
+          <dd>{g('mat_dp') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Firewall (F)</dt>
+          <dd>{g('mat_fw') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Matrix záznamník (poškození)</dt>
+          <dd>{matDmg} / 12</dd>
+        </div>
+      </dl>
+
+      <h3>Nainstalované programy</h3>
+      <SrPrintTable cda={cda} arrKey="mat_progs" cols={[['name', 'Program']]} />
+
+      <h2>Magie: Kouzla / Výtvory / Rituály / KF</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="spells"
+        cols={[
+          ['name', 'Jméno (K/V/R/KF)'],
+          ['type', 'Typ/Cíl'],
+          ['rng', 'Dosah'],
+          ['dur', 'Trvání'],
+          ['drain', 'Odliv'],
+        ]}
+      />
+
+      <h2>Adeptské síly a další schopnosti</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="powers"
+        cols={[
+          ['name', 'Název schopnosti'],
+          ['lvl', 'Úroveň'],
+          ['note', 'Poznámky'],
+        ]}
+      />
+
+      <h2>Střelné zbraně</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="ranged"
+        cols={[
+          ['name', 'Zbraň'],
+          ['dmg', 'HP'],
+          ['ar', 'HÚ'],
+          ['ammo', 'Munice'],
+        ]}
+      />
+
+      <h2>Zbraně na blízko</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="melee"
+        cols={[
+          ['name', 'Zbraň'],
+          ['dmg', 'HP'],
+          ['reach', 'Dosah'],
+        ]}
+      />
+
+      <h2>Hlavní Pancíř / Zbroj</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="armor"
+        cols={[
+          ['name', 'Pancíř'],
+          ['val', 'Hodn.'],
+          ['note', 'Poznámka'],
+        ]}
+      />
+
+      <h2>Augmentace (Cyber/Bioware)</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="aug"
+        cols={[
+          ['name', 'Zlepšení'],
+          ['val', 'Hodn.'],
+          ['ess', 'Esence'],
+        ]}
+      />
+
+      <h2>Dopravní prostředky / Droni</h2>
+      <SrPrintTable
+        cda={cda}
+        arrKey="vehicle"
+        cols={[
+          ['name', 'Model'],
+          ['speed', 'Max Y.'],
+          ['bod', 'Tělo/Pan'],
+        ]}
+      />
+
+      {notes && (
+        <>
+          <h2>Poznámky</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{notes}</p>
+        </>
       )}
     </div>
   );

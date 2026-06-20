@@ -1,0 +1,42 @@
+<!-- Fixture: CalendarPage printMode (1 týden výřez). Ověřuje: mřížka (grid se
+     v tisku obnoví print-cal-grid) + akce mají NÁZEV (print-event přebíjí
+     button{display:none}; dřív jen prázdné barevné proužky). -->
+<div class="print-month">
+  <h2 class="print-month-title">Březen 2039</h2>
+  <div class="_grid_x print-cal-grid" style="grid-template-columns: repeat(7, 1fr)" role="grid">
+    <div class="_weekday_w">Po</div>
+    <div class="_weekday_w">Út</div>
+    <div class="_weekday_w">St</div>
+    <div class="_weekday_w">Čt</div>
+    <div class="_weekday_w">Pá</div>
+    <div class="_weekday_w">So</div>
+    <div class="_weekday_w">Ne</div>
+
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">5.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#7c5cff">Pán Jeskyně: Karneval v Benátkách</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">6.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#7c5cff">Karneval — pokračování</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">7.</span></div>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">8.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#3cc46a">Schůzka u Kardinála</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">9.</span></div>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">10.</span></div>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#e0a020">Trh ve Florencii</button>
+      <button type="button" class="_eventChip_e print-event" style="--chip-color:#c0392b">Přepadení karavany</button>
+    </div>
+    <div class="_cell_c">
+      <div class="_cellHeader_h"><span class="_dayNum_d">11.</span></div>
+    </div>
+  </div>
+</div>

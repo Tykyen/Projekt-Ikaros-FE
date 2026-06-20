@@ -6,6 +6,7 @@
  * dynamický dle `drdp_profession` (6 inline rendererů).
  */
 import { useState } from 'react';
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
@@ -23,12 +24,18 @@ import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 
 export function DrdPlusSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'drdp_', onChange);
   const { g, set } = cda;
 
   const [tab, setTab] = useState<DrdPlusTab>('postava');
   const prof = (g('profession') || 'bojovnik') as DrdPlusProfessionId;
+
+  // Tisk: sheet má 4 taby (jen aktivní je v DOM) + inputy v tabulkách —
+  // netisknutelné. V printMode renderujeme oddělený statický dokument se
+  // VŠEMI taby pod sebou (čte stejná `drdp_*` data).
+  if (printMode) return <DrdPlusPrintView cda={cda} prof={prof} />;
 
   return (
     <div className="drdplus-dashboard">
@@ -878,5 +885,447 @@ function JsonTable({
         </button>
       )}
     </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `drdp_*` data)
+// ════════════════════════════════════════════════════════════════
+
+/** Tiskové vykreslení JSON pole jako semantická tabulka se statickým textem. */
+function DrdPlusPrintTable({
+  cda,
+  arrKey,
+  cols,
+}: {
+  cda: CdAccess;
+  arrKey: string;
+  cols: [string, string][];
+}) {
+  const rows = cda.parseJsonArr<Record<string, string>>(arrKey);
+  if (rows.length === 0) return null;
+  return (
+    <table>
+      <thead>
+        <tr>
+          {cols.map(([k, label]) => (
+            <th key={k}>{label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i}>
+            {cols.map(([k]) => (
+              <td key={k}>{row[k] || '—'}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function DrdPlusPrintView({
+  cda,
+  prof,
+}: {
+  cda: CdAccess;
+  prof: DrdPlusProfessionId;
+}) {
+  const { g } = cda;
+  const profLabel =
+    DRDPLUS_PROFESSIONS.find((p) => p.id === prof)?.label || prof;
+  const popis = g('postava_popis').trim();
+  const zraneniN = g('zraneni_n').trim();
+
+  return (
+    <div className="drdplus-print">
+      <dl>
+        <div>
+          <dt>Jméno</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Rasa</dt>
+          <dd>{g('race') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Věk</dt>
+          <dd>{g('age') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Povolání</dt>
+          <dd>{profLabel}</dd>
+        </div>
+        <div>
+          <dt>Úroveň</dt>
+          <dd>{g('uroven') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Zkušenosti</dt>
+          <dd>{g('xp') || '—'}</dd>
+        </div>
+      </dl>
+
+      {/* ═══ POSTAVA ═══ */}
+      <h2>Hlavní vlastnosti</h2>
+      <dl className="print-cols">
+        {DRDPLUS_STATS.map((stat) => (
+          <div key={stat}>
+            <dt>{stat}</dt>
+            <dd>{g(`stat_${stat}`) || '—'}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2>Odvozené vlastnosti</h2>
+      <dl className="print-cols">
+        {DRDPLUS_DERIVED.map((stat) => (
+          <div key={stat}>
+            <dt>{stat}</dt>
+            <dd>{g(`odv_${stat}`) || '—'}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {popis && (
+        <>
+          <h3>Popis postavy</h3>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{popis}</p>
+        </>
+      )}
+
+      {/* ═══ BOJ ═══ */}
+      <h2>Boj</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Boj</dt>
+          <dd>{g('boj_b') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Útok</dt>
+          <dd>{g('boj_u') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Střelba</dt>
+          <dd>{g('boj_s') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Obrana</dt>
+          <dd>{g('boj_o') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h3>Kombinace zbraní</h3>
+      <DrdPlusPrintTable
+        cda={cda}
+        arrKey="zbrane"
+        cols={[
+          ['zbran', 'Kombinace / Zbraně'],
+          ['bc', 'BČ'],
+          ['uc', 'ÚČ / ZZ'],
+          ['oc', 'OČ (Kryt)'],
+        ]}
+      />
+
+      <h3>Tracker zranění</h3>
+      <dl>
+        <div>
+          <dt>Hlavní zranění</dt>
+          <dd>{g('zraneni_hlavni') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Mez zranění</dt>
+          <dd>{g('zraneni_mez') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Postih ze zranění</dt>
+          <dd>{g('zraneni_postih') || '—'}</dd>
+        </div>
+      </dl>
+      {zraneniN && <p style={{ whiteSpace: 'pre-wrap' }}>{zraneniN}</p>}
+
+      <h3>Zbroj a ochrana</h3>
+      <DrdPlusPrintTable
+        cda={cda}
+        arrKey="zbroje"
+        cols={[
+          ['typ', 'Typ Zbroje'],
+          ['kvalita', 'Kvalita'],
+          ['zbrojhn', 'Zbroj H / N'],
+          ['ochrana', 'Ochrana H / T / N'],
+        ]}
+      />
+
+      {/* ═══ CESTY ═══ */}
+      <h2>Pohyb &amp; rychlost</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Pohybová rychlost</dt>
+          <dd>{g('rychlost_base') || '—'}</dd>
+        </div>
+        {[
+          ['chuze', 'Chůze'],
+          ['spech', 'Spěch'],
+          ['beh', 'Běh'],
+          ['sprint', 'Sprint'],
+        ].map(([key, label]) => (
+          <div key={key}>
+            <dt>{label}</dt>
+            <dd>{g(`spd_${key}`) || '—'}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h3>Tracker únavy</h3>
+      <dl className="print-cols">
+        <div>
+          <dt>Únava / Body</dt>
+          <dd>{g('unava_val') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Mez únavy</dt>
+          <dd>{g('unava_mez') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Postih z únavy</dt>
+          <dd>{g('unava_postih') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h3>Dovednosti na cestách</h3>
+      <DrdPlusPrintTable
+        cda={cda}
+        arrKey="dovednosti"
+        cols={[
+          ['dovednost', 'Dovednost'],
+          ['vlastnost', 'Vlastnost'],
+          ['bonus', 'Bonus'],
+          ['note', 'Poznámka'],
+        ]}
+      />
+
+      {/* ═══ PROFESE (dle aktivního povolání) ═══ */}
+      <h2>Profese: {profLabel}</h2>
+      <DrdPlusProfessionPrint cda={cda} prof={prof} />
+    </div>
+  );
+}
+
+/** Tiskové vykreslení profesního tabu dle aktivního povolání. */
+function DrdPlusProfessionPrint({
+  cda,
+  prof,
+}: {
+  cda: CdAccess;
+  prof: DrdPlusProfessionId;
+}) {
+  const { g } = cda;
+
+  if (prof === 'bojovnik') {
+    return (
+      <>
+        <h3>Archetypy</h3>
+        <dl className="print-cols">
+          {WARRIOR_ARCHETYPES.map((arc) => (
+            <div key={arc}>
+              <dt>{arc}</dt>
+              <dd>{g(`w_arc_${arc}`) || '—'}</dd>
+            </div>
+          ))}
+        </dl>
+        <h3>Bojové finty</h3>
+        <DrdPlusPrintTable
+          cda={cda}
+          arrKey="w_finty"
+          cols={[
+            ['name', 'Název'],
+            ['weapon', 'Zbraň'],
+            ['prevaha', 'Převaha'],
+            ['note', 'Poznámka'],
+          ]}
+        />
+        <h3>Bojové schopnosti</h3>
+        <DrdPlusPrintTable
+          cda={cda}
+          arrKey="w_schopnosti"
+          cols={[
+            ['name', 'Schopnost'],
+            ['note', 'Poznámka / Stupeň'],
+          ]}
+        />
+      </>
+    );
+  }
+
+  if (prof === 'carodej') {
+    const projevy = g('wiz_projevy').trim();
+    return (
+      <>
+        <h3>Magenergie</h3>
+        <dl className="print-cols">
+          <div>
+            <dt>Kapacita</dt>
+            <dd>{g('wiz_kapacita') || '—'}</dd>
+          </div>
+          <div>
+            <dt>Aktuální</dt>
+            <dd>{g('wiz_aktualni') || '—'}</dd>
+          </div>
+          <div>
+            <dt>Únava</dt>
+            <dd>{g('wiz_unava') || '—'}</dd>
+          </div>
+        </dl>
+        {projevy && (
+          <>
+            <h3>Projevy</h3>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{projevy}</p>
+          </>
+        )}
+        <h3>Kouzla</h3>
+        <DrdPlusPrintTable
+          cda={cda}
+          arrKey="wiz_kouzla"
+          cols={[
+            ['name', 'Kouzlo'],
+            ['obor', 'Obor'],
+            ['mg', 'Mg'],
+            ['note', 'Poznámka'],
+          ]}
+        />
+      </>
+    );
+  }
+
+  if (prof === 'hranicar') {
+    const totem = g('ran_totem').trim();
+    const zvirata = g('ran_zvirata').trim();
+    return (
+      <>
+        <h3>Zaměření a mechanismy</h3>
+        <DrdPlusPrintTable
+          cda={cda}
+          arrKey="ran_zam"
+          cols={[
+            ['znalost', 'Znalost'],
+            ['praxe', 'Praxe'],
+            ['name', 'Mechanismus / Název'],
+          ]}
+        />
+        <h3>Totem a zvířata</h3>
+        <dl>
+          <div>
+            <dt>Zvíře totemu</dt>
+            <dd>{totem || '—'}</dd>
+          </div>
+        </dl>
+        {zvirata && <p style={{ whiteSpace: 'pre-wrap' }}>{zvirata}</p>}
+      </>
+    );
+  }
+
+  if (prof === 'knez') {
+    return (
+      <>
+        <h3>Principy a aspekty</h3>
+        <dl className="print-cols">
+          <div>
+            <dt>Doména</dt>
+            <dd>{g('pri_domena') || '—'}</dd>
+          </div>
+          <div>
+            <dt>Síla as.</dt>
+            <dd>{g('pri_silaas') || '—'}</dd>
+          </div>
+          <div>
+            <dt>Neovliv.</dt>
+            <dd>{g('pri_neovliv') || '—'}</dd>
+          </div>
+        </dl>
+        <h3>Základní schopnosti</h3>
+        <dl className="print-cols">
+          {PRIEST_BASIC_ABILITIES.map((s) => (
+            <div key={s}>
+              <dt>{s}</dt>
+              <dd>{g(`pri_${s}`) || '—'}</dd>
+            </div>
+          ))}
+        </dl>
+        <h3>Zázračné schopnosti</h3>
+        <DrdPlusPrintTable
+          cda={cda}
+          arrKey="pri_zazraky"
+          cols={[
+            ['name', 'Zázrak'],
+            ['uroven', 'Úroven I/II/III'],
+            ['stupen', 'Stupeň / Hloubka'],
+            ['note', 'Poznámka'],
+          ]}
+        />
+      </>
+    );
+  }
+
+  if (prof === 'theurg') {
+    return (
+      <>
+        <h3>Nakloněnost</h3>
+        <dl className="print-cols">
+          {THEURG_INCLINATIONS.map((s) => (
+            <div key={s}>
+              <dt>{s}</dt>
+              <dd>{g(`the_nakl_${s}`) || '—'}</dd>
+            </div>
+          ))}
+        </dl>
+        <h3>Vazby, démoni, formule</h3>
+        <DrdPlusPrintTable
+          cda={cda}
+          arrKey="the_vazby"
+          cols={[
+            ['name', 'Název (Démon / Vazba)'],
+            ['type', 'Sféra / Typ'],
+            ['detail', 'Detaily'],
+          ]}
+        />
+      </>
+    );
+  }
+
+  // zlodej
+  return (
+    <>
+      <h3>Zlodějský cech</h3>
+      <dl className="print-cols">
+        <div>
+          <dt>Cech</dt>
+          <dd>{g('thi_cech') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Mentor</dt>
+          <dd>{g('thi_mentor') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Postavení</dt>
+          <dd>{g('thi_postaveni') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Profibody</dt>
+          <dd>{g('thi_profibody') || '—'}</dd>
+        </div>
+      </dl>
+      <h3>Schopnosti a finty</h3>
+      <DrdPlusPrintTable
+        cda={cda}
+        arrKey="thi_schopnosti"
+        cols={[
+          ['name', 'Pomůcka / Finta'],
+          ['bonus', 'Bonus / Hod'],
+          ['note', 'Poznámka'],
+        ]}
+      />
+    </>
   );
 }

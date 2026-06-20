@@ -123,6 +123,30 @@ Detaily chyb z práce na tisku (pilíř A 14.7). Přehled v [README](README.md).
 **Co nakonec zabralo:** `MatrixSheet` v `printMode` vrací **oddělený statický view** `MatrixPrintView` (čte stejná `matrix_*` data), místo aby se hackovaly inputy. Hodnoty jako text (`dl/dt/dd`), staty `print-cols` mřížka, přetlaky pips `●●●○○` (`pressurePips`), jazyky/schopnosti/aspekty `print-row` řádky, výbava text (`white-space:pre-wrap`).
 **Proč to je správně:** Navazuje na diagnózu výše — tisk diary sheetu NEJDE přes CSS, řeší to komponenta. Oddělený view je čistší než `usePrintMode` podmínky u každého inputu/pip.
 **Jak ověřeno:** offline náhled `scripts/print-preview` (fixtura `matrix-denik`) → čitelný dokument 1:1 se strukturou appky; build + 16/16 testů MatrixSheet.
-**Zhodnocení:** Dobře. Past: **emoji v tisku** (`📘`) se vykreslí jako prázdný obdélník → nahrazeno textem `(magická)`. Vzor je přenositelný na ostatních 11 diary sheetů (každý dostane svůj `*PrintView`). ZBÝVÁ: 11 sheetů + ověřit Matrix naživo + zakotvit hlídání (hook na `diary-systems/**` změny — viz `feedback_chybovy_denik_deník_práce`).
+**Zhodnocení:** Dobře. Past: **emoji v tisku** (`📘`) se vykreslí jako prázdný obdělník → nahrazeno textem `(magická)`. Vzor je přenositelný na ostatních 11 diary sheetů (každý dostane svůj `*PrintView`). ZBÝVÁ: 11 sheetů + ověřit Matrix naživo + zakotvit hlídání (hook na `diary-systems/**` změny — viz `feedback_chybovy_denik_deník_práce`).
+
+---
+
+### ✅ ŘEŠENÍ — tiskový režim zbývajících 11 diary sheetů (replikace vzoru) · 2026-06-20
+**Co zabralo:** Vzor `MatrixPrintView` replikován na všech 11 zbývajících systémů přes **4 paralelní agenty** (coc, dnd5e, drd2/16/h/plus, gurps, jad, shadowrun + sdílený `FateLikeSheet` pokryl fate+pi). Každý sheet: `usePrintMode()` → `if (printMode) return <XPrintView cda={cda} />`. PrintView čte stejná `*_` data, renderuje statický dokument na existujících tiskových třídách (`dl`/`print-cols`/`matrix-print__plain`/`print-row`/`table`).
+**Proč to je správně:** Stejná diagnóza (inputy/barvy netisknutelné) → stejné řešení. Paralelizace: nezávislé soubory, žádný konflikt; sdílený `printDoc.css` agenti NEsměli editovat (centralizace tříd → bez konfliktu).
+**Jak ověřeno:** centrálně build zelený (tsc -b — všech 10 souborů typuje), 133/133 diary testů, `printDoc.css` needitován, emoji jen v interaktivních větvích (v tisku skryté). **Vizuál Matrixu ověřen náhledem; jednotlivých 11 NE** (neúměrné = 11 fixtur) → reálný test.
+**Zhodnocení:** Kód-úroveň dobrá (build/test/vzor). Riziko = vizuální detaily per sheet (data klíče, struktura) neověřené náhledem — doladí se iterativně po reálném testu, jako u Matrixu. Past delegování: agenti tvrdí „hotovo", ale verifikace je MOJE (build+test centrálně, ne jejich slovo).
+
+---
+
+### ✅ ŘEŠENÍ — tisk Lokace/Ostatní stránky: pořadí obrázek → boxík → text · 2026-06-20
+**Co zabralo:** `OstatniLayout` v `printMode` vrací lineární strom: hero obrázek (`.print-hero`, menší/vystředěný) → datová tabulka (boxík) → text → sekce. Na obrazovce jsou obrázek+tabulka v bočním `aside` sidebaru (pravý sloupec) → v tisku (klon zachová DOM pořadí) spadaly ZA text. Tisková větev je dává explicitně vepředu; AutoTOC/QuickRef (navigace) se netiskne.
+**Proč to je správně:** `PageDataTable` jsem z `PageSidebar` vyEXPORTOVAL a reusoval (ne kopie). Reorder řešen renderem v komponentě (deterministické), ne CSS `order` hacky na flex sloupce (křehké, dříve zdroj chyb).
+**Jak ověřeno:** náhled `scripts/print-preview` fixtura `lokace` → obrázek nahoře (7×12 cm) → boxík → text na 1 straně; build zelený.
+**Zhodnocení:** Dobře. Platí pro VŠECHNY `OstatniLayout` tisky (typ Lokace, Ostatní, i AKJ taby) — konzistentní. Obecné `img` strop snížen z 12 na 9 cm; portrét 6 cm; hero stránky 7 cm.
+
+---
+
+### ✅ ŘEŠENÍ — tisk bestiáře (mezery) + kalendáře (akce + mřížka) · 2026-06-20
+**Bestiář:** staty/schopnosti měly label+hodnotu nalepené (`MAX HP5`, `Zbroj0`, `síla2`) — flex z CSS modulu v tisku zmizel. Fix: `.print-stat` (flex + gap, kompaktní — NE space-between, staty jsou krátké) na `EntityStatbar` `statRow`/`statBarHeader` + `BestieCard` `ability`.
+**Kalendář:** akce se netiskly (jen barevné proužky bez názvů). TŘI kořeny: (1) tisk dědil **compact density** (proužky bez textu) → `printMode` vynutí `density='detail'` + limit 999 (všechny akce); (2) eventChip je `<button>` → `button{display:none}` ho potlačil → `.print-event` přebíjí + barevný proužek (`--chip-color`); (3) **mřížka rozpadlá** — `display:grid` je v CSS modulu (v tisku pryč), `gridTemplateColumns` přežil (inline) → `.print-cal-grid` obnoví `display:grid` + rámečky buněk.
+**Jak ověřeno:** náhledy `bestiar` + `kalendar` fixtury, build zelený.
+**Zhodnocení:** Dobře. **Opakující se vzor:** CSS-module layout (grid/flex) se v tiskovém klonu ztrácí → stabilní tisková třída ho obnoví (`print-cols`/`print-row`/`print-stat`/`print-cal-grid`). To je systémový princip tisku přes klon — kdykoli layout drží jen CSS modul, v tisku potřebuje stabilní třídu.
 
 ---

@@ -6,8 +6,9 @@
  * Data v `diary.customData` s prefixem `dnd_*` (1:1 vůči legacy).
  */
 import { useState } from 'react';
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
-import { makeCdAccess } from '../../_shared/cdAccess';
+import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 import {
   ABILITY_KEYS,
@@ -18,6 +19,7 @@ import {
   type AbilityKey,
   type DndAttack,
   type DndSpellLevel,
+  type DndSpellEntry,
 } from './constants';
 import { abilityMod, calcSaveMod, calcSkillMod, fmtMod } from './formulas';
 
@@ -31,8 +33,10 @@ const DEFAULT_SPELL_LEVEL: DndSpellLevel = {
 
 export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
-  const { g, set, parseJsonArr } = makeCdAccess(cd, 'dnd_', onChange);
+  const cda = makeCdAccess(cd, 'dnd_', onChange);
+  const { g, set, parseJsonArr } = cda;
 
   const [tab, setTab] = useState<Tab>('main');
 
@@ -84,6 +88,11 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   // ── Death saves ─────────────────────────────────────────────
   const deathSuccess = parseInt(g('deathSuccess', '0'), 10) || 0;
   const deathFail = parseInt(g('deathFail', '0'), 10) || 0;
+
+  // Tisk: interaktivní sheet (inputy/pips/checkboxy) je netisknutelný —
+  // hodnoty jsou v `<input value>`, prof/death stav v barvě. V printMode
+  // vyrenderujeme oddělený statický čitelný dokument (viz vzor MatrixPrintView).
+  if (printMode) return <DndPrintView cda={cda} />;
 
   return (
     <div className="dnd-diary">
@@ -731,6 +740,299 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
             );
           })}
         </div>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `dnd_*` data)
+// ════════════════════════════════════════════════════════════════
+
+/** Death save 0..3 jako ●●○ (vždy 3 znaky). */
+function deathPips(val: number): string {
+  const filled = Math.max(0, Math.min(3, val));
+  return '●'.repeat(filled) + '○'.repeat(3 - filled);
+}
+
+/** Parsuje jednu spell level (stejně jako getSpellLevel ve sheetu). */
+function parseSpellLevel(raw: string): DndSpellLevel {
+  if (!raw) return { totalSlots: 0, usedSlots: 0, spells: [] };
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      totalSlots: parsed.totalSlots ?? 0,
+      usedSlots: parsed.usedSlots ?? 0,
+      spells: Array.isArray(parsed.spells) ? parsed.spells : [],
+    };
+  } catch {
+    return { totalSlots: 0, usedSlots: 0, spells: [] };
+  }
+}
+
+function DndPrintView({ cda }: { cda: CdAccess }) {
+  const { g, parseJsonArr } = cda;
+
+  // ── Derived (stejné formule jako interaktivní sheet) ──────────
+  const profBonus = parseInt(g('profBonus', '2'), 10) || 2;
+  const getScore = (k: AbilityKey) => parseInt(g(`ability_${k}`, '10'), 10) || 10;
+  const getMod = (k: AbilityKey) => abilityMod(getScore(k));
+  const isSaveProf = (k: AbilityKey) => g(`save_prof_${k}`) === '1';
+  const skillProfFor = (name: string) =>
+    parseInt(g(`skill_prof_${name}`, '0'), 10) || 0;
+
+  const deathSuccess = parseInt(g('deathSuccess', '0'), 10) || 0;
+  const deathFail = parseInt(g('deathFail', '0'), 10) || 0;
+
+  const attacks = parseJsonArr<DndAttack>('attacks');
+  const cantrips = parseJsonArr<string>('cantrips');
+  const spellEnabled = g('spellEnabled') === '1';
+
+  const passivePerception =
+    10 +
+    calcSkillMod(getMod('wis'), skillProfFor('Vnímání'), profBonus);
+
+  const profWord = (lvl: number) =>
+    lvl === 2 ? ' (expertíza)' : lvl === 1 ? ' (zdatnost)' : '';
+
+  return (
+    <div className="dnd-print">
+      {/* ═══ Identita ═══ */}
+      <dl>
+        <div>
+          <dt>Jméno postavy</dt>
+          <dd>{g('charName') || '—'}</dd>
+        </div>
+        {DND_HEADER_FIELDS.map((f) => (
+          <div key={f.key}>
+            <dt>{f.label}</dt>
+            <dd>{g(f.key) || '—'}</dd>
+          </div>
+        ))}
+        <div>
+          <dt>Inspirace</dt>
+          <dd>{g('inspiration') === '1' ? '(ano)' : '(ne)'}</dd>
+        </div>
+        <div>
+          <dt>Zdatnostní bonus</dt>
+          <dd>{fmtMod(profBonus)}</dd>
+        </div>
+      </dl>
+
+      {/* ═══ Vlastnosti ═══ */}
+      <h3>Vlastnosti</h3>
+      <ul className="matrix-print__plain">
+        {ABILITY_KEYS.map((k) => (
+          <li key={k} className="print-row">
+            <span>{ABILITY_LABELS[k]}</span>
+            <span>
+              {getScore(k)} ({fmtMod(getMod(k))})
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {/* ═══ Záchranné hody ═══ */}
+      <h3>Záchranné hody</h3>
+      <ul className="matrix-print__plain">
+        {ABILITY_KEYS.map((k) => (
+          <li key={k} className="print-row">
+            <span>
+              {ABILITY_LABELS[k]}
+              {isSaveProf(k) ? ' (zdatnost)' : ''}
+            </span>
+            <span>
+              {fmtMod(calcSaveMod(getMod(k), isSaveProf(k), profBonus))}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {/* ═══ Dovednosti ═══ */}
+      <h3>Dovednosti</h3>
+      <ul className="matrix-print__plain">
+        {SKILLS.map((sk) => {
+          const prof = skillProfFor(sk.name);
+          const mod = calcSkillMod(getMod(sk.ability), prof, profBonus);
+          return (
+            <li key={sk.name} className="print-row">
+              <span>
+                {sk.name} ({ABILITY_LABELS[sk.ability].slice(0, 3)})
+                {profWord(prof)}
+              </span>
+              <span>{fmtMod(mod)}</span>
+            </li>
+          );
+        })}
+        <li className="print-row">
+          <span>Pasivní vnímání (Moudrost)</span>
+          <span>{passivePerception}</span>
+        </li>
+      </ul>
+
+      {/* ═══ Boj ═══ */}
+      <h3>Boj</h3>
+      <dl className="print-cols">
+        <div>
+          <dt>OČ</dt>
+          <dd>{g('ac', '10')}</dd>
+        </div>
+        <div>
+          <dt>Iniciativa</dt>
+          <dd>{fmtMod(getMod('dex'))}</dd>
+        </div>
+        <div>
+          <dt>Rychlost</dt>
+          <dd>{g('speed', '9 m')}</dd>
+        </div>
+      </dl>
+
+      {/* ═══ Životy ═══ */}
+      <h3>Životy</h3>
+      <dl className="print-cols">
+        <div>
+          <dt>Maximum</dt>
+          <dd>{g('maxHP', '0')}</dd>
+        </div>
+        <div>
+          <dt>Aktuální</dt>
+          <dd>{g('currentHP', '0')}</dd>
+        </div>
+        <div>
+          <dt>Dočasné</dt>
+          <dd>{g('tempHP', '0')}</dd>
+        </div>
+        <div>
+          <dt>Kostky životů</dt>
+          <dd>{g('hitDice') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Záchrany — úspěchy</dt>
+          <dd>{deathPips(deathSuccess)}</dd>
+        </div>
+        <div>
+          <dt>Záchrany — neúspěchy</dt>
+          <dd>{deathPips(deathFail)}</dd>
+        </div>
+      </dl>
+
+      {/* ═══ Útoky ═══ */}
+      {attacks.length > 0 && (
+        <>
+          <h3>Útoky a kouzla</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Jméno</th>
+                <th>Út. bonus</th>
+                <th>Zranění / typ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attacks.map((a, i) => (
+                <tr key={i}>
+                  <td>{a.name || '—'}</td>
+                  <td>{a.bonus || '—'}</td>
+                  <td>{a.damage || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {/* ═══ Osobnost ═══ */}
+      <h3>Osobnost</h3>
+      <dl>
+        {DND_PERSONALITY_FIELDS.map((f) => (
+          <div key={f.key}>
+            <dt>{f.label}</dt>
+            <dd style={{ whiteSpace: 'pre-wrap' }}>{g(f.key) || '—'}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {g('otherProf').trim() && (
+        <>
+          <h3>Ostatní zdatnosti a jazyky</h3>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{g('otherProf')}</p>
+        </>
+      )}
+
+      {g('features').trim() && (
+        <>
+          <h3>Schopnosti a rysy</h3>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{g('features')}</p>
+        </>
+      )}
+
+      {/* ═══ Sesílání kouzel (jen je-li sesilatel) ═══ */}
+      {spellEnabled && (
+        <>
+          <h2>Sesílání kouzel</h2>
+          <dl className="print-cols">
+            <div>
+              <dt>Sesílací vlastnost</dt>
+              <dd>{g('spellAbility') || '—'}</dd>
+            </div>
+            <div>
+              <dt>SO záchrany kouzel</dt>
+              <dd>{g('spellDC', '0')}</dd>
+            </div>
+            <div>
+              <dt>Útočný bonus kouzla</dt>
+              <dd>{g('spellAttack', '0')}</dd>
+            </div>
+          </dl>
+
+          {cantrips.filter((c) => c.trim()).length > 0 && (
+            <>
+              <h3>Triky</h3>
+              <ul className="matrix-print__plain">
+                {cantrips
+                  .filter((c) => c.trim())
+                  .map((c, i) => (
+                    <li key={i} className="print-row">
+                      <span>{c}</span>
+                      <span />
+                    </li>
+                  ))}
+              </ul>
+            </>
+          )}
+
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => {
+            const data = parseSpellLevel(g(`spellLevel_${lvl}`));
+            const named = data.spells.filter(
+              (sp: DndSpellEntry) => (sp.name || '').trim(),
+            );
+            if (data.totalSlots === 0 && named.length === 0) return null;
+            return (
+              <div key={lvl}>
+                <h3>
+                  {lvl}. úroveň — sloty:{' '}
+                  {'●'.repeat(Math.min(data.usedSlots, data.totalSlots)) +
+                    '○'.repeat(
+                      Math.max(0, data.totalSlots - data.usedSlots),
+                    ) || '—'}
+                </h3>
+                {named.length > 0 && (
+                  <ul className="matrix-print__plain">
+                    {named.map((sp: DndSpellEntry, i: number) => (
+                      <li key={i} className="print-row">
+                        <span>
+                          {sp.prepared ? '(připraveno) ' : ''}
+                          {sp.name}
+                        </span>
+                        <span>{sp.note || ''}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </>
       )}
     </div>
   );

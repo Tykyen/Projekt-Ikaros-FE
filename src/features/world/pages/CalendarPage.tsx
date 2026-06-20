@@ -418,7 +418,7 @@ export default function CalendarPage() {
           </h2>
         )}
         <div
-          className={s.grid}
+          className={`${s.grid} print-cal-grid`}
           style={{
             gridTemplateColumns: `repeat(${displayConfig.daysOfWeek.length}, 1fr)`,
           }}
@@ -438,10 +438,12 @@ export default function CalendarPage() {
                 key={k}
                 cell={cell}
                 dayEvents={dayEvents}
-                density={densityCtl.effectiveDensity}
+                // Tisk: vždy DETAIL (texty akcí) — kompakt/heat by vytiskl jen
+                // barevné proužky bez názvů. A bez limitu (všechny akce dne).
+                density={printMode ? 'detail' : densityCtl.effectiveDensity}
                 today={today}
                 config={displayConfig}
-                detailVisibleLimit={DETAIL_VISIBLE_LIMIT}
+                detailVisibleLimit={printMode ? 999 : DETAIL_VISIBLE_LIMIT}
                 compactVisibleLimit={COMPACT_VISIBLE_LIMIT}
                 onSelectEvent={handleSelectByEventId}
                 onExpandDay={setExpandedDay}

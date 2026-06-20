@@ -179,68 +179,39 @@ hr { border: none; border-top: 1px solid #bbb; margin: 1em 0; }
 }
 .print-cols > * { break-inside: avoid; }
 </style></head>
-<body><!-- Fixture: MatrixPrintView output (diary sheet „matrix" v printMode).
-     Odpovídá statickému tiskovému renderu MatrixSheet.tsx — hodnoty jako text,
-     přetlaky jako pips ●●●○○. Reálná data ze screenshotu postavy Zara. -->
-<div class="matrix-print">
-  <dl>
-    <div><dt>Jméno</dt><dd>Zara Villiam</dd></div>
-    <div><dt>Stát</dt><dd>Francie</dd></div>
-    <div><dt>Magický gen</dt><dd>—</dd></div>
-    <div><dt>Poslední úprava</dt><dd>—</dd></div>
-    <div><dt>Body schopností</dt><dd>0 / 73</dd></div>
-    <div><dt>Body osudu</dt><dd>2</dd></div>
-  </dl>
-
-  <h2>Fyzický stav</h2>
-  <dl class="print-cols">
-    <div><dt>Životy</dt><dd>4</dd></div>
-    <div><dt>Runa</dt><dd>0</dd></div>
-    <div><dt>Vesta</dt><dd>1</dd></div>
-    <div><dt>Únava</dt><dd>0</dd></div>
-  </dl>
-
-  <h2>Přetlaky</h2>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Fyzický</span><span>●●●●●</span></li>
-    <li class="print-row"><span>Magický</span><span>●●●●●</span></li>
-    <li class="print-row"><span>Diplomatický</span><span>●●●●●</span></li>
-    <li class="print-row"><span>Technický</span><span>●●●●●</span></li>
-  </ul>
-
-  <h3>Jazyky</h3>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Angličtina</span><span>C2</span></li>
-    <li class="print-row"><span>Francouzština</span><span>C2</span></li>
-    <li class="print-row"><span>Esperanto</span><span>C2</span></li>
-  </ul>
-
-  <h3>Schopnosti</h3>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Hacker (magická)</span><span>5</span></li>
-    <li class="print-row"><span>Kouzlo šarmu</span><span>4</span></li>
-    <li class="print-row"><span>V podsvětí jako doma</span><span>3</span></li>
-    <li class="print-row"><span>Plížení a vloupání</span><span>4</span></li>
-    <li class="print-row"><span>Ostrostřelec</span><span>4</span></li>
-    <li class="print-row"><span>Vyznám se v technologiích</span><span>3</span></li>
-    <li class="print-row"><span>Intuice nebezpečí</span><span>2</span></li>
-    <li class="print-row"><span>Moje hlava!</span><span>1</span></li>
-  </ul>
-
-  <h3>Aspekty</h3>
-  <ul class="matrix-print__plain">
-    <li class="print-row"><span>Věřím v zákon, ale ne vždy v systém</span><span>Vybitý</span></li>
-    <li class="print-row"><span>Holka z ulice</span><span>Vybitý</span></li>
-    <li class="print-row"><span>Ostré oči a vřelé srdce</span><span>Vybitý</span></li>
-    <li class="print-row"><span>Hraní na hraně je moje druhé já</span><span>Vybitý</span></li>
-    <li class="print-row"><span>(Vodní) záchranář</span><span>Vybitý</span></li>
-  </ul>
-
-  <h2>Výbava a poznámky</h2>
-  <p style="white-space:pre-wrap">1. Hacker (Specializace na Matrix): Umožní jí ovládat virtuální svět a získávat důležité informace.
-
-2. Kouzlo šarmu: Schopnost využít jejího vzhledu k získání výhod v sociálních interakcích.
-
-3. V podsvětí jako doma: Dává jí silné kontakty v podsvětí.</p>
+<body><!-- Fixture: BestieCard v tisku (data-print-scope = BestiarPage).
+     Staty (EntityStatbar) a schopnosti mají print-stat → „Label hodnota"
+     s mezerou (dřív nalepené: MAX HP5, Zbroj0, síla2). -->
+<div class="_page_x">
+  <h1>Bestiář</h1>
+  <article class="_card_a1">
+    <div class="_avatar_a2">
+      <img alt="Duch"
+        src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='380'%3E%3Crect width='300' height='380' fill='%23223'/%3E%3Cellipse cx='150' cy='150' rx='70' ry='110' fill='%238fd' opacity='0.5'/%3E%3C/svg%3E" />
+    </div>
+    <div class="_body_a3">
+      <h4 class="_name_a4">Duch</h4>
+      <div class="_statbar_a5">
+        <section class="_section_a6">
+          <div class="_fieldsList_a7">
+            <div class="_statBar_a8">
+              <div class="_statBarHeader_a9 print-stat">
+                <span class="_statLabel_b1">MAX HP</span>
+                <span class="_statValue_b2">5 / 5</span>
+              </div>
+            </div>
+            <div class="_statRow_b3 print-stat"><span class="_statLabel_b1">Zbroj</span><span class="_statValue_b2">0</span></div>
+            <div class="_statRow_b3 print-stat"><span class="_statLabel_b1">Pohyb</span><span class="_statValue_b2">4</span></div>
+            <div class="_statRow_b3 print-stat"><span class="_statLabel_b1">Iniciativa</span><span class="_statValue_b2">0</span></div>
+          </div>
+        </section>
+      </div>
+      <ul class="_abilities_c1" aria-label="Schopnosti">
+        <li class="_ability_c2 print-stat"><span class="_abilityLabel_c3">Nemrtvá síla</span><span class="_abilityValue_c4">2</span></li>
+        <li class="_ability_c2 print-stat"><span class="_abilityLabel_c3">Ledový dotek</span><span class="_abilityValue_c4">4</span></li>
+        <li class="_ability_c2 print-stat"><span class="_abilityLabel_c3">Zranitelnost stříbro</span><span class="_abilityValue_c4">-1</span></li>
+      </ul>
+    </div>
+  </article>
 </div>
 </body></html>

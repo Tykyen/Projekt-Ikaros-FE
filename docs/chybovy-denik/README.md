@@ -30,4 +30,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](tisk.md#-řešení--doladění-vzhledu-tisku-postavy-vlna-2--2026-06-20) | tisk | doladění vzhledu postavy: obrázky strop/portrét, záložky na nové strany, profil dl, aside skryt, qty | — |
 | [✅ ŘEŠENÍ](tisk.md#-řešení-diagnóza--zvolený-směr--tisk-diary-sheetů-nejde-přes-css--2026-06-20) | tisk | tisk diary sheetů NEJDE přes CSS (hodnoty v inputech, stav v barvách) → nutný tiskový render v komponentě | ladím printDoc.css na deník, hodnoty/pips se netisknou |
 | [CH-010](proces.md#ch-010) | proces | nezapisoval jsem řešení do deníku průběžně (i po nastavení pravidla) | uživatel se ptá „proč jsi nevyužil deník" |
+| [✅ ŘEŠENÍ](tisk.md#-řešení--tisk-lokaceostatní-stránky-pořadí-obrázek--boxík--text--2026-06-20) | tisk | Lokace/Ostatní: pořadí obrázek → boxík (datová tabulka) → text v printMode; hero menší | — |
+| [✅ ŘEŠENÍ](tisk.md#-řešení--tisk-bestiáře-mezery--kalendáře-akce--mřížka--2026-06-20) | tisk | bestiář mezery (print-stat) + kalendář akce (detail density + print-event) a mřížka (print-cal-grid) | — |
 | [✅ ŘEŠENÍ](tisk.md#-řešení--tiskový-render-matrix-deníku-vzor-pro-ostatní-sheety--2026-06-20) | tisk | Matrix deník: oddělený statický `MatrixPrintView` v printMode (text místo inputů, pips ●●●○○); past = emoji v tisku | — |
+| [✅ ŘEŠENÍ](tisk.md#-řešení--tiskový-režim-zbývajících-11-diary-sheetů-replikace-vzoru--2026-06-20) | tisk | 11 diary sheetů přes 4 paralelní agenty (PrintView dle vzoru); ověřeno build+133 testů; vizuál per-sheet čeká reálný test | — |

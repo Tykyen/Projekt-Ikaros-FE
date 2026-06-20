@@ -5,8 +5,9 @@
  * Liší se prefix v customData (`pi_*` / `fate_*`) a vizuál (data-diary-system).
  * Layout: 2 sloupce — levý (Aspekty / Konflikt / Cíle), pravý (Dovednosti / Deník).
  */
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../types';
-import { makeCdAccess } from './cdAccess';
+import { makeCdAccess, type CdAccess } from './cdAccess';
 import { SkillPips } from './SkillPips';
 import { ConflictTrack } from './ConflictTrack';
 
@@ -38,6 +39,7 @@ export function FateLikeSheet({
   onRoll,
 }: Props) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, prefix, onChange);
   const { g, set, parseJsonArr, updateArr, addArr, removeArr } = cda;
@@ -47,6 +49,11 @@ export function FateLikeSheet({
   const goalsLong = parseJsonArr<GoalRow>('goals_long');
   const goalsShort = parseJsonArr<GoalRow>('goals_short');
   const conflictVal = parseInt(g('conflict'), 10) || 0;
+
+  // Tisk: interaktivní sheet (inputy / pips přes barvu / checkboxy) je
+  // netisknutelný — hodnoty jsou v `<input value>`, stav v barvě/zaškrtnutí.
+  // V printMode vyrenderujeme oddělený statický čitelný dokument.
+  if (printMode) return <FateLikePrintView cda={cda} />;
 
   return (
     <div className="pi-dashboard">
@@ -381,6 +388,117 @@ function GoalsBlock({
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `<prefix>_*` data)
+// ════════════════════════════════════════════════════════════════
+
+/** Konflikt stavy 0..4 (1:1 s ConflictTrack STATES). */
+const CONFLICT_LABELS = [
+  'V pořádku',
+  'Lehké zranění',
+  'Těžší zranění',
+  'Vážnější násl.',
+  'Vyřazen',
+];
+
+/** Dovednost 0..6 jako ●●●○○○ (vždy 6 znaků). */
+function skillPips(val: number): string {
+  const filled = Math.max(0, Math.min(6, val));
+  return '●'.repeat(filled) + '○'.repeat(6 - filled);
+}
+
+function FateLikePrintView({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const aspects = cda.parseJsonArr<AspectRow>('aspects');
+  const skills = cda.parseJsonArr<SkillRow>('skills');
+  const goalsLong = cda.parseJsonArr<GoalRow>('goals_long');
+  const goalsShort = cda.parseJsonArr<GoalRow>('goals_short');
+  const conflictVal = parseInt(g('conflict'), 10) || 0;
+  const conflictLabel = CONFLICT_LABELS[conflictVal] ?? CONFLICT_LABELS[0];
+  const notes = g('notes').trim();
+
+  return (
+    <div className="fate-print">
+      <dl>
+        <div>
+          <dt>Jméno</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Stav (konflikt)</dt>
+          <dd>{conflictLabel}</dd>
+        </div>
+      </dl>
+
+      <h2>Aspekty</h2>
+      {aspects.length > 0 ? (
+        <ul className="matrix-print__plain">
+          {aspects.map((a, i) => (
+            <li key={i} className="print-row">
+              <span>{a.name || '—'}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>—</p>
+      )}
+
+      <h2>Dovednosti</h2>
+      {skills.length > 0 ? (
+        <ul className="matrix-print__plain">
+          {skills.map((s, i) => (
+            <li key={i} className="print-row">
+              <span>
+                {s.name || '—'}
+                {s.note ? ` (${s.note})` : ''}
+              </span>
+              <span>{skillPips(parseInt(s.val, 10) || 0)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>—</p>
+      )}
+
+      <h2>Cíle</h2>
+      <h3>Dlouhodobé cíle</h3>
+      {goalsLong.length > 0 ? (
+        <ul className="matrix-print__plain">
+          {goalsLong.map((goal, i) => (
+            <li key={i} className="print-row">
+              <span>{goal.name || '—'}</span>
+              <span>{goal.done === 'true' ? '(splněno)' : '(nesplněno)'}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>—</p>
+      )}
+
+      <h3>Krátkodobé cíle (sezení)</h3>
+      {goalsShort.length > 0 ? (
+        <ul className="matrix-print__plain">
+          {goalsShort.map((goal, i) => (
+            <li key={i} className="print-row">
+              <span>{goal.name || '—'}</span>
+              <span>{goal.done === 'true' ? '(splněno)' : '(nesplněno)'}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>—</p>
+      )}
+
+      {notes && (
+        <>
+          <h2>Deník / Poznámky</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{notes}</p>
+        </>
+      )}
     </div>
   );
 }

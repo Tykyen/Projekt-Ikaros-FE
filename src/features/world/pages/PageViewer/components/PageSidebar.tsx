@@ -73,8 +73,11 @@ export function PageSidebar({ page }: Props) {
  * 8.5 — Datová tabulka. Buňky (klíče i hodnoty) jsou rich-text HTML s
  * inline odkazy (sanitizováno na BE). `useBrokenLinks` po renderu označí
  * odkazy na neexistující stránky (`.brokenLink` → červené přeškrtnutí).
+ *
+ * Export: tisk (OstatniLayout printMode) staví tabulku nad text (jiné pořadí
+ * než sidebar) — reuse stejné komponenty, ne kopie.
  */
-function PageDataTable({ table }: { table: NonNullable<Page['table']> }) {
+export function PageDataTable({ table }: { table: NonNullable<Page['table']> }) {
   const { worldId, worldSlug } = useWorldContext();
   // Ref na celý wrap (ne jen table) — broken-link hook musí scannit i odkazy
   // v title (h3), který stojí mimo <table>.

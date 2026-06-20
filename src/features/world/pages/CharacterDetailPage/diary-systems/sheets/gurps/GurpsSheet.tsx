@@ -7,6 +7,7 @@
  *
  * Data v `diary.customData` s prefixem `gurps_*` (1:1 vůči legacy).
  */
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
@@ -27,9 +28,15 @@ import {
 
 export function GurpsSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'gurps_', onChange);
   const { g, set } = cda;
+
+  // Tisk: interaktivní sheet (inputy v tabulkách/atributech) je netisknutelný —
+  // hodnoty jsou v `<input value>` (replaced element). V printMode renderujeme
+  // oddělený statický čitelný dokument (čte stejná `gurps_*` data).
+  if (printMode) return <GurpsPrintView cda={cda} />;
 
   return (
     <div className="gurps-dashboard">
@@ -552,6 +559,259 @@ function GurpsTable({
         >
           {addLabel}
         </button>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `gurps_*` data)
+// ════════════════════════════════════════════════════════════════
+
+/** Tiskové vykreslení JSON pole jako semantická tabulka se statickým textem. */
+function GurpsPrintTable({
+  cda,
+  arrKey,
+  cols,
+}: {
+  cda: CdAccess;
+  arrKey: string;
+  cols: [string, string][];
+}) {
+  const rows = cda.parseJsonArr<Record<string, string>>(arrKey);
+  if (rows.length === 0) return null;
+  return (
+    <table>
+      <thead>
+        <tr>
+          {cols.map(([k, label]) => (
+            <th key={k}>{label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i}>
+            {cols.map(([k]) => (
+              <td key={k}>{row[k] || '—'}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function GurpsPrintView({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const notes = g('notes').trim();
+
+  return (
+    <div className="gurps-print">
+      <dl>
+        <div>
+          <dt>Jméno</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Hráč</dt>
+          <dd>{g('player') || '—'}</dd>
+        </div>
+        {GURPS_META_FIELDS.map((f) => (
+          <div key={f.key}>
+            <dt>{f.label}</dt>
+            <dd>{g(f.key) || '—'}</dd>
+          </div>
+        ))}
+        <div>
+          <dt>Celkem bodů</dt>
+          <dd>{g('points_total') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Neutracené body</dt>
+          <dd>{g('points_unspent') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h2>Hlavní atributy</h2>
+      <dl className="print-cols">
+        {GURPS_CORE_ATTRS.map((a) => (
+          <div key={a.key}>
+            <dt>{a.label}</dt>
+            <dd>{g(a.key, '10')}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2>HP / FP</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>HP (Životy)</dt>
+          <dd>
+            {g('hp', '10')} / {g('hp_max', '10')}
+          </dd>
+        </div>
+        <div>
+          <dt>FP (Únava)</dt>
+          <dd>
+            {g('fp', '10')} / {g('fp_max', '10')}
+          </dd>
+        </div>
+      </dl>
+
+      <h2>Obrana &amp; TL</h2>
+      <dl className="print-cols">
+        {GURPS_DEFENSES.map((d) => (
+          <div key={d.key}>
+            <dt>{d.label}</dt>
+            <dd>{g(d.key, d.fallback ?? '—')}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2>Derived</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Rychlost</dt>
+          <dd>{g('basic_speed', '5.0')}</dd>
+        </div>
+        <div>
+          <dt>Pohyb</dt>
+          <dd>{g('basic_move', '5')}</dd>
+        </div>
+        {GURPS_DERIVED.map((d) => (
+          <div key={d.key}>
+            <dt>{d.label}</dt>
+            <dd>{g(d.key, d.fallback ?? '—')}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2>Zatížení a Úhyb</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Úroveň</th>
+            <th>Move</th>
+            <th>Dodge</th>
+          </tr>
+        </thead>
+        <tbody>
+          {GURPS_ENC_LEVELS.map((enc) => (
+            <tr key={enc.label}>
+              <td>{enc.label}</td>
+              <td>{g(enc.m, '—')}</td>
+              <td>{g(enc.d, '—')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h2>Dovednosti (Skills)</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="skills"
+        cols={[
+          ['name', 'Dovednost'],
+          ['lvl', 'Úroveň'],
+          ['base', 'Základ'],
+        ]}
+      />
+
+      <h2>Výhody</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="advs"
+        cols={[
+          ['name', 'Výhoda'],
+          ['note', 'Poznámka / Body'],
+        ]}
+      />
+
+      <h2>Nevýhody</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="disadvs"
+        cols={[
+          ['name', 'Nevýhoda'],
+          ['note', 'Poznámka / Body'],
+        ]}
+      />
+
+      <h2>Reakční modifikátory</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="react_mods"
+        cols={[
+          ['name', 'Situace / Skupina'],
+          ['val', 'Modifikátor'],
+        ]}
+      />
+
+      <h2>Jazyky</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="langs"
+        cols={[
+          ['name', 'Jazyk'],
+          ['spk', 'Mluvený'],
+          ['wrt', 'Psaný'],
+        ]}
+      />
+
+      <h2>Zbraně na blízko</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="melee"
+        cols={[
+          ['name', 'Zbraň'],
+          ['dmg', 'DMG'],
+          ['reach', 'Dosah'],
+          ['parry', 'Parry'],
+        ]}
+      />
+
+      <h2>Střelné zbraně</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="ranged"
+        cols={[
+          ['name', 'Zbraň'],
+          ['dmg', 'DMG'],
+          ['acc', 'Acc'],
+          ['rng', 'Rng'],
+          ['rof', 'RoF'],
+          ['shots', 'Shots'],
+        ]}
+      />
+
+      <h2>Zbroj a majetek</h2>
+      <GurpsPrintTable
+        cda={cda}
+        arrKey="armor"
+        cols={[
+          ['name', 'Předmět'],
+          ['loc', 'Lokace'],
+          ['wgt', 'Váha (lb)'],
+          ['cost', 'Cena ($)'],
+        ]}
+      />
+      <dl className="print-cols">
+        <div>
+          <dt>Celková váha</dt>
+          <dd>{g('inv_wgt') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Celková cena</dt>
+          <dd>{g('inv_cost') || '—'}</dd>
+        </div>
+      </dl>
+
+      {notes && (
+        <>
+          <h2>Poznámky k postavě</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{notes}</p>
+        </>
       )}
     </div>
   );

@@ -18,6 +18,7 @@
  * v badge `total-level-display`.
  */
 import { useState } from 'react';
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
@@ -60,6 +61,7 @@ interface MasterAbility {
 
 export function Drd2Sheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'drd2_', onChange);
   const { g, set } = cda;
@@ -78,6 +80,22 @@ export function Drd2Sheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
     basicProfs.reduce((s, p) => s + (p.level || 0), 0) +
     advProfs.reduce((s, p) => s + (p.level || 0), 0) +
     masterProfs.reduce((s, p) => s + (p.level || 0), 0);
+
+  // Tisk: interaktivní inputy/pips/select jsou netisknutelné (hodnota v
+  // `<input value>`, úroveň v barvě pipů). V printMode renderujeme oddělený
+  // statický čitelný dokument se stejnými `drd2_*` daty.
+  if (printMode)
+    return (
+      <Drd2PrintView
+        cda={cda}
+        basicProfs={basicProfs}
+        advProfs={advProfs}
+        masterProfs={masterProfs}
+        specAbilities={specAbilities}
+        masterAbilities={masterAbilities}
+        usedLevel={usedLevel}
+      />
+    );
 
   return (
     <div className="drd2-dashboard">
@@ -930,5 +948,283 @@ function ZsList({
         </button>
       )}
     </>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `drd2_*` data)
+// ════════════════════════════════════════════════════════════════
+
+/** Úroveň povolání 0..5 jako ●●●○○ (vždy 5 znaků). */
+function levelPips(level: number): string {
+  const filled = Math.max(0, Math.min(5, level || 0));
+  return '●'.repeat(filled) + '○'.repeat(5 - filled);
+}
+
+interface Drd2PrintViewProps {
+  cda: CdAccess;
+  basicProfs: BasicProf[];
+  advProfs: AdvProf[];
+  masterProfs: MasterProf[];
+  specAbilities: SpecAbility[];
+  masterAbilities: MasterAbility[];
+  usedLevel: number;
+}
+
+function Drd2PrintView({
+  cda,
+  basicProfs,
+  advProfs,
+  masterProfs,
+  specAbilities,
+  masterAbilities,
+  usedLevel,
+}: Drd2PrintViewProps) {
+  const { g } = cda;
+  const weapons = cda.parseJsonArr<Record<string, string>>('weapons');
+
+  const allProfs = [...basicProfs, ...advProfs, ...masterProfs];
+  const stateEffects = g('state_effects').trim();
+
+  return (
+    <div className="drd2-print">
+      <h2>Identita</h2>
+      <dl>
+        <div>
+          <dt>Jméno postavy</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Rasa a kultura</dt>
+          <dd>{g('race') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Úroveň (využitá / celková)</dt>
+          <dd>
+            {usedLevel} / {g('total_level') || String(usedLevel)}
+          </dd>
+        </div>
+      </dl>
+
+      <h2>Zdroje a jizvy</h2>
+      <dl>
+        <div>
+          <dt>Tělo</dt>
+          <dd>
+            {g('body', '0')} / {g('body_max', '0')}
+            {g('body_scars').trim() ? ` — ${g('body_scars').trim()}` : ''}
+          </dd>
+        </div>
+        <div>
+          <dt>Duše</dt>
+          <dd>
+            {g('soul', '0')} / {g('soul_max', '0')}
+            {g('soul_scars').trim() ? ` — ${g('soul_scars').trim()}` : ''}
+          </dd>
+        </div>
+        <div>
+          <dt>Vliv</dt>
+          <dd>
+            {g('influence', '0')} / {g('influence_max', '0')}
+            {g('influence_scars').trim()
+              ? ` — ${g('influence_scars').trim()}`
+              : ''}
+          </dd>
+        </div>
+      </dl>
+
+      <h2>Bojový stav</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Ohrožení</dt>
+          <dd>{g('threat') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Výhoda</dt>
+          <dd>{g('advantage') || '—'}</dd>
+        </div>
+      </dl>
+      {stateEffects && (
+        <>
+          <h3>Stavy a efekty</h3>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{stateEffects}</p>
+        </>
+      )}
+
+      {weapons.length > 0 && (
+        <>
+          <h2>Zbraně a zbroje</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Předmět</th>
+                <th>Charakteristika</th>
+                <th>Poznámka / Modifikátory</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weapons.map((w, i) => (
+                <tr key={i}>
+                  <td>{w.name || '—'}</td>
+                  <td>{w.char || '—'}</td>
+                  <td>{w.note || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      <h2>Identita a pomocník</h2>
+      <dl>
+        <div>
+          <dt>Rasová ZS</dt>
+          <dd>{g('race_ability') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Povahový rys</dt>
+          <dd>{g('personality') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Pomocník</dt>
+          <dd>{g('comp_char') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Pouto</dt>
+          <dd>{g('comp_bond') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Platba</dt>
+          <dd>{g('comp_pay') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Hranice poutu</dt>
+          <dd>{g('comp_bound') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Schopnost pomocníka</dt>
+          <dd>{g('comp_spec') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h2>Ekonomika a zkušenosti</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Groše</dt>
+          <dd>{g('coins') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Suroviny</dt>
+          <dd>{g('materials') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Volné XP</dt>
+          <dd>{g('xp_unused') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Celkem XP</dt>
+          <dd>{g('xp_total') || '—'}</dd>
+        </div>
+      </dl>
+
+      {allProfs.length > 0 && (
+        <>
+          <h2>Povolání</h2>
+          {basicProfs.length > 0 && (
+            <>
+              <h3>Základní povolání</h3>
+              <ul className="matrix-print__plain">
+                {basicProfs.map((p, i) => (
+                  <li key={i} className="print-row">
+                    <span>{p.name || '—'}</span>
+                    <span>{levelPips(p.level)}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {advProfs.length > 0 && (
+            <>
+              <h3>Pokročilá povolání</h3>
+              <ul className="matrix-print__plain">
+                {advProfs.map((p, i) => (
+                  <li key={i} className="print-row">
+                    <span>{p.name || '—'}</span>
+                    <span>{levelPips(p.level)}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {masterProfs.length > 0 && (
+            <>
+              <h3>Mistrovská povolání</h3>
+              <ul className="matrix-print__plain">
+                {masterProfs.map((p, i) => (
+                  <li key={i} className="print-row">
+                    <span>{p.name || '—'}</span>
+                    <span>{levelPips(p.level)}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </>
+      )}
+
+      {specAbilities.length > 0 && (
+        <>
+          <h2>Zvláštní schopnosti (ZS)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Název</th>
+                <th>Povolání</th>
+                <th>Popis</th>
+              </tr>
+            </thead>
+            <tbody>
+              {specAbilities.map((a, i) => (
+                <tr key={i}>
+                  <td>{a.name || '—'}</td>
+                  <td>{a.source || '—'}</td>
+                  <td style={{ whiteSpace: 'pre-wrap' }}>
+                    {a.description || '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {masterAbilities.length > 0 && (
+        <>
+          <h2>Mistrovské ZS</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Název</th>
+                <th>Mistrovství</th>
+                <th>Vyhrazená</th>
+                <th>Popis</th>
+              </tr>
+            </thead>
+            <tbody>
+              {masterAbilities.map((a, i) => (
+                <tr key={i}>
+                  <td>{a.name || '—'}</td>
+                  <td>{a.sourceMaster || '—'}</td>
+                  <td>{a.isReservedSkill ? '✓' : '○'}</td>
+                  <td style={{ whiteSpace: 'pre-wrap' }}>
+                    {a.description || '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
   );
 }

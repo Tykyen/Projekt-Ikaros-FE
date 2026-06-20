@@ -162,6 +162,7 @@ function CalendarCellImpl({
             const showTitle = isOriginStart || isWeekRestart;
             const chipClasses = [
               s.eventChip,
+              'print-event', // tisk: přebije button{display:none}, ukáže název akce
               position === 'start' && s.chipSpanStart,
               position === 'middle' && s.chipSpanMiddle,
               position === 'end' && s.chipSpanEnd,

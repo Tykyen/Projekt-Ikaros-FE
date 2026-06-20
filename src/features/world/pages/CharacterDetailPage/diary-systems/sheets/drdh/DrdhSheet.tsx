@@ -9,6 +9,7 @@
  * každé má vlastní sekundární zdroj (mega-box vpravo od HP) a vlastní
  * profession-tabulku (vlevo).
  */
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
@@ -25,11 +26,17 @@ import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 
 export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'drdh_', onChange);
   const { g, set } = cda;
 
   const prof = (g('profession_id') || 'valecnik') as DrdhProfessionId;
+
+  // Tisk: interaktivní inputy/tabulky jsou netisknutelné (hodnota v
+  // `<input value>`). V printMode renderujeme oddělený statický čitelný
+  // dokument se stejnými `drdh_*` daty.
+  if (printMode) return <DrdhPrintView cda={cda} prof={prof} />;
 
   return (
     <div className="drdh-dashboard">
@@ -714,6 +721,275 @@ function ProfessionTable({
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `drdh_*` data)
+// ════════════════════════════════════════════════════════════════
+
+function DrdhPrintView({
+  cda,
+  prof,
+}: {
+  cda: CdAccess;
+  prof: DrdhProfessionId;
+}) {
+  const { g } = cda;
+  const profLabel =
+    DRDH_PROFESSIONS.find((p) => p.id === prof)?.label || prof;
+
+  const weapons = cda.parseJsonArr<DrdhWeapon>('weapons');
+  const armors = cda.parseJsonArr<DrdhArmor>('armors');
+  const skills = cda.parseJsonArr<DrdhSkill>('skills');
+
+  // Sekundární zdroj per povolání (alchymista má dva).
+  const resourceLines: { label: string; value: string }[] = [];
+  if (prof === 'alchymista') {
+    resourceLines.push({
+      label: 'Mana',
+      value: `${g('res_mana', '0')} / ${g('res_mana_max', '0')}`,
+    });
+    resourceLines.push({
+      label: 'Suroviny',
+      value: `${g('res_sur', '0')} / ${g('res_sur_max', '0')}`,
+    });
+  } else {
+    const cfg = DRDH_RESOURCE_BY_PROF[prof];
+    if (cfg) {
+      const note = g(cfg.noteKey).trim();
+      resourceLines.push({
+        label: cfg.title,
+        value:
+          `${g(cfg.valueKey, '0')} / ${g(cfg.maxKey, '0')}` +
+          (note ? ` — ${note}` : ''),
+      });
+    }
+  }
+
+  // Profession-specific tabulka.
+  const profTable = DRDH_PROF_TABLE[prof];
+  const profRows = profTable
+    ? cda.parseJsonArr<Record<string, string>>(profTable.arrKey)
+    : [];
+
+  const notes = g('notes').trim();
+
+  return (
+    <div className="drdh-print">
+      <h2>Identita postavy</h2>
+      <dl>
+        <div>
+          <dt>Jméno</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Povolání</dt>
+          <dd>{profLabel}</dd>
+        </div>
+        <div>
+          <dt>Rasa</dt>
+          <dd>{g('race') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Úroveň</dt>
+          <dd>{g('lvl') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Zkušenosti</dt>
+          <dd>{g('xp') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Naložení</dt>
+          <dd>{g('encumbrance') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Únava</dt>
+          <dd>{g('fatigue') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Velikost</dt>
+          <dd>{g('size') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Pohyblivost</dt>
+          <dd>{g('mobility') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h2>Atributy</h2>
+      <ul className="matrix-print__plain">
+        {DRDH_ATTRS.map((a) => (
+          <li key={a.id} className="print-row">
+            <span>{a.label}</span>
+            <span>
+              {g(`attr_${a.id}`) || '—'} ({g(`attr_${a.id}_mod`) || '—'})
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <h2>Mince</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Zlaťáky</dt>
+          <dd>{g('coin_z', '0')}</dd>
+        </div>
+        <div>
+          <dt>Stříbrňáky</dt>
+          <dd>{g('coin_s', '0')}</dd>
+        </div>
+        <div>
+          <dt>Měďáky</dt>
+          <dd>{g('coin_m', '0')}</dd>
+        </div>
+      </dl>
+
+      <h2>Bojový stav</h2>
+      <dl>
+        <div>
+          <dt>Životy</dt>
+          <dd>
+            {g('hp', '0')} / {g('hp_max', '0')}
+          </dd>
+        </div>
+        <div>
+          <dt>Hranice smrti</dt>
+          <dd>{g('hp_death', '0')}</dd>
+        </div>
+        {resourceLines.map((r) => (
+          <div key={r.label}>
+            <dt>{r.label}</dt>
+            <dd>{r.value}</dd>
+          </div>
+        ))}
+        <div>
+          <dt>Tváří v tvář</dt>
+          <dd>{g('combat_melee') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Střelba</dt>
+          <dd>{g('combat_ranged') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Iniciativa</dt>
+          <dd>{g('combat_init') || '—'}</dd>
+        </div>
+      </dl>
+
+      {weapons.length > 0 && (
+        <>
+          <h2>Zbraně</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Zbraň</th>
+                <th>Útoč</th>
+                <th>Zran</th>
+                <th>Obrana</th>
+                <th>ÚČ</th>
+                <th>OČ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weapons.map((w, i) => (
+                <tr key={i}>
+                  <td>{w.name || '—'}</td>
+                  <td>{w.atk || '—'}</td>
+                  <td>{w.dmg || '—'}</td>
+                  <td>{w.def || '—'}</td>
+                  <td>{w.uc || '—'}</td>
+                  <td>{w.oc || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {armors.length > 0 && (
+        <>
+          <h2>Zbroj a štít</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Zbroj / Štít</th>
+                <th>Kvalita</th>
+                <th>Základ obrany</th>
+                <th>Pozn.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {armors.map((a, i) => (
+                <tr key={i}>
+                  <td>{a.name || '—'}</td>
+                  <td>{a.quality || '—'}</td>
+                  <td>{a.def || '—'}</td>
+                  <td>{a.note || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {skills.length > 0 && (
+        <>
+          <h2>Dovednosti</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Název dovednosti</th>
+                <th>Stupeň</th>
+                <th>Součet</th>
+                <th>Body</th>
+              </tr>
+            </thead>
+            <tbody>
+              {skills.map((s, i) => (
+                <tr key={i}>
+                  <td>{s.name || '—'}</td>
+                  <td>{s.lvl || '—'}</td>
+                  <td>{s.sum || '—'}</td>
+                  <td>{s.pts || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {profTable && profRows.length > 0 && (
+        <>
+          <h2>{profTable.title}</h2>
+          <table>
+            <thead>
+              <tr>
+                {profTable.cols.map((c) => (
+                  <th key={c.key}>{c.header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {profRows.map((row, i) => (
+                <tr key={i}>
+                  {profTable.cols.map((c) => (
+                    <td key={c.key}>{row[c.key] || '—'}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {notes && (
+        <>
+          <h2>Poznámky hlídkaře</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{notes}</p>
+        </>
+      )}
     </div>
   );
 }

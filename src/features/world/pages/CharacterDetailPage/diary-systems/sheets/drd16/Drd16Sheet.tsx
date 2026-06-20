@@ -18,6 +18,7 @@
  * z Matrix/Matrix jsou v customData zachovány (BE je přijímá), jen Ikaros
  * je teď zobrazuje pouze v base textareách.
  */
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
@@ -38,12 +39,18 @@ export function Drd16Sheet({
   onRoll,
 }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, '', onChange);
   // Note: Drd16 v Matrix/Matrix nepoužíval prefix (žádný `drd16_` ani `drd_`),
   // klíče byly přímé: `str_val`, `hp_current`, atd. Pro Ikaros zachováváme
   // stejný tvar — jiné systémy mají vlastní prefix, takže kolize nehrozí.
   const { g, set } = cda;
+
+  // Tisk: interaktivní inputy/tracky jsou netisknutelné (hodnota v
+  // `<input value>`, stav v barvě/výšce). V printMode renderujeme oddělený
+  // statický čitelný dokument se stejnými daty.
+  if (printMode) return <Drd16PrintView cda={cda} />;
 
   const strVal = parseInt(g('str_val', '10'), 10) || 10;
   const dexVal = parseInt(g('dex_val', '10'), 10) || 10;
@@ -639,6 +646,195 @@ function ResourceTracker({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná data, prefix '')
+// ════════════════════════════════════════════════════════════════
+
+function Drd16PrintView({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const meleeWeapons = cda.parseJsonArr<Drd16Weapon>('meleeWeapons');
+  const rangedWeapons = cda.parseJsonArr<Drd16RangedWeapon>('rangedWeapons');
+  const drdSkills = cda.parseJsonArr<Drd16Skill>('drdSkills');
+
+  // Auto-bonus (stejný výpočet jako interaktivní sheet) — pokud hráč
+  // nezadal vlastní `_mod`, ukážeme dopočítaný.
+  const primaryBonus = (key: string): string => {
+    const val = parseInt(g(`${key}_val`, '10'), 10) || 10;
+    return g(`${key}_mod`, String(getDrdBonus(val)));
+  };
+
+  const specialAbilities = g('special_abilities').trim();
+  const spells = g('spells').trim();
+
+  return (
+    <div className="drd16-print">
+      <h2>Identita</h2>
+      <dl>
+        <div>
+          <dt>Jméno</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Rasa</dt>
+          <dd>{g('race') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Povolání</dt>
+          <dd>{g('class') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Úroveň</dt>
+          <dd>{g('level') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h2>Zdroje</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Životy</dt>
+          <dd>
+            {g('hp_current', '0')} / {g('hp_max', '0')}
+          </dd>
+        </div>
+        <div>
+          <dt>Mana</dt>
+          <dd>
+            {g('mana_current', '0')} / {g('mana_max', '0')}
+          </dd>
+        </div>
+        <div>
+          <dt>Obrana (OČ)</dt>
+          <dd>{g('defense', '0')}</dd>
+        </div>
+      </dl>
+
+      <h2>Primární vlastnosti</h2>
+      <ul className="matrix-print__plain">
+        {DRD16_PRIMARY_STATS.map((s) => (
+          <li key={s.key} className="print-row">
+            <span>{s.label}</span>
+            <span>
+              {g(`${s.key}_val`, '—') || '—'} ({primaryBonus(s.key)})
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <h2>Sekundární vlastnosti</h2>
+      <ul className="matrix-print__plain">
+        {DRD16_SECONDARY_STATS.map((s) => (
+          <li key={s.key} className="print-row">
+            <span>{s.label}</span>
+            <span>{g(s.key) || '—'}</span>
+          </li>
+        ))}
+      </ul>
+
+      <h2>Naložení</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Lehké</dt>
+          <dd>{g('enc_light') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Střední</dt>
+          <dd>{g('enc_med') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Těžké</dt>
+          <dd>{g('enc_heavy') || '—'}</dd>
+        </div>
+      </dl>
+
+      {meleeWeapons.length > 0 && (
+        <>
+          <h2>Zbraně na blízko</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Zbraň</th>
+                <th>Kde</th>
+                <th>ÚČ</th>
+                <th>Útoč</th>
+                <th>Ozvl.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {meleeWeapons.map((w, i) => (
+                <tr key={i}>
+                  <td>{w.weapon || '—'}</td>
+                  <td>{w.where || '—'}</td>
+                  <td>{w.uc || '—'}</td>
+                  <td>{w.utoc || '—'}</td>
+                  <td>{w.oz || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {rangedWeapons.length > 0 && (
+        <>
+          <h2>Zbraně střelné</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Zbraň</th>
+                <th>ÚČ</th>
+                <th>Útoč</th>
+                <th>Malá</th>
+                <th>Stř.</th>
+                <th>Velká</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rangedWeapons.map((w, i) => (
+                <tr key={i}>
+                  <td>{w.weapon || '—'}</td>
+                  <td>{w.uc || '—'}</td>
+                  <td>{w.utoc || '—'}</td>
+                  <td>{w.small || '—'}</td>
+                  <td>{w.medium || '—'}</td>
+                  <td>{w.large || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {drdSkills.length > 0 && (
+        <>
+          <h2>Dovednosti DrD</h2>
+          <ul className="matrix-print__plain">
+            {drdSkills.map((s, i) => (
+              <li key={i} className="print-row">
+                <span>{s.name || '—'}</span>
+                <span>{s.level || '—'}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {specialAbilities && (
+        <>
+          <h2>Zvláštní schopnosti</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{specialAbilities}</p>
+        </>
+      )}
+
+      {spells && (
+        <>
+          <h2>Kouzla / Spellbook</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{spells}</p>
+        </>
+      )}
     </div>
   );
 }

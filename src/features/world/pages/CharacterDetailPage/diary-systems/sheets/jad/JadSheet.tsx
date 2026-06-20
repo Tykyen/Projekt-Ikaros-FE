@@ -8,6 +8,7 @@
  *   - Data v `diary.customData` s prefixem `jad_*` (1:1 vůči legacy).
  */
 import { useState } from 'react';
+import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
@@ -22,6 +23,7 @@ type Tab = 'main' | 'spells';
 
 export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
   const disabled = mode === 'view';
+  const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'jad_', onChange);
   const { g, set, parseJsonArr } = cda;
@@ -50,6 +52,10 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
 
   const spellEnabled = g('spellEnabled') === '1';
   const weapons = getJson<JadWeapon>('weapons');
+
+  // Tisk: inputy/number/taby jsou netisknutelné — vyrenderujeme statický
+  // čitelný dokument se spočtenými modifikátory jako text.
+  if (printMode) return <JadPrintView cda={cda} />;
 
   return (
     <div className="jad-diary">
@@ -721,5 +727,300 @@ function SpellLevelBlock({
         </button>
       )}
     </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRINT — statický čitelný dokument (čte stejná `jad_*` data)
+// ════════════════════════════════════════════════════════════════
+
+const JAD_HEADER_FIELDS: { key: string; label: string }[] = [
+  { key: 'race', label: 'Rasa' },
+  { key: 'class', label: 'Povolání' },
+  { key: 'level', label: 'Úroveň' },
+  { key: 'background', label: 'Zázemí' },
+  { key: 'alignment', label: 'Přesvědčení' },
+  { key: 'player', label: 'Hráč' },
+  { key: 'xp', label: 'Zkušenosti' },
+];
+
+/** Zdatnost dovednosti: 0 = žádná, 1 = zdatnost, 2 = expertíza. */
+const JAD_PROF_LABEL = ['', 'zdatnost', 'expertíza'];
+
+function JadPrintView({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const profBonus = parseInt(g('profBonus', '2'), 10) || 2;
+  const getScore = (k: string) => parseInt(g(`abi_${k}`, '10'), 10) || 10;
+  const getModFor = (k: string) => calcMod(getScore(k));
+  const isSaveProf = (k: string) => g(`save_${k}`) === '1';
+  const saveModFor = (k: string) =>
+    calcSaveMod(getModFor(k), isSaveProf(k), profBonus);
+  const skillProf = (n: string) => parseInt(g(`skill_${n}`, '0'), 10) || 0;
+  const skillModFor = (n: string, a: string) =>
+    calcSkillMod(getModFor(a), skillProf(n), profBonus);
+
+  const spellEnabled = g('spellEnabled') === '1';
+  const weapons = cda.parseJsonArr<JadWeapon>('weapons');
+
+  const playNotes = g('play_notes').trim();
+  const otherProfs = g('other_profs').trim();
+  const features = g('features').trim();
+
+  return (
+    <div className="jad-print">
+      <dl>
+        <div>
+          <dt>Jméno postavy</dt>
+          <dd>{g('charName') || '—'}</dd>
+        </div>
+        {JAD_HEADER_FIELDS.map((f) => (
+          <div key={f.key}>
+            <dt>{f.label}</dt>
+            <dd>{g(f.key) || '—'}</dd>
+          </div>
+        ))}
+        <div>
+          <dt>Zdatnostní bonus</dt>
+          <dd>{fmtMod(profBonus)}</dd>
+        </div>
+        <div>
+          <dt>Inspirace</dt>
+          <dd>{g('insp') === '1' ? 'ano' : 'ne'}</dd>
+        </div>
+      </dl>
+
+      <h2>Hlavní vlastnosti</h2>
+      <dl className="print-cols">
+        {ABIL_MAP.map(({ k, l }) => (
+          <div key={k}>
+            <dt>{l}</dt>
+            <dd>
+              {getScore(k)} ({fmtMod(getModFor(k))})
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2>Bojové údaje</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Iniciativa</dt>
+          <dd>{fmtMod(getModFor('dex'))}</dd>
+        </div>
+        <div>
+          <dt>Obranné číslo</dt>
+          <dd>{g('ac', '10') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Rychlost</dt>
+          <dd>{g('speed', '9 m') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Max Životy (VBD)</dt>
+          <dd>{g('hpMax') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Aktuální Životy</dt>
+          <dd>{g('hpCur') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Kostky obnovy</dt>
+          <dd>{g('hd') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Záchr. proti smrti (úspěch)</dt>
+          <dd>{g('ds_s') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Záchr. proti smrti (selhání)</dt>
+          <dd>{g('ds_f') || '—'}</dd>
+        </div>
+      </dl>
+
+      <h2>Záchranné hody</h2>
+      <ul className="matrix-print__plain">
+        {ABIL_MAP.map(({ k, l }) => (
+          <li key={k} className="print-row">
+            <span>
+              {l}
+              {isSaveProf(k) ? ' (zdatný)' : ''}
+            </span>
+            <span>{fmtMod(saveModFor(k))}</span>
+          </li>
+        ))}
+      </ul>
+
+      <h2>Dovednosti</h2>
+      <ul className="matrix-print__plain">
+        {SKILLS.map(({ n, a }) => {
+          const prof = skillProf(n);
+          const profText = JAD_PROF_LABEL[prof] ?? '';
+          return (
+            <li key={n} className="print-row">
+              <span>
+                {n} ({a.toUpperCase()})
+                {profText ? ` — ${profText}` : ''}
+              </span>
+              <span>{fmtMod(skillModFor(n, a))}</span>
+            </li>
+          );
+        })}
+      </ul>
+
+      <h2>Pasivní vnímání a smysly</h2>
+      <ul className="matrix-print__plain">
+        <li className="print-row">
+          <span>Pasivní Vnímání</span>
+          <span>{10 + skillModFor('Vnímání', 'wis')}</span>
+        </li>
+        <li className="print-row">
+          <span>Pasivní Vhled</span>
+          <span>{10 + skillModFor('Vhled', 'wis')}</span>
+        </li>
+        <li className="print-row">
+          <span>Pasivní Pátrání</span>
+          <span>{10 + skillModFor('Pátrání', 'int')}</span>
+        </li>
+      </ul>
+
+      <h2>Rychlý přehled kouzlení / Alchymie</h2>
+      <dl>
+        <div>
+          <dt>Sesílací / Útočná vlastnost</dt>
+          <dd>{g('qc_ss_abi') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Útočný bonus</dt>
+          <dd>{g('qc_ss_atk') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Stupeň obtížnosti (SO)</dt>
+          <dd>{g('qc_ss_dc') || '—'}</dd>
+        </div>
+      </dl>
+
+      {weapons.length > 0 && (
+        <>
+          <h2>Zbraně a doplňky</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Zbraň</th>
+                <th>Bon</th>
+                <th>Zásah</th>
+                <th>OČ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weapons.map((w, i) => (
+                <tr key={i}>
+                  <td>{w.n || '—'}</td>
+                  <td>{w.b || '—'}</td>
+                  <td>{w.d || '—'}</td>
+                  <td>{w.o || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {playNotes && (
+        <>
+          <h2>Poznámky k hraní postavy</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{playNotes}</p>
+        </>
+      )}
+
+      {otherProfs && (
+        <>
+          <h2>Ostatní zdatnosti a pomůcky</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{otherProfs}</p>
+        </>
+      )}
+
+      {features && (
+        <>
+          <h2>Záznam schopností (třídní / rasové)</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{features}</p>
+        </>
+      )}
+
+      {spellEnabled && <JadSpellsPrint cda={cda} />}
+    </div>
+  );
+}
+
+/** Kouzla (taby „Kouzla / Truhla") — vytištěno jen je-li sesilatel zapnut. */
+function JadSpellsPrint({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  return (
+    <>
+      <h2>Kouzla / Truhla</h2>
+      <dl>
+        <div>
+          <dt>Povolání</dt>
+          <dd>{g('sp_class') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Sesílací vlastnost</dt>
+          <dd>{g('sp_abi') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Útočný bonus</dt>
+          <dd>{g('sp_atk') || '—'}</dd>
+        </div>
+        <div>
+          <dt>S.O. záchrany</dt>
+          <dd>{g('sp_dc') || '—'}</dd>
+        </div>
+      </dl>
+
+      {levels.map((lvl) => {
+        const spells = cda.parseJsonArr<JadSpell>(`spl_${lvl}`);
+        if (spells.length === 0) return null;
+        const slotsMax = g(`spl_slots_${lvl}`);
+        const slotsUsed = g(`spl_used_${lvl}`);
+        const title = lvl === 0 ? 'Triky' : `${lvl}. Stupeň`;
+        const slotInfo =
+          lvl > 0 && (slotsMax || slotsUsed)
+            ? ` (pozice: ${slotsUsed || '0'} / ${slotsMax || '0'})`
+            : '';
+        return (
+          <div key={lvl}>
+            <h3>
+              {title}
+              {slotInfo}
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  {lvl > 0 && <th>Přip.</th>}
+                  <th>Název</th>
+                  <th>Úto/SO</th>
+                  <th>Doba</th>
+                  <th>Dosah</th>
+                  <th>Trvání</th>
+                </tr>
+              </thead>
+              <tbody>
+                {spells.map((sp, i) => (
+                  <tr key={i}>
+                    {lvl > 0 && <td>{sp.p ? 'ano' : '—'}</td>}
+                    <td>{sp.n || '—'}</td>
+                    <td>{sp.u || '—'}</td>
+                    <td>{sp.d || '—'}</td>
+                    <td>{sp.r || '—'}</td>
+                    <td>{sp.t || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
+    </>
   );
 }

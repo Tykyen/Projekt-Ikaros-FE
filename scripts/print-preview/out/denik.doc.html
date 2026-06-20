@@ -81,6 +81,15 @@ figcaption { font-size: 0.85rem; font-style: italic; margin-top: 0.3em; }
      půl stránky. Cílená třída — obecné `img` (mapy, ilustrace) zůstává větší. */
 .print-portrait { max-height: 6cm !important; }
 
+/* — Hero obrázek stránky (Lokace/Ostatní): nahoře nad textem, ale ne přes
+     celou šířku. Vystředěný, rozumný strop. */
+.print-hero {
+  display: block;
+  margin: 0 auto 0.8rem;
+  max-height: 7cm !important;
+  max-width: 12cm !important;
+}
+
 /* — Tisk „všech záložek": každá záložka na vlastní stránce (kromě první,
      která sdílí list s hero/profilem). */
 .print-page { break-before: page; }
@@ -107,6 +116,10 @@ dd { margin: 0; }
 /* — Řádek s hodnotou vpravo (položka výbavy: název ⟷ ×N; Matrix pips) — */
 .print-row { display: flex; justify-content: space-between; gap: 1rem; }
 
+/* — Kompaktní stat „Label hodnota" s mezerou (bestie staty/schopnosti) —
+     jen mezera mezi label a hodnotou, BEZ roztažení přes celou šířku. */
+.print-stat { display: flex; gap: 0.4rem; align-items: baseline; }
+
 /* — Seznam bez odrážek (Matrix tiskový deník: přetlaky/jazyky/schopnosti
      jsou řádky label–hodnota, ne výčet). — */
 .matrix-print__plain { list-style: none; padding-left: 0; }
@@ -127,6 +140,34 @@ hr { border: none; border-top: 1px solid #bbb; margin: 1em 0; }
 /* — Kalendář: každý měsíc na vlastní stránku (z 14.7b) — */
 .print-month { break-after: page; }
 .print-month:last-child { break-after: auto; }
+
+/* — Kalendář: mřížka. `display:grid` je v CSS modulu appky (v tisku zmizí) →
+     buňky by se rozpadly do sloupce. `gridTemplateColumns` přežívá (inline
+     style), tady obnovíme `display:grid` + rámečky buněk. */
+.print-cal-grid { display: grid !important; gap: 2px; }
+.print-cal-grid > * {
+  border: 1px solid #ccc;
+  padding: 2px 3px;
+  min-height: 1.8cm;
+  font-size: 8pt;
+  break-inside: avoid;
+  overflow: visible !important;
+}
+
+/* — Kalendář: událost (akce). Přebíjí button{display:none} a ukáže název
+     s barevným proužkem vlevo (--chip-color z inline style chipu). Bez toho
+     se v tisku tisknou jen prázdné barevné proužky bez názvů. */
+.print-event {
+  display: block !important;
+  border-left: 3px solid var(--chip-color, #888);
+  padding: 1px 5px;
+  margin: 1px 0;
+  font-size: 8.5pt;
+  line-height: 1.25;
+  text-align: left;
+  white-space: normal;
+  break-inside: avoid;
+}
 
 /* — Volitelná tisková utilita: mřížku karet (atributy bestie/postavy) lze
      v tisku zachovat přidáním stabilní třídy `print-cols` do komponenty
