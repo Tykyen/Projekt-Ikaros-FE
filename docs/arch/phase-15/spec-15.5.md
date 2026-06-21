@@ -1,6 +1,6 @@
 # Spec 15.5 — Osnovy & šablony stránek (obsahová osnova)
 
-**Stav:** návrh (čeká schválení) · **Fáze:** 15 · **Roadmap:** [§15.5](../../roadmap2.md) · **Dluh:** D-NEW-INV-WIKI (částečně)
+**Stav:** implementováno 2026-06-21 · **Fáze:** 15 · **Roadmap:** [§15.5](../../roadmap2.md) · **Souvis. dluh:** D-NEW-INV-WIKI ✅ vyřešen samostatným 15.5-followup (tabulky ve vieweru + mrtvý odkaz Informace, viz dluhy.md)
 **Varianta B (schváleno v brainstormingu):** rozšířit **stávající** per-svět šablonu `WorldPageTemplate` o jedno pole „obsahová osnova" (rich-text kostra). Žádný nový vazební koncept na typ stránky.
 
 ## 0. Princip

@@ -117,6 +117,27 @@
   font-style: italic;
 }
 
+/* Tabulky v obsahu (wiki). Read mode renderuje `<table.rte-table>` přes vždy
+   zapnutou Table extension v readOnly — shodný vizuál s editorem
+   (ContentPanel.module.css). Bez těchto pravidel by tabulka byla bez ohraničení. */
+.content :global(.rte-table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+}
+
+.content :global(.rte-table) td,
+.content :global(.rte-table) th {
+  border: 1px solid var(--border, rgb(var(--white-rgb) / 0.15));
+  padding: 0.45rem 0.65rem;
+  vertical-align: top;
+}
+
+.content :global(.rte-table) th {
+  background: var(--bg-overlay, rgb(var(--white-rgb) / 0.04));
+  font-weight: 600;
+}
+
 /* ─── Read-only mode — reading-focused prose ─────────────────────────── */
 
 .readOnly .content :global(.ProseMirror) {

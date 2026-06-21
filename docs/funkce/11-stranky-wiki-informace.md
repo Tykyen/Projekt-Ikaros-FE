@@ -97,7 +97,7 @@ Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read
 - **Tisk / PDF** (14.7a) — ikona 🖨 v hlavičce (`PageHeader.tsx`) → `window.print()` jen nad obsahem stránky (viz `## Tisk / PDF` níže).
 
 ### Hranice — co neumí
-- **Tabulky v `content` se ve vieweru ZAHODÍ.** `OstatniLayout` renderuje `<RichTextEditor readOnly>` BEZ `enableTable` (`OstatniLayout.tsx:67`), zatímco editor `ContentPanel` má `enableTable` (`ContentPanel.tsx:52`). TipTap bez table extension `<table>` při parse zahodí → PJ napíše tabulku v editoru, ale hráč ji ve čtení neuvidí. (Atributová `table` mimo `content` se renderuje normálně přes `PageSidebar` — týká se to jen inline tabulek vloženého HTML obsahu.)
+- **Tabulky v `content` se renderují i ve vieweru** (15.5-followup, D-NEW-INV-WIKI). `RichTextEditor` zapíná Table extension i v `readOnly` (`enableTable || readOnly`, `RichTextEditor.tsx`) + read CSS `.content .rte-table`. Jeden zásah pokryl všech 8 read layoutů; tabulka napsaná v editoru je teď ve čtení vidět. (Atributová `table` mimo `content` se renderuje samostatně přes `PageSidebar`.)
 - Backlinks panel je PJ-only — hráč nevidí, kdo na stránku odkazuje.
 
 ### Zvláštnosti
@@ -105,7 +105,7 @@ Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read
 - Error fallback: 403 → `AccessDenied`, 404 → `PageNotFound`, jiná chyba → též `PageNotFound`.
 
 ### Stav
-✅ Funkční, ⚠️ tabulky v obsahu = známý limit.
+✅ Funkční (vč. tabulek v obsahu — 15.5-followup).
 
 ### Kód
 FE `PageViewer/PageViewer.tsx:58`, `layouts/OstatniLayout.tsx:67`; BE `pages.service.ts:168`.
@@ -381,11 +381,11 @@ Při `world.created` se založí (pokud neexistují):
 - Matrix svět: `pravidla`/`magicky-system`/`technologie` nahrazuje Pravidlová kniha (`seedRulebook` — hub + kapitoly 1-9).
 
 ### Menu „Informace" (FE `worldNavConfig.ts`)
-Skupina „Informace" (`buildWorldNav:168`) obsahuje: Skupiny (rozbalovací), Pravidla, Magický systém (`id`, skrývatelné), Technologie (`id`, skrývatelné). „Stránky" je v skupině „Svět".
+Skupina „Informace" (`buildWorldNav`) obsahuje: Skupiny (rozbalovací), Pravidla, Magický systém (`id`, skrývatelné), Technologie (`id`, skrývatelné). „Stránky" je v skupině „Svět". **15.5-followup (D-NEW-INV-WIKI):** odkazy Magický systém/Technologie se skryjí, když odpovídající stránka neexistuje — `buildWorldNav` bere `existingPageSlugs` (z `usePagesDirectory` ve `WorldLayout`); `pravidla` má vlastní route (RulesPage) → nefiltruje se.
 
 ### Hranice — co neumí / nesrovnalost
-- **Dvě vrstvy:** seed zakládá OBSAH stránek (create-only), ale menu „Informace" je hardcoded v `buildWorldNav` — nejsou propojené (memory `project_world_informace_reference_pages`). Magický systém/Technologie jdou skrýt přes `hiddenNavItems` (mají `id`), Pravidla a Stránky se skrýt nedají (esenciály).
-- Seedované referenční stránky jsou typ `Ostatní` (mimo matrix) — tabulky v jejich obsahu by tedy také podléhaly limitu stripování tabulek ve vieweru.
+- **Dvě vrstvy:** seed zakládá OBSAH stránek (create-only), menu „Informace" je definované v `buildWorldNav`. Odkazy magicky-system/technologie se teď podmiňují existencí stránky (mrtvý odkaz vyřešen), ale **přidání nové referenční stránky** do menu je pořád ruční zásah do `buildWorldNav` (memory `project_world_informace_reference_pages`). Magický systém/Technologie jdou skrýt i ručně přes `hiddenNavItems` (`id`); Pravidla a Stránky jsou esenciály.
+- Seedované referenční stránky jsou typ `Ostatní` (mimo matrix); tabulky v jejich obsahu se ve vieweru **renderují** (15.5-followup).
 
 ### Stav
 ✅ Funkční.
@@ -441,13 +441,11 @@ Kód: `pages.controller.ts:36-176`.
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. **Tabulky v `content` se ve vieweru zahodí.** Editor `ContentPanel` má `enableTable`, ale read-only `RichTextEditor` v `OstatniLayout.tsx:67` (a pravděpodobně dalších layoutech) `enableTable` nemá → TipTap při parse `<table>` zahodí. PJ vloží tabulku, hráč ji ve čtení nevidí. Týká se inline tabulek v obsahu; atributová `table` (sidebar) je OK. **Doporučení: ověřit všechny read layouty a buď přidat `enableTable` na readOnly viewer, nebo to zakázat v editoru / převést na sekce.** (Memory `project_page_content_no_tables` to dokumentuje jako vědomý stav.)
+1. **Asymetrie subdoc create vs. read (Lokace/NPC).** `onCharacterCreated` vytvoří finance+inventory i pro lokaci/NPC, ale `getFinance`/`getInventory` je pro ně blokuje (404 `*_NOT_APPLICABLE`). Vznikají subdokumenty, které nikdy nejdou přečíst → mírný dluh/leak dat v DB. Spec „Character drží 5 subdoců" tak pro Lokaci/NPC neplatí v praxi.
 
-2. **Asymetrie subdoc create vs. read (Lokace/NPC).** `onCharacterCreated` vytvoří finance+inventory i pro lokaci/NPC, ale `getFinance`/`getInventory` je pro ně blokuje (404 `*_NOT_APPLICABLE`). Vznikají subdokumenty, které nikdy nejdou přečíst → mírný dluh/leak dat v DB. Spec „Character drží 5 subdoců" tak pro Lokaci/NPC neplatí v praxi.
+2. **Práh „šablon stránky" = Korektor, ale stránky samotné = PomocnyPJ.** `WorldPageTemplate` CRUD povolen Korektor+ (`world-page-templates.service.ts:146`), zatímco vytvoření/úprava stránky vyžaduje PomocnyPJ+. Korektor tedy může vytvořit šablonu tabulky, ale ne stránku, kde by ji použil. Záměr (komentář odkazuje na tab „Vzhled"), ale stojí za revizi konzistence.
 
-3. **Práh „šablon stránky" = Korektor, ale stránky samotné = PomocnyPJ.** `WorldPageTemplate` CRUD povolen Korektor+ (`world-page-templates.service.ts:146`), zatímco vytvoření/úprava stránky vyžaduje PomocnyPJ+. Korektor tedy může vytvořit šablonu tabulky, ale ne stránku, kde by ji použil. Záměr (komentář odkazuje na tab „Vzhled"), ale stojí za revizi konzistence.
-
-4. **Názvoslovný střet „Šablona".** „Datová šablona stránky" (`WorldPageTemplate`, atributová tabulka) vs. „Šablona deníku" (diary schema) v Nastavení světa jsou dvě různé věci se zaměnitelným názvem — riziko záměny v dokumentaci i UX.
+3. **Názvoslovný střet „Šablona".** „Datová šablona stránky" (`WorldPageTemplate`, atributová tabulka) vs. „Šablona deníku" (diary schema) v Nastavení světa jsou dvě různé věci se zaměnitelným názvem — riziko záměny v dokumentaci i UX.
 
 5. **Seed obsahu vs. nav menu jsou 2 nepropojené vrstvy.** Referenční stránky (`pravidla`/`magicky-system`/`technologie`) seeduje BE create-only, ale jejich přítomnost v menu „Informace" je hardcoded ve FE `buildWorldNav`. Pokud PJ stránku smaže, odkaz v menu vede na 404; pokud se seed nepovede, menu stále odkazuje. Skrytí jde jen u Magického systému/Technologie (mají `id`).
 

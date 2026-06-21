@@ -168,8 +168,16 @@ export function buildWorldNav(
   // uživatel reálně dosáhne (jinak klik = tichý redirect na index). Default
   // „ukaž vše" zachovává náhled 12.2 i testy.
   canAccess: (min: WorldRole) => boolean = () => true,
+  // D-NEW-INV-WIKI — slugy existujících stránek světa. Referenční odkazy
+  // (magicky-system/technologie) vedou na catch-all `:slug` → PageViewer, takže
+  // smazaná/neseedovaná stránka = mrtvý odkaz (404). Skryj je, když stránka
+  // neexistuje. `undefined` = directory neznáme → ukaž vše (BC: náhled 12.2,
+  // testy). „Pravidla" má dedikovanou route (RulesPage), proto se nefiltruje.
+  existingPageSlugs?: ReadonlySet<string>,
 ): NavNode[] {
   const b = `/svet/${worldSlug}`;
+  const refPageExists = (slug: string) =>
+    existingPageSlugs === undefined || existingPageSlugs.has(slug);
   return [
     {
       label: 'Informace',
@@ -185,12 +193,19 @@ export function buildWorldNav(
         { label: 'Pravidla', to: `${b}/pravidla` },
         // Referenční stránky seedované při tvorbě světa — k ruce hráčům.
         // Mají `id` → skrývatelné v Nastavení (HIDEABLE_NAV_ITEMS „informace").
-        {
-          id: 'magicky-system',
-          label: 'Magický systém',
-          to: `${b}/magicky-system`,
-        },
-        { id: 'technologie', label: 'Technologie', to: `${b}/technologie` },
+        // Navíc se skryjí, když odpovídající stránka neexistuje (D-NEW-INV-WIKI).
+        ...(refPageExists('magicky-system')
+          ? [
+              {
+                id: 'magicky-system',
+                label: 'Magický systém',
+                to: `${b}/magicky-system`,
+              },
+            ]
+          : []),
+        ...(refPageExists('technologie')
+          ? [{ id: 'technologie', label: 'Technologie', to: `${b}/technologie` }]
+          : []),
       ],
     },
     {
@@ -276,10 +291,12 @@ export function buildFullWorldNav(
   customHeadline: readonly HeadlineNode[] | undefined,
   groups: readonly string[] = [],
   canAccess: (min: WorldRole) => boolean = () => true,
+  // D-NEW-INV-WIKI — viz `buildWorldNav`; `undefined` = ukaž vše (BC).
+  existingPageSlugs?: ReadonlySet<string>,
 ): NavNode[] {
   return [
     ...filterNavByHidden(
-      buildWorldNav(worldSlug, isPJ, groups, canAccess),
+      buildWorldNav(worldSlug, isPJ, groups, canAccess, existingPageSlugs),
       hiddenNavItems,
     ),
     ...headlineToNavGroups(customHeadline),

@@ -79,7 +79,9 @@ export function RichTextEditor({
     extensions: getExtensions({
       placeholder,
       enableImage: !!onImageUpload,
-      enableTable,
+      // Read mode musí umět vyrenderovat tabulky uložené v contentu (jinak je
+      // TipTap tiše zahodí). Vzor: Superscript/Color jsou taky vždy v readOnly.
+      enableTable: enableTable || readOnly,
       additionalExtensions,
     }),
     content: value,

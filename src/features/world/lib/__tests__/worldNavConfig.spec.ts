@@ -67,6 +67,34 @@ describe('buildWorldNav', () => {
   });
 });
 
+describe('buildWorldNav — referenční stránky dle existence (D-NEW-INV-WIKI)', () => {
+  const infoLabels = (nav: ReturnType<typeof buildWorldNav>) =>
+    nav.find((g) => g.label === 'Informace')!.items!.map((i) => i.label);
+
+  it('bez seznamu slugů (undefined) → referenční odkazy zůstanou (BC)', () => {
+    const labels = infoLabels(buildWorldNav('a', true, [], () => true, undefined));
+    expect(labels).toContain('Magický systém');
+    expect(labels).toContain('Technologie');
+  });
+
+  it('prázdný seznam → magicky-system/technologie skryté, Pravidla zůstává', () => {
+    const labels = infoLabels(
+      buildWorldNav('a', true, [], () => true, new Set()),
+    );
+    expect(labels).not.toContain('Magický systém');
+    expect(labels).not.toContain('Technologie');
+    expect(labels).toContain('Pravidla'); // dedikovaná route, nefiltruje se
+  });
+
+  it('jen existující slug se ukáže', () => {
+    const labels = infoLabels(
+      buildWorldNav('a', true, [], () => true, new Set(['magicky-system'])),
+    );
+    expect(labels).toContain('Magický systém');
+    expect(labels).not.toContain('Technologie');
+  });
+});
+
 describe('buildWorldNav — role gating položek (N-04/05)', () => {
   const allIds = (nav: ReturnType<typeof buildWorldNav>) =>
     nav.flatMap((g) => (g.items ? g.items.map((i) => i.id) : [g.id]));

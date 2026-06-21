@@ -27,6 +27,7 @@ import { applyTheme } from '../../../themes/applyTheme';
 import { resolveWorldTheme } from '../../../themes/worldTheme';
 import { MatrixRain } from '../../../themes/effects/MatrixRain';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
+import { usePagesDirectory } from '@/features/world/pages/api/usePagesDirectory';
 import { buildFullWorldNav } from '@/features/world/lib/worldNavConfig';
 import type { NavNode, NavLinkItem } from '@/features/world/lib/headlineNav';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
@@ -289,6 +290,19 @@ export function WorldLayout() {
   const navBypass = world?.ownerId === currentUser?.id || isElevatedHere;
   const navRole = membership?.role ?? -1;
   const { data: settings } = useWorldSettings(realWorldId);
+  // D-NEW-INV-WIKI — slugy existujících stránek pro skrytí mrtvých referenčních
+  // odkazů (magicky-system/technologie). `isPlaceholderData` → directory ještě
+  // nenačtené (hook vrací `[]`, ne undefined) → předej undefined = ukaž vše,
+  // ať odkazy neproblikávají před načtením.
+  const { data: pagesDir = [], isPlaceholderData: pagesDirPlaceholder } =
+    usePagesDirectory(realWorldId);
+  const existingPageSlugs = useMemo(
+    () =>
+      pagesDirPlaceholder
+        ? undefined
+        : new Set(pagesDir.map((p) => p.slug)),
+    [pagesDirPlaceholder, pagesDir],
+  );
   const nav = useMemo(
     () =>
       buildFullWorldNav(
@@ -298,6 +312,7 @@ export function WorldLayout() {
         settings?.customHeadline,
         settings?.customGroups,
         (min) => navBypass || navRole >= min,
+        existingPageSlugs,
       ),
     [
       worldSlug,
@@ -307,6 +322,7 @@ export function WorldLayout() {
       settings?.hiddenNavItems,
       settings?.customHeadline,
       settings?.customGroups,
+      existingPageSlugs,
     ],
   );
 

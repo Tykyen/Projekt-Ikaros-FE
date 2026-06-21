@@ -47,12 +47,13 @@
 **Řešení:** napojit sekce na existující moduly; implementovat per-role taby nebo odstranit mrtvý param; validace displayName; doplnit worldsCount do friend shape.
 **Kdy:** Fáze 15.6 / 16.4. Zdroj: kap. 02.
 
-### D-NEW-INV-WIKI — Inventura: tabulky ve vieweru + seed↔menu
-**Soubory:** FE `OstatniLayout.tsx` (readonly `RichTextEditor` bez `enableTable`) a další read layouty; BE seed referenčních stránek vs. FE `buildWorldNav` (hardcoded „Informace").
-**Problém:** inline `<table>` v `page.content` se ve čtení zahodí (editor je umí, viewer ne) → PJ vloží tabulku, hráč ji nevidí; smazaná seedovaná stránka (`pravidla`/`magicky-system`/`technologie`) zůstává jako mrtvý odkaz v menu „Informace" (seed a menu jsou 2 nepropojené vrstvy).
-**Dopad:** Střední — ztráta obsahu při čtení.
-**Řešení:** přidat `enableTable` do readonly vieweru (nebo zakázat v editoru / převést na sekce); ošetřit smazanou seed-stránku v menu. Pozn.: [[project_page_content_no_tables]] to dnes drží jako vědomý stav.
-**Kdy:** Fáze 15.5. Zdroj: kap. 11.
+### D-NEW-INV-WIKI — Inventura: tabulky ve vieweru + seed↔menu — ✅ VYŘEŠENO 2026-06-21
+**✅ Opraveno (15.5-followup, 2026-06-21):**
+- **Tabulky ve vieweru:** `RichTextEditor` zapíná `Table` extension i v `readOnly` (`enableTable || readOnly`, `RichTextEditor.tsx`) + read-mode CSS `.content .rte-table` (`RichTextEditor.module.css`). Jeden zásah pokryl všech 8 read layoutů; tabulka už při čtení nezmizí. BE `sanitizeRichText` `<table>` povoluje (uloží se), problém byl čistě render.
+- **Mrtvý odkaz „Informace":** `buildWorldNav`/`buildFullWorldNav` přijímá `existingPageSlugs` (z `usePagesDirectory` ve `WorldLayout`); odkazy `magicky-system`/`technologie` se skryjí, když stránka neexistuje (smazaná/neseedovaná). `Pravidla` má dedikovanou route (RulesPage) → nefiltruje se (jinak by se u matrix/Rulebook chybně skryl). `isPlaceholderData` gate brání probliknutí před načtením.
+- Ověřeno: vitest RichTextEditor 22/22 + worldNavConfig 16/16, build ✓.
+
+**Bylo:** inline `<table>` v `page.content` se ve čtení zahodil (editor je uměl, viewer ne); smazaná seedovaná stránka zůstávala mrtvým odkazem v menu „Informace" (seed a menu byly 2 nepropojené vrstvy).
 
 ### D-NEW-INV-DATA-SYNC — Inventura: konzistence dat postav/měn
 **Soubory:** BE `map-operations.service.ts` (token→Character sync TODO), `world-currencies` `updateCurrencies` (full-replace), `character-subdocs.service.ts` (finance/inventory create vs. read), `characters.repository.ts` (legacy `/characters/directory`).
