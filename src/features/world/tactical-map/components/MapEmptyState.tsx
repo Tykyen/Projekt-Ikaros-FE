@@ -17,6 +17,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiClient } from '@/shared/api/client';
+import { stateIllustrationSrc } from '@/shared/ui';
 import { postWorldOperation } from '../api/worldOpsApi';
 import { mapSceneQueryKey } from '../hooks/useMapScene';
 import { useActiveScenes, activeScenesQueryKey } from '../hooks/useActiveScenes';
@@ -153,9 +154,13 @@ export function MapEmptyState({
 
   return (
     <div className={styles.container} role="status" aria-live="polite">
-      <div className={styles.icon} aria-hidden="true">
-        🪹
-      </div>
+      <img
+        src={stateIllustrationSrc('worlds')}
+        alt=""
+        aria-hidden="true"
+        className={styles.illustration}
+        draggable={false}
+      />
       <p className={styles.title}>{effectiveTitle}</p>
       <p className={styles.subtitle}>{effectiveSubtitle}</p>
       {isPJ && worldId && currentUserId && (

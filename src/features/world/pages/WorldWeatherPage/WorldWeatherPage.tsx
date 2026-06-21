@@ -21,10 +21,10 @@
 import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
-import { Plus, CloudSun, FastForward, Package, CalendarClock } from 'lucide-react';
+import { Plus, FastForward, Package, CalendarClock } from 'lucide-react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import { Button, ConfirmDialog, Spinner } from '@/shared/ui';
+import { Button, ConfirmDialog, Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { WorldRole, type WeatherGenerator } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -298,37 +298,34 @@ export default function WorldWeatherPage() {
       </header>
 
       {listQuery.isError ? (
-        <p className={s.error}>Nepodařilo se načíst počasí.</p>
+        <ErrorState
+          size="panel"
+          status={500}
+          title="Nepodařilo se načíst počasí"
+          onRetry={() => void listQuery.refetch()}
+        />
       ) : listQuery.isLoading ? (
         <Spinner center />
       ) : generators.length === 0 ? (
-        <div className={s.emptyState} data-testid="weather-empty">
-          <div className={s.emptyStateIcon} aria-hidden="true">
-            <CloudSun size={48} />
-          </div>
+        <div data-testid="weather-empty">
           {canManage ? (
-            <>
-              <h2 className={s.emptyStateTitle}>Zatím žádný generátor</h2>
-              <p className={s.emptyStateText}>
-                Vytvoř první generátor počasí — můžeš začít s reálným světem
-                (Praha, Reykjavík…) nebo s archetypem (Mírné oceánské, Poušť…).
-              </p>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => setModal({ kind: 'create' })}
-              >
-                <Plus size={18} aria-hidden="true" />
-                <span>Vytvořit první generátor</span>
-              </Button>
-            </>
+            <EmptyState
+              size="panel"
+              illustration="generic-empty"
+              title="Zatím žádný generátor"
+              description="Vytvoř první generátor počasí — můžeš začít s reálným světem (Praha, Reykjavík…) nebo s archetypem (Mírné oceánské, Poušť…)."
+              action={{
+                label: 'Vytvořit první generátor',
+                onClick: () => setModal({ kind: 'create' }),
+              }}
+            />
           ) : (
-            <>
-              <h2 className={s.emptyStateTitle}>Počasí ještě není nastaveno</h2>
-              <p className={s.emptyStateText}>
-                PJ světa ještě nenastavil žádné generátory počasí.
-              </p>
-            </>
+            <EmptyState
+              size="panel"
+              illustration="generic-empty"
+              title="Počasí ještě není nastaveno"
+              description="PJ světa ještě nenastavil žádné generátory počasí."
+            />
           )}
         </div>
       ) : (

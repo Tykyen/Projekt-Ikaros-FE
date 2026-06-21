@@ -27,6 +27,11 @@ vi.mock('@/features/world/pages/api/useCharacterDirectory', () => ({
 vi.mock('@/features/world/api/useWorldSettings', () => ({
   useWorldSettings: () => ({ data: undefined, isLoading: false }),
 }));
+// D-NEW-INV-WIKI — usePagesDirectory (skrytí mrtvých ref. odkazů) volá useQuery;
+// stub, aby layout test nepotřeboval QueryClientProvider.
+vi.mock('@/features/world/pages/api/usePagesDirectory', () => ({
+  usePagesDirectory: () => ({ data: [], isPlaceholderData: false }),
+}));
 // W-9 — useWorldSocket (WS room + listenery) volá useQueryClient; layout test
 // ho neověřuje → no-op stub, aby nepotřeboval QueryClientProvider.
 vi.mock('@/features/world/hooks/useWorldSocket', () => ({

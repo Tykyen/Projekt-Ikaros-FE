@@ -1,0 +1,7 @@
+.shell {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-6);
+  background: var(--theme-bg, var(--bg-primary, transparent));
+}

@@ -1,6 +1,5 @@
 import clsx from 'clsx';
-import { Inbox } from 'lucide-react';
-import { Button, Spinner } from '@/shared/ui';
+import { Button, Spinner, EmptyState } from '@/shared/ui';
 import { useMailFolder } from '@/features/ikaros/api/useMail';
 import { MailListItem } from './MailListItem';
 import type { MailFolder } from '@/shared/types';
@@ -50,10 +49,16 @@ export function MailList({
           <Spinner />
         </div>
       ) : messages.length === 0 ? (
-        <div className={s.empty}>
-          <Inbox size={32} aria-hidden="true" />
-          <p>Žádné zprávy.</p>
-        </div>
+        <EmptyState
+          size="panel"
+          illustration="messages"
+          title={folder === 'dorucene' ? 'Schránka je prázdná' : 'Nic odeslaného'}
+          description={
+            folder === 'dorucene'
+              ? 'Nemáš žádné doručené zprávy.'
+              : 'Zatím jsi neodeslal žádnou zprávu.'
+          }
+        />
       ) : (
         <>
           <ul className={s.items}>

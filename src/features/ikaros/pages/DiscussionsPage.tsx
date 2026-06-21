@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { Plus, Search, ArrowUpDown, Lock, MessageCircle, Heart } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState } from '@/shared/ui';
 import { useDiscussions } from '../api/useDiscussions';
 import { filterDiscussions, timeAgo, type DiscussionSort } from '../lib/discussions';
 import type { IkarosDiscussion } from '@/shared/types';
@@ -96,15 +96,29 @@ export default function DiscussionsPage() {
       {isLoading ? (
         <Spinner center />
       ) : filtered.length === 0 ? (
-        <div className={s.empty}>
-          <p>
-            {debouncedQuery
-              ? 'Žádná diskuze neodpovídá hledání.'
-              : tab === 'moje'
-                ? 'Zatím nespravuješ žádnou diskuzi.'
-                : 'Zatím tu není žádná diskuze. Založ první!'}
-          </p>
-        </div>
+        debouncedQuery ? (
+          <EmptyState
+            size="panel"
+            title="Nic neodpovídá hledání"
+            description="Zkus jiné klíčové slovo."
+          />
+        ) : tab === 'moje' ? (
+          <EmptyState
+            size="hero"
+            illustration="messages"
+            title="Zatím nic nespravuješ"
+            description="Tady se objeví diskuze, které jsi založil nebo spravuješ."
+            action={{ label: 'Založit diskuzi', to: '/ikaros/diskuze/nova' }}
+          />
+        ) : (
+          <EmptyState
+            size="hero"
+            illustration="messages"
+            title="Začni první rozhovor"
+            description="Zatím tu není žádná diskuze."
+            action={{ label: 'Nová diskuze', to: '/ikaros/diskuze/nova' }}
+          />
+        )
       ) : (
         <ul className={s.list}>
           {filtered.map((d) => (

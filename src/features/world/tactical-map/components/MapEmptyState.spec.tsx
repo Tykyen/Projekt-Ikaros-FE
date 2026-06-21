@@ -137,9 +137,9 @@ describe('MapEmptyState', () => {
       <MapEmptyState worldId="w1" currentUserId="h1" />,
       { wrapper: Wrapper },
     );
-    const img = container.querySelector('img');
+    // 15.6 — empty state má navíc dekorativní ilustraci; portrét hledej dle src
+    const img = container.querySelector('img[src="http://example.test/p.png"]');
     expect(img).toBeTruthy();
-    expect(img?.getAttribute('src')).toBe('http://example.test/p.png');
   });
 
   it('hráč bez portrétu — fallback ikona', () => {

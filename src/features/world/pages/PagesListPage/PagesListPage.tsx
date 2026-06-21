@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FilePlus2, Star, FileText } from 'lucide-react';
+import { FilePlus2, Star } from 'lucide-react';
 import {
   DndContext,
   KeyboardSensor,
@@ -17,7 +17,7 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { usePagesDirectory } from '../api/usePagesDirectory';
@@ -134,15 +134,17 @@ export default function PagesListPage() {
       {isLoading ? (
         <Spinner center />
       ) : directory.length === 0 ? (
-        <div className={s.empty}>
-          <FileText size={40} aria-hidden />
-          <p>Tento svět zatím nemá žádné stránky.</p>
-          {canCreate && (
-            <Link to={`/svet/${worldSlug}/nova-stranka`} className={s.newBtn}>
-              <FilePlus2 size={15} aria-hidden /> Vytvořit první stránku
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          size="hero"
+          illustration="pages"
+          title="Tenhle svět je zatím nepopsaný list"
+          description="Vytvoř první stránku — lokaci, postavu, frakci nebo cokoli, z čeho se tvůj svět skládá."
+          action={
+            canCreate
+              ? { label: 'Vytvořit stránku', to: `/svet/${worldSlug}/nova-stranka` }
+              : undefined
+          }
+        />
       ) : (
         <>
           {favoriteEntries.length > 0 && (

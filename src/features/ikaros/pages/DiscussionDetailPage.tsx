@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { Spinner, ConfirmDialog } from '@/shared/ui';
+import { Spinner, ConfirmDialog, EmptyState } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { UserRole, type IkarosDiscussion, type IkarosDiscussionPost } from '@/shared/types';
 import {
@@ -183,9 +183,12 @@ function DiscussionDetail({ discussion: d }: { discussion: IkarosDiscussion }) {
         {postsLoading ? (
           <Spinner center />
         ) : posts.length === 0 ? (
-          <p className={s.emptyThread}>
-            Zatím žádné příspěvky. Začni diskuzi prvním příspěvkem.
-          </p>
+          <EmptyState
+            size="panel"
+            illustration="messages"
+            title="Vlákno je zatím prázdné"
+            description="Začni diskuzi prvním příspěvkem."
+          />
         ) : (
           posts.map((post) => (
             <PostCard

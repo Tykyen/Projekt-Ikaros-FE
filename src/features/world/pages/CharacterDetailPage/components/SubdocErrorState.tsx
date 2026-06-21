@@ -1,7 +1,7 @@
 import axios from 'axios';
+import { ErrorState } from '@/shared/ui';
 import { parseApiErrorCode } from '@/shared/api';
 import type { ApiError } from '@/shared/types';
-import s from './subdocs.module.css';
 
 /**
  * Vrátí vlídnou serverovou `message` (HttpExceptionFilter shape), nebo `null`
@@ -24,6 +24,8 @@ interface Props {
 
 /**
  * 8.1-FIR — Sdílený error state pro subdoc taby Finance/Výbava.
+ * 15.6 — vnitřek sjednocen na sdílený `<ErrorState>`; veřejné API (props) i
+ * texty/CTA „Zkusit znovu" zachovány.
  * Rozlišuje:
  *  • 404 + `*_NOT_APPLICABLE` → postava typu, který subdoc nemá (NPC/Lokace).
  *    Statická hláška, žádné CTA (tab by se sem ani neměl dostat — viz
@@ -40,7 +42,15 @@ export function SubdocErrorState({ error, resourceLabel, onRetry }: Props) {
     status === 404 &&
     (code === 'FINANCE_NOT_APPLICABLE' || code === 'INVENTORY_NOT_APPLICABLE')
   ) {
-    return <p className={s.empty}>Tato postava {resourceLabel} nemá.</p>;
+    // Není to chyba — postava daného typu subdoc prostě nemá. Klidná hláška,
+    // žádné CTA (inline, bez ilustrace).
+    return (
+      <ErrorState
+        size="inline"
+        title={`Tato postava ${resourceLabel} nemá.`}
+        description="U postav tohoto typu se tato sekce nevede."
+      />
+    );
   }
 
   if (status === 403) {
@@ -48,22 +58,23 @@ export function SubdocErrorState({ error, resourceLabel, onRetry }: Props) {
     // fallback když server žádnou nepošle.
     const serverMessage = serverMessageOf(error);
     return (
-      <p className={s.empty}>
-        {serverMessage ?? 'Soukromé — vidí jen vlastník postavy a PJ.'}
-      </p>
+      <ErrorState
+        size="inline"
+        status={403}
+        title="Soukromé"
+        description={
+          serverMessage ?? 'Vidí jen vlastník postavy a vypravěč.'
+        }
+      />
     );
   }
 
   return (
-    <div className={s.errorBox}>
-      <p>Načtení se nepodařilo.</p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className={s.retryBtn}
-      >
-        Zkusit znovu
-      </button>
-    </div>
+    <ErrorState
+      size="panel"
+      status={500}
+      title="Načtení se nepodařilo."
+      onRetry={onRetry}
+    />
   );
 }

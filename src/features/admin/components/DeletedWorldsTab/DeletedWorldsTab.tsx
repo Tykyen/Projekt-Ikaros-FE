@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { RotateCcw, Trash2 } from 'lucide-react';
-import { Button, Spinner, ConfirmDialog } from '@/shared/ui';
+import { RotateCcw } from 'lucide-react';
+import { Button, Spinner, ConfirmDialog, EmptyState } from '@/shared/ui';
 import {
   useDeletedWorlds,
   useRestoreWorld,
@@ -30,10 +30,12 @@ export function DeletedWorldsTab() {
 
   if (worlds.length === 0) {
     return (
-      <div className={s.empty}>
-        <Trash2 size={32} aria-hidden />
-        <p>Žádné smazané světy. Vše je v pořádku.</p>
-      </div>
+      <EmptyState
+        size="panel"
+        illustration="generic-empty"
+        title="Žádné smazané světy."
+        description="Vše je v pořádku — žádný svět nečeká na obnovu."
+      />
     );
   }
 

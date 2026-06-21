@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { ErrorState, FullPageState } from './StatePlaceholder';
 
 interface Props {
   children: ReactNode;
@@ -22,13 +23,15 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: '1rem', fontFamily: 'sans-serif' }}>
-          <h1>Něco se pokazilo</h1>
-          <p>V aplikaci nastala neočekávaná chyba.</p>
-          <button onClick={() => window.location.reload()}>
-            Obnovit stránku
-          </button>
-        </div>
+        <FullPageState>
+          <ErrorState
+            size="hero"
+            illustration="crash"
+            title="Něco se rozbilo"
+            description="V aplikaci nastala neočekávaná chyba. Zkus stránku obnovit — pokud potíže přetrvají, dej nám vědět."
+            action={{ label: 'Obnovit stránku', onClick: () => window.location.reload() }}
+          />
+        </FullPageState>
       );
     }
 

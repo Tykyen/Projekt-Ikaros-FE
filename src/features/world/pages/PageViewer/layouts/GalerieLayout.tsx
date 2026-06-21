@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { EmptyState } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { AkjBanner } from '../components/AkjBanner';
 import { GalleryLightbox, type LightboxImage } from '../components/GalleryLightbox';
@@ -42,9 +43,12 @@ export function GalerieLayout({ page }: Props) {
       )}
 
       {sorted.length === 0 ? (
-        <div className={s.empty}>
-          <p>V této galerii ještě nejsou žádné obrázky.</p>
-        </div>
+        <EmptyState
+          size="panel"
+          illustration="gallery"
+          title="Galerie je zatím prázdná"
+          description="V této galerii ještě nejsou žádné obrázky."
+        />
       ) : (
         <ul className={s.grid}>
           {sorted.map((g, idx) => (

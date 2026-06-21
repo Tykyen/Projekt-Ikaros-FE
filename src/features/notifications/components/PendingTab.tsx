@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
+import { EmptyState } from '@/shared/ui';
 import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import { PendingActionType } from '@/shared/types';
 import { centerOpenAtom } from '../model/centerStore';
@@ -32,7 +33,14 @@ export function PendingTab() {
     .sort((a, b) => b[1] - a[1]);
 
   if (entries.length === 0)
-    return <p className={s.empty}>Nic nečeká na tvé zpracování.</p>;
+    return (
+      <EmptyState
+        size="panel"
+        illustration="generic-empty"
+        title="Nic nečeká na tvé zpracování"
+        description="Všechno máš vyřízené. Nové žádosti a fronty se objeví tady."
+      />
+    );
 
   return (
     <div className={s.pendingWrap}>

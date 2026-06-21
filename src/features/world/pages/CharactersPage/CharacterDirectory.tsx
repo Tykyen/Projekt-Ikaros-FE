@@ -4,13 +4,12 @@ import {
   Plus,
   Users,
   Bot,
-  UserSquare,
   Search as SearchIcon,
   Star,
   LayoutGrid,
   X,
 } from 'lucide-react';
-import { Button } from '@/shared/ui';
+import { Button, EmptyState as SharedEmptyState } from '@/shared/ui';
 import { WorldRole, type WorldMembership } from '@/shared/types';
 import { usePersonaDirectory } from '../api/usePersonaDirectory';
 import { useWorldMembers } from '../../api/useWorldMembers';
@@ -459,14 +458,14 @@ function EmptyState({
   onCreate: () => void;
 }) {
   return (
-    <div className={s.empty} role="status">
-      <UserSquare size={48} aria-hidden className={s.emptyIcon} />
-      <p>Zatím tu nejsou žádné postavy.</p>
-      {canManage && (
-        <Button variant="primary" onClick={onCreate}>
-          <Plus size={16} aria-hidden /> Vytvořit první postavu
-        </Button>
-      )}
-    </div>
+    <SharedEmptyState
+      size="hero"
+      illustration="characters"
+      title="Tvá družina hrdinů tu zatím chybí"
+      description="V tomhle světě ještě není žádná postava. Založ první a vdechni příběhu život."
+      action={
+        canManage ? { label: 'Vytvořit postavu', onClick: onCreate } : undefined
+      }
+    />
   );
 }

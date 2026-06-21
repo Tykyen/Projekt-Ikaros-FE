@@ -1,18 +1,22 @@
-import { useRouteError, isRouteErrorResponse, Link } from 'react-router-dom';
+import { useRouteError, isRouteErrorResponse } from 'react-router-dom';
+import { ErrorState, FullPageState } from '@/shared/ui/StatePlaceholder';
 
 export default function ErrorPage() {
   const error = useRouteError();
-  const message = isRouteErrorResponse(error)
-    ? `${error.status} ${error.statusText}`
-    : error instanceof Error
-      ? error.message
-      : 'Neznámá chyba';
+  const status = isRouteErrorResponse(error) ? error.status : undefined;
+  const mapped = status === 403 || status === 404 || status === 500 ? status : undefined;
 
   return (
-    <div style={{ padding: '4rem', textAlign: 'center' }}>
-      <h1>Chyba</h1>
-      <p>{message}</p>
-      <Link to="/">Zpět domů</Link>
-    </div>
+    <FullPageState>
+      <ErrorState
+        size="hero"
+        status={mapped}
+        action={{ label: 'Zpět domů', to: '/' }}
+        secondaryAction={{
+          label: 'Obnovit stránku',
+          onClick: () => window.location.reload(),
+        }}
+      />
+    </FullPageState>
   );
 }

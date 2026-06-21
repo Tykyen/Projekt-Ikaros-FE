@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { UserAvatar } from '@/shared/ui';
+import { UserAvatar, EmptyState } from '@/shared/ui';
 import { useFriends } from '@/features/friendships/api/useFriends';
 import styles from './ProfileSections.module.css';
 
@@ -30,12 +30,16 @@ export function FriendsSection() {
       {isLoading ? (
         <p className={styles.empty}>Načítám přátele…</p>
       ) : friends.length === 0 ? (
-        <div className={styles.empty}>
-          <p>Zatím nemáš žádné přátele.</p>
-          <p className={styles.placeholderHint}>
-            Najdi je v adresáři uživatelů a pošli žádost o přátelství.
-          </p>
-        </div>
+        <EmptyState
+          size="panel"
+          illustration="generic-empty"
+          title="Tvá družina se teprve sejde"
+          description="Najdi přátele v adresáři a pošli jim žádost o přátelství."
+          action={{
+            label: 'Najdi přátele v adresáři',
+            to: '/ikaros/uzivatele?tab=uzivatele',
+          }}
+        />
       ) : (
         <ul className={styles.friendList}>
           {friends.map((f) => (

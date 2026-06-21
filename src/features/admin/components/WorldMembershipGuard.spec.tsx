@@ -69,7 +69,7 @@ describe('WorldMembershipGuard', () => {
       { wrapper: makeWrapper(makeCtx({ loading: true })) },
     );
     expect(screen.queryByTestId('protected')).not.toBeInTheDocument();
-    expect(screen.queryByText(/403|odepřen|forbidden/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Sem nevidíš/i)).not.toBeInTheDocument();
     // Spinner je `<span class="spinner …" />` (případně wrap v `div.center`)
     expect(container.querySelector('span[class*="spinner"]')).toBeTruthy();
   });
@@ -82,7 +82,7 @@ describe('WorldMembershipGuard', () => {
       { wrapper: makeWrapper(makeCtx()) },
     );
     expect(screen.queryByTestId('protected')).not.toBeInTheDocument();
-    expect(screen.getByText(/403|odepřen|forbidden/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sem nevidíš/i)).toBeInTheDocument();
   });
 
   it('elevovaný Superadmin projde bez ohledu na membership (fallback)', () => {
@@ -125,7 +125,7 @@ describe('WorldMembershipGuard', () => {
       { wrapper: makeWrapper(makeCtx()) },
     );
     expect(screen.queryByTestId('protected')).not.toBeInTheDocument();
-    expect(screen.getByText(/403|odepřen|forbidden/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sem nevidíš/i)).toBeInTheDocument();
   });
 
   it('PJ daného světa projde (membership.role >= minWorldRole)', () => {
@@ -154,7 +154,7 @@ describe('WorldMembershipGuard', () => {
       { wrapper: makeWrapper(makeCtx({ userRole: WorldRole.Hrac })) },
     );
     expect(screen.queryByTestId('protected')).not.toBeInTheDocument();
-    expect(screen.getByText(/403|odepřen|forbidden/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sem nevidíš/i)).toBeInTheDocument();
   });
 
   it('Pending (Žadatel) je implicit deny při minWorldRole=PJ', () => {

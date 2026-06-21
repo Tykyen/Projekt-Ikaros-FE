@@ -108,7 +108,7 @@ describe('WorldsPage', () => {
     });
     await waitFor(() => {
       expect(
-        screen.getByText(/Žádné světy odpovídající filtru/),
+        screen.getByText(/Nic neodpovídá filtru/),
       ).toBeInTheDocument();
     });
   });

@@ -2,6 +2,7 @@
 // real-time sync (s předností draftu v edit módu) a PJ mutace.
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { EmptyState } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { PrintButton, usePrintMode } from '@/features/world/export/print';
 import {
@@ -207,11 +208,16 @@ export function UniverseMapView() {
               🔭 Zobrazit vše
             </button>
             {map.nodes.length === 0 && !isLoading && (
-              <div className={panel.hint}>
-                {isPJ
-                  ? 'Mapa je prázdná. Spusť editační režim a přidej tělesa.'
-                  : 'Pro tebe zatím nejsou viditelná žádná tělesa.'}
-              </div>
+              <EmptyState
+                size="panel"
+                illustration="worlds"
+                title={isPJ ? 'Mapa je prázdná' : 'Zatím nic k vidění'}
+                description={
+                  isPJ
+                    ? 'Spusť editační režim a přidej první tělesa.'
+                    : 'Pro tebe zatím nejsou viditelná žádná tělesa.'
+                }
+              />
             )}
             {selectedNode && (
               <UniverseDetail

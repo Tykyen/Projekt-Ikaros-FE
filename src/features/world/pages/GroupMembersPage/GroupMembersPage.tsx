@@ -2,7 +2,7 @@ import { useMemo, useState, type CSSProperties } from 'react';
 import { useParams } from 'react-router-dom';
 import { Users, ImagePlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useUploadImage } from '@/shared/api';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -124,7 +124,12 @@ export default function GroupMembersPage() {
       </header>
 
       {members.length === 0 ? (
-        <p className={s.empty}>Ve skupině zatím nikdo není.</p>
+        <EmptyState
+          size="panel"
+          illustration="characters"
+          title="Ve skupině zatím nikdo není"
+          description="Jakmile bude mít nějaká postava přiřazenou tuhle skupinu, objeví se tady."
+        />
       ) : (
         <div className={s.grid}>
           {members.map((m) => {

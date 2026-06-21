@@ -11,7 +11,7 @@ import {
   RefreshCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Spinner, ConfirmDialog } from '@/shared/ui';
+import { Spinner, ConfirmDialog, EmptyState } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import {
@@ -155,7 +155,13 @@ export function FinanceTab({
             />
           )
         ) : (
-          <p className={s.empty}>Žádný účet — vytvoř první.</p>
+          <EmptyState
+            size="inline"
+            icon={<CoinsIcon size={20} aria-hidden />}
+            title="Zatím žádný účet"
+            description="Postava nemá žádný účet — vytvoř první a začni hospodařit."
+            action={{ label: 'Nový účet', onClick: () => setCreateOpen(true) }}
+          />
         )}
       </div>
 
@@ -500,7 +506,13 @@ function Transactions({
   currencies: WorldCurrencyItem[];
 }) {
   if (account.transactions.length === 0) {
-    return <p className={s.empty}>Zatím žádné transakce.</p>;
+    return (
+      <EmptyState
+        size="inline"
+        title="Zatím žádné transakce"
+        description="Jakmile se na účtu něco pohne, uvidíš to tady."
+      />
+    );
   }
   return (
     <ul className={s.rowList}>

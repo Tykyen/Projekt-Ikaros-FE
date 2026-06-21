@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Spinner } from '@/shared/ui';
+import { Button, EmptyState, Spinner } from '@/shared/ui';
 import { useAdminAuditLog } from '../../api/useAdminUsers';
 import type { AdminAuditAction } from '@/shared/types';
 import s from './AuditLogTab.module.css';
@@ -92,9 +92,14 @@ export function AuditLogTab() {
             <Spinner /> Načítám audit log…
           </div>
         ) : items.length === 0 ? (
-          <div className={s.empty}>
-            Žádné záznamy {action ? `pro akci "${ACTION_LABELS[action]}"` : ''}.
-          </div>
+          <EmptyState
+            size="inline"
+            title={
+              action
+                ? `Žádné záznamy pro akci „${ACTION_LABELS[action]}".`
+                : 'Žádné záznamy.'
+            }
+          />
         ) : (
           <table className={s.table}>
             <thead>

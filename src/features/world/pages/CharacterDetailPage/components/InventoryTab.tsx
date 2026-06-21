@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { usePrintMode } from '@/features/world/export/print';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -175,7 +175,7 @@ function CollapsibleSection({
             </div>
           )}
           {!section.items || section.items.length === 0 ? (
-            <p className={s.empty}>Sekce je prázdná.</p>
+            <EmptyState size="inline" title="Sekce je prázdná" />
           ) : (
             <ul className={s.itemList}>
               {section.items.map((item) => (

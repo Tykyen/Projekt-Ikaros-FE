@@ -1,5 +1,6 @@
 import type { GameEvent, WorldRole } from '@/shared/types';
 import { GameEventCard } from '@/features/world/components/GameEventCard/GameEventCard';
+import { EmptyState } from '@/shared/ui';
 import type { EventsView } from './EventsToolbar';
 import s from './EventsList.module.css';
 
@@ -43,31 +44,30 @@ export function EventsList({
   if (events.length === 0) {
     if (view === 'archive') {
       return (
-        <p className={s.empty}>
-          Žádné archivované akce. Tady se brzy objeví historie.
-        </p>
-      );
-    }
-    if (canCreate) {
-      return (
-        <div className={s.empty}>
-          <p>Žádné nadcházející akce.</p>
-          {onCreate && (
-            <button
-              type="button"
-              className={s.emptyCta}
-              onClick={onCreate}
-            >
-              Naplánuj první →
-            </button>
-          )}
-        </div>
+        <EmptyState
+          size="hero"
+          illustration="events"
+          title="Zatím žádná historie"
+          description="Až nějaká akce proběhne, najdeš ji tady v archivu."
+        />
       );
     }
     return (
-      <p className={s.empty}>
-        Žádné nadcházející akce. PJ teprve plánuje.
-      </p>
+      <EmptyState
+        size="hero"
+        illustration="events"
+        title="Žádné nadcházející akce"
+        description={
+          canCreate
+            ? 'Naplánuj první událost a dej družině vědět, kdy se hraje.'
+            : 'Vypravěč teprve plánuje. Mrkni sem zase za chvíli.'
+        }
+        action={
+          canCreate && onCreate
+            ? { label: 'Naplánovat akci', onClick: onCreate }
+            : undefined
+        }
+      />
     );
   }
 

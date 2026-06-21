@@ -65,7 +65,7 @@ describe('PagesListPage', () => {
     mockDirectory = [];
     renderPage();
     expect(
-      screen.getByText(/nemá žádné stránky/),
+      screen.getByText(/nepopsaný list/),
     ).toBeInTheDocument();
   });
 

@@ -230,9 +230,7 @@ describe('WorldWeatherPage', () => {
     ctx.role = 5;
     hookData.generators = [];
     render(<WorldWeatherPage />, { wrapper });
-    expect(
-      screen.getByRole('heading', { name: /Zatím žádný generátor/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Zatím žádný generátor/i)).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Vytvořit první generátor/i }),
     ).toBeInTheDocument();
@@ -243,7 +241,7 @@ describe('WorldWeatherPage', () => {
     hookData.generators = [];
     render(<WorldWeatherPage />, { wrapper });
     expect(
-      screen.getByRole('heading', { name: /Počasí ještě není nastaveno/i }),
+      screen.getByText(/Počasí ještě není nastaveno/i),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Vytvořit první generátor/i }),
@@ -256,7 +254,7 @@ describe('WorldWeatherPage', () => {
     render(<WorldWeatherPage />, { wrapper });
     // Spinner se render. Empty state ani grid se nezobrazí.
     expect(
-      screen.queryByRole('heading', { name: /Zatím žádný generátor/i }),
+      screen.queryByText(/Zatím žádný generátor/i),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByText(/Nepodařilo se načíst počasí/i),

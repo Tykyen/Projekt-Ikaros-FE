@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
+import { EmptyState } from '@/shared/ui';
 import { WorldCard } from '../DashboardPage/components/WorldCard';
 import {
   WorldsToolbar,
@@ -128,15 +129,22 @@ export default function WorldsPage() {
         </div>
       )}
 
-      {!isLoading && visibleWorlds.length === 0 && (
-        <div className={s.empty}>
-          <p className={s.emptyText}>
-            {allWorlds.length === 0
-              ? 'Zatím tu nejsou žádné aktivní světy.'
-              : 'Žádné světy odpovídající filtru.'}
-          </p>
-        </div>
-      )}
+      {!isLoading &&
+        visibleWorlds.length === 0 &&
+        (allWorlds.length === 0 ? (
+          <EmptyState
+            size="hero"
+            illustration="worlds"
+            title="Zatím tu nečeká žádný svět"
+            description="Jakmile vypravěči otevřou své světy, objeví se přesně tady. Zkus to za chvíli znovu."
+          />
+        ) : (
+          <EmptyState
+            size="panel"
+            title="Nic neodpovídá filtru"
+            description="Zkus změnit hledání nebo zvolit jiný filtr."
+          />
+        ))}
 
       {!isLoading && visibleWorlds.length > 0 && (
         <div className={s.grid}>

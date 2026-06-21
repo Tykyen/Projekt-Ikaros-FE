@@ -198,7 +198,7 @@
   - Po smazání: auto-logout (revoke refresh tokenů přes `user.deletion.requested`).
   - **Reaktivace:** login během 30 dní → `deletion_pending` → ReactivateAccountModal → `POST /auth/reactivate-deletion` (credentials) vyčistí flagy a přihlásí; NEBO reset hesla (D-037).
   - Stav/zrušení žádosti: `GET`/`DELETE /users/me/deletion-request` (oba `@AllowPendingDeletion`).
-- **Account-state gate:** `JwtAuthGuard` per-request čte `request.user.id` a načítá usera: `!user || isDeleted`→401 `DELETED`, `bannedAt`→401 `BANNED`, `deletionRequestedAt` (bez `@AllowPendingDeletion`)→401 `DELETION_PENDING`. (Access token žije až 7 dní, proto gate per-request, ne jen při loginu.) Optional routy gate nemají (public read-only).
+- **Account-state gate:** `JwtAuthGuard` per-request čte `request.user.id` a načítá usera: `!user || isDeleted`→401 `DELETED`, `bannedAt`→401 `BANNED`, `deletionRequestedAt` (bez `@AllowPendingDeletion`)→401 `DELETION_PENDING`. (Access token žije 3 dny — `JWT_EXPIRES_IN`, dřív 7 d/1 d; proto gate per-request, ne jen při loginu.) Optional routy gate nemají (public read-only).
 - **Hranice / co neumí:**
   - Hard-delete je ANONYMIZACE, ne fyzické smazání řádku: cron `account-cleanup.cron` přepíše PII a emituje `user.deletion.hardDeleted`. Komunitní příspěvky (chat/články/galerie/diskuze) zůstávají s anonymním autorem.
   - **Dluh D-034b:** revert PJ handoveru při reaktivaci NENÍ automatický — uživatel po obnově musí role ve světech upravit ručně (modal o tom informuje).
@@ -243,7 +243,7 @@
 
 ### Refresh token rotace + reuse detection
 - **Co to je:** Rotace refresh tokenu s detekcí krádeže.
-- **Co jde dělat / vlastnosti:** `POST /auth/refresh` (cookie má přednost, body fallback). Při použití revokovaného tokenu → revoke celé rodiny + 401 `REFRESH_TOKEN_ABUSED`. TTL default 30 dní (`JWT_REFRESH_TTL_DAYS`).
+- **Co jde dělat / vlastnosti:** `POST /auth/refresh` (cookie má přednost, body fallback). Při použití revokovaného tokenu → revoke celé rodiny + 401 `REFRESH_TOKEN_ABUSED`. **Sliding session:** každý refresh razí NOVÝ token s expirací od teď (`generateTokenPair`) → aktivní uživatel se neodhlásí. **TTL 3 dny** (`JWT_REFRESH_TTL_DAYS`, dřív 30) = 3 dny nečinnosti → logout (2026-06-21). ⚠️ V prod refresh nejspíš nejede (cross-site cookie) → reálný kořen předčasného odhlašování = deploy (domény API vs web), viz deník.
 - **Stav:** ✅ funguje.
 - **Kód:** BE `auth.controller.ts:168`, `auth.service.ts:364`.
 

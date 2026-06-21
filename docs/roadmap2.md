@@ -219,7 +219,8 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Otevřené otázky:** Editovatelné PJ-em per svět, nebo fixní platformové? Provázat s typovým systémem stránek?
 > ⚠️ Obsah osnov seeduj jako list/heading, **ne tabulky** — TipTap je u page.content zahodí (`project_page_content_no_tables`).
 
-### - [ ] 15.6 Prázdné stavy (empty states) s výzvou — [H1-05 · dopad vysoký · náklad malý]
+### - [x] 15.6 Prázdné stavy (empty states) s výzvou — [H1-05 · dopad vysoký · náklad malý] ✅ 2026-06-21
+**Hotovo (2026-06-21):** Sdílená primitiva `StatePlaceholder` → `<EmptyState>`/`<ErrorState>`/`<FullPageState>` (3 velikosti hero/panel/inline, role-aware CTA, fade-in, CSS-mask okraje). 11 nadžánrových WebP ilustrací (`public/illustrations/states/`). Nasazeno ~30 souborů napříč moduly + 4 error stránky (403/404/500/crash) + **bonus 401 „přihlas se"** (odhlášený už nevidí falešné „svět neexistuje"). Spec [spec-15.6.md](arch/phase-15/spec-15.6.md). Build ✓, vitest 757 ✓. Mapa = ilustrace (ne plný přepis, overlay komponenta). Souvis. auth: session TTL sliding 3 d — viz deník. **Otevřené otázky vyřešeny:** ilustrace neutrální/nadžánrové (ne per-skin), texty per modul.
 **Cíl:** Žádná prázdná bílá obrazovka. Každý prázdný stav = tematická ilustrace + vlídný text + velké primární tlačítko. Špatně: „Nemáte vytvořené postavy." Správně: „Tvá družina hrdinů tu zatím chybí. [Vytvořit postavu]".
 **Proč:** Prázdná obrazovka po registraci je nejkritičtější bod, kde mizí třetina nováčků. **Nejlevnější páka na aktivaci** s velkým dopadem; přirozeně se pojí s onboardingem (16.4).
 **Návrh přípravy:** soupis prázdných stavů napříč moduly (postavy, stránky, mapy, chat, kampaně…); sada znovupoužitelných komponent + ilustrace per žánr/skin.

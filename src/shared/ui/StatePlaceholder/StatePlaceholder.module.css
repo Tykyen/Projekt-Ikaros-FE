@@ -1,0 +1,208 @@
+/* 15.6 — StatePlaceholder (empty + error stavy). Jen theme tokeny. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--sp-4);
+  color: var(--text);
+  padding: var(--sp-8) var(--sp-4);
+}
+
+.hero {
+  min-height: min(70vh, 560px);
+  gap: var(--sp-5);
+  padding: var(--sp-12) var(--sp-4);
+}
+
+.panel {
+  padding: var(--sp-8) var(--sp-4);
+  gap: var(--sp-3);
+}
+
+.inline {
+  padding: var(--sp-5) var(--sp-3);
+  gap: var(--sp-2);
+}
+
+/* ── Vizuál ─────────────────────────────────────────────── */
+.visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.illustration {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  /* R4b — zdroj nemá alfu → měkké vyblednutí okrajů, splyne s každým skinem. */
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 50%, transparent 80%);
+  mask-image: radial-gradient(ellipse at center, #000 50%, transparent 80%);
+}
+
+.hero .illustration {
+  width: min(300px, 62vw);
+}
+
+.panel .illustration {
+  width: min(160px, 42vw);
+}
+
+.icon {
+  /* ztlumení barvou (ne opacity → nekoliduje s fade-in animací) */
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+}
+
+.hero .icon {
+  font-size: 64px;
+}
+
+.panel .icon {
+  font-size: 44px;
+}
+
+.inline .icon {
+  font-size: 28px;
+}
+
+/* ── Text ───────────────────────────────────────────────── */
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  line-height: var(--leading-tight);
+}
+
+.hero .title {
+  font-size: var(--text-2xl);
+}
+
+.panel .title {
+  font-size: var(--text-lg);
+}
+
+.inline .title {
+  font-size: var(--text-base);
+}
+
+.description {
+  margin: 0;
+  font-family: var(--font-body);
+  color: color-mix(in srgb, var(--text) 78%, transparent);
+  line-height: var(--leading-normal);
+  max-width: 42ch;
+}
+
+.hero .description {
+  font-size: var(--text-md);
+}
+
+.panel .description,
+.inline .description {
+  font-size: var(--text-sm);
+}
+
+/* ── CTA ────────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  justify-content: center;
+  margin-top: var(--sp-2);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 44px; /* dotykový cíl na mobilu */
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.4px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--theme-accent, var(--accent));
+  outline-offset: 2px;
+}
+
+.actionPrimary {
+  background: var(--theme-accent, var(--accent));
+  color: var(--text-on-accent, #0a0a0f);
+  box-shadow: var(--depth-raised);
+}
+
+.actionPrimary:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--depth-hover);
+}
+
+.actionPrimary:active {
+  box-shadow: var(--depth-pressed);
+}
+
+.actionSecondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--frame-border);
+}
+
+.actionSecondary:hover {
+  background: rgb(var(--white-rgb) / 0.06);
+}
+
+/* ── Motion — staggered reveal ──────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .root > * {
+    animation: spRise 460ms ease both;
+  }
+
+  .title {
+    animation-delay: 70ms;
+  }
+
+  .description {
+    animation-delay: 140ms;
+  }
+
+  .actions {
+    animation-delay: 210ms;
+  }
+}
+
+@keyframes spRise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero .title {
+    font-size: var(--text-xl);
+  }
+
+  .hero .description {
+    font-size: var(--text-base);
+  }
+}

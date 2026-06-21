@@ -165,18 +165,18 @@ describe('CharacterDirectory (8.2e)', () => {
     useDirMock.mockReturnValue({ data: [], isLoading: false });
     renderDir(WorldRole.PJ);
     expect(
-      screen.getByText(/Zatím tu nejsou žádné postavy/i),
+      screen.getByText(/družina hrdinů tu zatím chybí/i),
     ).toBeInTheDocument();
-    expect(screen.getByText('Vytvořit první postavu')).toBeInTheDocument();
+    expect(screen.getByText('Vytvořit postavu')).toBeInTheDocument();
   });
 
   it('prázdný adresář — nižší role bez tlačítka', () => {
     useDirMock.mockReturnValue({ data: [], isLoading: false });
     renderDir(WorldRole.Ctenar);
     expect(
-      screen.getByText(/Zatím tu nejsou žádné postavy/i),
+      screen.getByText(/družina hrdinů tu zatím chybí/i),
     ).toBeInTheDocument();
-    expect(screen.queryByText('Vytvořit první postavu')).not.toBeInTheDocument();
+    expect(screen.queryByText('Vytvořit postavu')).not.toBeInTheDocument();
   });
 
   it('loading state — skeleton karet (žádná data)', () => {

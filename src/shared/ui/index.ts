@@ -20,4 +20,18 @@ export type { TabItem } from './Tabs';
 export { ImageZoomSlider } from './ImageZoomSlider/ImageZoomSlider';
 export { ImageFitToggle } from './ImageFitToggle/ImageFitToggle';
 export { FantasyDatePicker } from './FantasyDatePicker';
+export {
+  StatePlaceholder,
+  EmptyState,
+  ErrorState,
+  FullPageState,
+  stateIllustrationSrc,
+} from './StatePlaceholder';
+export type {
+  StatePlaceholderProps,
+  StateAction,
+  EmptyStateProps,
+  ErrorStateProps,
+  StateIllustration,
+} from './StatePlaceholder';
 

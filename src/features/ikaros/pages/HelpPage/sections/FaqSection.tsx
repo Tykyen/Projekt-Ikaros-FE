@@ -118,6 +118,19 @@ const FAQ: FaqItem[] = [
     ),
   },
   {
+    cat: 'ucet',
+    q: 'Jak dlouho zůstanu přihlášený?',
+    a: (
+      <p>
+        Dokud platformu používáš, zůstáváš přihlášený automaticky — přihlášení se
+        prodlužuje s každou aktivitou. Odhlásí tě až po <strong>3 dnech bez
+        použití</strong>. Když ti přihlášení vyprší a otevřeš stránku jen pro
+        přihlášené, místo chyby uvidíš výzvu <strong>„Nejdřív se přihlas"</strong>;
+        po přihlášení tě to vrátí přesně tam, kam jsi mířil.
+      </p>
+    ),
+  },
+  {
     cat: 'komunita',
     q: 'Co je „Zpracovat" v adresáři uživatelů?',
     a: (

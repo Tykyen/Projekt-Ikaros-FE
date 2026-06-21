@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   ConfirmDialog,
+  EmptyState,
   RoleStar,
   Spinner,
   UserAvatar,
@@ -107,7 +108,11 @@ export function UsersTable({
   if (items.length === 0) {
     return (
       <div className={s.tableWrapper}>
-        <div className={s.empty}>Žádní uživatelé neodpovídají filtrům.</div>
+        <EmptyState
+          size="inline"
+          title="Žádní uživatelé neodpovídají filtrům."
+          description="Zkus uvolnit hledání nebo zvolit jiný filtr."
+        />
       </div>
     );
   }

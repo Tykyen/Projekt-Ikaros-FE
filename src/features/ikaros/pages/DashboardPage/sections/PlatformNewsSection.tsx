@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Newspaper, Plus } from 'lucide-react';
 import { useAtomValue } from 'jotai';
-import { IkarosCard } from '@/shared/ui';
+import { IkarosCard, EmptyState, ErrorState } from '@/shared/ui';
 import { useIkarosNews } from '@/features/ikaros/api/useIkarosNews';
 import { NewsFormModal } from '@/features/ikaros/components/NewsFormModal';
 import { NewsCard } from '@/features/ikaros/components/NewsCard';
@@ -12,7 +12,7 @@ import { SectionHeader } from '../components/SectionHeader';
 import s from './PlatformNewsSection.module.css';
 
 export function PlatformNewsSection() {
-  const { data, isError } = useIkarosNews();
+  const { data, isError, refetch } = useIkarosNews();
   // Spec 3.1b — dashboard ukazuje jen první 3, zbytek na `/ikaros/novinky`.
   const items = data?.slice(0, 3) ?? [];
   const currentUser = useAtomValue(currentUserAtom);
@@ -44,9 +44,17 @@ export function PlatformNewsSection() {
       }
     >
       {isError ? (
-        <p className={s.empty}>Nepodařilo se načíst novinky.</p>
+        <ErrorState
+          size="panel"
+          title="Nepodařilo se načíst novinky."
+          onRetry={() => void refetch()}
+        />
       ) : items.length === 0 ? (
-        <p className={s.empty}>Zatím žádné novinky.</p>
+        <EmptyState
+          size="panel"
+          illustration="messages"
+          title="Zatím žádné novinky"
+        />
       ) : (
         <>
           <div className={s.list}>

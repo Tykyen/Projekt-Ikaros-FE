@@ -1,6 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import { useMyWorlds } from '@/features/world/api/useWorlds';
-import { Spinner, Badge } from '@/shared/ui';
+import { Spinner, Badge, EmptyState, ErrorState } from '@/shared/ui';
 import styles from './ProfileSections.module.css';
 
 /**
@@ -9,7 +9,7 @@ import styles from './ProfileSections.module.css';
  * PJ badge: zatím TODO — vyžaduje WorldMembership read (přidá 5.3).
  */
 export function WorldsSection() {
-  const { data, isPending, isError } = useMyWorlds();
+  const { data, isPending, isError, refetch } = useMyWorlds();
 
   return (
     <section className={styles.card} aria-label="Moje světy">
@@ -24,12 +24,19 @@ export function WorldsSection() {
         </div>
       )}
       {isError && (
-        <div className={styles.empty}>Nepodařilo se načíst světy.</div>
+        <ErrorState
+          size="panel"
+          title="Nepodařilo se načíst světy"
+          onRetry={() => void refetch()}
+        />
       )}
       {data && data.length === 0 && (
-        <div className={styles.empty}>
-          Ještě nejsi součástí žádného světa.
-        </div>
+        <EmptyState
+          size="panel"
+          illustration="worlds"
+          title="Ještě nejsi součástí žádného světa"
+          description="Až tě vypravěč přizve nebo se přidáš, světy se objeví tady."
+        />
       )}
       {data && data.length > 0 && (
         <ul className={styles.worldList}>

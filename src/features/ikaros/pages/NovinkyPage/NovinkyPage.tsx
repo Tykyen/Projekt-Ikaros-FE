@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { Archive, ArchiveRestore, Pencil, Plus, Trash2 } from 'lucide-react';
-import { Button, ConfirmDialog } from '@/shared/ui';
+import { Button, ConfirmDialog, EmptyState, ErrorState } from '@/shared/ui';
 import { NewsCard } from '@/features/ikaros/components/NewsCard';
 import { NewsFormModal } from '@/features/ikaros/components/NewsFormModal';
 import {
@@ -202,13 +202,28 @@ export function NovinkyPage() {
       )}
 
       {listQuery.isError ? (
-        <p className={s.empty}>Nepodařilo se načíst novinky.</p>
+        <ErrorState
+          size="panel"
+          title="Nepodařilo se načíst novinky."
+          onRetry={() => void listQuery.refetch()}
+        />
       ) : listQuery.isLoading ? (
         <p className={s.empty}>Načítám…</p>
       ) : items.length === 0 ? (
-        <p className={s.empty}>
-          {scope === 'archived' ? 'Archiv je prázdný.' : 'Zatím žádné novinky.'}
-        </p>
+        scope === 'archived' ? (
+          <EmptyState
+            size="panel"
+            illustration="messages"
+            title="Archiv je prázdný."
+          />
+        ) : (
+          <EmptyState
+            size="hero"
+            illustration="messages"
+            title="Zatím žádné novinky."
+            description="Až se něco semele, dáme ti vědět tady."
+          />
+        )
       ) : (
         <div className={s.list}>
           {items.map((news) => (

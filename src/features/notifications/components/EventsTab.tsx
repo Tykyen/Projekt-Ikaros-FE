@@ -1,3 +1,4 @@
+import { EmptyState, ErrorState } from '@/shared/ui';
 import { useEvents } from '../api/useEvents';
 import { formatWhen } from '../lib/feedFormat';
 import s from './NotificationCenter.module.css';
@@ -11,6 +12,7 @@ export function EventsTab() {
     data,
     isLoading,
     isError,
+    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -19,9 +21,23 @@ export function EventsTab() {
   const items = data?.pages.flat() ?? [];
 
   if (isLoading) return <p className={s.muted}>Načítám události…</p>;
-  if (isError) return <p className={s.muted}>Události se nepodařilo načíst.</p>;
+  if (isError)
+    return (
+      <ErrorState
+        size="panel"
+        title="Události se nepodařilo načíst"
+        onRetry={() => void refetch()}
+      />
+    );
   if (items.length === 0)
-    return <p className={s.empty}>Zatím žádné události.</p>;
+    return (
+      <EmptyState
+        size="panel"
+        illustration="events"
+        title="Zatím žádné události"
+        description="Tady se objeví, co ti schválili nebo co se v tvých světech semele."
+      />
+    );
 
   return (
     <ul className={s.feed}>

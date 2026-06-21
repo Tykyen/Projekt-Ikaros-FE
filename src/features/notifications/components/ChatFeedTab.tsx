@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
-import { UserAvatar } from '@/shared/ui';
+import { UserAvatar, EmptyState, ErrorState } from '@/shared/ui';
 import { useChatFeed } from '../api/useChatFeed';
 import { centerOpenAtom } from '../model/centerStore';
 import { preview, formatWhen } from '../lib/feedFormat';
@@ -15,6 +15,7 @@ export function ChatFeedTab() {
     data,
     isLoading,
     isError,
+    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -24,9 +25,23 @@ export function ChatFeedTab() {
   const items = data?.pages.flat() ?? [];
 
   if (isLoading) return <p className={s.muted}>Načítám zprávy…</p>;
-  if (isError) return <p className={s.muted}>Zprávy se nepodařilo načíst.</p>;
+  if (isError)
+    return (
+      <ErrorState
+        size="panel"
+        title="Zprávy se nepodařilo načíst"
+        onRetry={() => void refetch()}
+      />
+    );
   if (items.length === 0)
-    return <p className={s.empty}>Zatím žádné zprávy z tvých světů.</p>;
+    return (
+      <EmptyState
+        size="panel"
+        illustration="messages"
+        title="Zatím žádné zprávy z tvých světů"
+        description="Jakmile se v některém světě rozproudí konverzace, uvidíš ji tady."
+      />
+    );
 
   return (
     <ul className={s.feed}>

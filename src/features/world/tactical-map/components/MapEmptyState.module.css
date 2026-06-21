@@ -22,6 +22,16 @@
   opacity: 0.6;
 }
 
+/* 15.6 — sdílená ilustrace prázdného stavu (sjednocený vizuální jazyk) */
+.illustration {
+  width: min(180px, 42vw);
+  height: auto;
+  opacity: 0.85;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 50%, transparent 82%);
+  mask-image: radial-gradient(ellipse at center, #000 50%, transparent 82%);
+}
+
 .title {
   font-size: 18px;
   font-weight: 600;

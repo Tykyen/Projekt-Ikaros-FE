@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { Plus, Search, ArrowUpDown } from 'lucide-react';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState } from '@/shared/ui';
 import {
   useGalleryImages,
   useMyGalleryImages,
@@ -150,13 +150,20 @@ function PrehledTab() {
       )}
 
       {filtered.length === 0 ? (
-        <div className={s.empty}>
-          <p>
-            {catFilter.size > 0 || debouncedQuery
-              ? 'Žádné obrázky neodpovídají filtru.'
-              : 'Galerie je zatím prázdná.'}
-          </p>
-        </div>
+        catFilter.size > 0 || debouncedQuery ? (
+          <EmptyState
+            size="panel"
+            title="Nic neodpovídá filtru"
+            description="Zkus jiné kategorie nebo hledaný výraz."
+          />
+        ) : (
+          <EmptyState
+            size="hero"
+            illustration="gallery"
+            title="Galerie zatím zeje prázdnotou"
+            description="Až někdo nahraje první obrázek, objeví se přesně tady."
+          />
+        )
       ) : (
         <GalleryGrid
           images={filtered}
@@ -193,12 +200,13 @@ function MojeTab() {
     <>
       {stats && <MyStatsWidget stats={stats} />}
       {images.length === 0 ? (
-        <div className={s.empty}>
-          <p>Zatím jsi nenahrál žádný obrázek.</p>
-          <Link to="/ikaros/galerie/nahrat" className={s.newBtn}>
-            <Plus size={16} /> Nahrát první obrázek
-          </Link>
-        </div>
+        <EmptyState
+          size="hero"
+          illustration="gallery"
+          title="Ještě jsi nic nenahrál"
+          description="Poděl se o svou tvorbu — nahraj první obrázek do galerie."
+          action={{ label: 'Nahrát obrázek', to: '/ikaros/galerie/nahrat' }}
+        />
       ) : (
         <GalleryGrid images={images} categories={categories} isMine />
       )}

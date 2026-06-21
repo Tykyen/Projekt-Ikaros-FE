@@ -27,11 +27,11 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
   - FE: shell veřejný (anon povolen). Status řeší `useWorldStatus` (`useWorldStatus.ts`).
   - BE: `GET /worlds/slug/:slug` a `GET /worlds/:id` přes `OptionalJwtAuthGuard` → `findBySlugForRequester`/`findByIdForRequester` (`worlds.service.ts:183-229`). `applyDetailScope`: private + anon = **404**; private + non-member non-admin bez pending AR = **404**; private + member/pending/Admin = OK; public/open vidí kdokoli (i anon).
 - **Co jde dělat / co kdo vidí**
-  - **anon**: vidí public/open svět (hero + info + JoinCTA s „Přihlásit se a vstoupit/požádat"); private svět = WorldNotFound (BE 404).
+  - **anon**: vidí public/open svět (hero + info + JoinCTA s „Přihlásit se a vstoupit/požádat"); na private/nepřístupný svět vidí **401 „Nejdřív se přihlas"** (`ErrorState`) + CTA Přihlásit (login intent → návrat), NE „svět neexistuje". Leak-safe rozlišení na **FE** dle `isAuthenticatedAtom` (BE pořád vrací 404). (15.6, 2026-06-21.)
   - **non-member (přihlášený)**: hero + `WorldDetailInfo` + `JoinCTA` (`JoinCTA.tsx`).
   - **pending-access**: hero + info + `AccessRequestPending` banner (datum podání + „Zrušit žádost").
   - **member**: hero + `WorldDashboard` (3 sloupce) + `WorldToolboxPanel` (nápověda) + `WorldAboutPanel`.
-  - 404/error → `WorldNotFound`.
+  - 404/error → `WorldNotFound` (= `ErrorState`: anonym 401 „přihlas se", přihlášený nečlen čitelné 404 — vyřešen i dřívější nečitelný text).
 - **Hranice** Status (`useWorldStatus`) se počítá z `useMyWorlds` + `useMyAccessRequests` na FE — pro anon obojí prázdné, takže anon je vždy `non-member`. Anon nemůže provést akci; JoinCTA mu otevře login (`saveLoginIntent` + `openLoginModalAtom`).
 - **Stav** ✅
 - **Kód** FE `src/features/world/pages/WorldDashboardPage/WorldDashboardPage.tsx:24`, `JoinCTA.tsx`, `AccessRequestPending.tsx`, `useWorldStatus.ts`. BE `worlds.controller.ts:102-123`, `worlds.service.ts:199` (`applyDetailScope`).

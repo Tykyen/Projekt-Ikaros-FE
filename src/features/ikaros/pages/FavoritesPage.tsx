@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { toast } from 'sonner';
 import { Bookmark } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState } from '@/shared/ui';
 import {
   useMyFavoriteDiscussions,
   useTogglePinDiscussion,
@@ -150,7 +150,14 @@ function FavoriteCard({
 }
 
 function EmptyTab() {
-  return <p className={s.empty}>V oblíbených zatím nic nemáš.</p>;
+  return (
+    <EmptyState
+      size="panel"
+      illustration="generic-empty"
+      title="V oblíbených zatím nic nemáš."
+      description="Co si oblíbíš (srdíčko / záložka), najdeš pohromadě tady."
+    />
+  );
 }
 
 // ─── Tab: Diskuze ──────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Bot, MapPin, User as UserIcon } from 'lucide-react';
-import { Spinner, Badge } from '@/shared/ui';
+import { Spinner, Badge, EmptyState, ErrorState } from '@/shared/ui';
 import { useMyCharactersGlobal } from '../api/useMyCharactersGlobal';
 import type { MyCharacterEntry } from '@/shared/types';
 import styles from './ProfileSections.module.css';
@@ -11,7 +11,7 @@ import styles from './ProfileSections.module.css';
  * Klik → detail postavy ve světě.
  */
 export function MyCharactersSection() {
-  const { data, isPending, isError } = useMyCharactersGlobal();
+  const { data, isPending, isError, refetch } = useMyCharactersGlobal();
 
   return (
     <section className={styles.card} aria-label="Moje postavy">
@@ -26,14 +26,19 @@ export function MyCharactersSection() {
         </div>
       )}
       {isError && (
-        <div className={styles.empty}>
-          Nepodařilo se načíst postavy. Zkus obnovit stránku.
-        </div>
+        <ErrorState
+          size="panel"
+          title="Nepodařilo se načíst postavy"
+          onRetry={() => void refetch()}
+        />
       )}
       {data && data.length === 0 && (
-        <div className={styles.empty}>
-          Zatím ti v žádném světě nebyla přidělena postava.
-        </div>
+        <EmptyState
+          size="panel"
+          illustration="characters"
+          title="Zatím ti v žádném světě nebyla přidělena postava"
+          description="Až tě vypravěč pasuje do role, tvá postava se objeví tady."
+        />
       )}
       {data && data.length > 0 && (
         <ul className={styles.characterList}>

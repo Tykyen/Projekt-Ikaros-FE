@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { Plus, Search, ArrowUpDown } from 'lucide-react';
 import { isAuthenticatedAtom, currentUserAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState } from '@/shared/ui';
 import {
   useArticles,
   useMyArticles,
@@ -165,13 +165,20 @@ function PrehledTab() {
       )}
 
       {filtered.length === 0 ? (
-        <div className={s.empty}>
-          <p>
-            {catFilter.size > 0 || debouncedQuery
-              ? 'Žádné články neodpovídají filtru.'
-              : 'Žádné publikované články.'}
-          </p>
-        </div>
+        catFilter.size > 0 || debouncedQuery ? (
+          <EmptyState
+            size="panel"
+            title="Nic neodpovídá filtru"
+            description="Zkus jiné klíčové slovo nebo kategorii."
+          />
+        ) : (
+          <EmptyState
+            size="hero"
+            illustration="pages"
+            title="Archiv zatím čeká"
+            description="Žádný publikovaný článek tu ještě není."
+          />
+        )
       ) : (
         <div className={s.grid}>
           {filtered.map((a) => (
@@ -196,12 +203,13 @@ function MojeTab() {
     <>
       {stats && <MyStatsWidget stats={stats} />}
       {articles.length === 0 ? (
-        <div className={s.empty}>
-          <p>Zatím jsi nenapsal žádný článek.</p>
-          <Link to="/ikaros/clanky/novy" className={s.newBtn}>
-            <Plus size={16} /> Napsat první článek
-          </Link>
-        </div>
+        <EmptyState
+          size="hero"
+          illustration="pages"
+          title="Tvůj první příběh čeká"
+          description="Zatím jsi nenapsal žádný článek."
+          action={{ label: 'Napsat první článek', to: '/ikaros/clanky/novy' }}
+        />
       ) : (
         <div className={s.grid}>
           {articles.map((a) => (

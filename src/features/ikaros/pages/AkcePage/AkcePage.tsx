@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
-import { Modal, Button } from '@/shared/ui';
+import { Modal, Button, EmptyState, ErrorState } from '@/shared/ui';
 import { useIkarosEvents } from '@/features/ikaros/api/useIkarosEvents';
 import { IkarosEventCard } from '@/features/ikaros/components/IkarosEventCard';
 import { IkarosEventModal } from '@/features/ikaros/components/IkarosEventModal';
@@ -32,7 +32,7 @@ export function AkcePage() {
     currentUser?.role === UserRole.Admin ||
     currentUser?.role === UserRole.Superadmin;
 
-  const { data: events = [], isError, isLoading } = useIkarosEvents();
+  const { data: events = [], isError, isLoading, refetch } = useIkarosEvents();
   const today = new Date();
   const [cursor, setCursor] = useState(() => ({
     year: today.getFullYear(),
@@ -132,7 +132,11 @@ export function AkcePage() {
       </div>
 
       {isError ? (
-        <p className={s.empty}>Nepodařilo se načíst akce.</p>
+        <ErrorState
+          size="panel"
+          title="Nepodařilo se načíst akce."
+          onRetry={() => void refetch()}
+        />
       ) : isLoading ? (
         <p className={s.empty}>Načítám…</p>
       ) : (
@@ -178,7 +182,12 @@ export function AkcePage() {
           <div className={s.mobileList}>
             <h2 className={s.listHeading}>Nadcházející</h2>
             {upcoming.length === 0 ? (
-              <p className={s.empty}>Žádné nadcházející akce.</p>
+              <EmptyState
+                size="panel"
+                illustration="events"
+                title="Žádné nadcházející akce"
+                description="Nic naplánovaného. Mrkni sem zase za pár dní."
+              />
             ) : (
               upcoming.map((ev) => (
                 <IkarosEventCard key={ev.id} event={ev} />
@@ -186,7 +195,11 @@ export function AkcePage() {
             )}
             <h2 className={s.listHeading}>Proběhlé</h2>
             {past.length === 0 ? (
-              <p className={s.empty}>Žádné proběhlé akce.</p>
+              <EmptyState
+                size="panel"
+                illustration="events"
+                title="Žádné proběhlé akce"
+              />
             ) : (
               past.map((ev) => <IkarosEventCard key={ev.id} event={ev} />)
             )}

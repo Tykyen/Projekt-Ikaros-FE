@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useUpcomingEventsMine } from '@/features/world/api/useGameEvents';
 import { EventCard } from '@/features/ikaros/pages/DashboardPage/components/EventCard';
-import { Spinner } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import styles from './ProfileSections.module.css';
 
 /**
@@ -9,7 +9,9 @@ import styles from './ProfileSections.module.css';
  * Přesun z dashboardu (2.1) v rámci 2.1b — globální vs. světové oddělení.
  */
 export function ProfileEventsSection() {
-  const { data, isPending, isError } = useUpcomingEventsMine({ limit: 5 });
+  const { data, isPending, isError, refetch } = useUpcomingEventsMine({
+    limit: 5,
+  });
   const items = data ?? [];
 
   return (
@@ -32,12 +34,19 @@ export function ProfileEventsSection() {
         </div>
       )}
       {isError && (
-        <div className={styles.empty}>Nepodařilo se načíst akce.</div>
+        <ErrorState
+          size="panel"
+          title="Nepodařilo se načíst akce"
+          onRetry={() => void refetch()}
+        />
       )}
       {!isPending && !isError && items.length === 0 && (
-        <div className={styles.empty}>
-          Žádné nadcházející akce ve tvých světech.
-        </div>
+        <EmptyState
+          size="panel"
+          illustration="events"
+          title="Žádné nadcházející akce"
+          description="Až vypravěč naplánuje sezení, najdeš ho tady."
+        />
       )}
       {items.length > 0 && (
         <div className={styles.eventList}>
