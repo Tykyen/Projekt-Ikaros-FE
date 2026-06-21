@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#7c4dff" />
+    <title>Offline — Ikaros</title>
+    <!--
+      15.1 — offline fallback. Service worker ji vrací při výpadku sítě na
+      navigaci. ZÁMĚRNĚ self-contained (inline CSS, žádné externí závislosti
+      ani fonty) — musí fungovat i bez nacacheovaných assetů a bez sítě.
+    -->
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100dvh;
+        padding: 1.5rem;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #e8e3f5;
+        background: #14101e;
+        background-image:
+          radial-gradient(circle at 50% 0%, rgba(124, 77, 255, 0.28), transparent 60%),
+          linear-gradient(rgba(124, 77, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(124, 77, 255, 0.06) 1px, transparent 1px);
+        background-size: 100% 100%, 44px 44px, 44px 44px;
+        background-position: center top, center, center;
+        text-align: center;
+        -webkit-font-smoothing: antialiased;
+      }
+      .card {
+        max-width: 26rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+      }
+      .logo {
+        width: 96px;
+        height: 96px;
+        border-radius: 22px;
+        box-shadow: 0 0 0 1px rgba(124, 77, 255, 0.4),
+          0 12px 40px rgba(124, 77, 255, 0.35);
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      p {
+        font-size: 0.975rem;
+        line-height: 1.6;
+        color: #b7afd0;
+      }
+      button {
+        margin-top: 0.25rem;
+        padding: 0.7rem 1.6rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #7c4dff, #b14dff);
+        box-shadow: 0 8px 24px rgba(124, 77, 255, 0.4);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+      button:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(124, 77, 255, 0.5); }
+      button:active { transform: translateY(0); }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <img class="logo" src="/icons/icon-192.png" alt="Ikaros" />
+      <h1>Jsi offline</h1>
+      <p>Ikaros teď nemůže navázat spojení. Zkontroluj připojení k internetu a zkus to znovu.</p>
+      <button onclick="location.reload()">Zkusit znovu</button>
+    </div>
+  </body>
+</html>

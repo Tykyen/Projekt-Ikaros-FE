@@ -1,20 +1,28 @@
 /*
  * Spec 13.2c — service worker pro web push notifikace.
- * Vanilla (bez workboxu) — řeší jen příjem push, klik na notifikaci a obnovu
- * odběru při rotaci. BE `PushService` posílá payload { title, body, icon?, url?,
- * tag? } (tag = klientský dedup klíč pro slučování notifikací).
+ * Spec 15.1 — + offline shell cache (cache-first assety, navigace network-first
+ * → offline.html). Vanilla (bez workboxu).
+ * BE `PushService` posílá payload { title, body, icon?, url?, tag? }
+ * (tag = klientský dedup klíč pro slučování notifikací).
  */
 
-// BE origin předaný z `main.tsx` přes query (SW je mimo bundler, nemá env).
-// Použije se při `pushsubscriptionchange` pro fetch VAPID klíče. Prázdný =
+// BE origin + běhový režim předané z `main.tsx` přes query (SW je mimo bundler,
+// nemá env). `api` → fetch VAPID klíče při `pushsubscriptionchange`. Prázdný =
 // fallback na relativní URL (same-origin přes reverzní proxy).
-const API_BASE = (() => {
+const SW_PARAMS = (() => {
   try {
-    return new URL(self.location.href).searchParams.get('api') || '';
+    return new URL(self.location.href).searchParams;
   } catch {
-    return '';
+    return new URLSearchParams();
   }
 })();
+const API_BASE = SW_PARAMS.get('api') || '';
+
+// 15.1 — cache logika běží JEN v produkci (`mode=prod`). V dev by `fetch`
+// handler cacheoval Vite moduly a rozbil HMR → dev zůstává push-only (jako 13.2c).
+const CACHE_ENABLED = SW_PARAMS.get('mode') === 'prod';
+const CACHE = 'ikaros-shell-v1';
+const OFFLINE_URL = '/offline.html';
 
 /** VAPID base64url → Uint8Array (formát pro `applicationServerKey`). */
 function urlBase64ToUint8Array(base64) {
@@ -26,13 +34,61 @@ function urlBase64ToUint8Array(base64) {
   return out;
 }
 
-self.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
+  // 15.1 — precache offline fallback (jen prod; v dev nic neřešíme).
+  if (CACHE_ENABLED) {
+    event.waitUntil(caches.open(CACHE).then((c) => c.add(OFFLINE_URL)));
+  }
   // Nová verze SW se aktivuje hned (žádné čekání na zavření všech klientů).
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    (async () => {
+      // 15.1 — úklid starých verzí cache (po bumpu CACHE).
+      if (CACHE_ENABLED) {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
+      }
+      await self.clients.claim();
+    })(),
+  );
+});
+
+// 15.1 — offline shell. Jen prod (mode=prod), jen GET na vlastním originu;
+// cross-origin (fonty, API jiného hostu) a non-GET necháváme projít beze změny.
+self.addEventListener('fetch', (event) => {
+  if (!CACHE_ENABLED) return;
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Navigace = network-first → při výpadku sítě offline.html (žádný stale shell).
+  if (req.mode === 'navigate') {
+    event.respondWith(fetch(req).catch(() => caches.match(OFFLINE_URL)));
+    return;
+  }
+
+  // Hashované assety jsou immutable (Vite mění název při změně obsahu) →
+  // cache-first: z cache okamžitě, jinak stáhni a ulož.
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      caches.match(req).then(
+        (hit) =>
+          hit ||
+          fetch(req).then((res) => {
+            // Cacheuj jen úspěšné basic odpovědi (ne chyby/opaque).
+            if (res.ok && res.type === 'basic') {
+              const copy = res.clone();
+              void caches.open(CACHE).then((c) => c.put(req, copy));
+            }
+            return res;
+          }),
+      ),
+    );
+  }
 });
 
 self.addEventListener('push', (event) => {

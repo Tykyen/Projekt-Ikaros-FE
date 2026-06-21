@@ -7,6 +7,7 @@ import { router } from "./router";
 import { GlobalErrorBoundary } from "@/shared/ui/GlobalErrorBoundary";
 import { AuthBootstrap } from '@/features/auth/components';
 import { ThemeProvider } from "@/themes/ThemeProvider";
+import { InstallBanner } from "@/features/pwa";
 import { bootstrapSchemas } from "@/features/world/tactical-map/schemas/bootstrap";
 import "./index.css";
 
@@ -35,22 +36,26 @@ createRoot(document.getElementById("root")!).render(
           <AuthBootstrap />
           <RouterProvider router={router} />
           <Toaster position="bottom-right" theme="dark" richColors />
+          {/* 15.1 — PWA install hint (sám se skryje ve standalone / po dismissu) */}
+          <InstallBanner />
         </GlobalErrorBoundary>
       </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>
 );
 
-// 13.2c — registrace service workeru pro push notifikace (PWA). SW neřeší
-// offline cache (žádný fetch handler), jen příjem push + klik na notifikaci,
-// takže je bezpečný i v dev. Reálné doručení push vyžaduje HTTPS/server.
+// 13.2c — registrace service workeru pro push (PWA).
+// 15.1 — + offline shell cache. SW dostane `mode=prod` JEN v produkčním buildu;
+// v dev zůstává push-only (žádný fetch handler → HMR netknutý). Reálné doručení
+// push vyžaduje HTTPS/server.
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    // SW běží mimo bundler (nemá `import.meta.env`) → BE origin mu předáme query
-    // parametrem. Potřebuje ho při `pushsubscriptionchange` k re-subscribe
-    // (fetch VAPID klíče), když se odběr zrotuje bez otevřené appky.
+    // SW běží mimo bundler (nemá `import.meta.env`) → BE origin + režim mu
+    // předáme query parametrem. `api` potřebuje při `pushsubscriptionchange`
+    // k re-subscribe (fetch VAPID klíče), když se odběr zrotuje bez appky.
     const apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
-    const swUrl = `/sw.js?api=${encodeURIComponent(apiBase)}`;
+    const mode = import.meta.env.PROD ? "&mode=prod" : "";
+    const swUrl = `/sw.js?api=${encodeURIComponent(apiBase)}${mode}`;
     void navigator.serviceWorker.register(swUrl).catch(() => {});
   });
 }

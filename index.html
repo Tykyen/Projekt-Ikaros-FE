@@ -7,6 +7,12 @@
     <!-- 13.2c — PWA: instalovatelnost + push notifikace -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#7c4dff" />
+    <!-- 15.1 — iOS PWA: Safari nečte manifest spolehlivě, ikona/název/fullscreen
+         se berou z těchto meta. Ikona bez alfy (colorType 2) → iOS nepodloží černou. -->
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Ikaros" />
     <title>Projekt Ikaros</title>
 
     <!-- Pre-hydration: nastaví data-theme před React render → žádný FOUT -->

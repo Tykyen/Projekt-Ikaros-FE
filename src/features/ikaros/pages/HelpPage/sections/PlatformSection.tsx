@@ -18,6 +18,7 @@ import {
   Shield,
   Smile,
   Beer,
+  Smartphone,
 } from 'lucide-react';
 import { HelpAccordion, HelpSubAccordion, TagChip, ScreenshotSlot, type TagKind } from '../components';
 
@@ -119,6 +120,23 @@ export function PlatformSection() {
             zapnout systémová upozornění na zařízení; v sekci <strong>Tvá
             zařízení</strong> vidíš všechna přihlášená zařízení a ta vzdálená
             můžeš odhlásit (aktuální se ovládá přepínačem).
+          </p>
+        </Tool>
+        <Tool icon={<Smartphone size={16} />} title="Instalace na plochu (appka)" audience={{ kind: 'vse', label: 'Všichni' }} accent="info">
+          <p>
+            Ikaros si můžeš nainstalovat jako <strong>aplikaci na plochu</strong>{' '}
+            telefonu i počítače — vlastní ikona, spuštění na celou obrazovku, žádný
+            adresní řádek. Dole se sám nabídne pruh <strong>Nainstaluj Ikaros</strong>:
+            na Androidu a počítači stačí tlačítko <strong>Nainstalovat</strong>, na
+            iPhonu/iPadu (Safari) klepni na <strong>Sdílet</strong> a zvol{' '}
+            <strong>Přidat na plochu</strong>. Pruh můžeš zavřít křížkem; znovu se
+            ozve nejdřív za pár týdnů a po instalaci už vůbec.
+          </p>
+          <p>
+            Na <strong>iPhonu/iPadu</strong> je instalace na plochu nutná, aby
+            chodily <strong>upozornění na telefon</strong> (push) — bez ní je
+            Safari neumí. Když jsi <strong>offline</strong>, appka místo chybové
+            stránky prohlížeče ukáže vlastní hlášku s tlačítkem Zkusit znovu.
           </p>
         </Tool>
         <Tool icon={<MessagesSquare size={16} />} title="Diskuze" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">

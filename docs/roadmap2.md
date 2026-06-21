@@ -177,12 +177,13 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Závislosti:** ideálně po 14.1–14.4 (mít pojistku), ale technicky nezávislé.
 
-### - [ ] 15.1 PWA — instalace na plochu — [D1 · dopad vysoký · náklad malý] 🔁
+### - [x] 15.1 PWA — instalace na plochu — [D1 · dopad vysoký · náklad malý] 🔁 ✅ 2026-06-21
 **Cíl:** Z webu „appka" — ikona na ploše, spolehlivější push (na iOS push **vyžaduje** PWA na ploše).
 **Proč:** Push už máme (VAPID, modul `push`); PWA ho zpřístupní víc lidem a dá pocit skutečné aplikace bez App Store.
 **Návrh přípravy:** web manifest, service worker (cache shellu + offline fallback stránka), ikony per branding.
 **FE:** manifest + service worker + „nainstaluj" hint; ověřit s existující push infrastrukturou.
 **Otevřené otázky:** Co cacheovat offline (jen shell, nebo i poslední data)? Vlastní install prompt, nebo nechat na prohlížeči?
+**Hotovo:** Manifest + push SW byly z 13.2c. 15.1 doplnilo (spec [spec-15.1.md](arch/phase-15/spec-15.1.md)): offline shell — SW `fetch` handler gated `mode=prod` (navigace network-first → `offline.html`, `/assets/*` cache-first; v dev push-only, HMR netknutý); install hint (`src/features/pwa/` — `useInstallPrompt` + `InstallBanner`, Android/desktop `beforeinstallprompt`, iOS instrukce, dismiss 14 d, skrytý ve standalone); iOS meta + `apple-touch-icon` v `index.html`. Rozhodnuto: jen shell (žádná data), vlastní hint. Build ✓, mobil-desktop ✓.
 
 ### - [ ] 15.2 Čtvercová & bezmřížková mapa — [B1 · dopad vysoký · náklad střední] 1)🔁
 **Cíl:** Volba mřížky na úrovni scény: hex / čtverec / žádná.

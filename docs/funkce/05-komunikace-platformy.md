@@ -100,12 +100,33 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Pošta nepushuje** (jen WS) — soukromá zpráva na telefon nedorazí jako push.
   - **Žádné per-typ předvolby** — jediný přepínač zapne/vypne push na zařízení; nelze si zvolit „jen pošta, ne chat".
   - **`notifyAll` payloady nemají `url`** → deep-link se u novinek a globálního chatu nevyužije, bublina otevře `/`. (Nemají ani `tag`/`topic` → broadcast push se neslučuje.)
-  - iOS vyžaduje PWA přidanou na plochu (standardní omezení Safari pro Web Push).
+  - iOS vyžaduje PWA přidanou na plochu (standardní omezení Safari pro Web Push) — 15.1 install hint to usnadňuje instrukcí „Sdílet → Přidat na plochu" (viz blok „Instalace na plochu (PWA)" níže).
 - **Zvláštnosti:**
   - Neplatné subscription (HTTP 404/410) se automaticky promazávají (`push.service.ts`). VAPID klíče z env (`VAPID_SUBJECT/PUBLIC_KEY/PRIVATE_KEY`); chybí-li, modul při startu spadne na `!` non-null assertu.
   - **Úklid rotovaných odběrů (13.2c-push-delivery):** SW má `pushsubscriptionchange` handler → re-subscribe (auth není v SW dostupný, BE origin dostává query `?api=` z `main.tsx`). Nahlášení nového endpointu řeší FE `usePush` autentizovaně — na mountu porovná endpoint s `localStorage['push:endpoint']`, při změně pošle `POST /push/subscribe` s `oldEndpoint` → BE starý smaže (`subscribe` v `push.service.ts`). Bez toho se mrtvé endpointy hromadily → **duplicitní push na jedno zařízení**.
 - **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), ale dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push nejsou naplněné.
 - **Kód:** FE `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx`, `PushDevicesList.tsx`, `public/sw.js`, `src/app/main.tsx`. BE `backend/src/modules/push/push.controller.ts`, `push.service.ts`, `dto/subscribe.dto.ts`; chat push `backend/src/modules/chat/chat.service.ts`.
+
+---
+
+### Instalace na plochu (PWA) + offline režim
+- **Co to je:** Aplikace jde nainstalovat na plochu telefonu/desktopu jako „appku" (ikona, fullscreen, vlastní okno) a po výpadku sítě ukáže tematickou **offline stránku** místo chybové hlášky prohlížeče. Manifest + push SW byly z 13.2c; **15.1** doplnilo offline cache, aktivní install hint a iOS metadata.
+- **Kde:** install banner se sám zobrazí dole na libovolné stránce (i nepřihlášenému). Manifest `public/manifest.webmanifest`, offline stránka `public/offline.html`, SW `public/sw.js`.
+- **Kdo:** kdokoli (i nepřihlášený) na zařízení s podporou PWA. Bez role-gate.
+- **Co jde dělat:**
+  - **Nainstalovat appku** — Android/desktop Chromium: vlastní tlačítko „Nainstalovat" (zachycený `beforeinstallprompt`, `useInstallPrompt`). iOS Safari: banner ukáže **instrukci** „Sdílet → Přidat na plochu" (`beforeinstallprompt` na iOS neexistuje).
+  - **Zavřít banner** (×) — dismiss se uloží do `localStorage['pwa:install-dismissed']`, re-nabídka až po **14 dnech**. Ve standalone režimu (už nainstalováno) se banner nezobrazí vůbec.
+  - **Offline:** při výpadku sítě navigace zobrazí `offline.html` (tlačítko „Zkusit znovu" = reload). Po prvním načtení appka startuje rychleji (JS/CSS z cache).
+- **Hranice / co neumí:**
+  - **Žádná offline data** — záměrně se cacheuje jen app shell (`/assets/*` cache-first) a offline fallback; reálný obsah (chat, mapa, novinky, API) offline nefunguje, appka je real-time. Navigace je network-first → offline = jen statická hláška, ne použitelná appka.
+  - **Cache jen v produkci** — SW dostává `mode=prod` jen v prod buildu; v dev je SW push-only (jinak by `fetch` handler rozbil Vite HMR). Offline režim tedy nejde ověřit `npm run dev`, jen z `npm run build` / nasazeného webu.
+  - **Bobtnání assets cache** — staré hashované assety po deployi v cache zůstanou (drobnost; řeší bump `CACHE = 'ikaros-shell-v1'` v `sw.js` + browser eviction dle kvóty).
+- **Zvláštnosti:**
+  - `apple-touch-icon` = existující `/icons/icon-192.png` (colorType 2, bez alfy → iOS nepodloží černou). iOS meta v `index.html`: `apple-mobile-web-app-capable/-status-bar-style(black-translucent)/-title`.
+  - Banner detekuje standalone přes `matchMedia('(display-mode: standalone)')` || `navigator.standalone` (iOS); iPadOS 13+ se hlásí jako Mac → fallback přes `maxTouchPoints`.
+  - **Váže na push:** na iOS Web Push **vyžaduje** PWA přidanou na plochu — install hint je tedy předpoklad pro push na iPhonu (viz blok Web push výše).
+- **Stav:** ✅ — manifest/SW/offline/install hint hotové, build ✓, mobil-desktop ✓. (Reálné chování install promptu a iOS „Přidat na plochu" ověřitelné jen na zařízení / nasazeném HTTPS.)
+- **Kód:** FE `src/features/pwa/InstallBanner.tsx`, `useInstallPrompt.ts`, `index.ts`, `InstallBanner.module.css`; `public/sw.js` (fetch/cache lifecycle), `public/offline.html`, `index.html`, `src/app/main.tsx` (`mode=prod` + mount banneru), `scripts/stamp-pwa-icons.mjs`. Spec [spec-15.1.md](../arch/phase-15/spec-15.1.md).
 
 ---
 
