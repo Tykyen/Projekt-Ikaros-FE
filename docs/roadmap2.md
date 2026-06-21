@@ -185,7 +185,8 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Otevřené otázky:** Co cacheovat offline (jen shell, nebo i poslední data)? Vlastní install prompt, nebo nechat na prohlížeči?
 **Hotovo:** Manifest + push SW byly z 13.2c. 15.1 doplnilo (spec [spec-15.1.md](arch/phase-15/spec-15.1.md)): offline shell — SW `fetch` handler gated `mode=prod` (navigace network-first → `offline.html`, `/assets/*` cache-first; v dev push-only, HMR netknutý); install hint (`src/features/pwa/` — `useInstallPrompt` + `InstallBanner`, Android/desktop `beforeinstallprompt`, iOS instrukce, dismiss 14 d, skrytý ve standalone); iOS meta + `apple-touch-icon` v `index.html`. Rozhodnuto: jen shell (žádná data), vlastní hint. Build ✓, mobil-desktop ✓.
 
-### - [ ] 15.2 Čtvercová & bezmřížková mapa — [B1 · dopad vysoký · náklad střední] 1)🔁
+### - [x] 15.2 Čtvercová & bezmřížková mapa — [B1 · dopad vysoký · náklad střední] 1)🔁
+**Hotovo (2026-06-21):** `GridAdapter` strategy (hex/čtverec/žádná), integer `q/r` lattice = nula migrace, `gridType` propluje volným `scene.config` (0 BE schema změn). Selektor v „Upravit scénu". Spec [spec-15.2-15.4.md](arch/phase-15/spec-15.2-15.4.md). Build ✓, vitest tactical-map 456 ✓.
 **Cíl:** Volba mřížky na úrovni scény: hex / čtverec / žádná.
 **Proč:** Většina systémů (D&D, DrD, Zaklínač) i většina stažených map počítá se čtvercem nebo bez mřížky; hex-only odrazuje část PJ hned na startu.
 **Návrh přípravy:** ověřit abstrakci souřadnic (dnes q/r) — rozšíření, ne přepis; spec na rendering + pohyb tokenů per typ mřížky; dopad na fog, efekty, měření.
@@ -193,14 +194,16 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **FE:** render mřížky + snapping pohybu per typ; migrace existujících hex scén beze změny.
 **Otevřené otázky:** Jak řešit přepočet existujících hex scén? Podpora obdélníkových políček/velikostí tokenů 2×2?
 
-### - [ ] 15.3 Měření, pravítko & šablony oblastí — [B3 · dopad střední · náklad malý] 🔁
+### - [x] 15.3 Měření, pravítko & šablony oblastí — [B3 · dopad střední · náklad malý] 🔁
+**Hotovo (2026-06-21):** Měřítko (`unitsPerCell`/jednotka) + stupnice po okraji mapy (`MapScaleFrame`, vidí všichni). Sdílené pravítko bod↔bod (hráč i PJ, výsledek vidí všichni přes WS `map:ruler`→`map:rulered`, ephemeral vzor pingu, BE klíčuje authenticated userId). Šablony kužel/linie/koule/čtverec (placement → `color` effect, pixel-space geometrie). Build ✓.
 **Cíl:** Pravítko (vzdálenost v jednotkách scény) + šablony kouzel (kužel, koule, linie, čtverec).
 **Proč:** Denní chleba taktiky; máme výbuchové oblasti, chybí obecné měření navázané na mřížku.
 **Návrh přípravy:** spec na jednotky scény (políčko = X meL), přichytávání šablon na mřížku z 15.2.
 **FE:** nástroj pravítko + parametrické šablony (overlay vrstva nad mapou).
 **Otevřené otázky:** Sdílet měření/šablony s ostatními hráči, nebo soukromé? Ukotvit jednotky na nastavení světa?
 
-### - [ ] 15.4 Kreslení & anotace na mapě — [B5 · dopad nízký · náklad malý]
+### - [x] 15.4 Kreslení & anotace na mapě — [B5 · dopad nízký · náklad malý]
+**Hotovo (2026-06-21):** Kreslení čára/šipka/kruh/text → perzistované `scene.drawings` (vzor `effects`: ops `drawing.add/remove/clear` + authorizer). Viditelnost `pj`/`all`; PJ vždy + hráč když scéna povolí (`allowPlayerDrawing`). **+ bonus E:** `WorldSettings.mapDefaults` (tab „Mapy" v nastavení světa) → seed configu nové scény (server-side). BE jest maps 173 + worlds 164 ✓, FE build ✓.
 **Cíl:** Čára, šipka, kruh, text přímo do scény.
 **Proč:** Drobnost, kterou hráči u VTT očekávají a postrádají.
 **Návrh přípravy:** rozhodnout perzistenci (uložit do scény vs. dočasné), viditelnost (PJ/all).

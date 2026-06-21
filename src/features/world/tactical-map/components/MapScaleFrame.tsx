@@ -108,29 +108,40 @@ export function MapScaleFrame({
       if (!mapBounds || !xAxis || !yAxis) return;
       const top = mapBounds.y;
       const left = mapBounds.x;
-      // Horní osa — značky směřují dolů od horní hrany.
+      const right = mapBounds.x + mapBounds.width;
+      const bottom = mapBounds.y + mapBounds.height;
+      // Osa X — značky na HORNÍ (dolů) i DOLNÍ (nahoru) hraně.
       for (const x of xAxis.minors) {
         g.moveTo(x, top);
         g.lineTo(x, top + MINOR_TICK);
+        g.moveTo(x, bottom);
+        g.lineTo(x, bottom - MINOR_TICK);
       }
       for (const m of xAxis.majors) {
         g.moveTo(m.pos, top);
         g.lineTo(m.pos, top + MAJOR_TICK);
+        g.moveTo(m.pos, bottom);
+        g.lineTo(m.pos, bottom - MAJOR_TICK);
       }
-      // Levá osa — značky směřují doprava od levé hrany.
+      // Osa Y — značky na LEVÉ (doprava) i PRAVÉ (doleva) hraně.
       for (const y of yAxis.minors) {
         g.moveTo(left, y);
         g.lineTo(left + MINOR_TICK, y);
+        g.moveTo(right, y);
+        g.lineTo(right - MINOR_TICK, y);
       }
       for (const m of yAxis.majors) {
         g.moveTo(left, m.pos);
         g.lineTo(left + MAJOR_TICK, m.pos);
+        g.moveTo(right, m.pos);
+        g.lineTo(right - MAJOR_TICK, m.pos);
       }
-      // Hraniční linky (samotné „ohraničení").
+      // Uzavřený rám kolem celé mapy (4 hrany).
       g.moveTo(left, top);
-      g.lineTo(mapBounds.x + mapBounds.width, top);
-      g.moveTo(left, top);
-      g.lineTo(left, mapBounds.y + mapBounds.height);
+      g.lineTo(right, top);
+      g.lineTo(right, bottom);
+      g.lineTo(left, bottom);
+      g.lineTo(left, top);
       g.stroke({
         color: theme.gridStroke,
         width: theme.gridStrokeWidth,
@@ -149,39 +160,62 @@ export function MapScaleFrame({
     fill: 0xffffff,
     stroke: { color: 0x000000, width: 3 },
   } as const;
+  const right = mapBounds.x + mapBounds.width;
+  const bottom = mapBounds.y + mapBounds.height;
 
   return (
     <pixiContainer label="scale-frame">
       <pixiGraphics draw={draw} />
-      {/* Popisky horní osy (nad hranou). */}
-      {xAxis.majors.map((m, i) => (
-        <pixiText
-          key={`x${i}`}
-          text={i === 0 ? `0` : fmt(m.value)}
-          x={m.pos}
-          y={mapBounds.y - fontSize * 0.7}
-          anchor={0.5}
-          resolution={2}
-          style={labelStyle}
-        />
-      ))}
-      {/* Popisky levé osy (vlevo od hrany). Poslední na ose nese jednotku.
-          Číselný (uniform) anchor 0.5 → centrovaný, posunutý doleva od hrany. */}
-      {yAxis.majors.map((m, i) => (
-        <pixiText
-          key={`y${i}`}
-          text={
-            i === yAxis.majors.length - 1
-              ? `${fmt(m.value)} ${unitLabel}`
-              : fmt(m.value)
-          }
-          x={mapBounds.x - fontSize * 1.8}
-          y={m.pos}
-          anchor={0.5}
-          resolution={2}
-          style={labelStyle}
-        />
-      ))}
+      {/* Popisky osy X — nad horní hranou i pod dolní (poslední nese jednotku). */}
+      {xAxis.majors.map((m, i) => {
+        const isLast = i === xAxis.majors.length - 1;
+        const text = i === 0 ? '0' : isLast ? `${fmt(m.value)} ${unitLabel}` : fmt(m.value);
+        return (
+          <pixiContainer key={`x${i}`}>
+            <pixiText
+              text={text}
+              x={m.pos}
+              y={mapBounds.y - fontSize * 0.7}
+              anchor={0.5}
+              resolution={2}
+              style={labelStyle}
+            />
+            <pixiText
+              text={text}
+              x={m.pos}
+              y={bottom + fontSize * 0.7}
+              anchor={0.5}
+              resolution={2}
+              style={labelStyle}
+            />
+          </pixiContainer>
+        );
+      })}
+      {/* Popisky osy Y — vlevo od levé hrany i vpravo od pravé. */}
+      {yAxis.majors.map((m, i) => {
+        const isLast = i === yAxis.majors.length - 1;
+        const text = isLast ? `${fmt(m.value)} ${unitLabel}` : fmt(m.value);
+        return (
+          <pixiContainer key={`y${i}`}>
+            <pixiText
+              text={text}
+              x={mapBounds.x - fontSize * 1.8}
+              y={m.pos}
+              anchor={0.5}
+              resolution={2}
+              style={labelStyle}
+            />
+            <pixiText
+              text={text}
+              x={right + fontSize * 1.8}
+              y={m.pos}
+              anchor={0.5}
+              resolution={2}
+              style={labelStyle}
+            />
+          </pixiContainer>
+        );
+      })}
     </pixiContainer>
   );
 }

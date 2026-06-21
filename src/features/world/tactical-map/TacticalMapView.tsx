@@ -2036,6 +2036,17 @@ export function TacticalMapView(): React.ReactElement {
             />
           </MapToolDock>
         )}
+        {/* 15.4 — kreslení (anotace) hned pod efekty; PJ vždy, hráč když scéna povolí. */}
+        {scene && canDraw && (
+          <MapToolDock title="✏️ Kreslení" storageKey="drawing" defaultCollapsed>
+            <MapDrawingControls
+              tool={drawingTool}
+              isPJ={isPJ}
+              onClearMine={handleClearMyDrawings}
+              onClearAll={handleClearAllDrawings}
+            />
+          </MapToolDock>
+        )}
         {isPJ && scene && (
           <MapToolDock title="🌫️ Mlha" storageKey="fog">
             <FogPalette
@@ -2056,23 +2067,12 @@ export function TacticalMapView(): React.ReactElement {
             fullscreenTargetRef={viewportRef}
           />
         </MapToolDock>
-        {/* 15.3 — měření (pravítko); hráč i PJ. */}
+        {/* 15.3 — měření (pravítko) hned pod zobrazením; hráč i PJ. */}
         {scene && (
           <MapToolDock title="📏 Měření" storageKey="measure" defaultCollapsed>
             <MapMeasureControls
               active={rulerActive}
               onToggle={() => setRulerActive((v) => !v)}
-            />
-          </MapToolDock>
-        )}
-        {/* 15.4 — kreslení (anotace); PJ vždy, hráč když scéna povolí. */}
-        {scene && canDraw && (
-          <MapToolDock title="✏️ Kreslení" storageKey="drawing" defaultCollapsed>
-            <MapDrawingControls
-              tool={drawingTool}
-              isPJ={isPJ}
-              onClearMine={handleClearMyDrawings}
-              onClearAll={handleClearAllDrawings}
             />
           </MapToolDock>
         )}

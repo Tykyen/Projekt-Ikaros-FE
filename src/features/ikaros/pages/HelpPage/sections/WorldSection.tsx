@@ -27,6 +27,10 @@ import {
   Lock,
   Backpack,
   Smile,
+  Grid3x3,
+  Ruler,
+  Triangle,
+  Pencil,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -232,12 +236,30 @@ export function WorldSection() {
         tag={<TagChip kind="hrac" label="Hráč + PJ" />}
       >
         <p>
-          Hex-grid prostor pro boj a scény. PJ vytvoří scénu (pozadí + grid + tokeny
-          + efekty), přiřadí na ni hráče a ti se připojí v reálném čase. Rozbal si
-          jednotlivé funkce:
+          Mřížkový prostor pro boj a scény. PJ vytvoří scénu (pozadí + mřížka +
+          tokeny + efekty), přiřadí na ni hráče a ti se připojí v reálném čase.
+          Rozbal si jednotlivé funkce:
         </p>
         <ScreenshotSlot media="svet.takticka-mapa" />
 
+          <MapFeature icon={<Grid3x3 size={15} />} title="Typ mřížky a měřítko">
+            <p>
+              U každé scény si PJ v „Upravit scénu" vybere mřížku: <strong>šestiúhelníky</strong>{' '}
+              (výchozí), <strong>čtverce</strong>, nebo <strong>žádnou</strong>. Nastaví
+              i měřítko — kolik metrů (či jiných jednotek) je jedno políčko. Po okraji
+              mapy se pak ukáže stupnice, kterou vidí všichni. PJ si může výchozí
+              mřížku a měřítko přednastavit pro celý svět (Nastavení světa → Mapy) —
+              nové scény je pak převezmou.
+            </p>
+          </MapFeature>
+          <MapFeature icon={<Ruler size={15} />} title="Pravítko (měření vzdálenosti)">
+            <p>
+              Nástroj „📏 Měření" v pravém dolním rohu — zapni a táhni z jednoho bodu
+              do druhého. Ukáže se vzdálenost v políčkách i v jednotkách scény.
+              <strong> Měří hráč i PJ a výsledek vidí všichni</strong>, takže celý stůl
+              hned vidí, jestli na cíl dostřelíš nebo dosáhneš.
+            </p>
+          </MapFeature>
           <MapFeature icon={<Footprints size={15} />} title="Hráčské postavy (PC)">
             <p>
               Token PC z postavy hráče. Drag pro pohyb (hráč hýbe jen vlastním, PJ
@@ -280,6 +302,22 @@ export function WorldSection() {
               Paleta PJ: barevná pole (8 barev), bariéra (stěna s DC) a výbuch/oblast
               (soustředné kruhy se zraněním, varianty oheň/plyn/kouř). Guma maže,
               koš smaže vše. Efekty vidí všichni v reálném čase.
+            </p>
+          </MapFeature>
+          <MapFeature icon={<Triangle size={15} />} title="Šablony oblastí (kouzla)">
+            <p>
+              V paletě efektů nástroj „📐 Šablona" — vyber tvar (kužel, linie, koule,
+              čtverec) a barvu, klikni na začátek a táhni směr a dosah. Vidíš živý
+              náhled; po puštění se oblast zafixuje jako barevné pole. Hodí se na
+              zásah kouzla, dech příšery, čáru ohně apod.
+            </p>
+          </MapFeature>
+          <MapFeature icon={<Pencil size={15} />} title="Kreslení a poznámky na mapě">
+            <p>
+              Nástroj „✏️ Kreslení": čára, šipka, kruh a text přímo do scény. U každé
+              kresby zvolíš barvu a kdo ji uvidí (<strong>všichni</strong> / <strong>jen
+              PJ</strong>). Kreslit smí vždy PJ; <strong>hráči jen když to PJ u scény
+              povolí</strong> (v „Upravit scénu"). Smazat můžeš svoje kresby, PJ kterékoli.
             </p>
           </MapFeature>
           <MapFeature icon={<CloudFog size={15} />} title="Mlha války">

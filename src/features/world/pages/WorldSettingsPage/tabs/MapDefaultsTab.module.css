@@ -65,8 +65,8 @@
 
 .segBtnActive,
 .segBtnActive:hover {
-  background: var(--accent-soft, rgb(var(--accent-rgb, 130 80 220) / 0.18));
-  border-color: var(--accent, var(--border-strong));
+  background: var(--accent-soft);
+  border-color: var(--border-strong, var(--border));
   color: var(--text-primary);
 }
 

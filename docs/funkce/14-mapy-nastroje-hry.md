@@ -63,13 +63,25 @@ Všechny tři routy jsou `memberOnly` — vyžadují členství (Čtenář+). Ne
 Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-time přes Socket.IO operation model, per-system layout.
 
 ### Architektura render (PIXI)
-- **Co to je:** `<Application>` (PixiJS v8) s 6 vrstvami v pevném z-orderu: `background → grid → effects → tokens → fog → pings`. Wrapper div drží pointer/drag/drop/wheel handlery.
-- **Zvláštnost PIXI:** `@pixi/react` v8 vyžaduje `extend({Container,Graphics,Sprite,Text})`. Init je **async** — `<Application>` se mountuje **až když jsou rozměry I scéna ready** (`width>0 && height>0 && scene`, `TacticalMapView.tsx:1202`), jinak prázdné plátno bez chyby. Fullscreen vyžaduje imperativní `renderer.resize` (`:323`) + auto-fit (`:350`).
-- **Kód:** `TacticalMapView.tsx` (~1700 řádků), `hexUtils.ts`, `components/{HexGrid,MapBackground}.tsx`.
+- **Co to je:** `<Application>` (PixiJS v8) s vrstvami v pevném z-orderu: `background → grid → effects → tokens → fog → scale → pings → ruler → drawings`. Wrapper div drží pointer/drag/drop/wheel handlery.
+- **Zvláštnost PIXI:** `@pixi/react` v8 vyžaduje `extend({Container,Graphics,Sprite,Text})`. Init je **async** — `<Application>` se mountuje **až když jsou rozměry I scéna ready** (`width>0 && height>0 && scene`), jinak prázdné plátno bez chyby. Fullscreen vyžaduje imperativní `renderer.resize` + auto-fit.
+- **Kód:** `TacticalMapView.tsx` (~1900 řádků), `hexUtils.ts`, `grid/`, `components/{HexGrid,MapBackground}.tsx`.
 
-### Mřížka a viewport
-- Hexová mřížka (`HexGrid`) + pan/zoom (`useViewportPanZoom`, per-scéna persistence pozice v LS), zoom controls + fullscreen. `screenToHex`/`screenToMap` převody. Lem hexů jen kolem mapy (mapBounds z `MapBackground.onLoad`).
-- Souřadnice = axiální hex (`{q,r}`). Config: `{size, originX, originY, showGrid}`.
+### Mřížka a viewport (typ mřížky — 15.2)
+- **Typ mřížky per scéna:** `hex` (flat-top axial, default) / `square` (čtverec) / `none` (čtvercová geometrie bez kreslených čar). Volba v „Upravit scénu" (segmentový selektor). Souřadnice zůstávají integer `{q,r}` napříč typy — liší se jen geometrie převodu buňka↔pixel (`GridAdapter` strategy: `getGridAdapter(config.gridType)`; render/snap/fog/efekty/měření přes adapter). Legacy scény bez `gridType` = hex (BC, nula migrace). BE: `gridType` propluje volným `scene.config` bez schema změny.
+- Pan/zoom (`useViewportPanZoom`, per-scéna persistence pozice v LS), zoom controls + fullscreen. `screenToHex`/`screenToMap` převody. Lem buněk jen kolem mapy (mapBounds z `MapBackground.onLoad`).
+- Config: `{gridType, size, originX, originY, showGrid, unitsPerCell, unitLabel, showScale, allowPlayerDrawing, showHpPc/Npc/Bestie}`.
+- **Kód:** `grid/{types,hexAdapter,squareAdapter,index}.ts`, `components/HexGrid.tsx`.
+
+### Měřítko a stupnice (15.3)
+- **Co to je:** Stupnice po horním + levém okraji mapy (`MapScaleFrame`), značka = buňka, popisek po 5 buňkách v jednotkách scény (`unitsPerCell` × `unitLabel`, default 1 / „m"). **Viditelná všem** (z `config`). Toggle „Zobrazit stupnici" (`showScale`, default zap.).
+- Rozteč značek z `adapter.toPixel(1,0)−toPixel(0,0)` → uniformní napříč typy mřížky (hex √3·size, square size).
+- **Kód:** `components/MapScaleFrame.tsx`.
+
+### Pravítko (sdílené měření — 15.3)
+- **Co to je:** Měření vzdálenosti bod↔bod. **Hráč i PJ** (toggle „📏 Měření" v docku). Drag A→B → čára + popisek (vzdálenost v buňkách × `unitsPerCell`). **Výsledek vidí všichni** (collaborative range-check „dostřelím?").
+- **Zvláštnost (WS):** ephemeral, NEukládá se (vzor pingu). FE `emitRuler(line\|null)` → BE `map:ruler` → broadcast `map:rulered` do scene-roomu (throttle ~16/s, `line=null` = konec měření). BE klíčuje cizí pravítka **authenticated `client.data.user.id`** (ne payload) proti spoofu. All-roles (žádný role gate, oproti spotlight = PJ-only).
+- **Kód:** FE `components/{MapRulerLayer,MapMeasureControls}.tsx`, `hooks/{useMapSocket,useMapScene}.ts`. BE `maps.gateway.ts` (`handleRuler`).
 
 ### Tokeny (PC / NPC / Bestie)
 - **Co to je:** Tři typy tokenů — hráčská postava (PC), NPC postava (Character `isNpc`), a Bestie (z bestiáře). Rozlišení 3-tier (memory `npc_vs_bestie`).
@@ -102,10 +114,17 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - NPC token skrytý mlhou pro hráče (`isTokenHiddenByFog`). PJ vidí vše.
 - **Kód:** `components/fog/{FogLayer,FogPalette,fogUtils}.tsx`, `hooks/useFogTool.ts`.
 
-### Efekty
+### Efekty + šablony oblastí (15.3)
 - PJ paleta „🎨 Efekty": barva hexu (`color`), exploze (kruhové prstence, varianty), bariéra (kruh / brush tah). Mazání souřadnicové (klik na hex smaže efekty, které ho pokrývají — deterministické, ne Pixi hit-test). „Smazat vše". Optimistic + rollback. Op `effect.add/update/remove`, `scene.effects.replace`.
+- **Šablony oblastí (15.3):** nástroj „📐 Šablona" — `kužel / linie / koule / čtverec`. PJ klikne origin + táhne směr/dosah → **živý náhled**, pustí → uloží se jako stávající `color` effect (reuse, žádné nové úložiště). Buňky tvaru se počítají v **pixel-space** (`templateCells`) → uniformní pro hex/čtverec/none.
 - Bariéra má `barrierDC` (info), pohyb **fyzicky neblokuje**.
-- **Kód:** `components/effects/*`, `hooks/useEffectTool.ts`.
+- **Kód:** `components/effects/*`, `hooks/useEffectTool.ts`, `utils/templateGeometry.ts`.
+
+### Kreslení / anotace (15.4)
+- **Co to je:** Kresby na mapu — `čára / šipka / kruh / text`. Dock „✏️ Kreslení": výběr druhu + barva + viditelnost (`👁 Všichni` / `🔒 Jen PJ`) + „Smazat moje" / „Smazat vše" (PJ). Text = klik → prompt. Ostatní = drag origin→konec (živý náhled). Perzistované do `scene.drawings`.
+- **Kdo:** PJ vždy; **hráč jen když scéna povolí** (`config.allowPlayerDrawing`, toggle v „Upravit scénu" i ve world defaults). Per-kresba `visibility`: `all` vidí všichni, `pj` jen PJ + autor. Mazání: autor vlastní + PJ kdokoli (klik na kresbu při aktivním nástroji).
+- **BE (vzor effects):** `scene.drawings` (MixedArray) + op `drawing.add/remove/clear` (apply $push/$pull/$set + inverse). Authorizer: hráč `drawing.add` jen `allowPlayerDrawing` && vlastní (`createdByUserId === user.id`, server-enforced proti spoofu); `drawing.remove` vlastní; `drawing.clear` PJ-only. Real-time přes stávající `map:operation` (optimistic + WS + catch-up zdarma).
+- **Kód:** FE `components/{MapDrawingLayer,MapDrawingControls}.tsx`, `hooks/useDrawingTool.ts`. BE `dto/operations/drawing-ops.dto.ts`, `map-operations.service.ts`, `operations-authorizer.service.ts`.
 
 ### Combat tracker + iniciativa (live sort)
 - **Co to je:** Iniciativní lišta (horní full-width) + bojové kolo. Op `combat.start/turn/end/reorder`, `combat.effect.add/remove`.
@@ -118,7 +137,7 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Co to je:** Veškeré změny scény jdou přes `POST /maps/:id/operations` (op typovaný). Server: validace → load snapshot → autorizace → výpočet inverse → atomic Mongo update → alokace `seqNumber` (`$inc`) → append do logu → WS broadcast `map:operation`.
 - **Undo:** každá op počítá **inverse** ze snapshotu (`computeInverse` `:176`). Některé op undo nemají (`scene.deactivate`, bulk assign → inverse `null`, MVP limitace).
 - **Catch-up:** `GET /maps/:id/operations?since=seq` (cap 1000). Po WS reconnectu forced catch-up (`onReconnect` `useMapScene.ts:192`); když gap moc velký → full refetch.
-- **WS:** `MapsGateway` (`maps.gateway.ts`). JWT v handshake (`handleConnection`). Roomy: `map:join` (scéna, member-gated), `map:join-world`/`world-ops:{id}` (PJ orchestrátor, **PJ-only** room s pomlčkou aby tam neprosákl běžný člen), `user:{id}` (private `map:reassigned`). Eventy: `map:operation`, `world:operation`, `map:reassigned`, `map:ping`/`map:pinged`, `map:spotlight`. Legacy relay handlery odstraněny (W-5).
+- **WS:** `MapsGateway` (`maps.gateway.ts`). JWT v handshake (`handleConnection`). Roomy: `map:join` (scéna, member-gated), `map:join-world`/`world-ops:{id}` (PJ orchestrátor, **PJ-only** room s pomlčkou aby tam neprosákl běžný člen), `user:{id}` (private `map:reassigned`). Eventy: `map:operation`, `world:operation`, `map:reassigned`, `map:ping`/`map:pinged`, `map:spotlight`, `map:ruler`/`map:rulered` (15.3 pravítko, ephemeral). Legacy relay handlery odstraněny (W-5). Op katalog vč. `drawing.add/remove/clear` (15.4).
 - **Kód:** BE `maps/maps.controller.ts`, `operations/{map-operations,world-operations,operations-authorizer,operation-payload-validator}.service.ts`. FE `hooks/{useMapScene,useMapSocket}.ts`, `api/{mapApi,worldOpsApi}.ts`, `utils/{applyOperationToScene,catchUpScene}.ts`.
 
 ### Per-player scene assignment (currentSceneId)

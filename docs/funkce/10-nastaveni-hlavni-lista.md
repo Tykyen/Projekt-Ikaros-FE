@@ -30,6 +30,7 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 | Postavy & NPC | `postavy-npc` | PJ | — | `CharacterTabsVisibilityTab` |
 | Hlavní lišta | `navigace` | PJ | — | `HeadlineLinkTab` (rozcestník) |
 | Šablony | `sablony` | Korektor | — | `PageTemplatesTab` |
+| Mapy | `mapy` | PJ | — | `MapDefaultsTab` |
 | PJ v chatu | `pj-chat` | PomocnyPJ | — | `PjChatTab` |
 | Emoty světa | `emotes` | PomocnyPJ | — | `WorldEmotesAdminPage` |
 | Kalendáře | `kalendare` | PomocnyPJ | — | `CalendarConfigsPage` |
@@ -94,6 +95,13 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 - **Hranice:** smazání šablony nemění existující stránky, které ji použily.
 - **Stav:** ✅
 - **Kód:** FE `tabs/PageTemplatesTab.tsx`, `pages/api/useWorldPageTemplates.ts`.
+
+### Tab Mapy (výchozí nastavení map světa — 15.4 E)
+- **Co to je:** PJ nastaví výchozí parametry map světa: typ mřížky (hex/čtverec/žádná), velikost buňky, měřítko (jednotek/buňku + jednotka), zobrazit stupnici, viditelnost HP (PC/NPC/bestie), povolit kreslení hráčům. **Každá nově založená scéna je zdědí**; existující scény zůstávají a každou lze přepsat v „Upravit scénu".
+- **Kdo (FE):** tab PJ+. **Kdo (BE):** `PUT /worlds/:worldId/settings` (`mapDefaults`, PJ+ `canAdminWorld`).
+- **Zvláštnost:** seed je **server-side** v `MapsService.create` (jen když scéna není ze šablony ani s explicitním configem) — schválně mimo `CreateMapDto` (jeho `HexConfigDto` whitelist by nová pole zahodil). `mapDefaults` = volný objekt na `WorldSettings` (vzor `pjChatPersona`).
+- **Hranice:** dědí jen NOVÁ scéna; změna defaultů nepřepíše existující scény.
+- **Kód:** FE `tabs/MapDefaultsTab.tsx`; BE `worlds` (schema/interface/dto/repo `mapDefaults`) + `maps/maps.service.ts` (seed v `create`).
 
 ### Tab Šablona deníku (diary schema editor)
 - **Co to je:** editor schématu deníku postavy (8.5). Záložka jen pro svět se systémem **„Vlastní Systém"** (`SYSTEM_CUSTOM_ID = 'vlastni'`) — u presetů je schema seedované automaticky.
