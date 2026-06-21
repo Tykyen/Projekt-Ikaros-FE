@@ -2027,24 +2027,28 @@ export function TacticalMapView(): React.ReactElement {
             }
           />
         )}
-        {isPJ && scene && (
-          <MapToolDock title="🎨 Efekty" storageKey="effects">
-            <EffectsPalette
-              tool={effectTool}
-              effectCount={scene.effects.length}
-              onClearAll={handleClearAllEffects}
-            />
-          </MapToolDock>
-        )}
-        {/* 15.4 — kreslení (anotace) hned pod efekty; PJ vždy, hráč když scéna povolí. */}
-        {scene && canDraw && (
-          <MapToolDock title="✏️ Kreslení" storageKey="drawing" defaultCollapsed>
-            <MapDrawingControls
-              tool={drawingTool}
-              isPJ={isPJ}
-              onClearMine={handleClearMyDrawings}
-              onClearAll={handleClearAllDrawings}
-            />
+        {/* 15.4 — kreslení je SOUČÁSTÍ docku Efekty (PJ efekty + kresby; hráč
+            jen kresby, když scéna povolí). */}
+        {scene && (isPJ || canDraw) && (
+          <MapToolDock title="🎨 Efekty & kreslení" storageKey="effects">
+            {isPJ && (
+              <EffectsPalette
+                tool={effectTool}
+                effectCount={scene.effects.length}
+                onClearAll={handleClearAllEffects}
+              />
+            )}
+            {canDraw && (
+              <>
+                {isPJ && <div className={styles.dockDivider}>✏️ Kreslení</div>}
+                <MapDrawingControls
+                  tool={drawingTool}
+                  isPJ={isPJ}
+                  onClearMine={handleClearMyDrawings}
+                  onClearAll={handleClearAllDrawings}
+                />
+              </>
+            )}
           </MapToolDock>
         )}
         {isPJ && scene && (
@@ -2058,6 +2062,7 @@ export function TacticalMapView(): React.ReactElement {
             />
           </MapToolDock>
         )}
+        {/* 15.3 — měření (pravítko) je SOUČÁSTÍ docku Zobrazení (hráč i PJ). */}
         <MapToolDock title="🖥️ Zobrazení" storageKey="view">
           <MapZoomControls
             zoom={panZoom.zoom}
@@ -2066,16 +2071,16 @@ export function TacticalMapView(): React.ReactElement {
             onReset={panZoom.resetZoom}
             fullscreenTargetRef={viewportRef}
           />
-        </MapToolDock>
-        {/* 15.3 — měření (pravítko) hned pod zobrazením; hráč i PJ. */}
-        {scene && (
-          <MapToolDock title="📏 Měření" storageKey="measure" defaultCollapsed>
+          {scene && (
+            <div className={styles.dockDivider}>📏 Měření</div>
+          )}
+          {scene && (
             <MapMeasureControls
               active={rulerActive}
               onToggle={() => setRulerActive((v) => !v)}
             />
-          </MapToolDock>
-        )}
+          )}
+        </MapToolDock>
         {/* 10.2n — ambient ovládání (PJ) pod Zobrazením v pravém dolním stacku.
             Vlastní sbalitelná hlavička (· vysílá indikátor) + cyan sound-accent. */}
         {isPJ && scene && (
