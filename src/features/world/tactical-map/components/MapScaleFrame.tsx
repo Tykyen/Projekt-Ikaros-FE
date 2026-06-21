@@ -1,14 +1,17 @@
 /**
- * 15.3 — stupnice (měřítko) po okraji mapy. „Ohraničí" mapu pravítkem se
- * značkami po buňkách a popiskem v jednotkách scény (`unitsPerCell`/`unitLabel`).
- * Viditelná všem (z `config`), gate `config.showScale !== false` + existující
- * `mapBounds` (bez mapy nemá měřítko smysl).
+ * 15.3 — stupnice (měřítko) jako opravdové PRAVÍTKO kolem mapy.
  *
- * Rozteč značek = rozteč buňky daného typu mřížky (z `GridAdapter.toPixel`):
- * square = `size`, hex flat-top = `√3·size` (X) / `1,5·size` (Y). Jedna buňka =
- * `unitsPerCell` jednotek; popisek po 5 buňkách udává vzdálenost od rohu mapy.
+ * Dílky jsou stupňované po **jednotkách scény** (ne po buňkách) — jako mm/cm na
+ * fyzickém pravítku: jemný dílek (krátký), půlený (střední), hlavní s číslem
+ * (dlouhý), čísla v kulatých hodnotách (0, 5, 10, …). Lemuje celý okraj mapy
+ * (uzavřený rám, dílky + čísla na všech 4 hranách), takže hráč změří délku
+ * odkudkoli. Vidí ji všichni (z `config`); gate `showScale !== false`.
  *
- * Žije uvnitř transform rootu (pan/zoom s mapou) jako vlastní layer.
+ * Měřítko: `pxPerUnit = rozteč buňky / unitsPerCell` (rozteč z `GridAdapter`).
+ * Hlavní (číslovaný) dílek se volí tak, aby vyšel na ~70 px a kulaté číslo
+ * (1-2-5 řada); jemný dílek = 1/10 hlavního, půlený = 1/2.
+ *
+ * Žije uvnitř transform rootu (pan/zoom s mapou).
  *
  * Spec: docs/arch/phase-15/spec-15.2-15.4.md §2.2.
  */
@@ -24,45 +27,56 @@ interface Props {
   mapBounds: MapBounds | null;
 }
 
-const MINOR_TICK = 6;
-const MAJOR_TICK = 13;
-const MAJOR_EVERY = 5;
+/** Cílová rozteč číslovaných dílků v px (jednotka volby „nice" kroku). */
+const TARGET_MAJOR_PX = 72;
+const MINOR_LEN = 5; // jemný (1/10)
+const MID_LEN = 9; // půlený (1/2)
+const MAJOR_LEN = 15; // hlavní (s číslem)
+const MAX_TICKS = 4000; // strop proti zaseknutí (malá jednotka × obří mapa)
 
-/** Formát čísla bez zbytečných nul (7.5 → „7,5", 3 → „3"). */
+/** Kulatý krok z 1-2-5 řady ≥ raw. */
+function niceStep(raw: number): number {
+  if (raw <= 0 || !Number.isFinite(raw)) return 1;
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / pow;
+  const step = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10;
+  return step * pow;
+}
+
+/** Formát čísla bez zbytečných nul (7.5 → „7,5"). */
 function fmt(n: number): string {
   return (Math.round(n * 100) / 100).toString().replace('.', ',');
 }
 
-interface TickAxis {
-  /** Indexy major značek (k) + jejich pozice v px a hodnota od rohu. */
-  majors: { pos: number; value: number }[];
-  /** Pozice všech minor značek v px. */
-  minors: number[];
+interface RulerTick {
+  pos: number;
+  level: 0 | 1 | 2; // 0 jemný · 1 půlený · 2 hlavní (číslo)
+  value: number;
 }
 
-/** Spočítá značky podél jedné osy v rozsahu [min,max], rozteč `pitch`, origin. */
-function axisTicks(
-  min: number,
-  max: number,
-  pitch: number,
-  origin: number,
-  unitsPerCell: number,
-): TickAxis {
-  const majors: { pos: number; value: number }[] = [];
-  const minors: number[] = [];
-  if (pitch <= 0) return { majors, minors };
-  const kStart = Math.ceil((min - origin) / pitch);
-  const kEnd = Math.floor((max - origin) / pitch);
-  // Bezpečnostní strop (velmi malá buňka × obří mapa).
-  if (kEnd - kStart > 2000) return { majors, minors };
-  for (let k = kStart; k <= kEnd; k++) {
-    const pos = origin + k * pitch;
-    minors.push(pos);
-    if ((k - kStart) % MAJOR_EVERY === 0) {
-      majors.push({ pos, value: (k - kStart) * unitsPerCell });
-    }
+/** Dílky podél jedné osy od `startPx` po délce `lengthPx`, `pxPerUnit`. */
+function buildAxis(
+  startPx: number,
+  lengthPx: number,
+  pxPerUnit: number,
+): RulerTick[] {
+  if (pxPerUnit <= 0 || !Number.isFinite(pxPerUnit) || lengthPx <= 0) return [];
+  const majorUnit = niceStep(TARGET_MAJOR_PX / pxPerUnit);
+  const minorUnit = majorUnit / 10;
+  const maxUnit = lengthPx / pxPerUnit;
+  const n = Math.floor(maxUnit / minorUnit + 1e-6);
+  if (n > MAX_TICKS) return [];
+  const ticks: RulerTick[] = [];
+  for (let i = 0; i <= n; i++) {
+    const u = i * minorUnit;
+    const level: 0 | 1 | 2 = i % 10 === 0 ? 2 : i % 5 === 0 ? 1 : 0;
+    ticks.push({ pos: startPx + u * pxPerUnit, level, value: u });
   }
-  return { majors, minors };
+  return ticks;
+}
+
+function tickLen(level: 0 | 1 | 2): number {
+  return level === 2 ? MAJOR_LEN : level === 1 ? MID_LEN : MINOR_LEN;
 }
 
 export function MapScaleFrame({
@@ -74,69 +88,49 @@ export function MapScaleFrame({
   const unitsPerCell = config.unitsPerCell ?? 1;
   const unitLabel = config.unitLabel ?? 'm';
 
+  // Rozteč buňky v px (z geometrie mřížky) → px na jednotku scény.
   const origin0 = adapter.toPixel(0, 0, config.size);
   const pitchX =
     adapter.toPixel(1, 0, config.size).x - origin0.x || config.size;
   const pitchY =
     adapter.toPixel(0, 1, config.size).y - origin0.y || config.size;
+  const pxPerUnitX = pitchX / unitsPerCell;
+  const pxPerUnitY = pitchY / unitsPerCell;
 
-  const { xAxis, yAxis } = useMemo(() => {
-    if (!mapBounds) {
-      return { xAxis: null as TickAxis | null, yAxis: null as TickAxis | null };
-    }
+  const { xTicks, yTicks } = useMemo(() => {
+    if (!mapBounds) return { xTicks: [], yTicks: [] };
     return {
-      xAxis: axisTicks(
-        mapBounds.x,
-        mapBounds.x + mapBounds.width,
-        pitchX,
-        config.originX,
-        unitsPerCell,
-      ),
-      yAxis: axisTicks(
-        mapBounds.y,
-        mapBounds.y + mapBounds.height,
-        pitchY,
-        config.originY,
-        unitsPerCell,
-      ),
+      xTicks: buildAxis(mapBounds.x, mapBounds.width, pxPerUnitX),
+      yTicks: buildAxis(mapBounds.y, mapBounds.height, pxPerUnitY),
     };
-  }, [mapBounds, pitchX, pitchY, config.originX, config.originY, unitsPerCell]);
+  }, [mapBounds, pxPerUnitX, pxPerUnitY]);
 
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
-      if (!mapBounds || !xAxis || !yAxis) return;
+      if (!mapBounds) return;
       const top = mapBounds.y;
       const left = mapBounds.x;
       const right = mapBounds.x + mapBounds.width;
       const bottom = mapBounds.y + mapBounds.height;
-      // Osa X — značky na HORNÍ (dolů) i DOLNÍ (nahoru) hraně.
-      for (const x of xAxis.minors) {
-        g.moveTo(x, top);
-        g.lineTo(x, top + MINOR_TICK);
-        g.moveTo(x, bottom);
-        g.lineTo(x, bottom - MINOR_TICK);
+
+      // Osa X — dílky na horní (dolů) i dolní (nahoru) hraně.
+      for (const t of xTicks) {
+        const len = tickLen(t.level);
+        g.moveTo(t.pos, top);
+        g.lineTo(t.pos, top + len);
+        g.moveTo(t.pos, bottom);
+        g.lineTo(t.pos, bottom - len);
       }
-      for (const m of xAxis.majors) {
-        g.moveTo(m.pos, top);
-        g.lineTo(m.pos, top + MAJOR_TICK);
-        g.moveTo(m.pos, bottom);
-        g.lineTo(m.pos, bottom - MAJOR_TICK);
+      // Osa Y — dílky na levé (doprava) i pravé (doleva) hraně.
+      for (const t of yTicks) {
+        const len = tickLen(t.level);
+        g.moveTo(left, t.pos);
+        g.lineTo(left + len, t.pos);
+        g.moveTo(right, t.pos);
+        g.lineTo(right - len, t.pos);
       }
-      // Osa Y — značky na LEVÉ (doprava) i PRAVÉ (doleva) hraně.
-      for (const y of yAxis.minors) {
-        g.moveTo(left, y);
-        g.lineTo(left + MINOR_TICK, y);
-        g.moveTo(right, y);
-        g.lineTo(right - MINOR_TICK, y);
-      }
-      for (const m of yAxis.majors) {
-        g.moveTo(left, m.pos);
-        g.lineTo(left + MAJOR_TICK, m.pos);
-        g.moveTo(right, m.pos);
-        g.lineTo(right - MAJOR_TICK, m.pos);
-      }
-      // Uzavřený rám kolem celé mapy (4 hrany).
+      // Uzavřený rám kolem celé mapy.
       g.moveTo(left, top);
       g.lineTo(right, top);
       g.lineTo(right, bottom);
@@ -145,15 +139,15 @@ export function MapScaleFrame({
       g.stroke({
         color: theme.gridStroke,
         width: theme.gridStrokeWidth,
-        alpha: 0.9,
+        alpha: 0.95,
       });
     },
-    [mapBounds, xAxis, yAxis, theme.gridStroke, theme.gridStrokeWidth],
+    [mapBounds, xTicks, yTicks, theme.gridStroke, theme.gridStrokeWidth],
   );
 
-  if (config.showScale === false || !mapBounds || !xAxis || !yAxis) return null;
+  if (config.showScale === false || !mapBounds) return null;
 
-  const fontSize = Math.max(9, Math.round(config.size * 0.32));
+  const fontSize = Math.max(9, Math.round(config.size * 0.3));
   const labelStyle = {
     fontFamily: 'monospace',
     fontSize,
@@ -162,28 +156,32 @@ export function MapScaleFrame({
   } as const;
   const right = mapBounds.x + mapBounds.width;
   const bottom = mapBounds.y + mapBounds.height;
+  const xMajors = xTicks.filter((t) => t.level === 2);
+  const yMajors = yTicks.filter((t) => t.level === 2);
 
   return (
     <pixiContainer label="scale-frame">
       <pixiGraphics draw={draw} />
-      {/* Popisky osy X — nad horní hranou i pod dolní (poslední nese jednotku). */}
-      {xAxis.majors.map((m, i) => {
-        const isLast = i === xAxis.majors.length - 1;
-        const text = i === 0 ? '0' : isLast ? `${fmt(m.value)} ${unitLabel}` : fmt(m.value);
+      {/* Čísla osy X — nad horní i pod dolní hranou (poslední nese jednotku). */}
+      {xMajors.map((t, i) => {
+        const text =
+          i === xMajors.length - 1
+            ? `${fmt(t.value)} ${unitLabel}`
+            : fmt(t.value);
         return (
           <pixiContainer key={`x${i}`}>
             <pixiText
               text={text}
-              x={m.pos}
-              y={mapBounds.y - fontSize * 0.7}
+              x={t.pos}
+              y={mapBounds.y - fontSize * 0.8}
               anchor={0.5}
               resolution={2}
               style={labelStyle}
             />
             <pixiText
               text={text}
-              x={m.pos}
-              y={bottom + fontSize * 0.7}
+              x={t.pos}
+              y={bottom + fontSize * 0.8}
               anchor={0.5}
               resolution={2}
               style={labelStyle}
@@ -191,16 +189,18 @@ export function MapScaleFrame({
           </pixiContainer>
         );
       })}
-      {/* Popisky osy Y — vlevo od levé hrany i vpravo od pravé. */}
-      {yAxis.majors.map((m, i) => {
-        const isLast = i === yAxis.majors.length - 1;
-        const text = isLast ? `${fmt(m.value)} ${unitLabel}` : fmt(m.value);
+      {/* Čísla osy Y — vlevo od levé i vpravo od pravé hrany. */}
+      {yMajors.map((t, i) => {
+        const text =
+          i === yMajors.length - 1
+            ? `${fmt(t.value)} ${unitLabel}`
+            : fmt(t.value);
         return (
           <pixiContainer key={`y${i}`}>
             <pixiText
               text={text}
               x={mapBounds.x - fontSize * 1.8}
-              y={m.pos}
+              y={t.pos}
               anchor={0.5}
               resolution={2}
               style={labelStyle}
@@ -208,7 +208,7 @@ export function MapScaleFrame({
             <pixiText
               text={text}
               x={right + fontSize * 1.8}
-              y={m.pos}
+              y={t.pos}
               anchor={0.5}
               resolution={2}
               style={labelStyle}
