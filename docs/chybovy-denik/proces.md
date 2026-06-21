@@ -21,3 +21,11 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** „Build prošel, ale soubor nenalezen" / eslint nenajde čerstvě zapsaný soubor.
 
 ---
+
+### CH-015 — Cyklení na vzhledu UI (stupnice mapy), protože uživatel testoval PROD a mé změny byly lokální/necommitnuté · 2026-06-21
+**Kontext:** 15.3 stupnice mapy `MapScaleFrame` prošla ~5 iteracemi vzhledu (L-tvar → plný rám → pravítko po jednotkách → vyplněná lišta → průhlednost). Uživatel po každé poslal feedback ze **screenshotu produkce** (`www.projekt-ikaros.com`), jenže ten běžel na jeho **posledním FE commitu** — moje úpravy byly lokální, necommitnuté → uživatel reagoval pořád na PŘEDCHOZÍ (nebo úplně starou) verzi. „Zase špatně" často znamenalo „nevidím to, cos udělal", ne „udělals to špatně".
+**Co jsem udělal špatně:** Iteroval jsem vizuál dál a dál, aniž jsem **vynutil nasazení** mezi koly. Feedback loop byl rozbitý (porovnává se proti stale stavu), takže konvergence nebyla možná, jen pseudo-cyklení. Flagoval jsem deploy-gap, ale pozdě/málo důrazně a nezastavil jsem se.
+**Poučení:** **Vizuální feedback na produkci vyžaduje deploy.** Když uživatel testuje prod a mé změny jsou lokální → než si vyžádám další vizuální feedback, MUSÍ být předchozí verze nasazená (commit+push+deploy), jinak se točíme nadarmo. Buď řešit deploy mezi koly, nebo vizuální změnu nasbírat a nasadit jednorázově. Deploy-gap hlásit HNED a důrazně, ideálně blokovat další iteraci, dokud se nevyřeší.
+**Příznak cyklení:** ≥3 kola „oprav vzhled X" na téže komponentě + feedback ze screenshotu produkce + mé změny stále necommitnuté.
+
+---

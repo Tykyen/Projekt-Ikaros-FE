@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-015.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-016.**
 
 ## Jak je deník členěný
 
@@ -46,4 +46,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--153-měřítko-stupnice--sdílené-pravítko-přes-ws-vzor-pingu--2026-06-21) | fe/BE | 15.3 měřítko (`MapScaleFrame`) + sdílené pravítko = reuse ephemeral WS vzoru pingu (emit→broadcast, 0 úložiště); BE klíčuje per-user authenticated userId (ne payload); all-roles vs spotlight PJ-only | — (zabralo) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--154-kreslení-anotace-na-mapě-perzistované-scenedrawings-vzor-effects--2026-06-21) | fe/BE | 15.4 kreslení/anotace = perzistované `scene.drawings`, **mirror effects** (schema+3 ops+apply/inverse+authorizer+repo+FE apply/layer) → infra zdarma; authorizer: hráč jen `allowPlayerDrawing` && vlastní | — (zabralo) |
 | [CH-014](proces.md#ch-014--set-location-powershell-tiše-přesunul-i-bash-cwd--tsc--b-běžel-ve-špatném-repu-falešný-zelený--2026-06-21) | proces | `Set-Location` (PS) přepsal i Bash cwd → `tsc -b` běžel v backendu (falešný zelený), FE neověřené; před build/test ověř `pwd` | „build prošel, ale soubor nenalezen" |
+| [CH-015](proces.md#ch-015--cyklení-na-vzhledu-ui-stupnice-mapy-protože-uživatel-testoval-prod-a-mé-změny-byly-lokálnínecommitnuté--2026-06-21) | proces | Cyklení na vzhledu UI: uživatel testuje PROD, mé změny lokální → feedback vždy na stale verzi → nelze zkonvergovat; vizuál nasaď před dalším feedbackem | ≥3 kola „oprav vzhled X" + screenshot produkce + necommitnuté |
 | [✅ ŘEŠENÍ](fe.md#-řešení--154-e-world-map-defaults-dvouvrstvá-config--be-side-seed--2026-06-21) | fe/BE | 15.4-E world map defaults = dvouvrstvá config (worldSettings.mapDefaults → seed scény → override); **seed BE-side** (create DTO `HexConfigDto` whitelist by nová pole zahodil); inject IWorldSettingsRepository | — (zabralo) |
