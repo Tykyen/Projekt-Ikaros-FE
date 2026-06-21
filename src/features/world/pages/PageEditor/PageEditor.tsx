@@ -415,6 +415,8 @@ export function PageEditor({
           <DataTemplatePanel
             table={state.table}
             onChange={(table) => setField('table', table)}
+            content={state.content}
+            onApplyOutline={(html) => setField('content', html)}
           />
 
           {/* Atributy & metadata hned pod šablonou — šablona předvyplňuje

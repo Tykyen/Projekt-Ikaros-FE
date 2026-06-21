@@ -33,6 +33,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Modal, Button } from '@/shared/ui';
+import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import type {
   CreateWorldPageTemplateInput,
   WorldPageTemplate,
@@ -102,6 +103,8 @@ export function TemplateEditorModal({
   const [defaultTitle, setDefaultTitle] = useState('');
   const [icon, setIcon] = useState<WorldPageTemplateIcon>('FileText');
   const [rows, setRows] = useState<HeaderRow[]>([freshRow()]);
+  // 15.5 — obsahová osnova (TipTap HTML) vkládaná do page.content při create.
+  const [outline, setOutline] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -127,6 +130,7 @@ export function TemplateEditorModal({
           ? existing.headers.map((h) => freshRow(h))
           : [freshRow()],
       );
+      setOutline(existing.contentOutline ?? '');
     } else if (open) {
       setLabel('');
       setKeySlug('');
@@ -134,6 +138,7 @@ export function TemplateEditorModal({
       setDefaultTitle('');
       setIcon('FileText');
       setRows([freshRow()]);
+      setOutline('');
     }
     if (open) setError(null);
   }
@@ -195,6 +200,7 @@ export function TemplateEditorModal({
       label: cleanedLabel,
       headers,
       defaultTitle: defaultTitle.trim() || undefined,
+      contentOutline: outline.trim() || undefined,
       icon,
     });
   }
@@ -303,6 +309,22 @@ export function TemplateEditorModal({
           <button type="button" onClick={addRow} className={s.addRowBtn}>
             <Plus size={14} aria-hidden /> Přidat hlavičku
           </button>
+        </div>
+
+        <div className={s.field}>
+          <span className={s.label}>
+            Osnova obsahu (volitelné){' '}
+            <small className={s.hint}>
+              předvyplní textové tělo nové stránky — jen když je prázdné
+            </small>
+          </span>
+          <RichTextEditor
+            value={outline}
+            onChange={setOutline}
+            maxLength={100_000}
+            placeholder="Nadpisy a návodné prompty (např. Vzhled, Motivace, Tajemství…)"
+            className={s.outlineEditor}
+          />
         </div>
 
         {error && <p className={s.error}>{error}</p>}

@@ -129,6 +129,11 @@ export function WorldSection() {
             <code>Ctrl+S</code> ukládá, Náhled ukáže živý preview. Rozepsaná stránka
             se uloží jako draft.
           </p>
+          <p>
+            Datová šablona z pruhu předvyplní tabulku (a u některých i kostru textu —
+            nadpisy s nápovědou, ať prázdná stránka nestraší). Osnovu vloží jen do
+            prázdného textu, takže ti nikdy nepřepíše, co už máš napsané.
+          </p>
         </Tool>
         <Tool icon={<FileText size={16} />} title="Index a Správa stránek" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="corrector">
           <p>

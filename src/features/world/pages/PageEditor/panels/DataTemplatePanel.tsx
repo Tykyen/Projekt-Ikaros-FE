@@ -39,6 +39,21 @@ import s from './DataTemplatePanel.module.css';
 interface Props {
   table: PageTable;
   onChange: (table: PageTable) => void;
+  /** 15.5 — aktuální obsah stránky; osnova se vkládá jen když je prázdný. */
+  content: string;
+  /** 15.5 — vloží osnovu šablony do `page.content` (jen prázdný content). */
+  onApplyOutline: (html: string) => void;
+}
+
+/** Prázdný TipTap content = bez textu (pokrývá `<p></p>`, `<p><br></p>`, …). */
+function isContentEmpty(html: string): boolean {
+  if (!html) return true;
+  return (
+    html
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .trim().length === 0
+  );
 }
 
 const ICON_MAP: Record<WorldPageTemplateIcon, LucideIcon> = {
@@ -67,7 +82,12 @@ type PendingSwitch =
   | { kind: 'free' }
   | { kind: 'template'; template: WorldPageTemplate };
 
-export function DataTemplatePanel({ table, onChange }: Props) {
+export function DataTemplatePanel({
+  table,
+  onChange,
+  content,
+  onApplyOutline,
+}: Props) {
   const { worldId, worldSlug } = useWorldContext();
   const { data: templates = [], isLoading } = useWorldPageTemplates(worldId);
   const [pending, setPending] = useState<PendingSwitch | null>(null);
@@ -98,6 +118,10 @@ export function DataTemplatePanel({ table, onChange }: Props) {
       headers: [...t.headers],
       values: t.headers.map(() => ''),
     });
+    // 15.5 — osnovu vlož jen do prázdného textu, ať nepřepíšeme napsaný obsah.
+    if (t.contentOutline && isContentEmpty(content)) {
+      onApplyOutline(t.contentOutline);
+    }
     setPending(null);
   }
 
@@ -166,6 +190,7 @@ export function DataTemplatePanel({ table, onChange }: Props) {
                 <span className={s.cardLabel}>{t.label}</span>
                 <span className={s.cardDesc}>
                   {t.headers.length} {t.headers.length === 1 ? 'pole' : 'polí'}
+                  {t.contentOutline ? ' · osnova' : ''}
                 </span>
               </button>
             );

@@ -205,3 +205,15 @@
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
+
+/* 15.5 — editor osnovy: ohraničení jako ostatní pole + limit výšky v modalu. */
+.outlineEditor {
+  border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.3));
+  border-radius: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.outlineEditor:focus-within {
+  border-color: var(--accent-bright, #3b5af6);
+}

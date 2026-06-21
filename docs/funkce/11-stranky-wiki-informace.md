@@ -173,7 +173,7 @@ Plnohodnotný editor pro tvorbu i úpravu stránek, panelová struktura.
 ### Co jde dělat (VŠE)
 Panely (`PageEditor.tsx:397`):
 - **IdentityPanel** — název, typ (switch s warning modalem na ztrátu dat), hero obrázek + výřez (focal/zoom/fit), bigImage, isWoodWide, order.
-- **DataTemplatePanel** — stripe karet datových šablon (per-svět `WorldPageTemplate`); „Volný text" + per-svět šablony aplikují headers + defaultTitle.
+- **DataTemplatePanel** — stripe karet datových šablon (per-svět `WorldPageTemplate`); „Volný text" + per-svět šablony aplikují headers + defaultTitle; šablona s osnovou (15.5) navíc vloží `contentOutline` do prázdného `content`.
 - **TablePanel** — atributová tabulka (headers/values, rich-text buňky s inline odkazy).
 - **GalleryPanel** (typ Galerie), **VideosPanel** (Obrazovka), **MenuPanel** (Seznam), **CustomDataPanel** (Noviny), **PostavaPanel** (PC/NPC — výběr ownera).
 - **ContentPanel** — TipTap rich-text: B/I/U/S/sup/sub, nadpisy H2/H3, seznamy, citace, **tabulky** (`enableTable`), barvy, bloky. Wikilink `[[` dropdown (`useWikilinkExtension`), broken-link dekorace, image upload (Cloudinary), `StyleRail` (permanentní toolbar) + bubble menu, `LinkPickerPopover` pro vkládání odkazů (`linkDirectory` + `linkMakeSlug`).
@@ -192,7 +192,7 @@ Save flow:
 
 ### Hranice — co neumí
 - Editor needituje subdokumenty postavy (deník/finance/…) — ty mají vlastní rozhraní (CharacterDetailPage). PageEditor pro PC/NPC řeší jen `ownerUserId` a AKJ záložky.
-- Šablony (`WorldPageTemplate`) plní jen `table.headers`/`defaultTitle`, ne `content` ani sekce — je to šablona atributové tabulky, ne celé stránky.
+- Šablony (`WorldPageTemplate`) plní `table.headers`/`defaultTitle` + volitelně osnovu do prázdného `content` (15.5) — neplní `values` ani sekce; není to šablona celé stránky.
 - Type switch může ztratit data (warning modal `TypeSwitchWarningModal` to hlásí, ale neuchovává).
 
 ### Zvláštnosti
@@ -307,17 +307,29 @@ Per-svět šablony **atributové tabulky** (NE celé stránky, NE deníkové sch
 - Create/Update/Delete: `assertCanManage` = platform Admin+ NEBO world role >= **Korektor** (`:130`). Pozn.: nižší práh než stránky (PomocnyPJ)! Komentář to zdůvodňuje konzistencí s tabem „Vzhled".
 
 ### Co obsahuje šablona
-`key` (unique/svět), `label`, `headers[]` (hlavičky tabulky), `defaultTitle`, `icon` (whitelist 10 Lucide ikon), `order`. Matrix svět dostává 6 výchozích šablon v seedu; ostatní startují prázdné.
+`key` (unique/svět), `label`, `headers[]` (hlavičky tabulky), `defaultTitle`, `contentOutline` (15.5 — obsahová osnova, sanitizovaný TipTap HTML), `icon` (whitelist 10 Lucide ikon), `order`. Matrix svět dostává 6 výchozích šablon v seedu (vč. osnov); ostatní startují prázdné.
+
+### Co jde dělat
+- Spravovat šablony (CRUD) v Nastavení světa → Šablony — modal `TemplateEditorModal` (label/key/defaultTitle/ikona/headers + **osnova přes `RichTextEditor` bez tabulek**).
+- V editoru stránky vybrat šablonu na stripe karet (`DataTemplatePanel`) → aplikuje `headers` + `defaultTitle` do tabulky; karta s osnovou nese popisek „· osnova".
+- **15.5 — vložení osnovy do textu:** výběr šablony s `contentOutline` vloží osnovu do `page.content`, **ale jen když je content prázdný** (`isContentEmpty` — pokrývá `<p></p>`); rozepsaný text se nikdy nepřepíše.
 
 ### Hranice — co neumí
-- Šablona aplikuje jen `headers` + `defaultTitle` + nastaví prázdné `values` — neplní content, sekce, ani metadata. Je to jen kostra tabulky.
+- Šablona aplikuje `headers` + `defaultTitle` + prázdné `values` + (volitelně) osnovu do prázdného contentu — **neplní hodnoty tabulky ani sekce**.
+- Osnovu **nelze** vložit do už rozepsané stránky (žádné „přepsat textem osnovy") — kdo chce osnovu do napsaného textu, musí ho nejdřív smazat.
+- Osnova je per-šablona, **nevázaná na typ stránky** (PAGE_TYPES) — varianta A (osnova podle typu) zamítnuta; žádné substituce/AI generování.
+- Seed je idempotentní → na **už naseedovaném** Matrixu se osnovy ke stávajícím šablonám nedoplní samy (PJ ručně, nebo migrace mimo scope).
 - **POZOR na názvosloví:** prompt zmiňuje „Šablona deníku" v Nastavení světa — to je JINÁ věc (diary schema, `diary-schema-versions` / `personalDiarySchema`), ne tento `WorldPageTemplate`. Tento modul je „datová šablona stránky / atributová tabulka".
 
+### Zvláštnosti
+- Osnova se **sanitizuje při uložení šablony** (`sanitizeRichText` v service, create i update; prázdný string = mazání osnovy) — žádné uložené XSS čekající na vložení do contentu.
+- Editor osnovy běží **bez** `enableTable` → TipTap tabulku nedovolí vložit (jinak by ji `page.content` viewer tiše zahodil, `project_page_content_no_tables`).
+
 ### Stav
-✅ Funkční.
+✅ Funkční (osnova obsahu = krok 15.5).
 
 ### Kód
-BE `world-page-templates.service.ts:38`, interface `:8`; FE `PageEditor/panels/DataTemplatePanel.tsx:70`.
+BE `world-page-templates.service.ts:40` (create+sanitize), interface `:8`, schema `contentOutline`, seed `world-page-templates.matrix-seed.ts`; FE editor `WorldSettingsPage/components/TemplateEditorModal.tsx`, vložení `PageEditor/panels/DataTemplatePanel.tsx:94`.
 
 ---
 

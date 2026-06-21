@@ -210,7 +210,8 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **FE:** jednoduchá kreslicí vrstva (free-draw, tvary, text) s mazáním.
 **Otevřené otázky:** Kdo smí kreslit (PJ vs. hráči)? Ukládat kresby do scény trvale?
 
-### - [ ] 15.5 Osnovy & šablony stránek — [C4 · dopad nízký · náklad malý] 🔁
+### - [x] 15.5 Osnovy & šablony stránek — [C4 · dopad nízký · náklad malý] 🔁 ✅ 2026-06-21
+**Hotovo (2026-06-21):** Varianta B (spec [spec-15.5.md](arch/phase-15/spec-15.5.md)) — `WorldPageTemplate` rozšířena o `contentOutline` (sanitizovaný TipTap HTML). PJ/Korektor osnovu edituje v Nastavení světa → Šablony (`RichTextEditor` **bez tabulek** = past `project_page_content_no_tables` řešena u kořene). Výběr šablony v editoru stránky vloží osnovu do `page.content` **jen když je prázdný** (`isContentEmpty`, nikdy nepřepíše napsané). Matrix seed: 6 výchozích šablon dostalo osnovy. BE 5 míst od `toEntity` mapperu + sanitize (create+update). Build ✓, jest 17/17, vitest DataTemplatePanel 9/9. **Odchylka od původního cíle:** osnova je **per-šablona, NEvázaná na typ stránky** (otevřená otázka „provázat s typem" → ne, varianta A zamítnuta). **Po BE změně restart.**
 **Cíl:** Předvyplněné osnovy podle typu stránky (Postava: vzhled / motivace / tajemství…).
 **Proč:** Prázdná stránka děsí; osnova snižuje bariéru tvorby. Máme šablony stránek na úrovni světa — chybí obsahové prompty.
 **Návrh přípravy:** sada osnov per typ (lokace/frakce/osoba/…); volitelné při zakládání stránky.

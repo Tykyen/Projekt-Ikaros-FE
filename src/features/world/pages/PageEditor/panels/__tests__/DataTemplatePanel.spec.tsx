@@ -63,7 +63,12 @@ describe('DataTemplatePanel', () => {
   });
 
   it('vykreslí „Volný text" + per-svět šablony', () => {
-    renderPanel(<DataTemplatePanel table={EMPTY_TABLE} onChange={() => {}} />);
+    renderPanel(<DataTemplatePanel
+        table={EMPTY_TABLE}
+        onChange={() => {}}
+        content=""
+        onApplyOutline={() => {}}
+      />);
     expect(screen.getByText('Volný text')).toBeInTheDocument();
     expect(screen.getByText('Stát')).toBeInTheDocument();
     expect(screen.getByText('Město')).toBeInTheDocument();
@@ -71,7 +76,12 @@ describe('DataTemplatePanel', () => {
 
   it('prázdný svět ukáže jen „Volný text" a hint', () => {
     mockTemplates = [];
-    renderPanel(<DataTemplatePanel table={EMPTY_TABLE} onChange={() => {}} />);
+    renderPanel(<DataTemplatePanel
+        table={EMPTY_TABLE}
+        onChange={() => {}}
+        content=""
+        onApplyOutline={() => {}}
+      />);
     expect(screen.getByText('Volný text')).toBeInTheDocument();
     expect(screen.queryByText('Stát')).not.toBeInTheDocument();
     expect(screen.getByText(/Vytvořit v Nastavení/)).toBeInTheDocument();
@@ -79,7 +89,12 @@ describe('DataTemplatePanel', () => {
 
   it('klik na šablonu na prázdnou tabulku aplikuje headers + defaultTitle', async () => {
     const onChange = vi.fn();
-    renderPanel(<DataTemplatePanel table={EMPTY_TABLE} onChange={onChange} />);
+    renderPanel(<DataTemplatePanel
+        table={EMPTY_TABLE}
+        onChange={onChange}
+        content=""
+        onApplyOutline={() => {}}
+      />);
     await userEvent.click(screen.getByText('Stát'));
     expect(onChange).toHaveBeenCalledWith({
       hasTable: true,
@@ -91,7 +106,12 @@ describe('DataTemplatePanel', () => {
 
   it('„Volný text" karta na prázdné table = no-op (žádný warning modal)', async () => {
     const onChange = vi.fn();
-    renderPanel(<DataTemplatePanel table={EMPTY_TABLE} onChange={onChange} />);
+    renderPanel(<DataTemplatePanel
+        table={EMPTY_TABLE}
+        onChange={onChange}
+        content=""
+        onApplyOutline={() => {}}
+      />);
     await userEvent.click(screen.getByText('Volný text'));
     expect(onChange).toHaveBeenCalledWith({
       hasTable: false,
@@ -109,7 +129,12 @@ describe('DataTemplatePanel', () => {
       headers: ['x'],
       values: ['y'],
     };
-    renderPanel(<DataTemplatePanel table={tableWithData} onChange={onChange} />);
+    renderPanel(<DataTemplatePanel
+        table={tableWithData}
+        onChange={onChange}
+        content=""
+        onApplyOutline={() => {}}
+      />);
     await userEvent.click(screen.getByText('Město'));
     // Modal se objeví — onChange ne hned.
     expect(onChange).not.toHaveBeenCalled();
@@ -134,7 +159,12 @@ describe('DataTemplatePanel', () => {
       headers: ['x'],
       values: ['y'],
     };
-    renderPanel(<DataTemplatePanel table={tableWithData} onChange={onChange} />);
+    renderPanel(<DataTemplatePanel
+        table={tableWithData}
+        onChange={onChange}
+        content=""
+        onApplyOutline={() => {}}
+      />);
     await userEvent.click(screen.getByText('Volný text'));
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByText(/Přepnutí na „Volný text"/)).toBeInTheDocument();
@@ -147,6 +177,40 @@ describe('DataTemplatePanel', () => {
     });
   });
 
+  it('15.5 — šablona s osnovou na prázdný text vloží osnovu do content', async () => {
+    mockTemplates = [
+      { ...TEMPLATES[0], contentOutline: '<h2>Historie</h2><p></p>' },
+    ];
+    const onApplyOutline = vi.fn();
+    renderPanel(
+      <DataTemplatePanel
+        table={EMPTY_TABLE}
+        onChange={() => {}}
+        content=""
+        onApplyOutline={onApplyOutline}
+      />,
+    );
+    await userEvent.click(screen.getByText('Stát'));
+    expect(onApplyOutline).toHaveBeenCalledWith('<h2>Historie</h2><p></p>');
+  });
+
+  it('15.5 — šablona s osnovou na NEprázdný text osnovu NEvloží', async () => {
+    mockTemplates = [
+      { ...TEMPLATES[0], contentOutline: '<h2>Historie</h2><p></p>' },
+    ];
+    const onApplyOutline = vi.fn();
+    renderPanel(
+      <DataTemplatePanel
+        table={EMPTY_TABLE}
+        onChange={() => {}}
+        content="<p>Už mám napsaný text</p>"
+        onApplyOutline={onApplyOutline}
+      />,
+    );
+    await userEvent.click(screen.getByText('Stát'));
+    expect(onApplyOutline).not.toHaveBeenCalled();
+  });
+
   it('warning modal — „Zrušit" zavře bez změny', async () => {
     const onChange = vi.fn();
     const tableWithData: PageTable = {
@@ -155,7 +219,12 @@ describe('DataTemplatePanel', () => {
       headers: ['x'],
       values: ['y'],
     };
-    renderPanel(<DataTemplatePanel table={tableWithData} onChange={onChange} />);
+    renderPanel(<DataTemplatePanel
+        table={tableWithData}
+        onChange={onChange}
+        content=""
+        onApplyOutline={() => {}}
+      />);
     await userEvent.click(screen.getByText('Město'));
     await userEvent.click(screen.getByRole('button', { name: 'Zrušit' }));
     expect(onChange).not.toHaveBeenCalled();

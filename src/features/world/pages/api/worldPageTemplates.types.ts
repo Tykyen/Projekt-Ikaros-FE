@@ -13,6 +13,11 @@ export interface WorldPageTemplate {
   label: string;
   headers: string[];
   defaultTitle?: string;
+  /**
+   * 15.5 — obsahová osnova (TipTap HTML). Vloží se do `page.content` při
+   * zakládání stránky, jen pokud je content prázdný.
+   */
+  contentOutline?: string;
   /** Lucide-react ikona (jednoduchý slug). Viz `WORLD_PAGE_TEMPLATE_ICONS`. */
   icon?: WorldPageTemplateIcon;
   order: number;
@@ -41,6 +46,8 @@ export interface CreateWorldPageTemplateInput {
   label: string;
   headers: string[];
   defaultTitle?: string;
+  /** 15.5 — obsahová osnova (TipTap HTML). */
+  contentOutline?: string;
   icon?: WorldPageTemplateIcon;
   order?: number;
 }
