@@ -603,6 +603,22 @@ export interface PjChatPersona {
   mode?: 'unified' | 'individual';
 }
 
+/**
+ * 15.4 (E) — výchozí nastavení map světa (PJ nastaví jednou; nová scéna je
+ * zdědí, scéna pak může přepsat). Vše optional = bez nastavení → tvrdé defaulty.
+ */
+export interface MapDefaults {
+  gridType?: 'hex' | 'square' | 'none';
+  size?: number;
+  unitsPerCell?: number;
+  unitLabel?: string;
+  showScale?: boolean;
+  showHpPc?: boolean;
+  showHpNpc?: boolean;
+  showHpBestie?: boolean;
+  allowPlayerDrawing?: boolean;
+}
+
 export interface WorldSettings {
   id: string;
   worldId: string;
@@ -619,6 +635,8 @@ export interface WorldSettings {
   lastInfo?: LastInfo | null;
   /** 6.8 — PJ persona v chatu. `null`/`undefined` = nenastaveno (default „PJ"). */
   pjChatPersona?: PjChatPersona | null;
+  /** 15.4 (E) — výchozí nastavení map (seed nové scény). `null` = nenastaveno. */
+  mapDefaults?: MapDefaults | null;
   akjTypes: AkjType[];
   hideDefaultWeather: boolean;
   /** Side-task character-tab-visibility — pokud chybí, FE považuje vše za viditelné. */

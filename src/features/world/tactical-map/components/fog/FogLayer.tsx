@@ -19,7 +19,7 @@
 import type { Graphics as PixiGraphics } from 'pixi.js';
 import { BlurFilter } from 'pixi.js';
 import { useCallback, useMemo } from 'react';
-import { axialToPixel, getHexPolyPoints } from '../../hexUtils';
+import { getGridAdapter } from '../../grid';
 import { parseHexColor } from '../../hooks/useMapTheme';
 import { hexKey, parseAlpha } from './fogUtils';
 import type { MapBounds } from '../HexGrid';
@@ -57,6 +57,8 @@ export function FogLayer({
   const color = parseHexColor(fill);
   const alpha = parseAlpha(fill);
   const bounds = mapBounds ?? FALLBACK_BOUNDS;
+  // 15.2 — geometrie fog buněk dle typu mřížky scény.
+  const adapter = getGridAdapter(config.gridType);
 
   // Blur = měkké okraje. Strength v map-space px (Matrix feather ≈ size*0.18).
   const blur = useMemo(
@@ -75,7 +77,7 @@ export function FogLayer({
 
       for (let q = -HEX_RANGE; q <= HEX_RANGE; q++) {
         for (let r = -HEX_RANGE; r <= HEX_RANGE; r++) {
-          const center = axialToPixel(q, r, config.size);
+          const center = adapter.toPixel(q, r, config.size);
           center.x += config.originX;
           center.y += config.originY;
           if (
@@ -88,13 +90,13 @@ export function FogLayer({
           }
           if (revealedSet.has(hexKey(q, r))) continue; // odhalený → bez mlhy
           // Mírné překrytí (×1.05), ať mezi sousedy nevzniká neostrá mezera.
-          g.poly(getHexPolyPoints(center, config.size * 1.05));
+          g.poly(adapter.cellPoly(center, config.size * 1.05));
         }
       }
-      // Single fill po loopu — všechny zamlžené hexy jednou barvou.
+      // Single fill po loopu — všechny zamlžené buňky jednou barvou.
       g.fill({ color, alpha });
     },
-    [revealedSet, config, bounds, color, alpha],
+    [revealedSet, config, bounds, color, alpha, adapter],
   );
 
   return <pixiGraphics label="fog" draw={draw} filters={[blur]} />;

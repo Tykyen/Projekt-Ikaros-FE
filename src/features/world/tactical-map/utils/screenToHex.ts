@@ -10,7 +10,7 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9a.md §3.1.
  */
-import { pixelToAxial } from '../hexUtils';
+import { getGridAdapter } from '../grid';
 import type { HexConfig, HexCoord } from '../types';
 
 interface ViewportTransform {
@@ -39,5 +39,5 @@ export function screenToHex(
   const localY = clientY - viewportRect.top;
   const mapX = (localX - panZoom.offsetX) / panZoom.zoom - config.originX;
   const mapY = (localY - panZoom.offsetY) / panZoom.zoom - config.originY;
-  return pixelToAxial(mapX, mapY, config.size);
+  return getGridAdapter(config.gridType).toCell(mapX, mapY, config.size);
 }

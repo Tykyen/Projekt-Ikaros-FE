@@ -10,12 +10,19 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import type { ExplosionRing } from '../types';
+import type { TemplateShape } from '../utils/templateGeometry';
 import {
   PALETTE_COLORS,
   type ExplosionVariant,
 } from '../components/effects/effectColors';
 
-export type EffectTool = 'color' | 'barrier' | 'explosion' | 'erase' | null;
+export type EffectTool =
+  | 'color'
+  | 'barrier'
+  | 'explosion'
+  | 'template'
+  | 'erase'
+  | null;
 export type BarrierShape = 'brush' | 'circle';
 
 const LS_PREFIX = 'ikr-map-effect-';
@@ -57,6 +64,10 @@ export interface EffectToolState {
   setExplosionRings: (rings: ExplosionRing[]) => void;
   explosionVariant: ExplosionVariant;
   setExplosionVariant: (v: ExplosionVariant) => void;
+
+  // 15.3 — šablony oblastí (kužel/linie/koule/čtverec → color effect).
+  templateShape: TemplateShape;
+  setTemplateShape: (s: TemplateShape) => void;
 }
 
 export function useEffectTool(): EffectToolState {
@@ -82,6 +93,9 @@ export function useEffectTool(): EffectToolState {
   const [explosionVariant, setExplosionVariantRaw] = useState<ExplosionVariant>(
     () => load('variant', 'fire'),
   );
+  const [templateShape, setTemplateShapeRaw] = useState<TemplateShape>(() =>
+    load('templateShape', 'cone'),
+  );
 
   // Persist (debounce zbytečný — settery běží na user akci, ne ve smyčce).
   useEffect(() => save('color', selectedColor), [selectedColor]);
@@ -90,6 +104,7 @@ export function useEffectTool(): EffectToolState {
   useEffect(() => save('barrierRadius', barrierRadius), [barrierRadius]);
   useEffect(() => save('rings', explosionRings), [explosionRings]);
   useEffect(() => save('variant', explosionVariant), [explosionVariant]);
+  useEffect(() => save('templateShape', templateShape), [templateShape]);
 
   const setTool = useCallback((tool: EffectTool): void => {
     setActiveToolRaw(tool);
@@ -110,5 +125,7 @@ export function useEffectTool(): EffectToolState {
     setExplosionRings: setExplosionRingsRaw,
     explosionVariant,
     setExplosionVariant: setExplosionVariantRaw,
+    templateShape,
+    setTemplateShape: setTemplateShapeRaw,
   };
 }

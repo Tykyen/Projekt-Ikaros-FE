@@ -100,6 +100,30 @@ export function applyOperationToScene(
       return { ...scene, effects: updated };
     }
 
+    // ─── Drawing ops (15.4) ──────────────────────────────────────────
+    case 'drawing.add': {
+      // Idempotentní (dedup podle id): optimistic + WS broadcast téže op.
+      const drawings = scene.drawings ?? [];
+      if (drawings.some((d) => d.id === op.drawing.id)) {
+        return {
+          ...scene,
+          drawings: drawings.map((d) =>
+            d.id === op.drawing.id ? op.drawing : d,
+          ),
+        };
+      }
+      return { ...scene, drawings: [...drawings, op.drawing] };
+    }
+
+    case 'drawing.remove':
+      return {
+        ...scene,
+        drawings: (scene.drawings ?? []).filter((d) => d.id !== op.drawingId),
+      };
+
+    case 'drawing.clear':
+      return { ...scene, drawings: [] };
+
     // ─── Fog ops ──────────────────────────────────────────────────────
     case 'fog.set':
       return {

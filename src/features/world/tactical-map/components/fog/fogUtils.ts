@@ -6,7 +6,8 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2h.md.
  */
-import { getHexesInRadius } from '../../hexUtils';
+import { hexAdapter } from '../../grid';
+import type { GridAdapter } from '../../grid';
 import type { HexCoord, MapToken } from '../../types';
 import type { FogBrushSize } from '../../hooks/useFogTool';
 
@@ -40,13 +41,18 @@ function clamp01(a: number): number {
   return Number.isFinite(a) ? Math.min(1, Math.max(0, a)) : 1;
 }
 
-/** Hexy zasažené štětcem dané velikosti se středem v (q,r). */
+/**
+ * Buňky zasažené štětcem dané velikosti se středem v (q,r).
+ * 15.2 — `adapter` per typ mřížky (default hex pro BC); caller passuje
+ * `getGridAdapter(config.gridType)`.
+ */
 export function fogBrushHexes(
   q: number,
   r: number,
   size: FogBrushSize,
+  adapter: GridAdapter = hexAdapter,
 ): HexCoord[] {
-  return size === 0 ? [{ q, r }] : getHexesInRadius(q, r, size);
+  return size === 0 ? [{ q, r }] : adapter.cellsInRadius(q, r, size);
 }
 
 /**

@@ -12,3 +12,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** Uživatel se ptá „proč jsi nevyužil deník / kde máš poznámky".
 
 ---
+
+### CH-014 — `Set-Location` (PowerShell) tiše přesunul i Bash cwd → `tsc -b` běžel ve špatném repu (falešný zelený) · 2026-06-21
+**Kontext:** Při 15.4 (D) jsem pro BE jest pustil PowerShell `Set-Location …\backend; npx jest`. Sdílený pracovní adresář se tím přepnul na backend **i pro Bash tool**. Následný `npx tsc -b` (mířený na FE) tak proběhl v backendu → backend build → `EXIT 0`. FE změny D zůstaly **neověřené**, ač jsem hlásil „tsc zelený".
+**Co jsem udělal špatně:** Předpokládal jsem, že Bash a PowerShell mají oddělený cwd. Nemají — `Set-Location`/`cd` v jednom přepíše druhý. Po něm jsem nezkontroloval `pwd`.
+**Jak odhaleno:** Glob/eslint hlásily „MapDrawingLayer.tsx neexistuje", ač Write i `tsc` prošly → **rozpor „build prošel, ale soubor není"** = červená vlajka. `pwd` ukázal `…/backend`.
+**Poučení:** Pro cross-repo příkazy NE `Set-Location` na přepnutí — použij `npm --prefix <dir> run <script>` (cwd-agnostic) nebo PowerShell `Push-Location`/`-WorkingDirectory`. Po jakémkoli `Set-Location` ověř `pwd` před build/test. **Verifikace „exit 0" nestačí — musí běžet ve správném repu.** Rozpor mezi nástroji (tsc OK × Glob nenajde) ber jako signál cwd/prostředí, ne „záhada".
+**Příznak cyklení:** „Build prošel, ale soubor nenalezen" / eslint nenajde čerstvě zapsaný soubor.
+
+---

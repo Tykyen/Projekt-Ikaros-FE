@@ -1,0 +1,98 @@
+/* 15.4 (E) — výchozí nastavení map světa. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.input {
+  padding: 8px 10px;
+  background: var(--bg-input, var(--bg-card));
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent, var(--border-strong));
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-width: 360px;
+}
+
+.segBtn {
+  padding: 8px 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.segBtn:hover {
+  border-color: var(--border-strong, var(--border));
+}
+
+.segBtnActive,
+.segBtnActive:hover {
+  background: var(--accent-soft, rgb(var(--accent-rgb, 130 80 220) / 0.18));
+  border-color: var(--accent, var(--border-strong));
+  color: var(--text-primary);
+}
+
+.checks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    flex-direction: column-reverse;
+  }
+}

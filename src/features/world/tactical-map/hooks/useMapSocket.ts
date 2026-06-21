@@ -17,6 +17,7 @@
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { getSocket } from "@/features/chat/api/socket";
+import type { RulerLine } from "../components/MapRulerLayer";
 import type {
   MapOperationBroadcast,
   MapReassignedBroadcast,
@@ -43,6 +44,11 @@ interface UseMapSocketOptions {
    * `x`/`y` jsou v mapa-space (transform root). BE emituje poziční argumenty.
    */
   onPing?: (x: number, y: number, userName: string) => void;
+  /**
+   * 15.3 — callback při `map:rulered` (kdokoli měří pravítkem). `line=null` =
+   * měření skončilo (vyčistit). `userId` z autentizace (BE), klíč per-uživatel.
+   */
+  onRuler?: (userId: string, userName: string, line: RulerLine | null) => void;
 }
 
 export interface UseMapSocketResult {
@@ -50,6 +56,8 @@ export interface UseMapSocketResult {
   emitSpotlight: (tokenId: string) => void;
   /** 10.2m — emit ping na plochu (mapa-space x/y). Broadcast ostatním na scéně. */
   emitPing: (x: number, y: number, userName: string) => void;
+  /** 15.3 — emit pravítka (`line=null` = konec měření). Broadcast ostatním. */
+  emitRuler: (line: RulerLine | null, userName: string) => void;
 }
 
 export function useMapSocket({
@@ -59,6 +67,7 @@ export function useMapSocket({
   onReassigned,
   onSpotlight,
   onPing,
+  onRuler,
 }: UseMapSocketOptions): UseMapSocketResult {
   useEffect(() => {
     if (!sceneId) return;
@@ -149,6 +158,22 @@ export function useMapSocket({
     };
   }, [onPing]);
 
+  // Listener: map:rulered (kdokoli měří — ephemeral). BE přidává authenticated
+  // userId (klíč per-uživatel, ne z payloadu).
+  useEffect(() => {
+    if (!onRuler) return;
+    const socket = getSocket();
+    const handler = (payload: {
+      userId: string;
+      userName: string;
+      line: RulerLine | null;
+    }): void => onRuler(payload.userId, payload.userName, payload.line);
+    socket.on("map:rulered", handler);
+    return () => {
+      socket.off("map:rulered", handler);
+    };
+  }, [onRuler]);
+
   const emitSpotlight = useCallback(
     (tokenId: string): void => {
       if (!sceneId) return;
@@ -165,5 +190,13 @@ export function useMapSocket({
     [sceneId],
   );
 
-  return { emitSpotlight, emitPing };
+  const emitRuler = useCallback(
+    (line: RulerLine | null, userName: string): void => {
+      if (!sceneId) return;
+      getSocket().emit("map:ruler", { sceneId, line, userName });
+    },
+    [sceneId],
+  );
+
+  return { emitSpotlight, emitPing, emitRuler };
 }

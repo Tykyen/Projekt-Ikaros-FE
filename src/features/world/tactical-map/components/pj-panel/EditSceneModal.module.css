@@ -132,6 +132,56 @@
   cursor: pointer;
 }
 
+/* 15.2 — segmentový selektor typu mřížky (hex/čtverec/žádná). */
+.gridTypeSelector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.gridTypeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  background: rgb(var(--map-ui-panel-rgb) / 0.5);
+  color: var(--text-secondary, rgb(var(--map-ui-light-rgb) / 0.7));
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.gridTypeOption:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.12);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.45);
+}
+
+.gridTypeOption:focus-visible {
+  outline: none;
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.7);
+}
+
+.gridTypeOptionActive,
+.gridTypeOptionActive:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.7);
+  color: var(--text-primary, var(--map-ui-text));
+}
+
+.gridTypeIcon {
+  display: block;
+}
+
 .error {
   font-size: 12px;
   color: var(--map-ui-danger-solid);

@@ -1,0 +1,34 @@
+/* 15.3 — toggle pravítka v dock stacku (obsah MapToolDock „Měření"). */
+.controls {
+  display: flex;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+  border-radius: 6px;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.btn:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.4);
+}
+
+.btnActive,
+.btnActive:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.25);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.7);
+}

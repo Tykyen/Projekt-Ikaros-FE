@@ -14,7 +14,7 @@
 import type { Graphics as PixiGraphics, Container as PixiContainer, Ticker } from 'pixi.js';
 import { useCallback, useMemo, useRef } from 'react';
 import { useTick } from '@pixi/react';
-import { axialToPixel, getHexPolyPoints, getHexRing } from '../../hexUtils';
+import { getGridAdapter } from '../../grid';
 import { getVariantColors } from './effectColors';
 import type { HexConfig, MapEffect, MapThemeColors } from '../../types';
 
@@ -31,9 +31,9 @@ const REDUCED_MOTION =
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-/** Střed hexu v map-space (origin už přičten). */
+/** Střed buňky v map-space (origin už přičten). 15.2 — geometrie dle gridType. */
 function hexCenter(q: number, r: number, config: HexConfig): { x: number; y: number } {
-  const p = axialToPixel(q, r, config.size);
+  const p = getGridAdapter(config.gridType).toPixel(q, r, config.size);
   return { x: p.x + config.originX, y: p.y + config.originY };
 }
 
@@ -55,7 +55,7 @@ function ColorEffect({
       const fill = effect.color ?? 'rgba(255,255,0,0.3)'; // lint-colors-ignore
       for (const hex of effect.hexes) {
         const c = hexCenter(hex.q, hex.r, config);
-        g.poly(getHexPolyPoints(c, config.size * 0.95));
+        g.poly(getGridAdapter(config.gridType).cellPoly(c, config.size * 0.95));
         g.fill({ color: fill, alpha: 0.6 });
       }
     },
@@ -95,9 +95,9 @@ function BarrierEffect({
       for (const hex of effect.hexes) {
         const c = hexCenter(hex.q, hex.r, config);
         // Glow vrstva (širší poly, nízká alpha) — náhrada SVG drop-shadow.
-        g.poly(getHexPolyPoints(c, config.size * 1.04));
+        g.poly(getGridAdapter(config.gridType).cellPoly(c, config.size * 1.04));
         g.fill({ color: theme.effectBarrierGlow, alpha: 0.18 });
-        g.poly(getHexPolyPoints(c, config.size * 1.01));
+        g.poly(getGridAdapter(config.gridType).cellPoly(c, config.size * 1.01));
         g.fill({ color: theme.effectBarrierFill, alpha: 0.5 });
       }
     },
@@ -171,7 +171,9 @@ function ExplosionEffect({
     const excluded = effect.excludedHexes ?? [];
     const out: { key: string; x: number; y: number; damage: number }[] = [];
     for (const ring of effect.rings) {
-      const ringHexes = getHexRing(centerHex.q, centerHex.r, ring.radius).filter(
+      const ringHexes = getGridAdapter(config.gridType)
+        .cellsInRing(centerHex.q, centerHex.r, ring.radius)
+        .filter(
         (h) => !excluded.some((ex) => ex.q === h.q && ex.r === h.r),
       );
       if (ringHexes.length === 0) continue;
@@ -191,12 +193,14 @@ function ExplosionEffect({
       // Od největšího ringu (kreslí se pod menší → překryv jako v Matrixu).
       for (const ring of [...effect.rings].reverse()) {
         const fill = colors[Math.min(ring.radius, colors.length - 1)];
-        const ringHexes = getHexRing(centerHex.q, centerHex.r, ring.radius).filter(
+        const ringHexes = getGridAdapter(config.gridType)
+        .cellsInRing(centerHex.q, centerHex.r, ring.radius)
+        .filter(
           (h) => !excluded.some((ex) => ex.q === h.q && ex.r === h.r),
         );
         for (const hex of ringHexes) {
           const c = hexCenter(hex.q, hex.r, config);
-          g.poly(getHexPolyPoints(c, config.size * 0.95));
+          g.poly(getGridAdapter(config.gridType).cellPoly(c, config.size * 0.95));
           g.fill({ color: fill, alpha: 1 });
         }
       }

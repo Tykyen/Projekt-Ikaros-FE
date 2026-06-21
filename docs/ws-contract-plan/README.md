@@ -125,7 +125,7 @@ Přejato z bug-planu kvůli konzistenci, s důrazem na WS.
 | `user:{userId}` | **server automaticky** při connect (Chat/Worlds/Maps/Ikaros gateway z JWT) | whisper, `chat:unread`, `chat:feed:bump`, `friend:*`, `world:access-*`, `ikaros:new-message`, `account:transfer:received`, `presence` (?), `map:reassigned` | per-user — kdo nemá JWT, nemá room → tiše nedostane |
 | `chat:{channelId}` | `room:join chat:{id}` (ChatRoom, ChannelView) | `chat:message`, `chat:typing`, `chat:presence`, `chat:sound:*`, reactions | hráč bez přístupu nesmí být v roomu (access check?) |
 | `world:{worldId}` | `room:join world:{id}` (WorldChatRoom, useUniverseSocket, useMapWeather) | `world:*`, `chat:channel:*`, `chat:group:*`, `emote:*`, `universe:updated`, `weather:updated` | **N-8: join bez membership** → leak počasí/membership |
-| `{sceneId}` | `map:join {sceneId}` (useMapSocket) | `map:operation`, `map:spotlight`, `map:pinged`, `map:member-*`, legacy | read-access check v `map:join` |
+| `{sceneId}` | `map:join {sceneId}` (useMapSocket) | `map:operation`, `map:spotlight`, `map:pinged`, `map:rulered`, `map:member-*`, legacy | read-access check v `map:join` |
 
 > 🔑 **Klíčová otázka pro celý plán:** je klient v roomu, do kterého mu BE posílá? Mnoho eventů jde do `world:{id}`, ale `room:join world:{id}` dělá jen **WorldChatRoom / universe / weather hook**. Hráč na stránce světa **mimo chat/mapu** možná v roomu není → `world:updated`, `emote:*`, membership eventy mu nedorazí. To je systematický kandidát na nález (oblast 06, 09).
 

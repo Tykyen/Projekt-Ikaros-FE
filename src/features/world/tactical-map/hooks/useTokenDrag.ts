@@ -9,7 +9,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FederatedPointerEvent } from 'pixi.js';
-import { pixelToAxial } from '../hexUtils';
+import { getGridAdapter } from '../grid';
 import type { HexConfig, MapToken, Point } from '../types';
 
 interface ViewportState {
@@ -82,27 +82,19 @@ export function useTokenDrag({ viewport, config, onDrop }: Args): {
         return;
       }
       const delta = screenToMapaDelta(dx, dy);
-      // axialToPixel(token.q, token.r) + delta → pixelToAxial.
-      // Pro snap-to-hex spočítáme target pixel pozici:
-      // currentPixel = axialToPixel(start.token.q, start.token.r, config.size)
-      // targetPixel = currentPixel + delta
-      // pixelToAxial(targetPixel.x - originX, targetPixel.y - originY, size)
-      // → q, r
-      // (inline import abychom nezasahovali to useCallback dep)
-      import('../hexUtils').then(({ axialToPixel }) => {
-        const cur = axialToPixel(
-          start.token.q,
-          start.token.r,
-          config.size,
-        );
-        const targetX = cur.x + delta.x;
-        const targetY = cur.y + delta.y;
-        const target = pixelToAxial(targetX, targetY, config.size);
-        setDragState(null);
-        // Pokud cílový hex shodný s původním → neukládat.
-        if (target.q === start.token.q && target.r === start.token.r) return;
-        onDrop(start.token.id, target.q, target.r);
-      });
+      // 15.2 — snap přes adaptér mřížky: aktuální buňka → pixel + delta →
+      // nejbližší buňka cílového typu mřížky (hex/square/none).
+      const adapter = getGridAdapter(config.gridType);
+      const cur = adapter.toPixel(start.token.q, start.token.r, config.size);
+      const target = adapter.toCell(
+        cur.x + delta.x,
+        cur.y + delta.y,
+        config.size,
+      );
+      setDragState(null);
+      // Pokud cílová buňka shodná s původní → neukládat.
+      if (target.q === start.token.q && target.r === start.token.r) return;
+      onDrop(start.token.id, target.q, target.r);
     };
     const handleCancel = (): void => {
       dragRef.current = null;
@@ -121,7 +113,7 @@ export function useTokenDrag({ viewport, config, onDrop }: Args): {
       window.removeEventListener('pointercancel', handleCancel);
       window.removeEventListener('keydown', handleEsc);
     };
-  }, [config.size, onDrop, screenToMapaDelta]);
+  }, [config.size, config.gridType, onDrop, screenToMapaDelta]);
 
   const handleTokenPointerDown = useCallback(
     (e: FederatedPointerEvent, token: MapToken): void => {

@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-014.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-015.**
 
 ## Jak je deník členěný
 
@@ -42,3 +42,8 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--první-3d-animace-hodu-kostkou-fix10-hod-effekt-na-active--dedupe-nonce--2026-06-20) | fe | **VYŘEŠENO (fix10):** hod-effekt navázán i na `active` + dedupe nonce → 1. 3D animace naběhne; potvrzeno hráčem na live | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--pwa-151-sw-offline-cache-bez-rozbití-dev-hmr-dev-guard-modeprod--2026-06-21) | fe | PWA 15.1: SW `fetch`/offline cache přidán bez rozbití dev HMR přes dev-guard `mode=prod` (klient předá režim query, SW gate-uje); vzor místo blacklistu Vite cest | — (zabralo napoprvé) |
 | [✅ ŘEŠENÍ](role.md#-řešení--elevation-nahození-práv-admin-moc-uspaná-per-svět-nahoditelná-náhrada-r-20--2026-06-21) | role/BE+FE | Elevation: 1 helper `worldAdminBypass` nahradil ~45 world bran (náhrada R-20); povinný `RequestUser` místo optional = bez tichých děr; **vlastní grep sweep > subagent inventura** (minula 5 bran); FE drift byl širší (7 komponent), ne jen router | — (zabralo) |
+| [✅ ŘEŠENÍ](fe.md#-řešení--152-krok-a-typ-mřížky-hexčtverecžádná-přes-gridadapter-strategy--2026-06-21) | fe | 15.2-A typ mřížky přes `GridAdapter` strategy (hex obal/square/none); integer `q/r` lattice = nula migrace; BE `config` volný → 0 BE změn; UI selektor=krok B | — (zabralo napoprvé) |
+| [✅ ŘEŠENÍ](fe.md#-řešení--153-měřítko-stupnice--sdílené-pravítko-přes-ws-vzor-pingu--2026-06-21) | fe/BE | 15.3 měřítko (`MapScaleFrame`) + sdílené pravítko = reuse ephemeral WS vzoru pingu (emit→broadcast, 0 úložiště); BE klíčuje per-user authenticated userId (ne payload); all-roles vs spotlight PJ-only | — (zabralo) |
+| [✅ ŘEŠENÍ](fe.md#-řešení--154-kreslení-anotace-na-mapě-perzistované-scenedrawings-vzor-effects--2026-06-21) | fe/BE | 15.4 kreslení/anotace = perzistované `scene.drawings`, **mirror effects** (schema+3 ops+apply/inverse+authorizer+repo+FE apply/layer) → infra zdarma; authorizer: hráč jen `allowPlayerDrawing` && vlastní | — (zabralo) |
+| [CH-014](proces.md#ch-014--set-location-powershell-tiše-přesunul-i-bash-cwd--tsc--b-běžel-ve-špatném-repu-falešný-zelený--2026-06-21) | proces | `Set-Location` (PS) přepsal i Bash cwd → `tsc -b` běžel v backendu (falešný zelený), FE neověřené; před build/test ověř `pwd` | „build prošel, ale soubor nenalezen" |
+| [✅ ŘEŠENÍ](fe.md#-řešení--154-e-world-map-defaults-dvouvrstvá-config--be-side-seed--2026-06-21) | fe/BE | 15.4-E world map defaults = dvouvrstvá config (worldSettings.mapDefaults → seed scény → override); **seed BE-side** (create DTO `HexConfigDto` whitelist by nová pole zahodil); inject IWorldSettingsRepository | — (zabralo) |

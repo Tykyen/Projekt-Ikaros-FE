@@ -1,8 +1,9 @@
 /**
  * 10.2a/c — Hlavní komponenta taktické mapy.
  *
- * Mountuje PixiJS `<Application>` přes `@pixi/react` v8. 6 vrstev v určeném
- * z-order (background → grid → effects → tokens → fog → pings).
+ * Mountuje PixiJS `<Application>` přes `@pixi/react` v8. Vrstvy v určeném
+ * z-order (background → grid → effects → tokens → fog → scale → pings → ruler
+ * → drawings).
  *
  * Konzumuje:
  *   - `WorldContext` (worldId, userRole, loading)
@@ -44,12 +45,22 @@ import {
   fogBrushHexes,
   isTokenHiddenByFog,
 } from "./components/fog/fogUtils";
-import { getHexesInRadius, hexDistance } from "./hexUtils";
+import { getGridAdapter, type GridAdapter } from "./grid";
 import { MapZoomControls } from "./components/MapZoomControls";
+import { MapMeasureControls } from "./components/MapMeasureControls";
+import { MapDrawingControls } from "./components/MapDrawingControls";
+import { MapDrawingLayer } from "./components/MapDrawingLayer";
+import { useDrawingTool } from "./hooks/useDrawingTool";
 import { MapToolDock, MapDockStack } from "./components/MapToolDock";
 import { MapEmptyState } from "./components/MapEmptyState";
 import { MapPlacementBanner } from "./components/MapPlacementBanner";
 import { HexGrid, type MapBounds } from "./components/HexGrid";
+import { MapScaleFrame } from "./components/MapScaleFrame";
+import {
+  MapRulerLayer,
+  type RulerLine,
+  type RemoteRuler,
+} from "./components/MapRulerLayer";
 import { MapBackground } from "./components/MapBackground";
 import { MapHiddenOverlay } from "./components/MapHiddenOverlay";
 import { MapLockedOverlay } from "./components/MapLockedOverlay";
@@ -89,7 +100,6 @@ import { applyOperationToScene } from "./utils/applyOperationToScene";
 import { effectiveHidden, effectiveLocked } from "./utils/sceneAccess";
 import { findFirstFreeHex } from "./utils/findFirstFreeHex";
 import { screenToHex } from "./utils/screenToHex";
-import { axialToPixel } from "./hexUtils";
 import { isPcToken } from "./utils/isPcToken";
 import { sortByInitiativeDesc } from "./utils/initiativeOrder";
 import {
@@ -115,7 +125,11 @@ import type {
   MapScene,
   MapDiceRoll,
   MapEffect,
+  MapDrawing,
+  HexCoord,
+  Point,
 } from "./types";
+import { templateCells } from "./utils/templateGeometry";
 import styles from "./TacticalMapView.module.css";
 
 // PixiJS v8 @pixi/react JSX pragma — extend dovolí použít `pixiContainer`
@@ -132,13 +146,18 @@ extend({ Container, Graphics, Sprite, Text });
  * bariéře tak smaže celou (je to jeden souvislý objekt). `explosion` =
  * vzdálenost ≤ max ring radius (mimo excluded).
  */
-function effectCoversHex(e: MapEffect, q: number, r: number): boolean {
+function effectCoversHex(
+  e: MapEffect,
+  q: number,
+  r: number,
+  adapter: GridAdapter,
+): boolean {
   if (e.type === "explosion") {
     const center = e.hexes[0];
     if (!center || !e.rings?.length) return false;
     if (e.excludedHexes?.some((ex) => ex.q === q && ex.r === r)) return false;
     const maxR = Math.max(...e.rings.map((ri) => ri.radius));
-    return hexDistance(center, { q, r }) <= maxR;
+    return adapter.distance(center, { q, r }) <= maxR;
   }
   return e.hexes.some((h) => h.q === q && h.r === r);
 }
@@ -176,6 +195,27 @@ export function TacticalMapView(): React.ReactElement {
   // před useMapScene, ať může přijmout `onPing` callback. Expiraci řeší
   // PingsLayer přes TTL (onExpire odebere marker).
   const [pings, setPings] = useState<PingMarker[]>([]);
+  // 15.3 — sdílené pravítko. `rulerActive` (toggle nástroje) musí být PŘED
+  // panZoom (suppress pan při měření). `remoteRulers` = cizí měření keyed userId,
+  // `onRuler` přijímá WS callback (před useMapScene). `localRuler` + emit níž.
+  const [rulerActive, setRulerActive] = useState(false);
+  const [localRuler, setLocalRuler] = useState<RulerLine | null>(null);
+  const [remoteRulers, setRemoteRulers] = useState<Map<string, RemoteRuler>>(
+    () => new Map(),
+  );
+  const rulerDownRef = useRef<{ x: number; y: number } | null>(null);
+  const rulerEmitRef = useRef(0);
+  const onRuler = useCallback(
+    (userId: string, userName: string, line: RulerLine | null): void => {
+      setRemoteRulers((prev) => {
+        const next = new Map(prev);
+        if (line) next.set(userId, { userName, line });
+        else next.delete(userId);
+        return next;
+      });
+    },
+    [],
+  );
   const addPing = useCallback(
     (x: number, y: number, userName: string): void => {
       setPings((prev) => [
@@ -237,12 +277,13 @@ export function TacticalMapView(): React.ReactElement {
   // 10.2c — scene fetch + WS + cross-scene reassignment listener.
   // POZOR: `useMapScene` musí být před `useViewportPanZoom`, aby hook
   // dostal `scene.id` pro per-scéna LS klíče (10.2c-edit-5).
-  const { scene, emitSpotlight, emitPing, rollDice } = useMapScene(
+  const { scene, emitSpotlight, emitPing, emitRuler, rollDice } = useMapScene(
     worldId || null,
     {
       onSpotlight: triggerSpotlight,
       onLiveDiceRoll: handleLiveDiceRoll,
       onPing: addPing,
+      onRuler,
     },
   );
   useReassignmentListener(worldId || null);
@@ -265,6 +306,8 @@ export function TacticalMapView(): React.ReactElement {
   const effectTool = useEffectTool();
   // 10.2h — fog tool state (paleta mlhy). Aktivní = left-drag kreslí mlhu.
   const fogTool = useFogTool();
+  // 15.4 — kreslicí nástroj (anotace). Aktivní = left-drag kreslí čáru/…
+  const drawingTool = useDrawingTool();
   // 10.2h — poslední hex pod fog brushem (dedup při tažení, výkon).
   const lastFogHexRef = useRef<string | null>(null);
   // 10.2g — master id rozpracované brush bariéry (jeden tah = jedna bariéra).
@@ -275,7 +318,11 @@ export function TacticalMapView(): React.ReactElement {
   const panZoom = useViewportPanZoom(
     viewportRef,
     scene?.id ?? null,
-    effectTool.activeTool !== null || placement.state.active || fogTool.active,
+    effectTool.activeTool !== null ||
+      placement.state.active ||
+      fogTool.active ||
+      rulerActive ||
+      drawingTool.activeKind !== null,
   );
 
   // 10.2c-edit-5 — bbox mapy z MapBackground.onLoad. Předáno do HexGrid
@@ -633,7 +680,12 @@ export function TacticalMapView(): React.ReactElement {
         op: {
           type: "fog.brush",
           mode: fogTool.mode,
-          hexes: fogBrushHexes(q, r, fogTool.brushSize),
+          hexes: fogBrushHexes(
+            q,
+            r,
+            fogTool.brushSize,
+            getGridAdapter(scene.config.gridType),
+          ),
         },
       });
     },
@@ -751,7 +803,11 @@ export function TacticalMapView(): React.ReactElement {
         (t) => t.q === targetQ && t.r === targetR,
       );
       const { q, r } = taken
-        ? findFirstFreeHex(scene.tokens, { q: targetQ, r: targetR })
+        ? findFirstFreeHex(
+            scene.tokens,
+            { q: targetQ, r: targetR },
+            getGridAdapter(scene.config.gridType).neighbors,
+          )
         : { q: targetQ, r: targetR };
 
       let token: MapToken;
@@ -836,7 +892,11 @@ export function TacticalMapView(): React.ReactElement {
               effect: {
                 id: newId(),
                 type: "barrier",
-                hexes: getHexesInRadius(q, r, effectTool.barrierRadius),
+                hexes: getGridAdapter(scene.config.gridType).cellsInRadius(
+                  q,
+                  r,
+                  effectTool.barrierRadius,
+                ),
                 barrierDC: effectTool.barrierDC,
               },
             },
@@ -912,7 +972,10 @@ export function TacticalMapView(): React.ReactElement {
         (worldId &&
           queryClient.getQueryData<MapScene>(mapSceneQueryKey(worldId))) ||
         scene;
-      const hits = fresh.effects.filter((e) => effectCoversHex(e, q, r));
+      const coverAdapter = getGridAdapter(fresh.config.gridType);
+      const hits = fresh.effects.filter((e) =>
+        effectCoversHex(e, q, r, coverAdapter),
+      );
       for (const e of hits) handleRemoveEffect(e.id);
     },
     [scene, isPJ, worldId, queryClient, handleRemoveEffect],
@@ -1012,6 +1075,251 @@ export function TacticalMapView(): React.ReactElement {
     },
     [scene, panZoom, addPing, emitPing, pingLabel],
   );
+  // 15.3 — pravítko (hráč i PJ). Drag A→B; throttled emit ostatním (~16/s);
+  // release vyčistí (emit null). Aktivní jen když rulerActive (jinak no-op).
+  const handleRulerPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      if (!viewportRef.current) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
+      rulerDownRef.current = p;
+      setLocalRuler({ x1: p.x, y1: p.y, x2: p.x, y2: p.y });
+    },
+    [panZoom],
+  );
+  const handleRulerPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      const down = rulerDownRef.current;
+      if (!down || !viewportRef.current) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
+      const line: RulerLine = { x1: down.x, y1: down.y, x2: p.x, y2: p.y };
+      setLocalRuler(line);
+      const now = performance.now();
+      if (now - rulerEmitRef.current > 60) {
+        rulerEmitRef.current = now;
+        emitRuler(line, pingLabel);
+      }
+    },
+    [panZoom, emitRuler, pingLabel],
+  );
+  const handleRulerPointerUp = useCallback((): void => {
+    if (!rulerDownRef.current) return;
+    rulerDownRef.current = null;
+    setLocalRuler(null);
+    emitRuler(null, pingLabel);
+  }, [emitRuler, pingLabel]);
+
+  // 15.3 — vypnutí nástroje uprostřed měření: vyčisti lokálně + řekni ostatním
+  // (jinak by cizím klientům viselo poslední měření). Guard = jen přechod
+  // aktivní→neaktivní (ne při mountu).
+  const rulerWasActiveRef = useRef(false);
+  useEffect(() => {
+    if (rulerWasActiveRef.current && !rulerActive) {
+      rulerDownRef.current = null;
+      setLocalRuler(null);
+      emitRuler(null, pingLabel);
+    }
+    rulerWasActiveRef.current = rulerActive;
+  }, [rulerActive, emitRuler, pingLabel]);
+
+  // 15.3 — šablona oblasti (PJ effect tool 'template'): tažení origin→target
+  // → color effect. Preview se počítá při tažení; release vytvoří effect.
+  const templateOriginRef = useRef<Point | null>(null);
+  const [templatePreview, setTemplatePreview] = useState<HexCoord[] | null>(
+    null,
+  );
+  const handleTemplatePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      if (!viewportRef.current) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      templateOriginRef.current = screenToMap(
+        e.clientX,
+        e.clientY,
+        rect,
+        panZoom,
+      );
+      setTemplatePreview([]);
+    },
+    [panZoom],
+  );
+  const handleTemplatePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      const origin = templateOriginRef.current;
+      if (!origin || !viewportRef.current || !scene) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
+      setTemplatePreview(
+        templateCells(effectTool.templateShape, origin, p, scene.config),
+      );
+    },
+    [panZoom, scene, effectTool.templateShape],
+  );
+  const handleTemplatePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      const origin = templateOriginRef.current;
+      templateOriginRef.current = null;
+      setTemplatePreview(null);
+      if (!origin || !viewportRef.current || !scene) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
+      const cells = templateCells(
+        effectTool.templateShape,
+        origin,
+        p,
+        scene.config,
+      );
+      if (cells.length === 0) return;
+      const id =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `effect-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      effectMutation.mutate({
+        sceneId: scene.id,
+        op: {
+          type: "effect.add",
+          effect: {
+            id,
+            type: "color",
+            hexes: cells,
+            color: effectTool.selectedColor,
+          },
+        },
+      });
+    },
+    [
+      panZoom,
+      scene,
+      effectTool.templateShape,
+      effectTool.selectedColor,
+      effectMutation,
+    ],
+  );
+
+  // 15.4 — kreslení anotací (PJ vždy; hráč když scéna povolí). Reuse
+  // effectMutation (generická op mutace s optimistic + rollback).
+  const drawingOriginRef = useRef<Point | null>(null);
+  const [drawingPreview, setDrawingPreview] = useState<MapDrawing | null>(null);
+  const drawId = (): string =>
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `draw-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const commitDrawing = useCallback(
+    (kind: MapDrawing["kind"], points: number[], text?: string): void => {
+      if (!scene) return;
+      const drawing: MapDrawing = {
+        id: drawId(),
+        kind,
+        points,
+        color: drawingTool.color,
+        createdByUserId: currentUser?.id ?? "",
+        visibility: drawingTool.visibility,
+        ...(text ? { text } : {}),
+      };
+      effectMutation.mutate({
+        sceneId: scene.id,
+        op: { type: "drawing.add", drawing },
+      });
+    },
+    [
+      scene,
+      effectMutation,
+      drawingTool.color,
+      drawingTool.visibility,
+      currentUser,
+    ],
+  );
+  const handleDrawingPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      if (!viewportRef.current || !scene || !drawingTool.activeKind) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
+      if (drawingTool.activeKind === "text") {
+        const text = window.prompt("Text anotace:")?.trim();
+        if (text) commitDrawing("text", [p.x, p.y], text);
+        return;
+      }
+      drawingOriginRef.current = p;
+      setDrawingPreview({
+        id: "__draw_preview__",
+        kind: drawingTool.activeKind,
+        points: [p.x, p.y, p.x, p.y],
+        color: drawingTool.color,
+        createdByUserId: currentUser?.id ?? "",
+        visibility: drawingTool.visibility,
+      });
+    },
+    [
+      scene,
+      panZoom,
+      drawingTool.activeKind,
+      drawingTool.color,
+      drawingTool.visibility,
+      currentUser,
+      commitDrawing,
+    ],
+  );
+  const handleDrawingPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      const origin = drawingOriginRef.current;
+      if (!origin || !viewportRef.current) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
+      setDrawingPreview((prev) =>
+        prev ? { ...prev, points: [origin.x, origin.y, p.x, p.y] } : prev,
+      );
+    },
+    [panZoom],
+  );
+  const handleDrawingPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      const origin = drawingOriginRef.current;
+      drawingOriginRef.current = null;
+      setDrawingPreview(null);
+      if (
+        !origin ||
+        !viewportRef.current ||
+        !drawingTool.activeKind ||
+        drawingTool.activeKind === "text"
+      )
+        return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
+      // Bez tažení (klik) → nevytvářej degenerovanou kresbu.
+      if (Math.hypot(p.x - origin.x, p.y - origin.y) < 4) return;
+      commitDrawing(drawingTool.activeKind, [origin.x, origin.y, p.x, p.y]);
+    },
+    [panZoom, drawingTool.activeKind, commitDrawing],
+  );
+  const handleRemoveDrawing = useCallback(
+    (id: string): void => {
+      if (!scene) return;
+      effectMutation.mutate({
+        sceneId: scene.id,
+        op: { type: "drawing.remove", drawingId: id },
+      });
+    },
+    [scene, effectMutation],
+  );
+  const handleClearMyDrawings = useCallback((): void => {
+    if (!scene) return;
+    for (const d of scene.drawings ?? []) {
+      if (d.createdByUserId === currentUser?.id) {
+        effectMutation.mutate({
+          sceneId: scene.id,
+          op: { type: "drawing.remove", drawingId: d.id },
+        });
+      }
+    }
+  }, [scene, effectMutation, currentUser]);
+  const handleClearAllDrawings = useCallback((): void => {
+    if (!scene) return;
+    effectMutation.mutate({
+      sceneId: scene.id,
+      op: { type: "drawing.clear" },
+    });
+  }, [scene, effectMutation]);
+
   // PJ brush-konec + ping detekce v jednom pointerup (ping má všechny role).
   const handleViewportPointerUpAll = useCallback(
     (e: React.PointerEvent<HTMLDivElement>): void => {
@@ -1105,7 +1413,12 @@ export function TacticalMapView(): React.ReactElement {
       }
 
       // 10.2g — aktivní efekt-nástroj má NEJVYŠŠÍ prioritu (PJ kreslí / maže).
-      if (effectTool.activeTool && isPJ) {
+      // 15.3 — `template` se umisťuje tažením (pointer down/move/up), NE klikem.
+      if (
+        effectTool.activeTool &&
+        effectTool.activeTool !== "template" &&
+        isPJ
+      ) {
         if (effectTool.activeTool === "erase") {
           eraseEffectsAtHex(target.q, target.r);
         } else {
@@ -1190,6 +1503,14 @@ export function TacticalMapView(): React.ReactElement {
   const showLocked =
     !!scene && !isPJ && effectiveLocked(scene, currentUser?.id ?? "");
 
+  // 15.3 — šablona oblasti je aktivní (PJ + nástroj 'template') → tažení po
+  // mapě má přednost před ping/effect-click.
+  const templateActive = isPJ && effectTool.activeTool === "template";
+  // 15.4 — kreslení aktivní (vybraný druh + oprávnění: PJ vždy, hráč jen když
+  // scéna povolí). Hráč může i 'pj' kresbu (soukromá poznámka PJ).
+  const canDraw = isPJ || (scene?.config.allowPlayerDrawing ?? false);
+  const drawingActive = canDraw && drawingTool.activeKind !== null;
+
   return (
     <div
       ref={viewportRef}
@@ -1205,9 +1526,52 @@ export function TacticalMapView(): React.ReactElement {
           ? handleViewportClick
           : undefined
       }
-      onPointerDown={handlePingPointerDown}
-      onPointerMove={isPJ ? handleViewportPointerMove : undefined}
-      onPointerUp={handleViewportPointerUpAll}
+      onPointerDown={(e) => {
+        // 15.3 — pravítko (všichni) a šablona (PJ) mají přednost; jinak ping.
+        if (rulerActive) {
+          handleRulerPointerDown(e);
+          return;
+        }
+        if (templateActive) {
+          handleTemplatePointerDown(e);
+          return;
+        }
+        if (drawingActive) {
+          handleDrawingPointerDown(e);
+          return;
+        }
+        handlePingPointerDown(e);
+      }}
+      onPointerMove={(e) => {
+        if (rulerActive) {
+          handleRulerPointerMove(e);
+          return;
+        }
+        if (templateActive) {
+          handleTemplatePointerMove(e);
+          return;
+        }
+        if (drawingActive) {
+          handleDrawingPointerMove(e);
+          return;
+        }
+        if (isPJ) handleViewportPointerMove(e);
+      }}
+      onPointerUp={(e) => {
+        if (rulerActive) {
+          handleRulerPointerUp();
+          return;
+        }
+        if (templateActive) {
+          handleTemplatePointerUp(e);
+          return;
+        }
+        if (drawingActive) {
+          handleDrawingPointerUp(e);
+          return;
+        }
+        handleViewportPointerUpAll(e);
+      }}
       data-placement-active={placement.state.active ? "true" : undefined}
     >
       {/* PIXI v8 Application init je async — pokud se mountne bez scény
@@ -1271,6 +1635,26 @@ export function TacticalMapView(): React.ReactElement {
                   />
                 )}
               </pixiContainer>
+              {/* 15.3 — živý náhled šablony oblasti (přes EffectsLayer jako
+                  dočasný color effect; necommitnuto dokud PJ nepustí). */}
+              <pixiContainer label="layer-template-preview">
+                {scene && templatePreview && templatePreview.length > 0 && (
+                  <EffectsLayer
+                    effects={[
+                      {
+                        id: "__template_preview__",
+                        type: "color",
+                        hexes: templatePreview,
+                        color: effectTool.selectedColor,
+                      },
+                    ]}
+                    config={scene.config}
+                    theme={theme}
+                    canEdit={false}
+                    onRemoveEffect={() => {}}
+                  />
+                )}
+              </pixiContainer>
               <pixiContainer label="layer-tokens">
                 {scene && (
                   <TokenLayer
@@ -1307,6 +1691,15 @@ export function TacticalMapView(): React.ReactElement {
                   />
                 )}
               </pixiContainer>
+              <pixiContainer label="layer-scale">
+                {scene && (
+                  <MapScaleFrame
+                    config={scene.config}
+                    theme={theme}
+                    mapBounds={mapBounds}
+                  />
+                )}
+              </pixiContainer>
               <pixiContainer label="layer-pings">
                 {scene && (
                   <PingsLayer
@@ -1314,6 +1707,40 @@ export function TacticalMapView(): React.ReactElement {
                     config={scene.config}
                     theme={theme}
                     onExpire={removePing}
+                  />
+                )}
+              </pixiContainer>
+              <pixiContainer label="layer-ruler">
+                {scene &&
+                  (localRuler || remoteRulers.size > 0) && (
+                    <MapRulerLayer
+                      local={localRuler}
+                      remotes={[...remoteRulers.values()]}
+                      config={scene.config}
+                      theme={theme}
+                    />
+                  )}
+              </pixiContainer>
+              {/* 15.4 — anotace (kresby) + živý náhled rozkreslené. */}
+              <pixiContainer label="layer-drawings">
+                {scene && (
+                  <MapDrawingLayer
+                    drawings={scene.drawings ?? []}
+                    theme={theme}
+                    isPJ={isPJ}
+                    currentUserId={currentUser?.id ?? null}
+                    removable={drawingActive}
+                    onRemove={handleRemoveDrawing}
+                  />
+                )}
+                {drawingPreview && (
+                  <MapDrawingLayer
+                    drawings={[drawingPreview]}
+                    theme={theme}
+                    isPJ={isPJ}
+                    currentUserId={currentUser?.id ?? null}
+                    removable={false}
+                    onRemove={() => {}}
                   />
                 )}
               </pixiContainer>
@@ -1565,7 +1992,11 @@ export function TacticalMapView(): React.ReactElement {
           resolveTokenImage={resolveTokenImage}
           onOpenInfo={setOpenedTokenId}
           onItemClick={(token) => {
-            const p = axialToPixel(token.q, token.r, scene.config.size);
+            const p = getGridAdapter(scene.config.gridType).toPixel(
+              token.q,
+              token.r,
+              scene.config.size,
+            );
             panZoom.centerOnPoint(
               p.x + scene.config.originX,
               p.y + scene.config.originY,
@@ -1625,6 +2056,26 @@ export function TacticalMapView(): React.ReactElement {
             fullscreenTargetRef={viewportRef}
           />
         </MapToolDock>
+        {/* 15.3 — měření (pravítko); hráč i PJ. */}
+        {scene && (
+          <MapToolDock title="📏 Měření" storageKey="measure" defaultCollapsed>
+            <MapMeasureControls
+              active={rulerActive}
+              onToggle={() => setRulerActive((v) => !v)}
+            />
+          </MapToolDock>
+        )}
+        {/* 15.4 — kreslení (anotace); PJ vždy, hráč když scéna povolí. */}
+        {scene && canDraw && (
+          <MapToolDock title="✏️ Kreslení" storageKey="drawing" defaultCollapsed>
+            <MapDrawingControls
+              tool={drawingTool}
+              isPJ={isPJ}
+              onClearMine={handleClearMyDrawings}
+              onClearAll={handleClearAllDrawings}
+            />
+          </MapToolDock>
+        )}
         {/* 10.2n — ambient ovládání (PJ) pod Zobrazením v pravém dolním stacku.
             Vlastní sbalitelná hlavička (· vysílá indikátor) + cyan sound-accent. */}
         {isPJ && scene && (

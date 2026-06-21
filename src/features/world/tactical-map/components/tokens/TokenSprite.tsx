@@ -28,7 +28,7 @@ import type {
   Ticker,
   FederatedPointerEvent,
 } from 'pixi.js';
-import { axialToPixel } from '../../hexUtils';
+import { getGridAdapter } from '../../grid';
 import type {
   HexConfig,
   MapThemeColors,
@@ -130,12 +130,13 @@ export function TokenSprite({
   onOpenInfo,
   onPointerDown,
 }: Props): React.ReactElement {
-  // Token radius = vepsaná kružnice flat-top hexu (apotéma = √3/2·size
-  // ≈ 0.866·size). Dotkne se vnitřních stěn hexu, ale nepřeteče přes ně.
-  // Ring se kreslí dovnitř (alignment:1 v drawRing), takže ani obrys nevyleze.
-  const tokenSize = Math.round(config.size * (Math.sqrt(3) / 2));
+  // 15.2 — geometrie dle typu mřížky. Token radius = vepsaná kružnice buňky
+  // (hex apotéma √3/2·size ≈ 0.866; čtverec size/2). Dotkne se vnitřních stěn
+  // buňky, ale nepřeteče. Ring se kreslí dovnitř (alignment:1 v drawRing).
+  const adapter = getGridAdapter(config.gridType);
+  const tokenSize = adapter.tokenRadius(config.size);
 
-  const center = axialToPixel(token.q, token.r, config.size);
+  const center = adapter.toPixel(token.q, token.r, config.size);
   const x = center.x + config.originX + staggerOffset.x;
   const y = center.y + config.originY + staggerOffset.y;
 

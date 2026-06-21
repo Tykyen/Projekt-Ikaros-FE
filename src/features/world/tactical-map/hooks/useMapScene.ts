@@ -28,6 +28,7 @@ import { getActiveMapScene, postMapOperation } from "../api/mapApi";
 import { applyOperationToScene } from "../utils/applyOperationToScene";
 import { catchUpScene } from "../utils/catchUpScene";
 import { useMapSocket } from "./useMapSocket";
+import type { RulerLine } from "../components/MapRulerLayer";
 import type {
   MapScene,
   MapOperation,
@@ -57,6 +58,8 @@ interface UseMapSceneOptions {
    * v map-space. Konzument přidá ephemeral marker do `layer-pings`.
    */
   onPing?: (x: number, y: number, userName: string) => void;
+  /** 15.3 — callback při `map:rulered` (kdokoli měří pravítkem). */
+  onRuler?: (userId: string, userName: string, line: RulerLine | null) => void;
 }
 
 interface UseMapSceneResult {
@@ -73,6 +76,8 @@ interface UseMapSceneResult {
   emitSpotlight: (tokenId: string) => void;
   /** 10.2m — emit ping na plochu (map-space x/y). Broadcast ostatním na scéně. */
   emitPing: (x: number, y: number, userName: string) => void;
+  /** 15.3 — emit pravítka (`line=null` = konec měření). Broadcast ostatním. */
+  emitRuler: (line: RulerLine | null, userName: string) => void;
   /**
    * 10.2j — persist hodu kostkou jako `dice.roll` op (optimistic + rollback).
    * No-op když chybí aktivní scéna. Overlay spouští volající (F2), tohle jen
@@ -211,12 +216,13 @@ export function useMapScene(
     (p: MapSpotlightBroadcast) => spotlightCb?.(p.tokenId),
     [spotlightCb],
   );
-  const { emitSpotlight, emitPing } = useMapSocket({
+  const { emitSpotlight, emitPing, emitRuler } = useMapSocket({
     sceneId: scene?.id ?? null,
     onOperation,
     onReconnect,
     onSpotlight: spotlightCb ? handleSpotlight : undefined,
     onPing: options?.onPing,
+    onRuler: options?.onRuler,
   });
 
   return {
@@ -227,6 +233,7 @@ export function useMapScene(
     refetch: () => void query.refetch(),
     emitSpotlight,
     emitPing,
+    emitRuler,
     rollDice: (op) => {
       if (scene) diceMutation.mutate({ sceneId: scene.id, op });
     },

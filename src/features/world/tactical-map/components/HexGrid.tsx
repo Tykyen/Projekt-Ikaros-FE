@@ -16,7 +16,7 @@
  */
 import type { Graphics } from 'pixi.js';
 import { useCallback } from 'react';
-import { axialToPixel, getHexPolyPoints } from '../hexUtils';
+import { getGridAdapter } from '../grid';
 import type { HexConfig, MapThemeColors } from '../types';
 
 // 10.2c-edit-5 — iteration range zůstává ±80 (25921 kandidátů), uvnitř
@@ -62,13 +62,16 @@ export function HexGrid({
   mapBounds,
 }: Props): React.ReactElement | null {
   // Pokud scéna nemá pozadí (mapBounds null), použij fallback bbox aby
-  // user viděl alespoň hex grid (nikoli prázdný černý viewport).
+  // user viděl alespoň grid (nikoli prázdný černý viewport).
   const effectiveBounds = mapBounds ?? FALLBACK_BOUNDS;
+  // 15.2 — typ mřížky řídí geometrii. `none` → drawsGrid:false (žádné čáry).
+  const adapter = getGridAdapter(config.gridType);
+  const visible = adapter.drawsGrid && config.showGrid;
 
   const draw = useCallback(
     (g: Graphics) => {
       g.clear();
-      if (!config.showGrid) return;
+      if (!visible) return;
       const originX = config.originX;
       const originY = config.originY;
       const padding = HEX_PADDING * config.size;
@@ -79,7 +82,7 @@ export function HexGrid({
 
       for (let q = -HEX_RANGE; q <= HEX_RANGE; q++) {
         for (let r = -HEX_RANGE; r <= HEX_RANGE; r++) {
-          const center = axialToPixel(q, r, config.size);
+          const center = adapter.toPixel(q, r, config.size);
           center.x += originX;
           center.y += originY;
           if (
@@ -90,7 +93,7 @@ export function HexGrid({
           ) {
             continue;
           }
-          g.poly(getHexPolyPoints(center, config.size));
+          g.poly(adapter.cellPoly(center, config.size));
         }
       }
       // Single stroke call po loopu — všechny polygony obtažené stejnou linkou.
@@ -100,10 +103,10 @@ export function HexGrid({
         alpha: 1,
       });
     },
-    [config, theme, effectiveBounds],
+    [config, theme, effectiveBounds, adapter, visible],
   );
 
-  if (!config.showGrid) return null;
+  if (!visible) return null;
 
   return <pixiGraphics label="hex-grid" draw={draw} />;
 }

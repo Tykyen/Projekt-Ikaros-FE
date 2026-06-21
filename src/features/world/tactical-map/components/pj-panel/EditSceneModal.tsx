@@ -15,7 +15,54 @@ import { useUploadImage } from '@/shared/api/useUploadImage';
 import { postMapOperation } from '../../api/mapApi';
 import { SceneAccessSection } from './SceneAccessSection';
 import type { MapScene, MapOperation, HexConfig } from '../../types';
+import type { GridType } from '../../grid';
 import styles from './EditSceneModal.module.css';
+
+/** 15.2 — volby typu mřížky pro segmentový selektor. */
+const GRID_TYPES: { value: GridType; label: string }[] = [
+  { value: 'hex', label: 'Hex' },
+  { value: 'square', label: 'Čtverec' },
+  { value: 'none', label: 'Žádná' },
+];
+
+/** Vizuální glyf typu mřížky (stroke = currentColor → dědí barvu aktivního/neaktivního stavu). */
+function GridTypeGlyph({ type }: { type: GridType }): React.ReactElement {
+  const common = {
+    width: 26,
+    height: 26,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.6,
+    strokeLinejoin: 'round' as const,
+    className: styles.gridTypeIcon,
+    'aria-hidden': true,
+  };
+  if (type === 'hex') {
+    // Flat-top hexagon.
+    return (
+      <svg {...common}>
+        <path d="M7 3 H17 L22 12 L17 21 H7 L2 12 Z" />
+      </svg>
+    );
+  }
+  if (type === 'square') {
+    // 2×2 mřížka.
+    return (
+      <svg {...common}>
+        <rect x="3" y="3" width="18" height="18" rx="1" />
+        <path d="M12 3 V21 M3 12 H21" />
+      </svg>
+    );
+  }
+  // none — přerušovaný obrys + diagonála (= bez mřížky).
+  return (
+    <svg {...common}>
+      <rect x="3" y="3" width="18" height="18" rx="1" strokeDasharray="3 3" />
+      <path d="M5 19 L19 5" opacity="0.6" />
+    </svg>
+  );
+}
 
 interface Props {
   scene: MapScene;
@@ -65,6 +112,12 @@ export function EditSceneModal({
       }
       const prevExt = scene.config as unknown as ExtendedConfig;
       const configChanged =
+        (config.gridType ?? 'hex') !== (scene.config.gridType ?? 'hex') ||
+        (config.unitsPerCell ?? 1) !== (scene.config.unitsPerCell ?? 1) ||
+        (config.unitLabel ?? 'm') !== (scene.config.unitLabel ?? 'm') ||
+        (config.showScale ?? true) !== (scene.config.showScale ?? true) ||
+        (config.allowPlayerDrawing ?? false) !==
+          (scene.config.allowPlayerDrawing ?? false) ||
         config.size !== scene.config.size ||
         config.originX !== scene.config.originX ||
         config.originY !== scene.config.originY ||
@@ -109,6 +162,8 @@ export function EditSceneModal({
   };
 
   const pending = saveMutation.isPending || upload.isPending;
+  // 15.2 — legacy scény bez gridType = hex (BC).
+  const gridType = config.gridType ?? 'hex';
 
   const footer = (
     <div className={styles.footer}>
@@ -239,10 +294,39 @@ export function EditSceneModal({
         </section>
 
         <section className={styles.section}>
-          <h4 className={styles.sectionTitle}>Hex mřížka</h4>
+          <h4 className={styles.sectionTitle}>Mřížka</h4>
+          {/* 15.2 — typ mřížky per scéna (hex/čtverec/žádná). */}
+          <div
+            className={styles.gridTypeSelector}
+            role="radiogroup"
+            aria-label="Typ mřížky"
+          >
+            {GRID_TYPES.map((opt) => {
+              const active = gridType === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  className={
+                    active
+                      ? `${styles.gridTypeOption} ${styles.gridTypeOptionActive}`
+                      : styles.gridTypeOption
+                  }
+                  onClick={() =>
+                    setConfig((c) => ({ ...c, gridType: opt.value }))
+                  }
+                >
+                  <GridTypeGlyph type={opt.value} />
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
           <div className={styles.configGrid}>
             <label className={styles.label}>
-              Velikost hexu (px)
+              Velikost buňky (px)
               <input
                 type="number"
                 className={styles.input}
@@ -276,17 +360,84 @@ export function EditSceneModal({
                 }
               />
             </label>
+            {/* `none` nikdy nekreslí čáry → toggle „Zobrazit grid" je pro něj
+                bezpředmětný (skryt). */}
+            {gridType !== 'none' && (
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={config.showGrid}
+                  onChange={(e) =>
+                    setConfig((c) => ({ ...c, showGrid: e.target.checked }))
+                  }
+                />
+                Zobrazit grid
+              </label>
+            )}
+          </div>
+        </section>
+
+        {/* 15.3 — měřítko scény (viditelné hráčům přes stupnici po okraji mapy). */}
+        <section className={styles.section}>
+          <h4 className={styles.sectionTitle}>Měřítko</h4>
+          <div className={styles.configGrid}>
+            <label className={styles.label}>
+              Jednotek na buňku
+              <input
+                type="number"
+                className={styles.input}
+                value={config.unitsPerCell ?? 1}
+                min={0.1}
+                step={0.1}
+                onChange={(e) =>
+                  setConfig((c) => ({
+                    ...c,
+                    unitsPerCell: Number(e.target.value),
+                  }))
+                }
+              />
+            </label>
+            <label className={styles.label}>
+              Jednotka
+              <input
+                type="text"
+                className={styles.input}
+                value={config.unitLabel ?? 'm'}
+                maxLength={8}
+                onChange={(e) =>
+                  setConfig((c) => ({ ...c, unitLabel: e.target.value }))
+                }
+              />
+            </label>
             <label className={styles.checkboxLabel}>
               <input
                 type="checkbox"
-                checked={config.showGrid}
+                checked={config.showScale ?? true}
                 onChange={(e) =>
-                  setConfig((c) => ({ ...c, showGrid: e.target.checked }))
+                  setConfig((c) => ({ ...c, showScale: e.target.checked }))
                 }
               />
-              Zobrazit grid
+              Zobrazit stupnici
             </label>
           </div>
+        </section>
+
+        {/* 15.4 — povolení kreslení hráčům na této scéně. */}
+        <section className={styles.section}>
+          <h4 className={styles.sectionTitle}>Kreslení</h4>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={config.allowPlayerDrawing ?? false}
+              onChange={(e) =>
+                setConfig((c) => ({
+                  ...c,
+                  allowPlayerDrawing: e.target.checked,
+                }))
+              }
+            />
+            Hráči smí kreslit anotace
+          </label>
         </section>
 
         <section className={styles.section}>

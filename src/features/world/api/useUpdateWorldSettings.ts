@@ -3,6 +3,7 @@ import { api } from '@/shared/api/client';
 import type {
   CharacterTabVisibility,
   HeadlineNode,
+  MapDefaults,
   MenuTemplate,
   PjChatPersona,
   WorldSettings,
@@ -32,6 +33,8 @@ export interface UpdateWorldSettingsInput {
   lastInfo?: { text: string; visible: boolean } | null;
   /** 6.8 — PJ persona v chatu. `null` = reset na výchozí. */
   pjChatPersona?: PjChatPersona | null;
+  /** 15.4 (E) — výchozí nastavení map světa. `null` = reset. */
+  mapDefaults?: MapDefaults | null;
 }
 
 export function useUpdateWorldSettings(worldId: string) {

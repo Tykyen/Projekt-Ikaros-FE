@@ -17,6 +17,7 @@ import {
   Theater,
   Smile,
   Download,
+  Map as MapIcon,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
@@ -39,6 +40,7 @@ const CharacterTabsVisibilityTab = lazy(
 );
 const HeadlineLinkTab = lazy(() => import('./tabs/HeadlineLinkTab'));
 const PjChatTab = lazy(() => import('./tabs/PjChatTab'));
+const MapDefaultsTab = lazy(() => import('./tabs/MapDefaultsTab'));
 const DeleteWorldTab = lazy(() => import('./tabs/DeleteWorldTab'));
 const ExportTab = lazy(() => import('./tabs/ExportTab'));
 // Přesun z world nav (2026-05-25): admin nástroje do Nastavení tabů.
@@ -115,6 +117,15 @@ const TABS: SettingsTab[] = [
     icon: <LayoutTemplate size={18} />,
     minRole: WorldRole.Korektor,
     render: () => <PageTemplatesTab />,
+  },
+  {
+    // 15.4 (E) — výchozí nastavení map (typ mřížky, měřítko, HP, kreslení).
+    // Seeduje novou scénu; PJ-level.
+    id: 'mapy',
+    label: 'Mapy',
+    icon: <MapIcon size={18} />,
+    minRole: WorldRole.PJ,
+    render: () => <MapDefaultsTab />,
   },
   {
     // 6.8 / 6.8-followup — PJ identita v chatu i headeru. Viditelný od PomocnyPJ

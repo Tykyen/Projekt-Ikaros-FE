@@ -49,6 +49,20 @@ export interface MapEffect {
   barrierDC?: number;
 }
 
+/**
+ * 15.4 — anotace (kresba) na mapě. `points` = map-space px páry
+ * `[x0,y0,x1,y1,...]`. `visibility`: `pj` = jen PJ, `all` = všichni.
+ */
+export interface MapDrawing {
+  id: string;
+  kind: 'line' | 'arrow' | 'circle' | 'text';
+  points: number[];
+  color: string;
+  text?: string;
+  createdByUserId: string;
+  visibility: 'pj' | 'all';
+}
+
 export interface MapTokenAbility {
   name: string;
   description: string;
@@ -185,6 +199,8 @@ export interface MapScene {
   tokens: MapToken[];
   npcTemplates: MapSceneNpc[];
   effects: MapEffect[];
+  /** 15.4 — anotace (kresby) na scéně. */
+  drawings?: MapDrawing[];
   fogEnabled: boolean;
   revealedHexes: HexCoord[];
   templateId?: string;
@@ -234,6 +250,10 @@ export type MapOperation =
   | { type: 'effect.add'; effect: MapEffect }
   | { type: 'effect.remove'; effectId: string }
   | { type: 'effect.update'; effectId: string; patch: Partial<MapEffect> }
+  // 15.4 — Drawing (anotace)
+  | { type: 'drawing.add'; drawing: MapDrawing }
+  | { type: 'drawing.remove'; drawingId: string }
+  | { type: 'drawing.clear' }
   // Fog
   | { type: 'fog.set'; enabled: boolean; revealedHexes: HexCoord[] }
   | { type: 'fog.brush'; mode: 'reveal' | 'fog'; hexes: HexCoord[] }
@@ -361,16 +381,34 @@ export interface WorldOperationBroadcast {
 }
 
 /**
- * 10.2b — konfigurace hex gridu. Match BE `MapScene.config` schema.
+ * 10.2b — konfigurace gridu scény. Match BE `MapScene.config` schema.
+ * 15.2 — `gridType` (hex/square/none); chybí (undefined) = `hex` (BC, legacy
+ * scény). `size` má per-typ význam: hex = délka hrany, square = délka strany.
  */
 export interface HexConfig {
-  /** Délka hrany hexu v px (mapa-space, ne screen). Default 40. */
+  /**
+   * 15.2 — typ mřížky. `undefined` = `hex` (BC). Render/snap/fog/efekty řeší
+   * `getGridAdapter(gridType)` — viz `./grid`.
+   */
+  gridType?: 'hex' | 'square' | 'none';
+  /** Délka hrany hexu / strany čtverce v px (mapa-space, ne screen). Default 40. */
   size: number;
   /** Pixel offset gridu od (0,0) v mapa-space. */
   originX: number;
   originY: number;
-  /** Render grid? Pokud false, `HexGrid` neRenderuje vůbec nic. */
+  /** Render čar mřížky? Pro `none` se ignoruje (čáry se nekreslí tak jako tak). */
   showGrid: boolean;
+  /**
+   * 15.3 — měřítko: kolik jednotek (unitLabel) připadá na jednu buňku. Chybí =
+   * `1`. Řídí stupnici po okraji mapy (`MapScaleFrame`) i pravítko.
+   */
+  unitsPerCell?: number;
+  /** 15.3 — popisek jednotky měřítka (např. „m"). Chybí = `m`. */
+  unitLabel?: string;
+  /** 15.3 — zobrazit stupnici po okraji mapy? Chybí = `true`. */
+  showScale?: boolean;
+  /** 15.4 — smí hráč kreslit anotace na této scéně? Chybí = `false`. */
+  allowPlayerDrawing?: boolean;
   /**
    * 10.2g — per-scéna viditelnost HP barů dle typu tokenu.
    * Chybí (undefined) = `true` (BC + default zapnuto).

@@ -1,5 +1,7 @@
 /**
- * 10.2d — najde první volný hex počínaje `start`, spirálovým BFS.
+ * 10.2d — najde první volnou buňku počínaje `start`, spirálovým BFS.
+ * 15.2 — `neighbors` per typ mřížky (default hex pro BC); caller passuje
+ * `getGridAdapter(config.gridType).neighbors`.
  *
  * Plán: docs/arch/phase-10/plan-10.2d.md C5.
  */
@@ -11,6 +13,7 @@ const MAX_SEARCH = 500;
 export function findFirstFreeHex(
   occupied: MapToken[],
   start: HexCoord = { q: 0, r: 0 },
+  neighbors: HexCoord[] = AXIAL_DIRECTIONS,
 ): HexCoord {
   const taken = new Set(occupied.map((t) => `${t.q},${t.r}`));
   const visited = new Set<string>();
@@ -22,7 +25,7 @@ export function findFirstFreeHex(
     if (visited.has(key)) continue;
     visited.add(key);
     if (!taken.has(key)) return cur;
-    for (const dir of AXIAL_DIRECTIONS) {
+    for (const dir of neighbors) {
       queue.push({ q: cur.q + dir.q, r: cur.r + dir.r });
     }
     i++;

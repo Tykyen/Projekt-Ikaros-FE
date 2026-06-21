@@ -50,7 +50,16 @@ export function EffectsPalette({
     setExplosionRings,
     explosionVariant,
     setExplosionVariant,
+    templateShape,
+    setTemplateShape,
   } = tool;
+
+  const TEMPLATE_SHAPES: { key: typeof templateShape; label: string }[] = [
+    { key: 'cone', label: '🔺 Kužel' },
+    { key: 'line', label: '📏 Linie' },
+    { key: 'circle', label: '⭕ Koule' },
+    { key: 'square', label: '⬛ Čtverec' },
+  ];
 
   const currentVariant =
     VARIANT_CONFIG.find((v) => v.key === explosionVariant) ?? VARIANT_CONFIG[0];
@@ -85,7 +94,7 @@ export function EffectsPalette({
       ? 'var(--map-ui-gold-solid)'
       : activeTool === 'explosion'
         ? currentVariant.color
-        : activeTool === 'color'
+        : activeTool === 'color' || activeTool === 'template'
           ? 'var(--map-ui-accent-solid)'
           : activeTool === 'erase'
             ? 'var(--map-ui-danger-solid)'
@@ -105,6 +114,7 @@ export function EffectsPalette({
               {activeTool === 'barrier' && '🛡️ Bariéra'}
               {activeTool === 'explosion' &&
                 `${currentVariant.icon} ${currentVariant.label}`}
+              {activeTool === 'template' && '📐 Šablona oblasti'}
               {activeTool === 'erase' && '🧽 Guma'}
             </span>
             <button
@@ -251,6 +261,40 @@ export function EffectsPalette({
             </div>
           )}
 
+          {activeTool === 'template' && (
+            <div className={styles.config}>
+              <div className={styles.segmented}>
+                {TEMPLATE_SHAPES.map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    className={`${styles.segBtn} ${templateShape === s.key ? styles.segBtnActive : ''}`}
+                    onClick={() => setTemplateShape(s.key)}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.colorGrid}>
+                {PALETTE_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    className={`${styles.swatch} ${selectedColor === c.value ? styles.swatchActive : ''}`}
+                    style={{ backgroundColor: c.dot }}
+                    onClick={() => setSelectedColor(c.value)}
+                    title={c.label}
+                    aria-label={c.label}
+                  />
+                ))}
+              </div>
+              <p className={styles.hint}>
+                Klikni na mapu (origin) a táhni směrem/dosahem; pusť pro
+                umístění. Vznikne barevné pole.
+              </p>
+            </div>
+          )}
+
           {activeTool === 'erase' && (
             <p className={styles.hint}>
               Klikni nebo táhni přes mapu pro smazání efektů. Barevné pole
@@ -300,6 +344,19 @@ export function EffectsPalette({
           title="Výbuch / oblast (oheň / plyn / kouř)"
         >
           💥
+        </button>
+        <button
+          type="button"
+          className={`${styles.toolBtn} ${activeTool === 'template' ? styles.toolBtnActive : ''}`}
+          style={
+            activeTool === 'template'
+              ? ({ '--accent': 'var(--map-ui-accent-solid)' } as React.CSSProperties)
+              : undefined
+          }
+          onClick={() => handleToolClick('template')}
+          title="Šablona oblasti (kužel / linie / koule / čtverec)"
+        >
+          📐
         </button>
         <button
           type="button"
