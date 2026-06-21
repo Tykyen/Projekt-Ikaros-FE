@@ -22,7 +22,7 @@ interface Props {
 
 /** 5.2 — prostřední sloupec: oznámení světa + tvorba (PomocnyPJ+), max 3. */
 export function NewsColumn({ worldId }: Props) {
-  const { userRole, worldSlug } = useWorldContext();
+  const { userRole, worldSlug, world } = useWorldContext();
   const currentUser = useAtomValue(currentUserAtom);
   const { data, isLoading } = useWorldNews(worldId);
   const deleteMut = useDeleteWorldNews(worldId);
@@ -31,11 +31,14 @@ export function NewsColumn({ worldId }: Props) {
   const [editing, setEditing] = useState<WorldNewsItem | undefined>(undefined);
   const [toDelete, setToDelete] = useState<WorldNewsItem | null>(null);
 
-  const isGlobalAdmin =
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const isElevatedHere = world?.elevated === true;
+  // Globální novinky (worldId=null) needituje PJ ani elevated admin světa —
+  // jen platform admin (BE: world-news null větev je platformová).
+  const isPlatformAdmin =
     currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
   const canManage =
-    isGlobalAdmin ||
-    (userRole ?? WorldRole.Zadatel) >= WorldRole.PomocnyPJ;
+    isElevatedHere || (userRole ?? WorldRole.Zadatel) >= WorldRole.PomocnyPJ;
 
   const news = (data ?? []).slice(0, 3);
 
@@ -78,7 +81,7 @@ export function NewsColumn({ worldId }: Props) {
               worldId={worldId}
               worldSlug={worldSlug}
               /* Globální novinky (worldId null) needituje PJ světa. */
-              canManage={canManage && (isGlobalAdmin || n.worldId !== null)}
+              canManage={canManage && (isPlatformAdmin || n.worldId !== null)}
               onEdit={() => {
                 setEditing(n);
                 setEditorOpen(true);

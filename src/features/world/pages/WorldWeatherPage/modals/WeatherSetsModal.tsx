@@ -31,7 +31,6 @@
  *   items (rename/remove) → uložit jako custom
  */
 import { useMemo, useState } from 'react';
-import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 import {
   Package,
@@ -55,8 +54,7 @@ import {
   type TabItem,
   type KebabMenuItem,
 } from '@/shared/ui';
-import { currentUserAtom } from '@/shared/store/authStore';
-import { UserRole, type WeatherGeneratorSet } from '@/shared/types';
+import { type WeatherGeneratorSet } from '@/shared/types';
 import {
   GLOBAL_SETS,
   type GlobalSet,
@@ -134,10 +132,8 @@ export function WeatherSetsModal({
   worldId,
   readOnly = false,
 }: Props) {
-  const user = useAtomValue(currentUserAtom);
-  const isGlobalAdmin =
-    user?.role !== undefined && user.role <= UserRole.Admin;
-  // role z props by byla čistší — v MVP řešíme přes readOnly + isGlobalAdmin.
+  // Přístup gate-uje parent (WorldWeatherPage) — modal otevře jen když smí
+  // spravovat (PomocnyPJ+ nebo elevated admin); tady stačí `readOnly`.
 
   const [activeTab, setActiveTab] = useState<TabId>('global');
   const [mineSubTab, setMineSubTab] = useState<MineSubTab>('list');
@@ -327,7 +323,7 @@ export function WeatherSetsModal({
     }
   }
 
-  const canManage = !readOnly && (isGlobalAdmin || true); // PomocnyPJ+ check je v parent (otevírá modal jen pokud canManage). Tady cover přes readOnly.
+  const canManage = !readOnly; // parent otevírá modal jen pokud uživatel smí spravovat
   const canDelete = !readOnly; // PJ+ — parent musí přepnout readOnly nebo nesvázat delete (TODO: jemnější role flag).
 
   const pendingApplyForce = (pendingApply as (DisplaySet & { __force?: true }) | null)?.__force === true;

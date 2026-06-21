@@ -29,7 +29,7 @@
 > | **R-06** | 🟡 nízká | 06 | FE timeline route povoluje Ctenar, BE vyžaduje Hrac → Ctenar dostal 403 na načtené stránce + matoucí kód | ✅ opraveno (FE+BE) |
 > | **R-05** | 🟡 nízká | 02 | Granular `adminPermissions`: `canManageAdmins` + `canEditPlatformPages` se v UI přepínají, ale BE je nevynucuje (jen `canModerateContent` funguje) — klamavé toggly | ✅ opraveno (A, +5 testů) |
 > | **R-01** | 🟡 nízká | 00 | FE prahy `role <= 3` cílí na globálního PJ(3), který FE enum nezná (D-053 ho zrušila) — vestigiální past | ✅ opraveno |
-> | **R-20** | ⚖️ politika | 03 | Platformový Admin/Superadmin **vyřazen z governance světů** (rozhodnutí uživatele 2026-06-13); pojistka = jen `restore` opuštěného světa | ✅ aplikováno (+6 testů) |
+> | **R-20** | ⚖️ politika | 03 | Platformový Admin/Superadmin **vyřazen z governance světů** (rozhodnutí uživatele 2026-06-13); pojistka = jen `restore` opuštěného světa. **2026-06-21 přepracováno na ELEVATION** (moc uspaná, per-svět nahoditelná) — viz doplněk níže | ✅ aplikováno → ✅ elevation (BE+FE) |
 >
 > **2. audit vlna (2026-06-04):** K-R5 → **R-05 ✅ opraveno (varianta A)** (canManageAdmins wired: gatuje admin-permissions endpoint, Admin-manager smí delegovat moderaci; canEditPlatformPages skryt — mrtvý) · HN-10 → **R-06 ✅ opraveno** (FE route Hrac práh + BE rozlišený kód) · **SM-06 ✅ konzistentní** (moderace AR owner-only) · **K-R2 ✅ konzistentní** (PomocnyPJ tab-filter BE-autoritativní).
 >
@@ -59,6 +59,22 @@
 > [`MembersTab`](../Projekt-ikaros-FE/src/features/world/pages/WorldSettingsPage/tabs/MembersTab.tsx) (`viewerRole`) → platform admin bez world-staff role **nevidí** management taby ani role/odebrání/skupiny → žádné 403 tlačítko.
 > **Ponecháno:** `showFullNav`/`isGlobalAdmin` ve `WorldLayout` (admin **vidí** svět = read) a `isPJ`/`isPJForNav` (obsah: Nová stránka, Deník PJ — BE pages adminovi pořád dovolí, jiný scope). Approve/reject žádostí žije v inboxu „Zpracovat" (`WorldAccessRequestRenderer`) — gatuje BE doručením majiteli/PJ, ne admin flag → beze změny.
 > FE build (tsc -b) 0, eslint čistý, 8/8 WorldSettingsPage+MemberRow specs zelené (1 nesouvisející pre-existing fail `worldNavConfig` — Mapy nav).
+>
+> **DOPLNĚK 2026-06-21 — R-20 PŘEPRACOVÁNO na ELEVATION model (rozhodnutí uživatele).**
+> R-20 „admin natvrdo bez moci" nahrazeno modelem **elevation („nahození práv")**: platform Admin/Superadmin
+> má world pravomoci JEN když si je per-svět vědomě aktivuje (toggle); jinak se chová jako hráč. Sjednocuje
+> dříve roztříštěný admin bypass (~45 bran ve 20 modulech) pod jeden vědomý přepínač + audit.
+> Spec: [spec-world-admin-elevation.md](arch/phase-1/_side-tasks/spec-world-admin-elevation.md).
+> - **BE:** kolekce `world_elevations`, guard plní `requester.elevatedWorldIds`, helper `worldAdminBypass(user, worldId)`
+>   nahradil VŠECH ~45 přímých `role <= Admin` ve world-scoped branách; `POST/DELETE/GET /worlds/:id/elevation`;
+>   audit `admin_audit_log` (`WORLD_ELEVATION_ACTIVATED/REVOKED`); logout elevaci skládá; WS (maps.gateway) +
+>   cross-user (chat `isWorldManagerByUserId`) čtou elevaci z DB. **Lint guard** `scripts/check-elevation-bypass.mjs`
+>   (zapojen v `lint:check`) brání vzniku nového přímého bypassu.
+> - **FE:** `world.elevated` enrich; `isPJ`/`isPJForNav`/`navBypass`/`showFullNav` (WorldLayout) i `WorldMembershipGuard`
+>   fallback nově podmíněny `world.elevated`; toggle zámku v hlavičce světa (`AdminElevationToggle`).
+> - **Výjimky (elevation-exempt v kódu):** platform akce mimo svět (restore/listDeleted, upload, globální novinky/chat/zvuky,
+>   cross-world šablony, bestiář system/user scope). **Korekce:** de-elevated admin vidí metadata světa (shell), gated je obsah.
+> - **Ověřeno:** BE tsc + jest 2225/2225 + lint:check; FE build + testy. **Po BE změně restart.**
 >
 > **Ověřeno vzorně (bez díry):** MA-06/07/08/09 (`operations-authorizer` field-level/isLocked/ownership/dice
 > spoof — vše drží, L2) · PO-09 (write-settings staff-only, controller volá assert před update) ·

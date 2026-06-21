@@ -38,6 +38,7 @@ Platformové i světové role, kdo co smí, hierarchie, oprávnění.
 - [globalni-role.md](globalni-role.md) — role nad celou platformou Ikaros
 - [spravci-obsahu.md](spravci-obsahu.md) — globální role 10–12 (články/galerie/diskuze)
 - [granular-permissions.md](granular-permissions.md) — jemné permission flagy
+- [elevation.md](elevation.md) — admin „nahození práv" ve světě (per-svět, nahradilo R-20)
 - [world-role.md](world-role.md) — role v rámci konkrétního světa
 - [world-membership.md](world-membership.md) — uživatel × svět × role
 - [zadatel.md](zadatel.md) — `WorldRole.Zadatel = 0` (uchazeč o vstup)
@@ -194,6 +195,7 @@ Herní logika — postavy, mapa, čas, příběh, ekonomika, nástroje hry.
 - [dvoufazove-overeni.md](dvoufazove-overeni.md) — 2FA/TOTP + trusted device
 - [editor-obsahu.md](editor-obsahu.md) — rich-text editor (TipTap)
 - [efekt-na-mape.md](efekt-na-mape.md) — vizuální efekt na taktické mapě
+- [elevation.md](elevation.md) — admin „nahození práv" ve světě (per-svět)
 - [financni-ucet.md](financni-ucet.md) — peněžní účet postavy
 - [fog-of-war.md](fog-of-war.md) — mlha války na mapě
 - [gdpr-export.md](gdpr-export.md) — export vlastních dat do JSON

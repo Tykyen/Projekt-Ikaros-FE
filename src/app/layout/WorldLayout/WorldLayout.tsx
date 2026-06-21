@@ -30,6 +30,7 @@ import { useWorldSettings } from '@/features/world/api/useWorldSettings';
 import { buildFullWorldNav } from '@/features/world/lib/worldNavConfig';
 import type { NavNode, NavLinkItem } from '@/features/world/lib/headlineNav';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
+import { AdminElevationToggle } from '@/features/world/components/AdminElevationToggle';
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
 import { resolvePersona } from './resolvePersona';
 
@@ -272,17 +273,20 @@ export function WorldLayout() {
   // 8.3 — directory pro naplnění `character` slotu (jméno + avatar postavy
   // přihlášeného člena). Sdílí cache s CharactersPage; žádný extra endpoint.
   const { data: directory } = useCharacterDirectory(realWorldId);
-  // 10.2l — PJ flag pro nav: owner / globální Admin+ / world membership
-  // PomocnyPJ+. Dřív chyběl membership → ne-owner PJ neviděl PJ-only položky.
+  // Elevation — platform admin má world pravomoci JEN když je v tomto světě
+  // „nahozený" (world.elevated z BE). `isPlatformAdmin` je jen pro zobrazení
+  // toggle zámku (kdo SMÍ elevovat), ne pro samotné pravomoci.
+  const isElevatedHere = world?.elevated === true;
+  const isPlatformAdmin =
+    currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
+  // 10.2l — PJ flag pro nav: owner / elevated admin / world membership PomocnyPJ+.
   const isPJForNav =
     world?.ownerId === currentUser?.id ||
-    (currentUser?.role !== undefined && currentUser.role <= UserRole.Admin) ||
+    isElevatedHere ||
     (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
   // N-04/05 — nav položku ukaž jen když na ni uživatel reálně dosáhne (parita
-  // s route guardem: Sa/Admin + owner bypass, jinak membership >= min role).
-  const navBypass =
-    world?.ownerId === currentUser?.id ||
-    (currentUser?.role !== undefined && currentUser.role <= UserRole.Admin);
+  // s route guardem: owner + elevated admin bypass, jinak membership >= min role).
+  const navBypass = world?.ownerId === currentUser?.id || isElevatedHere;
   const navRole = membership?.role ?? -1;
   const { data: settings } = useWorldSettings(realWorldId);
   const nav = useMemo(
@@ -308,15 +312,14 @@ export function WorldLayout() {
 
   // N-16 — isPJ musí (stejně jako isPJForNav) zahrnout world membership
   // PomocnyPJ+, jinak ne-owner PomocnyPJ viděl isPJ=false a mizelo mu PJ UI
-  // (tlačítko „Nová stránka", editace).
+  // (tlačítko „Nová stránka", editace). Elevated admin = plné PJ UI.
   const isPJ =
     world?.ownerId === currentUser?.id ||
-    // R-01 — dřív `<= 3` (globální PJ); D-053 globální PJ zrušil (→Ikarus 9),
-    // FE enum hodnotu 3 nezná. `<= UserRole.Admin` = Superadmin(1)/Admin(2).
-    (currentUser?.role !== undefined && currentUser.role <= UserRole.Admin) ||
+    isElevatedHere ||
     (membership?.role ?? -1) >= WorldRole.PomocnyPJ;
-  const isGlobalAdmin =
-    currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
+  // Full nav pustí člena světa NEBO elevovaného admina (de-elevated admin vidí
+  // jen shell + toggle, ne nav — jako nečlen).
+  const isGlobalAdmin = isElevatedHere;
 
   // Spec 5.1 — loading shellu: header skeleton, dokud world + status nedoběhnou.
   const loading = isLoading || statusLoading;
@@ -463,6 +466,12 @@ export function WorldLayout() {
                 {world?.name ?? 'Svět nenalezen'}
               </Link>
             </>
+          )}
+
+          {/* Elevation toggle — pro platform admina i MIMO full nav, aby se mohl
+              „nahodit" i ve světě, kde není člen (de-elevated vidí jen shell). */}
+          {!loading && isPlatformAdmin && world && (
+            <AdminElevationToggle worldId={world.id} elevated={isElevatedHere} />
           )}
 
           {/* Spec 2.4 — full nav jen pro membery / globální adminy */}

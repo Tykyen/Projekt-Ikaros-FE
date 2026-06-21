@@ -1,0 +1,51 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.toggle:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.toggle:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Elevated = admin má plnou moc → výrazný „varovný" stav, ať na to nezapomene. */
+.elevated {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: rgb(var(--white-rgb));
+}
+
+.elevated:hover:not(:disabled) {
+  filter: brightness(1.1);
+  border-color: var(--danger);
+  color: rgb(var(--white-rgb));
+}
+
+/* Mobil — jen ikona (šetří místo v hlavičce). */
+@media (max-width: 768px) {
+  .label {
+    display: none;
+  }
+  .toggle {
+    padding: var(--sp-1) var(--sp-2);
+  }
+}

@@ -191,12 +191,22 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 
 ---
 
-## I. Governance (R-20) & soft-delete / restore světa
+## I. Governance — Elevation („nahození práv") & soft-delete / restore světa
 
-### R-20 — platform Admin/Superadmin nemá moc uvnitř světa
-- **Princip** `canAdminWorld` (`worlds.service.ts:1942`) vrací true JEN pro membership role ≥ PJ. Platform Admin/Superadmin SÁM O SOBĚ NEMÁ governance moc ve světě (approve žádostí, role, transfer, delete, settings write, calendar). Governance = doména PJ. Read viditelnost zachována (Admin private svět vidí).
-- **Jediná Admin pojistka** = **restore** opuštěného soft-smazaného světa (+ volitelně dosadit nového vlastníka). Mimo to nula.
-- **Důsledky v UI** WorldSettingsPage i MembersTab používají `effectiveRole = skutečná world role` (`WorldSettingsPage.tsx:197`, `MembersTab.tsx:57`) — Admin bez staff role nevidí žádné PJ taby/akce. (Pozn.: FE `WorldMembershipGuard` má sice `fallbackGlobalRoles=[Sa,Admin]` pro vstup na route, ale samotné akce uvnitř BE odmítne — viditelnost ≠ akce.)
+### Elevation — admin moc uspaná, per-svět nahoditelná (nahradila R-20 „natvrdo bez moci", 2026-06-21)
+- **Co to je:** platform Admin/Superadmin má world pravomoci **uspané** — chová se jako jeho world membership role (nebo nečlen). Plnou moc PJ získá JEN po vědomém **nahození** pro daný svět; pak ji zase složí.
+- **Kde:** toggle zámku/štítu v hlavičce světa (`AdminElevationToggle`) — „Aktivovat admina" / „Admin režim". Viditelný platform adminovi i mimo full nav.
+- **Princip (BE):** kolekce `world_elevations` `{userId, worldId}`, guard plní `requester.elevatedWorldIds` (jen pro `role<=Admin`), helper `worldAdminBypass(user, worldId)` (`common/utils/world-elevation.ts`) nahradil VŠECH ~45 přímých `role <= Admin` ve world-scoped branách (worlds/pages/chat/maps/campaign/characters/calendars/timeline/weather/news/currencies/emotes/sounds/universe/gm-notes/bestiae). `canAdminWorld` (`worlds.service.ts:1942`) dál vrací true jen pro membership ≥ PJ — admin moc teče přes `worldAdminBypass`, ne přes governance gate.
+- **Kdo smí elevovat:** jen platform Admin/Superadmin (`assertCanElevate` → jinak 403). `POST/DELETE/GET /worlds/:worldId/elevation`.
+- **Cross-user / WS:** chat `isWorldManagerByUserId` (`:114`) a `maps.gateway` čtou elevaci z DB (`isElevated`) — nemají `requester.elevatedWorldIds` (WS mimo HTTP guard).
+- **Audit:** každé nahození/složení → `admin_audit_log` (`WORLD_ELEVATION_ACTIVATED/REVOKED`, targetType `world`), event-driven `world.elevation.changed`.
+- **Životnost:** bez časové expirace (on/off); **logout elevaci skládá** (`auth.service` → `deactivateAllForUser`); hard-delete účtu uklidí.
+- **Read v de-elevated:** admin-nečlen na private světě nevidí OBSAH (pages/chat/settings = jako nečlen), ale vidí **shell** (název) pro toggle. „Vidět jako hráč" = obsah, ne existence/jméno.
+- **Důsledky v UI:** WorldSettingsPage/MembersTab dál `effectiveRole = skutečná world role`; `WorldLayout` `isPJ`/`isPJForNav`/`navBypass`/`showFullNav` i `WorldMembershipGuard` fallback nově podmíněny `world.elevated`.
+- **Lint guard:** `scripts/check-elevation-bypass.mjs` (v `lint:check`) brání novému přímému `role <= Admin` ve world modulech (výjimky přes `// elevation-exempt`).
+- **Jediná moc mimo elevaci** = **restore** opuštěného soft-smazaného světa (platform akce mimo world runtime).
+- **Stav:** ✅ funguje (BE jest 2225/2225 + lint guard + FE build/testy zelené). **Po BE změně restart.**
+- **Kód:** BE `modules/world-elevations/*`, `common/utils/world-elevation.ts`, `worlds.service.ts` (`elevate`/`deElevate`/`getElevationStatus`/`enrichElevation`/`applyDetailScope`), `worlds.controller.ts`; FE `features/world/api/useWorldElevation.ts`, `features/world/components/AdminElevationToggle.tsx`, `WorldLayout.tsx`, `WorldMembershipGuard.tsx`.
 
 ### Soft-delete světa — tab „Smazat svět" (DeleteWorldTab)
 - **Kde** `/svet/:slug/nastaveni#smazat`, tab od `PJ` (`WorldSettingsPage.tsx:177`).
@@ -238,7 +248,7 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 
 4. **`assertMember` práh = Hrac, ne Ctenar.** Content read gate `assertMember` (`:1934`) odmítá role < `Hrac`(2), tj. i `Ctenar`(1) — „Pending členství nemá přístup". Ale FE memberOnly routy (chat, stránky, mapa…) mají `minWorldRole=Ctenar`. Pokud konkrétní BE endpoint použije `assertMember` (timeline/pocasi/diary-schema), Čtenář dostane 403 i když ho FE guard pustil. Většina obsahových modulů má vlastní gate (Ctenar+), ale pro moduly volající `assertMember` to znamená Čtenář = bez přístupu. K ověření per-modul (mimo tuto kapitolu).
 
-5. **FE guard fallback Sa/Admin vs. BE R-20.** `memberOnly`/route guardy pouštějí Sa/Admin na PJ-only routy (kalendar, scenare, admin/*), ale BE write akce je odmítne (governance R-20). Admin tak vidí stránku, ale akce selžou 403. Pro průvodce: Admin „nahlíží", ale nespravuje cizí svět.
+5. ✅ VYŘEŠENO 2026-06-21 (elevation) — **FE guard fallback Sa/Admin vs. BE.** Drift „FE pustí admina, BE 403kuje" odstraněn: `WorldMembershipGuard` fallback i `WorldLayout` (`isPJ`/`showFullNav`) jsou nově podmíněny `world.elevated`. De-elevated admin = jako nečlen na obou stranách; po nahození (toggle) projde vším. Zbývá drobnost: router-level `memberOnly` fallback (router.tsx) elevaci ještě nečte — ale BE je autoritativní (obsah gated elevací), takže max zobrazí prázdnou stránku, ne reálný leak. Sledováno jako drobný FE follow-up.
 
 6. **Presence škálování (D-051).** WS presence je in-memory single-instance; v multi-instance prod (PM2 cluster / víc podů) by online stav byl per-instance nekonzistentní. Sledováno jako dluh. Stav funkce proto 🚧.
 

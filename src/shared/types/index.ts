@@ -414,6 +414,11 @@ export interface World {
     username: string;
     avatarUrl?: string;
   };
+  /**
+   * Elevation — pro platform admina: má v tomto světě „nahozené" pravomoci?
+   * Read-time enrich z BE (detail světa + /worlds/my). U ne-admina undefined.
+   */
+  elevated?: boolean;
 }
 
 /**

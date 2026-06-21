@@ -23,7 +23,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import { useWorldContext } from "@/features/world/context/WorldContext";
 import { currentUserAtom } from "@/shared/store/authStore";
-import { WorldRole, UserRole } from "@/shared/types";
+import { WorldRole } from "@/shared/types";
 import { useMapTheme } from "./hooks/useMapTheme";
 import { useViewportPanZoom } from "./hooks/useViewportPanZoom";
 import { useViewportSize } from "./hooks/useViewportSize";
@@ -380,15 +380,12 @@ export function TacticalMapView(): React.ReactElement {
   }, [panZoom]);
 
   // PJ branching — práh `>= PomocnyPJ` (zarovnané s BE OperationsAuthorizer).
-  // 10.2c hotfix — globální Sa/Admin bypass (mirror BE `OperationsAuthorizer`
-  // z 10.2-prep-1, který povoluje ops Sa/Admin bez ohledu na WorldRole).
-  // Bez tohoto bypassu Superadmin (vlastník platformy) neviděl `MapPjPanel`
-  // v cizích světech, kde nemá explicit PomocnyPJ+ membership.
-  const isGlobalAdmin =
-    currentUser?.role === UserRole.Superadmin ||
-    currentUser?.role === UserRole.Admin;
+  // Elevation — admin má world bypass (MapPjPanel/ops) jen když je v tomto světě
+  // „nahozený" (world.elevated); mirror BE `worldAdminBypass`. De-elevated admin
+  // se na mapě chová jako jeho world role.
+  const isElevatedHere = world?.elevated === true;
   const isPJ =
-    isGlobalAdmin || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
+    isElevatedHere || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
 
   // 10.2j G3 — drž ref pro onLiveDiceRoll aktuální (počítá se pod useMapScene).
   // Sync v effectu (ne za renderu) — `handleLiveDiceRoll` ref čte až ve WS
@@ -437,7 +434,7 @@ export function TacticalMapView(): React.ReactElement {
   const mySlugs = useMyCharacterSlugs(worldId || null, currentUser?.id ?? null);
   const canDrag = useTokenPermissions({
     scene,
-    isGlobalAdmin,
+    isGlobalAdmin: isElevatedHere,
     isPj: userRole !== null && userRole >= WorldRole.PomocnyPJ,
     mySlugs,
     userId: currentUser?.id ?? "",
@@ -1353,7 +1350,7 @@ export function TacticalMapView(): React.ReactElement {
             openedToken.instanceName ?? openedToken.characterData?.name ?? "?";
           const editable = canDrag(openedToken);
           const deletable =
-            isGlobalAdmin ||
+            isElevatedHere ||
             (userRole !== null && userRole >= WorldRole.PomocnyPJ);
           // Body osudu — Matrix-specific stat. Pro ostatní systémy se badge skryje.
           const fatePoints =

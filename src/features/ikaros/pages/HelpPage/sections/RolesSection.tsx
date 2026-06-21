@@ -261,6 +261,31 @@ export function RolesSection() {
           <li>Každá admin akce se zapisuje do auditního logu.</li>
         </ul>
 
+        <h3>Admin ve světě — „nahození práv"</h3>
+        <p>
+          Admin i Superadmin se v cizím světě <strong>chovají jako běžný hráč</strong>{' '}
+          — jejich admin pravomoci jsou ve světě uspané. Když potřebují něco
+          vyřešit, kliknou v hlavičce světa na tlačítko zámku{' '}
+          <strong>„Aktivovat admina"</strong> a získají plná práva vypravěče (PJ) v
+          tom světě. Stejným tlačítkem (<strong>„Admin režim"</strong>) je zase
+          složí.
+        </p>
+        <ul>
+          <li>
+            Nahození platí <strong>jen pro daný svět</strong> — v ostatních
+            světech zůstávají pořád hráčem.
+          </li>
+          <li>
+            Trvá, dokud ho admin sám nesloží — nebo <strong>do odhlášení</strong>{' '}
+            (po novém přihlášení je zase uspané).
+          </li>
+          <li>Každé nahození i složení se zapisuje do auditního logu.</li>
+          <li>
+            Bez nahození vidí ve světě jen to co běžný hráč (obsah uzavřeného
+            světa zůstává skrytý).
+          </li>
+        </ul>
+
         <h3>Co kdo smí udělat s kým</h3>
         <div className={s.tableWrap}>
           <table>

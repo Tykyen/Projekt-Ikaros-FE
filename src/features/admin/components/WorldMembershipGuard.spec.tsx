@@ -9,7 +9,10 @@ import {
   type WorldContextValue,
 } from '@/features/world/context/WorldContext';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { UserRole, WorldRole, type User } from '@/shared/types';
+import { UserRole, WorldRole, type User, type World } from '@/shared/types';
+
+/** Svět s aktivní elevací admina (stačí pole `elevated` pro guard). */
+const elevatedWorld = { elevated: true } as World;
 
 function makeUser(role: UserRole): User {
   return {
@@ -82,7 +85,7 @@ describe('WorldMembershipGuard', () => {
     expect(screen.getByText(/403|odepřen|forbidden/i)).toBeInTheDocument();
   });
 
-  it('Superadmin projde bez ohledu na membership (fallback)', () => {
+  it('elevovaný Superadmin projde bez ohledu na membership (fallback)', () => {
     store.set(currentUserAtom, makeUser(UserRole.Superadmin));
     render(
       <WorldMembershipGuard
@@ -91,12 +94,26 @@ describe('WorldMembershipGuard', () => {
       >
         <div data-testid="protected">OK</div>
       </WorldMembershipGuard>,
-      { wrapper: makeWrapper(makeCtx()) },
+      { wrapper: makeWrapper(makeCtx({ world: elevatedWorld })) },
     );
     expect(screen.getByTestId('protected')).toBeInTheDocument();
   });
 
-  it('Admin projde bez ohledu na membership (fallback)', () => {
+  it('elevovaný Admin projde bez ohledu na membership (fallback)', () => {
+    store.set(currentUserAtom, makeUser(UserRole.Admin));
+    render(
+      <WorldMembershipGuard
+        minWorldRole={WorldRole.PJ}
+        fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
+      >
+        <div data-testid="protected">OK</div>
+      </WorldMembershipGuard>,
+      { wrapper: makeWrapper(makeCtx({ world: elevatedWorld })) },
+    );
+    expect(screen.getByTestId('protected')).toBeInTheDocument();
+  });
+
+  it('de-elevated Admin (world.elevated=false) → ForbiddenPage', () => {
     store.set(currentUserAtom, makeUser(UserRole.Admin));
     render(
       <WorldMembershipGuard
@@ -107,7 +124,8 @@ describe('WorldMembershipGuard', () => {
       </WorldMembershipGuard>,
       { wrapper: makeWrapper(makeCtx()) },
     );
-    expect(screen.getByTestId('protected')).toBeInTheDocument();
+    expect(screen.queryByTestId('protected')).not.toBeInTheDocument();
+    expect(screen.getByText(/403|odepřen|forbidden/i)).toBeInTheDocument();
   });
 
   it('PJ daného světa projde (membership.role >= minWorldRole)', () => {

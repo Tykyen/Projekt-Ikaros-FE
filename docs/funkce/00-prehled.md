@@ -59,13 +59,13 @@ Každá funkce má jednotnou strukturu:
 | PomocnyPJ | 4 | Pomocný vypravěč — většina správy obsahu (stránky, kalendáře, chat, postavy). |
 | PJ | 5 | Vypravěč = vlastník světa; plná governance (nastavení, mazání, předání, role). |
 
-> **R-20 governance:** platformový Admin/Superadmin **nemá moc uvnitř světa** — governance patří PJ. Jediná výjimka = obnova opuštěného soft-smazaného světa (30denní okno). Detail viz kap. 09.
+> **Elevation (2026-06-21, nahradila R-20):** platformový Admin/Superadmin má world pravomoci **uspané** — chová se jako hráč, dokud si je per-svět vědomě **nenahodí** (toggle „Aktivovat admina" v hlavičce světa). Elevated = plná moc PJ v tom světě; de-elevated = jako nečlen/člen. BE-enforced (`world_elevations` + `worldAdminBypass` napříč ~45 branami), audit, logout skládá. Výjimka mimo elevaci = obnova opuštěného světa. Detail viz kap. 09.
 
 ---
 
 ## Průřezové koncepty (platí napříč kapitolami)
 
-- **Autoritativní BE:** FE guardy jsou jen UX; o přístupu rozhoduje BE (`assertAccess`, `assertMember`, `@Roles`, `canAdminWorld`…). Pozor: FE pustí Sa/Admin do světa „nahlédnout", ale BE write akce je dle R-20 odmítne.
+- **Autoritativní BE:** FE guardy jsou jen UX; o přístupu rozhoduje BE (`assertAccess`, `assertMember`, `@Roles`, `canAdminWorld`, `worldAdminBypass`…). Admin bez aktivní **elevace** je BE i FE bránami odmítnut jako nečlen; po nahození (elevation) projde vším v daném světě.
 - **Real-time (WebSocket):** identita ze socketu (JWT `client.data.userId`), ne z payloadu. World-level eventy chodí jako leak-safe signál `world:{id}` → klient si refetchne filtrovaný GET. Ruční `room:join` nutně s reconnect re-join.
 - **Per-system schémata:** postavy i bestie mají staty dle herního systému světa; schémata jsou canonical na FE → exportují se do BE, kde je validace v soft-mode (chybí-li schema, důvěřuje FE). 13+ herních systémů.
 - **Témata / skiny:** `:root` vlastní buď globální ThemeProvider, nebo WorldLayout (per-svět téma) přes gate atom — nikdy ne třetí aplikátor.

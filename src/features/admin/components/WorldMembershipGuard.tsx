@@ -42,12 +42,18 @@ export function WorldMembershipGuard({
   children,
 }: Props) {
   const user = useAtomValue(currentUserAtom);
-  const { userRole: worldRole, loading } = useWorldContext();
+  const { userRole: worldRole, world, loading } = useWorldContext();
   const { worldSlug } = useParams<{ worldSlug: string }>();
 
   if (loading) return <Spinner center />;
 
-  if (user && fallbackGlobalRoles?.includes(user.role)) {
+  // Elevation — platform admin obejde membership JEN když je v tomto světě
+  // „nahozený" (world.elevated). De-elevated admin se chová jako nečlen.
+  if (
+    user &&
+    fallbackGlobalRoles?.includes(user.role) &&
+    world?.elevated === true
+  ) {
     return <>{children}</>;
   }
 

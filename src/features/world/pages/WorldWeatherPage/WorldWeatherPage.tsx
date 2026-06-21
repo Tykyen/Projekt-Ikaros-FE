@@ -26,7 +26,7 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { Button, ConfirmDialog, Spinner } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { UserRole, WorldRole, type WeatherGenerator } from '@/shared/types';
+import { WorldRole, type WeatherGenerator } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import {
   useWeatherGenerators,
@@ -93,12 +93,11 @@ export default function WorldWeatherPage() {
   const { worldId, worldSlug, world, userRole, loading } = useWorldContext();
   const currentUser = useAtomValue(currentUserAtom);
 
-  // Role gating — globální Admin+ = world bypass.
-  const isGlobalAdmin =
-    currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const isElevatedHere = world?.elevated === true;
   const role = userRole ?? WorldRole.Zadatel;
-  const canManage = isGlobalAdmin || role >= WorldRole.PomocnyPJ;
-  const canDelete = isGlobalAdmin || role >= WorldRole.PJ;
+  const canManage = isElevatedHere || role >= WorldRole.PomocnyPJ;
+  const canDelete = isElevatedHere || role >= WorldRole.PJ;
 
   // Data + WS.
   const listQuery = useWeatherGenerators(worldId);

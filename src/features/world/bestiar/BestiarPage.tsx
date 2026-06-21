@@ -28,11 +28,14 @@ export default function BestiarPage(): React.ReactElement {
   const query = useBestiar(worldId || null, systemId);
   const { softDelete } = useBestieMutations(worldId || null, systemId);
 
-  const isGlobalAdmin =
+  // System/user scope = globální/osobní katalog → platform admin. World scope =
+  // svět → elevation (admin musí být v tomto světě „nahozený").
+  const isPlatformAdmin =
     currentUser?.role === UserRole.Superadmin ||
     currentUser?.role === UserRole.Admin;
+  const isElevatedHere = world?.elevated === true;
   const isPjInWorld =
-    isGlobalAdmin || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
+    isElevatedHere || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
 
   const [tab, setTab] = useState<Tab>('user');
   const [search, setSearch] = useState('');
@@ -57,8 +60,7 @@ export default function BestiarPage(): React.ReactElement {
   }, [query.data, tab, search]);
 
   const canEdit = (b: Bestie): boolean => {
-    if (isGlobalAdmin) return true;
-    if (b.scope === 'system') return false;
+    if (b.scope === 'system') return isPlatformAdmin;
     if (b.scope === 'user') return b.ownerUserId === currentUser?.id;
     if (b.scope === 'world') return isPjInWorld;
     return false;
@@ -82,7 +84,7 @@ export default function BestiarPage(): React.ReactElement {
       <header className={styles.header}>
         <h1 className={styles.title}>Bestiář</h1>
         {/* System scope smí tvořit jen Admin/Superadmin; user/world PJ+. */}
-        {(tab === 'system' ? isGlobalAdmin : isPjInWorld) && (
+        {(tab === 'system' ? isPlatformAdmin : isPjInWorld) && (
           <Button
             variant="primary"
             className="print-hide"
