@@ -1,6 +1,6 @@
 # Spec 15B.2 — Meta tagy, title, sitemap, robots, canonical, breadcrumbs
 
-**Stav:** 🟡 NÁVRH (čeká schválení) · **Fáze:** 15B (H2 Objevitelnost / SEO) · **Roadmap:** [15B.2](../../roadmap2.md) [H2-02] · **Navazuje:** [15B.1 prerender](spec-15B.1-prerender.md) (sidecar sebere hotový DOM vč. meta), veřejné routy, `GET /worlds|/articles|/galleries` · **Připravuje:** 15B.3 (JSON-LD — breadcrumbs data), 15B.6 (sociální sdílení — OG karty) · **Souvis.:** [auth-leak-policy], prod nginx 14.3, FRONTEND_URL (env)
+**Stav:** ✅ IMPLEMENTOVÁNO 2026-06-22 (FE+BE kód hotový, testy zelené; **čeká deploy + BE restart**) · **Fáze:** 15B (H2 Objevitelnost / SEO) · **Roadmap:** [15B.2](../../roadmap2.md) [H2-02] · **Navazuje:** [15B.1 prerender](spec-15B.1-prerender.md) (sidecar sebere hotový DOM vč. meta), veřejné routy, `GET /worlds|/articles|/galleries` · **Připravuje:** 15B.3 (JSON-LD — breadcrumbs data), 15B.6 (sociální sdílení — OG karty) · **Souvis.:** [auth-leak-policy], prod nginx 14.3, FRONTEND_URL (env)
 
 **Cíl:** Každá veřejná stránka má **vlastní** `<title>`, popis, kanonickou adresu a sociální náhledovou kartu; vyhledávač dostane `robots.txt` (kam smí) a `sitemap.xml` (co existuje). Bez tohohle 15B.1 prerenderuje obsah, ale všechny stránky vypadají pro Google i pro sdílení jako jedno boilerplate „Projekt Ikaros".
 

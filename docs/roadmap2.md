@@ -263,13 +263,15 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Ops/FE:** prerender služba/proxy NEBO SSR vrstva pro public routy.
 **Otevřené otázky:** Prerender (jednodušší) vs. SSR (čistší)? Které routy jsou veřejné?
 
-### - [ ] 15B.2 Meta tagy, title, sitemap, robots — [H2-02 · dopad vysoký · náklad střední]
+### - [x] 15B.2 Meta tagy, title, sitemap, robots — [H2-02 · dopad vysoký · náklad střední]
+> ✅ **Implementováno 2026-06-22** (viz [spec-15B.2](arch/phase-15B/spec-15B.2-meta-sitemap.md)) — per-page `<title>`/description/canonical/OG+Twitter přes sdílenou `<Seo>` (**nativní React 19 hoisting**, ne helmet; titulek imperativně `document.title` kvůli duplikátu se statickým `<title>`) na 10 veřejných stránkách; `public/robots.txt`; **`/sitemap.xml` = BE modul `seo`** (leak-safe — jen public/open světy + Published obsah, cache 1 h; nginx mapuje `/sitemap.xml` → `/api/sitemap.xml`); vizuální **breadcrumbs** na detailech (data připravená pro 15B.3 JSON-LD). noindex na private/nepublikovaném. Testy: FE 11 + HelpPage 25, BE seo 6. **Čeká deploy + BE restart.** Analytics návštěvnosti → nový bod 15B.7.
 **Cíl:** `<title>` + meta description per stránka (`react-helmet-async`), `sitemap.xml`, `robots.txt`, canonical URL, breadcrumbs.
 **Proč:** Bez sitemap a canonical se veřejný obsah špatně indexuje; title musí odpovídat obsahu, ne být boilerplate. Technický základ celého SEO.
 **FE:** helmet-async napříč veřejnými stránkami + generátor sitemap (dynamická → dávkově/cache).
 **Otevřené otázky:** Jak generovat sitemap velkých světů? Které stránky do indexu?
 
-### - [ ] 15B.3 Structured data (JSON-LD) — [H2-03 · dopad střední · náklad střední]
+### - [x] 15B.3 Structured data (JSON-LD) — [H2-03 · dopad střední · náklad střední]
+> ✅ **Implementováno 2026-06-22** (viz [spec-15B.3](arch/phase-15B/spec-15B.3-json-ld.md)) — JSON-LD generátory: **Article** (článek, obrázek = 1. `<img>` z obsahu/brand), **ImageObject** (galerie), **CreativeWork** (svět), **BreadcrumbList** (3 detaily, reuse `Crumb[]` z 15B.2), **WebSite+Organization** (homepage). Komponenta `<JsonLd>` + čisté buildery v `src/shared/seo/jsonLd.tsx`; render jen na `indexable` stránkách (gate sdílený s `noindex`); `serializeJsonLd` escapuje `<` proti `</script>` breakoutu. **Vynecháno:** `ProfilePage`/`Person` (profily v robots Disallow + privacy) a `DiscussionForumPosting` (diskuze za auth, neindexovatelné — roadmapa předjímala). **AggregateRating** vědomě ne (Google u Article hvězdičky neukazuje, self-serving rating = riziko manual action). BE beze změny. Testy 15/15 + build OK. **Čeká deploy.**
 **Cíl:** Strukturovaná data: `Article` (články, lore), `ProfilePage` (autoři, světy), `BreadcrumbList`, `DiscussionForumPosting` (veřejné **komunitní diskuze** — modul Diskuze z Etapy I).
 **Proč:** Google díky tomu zobrazí náhledový obrázek, datum, hodnocení → vyšší CTR.
 > Pozn.: dřívější opora o „veřejná RP vlákna z 16.1" padá — herní příběhy jsou v **privátním** světovém chatu (rozhodnutí 2026-06-15c), neindexují se. Indexovatelný komunitní obsah = články + veřejné diskuze + veřejné světy (vitrína 17.3).

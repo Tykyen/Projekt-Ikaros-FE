@@ -6,7 +6,7 @@ import { ArrowLeft, Check, Pencil, Trash2 } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { Spinner, Breadcrumbs } from '@/shared/ui';
-import { Seo, metaDescription } from '@/shared/seo';
+import { Seo, metaDescription, JsonLd, galleryJsonLd, breadcrumbJsonLd } from '@/shared/seo';
 import {
   useGalleryImage,
   useApproveGalleryImage,
@@ -49,6 +49,15 @@ export default function GalleryDetailPage() {
 
   const cat = categoryByKey(categories, image.category);
 
+  // 15B.3 — drobečky sdílí Breadcrumbs i BreadcrumbList JSON-LD (jeden zdroj).
+  const crumbs = [
+    { label: 'Domů', href: '/' },
+    { label: 'Galerie', href: '/ikaros/galerie' },
+    { label: image.title },
+  ];
+  const indexable = image.status === 'Published';
+  const origin = window.location.origin;
+
   return (
     <div className={s.page}>
       <Seo
@@ -56,15 +65,11 @@ export default function GalleryDetailPage() {
         description={metaDescription(image.description) ?? `Dílo z galerie komunity Ikaros: ${image.title}.`}
         type="article"
         image={image.imageUrl}
-        noindex={image.status !== 'Published'}
+        noindex={!indexable}
       />
-      <Breadcrumbs
-        items={[
-          { label: 'Domů', href: '/' },
-          { label: 'Galerie', href: '/ikaros/galerie' },
-          { label: image.title },
-        ]}
-      />
+      {indexable && <JsonLd data={galleryJsonLd(image, origin)} />}
+      {indexable && <JsonLd data={breadcrumbJsonLd(crumbs, origin)} />}
+      <Breadcrumbs items={crumbs} />
       <Link to="/ikaros/galerie" className={s.back}>
         <ArrowLeft size={14} /> Zpět na galerii
       </Link>

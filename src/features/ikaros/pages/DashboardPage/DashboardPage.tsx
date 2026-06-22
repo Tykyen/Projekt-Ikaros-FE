@@ -7,7 +7,7 @@ import {
   registerModalOpenAtom,
   forgotPasswordModalOpenAtom,
 } from '@/shared/store/authStore';
-import { Seo } from '@/shared/seo';
+import { Seo, JsonLd, siteJsonLd } from '@/shared/seo';
 import { ShowcaseSection } from './sections/ShowcaseSection';
 import { WelcomeSection } from './sections/WelcomeSection';
 import { IkarosEventsSection } from './sections/IkarosEventsSection';
@@ -53,6 +53,10 @@ export default function DashboardPage() {
         title="Ikaros — online platforma pro RPG světy a vyprávění"
         description="Tvoř a hraj RPG světy online: postavy, deníky, mapy, kalendáře, chat a komunitní obsah. Dračí Doupě, D&D i vlastní systémy."
       />
+      {/* 15B.3 — brand uzly WebSite + Organization. */}
+      {siteJsonLd(window.location.origin).map((node) => (
+        <JsonLd key={node['@type'] as string} data={node} />
+      ))}
       {!isAuthenticated && <ShowcaseSection />}
       <WelcomeSection />
       <div className={s.twoCol}>

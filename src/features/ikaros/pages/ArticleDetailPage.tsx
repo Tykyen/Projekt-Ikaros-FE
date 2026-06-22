@@ -5,7 +5,7 @@ import { ArrowLeft, Edit3, Send, Trash2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { Spinner, ConfirmDialog, Breadcrumbs } from '@/shared/ui';
-import { Seo, metaDescription } from '@/shared/seo';
+import { Seo, metaDescription, JsonLd, articleJsonLd, breadcrumbJsonLd } from '@/shared/seo';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { UserRole } from '@/shared/types';
 import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles, useToggleFavoriteArticle } from '../api/useArticles';
@@ -61,6 +61,15 @@ export default function ArticleDetailPage() {
   const cat = categoryByKey(categories, article.category);
   const glyph = glyphFor(article.id);
 
+  // 15B.3 — drobečky sdílí Breadcrumbs i BreadcrumbList JSON-LD (jeden zdroj).
+  const crumbs = [
+    { label: 'Domů', href: '/' },
+    { label: 'Články', href: '/ikaros/clanky' },
+    { label: article.title },
+  ];
+  const indexable = article.status === 'Published';
+  const origin = window.location.origin;
+
   return (
     <article
       className={s.page}
@@ -74,17 +83,13 @@ export default function ArticleDetailPage() {
         title={article.title}
         description={metaDescription(article.content)}
         type="article"
-        noindex={article.status !== 'Published'}
+        noindex={!indexable}
       />
+      {indexable && <JsonLd data={articleJsonLd(article, origin)} />}
+      {indexable && <JsonLd data={breadcrumbJsonLd(crumbs, origin)} />}
 
       <div className={s.headerWrap}>
-        <Breadcrumbs
-          items={[
-            { label: 'Domů', href: '/' },
-            { label: 'Články', href: '/ikaros/clanky' },
-            { label: article.title },
-          ]}
-        />
+        <Breadcrumbs items={crumbs} />
         <Link to="/ikaros/clanky" className={s.back}>
           <ArrowLeft size={14} /> Zpět
         </Link>

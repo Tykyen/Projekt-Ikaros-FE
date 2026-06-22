@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { Spinner, Breadcrumbs } from '@/shared/ui';
-import { Seo, metaDescription } from '@/shared/seo';
+import { Seo, metaDescription, JsonLd, worldJsonLd, breadcrumbJsonLd } from '@/shared/seo';
 import { useWorld } from '@/features/world/api/useWorlds';
 import { useWorldStatus } from '@/features/world/api/useWorldStatus';
 import { WorldDetailHero } from '@/features/world/components/WorldDetailHero';
@@ -42,6 +42,13 @@ export default function WorldDashboardPage() {
 
   // 15B.2 — indexovat jen veřejné světy; private/closed dostane noindex.
   const indexable = world.accessMode === 'public' || world.accessMode === 'open';
+  // 15B.3 — drobečky sdílí Breadcrumbs i BreadcrumbList JSON-LD (jeden zdroj).
+  const crumbs = [
+    { label: 'Domů', href: '/' },
+    { label: 'Světy', href: '/ikaros/vesmiry' },
+    { label: world.name },
+  ];
+  const origin = window.location.origin;
   const seo = (
     <Seo
       title={world.name}
@@ -69,13 +76,9 @@ export default function WorldDashboardPage() {
   return (
     <article className={s.page}>
       {seo}
-      <Breadcrumbs
-        items={[
-          { label: 'Domů', href: '/' },
-          { label: 'Světy', href: '/ikaros/vesmiry' },
-          { label: world.name },
-        ]}
-      />
+      {indexable && <JsonLd data={worldJsonLd(world, origin)} />}
+      {indexable && <JsonLd data={breadcrumbJsonLd(crumbs, origin)} />}
+      <Breadcrumbs items={crumbs} />
       <WorldDetailHero world={world} />
       <div className={s.body}>
         <WorldDetailInfo world={world} />

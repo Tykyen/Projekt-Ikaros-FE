@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-019.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-020.**
 
 ## Jak je deník členěný
 
@@ -60,3 +60,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](infra.md#-řešení--docker-build-za-corporate-mitm-proxy-apk--npm-tls--2026-06-22) | infra/docker | 15B.1 prerender: docker build za MITM proxy → apk `no such package` (kořen = `TLS: cert not trusted`, ne chybějící balík); fix opt-in `--build-arg INSECURE_TLS=1` (apk→HTTP signed + npm strict-ssl false), prod zůstává HTTPS; diagnostikuj `apk update`, ne obsah balíku | stejný kořen jako npm SSL na hostu (MITM CA) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--sjednocení-novinek-globální--světové-na-sdílenou-kartu--detail-okno--2026-06-22) | fe | sjednocení novinek (globální+světové) na sdílenou `NewsPreviewCard`+`NewsDetailModal` přes per-doménový VM adaptér; klik→modal (reuse `Modal`, past: `×` jen s `title`); stretched hit-area = žádné nested-interactive; přepiš `*.spec` při změně chování | — (zabralo napoprvé) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--15b2-seo-metasitemaprobotsbreadcrumbs-febe--2026-06-22) | fe+be | 15B.2 SEO: nativní React 19 hoisting `<meta>`/`<link>` (žádný helmet); **past duplicitní `<title>`** (statický v index.html × hoisting) → title imperativně `document.title`; sitemap=BE endpoint leak-safe+cache, **global prefix `api` → nginx rewrite `/sitemap.xml`**; BE prettier před lint:check; `.lean<T>()` místo any | — (zabralo napoprvé) |
+| [CH-019](fe.md#ch-019--15b3-dva-soubory-lišící-se-jen-casem-jsonldtsx--jsonldts--import-resolvoval-špatný-modul--2026-06-22) | fe | 15B.3: `JsonLd.tsx` × `jsonLd.ts` (basename liší se jen casem) na Windows case-insensitive FS → Vite resolvuje `.ts` před `.tsx` → import vzal špatný modul (`serializeJsonLd is not a function`); sluč do jednoho `.tsx` | `... is not a function` u exportu, který tam je; přejmenování importu „pomáhá" náhodně |
