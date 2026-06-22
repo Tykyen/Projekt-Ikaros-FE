@@ -89,15 +89,20 @@ type NavItemDef = {
    * akcí daného typu (jen pro uživatele, který typ přes BE `canHandle` vidí).
    */
   pendingType?: PendingActionType;
+  /**
+   * Spec 15.7 — položka, která pro anonima vede jen na login (slepý odkaz), se
+   * mu v menu vůbec nezobrazí. CTA na tvorbu světa je místo toho v hero kartě.
+   */
+  anonHidden?: boolean;
 };
 
 const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'uvodnik',       label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
   { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
-  { navKey: 'diskuze',       label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} />, pendingType: PendingActionType.DiscussionPendingReview },
+  { navKey: 'diskuze',       label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} />, pendingType: PendingActionType.DiscussionPendingReview, anonHidden: true },
   { navKey: 'clanky',        label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} />,      pendingType: PendingActionType.ArticlePendingReview },
   { navKey: 'galerie',       label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} />,     pendingType: PendingActionType.GalleryPendingReview },
-  { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} /> },
+  { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} />,    anonHidden: true },
 ];
 
 // Krok 4.1 — Hospoda žije na `/chat`. Krok 4.2a — Rozcestí I.–III. na `/chat/rozcesti*`.
@@ -109,11 +114,14 @@ const CHAT_ROOMS: {
   label: string;
   to: string;
   disabled?: boolean;
+  /** Spec 15.7 — Rozcestí jsou login-only roleplay; anonimovi se skryjí.
+   *  Hospoda zůstává (budoucí anon-chat, zatím klik → login). */
+  anonHidden?: boolean;
 }[] = [
   { key: 'hospoda',   roomKey: 'hospoda',    label: 'Hospoda',       to: '/chat' },
-  { key: 'rozcesti1', roomKey: 'rozcesti-1', label: 'Rozcestí I.',   to: '/chat/rozcesti' },
-  { key: 'rozcesti2', roomKey: 'rozcesti-2', label: 'Rozcestí II.',  to: '/chat/rozcesti2' },
-  { key: 'rozcesti3', roomKey: 'rozcesti-3', label: 'Rozcestí III.', to: '/chat/rozcesti3' },
+  { key: 'rozcesti1', roomKey: 'rozcesti-1', label: 'Rozcestí I.',   to: '/chat/rozcesti',  anonHidden: true },
+  { key: 'rozcesti2', roomKey: 'rozcesti-2', label: 'Rozcestí II.',  to: '/chat/rozcesti2', anonHidden: true },
+  { key: 'rozcesti3', roomKey: 'rozcesti-3', label: 'Rozcestí III.', to: '/chat/rozcesti3', anonHidden: true },
 ];
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -174,7 +182,7 @@ function byNewest(a: SidebarWorld, b: SidebarWorld): number {
   return b.createdAt.localeCompare(a.createdAt);
 }
 
-function SidebarContent({
+export function SidebarContent({
   isAuthenticated,
   onNav,
 }: {
@@ -217,14 +225,16 @@ function SidebarContent({
       <div className={s.section} data-section-key="navigace">
         <SectionTitle>Navigace</SectionTitle>
         <div className={s.navList}>
-          {PRIMARY_NAV.map((item) => (
-            <NavItem
-              key={item.to}
-              {...item}
-              pendingByType={pendingCount?.byType}
-              onClick={onNav}
-            />
-          ))}
+          {PRIMARY_NAV.filter((item) => isAuthenticated || !item.anonHidden).map(
+            (item) => (
+              <NavItem
+                key={item.to}
+                {...item}
+                pendingByType={pendingCount?.byType}
+                onClick={onNav}
+              />
+            ),
+          )}
         </div>
       </div>
 
@@ -253,7 +263,8 @@ function SidebarContent({
           {chatPresence > 0 ? `Chat (${chatPresence})` : 'Chat'}
         </SectionTitle>
         <div className={s.navList}>
-          {CHAT_ROOMS.map((room) => {
+          {CHAT_ROOMS.filter((room) => isAuthenticated || !room.anonHidden).map(
+            (room) => {
             if (room.disabled) {
               return (
                 <span
@@ -554,6 +565,51 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   );
 }
 
+/**
+ * Spec 15.7 — pravý panel pro anonima (místo Administrace/Moje světy). Timeline
+ * 3 kroků „Začni tady"; krok 1 je klikací → otevře registraci.
+ */
+function AnonStartPanel({ onNav }: { onNav?: () => void } = {}) {
+  const setRegisterOpen = useSetAtom(registerModalOpenAtom);
+  return (
+    <div className={s.rightPanelInner}>
+      <div className={s.section} data-section-key="zacni-tady">
+        <SectionTitle>Začni tady</SectionTitle>
+        <ol className={s.startSteps}>
+          <li className={s.startStep}>
+            <span className={s.startNum}>1</span>
+            <button
+              type="button"
+              className={s.startStepLink}
+              onClick={() => {
+                setRegisterOpen(true);
+                onNav?.();
+              }}
+            >
+              <span className={s.startStepTitle}>Zaregistruj se</span>
+              <span className={s.startStepDesc}>Zdarma, během chvilky</span>
+            </button>
+          </li>
+          <li className={s.startStep}>
+            <span className={s.startNum}>2</span>
+            <div className={s.startStepText}>
+              <span className={s.startStepTitle}>Vytvoř svůj svět</span>
+              <span className={s.startStepDesc}>Nebo se přidej k existujícímu</span>
+            </div>
+          </li>
+          <li className={s.startStep}>
+            <span className={s.startNum}>3</span>
+            <div className={s.startStepText}>
+              <span className={s.startStepTitle}>Pozvi přátele</span>
+              <span className={s.startStepDesc}>A hrajte společně</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  );
+}
+
 function HeaderButton({
   to,
   onClick,
@@ -696,7 +752,9 @@ export function IkarosLayout() {
   // Administrace = široká správní tabulka → skryj pravý panel (Moje světy /
   // Oblíbené) pro plnou šířku main, stejně jako chat (focus mód).
   const isAdmin = pathname.startsWith('/admin');
-  const showRightPanel = isAuthenticated && !isChat && !isAdmin;
+  // Spec 15.7 — pravý panel se ukáže i anonimovi (obsah = AnonStartPanel
+  // „Začni tady" místo Administrace). Skrytý jen v chat/admin focus módu.
+  const showRightPanel = !isChat && !isAdmin;
 
   function openLeftDrawer() {
     setRightDrawerOpen(false);
@@ -771,7 +829,7 @@ export function IkarosLayout() {
           <button
             className={s.rightHamburger}
             onClick={openRightDrawer}
-            aria-label="Otevřít administraci"
+            aria-label={isAuthenticated ? 'Otevřít administraci' : 'Otevřít panel Začni tady'}
           >
             <Sparkles size={20} />
           </button>
@@ -828,7 +886,7 @@ export function IkarosLayout() {
         {showRightPanel && (
           <aside className={s.rightPanel} data-frame-panel="right">
             <PanelCorners />
-            <RightPanel />
+            {isAuthenticated ? <RightPanel /> : <AnonStartPanel />}
           </aside>
         )}
 
@@ -838,7 +896,11 @@ export function IkarosLayout() {
             data-frame-panel="right"
           >
             <PanelCorners />
-            <RightPanel onNav={() => setRightDrawerOpen(false)} />
+            {isAuthenticated ? (
+              <RightPanel onNav={() => setRightDrawerOpen(false)} />
+            ) : (
+              <AnonStartPanel onNav={() => setRightDrawerOpen(false)} />
+            )}
           </aside>
         )}
       </div>

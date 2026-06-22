@@ -29,3 +29,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** ≥3 kola „oprav vzhled X" na téže komponentě + feedback ze screenshotu produkce + mé změny stále necommitnuté.
 
 ---
+
+### CH-016 — `git commit` po selhaném pokusu spolkl staged zbytky → smíchaný commit · 2026-06-21
+**Kontext:** Push BE = 2 plánované commity (15.5 templates + 15.6 auth). 1. pokus: `git add templates; commit; git add auth; commit` — OBA commity selhaly na pre-commit hooku (prettier/prettier v jednom 15.5 spec souboru). Po opravě (`eslint --fix`) jsem znovu `git add templates; commit -F msg1; git add auth; commit -F msg2`.
+**Co jsem udělal špatně:** Po selhaném commitu **staging area přežívá** — auth soubory zůstaly staged z 1. (selhaného) pokusu. Takže `commit -F msg1` (15.5 zpráva) spolkl VŠE staged = 7 templates + 3 auth = **10 souborů**; `commit -F msg2` (auth zpráva) pak hlásil „nothing to commit". Auth se sice pushnul (funkčně OK), ale pod zprávou „15.5 osnovy" — historie nepřesná.
+**Proč to nefungovalo:** Mentální model „git add X; commit = commitne jen X" je špatný — `commit` bez cesty commitne CELÝ index, ne jen poslední `add`. A selhaný commit index NEvyprázdní.
+**Poučení:** (1) Před každým commitem v multi-commit sekvenci ověř `git diff --cached --name-only` (co je REÁLNĚ v indexu), ne jen co jsem teď přidal. (2) Nebo commitni cíleně: `git commit <cesty> -F msg` (commitne jen dané cesty, ignoruje zbytek indexu). (3) Po selhaném commitu zvaž `git reset` před dalším pokusem. (4) „N files changed" > očekávaný počet = červená vlajka, zkontroluj PŘED push. Náprava smíchaného commitu na pushnutém `main` = rewrite + force push (riziko) → nechat, pokud je to jen kosmetika zprávy.
+**Příznak:** `commit` hlásí víc souborů, než jsem naposledy `add`-oval; navazující commit „nothing to commit".
+
+---

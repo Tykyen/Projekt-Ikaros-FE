@@ -27,6 +27,22 @@
   margin-bottom: 0;
 }
 
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+@media (max-width: 768px) {
+  .ctaRow {
+    flex-direction: column;
+  }
+  .ctaRow > * {
+    width: 100%;
+  }
+}
+
 .signature {
   font-family: var(--font-script);
   font-size: 32px;

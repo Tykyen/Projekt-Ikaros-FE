@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-016.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-017.**
 
 ## Jak je deník členěný
 
@@ -47,6 +47,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--154-kreslení-anotace-na-mapě-perzistované-scenedrawings-vzor-effects--2026-06-21) | fe/BE | 15.4 kreslení/anotace = perzistované `scene.drawings`, **mirror effects** (schema+3 ops+apply/inverse+authorizer+repo+FE apply/layer) → infra zdarma; authorizer: hráč jen `allowPlayerDrawing` && vlastní | — (zabralo) |
 | [CH-014](proces.md#ch-014--set-location-powershell-tiše-přesunul-i-bash-cwd--tsc--b-běžel-ve-špatném-repu-falešný-zelený--2026-06-21) | proces | `Set-Location` (PS) přepsal i Bash cwd → `tsc -b` běžel v backendu (falešný zelený), FE neověřené; před build/test ověř `pwd` | „build prošel, ale soubor nenalezen" |
 | [CH-015](proces.md#ch-015--cyklení-na-vzhledu-ui-stupnice-mapy-protože-uživatel-testoval-prod-a-mé-změny-byly-lokálnínecommitnuté--2026-06-21) | proces | Cyklení na vzhledu UI: uživatel testuje PROD, mé změny lokální → feedback vždy na stale verzi → nelze zkonvergovat; vizuál nasaď před dalším feedbackem | ≥3 kola „oprav vzhled X" + screenshot produkce + necommitnuté |
+| [CH-016](proces.md#ch-016--git-commit-po-selhaném-pokusu-spolkl-staged-zbytky--smíchaný-commit--2026-06-21) | proces/git | `git commit -F` po selhaném pre-commit hooku spolkl staged zbytky (auth+templates v 1 commitu, 2. „nothing to commit"); `commit` commitne CELÝ index, ne poslední `add`; ověř `git diff --cached` před commitem | „N files changed" > očekávané; navazující commit „nothing to commit" |
 | [✅ ŘEŠENÍ](fe.md#-řešení--154-e-world-map-defaults-dvouvrstvá-config--be-side-seed--2026-06-21) | fe/BE | 15.4-E world map defaults = dvouvrstvá config (worldSettings.mapDefaults → seed scény → override); **seed BE-side** (create DTO `HexConfigDto` whitelist by nová pole zahodil); inject IWorldSettingsRepository | — (zabralo) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--d-new-inv-wiki-tabulky-ve-vieweru--mrtvý-odkaz-informace-15.5-followup--2026-06-21) | fe | D-NEW-INV-WIKI: tabulky ve vieweru (`enableTable\|\|readOnly` + read CSS, 1 zásah = 8 layoutů) + mrtvý odkaz Informace (`buildWorldNav` filtr dle `usePagesDirectory`); pasti chycené předem = `placeholderData:[]` flicker + `pravidla`=dedikovaná route (matrix Rulebook) | — (zabralo napoprvé) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--156-a-stateplaceholder-emptyerror-stavy--webp-pipeline--2026-06-21) | fe | 15.6-A sdílená `StatePlaceholder` (empty+error) + 4 error stránky + 5 hero empty; 3 velikosti→ilustrace jen hero=11 obrázků ne 100; `.jfif`=JPEG→WebP `sharp` 93%, CSS mask místo transparent; broad text change→oprav `*.spec`; OTEVŘENO auth 401/session | — (zabralo) |

@@ -147,8 +147,10 @@
   padding: var(--sp-2) var(--sp-4) var(--sp-4);
 }
 
+/* Spec 15.7 — anon má nově taky pravý panel (AnonStartPanel „Začni tady"),
+   proto 3 sloupce jako přihlášený. (Dřív anon = 2 sloupce bez pravého panelu.) */
 .shellAnon .body {
-  grid-template-columns: var(--sidebar-w, 280px) 1fr;
+  grid-template-columns: var(--sidebar-w, 280px) 1fr 280px;
 }
 
 /* `/chat*` — bez pravého panelu (viz spec-chat-hide-right-panel). */
@@ -394,6 +396,85 @@
   text-align: center;
 }
 
+/* ── Spec 15.7 — pravý panel „Začni tady" (anon), timeline 3 kroků ── */
+.startSteps {
+  list-style: none;
+  margin: 0;
+  padding: var(--sp-2) var(--sp-2) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.startStep {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+/* svislá spojnice mezi čísly (cesta) */
+.startStep:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 34px;
+  bottom: calc(var(--sp-4) * -1);
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--theme-accent, var(--accent)) 0%,
+    transparent 100%
+  );
+  opacity: 0.4;
+}
+.startNum {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--theme-accent, var(--accent));
+  background: var(--bg-card);
+  color: var(--theme-accent, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  box-shadow: 0 0 12px var(--theme-glow-gold);
+  position: relative;
+  z-index: 1;
+}
+.startStepText,
+.startStepLink {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 3px;
+}
+.startStepLink {
+  border: none;
+  background: none;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity 160ms ease;
+}
+.startStepLink:hover .startStepTitle {
+  color: var(--theme-accent, var(--accent));
+  text-shadow: 0 0 8px var(--theme-glow-gold);
+}
+.startStepTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  transition: color 160ms ease;
+}
+.startStepDesc {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
 /* 3.7 — malý náhled obrázku v sidebar sekci Oblíbené obrázky */
 .favThumb {
   width: 28px;
@@ -470,8 +551,8 @@
 }
 
 /* ── Responsive ── */
-/* Tablet a malý notebook — zúžit oba postranní panely, ale ZACHOVAT 3-sloupcový layout.
-   Anon mód zůstává 2-sloupcový (pravý panel přihlášený uživatel jen). */
+/* Tablet a malý notebook — zúžit oba postranní panely, ZACHOVAT 3-sloupcový
+   layout pro anon i přihlášeného (spec 15.7 — anon má pravý panel „Začni tady"). */
 @media (max-width: 1280px) {
   .body {
     grid-template-columns: 220px 1fr 220px;
@@ -479,7 +560,7 @@
     padding: var(--sp-2) var(--sp-3) var(--sp-3);
   }
   .shellAnon .body {
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: 220px 1fr 220px;
   }
   .bodyNoRight {
     grid-template-columns: 220px 1fr;

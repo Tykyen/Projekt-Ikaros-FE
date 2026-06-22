@@ -1,9 +1,20 @@
-import { IkarosCard } from '@/shared/ui';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
+import { Sparkles, Compass } from 'lucide-react';
+import { IkarosCard, Button } from '@/shared/ui';
+import {
+  isAuthenticatedAtom,
+  registerModalOpenAtom,
+} from '@/shared/store/authStore';
 import s from './WelcomeSection.module.css';
 
 // Uvítací karta úvodní stránky. Zobrazuje se VŠEM (anon i přihlášeným) —
-// generický pozdrav. Personalizovaná varianta pro přihlášené = roadmap2 15.7.
+// generický pozdrav. Spec 15.7 — anonimovi navíc dvojice CTA tlačítek
+// (registrace + prozkoumat veřejné světy); přihlášený je nevidí.
 export function WelcomeSection() {
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  const setRegisterOpen = useSetAtom(registerModalOpenAtom);
+  const navigate = useNavigate();
   return (
     <IkarosCard
       variant="welcome"
@@ -23,6 +34,27 @@ export function WelcomeSection() {
         Zároveň je to prostor pro setkávání lidí podobného smýšlení, kteří chtějí sdílet
         své nápady, inspirovat se navzájem a objevovat nové světy i možnosti hraní.
       </p>
+
+      {!isAuthenticated && (
+        <div className={s.ctaRow}>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => setRegisterOpen(true)}
+          >
+            <Sparkles size={18} aria-hidden="true" />
+            Vytvořit svět zdarma
+          </Button>
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={() => navigate('/ikaros/vesmiry')}
+          >
+            <Compass size={18} aria-hidden="true" />
+            Prozkoumat světy
+          </Button>
+        </div>
+      )}
 
       <p className={s.signature}>Příjemnou zábavu přeje administrátor.</p>
     </IkarosCard>
