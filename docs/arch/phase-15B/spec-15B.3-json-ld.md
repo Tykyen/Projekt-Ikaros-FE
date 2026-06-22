@@ -208,7 +208,7 @@ const indexable = article.status === 'Published';
 
 ## 6. Nesrovnalost zděděná z 15B.2
 
-`IkarosArticle` ([src/shared/types/index.ts:718](../../../src/shared/types/index.ts#L718)) **nemá `coverUrl`** — spec 15B.2 §2.3 přitom u OG image píše `article.coverUrl || brand`, takže OG image článku dnes **vždy** padá na brand. 15B.3 to řeší pro JSON-LD přes `firstImageSrc(content)` (R5). 💡 Stejný helper lze v navazujícím kroku použít i pro OG image v `<Seo>` (sjednotit), ale to je mimo záběr 15B.3 — zapsat jako drobnost, neměnit teď `<Seo>`.
+`IkarosArticle` ([src/shared/types/index.ts:718](../../../src/shared/types/index.ts#L718)) **nemá `coverUrl`** — spec 15B.2 §2.3 přitom u OG image píše `article.coverUrl || brand`, takže OG image článku dříve **vždy** padal na brand. 15B.3 zavedl `firstImageSrc(content)` (R5) pro JSON-LD `Article.image`. ✅ **Vyřešeno hned (2026-06-22):** stejný helper napojen i na `<Seo image>` v `ArticleDetailPage` → OG/Twitter náhled článku i JSON-LD sdílí 1. obrázek z obsahu, fallback brand. (Dluh D-NEW-SEO-OG-IMG založen a týmž zátahem uzavřen.)
 
 ---
 
@@ -241,4 +241,4 @@ const indexable = article.status === 'Published';
 2. **AggregateRating** — články/galerie mají `averageRating`+`ratings`. Google `Article` rating neukazuje (jen u Product/Recipe…), a hvězdičkový rich snippet má přísná pravidla → **vynecháno teď** (riziko manual action za „self-serving" rating). Případně později u jiného typu.
 3. **Veřejné profily autorů** (`Person`/`ProfilePage`) — vyžaduje napřed otevřít profily indexaci (robots + sitemap) = privacy rozhodnutí. Mimo 15B.3 (R7).
 4. **Diskuze** (`DiscussionForumPosting`) — neindexovatelné (R8). Padá definitivně.
-5. **OG image sjednocení** — `firstImageSrc` i pro OG v `<Seo>` (oprava nesrovnalosti §6) — drobnost, ne teď.
+5. ✅ **OG image sjednocení** — `firstImageSrc` napojen i na OG v `<Seo>` (ArticleDetailPage); nesrovnalost §6 vyřešena týmž zátahem.

@@ -5,7 +5,7 @@ import { ArrowLeft, Edit3, Send, Trash2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { Spinner, ConfirmDialog, Breadcrumbs } from '@/shared/ui';
-import { Seo, metaDescription, JsonLd, articleJsonLd, breadcrumbJsonLd } from '@/shared/seo';
+import { Seo, metaDescription, JsonLd, articleJsonLd, breadcrumbJsonLd, firstImageSrc } from '@/shared/seo';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { UserRole } from '@/shared/types';
 import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles, useToggleFavoriteArticle } from '../api/useArticles';
@@ -83,6 +83,9 @@ export default function ArticleDetailPage() {
         title={article.title}
         description={metaDescription(article.content)}
         type="article"
+        // D-NEW-SEO-OG-IMG — OG/Twitter náhled = 1. obrázek z obsahu (sdílí
+        // zdroj s JSON-LD `Article.image`); chybí-li, <Seo> padá na brand logo.
+        image={firstImageSrc(article.content, origin)}
         noindex={!indexable}
       />
       {indexable && <JsonLd data={articleJsonLd(article, origin)} />}
