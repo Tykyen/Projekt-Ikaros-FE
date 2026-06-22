@@ -164,6 +164,13 @@
   padding-top: 220px;
 }
 
+/* Spec 15.7 — anon má nahoře showcase banner, který má ten „atmosférický"
+   prostor VYPLNIT (ne pod ním viset). Proto u anonima jen malý odstup od
+   headeru. Přihlášený si 220px ponechá (welcome karta plave pod pozadím). */
+.shellAnon .main {
+  padding-top: var(--sp-4);
+}
+
 /* `/chat*` — chat vyplní výšku, jen drobný odstup od headeru. */
 .mainChat {
   padding-top: var(--sp-2);

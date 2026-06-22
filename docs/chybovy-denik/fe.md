@@ -123,3 +123,12 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Zhodnocení:** Zabralo. Agentní fan-out ušetřil čas, drift byl předvídatelný a centrálně pochycený. Mapa-kompromis vědomý. **ZBÝVÁ:** `mobil-desktop` (reálný UI test viewportů), `funkce`, `napoveda`, git. Loading stavy (~15) mimo záběr 15.6.
 
 ---
+
+### CH-017 — 15.7: zapnul jsem anon pravý panel, ale zapomněl na grid varianty → rozbitý layout · 2026-06-22
+**Co nefungovalo:** Pro 15.7 jsem v `IkarosLayout.tsx` zapnul pravý panel i anonimovi (`showRightPanel = !isChat && !isAdmin`, dřív `isAuthenticated && …`) a vyrenderoval `AnonStartPanel`. Render byl správně, ale **CSS grid `.shellAnon .body` měl natvrdo 2 sloupce** (`sidebar 1fr`) — protože historicky anon pravý panel NEMĚL (komentář v CSS to i explicitně tvrdil: „Anon mód zůstává 2-sloupcový"). Třetí grid item (panel) by spadl do implicitního auto tracku → rozbitá šířka/umístění. Bug byl ve **2 explicitních místech** (base `.shellAnon .body` + tablet `@media ≤1280`), mobil `@media ≤768` (D-022) zůstal správně 1 sloupec.
+**Jak chyceno:** NE při psaní ani tsc/testy/build (ty prošly — je to čistě vizuální grid drift) — chytil ho až **`mobil-desktop` CSS audit** (statická kontrola media queries a grid variant). tsc/vitest/build na layout grid slepé.
+**Poučení:** (1) **Když zapínám nový panel/sloupec do existujícího gridu, musím projít VŠECHNY varianty gridu** (auth × anon × tablet × mobil × `bodyNoRight`), ne jen ověřit, že se komponenta vyrenderuje. Render ≠ správné umístění. (2) **Komentář v CSS, který tvrdí invariant** („anon = 2 sloupce"), je červená vlajka při změně toho invariantu — grep na třídu (`.shellAnon`) odhalí všechna místa, co na něm stojí. (3) Layout grid drift **neprojde žádným kódovým ověřením** (tsc/test/build zelené) → `mobil-desktop` audit je jediná brána; nevynechávat ho ani u „malé" grafické změny. (4) Oprava hodnotou (2→3 sloupce) je bezpečnější než mazání override (nulová změna kaskády/specificity, D-022 mobil fix zůstává).
+**Jak ověřeno:** `.shellAnon .body` → 3 sloupce (desktop+tablet), mobil 1fr zachován; `npm run build` ✓ (po opravě, 9,04 s, CSP OK).
+**Zhodnocení:** Drobná, ale poučná — vlastní chyba z neúplného domyšlení dopadu změny (`showRightPanel` jsem změnil, navazující grid ne). `mobil-desktop` se osvědčil jako záchytná brána přesně pro to, na co je kódové ověření slepé.
+
+---

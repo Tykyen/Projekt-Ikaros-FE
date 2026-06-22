@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-017.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-018.**
 
 ## Jak je deník členěný
 
@@ -53,3 +53,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--156-a-stateplaceholder-emptyerror-stavy--webp-pipeline--2026-06-21) | fe | 15.6-A sdílená `StatePlaceholder` (empty+error) + 4 error stránky + 5 hero empty; 3 velikosti→ilustrace jen hero=11 obrázků ne 100; `.jfif`=JPEG→WebP `sharp` 93%, CSS mask místo transparent; broad text change→oprav `*.spec`; OTEVŘENO auth 401/session | — (zabralo) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--auth-401-přihlas-se-stav--session-ttlsliding-3-dny--2026-06-21) | fe/BE | auth #1 401 stav (anonym→přihlas se, leak-safe na FE ne BE; `WorldNotFound`→`ErrorState` opravil i nečitelný text) + #2 session: sliding UŽ existuje, TTL access+refresh sjednoceno na 3 d; kořen „odhlašuje po dnech"=refresh v prod nejede (cross-site cookie=deploy). BE typecheck=`npm run typecheck` ne `tsc -p tsconfig.json` (e2e bez jest types). **BE restart+prod env** | — (zabralo, kořen #2=deploy) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--156-dokončení-sub-kroky-bc-přes-paralelní-agenty--2026-06-21) | fe | 15.6 B+C ~80 empty/error míst přes 4 paralelní agenty (1=skupina, bez konfliktů) + centrální ověření; mapa NEpřepsána (overlay≠flow, jen ilustrace); **vlastní chyba: background běh s `Select-Object -Last` = neviditelný průběh (buffering)** → na pozadí nepoužívat; 4 test drifty pochyceny centrálně | — (zabralo) |
+| [CH-017](fe.md#ch-017--157-zapnul-jsem-anon-pravý-panel-ale-zapomněl-na-grid-varianty--rozbitý-layout--2026-06-22) | fe | 15.7: zapnul anon pravý panel, ale `.shellAnon .body` grid zůstal 2-sloupcový (2 místa) → rozbitý layout; tsc/test/build slepé, chytil `mobil-desktop` audit; při novém sloupci projdi VŠECHNY grid varianty | render≠umístění; CSS komentář tvrdící invariant = vlajka |
