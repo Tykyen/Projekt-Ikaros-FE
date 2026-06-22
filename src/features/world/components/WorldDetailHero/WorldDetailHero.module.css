@@ -47,6 +47,19 @@
   gap: 8px;
 }
 
+/* 15B.6 — horní řádek: badges vlevo, sdílecí tlačítko vpravo. Flow layout
+   (ne absolute) → title pod ním nikdy nezaleze pod tlačítko. */
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.share {
+  flex-shrink: 0;
+}
+
 .badges {
   display: flex;
   gap: 8px;

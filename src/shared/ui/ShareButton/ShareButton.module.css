@@ -1,0 +1,46 @@
+/* 15B.6 — sdílecí tlačítko. Glassy vzhled pro čitelnost nad hero obrázkem
+   (laděné na badges v WorldDetailHero: blur + poloprůhledný surface). */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--frame-border);
+  background: color-mix(in srgb, var(--surface-1) 60%, transparent);
+  backdrop-filter: blur(4px);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background: color-mix(in srgb, var(--surface-1) 80%, transparent);
+  border-color: var(--accent);
+}
+
+.label {
+  line-height: 1;
+}
+
+/* Úzký mobil → ikonové kruhové tlačítko (text by tlačil na název v hero).
+   44×44 = doporučený dotykový cíl. */
+@media (max-width: 480px) {
+  .btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px;
+    justify-content: center;
+  }
+
+  .label {
+    display: none;
+  }
+}

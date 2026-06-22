@@ -34,6 +34,7 @@ import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 import { AdminElevationToggle } from '@/features/world/components/AdminElevationToggle';
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
 import { resolvePersona } from './resolvePersona';
+import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 
 /* ── Nav ── */
 // Systémová nav + filtrace + vlastní headline (12.2) žijí v `worldNavConfig.ts`
@@ -256,6 +257,9 @@ export function WorldLayout() {
   // W-9 — world-level real-time (world:updated/deleted/membership). Jediný
   // vlastník `world:{id}` roomu pro celý svět; drží i reconnect re-join.
   useWorldSocket(realWorldId || null);
+
+  // 15B.7 — page-view ping pro analytics (world routy; Ikaros routy = IkarosLayout).
+  usePageViewPing();
 
   // 13.1 — Ctrl/Cmd+K otevře vyhledávání světa (jen když je svět načtený).
   useEffect(() => {

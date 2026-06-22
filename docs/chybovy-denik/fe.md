@@ -213,3 +213,34 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Zhodnocení:** dobře — implementace dle schválené spec hladce, žádné cyklení; pořadí „čisté funkce → data → komponenty → routy → napojení" drželo build zelený průběžně. Past, kterou spec chytila předem: prerender whitelist (bez něj SEO neviditelné a nikdo by si nevšiml — žádný runtime error). Otevřené: draft copy 3 systémů k revizi uživatelem; dedikovaný screenshot deníku až dodá.
 
 ---
+
+### ✅ ŘEŠENÍ — 15B.6 sociální sdílení (ShareButton) — 2026-06-22
+
+**Co se stavělo:** sdílecí tlačítko na detailu světa (`ShareButton` v `shared/ui`) — adaptivní mobil `navigator.share` / desktop `KebabMenu` (copy + Facebook + X sharer-URL); reuse OG tagů z 15B.2.
+
+**Co zabralo / klíčová rozhodnutí:**
+- **Adaptivní UX**: `navigator.share` + `canShare` gate → nativní sheet na mobilu/PWA, jinak fallback menu. `AbortError` (zrušený sheet) tiše. Web Share i Clipboard chtějí secure context + user gesture (klik) — voláno přímo v `onClick`.
+- **Reuse `KebabMenu`** místo nového popoveru; ale item.onClick sám menu **nezavírá** → obal `withClose`.
+- **Anchor přes callback ref do state** (`ref={setAnchorEl}`), ne `useRef.current` v renderu — jinak lint `react-hooks/refs` „access ref during render".
+- **`window.open(..., 'noopener,noreferrer')`** — bez toho reverse tabnabbing.
+
+**Dvě vlastní chyby (chycené, ne cyklení):**
+1. **Lucide nemá brand ikony.** `import { Facebook, Twitter } from 'lucide-react'` → **`undefined`** → React „Element type is invalid" crash až při renderu menu (2 testy co menu nerenderovaly prošly, 4 padly). Lucide brand glyfy odstranil (loga 3. stran). **Řešení:** vlastní inline monochrome SVG (`currentColor`). **Poučení:** pro brand loga (FB/X/GitHub/…) lucide NEpoužívat — ověř `node -e "typeof require('lucide-react').X"` nebo rovnou vlastní SVG.
+2. **Absolute pozicování v hero → překryv.** První verze `ShareButton` `position:absolute; top/right` v `WorldDetailHero` → na úzkém mobilu by dlouhý název/badges zalezly **pod** tlačítko (absolute nerezervuje místo) + touch target 40<44px. Chytil `mobil-desktop` audit (ne tsc/test/build — ty jsou na layout slepé). **Řešení:** share do **flow** (flex `topRow` space-between s badges) → title pod ním, nikdy nekoliduje; mobil touch target 44×44.
+
+**Jak ověřeno:** vitest 6/6 (desktop menu / copy / FB / X / nativní share / AbortError), `npm run build` ✓, eslint 0, lint:colors bez nových nálezů (token-only CSS), HelpPage 25/25. `mobil-desktop` CSS audit PASS. BE beze změny. **Čeká deploy.**
+
+**Zhodnocení:** dobře — spec→souhlas→plán→kód, čistý reuse, malý zátah bez dluhu. **Poučení do příště:** (1) lucide ≠ brand ikony; (2) `mobil-desktop` audit má reálnou hodnotu i u „triviální" komponenty — odhalil překryv, který statická brána (tsc/test/build) nikdy nechytí (vzor stejný jako CH-017).
+**Příznak:** „Element type is invalid … got: undefined" u importu, který „evidentně existuje" → ověř, že balík ten export reálně má (ne každá ikona je v lucide).
+
+### ✅ ŘEŠENÍ — 15B.7 self-hosted analytics (page-view counter + admin dashboard) · 2026-06-22
+**Co nakonec zabralo:** Vlastní BE modul `analytics` (žádná 3rd-party): veřejný `POST /analytics/pageview` (sběr) + admin `GET /analytics/summary` (aggregation `$facet`, cache 5 min). Surové eventy v kolekci s **TTL indexem 90 dní** (Mongo maže sama, žádný cron). FE hook `usePageViewPing` (fire-and-forget) v obou layoutech + sekce „Návštěvnost" v Přehledu (rozšíření `OverviewTab`, ne nový tab — přání uživatele).
+**Proč to je správně (a ne další variace):** Self-hosted bez cookies/IP/PII = GDPR-čisté bez consent lišty a bez závislosti na cizí službě (GA4/Plausible). Surové eventy + agregace dotazem = jeden zdroj pravdy, agreguju libovolně bez předpočítaných tabulek.
+**Dvě netriviální designové pasti (kořen, snadno se přehlédnou):**
+1. **Prerender by se počítal sám** — sidecar z 15B.1 je headless Chrome → spustí SPA JS → odpálil by ping a nafoukl návštěvnost o každý bot-render. Fix: sidecar vkládá do UA marker `Ikaros-Prerender`, BE ho v pageview filtruje (vedle bot UA regexu = kopie nginx mapy, dual-source).
+2. **`document.referrer` je v SPA konstantní celou session** — zůstává externí stránka, co tě přivedla → každá podstránka by se nálepkovala původním vyhledávačem. Fix: referrer se posílá jen u 1. pingu session (externí zdroj); interní prokliky pošlou vlastní origin → BE → `internal`.
+**Jak ověřeno:** BE jest 19/19 (filtr botů/prerenderu, kategorizace referreru 8 případů, aggregation totals/daily-fill/topPaths/sources, cache), typecheck + prettier/lint čisté. FE vitest 8/8 (ping dedupe + sessionId persist, dashboard render/loading/error/empty/přepínač období), `npm run build` ✓. `mobil-desktop` CSS audit: 2 opravy (graf min-width 1px+gap 1px → 90 sloupců se vejde na 375px; touch target 44px na přepínači).
+**Zhodnocení:** dobře — spec→souhlas→plán→kód, jeden zátah BE+FE bez dluhu. Obě pasti chyceny v design fázi (ne až z dat), což ušetřilo cyklení. **Čeká deploy + BE restart + redeploy prerender sidecaru.**
+**Příznak:** kdyby návštěvnost po nasazení byla nereálně vysoká → zkontroluj, že prerender sidecar reálně posílá UA marker (redeploy proběhl) a že bot regex sedí s nginx mapou.
+
+---

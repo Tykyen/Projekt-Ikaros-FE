@@ -15,6 +15,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useAdminStats } from '../../api/useAdminStats';
 import { StatCard } from './StatCard';
+import { AnalyticsSection } from '../AnalyticsSection/AnalyticsSection';
 import s from './OverviewTab.module.css';
 
 /**
@@ -112,6 +113,8 @@ export function OverviewTab() {
           />
         </div>
       </section>
+
+      <AnalyticsSection />
 
       <section className={s.section}>
         <h2 className={s.sectionTitle}>Fronta</h2>

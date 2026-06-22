@@ -16,4 +16,6 @@ export const adminKeys = {
   friendships: ['admin', 'friendships'] as const,
   /** prefix; konkrétní dotaz je `[...stats, 'overview']`. */
   stats: ['admin', 'stats'] as const,
+  /** 15B.7 — návštěvnost; dotaz `[...analytics, days]`. */
+  analytics: ['admin', 'analytics'] as const,
 };

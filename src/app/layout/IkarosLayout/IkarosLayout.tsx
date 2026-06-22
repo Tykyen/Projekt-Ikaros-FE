@@ -53,6 +53,7 @@ import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import { UserAvatar } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
+import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
 import {
@@ -783,6 +784,9 @@ export function IkarosLayout() {
   useAccountTransferNotifications();
   // 13.2a — „Souhrn chatů" živě: badge u zvonku tiká na `chat:feed:bump`.
   useChatFeedLive();
+  // 15B.7 — page-view ping pro analytics (fire-and-forget; boti/prerender se
+  // filtrují na BE). Pokrývá všechny Ikaros routy; world routy řeší WorldLayout.
+  usePageViewPing();
 
   const themeId = useAtomValue(themeAtom);
   const theme = getTheme(themeId);

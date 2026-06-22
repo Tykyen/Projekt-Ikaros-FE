@@ -57,6 +57,10 @@ async function renderPage(pathname) {
   const page = await browser.newPage();
   try {
     page.setDefaultNavigationTimeout(NAV_TIMEOUT);
+    // 15B.7 — marker v UA, ať analytics ping z renderované SPA BE odfiltruje
+    // (sidecar = headless Chrome, jinak by každý render nafoukl návštěvnost).
+    const ua = await browser.userAgent();
+    await page.setUserAgent(`${ua} Ikaros-Prerender`);
     // Render jako anonym — žádné hlavičky uživatele se nepřenášejí.
     await page.goto(FRONTEND_INTERNAL + pathname, { waitUntil: "domcontentloaded" });
     // Počkáme na signál, že SPA dořešila data; když nepřijde, vrátíme co je

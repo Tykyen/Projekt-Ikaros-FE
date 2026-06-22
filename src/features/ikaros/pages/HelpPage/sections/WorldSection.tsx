@@ -31,6 +31,7 @@ import {
   Ruler,
   Triangle,
   Pencil,
+  Share2,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -97,6 +98,16 @@ export function WorldSection() {
             Anonym a Žadatel vidí pre-join verzi s tlačítkem Vstoupit / Požádat.
           </p>
           <ScreenshotSlot media="svet.prehled" />
+        </Tool>
+        <Tool icon={<Share2 size={16} />} title="Sdílet svět (pozvánka)" audience={{ kind: 'vse', label: 'Kdokoli' }}>
+          <p>
+            Na detailu světa je tlačítko <strong>Sdílet</strong> — zkopíruje nebo
+            rozešle odkaz na svět, kterým můžeš pozvat přátele. Na mobilu se otevře
+            systémové sdílení (vybereš si appku — WhatsApp, Messenger, …), na počítači
+            menu s <strong>Kopírovat odkaz</strong>, <strong>Facebook</strong> a{' '}
+            <strong>X</strong>. Sdílí se jen adresa světa; u veřejného světa se host
+            rovnou podívá, u soukromého požádá o vstup.
+          </p>
         </Tool>
         <Tool icon={<Crown size={16} />} title="Role ve světě" audience={{ kind: 'vse', label: 'Členové' }}>
           <p>

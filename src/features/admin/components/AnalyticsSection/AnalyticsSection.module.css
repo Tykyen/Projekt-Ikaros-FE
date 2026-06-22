@@ -1,0 +1,199 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  letter-spacing: 0.02em;
+}
+
+/* ── Přepínač období ──────────────────────────────────────────────── */
+.range {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+}
+
+.rangeBtn,
+.rangeBtnActive {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-base);
+}
+.rangeBtn:hover {
+  background: var(--surface-3, var(--surface-2));
+}
+.rangeBtnActive {
+  background: var(--theme-accent, var(--text-strong));
+  color: var(--surface-1, #fff);
+}
+
+.error {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+
+.empty {
+  margin: 0;
+  padding: var(--sp-4);
+  color: var(--text-muted, var(--text));
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--sp-4);
+}
+
+.blockLabel {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted, var(--text));
+  margin-bottom: var(--sp-2);
+}
+
+/* ── Denní trend (CSS sloupce) ────────────────────────────────────── */
+.chartWrap {
+  display: flex;
+  flex-direction: column;
+}
+.chart {
+  display: flex;
+  align-items: flex-end;
+  /* gap 1px + min-width 1px → i 90 sloupců se vejde do mobilu 375px bez ořezu */
+  gap: 1px;
+  height: 120px;
+  padding: var(--sp-3);
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.bar {
+  flex: 1 1 0;
+  min-width: 1px;
+  background: var(--theme-accent, var(--text-strong));
+  border-radius: 2px 2px 0 0;
+  transition: opacity var(--transition-base);
+}
+.bar:hover {
+  opacity: 0.7;
+}
+
+/* ── Top stránky / zdroje ─────────────────────────────────────────── */
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-6);
+}
+
+.block {
+  min-width: 0;
+}
+
+.barList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.barRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.barFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--theme-accent, var(--text-strong));
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.barText {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+.barValue {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cols {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+  /* Touch target ≥ 44px na dotyku (mobil-desktop pravidlo). */
+  .rangeBtn,
+  .rangeBtnActive {
+    min-height: 44px;
+    padding: var(--sp-2) var(--sp-4);
+  }
+  .range {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

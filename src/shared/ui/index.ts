@@ -6,6 +6,8 @@ export { Modal } from './Modal/Modal';
 export { ConfirmDialog } from './ConfirmDialog/ConfirmDialog';
 export { KebabMenu } from './KebabMenu/KebabMenu';
 export type { KebabMenuItem } from './KebabMenu/KebabMenu';
+export { ShareButton } from './ShareButton/ShareButton';
+export type { ShareButtonProps } from './ShareButton/ShareButton';
 export { Badge } from './Badge/Badge';
 export { Breadcrumbs } from './Breadcrumbs';
 export type { Crumb } from './Breadcrumbs';

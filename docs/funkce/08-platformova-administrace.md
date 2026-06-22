@@ -85,9 +85,29 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
   - Obsah: Články / Obrázky v galerii / Diskuze.
   - Fronta: Žádosti o username (link na `/ikaros/uzivatele?tab=zpracovat`).
   - Rychlé odkazy: Správa uživatelů, Audit log, Zpracovat frontu, „Index vyhledávání" (DISABLED placeholder „Připravujeme fáze 13.1", i když search-index tab už funguje — kosmetický dluh).
-- **Zvláštnosti:** každá metrika běží přes `safe()` — rozbitý modul vrátí 0 a zaloguje warning, dashboard nikdy nespadne (`admin-stats.service.ts:106`).
+- **Zvláštnosti:** každá metrika běží přes `safe()` — rozbitý modul vrátí 0 a zaloguje warning, dashboard nikdy nespadne (`admin-stats.service.ts:106`). Pod sekcemi metrik je sekce **Návštěvnost** (15B.7, viz níže).
 - **Stav:** ✅
 - **Kód:** FE `components/OverviewTab/OverviewTab.tsx`, BE `admin-stats.service.ts:46`.
+
+---
+
+### Návštěvnost — analytics (15B.7, sekce v Přehledu)
+- **Co to je:** self-hosted měření návštěvnosti platformy (page views) — agregát pro provozovatele, žádná data o jednotlivých uživatelích. Žádná 3rd-party, žádné cookies → GDPR-čisté bez consent lišty.
+- **Kde:** sekce „Návštěvnost" uvnitř tabu Přehled (`components/AnalyticsSection/AnalyticsSection.tsx`), NE samostatný tab. Data `GET /analytics/summary?days=7|30|90`.
+- **Kdo:** FE pod RoleGuardem (Superadmin/Admin). BE `analytics.controller.ts` summary `@UseGuards(JwtAuthGuard, AdminGuard)`. Sběrový endpoint `POST /analytics/pageview` je VEŘEJNÝ (bez guardu — musí počítat i anon návštěvy), jen zapisuje, nic nevrací.
+- **Co ukazuje:** karty Návštěvy / Návštěvníci / Podíl anonymních; denní trend (vlastní CSS sloupcový graf, žádný chart dep); top stránky (path → počet); zdroje (vyhledávač/sociální/interní/odkaz/přímo). Přepínač období 7/30/90 dní.
+- **Jak se sbírá:** FE hook `usePageViewPing` (`Projekt-ikaros-FE/src/shared/analytics/usePageViewPing.ts`) mountovaný v IkarosLayout i WorldLayout → fire-and-forget `POST /analytics/pageview` na každou změnu routy. `sessionId` = anonymní nonce v sessionStorage (per-tab). Referrer se posílá jen při 1. pingu session (externí zdroj); interní prokliky → `internal`.
+- **Co se ukládá (kolekce `analytics_events`):** path, kategorie zdroje (odvozená z referreru na BE), anonymní sessionId, `authed` flag, čas. **Žádné PII** — IP, user-agent ani userId se NEukládají. TTL index 90 dní (Mongo maže sama, žádný cron).
+- **Bot/prerender filtr:** BE zahodí ping, když UA odpovídá bot regexu (`BOT_UA_RE`, kopie nginx mapy z 15B.1) NEBO obsahuje marker `Ikaros-Prerender` (prerender sidecar si ho vkládá do UA, `prerender/index.js`) — jinak by každý render nafoukl čísla.
+- **Hranice / co neumí:**
+  - **Trend max 90 dní** (TTL events). Delší historie by chtěla denní rollup kolekci (zatím ne).
+  - **Návštěvníci jsou hrubý odhad** — sessionStorage nonce zaniká zavřením tabu, nerozliší návrat téhož člověka jiný den (žádná cross-session identita, záměr kvůli soukromí).
+  - `authed` flag posílá FE (důvěřujeme mu — jen statistika, ne bezpečnostní hranice).
+  - **Dual-source bot seznam** — `BOT_UA_RE` v BE je kopie nginx mapy; změna na jednom místě vyžaduje sjednocení i druhého.
+  - Agregace v UTC (CZ posun pár hodin u hranic dnů — pro agregát zanedbatelné).
+- **Zvláštnosti:** summary cache 5 min per období; nový event invaliduje cache. Aggregation `$facet` (totals/daily/topPaths/sources) s `allowDiskUse`. Prázdný stav → hláška „Zatím žádná data".
+- **Stav:** ✅ (čeká deploy + BE restart + redeploy prerender sidecaru)
+- **Kód:** FE `components/AnalyticsSection/AnalyticsSection.tsx` + `MiniBarChart.tsx`, `api/useAnalyticsSummary.ts`, `shared/analytics/usePageViewPing.ts`; BE `modules/analytics/{analytics.controller,analytics.service}.ts`, `schemas/analytics-event.schema.ts`.
 
 ---
 

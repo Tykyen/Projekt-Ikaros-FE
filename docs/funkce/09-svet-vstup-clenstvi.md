@@ -47,6 +47,18 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 - **Stav** ✅
 - **Kód** FE `JoinCTA.tsx:28`, `useWorldJoin.ts:9-34`. BE `joinPublic` (`worlds.service.ts:573`), `requestAccess` (`:629`).
 
+### Sdílení světa — ShareButton (15B.6)
+- **Co to je** Tlačítko „Sdílet" v hlavičce detailu světa; šíří pozvánkovou URL `/svet/:slug`. Sdílí se holá URL (žádné API klíče / OAuth) — náhled (obrázek + titulek) si síť stáhne z OG meta tagů cílové stránky (15B.2 `<Seo>`).
+- **Kde** Pravý horní roh `WorldDetailHero` (řádek badges, flow layout). Renderuje se pro **všechny statusy** (member i non-member), protože hero je sdílený. Žádné role gating — pozvánková URL je veřejná podstata kroku.
+- **Kdo** Kdokoli vidí hero (anon i člen). Čistě FE, **žádný BE endpoint** — sdílí se URL, BE se neúčastní.
+- **Co jde dělat**
+  - **Mobil/PWA** (`navigator.share` dostupné) → klik = **nativní share sheet** (uživatel sám vybere FB/WhatsApp/IG/…). Zrušení sheetu (`AbortError`) = tiše bez chyby.
+  - **Desktop** (bez Web Share API) → klik otevře `KebabMenu`: **Kopírovat odkaz** (`navigator.clipboard` + toast „Odkaz zkopírován") · **Facebook** (`facebook.com/sharer`) · **X** (`twitter.com/intent/tweet`). Sharer-URL se otevírá `window.open(..., 'noopener,noreferrer')` (obrana proti reverse tabnabbingu).
+- **Hranice / co neumí** Sdílí **jen detail světa** — ne wiki články/galerie (member-only, neveřejné) ani vitrínu (17.3 zatím neexistuje; `ShareButton` je ale navržen znovupoužitelně). **Negeneruje** per-svět OG kartu (náhled = `world.imageUrl`, když svět obrázek má; jinak brand logo). Žádné pozvánky e-mailem ani invite-link s předschválením (to řeší JoinCTA — „kdo má odkaz, může požádat"). Sdílení achievementů je vědomě mimo záběr (roadmapa).
+- **Zvláštnosti** Web Share API i Clipboard API vyžadují secure context (HTTPS/localhost) + user gesture (klik) — splněno. `navigator.share` na desktopu většinou chybí → menu fallback. Brand ikony (Facebook/Twitter) lucide nemá → vlastní inline SVG glyfy.
+- **Stav** ✅
+- **Kód** FE `src/shared/ui/ShareButton/ShareButton.tsx`, integrace `WorldDetailHero.tsx:21,29`. Reuse `KebabMenu`, `sonner` toast, `metaDescription` (`@/shared/seo`).
+
 ---
 
 ## B. Member dashboard (3 sloupce — spec 5.2)
