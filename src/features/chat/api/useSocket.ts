@@ -3,22 +3,26 @@ import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 import { getSocket, disconnectSocket } from './socket';
 import { accessTokenAtom } from '@/shared/store/authStore';
+import { anonSessionAtom } from '../store/anonSession';
 import { socketStatusAtom } from '../store/socketStore';
 import type { Socket } from 'socket.io-client';
 
 /** Řídí životní cyklus socketu podle auth stavu — volat jednou v root layoutu. */
 export function useSocketInit(): void {
   const token = useAtomValue(accessTokenAtom);
+  // 15.8 — host (guest session) se taky připojí (Hospoda); členský token přednost.
+  const anon = useAtomValue(anonSessionAtom);
+  const effectiveToken = token ?? anon?.token ?? null;
   const status = useAtomValue(socketStatusAtom);
   const wasConnected = useRef(false);
 
   useEffect(() => {
-    if (!token) {
+    if (!effectiveToken) {
       disconnectSocket();
       return;
     }
     getSocket();
-  }, [token]);
+  }, [effectiveToken]);
 
   // Toast při ztrátě spojení (jen když předtím bylo connected)
   useEffect(() => {

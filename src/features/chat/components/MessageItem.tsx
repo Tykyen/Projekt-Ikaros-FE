@@ -330,6 +330,12 @@ export function MessageItem({
               NPC
             </span>
           )}
+          {/* 15.8 — host (anonym): vizuální odlišení od registrovaných. */}
+          {message.isAnonymous && (
+            <span className={s.hostTag} title="Nepřihlášený host">
+              host
+            </span>
+          )}
           {stamp && <time className={s.time} title={stampFull}>{stamp}</time>}
           {message.isEdited && (
             <span className={s.editedBadge}>(upraveno)</span>

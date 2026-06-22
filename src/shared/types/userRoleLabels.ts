@@ -12,6 +12,8 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   [UserRole.SpravceClanku]: 'Správce článků',
   [UserRole.SpravceGalerie]: 'Správce galerie',
   [UserRole.SpravceDiskuzi]: 'Správce diskuzí',
+  // 15.8 — host (anonym) v Hospodě; není přiřaditelná role, jen pro úplnost mapy.
+  [UserRole.Guest]: 'Host',
 };
 
 /**

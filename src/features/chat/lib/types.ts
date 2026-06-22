@@ -63,6 +63,8 @@ export interface ChatMessage {
   isDeleted: boolean;
   /** Systémová zpráva (příchod/odchod) — FE ji renderuje jako system line. */
   isSystem?: boolean;
+  /** 15.8 — zpráva od hosta (anonyma) v Hospodě → odznak „host". */
+  isAnonymous?: boolean;
   /** Vyplněno → whisper viditelný jen těmto userId. */
   visibleTo?: string[];
   /** Emoji → pole `userId`, kteří reagovali (krok 4.3a). */

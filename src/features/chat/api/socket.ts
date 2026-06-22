@@ -1,6 +1,7 @@
 ﻿import { io, type Socket } from 'socket.io-client';
 import { getDefaultStore } from 'jotai';
 import { accessTokenAtom } from '@/shared/store/authStore';
+import { anonSessionAtom } from '../store/anonSession';
 import { socketStatusAtom } from '../store/socketStore';
 
 const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
@@ -15,7 +16,10 @@ export function getSocket(): Socket {
   // Nová instance vznikne jen po `disconnectSocket()` (které `socket` nuluje).
   if (socket) return socket;
 
-  const token = getDefaultStore().get(accessTokenAtom) ?? undefined;
+  // Členský token má přednost; 15.8 — host použije guest token (Hospoda).
+  const store0 = getDefaultStore();
+  const token =
+    store0.get(accessTokenAtom) ?? store0.get(anonSessionAtom)?.token ?? undefined;
 
   socket = io(baseUrl, {
     auth: token ? { token } : undefined,

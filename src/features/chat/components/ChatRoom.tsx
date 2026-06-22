@@ -12,6 +12,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Users, X, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 import { currentUserAtom } from '@/shared/store/authStore';
+import { anonSessionAtom } from '../store/anonSession';
+import type { User } from '@/shared/types';
 import { UserRole } from '@/shared/types';
 import { Spinner } from '@/shared/ui';
 import { useSocketEvent, useSocketReconnect } from '../api/useSocket';
@@ -65,7 +67,23 @@ export interface ChatRoomProps {
 
 /** Globální chat — drží socket lifecycle a stav místnosti (Hospoda i Rozcestí). */
 export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
-  const user = useAtomValue(currentUserAtom);
+  const member = useAtomValue(currentUserAtom);
+  // 15.8 — host (guest): pseudo-identita z anonSession (currentUser je null).
+  // Roleplay role je Guest → canDelete/akce pro role≥Admin se ho netýkají.
+  const anon = useAtomValue(anonSessionAtom);
+  const isGuest = !member && !!anon;
+  const user = useMemo<User | null>(
+    () =>
+      member ??
+      (anon
+        ? ({
+            id: anon.anonId,
+            username: anon.anonName,
+            role: UserRole.Guest,
+          } as User)
+        : null),
+    [member, anon],
+  );
   const navigate = useNavigate();
   const qc = useQueryClient();
   const keys = useMemo(() => chatQueryKeys(room), [room]);
@@ -487,6 +505,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
         <TypingIndicator names={typingNames} />
         <ChatInput
           disabled={!channelId}
+          isGuest={isGuest}
           users={users}
           currentUserId={user.id}
           replyTo={replyTo}

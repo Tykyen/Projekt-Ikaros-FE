@@ -4,6 +4,7 @@ import { getDefaultStore } from 'jotai';
 import { router } from '@/app/router';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
 import { accessTokenAtom, refreshTokenAtom } from '@/shared/store/authStore';
+import { anonSessionAtom } from '@/features/chat/store/anonSession';
 import type { ApiError, RefreshResponse } from '@/shared/types';
 
 const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
@@ -25,9 +26,11 @@ function logoutAndRedirectToLogin() {
   void router.navigate('/?openLogin=1');
 }
 
-// Request — přidá Bearer token
+// Request — přidá Bearer token. Členský token má přednost; 15.8 — když chybí,
+// použije se guest token (host v Hospodě). Přihlášený nikdy neposílá guest token.
 apiClient.interceptors.request.use((config) => {
-  const token = getDefaultStore().get(accessTokenAtom);
+  const store = getDefaultStore();
+  const token = store.get(accessTokenAtom) ?? store.get(anonSessionAtom)?.token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

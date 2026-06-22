@@ -20,6 +20,8 @@ interface PickedFile {
 
 interface ChatInputProps {
   disabled: boolean;
+  /** 15.8 — host (anonym): jen text, bez příloh a soukromých zpráv. */
+  isGuest?: boolean;
   users: ChatUser[];
   currentUserId: string;
   /** Zpráva, na kterou se právě odpovídá (4.3a); `null` = běžná zpráva. */
@@ -41,6 +43,7 @@ interface ChatInputProps {
 /** Vstupní lišta — výběr cíle (Všem / whisper), pole, přílohy, odeslání. */
 export function ChatInput({
   disabled,
+  isGuest = false,
   users,
   currentUserId,
   replyTo,
@@ -217,42 +220,50 @@ export function ChatInput({
       )}
 
       <div className={clsx(s.bar, isWhisper && s.barWhisper)}>
-        <select
-          className={s.target}
-          value={effectiveTarget}
-          onChange={(e) => setTarget(e.target.value)}
-          disabled={disabled}
-          aria-label="Komu napsat"
-        >
-          <option value="all">Všem</option>
-          {users
-            .filter((u) => u.userId !== currentUserId)
-            .map((u) => (
-              <option key={u.userId} value={u.userId}>
-                → {u.username}
-              </option>
-            ))}
-        </select>
+        {/* 15.8 — host (anonym) píše jen veřejně (žádný whisper picker). */}
+        {!isGuest && (
+          <select
+            className={s.target}
+            value={effectiveTarget}
+            onChange={(e) => setTarget(e.target.value)}
+            disabled={disabled}
+            aria-label="Komu napsat"
+          >
+            <option value="all">Všem</option>
+            {users
+              .filter((u) => u.userId !== currentUserId)
+              .map((u) => (
+                <option key={u.userId} value={u.userId}>
+                  → {u.username}
+                </option>
+              ))}
+          </select>
+        )}
 
-        <button
-          type="button"
-          className={s.attach}
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || uploading}
-          aria-label="Přidat přílohu"
-          title="Přidat přílohu"
-        >
-          <Paperclip size={16} />
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept={ACCEPT_ATTR}
-          className={s.fileInput}
-          onChange={handlePickFiles}
-          aria-label="Vybrat přílohy"
-        />
+        {/* 15.8 — host (anonym) nemá přílohy (jen text). */}
+        {!isGuest && (
+          <>
+            <button
+              type="button"
+              className={s.attach}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled || uploading}
+              aria-label="Přidat přílohu"
+              title="Přidat přílohu"
+            >
+              <Paperclip size={16} />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept={ACCEPT_ATTR}
+              className={s.fileInput}
+              onChange={handlePickFiles}
+              aria-label="Vybrat přílohy"
+            />
+          </>
+        )}
 
         <input
           type="text"

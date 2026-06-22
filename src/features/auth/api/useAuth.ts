@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import { api } from '@/shared/api/client';
+import { anonSessionAtom } from '@/features/chat/store/anonSession';
 import {
   accessTokenAtom,
   refreshTokenAtom,
@@ -45,6 +46,8 @@ export function useLogin() {
       store.set(accessTokenAtom, result.accessToken);
       store.set(refreshTokenAtom, result.refreshToken);
       store.set(currentUserAtom, result.user);
+      // 15.8 — host→člen: zahodit guest session (naskočí členský chat).
+      store.set(anonSessionAtom, null);
       store.set(loginModalOpenAtom, false);
       // Pokud byl spuštěný pending logout, zruš ho — uživatel se přihlásil znovu
       store.set(pendingLogoutAtom, null);
@@ -68,6 +71,8 @@ export function useLoginTotp() {
       store.set(accessTokenAtom, result.accessToken);
       store.set(refreshTokenAtom, result.refreshToken);
       store.set(currentUserAtom, result.user);
+      // 15.8 — host→člen: zahodit guest session (naskočí členský chat).
+      store.set(anonSessionAtom, null);
       store.set(loginModalOpenAtom, false);
       store.set(pendingLogoutAtom, null);
     },
@@ -91,6 +96,8 @@ export function useRegister() {
       store.set(accessTokenAtom, accessToken);
       store.set(refreshTokenAtom, refreshToken);
       store.set(currentUserAtom, user);
+      // 15.8 — host→člen: zahodit guest session.
+      store.set(anonSessionAtom, null);
       store.set(registerModalOpenAtom, false);
       store.set(pendingLogoutAtom, null);
     },

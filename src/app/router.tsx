@@ -164,7 +164,9 @@ export const router = createBrowserRouter([
       { path: 'email-change/confirm',   element: p(EmailChangeConfirmPage) },
 
       // Chráněné — vyžadují přihlášení (per-route loader)
-      { path: 'chat',                   element: p(ChatPage),         loader: requireAuth },
+      // 15.8 — `/chat` (Hospoda) veřejné: host bez session dostane captcha bránu
+      // (ChatPage). Rozcestí níže zůstávají login-only.
+      { path: 'chat',                   element: p(ChatPage) },
       // 4.2a — Rozcestí I.–III. (atmosférické roleplay místnosti)
       { path: 'chat/rozcesti',          element: p(RozcestiPage),     loader: requireAuth },
       { path: 'chat/rozcesti2',         element: p(RozcestiPage),     loader: requireAuth },
