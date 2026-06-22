@@ -141,3 +141,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Zhodnocení:** Vlastní chyba (kód≠komentář) + neúplné domyšlení layout změny. **Multi-skin grep audit = nová záchytná technika** pro tenhle 33-skin projekt — vizuál na jednom skinu nestačí. ČEKÁ uživatelův vizuální spot-check zlatého (fix data-frame-panel) + arabského (fix lampy).
 
 ---
+
+### ✅ ŘEŠENÍ — 15.8 Hospoda‑anon: guest token end‑to‑end (BE+FE, 15 TDD tasků) · 2026-06-22
+**Co se řešilo:** anonymní host smí číst+psát do Hospody pod `anonym{N}`, banovatelný + rate‑limit, jen text. Velká BE+FE featura (spec‑15.8 + plán).
+**Co zabralo (a proč správně):**
+- **Guest = „člen s minimálními právy" přes guest JWT** (role `guest`) → jednotný auth flow v HTTP `Authorization` i WS handshake, reuse skoro celé chat trubky. Stavět paralelní anon‑identitu mimo JWT by znamenalo druhé cesty identity (cookie/WS) a víc okrajových případů. Identita pořád z OVĚŘENÉHO tokenu (anti‑spoof drží).
+- **`UserRole.Guest = 99` sentinel** (dual‑source FE+BE) — guest potřeboval hodnotu pro povinné `RequestUser.role`; vysoké číslo nikdy neprojde gating (`role <= X` ani `@Roles`) → 2. pojistka scope zdarma, i kdyby guard selhal.
+- **`GuestOrMemberGuard`**: passport validace přes grandparent prototyp, member DB gate (`JwtAuthGuard`) jen pro nečlena — host nemá DB účet, `findById(anon‑id)` by spadl na falešné „DELETED". Bez refaktoru JwtAuthGuard (žádná regrese).
+- **Rate‑limit in‑memory v service per anon‑id** (ne `@Throttle`) — `@Throttle` klíčuje per IP a omezil by i členy; chtěli jsme limit jen pro hosty.
+**Jak ověřeno:** BE jest dotčené (auth 86, global‑chat service 47 / controller 7 / gateway 36, guard 5, ban 4) + typecheck; FE tsc‑b + vitest 4 + build. Vše pushnuto (BE 55cfc00, FE 22322aa6).
+**Zhodnocení (dobře/špatně):** **Dobře** — rozdělení na malé TDD tasky (A1‑A8, B1‑B7) + průběžné commity/pushe + **checkpointy u delikátních kusů** (A4 guard, A7 WS dělané s „čerstvou hlavou") drželo kvalitu i v extrémně dlouhé session. **Špatně/poučení** — **dual‑source drift chycen až `tsc -b`**: přidání pole do BE entity (`ChatMessage.isAnonymous`) a hodnoty do BE enumu (`UserRole.Guest`) si vynutilo zrcadlo na FE (`lib/types.ts`, `userRoleLabels` Record) → **při přidání pole/enum hodnoty do BE entity hned zkontroluj FE zrcadlo** ([project_schema_be_fe_sync], [project_theme_ids_dual_source] vzor). Druhá drobnost: NestJS `jwtService.sign` chce `expiresIn: StringValue` ne plain `string` z `config.get` → cast `as JwtSignOptions`.
+
+---

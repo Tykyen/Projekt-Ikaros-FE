@@ -56,7 +56,9 @@ export function StartSection() {
         <InfoGrid>
           <InfoCard icon={<Eye size={22} />} title="Bez přihlášení" accent="reader">
             Úvodník platformy, veřejné vesmíry, tahle nápověda a podmínky, články a
-            galerie ke čtení. Diskuze a vstup do světů vyžadují účet.
+            galerie ke čtení. Do <strong>Hospody</strong> můžeš nakouknout i jako
+            host (po ověření „nejsi robot") — popovídáš si pod přezdívkou anonym.
+            Diskuze a vstup do světů vyžadují účet.
           </InfoCard>
           <InfoCard icon={<KeyRound size={22} />} title="Po registraci" accent="success">
             Vlastní profil a postava, vstup do vesmírů i tvorba světa, soukromá
@@ -94,7 +96,7 @@ export function StartSection() {
             { term: 'AKJ', desc: 'Stupeň utajení stránky/záložky. Bez přístupu uvidíš jen zamčenou záložku, ne její obsah.' },
             { term: 'Motiv (theme)', desc: 'Vizuální styl — platforma má vlastní, každý svět taky svůj.' },
             { term: 'Rozcestí', desc: 'Atmosférické roleplay místnosti pro hru na jeden večer bez mechanik.' },
-            { term: 'Hospoda', desc: 'Globální chat pro celou platformu napříč světy.' },
+            { term: 'Hospoda', desc: 'Globální chat pro celou platformu napříč světy. Nakouknout a popovídat si jako host (anonym) můžeš i bez registrace — jen text.' },
             { term: 'Pavučina', desc: 'Vztahový graf kampaně — kdo koho má rád, frakce, příběhové linky.' },
             { term: 'Taktická mapa', desc: 'Hex-grid plocha pro boj a scény s tokeny, iniciativou a mlhou války.' },
           ]}

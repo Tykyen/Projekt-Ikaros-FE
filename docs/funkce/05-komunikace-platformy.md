@@ -7,11 +7,16 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 ---
 
 ### Globální chat — Hospoda
-- **Co to je:** Veřejná real-time klábosna platformy („Interdimenzionální hospoda") — jeden sdílený kanál pro všechny přihlášené napříč světy.
-- **Kde:** route `/chat` (`ChatPage` → `ChatRoom room="hospoda"`). Levý panel: sekce „Chat" s počtem přítomných, položka „Hospoda".
+- **Co to je:** Veřejná real-time klábosna platformy („Interdimenzionální hospoda") — jeden sdílený kanál pro všechny napříč světy. **15.8 — i pro nepřihlášené (host).**
+- **Kde:** route `/chat` (`ChatPage` → `ChatRoom room="hospoda"`). Levý panel: sekce „Chat", položka „Hospoda" (viditelná i anonimovi z 15.7).
 - **Kdo:**
-  - **FE:** `loader: requireAuth` (router `:167`) — anon **nemá** přístup.
-  - **BE:** celý `GlobalChatController` za `JwtAuthGuard` (`global-chat.controller.ts:69`). Žádné role-gate pro čtení/psaní — stačí být přihlášen. Mazání zprávy = `AdminGuard` (`role ≤ Admin`, tj. jen `Superadmin`/`Admin`; `admin.guard.ts:17`).
+  - **FE:** `/chat` je **veřejné** (15.8 — zrušen `requireAuth`). Nepřihlášený bez host session vidí captcha bránu `AnonChatGate`; po ověření má guest session a vejde v „host módu".
+  - **BE:** `GlobalChatController` za `GuestOrMemberGuard` (`global-chat.controller.ts`) — pustí člena (plný member gate) i hosta (guest JWT, role `Guest`). **Host smí jen Hospodu** (`assertGuestScope` → Rozcestí 403), **jen text** (upload → 403). Mazání = `AdminGuard`. Ban hosta = `POST /global-chat/anon-ban` (Admin, váže na anon-id).
+- **Host (anonym) — 15.8:**
+  - **Vstup:** captcha (Turnstile) → `POST /auth/anon-session` → guest JWT (role `Guest`, TTL `ANON_SESSION_TTL` = 14 d) + náhodné jméno `anonym{1000–9999}`. Session v `localStorage: ikaros.anonToken` (oddělená od členské), drží přes reload/reconnect. Po registraci/přihlášení se zahodí.
+  - **Smí:** číst Hospodu + psát **text**, vidět přítomné. Zpráva nese odznak „host" (`isAnonymous`), bez avataru.
+  - **Nesmí:** upload příloh, šepot, mazání, Rozcestí, cokoli mimo Hospodu (guest token scope + sentinel `UserRole.Guest = 99` nikdy neprojde gating).
+  - **Moderace:** Admin zabanuje `anon-id` (kolekce `anon_bans`) → 403 při psaní; **rate-limit 10 zpráv/min** per anon-id (in-memory, jen host).
 - **Co jde dělat:**
   - Psát zprávy (text + barva `chatColor` z profilu), **odpovídat** na zprávu (reply preview), **reagovat** emoji reakcí, **nahrávat přílohy** (max **10 MB**).
   - **Šeptat** (whisper) konkrétnímu uživateli přes WS `ikaros:whisper` (`visibleTo` → vidí jen příjemce a odesílatel) — `ChatRoom.tsx:333`, service `sendWhisper`.
@@ -25,7 +30,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Každá odeslaná zpráva spustí web push `notifyAll` na všechna zařízení** (fire-and-forget, `global-chat.service.ts:242`) — i lidem, co v chatu nejsou. Payload bez `url` → bublina otevře jen `/`.
   - Presence je per-socket multi-room; socket je sdílený celou appkou (pošta, online stav, přátelé) — proto se při opuštění chatu neodpojuje, jen odebere z presence. Heartbeat `chat:heartbeat` udržuje „naživu", neaktivita → auto-odhlášení z presence.
 - **Stav:** ✅
-- **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`.
+- **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `components/AnonChatGate.tsx` (15.8 brána), `store/anonSession.ts`, `api/useAnonSession.ts`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`, `anon-ban.service.ts`, `common/guards/guest-or-member.guard.ts`, `auth/auth.service.ts` (`createAnonSession`). Spec 15.8.
 
 ### Globální chat — Rozcestí I.–III.
 - **Co to je:** Tři atmosférické roleplay místnosti se **sdíleným prostředím** (vizuální styl + lokace) a ilustračním pozadím scény. Technicky tři další kanály téhož globálního chatu.

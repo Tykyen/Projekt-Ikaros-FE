@@ -236,6 +236,11 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Závislosti:** ideálně po 17.3 (vitrína, aby měl hero co ukázat) a 16.4 (demo). Bez SEO (15B) zatím jen marketingová hodnota.
 **Otevřené otázky:** Kolik person (4, nebo méně)? Sjednotit s existující úvodní stránkou, nebo nová route?
 
+### - [x] 15.8 Hospoda pro hosty (anonymní chat) — [H1 navazuje na 15.7 · dopad střední · náklad velký]
+> ✅ **Implementováno 2026-06-22** (viz [spec-15.8](arch/phase-15/spec-15.8-hospoda-anon.md)) — nepřihlášený „host" může v **Hospodě** (globální chat) **číst i psát** pod přezdívkou `anonym{N}` (jen text), bez registrace. Akviziční navázání na „Pozvi přátele" z 15.7.
+**Co se postavilo:** captcha brána (Turnstile) → **guest JWT** (role `Guest`, TTL 14 d) → host mód Hospody. Host: jen text, žádný upload/šepot/Rozcestí. Moderace: Admin ban per anon‑id + rate‑limit 10/min. BE (A1‑A8: token, guard, scope, identita, ban, WS) + FE (B1‑B7: anonSession, brána, host mód). **Bezpečnost:** guest token scope jen Hospoda + sentinel `UserRole.Guest=99` (2. pojistka), captcha fail‑closed, identita z ověřeného tokenu.
+**Ops:** ČEKÁ BE restart + env `ANON_SESSION_TTL=14d`.
+
 ---
 
 ## Fáze 15B — SEO & objevitelnost

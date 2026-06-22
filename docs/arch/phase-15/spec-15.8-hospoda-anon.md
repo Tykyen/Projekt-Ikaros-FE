@@ -1,6 +1,8 @@
 # Spec 15.8 — Hospoda pro hosty (anonymní přístup do globálního chatu)
 
-**Stav:** NÁVRH (čeká revizi uživatele) · **Fáze:** 15 (H1 Viditelnost / komunita) · **Roadmap:** navazuje na [15.7](../../roadmap2.md) (anon homepage — „Pozvi přátele", Hospoda ponechána v anon menu) · **Souvis.:** chat 4.1 (Hospoda), 6.7/6.8 (persona/avatary), 1.4/2FA (captcha Turnstile), [project_ws_security_patterns]
+**Stav:** ✅ IMPLEMENTOVÁNO 2026-06-22 (BE+FE, pushnuto; čeká BE restart + env `ANON_SESSION_TTL`) · **Fáze:** 15 (H1 Viditelnost / komunita) · **Roadmap:** navazuje na [15.7](../../roadmap2.md) (anon homepage — „Pozvi přátele", Hospoda ponechána v anon menu) · **Souvis.:** chat 4.1 (Hospoda), 6.7/6.8 (persona/avatary), 1.4/2FA (captcha Turnstile), [project_ws_security_patterns]
+
+**Implementace (commity):** BE `Projekt-ikaros` — A1‑A3 token/data/ban, A4‑A8 guard/scope/identita/ban/WS; FE `Projekt-ikaros-FE` — B1‑B7 anonSession/brána/host mód. Plán [docs/superpowers/plans/2026-06-22-hospoda-anon.md](../../superpowers/plans/2026-06-22-hospoda-anon.md). **Ověřeno:** BE jest (auth 86, global-chat service 47, controller 7, gateway 36, guard 5, ban 4), FE tsc‑b + vitest 4 + build. **Realizační odchylky od plánu:** (1) `UserRole.Guest = 99` sentinel (dual‑source FE+BE) — guest potřeboval hodnotu pro povinné `role`; gating ho nikdy nepustí (2. pojistka). (2) rate‑limit **in‑memory v service** per anon‑id (ne `@Throttle`, ten klíčuje per IP a omezil by i členy). (3) `GuestOrMemberGuard` volá passport přes grandparent prototyp, member gate jen pro nečlena (host nemá DB účet → `findById` by spadl). **Zbývá ops:** BE restart + `ANON_SESSION_TTL=14d` do env.
 
 **Cíl:** Nepřihlášený návštěvník („host") může v **Hospodě** (globální chat) **číst i psát** pod dočasnou identitou `anonym{N}` — ochutná komunitu bez registrace. Akviziční nástroj navazující na 15.7. **Jen Hospoda**, ne Rozcestí.
 
