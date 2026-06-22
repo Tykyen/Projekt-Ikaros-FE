@@ -10,6 +10,9 @@ export enum UserRole {
   SpravceClanku  = 10,
   SpravceGalerie = 11,
   SpravceDiskuzi = 12,
+  /** Spec 15.8 — host (anonym) z guest JWT, bez účtu. Sentinel mimo řadu;
+   *  nikdy neprojde role gating. NENÍ přiřaditelná role. Drží se s BE enumem. */
+  Guest          = 99,
 }
 
 export type DefaultAvatarType = 'male' | 'female' | 'being';

@@ -227,7 +227,8 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **FE:** sdílená `<EmptyState>` komponenta (ilustrace + text + CTA) nasazená napříč moduly.
 **Otevřené otázky:** Ilustrace per skin, nebo neutrální? Texty per modul, nebo generické?
 
-### - [ ] 15.7 Role-based homepage / rozcestník — [H1-02 · dopad vysoký · náklad střední]
+### - [x] 15.7 Role-based homepage / rozcestník — [H1-02 · dopad vysoký · náklad střední]
+> ✅ **Implementováno 2026-06-22 v zúžené podobě** (viz [spec-15.7](arch/phase-15/spec-15.7.md)) — jen **anonymní landing**: showcase banner (5 ukázek), hero CTA, pravý panel „Začni tady", skrytí slepých odkazů. Přihlášený dashboard nezměněn. **Vynecháno:** 4-persona rozcestník + featured světy (→ 17.3). „Pozvi přátele" → sociální sdílení rozpracováno do 15B.6.
 **Cíl:** Veřejná úvodní stránka jako rozcestník: *Pro vypravěče · Pro hráče · Pro textové hry · Pro worldbuildery*. Hero s jediným slibem + dvě CTA („Zkusit demo", „Začít zdarma"), pod tím tři pilíře (veď / hraj / udrž komunitu), pak reálný náhled + sociální důkaz (featured světy z 17.3).
 **Proč:** Když produkt pokrývá více use-cases, prvních 20 s musí být absolutně čitelných; personalizace dle role snižuje tření a zrychluje aktivaci (tak to dělá Roll20, World Anvil, LegendKeeper).
 **Návrh přípravy:** copy per persona; 4 landing podstránky; provázat s vitrínou (17.3) jako náhled a s demo světem (16.4).

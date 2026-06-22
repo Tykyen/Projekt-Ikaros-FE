@@ -70,9 +70,9 @@ export function StartSection() {
         <TermGrid
           items={[
             { term: 'Hlavička', desc: 'Logo (na úvodník), přepínač motivů, zvonek (notifikace), Pošta, Profil, Odhlásit. U anonyma Přihlásit / Registrace.' },
-            { term: 'Levý sidebar', desc: 'Navigace (Úvodník, Nápověda, Diskuze, Články, Galerie, Vytvořit svět), seznam vesmírů a chat kanály.' },
-            { term: 'Hlavní panel', desc: 'Obsah aktuální stránky.' },
-            { term: 'Pravý panel', desc: 'Jen po přihlášení — administrace, moje světy, oblíbené.' },
+            { term: 'Levý sidebar', desc: 'Navigace, seznam vesmírů a chat. Po přihlášení i Diskuze, Vytvořit svět a Rozcestí; nepřihlášenému se tyhle skryjí (zůstává Úvodník, Nápověda, Články, Galerie, vesmíry a Hospoda).' },
+            { term: 'Hlavní panel', desc: 'Obsah aktuální stránky. Nepřihlášenému se na úvodníku navíc ukáže pás ukázek z aplikace.' },
+            { term: 'Pravý panel', desc: 'Po přihlášení administrace, moje světy a oblíbené. Bez přihlášení tu najdeš „Začni tady" — tři kroky, jak se zapojit.' },
             { term: 'Zvonek', desc: 'Souhrn zpráv ze všech tvých světů + záložky Události a Ke zpracování.' },
             { term: 'Hledání', desc: 'Uvnitř světa pole „Hledat…" (Ctrl+K) prohledá stránky aktuálního světa.' },
             { term: 'Mobil', desc: 'Sidebar se schová do hamburger menu vlevo nahoře.' },

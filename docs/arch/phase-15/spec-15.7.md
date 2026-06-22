@@ -1,6 +1,8 @@
 # Spec 15.7 — Anonymní úvodní stránka (role-based homepage, fáze 1)
 
-**Stav:** NÁVRH (čeká schválení) · **Fáze:** 15 (H1 Viditelnost) · **Roadmap:** [§15.7](../../roadmap2.md) · **Souvis.:** 15.6 prázdné/chybové stavy (sdílený vizuál), 16.4 onboarding, 17.3 vitrína (budoucí featured světy)
+**Stav:** ✅ IMPLEMENTOVÁNO 2026-06-22 (zúžená podoba — jen anon landing; čeká commit) · **Fáze:** 15 (H1 Viditelnost) · **Roadmap:** [§15.7](../../roadmap2.md) · **Souvis.:** 15.6 prázdné/chybové stavy (sdílený vizuál), 15B.6 sociální sdílení (navazuje na „Pozvi přátele"), 16.4 onboarding, 17.3 vitrína (budoucí featured světy)
+
+**Implementováno:** showcase banner (5 snímků, data-driven, crossfade+reduced-motion) · hero CTA (anon-only) · pravý panel „Začni tady" (anon-only) · skrytí slepých odkazů v levém panelu (anon) · `data-anon` shell atribut pro theme-gating. Ověřeno: tsc/build ✓, 23 testů, `mobil-desktop` audit (opraven grid bug CH-017), audit 33 skinů (opravena arabská lampa CH-018), `funkce` kap. 03 + `napoveda` aktualizovány. **Vynecháno dle dohody:** 4-persona rozcestník + featured světy (→ 17.3). **Hospoda-anon = samostatný budoucí krok.**
 
 **Záběr ZÚŽEN oproti roadmapě:** roadmap 15.7 navrhuje velký 4‑persona rozcestník + 4 landing podstránky + featured světy (závisí na 17.3). Uživatel (2026‑06‑21/22) explicitně **nechce přestavbu** — současný přihlášený dashboard mu vyhovuje. Tato spec řeší **jen anonymní (nepřihlášený) pohled** jako aditivní vrstvu. Přihlášený dashboard se **nemění ani o pixel**.
 
