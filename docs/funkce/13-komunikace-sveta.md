@@ -129,7 +129,8 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 ### Pole novinky / co jde nastavit
 DTO `create-world-news.dto.ts`: `title` (≤200), `content` (≤10000), `date` (ISO UTC), `type` (`info` | `alert` | `system`), `link` (URL s protokolem) nebo interní `linkPageSlug` (priorita), hero obrázek (`imageUrl` + focal X/Y + zoom 25–400 + fit cover/contain), fantasy datum (`calendarConfigId` + `calendarDate` = FantasyDate). Archivace přes `POST /:id/archive` a `/unarchive` (idempotentní). Limit listu 200, default 50.
 
-### Real-time
+### Real-time + push (15.9)
+- **Web push při vytvoření novinky světa** (`worldId !== null`) → členům světa mimo Zadatele, kategorie `worldNews` (`world-news.service.ts` `notifyMembers`, fire-and-forget, respektuje `notificationPreferences`). Globální novinky (`worldId === null`) push negenerují — ty jdou přes „Novinky Ikarosu" (kap. 04/05). Viz „Nastavení notifikací" v kap. 05.
 - BE emituje `world-news.changed` → `worlds.gateway` přemostí na WS `world:news:changed` do `world:{id}` roomu (leak-safe signál, globální novinka se neemituje) — `worlds.gateway.ts:51-58`.
 - FE: listener v `useWorldSocket` (na úrovni `WorldLayout`) invaliduje `['world-news', worldId]` → dashboard widget i stránka se obnoví bez čekání na staleTime (`useWorldSocket.ts:49-55`). Lokální mutace navíc invalidují přímo.
 - **Stav:** ✅

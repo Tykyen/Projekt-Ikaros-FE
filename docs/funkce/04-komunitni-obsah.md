@@ -41,7 +41,7 @@ Společné principy ověřené v kódu:
   - „Uložit koncept" (`Draft`) nebo „Odeslat ke schválení" (`Pending`, `submit: true`) — `ArticleEditorPage.tsx:82`/`:114`.
   - Recenzent: **Schválit** (`/approve` → `Published`), **Vrátit s poznámkou** (`/reject` → `Rejected` + důvod), **hromadně** `bulk/approve` a `bulk/reject` (vrací `{succeeded, failed}`) — `:162`/`:169`/`:184`/`:194`.
 - **Hranice / co neumí:** běžný uživatel sám nepublikuje (vždy přes recenzi). Po odeslání nelze článek editovat, dokud není vrácen. Obrázek/cover článku není samostatné pole — vkládá se jen do těla přes editor.
-- **Zvláštnosti:** při odeslání ke schválení dostanou recenzenti (+`Tyky`) systémovou **poštu** (`notifyAdmins`); autor dostane poštu při schválení/vrácení. Vrácený článek nese `rejectReason`, který se autorovi zobrazí inline.
+- **Zvláštnosti:** při odeslání ke schválení dostanou recenzenti (+`Tyky`) systémovou **poštu** (`notifyAdmins`); autor dostane poštu při schválení/vrácení. Vrácený článek nese `rejectReason`, který se autorovi zobrazí inline. **15.9 — web push autorovi** (kategorie `ownContent`) při schválení, zamítnutí i **novém hodnocení** (`pushAuthor` v `ikaros-articles.service.ts`, s `url` na článek).
 - **Stav:** ✅
 - **Kód:** FE `src/features/ikaros/pages/ArticleEditorPage.tsx`, `api/useBulkArticleActions.ts`. BE `ikaros-articles.controller.ts`, `article-review.provider.ts`, `ikaros-categories.controller.ts`.
 
@@ -64,7 +64,7 @@ Společné principy ověřené v kódu:
   - **SVG je záměrně zakázané** (XSS vektor, UM-01) — povolené jen JPEG/PNG/GIF/WebP. Typ se ověřuje i **magic-byte** signaturou (UM-07), ne jen MIME (`upload.service.ts:54`).
   - Editace nemění samotný soubor (jen metadata).
   - Bulk approve/reject (jako u článků) tu **chybí** — schvaluje se po jednom.
-- **Zvláštnosti:** EXIF/GPS metadata se při uploadu odstraňují (`strip_profile`, UM-09). Při odeslání ke schválení jde recenzentům systémová pošta s odkazem na obrázek. Smazaný autor → tombstone.
+- **Zvláštnosti:** EXIF/GPS metadata se při uploadu odstraňují (`strip_profile`, UM-09). Při odeslání ke schválení jde recenzentům systémová pošta s odkazem na obrázek. Smazaný autor → tombstone. **15.9 — web push autorovi** (kategorie `ownContent`) při schválení, zamítnutí i **novém hodnocení** (`pushAuthor` v `ikaros-gallery.service.ts`).
 - **Stav:** ✅
 - **Kód:** FE `src/features/ikaros/pages/GalleryUploadPage.tsx`, `GalleryPage.tsx`, `GalleryDetailPage.tsx`, `api/useGallery.ts`. BE `ikaros-gallery.controller.ts`, `ikaros-gallery.service.ts`, `gallery-categories.controller.ts`, `upload.service.ts`.
 
@@ -87,7 +87,7 @@ Společné principy ověřené v kódu:
   - Žádné kategorie/štítky diskuzí (jen otevřená/uzamčená a oblíbené/připnuté).
   - Žádné vnořené odpovědi/threading uvnitř diskuze (ploché příspěvky); reply na konkrétní příspěvek jako u chatu tu není.
   - Nahlášení příspěvku nemá vlastní administrační přehled na samostatné stránce — řeší se přes `resolveReport` (FE expozici je vhodné ověřit, viz Nesrovnalosti).
-- **Zvláštnosti:** při založení nepschválené diskuze a při schválení/zamítnutí chodí systémová **pošta**. Smazaný autor příspěvku → tombstone avatar + kurzíva (D-040). Uzamčená diskuze (`isOpen=false`) má badge zámku.
+- **Zvláštnosti:** při založení nepschválené diskuze a při schválení/zamítnutí chodí systémová **pošta**. **15.9 — web push autorovi diskuse** (kategorie `ownDiscussion`) při **novém příspěvku** od někoho jiného (`ikaros-discussions.service.ts` `addPost`, s `url` na diskusi). Smazaný autor příspěvku → tombstone avatar + kurzíva (D-040). Uzamčená diskuze (`isOpen=false`) má badge zámku.
 - **Stav:** ✅
 - **Kód:** FE `src/features/ikaros/pages/DiscussionDetailPage.tsx`, `DiscussionsNewPage.tsx`, `api/useDiscussions.ts`. BE `ikaros-discussions.controller.ts`, `ikaros-discussions.service.ts`.
 
@@ -105,7 +105,7 @@ Společné principy ověřené v kódu:
   - Admin: vytvořit (titulek, rich-text obsah, typ, volitelný `imageUrl`), upravit, **archivovat/odarchivovat** (idempotentní), **smazat** (hard delete).
 - **Hranice / co neumí:** žádné kategorie ani hodnocení; archivace = jen skrytí z aktivního scope (data zůstávají). Anonym vidí pouze aktivní novinky.
 - **Zvláštnosti:**
-  - **Vytvoření novinky pošle web push na VŠECHNA zaregistrovaná zařízení** (`pushService.notifyAll`, fire-and-forget) — `ikaros-news.service.ts:128`. Push payload **neobsahuje `url`**, takže kliknutí na bublinu otevře jen kořen `/` (deep-link se nevyužije).
+  - **Vytvoření novinky pošle web push** (`pushService.notifyAll(payload, 'ikarosNews')`, fire-and-forget) — `ikaros-news.service.ts`. **15.9:** filtruje se dle `notificationPreferences` (kategorie `ikarosNews`, default ZAP → kdo si ji nevypnul). Push payload **neobsahuje `url`**, takže kliknutí na bublinu otevře jen kořen `/` (deep-link se nevyužije).
   - Po každé mutaci se emituje WS signál `ikaros:news:changed` (leak-safe, bez dat) → klienti si refetchnou (`ikaros-news.gateway.ts:15`).
   - Obsah se před uložením sanitizuje (`sanitizeRichText`, F-10).
 - **Stav:** ✅
@@ -116,7 +116,7 @@ Společné principy ověřené v kódu:
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
 1. **Web push novinek bez deep-linku.** `IkarosNewsService.create` volá `notifyAll` bez pole `url`, takže service worker (`public/sw.js:30`) otevře default `/` místo `/ikaros/novinky`. Deep-link infrastruktura existuje, ale není naplněna. (Stejný problém má i push globálního chatu — viz kap. 05.)
-2. **`notifyAll` = doslova všem.** Novinka pingne i uživatele, kteří o novinkách nestojí — neexistuje opt-in/opt-out per typ obsahu, jen globální zapnutí/vypnutí push (kap. 05). Možný spam-vektor při vysoké frekvenci.
+2. ✅ VYŘEŠENO 15.9 — **opt-out novinek existuje.** `notifyAll` nyní filtruje dle `notificationPreferences` (kategorie `ikarosNews`); kdo nestojí o novinky, vypne si je v profilu (sekce „Nastavení notifikací", kap. 05). (Default zůstává ZAP — novinky jsou opt-out, ne opt-in.)
 3. ✅ OPRAVENO 2026-06-18 — **Zastaralý komentář u role.** `article-review.provider.ts:11` tvrdí „BE enum má dvojité „uu" (FE má SpravceClanku)". Ověřeno: oba enumy mají `SpravceClanku` (BE `user.interface.ts:11`, FE `index.ts:10`) — komentář i odkaz na dluh `D-NEW-role-name-mismatch` jsou neaktuální.
 4. **`Tyky` hardcoded admin.** Bypass přes username `=== 'Tyky'` je rozeset ve 3 service (články/galerie/diskuze). Křehké (závisí na jménu, ne roli) a duplikované.
 5. **Galerie nemá „alba".** Zadání zmiňuje „alba/kategorie" — reálně existují **jen kategorie**, žádná entita album. Pro průvodce formulovat jako kategorie.

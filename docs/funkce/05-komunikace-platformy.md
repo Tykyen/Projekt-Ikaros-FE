@@ -27,7 +27,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - Žádné trvalé vlákno/archiv, žádné kategorie. Mazání jen Admin+ (uživatel nesmaže ani vlastní).
 - **Zvláštnosti:**
   - **Identita autora zprávy = účet** (`username` + `avatarUrl`). Od **4.2e** se ukládá jako **snapshot** při odeslání (`resolveSenderIdentity` → `senderName`/`senderAvatarUrl`, `global-chat.service.ts`) — zpráva si jméno+avatar pamatuje natrvalo. FE má navíc fallback resolver z presence pro zprávy bez snapshotu (`roomAvatarFor`). Dřív zprávy ukazovaly jen iniciálu (avatar se neplnil).
-  - **Každá odeslaná zpráva spustí web push `notifyAll` na všechna zařízení** (fire-and-forget, `global-chat.service.ts:242`) — i lidem, co v chatu nejsou. Payload bez `url` → bublina otevře jen `/`.
+  - **15.9 — push jen z Hospody a opt-in:** odeslaná zpráva spustí web push **jen v Hospodě** (`room === 'hospoda'`), přes `notifyAll(payload, 'hospoda')` (fire-and-forget). Kategorie `hospoda` je v preferencích **default VYP** → defaultně push nedostane nikdo, jen kdo si Hospodu výslovně zapnul v profilu. Rozcestí push **negeneruje** (dřív sdílená `notifyAll` spamovala všechny i ze zpráv z Rozcestí — opraveno). Payload bez `url` → bublina otevře jen `/`. (`global-chat.service.ts` `sendMessage`.)
   - Presence je per-socket multi-room; socket je sdílený celou appkou (pošta, online stav, přátelé) — proto se při opuštění chatu neodpojuje, jen odebere z presence. Heartbeat `chat:heartbeat` udržuje „naživu", neaktivita → auto-odhlášení z presence.
 - **Stav:** ✅
 - **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `components/AnonChatGate.tsx` (15.8 brána), `store/anonSession.ts`, `api/useAnonSession.ts`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`, `anon-ban.service.ts`, `common/guards/guest-or-member.guard.ts`, `auth/auth.service.ts` (`createAnonSession`). Spec 15.8.
@@ -47,6 +47,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Zvláštnosti:**
   - **Identita postavy = snapshot při odeslání** (4.2e): zpráva si pamatuje, za kterou postavu byla psána, i když hráč postavu/avatar později změní (záměr pro roleplay — opak render-time PJ persony ve světovém chatu). `resolveSenderIdentity(room≠hospoda)` v `global-chat.service.ts`; FE pravidlo `roomAvatarFor` + panel `UserList` mode `character`.
   - Přepnutí mezi Rozcestími dělá čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická lokální změna), aby se neduplikovalo do useState.
+  - **15.9 — Rozcestí negeneruje web push.** Sdílený `sendMessage` posílá push jen pro `room === 'hospoda'`; zprávy z Rozcestí push nespouští (záměr — atmosférický roleplay, ne notifikační kanál).
 - **Stav:** ✅
 - **Kód:** FE `src/features/chat/pages/RozcestiPage.tsx`, `components/ChatRoom.tsx`, `lib/roomAvatar.ts`, `components/RozcestiHeader.tsx`, `RozcestiDescription.tsx`, `lib/rozcestiRooms.ts`, `lib/rozcestiPlaces.ts`. BE `global-chat.service.ts` (`resolveSenderIdentity`/`sendMessage`/`sendWhisper`), `global-chat.controller.ts:179`, `global-chat.gateway.ts:175`. Spec `docs/arch/phase-4/spec-4.2e.md`.
 
@@ -83,7 +84,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Chaty** (`ChatFeedTab`) — souhrn nepřečtených zpráv **napříč všemi mými světy** (cross-world feed `GET /chat/feed`, cursor paginace; access-safe). **Klik na položku** otevře daný svět + konverzaci a doscrolluje/zvýrazní konkrétní zprávu (deep-link `/svet/:slug/chat?konverzace=&zprava=`; feed nese `worldSlug`). Zpráva mimo načtené okno historie (~50) → konverzace se otevře, ale skok je no-op.
   - **Události** (`EventsTab`) — co mi schválili / přiřazení postavy apod.
   - **Ke zpracování** (`PendingTab`) — fronta schvalování (články/galerie/diskuze, …) přes `usePendingActionsCount`.
-  - Patička: **přepínač web push** na tomto zařízení (`PushToggle`).
+  - Patička: **přepínač web push** na tomto zařízení (`PushToggle`); **výběr typů** notifikací je v profilu (sekce „Notifikace", 15.9).
 - **Hranice / co neumí:** není to plnohodnotný „seznam všech notifikací" — je to agregace tří zdrojů. Žádné „označit vše přečtené" napříč typy z jednoho místa (řeší se per zdroj).
 - **Zvláštnosti:** badge u nav položek (Diskuze/Články/Galerie) zrcadlí pending count; „Chaty" se aktualizuje živě přes WS (`useChatFeedLive`).
 - **Stav:** ✅
@@ -96,21 +97,45 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Co jde dělat:**
   - Získat veřejný klíč (`GET /push/vapid-public-key`, veřejné), **přihlásit** zařízení (`POST /push/subscribe`, upsert dle endpointu, ukládá user-agent), **odhlásit** (`/unsubscribe` dle endpointu nebo `DELETE /subscriptions/:id`), vypsat **vlastní zařízení** (`GET /push/subscriptions`, bez klíčů).
   - SW zobrazí notifikaci z payloadu `{title, body, icon?, url?, tag?}` a na klik naviguje na `url` (deep-link), jinak na `/` (`sw.js`). `tag` slučuje bubliny stejné konverzace (`renotify:true` znovu upozorní).
-- **Co reálně pushuje:**
-  - **Nová platformová novinka** → `notifyAll` (kap. 04).
-  - **Každá zpráva v globálním chatu** → `notifyAll` (viz výše).
-  - **Chat ve světě** → `notifyUsers` cílově, s `tag`/`topic = chat-{channelId}` (mimo tuto kapitolu; viz [spec-13.2c-push-delivery](../arch/phase-13/spec-13.2c-push-delivery.md)).
+- **Co reálně pushuje (15.9 — každý push nese kategorii a respektuje `notificationPreferences` příjemce):**
+  - **Chat ve světě** → `notifyUsers(..., 'worldChat')`, `tag`/`topic = chat-{channelId}` (kap. 13; viz [spec-13.2c-push-delivery](../arch/phase-13/spec-13.2c-push-delivery.md)).
+  - **Akce ve světě** → vytvoření hry `notifyUsers(..., 'worldEvent')` + připomínky **24 h a 1 h** před začátkem (cron à 15 min, `game-event-reminder.job.ts`, kap. 15).
+  - **Vlastní diskuse** → nový příspěvek **autorovi diskuse** `notify(..., 'ownDiscussion')` s `url` na diskusi (kap. 04).
+  - **Vlastní článek / galerie** → schválení / zamítnutí / nové hodnocení **autorovi** `notify(..., 'ownContent')` s `url` (kap. 04).
+  - **Novinky světa** → členům světa (mimo Zadatele) `notifyUsers(..., 'worldNews')` (kap. 13).
+  - **Novinky Ikarosu** → `notifyAll(..., 'ikarosNews')` (kap. 04).
+  - **Hospoda** → `notifyAll(..., 'hospoda')`, **opt-in** (kategorie default VYP).
+  - Filtr příjemců dle preferencí běží v `PushService` (`filterByCategory`/`userWantsCategory` → `wantsPush`); `undefined` pole = default z kódu. Viz funkce „Nastavení notifikací" níže.
 - **Doručovací politika (13.2c-push-delivery, 2026-06-19):** každý push nese **TTL** (default 4 h, konst. `DEFAULT_TTL_SECONDS`) — provider po vypršení notifikaci zahodí, takže offline telefon už nedostane **dny staré** zprávy. Validní **`topic`** (server-side collapse, RFC 8030) navíc nahradí předchozí nedoručenou ve frontě → jen poslední, ne hromada. (`push.service.ts` `sendToSubscriptions`.)
 - **Hranice / co neumí:**
   - **Pošta nepushuje** (jen WS) — soukromá zpráva na telefon nedorazí jako push.
-  - **Žádné per-typ předvolby** — jediný přepínač zapne/vypne push na zařízení; nelze si zvolit „jen pošta, ne chat".
-  - **`notifyAll` payloady nemají `url`** → deep-link se u novinek a globálního chatu nevyužije, bublina otevře `/`. (Nemají ani `tag`/`topic` → broadcast push se neslučuje.)
+  - **`notifyAll` payloady (novinky Ikarosu, Hospoda) nemají `url`** → bublina otevře `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie) `url` **mají**.
+  - **Granularita jen per-typ, ne per-svět** — nelze ztlumit konkrétní svět (plánováno jako pozdější rozšíření).
   - iOS vyžaduje PWA přidanou na plochu (standardní omezení Safari pro Web Push) — 15.1 install hint to usnadňuje instrukcí „Sdílet → Přidat na plochu" (viz blok „Instalace na plochu (PWA)" níže).
 - **Zvláštnosti:**
   - Neplatné subscription (HTTP 404/410) se automaticky promazávají (`push.service.ts`). VAPID klíče z env (`VAPID_SUBJECT/PUBLIC_KEY/PRIVATE_KEY`); chybí-li, modul při startu spadne na `!` non-null assertu.
   - **Úklid rotovaných odběrů (13.2c-push-delivery):** SW má `pushsubscriptionchange` handler → re-subscribe (auth není v SW dostupný, BE origin dostává query `?api=` z `main.tsx`). Nahlášení nového endpointu řeší FE `usePush` autentizovaně — na mountu porovná endpoint s `localStorage['push:endpoint']`, při změně pošle `POST /push/subscribe` s `oldEndpoint` → BE starý smaže (`subscribe` v `push.service.ts`). Bez toho se mrtvé endpointy hromadily → **duplicitní push na jedno zařízení**.
-- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), ale dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push nejsou naplněné.
+- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), **15.9** doplnilo per-typ předvolby + filtr příjemců; dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push (novinky Ikarosu, Hospoda) nejsou naplněné.
 - **Kód:** FE `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx`, `PushDevicesList.tsx`, `public/sw.js`, `src/app/main.tsx`. BE `backend/src/modules/push/push.controller.ts`, `push.service.ts`, `dto/subscribe.dto.ts`; chat push `backend/src/modules/chat/chat.service.ts`.
+
+### Nastavení notifikací (preference) — 15.9
+- **Co to je:** Per-uživatelské předvolby, **na co** chodí web push. Master vypínač + 7 kategorií. Filtr běží na BE před každým odesláním push.
+- **Kde:** sekce **„Notifikace"** v profilu (`/ikaros/profil`, `NotificationPreferencesSection`, mezi Soukromím a Bezpečností).
+- **Kdo:** přihlášený, jen vlastní preference (`PATCH /users/me/notification-preferences`, `JwtAuthGuard`). Bez role-gate.
+- **Co jde dělat:**
+  - **Master `pushEnabled`** (default ZAP) — vypnutím se ztlumí veškerý push bez ohledu na kategorie.
+  - **7 kategorií** ve 4 skupinách (default ZAP kromě Hospody): *Můj svět* — `worldChat`, `worldEvent`; *Můj obsah* — `ownDiscussion`, `ownContent`; *Novinky* — `worldNews`, `ikarosNews`; *Komunita* — `hospoda` (default **VYP**).
+  - **Per-device přepínač** (reuse `usePush`) — povolení push na tomto zařízení (hardware brána, nezávislá na kategoriích).
+- **Hranice / co neumí:**
+  - **Řídí jen push bublinu**, ne obsah notifikačního centra (zvoneček ukazuje vše vždy).
+  - **Granularita per-typ, ne per-svět** — nelze ztlumit konkrétní svět.
+  - Hodnocení článku/galerie pushuje **za každé hodnocení** (žádný throttle/souhrn — možné pozdější rozšíření).
+- **Zvláštnosti:**
+  - **Dual-source defaulty** — kategorie/defaulty jsou na FE (`features/notifications/lib/notificationPreferences.ts`) i BE (`common/notifications/notification-preferences.ts`); při změně měň obě.
+  - Defaulty se **neukládají do DB** — nenastavené pole zůstává `undefined`, default žije v kódu (`wantsPush`/`resolvePref`).
+  - **Delta merge** na PATCH — pošle se jen měněné pole, ostatní zůstanou.
+- **Stav:** ✅ (BE filtr + endpoint + FE sekce hotové, ověřeno jest+build; čeká BE restart pro nasazení).
+- **Kód:** FE `src/features/profile/components/NotificationPreferencesSection.tsx`, `api/useNotificationPreferences.ts`, `features/notifications/lib/notificationPreferences.ts`. BE `common/notifications/notification-preferences.ts`, `modules/push/push.service.ts` (`filterByCategory`), `modules/users/users.service.ts` (`updateNotificationPreferences`), `users.controller.ts`, `dto/update-notification-preferences.dto.ts`.
 
 ---
 
@@ -157,10 +182,11 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. **Globální chat pushuje každou zprávu všem.** `GlobalChatService.sendMessage` volá `pushService.notifyAll` na **každou** zprávu (`global-chat.service.ts:242`) — při živé Hospodě to znamená web push na všechna zařízení za každou hlášku. Silný spam-vektor; chybí throttling / opt-out / exclude odesílatele.
-2. **Push bez deep-linku.** `notifyAll` payloady (novinky i globální chat) neobsahují `url`, takže klik na bublinu otevře jen `/`, ne konkrétní místnost/novinku. SW deep-link (`sw.js:35`) je připravený, ale nenaplněný. (Shoduje se s MEMORY: deep-link schválit a doplnit `url` do payloadu.)
-3. **Pošta bez push.** Soukromá/systémová zpráva nikdy nedorazí jako push na telefon (jen WS + badge). Pro uživatele matoucí, když chat pushuje a pošta ne.
-4. **Žádné per-typ push předvolby.** Jediný přepínač zapne/vypne vše; nelze odlišit „novinky vs. chat vs. pošta". Společně s bodem 1 dělá push prakticky nepoužitelný pro aktivní uživatele Hospody.
-5. **Dva nezávislé „emote" systémy se snadno zamění.** Globální chat = textové emoji; svět = custom obrázkové. Sdílí UI termín „emoty", ale ne kód ani datový zdroj. V průvodci jasně oddělit, aby amatér nehledal v Hospodě obrázkové emoty světa.
-6. **1h TTL globálního chatu** není v UI nikde explicitně komunikováno — uživatel může být překvapen, že se historie „ztrácí". Vhodné zmínit v nápovědě.
-7. **VAPID fail-fast.** Bez env klíčů push modul spadne na non-null assertu při startu (`push.service.ts:31`) — provozní závislost; ověřit, že produkce má klíče (dle MEMORY 3/3 OK).
+1. **Push bez deep-linku jen u broadcastu.** `notifyAll` payloady (novinky Ikarosu, Hospoda) neobsahují `url` → klik otevře jen `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie — 15.9) už `url` **mají**; SW deep-link (`sw.js:35`) funguje. Zbývá doplnit `url` do broadcast payloadů.
+2. **Pošta bez push.** Soukromá/systémová zpráva nikdy nedorazí jako push na telefon (jen WS + badge). Pro uživatele matoucí, když chat pushuje a pošta ne.
+3. **Dva nezávislé „emote" systémy se snadno zamění.** Globální chat = textové emoji; svět = custom obrázkové. Sdílí UI termín „emoty", ale ne kód ani datový zdroj. V průvodci jasně oddělit, aby amatér nehledal v Hospodě obrázkové emoty světa.
+4. **1h TTL globálního chatu** není v UI nikde explicitně komunikováno — uživatel může být překvapen, že se historie „ztrácí". Vhodné zmínit v nápovědě.
+5. **VAPID fail-fast.** Bez env klíčů push modul spadne na non-null assertu při startu (`push.service.ts:31`) — provozní závislost; ověřit, že produkce má klíče (dle MEMORY 3/3 OK).
+6. **Push granularita jen per-typ, ne per-svět** (15.9) — uživatel nemůže ztlumit konkrétní svět, jen celou kategorii. Plánováno jako pozdější rozšíření.
+
+> **Vyřešeno 15.9 (smazáno z výše):** globální chat už nepushuje každou zprávu všem (Hospoda opt-in, Rozcestí push zrušen, exclude přes preference); per-typ předvolby existují (sekce „Nastavení notifikací").

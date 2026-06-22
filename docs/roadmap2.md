@@ -241,6 +241,11 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Co se postavilo:** captcha brána (Turnstile) → **guest JWT** (role `Guest`, TTL 14 d) → host mód Hospody. Host: jen text, žádný upload/šepot/Rozcestí. Moderace: Admin ban per anon‑id + rate‑limit 10/min. BE (A1‑A8: token, guard, scope, identita, ban, WS) + FE (B1‑B7: anonSession, brána, host mód). **Bezpečnost:** guest token scope jen Hospoda + sentinel `UserRole.Guest=99` (2. pojistka), captcha fail‑closed, identita z ověřeného tokenu.
 **Ops:** ČEKÁ BE restart + env `ANON_SESSION_TTL=14d`.
 
+### - [x] 15.9 Notifikační preference + rozšíření push — [H1 · dopad střední · náklad střední]
+> ✅ **Implementováno 2026-06-22** (viz [spec-15.9](arch/phase-15/spec-15.9-notifikace-preferences.md)) — hráč si v profilu (sekce **Notifikace**) vybere, na co mu chodí web push: master vypínač + **7 kategorií** ve 4 skupinách. BE filtruje každý push dle preferencí.
+**Co se postavilo:** `notificationPreferences` na User + `PATCH /users/me/notification-preferences` (delta merge); filtr v `PushService` (`notifyUsers/notifyAll` s kategorií, jednosměrná závislost push→users). **3 nové push triggery:** novinky světa (členům), vlastní diskuse (autorovi), hodnocení/schválení článku i galerie (autorovi). **Hospoda push = opt‑in** (default VYP), **Rozcestí push zrušen** (dřív spamoval všechny). **Plánovaná hra: připomínka 24h i 1h** (cron à 15 min, druhý flag `reminder1hSent`). FE sekce + dual‑source defaulty. Ověřeno: BE jest 440/440 + push 21/21, FE build + HelpPage 25/25.
+**Ops:** ČEKÁ BE restart (nové env netřeba).
+
 ---
 
 ## Fáze 15B — SEO & objevitelnost

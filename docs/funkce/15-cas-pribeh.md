@@ -113,7 +113,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - **Upcoming / Archiv** taby (URL `?view=`), **filtr podle skupiny** (`?group=`, klient-side dle `targetGroup` + barvy skupin z worldSettings).
   - **Vytvořit/upravit/smazat akci** (`GameEventModal`): název, datum+čas, popis, obrázek (focal/zoom/fit), cílová skupina + `groupOnly`, `confirmable` (RSVP). `groupOnly` vyžaduje `targetGroup` (jinak 400).
   - **RSVP** (`/:id/confirm` toggle), **komentáře** root + reply na root, **editace/soft-delete** komentáře, **emoji reakce** toggle na komentář.
-  - **Push notifikace** při vytvoření akce (respektuje groupOnly příjemce) + **cron připomínka 24 h předem** (`GameEventReminderJob`, každou hodinu, okno 23–25 h, `reminderSent` flag).
+  - **Push notifikace** při vytvoření akce (respektuje groupOnly příjemce) + **cron připomínky 24 h a 1 h předem** (15.9; `GameEventReminderJob` à 15 min, okna 23–25 h / 0.75–1.25 h, nezávislé flagy `reminderSent` + `reminder1hSent`). Vše kategorie push `worldEvent` (respektuje `notificationPreferences`).
   - Dashboard widget „blížící se akce" napříč světy uživatele (`upcoming/mine`, limit 5, max 20).
 - **Hranice / co neumí:**
   - Komentáře jsou jen **2 úrovně** (root + jedna vrstva reply; reply nesmí mířit na jiný reply).
@@ -123,7 +123,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - Hard delete eventu maže přidružený obrázek (event `media.orphaned`), ale samotný event je **hard delete** (ne soft).
 - **Zvláštnosti:** Archive policy = varianta A (implicit filter dle date, ne separátní endpoint). `findList` limit default 100 / max 500. `confirmedBy` lze přepsat i přes update (PJ).
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/EventsPage/EventsPage.tsx:24`, toolbar/list `components/`, modal `src/features/world/components/GameEventModal/GameEventModal.tsx`, dashboard `pages/WorldDashboardPage/.../columns/EventsColumn.tsx`. BE controller `backend/src/modules/game-events/game-events.controller.ts:36`, service `game-events.service.ts` (`findList:123`, `create:239`, archive gate `:135`), cron `game-event-reminder.job.ts:25`.
+- **Kód:** FE `src/features/world/pages/EventsPage/EventsPage.tsx:24`, toolbar/list `components/`, modal `src/features/world/components/GameEventModal/GameEventModal.tsx`, dashboard `pages/WorldDashboardPage/.../columns/EventsColumn.tsx`. BE controller `backend/src/modules/game-events/game-events.controller.ts:36`, service `game-events.service.ts` (`findList:123`, `create:239`, `notifyOnCreate`, archive gate `:135`), cron `game-event-reminder.job.ts` (à 15 min, dvě okna 24 h/1 h).
 
 ---
 

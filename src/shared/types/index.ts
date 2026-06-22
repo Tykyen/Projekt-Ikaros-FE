@@ -33,6 +33,22 @@ export const DEFAULT_ADMIN_PERMISSIONS: AdminPermissions = {
   canEditPlatformPages: false,
 };
 
+/**
+ * 15.9 — notifikační preference (push). Kopie BE tvaru (oddělená repa,
+ * dual-source — měň obě). `undefined` pole = default z kódu (viz
+ * `features/notifications/lib/notificationPreferences`).
+ */
+export interface NotificationPreferences {
+  pushEnabled?: boolean;
+  worldChat?: boolean;
+  worldEvent?: boolean;
+  ownDiscussion?: boolean;
+  ownContent?: boolean;
+  worldNews?: boolean;
+  ikarosNews?: boolean;
+  hospoda?: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -86,6 +102,8 @@ export interface User {
   isDeleted?: boolean;
   themeSettings: Record<string, unknown>;
   chatPreferences: Record<string, unknown>;
+  /** 15.9 — notifikační preference (push); undefined pole = default z kódu. */
+  notificationPreferences?: NotificationPreferences;
   /* themeSettings — viz `UserThemeSettings` (čte se přes cast). */
   favoriteDiscussionIds: string[];
   /** 3.7 — oblíbené (záložky) napříč globálním obsahem */

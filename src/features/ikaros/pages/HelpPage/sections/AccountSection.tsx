@@ -9,6 +9,7 @@ import {
   EyeOff,
   Trash2,
   Globe2,
+  Bell,
 } from 'lucide-react';
 import { HelpAccordion, StepList, CalloutBox, TermGrid } from '../components';
 
@@ -132,6 +133,31 @@ export function AccountSection() {
             { term: 'Pošta jen pro přátele', desc: 'Napsat ti jako první může jen přítel (a administrátor); na tvou zprávu ti odpoví kdokoli.' },
           ]}
         />
+      </HelpAccordion>
+
+      <HelpAccordion icon={<Bell size={20} />} title="Notifikace (upozornění)" accent="accent">
+        <p>
+          Sám/sama si vybíráš, na co ti přijde <strong>push upozornění</strong> —
+          bublina na telefon nebo do prohlížeče, i když appku nemáš otevřenou.
+          Nejdřív upozornění <strong>povol na zařízení</strong> (tlačítko v sekci),
+          pak zaškrtni typy:
+        </p>
+        <TermGrid
+          items={[
+            { term: 'Chat ve světě', desc: 'Nová zpráva v chatu světa, jehož jsi členem.' },
+            { term: 'Akce ve světě', desc: 'Nová hra ve světě + připomínka 24 hodin a 1 hodinu před začátkem, ať na hru nezapomeneš.' },
+            { term: 'Vlastní diskuse', desc: 'Nový příspěvek v diskusi, kterou jsi založil/a.' },
+            { term: 'Vlastní článek a galerie', desc: 'Schválení, zamítnutí nebo nové hodnocení tvého článku či obrázku.' },
+            { term: 'Novinky světa', desc: 'Nová novinka ve světě, jehož jsi členem.' },
+            { term: 'Novinky Ikarosu', desc: 'Oznámení a novinky celé platformy.' },
+            { term: 'Hospoda', desc: 'Zprávy v Interdimenzionální hospodě — standardně vypnuto, ať tě každá hláška neruší.' },
+          ]}
+        />
+        <CalloutBox variant="tip">
+          Hlavní vypínač „Push notifikace" ztlumí všechno naráz. Vypnutí ovlivní
+          jen bublinky — ve zvonečku v hlavičce uvidíš upozornění vždy. Na každém
+          zařízení (telefon, počítač) se push povoluje zvlášť.
+        </CalloutBox>
       </HelpAccordion>
 
       <HelpAccordion icon={<Globe2 size={20} />} title="Moje světy & komunitní stopa" accent="success">

@@ -12,6 +12,7 @@ import { FriendsSection } from '../components/FriendsSection';
 import { CommunityPlaceholders } from '../components/CommunityPlaceholders';
 import { AppearanceSection } from '../components/AppearanceSection';
 import { PrivacySection } from '../components/PrivacySection';
+import { NotificationPreferencesSection } from '../components/NotificationPreferencesSection';
 import { SecuritySection } from '../components/SecuritySection';
 import { AccountSection } from '../components/AccountSection';
 import styles from './ProfilePage.module.css';
@@ -80,6 +81,8 @@ export default function ProfilePage() {
           hiddenInDirectory={!!user.hiddenInDirectory}
           profileVisibility={user.profileVisibility ?? 'public'}
         />
+
+        <NotificationPreferencesSection user={user} />
 
         <SecuritySection username={user.username} />
 

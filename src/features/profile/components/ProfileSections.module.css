@@ -483,6 +483,70 @@
   line-height: var(--leading-normal);
 }
 
+/* 15.9 — notifikační preference */
+.notifGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.notifGroupTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 12px 0 2px;
+}
+
+.notifDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--frame-border);
+  border: 0;
+  margin: 6px 0;
+}
+
+.notifDeviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.notifDeviceBtn {
+  padding: 6px 16px;
+  border: 1px solid var(--frame-border);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.notifDeviceBtn:hover:not(:disabled) {
+  background: var(--surface-3, var(--surface-2));
+  border-color: var(--accent);
+}
+
+.notifDeviceBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notifHint {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.notifDisabledGroup {
+  opacity: 0.5;
+}
+
 @media (max-width: 640px) {
   .card {
     padding: 16px;
