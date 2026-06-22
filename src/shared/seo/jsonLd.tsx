@@ -135,6 +135,43 @@ export function breadcrumbJsonLd(items: Crumb[], origin: string): JsonLdNode {
   };
 }
 
+// ─── FAQPage (landing systémů — „jak začít" Q&A) ─────────────────────────
+
+/**
+ * 15B.4a — FAQ na landing stránce systému. `FAQPage` strukturuje Q&A pro
+ * vyhledávač (Google už FAQ rich snippet u běžných webů neukazuje, ale markup
+ * dál pomáhá porozumění obsahu). Bez URL → bez `origin`.
+ */
+export function faqJsonLd(items: { q: string; a: string }[]): JsonLdNode {
+  return {
+    '@context': CONTEXT,
+    '@type': 'FAQPage',
+    mainEntity: items.map((it) => ({
+      '@type': 'Question',
+      name: it.q,
+      acceptedAnswer: { '@type': 'Answer', text: it.a },
+    })),
+  };
+}
+
+// ─── ItemList (hub /ikaros/systemy — rozcestník systémů) ──────────────────
+
+export function itemListJsonLd(
+  items: { name: string; url: string }[],
+  origin: string,
+): JsonLdNode {
+  return {
+    '@context': CONTEXT,
+    '@type': 'ItemList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      url: absoluteUrl(origin, it.url),
+    })),
+  };
+}
+
 // ─── WebSite + Organization (homepage brand) ─────────────────────────────
 
 export function siteJsonLd(origin: string): JsonLdNode[] {

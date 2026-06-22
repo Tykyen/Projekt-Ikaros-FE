@@ -19,6 +19,7 @@ import {
   Signpost,
   Sparkles,
   ShieldCheck,
+  Dices,
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
 import { pendingTooltip } from './pendingBadge';
@@ -99,6 +100,8 @@ type NavItemDef = {
 const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'uvodnik',       label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
   { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
+  // 15B.4a — veřejný rozcestník landing stránek RPG systémů (anon i člen)
+  { navKey: 'systemy',       label: 'RPG systémy',   to: '/ikaros/systemy',                   icon: <Dices size={18} /> },
   { navKey: 'diskuze',       label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} />, pendingType: PendingActionType.DiscussionPendingReview, anonHidden: true },
   { navKey: 'clanky',        label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} />,      pendingType: PendingActionType.ArticlePendingReview },
   { navKey: 'galerie',       label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} />,     pendingType: PendingActionType.GalleryPendingReview },

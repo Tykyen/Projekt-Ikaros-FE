@@ -4,13 +4,16 @@
 # Claudeovi přeposílat, a Claude zápis odkládal/zapomínal. `decision:block` míří
 # reason PŘÍMO modelovi → musí se k deníku postavit, NEŽ dokončí tah.
 #
-# Heuristika: mtime nejnovějšího src/*.ts(x) vs nejnovějšího docs/chybovy-denik/*.md.
-# Když je kód novější → block s instrukcí. Self-resolving: po zápisu je deník
-# novější → příště ticho. Anti-loop: když už hook jednou blokoval tenhle stop
-# (`stop_hook_active`), PROPUSTÍ (Claude se vědomě rozhodl — i „triviální, přeskoč").
-# Fail-open: jakákoli chyba hooku NIKDY neblokuje turn.
+# Detekce: git working tree — necommitnuté změny v src/*.ts(x). Když existují →
+# block s instrukcí. Self-resolving: po commitu (uživatel commituje ručně) je
+# working tree čistý → příště ticho. Anti-loop: když už hook jednou blokoval
+# tenhle stop (`stop_hook_active`), PROPUSTÍ (Claude se vědomě rozhodl — i
+# „triviální, přeskoč"). Fail-open: jakákoli chyba hooku NIKDY neblokuje turn.
 #
 # Schváleno uživatelem (2026-06-20) jako tvrdá pojistka spolehlivosti deníku.
+# 2026-06-22: přepnuto z mtime na git working tree. Mtime ≠ autorství — checkout,
+#   IDE auto-save i watcher posunou mtime bez obsahové změny → hook plašil falešně
+#   po každém tahu (commitnutý soubor s novým mtime vypadal „novější než deník").
 
 try {
   # stdin = JSON vstupu hooku (obsahuje stop_hook_active).
@@ -26,14 +29,15 @@ try {
   # .claude/hooks → .claude → kořen projektu (nezávislé na cwd hooku)
   $root = $PSScriptRoot | Split-Path | Split-Path
 
-  $src = Get-ChildItem -Path (Join-Path $root 'src') -Recurse -Include *.ts, *.tsx -File -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 1
-  $denik = Get-ChildItem -Path (Join-Path $root 'docs\chybovy-denik') -Filter *.md -File -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  # Necommitnuté změny v src/*.ts(x). `--porcelain -- src` omezí na složku src,
+  # filtr přípony pokryje i rename (`orig -> new.tsx`).
+  $dirty = & git -C $root status --porcelain -- src 2>$null |
+    Where-Object { $_ -match '\.tsx?$' }
 
-  if ($src -and (-not $denik -or $src.LastWriteTime -gt $denik.LastWriteTime)) {
-    $reason = "STOP HOOK - chybovy denik: menil jsi kod ($($src.Name)) po poslednim zapisu do " +
-      "docs/chybovy-denik/. Podle base.md: pokud to byla netrivialni oprava / reseni / zmena " +
+  if ($dirty) {
+    $first = ([string]($dirty | Select-Object -First 1)).Trim()
+    $reason = "STOP HOOK - chybovy denik: mas necommitnute zmeny v src ($first). " +
+      "Podle base.md: pokud to byla netrivialni oprava / reseni / zmena " +
       "pristupu nebo vlastni chyba/slepa ulicka, ZAPIS to TED (CH-xxx nebo RESENI) " +
       "vcetne indexu README.md. Pokud slo jen o trivialni jednoradkovy fix nebo rutinu, " +
       "kratce to uvedy v odpovedi (proc se nezapisuje) a muzes skoncit."

@@ -9,6 +9,8 @@ export {
   worldJsonLd,
   breadcrumbJsonLd,
   siteJsonLd,
+  faqJsonLd,
+  itemListJsonLd,
   firstImageSrc,
   absoluteUrl,
 } from './jsonLd';

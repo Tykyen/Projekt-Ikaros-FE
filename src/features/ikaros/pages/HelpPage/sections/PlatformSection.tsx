@@ -19,6 +19,7 @@ import {
   Smile,
   Beer,
   Smartphone,
+  Dices,
 } from 'lucide-react';
 import { HelpAccordion, HelpSubAccordion, TagChip, ScreenshotSlot, type TagKind } from '../components';
 
@@ -74,6 +75,16 @@ export function PlatformSection() {
             kartu otevřeš detail světa. Anonym vidí veřejné a otevřené světy,
             přihlášený navíc své. Najdeš v{' '}
             <Link to="/ikaros/vesmiry">Přehledu vesmírů</Link>.
+          </p>
+        </Tool>
+        <Tool icon={<Dices size={16} />} title="RPG systémy" audience={{ kind: 'vse', label: 'Všichni' }}>
+          <p>
+            Rozcestník stránek o jednotlivých herních systémech — co pro daný
+            systém Ikaros umí (deníkový list, taktická mapa, kalendář, chat za
+            postavu), jak začít a jak založit svět. Zatím{' '}
+            <strong>Dračí Doupě 1.6</strong>, <strong>Dračí Doupě II</strong> a{' '}
+            <strong>Jeskyně a Draci</strong>; další systémy přibydou. Najdeš v{' '}
+            <Link to="/ikaros/systemy">RPG systémech</Link>.
           </p>
         </Tool>
       </HelpAccordion>

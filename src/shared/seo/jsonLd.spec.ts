@@ -5,6 +5,8 @@ import {
   worldJsonLd,
   breadcrumbJsonLd,
   siteJsonLd,
+  faqJsonLd,
+  itemListJsonLd,
   firstImageSrc,
   absoluteUrl,
   serializeJsonLd,
@@ -171,6 +173,38 @@ describe('siteJsonLd', () => {
     expect(site['@type']).toBe('WebSite');
     expect(org['@type']).toBe('Organization');
     expect(org.logo).toBe(`${ORIGIN}/icons/icon-512.png`);
+  });
+});
+
+describe('faqJsonLd', () => {
+  it('FAQPage s Question/acceptedAnswer', () => {
+    const n = faqJsonLd([
+      { q: 'Je to zdarma?', a: 'Ano.' },
+      { q: 'Jak začít?', a: 'Vytvoř svět.' },
+    ]);
+    expect(n['@type']).toBe('FAQPage');
+    const items = n.mainEntity as Array<Record<string, unknown>>;
+    expect(items).toHaveLength(2);
+    expect(items[0]['@type']).toBe('Question');
+    expect(items[0].name).toBe('Je to zdarma?');
+    expect((items[0].acceptedAnswer as Record<string, string>).text).toBe('Ano.');
+  });
+});
+
+describe('itemListJsonLd', () => {
+  it('ItemList s pozicemi a absolutními URL', () => {
+    const n = itemListJsonLd(
+      [
+        { name: 'Dračí Doupě 1.6', url: '/ikaros/systemy/draci-doupe-1-6' },
+        { name: 'Jeskyně a Draci', url: '/ikaros/systemy/jeskyne-a-draci' },
+      ],
+      ORIGIN,
+    );
+    expect(n['@type']).toBe('ItemList');
+    const items = n.itemListElement as Array<Record<string, unknown>>;
+    expect(items[0].position).toBe(1);
+    expect(items[0].url).toBe(`${ORIGIN}/ikaros/systemy/draci-doupe-1-6`);
+    expect(items[1].position).toBe(2);
   });
 });
 

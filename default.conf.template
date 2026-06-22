@@ -23,6 +23,7 @@ map $uri $prerender_path {
     "~^/podminky/?$"                                       1;
     "~^/ikaros/(napoveda|novinky|vesmiry)/?$"              1;
     "~^/ikaros/(clanky|galerie)(/[^/]+)?/?$"               1;
+    "~^/ikaros/systemy(/[^/]+)?/?$"                        1;
     "~^/svet/[^/]+/?$"                                     1;
 }
 

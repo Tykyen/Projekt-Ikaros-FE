@@ -198,3 +198,18 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak cyklení:** `... is not a function` u exportu, který v importovaném souboru objektivně je; přejmenování importu „pomáhá" náhodně podle casu.
 
 ---
+
+### ✅ ŘEŠENÍ — 15B.4a SEO landing kostra systémů — 2026-06-22
+
+**Co se stavělo:** veřejné landing stránky RPG systémů (`/ikaros/systemy` hub + `/ikaros/systemy/:slug`) jako **SEO kostra** — obsah jen na dnes existujícím (deník per systém + generické platform featury); bohatší pilíře (bestiář/dodatky) vědomě odložené na bod 22.1 po 16.2.
+
+**Co zabralo / klíčová rozhodnutí:**
+- **Data-driven registr** `systemLandings.ts` s **optional poli** (`bestiar?`/`dodatky?`/`denikScreenshot?`) — šablona sekci nevykreslí bez dat → 22.1 doplní bez přestavby. `published:false` kostra (4 ze 7 CZ) negeneruje stránku ani odkaz (žádné „připravujeme"). `getLandingBySlug` filtruje `published` → nepublikované neviditelné i přímou URL.
+- **3 napojení, bez kterých SEO TIŠE neběží:** (1) prerender whitelist `/ikaros/systemy` v `default.conf.template` — jinak bot dostane prázdný SPA shell; (2) BE sitemap `STATIC_ROUTES` (dual-source s FE registrem — slugy na 2 místech, zapsáno do nesrovnalostí kap. 03); (3) JSON-LD `faqJsonLd`/`itemListJsonLd` (čisté funkce, render jen na published).
+- **Reuse estetiky** (frontend-design audit): glass `Frame` (`data-frame-panel="card"` + 4× `CornerOrnament`) místo nové komponenty; CTA reuse `registerModalOpenAtom` vzoru z 15.7; galerie reuse `SHOWCASE_SLIDES`.
+
+**Jak ověřeno:** `npm run build` (tsc-b+vite, 0 chyb), vitest 23 (jsonLd 17 + registr 6), HelpPage 25, lint:colors bez nových nálezů (jen theme tokeny). CSS audit responsivity (media 768, žádné fixed layout šířky). **Vizuál čeká na živé potvrzení uživatelem** — Chrome headless screenshot v tomhle prostředí nevyšel (exit bez png), spolehnuto na CSS audit + běžící dev server.
+
+**Zhodnocení:** dobře — implementace dle schválené spec hladce, žádné cyklení; pořadí „čisté funkce → data → komponenty → routy → napojení" drželo build zelený průběžně. Past, kterou spec chytila předem: prerender whitelist (bez něj SEO neviditelné a nikdo by si nevšiml — žádný runtime error). Otevřené: draft copy 3 systémů k revizi uživatelem; dedikovaný screenshot deníku až dodá.
+
+---

@@ -278,18 +278,20 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **FE:** JSON-LD generátory podle typu stránky (validovat přes Rich Results Test).
 **Otevřené otázky:** Které typy schémat prioritně? Jsou komunitní diskuze veřejné (nepřihlášený je vidí)?
 
-### - [ ] 15B.4 👑 Landing pages pro české systémy — [H2-04 · dopad vysoký · náklad střední] 🔁
+### - 15B.4 👑 Landing pages pro české systémy — [H2-04 · dopad vysoký · náklad střední] 🔁
+> **Rozhodnuto 2026-06-22 — rozděleno na 4a/4b.** Důvod: landing slibuje „co Ikaros pro systém umí", ale bestiář-system-scope + pravidlové dodatky + finální grafika deníků vznikají až v **16.2**. Princip „postav model jednou, plň fázovaně": technická kostra teď (URL žijí a indexují se — **SEO běží na čase, ne na příkazu**: doménová autorita roste měsíce, spustit dřív i tenčí > spustit hotové na konci od nuly), bohatý obsah po 16.2. → **4a (kostra) je zde v 15B; 4b přesunuto na bod 22.1** (konec Etapy II).
 **Cíl:** Obsahově bohaté stránky pro Dračí Doupě, DrD II, Jeskyně a Draci, textové hry a worldbuilding — co Ikaros pro daný systém umí, jak začít, ukázky, šablony.
 **Proč:** **Český SEO příkop** — globální konkurence to lokálně nenabízí; nejsilnější organická akvizice na českém trhu. Provázané s hloubkovou podporou systémů (16.2).
-**Návrh přípravy:** landing šablona + SEO copy per systém (people-first, ne klíčové fráze).
-**FE/Obsah:** šablona + obsah per systém.
-**Otevřené otázky:** Které systémy první? Provázat 1:1 s rozpadem 16.2a–m?
 
-### - [ ] 15B.5 Academy / evergreen obsah + Core Web Vitals — [H2-05 · dopad střední · náklad střední]
-**Cíl:** Redakční seriály („jak založit svět", „jak řídit intriky", „jak hrát textové RPG", „ukázkové světy") + provozní standard rychlosti: LCP ≤ 2,5 s, INP ≤ 200 ms, CLS ≤ 0,1.
-**Proč:** Education je akviziční i retenční vrstva (World Anvil Academy, Kanka learning hub); obsahový flywheel — produkt generuje obsah, obsah přivádí uživatele. CWV zlepší UX i ranking.
-**Obsah/FE:** redakční obsah (🔁 článkový modul) + perf optimalizace (lazy loading, image pipeline, code splitting).
-**Otevřené otázky:** Kdo píše obsah? Dávkovat udržitelně (vyžaduje průběžnou údržbu).
+#### - [x] 15B.4a Kostra landing systémů — ✅ HOTOVO 2026-06-22 (čeká deploy + BE restart kvůli sitemapě; draft copy + vizuál k revizi)
+**Co:** data-driven šablona `SystemLandingPage` + registr `systemLandings.ts` (**optional pole** `bestiar?`/`dodatky?`/`denikScreenshot?` pro budoucí pilíře — sekce se nevykreslí, dokud nemá obsah) + routy `/ikaros/systemy` (hub) a `/ikaros/systemy/:slug` (veřejné, bez `requireAuth`) + `<Seo>` + JSON-LD (FAQPage/CollectionPage) + statické routy do BE `seo` sitemap + ověřit, že prerender (15B.1) bere routy jako veřejné.
+**Obsah 1. vlny — 3 vlajkové** (DrD 1.6, DrD II, Jeskyně a Draci), postavené na tom, co reálně existuje: deníkový list per systém + generické platform featury (taktická mapa, kalendář, chat za postavu, bestiář-world-scope). Registr datově pojme **všech 7 CZ** (matrix, drd16, drd-plus, drd2, draci-hlidka, pi, jad); zbylé 4 = kostra + `completeness` marker (drží evidenci, co čeká na 16.2).
+**Pozor:** žádné „připravujeme" bloky (kazí SEO i dojem) — optional sekce se prostě nezobrazí.
+
+> **15B.4b → přesunuto na bod 22.1** (2026-06-22): obohacení landing po 16.2 (bestiář, dodatky, finální grafika, zbylé systémy) patří na konec Etapy II, ne do SEO vlny. Plný popis i otevřené otázky viz **Fáze 22 → 22.1**.
+
+### 15B.5 → přesunuto na bod 22.2 (2026-06-22)
+> Academy / evergreen obsah + Core Web Vitals se dělá na konci Etapy II — plný popis viz **Fáze 22 → 22.2**. (CWV se ladí až na feature-complete appce; evergreen není blokující.)
 
 ### - [ ] 15B.6 Sociální sdílení & pozvánkové odkazy — [H2-06 · dopad střední · náklad malý]
 **Cíl:** „Pozvi přátele" / „Sdílej tenhle svět" — tlačítko **Web Share API** (`navigator.share()`, nativní sdílení na mobilu/PWA → uživatel sám vybere FB/IG/WhatsApp/…), **Kopírovat odkaz** (univerzál) a případně přímé sharer‑URL (`facebook.com/sharer`, X intent). Primárně u **detailu světa** (pozvánka → pre‑join) a **vitríny** (17.3); odkaz vede host na `/svet/:slug` (veřejný rovnou vidí, privátní požádá o přístup).
@@ -329,44 +331,60 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Otevřené otázky:** Co konkrétně chatu chybí pro pohodlné dlouhé vyprávění (odběr kanálu? archiv? mobilní čtení dlouhých příspěvků?) — zjistit průchodem reálným chatem (vyžádám si screen). Kdo zakládá příběhové kanály a kdo do nich smí psát (role/skupiny — máme)?
 
-### - [ ] 16.2 👑 Hloubková podpora RPG systémů — dotažení per systém — [E2 · dopad vysoký · náklad velký] 🔁
-**Cíl:** Každý systém s deníkem dotáhnout do plnohodnotné podoby ve **třech pilířích**:
-1. **Deník** — deníkový list + kostkové mechaniky (hody dle systému, pasti, postih/bonus, dílčí výpočty v rozumné míře).
-2. **Bestiář** — kompendium příšer per systém (statbloky v tvaru daného systému, spawnovatelné na mapu).
-3. **Dodatky k pravidlům** — předměty, kouzla/schopnosti, vybavení, tabulky — referenční obsah, na který deník a hra odkazují.
-
-**Proč:** Foundry/Roll20 mají pro české systémy slabou/žádnou podporu — **náš příkop**. „Mít schéma" ≠ „mít list s mechanikou, bestiář a pravidlové dodatky". Tohle z Ikara dělá jediné místo, kde se české systémy dají plnohodnotně hrát.
+### - [ ] 16.2 👑 Hloubková podpora RPG systémů — [E2 · dopad vysoký · náklad velký] 🔁
+> **Reorganizováno 2026-06-22 — rozpad „per pilíř", ne „per systém".** Pilíř = sdílená infrastruktura; postavit engine jednou a naplnit napříč systémy je efektivnější než stavět ho u každého systému znovu. **Dva pilíře:** 16.2a Deník · 16.2b Bestiář. **3. pilíř „Dodatky k pravidlům" VYŘAZEN z 16.2** — design je nejasný (jak by fungoval); vrátí se jako vlastní pozdější bod, až bude promyšlený. Progress per systém = matice na konci.
+**Cíl:** Každý systém s deníkem dotáhnout ve **dvou pilířích**: deníkový list s kostkovými mechanikami + bestiář (statbloky v tvaru systému, spawnovatelné na mapu).
+**Proč:** Foundry/Roll20 mají pro české systémy slabou/žádnou podporu — **náš příkop**. „Mít schéma" ≠ „mít list s mechanikou a bestiář". Tohle z Ikara dělá jediné místo, kde se české systémy dají plnohodnotně hrát.
 
 **Společný základ (dělat jednou, sdílet napříč systémy):**
 - 🔁 `system-presets` + per-system schema engine (schéma canonical na FE → export do BE, `project_schema_be_fe_sync`).
-- 🔁 Bestiář 3-scope (system/user/world) + snapshot při spawnu (`project_bestiar_design`); pilíř „Bestiář" plní **system** scope per systém.
+- 🔁 Bestiář scope engine + snapshot semantics (`project_bestiar_design`) — scope model v 16.2b.
 - Kostkový engine s presety hodů per systém (k6/k%/d20/dpool/fudge/3d6…).
 - Rozsah „mechaniky": **jen hody + základní výpočty**, ne plná automatizace pravidel (hranice v „Co tato roadmapa NEDĚLÁ").
 
-**Rozhodnuto (2026-06-15):** dotáhnout **všechny systémy, které dnes mají deník**; **prioritně české** (příkop). Každý systém = vlastní podbod níže, každý se třemi pilíři (Deník · Bestiář · Dodatky). Stav každého pilíře značíme zvlášť.
+**Rozhodnuto (2026-06-15):** dotáhnout **všechny systémy, které dnes mají deník**; **prioritně české** (příkop).
 
-> ⚠️ **Drift k vyřešení** (ověřeno 2026-06-15, dluh D-NEW-SYS-DIARY-DRIFT): **Dračí Hlídka má dvě nesladěná id.** Nabídka ji ukládá jako `world.system = 'draci-hlidka'`, ale deník je registrovaný pod `drdh` (`drdh.ts`: `id:'drdh'`, `name:'Dračí Hlídka'`). → svět „Dračí Hlídka" svůj deník nenajde. **Žádné samostatné „Dračí Doupě Hero" neexistuje** — `drdh` JE Dračí Hlídka. Před rozjezdem 16.2 sjednotit na jedno id napříč vrstvami (nabídka · FE registry/types/preset · BE system-presets). Provázat s 15B.4 (CZ landing pages 1:1 se systémy).
+> ⚠️ **Drift k vyřešení** (ověřeno 2026-06-15, dluh D-NEW-SYS-DIARY-DRIFT): **Dračí Hlídka má dvě nesladěná id.** Nabídka ji ukládá jako `world.system = 'draci-hlidka'`, ale deník je registrovaný pod `drdh` (`drdh.ts`: `id:'drdh'`, `name:'Dračí Hlídka'`). → svět „Dračí Hlídka" svůj deník nenajde. **Žádné samostatné „Dračí Doupě Hero" neexistuje** — `drdh` JE Dračí Hlídka. Před rozjezdem 16.2 sjednotit na jedno id napříč vrstvami (nabídka · FE registry/types/preset · BE system-presets). Provázat s 15B.4a (CZ landing pages).
 
-#### Prioritně — české systémy (příkop)
-- [ ] **16.2a Matrix / Ikaros pravidla** (`matrix`) — vlastní systém platformy. ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2b Dračí Doupě 1.6** (`drd16`) — k6/k%, postih/bonus, pasti. ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2c Dračí Doupě Plus** (`drd-plus`) — ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2d Dračí Doupě II** (`drd2`) — ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2e Jeskyně a Draci** (`jad`) — ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2f Příběhy Impéria** (`pi`) — ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2g Dračí Hlídka** (`draci-hlidka` / deník pod `drdh`) — ⚠️ **id drift** (D-NEW-SYS-DIARY-DRIFT): sjednotit id, pak dotáhnout tři pilíře. Deník (DrdhSheet, 6 povolání) už existuje. ☐ Deník ☐ Bestiář ☐ Dodatky
+#### - [ ] 16.2a Pilíř DENÍK — všechny systémy
+Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s deníkem (prioritně CZ). Po dokončení má každý systém plnohodnotný list — zároveň základ pro 15B.4a landing. Vizuál listu se může lišit per systém. Progress = sloupec **Deník** v matici.
 
-#### Parita — zahraniční systémy s deníkem
-- [ ] **16.2h Dungeons & Dragons 5e** (`dnd5e`) — d20 + modifikátory. ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2i Shadowrun** (`shadowrun`) — d6 pool. ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2j GURPS** (`gurps`) — 3d6 roll-under. ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2k Fate Core / Accelerated** (`fate`) — 4dF (fudge). ☐ Deník ☐ Bestiář ☐ Dodatky
-- [ ] **16.2l Call of Cthulhu** (`call-of-cthulhu`) — k% + sanity. ☐ Deník ☐ Bestiář ☐ Dodatky
+#### - [ ] 16.2b Pilíř BESTIÁŘ — scope model + obsah
+Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna bestie = lore/text + mapa `systém → statblok`** — přidání systému znamená jen přidat sadu statů, ne novou bestii.
 
-#### Engine pro vlastní systém
-- [ ] **16.2m Vlastní systém** (`vlastni` / `generic`) — ne dotahovat obsah, ale dát PJ **nástroje**, aby si deník, bestiář i dodatky pravidel vytvořil sám (editor schématu listu + custom bestie + custom dodatky). Tohle je most k Fázi 21 (komunitní tvorba).
+| scope | edituje | viditelnost | vznik |
+|---|---|---|---|
+| **Systémové** | Admin/Superadmin + „povýšení" z komunity | **všechny světy** (platformový základ) | předpřipravený fantasy bestiář; staty per systém |
+| **Komunitní** | **autor** (globálně) + admin (kurátor) | veřejný katalog | hráč vytvoří a sdílí |
+| **Můj** (osobní) | vlastník, **jen pro sebe** | jen moje, napříč mými světy | fork z komunity/systému |
+| **Per svět** | PJ světa | jen v tom světě | PJ vytvoří, nebo klon do světa |
 
-**Otevřené otázky:** Kolik automatizace je „akorát" per systém (jen hody, nebo i základní výpočty jako únava/zranění)? Sdílet kompendium/dodatky napříč světy (system scope) i mezi uživateli (→ 21.1)? Pořadí dotahování v rámci priority (DrD 1.6 → JaD → DrD II → …)?
+**Klonovací toky** (po úpravě odpojeno od zdroje): systém→svět/můj · komunita→můj/svět · svět→svět · **povýšení** komunita→systém (admin „uzná").
+**Defaulty (rozhodnuto 2026-06-22):** (1) klon = **vždy fork/snapshot** — pozdější změny autora se do klonů nepropíšou (cena za „uprav si pro sebe"); (2) chybějící staty pro systém → **soft-mode** (vloží se prázdné, PJ doplní; reuse schema soft-mode).
+**Podkroky (fázovat — model jednou, aktivace postupně):**
+- **16.2b-1 Jádro:** naplnit dnešní 3 scope; systémový bestiář (tvůj fantasy základ) + per-systém staty; klony systém→svět/můj a svět→svět.
+- **16.2b-2 Komunitní vrstva:** 4. `community` scope (autor edituje) + katalog + „pošli si k sobě" klon + povýšení do systémových. Sdílí grant/moderaci s **21.1/21.4**.
+- **16.2b-3 Reveal (volitelně, později):** PJ zpřístupní bestii/lore vybraným hráčům přes mapu nebo odkaz v chatu. ⚠️ Info-reveal, ne bestiář-data — blíž AKJ clearance; vyčlenit, ať nezatíží jádro.
+
+#### Matice systémů (progress; pilíře Deník · Bestiář — Dodatky vyřazeny)
+##### Prioritně — české (příkop)
+- [ ] **Matrix / Ikaros pravidla** (`matrix`) — vlastní systém platformy. ☐ Deník ☐ Bestiář
+- [ ] **Dračí Doupě 1.6** (`drd16`) — k6/k%, postih/bonus, pasti. ☐ Deník ☐ Bestiář
+- [ ] **Dračí Doupě Plus** (`drd-plus`) — ☐ Deník ☐ Bestiář
+- [ ] **Dračí Doupě II** (`drd2`) — ☐ Deník ☐ Bestiář
+- [ ] **Jeskyně a Draci** (`jad`) — ☐ Deník ☐ Bestiář
+- [ ] **Příběhy Impéria** (`pi`) — ☐ Deník ☐ Bestiář
+- [ ] **Dračí Hlídka** (`draci-hlidka` / deník pod `drdh`) — ⚠️ **id drift** (D-NEW-SYS-DIARY-DRIFT): sjednotit id, pak dotáhnout. Deník (DrdhSheet, 6 povolání) už existuje. ☐ Deník ☐ Bestiář
+##### Parita — zahraniční
+- [ ] **Dungeons & Dragons 5e** (`dnd5e`) — d20 + modifikátory. ☐ Deník ☐ Bestiář
+- [ ] **Shadowrun** (`shadowrun`) — d6 pool. ☐ Deník ☐ Bestiář
+- [ ] **GURPS** (`gurps`) — 3d6 roll-under. ☐ Deník ☐ Bestiář
+- [ ] **Fate Core / Accelerated** (`fate`) — 4dF (fudge). ☐ Deník ☐ Bestiář
+- [ ] **Call of Cthulhu** (`call-of-cthulhu`) — k% + sanity. ☐ Deník ☐ Bestiář
+##### Engine pro vlastní systém
+- [ ] **Vlastní systém** (`vlastni` / `generic`) — nedotahovat obsah, dát PJ **nástroje** (editor schématu listu + custom bestie). Most k Fázi 21 (komunitní tvorba).
+
+**Otevřené otázky:** Pořadí dotahování deníků (DrD 1.6 → JaD → DrD II → …)? Kdy/jak vrátit „dodatky k pravidlům" (vyřazeny z 16.2)? Pre/post moderace komunitního bestiáře (→ 21.4)?
 
 ### - [ ] 16.3 Migrace obsahu ze starých fórovek / Matrixu — [E3 · dopad vysoký · náklad střední] 🔁
 **Cíl:** Import postav, stránek a vláken ze staré DB; ideálně generický import z phpBB/Webnode exportů.
@@ -592,6 +610,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 ### - [ ] 21.1 Globální/komunitní knihovny obsahu (items, bestie, kouzla, šablony) — [dopad vysoký · náklad střední] 🔁
 **Cíl:** Sdílené knihovny, do kterých komunita přidává: **vlastní předměty (items)**, bestie, kouzla, šablony stránek/postav — klonovatelné do libovolného světa.
 **Proč:** Obsah přitahuje obsah; jeden přidaný statblok/item poslouží stovkám PJ. Rozšiřuje bestiář (dnes 3 scope) o **komunitní/globální scope** a navazuje na sdílení (17.5). Pokrývá tvoje „custom itemy, globální itemy, globální bestie".
+> 💡 **Nápad 2026-06-22 — předpřipravené obchody (shop templates):** systémový/komunitní katalog hotových obchodů; PJ si obchod vloží do světa a jen **přidá jednotky** (zboží). **Stejný scope+klon model jako bestiář (16.2b)**, jen entita = obchod + položky. Váže na item knihovnu zde. (Modul obchodů už existuje — `ShopPage` / `/obchod` — tohle přidává sdílené šablony nad něj.)
 **Návrh přípravy:** rozhodnout 4. „globální/komunitní" scope vedle system/user/world; atribuce autora; verzování; snapshot při klonu (🔁 bestiář spawn semantics).
 **BE/FE:** rozšíření bestiáře + nové typy „global item/spell"; katalog + klonování; 🔁 upload pro obrázky.
 **✅ Rozhodnuto (2026-06-15) — kdo smí přidávat do globálu:** defaultně **Admin, Superadmin, vedoucí diskusí (SpravceDiskuzi)**. Navíc **grantovatelná pravomoc běžnému hráči**, který má nápady (per-user flag „smí přispívat do globální knihovny", uděluje admin/správce). 🔁 vzor granular permissions (D-031) + grant model jako AKJ clearance.
@@ -617,6 +636,24 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Cíl:** Schvalování, hodnocení a atribuce sdíleného obsahu (items/bestie/mapy/generátorové tabulky).
 **Proč:** Komunitní obsah potřebuje kvalitu a moderaci; 🔁 schvalovací toky, co už máme (články/galerie), + role správců.
 **Otevřené otázky:** Pre-moderace (schválit před zveřejněním) vs. post (nahlásit)? Kdo kurátoruje (noví správci)?
+
+---
+
+## Fáze 22 — Finální SEO dotažení (konec Etapy II)
+**Vlna závěr.** Body odložené z Fáze 15B (SEO), které musí počkat na dokončení produktu: bohatý per-systém obsah landing (po 16.2 + finální grafika deníků) a Core Web Vitals (laditelné až na hotové appce). Smysl odložení: URL z 15B.4a se indexují už od Fáze 15B, takže se sem jen **doplní obsah na zaběhlé URL** — nestartuje se od nuly. Cíl: dodělat vše a mít klid ve tvorbě.
+
+### - [ ] 22.1 Landing systémů — obohacení po 16.2 (bývalý 15B.4b) — [dopad vysoký · náklad střední] 🔁
+> Přesunuto z 15B.4b (2026-06-22). Kostra + registr = **15B.4a** (Fáze 15B); tohle je dotažení obsahu, závislé na hotovém 16.2 a finální grafice.
+**Co:** doplnit do registru `systemLandings.ts` bestiář + (pokud vznikne) pravidlové dodatky z 16.2, vyměnit za **finální screenshoty hotové grafiky** deníků, dopsat zbylé 4 CZ systémy, vyčistit `completeness` markery. Bohatý obsah už na zaběhlých, indexovaných URL.
+**Závislost:** 16.2 (deníky + bestiář per systém) + finální grafika deníků; navazuje na 15B.4a (kostra + registr).
+**Otevřené otázky:** Provázat 1:1 s maticí systémů v 16.2? „textové hry"/„worldbuilding" = use-case landing (jiná šablona, blíž personám 15.7) — vlastní podbod, nebo do 15.7?
+
+### - [ ] 22.2 Academy / evergreen obsah + Core Web Vitals (bývalý 15B.5) — [dopad střední · náklad střední]
+> Přesunuto z 15B.5 (2026-06-22). CWV se ladí až je appka feature-complete (jinak pohyblivý cíl); evergreen články nejsou blokující a na grafice systémů nezávisí.
+**Cíl:** Redakční seriály („jak založit svět", „jak řídit intriky", „jak hrát textové RPG", „ukázkové světy") + provozní standard rychlosti: LCP ≤ 2,5 s, INP ≤ 200 ms, CLS ≤ 0,1.
+**Proč:** Education je akviziční i retenční vrstva (World Anvil Academy, Kanka learning hub); obsahový flywheel — produkt generuje obsah, obsah přivádí uživatele. CWV zlepší UX i ranking.
+**Obsah/FE:** redakční obsah (🔁 článkový modul) + perf optimalizace (lazy loading, image pipeline, code splitting).
+**Otevřené otázky:** Kdo píše obsah? Dávkovat udržitelně (vyžaduje průběžnou údržbu).
 
 ---
 

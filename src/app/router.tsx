@@ -42,6 +42,9 @@ const DiscussionsPage  = lazy(() => import('@/features/ikaros/pages/DiscussionsP
 const DiscussionDetailPage = lazy(() => import('@/features/ikaros/pages/DiscussionDetailPage'));
 const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage'));
 const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
+// 15B.4a — veřejné landing stránky RPG systémů (hub + detail)
+const SystemsHubPage       = lazy(() => import('@/features/ikaros/pages/SystemLanding/SystemsHubPage'));
+const SystemLandingPage    = lazy(() => import('@/features/ikaros/pages/SystemLanding/SystemLandingPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
 // 3.7 — `/ikaros/oblibene` stránka oblíbeného obsahu (záložky napříč moduly).
@@ -157,6 +160,9 @@ export const router = createBrowserRouter([
       { path: 'ikaros/galerie/:id/upravit',   element: p(GalleryUploadPage), loader: requireAuth },
       { path: 'ikaros/galerie/:id',           element: p(GalleryDetailPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
+      // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug
+      { path: 'ikaros/systemy',         element: p(SystemsHubPage) },
+      { path: 'ikaros/systemy/:slug',   element: p(SystemLandingPage) },
       { path: 'podminky',               element: p(TermsPage) },
       // 1.7 — anonymní routes pro mailové linky (reset / verify / email change)
       { path: 'reset-password',         element: p(ResetPasswordPage) },
