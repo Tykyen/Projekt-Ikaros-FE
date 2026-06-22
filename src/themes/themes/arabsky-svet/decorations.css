@@ -566,6 +566,13 @@
   forced-color-adjust: none;
 }
 
+/* Spec 15.7 — anon má nahoře showcase banner; lampa génia + glow by ho v horní
+   zóně main překryly. Pro anonima je skryjeme (přihlášený je má dál). */
+[data-theme="arabsky-svet"][data-shell="ikaros"][data-anon] main::before,
+[data-theme="arabsky-svet"][data-shell="ikaros"][data-anon] main::after {
+  display: none;
+}
+
 @keyframes arabsky-caustic-breathe {
   0%, 100% { opacity: 0.22; }
   50%      { opacity: 0.35; }

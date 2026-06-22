@@ -812,6 +812,10 @@ export function IkarosLayout() {
       className={clsx(s.shell, !isAuthenticated && s.shellAnon)}
       data-theme={themeId}
       data-shell="ikaros"
+      // Spec 15.7 — anon má nahoře showcase banner; skiny, které kreslí
+      // dekorace do horní zóny main (arabsky-svet lampa), je přes tento
+      // atribut pro anonima skryjí, ať nekolidují s bannerem.
+      data-anon={!isAuthenticated ? '' : undefined}
       style={bgStyle}
     >
       <header className={s.header}>

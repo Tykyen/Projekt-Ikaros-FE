@@ -50,7 +50,6 @@ export function ShowcaseSection() {
   return (
     <section
       className={s.showcase}
-      data-frame-panel="card"
       aria-roledescription="carousel"
       aria-label="Ukázky z aplikace"
       onMouseEnter={() => setPaused(true)}

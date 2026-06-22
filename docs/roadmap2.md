@@ -277,6 +277,14 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Obsah/FE:** redakční obsah (🔁 článkový modul) + perf optimalizace (lazy loading, image pipeline, code splitting).
 **Otevřené otázky:** Kdo píše obsah? Dávkovat udržitelně (vyžaduje průběžnou údržbu).
 
+### - [ ] 15B.6 Sociální sdílení & pozvánkové odkazy — [H2-06 · dopad střední · náklad malý]
+**Cíl:** „Pozvi přátele" / „Sdílej tenhle svět" — tlačítko **Web Share API** (`navigator.share()`, nativní sdílení na mobilu/PWA → uživatel sám vybere FB/IG/WhatsApp/…), **Kopírovat odkaz** (univerzál) a případně přímé sharer‑URL (`facebook.com/sharer`, X intent). Primárně u **detailu světa** (pozvánka → pre‑join) a **vitríny** (17.3); odkaz vede host na `/svet/:slug` (veřejný rovnou vidí, privátní požádá o přístup).
+**Proč:** Pozvánkový odkaz = nejlevnější virální akvizice (sdílení samotné URL nepotřebuje žádné API klíče ani OAuth). Navazuje na krok „Pozvi přátele" z anon homepage (15.7).
+**Závislosti:** **15B.2 (OG meta tagy + prerender)** — bez nich FB/sociální síť stáhne SPA bez náhledu → nasdílí se holý ošklivý odkaz bez obrázku/titulku. 17.3 (vitrína = co sdílet).
+**FE:** sdílecí tlačítka (Web Share + copy + sharer) u detailu světa a vitríny; fallback copy‑to‑clipboard tam, kde Web Share API není.
+**❌ Mimo záběr (rozhodnuto 2026‑06‑22):** **sdílení herních úspěchů/achievementů** na sociální sítě se NESTAVÍ — (a) systém úspěchů neexistuje a musel by vzniknout, (b) auto‑post na FB zeď přes API není možný (FB zrušil ~2018, jen uživatelem iniciované sdílení), (c) herní příběhy jsou záměrně privátní (rozhodnutí 2026‑06‑15c) → sdílet by šla jen meta, ne obsah. Marketingově lákavé, ale samostatný velký projekt závislý na achievementech + veřejných profilech + OG infře — případně až pozdější etapa.
+**Otevřené otázky:** Které entity dovolit sdílet (jen veřejné světy + vitrína, nebo i veřejné články/galerie)? Generovat per‑svět OG image (náhledová karta)?
+
 ---
 
 ## Fáze 16 — Český příkop
