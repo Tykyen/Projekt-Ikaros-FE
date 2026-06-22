@@ -1,26 +1,24 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import clsx from 'clsx';
 import {
   Archive,
   ArchiveRestore,
-  Bell,
-  AlertTriangle,
-  Settings,
   ExternalLink,
   FileText,
   MoreVertical,
   Pencil,
   Trash2,
 } from 'lucide-react';
-import type { WorldNewsItem } from '@/shared/types';
-import { KebabMenu } from '@/shared/ui';
-import type { KebabMenuItem } from '@/shared/ui';
+import type { WorldNewsItem, WorldNewsType } from '@/shared/types';
+import {
+  KebabMenu,
+  NewsPreviewCard,
+  NewsDetailModal,
+} from '@/shared/ui';
+import type { KebabMenuItem, NewsCardVM, NewsTone } from '@/shared/ui';
 import { relativeEventDate } from '@/features/world/utils/relativeEventDate';
 import { usePagesDirectory } from '@/features/world/pages/api/usePagesDirectory';
 import { useCalendarConfigs } from '@/features/world/api/useCalendarConfigs';
-import { TypeChip } from '@/features/world/components/TypeChip/TypeChip';
-import { getImageStyle } from '@/shared/lib/imageStyle';
 import { formatFantasyDate } from '@/shared/lib/calendarEngine';
 import s from './WorldNewsCard.module.css';
 
@@ -38,28 +36,23 @@ interface Props {
   onArchive?: () => void;
 }
 
-/** HTML obsah → plain text excerpt (3 řádky truncate v CSS). */
-function plainText(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+const TYPE_LABEL: Record<WorldNewsType, string> = {
+  info: 'Informace',
+  alert: 'Důležité',
+  system: 'Systém',
+};
 
-const FALLBACK_ICON = {
-  info: Bell,
-  alert: AlertTriangle,
-  system: Settings,
-} as const;
+const TYPE_TONE: Record<WorldNewsType, NewsTone> = {
+  info: 'info',
+  alert: 'warning',
+  system: 'system',
+};
 
 /**
- * 5.2 / 9.5 — karta oznámení světa.
- *
- * 9.5 refactor (2026-05-25): plnohodnotná karta (parita s GameEventCard).
- * 16:9 hero obrázek s focal point + TypeChip + interní link na stránku
- * (přes `linkPageSlug` resolved přes `usePagesDirectory`) nebo externí URL
- * (legacy `link`).
+ * 5.2 / 9.5 → sjednocení (2026-06-22): adaptér oznámení světa na sdílenou
+ * preview-kartu + detail-modal. Drží doménové hooky (resolve interního odkazu
+ * a fantasy data), složí `NewsCardVM` a předá ho prezentační vrstvě. Klik na
+ * kartu otevře okno s plným obsahem; kebab akce sedí nad médiem.
  */
 export function WorldNewsCard({
   news,
@@ -70,7 +63,7 @@ export function WorldNewsCard({
   onDelete,
   onArchive,
 }: Props) {
-  const [imageError, setImageError] = useState(false);
+  const [open, setOpen] = useState(false);
   const [kebabAnchor, setKebabAnchor] = useState<HTMLButtonElement | null>(
     null,
   );
@@ -78,8 +71,6 @@ export function WorldNewsCard({
 
   const validDate = !Number.isNaN(new Date(news.date).getTime());
   const isArchived = !!news.archived;
-  const showImage = news.imageUrl && !imageError;
-  const FallbackIcon = FALLBACK_ICON[news.type];
 
   // Resolution page-link slug → title (cache sdílená napříč kartami)
   const pagesQ = usePagesDirectory(worldId);
@@ -98,6 +89,52 @@ export function WorldNewsCard({
     news.calendarDate && fantasyConfig
       ? formatFantasyDate(news.calendarDate, fantasyConfig)
       : null;
+
+  const realDateLabel = validDate
+    ? new Date(news.date).toLocaleString('cs-CZ')
+    : '';
+
+  const footer = linkedPage ? (
+    <Link to={`/svet/${worldSlug}/${linkedPage.slug}`} className={s.linkRow}>
+      <FileText size={14} aria-hidden="true" />
+      <span>{linkedPage.title} →</span>
+    </Link>
+  ) : news.link ? (
+    <a
+      href={news.link}
+      className={s.linkRow}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <ExternalLink size={14} aria-hidden="true" />
+      <span>Externí odkaz →</span>
+    </a>
+  ) : undefined;
+
+  const vm: NewsCardVM = {
+    id: news.id,
+    title: news.title,
+    contentHtml: news.content,
+    tone: TYPE_TONE[news.type],
+    typeLabel: TYPE_LABEL[news.type],
+    image: news.imageUrl
+      ? {
+          url: news.imageUrl,
+          focalX: news.imageFocalX,
+          focalY: news.imageFocalY,
+          zoom: news.imageZoom,
+          fit: news.imageFit,
+        }
+      : null,
+    dateChipLabel: fantasyLabel ?? (validDate ? relativeEventDate(news.date) : ''),
+    dateChipTitle:
+      fantasyLabel && validDate ? `Reálné: ${realDateLabel}` : undefined,
+    fullDateLabel: fantasyLabel
+      ? `${fantasyLabel}${realDateLabel ? ` · ${realDateLabel}` : ''}`
+      : realDateLabel,
+    footer,
+    archived: isArchived,
+  };
 
   const kebabItems: KebabMenuItem[] = [
     {
@@ -138,100 +175,28 @@ export function WorldNewsCard({
     },
   ];
 
-  return (
-    <article
-      className={clsx(s.card, isArchived && s.cardArchived)}
-      data-elev="card"
-      data-archived={isArchived ? 'true' : 'false'}
+  const adminSlot = canManage ? (
+    <button
+      ref={setKebabAnchor}
+      type="button"
+      className={s.kebabBtn}
+      aria-label="Akce"
+      aria-haspopup="menu"
+      aria-expanded={kebabOpen}
+      onClick={() => setKebabOpen((v) => !v)}
     >
-      <div className={s.media}>
-        {showImage ? (
-          <img
-            src={news.imageUrl!}
-            alt=""
-            className={s.image}
-            style={getImageStyle(
-              news.imageFocalX,
-              news.imageFocalY,
-              news.imageZoom,
-              news.imageFit,
-            )}
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className={s.imageFallback} aria-hidden="true">
-            <FallbackIcon size={36} />
-          </div>
-        )}
+      <MoreVertical size={18} aria-hidden="true" />
+    </button>
+  ) : undefined;
 
-        {canManage && (
-          <button
-            ref={setKebabAnchor}
-            type="button"
-            className={s.kebabBtn}
-            aria-label="Akce"
-            aria-haspopup="menu"
-            aria-expanded={kebabOpen}
-            onClick={() => setKebabOpen((v) => !v)}
-          >
-            <MoreVertical size={18} aria-hidden="true" />
-          </button>
-        )}
-      </div>
-
-      <div className={s.body}>
-        <div className={s.meta}>
-          <TypeChip type={news.type} size="sm" />
-          {fantasyLabel ? (
-            <span
-              className={s.dateChip}
-              title={
-                validDate
-                  ? `Reálné: ${new Date(news.date).toLocaleString('cs-CZ')}`
-                  : undefined
-              }
-            >
-              {fantasyLabel}
-            </span>
-          ) : (
-            validDate && (
-              <span className={s.dateChip}>
-                {relativeEventDate(news.date)}
-              </span>
-            )
-          )}
-          {isArchived && (
-            <span className={s.archivedChip} aria-label="Archivováno">
-              archivováno
-            </span>
-          )}
-        </div>
-
-        <h3 className={s.title}>{news.title}</h3>
-
-        <p className={s.excerpt}>{plainText(news.content)}</p>
-
-        {linkedPage && (
-          <Link
-            to={`/svet/${worldSlug}/${linkedPage.slug}`}
-            className={s.linkRow}
-          >
-            <FileText size={14} aria-hidden="true" />
-            <span>{linkedPage.title} →</span>
-          </Link>
-        )}
-        {!linkedPage && news.link && (
-          <a
-            href={news.link}
-            className={s.linkRow}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ExternalLink size={14} aria-hidden="true" />
-            <span>Externí odkaz →</span>
-          </a>
-        )}
-      </div>
+  return (
+    <>
+      <NewsPreviewCard
+        vm={vm}
+        onOpen={() => setOpen(true)}
+        adminSlot={adminSlot}
+      />
+      <NewsDetailModal vm={vm} open={open} onClose={() => setOpen(false)} />
 
       {canManage && (
         <KebabMenu
@@ -242,6 +207,6 @@ export function WorldNewsCard({
           ariaLabel="Akce s touto novinkou"
         />
       )}
-    </article>
+    </>
   );
 }

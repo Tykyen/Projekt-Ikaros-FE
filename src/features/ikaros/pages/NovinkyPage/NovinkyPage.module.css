@@ -76,6 +76,20 @@
   font-family: var(--font-body);
 }
 
+/* Admin akce nad hero obrázkem novinky — translucentní pilulka kvůli
+   čitelnosti ikon přes libovolný obrázek. */
+.adminActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-md);
+  background: var(--img-ctrl-bg);
+}
+.adminActions .iconBtn {
+  color: var(--img-ctrl-fg);
+}
+
 .iconBtn {
   display: inline-flex;
   align-items: center;

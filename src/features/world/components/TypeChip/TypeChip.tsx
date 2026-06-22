@@ -1,43 +1,27 @@
-import { Info, AlertTriangle, Settings } from 'lucide-react';
-import clsx from 'clsx';
 import type { WorldNewsType } from '@/shared/types';
-import s from './TypeChip.module.css';
+import { NewsTypeChip, type NewsTone } from '@/shared/ui';
 
 interface Props {
   type: WorldNewsType;
   size?: 'sm' | 'md';
 }
 
-const TYPE_META: Record<
-  WorldNewsType,
-  { label: string; cssVar: string; Icon: typeof Info }
-> = {
-  info: { label: 'Informace', cssVar: 'var(--accent)', Icon: Info },
-  alert: { label: 'Důležité', cssVar: 'var(--danger)', Icon: AlertTriangle },
-  system: {
-    label: 'Systém',
-    cssVar: 'var(--warning, #f59e0b)',
-    Icon: Settings,
-  },
+const TYPE_LABEL: Record<WorldNewsType, string> = {
+  info: 'Informace',
+  alert: 'Důležité',
+  system: 'Systém',
+};
+
+const TYPE_TONE: Record<WorldNewsType, NewsTone> = {
+  info: 'info',
+  alert: 'warning',
+  system: 'system',
 };
 
 /**
- * 9.5 — barevný štítek typu novinky (info / alert / system). Vizuální
- * paralela `GroupChip` u game events — bílý text + ikonka.
+ * 9.5 — barevný štítek typu novinky světa. Po sjednocení (2026-06-22) tenký
+ * adaptér nad sdíleným `NewsTypeChip` (mapuje `WorldNewsType` → tón + popisek).
  */
 export function TypeChip({ type, size = 'md' }: Props) {
-  const meta = TYPE_META[type];
-  return (
-    <span
-      className={clsx(s.chip, size === 'sm' && s.sm)}
-      style={{ background: meta.cssVar }}
-      title={meta.label}
-    >
-      <meta.Icon
-        size={size === 'sm' ? 11 : 13}
-        aria-hidden="true"
-      />
-      <span className={s.label}>{meta.label}</span>
-    </span>
-  );
+  return <NewsTypeChip tone={TYPE_TONE[type]} label={TYPE_LABEL[type]} size={size} />;
 }

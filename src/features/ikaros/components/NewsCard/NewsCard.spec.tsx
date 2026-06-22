@@ -18,49 +18,40 @@ function makeNews(overrides: Partial<IkarosNews> = {}): IkarosNews {
 }
 
 describe('NewsCard', () => {
-  it('sbaleno — nadpis, štítek typu, datum; bez obsahu a autora', () => {
+  it('karta — titulek, štítek typu, datum a úryvek; autor až v detailu', () => {
     render(<NewsCard news={makeNews()} />);
     expect(screen.getByText('Spuštěna fáze 2')).toBeInTheDocument();
     expect(screen.getByText('Informace')).toBeInTheDocument();
     expect(screen.getByText(/před 2 h/)).toBeInTheDocument();
-    expect(screen.queryByText(/Detailní obsah/)).not.toBeInTheDocument();
+    // úryvek (plain text z HTML obsahu) je na kartě vidět
+    expect(screen.getByText('Detailní obsah novinky.')).toBeInTheDocument();
+    // autor je jen v detail-okně, ne na kartě
     expect(screen.queryByText(/— Admin/)).not.toBeInTheDocument();
   });
 
-  it('po kliknutí rozbalí obsah a autora za datem', async () => {
+  it('klik na kartu otevře detail-okno (autor je proof otevření)', async () => {
     render(<NewsCard news={makeNews()} />);
-    fireEvent.click(screen.getByRole('button'));
-    expect(await screen.findByText(/Detailní obsah/)).toBeInTheDocument();
-    expect(screen.getByText(/— Admin/)).toBeInTheDocument();
+    expect(screen.queryByText(/— Admin/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Otevřít novinku/ }));
+    expect(await screen.findByText(/— Admin/)).toBeInTheDocument();
   });
 
-  it('aria-expanded reflektuje stav', () => {
-    render(<NewsCard news={makeNews()} />);
-    const btn = screen.getByRole('button');
-    expect(btn).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(btn);
-    expect(btn).toHaveAttribute('aria-expanded', 'true');
-  });
-
-  it('štítek typu + data-type dle typu novinky', () => {
-    const { container } = render(
-      <NewsCard news={makeNews({ type: 'warning' })} />,
-    );
+  it('štítek typu dle typu novinky', () => {
+    render(<NewsCard news={makeNews({ type: 'warning' })} />);
     expect(screen.getByText('Upozornění')).toBeInTheDocument();
-    expect(container.querySelector('[data-type="warning"]')).toBeTruthy();
   });
 
-  it('defaultExpanded zobrazí obsah rovnou', async () => {
-    render(<NewsCard news={makeNews()} defaultExpanded />);
-    expect(await screen.findByText(/Detailní obsah/)).toBeInTheDocument();
-  });
-
-  it('obrázek se vykreslí jen pokud novinka má imageUrl', () => {
+  it('obrázek se vykreslí v médiu karty když má imageUrl', () => {
     const { container } = render(
-      <NewsCard news={makeNews({ imageUrl: 'https://cdn/x.png' })} defaultExpanded />,
+      <NewsCard news={makeNews({ imageUrl: 'https://cdn/x.png' })} />,
     );
     expect(container.querySelector('img')?.getAttribute('src')).toBe(
       'https://cdn/x.png',
     );
+  });
+
+  it('bez imageUrl ukáže fallback místo obrázku', () => {
+    const { container } = render(<NewsCard news={makeNews()} />);
+    expect(container.querySelector('img')).toBeNull();
   });
 });

@@ -20,6 +20,8 @@ export type { TabItem } from './Tabs';
 export { ImageZoomSlider } from './ImageZoomSlider/ImageZoomSlider';
 export { ImageFitToggle } from './ImageFitToggle/ImageFitToggle';
 export { FantasyDatePicker } from './FantasyDatePicker';
+export { NewsPreviewCard, NewsDetailModal, NewsTypeChip, stripHtml } from './news';
+export type { NewsCardVM, NewsCardImage, NewsTone } from './news';
 export {
   StatePlaceholder,
   EmptyState,

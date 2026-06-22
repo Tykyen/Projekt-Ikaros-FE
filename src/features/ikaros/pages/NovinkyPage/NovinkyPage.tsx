@@ -109,7 +109,7 @@ export function NovinkyPage() {
 
   function adminActions(item: IkarosNews) {
     return (
-      <>
+      <div className={s.adminActions}>
         <button
           type="button"
           className={s.iconBtn}
@@ -151,7 +151,7 @@ export function NovinkyPage() {
         >
           <Trash2 size={16} aria-hidden="true" />
         </button>
-      </>
+      </div>
     );
   }
 

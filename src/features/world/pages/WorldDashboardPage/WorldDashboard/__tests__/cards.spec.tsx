@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createStore, Provider as JotaiProvider } from 'jotai';
@@ -136,7 +136,7 @@ describe('WorldNewsCard (9.5 refactor)', () => {
     ).toBeInTheDocument();
   });
 
-  it('externí link (legacy) vykreslí jako <a target=_blank>', () => {
+  it('externí link (legacy) se v detailu vykreslí jako <a target=_blank>', () => {
     wrapNewsCard(
       <WorldNewsCard
         news={makeNews({ link: 'https://example.com' })}
@@ -147,6 +147,8 @@ describe('WorldNewsCard (9.5 refactor)', () => {
         onDelete={() => {}}
       />,
     );
+    // Odkaz žije v detail-okně — nejdřív kartu rozkliknout.
+    fireEvent.click(screen.getByRole('button', { name: /Otevřít novinku/ }));
     const link = screen.getByText(/Externí odkaz/);
     expect(link.closest('a')?.getAttribute('href')).toBe(
       'https://example.com',
