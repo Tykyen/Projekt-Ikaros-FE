@@ -255,7 +255,8 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Závislosti:** potřebuje veřejnou vrstvu (17.3 vitrína) a veřejnou homepage (15.7).
 
-### - [ ] 15B.1 SSR / prerender veřejných stránek — [H2-01 · dopad vysoký · náklad velký]
+### - [x] 15B.1 SSR / prerender veřejných stránek — [H2-01 · dopad vysoký · náklad velký]
+> ✅ **Implementováno 2026-06-22** (viz [spec-15B.1](arch/phase-15B/spec-15B.1-prerender.md)) — runtime prerender: self-hosted headless Chromium sidecar za nginx UA-detekcí (bot+veřejná routa → hotové HTML; člověk → SPA). Leak-safe (render jako anonym → privátní svět = BE 404). Scope jen pipeline; per-page meta/OG → 15B.2. **Čeká deploy** + ops ověření RAM serveru (Chromium ~150–300 MB).
 **Cíl:** Veřejné stránky (vitrína, články, veřejné profily a světy) servírovat jako hotové HTML — prerender přes headless Chrome (Prerender.io / Rendertron / React Snap) pro crawlery, nebo cílené SSR. Přihlášená část zůstává SPA.
 **Proč:** U klientsky renderovaného webu vyhledávač nečeká na JS — bez prerenderu zůstává veřejný obsah neviditelný. Prerender dá Googlebotu plné HTML bez velké změny architektury.
 **Návrh přípravy:** rozhodnout prerender vs. SSR; začít prerenderem jen pro veřejné routy (SSR celé app = velký zásah).

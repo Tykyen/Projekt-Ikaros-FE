@@ -8,6 +8,7 @@ import { GlobalErrorBoundary } from "@/shared/ui/GlobalErrorBoundary";
 import { AuthBootstrap } from '@/features/auth/components';
 import { ThemeProvider } from "@/themes/ThemeProvider";
 import { InstallBanner } from "@/features/pwa";
+import { PrerenderReady } from "./PrerenderReady";
 import { bootstrapSchemas } from "@/features/world/tactical-map/schemas/bootstrap";
 import "./index.css";
 
@@ -34,6 +35,8 @@ createRoot(document.getElementById("root")!).render(
       <ThemeProvider>
         <GlobalErrorBoundary>
           <AuthBootstrap />
+          {/* 15B.1 — signál pro prerender (kdy je SPA domalovaná). No-op pro lidi. */}
+          <PrerenderReady />
           <RouterProvider router={router} />
           <Toaster position="bottom-right" theme="dark" richColors />
           {/* 15.1 — PWA install hint (sám se skryje ve standalone / po dismissu) */}
@@ -43,6 +46,12 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </StrictMode>
 );
+
+// 15B.1 — tvrdý strop pro prerender: kdyby se data nikdy neustálila
+// (poll / živé WS), nečeká věčně — po 10 s ho pustíme renderovat, co je.
+window.setTimeout(() => {
+  window.__PRERENDER_READY__ = true;
+}, 10000);
 
 // 13.2c — registrace service workeru pro push (PWA).
 // 15.1 — + offline shell cache. SW dostane `mode=prod` JEN v produkčním buildu;
