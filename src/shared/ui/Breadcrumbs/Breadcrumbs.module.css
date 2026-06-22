@@ -1,0 +1,55 @@
+.nav {
+  margin-bottom: var(--sp-4);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+.link:hover {
+  color: var(--accent-bright);
+  text-decoration: underline;
+}
+
+.current {
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+  /* Dlouhý název (svět/článek) na mobilu nesmí rozbít layout. */
+  max-width: 60vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sep {
+  color: var(--text-secondary);
+  opacity: 0.6;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .current {
+    max-width: 50vw;
+  }
+}

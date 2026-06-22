@@ -5,6 +5,7 @@ import { Plus, Search, ArrowUpDown } from 'lucide-react';
 import { isAuthenticatedAtom, currentUserAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
 import { Spinner, EmptyState } from '@/shared/ui';
+import { Seo } from '@/shared/seo';
 import {
   useArticles,
   useMyArticles,
@@ -47,6 +48,10 @@ export default function ArticlesPage() {
 
   return (
     <div className={s.page}>
+      <Seo
+        title="Články"
+        description="Literární archiv komunity Ikaros — povídky, lore a worldbuilding od hráčů. Čti veřejné články nebo přidej vlastní."
+      />
       <header className={s.header}>
         <div className={s.headerLeft}>
           <h1 className={s.title}>Články</h1>

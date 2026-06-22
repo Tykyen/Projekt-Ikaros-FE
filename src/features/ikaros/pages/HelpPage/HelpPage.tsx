@@ -8,6 +8,7 @@ import { WorldSection } from "./sections/WorldSection";
 import { RolesSection } from "./sections/RolesSection";
 import { AccountSection } from "./sections/AccountSection";
 import { FaqSection } from "./sections/FaqSection";
+import { Seo } from "@/shared/seo";
 import s from "./HelpPage.module.css";
 
 const SECTIONS: Record<HelpTab, ComponentType> = {
@@ -38,6 +39,10 @@ export default function HelpPage() {
 
   return (
     <article className={s.page}>
+      <Seo
+        title="Nápověda"
+        description="Jak používat platformu Ikaros — co která stránka umí, kdo má jaká práva, jak na účet, postavy a hraní."
+      />
       <header className={s.header}>
         <h1>Nápověda</h1>
         <p className={s.lead}>

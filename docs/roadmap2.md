@@ -297,6 +297,15 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **❌ Mimo záběr (rozhodnuto 2026‑06‑22):** **sdílení herních úspěchů/achievementů** na sociální sítě se NESTAVÍ — (a) systém úspěchů neexistuje a musel by vzniknout, (b) auto‑post na FB zeď přes API není možný (FB zrušil ~2018, jen uživatelem iniciované sdílení), (c) herní příběhy jsou záměrně privátní (rozhodnutí 2026‑06‑15c) → sdílet by šla jen meta, ne obsah. Marketingově lákavé, ale samostatný velký projekt závislý na achievementech + veřejných profilech + OG infře — případně až pozdější etapa.
 **Otevřené otázky:** Které entity dovolit sdílet (jen veřejné světy + vitrína, nebo i veřejné články/galerie)? Generovat per‑svět OG image (náhledová karta)?
 
+### - [ ] 15B.7 Analytics — měření návštěvnosti (admin/superadmin) — [H2-07 · dopad střední · náklad střední]
+**Cíl:** Admin/Superadmin vidí **celkovou návštěvnost platformy** — kolik lidí chodí, na které stránky, odkud (vyhledávač / přímo / sdílený odkaz), trend v čase. Dashboard v administraci.
+**Proč:** SEO vlna (15B) zvyšuje viditelnost — bez měření nevíš, jestli funguje. I „jen ze zvědavosti" je přehled návštěvnosti přirozený admin nástroj a zpětná vazba na celou Fázi 15B (objevitelnost). Nepoměřuje uživatele mezi sebou — agregát pro provozovatele.
+**Návrh přípravy:** rozhodnout **self-hosted** (vlastní lehký counter v BE — žádná 3rd-party, GDPR-čisté, sedí na anonymní render z 15B.1) **vs.** napojení na externí (Plausible/Umami self-host, GA4). Vyřešit, jak nepočítat boty/prerender sidecar (15B.1) jako návštěvy.
+**BE:** sběr eventů (page view: path, referrer kategorie, čas) + agregační endpoint pro dashboard; respektovat soukromí (žádná osobní data, anon agregát).
+**FE:** admin dashboard (grafy návštěvnosti, top stránky, zdroje); lehký page-view ping z SPA na BE.
+**Závislosti:** těží z 15B.1 (rozlišit boty od lidí) a 15B.2 (které routy jsou veřejné). Samostatné od SEO — měří jeho efekt.
+**Otevřené otázky:** Self-hosted counter vs. externí nástroj? Granularita (per-stránka vs. jen souhrn)? Jak dlouho držet historii? Počítat i přihlášenou část, nebo jen veřejnou?
+
 ---
 
 ## Fáze 16 — Český příkop

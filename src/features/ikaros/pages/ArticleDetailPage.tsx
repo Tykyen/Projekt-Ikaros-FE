@@ -4,7 +4,8 @@ import { useAtomValue } from 'jotai';
 import { ArrowLeft, Edit3, Send, Trash2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { Spinner, ConfirmDialog } from '@/shared/ui';
+import { Spinner, ConfirmDialog, Breadcrumbs } from '@/shared/ui';
+import { Seo, metaDescription } from '@/shared/seo';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { UserRole } from '@/shared/types';
 import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles, useToggleFavoriteArticle } from '../api/useArticles';
@@ -69,8 +70,21 @@ export default function ArticleDetailPage() {
       }}
     >
       <ReadingProgressBar />
+      <Seo
+        title={article.title}
+        description={metaDescription(article.content)}
+        type="article"
+        noindex={article.status !== 'Published'}
+      />
 
       <div className={s.headerWrap}>
+        <Breadcrumbs
+          items={[
+            { label: 'Domů', href: '/' },
+            { label: 'Články', href: '/ikaros/clanky' },
+            { label: article.title },
+          ]}
+        />
         <Link to="/ikaros/clanky" className={s.back}>
           <ArrowLeft size={14} /> Zpět
         </Link>

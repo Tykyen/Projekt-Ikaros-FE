@@ -106,7 +106,7 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 ## Novinky světa (`WorldNewsPage`)
 
 ### Přehled
-- **Co to je:** stránka `/svet/:slug/novinky` — veřejná oznámení světa (aktivní) + archiv (pro správce). Karty `WorldNewsCard`, stránkování po 10.
+- **Co to je:** stránka `/svet/:slug/novinky` — veřejná oznámení světa (aktivní) + archiv (pro správce). Karty `WorldNewsCard` (obrázek 16:9 + štítek + datum + úryvek), stránkování po 10; klik na kartu otevře vystředěné **detail-okno** s plným obsahem a odkazem (× / Escape / klik do pozadí zavře).
 - **Kde:** FE `pages/WorldNewsPage/WorldNewsPage.tsx`, editor `WorldNewsEditorModal`. BE modul `modules/world-news` (controller `world-news`, service).
 - **Kdo (FE):** route `memberOnly(p(WorldNewsPage))` — Čtenář+. Správa (tvorba/edit/archiv/mazání + tab Archiv) jen `canManage` = global Admin+ **nebo** world role **PomocnyPJ+** (`WorldNewsPage.tsx:37-40`).
 - **Stav:** ✅
@@ -137,6 +137,11 @@ DTO `create-world-news.dto.ts`: `title` (≤200), `content` (≤10000), `date` (
 
 ### Kde se novinky ještě zobrazují
 - Úvodní dashboard světa — sloupec Novinky (`WorldDashboard/columns/NewsColumn.tsx`, `WorldNewsCard`), spec 5.2.
+
+### Karta + detail-okno (sjednoceno s globálními novinkami, 2026-06-22)
+- `WorldNewsCard` je teď adaptér nad sdílenou `NewsPreviewCard` + `NewsDetailModal` (`src/shared/ui/news/`) — stejná prezentační vrstva jako globální novinky (kap. 04), liší se jen view-model (svět navíc resolvuje interní odkaz `linkPageSlug` přes `usePagesDirectory` a fantasy datum přes `useCalendarConfigs`).
+- **Plný text oznámení se čte v detail-okně** — dřív nebyl viditelný nikde (karta ukazovala jen 3řádkový úryvek). Interní/externí odkaz se přesunul z karty do okna.
+- Štítek důležitosti = sdílený `NewsTypeChip` (tón `info`/`warning`/`system`, `alert`→`warning`); původní world `TypeChip` je tenká delegace.
 
 ---
 

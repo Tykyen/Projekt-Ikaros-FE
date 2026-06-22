@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
-import { Spinner } from '@/shared/ui';
+import { Spinner, Breadcrumbs } from '@/shared/ui';
+import { Seo, metaDescription } from '@/shared/seo';
 import { useWorld } from '@/features/world/api/useWorlds';
 import { useWorldStatus } from '@/features/world/api/useWorldStatus';
 import { WorldDetailHero } from '@/features/world/components/WorldDetailHero';
@@ -39,9 +40,24 @@ export default function WorldDashboardPage() {
     return <WorldNotFound />;
   }
 
+  // 15B.2 — indexovat jen veřejné světy; private/closed dostane noindex.
+  const indexable = world.accessMode === 'public' || world.accessMode === 'open';
+  const seo = (
+    <Seo
+      title={world.name}
+      description={
+        metaDescription(world.description) ??
+        `Svět ${world.name} na platformě Ikaros.`
+      }
+      image={world.imageUrl}
+      noindex={!indexable}
+    />
+  );
+
   if (status === 'member') {
     return (
       <article className={s.page}>
+        {seo}
         <WorldDetailHero world={world} />
         <WorldDashboard world={world} />
         <WorldToolboxPanel />
@@ -52,6 +68,14 @@ export default function WorldDashboardPage() {
 
   return (
     <article className={s.page}>
+      {seo}
+      <Breadcrumbs
+        items={[
+          { label: 'Domů', href: '/' },
+          { label: 'Světy', href: '/ikaros/vesmiry' },
+          { label: world.name },
+        ]}
+      />
       <WorldDetailHero world={world} />
       <div className={s.body}>
         <WorldDetailInfo world={world} />

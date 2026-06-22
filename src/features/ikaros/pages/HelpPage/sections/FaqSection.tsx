@@ -388,6 +388,28 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'obecne',
+    q: 'Když někomu pošlu odkaz na svět nebo článek, co uvidí?',
+    a: (
+      <>
+        <p>
+          Odkaz na <strong>veřejný</strong> svět, článek nebo galerii se při vložení
+          do <strong>Discordu, Messengeru, WhatsAppu</strong> a podobně rozbalí do{' '}
+          <strong>náhledové karty</strong> — s názvem, krátkým popisem a obrázkem
+          místo holé adresy. Odkaz na <strong>neveřejný</strong> svět kartu
+          nezobrazí (soukromý obsah se ven nedostane).
+        </p>
+        <p>
+          Veřejné světy a články jsou navíc <strong>dohledatelné ve vyhledávačích</strong>{' '}
+          (Google, Seznam). Přihlášená část a soukromé světy zůstávají skryté. Na
+          detailu světa/článku tě nahoře vede <strong>drobečková navigace</strong>{' '}
+          (např. „Domů › Světy › název").
+        </p>
+        <p>🚧 Tahle vrstva se právě nasazuje — naplno se projeví po spuštění.</p>
+      </>
+    ),
+  },
+  {
+    cat: 'obecne',
     q: 'Co znamená Motiv (theme)?',
     a: (
       <p>

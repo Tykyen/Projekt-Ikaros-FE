@@ -1,0 +1,19 @@
+# 15B.2 — vrátný pro crawlery. Veřejné routy povolené, auth/admin/citlivé zakázané.
+# Member podstránky světa (/svet/:slug/...) nejsou v sitemap, neprerenderují se
+# (15B.1) a nesou noindex (Seo) — robots je neblokuje, aby nepadl i veřejný shell.
+User-agent: *
+Allow: /
+Disallow: /chat
+Disallow: /admin
+Disallow: /reset-password
+Disallow: /email-verify
+Disallow: /email-change
+Disallow: /ikaros/profil
+Disallow: /ikaros/posta
+Disallow: /ikaros/diskuze
+Disallow: /ikaros/oblibene
+Disallow: /ikaros/akce
+Disallow: /ikaros/uzivatele
+Disallow: /ikaros/uzivatel
+
+Sitemap: https://www.projekt-ikaros.com/sitemap.xml

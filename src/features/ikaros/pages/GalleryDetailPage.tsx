@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import { ArrowLeft, Check, Pencil, Trash2 } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
-import { Spinner } from '@/shared/ui';
+import { Spinner, Breadcrumbs } from '@/shared/ui';
+import { Seo, metaDescription } from '@/shared/seo';
 import {
   useGalleryImage,
   useApproveGalleryImage,
@@ -50,6 +51,20 @@ export default function GalleryDetailPage() {
 
   return (
     <div className={s.page}>
+      <Seo
+        title={image.title}
+        description={metaDescription(image.description) ?? `Dílo z galerie komunity Ikaros: ${image.title}.`}
+        type="article"
+        image={image.imageUrl}
+        noindex={image.status !== 'Published'}
+      />
+      <Breadcrumbs
+        items={[
+          { label: 'Domů', href: '/' },
+          { label: 'Galerie', href: '/ikaros/galerie' },
+          { label: image.title },
+        ]}
+      />
       <Link to="/ikaros/galerie" className={s.back}>
         <ArrowLeft size={14} /> Zpět na galerii
       </Link>

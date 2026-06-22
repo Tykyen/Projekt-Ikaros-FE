@@ -94,22 +94,23 @@ Společné principy ověřené v kódu:
 ---
 
 ### Novinky platformy
-- **Co to je:** Oficiální platformová oznámení Ikarosu (typ `info`/…). Zobrazují se na úvodníku (první 3) a na vlastní stránce.
+- **Co to je:** Oficiální platformová oznámení Ikarosu (typ `info`/`warning`/`system`). Zobrazují se na úvodníku (první 3) a na vlastní stránce jako karty (obrázek 16:9 / fallback ikona + štítek důležitosti + datum + úryvek); klik na kartu otevře vystředěné **detail-okno** s plným obsahem, autorem a datem.
 - **Kde:** route `/ikaros/novinky` (`NovinkyPage`). Menu „Novinky". Sekce na dashboardu (`PlatformNewsSection`).
 - **Kdo:**
   - **Čtení (scope `active`) je veřejné** — `GET /IkarosNews` přes `OptionalJwtAuthGuard`, anon povolen (router `:190` bez loaderu).
   - **`scope=archived` / `scope=all`** vyžaduje `Admin`/`Superadmin` (anon → 401, slabá role → 403) — `ikaros-news.controller.ts:73`.
   - **Vytváření/úprava/archivace/mazání** jen `Admin`/`Superadmin` (`assertCanWrite` v `ikaros-news.service.ts:80`). `SpravceClanku/Galerie/Diskuzi` sem **nemají** přístup.
 - **Co jde dělat:**
-  - Číst aktivní novinky (paging `?limit&offset`, `GET /IkarosNews/count`).
+  - Číst aktivní novinky (paging `?limit&offset`, `GET /IkarosNews/count`); klik na kartu → detail-okno s plným textem (× / Escape / klik do pozadí zavře).
   - Admin: vytvořit (titulek, rich-text obsah, typ, volitelný `imageUrl`), upravit, **archivovat/odarchivovat** (idempotentní), **smazat** (hard delete).
 - **Hranice / co neumí:** žádné kategorie ani hodnocení; archivace = jen skrytí z aktivního scope (data zůstávají). Anonym vidí pouze aktivní novinky.
 - **Zvláštnosti:**
   - **Vytvoření novinky pošle web push** (`pushService.notifyAll(payload, 'ikarosNews')`, fire-and-forget) — `ikaros-news.service.ts`. **15.9:** filtruje se dle `notificationPreferences` (kategorie `ikarosNews`, default ZAP → kdo si ji nevypnul). Push payload **neobsahuje `url`**, takže kliknutí na bublinu otevře jen kořen `/` (deep-link se nevyužije).
   - Po každé mutaci se emituje WS signál `ikaros:news:changed` (leak-safe, bez dat) → klienti si refetchnou (`ikaros-news.gateway.ts:15`).
   - Obsah se před uložením sanitizuje (`sanitizeRichText`, F-10).
+  - **Sjednoceno se světovými novinkami (2026-06-22):** karta i detail-okno = sdílené `NewsPreviewCard` + `NewsDetailModal` (`src/shared/ui/news/`); globální i světová novinka se na ně mapují přes per-doménový view-model (`NewsCardVM`). Dřívější inline rozbalení karty nahrazeno modálem (zrušeno mrtvé `defaultExpanded`).
 - **Stav:** ✅
-- **Kód:** FE `src/features/ikaros/pages/NovinkyPage`, `api/useIkarosNews.ts`, dashboard `…/sections/PlatformNewsSection.tsx`. BE `ikaros-news.controller.ts`, `ikaros-news.service.ts`, `ikaros-news.gateway.ts`.
+- **Kód:** FE `src/features/ikaros/pages/NovinkyPage`, `api/useIkarosNews.ts`, karta-adaptér `components/NewsCard/NewsCard.tsx`, dashboard `…/sections/PlatformNewsSection.tsx`, sdílené `src/shared/ui/news/` (`NewsPreviewCard`, `NewsDetailModal`, `NewsTypeChip`). BE `ikaros-news.controller.ts`, `ikaros-news.service.ts`, `ikaros-news.gateway.ts`.
 
 ---
 

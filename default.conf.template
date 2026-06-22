@@ -62,6 +62,20 @@ server {
         add_header X-Content-Type-Options "nosniff" always;
     }
 
+    # 15B.2 — sitemap.xml musí být na FE originu (SEO same-host pravidlo), ale obsah
+    # generuje backend dynamicky z DB. Proxy na public API host (globální prefix `api`).
+    # Exact `=` match má prioritu před `location /` (prerender větví). robots.txt je
+    # statický soubor v rootu → servíruje ho try_files níž (žádná location netřeba).
+    # BACKEND_HOST dodá deploy (stejně jako pro CSP).
+    location = /sitemap.xml {
+        proxy_pass https://${BACKEND_HOST}/api/sitemap.xml;
+        proxy_ssl_server_name on;
+        proxy_set_header Host ${BACKEND_HOST};
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 15s;
+        add_header X-Content-Type-Options "nosniff" always;
+    }
+
     # index.html + SPA fallback — vždy revalidovat (no-cache), aby po deployi
     # prohlížeč načetl nový vstupní bod s odkazy na nové hashované assety.
     # add_header se v location nedědí z parent serveru → security hlavičky

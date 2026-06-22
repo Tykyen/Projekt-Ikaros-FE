@@ -1,3 +1,4 @@
+import { Seo } from '@/shared/seo';
 import styles from './TermsPage.module.css';
 
 /**
@@ -9,6 +10,10 @@ import styles from './TermsPage.module.css';
 export default function TermsPage() {
   return (
     <article className={styles.page}>
+      <Seo
+        title="Podmínky použití"
+        description="Pravidla používání platformy Projekt Ikaros — účet, obsah, soukromí a odpovědnost."
+      />
       <h1>Podmínky použití</h1>
       <p className={styles.lead}>
         Vítej v Projektu Ikaros — komunitní platformě pro hraní rolí (RPG),

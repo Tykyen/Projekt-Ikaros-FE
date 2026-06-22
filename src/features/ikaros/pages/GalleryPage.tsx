@@ -5,6 +5,7 @@ import { Plus, Search, ArrowUpDown } from 'lucide-react';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
 import { Spinner, EmptyState } from '@/shared/ui';
+import { Seo } from '@/shared/seo';
 import {
   useGalleryImages,
   useMyGalleryImages,
@@ -32,6 +33,10 @@ export default function GalleryPage() {
 
   return (
     <div className={s.page}>
+      <Seo
+        title="Galerie"
+        description="Obrazový salon komunity Ikaros — ilustrace, mapy a artwork od hráčů. Prohlížej veřejnou galerii nebo nahraj vlastní díla."
+      />
       <header className={s.header}>
         <div className={s.headerLeft}>
           <h1 className={s.title}>Galerie</h1>

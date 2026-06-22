@@ -4,6 +4,7 @@ import { useAtomValue } from 'jotai';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
 import { EmptyState } from '@/shared/ui';
+import { Seo } from '@/shared/seo';
 import { WorldCard } from '../DashboardPage/components/WorldCard';
 import {
   WorldsToolbar,
@@ -103,6 +104,10 @@ export default function WorldsPage() {
 
   return (
     <div className={s.page}>
+      <Seo
+        title="Veřejné světy"
+        description="Procházej veřejné RPG světy na platformě Ikaros — fantasy, sci-fi i vlastní systémy. Najdi svět, do kterého se přidáš a začneš hrát."
+      />
       <div>
         <h2 className={s.title}>Vesmíry</h2>
         <p className={s.subtitle}>

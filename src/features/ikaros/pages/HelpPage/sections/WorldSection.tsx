@@ -456,7 +456,8 @@ export function WorldSection() {
             <strong>Akce světa</strong> — karty herních akcí s odpočtem a tlačítkem
             Zúčastním se; pod akcí vláknové komentáře s reakcemi. Akce může být jen pro
             vybranou skupinu. <strong>Novinky světa</strong> — oznámení s hero obrázkem
-            a typem; datum může být reálné nebo herní (fantasy datum).
+            a typem; datum může být reálné nebo herní (fantasy datum). Klikem na
+            novinku se otevře okno s celým textem (stejné jako u novinek platformy).
           </p>
         </Tool>
       </HelpAccordion>

@@ -57,6 +57,10 @@
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 .close:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+/* Dotykový terč ≥44px na mobilu (vzor kebab/iconBtn); na desktopu myš stačí 32px. */
+@media (max-width: 768px) {
+  .close { width: 44px; height: 44px; }
+}
 
 .body {
   padding: var(--sp-6);

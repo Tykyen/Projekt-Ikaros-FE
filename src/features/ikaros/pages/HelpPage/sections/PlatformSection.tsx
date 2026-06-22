@@ -171,8 +171,9 @@ export function PlatformSection() {
         <Tool icon={<Newspaper size={16} />} title="Novinky" audience={{ kind: 'vse', label: 'Všichni' }} accent="corrector">
           <p>
             Archiv platformových novinek. Každá má typ (Informace / Upozornění /
-            Systémová) odlišený barvou nadpisu; karta je sbalená, po kliknutí
-            ukáže obrázek a celý text. Admin tu novinky rovnou spravuje (Aktivní /
+            Systémová) se štítkem; karta ukazuje obrázek, datum a úryvek, po
+            kliknutí se otevře okno s celým textem (zavřeš křížkem, klávesou Esc
+            nebo klikem mimo). Admin tu novinky rovnou spravuje (Aktivní /
             Archiv, vytvořit, upravit, archivovat, smazat).
           </p>
         </Tool>

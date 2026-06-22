@@ -7,6 +7,8 @@ export { ConfirmDialog } from './ConfirmDialog/ConfirmDialog';
 export { KebabMenu } from './KebabMenu/KebabMenu';
 export type { KebabMenuItem } from './KebabMenu/KebabMenu';
 export { Badge } from './Badge/Badge';
+export { Breadcrumbs } from './Breadcrumbs';
+export type { Crumb } from './Breadcrumbs';
 export { RoleStar } from './RoleStar/RoleStar';
 export { WorldRoleIcon } from './WorldRoleIcon';
 export type { WorldRoleKey } from './WorldRoleIcon';
