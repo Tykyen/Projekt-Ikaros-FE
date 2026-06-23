@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { User } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -23,6 +23,8 @@ interface Props {
   /** Živá presence (PJ-only; hráč ji nedostává). */
   presence: ChannelPresenceUser[];
   onClose?: () => void;
+  /** Hlásí, že rail ukazuje deník/statblok (širší layout jako taktická mapa). */
+  onWideChange?: (wide: boolean) => void;
 }
 
 /** Co je v railu načtené (PJ): deník postavy/NPC, nebo statblok bestie. */
@@ -51,16 +53,23 @@ export function ChatContextRail({
   currentUser,
   presence,
   onClose,
+  onWideChange,
 }: Props) {
   const { world } = useWorldContext();
   const systemId = world?.system ?? null;
   const members = useWorldMembers(worldId);
   const [selected, setSelected] = useState<Selected | null>(null);
 
+  const my = members.data?.find((m) => m.userId === currentUser.id);
+  const mySlug = !isManager ? slugOf(my?.characterPath) : undefined;
+  // „Wide" = rail ukazuje deník/statblok (ne presence roster) → širší sloupec.
+  const wide = isManager ? selected !== null : Boolean(mySlug);
+  useEffect(() => {
+    onWideChange?.(wide);
+  }, [wide, onWideChange]);
+
   // ── Hráč — vlastní deník ──
   if (!isManager) {
-    const my = members.data?.find((m) => m.userId === currentUser.id);
-    const mySlug = slugOf(my?.characterPath);
     if (!mySlug) {
       return (
         <aside className={s.empty}>

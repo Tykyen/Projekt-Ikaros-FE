@@ -18,6 +18,12 @@
   grid-template-columns: 272px 1fr 300px;
 }
 
+/* Deníkový/bestie mód = širší sloupec jako panel taktické mapy (480px),
+   ať se sheet (2sloupcové karty) vykreslí stejně, ne zmáčknutě. */
+.withMembers.railWide {
+  grid-template-columns: 272px 1fr 480px;
+}
+
 .sidebarSlot,
 .viewSlot,
 .membersSlot {
@@ -89,6 +95,10 @@
   }
   .membersOpen .membersSlot {
     transform: translateX(0);
+  }
+  /* Deník/bestie šuplík širší (jako mapový panel na mobilu). */
+  .railWide .membersSlot {
+    width: min(560px, 94vw);
   }
 
   .scrim {

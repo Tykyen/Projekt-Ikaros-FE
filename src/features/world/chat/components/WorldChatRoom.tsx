@@ -85,6 +85,8 @@ export function WorldChatRoom() {
     return localStorage.getItem(membersKey) === '1';
   });
   const [searchOpen, setSearchOpen] = useState(false);
+  // Rail v deníkovém/bestie módu = širší sloupec (jako panel taktické mapy).
+  const [railWide, setRailWide] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -252,6 +254,7 @@ export function WorldChatRoom() {
       className={clsx(
         s.room,
         active && railOpen && s.withMembers,
+        active && railOpen && railWide && s.railWide,
         sidebarOpen && s.sidebarOpen,
         railOpen && s.membersOpen,
       )}
@@ -320,6 +323,7 @@ export function WorldChatRoom() {
             currentUser={user}
             presence={presence}
             onClose={() => setRailOpen(false)}
+            onWideChange={setRailWide}
           />
         </div>
       )}

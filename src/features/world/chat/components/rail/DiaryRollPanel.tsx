@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowLeft, X, Pencil } from 'lucide-react';
 import { DiaryTab } from '@/features/world/pages/CharacterDetailPage/components/DiaryTab';
+import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
 import { useChatDiaryRoll, type RollAttribution } from './useChatDiaryRoll';
-import s from './DiaryRollPanel.module.css';
+import s from './railShell.module.css';
 
 interface Props {
   worldId: string;
@@ -14,7 +15,7 @@ interface Props {
   attribution: RollAttribution;
   /** Smí editovat deník (vlastník / PJ). */
   canEdit: boolean;
-  /** Titulek panelu (např. „Můj deník" nebo jméno hráče). */
+  /** Fallback titulek, než se z adresáře dotáhne jméno postavy. */
   title: string;
   /** PJ — zpět na panel Přítomní. */
   onBack?: () => void;
@@ -23,13 +24,13 @@ interface Props {
 }
 
 /**
- * 16.1a — deník postavy v railu světového chatu. Tenký wrapper kolem
- * `DiaryTab` (jediný zdroj pravdy deníku): view/edit toggle + napojení
- * `onRoll` schopností na chat (3D overlay → zpráva).
+ * 16.1 — deník postavy v railu světového chatu. Vizuál „pro hru" (jako
+ * taktická mapa): identity hlavička s portrétem + jménem, pod ní deník.
+ * Tenký wrapper kolem `DiaryTab` (jediný zdroj pravdy deníku): view/edit
+ * toggle + napojení `onRoll` schopností na chat (3D overlay → zpráva).
  *
- * V edit módu řídí Uložit/Zrušit sticky bar uvnitř `DiaryTab` (Zrušit =
- * `onExitEdit`); back/zavřít proto skrýváme, ať se neztratí rozeditované
- * změny.
+ * Portrét + jméno bere z adresáře postav (`usePersonaDirectory`) podle slug —
+ * `Character` sám `imageUrl` nedrží (je na Page/adresáři).
  */
 export function DiaryRollPanel({
   worldId,
@@ -44,12 +45,20 @@ export function DiaryRollPanel({
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [, setDirty] = useState(false);
 
+  const directory = usePersonaDirectory(worldId);
+  const entry = useMemo(
+    () => (directory.data ?? []).find((e) => e.slug === slug),
+    [directory.data, slug],
+  );
+  const name = entry?.title ?? title;
+  const imageUrl = entry?.imageUrl;
+
   const makeOnRoll = useChatDiaryRoll(worldId, channelId);
   const onRoll = makeOnRoll(attribution);
 
   return (
     <aside className={s.panel}>
-      <div className={s.head}>
+      <div className={s.controls}>
         {mode === 'view' && onBack && (
           <button
             type="button"
@@ -61,7 +70,7 @@ export function DiaryRollPanel({
             <ArrowLeft size={16} />
           </button>
         )}
-        <span className={s.title}>{mode === 'edit' ? `${title} — úpravy` : title}</span>
+        <div className={s.spacer} />
         {mode === 'view' && canEdit && (
           <button
             type="button"
@@ -83,6 +92,19 @@ export function DiaryRollPanel({
             <X size={16} />
           </button>
         )}
+      </div>
+
+      <div className={s.identity}>
+        <div className={s.avatar}>
+          {imageUrl ? (
+            <img src={imageUrl} alt={name} />
+          ) : (
+            <div className={s.avatarFallback}>
+              {name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <h2 className={s.name}>{mode === 'edit' ? `${name} — úpravy` : name}</h2>
       </div>
 
       <div className={s.scroll}>

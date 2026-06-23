@@ -5,7 +5,8 @@ import { BestieStatblock } from '@/features/world/tactical-map/components/tokens
 import { getBestieAbilities } from '@/features/world/bestiar/lib/bestieAbilities';
 import type { Bestie } from '@/features/world/bestiar/types';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
-import s from './BestieRollPanel.module.css';
+import s from './railShell.module.css';
+import b from './BestieRollPanel.module.css';
 
 interface Props {
   worldId: string;
@@ -21,11 +22,11 @@ interface Props {
 const noop = () => {};
 
 /**
- * 16.1c — statblok bestie z katalogu v railu chatu. Read-only (staty + lore;
- * editace bestie patří do Bestiáře), schopnosti **klikací → hod do chatu** jako
- * ta bestie (atribuce `bestie`). Token vyrábíme z katalogové bestie přes
- * `buildBestieToken` (BestieStatblock chce `MapToken`) — žádná HP perzistence,
- * je to jen one-shot hod „za bestii".
+ * 16.1c — statblok bestie z katalogu v railu chatu. Vizuál „pro hru" (jako
+ * taktická mapa): identity hlavička s portrétem + jménem, pod ní statblok.
+ * Read-only (staty + lore; editace bestie patří do Bestiáře), schopnosti
+ * **klikací → hod do chatu** jako ta bestie (atribuce `bestie`). Token
+ * vyrábíme z katalogové bestie přes `buildBestieToken` — žádná HP perzistence.
  */
 export function BestieRollPanel({
   worldId,
@@ -47,7 +48,7 @@ export function BestieRollPanel({
 
   return (
     <aside className={s.panel}>
-      <div className={s.head}>
+      <div className={s.controls}>
         {onBack && (
           <button
             type="button"
@@ -59,7 +60,7 @@ export function BestieRollPanel({
             <ArrowLeft size={16} />
           </button>
         )}
-        <span className={s.title}>{bestie.name}</span>
+        <div className={s.spacer} />
         {onClose && (
           <button
             type="button"
@@ -70,6 +71,19 @@ export function BestieRollPanel({
             <X size={16} />
           </button>
         )}
+      </div>
+
+      <div className={s.identity}>
+        <div className={s.avatar}>
+          {bestie.imageUrl ? (
+            <img src={bestie.imageUrl} alt={bestie.name} />
+          ) : (
+            <div className={s.avatarFallback}>
+              {bestie.name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <h2 className={s.name}>{bestie.name}</h2>
       </div>
 
       <div className={s.scroll}>
@@ -95,9 +109,9 @@ export function BestieRollPanel({
         />
 
         {bestie.notes?.trim() && (
-          <section className={s.lore}>
-            <h4 className={s.loreHead}>📜 Popis</h4>
-            <p className={s.loreBody}>{bestie.notes}</p>
+          <section className={b.lore}>
+            <h4 className={b.loreHead}>📜 Popis</h4>
+            <p className={b.loreBody}>{bestie.notes}</p>
           </section>
         )}
       </div>
