@@ -17,6 +17,7 @@ export type { WorldRoleKey } from './WorldRoleIcon';
 export { UserAvatar } from './UserAvatar';
 export { IkarosCard } from './IkarosCard/IkarosCard';
 export { GlobalErrorBoundary } from './GlobalErrorBoundary';
+export { MaintenanceOverlay } from './MaintenanceOverlay';
 export { ImageLightbox } from './ImageLightbox';
 export type { LightboxImage } from './ImageLightbox';
 export { Tabs } from './Tabs';

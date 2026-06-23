@@ -5,9 +5,33 @@ import { router } from '@/app/router';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
 import { accessTokenAtom, refreshTokenAtom } from '@/shared/store/authStore';
 import { anonSessionAtom } from '@/features/chat/store/anonSession';
+import { backendUnavailableAtom } from '@/shared/store/backendStatus';
+import { isBackendUnavailable } from './isBackendUnavailable';
 import type { ApiError, RefreshResponse } from '@/shared/types';
 
 const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+
+// Detekce výpadku BE (deploy/restart). Práh 2 po sobě jdoucích výpadků →
+// jeden náhodný blip nezačerní celou app, ale trvalý výpadek se chytne hned
+// (React Query `retry:1` + paralelní dotazy stránky failnou rychle). Reset na
+// první úspěšnou odpověď i na první ne-výpadkovou chybu (BE evidentně odpovídá).
+const UNAVAILABLE_THRESHOLD = 2;
+let consecutiveBackendFailures = 0;
+
+function markBackendDown() {
+  consecutiveBackendFailures += 1;
+  if (consecutiveBackendFailures >= UNAVAILABLE_THRESHOLD) {
+    getDefaultStore().set(backendUnavailableAtom, true);
+  }
+}
+
+function markBackendUp() {
+  consecutiveBackendFailures = 0;
+  const store = getDefaultStore();
+  if (store.get(backendUnavailableAtom)) {
+    store.set(backendUnavailableAtom, false);
+  }
+}
 
 export const apiClient = axios.create({
   baseURL: `${apiBase}/api`,
@@ -39,7 +63,11 @@ apiClient.interceptors.request.use((config) => {
 
 // Response — 401 → pokus o refresh, pak retry. BANNED → instant logout (1.3b)
 apiClient.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // BE odpovídá → výpadek (pokud běžel) skončil; overlay se schová.
+    markBackendUp();
+    return res;
+  },
   async (error: AxiosError) => {
     const original = error.config as typeof error.config & { _retry?: boolean };
     const data = error.response?.data as ApiError | undefined;
@@ -85,6 +113,14 @@ apiClient.interceptors.response.use(
         logoutAndRedirectToLogin();
         return Promise.reject(error);
       }
+    }
+
+    // Výpadek BE (network / 502-504) → po prahu zobraz údržbu místo matoucí
+    // chyby na stránce. Jiná chyba (404/403/500…) = BE odpověděl → reset.
+    if (isBackendUnavailable(error)) {
+      markBackendDown();
+    } else {
+      markBackendUp();
     }
     return Promise.reject(error);
   },

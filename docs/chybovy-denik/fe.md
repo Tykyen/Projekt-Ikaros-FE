@@ -342,3 +342,23 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 - 👍 **Dobře:** featura postavená výhradně z existující 5.9 infrastruktury (endpoint, atom, ThemePresetGrid, bg blok) → málo nového kódu, nízké riziko. Návrh pasti pochycené PŘEDEM v hlavě: (a) `toEntity` whitelist mapper — nová pole rovnou přidána (bez toho GET tiše zahodí); (b) `themeId` validace volná jako world DTO (`@IsString`, ne `@IsIn(THEME_IDS)`) → vyhne se dual-source 400 pasti.
 - 👍 **Dobře:** náhled v editoru = stejný resolver jako runtime → „co uložíš, to vidíš" bez divergence.
 - 📌 **Pozn.:** po BE změně nutný restart (whitelist ValidationPipe by jinak nová pole dropnul) — featura jinak na FE „funguje", ale BE pole zahazuje.
+
+---
+
+## ✅ ŘEŠENÍ — BE restart ukazoval „Tento svět nenajdeme" → globální údržbový overlay — 2026-06-23
+
+**Problém / zadání.** Po restartu BE (deploy/údržba) viděl uživatel na stránce světa děsivé „Tento svět nenajdeme" (404 leak hláška) — vypadalo to jako ztráta dat / odebrání přístupu. PJ chtěl: rozpoznat, že jde o restart, a oznámit údržbu.
+
+**Diagnóza (kořen).** `useWorld` failne na JAKOUKOLI chybu → React Query `retry:1` (main.tsx) selže za ~1–2 s → `WorldLayout` testuje jen `!world` (ne typ chyby) → vyrenderuje `WorldNotFound`. Network error (BE dole) má `error.response === undefined` (server neodpověděl) — **technicky rozlišitelné** od skutečné 404 (server odpověděl „nenašel").
+
+**Co zabralo (přístup — varianta B, globální).**
+- **Klasifikátor** `isBackendUnavailable` (`src/shared/api/isBackendUnavailable.ts`): bez `response` (network) NEBO 502/503/504 = výpadek; 404/403/**500** = BE odpověděl (500 = reálná chyba appky, ne údržba → vědomě false).
+- **Detekce v axios interceptoru** (`client.ts`) s **prahem 2** po sobě jdoucích výpadků → `backendUnavailableAtom`. Práh = jeden náhodný blip nezačerní app, ale trvalý výpadek se chytne hned (RQ `retry:1` + paralelní dotazy stránky failnou rychle). **Reset na první úspěch** (success interceptor) i na první ne-výpadkovou chybu.
+- **Globální `<MaintenanceOverlay>`** (mount v `main.tsx`, z-index nad toastem): „Probíhá údržba", sám poll-uje `GET /api/health` (existoval, veřejný!) à 4 s; po úspěchu interceptor atom shodí → overlay zmizí + `invalidateQueries()` → stránky se obnoví **bez reloadu**. FE-only, žádná BE změna.
+
+**Jak ověřeno.** FE vitest: klasifikátor 4/4 (network/502-504 → true; 404/403/500 → false), overlay 2/2 (skrytý když BE běží / hláška + „Zkusit hned" při výpadku). `npm run build` (tsc -b) ✓, eslint ✓. Responsivní z principu (`width: min(420px, 92vw)`).
+
+**Zhodnocení.**
+- 👍 **Dobře:** rozlišení šlo po datech (`error.response === undefined`), ne po hádání. Práh 2 + reset-on-success dává přirozený debounce bez ručního časovače. `GET /health` už existoval → auto-zotavení zdarma, nula BE změny.
+- 👍 **Dobře:** globální (B) místo per-stránka — pokrývá dashboard/chat/… jednotně, deploy je celoplošný. Overlay invaliduje dotazy → po naběhnutí BE se appka opraví sama, bez F5.
+- 📌 **Pozn.:** overlay leží nad `WorldNotFound` (z-index 600 > toast 500); při zotavení se obě vrstvy srovnají přes invalidate. 500 záměrně NEspouští údržbu (to je `ErrorState` „Něco se rozbilo").

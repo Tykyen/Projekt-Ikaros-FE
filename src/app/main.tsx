@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { router } from "./router";
 import { GlobalErrorBoundary } from "@/shared/ui/GlobalErrorBoundary";
+import { MaintenanceOverlay } from "@/shared/ui/MaintenanceOverlay";
 import { AuthBootstrap } from '@/features/auth/components';
 import { ThemeProvider } from "@/themes/ThemeProvider";
 import { InstallBanner } from "@/features/pwa";
@@ -41,6 +42,9 @@ createRoot(document.getElementById("root")!).render(
           <Toaster position="bottom-right" theme="dark" richColors />
           {/* 15.1 — PWA install hint (sám se skryje ve standalone / po dismissu) */}
           <InstallBanner />
+          {/* Globální údržbový overlay — při výpadku BE (deploy/restart) ukáže
+              „Probíhá údržba" místo matoucího „svět nenalezen"; sám se schová. */}
+          <MaintenanceOverlay />
         </GlobalErrorBoundary>
       </ThemeProvider>
     </QueryClientProvider>

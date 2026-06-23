@@ -333,6 +333,22 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Otevřené otázky:** Co konkrétně chatu chybí pro pohodlné dlouhé vyprávění (odběr kanálu? archiv? mobilní čtení dlouhých příspěvků?) — zjistit průchodem reálným chatem (vyžádám si screen). Kdo zakládá příběhové kanály a kdo do nich smí psát (role/skupiny — máme)?
 
+**Doplněno 2026-06-23 — dvě konkrétní rozšíření 16.1** (návaznost na 16.2c skiny + zpětná vazba testerů):
+
+#### - [ ] 16.1d Vzhled/skin chatu — volba stylu hráčem (váže na 16.2c) — [dopad střední · náklad malý]
+**Cíl:** Hráč si v **nastavení chatu** (paletka 🎨 v hlavičce konverzace — dnes barva/font/velikost zprávy, 6.2f) zvolí i **vizuální skin/vzhled** (chatu, resp. deníku v chatu) a vybere si, který se mu líbí. Reuse sady stylů z **16.2c** (sci-fi / fantasy / horor / …).
+**Proč:** Výrazný HUD nesedne každému (stejný důvod jako 16.2c). Volba je **per hráč** a nikomu se nepropisuje — přesný vzor je per-člen „Můj vzhled" světa (**5.9b**, hotovo 2026-06-23: člen si volí vlastní motiv/pozadí jen pro sebe).
+**Návrh:** rozšířit per-svět chat prefs na membershipu (`chatColor/chatFont/chatFontSize`, 6.2f) o volbu skinu; aplikovat přes `data-diary-skin` (engine 16.2c) na chat/rail. **Skin engine se staví jednou v 16.2c** a sdílí se (deník · mapa · chat — 3 místa, viz otevřená otázka 16.2c).
+**Závislost:** 16.2c skin engine (tokenizované sheety). Bez něj jen UI háček bez obsahu.
+**Otevřené:** Skin chatu = skin deníku, nebo samostatná volba? Týká se jen deníkového railu v chatu, nebo i bublin zpráv? PJ override (vynutit styl), nebo čistě hráčská volba jako 5.9b?
+
+#### - [ ] 16.1e Bestie v konverzaci — perzistentní soubojové instance (jako mapa) — [dopad střední · náklad střední] · *zpětná vazba testerů*
+**Cíl:** V konverzaci, kde běží **souboj**, jde mít **víc kopií téže bestie** (stejně jako na taktické mapě), měnit jim **životy** a **uložit je do konverzace**, aby s nimi šlo pracovat **dlouhodobě**.
+**Proč:** PC a NPC drží stav v **deníku** (charakterové subdokumenty). **Bestie fungují jinak** — jsou to nezávislé **instance bez deníku** (`project_bestie_token_instance`, 3-tier `project_npc_vs_bestie`). V chatu dnes (rail 16.1b/c) je bestie statblok z katalogu jen read-flow; chybí **perzistentní instance s HP vázaná na konverzaci**.
+**Návrh:** bestie instance v chatu = stejný model jako bestie `MapToken` (nezávislá instance: `health.current` seed, vlastní `notes`/`abilities`), ale **scope = konverzace** místo scény. Pole instancí uložit na `ChatChannel` (konverzaci); reuse `buildBestieToken` + `BestieStatblock` z 16.1b/c; HP editovatelné a perzistentní napříč session. Combat-tracker-lite, ne plná mapa v chatu.
+**Hranice:** žádný grid/fog/pohyb — jen seznam soubojových bestií s HP (+ případně iniciativa). Plné taktické věci zůstávají na mapě.
+**Otevřené:** Instance žijí na `ChatChannel`, nebo ve vlastní kolekci klíčované konverzací? Iniciativa/řazení? Viditelnost HP hráčům (per-instance toggle jako mapa per-scéna)? Sdílí combat tracker s mapou, nebo samostatný lehký?
+
 ### - [ ] 16.2 👑 Hloubková podpora RPG systémů — [E2 · dopad vysoký · náklad velký] 🔁
 > **Reorganizováno 2026-06-22 — rozpad „per pilíř", ne „per systém".** Pilíř = sdílená infrastruktura; postavit engine jednou a naplnit napříč systémy je efektivnější než stavět ho u každého systému znovu. **Dva pilíře:** 16.2a Deník · 16.2b Bestiář. **3. pilíř „Dodatky k pravidlům" VYŘAZEN z 16.2** — design je nejasný (jak by fungoval); vrátí se jako vlastní pozdější bod, až bude promyšlený. Progress per systém = matice na konci.
 **Cíl:** Každý systém s deníkem dotáhnout ve **dvou pilířích**: deníkový list s kostkovými mechanikami + bestiář (statbloky v tvaru systému, spawnovatelné na mapu).
@@ -358,7 +374,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
 - **Matrix / Ikaros** (`matrix`) — *stav kódu:* list sheet+testy, mapa combat panel `MatrixCombatPanel` (+ diary→token HP/armor sync)
   - [x] **Reálný list (grafika)** — ✅ 2026-06-23 HUD redesign (spec-16.2a; hero/vitals tracky/pips 1–10/budget/přetlaky/validace; PC 7/NPC 10; magie 📘 auto-match→odkaz). **Vzor pro ostatní systémy.**
   - [x] **Taktická mapa (grafika)** — ✅ 2026-06-23 `MatrixCombatPanel` HUD redesign (PC/NPC; Životy/Únava tracky+postih, schopnosti pips+klik=hod, Ochrana/Runa, přetlaky, aspekty, iniciativa; logika zachována). Bestie = samostatná položka níže.
-  - [ ] Bestie (grafika)
+  - [x] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
 - **Dračí Doupě 1.6** (`drd16`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
@@ -468,7 +484,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Rozhodnuto (2026-06-23):** (1) volba **per-hráč** (preference v nastavení; per-postava odloženo); (2) **chytrý default dle systému** + hráčův override; (3) **workflow per systém** — uživatel tvoří systém **kompletně** (reálný list → taktická mapa → chat → skiny), pak jede na další. **Skin engine + 6 univerzálních skin token sad = postavit u 1. systému (Matrix)**; další systémy je **dědí** (jen tokenizace sheetu, kterou stejně děláme, + případná per-systém specifika ornamentů). ⚠️ „Skiny u každého deníku" tedy **≠ 6×N CSS**, ale **engine jednou + 6 sdílených token sad**. Předpoklad: konzistentní token názvy napříč sheety (Matrix `--mx-*`; sjednotit / mapovat při stavbě enginu).
 **Cíl rozsahu (rozhodnuto uživatelem 2026-06-23):** **7 stylů × všechny systémy** = každý systém **plně ostylovaný 7 způsoby** (per-systém, ne jen univerzální skin). **Jak chytře, ať to není 7×N CSS od nuly:** engine + 7 sdílených token sad jako kostra → per systém se aplikují a **doladí per-systém ornamenty/specifika** (fantasy DrD ≠ fantasy Matrix). Sdílený základ zlevní, výsledek = 7 plnohodnotných stylů na systém.
 **FE rozsah:** skin engine (token override vrstva) + 7 stylových sad + per-systém doladění + selector v nastavení + persistence (per-hráč). Předpoklad: konzistentní token názvy napříč sheety (Matrix `--mx-*`; sjednotit / mapovat při stavbě enginu). ⚠️ Retro (skeuomorfní/textury) je nejnáročnější — víc než token override (textury, border-image, bevel), počítat s vyšším nákladem než ploché styly.
-**Otevřené otázky:** PJ override per svět (vynutí styl všem)? Skin i pro deník v mapě/chatu (3 místa = 16.2a)? Tisk respektuje skin, nebo zůstává neutrální? Originální ornamenty per skin (žádné sdílení — viz `feedback_skin_originality`)? **Obal `TokenInfoPanel` na mapě (hlavička: Zamknout/Odstranit/📌pin/skin/×/Body osudu) je sdílený všemi systémy — musí být skinnable (styl dle systému/skinu), aby ladil s combat panelem; ne hardcoded jeden styl.**
+**Otevřené otázky:** PJ override per svět (vynutí styl všem)? Skin i pro deník v mapě/chatu (3 místa = 16.2a; **ovládání skinu chatu z chat prefs = 16.1d**, hráčská volba dle vzoru 5.9b)? Tisk respektuje skin, nebo zůstává neutrální? Originální ornamenty per skin (žádné sdílení — viz `feedback_skin_originality`)? **Obal `TokenInfoPanel` na mapě (hlavička: Zamknout/Odstranit/📌pin/skin/×/Body osudu) je sdílený všemi systémy — musí být skinnable (styl dle systému/skinu), aby ladil s combat panelem; ne hardcoded jeden styl.**
 
 #### Matice systémů (progress; pilíře Deník · Bestiář — Dodatky vyřazeny)
 ##### Prioritně — české (příkop)
