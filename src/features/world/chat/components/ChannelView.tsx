@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Menu, Users, Search, Palette } from 'lucide-react';
+import { Menu, Users, Search, Palette, BookOpen } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
 import { WorldHelpButton, WorldHelpModal, ChatHelp } from '@/features/world/help';
 import type { User } from '@/shared/types';
@@ -58,10 +58,10 @@ interface ChannelViewProps {
   canManage: boolean;
   /** Mobil — otevře sidebar. */
   onOpenSidebar: () => void;
-  /** Toggle panelu Přítomní (PJ-only). Bez prop tlačítko nezobrazím. */
-  onToggleMembers?: () => void;
-  /** Aktuální stav panelu Přítomní — active styling tlačítka. */
-  membersOpen?: boolean;
+  /** Toggle pravého railu (PJ: Přítomní/deníky · hráč: vlastní deník). */
+  onToggleRail?: () => void;
+  /** Aktuální stav railu — active styling tlačítka. */
+  railOpen?: boolean;
   /** Počet právě přítomných — badge na tlačítku, když je panel zavřený. */
   presenceCount?: number;
   /** Otevře modal hledání ve zprávách (krok 6.6). */
@@ -90,8 +90,8 @@ export function ChannelView({
   currentUser,
   canManage,
   onOpenSidebar,
-  onToggleMembers,
-  membersOpen = false,
+  onToggleRail,
+  railOpen = false,
   presenceCount = 0,
   onOpenSearch,
   worldEmotes,
@@ -472,27 +472,34 @@ export function ChannelView({
             />
           )}
         </div>
-        {onToggleMembers && (
+        {onToggleRail && (
           <button
             type="button"
-            className={clsx(
-              s.membersBtn,
-              membersOpen && s.membersBtnActive,
-            )}
-            onClick={onToggleMembers}
+            className={clsx(s.membersBtn, railOpen && s.membersBtnActive)}
+            onClick={onToggleRail}
             aria-label={
-              membersOpen
-                ? 'Zavřít panel Přítomní'
-                : presenceCount > 0
-                  ? `Přítomní (${presenceCount} online)`
-                  : 'Přítomní'
+              canManage
+                ? railOpen
+                  ? 'Zavřít panel Přítomní'
+                  : presenceCount > 0
+                    ? `Přítomní (${presenceCount} online)`
+                    : 'Přítomní'
+                : railOpen
+                  ? 'Zavřít můj deník'
+                  : 'Můj deník'
             }
             title={
-              membersOpen ? 'Zavřít panel Přítomní' : 'Otevřít panel Přítomní'
+              canManage
+                ? railOpen
+                  ? 'Zavřít panel Přítomní'
+                  : 'Otevřít panel Přítomní'
+                : railOpen
+                  ? 'Zavřít můj deník'
+                  : 'Otevřít můj deník'
             }
           >
-            <Users size={18} />
-            {!membersOpen && presenceCount > 0 && (
+            {canManage ? <Users size={18} /> : <BookOpen size={18} />}
+            {canManage && !railOpen && presenceCount > 0 && (
               <span className={s.presenceBadge}>
                 {presenceCount > 99 ? '99+' : presenceCount}
               </span>

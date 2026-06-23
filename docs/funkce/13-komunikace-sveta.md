@@ -13,7 +13,7 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 ## Chat světa (`WorldChatPage` / `WorldChatRoom`)
 
 ### Přehled
-- **Co to je:** stránka `/svet/:slug/chat`. Orchestrátor `WorldChatRoom` = sidebar (kanály+konverzace) + okno konverzace (`ChannelView`) + panel Přítomní (`ChannelMemberPanel`, PJ-only).
+- **Co to je:** stránka `/svet/:slug/chat`. Orchestrátor `WorldChatRoom` = sidebar (kanály+konverzace) + okno konverzace (`ChannelView`) + **kontextový pravý rail** (`ChatContextRail`: hráč = svůj deník · PJ = Přítomní + hledání NPC/bestie + načtené deníky/statbloky — viz „Deník v chatu" níže).
 - **Kde:** FE `pages/WorldChatPage.tsx` → `chat/components/WorldChatRoom.tsx`. BE modul `modules/chat` (controller `worlds/:worldId/chat`, service, gateway).
 - **Kdo (FE):** route `memberOnly(p(WorldChatPage))` — Čtenář+. **Kdo (BE):** celý controller `@UseGuards(JwtAuthGuard)`; čtení struktury navíc přes world-level bránu `assertCanViewWorldChat` (privátní svět → jen člen/Admin, jinak 403 friendly, R-09b — `chat.service.ts:205-226`).
 - **Stav:** ✅
@@ -81,6 +81,17 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - **Nastavení znaku:** Nastavení → Členové → Skupiny a barvy (`GroupColorEditor`, ukládá `groupImages`).
 - **Stav:** ✅
 - **Kód:** `chat.service.ts:263-307`, `:1502-1554`.
+
+### Deník v chatu — kontextový rail (16.1)
+- **Co to je:** pravý panel chatu je kontextový. **Hráč** v něm má svůj deník postavy; **PJ** má Přítomní + jedno pole hledání (NPC + bestie) + klik na člena → načte jeho deník. Z deníku/statbloku jde **klikací hod schopnosti přímo do aktivní konverzace** (3D overlay → zpráva).
+- **Kde:** FE `chat/components/rail/` — `ChatContextRail.tsx` (orchestrátor), `DiaryRollPanel.tsx` (deník postavy/NPC = tenký wrapper `DiaryTab`), `BestieRollPanel.tsx` (statblok bestie z katalogu), `RailEntitySearch.tsx` (hledání NPC+bestie), `useChatDiaryRoll.ts` (most hodu), `dice/lib/rollFromDiary.ts` (roll engine). Tlačítko railu v hlavičce `ChannelView` (PJ ikona Přítomní + presence badge, hráč ikona „Můj deník").
+- **Kdo:** hráč vidí/edituje **jen svůj** deník (vlastní postava z `membership.characterPath`); **PJ/PomocnyPJ** (`isManager`) vidí Přítomní, načte deník libovolného člena/NPC i statblok bestie a smí editovat. Čtení deníku cizí postavy gatuje **BE** (`GET …/characters/:slug/diary` → 403 bez práv; PJ/vlastník mají přístup — stejný endpoint jako mapa). Bestie statblok = read-only.
+- **Co jde dělat:** hráč: otevřít „Můj deník", hodit schopnost (→ konverzace), editovat deník (uloží se do Character subdoku, delta `customDataPatch`). PJ: klik na člena → jeho deník (hod atribuovaný „PJ"); hledat NPC → jeho deník (hod jako NPC); hledat bestii → její statblok, klik schopnost (hod jako bestie); ⟵ zpět na Přítomní.
+- **Atribuce hodu (R1):** hráč za svou postavu = bez override (jeho persona); PJ za hráče = bez override → render-time „PJ"; NPC/bestie = override jméno+avatar (NPC navíc klikací slug). Skin kostek = volba toho, kdo hází (parita s mapou).
+- **Hranice / co neumí:** **systémově agnostické — hod jde tam, kde sheet má `onRoll`**; per-systém bohatost hodů + grafika railu = **16.1d přesunuto ZA 16.2** (splývá s 16.2a). Audit (2026-06-23): hotové matrix/drd2/fate/pi; jen iniciativa coc/drd16/drdplus/drdh/gurps/dnd5e; nic shadowrun (pool nejde přes `onRoll({modifier,kind})`) /jad. Bestie = **katalog** (žádná HP perzistence — instance s HP žije na mapě); editace statbloku jen v Bestiáři. NPC search filtruje `type==='NPC'` (PC jsou v rosteru). Hráč s víc postavami: bere přiřazenou (`characterPath`).
+- **Zvláštnosti:** `DiaryTab` se sdílí list/mapa/chat = jediný zdroj pravdy deníku. Bestie panel reuse `BestieStatblock` + `buildBestieToken` z tactical-map (coupling chat→map; **přímé importy → PIXI zůstal lazy chunk**, WorldChatPage 105 kB). Hod se pošle **až po doběhnutí 3D overlay** (`overlay.trigger` callback, ať se nepřekrývá 3D + 2D snapshot). `DiceRollOverlayProvider` obaluje `WorldChatPage`. Readout overlaye nově ukazuje rozpad `schopnost (mod) hod = výsledek` (i na mapě).
+- **Stav:** ✅ mechanismus (hráč/PJ/NPC/bestie); 🚧 per-systém pokrytí hodů (16.2a).
+- **Kód:** FE `chat/components/rail/ChatContextRail.tsx`, `DiaryRollPanel.tsx`, `BestieRollPanel.tsx`, `RailEntitySearch.tsx`, `useChatDiaryRoll.ts`, `dice/lib/rollFromDiary.ts`; reuse `pages/CharacterDetailPage/components/DiaryTab.tsx`, `tactical-map/components/tokens/BestieStatblock.tsx`, `tactical-map/utils/buildSpawnToken.ts`.
 
 ### Další funkce chatu (ověřeno v controlleru/service)
 - Zprávy: cursor paginace (`GET …/channels/:id/messages`), odeslání, editace, smazání (soft / PJ hard), emoji reakce (`PUT …/reactions/:emoji`).
@@ -153,3 +164,5 @@ DTO `create-world-news.dto.ts`: `title` (≤200), `content` (≤10000), `date` (
 4. **Dvě čtecí cesty settings pro chat:** persona/groupImages čte interní `getSettings` (plný objekt), zatímco REST GET filtruje nečleny. Při přidání citlivého settings pole je nutné aktualizovat `toPublicSettings` (riziko leaku přes REST), jinak chat (interní) funguje, ale REST nečlenovi unikne. Field-drift checklist.
 5. **`backfillCharacterChannels` + lazy seed běží při každém otevření chatu** (`getGroupsWithChannels` → `ensureWorldChat`). U světů s mnoha družinami/členy je to opakovaná práce na čtecí cestě — sledovat výkon (není to bug, ale potenciální zátěž).
 6. **Globální emoty + per-svět emoty mají oddělené limity a zdroje** (`mergeEmoteSets`); kolize shortcode mezi globálním a světovým emote — ověřit, který vyhrává v merge (priorita v `mergeEmoteSets`).
+7. **Deník v chatu táhne coupling chat → tactical-map** (16.1c): `BestieRollPanel` importuje `BestieStatblock` + `buildBestieToken` (+ tranzitivně schema-form) z `tactical-map`. Funkčně OK a PIXI se nepřitáhl (přímé importy → DiceBox3D zůstal lazy), ale statblok/schema primitiva by patřila do `shared/`. Kandidát na refactor v 16.2a; past: kdyby někdo přidal do importního grafu z mapy něco s PIXI, chat bundle nabobtná.
+8. **Per-systém pokrytí hodů v chatu je nerovné** (16.1d odloženo za 16.2): matrix/drd2/fate/pi mají iniciativu i dovednosti, 6 systémů jen iniciativu, shadowrun/jad nic. Shadowrun (dice pool) a CoC (d100 roll-under) se navíc **nevejdou do kontraktu `onRoll({label, modifier, kind})`** — pool/target sémantika chybí. Řeší 16.2a (per-systém pravidla + případné rozšíření kontraktu).

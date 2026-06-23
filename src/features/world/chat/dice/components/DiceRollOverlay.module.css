@@ -31,6 +31,9 @@
   border: 1px solid rgba(120, 100, 255, 0.25);
   border-radius: 14px;
   padding: 14px 24px;
+  /* 16.1a — strop šířky + wrap rovnice níž, ať delší popisek schopnosti
+     (+ přidaný operand součtu kostek) nepřeteče na úzkém mobilu. */
+  max-width: 92vw;
   pointer-events: none;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -93,6 +96,8 @@
 
 .equation {
   display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   gap: 8px;
   font-size: 1.05rem;
@@ -113,6 +118,14 @@
 .skillMod {
   color: rgba(167, 139, 250, 0.9);
   font-weight: bold;
+  font-family: 'Iceland', monospace;
+}
+
+/* 16.1a — součet kostek (hod) v rovnici; odlišný od `.skillMod` (schopnost),
+   ať jde poznat, co je hod a co velikost schopnosti. */
+.diceSum {
+  color: rgba(168, 213, 255, 0.85);
+  font-weight: 700;
   font-family: 'Iceland', monospace;
 }
 

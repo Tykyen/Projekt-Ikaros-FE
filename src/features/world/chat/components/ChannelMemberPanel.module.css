@@ -75,12 +75,28 @@
 }
 
 .member {
+  list-style: none;
+}
+
+/* Řádek člena — sdílí button (klikací → deník) i div (bez postavy). */
+.memberRow {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  width: 100%;
   padding: var(--sp-1) var(--sp-3);
+  font: inherit;
   font-size: var(--text-sm);
+  text-align: left;
   color: var(--theme-text, var(--text-primary));
+  border: none;
+  background: transparent;
+}
+button.memberRow {
+  cursor: pointer;
+}
+button.memberRow:hover {
+  background: rgb(var(--white-rgb) / 0.06);
 }
 
 .offline .name {

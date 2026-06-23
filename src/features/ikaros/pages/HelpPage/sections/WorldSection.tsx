@@ -498,11 +498,16 @@ export function WorldSection() {
         <Tool icon={<MessageSquare size={16} />} title="Chat světa" audience={{ kind: 'vse', label: 'Členové' }} accent="info">
           <p>
             Chat uvnitř světa — vlevo kanály a v nich konverzace, uprostřed zprávy,
-            vpravo (PJ) panel Přítomní. Kanál <strong>Postavy</strong> je soukromý:
-            přiřazená postava ti automaticky založí privátní konverzaci s vedením.
-            Pořadí kanálů, konverzací i připnutých si každý řadí sám přetažením
-            úchopky (⋮⋮); kanály jsou defaultně sbalené. Připnuté konverzace
-            (sekce nahoře) máš ve svém pořadí v každém světě zvlášť.
+            vpravo <strong>pravý panel</strong>: jako hráč v něm máš{' '}
+            <strong>svůj deník</strong> (otevřeš ikonou „Můj deník") a klikem na
+            schopnost ji <strong>hodíš rovnou do konverzace</strong> — i deník můžeš
+            upravit. Vedení tam má místo toho <strong>Přítomní</strong> + hledání NPC
+            a bestií, aby hodilo za hráče, NPC i bestii. Kanál{' '}
+            <strong>Postavy</strong> je soukromý: přiřazená postava ti automaticky
+            založí privátní konverzaci s vedením. Pořadí kanálů, konverzací i
+            připnutých si každý řadí sám přetažením úchopky (⋮⋮); kanály jsou
+            defaultně sbalené. Připnuté konverzace (sekce nahoře) máš ve svém pořadí
+            v každém světě zvlášť.
           </p>
           <ScreenshotSlot media="svet.chat" />
           <CalloutBox variant="tip">

@@ -65,34 +65,36 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
   const [webgl] = useState(isWebGLAvailable);
   const [phase, setPhase] = useState<Phase>('idle');
   // Jednou nasazený 3D host žije dál (lazy instance se nereinicializuje).
-  const [mount3d, setMount3d] = useState(false);
+  // Warmup: předmountuj engine hned při prvním renderu — lazy init místo
+  // efektu se setState (react-hooks/set-state-in-effect). Engine se tak nahřeje
+  // dřív, první reálný hod ho trefí připravený.
+  const [mount3d, setMount3d] = useState(() => Boolean(warmup) && webgl);
   const [use3dThisRoll, setUse3dThisRoll] = useState(false);
   // 6.3-fix8 — kdy REÁLNÝ 3D hod opravdu začal kutálet (0 = ještě ne). Od tohoto
   // okamžiku běží ROLL_CAP_MS; do té doby drží COLD_START_CAP_MS (warmup/ghost).
   const [realRollStartedAt, setRealRollStartedAt] = useState(0);
   const handleRollStart = useCallback(() => setRealRollStartedAt(Date.now()), []);
 
-  // Warmup: předmountuj engine při prvním renderu (active=false → jen init,
-  // žádný hod). První reálný hod pak trefí už nahřátý engine → zobrazí se napoprvé.
-  useEffect(() => {
-    if (warmup && webgl) setMount3d(true);
-  }, [warmup, webgl]);
-
   const notation = roll ? payloadToNotation(roll.payload) : null;
   const can3d = !!roll && webgl && notation !== null;
 
-  // Nový hod.
-  useEffect(() => {
-    if (!roll) {
+  // Nový hod / konec hodu — reaguje na změnu `roll.timestamp`. Adjust-during-
+  // render (ne efekt se setState) — React přerenderuje okamžitě, bez cascading
+  // efektu (react-hooks/set-state-in-effect). `trackedTs` drží poslední
+  // zpracovaný timestamp; gate zabrání smyčce.
+  const [trackedTs, setTrackedTs] = useState<number | null>(null);
+  const rollTs = roll?.timestamp ?? null;
+  if (rollTs !== trackedTs) {
+    setTrackedTs(rollTs);
+    if (rollTs === null) {
       setPhase('idle');
-      return;
+    } else {
+      if (can3d) setMount3d(true);
+      setUse3dThisRoll(can3d);
+      setRealRollStartedAt(0); // DiceBox3D ohlásí start reálného hodu přes onRollStart
+      setPhase('rolling');
     }
-    if (can3d) setMount3d(true);
-    setUse3dThisRoll(can3d);
-    setRealRollStartedAt(0); // DiceBox3D ohlásí start reálného hodu přes onRollStart
-    setPhase('rolling');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roll?.timestamp]);
+  }
 
   // Strop fáze 'rolling' → výsledek se ukáže VŽDY (je z payloadu), i kdyby 3D
   // onComplete nepřišel (hang/chyba). 3D normálně doběhne ~2–3 s; 6 s je jen
@@ -147,7 +149,7 @@ export function DiceRollOverlay({ roll, onDone, warmup }: DiceRollOverlayProps) 
 
 // ─── Readout (faces + total + jméno) ─────────────────────────────────────
 
-function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) {
+export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) {
   if (!show) return null;
 
   const total = roll.payload.total;
@@ -204,6 +206,16 @@ function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) {
                 )}
             </>
           )}
+          {/* 16.1a — součet kostek jako samostatný operand, ať je vidět co je
+              hod a co velikost schopnosti (`schopnost (mod) hod = total`).
+              Jen při modifieru ≠ 0 — bez něj `sum === total`, breakdown = šum. */}
+          {roll.payload.modifier !== undefined &&
+            roll.payload.modifier !== 0 && (
+              <span className={styles.diceSum}>
+                {roll.payload.sum > 0 ? '+' : ''}
+                {roll.payload.sum}
+              </span>
+            )}
           <span className={styles.eqSign}>=</span>
           <span className={`${styles.totalValue} ${totalColorClass}`}>
             {total > 0 ? `+${total}` : total === 0 ? '0' : total}

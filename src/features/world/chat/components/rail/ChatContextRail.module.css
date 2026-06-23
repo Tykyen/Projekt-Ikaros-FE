@@ -1,0 +1,22 @@
+.empty {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--sp-4) var(--sp-3);
+  border-left: 1px solid var(--theme-border-soft, var(--border));
+  background: var(--theme-surface, var(--bg-card));
+  color: var(--theme-text-muted, var(--text-muted));
+  font-size: var(--text-sm);
+}
+
+.emptyClose {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  display: inline-flex;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+}

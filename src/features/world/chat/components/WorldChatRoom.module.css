@@ -12,9 +12,10 @@
   background: var(--theme-surface, var(--bg-card));
 }
 
-/* 3-panel layout — jen když PJ má panel Přítomní otevřený. */
+/* 3-panel layout — když je rail otevřený (Přítomní / deník). Širší než
+   dřív (240→300), ať se do railu vejde deník postavy, ne jen roster. */
 .withMembers {
-  grid-template-columns: 272px 1fr 240px;
+  grid-template-columns: 272px 1fr 300px;
 }
 
 .sidebarSlot,
@@ -80,7 +81,8 @@
     top: 0;
     bottom: 0;
     right: 0;
-    width: min(260px, 78vw);
+    /* Širší šuplík (260→320), ať se do railu vejde i deník postavy. */
+    width: min(320px, 86vw);
     z-index: var(--z-dropdown, 50);
     transform: translateX(100%);
     transition: transform var(--transition-fast);

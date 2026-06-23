@@ -1,4 +1,4 @@
-import { UserRound, Crown } from 'lucide-react';
+import { UserRound, Crown, BookOpen } from 'lucide-react';
 import { TermGrid, CalloutBox } from '@/shared/ui/help';
 import type { HelpAudience } from '../toolboxItems';
 import s from '../WorldHelp.module.css';
@@ -32,6 +32,21 @@ export function ChatHelp({ audience }: { audience: HelpAudience }) {
         ]}
       />
 
+      {!isPJ && (
+        <>
+          <div className={s.sectionTitle}>
+            <BookOpen size={18} aria-hidden="true" /> Můj deník a hody
+          </div>
+          <TermGrid
+            items={[
+              { term: 'Můj deník (📖)', desc: 'Vpravo otevřeš svůj deník — ikona „Můj deník" v hlavičce konverzace.' },
+              { term: 'Hod schopnosti', desc: 'Klik na schopnost v deníku ji hodí rovnou do konverzace (kostky se rozletí).' },
+              { term: 'Úprava', desc: 'Deník upravíš přímo z chatu; změna se projeví i na listu postavy.' },
+            ]}
+          />
+        </>
+      )}
+
       {isPJ && (
         <>
           <div className={s.sectionTitle}>
@@ -42,7 +57,8 @@ export function ChatHelp({ audience }: { audience: HelpAudience }) {
               { term: 'Kanály a konverzace', desc: 'Zakládáš (+) a spravuješ je — barva, ikona, přístup, přesun.' },
               { term: 'NPC mód (🎭)', desc: 'Pošleš zprávu pod libovolným jménem a avatarem.' },
               { term: 'Moderace', desc: 'Můžeš smazat cizí zprávu.' },
-              { term: 'Přítomní (👥)', desc: 'Panel se členy online podle role.' },
+              { term: 'Přítomní (👥) + deníky', desc: 'Panel se členy online; klik na člena načte jeho deník — hodíš za něj (hod označen „PJ").' },
+              { term: 'Hledání NPC/bestie', desc: 'Pole nad Přítomnými najde NPC nebo bestii → otevře jejich deník/statblok a hodíš za ně.' },
             ]}
           />
           <CalloutBox variant="tip">

@@ -24,7 +24,7 @@ import { groupColorVar } from '../lib/groupColor';
 import type { ChannelUnread, ChatChannel, ChatGroup } from '../lib/types';
 import { ChannelSidebar } from './ChannelSidebar';
 import { ChannelView } from './ChannelView';
-import { ChannelMemberPanel } from './ChannelMemberPanel';
+import { ChatContextRail } from './rail/ChatContextRail';
 import { GroupDialog } from './GroupDialog';
 import { ChannelDialog } from './ChannelDialog';
 import { ChatSearchModal } from './ChatSearchModal';
@@ -78,9 +78,9 @@ export function WorldChatRoom() {
     setJumpToMessageId(jumpParam);
   }
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  // Default: zavřeno. PJ si panel otevře přes Users ikonu, badge ho upozorní
-  // na příchody. localStorage drží volbu per world.
-  const [membersOpen, setMembersOpen] = useState<boolean>(() => {
+  // Default: zavřeno. PJ si rail otevře přes ikonu (Přítomní), hráč přes
+  // ikonu „Můj deník". localStorage drží volbu per world (sdílený klíč).
+  const [railOpen, setRailOpen] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(membersKey) === '1';
   });
@@ -88,9 +88,9 @@ export function WorldChatRoom() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (membersOpen) localStorage.setItem(membersKey, '1');
+    if (railOpen) localStorage.setItem(membersKey, '1');
     else localStorage.removeItem(membersKey);
-  }, [membersOpen, membersKey]);
+  }, [railOpen, membersKey]);
   const [groupDialog, setGroupDialog] = useState<{
     mode: 'create' | 'edit';
     initial?: ChatGroup;
@@ -251,9 +251,9 @@ export function WorldChatRoom() {
     <div
       className={clsx(
         s.room,
-        isManager && membersOpen && s.withMembers,
+        active && railOpen && s.withMembers,
         sidebarOpen && s.sidebarOpen,
-        membersOpen && s.membersOpen,
+        railOpen && s.membersOpen,
       )}
     >
       <div className={s.sidebarSlot}>
@@ -292,10 +292,8 @@ export function WorldChatRoom() {
             currentUser={user}
             canManage={isManager}
             onOpenSidebar={() => setSidebarOpen(true)}
-            onToggleMembers={
-              isManager ? () => setMembersOpen((o) => !o) : undefined
-            }
-            membersOpen={membersOpen}
+            onToggleRail={() => setRailOpen((o) => !o)}
+            railOpen={railOpen}
             presenceCount={isManager ? presence.length : 0}
             onOpenSearch={() => setSearchOpen(true)}
             worldEmotes={emoteSet}
@@ -312,26 +310,29 @@ export function WorldChatRoom() {
         )}
       </div>
 
-      {isManager && active && (
+      {active && (
         <div className={s.membersSlot}>
-          <ChannelMemberPanel
+          <ChatContextRail
             worldId={worldId}
             channel={active}
+            activeChannelId={activeChannelId}
+            isManager={isManager}
+            currentUser={user}
             presence={presence}
-            onClose={() => setMembersOpen(false)}
+            onClose={() => setRailOpen(false)}
           />
         </div>
       )}
 
       {/* Mobil — zhasnutí overlaye klikem mimo. */}
-      {(sidebarOpen || membersOpen) && (
+      {(sidebarOpen || railOpen) && (
         <button
           type="button"
           className={s.scrim}
           aria-label="Zavřít"
           onClick={() => {
             setSidebarOpen(false);
-            setMembersOpen(false);
+            setRailOpen(false);
           }}
         />
       )}

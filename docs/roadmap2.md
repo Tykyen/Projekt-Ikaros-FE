@@ -351,6 +351,65 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 #### - [ ] 16.2a Pilíř DENÍK — všechny systémy
 Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s deníkem (prioritně CZ). Po dokončení má každý systém plnohodnotný list — zároveň základ pro 15B.4a landing. Vizuál listu se může lišit per systém. Progress = sloupec **Deník** v matici.
 
+**TODO list per systém — manuální grafický průchod** (kódem ověřený snímek 2026-06-22; registr [`diary-systems/registry.ts`](../src/features/world/pages/CharacterDetailPage/diary-systems/registry.ts), mapa [`TokenSystemSheet.tsx`](../src/features/world/tactical-map/components/token-panel/TokenSystemSheet.tsx)).
+**Nic není předtrženo schválně** — deníky existují funkčně, ale grafiku předěláváme u všech a na **dvou místech**: reálný list (CharacterDetailPage) i verze v taktické mapě. Každý systém projít ručně. *Stav kódu* je jen výchozí bod, ne hotovo.
+**3 položky per systém:** ▸ **Reálný list** (grafika + kontrola) ▸ **Taktická mapa** (grafika + napojení) ▸ **Chat** (hod za postavu z deníku, = blok **16.1**).
+
+- **Matrix / Ikaros** (`matrix`) — *stav kódu:* list sheet+testy, mapa combat panel `MatrixCombatPanel` (+ diary→token HP/armor sync)
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika)
+  - [ ] Chat (→ 16.1)
+- **Dračí Doupě 1.6** (`drd16`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika + zvážit vlastní combat panel)
+  - [ ] Chat (→ 16.1)
+- **Dračí Doupě Plus** (`drdplus`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika + zvážit vlastní combat panel)
+  - [ ] Chat (→ 16.1)
+- **Dračí Doupě II** (`drd2`) — *stav kódu:* list sheet+testy, mapa combat panel `Drd2CombatPanel`
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika)
+  - [ ] Chat (→ 16.1)
+- **Jeskyně a Draci** (`jad`) — *stav kódu:* list sheet+testy (+formulas); mapa fallback BEZ `onRoll`
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [ ] Chat (→ 16.1)
+- **Příběhy Impéria** (`pi`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [ ] Chat (→ 16.1)
+- **Dračí Hlídka** (`drdh`) — *stav kódu:* list sheet+testy (`onRoll`); mapa ⚠️ **id drift** `draci-hlidka`≠`drdh` → svět dostane `generic`, deník/panel se NENAPOJÍ (D-NEW-SYS-DIARY-DRIFT, **fix první**)
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika — **až po fixu driftu**)
+  - [ ] Chat (→ 16.1)
+- **D&D 5e** (`dnd5e`) — *stav kódu:* list sheet+testy (+formulas), mapa combat panel `DndCombatPanel`
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika)
+  - [ ] Chat (→ 16.1)
+- **Shadowrun** (`shadowrun`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [ ] Chat (→ 16.1)
+- **GURPS** (`gurps`) — *stav kódu:* list sheet+testy, mapa combat panel `GurpsCombatPanel`
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika)
+  - [ ] Chat (→ 16.1)
+- **Fate** (`fate`) — *stav kódu:* list sheet+testy, mapa combat panel `FateCombatPanel` (hody řeší panel; sheet sám bez `onRoll`)
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika)
+  - [ ] Chat (→ 16.1)
+- **Call of Cthulhu** (`coc`) — *stav kódu:* list sheet+testy, mapa combat panel `CocCombatPanel`
+  - [ ] Reálný list (grafika)
+  - [ ] Taktická mapa (grafika)
+  - [ ] Chat (→ 16.1)
+- **Vlastní / generic** (`vlastni` / `generic`) — engine, ne obsah; *stav kódu:* generic `DiaryBlockView` (PJ schéma), mapa `DiaryTab` fallback
+  - [ ] Reálný list (grafika nástrojů, ne dotahovat obsah)
+  - [ ] Taktická mapa (grafika)
+  - [ ] Chat (→ 16.1)
+
+**Pozn. k stavu kódu (výchozí bod, ne TODO):** funkčně má list+testy **12/12**; v mapě je combat panel u **6** (`matrix`, `drd2`, `dnd5e`, `gurps`, `fate`, `coc`), jen `onRoll` fallback u **2** (`drd16`, `drdplus`), bez klikacích hodů **3** (`jad`, `pi`, `shadowrun`), drift blokuje **1** (`drdh`); chat **0/12** (vše 16.1). Grafický průchod se dělá u všech bez ohledu na tento stav.
+
 #### - [ ] 16.2b Pilíř BESTIÁŘ — scope model + obsah
 Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna bestie = lore/text + mapa `systém → statblok`** — přidání systému znamená jen přidat sadu statů, ne novou bestii.
 

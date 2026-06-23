@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import clsx from 'clsx';
 import { UserAvatar } from '@/shared/ui';
@@ -16,15 +16,21 @@ interface ChannelMemberPanelProps {
   presence: ChannelPresenceUser[];
   /** Mobil i desktop — zavře panel; default je zavřeno. */
   onClose?: () => void;
+  /** 16.1a — klik na člena (s přiřazenou postavou) → otevři jeho deník v railu. */
+  onSelectMember?: (entry: RosterEntry) => void;
+  /** 16.1b — slot pod hlavičkou (search NPC) — vykreslí ho rail jen PJ. */
+  topSlot?: ReactNode;
 }
 
-interface RosterEntry {
+export interface RosterEntry {
   userId: string;
   username: string;
   avatarUrl?: string;
   worldRole: WorldRole;
   online: boolean;
   lastSeenAt?: string;
+  /** Slug/path přiřazené postavy — když chybí, řádek nelze otevřít do deníku. */
+  characterPath?: string;
 }
 
 /** Sekce panelu — grupování dle world role (krok 6.1d). */
@@ -62,6 +68,8 @@ export function ChannelMemberPanel({
   channel,
   presence,
   onClose,
+  onSelectMember,
+  topSlot,
 }: ChannelMemberPanelProps) {
   const members = useWorldMembers(worldId);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -81,6 +89,7 @@ export function ChannelMemberPanel({
         worldRole: m.role,
         online: onlineIds.has(m.userId),
         lastSeenAt: m.user!.lastSeenAt,
+        characterPath: m.characterPath,
       }));
   }, [members.data, channel, onlineIds]);
 
@@ -99,6 +108,8 @@ export function ChannelMemberPanel({
           </button>
         )}
       </div>
+
+      {topSlot}
 
       <div className={s.scroll}>
         {BUCKETS.map((bucket) => {
@@ -130,11 +141,11 @@ export function ChannelMemberPanel({
                 <ul className={s.list}>
                   {entries.map((e) => {
                     const seen = formatLastSeen(e.lastSeenAt, e.online);
-                    return (
-                      <li
-                        key={e.userId}
-                        className={clsx(s.member, !e.online && s.offline)}
-                      >
+                    const clickable = Boolean(
+                      onSelectMember && e.characterPath,
+                    );
+                    const inner = (
+                      <>
                         <span
                           className={clsx(s.seen, s[`seen_${seen.tier}`])}
                           title={
@@ -153,6 +164,34 @@ export function ChannelMemberPanel({
                           alt={e.username}
                         />
                         <span className={s.name}>{e.username}</span>
+                      </>
+                    );
+                    return (
+                      <li
+                        key={e.userId}
+                        className={clsx(s.member, !e.online && s.offline)}
+                      >
+                        {clickable ? (
+                          <button
+                            type="button"
+                            className={s.memberRow}
+                            onClick={() => onSelectMember!(e)}
+                            title="Otevřít deník postavy"
+                          >
+                            {inner}
+                          </button>
+                        ) : (
+                          <div
+                            className={s.memberRow}
+                            title={
+                              onSelectMember
+                                ? 'Bez přiřazené postavy'
+                                : undefined
+                            }
+                          >
+                            {inner}
+                          </div>
+                        )}
                       </li>
                     );
                   })}

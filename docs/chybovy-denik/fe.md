@@ -244,3 +244,24 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak:** kdyby návštěvnost po nasazení byla nereálně vysoká → zkontroluj, že prerender sidecar reálně posílá UA marker (redeploy proběhl) a že bot regex sedí s nginx mapou.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.1a deník v chatu: rail + hod za postavu (reuse DiaryTab) · 2026-06-23
+**Co nakonec zabralo:** Pravý panel chatu udělán kontextový (`ChatContextRail`): hráč = vlastní deník, PJ = Přítomní + klik na člena načte jeho deník (⟵ zpět). Deník v railu je **tenký wrapper kolem existujícího `DiaryTab`** (slug-driven, sám se plní přes `useCharacterDiary`, view/edit, save přes `customDataPatch`) — `DiaryTab` už propouští `onRoll` do sheetu (mapa to dělá taky). Hod z deníku jde do chatu přes **chat-local most** `rollFromDiary.ts` (zrcadlo `performSheetRoll`, ale bez importu z tactical-map) + hook `useChatDiaryRoll` (overlay.trigger → po doběhnutí `useSendMessage`). Atribuce: hráč/PJ bez override, NPC/bestie override (16.1b/c).
+**Proč to je správně (a ne kopie):** Jediný zdroj pravdy deníku (list/mapa/chat = stejný `DiaryTab` + subdok). **Rail je systémově agnostický** — `getDiaryPreset(system).SystemSheet`, takže deník v chatu jede pro všech 13 systémů zdarma; hody tam, kde sheet má `onRoll` (matrix referenční: iniciativa + schopnosti). 16.1d = doplnit `onRoll` u systémů co ho nemají + grafika rail-fit.
+**Dvě věci navíc:**
+1. **Readout overlaye** schovával součet kostek (`label (mod) = total`) → doplněn operand `sum` jen při modifieru ≠ 0 (`Ledový dotek (+4) −1 = +3`). Sdílené s mapou → opraveno i tam.
+2. **Pre-existující `react-hooks/set-state-in-effect` warningy v `DiceRollOverlay`** (háklivá komponenta, 6.3-fix1..8) opraveny beze změny chování: warmup → **lazy init** `useState(() => warmup && webgl)`; reset na nový hod → **adjust-during-render** (`if (rollTs !== trackedTs) {...}`) místo efektu se setState. React-blessed vzory, bez cascading renderu.
+**Jak ověřeno:** 15 nových testů (rollFromDiary 5 / readout 3 / hook 4 / rail 3) + 103 chat testů zelených, eslint 0 (vč. opravených warningů), `npm run build` ✓. `mobil-desktop` CSS audit: rail 240→300px, mobilní šuplík 320px, readout flex-wrap+max-width.
+**Zhodnocení:** dobře — spec→souhlas→plán→souhlas→kód, hladký zátah bez cyklení, nula BE práce (čtecí endpoint deníku už existuje, mapa ho používá). Reuse `DiaryTab` ušetřil ~13 per-system implementací. **Pozor do příště:** DiaryTab je těžký (266 kB chunk) — teď se táhne i do chat bundlu; kdyby vadilo, lazy-load `DiaryRollPanel`. **Čeká živý smoke (matrix svět) + funkce/napoveda + deploy.**
+**Příznak:** kdyby hod z deníku v chatu „zmizel" (overlay bez zprávy) → ověř `doSend` callback v `overlay.trigger` (send až po doběhnutí) a že `DiceRollOverlayProvider` obaluje WorldChatPage.
+
+---
+
+### ✅ ŘEŠENÍ — 16.1b/c hledání NPC+bestie v railu + statblok bestie z katalogu · 2026-06-23
+**Co zabralo:** Jedno pole hledání v presence railu (PJ): NPC (persona adresář) + bestie (`useBestiar`) → výběr načte deník NPC (atribuce `npc`) nebo **statblok bestie** (atribuce `bestie`). Bestie panel = reuse `BestieStatblock` (canEdit=false → read-only `EntityStatbar` + ability roll chipy) plněný z katalogové bestie přes `buildBestieToken(bestie,0,0)` (reálný `MapToken`, žádný type-lie), hod přes `useChatDiaryRoll` (větev `bestie` hotová z 16.1a).
+**Proč správně:** Statblok bestie fakticky bydlí v `tactical-map` → reuse `BestieStatblock`+`buildBestieToken` místo kopie. Coupling chat→tactical-map vědomě přijat; **přímé importy (ne barrel) → DiceBox3D (PIXI 616 kB) zůstal samostatný lazy chunk, WorldChatPage jen 105 kB** (+4). Jedno pole = uživatelův záměr (16.1b `NpcDiarySearch` nahrazeno `RailEntitySearch`; `PersonaAutocomplete.placement` vrácen — konzument zmizel, nenechávat dead API).
+**Jak ověřeno:** chat 109 testů (rail 13), `npm run build` ✓ (chunk check: chat bez PIXI), eslint 0.
+**Zhodnocení:** dobře — bestie větev nezávislá na NPC/PC, hladké. **Pozor:** chat teď závisí na `tactical-map/components/tokens/BestieStatblock` + `utils/buildSpawnToken` (+tranzitivně schema-form); přesun primitiv do `shared/` = kandidát na dluh (16.1d).
+**Příznak:** kdyby chat bundle náhle nabobtnal o stovky kB → někdo přidal do importního grafu z tactical-map něco s PIXI; z mapy importuj jen DOM/schema moduly přímo.
+
+---
