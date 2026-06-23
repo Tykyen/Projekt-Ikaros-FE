@@ -285,3 +285,13 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak:** kdyby nově přidaný systém v nabídce ukázal generic deník/mapu → chybí alias nebo přímý klíč v registry; parity test to teď shodí v CI dřív.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.2a Matrix deník: grafický redesign „operátorský HUD" (vzor pro systémy) · 2026-06-23
+**Co zabralo:** Přepis MatrixSheet z generického tmavého formuláře na cyberpunk HUD dle **odsouhlaseného standalone HTML prototypu** (`c:\tmp\matrix-denik-audit.html`). Postup: dlouhý iterativní brainstorming s uživatelem nad prototypem (ladění po kouskách: hero layout, vitals tracky, pips, magie, výpočty, validace) → spec-16.2a → kód. 3 soubory: `constants.ts` (stupnice 1–10 Talent..Entita + magie helpery), `styles/matrix.css` (kompletní HUD přepis, scoped), `MatrixSheet.tsx` (view/edit split + print). Nová pole `matrix_profession` (Povolání), validace (přečerpání bodů + schopnost≤aspekty), magie 📘 auto-match názvu (`MATRIX_MAGIC` list = magie v pravidlech) → `<Link>` na stránku magie.
+**Proč to je správně:** (1) **Prototyp jako kontrakt** — vizuál i chování odsouhlaseny PŘED produkčním kódem, nula překvapení, žádné cyklení „uprav vzhled X" (kontrast s CH-015/CH-020). (2) **Reuse `makeCdAccess`** — datový přístup beze změny, BE netknuté (vše přes volný `customData`). (3) **Výpočty zachovány** (trojúhelník + aspekty ×6) — žádná regrese mechaniky. (4) **`data-mode` na `.matrix-sheet`** (ne na provider wrapperu) → edit-only CSS přes `.matrix-sheet[data-mode='edit']`.
+**Past chycená:** `MatrixSheet` nově používá `<Link>` (magie) → **testy musí běžet v `MemoryRouter`**, jinak crash „useHref outside Router". `React.CSSProperties` bez importu Reactu → `import type { CSSProperties }`. Custom CSS prop `--lvlc` přes `style` cast `as CSSProperties`.
+**Jak ověřeno:** tsc -b čistý · MatrixSheet 21/21 (přepsané na novou strukturu) · CharacterDetailPage 228/228 · `npm run build` ✓ · eslint 0.
+**Zhodnocení:** dobře — spec→souhlas→kód, hladký zátah; prototyp ušetřil cyklení. **Vědomě zjednodušeno (follow-up):** H1 portrét = iniciály (sheet má jen slug, donačtení obrázku zvlášť) · H2 pips NPC clamp natvrdo PC=7 (sheet nezná `isNpc`). **Matrix = vzor;** sdílené prvky (Pips/VitalTrack) zatím inline v matrix/ — refactor do `_shared/` až u 2. systému (až bude jasné, co je společné). Čeká živý vizuální smoke + funkce/napoveda/roadmap po potvrzení.
+**Příznak:** kdyby deník v testu/appce crashnul na „useHref" → chybí Router wrapper kolem sheetu (magie Link).
+
+---

@@ -12,11 +12,13 @@
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { usePrintMode } from '@/features/world/export/print';
+import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
   MATRIX_PRESSURE_TYPES,
   MATRIX_SKILL_MAX_PC,
+  MATRIX_SKILL_MAX_NPC,
   matrixLevelName,
   isMatrixMagic,
   matrixMagicSlug,
@@ -28,11 +30,18 @@ type OnRoll = NonNullable<SystemSheetProps['onRoll']>;
 export function MatrixSheet({
   diary,
   mode,
+  worldId,
   worldSlug,
+  characterSlug,
   onChange,
   onRoll,
 }: SystemSheetProps) {
   const printMode = usePrintMode();
+  // H1 portrét + H2 NPC detekce — adresář postav (Page) nese imageUrl i type.
+  const { data: directory } = usePersonaDirectory(worldId);
+  const entry = directory?.find((e) => e.slug === characterSlug);
+  const portraitUrl = entry?.imageUrl;
+  const isNpc = entry?.type === 'NPC';
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'matrix_', onChange);
 
@@ -42,12 +51,12 @@ export function MatrixSheet({
 
   return (
     <div className="matrix-sheet" data-mode={mode}>
-      <Hero cda={cda} editing={editing} onRoll={onRoll} />
+      <Hero cda={cda} editing={editing} onRoll={onRoll} portraitUrl={portraitUrl} />
       <LanguagesPanel cda={cda} editing={editing} />
       <VitalsPanel cda={cda} editing={editing} />
       <BudgetPanel cda={cda} editing={editing} />
       <PressurePanel cda={cda} editing={editing} />
-      <SkillsPanel cda={cda} editing={editing} worldSlug={worldSlug} onRoll={onRoll} />
+      <SkillsPanel cda={cda} editing={editing} worldSlug={worldSlug} isNpc={isNpc} onRoll={onRoll} />
       <AspectsPanel cda={cda} editing={editing} />
       <NotesPanel cda={cda} editing={editing} />
     </div>
@@ -161,7 +170,8 @@ function Hero({
   cda,
   editing,
   onRoll,
-}: SubProps & { onRoll?: OnRoll }) {
+  portraitUrl,
+}: SubProps & { onRoll?: OnRoll; portraitUrl?: string }) {
   const { g, set } = cda;
   const name = g('name');
   const initials =
@@ -177,7 +187,7 @@ function Hero({
   return (
     <header className="mx-hero">
       <div className="mx-portrait">
-        <span>{initials}</span>
+        {portraitUrl ? <img src={portraitUrl} alt={name || 'Portrét postavy'} /> : <span>{initials}</span>}
       </div>
       <div className="mx-id">
         <h1 className="mx-name">{name || 'Bez jména'}</h1>
@@ -513,11 +523,14 @@ function SkillsPanel({
   cda,
   editing,
   worldSlug,
+  isNpc,
   onRoll,
-}: SubProps & { worldSlug: string; onRoll?: OnRoll }) {
+}: SubProps & { worldSlug: string; isNpc: boolean; onRoll?: OnRoll }) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
   const skills = parseJsonArr<MatrixTagValue>('abilities');
   const aspectCount = parseJsonArr<MatrixTagValue>('aspects').length;
+  // H2 — hráč: lidský strop 7; NPC/Bestie: extrém 10 (entity).
+  const skillMax = isNpc ? MATRIX_SKILL_MAX_NPC : MATRIX_SKILL_MAX_PC;
 
   return (
     <section className="mx-panel">
@@ -525,7 +538,7 @@ function SkillsPanel({
       <div className="mx-list">
         {skills.map((s, i) => {
           const lvl = parseInt(s.value, 10) || 0;
-          const total = Math.max(MATRIX_SKILL_MAX_PC, lvl);
+          const total = Math.max(skillMax, lvl);
           const lvlc = `var(--lvl-${Math.min(Math.max(lvl, 1), 10)})`;
           const tooHigh = lvl > aspectCount;
           const magic = isMatrixMagic(s.label);
@@ -550,7 +563,7 @@ function SkillsPanel({
                   <Pips lvl={lvl} total={total} editable onPick={(n) => updateArr<MatrixTagValue>('abilities', i, { value: String(n) })} />
                   <span className="mx-skill__lvl" data-tip={tip}>
                     {lvl}
-                    <small>/{MATRIX_SKILL_MAX_PC}</small>
+                    <small>/{skillMax}</small>
                   </span>
                   <span className="mx-del" onClick={() => removeArr('abilities', i)} role="button" aria-label="Smazat schopnost">
                     ✕
@@ -577,7 +590,7 @@ function SkillsPanel({
                   <Pips lvl={lvl} total={total} />
                   <span className="mx-skill__lvl" data-tip={tip}>
                     {lvl}
-                    <small>/{MATRIX_SKILL_MAX_PC}</small>
+                    <small>/{skillMax}</small>
                   </span>
                 </>
               )}

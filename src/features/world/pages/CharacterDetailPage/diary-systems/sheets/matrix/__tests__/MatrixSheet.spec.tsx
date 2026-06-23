@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MatrixSheet } from '../MatrixSheet';
 import type { CharacterDiary } from '../../../../../api/characters.types';
 
@@ -14,9 +15,18 @@ const commonProps = {
   characterSlug: 'katerina',
 } as const;
 
-/** Sheet používá <Link> (magie 📘) → render v Router contextu. */
+/**
+ * Sheet používá <Link> (magie 📘) a useCharacter (portrét) → render v
+ * Router + QueryClient contextu. Portrét query selže (žádný server) →
+ * fallback iniciály, testy se na ni nespoléhají.
+ */
 function renderSheet(ui: React.ReactElement) {
-  return render(<MemoryRouter>{ui}</MemoryRouter>);
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={qc}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </QueryClientProvider>,
+  );
 }
 
 describe('MatrixSheet (16.2a HUD)', () => {

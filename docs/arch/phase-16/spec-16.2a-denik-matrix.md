@@ -1,6 +1,6 @@
 # Spec 16.2a — Deník: grafický redesign (vzor Matrix / Ikaros)
 
-**Status:** 📝 Návrh k odsouhlasení — 2026-06-23. Prototyp odsouhlasen (vizuál i chování): `c:\tmp\matrix-denik-audit.html`.
+**Status:** 🔨 **Implementováno 2026-06-23** (MatrixSheet/constants/matrix.css; tsc+build+228 testů zelené, eslint 0). Čeká **živý vizuální smoke** + dotažení H1 (portrét z postavy) / H2 (NPC clamp). Pak funkce/napoveda/roadmap zaškrtnout. Prototyp: `c:\tmp\matrix-denik-audit.html`.
 **Rozsah:** FE only. Přepis vizuálu MatrixSheet + nová pole/validace; BE bez změn (vše jede přes volný `diary.customData`).
 **Repo:** `Projekt-ikaros-FE`, commit na `main` (žádná feature větev).
 **Autor:** PJ + Claude
