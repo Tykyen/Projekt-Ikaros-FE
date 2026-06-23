@@ -8,12 +8,17 @@
 
 ## Otevřené
 
-### D-NEW-SYS-DIARY-DRIFT — Dračí Hlídka: nesladěné id mezi nabídkou systémů a deníkem
-**Soubor:** `src/features/ikaros/pages/CreateWorldPage/constants/systems.ts` (RPG_SYSTEMS) ↔ `src/features/world/pages/CharacterDetailPage/diary-systems/registry.ts` + `presets/drdh.ts`
-**Problém:** **Jeden systém (Dračí Hlídka) má dvě různá id.** Nabídka při vytvoření světa ho ukládá jako `world.system = 'draci-hlidka'`, ale jeho deník je registrovaný pod klíčem **`drdh`** (`drdh.ts`: `id: 'drdh'`, `name: 'Dračí Hlídka'`; `types.ts` whitelist zná jen `drdh`). Diary registry nezná `draci-hlidka` → **svět vytvořený jako Dračí Hlídka svůj deník nenajde a dostane prázdné/generic schema.** (Žádný samostatný „Dračí Doupě Hero" neexistuje — `drdh` JE Dračí Hlídka.)
-**Dopad:** Střední — funkční bug: existující/nové světy „Dračí Hlídka" nemají svůj deníkový list. Blokuje dotažení systému (roadmap2 16.2h).
-**Řešení:** Sjednotit na **jedno** id napříč vrstvami (nabídka systems.ts · FE diary registry/types/preset · BE `system-presets` + export-schemas). Doporučeno sladit deník na `draci-hlidka` (id z nabídky, které se ukládá do `world.system`) — nebo přidat alias `draci-hlidka → drdh` v registry. Ověřit migraci případných existujících světů.
-**Kdy:** Před rozjezdem fáze 16.2 (hloubková podpora systémů). Zaznamenáno i v `docs/roadmap2.md` (16.2 drift blok + otevřená otázka #10).
+### D-NEW-SYS-PRESET-SEED-DRIFT — BE diarySchema seed nemá preset pro 5 systémů
+> **FE část vyřešena 2026-06-23 (16.2a, ✅ ŘEŠENÍ fe.md).** Původní `D-NEW-SYS-DIARY-DRIFT` (Dračí Hlídka) byl jen špička: FE sheet/plugin lookup spadl na generic u **tří** systémů (`draci-hlidka`/`drd-plus`/`call-of-cthulhu`). Opraveno aliasy v obou FE registry + parity guard test. **Zbývá níže popsaná druhá, nezávislá porucha na BE.**
+
+**Soubor:** `backend/src/modules/system-presets/presets/index.ts` + `system-presets.service.ts` (`findOne`, striktní `p.system === system`) ↔ `world.system` z `RPG_SYSTEMS`.
+**Problém:** Při vytvoření/změně systému světa BE seeduje `diarySchema` přes `SystemPresetsService.findOne(world.system)`. BE presety mají **vlastní, jinou sadu id** (`matrix-custom`, `drd-hero`, `drd16-warrior/wizard/thief/ranger/alchemy`, `call-of-cthulhu`…). Pro uložené `world.system` **`matrix`, `drd16`, `drd2`, `drd-plus`, `draci-hlidka`** BE žádný preset nenajde (`drd2` a `drd-plus` chybí úplně) → **seedne prázdné `diarySchema`**.
+**Dopad:** Nízký–střední — maskováno tím, že per-system schémata jsou canonical na FE (`project_schema_be_fe_sync`) a BE jede soft-mode; reálná data deníku jedou přes FE sheet (ten už funguje). Ale BE seed je mrtvý/nekonzistentní pro tyto systémy a `system-presets` granularita (`drd16` rozpadlý na 5 povolání, `drd-hero` ≠ `drdh`) neodpovídá FE modelu.
+**Řešení (k rozhodnutí):** buď přidat alias/normalizaci i do BE `findOne` (zrcadlo FE), nebo BE `system-presets` přemapovat na FE-canonical id, nebo BE seed úplně opřít o export-schemas z FE a `system-presets` retírovat. **Po BE změně restart** (`feedback_be_restart_required`).
+**Kdy:** Při dotahování BE strany 16.2 (ne blokuje FE grafický průchod 16.2a).
+
+#### Mikro-dluh: alias mapa duplikovaná ve 2 FE registry
+`SYSTEM_ALIASES` je samostatná kopie v `diary-systems/registry.ts` i `map-systems/registry.ts` (komentář tvrdí „jediná zdrojová pravda", fakticky 2 kopie → riziko driftu při příštím přidání systému). Extrahovat do sdíleného modulu (blokuje společný `SystemId` typ — dnes 2 nezávislé). Nízká priorita.
 
 ---
 

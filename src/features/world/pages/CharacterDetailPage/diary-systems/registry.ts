@@ -50,6 +50,11 @@ const SYSTEM_ALIASES: Record<string, SystemId> = {
   pribehy: 'pi',
   pribehy_imperia: 'pi',
   'pribehy-imperia': 'pi',
+  // 16.2a — nabídka (RPG_SYSTEMS) ukládá do `world.system` „dlouhá" id,
+  // engine je zná krátce. Bez těchto aliasů svět spadne na generic sheet.
+  'draci-hlidka': 'drdh',
+  'drd-plus': 'drdplus',
+  'call-of-cthulhu': 'coc',
 };
 
 /**

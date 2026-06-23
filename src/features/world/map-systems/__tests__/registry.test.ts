@@ -5,6 +5,10 @@
  */
 import { describe, it, expect } from "vitest";
 import { getMapSystemPlugin, listMapSystems } from "../registry";
+import {
+  RPG_SYSTEMS,
+  SYSTEM_CUSTOM_ID,
+} from "../../../ikaros/pages/CreateWorldPage/constants/systems";
 
 describe("getMapSystemPlugin", () => {
   it("resolvuje canonical system ID", () => {
@@ -18,6 +22,12 @@ describe("getMapSystemPlugin", () => {
     expect(getMapSystemPlugin("pribehy_imperia").id).toBe("pi");
     expect(getMapSystemPlugin("pribehy-imperia").id).toBe("pi");
     expect(getMapSystemPlugin("pribehy").id).toBe("pi");
+  });
+
+  it('16.2a — aliasy dlouhych id z nabidky', () => {
+    expect(getMapSystemPlugin("draci-hlidka").id).toBe("drdh");
+    expect(getMapSystemPlugin("drd-plus").id).toBe("drdplus");
+    expect(getMapSystemPlugin("call-of-cthulhu").id).toBe("coc");
   });
 
   it("case-insensitive", () => {
@@ -64,6 +74,18 @@ describe("listMapSystems", () => {
     expect(list).toContain("matrix");
     expect(list).toContain("generic");
   });
+});
+
+describe("parita s nabídkou RPG_SYSTEMS", () => {
+  // 16.2a guard — každý systém, který jde vybrat při tvorbě světa, musí mít
+  // v map registry plugin (přímo nebo aliasem). `vlastni` = generic záměrně.
+  // Tenhle test chytí jakýkoli budoucí id-drift mezi nabídkou a engine.
+  for (const sys of RPG_SYSTEMS) {
+    if (sys.id === SYSTEM_CUSTOM_ID) continue;
+    it(`„${sys.label}" (${sys.id}) → dedikovaný plugin, ne generic`, () => {
+      expect(getMapSystemPlugin(sys.id).id).not.toBe("generic");
+    });
+  }
 });
 
 describe("rollCategories", () => {

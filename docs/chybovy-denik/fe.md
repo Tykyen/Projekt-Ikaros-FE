@@ -274,3 +274,14 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak cyklení:** uživatel opakuje „má to vypadat jako u mapy" + posílá screenshoty; já ladím obal (portrét/šířku) místo vnitřního sheetu.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.2a fix system-id driftu: nabídka ↔ diary/map engine (alias-most) · 2026-06-23
+**Diagnóza (širší než dluh tvrdil):** `world.system` se ukládá **raw** z nabídky `RPG_SYSTEMS` (FE `system: finalSystem`, BE `resolvedSystem = dto.system` — žádná normalizace nikde) a pak ho **tři nezávislé vrstvy** hledají, každá s jinou sadou id. Dluh D-NEW-SYS-DIARY-DRIFT evidoval jen Dračí Hlídku; reálně spadnou na `generic` sheet **tři** systémy: `draci-hlidka`→engine zná `drdh`, `drd-plus`→`drdplus`, `call-of-cthulhu`→`coc`. Druhá, nezávislá porucha: **BE diarySchema seed** (`SystemPresetsService.findOne`, striktní `===`) nemá preset pro `matrix`/`drd16`/`drd2`/`drd-plus`/`draci-hlidka` → prázdné schema (sekundární, FE schémata jsou canonical, BE soft-mode — neřešeno teď, viz zúžený dluh).
+**Co zabralo:** Přidat 3 aliasy `draci-hlidka→drdh`, `drd-plus→drdplus`, `call-of-cthulhu→coc` do `SYSTEM_ALIASES` v **obou** FE registry (`diary-systems/registry.ts` + `map-systems/registry.ts`). Sheet/plugin lookup oba normalizují přes alias před lookupem (precedent `dnd→dnd5e`, `pribehy→pi`).
+**Proč alias, ne kanonizace nabídky:** Přepis nabídky z `call-of-cthulhu` na `coc` by **rozbil BE seed** (BE zná `call-of-cthulhu`) — jen přehození poruchy z FE na BE. Alias řeší FE lookup a **nesahá na nic dalšího**: staré i nové světy fungují, **nula migrace DB, nula BE restartu**. Přesně k tomu alias mechanismus v kódu je.
+**Pojistka proti regresi:** parity guard — pro každý `RPG_SYSTEMS` (kromě `vlastni`) test ověří, že `getDiaryPreset(id)` i `getMapSystemPlugin(id)` vrátí dedikovaný sheet/plugin, ne `generic`. Nový `diary-systems/__tests__/registry.test.ts` (dosud žádný) + rozšířený map test. Chytí **jakýkoli** budoucí drift nabídka↔engine automaticky.
+**Jak ověřeno:** `tsc -b` čistý, 45 testů zelených (oba registry). Live smoke (vytvořit svět „Dračí Hlídka"/CoC/DrD+ a ověřit, že deník/mapa ukáže svůj sheet) čeká.
+**Zhodnocení:** dobře — verifikace driftu čtením tří vrstev odhalila, že roadmapa/dluh podhodnocovaly rozsah (1 systém → 3 FE + 5 BE); minimální bezpečný zásah (6 řádků) místo migrace; parity guard zabrání opakování. **Pozn.:** alias mapa je duplikovaná ve 2 registry (komentář tvrdí „jediná zdrojová pravda", fakticky 2 kopie) → mikro-dluh na extrakci.
+**Příznak:** kdyby nově přidaný systém v nabídce ukázal generic deník/mapu → chybí alias nebo přímý klíč v registry; parity test to teď shodí v CI dřív.
+
+---

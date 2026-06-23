@@ -51,6 +51,11 @@ const SYSTEM_ALIASES: Record<string, SystemId> = {
   pribehy: 'pi',
   pribehy_imperia: 'pi',
   'pribehy-imperia': 'pi',
+  // 16.2a — viz diary-systems/registry.ts: nabídka ukládá „dlouhá" id
+  // (draci-hlidka/drd-plus/call-of-cthulhu), engine zná krátká.
+  'draci-hlidka': 'drdh',
+  'drd-plus': 'drdplus',
+  'call-of-cthulhu': 'coc',
 };
 
 /**
