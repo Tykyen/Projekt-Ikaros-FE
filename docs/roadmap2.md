@@ -357,7 +357,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
 
 - **Matrix / Ikaros** (`matrix`) — *stav kódu:* list sheet+testy, mapa combat panel `MatrixCombatPanel` (+ diary→token HP/armor sync)
   - [x] **Reálný list (grafika)** — ✅ 2026-06-23 HUD redesign (spec-16.2a; hero/vitals tracky/pips 1–10/budget/přetlaky/validace; PC 7/NPC 10; magie 📘 auto-match→odkaz). **Vzor pro ostatní systémy.**
-  - [ ] Taktická mapa (grafika)
+  - [x] **Taktická mapa (grafika)** — ✅ 2026-06-23 `MatrixCombatPanel` HUD redesign (PC/NPC; Životy/Únava tracky+postih, schopnosti pips+klik=hod, Ochrana/Runa, přetlaky, aspekty, iniciativa; logika zachována). Bestie = samostatná položka níže.
   - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)

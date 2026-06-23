@@ -35,7 +35,7 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 | Emoty světa | `emotes` | PomocnyPJ | — | `WorldEmotesAdminPage` |
 | Kalendáře | `kalendare` | PomocnyPJ | — | `CalendarConfigsPage` |
 | Šablona deníku | `sablona-deniku` | PJ | `vlastni` (custom) | `WorldDiarySchemaEditorPage` |
-| Vzhled | `vzhled` | Korektor | — | `ThemeTab` |
+| Vzhled | `vzhled` | PomocnyPJ | — | `ThemeTab` |
 | Můj vzhled | `muj-vzhled` | Ctenar | — | `MyThemeTab` |
 | Členství | `clenstvi` | Ctenar | — | `MembershipTab` |
 | Smazat svět | `smazat` | PJ | — | `DeleteWorldTab` |
@@ -126,25 +126,27 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 - **Kód:** FE `pages/CalendarConfigsPage`.
 
 ### Tab Vzhled (téma/skin světa) — sdílený motiv
-- **Co to je:** výběr preset motivu světa + editor vlastních barev (overrides) + vlastní pozadí. Sdílený vzhled — vidí ho všichni členové.
+- **Co to je:** výběr preset motivu světa + editor vlastních barev (overrides) + vlastní pozadí. Sdílený vzhled = **výchozí** pro všechny členy (každý si ho lokálně přebije v „Můj vzhled").
 - **Co jde dělat:**
   - Vybrat preset (`ThemePresetGrid`), default `modre-nebe`.
   - Doladit barvy (`ThemeCustomEditor` → `themeOverrides`).
   - Nahrát vlastní pozadí (`themeBackgroundUrl`); `null` = explicit clear ($unset na BE).
   - „Zpět na preset" = vyčistí overrides i pozadí.
 - **Živý náhled:** publikuje volbu do `worldThemePreviewAtom`; `WorldLayout` ho aplikuje na celý svět během editace; opuštění tabu náhled vyčistí (cleanup efektu).
-- **Kdo (FE):** Korektor+. **Kdo (BE):** ukládá přes `PATCH /worlds/:id` (`themeId`, `themeOverrides`, `themeBackgroundUrl`) → `canEditWorldData` = **Korektor+**. BE sanitizuje overrides (`sanitizeThemeOverrides`: jen `--theme-*` klíče, max 60), úklid starých blobů pozadí (UM-03, `worlds.service.ts:466-513`).
-- **Hranice:** skin (preset) a barvy mění Korektor; písmo se tu nenastavuje. `null` pozadí = clear.
+- **Kdo (FE):** **PomocnyPJ+** (dřív Korektor — viz bug níže). **Kdo (BE):** ukládá přes `PATCH /worlds/:id` (`themeId`, `themeOverrides`, `themeBackgroundUrl`); cílený guard JEN na theme pole → `canManageMembers` = **PomocnyPJ+** (`worlds.service.ts` v `update()`), zbytek polí (jméno/popis) zůstává Korektor+ přes `canEditWorldData`. BE sanitizuje overrides (`sanitizeThemeOverrides`: jen `--theme-*` klíče, max 60), úklid starých blobů pozadí (UM-03).
+- **Hranice:** sdílený skin/barvy/pozadí mění jen vedení (PomocnyPJ+); písmo se tu nenastavuje. `null` pozadí = clear.
 - **Stav:** ✅
-- **Kód:** FE `tabs/ThemeTab.tsx`, `components/ThemePresetGrid.tsx`, `components/ThemeCustomEditor.tsx`; BE `worlds.service.ts:424`.
+- **Kód:** FE `tabs/ThemeTab.tsx`, `WorldSettingsPage.tsx` (tab gate), `components/ThemePresetGrid.tsx`, `components/ThemeCustomEditor.tsx`; BE `worlds.service.ts` (`update` theme guard).
 
-### Tab Můj vzhled (per-uživatel doladění)
-- **Co to je:** osobní úpravy vzhledu světa **jen pro mě** (přístupnost, 5.9) — jas, kontrast, vlastní barvy nad sdíleným skinem PJ.
-- **Co jde dělat:** posuvníky jas (0.7–1.3) a kontrast (0.7–1.3), vlastní barvy (`themeUserOverrides`), reset na vzhled PJ. Ukládá `PUT /worlds/:wid/members/me/theme`.
-- **Kdo (FE):** Ctenar+ (každý člen). **Kdo (BE):** `updateMyTheme` — vyžaduje jen **membership** (jakákoli role), self-scoped (`me` z JWT, `worlds.service.ts:1455-1483`).
-- **Hranice:** skin a písmo určuje PJ a člen je nemění — jen jas/kontrast/barvy. Jas+kontrast se aplikují jako CSS `filter` na obsahovou vrstvu (`WorldLayout.tsx:376-383`).
+### Tab Můj vzhled (per-uživatel — vlastní motiv, pozadí, barvy, a11y)
+- **Co to je:** osobní vzhled světa **jen pro mě** (5.9 + 5.9b). 5.9 = jas/kontrast/barvy nad sdíleným skinem; **5.9b nově = vlastní motiv (skin) a vlastní pozadí**. Vše na membershipu, nepropisuje se do World ani jiným členům.
+- **Co jde dělat:** vybrat vlastní **motiv** (`ThemePresetGrid` → `themeId`), nahrát vlastní **pozadí** (`themeBackgroundUrl`), vlastní barvy (`themeUserOverrides`), posuvníky jas/kontrast (0.7–1.3), „Zpět na vzhled PJ" (clear všeho). Ukládá `PUT /worlds/:wid/members/me/theme`.
+- **„Follow PJ":** vlastní `themeId` se ukládá jen když se LIŠÍ od `world.themeId` (jinak `null`) → člen není zaseknutý na starém motivu, když PJ změní sdílený. Pozadí funguje i samostatně nad sdíleným motivem.
+- **Vrstvení:** vlastní motiv člena = samostatná vrstva (PJ overrides/pozadí laděné pro skin světa se na cizí skin nevztáhnou); bez vlastního motivu jen vrší úpravy nad sdíleným. Viz `WorldLayout.tsx`.
+- **Kdo (FE):** Ctenar+ (každý člen). **Kdo (BE):** `updateMyTheme` — vyžaduje jen **membership** (jakákoli role), self-scoped (`me` z JWT). `''`/`null` z FE = clear (`$set: null`); `undefined` Mongoose stripne (backward-compat).
+- **Hranice:** font člen stále nemění (out of scope 5.9b). Jas+kontrast jako CSS `filter` na obsahové vrstvě.
 - **Stav:** ✅
-- **Kód:** FE `tabs/MyThemeTab.tsx`; BE `worlds.controller.ts:480-491`.
+- **Kód:** FE `tabs/MyThemeTab.tsx`, `WorldLayout.tsx` (resolver), `shared/types` (`WorldMembership.themeId/themeBackgroundUrl`); BE `worlds.controller.ts` (`me/theme`), `worlds.service.ts` (`updateMyTheme`), `world-membership.schema.ts` + `.repository.ts` (`toEntity`), `dto/update-member.dto.ts`.
 
 ### Tab Členství (odejít / předat svět)
 - **Co to je:** ukončení vlastního členství + (pro vlastníka) předání světa.
@@ -210,12 +212,12 @@ FE `WorldSettingsPage/tabs/ExportTab.tsx`; BE `modules/world-export/{world-expor
 - **Jak (ověřeno):**
   - `resolveWorldTheme(world)` dá `themeId/overrides/backgroundUrl` (`WorldLayout.tsx:366`).
   - **Náhled má přednost:** `worldThemePreviewAtom` (z editoru) > `World` data (`:367-373`).
-  - **Vrstvení overrides:** sdílené (PJ) + `membership.themeUserOverrides` (můj vzhled) — `:369-372`.
+  - **Vrstvení (5.9b):** motiv = `preview ?? membership.themeId ?? world.themeId`; když má člen vlastní motiv (≠ svět), je jeho vrstva SAMOSTATNÁ (jen `membership.themeUserOverrides`/pozadí, bez PJ overrides cizího skinu); jinak `{ ...world.themeOverrides, ...membership.themeUserOverrides }`. Vlastní `membership.themeBackgroundUrl` přebíjí pozadí světa.
   - **Jas/kontrast** člena = CSS `filter` na `<main>` (`:376-383`).
   - **Vlastnictví `:root`:** atom `worldThemeActiveAtom` (`themes/state.ts:42`) — dokud je `WorldLayout` mountnutý, `ThemeProvider` přeskočí globální `applyTheme` (jinak by race po opuštění profilu přepsal world skin globálním motivem). Pozadí přes `||` (ne `??`), aby prázdný string spadl na pozadí skinu (`:387`).
   - **Efekt skinu:** `theme.effect === 'matrix-rain'` → `<MatrixRain>` (brand identita skinu `ikaros`).
   - **EXIT:** unmount obnoví globální motiv uživatele (`:415-420`).
-- **Kdo nastavuje:** PJ/Korektor (tab Vzhled, sdílený); každý člen (tab Můj vzhled, jen pro sebe).
+- **Kdo nastavuje:** vedení PomocnyPJ+ (tab Vzhled, sdílený výchozí); každý člen Ctenar+ (tab Můj vzhled — vlastní motiv/pozadí/barvy/a11y jen pro sebe).
 - **Stav:** ✅
 - **Kód:** `WorldLayout.tsx:362-420`, `themes/state.ts:9-42`.
 

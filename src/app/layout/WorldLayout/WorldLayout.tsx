@@ -387,13 +387,31 @@ export function WorldLayout() {
   // Krok 5.7b — editor vzhledu publikuje náhled; má přednost před `World`.
   const preview = useAtomValue(worldThemePreviewAtom);
   const resolved = resolveWorldTheme(world ?? null);
-  const themeId = preview?.themeId ?? resolved.themeId;
-  // Krok 5.9 — uživatelské overrides člena se vrší nad sdílené (PJ).
-  const sharedOverrides = membership?.themeUserOverrides
-    ? { ...resolved.overrides, ...membership.themeUserOverrides }
-    : resolved.overrides;
-  const overrides = preview ? preview.overrides : sharedOverrides;
-  const backgroundUrl = preview ? preview.backgroundUrl : resolved.backgroundUrl;
+  // 5.9b — člen si může pro sebe zvolit vlastní motiv + pozadí (uloženo na jeho
+  // membership, nikdy ve World). Když má vlastní motiv ≠ svět, jeho vrstva je
+  // SAMOSTATNÁ: PJ overrides/pozadí (laděné pro skin světa) se na cizí skin
+  // nevztáhnou. Bez vlastního motivu jen vrší své úpravy nad sdíleným (jako 5.9).
+  const memberThemeId = membership?.themeId || undefined;
+  const memberBg = membership?.themeBackgroundUrl || undefined;
+  const usingMemberMotif = !!memberThemeId && memberThemeId !== resolved.themeId;
+
+  const themeId = preview?.themeId ?? memberThemeId ?? resolved.themeId;
+
+  // Krok 5.9 — uživatelské overrides člena se vrší nad sdílené (PJ); u vlastního
+  // motivu (5.9b) jen vlastní overrides.
+  const memberOverrides = usingMemberMotif
+    ? (membership?.themeUserOverrides ?? {})
+    : membership?.themeUserOverrides
+      ? { ...resolved.overrides, ...membership.themeUserOverrides }
+      : resolved.overrides;
+  // 5.9b — vlastní pozadí přebíjí svět; u vlastního motivu bez vlastního pozadí
+  // padne na default zvoleného skinu (`backgroundUrl` undefined → theme.background).
+  const memberBackground = usingMemberMotif
+    ? memberBg
+    : (memberBg ?? resolved.backgroundUrl);
+
+  const overrides = preview ? preview.overrides : memberOverrides;
+  const backgroundUrl = preview ? preview.backgroundUrl : memberBackground;
   // Krok 5.9 — jas / kontrast (přístupnost) přes filter na obsahové vrstvě.
   const adjust = preview ? preview.adjust : membership?.themeAdjust;
   const mainStyle =

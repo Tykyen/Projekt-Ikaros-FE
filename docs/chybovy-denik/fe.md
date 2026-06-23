@@ -313,3 +313,32 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak:** kdyby combat panel v testu crashnul na QueryClient/useCharacter → chybí mock `useCharacter`.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.2a Matrix bestie statblok: HUD panel + HP výpočet + autosave · 2026-06-23
+**Co zabralo:** Nový `MatrixBestiePanel.tsx` + `.module.css` (HUD jako combat panel), napojený v `TokenSystemSheet` bestie větvi pro `world.system==='matrix'` (ostatní systémy = generický `BestiePanelView`/schema engine, beze změny). Dle prototypu `c:\tmp\matrix-bestie-audit.html`. Reuse logiky z `BestiePanelView` (useTokenUpdate save, performSheetRoll/onMapRoll, systemStats z `matrix:token` schema, templateNotes z bestiar cache).
+**Funkční mechanika (přání uživatele):** (1) **HP odvozené** `clamp(maxHP + zbroj − zranění, 0, maxHP)` — PJ edituje maxHP/zbroj/zranění, `health.current` se ukládá jako výsledek (token HP bar); zbroj = **skrytá vrstva** (hráč nevidí, „pohlcuje X/Y" jen PJ). (2) **Iniciativa sjednocená** — 1 pole bonus (`initiative.base`) místo 2 matoucích INIT polí. (3) **Schopnosti** pips 1–10 + 🎲 (na rozdíl od PC/NPC, kde je klik na řádek — bestie hodně edituje, klik by koliduje). (4) **Autosave** (debounce 500 ms) místo „Uložit statblok".
+**Past:** `const s = ternary` se inferoval jako union (ne Record) → `s['k']=number` tsc error; anotovat `const s: Record<string,unknown>`. Testy: schopnost v editu = **input** (`getByDisplayValue`, ne getByText); HP num text „4/5" rozdělen na `4`+`<small>` → ověřovat **počet aktivních HP segmentů** (`[data-mod]` filtr — pips data-mod nemají).
+**Jak ověřeno:** tsc-b · 4/4 spec (render/HP clamp/zbroj pohlcení/canEdit gate) · 58/58 token-panel · build · eslint 0. Čeká **živý vizuální smoke** (bestie token na mapě). Po BE — bez BE změny (jede přes systemStats patch).
+**Zhodnocení:** dobře — prototyp=kontrakt; reuse BestiePanelView ušetřil save/roll plumbing. **Pozn.:** HUD CSS teď trojí duplikace (list/combat/bestie) — skin engine 16.2c sjednotí. Matrix má teď všechna 3 místa (list/combat/bestie) v HUD.
+**Příznak:** kdyby bestie na mapě ukázala starý schema form → `world.system` není „matrix" nebo `tokenIsBestie` false.
+
+---
+
+---
+
+## ✅ ŘEŠENÍ — 5.9b vlastní motiv + pozadí člena („Můj vzhled", jen pro mě) — 2026-06-23
+
+**Problém / zadání.** Po hotfixu sdíleného motivu (Korektor přepsal vzhled všem → zvednuto na PomocnyPJ) zadal PJ navazující featuru: každý člen si má jít upravit vzhled světa podle sebe — **včetně motivu (skinu) a pozadí** — a nesmí to ovlivnit ostatní. To otáčí původní rozhodnutí 5.9 §5 (skin člen nemění).
+
+**Co zabralo (přístup).**
+- **Reuse existující 5.9 trubky.** Endpoint `PUT /members/me/theme` (self-scoped z JWT) + tab „Můj vzhled" už existovaly pro jas/kontrast/barvy → jen rozšířit DTO + membership o `themeId` + `themeBackgroundUrl`, ne stavět nový modul.
+- **Žádná nová repo metoda.** `BaseMongoRepository.update` dělá `$set`; clear řeším přes `null` (Mongoose stripne `undefined` = beze změny, `$set: null` = clear). Ve `WorldLayout` `??` bere null jako „bez override". Minimální BE plocha.
+- **„Follow PJ" sémantika.** `MyThemeTab` ukládá `themeId` jen když se LIŠÍ od `world.themeId` (jinak null) → člen nezůstane zaseknutý na starém motivu, když PJ změní sdílený. Klíčové rozhodnutí, jinak by se „dědění" rozbilo.
+- **Vlastní motiv = samostatná vrstva.** Když člen zvolí jiný skin než svět, PJ overrides/pozadí (laděné pro skin světa) se na cizí skin nevztáhnou (odsouhlaseno PJ jako „bod 2"). Resolver ve `WorldLayout` i náhled v `MyThemeTab` to zrcadlí 1:1.
+
+**Jak ověřeno.** BE jest `worlds.service.spec` 134/134 (+4: motiv/pozadí jde na membership ne World; `''`→null clear; backward-compat bez polí) · BE `tsc` ✓. FE vitest `MyThemeTab.spec` (follow-PJ null / vlastní themeId / předvyplnění z membershipu) + `WorldSettingsPage` 37 · `npm run build` (tsc -b) ✓ · `mobil-desktop` PASS (reuse responsivních tříd, grid auto-wrap, bgRow `@media`). Docs: spec 5.9b, funkce kap.10, napoveda (nový member Tool „Můj vzhled"), roadmap-fe.
+
+**Zhodnocení.**
+- 👍 **Dobře:** featura postavená výhradně z existující 5.9 infrastruktury (endpoint, atom, ThemePresetGrid, bg blok) → málo nového kódu, nízké riziko. Návrh pasti pochycené PŘEDEM v hlavě: (a) `toEntity` whitelist mapper — nová pole rovnou přidána (bez toho GET tiše zahodí); (b) `themeId` validace volná jako world DTO (`@IsString`, ne `@IsIn(THEME_IDS)`) → vyhne se dual-source 400 pasti.
+- 👍 **Dobře:** náhled v editoru = stejný resolver jako runtime → „co uložíš, to vidíš" bez divergence.
+- 📌 **Pozn.:** po BE změně nutný restart (whitelist ValidationPipe by jinak nová pole dropnul) — featura jinak na FE „funguje", ale BE pole zahazuje.

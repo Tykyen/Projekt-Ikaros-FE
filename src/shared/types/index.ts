@@ -505,6 +505,17 @@ export interface WorldMembership {
   themeAdjust?: WorldThemeAdjust;
   themeUserOverrides?: Record<string, string>;
   /**
+   * 5.9b — per-člen vlastní motiv světa (override sdíleného `world.themeId`).
+   * Platí jen tomuto členovi v tomto světě, nepropisuje se do World. Absent/null
+   * = dědí motiv PJ.
+   */
+  themeId?: string | null;
+  /**
+   * 5.9b — per-člen vlastní pozadí světa (override `world.themeBackgroundUrl`).
+   * Funguje i samostatně nad sdíleným motivem. Absent/null = pozadí z motivu.
+   */
+  themeBackgroundUrl?: string | null;
+  /**
    * 10.2-prep-1 — aktuální scéna hráče v taktické mapě. `null`/undefined =
    * neassigned (klient zobrazí MapEmptyState). Mění se přes `member.*` ops
    * (PJ-only kromě hráčova self-unassign).

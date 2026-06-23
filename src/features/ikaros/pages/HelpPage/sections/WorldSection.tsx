@@ -32,6 +32,7 @@ import {
   Triangle,
   Pencil,
   Share2,
+  Palette,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -114,6 +115,20 @@ export function WorldSection() {
             Ve světě jsou role PJ, Pomocný PJ, Korektor, Hráč, Čtenář a Žadatel —
             určují, co kdo smí. Roli ti přiděluje PJ. Plný rozpis pravomocí i matici
             oprávnění najdeš v tabu <strong>Role &amp; oprávnění</strong>.
+          </p>
+        </Tool>
+        <Tool icon={<Palette size={16} />} title="Můj vzhled — uprav si svět pro sebe" audience={{ kind: 'vse', label: 'Členové' }}>
+          <p>
+            Nelíbí se ti, jak svět vypadá? V <strong>Nastavení světa → Můj vzhled</strong>{' '}
+            si zvolíš <strong>vlastní motiv</strong> (jiný skin), nahraješ{' '}
+            <strong>vlastní pozadí</strong> a doladíš barvy, jas i kontrast. Všechno
+            platí <strong>jen tobě</strong> — ostatní hráči ani PJ tvoje úpravy
+            neuvidí a nic se jim nepřepíše.
+          </p>
+          <p>
+            Výchozí vzhled světa nastavuje vedení (sdílený „Motiv světa"); tvoje
+            úpravy ho jen pro tebe překryjí. Tlačítko{' '}
+            <strong>„Zpět na vzhled PJ"</strong> tě kdykoli vrátí na výchozí podobu.
           </p>
         </Tool>
         <Tool icon={<FileText size={16} />} title="Wiki stránky — čtení" audience={{ kind: 'vse', label: 'Členové' }} accent="corrector">
@@ -551,10 +566,12 @@ export function WorldSection() {
         <Tool icon={<Settings size={16} />} title="Nastavení světa" audience={{ kind: 'pjasst', label: 'PJ / Pomocný PJ' }} accent="pjasst">
           <p>
             Konfigurace světa v tabech: Základní info (název, systém, viditelnost hodů),
-            Vzhled (motiv, vlastní pozadí), Členové (skupiny + barvy, role), AKJ úrovně,
-            Postavy &amp; NPC (matice typ × tab), Šablony stránek, <strong>PJ v chatu</strong>{' '}
-            (jak vystupuje vedení), Přístup světa, Členství (odejít / předat svět),
-            Smazat svět. Tab „Můj vzhled" = osobní override motivu.
+            <strong>Vzhled</strong> (sdílený výchozí motiv + pozadí pro všechny —
+            nastavuje jen vedení, PJ nebo Pomocný PJ), Členové (skupiny + barvy, role),
+            AKJ úrovně, Postavy &amp; NPC (matice typ × tab), Šablony stránek,{' '}
+            <strong>PJ v chatu</strong> (jak vystupuje vedení), Přístup světa,
+            Členství (odejít / předat svět), Smazat svět. Osobní úpravy vzhledu jen
+            pro sebe má každý člen v tabu <strong>Můj vzhled</strong> (viz Základy světa).
           </p>
           <CalloutBox variant="pozor" title="Smazání světa je vratné (30 dní)">
             Svět smaže PJ (vlastník) nebo administrátor přes tab <strong>Smazat

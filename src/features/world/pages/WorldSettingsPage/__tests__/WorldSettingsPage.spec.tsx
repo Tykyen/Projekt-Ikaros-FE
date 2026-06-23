@@ -38,20 +38,21 @@ describe('WorldSettingsPage — gating tabů dle role', () => {
     expect(labels).toEqual(['Můj vzhled', 'Členství']);
   });
 
-  it('Korektor vidí Základní info, Přístup, Šablony, Vzhled, Můj vzhled, Členství', () => {
+  // Bug-fix (sdílený motiv) — „Vzhled" zvednut z Korektor na PomocnyPJ, aby
+  // člen nemohl přepsat motiv světa všem. Korektor ho už nevidí.
+  it('Korektor vidí Základní info, Přístup, Šablony, Můj vzhled, Členství (bez Vzhled)', () => {
     renderWithRole(WorldRole.Korektor);
     const labels = screen.getAllByRole('tab').map((t) => t.textContent);
     expect(labels).toEqual([
       'Základní info',
       'Přístup',
       'Šablony',
-      'Vzhled',
       'Můj vzhled',
       'Členství',
     ]);
   });
 
-  it('PomocnyPJ vidí navíc Členy, AKJ úrovně a PJ v chatu (11 tabů)', () => {
+  it('PomocnyPJ vidí navíc Členy, AKJ úrovně, PJ v chatu a Vzhled (11 tabů)', () => {
     renderWithRole(WorldRole.PomocnyPJ);
     expect(screen.getAllByRole('tab')).toHaveLength(11);
     expect(screen.getByRole('tab', { name: /Členové/ })).toBeInTheDocument();
@@ -61,6 +62,10 @@ describe('WorldSettingsPage — gating tabů dle role', () => {
     // 6.8-followup — „PJ v chatu" snížen na PomocnyPJ (self „Můj obrázek vedení").
     expect(
       screen.getByRole('tab', { name: /PJ v chatu/ }),
+    ).toBeInTheDocument();
+    // Bug-fix — sdílený „Vzhled" nově od PomocnyPJ.
+    expect(
+      screen.getByRole('tab', { name: /^Vzhled$/ }),
     ).toBeInTheDocument();
   });
 

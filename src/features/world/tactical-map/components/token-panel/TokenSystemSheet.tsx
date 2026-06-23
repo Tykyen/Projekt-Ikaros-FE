@@ -26,6 +26,7 @@ import type { MapToken } from "../../types";
 import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
 import { tokenIsBestie } from "../../utils/tokenIsBestie";
 import { BestiePanelView } from "./BestiePanelView";
+import { MatrixBestiePanel } from "./system-panels/MatrixBestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import styles from "./TokenSystemSheet.module.css";
 
@@ -69,6 +70,22 @@ export function TokenSystemSheet({
   const initiativeUpdate = useTokenUpdate(sceneId, worldId);
 
   if (tokenIsBestie(token)) {
+    // 16.2a — Matrix bestie má vlastní HUD panel (HP výpočet, autosave,
+    // iniciativa sjednocení); ostatní systémy generický schema engine.
+    if (world?.system === "matrix") {
+      return (
+        <div className={styles.sheet}>
+          <MatrixBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="matrix"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </div>
+      );
+    }
     return (
       <BestiePanelView
         token={token}

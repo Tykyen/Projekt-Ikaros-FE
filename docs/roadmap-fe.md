@@ -984,6 +984,15 @@ dle místnosti. Dřív globální zprávy ukazovaly vždy username + iniciálu.
 - [x] **rovina B — platforma** — `User.themeSettings` (adjust + overrides), sekce „Doladění vzhledu" v profilu, vrstvení v `ThemeProvider` + `IkarosLayout`
 - [x] jas/kontrast přes `filter` na obsahové vrstvě (nerozbije `fixed` prvky); `bgDim` odložen
 
+### - [x] 5.9b Vlastní motiv + pozadí člena („Můj vzhled", jen pro mě) ✅ (2026-06-23)
+
+*Reverze 5.9 §5 (skin člen nemění): člen Ctenar+ si v „Můj vzhled" zvolí vlastní motiv i pozadí, uloženo na membership, jen pro sebe, nepropisuje se do World. Vyšlo z bugu — sdílený „Motiv světa" zvednut z Korektor na PomocnyPJ. Spec: [spec-5.9b-user-own-skin.md](arch/phase-5/spec-5.9b-user-own-skin.md).*
+
+- [x] **sdílený „Vzhled"** zvednut Korektor→PomocnyPJ (FE tab gate + BE `update` theme guard `canManageMembers`, jen na theme pole)
+- [x] **`WorldMembership.themeId` + `themeBackgroundUrl`** (schema + interface + `toEntity` + FE typ + DTO), `updateMyTheme` rozšířen (`''`/`null` = clear)
+- [x] **`MyThemeTab`** — `ThemePresetGrid` + nahrání pozadí + reset; „follow PJ" (themeId ukládán jen když ≠ svět)
+- [x] **vrstvení ve `WorldLayout`** — vlastní motiv = samostatná vrstva; vlastní pozadí přebíjí svět
+
 ---
 
 **Uzavírá dluhy:** D-064 (leave world — 5.3e).

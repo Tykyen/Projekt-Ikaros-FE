@@ -165,10 +165,13 @@ const TABS: SettingsTab[] = [
     render: () => <WorldDiarySchemaEditorPage />,
   },
   {
+    // Sdílený motiv světa = brand světa → jen vedení (PomocnyPJ+). Bug-fix:
+    // dřív Korektor+ → člen přepsal motiv VŠEM včetně PJ. Členská personalizace
+    // (vlastní motiv/pozadí/barvy jen pro sebe) žije v tabu „Můj vzhled".
     id: 'vzhled',
     label: 'Vzhled',
     icon: <Palette size={18} />,
-    minRole: WorldRole.Korektor,
+    minRole: WorldRole.PomocnyPJ,
     render: () => <ThemeTab />,
   },
   {

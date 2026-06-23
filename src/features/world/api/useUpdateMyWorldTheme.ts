@@ -9,6 +9,10 @@ import type { WorldMembership, WorldThemeAdjust } from '@/shared/types';
 export interface UpdateMyThemeInput {
   themeAdjust?: WorldThemeAdjust;
   themeUserOverrides?: Record<string, string>;
+  /** 5.9b — vlastní motiv (jen pro mě). `null` = zpět na motiv PJ. */
+  themeId?: string | null;
+  /** 5.9b — vlastní pozadí (jen pro mě). `null` = bez vlastního pozadí. */
+  themeBackgroundUrl?: string | null;
 }
 
 export function useUpdateMyWorldTheme(worldId: string) {

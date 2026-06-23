@@ -23,3 +23,26 @@ Detaily k záznamům z indexu ([README.md](README.md)) pro oblast rolí, oprávn
 - 👎 **Poučení 1:** subagent klasifikace/inventura je **hypotéza, ne fakt** — u plošné bezpečnostní změny VŽDY vlastní úplný grep sweep obou forem (`<=` i `>`), ne spoléhat na agentní seznam. (Stejné poučení jako u plného auditu: agentní TL;DR přestřeluje.)
 - 👎 **Poučení 2:** první odhad „zbývá jen router `memberOnly`" byl nepřesný — `memberOnly` byl už vyřešen opraveným `WorldMembershipGuard`, ale skutečný FE drift byl jinde (**7 komponent s vlastním `role<=Admin` world gate**: počasí, news, mapa, bestiář). Odhalil ho až grep sweep FE, ne paměť. → i u FE „dokončení" udělej sweep, nedůvěřuj dílčí poznámce.
 - 👍 **Bonus:** sweep odhalil dead code (`WeatherSetsModal` `isGlobalAdmin || true`) a FE>BE drift v bestiáři (admin editoval user-scope bestie, BE = owner-only) → opraveno BE-konzistentně (system=platform admin, world=elevation, user=owner).
+
+---
+
+## ✅ ŘEŠENÍ — sdílený motiv světa unikal: Korektor přepsal vzhled VŠEM (vč. PJ) — 2026-06-23
+
+**Problém / zadání.** Hráč/člen si „upravil styl podle sebe", uložil — a vzhled se propsal celému světu včetně PJ. Extrémní bug: osobní úprava nesmí ovlivnit ostatní, ani motiv.
+
+**Diagnóza (kořen).** Dva taby v Nastavení světa:
+- **„Vzhled"** ([ThemeTab.tsx](../../src/features/world/pages/WorldSettingsPage/tabs/ThemeTab.tsx)) = sdílený motiv → `useUpdateWorld` → `PATCH /worlds/:id` → zápis `themeId/themeOverrides/themeBackgroundUrl` do **entity World** = vidí všichni.
+- **„Můj vzhled"** ([MyThemeTab.tsx](../../src/features/world/pages/WorldSettingsPage/tabs/MyThemeTab.tsx)) = per-membership (`PUT /members/me/theme`). Čistý, neuniká.
+
+Únik byl přes „Vzhled": FE tab `minRole: Korektor` (3) + BE `canEditWorldData` (Korektor+) → korektor/pomocný PJ přepsal motiv celého světa. (Render-vrstva membershipu v pořádku — [WorldLayout.tsx](../../src/app/layout/WorldLayout/WorldLayout.tsx) vrší `themeUserOverrides`/`themeAdjust` jen lokálně; ale `themeId` motiv bral JEN ze světa.)
+
+**Co zabralo (oprava A — hotfix).**
+- FE: tab „Vzhled" `minRole: Korektor → PomocnyPJ` ([WorldSettingsPage.tsx](../../src/features/world/pages/WorldSettingsPage/WorldSettingsPage.tsx)).
+- BE: v `worlds.service.update` cílený guard JEN na theme pole (`themeId/themeOverrides/themeBackgroundUrl !== undefined`) → `canManageMembers` (PomocnyPJ+), jinak 403. **Nesmí se zvednout celý `update` na PJ** — Korektor musí dál editovat jméno/popis (stejný endpoint, jiná pole).
+
+**Jak ověřeno.** FE vitest 37/37 (Korektor „Vzhled" nevidí, PomocnyPJ ano, 11 tabů). BE jest 130/130 (+3 nové: Korektor theme→403, Korektor jméno→OK, PomocnyPJ theme→OK). **BE nutný restart** (jinak starý bundle).
+
+**Zhodnocení.**
+- 👍 **Dobře:** guard na úrovni polí, ne celého endpointu — nerozbil legitimní Korektor editaci metadat. Diagnóza šla po datovém toku (kam se zapisuje), ne po UI.
+- 👎 **Past v testu:** počet tabů PomocnyPJ jsem omylem zvedl na 12 — Vzhled PomocnyPJ **už dřív viděl** (4>3), přesun prahu nahoru ubere tab jen rolím *mezi* starým a novým prahem (Korektor). Zůstává 11.
+- 📌 **Navazuje:** část B (per-člen vlastní motiv + pozadí v „Můj vzhled", jen pro sebe v rámci světa) — přes spec.
