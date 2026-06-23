@@ -1,570 +1,758 @@
-/* Matrix RPG — vlastní herní systém projektu Matrix/Ikaros
- * 8.7n — přenos z c:/Matrix/Matrix/frontend/src/styles/characterSheet.scss
- *        + entities.ts (healthPenalty / tirednessPenalty / magic).
- * Cyberpunk navy + modré akcenty, font Inter + Rajdhani.
+/* Matrix / Ikaros deník — „operátorský HUD / cyberpunk terminál" (16.2a).
+ *
+ * Self-contained: veškerá grafika scoped na [data-diary-system='matrix'],
+ * vlastní tmavé barvy (NE theme tokeny) — deník se renderuje nad libovolným
+ * skinem (world.system='matrix' ≠ matrix skin) a musí být čitelný všude.
+ * Hardcoded barvy = záměrná identita systému (jako skin), viz spec-16.2a / H5.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
 [data-diary-system='matrix'] .matrix-sheet {
-  --mx-bg: #030408;
-  --mx-card-bg: rgba(14, 18, 30, 0.9);
-  --mx-card-border: rgba(90, 110, 230, 0.15);
-  --mx-card-highlight: rgba(180, 200, 255, 0.1);
-  --mx-card-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.7),
-    0 10px 20px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.05);
-  --mx-field-bg: rgba(6, 8, 16, 0.7);
-  --mx-field-border: rgba(80, 100, 220, 0.15);
-  --mx-field-focus: rgba(110, 140, 255, 0.5);
-  --mx-text-main: #e2e8f0;
-  --mx-text-muted: #94a3b8;
-  --mx-text-label: rgba(160, 180, 255, 0.8);
-  --mx-accent: #6b8cff;
-  --mx-accent-glow: rgba(107, 140, 255, 0.25);
-  --mx-danger: #ef4444;
-  --mx-danger-muted: rgba(239, 68, 68, 0.15);
-  --mx-charged: #3b82f6;
-  --mx-charged-bg: rgba(59, 130, 246, 0.15);
-  --mx-amber: #f59e0b;
-  --mx-orange: #f97316;
-  --mx-purple: #a855f7;
+  --mx-panel: #0e0f1e;
+  --mx-line: rgba(255, 255, 255, 0.08);
+  --mx-cyan: #38e0ff;
+  --mx-violet: #a78bfa;
+  --mx-text: #d6def0;
+  --mx-muted: #76809a;
+  --mx-dim: #444b63;
+  --mx-danger: #f87171;
 
-  width: min(100%, 1200px);
+  /* stupně schopností 1–10 */
+  --lvl-1: #8a8f9c;
+  --lvl-2: #4ade80;
+  --lvl-3: #38e0ff;
+  --lvl-4: #3b82f6;
+  --lvl-5: #a78bfa;
+  --lvl-6: #ec4899;
+  --lvl-7: #fbbf24;
+  --lvl-8: #ffffff;
+  --lvl-9: #ffffff;
+  --lvl-10: #ffffff;
+
+  width: min(100%, 940px);
   margin-inline: auto;
-  padding: clamp(1rem, 4vw, 2.5rem);
-  background: var(--mx-bg);
-  border-radius: 16px;
-  border: 1px solid rgba(60, 80, 180, 0.15);
-  border-top: 1px solid rgba(100, 120, 220, 0.25);
-  box-shadow:
-    0 35px 60px rgba(0, 0, 0, 0.6),
-    inset 0 0 120px rgba(15, 10, 30, 0.3);
-  color: var(--mx-text-main);
-  font-family: 'Inter', system-ui, sans-serif;
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
+  padding: clamp(0.85rem, 3vw, 1.25rem);
+  background: linear-gradient(180deg, #0b0b18, #08080f);
+  border: 1px solid var(--mx-line);
+  border-radius: 8px;
+  position: relative;
+  box-shadow:
+    0 30px 80px -30px #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: var(--mx-text);
+  font-family: 'Chakra Petch', system-ui, sans-serif;
 }
-
+[data-diary-system='matrix'] .matrix-sheet * {
+  box-sizing: border-box;
+}
+/* scanline + grid overlay */
 [data-diary-system='matrix'] .matrix-sheet::before {
   content: '';
   position: absolute;
   inset: 0;
+  border-radius: 8px;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(100, 130, 255, 0.015) 0,
-    rgba(100, 130, 255, 0.015) 1px,
-    transparent 1px,
-    transparent 2px
-  );
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, rgba(56, 224, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(56, 224, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 3px, 28px 28px, 28px 28px;
+  mix-blend-mode: screen;
+  opacity: 0.5;
   z-index: 0;
-  border-radius: 16px;
 }
-
-[data-diary-system='matrix'] .matrix-sheet * {
-  box-sizing: border-box;
-}
-
-/* ── Card base ─────────────────────────────────────── */
-
-[data-diary-system='matrix'] .mx-card {
-  background: var(--mx-card-bg);
-  border: 1px solid var(--mx-card-border);
-  border-top: 1px solid var(--mx-card-highlight);
-  border-radius: 14px;
-  box-shadow: var(--mx-card-shadow);
-  padding: 2rem;
+[data-diary-system='matrix'] .matrix-sheet > * {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
 }
 
-[data-diary-system='matrix'] .mx-section-title {
-  font-family: 'Rajdhani', 'Inter', sans-serif;
-  font-size: 1.4rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #fff;
-  letter-spacing: 3px;
-  margin: 0 0 2rem 0;
-  padding-bottom: 1rem;
+/* ── Panel (cut-corner HUD) ───────────────────────────── */
+[data-diary-system='matrix'] .mx-panel {
   position: relative;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background:
+    linear-gradient(180deg, rgba(17, 18, 36, 0.25), rgba(12, 13, 24, 0.25)),
+    var(--mx-panel);
+  border: 1px solid var(--mx-line);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  padding: 16px 18px;
 }
-[data-diary-system='matrix'] .mx-section-title::after {
+[data-diary-system='matrix'] .mx-panel--accent {
+  border-color: rgba(56, 224, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(56, 224, 255, 0.06), 0 0 30px -16px rgba(56, 224, 255, 0.33);
+}
+[data-diary-system='matrix'] .mx-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font: 700 13px/1 'Chakra Petch', sans-serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #aeb8d4;
+}
+[data-diary-system='matrix'] .mx-title::before {
   content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--mx-cyan);
+  box-shadow: 0 0 10px var(--mx-cyan);
+  transform: rotate(45deg);
+}
+[data-diary-system='matrix'] .mx-title::after {
+  content: '';
+  flex: 1;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    rgba(130, 160, 255, 0.3) 0,
-    rgba(130, 160, 255, 0) 100%
-  );
+  background: linear-gradient(90deg, rgba(56, 224, 255, 0.27), transparent);
 }
-/* Boxed section title (jako Jazyky / Schopnosti / Aspekty) */
-[data-diary-system='matrix'] .mx-section-title--chip {
-  display: inline-block;
-  font-size: 1rem;
-  letter-spacing: 2px;
-  padding: 0.5rem 1rem;
-  background: rgba(107, 140, 255, 0.08);
-  border: 1px solid rgba(107, 140, 255, 0.2);
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-  color: var(--mx-accent);
-}
-[data-diary-system='matrix'] .mx-section-title--chip::after {
-  display: none;
-}
-
-/* ── Inputs ────────────────────────────────────────── */
-
-[data-diary-system='matrix'] .mx-input {
-  background: var(--mx-field-bg);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 8px;
-  padding: 0.6rem 0.8rem;
-  color: var(--mx-text-main);
-  font-size: 0.95rem;
-  font-family: inherit;
-  outline: none;
-  transition: all 0.15s;
-  width: 100%;
-}
-[data-diary-system='matrix'] .mx-input:focus {
-  border-color: var(--mx-field-focus);
-  box-shadow: 0 0 0 3px var(--mx-accent-glow);
-  background: rgba(10, 14, 24, 0.9);
-}
-[data-diary-system='matrix'] .mx-input.is-negative {
-  color: var(--mx-danger);
-}
-[data-diary-system='matrix'] .mx-input.is-magic {
-  color: var(--mx-purple);
-}
-[data-diary-system='matrix'] .mx-input:disabled {
-  cursor: default;
-  opacity: 0.7;
-}
-
-/* ── Buttons ───────────────────────────────────────── */
-
-[data-diary-system='matrix'] .mx-btn {
-  background: rgba(107, 140, 255, 0.1);
-  border: 1px solid rgba(107, 140, 255, 0.25);
-  color: var(--mx-accent);
-  padding: 0.7rem 1.4rem;
-  font-size: 0.85rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 8px;
-  font-family: inherit;
-  transition: all 0.15s;
-}
-[data-diary-system='matrix'] .mx-btn:hover:not(:disabled) {
-  background: rgba(107, 140, 255, 0.2);
-  border-color: rgba(107, 140, 255, 0.5);
-}
-[data-diary-system='matrix'] .mx-btn--ghost {
-  background: transparent;
-  border-style: dashed;
-}
-[data-diary-system='matrix'] .mx-btn:disabled {
-  cursor: default;
-  opacity: 0.5;
-}
-
-[data-diary-system='matrix'] .mx-icon-btn {
-  background: transparent;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: var(--mx-danger);
-  cursor: pointer;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  transition: all 0.15s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-[data-diary-system='matrix'] .mx-icon-btn:hover:not(:disabled) {
-  background: var(--mx-danger-muted);
-  border-color: var(--mx-danger);
-}
-[data-diary-system='matrix'] .mx-icon-btn:disabled {
-  cursor: default;
-  opacity: 0.4;
-}
-
-/* ── Overview card (6 fields) ───────────────────────── */
-
-[data-diary-system='matrix'] .mx-overview-card {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-@media (max-width: 700px) {
-  [data-diary-system='matrix'] .mx-overview-card {
-    grid-template-columns: 1fr;
-  }
-}
-
-[data-diary-system='matrix'] .mx-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-[data-diary-system='matrix'] .mx-field__label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--mx-text-label);
-}
-
-[data-diary-system='matrix'] .mx-stat-capsule {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--mx-field-bg);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 8px;
-  padding: 0.2rem 0.6rem;
-}
-[data-diary-system='matrix'] .mx-stat-capsule input {
-  background: transparent;
-  border: none;
-  text-align: right;
-  font-weight: 700;
-  width: 100%;
-  color: var(--mx-text-main);
-  font-family: inherit;
-  outline: none;
-  padding: 0.4rem 0;
-}
-[data-diary-system='matrix'] .mx-stat-capsule input:disabled {
-  cursor: default;
-}
-[data-diary-system='matrix'] .mx-stat-capsule p {
-  margin: 0;
-  color: var(--mx-text-muted);
-}
-
-/* ── Vitals card ───────────────────────────────────── */
-
-[data-diary-system='matrix'] .mx-vitals-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1.5rem;
-}
-@media (max-width: 700px) {
-  [data-diary-system='matrix'] .mx-vitals-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-[data-diary-system='matrix'] .mx-stat-block {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-[data-diary-system='matrix'] .mx-stat-tiles {
-  display: flex;
-  gap: 0.75rem;
-}
-[data-diary-system='matrix'] .mx-stat-tile {
-  flex: 1;
-  background: var(--mx-field-bg);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 10px;
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-[data-diary-system='matrix'] .mx-stat-tile__label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--mx-accent);
-  background: rgba(107, 140, 255, 0.1);
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-}
-[data-diary-system='matrix'] .mx-stat-tile__label.is-link {
-  cursor: pointer;
-}
-[data-diary-system='matrix'] .mx-stat-tile__value {
-  width: 100%;
-}
-[data-diary-system='matrix'] .mx-stat-tile__value input {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 6px;
-  color: #fff;
-  font-size: 1.6rem;
-  font-weight: 700;
-  text-align: center;
-  padding: 0.4rem;
-  font-family: inherit;
-  outline: none;
-}
-[data-diary-system='matrix'] .mx-stat-tile__value input:focus {
-  border-color: var(--mx-field-focus);
-}
-[data-diary-system='matrix'] .mx-stat-tile__value input:disabled {
-  cursor: default;
-}
-
-[data-diary-system='matrix'] .mx-penalty-strip {
-  display: flex;
-  gap: 4px;
-  margin-top: 0.4rem;
-}
-[data-diary-system='matrix'] .mx-penalty-segment {
-  flex: 1;
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.4rem 0.2rem;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 4px;
-  color: var(--mx-text-muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-[data-diary-system='matrix'] .mx-penalty-segment.is-active {
-  background: var(--mx-charged-bg);
-  border-color: var(--mx-charged);
-  color: #fff;
-}
-[data-diary-system='matrix']
-  .mx-penalty-segment.is-active.mx-penalty-segment--amber {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: var(--mx-amber);
-  color: var(--mx-amber);
-}
-[data-diary-system='matrix']
-  .mx-penalty-segment.is-active.mx-penalty-segment--orange {
-  background: rgba(249, 115, 22, 0.2);
-  border-color: var(--mx-orange);
-  color: #fff;
-}
-[data-diary-system='matrix']
-  .mx-penalty-segment.is-active.mx-penalty-segment--danger {
-  background: var(--mx-danger-muted);
-  border-color: var(--mx-danger);
-  color: #fff;
-}
-[data-diary-system='matrix']
-  .mx-penalty-segment.is-active.mx-penalty-segment--purple {
-  background: rgba(168, 85, 247, 0.15);
-  border-color: var(--mx-purple);
-  color: var(--mx-purple);
-}
-
-/* ── Pressure card ─────────────────────────────────── */
-
-[data-diary-system='matrix'] .mx-grid-2col {
+[data-diary-system='matrix'] .mx-row2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-@media (max-width: 900px) {
-  [data-diary-system='matrix'] .mx-grid-2col {
-    grid-template-columns: 1fr;
-  }
+  gap: 16px;
 }
 
-[data-diary-system='matrix'] .mx-pressure-list {
+/* ── Hero ─────────────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: stretch;
+  background:
+    radial-gradient(600px 200px at 0% 0%, rgba(167, 139, 250, 0.09), transparent 70%),
+    linear-gradient(180deg, #12132a, #0b0b16);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  padding: 18px 22px;
+}
+[data-diary-system='matrix'] .mx-portrait {
+  width: 92px;
+  height: 92px;
+  flex: none;
+  border: 1px solid rgba(56, 224, 255, 0.33);
+  border-radius: 4px;
+  background: linear-gradient(135deg, #1a1c38, #0c0d1a);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 24px -8px rgba(56, 224, 255, 0.4);
+}
+[data-diary-system='matrix'] .mx-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+[data-diary-system='matrix'] .mx-portrait span {
+  font: 700 30px 'Chakra Petch', sans-serif;
+  color: #5b6790;
+  letter-spacing: 0.05em;
+}
+[data-diary-system='matrix'] .mx-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(56, 224, 255, 0.06) 0 2px, transparent 2px 4px);
+  pointer-events: none;
+}
+[data-diary-system='matrix'] .mx-id {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
 }
-[data-diary-system='matrix'] .mx-pressure-row {
+[data-diary-system='matrix'] .mx-name {
+  margin: 0;
+  font: 700 30px/0.95 'Chakra Petch', sans-serif;
+  letter-spacing: 0.04em;
+  color: #f0f3ff;
+  text-shadow: 0 0 22px rgba(167, 139, 250, 0.33);
+}
+[data-diary-system='matrix'] .mx-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: 500 13px/1.2 'IBM Plex Mono', monospace;
+}
+[data-diary-system='matrix'] .mx-meta .line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+[data-diary-system='matrix'] .mx-meta .k {
+  color: var(--mx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+[data-diary-system='matrix'] .mx-meta .v {
+  color: var(--mx-text);
+}
+[data-diary-system='matrix'] .mx-fate {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 18px;
+  border: 1px solid rgba(251, 191, 36, 0.33);
+  background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.13), transparent 70%);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+[data-diary-system='matrix'] .mx-fate .lab {
+  font: 600 10px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #d6b14f;
+}
+[data-diary-system='matrix'] .mx-fate .num {
+  font: 700 34px/1 'IBM Plex Mono', monospace;
+  color: #fde08a;
+  text-shadow: 0 0 18px rgba(251, 191, 36, 0.47);
+}
+[data-diary-system='matrix'] .mx-fate .star {
+  color: #fbbf24;
+  font-size: 14px;
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.53));
+}
+
+/* ── Vitals ───────────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-vitals-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 18px;
+}
+[data-diary-system='matrix'] .mx-vit-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+[data-diary-system='matrix'] .mx-vit {
+  flex: 1 1 0;
+  min-width: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+[data-diary-system='matrix'] .mx-vit__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  background: var(--mx-field-bg);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 8px;
+  gap: 8px;
 }
-[data-diary-system='matrix'] .mx-pressure-row__label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
+[data-diary-system='matrix'] .mx-vit__label {
+  font: 600 11px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--mx-text-muted);
-  cursor: pointer;
+  color: var(--mx-muted);
 }
-[data-diary-system='matrix'] .mx-pressure-row__rail {
+[data-diary-system='matrix'] .mx-vit__num {
+  font: 700 18px/1 'IBM Plex Mono', monospace;
+  color: var(--mx-text);
+}
+[data-diary-system='matrix'] .mx-vit__num small {
+  color: var(--mx-dim);
+  font-size: 12px;
+}
+[data-diary-system='matrix'] .mx-track {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
-[data-diary-system='matrix'] .mx-pressure-segment {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--mx-field-border);
-  cursor: pointer;
-  transition: all 0.15s;
-  padding: 0;
+[data-diary-system='matrix'] .mx-seg {
+  flex: 1;
+  height: 18px;
+  background: #1a1d2e;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
 }
-[data-diary-system='matrix'] .mx-pressure-segment.is-active {
-  background: var(--mx-charged);
-  border-color: var(--mx-charged);
-  box-shadow: 0 0 8px var(--mx-charged);
+[data-diary-system='matrix'] .mx-seg.hp.on {
+  background: linear-gradient(180deg, #4ade80, #16a34a);
+  border-color: rgba(74, 222, 128, 0.47);
 }
-[data-diary-system='matrix']
-  .mx-pressure-segment.is-active.is-danger {
-  background: var(--mx-danger);
-  border-color: var(--mx-danger);
-  box-shadow: 0 0 8px var(--mx-danger);
+[data-diary-system='matrix'] .mx-seg.hp.warn {
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+  border-color: rgba(251, 191, 36, 0.47);
 }
-[data-diary-system='matrix'] .mx-pressure-segment:disabled {
-  cursor: default;
+[data-diary-system='matrix'] .mx-seg.hp.crit {
+  background: linear-gradient(180deg, #f87171, #dc2626);
+  border-color: rgba(248, 113, 113, 0.47);
+}
+[data-diary-system='matrix'] .mx-seg.rune.on {
+  background: linear-gradient(180deg, #38e0ff, #0ea5c4);
+  border-color: rgba(56, 224, 255, 0.47);
+  box-shadow: 0 0 10px -2px rgba(56, 224, 255, 0.53);
+}
+[data-diary-system='matrix'] .mx-seg.arm.on {
+  background: linear-gradient(180deg, #a78bfa, #7c3aed);
+  border-color: rgba(167, 139, 250, 0.47);
+  box-shadow: 0 0 10px -2px rgba(167, 139, 250, 0.53);
+}
+[data-diary-system='matrix'] .mx-status {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font: 600 11px 'IBM Plex Mono', monospace;
+  letter-spacing: 0.06em;
+}
+[data-diary-system='matrix'] .mx-status .badge {
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: rgba(74, 222, 128, 0.09);
+  color: #6ee7a0;
+  border: 1px solid rgba(74, 222, 128, 0.27);
+}
+[data-diary-system='matrix'] .mx-status .badge.warn {
+  background: rgba(251, 191, 36, 0.09);
+  color: #fcd34d;
+  border-color: rgba(251, 191, 36, 0.27);
+}
+[data-diary-system='matrix'] .mx-status .badge.crit {
+  background: rgba(248, 113, 113, 0.09);
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.27);
+}
+[data-diary-system='matrix'] .mx-status .scale {
+  color: var(--mx-dim);
+}
+[data-diary-system='matrix'] .mx-status .scale b {
+  color: var(--mx-muted);
+  font-weight: 600;
 }
 
-/* ── Data list (Languages / Abilities / Aspects) ───── */
+/* ── Budget ───────────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-budget {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+[data-diary-system='matrix'] .mx-budget .blk {
+  flex: 1 1 240px;
+}
+[data-diary-system='matrix'] .mx-budget__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+[data-diary-system='matrix'] .mx-budget__lab {
+  font: 600 11px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mx-muted);
+}
+[data-diary-system='matrix'] .mx-budget__val {
+  font: 700 14px 'IBM Plex Mono', monospace;
+  color: #c5b3ff;
+}
+[data-diary-system='matrix'] .mx-budget__val.over {
+  color: #fca5a5;
+}
+[data-diary-system='matrix'] .mx-budget__bar {
+  height: 10px;
+  background: #15172a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+}
+[data-diary-system='matrix'] .mx-budget__fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #a78bfa, #38e0ff);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.53);
+}
+[data-diary-system='matrix'] .mx-budget__fill.over {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.6);
+}
+[data-diary-system='matrix'] .mx-budget__warn {
+  display: block;
+  margin-top: 7px;
+  font: 600 11px 'IBM Plex Mono', monospace;
+  color: #fca5a5;
+  letter-spacing: 0.03em;
+}
+[data-diary-system='matrix'] .mx-budget .upd {
+  font: 500 12px 'IBM Plex Mono', monospace;
+  color: var(--mx-muted);
+  white-space: nowrap;
+}
+[data-diary-system='matrix'] .mx-budget .upd b {
+  color: var(--mx-text);
+  font-weight: 600;
+}
 
-[data-diary-system='matrix'] .mx-data-list {
+/* ── Přetlaky ─────────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-pressure {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 12px;
 }
-[data-diary-system='matrix'] .mx-data-row {
-  display: flex;
+[data-diary-system='matrix'] .mx-pr-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.4rem 0.5rem;
-  background: var(--mx-field-bg);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 6px;
+  gap: 12px;
 }
-[data-diary-system='matrix'] .mx-data-row__level {
-  flex-shrink: 0;
-  width: 56px;
-}
-[data-diary-system='matrix'] .mx-data-row__level input {
-  width: 100%;
-  text-align: center;
-  font-weight: 700;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--mx-field-border);
-  color: #fff;
-  padding: 0.4rem;
-  border-radius: 4px;
-  font-family: inherit;
-  outline: none;
-}
-[data-diary-system='matrix']
-  .mx-data-row__level
-  input:focus {
-  border-color: var(--mx-field-focus);
-}
-[data-diary-system='matrix'] .mx-data-row__value {
-  flex: 1;
-}
-[data-diary-system='matrix'] .mx-data-row__value input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: var(--mx-text-main);
-  font-size: 0.95rem;
-  padding: 0.3rem;
-  outline: none;
-  font-family: inherit;
-}
-
-/* Aspect chip (Nabitý / Vybitý) */
-[data-diary-system='matrix'] .mx-state-chip {
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+[data-diary-system='matrix'] .mx-pr-row .lab {
+  font: 600 12px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  cursor: pointer;
-  user-select: none;
-  border: 1px solid transparent;
-  transition: all 0.15s;
+  color: #9aa4c0;
 }
-[data-diary-system='matrix'] .mx-state-chip--charged {
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
-  border-color: rgba(34, 197, 94, 0.3);
+[data-diary-system='matrix'] .mx-pr-rail {
+  display: flex;
+  gap: 5px;
 }
-[data-diary-system='matrix']
-  .mx-state-chip--charged:hover:not(.is-disabled) {
-  background: rgba(34, 197, 94, 0.25);
-}
-[data-diary-system='matrix'] .mx-state-chip--depleted {
-  background: rgba(239, 68, 68, 0.15);
-  color: var(--mx-danger);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-[data-diary-system='matrix']
-  .mx-state-chip--depleted:hover:not(.is-disabled) {
-  background: rgba(239, 68, 68, 0.25);
-}
-[data-diary-system='matrix'] .mx-state-chip.is-disabled {
+[data-diary-system='matrix'] .mx-pr-seg {
+  flex: 1;
+  height: 14px;
+  border-radius: 2px;
+  background: #181b2c;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0;
   cursor: default;
 }
-
-/* Magic link icon */
-[data-diary-system='matrix'] .mx-magic-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: rgba(168, 85, 247, 0.15);
-  color: var(--mx-purple);
-  border: 1px solid rgba(168, 85, 247, 0.3);
+[data-diary-system='matrix'] .mx-pr-seg.on1 {
+  background: linear-gradient(180deg, #4ade80, #22c55e);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+[data-diary-system='matrix'] .mx-pr-seg.on2 {
+  background: linear-gradient(180deg, #a3e635, #84cc16);
+  border-color: rgba(163, 230, 53, 0.4);
+}
+[data-diary-system='matrix'] .mx-pr-seg.on3 {
+  background: linear-gradient(180deg, #fbbf24, #f59e0b);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+[data-diary-system='matrix'] .mx-pr-seg.on4 {
+  background: linear-gradient(180deg, #fb923c, #ea580c);
+  border-color: rgba(251, 146, 60, 0.4);
+}
+[data-diary-system='matrix'] .mx-pr-seg.on5 {
+  background: linear-gradient(180deg, #f87171, #dc2626);
+  border-color: rgba(248, 113, 113, 0.53);
+  box-shadow: 0 0 10px -2px rgba(248, 113, 113, 0.53);
+}
+[data-diary-system='matrix'] .matrix-sheet[data-mode='edit'] .mx-pr-seg {
   cursor: pointer;
-  transition: all 0.15s;
+}
+
+/* ── Schopnosti ───────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+[data-diary-system='matrix'] .mx-skill {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: linear-gradient(90deg, #10111f, #0d0e1a);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--lvlc, #2a2e44);
+  border-radius: 2px;
+}
+[data-diary-system='matrix'] .mx-skill.toohigh {
+  border-left-color: var(--mx-danger) !important;
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.19);
+}
+[data-diary-system='matrix'] .mx-skill__name {
+  font: 500 14px 'Chakra Petch', sans-serif;
+  color: var(--mx-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+[data-diary-system='matrix'] .mx-skill__mag {
+  font-size: 14px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(56, 224, 255, 0.67));
+  cursor: pointer;
   text-decoration: none;
+  transition: filter 0.15s, transform 0.15s;
 }
-[data-diary-system='matrix'] .mx-magic-link:hover {
-  background: rgba(168, 85, 247, 0.3);
-  color: #fff;
+[data-diary-system='matrix'] .mx-skill__mag:hover {
+  filter: drop-shadow(0 0 12px #38e0ff);
+  transform: scale(1.15);
+}
+[data-diary-system='matrix'] .mx-mag-empty {
+  width: 18px;
+  flex: none;
+  display: inline-block;
+}
+[data-diary-system='matrix'] .mx-pips {
+  display: flex;
+  gap: 3px;
+}
+[data-diary-system='matrix'] .mx-pip {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #20233a;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 0;
+}
+[data-diary-system='matrix'] .mx-pip.on {
+  background: var(--lvlc);
+  border-color: rgba(255, 255, 255, 0.27);
+  box-shadow: 0 0 8px -1px var(--lvlc);
+}
+[data-diary-system='matrix'] .mx-pip.entity.on {
+  animation: mx-pulse 1.4s ease-in-out infinite;
+}
+@keyframes mx-pulse {
+  0%, 100% { box-shadow: 0 0 6px #fff; }
+  50% { box-shadow: 0 0 16px #fff, 0 0 28px #a78bfa; }
+}
+[data-diary-system='matrix'] .matrix-sheet[data-mode='edit'] .mx-pip {
+  cursor: pointer;
+}
+[data-diary-system='matrix'] .matrix-sheet[data-mode='edit'] .mx-pip:hover {
+  border-color: rgba(56, 224, 255, 0.6);
+  box-shadow: 0 0 8px -2px rgba(56, 224, 255, 0.6);
+}
+[data-diary-system='matrix'] .mx-skill__lvl {
+  font: 700 13px 'IBM Plex Mono', monospace;
+  color: var(--lvlc, #9aa4c0);
+  min-width: 40px;
+  text-align: right;
+  position: relative;
+  cursor: help;
+}
+[data-diary-system='matrix'] .mx-skill__lvl small {
+  color: var(--mx-dim);
+}
+[data-diary-system='matrix'] .mx-skill__lvl:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 130%;
+  right: 0;
+  white-space: nowrap;
+  background: #060710;
+  color: #e6ecff;
+  border: 1px solid var(--lvlc, #38e0ff);
+  border-radius: 3px;
+  padding: 5px 9px;
+  font: 600 11px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.04em;
+  box-shadow: 0 8px 24px -8px #000;
+  z-index: 5;
 }
 
-/* ── Inventory editor ──────────────────────────────── */
+/* ── Jazyky ───────────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-lang {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  background: #0d0e1a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+[data-diary-system='matrix'] .mx-lang__lvl {
+  font: 700 11px 'IBM Plex Mono', monospace;
+  color: #0a0a14;
+  padding: 3px 7px;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+  min-width: 26px;
+  text-align: center;
+  background: #4a5168;
+}
+[data-diary-system='matrix'] .mx-lang__lvl.lvl-a {
+  background: linear-gradient(135deg, #4ade80, #16a34a);
+}
+[data-diary-system='matrix'] .mx-lang__lvl.lvl-b {
+  background: linear-gradient(135deg, #38e0ff, #0ea5c4);
+}
+[data-diary-system='matrix'] .mx-lang__lvl.lvl-c {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+}
+[data-diary-system='matrix'] .mx-lang__name {
+  font: 500 14px 'Chakra Petch', sans-serif;
+  color: var(--mx-text);
+}
 
-[data-diary-system='matrix'] .mx-inventory-textarea {
+/* ── Aspekty ──────────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-aspect {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #0d0e1a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+[data-diary-system='matrix'] .mx-aspect__name {
+  font: 500 13.5px 'Chakra Petch', sans-serif;
+  color: #cdd5ea;
+}
+[data-diary-system='matrix'] .mx-chip {
+  font: 700 10px 'IBM Plex Mono', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+[data-diary-system='matrix'] .mx-chip.charged {
+  background: rgba(74, 222, 128, 0.09);
+  color: #86efac;
+  border-color: rgba(74, 222, 128, 0.33);
+  box-shadow: 0 0 12px -3px rgba(74, 222, 128, 0.6);
+}
+[data-diary-system='matrix'] .mx-chip.depleted {
+  background: rgba(248, 113, 113, 0.06);
+  color: #c47c7c;
+  border-color: rgba(248, 113, 113, 0.2);
+}
+
+/* ── Poznámky ─────────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-gear {
   width: 100%;
-  min-height: 200px;
-  background: var(--mx-field-bg);
-  border: 1px solid var(--mx-field-border);
-  border-radius: 8px;
-  color: var(--mx-text-main);
-  padding: 1rem;
-  font-size: 0.95rem;
-  font-family: inherit;
-  line-height: 1.5;
+  min-height: 160px;
+  font: 400 13.5px/1.6 'IBM Plex Mono', monospace;
+  color: #aeb6cf;
+  background: #0b0c16;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  padding: 14px 16px;
   resize: vertical;
   outline: none;
 }
-[data-diary-system='matrix'] .mx-inventory-textarea:focus {
-  border-color: var(--mx-field-focus);
-  box-shadow: 0 0 0 3px var(--mx-accent-glow);
+[data-diary-system='matrix'] .mx-gear:focus {
+  border-color: rgba(56, 224, 255, 0.5);
+}
+[data-diary-system='matrix'] .mx-gear[readonly] {
+  white-space: pre-wrap;
+  resize: none;
+  cursor: default;
+}
+
+/* ── Edit prvky ───────────────────────────────────────── */
+[data-diary-system='matrix'] .mx-input {
+  font: 500 13px 'Chakra Petch', sans-serif;
+  color: #e6ecff;
+  background: #0a0b16;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  padding: 6px 9px;
+  outline: none;
+}
+[data-diary-system='matrix'] .mx-input:focus {
+  border-color: rgba(56, 224, 255, 0.53);
+  box-shadow: 0 0 10px -3px rgba(56, 224, 255, 0.53);
+}
+[data-diary-system='matrix'] .mx-input.name {
+  flex: 1;
+  min-width: 0;
+}
+[data-diary-system='matrix'] .mx-num {
+  width: 60px;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  box-sizing: border-box;
+  padding: 6px 4px;
+}
+[data-diary-system='matrix'] .hero-in {
+  width: 170px;
+  max-width: 60%;
+}
+[data-diary-system='matrix'] .mx-del {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  background: rgba(248, 113, 113, 0.09);
+  color: #fca5a5;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  font: 700 12px 'IBM Plex Mono', monospace;
+}
+[data-diary-system='matrix'] .mx-del:hover {
+  background: rgba(248, 113, 113, 0.19);
+}
+[data-diary-system='matrix'] .mx-add {
+  margin-top: 8px;
+  cursor: pointer;
+  width: 100%;
+  font: 600 12px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px;
+  border-radius: 2px;
+  background: transparent;
+  color: #7fd9ef;
+  border: 1px dashed rgba(56, 224, 255, 0.33);
+}
+[data-diary-system='matrix'] .mx-add:hover {
+  background: rgba(56, 224, 255, 0.08);
+  border-style: solid;
+}
+[data-diary-system='matrix'] .mx-skill.edit,
+[data-diary-system='matrix'] .mx-aspect.edit,
+[data-diary-system='matrix'] .mx-lang.edit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+[data-diary-system='matrix'] .mx-warn {
+  margin-top: 8px;
+  padding: 8px 11px;
+  font: 600 11px/1.4 'IBM Plex Mono', monospace;
+  color: #fca5a5;
+  background: rgba(248, 113, 113, 0.06);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 768px) {
+  [data-diary-system='matrix'] .mx-hero {
+    grid-template-columns: auto 1fr;
+  }
+  [data-diary-system='matrix'] .mx-fate {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+  [data-diary-system='matrix'] .mx-vitals-grid,
+  [data-diary-system='matrix'] .mx-row2 {
+    grid-template-columns: 1fr;
+  }
+  [data-diary-system='matrix'] .mx-pr-row {
+    grid-template-columns: 100px 1fr;
+  }
+}
+@media (max-width: 480px) {
+  [data-diary-system='matrix'] .mx-portrait {
+    width: 64px;
+    height: 64px;
+  }
+  [data-diary-system='matrix'] .mx-name {
+    font-size: 24px;
+  }
+  [data-diary-system='matrix'] .mx-pr-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
 }

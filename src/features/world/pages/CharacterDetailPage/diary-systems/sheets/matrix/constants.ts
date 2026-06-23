@@ -61,3 +61,50 @@ export interface MatrixTagValue {
   /** Hodnota (např. úroveň „1"–„6" pro ability / „C2" pro jazyk / „Nabitý"/„Vybitý" pro aspect). */
   value: string;
 }
+
+/**
+ * 16.2a — univerzální stupnice úrovní schopností 1–10. Domény si hráč
+ * pojmenovává sám, proto jedno měřítko „jak dobře to umí" napříč okruhy.
+ * Tooltip u pipů ukazuje tento název.
+ */
+export const MATRIX_SKILL_LEVELS: Record<number, string> = {
+  1: 'Talent',
+  2: 'Základní výcvik',
+  3: 'Profesionál',
+  4: 'Elita',
+  5: 'Mistr oboru',
+  6: 'Nadlidský',
+  7: 'Vrchol smrtelnosti',
+  8: 'Entita',
+  9: 'Entita',
+  10: 'Entita',
+};
+
+/** Hráč (PC) = lidský strop 7 pipů; NPC/Bestie = extrém až 10 (entity). */
+export const MATRIX_SKILL_MAX_PC = 7;
+export const MATRIX_SKILL_MAX_NPC = 10;
+
+/** Název stupně pro tooltip (clamp 1–10). */
+export function matrixLevelName(lvl: number): string {
+  const k = Math.max(1, Math.min(10, Math.round(lvl)));
+  return MATRIX_SKILL_LEVELS[k] ?? '';
+}
+
+/**
+ * 16.2a — 📘 auto-match: schopnost je magická, pokud se její název shoduje
+ * s magií v pravidlech ({@link MATRIX_MAGIC}). Žádný ruční flag.
+ */
+export function isMatrixMagic(name: string): boolean {
+  const n = (name ?? '').trim().toLowerCase();
+  return n.length > 0 && MATRIX_MAGIC.some((m) => m.toLowerCase() === n);
+}
+
+/** Slug magie-stránky z názvu (odkaz na pravidlo, např. „Magie těla" → „magie-tela"). */
+export function matrixMagicSlug(name: string): string {
+  return (name ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/\s+/g, '-');
+}

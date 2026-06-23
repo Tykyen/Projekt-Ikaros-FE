@@ -1,167 +1,129 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { MatrixSheet } from '../MatrixSheet';
 import type { CharacterDiary } from '../../../../../api/characters.types';
 
-function makeDiary(
-  customData: Record<string, unknown> = {},
-): CharacterDiary {
-  return {
-    id: 'd1',
-    characterId: 'c1',
-    worldId: 'w1',
-    sections: [],
-    customData,
-  };
+function makeDiary(customData: Record<string, unknown> = {}): CharacterDiary {
+  return { id: 'd1', characterId: 'c1', worldId: 'w1', sections: [], customData };
 }
 
 const commonProps = {
   worldId: 'w1',
   worldSlug: 'testw',
   characterSlug: 'katerina',
-};
+} as const;
 
-describe('MatrixSheet (8.7n)', () => {
-  it('vyrenderuje 6 polí overview (Jméno, Stát, Magický gen, Datum, Body schopností, Body osudu)', () => {
-    render(
-      <MatrixSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
+/** Sheet používá <Link> (magie 📘) → render v Router contextu. */
+function renderSheet(ui: React.ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
+
+describe('MatrixSheet (16.2a HUD)', () => {
+  it('Hero: jméno read-only text, Stát/Povolání/Genom/Body osudu editovatelné', () => {
+    renderSheet(
+      <MatrixSheet {...commonProps} diary={makeDiary({ matrix_name: 'Zara' })} mode="edit" onChange={() => {}} />,
     );
-    expect(screen.getByLabelText('Jméno')).toBeInTheDocument();
+    // jméno = text (ne input)
+    expect(screen.getByText('Zara')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Jméno')).toBeNull();
+    // editovatelná pole
     expect(screen.getByLabelText('Stát')).toBeInTheDocument();
-    expect(screen.getByLabelText('Magický gen')).toBeInTheDocument();
-    expect(screen.getByText('Body schopností:')).toBeInTheDocument();
+    expect(screen.getByLabelText('Povolání')).toBeInTheDocument();
+    expect(screen.getByLabelText('Magický genom')).toBeInTheDocument();
     expect(screen.getByLabelText('Body osudu')).toBeInTheDocument();
   });
 
-  it('vyrenderuje Fyzický stav s 4 tiles (Životy/Runa/Vesta/Únava)', () => {
-    render(
-      <MatrixSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
-    );
+  it('Fyzický stav: Životy/Runa/Ochrana/Únava (edit inputy)', () => {
+    renderSheet(<MatrixSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />);
     expect(screen.getByLabelText('Životy')).toBeInTheDocument();
     expect(screen.getByLabelText('Runa')).toBeInTheDocument();
-    expect(screen.getByLabelText('Vesta')).toBeInTheDocument();
+    expect(screen.getByLabelText('Ochrana')).toBeInTheDocument();
     expect(screen.getByLabelText('Únava')).toBeInTheDocument();
   });
 
-  it('Health penalty: život = 1 aktivuje -2 segment (orange)', () => {
-    const { container } = render(
-      <MatrixSheet
-        {...commonProps}
-        diary={makeDiary({ matrix_health: '1' })}
-        mode="view"
-      />,
+  it('Penalty readout: život = 1 → postih −2', () => {
+    const { container } = renderSheet(
+      <MatrixSheet {...commonProps} diary={makeDiary({ matrix_health: '1' })} mode="view" />,
     );
-    const segments = container.querySelectorAll(
-      '.mx-stat-block:first-child .mx-penalty-segment',
-    );
-    expect(segments).toHaveLength(4);
-    // -2 segment je index 2
-    expect(segments[2].className).toContain('is-active');
-    expect(segments[2].className).toContain('mx-penalty-segment--orange');
+    const badge = container.querySelector('.mx-status .badge');
+    expect(badge?.textContent).toBe('−2');
   });
 
-  it('Tiredness penalty: únava 18 aktivuje „Bez" segment (purple)', () => {
-    const { container } = render(
-      <MatrixSheet
-        {...commonProps}
-        diary={makeDiary({ matrix_tiredness: '18' })}
-        mode="view"
-      />,
+  it('Penalty readout: únava 18 → postih BEZ', () => {
+    const { container } = renderSheet(
+      <MatrixSheet {...commonProps} diary={makeDiary({ matrix_tiredness: '18' })} mode="view" />,
     );
-    const segments = container.querySelectorAll(
-      '.mx-stat-block:last-child .mx-penalty-segment',
+    const badges = container.querySelectorAll('.mx-status .badge');
+    expect(badges[1]?.textContent).toBe('BEZ');
+  });
+
+  it('Ochrana track má minimálně 3 segmenty', () => {
+    const { container } = renderSheet(
+      <MatrixSheet {...commonProps} diary={makeDiary({ matrix_armor: '1' })} mode="view" />,
     );
-    expect(segments).toHaveLength(5);
-    expect(segments[3].className).toContain('is-active');
-    expect(segments[3].className).toContain('mx-penalty-segment--purple');
+    const armSegs = container.querySelectorAll('.mx-seg.arm');
+    expect(armSegs.length).toBeGreaterThanOrEqual(3);
   });
 
   it('Přetlaky: 4 typy (Fyzický/Magický/Diplomatický/Technický)', () => {
-    render(
-      <MatrixSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
-    );
+    renderSheet(<MatrixSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />);
     expect(screen.getByText('Fyzický')).toBeInTheDocument();
     expect(screen.getByText('Magický')).toBeInTheDocument();
     expect(screen.getByText('Diplomatický')).toBeInTheDocument();
     expect(screen.getByText('Technický')).toBeInTheDocument();
   });
 
-  it('Přetlak klik na segment 2 nastaví matrix_pressure_physical na 2', () => {
+  it('Přetlak klik na 3. segment nastaví pressure_physical na 2', () => {
     const onChange = vi.fn();
-    render(
-      <MatrixSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={onChange}
-      />,
-    );
-    fireEvent.click(screen.getByLabelText('Fyzický přetlak 3 z 5'));
+    renderSheet(<MatrixSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={onChange} />);
+    fireEvent.click(screen.getByLabelText('Fyzický 3 z 5'));
     expect(onChange).toHaveBeenCalledWith({
-      customDataPatch: expect.objectContaining({
-        matrix_pressure_physical: '2',
-      }),
+      customDataPatch: expect.objectContaining({ matrix_pressure_physical: '2' }),
     });
   });
 
-  it('+ Přidat jazyk vytvoří TagValue {label:"", value:"C"}', () => {
+  it('+ Přidat jazyk vytvoří TagValue {label:"", value:"A1"}', () => {
     const onChange = vi.fn();
-    render(
-      <MatrixSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={onChange}
-      />,
-    );
+    renderSheet(<MatrixSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={onChange} />);
     fireEvent.click(screen.getByText('+ Přidat jazyk'));
     expect(onChange).toHaveBeenCalledWith({
       customDataPatch: expect.objectContaining({
-        matrix_languages: JSON.stringify([{ label: '', value: 'C' }]),
+        matrix_languages: JSON.stringify([{ label: '', value: 'A1' }]),
       }),
     });
   });
 
-  it('Magická schopnost: „Ohnivá magie" → renderuje magic 📘 icon', () => {
-    const { container } = render(
+  it('Magie 📘 auto-match: „Ohnivá magie" → odkaz na pravidlo', () => {
+    const { container } = renderSheet(
       <MatrixSheet
         {...commonProps}
-        diary={makeDiary({
-          matrix_abilities: JSON.stringify([
-            { label: 'Ohnivá magie', value: '4' },
-          ]),
-        })}
+        diary={makeDiary({ matrix_abilities: JSON.stringify([{ label: 'Ohnivá magie', value: '4' }]) })}
         mode="view"
       />,
     );
-    expect(container.querySelector('.mx-magic-link')).not.toBeNull();
+    const mag = container.querySelector('.mx-skill__mag');
+    expect(mag).not.toBeNull();
+    expect(mag?.getAttribute('href')).toBe('/svet/testw/ohniva-magie');
+  });
+
+  it('Magie 📘: nemagická schopnost (Hacker) → žádné 📘', () => {
+    const { container } = renderSheet(
+      <MatrixSheet
+        {...commonProps}
+        diary={makeDiary({ matrix_abilities: JSON.stringify([{ label: 'Hacker', value: '4' }]) })}
+        mode="view"
+      />,
+    );
+    expect(container.querySelector('.mx-skill__mag')).toBeNull();
   });
 
   it('Aspekt chip: klik na „Vybitý" přepne na „Nabitý"', () => {
     const onChange = vi.fn();
-    render(
+    renderSheet(
       <MatrixSheet
         {...commonProps}
-        diary={makeDiary({
-          matrix_aspects: JSON.stringify([
-            { label: 'Empatická', value: 'Vybitý' },
-          ]),
-        })}
+        diary={makeDiary({ matrix_aspects: JSON.stringify([{ label: 'Empatická', value: 'Vybitý' }]) })}
         mode="edit"
         onChange={onChange}
       />,
@@ -169,47 +131,91 @@ describe('MatrixSheet (8.7n)', () => {
     fireEvent.click(screen.getByText('Vybitý'));
     expect(onChange).toHaveBeenCalledWith({
       customDataPatch: expect.objectContaining({
-        matrix_aspects: JSON.stringify([
-          { label: 'Empatická', value: 'Nabitý' },
-        ]),
+        matrix_aspects: JSON.stringify([{ label: 'Empatická', value: 'Nabitý' }]),
       }),
     });
   });
 
-  it('View mode disabluje vše', () => {
-    render(
+  it('View mode: žádná „+ Přidat" tlačítka, jméno není input', () => {
+    renderSheet(
       <MatrixSheet
         {...commonProps}
-        diary={makeDiary({
-          matrix_aspects: JSON.stringify([{ label: 'A1', value: 'Nabitý' }]),
-        })}
+        diary={makeDiary({ matrix_name: 'Zara' })}
         mode="view"
       />,
     );
-    expect(screen.getByLabelText('Jméno')).toBeDisabled();
     expect(screen.queryByText('+ Přidat jazyk')).not.toBeInTheDocument();
     expect(screen.queryByText('+ Přidat aspekt')).not.toBeInTheDocument();
+    expect(screen.queryByText('+ Přidat schopnost')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Stát')).toBeNull(); // view = text, ne input
   });
 
-  it('Body schopností auto-počítá used z `matrix_abilities` (triangle sum)', () => {
-    // abilities: úroveň 3 → 1+2+3 = 6, úroveň 2 → 1+2 = 3; total = 9 / 70
-    render(
+  it('Body schopností: used = trojúhelník + aspekty nad 3 ×6', () => {
+    // abilities: 3→6, 2→3 = 9; aspekty 4 → (4-3)*6 = 6; total 15 / 70
+    const { container } = renderSheet(
       <MatrixSheet
         {...commonProps}
         diary={makeDiary({
           matrix_abilityPoints: '70',
           matrix_abilities: JSON.stringify([
             { label: 'Programátor', value: '3' },
-            { label: 'Démonologie', value: '2' },
+            { label: 'Vyjednavač', value: '2' },
+          ]),
+          matrix_aspects: JSON.stringify([
+            { label: 'a', value: 'Vybitý' },
+            { label: 'b', value: 'Vybitý' },
+            { label: 'c', value: 'Vybitý' },
+            { label: 'd', value: 'Vybitý' },
           ]),
         })}
         mode="view"
       />,
     );
-    // remaining = 70 - 9 = 61
-    expect(
-      screen.getByLabelText('Zbývající body schopností'),
-    ).toHaveValue(61);
+    const val = container.querySelector('.mx-budget__val')?.textContent ?? '';
+    expect(val).toContain('15');
+    expect(val).toContain('70');
+  });
+
+  it('Přečerpání: used > strop → warn hláška', () => {
+    const { container } = renderSheet(
+      <MatrixSheet
+        {...commonProps}
+        diary={makeDiary({
+          matrix_abilityPoints: '5',
+          matrix_abilities: JSON.stringify([{ label: 'X', value: '5' }]), // 15 b > 5
+        })}
+        mode="view"
+      />,
+    );
+    expect(container.querySelector('.mx-budget__warn')).not.toBeNull();
+    expect(container.querySelector('.mx-budget__fill.over')).not.toBeNull();
+  });
+
+  it('Validace: schopnost s úrovní > počet aspektů → warn + zvýraznění', () => {
+    const { container } = renderSheet(
+      <MatrixSheet
+        {...commonProps}
+        diary={makeDiary({
+          matrix_abilities: JSON.stringify([{ label: 'X', value: '5' }]),
+          matrix_aspects: JSON.stringify([{ label: 'a', value: 'Vybitý' }]), // 1 aspekt < 5
+        })}
+        mode="view"
+      />,
+    );
+    expect(container.querySelector('.mx-warn')).not.toBeNull();
+    expect(container.querySelector('.mx-skill.toohigh')).not.toBeNull();
+  });
+
+  it('Tooltip stupně: úroveň 5 → data-tip „5 — Mistr oboru"', () => {
+    const { container } = renderSheet(
+      <MatrixSheet
+        {...commonProps}
+        diary={makeDiary({ matrix_abilities: JSON.stringify([{ label: 'X', value: '5' }]) })}
+        mode="view"
+      />,
+    );
+    const lvl = container.querySelector('.mx-skill__lvl');
+    expect(lvl?.getAttribute('data-tip')).toBe('5 — Mistr oboru');
   });
 });
 

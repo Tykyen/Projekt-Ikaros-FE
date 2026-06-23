@@ -1,659 +1,702 @@
 /**
- * 8.7n — Matrix RPG deník postavy (vlastní systém projektu Matrix/Ikaros).
+ * 16.2a — Matrix / Ikaros deník postavy. Redesign „operátorský HUD".
  *
- * Adaptace z `c:/Matrix/Matrix/frontend/src/pages/CharacterSheet.tsx`
- * (řádky 356–948, default layout pro `world.system === 'matrix'`).
+ * Vizuál: styles/matrix.css (scoped [data-diary-system='matrix']).
+ * Data v `diary.customData` s prefixem `matrix_*` přes `makeCdAccess`.
+ * 3 režimy: view (čtení) · edit (klikací prvky + inputy) · print
+ * (oddělený statický `MatrixPrintView`).
  *
- * Data v `diary.customData` s prefixem `matrix_*` (mapping z přímých
- * polí Character entity legacy projektu — pro Ikaros konsistentní s
- * ostatními systémovými presety).
- *
- * Sekce:
- *   A) Overview (jméno, stát, magický gen, datum, body schopností,
- *      body osudu)
- *   B) Vitals (Životy + Runa + Vesta + penalty strip / Únava + penalty)
- *   C) Přetlaky (4 typy × 5 segmentů) + Jazyky (TagValue list)
- *   D) Schopnosti (TagValue + magic ★) + Aspekty (TagValue + chip)
- *   E) Výbava (textarea / RichText prozatím plain)
+ * Sekce: Hero · Jazyky · Fyzický stav · Body schopností · Přetlaky ·
+ *        Schopnosti · Aspekty · Poznámky.
  */
+import type { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
 import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
-  MATRIX_HEALTH_PENALTY,
-  MATRIX_MAGIC,
   MATRIX_PRESSURE_TYPES,
-  MATRIX_TIREDNESS_PENALTY,
+  MATRIX_SKILL_MAX_PC,
+  matrixLevelName,
+  isMatrixMagic,
+  matrixMagicSlug,
   type MatrixTagValue,
 } from './constants';
 
-export function MatrixSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
-  const disabled = mode === 'view';
+type OnRoll = NonNullable<SystemSheetProps['onRoll']>;
+
+export function MatrixSheet({
+  diary,
+  mode,
+  worldSlug,
+  onChange,
+  onRoll,
+}: SystemSheetProps) {
   const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'matrix_', onChange);
 
-  // Tisk: interaktivní sheet (inputy/pips přes barvu) je netisknutelný —
-  // hodnoty jsou v `<input value>` (replaced element), stav v barvě. Proto
-  // v printMode vyrenderujeme oddělený statický čitelný dokument (viz
-  // chybový deník: ✅ ŘEŠENÍ-diagnóza tisk diary sheetů).
   if (printMode) return <MatrixPrintView cda={cda} />;
 
+  const editing = mode === 'edit';
+
   return (
-    <div className="matrix-sheet">
-      <OverviewCard cda={cda} disabled={disabled} onRoll={onRoll} />
-      <VitalsCard cda={cda} disabled={disabled} />
-      <div className="mx-grid-2col">
-        <PressureCard cda={cda} disabled={disabled} />
-        <DataListCard
-          cda={cda}
-          disabled={disabled}
-          arrKey="languages"
-          title="Jazyky"
-          template={{ label: '', value: 'C' }}
-          addLabel="+ Přidat jazyk"
-          variant="language"
-        />
-      </div>
-      <div className="mx-grid-2col">
-        <DataListCard
-          cda={cda}
-          disabled={disabled}
-          arrKey="abilities"
-          title="Schopnosti"
-          template={{ label: '', value: '1' }}
-          addLabel="+ Přidat schopnost"
-          variant="ability"
-          onRoll={onRoll}
-        />
-        <DataListCard
-          cda={cda}
-          disabled={disabled}
-          arrKey="aspects"
-          title="Aspekty"
-          template={{ label: '', value: 'Vybitý' }}
-          addLabel="+ Přidat aspekt"
-          variant="aspect"
-        />
-      </div>
-      <InventoryCard cda={cda} disabled={disabled} />
+    <div className="matrix-sheet" data-mode={mode}>
+      <Hero cda={cda} editing={editing} onRoll={onRoll} />
+      <LanguagesPanel cda={cda} editing={editing} />
+      <VitalsPanel cda={cda} editing={editing} />
+      <BudgetPanel cda={cda} editing={editing} />
+      <PressurePanel cda={cda} editing={editing} />
+      <SkillsPanel cda={cda} editing={editing} worldSlug={worldSlug} onRoll={onRoll} />
+      <AspectsPanel cda={cda} editing={editing} />
+      <NotesPanel cda={cda} editing={editing} />
     </div>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
-// A) Overview card
-// ════════════════════════════════════════════════════════════════
+// ── helpers ──────────────────────────────────────────────
 
 interface SubProps {
   cda: CdAccess;
-  disabled: boolean;
+  editing: boolean;
 }
 
-/** 10.2c-edit-9g — optional roll callback (tactical-map embed). */
-type OnRoll = NonNullable<SystemSheetProps['onRoll']>;
-
-interface OverviewProps extends SubProps {
-  onRoll?: OnRoll;
-}
-
-function OverviewCard({ cda, disabled, onRoll }: OverviewProps) {
-  const { g, set } = cda;
-  const abilityPoints = parseInt(g('abilityPoints', '0'), 10) || 0;
-  // Auto-compute used points from `matrix_abilities` array
+/** Body schopností: trojúhelník per schopnost + každý aspekt nad 3 ×6. */
+function computeUsedPoints(cda: CdAccess): {
+  used: number;
+  max: number;
+  over: boolean;
+} {
   const abilities = cda.parseJsonArr<MatrixTagValue>('abilities');
-  const usedPoints = abilities.reduce((sum, ab) => {
+  const aspects = cda.parseJsonArr<MatrixTagValue>('aspects');
+  const skillsCost = abilities.reduce((sum, ab) => {
     const v = parseInt(ab.value, 10) || 0;
-    // sum 1..v (triangle number) — z entities.ts `sum(n)` helper
-    let s = 0;
-    for (let i = 1; i <= v; i++) s += i;
-    return sum + s;
+    let tri = 0;
+    for (let i = 1; i <= v; i++) tri += i;
+    return sum + tri;
   }, 0);
-  const aspectsCount =
-    cda.parseJsonArr<MatrixTagValue>('aspects').length;
-  // +6 bodů za každý aspekt nad 3
-  const extraAspectsCost = Math.max(0, (aspectsCount - 3) * 6);
-  const totalUsed = usedPoints + extraAspectsCost;
-  const remaining = abilityPoints - totalUsed;
+  const aspectsCost = Math.max(0, aspects.length - 3) * 6;
+  const used = skillsCost + aspectsCost;
+  const max = parseInt(cda.g('abilityPoints', '0'), 10) || 0;
+  return { used, max, over: used > max };
+}
+
+/** Nejvyšší úroveň schopnosti (pro validaci aspektů). */
+function maxSkillLevel(cda: CdAccess): number {
+  return cda
+    .parseJsonArr<MatrixTagValue>('abilities')
+    .reduce((m, ab) => Math.max(m, parseInt(ab.value, 10) || 0), 0);
+}
+
+function langClass(level: string): string {
+  const c = (level || '').trim()[0]?.toUpperCase();
+  return c === 'A' ? 'lvl-a' : c === 'B' ? 'lvl-b' : c === 'C' ? 'lvl-c' : '';
+}
+
+/** Pips 1..total, barva dle dosaženého stupně. */
+function Pips({
+  lvl,
+  total,
+  editable,
+  onPick,
+}: {
+  lvl: number;
+  total: number;
+  editable?: boolean;
+  onPick?: (n: number) => void;
+}) {
+  const pips = [];
+  for (let i = 1; i <= total; i++) {
+    const on = i <= lvl;
+    const cls = `mx-pip${on ? ' on' + (lvl >= 8 ? ' entity' : '') : ''}`;
+    const style = on
+      ? ({ ['--lvlc' as string]: `var(--lvl-${Math.min(lvl, 10)})` } as CSSProperties)
+      : undefined;
+    pips.push(
+      editable ? (
+        <button
+          key={i}
+          type="button"
+          className={cls}
+          style={style}
+          onClick={() => onPick?.(i)}
+          aria-label={`Stupeň ${i}`}
+        />
+      ) : (
+        <span key={i} className={cls} style={style} />
+      ),
+    );
+  }
+  return <span className="mx-pips">{pips}</span>;
+}
+
+/** Segmentový vitals track. */
+function VitalTrack({
+  value,
+  total,
+  kind,
+  mod,
+}: {
+  value: number;
+  total: number;
+  kind: 'hp' | 'rune' | 'arm';
+  mod?: string;
+}) {
+  const segs = [];
+  for (let i = 1; i <= total; i++) {
+    const on = i <= value;
+    segs.push(
+      <div
+        key={i}
+        className={`mx-seg ${kind}${on ? ' on' + (mod ? ' ' + mod : '') : ''}`}
+      />,
+    );
+  }
+  return <div className="mx-track">{segs}</div>;
+}
+
+// ── Hero ─────────────────────────────────────────────────
+
+function Hero({
+  cda,
+  editing,
+  onRoll,
+}: SubProps & { onRoll?: OnRoll }) {
+  const { g, set } = cda;
+  const name = g('name');
+  const initials =
+    name
+      .split(/\s+/)
+      .map((w) => w[0] ?? '')
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || '?';
+  const fate = parseInt(g('fatePoints', '0'), 10) || 0;
+  const stars = Array.from({ length: 3 }, (_, i) => (i < fate ? '✦' : '✧')).join(' ');
 
   return (
-    <div className="mx-card mx-overview-card">
-      <SimpleField label="Jméno:" cda={cda} fieldKey="name" disabled={disabled} />
-      <SimpleField label="Stát:" cda={cda} fieldKey="bornWhere" disabled={disabled} />
-      <SimpleField
-        label="Magický gen:"
-        cda={cda}
-        fieldKey="magicGene"
-        disabled={disabled}
-      />
-      <div className="mx-field">
-        <label className="mx-field__label" htmlFor="matrix_lastFatePointModification">
-          Poslední úprava:
-        </label>
-        <input
-          id="matrix_lastFatePointModification"
-          type="date"
-          className="mx-input"
-          value={g('lastFatePointModification')}
-          disabled={disabled}
-          onChange={(e) => set('lastFatePointModification', e.target.value)}
-        />
+    <header className="mx-hero">
+      <div className="mx-portrait">
+        <span>{initials}</span>
       </div>
-      <div className="mx-field">
-        <span className="mx-field__label">Body schopností:</span>
-        <div className="mx-stat-capsule">
-          <input
-            className={`mx-input ${remaining < 0 ? 'is-negative' : ''}`}
-            type="number"
-            value={remaining}
-            readOnly
-            aria-label="Zbývající body schopností"
-            style={{ background: 'transparent', border: 'none' }}
-          />
-          <p>/</p>
-          <input
-            type="number"
-            value={abilityPoints}
-            disabled={disabled}
-            onChange={(e) => set('abilityPoints', e.target.value)}
-            aria-label="Celkové body schopností"
-            style={{ background: 'transparent', border: 'none' }}
-          />
+      <div className="mx-id">
+        <h1 className="mx-name">{name || 'Bez jména'}</h1>
+        <div className="mx-meta">
+          <MetaRow label="Stát" value={g('bornWhere')} editing={editing} onChange={(v) => set('bornWhere', v)} />
+          <MetaRow label="Povolání" value={g('profession')} editing={editing} onChange={(v) => set('profession', v)} />
+          <MetaRow label="Magický genom" value={g('magicGene')} editing={editing} onChange={(v) => set('magicGene', v)} muted />
         </div>
+        {onRoll && (
+          <button
+            type="button"
+            className="mx-add"
+            style={{ marginTop: 4, maxWidth: 200 }}
+            onClick={() => onRoll({ label: 'Iniciativa', modifier: 0, kind: 'fate' })}
+          >
+            ⚡ Iniciativa
+          </button>
+        )}
       </div>
-      <div className="mx-field">
-        <label className="mx-field__label" htmlFor="matrix_fatePoints">
-          Body osudu:
-        </label>
-        <div className="mx-stat-capsule">
+      <div className="mx-fate">
+        <span className="lab">Body osudu</span>
+        {editing ? (
           <input
-            id="matrix_fatePoints"
+            className="mx-input mx-num"
             type="number"
             min={0}
             max={3}
-            value={g('fatePoints', '0')}
-            disabled={disabled}
-            onChange={(e) => set('fatePoints', e.target.value)}
+            value={fate}
+            onChange={(e) =>
+              set('fatePoints', String(Math.max(0, Math.min(3, parseInt(e.target.value, 10) || 0))))
+            }
             aria-label="Body osudu"
-            style={{ background: 'transparent', border: 'none' }}
           />
-        </div>
+        ) : (
+          <span className="num">{fate}</span>
+        )}
+        <span className="star">{stars}</span>
       </div>
-      {/* 10.2c-edit-9g — quick roll Iniciativa (tactical-map only) */}
-      {onRoll && (
-        <button
-          type="button"
-          onClick={() =>
-            onRoll({
-              label: 'Iniciativa',
-              modifier: 0,
-              kind: 'fate',
-            })
-          }
-          style={{
-            marginTop: 10,
-            padding: '8px 14px',
-            background: 'rgba(120, 100, 255, 0.22)',
-            color: 'rgba(220, 235, 255, 0.95)',
-            border: '1px solid rgba(120, 100, 255, 0.6)',
-            borderRadius: 6,
-            font: 'inherit',
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: 0.5,
-            textTransform: 'uppercase',
-            cursor: 'pointer',
-            width: '100%',
-          }}
-          title="Hodit iniciativu (4dF)"
-        >
-          ⚡ + Iniciativa
-        </button>
+    </header>
+  );
+}
+
+function MetaRow({
+  label,
+  value,
+  editing,
+  onChange,
+  muted,
+}: {
+  label: string;
+  value: string;
+  editing: boolean;
+  onChange: (v: string) => void;
+  muted?: boolean;
+}) {
+  return (
+    <div className="line">
+      <span className="k">{label}</span>
+      {editing ? (
+        <input
+          className="mx-input hero-in"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={label}
+        />
+      ) : (
+        <span className="v" style={muted && !value ? { color: '#5b6585' } : undefined}>
+          {value || '—'}
+        </span>
       )}
     </div>
   );
 }
 
-interface SimpleFieldProps extends SubProps {
-  label: string;
-  fieldKey: string;
-}
+// ── Jazyky ───────────────────────────────────────────────
 
-function SimpleField({ label, fieldKey, cda, disabled }: SimpleFieldProps) {
-  const { g, set } = cda;
+function LanguagesPanel({ cda, editing }: SubProps) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const langs = parseJsonArr<MatrixTagValue>('languages');
+  const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+
   return (
-    <div className="mx-field">
-      <label className="mx-field__label" htmlFor={`matrix_${fieldKey}`}>
-        {label}
-      </label>
-      <input
-        id={`matrix_${fieldKey}`}
-        type="text"
-        className="mx-input"
-        value={g(fieldKey)}
-        disabled={disabled}
-        onChange={(e) => set(fieldKey, e.target.value)}
-        aria-label={label.replace(':', '')}
-      />
-    </div>
+    <section className="mx-panel">
+      <h2 className="mx-title">Jazyky</h2>
+      <div className="mx-row2">
+        {langs.map((l, i) =>
+          editing ? (
+            <div className="mx-lang edit" key={i}>
+              <select
+                className="mx-input"
+                value={LEVELS.includes(l.value) ? l.value : 'A1'}
+                onChange={(e) => updateArr<MatrixTagValue>('languages', i, { value: e.target.value })}
+                aria-label="Úroveň jazyka"
+              >
+                {LEVELS.map((o) => (
+                  <option key={o}>{o}</option>
+                ))}
+              </select>
+              <input
+                className="mx-input name"
+                value={l.label}
+                onChange={(e) => updateArr<MatrixTagValue>('languages', i, { label: e.target.value })}
+                placeholder="Jazyk"
+              />
+              <span className="mx-del" onClick={() => removeArr('languages', i)} role="button" aria-label="Smazat jazyk">
+                ✕
+              </span>
+            </div>
+          ) : (
+            <div className="mx-lang" key={i}>
+              <span className={`mx-lang__lvl ${langClass(l.value)}`}>{l.value || '—'}</span>
+              <span className="mx-lang__name">{l.label || '—'}</span>
+            </div>
+          ),
+        )}
+      </div>
+      {editing && (
+        <button
+          type="button"
+          className="mx-add"
+          onClick={() => addArr<MatrixTagValue>('languages', { label: '', value: 'A1' })}
+        >
+          + Přidat jazyk
+        </button>
+      )}
+    </section>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
-// B) Vitals card (Životy + Runa + Vesta + Únava)
-// ════════════════════════════════════════════════════════════════
+// ── Fyzický stav ─────────────────────────────────────────
 
-function VitalsCard({ cda, disabled }: SubProps) {
-  const { g } = cda;
-  const health = parseInt(g('health', '5'), 10);
-  const tiredness = parseInt(g('tiredness', '0'), 10);
+function VitalsPanel({ cda, editing }: SubProps) {
+  const { g, set } = cda;
+  const health = parseInt(g('health', '5'), 10) || 0;
+  const rune = parseInt(g('magicHealth', '0'), 10) || 0;
+  const armor = parseInt(g('armor', '0'), 10) || 0;
+  const tiredness = parseInt(g('tiredness', '0'), 10) || 0;
+
+  const hpMod = health >= 4 ? '' : health >= 2 ? 'warn' : 'crit';
+  const hpPen =
+    health >= 4 ? ['0', ''] : health >= 2 ? ['−1', 'warn'] : health >= 1 ? ['−2', 'warn'] : ['SMRT', 'crit'];
+  const tPen =
+    tiredness <= 5
+      ? ['0', '']
+      : tiredness <= 10
+        ? ['−1', 'warn']
+        : tiredness <= 15
+          ? ['−2', 'warn']
+          : tiredness <= 20
+            ? ['BEZ', 'warn']
+            : ['SMRT', 'crit'];
 
   return (
-    <div className="mx-card mx-vitals-card">
-      <h2 className="mx-section-title">Fyzický stav</h2>
+    <section className="mx-panel mx-panel--accent">
+      <h2 className="mx-title">Fyzický stav</h2>
       <div className="mx-vitals-grid">
-        {/* Životy + Runa + Vesta */}
-        <div className="mx-stat-block">
-          <div className="mx-stat-tiles">
-            <StatTile
-              label="Životy"
-              fieldKey="health"
-              cda={cda}
-              disabled={disabled}
-              max={5}
-            />
-            <StatTile
-              label="Runa"
-              fieldKey="magicHealth"
-              cda={cda}
-              disabled={disabled}
-            />
-            <StatTile
-              label="Vesta"
-              fieldKey="armor"
-              cda={cda}
-              disabled={disabled}
-            />
+        <div>
+          <div className="mx-vit-group">
+            <VitalCell label="❤ Životy" name="Životy" valueKey="health" value={health} max={5} kind="hp" mod={hpMod} cda={cda} editing={editing} />
+            <VitalCell label="◇ Runa" name="Runa" valueKey="magicHealth" value={rune} max={Math.max(rune, 2)} kind="rune" cda={cda} editing={editing} />
+            <VitalCell label="🛡 Ochrana" name="Ochrana" valueKey="armor" value={armor} max={Math.max(armor, 3)} kind="arm" cda={cda} editing={editing} />
           </div>
-          <HealthPenaltyStrip health={health} />
+          <div className="mx-status">
+            <span>Postih:</span>
+            <span className={`badge ${hpPen[1]}`}>{hpPen[0]}</span>
+            <span className="scale">
+              <b>4–5 ▸ 0</b> · <b>2–3 ▸ −1</b> · <b>1 ▸ −2</b> · <b>0 ▸ SMRT</b>
+            </span>
+          </div>
         </div>
-
-        {/* Únava */}
-        <div className="mx-stat-block">
-          <div className="mx-stat-tiles">
-            <StatTile
-              label="Únava"
-              fieldKey="tiredness"
-              cda={cda}
-              disabled={disabled}
-              max={25}
-            />
+        <div>
+          <div className="mx-vit">
+            <div className="mx-vit__head">
+              <span className="mx-vit__label">⚡ Únava</span>
+              {editing ? (
+                <input
+                  className="mx-input mx-num"
+                  type="number"
+                  min={0}
+                  value={tiredness}
+                  onChange={(e) => set('tiredness', String(Math.max(0, parseInt(e.target.value, 10) || 0)))}
+                  aria-label="Únava"
+                />
+              ) : (
+                <span className="mx-vit__num">
+                  {tiredness}
+                  <small>/25</small>
+                </span>
+              )}
+            </div>
           </div>
-          <TirednessPenaltyStrip tiredness={tiredness} />
+          <div className="mx-status">
+            <span>Postih:</span>
+            <span className={`badge ${tPen[1]}`}>{tPen[0]}</span>
+            <span className="scale">0–5 ▸ 0 · 6–10 ▸ −1 · 11–15 ▸ −2 · 16–20 ▸ BEZ · 21+ ▸ SMRT</span>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-interface StatTileProps extends SubProps {
+function VitalCell({
+  label,
+  name,
+  valueKey,
+  value,
+  max,
+  kind,
+  mod,
+  cda,
+  editing,
+}: SubProps & {
   label: string;
-  fieldKey: string;
-  max?: number;
-}
-
-function StatTile({ label, fieldKey, max, cda, disabled }: StatTileProps) {
-  const { g, set } = cda;
+  name: string;
+  valueKey: string;
+  value: number;
+  max: number;
+  kind: 'hp' | 'rune' | 'arm';
+  mod?: string;
+}) {
+  const { set } = cda;
   return (
-    <div className="mx-stat-tile">
-      <span className="mx-stat-tile__label">{label}</span>
-      <div className="mx-stat-tile__value">
-        <input
-          type="number"
-          min={0}
-          max={max}
-          value={g(fieldKey, '0')}
-          disabled={disabled}
-          onChange={(e) => set(fieldKey, e.target.value)}
-          aria-label={label}
-        />
+    <div className="mx-vit">
+      <div className="mx-vit__head">
+        <span className="mx-vit__label">{label}</span>
+        {editing ? (
+          <input
+            className="mx-input mx-num"
+            type="number"
+            min={0}
+            value={value}
+            onChange={(e) => set(valueKey, String(Math.max(0, parseInt(e.target.value, 10) || 0)))}
+            aria-label={name}
+          />
+        ) : (
+          <span className="mx-vit__num">
+            {value}
+            <small>/{max}</small>
+          </span>
+        )}
       </div>
+      <VitalTrack value={value} total={max} kind={kind} mod={mod} />
     </div>
   );
 }
 
-function HealthPenaltyStrip({ health }: { health: number }) {
+// ── Body schopností ──────────────────────────────────────
+
+function BudgetPanel({ cda, editing }: SubProps) {
+  const { g, set } = cda;
+  const { used, max, over } = computeUsedPoints(cda);
+  const pct = over ? 100 : max > 0 ? Math.min(100, Math.round((used / max) * 100)) : 0;
+  const lastUpd = g('lastFatePointModification');
+
   return (
-    <div className="mx-penalty-strip">
-      {MATRIX_HEALTH_PENALTY.map((penalty, i) => {
-        let isActive = false;
-        let mod = '';
-        if (i === 0) {
-          isActive = health >= 4;
-        } else if (i === 1) {
-          isActive = health === 2 || health === 3;
-          mod = 'mx-penalty-segment--amber';
-        } else if (i === 2) {
-          isActive = health === 1;
-          mod = 'mx-penalty-segment--orange';
-        } else if (i === 3) {
-          isActive = health === 0;
-          mod = 'mx-penalty-segment--danger';
-        }
-        return (
-          <div
-            key={`he${i}`}
-            className={`mx-penalty-segment ${isActive ? `is-active ${mod}` : ''}`}
-            aria-label={`Penalty ${penalty}${isActive ? ' (aktivní)' : ''}`}
-          >
-            {penalty}
+    <section className="mx-panel">
+      <div className="mx-budget">
+        <div className="blk">
+          <div className="mx-budget__head">
+            <span className="mx-budget__lab">▸ Body schopností</span>
+            <span className={`mx-budget__val ${over ? 'over' : ''}`}>
+              <span className={over ? 'over' : ''}>{used}</span> /{' '}
+              {editing ? (
+                <input
+                  className="mx-input mx-num"
+                  type="number"
+                  min={0}
+                  value={max}
+                  onChange={(e) => set('abilityPoints', String(Math.max(0, parseInt(e.target.value, 10) || 0)))}
+                  aria-label="Strop bodů schopností"
+                />
+              ) : (
+                max
+              )}
+            </span>
           </div>
-        );
-      })}
-    </div>
+          <div className="mx-budget__bar">
+            <div className={`mx-budget__fill ${over ? 'over' : ''}`} style={{ width: `${pct}%` }} />
+          </div>
+          {over && <span className="mx-budget__warn">⚠ Přečerpáno o {used - max} b.</span>}
+        </div>
+        <span className="upd">
+          Poslední úprava: <b>{lastUpd || '—'}</b>
+        </span>
+      </div>
+    </section>
   );
 }
 
-function TirednessPenaltyStrip({ tiredness }: { tiredness: number }) {
-  return (
-    <div className="mx-penalty-strip">
-      {MATRIX_TIREDNESS_PENALTY.map((penalty, i) => {
-        let displayVal = String(penalty);
-        let isActive = false;
-        let mod = '';
-        if (i === 0) {
-          isActive = tiredness >= 0 && tiredness <= 5;
-        } else if (i === 1) {
-          isActive = tiredness >= 6 && tiredness <= 10;
-          mod = 'mx-penalty-segment--amber';
-        } else if (i === 2) {
-          isActive = tiredness >= 11 && tiredness <= 15;
-          mod = 'mx-penalty-segment--orange';
-        } else if (i === 3) {
-          displayVal = 'Bez';
-          isActive = tiredness >= 16 && tiredness <= 20;
-          mod = 'mx-penalty-segment--purple';
-        } else if (i === 4) {
-          displayVal = 'Smrt';
-          isActive = tiredness >= 21;
-          mod = 'mx-penalty-segment--danger';
-        }
-        return (
-          <div
-            key={`ti${i}`}
-            className={`mx-penalty-segment ${isActive ? `is-active ${mod}` : ''}`}
-            title={String(penalty)}
-            aria-label={`Únava ${displayVal}${isActive ? ' (aktivní)' : ''}`}
-          >
-            {displayVal}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+// ── Přetlaky ─────────────────────────────────────────────
 
-// ════════════════════════════════════════════════════════════════
-// C) Pressure card
-// ════════════════════════════════════════════════════════════════
-
-function PressureCard({ cda, disabled }: SubProps) {
+function PressurePanel({ cda, editing }: SubProps) {
   const { g, set } = cda;
   return (
-    <div className="mx-card">
-      <h2 className="mx-section-title">Přetlaky</h2>
-      <div className="mx-pressure-list">
+    <section className="mx-panel">
+      <h2 className="mx-title">Přetlaky</h2>
+      <div className="mx-pressure">
         {MATRIX_PRESSURE_TYPES.map((p) => {
           const current = parseInt(g(`pressure_${p.key}`, '-1'), 10);
           return (
-            <div className="mx-pressure-row" key={p.key}>
-              <span className="mx-pressure-row__label">{p.label}</span>
-              <div
-                className="mx-pressure-row__rail"
-                role="group"
-                aria-label={`Přetlak ${p.label}`}
-              >
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <button
-                    type="button"
-                    key={i}
-                    className={`mx-pressure-segment ${current >= i ? 'is-active' : ''} ${i === 4 ? 'is-danger' : ''}`}
-                    disabled={disabled}
-                    onClick={() => {
-                      if (current === i) {
-                        set(`pressure_${p.key}`, '-1');
-                      } else {
-                        set(`pressure_${p.key}`, String(i));
-                      }
-                    }}
-                    aria-label={`${p.label} přetlak ${i + 1} z 5`}
-                    aria-pressed={current >= i}
-                  />
-                ))}
+            <div className="mx-pr-row" key={p.key}>
+              <span className="lab">{p.label}</span>
+              <div className="mx-pr-rail" role="group" aria-label={`Přetlak ${p.label}`}>
+                {Array.from({ length: 5 }).map((_, i) => {
+                  const on = current >= i; // current = nejvyšší aktivní index (0..4)
+                  const cls = `mx-pr-seg ${on ? 'on' + (i + 1) : ''}`;
+                  return editing ? (
+                    <button
+                      key={i}
+                      type="button"
+                      className={cls}
+                      onClick={() => set(`pressure_${p.key}`, String(current === i ? i - 1 : i))}
+                      aria-label={`${p.label} ${i + 1} z 5`}
+                      aria-pressed={on}
+                    />
+                  ) : (
+                    <i key={i} className={cls} />
+                  );
+                })}
               </div>
             </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
-// D) Generic data list (Languages / Abilities / Aspects)
-// ════════════════════════════════════════════════════════════════
+// ── Schopnosti ───────────────────────────────────────────
 
-type DataListVariant = 'language' | 'ability' | 'aspect';
-
-interface DataListCardProps extends SubProps {
-  arrKey: string;
-  title: string;
-  template: MatrixTagValue;
-  addLabel: string;
-  variant: DataListVariant;
-  /** 10.2c-edit-9g — onRoll callback (jen ability variant + tactical-map). */
-  onRoll?: OnRoll;
-}
-
-function DataListCard({
+function SkillsPanel({
   cda,
-  disabled,
-  arrKey,
-  title,
-  template,
-  addLabel,
-  variant,
+  editing,
+  worldSlug,
   onRoll,
-}: DataListCardProps) {
+}: SubProps & { worldSlug: string; onRoll?: OnRoll }) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
-  const rows = parseJsonArr<MatrixTagValue>(arrKey);
+  const skills = parseJsonArr<MatrixTagValue>('abilities');
+  const aspectCount = parseJsonArr<MatrixTagValue>('aspects').length;
 
   return (
-    <div className="mx-card">
-      <h3 className="mx-section-title mx-section-title--chip">{title}</h3>
-      <div className="mx-data-list">
-        {rows.map((row, i) => (
-          <DataRow
-            key={i}
-            row={row}
-            index={i}
-            arrKey={arrKey}
-            variant={variant}
-            updateArr={updateArr}
-            removeArr={removeArr}
-            disabled={disabled}
-            onRoll={onRoll}
-          />
-        ))}
+    <section className="mx-panel">
+      <h2 className="mx-title">Schopnosti</h2>
+      <div className="mx-list">
+        {skills.map((s, i) => {
+          const lvl = parseInt(s.value, 10) || 0;
+          const total = Math.max(MATRIX_SKILL_MAX_PC, lvl);
+          const lvlc = `var(--lvl-${Math.min(Math.max(lvl, 1), 10)})`;
+          const tooHigh = lvl > aspectCount;
+          const magic = isMatrixMagic(s.label);
+          const tip = `${lvl} — ${matrixLevelName(lvl)}`;
+
+          return (
+            <div
+              className={`mx-skill${editing ? ' edit' : ''}${tooHigh ? ' toohigh' : ''}`}
+              key={i}
+              style={{ ['--lvlc' as string]: lvlc } as CSSProperties}
+              title={tooHigh ? `Úroveň ${lvl} vyžaduje aspoň ${lvl} aspektů (máš ${aspectCount})` : undefined}
+            >
+              {editing ? (
+                <>
+                  <input
+                    className="mx-input name"
+                    value={s.label}
+                    onChange={(e) => updateArr<MatrixTagValue>('abilities', i, { label: e.target.value })}
+                    placeholder="Název schopnosti"
+                  />
+                  <MagicMark magic={magic} name={s.label} worldSlug={worldSlug} />
+                  <Pips lvl={lvl} total={total} editable onPick={(n) => updateArr<MatrixTagValue>('abilities', i, { value: String(n) })} />
+                  <span className="mx-skill__lvl" data-tip={tip}>
+                    {lvl}
+                    <small>/{MATRIX_SKILL_MAX_PC}</small>
+                  </span>
+                  <span className="mx-del" onClick={() => removeArr('abilities', i)} role="button" aria-label="Smazat schopnost">
+                    ✕
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="mx-skill__name">
+                    {s.label || '—'}
+                    <MagicMark magic={magic} name={s.label} worldSlug={worldSlug} />
+                  </span>
+                  {onRoll && s.label && (
+                    <button
+                      type="button"
+                      className="mx-del"
+                      style={{ background: 'rgba(120,200,120,0.12)', color: '#9ddf9d', borderColor: 'rgba(120,200,120,0.4)' }}
+                      onClick={() => onRoll({ label: s.label, modifier: lvl, kind: 'fate' })}
+                      aria-label={`Hodit ${s.label}`}
+                      title={`Hodit ${s.label}`}
+                    >
+                      🎲
+                    </button>
+                  )}
+                  <Pips lvl={lvl} total={total} />
+                  <span className="mx-skill__lvl" data-tip={tip}>
+                    {lvl}
+                    <small>/{MATRIX_SKILL_MAX_PC}</small>
+                  </span>
+                </>
+              )}
+            </div>
+          );
+        })}
       </div>
-      {!disabled && (
+      {editing && (
         <button
           type="button"
-          className="mx-btn mx-btn--ghost"
-          onClick={() => addArr<MatrixTagValue>(arrKey, template)}
+          className="mx-add"
+          onClick={() => addArr<MatrixTagValue>('abilities', { label: '', value: '1' })}
         >
-          {addLabel}
+          + Přidat schopnost
         </button>
       )}
-    </div>
+    </section>
   );
 }
 
-interface DataRowProps {
-  row: MatrixTagValue;
-  index: number;
-  arrKey: string;
-  variant: DataListVariant;
-  updateArr: CdAccess['updateArr'];
-  removeArr: CdAccess['removeArr'];
-  disabled: boolean;
-  onRoll?: OnRoll;
-}
-
-function DataRow({
-  row,
-  index,
-  arrKey,
-  variant,
-  updateArr,
-  removeArr,
-  disabled,
-  onRoll,
-}: DataRowProps) {
-  const isMagic =
-    variant === 'ability' && MATRIX_MAGIC.includes(row.label);
-  const isAspect = variant === 'aspect';
-  const charged = row.value === 'Nabitý';
-
-  const updateField = (field: 'label' | 'value', val: string) =>
-    updateArr<MatrixTagValue>(arrKey, index, { [field]: val } as Partial<MatrixTagValue>);
-
+/** 📘 auto-match: pokud název = magie v pravidlech → odkaz na stránku magie. */
+function MagicMark({ magic, name, worldSlug }: { magic: boolean; name: string; worldSlug: string }) {
+  if (!magic) return null;
   return (
-    <div className="mx-data-row">
-      {variant === 'language' && (
-        <div className="mx-data-row__level">
-          <input
-            type="text"
-            value={row.value}
-            disabled={disabled}
-            onChange={(e) => updateField('value', e.target.value)}
-            placeholder="C"
-            aria-label={`Úroveň jazyka ${index + 1}`}
-          />
-        </div>
-      )}
-      <div className="mx-data-row__value">
-        <input
-          type="text"
-          className={isMagic ? 'is-magic' : ''}
-          value={row.label}
-          disabled={disabled}
-          onChange={(e) => updateField('label', e.target.value)}
-          aria-label={`${arrKey} ${index + 1} název`}
-        />
-      </div>
-      {isMagic && (
-        <span
-          className="mx-magic-link"
-          aria-label="Magická schopnost"
-          title={`Magická: ${row.label}`}
-        >
-          📘
-        </span>
-      )}
-      {variant === 'ability' && (
-        <div className="mx-data-row__level">
-          <input
-            type="number"
-            min={1}
-            value={row.value}
-            disabled={disabled}
-            onChange={(e) => updateField('value', e.target.value)}
-            aria-label={`Schopnost ${index + 1} úroveň`}
-          />
-        </div>
-      )}
-      {/* 10.2c-edit-9g — roll button (jen ability + tactical-map embed) */}
-      {variant === 'ability' && onRoll && row.label && (
-        <button
-          type="button"
-          onClick={() =>
-            onRoll({
-              label: row.label,
-              modifier: parseInt(row.value, 10) || 0,
-              kind: 'fate',
-            })
-          }
-          style={{
-            padding: '4px 10px',
-            background: 'rgba(120, 200, 120, 0.18)',
-            color: '#9ddf9d',
-            border: '1px solid rgba(120, 200, 120, 0.5)',
-            borderRadius: 4,
-            font: 'inherit',
-            fontSize: 13,
-            cursor: 'pointer',
-            minHeight: 30,
-          }}
-          title={`Hodit ${row.label} (4dF + ${row.value})`}
-          aria-label={`Hodit ${row.label}`}
-        >
-          🎲
-        </button>
-      )}
-      {isAspect && (
-        <button
-          type="button"
-          className={`mx-state-chip ${charged ? 'mx-state-chip--charged' : 'mx-state-chip--depleted'} ${disabled ? 'is-disabled' : ''}`}
-          disabled={disabled}
-          onClick={() => updateField('value', charged ? 'Vybitý' : 'Nabitý')}
-          aria-label={`Aspekt ${index + 1}: ${row.value}`}
-          aria-pressed={charged}
-        >
-          {row.value || 'Vybitý'}
-        </button>
-      )}
-      {!disabled && (
-        <button
-          type="button"
-          className="mx-icon-btn"
-          onClick={() => removeArr(arrKey, index)}
-          aria-label={`Smazat ${arrKey} ${index + 1}`}
-          title={`Smazat ${arrKey}`}
-        >
-          ✕
-        </button>
-      )}
-    </div>
+    <Link
+      className="mx-skill__mag"
+      to={`/svet/${worldSlug}/${matrixMagicSlug(name)}`}
+      title={`Otevřít pravidlo magie: ${name}`}
+    >
+      📘
+    </Link>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
-// E) Inventory editor
-// ════════════════════════════════════════════════════════════════
+// ── Aspekty ──────────────────────────────────────────────
 
-function InventoryCard({ cda, disabled }: SubProps) {
+function AspectsPanel({ cda, editing }: SubProps) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const aspects = parseJsonArr<MatrixTagValue>('aspects');
+  const maxLvl = maxSkillLevel(cda);
+  const deficit = maxLvl > aspects.length;
+
+  return (
+    <section className="mx-panel">
+      <h2 className="mx-title">Aspekty</h2>
+      <div className="mx-list">
+        {aspects.map((a, i) => {
+          const charged = a.value === 'Nabitý';
+          return editing ? (
+            <div className="mx-aspect edit" key={i}>
+              <input
+                className="mx-input name"
+                value={a.label}
+                onChange={(e) => updateArr<MatrixTagValue>('aspects', i, { label: e.target.value })}
+                placeholder="Aspekt / perk"
+              />
+              <span
+                className={`mx-chip ${charged ? 'charged' : 'depleted'}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => updateArr<MatrixTagValue>('aspects', i, { value: charged ? 'Vybitý' : 'Nabitý' })}
+                role="button"
+                aria-pressed={charged}
+              >
+                {charged ? 'Nabitý' : 'Vybitý'}
+              </span>
+              <span className="mx-del" onClick={() => removeArr('aspects', i)} role="button" aria-label="Smazat aspekt">
+                ✕
+              </span>
+            </div>
+          ) : (
+            <div className="mx-aspect" key={i}>
+              <span className="mx-aspect__name">{a.label || '—'}</span>
+              <span className={`mx-chip ${charged ? 'charged' : 'depleted'}`}>{charged ? 'Nabitý' : 'Vybitý'}</span>
+            </div>
+          );
+        })}
+      </div>
+      {deficit && (
+        <div className="mx-warn">
+          ⚠ Málo aspektů — nejvyšší schopnost má úroveň {maxLvl}, potřebuješ aspoň {maxLvl} aspektů (máš {aspects.length}).
+        </div>
+      )}
+      {editing && (
+        <button
+          type="button"
+          className="mx-add"
+          onClick={() => addArr<MatrixTagValue>('aspects', { label: '', value: 'Vybitý' })}
+        >
+          + Přidat aspekt
+        </button>
+      )}
+    </section>
+  );
+}
+
+// ── Poznámky ─────────────────────────────────────────────
+
+function NotesPanel({ cda, editing }: SubProps) {
   const { g, set } = cda;
   return (
-    <div className="mx-card">
-      <h2 className="mx-section-title">Výbava a poznámky</h2>
+    <section className="mx-panel">
+      <h2 className="mx-title">Poznámky</h2>
       <textarea
-        className="mx-inventory-textarea"
+        className="mx-gear"
         value={g('inventory')}
-        disabled={disabled}
+        readOnly={!editing}
         onChange={(e) => set('inventory', e.target.value)}
         placeholder="Výbava postavy, poznámky, vztahy, RP detaily..."
-        aria-label="Výbava a poznámky"
+        aria-label="Poznámky"
       />
-    </div>
+    </section>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
 // PRINT — statický čitelný dokument (čte stejná `matrix_*` data)
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
 
-/** Přetlak 0..4 jako ●●●○○ (vždy 5 znaků); -1 = žádný → 5× prázdné. */
+/** Přetlak -1..4 jako ●●●○○ (vždy 5 znaků). */
 function pressurePips(cur: number): string {
   const filled = Math.max(0, cur + 1);
   return '●'.repeat(filled) + '○'.repeat(5 - filled);
@@ -664,18 +707,7 @@ function MatrixPrintView({ cda }: { cda: CdAccess }) {
   const abilities = cda.parseJsonArr<MatrixTagValue>('abilities');
   const languages = cda.parseJsonArr<MatrixTagValue>('languages');
   const aspects = cda.parseJsonArr<MatrixTagValue>('aspects');
-
-  // Body schopností — stejný výpočet jako OverviewCard.
-  const abilityPoints = parseInt(g('abilityPoints', '0'), 10) || 0;
-  const usedPoints = abilities.reduce((sum, ab) => {
-    const v = parseInt(ab.value, 10) || 0;
-    let s = 0;
-    for (let i = 1; i <= v; i++) s += i;
-    return sum + s;
-  }, 0);
-  const extraAspectsCost = Math.max(0, (aspects.length - 3) * 6);
-  const remaining = abilityPoints - (usedPoints + extraAspectsCost);
-
+  const { used, max } = computeUsedPoints(cda);
   const inventory = g('inventory').trim();
 
   return (
@@ -690,7 +722,11 @@ function MatrixPrintView({ cda }: { cda: CdAccess }) {
           <dd>{g('bornWhere') || '—'}</dd>
         </div>
         <div>
-          <dt>Magický gen</dt>
+          <dt>Povolání</dt>
+          <dd>{g('profession') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Magický genom</dt>
           <dd>{g('magicGene') || '—'}</dd>
         </div>
         <div>
@@ -700,7 +736,7 @@ function MatrixPrintView({ cda }: { cda: CdAccess }) {
         <div>
           <dt>Body schopností</dt>
           <dd>
-            {remaining} / {abilityPoints}
+            {used} / {max}
           </dd>
         </div>
         <div>
@@ -720,7 +756,7 @@ function MatrixPrintView({ cda }: { cda: CdAccess }) {
           <dd>{g('magicHealth', '0')}</dd>
         </div>
         <div>
-          <dt>Vesta</dt>
+          <dt>Ochrana</dt>
           <dd>{g('armor', '0')}</dd>
         </div>
         <div>
@@ -761,9 +797,11 @@ function MatrixPrintView({ cda }: { cda: CdAccess }) {
               <li key={i} className="print-row">
                 <span>
                   {a.label || '—'}
-                  {MATRIX_MAGIC.includes(a.label) ? ' (magická)' : ''}
+                  {isMatrixMagic(a.label) ? ' (magická)' : ''}
                 </span>
-                <span>{a.value}</span>
+                <span>
+                  {a.value} — {matrixLevelName(parseInt(a.value, 10) || 0)}
+                </span>
               </li>
             ))}
           </ul>
@@ -786,7 +824,7 @@ function MatrixPrintView({ cda }: { cda: CdAccess }) {
 
       {inventory && (
         <>
-          <h2>Výbava a poznámky</h2>
+          <h2>Poznámky</h2>
           <p style={{ whiteSpace: 'pre-wrap' }}>{inventory}</p>
         </>
       )}
