@@ -16,44 +16,18 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9g.md §B; rozšíření 9h.
  */
-import { useEffect, useRef, type ComponentType } from "react";
+import { useEffect, useRef } from "react";
 import { DiaryTab } from "@/features/world/pages/CharacterDetailPage/components/DiaryTab";
 import { useCharacterDiary } from "@/features/world/pages/api/useCharacterSubdocs";
 import { useWorldContext } from "@/features/world/context/WorldContext";
 import { performSheetRoll } from "../../utils/rollFromSheet";
 import { useTokenUpdate } from "../../hooks/useTokenUpdate";
-import type { SystemSheetProps } from "@/features/world/pages/CharacterDetailPage/diary-systems/types";
 import type { MapToken } from "../../types";
 import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
 import { tokenIsBestie } from "../../utils/tokenIsBestie";
 import { BestiePanelView } from "./BestiePanelView";
-import { MatrixCombatPanel } from "./system-panels/MatrixCombatPanel";
-import { DndCombatPanel } from "./system-panels/DndCombatPanel";
-import { CocCombatPanel } from "./system-panels/CocCombatPanel";
-import { Drd2CombatPanel } from "./system-panels/Drd2CombatPanel";
-import { FateCombatPanel } from "./system-panels/FateCombatPanel";
-import { GurpsCombatPanel } from "./system-panels/GurpsCombatPanel";
+import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import styles from "./TokenSystemSheet.module.css";
-
-/** Per-system kompaktní combat panel registry. Klíč = `world.system`. */
-interface CombatPanelProps {
-  token: MapToken;
-  sceneId: string;
-  worldId: string;
-  canEdit: boolean;
-  // Sdílený tvar s deníkovými sheety (`SystemSheetProps`), ať registry sedí
-  // všem panelům (CoC používá d100, modifier volitelný).
-  onRoll?: SystemSheetProps["onRoll"];
-}
-
-const COMBAT_PANELS: Record<string, ComponentType<CombatPanelProps>> = {
-  matrix: MatrixCombatPanel,
-  dnd5e: DndCombatPanel,
-  coc: CocCombatPanel,
-  drd2: Drd2CombatPanel,
-  fate: FateCombatPanel,
-  gurps: GurpsCombatPanel,
-};
 
 interface Props {
   token: MapToken;

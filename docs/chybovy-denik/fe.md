@@ -265,3 +265,12 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak:** kdyby chat bundle náhle nabobtnal o stovky kB → někdo přidal do importního grafu z tactical-map něco s PIXI; z mapy importuj jen DOM/schema moduly přímo.
 
 ---
+
+### CH-020 — deník v chatu postaven na DiaryTab místo combat panelu z mapy · 2026-06-23
+**Kontext:** 16.1 deník v chatu měl vypadat „stejně jako v taktické mapě".
+**Co jsem udělal špatně:** Reuse `DiaryTab` (= reálný list CharacterDetailPage → `MatrixSheet`, **plný** list: Overview/Vitals/Pressures/Languages/Inventory). Předpokládal jsem, že „deník mapy" = DiaryTab.
+**Proč to nefungovalo:** Mapa NErenderuje DiaryTab — renderuje per-systém **kompaktní combat panel** (`COMBAT_PANELS` v `TokenSystemSheet` → `MatrixCombatPanel`…); `DiaryTab` je tam jen FALLBACK pro systémy bez panelu. Chat tak měl jiný (plný) layout než mapa (kompaktní statblok). Uživatel to reklamoval 3× (screenshoty), než jsem si přečetl `TokenSystemSheet`.
+**Poučení:** Když má být „stejné jako X", PŘEČTI render X (`TokenSystemSheet`), ne reuse první podobné komponenty (`DiaryTab`). Combat panely jsou diary-backed přes `characterSlug` (sceneId nepoužit) → jdou pustit i mimo mapu (mini-token jen se slugem). Sdílení přes registr `combatPanels.ts` (export registru z komponenty = fast-refresh warning → vlastní modul). NPC = stejná cesta (DiaryRollPanel) → vyřešeno týmž fixem.
+**Příznak cyklení:** uživatel opakuje „má to vypadat jako u mapy" + posílá screenshoty; já ladím obal (portrét/šířku) místo vnitřního sheetu.
+
+---

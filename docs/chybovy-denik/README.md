@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-020.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-021.**
 
 ## Jak je deník členěný
 
@@ -66,3 +66,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--15b7-self-hosted-analytics-page-view-counter--admin-dashboard--2026-06-22) | fe+be | 15B.7 self-hosted analytics: BE modul (pageview veřejný + summary admin, TTL 90d, `$facet`+cache) + FE ping hook + sekce v Přehledu; **2 pasti chycené v designu** — prerender headless Chrome by se počítal sám (UA marker `Ikaros-Prerender`) + `document.referrer` v SPA konstantní (referrer jen u 1. pingu, jinak origin→internal); žádné cookies/PII = GDPR bez consent | návštěvnost po deploy nereálně vysoká → prerender marker / bot regex |
 | [✅ ŘEŠENÍ](fe.md#-řešení--161a-deník-v-chatu-rail--hod-za-postavu-reuse-diarytab--2026-06-23) | fe | 16.1a deník v chatu: kontextový rail (hráč=svůj deník, PJ klik na člena→jeho deník), reuse `DiaryTab` přes `onRoll` + chat-local roll most (bez závislosti na tactical-map), systémově agnostický; readout overlaye fix (součet kostek) + 2 set-state-in-effect warningy opraveny (lazy-init/adjust-during-render) | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--161bc-hledání-npcbestie-v-railu--statblok-bestie-z-katalogu--2026-06-23) | fe | 16.1b/c rail: jedno pole hledání NPC+bestie; bestie statblok = reuse `BestieStatblock`+`buildBestieToken` z tactical-map (coupling přijat, PIXI zůstal lazy chunk, chat 105 kB); `NpcDiarySearch`→`RailEntitySearch` | — |
+| [CH-020](fe.md#ch-020--deník-v-chatu-postaven-na-diarytab-místo-combat-panelu-z-mapy--2026-06-23) | fe | deník v chatu na `DiaryTab` (plný list) místo mapového `COMBAT_PANELS` panelu → jiný layout než mapa; combat panely jsou diary-backed přes characterSlug, jdou pustit i v chatu (PC i NPC) | uživatel opakuje „jako mapa" + screenshoty, ladím obal ne sheet |
