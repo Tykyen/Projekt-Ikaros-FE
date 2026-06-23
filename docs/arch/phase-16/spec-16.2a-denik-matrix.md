@@ -1,6 +1,6 @@
 # Spec 16.2a — Deník: grafický redesign (vzor Matrix / Ikaros)
 
-**Status:** 🔨 **Implementováno 2026-06-23** (MatrixSheet/constants/matrix.css; tsc+build+228 testů zelené, eslint 0). Čeká **živý vizuální smoke** + dotažení H1 (portrét z postavy) / H2 (NPC clamp). Pak funkce/napoveda/roadmap zaškrtnout. Prototyp: `c:\tmp\matrix-denik-audit.html`.
+**Status:** ✅ **Reálný list HOTOVÝ 2026-06-23** — vizuálně potvrzen uživatelem (Luke Villiam NPC); tsc+build+23 testů+DiaryTab 8 zelené, eslint 0. **Portrét = iniciály** (rozhodnutí uživatele: deník na stránce postavy obrázek nezobrazuje — `usePersonaDirectory` lookup byl navíc vadný). **NPC clamp** ze spolehlivého `Character.isNpc` (PC pips 1–7 / NPC 1–10). **Zbývá pro Matrix:** taktická mapa + chat (samostatné body roadmapy 16.2a). Funkce/napoveda dávkově po kompletním Matrixu (všechna 3 místa). Prototyp: `c:\tmp\matrix-denik-audit.html`.
 **Rozsah:** FE only. Přepis vizuálu MatrixSheet + nová pole/validace; BE bez změn (vše jede přes volný `diary.customData`).
 **Repo:** `Projekt-ikaros-FE`, commit na `main` (žádná feature větev).
 **Autor:** PJ + Claude

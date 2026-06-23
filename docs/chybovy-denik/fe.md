@@ -295,3 +295,21 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 **Příznak:** kdyby deník v testu/appce crashnul na „useHref" → chybí Router wrapper kolem sheetu (magie Link).
 
 ---
+
+### CH-021 — portrét v deníku: hledal jsem ho přes 2 špatné zdroje (Character.imageUrl → usePersonaDirectory) · 2026-06-23
+**Co jsem udělal špatně:** Pro hero portrét deníku (16.2a) jsem sáhl nejdřív na `useCharacter(slug).data.imageUrl` (tsc hned: **`Character` nemá `imageUrl`**), pak na `usePersonaDirectory` + find slug → `entry.imageUrl`. Druhý build/test prošel, ale **v reálu portrét nenaskočil** (Luke přitom obrázek MÁ — viz screenshot), a protože jsem z téhož vadného lookupu bral i `isNpc`, **NPC clamp by taky nešel**.
+**Proč to nefungovalo:** Po **sjednocení 9.1 Character→Page** žijí bio data (`imageUrl`, bio, accessRequirements) na **`Page`** (`Page.characterRef`), ne na `Character` — `Character` drží jen subdoc data + `isNpc`/`kind` (říká to komentář v `characters.types.ts:1-9`, který jsem nečetl). `usePersonaDirectory` slug-match v reálu nesedl (slug/projection).
+**Poučení:** (1) **Ověř, kde pole reálně žije, PŘED použitím** — u postavy po 9.1: obrázek=Page, `isNpc`=Character. Typový komentář v `*.types.ts` to často říká. (2) Pro spolehlivý fakt (isNpc) sáhni na **kanonický zdroj** (`Character.isNpc`), ne na odvozeninu z adresáře (`type==='NPC'` přes vadný lookup). (3) Uživatel nakonec portrét v deníku nechtěl → **iniciály**; NPC clamp jede z `Character.isNpc` (PC 7 / NPC 10, test pokrývá oba).
+**Příznak cyklení:** druhý zdroj dat za sebou pro tutéž věc (portrét), oba selhaly jinak (tsc typo / runtime nenaskočil) — STOP a ověř datový model, ne třetí lookup.
+
+---
+
+### ✅ ŘEŠENÍ — 16.2a Matrix taktická mapa: combat panel HUD redesign · 2026-06-23
+**Co zabralo:** Přepis `MatrixCombatPanel.tsx` + `.module.css` do HUD stylu sladěného s deníkovým listem (16.2a), dle odsouhlaseného prototypu `c:\tmp\matrix-mapa-audit.html`. Ořez na bojové minimum (STATY/Schopnosti/Přetlaky/Aspekty + Iniciativa); Vesta→Ochrana; Životy/Únava barevné tracky + postih readout; schopnosti pips 1–10 (PC7/NPC10 přes `useCharacter.isNpc`) + **klik na řádek = hod** (bez ikony kostky); přetlaky barevné 0–5; aspekty chip.
+**Proč správně:** **Zachována veškerá logika** (iniciativa = 4dF+⌊nabité aspekty/2⌋, hody přes onRoll, auto-save debounce, permission gate canEdit). Reuse konstant z `diary-systems/matrix/constants` (matrixLevelName, SKILL_MAX). CSS module se **stavy přes data-atributy** (`data-on`/`data-kind`/`data-mod`/`data-charged`) místo kombinací tříd → barvy track/pips přes inline `--lvlc`/`--seg-color` var. **Obal `TokenInfoPanel`** (Zamknout/pin/skin/×/Body osudu) je sdílený všemi systémy → needituji ho; jeho sladění se skinem = otevřená otázka 16.2c.
+**Past:** combat panel nově volá `useCharacter` (isNpc) → spec musí **mocknout `useCharacter`** (vedle useCharacterDiary). Přejmenování „Dovednosti"→„Schopnosti" a aspekt chip (aria-label→text) rozbilo 2 testy — přepsat na novou strukturu.
+**Jak ověřeno:** tsc-b · 7/7 spec (přepsané) · 58/58 token-panel · build · eslint 0. Čeká **živý vizuální smoke** (token postavy na mapě).
+**Zhodnocení:** dobře — prototyp opět = kontrakt, hladký zátah; reuse listových konstant. **Pozn.:** HUD CSS je teď duplikované (matrix.css scoped × MatrixCombatPanel.module.css) — skin engine 16.2c to má sjednotit (token sady). Roadmapa: přibyla položka „Bestie (grafika)" do matice per systém.
+**Příznak:** kdyby combat panel v testu crashnul na QueryClient/useCharacter → chybí mock `useCharacter`.
+
+---

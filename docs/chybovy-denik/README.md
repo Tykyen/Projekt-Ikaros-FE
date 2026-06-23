@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-021.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-022.**
 
 ## Jak je deník členěný
 
@@ -69,3 +69,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-020](fe.md#ch-020--deník-v-chatu-postaven-na-diarytab-místo-combat-panelu-z-mapy--2026-06-23) | fe | deník v chatu na `DiaryTab` (plný list) místo mapového `COMBAT_PANELS` panelu → jiný layout než mapa; combat panely jsou diary-backed přes characterSlug, jdou pustit i v chatu (PC i NPC) | uživatel opakuje „jako mapa" + screenshoty, ladím obal ne sheet |
 | [✅ ŘEŠENÍ](fe.md#-řešení--162a-fix-system-id-driftu-nabídka--diarymap-engine-alias-most--2026-06-23) | fe | 16.2a system-id drift: nabídka ukládá „dlouhá" id raw, engine zná krátká → **3** systémy (draci-hlidka/drd-plus/coc) spadly na generic (dluh tvrdil 1); fix = alias v obou registry (bez migrace/BE) + parity guard test | — (zabralo; rozsah > dluh) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--162a-matrix-deník-grafický-redesign-operátorský-hud-vzor-pro-systémy--2026-06-23) | fe | 16.2a Matrix deník HUD redesign dle odsouhlaseného HTML prototypu (vzor pro systémy); reuse cdAccess, BE netknuté; magie 📘 auto-match→Link; past: Link→testy v MemoryRouter, data-mode na .matrix-sheet; H1 portrét/H2 NPC clamp follow-up | — (prototyp=kontrakt, bez cyklení) |
+| [CH-021](fe.md#ch-021--portrét-v-deníku-hledal-jsem-ho-přes-2-špatné-zdroje-characterimageurl--usepersonadirectory--2026-06-23) | fe | portrét postavy: po 9.1 Character→Page žije `imageUrl` na **Page** (ne Character, ten má jen `isNpc`/subdocy); 2 špatné lookupy (tsc / runtime nenaskočil) → fallback iniciály + NPC clamp z `Character.isNpc` | 2. zdroj dat za sebou pro tutéž věc, oba selhaly |
+| [✅ ŘEŠENÍ](fe.md#-řešení--162a-matrix-taktická-mapa-combat-panel-hud-redesign--2026-06-23) | fe | 16.2a Matrix combat panel (mapa) HUD redesign dle prototypu; ořez bojové minimum, pips+klik=hod, Vesta→Ochrana, logika zachována; CSS module stavy přes data-atributy; past: mock `useCharacter` v testu, „Dovednosti"→„Schopnosti" | — (prototyp=kontrakt) |

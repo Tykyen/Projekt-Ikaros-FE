@@ -1,502 +1,234 @@
 /**
- * 10.2c-edit-9h — Matrix kompaktní bojový panel.
- *
- * Vizuální port `chat.scss` selectorů `.char-stats-panel` / `.char-stat-card` /
- * `.char-penalty-pill` / `.overpressure-row` / `.diary-aspect-card` /
- * `.diary-skill-card` / `.diary-panel__section` ze starého Matrixu
- * (`C:/Matrix/Matrix/frontend/src/styles/chat.scss` ~ř.2892, 3700-3920).
- *
- * Fallback hex barvy (purple synthwave palette) místo `--mx-diary-*` vars,
- * které v Ikarosu nejsou globálně definované.
+ * 16.2a — Matrix combat panel (taktická mapa), HUD styl sladěný s deníkovým
+ * listem (MatrixSheet). Kompaktní (úzký token panel), vlastní tmavé barvy
+ * (self-contained identita systému). Stavy přes data-atributy.
  */
 
-/* ── Sekce ────────────────────────────────────────────────────────── */
-
-.section {
+.panel {
+  --mx-panel: #0e0f1e;
+  --mx-line: rgba(255, 255, 255, 0.08);
+  --mx-cyan: #38e0ff;
+  --mx-text: #d6def0;
+  --mx-muted: #76809a;
+  --mx-dim: #444b63;
+  --lvl-1: #8a8f9c; --lvl-2: #4ade80; --lvl-3: #38e0ff; --lvl-4: #3b82f6; --lvl-5: #a78bfa;
+  --lvl-6: #ec4899; --lvl-7: #fbbf24; --lvl-8: #fff; --lvl-9: #fff; --lvl-10: #fff;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.section:last-child {
-  margin-bottom: 0;
-}
-
-.sectionTitleRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(120, 90, 240, 0.2);
-  margin-bottom: 6px;
-}
-
-.sectionTitle {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: rgba(180, 160, 255, 0.9);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-.initiativeBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-radius: 8px;
-  cursor: pointer;
-  background: rgba(100, 70, 220, 0.2);
-  color: rgba(220, 210, 255, 0.95);
-  border: 1px solid rgba(140, 110, 255, 0.4);
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-
-.initiativeBtn:hover {
-  background: rgba(120, 90, 240, 0.3);
-  border-color: rgba(160, 130, 255, 0.6);
-  box-shadow: 0 0 16px rgba(120, 90, 255, 0.2);
-}
-
-/* ── STATY grid ───────────────────────────────────────────────────── */
-
-.statsGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.statCard {
-  background: rgba(20, 15, 40, 0.6);
-  border: 1px solid rgba(90, 80, 140, 0.3);
-  border-radius: 12px;
-  padding: 0.9rem;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.2),
-    inset 0 1px 1px rgba(255, 255, 255, 0.05);
-}
-
-.statCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(120, 90, 240, 0.4), transparent);
-}
-
-.statCardHealth {
-  background: linear-gradient(
-    135deg,
-    rgba(20, 15, 40, 0.8) 0%,
-    rgba(30, 20, 60, 0.4) 100%
-  );
-  border-color: rgba(120, 90, 240, 0.5);
-}
-
-.statCardHealth::before {
-  height: 3px;
-  background: linear-gradient(90deg, rgba(120, 90, 240, 0.8), transparent);
-}
-
-.statCardArmor::before {
-  background: linear-gradient(90deg, rgba(100, 160, 255, 0.6), transparent);
-}
-
-.statCardMagic::before {
-  background: linear-gradient(90deg, rgba(180, 100, 255, 0.6), transparent);
-}
-
-.secondaryGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
-}
-
-.statLabel {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(160, 150, 200, 0.9);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
-}
-
-.statMain {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.statInputWrap {
-  display: flex;
-  align-items: center;
-}
-
-.statInput {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(120, 90, 240, 0.5);
-  color: rgba(220, 210, 255, 0.95);
-  border-radius: 6px;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 1.4rem;
-  font-weight: 700;
-  text-align: center;
-  width: 56px;
-  height: 38px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-  outline: none;
-  padding: 0;
-  /* skryje krok-up/down nativní kontroly */
-  -moz-appearance: textfield;
-}
-
-.statInput::-webkit-outer-spin-button,
-.statInput::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.statInput:focus {
-  border-color: rgba(120, 90, 240, 0.8);
-  box-shadow:
-    0 0 10px rgba(120, 90, 240, 0.3),
-    inset 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.statValue {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: rgba(220, 210, 255, 0.95);
-  min-width: 56px;
-  text-align: center;
-}
-
-.statValueMax {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.3);
-  font-weight: 600;
-  margin-left: 2px;
-}
-
-/* ── Penalty strip ────────────────────────────────────────────────── */
-
-.penaltyStrip {
-  display: flex;
-  gap: 0.35rem;
-  margin-top: 0.4rem;
-  flex-wrap: wrap;
-}
-
-.penaltyPill {
-  padding: 0.35rem 0.55rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  background: rgba(15, 12, 30, 0.5);
-  border: 1px solid rgba(90, 80, 140, 0.2);
-  color: rgba(160, 150, 200, 0.85);
-  min-width: 30px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.penaltyPillActive {
-  background: rgba(60, 50, 90, 0.8);
-  border-color: rgba(120, 90, 240, 0.5);
-  color: rgba(220, 210, 255, 0.95);
-  box-shadow: 0 0 10px rgba(120, 90, 240, 0.2);
-  transform: translateY(-2px);
-}
-
-.penaltyPillWarning.penaltyPillActive {
-  background: rgba(255, 170, 0, 0.15);
-  border-color: rgba(255, 170, 0, 0.5);
-  color: #ffb300;
-  box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
-}
-
-.penaltyPillOrange.penaltyPillActive {
-  background: rgba(255, 120, 40, 0.15);
-  border-color: rgba(255, 120, 40, 0.55);
-  color: #ff9a4a;
-  box-shadow: 0 0 10px rgba(255, 120, 40, 0.25);
-}
-
-.penaltyPillPurple.penaltyPillActive {
-  background: rgba(180, 100, 255, 0.15);
-  border-color: rgba(180, 100, 255, 0.55);
-  color: #c98aff;
-  box-shadow: 0 0 10px rgba(180, 100, 255, 0.25);
-}
-
-.penaltyPillDanger.penaltyPillActive {
-  background: rgba(255, 60, 60, 0.15);
-  border-color: rgba(255, 60, 60, 0.5);
-  color: #ff5555;
-  box-shadow: 0 0 10px rgba(255, 60, 60, 0.2);
-}
-
-/* ── DOVEDNOSTI grid ──────────────────────────────────────────────── */
-
-.skillGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 10px;
+  color: var(--mx-text);
+  font-family: 'Chakra Petch', system-ui, sans-serif;
 }
-
-.skillCard {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(30, 25, 60, 0.45);
-  border: 1px solid rgba(90, 80, 140, 0.3);
-  border-left: 3px solid rgba(60, 180, 255, 0.5);
-  border-radius: 8px;
-  padding: 10px 14px;
-  box-shadow: 0 4px 12px rgba(4, 6, 20, 0.2);
-  transition:
-    transform 0.2s,
-    background 0.2s,
-    box-shadow 0.2s;
-}
-
-.skillCard:hover {
-  background: rgba(45, 35, 90, 0.45);
-  box-shadow: 0 6px 16px rgba(4, 6, 20, 0.3);
-}
-
-.skillLabel {
-  font-size: 0.9rem;
-  color: rgba(220, 210, 255, 0.95);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.skillValue {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  color: rgba(200, 220, 255, 0.9);
-  background: rgba(30, 40, 70, 0.5);
-  border: 1px solid rgba(60, 140, 220, 0.3);
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  margin-left: 8px;
-  flex-shrink: 0;
-}
-
-.skillValueAction {
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    border-color 0.2s;
-  font: inherit;
-  /* button reset */
-  appearance: none;
-  font-family: var(--font-mono, ui-monospace, monospace);
-}
-
-.skillValueAction:hover {
-  background: rgba(60, 120, 220, 0.3);
-  border-color: rgba(100, 180, 255, 0.6);
-}
-
-.skillValueAction:focus-visible {
-  outline: 2px solid rgba(100, 180, 255, 0.6);
-  outline-offset: 2px;
-}
-
-/* ── PŘETLAKY ─────────────────────────────────────────────────────── */
-
-.pressureRow {
-  background: rgba(20, 15, 40, 0.4);
-  border: 1px solid rgba(90, 80, 140, 0.2);
-  border-radius: 8px;
-  padding: 0.7rem 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  transition: background 0.2s;
-}
-
-.pressureRow:hover {
-  background: rgba(30, 20, 50, 0.5);
-  border-color: rgba(120, 90, 240, 0.3);
-}
-
-.pressureLabel {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: rgba(160, 150, 200, 0.85);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.pressureRail {
-  display: flex;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 4px;
-  border-radius: 6px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(90, 80, 140, 0.15);
-}
-
-.pressureSegment {
-  width: 20px;
-  height: 12px;
-  border-radius: 3px;
-  background: rgba(40, 35, 60, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  transition: all 0.2s;
-  cursor: pointer;
-  padding: 0;
-  appearance: none;
-}
-
-.pressureSegment:disabled {
-  cursor: default;
-}
-
-.pressureSegmentActive {
-  background: rgba(120, 90, 240, 0.8);
-  border-color: rgba(160, 130, 255, 0.9);
-  box-shadow: 0 0 8px rgba(120, 90, 240, 0.4);
-}
-
-/* ── ASPEKTY ──────────────────────────────────────────────────────── */
-
-.aspectGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 10px;
-}
-
-.aspectCard {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(30, 25, 60, 0.45);
-  border: 1px solid rgba(90, 80, 140, 0.3);
-  border-radius: 8px;
-  padding: 10px 14px;
-  box-shadow: 0 4px 12px rgba(4, 6, 20, 0.2);
-  border-left: 3px solid rgba(120, 90, 240, 0.5);
-  transition:
-    transform 0.2s,
-    background 0.2s;
-}
-
-.aspectCard:hover {
-  background: rgba(45, 35, 90, 0.45);
-}
-
-.aspectCardCharged {
-  border-left-color: #4adb7a;
-}
-
-.aspectCardDepleted {
-  border-left-color: #ff5555;
-}
-
-.aspectLabel {
-  font-size: 0.9rem;
-  color: rgba(220, 210, 255, 0.95);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.aspectChip {
-  font-weight: 700;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
-  background: rgba(20, 15, 40, 0.5);
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: 8px;
-  cursor: pointer;
-  appearance: none;
-  font-family: var(--font-mono, ui-monospace, monospace);
-}
-
-.aspectChip:disabled {
-  cursor: default;
-}
-
-.aspectChipCharged {
-  color: #4adb7a;
-  background: rgba(74, 219, 122, 0.12);
-  border: 1px solid rgba(74, 219, 122, 0.45);
-}
-
-.aspectChipDepleted {
-  color: #ff5555;
-  background: rgba(255, 85, 85, 0.12);
-  border: 1px solid rgba(255, 85, 85, 0.45);
-}
-
-/* ── Loading / error ──────────────────────────────────────────────── */
 
 .loading,
 .error {
+  padding: 16px;
+  font: 500 13px 'IBM Plex Mono', monospace;
+  color: var(--mx-muted);
+  text-align: center;
+}
+.error { color: #fca5a5; }
+
+/* ── panel (cut-corner) ── */
+.section {
+  background: linear-gradient(180deg, rgba(17, 18, 36, 0.25), rgba(12, 13, 24, 0.25)), var(--mx-panel);
+  border: 1px solid var(--mx-line);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.titleRow {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 24px;
-  color: rgba(180, 160, 255, 0.7);
-  font-size: 0.85rem;
+  gap: 8px;
 }
-
-.error {
-  color: #ff8080;
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0;
+  font: 700 11px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #aeb8d4;
 }
-
-/* ── Responsivní ──────────────────────────────────────────────────── */
-
-@media (max-width: 480px) {
-  .skillGrid,
-  .aspectGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .secondaryGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .penaltyStrip {
-    gap: 0.25rem;
-  }
-
-  .penaltyPill {
-    padding: 0.3rem 0.4rem;
-    font-size: 0.7rem;
-    min-width: 26px;
-  }
+.title::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--mx-cyan);
+  box-shadow: 0 0 8px var(--mx-cyan);
+  transform: rotate(45deg);
 }
+.title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(56, 224, 255, 0.27), transparent);
+}
+.initBtn {
+  cursor: pointer;
+  font: 700 9.5px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 3px;
+  background: rgba(120, 100, 255, 0.18);
+  color: #dcebff;
+  border: 1px solid rgba(120, 100, 255, 0.55);
+}
+.initBtn:hover { background: rgba(120, 100, 255, 0.3); }
+
+/* ── vitals ── */
+.vit { display: flex; flex-direction: column; gap: 5px; }
+.vit2col { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.vitHead { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.vitLab {
+  font: 600 10px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--mx-muted);
+}
+.vitNum {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 700 16px/1 'IBM Plex Mono', monospace;
+  color: var(--mx-text);
+}
+.vitNum small { color: var(--mx-dim); font-size: 11px; }
+.num {
+  width: 46px;
+  text-align: center;
+  font: 700 15px 'IBM Plex Mono', monospace;
+  background: #0a0b16;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  color: #e6ecff;
+  padding: 3px;
+  outline: none;
+  box-sizing: border-box;
+}
+.num:focus { border-color: rgba(56, 224, 255, 0.5); box-shadow: 0 0 8px -3px rgba(56, 224, 255, 0.5); }
+
+.track { display: flex; gap: 3px; }
+.seg {
+  flex: 1;
+  height: 15px;
+  background: #1a1d2e;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+.seg[data-on='true'][data-kind='hp'] { background: linear-gradient(180deg, #4ade80, #16a34a); border-color: rgba(74, 222, 128, 0.5); }
+.seg[data-on='true'][data-kind='hp'][data-mod='warn'] { background: linear-gradient(180deg, #fbbf24, #d97706); }
+.seg[data-on='true'][data-kind='hp'][data-mod='crit'] { background: linear-gradient(180deg, #f87171, #dc2626); }
+.seg[data-on='true'][data-kind='rune'] { background: linear-gradient(180deg, #38e0ff, #0ea5c4); box-shadow: 0 0 8px -2px rgba(56, 224, 255, 0.5); }
+.seg[data-on='true'][data-kind='arm'] { background: linear-gradient(180deg, #a78bfa, #7c3aed); box-shadow: 0 0 8px -2px rgba(167, 139, 250, 0.5); }
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: 600 10px 'IBM Plex Mono', monospace;
+}
+.badge {
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: rgba(74, 222, 128, 0.1);
+  color: #6ee7a0;
+  border: 1px solid rgba(74, 222, 128, 0.27);
+}
+.badge[data-mod='warn'] { background: rgba(251, 191, 36, 0.1); color: #fcd34d; border-color: rgba(251, 191, 36, 0.27); }
+.badge[data-mod='crit'] { background: rgba(248, 113, 113, 0.1); color: #fca5a5; border-color: rgba(248, 113, 113, 0.27); }
+
+/* ── schopnosti ── */
+.list { display: flex; flex-direction: column; gap: 5px; }
+.skill {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  background: linear-gradient(90deg, #10111f, #0d0e1a);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--lvlc, #2a2e44);
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: background 0.12s, box-shadow 0.12s;
+}
+.skill:hover:not(:disabled) { background: linear-gradient(90deg, #16182c, #111322); box-shadow: inset 0 0 0 1px rgba(56, 224, 255, 0.25); }
+.skill:disabled { cursor: default; }
+.skillName { font: 500 13px 'Chakra Petch', sans-serif; color: var(--mx-text); }
+.skillRight { display: flex; align-items: center; gap: 7px; }
+.skillLvl { font: 700 12px 'IBM Plex Mono', monospace; color: var(--lvlc, #9aa4c0); min-width: 14px; text-align: right; cursor: help; }
+
+.pips { display: flex; gap: 2.5px; }
+.pip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #20233a;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.pip[data-on='true'] { background: var(--lvlc); border-color: rgba(255, 255, 255, 0.27); box-shadow: 0 0 6px -1px var(--lvlc); }
+
+/* ── přetlaky ── */
+.pressure { display: flex; flex-direction: column; gap: 7px; }
+.prRow { display: grid; grid-template-columns: 88px 1fr; align-items: center; gap: 8px; }
+.prLabel {
+  font: 600 10px 'Chakra Petch', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9aa4c0;
+}
+.prRail { display: flex; gap: 4px; }
+.prSeg {
+  flex: 1;
+  height: 12px;
+  border-radius: 2px;
+  background: #181b2c;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  padding: 0;
+}
+.prSeg[data-on='1'] { background: linear-gradient(180deg, #4ade80, #22c55e); }
+.prSeg[data-on='2'] { background: linear-gradient(180deg, #a3e635, #84cc16); }
+.prSeg[data-on='3'] { background: linear-gradient(180deg, #fbbf24, #f59e0b); }
+.prSeg[data-on='4'] { background: linear-gradient(180deg, #fb923c, #ea580c); }
+.prSeg[data-on='5'] { background: linear-gradient(180deg, #f87171, #dc2626); box-shadow: 0 0 8px -2px rgba(248, 113, 113, 0.5); }
+
+/* ── aspekty ── */
+.aspect {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #0d0e1a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid transparent;
+  border-radius: 2px;
+}
+.aspect[data-charged='true'] { border-left-color: #4ade80; }
+.aspect[data-charged='false'] { border-left-color: #f87171; }
+.aspectName { font: 500 12.5px 'Chakra Petch', sans-serif; color: #cdd5ea; }
+.chip {
+  cursor: pointer;
+  font: 700 9px 'IBM Plex Mono', monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+.chip[data-charged='true'] { background: rgba(74, 222, 128, 0.1); color: #86efac; border-color: rgba(74, 222, 128, 0.33); box-shadow: 0 0 10px -3px rgba(74, 222, 128, 0.6); }
+.chip[data-charged='false'] { background: rgba(248, 113, 113, 0.07); color: #c47c7c; border-color: rgba(248, 113, 113, 0.22); }

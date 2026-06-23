@@ -39,6 +39,11 @@ vi.mock(
   }),
 );
 
+// useCharacter → isNpc (pips clamp). Default PC (data undefined).
+vi.mock('@/features/world/pages/api/useCharacter', () => ({
+  useCharacter: () => ({ data: undefined }),
+}));
+
 vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
@@ -128,7 +133,7 @@ describe('MatrixCombatPanel', () => {
     );
 
     expect(screen.getByText('Staty')).toBeInTheDocument();
-    expect(screen.getByText('Dovednosti')).toBeInTheDocument();
+    expect(screen.getByText('Schopnosti')).toBeInTheDocument();
     expect(screen.getByText('Přetlaky')).toBeInTheDocument();
     expect(screen.getByText('Aspekty')).toBeInTheDocument();
     expect(screen.getByText('Boj zblízka')).toBeInTheDocument();
@@ -269,9 +274,8 @@ describe('MatrixCombatPanel', () => {
       { wrapper: Wrapper },
     );
 
-    const chip = screen.getByRole('button', {
-      name: /Aspekt Hrdina: nabitý/i,
-    });
+    // aspekt chip = button s textem stavu (Nabitý)
+    const chip = screen.getByRole('button', { name: 'Nabitý' });
     fireEvent.click(chip);
 
     // Debounce 500 ms — počkáme než se mutate vyvolá

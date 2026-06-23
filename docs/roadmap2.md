@@ -356,57 +356,83 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
 **3 položky per systém:** ▸ **Reálný list** (grafika + kontrola) ▸ **Taktická mapa** (grafika + napojení) ▸ **Chat** (hod za postavu z deníku, = blok **16.1**).
 
 - **Matrix / Ikaros** (`matrix`) — *stav kódu:* list sheet+testy, mapa combat panel `MatrixCombatPanel` (+ diary→token HP/armor sync)
-  - [ ] Reálný list (grafika)
+  - [x] **Reálný list (grafika)** — ✅ 2026-06-23 HUD redesign (spec-16.2a; hero/vitals tracky/pips 1–10/budget/přetlaky/validace; PC 7/NPC 10; magie 📘 auto-match→odkaz). **Vzor pro ostatní systémy.**
   - [ ] Taktická mapa (grafika)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Dračí Doupě 1.6** (`drd16`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + zvážit vlastní combat panel)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Dračí Doupě Plus** (`drdplus`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + zvážit vlastní combat panel)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Dračí Doupě II** (`drd2`) — *stav kódu:* list sheet+testy, mapa combat panel `Drd2CombatPanel`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Jeskyně a Draci** (`jad`) — *stav kódu:* list sheet+testy (+formulas); mapa fallback BEZ `onRoll`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Příběhy Impéria** (`pi`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Dračí Hlídka** (`drdh`) — *stav kódu:* list sheet+testy (`onRoll`); mapa ⚠️ **id drift** `draci-hlidka`≠`drdh` → svět dostane `generic`, deník/panel se NENAPOJÍ (D-NEW-SYS-DIARY-DRIFT, **fix první**)
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika — **až po fixu driftu**)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **D&D 5e** (`dnd5e`) — *stav kódu:* list sheet+testy (+formulas), mapa combat panel `DndCombatPanel`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Shadowrun** (`shadowrun`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **GURPS** (`gurps`) — *stav kódu:* list sheet+testy, mapa combat panel `GurpsCombatPanel`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Fate** (`fate`) — *stav kódu:* list sheet+testy, mapa combat panel `FateCombatPanel` (hody řeší panel; sheet sám bez `onRoll`)
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Call of Cthulhu** (`coc`) — *stav kódu:* list sheet+testy, mapa combat panel `CocCombatPanel`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 - **Vlastní / generic** (`vlastni` / `generic`) — engine, ne obsah; *stav kódu:* generic `DiaryBlockView` (PJ schéma), mapa `DiaryTab` fallback
   - [ ] Reálný list (grafika nástrojů, ne dotahovat obsah)
   - [ ] Taktická mapa (grafika)
+  - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
+  - [ ] Skiny (→ 16.2c)
 
 **Pozn. k stavu kódu (výchozí bod, ne TODO):** funkčně má list+testy **12/12**; v mapě je combat panel u **6** (`matrix`, `drd2`, `dnd5e`, `gurps`, `fate`, `coc`), jen `onRoll` fallback u **2** (`drd16`, `drdplus`), bez klikacích hodů **3** (`jad`, `pi`, `shadowrun`), drift blokuje **1** (`drdh`); chat **0/12** (vše 16.1). Grafický průchod se dělá u všech bez ohledu na tento stav.
 
@@ -426,6 +452,23 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 - **16.2b-1 Jádro:** naplnit dnešní 3 scope; systémový bestiář (tvůj fantasy základ) + per-systém staty; klony systém→svět/můj a svět→svět.
 - **16.2b-2 Komunitní vrstva:** 4. `community` scope (autor edituje) + katalog + „pošli si k sobě" klon + povýšení do systémových. Sdílí grant/moderaci s **21.1/21.4**.
 - **16.2b-3 Reveal (volitelně, později):** PJ zpřístupní bestii/lore vybraným hráčům přes mapu nebo odkaz v chatu. ⚠️ Info-reveal, ne bestiář-data — blíž AKJ clearance; vyčlenit, ať nezatíží jádro.
+
+#### - [ ] 16.2c Skiny deníku — volitelný vizuální styl (sci-fi / fantasy / horor / …)
+**Cíl:** Hráč (později i PJ) si zvolí **vizuální styl deníku** — výrazný sci-fi HUD (16.2a) nesedne každému. Nabídnout sadu stylů jako přepnutelnou „kůži" nad stejným listem (obsah/mechanika beze změny).
+**Proč:** Tester (2026-06-23): HUD je „příliš zářící / sci-fi"; fantasáci chtějí klasiku (reference **Heroes of Might & Magic III**). Vzhled ≠ obsah; deník je tokenizovaný → styl je **levná vrstva s velkým dopadem na pocit „tohle je MŮJ svět"**.
+**7 stylů (1. vlna):**
+- 🛸 **Sci-fi / neon** — současný HUD (cyan/fialová, scanline, glow). *Default `matrix`.*
+- ⚔️ **Fantasy** — pergamen, zlato, dřevo/kámen, kovové rámy, žádný neon (HoMM3). *Default DrD/JaD.*
+- 🦇 **Horor / noir** — černá, krvavá červená, sépie, gotické rámy (upíři, detektivky). *Default CoC.*
+- 🕰️ **Steampunk** — mosaz, ozubená kola, viktoriánské (mezi fantasy a sci-fi).
+- 🌿 **Příroda / druid** — dřevo, listí, zeleň (přírodní/keltské světy).
+- 📜 **Minimal / rukopis** — čistý papír + inkoust, bez efektů (pro klid).
+- 🎮 **Retro / herní (oprýskané)** — *přání hráče 2026-06-23.* **Skeuomorfní UI 90s/2000s** (Heroes III, Warcraft III, StarCraft, Robin Hood: Legend of Sherwood, Dragon Age): panely jako kov/dřevo/kámen/kůže, beveled/embossed, **oprýskané** (patina, škrábance, noise), kovové rámy s nýty/ornamenty, tlumená sépie/bronz/rez (žádný neon), Životy jako herní HP bar, pips jako zasazené drahokamy, patkový/pixel font. **Estetika éry** (ne žánr) — „vtáhne do hry". Sedí mezi Fantasy a Steampunk; podpis = oprýskanost.
+**Architektura (návrh):** `data-diary-skin` na sheet root → CSS přepíše tokeny (`--mx-*`, `--lvl-*`, fonty) + sada **strukturálních přepínačů** (scanline/glow on-off, tvar rámu `clip-path`, ornamenty). Reuse princip platform skinů (`project_ikaros_skin_identity`). **Předpoklad:** sheety musí být tokenizované (Matrix HUD ✅; ostatní se tokenizují během 16.2a) → engine se postaví **jednou** a aplikuje na všechny.
+**Rozhodnuto (2026-06-23):** (1) volba **per-hráč** (preference v nastavení; per-postava odloženo); (2) **chytrý default dle systému** + hráčův override; (3) **workflow per systém** — uživatel tvoří systém **kompletně** (reálný list → taktická mapa → chat → skiny), pak jede na další. **Skin engine + 6 univerzálních skin token sad = postavit u 1. systému (Matrix)**; další systémy je **dědí** (jen tokenizace sheetu, kterou stejně děláme, + případná per-systém specifika ornamentů). ⚠️ „Skiny u každého deníku" tedy **≠ 6×N CSS**, ale **engine jednou + 6 sdílených token sad**. Předpoklad: konzistentní token názvy napříč sheety (Matrix `--mx-*`; sjednotit / mapovat při stavbě enginu).
+**Cíl rozsahu (rozhodnuto uživatelem 2026-06-23):** **7 stylů × všechny systémy** = každý systém **plně ostylovaný 7 způsoby** (per-systém, ne jen univerzální skin). **Jak chytře, ať to není 7×N CSS od nuly:** engine + 7 sdílených token sad jako kostra → per systém se aplikují a **doladí per-systém ornamenty/specifika** (fantasy DrD ≠ fantasy Matrix). Sdílený základ zlevní, výsledek = 7 plnohodnotných stylů na systém.
+**FE rozsah:** skin engine (token override vrstva) + 7 stylových sad + per-systém doladění + selector v nastavení + persistence (per-hráč). Předpoklad: konzistentní token názvy napříč sheety (Matrix `--mx-*`; sjednotit / mapovat při stavbě enginu). ⚠️ Retro (skeuomorfní/textury) je nejnáročnější — víc než token override (textury, border-image, bevel), počítat s vyšším nákladem než ploché styly.
+**Otevřené otázky:** PJ override per svět (vynutí styl všem)? Skin i pro deník v mapě/chatu (3 místa = 16.2a)? Tisk respektuje skin, nebo zůstává neutrální? Originální ornamenty per skin (žádné sdílení — viz `feedback_skin_originality`)? **Obal `TokenInfoPanel` na mapě (hlavička: Zamknout/Odstranit/📌pin/skin/×/Body osudu) je sdílený všemi systémy — musí být skinnable (styl dle systému/skinu), aby ladil s combat panelem; ne hardcoded jeden styl.**
 
 #### Matice systémů (progress; pilíře Deník · Bestiář — Dodatky vyřazeny)
 ##### Prioritně — české (příkop)

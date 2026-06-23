@@ -1,35 +1,30 @@
 /**
- * 10.2c-edit-9h — Kompaktní bojový panel pro Matrix systém v TokenInfoPanel.
+ * 16.2a — Matrix kompaktní bojový panel (taktická mapa), HUD redesign.
  *
- * Port 1:1 ze starého Matrixu `C:/Matrix/Matrix/frontend/src/components/Map/
- * CharacterDiary.tsx` ř.568-820 (sekce STATY / DOVEDNOSTI / PŘETLAKY /
- * ASPEKTY) na Ikaros data model (`customData` prefix `matrix_*`).
+ * Sladěno s deníkovým listem (MatrixSheet „operátorský HUD"), ořezané na
+ * bojové minimum: STATY (Životy/Únava/Ochrana/Runa — barevné tracky +
+ * postih readout) · SCHOPNOSTI (pips 1–10, klik = hod 4dF+stupeň) ·
+ * PŘETLAKY (segmenty 0–5) · ASPEKTY (chip Nabitý/Vybitý). + ⚡ Iniciativa.
  *
- * Cíl: V tactical-map TokenInfoPanel hráč nepotřebuje plný editor deníku
- * (`DiaryTab → MatrixSheet`) — chce jen rychlý bojový statblok s roll
- * tlačítky. Plná editace (přidávání schopností, jazyky, výbava…) zůstává
- * v `/world/:slug/postavy/:slug`.
+ * Iniciativa = 4dF + ⌊nabité aspekty / 2⌋. Hody jdou přes `onRoll` → mapa.
  *
  * Permission gate:
- *   - `canEdit=true` (PJ + vlastník) → STATY (editovatelné) + DOVEDNOSTI
- *     (klikatelné rolly) + PŘETLAKY (toggle segmenty) + ASPEKTY (toggle
- *     nabitý/vybitý).
- *   - `canEdit=false` (cizí hráč) → JEN STATY readonly (zbývající sekce
- *     skryté — privátní info).
+ *   - canEdit=false (cizí hráč) → JEN STATY readonly (zbytek privátní, skrytý).
+ *   - canEdit=true (PJ + vlastník) → vše editovatelné + klikací hody.
  *
- * Auto-save: lokální `customDataPatch` state, debounce 500 ms → mutate
- * přes `useUpdateCharacterDiary`. Důvod debounce: NumericInput change
- * onChange při každém keystroke; bez debounce ~5 mutací/sek při psaní
- * dvouciferného čísla.
+ * Auto-save: lokální `customDataPatch`, debounce 500 ms → `useUpdateCharacterDiary`.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { toast } from 'sonner';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
 import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
+import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import {
-  MATRIX_HEALTH_PENALTY,
   MATRIX_PRESSURE_TYPES,
-  MATRIX_TIREDNESS_PENALTY,
+  MATRIX_SKILL_MAX_PC,
+  MATRIX_SKILL_MAX_NPC,
+  matrixLevelName,
   type MatrixTagValue,
 } from '@/features/world/pages/CharacterDetailPage/diary-systems/sheets/matrix/constants';
 import type { MapToken } from '../../../types';
@@ -49,51 +44,44 @@ interface Props {
   }) => void;
 }
 
-/** Debounce auto-save interval (ms) — viz hlavička. */
 const AUTOSAVE_DEBOUNCE_MS = 500;
-
 const PREFIX = 'matrix_';
 const k = (key: string): string => `${PREFIX}${key}`;
 
+/** Barva stupně 1–10 (CSS var z modulu). */
+const lvlVar = (lvl: number): string => `var(--lvl-${Math.min(Math.max(lvl, 1), 10)})`;
+
 export function MatrixCombatPanel({
   token,
-  sceneId: _sceneId, // reservováno (může se hodit pro budoucí sceneId-scoped operace)
+  sceneId: _sceneId,
   worldId,
   canEdit,
   onRoll,
 }: Props): React.ReactElement {
   void _sceneId;
-  const { data: diary, isLoading } = useCharacterDiary(
-    worldId,
-    token.characterSlug,
-  );
+  const { data: diary, isLoading } = useCharacterDiary(worldId, token.characterSlug);
+  const { data: character } = useCharacter(worldId, token.characterSlug);
+  const isNpc = !!character?.isNpc;
   const updateDiary = useUpdateCharacterDiary(worldId, token.characterSlug);
 
-  // Lokální patch overlay (delta merge nad serverovými customData)
   const [patch, setPatch] = useState<Record<string, unknown>>({});
   const pendingPatchRef = useRef<Record<string, unknown>>({});
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sjednocený view: server cd + lokální patch overlay
   const cd: Record<string, unknown> = useMemo(() => {
     const base = diary?.customData ?? {};
     return { ...base, ...patch };
   }, [diary?.customData, patch]);
 
-  // Po úspěšném save (server odpověděl) vyčistíme overlay
-  // — server už drží novou pravdu, lokální patch by jinak overshadowed novější změny.
-  // Reakce na async výsledek mutace (server odpověděl) — legitimní effekt.
   useEffect(() => {
     if (updateDiary.isSuccess) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setPatch({});
       pendingPatchRef.current = {};
-      // reset flag pro další save
       updateDiary.reset();
     }
   }, [updateDiary]);
 
-  // Cleanup pending timer při unmount
   useEffect(
     () => () => {
       if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
@@ -125,10 +113,7 @@ export function MatrixCombatPanel({
       if (!canEdit) return;
       const fullKey = k(key);
       setPatch((p) => ({ ...p, [fullKey]: value }));
-      pendingPatchRef.current = {
-        ...pendingPatchRef.current,
-        [fullKey]: value,
-      };
+      pendingPatchRef.current = { ...pendingPatchRef.current, [fullKey]: value };
       scheduleSave();
     },
     [canEdit, scheduleSave],
@@ -158,7 +143,6 @@ export function MatrixCombatPanel({
     return [];
   };
 
-  // ── Loading / error ────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className={styles.loading} role="status" aria-live="polite">
@@ -167,52 +151,38 @@ export function MatrixCombatPanel({
     );
   }
   if (!diary) {
-    return (
-      <p className={styles.error}>Deník se nepodařilo načíst.</p>
-    );
+    return <p className={styles.error}>Deník se nepodařilo načíst.</p>;
   }
 
-  // ── Derived values ─────────────────────────────────────────────
+  // ── Derived ────────────────────────────────────────────────────
   const health = readNum('health', 5);
   const tiredness = readNum('tiredness', 0);
   const armor = readNum('armor', 0);
   const magicHealth = readNum('magicHealth', 0);
   const abilities = readArr<MatrixTagValue>('abilities');
   const aspects = readArr<MatrixTagValue>('aspects');
+  const skillMax = isNpc ? MATRIX_SKILL_MAX_NPC : MATRIX_SKILL_MAX_PC;
 
   const isAspectCharged = (val: string): boolean => {
     const v = (val || '').toLowerCase();
     return v !== 'vybitý' && v !== 'vybity' && v.toUpperCase() !== 'V';
   };
 
-  // Iniciativa modifier = ⌊nabitých aspektů / 2⌋ (port `CharacterDiary.tsx` ř.578-583)
-  const chargedAspectsCount = aspects.filter((a) =>
-    isAspectCharged(a.value || ''),
-  ).length;
+  // Iniciativa modifier = ⌊nabitých aspektů / 2⌋
+  const chargedAspectsCount = aspects.filter((a) => isAspectCharged(a.value || '')).length;
   const initiativeModifier = Math.floor(chargedAspectsCount / 2);
 
   const handleInitiative = (): void => {
-    onRoll?.({
-      label: 'Iniciativa',
-      modifier: initiativeModifier,
-      kind: 'fate',
-    });
+    onRoll?.({ label: 'Iniciativa', modifier: initiativeModifier, kind: 'fate' });
   };
-
   const handleSkillRoll = (ability: MatrixTagValue): void => {
     const mod = parseInt(ability.value, 10) || 0;
     onRoll?.({ label: ability.label, modifier: mod, kind: 'fate' });
   };
-
-  const handlePressureToggle = (
-    pressureKey: string,
-    segmentIdx: number,
-  ): void => {
+  const handlePressureToggle = (pressureKey: string, segmentIdx: number): void => {
     const current = readNum(`pressure_${pressureKey}`, -1);
-    const next = current === segmentIdx ? -1 : segmentIdx;
-    setField(`pressure_${pressureKey}`, String(next));
+    setField(`pressure_${pressureKey}`, String(current === segmentIdx ? segmentIdx - 1 : segmentIdx));
   };
-
   const handleAspectToggle = (index: number): void => {
     const arr = readArr<MatrixTagValue>('aspects');
     const row = arr[index];
@@ -224,378 +194,232 @@ export function MatrixCombatPanel({
     setField('aspects', JSON.stringify(copy));
   };
 
-  // ── Render ─────────────────────────────────────────────────────
+  // postihy (status readout)
+  const hpMod = health >= 4 ? '' : health >= 2 ? 'warn' : 'crit';
+  const hpPen =
+    health >= 4 ? ['0', ''] : health >= 2 ? ['−1', 'warn'] : health >= 1 ? ['−2', 'warn'] : ['SMRT', 'crit'];
+  const tPen =
+    tiredness <= 5
+      ? ['0', '']
+      : tiredness <= 10
+        ? ['−1', 'warn']
+        : tiredness <= 15
+          ? ['−2', 'warn']
+          : tiredness <= 20
+            ? ['BEZ', 'warn']
+            : ['SMRT', 'crit'];
+
   return (
-    <div data-system="matrix">
-      {/* ────────── STATY ────────── */}
-      <section className={styles.section} aria-labelledby="matrix-stats-title">
-        <div className={styles.sectionTitleRow}>
-          <span id="matrix-stats-title" className={styles.sectionTitle}>
-            Staty
-          </span>
+    <div className={styles.panel} data-system="matrix">
+      {/* ───── STATY ───── */}
+      <section className={styles.section} aria-labelledby="mx-cp-stats">
+        <div className={styles.titleRow}>
+          <span id="mx-cp-stats" className={styles.title}>Staty</span>
           {canEdit && onRoll && (
             <button
               type="button"
-              className={styles.initiativeBtn}
+              className={styles.initBtn}
               onClick={handleInitiative}
-              title={`Iniciativa = 4dF + ⌊nabitých aspektů (${chargedAspectsCount}) / 2⌋ = +${initiativeModifier}`}
+              title={`Iniciativa = 4dF + ⌊nabité aspekty (${chargedAspectsCount}) / 2⌋ = +${initiativeModifier}`}
             >
               ⚡ Iniciativa
             </button>
           )}
         </div>
 
-        <div className={styles.statsGrid}>
-          {/* Životy */}
-          <div className={`${styles.statCard} ${styles.statCardHealth}`}>
-            <div className={styles.statLabel}>Životy</div>
-            <div className={styles.statMain}>
-              <div className={styles.statInputWrap}>
-                {canEdit ? (
-                  <input
-                    type="number"
-                    min={0}
-                    max={5}
-                    className={styles.statInput}
-                    value={health}
-                    onChange={(e) => {
-                      const n = parseInt(e.target.value, 10);
-                      setField(
-                        'health',
-                        String(Number.isFinite(n) ? n : 0),
-                      );
-                    }}
-                    aria-label="Životy"
-                  />
-                ) : (
-                  <span className={styles.statValue}>{health}</span>
-                )}
-              </div>
-              <span className={styles.statValueMax}>/ 5</span>
-            </div>
-            <HealthPenaltyStrip health={health} />
-          </div>
+        <VitalRow label="❤ Životy" name="Životy" valueKey="health" value={health} max={5} kind="hp" mod={hpMod} canEdit={canEdit} setField={setField} pen={hpPen} />
+        <VitalRow label="⚡ Únava" name="Únava" valueKey="tiredness" value={tiredness} max={25} kind="tired" canEdit={canEdit} setField={setField} pen={tPen} noTrack />
 
-          {/* Únava */}
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>Únava</div>
-            <div className={styles.statMain}>
-              <div className={styles.statInputWrap}>
-                {canEdit ? (
-                  <input
-                    type="number"
-                    min={0}
-                    max={25}
-                    className={styles.statInput}
-                    value={tiredness}
-                    onChange={(e) => {
-                      const n = parseInt(e.target.value, 10);
-                      setField(
-                        'tiredness',
-                        String(Number.isFinite(n) ? n : 0),
-                      );
-                    }}
-                    aria-label="Únava"
-                  />
-                ) : (
-                  <span className={styles.statValue}>{tiredness}</span>
-                )}
-              </div>
-              <span className={styles.statValueMax}>/ 25</span>
-            </div>
-            <TirednessPenaltyStrip tiredness={tiredness} />
-          </div>
-
-          {/* Vesta + Runa */}
-          <div className={styles.secondaryGrid}>
-            <div className={`${styles.statCard} ${styles.statCardArmor}`}>
-              <div className={styles.statLabel}>Vesta</div>
-              <div className={styles.statInputWrap}>
-                {canEdit ? (
-                  <input
-                    type="number"
-                    min={0}
-                    className={styles.statInput}
-                    value={armor}
-                    onChange={(e) => {
-                      const n = parseInt(e.target.value, 10);
-                      setField(
-                        'armor',
-                        String(Number.isFinite(n) ? n : 0),
-                      );
-                    }}
-                    aria-label="Vesta"
-                  />
-                ) : (
-                  <span className={styles.statValue}>{armor}</span>
-                )}
-              </div>
-            </div>
-            <div className={`${styles.statCard} ${styles.statCardMagic}`}>
-              <div className={styles.statLabel}>Runa</div>
-              <div className={styles.statInputWrap}>
-                {canEdit ? (
-                  <input
-                    type="number"
-                    min={0}
-                    className={styles.statInput}
-                    value={magicHealth}
-                    onChange={(e) => {
-                      const n = parseInt(e.target.value, 10);
-                      setField(
-                        'magicHealth',
-                        String(Number.isFinite(n) ? n : 0),
-                      );
-                    }}
-                    aria-label="Runa"
-                  />
-                ) : (
-                  <span className={styles.statValue}>{magicHealth}</span>
-                )}
-              </div>
-            </div>
-          </div>
+        <div className={styles.vit2col}>
+          <VitalRow label="🛡 Ochrana" name="Ochrana" valueKey="armor" value={armor} max={Math.max(armor, 3)} kind="arm" canEdit={canEdit} setField={setField} compact />
+          <VitalRow label="◇ Runa" name="Runa" valueKey="magicHealth" value={magicHealth} max={Math.max(magicHealth, 2)} kind="rune" canEdit={canEdit} setField={setField} compact />
         </div>
       </section>
 
-      {/* Cizí hráč → tady končí. STATY je vše co vidí. */}
-      {!canEdit && null}
-
-      {/* ────────── DOVEDNOSTI ────────── */}
-      {canEdit && abilities.length > 0 && (
-        <section
-          className={styles.section}
-          aria-labelledby="matrix-skills-title"
-        >
-          <div className={styles.sectionTitleRow}>
-            <span
-              id="matrix-skills-title"
-              className={styles.sectionTitle}
-            >
-              Dovednosti
-            </span>
-          </div>
-          <div className={styles.skillGrid}>
-            {abilities.map((ability, idx) => (
-              <div key={idx} className={styles.skillCard}>
-                <span className={styles.skillLabel}>
-                  {ability.label || '(bez názvu)'}
-                </span>
-                {onRoll && ability.label ? (
-                  <button
-                    type="button"
-                    className={`${styles.skillValue} ${styles.skillValueAction}`}
-                    onClick={() => handleSkillRoll(ability)}
-                    title={`Hodit ${ability.label} (4dF + ${ability.value})`}
-                    aria-label={`Hodit ${ability.label}`}
-                  >
-                    {ability.value}
-                  </button>
-                ) : (
-                  <span className={styles.skillValue}>{ability.value}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ────────── PŘETLAKY ────────── */}
+      {/* cizí hráč → konec (STATY je vše co vidí) */}
       {canEdit && (
-        <section
-          className={styles.section}
-          aria-labelledby="matrix-pressure-title"
-        >
-          <div className={styles.sectionTitleRow}>
-            <span
-              id="matrix-pressure-title"
-              className={styles.sectionTitle}
-            >
-              Přetlaky
-            </span>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.6rem',
-            }}
-          >
-            {MATRIX_PRESSURE_TYPES.map((p) => {
-              const current = readNum(`pressure_${p.key}`, -1);
-              return (
-                <div className={styles.pressureRow} key={p.key}>
-                  <span className={styles.pressureLabel}>{p.label}</span>
-                  <div
-                    className={styles.pressureRail}
-                    role="group"
-                    aria-label={`Přetlak ${p.label}`}
-                  >
-                    {Array.from({ length: 5 }).map((_, i) => {
-                      const active = current >= i;
-                      return (
-                        <button
-                          type="button"
-                          key={i}
-                          className={`${styles.pressureSegment} ${active ? styles.pressureSegmentActive : ''}`}
-                          onClick={() => handlePressureToggle(p.key, i)}
-                          aria-label={`${p.label} přetlak ${i + 1} z 5`}
-                          aria-pressed={active}
-                        />
-                      );
-                    })}
+        <>
+          {/* ───── SCHOPNOSTI ───── */}
+          {abilities.length > 0 && (
+            <section className={styles.section} aria-labelledby="mx-cp-skills">
+              <div className={styles.titleRow}>
+                <span id="mx-cp-skills" className={styles.title}>Schopnosti</span>
+              </div>
+              <div className={styles.list}>
+                {abilities.map((ability, idx) => {
+                  const lvl = parseInt(ability.value, 10) || 0;
+                  const total = Math.max(skillMax, lvl);
+                  const rollable = Boolean(onRoll && ability.label);
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={styles.skill}
+                      style={{ ['--lvlc' as string]: lvlVar(lvl) } as CSSProperties}
+                      onClick={() => rollable && handleSkillRoll(ability)}
+                      disabled={!rollable}
+                      title={rollable ? `Hodit ${ability.label} (4dF + ${lvl})` : ability.label}
+                      aria-label={rollable ? `Hodit ${ability.label}` : ability.label}
+                    >
+                      <span className={styles.skillName}>{ability.label || '(bez názvu)'}</span>
+                      <span className={styles.skillRight}>
+                        <Pips lvl={lvl} total={total} />
+                        <span className={styles.skillLvl} title={`${lvl} — ${matrixLevelName(lvl)}`}>{lvl}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* ───── PŘETLAKY ───── */}
+          <section className={styles.section} aria-labelledby="mx-cp-pressure">
+            <div className={styles.titleRow}>
+              <span id="mx-cp-pressure" className={styles.title}>Přetlaky</span>
+            </div>
+            <div className={styles.pressure}>
+              {MATRIX_PRESSURE_TYPES.map((p) => {
+                const current = readNum(`pressure_${p.key}`, -1);
+                return (
+                  <div className={styles.prRow} key={p.key}>
+                    <span className={styles.prLabel}>{p.label}</span>
+                    <div className={styles.prRail} role="group" aria-label={`Přetlak ${p.label}`}>
+                      {Array.from({ length: 5 }).map((_, i) => {
+                        const on = current >= i;
+                        return (
+                          <button
+                            key={i}
+                            type="button"
+                            className={styles.prSeg}
+                            data-on={on ? String(i + 1) : 'off'}
+                            onClick={() => handlePressureToggle(p.key, i)}
+                            aria-label={`${p.label} ${i + 1} z 5`}
+                            aria-pressed={on}
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
+                );
+              })}
+            </div>
+          </section>
 
-      {/* ────────── ASPEKTY ────────── */}
-      {canEdit && aspects.length > 0 && (
-        <section
-          className={styles.section}
-          aria-labelledby="matrix-aspects-title"
-        >
-          <div className={styles.sectionTitleRow}>
-            <span
-              id="matrix-aspects-title"
-              className={styles.sectionTitle}
-            >
-              Aspekty
-            </span>
-          </div>
-          <div className={styles.aspectGrid}>
-            {aspects.map((aspect, idx) => {
-              const charged = isAspectCharged(aspect.value || '');
-              const cardClass = charged
-                ? `${styles.aspectCard} ${styles.aspectCardCharged}`
-                : `${styles.aspectCard} ${styles.aspectCardDepleted}`;
-              const chipClass = charged
-                ? `${styles.aspectChip} ${styles.aspectChipCharged}`
-                : `${styles.aspectChip} ${styles.aspectChipDepleted}`;
-              return (
-                <div key={idx} className={cardClass}>
-                  <span className={styles.aspectLabel}>
-                    {aspect.label || '(bez názvu)'}
-                  </span>
-                  <button
-                    type="button"
-                    className={chipClass}
-                    onClick={() => handleAspectToggle(idx)}
-                    aria-label={`Aspekt ${aspect.label || idx + 1}: ${charged ? 'nabitý' : 'vybitý'} — klikni pro přepnutí`}
-                    aria-pressed={charged}
-                    title={
-                      charged ? 'Klikni pro vybití' : 'Klikni pro nabití'
-                    }
-                  >
-                    {charged ? 'Nabitý' : 'Vybitý'}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+          {/* ───── ASPEKTY ───── */}
+          {aspects.length > 0 && (
+            <section className={styles.section} aria-labelledby="mx-cp-aspects">
+              <div className={styles.titleRow}>
+                <span id="mx-cp-aspects" className={styles.title}>Aspekty</span>
+              </div>
+              <div className={styles.list}>
+                {aspects.map((aspect, idx) => {
+                  const charged = isAspectCharged(aspect.value || '');
+                  return (
+                    <div className={styles.aspect} data-charged={charged} key={idx}>
+                      <span className={styles.aspectName}>{aspect.label || '(bez názvu)'}</span>
+                      <button
+                        type="button"
+                        className={styles.chip}
+                        data-charged={charged}
+                        onClick={() => handleAspectToggle(idx)}
+                        aria-pressed={charged}
+                        title={charged ? 'Klikni pro vybití' : 'Klikni pro nabití'}
+                      >
+                        {charged ? 'Nabitý' : 'Vybitý'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+        </>
       )}
     </div>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
-// Penalty strips (lokální helper komponenty)
-// ════════════════════════════════════════════════════════════════
-
-function HealthPenaltyStrip({
-  health,
-}: {
-  health: number;
-}): React.ReactElement {
+// ── Pips (barva dle stupně) ──────────────────────────────────────
+function Pips({ lvl, total }: { lvl: number; total: number }): React.ReactElement {
   return (
-    <div className={styles.penaltyStrip}>
-      {MATRIX_HEALTH_PENALTY.map((penalty, i) => {
-        let isActive = false;
-        let modClass = '';
-        const val = String(penalty);
-        if (i === 0) {
-          isActive = health >= 4;
-        } else if (i === 1) {
-          isActive = health === 2 || health === 3;
-          modClass = styles.penaltyPillWarning;
-        } else if (i === 2) {
-          isActive = health === 1;
-          modClass = styles.penaltyPillOrange;
-        } else if (i === 3) {
-          isActive = health === 0;
-          modClass = styles.penaltyPillDanger;
-        }
-        const cls = [
-          styles.penaltyPill,
-          modClass,
-          isActive ? styles.penaltyPillActive : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
+    <span className={styles.pips}>
+      {Array.from({ length: total }).map((_, i) => {
+        const on = i < lvl;
         return (
-          <div
-            key={`he${i}`}
-            className={cls}
-            aria-label={`Penalty ${val}${isActive ? ' (aktivní)' : ''}`}
-          >
-            {val}
-          </div>
+          <i
+            key={i}
+            className={styles.pip}
+            data-on={on}
+            style={on ? ({ ['--lvlc' as string]: lvlVar(lvl) } as CSSProperties) : undefined}
+          />
         );
       })}
-    </div>
+    </span>
   );
 }
 
-function TirednessPenaltyStrip({
-  tiredness,
+// ── Vital row (track + číslo + postih) ───────────────────────────
+function VitalRow({
+  label,
+  name,
+  valueKey,
+  value,
+  max,
+  kind,
+  mod,
+  canEdit,
+  setField,
+  pen,
+  noTrack,
+  compact,
 }: {
-  tiredness: number;
+  label: string;
+  name: string;
+  valueKey: string;
+  value: number;
+  max: number;
+  kind: 'hp' | 'tired' | 'arm' | 'rune';
+  mod?: string;
+  canEdit: boolean;
+  setField: (key: string, value: unknown) => void;
+  pen?: string[];
+  noTrack?: boolean;
+  compact?: boolean;
 }): React.ReactElement {
   return (
-    <div className={styles.penaltyStrip}>
-      {MATRIX_TIREDNESS_PENALTY.map((penalty, i) => {
-        let isActive = false;
-        let modClass = '';
-        let display = String(penalty);
-        if (i === 0) {
-          isActive = tiredness >= 0 && tiredness <= 5;
-        } else if (i === 1) {
-          isActive = tiredness >= 6 && tiredness <= 10;
-          modClass = styles.penaltyPillWarning;
-        } else if (i === 2) {
-          isActive = tiredness >= 11 && tiredness <= 15;
-          modClass = styles.penaltyPillOrange;
-        } else if (i === 3) {
-          isActive = tiredness >= 16 && tiredness <= 20;
-          modClass = styles.penaltyPillPurple;
-          display = 'Bez';
-        } else if (i === 4) {
-          isActive = tiredness >= 21;
-          modClass = styles.penaltyPillDanger;
-          display = 'Smrt';
-        }
-        const cls = [
-          styles.penaltyPill,
-          modClass,
-          isActive ? styles.penaltyPillActive : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
-        return (
-          <div
-            key={`ti${i}`}
-            className={cls}
-            title={String(penalty)}
-            aria-label={`Únava ${display}${isActive ? ' (aktivní)' : ''}`}
-          >
-            {display}
-          </div>
-        );
-      })}
+    <div className={styles.vit}>
+      <div className={styles.vitHead}>
+        <span className={styles.vitLab}>{label}</span>
+        <span className={styles.vitNum}>
+          {canEdit ? (
+            <input
+              type="number"
+              min={0}
+              className={styles.num}
+              value={value}
+              onChange={(e) => setField(valueKey, String(Math.max(0, parseInt(e.target.value, 10) || 0)))}
+              aria-label={name}
+            />
+          ) : (
+            value
+          )}
+          {!compact && <small>/{max}</small>}
+        </span>
+      </div>
+      {!noTrack && (
+        <div className={styles.track}>
+          {Array.from({ length: max }).map((_, i) => (
+            <i key={i} className={styles.seg} data-kind={kind} data-on={i < value} data-mod={i < value ? mod || '' : ''} />
+          ))}
+        </div>
+      )}
+      {pen && (
+        <div className={styles.status}>
+          <span>Postih:</span>
+          <span className={styles.badge} data-mod={pen[1]}>{pen[0]}</span>
+        </div>
+      )}
     </div>
   );
 }

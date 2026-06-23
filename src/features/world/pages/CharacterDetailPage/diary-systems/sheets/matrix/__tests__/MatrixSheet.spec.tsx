@@ -1,9 +1,20 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MatrixSheet } from '../MatrixSheet';
+import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import type { CharacterDiary } from '../../../../../api/characters.types';
+
+// useCharacter řídí NPC clamp (pips 1–7 vs 1–10). Mockujeme ho.
+vi.mock('@/features/world/pages/api/useCharacter');
+const mockedUseCharacter = vi.mocked(useCharacter);
+beforeEach(() => {
+  // default = PC (data nedoběhla / není NPC)
+  mockedUseCharacter.mockReturnValue({
+    data: undefined,
+  } as unknown as ReturnType<typeof useCharacter>);
+});
 
 function makeDiary(customData: Record<string, unknown> = {}): CharacterDiary {
   return { id: 'd1', characterId: 'c1', worldId: 'w1', sections: [], customData };
@@ -226,6 +237,31 @@ describe('MatrixSheet (16.2a HUD)', () => {
     );
     const lvl = container.querySelector('.mx-skill__lvl');
     expect(lvl?.getAttribute('data-tip')).toBe('5 — Mistr oboru');
+  });
+
+  it('PC clamp: schopnost lvl 4 → 7 pipů (lidský strop)', () => {
+    const { container } = renderSheet(
+      <MatrixSheet
+        {...commonProps}
+        diary={makeDiary({ matrix_abilities: JSON.stringify([{ label: 'X', value: '4' }]) })}
+        mode="view"
+      />,
+    );
+    expect(container.querySelectorAll('.mx-pip').length).toBe(7);
+  });
+
+  it('NPC clamp: NPC schopnost lvl 4 → 10 pipů (entity strop)', () => {
+    mockedUseCharacter.mockReturnValue({
+      data: { isNpc: true },
+    } as unknown as ReturnType<typeof useCharacter>);
+    const { container } = renderSheet(
+      <MatrixSheet
+        {...commonProps}
+        diary={makeDiary({ matrix_abilities: JSON.stringify([{ label: 'X', value: '4' }]) })}
+        mode="view"
+      />,
+    );
+    expect(container.querySelectorAll('.mx-pip').length).toBe(10);
   });
 });
 

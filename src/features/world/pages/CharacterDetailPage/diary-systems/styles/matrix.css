@@ -396,6 +396,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* tester 16.2a — segmenty nemusí být přes celou šířku; do ~poloviny.
+     Na mobilu (< 520px) se max-width neuplatní → plná šířka. */
+  max-width: 520px;
 }
 [data-diary-system='matrix'] .mx-pr-row {
   display: grid;

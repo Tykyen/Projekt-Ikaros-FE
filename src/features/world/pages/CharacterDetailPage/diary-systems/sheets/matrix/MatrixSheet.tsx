@@ -12,7 +12,7 @@
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { usePrintMode } from '@/features/world/export/print';
-import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
+import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
@@ -37,11 +37,10 @@ export function MatrixSheet({
   onRoll,
 }: SystemSheetProps) {
   const printMode = usePrintMode();
-  // H1 portrét + H2 NPC detekce — adresář postav (Page) nese imageUrl i type.
-  const { data: directory } = usePersonaDirectory(worldId);
-  const entry = directory?.find((e) => e.slug === characterSlug);
-  const portraitUrl = entry?.imageUrl;
-  const isNpc = entry?.type === 'NPC';
+  // H2 NPC clamp — `Character.isNpc` (spolehlivé). Portrét záměrně iniciály:
+  // deník na stránce postavy obrázek nezobrazuje (rozhodnutí uživatele 16.2a).
+  const { data: character } = useCharacter(worldId, characterSlug);
+  const isNpc = !!character?.isNpc;
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'matrix_', onChange);
 
@@ -51,7 +50,7 @@ export function MatrixSheet({
 
   return (
     <div className="matrix-sheet" data-mode={mode}>
-      <Hero cda={cda} editing={editing} onRoll={onRoll} portraitUrl={portraitUrl} />
+      <Hero cda={cda} editing={editing} onRoll={onRoll} />
       <LanguagesPanel cda={cda} editing={editing} />
       <VitalsPanel cda={cda} editing={editing} />
       <BudgetPanel cda={cda} editing={editing} />
@@ -170,8 +169,7 @@ function Hero({
   cda,
   editing,
   onRoll,
-  portraitUrl,
-}: SubProps & { onRoll?: OnRoll; portraitUrl?: string }) {
+}: SubProps & { onRoll?: OnRoll }) {
   const { g, set } = cda;
   const name = g('name');
   const initials =
@@ -187,7 +185,7 @@ function Hero({
   return (
     <header className="mx-hero">
       <div className="mx-portrait">
-        {portraitUrl ? <img src={portraitUrl} alt={name || 'Portrét postavy'} /> : <span>{initials}</span>}
+        <span>{initials}</span>
       </div>
       <div className="mx-id">
         <h1 className="mx-name">{name || 'Bez jména'}</h1>
