@@ -516,6 +516,12 @@ export interface WorldMembership {
    */
   themeBackgroundUrl?: string | null;
   /**
+   * 16.2c — per-člen vizuální skin deníku (`scifi`/`fantasy`/`horror`/
+   * `steampunk`/`nature`/`minimal`/`retro`). Absent/null = dědí default dle
+   * `world.system` (`resolveDefaultSkin`). Self-service přes `members/me/theme`.
+   */
+  diarySkin?: string | null;
+  /**
    * 10.2-prep-1 — aktuální scéna hráče v taktické mapě. `null`/undefined =
    * neassigned (klient zobrazí MapEmptyState). Mění se přes `member.*` ops
    * (PJ-only kromě hráčova self-unassign).

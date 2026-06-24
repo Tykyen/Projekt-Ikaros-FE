@@ -25,6 +25,9 @@ import {
 import type { DiarySchemaBlock } from '../../api/diarySchema.types';
 import { DiarySystemProvider } from '../diary-systems/DiarySystemProvider';
 import { useDiarySystem } from '../diary-systems/DiarySystemContext';
+import { getDiaryPreset } from '../diary-systems/registry';
+import { useDiarySkin } from '../diary-systems/skins/useDiarySkin';
+import { DiarySkinSelector } from '../diary-systems/skins/DiarySkinSelector';
 import { EditStickyBar } from './EditStickyBar';
 import { EditModeBanner } from './EditModeBanner';
 import { SectionListEditor } from './editors/SectionListEditor';
@@ -58,6 +61,11 @@ export function DiaryTab({ slug, mode, onExitEdit, onDirtyChange, onRoll }: Prop
   const { worldId, worldSlug, world } = useWorldContext();
   const { data: diary, isLoading, isError } = useCharacterDiary(worldId, slug);
   const activeWorldSchema = useActiveDiarySchema(worldId);
+  // 16.2c — skin deníku (per uživatel × svět). Selector se ukazuje jen pro
+  // systémy s dedikovaným skinovatelným listem (dnes matrix); ostatní systémy
+  // skin zatím vizuálně nemění (F3), tak nemateme volbou bez efektu.
+  const { skin, setSkin, isPending: skinPending } = useDiarySkin(worldId);
+  const skinnable = Boolean(getDiaryPreset(world?.system).SystemSheet);
 
   if (isLoading) return <Spinner center />;
   if (isError || !diary) {
@@ -74,23 +82,43 @@ export function DiaryTab({ slug, mode, onExitEdit, onDirtyChange, onRoll }: Prop
   // 8.7a — Provider obalí oba módy. `world.system` určuje preset
   // (dedikovaný sheet vs generic block view). Pokud world ještě
   // neloaded, fallback `undefined` → `generic` preset.
+  // 16.2c — selector skinu (jen skinovatelné systémy). `print-hide`, aby
+  // do tisku/PDF nešel.
+  const skinSelector = skinnable ? (
+    <DiarySkinSelector active={skin} onPick={setSkin} disabled={skinPending} />
+  ) : null;
+
   return (
-    <DiarySystemProvider system={world?.system}>
+    <DiarySystemProvider system={world?.system} skin={skin}>
       {mode === 'edit' ? (
-        <DiaryTabEdit
-          diary={diary}
-          worldId={worldId}
-          worldSlug={worldSlug}
-          slug={slug}
-          effectiveBlocks={effectiveBlocks}
-          isOverride={diary.personalDiarySchema != null}
-          onExitEdit={onExitEdit}
-          onDirtyChange={onDirtyChange}
-          onRoll={onRoll}
-        />
+        <>
+          {skinSelector && (
+            <div
+              className="print-hide"
+              style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}
+            >
+              {skinSelector}
+            </div>
+          )}
+          <DiaryTabEdit
+            diary={diary}
+            worldId={worldId}
+            worldSlug={worldSlug}
+            slug={slug}
+            effectiveBlocks={effectiveBlocks}
+            isOverride={diary.personalDiarySchema != null}
+            onExitEdit={onExitEdit}
+            onDirtyChange={onDirtyChange}
+            onRoll={onRoll}
+          />
+        </>
       ) : (
         <div data-print-scope>
-          <div className="print-hide" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div
+            className="print-hide"
+            style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, alignItems: 'center' }}
+          >
+            {skinSelector}
             <PrintButton title="Vytisknout / uložit deník jako PDF" />
           </div>
           <DiaryTabView

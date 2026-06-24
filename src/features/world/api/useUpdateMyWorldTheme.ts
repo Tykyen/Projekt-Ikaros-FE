@@ -13,6 +13,8 @@ export interface UpdateMyThemeInput {
   themeId?: string | null;
   /** 5.9b — vlastní pozadí (jen pro mě). `null` = bez vlastního pozadí. */
   themeBackgroundUrl?: string | null;
+  /** 16.2c — skin deníku (jen pro mě). `null`/`''` = default dle systému. */
+  diarySkin?: string | null;
 }
 
 export function useUpdateMyWorldTheme(worldId: string) {

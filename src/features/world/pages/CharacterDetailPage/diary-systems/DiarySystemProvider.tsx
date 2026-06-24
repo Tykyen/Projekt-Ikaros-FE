@@ -10,6 +10,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { DiarySystemContext } from './DiarySystemContext';
 import { getDiaryPreset } from './registry';
+// 16.2c — skin token sady (7 stylů). Statický import: malý CSS, vždy
+// potřeba jakmile je deník otevřen; tokeny řídí `data-diary-skin`.
+import './styles/diary-skins.css';
 
 interface Props {
   /** Hodnota `world.system`. Pokud undefined/neznámá → generic preset. */
@@ -20,9 +23,19 @@ interface Props {
    * přidává vždy nezávisle.
    */
   className?: string;
+  /**
+   * 16.2c — aktivní skin deníku (`data-diary-skin`). Když chybí, atribut se
+   * nepřidá → matrix.css fallbackuje na sci-fi defaulty.
+   */
+  skin?: string;
 }
 
-export function DiarySystemProvider({ system, children, className }: Props) {
+export function DiarySystemProvider({
+  system,
+  children,
+  className,
+  skin,
+}: Props) {
   const preset = getDiaryPreset(system);
 
   // `loadedFor` drží ID presetu, jehož styly už byly načteny. Derived
@@ -52,7 +65,11 @@ export function DiarySystemProvider({ system, children, className }: Props) {
 
   return (
     <DiarySystemContext.Provider value={{ preset, stylesReady }}>
-      <div data-diary-system={preset.id} className={className}>
+      <div
+        data-diary-system={preset.id}
+        data-diary-skin={skin || undefined}
+        className={className}
+      >
         {children}
       </div>
     </DiarySystemContext.Provider>
