@@ -314,6 +314,25 @@ export const CHAT_FONTS: readonly ChatFont[] = [
 
 export const CHAT_FONT_KEYS = CHAT_FONTS.map((f) => f.key);
 
+/**
+ * 16.1f — kurátorská podmnožina pro čtenářský font override („Jak čtu ostatní").
+ * Jen opravdu čitelná písma; ozdobné blackletter/script tu nedávají smysl (smysl
+ * přepínače = pohodlné čtení, ne další ozdoba). Pořadí = pořadí v UI.
+ */
+export const READABLE_FONT_KEYS: readonly string[] = [
+  'system', // systémový sans
+  'inter', // Moderní (Inter)
+  'lora', // Literární serif
+  'crimson', // Tradiční román serif
+  'spectral', // Spektrální serif
+  'mono', // IBM Plex Mono (pro čtenáře, kterým vyhovuje mono)
+];
+
+/** 16.1f — `ChatFont` objekty kurátorské sady, v pořadí `READABLE_FONT_KEYS`. */
+export const READABLE_FONTS: readonly ChatFont[] = READABLE_FONT_KEYS.map(
+  (k) => CHAT_FONTS.find((f) => f.key === k)!,
+);
+
 const STACK_BY_KEY = new Map(CHAT_FONTS.map((f) => [f.key, f.stack]));
 
 /** CSS font-family stack pro klíč; null/neznámý → systémový fallback. */

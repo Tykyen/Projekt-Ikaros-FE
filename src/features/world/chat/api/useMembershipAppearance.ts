@@ -14,13 +14,21 @@ export interface MembershipAppearance {
   chatFontSize: string | null;
   /** 16.1d — per-svět skin chatu (= motiv světa; null = auto dle světa). */
   chatSkin: string | null;
+  /**
+   * 16.1f — čtenářský font override. Když zapnuto, klient vykreslí VŠECHNY
+   * zprávy fontem `readerFont` + velikostí `readerFontSize` místo fontu
+   * odesílatele. `readerFont` null = systémový, `readerFontSize` null = 1×.
+   */
+  readerFontOverride: boolean;
+  readerFont: string | null;
+  readerFontSize: string | null;
   /** Krok 6.3e — per-svět volba skinu kostek per typ. */
   diceSkinMapping: Record<string, string> | null;
   /** Krok 6.3 D-NEW-dice-jail — uvězněné skiny (skryté z hlavního gridu). */
   jailedDiceSkins: string[];
 }
 
-const appearanceKey = (worldId: string) =>
+export const appearanceKey = (worldId: string) =>
   ['world-chat', worldId, 'appearance'] as const;
 
 export function useMembershipAppearance(worldId: string) {
@@ -39,6 +47,10 @@ export interface UpdateAppearancePayload {
   chatFontSize?: string | null;
   /** 16.1d — skin chatu (světový ThemeId; null = auto). */
   chatSkin?: string | null;
+  /** 16.1f — čtenářský font override (přepínač + zvolený font/velikost). */
+  readerFontOverride?: boolean;
+  readerFont?: string | null;
+  readerFontSize?: string | null;
   diceSkinMapping?: Record<string, string> | null;
   jailedDiceSkins?: string[];
 }

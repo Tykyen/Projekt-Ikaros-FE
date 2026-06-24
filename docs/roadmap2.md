@@ -333,7 +333,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Otevřené otázky:** Co konkrétně chatu chybí pro pohodlné dlouhé vyprávění (odběr kanálu? archiv? mobilní čtení dlouhých příspěvků?) — zjistit průchodem reálným chatem (vyžádám si screen). Kdo zakládá příběhové kanály a kdo do nich smí psát (role/skupiny — máme)?
 
-**Doplněno 2026-06-23 — dvě konkrétní rozšíření 16.1** (návaznost na 16.2c skiny + zpětná vazba testerů):
+**Doplněno 2026-06-23 — konkrétní rozšíření 16.1** (návaznost na 16.2c skiny + zpětná vazba testerů):
 
 #### - [x] 16.1d Vzhled/skin chatu — volba stylu hráčem — ✅ 2026-06-24 [dopad střední · náklad malý]
 > **✅ Hotovo 2026-06-24 (spec-16.1d, BE čeká restart).** **Pivot vs. původní návrh:** skin chatu = **motiv světa** (12 žánrů), NE 7 systémových skinů deníku (16.2c). PJ motiv světa se propíše do chatu; hráč v 🎨 paletce přebije skin svého chatu (per člen×svět, `WorldMembership.chatSkin`). Engine = scoped přepis `--theme-*` z `getTheme(skin).vars` na `data-chat-skin` kontejneru (žádný refaktor chat CSS — chrome už čte `--theme-*`) + atmosféra per žánr. Ikaros = baseline 1:1. ⚠️ Chat je plochý message-stream (ne bubliny) → reskin nese paleta+fonty+chrome.
@@ -350,6 +350,13 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Návrh:** bestie instance v chatu = stejný model jako bestie `MapToken` (nezávislá instance: `health.current` seed, vlastní `notes`/`abilities`), ale **scope = konverzace** místo scény. Pole instancí uložit na `ChatChannel` (konverzaci); reuse `buildBestieToken` + `BestieStatblock` z 16.1b/c; HP editovatelné a perzistentní napříč session. Combat-tracker-lite, ne plná mapa v chatu.
 **Hranice:** žádný grid/fog/pohyb — jen seznam soubojových bestií s HP (+ případně iniciativa). Plné taktické věci zůstávají na mapě.
 **Otevřené:** Instance žijí na `ChatChannel`, nebo ve vlastní kolekci klíčované konverzací? Iniciativa/řazení? Viditelnost HP hráčům (per-instance toggle jako mapa per-scéna)? Sdílí combat tracker s mapou, nebo samostatný lehký?
+
+#### - [x] 16.1f Čtenářský font override — čitelnost na přání — ✅ 2026-06-24 [dopad střední · náklad malý] · *zpětná vazba testerů*
+> **✅ Implementováno 2026-06-24 (spec-16.1f), BE čeká restart.** Čtenář defaultně vidí zprávy fontem každého odesílatele (6.2f), ale **přepínačem 👓 v hlavičce konverzace** (na mobilu skrytý → v 🎨 paletce) převede všechen text do **vlastního čitelného písma + velikosti**. Per-viewer × per-svět, persistence BE na `WorldMembership` (3 pole `readerFontOverride/readerFont/readerFontSize`, sync napříč zařízeními). FE override = obejít 2 resolvery v `ChannelView` (žádná změna `MessageList`). Nabídka = kurátorská podmnožina čitelných fontů, ne všech 40. Barva zpráv zůstává (kontrast guard). **Při práci přibalené UI fixy (zpětná vazba testera):** neprůhledné pozadí popoveru + sdíleného `Modal`u (theme surface mají alfu → kompozice na `--theme-bg`), kompaktnější hod kostkou (`DiceMessage` 80→52). Detail: spec-16.1f, fe.md ✅ ŘEŠENÍ.
+**Cíl:** Když je cizí ozdobný font nečitelný, čtenář jedním klikem zobrazí všechny zprávy písmem, které se *jemu* dobře čte — aniž by komukoli měnil jeho zvolený font.
+**Proč:** Zpětná vazba testera. Ozdobná písma (6.2f) slouží atmosféře/zvýraznění, ale můžou škodit čitelnosti; čtenářská volba řeší obojí bez kompromisu.
+**Rozsah:** BE 3 pole + whitelist na `/chat/appearance` (vzor `chatSkin` z 16.1d) · FE override resolverů + přepínač v hlavičce + sekce „Jak čtu ostatní" v `AppearancePopover`.
+**Co ne:** OpenDyslexic font (chce font load — možné rozšíření), override barvy, PJ vynucení, per-konverzace volba.
 
 ### - [ ] 16.2 👑 Hloubková podpora RPG systémů — [E2 · dopad vysoký · náklad velký] 🔁
 > **Reorganizováno 2026-06-22 — rozpad „per pilíř", ne „per systém".** Pilíř = sdílená infrastruktura; postavit engine jednou a naplnit napříč systémy je efektivnější než stavět ho u každého systému znovu. **Dva pilíře:** 16.2a Deník · 16.2b Bestiář. **3. pilíř „Dodatky k pravidlům" VYŘAZEN z 16.2** — design je nejasný (jak by fungoval); vrátí se jako vlastní pozdější bod, až bude promyšlený. Progress per systém = matice na konci.

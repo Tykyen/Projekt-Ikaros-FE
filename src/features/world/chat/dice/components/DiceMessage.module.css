@@ -40,14 +40,16 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
   flex-wrap: wrap;
 }
 
 .sceneWrap {
   flex: 1 1 auto;
-  min-height: 120px;
+  /* 6.3-followup — kompaktní hod (testerská zpětná vazba): kostky zmenšeny
+     80→52, rezervovaná výška ladí s nimi. */
+  min-height: 60px;
   position: relative;
   display: flex;
   align-items: center;
@@ -56,8 +58,8 @@
 /* Total box. Barva přes accent class (positive/negative/zero/neutral). */
 .totalBox {
   flex-shrink: 0;
-  width: 72px;
-  height: 56px;
+  width: 60px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,7 +71,7 @@
 }
 
 .totalValue {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 600;
   line-height: 1;
 }
@@ -150,16 +152,16 @@
   }
 
   .sceneWrap {
-    min-height: 100px;
+    min-height: 56px;
   }
 
   .totalBox {
-    width: 60px;
-    height: 48px;
+    width: 52px;
+    height: 42px;
   }
 
   .totalValue {
-    font-size: 26px;
+    font-size: 22px;
   }
 
   .subtitle {

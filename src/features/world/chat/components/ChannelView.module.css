@@ -141,6 +141,13 @@
     width: 44px;
     height: 44px;
   }
+
+  /* 16.1f — čtenářský font override (👓) se na úzkém mobilu skryje z hlavičky
+     (princip „počet prvků v headeru konstantní, swap ne add"). Přepínač zůstává
+     dostupný v 🎨 paletce (na mobilu spodní sheet). */
+  .readerToggleBtn {
+    display: none;
+  }
 }
 
 /* ── 16.1d — per-skin chrome ornamenty hlavičky (gated ancestor [data-chat-skin]).

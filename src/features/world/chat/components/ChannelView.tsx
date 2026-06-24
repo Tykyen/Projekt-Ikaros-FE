@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Menu, Users, Search, Palette, BookOpen } from 'lucide-react';
+import { Menu, Users, Search, Palette, BookOpen, Glasses } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
 import { WorldHelpButton, WorldHelpModal, ChatHelp } from '@/features/world/help';
 import type { User } from '@/shared/types';
@@ -31,7 +31,11 @@ import {
 import { useEditMessage } from '../api/useEditMessage';
 import { useToggleReaction } from '../api/useToggleReaction';
 import { useUploadWorldAttachment } from '../api/useUploadWorldAttachment';
-import { useMembershipAppearance } from '../api/useMembershipAppearance';
+import {
+  useMembershipAppearance,
+  useUpdateAppearance,
+  appearanceKey,
+} from '../api/useMembershipAppearance';
 import { useOptimisticSend } from '../api/useOptimisticSend';
 import { useChannelMembers } from '../api/useChannelMembers';
 import { useWorld } from '@/features/world/api/useWorlds';
@@ -106,6 +110,7 @@ export function ChannelView({
   const reactionMutation = useToggleReaction(worldId);
   const uploadMutation = useUploadWorldAttachment(worldId);
   const appearance = useMembershipAppearance(worldId);
+  const updateAppearance = useUpdateAppearance(worldId);
   const { members } = useChannelMembers(worldId, channel);
   // Krok 6.3a — `World.dice` whitelist + slug pro CTA v prázdném stavu pickeru.
   const worldQuery = useWorld(worldId);
@@ -157,16 +162,40 @@ export function ChannelView({
     return m;
   }, [members]);
 
+  // 16.1f — čtenářský font override. Když je zapnutý, KAŽDÁ zpráva se vykreslí
+  // čtenářovým fontem/velikostí místo fontu odesílatele (čitelnost na přání).
+  // `readerFont` null → systémový fallback; `readerFontSize` null → undefined (1×).
+  const readerOverride = appearance.data?.readerFontOverride ?? false;
+  const overrideFontStack = useMemo(
+    () => getFontStack(appearance.data?.readerFont),
+    [appearance.data?.readerFont],
+  );
+  const overrideFontSize = useMemo(
+    () => getFontSize(appearance.data?.readerFontSize),
+    [appearance.data?.readerFontSize],
+  );
+
   const resolveFont = useCallback(
     (key: string | null | undefined): string | undefined =>
-      key ? getFontStack(key) : undefined,
-    [],
+      readerOverride ? overrideFontStack : key ? getFontStack(key) : undefined,
+    [readerOverride, overrideFontStack],
   );
   const resolveFontSize = useCallback(
     (key: string | null | undefined): string | undefined =>
-      key ? getFontSize(key) : undefined,
-    [],
+      readerOverride ? overrideFontSize : key ? getFontSize(key) : undefined,
+    [readerOverride, overrideFontSize],
   );
+
+  // Rychlý přepínač v hlavičce — optimistický flip cache + PATCH (onSuccess
+  // přepíše autoritativními daty serveru → self-correcting i při dropnutí pole
+  // před BE restartem). Konfigurace fontu/velikosti je v AppearancePopover.
+  const toggleReaderOverride = useCallback(() => {
+    const next = !readerOverride;
+    qc.setQueryData(appearanceKey(worldId), (prev) =>
+      prev ? { ...prev, readerFontOverride: next } : prev,
+    );
+    updateAppearance.mutate({ readerFontOverride: next });
+  }, [readerOverride, qc, worldId, updateAppearance]);
 
   // Portrét postavy podle hráče (PC) — single source z adresáře postav. Řeší
   // migrované zprávy, které nemají uložený `senderAvatarUrl` (avatar se per
@@ -472,6 +501,26 @@ export function ChannelView({
             />
           )}
         </div>
+        {/* 16.1f — čtenářský font override: jeden klik = číst vše svým písmem.
+            Konfigurace fontu/velikosti je v 🎨 paletce („Jak čtu ostatní"). */}
+        <button
+          type="button"
+          className={clsx(
+            s.search,
+            s.readerToggleBtn,
+            readerOverride && s.searchActive,
+          )}
+          onClick={toggleReaderOverride}
+          aria-label="Číst vše svým písmem"
+          aria-pressed={readerOverride}
+          title={
+            readerOverride
+              ? 'Čtu vše svým písmem (klik = zpět na písmo odesílatelů)'
+              : 'Číst vše svým písmem'
+          }
+        >
+          <Glasses size={18} />
+        </button>
         {onToggleRail && (
           <button
             type="button"

@@ -537,6 +537,15 @@ export function WorldSection() {
             odešleš tlačítkem.
           </CalloutBox>
           <CalloutBox variant="tip">
+            <strong>Číst vše svým písmem 👓.</strong> Když se ti něčí ozdobné
+            písmo špatně čte, zapni v hlavičce konverzace přepínač{' '}
+            <strong>👓</strong> (na mobilu ho najdeš v paletce 🎨, sekce{' '}
+            <strong>„Jak čtu ostatní"</strong>) — všechny zprávy uvidíš svým
+            vlastním <strong>čitelným fontem a velikostí</strong>, ať si je
+            ostatní napsali jakkoli. Je to jen pro tebe, nikomu jinému to nic
+            nezmění, a nastavuješ to zvlášť pro každý svět.
+          </CalloutBox>
+          <CalloutBox variant="tip">
             <strong>Souboj v chatu.</strong> V pravém panelu je záložka{' '}
             <strong>⚔️ Souboj</strong> — vedení do ní přidá bojovníky (postavy,
             NPC i <strong>bestie z bestiáře</strong>), nastaví jim iniciativu a

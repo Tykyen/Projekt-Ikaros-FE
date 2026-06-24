@@ -47,7 +47,9 @@ interface DieDef {
 }
 
 function buildDieDefs(payload: DicePayload): DieDef[] {
-  const size = 80;
+  // 6.3-followup — kompaktnější hod v chatu (zabíral hodně místa, zpětná vazba
+  // testera). Text glyfu škáluje `size * 0.42` → zmenšení zůstává čitelné.
+  const size = 52;
 
   if (payload.type === 'fate') {
     return payload.faces.map((f) => ({

@@ -11,7 +11,12 @@
 }
 
 .dialog {
-  background: var(--bg-card);
+  /* Neprůhledné pozadí: `--bg-card` (=theme-surface) má v řadě motivů alfu →
+     obsah za modalem prosvítal a špatně se četl (zvlášť nad chatem/Matrix rainem).
+     Translucentní surface složíme na neprůhledný `--theme-bg` (core token,
+     vždy definovaný ThemeProviderem). */
+  background-color: var(--theme-bg);
+  background-image: linear-gradient(var(--bg-card), var(--bg-card));
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   width: 100%;

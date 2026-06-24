@@ -7,7 +7,14 @@
   max-height: min(72vh, 640px);
   overflow-y: auto;
   padding: 14px 14px 12px;
-  background: var(--theme-elevated-bg, var(--theme-surface));
+  /* 16.1f — neprůhledné pozadí: theme `--theme-surface*` mají alfu (0.74–0.9) →
+     chat za popoverem prosvítal a text se blbě četl. Translucentní surface
+     složíme na neprůhledný `--theme-bg` (core token, vždy definovaný). */
+  background-color: var(--theme-bg);
+  background-image: linear-gradient(
+    var(--theme-elevated-bg, var(--theme-surface)),
+    var(--theme-elevated-bg, var(--theme-surface))
+  );
   border: 1px solid var(--theme-border);
   border-radius: var(--radius-md);
   box-shadow:
@@ -338,6 +345,40 @@
 .reset:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ── 16.1f — čtenářský font override („Jak čtu ostatní") ───────────── */
+.readerToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--theme-text);
+}
+
+.readerToggle input {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--ch-accent, var(--theme-accent));
+  cursor: pointer;
+}
+
+.readerHint {
+  margin: 6px 0 0;
+  font-size: var(--text-xs);
+  color: var(--theme-text-dim);
+  line-height: 1.4;
+}
+
+.readerSubTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-text-dim);
+  margin: 10px 0 4px;
 }
 
 /* ── 16.1d — skin chatu (motiv světa) ──────────────────────────────── */

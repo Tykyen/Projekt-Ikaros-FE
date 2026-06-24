@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { HexColorPicker } from 'react-colorful';
 import { X, Undo2 } from 'lucide-react';
 import clsx from 'clsx';
@@ -7,6 +8,7 @@ import { guardChatColor } from '@/features/chat/lib/chatColorGuard';
 import {
   CHAT_FONTS,
   CHAT_FONT_SIZES,
+  READABLE_FONTS,
   getFontStack,
   getFontSize,
   type ChatFontCategory,
@@ -14,6 +16,9 @@ import {
 import {
   useMembershipAppearance,
   useUpdateAppearance,
+  appearanceKey,
+  type MembershipAppearance,
+  type UpdateAppearancePayload,
 } from '../api/useMembershipAppearance';
 import { useChatSkin } from '../skins/useChatSkin';
 import { CHAT_SKINS } from '../skins/registry';
@@ -64,9 +69,23 @@ export function AppearancePopover({
 }: Props) {
   const appearance = useMembershipAppearance(worldId);
   const update = useUpdateAppearance(worldId);
+  const qc = useQueryClient();
   // 16.1d — skin chatu (motiv světa); přepíná instantně, mimo commit „podpisu".
   const chatSkin = useChatSkin(worldId);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // 16.1f — „Jak čtu ostatní" (čtenářský font override). Instant, mimo commit
+  // „podpisu" (stejně jako skin) → optimistický flip cache + PATCH; `onSuccess`
+  // mutace přepíše autoritativními daty serveru.
+  const readerOverride = appearance.data?.readerFontOverride ?? false;
+  const readerFont = appearance.data?.readerFont ?? 'system';
+  const readerSize = appearance.data?.readerFontSize ?? 'normal';
+  function patchReader(partial: UpdateAppearancePayload) {
+    qc.setQueryData<MembershipAppearance>(appearanceKey(worldId), (prev) =>
+      prev ? { ...prev, ...partial } : prev,
+    );
+    update.mutate(partial);
+  }
 
   // Lokální nepotvrzený stav (živý preview); na uložení se commit do BE.
   const [color, setColor] = useState<string | null>(null);
@@ -348,6 +367,89 @@ export function AppearancePopover({
                   );
                 })}
               </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 16.1f — Jak čtu ostatní (čtenářský font override). Instant, mimo
+          „podpis". Týká se JEN toho, jak vidím zprávy já; ostatním se nic
+          nemění. Rychlý přepínač je i v hlavičce konverzace (ikona brýlí). */}
+      <section className={s.section}>
+        <h3 className={s.sectionTitle}>Jak čtu ostatní</h3>
+        <label className={s.readerToggle}>
+          <input
+            type="checkbox"
+            checked={readerOverride}
+            onChange={(e) =>
+              patchReader({ readerFontOverride: e.target.checked })
+            }
+          />
+          <span>Číst všechny zprávy svým písmem</span>
+        </label>
+        <p className={s.readerHint}>
+          Cizí ozdobné písmo uvidíš ve svém čitelném písmu a velikosti. Ostatním
+          se nic nezmění. Stejný přepínač najdeš v hlavičce konverzace (👓).
+        </p>
+
+        <div className={s.readerSubTitle}>Mé písmo pro čtení</div>
+        <div className={s.fontList} role="radiogroup" aria-label="Písmo pro čtení">
+          {READABLE_FONTS.map((f) => {
+            const checked = readerFont === f.key;
+            return (
+              <label
+                key={f.key}
+                className={
+                  checked ? `${s.fontRow} ${s.fontRowActive}` : s.fontRow
+                }
+              >
+                <input
+                  type="radio"
+                  name="reader-font"
+                  value={f.key}
+                  checked={checked}
+                  onChange={() => patchReader({ readerFont: f.key })}
+                  className={s.fontRadio}
+                />
+                <span className={s.fontLabel}>{f.label}</span>
+                <span
+                  className={s.fontSample}
+                  style={{ fontFamily: f.stack }}
+                >
+                  {f.sample}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+
+        <div className={s.readerSubTitle}>Velikost pro čtení</div>
+        <div
+          className={s.sizeRow}
+          role="radiogroup"
+          aria-label="Velikost pro čtení"
+        >
+          {CHAT_FONT_SIZES.map((sz) => {
+            const checked = readerSize === sz.key;
+            return (
+              <label
+                key={sz.key}
+                className={
+                  checked ? `${s.sizeBtn} ${s.sizeBtnActive}` : s.sizeBtn
+                }
+                style={{ fontSize: sz.value }}
+                title={sz.label}
+              >
+                <input
+                  type="radio"
+                  name="reader-font-size"
+                  value={sz.key}
+                  checked={checked}
+                  onChange={() => patchReader({ readerFontSize: sz.key })}
+                  className={s.sizeRadio}
+                />
+                <span>Aa</span>
+              </label>
             );
           })}
         </div>

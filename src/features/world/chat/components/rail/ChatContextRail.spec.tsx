@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { User } from '@/shared/types';
 import type { ChatChannel } from '../../lib/types';
 import type { RosterEntry } from '../ChannelMemberPanel';
@@ -62,6 +63,27 @@ vi.mock('./RailEntitySearch', () => ({
     </div>
   ),
 }));
+// 16.1e — combat roster hook (useQuery/mutation). Mock → deterministický roster
+// + odchycení add mutace. CombatRosterPanel mockujeme na „+ přidat" tlačítko.
+const mockCombatMutate = vi.fn();
+vi.mock('../../api/useChannelCombat', () => ({
+  useChannelCombatants: () => ({ data: { combatants: [] }, isLoading: false }),
+  useCombatantMutation: () => ({ mutate: mockCombatMutate, isPending: false }),
+}));
+vi.mock('../combat/CombatRosterPanel', () => ({
+  CombatRosterPanel: ({ onAdd }: { onAdd: () => void }) => (
+    <button data-testid="combat-add" onClick={onAdd}>
+      add
+    </button>
+  ),
+}));
+// Bestie helpery (addBestie volá oba) — izolace od reálné stavby tokenu.
+vi.mock('@/features/world/tactical-map/utils/buildSpawnToken', () => ({
+  buildBestieToken: () => ({ systemStats: {} }),
+}));
+vi.mock('@/features/world/bestiar/lib/bestieAbilities', () => ({
+  getBestieAbilities: () => [],
+}));
 vi.mock('../ChannelMemberPanel', () => ({
   ChannelMemberPanel: ({
     onSelectMember,
@@ -94,22 +116,30 @@ import { ChatContextRail } from './ChatContextRail';
 const user = { id: 'u1', username: 'Alice' } as User;
 const channel = { id: 'c1', name: 'Test' } as ChatChannel;
 
+// 16.1e — ChatContextRail volá `useChannelCombatants` (useQuery) → render musí
+// být obalen QueryClientProvider (D-NEW-chat-combat-test-provider).
 function renderRail(isManager: boolean) {
+  const qc = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
-    <ChatContextRail
-      worldId="w1"
-      channel={channel}
-      activeChannelId="c1"
-      isManager={isManager}
-      currentUser={user}
-      presence={[]}
-    />,
+    <QueryClientProvider client={qc}>
+      <ChatContextRail
+        worldId="w1"
+        channel={channel}
+        activeChannelId="c1"
+        isManager={isManager}
+        currentUser={user}
+        presence={[]}
+      />
+    </QueryClientProvider>,
   );
 }
 
-describe('ChatContextRail (16.1a–c)', () => {
+describe('ChatContextRail (16.1a–e)', () => {
   beforeEach(() => {
     mockMembersData = [];
+    mockCombatMutate.mockClear();
   });
 
   it('hráč bez přiřazené postavy → empty stav', () => {
@@ -133,16 +163,33 @@ describe('ChatContextRail (16.1a–c)', () => {
     expect(getByTestId('diary').textContent).toBe('Bob|bob|pj|true');
   });
 
-  it('PJ → výběr NPC ze searche → deník NPC (npc)', () => {
-    const { getByTestId } = renderRail(true);
+  // 16.1e — hledání NPC/bestií se přesunulo z „Přítomní" do „Souboj" → „+ přidat";
+  // výběr přidá entitu do boje (combat mutace), neotevírá deník.
+  it('PJ → Souboj → přidat → NPC ze searche → přidá postavu do boje', () => {
+    const { getByTestId, getByRole } = renderRail(true);
+    fireEvent.click(getByRole('tab', { name: /Souboj/ }));
+    fireEvent.click(getByTestId('combat-add'));
     fireEvent.click(getByTestId('pick-npc'));
-    expect(getByTestId('diary').textContent).toBe('Duch|duch|npc|true');
+    expect(mockCombatMutate).toHaveBeenCalledWith({
+      op: 'add',
+      data: { kind: 'character', characterSlug: 'duch', isNpc: true },
+    });
   });
 
-  it('PJ → výběr bestie ze searche → statblok bestie', () => {
-    const { getByTestId, queryByTestId } = renderRail(true);
+  it('PJ → Souboj → přidat → bestie ze searche → přidá bestii do boje', () => {
+    const { getByTestId, getByRole } = renderRail(true);
+    fireEvent.click(getByRole('tab', { name: /Souboj/ }));
+    fireEvent.click(getByTestId('combat-add'));
     fireEvent.click(getByTestId('pick-bestie'));
-    expect(queryByTestId('diary')).toBeNull();
-    expect(getByTestId('bestie').textContent).toBe('Skřet');
+    expect(mockCombatMutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        op: 'add',
+        data: expect.objectContaining({
+          kind: 'bestie',
+          bestieId: 'b1',
+          name: 'Skřet',
+        }),
+      }),
+    );
   });
 });

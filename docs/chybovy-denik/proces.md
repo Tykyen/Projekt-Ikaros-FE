@@ -47,3 +47,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** Vracím se k tématu, které deník už uzavřel jiným kořenem; navrhuju měnit TTL/auth model, ač předchozí závěr ukázal na deploy.
 
 ---
+
+### CH-023 — Tvrdil jsem, že `getDrdBonus` je špatně — pravidlo jsem rekonstruoval z paměti místo z uživatelova zdroje · 2026-06-24
+**Kontext:** Sběr specu pro grafický redesign deníku DrD 1.6 (16.2b). Uživatel poslal fotku „TABULKA POSTIHŮ A BONUSŮ", ale nečitelnou. Místo abych počkal na čitelný zdroj, **domyslel jsem si „standardní" DrD tabulku z paměti** (kladná strana krok po 3: 13-15→+1, 16-18→+2) a prezentoval uživateli „tabulku nesrovnalostí" s ❌ — tvrdil, že kód počítá bonusy špatně a nadhodnocuje je.
+**Co jsem udělal špatně:** Z nečitelné fotky jsem vyplnil mezery domnělým standardem a na jeho základě **prohlásil funkční kód za vadný**. Skutečná varianta (kterou uživatel vzápětí napsal) jde po 2: 13-14→+1, 15-16→+2, … 21-22→+5 — což `floor((val-11)/2)` počítá přesně správně, i extrapolace pro NPC > 21.
+**Proč to je problém:** Eroze důvěry v kód, který byl celou dobu v pořádku; zbytečné kolo; málem bych „opravoval" správnou funkci do nesprávné.
+**Poučení:** (1) Systémová/herní pravidla **NIKDY** nerekonstruovat z paměti domnělého standardu — existují varianty. (2) Když je autoritativní zdroj (fotka/sken) nečitelný, **ptej se a počkej**; netvrď přitom nic o (ne)správnosti kódu. (3) Nepiš „❌ nesrovnalost", dokud nemám hodnoty ověřené ze zdroje, ne z paměti.
+**Příznak cyklení:** Prezentuju „bug v pravidlech" odvozený z paměti; navrhuju opravit výpočet, který reálná tabulka potvrzuje jako správný.
+
+---

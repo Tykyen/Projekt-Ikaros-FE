@@ -8,6 +8,14 @@
 
 ## Otevřené
 
+### D-NEW-chat-combat-test-provider — ChatContextRail.spec padá „No QueryClient set" — ✅ VYŘEŠENO 2026-06-24
+**Soubor:** `src/features/world/chat/components/rail/ChatContextRail.spec.tsx` (16.1e combat)
+**Problém:** 5 testů padalo. Dvojí příčina: (1) render nebyl v `QueryClientProvider`, ale komponenta od 16.1e volá `useChannelCombatants`; (2) 2 testy ověřovaly **zrušené** chování — 16.1e přesunul hledání NPC/bestií z „Přítomní" do „Souboj → + přidat" a výběr teď přidá do boje (neotevírá deník).
+**Řešení (hotovo):** Mock `useChannelCombat` (deterministický roster + odchycení add mutace) + mock `CombatRosterPanel`/bestie helperů; 3 původní testy ponechány, 2 zastaralé přepsány na nový kontrakt (Souboj → přidat → search → combat add). **5/5 zelené.**
+**Pozn.:** Objeveno při 16.1f, nebyla to regrese 16.1f. Vyřešeno na žádost uživatele ihned.
+
+---
+
 ### D-NEW-SYS-PRESET-SEED-DRIFT — BE diarySchema seed nemá preset pro 5 systémů
 > **FE část vyřešena 2026-06-23 (16.2a, ✅ ŘEŠENÍ fe.md).** Původní `D-NEW-SYS-DIARY-DRIFT` (Dračí Hlídka) byl jen špička: FE sheet/plugin lookup spadl na generic u **tří** systémů (`draci-hlidka`/`drd-plus`/`call-of-cthulhu`). Opraveno aliasy v obou FE registry + parity guard test. **Zbývá níže popsaná druhá, nezávislá porucha na BE.**
 
