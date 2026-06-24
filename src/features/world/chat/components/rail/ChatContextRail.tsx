@@ -119,6 +119,15 @@ export function ChatContextRail({
     setAddMode(false);
   };
   const addCharacter = (slug: string, isNpc: boolean) => {
+    // Postava/NPC = unikátní v rosteru (1 postava = 1 bojovník); duplikovat
+    // se smí jen bestie (kopie nestvůr). Když už je v boji, jen zavři výběr.
+    const already = (roster.data?.combatants ?? []).some(
+      (c) => c.kind === 'character' && c.characterSlug === slug,
+    );
+    if (already) {
+      setAddMode(false);
+      return;
+    }
     combatMut.mutate({
       op: 'add',
       data: { kind: 'character', characterSlug: slug, isNpc },
