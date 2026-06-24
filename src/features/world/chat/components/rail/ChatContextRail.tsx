@@ -362,20 +362,13 @@ export function ChatContextRail({
   return (
     <div className={s.tabWrap}>
       {tabs}
+      {/* Přítomní = jen roster členů (klik → deník). Hledání NPC/bestií se
+          přesunulo do záložky Souboj („+ přidat") — autor 2026-06-24. */}
       <ChannelMemberPanel
         worldId={worldId}
         channel={channel}
         presence={presence}
         onClose={onClose}
-        topSlot={
-          // Přítomní: hledání slouží k otevření deníku NPC / statbloku bestie
-          // (ne k přidání do boje — to je v záložce Souboj). Proto bez PC.
-          <RailEntitySearch
-            worldId={worldId}
-            systemId={systemId}
-            onSelect={handleSearchSelect}
-          />
-        }
         onSelectMember={handleSelectMember}
       />
     </div>

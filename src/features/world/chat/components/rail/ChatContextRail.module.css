@@ -56,11 +56,15 @@
   border-color: rgb(var(--map-ui-accent-rgb) / 0.25);
   color: var(--map-ui-accent-text);
 }
-/* Panel uvnitř obalu vyplní zbytek a nemá vlastní levý okraj (má ho .tabWrap). */
-.tabWrap > :not(.tabs) {
+/* Hlavní panel (poslední dítě obalu) vyplní zbytek; banner/hledání nad ním
+   mají default flex-grow:0 → drží jen svou výšku (jinak by se 3 flex děti
+   dělily o prostor — rozbitý layout). */
+.tabWrap > * {
+  border-left: none;
+}
+.tabWrap > :last-child {
   flex: 1;
   min-height: 0;
-  border-left: none;
 }
 
 /* 16.1e — banner „přidat do boje" nad hledáním. */
