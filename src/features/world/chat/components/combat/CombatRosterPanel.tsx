@@ -4,7 +4,10 @@
  * textu — chat je úzký vertikální tok). Hlavička = ovládání boje (Začít / Další
  * tah / Konec + kolo) + „+ přidat". Klik na řádek → detail v témže railu.
  */
+import { useMemo } from 'react';
+import { Trash2 } from 'lucide-react';
 import { useWorldContext } from '@/features/world/context/WorldContext';
+import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
 import { resolveHp, hpTierCss } from '@/features/world/tactical-map/utils/hpTier';
 import { getInitials } from '@/features/world/tactical-map/utils/getInitials';
 import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
@@ -49,8 +52,10 @@ function CombatRow({
   canEdit,
   systemId,
   config,
+  image,
   onOpenInfo,
   onInit,
+  onRemove,
 }: {
   c: ChatCombatant;
   order: number;
@@ -59,14 +64,16 @@ function CombatRow({
   canEdit: boolean;
   systemId: string | null;
   config: ChatCombatConfig;
+  /** Portrét: bestie ze snapshotu, PC/NPC z adresáře (resolve v panelu). */
+  image?: string;
   onOpenInfo: (id: string) => void;
   onInit: (id: string, v: number) => void;
+  onRemove: (id: string) => void;
 }) {
   const label = combatantLabel(c);
   const showHp = visibilityAllows(c, config);
   const hp = showHp ? bestieHp(c, systemId) : null;
   const ring = hp ? hpTierCss(hp.percent, hp.current) : RING_DEFAULT;
-  const image = c.kind === 'bestie' ? c.imageUrl : undefined;
 
   return (
     <li
@@ -113,6 +120,21 @@ function CombatRow({
           onChange={(v) => onInit(c.id, v)}
         />
       </span>
+
+      {canEdit && (
+        <button
+          type="button"
+          className={s.rowRemove}
+          title="Odebrat ze souboje"
+          aria-label={`Odebrat ${label} ze souboje`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(c.id);
+          }}
+        >
+          <Trash2 size={14} />
+        </button>
+      )}
     </li>
   );
 }
@@ -137,8 +159,19 @@ export function CombatRosterPanel({
     showHpBestie: true,
   };
 
+  // Portrét PC/NPC = z adresáře (combatant nese jen slug, ne obrázek); bestie ze snapshotu.
+  const personas = usePersonaDirectory(worldId);
+  const imageBySlug = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const e of personas.data ?? []) if (e.imageUrl) m.set(e.slug, e.imageUrl);
+    return m;
+  }, [personas.data]);
+  const resolveImage = (c: ChatCombatant): string | undefined =>
+    c.kind === 'bestie' ? c.imageUrl : imageBySlug.get(c.characterSlug);
+
   const onInit = (id: string, v: number) =>
     mut.mutate({ op: 'update', combatantId: id, patch: { initiative: v } });
+  const onRemove = (id: string) => mut.mutate({ op: 'remove', combatantId: id });
 
   const VIS: { key: 'showHpPc' | 'showHpNpc' | 'showHpBestie'; label: string }[] =
     [
@@ -224,8 +257,10 @@ export function CombatRosterPanel({
             canEdit={isManager}
             systemId={systemId}
             config={config}
+            image={resolveImage(c)}
             onOpenInfo={onOpenInfo}
             onInit={onInit}
+            onRemove={onRemove}
           />
         ))}
 
@@ -244,8 +279,10 @@ export function CombatRosterPanel({
             canEdit={isManager}
             systemId={systemId}
             config={config}
+            image={resolveImage(c)}
             onOpenInfo={onOpenInfo}
             onInit={onInit}
+            onRemove={onRemove}
           />
         ))}
 

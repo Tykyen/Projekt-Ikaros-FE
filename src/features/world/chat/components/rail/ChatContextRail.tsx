@@ -297,7 +297,7 @@ export function ChatContextRail({
   const handleSearchSelect = (r: RailSearchResult) => {
     if (addMode) {
       if (r.kind === 'bestie') addBestie(r.bestie);
-      else addCharacter(r.slug, true);
+      else addCharacter(r.slug, r.kind === 'npc'); // pc→PC (false), npc→NPC (true)
       return;
     }
     if (r.kind === 'bestie') {
@@ -353,6 +353,7 @@ export function ChatContextRail({
             <RailEntitySearch
               worldId={worldId}
               systemId={systemId}
+              includePc={addMode}
               onSelect={handleSearchSelect}
             />
           </>

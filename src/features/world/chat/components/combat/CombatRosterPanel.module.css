@@ -230,6 +230,30 @@
   flex-shrink: 0;
 }
 
+.rowRemove {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--map-ui-text-muted);
+  cursor: pointer;
+  opacity: 0.6;
+}
+.row:hover .rowRemove {
+  opacity: 1;
+}
+.rowRemove:hover {
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.5);
+  background: rgb(var(--map-ui-danger-rgb) / 0.12);
+  color: var(--map-ui-danger-solid);
+}
+
 .divider {
   list-style: none;
   margin: 6px 4px 2px;

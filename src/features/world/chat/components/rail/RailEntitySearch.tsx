@@ -8,12 +8,15 @@ import s from './RailEntitySearch.module.css';
 /** Výsledek sjednoceného hledání v railu (PJ). */
 export type RailSearchResult =
   | { kind: 'npc'; slug: string; title: string; imageUrl?: string }
+  | { kind: 'pc'; slug: string; title: string; imageUrl?: string }
   | { kind: 'bestie'; bestie: Bestie };
 
 interface Props {
   worldId: string;
   /** Systém světa — pro katalog bestií. `null` = bez bestií (jen NPC). */
   systemId: string | null;
+  /** 16.1e — zahrnout i PC postavy (přidávání do boje). Default jen NPC+bestie. */
+  includePc?: boolean;
   onSelect: (r: RailSearchResult) => void;
 }
 
@@ -32,13 +35,28 @@ function norm(v: string): string {
  * bestie (katalog bestiáře). PC jsou v rosteru, sem nepatří. Výběr → rail
  * načte deník NPC (atribuce `npc`) nebo statblok bestie (atribuce `bestie`).
  */
-export function RailEntitySearch({ worldId, systemId, onSelect }: Props) {
+export function RailEntitySearch({
+  worldId,
+  systemId,
+  includePc = false,
+  onSelect,
+}: Props) {
   const personas = usePersonaDirectory(worldId);
   const bestiar = useBestiar(worldId, systemId);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
 
   const results = useMemo<RailSearchResult[]>(() => {
+    const pcs: RailSearchResult[] = includePc
+      ? (personas.data ?? [])
+          .filter((e) => e.type === 'Postava hráče')
+          .map((e) => ({
+            kind: 'pc',
+            slug: e.slug,
+            title: e.title,
+            imageUrl: e.imageUrl,
+          }))
+      : [];
     const npcs: RailSearchResult[] = (personas.data ?? [])
       .filter((e) => e.type === 'NPC')
       .map((e) => ({
@@ -52,12 +70,12 @@ export function RailEntitySearch({ worldId, systemId, onSelect }: Props) {
       ...(bestiar.data?.world ?? []),
       ...(bestiar.data?.user ?? []),
     ].map((b) => ({ kind: 'bestie', bestie: b }));
-    return [...npcs, ...bestie];
-  }, [personas.data, bestiar.data]);
+    return [...pcs, ...npcs, ...bestie];
+  }, [personas.data, bestiar.data, includePc]);
 
   const filtered = useMemo(() => {
     const titleOf = (r: RailSearchResult) =>
-      r.kind === 'npc' ? r.title : r.bestie.name;
+      r.kind === 'bestie' ? r.bestie.name : r.title;
     const q = norm(query.trim());
     const pool = q ? results.filter((r) => norm(titleOf(r)).includes(q)) : results;
     return pool.slice(0, MAX_VISIBLE);
@@ -77,7 +95,7 @@ export function RailEntitySearch({ worldId, systemId, onSelect }: Props) {
           type="text"
           className={s.input}
           value={query}
-          placeholder="Hledat NPC / bestii…"
+          placeholder={includePc ? 'Hledat postavu / NPC / bestii…' : 'Hledat NPC / bestii…'}
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
@@ -102,9 +120,11 @@ export function RailEntitySearch({ worldId, systemId, onSelect }: Props) {
           <div className={s.popover}>
             {filtered.map((r) => {
               const key =
-                r.kind === 'npc' ? `npc:${r.slug}` : `bestie:${r.bestie.id}`;
-              const title = r.kind === 'npc' ? r.title : r.bestie.name;
-              const img = r.kind === 'npc' ? r.imageUrl : r.bestie.imageUrl;
+                r.kind === 'bestie' ? `bestie:${r.bestie.id}` : `${r.kind}:${r.slug}`;
+              const title = r.kind === 'bestie' ? r.bestie.name : r.title;
+              const img = r.kind === 'bestie' ? r.bestie.imageUrl : r.imageUrl;
+              const typeLabel =
+                r.kind === 'bestie' ? 'bestie' : r.kind === 'pc' ? 'PC' : 'NPC';
               return (
                 <button
                   key={key}
@@ -123,9 +143,7 @@ export function RailEntitySearch({ worldId, systemId, onSelect }: Props) {
                     )}
                   </span>
                   <span className={s.name}>{title}</span>
-                  <span className={s.type}>
-                    {r.kind === 'npc' ? 'NPC' : 'bestie'}
-                  </span>
+                  <span className={s.type}>{typeLabel}</span>
                 </button>
               );
             })}
