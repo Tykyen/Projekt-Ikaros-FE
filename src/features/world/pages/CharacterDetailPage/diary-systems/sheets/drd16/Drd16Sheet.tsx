@@ -1,257 +1,342 @@
 /**
- * 8.7l — Dračí doupě 1.6 (Drd16) deník postavy.
+ * 16.2b — Dračí doupě 1.6 (Drd16) deník postavy: grafický redesign.
  *
- * Adaptace z `c:/Matrix/Matrix/frontend/src/components/diary/Drd16CharacterSheet.tsx`
- * (589 ř base sheet). Warm medieval amber téma.
+ * Fantasy „Iluminovaný kodex kováře" — pergamenový list na kovárně, věrný
+ * reálnému papíru „Osobní deník" (univerzální napříč povoláními; class-
+ * specifický obsah jde do volných textarey). Viz spec-16.2b.
  *
- * SCOPE CUT: Matrix/Matrix má 13 class-specific modulů (Warrior /
- * Ranger / Thief / Wizard / Alchemy / Theurg / NonMagicItems / AlchemyItems
- * / SwordsmanFints / RangerSpells / WizardData / ThiefData / ThiefConstants)
- * dohromady ~17k řádků kódu + 100KB data files se spell databází + thief skill
- * tabulkami. Tato iterace 8.7l implementuje **base sheet** (atributy, HP/mana,
- * weapons tables, skills, defense, encumbrance, povolání select, textarea
- * pro spells & special abilities). Class-specific moduly = budoucí 8.7n+
- * iterace (každý modul samostatný sub-spec).
+ * Self-contained, scoped `[data-diary-system='drd16']` (vlastní `--dd-*`
+ * tokeny, NE sdílené `--mx-*` skin tokeny — pergamen se musí ukázat i pod
+ * default fantasy skinem; sjednocení se skin-enginem = 16.2c).
  *
- * PJ může v Ikarosu vyplnit specializace ručně v `special_abilities`/`spells`
- * textareách. Datové klíče `wizard_known_spells`, `thief_skill_*`, atd.
- * z Matrix/Matrix jsou v customData zachovány (BE je přijímá), jen Ikaros
- * je teď zobrazuje pouze v base textareách.
+ * Data v `diary.customData` BEZ prefixu (`str_val`, `hp_current`, …) přes
+ * `makeCdAccess(cd, '', onChange)` — BC s původním 8.7l sheetem; drd16 je
+ * jediný neprefixovaný systém, kolize nehrozí.
+ *
+ * Mechaniky (potvrzené uživatelem, NErekonstruovat z paměti — CH-023):
+ * - 5 háznových vlastností (Síla/Obr/Odl/Int/Cha) → auto-bonus `getDrdBonus`.
+ *   PC soft-cap 21 (varování, neblokuje); NPC bez stropu (bonus extrapoluje).
+ * - Velikost = písmeno (A/B/C), Pohyblivost = čísla bez bonusu.
+ * - Povolání 2-stupňové: specializace odemčená od 6. úrovně.
+ * - Životy/Magy = žebřík 50 příček; ≤50 bodů „1 příčka = 1 bod", >50 poměr.
  */
 import { usePrintMode } from '@/features/world/export/print';
+import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
-  DRD16_CLASSES,
-  DRD16_PRIMARY_STATS,
-  DRD16_SECONDARY_STATS,
+  DRD16_CLASS_FAMILIES,
+  DRD16_HAZ_STATS,
+  DRD16_LOAD_ROWS,
+  DRD16_PC_STAT_CAP,
+  DRD16_SPECIALIZATIONS,
+  DRD16_SPEC_UNLOCK_LEVEL,
   getDrdBonus,
+  type Drd16Armor,
   type Drd16RangedWeapon,
   type Drd16Skill,
   type Drd16Weapon,
 } from './constants';
 import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 
+const DRD16_RUNGS = 50;
+
+const fmtBonus = (b: number): string => (b > 0 ? `+${b}` : String(b));
+
 export function Drd16Sheet({
   diary,
   mode,
   onChange,
   onRoll,
+  worldId,
+  characterSlug,
 }: SystemSheetProps) {
   const disabled = mode === 'view';
   const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, '', onChange);
-  // Note: Drd16 v Matrix/Matrix nepoužíval prefix (žádný `drd16_` ani `drd_`),
-  // klíče byly přímé: `str_val`, `hp_current`, atd. Pro Ikaros zachováváme
-  // stejný tvar — jiné systémy mají vlastní prefix, takže kolize nehrozí.
   const { g, set } = cda;
 
-  // Tisk: interaktivní inputy/tracky jsou netisknutelné (hodnota v
-  // `<input value>`, stav v barvě/výšce). V printMode renderujeme oddělený
-  // statický čitelný dokument se stejnými daty.
+  // NPC clamp — `Character.isNpc` (jako Matrix 16.2a). Bez portrétu (erb dekorativní).
+  const { data: character } = useCharacter(worldId, characterSlug);
+  const isNpc = !!character?.isNpc;
+
   if (printMode) return <Drd16PrintView cda={cda} />;
 
-  const strVal = parseInt(g('str_val', '10'), 10) || 10;
-  const dexVal = parseInt(g('dex_val', '10'), 10) || 10;
-  const conVal = parseInt(g('con_val', '10'), 10) || 10;
-  const intVal = parseInt(g('int_val', '10'), 10) || 10;
-  const chaVal = parseInt(g('cha_val', '10'), 10) || 10;
-  const sizVal = parseInt(g('siz_val', '10'), 10) || 10;
-  const movVal = parseInt(g('mov_val', '10'), 10) || 10;
-
-  // Auto-compute bonus pole pro vizualizaci (originál je manuální input)
-  const autoBonus: Record<string, number> = {
-    str: getDrdBonus(strVal),
-    dex: getDrdBonus(dexVal),
-    con: getDrdBonus(conVal),
-    int: getDrdBonus(intVal),
-    cha: getDrdBonus(chaVal),
-    siz: getDrdBonus(sizVal),
-    mov: getDrdBonus(movVal),
-  };
+  const level = parseInt(g('level', ''), 10);
+  const classBase = g('class');
+  const specs = DRD16_SPECIALIZATIONS[classBase] ?? [];
+  const specUnlocked =
+    !Number.isNaN(level) && level >= DRD16_SPEC_UNLOCK_LEVEL && specs.length > 0;
 
   return (
-    <div className="drd16-dashboard">
+    <div className={`drd16-sheet${disabled ? ' is-view' : ''}`}>
       {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}
-      {/* ═══ QUICK PJ BAR ═══ */}
-      <div className="drd16-quick-pj-bar">
-        <div className="quick-stat health">
-          <span className="qs-label">HP</span>
-          <span className="qs-value">
+
+      {/* ═══ HERO ═══ */}
+      <header className="drd16-hero">
+        <Erb />
+        <div className="drd16-ident">
+          <p className="drd16-eyebrow">Dračí doupě 1.6</p>
+          <input
+            className="drd16-name"
+            value={g('name')}
+            disabled={disabled}
+            onChange={(e) => set('name', e.target.value)}
+            placeholder="Jméno postavy…"
+            aria-label="Jméno postavy"
+          />
+          <div className="drd16-ident-line">
+            <div className="drd16-field">
+              <label htmlFor="drd16-race">Rasa</label>
+              <input
+                id="drd16-race"
+                value={g('race')}
+                disabled={disabled}
+                onChange={(e) => set('race', e.target.value)}
+                placeholder="Rasa…"
+              />
+            </div>
+            <div className="drd16-field">
+              <label htmlFor="drd16-class">Povolání</label>
+              <select
+                id="drd16-class"
+                value={g('class')}
+                disabled={disabled}
+                onChange={(e) => set('class', e.target.value)}
+                aria-label="Povolání"
+              >
+                <option value="">— Povolání —</option>
+                {DRD16_CLASS_FAMILIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={`drd16-field drd16-spec${specUnlocked ? '' : ' locked'}`}>
+              <label htmlFor="drd16-spec">Specializace (od 6. úrovně)</label>
+              <select
+                id="drd16-spec"
+                value={g('class_spec')}
+                disabled={disabled || !specUnlocked}
+                onChange={(e) => set('class_spec', e.target.value)}
+                aria-label="Specializace"
+              >
+                <option value="">—</option>
+                {specs.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+              {!specUnlocked && (
+                <span className="drd16-spec-lock">🔒 odemkne se na 6. úrovni</span>
+              )}
+            </div>
+            <div className="drd16-field drd16-field-level">
+              <label htmlFor="drd16-level">Úroveň</label>
+              <input
+                id="drd16-level"
+                inputMode="numeric"
+                value={g('level')}
+                disabled={disabled}
+                onChange={(e) => set('level', e.target.value)}
+                aria-label="Úroveň"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="drd16-vitals">
+          <PlaqueInput
+            variant="life"
+            label="Max. životů"
+            statKey="hp_max"
+            cda={cda}
+            disabled={disabled}
+          />
+          <PlaqueInput
+            variant="magy"
+            label="Max. magů"
+            statKey="mana_max"
+            cda={cda}
+            disabled={disabled}
+          />
+        </div>
+      </header>
+
+      {/* ═══ HUD ═══ */}
+      <div className="drd16-hud">
+        <div className="drd16-hud-cell hp">
+          <span className="drd16-hud-emblem">❤</span>
+          <span className="drd16-hud-lab">Životy</span>
+          <span className="drd16-hud-val">
             {g('hp_current', '0')} / {g('hp_max', '0')}
           </span>
         </div>
-        <div className="quick-stat mana">
-          <span className="qs-label">Mana</span>
-          <span className="qs-value">
+        <div className="drd16-hud-cell ma">
+          <span className="drd16-hud-emblem">✦</span>
+          <span className="drd16-hud-lab">Magy</span>
+          <span className="drd16-hud-val">
             {g('mana_current', '0')} / {g('mana_max', '0')}
           </span>
         </div>
-        <div className="quick-stat defense">
-          <span className="qs-label">Obrana</span>
-          <span className="qs-value">{g('defense', '0')}</span>
+        <div className="drd16-hud-cell oc">
+          <span className="drd16-hud-emblem">⛨</span>
+          <span className="drd16-hud-lab">Obranné číslo</span>
+          <span className="drd16-hud-val">{g('defense', '0')}</span>
         </div>
       </div>
 
-      {/* ═══ MAIN GRID 3 sloupce ═══ */}
+      {/* ═══ GRID 3 sloupce ═══ */}
       <div className="drd16-grid">
-        {/* LEVÝ SLOUPEC: Identita + Atributy */}
-        <div className="drd16-panel">
-          <h3 className="panel-title">Identita</h3>
-          <div className="identity-card">
-            <input
-              className="identity-name"
-              value={g('name')}
-              disabled={disabled}
-              onChange={(e) => set('name', e.target.value)}
-              placeholder="Jméno..."
-              aria-label="Jméno postavy"
-            />
-            <input
-              value={g('race')}
-              disabled={disabled}
-              onChange={(e) => set('race', e.target.value)}
-              placeholder="Rasa..."
-              aria-label="Rasa"
-            />
-            <select
-              value={g('class')}
-              disabled={disabled}
-              onChange={(e) => set('class', e.target.value)}
-              aria-label="Povolání"
-            >
-              <option value="">— Povolání —</option>
-              {DRD16_CLASSES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            <input
-              value={g('level')}
-              disabled={disabled}
-              onChange={(e) => set('level', e.target.value)}
-              placeholder="Úroveň..."
-              aria-label="Úroveň"
-            />
-          </div>
-
-          <h3 className="panel-title">Primární vlastnosti</h3>
-          <div className="stats-list">
-            {DRD16_PRIMARY_STATS.map((s) => (
-              <StatRow
+        {/* SLOUPEC 1 */}
+        <div className="drd16-col">
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Vlastnosti</h3>
+            {DRD16_HAZ_STATS.map((s) => (
+              <PrimaryStatRow
                 key={s.key}
                 label={s.label}
                 statKey={s.key}
-                autoBonus={autoBonus[s.key]}
+                isNpc={isNpc}
                 cda={cda}
                 disabled={disabled}
               />
             ))}
-          </div>
+            <div className="drd16-stat-row siz">
+              <span className="st-name">Velikost</span>
+              <input
+                className="st-letter"
+                value={g('size_letter')}
+                maxLength={2}
+                disabled={disabled}
+                onChange={(e) => set('size_letter', e.target.value)}
+                aria-label="Velikost (písmeno)"
+              />
+              <span className="siz-note">písmeno (A/B/C…)</span>
+            </div>
+          </section>
 
-          <h3 className="panel-title">Sekundární vlastnosti</h3>
-          <div className="stats-list">
-            {DRD16_SECONDARY_STATS.map((s) => (
-              <SimpleStatRow
-                key={s.key}
-                label={s.label}
-                statKey={s.key}
-                cda={cda}
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Pohyblivost</h3>
+            <div className="drd16-enc-row base">
+              <span className="st-name">Základní</span>
+              <input
+                value={g('mov_val')}
                 disabled={disabled}
+                onChange={(e) => set('mov_val', e.target.value)}
+                aria-label="Pohyblivost základní"
               />
+            </div>
+            {DRD16_LOAD_ROWS.map((r) => (
+              <div key={r.key} className="drd16-enc-row">
+                <span className="st-name">{r.label}</span>
+                <input
+                  value={g(r.key)}
+                  disabled={disabled}
+                  onChange={(e) => set(r.key, e.target.value)}
+                  aria-label={`Pohyblivost — ${r.label}`}
+                />
+              </div>
             ))}
-          </div>
+            <p className="drd16-hint">
+              Čísla bez bonusu — kolik dílků postava ujde při daném naložení.
+            </p>
+          </section>
 
-          <h3 className="panel-title">Naložení</h3>
-          <div className="stats-list">
-            {(
-              [
-                ['enc_light', 'Lehké'],
-                ['enc_med', 'Střední'],
-                ['enc_heavy', 'Těžké'],
-              ] as const
-            ).map(([key, label]) => (
-              <SimpleStatRow
-                key={key}
-                label={label}
-                statKey={key}
-                cda={cda}
-                disabled={disabled}
-                wide
-              />
-            ))}
-          </div>
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Postřeh</h3>
+            <PostrehTable cda={cda} disabled={disabled} />
+          </section>
         </div>
 
-        {/* STŘEDNÍ SLOUPEC: Zbraně + Defense */}
-        <div className="drd16-panel">
-          <h3 className="panel-title">Boj — Zbraně na blízko</h3>
-          <MeleeWeaponsTable cda={cda} disabled={disabled} />
-
-          <h3 className="panel-title">Boj — Zbraně střelné</h3>
-          <RangedWeaponsTable cda={cda} disabled={disabled} />
-
-          <h3 className="panel-title">Dovednosti DrD</h3>
-          <SkillsTable cda={cda} disabled={disabled} />
-
-          <div className="defense-box">
-            <span className="def-label">OČ</span>
-            <input
-              value={g('defense')}
-              disabled={disabled}
-              onChange={(e) => set('defense', e.target.value)}
-              placeholder="0"
-              aria-label="Obranné číslo"
-            />
-          </div>
+        {/* SLOUPEC 2 */}
+        <div className="drd16-col">
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Boj — tváří v tvář</h3>
+            <MeleeWeaponsTable cda={cda} disabled={disabled} />
+          </section>
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Boj — střelecký</h3>
+            <RangedWeaponsTable cda={cda} disabled={disabled} />
+          </section>
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Obrana</h3>
+            <div className="drd16-oc-seal">
+              <span className="oc-lab">Obranné číslo</span>
+              <input
+                value={g('defense')}
+                disabled={disabled}
+                onChange={(e) => set('defense', e.target.value)}
+                placeholder="0"
+                aria-label="Obranné číslo"
+              />
+            </div>
+            <ArmorTable cda={cda} disabled={disabled} />
+          </section>
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Dovednosti</h3>
+            <SkillsTable cda={cda} disabled={disabled} />
+          </section>
         </div>
 
-        {/* PRAVÝ SLOUPEC: HP + Mana trackers */}
-        <div className="drd16-panel">
-          <h3 className="panel-title">Zdroje</h3>
-          <div className="resource-trackers">
-            <ResourceTracker
-              variant="health"
-              title="Životy"
-              curKey="hp_current"
-              maxKey="hp_max"
-              cda={cda}
-              disabled={disabled}
-            />
-            <ResourceTracker
-              variant="mana"
-              title="Mana"
-              curKey="mana_current"
-              maxKey="mana_max"
-              cda={cda}
-              disabled={disabled}
-            />
-          </div>
+        {/* SLOUPEC 3 */}
+        <div className="drd16-col">
+          <section className="drd16-panel">
+            <h3 className="drd16-panel-h">Životy a magy</h3>
+            <div className="drd16-ladders">
+              <DrdLadder
+                variant="life"
+                title="Životy"
+                curKey="hp_current"
+                maxKey="hp_max"
+                cda={cda}
+                disabled={disabled}
+              />
+              <DrdLadder
+                variant="magy"
+                title="Magy"
+                curKey="mana_current"
+                maxKey="mana_max"
+                cda={cda}
+                disabled={disabled}
+              />
+            </div>
+          </section>
         </div>
       </div>
 
-      {/* ═══ BOTTOM ZONE: textareas ═══ */}
-      <div className="drd16-bottom-zone">
-        <div>
-          <h3 className="panel-title">Zvláštní schopnosti</h3>
+      {/* ═══ SPODNÍ ZÓNA ═══ */}
+      <div className="drd16-bottom">
+        <div className="drd16-scroll-panel">
+          <h3 className="drd16-panel-h">Zvláštní schopnosti</h3>
           <textarea
             value={g('special_abilities')}
             disabled={disabled}
             onChange={(e) => set('special_abilities', e.target.value)}
-            placeholder="Zde zapiš class-specific schopnosti (povolání, finty, bojové triky, alchymistické recepty, zlodějské cviky…). Pro plné rozšíření per povolání je v plánu iterace 8.7n+."
+            placeholder="Schopnosti povolání, finty, bojové triky, alchymistické recepty, zlodějské cviky…"
             aria-label="Zvláštní schopnosti"
           />
         </div>
-        <div>
-          <h3 className="panel-title">Kouzla / Spellbook</h3>
+        <div className="drd16-scroll-panel">
+          <h3 className="drd16-panel-h">Kouzla / Spellbook</h3>
           <textarea
             value={g('spells')}
             disabled={disabled}
             onChange={(e) => set('spells', e.target.value)}
-            placeholder="Známá kouzla, poznámky o spellbooku, PPZ tabulka, mág projevy…"
+            placeholder="Známá kouzla, PPZ, projevy mága, poznámky o spellbooku…"
             aria-label="Kouzla a spellbook"
+          />
+        </div>
+        <div className="drd16-scroll-panel notes">
+          <h3 className="drd16-panel-h">Poznámky</h3>
+          <textarea
+            value={g('notes')}
+            disabled={disabled}
+            onChange={(e) => set('notes', e.target.value)}
+            placeholder="Deník dobrodružství, sliby, dluhy, kontakty…"
+            aria-label="Poznámky"
           />
         </div>
       </div>
@@ -268,90 +353,165 @@ interface SubProps {
   disabled: boolean;
 }
 
-interface StatRowProps extends SubProps {
-  label: string;
-  statKey: string;
-  autoBonus: number;
-}
-
-function StatRow({
-  label,
-  statKey,
-  autoBonus,
-  cda,
-  disabled,
-}: StatRowProps) {
-  const { g, set } = cda;
+/** Dekorativní heraldický štít (erb). Upload vlastního = navazující sub-krok. */
+function Erb() {
   return (
-    <div className="stat-row">
-      <p>{label}</p>
-      <div className="stat-inputs">
-        <input
-          value={g(`${statKey}_val`)}
-          disabled={disabled}
-          onChange={(e) => set(`${statKey}_val`, e.target.value)}
-          placeholder="Val"
-          aria-label={`${label} hodnota`}
+    <div className="drd16-erb" aria-hidden="true">
+      <svg viewBox="0 0 100 118">
+        <defs>
+          <linearGradient id="drd16-shield" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#9c2a23" />
+            <stop offset="1" stopColor="#5c1612" />
+          </linearGradient>
+          <linearGradient id="drd16-gold" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#f3dd97" />
+            <stop offset="1" stopColor="#8a6a26" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M50 6 L92 18 V58 C92 86 72 104 50 114 C28 104 8 86 8 58 V18 Z"
+          fill="url(#drd16-shield)"
+          stroke="url(#drd16-gold)"
+          strokeWidth="3.5"
         />
-        <input
-          className="stat-mod"
-          value={g(`${statKey}_mod`, String(autoBonus))}
-          disabled={disabled}
-          onChange={(e) => set(`${statKey}_mod`, e.target.value)}
-          placeholder="Mod"
-          aria-label={`${label} bonus`}
+        <path
+          d="M50 14 L85 24 V57 C85 80 68 95 50 104 C32 95 15 80 15 57 V24 Z"
+          fill="none"
+          stroke="rgba(243,221,151,.45)"
+          strokeWidth="1"
         />
-      </div>
+        <path
+          d="M50 34 C44 40 40 44 42 52 C44 58 52 56 52 50 C52 46 48 46 48 49 M50 34 C56 40 60 44 58 52 C56 58 50 60 48 66 C46 74 54 78 60 72 M50 60 C46 68 44 76 50 84 C56 76 54 68 50 60Z"
+          fill="url(#drd16-gold)"
+          opacity=".92"
+        />
+        <circle cx="50" cy="33" r="3" fill="url(#drd16-gold)" />
+      </svg>
+      <span className="drd16-erb-banner">Erb</span>
     </div>
   );
 }
 
-interface SimpleStatRowProps extends SubProps {
+interface PrimaryStatRowProps extends SubProps {
   label: string;
   statKey: string;
-  wide?: boolean;
+  isNpc: boolean;
 }
 
-function SimpleStatRow({
+function PrimaryStatRow({
   label,
   statKey,
+  isNpc,
   cda,
   disabled,
-  wide,
-}: SimpleStatRowProps) {
+}: PrimaryStatRowProps) {
+  const { g, set } = cda;
+  const raw = g(`${statKey}_val`);
+  const v = parseInt(raw, 10);
+  const bonus = Number.isNaN(v) ? 0 : getDrdBonus(v);
+  const over = !isNpc && !Number.isNaN(v) && v > DRD16_PC_STAT_CAP;
+  const bcls = bonus > 0 ? 'pos' : bonus < 0 ? 'neg' : 'zero';
+  return (
+    <div className={`drd16-stat-row${over ? ' over' : ''}`}>
+      <span className="st-name">{label}</span>
+      <input
+        className="st-val"
+        inputMode="numeric"
+        value={raw}
+        disabled={disabled}
+        onChange={(e) => set(`${statKey}_val`, e.target.value)}
+        aria-label={`${label} hodnota`}
+      />
+      <span className={`drd16-bonus ${bcls}`} aria-label={`${label} bonus`}>
+        {fmtBonus(bonus)}
+      </span>
+      {over && (
+        <span className="st-warn">
+          Hráčova trvalá vlastnost nepřekročí {DRD16_PC_STAT_CAP} (přechodný buff
+          je v pořádku).
+        </span>
+      )}
+    </div>
+  );
+}
+
+interface PlaqueInputProps extends SubProps {
+  variant: 'life' | 'magy';
+  label: string;
+  statKey: string;
+}
+
+function PlaqueInput({ variant, label, statKey, cda, disabled }: PlaqueInputProps) {
   const { g, set } = cda;
   return (
-    <div className="stat-row">
-      <p>{label}</p>
-      <div className="stat-inputs">
+    <div className={`drd16-plaque ${variant}`}>
+      <span className="pl-lab">{label}</span>
+      <span className="pl-val">
         <input
+          inputMode="numeric"
           value={g(statKey)}
           disabled={disabled}
           onChange={(e) => set(statKey, e.target.value)}
-          style={wide ? { width: 96 } : undefined}
           aria-label={label}
         />
-      </div>
+      </span>
     </div>
   );
 }
 
-// ── Weapons tables ──────────────────────────────────────────────
+function PostrehTable({ cda, disabled }: SubProps) {
+  const { g, set } = cda;
+  const cell = (key: string, aria: string) => (
+    <td>
+      <input
+        value={g(key)}
+        disabled={disabled}
+        onChange={(e) => set(key, e.target.value)}
+        aria-label={aria}
+      />
+    </td>
+  );
+  return (
+    <table className="drd16-combat per">
+      <thead>
+        <tr>
+          <th />
+          <th>Náhodný</th>
+          <th>Hledaný</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th className="rh">Objevení objektů</th>
+          {cell('per_obj_rand', 'Objevení objektů náhodný')}
+          {cell('per_obj_seek', 'Objevení objektů hledaný')}
+        </tr>
+        <tr>
+          <th className="rh">Objevení mechanismů</th>
+          {cell('per_mec_rand', 'Objevení mechanismů náhodný')}
+          {cell('per_mec_seek', 'Objevení mechanismů hledaný')}
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
+// ── Weapons / Skills / Armor tabulky ────────────────────────────
 
 function MeleeWeaponsTable({ cda, disabled }: SubProps) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
   const rows = parseJsonArr<Drd16Weapon>('meleeWeapons');
   return (
     <>
-      <table className="combat-table">
+      <table className="drd16-combat">
         <thead>
           <tr>
             <th>Zbraň</th>
             <th>Kde</th>
             <th>ÚČ</th>
-            <th>Útoč</th>
-            <th>Ozvl.</th>
-            <th></th>
+            <th>Útoč.</th>
+            <th>OZ</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -378,9 +538,9 @@ function MeleeWeaponsTable({ cda, disabled }: SubProps) {
                 {!disabled && (
                   <button
                     type="button"
-                    className="delete-btn"
+                    className="drd16-del"
                     onClick={() => removeArr('meleeWeapons', i)}
-                    aria-label="Smazat melee zbraň"
+                    aria-label="Smazat zbraň na blízko"
                   >
                     ✕
                   </button>
@@ -393,7 +553,7 @@ function MeleeWeaponsTable({ cda, disabled }: SubProps) {
       {!disabled && (
         <button
           type="button"
-          className="add-weapon-btn"
+          className="drd16-add"
           onClick={() =>
             addArr<Drd16Weapon>('meleeWeapons', {
               weapon: '',
@@ -416,16 +576,16 @@ function RangedWeaponsTable({ cda, disabled }: SubProps) {
   const rows = parseJsonArr<Drd16RangedWeapon>('rangedWeapons');
   return (
     <>
-      <table className="combat-table">
+      <table className="drd16-combat">
         <thead>
           <tr>
             <th>Zbraň</th>
             <th>ÚČ</th>
-            <th>Útoč</th>
-            <th>Malá</th>
+            <th>Útoč.</th>
+            <th>Malý</th>
             <th>Stř.</th>
-            <th>Velká</th>
-            <th></th>
+            <th>Velký</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -452,9 +612,9 @@ function RangedWeaponsTable({ cda, disabled }: SubProps) {
                 {!disabled && (
                   <button
                     type="button"
-                    className="delete-btn"
+                    className="drd16-del"
                     onClick={() => removeArr('rangedWeapons', i)}
-                    aria-label="Smazat ranged zbraň"
+                    aria-label="Smazat střelnou zbraň"
                   >
                     ✕
                   </button>
@@ -467,7 +627,7 @@ function RangedWeaponsTable({ cda, disabled }: SubProps) {
       {!disabled && (
         <button
           type="button"
-          className="add-weapon-btn"
+          className="drd16-add"
           onClick={() =>
             addArr<Drd16RangedWeapon>('rangedWeapons', {
               weapon: '',
@@ -491,12 +651,12 @@ function SkillsTable({ cda, disabled }: SubProps) {
   const rows = parseJsonArr<Drd16Skill>('drdSkills');
   return (
     <>
-      <table className="combat-table">
+      <table className="drd16-combat">
         <thead>
           <tr>
             <th>Dovednost</th>
             <th>Stupeň</th>
-            <th></th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -532,7 +692,7 @@ function SkillsTable({ cda, disabled }: SubProps) {
                 {!disabled && (
                   <button
                     type="button"
-                    className="delete-btn"
+                    className="drd16-del"
                     onClick={() => removeArr('drdSkills', i)}
                     aria-label="Smazat dovednost"
                   >
@@ -547,10 +707,8 @@ function SkillsTable({ cda, disabled }: SubProps) {
       {!disabled && (
         <button
           type="button"
-          className="add-weapon-btn"
-          onClick={() =>
-            addArr<Drd16Skill>('drdSkills', { name: '', level: '' })
-          }
+          className="drd16-add"
+          onClick={() => addArr<Drd16Skill>('drdSkills', { name: '', level: '' })}
         >
           + Přidat dovednost
         </button>
@@ -559,92 +717,171 @@ function SkillsTable({ cda, disabled }: SubProps) {
   );
 }
 
-// ── Resource tracker (HP / Mana) ────────────────────────────────
+function ArmorTable({ cda, disabled }: SubProps) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const rows = parseJsonArr<Drd16Armor>('armor');
+  return (
+    <>
+      <table className="drd16-combat armor">
+        <thead>
+          <tr>
+            <th>Zbroj / štít</th>
+            <th>OČ</th>
+            <th>Pozn.</th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              <td>
+                <input
+                  className="left-align"
+                  value={row.name || ''}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<Drd16Armor>('armor', i, { name: e.target.value })
+                  }
+                  aria-label={`Zbroj ${i + 1} název`}
+                />
+              </td>
+              <td>
+                <input
+                  value={row.oc || ''}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<Drd16Armor>('armor', i, { oc: e.target.value })
+                  }
+                  aria-label={`Zbroj ${i + 1} OČ`}
+                />
+              </td>
+              <td>
+                <input
+                  value={row.note || ''}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<Drd16Armor>('armor', i, { note: e.target.value })
+                  }
+                  aria-label={`Zbroj ${i + 1} poznámka`}
+                />
+              </td>
+              <td>
+                {!disabled && (
+                  <button
+                    type="button"
+                    className="drd16-del"
+                    onClick={() => removeArr('armor', i)}
+                    aria-label="Smazat zbroj"
+                  >
+                    ✕
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!disabled && (
+        <button
+          type="button"
+          className="drd16-add"
+          onClick={() =>
+            addArr<Drd16Armor>('armor', { name: '', oc: '', note: '' })
+          }
+        >
+          + Přidat zbroj / štít
+        </button>
+      )}
+    </>
+  );
+}
 
-interface ResourceTrackerProps extends SubProps {
-  variant: 'health' | 'mana';
+// ── Iluminovaný žebřík životů/magů ──────────────────────────────
+// 50 příček = konstantní výška. ≤50 bodů → „1 příčka = 1 bod" (papír);
+// >50 → poměr (1 příčka = max/50), popisky se přečíslují. Mobilní proužek
+// (.drd16-hpbar) je v DOM vždy, CSS ho ukáže místo žebříku ≤900px.
+
+interface DrdLadderProps extends SubProps {
+  variant: 'life' | 'magy';
   title: string;
   curKey: string;
   maxKey: string;
 }
 
-function ResourceTracker({
+function DrdLadder({
   variant,
   title,
   curKey,
   maxKey,
   cda,
   disabled,
-}: ResourceTrackerProps) {
+}: DrdLadderProps) {
   const { g, set } = cda;
-  const cur = parseInt(g(curKey, '0'), 10) || 0;
-  const max = parseInt(g(maxKey, '0'), 10) || 0;
+  const max = Math.max(0, parseInt(g(maxKey, '0'), 10) || 0);
+  const cur = Math.max(0, Math.min(max, parseInt(g(curKey, '0'), 10) || 0));
+  const perPoint = max <= DRD16_RUNGS;
+  const step = max > 0 ? max / DRD16_RUNGS : 0;
+  const lit =
+    max > 0 ? (perPoint ? cur : Math.round((cur / max) * DRD16_RUNGS)) : 0;
+  const maxRung = perPoint ? max : DRD16_RUNGS;
   const pct = max > 0 ? Math.min(100, (cur / max) * 100) : 0;
 
-  const adjust = (delta: number) => {
+  const setCur = (val: number) => {
     if (disabled) return;
-    const next = Math.max(0, Math.min(max, cur + delta));
-    set(curKey, String(next));
+    set(curKey, String(Math.max(0, Math.min(max, val))));
   };
 
+  const rungs = [];
+  for (let i = 1; i <= DRD16_RUNGS; i++) {
+    const val = perPoint ? i : Math.round(i * step);
+    const on = i <= lit;
+    const mark = max > 0 && i === maxRung;
+    rungs.push(
+      <div
+        key={i}
+        className={`drd16-rung${on ? ' on' : ''}${mark ? ' maxmark' : ''}`}
+        onClick={disabled ? undefined : () => setCur(val)}
+      >
+        <span className="rn">{val}</span>
+        <span className="rbar" />
+      </div>,
+    );
+  }
+
   return (
-    <div className={`tracker-column ${variant}`}>
-      <div className="tracker-title">{title}</div>
-      <div className="tracker-visual">
-        <div
-          className="tracker-fill"
-          style={{ height: `${pct}%` }}
-          aria-label={`${title} fill ${pct.toFixed(0)}%`}
-        />
+    <div className={`drd16-ladder ${variant}`}>
+      <div className="drd16-ladder-h">{title}</div>
+      <div className="drd16-rungs">{rungs}</div>
+      <div className="drd16-hpbar">
+        <div className="drd16-hpbar-fill" style={{ width: `${pct}%` }} />
       </div>
-      <div className="tracker-controls">
+      {!disabled && (
+        <div className="drd16-ladder-ctl">
+          {[-5, -1, 1, 5].map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setCur(cur + d)}
+              aria-label={`${title} ${d > 0 ? `+${d}` : d}`}
+            >
+              {d > 0 ? `+${d}` : d}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="drd16-ladder-cur">
         <input
+          className="c"
+          inputMode="numeric"
           value={g(curKey, '0')}
           disabled={disabled}
           onChange={(e) => set(curKey, e.target.value)}
           aria-label={`${title} aktuální`}
         />
-        <input
-          value={g(maxKey, '0')}
-          disabled={disabled}
-          onChange={(e) => set(maxKey, e.target.value)}
-          style={{ fontSize: '0.9rem', opacity: 0.7 }}
-          aria-label={`${title} maximum`}
-        />
-        <div className="controls-row">
-          <button
-            type="button"
-            onClick={() => adjust(-5)}
-            disabled={disabled}
-            aria-label={`${title} -5`}
-          >
-            -5
-          </button>
-          <button
-            type="button"
-            onClick={() => adjust(-1)}
-            disabled={disabled}
-            aria-label={`${title} -1`}
-          >
-            -1
-          </button>
-          <button
-            type="button"
-            onClick={() => adjust(1)}
-            disabled={disabled}
-            aria-label={`${title} +1`}
-          >
-            +1
-          </button>
-          <button
-            type="button"
-            onClick={() => adjust(5)}
-            disabled={disabled}
-            aria-label={`${title} +5`}
-          >
-            +5
-          </button>
-        </div>
+        <small>
+          {' / '}
+          <span className="m">{g(maxKey, '0')}</span>
+        </small>
       </div>
     </div>
   );
@@ -659,16 +896,17 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
   const meleeWeapons = cda.parseJsonArr<Drd16Weapon>('meleeWeapons');
   const rangedWeapons = cda.parseJsonArr<Drd16RangedWeapon>('rangedWeapons');
   const drdSkills = cda.parseJsonArr<Drd16Skill>('drdSkills');
+  const armor = cda.parseJsonArr<Drd16Armor>('armor');
 
-  // Auto-bonus (stejný výpočet jako interaktivní sheet) — pokud hráč
-  // nezadal vlastní `_mod`, ukážeme dopočítaný.
   const primaryBonus = (key: string): string => {
-    const val = parseInt(g(`${key}_val`, '10'), 10) || 10;
-    return g(`${key}_mod`, String(getDrdBonus(val)));
+    const v = parseInt(g(`${key}_val`, ''), 10);
+    return Number.isNaN(v) ? '—' : fmtBonus(getDrdBonus(v));
   };
 
+  const classLine = [g('class'), g('class_spec')].filter(Boolean).join(' → ');
   const specialAbilities = g('special_abilities').trim();
   const spells = g('spells').trim();
+  const notes = g('notes').trim();
 
   return (
     <div className="drd16-print">
@@ -684,7 +922,7 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
         </div>
         <div>
           <dt>Povolání</dt>
-          <dd>{g('class') || '—'}</dd>
+          <dd>{classLine || '—'}</dd>
         </div>
         <div>
           <dt>Úroveň</dt>
@@ -701,7 +939,7 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
           </dd>
         </div>
         <div>
-          <dt>Mana</dt>
+          <dt>Magy</dt>
           <dd>
             {g('mana_current', '0')} / {g('mana_max', '0')}
           </dd>
@@ -712,9 +950,9 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
         </div>
       </dl>
 
-      <h2>Primární vlastnosti</h2>
+      <h2>Vlastnosti</h2>
       <ul className="matrix-print__plain">
-        {DRD16_PRIMARY_STATS.map((s) => (
+        {DRD16_HAZ_STATS.map((s) => (
           <li key={s.key} className="print-row">
             <span>{s.label}</span>
             <span>
@@ -722,33 +960,65 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
             </span>
           </li>
         ))}
+        <li className="print-row">
+          <span>Velikost</span>
+          <span>{g('size_letter') || '—'}</span>
+        </li>
       </ul>
 
-      <h2>Sekundární vlastnosti</h2>
-      <ul className="matrix-print__plain">
-        {DRD16_SECONDARY_STATS.map((s) => (
-          <li key={s.key} className="print-row">
-            <span>{s.label}</span>
-            <span>{g(s.key) || '—'}</span>
-          </li>
-        ))}
-      </ul>
-
-      <h2>Naložení</h2>
+      <h2>Pohyblivost</h2>
       <dl className="print-cols">
         <div>
-          <dt>Lehké</dt>
-          <dd>{g('enc_light') || '—'}</dd>
+          <dt>Základní</dt>
+          <dd>{g('mov_val') || '—'}</dd>
         </div>
-        <div>
-          <dt>Střední</dt>
-          <dd>{g('enc_med') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Těžké</dt>
-          <dd>{g('enc_heavy') || '—'}</dd>
-        </div>
+        {DRD16_LOAD_ROWS.map((r) => (
+          <div key={r.key}>
+            <dt>{r.label}</dt>
+            <dd>{g(r.key) || '—'}</dd>
+          </div>
+        ))}
       </dl>
+
+      <h2>Postřeh</h2>
+      <table>
+        <thead>
+          <tr>
+            <th />
+            <th>Náhodný</th>
+            <th>Hledaný</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Objevení objektů</td>
+            <td>{g('per_obj_rand') || '—'}</td>
+            <td>{g('per_obj_seek') || '—'}</td>
+          </tr>
+          <tr>
+            <td>Objevení mechanismů</td>
+            <td>{g('per_mec_rand') || '—'}</td>
+            <td>{g('per_mec_seek') || '—'}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {armor.length > 0 && (
+        <>
+          <h2>Zbroj</h2>
+          <ul className="matrix-print__plain">
+            {armor.map((a, i) => (
+              <li key={i} className="print-row">
+                <span>{a.name || '—'}</span>
+                <span>
+                  OČ {a.oc || '—'}
+                  {a.note ? ` · ${a.note}` : ''}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {meleeWeapons.length > 0 && (
         <>
@@ -760,7 +1030,7 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
                 <th>Kde</th>
                 <th>ÚČ</th>
                 <th>Útoč</th>
-                <th>Ozvl.</th>
+                <th>OZ</th>
               </tr>
             </thead>
             <tbody>
@@ -787,9 +1057,9 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
                 <th>Zbraň</th>
                 <th>ÚČ</th>
                 <th>Útoč</th>
-                <th>Malá</th>
+                <th>Malý</th>
                 <th>Stř.</th>
-                <th>Velká</th>
+                <th>Velký</th>
               </tr>
             </thead>
             <tbody>
@@ -810,7 +1080,7 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
 
       {drdSkills.length > 0 && (
         <>
-          <h2>Dovednosti DrD</h2>
+          <h2>Dovednosti</h2>
           <ul className="matrix-print__plain">
             {drdSkills.map((s, i) => (
               <li key={i} className="print-row">
@@ -833,6 +1103,13 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
         <>
           <h2>Kouzla / Spellbook</h2>
           <p style={{ whiteSpace: 'pre-wrap' }}>{spells}</p>
+        </>
+      )}
+
+      {notes && (
+        <>
+          <h2>Poznámky</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{notes}</p>
         </>
       )}
     </div>

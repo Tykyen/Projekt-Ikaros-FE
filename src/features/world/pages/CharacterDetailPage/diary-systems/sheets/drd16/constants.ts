@@ -23,7 +23,7 @@ export const DRD16_SECONDARY_STATS = [
   { key: 'sea', label: 'Hledání' },
 ];
 
-/** Povolání Drd 1.6 (rodiny). */
+/** Povolání Drd 1.6 (plochý seznam — BC, ponecháno). */
 export const DRD16_CLASSES = [
   'Bojovník',
   'Šermíř',
@@ -41,6 +41,63 @@ export const DRD16_CLASSES = [
   'Theurg',
   'Pyrofor',
 ];
+
+/**
+ * 16.2b — 5 základních rodin povolání. Od 6. úrovně se každá štěpí na 2
+ * specializace (`DRD16_SPECIALIZATIONS`). Base select nabízí jen tyto.
+ */
+export const DRD16_CLASS_FAMILIES = [
+  'Válečník',
+  'Hraničář',
+  'Zloděj',
+  'Alchymista',
+  'Kouzelník',
+] as const;
+
+/** Rozdělení rodiny na 2 specializace (odemčeno od `DRD16_SPEC_UNLOCK_LEVEL`). */
+export const DRD16_SPECIALIZATIONS: Record<string, readonly [string, string]> = {
+  Válečník: ['Bojovník', 'Šermíř'],
+  Hraničář: ['Chodec', 'Druid'],
+  Zloděj: ['Lupič', 'Sicco'],
+  Alchymista: ['Pyrofor', 'Theurg'],
+  Kouzelník: ['Čaroděj', 'Mág'],
+};
+
+/** Úroveň, od které se odemyká výběr specializace. */
+export const DRD16_SPEC_UNLOCK_LEVEL = 6;
+
+/**
+ * Soft-cap primární vlastnosti hráče (PC). Nad ní červené varování, ale
+ * NEblokuje (přechodný buff je v pořádku). NPC strop nemá — bonus
+ * extrapoluje stejnou formulí (`getDrdBonus`).
+ */
+export const DRD16_PC_STAT_CAP = 21;
+
+/**
+ * 5 „háznových" vlastností se zlatým auto-bonusem (`getDrdBonus`).
+ * Velikost (písmeno) a Pohyblivost (čísla bez bonusu) stojí mimo.
+ */
+export const DRD16_HAZ_STATS = [
+  { key: 'str', label: 'Síla' },
+  { key: 'dex', label: 'Obratnost' },
+  { key: 'con', label: 'Odolnost' },
+  { key: 'int', label: 'Inteligence' },
+  { key: 'cha', label: 'Charisma' },
+] as const;
+
+/** Pohyblivost při naložení (reuse `enc_*` klíčů, nová sémantika). */
+export const DRD16_LOAD_ROWS = [
+  { key: 'enc_light', label: 'Mírné naložení' },
+  { key: 'enc_med', label: 'Střední naložení' },
+  { key: 'enc_heavy', label: 'Velké naložení' },
+] as const;
+
+/** Zbroj / štít — řádek tabulky u OČ. */
+export interface Drd16Armor {
+  name: string;
+  oc: string;
+  note: string;
+}
 
 /**
  * Bonus z vlastnosti dle Drd 1.6 pravidel.

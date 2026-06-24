@@ -8,14 +8,6 @@
 
 ## Otevřené
 
-### D-NEW-chat-combat-test-provider — ChatContextRail.spec padá „No QueryClient set" — ✅ VYŘEŠENO 2026-06-24
-**Soubor:** `src/features/world/chat/components/rail/ChatContextRail.spec.tsx` (16.1e combat)
-**Problém:** 5 testů padalo. Dvojí příčina: (1) render nebyl v `QueryClientProvider`, ale komponenta od 16.1e volá `useChannelCombatants`; (2) 2 testy ověřovaly **zrušené** chování — 16.1e přesunul hledání NPC/bestií z „Přítomní" do „Souboj → + přidat" a výběr teď přidá do boje (neotevírá deník).
-**Řešení (hotovo):** Mock `useChannelCombat` (deterministický roster + odchycení add mutace) + mock `CombatRosterPanel`/bestie helperů; 3 původní testy ponechány, 2 zastaralé přepsány na nový kontrakt (Souboj → přidat → search → combat add). **5/5 zelené.**
-**Pozn.:** Objeveno při 16.1f, nebyla to regrese 16.1f. Vyřešeno na žádost uživatele ihned.
-
----
-
 ### D-NEW-SYS-PRESET-SEED-DRIFT — BE diarySchema seed nemá preset pro 5 systémů
 > **FE část vyřešena 2026-06-23 (16.2a, ✅ ŘEŠENÍ fe.md).** Původní `D-NEW-SYS-DIARY-DRIFT` (Dračí Hlídka) byl jen špička: FE sheet/plugin lookup spadl na generic u **tří** systémů (`draci-hlidka`/`drd-plus`/`call-of-cthulhu`). Opraveno aliasy v obou FE registry + parity guard test. **Zbývá níže popsaná druhá, nezávislá porucha na BE.**
 
@@ -60,14 +52,6 @@
 **Řešení:** napojit sekce na existující moduly; implementovat per-role taby nebo odstranit mrtvý param; validace displayName; doplnit worldsCount do friend shape.
 **Kdy:** Fáze 15.6 / 16.4. Zdroj: kap. 02.
 
-### D-NEW-INV-WIKI — Inventura: tabulky ve vieweru + seed↔menu — ✅ VYŘEŠENO 2026-06-21
-**✅ Opraveno (15.5-followup, 2026-06-21):**
-- **Tabulky ve vieweru:** `RichTextEditor` zapíná `Table` extension i v `readOnly` (`enableTable || readOnly`, `RichTextEditor.tsx`) + read-mode CSS `.content .rte-table` (`RichTextEditor.module.css`). Jeden zásah pokryl všech 8 read layoutů; tabulka už při čtení nezmizí. BE `sanitizeRichText` `<table>` povoluje (uloží se), problém byl čistě render.
-- **Mrtvý odkaz „Informace":** `buildWorldNav`/`buildFullWorldNav` přijímá `existingPageSlugs` (z `usePagesDirectory` ve `WorldLayout`); odkazy `magicky-system`/`technologie` se skryjí, když stránka neexistuje (smazaná/neseedovaná). `Pravidla` má dedikovanou route (RulesPage) → nefiltruje se (jinak by se u matrix/Rulebook chybně skryl). `isPlaceholderData` gate brání probliknutí před načtením.
-- Ověřeno: vitest RichTextEditor 22/22 + worldNavConfig 16/16, build ✓.
-
-**Bylo:** inline `<table>` v `page.content` se ve čtení zahodil (editor je uměl, viewer ne); smazaná seedovaná stránka zůstávala mrtvým odkazem v menu „Informace" (seed a menu byly 2 nepropojené vrstvy).
-
 ### D-NEW-INV-DATA-SYNC — Inventura: konzistence dat postav/měn
 **Soubory:** BE `map-operations.service.ts` (token→Character sync TODO), `world-currencies` `updateCurrencies` (full-replace), `character-subdocs.service.ts` (finance/inventory create vs. read), `characters.repository.ts` (legacy `/characters/directory`).
 **Problém:** staty/HP tokenu PC/NPC se z mapy nepropíšou do listiny postavy (žijí v `diary.customData`); `updateCurrencies` přepisuje celou sadu (riziko ztráty měn bez delta merge); subdoc finance/výbava se zakládají i pro NPC/Lokaci, ale `getFinance`/`getInventory` je pro ně blokuje 404 → orphan data; legacy adresářový endpoint zůstává vedle Pages directory (dvojí zdroj).
@@ -82,15 +66,10 @@
 **Řešení:** doplnit inverse pro chybějící operace; sjednotit role-prahy; vyjasnit jediný zdroj combat order; pathfinding buď doplnit (17.x), nebo opravit spec (rychlý fix).
 **Kdy:** Fáze 17.x. Zdroj: kap. 14.
 
-### D-NEW-INV-CASCADE — Inventura: kaskády & čas — ✅ z větší části VYŘEŠENO 2026-06-20
-**✅ Opraveno (plný audit 14.9, 2026-06-20):**
-- `world-calendar-config` delete nulluje dangling `worldSettings.timelineCalendarSlug` (CD-RUN-2).
-- `ikaros-events` soft-delete (`isActive=false`, **bez jakékoli obnovy**) → **hard delete + `media.orphaned`** (CD-RUN-4b); `game-events` delete byl už čistý (tvrdé + blob cleanup) — „soft-delete akcí bez cleanup" se týkal jen ikaros-events.
-- `/akce` přidáno do menu „Svět" (skrývatelné `id:'akce'`, spec 12.3 R2 akt.).
-- legacy `/sprava-udalosti` redirect **smazán** (expiroval); `LegacyCalendersController` `/calenders` překlep **smazán** (eventy přes character-subdocs `PUT calendar`).
-**Otevřené (zbytek, mimo 14.9):** in-game datum (advance-day v Počasí) se nepromítne do „Dnes" v `/kalendar` — sjednotit zdroj in-game data.
-**Dopad:** Nízký — zbývá jen UX (in-game datum).
-**Kdy:** zbytek mimo 14.9. Zdroj: kap. 15.
+### D-NEW-INV-CASCADE-INGAME-DATE — in-game datum se nepromítne do „Dnes" v /kalendar
+**Problém:** in-game datum (advance-day v Počasí) se nepromítne do „Dnes" v `/kalendar` — sjednotit zdroj in-game data. (Zbytek kaskád/času z inventury vyřešen plným auditem 14.9, 2026-06-20 — v git logu.)
+**Dopad:** Nízký — UX.
+**Kdy:** mimo 14.9. Zdroj: kap. 15.
 
 ### D-NEW-INV-CLEANUP — Inventura: úklid kódu (drift & mrtvé)
 **Soubory:** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní), `AuditLogTab.tsx` vs `admin-audit-log.interface.ts` (label drift).

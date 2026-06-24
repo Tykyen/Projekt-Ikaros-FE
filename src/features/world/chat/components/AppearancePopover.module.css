@@ -9,11 +9,12 @@
   padding: 14px 14px 12px;
   /* 16.1f — neprůhledné pozadí: theme `--theme-surface*` mají alfu (0.74–0.9) →
      chat za popoverem prosvítal a text se blbě četl. Translucentní surface
-     složíme na neprůhledný `--theme-bg` (core token, vždy definovaný). */
-  background-color: var(--theme-bg);
+     složíme na NEPRŮHLEDNÝ `--bg-primary` (= bgPrimary motivu, opaque ve všech
+     motivech; pozor: `--theme-bg` NEEXISTUJE → bez fallbacku = transparent). */
+  background-color: var(--bg-primary, #0c0820);
   background-image: linear-gradient(
-    var(--theme-elevated-bg, var(--theme-surface)),
-    var(--theme-elevated-bg, var(--theme-surface))
+    var(--theme-surface),
+    var(--theme-surface)
   );
   border: 1px solid var(--theme-border);
   border-radius: var(--radius-md);

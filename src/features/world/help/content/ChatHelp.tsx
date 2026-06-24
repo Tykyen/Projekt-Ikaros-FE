@@ -29,6 +29,7 @@ export function ChatHelp({ audience }: { audience: HelpAudience }) {
           { term: 'Hod kostkou (🎲)', desc: 'Kostky dle systému; 30 skinů, per svět.' },
           { term: 'Emoty', desc: 'Napiš :zkratka: (např. :smile:) → obrázek.' },
           { term: 'Oblíbené', desc: 'Konverzaci si připneš nahoru.' },
+          { term: 'Čtení svým písmem (👓)', desc: 'Nečitelný cizí font? Přepínač v hlavičce konverzace (na mobilu v paletce 🎨, sekce „Jak čtu ostatní") zobrazí všechny zprávy tvým čitelným písmem a velikostí. Mění jen tvůj pohled, ostatním nic.' },
         ]}
       />
 

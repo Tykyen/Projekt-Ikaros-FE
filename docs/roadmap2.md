@@ -387,7 +387,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] **Chat (→ 16.1)** — ✅ 2026-06-23 reuse `DiaryTab`/MatrixSheet → chat **zdědil HUD list automaticky** (single source). Plný list, ne kompaktní combat panel (rozhodnutí 16.1a).
   - [x] Skiny (→ 16.2c)
 - **Dračí Doupě 1.6** (`drd16`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
-  - [ ] Reálný list (grafika)
+  - [x] **Reálný list (grafika)** — ✅ 2026-06-24 fantasy „Iluminovaný kodex kováře" (spec-16.2b; pergamen HUD, 5 háznových+bonus / Velikost-písmeno / Pohyblivost+naložení / Postřeh 2×2 / Zbroj; povolání 2-stupňové od 6. úrovně; PC soft-cap 21, NPC bez; Životy/magy žebřík 50 příček + poměr >50 / mobil proužek). Self-contained pergamen (tokenizace na skin-engine = 16.2c). Ověřeno tsc+build+15 testů+eslint; vizuál po deployi.
   - [ ] Taktická mapa (grafika + zvážit vlastní combat panel)
   - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
