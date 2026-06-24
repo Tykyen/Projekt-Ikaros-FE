@@ -376,7 +376,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] **Taktická mapa (grafika)** — ✅ 2026-06-23 `MatrixCombatPanel` HUD redesign (PC/NPC; Životy/Únava tracky+postih, schopnosti pips+klik=hod, Ochrana/Runa, přetlaky, aspekty, iniciativa; logika zachována). Bestie = samostatná položka níže.
   - [x] Bestie (grafika)
   - [x] **Chat (→ 16.1)** — ✅ 2026-06-23 reuse `DiaryTab`/MatrixSheet → chat **zdědil HUD list automaticky** (single source). Plný list, ne kompaktní combat panel (rozhodnutí 16.1a).
-  - [ ] Skiny (→ 16.2c)
+  - [x] Skiny (→ 16.2c)
 - **Dračí Doupě 1.6** (`drd16`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + zvážit vlastní combat panel)

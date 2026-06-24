@@ -362,3 +362,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 - 👍 **Dobře:** rozlišení šlo po datech (`error.response === undefined`), ne po hádání. Práh 2 + reset-on-success dává přirozený debounce bez ručního časovače. `GET /health` už existoval → auto-zotavení zdarma, nula BE změny.
 - 👍 **Dobře:** globální (B) místo per-stránka — pokrývá dashboard/chat/… jednotně, deploy je celoplošný. Overlay invaliduje dotazy → po naběhnutí BE se appka opraví sama, bez F5.
 - 📌 **Pozn.:** overlay leží nad `WorldNotFound` (z-index 600 > toast 500); při zotavení se obě vrstvy srovnají přes invalidate. 500 záměrně NEspouští údržbu (to je `ErrorState` „Něco se rozbilo").
+
+---
+
+### ✅ ŘEŠENÍ — 16.2c Skiny deníku: skin engine F1 (BE) + F2 (FE list, 7 stylů) · 2026-06-24
+**Co zabralo:** Cross-stack skin engine pro deník, **per uživatel × svět, cross-device**. Prototyp 7 stylů (`c:\tmp\matrix-skiny-audit.html`) odsouhlasen → spec-16.2c → BE F1 + FE F2.
+**F1 (BE, sám):** `WorldMembership.diarySkin` reuse vzoru per-člen `themeId` — 5 míst (schema/interface/toEntity/DTO/service) + endpoint **reuse** `PUT members/me/theme {diarySkin}` + DTO whitelist 7 (`@IsIn`). Commit `04f9826` na main (typecheck+135 jest+prettier+lint). **Po BE změně RESTART** (ValidationPipe whitelist).
+**F2 (FE, delegováno subagentovi, ověřeno mnou):** skin registr + `DEFAULT_SKIN_BY_SYSTEM`; `diary-skins.css` 7 token sad; **refactor `matrix.css` na `--mx-*` tokeny** — sci-fi defaulty v `:where([data-diary-system='matrix'])` (**specificita 0** → skin `[data-diary-skin]` (0,1,0) vždy přebije nezávisle na pořadí CSS) = regrese-safe; `useDiarySkin(worldId)` čte `membership.diarySkin` z `['worlds','my']`, fallback default dle systému, setter optimistic přes `useUpdateMyWorldTheme`; `data-diary-skin` na `DiarySystemProvider`; `DiarySkinSelector` „🎨 Vzhled" v DiaryTab.
+**Proč správně:** reuse vzorů (themeId + my-world theme mutace); layout beze změny, mění se jen tokeny. `:where()` řeší regrese-safety bez závislosti na pořadí CSS.
+**Past / poučení:** **agentní report = hypotéza** → ověřeno sám: tsc-b + 168 diary testů + build + selector integrace (grep). Subagent zvolen kvůli přetížené session.
+**Jak ověřeno:** tsc-b · diary 168/168 · build · eslint 0. **Čeká: deploy FE + BE restart → vizuální smoke 7 skinů.**
+**Zhodnocení:** dobře. **Zbývá F3** (combat/bestie module — tokeny z předka). Háčky: fonty CDN @import (self-host later); selector gated na `preset.SystemSheet` (dnes jen matrix).
+**Příznak:** sci-fi deník po refaktoru jiný → `:where` specificita / fallback rozbitý; skin zápis 400 → BE nerestartovaný.

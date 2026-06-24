@@ -1,6 +1,11 @@
 # Spec 16.2c — Skiny deníku (7 vizuálních stylů, per uživatel × svět)
 
-**Status:** 🔨 **F1 (BE) HOTOVO 2026-06-24** — `WorldMembership.diarySkin` (per uživatel×svět, reuse endpoint `members/me/theme`, whitelist 7 stylů); typecheck+135 jest+prettier+eslint zelené. **Po BE změně RESTART; BE commit zvlášť.** Zbývá **F2 (FE engine+list)** + **F3 (combat/bestie)**. Prototyp 7 stylů: `c:\tmp\matrix-skiny-audit.html`.
+**Status:** 🔨 **F1 (BE) + F2 (FE list) HOTOVO 2026-06-24.**
+- **F1 (BE):** `WorldMembership.diarySkin` + endpoint + whitelist. Commit `04f9826` na main. **Po BE změně RESTART.**
+- **F2 (FE):** skin registr + `diary-skins.css` (7 sad) + `matrix.css` tokenizace (`:where()` regrese-safe) + `useDiarySkin` hook + `data-diary-skin` na provider + `DiarySkinSelector` v DiaryTab. tsc+168 testů+build+eslint zelené (ověřeno mimo agenta). Háčky: fonty CDN, selector jen matrix.
+- **Zbývá F3** (combat panel + bestie CSS module → tokeny z předka). **Čeká: deploy FE + BE restart → vizuální smoke 7 skinů.**
+
+Prototyp 7 stylů: `c:\tmp\matrix-skiny-audit.html`.
 **Rozsah:** **cross-stack** — BE (1 pole + endpoint) + FE (engine, tokenizace 3 míst, 7 skin sad, selector).
 **Repo:** FE `Projekt-ikaros-FE` · BE `Projekt-ikaros`, commit na `main`.
 **Autor:** PJ + Claude · **Datum:** 2026-06-24
