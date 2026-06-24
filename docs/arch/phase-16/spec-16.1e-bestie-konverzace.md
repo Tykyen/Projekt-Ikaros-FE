@@ -1,6 +1,6 @@
 # Spec 16.1e — Bestie v konverzaci (perzistentní soubojové instance)
 
-**Status:** ✅ Spec schválena autorem 2026-06-24 (R1–R6 + O1–O4 zafixovány) → následuje `frontend-design` audit → implementační plán → kód.
+**Status:** 🚧 Implementováno 2026-06-24 (BE A+E pushnuto, FE B–E hotové, build+regrese zelené). **UX revize D2 (po živém testu):** vodorovná lišta nad konverzací ukrajovala výšku textu → přesunuta do **vertikálního rail módu „⚔️ Souboj"** (pravý bok, vedle Přítomní). Zbývá: nové BE testy combat, `mobil-desktop`, `funkce`, `napoveda`, smoke po BE restartu.
 **Rozsah:** BE (nový perzistentní stav na konverzaci + atomické operace + WS) **i** FE (combat-tracker-lite rail, HP editace, spawn). Reuse mapového vzoru.
 **Repo:** `Projekt-ikaros-FE` + `Projekt-ikaros` (BE), commit na `main` (žádná feature větev — viz feedback)
 **Velikost:** odhad ~14–18 souborů (BE 6–7, FE 8–11) — rozšířeno o roster PC/NPC + lišta nad konverzací
@@ -125,7 +125,11 @@ Vzor = mapa operations (`POST /map/:sceneId/operation` s atomic `$push/$set/$pul
 
 **WS** — nový event `chat:combat:updated { channelId }` na room `chat:{channelId}` (účastníci přes `chat:channel:join`). Leak-safe signál → klient refetchne roster GET s access checkem.
 
-### 4.4 FE — UX: lišta nahoře + „i" otevírá bok (potvrzeno autorem 2026-06-24, viz screenshot)
+### 4.4 FE — UX
+
+> ⚠️ **REVIZE D2 (2026-06-24, po živém testu):** Původní návrh = vodorovná lišta nad konverzací. V reálu ukrajovala ~110 px **výšky textu** (chat je úzký vertikální tok, ne široké plátno jako mapa). Přesunuto do **vertikálního rail módu „⚔️ Souboj"** v pravém boku (záložka vedle „Přítomní"/„Můj deník" v `ChatContextRail`): `CombatRosterPanel` = svislý seznam (portrét + jméno + iniciativa + bestie HP bar), ovládání boje + 👁 viditelnost v hlavičce panelu, klik na řádek → detail v témže railu (⟵ zpět). Text dostal plnou výšku zpět. Combat UI stav je lokální v `ChatContextRail` (ne `WorldChatRoom`). Níže popsaná „lišta nahoře" je historický návrh.
+
+#### Historický návrh (lišta nahoře — nahrazen D2)
 
 **Vzor = mapový `InitiativeBar` + `onOpenInfo`. Tracker neřeší editaci sám — je vstupní bod do bočního railu, kde už deník/statblok je. „Nic víc."**
 

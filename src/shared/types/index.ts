@@ -657,6 +657,13 @@ export interface MapDefaults {
   allowPlayerDrawing?: boolean;
 }
 
+/** 16.1e — výchozí viditelnost HP v combat rosteru chatu (per typ). */
+export interface ChatCombatDefaults {
+  showHpPc?: boolean;
+  showHpNpc?: boolean;
+  showHpBestie?: boolean;
+}
+
 export interface WorldSettings {
   id: string;
   worldId: string;
@@ -675,6 +682,8 @@ export interface WorldSettings {
   pjChatPersona?: PjChatPersona | null;
   /** 15.4 (E) — výchozí nastavení map (seed nové scény). `null` = nenastaveno. */
   mapDefaults?: MapDefaults | null;
+  /** 16.1e — výchozí viditelnost HP v combat rosteru chatu. `null` = nenastaveno (→ true). */
+  chatCombatDefaults?: ChatCombatDefaults | null;
   akjTypes: AkjType[];
   hideDefaultWeather: boolean;
   /** Side-task character-tab-visibility — pokud chybí, FE považuje vše za viditelné. */

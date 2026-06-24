@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import type {
   CharacterTabVisibility,
+  ChatCombatDefaults,
   HeadlineNode,
   MapDefaults,
   MenuTemplate,
@@ -35,6 +36,8 @@ export interface UpdateWorldSettingsInput {
   pjChatPersona?: PjChatPersona | null;
   /** 15.4 (E) — výchozí nastavení map světa. `null` = reset. */
   mapDefaults?: MapDefaults | null;
+  /** 16.1e — výchozí viditelnost HP v combat rosteru chatu. `null` = reset. */
+  chatCombatDefaults?: ChatCombatDefaults | null;
 }
 
 export function useUpdateWorldSettings(worldId: string) {

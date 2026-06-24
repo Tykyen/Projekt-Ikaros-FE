@@ -18,6 +18,7 @@ import {
   Smile,
   Download,
   Map as MapIcon,
+  Swords,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
@@ -41,6 +42,9 @@ const CharacterTabsVisibilityTab = lazy(
 const HeadlineLinkTab = lazy(() => import('./tabs/HeadlineLinkTab'));
 const PjChatTab = lazy(() => import('./tabs/PjChatTab'));
 const MapDefaultsTab = lazy(() => import('./tabs/MapDefaultsTab'));
+const ChatCombatDefaultsTab = lazy(
+  () => import('./tabs/ChatCombatDefaultsTab'),
+);
 const DeleteWorldTab = lazy(() => import('./tabs/DeleteWorldTab'));
 const ExportTab = lazy(() => import('./tabs/ExportTab'));
 // Přesun z world nav (2026-05-25): admin nástroje do Nastavení tabů.
@@ -135,6 +139,14 @@ const TABS: SettingsTab[] = [
     icon: <Theater size={18} />,
     minRole: WorldRole.PomocnyPJ,
     render: () => <PjChatTab />,
+  },
+  {
+    // 16.1e — výchozí viditelnost HP v combat rosteru chatu (per typ). PJ-level.
+    id: 'chat-souboj',
+    label: 'Souboj v chatu',
+    icon: <Swords size={18} />,
+    minRole: WorldRole.PJ,
+    render: () => <ChatCombatDefaultsTab />,
   },
   {
     // 6.4c — custom emoty světa (PomocnyPJ+). N-03: přesun z orphan routy

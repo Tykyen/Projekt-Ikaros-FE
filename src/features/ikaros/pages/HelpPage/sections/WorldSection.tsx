@@ -536,6 +536,20 @@ export function WorldSection() {
             mobilu klávesa <strong>Enter</strong> dělá nový řádek (odstavec) — zprávu
             odešleš tlačítkem.
           </CalloutBox>
+          <CalloutBox variant="tip">
+            <strong>Souboj v chatu.</strong> V pravém panelu je záložka{' '}
+            <strong>⚔️ Souboj</strong> — vedení do ní přidá bojovníky (postavy,
+            NPC i <strong>bestie z bestiáře</strong>), nastaví jim iniciativu a
+            tlačítkem <strong>Začít boj</strong> spustí kola s pořadím „na tahu".
+            Bestie tu mají <strong>vlastní životy uložené u konverzace</strong>{' '}
+            (vedení je ubírá a vydrží i po znovunačtení), víc kopií téže bestie
+            má každá svoje HP. Klik na bojovníka otevře jeho{' '}
+            <strong>deník nebo statblok</strong> rovnou v panelu (a schopnost
+            odtud hodíš do konverzace). Jestli hráči vidí životy soupeřů,
+            rozhoduje vedení — zvlášť pro postavy, NPC a bestie (přepínače 👁 v
+            panelu, výchozí hodnotu nastavíš v <strong>Nastavení světa →
+            Souboj v chatu</strong>).
+          </CalloutBox>
           <p>
             Vedení světa (PJ i Pomocný PJ) může v chatu vystupovat{' '}
             <strong>anonymně</strong> (všichni jako jedno „PJ" — kvůli tajemství),

@@ -1,0 +1,250 @@
+/* 16.1e (D2) — vertikální combat roster panel v pravém railu. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  border-left: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  color: rgb(var(--map-ui-text-on-dark-rgb) / 0.9);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
+  background: rgb(var(--map-ui-accent-rgb) / 0.06);
+}
+.headTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--map-ui-gold-text);
+}
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  border-radius: 7px;
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.4);
+  background: rgb(var(--map-ui-accent-rgb) / 0.14);
+  color: var(--map-ui-accent-solid);
+}
+.btn:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.24);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.start,
+.next {
+  flex: 1;
+  border-color: rgb(var(--map-ui-gold-rgb) / 0.55);
+  background: rgb(var(--map-ui-gold-rgb) / 0.14);
+  color: var(--map-ui-gold-text);
+}
+.end {
+  border-color: rgb(var(--map-ui-danger-rgb) / 0.5);
+  background: rgb(var(--map-ui-danger-rgb) / 0.12);
+  color: var(--map-ui-danger-solid);
+}
+.ghost {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.25);
+  background: transparent;
+  color: var(--map-ui-text-muted);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+}
+
+/* 👁 viditelnost HP hráčům per typ (R3 per-konverzace override). */
+.visRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.visLabel {
+  font-size: 0.68rem;
+  color: var(--map-ui-text-muted);
+}
+.chip {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.3);
+  background: transparent;
+  color: var(--map-ui-text-muted);
+}
+.chipOn {
+  border-color: rgb(var(--map-ui-success-rgb) / 0.6);
+  background: rgb(var(--map-ui-success-rgb) / 0.16);
+  color: var(--map-ui-success-solid);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgb(var(--map-ui-panel-rgb) / 0.4);
+  border: 1px solid transparent;
+  transition: background 0.12s ease;
+}
+.row:hover {
+  background: rgb(var(--map-ui-accent-bright-rgb) / 0.12);
+}
+.row:focus-visible {
+  outline: 2px solid var(--map-ui-accent-solid);
+  outline-offset: 1px;
+}
+.muted {
+  opacity: 0.55;
+}
+.muted:hover {
+  opacity: 0.85;
+}
+.current {
+  background: rgb(var(--map-ui-gold-rgb) / 0.12);
+  border-color: rgb(var(--map-ui-gold-rgb) / 0.45);
+}
+
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--ring, var(--map-token-ring-default));
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+.current .avatar {
+  box-shadow: 0 0 10px rgb(var(--map-ui-gold-rgb) / 0.45);
+}
+.avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.initials {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgb(var(--map-ui-text-on-dark-rgb) / 0.9);
+}
+.order {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 8px;
+  border: 1px solid rgb(var(--map-ui-shadow-rgb) / 0.6);
+  color: rgb(var(--map-ui-shadow-rgb) / 1);
+  font-size: 0.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.name {
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.current .name {
+  color: var(--map-ui-gold-text);
+  font-weight: 600;
+}
+.hpRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hpBar {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: rgb(var(--map-ui-shadow-rgb) / 0.5);
+  overflow: hidden;
+}
+.hpFill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+}
+.hpText {
+  font-size: 0.66rem;
+  color: var(--map-ui-text-muted);
+  flex-shrink: 0;
+}
+
+.init {
+  flex-shrink: 0;
+}
+
+.divider {
+  list-style: none;
+  margin: 6px 4px 2px;
+  padding-top: 6px;
+  border-top: 1px dashed rgb(var(--map-ui-accent-rgb) / 0.25);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgb(var(--map-ui-blue-bright-rgb) / 0.5);
+}
+
+.empty {
+  list-style: none;
+  padding: 16px 10px;
+  font-size: 0.8rem;
+  color: var(--map-ui-text-muted);
+  text-align: center;
+}

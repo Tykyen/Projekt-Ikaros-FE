@@ -21,6 +21,48 @@
   cursor: pointer;
 }
 
+/* 16.1e D2 — záložky railu (Přítomní/Deník · Souboj) + obal panelu. */
+.tabWrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  border-left: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
+  background: var(--map-toolbar-bg-solid, var(--theme-surface, var(--bg-card)));
+}
+.tabs {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 6px 6px 0;
+}
+.tab {
+  flex: 1;
+  padding: 8px 6px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--map-ui-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tab:hover {
+  color: rgb(var(--map-ui-text-on-dark-rgb) / 0.9);
+}
+.tabActive {
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.25);
+  color: var(--map-ui-accent-text);
+}
+/* Panel uvnitř obalu vyplní zbytek a nemá vlastní levý okraj (má ho .tabWrap). */
+.tabWrap > :not(.tabs) {
+  flex: 1;
+  min-height: 0;
+  border-left: none;
+}
+
 /* 16.1e — banner „přidat do boje" nad hledáním. */
 .addBanner {
   display: flex;

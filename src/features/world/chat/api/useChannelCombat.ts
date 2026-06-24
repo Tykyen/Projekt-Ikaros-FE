@@ -122,6 +122,26 @@ export function useCombatantMutation(worldId: string, channelId: string) {
   });
 }
 
+/** 16.1e — per-konverzace viditelnost HP hráčům per typ (R3 override; PJ). */
+export function useCombatConfig(worldId: string, channelId: string) {
+  const qc = useQueryClient();
+  const key = combatKey(worldId, channelId);
+  return useMutation({
+    mutationFn: (patch: {
+      showHpPc?: boolean;
+      showHpNpc?: boolean;
+      showHpBestie?: boolean;
+    }) =>
+      api.patch<ChannelCombatRoster>(
+        `${base(worldId)}/channels/${channelId}/combat-config`,
+        patch,
+      ),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: key });
+    },
+  });
+}
+
 export interface UseChatCombatResult {
   /** Bojovníci `inCombat`, seřazení dle iniciativy (lišta nahoře). */
   combatants: ChatCombatant[];

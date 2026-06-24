@@ -3,11 +3,12 @@ import { X } from 'lucide-react';
 import type { User } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
-import type { Bestie } from '@/features/world/bestiar/types';
 import { buildBestieToken } from '@/features/world/tactical-map/utils/buildSpawnToken';
 import { getBestieAbilities } from '@/features/world/bestiar/lib/bestieAbilities';
+import type { Bestie } from '@/features/world/bestiar/types';
 import type { ChatChannel, ChannelPresenceUser } from '../../lib/types';
 import { ChannelMemberPanel, type RosterEntry } from '../ChannelMemberPanel';
+import { CombatRosterPanel } from '../combat/CombatRosterPanel';
 import { DiaryRollPanel } from './DiaryRollPanel';
 import { BestieRollPanel } from './BestieRollPanel';
 import { BestieInstancePanel } from './BestieInstancePanel';
@@ -22,7 +23,7 @@ import s from './ChatContextRail.module.css';
 interface Props {
   worldId: string;
   channel: ChatChannel;
-  /** Aktivní konverzace — kam hod míří. */
+  /** Aktivní konverzace — kam hod míří + odkud roster boje. */
   activeChannelId: string | null;
   /** PJ/PomocnyPJ vidí Přítomní + může načítat cizí deníky; hráč jen svůj. */
   isManager: boolean;
@@ -30,33 +31,29 @@ interface Props {
   /** Živá presence (PJ-only; hráč ji nedostává). */
   presence: ChannelPresenceUser[];
   onClose?: () => void;
-  /** Hlásí, že rail ukazuje deník/statblok (širší layout jako taktická mapa). */
+  /** Hlásí, že rail ukazuje deník/statblok/combat (širší layout). */
   onWideChange?: (wide: boolean) => void;
-  /** 16.1e — combatant otevřený z lišty přes „i" (má přednost před presence). */
-  openCombatantId?: string | null;
-  onClearCombatant?: () => void;
-  /** 16.1e — „+ přidat do boje": rail vybírá entitu (člen/NPC/bestie). */
-  combatAddMode?: boolean;
-  onCombatAddDone?: () => void;
 }
 
-/** Co je v railu načtené (PJ): deník postavy/NPC, nebo statblok bestie. */
+/** Co je v railu načtené (PJ): deník postavy/NPC, nebo statblok bestie z katalogu. */
 type Selected =
   | { kind: 'diary'; slug: string; title: string; attribution: RollAttribution }
   | { kind: 'bestie'; bestie: Bestie };
 
-/** `characterPath` může být cesta i holý slug — vrať poslední segment. */
+/** Záložka railu (16.1e D2): Přítomní/Deník vs. Souboj. */
+type RailTab = 'main' | 'combat';
+
 function slugOf(characterPath?: string): string | undefined {
   if (!characterPath) return undefined;
   return characterPath.split('/').pop() || undefined;
 }
 
 /**
- * 16.1a–c — kontextový pravý rail světového chatu.
- *   - Hráč: rovnou jeho deník (hody + editace do aktivní konverzace).
- *   - PJ: Přítomní + jedno pole hledání (NPC + bestie). Klik na člena / výběr
- *     NPC → deník (atribuce „PJ" / NPC); výběr bestie → statblok (atribuce
- *     bestie). ⟵ zpět na Přítomní.
+ * 16.1a–e — kontextový pravý rail světového chatu.
+ *   - Hráč: deník (default) + záložka „Souboj" (read-only roster, když běží).
+ *   - PJ: Přítomní + hledání (NPC/bestie) + záložka „Souboj" (combat roster,
+ *     ovládání boje, „+ přidat"). Klik na bojovníka → jeho deník/statblok
+ *     v témže railu (⟵ zpět). Combat stav (16.1e D2) je lokální v railu.
  */
 export function ChatContextRail({
   worldId,
@@ -67,15 +64,14 @@ export function ChatContextRail({
   presence,
   onClose,
   onWideChange,
-  openCombatantId,
-  onClearCombatant,
-  combatAddMode = false,
-  onCombatAddDone,
 }: Props) {
   const { world } = useWorldContext();
   const systemId = world?.system ?? null;
   const members = useWorldMembers(worldId);
   const [selected, setSelected] = useState<Selected | null>(null);
+  const [tab, setTab] = useState<RailTab>('main');
+  const [openCombatantId, setOpenCombatantId] = useState<string | null>(null);
+  const [addMode, setAddMode] = useState(false);
 
   const roster = useChannelCombatants(worldId, activeChannelId);
   const combatMut = useCombatantMutation(worldId, activeChannelId ?? '');
@@ -84,21 +80,27 @@ export function ChatContextRail({
       ? roster.data?.combatants.find((c) => c.id === openCombatantId)
       : undefined;
 
+  // Přepnutí konverzace → zahoď combat kontext (combatant.id z jiné neplatí).
+  useEffect(() => {
+    setOpenCombatantId(null);
+    setAddMode(false);
+    setSelected(null);
+  }, [activeChannelId]);
+
   const my = members.data?.find((m) => m.userId === currentUser.id);
   const mySlug = !isManager ? slugOf(my?.characterPath) : undefined;
-  // „Wide" = rail ukazuje deník/statblok (ne presence roster) → širší sloupec.
-  const wide = openCombatantId != null || (isManager ? selected !== null : Boolean(mySlug));
+
+  const wide =
+    openCombatantId != null ||
+    tab === 'combat' ||
+    (isManager ? selected !== null : Boolean(mySlug));
   useEffect(() => {
     onWideChange?.(wide);
   }, [wide, onWideChange]);
 
-  // 16.1e — přidání vybrané entity do boje (combatAddMode).
+  // ── Přidání vybrané entity do boje (addMode) ──
   const addBestie = (bestie: Bestie) => {
     const token = buildBestieToken(bestie, 0, 0);
-    const abilities = getBestieAbilities(bestie).map((a) => ({
-      name: a.label,
-      description: a.value,
-    }));
     combatMut.mutate({
       op: 'add',
       data: {
@@ -107,21 +109,24 @@ export function ChatContextRail({
         name: bestie.name,
         imageUrl: bestie.imageUrl,
         systemStats: token.systemStats,
-        abilities,
+        abilities: getBestieAbilities(bestie).map((a) => ({
+          name: a.label,
+          description: a.value,
+        })),
         notes: bestie.notes ?? '',
       },
     });
-    onCombatAddDone?.();
+    setAddMode(false);
   };
   const addCharacter = (slug: string, isNpc: boolean) => {
     combatMut.mutate({
       op: 'add',
       data: { kind: 'character', characterSlug: slug, isNpc },
     });
-    onCombatAddDone?.();
+    setAddMode(false);
   };
 
-  // ── 16.1e — combatant otevřený z lišty přes „i" (PJ i hráč) ──
+  // ── Detail bojovníka otevřený z rosteru (PJ i hráč) ──
   if (openCombatantId != null && activeChannelId) {
     if (openCombatant?.kind === 'bestie') {
       return (
@@ -131,7 +136,7 @@ export function ChatContextRail({
           systemId={systemId ?? ''}
           combatant={openCombatant}
           canEdit={isManager}
-          onBack={onClearCombatant}
+          onBack={() => setOpenCombatantId(null)}
           onClose={onClose}
         />
       );
@@ -155,18 +160,17 @@ export function ChatContextRail({
           attribution={attribution}
           canEdit={isManager || isOwn}
           title={openCombatant.characterSlug}
-          onBack={onClearCombatant}
+          onBack={() => setOpenCombatantId(null)}
           onClose={onClose}
         />
       );
     }
-    // Roster se ještě nenačetl / combatant zmizel — drobný stav se „zpět".
     return (
       <aside className={s.empty}>
         <button
           type="button"
           className={s.emptyClose}
-          onClick={onClearCombatant}
+          onClick={() => setOpenCombatantId(null)}
           aria-label="Zpět"
         >
           <X size={16} />
@@ -176,43 +180,8 @@ export function ChatContextRail({
     );
   }
 
-  // ── Hráč — vlastní deník ──
-  if (!isManager) {
-    if (!mySlug) {
-      return (
-        <aside className={s.empty}>
-          {onClose && (
-            <button
-              type="button"
-              className={s.emptyClose}
-              onClick={onClose}
-              aria-label="Zavřít"
-            >
-              <X size={16} />
-            </button>
-          )}
-          <p>
-            Nemáš ve světě přiřazenou postavu — deník se zobrazí, až ti
-            vypravěč postavu přiřadí.
-          </p>
-        </aside>
-      );
-    }
-    return (
-      <DiaryRollPanel
-        worldId={worldId}
-        channelId={activeChannelId}
-        slug={mySlug}
-        attribution={{ kind: 'self', rollerName: my?.user?.username ?? 'Hráč' }}
-        canEdit
-        title="Můj deník"
-        onClose={onClose}
-      />
-    );
-  }
-
-  // ── PJ — načtený statblok bestie ──
-  if (selected?.kind === 'bestie') {
+  // ── PJ — načtený statblok bestie z katalogu (hledání) ──
+  if (isManager && selected?.kind === 'bestie') {
     return (
       <BestieRollPanel
         worldId={worldId}
@@ -224,9 +193,8 @@ export function ChatContextRail({
       />
     );
   }
-
-  // ── PJ — načtený deník člena / NPC ──
-  if (selected?.kind === 'diary') {
+  // ── PJ — načtený deník člena / NPC (hledání) ──
+  if (isManager && selected?.kind === 'diary') {
     return (
       <DiaryRollPanel
         worldId={worldId}
@@ -241,12 +209,95 @@ export function ChatContextRail({
     );
   }
 
-  // ── PJ — Přítomní + jedno pole hledání (NPC + bestie) ──
-  // V `combatAddMode` výběr = přidat do boje (ne otevřít deník).
+  // ── Záložky (Přítomní/Deník · Souboj) ──
+  const tabs = (
+    <div className={s.tabs} role="tablist">
+      <button
+        type="button"
+        role="tab"
+        aria-selected={tab === 'main'}
+        className={`${s.tab} ${tab === 'main' ? s.tabActive : ''}`}
+        onClick={() => setTab('main')}
+      >
+        {isManager ? 'Přítomní' : 'Můj deník'}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={tab === 'combat'}
+        className={`${s.tab} ${tab === 'combat' ? s.tabActive : ''}`}
+        onClick={() => setTab('combat')}
+      >
+        ⚔️ Souboj
+      </button>
+    </div>
+  );
+
+  // ── Záložka Souboj — vertikální roster v railu ──
+  if (tab === 'combat' && activeChannelId) {
+    return (
+      <div className={s.tabWrap}>
+        {tabs}
+        <CombatRosterPanel
+          worldId={worldId}
+          channelId={activeChannelId}
+          isManager={isManager}
+          onOpenInfo={(id) => setOpenCombatantId(id)}
+          onAdd={() => {
+            setTab('main');
+            setAddMode(true);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // ── Hráč — vlastní deník (záložka „main") ──
+  if (!isManager) {
+    if (!mySlug) {
+      return (
+        <div className={s.tabWrap}>
+          {tabs}
+          <aside className={s.empty}>
+            {onClose && (
+              <button
+                type="button"
+                className={s.emptyClose}
+                onClick={onClose}
+                aria-label="Zavřít"
+              >
+                <X size={16} />
+              </button>
+            )}
+            <p>
+              Nemáš ve světě přiřazenou postavu — deník se zobrazí, až ti
+              vypravěč postavu přiřadí.
+            </p>
+          </aside>
+        </div>
+      );
+    }
+    return (
+      <div className={s.tabWrap}>
+        {tabs}
+        <DiaryRollPanel
+          worldId={worldId}
+          channelId={activeChannelId}
+          slug={mySlug}
+          attribution={{ kind: 'self', rollerName: my?.user?.username ?? 'Hráč' }}
+          canEdit
+          title="Můj deník"
+          onClose={onClose}
+        />
+      </div>
+    );
+  }
+
+  // ── PJ — Přítomní + hledání (NPC + bestie); v addMode = přidat do boje ──
   const handleSearchSelect = (r: RailSearchResult) => {
-    if (combatAddMode) {
+    if (addMode) {
       if (r.kind === 'bestie') addBestie(r.bestie);
-      else addCharacter(r.slug, true); // NPC ze searche
+      else addCharacter(r.slug, true);
       return;
     }
     if (r.kind === 'bestie') {
@@ -269,8 +320,8 @@ export function ChatContextRail({
   const handleSelectMember = (e: RosterEntry) => {
     const slug = slugOf(e.characterPath);
     if (!slug) return;
-    if (combatAddMode) {
-      addCharacter(slug, false); // PC z Přítomných
+    if (addMode) {
+      addCharacter(slug, false);
       return;
     }
     setSelected({
@@ -282,29 +333,32 @@ export function ChatContextRail({
   };
 
   return (
-    <ChannelMemberPanel
-      worldId={worldId}
-      channel={channel}
-      presence={presence}
-      onClose={onClose}
-      topSlot={
-        <>
-          {combatAddMode && (
-            <div className={s.addBanner}>
-              <span>⚔️ Vyber, koho přidat do boje</span>
-              <button type="button" onClick={onCombatAddDone}>
-                Hotovo
-              </button>
-            </div>
-          )}
-          <RailEntitySearch
-            worldId={worldId}
-            systemId={systemId}
-            onSelect={handleSearchSelect}
-          />
-        </>
-      }
-      onSelectMember={handleSelectMember}
-    />
+    <div className={s.tabWrap}>
+      {tabs}
+      <ChannelMemberPanel
+        worldId={worldId}
+        channel={channel}
+        presence={presence}
+        onClose={onClose}
+        topSlot={
+          <>
+            {addMode && (
+              <div className={s.addBanner}>
+                <span>⚔️ Vyber, koho přidat do boje</span>
+                <button type="button" onClick={() => setAddMode(false)}>
+                  Hotovo
+                </button>
+              </div>
+            )}
+            <RailEntitySearch
+              worldId={worldId}
+              systemId={systemId}
+              onSelect={handleSearchSelect}
+            />
+          </>
+        }
+        onSelectMember={handleSelectMember}
+      />
+    </div>
   );
 }

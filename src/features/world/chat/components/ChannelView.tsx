@@ -41,7 +41,6 @@ import { makePjDisplayResolver } from '../lib/pjPersona';
 import { getFontStack, getFontSize } from '../lib/chatFonts';
 import { renderChatContent, type WorldEmoteSet } from '../lib/renderChatContent';
 import { ChannelComposer, type ComposerSendPayload } from './ChannelComposer';
-import { ChatInitiativeBar } from './combat/ChatInitiativeBar';
 import { AppearancePopover } from './AppearancePopover';
 import { SoundNowPlayingBanner } from './SoundNowPlayingBanner';
 import { MessageEditInline } from './MessageEditInline';
@@ -71,10 +70,6 @@ interface ChannelViewProps {
   worldEmotes?: WorldEmoteSet;
   /** Deep-link z notifikačního feedu (13.2a) — po načtení doscrollovat na zprávu. */
   jumpToMessageId?: string | null;
-  /** 16.1e — klik „i" na combat liště → otevři bojovníka v boku (rail). */
-  onOpenCombatant?: (combatantId: string) => void;
-  /** 16.1e — „+ přidat do boje" → rail do výběrového módu. */
-  onAddCombat?: () => void;
 }
 
 interface TypingEvent {
@@ -101,8 +96,6 @@ export function ChannelView({
   onOpenSearch,
   worldEmotes,
   jumpToMessageId,
-  onOpenCombatant,
-  onAddCombat,
 }: ChannelViewProps) {
   const qc = useQueryClient();
   const channelId = channel.id;
@@ -524,18 +517,6 @@ export function ChannelView({
       >
         <ChatHelp audience={canManage ? 'pj' : 'hrac'} />
       </WorldHelpModal>
-
-      {/* 16.1e — combat lišta (roster + iniciativa + ovládání boje). Sama se
-          skryje hráči, když žádný boj neběží; PJ ji má pro přidávání vždy. */}
-      {onOpenCombatant && onAddCombat && (
-        <ChatInitiativeBar
-          worldId={worldId}
-          channelId={channelId}
-          isManager={canManage}
-          onOpenInfo={onOpenCombatant}
-          onAdd={onAddCombat}
-        />
-      )}
 
       <div className={s.body}>
         {history.isLoading ? (

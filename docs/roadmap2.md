@@ -319,7 +319,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Závislosti:** těží z hotové Fáze 14–15 (bezpečné a příjemné prostředí), ale 16.1 lze specovat paralelně.
 
-### - [ ] 16.1 Dlouhé příběhy ve světovém chatu (oddělené příběhové kanály) — [E1 · dopad vysoký · náklad malý] 🔁
+### - [x] 16.1 Dlouhé příběhy ve světovém chatu (oddělené příběhové kanály) — [E1 · dopad vysoký · náklad malý] 🔁
 **Cíl:** Dlouhé, paralelní a **oddělené** příběhy/ságy se hrají **ve světovém chatu** — PJ má kanály jako jednotlivé příběhové linky / místa. **Žádný nový typ chatu.** Karta = ověřit, že stávající chat tohle plně zvládá, a doladit chybějící drobnosti pro vyprávěcí hraní.
 **Proč:** Tvé rozhodnutí (2026-06-15c): světový chat **je k tomu uzpůsoben** — kanály/skupiny drží oddělené příběhy, máme hraní „za postavu" (PJ persona + avatar postavy, chat 6.7/6.8). Stavět třetí systém vláken by byl zbytečný náklad i riziko rozbití funkčního chatu.
 **Návrh přípravy:** projít existující světový chat skrz potřeby vyprávěcího hraní a vypsat, co (pokud něco) chybí — typicky: odběr kanálu + push na nový příspěvek, archiv/řazení dlouhé linky, čtení dlouhých formátovaných příspěvků na mobilu, snadné přepnutí mluvící postavy.
@@ -343,7 +343,8 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Závislost:** 16.2c skin engine (tokenizované sheety). Bez něj jen UI háček bez obsahu.
 **Otevřené:** Skin chatu = skin deníku, nebo samostatná volba? Týká se jen deníkového railu v chatu, nebo i bublin zpráv? PJ override (vynutit styl), nebo čistě hráčská volba jako 5.9b?
 
-#### - [ ] 16.1e Bestie v konverzaci — perzistentní soubojové instance (jako mapa) — [dopad střední · náklad střední] · *zpětná vazba testerů*
+#### - [x] 16.1e Bestie v konverzaci — perzistentní soubojové instance (jako mapa) — ✅ 2026-06-24 [dopad střední · náklad střední] · *zpětná vazba testerů*
+> **✅ Implementováno 2026-06-24** (spec+plan 16.1e; BE pushnuto na main `35f6b2b`, FE lokální, build+testy zelené, čeká BE restart + živý smoke). **Rozšířeno nad rámec karty** dle dialogu s autorem: nejen bestie, ale **plný combat roster** (PC/NPC/bestie, v boji/mimo) + **kola/„na tahu"** (R6) + viditelnost HP per typ (per-konverzace 👁 + world default). **UX revize D2:** přesunuto z vodorovné lišty nad chatem do **vertikálního rail módu „⚔️ Souboj"** (lišta ukrajovala výšku textu). Bestie = perzistentní instance na `ChatChannel` (atomické operace), PC/NPC = reference (HP z deníku). Detail: spec-16.1e, funkce/13.
 **Cíl:** V konverzaci, kde běží **souboj**, jde mít **víc kopií téže bestie** (stejně jako na taktické mapě), měnit jim **životy** a **uložit je do konverzace**, aby s nimi šlo pracovat **dlouhodobě**.
 **Proč:** PC a NPC drží stav v **deníku** (charakterové subdokumenty). **Bestie fungují jinak** — jsou to nezávislé **instance bez deníku** (`project_bestie_token_instance`, 3-tier `project_npc_vs_bestie`). V chatu dnes (rail 16.1b/c) je bestie statblok z katalogu jen read-flow; chybí **perzistentní instance s HP vázaná na konverzaci**.
 **Návrh:** bestie instance v chatu = stejný model jako bestie `MapToken` (nezávislá instance: `health.current` seed, vlastní `notes`/`abilities`), ale **scope = konverzace** místo scény. Pole instancí uložit na `ChatChannel` (konverzaci); reuse `buildBestieToken` + `BestieStatblock` z 16.1b/c; HP editovatelné a perzistentní napříč session. Combat-tracker-lite, ne plná mapa v chatu.
