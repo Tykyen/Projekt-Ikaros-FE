@@ -6,6 +6,7 @@ import {
   type NewPageChoice,
 } from '@/features/world/pages/PageEditor/components/NewPageWizardModal';
 import { WorldSearchModal } from '@/features/world/search/components/WorldSearchModal';
+import { ChatNavLink } from '@/features/world/chat/components/ChatNavLink/ChatNavLink';
 import { useAtomValue, useSetAtom } from 'jotai';
 import clsx from 'clsx';
 import s from './WorldLayout.module.css';
@@ -515,6 +516,15 @@ export function WorldLayout() {
           {/* Spec 2.4 — full nav jen pro membery / globální adminy */}
           {showFullNav && (
             <>
+              {/* Tester-feedback — chat byl přehlížený (chyběl v nav). Zvýrazněný
+                  vstup jako PRVNÍ položka, accent pill + unread badge. */}
+              {realWorldId && (
+                <ChatNavLink
+                  variant="bar"
+                  worldSlug={worldSlug}
+                  worldId={realWorldId}
+                />
+              )}
               <nav className={s.nav}>
                 {nav.map((group) => (
                   <NavDropdown
@@ -564,9 +574,11 @@ export function WorldLayout() {
 
                 {/* Krok 5.7a — vstup do Nastavení světa (vč. tab Vzhled);
                     viditelnost tabů uvnitř gatuje role */}
+                {/* ≤768px: ⚙ ustupuje searchi (s.settingsBtn skryto), nastavení
+                    je dostupné z draweru — viz drawer níže. */}
                 <Link
                   to={`/svet/${worldSlug}/nastaveni`}
-                  className={s.actionBtn}
+                  className={clsx(s.actionBtn, s.settingsBtn)}
                   title="Nastavení světa"
                 >
                   ⚙
@@ -625,18 +637,27 @@ export function WorldLayout() {
               onClick={() => setDrawerOpen(false)}
             />
             <div className={clsx(s.drawer, drawerOpen && s.drawerOpen)}>
-              {/* 13.1 — hledání v draweru (na mobilu není lupa v headeru) */}
-              <button
-                type="button"
-                className={s.drawerSearch}
-                onClick={() => {
-                  setDrawerOpen(false);
-                  setSearchOpen(true);
-                }}
-              >
-                <Search size={16} aria-hidden="true" />
-                Hledat ve světě
-              </button>
+              {/* Tester-feedback — zvýrazněný chat jako první položka draweru. */}
+              {realWorldId && (
+                <ChatNavLink
+                  variant="drawer"
+                  worldSlug={worldSlug}
+                  worldId={realWorldId}
+                  onClick={() => setDrawerOpen(false)}
+                />
+              )}
+              {/* Nastavení světa — v draweru JEN na mobilu (≤768), kde ⚙ ustoupilo
+                  z headeru searchi. Nad 768px je ⚙ v headeru → tady skryto
+                  (s.drawerSettingsOnly), ať se nedubluje. Taby uvnitř gatuje role. */}
+              <div className={clsx(s.drawerSection, s.drawerSettingsOnly)}>
+                <Link
+                  to={`/svet/${worldSlug}/nastaveni`}
+                  className={s.drawerLink}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  ⚙ Nastavení světa
+                </Link>
+              </div>
               {isPJ && (
                 <button
                   type="button"

@@ -371,26 +371,13 @@
   margin-bottom: var(--sp-2);
 }
 
-/* 13.1 — hledání v draweru (neutrální surface, ne accent jako Nová stránka) */
-.drawerSearch {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-height: 44px; /* touch target — base.md */
-  padding: var(--sp-3) var(--sp-2);
-  border-radius: var(--radius-md);
-  background: var(--bg-card-hover);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  cursor: pointer;
+.drawerSection {
   margin-bottom: var(--sp-2);
 }
 
-.drawerSection {
-  margin-bottom: var(--sp-2);
+/* Nastavení v draweru jen na mobilu (≤768); nad tím je ⚙ v headeru → bez duplicity. */
+@media (min-width: 769px) {
+  .drawerSettingsOnly { display: none; }
 }
 
 /* 12.3 — sbalovací nadpis sekce draweru (nahradil statický drawerSectionTitle) */
@@ -467,9 +454,10 @@
 
 @media (max-width: 768px) {
   .header { gap: var(--sp-2); }
-  /* 13.1 — na mobilu se lupa z headeru schová (tlačila by ostatní akce);
-     hledání je dostupné z draweru (drawerSearch) */
-  .searchIconBtn { display: none; }
+  /* Tester-feedback — lupa zpět do headeru vedle pošty (hledání hráč používá
+     často). Místo uvolní ⚙ nastavení, které na mobilu ustoupí do draweru. */
+  .searchIconBtn { display: flex; }
+  .settingsBtn { display: none; }
   /* Spec 5.1 — na mobilu slot postavy jen avatar (jméno by tlačilo header) */
   .personaName { display: none; }
   /* 6.8-followup — touch target ≥ 44px (slot je klikatelný). */

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
@@ -28,6 +29,8 @@ import { ChatContextRail } from './rail/ChatContextRail';
 import { GroupDialog } from './GroupDialog';
 import { ChannelDialog } from './ChannelDialog';
 import { ChatSearchModal } from './ChatSearchModal';
+import { useChatSkin } from '../skins/useChatSkin';
+import { getTheme } from '@/themes/registry';
 import s from './WorldChatRoom.module.css';
 
 /** Orchestrátor světového chatu — sidebar + konverzace + presence panel. */
@@ -35,6 +38,14 @@ export function WorldChatRoom() {
   const { worldId, userRole } = useWorldContext();
   const user = useAtomValue(currentUserAtom);
   const qc = useQueryClient();
+
+  // 16.1d — skin chatu = motiv světa (override per hráč přebíjí). `applyVars`
+  // jen při overridu ≠ motiv světa → inline `--theme-*` zvoleného skinu; jinak
+  // chat dědí `:root` (zachová 5.9b overrides + přesný vzhled světa).
+  const chatSkin = useChatSkin(worldId);
+  const chatSkinStyle = chatSkin.applyVars
+    ? (getTheme(chatSkin.skin).vars as unknown as CSSProperties)
+    : undefined;
 
   const groups = useChatGroups(worldId);
   const unread = useUnread(worldId);
@@ -258,6 +269,8 @@ export function WorldChatRoom() {
         sidebarOpen && s.sidebarOpen,
         railOpen && s.membersOpen,
       )}
+      data-chat-skin={chatSkin.skin}
+      style={chatSkinStyle}
     >
       <div className={s.sidebarSlot}>
         <ChannelSidebar

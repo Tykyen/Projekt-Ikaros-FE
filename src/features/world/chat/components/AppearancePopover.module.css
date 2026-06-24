@@ -340,6 +340,64 @@
   cursor: not-allowed;
 }
 
+/* ── 16.1d — skin chatu (motiv světa) ──────────────────────────────── */
+.skinGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.skinBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  background: transparent;
+  border: 1px solid var(--theme-border-soft);
+  border-radius: var(--radius-xs, 4px);
+  color: var(--theme-text-dim);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  transition: background 100ms ease-out, border-color 100ms ease-out, color 100ms ease-out;
+}
+
+.skinBtn:hover {
+  color: var(--theme-text);
+  border-color: var(--theme-border);
+}
+
+.skinBtnActive {
+  color: var(--ch-accent, var(--theme-accent));
+  border-color: var(--ch-accent, var(--theme-accent));
+  background: color-mix(in srgb, var(--ch-accent, var(--theme-accent)) 12%, transparent);
+}
+
+.skinEmoji {
+  font-size: 15px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.skinLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skinAuto {
+  grid-column: 1 / -1;
+  justify-content: center;
+}
+
+/* Mobil — větší dotykové terče (blíž 44px ideálu). */
+@media (max-width: 768px) {
+  .skinBtn {
+    padding: 10px 11px;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   @keyframes popIn {
     from {

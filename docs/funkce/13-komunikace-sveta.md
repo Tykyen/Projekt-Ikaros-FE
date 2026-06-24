@@ -98,6 +98,7 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - Zprávy: cursor paginace (`GET …/channels/:id/messages`), odeslání, editace, smazání (soft / PJ hard), emoji reakce (`PUT …/reactions/:emoji`).
 - **Mentions:** `@username`, `@all`, `@here`, i `@character-slug` (dvoukrokový resolve) — `chat.service.ts:967-1010`.
 - **Vzhled mé zprávy:** per-svět barva + font + velikost (`GET/PATCH …/appearance`, z `WorldMembership`), server-side fill při neposlání (`chat.service.ts:961-965`).
+- **Skin chatu (16.1d):** vzhled chatu = **motiv světa** (žánr) — propíše se všem automaticky. Hráč si v 🎨 paletce („Vzhled chatu") přebije skin svého chatu na jiný z 12 motivů, jen pro sebe v tomto světě (`WorldMembership.chatSkin`, whitelist `WORLD_THEME_IDS`; `null` = auto dle světa). Aplikace: `data-chat-skin` na `WorldChatRoom .room` + při overridu scoped přepis `--theme-*` z `getTheme(skin).vars` (`useChatSkin`); paleta+fonty bez refaktoru chat CSS (chrome už čte `--theme-*`), atmosféra per žánr v `chat-skins.css`. Default (bez overridu) dědí `:root` → Ikaros = beze změny. **Stav:** ✅ (BE čeká restart).
 - **Přílohy:** `POST …/upload` (max 10 MB, member-only guard přes `getMembershipAppearance`).
 - **NPC mód:** `overrideName/overrideAvatarUrl/overridePageSlug` jen pro `canManageChat` (PomocnyPJ+) — `chat.service.ts:925-936`.
 - **Hledání:** `GET …/search` (substring v zprávách světa).

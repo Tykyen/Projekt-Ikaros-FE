@@ -18,6 +18,26 @@
   transform: translateY(-2px);
 }
 
+/* Accent varianta (chat) — vyčnívá z trojice dlaždic: accent nádech pozadí,
+   trvalý accent obrys a jemný glow. Tester-feedback (chat byl přehlížený). */
+.tileAccent {
+  background: linear-gradient(135deg, var(--accent-soft), var(--surface-2));
+  border-color: var(--accent-dim);
+  box-shadow: var(--shadow-md), 0 0 20px var(--accent-soft);
+}
+.tileAccent:hover {
+  border-color: var(--accent);
+}
+
+/* Výzva „Otevřít ›" — naplní místo po chybějícím čísle. */
+.cta {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+  color: var(--accent-bright);
+  white-space: nowrap;
+}
+
 .icon {
   display: inline-flex;
   color: var(--accent);

@@ -12,6 +12,7 @@ import { Spinner } from '@/shared/ui';
 import { RoleGuard } from '@/features/admin/components/RoleGuard';
 import { WorldMembershipGuard } from '@/features/admin/components/WorldMembershipGuard';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
+import { applyStartupRestore, saveLastRoute } from '@/shared/lib/lastRoute';
 import { UserRole, WorldRole } from '@/shared/types';
 import NotFoundPage from '@/pages/errors/NotFoundPage';
 import ErrorPage from '@/pages/errors/ErrorPage';
@@ -139,6 +140,11 @@ export function requireAuth({ request }: LoaderFunctionArgs) {
 }
 
 // ── Router ────────────────────────────────────────────────────────────────
+// PWA „obnov poslední místo": přepíše URL na poslední route PŘED inicializací
+// routeru (cold open standalone PWA na rootu) → router naběhne rovnou tam, bez
+// bliknutí dashboardu. No-op v prohlížeči / při refreshi / pro nepřihlášeného.
+applyStartupRestore();
+
 export const router = createBrowserRouter([
   // IkarosLayout — některé child routes veřejné, některé chráněné per-route
   {
@@ -347,3 +353,9 @@ export const router = createBrowserRouter([
   // 404
   { path: '*', element: <NotFoundPage /> },
 ]);
+
+// Pamatuj poslední „smysluplnou" route (mimo dashboard/auth) pro PWA cold-open
+// obnovu. localStorage přežije zavření PWA (na rozdíl od sessionStorage intent).
+router.subscribe((state) => {
+  saveLastRoute(state.location.pathname + state.location.search);
+});

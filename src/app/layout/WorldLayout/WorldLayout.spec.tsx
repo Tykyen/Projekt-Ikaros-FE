@@ -37,6 +37,11 @@ vi.mock('@/features/world/pages/api/usePagesDirectory', () => ({
 vi.mock('@/features/world/hooks/useWorldSocket', () => ({
   useWorldSocket: () => undefined,
 }));
+// ChatNavLink (zvýrazněný vstup do chatu) volá useWorldChatUnread → useQuery;
+// stub, aby layout test nepotřeboval QueryClientProvider.
+vi.mock('@/features/world/api/useWorldChat', () => ({
+  useWorldChatUnread: () => 0,
+}));
 
 const fakeWorld: World = {
   id: 'w1',

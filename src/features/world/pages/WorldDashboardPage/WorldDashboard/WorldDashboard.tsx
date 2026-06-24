@@ -37,6 +37,8 @@ export function WorldDashboard({ world }: Props) {
         label="Chat"
         to={`/svet/${world.slug}/chat`}
         badge={chatUnread}
+        accent
+        cta="Otevřít"
       />
       <div className={`${s.cell} ${s.colAkce}`}>
         <EventsColumn worldId={world.id} />

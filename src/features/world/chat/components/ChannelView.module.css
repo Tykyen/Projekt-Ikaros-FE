@@ -142,3 +142,25 @@
     height: 44px;
   }
 }
+
+/* ── 16.1d — per-skin chrome ornamenty hlavičky (gated ancestor [data-chat-skin]).
+   Jen pár ikonických; zbytek nese atmosféra plochy (chat-skins.css). Top hrana,
+   ať nekoliduje s `.header::after` (nit kanálu dole). ── */
+:global([data-chat-skin='cyberpunk']) .header {
+  border-top: 3px solid transparent;
+  border-image: repeating-linear-gradient(
+      45deg,
+      var(--theme-accent) 0 10px,
+      transparent 10px 20px
+    )
+    3;
+}
+
+:global([data-chat-skin='western']) .header {
+  border-top: 3px double var(--theme-accent);
+}
+
+:global([data-chat-skin='steampunk']) .header,
+:global([data-chat-skin='historie']) .header {
+  box-shadow: inset 0 2px 0 color-mix(in srgb, var(--theme-heading) 20%, transparent);
+}

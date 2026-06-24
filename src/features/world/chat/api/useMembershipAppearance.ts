@@ -12,6 +12,8 @@ export interface MembershipAppearance {
   chatColor: string | null;
   chatFont: string | null;
   chatFontSize: string | null;
+  /** 16.1d — per-svět skin chatu (= motiv světa; null = auto dle světa). */
+  chatSkin: string | null;
   /** Krok 6.3e — per-svět volba skinu kostek per typ. */
   diceSkinMapping: Record<string, string> | null;
   /** Krok 6.3 D-NEW-dice-jail — uvězněné skiny (skryté z hlavního gridu). */
@@ -35,6 +37,8 @@ export interface UpdateAppearancePayload {
   chatColor?: string | null;
   chatFont?: string | null;
   chatFontSize?: string | null;
+  /** 16.1d — skin chatu (světový ThemeId; null = auto). */
+  chatSkin?: string | null;
   diceSkinMapping?: Record<string, string> | null;
   jailedDiceSkins?: string[];
 }

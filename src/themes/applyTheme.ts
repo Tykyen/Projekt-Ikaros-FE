@@ -91,3 +91,21 @@ export async function applyTheme(
 
   await Promise.all([loadDecorations(theme.id as ThemeId), ...fontPromises]);
 }
+
+/**
+ * 16.1d — načte fonty motivu BEZ zápisu na `:root`. Pro skin chatu, který může
+ * mít jiný font než aktivní motiv světa (override skin → svět ho nenačetl).
+ * Reuse `loadFont` (dedup přes `loadedFonts`).
+ */
+export async function loadThemeFonts(id: string): Promise<void> {
+  const theme = getTheme(id);
+  const tasks: Promise<void>[] = [];
+  if (theme.fonts.logo) tasks.push(loadFont(theme.fonts.logo));
+  if (theme.fonts.display && theme.fonts.display !== theme.fonts.logo) {
+    tasks.push(loadFont(theme.fonts.display));
+  }
+  if (theme.fonts.body && theme.fonts.body !== theme.fonts.display) {
+    tasks.push(loadFont(theme.fonts.body));
+  }
+  await Promise.all(tasks);
+}

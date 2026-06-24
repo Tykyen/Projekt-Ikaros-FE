@@ -38,3 +38,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak:** `commit` hlásí víc souborů, než jsem naposledy `add`-oval; navazující commit „nothing to commit".
 
 ---
+
+### CH-022 — Diagnostika „odhlašuje mě z mobilu" naslepo (TTL fallback + per-user model), ač deník měl přímý záznam · 2026-06-24
+**Kontext:** Uživatel: „pracuju na PC, odhlásí mě z mobilu, nechci to, restart vázat na uživatele". Spustil jsem 2× Explore (BE+FE auth), dospěl k hypotéze „degradovaný fallback `JWT_REFRESH_TTL_DAYS ?? 3`" a doporučil **variantu B (per-user sliding session)**, dokonce eskaloval na `spec-driven-development`. Teprve při čtení kódu pro spec jsem zjistil, že B je technicky nerealizovatelná (refresh token + cookie fyzicky sídlí na klientovi, server z PC requestu na mobilní token nedosáhne; `refresh()` ani nečte DB `expiresAt`). A pak jsem (až teď) otevřel index deníku — kde byl **přímý záznam z 2026-06-21**: sliding UŽ existuje, TTL je úmyslně 3 d, kořen „odhlašuje po dnech" = **refresh v prod nejede (cross-site cookie / deploy topologie)**, ne kód/model.
+**Co jsem udělal špatně:** (1) Diagnostikoval a doporučil řešení (B) **před** čtením kódu, který určuje proveditelnost. (2) Index deníku jsem přečetl až po dvou agentech a jednom doporučení — přitom tam byl hotový závěr přesně k téhle otázce. Riskoval jsem zopakování už zamítnuté cesty (měnit TTL/model místo deploye).
+**Proč to je problém:** base.md má deník jako **brzdu proti cyklení** — „před opakováním přístupu projdi index". U opakujícího se tématu (auth/session) jsem ho neprošel první → málem druhý průchod stejnou slepou uličkou.
+**Poučení:** (1) U auth/session/deploy témat **čti `docs/chybovy-denik/README.md` index PRVNÍ**, před Explore agenty. (2) Nedoporučuj konkrétní variantu řešení, dokud nemám přečtený kód, který rozhoduje o proveditelnosti — „doporučuju B" před ověřením = slib, který beru zpět. (3) httpOnly cookie + JWT `exp` = expirace žije na klientovi; „per-user obnova cizího zařízení ze serveru" je principiálně mimo dosah → nevymýšlet pro to spec.
+**Příznak cyklení:** Vracím se k tématu, které deník už uzavřel jiným kořenem; navrhuju měnit TTL/auth model, ač předchozí závěr ukázal na deploy.
+
+---

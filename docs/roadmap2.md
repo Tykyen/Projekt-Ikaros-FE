@@ -335,7 +335,8 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 **Doplněno 2026-06-23 — dvě konkrétní rozšíření 16.1** (návaznost na 16.2c skiny + zpětná vazba testerů):
 
-#### - [ ] 16.1d Vzhled/skin chatu — volba stylu hráčem (váže na 16.2c) — [dopad střední · náklad malý]
+#### - [x] 16.1d Vzhled/skin chatu — volba stylu hráčem — ✅ 2026-06-24 [dopad střední · náklad malý]
+> **✅ Hotovo 2026-06-24 (spec-16.1d, BE čeká restart).** **Pivot vs. původní návrh:** skin chatu = **motiv světa** (12 žánrů), NE 7 systémových skinů deníku (16.2c). PJ motiv světa se propíše do chatu; hráč v 🎨 paletce přebije skin svého chatu (per člen×svět, `WorldMembership.chatSkin`). Engine = scoped přepis `--theme-*` z `getTheme(skin).vars` na `data-chat-skin` kontejneru (žádný refaktor chat CSS — chrome už čte `--theme-*`) + atmosféra per žánr. Ikaros = baseline 1:1. ⚠️ Chat je plochý message-stream (ne bubliny) → reskin nese paleta+fonty+chrome.
 **Cíl:** Hráč si v **nastavení chatu** (paletka 🎨 v hlavičce konverzace — dnes barva/font/velikost zprávy, 6.2f) zvolí i **vizuální skin/vzhled** (chatu, resp. deníku v chatu) a vybere si, který se mu líbí. Reuse sady stylů z **16.2c** (sci-fi / fantasy / horor / …).
 **Proč:** Výrazný HUD nesedne každému (stejný důvod jako 16.2c). Volba je **per hráč** a nikomu se nepropisuje — přesný vzor je per-člen „Můj vzhled" světa (**5.9b**, hotovo 2026-06-23: člen si volí vlastní motiv/pozadí jen pro sebe).
 **Návrh:** rozšířit per-svět chat prefs na membershipu (`chatColor/chatFont/chatFontSize`, 6.2f) o volbu skinu; aplikovat přes `data-diary-skin` (engine 16.2c) na chat/rail. **Skin engine se staví jednou v 16.2c** a sdílí se (deník · mapa · chat — 3 místa, viz otevřená otázka 16.2c).

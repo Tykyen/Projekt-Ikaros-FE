@@ -15,6 +15,8 @@ import {
   useMembershipAppearance,
   useUpdateAppearance,
 } from '../api/useMembershipAppearance';
+import { useChatSkin } from '../skins/useChatSkin';
+import { CHAT_SKINS } from '../skins/registry';
 import s from './AppearancePopover.module.css';
 
 /**
@@ -62,6 +64,8 @@ export function AppearancePopover({
 }: Props) {
   const appearance = useMembershipAppearance(worldId);
   const update = useUpdateAppearance(worldId);
+  // 16.1d — skin chatu (motiv světa); přepíná instantně, mimo commit „podpisu".
+  const chatSkin = useChatSkin(worldId);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Lokální nepotvrzený stav (živý preview); na uložení se commit do BE.
@@ -178,6 +182,44 @@ export function AppearancePopover({
           <X size={16} />
         </button>
       </header>
+
+      {/* 16.1d — Vzhled chatu (motiv světa). Default „Automaticky" dědí motiv
+          PJ; volba zde ho přebije jen pro můj chat v tomto světě. Instant. */}
+      <section className={s.section}>
+        <h3 className={s.sectionTitle}>Vzhled chatu</h3>
+        <div className={s.skinGrid}>
+          <button
+            type="button"
+            className={clsx(
+              s.skinBtn,
+              s.skinAuto,
+              !chatSkin.isExplicit && s.skinBtnActive,
+            )}
+            onClick={() => chatSkin.setSkin(null)}
+            disabled={chatSkin.isPending}
+          >
+            <span className={s.skinEmoji}>🌍</span>
+            <span className={s.skinLabel}>Automaticky (dle světa)</span>
+          </button>
+          {CHAT_SKINS.map((sk) => (
+            <button
+              key={sk.id}
+              type="button"
+              className={clsx(
+                s.skinBtn,
+                chatSkin.isExplicit &&
+                  chatSkin.skin === sk.id &&
+                  s.skinBtnActive,
+              )}
+              onClick={() => chatSkin.setSkin(sk.id)}
+              disabled={chatSkin.isPending}
+            >
+              <span className={s.skinEmoji}>{sk.emoji}</span>
+              <span className={s.skinLabel}>{sk.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* Náhled */}
       <div className={s.previewWrap} aria-label="Náhled zprávy">

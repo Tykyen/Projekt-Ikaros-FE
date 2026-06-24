@@ -12,6 +12,7 @@ import {
   registerModalOpenAtom,
 } from '@/shared/store/authStore';
 import { isJwtValid } from '@/shared/lib/jwt';
+import { clearLastRoute } from '@/shared/lib/lastRoute';
 import type {
   AuthResponse,
   LoginRequest,
@@ -128,6 +129,8 @@ export function useLogout() {
       store.set(pendingLogoutAtom, null);
       // C-29 — vyčisti RQ cache (jinak osobní data přežijí pro dalšího uživatele).
       qc.clear();
+      // Hygiena — ať PWA cold open po odhlášení nevede na starou/cizí route.
+      clearLastRoute();
     }, LOGOUT_UNDO_MS);
 
     return function cancel() {

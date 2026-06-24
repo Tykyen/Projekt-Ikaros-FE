@@ -529,9 +529,12 @@ export function WorldSection() {
             U zpráv funguje odpověď s citací, emoji reakce, šepot, přílohy, editace,
             <strong>smazání vlastní zprávy</strong>, zmínka <code>@jméno</code>, herní
             datum, PJ NPC mód a hod kostkou (🎲) se 30 skiny. Vzhled svých zpráv i
-            kostek si nastavíš přes paletku 🎨 v <strong>hlavičce konverzace</strong>,
-            zvlášť pro každý svět. Na mobilu klávesa <strong>Enter</strong> dělá nový
-            řádek (odstavec) — zprávu odešleš tlačítkem.
+            kostek — a také <strong>vzhled (skin) celého chatu</strong> — si nastavíš
+            přes paletku 🎨 v <strong>hlavičce konverzace</strong>, zvlášť pro každý
+            svět. Chat se sám ladí podle <strong>motivu světa</strong>; pokud ti styl
+            nesedí, přepneš si v paletce skin chatu na jiný motiv jen pro sebe. Na
+            mobilu klávesa <strong>Enter</strong> dělá nový řádek (odstavec) — zprávu
+            odešleš tlačítkem.
           </CalloutBox>
           <p>
             Vedení světa (PJ i Pomocný PJ) může v chatu vystupovat{' '}

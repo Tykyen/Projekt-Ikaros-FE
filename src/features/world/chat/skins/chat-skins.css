@@ -1,0 +1,97 @@
+/**
+ * 16.1d — Atmosférická vrstva skinů chatu (per motiv světa).
+ *
+ * Paletu+fonty řeší engine `useChatSkin` (scoped přepis `--theme-*` na
+ * kontejneru `.room[data-chat-skin]`). Tady jen **žánrová atmosféra plochy** —
+ * overlay přes `::after` na kontejneru (pointer-events:none, drží se plochy,
+ * NE hashovaných tříd modulů). Ornamenty na konkrétní prvky (hlavička/composer)
+ * žijí scoped `:global([data-chat-skin])` v jejich modulech.
+ *
+ * Chat je plochý message-stream (ne bubliny) → atmosféra = textura/vinětace
+ * přes celou plochu. Ikaros = baseline (1:1 dnešní vzhled, žádný overlay).
+ * Originál per skin (`feedback_skin_originality`), žádné sdílení.
+ */
+
+[data-chat-skin]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  /* Skiny níž plní; bez náplně = nic (ikaros / moderní = klid). */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-chat-skin]::after { animation: none !important; }
+}
+
+/* ⚔️ FANTASY — teplá zlatá vinětace, lehký svit shora */
+[data-chat-skin='fantasy']::after {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(227, 198, 107, 0.06), transparent 55%),
+    radial-gradient(130% 100% at 50% 100%, transparent 62%, rgba(6, 14, 10, 0.4));
+}
+
+/* 🩸 DARK-FANTASY — těžká temná vinětace + nádech krve shora */
+[data-chat-skin='dark-fantasy']::after {
+  background:
+    radial-gradient(120% 70% at 50% -5%, rgba(181, 30, 46, 0.07), transparent 50%),
+    radial-gradient(130% 120% at 50% 50%, transparent 48%, rgba(0, 0, 0, 0.55));
+}
+
+/* 🛸 SCI-FI / VESMÍR — jemná holo mřížka přes plochu */
+[data-chat-skin='vesmir']::after {
+  background-image:
+    linear-gradient(rgba(79, 212, 228, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 212, 228, 0.045) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+/* ☣️ CYBERPUNK — kyselý scan + varovný nádech u horní hrany */
+[data-chat-skin='cyberpunk']::after {
+  background:
+    linear-gradient(180deg, rgba(240, 208, 32, 0.06), transparent 8%),
+    repeating-linear-gradient(0deg, rgba(240, 208, 32, 0.035) 0 1px, transparent 1px 4px);
+}
+
+/* ⚙️ STEAMPUNK — teplá mosazná vinětace */
+[data-chat-skin='steampunk']::after {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(200, 137, 58, 0.06), transparent 55%),
+    radial-gradient(130% 120% at 50% 100%, transparent 60%, rgba(10, 6, 2, 0.42));
+}
+
+/* ☢️ APOKALYPSA — svislé grunge šrafy, rezavý nádech dole */
+[data-chat-skin='apokalypsa']::after {
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 2px, transparent 2px 6px),
+    radial-gradient(130% 120% at 50% 100%, transparent 64%, rgba(160, 104, 64, 0.08));
+}
+
+/* 🕯️ HOROR — silná svíčková vinětace, teplý střed */
+[data-chat-skin='horor']::after {
+  background:
+    radial-gradient(90% 70% at 50% 42%, rgba(200, 154, 82, 0.05), transparent 60%),
+    radial-gradient(135% 130% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.62));
+}
+
+/* 🌧️ MYSTERY — šikmé dešťové šmouhy + rohový svit lampy */
+[data-chat-skin='mystery']::after {
+  background:
+    radial-gradient(160px 90px at 96% 2%, rgba(216, 162, 74, 0.12), transparent 70%),
+    repeating-linear-gradient(74deg, rgba(150, 170, 190, 0.035) 0 1px, transparent 1px 11px);
+}
+
+/* 📜 HISTORIE — teplý pergamenový nádech */
+[data-chat-skin='historie']::after {
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(189, 154, 78, 0.05), transparent 60%),
+    radial-gradient(130% 120% at 50% 100%, transparent 66%, rgba(20, 10, 8, 0.34));
+}
+
+/* 🤠 WESTERN — spálená teplá vinětace + jemná zrnitost */
+[data-chat-skin='western']::after {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(207, 138, 68, 0.055), transparent 58%),
+    radial-gradient(130% 120% at 50% 100%, transparent 62%, rgba(14, 8, 3, 0.4));
+}

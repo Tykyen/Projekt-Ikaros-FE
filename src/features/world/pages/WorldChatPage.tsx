@@ -1,4 +1,5 @@
 import '../chat/chatSkin.css';
+import '../chat/skins/chat-skins.css';
 import { WorldChatRoom } from '../chat/components/WorldChatRoom';
 import { DiceRollOverlayProvider } from '../chat/dice/components/DiceRollOverlayProvider';
 
