@@ -20,3 +20,28 @@
   color: var(--theme-text-muted, var(--text-muted));
   cursor: pointer;
 }
+
+/* 16.1e — banner „přidat do boje" nad hledáním. */
+.addBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-2);
+  border-radius: var(--radius-sm, 6px);
+  background: rgb(var(--map-ui-gold-rgb) / 0.12);
+  border: 1px solid rgb(var(--map-ui-gold-rgb) / 0.4);
+  color: var(--map-ui-gold-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.addBanner button {
+  border: 1px solid rgb(var(--map-ui-gold-rgb) / 0.5);
+  background: transparent;
+  color: var(--map-ui-gold-text);
+  border-radius: var(--radius-sm, 6px);
+  padding: 2px 10px;
+  cursor: pointer;
+  font-size: var(--text-xs);
+}

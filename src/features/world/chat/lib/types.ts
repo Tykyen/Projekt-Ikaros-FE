@@ -56,6 +56,59 @@ export interface GroupWithChannels {
   channels: ChatChannel[];
 }
 
+// ─── 16.1e — combat roster konverzace (type-sync s BE chat-channel.interface) ──
+
+export interface ChatCombatantBase {
+  id: string;
+  /** Řazení v liště (desc). */
+  initiative: number;
+  /** V boji (lišta) vs. mimo boj (bench). */
+  inCombat: boolean;
+  /** U `character` rozlišuje PC/NPC → visibility flag (R3). */
+  isNpc?: boolean;
+  createdAt: string;
+}
+
+/** PC/NPC v rosteru — jen reference; HP/staty žijí v DENÍKU (single source). */
+export interface ChatCharacterCombatant extends ChatCombatantBase {
+  kind: 'character';
+  characterSlug: string;
+}
+
+/** Bestie v rosteru — perzistentní instance se snapshotem (nemá deník). */
+export interface ChatBestieCombatant extends ChatCombatantBase {
+  kind: 'bestie';
+  bestieId: string;
+  name: string;
+  imageUrl?: string;
+  systemStats: Record<string, unknown>;
+  abilities: { name: string; description: string }[];
+  notes: string;
+}
+
+export type ChatCombatant = ChatCharacterCombatant | ChatBestieCombatant;
+
+/** Stav boje konverzace (R6) — před `active` jen roster, žádné kolo/pointer. */
+export interface ChatCombatState {
+  active: boolean;
+  round: number;
+  currentCombatantId?: string;
+}
+
+/** Resolvovaná viditelnost HP per typ (R3) — z GET, hráč ji respektuje. */
+export interface ChatCombatConfig {
+  showHpPc: boolean;
+  showHpNpc: boolean;
+  showHpBestie: boolean;
+}
+
+/** `GET /worlds/:id/chat/channels/:cid/combatants` — server-filtrovaný dle role. */
+export interface ChannelCombatRoster {
+  combatants: ChatCombatant[];
+  combat: ChatCombatState;
+  config: ChatCombatConfig;
+}
+
 /** Přítomný uživatel v konverzaci (presence panel, jen PJ+). */
 export interface ChannelPresenceUser {
   userId: string;

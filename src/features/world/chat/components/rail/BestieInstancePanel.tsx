@@ -1,0 +1,184 @@
+/**
+ * 16.1e — bok bestie INSTANCE z combat rosteru konverzace (otevřený přes „i").
+ * Na rozdíl od 16.1c `BestieRollPanel` (read-only katalog) je tahle perzistentní:
+ * PJ edituje HP/staty/schopnosti/poznámky → autosave (debounce 500 ms, vzor
+ * `MatrixBestiePanel`) do konverzace přes `useCombatantMutation`. Schopnost →
+ * hod do chatu (atribuce = jméno+obrázek instance). „🗑" odebere z boje.
+ */
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, X, Trash2 } from 'lucide-react';
+import type { MapToken } from '@/features/world/tactical-map/types';
+import {
+  BestieStatblock,
+  type AbilityDraft,
+} from '@/features/world/tactical-map/components/tokens/BestieStatblock';
+import type { ChatBestieCombatant } from '../../lib/types';
+import { useCombatantMutation } from '../../api/useChannelCombat';
+import { useChatDiaryRoll } from './useChatDiaryRoll';
+import s from './railShell.module.css';
+
+interface Props {
+  worldId: string;
+  channelId: string;
+  systemId: string;
+  combatant: ChatBestieCombatant;
+  canEdit: boolean;
+  onBack?: () => void;
+  onClose?: () => void;
+}
+
+const AUTOSAVE_MS = 500;
+
+export function BestieInstancePanel({
+  worldId,
+  channelId,
+  systemId,
+  combatant,
+  canEdit,
+  onBack,
+  onClose,
+}: Props) {
+  const mut = useCombatantMutation(worldId, channelId);
+  const makeOnRoll = useChatDiaryRoll(worldId, channelId);
+  const onRoll = makeOnRoll({
+    kind: 'bestie',
+    rollerName: combatant.name,
+    avatarUrl: combatant.imageUrl,
+  });
+
+  // BestieStatblock čte z `token` jen `templateId` (katalogový lore); zbytek
+  // jde přes props → minimální pseudo-token stačí.
+  const token = useMemo(
+    () => ({ templateId: combatant.bestieId }) as unknown as MapToken,
+    [combatant.bestieId],
+  );
+
+  // Lokální editovaný stav (seed z instance), re-seed při přepnutí na jinou.
+  const [stats, setStats] = useState<Record<string, unknown>>(
+    combatant.systemStats,
+  );
+  const [abilities, setAbilities] = useState<AbilityDraft[]>(() =>
+    combatant.abilities.map((a) => ({ label: a.name, value: a.description })),
+  );
+  const [notes, setNotes] = useState(combatant.notes);
+
+  useEffect(() => {
+    setStats(combatant.systemStats);
+    setAbilities(
+      combatant.abilities.map((a) => ({ label: a.name, value: a.description })),
+    );
+    setNotes(combatant.notes);
+  }, [combatant.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced autosave (vzor MatrixBestiePanel). `mut.mutate` je stabilní.
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const schedule = (patch: {
+    systemStats?: Record<string, unknown>;
+    abilities?: { name: string; description: string }[];
+    notes?: string;
+  }) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(
+      () => mut.mutate({ op: 'update', combatantId: combatant.id, patch }),
+      AUTOSAVE_MS,
+    );
+  };
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const onStatsChange = (next: Record<string, unknown>) => {
+    setStats(next);
+    schedule({ systemStats: next });
+  };
+  const onAbilitiesChange = (next: AbilityDraft[]) => {
+    setAbilities(next);
+    schedule({
+      abilities: next.map((a) => ({ name: a.label, description: a.value })),
+    });
+  };
+  const onNotesChange = (next: string) => {
+    setNotes(next);
+    schedule({ notes: next });
+  };
+
+  const remove = () => {
+    if (!window.confirm(`Odebrat „${combatant.name}" z boje?`)) return;
+    mut.mutate({ op: 'remove', combatantId: combatant.id });
+    onBack?.();
+  };
+
+  return (
+    <aside className={s.panel}>
+      <div className={s.controls}>
+        {onBack && (
+          <button
+            type="button"
+            className={s.iconBtn}
+            onClick={onBack}
+            aria-label="Zpět"
+            title="Zpět"
+          >
+            <ArrowLeft size={16} />
+          </button>
+        )}
+        <div className={s.spacer} />
+        {canEdit && (
+          <button
+            type="button"
+            className={s.iconBtn}
+            onClick={remove}
+            aria-label="Odebrat z boje"
+            title="Odebrat z boje"
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
+        {onClose && (
+          <button
+            type="button"
+            className={s.iconBtn}
+            onClick={onClose}
+            aria-label="Zavřít"
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
+
+      <div className={s.identity}>
+        <div className={s.avatar}>
+          {combatant.imageUrl ? (
+            <img src={combatant.imageUrl} alt={combatant.name} />
+          ) : (
+            <div className={s.avatarFallback}>
+              {combatant.name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <h2 className={s.name}>{combatant.name}</h2>
+      </div>
+
+      <div className={s.scroll}>
+        <BestieStatblock
+          token={token}
+          worldId={worldId}
+          systemId={systemId}
+          canEdit={canEdit}
+          stats={stats}
+          onStatsChange={onStatsChange}
+          abilities={abilities}
+          onAbilitiesChange={onAbilitiesChange}
+          notes={notes}
+          onNotesChange={onNotesChange}
+          disabled={false}
+          onRollAbility={(a) =>
+            onRoll({
+              label: a.label,
+              modifier: parseInt(a.value, 10) || 0,
+              kind: 'fate',
+            })
+          }
+        />
+      </div>
+    </aside>
+  );
+}

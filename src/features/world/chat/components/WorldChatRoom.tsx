@@ -98,6 +98,19 @@ export function WorldChatRoom() {
   const [searchOpen, setSearchOpen] = useState(false);
   // Rail v deníkovém/bestie módu = širší sloupec (jako panel taktické mapy).
   const [railWide, setRailWide] = useState(false);
+  // 16.1e — combatant otevřený z lišty přes „i" + mód „přidat do boje".
+  const [openCombatantId, setOpenCombatantId] = useState<string | null>(null);
+  const [combatAddMode, setCombatAddMode] = useState(false);
+  const openCombatant = useCallback((id: string) => {
+    setOpenCombatantId(id);
+    setCombatAddMode(false);
+    setRailOpen(true);
+  }, []);
+  const startCombatAdd = useCallback(() => {
+    setOpenCombatantId(null);
+    setCombatAddMode(true);
+    setRailOpen(true);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -166,6 +179,12 @@ export function WorldChatRoom() {
     if (!activeChannelId) return;
     localStorage.setItem(storeKey, activeChannelId);
   }, [activeChannelId, storeKey]);
+
+  // 16.1e — přepnutí konverzace → zahoď combat kontext (combatant.id neplatí jinde).
+  useEffect(() => {
+    setOpenCombatantId(null);
+    setCombatAddMode(false);
+  }, [activeChannelId]);
 
   // Po vybrání deep-linku (adjustment výše) ho ulož na server jako vědomou
   // volbu (cross-device) a vyčisti param z URL (replace), ať refresh nezůstane
@@ -316,6 +335,8 @@ export function WorldChatRoom() {
             jumpToMessageId={
               active.id === lastDeepLink ? jumpToMessageId : null
             }
+            onOpenCombatant={openCombatant}
+            onAddCombat={startCombatAdd}
           />
         ) : (
           <div className={s.state}>
@@ -337,6 +358,10 @@ export function WorldChatRoom() {
             presence={presence}
             onClose={() => setRailOpen(false)}
             onWideChange={setRailWide}
+            openCombatantId={openCombatantId}
+            onClearCombatant={() => setOpenCombatantId(null)}
+            combatAddMode={combatAddMode}
+            onCombatAddDone={() => setCombatAddMode(false)}
           />
         </div>
       )}
