@@ -218,3 +218,200 @@
     height: 16px;
   }
 }
+
+/* ── 16.1d-apokalypsa — RP datum jako stencil hlášení mezi dashed (trhanými)
+   rezavými linkami; datum Oswald uppercase. */
+:global([data-chat-skin='apokalypsa']) .badge {
+  gap: 12px;
+  color: var(--theme-heading, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+:global([data-chat-skin='apokalypsa']) .icon {
+  display: none;
+}
+:global([data-chat-skin='apokalypsa']) .badge::before,
+:global([data-chat-skin='apokalypsa']) .badge::after {
+  content: '';
+  width: 56px;
+  height: 0;
+  flex-shrink: 0;
+  border-top: 2px dashed var(--theme-accent-cyan, var(--theme-accent));
+  opacity: 0.7;
+}
+@media (max-width: 480px) {
+  :global([data-chat-skin='apokalypsa']) .badge {
+    gap: 9px;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+  }
+  :global([data-chat-skin='apokalypsa']) .badge::before,
+  :global([data-chat-skin='apokalypsa']) .badge::after {
+    width: 28px;
+  }
+}
+
+/* ── 16.1d-horor — RP datum mezi dvěma inkoustovými kaňkami (clip-path blob);
+   datum IM Fell italic. */
+:global([data-chat-skin='horor']) .badge {
+  gap: 12px;
+  color: var(--theme-heading, var(--accent));
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+}
+:global([data-chat-skin='horor']) .icon {
+  display: none;
+}
+:global([data-chat-skin='horor']) .badge::before,
+:global([data-chat-skin='horor']) .badge::after {
+  content: '';
+  width: 13px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.8;
+  background: var(--theme-accent);
+  clip-path: polygon(20% 5%, 45% 0, 62% 12%, 85% 8%, 95% 30%, 88% 52%, 100% 70%, 80% 88%, 55% 95%, 32% 100%, 12% 82%, 5% 58%, 0 32%, 8% 14%);
+}
+@media (max-width: 480px) {
+  :global([data-chat-skin='horor']) .badge {
+    gap: 9px;
+  }
+}
+
+/* ── 16.1d-mystery — RP datum jako utajený spis: mezi redakčními začerněnými
+   pruhy (tmavý blok + jantarový spodní okraj); datum mono uppercase. */
+:global([data-chat-skin='mystery']) .badge {
+  gap: 12px;
+  color: var(--theme-accent);
+  font-family: var(--font-mono, monospace);
+  font-weight: 500;
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+:global([data-chat-skin='mystery']) .icon {
+  display: none;
+}
+:global([data-chat-skin='mystery']) .badge::before,
+:global([data-chat-skin='mystery']) .badge::after {
+  content: '';
+  width: 56px;
+  height: 11px;
+  flex-shrink: 0;
+  opacity: 0.85;
+  background: var(--theme-surface-strong, var(--bg-secondary));
+  border-bottom: 2px solid var(--theme-accent);
+}
+@media (max-width: 480px) {
+  :global([data-chat-skin='mystery']) .badge {
+    gap: 9px;
+    letter-spacing: 0.08em;
+  }
+  :global([data-chat-skin='mystery']) .badge::before,
+  :global([data-chat-skin='mystery']) .badge::after {
+    width: 28px;
+  }
+}
+
+/* ── 16.1d-historie — RP datum mezi dvěma fleurony ❧ (oxblood rubrikace);
+   datum Cormorant italic. */
+:global([data-chat-skin='historie']) .badge {
+  gap: 12px;
+  color: var(--theme-heading, var(--accent));
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+}
+:global([data-chat-skin='historie']) .icon {
+  display: none;
+}
+:global([data-chat-skin='historie']) .badge::before,
+:global([data-chat-skin='historie']) .badge::after {
+  content: '❧';
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--theme-accent-cyan, var(--theme-accent));
+}
+:global([data-chat-skin='historie']) .badge::after {
+  transform: scaleX(-1);
+}
+@media (max-width: 480px) {
+  :global([data-chat-skin='historie']) .badge {
+    gap: 8px;
+  }
+}
+
+/* ── 16.1d-moderni — RP datum jako editorial kicker: mono uppercase tracking
+   mezi tenkými vlasovými linkami. Minimalistické (žádný ornament). */
+:global([data-chat-skin='moderni']) .badge {
+  gap: 16px;
+  color: var(--theme-accent);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+:global([data-chat-skin='moderni']) .icon {
+  display: none;
+}
+:global([data-chat-skin='moderni']) .badge::before,
+:global([data-chat-skin='moderni']) .badge::after {
+  content: '';
+  width: 48px;
+  height: 1px;
+  flex-shrink: 0;
+  background: var(--theme-border-soft);
+}
+@media (max-width: 480px) {
+  :global([data-chat-skin='moderni']) .badge {
+    gap: 10px;
+    letter-spacing: 0.14em;
+  }
+  :global([data-chat-skin='moderni']) .badge::before,
+  :global([data-chat-skin='moderni']) .badge::after {
+    width: 24px;
+  }
+}
+
+/* ── 16.1d-western — RP datum mezi dvěma provazovými děliči (vinuté lano přes
+   repeating-linear-gradient); datum Rye wood-type. */
+:global([data-chat-skin='western']) .badge {
+  gap: 12px;
+  color: var(--theme-heading, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  letter-spacing: 0.02em;
+}
+:global([data-chat-skin='western']) .icon {
+  display: none;
+}
+:global([data-chat-skin='western']) .badge::before,
+:global([data-chat-skin='western']) .badge::after {
+  content: '';
+  width: 56px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  opacity: 0.7;
+  background: repeating-linear-gradient(
+    66deg,
+    var(--theme-accent) 0 4px,
+    color-mix(in srgb, var(--theme-accent) 55%, var(--bg-primary, #000)) 4px 8px
+  );
+}
+@media (max-width: 480px) {
+  :global([data-chat-skin='western']) .badge {
+    gap: 9px;
+  }
+  :global([data-chat-skin='western']) .badge::before,
+  :global([data-chat-skin='western']) .badge::after {
+    width: 28px;
+  }
+}

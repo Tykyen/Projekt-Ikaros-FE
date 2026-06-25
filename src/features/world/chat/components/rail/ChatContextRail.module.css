@@ -188,3 +188,111 @@
   --map-canvas-bg: var(--bg-primary, #16100a);
   --map-token-ring-default: var(--theme-border);
 }
+
+/* ── 16.1d-apokalypsa — souboj/přítomní panel do vojenské zeleně + rzi. */
+:global([data-chat-skin='apokalypsa']) .tabWrap {
+  --map-ui-accent-rgb: 126, 156, 92;
+  --map-ui-accent-bright-rgb: 168, 196, 126;
+  --map-ui-gold-rgb: 226, 228, 212;
+  --map-ui-panel-rgb: 26, 32, 24;
+  --map-ui-panel-deep-rgb: 12, 15, 11;
+  --map-ui-text-on-dark-rgb: 212, 212, 198;
+  --map-ui-blue-bright-rgb: 160, 104, 64;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #10130e);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-horor — souboj/přítomní panel do svíčkového zlata + popela. */
+:global([data-chat-skin='horor']) .tabWrap {
+  --map-ui-accent-rgb: 200, 154, 82;
+  --map-ui-accent-bright-rgb: 232, 200, 132;
+  --map-ui-gold-rgb: 221, 212, 194;
+  --map-ui-panel-rgb: 20, 17, 13;
+  --map-ui-panel-deep-rgb: 7, 6, 5;
+  --map-ui-text-on-dark-rgb: 204, 198, 186;
+  --map-ui-blue-bright-rgb: 138, 132, 120;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #090807);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-mystery — souboj/přítomní panel do lampového jantaru + modrošedé. */
+:global([data-chat-skin='mystery']) .tabWrap {
+  --map-ui-accent-rgb: 216, 162, 74;
+  --map-ui-accent-bright-rgb: 240, 200, 120;
+  --map-ui-gold-rgb: 228, 226, 218;
+  --map-ui-panel-rgb: 22, 27, 36;
+  --map-ui-panel-deep-rgb: 9, 12, 17;
+  --map-ui-text-on-dark-rgb: 210, 212, 216;
+  --map-ui-blue-bright-rgb: 94, 116, 136;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #0c0f14);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-historie — souboj/přítomní panel do zlata + oxblood. */
+:global([data-chat-skin='historie']) .tabWrap {
+  --map-ui-accent-rgb: 189, 154, 78;
+  --map-ui-accent-bright-rgb: 221, 192, 121;
+  --map-ui-gold-rgb: 240, 230, 204;
+  --map-ui-panel-rgb: 36, 22, 18;
+  --map-ui-panel-deep-rgb: 16, 9, 8;
+  --map-ui-text-on-dark-rgb: 230, 220, 198;
+  --map-ui-blue-bright-rgb: 138, 59, 58;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #160d0c);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-moderni — souboj/přítomní panel do terakoty + šalvěje. */
+:global([data-chat-skin='moderni']) .tabWrap {
+  --map-ui-accent-rgb: 200, 126, 84;
+  --map-ui-accent-bright-rgb: 227, 163, 120;
+  --map-ui-gold-rgb: 240, 232, 214;
+  --map-ui-panel-rgb: 34, 28, 21;
+  --map-ui-panel-deep-rgb: 14, 11, 8;
+  --map-ui-text-on-dark-rgb: 230, 221, 205;
+  --map-ui-blue-bright-rgb: 125, 148, 120;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #15110d);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-western — souboj/přítomní panel do spálené oranže + šalvěje. */
+:global([data-chat-skin='western']) .tabWrap {
+  --map-ui-accent-rgb: 207, 138, 68;
+  --map-ui-accent-bright-rgb: 232, 173, 108;
+  --map-ui-gold-rgb: 240, 228, 194;
+  --map-ui-panel-rgb: 36, 26, 16;
+  --map-ui-panel-deep-rgb: 15, 10, 6;
+  --map-ui-text-on-dark-rgb: 230, 216, 188;
+  --map-ui-blue-bright-rgb: 138, 138, 100;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #171009);
+  --map-token-ring-default: var(--theme-border);
+}

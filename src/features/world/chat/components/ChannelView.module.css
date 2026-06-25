@@ -284,3 +284,120 @@
     0 1px 0 color-mix(in srgb, var(--bg-primary, #000) 70%, transparent),
     0 -1px 0 color-mix(in srgb, var(--theme-accent-bright) 12%, transparent);
 }
+
+/* ── 16.1d-apokalypsa — military stencil & rez ──────────────────────────────
+   Drsné postapo; odliš od cyberpunk (neon žlutá) vojenskou zelení+rzí, od
+   steampunk (leštěná mosaz) zrezavělou drsností. Hlavička = duct-tape záplata
+   (::before, khaki z `--theme-text`) + dashed (trhaný) okraj + rezavé skvrny
+   (radial v rzi = `--theme-accent-cyan`) + stencil Oswald uppercase titul. */
+:global([data-chat-skin='apokalypsa']) .header {
+  border-bottom-style: dashed;
+  border-bottom-color: var(--theme-border-cyan, var(--theme-border-soft));
+  background:
+    radial-gradient(circle at 18% 120%, color-mix(in srgb, var(--theme-accent-cyan) 16%, transparent), transparent 35%),
+    radial-gradient(circle at 88% -10%, color-mix(in srgb, var(--theme-accent-cyan) 12%, transparent), transparent 30%),
+    var(--theme-surface-strong, var(--bg-secondary));
+  background-repeat: no-repeat;
+}
+:global([data-chat-skin='apokalypsa']) .header::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 18px;
+  width: 62px;
+  height: 19px;
+  z-index: 1;
+  opacity: 0.5;
+  transform: rotate(-4deg);
+  pointer-events: none;
+  clip-path: polygon(2% 10%, 98% 0, 100% 88%, 4% 100%);
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--theme-text) 42%, transparent) 0 6px,
+    color-mix(in srgb, var(--theme-text) 30%, transparent) 6px 12px
+  );
+}
+:global([data-chat-skin='apokalypsa']) .title {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── 16.1d-horor — viktoriánský sépiový okultismus ──────────────────────────
+   Tlumený strach; odliš od dark-fantasy (krvavý grimdark, ostré) sépií/parchmentem
+   a organickými ink-bleed okraji. Hlavička = ink-bleed (rozpitá) spodní nit
+   přes `mask` + iluminovaná iniciála se svíčkovým flickerem (IM Fell z motivu). */
+:global([data-chat-skin='horor']) .header::after {
+  height: 4px;
+  bottom: 0;
+  opacity: 0.55;
+  background: var(--ch-accent, var(--theme-accent));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='4' viewBox='0 0 120 4'%3E%3Cpath d='M0 1.5 Q15 0 30 1.8 T60 1.2 T90 2 T120 1.5 L120 4 L0 4 Z' fill='%23000'/%3E%3C/svg%3E") repeat-x bottom / 120px 4px;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='4' viewBox='0 0 120 4'%3E%3Cpath d='M0 1.5 Q15 0 30 1.8 T60 1.2 T90 2 T120 1.5 L120 4 L0 4 Z' fill='%23000'/%3E%3C/svg%3E") repeat-x bottom / 120px 4px;
+}
+:global([data-chat-skin='horor']) .title::first-letter {
+  font-size: 1.35em;
+  color: var(--theme-accent-bright, var(--theme-heading));
+  text-shadow: 0 0 10px var(--theme-glow-gold, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes hororCandle {
+    0%, 100% { text-shadow: 0 0 9px var(--theme-glow-gold, transparent); }
+    12% { text-shadow: 0 0 4px var(--theme-glow-gold, transparent); }
+    44% { text-shadow: 0 0 15px var(--theme-glow-gold, transparent); }
+    50% { text-shadow: 0 0 6px var(--theme-glow-gold, transparent); }
+    72% { text-shadow: 0 0 11px var(--theme-glow-gold, transparent); }
+  }
+  :global([data-chat-skin='horor']) .title::first-letter {
+    animation: hororCandle 5s ease-in-out infinite;
+  }
+}
+
+/* ── 16.1d-mystery — noir detektivka ────────────────────────────────────────
+   Analytický chlad; odliš od horor (okultní sépie/svíčka) lampovým jantarem +
+   chladnou modrošedou a deštěm. Hlavička = diagonální lampový úhel světla
+   (linear-gradient) + Cinzel uppercase titul. Statické (bez motion). */
+:global([data-chat-skin='mystery']) .header {
+  background:
+    linear-gradient(122deg, transparent 38%, color-mix(in srgb, var(--theme-accent) 8%, transparent) 52%, transparent 68%),
+    var(--theme-surface-strong, var(--bg-secondary));
+}
+:global([data-chat-skin='mystery']) .title {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── 16.1d-historie — iluminovaný středověký rukopis ────────────────────────
+   Autentický rukopis; odliš od fantasy (elfí zlato/filigrán/smaragd) rubrikací
+   (oxblood = historický červený inkoust) a iluminovanou drop-cap. Hlavička =
+   rubrikační dvojlinka (oxblood okraj + zlatá inset) + iluminovaná iniciála. */
+:global([data-chat-skin='historie']) .header {
+  border-bottom-color: var(--theme-border-cyan, var(--theme-border-soft));
+  box-shadow: inset 0 -3px 0 -1px var(--theme-border-soft);
+}
+:global([data-chat-skin='historie']) .title::first-letter {
+  font-size: 1.3em;
+  color: var(--theme-accent-bright, var(--theme-accent));
+}
+
+/* ── 16.1d-moderni — editorial magazín (klidný protipól) ────────────────────
+   ZÁMĚRNĚ minimalistické: žádné ornamenty, vzhled nese typografie (Fraunces) +
+   whitespace. Jediný akcent = krátká terakotová vlasová linka (nit kanálu
+   zkrácena na editorial značku). Restraint. */
+:global([data-chat-skin='moderni']) .header::after {
+  left: 24px;
+  right: auto;
+  width: 44px;
+  opacity: 1;
+  background: var(--ch-accent, var(--theme-accent));
+}
+:global([data-chat-skin='moderni']) .title {
+  letter-spacing: -0.01em;
+}
+
+/* ── 16.1d-western — wanted-poster letterpress ──────────────────────────────
+   Kovbojka; odliš od apokalypsa (military stencil zeleň+rez) spálenou oranží,
+   wood-type (Rye) a šerifskou hvězdou. Hlavička = wanted-poster dvojrám
+   (double border) + Rye titul. */
+:global([data-chat-skin='western']) .header {
+  border-bottom: 3px double var(--theme-border, var(--border));
+}

@@ -75,6 +75,50 @@
     0 0 5px var(--theme-glow-gold, transparent);
 }
 
+/* ── 16.1d-apokalypsa — aktivní kanál: trhaný (roztřepený) stencil marker. */
+:global([data-chat-skin='apokalypsa']) .item::before {
+  width: 4px;
+  background: var(--theme-accent);
+  clip-path: polygon(0 0, 100% 8%, 55% 26%, 100% 44%, 50% 62%, 100% 80%, 0 100%);
+}
+
+/* ── 16.1d-horor — aktivní kanál: inkoustová kaňka (rozpitá organická skvrna). */
+:global([data-chat-skin='horor']) .item::before {
+  width: 11px;
+  background: var(--theme-accent);
+  clip-path: polygon(20% 5%, 45% 0, 62% 12%, 85% 8%, 95% 30%, 88% 52%, 100% 70%, 80% 88%, 55% 95%, 32% 100%, 12% 82%, 5% 58%, 0 32%, 8% 14%);
+}
+
+/* ── 16.1d-mystery — aktivní kanál: lampový marker se svitem v mlze. */
+:global([data-chat-skin='mystery']) .active::before {
+  box-shadow: 0 0 7px var(--theme-glow-gold, transparent);
+}
+
+/* ── 16.1d-historie — aktivní kanál: rubrikační marker (oxblood + zlatý lem). */
+:global([data-chat-skin='historie']) .item::before {
+  width: 4px;
+  background: var(--theme-accent-cyan, var(--theme-accent));
+  box-shadow: 1px 0 0 var(--theme-accent);
+}
+
+/* ── 16.1d-moderni — aktivní kanál: tenká terakotová vlasová linka (editorial). */
+:global([data-chat-skin='moderni']) .item::before {
+  width: 2px;
+}
+
+/* ── 16.1d-western — aktivní kanál: šerifská hvězda ★ místo proužku. */
+:global([data-chat-skin='western']) .item::before {
+  content: '★';
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: auto;
+  background: none;
+  color: var(--theme-accent);
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
 .main {
   flex: 1;
   min-width: 0;
