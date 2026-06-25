@@ -176,27 +176,201 @@
  * (jméno/=); SÉMANTICKÉ +/−/total (cyan/červená/jantar) zůstávají = nesou
  * výsledek. Scoped na matrix → ostatní systémy beze změny. */
 [data-diary-system='matrix'] .readout {
-  /* vrstvíme panel PŘES neprůhledné --mx-bg: retro/minimal mají --mx-panel-bg
-     s alfou → samotný by ukazoval mapu skrz. --mx-bg je plný hex = výsledek
-     neprůhledný a stále v barvě skinu. */
-  background: var(--mx-panel-bg, linear-gradient(180deg, rgba(14, 12, 40, 0.95), rgba(10, 8, 32, 0.98))),
-    var(--mx-bg, #0e0f1e);
-  border-color: color-mix(in srgb, var(--mx-accent, #7864ff) 30%, transparent);
+  /* 16.2c-F3c — designovaný NEPRŮHLEDNÝ povrch skinu. --mx-log-surface dává skin
+     (MUSÍ být opaque); fallback = panel vrstvený přes plný --mx-bg. backdrop-filter
+     VYPNUT: na neprůhledném povrchu jen rozmazává mapu = vypadá „průhledně". */
+  background: var(--mx-log-surface,
+    var(--mx-panel-bg, linear-gradient(180deg, rgba(14, 12, 40, 0.95), rgba(10, 8, 32, 0.98))), var(--mx-bg, #0e0f1e));
+  border: 1px solid var(--mx-log-border, color-mix(in srgb, var(--mx-accent, #7864ff) 30%, transparent));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 [data-diary-system='matrix'] .faceBadge {
-  background: color-mix(in srgb, var(--mx-panel, #0e0f1e) 90%, transparent);
-  border-color: color-mix(in srgb, var(--mx-accent, #6464b4) 35%, transparent);
+  background: var(--mx-log-chip, color-mix(in srgb, var(--mx-panel, #0e0f1e) 92%, var(--mx-bg, #0e0f1e)));
+  border-color: var(--mx-log-border, color-mix(in srgb, var(--mx-accent, #6464b4) 35%, transparent));
+  font-family: var(--mx-log-num-font, var(--mx-font-num, 'Iceland', monospace));
+  color: var(--mx-log-num, var(--mx-text, #fff));
 }
-[data-diary-system='matrix'] .faceGeneric {
-  color: var(--mx-text, #fff);
+[data-diary-system='matrix'] .faceGeneric { color: var(--mx-log-num, var(--mx-text, #fff)); }
+/* čísla nesou skin (font+barva); znaménko +/− drží význam, ne barva */
+[data-diary-system='matrix'] .totalValue { font-family: var(--mx-log-num-font, var(--mx-font-num, 'Iceland', monospace)); }
+[data-diary-system='matrix'] .totalPositive {
+  color: var(--mx-log-total-pos, var(--mx-accent, #22d3ee));
+  text-shadow: var(--mx-log-total-shadow, 0 0 12px color-mix(in srgb, var(--mx-accent, #22d3ee) 60%, transparent));
 }
-[data-diary-system='matrix'] .skillName {
-  color: var(--mx-text, #fff);
+[data-diary-system='matrix'] .totalNegative { color: var(--mx-log-total-neg, var(--mx-danger, #f43f5e)); }
+[data-diary-system='matrix'] .totalNeutral {
+  color: var(--mx-log-total, var(--mx-gold, #ffdc28));
+  text-shadow: var(--mx-log-total-shadow, 0 0 12px color-mix(in srgb, var(--mx-gold, #ffdc28) 55%, transparent));
 }
-[data-diary-system='matrix'] .eqSign {
-  color: var(--mx-muted, rgba(150, 180, 255, 0.55));
-}
+[data-diary-system='matrix'] .equation { font-family: var(--mx-log-eq-font, var(--mx-font-display, 'Cinzel', serif)); }
+[data-diary-system='matrix'] .skillName { color: var(--mx-log-title, var(--mx-text, #fff)); }
+[data-diary-system='matrix'] .eqSign { color: var(--mx-muted, rgba(150, 180, 255, 0.55)); }
 [data-diary-system='matrix'] .rollerName {
   color: var(--mx-muted, rgba(180, 200, 255, 0.55));
-  font-family: var(--mx-font-display, 'Cinzel', serif);
+  font-family: var(--mx-log-eq-font, var(--mx-font-display, 'Cinzel', serif));
+}
+
+/* ════════════ 16.2c-F3c — per-skin SIGNATURE readoutu ════════════
+ * Tvarové ornamenty (rámy/nýty/scanlines/lístek) musí být ZDE (hashovaná
+ * třída `.readout` nejde zacílit z globálního diary-skins.css). Paletu+čísla
+ * řeší tokeny --mx-log-* v diary-skins.css. POZN.: `.readout` je position:fixed
+ * (overlay) → NEPŘEPISOVAT position (jen ::before/::after, fixed je positioned). */
+
+/* fantasy — dvojitý zlatý fillet (kožená vazba grimoáru) */
+[data-diary-system='matrix'][data-diary-skin='fantasy'] .readout {
+  box-shadow: 0 0 0 1px #100a03, 0 0 0 3px #9a7330, 0 0 0 5px #1a1207, 0 0 0 6px #6a4c1c,
+    0 20px 60px -10px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(200, 150, 50, 0.08);
+  border-radius: 4px;
+}
+
+/* horror — filigránová bordura + oxblood vnitřní glow */
+[data-diary-system='matrix'][data-diary-skin='horror'] .readout {
+  outline: 1px solid rgba(90, 84, 96, 0.45);
+  outline-offset: 4px;
+  box-shadow: inset 0 0 28px rgba(94, 22, 34, 0.38), inset 0 0 0 1px rgba(90, 84, 96, 0.15),
+    0 24px 64px rgba(0, 0, 0, 0.85), 0 4px 14px rgba(0, 0, 0, 0.75);
+}
+
+/* steampunk — kovová deska + rohové mosazné nýty */
+[data-diary-system='matrix'][data-diary-skin='steampunk'] .readout {
+  isolation: isolate;
+  box-shadow: inset 0 1px 0 rgba(210, 175, 90, 0.42), inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    inset 1px 0 0 rgba(210, 175, 90, 0.18), inset -1px 0 0 rgba(0, 0, 0, 0.4),
+    0 6px 28px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+[data-diary-system='matrix'][data-diary-skin='steampunk'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: inherit;
+  --_nyt: radial-gradient(circle at 38% 36%, #f4e0a0 0%, #c9a45e 38%, #7a5a2a 72%, #3a2610 100%);
+  background-image: var(--_nyt), var(--_nyt), var(--_nyt), var(--_nyt);
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+}
+
+/* nature — organický rám + letokruhová lišta + lísteček + dřevěné políčko */
+[data-diary-system='matrix'][data-diary-skin='nature'] .readout {
+  border-width: 2px;
+  border-radius: 14px 6px 14px 6px;
+  box-shadow: inset 0 0 0 1px #2a3a18, inset 0 0 0 3px #4e6a2c, inset 0 0 20px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(0, 0, 0, 0.7);
+  padding-left: 32px;
+}
+[data-diary-system='matrix'][data-diary-skin='nature'] .readout::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 22px;
+  height: 28px;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='28' viewBox='0 0 22 28' fill='none'%3E%3Cpath d='M11 27 L11 14' stroke='%234e6a2c' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M11 15 C11 9 17 6 20 5 C20 11 16 15 11 16Z' fill='%237aa840' opacity='0.75'/%3E%3Cpath d='M11 20 C11 15 6 12 3 12 C3 17 6 21 11 21Z' fill='%235e8832' opacity='0.68'/%3E%3Ccircle cx='11' cy='27' r='1.5' fill='%234e6a2c'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.7;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+[data-diary-system='matrix'][data-diary-skin='nature'] .faceBadge {
+  background: linear-gradient(180deg, #2a3818 0%, #1e2c12 100%), #161c0b;
+  border: 1.5px solid #5e8038;
+  box-shadow: inset 0 1px 0 rgba(158, 200, 90, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 4px 2px 4px 2px;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+/* minimal — dvojitý ledger rám archivní karty (position NEpřepisovat) */
+[data-diary-system='matrix'][data-diary-skin='minimal'] .readout {
+  overflow: visible;
+}
+[data-diary-system='matrix'][data-diary-skin='minimal'] .readout::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  pointer-events: none;
+  border: 1px solid #ddd6c7;
+  border-radius: 1px;
+  z-index: 0;
+}
+
+/* retro — terminálový double-rám + scanlines (position NEpřepisovat) */
+[data-diary-system='matrix'][data-diary-skin='retro'] .readout {
+  box-shadow: 0 0 0 1px #4a2e08, 0 0 0 2px #0c0601, 0 0 0 3px #8a5e15, 0 0 0 4px #0c0601,
+    0 0 0 5px rgba(255, 178, 39, 0.2), 0 10px 40px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(255, 100, 0, 0.06);
+  border-radius: 0;
+  overflow: visible;
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] .readout::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: repeating-linear-gradient(0deg, transparent 0, transparent 1.8px, rgba(0, 0, 0, 0.28) 1.8px, rgba(0, 0, 0, 0.28) 2.8px);
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] .faceBadge {
+  font-size: 1.3rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
+  text-shadow: 0 0 6px rgba(255, 194, 77, 0.8), 0 0 14px rgba(255, 122, 0, 0.5);
+  border-color: #8a5e15;
+  background: #160e02;
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] .skillName {
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] .totalValue {
+  font-size: 2rem;
+  letter-spacing: 2px;
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] .rollerName {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* anime/MLP — cel-shade ink rám + bílé chip kostky + ink-outlined total */
+[data-diary-system='matrix'][data-diary-skin='anime'] .readout {
+  border: 3px solid #16162e;
+  border-radius: 18px;
+  box-shadow: 0 0 0 6px #ffffff, 0 0 0 9px #16162e, 0 8px 0 9px #16162e, 0 16px 32px -8px rgba(26, 20, 80, 0.5);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .faceBadge {
+  background: #ffffff;
+  border: 2.5px solid #16162e;
+  border-radius: 10px;
+  box-shadow: 0 3px 0 #16162e, 0 4px 8px rgba(26, 20, 80, 0.25);
+  color: #16162e;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 900;
+  width: 36px;
+  height: 36px;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .totalValue {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 900;
+  font-size: 2rem;
+  -webkit-text-stroke: 2px #16162e;
+  text-shadow: 0 3px 0 #16162e;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .totalPositive {
+  color: #ff4d97;
+  -webkit-text-stroke: 2px #16162e;
+  text-shadow: 0 3px 0 #16162e;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .totalNegative {
+  color: #ff5d6c;
+  -webkit-text-stroke: 2px #16162e;
+  text-shadow: 0 3px 0 #16162e;
 }

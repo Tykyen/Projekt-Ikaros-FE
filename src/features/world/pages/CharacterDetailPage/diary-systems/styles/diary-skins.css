@@ -255,11 +255,6 @@
   --mx-pip-radius: 50%;
   --mx-pip-glow: none;
   --mx-seg-off: linear-gradient(180deg, #160f08, #1f150b);
-  /* drahokamový nýt (pip → token: nese se do mapy/chatu i listu) */
-  --mx-pip-on-bg: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.8), transparent 38%),
-    radial-gradient(circle at 50% 50%, var(--lvlc), color-mix(in srgb, var(--lvlc) 50%, #000) 95%);
-  --mx-pip-on-border: transparent;
-  --mx-pip-on-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.31), 0 0 5px -1px var(--lvlc), 0 1px 1px #000;
   --mx-seg-radius: 2px;
   --mx-hp-on: linear-gradient(180deg, #c14a2e, #7c2418);
   --mx-rune-on: linear-gradient(180deg, #3f7fae, #234e74);
@@ -387,7 +382,6 @@
 [data-diary-system='matrix'][data-diary-skin='fantasy'] .mx-fate .num {
   text-shadow: 0 1px 0 #4a120b, 0 2px 3px #000;
 }
-/* pip ON: signature v --mx-pip-on-* (blok skinu) → list i mapa/chat */
 /* smaltované rýhované ukazatele */
 [data-diary-system='matrix'][data-diary-skin='fantasy'] .mx-seg {
   box-shadow: inset 0 1px 2px #000, inset 0 -1px 0 rgba(255, 255, 255, 0.04);
@@ -471,11 +465,6 @@
   --mx-pip-radius: 50%;
   --mx-pip-glow: none;
   --mx-seg-off: linear-gradient(180deg, #0c070a, #150d12);
-  /* tmavý granát (pip → token: list i mapa/chat) */
-  --mx-pip-on-bg: radial-gradient(circle at 34% 26%, rgba(240, 216, 224, 0.67), transparent 36%),
-    radial-gradient(circle at 50% 56%, var(--lvlc), color-mix(in srgb, var(--lvlc) 42%, #000) 96%);
-  --mx-pip-on-border: transparent;
-  --mx-pip-on-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.44), inset 0 -1px 2px rgba(0, 0, 0, 0.5), 0 0 5px -1px var(--lvlc), 0 1px 1px #000;
   --mx-seg-radius: 2px;
   --mx-hp-on: linear-gradient(180deg, #a2283a, #5e1622);
   --mx-rune-on: linear-gradient(180deg, #8a6e98, #4a3858);
@@ -559,10 +548,10 @@
   background-repeat: no-repeat;
   background-size: 64px 64px;
   background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 0)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 0) scale(-1 1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 72) scale(1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 72) scale(-1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 0)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 0) scale(-1 1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 72) scale(1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 72) scale(-1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E");
   filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.67)) drop-shadow(0 0 7px rgba(200, 196, 207, 0.15));
 }
 /* elegantní stříbrný titulek (Cormorant SC) + lilie marker; odsaz od tracerie */
@@ -686,7 +675,6 @@
   border-radius: 1px;
   background: rgba(255, 255, 255, 0.1);
 }
-/* pip ON: signature v --mx-pip-on-* (blok skinu) → list i mapa/chat */
 /* aspekty kurzívou */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-aspect__name {
   font-style: italic;
@@ -764,10 +752,6 @@
   --mx-pip-radius: 50%;
   --mx-pip-glow: none;
   --mx-seg-off: linear-gradient(180deg, #1a120a, #221810);
-  /* mosazný cvoček (pip → token: list i mapa/chat) */
-  --mx-pip-on-bg: radial-gradient(circle at 36% 32%, #f4e0a0, var(--lvlc) 46%, color-mix(in srgb, var(--lvlc) 55%, #000) 88%);
-  --mx-pip-on-border: transparent;
-  --mx-pip-on-shadow: inset 0 0 0 1px #2a1d10, inset 0 -1px 1px rgba(0, 0, 0, 0.5), 0 1px 1px #000;
   --mx-seg-radius: 1px;
   --mx-hp-on: linear-gradient(180deg, #c97a3a, #7a4420);
   --mx-rune-on: linear-gradient(180deg, #5a9a8a, #2e5a50);
@@ -904,7 +888,6 @@
 [data-diary-system='matrix'][data-diary-skin='steampunk'] .mx-fate .star {
   display: none;
 }
-/* pip ON: signature v --mx-pip-on-* (blok skinu) → list i mapa/chat */
 
 /* ════════════ SKIN 5 — PŘÍRODA (živý letopis) ════════════
  * Vlastní tvarový jazyk: tmavé živé dřevo s mechovým prosvětlením shora,
@@ -982,11 +965,6 @@
   --mx-pip-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   --mx-pip-glow: none;
   --mx-seg-off: linear-gradient(180deg, #0e150a, #161f0d);
-  /* semínko / bobule (pip → token: list i mapa/chat) */
-  --mx-pip-on-bg: radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.8), transparent 40%),
-    radial-gradient(circle at 50% 55%, var(--lvlc), color-mix(in srgb, var(--lvlc) 48%, #000) 95%);
-  --mx-pip-on-border: transparent;
-  --mx-pip-on-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.31), 0 0 5px -1px var(--lvlc), 0 1px 1px #000;
   --mx-seg-radius: 7px;
   --mx-hp-on: linear-gradient(180deg, #93cc4a, #487420);
   --mx-rune-on: linear-gradient(180deg, #ecc262, #9a7424);
@@ -1148,7 +1126,6 @@
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.15);
 }
-/* pip ON: signature v --mx-pip-on-* (blok skinu) → list i mapa/chat */
 /* organické chipy */
 [data-diary-system='matrix'][data-diary-skin='nature'] .mx-chip {
   border-radius: 8px 2px 8px 2px;
@@ -1223,10 +1200,6 @@
   --mx-pip-radius: 1px;
   --mx-pip-glow: none;
   --mx-seg-off: #e9e2d3;
-  /* přesný plný čtvereček (pip → token: list i mapa/chat) */
-  --mx-pip-on-bg: var(--lvlc);
-  --mx-pip-on-border: transparent;
-  --mx-pip-on-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.9);
   --mx-seg-radius: 1px;
   --mx-hp-on: #9a7b2e;
   --mx-rune-on: #4a5862;
@@ -1397,7 +1370,6 @@
   border: none;
   box-shadow: inset 0 0 0 1px #cabfa8;
 }
-/* pip ON: signature v --mx-pip-on-* (blok skinu) → list i mapa/chat */
 /* ledger řádky — vlasová linka, akcentní index vlevo */
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-skill,
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-aspect,
@@ -1513,10 +1485,6 @@
   --mx-pip-radius: 0px;
   --mx-pip-glow: none;
   --mx-seg-off: #1a0f02;
-  /* pixelový pip (pip → token: list i mapa/chat) */
-  --mx-pip-on-bg: linear-gradient(180deg, color-mix(in srgb, var(--lvlc) 88%, #fff 12%), var(--lvlc));
-  --mx-pip-on-border: transparent;
-  --mx-pip-on-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.31), 0 0 5px -1px var(--lvlc), 0 0 1px var(--lvlc);
   --mx-seg-radius: 1px;
   --mx-hp-on: linear-gradient(180deg, #ffd061, #ff7a14);
   --mx-rune-on: linear-gradient(180deg, #ffc24d, #d99200);
@@ -1695,7 +1663,6 @@
   border-radius: 1px;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.38), 0 0 5px -1px rgba(255, 157, 26, 0.7);
 }
-/* pip ON: signature v --mx-pip-on-* (blok skinu) → list i mapa/chat */
 /* terminálové odrážky řádků */
 [data-diary-system='matrix'][data-diary-skin='retro'] .mx-skill__name::before {
   content: '\00B7\00A0';
@@ -1823,11 +1790,6 @@
   --mx-pip-radius: 50%;
   --mx-pip-glow: none;
   --mx-seg-off: #e7e2d6;
-  /* lesklý cel-shade gem (gloss dot zapečen do gradientu) → token: list i mapa/chat */
-  --mx-pip-on-bg: radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.9) 0, transparent 26%),
-    radial-gradient(circle at 36% 30%, #ffffff 0%, var(--lvlc) 46%, color-mix(in srgb, var(--lvlc) 62%, #16162e) 100%);
-  --mx-pip-on-border: transparent;
-  --mx-pip-on-shadow: 0 0 0 2px #16162e, 0 0 7px -1px var(--lvlc);
   --mx-seg-radius: 6px;
   --mx-hp-on: linear-gradient(180deg, #ff9a7a, #ff7a59);
   --mx-rune-on: linear-gradient(180deg, #6ec0ff, #3aa7ff);
@@ -2022,7 +1984,6 @@
   border: none;
   box-shadow: inset 0 0 0 2px #16162e, inset 0 -2px 0 #c9c2b2;
 }
-/* pip ON: signature v --mx-pip-on-* (blok skinu, gloss dot zapečen) → list i mapa/chat */
 /* cel-karty řádků: ink obrys + cel drop + tlustý barevný levý okraj */
 [data-diary-system='matrix'][data-diary-skin='anime'] .mx-skill {
   border: none;
@@ -2044,4 +2005,166 @@
 }
 [data-diary-system='matrix'][data-diary-skin='anime'] .mx-chip.depleted {
   background: linear-gradient(180deg, #9aa0b5, #6f7690);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 16.2c-F3c — DICE READOUT + ROLL LOG token kontrakt per skin
+ * Konzumují DiceRollOverlay.module.css + DiceLogPanel.module.css. Povrch
+ * (--mx-log-surface) je VŽDY plně NEPRŮHLEDNÝ (žádná alfa) → readout/log
+ * neprosvítá mapu. Čísla nesou skin (barva + font). Signature tvary (rámy,
+ * scanlines, nýty…) jsou v modulech (hashované třídy nejdou z global CSS).
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='matrix'][data-diary-skin='fantasy'] {
+  --mx-log-surface:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 90% 60% at 15% 20%, #3d2c14 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 80%, #2e1f0e 0%, transparent 50%),
+    linear-gradient(160deg, #2e2010 0%, #261a0c 40%, #1e1409 70%, #221709 100%);
+  --mx-log-border: #9a7330;
+  --mx-log-title: #e3c06a;
+  --mx-log-chip: #2e1e0a;
+  --mx-log-num: #d4a82a;
+  --mx-log-num-font: 'Cinzel', serif;
+  --mx-log-total: #c9a020;
+  --mx-log-total-pos: #f0c84a;
+  --mx-log-total-neg: #d95030;
+  --mx-log-total-shadow: 0 1px 0 #1a1005, 0 0 14px rgba(200, 150, 30, 0.45), 0 2px 4px rgba(0, 0, 0, 0.7);
+  --mx-log-eq-font: 'Cormorant Garamond', serif;
+}
+[data-diary-system='matrix'][data-diary-skin='horror'] {
+  --mx-log-surface:
+    linear-gradient(160deg, #1e1118 0%, #180e14 45%, #120a10 100%),
+    #120a10;
+  --mx-log-border: #5a5460;
+  --mx-log-title: #c8c4cf;
+  --mx-log-chip: #2c1520;
+  --mx-log-num: #e8dfd4;
+  --mx-log-num-font: 'Cormorant Garamond', Georgia, serif;
+  --mx-log-total: #c8c4cf;
+  --mx-log-total-pos: #c8506a;
+  --mx-log-total-neg: #b89ec8;
+  --mx-log-total-shadow: 0 0 10px rgba(162, 40, 58, 0.55), 0 1px 0 rgba(0, 0, 0, 0.9);
+  --mx-log-eq-font: 'Cormorant SC', Georgia, serif;
+}
+[data-diary-system='matrix'][data-diary-skin='steampunk'] {
+  --mx-log-surface:
+    linear-gradient(118deg, rgba(255, 255, 255, 0) 0%, rgba(220, 180, 100, 0.09) 35%, rgba(255, 235, 160, 0.14) 50%, rgba(180, 140, 70, 0.07) 65%, rgba(0, 0, 0, 0) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.78' numOctaves='2'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #382818 0%, #2c1d10 55%, #201209 100%),
+    #201209;
+  --mx-log-border: #9a7830;
+  --mx-log-title: #e0bc72;
+  --mx-log-chip: rgba(120, 88, 34, 0.65);
+  --mx-log-num: #f0d080;
+  --mx-log-num-font: 'Cinzel Decorative', serif;
+  --mx-log-total: #d4a84a;
+  --mx-log-total-pos: #7ecfad;
+  --mx-log-total-neg: #e88840;
+  --mx-log-total-shadow: 0 1px 0 rgba(0, 0, 0, 0.85), 0 0 12px rgba(200, 160, 60, 0.5), 0 0 28px rgba(200, 160, 60, 0.25);
+  --mx-log-eq-font: 'Special Elite', serif;
+}
+[data-diary-system='matrix'][data-diary-skin='nature'] {
+  --mx-log-surface:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045 0.008' numOctaves='5' seed='23'/%3E%3CfeColorMatrix type='saturate' values='0.2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23w)' opacity='0.09'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #2f3d1c 0%, #26321a 42%, #1e2813 72%, #171e0f 100%),
+    #161c0b;
+  --mx-log-border: #5e8038;
+  --mx-log-title: #b8e070;
+  --mx-log-chip: #2e4218;
+  --mx-log-num: #f0c060;
+  --mx-log-num-font: 'Cormorant Garamond', serif;
+  --mx-log-total: #d4a040;
+  --mx-log-total-pos: #f2c04a;
+  --mx-log-total-neg: #e07040;
+  --mx-log-total-shadow: 0 0 10px rgba(232, 176, 72, 0.55), 0 1px 0 rgba(0, 0, 0, 0.8);
+  --mx-log-eq-font: 'Marcellus', serif;
+}
+[data-diary-system='matrix'][data-diary-skin='minimal'] {
+  --mx-log-surface:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.032'/%3E%3C/svg%3E"),
+    #f6f2e9;
+  --mx-log-border: #cabfa8;
+  --mx-log-title: #4d4a42;
+  --mx-log-chip: #eee7d6;
+  --mx-log-num: #20211f;
+  --mx-log-num-font: 'Spline Sans Mono', monospace;
+  --mx-log-total: #4d4a42;
+  --mx-log-total-pos: #6e5520;
+  --mx-log-total-neg: #8b3a22;
+  --mx-log-total-shadow: none;
+  --mx-log-eq-font: 'Fraunces', serif;
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] {
+  --mx-log-surface: #0d0701;
+  --mx-log-border: #8a5e15;
+  --mx-log-title: #ffb627;
+  --mx-log-chip: #1e1002;
+  --mx-log-num: #ffc24d;
+  --mx-log-num-font: 'VT323', monospace;
+  --mx-log-total: #ffb627;
+  --mx-log-total-pos: #ffe7b8;
+  --mx-log-total-neg: #ff5500;
+  --mx-log-total-shadow: 0 0 8px rgba(255, 220, 150, 0.9), 0 0 20px rgba(255, 157, 26, 0.6), 0 0 3px #fff;
+  --mx-log-eq-font: 'Share Tech Mono', monospace;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] {
+  --mx-log-surface:
+    linear-gradient(135deg, #ff5d6c 0%, #ff9a4d 16%, #ffe14d 33%, #5bd47e 50%, #3ac0ff 66%, #7a6bff 82%, #ff6ad5 100%);
+  --mx-log-border: #16162e;
+  --mx-log-title: #16162e;
+  --mx-log-chip: rgba(255, 255, 255, 0.85);
+  --mx-log-num: #16162e;
+  --mx-log-num-font: 'Bricolage Grotesque', sans-serif;
+  --mx-log-total: #2b2a55;
+  --mx-log-total-pos: #ff4d97;
+  --mx-log-total-neg: #ff5d6c;
+  --mx-log-total-shadow: 0 0 0 2px #16162e, 0 2px 0 rgba(22, 22, 46, 0.3);
+  --mx-log-eq-font: 'Outfit', sans-serif;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 16.2c-F3b-FIX — pip ON gem = PŘÍMÁ deklarace (NE přes token).
+ * Token --mx-pip-on-bg obsahoval var(--lvlc), který se resolvoval na
+ * skin-wrapperu (bez --lvlc) → guaranteed-invalid → fallback na plochý lvlc.
+ * Recept s var(--lvlc) MUSÍ být přímo na pip pravidle (--lvlc je tam in scope).
+ * Stejné recepty i v MatrixCombat/BestiePanel.module.css (mapa/chat .pip).
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='matrix'][data-diary-skin='fantasy'] .mx-pip.on {
+  border-color: transparent;
+  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.8), transparent 38%),
+    radial-gradient(circle at 50% 50%, var(--lvlc), color-mix(in srgb, var(--lvlc) 50%, #000) 95%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.31), 0 0 5px -1px var(--lvlc), 0 1px 1px #000;
+}
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-pip.on {
+  border-color: transparent;
+  background: radial-gradient(circle at 34% 26%, rgba(240, 216, 224, 0.67), transparent 36%),
+    radial-gradient(circle at 50% 56%, var(--lvlc), color-mix(in srgb, var(--lvlc) 42%, #000) 96%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.44), inset 0 -1px 2px rgba(0, 0, 0, 0.5), 0 0 5px -1px var(--lvlc), 0 1px 1px #000;
+}
+[data-diary-system='matrix'][data-diary-skin='steampunk'] .mx-pip.on {
+  border-color: transparent;
+  background: radial-gradient(circle at 36% 32%, #f4e0a0, var(--lvlc) 46%, color-mix(in srgb, var(--lvlc) 55%, #000) 88%);
+  box-shadow: inset 0 0 0 1px #2a1d10, inset 0 -1px 1px rgba(0, 0, 0, 0.5), 0 1px 1px #000;
+}
+[data-diary-system='matrix'][data-diary-skin='nature'] .mx-pip.on {
+  border-color: transparent;
+  background: radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.8), transparent 40%),
+    radial-gradient(circle at 50% 55%, var(--lvlc), color-mix(in srgb, var(--lvlc) 48%, #000) 95%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.31), 0 0 5px -1px var(--lvlc), 0 1px 1px #000;
+}
+[data-diary-system='matrix'][data-diary-skin='minimal'] .mx-pip.on {
+  border-color: transparent;
+  background: var(--lvlc);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] .mx-pip.on {
+  border-color: transparent;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lvlc) 88%, #fff 12%), var(--lvlc));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.31), 0 0 5px -1px var(--lvlc), 0 0 1px var(--lvlc);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-pip.on {
+  border-color: transparent;
+  background: radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.9) 0, transparent 26%),
+    radial-gradient(circle at 36% 30%, #ffffff 0%, var(--lvlc) 46%, color-mix(in srgb, var(--lvlc) 62%, #16162e) 100%);
+  box-shadow: 0 0 0 2px #16162e, 0 0 7px -1px var(--lvlc);
 }

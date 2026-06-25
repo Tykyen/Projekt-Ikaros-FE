@@ -593,12 +593,13 @@
   border: 1px solid rgba(255, 255, 255, 0.07);
   padding: 0;
 }
-/* 16.2c-F3b — pip ON = token --mx-pip-on-* (signature per skin, jeden zdroj
-   pro list i kompaktní panely v mapě/chatu). Fallback = sci-fi (plný lvlc + glow). */
+/* 16.2c-F3b — base pip ON = plochý sci-fi (lvlc + glow). Per-skin gem recept
+   je PŘÍMÉ pravidlo v diary-skins.css (list) + modulech (mapa/chat) — recept
+   s var(--lvlc) NEJDE přes token (na skin-wrapperu bez --lvlc = invalid). */
 [data-diary-system='matrix'] .mx-pip.on {
-  background: var(--mx-pip-on-bg, var(--lvlc));
-  border-color: var(--mx-pip-on-border, rgba(255, 255, 255, 0.27));
-  box-shadow: var(--mx-pip-on-shadow, var(--mx-pip-glow));
+  background: var(--lvlc);
+  border-color: rgba(255, 255, 255, 0.27);
+  box-shadow: var(--mx-pip-glow);
 }
 [data-diary-system='matrix'] .mx-pip.entity.on {
   animation: mx-pulse 1.4s ease-in-out infinite;
