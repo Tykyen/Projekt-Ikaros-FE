@@ -53,6 +53,22 @@ interface MessageListProps {
 const isWhisper = (m: ChatMessage) => !!m.visibleTo && m.visibleTo.length > 0;
 const msgTime = (m: ChatMessage) => new Date(m.createdAt).getTime();
 
+/**
+ * Navazuje `cur` na `prev` jako pokračování téže skupiny (stejný autor, stejný
+ * whisper-stav, ne reply, do času okna)? Sdílený předpis pro `grouped` (vůči
+ * předchozí) i `groupEnd` (vůči následující) — rámeček skupiny zpráv.
+ */
+const isContinuation = (
+  prev: ChatItem | undefined,
+  cur: ChatItem,
+): boolean =>
+  prev?.kind === 'message' &&
+  cur.kind === 'message' &&
+  prev.message.senderId === cur.message.senderId &&
+  isWhisper(prev.message) === isWhisper(cur.message) &&
+  !cur.message.replyToId &&
+  msgTime(cur.message) - msgTime(prev.message) < GROUP_WINDOW_MS;
+
 /** Scrollovací výpis zpráv — seskupování, auto-scroll, empty stav. */
 export function MessageList({
   items,
@@ -215,18 +231,17 @@ export function MessageList({
           );
         }
         const prev = items[i - 1];
-        const grouped =
-          prev?.kind === 'message' &&
-          prev.message.senderId === item.message.senderId &&
-          isWhisper(prev.message) === isWhisper(item.message) &&
-          !item.message.replyToId &&
-          msgTime(item.message) - msgTime(prev.message) < GROUP_WINDOW_MS;
+        const next = items[i + 1];
+        const grouped = isContinuation(prev, item);
+        // Konec skupiny = následující zpráva už není pokračováním (nebo nic / system).
+        const groupEnd = !(next && isContinuation(item, next));
         return (
           <MessageItem
             key={item.message.id}
             message={item.message}
             currentUserId={currentUserId}
-            grouped={!!grouped}
+            grouped={grouped}
+            groupEnd={groupEnd}
             surfaceColor={surfaceColor}
             canDelete={canDelete}
             usersById={usersById}

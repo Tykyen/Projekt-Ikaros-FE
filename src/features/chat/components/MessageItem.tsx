@@ -24,6 +24,8 @@ interface MessageItemProps {
   currentUserId: string;
   /** Po sobě jdoucí zpráva téhož autora — skryje hlavičku (jméno + čas). */
   grouped: boolean;
+  /** Poslední zpráva ve skupině — uzavře rámeček skupiny (spodní hrana). */
+  groupEnd: boolean;
   /** Computed `--theme-surface` pro kontrast guard barvy textu. */
   surfaceColor: string;
   /** Admin/Superadmin → zobrazí tlačítko smazat. */
@@ -104,6 +106,7 @@ export function MessageItem({
   message,
   currentUserId,
   grouped,
+  groupEnd,
   surfaceColor,
   canDelete,
   usersById,
@@ -206,7 +209,7 @@ export function MessageItem({
     return (
       <div
         ref={(el) => registerRef(message.id, el)}
-        className={clsx(s.item, s.deleted, grouped && s.grouped)}
+        className={clsx(s.item, s.deleted, grouped && s.grouped, groupEnd && s.groupEnd)}
       >
         {grouped ? (
           <div className={s.avatarSlotGrouped} aria-hidden="true" />
@@ -258,6 +261,7 @@ export function MessageItem({
         s.item,
         isWhisper && s.whisper,
         grouped && s.grouped,
+        groupEnd && s.groupEnd,
         highlighted && s.highlighted,
         isPending && s.pending,
         isFailed && s.failed,

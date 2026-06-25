@@ -91,3 +91,27 @@
   cursor: pointer;
   font-size: var(--text-xs);
 }
+
+/* ── 16.1d-fantasy — souboj/přítomní panel do elfí palety ────────────────────
+   Pravý rail (taby + combat panel jako potomek `.tabWrap`) dědí MAPOVÉ tokeny
+   `--map-ui-*` (combat tracker je portovaný z taktické mapy 16.1e) → chat
+   fantasy skin ho jinak nepřebarví. Přemapujeme `--map-ui-*` na fantasy hodnoty
+   jen uvnitř chatu; combat na taktické mapě (mimo `[data-chat-skin]`) zůstává
+   beze změny. Barvy/text → `--theme-*` (drží přesnou paletu i při overridu);
+   RGB-triplety musí být čísla (vzor `rgb(var(--x-rgb)/α)`) = fantasy identita. */
+:global([data-chat-skin='fantasy']) .tabWrap {
+  --map-ui-accent-rgb: 227, 198, 107;
+  --map-ui-accent-bright-rgb: 246, 228, 160;
+  --map-ui-gold-rgb: 244, 221, 146;
+  --map-ui-panel-rgb: 16, 32, 24;
+  --map-ui-panel-deep-rgb: 8, 18, 13;
+  --map-ui-text-on-dark-rgb: 240, 232, 212;
+  --map-ui-blue-bright-rgb: 111, 211, 168;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #0b1510);
+  --map-token-ring-default: var(--theme-border);
+}

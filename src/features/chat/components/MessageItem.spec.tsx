@@ -23,6 +23,7 @@ const makeMsg = (o: Partial<ChatMessage> = {}): ChatMessage => ({
 const baseProps = {
   currentUserId: 'me',
   grouped: false,
+  groupEnd: true,
   surfaceColor: '#1a0f06',
   canDelete: false,
   usersById: new Map<string, string>(),
