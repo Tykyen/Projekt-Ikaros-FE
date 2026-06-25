@@ -19,7 +19,8 @@ export type DiarySkinId =
   | 'steampunk'
   | 'nature'
   | 'minimal'
-  | 'retro';
+  | 'retro'
+  | 'anime';
 
 export interface DiarySkinMeta {
   id: DiarySkinId;
@@ -29,7 +30,7 @@ export interface DiarySkinMeta {
   emoji: string;
 }
 
-/** 7 skinů v pořadí pro selector. */
+/** 8 skinů v pořadí pro selector. */
 export const DIARY_SKINS: readonly DiarySkinMeta[] = [
   { id: 'scifi', label: 'Sci-fi', emoji: '🛸' },
   { id: 'fantasy', label: 'Fantasy', emoji: '⚔️' },
@@ -38,6 +39,7 @@ export const DIARY_SKINS: readonly DiarySkinMeta[] = [
   { id: 'nature', label: 'Příroda', emoji: '🌿' },
   { id: 'minimal', label: 'Minimal', emoji: '📜' },
   { id: 'retro', label: 'Retro', emoji: '🎮' },
+  { id: 'anime', label: 'Anime', emoji: '🌸' },
 ] as const;
 
 /** Default = sci-fi (= dnešní HUD), pokud systém nemá vlastní mapování. */

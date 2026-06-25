@@ -9,10 +9,10 @@ import {
 import { DiarySkinSelector } from '../DiarySkinSelector';
 
 describe('skins/registry', () => {
-  it('má 7 skinů s unikátními ID a sjednocenými s BE whitelistem', () => {
-    expect(DIARY_SKINS).toHaveLength(7);
+  it('má 8 skinů s unikátními ID a sjednocenými s BE whitelistem', () => {
+    expect(DIARY_SKINS).toHaveLength(8);
     const ids = DIARY_SKINS.map((s) => s.id);
-    expect(new Set(ids).size).toBe(7);
+    expect(new Set(ids).size).toBe(8);
     expect(ids).toEqual([
       'scifi',
       'fantasy',
@@ -21,6 +21,7 @@ describe('skins/registry', () => {
       'nature',
       'minimal',
       'retro',
+      'anime',
     ]);
   });
 
@@ -73,7 +74,7 @@ describe('DiarySkinSelector', () => {
     render(<DiarySkinSelector active="scifi" onPick={() => {}} />);
     fireEvent.click(screen.getByTitle('Změnit vzhled deníku'));
     expect(screen.getByRole('menu')).toBeInTheDocument();
-    expect(screen.getAllByRole('menuitemradio')).toHaveLength(7);
+    expect(screen.getAllByRole('menuitemradio')).toHaveLength(8);
   });
 
   it('výběr stylu zavolá onPick s ID a zavře menu', () => {

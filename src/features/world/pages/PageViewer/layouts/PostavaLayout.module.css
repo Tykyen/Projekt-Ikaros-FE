@@ -29,14 +29,16 @@
 .editTabBtn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.85rem;
+  gap: 0.5rem;
+  /* 2× zvětšeno na žádost testera (špatně se hledalo) */
+  padding: 0.9rem 1.7rem;
   border: 1px solid var(--border-soft, rgba(120, 140, 180, 0.4));
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--surface-2, rgba(30, 40, 60, 0.4));
   color: var(--text-strong, #fff);
   font-family: inherit;
-  font-size: 0.84rem;
+  font-size: 1.25rem;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;

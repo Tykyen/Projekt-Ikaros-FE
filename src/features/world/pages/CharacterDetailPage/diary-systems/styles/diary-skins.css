@@ -11,7 +11,7 @@
  *
  * Fonty: CDN přes @import (PWA self-host = otevřená otázka spec H4 / F2).
  */
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cinzel+Decorative:wght@400;700&family=Special+Elite&family=Lora:ital,wght@0,400;0,600;1,400&family=VT323&family=Marcellus&family=Marcellus+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cinzel+Decorative:wght@400;700&family=Special+Elite&family=Lora:ital,wght@0,400;0,600;1,400&family=VT323&family=Marcellus&family=Marcellus+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600&family=Share+Tech+Mono&family=Cormorant+SC:wght@500;600;700&family=UnifrakturCook:wght@700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap');
 
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */
 .diary-skin-picker {
@@ -404,199 +404,283 @@
   background: rgba(255, 255, 255, 0.13);
 }
 
-/* ════════════ SKIN 3 — HOROR (prokletý spis) ════════════
- * Vlastní tvarový jazyk: černé desky + oxblood, svíčková vinětace,
- * blackletter (Pirata One) + dagger, sražená krvavá pečeť osudu,
- * krevní kapky místo nýtů. Signature ornament = KRVAVÝ PROSAK stékající
- * z horní hrany každého panelu (.mx-panel/.mx-hero ::before). Strukturní
- * pravidla scopnutá `[data-diary-system='matrix'][data-diary-skin='horror']`. */
+/* ════════════ SKIN 3 — HOROR (půlnoční salon) ════════════
+ * PŘEPRACOVÁNO: aristokratická viktoriánská upířina, NE gore. Uhel +
+ * tlumený oxblood damašek + zašlé stříbro + nádech studené fialové.
+ * Signature ornament = KOVANÁ GOTICKÁ FILIGRÁNOVÁ TRACERIE v rozích panelů
+ * (mříž katedrálního okna / brána sídla, zašlé stříbro). Stříbrná erbovní
+ * pečeť osudu (růže & netopýří křídla), tmavé granáty místo pipů, blackletter
+ * iniciála spoře. Strukturní `[data-diary-system='matrix'][data-diary-skin='horror']`. */
 [data-diary-skin='horror'] {
-  --mx-bg: radial-gradient(90% 55% at 50% 34%, #25090a 0%, #140506 45%, #0a0203 100%);
-  --mx-panel: linear-gradient(180deg, #150a0b, #0f0708);
-  --mx-text: #cdbdb6;
-  --mx-muted: #8f7475;
-  --mx-dim: #5e4647;
-  --mx-accent: #c63a3a;
-  --mx-violet: #6a4a8a;
-  --mx-gold: #b07a4a;
-  --mx-danger: #d4202a;
-  --mx-line: rgba(155, 28, 28, 0.22);
-  --mx-line-strong: rgba(155, 28, 28, 0.5);
+  --mx-bg: radial-gradient(120% 78% at 50% -4%, #20121a 0%, #130b11 52%, #0a060a 100%);
+  --mx-panel: linear-gradient(180deg, #241823, #18101a);
+  --mx-text: #ddd2d6;
+  --mx-muted: #ad9aa2;
+  --mx-dim: #7c6770;
+  --mx-accent: #c8c4cf;
+  --mx-violet: #6a5170;
+  --mx-gold: #c8c4cf;
+  --mx-danger: #a2283a;
+  --mx-line: rgba(125, 118, 130, 0.2);
+  --mx-line-strong: #6d6a76;
 
-  --mx-font-display: 'Pirata One', cursive;
-  --mx-font-body: 'Crimson Text', serif;
-  --mx-font-num: 'Crimson Text', serif;
+  --mx-font-display: 'Cormorant Garamond', serif;
+  --mx-font-body: 'EB Garamond', serif;
+  --mx-font-num: 'Cormorant Garamond', serif;
 
   --mx-sheet-radius: 4px;
-  --mx-sheet-shadow: 0 40px 100px -30px #000, inset 0 0 0 1px #2a0a0a, inset 0 0 0 2px #1a0606,
-    inset 0 0 160px #000000a0;
-  --mx-overlay: radial-gradient(120% 90% at 50% 50%, transparent 38%, rgba(0, 0, 0, 0.69) 100%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  --mx-overlay-size: auto, 140px 140px;
-  --mx-overlay-opacity: 1;
-  --mx-overlay-blend: multiply;
+  --mx-sheet-shadow: 0 46px 100px -34px #000, inset 0 0 0 2px #0a0509, inset 0 0 0 3px #4a4750,
+    inset 0 0 0 5px #100a0e, inset 0 0 150px #00000090;
+  --mx-overlay: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='168' viewBox='0 0 128 168'%3E%3Cg fill='none' stroke='%23b07a86' stroke-width='1.3' opacity='0.5' stroke-linecap='round'%3E%3Cpath d='M64 10 C80 26 80 44 64 58 C48 44 48 26 64 10Z'/%3E%3Cpath d='M64 58 C80 72 80 90 64 104 C48 90 48 72 64 58Z'/%3E%3Cpath d='M30 50 C42 60 42 74 30 84 C18 74 18 60 30 50Z'/%3E%3Cpath d='M98 50 C110 60 110 74 98 84 C86 74 86 60 98 50Z'/%3E%3Cpath d='M64 104 C80 120 80 140 64 154 C48 140 48 120 64 104Z'/%3E%3Cpath d='M30 130 C42 140 42 154 30 164 C18 154 18 140 30 130Z'/%3E%3Cpath d='M98 130 C110 140 110 154 98 164 C86 154 86 140 98 130Z'/%3E%3Ccircle cx='64' cy='58' r='3.4'/%3E%3Ccircle cx='64' cy='104' r='3.4'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(125% 92% at 50% 50%, transparent 38%, rgba(0, 0, 0, 0.67) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  --mx-overlay-size: 128px 168px, cover, 150px 150px;
+  --mx-overlay-opacity: 0.85;
+  --mx-overlay-blend: overlay;
 
-  --mx-panel-bg: linear-gradient(180deg, #150a0b, #0f0708);
-  --mx-panel-border: 1px solid #6e1414;
-  --mx-panel-radius: 2px;
-  --mx-panel-shadow: inset 0 0 0 1px #0a0405, inset 0 0 30px #000000a0, 0 2px 6px #00000080;
+  --mx-panel-bg: linear-gradient(180deg, #241823, #18101a);
+  --mx-panel-border: 1px solid #0a0509;
+  --mx-panel-radius: 3px;
+  --mx-panel-shadow: inset 0 1px 0 rgba(200, 196, 207, 0.13), inset 0 0 0 2px #7a7682,
+    inset 0 0 0 3px #0a0509, inset 0 0 34px #000000a0, 0 2px 6px #00000080;
   --mx-clip: none;
   --mx-clip-hero: none;
   --mx-clip-small: none;
 
-  --mx-title-color: #c63a3a;
-  --mx-title-weight: 400;
-  --mx-title-spacing: 0.04em;
+  --mx-title-color: #c8c4cf;
+  --mx-title-weight: 600;
+  --mx-title-spacing: 0.2em;
   --mx-title-transform: uppercase;
   --mx-marker-radius: 0px;
   --mx-marker-glow: none;
 
-  --mx-hero-bg: linear-gradient(180deg, #150a0b, #0f0708);
-  --mx-hero-border: 1px solid #6e1414;
-  --mx-name-color: #e6d4d0;
-  --mx-name-weight: 400;
-  --mx-name-spacing: 0.02em;
-  --mx-name-glow: 0 0 22px rgba(155, 28, 28, 0.4), 0 2px 1px #000, 0 1px 0 #3a0808;
-  --mx-portrait-radius: 2px;
-  --mx-portrait-bg: linear-gradient(135deg, #1c1011, #0c0506);
-  --mx-portrait-border: 1px solid #0a0405;
-  --mx-portrait-shadow: inset 0 0 0 1px #0a0405, inset 0 0 0 2px #5a1414, inset 0 0 0 3px #0a0405,
-    inset 0 0 26px #000000c0;
-  --mx-portrait-ink: #b58484;
-  --mx-portrait-scan: radial-gradient(40% 30% at 78% 88%, rgba(110, 14, 14, 0.33), transparent 60%);
+  --mx-hero-bg: linear-gradient(180deg, #241823, #18101a);
+  --mx-hero-border: 1px solid #0a0509;
+  --mx-name-color: #ece2e6;
+  --mx-name-weight: 600;
+  --mx-name-spacing: 0.01em;
+  --mx-name-glow: 0 1px 0 #3a0d16, 0 2px 2px #000, 0 0 18px rgba(106, 81, 112, 0.2);
+  --mx-portrait-radius: 3px;
+  --mx-portrait-bg: linear-gradient(135deg, #241620, #110a0f);
+  --mx-portrait-border: 1px solid #0a0509;
+  --mx-portrait-shadow: inset 0 0 0 2px #6d6a76, inset 0 0 0 3px #0a0509, inset 0 0 26px #000000c0;
+  --mx-portrait-ink: #9a7f8a;
+  --mx-portrait-scan: radial-gradient(60% 40% at 50% 14%, rgba(234, 230, 238, 0.08), transparent 60%);
 
-  --mx-row-bg: linear-gradient(180deg, #160a0b, #110708);
+  --mx-row-bg: linear-gradient(180deg, #1a1118, #150e13);
   --mx-row-radius: 2px;
   --mx-pip-radius: 50%;
   --mx-pip-glow: none;
-  --mx-seg-off: linear-gradient(180deg, #0c0506, #160a0b);
+  --mx-seg-off: linear-gradient(180deg, #0c070a, #150d12);
   --mx-seg-radius: 2px;
-  --mx-hp-on: linear-gradient(180deg, #c4202e, #5a0e0e);
-  --mx-rune-on: linear-gradient(180deg, #6a4a8a, #38255a);
-  --mx-arm-on: linear-gradient(180deg, #7a5a5c, #3a2426);
-  --mx-charged: #8fbf66;
-  --mx-depleted: #c46a6a;
+  --mx-hp-on: linear-gradient(180deg, #a2283a, #5e1622);
+  --mx-rune-on: linear-gradient(180deg, #8a6e98, #4a3858);
+  --mx-arm-on: linear-gradient(180deg, #d6d2de, #7a767f);
+  --mx-charged: #c6b2d2;
+  --mx-depleted: #c08a92;
   --mx-chip-glow: none;
 
-  --mx-accent-border: color-mix(in srgb, #9b1c1c 35%, transparent);
-  --mx-accent-shadow: inset 0 0 0 1px #0a0405, inset 0 0 30px #000000a0, 0 2px 6px #00000080;
+  --mx-accent-border: rgba(125, 118, 130, 0.3);
+  --mx-accent-shadow: inset 0 1px 0 rgba(200, 196, 207, 0.13), inset 0 0 0 2px #7a7682,
+    inset 0 0 0 3px #0a0509, inset 0 0 34px #000000a0;
   --mx-fate-border: transparent;
-  --mx-fate-bg: radial-gradient(circle at 42% 36%, #8a1414, #4a0a0a 58%, #2a0606 100%);
-  --mx-fate-lab: #e0a0a0;
-  --mx-fate-num: #f0d0c8;
-  --mx-fate-glow: color-mix(in srgb, #9b1c1c 40%, transparent);
-  --mx-budget-val: #d4bcbc;
-  --mx-budget-glow: color-mix(in srgb, #9b1c1c 50%, transparent);
-  --mx-gear-text: #cdbdb6;
-  --mx-gear-bg: #0f0708;
-  --mx-input-bg: #0d0506;
-  --mx-input-focus-border: color-mix(in srgb, #c4202e 60%, transparent);
-  --mx-add-color: #c46a6a;
-  --mx-add-border: color-mix(in srgb, #9b1c1c 40%, transparent);
-  --mx-add-hover-bg: color-mix(in srgb, #9b1c1c 10%, transparent);
+  --mx-fate-bg: radial-gradient(circle at 36% 28%, #f2eef6 0%, #cac6d2 20%, #908c98 48%, #5a5660 78%, #34303a 100%);
+  --mx-fate-lab: #281a22;
+  --mx-fate-num: #ece2e6;
+  --mx-fate-glow: transparent;
+  --mx-budget-val: #c6b2d2;
+  --mx-budget-glow: rgba(106, 81, 112, 0.4);
+  --mx-gear-text: #ddd2d6;
+  --mx-gear-bg: #130b11;
+  --mx-input-bg: #130b11;
+  --mx-input-focus-border: rgba(138, 110, 152, 0.6);
+  --mx-add-color: #c6b2d2;
+  --mx-add-border: rgba(125, 118, 130, 0.4);
+  --mx-add-hover-bg: rgba(106, 81, 112, 0.12);
 
-  --lvl-1: #5a4a4a;
-  --lvl-2: #7a3a3a;
-  --lvl-3: #9b2a2a;
-  --lvl-4: #b91c1c;
-  --lvl-5: #d42424;
-  --lvl-6: #e84040;
-  --lvl-7: #ff6060;
-  --lvl-8: #ff8080;
-  --lvl-9: #ffa0a0;
-  --lvl-10: #ffc0c0;
+  --lvl-1: #5a4650;
+  --lvl-2: #6a3a44;
+  --lvl-3: #7a2434;
+  --lvl-4: #8a2030;
+  --lvl-5: #a83a4a;
+  --lvl-6: #c25060;
+  --lvl-7: #d87080;
+  --lvl-8: #e090a0;
+  --lvl-9: #ece2e6;
+  --lvl-10: #f6f2fa;
 }
 
-/* ── Horor: strukturní ornamenty (nad rámec tokenů) ──────────────── */
-/* panel/hero = stacking context → grime pod obsah; obsah níž kvůli prosaku */
+/* ── Horor: strukturní ornamenty (aristokratická upířina) ──────────── */
+/* panel/hero = stacking context → samet pod obsah, tracerie nad */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-panel,
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-hero {
   isolation: isolate;
-  padding-top: 28px;
 }
-/* grime textura (pod obsahem) */
+/* studený měsíční svit shora */
+[data-diary-system='matrix'][data-diary-skin='horror'] .matrix-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+  background-image: radial-gradient(66% 34% at 50% -8%, rgba(122, 94, 130, 0.25), transparent 72%),
+    radial-gradient(44% 24% at 50% 106%, rgba(94, 22, 34, 0.13), transparent 74%);
+  mix-blend-mode: screen;
+}
+/* sametové zrno + oxblood/fialový nádech v rozích (pod obsahem) */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-panel::after,
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-hero::after {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: 3px;
   pointer-events: none;
-  border-radius: 1px;
+  border-radius: 2px;
   z-index: -1;
-  background-image: radial-gradient(50% 40% at 90% 96%, rgba(0, 0, 0, 0.38), transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+  background-image: radial-gradient(46% 40% at 92% 94%, rgba(94, 22, 34, 0.15), transparent 60%),
+    radial-gradient(40% 36% at 6% 8%, rgba(106, 81, 112, 0.13), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='110' height='110' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
 }
-/* SIGNATURE: krvavý prosak z horní hrany */
+/* SIGNATURE: kovaná gotická tracerie ve 4 rozích (1 ::before, 4 vrstvy) */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-panel::before,
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-hero::before {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 26px;
+  inset: 0;
   pointer-events: none;
   z-index: 2;
-  background-repeat: repeat-x;
-  background-size: 180px 26px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='28' viewBox='0 0 180 28' preserveAspectRatio='none'%3E%3Cpath d='M0 0 H180 V6 C174 6 176 25 170 25 C165 25 167 10 160 10 C152 10 154 18 148 18 C143 18 145 8 138 8 C130 8 132 23 126 23 C121 23 123 11 116 11 C108 11 110 16 104 16 C99 16 101 7 94 7 C86 7 88 26 82 26 C77 26 79 10 72 10 C64 10 66 17 60 17 C55 17 57 8 50 8 C42 8 44 22 38 22 C33 22 35 11 28 11 C20 11 22 16 16 16 C11 16 13 7 6 7 C3 7 2 6 0 6 Z' fill='%23560d0d'/%3E%3Cpath d='M160 10 C167 10 165 25 170 25 M94 7 C101 7 99 16 104 16 M38 22 C44 22 42 8 50 8' stroke='%23a01a1a' stroke-width='0.8' fill='none' opacity='0.45'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.67));
+  background-repeat: no-repeat;
+  background-size: 64px 64px;
+  background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 0)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3Ccircle cx='36' cy='40' r='3.4' stroke-width='1'/%3E%3Cpath d='M5 26 C5 16 12 11 21 11 C17 17 17 22 12 26' stroke-width='1.1'/%3E%3Cpath d='M26 5 C16 5 11 12 11 21 C17 17 22 17 26 12' stroke-width='1.1'/%3E%3Ccircle cx='14' cy='14' r='5' stroke-width='1.3'/%3E%3Ccircle cx='14' cy='14' r='2' fill='%23f0ecf4' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 0) scale(-1 1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3Ccircle cx='36' cy='40' r='3.4' stroke-width='1'/%3E%3Cpath d='M5 26 C5 16 12 11 21 11 C17 17 17 22 12 26' stroke-width='1.1'/%3E%3Cpath d='M26 5 C16 5 11 12 11 21 C17 17 22 17 26 12' stroke-width='1.1'/%3E%3Ccircle cx='14' cy='14' r='5' stroke-width='1.3'/%3E%3Ccircle cx='14' cy='14' r='2' fill='%23f0ecf4' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 72) scale(1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3Ccircle cx='36' cy='40' r='3.4' stroke-width='1'/%3E%3Cpath d='M5 26 C5 16 12 11 21 11 C17 17 17 22 12 26' stroke-width='1.1'/%3E%3Cpath d='M26 5 C16 5 11 12 11 21 C17 17 22 17 26 12' stroke-width='1.1'/%3E%3Ccircle cx='14' cy='14' r='5' stroke-width='1.3'/%3E%3Ccircle cx='14' cy='14' r='2' fill='%23f0ecf4' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 72) scale(-1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Cpath d='M22 71 L22 44 C22 31 29 25 36 25 C43 25 50 31 50 44 L50 71' stroke-width='1.3'/%3E%3Ccircle cx='36' cy='40' r='3.4' stroke-width='1'/%3E%3Cpath d='M5 26 C5 16 12 11 21 11 C17 17 17 22 12 26' stroke-width='1.1'/%3E%3Cpath d='M26 5 C16 5 11 12 11 21 C17 17 22 17 26 12' stroke-width='1.1'/%3E%3Ccircle cx='14' cy='14' r='5' stroke-width='1.3'/%3E%3Ccircle cx='14' cy='14' r='2' fill='%23f0ecf4' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.67)) drop-shadow(0 0 7px rgba(200, 196, 207, 0.15));
 }
-/* gotický titulek (Pirata One větší) + dagger marker */
+/* elegantní stříbrný titulek (Cormorant SC) + lilie marker; odsaz od tracerie */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-title {
+  font-family: 'Cormorant SC', serif;
   font-size: 16px;
-  text-shadow: 0 0 14px rgba(155, 28, 28, 0.33), 0 1px 0 #000;
+  padding-left: 38px;
+  background: linear-gradient(180deg, #eae6ee, #c8c4cf 60%, #7d7986);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.56));
 }
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-title::before {
-  content: '\271D';
-  width: auto;
-  height: auto;
+  content: '';
+  width: 15px;
+  height: 17px;
+  flex: none;
   background: none;
   box-shadow: none;
   transform: none;
-  color: #b51e2e;
-  font-size: 15px;
-  text-shadow: 0 0 8px rgba(181, 30, 46, 0.53);
+  -webkit-text-fill-color: initial;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='17' viewBox='0 0 15 17' fill='none' stroke='%237a2030' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.5 16 L7.5 6'/%3E%3Cpath d='M7.5 6 C7.5 2 9 1 9.5 1 C10 3 9 5 7.5 6Z' fill='%237a2030'/%3E%3Cpath d='M7.5 8 C7.5 4 11 3 13 4 C12.5 8 9.5 9 7.5 8Z' fill='%235e1622'/%3E%3Cpath d='M7.5 8 C7.5 4 4 3 2 4 C2.5 8 5.5 9 7.5 8Z' fill='%235e1622'/%3E%3Cpath d='M4 11 L11 11' stroke='%23c8c4cf'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 4px rgba(122, 32, 48, 0.33));
 }
-/* sražená krvavá pečeť osudu */
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-title::after {
+  -webkit-text-fill-color: initial;
+  background: linear-gradient(90deg, #6d6a76, transparent 88%),
+    radial-gradient(circle at right, #c8c4cf 1.4px, transparent 2px);
+}
+/* jméno kurzívou + blackletter iniciála (spoře) */
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-name {
+  font-style: italic;
+}
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-name::first-letter {
+  font-family: 'UnifrakturCook', serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 1.5em;
+  line-height: 1;
+  background: linear-gradient(180deg, #f4f0f6, #c8c4cf 52%, #8a3040 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-portrait span {
+  font-family: 'UnifrakturCook', serif;
+}
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-meta .v {
+  font-style: italic;
+}
+/* zašlá stříbrná erbovní pečeť osudu (růže & netopýří křídla) */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-fate {
-  width: 92px;
-  height: 92px;
-  min-width: 92px;
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
   padding: 0;
   border: none;
-  border-radius: 49% 51% 52% 48% / 48% 50% 50% 52%;
+  border-radius: 50%;
   clip-path: none;
   flex-direction: column;
   justify-content: center;
   justify-self: center;
-  gap: 2px;
   position: relative;
-  box-shadow: inset 0 2px 6px rgba(255, 90, 90, 0.19), inset 0 -8px 14px rgba(0, 0, 0, 0.56),
-    0 4px 12px -2px #000, 0 0 0 1px #1a0303;
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.53), inset 0 -9px 18px rgba(0, 0, 0, 0.67),
+    0 5px 16px -2px #000, 0 0 0 1px #1a1016, 0 0 0 2px #46424c, 0 0 0 3px #16101a;
 }
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-fate::before {
   content: '';
   position: absolute;
-  inset: 9px;
+  inset: 8px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 138, 138, 0.13);
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.44);
+  background: radial-gradient(circle at 40% 34%, #dcd8e2, #8e8a96 58%, #4a4650 100%);
+  box-shadow: inset 0 3px 5px rgba(255, 255, 255, 0.47), inset 0 -4px 10px rgba(0, 0, 0, 0.67), 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-fate::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80px 80px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80' fill='none'%3E%3Cg stroke='%23201018' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M40 28 C28 18 18 22 10 19 C15 26 16 31 12 35 C20 35 24 31 28 36 C32 31 36 28 40 30'/%3E%3Cpath d='M40 28 C52 18 62 22 70 19 C65 26 64 31 68 35 C60 35 56 31 52 36 C48 31 44 28 40 30'/%3E%3Ccircle cx='40' cy='47' r='11'/%3E%3Cpath d='M40 47 C35 42 35 35 40 32 C45 35 45 42 40 47'/%3E%3Cpath d='M40 47 C47 44 53 47 53 54 C46 54 42 51 40 47'/%3E%3Cpath d='M40 47 C33 44 27 47 27 54 C34 54 38 51 40 47'/%3E%3Cpath d='M40 58 L40 70'/%3E%3Cpath d='M40 62 L33 60 M40 66 L47 64'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.27));
+}
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-fate .lab {
+  position: relative;
+  z-index: 3;
+  margin-top: -40px;
+  font-family: 'Cormorant SC', serif;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+  color: #281a22;
+  text-shadow: 0 1px 0 rgba(232, 228, 238, 0.6);
 }
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-fate .num {
-  text-shadow: 0 1px 0 #2a0606, 0 2px 4px #000;
+  display: none;
 }
-/* krevní kapky místo nýtů */
-[data-diary-system='matrix'][data-diary-skin='horror'] .mx-pip.on {
-  border-color: transparent;
-  background: radial-gradient(circle at 34% 26%, rgba(255, 176, 176, 0.8), transparent 36%),
-    radial-gradient(circle at 50% 55%, var(--lvlc), color-mix(in srgb, var(--lvlc) 45%, #000) 95%);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.38), 0 0 6px -1px var(--lvlc), 0 1px 1px #000;
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-fate .star {
+  position: absolute;
+  bottom: 14px;
+  z-index: 3;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  color: #5e1622;
+  filter: none;
+  text-shadow: 0 1px 0 rgba(232, 228, 238, 0.67);
 }
-/* krvavé smaltované žlábky */
+/* sametová koryta + lesk */
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-track {
+  padding: 2px;
+  background: #0c070a;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(109, 106, 118, 0.2), inset 0 1px 3px #000;
+}
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-seg {
-  box-shadow: inset 0 1px 2px #000, inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 2px #000, inset 0 -1px 0 rgba(255, 255, 255, 0.024);
 }
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-seg.on {
   position: relative;
@@ -606,7 +690,18 @@
   position: absolute;
   inset: 1px 1px 55% 1px;
   border-radius: 1px;
-  background: rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.1);
+}
+/* tmavé granáty místo nýtů */
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-pip.on {
+  border-color: transparent;
+  background: radial-gradient(circle at 34% 26%, rgba(240, 216, 224, 0.67), transparent 36%),
+    radial-gradient(circle at 50% 56%, var(--lvlc), color-mix(in srgb, var(--lvlc) 42%, #000) 96%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.44), inset 0 -1px 2px rgba(0, 0, 0, 0.5), 0 0 5px -1px var(--lvlc), 0 1px 1px #000;
+}
+/* aspekty kurzívou */
+[data-diary-system='matrix'][data-diary-skin='horror'] .mx-aspect__name {
+  font-style: italic;
 }
 
 /* ════════════ SKIN 4 — STEAMPUNK (mosazný stroj) ════════════
@@ -1090,10 +1185,10 @@
   --mx-text: #20211f;
   --mx-muted: #8d8779;
   --mx-dim: #b9b09c;
-  --mx-accent: #9e3b2e;
+  --mx-accent: #9a7b2e;
   --mx-violet: #7c5a3e;
-  --mx-gold: #9e3b2e;
-  --mx-danger: #9e3b2e;
+  --mx-gold: #9a7b2e;
+  --mx-danger: #9a7b2e;
   --mx-line: #ddd6c7;
   --mx-line-strong: #cabfa8;
 
@@ -1144,10 +1239,10 @@
   --mx-pip-glow: none;
   --mx-seg-off: #e9e2d3;
   --mx-seg-radius: 1px;
-  --mx-hp-on: #9e3b2e;
+  --mx-hp-on: #9a7b2e;
   --mx-rune-on: #4a5862;
   --mx-arm-on: #6b5238;
-  --mx-charged: #9e3b2e;
+  --mx-charged: #9a7b2e;
   --mx-depleted: #8d8779;
   --mx-chip-glow: none;
 
@@ -1155,7 +1250,7 @@
   --mx-accent-shadow: none;
   --mx-fate-border: transparent;
   --mx-fate-bg: #f6f2e9;
-  --mx-fate-lab: #7c2c22;
+  --mx-fate-lab: #6e5520;
   --mx-fate-num: #20211f;
   --mx-fate-glow: transparent;
   --mx-budget-val: #4d4a42;
@@ -1163,21 +1258,21 @@
   --mx-gear-text: #20211f;
   --mx-gear-bg: #f1ece1;
   --mx-input-bg: #ffffff;
-  --mx-input-focus-border: color-mix(in srgb, #9e3b2e 50%, transparent);
-  --mx-add-color: #7c2c22;
+  --mx-input-focus-border: color-mix(in srgb, #9a7b2e 50%, transparent);
+  --mx-add-color: #6e5520;
   --mx-add-border: #cabfa8;
-  --mx-add-hover-bg: rgba(158, 59, 46, 0.06);
+  --mx-add-hover-bg: rgba(154, 123, 46, 0.06);
 
   --lvl-1: #cabfa8;
   --lvl-2: #b9b09c;
   --lvl-3: #9a8f78;
   --lvl-4: #7c5a3e;
-  --lvl-5: #9e3b2e;
-  --lvl-6: #9e3b2e;
-  --lvl-7: #7c2c22;
-  --lvl-8: #7c2c22;
-  --lvl-9: #5c1f17;
-  --lvl-10: #5c1f17;
+  --lvl-5: #9a7b2e;
+  --lvl-6: #9a7b2e;
+  --lvl-7: #6e5520;
+  --lvl-8: #6e5520;
+  --lvl-9: #4e3d12;
+  --lvl-10: #4e3d12;
 }
 
 /* ── Minimal: strukturní (světlá karta, preciznost) ──────────────── */
@@ -1198,10 +1293,10 @@
   background-repeat: no-repeat;
   background-position: 0 0, 100% 0, 0 100%, 100% 100%;
   background-size: 13px 13px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239e3b2e' stroke-width='1'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239e3b2e' stroke-width='1'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239e3b2e' stroke-width='1'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239e3b2e' stroke-width='1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0V13M0 6.5H13' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E");
 }
 /* bloky oddělené vlasovou linkou (ledger), žádné boxy */
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-panel {
@@ -1218,7 +1313,7 @@
   content: '';
   width: 18px;
   height: 2px;
-  background: #9e3b2e;
+  background: #9a7b2e;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
   transform: none;
   border-radius: 0;
@@ -1228,7 +1323,7 @@
 }
 /* iniciála jména v akcentu */
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-name::first-letter {
-  color: #7c2c22;
+  color: #6e5520;
   font-weight: 500;
 }
 /* registrační crop-kříže na portrétní destičce */
@@ -1239,7 +1334,7 @@
   left: 5px;
   width: 9px;
   height: 9px;
-  border: 1px solid #9e3b2e;
+  border: 1px solid #9a7b2e;
   border-right: 0;
   border-bottom: 0;
   opacity: 0.7;
@@ -1254,7 +1349,7 @@
   right: 5px;
   width: 9px;
   height: 9px;
-  border: 1px solid #9e3b2e;
+  border: 1px solid #9a7b2e;
   border-left: 0;
   border-top: 0;
   opacity: 0.7;
@@ -1281,7 +1376,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1.5px solid #9e3b2e;
+  border: 1.5px solid #9a7b2e;
   opacity: 0.85;
 }
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-fate::after {
@@ -1289,7 +1384,7 @@
   position: absolute;
   inset: 7px;
   border-radius: 50%;
-  border: 1px solid #9e3b2e;
+  border: 1px solid #9a7b2e;
   opacity: 0.35;
 }
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-fate .num {
@@ -1340,9 +1435,9 @@
   border-radius: 1px;
 }
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-chip.charged {
-  color: #7c2c22;
-  box-shadow: inset 0 0 0 1px #9e3b2e;
-  background: rgba(158, 59, 46, 0.06);
+  color: #6e5520;
+  box-shadow: inset 0 0 0 1px #9a7b2e;
+  background: rgba(154, 123, 46, 0.06);
 }
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-chip.depleted {
   color: #8d8779;
@@ -1358,8 +1453,8 @@
   box-shadow: none;
 }
 [data-diary-system='matrix'][data-diary-skin='minimal'] .mx-status .badge {
-  background: rgba(158, 59, 46, 0.06);
-  color: #7c2c22;
+  background: rgba(154, 123, 46, 0.06);
+  color: #6e5520;
   border-color: #cabfa8;
 }
 
@@ -1371,9 +1466,9 @@
  * USR:// prompt u jména. Vše monochromní jantar (žádná modrá/zelená/červená).
  * Strukturní `[data-diary-system='matrix'][data-diary-skin='retro']`. */
 [data-diary-skin='retro'] {
-  --mx-bg: radial-gradient(120% 130% at 50% 42%, #2e1c06 0%, #1c1104 52%, #120a02 78%, #0a0601 100%);
-  --mx-panel: linear-gradient(180deg, rgba(32, 19, 4, 0.13), rgba(21, 13, 2, 0.2));
-  --mx-text: #ffc24d;
+  --mx-bg: radial-gradient(120% 130% at 50% 42%, #43290a 0%, #2c1b07 52%, #1a1004 78%, #0f0902 100%);
+  --mx-panel: linear-gradient(180deg, rgba(40, 24, 6, 0.13), rgba(26, 16, 3, 0.2));
+  --mx-text: #ffce63;
   --mx-muted: #c98a1d;
   --mx-dim: #8a5e15;
   --mx-accent: #ffb627;
@@ -1484,12 +1579,12 @@
   z-index: 50;
   pointer-events: none;
   border-radius: 18px / 22px;
-  background: radial-gradient(125% 135% at 50% 45%, transparent 52%, rgba(0, 0, 0, 0.31) 72%, rgba(0, 0, 0, 0.82) 100%),
-    radial-gradient(70% 38% at 32% 8%, rgba(255, 231, 184, 0.12), transparent 62%),
-    radial-gradient(55% 22% at 70% 96%, rgba(255, 157, 26, 0.05), transparent 70%),
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 1.4px, rgba(0, 0, 0, 0.67) 1.5px, rgba(0, 0, 0, 0.67) 2.6px, rgba(0, 0, 0, 0) 2.7px),
-    repeating-linear-gradient(90deg, rgba(255, 122, 0, 0.08) 0px, rgba(255, 122, 0, 0.08) 1px, rgba(0, 0, 0, 0.06) 1px, rgba(0, 0, 0, 0.06) 2px, transparent 2px, transparent 3px);
-  box-shadow: inset 0 0 120px 10px rgba(0, 0, 0, 0.5);
+  background: radial-gradient(125% 135% at 50% 45%, transparent 58%, rgba(0, 0, 0, 0.16) 78%, rgba(0, 0, 0, 0.5) 100%),
+    radial-gradient(70% 38% at 32% 8%, rgba(255, 231, 184, 0.1), transparent 62%),
+    radial-gradient(55% 22% at 70% 96%, rgba(255, 157, 26, 0.04), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 1.7px, rgba(0, 0, 0, 0.4) 1.8px, rgba(0, 0, 0, 0.4) 2.8px, rgba(0, 0, 0, 0) 2.9px),
+    repeating-linear-gradient(90deg, rgba(255, 122, 0, 0.06) 0px, rgba(255, 122, 0, 0.06) 1px, rgba(0, 0, 0, 0.04) 1px, rgba(0, 0, 0, 0.04) 2px, transparent 2px, transparent 3px);
+  box-shadow: inset 0 0 100px 8px rgba(0, 0, 0, 0.28);
 }
 /* SIGNATURE B: ASCII rohové glyfy panelů (4 zlomy v 1 ::before) */
 [data-diary-system='matrix'][data-diary-skin='retro'] .mx-panel::before,
@@ -1641,4 +1736,327 @@
 [data-diary-system='matrix'][data-diary-skin='retro'] .mx-chip::after {
   content: ']';
   opacity: 0.6;
+}
+
+/* ════════════ Fate label „Body osudu" — fit do kruhu + čitelnost ════════════
+ * 2 slova se v kruhu mačkala/přetékala → malé + nowrap, ať se vejde.
+ * Explicitní barva (ne přes token) = pojistka proti leaku motivu (fialová). */
+[data-diary-system='matrix'][data-diary-skin='fantasy'] .mx-fate .lab,
+[data-diary-system='matrix'][data-diary-skin='steampunk'] .mx-fate .lab,
+[data-diary-system='matrix'][data-diary-skin='nature'] .mx-fate .lab,
+[data-diary-system='matrix'][data-diary-skin='minimal'] .mx-fate .lab,
+[data-diary-system='matrix'][data-diary-skin='retro'] .mx-fate .lab {
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  white-space: nowrap;
+}
+[data-diary-system='matrix'][data-diary-skin='fantasy'] .mx-fate .lab {
+  color: #ffe6c8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='matrix'][data-diary-skin='steampunk'] .mx-fate .lab {
+  color: #f4e0a0;
+  text-shadow: 0 1px 2px #000, 0 0 2px #000;
+}
+[data-diary-system='matrix'][data-diary-skin='nature'] .mx-fate .lab {
+  color: #fff0c0;
+  text-shadow: 0 1px 2px #000, 0 0 4px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='matrix'][data-diary-skin='minimal'] .mx-fate .lab {
+  color: #6e5520;
+}
+[data-diary-system='matrix'][data-diary-skin='retro'] .mx-fate .lab {
+  color: #ffc24d;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 5px rgba(255, 157, 26, 0.6);
+}
+
+/* ════════════ SKIN 8 — ANIME (key visual / moderní cel-shade) ════════════
+ * Barevná pestrost jako protiváha tmavé/tlumené sedmici. Bílé cel-karty s
+ * tučným ink obrysem + tvrdým spodním cel-stínem + lesklým highlightem na
+ * živém sky/coral/magenta podkladu. Signature ornament = akční SWOOSH +
+ * ✦ sparkles; star-burst medailon osudu. Strukturní
+ * `[data-diary-system='matrix'][data-diary-skin='anime']`. */
+[data-diary-skin='anime'] {
+  --mx-bg: radial-gradient(120% 80% at 78% 8%, #ffd58a 0%, #ffb27a 16%, #ff8fb0 34%, #c46fd6 55%, #6b5cd6 74%, #2e2a6e 100%);
+  --mx-panel: #fbf7ef;
+  --mx-text: #2b2a55;
+  --mx-muted: #6a6a8a;
+  --mx-dim: #9b95a8;
+  --mx-accent: #ff4d97;
+  --mx-violet: #7a6bff;
+  --mx-gold: #ffd23e;
+  --mx-danger: #ff4d97;
+  --mx-line: rgba(22, 22, 46, 0.12);
+  --mx-line-strong: #16162e;
+
+  --mx-font-display: 'Bricolage Grotesque', sans-serif;
+  --mx-font-body: 'Outfit', sans-serif;
+  --mx-font-num: 'Bricolage Grotesque', sans-serif;
+
+  --mx-sheet-radius: 22px;
+  --mx-sheet-shadow: 0 0 0 4px #16162e, 0 0 0 9px #ffffff, 0 0 0 12px #16162e,
+    0 34px 70px -20px rgba(26, 20, 80, 0.75);
+  --mx-overlay: linear-gradient(125deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0) 26%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.16) 100%);
+  --mx-overlay-size: cover;
+  --mx-overlay-opacity: 1;
+  --mx-overlay-blend: screen;
+
+  --mx-panel-bg: #fbf7ef;
+  --mx-panel-border: none;
+  --mx-panel-radius: 16px;
+  --mx-panel-shadow: 0 0 0 3px #16162e, 0 7px 0 0 #d9d2c4, 0 8px 0 3px #16162e,
+    0 18px 26px -14px rgba(26, 20, 80, 0.44);
+  --mx-clip: none;
+  --mx-clip-hero: none;
+  --mx-clip-small: none;
+
+  --mx-title-color: #16162e;
+  --mx-title-weight: 800;
+  --mx-title-spacing: 0.01em;
+  --mx-title-transform: uppercase;
+  --mx-marker-radius: 0px;
+  --mx-marker-glow: none;
+
+  --mx-hero-bg: linear-gradient(180deg, #ffffff, #eef3ff 60%, #e6edff 100%);
+  --mx-hero-border: none;
+  --mx-name-color: #16162e;
+  --mx-name-weight: 800;
+  --mx-name-spacing: -0.01em;
+  --mx-name-glow: 3px 3px 0 rgba(255, 122, 89, 0.33), 1px 1px 0 rgba(58, 167, 255, 0.33);
+  --mx-portrait-radius: 18px;
+  --mx-portrait-bg: linear-gradient(150deg, #3aa7ff 0%, #1d6fd6 52%, #ff4d97 100%);
+  --mx-portrait-border: none;
+  --mx-portrait-shadow: 0 0 0 3px #16162e, inset 0 -16px 0 rgba(22, 22, 46, 0.13), inset 0 14px 18px rgba(255, 255, 255, 0.33);
+  --mx-portrait-ink: #ffffff;
+  --mx-portrait-scan: radial-gradient(44px 26px at 22% 16%, rgba(255, 255, 255, 0.8), transparent 62%);
+
+  --mx-row-bg: #ffffff;
+  --mx-row-radius: 12px;
+  --mx-pip-radius: 50%;
+  --mx-pip-glow: none;
+  --mx-seg-off: #e7e2d6;
+  --mx-seg-radius: 6px;
+  --mx-hp-on: linear-gradient(180deg, #ff9a7a, #ff7a59);
+  --mx-rune-on: linear-gradient(180deg, #6ec0ff, #3aa7ff);
+  --mx-arm-on: linear-gradient(180deg, #ffe07a, #ffd23e);
+  --mx-charged: #1faf5a;
+  --mx-depleted: #6f7690;
+  --mx-chip-glow: none;
+
+  --mx-accent-border: #16162e;
+  --mx-accent-shadow: 0 0 0 3px #16162e, 0 7px 0 0 #d9d2c4, 0 8px 0 3px #16162e;
+  --mx-fate-border: transparent;
+  --mx-fate-bg: transparent;
+  --mx-fate-lab: #ffffff;
+  --mx-fate-num: #ffffff;
+  --mx-fate-glow: transparent;
+  --mx-budget-val: #16162e;
+  --mx-budget-glow: rgba(255, 77, 151, 0.4);
+  --mx-gear-text: #2b2a55;
+  --mx-gear-bg: #ffffff;
+  --mx-input-bg: #ffffff;
+  --mx-input-focus-border: #ff4d97;
+  --mx-add-color: #16162e;
+  --mx-add-border: #16162e;
+  --mx-add-hover-bg: rgba(255, 77, 151, 0.1);
+
+  --lvl-1: #6ec0ff;
+  --lvl-2: #3aa7ff;
+  --lvl-3: #7a6bff;
+  --lvl-4: #ff4d97;
+  --lvl-5: #ff7a59;
+  --lvl-6: #ffb13e;
+  --lvl-7: #ffd23e;
+  --lvl-8: #ffe07a;
+  --lvl-9: #b9f0ff;
+  --lvl-10: #ffffff;
+}
+
+/* ── Anime: strukturní (cel-shade key visual) ──────────────────────── */
+/* SIGNATURE: akční swoosh + ✦ sparkles (roh plochy, nad obsahem v rohu) */
+[data-diary-system='matrix'][data-diary-skin='anime'] .matrix-sheet {
+  isolation: isolate;
+  overflow: hidden;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .matrix-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: right -24px bottom -24px, 6% 7%, 96% 32%, 90% 80%;
+  background-size: 280px 158px, 22px 22px, 15px 15px, 12px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='170' viewBox='0 0 300 170' fill='none'%3E%3Cpath d='M6 24 C90 18 200 48 294 150' stroke='%2316162e' stroke-width='13' stroke-linecap='round'/%3E%3Cpath d='M14 22 C98 16 206 44 296 146' stroke='%23ff4d97' stroke-width='7.5' stroke-linecap='round'/%3E%3Cpath d='M2 54 C100 50 214 80 286 162' stroke='%2316162e' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M10 52 C108 48 220 76 288 158' stroke='%233aa7ff' stroke-width='5.5' stroke-linecap='round'/%3E%3Cpath d='M4 88 C124 86 232 116 282 176' stroke='%2316162e' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M12 86 C130 84 236 112 286 172' stroke='%23ffd23e' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffffff' stroke='%2316162e' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffffff' stroke='%2316162e' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffd23e' stroke='%2316162e' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 4px 6px rgba(26, 20, 80, 0.25));
+}
+/* cel-shade: gloss bar + spodní stínový stupeň uvnitř karet */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-panel::before,
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-hero::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  border-radius: 13px;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 58%, rgba(43, 42, 85, 0.06) 58%, rgba(43, 42, 85, 0.07) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 30%);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-panel > *,
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-hero > * {
+  position: relative;
+  z-index: 1;
+}
+/* anime sub-header: ✦ tab + barevný rail */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-title {
+  font-size: 16px;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-title::before {
+  content: '\2726';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  font-size: 15px;
+  color: #ff4d97;
+  -webkit-text-stroke: 1.5px #16162e;
+  text-shadow: 0 1.5px 0 #16162e;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-title::after {
+  height: 5px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #3aa7ff, #ff7a59 60%, #ff4d97);
+  box-shadow: 0 0 0 2px #16162e, 0 2px 0 rgba(22, 22, 46, 0.13);
+}
+/* jméno = manga pop + magenta iniciála s ink obrysem */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-name::first-letter {
+  color: #ff4d97;
+  -webkit-text-stroke: 2px #16162e;
+}
+/* meta klíče jako ink-outlined chip */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-meta .k {
+  color: #fff;
+  background: #2b2a55;
+  padding: 2px 8px;
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px #16162e;
+  font-weight: 700;
+}
+/* fate = star-burst medailon (hvězda + lesklý magenta disk) */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-fate {
+  width: 116px;
+  height: 116px;
+  min-width: 116px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  clip-path: none;
+  flex-direction: column;
+  justify-content: center;
+  justify-self: center;
+  position: relative;
+  filter: drop-shadow(0 6px 10px rgba(214, 42, 114, 0.25));
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-fate::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  z-index: 0;
+  background: #ffd23e;
+  clip-path: polygon(50% 0%, 58% 33%, 79% 12%, 67% 40%, 100% 38%, 70% 50%, 100% 62%, 67% 60%, 79% 88%, 58% 67%, 50% 100%, 42% 67%, 21% 88%, 33% 60%, 0% 62%, 30% 50%, 0% 38%, 33% 40%, 21% 12%, 42% 33%);
+  filter: drop-shadow(2px 2px 0 #16162e) drop-shadow(-2px -2px 0 #16162e) drop-shadow(0 0 8px rgba(255, 210, 62, 0.56));
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-fate::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  z-index: 1;
+  background: radial-gradient(circle at 38% 28%, #ff8fc0 0%, #ff4d97 40%, #d62a72 100%);
+  box-shadow: 0 0 0 3px #16162e, inset 0 -10px 0 rgba(214, 42, 114, 0.5), inset 0 10px 12px rgba(255, 255, 255, 0.44);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-fate .lab {
+  position: relative;
+  z-index: 2;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 0 #16162e;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-fate .num {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  text-shadow: 2px 2px 0 #16162e, 0 0 10px rgba(255, 255, 255, 0.5);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-fate .star {
+  display: none;
+}
+/* cel-shade ukazatele */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-seg {
+  border: none;
+  box-shadow: inset 0 0 0 2px #16162e, inset 0 -3px 0 #c9c2b2;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-seg.on {
+  position: relative;
+  box-shadow: 0 0 0 2px #16162e, inset 0 -4px 0 rgba(0, 0, 0, 0.15);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-seg.on::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.5);
+}
+/* lesklé cel-shade gemy */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-pip {
+  border: none;
+  box-shadow: inset 0 0 0 2px #16162e, inset 0 -2px 0 #c9c2b2;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-pip.on {
+  position: relative;
+  background: radial-gradient(circle at 36% 30%, #ffffff 0%, var(--lvlc) 46%, color-mix(in srgb, var(--lvlc) 62%, #16162e) 100%);
+  box-shadow: 0 0 0 2px #16162e, 0 0 7px -1px var(--lvlc);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-pip.on::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+}
+/* cel-karty řádků: ink obrys + cel drop + tlustý barevný levý okraj */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-skill {
+  border: none;
+  border-left: 7px solid var(--lvlc, #3aa7ff);
+  box-shadow: 0 0 0 2.5px #16162e, 0 4px 0 0 #d9d2c4, 0 5px 0 2.5px #16162e;
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-aspect {
+  border: none;
+  box-shadow: 0 0 0 2.5px #16162e, 0 4px 0 0 #d9d2c4, 0 5px 0 2.5px #16162e;
+}
+/* cel chipy (ink obrys, bílý text) */
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-chip {
+  color: #fff;
+  border: none;
+  box-shadow: 0 0 0 2px #16162e, 0 3px 0 -1px rgba(22, 22, 46, 0.19);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-chip.charged {
+  background: linear-gradient(180deg, #4fd17e, #1faf5a);
+}
+[data-diary-system='matrix'][data-diary-skin='anime'] .mx-chip.depleted {
+  background: linear-gradient(180deg, #9aa0b5, #6f7690);
 }
