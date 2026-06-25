@@ -39,7 +39,7 @@ export const DIARY_SKINS: readonly DiarySkinMeta[] = [
   { id: 'nature', label: 'Příroda', emoji: '🌿' },
   { id: 'minimal', label: 'Minimal', emoji: '📜' },
   { id: 'retro', label: 'Retro', emoji: '🎮' },
-  { id: 'anime', label: 'Anime', emoji: '🌸' },
+  { id: 'anime', label: 'MLP', emoji: '🦄' },
 ] as const;
 
 /** Default = sci-fi (= dnešní HUD), pokud systém nemá vlastní mapování. */

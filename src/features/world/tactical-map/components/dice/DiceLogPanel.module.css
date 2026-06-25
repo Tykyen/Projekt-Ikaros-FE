@@ -15,10 +15,11 @@
   max-height: 32vh;
   display: flex;
   flex-direction: column;
+  /* plně NEPRŮHLEDNÝ (rgb bez alfy) — log nesmí být „skrz" na mapu. */
   background: linear-gradient(
     180deg,
-    var(--map-toolbar-bg-solid, rgb(var(--map-ui-panel-rgb) / 0.985)) 0%,
-    var(--map-toolbar-bg-solid, rgb(var(--map-ui-panel-deep-rgb) / 0.99)) 100%
+    rgb(var(--map-ui-panel-rgb)) 0%,
+    rgb(var(--map-ui-panel-deep-rgb)) 100%
   );
   border: 1px solid var(--accent, rgb(var(--map-ui-accent-rgb) / 0.15));
   border-radius: 12px;
