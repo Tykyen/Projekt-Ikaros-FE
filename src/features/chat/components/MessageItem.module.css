@@ -494,3 +494,26 @@
 .failedAction:hover {
   background: color-mix(in srgb, var(--theme-error, #c0392b) 12%, transparent);
 }
+
+/* ── 16.1d-fantasy — vznešená elfí síň ──────────────────────────────────────
+   Avatar = zlatý prstenec; NPC = smaragdový prstenec se svitem (odliší
+   postavy od hráčů). Šepot v elfím smaragdu místo burgundy. Jméno autora
+   s jemným prostrkáním (Marcellus dědí z `--font-display`). */
+:global([data-chat-skin='fantasy']) .avatar {
+  box-shadow:
+    0 0 0 1px var(--theme-surface-strong, var(--bg-secondary)),
+    0 0 0 2px var(--theme-border, var(--border));
+}
+:global([data-chat-skin='fantasy']) .avatarNpc {
+  box-shadow:
+    0 0 0 1px var(--theme-surface-strong, var(--bg-secondary)),
+    0 0 0 2px var(--theme-border-cyan, var(--theme-accent)),
+    0 0 8px var(--theme-glow-cyan, transparent);
+}
+:global([data-chat-skin='fantasy']) .name {
+  letter-spacing: 0.02em;
+}
+:global([data-chat-skin='fantasy']) .whisper {
+  border-left-color: var(--theme-accent-cyan, var(--accent));
+  background: color-mix(in srgb, var(--theme-accent-cyan, var(--accent)) 7%, transparent);
+}

@@ -1,6 +1,7 @@
 Stručně, jasně, přímo; bez vaty. Gramatiku obětuj brevitě, ne srozumitelnosti. Česky (i dokumentace).
 Nesrovnalost/problém v kódu hned prokomunikuj (co · dopad · návrh), neopravuj tiše, čekej na souhlas. Vlastní nápady (lepší/jinak/rozšíření) nejdřív do diskuze, neimplementuj bez souhlasu.
 UI musí fungovat na mobilu i desktopu: po grafické úpravě → `mobil-desktop`; před spec plánem grafiky → `frontend-design`.
+Skiny/motivy (chat, deník, …) drž na PROFESIONÁLNÍ úrovni — kvalita > čas i počet, na grafice se nešetří. U KAŽDÉHO skinu/motivu nejdřív vymysli, jak má vypadat (`frontend-design` jako návrh, ne až review) → odsouhlas → impl. → `mobil-desktop`. Testerům dáváme to nejlepší; „přebarvený sdílený vzhled" nestačí — každý nese vlastní tvarový jazyk + signature ornament.
 Před implementací komponenty/featury → `spec-driven-development`.
 Změna funkčnosti (route · stub→funkční · chování · role/oprávnění · BE schopnost · dluh) → `funkce` (kódem ověřená inventura `docs/funkce/`, zdroj pravdy) + `napoveda` (hráčský výtah `/ikaros/napoveda`); měň oba.
 Neřešený dluh/riziko/nesrovnalost → `dluh`.

@@ -171,3 +171,35 @@
 :global([data-chat-skin='historie']) .header {
   box-shadow: inset 0 2px 0 color-mix(in srgb, var(--theme-heading) 20%, transparent);
 }
+
+/* ── 16.1d-fantasy — vznešená elfí síň ──────────────────────────────────────
+   Signature ornament = zlatá filigrán-vlnovka. Hlavička: „nit kanálu"
+   (`.header::after`) přetvořená z ploché linky na filigránovou krajku v barvě
+   konverzace (`--ch-accent`), tvar přes `mask` (žádný hardcoded hex) +
+   iluminovaná iniciála názvu (`::first-letter`). */
+:global([data-chat-skin='fantasy']) .header {
+  border-bottom-color: var(--theme-border-cyan, var(--theme-border-soft));
+}
+:global([data-chat-skin='fantasy']) .header::after {
+  height: 11px;
+  bottom: -6px;
+  opacity: 0.7;
+  background: var(--ch-accent, var(--theme-accent));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='11' viewBox='0 0 48 11'%3E%3Cpath d='M0 5.5 q12 -5 24 0 t24 0' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") repeat-x center / 48px 11px;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='11' viewBox='0 0 48 11'%3E%3Cpath d='M0 5.5 q12 -5 24 0 t24 0' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") repeat-x center / 48px 11px;
+}
+/* Iluminovaná iniciála názvu konverzace — větší zlatá kapitálka se svitem. */
+:global([data-chat-skin='fantasy']) .title::first-letter {
+  font-size: 1.5em;
+  color: var(--theme-accent-bright, var(--theme-heading));
+  text-shadow: 0 0 10px var(--theme-glow-gold, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fantasyInitialShimmer {
+    0%, 100% { text-shadow: 0 0 6px var(--theme-glow-gold, transparent); }
+    50% { text-shadow: 0 0 14px var(--theme-glow-gold, transparent); }
+  }
+  :global([data-chat-skin='fantasy']) .title::first-letter {
+    animation: fantasyInitialShimmer 4.5s ease-in-out infinite;
+  }
+}

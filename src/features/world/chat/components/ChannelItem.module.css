@@ -20,6 +20,18 @@
   opacity: 1;
 }
 
+/* ── 16.1d-fantasy — aktivní kanál: zlatý filigránový marker se svitem
+   (zúžený gradient + glow), místo plochého proužku. */
+:global([data-chat-skin='fantasy']) .active::before {
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--theme-accent) 50%,
+    transparent
+  );
+  box-shadow: 0 0 6px var(--theme-glow-gold, transparent);
+}
+
 .main {
   flex: 1;
   min-width: 0;
