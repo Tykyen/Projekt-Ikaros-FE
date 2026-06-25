@@ -542,14 +542,16 @@
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='110' height='110' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
   mix-blend-mode: soft-light;
 }
-/* SIGNATURE: kovaná gotická tracerie ve 4 rozích (1 ::before, 4 vrstvy) */
+/* SIGNATURE: kovaná gotická tracerie ve 4 rozích (1 ::before, 4 vrstvy).
+   z-index:-1 = POD obsahem (text vždy nahoře, nečitelnost vyřešena); panel má
+   isolation:isolate → ornament nad pozadím, pod obsahem. */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-panel::before,
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-hero::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: -1;
   background-repeat: no-repeat;
   background-size: 64px 64px;
   background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
