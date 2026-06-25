@@ -68,6 +68,12 @@
   --mx-name-spacing: 0.04em;
   --mx-name-glow: 0 0 22px rgba(167, 139, 250, 0.33);
   --mx-portrait-radius: 4px;
+  /* 16.2c — portrét tokenizován (dřív natvrdo sci-fi → leak do skinů) */
+  --mx-portrait-bg: linear-gradient(135deg, #1a1c38, #0c0d1a);
+  --mx-portrait-border: 1px solid color-mix(in srgb, var(--mx-accent) 33%, transparent);
+  --mx-portrait-shadow: 0 0 24px -8px color-mix(in srgb, var(--mx-accent) 40%, transparent);
+  --mx-portrait-ink: #5b6790;
+  --mx-portrait-scan: repeating-linear-gradient(0deg, rgba(56, 224, 255, 0.06) 0 2px, transparent 2px 4px);
 
   --mx-row-bg: linear-gradient(90deg, #10111f, #0d0e1a);
   --mx-row-radius: 2px;
@@ -211,14 +217,14 @@
   width: 92px;
   height: 92px;
   flex: none;
-  border: 1px solid color-mix(in srgb, var(--mx-accent) 33%, transparent);
+  border: var(--mx-portrait-border);
   border-radius: var(--mx-portrait-radius);
-  background: linear-gradient(135deg, #1a1c38, #0c0d1a);
+  background: var(--mx-portrait-bg);
   display: grid;
   place-items: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 24px -8px color-mix(in srgb, var(--mx-accent) 40%, transparent);
+  box-shadow: var(--mx-portrait-shadow);
 }
 [data-diary-system='matrix'] .mx-portrait img {
   width: 100%;
@@ -227,14 +233,14 @@
 }
 [data-diary-system='matrix'] .mx-portrait span {
   font: 700 30px var(--mx-font-display);
-  color: #5b6790;
+  color: var(--mx-portrait-ink);
   letter-spacing: 0.05em;
 }
 [data-diary-system='matrix'] .mx-portrait::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(0deg, rgba(56, 224, 255, 0.06) 0 2px, transparent 2px 4px);
+  background: var(--mx-portrait-scan);
   pointer-events: none;
 }
 [data-diary-system='matrix'] .mx-id {
