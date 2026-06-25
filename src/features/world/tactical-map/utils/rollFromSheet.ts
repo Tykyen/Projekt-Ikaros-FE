@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import {
   rollFate,
   rollGenericDice,
+  rollExplodingD6,
   type RollKind,
 } from "@/features/world/chat/dice/lib/rollEngine";
 import {
@@ -59,6 +60,11 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
     const r = rollFate();
     total = r.sum + modifier;
     dicePayload = buildFatePayload(r, { label, modifier });
+  } else if (kind === "d6+") {
+    // DrD 1.6 nafukovací k6 (exploding) — kaskáda kostek v generic payloadu.
+    const r = rollExplodingD6();
+    total = r.sum + modifier;
+    dicePayload = buildGenericPayload(r, { label, modifier });
   } else if (
     kind === "d4" ||
     kind === "d6" ||

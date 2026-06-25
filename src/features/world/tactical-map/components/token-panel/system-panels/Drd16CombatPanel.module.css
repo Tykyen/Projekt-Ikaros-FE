@@ -1,0 +1,450 @@
+/**
+ * 16.2b-mapa — Drd16CombatPanel (fantasy „iluminovaný kodex kováře").
+ *
+ * Self-contained pergamenová paleta (NE sdílené `--mx-*` skin tokeny — ty jsou
+ * laděné na tmavý HUD a na světlém pergamenu by byly nečitelné; stejný důvod,
+ * proč list `Drd16Sheet` jede self-contained, viz 162b). Skin tokenizace =
+ * 16.2c-drd16. Pergamen tělo sedí v tmavém leather wrapperu (TokenInfoPanel,
+ * skinovaný F3 scoped `[data-diary-system='drd16']`).
+ *
+ * Port HTML prototypu `c:/tmp/drd16-mapa-audit.html` (schválen 2026-06-25).
+ */
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #3a2b19;
+  background-color: #e8dab7;
+  background-image:
+    radial-gradient(120% 90% at 18% 8%, rgba(255, 250, 235, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 88% 96%, rgba(150, 120, 72, 0.28), transparent 60%),
+    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f);
+  border-radius: 5px;
+  padding: 12px;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px #c4ad7e,
+    0 0 0 4px #1d160e,
+    0 0 0 5px #6f5320;
+}
+
+.loading,
+.empty {
+  padding: 16px;
+  text-align: center;
+  font-style: italic;
+  color: #6c573a;
+}
+
+/* ── Iniciativa ── */
+.initBtn {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #1f1607;
+  background: linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320);
+  border: 1px solid #6f5320;
+  border-radius: 4px;
+  padding: 9px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 0 rgba(255, 250, 220, 0.6) inset;
+}
+.initBtn:hover {
+  filter: brightness(1.06);
+}
+
+/* ── Section header ── */
+.section {
+  margin-top: 4px;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 7px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #3a2812;
+}
+.title small {
+  font-size: 8px;
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+.title::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, #f3dd97, #6f5320);
+  box-shadow: 0 0 0 1px rgba(60, 40, 10, 0.4);
+}
+.title::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(90deg, #c19a3f, transparent);
+  opacity: 0.5;
+}
+
+/* ── Vitals ── */
+.vital {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.vitalLab {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.vital.hp .vitalLab {
+  color: #9c2a23;
+}
+.vital.ma .vitalLab {
+  color: #2c569e;
+}
+.vbar {
+  position: relative;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid #6f5320;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.4),
+    rgba(221, 202, 159, 0.25)
+  );
+}
+.vbarFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  transition: width 0.18s;
+}
+.vital.hp .vbarFill {
+  background: linear-gradient(90deg, #9c2a23, #cb4138);
+}
+.vital.ma .vbarFill {
+  background: linear-gradient(90deg, #2c569e, #5e8cd8);
+}
+.vbarTxt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #241509;
+  text-shadow: 0 1px 0 rgba(255, 250, 235, 0.5);
+}
+.vsteps {
+  display: flex;
+  gap: 3px;
+}
+.vsteps button {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 26px;
+  padding: 3px 0;
+  color: #2a1a0a;
+  background: linear-gradient(180deg, #f1e6cb, #ddca9f);
+  border: 1px solid #6f5320;
+  border-radius: 3px;
+}
+.vsteps button:hover {
+  background: #f3dd97;
+}
+
+/* ── Vlastnosti ── */
+.statRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 6px 9px;
+  cursor: pointer;
+  border-radius: 3px;
+  text-align: left;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 252, 242, 0.5),
+    rgba(232, 218, 183, 0.25)
+  );
+  border: 1px solid rgba(196, 173, 126, 0.55);
+}
+.statRow:hover:not(:disabled) {
+  border-color: #6f5320;
+  background: rgba(221, 202, 159, 0.45);
+}
+.statName {
+  font-size: 14px;
+  color: #3a2b19;
+}
+.statVal {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #2a1a0a;
+  width: 24px;
+  text-align: center;
+}
+.statBonus {
+  min-width: 30px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1f1607;
+  border-radius: 3px;
+  border: 1px solid #6f5320;
+  background: linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320);
+}
+.statBonus.neg {
+  background: linear-gradient(180deg, #caa0a0, #9c6b6b 60%, #5e3a3a);
+  border-color: #5e3a3a;
+  color: #2a1010;
+}
+.statBonus.zero {
+  background: linear-gradient(180deg, #d9cba8, #b8a070 60%, #8c7549);
+  border-color: #8c7549;
+}
+
+/* ── Pohyb & Postřeh ── */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.infoCard {
+  padding: 7px 9px;
+  border-radius: 3px;
+  background: rgba(255, 252, 242, 0.42);
+  border: 1px solid rgba(196, 173, 126, 0.5);
+}
+.infoLab {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6c573a;
+}
+.infoVal {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #2a1a0a;
+}
+.perGrid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 2px 6px;
+  font-size: 11px;
+  margin-top: 3px;
+}
+.perHead {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6c573a;
+  text-align: center;
+}
+.perRow {
+  color: #6c573a;
+}
+.perVal {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: #3a2812;
+  text-align: center;
+}
+
+/* ── Obrana ── */
+.defBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 9px 13px;
+  border-radius: 4px;
+  text-align: left;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(193, 154, 63, 0.18), transparent 70%),
+    linear-gradient(180deg, rgba(255, 252, 242, 0.5), rgba(221, 202, 159, 0.3));
+  border: 1px solid #6f5320;
+}
+.defBtn:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+.defLab {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3a2812;
+  font-weight: 600;
+}
+.defVal {
+  margin-left: auto;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 26px;
+  color: #2a1a0a;
+}
+
+/* ── Zbraně ── */
+.weapon {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 10px;
+  align-items: center;
+  cursor: pointer;
+  text-align: left;
+  padding: 6px 9px;
+  margin-bottom: 4px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 252, 242, 0.5),
+    rgba(232, 218, 183, 0.22)
+  );
+  border: 1px solid rgba(196, 173, 126, 0.55);
+}
+.weapon:hover:not(:disabled) {
+  border-color: #6f5320;
+  background: rgba(221, 202, 159, 0.42);
+}
+.weapName {
+  font-size: 14px;
+  color: #3a2b19;
+  font-weight: 500;
+}
+.weapUc {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #5c1612;
+}
+.weapMeta {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: #6c573a;
+  flex-wrap: wrap;
+}
+.weapMeta b {
+  color: #3a2812;
+}
+.weapKind {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6f5320;
+}
+
+/* ── Okna (tlačítka) ── */
+.winBtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.winBtn {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 10px;
+  color: #3a2812;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.55),
+    rgba(221, 202, 159, 0.32)
+  );
+  border: 1px solid #6f5320;
+  border-radius: 4px;
+}
+.winBtn:hover {
+  background: #f3dd97;
+}
+
+/* ── Obsah oken (Schopnosti = text) ── */
+.abilArea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #3a2b19;
+  background: rgba(255, 252, 242, 0.6);
+  border: 1px solid rgba(196, 173, 126, 0.7);
+  border-radius: 4px;
+  padding: 10px 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+.abilArea:focus {
+  border-color: #6f5320;
+}
+.abilText {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  color: #3a2b19;
+}
+.addSpell {
+  width: 100%;
+  padding: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  color: #6f5320;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.4),
+    rgba(221, 202, 159, 0.3)
+  );
+  border: 1px dashed #6f5320;
+  border-radius: 4px;
+}
+.addSpell:hover {
+  color: #3a2812;
+  border-style: solid;
+  background: rgba(221, 202, 159, 0.5);
+}

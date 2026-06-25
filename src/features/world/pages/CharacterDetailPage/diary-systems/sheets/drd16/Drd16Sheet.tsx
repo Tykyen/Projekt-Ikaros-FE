@@ -26,6 +26,8 @@ import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
   DRD16_CLASS_FAMILIES,
+  DRD16_EMPTY_SPELL,
+  DRD16_SPELL_FIELDS,
   DRD16_HAZ_STATS,
   DRD16_LOAD_ROWS,
   DRD16_PC_STAT_CAP,
@@ -35,8 +37,10 @@ import {
   type Drd16Armor,
   type Drd16RangedWeapon,
   type Drd16Skill,
+  type Drd16Spell,
   type Drd16Weapon,
 } from './constants';
+import { Drd16SpellCard } from './Drd16SpellCard';
 import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 
 const DRD16_RUNGS = 50;
@@ -321,13 +325,7 @@ export function Drd16Sheet({
         </div>
         <div className="drd16-scroll-panel">
           <h3 className="drd16-panel-h">Kouzla / Spellbook</h3>
-          <textarea
-            value={g('spells')}
-            disabled={disabled}
-            onChange={(e) => set('spells', e.target.value)}
-            placeholder="Známá kouzla, PPZ, projevy mága, poznámky o spellbooku…"
-            aria-label="Kouzla a spellbook"
-          />
+          <Drd16Spellbook cda={cda} disabled={disabled} />
         </div>
         <div className="drd16-scroll-panel notes">
           <h3 className="drd16-panel-h">Poznámky</h3>
@@ -351,6 +349,39 @@ export function Drd16Sheet({
 interface SubProps {
   cda: CdAccess;
   disabled: boolean;
+}
+
+/**
+ * 16.2b-mapa — spellbook editor (sdílená `Drd16SpellCard`). Jediný zdroj =
+ * `customData.spells` (JSON pole), reuse i v okně „Kouzla" combat panelu na
+ * taktické mapě. Změna typu textarea→JSON; v drd16 denících zatím žádná
+ * kouzla → bez migrace (starý prázdný/text klíč → `parseJsonArr` vrátí []).
+ */
+function Drd16Spellbook({ cda, disabled }: SubProps) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const spells = parseJsonArr<Drd16Spell>('spells');
+  return (
+    <>
+      {spells.map((spell, i) => (
+        <Drd16SpellCard
+          key={i}
+          spell={{ ...DRD16_EMPTY_SPELL, ...spell }}
+          editable={!disabled}
+          onChange={(patch) => updateArr<Drd16Spell>('spells', i, patch)}
+          onRemove={() => removeArr('spells', i)}
+        />
+      ))}
+      {!disabled && (
+        <button
+          type="button"
+          className="drd16-add"
+          onClick={() => addArr<Drd16Spell>('spells', DRD16_EMPTY_SPELL)}
+        >
+          + Přidat kouzlo
+        </button>
+      )}
+    </>
+  );
 }
 
 /** Dekorativní heraldický štít (erb). Upload vlastního = navazující sub-krok. */
@@ -897,6 +928,7 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
   const rangedWeapons = cda.parseJsonArr<Drd16RangedWeapon>('rangedWeapons');
   const drdSkills = cda.parseJsonArr<Drd16Skill>('drdSkills');
   const armor = cda.parseJsonArr<Drd16Armor>('armor');
+  const spells = cda.parseJsonArr<Drd16Spell>('spells');
 
   const primaryBonus = (key: string): string => {
     const v = parseInt(g(`${key}_val`, ''), 10);
@@ -905,7 +937,6 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
 
   const classLine = [g('class'), g('class_spec')].filter(Boolean).join(' → ');
   const specialAbilities = g('special_abilities').trim();
-  const spells = g('spells').trim();
   const notes = g('notes').trim();
 
   return (
@@ -1099,10 +1130,27 @@ function Drd16PrintView({ cda }: { cda: CdAccess }) {
         </>
       )}
 
-      {spells && (
+      {spells.length > 0 && (
         <>
           <h2>Kouzla / Spellbook</h2>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{spells}</p>
+          {spells.map((s, i) => (
+            <div key={i} className="print-spell">
+              <strong>{s.name || '(bez názvu)'}</strong>
+              {s.incantation && <em> — {s.incantation}</em>}
+              {s.domain && <span> [{s.domain}]</span>}
+              <dl className="print-cols">
+                {DRD16_SPELL_FIELDS.filter((f) => s[f.key]).map((f) => (
+                  <div key={f.key}>
+                    <dt>{f.label}</dt>
+                    <dd>{s[f.key]}</dd>
+                  </div>
+                ))}
+              </dl>
+              {s.description && (
+                <p style={{ whiteSpace: 'pre-wrap' }}>{s.description}</p>
+              )}
+            </div>
+          ))}
         </>
       )}
 

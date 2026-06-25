@@ -361,6 +361,79 @@
   background: color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent);
 }
 
+/* ════════════ 16.2b-mapa — drd16 wrapper chrome nese FANTASY skin ════════════
+ * Tmavá kožená vazba + zlato (sladěno s pergamenovým combat panelem uvnitř).
+ * Self-contained (drd16 nemá --mx-*; pergamen body jede vlastní paletou).
+ * Scoped na drd16 → ostatní systémy drží mapový motiv `--map-ui-*`. */
+.panel[data-diary-system='drd16'] {
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(193, 154, 63, 0.14), transparent 62%),
+    linear-gradient(180deg, #2a2014, #1a130b);
+  border-color: #6f5320;
+  color: #e2cfa3;
+  box-shadow:
+    -8px 0 32px rgba(0, 0, 0, 0.55),
+    0 0 24px rgba(193, 154, 63, 0.12);
+}
+.panel[data-diary-system='drd16'] .modeDock,
+.panel[data-diary-system='drd16'].modeDock {
+  border-left-color: #6f5320;
+}
+.panel[data-diary-system='drd16'] .header {
+  background: linear-gradient(
+    180deg,
+    rgba(193, 154, 63, 0.16),
+    rgba(193, 154, 63, 0.08)
+  );
+  border-bottom-color: rgba(193, 154, 63, 0.3);
+}
+.panel[data-diary-system='drd16'] .actionBar {
+  background: rgba(193, 154, 63, 0.06);
+  border-bottom-color: rgba(193, 154, 63, 0.18);
+}
+.panel[data-diary-system='drd16'] .modeToggle {
+  background: #2a2014;
+  border-color: rgba(193, 154, 63, 0.5);
+}
+.panel[data-diary-system='drd16'] .modeBtn {
+  color: #b09467;
+}
+.panel[data-diary-system='drd16'] .modeBtn:hover,
+.panel[data-diary-system='drd16'] .modeBtnActive {
+  background: rgba(193, 154, 63, 0.28);
+  color: #f3dd97;
+}
+.panel[data-diary-system='drd16'] .closeBtn {
+  color: #b09467;
+  border-color: rgba(193, 154, 63, 0.3);
+}
+.panel[data-diary-system='drd16'] .closeBtn:hover {
+  background: rgba(203, 65, 56, 0.18);
+  border-color: rgba(203, 65, 56, 0.5);
+  color: #cb4138;
+}
+.panel[data-diary-system='drd16'] .identity {
+  border-bottom-color: rgba(193, 154, 63, 0.18);
+}
+.panel[data-diary-system='drd16'] .avatar {
+  background: radial-gradient(circle at 40% 30%, #f1e6cb, #ddca9f);
+  border-color: #c19a3f;
+  box-shadow: 0 0 16px rgba(193, 154, 63, 0.3);
+}
+.panel[data-diary-system='drd16'] .name {
+  color: #f3dd97;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+}
+.panel[data-diary-system='drd16'] .resizeHandle:hover {
+  background: rgba(193, 154, 63, 0.35);
+}
+.panel[data-diary-system='drd16'] .body {
+  scrollbar-color: rgba(193, 154, 63, 0.3) transparent;
+}
+.panel[data-diary-system='drd16'] .body::-webkit-scrollbar-thumb {
+  background: rgba(193, 154, 63, 0.3);
+}
+
 /* ── Responsive: mobile force overlay ──────────────────────────── */
 @media (max-width: 640px) {
   .modeDock,

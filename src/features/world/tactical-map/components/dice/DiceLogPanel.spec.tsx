@@ -60,6 +60,64 @@ describe("DiceLogPanel", () => {
     expect(localStorage.getItem("ikr-map-dice-cleared-s1")).toBeTruthy();
   });
 
+  it("rozpis d6+ rozepíše kaskádu: (mod) + (a + b + c) = total", () => {
+    const roll: MapDiceRoll = {
+      id: "r1",
+      rolledAt: "2026-05-31T08:00:00.000Z",
+      byUserId: "me",
+      rollerName: "me",
+      rollerKind: "pc",
+      category: "skill",
+      dicePayload: {
+        type: "d6+",
+        faces: [6, 6, 3],
+        sum: 15,
+        total: 22,
+        label: "Útok: Meč",
+        modifier: 7,
+      } as never,
+    };
+    render(
+      <DiceLogPanel
+        rolls={[roll]}
+        viewer={{ userId: "me", isPj: false }}
+        visibility={undefined}
+        sceneId="s9"
+      />,
+    );
+    expect(
+      screen.getByText("Útok: Meč (+7) + (6 + 6 + 3) = +22"),
+    ).toBeTruthy();
+  });
+
+  it("fate rozpis zůstává v ± součet tvaru (žádná regrese Matrix)", () => {
+    const roll: MapDiceRoll = {
+      id: "r2",
+      rolledAt: "2026-05-31T08:00:00.000Z",
+      byUserId: "me",
+      rollerName: "me",
+      rollerKind: "pc",
+      category: "skill",
+      dicePayload: {
+        type: "fate",
+        faces: ["+", "-", "0", "0"],
+        sum: 0,
+        total: 1,
+        label: "Magie",
+        modifier: 1,
+      } as never,
+    };
+    render(
+      <DiceLogPanel
+        rolls={[roll]}
+        viewer={{ userId: "me", isPj: false }}
+        visibility={undefined}
+        sceneId="s10"
+      />,
+    );
+    expect(screen.getByText("Magie (+1) + 0 = +1")).toBeTruthy();
+  });
+
   it("PJ vidí všechny hody", () => {
     const rolls = [
       mkRoll("pc", "me"),

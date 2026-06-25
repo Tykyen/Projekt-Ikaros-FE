@@ -89,17 +89,34 @@ function totalClass(total: number): string {
 
 /**
  * 10.2j — rozpis výpočtu hodu (dřív v zeleném toastu): „Magie (+1) − 1 = +0".
- * `{label} ({modifier}) {±kostky} = {total}`. Zobrazí se jen když má hod
- * schopnost (label) nebo modifier — holé vlastní hody zůstanou bez rozpisu.
+ * Zobrazí se jen když má hod schopnost (label) nebo modifier — holé vlastní
+ * hody zůstanou bez rozpisu.
+ *
+ * 16.2b — číselné tváře (d6+/d6/d10/d20/pool/mixed) rozepisujeme po
+ * jednotlivých kostkách `({a} + {b} + {c})`, ať je u DrD nafukovacího k6
+ * vidět celá kaskáda: „Útok (+7) + (6 + 6 + 3) = +22". Fate (+/−/0) a d100
+ * (tens/ones) si drží původní `± součet` tvar (rozpis kostek by tam mátl).
  */
 function renderBreakdown(p: MapDiceRoll["dicePayload"]): string | null {
   const mod = p.modifier ?? 0;
   if (!p.label && mod === 0) return null;
+  const totalStr = p.total >= 0 ? `+${p.total}` : `${p.total}`;
+  const prefix = p.label ? `${p.label} ` : "";
+
+  const numericFaces =
+    p.type !== "fate" &&
+    p.type !== "d100" &&
+    p.faces.every((f) => typeof f === "number");
+  if (numericFaces) {
+    const dicePart = `(${(p.faces as number[]).join(" + ")})`;
+    const modPart =
+      mod !== 0 ? `(${mod > 0 ? "+" : "−"}${Math.abs(mod)}) + ` : "";
+    return `${prefix}${modPart}${dicePart} = ${totalStr}`;
+  }
+
   const signedMod = mod >= 0 ? `+${mod}` : `${mod}`;
   const subSign = p.sum >= 0 ? "+" : "−";
   const subAbs = Math.abs(p.sum);
-  const totalStr = p.total >= 0 ? `+${p.total}` : `${p.total}`;
-  const prefix = p.label ? `${p.label} ` : "";
   return `${prefix}(${signedMod}) ${subSign} ${subAbs} = ${totalStr}`;
 }
 

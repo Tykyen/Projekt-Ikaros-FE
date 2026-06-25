@@ -31,6 +31,7 @@ export type RollKind =
   | 'd100'
   | 'd4'
   | 'd6'
+  | 'd6+'
   | 'd8'
   | 'd10'
   | 'd12'
@@ -154,6 +155,22 @@ export function rollGenericDice(type: string): GenericRollResult {
   const symbols = `[${rolls.join(', ')}]`;
 
   return { rolls, sum, symbols, type };
+}
+
+/**
+ * `d6+` — „nafukovací k6" (exploding d6, DrD 1.6): hoď d6; padne-li 6, hoď
+ * znovu a přičti; opakuj. Vrací CELOU kaskádu hozených kostek + součet.
+ * Tvrdý strop 50 hodů proti teoretické nekonečné smyčce (prakticky 1–3 hody).
+ */
+export function rollExplodingD6(): GenericRollResult {
+  const rolls: number[] = [];
+  let face: number;
+  do {
+    face = secureRandomInt(6) + 1;
+    rolls.push(face);
+  } while (face === 6 && rolls.length < 50);
+  const sum = rolls.reduce((a, b) => a + b, 0);
+  return { rolls, sum, symbols: `[${rolls.join(', ')}]`, type: 'd6+' };
 }
 
 /** Pool roll s explicitním počtem kostek. */

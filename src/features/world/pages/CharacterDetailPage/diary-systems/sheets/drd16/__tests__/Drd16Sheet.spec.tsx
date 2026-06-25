@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Drd16Sheet } from '../Drd16Sheet';
-import { getDrdBonus } from '../constants';
+import { getDrdBonus, DRD16_EMPTY_SPELL } from '../constants';
 import type { CharacterDiary } from '../../../../../api/characters.types';
 import { useCharacter } from '@/features/world/pages/api/useCharacter';
 
@@ -179,6 +179,41 @@ describe('Drd16Sheet (16.2b)', () => {
         ]),
       }),
     });
+  });
+
+  it('+ Přidat kouzlo vyvolá onChange se strukturovaným spells', () => {
+    const onChange = vi.fn();
+    render(
+      <Drd16Sheet {...commonProps} diary={makeDiary()} mode="edit" onChange={onChange} />,
+    );
+    fireEvent.click(screen.getByText('+ Přidat kouzlo'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: expect.objectContaining({
+        spells: JSON.stringify([DRD16_EMPTY_SPELL]),
+      }),
+    });
+  });
+
+  it('editace názvu kouzla zapíše delta do spells (persistence)', () => {
+    const onChange = vi.fn();
+    render(
+      <Drd16Sheet
+        {...commonProps}
+        diary={makeDiary({
+          spells: JSON.stringify([{ ...DRD16_EMPTY_SPELL, name: 'Blesk' }]),
+        })}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.change(screen.getByDisplayValue('Blesk'), {
+      target: { value: 'Ohnivá koule' },
+    });
+    const last = onChange.mock.calls.at(-1)![0] as {
+      customDataPatch: { spells: string };
+    };
+    const spells = JSON.parse(last.customDataPatch.spells);
+    expect(spells[0].name).toBe('Ohnivá koule');
   });
 
   it('žebřík -1 sníží hp_current', () => {

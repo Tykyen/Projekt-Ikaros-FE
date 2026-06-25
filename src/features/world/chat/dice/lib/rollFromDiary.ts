@@ -11,7 +11,7 @@
  *
  * Pool/mixed se z deníku nehází (parita s mapou) → `null`.
  */
-import { rollFate, rollGenericDice } from './rollEngine';
+import { rollFate, rollGenericDice, rollExplodingD6 } from './rollEngine';
 import {
   buildFatePayload,
   buildGenericPayload,
@@ -24,6 +24,7 @@ export type DiaryRollKind =
   | 'fate'
   | 'd4'
   | 'd6'
+  | 'd6+'
   | 'd8'
   | 'd10'
   | 'd12'
@@ -62,7 +63,9 @@ export function rollDiaryRequest(
     };
   }
 
-  const r = rollGenericDice(kind);
+  // DrD 1.6 nafukovací k6 (exploding) — `rollGenericDice('d6+')` by `+` neparsoval
+  // a spadl na default d20, proto vlastní větev.
+  const r = kind === 'd6+' ? rollExplodingD6() : rollGenericDice(kind);
   return {
     dicePayload: buildGenericPayload(r, { label, modifier }),
     content: formatGenericDiceMessage(label, modifier, r),

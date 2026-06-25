@@ -255,6 +255,51 @@
   color: var(--mx-log-total, var(--mx-gold, #f5c451));
 }
 
+/* ════════════ 16.2b-mapa — drd16 roll log nese FANTASY skin ════════════
+ * Tmavá kožená vazba + zlatý rám, pergamenová čísla (mono), krvavý total.
+ * Self-contained (drd16 nemá --mx-*; pergamen body jede vlastní paletou).
+ * Scoped na drd16 → ostatní systémy beze změny. */
+[data-diary-system='drd16'] .panel {
+  background: linear-gradient(180deg, #2a2014, #15100a);
+  border-color: #6f5320;
+  color: #e2cfa3;
+  backdrop-filter: none;
+}
+[data-diary-system='drd16'] .header {
+  border-bottom-color: rgba(193, 154, 63, 0.22);
+}
+[data-diary-system='drd16'] .title {
+  color: #f3dd97;
+  font-family: 'Cinzel', serif;
+}
+[data-diary-system='drd16'] .chip {
+  background: rgba(193, 154, 63, 0.12);
+  color: #e2cfa3;
+}
+[data-diary-system='drd16'] .name {
+  color: #b09467;
+}
+[data-diary-system='drd16'] .breakdown {
+  color: #c9b486;
+  font-family: 'IBM Plex Mono', monospace;
+}
+[data-diary-system='drd16'] .faces,
+[data-diary-system='drd16'] .total {
+  font-family: 'IBM Plex Mono', monospace;
+}
+[data-diary-system='drd16'] .faceNum {
+  color: #e8dab7;
+}
+[data-diary-system='drd16'] .totalPositive {
+  color: #cb4138;
+}
+[data-diary-system='drd16'] .totalNegative {
+  color: #9c6b6b;
+}
+[data-diary-system='drd16'] .totalNeutral {
+  color: #c19a3f;
+}
+
 /* ════════════ 16.2c-F3c — per-skin SIGNATURE roll logu ════════════
  * Tvarové ornamenty (rámy/nýty/scanlines/lišta) ZDE (hashovaná `.panel`
  * nejde z globálního diary-skins.css). Paletu+čísla řeší tokeny --mx-log-*. */

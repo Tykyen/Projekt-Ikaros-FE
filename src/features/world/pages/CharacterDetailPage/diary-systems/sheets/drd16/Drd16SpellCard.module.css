@@ -1,0 +1,169 @@
+/* 16.2b-mapa — karta kouzla DrD 1.6 (fantasy pergamen, self-contained).
+   Vlastní paleta (ne sdílené tokeny), ať drží i v portálovaném modálu mimo
+   [data-diary-system] scope. Skin tokenizace = 16.2c-drd16. */
+
+.card {
+  position: relative;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 5px;
+  background-color: #efe3c6;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.55),
+    rgba(221, 202, 159, 0.28)
+  );
+  border: 1px solid #c4ad7e;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+  color: #3a2b19;
+  font-family: 'EB Garamond', Georgia, serif;
+}
+
+/* ── header (view + edit) ── */
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.name {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #241608;
+}
+.incant {
+  font-style: italic;
+  font-size: 14px;
+  color: #5c1612;
+}
+.domain {
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1f1607;
+  background: linear-gradient(180deg, #f3dd97, #c19a3f);
+  border: 1px solid #6f5320;
+  border-radius: 3px;
+  padding: 3px 8px;
+}
+
+/* ── grid (mana/past/dosah/rozsah/vyvolání/trvání) ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px 18px;
+  margin-bottom: 9px;
+}
+
+/* view field = řádek „LABEL  hodnota" */
+.field {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+  font-size: 13.5px;
+}
+.k {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6c573a;
+  min-width: 78px;
+  flex: 0 0 auto;
+  padding-top: 2px;
+}
+.v {
+  color: #3a2b19;
+  font-weight: 500;
+}
+.mana {
+  color: #16294f;
+  font-weight: 700;
+}
+.desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #3a2b19;
+  border-top: 1px dashed rgba(111, 83, 32, 0.35);
+  padding-top: 8px;
+  white-space: pre-wrap;
+}
+
+/* ── edit ── */
+.topEdit {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 9px;
+}
+/* edit field = sloupec „LABEL / input" */
+.fieldEdit {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nameInput,
+.incantInput,
+.domainInput,
+.descInput,
+.fieldEdit input {
+  font-family: inherit;
+  color: #2a1a0a;
+  background: rgba(255, 252, 242, 0.6);
+  border: 1px solid rgba(196, 173, 126, 0.7);
+  border-radius: 3px;
+  padding: 5px 7px;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+.nameInput:focus,
+.incantInput:focus,
+.domainInput:focus,
+.descInput:focus,
+.fieldEdit input:focus {
+  border-color: #6f5320;
+  background: #fffdf6;
+}
+.nameInput {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+}
+.incantInput {
+  font-style: italic;
+  color: #5c1612;
+}
+.domainInput {
+  width: 70px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.descInput {
+  min-height: 64px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.remove {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  cursor: pointer;
+  color: #5c1612;
+  background: rgba(156, 42, 35, 0.1);
+  border: 1px solid rgba(156, 42, 35, 0.4);
+  border-radius: 3px;
+  font-size: 13px;
+  line-height: 1;
+}
+.remove:hover {
+  background: rgba(156, 42, 35, 0.2);
+}

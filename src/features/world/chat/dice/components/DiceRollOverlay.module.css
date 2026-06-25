@@ -211,6 +211,51 @@
   font-family: var(--mx-log-eq-font, var(--mx-font-display, 'Cinzel', serif));
 }
 
+/* ════════════ 16.2b-mapa — drd16 readout nese FANTASY skin ════════════
+ * Kožená vazba kolem readoutu, pergamenové kostky, krvavý total. Self-contained.
+ * Sémantické +/− drží význam (text), barvy = fantasy paleta. Scoped na drd16. */
+[data-diary-system='drd16'] .readout {
+  background-color: #1a130b;
+  background-image: linear-gradient(180deg, #2a2014, #1a130b);
+  border: 1px solid #6f5320;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-diary-system='drd16'] .faceBadge {
+  background: linear-gradient(180deg, #f1e6cb, #ddca9f);
+  border-color: #6f5320;
+  color: #2a1a0a;
+  font-family: 'IBM Plex Mono', monospace;
+}
+[data-diary-system='drd16'] .faceGeneric {
+  color: #2a1a0a;
+}
+[data-diary-system='drd16'] .totalValue {
+  font-family: 'IBM Plex Mono', monospace;
+}
+[data-diary-system='drd16'] .totalPositive {
+  color: #cb4138;
+}
+[data-diary-system='drd16'] .totalNegative {
+  color: #9c6b6b;
+}
+[data-diary-system='drd16'] .totalNeutral {
+  color: #c19a3f;
+}
+[data-diary-system='drd16'] .equation {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+}
+[data-diary-system='drd16'] .skillName {
+  color: #f3dd97;
+}
+[data-diary-system='drd16'] .eqSign {
+  color: #8a7350;
+}
+[data-diary-system='drd16'] .rollerName {
+  color: #b09467;
+  font-family: 'Cinzel', serif;
+}
+
 /* ════════════ 16.2c-F3c — per-skin SIGNATURE readoutu ════════════
  * Tvarové ornamenty (rámy/nýty/scanlines/lístek) musí být ZDE (hashovaná
  * třída `.readout` nejde zacílit z globálního diary-skins.css). Paletu+čísla

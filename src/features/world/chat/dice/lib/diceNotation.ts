@@ -65,6 +65,11 @@ export function payloadToNotation(payload: DicePayload): string | null {
     return parts.join('+');
   }
 
+  if (payload.type === 'd6+') {
+    // Nafukovací k6: kaskáda hozených d6 (best-effort 3D = N viditelných d6).
+    return group(6, payload.faces.map(Number));
+  }
+
   if (payload.type.startsWith('pool-d')) {
     const sides = parseInt(payload.type.replace('pool-d', ''), 10);
     if (!sides) return null;

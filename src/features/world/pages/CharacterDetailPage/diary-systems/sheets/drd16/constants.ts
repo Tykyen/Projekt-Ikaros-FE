@@ -141,3 +141,49 @@ export interface Drd16Skill {
   name: string;
   level: string;
 }
+
+/**
+ * 16.2b-mapa — strukturovaná karta kouzla (spellbook). Vše string, bez
+ * parsování (magenergie je proměnlivá: „3 + za další 2"). Editor sdílený
+ * mezi listem (`Drd16Sheet`) a oknem „Kouzla" v combat panelu na mapě;
+ * jediný zdroj = `customData.spells` (změna typu textarea→JSON, v drd16
+ * denících zatím žádná data → bez migrace).
+ */
+export interface Drd16Spell {
+  name: string;
+  incantation: string;
+  mana: string;
+  trap: string;
+  range: string;
+  scope: string;
+  casting: string;
+  duration: string;
+  domain: string;
+  description: string;
+}
+
+export const DRD16_EMPTY_SPELL: Drd16Spell = {
+  name: '',
+  incantation: '',
+  mana: '',
+  trap: '',
+  range: '',
+  scope: '',
+  casting: '',
+  duration: '',
+  domain: '',
+  description: '',
+};
+
+/** Popisky polí karty kouzla (pořadí = pořadí v gridu). */
+export const DRD16_SPELL_FIELDS: ReadonlyArray<{
+  key: keyof Drd16Spell;
+  label: string;
+}> = [
+  { key: 'mana', label: 'Magenergie' },
+  { key: 'trap', label: 'Past' },
+  { key: 'range', label: 'Dosah' },
+  { key: 'scope', label: 'Rozsah' },
+  { key: 'casting', label: 'Vyvolání' },
+  { key: 'duration', label: 'Trvání' },
+];

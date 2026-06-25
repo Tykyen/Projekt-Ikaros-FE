@@ -4,6 +4,7 @@ import {
   rollGenericDice,
   rollPool,
   rollMixedDice,
+  rollExplodingD6,
   getOverpressureFromRollTotal,
   secureRandomInt,
 } from './rollEngine';
@@ -136,6 +137,33 @@ describe('rollMixedDice', () => {
     const r = rollMixedDice({ d100: 1 });
     expect(r.sum).toBe(100);
     expect(r.faceTypes).toEqual(['d100', 'd100']);
+  });
+});
+
+describe('rollExplodingD6', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('bez nafouknutí — jeden hod (3)', () => {
+    mockSecureSeeds([2]); // secureRandomInt(6) = 2 → face 3 (≠6, stop)
+    const r = rollExplodingD6();
+    expect(r.rolls).toEqual([3]);
+    expect(r.sum).toBe(3);
+    expect(r.type).toBe('d6+');
+  });
+
+  it('kaskáda [6, 6, 3] = 15 (6 nafoukne, dál hází)', () => {
+    mockSecureSeeds([5, 5, 2]); // faces 6, 6, 3 → třetí ≠6 ukončí
+    const r = rollExplodingD6();
+    expect(r.rolls).toEqual([6, 6, 3]);
+    expect(r.sum).toBe(15);
+    expect(r.symbols).toBe('[6, 6, 3]');
+  });
+
+  it('tvrdý strop 50 hodů (samé šestky neskončí donekonečna)', () => {
+    mockSecureSeeds(Array(60).fill(5)); // vždy face 6
+    const r = rollExplodingD6();
+    expect(r.rolls).toHaveLength(50);
+    expect(r.rolls.every((f) => f === 6)).toBe(true);
   });
 });
 
