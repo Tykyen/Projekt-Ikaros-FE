@@ -73,6 +73,7 @@ import { MapWeatherPanel } from "./components/weather/MapWeatherPanel";
 import { MapWeatherAtmosphere } from "./components/weather/MapWeatherAtmosphere";
 import { useMapWeather } from "./hooks/useMapWeather";
 import { DiceLogPanel } from "./components/dice/DiceLogPanel";
+import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import { DiceRollButton } from "./components/dice/DiceRollButton";
 import { AmbientSoundPanel } from "./components/sound/AmbientSoundPanel";
 import { SceneSoundPlayer } from "./components/sound/SceneSoundPlayer";
@@ -2156,12 +2157,14 @@ export function TacticalMapView(): React.ReactElement {
       {worldId && currentUser && (scene || isPJ) && (
         <div className={styles.bottomLeftStack}>
           {scene && (
-            <DiceLogPanel
-              rolls={scene.diceRolls ?? []}
-              viewer={{ userId: currentUser.id, isPj: isPJ }}
-              visibility={world?.diceVisibility}
-              sceneId={scene.id}
-            />
+            <DiarySkinScope worldId={worldId} style={{ display: "contents" }}>
+              <DiceLogPanel
+                rolls={scene.diceRolls ?? []}
+                viewer={{ userId: currentUser.id, isPj: isPJ }}
+                visibility={world?.diceVisibility}
+                sceneId={scene.id}
+              />
+            </DiarySkinScope>
           )}
           {isPJ && (
             <MapPjPanel
@@ -2177,11 +2180,13 @@ export function TacticalMapView(): React.ReactElement {
       {/* 10.2j G3 — fullscreen 3D dice overlay (lokální hod + cizí viditelný).
           warmup: přednahřeje 3D engine při otevření mapy → první hod se zobrazí
           napoprvé (jinak studený engine spolkne první hod, viz „hodit dvakrát"). */}
-      <DiceRollOverlay
-        warmup
-        roll={diceOverlay}
-        onDone={() => setDiceOverlay(null)}
-      />
+      <DiarySkinScope worldId={worldId} style={{ display: "contents" }}>
+        <DiceRollOverlay
+          warmup
+          roll={diceOverlay}
+          onDone={() => setDiceOverlay(null)}
+        />
+      </DiarySkinScope>
     </div>
   );
 }

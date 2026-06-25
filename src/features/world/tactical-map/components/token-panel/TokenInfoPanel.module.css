@@ -282,6 +282,85 @@
   background: rgb(var(--map-ui-accent-rgb) / 0.55);
 }
 
+/* ════════════ 16.2c-F3 — chrome nese DENÍKOVÝ SKIN ════════════
+ * Scoped na `[data-diary-system='matrix']` (aside má data-diary-skin) → pro
+ * ostatní herní systémy zůstává mapový motiv `--map-ui-*` beze změny. Hlavní
+ * plochy (panel, header, BODY OSUDU badge, akce, 📌 toggle, close, identity)
+ * se přemapují na `--mx-*` skinu; alfy přes color-mix. Pokud token chybí,
+ * color-mix je invalidní → padá na základní mapové pravidlo (regrese-safe). */
+.panel[data-diary-system='matrix'] {
+  background: var(--mx-bg, linear-gradient(180deg, #0b0b18, #08080f));
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 32%, transparent);
+  color: var(--mx-text, #d6def0);
+  box-shadow:
+    -8px 0 32px rgba(0, 0, 0, 0.55),
+    0 0 24px color-mix(in srgb, var(--mx-accent, #38e0ff) 12%, transparent);
+}
+.panel[data-diary-system='matrix'] .modeDock,
+.panel[data-diary-system='matrix'].modeDock {
+  border-left-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 40%, transparent);
+}
+.panel[data-diary-system='matrix'] .header {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--mx-accent, #38e0ff) 18%, transparent),
+    color-mix(in srgb, var(--mx-accent, #38e0ff) 9%, transparent)
+  );
+  border-bottom-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 40%, transparent);
+}
+.panel[data-diary-system='matrix'] .badge {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 45%, transparent);
+  color: var(--mx-text, #d6def0);
+  font-family: var(--mx-font-display, inherit);
+}
+.panel[data-diary-system='matrix'] .actionBar {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 6%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 18%, transparent);
+}
+.panel[data-diary-system='matrix'] .modeToggle {
+  background: var(--mx-panel, #0e0f1e);
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 50%, transparent);
+}
+.panel[data-diary-system='matrix'] .modeBtn {
+  color: var(--mx-muted, #76809a);
+}
+.panel[data-diary-system='matrix'] .modeBtn:hover,
+.panel[data-diary-system='matrix'] .modeBtnActive {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 28%, transparent);
+  color: var(--mx-text, #d6def0);
+}
+.panel[data-diary-system='matrix'] .closeBtn {
+  color: var(--mx-muted, #76809a);
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 25%, transparent);
+}
+.panel[data-diary-system='matrix'] .closeBtn:hover {
+  background: color-mix(in srgb, var(--mx-danger, #f87171) 18%, transparent);
+  border-color: color-mix(in srgb, var(--mx-danger, #f87171) 50%, transparent);
+  color: var(--mx-danger, #f87171);
+}
+.panel[data-diary-system='matrix'] .identity {
+  border-bottom-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 16%, transparent);
+}
+.panel[data-diary-system='matrix'] .avatar {
+  background: var(--mx-panel, #0e0f1e);
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 45%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--mx-accent, #38e0ff) 18%, transparent);
+}
+.panel[data-diary-system='matrix'] .name {
+  color: var(--mx-name-color, var(--mx-text, #f0f3ff));
+  font-family: var(--mx-font-display, inherit);
+}
+.panel[data-diary-system='matrix'] .resizeHandle:hover {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 35%, transparent);
+}
+.panel[data-diary-system='matrix'] .body {
+  scrollbar-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent) transparent;
+}
+.panel[data-diary-system='matrix'] .body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent);
+}
+
 /* ── Responsive: mobile force overlay ──────────────────────────── */
 @media (max-width: 640px) {
   .modeDock,

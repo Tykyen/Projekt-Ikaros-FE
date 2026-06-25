@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components -- idiomatický Context pattern (Provider + useDiceRollOverlay hook v jednom souboru); jen DX/HMR */
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
+import { useWorldContext } from '@/features/world/context/WorldContext';
+import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
 import type { DicePayload } from '../lib/dicePayload';
 import { DiceRollOverlay, type DiceRollEvent } from './DiceRollOverlay';
 
@@ -50,6 +52,9 @@ export function DiceRollOverlayProvider({ children }: PropsWithChildren) {
   const [roll, setRoll] = useState<DiceRollEvent | null>(null);
   const counter = useRef(0);
   const onCompleteRef = useRef<(() => void) | null>(null);
+  // 16.2c-F3 — readout (vyčíslení hodu) nese deníkový skin viewera; chat shell
+  // zůstává motivový (jen overlay obalen, ne `children`).
+  const { world } = useWorldContext();
 
   const trigger = useCallback(
     (
@@ -83,7 +88,9 @@ export function DiceRollOverlayProvider({ children }: PropsWithChildren) {
   return (
     <Ctx.Provider value={{ trigger }}>
       {children}
-      <DiceRollOverlay roll={roll} onDone={handleDone} />
+      <DiarySkinScope worldId={world?.id ?? ''} style={{ display: 'contents' }}>
+        <DiceRollOverlay roll={roll} onDone={handleDone} />
+      </DiarySkinScope>
     </Ctx.Provider>
   );
 }

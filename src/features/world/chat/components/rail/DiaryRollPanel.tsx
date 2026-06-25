@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ArrowLeft, X, Pencil } from 'lucide-react';
 import { DiaryTab } from '@/features/world/pages/CharacterDetailPage/components/DiaryTab';
+import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
 import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { COMBAT_PANELS } from '@/features/world/tactical-map/components/token-panel/combatPanels';
@@ -147,23 +148,25 @@ export function DiaryRollPanel({
       </div>
 
       <div className={s.scroll}>
-        {CombatPanel ? (
-          <CombatPanel
-            token={miniToken}
-            sceneId=""
-            worldId={worldId}
-            canEdit={canEdit}
-            onRoll={onRoll}
-          />
-        ) : (
-          <DiaryTab
-            slug={slug}
-            mode={mode}
-            onExitEdit={() => setMode('view')}
-            onDirtyChange={setDirty}
-            onRoll={onRoll}
-          />
-        )}
+        <DiarySkinScope worldId={worldId}>
+          {CombatPanel ? (
+            <CombatPanel
+              token={miniToken}
+              sceneId=""
+              worldId={worldId}
+              canEdit={canEdit}
+              onRoll={onRoll}
+            />
+          ) : (
+            <DiaryTab
+              slug={slug}
+              mode={mode}
+              onExitEdit={() => setMode('view')}
+              onDirtyChange={setDirty}
+              onRoll={onRoll}
+            />
+          )}
+        </DiarySkinScope>
       </div>
     </aside>
   );

@@ -510,3 +510,38 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 - **mobil RP-divider** = opakovaná past (dlouhé datum) → `flex-shrink:0` na ornament + `@media(max-width:480px)` zmenšit. **`prefers-reduced-motion`** kolem každé animace.
 - **Souboj panel** dědí mapové `--map-ui-*` → přemapovat na `.tabWrap` (combat=potomek), mapa scoped netknutá.
 **Zhodnocení (špatně/co hlídat):** velký necommitnutý balík (~8 souborů, 11 motivů) — měl jsem důrazněji tlačit na průběžný commit dřív. Společné zbývající: chat modaly (portál) + panel kostek.
+
+## ✅ ŘEŠENÍ — 16.2c deník skiny pro-redesign (8 stylů) + tester rework — 2026-06-25
+
+Přepracoval jsem 6 „levných" deníkových skinů na profesionální + přidal 8. (Anime) a přepracoval Horor po odmítnutí testerem. Vše ověřeno renderem reálného `matrix.css`+`diary-skins.css` (Chrome headless) desktop+mobil PŘED předáním.
+
+**Vzor implementace (ustálený):** token blok `[data-diary-skin='X']` (specificita 0,1,0) + strukturní ornamenty `[data-diary-system='matrix'][data-diary-skin='X']` (compound 0,2,0 > layout `[data-diary-system] .x` → vyhraje nezávisle na pořadí načtení CSS). Ornamenty přes volné `::before`/`::after` na `.mx-panel`/`.mx-hero`/`.mx-fate`; **4-rohová technika = 1 `::before` + 4 background-image vrstvy (SVG `<g transform>` flip)**; `isolation:isolate` na panel → `z-index:-1` ornament pod obsah / `z-index:2` nad. Žádný JS, žádný zásah do React markupu.
+
+**Dedikovaný design-agent per skin** (Příroda/Minimal/Retro/Anime/Horor-v2): samostatný agent vymyslí koncept → vyrenderuje → iteruje; já ověřil renderem a poslal zpět s kritikou. Zabránilo to sbíhání (každý skin vlastní tvarový jazyk + signature). `feedback_frontend_design_audit`.
+
+**Vlastní falešný poplach (dobře, že chycen):** tester hlásil „BODY OSUDU" FIALOVOU. `.lab` používá `var(--mx-fate-lab)`, ale sourozenci `.num`/`.star` v TÉMŽE bloku se barvili správně → vypadalo to na selhání jednoho tokenu. **Reprodukce v izolaci (fialový rodič + reálný label) ukázala, že mé CSS je SPRÁVNĚ** (label = skin barva, ne fialová) → kořen = stará CACHE/build u testera, ne CSS bug. **Poučení: když JEDEN var „selže" a sourozenci v témže bloku jedou, NENÍ to CSS bug — reprodukuj dřív než honíš.** Pojistka = explicitní barva ve scoped `.mx-fate .lab` (nezávislá na tokenu, vyšší specificita) → fialová se nevrátí ani po cache.
+
+**Past — světlý skin na tmavém layoutu:** Minimal (jediný světlý) → hardcoded tmavé chrome layoutu prosvítá na papír (budget bar `#15172a`, status badge). Layout je stavěný pro tmu (netokenizované tmavé hodnoty splynou u 7 tmavých skinů). Fix = scoped světlé overrides per světlý prvek. **Poučení: přidáváš-li světlý skin, zgrepuj netokenizované tmavé hex v layoutu.**
+
+**Past — fate label „Body osudu" (2 slova) v kruhu:** prototypy měly „Osud" (1 slovo) → reálný 2slovní label se ve star/kruh pečeti mačkal/přetékal nad kruh. Fix = `font-size:8px; white-space:nowrap` + kontrastní barva per skin.
+
+**8. skin cross-stack (Anime):** FE `DiarySkinId`+`DIARY_SKINS` + **test `skins.spec` čekal přesně 7 → aktualizovat na 8** (jinak červený) + BE `update-member.dto.ts` `@IsIn` whitelist 7→8. **BE schema je `String` (žádný enum) → whitelist DTO je jediná brána; BE RESTART nutný** (`feedback_be_restart_required`), jinak 'anime' → 400. BE+FE NEmíchat v 1 dávce (`feedback_no_mixed_be_fe_batch`).
+
+**Tester rework Horor (gore→elegance):** původní „krvavý prosak" odmítnut jako „od třeťáka/gore". Přepracováno na aristokratickou viktoriánskou upířinu (kovaná stříbrná tracerie, erbovní pečeť, damašek). **Poučení: gore ≠ horor; elegance/zdrženlivost > intenzita; skin kvalita = subjektivní laťka testera, raději dedikovaný redesign než „přibarvit".**
+
+**Zhodnocení:** dobře = reprodukce chytila falešný poplach (necyklil jsem na neexistujícím CSS bugu), render-verify per skin držel kvalitu, pasti (label fit, světlý leak) chyceny v ověření. Špatně/hlídat = velký necommitnutý balík (CSS + registr + test + BE); nutný **BE restart + hard refresh** u testera; zbývá F3 (skin do embedů chat/mapa/kostky/rolllog) + update spec-16.2c.
+
+## ✅ ŘEŠENÍ — 16.2c-F3 deníkový skin do embedů (chat/mapa/dice/roll log) — 2026-06-25
+
+F3 = kompaktní panely v chatu/mapě + dice readout + roll log nesou DENÍKOVÝ SKIN viewera (ne svoje sci-fi/mapové barvy). Autonomně (uživatel spal), proto důraz na **nerozbít**: vše build+testy ověřeno.
+
+**Vzor (přenositelný):** obal `DiarySkinScope` (`diary-systems/DiarySkinScope.tsx`) = `data-diary-system`+`data-diary-skin` viewera (`useDiarySkin`) + statický import `diary-skins.css` (token sady musí být v bundlu i mimo deníkovou stránku). CSS moduly embedů pak **dědí `--mx-*`** z předka.
+- **Kombat/bestie moduly:** odebrat LOKÁLNÍ `--mx-*` defs na `.panel` (jinak přebijí zděděný skin!) + hardcoded barvy/fonty → `var(--mx-x, <sci-fi-orig>)`. Fallback = bez skinu vypadá jako dnes (regrese-safe).
+- **CSS Modules + globální atribut:** `[data-diary-system='matrix'] .panel { }` funguje — modules hashují JEN třídy/#id, atributové/elementové selektory zůstávají globální. Takže lze mixovat globální `[data-*]` předka s lokální `.panel`.
+- **`display:contents` na obalu** pro layout-citlivé embedy (dice overlay fixed, roll log ve flex-stacku) → wrapper negeneruje box, ale dědičnost `--mx-*` i selektory `[data-diary-system] .x` drží přes DOM. Nula vlivu na layout.
+- **Sémantika vs skin:** u dice readout/log a HP heat (warn/crit, přetlaky) jsem barvy NEtokenizoval — nesou VÝSLEDEK/STAV, ne skin. Skinuje se jen rám/paleta. (3D kostky samotné = vlastní per-hod skin, netknuto.)
+- **Chrome map panelu** (`TokenInfoPanel`, sdílený všemi systémy): override scoped `[data-diary-system='matrix']` → pro ne-matrix systémy zůstává mapový motiv `--map-ui-*` beze změny (color-mix invalidní u chybějícího tokenu → padá na základní pravidlo).
+
+**Ověření bez živé appky:** React komponenty (hashované třídy) nejdou renderovat samostatně, ALE **zdrojový `.module.css` má třídy `.panel`/`.section`** (nehashované) → static HTML s týmiž názvy + `diary-skins.css` + `data-diary-skin` = vizuální ověření tokenizace (combat panel: fantasy zlatý / anime barevný / bez skinu sci-fi fallback ✓). Build (tsc+vite) + 753 testů zelené.
+
+**Zhodnocení:** dobře = fallback-first (`var(--mx-x, orig)`) + scoped na matrix = nulová regrese pro ostatní systémy/bez skinu, ověřeno build+test+static-HTML; `display:contents` elegantně vyřešil layout-citlivé obaly. Špatně/hlídat = chrome/dice/log nešlo vizuálně ověřit živě (mapový motiv `--map-ui-*` v static HTML chybí) → **čeká živý test uživatele**; dice readout byl user-nejistý („já nechtěl mě") → udělán jen rám, snadno revertovatelný.

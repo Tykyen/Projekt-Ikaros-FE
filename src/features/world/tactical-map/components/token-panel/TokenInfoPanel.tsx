@@ -19,6 +19,9 @@
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9g.md §A.
  */
 import { type ReactNode, useEffect } from 'react';
+import { useWorldContext } from '@/features/world/context/WorldContext';
+import { getDiaryPreset } from '@/features/world/pages/CharacterDetailPage/diary-systems/registry';
+import { useDiarySkin } from '@/features/world/pages/CharacterDetailPage/diary-systems/skins/useDiarySkin';
 import { usePanelMode, type PanelMode } from '../../hooks/usePanelMode';
 import { usePanelLayout } from '../../hooks/usePanelLayout';
 import styles from './TokenInfoPanel.module.css';
@@ -56,6 +59,12 @@ const MODE_LABEL: Record<PanelMode, string> = {
 export function TokenInfoPanel({ open, header, children }: Props): React.ReactElement | null {
   const { mode, setMode } = usePanelMode();
   const layout = usePanelLayout();
+  // 16.2c-F3 — chrome panelu (badge BODY OSUDU, mode toggle/📌, close, identity)
+  // nese DENÍKOVÝ SKIN viewera. Override v CSS je scoped na `[data-diary-system='matrix']`
+  // → pro ostatní systémy zůstává mapový motiv (--map-ui-*) beze změny.
+  const { world } = useWorldContext();
+  const diarySystem = getDiaryPreset(world?.system).id;
+  const { skin: diarySkin } = useDiarySkin(world?.id ?? '');
 
   // 10.2g — v dock módu vystav šířku panelu jako CSS proměnnou na <html>,
   // aby se floating prvky vpravo (paleta efektů, zoom controls) odsunuly
@@ -108,6 +117,8 @@ export function TokenInfoPanel({ open, header, children }: Props): React.ReactEl
       <aside
         className={wrapperClass}
         style={wrapperStyle}
+        data-diary-system={diarySystem}
+        data-diary-skin={diarySkin}
         role="dialog"
         aria-label={`Detail tokenu: ${header.name}`}
       >

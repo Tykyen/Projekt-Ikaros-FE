@@ -28,6 +28,7 @@ import { tokenIsBestie } from "../../utils/tokenIsBestie";
 import { BestiePanelView } from "./BestiePanelView";
 import { MatrixBestiePanel } from "./system-panels/MatrixBestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
+import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import styles from "./TokenSystemSheet.module.css";
 
 interface Props {
@@ -74,7 +75,7 @@ export function TokenSystemSheet({
     // iniciativa sjednocení); ostatní systémy generický schema engine.
     if (world?.system === "matrix") {
       return (
-        <div className={styles.sheet}>
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
           <MatrixBestiePanel
             token={token}
             sceneId={sceneId}
@@ -83,7 +84,7 @@ export function TokenSystemSheet({
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />
-        </div>
+        </DiarySkinScope>
       );
     }
     return (
@@ -142,7 +143,7 @@ export function TokenSystemSheet({
 
   if (SystemPanel) {
     return (
-      <div className={styles.sheet}>
+      <DiarySkinScope worldId={worldId} className={styles.sheet}>
         <SystemPanel
           token={token}
           sceneId={sceneId}
@@ -150,12 +151,12 @@ export function TokenSystemSheet({
           canEdit={canEdit}
           onRoll={onRoll}
         />
-      </div>
+      </DiarySkinScope>
     );
   }
 
   return (
-    <div className={styles.sheet}>
+    <DiarySkinScope worldId={worldId} className={styles.sheet}>
       <DiaryTab
         slug={token.characterSlug}
         mode={canEdit ? "edit" : "view"}
@@ -165,7 +166,7 @@ export function TokenSystemSheet({
         onDirtyChange={onDirtyChange ?? (() => {})}
         onRoll={onRoll}
       />
-    </div>
+    </DiarySkinScope>
   );
 }
 

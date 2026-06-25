@@ -205,3 +205,34 @@
     background: transparent;
   }
 }
+
+/* ════════════ 16.2c-F3 — roll log nese DENÍKOVÝ SKIN ════════════
+ * Obaleno `DiarySkinScope` (predek má data-diary-system/skin). Skinuje se RÁM
+ * (panel/header/title/chip/jméno); SÉMANTICKÉ výsledky (faces +/−, total
+ * zelená/červená/jantar) zůstávají = nesou výsledek hodu, ne skin. Scoped na
+ * matrix → ostatní systémy beze změny. */
+[data-diary-system='matrix'] .panel {
+  background: var(--mx-panel-bg, linear-gradient(180deg, rgba(17, 18, 36, 0.94), rgba(12, 13, 24, 0.96)));
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent);
+  color: var(--mx-text, #d6def0);
+  font-family: var(--mx-font-num, var(--font-mono));
+}
+[data-diary-system='matrix'] .header {
+  border-bottom-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 22%, transparent);
+}
+[data-diary-system='matrix'] .title {
+  color: var(--mx-accent, #38e0ff);
+}
+[data-diary-system='matrix'] .chip {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 14%, transparent);
+  color: var(--mx-accent, #38e0ff);
+}
+[data-diary-system='matrix'] .name {
+  color: var(--mx-muted, #76809a);
+}
+[data-diary-system='matrix'] .breakdown {
+  color: var(--mx-muted, #76809a);
+}
+[data-diary-system='matrix'] .faceNum {
+  color: var(--mx-text, #d6def0);
+}

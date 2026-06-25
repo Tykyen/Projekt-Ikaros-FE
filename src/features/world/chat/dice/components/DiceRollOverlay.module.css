@@ -170,3 +170,29 @@
     animation: none;
   }
 }
+
+/* ════════════ 16.2c-F3 — dice readout (vyčíslení hodu) nese DENÍKOVÝ SKIN ═══
+ * Obaleno `DiarySkinScope`. Skinuje se jen RÁM readout boxu + neutrální text
+ * (jméno/=); SÉMANTICKÉ +/−/total (cyan/červená/jantar) zůstávají = nesou
+ * výsledek. Scoped na matrix → ostatní systémy beze změny. */
+[data-diary-system='matrix'] .readout {
+  background: var(--mx-panel-bg, linear-gradient(180deg, rgba(14, 12, 40, 0.95), rgba(10, 8, 32, 0.98)));
+  border-color: color-mix(in srgb, var(--mx-accent, #7864ff) 30%, transparent);
+}
+[data-diary-system='matrix'] .faceBadge {
+  background: color-mix(in srgb, var(--mx-panel, #0e0f1e) 90%, transparent);
+  border-color: color-mix(in srgb, var(--mx-accent, #6464b4) 35%, transparent);
+}
+[data-diary-system='matrix'] .faceGeneric {
+  color: var(--mx-text, #fff);
+}
+[data-diary-system='matrix'] .skillName {
+  color: var(--mx-text, #fff);
+}
+[data-diary-system='matrix'] .eqSign {
+  color: var(--mx-muted, rgba(150, 180, 255, 0.55));
+}
+[data-diary-system='matrix'] .rollerName {
+  color: var(--mx-muted, rgba(180, 200, 255, 0.55));
+  font-family: var(--mx-font-display, 'Cinzel', serif);
+}
