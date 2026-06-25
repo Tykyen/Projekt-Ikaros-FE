@@ -111,7 +111,8 @@
 .skillInput:focus { border-bottom: 1px solid var(--mx-input-focus-border, rgba(56, 224, 255, 0.4)); }
 .pips { display: flex; gap: 2.5px; }
 .pip { width: 9px; height: 9px; border-radius: var(--mx-pip-radius, 50%); background: var(--mx-seg-off, #20233a); border: 1px solid rgba(255, 255, 255, 0.07); padding: 0; }
-.pip[data-on='true'] { background: var(--lvlc); border-color: rgba(255, 255, 255, 0.27); box-shadow: var(--mx-pip-glow, 0 0 6px -1px var(--lvlc)); }
+/* 16.2c-F3b — signature pip skinu přes token --mx-pip-on-* (jako plný list). */
+.pip[data-on='true'] { border-color: var(--mx-pip-on-border, rgba(255, 255, 255, 0.27)); background: var(--mx-pip-on-bg, var(--lvlc)); box-shadow: var(--mx-pip-on-shadow, var(--mx-pip-glow, 0 0 6px -1px var(--lvlc))); }
 button.pip { cursor: pointer; }
 button.pip:hover { border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 60%, transparent); }
 .lvl { font: 700 12px var(--mx-font-num, 'IBM Plex Mono', monospace); color: var(--lvlc, var(--mx-muted, #9aa4c0)); min-width: 14px; text-align: right; cursor: help; }

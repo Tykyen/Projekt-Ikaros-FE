@@ -213,9 +213,10 @@
  * zelená/červená/jantar) zůstávají = nesou výsledek hodu, ne skin. Scoped na
  * matrix → ostatní systémy beze změny. */
 [data-diary-system='matrix'] .panel {
-  /* neprůhledný podklad skinu (deníkové --mx-bg/-panel jsou plné hex, ne alfa)
-     → log není „skrz"; čísla zůstávají v ČISTÉM mono (font NEpřebíjíme skinem). */
-  background: var(--mx-panel, var(--mx-bg, #0e0f1e));
+  /* vrstvíme panel PŘES neprůhledné --mx-bg — retro/minimal mají --mx-panel
+     s alfou, takže samotný panel by byl „skrz" na mapu. --mx-bg je plný hex →
+     výsledek neprůhledný; čísla zůstávají v ČISTÉM mono (font NEpřebíjíme). */
+  background: var(--mx-panel, transparent), var(--mx-bg, #0e0f1e);
   border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent);
   color: var(--mx-text, #d6def0);
 }

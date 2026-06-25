@@ -180,7 +180,14 @@
   background: var(--mx-seg-off, #20233a);
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
-.pip[data-on='true'] { background: var(--lvlc); border-color: rgba(255, 255, 255, 0.27); box-shadow: var(--mx-pip-glow, 0 0 6px -1px var(--lvlc)); }
+/* 16.2c-F3b — pip nese SIGNATURE skinu: recept přes token --mx-pip-on-*
+   (jeden zdroj s plným listem, def. v diary-skins.css). Fallback = sci-fi
+   (plný lvlc + glow), když není žádný skin. */
+.pip[data-on='true'] {
+  border-color: var(--mx-pip-on-border, rgba(255, 255, 255, 0.27));
+  background: var(--mx-pip-on-bg, var(--lvlc));
+  box-shadow: var(--mx-pip-on-shadow, var(--mx-pip-glow, 0 0 6px -1px var(--lvlc)));
+}
 
 /* ── přetlaky (sémantické heat — nesou stav, ne skin) ── */
 .pressure { display: flex; flex-direction: column; gap: 7px; }

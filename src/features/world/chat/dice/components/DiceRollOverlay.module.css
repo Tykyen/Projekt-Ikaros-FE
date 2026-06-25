@@ -176,7 +176,11 @@
  * (jméno/=); SÉMANTICKÉ +/−/total (cyan/červená/jantar) zůstávají = nesou
  * výsledek. Scoped na matrix → ostatní systémy beze změny. */
 [data-diary-system='matrix'] .readout {
-  background: var(--mx-panel-bg, linear-gradient(180deg, rgba(14, 12, 40, 0.95), rgba(10, 8, 32, 0.98)));
+  /* vrstvíme panel PŘES neprůhledné --mx-bg: retro/minimal mají --mx-panel-bg
+     s alfou → samotný by ukazoval mapu skrz. --mx-bg je plný hex = výsledek
+     neprůhledný a stále v barvě skinu. */
+  background: var(--mx-panel-bg, linear-gradient(180deg, rgba(14, 12, 40, 0.95), rgba(10, 8, 32, 0.98))),
+    var(--mx-bg, #0e0f1e);
   border-color: color-mix(in srgb, var(--mx-accent, #7864ff) 30%, transparent);
 }
 [data-diary-system='matrix'] .faceBadge {
