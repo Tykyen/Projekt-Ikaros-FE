@@ -547,3 +547,123 @@
   border-left-color: var(--theme-accent-cyan, var(--accent));
   background: color-mix(in srgb, var(--theme-accent-cyan, var(--accent)) 7%, transparent);
 }
+
+/* ── 16.1d-dark-fantasy — grimdark zprávy ───────────────────────────────────
+   Avatar = gotický štít (hranatý radius, ne kruh) + krvavý prstenec; NPC ocel.
+   Krvavá kapka u jména (signature). Šepot v oceli (kontrast ke krvavé). */
+:global([data-chat-skin='dark-fantasy']) .avatar {
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 0 0 1px var(--theme-surface-strong, var(--bg-secondary)),
+    0 0 0 2px var(--theme-border, var(--border));
+}
+:global([data-chat-skin='dark-fantasy']) .avatarNpc {
+  box-shadow:
+    0 0 0 1px var(--theme-surface-strong, var(--bg-secondary)),
+    0 0 0 2px var(--theme-border-cyan, var(--theme-accent)),
+    0 0 8px var(--theme-glow-cyan, transparent);
+}
+:global([data-chat-skin='dark-fantasy']) .name::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 9px;
+  margin-right: 6px;
+  background: var(--theme-accent);
+  clip-path: polygon(50% 0, 90% 55%, 50% 100%, 10% 55%);
+}
+:global([data-chat-skin='dark-fantasy']) .whisper {
+  border-left-color: var(--theme-accent-cyan, var(--accent));
+  background: color-mix(in srgb, var(--theme-accent-cyan, var(--accent)) 7%, transparent);
+}
+
+/* ── 16.1d-vesmir — holo-HUD zprávy ─────────────────────────────────────────
+   Avatar = hranatý cyan HUD rámeček + holo inset glow; NPC modrý. HUD tick `▸`
+   u jména (cyan). Šepot v modré (secondary). Žádné rohové ticky na avataru —
+   `.avatar` má `overflow:hidden`, ořízly by se. */
+:global([data-chat-skin='vesmir']) .avatar {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--theme-border, var(--border));
+  box-shadow: inset 0 0 8px var(--theme-glow-gold, transparent);
+}
+:global([data-chat-skin='vesmir']) .avatarNpc {
+  border-color: var(--theme-border-cyan, var(--theme-accent));
+  box-shadow:
+    inset 0 0 8px var(--theme-glow-cyan, transparent),
+    0 0 6px var(--theme-glow-cyan, transparent);
+}
+:global([data-chat-skin='vesmir']) .name::before {
+  content: '▸';
+  margin-right: 6px;
+  color: var(--theme-accent);
+  font-size: 0.7em;
+}
+:global([data-chat-skin='vesmir']) .whisper {
+  border-left-color: var(--theme-accent-cyan, var(--accent));
+  background: color-mix(in srgb, var(--theme-accent-cyan, var(--accent)) 7%, transparent);
+}
+
+/* ── 16.1d-cyberpunk — corpo hazard zprávy ──────────────────────────────────
+   Avatar = industriální žlutý rámeček (ostrý radius); NPC ocel. Barcode strip
+   u jména (signature, svislé žluté čárky). Šepot v oceli (kontrast). */
+:global([data-chat-skin='cyberpunk']) .avatar {
+  border-radius: 4px;
+  border: 1px solid var(--theme-border, var(--border));
+}
+:global([data-chat-skin='cyberpunk']) .avatarNpc {
+  border-color: var(--theme-accent-cyan, var(--theme-accent));
+  box-shadow: none;
+}
+:global([data-chat-skin='cyberpunk']) .name::before {
+  content: '';
+  display: inline-block;
+  width: 13px;
+  height: 12px;
+  margin-right: 7px;
+  vertical-align: middle;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--theme-accent) 0 1px,
+    transparent 1px 3px
+  );
+}
+:global([data-chat-skin='cyberpunk']) .whisper {
+  border-left-color: var(--theme-accent-cyan, var(--accent));
+  background: color-mix(in srgb, var(--theme-accent-cyan, var(--accent)) 7%, transparent);
+}
+
+/* ── 16.1d-steampunk — mosaz & ozubení zprávy ───────────────────────────────
+   Avatar = embossed mosazný rámeček (kovový bevel); NPC patina. Mosazný nýt
+   (3D cvoček) u jména. Šepot v patině. */
+:global([data-chat-skin='steampunk']) .avatar {
+  border-radius: 6px;
+  border: 2px solid var(--theme-accent, var(--accent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--theme-accent-bright) 25%, transparent),
+    inset 0 -2px 4px color-mix(in srgb, var(--bg-primary, #000) 60%, transparent);
+}
+:global([data-chat-skin='steampunk']) .avatarNpc {
+  border-color: var(--theme-accent-cyan, var(--theme-accent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--theme-accent-cyan) 25%, transparent),
+    inset 0 -2px 4px color-mix(in srgb, var(--bg-primary, #000) 60%, transparent);
+}
+:global([data-chat-skin='steampunk']) .name::before {
+  content: '';
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  border-radius: 50%;
+  vertical-align: middle;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--theme-accent-bright),
+    var(--theme-accent) 60%,
+    transparent 78%
+  );
+}
+:global([data-chat-skin='steampunk']) .whisper {
+  border-left-color: var(--theme-accent-cyan, var(--accent));
+  background: color-mix(in srgb, var(--theme-accent-cyan, var(--accent)) 8%, transparent);
+}

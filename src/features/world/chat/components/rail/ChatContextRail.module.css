@@ -115,3 +115,76 @@
   --map-canvas-bg: var(--bg-primary, #0b1510);
   --map-token-ring-default: var(--theme-border);
 }
+
+/* ── 16.1d-dark-fantasy — souboj/přítomní panel do krvavé palety (viz fantasy
+   výše; combat = potomek `.tabWrap`, mapa mimo `[data-chat-skin]` netknutá). */
+:global([data-chat-skin='dark-fantasy']) .tabWrap {
+  --map-ui-accent-rgb: 181, 30, 46;
+  --map-ui-accent-bright-rgb: 224, 67, 63;
+  --map-ui-gold-rgb: 232, 220, 214;
+  --map-ui-panel-rgb: 22, 12, 16;
+  --map-ui-panel-deep-rgb: 10, 5, 7;
+  --map-ui-text-on-dark-rgb: 221, 214, 210;
+  --map-ui-blue-bright-rgb: 200, 204, 214;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #0c0608);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-vesmir — souboj/přítomní panel do cyan HUD palety. */
+:global([data-chat-skin='vesmir']) .tabWrap {
+  --map-ui-accent-rgb: 79, 212, 228;
+  --map-ui-accent-bright-rgb: 154, 240, 250;
+  --map-ui-gold-rgb: 234, 244, 251;
+  --map-ui-panel-rgb: 16, 26, 42;
+  --map-ui-panel-deep-rgb: 8, 13, 22;
+  --map-ui-text-on-dark-rgb: 221, 230, 239;
+  --map-ui-blue-bright-rgb: 91, 143, 214;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #070b12);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-cyberpunk — souboj/přítomní panel do žluté hazard palety. */
+:global([data-chat-skin='cyberpunk']) .tabWrap {
+  --map-ui-accent-rgb: 240, 208, 32;
+  --map-ui-accent-bright-rgb: 255, 240, 74;
+  --map-ui-gold-rgb: 244, 240, 220;
+  --map-ui-panel-rgb: 22, 22, 14;
+  --map-ui-panel-deep-rgb: 10, 10, 7;
+  --map-ui-text-on-dark-rgb: 230, 228, 216;
+  --map-ui-blue-bright-rgb: 125, 138, 150;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #0a0a08);
+  --map-token-ring-default: var(--theme-border);
+}
+
+/* ── 16.1d-steampunk — souboj/přítomní panel do mosazné palety. */
+:global([data-chat-skin='steampunk']) .tabWrap {
+  --map-ui-accent-rgb: 200, 137, 58;
+  --map-ui-accent-bright-rgb: 230, 178, 96;
+  --map-ui-gold-rgb: 240, 228, 200;
+  --map-ui-panel-rgb: 36, 26, 16;
+  --map-ui-panel-deep-rgb: 16, 11, 6;
+  --map-ui-text-on-dark-rgb: 232, 220, 196;
+  --map-ui-blue-bright-rgb: 95, 168, 144;
+  --map-ui-accent-solid: var(--theme-accent);
+  --map-ui-accent-text: var(--theme-heading);
+  --map-ui-gold-text: var(--theme-heading);
+  --map-ui-text-muted: var(--theme-text-muted);
+  --map-toolbar-bg-solid: var(--theme-surface-strong);
+  --map-canvas-bg: var(--bg-primary, #16100a);
+  --map-token-ring-default: var(--theme-border);
+}

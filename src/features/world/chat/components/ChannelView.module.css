@@ -203,3 +203,84 @@
     animation: fantasyInitialShimmer 4.5s ease-in-out infinite;
   }
 }
+
+/* ── 16.1d-dark-fantasy — grimdark, krev & blackletter ───────────────────────
+   Záměrný protiklad fantasy: OSTRÉ/LOMENÉ místo oblého. Hlavička: „nit kanálu"
+   přetvořená na zubatou (zig-zag) krvavou linku přes `mask`; krvavá blackletter
+   drop-cap iniciála (Grenze Gotisch z motivu). */
+:global([data-chat-skin='dark-fantasy']) .header {
+  border-bottom-color: var(--theme-border-soft);
+}
+:global([data-chat-skin='dark-fantasy']) .header::after {
+  height: 10px;
+  bottom: -6px;
+  opacity: 0.75;
+  background: var(--ch-accent, var(--theme-accent));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'%3E%3Cpath d='M0 8 L12 2 L24 8' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") repeat-x center / 24px 10px;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'%3E%3Cpath d='M0 8 L12 2 L24 8' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") repeat-x center / 24px 10px;
+}
+:global([data-chat-skin='dark-fantasy']) .title::first-letter {
+  font-size: 1.4em;
+  color: var(--theme-accent-bright, var(--theme-accent));
+  text-shadow: 0 0 12px var(--theme-glow-gold, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes darkFantasyBreath {
+    0%, 100% { text-shadow: 0 0 7px var(--theme-glow-gold, transparent); }
+    50% { text-shadow: 0 0 16px var(--theme-glow-gold, transparent); }
+  }
+  :global([data-chat-skin='dark-fantasy']) .title::first-letter {
+    animation: darkFantasyBreath 5s ease-in-out infinite;
+  }
+}
+
+/* ── 16.1d-vesmir — čistý sci-fi holo-HUD ────────────────────────────────────
+   Žádné organické ornamenty (to je fantasy) ani glitch (to je ikaros): technický
+   HUD. Hlavička = rohový bracket-tick (cyan L) + Orbitron uppercase titul + tenká
+   cyan nit. BEZ drop-capu (tech, ne iluminovaný rukopis). */
+:global([data-chat-skin='vesmir']) .header::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 10px;
+  width: 13px;
+  height: 13px;
+  border-left: 2px solid var(--theme-accent);
+  border-top: 2px solid var(--theme-accent);
+  opacity: 0.8;
+  pointer-events: none;
+}
+:global([data-chat-skin='vesmir']) .title {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── 16.1d-cyberpunk — corpo hazard (naváz na F2 hazard-border `.header`) ─────
+   Industriální žlutá + hazard-tape; odliš od ikaros (fialový neon) barvou,
+   od vesmir (čistý HUD) drsností. Titul Chakra Petch uppercase. */
+:global([data-chat-skin='cyberpunk']) .title {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── 16.1d-steampunk — mosaz & ozubení ──────────────────────────────────────
+   Mechanická viktoriánská mosaz; odliš od fantasy (oblé zlato) nýty/kovem, od
+   cyberpunk (neon žlutá) teplou mosazí. Hlavička = kovový panel s nýty v rozích
+   (4 radial-gradient cvočky, 0 DOM navíc) + embossed bevel + emboss titul. */
+:global([data-chat-skin='steampunk']) .header {
+  background:
+    radial-gradient(circle at 13px 12px, var(--theme-accent-bright) 0 1.5px, var(--theme-accent) 1.5px 3px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 13px) 12px, var(--theme-accent-bright) 0 1.5px, var(--theme-accent) 1.5px 3px, transparent 3.5px),
+    radial-gradient(circle at 13px calc(100% - 12px), var(--theme-accent-bright) 0 1.5px, var(--theme-accent) 1.5px 3px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 13px) calc(100% - 12px), var(--theme-accent-bright) 0 1.5px, var(--theme-accent) 1.5px 3px, transparent 3.5px),
+    var(--theme-surface-strong, var(--bg-secondary));
+  background-repeat: no-repeat;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--theme-accent-bright) 22%, transparent),
+    inset 0 -3px 5px color-mix(in srgb, var(--bg-primary, #000) 65%, transparent);
+}
+:global([data-chat-skin='steampunk']) .title {
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--bg-primary, #000) 70%, transparent),
+    0 -1px 0 color-mix(in srgb, var(--theme-accent-bright) 12%, transparent);
+}
