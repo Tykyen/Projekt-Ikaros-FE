@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-027.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-028.**
 
 ## Jak je deník členěný
 
@@ -99,3 +99,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-026](fe.md#ch-026--tvrdil-jsem-chat-combat-nemá-current-hp-screenshot-mě-usvědčil--2026-06-26) | fe | tvrdil jsem „chat combat nemá current-HP / mimo scope" z odhadu typu; screenshot ukázal HP editovatelné jako `systemStats` pole (jiná vrstva) | scope-cut/limit prezentuju jako fakt z odhadu, uživatel přinese důkaz že funguje |
 | [✅ ŘEŠENÍ](fe.md#-řešení--drd16matrix-chat-bestie-parita-sdílené-jádro-mapachat--init-persist--2026-06-26) | fe | drd16+Matrix chat bestie parita: sdílené jádro `Drd16BestieCombatActions` (mapa↔chat, 0 regrese) + chat panely (klik=hod, HP ±, edit modal) + init persist přes `useChatDiaryRoll` `onResult(total)`; key-remount místo setState-in-effect | — (build+28 testů) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--162c-drd16-skiny-7-stylů-přes---dd--tokenizaci--agent-fleet--2026-06-26) | fe | 16.2c-drd16 7 skinů: foundation `--dd-*` hoist+sémantické tokeny, tokenizace panelů (~112, 0 regrese), 7 paralelních agentů (1/skin proti kontraktu+mockupu), statický import pro embedy; vizuál čeká živou revizi | — (build+107 testů; past CH-014 znovu) |
+| [CH-027](fe.md#ch-027--retro-skin-importoval-font-z-cdnjsdelivrnet--csp-block--prod-chatdeník-spadl--2026-06-26) | fe | retro skin `@import` DSEG7 z `cdn.jsdelivr.net` → prod CSP `style-src` block → `Unable to preload DiaryTab.css` → chat/deník error boundary; build/testy na CSP slepé | prod „Něco se nepovedlo" + konzole CSP violation na externí doméně |

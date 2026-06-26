@@ -16,10 +16,14 @@
  * sun-grid/horizont ani 7segment nepoužívá. ODLIŠENÍ od sci-fi: teplá fialová
  * noc + jantarové slunce, zkosené chunky hrany (ne studený hladký futurismus).
  *
- * Fonty: CDN @import (Orbitron / Press Start 2P / Share Tech Mono / DSEG7).
+ * Fonty: jen Google Fonts (Orbitron / Press Start 2P / Share Tech Mono).
+ * POZN.: DSEG7 (7segment LED) byl odebrán — `cdn.jsdelivr.net` porušuje CSP
+ * `style-src 'self' 'unsafe-inline' fonts.googleapis.com` → zablokovaný @import
+ * shazoval celý DiaryTab chunk (preload fail → error boundary). Čísla teď jedou
+ * na Share Tech Mono. Pokud chceme LED segment look → self-hostnout font do
+ * `/assets` (= 'self', povoleno CSP).
  */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
-@import url('https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css');
 
 /* ════════════════════ TOKENY (kompletní --dd-* override) ════════════════════
  * Sémantické mapování fantasy → retro:
@@ -73,8 +77,8 @@
   --dd-font-display: 'Orbitron', 'Share Tech Mono', sans-serif;
   --dd-font-head: 'Press Start 2P', 'Share Tech Mono', monospace;
   --dd-font-body: 'Share Tech Mono', 'Courier New', monospace;
-  /* čísla = 7segmentový LED displej (DSEG7), fallback monospace */
-  --dd-font-num: 'DSEG7 Classic', 'Share Tech Mono', monospace;
+  /* čísla = monospace „LED-ish" (DSEG7 odebrán kvůli CSP, viz hlavička) */
+  --dd-font-num: 'Share Tech Mono', monospace;
 
   /* ── kompozity: pozadí ploch (synthwave gradient + jemný sun-grid pruh) ──
    * Tento token nese pozadí listu I panelů (.root combat/bestie čte

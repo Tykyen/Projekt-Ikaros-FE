@@ -650,6 +650,16 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 
 ---
 
+### CH-027 — retro skin importoval font z `cdn.jsdelivr.net` → CSP block → prod chat/deník spadl · 2026-06-26
+**Kontext:** 16.2c-drd16 skiny, retro skin (synthwave). Agent použil 7segmentový LED font DSEG7 z CDN.
+**Co jsem udělal špatně:** Přijal jsem v F3 integraci `retro.css` s `@import url('https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css')` bez kontroly proti CSP allowlistu. Build i 107 testů prošly → falešný klid.
+**Proč to nefungovalo:** Prod CSP je `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com` (spec-14.3). `cdn.jsdelivr.net` NENÍ povolen → browser zablokoval ten `@import`. Protože byl uvnitř `diary-skins.css` zabundlovaného do `DiaryTab.css` chunku, **zablokovaný @import → Vite `Unable to preload CSS for DiaryTab.css` → React Router render error → celá chat/deník stránka spadla na error boundary „Něco se nepovedlo"**. Build/vitest jsou na CSP **slepé** (CSP je runtime hlavička jen na nasazeném prod).
+**Poučení:** U agenty-generovaného (i vlastního) CSS **VŽDY grepni externí `@import url(...)` proti CSP allowlistu** (jen `fonts.googleapis.com` + `'self'`) PŘED commitem — `npm run build` to nechytí. Externí font mimo Google Fonts → **self-hostnout do `/assets`** (= `'self'`), ne CDN. Jeden CSP-blokovaný sub-resource v bundlovaném CSS umí shodit celý lazy route chunk (ne jen tiše chybět).
+**Příznak cyklení:** prod „Něco se nepovedlo" + konzole `… violates CSP "style-src …"` na externí doméně + `Unable to preload CSS for <chunk>`.
+**Fix:** odebrán jsdelivr `@import`, `--dd-font-num` DSEG7 → `'Share Tech Mono'` fallback. Build zelený. **Nutný commit + deploy** (prod fix).
+
+---
+
 ### ✅ ŘEŠENÍ — 16.2c-drd16 skiny (7 stylů) přes `--dd-*` tokenizaci + agent-fleet · 2026-06-26
 **Co nakonec zabralo:** (1) **Foundation kontrakt** — `--dd-*` tokeny hoistnuté z `.drd16-sheet` na `[data-diary-system='drd16']` (wrapper → dědí list I embedované panely) + sémantické kompozity (`--dd-row-bg`, `--dd-accent-grad`, `--dd-hp-grad`, `--dd-line`…). (2) **Tokenizace panelů** (combat/bestie/chat/spellcard) z hardcoded pergamenu na `var(--dd-x, <fantasy>)` → 0 regrese, ale jednotný kontrakt přes všechny plochy (~112 náhrad, agentem proti `c:/tmp/drd16-skins/CONTRACT.md`). (3) **7 skin souborů** `styles/drd16-skins/<id>.css` přes **7 paralelních opus agentů** (1/skin, proti kontraktu + schválenému HTML mockupu) — override všech `--dd-*` + signature ornamenty CSS-only. (4) **Integrace**: všech 7 `@import` do **statického** `diary-skins.css` (ne lazy `drd16.css`) → skiny platí i v embedech.
 **Proč to je správně (a ne další variace):** Tokenový engine = jeden override blok reskinuje list I panely (panely dědí `--dd-*` z wrapperu). Foundation napřed (kontrakt) → 7 agentů authoring proti pevnému seznamu tokenů, ne každý vlastní názvy. Ornamenty jen na **globální** `.drd16-*` třídy listu (modulové hashované `.root` nejdou cílit globálně — shodné s Matrix F3; panely nesou skin tokeny). Statický import = embedy (chat/mapa), kde lazy `drd16.css` neběží, fantasy přežije přes `var()` fallbacky.
