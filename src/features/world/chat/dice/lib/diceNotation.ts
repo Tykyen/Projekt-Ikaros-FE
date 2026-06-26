@@ -65,8 +65,9 @@ export function payloadToNotation(payload: DicePayload): string | null {
     return parts.join('+');
   }
 
-  if (payload.type === 'd6+') {
-    // Nafukovací k6: kaskáda hozených d6 (best-effort 3D = N viditelných d6).
+  if (payload.type === 'd6+' || payload.type === '2d6+') {
+    // Nafukovací k6 / otevřený 2k6+: kaskáda hozených d6 (best-effort 3D = N
+    // viditelných d6 — pár + eskalace). Hodnota (±1 kroky) je v `total`.
     return group(6, payload.faces.map(Number));
   }
 

@@ -32,6 +32,7 @@ export type RollKind =
   | 'd4'
   | 'd6'
   | 'd6+'
+  | '2d6+'
   | 'd8'
   | 'd10'
   | 'd12'
@@ -123,6 +124,12 @@ export function rollGenericDice(type: string): GenericRollResult {
     return { rolls: f.rolls, sum: f.sum, symbols: f.symbols, type };
   }
 
+  // Eskalující/nafukovací kostky — `+` v typu by neprošel regexem XdN níže a
+  // spadl by na default d20. Centralizováno tady, aby je dostal i manuální
+  // picker (`performRoll` volá `rollGenericDice`), nejen sheet/deník.
+  if (type === 'd6+') return rollExplodingD6();
+  if (type === '2d6+') return rollExploding2d6();
+
   if (type === 'd100' || type === 'k100') {
     const tens = secureRandomInt(10) * 10;
     const ones = secureRandomInt(10);
@@ -171,6 +178,47 @@ export function rollExplodingD6(): GenericRollResult {
   } while (face === 6 && rolls.length < 50);
   const sum = rolls.reduce((a, b) => a + b, 0);
   return { rolls, sum, symbols: `[${rolls.join(', ')}]`, type: 'd6+' };
+}
+
+/**
+ * `2d6+` — otevřený / eskalující hod (DrD+). Jiná mechanika než `d6+`:
+ * hoď **2k6**; eskaluje **jen na dvojici**:
+ * - `2×6` → házej dál po jedné kostce: 4/5/6 → **+1** a pokračuj, 1/2/3 → **stop**.
+ * - `2×1` → házej dál po jedné: 1/2/3 → **−1** a pokračuj, 4/5/6 → **stop** (i do záporu).
+ *
+ * Jiný úvodní hod = prostý součet (žádná eskalace). Pokračovací kostka
+ * **nepřičítá svou hodnotu** — určuje jen znaménko kroku (±1) a zda pokračovat
+ * (tím se liší od `d6+`, který přičítá celou hozenou hodnotu). Tvrdý strop
+ * 50 hodů proti teoretické nekonečné smyčce.
+ *
+ * `rolls` = `[d1, d2, ...kaskáda]` (vč. závěrečné „stop" kostky) — kvůli 3D
+ * vizuálu a rozpisu v dice logu. `sum` = `base ± delta` (NE součet tváří).
+ */
+export function rollExploding2d6(): GenericRollResult {
+  const d1 = secureRandomInt(6) + 1;
+  const d2 = secureRandomInt(6) + 1;
+  const rolls: number[] = [d1, d2];
+  const base = d1 + d2;
+  let delta = 0;
+
+  if (d1 === 6 && d2 === 6) {
+    let face: number;
+    do {
+      face = secureRandomInt(6) + 1;
+      rolls.push(face);
+      if (face >= 4) delta += 1;
+    } while (face >= 4 && rolls.length < 50);
+  } else if (d1 === 1 && d2 === 1) {
+    let face: number;
+    do {
+      face = secureRandomInt(6) + 1;
+      rolls.push(face);
+      if (face <= 3) delta -= 1;
+    } while (face <= 3 && rolls.length < 50);
+  }
+
+  const sum = base + delta;
+  return { rolls, sum, symbols: `[${rolls.join(', ')}]`, type: '2d6+' };
 }
 
 /** Pool roll s explicitním počtem kostek. */

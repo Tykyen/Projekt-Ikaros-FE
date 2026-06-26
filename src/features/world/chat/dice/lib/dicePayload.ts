@@ -40,7 +40,7 @@ export interface FateDicePayload extends DicePayloadBase {
 }
 
 export interface GenericDicePayload extends DicePayloadBase {
-  type: 'd4' | 'd6' | 'd6+' | 'd8' | 'd10' | 'd12' | 'd20';
+  type: 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20';
   faces: number[];
 }
 

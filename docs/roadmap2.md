@@ -393,7 +393,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Chat (→ 16.1)
   - [x] Skiny (→ 16.2c)
 - **Dračí Doupě Plus** (`drdplus`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
-  - [ ] Reálný list (grafika)
+  - [x] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + zvážit vlastní combat panel)
   - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)

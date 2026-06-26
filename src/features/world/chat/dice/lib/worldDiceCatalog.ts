@@ -23,6 +23,10 @@ export const DICE_CATALOG: Record<string, DiceCatalogEntry> = {
   fate: { label: 'Fate', glyph: 'F', rollType: 'fate', glyphSize: 'lg' },
   d4: { label: 'k4', glyph: '4', rollType: 'd4', glyphSize: 'lg' },
   d6: { label: 'k6', glyph: '6', rollType: 'd6', glyphSize: 'lg' },
+  // Nafukovací k6 (DrD 1.6) — padne-li 6, házíš znovu a přičteš hodnotu.
+  'd6+': { label: 'k6+', glyph: '6+', rollType: 'd6+', glyphSize: 'md' },
+  // Otevřený / eskalující 2k6 (DrD+) — dvojice 2×6 eskaluje +1, 2×1 −1.
+  '2d6+': { label: '2k6+', glyph: '2k6﹢', rollType: '2d6+', glyphSize: 'sm' },
   d8: { label: 'k8', glyph: '8', rollType: 'd8', glyphSize: 'lg' },
   d10: { label: 'k10', glyph: '10', rollType: 'd10', glyphSize: 'md' },
   d12: { label: 'k12', glyph: '12', rollType: 'd12', glyphSize: 'md' },
