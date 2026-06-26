@@ -1,0 +1,115 @@
+/* 16.2b-bestie Cesta B — custom DrD 1.6 editor (explicitní layout).
+   Tmavé inputy (sladěné s modálem), řízená šířka čísel (3-cif úzké, Zkušenost
+   širší), čísla i do záporu. Layout: Útoky vlastní řádek; Pohyblivost+způsob
+   na jedné řádce. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary, rgb(var(--map-ui-light-rgb, 220 220 255) / 0.7));
+}
+.required {
+  color: var(--map-ui-danger-solid, #e0607a);
+  margin-left: 4px;
+}
+.input {
+  padding: 6px 10px;
+  background: rgb(var(--map-ui-panel-rgb, 20 14 50) / 0.6);
+  color: var(--text-primary, var(--map-ui-text, #fff));
+  border: 1px solid rgb(var(--map-ui-accent-rgb, 120 100 255) / 0.25);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+.input:focus {
+  outline: none;
+  border-color: rgb(var(--map-ui-accent-rgb, 120 100 255) / 0.7);
+}
+.input:disabled {
+  opacity: 0.5;
+}
+.inputError {
+  border-color: var(--map-ui-danger-solid, #e0607a);
+}
+.error {
+  font-size: 11px;
+  color: var(--map-ui-danger-solid, #e0607a);
+  margin: 0;
+}
+
+/* šířkové varianty */
+.num {
+  width: 88px;
+  flex: 0 0 auto;
+}
+.num .input {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.numWide {
+  width: 128px;
+  flex: 0 0 auto;
+}
+.numWide .input {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.tiny {
+  width: 64px;
+  flex: 0 0 auto;
+}
+.tiny .input {
+  text-align: center;
+}
+.grow {
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+.enum {
+  width: 110px;
+  flex: 0 0 auto;
+}
+.full {
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .grow {
+    flex-basis: 100%;
+  }
+}

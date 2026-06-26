@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
 import { EntitySchemaForm } from '@/features/world/tactical-map/components/schema-form/EntitySchemaForm';
+import { Drd16BestieForm } from './Drd16BestieForm';
 import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/HeroUploadCard';
 import { Modal, Button } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -216,13 +217,23 @@ export function BestieEditorModal({
           </div>
         )}
 
-        <EntitySchemaForm
-          schema={schema}
-          value={systemStats}
-          onChange={setSystemStats}
-          errors={errors}
-          disabled={pending}
-        />
+        {systemId === 'drd16' ? (
+          <Drd16BestieForm
+            schema={schema}
+            value={systemStats}
+            onChange={setSystemStats}
+            errors={errors}
+            disabled={pending}
+          />
+        ) : (
+          <EntitySchemaForm
+            schema={schema}
+            value={systemStats}
+            onChange={setSystemStats}
+            errors={errors}
+            disabled={pending}
+          />
+        )}
 
         <div className={styles.row}>
           <label className={styles.label}>
