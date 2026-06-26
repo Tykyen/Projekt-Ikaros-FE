@@ -112,6 +112,38 @@ describe('Drd16BestiePanel', () => {
     );
   });
 
+  it('read-only staty + popis se zobrazí (PJ reference)', () => {
+    render(
+      <Drd16BestiePanel
+        {...props}
+        token={makeToken({
+          notes: 'Tvrdý pancíř, žije v bažinách.',
+          systemStats: {
+            hp: 3,
+            defense: 7,
+            attacks: [{ name: 'ostny', value: 3 }],
+            resilience: 16,
+            movement: 15,
+            movementMode: 'hmyz',
+            alignment: 'N',
+            experience: 20,
+            mindForce: 0,
+          },
+        })}
+        onMapRoll={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('Vlastnosti & chování')).toBeInTheDocument();
+    expect(screen.getByText('16')).toBeInTheDocument(); // Odolnost
+    expect(screen.getByText('hmyz')).toBeInTheDocument(); // způsob pohybu
+    expect(screen.getByText('20')).toBeInTheDocument(); // Zkušenost
+    expect(screen.getByText('ZSM')).toBeInTheDocument(); // i nula se ukáže
+    expect(screen.getByText('Popis')).toBeInTheDocument();
+    expect(
+      screen.getByText('Tvrdý pancíř, žije v bažinách.'),
+    ).toBeInTheDocument();
+  });
+
   it('!canEdit → bez iniciativy, útoky nehratelné', () => {
     const onMapRoll = vi.fn();
     render(

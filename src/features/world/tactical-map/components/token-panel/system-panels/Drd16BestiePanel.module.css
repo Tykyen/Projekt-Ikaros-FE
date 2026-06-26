@@ -227,3 +227,49 @@
   color: #6c573a;
   margin: 0 0 4px;
 }
+
+/* read-only staty (piluly) — PJ reference */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 11.5px;
+  padding: 2px 8px;
+  border-radius: 11px;
+  background: rgba(111, 83, 32, 0.1);
+  border: 1px solid rgba(196, 173, 126, 0.5);
+}
+.pk {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6c573a;
+}
+.pv {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #2a1a0a;
+}
+.pvWord {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-weight: 600;
+}
+
+/* popis (slovní) */
+.desc {
+  margin-top: 4px;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #3a2b19;
+  white-space: pre-wrap;
+  border-top: 1px dashed rgba(111, 83, 32, 0.3);
+  padding-top: 8px;
+}

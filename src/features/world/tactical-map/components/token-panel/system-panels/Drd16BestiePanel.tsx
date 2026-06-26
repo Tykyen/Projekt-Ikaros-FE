@@ -35,6 +35,26 @@ const toNum = (v: unknown, fb = 0): number => {
   return Number.isFinite(n) ? n : fb;
 };
 
+const has = (v: unknown): boolean =>
+  v !== undefined && v !== null && v !== '';
+
+/** Read-only staty pro PJ referenci (label · key · slovo?). */
+const SECONDARY: ReadonlyArray<{ label: string; key: string; word?: boolean }> = [
+  { label: 'Velikost', key: 'size', word: true },
+  { label: 'Zranit.', key: 'vulnerability', word: true },
+  { label: 'Odoln.', key: 'resilience' },
+  { label: 'Bojov.', key: 'combativeness' },
+  { label: 'Vytrv.', key: 'endurance' },
+  { label: 'Manévr.', key: 'maneuver' },
+  { label: 'Int.', key: 'intelligence' },
+  { label: 'Cha.', key: 'charisma' },
+  { label: 'ZSM', key: 'mindForce' },
+  { label: 'Přesv.', key: 'alignment', word: true },
+  { label: 'Poklady', key: 'treasure', word: true },
+  { label: 'Zkuš.', key: 'experience' },
+  { label: 'Ochoč.', key: 'taming' },
+];
+
 export function Drd16BestiePanel({
   token,
   sceneId,
@@ -171,6 +191,41 @@ export function Drd16BestiePanel({
           <span className={styles.defVal}>{defense}</span>
         </button>
       </section>
+
+      {/* Read-only staty + popis — PJ s nimi pracuje (nehází se, jen reference). */}
+      <section>
+        <h3 className={styles.title}>Vlastnosti &amp; chování</h3>
+        <div className={styles.stats}>
+          {has(ss.movement) && (
+            <span className={styles.pill}>
+              <span className={styles.pk}>Pohyb</span>
+              <span className={styles.pv}>{String(ss.movement)}</span>
+              {has(ss.movementMode) && (
+                <span className={`${styles.pv} ${styles.pvWord}`}>
+                  {String(ss.movementMode)}
+                </span>
+              )}
+            </span>
+          )}
+          {SECONDARY.filter((s) => has(ss[s.key])).map((s) => (
+            <span key={s.key} className={styles.pill}>
+              <span className={styles.pk}>{s.label}</span>
+              <span
+                className={`${styles.pv} ${s.word ? styles.pvWord : ''}`.trim()}
+              >
+                {String(ss[s.key])}
+              </span>
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {token.notes && token.notes.trim() && (
+        <section>
+          <h3 className={styles.title}>Popis</h3>
+          <div className={styles.desc}>{token.notes}</div>
+        </section>
+      )}
     </div>
   );
 }
