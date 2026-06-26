@@ -7,6 +7,7 @@ import {
   CornerUpLeft,
   Pencil,
   Theater,
+  MoreVertical,
 } from 'lucide-react';
 import clsx from 'clsx';
 import type { ChatMessage } from '../lib/types';
@@ -15,6 +16,7 @@ import { resolveTombstone } from '@/shared/lib/tombstone';
 import { guardChatColor } from '../lib/chatColorGuard';
 import { formatTime, formatChatStamp, formatChatFull } from '../lib/format';
 import { EmojiPickerPopover } from './EmojiPickerPopover';
+import { KebabMenu, type KebabMenuItem } from '@/shared/ui/KebabMenu/KebabMenu';
 import { MessageAttachments } from './MessageAttachments';
 import { DiceMessage } from '@/features/world/chat/dice/components/DiceMessage';
 import s from './MessageItem.module.css';
@@ -134,6 +136,12 @@ export function MessageItem({
 }: MessageItemProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const reactionBtnRef = useRef<HTMLButtonElement>(null);
+  // Dotyk: jedno ⋮ tlačítko → KebabMenu (inline ikony se na mobilu nevešly do
+  // rezervovaného sloupce a ležely na textu).
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Callback ref (ne useRef.current za renderu) — vzor jako ShareButton:
+  // zápis elementu do state dá KebabMenu platnou kotvu bez varování.
+  const [kebabAnchor, setKebabAnchor] = useState<HTMLButtonElement | null>(null);
   const isSelf = message.senderId === currentUserId;
   const isWhisper = !!message.visibleTo && message.visibleTo.length > 0;
   const isNpc = !!message.overrideName;
@@ -253,6 +261,44 @@ export function MessageItem({
   // 6.2c — edit dostupný pro vlastníka (ne dice) nebo pro PJ/Admin moderaci.
   const canEdit =
     !!onStartEdit && !isDice && (isSelf || canDelete) && !isPending && !isFailed;
+
+  // Sdílené podmínky viditelnosti pro inline ikony (desktop) i kebab (dotyk).
+  const showReply = allowReply && !isPending && !isFailed;
+  const showReact = allowReactions && !isPending && !isFailed;
+  const showDelete = (canDelete || (isSelf && !isDice)) && !isPending && !isFailed;
+  const hasActions = showReply || showReact || canEdit || showDelete;
+
+  // Dotyk: stejné akce jako inline lišta, jen složené do KebabMenu.
+  const menuItems: KebabMenuItem[] = [];
+  if (showReply)
+    menuItems.push({
+      key: 'reply',
+      label: 'Odpovědět',
+      icon: <Reply size={15} />,
+      onClick: () => onReply(message),
+    });
+  if (showReact)
+    menuItems.push({
+      key: 'react',
+      label: 'Přidat reakci',
+      icon: <SmilePlus size={15} />,
+      onClick: () => setPickerOpen(true),
+    });
+  if (canEdit)
+    menuItems.push({
+      key: 'edit',
+      label: 'Upravit zprávu',
+      icon: <Pencil size={15} />,
+      onClick: () => onStartEdit!(message),
+    });
+  if (showDelete)
+    menuItems.push({
+      key: 'delete',
+      label: 'Smazat zprávu',
+      icon: <Trash2 size={15} />,
+      variant: 'danger',
+      onClick: () => onDelete(message.id),
+    });
 
   return (
     <div
@@ -403,64 +449,96 @@ export function MessageItem({
         )}
         {grouped && time && <time className={s.timeHover} title={stampFull}>{time}</time>}
 
-        {!editing && (
-          <div className={s.actions}>
-            {allowReply && !isPending && !isFailed && (
-              <button
-                type="button"
-                className={s.action}
-                onClick={() => onReply(message)}
-                title="Odpovědět"
-                aria-label="Odpovědět"
-              >
-                <Reply size={14} />
-              </button>
-            )}
-            {allowReactions && !isPending && !isFailed && (
-              <button
-                ref={reactionBtnRef}
-                type="button"
-                className={s.action}
-                onClick={() => setPickerOpen((v) => !v)}
-                title="Přidat reakci"
-                aria-label="Přidat reakci"
-              >
-                <SmilePlus size={14} />
-              </button>
-            )}
-            {allowReactions && pickerOpen && (
-              <EmojiPickerPopover
-                anchorRef={reactionBtnRef}
-                onSelect={(emoji) => onToggleReaction(message.id, emoji)}
-                onClose={() => setPickerOpen(false)}
-              />
-            )}
-            {canEdit && (
-              <button
-                type="button"
-                className={clsx(s.action, s.edit)}
-                onClick={() => onStartEdit!(message)}
-                title="Upravit zprávu"
-                aria-label="Upravit zprávu"
-              >
-                <Pencil size={13} />
-              </button>
-            )}
-            {/* Mazání: vlastník smí mazat vlastní NE-dice zprávy (BE
-                chat.service.deleteMessage to povoluje), dice hod jen
-                PJ/Admin (canDelete) — shoda s BE dice guardem. */}
-            {(canDelete || (isSelf && !isDice)) && !isPending && !isFailed && (
-              <button
-                type="button"
-                className={clsx(s.action, s.delete)}
-                onClick={() => onDelete(message.id)}
-                title="Smazat zprávu"
-                aria-label="Smazat zprávu"
-              >
-                <Trash2 size={13} />
-              </button>
-            )}
-          </div>
+        {!editing && hasActions && (
+          <>
+            {/* Desktop (hover) — rozbalené ikony. Na dotyku skryté (CSS). */}
+            <div className={s.actions}>
+              {showReply && (
+                <button
+                  type="button"
+                  className={s.action}
+                  onClick={() => onReply(message)}
+                  title="Odpovědět"
+                  aria-label="Odpovědět"
+                >
+                  <Reply size={14} />
+                </button>
+              )}
+              {showReact && (
+                <button
+                  ref={reactionBtnRef}
+                  type="button"
+                  className={s.action}
+                  onClick={() => setPickerOpen((v) => !v)}
+                  title="Přidat reakci"
+                  aria-label="Přidat reakci"
+                >
+                  <SmilePlus size={14} />
+                </button>
+              )}
+              {canEdit && (
+                <button
+                  type="button"
+                  className={clsx(s.action, s.edit)}
+                  onClick={() => onStartEdit!(message)}
+                  title="Upravit zprávu"
+                  aria-label="Upravit zprávu"
+                >
+                  <Pencil size={13} />
+                </button>
+              )}
+              {/* Mazání: vlastník smí mazat vlastní NE-dice zprávy (BE
+                  chat.service.deleteMessage to povoluje), dice hod jen
+                  PJ/Admin (canDelete) — shoda s BE dice guardem. */}
+              {showDelete && (
+                <button
+                  type="button"
+                  className={clsx(s.action, s.delete)}
+                  onClick={() => onDelete(message.id)}
+                  title="Smazat zprávu"
+                  aria-label="Smazat zprávu"
+                >
+                  <Trash2 size={13} />
+                </button>
+              )}
+            </div>
+
+            {/* Dotyk — jedno ⋮ tlačítko (vejde se do gutteru, neleží na textu). */}
+            <button
+              ref={setKebabAnchor}
+              type="button"
+              className={s.kebabTrigger}
+              onClick={() => setMenuOpen((v) => !v)}
+              title="Akce"
+              aria-label="Akce zprávy"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+            >
+              <MoreVertical size={16} />
+            </button>
+            <KebabMenu
+              anchor={kebabAnchor}
+              open={menuOpen}
+              onClose={() => setMenuOpen(false)}
+              items={menuItems.map((item) => ({
+                ...item,
+                onClick: () => {
+                  setMenuOpen(false);
+                  item.onClick();
+                },
+              }))}
+              ariaLabel="Akce zprávy"
+            />
+          </>
+        )}
+        {/* Emoji picker (portál) — společný pro hover ikonu i kebab; na mobilu
+            bottom sheet, takže kotvu (reactionBtnRef) ignoruje. */}
+        {showReact && pickerOpen && (
+          <EmojiPickerPopover
+            anchorRef={reactionBtnRef}
+            onSelect={(emoji) => onToggleReaction(message.id, emoji)}
+            onClose={() => setPickerOpen(false)}
+          />
         )}
       </div>
 

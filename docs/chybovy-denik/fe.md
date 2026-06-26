@@ -743,3 +743,13 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** „0 test" + chyba v `setup.ts afterEach`, ač test soubor je validní → neladit test, přepnout na `npm run test:run`.
 
 ---
+
+### ✅ ŘEŠENÍ — mobil: chat akce (odpovědět/reakce/upravit/smazat) ležely na textu → kebab přes `@media (hover: none)` · 2026-06-26
+
+**Symptom (screenshot testera):** Na mobilu inline ikony akcí zprávy překrývaly text (`…máš na to názor` přes ←😊✎).
+**Kořen:** [`MessageItem.module.css`](../../src/features/chat/components/MessageItem.module.css) — `.actions` je `position:absolute; top:0; right:0` uvnitř `.body` a starý `@media (hover:none)` ji jen zviditelnil (`opacity:1`). `.body` rezervuje vpravo jen `padding-right: 64px`, ale 4 tlačítka (8px padding/ks) ≈ 120px → přetekla do textu prvního řádku. Na desktopu nevadí (jen na hover).
+**Fix:** Na dotyku `.actions { display:none }` a místo nich jediný kebab `⋮` (`.kebabTrigger`) ukotvený v gutteru (≤64px → nepřekrývá text), klik → sdílený [`KebabMenu`](../../src/shared/ui/KebabMenu/KebabMenu.tsx) (desktop popover / mobil bottom-sheet, sám se zavírá). Reakce z menu → `EmojiPickerPopover`, na mobilu taky bottom-sheet, takže kotvu (`reactionBtnRef`) ignoruje — netřeba živé inline tlačítko. Touch terč zvětšen 24→44×36px.
+**Past chycená v `mobil-desktop`:** Rozhoduje `@media (hover: none)` (dotyk vs. myš), **ne** šířka — Playwright desktop screenshot má hover, rozdíl by neukázal. Ověřeno CSS rozborem + 18/18 unit testů (kebab items se renderují jen při otevřeném menu → `getByLabelText('Odpovědět')` stále unikátní inline tlačítko).
+**Zhodnocení:** dobře — jeden zátah ve sdílené komponentě (globální i world chat, 11 chat skinů, žádný skin `.actions` nepřebíjí), reuse `KebabMenu`+`EmojiPickerPopover` bottom-sheetů. Hlídat: u responsivních interakčních fixů odlišit `hover`-media od `width`-media (skill `mobil-desktop` defaultně myslí šířku).
+
+---

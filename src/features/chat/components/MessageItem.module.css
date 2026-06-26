@@ -281,14 +281,35 @@
   color: var(--danger);
 }
 
-/* Dotyková zařízení nemají hover — akce musí být trvale viditelné. */
+/* Kebab spouštěč — jen pro dotyk. Na desktopu se nepoužívá (hover ikony). */
+.kebabTrigger {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  align-items: center;
+  padding: var(--sp-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+}
+
+/* Dotyková zařízení nemají hover — inline lišta překrývala text, proto ji
+   schováme a místo ní dáme jediné ⋮ tlačítko ukotvené v gutteru. */
 @media (hover: none) {
   .actions {
-    opacity: 1;
+    display: none;
   }
 
-  .action {
-    padding: var(--sp-2);
+  .kebabTrigger {
+    display: inline-flex;
+    justify-content: center;
+    /* Pohodlný dotykový terč; šířka se vejde do gutteru (.body padding 64px),
+       výška držena nízko, ať absolutní tlačítko nezasahuje do další zprávy. */
+    min-width: 44px;
+    min-height: 36px;
   }
 }
 
