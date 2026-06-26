@@ -1,8 +1,9 @@
 /**
- * 8.7f — Preset pro Dračí doupě Plus (DrdPlus).
- * Arkanní svět s purpurovými akcenty (#7c5cbf), 4 taby (Postava, Boj, Cesty,
- * Profese), 6 povolání s vlastními inline renderery (Bojovník, Čaroděj,
- * Hraničář, Kněz, Theurg, Zloděj).
+ * 16.2d — Preset pro Dračí doupě Plus (DrdPlus).
+ * „Iluminovaný kodex" — jeden souvislý pergamenový list (Postava / Boj /
+ * Na cesty / Profese pod sebou). Povolání se volí erbem; erb řídí akcent
+ * listu i proměnlivou sekci Profese (6 povolání: Bojovník, Čaroděj,
+ * Hraničář, Kněz, Theurg, Zloděj — vč. formulí, démonů a vazeb theurga).
  */
 import type { DiarySystemPreset } from '../types';
 import { DrdPlusSheet } from '../sheets/drdplus/DrdPlusSheet';
@@ -11,10 +12,9 @@ export const drdplusPreset: DiarySystemPreset = {
   id: 'drdplus',
   name: 'Dračí doupě Plus',
   description:
-    'Arkanní svět s purpurovými akcenty. 6 hlavních + 9 odvozených vlastností, ' +
-    '4 taby (Postava / Boj / Cesty / Profese). Poslední tab dynamicky podle ' +
-    'volby povolání (6 různých rendererů — Bojovník, Čaroděj, Hraničář, Kněz, ' +
-    'Theurg, Zloděj) s vlastní strukturou.',
+    'Iluminovaný kodex — jeden list (Postava / Boj / Na cesty / Profese). ' +
+    'Povolání se volí erbem a mění barvu listu i spodní proměnlivou sekci ' +
+    '(6 povolání s vlastní strukturou, vč. theurgových formulí a démonů).',
   SystemSheet: DrdPlusSheet,
   loadStyles: () => import('../styles/drdplus.css'),
 };

@@ -1,6 +1,6 @@
 /**
- * 8.7f — Dračí doupě Plus (DrdPlus) konstanty.
- * 1:1 přenos z `c:/Matrix/Matrix/frontend/src/components/diary/DrdPlusCharacterSheet.tsx`.
+ * 16.2d — Dračí doupě Plus (DrdPlus) konstanty.
+ * Jednotný list, výběr povolání erbem. Bez tabů.
  */
 
 export type DrdPlusProfessionId =
@@ -14,13 +14,18 @@ export type DrdPlusProfessionId =
 export const DRDPLUS_PROFESSIONS: {
   id: DrdPlusProfessionId;
   label: string;
+  /** Iniciála do erbu (blackletter). */
+  glyph: string;
+  /** Bodový rozpočet zobrazený v hlavičce profese. */
+  pointsKey: string;
+  pointsLabel: string;
 }[] = [
-  { id: 'bojovnik', label: 'Bojovník' },
-  { id: 'carodej', label: 'Čaroděj' },
-  { id: 'hranicar', label: 'Hraničář' },
-  { id: 'knez', label: 'Kněz' },
-  { id: 'theurg', label: 'Theurg' },
-  { id: 'zlodej', label: 'Zloděj' },
+  { id: 'bojovnik', label: 'Bojovník', glyph: 'B', pointsKey: 'w_finty_left', pointsLabel: 'Zbývající finty' },
+  { id: 'carodej', label: 'Čaroděj', glyph: 'Č', pointsKey: 'wiz_body', pointsLabel: 'Body kouzel' },
+  { id: 'hranicar', label: 'Hraničář', glyph: 'H', pointsKey: 'ran_body', pointsLabel: 'Body' },
+  { id: 'knez', label: 'Kněz', glyph: 'K', pointsKey: 'pri_body', pointsLabel: 'Body víry' },
+  { id: 'theurg', label: 'Theurg', glyph: 'T', pointsKey: 'the_body', pointsLabel: 'Theurgické body' },
+  { id: 'zlodej', label: 'Zloděj', glyph: 'Z', pointsKey: 'thi_profibody', pointsLabel: 'Profibody' },
 ];
 
 /** 6 hlavních vlastností. */
@@ -46,17 +51,14 @@ export const DRDPLUS_DERIVED = [
   'Důstojnost',
 ];
 
-/** Tab IDs. */
-export type DrdPlusTab = 'postava' | 'boj' | 'cesty' | 'profese';
+/** Odvozené vlastnosti se vzorcem (nápověda pod políčkem). */
+export const DRDPLUS_DERIVED_FORMULAS: Record<string, string> = {
+  Krása: '(Obr+Zrč)/2+Chr',
+  Nebezpečnost: '(Síl+Vůle)/2+Chr',
+  Důstojnost: '(Int+Vůle)/2+Chr',
+};
 
-export const DRDPLUS_TABS: { id: DrdPlusTab; label: string }[] = [
-  { id: 'postava', label: '1. Postava' },
-  { id: 'boj', label: '2. Boj' },
-  { id: 'cesty', label: '3. Na Cesty' },
-  { id: 'profese', label: '4. Profese' },
-];
-
-/** Bojovník archetypy. */
+/** Bojovník archetypy (stupnice 1–10). */
 export const WARRIOR_ARCHETYPES = [
   'Rytíř',
   'Šermíř',
@@ -66,7 +68,17 @@ export const WARRIOR_ARCHETYPES = [
   'Kondotiér',
 ];
 
-/** Knězovy základní schopnosti. */
+/** Čaroděj — projevy (sféry magie), stupnice 1–10. */
+export const WIZARD_PROJEVY = [
+  'Vitální',
+  'Mentální',
+  'Investigativní',
+  'Materiální',
+  'Energetická',
+  'Časová',
+];
+
+/** Knězovy základní schopnosti (stupnice 1–10). */
 export const PRIEST_BASIC_ABILITIES = [
   'Empatie',
   'Jasnozřivost',
@@ -74,5 +86,20 @@ export const PRIEST_BASIC_ABILITIES = [
   'Exorcismus',
 ];
 
+/** Kněz — principy (hexagon, protiklady Dobro↔Zlo, Řád↔Chaos, Život↔Smrt). */
+export const PRIEST_PRINCIPLES = ['Dobro', 'Řád', 'Smrt', 'Zlo', 'Chaos', 'Život'];
+export const PRIEST_PRINCIPLE_BUDGET = 6;
+
 /** Theurgova nakloněnost. */
 export const THEURG_INCLINATIONS = ['Denní', 'Měsíční', 'Roční', 'Životní'];
+
+/** Forma kouzla — 4 osy. */
+export const FORMA_AXES: { key: string; label: string; options: string[] }[] = [
+  { key: 'action', label: 'Působení', options: ['Přímá', 'Nepřímá'] },
+  { key: 'shape', label: 'Projev', options: ['Paprsek', 'Plocha', 'Objem'] },
+  { key: 'matter', label: 'Hmota', options: ['Hmotná', 'Nehmotná'] },
+  { key: 'vis', label: 'Viditelnost', options: ['Viditelná', 'Neviditelná'] },
+];
+
+/** Druhy démonů. */
+export const DEMON_KINDS = ['Vazbochyt', 'Nižší', 'Vyšší'];

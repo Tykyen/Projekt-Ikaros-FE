@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-029.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-030.**
 
 ## Jak je deník členěný
 
@@ -104,3 +104,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--sci-fi-skin-dice-log-hody-i-orchestrace-průhledné--vadný-var--mislabel-solid-tokenu--2026-06-26) | fe/css | sci-fi skin: HODY+ORCHESTRACE prosvítaly. **`var()` má 2 argumenty — čárka ve fallbacku = víc `background` vrstev → `<color>` v ne-poslední → invalid → `transparent`**; řetězit = zanořit. + token `*-solid` dědil průhledný `--theme-surface` (název lže) | — (zabralo; vizuál čeká testera) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--drd16-cross-surface-embedy-nesou-deníkový-skin---dd-embed--kontrakt--2026-06-26) | fe/css | drd16 embedy (dice log/token panel/readout/orchestrace) zamrzlé na fantasy → sada **`--dd-embed-*`** (generická přes `--dd-forge/gold` → auto per-skin; ručně jen text/muted/num); polarita forge (tmavý×světlý skin); ORCHESTRACE do `DiarySkinScope`. **CH-014 cwd drift POTŘETÍ** (`cd` v Bash loopu) | — (build✓; vizuál čeká testera) |
 | [CH-028](fe.md#ch-028--drd16-embed-tokeny---dd-embed--jsem-dal-do-lazy-drd16css--v-embedech-nedefinované--panely-průhledné--2026-06-26) | fe/css | `--dd-embed-*` defaulty jsem dal do **lazy** `drd16.css` (jen deníková stránka) → v embedech (mapa/chat) nedefinované → `var()` bez fallbacku invalid → `background:transparent`. Fix: defaulty do **static `diary-skins.css`** + fallbacky. **Token default musí žít tam, kde se konzument načítá** (rodina CH-027) | panel „skrz" i po tokenizaci; text skinu OK, plocha průhledná |
+| [✅ ŘEŠENÍ](fe.md#-řešení--162d-deník-drd-přepis-na-jednotný-erb-driven-list-pergamen-kodex--2026-06-26) | fe | 16.2d DrD+ deník: 4 taby→jeden list, povolání volené erbem (popover→`data-prof`+sekce Profese), pergamen základní; `drdp_` prefix zachován=0 migrace, print=read-only list | — (prototyp=kontrakt, 10/10 testů) |
+| [CH-029](fe.md#ch-029--fe-testy-spuštěné-přes-npx-vitest-run-file-spadly-na-setupts-aftereach-špatný-kontext--2026-06-26) | proces/fe | `npx vitest run <file>` spadl na setup.ts afterEach (0 test); FE testy spouštět `npm run test:run -- <path>` | „0 test" + chyba v setup.ts afterEach u validního testu |

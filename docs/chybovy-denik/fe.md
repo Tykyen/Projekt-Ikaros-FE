@@ -721,3 +721,25 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** panel „skrz" na mapu i po „tokenizaci"; text skinu funguje, plocha průhledná → hledat ROZDÍL mezi text-tokenem (loaded) a surface-tokenem (neloaded), ne ladit alfu.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.2d deník DrD+ přepis na jednotný erb-driven list (pergamen-kodex) · 2026-06-26
+
+**Co nakonec zabralo:** Kompletní přepis DrdPlus deníku ze 4-tabového sheetu (8.7f) na **jeden souvislý list** (Postava→Boj→Na cesty→Profese pod sebou) s **výběrem povolání erbem** (klik na štít → popover 6 erbů → řídí akcent listu `data-prof` i proměnlivou sekci Profese). Postaveno z odsouhlaseného HTML mockupu (prototyp=kontrakt). Rozpad: `DrdPlusSheet` (kostra+strany 1-3+erb), `DrdPlusShared` (Scale/Tri/WoundGrid/SignedScale/PrincipHex/JsonTable), `DrdPlusCards` (kouzla/formule s modifikátory+živý součet/démoni — sbalitelné), `DrdPlusProfessions` (6 povolání), přepis `drdplus.css` na pergamen (vlastní `--dp-*`, scoped `.dp-sheet`, akcent per `[data-prof]`).
+
+**Proč to je správně:** `drdp_` prefix + delta-merge `cdAccess` zachovány → **žádná migrace postav** (nová pole jen přídavek; `age`/`postava_popis` osiří, neškodí). Print = **stejný list read-only** (`disabled = view||print`), žádný separátní PrintView (lineární list to umožnil — proti drd16/matrix vzoru se separátním PrintView). Pergamen jako **základní vzhled** (NE skin-reaktivní jako drd16 16.2c — vědomé rozhodnutí uživatele, follow-up).
+
+**Jak ověřeno:** vitest 10/10 (přepis testů taby→sekce, `getByRole('heading')` kvůli kolizi „Boj" page-title × combat label), `tsc -b` čistý, eslint čistý. Vizuál v reálné appce (skutečné fonty, šířka panelu deníku) zatím NEověřen — čeká `mobil-desktop` + uživatel.
+
+**Zhodnocení:** dobře — prototyp=kontrakt + rozpad do shared/cards/professions držel sheet čitelný; jen 2 triviální fixy po tsc/lint (union typ u zlodějova Mistr patche → explicitní `updateArr<Record<…>>`; `no-useless-escape` v pnum regexu). Zbývá vizuál + `funkce`/`napoveda` docs + commit.
+
+---
+
+### CH-029 — FE testy spuštěné přes `npx vitest run <file>` spadly na setup.ts afterEach (špatný kontext) · 2026-06-26
+
+**Kontext:** Ověřoval jsem nový `DrdPlusSheet.spec.tsx`; spustil `npx vitest run src/.../DrdPlusSheet.spec.tsx`.
+**Co jsem udělal špatně:** Volal vitest přes `npx` přímo místo projektového skriptu.
+**Proč to nefungovalo:** Běh skončil „0 test" + `Error: Vitest failed to find the current suite` v `src/__tests__/setup.ts:9` (`afterEach`). `npx vitest` se rozběhl v kontextu, kde `setupFiles`/globals nedosedly správně → setup hook bez suite kontextu. Přes `npm run test:run -- <file>` (lokální vitest + projektová konfigurace) běh prošel (drd16 17/17, drdplus 10/10).
+**Poučení:** FE testy spouštět **`npm run test:run -- <path>`**, ne `npx vitest run <path>` (souvisí s [[project_fe_test_precommit]] — vitest bez globals; projektový skript nese správnou konfiguraci).
+**Příznak cyklení:** „0 test" + chyba v `setup.ts afterEach`, ač test soubor je validní → neladit test, přepnout na `npm run test:run`.
+
+---
