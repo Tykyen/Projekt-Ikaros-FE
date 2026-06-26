@@ -1,0 +1,549 @@
+/* Dračí doupě 1.6 — skin „Minimal" (16.2c-drd16).
+ *
+ * Architektonický rýsovací list. NE prázdný minimalismus — minimalismus jako
+ * PRECIZNÍ inženýrské měřítko. Kostěný papír + uhlová čerň, JEDINÝ akcent =
+ * inkoustová teal #0b6b66. Gradienty zplošťuju na ploché barvy / hairline plochy,
+ * textury (parch-tex/noise) ruším → čistý světlý papír. Mono čísla, serif text.
+ *
+ * Mechanika (CONTRACT.md): přepisuju `--dd-*` tokeny na vyšší specificitě
+ * `[data-diary-system='drd16'][data-diary-skin='minimal']` (compound 0,2,0 >
+ * fantasy default 0,1,0 z drd16.css, nezávislé na pořadí načtení). Tokeny dědí
+ * list `.drd16-sheet` I embedované panely (combat/bestie/chat/spellcard) přes
+ * jejich `var(--dd-x, …)`. Ornamenty (tick-rule pravítko + registrační rohy)
+ * jsou CSS-only, scoped, na globálních třídách listu + panel `.root`.
+ *
+ * Signature ornament „TICK-RULE": plný ■ teal marker + baseline se svislými
+ * ryskami (maskované do dolních ~40 % výšky → značky na pravítku, ne mřížka).
+ * Registrační rohové rysky (4 teal „L") na vnitřním rámu = ořezové/soutiskové
+ * značky kalibrovaného listu. NESDÍLÍ se s jiným skinem (fantasy = filigrán,
+ * horor = tracerie, steampunk = nýty); tady rysky pravítka + ■.
+ *
+ * Import: statický z `diary-skins.css` (vždy v bundlu i mimo deníkovou stránku
+ * → token override doletí i na mapu/chat, kde se drd16.css nelazyloaduje).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════
+   1. TOKEN OVERRIDE — kompletní `--dd-*` přemapování na minimal paletu
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='minimal'] {
+  /* ── lokální minimal proměnné (čitelnost mapování) ── */
+  --mn-paper: #f4f1ea; /* kostěný list */
+  --mn-paper-2: #ece7dd; /* sotva tmavší plocha / vtisk */
+  --mn-ink: #1b1c1d; /* uhlová čerň — text/čísla */
+  --mn-ink-2: #55585a; /* sekundární text */
+  --mn-ink-3: #8b8e8c; /* muted / mono popisky */
+  --mn-hair: #d7d2c6; /* vlasová linka */
+  --mn-hair-2: #c4bfb2; /* silnější linka / obrys */
+  --mn-acc: #0b6b66; /* JEDINÝ akcent — inkoustová teal */
+  --mn-acc-deep: #084e4a; /* tmavší teal — čísla, hover */
+  --mn-acc-wash: rgba(11, 107, 102, 0.07);
+  --mn-danger: #9a3b2e; /* cihla — jen kritické stavy */
+
+  /* ── rám: kovárna → uhlový/papírový (žádný tmavý leather) ── */
+  --dd-forge-1: var(--mn-hair-2);
+  --dd-forge-2: var(--mn-paper-2);
+  --dd-forge-edge: var(--mn-hair);
+
+  /* ── papír: čistý kostěný, plochý ── */
+  --dd-parch-0: #faf8f3;
+  --dd-parch-1: var(--mn-paper);
+  --dd-parch-2: var(--mn-paper-2);
+  --dd-parch-edge: var(--mn-hair-2);
+
+  /* ── inkoust: uhlová čerň + odstíny šedi ── */
+  --dd-ink: var(--mn-ink);
+  --dd-ink-soft: var(--mn-ink-2);
+  --dd-ink-faint: var(--mn-ink-3);
+  --dd-ink-deep: var(--mn-ink);
+  --dd-ink-2: var(--mn-ink);
+  --dd-ink-head: var(--mn-ink);
+
+  /* ── heraldika → JEDINÝ teal akcent (zlato/safír/ocel sjednoceny) ── */
+  --dd-gold: var(--mn-acc);
+  --dd-gold-hi: var(--mn-acc);
+  --dd-gold-deep: var(--mn-acc-deep);
+  --dd-crimson: var(--mn-danger);
+  --dd-crimson-hi: var(--mn-danger);
+  --dd-crimson-deep: var(--mn-danger);
+  --dd-sapphire: var(--mn-acc);
+  --dd-sapphire-hi: var(--mn-acc);
+  --dd-sapphire-deep: var(--mn-acc-deep);
+  --dd-steel: var(--mn-acc-deep);
+
+  /* ── fonty: editorial serif + strojový mono ── */
+  --dd-font-title: 'Fraunces', Georgia, serif;
+  --dd-font-display: 'Fraunces', Georgia, serif;
+  --dd-font-head: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-font-body: 'Newsreader', Georgia, serif;
+
+  /* ── plochy: textury PRYČ → čistý papír, jemný horní vtisk ── */
+  --dd-parch-tex: linear-gradient(180deg, #faf8f3, var(--mn-paper) 42%, var(--mn-paper-2));
+  --dd-noise: none;
+
+  /* ── kompozity panelů (gradienty zploštěné na ploché barvy / hairline) ── */
+  --dd-panel-line: var(--mn-hair);
+  --dd-line: var(--mn-hair);
+  --dd-line-soft: var(--mn-hair);
+  --dd-row-bg: transparent;
+  --dd-row-bg-hover: var(--mn-acc-wash);
+  --dd-card-bg: transparent;
+  --dd-input-bg: #fbfaf6;
+  /* akcent „grad" = plochá teal (mono čísla/badge na bílém zůstanou čitelné) */
+  --dd-accent-grad: var(--mn-acc);
+  --dd-step-bg: #fbfaf6;
+  --dd-bar-bg: var(--mn-hair);
+  --dd-hp-grad: var(--mn-acc);
+  --dd-mana-grad: var(--mn-ink-2);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   2. LIST — sploštění rámu/inkoustu na kostěný papír (chrome, kde token
+      sám nestačí: shadow rám, vnitřní rám, hero linka, badge, …)
+   ════════════════════════════════════════════════════════════════════ */
+
+/* deska pod listem + čistý hairline rám místo kožené vazby */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-sheet {
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 0 0 1px var(--mn-hair-2),
+    0 30px 70px -34px rgba(30, 28, 22, 0.55),
+    0 6px 20px -12px rgba(30, 28, 22, 0.3);
+}
+/* zrno PRYČ (token --dd-noise = none → ::after pozadí zmizí, ale jistota) */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-sheet::after {
+  background: none;
+  opacity: 0;
+}
+/* vnitřní rám → SIGNATURE registrační rohové rysky (4 teal „L").
+   Každá „L" = 2 vrstvy: svislá (1.5×16) + vodorovná (16×1.5) ukotvená v rohu.
+   8 lin. gradientů = 4 rohy × 2 ramena. */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-sheet::before {
+  inset: 14px;
+  border: 1px solid var(--mn-hair);
+  border-radius: 1px;
+  box-shadow: none;
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(var(--mn-acc), var(--mn-acc)), linear-gradient(var(--mn-acc), var(--mn-acc)),
+    linear-gradient(var(--mn-acc), var(--mn-acc)), linear-gradient(var(--mn-acc), var(--mn-acc)),
+    linear-gradient(var(--mn-acc), var(--mn-acc)), linear-gradient(var(--mn-acc), var(--mn-acc)),
+    linear-gradient(var(--mn-acc), var(--mn-acc)), linear-gradient(var(--mn-acc), var(--mn-acc));
+  background-size:
+    1.5px 16px, 16px 1.5px /* TL: svislá, vodorovná */,
+    1.5px 16px, 16px 1.5px /* TR */,
+    1.5px 16px, 16px 1.5px /* BL */,
+    1.5px 16px, 16px 1.5px; /* BR */
+  background-position:
+    0 0, 0 0 /* TL */,
+    100% 0, 100% 0 /* TR */,
+    0 100%, 0 100% /* BL */,
+    100% 100%, 100% 100%; /* BR */
+}
+
+/* HERO: zlatá border-image linka → SIGNATURE tick-rule (■ + rysky) baseline */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hero {
+  position: relative;
+  border-bottom: 0;
+  border-image: none;
+  padding-bottom: 26px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hero::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  height: 8px;
+  pointer-events: none;
+  /* ■ marker (vlevo) + baseline + svislé rysky maskované do dolních 40 % */
+  background-image:
+    /* ■ plný marker 6×6 */
+    linear-gradient(var(--mn-acc), var(--mn-acc)),
+    /* baseline 1px */
+    linear-gradient(var(--mn-hair-2), var(--mn-hair-2)),
+    /* svislé rysky každých 13px */
+    linear-gradient(90deg, var(--mn-hair-2) 1px, transparent 1px);
+  background-repeat: no-repeat, no-repeat, repeat-x;
+  background-position: 0 1px, 11px 3px, 11px 0;
+  background-size: 6px 6px, calc(100% - 11px) 1px, 13px 100%;
+  -webkit-mask:
+    linear-gradient(#000 0 0) 0 0 / 11px 100% no-repeat,
+    linear-gradient(180deg, #000 0 60%, transparent 60%) 11px 0 / calc(100% - 11px) 100% no-repeat;
+  mask:
+    linear-gradient(#000 0 0) 0 0 / 11px 100% no-repeat,
+    linear-gradient(180deg, #000 0 60%, transparent 60%) 11px 0 / calc(100% - 11px) 100% no-repeat;
+}
+/* eyebrow → mono kapitálky v teal (z fantasy zlatého kódu) */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-eyebrow {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.34em;
+  color: var(--mn-acc);
+}
+/* jméno: editorial Fraunces, čistá hairline podtržení */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-name {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--mn-ink);
+  border-bottom: 1px solid var(--mn-hair-2);
+}
+/* identity inputy/selecty: plochý papír, hairline */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ident-line input,
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ident-line select {
+  background: #fbfaf6;
+  border: 1px solid var(--mn-hair);
+  border-radius: 1px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-field > label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: var(--mn-ink-3);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-spec-lock {
+  color: var(--mn-ink-3);
+}
+
+/* vitální plakety: kožená destička → kostěná, jen mono číslo */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-plaque {
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--mn-hair);
+  border-radius: 0;
+  box-shadow: none;
+  text-align: left;
+  padding: 2px 0 2px 14px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-plaque .pl-lab {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--mn-ink-3);
+  letter-spacing: 0.2em;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-plaque .pl-val input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--mn-ink);
+  border-bottom: 1px solid var(--mn-hair-2);
+  text-align: left;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-plaque.magy .pl-val input {
+  color: var(--mn-acc-deep);
+}
+
+/* ── HUD: kožené destičky → otevřené měřené buňky dělené hairline ── */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hud-cell {
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--mn-hair);
+  border-radius: 0;
+  box-shadow: none;
+  justify-content: flex-start;
+  padding: 6px 18px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hud-emblem {
+  display: none; /* minimalismus = typografie, ne ikonky */
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hud-lab {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.2em;
+  color: var(--mn-ink-3);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hud-val,
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hud-cell.hp .drd16-hud-val,
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hud-cell.ma .drd16-hud-val {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--mn-ink);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hud-cell.oc .drd16-hud-val {
+  color: var(--mn-acc-deep);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   3. SIGNATURE TICK-RULE u nadpisů sekcí listu (.drd16-panel-h)
+   ── kosočtverec + zlatá linka → plný ■ marker + měřítková linka ──
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-panel-h {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--mn-ink-2);
+}
+/* ■ index marker (plný teal čtvereček místo kosočtverce) */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-panel-h::before {
+  width: 6px;
+  height: 6px;
+  transform: none;
+  background: var(--mn-acc);
+  box-shadow: none;
+}
+/* baseline → měřítko: linka + svislé rysky maskované do dolních 40 % */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-panel-h::after {
+  height: 7px;
+  opacity: 1;
+  background-image:
+    linear-gradient(var(--mn-hair-2), var(--mn-hair-2)),
+    linear-gradient(90deg, var(--mn-hair-2) 1px, transparent 1px);
+  background-repeat: no-repeat, repeat-x;
+  background-position: 0 3px, 0 0;
+  background-size: 100% 1px, 13px 100%;
+  -webkit-mask: linear-gradient(180deg, #000 0 58%, transparent 58%);
+  mask: linear-gradient(180deg, #000 0 58%, transparent 58%);
+}
+
+/* ── měřené řádky (stat/enc): boxy → otevřené ledger řádky s hairline ── */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-stat-row {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--mn-hair);
+  border-radius: 0;
+  padding: 9px 2px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-stat-row .st-name {
+  font-weight: 400;
+  color: var(--mn-ink);
+}
+/* háznová hodnota: kruhový žeton → mono číslo v pravém sloupci */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-stat-row .st-val,
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-stat-row.siz .st-letter {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--mn-ink);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  width: auto;
+  min-width: 2ch;
+  height: auto;
+}
+/* bonus badge: zlatá destička → plochý teal mono text */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-bonus {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--mn-acc-deep);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  min-width: 3ch;
+  height: auto;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-bonus.zero {
+  color: var(--mn-ink-3);
+  background: transparent;
+  border: 0;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-bonus.neg {
+  color: var(--mn-danger);
+  background: transparent;
+  border: 0;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-stat-row.over .st-val {
+  box-shadow: none;
+  color: var(--mn-danger);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-enc-row input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  background: transparent;
+  border: 0;
+  text-align: right;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-enc-row.base {
+  border-bottom: 1px solid var(--mn-hair-2);
+}
+
+/* ── tabulky (boj/postřeh/zbroj/dovednosti): zlaté linky → hairline ── */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-combat th {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--mn-ink-3);
+  border-bottom: 1px solid var(--mn-hair-2);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-combat input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--mn-hair);
+  border-radius: 0;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-combat input.left-align {
+  font-family: 'Newsreader', Georgia, serif;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-combat.per th.rh {
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--mn-ink-2);
+  border-bottom: 1px solid var(--mn-hair);
+}
+/* „+ přidat" řádek: zlatý dashed → teal podtržené mono */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-add {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--mn-acc-deep);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--mn-hair);
+  border-radius: 0;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-add:hover {
+  background: var(--mn-acc-wash);
+  border-style: solid;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-del {
+  color: var(--mn-danger);
+}
+
+/* ── OČ pečeť: zlatá destička → ražené dvojkroužek razítko (inset shadow) ── */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-oc-seal {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--mn-hair);
+  border-radius: 0;
+  padding: 14px 0 4px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-oc-seal .oc-lab {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.2em;
+  color: var(--mn-ink-3);
+  font-weight: 600;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-oc-seal input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--mn-acc-deep);
+  background: var(--mn-paper);
+  border: 0;
+  /* ražený dvojkroužek: vnitřní teal prstenec + papírová mezera + slabý teal */
+  box-shadow:
+    inset 0 0 0 1.5px var(--mn-acc),
+    inset 0 0 0 6px var(--mn-paper),
+    inset 0 0 0 7px rgba(11, 107, 102, 0.25);
+  width: 64px;
+  height: 64px;
+}
+
+/* ── žebřík HP/Magů: smaltové segmenty → inženýrské měřítko (ryska/5.) ── */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.life .drd16-ladder-h {
+  color: var(--mn-ink-2);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.magy .drd16-ladder-h {
+  color: var(--mn-ink-2);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder-h {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.18em;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-rungs {
+  border: 1px solid var(--mn-hair);
+  border-radius: 1px;
+  background: var(--mn-paper);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-rung {
+  border-top-color: var(--mn-hair);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-rung .rn {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--mn-ink-3);
+}
+/* zaplněná příčka HP = plochá teal, magy = uhlová (kontrast měřítka) */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.life .drd16-rung.on .rbar {
+  background: var(--mn-acc);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.magy .drd16-rung.on .rbar {
+  background: var(--mn-ink-2);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-rung.maxmark {
+  box-shadow: inset 0 0 0 1px var(--mn-acc);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-rung.maxmark::after {
+  content: '';
+  width: 5px;
+  height: 1.5px;
+  right: 0;
+  background: var(--mn-acc);
+  color: transparent;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder-ctl button {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--mn-ink-2);
+  background: #fbfaf6;
+  border: 1px solid var(--mn-hair-2);
+  border-radius: 1px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder-ctl button:hover {
+  background: var(--mn-acc-wash);
+  border-color: var(--mn-acc);
+  color: var(--mn-acc-deep);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.life .drd16-ladder-cur,
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.magy .drd16-ladder-cur {
+  color: var(--mn-ink);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder-cur .c {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  border-bottom: 1px solid var(--mn-hair-2);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-hpbar {
+  border: 1px solid var(--mn-hair-2);
+  background: var(--mn-hair);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.life .drd16-hpbar-fill {
+  background: var(--mn-acc);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-ladder.magy .drd16-hpbar-fill {
+  background: var(--mn-ink-2);
+}
+
+/* ── spodní zóna (schopnosti/poznámky): rámované panely → otevřené ── */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-scroll-panel {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--mn-hair-2);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 18px 0 6px;
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-scroll-panel textarea {
+  color: var(--mn-ink-2);
+  background: none; /* žádné linkované řádky — čistá plocha */
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-scroll-panel textarea::placeholder {
+  color: var(--mn-ink-3);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   4. PANELY embedů (combat/bestie/chat/spellcard) = CSS Moduly s hash
+      třídami. Reskin běží VÝHRADNĚ přes `--dd-*` token override z bloku 1
+      (moduly je čtou přes var()) — stejná konvence jako steampunk/horror
+      drd16 skin: hashované modulové třídy ZÁMĚRNĚ necílíme (substringové
+      `[class*='…']` selektory jsou křehké, mohou matchnout cizí komponenty
+      pod stejným `data-diary-skin` předkem). Token sada už panelům dává:
+        • čistý kostěný papír (--dd-parch-tex bez textury) + hairline rám,
+        • uhlový inkoust + mono čísla (--dd-font-display → Spline Sans Mono),
+        • JEDINÝ teal akcent (--dd-gold/accent/hp/sapphire sjednoceny),
+        • ploché plochy místo gradientů (--dd-row-bg/step/bar = ploché).
+      Zbytek (drobné hardcoded sépiové hodnoty v `.pill`/`.desc`/`.editBtn`,
+      mimo token engine) ponechán — shodný kompromis jako u steampunku.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════
+   5. View mode (čistý readout) — ražené dvojkroužek razítko zůstává čitelné
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-sheet.is-view .st-val,
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-sheet.is-view .st-letter,
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-sheet.is-view .drd16-oc-seal input {
+  box-shadow:
+    inset 0 0 0 1.5px var(--mn-acc),
+    inset 0 0 0 6px var(--mn-paper),
+    inset 0 0 0 7px rgba(11, 107, 102, 0.25);
+}
+[data-diary-system='drd16'][data-diary-skin='minimal'] .drd16-sheet.is-view .st-val {
+  box-shadow: none;
+}

@@ -1,0 +1,646 @@
+/* Dračí doupě 1.6 — skin „RETRO" (synthwave / arkáda 80s) — 16.2c-drd16.
+ *
+ * Token sada + signature ornamenty nad jedním layoutem (`drd16.css`). Přepisuje
+ * VŠECHNY `--dd-*` tokeny (fantasy default → synthwave) → reskinuje deníkový
+ * list (`.drd16-sheet`) i embedované panely (combat/bestie/chat/spellcard),
+ * které tokeny konzumují přes `var(--dd-*)`.
+ *
+ * Scope: `[data-diary-system='drd16'][data-diary-skin='retro']` (vyšší
+ * specificita než fantasy default na `[data-diary-system='drd16']` → přebíjí
+ * bez ohledu na pořadí načtení). Atributy nasazuje DiarySystemProvider (list)
+ * i DiarySkinScope / TokenInfoPanel (embedy F3).
+ *
+ * Tvarový jazyk (unikátní, nesdílený): chunky bevel neon rám, šikmé chevron
+ * řezy, 7segmentové LED displeje, pixel labely. Signature ornament: perspektivní
+ * NEON SUN-GRID horizont (sluneční gradient + mizící mřížka) — žádný jiný skin
+ * sun-grid/horizont ani 7segment nepoužívá. ODLIŠENÍ od sci-fi: teplá fialová
+ * noc + jantarové slunce, zkosené chunky hrany (ne studený hladký futurismus).
+ *
+ * Fonty: CDN @import (Orbitron / Press Start 2P / Share Tech Mono / DSEG7).
+ */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css');
+
+/* ════════════════════ TOKENY (kompletní --dd-* override) ════════════════════
+ * Sémantické mapování fantasy → retro:
+ *   forge (rám)   → temně fialová noc / nejhlubší
+ *   parch (papír) → fialová karta + neonové „papír" plochy (tmavé, ne světlé!)
+ *   ink (text)    → světlý levandulový text (kontrast na tmavém)
+ *   gold (akcent) → sluneční jantar (teplé pozitivní)
+ *   crimson (HP)  → neon růžová
+ *   sapphire (MP) → azurová (cyan)
+ *   steel (OČ)    → jantar (teplý, ne chladný) */
+[data-diary-system='drd16'][data-diary-skin='retro'] {
+  /* ── noc / rám (forge) ── */
+  --dd-forge-1: #0d0420; /* nejhlubší (vnější rám) */
+  --dd-forge-2: #1b0f37; /* tmavý rám / karta */
+  --dd-forge-edge: #3a1450; /* hrana rámu */
+
+  /* ── plochy panelů (parch → tmavá fialová, NE světlý papír) ── */
+  --dd-parch-0: #241148; /* „nejsvětlejší" plocha = fialová karta */
+  --dd-parch-1: #1b0f37; /* base plocha */
+  --dd-parch-2: #120726; /* tmavší / inset */
+  --dd-parch-edge: #7b3fb0; /* hrana plochy (hot line) */
+
+  /* ── text (ink → světlý) ── */
+  --dd-ink: #f3e9ff; /* hlavní text */
+  --dd-ink-soft: #b89fd6; /* tlumený */
+  --dd-ink-faint: #7d639f; /* nejslabší */
+  --dd-ink-deep: #0d0420; /* text NA světlém neon akcentu (tmavý) */
+  --dd-ink-2: #f3e9ff; /* tmavý text 2 → na tmavém je světlý */
+  --dd-ink-head: #7df0ff; /* nadpisy (cyan hi) */
+
+  /* ── jantar / akcent (gold → sluneční) ── */
+  --dd-gold: #ffb347; /* primární akcent */
+  --dd-gold-hi: #fff06a; /* světlý */
+  --dd-gold-deep: #6b4b16; /* tmavý / borders */
+
+  /* ── životy (crimson → neon růžová) ── */
+  --dd-crimson: #ff2e97;
+  --dd-crimson-hi: #ff7ac4;
+  --dd-crimson-deep: #b3146a;
+
+  /* ── magy (sapphire → azurová) ── */
+  --dd-sapphire: #22d3ee;
+  --dd-sapphire-hi: #7df0ff;
+  --dd-sapphire-deep: #0e7c92;
+
+  /* ── obrana (steel → teplý jantar, ne chladná modrá) ── */
+  --dd-steel: #ffb347;
+
+  /* ── fonty ── */
+  --dd-font-title: 'Orbitron', 'Share Tech Mono', sans-serif;
+  --dd-font-display: 'Orbitron', 'Share Tech Mono', sans-serif;
+  --dd-font-head: 'Press Start 2P', 'Share Tech Mono', monospace;
+  --dd-font-body: 'Share Tech Mono', 'Courier New', monospace;
+  /* čísla = 7segmentový LED displej (DSEG7), fallback monospace */
+  --dd-font-num: 'DSEG7 Classic', 'Share Tech Mono', monospace;
+
+  /* ── kompozity: pozadí ploch (synthwave gradient + jemný sun-grid pruh) ──
+   * Tento token nese pozadí listu I panelů (.root combat/bestie čte
+   * background-image: var(--dd-parch-tex)). Sun-grid je vetkaný přímo do
+   * gradientu → signature ornament dorazí i na embedy bez modulové editace. */
+  --dd-parch-tex:
+    radial-gradient(120% 60% at 50% 0%, rgba(255, 46, 151, 0.14), transparent 60%),
+    radial-gradient(90% 50% at 50% 100%, rgba(34, 211, 238, 0.1), transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(34, 211, 238, 0.05) 39px 40px),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 46, 151, 0.045) 31px 32px),
+    linear-gradient(180deg, #2d0e4f, #150826 78%);
+  /* CRT scanline overlay (přebíjí fantasy SVG turbulenci) */
+  --dd-noise: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0 2px,
+    rgba(0, 0, 0, 0.34) 2px 3px
+  );
+
+  /* ── sémantické kompozity pro PANELY (combat/bestie/chat/spellcard) ── */
+  --dd-panel-line: var(--dd-parch-edge);
+  --dd-line: rgba(123, 63, 176, 0.55);
+  --dd-line-soft: rgba(74, 42, 115, 0.6);
+  --dd-row-bg: linear-gradient(90deg, rgba(36, 17, 72, 0.85), rgba(18, 7, 38, 0.7));
+  --dd-row-bg-hover: rgba(123, 63, 176, 0.32);
+  --dd-card-bg: rgba(18, 7, 38, 0.7);
+  --dd-input-bg: rgba(18, 7, 38, 0.85);
+  --dd-accent-grad: linear-gradient(180deg, var(--dd-gold-hi), var(--dd-gold) 55%, #ff5d8f);
+  --dd-step-bg: linear-gradient(180deg, var(--dd-parch-0), var(--dd-parch-2));
+  --dd-bar-bg: linear-gradient(180deg, rgba(18, 7, 38, 0.9), rgba(36, 17, 72, 0.7));
+  --dd-hp-grad: linear-gradient(90deg, var(--dd-crimson-deep), var(--dd-crimson));
+  --dd-mana-grad: linear-gradient(90deg, var(--dd-sapphire-deep), var(--dd-sapphire));
+}
+
+/* ════════════════════════ LIST — kořenová kazeta ════════════════════════ */
+/* Chunky bevel neon rám (přebíjí fantasy zlato-kožený box-shadow). */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-sheet {
+  color: var(--dd-ink);
+  border-radius: 14px;
+  isolation: isolate;
+  box-shadow:
+    0 0 0 1px var(--dd-crimson),
+    0 0 0 5px var(--dd-forge-1),
+    0 0 0 6px var(--dd-sapphire-deep),
+    0 0 28px -2px rgba(255, 46, 151, 0.5),
+    0 0 60px -6px rgba(34, 211, 238, 0.3),
+    0 40px 90px -30px #000;
+}
+
+/* SIGNATURE ORNAMENT: perspektivní neon sun-grid horizont na spodním pásu.
+ * Přepisuje fantasy `::before` (vnitřní pergamenový fillet) na sun-grid podlahu
+ * mizící do dálky (rotateX = perspektiva). */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-sheet::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  top: auto;
+  height: 230px;
+  z-index: 0;
+  pointer-events: none;
+  border: none;
+  border-radius: 0 0 14px 14px;
+  overflow: hidden;
+  background:
+    linear-gradient(0deg, rgba(13, 4, 32, 0) 0 40%, var(--dd-forge-1) 92%),
+    repeating-linear-gradient(90deg, transparent 0 38px, rgba(34, 211, 238, 0.22) 38px 39px),
+    repeating-linear-gradient(0deg, transparent 0 30px, rgba(255, 46, 151, 0.18) 30px 31px);
+  background-position: center bottom;
+  -webkit-mask-image: linear-gradient(0deg, #000 0 55%, transparent 100%);
+  mask-image: linear-gradient(0deg, #000 0 55%, transparent 100%);
+  transform-origin: bottom;
+  transform: perspective(420px) rotateX(62deg);
+}
+
+/* slunce nad horizontem (signature) — vlastní pseudo na sheetu přes ::after
+ * by kolidovalo se scanline; použijeme samostatnou kresbu v gradientu hero. */
+
+/* CRT scanlines + vinětace přes celý list (přepisuje fantasy SVG zrno). */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-sheet::after {
+  border-radius: 14px;
+  background:
+    var(--dd-noise),
+    radial-gradient(130% 120% at 50% 45%, transparent 62%, rgba(0, 0, 0, 0.45) 100%);
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  z-index: 40;
+}
+
+/* ════════════════════════════════ HERO ════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hero {
+  position: relative;
+  border-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--dd-sapphire) 16%,
+      var(--dd-crimson) 50%,
+      var(--dd-sapphire) 84%,
+      transparent
+    )
+    1;
+}
+/* zapadající slunce za hero (signature, malá varianta) */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hero::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 96px;
+  height: 96px;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 8px, var(--dd-forge-1) 8px 11px),
+    linear-gradient(180deg, var(--dd-gold-hi), var(--dd-gold) 38%, #ff5d8f 72%, var(--dd-crimson));
+  -webkit-mask-image: linear-gradient(0deg, transparent 42%, #000 42%);
+  mask-image: linear-gradient(0deg, transparent 42%, #000 42%);
+  filter: drop-shadow(0 0 18px rgba(255, 93, 143, 0.5));
+  opacity: 0.55;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-eyebrow {
+  font-family: var(--dd-font-head);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--dd-sapphire-hi);
+  text-shadow: 0 0 8px var(--dd-sapphire);
+}
+/* jméno: Orbitron + neon glow + ★ marker (přebíjí tmavý fantasy color) */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-name {
+  font-family: var(--dd-font-title);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: var(--dd-ink);
+  border-bottom: 2px solid var(--dd-parch-edge);
+  text-shadow:
+    0 0 10px rgba(255, 46, 151, 0.7),
+    0 0 2px var(--dd-crimson-hi),
+    2px 2px 0 var(--dd-sapphire-deep);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-name::before {
+  content: '★ ';
+  color: var(--dd-gold);
+  text-shadow: 0 0 8px var(--dd-gold);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-field > label {
+  font-family: var(--dd-font-head);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: var(--dd-ink-soft);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ident-line input,
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ident-line select {
+  color: var(--dd-ink);
+  background: var(--dd-input-bg);
+  border: 1px solid var(--dd-line);
+  border-radius: 3px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ident-line input:focus,
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ident-line select:focus {
+  border-color: var(--dd-sapphire);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6), 0 0 8px rgba(34, 211, 238, 0.5);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-spec-lock {
+  font-family: var(--dd-font-head);
+  font-size: 7px;
+  color: var(--dd-crimson-hi);
+}
+
+/* plakety MAX životů/magů → segmentový LED displej */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-plaque {
+  background: linear-gradient(180deg, var(--dd-parch-0), var(--dd-parch-2));
+  border: 1px solid var(--dd-parch-edge);
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px var(--dd-parch-edge), inset 0 0 14px rgba(0, 0, 0, 0.7);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-plaque .pl-lab {
+  font-family: var(--dd-font-head);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--dd-ink-faint);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-plaque .pl-val input {
+  font-family: var(--dd-font-num);
+  font-weight: 400;
+  font-size: 26px;
+  border-bottom: 1px dashed var(--dd-parch-edge);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-plaque.life .pl-val input {
+  color: var(--dd-crimson);
+  text-shadow: 0 0 10px var(--dd-crimson), 0 0 2px var(--dd-crimson-hi);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-plaque.magy .pl-val input {
+  color: var(--dd-sapphire);
+  text-shadow: 0 0 10px var(--dd-sapphire), 0 0 2px var(--dd-sapphire-hi);
+}
+
+/* ════════════════════════════════ HUD ════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell {
+  justify-content: flex-start;
+  background: linear-gradient(180deg, var(--dd-parch-1), var(--dd-parch-2));
+  border: none;
+  border-radius: 6px;
+  /* šikmý chevron řez na pravém okraji = tvarový jazyk */
+  clip-path: polygon(0 0, 100% 0, 100% 70%, calc(100% - 14px) 100%, 0 100%);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.hp {
+  box-shadow: 0 0 0 1px var(--dd-crimson-deep), inset 0 0 16px rgba(255, 46, 151, 0.12);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.ma {
+  box-shadow: 0 0 0 1px var(--dd-sapphire-deep), inset 0 0 16px rgba(34, 211, 238, 0.12);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.oc {
+  box-shadow: 0 0 0 1px var(--dd-gold-deep), inset 0 0 16px rgba(255, 179, 71, 0.12);
+}
+/* mini sun-grid pruhy uvnitř emblému (signature, komorní) */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-emblem {
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, transparent, var(--dd-parch-2)),
+    repeating-linear-gradient(0deg, transparent 0 4px, currentColor 4px 5px);
+  box-shadow: 0 0 12px -2px currentColor;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.hp .drd16-hud-emblem {
+  color: var(--dd-crimson);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.ma .drd16-hud-emblem {
+  color: var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.oc .drd16-hud-emblem {
+  color: var(--dd-gold);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-lab {
+  font-family: var(--dd-font-head);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--dd-ink-faint);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-val {
+  font-family: var(--dd-font-num);
+  font-weight: 400;
+  font-size: 22px;
+  margin-left: auto;
+  color: var(--dd-ink);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.hp .drd16-hud-val {
+  color: var(--dd-crimson);
+  text-shadow: 0 0 10px var(--dd-crimson);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.ma .drd16-hud-val {
+  color: var(--dd-sapphire);
+  text-shadow: 0 0 10px var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hud-cell.oc .drd16-hud-val {
+  color: var(--dd-gold-hi);
+  text-shadow: 0 0 10px var(--dd-gold);
+}
+
+/* ════════════════════════ SEKČNÍ NADPISY (chevron) ════════════════════════
+ * Fantasy zlatý kosočtverec → neon chevron šipka vpravo + neonová linka. */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-panel-h {
+  font-family: var(--dd-font-title);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--dd-sapphire-hi);
+  text-shadow: 0 0 8px var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-panel-h::before {
+  content: '';
+  width: 0;
+  height: 0;
+  transform: none;
+  border-left: 10px solid var(--dd-crimson);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(0 0 5px var(--dd-crimson));
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-panel-h::after {
+  height: 2px;
+  opacity: 1;
+  background: linear-gradient(90deg, var(--dd-crimson), transparent);
+  box-shadow: 0 0 6px var(--dd-crimson-deep);
+}
+
+/* ════════════════════ vlastnosti (řádek + bonus žeton) ════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-stat-row {
+  background: var(--dd-parch-1);
+  border: none;
+  box-shadow: inset 0 0 0 1px var(--dd-line), inset 0 0 12px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-stat-row .st-name {
+  color: var(--dd-ink);
+  font-weight: 400;
+}
+/* hodnota = 7segment LED v zapuštěném poli (přebíjí kruhový pergamenový žeton) */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-stat-row .st-val,
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-stat-row.siz .st-letter {
+  width: 50px;
+  font-family: var(--dd-font-num);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--dd-sapphire);
+  text-shadow: 0 0 8px var(--dd-sapphire);
+  background: var(--dd-parch-2);
+  border: 1px solid var(--dd-sapphire-deep);
+  border-radius: 4px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-stat-row.siz .st-letter {
+  color: var(--dd-gold-hi);
+  border-color: var(--dd-gold-deep);
+  text-shadow: 0 0 8px var(--dd-gold);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-stat-row.siz .siz-note {
+  color: var(--dd-ink-faint);
+}
+/* bonus = neon žeton se šikmým chevron řezem */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-bonus {
+  font-family: var(--dd-font-title);
+  font-weight: 700;
+  color: var(--dd-ink-deep);
+  border: none;
+  border-radius: 0;
+  background: linear-gradient(180deg, var(--dd-crimson-hi), var(--dd-crimson) 55%, var(--dd-crimson-deep));
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  box-shadow: 0 0 12px -2px var(--dd-crimson), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  text-shadow: none;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-bonus.neg {
+  background: linear-gradient(180deg, #9bb0c0, #5b6b7c 55%, #34404c);
+  box-shadow: 0 0 8px -2px #5b6b7c;
+  color: #0d0420;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-bonus.zero {
+  background: linear-gradient(180deg, #cbb1e0, #9d7ac0 55%, #6b4b8c);
+  box-shadow: 0 0 8px -2px #9d7ac0;
+  color: #0d0420;
+}
+
+/* ════════════════════════════ pohyblivost ════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-enc-row .st-name {
+  color: var(--dd-ink-soft);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-enc-row.base .st-name {
+  color: var(--dd-sapphire-hi);
+  font-weight: 600;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-enc-row.base {
+  border-bottom-color: var(--dd-line);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-enc-row input {
+  font-family: var(--dd-font-num);
+  color: var(--dd-ink);
+  background: var(--dd-parch-2);
+  border: 1px solid var(--dd-line);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hint {
+  color: var(--dd-ink-faint);
+}
+
+/* ════════════════════════════ tabulky ════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-combat th {
+  font-family: var(--dd-font-head);
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--dd-ink-soft);
+  border-bottom: 2px solid var(--dd-crimson-deep);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-combat input {
+  font-family: var(--dd-font-body);
+  color: var(--dd-ink);
+  background: var(--dd-parch-2);
+  border: 1px solid var(--dd-line);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-combat input:focus {
+  border-color: var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-combat.per th.rh {
+  font-family: var(--dd-font-body);
+  color: var(--dd-ink-soft);
+  border-bottom-color: var(--dd-line);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-combat.per td input {
+  font-family: var(--dd-font-num);
+  font-weight: 400;
+  color: var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-del {
+  color: var(--dd-crimson);
+  text-shadow: 0 0 6px var(--dd-crimson);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-add {
+  font-family: var(--dd-font-head);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--dd-sapphire-hi);
+  background: transparent;
+  border: 1px dashed var(--dd-sapphire-deep);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-add:hover {
+  color: var(--dd-ink-deep);
+  background: var(--dd-sapphire);
+  border-style: solid;
+}
+
+/* ════════════════════════════ OČ pečeť ════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-oc-seal {
+  background: linear-gradient(180deg, var(--dd-parch-0), var(--dd-parch-2));
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--dd-parch-edge), inset 0 0 18px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-oc-seal .oc-lab {
+  font-family: var(--dd-font-head);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--dd-sapphire-hi);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-oc-seal input {
+  font-family: var(--dd-font-num);
+  font-weight: 400;
+  font-size: 30px;
+  color: var(--dd-gold-hi);
+  text-shadow: 0 0 12px var(--dd-gold);
+  background: var(--dd-parch-2);
+  border: 2px solid var(--dd-gold-deep);
+  border-radius: 6px;
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.8);
+}
+
+/* ════════════════════ žebřík životů/magů (segmentový) ════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder-h {
+  font-family: var(--dd-font-head);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.life .drd16-ladder-h {
+  color: var(--dd-crimson);
+  text-shadow: 0 0 8px var(--dd-crimson);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.magy .drd16-ladder-h {
+  color: var(--dd-sapphire);
+  text-shadow: 0 0 8px var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-rungs {
+  border: none;
+  background: var(--dd-parch-2);
+  box-shadow: inset 0 0 0 1px var(--dd-parch-edge), inset 0 0 16px rgba(0, 0, 0, 0.7);
+  padding: 3px;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-rung {
+  border-top: none;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-rung .rn {
+  color: var(--dd-ink-faint);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-rung .rbar {
+  background: var(--dd-forge-edge);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.life .drd16-rung.on .rbar {
+  background: linear-gradient(90deg, var(--dd-crimson-deep), var(--dd-crimson));
+  box-shadow: 0 0 6px var(--dd-crimson);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.magy .drd16-rung.on .rbar {
+  background: linear-gradient(90deg, var(--dd-sapphire-deep), var(--dd-sapphire));
+  box-shadow: 0 0 6px var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-rung.maxmark {
+  box-shadow: 0 0 0 1px var(--dd-gold) inset;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-rung.maxmark::after {
+  color: var(--dd-gold);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder-ctl button {
+  font-family: var(--dd-font-body);
+  color: var(--dd-ink);
+  background: linear-gradient(180deg, var(--dd-parch-0), var(--dd-parch-2));
+  border: 1px solid var(--dd-parch-edge);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder-ctl button:hover {
+  background: var(--dd-crimson);
+  color: var(--dd-ink-deep);
+  border-color: var(--dd-crimson-hi);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder-cur {
+  font-family: var(--dd-font-num);
+  font-weight: 400;
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.life .drd16-ladder-cur {
+  color: var(--dd-crimson);
+  text-shadow: 0 0 8px var(--dd-crimson);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.magy .drd16-ladder-cur {
+  color: var(--dd-sapphire);
+  text-shadow: 0 0 8px var(--dd-sapphire);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder-cur .c {
+  font-family: var(--dd-font-num);
+  color: inherit;
+  border-bottom: 1px dashed var(--dd-parch-edge);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder-cur small {
+  font-family: var(--dd-font-body);
+  color: var(--dd-ink-faint);
+}
+/* mobilní vodorovný proužek */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-hpbar {
+  border: none;
+  background: var(--dd-parch-2);
+  box-shadow: inset 0 0 0 1px var(--dd-parch-edge);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.life .drd16-hpbar-fill {
+  background: linear-gradient(90deg, var(--dd-crimson-deep), var(--dd-crimson));
+  box-shadow: 0 0 10px var(--dd-crimson);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder.magy .drd16-hpbar-fill {
+  background: linear-gradient(90deg, var(--dd-sapphire-deep), var(--dd-sapphire));
+  box-shadow: 0 0 10px var(--dd-sapphire);
+}
+/* mobilní žebřík kontejner */
+@media (max-width: 900px) {
+  [data-diary-system='drd16'][data-diary-skin='retro'] .drd16-ladder {
+    background: linear-gradient(180deg, var(--dd-parch-1), var(--dd-parch-2));
+    border: none;
+    box-shadow: inset 0 0 0 1px var(--dd-parch-edge);
+  }
+}
+
+/* ════════════════════════ spodní zóna (terminál) ════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-scroll-panel {
+  background: linear-gradient(180deg, var(--dd-parch-1), var(--dd-parch-2));
+  border: none;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px var(--dd-parch-edge), inset 0 0 18px rgba(0, 0, 0, 0.5);
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-scroll-panel textarea {
+  color: var(--dd-ink);
+  background: repeating-linear-gradient(
+    transparent 0 26px,
+    rgba(255, 46, 151, 0.12) 26px 27px
+  );
+}
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-scroll-panel textarea::placeholder {
+  color: var(--dd-ink-faint);
+}
+
+/* ════════════════════════ view mode (čistý readout) ════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-sheet.is-view .st-val,
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-sheet.is-view .st-letter,
+[data-diary-system='drd16'][data-diary-skin='retro'] .drd16-sheet.is-view .drd16-oc-seal input {
+  box-shadow: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * EMBEDY (combat / bestie / chat panel) — ornament přes token + chevron.
+ * `.root` panelů je hashovaná CSS-modulová třída → z globálu na ni necílíme;
+ * reskin nese token override (--dd-parch-tex se sun-grid pruhem + neon rám
+ * barvy). Doplňkové neon ladění chevron markeru `.drd16-panel-h` výše platí
+ * i pro panely (ty třídu nepoužívají — mají vlastní `.title` v modulu, jeho
+ * tokenizace = navazující práce). Spell card `.drd16-spell` (mockup) sdílí
+ * `.drd16-scroll-panel` kontext listu, reskinován výše.
+ * ════════════════════════════════════════════════════════════════════════ */

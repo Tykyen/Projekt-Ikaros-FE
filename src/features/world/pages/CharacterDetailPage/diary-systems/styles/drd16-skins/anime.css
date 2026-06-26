@@ -1,0 +1,743 @@
+/**
+ * Dračí doupě 1.6 — skin „MLP" (id `anime`, 16.2c-drd16): PASTELOVÉ KOUZELNÉ ALBUM.
+ *
+ * Override `--dd-*` tokenů + signature ornamenty, scoped na
+ * `[data-diary-system='drd16'][data-diary-skin='anime']` (compound 0,2,0 →
+ * přebije fantasy default `[data-diary-system='drd16']` z drd16.css). Tokeny
+ * dědí list (.drd16-*) i tokenizované panely (Drd16CombatPanel/Bestie přes
+ * var(--dd-*)) → reskinuje deník i bojový/bestie panel na mapě a v chatu.
+ *
+ * Vizuální kontrakt = mockup `c:/tmp/drd16-skins/mlp/{diary,tm}.html` + `notes.md`.
+ * Paleta = pastely levandule/mint/broskev/baby-blue/růžová/máslová; „inkoust“ =
+ * měkká fialová (#5b4a72, NIKDY čistá černá → drží pastelovou jemnost, přitom
+ * kontrast 7:1 na bílém papíru). Fonty Baloo 2 / Fredoka / Quicksand.
+ * Tvarový jazyk = „nálepka do alba“: 3px plný bílý okraj + měkký barevný PILLOW
+ * spodní stín (NE tvrdý ink obrys), extra-zaoblené rohy (14/22/30/34px), vitální
+ * prvky plně 999px. Signature ornament = rotující „cutie-mark“ emblém
+ * (věnec teček + star-in-heart) + obláčkový rám hero + hvězdičkový marker
+ * nadpisů. Roztomilé, ale VKUSNÉ a ČITELNÉ. Tento motiv se NESDÍLÍ s jiným skinem.
+ *
+ * Struktura drd16 beze změny — měněn jen vzhled (tokeny + pseudo-element
+ * ornamenty). DOM-vázané ornamenty modulových panelů (hashovaná `.root`) nejdou
+ * z globálního CSS adresovat → panely nesou skin přes paletu/fonty/kompozity
+ * (token dědění: --dd-parch-tex pastel album, --dd-accent-grad duha, pillow).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKEN OVERRIDE — všechny `--dd-*` z CONTRACT.md na MLP pastel hodnoty.
+   Sémantika fantasy tokenu se MAPUJE na nejbližší pastel roli:
+     forge (tmavý rám) → měkká levandulová obroba alba (světlý, NE tmavý),
+     parch (světlý papír) → pastelové album (#fffafd / #fff4fb / #fff),
+     ink (tmavý text) → měkká fialová (#5b4a72 — kontrast drží, jen ne černá),
+     gold (akcent) → levandule (primár) + duha pro accent grad,
+     crimson (životy) → růžová, sapphire (magy) → baby-blue,
+     steel (obrana) → levandule.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='anime'] {
+  /* ── „kovárna“ → album obroba (světlá levandulovo-bílá, NE tmavá) ── */
+  --dd-forge-1: #efe4fb; /* nejsvětlejší rám (album desky) */
+  --dd-forge-2: #ffffff; /* bílý rám (nálepkový okraj) */
+  --dd-forge-edge: #e0cdf4; /* hrana rámu (jemná levandule) */
+
+  /* ── „pergamen“ → pastelové album (světlé plochy, tmavý fialový inkoust) ── */
+  --dd-parch-0: #ffffff; /* nejsvětlejší karta */
+  --dd-parch-1: #fffafd; /* album stránka base */
+  --dd-parch-2: #fff4fb; /* tmavší pastel pole */
+  --dd-parch-edge: #f0dcee; /* hrana papíru (růžovo-levandulová linka) */
+
+  /* ── „inkoust“ → měkká fialová (NIKDY čistá černá; kontrast hlídán) ── */
+  --dd-ink: #5b4a72; /* hlavní text — ~7:1 na bílém */
+  --dd-ink-soft: #7a6a93; /* tlumený (ztmaveno z mockupu 8a7aa3 kvůli AA na bílém) */
+  --dd-ink-faint: #9a8cb4; /* nejslabší — drž čitelný na pastelu */
+  --dd-ink-deep: #4a3a66; /* text NA světlém akcentu (mint/pink/duha badge) — tmavý */
+  --dd-ink-2: #4a3a66; /* zvýrazněný text (hodnoty) */
+  --dd-ink-head: #6f54a8; /* nadpisy → sytá levandule (~4.5:1 na bílém) */
+
+  /* ── akcent: gold → levandule (primární akcent / borders / OČ) ── */
+  --dd-gold: #b79ce8;
+  --dd-gold-hi: #d9c8f4;
+  --dd-gold-deep: #8b6fd0;
+
+  /* ── životy: crimson → růžová ── */
+  --dd-crimson: #ff7eb6;
+  --dd-crimson-hi: #ffb3d4;
+  --dd-crimson-deep: #d65a93; /* tmavší růžová → čitelný text/akcent */
+
+  /* ── magy: sapphire → baby-blue ── */
+  --dd-sapphire: #5fb4f5;
+  --dd-sapphire-hi: #a9d9ff;
+  --dd-sapphire-deep: #3d87c9; /* tmavší modrá → čitelný text */
+
+  /* ── obrana: steel → levandule (ladí s akcentem) ── */
+  --dd-steel: #8b6fd0;
+
+  /* ── fonty ── */
+  --dd-font-title: 'Baloo 2', 'Fredoka', cursive;
+  --dd-font-display: 'Baloo 2', 'Fredoka', cursive;
+  --dd-font-head: 'Fredoka', system-ui, sans-serif;
+  --dd-font-body: 'Quicksand', system-ui, sans-serif;
+
+  /* ── lokální MLP pomocníky (ornamenty + kompozity je čtou) ── */
+  --mlp-lavender: #b79ce8;
+  --mlp-lavender-d: #8b6fd0;
+  --mlp-mint: #9fe6c8;
+  --mlp-mint-d: #4fc79b;
+  --mlp-peach: #ffc6a8;
+  --mlp-peach-d: #ff9d7a;
+  --mlp-sky: #a9d9ff;
+  --mlp-sky-d: #5fb4f5;
+  --mlp-pink: #ffb3d4;
+  --mlp-pink-d: #ff7eb6;
+  --mlp-butter: #ffe9a8;
+  --mlp-line: #f0dcee;
+  /* duha — STŘÍDMĚ (proužek nad hero, levý okraj karet, mini-cutie, jméno) */
+  --mlp-rainbow: linear-gradient(
+    100deg,
+    #ffb3d4 0%,
+    #ffc6a8 18%,
+    #ffe9a8 34%,
+    #9fe6c8 52%,
+    #a9d9ff 70%,
+    #b79ce8 88%,
+    #ffb3d4 100%
+  );
+  /* měkký „pillow“ spodní stín — signature tvar (NE tvrdý ink drop) */
+  --mlp-shadow: 0 10px 22px -12px rgba(143, 108, 196, 0.45);
+  --mlp-pillow: 0 6px 0 -1px rgba(170, 140, 210, 0.22);
+  /* extra-zaoblené rádiusy */
+  --mlp-r-sm: 14px;
+  --mlp-r-md: 22px;
+  --mlp-r-lg: 30px;
+  --mlp-r-xl: 34px;
+  /* signature cutie-mark emblém (data-uri SVG: věnec teček + star-in-heart) */
+  --mlp-cutie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='d' cx='50%25' cy='40%25' r='65%25'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.55' stop-color='%23ffe1f1'/%3E%3Cstop offset='1' stop-color='%23e7d4ff'/%3E%3C/radialGradient%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe9a8'/%3E%3Cstop offset='1' stop-color='%23ff9d7a'/%3E%3C/linearGradient%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb3d4'/%3E%3Cstop offset='1' stop-color='%23ff7eb6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Cg fill='%23b79ce8'%3E%3Ccircle cx='50' cy='6' r='2.6'/%3E%3Ccircle cx='72' cy='12' r='2.6'/%3E%3Ccircle cx='88' cy='28' r='2.6'/%3E%3Ccircle cx='94' cy='50' r='2.6'/%3E%3Ccircle cx='88' cy='72' r='2.6'/%3E%3Ccircle cx='72' cy='88' r='2.6'/%3E%3Ccircle cx='50' cy='94' r='2.6'/%3E%3Ccircle cx='28' cy='88' r='2.6'/%3E%3Ccircle cx='12' cy='72' r='2.6'/%3E%3Ccircle cx='6' cy='50' r='2.6'/%3E%3Ccircle cx='12' cy='28' r='2.6'/%3E%3Ccircle cx='28' cy='12' r='2.6'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='38' fill='url(%23d)' stroke='%23fff' stroke-width='3'/%3E%3Cpath d='M50 74 C30 58 30 40 42 38 C48 37 50 44 50 47 C50 44 52 37 58 38 C70 40 70 58 50 74Z' fill='url(%23h)' opacity='.9'/%3E%3Cpath d='M50 38 l3.5 7 7.6 1 -5.5 5.4 1.3 7.6 -6.9-3.6 -6.9 3.6 1.3-7.6 -5.5-5.4 7.6-1Z' fill='url(%23s)' stroke='%23fff' stroke-width='1'/%3E%3Cellipse cx='38' cy='32' rx='11' ry='6' fill='%23fff' opacity='.5'/%3E%3C/svg%3E");
+  /* mini cutie disk (echo: duhový disk s bílou tečkou — odrážka nadpisů) */
+  --mlp-cutie-mini: radial-gradient(circle at 50% 42%, #fff 2.4px, transparent 3px), var(--mlp-rainbow);
+
+  /* ── KOMPOZITY (panely + list je konzumují přes var()) ── */
+
+  /* pozadí listu i tokenizovaných panelů → pastelové album (obloha + obláčky) */
+  --dd-parch-tex:
+    radial-gradient(60% 42% at 12% 8%, rgba(183, 156, 232, 0.16), transparent 70%),
+    radial-gradient(52% 40% at 88% 12%, rgba(159, 230, 200, 0.18), transparent 70%),
+    radial-gradient(55% 42% at 80% 94%, rgba(255, 198, 168, 0.16), transparent 72%),
+    radial-gradient(55% 40% at 14% 90%, rgba(169, 217, 255, 0.18), transparent 72%),
+    linear-gradient(180deg, #fffafd 0%, #fff7fd 52%, #fff4fb 100%);
+
+  /* zrno → jemná pastelová zrníčka (hvězdičky/tečky), ne papírový šum */
+  --dd-noise:
+    radial-gradient(circle, rgba(255, 179, 212, 0.5) 1.4px, transparent 2px),
+    radial-gradient(circle, rgba(169, 217, 255, 0.5) 1.4px, transparent 2px),
+    radial-gradient(circle, rgba(159, 230, 200, 0.45) 1.4px, transparent 2px);
+
+  --dd-panel-line: var(--dd-parch-edge);
+  --dd-line: #f0dcee;
+  --dd-line-soft: #f4e6f3;
+
+  /* klikací řádky — měkké pastelové pole se sticker okrajem */
+  --dd-row-bg: linear-gradient(180deg, #ffffff, #fff4fb);
+  --dd-row-bg-hover: #fff0fa;
+
+  --dd-card-bg: #fff4fb;
+  --dd-input-bg: #ffffff;
+
+  /* akcent grad (tlačítka/bonus) — duhový pop (signature, střídmě) */
+  --dd-accent-grad: linear-gradient(160deg, #c9b3f0, var(--mlp-lavender-d));
+
+  /* ± krokovací tlačítka — bílý bonbónek s pillow */
+  --dd-step-bg: linear-gradient(180deg, #ffffff, #fff4fb);
+
+  /* prázdný progress bar — zapuštěné album políčko */
+  --dd-bar-bg: #fff4fb;
+
+  /* HP fill = růžová, mana fill = baby-blue */
+  --dd-hp-grad: linear-gradient(90deg, #ffd0e2, var(--mlp-pink-d));
+  --dd-mana-grad: linear-gradient(90deg, #cfeaff, var(--mlp-sky-d));
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) LIST — strukturní doladění tam, kde fantasy default počítá s tmavým
+   kováním/zlatem (radius, ink stíny, drahokamové pipy). Měníme jen vzhled,
+   ne layout (grid/rozměry zůstávají z drd16.css).
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* sheet — album stránka s měkkým pillow místo tmavého kování */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-sheet {
+  border-radius: var(--mlp-r-xl);
+  color: var(--dd-ink);
+  background: var(--dd-parch-tex);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    0 26px 50px -28px rgba(143, 108, 196, 0.5),
+    0 0 0 3px #ffffff,
+    0 0 0 5px var(--mlp-line);
+}
+
+/* pastelová zrníčka (--dd-noise) — jemná, glow ne multiply */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-sheet::after {
+  border-radius: var(--mlp-r-xl);
+  background: var(--dd-noise);
+  background-size: 150px 150px, 220px 220px, 300px 300px;
+  background-position: 0 0, 70px 90px, 30px 160px;
+  opacity: 0.5;
+  mix-blend-mode: normal;
+}
+
+/* ── SIGNATURE ORNAMENT A: vnitřní album rámeček (dvojitá tečkovaná linka) ── */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-sheet::before {
+  inset: 9px;
+  border-radius: calc(var(--mlp-r-xl) - 8px);
+  border: 2px dotted var(--mlp-line);
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.6);
+}
+
+/* ── HERO — duhový proužek + obláčkový rám + cutie-mark emblém ── */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hero {
+  position: relative;
+  border-image: none;
+  border-bottom: 0;
+  padding: 30px 20px 26px;
+  border-radius: var(--mlp-r-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.66)),
+    var(--mlp-rainbow);
+  box-shadow:
+    var(--mlp-shadow),
+    inset 0 0 0 3px #ffffff,
+    inset 0 0 0 9px rgba(255, 255, 255, 0.4);
+  overflow: visible;
+}
+/* SIGNATURE: cutie-mark razítko v levém horním rohu hero (rotuje) */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hero::before {
+  content: '';
+  position: absolute;
+  top: -22px;
+  left: 18px;
+  width: 64px;
+  height: 64px;
+  background: var(--mlp-cutie) center / contain no-repeat;
+  filter: drop-shadow(0 6px 9px rgba(143, 108, 196, 0.35));
+  animation: dd-mlp-spin 26s linear infinite;
+  z-index: 3;
+  pointer-events: none;
+}
+/* SIGNATURE: obláčkový rám podél horní hrany hero */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hero::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: -13px;
+  height: 24px;
+  background:
+    radial-gradient(circle at 8% 100%, #fff 11px, transparent 12px),
+    radial-gradient(circle at 22% 100%, #fff 15px, transparent 16px),
+    radial-gradient(circle at 38% 100%, #fff 12px, transparent 13px),
+    radial-gradient(circle at 54% 100%, #fff 16px, transparent 17px),
+    radial-gradient(circle at 70% 100%, #fff 12px, transparent 13px),
+    radial-gradient(circle at 84% 100%, #fff 15px, transparent 16px),
+    radial-gradient(circle at 96% 100%, #fff 11px, transparent 12px);
+  filter: drop-shadow(0 -2px 3px rgba(170, 140, 210, 0.18));
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes dd-mlp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hero::before {
+    animation: none;
+  }
+}
+
+/* erb (drd16.css render slot) — měkký pillow, ne tvrdý drop */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-erb svg {
+  filter: drop-shadow(0 6px 9px rgba(143, 108, 196, 0.32));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-erb-banner {
+  background: linear-gradient(180deg, var(--mlp-pink), var(--mlp-pink-d));
+  color: #fff;
+  clip-path: none;
+  border-radius: 999px;
+  box-shadow: 0 4px 8px -3px rgba(255, 126, 182, 0.6);
+}
+
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-eyebrow {
+  color: var(--mlp-lavender-d);
+  font-family: var(--dd-font-head);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+/* jméno — duhový pop-nápis (text-clip), čitelný i bez clip podpory (fallback ink) */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-name {
+  font-family: var(--dd-font-display);
+  color: #8b6fd0;
+  border-bottom: 0;
+  background: linear-gradient(96deg, #ff7eb6, #ff9d7a 26%, #e0ad2e 44%, #4fc79b 62%, #5fb4f5 80%, #8b6fd0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-name:focus {
+  -webkit-text-fill-color: #5b4a72;
+  color: #5b4a72;
+  background: none;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ident-line input,
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ident-line select {
+  color: var(--dd-ink);
+  background: #ffffff;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1.5px var(--mlp-line), var(--mlp-pillow);
+  padding: 7px 12px;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ident-line input:focus,
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ident-line select:focus {
+  box-shadow: inset 0 0 0 2px var(--mlp-lavender), 0 0 0 4px rgba(183, 156, 232, 0.25);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-field > label {
+  color: var(--dd-ink-soft);
+  font-family: var(--dd-font-head);
+  letter-spacing: 0.08em;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-spec-lock {
+  color: var(--mlp-lavender-d);
+}
+
+/* max-životy/magy plaketky — bílá nálepka s barevnou „kuličkou“ nahoře */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque {
+  position: relative;
+  background: #ffffff;
+  border: 3px solid #fff;
+  border-radius: var(--mlp-r-md);
+  box-shadow: var(--mlp-shadow), var(--mlp-pillow);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #fff, 0 4px 6px -2px rgba(170, 140, 210, 0.4);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque.life::after {
+  background: var(--mlp-pink);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque.magy::after {
+  background: var(--mlp-sky);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque .pl-lab {
+  color: var(--dd-ink-soft);
+  font-family: var(--dd-font-head);
+  letter-spacing: 0.06em;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque .pl-val input {
+  font-family: var(--dd-font-display);
+  border-bottom: 1px dashed var(--mlp-lavender);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque.life .pl-val input {
+  color: var(--mlp-pink-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-plaque.magy .pl-val input {
+  color: var(--mlp-sky-d);
+}
+
+/* ── HUD (3 buňky) — bílé nálepky s barevným levým žebrem + kulatým emblémem ── */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell {
+  position: relative;
+  background: #ffffff;
+  border: 3px solid #fff;
+  border-radius: var(--mlp-r-lg);
+  box-shadow: var(--mlp-shadow);
+  overflow: hidden;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.hp::after {
+  background: linear-gradient(180deg, var(--mlp-pink), var(--mlp-pink-d));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.ma::after {
+  background: linear-gradient(180deg, var(--mlp-sky), var(--mlp-sky-d));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.oc::after {
+  background: linear-gradient(180deg, var(--mlp-lavender), var(--mlp-lavender-d));
+}
+/* emblém — kulatý pastelový disk s bílou glyfou */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-emblem {
+  border-radius: 50%;
+  color: #fff;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.08), 0 4px 8px -3px rgba(170, 140, 210, 0.5);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.hp .drd16-hud-emblem {
+  background: linear-gradient(160deg, #ffc0dd, var(--mlp-pink-d));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.ma .drd16-hud-emblem {
+  background: linear-gradient(160deg, #bfe2ff, var(--mlp-sky-d));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.oc .drd16-hud-emblem {
+  background: linear-gradient(160deg, #cdb8f4, var(--mlp-lavender-d));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-lab {
+  color: var(--dd-ink-soft);
+  font-family: var(--dd-font-head);
+  letter-spacing: 0.06em;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-val {
+  font-family: var(--dd-font-display);
+  color: var(--dd-ink);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.hp .drd16-hud-val {
+  color: var(--mlp-pink-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.ma .drd16-hud-val {
+  color: var(--mlp-sky-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hud-cell.oc .drd16-hud-val {
+  color: var(--mlp-lavender-d);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE ORNAMENT B: mini cutie-mark marker nadpisů + sticker karty.
+   Panely listu (.drd16-panel + .drd16-scroll-panel) = nálepky do alba.
+   Nadpisy (.drd16-panel-h) dostanou mini duhový cutie disk (echo emblému)
+   místo zlatého kosočtverce + tečkovanou album linku.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-scroll-panel {
+  position: relative;
+  background: #ffffff;
+  border: 3px solid #fff;
+  border-radius: var(--mlp-r-lg);
+  box-shadow: var(--mlp-shadow), var(--mlp-pillow);
+  padding: 16px;
+}
+
+/* nadpis panelu — mini cutie disk marker + tečkovaná podtržená linka */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-panel-h {
+  color: var(--mlp-lavender-d);
+  font-family: var(--dd-font-head);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-panel-h::before {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transform: none;
+  background: var(--mlp-cutie-mini);
+  box-shadow: 0 0 0 3px #fff, 0 3px 5px -2px rgba(170, 140, 210, 0.5);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-panel-h::after {
+  height: 0;
+  border-bottom: 2px dotted var(--mlp-line);
+  background: none;
+  opacity: 1;
+}
+
+/* ── řádek vlastnosti — měkké pole se sticker okrajem ── */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row {
+  border-radius: var(--mlp-r-sm);
+  background: var(--dd-row-bg);
+  border: 2px solid #fff;
+  box-shadow: inset 0 0 0 1.5px var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row .st-name {
+  color: var(--dd-ink);
+  font-weight: 600;
+}
+/* kruhová pip → kulatá bílá nálepka (Baloo 2 číslice) */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row .st-val,
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row.siz .st-letter {
+  font-family: var(--dd-font-display);
+  color: var(--dd-ink);
+  background: #ffffff;
+  border: 2px solid #fff;
+  border-radius: var(--mlp-r-sm);
+  box-shadow: inset 0 0 0 1.5px var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row .st-val {
+  border-radius: 50%;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row.over .st-val {
+  box-shadow: inset 0 0 0 2px var(--mlp-pink-d), inset 0 0 0 4px #fff;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row .st-warn,
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-stat-row.siz .siz-note {
+  color: var(--mlp-pink-d);
+}
+
+/* bonus badge — pilulka; kladný=mint, neg=růžová, nula=tlumená levandule */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-bonus {
+  font-family: var(--dd-font-head);
+  font-weight: 700;
+  color: var(--dd-ink-deep);
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(160deg, var(--mlp-mint), var(--mlp-mint-d));
+  box-shadow: var(--mlp-pillow);
+  text-shadow: none;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-bonus.neg {
+  color: #5e2a3e;
+  background: linear-gradient(160deg, #ffb0c0, #f0728e);
+  border: 0;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-bonus.zero {
+  color: var(--dd-ink-soft);
+  background: #e9e0f4;
+  border: 0;
+}
+
+/* ── pohyblivost ── */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-enc-row input {
+  font-family: var(--dd-font-display);
+  color: var(--dd-ink);
+  background: #ffffff;
+  border: 2px solid #fff;
+  border-radius: var(--mlp-r-sm);
+  box-shadow: inset 0 0 0 1.5px var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-enc-row.base {
+  border-bottom-color: var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-enc-row.base .st-name {
+  color: var(--mlp-lavender-d);
+  font-weight: 700;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hint {
+  color: var(--dd-ink-soft);
+  font-style: normal;
+}
+
+/* ── tabulky (boj / postřeh / dovednosti / zbroj) ── */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-combat th {
+  font-family: var(--dd-font-head);
+  color: var(--dd-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px dotted var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-combat input {
+  font-family: var(--dd-font-body);
+  font-weight: 600;
+  color: var(--dd-ink);
+  background: var(--dd-parch-2);
+  border: 2px solid #fff;
+  border-radius: var(--mlp-r-sm);
+  box-shadow: inset 0 0 0 1.5px var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-combat input:focus {
+  background: #fff;
+  box-shadow: inset 0 0 0 2px var(--mlp-mint-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-combat.per th.rh {
+  color: var(--dd-ink);
+  font-weight: 600;
+  border-bottom: 1px dashed var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-combat.per td input {
+  font-family: var(--dd-font-display);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-del {
+  color: var(--mlp-pink-d);
+  background: #ffe0ea;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-weight: 700;
+  box-shadow: var(--mlp-pillow);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-add {
+  font-family: var(--dd-font-head);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--mlp-lavender-d);
+  background: linear-gradient(180deg, #fff, var(--dd-parch-2));
+  border: 2px dashed var(--mlp-lavender);
+  border-radius: var(--mlp-r-md);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-add:hover {
+  color: var(--mlp-lavender-d);
+  background: var(--dd-parch-2);
+  border-style: solid;
+}
+
+/* ── OČ pečeť → kulatý medailon s tečkovaným prstencem ── */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-oc-seal {
+  position: relative;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px auto;
+  width: 116px;
+  padding: 14px 10px;
+  background: radial-gradient(circle at 50% 38%, #fff, #f3e9ff);
+  box-shadow: var(--mlp-shadow), inset 0 0 0 3px var(--mlp-lavender);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-oc-seal::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 2px dotted var(--mlp-lavender);
+  pointer-events: none;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-oc-seal .oc-lab {
+  font-family: var(--dd-font-head);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--mlp-lavender-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-oc-seal input {
+  margin: 0;
+  width: 64px;
+  height: auto;
+  font-family: var(--dd-font-display);
+  color: var(--mlp-lavender-d);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) ŽEBŘÍK životů / magů — zaoblené pastelové proužky v album políčku.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.life .drd16-ladder-h {
+  color: var(--mlp-pink-d);
+  font-family: var(--dd-font-head);
+  text-transform: none;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.magy .drd16-ladder-h {
+  color: var(--mlp-sky-d);
+  font-family: var(--dd-font-head);
+  text-transform: none;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-rungs {
+  border: 0;
+  border-radius: var(--mlp-r-md);
+  background: var(--dd-parch-2);
+  box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3.5px var(--mlp-line);
+  padding: 6px;
+  gap: 2px;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-rung {
+  border-top: 0;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-rung .rn {
+  color: var(--dd-ink-soft);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-rung .rbar {
+  height: 7px;
+  border-radius: 999px;
+  background: #efe4f5;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.life .drd16-rung.on .rbar {
+  background: linear-gradient(90deg, #ffd0e2, var(--mlp-pink-d));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.magy .drd16-rung.on .rbar {
+  background: linear-gradient(90deg, #cfeaff, var(--mlp-sky-d));
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-rung.maxmark {
+  box-shadow: none;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-rung.maxmark .rbar {
+  box-shadow: 0 0 0 1.5px var(--mlp-butter);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-rung.maxmark::after {
+  content: '★';
+  color: var(--mlp-peach-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder-ctl button {
+  font-family: var(--dd-font-head);
+  font-weight: 600;
+  color: var(--dd-ink);
+  background: #ffffff;
+  border: 0;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px var(--mlp-line), var(--mlp-pillow);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder-ctl button:hover {
+  background: #fff;
+  box-shadow: inset 0 0 0 2px var(--mlp-lavender), var(--mlp-pillow);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.life .drd16-ladder-cur {
+  color: var(--mlp-pink-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.magy .drd16-ladder-cur {
+  color: var(--mlp-sky-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder-cur .c {
+  font-family: var(--dd-font-display);
+  color: var(--dd-ink);
+  border: 2px solid #fff;
+  border-radius: var(--mlp-r-sm);
+  box-shadow: inset 0 0 0 1.5px var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder-cur small {
+  color: var(--dd-ink-soft);
+  font-family: var(--dd-font-body);
+}
+/* mobilní vodorovný proužek */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-hpbar {
+  border: 0;
+  border-radius: 999px;
+  background: var(--dd-bar-bg);
+  box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px var(--mlp-line);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.life .drd16-hpbar-fill {
+  background: var(--dd-hp-grad);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-ladder.magy .drd16-hpbar-fill {
+  background: var(--dd-mana-grad);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) Spodní zóna (schopnosti / kouzla / poznámky) — album „svitky“.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-scroll-panel textarea {
+  font-family: var(--dd-font-body);
+  color: var(--dd-ink);
+  /* linkovaný pergamen → čisté pastelové pole bez papírových linek */
+  background: var(--dd-parch-2);
+  border: 2px solid #fff;
+  border-radius: var(--mlp-r-md);
+  box-shadow: inset 0 0 0 1.5px var(--mlp-line);
+  padding: 12px;
+  line-height: 1.5;
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-scroll-panel textarea:focus {
+  background: #fff;
+  box-shadow: inset 0 0 0 2px var(--mlp-mint-d);
+}
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-scroll-panel textarea::placeholder {
+  color: var(--dd-ink-soft);
+  font-style: normal;
+  opacity: 0.7;
+}
+
+/* view mode — readout (transparentní pole, drž čitelnost) */
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-sheet.is-view .st-val,
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-sheet.is-view .st-letter,
+[data-diary-system='drd16'][data-diary-skin='anime'] .drd16-sheet.is-view .drd16-oc-seal input {
+  box-shadow: none;
+}

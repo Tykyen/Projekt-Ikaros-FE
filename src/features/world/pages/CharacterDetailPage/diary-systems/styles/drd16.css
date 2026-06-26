@@ -8,7 +8,14 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=UnifrakturCook:wght@700&display=swap');
 
-[data-diary-system='drd16'] .drd16-sheet {
+/* 16.2c-drd16 — skiny deníku (override `--dd-*` + ornamenty) žijí v
+   `drd16-skins/` a importují se ze STATICKÉHO `diary-skins.css` (ne odtud) —
+   aby platily i v embedech (chat/mapa), kde se tento lazy list-preset NEnačítá. */
+
+/* 16.2c — Tokeny hoistnuté na [data-diary-system='drd16'] (wrapper), ať je dědí
+   i embedované panely (combat/bestie/chat/spellcard), ne jen list .drd16-sheet.
+   Fantasy = tyto defaulty; skin je přebije v drd16-skins.css. */
+[data-diary-system='drd16'] {
   /* kovárna (rám) */
   --dd-forge-1: #1d160e;
   --dd-forge-2: #271d12;
@@ -45,6 +52,27 @@
     linear-gradient(165deg, var(--dd-parch-0), var(--dd-parch-1) 55%, var(--dd-parch-2));
   --dd-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
 
+  /* ─ 16.2c — sémantické kompozity pro PANELY (combat/bestie/chat/spellcard).
+     Skin přebije; fantasy = tyto fallbacky. Panely je konzumují přes var(). ─ */
+  --dd-ink-deep: #241509;
+  --dd-ink-2: #2a1a0a;
+  --dd-ink-head: #3a2812;
+  --dd-steel: #23344c;
+  --dd-panel-line: var(--dd-parch-edge);
+  --dd-line: rgba(196, 173, 126, 0.55);
+  --dd-line-soft: rgba(196, 173, 126, 0.5);
+  --dd-row-bg: linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.25));
+  --dd-row-bg-hover: rgba(221, 202, 159, 0.45);
+  --dd-card-bg: rgba(255, 252, 242, 0.42);
+  --dd-input-bg: rgba(255, 252, 242, 0.6);
+  --dd-accent-grad: linear-gradient(180deg, var(--dd-gold-hi), var(--dd-gold) 60%, var(--dd-gold-deep));
+  --dd-step-bg: linear-gradient(180deg, var(--dd-parch-0), var(--dd-parch-2));
+  --dd-bar-bg: linear-gradient(180deg, rgba(255, 252, 242, 0.4), rgba(221, 202, 159, 0.25));
+  --dd-hp-grad: linear-gradient(90deg, var(--dd-crimson), var(--dd-crimson-hi));
+  --dd-mana-grad: linear-gradient(90deg, var(--dd-sapphire), var(--dd-sapphire-hi));
+}
+
+[data-diary-system='drd16'] .drd16-sheet {
   position: relative;
   max-width: 1180px;
   margin-inline: auto;

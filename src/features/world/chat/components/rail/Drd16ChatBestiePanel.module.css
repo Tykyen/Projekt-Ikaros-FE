@@ -1,0 +1,20 @@
+/* 16.2b-chat — drd16 bestie panel v railu chatu. Většinu skinu (root/initBtn/
+   editBtn/hpLab/steps + boj/statline/popis) dědí z mapového
+   `Drd16BestiePanel.module.css` (sdílený pergamen). Lokálně jen jednočíselné
+   Životy (chat nemá current/max bar jako mapový token). */
+
+.hpRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.hpVal {
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--dd-crimson, #9c2a23);
+  text-shadow: 0 1px 0 rgba(255, 250, 235, 0.5);
+}

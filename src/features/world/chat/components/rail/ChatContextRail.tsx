@@ -179,6 +179,8 @@ export function ChatContextRail({
     if (openCombatant?.kind === 'bestie') {
       return (
         <BestieInstancePanel
+          // remount při přepnutí bojovníka → re-seed lokálního edit stavu
+          key={openCombatant.id}
           worldId={worldId}
           channelId={activeChannelId}
           systemId={systemId ?? ''}

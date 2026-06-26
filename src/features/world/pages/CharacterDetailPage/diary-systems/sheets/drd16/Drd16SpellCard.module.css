@@ -13,10 +13,10 @@
     rgba(255, 252, 242, 0.55),
     rgba(221, 202, 159, 0.28)
   );
-  border: 1px solid #c4ad7e;
+  border: 1px solid var(--dd-parch-edge, #c4ad7e);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
-  color: #3a2b19;
-  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--dd-ink, #3a2b19);
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
 }
 
 /* ── header (view + edit) ── */
@@ -28,25 +28,25 @@
   margin-bottom: 8px;
 }
 .name {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 18px;
-  color: #241608;
+  color: var(--dd-ink-deep, #241608);
 }
 .incant {
   font-style: italic;
   font-size: 14px;
-  color: #5c1612;
+  color: var(--dd-crimson-deep, #5c1612);
 }
 .domain {
   margin-left: auto;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #1f1607;
-  background: linear-gradient(180deg, #f3dd97, #c19a3f);
-  border: 1px solid #6f5320;
+  color: var(--dd-ink-deep, #1f1607);
+  background: linear-gradient(180deg, var(--dd-gold-hi, #f3dd97), var(--dd-gold, #c19a3f));
+  border: 1px solid var(--dd-gold-deep, #6f5320);
   border-radius: 3px;
   padding: 3px 8px;
 }
@@ -67,27 +67,27 @@
   font-size: 13.5px;
 }
 .k {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #6c573a;
+  color: var(--dd-ink-soft, #6c573a);
   min-width: 78px;
   flex: 0 0 auto;
   padding-top: 2px;
 }
 .v {
-  color: #3a2b19;
+  color: var(--dd-ink, #3a2b19);
   font-weight: 500;
 }
 .mana {
-  color: #16294f;
+  color: var(--dd-sapphire-deep, #16294f);
   font-weight: 700;
 }
 .desc {
   font-size: 14px;
   line-height: 1.6;
-  color: #3a2b19;
+  color: var(--dd-ink, #3a2b19);
   border-top: 1px dashed rgba(111, 83, 32, 0.35);
   padding-top: 8px;
   white-space: pre-wrap;
@@ -114,8 +114,8 @@
 .descInput,
 .fieldEdit input {
   font-family: inherit;
-  color: #2a1a0a;
-  background: rgba(255, 252, 242, 0.6);
+  color: var(--dd-ink-2, #2a1a0a);
+  background: var(--dd-input-bg, rgba(255, 252, 242, 0.6));
   border: 1px solid rgba(196, 173, 126, 0.7);
   border-radius: 3px;
   padding: 5px 7px;
@@ -128,22 +128,22 @@
 .domainInput:focus,
 .descInput:focus,
 .fieldEdit input:focus {
-  border-color: #6f5320;
+  border-color: var(--dd-gold-deep, #6f5320);
   background: #fffdf6;
 }
 .nameInput {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 15px;
 }
 .incantInput {
   font-style: italic;
-  color: #5c1612;
+  color: var(--dd-crimson-deep, #5c1612);
 }
 .domainInput {
   width: 70px;
   text-align: center;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   text-transform: uppercase;
   font-size: 11px;
 }
@@ -157,7 +157,7 @@
   height: 26px;
   flex: 0 0 auto;
   cursor: pointer;
-  color: #5c1612;
+  color: var(--dd-crimson-deep, #5c1612);
   background: rgba(156, 42, 35, 0.1);
   border: 1px solid rgba(156, 42, 35, 0.4);
   border-radius: 3px;

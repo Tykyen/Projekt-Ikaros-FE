@@ -43,6 +43,22 @@ function attributionOverride(att: RollAttribution): OverrideFields {
   }
 }
 
+/** Tvar requestu deníkového sheetu (`{label, modifier, kind}`). */
+type SheetRollReq = Parameters<NonNullable<SystemSheetProps['onRoll']>>[0];
+
+/**
+ * Hod z chatu. Nadmnožina `SystemSheetProps['onRoll']` o volitelný
+ * `onResult(total)` — zavolá se s konečným výsledkem hodu (sum + modifier)
+ * SYNCHRONNĚ při spuštění (před overlay/odesláním). Slouží k persistenci
+ * výsledku (např. bestie iniciativa → `combatant.initiative`). `(req, onResult?)`
+ * je přiřaditelný k `(req) => void`, takže combat panely (PC/NPC) ho berou beze
+ * změny.
+ */
+export type ChatDiaryRoll = (
+  req: SheetRollReq,
+  onResult?: (total: number) => void,
+) => void;
+
 /**
  * Vrací továrnu `makeOnRoll(attribution)` → `onRoll` pro deníkový sheet.
  * Klik na schopnost: hod → 3D overlay → po doběhnutí pošle zprávu do
@@ -54,8 +70,8 @@ export function useChatDiaryRoll(worldId: string, channelId: string | null) {
   const { getSkin } = useDiceSkinMapping(worldId);
 
   return useCallback(
-    (attribution: RollAttribution): NonNullable<SystemSheetProps['onRoll']> =>
-      (req) => {
+    (attribution: RollAttribution): ChatDiaryRoll =>
+      (req, onResult) => {
         if (!channelId) {
           toast.error('Nejdřív vyber konverzaci.');
           return;
@@ -66,6 +82,8 @@ export function useChatDiaryRoll(worldId: string, channelId: string | null) {
           return;
         }
         const { dicePayload, content } = result;
+        // Výsledek pro persistenci (init lišta) — total = sum + modifier.
+        onResult?.(dicePayload.total);
         const skin = getSkin(dicePayload.type);
         const doSend = () =>
           sendMessage.mutate({

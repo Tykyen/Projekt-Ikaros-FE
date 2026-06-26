@@ -2,9 +2,12 @@ import { useMemo } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { buildBestieToken } from '@/features/world/tactical-map/utils/buildSpawnToken';
 import { BestieStatblock } from '@/features/world/tactical-map/components/tokens/BestieStatblock';
+import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
 import { getBestieAbilities } from '@/features/world/bestiar/lib/bestieAbilities';
 import type { Bestie } from '@/features/world/bestiar/types';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
+import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
+import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import s from './railShell.module.css';
 import b from './BestieRollPanel.module.css';
 
@@ -87,32 +90,70 @@ export function BestieRollPanel({
       </div>
 
       <div className={s.scroll}>
-        <BestieStatblock
-          token={token}
-          worldId={worldId}
-          systemId={systemId}
-          canEdit={false}
-          stats={bestie.systemStats}
-          onStatsChange={noop}
-          abilities={abilities}
-          onAbilitiesChange={noop}
-          notes=""
-          onNotesChange={noop}
-          disabled={false}
-          onRollAbility={(a) =>
-            onRoll({
-              label: a.label,
-              modifier: parseInt(a.value, 10) || 0,
-              kind: 'fate',
-            })
-          }
-        />
+        {systemId === 'drd16' ? (
+          // 16.2b-chat — drd16 katalogová bestie: vlastní bojový panel (d6+
+          // útoky/OČ/iniciativa, fantasy skin), read-only (editace patří do
+          // Bestiáře → bez onPatch). Popis renderuje panel sám.
+          <DiarySkinScope worldId={worldId}>
+            <Drd16ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              notes={bestie.notes}
+              canEdit={false}
+            />
+          </DiarySkinScope>
+        ) : systemId === 'matrix' ? (
+          // 16.2b-chat (D-NEW-CHAT-BESTIE-MATRIX-UNIFY) — Matrix katalogová
+          // bestie: drd16-style panel (klik na schopnost = hod), read-only.
+          <DiarySkinScope worldId={worldId}>
+            <MatrixChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              systemId={systemId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              abilities={abilities.map((a) => ({
+                name: a.label,
+                description: a.value,
+              }))}
+              notes={bestie.notes}
+              canEdit={false}
+            />
+          </DiarySkinScope>
+        ) : (
+          <>
+            <BestieStatblock
+              token={token}
+              worldId={worldId}
+              systemId={systemId}
+              canEdit={false}
+              stats={bestie.systemStats}
+              onStatsChange={noop}
+              abilities={abilities}
+              onAbilitiesChange={noop}
+              notes=""
+              onNotesChange={noop}
+              disabled={false}
+              onRollAbility={(a) =>
+                onRoll({
+                  label: a.label,
+                  modifier: parseInt(a.value, 10) || 0,
+                  kind: 'fate',
+                })
+              }
+            />
 
-        {bestie.notes?.trim() && (
-          <section className={b.lore}>
-            <h4 className={b.loreHead}>📜 Popis</h4>
-            <p className={b.loreBody}>{bestie.notes}</p>
-          </section>
+            {bestie.notes?.trim() && (
+              <section className={b.lore}>
+                <h4 className={b.loreHead}>📜 Popis</h4>
+                <p className={b.loreBody}>{bestie.notes}</p>
+              </section>
+            )}
+          </>
         )}
       </div>
     </aside>

@@ -1,0 +1,90 @@
+/* 16.2b-chat — Matrix bestie panel v railu chatu (drd16-style: klik na schopnost
+   = hod, Životy klik ±, edit přes modal). Většinu HUD skinu dědí z mapového
+   `MatrixBestiePanel.module.css` (--mx-* tokeny, skin-aware). Lokálně jen:
+   init/edit tlačítka, HP ± kroky, klikací schopnost-řádek, popis. */
+
+.initBtn {
+  width: 100%;
+  cursor: pointer;
+  font: 700 12px var(--mx-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 9px;
+  border-radius: 3px;
+  color: var(--mx-text, #dcebff);
+  background: color-mix(in srgb, var(--mx-violet, #7864ff) 24%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mx-violet, #7864ff) 55%, transparent);
+}
+.initBtn:hover {
+  background: color-mix(in srgb, var(--mx-violet, #7864ff) 36%, transparent);
+}
+
+.editBtn {
+  width: 100%;
+  cursor: pointer;
+  font: 600 11px var(--mx-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px;
+  border-radius: 2px;
+  color: var(--mx-add-color, #7fd9ef);
+  background: transparent;
+  border: 1px dashed var(--mx-add-border, rgba(56, 224, 255, 0.33));
+}
+.editBtn:hover {
+  background: var(--mx-add-hover-bg, rgba(56, 224, 255, 0.08));
+  border-style: solid;
+}
+
+/* Životy ± kroky */
+.steps {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+.steps button {
+  cursor: pointer;
+  flex: 1;
+  font: 700 11px var(--mx-font-num, 'IBM Plex Mono', monospace);
+  padding: 5px 0;
+  border-radius: 2px;
+  color: var(--mx-text, #e6ecff);
+  background: var(--mx-input-bg, #0a0b16);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.steps button:hover {
+  border-color: var(--mx-input-focus-border, rgba(56, 224, 255, 0.5));
+}
+
+/* schopnost = klikací řádek (přebírá .skill z mapy, jen reset button chování) */
+.skillBtn {
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+}
+.skillBtn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 55%, transparent);
+  background: var(--mx-row-hover-bg, rgba(56, 224, 255, 0.06));
+}
+.skillBtn:disabled {
+  cursor: default;
+}
+
+.hint {
+  font: 600 8.5px var(--mx-font-num, 'IBM Plex Mono', monospace);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--mx-dim, #444b63);
+}
+
+.empty {
+  font: italic 400 12px var(--mx-font-body, 'Chakra Petch', sans-serif);
+  color: var(--mx-muted, #76809a);
+  margin: 0 0 4px;
+}
+
+.desc {
+  font: 400 12.5px/1.55 var(--mx-font-num, 'IBM Plex Mono', monospace);
+  color: var(--mx-gear-text, #aeb6cf);
+  white-space: pre-wrap;
+}

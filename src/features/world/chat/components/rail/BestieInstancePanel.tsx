@@ -12,9 +12,12 @@ import {
   BestieStatblock,
   type AbilityDraft,
 } from '@/features/world/tactical-map/components/tokens/BestieStatblock';
+import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
 import type { ChatBestieCombatant } from '../../lib/types';
 import { useCombatantMutation } from '../../api/useChannelCombat';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
+import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
+import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import s from './railShell.module.css';
 
 interface Props {
@@ -62,13 +65,8 @@ export function BestieInstancePanel({
   );
   const [notes, setNotes] = useState(combatant.notes);
 
-  useEffect(() => {
-    setStats(combatant.systemStats);
-    setAbilities(
-      combatant.abilities.map((a) => ({ label: a.name, value: a.description })),
-    );
-    setNotes(combatant.notes);
-  }, [combatant.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Re-seed lokálního stavu při přepnutí bojovníka řeší `key={combatant.id}` v
+  // ChatContextRail (remount) — žádný setState-in-effect (cascading renders).
 
   // Debounced autosave (vzor MatrixBestiePanel). `mut.mutate` je stabilní.
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -158,26 +156,73 @@ export function BestieInstancePanel({
       </div>
 
       <div className={s.scroll}>
-        <BestieStatblock
-          token={token}
-          worldId={worldId}
-          systemId={systemId}
-          canEdit={canEdit}
-          stats={stats}
-          onStatsChange={onStatsChange}
-          abilities={abilities}
-          onAbilitiesChange={onAbilitiesChange}
-          notes={notes}
-          onNotesChange={onNotesChange}
-          disabled={false}
-          onRollAbility={(a) =>
-            onRoll({
-              label: a.label,
-              modifier: parseInt(a.value, 10) || 0,
-              kind: 'fate',
-            })
-          }
-        />
+        {systemId === 'drd16' ? (
+          // 16.2b-chat — drd16 dostává vlastní bojový panel (d6+ útoky/OČ/
+          // iniciativa, fantasy skin, edit přes Drd16BestieForm modal), parita
+          // s mapou. Ostatní systémy generic statblok (Matrix funguje, fate OK).
+          <DiarySkinScope worldId={worldId}>
+            <Drd16ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              notes={combatant.notes}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({
+                  op: 'update',
+                  combatantId: combatant.id,
+                  patch,
+                })
+              }
+            />
+          </DiarySkinScope>
+        ) : systemId === 'matrix' ? (
+          // 16.2b-chat (D-NEW-CHAT-BESTIE-MATRIX-UNIFY) — Matrix dostal stejný
+          // drd16-style panel (klik na schopnost = hod, HP klik ±, edit modal).
+          <DiarySkinScope worldId={worldId}>
+            <MatrixChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              systemId={systemId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              abilities={combatant.abilities}
+              notes={combatant.notes}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({
+                  op: 'update',
+                  combatantId: combatant.id,
+                  patch,
+                })
+              }
+            />
+          </DiarySkinScope>
+        ) : (
+          <BestieStatblock
+            token={token}
+            worldId={worldId}
+            systemId={systemId}
+            canEdit={canEdit}
+            stats={stats}
+            onStatsChange={onStatsChange}
+            abilities={abilities}
+            onAbilitiesChange={onAbilitiesChange}
+            notes={notes}
+            onNotesChange={onNotesChange}
+            disabled={false}
+            onRollAbility={(a) =>
+              onRoll({
+                label: a.label,
+                modifier: parseInt(a.value, 10) || 0,
+                kind: 'fate',
+              })
+            }
+          />
+        )}
       </div>
     </aside>
   );

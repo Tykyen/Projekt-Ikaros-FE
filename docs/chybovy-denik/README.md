@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-026.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-027.**
 
 ## Jak je deník členěný
 
@@ -96,3 +96,6 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--oprava-4-pre-existujících-rozbitých-test-souborů-48-testů-4-různé-kořeny--2026-06-25) | fe | 4 pre-existující rozbité testy (společné=komponenta přibrala RQ hook/embed po napsání testu): DiaryTab mock useDiarySkin · nav-guard elevation+friendly-403 (NE bug) · OverviewTab mock AnalyticsSection · RegisterModal **async vi.mock factory→reálný axios** fix sync; **„submit nefiruje" → instrumentuj HNED, nehádej** | — (8/65/3/14 zeleně; 2 chybné hypotézy u RegisterModalu) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--162b-fáze-2-drd16-bestie-na-taktické-mapě--schema-aware-spawn-hp--2026-06-26) | fe | 16.2b Fáze 2 drd16 bestie na mapě: Drd16BestiePanel (Životy HP + Iniciativa/Útoky/OČ = **d6+**), read-only staty=bez sanitizace; **cross-system bug: `buildBestieToken` četl HP natvrdo z matrix `health.max` → schema-aware přes `combatBehavior:'damageable'`** (fallback BC) | — (testy 18/18, build ✓) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--drd16-bestie-editovatelná-na-mapě-per-token--drd16token-schéma--2026-06-26) | fe | drd16 bestie editovatelná na mapě: „✏ Upravit" → modál **reuse `Drd16BestieForm`** (všechna pole) patch tokenu; **edit `token.systemStats` → BE strict validace proti `<system>:token` → nutné `drd16:token` schéma** (jinak generic:token 400); past CH-014 cwd po `cd` | — (31 testů, BE push) |
+| [CH-026](fe.md#ch-026--tvrdil-jsem-chat-combat-nemá-current-hp-screenshot-mě-usvědčil--2026-06-26) | fe | tvrdil jsem „chat combat nemá current-HP / mimo scope" z odhadu typu; screenshot ukázal HP editovatelné jako `systemStats` pole (jiná vrstva) | scope-cut/limit prezentuju jako fakt z odhadu, uživatel přinese důkaz že funguje |
+| [✅ ŘEŠENÍ](fe.md#-řešení--drd16matrix-chat-bestie-parita-sdílené-jádro-mapachat--init-persist--2026-06-26) | fe | drd16+Matrix chat bestie parita: sdílené jádro `Drd16BestieCombatActions` (mapa↔chat, 0 regrese) + chat panely (klik=hod, HP ±, edit modal) + init persist přes `useChatDiaryRoll` `onResult(total)`; key-remount místo setState-in-effect | — (build+28 testů) |
+| [✅ ŘEŠENÍ](fe.md#-řešení--162c-drd16-skiny-7-stylů-přes---dd--tokenizaci--agent-fleet--2026-06-26) | fe | 16.2c-drd16 7 skinů: foundation `--dd-*` hoist+sémantické tokeny, tokenizace panelů (~112, 0 regrese), 7 paralelních agentů (1/skin proti kontraktu+mockupu), statický import pro embedy; vizuál čeká živou revizi | — (build+107 testů; past CH-014 znovu) |
