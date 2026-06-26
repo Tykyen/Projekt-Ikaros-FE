@@ -5,6 +5,8 @@ import {
   buildPcToken,
 } from '../buildSpawnToken';
 import type { Bestie } from '@/features/world/bestiar/types';
+import { systemEntitySchemaRegistry } from '../../schemas/registry';
+import { drd16BestieSchema } from '../../schemas/drd16/bestie';
 
 describe('buildSpawnToken — PC', () => {
   it('PC token má isNpc=false a správné identifiers', () => {
@@ -148,5 +150,30 @@ describe('buildSpawnToken — Bestie', () => {
     expect(t.maxHp).toBe(10); // default
     expect(t.armor).toBe(0);
     expect(t.movement).toBe(5);
+  });
+
+  it('drd16 bestie: HP z `hp` klíče + pohyb z `movement` (schema-aware)', () => {
+    systemEntitySchemaRegistry._clearForTesting();
+    systemEntitySchemaRegistry.register(drd16BestieSchema);
+    const t = buildBestieToken(
+      makeBestie({
+        systemId: 'drd16',
+        systemStats: {
+          hp: 3,
+          defense: 7,
+          movement: 15,
+          attacks: [{ name: 'ostny', value: 3 }],
+        },
+      }),
+      0,
+      0,
+    );
+    expect(t.maxHp).toBe(3); // z `hp` (ne matrix `health.max`)
+    expect(t.currentHp).toBe(3);
+    expect(t.movement).toBe(15);
+    // staty (attacks/defense) snapshotnuté na token pro panel
+    expect(t.systemStats?.attacks).toEqual([{ name: 'ostny', value: 3 }]);
+    expect(t.systemStats?.defense).toBe(7);
+    systemEntitySchemaRegistry._clearForTesting();
   });
 });

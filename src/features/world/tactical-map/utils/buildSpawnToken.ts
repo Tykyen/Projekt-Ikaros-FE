@@ -13,6 +13,7 @@ import type { MapToken } from '../types';
 import type { SpawnPayload } from './spawnPayload';
 import type { Bestie } from '@/features/world/bestiar/types';
 import { getBestieAbilities } from '@/features/world/bestiar/lib/bestieAbilities';
+import { systemEntitySchemaRegistry } from '../schemas/registry';
 
 function pendingId(prefix: string): string {
   // Náhodný suffix proti kolizi ID: multi-placement bestií ve stejné
@@ -89,11 +90,24 @@ export function buildBestieToken(
   q: number,
   r: number,
 ): MapToken {
-  const hp = (bestie.systemStats['health.max'] as number) ?? 10;
+  // Schema-aware HP/pohyb: per-system schéma definuje klíč přes combatBehavior
+  // (matrix/drd2 = `health.max`, drd16 = `hp`). Bez toho by drd16 HP spadlo na
+  // default (matrix klíč `health.max` neexistuje).
+  const fields =
+    systemEntitySchemaRegistry
+      .get(bestie.systemId, 'bestie')
+      ?.sections.flatMap((s) => s.fields) ?? [];
+  const hpKey =
+    fields.find((f) => f.combatBehavior === 'damageable')?.key ?? 'health.max';
+  const moveKey =
+    fields.find((f) => f.combatBehavior === 'movement')?.key ?? 'movement';
+  const hpVal = Number(bestie.systemStats[hpKey]);
+  const hp = Number.isFinite(hpVal) ? hpVal : 10;
+  const moveVal = Number(bestie.systemStats[moveKey]);
+  const movement = Number.isFinite(moveVal) ? moveVal : 5;
   const armor = (bestie.systemStats.armor as number) ?? 0;
   const injury = (bestie.systemStats.injury as number) ?? 0;
   const initBase = (bestie.systemStats['initiative.base'] as number) ?? 0;
-  const movement = (bestie.systemStats.movement as number) ?? 5;
   return {
     id: pendingId(bestie.id),
     isNpc: true,

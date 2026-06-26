@@ -27,6 +27,7 @@ import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
 import { tokenIsBestie } from "../../utils/tokenIsBestie";
 import { BestiePanelView } from "./BestiePanelView";
 import { MatrixBestiePanel } from "./system-panels/MatrixBestiePanel";
+import { Drd16BestiePanel } from "./system-panels/Drd16BestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import styles from "./TokenSystemSheet.module.css";
@@ -81,6 +82,21 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="matrix"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // 16.2b Fáze 2 — drd16 bestie: bojové minimum + d6+ (init/útoky/OČ).
+    if (world?.system === "drd16") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <Drd16BestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="drd16"
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

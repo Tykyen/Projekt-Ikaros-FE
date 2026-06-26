@@ -616,3 +616,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře u 3 (rychlá atribuce + cílený mock). U RegisterModalu **2 chybné hypotézy** (availability hooky, captcha, password validace) než **empirická diagnostika** (log `btn.disabled` + `api.post` call count + skutečná caught chyba v catch) odhalila reálný axios. **Poučení: u „submit nefiruje" instrumentuj (disabled? volá se API? jaká chyba?) HNED, nehádej.** Async `vi.mock` factory s `importActual` = past (pozdní aplikace) — preferuj sync factory.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.2b Fáze 2: drd16 bestie na taktické mapě + schema-aware spawn HP · 2026-06-26
+**Co nakonec zabralo:** Custom `Drd16BestiePanel` (bojové minimum dle přání: Životy=standardní token HP + ±, Iniciativa d6+ bez bonusu, Útoky=d6+ + číslo (víc útoků z `systemStats.attacks`), Obranné číslo=d6+ + OČ). Read-only staty (snapshot z `token.systemStats`) → žádná editace/save → vyhnul jsem se sanitizaci na token-schéma (drd16 nemá `drd16:token`). Větev v `TokenSystemSheet` (vzorem matrix bestie), obal `DiarySkinScope` (fantasy chrome).
+**Netriviální nález (cross-system bug):** `buildBestieToken` četl HP **natvrdo z matrix klíče** `bestie.systemStats['health.max']` → pro drd16 (klíč `hp`) by HP spadlo na default 10 (token.maxHp špatně). Fix = **schema-aware**: vyhledej klíč přes `combatBehavior==='damageable'` (a `'movement'`) z `<system>:bestie` schématu. Fallback `health.max`/`movement` při prázdném registru = BC pro drd2/matrix (jejich damageable klíč JE `health.max`).
+**Jak ověřeno:** build (tsc -b + vite) ✓; testy 18/18 (Drd16BestiePanel 6: init/útoky/OČ d6+ s modifierem, HP ±, !canEdit gate; buildSpawnToken +1: drd16 `hp`→maxHp 3, attacks snapshot); eslint 0; static render (fantasy panel). Živý test na mapě po deployi.
+**Zhodnocení:** dobře — read-only panel obešel token-schéma sanitizaci (drd16 token-schéma neexistuje); spawn HP key zobecněn přes combatBehavior = funguje pro všechny systémy. Hlídat: nový bestie systém musí mít na HP poli `combatBehavior:'damageable'`, jinak spawn HP = default.
+
+---
