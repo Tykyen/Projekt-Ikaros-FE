@@ -26,6 +26,32 @@
 @import './drd16-skins/retro.css';
 @import './drd16-skins/anime.css';
 
+/* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
+   dice readout / orchestrace) ════════════
+ * ŽIJÍ ZDE, ne v `drd16.css` — ten je lazy (jen deníková stránka), kdežto embedy
+ * běží na MAPĚ/CHATU, kde se `drd16.css` nenačte (→ tokeny by byly nedefinované →
+ * `background: var(--dd-embed-surface)` invalid → `transparent`, panel „skrz").
+ * Vlastní sada, protože `--dd-parch/ink` cílí na LIST (světlý papír ve fantasy),
+ * kdežto embedy mají polaritu skinu. Většina generická přes `--dd-forge/gold/crimson`
+ * (skin je override-uje) → auto per-skin; fallbacky = fantasy default (žádný
+ * fantasy.css; v embedu nejsou ani `--dd-forge/gold`, proto fallback hex). Skiny
+ * override-ují `--dd-embed-text/muted/num-font` ve svých souborech. Plocha opaque. */
+[data-diary-system='drd16'] {
+  --dd-embed-surface: linear-gradient(180deg, var(--dd-forge-2, #271d12), var(--dd-forge-1, #1d160e));
+  --dd-embed-border: var(--dd-gold-deep, #6f5320);
+  --dd-embed-line: color-mix(in srgb, var(--dd-gold, #c19a3f) 24%, transparent);
+  --dd-embed-text: #e2cfa3; /* fantasy cream na tmavém — skin přebije */
+  --dd-embed-muted: #b09467; /* skin přebije */
+  --dd-embed-title: var(--dd-gold-hi, #f3dd97);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--dd-gold, #c19a3f) 14%, transparent);
+  --dd-embed-accent: var(--dd-gold, #c19a3f);
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace; /* skin přebije */
+  --dd-embed-title-font: var(--dd-font-head, 'Cinzel', serif);
+  --dd-embed-pos: var(--dd-crimson-hi, #cb4138);
+  --dd-embed-neg: #9c6b6b;
+  --dd-embed-neutral: var(--dd-gold, #c19a3f);
+}
+
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */
 .diary-skin-picker {
   position: relative;

@@ -705,3 +705,19 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — token-kontrakt škáluje (1 sada × 7 skinů × 4 plochy), generická definice minimalizovala per-skin práci na 2-3 řádky/skin. Past: **CH-014 cwd drift POTŘETÍ** — Bash `cd "…drd16-skins"` ve for-loopu (čtení palet) přetekl do SDÍLENÉHO cwd → `npx vitest` i background build běžely z `drd16-skins` (build přežil přes npm root-resolve, vitest „No test files found"). **Durable fix: NIKDY `cd` v shell loopu** — iteruj s absolutními cestami nebo v subshellu `(cd … && …)`. Tutéž past mám už 2× zapsanou ([CH-014]) → příště ji musím chytit DŘÍV. Vizuál neověřen (čeká uživatel).
 
 ---
+
+### CH-028 — drd16 embed tokeny (`--dd-embed-*`) jsem dal do LAZY `drd16.css` → v embedech nedefinované → panely průhledné · 2026-06-26
+
+**Kontext:** Po ✅ ŘEŠENÍ „drd16 cross-surface embedy nesou skin" tester ukázal, že HODY/dicelog i „obaly" jsou na mapě **PRŮHLEDNÉ** (prosvítá mapa) na drd16 skinech.
+
+**Co jsem udělal špatně:** Generické `--dd-embed-*` defaulty (surface/border/title/accent/…) jsem definoval v `drd16.css`. Jenže `drd16.css` je **lazy** — `presets/drd16.ts` `loadStyles: () => import('../styles/drd16.css')` ho načte **jen na deníkové stránce**. Embedy (dice log / token panel / readout / orchestrace) běží na MAPĚ/CHATU, kde se drd16.css **NEnačítá** → `--dd-embed-surface` nedefinované → `background: var(--dd-embed-surface)` (bez fallbacku) = invalid → `background` spadne na initial `transparent` → panel „skrz". Skiny override-ují jen `--dd-embed-text/muted/num` (ty jsou v `diary-skins.css` přes @import skinů, loaded), proto barva textu fungovala, ale plocha zůstala průhledná.
+
+**Proč jsem to neviděl:** `npm run build` + 8 testů zelené — CSS var bez fallbacku **nezpůsobí build error** a testy nerenderují skutečné pozadí. **Nejhorší: info jsem MĚL** — `minimal.css:22` („token override doletí i na mapu/chat, kde se **drd16.css nelazyloaduje**"), `diary-skins.css:19` („aby se načetly i v embedech … kde drd16.css [není]") + [[project_drd16_system_status]] memory („7 @importů ve STATICKÉM diary-skins.css ne lazy drd16.css"). Přečetl jsem je při průzkumu a stejně dal defaulty do špatné vrstvy.
+
+**Fix:** `--dd-embed-*` defaulty **přesunuty do `diary-skins.css`** (statický, loaded v embedech I na deníkové stránce) + interní fallbacky na `--dd-forge/gold/crimson` (fantasy default v embedu nemá ani ty) + fantasy fallbacky na syrové `--dd-*` v konzumentech (`--dd-parch-0`, `--dd-accent-grad`, `--dd-ink-deep`, `--dd-forge-1`, `--dd-font-display/head/body`, `--dd-crimson-hi`). Build ✓, CSP ✓.
+
+**Poučení:** **Token DEFAULT musí žít tam, kde se KONZUMENT načítá.** drd16 má dvě CSS vrstvy — list (lazy `drd16.css`) vs embedy (static `diary-skins.css`); embed-only tokeny patří do statické vrstvy. Pravidlo: každý `var(--dd-x)` v embed CSS buď má fantasy fallback, nebo token musí být ve static vrstvě. Stejná rodina jako [CH-027] (build/testy slepé na runtime CSS kontext — CSP / lazy-load).
+
+**Příznak cyklení:** panel „skrz" na mapu i po „tokenizaci"; text skinu funguje, plocha průhledná → hledat ROZDÍL mezi text-tokenem (loaded) a surface-tokenem (neloaded), ne ladit alfu.
+
+---

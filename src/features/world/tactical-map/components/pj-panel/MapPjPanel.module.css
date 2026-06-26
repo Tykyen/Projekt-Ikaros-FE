@@ -328,7 +328,7 @@
   background: var(--dd-embed-surface);
   border-color: var(--dd-embed-border);
   color: var(--dd-embed-text);
-  font-family: var(--dd-font-body);
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
 }
 [data-diary-system='drd16'] .header,
 [data-diary-system='drd16'] .flyoutHeader {

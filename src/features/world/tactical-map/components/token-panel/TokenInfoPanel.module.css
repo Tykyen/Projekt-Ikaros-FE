@@ -362,7 +362,7 @@
 }
 
 /* ════════════ 16.2c-F3 — drd16 wrapper chrome NESE deníkový skin ════════════
- * Tokenizováno na `--dd-embed-*` (drd16.css) → sleduje vybraný drd16 skin
+ * Tokenizováno na `--dd-embed-*` (diary-skins.css) → sleduje vybraný drd16 skin
  * barvou i písmem (sladěno s combat/bestie panelem uvnitř). Plocha opaque.
  * Scoped na drd16 → ostatní systémy drží mapový motiv `--map-ui-*`. */
 .panel[data-diary-system='drd16'] {
@@ -408,21 +408,21 @@
   border-color: var(--dd-embed-line);
 }
 .panel[data-diary-system='drd16'] .closeBtn:hover {
-  background: color-mix(in srgb, var(--dd-crimson-hi) 18%, transparent);
-  border-color: color-mix(in srgb, var(--dd-crimson-hi) 50%, transparent);
-  color: var(--dd-crimson-hi);
+  background: color-mix(in srgb, var(--dd-crimson-hi, #cb4138) 18%, transparent);
+  border-color: color-mix(in srgb, var(--dd-crimson-hi, #cb4138) 50%, transparent);
+  color: var(--dd-crimson-hi, #cb4138);
 }
 .panel[data-diary-system='drd16'] .identity {
   border-bottom-color: var(--dd-embed-line);
 }
 .panel[data-diary-system='drd16'] .avatar {
-  background: radial-gradient(circle at 40% 30%, var(--dd-parch-0), var(--dd-parch-2));
+  background: radial-gradient(circle at 40% 30%, var(--dd-parch-0, #f1e6cb), var(--dd-parch-2, #ddca9f));
   border-color: var(--dd-embed-accent);
   box-shadow: 0 0 16px color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
 }
 .panel[data-diary-system='drd16'] .name {
   color: var(--dd-embed-title);
-  font-family: var(--dd-font-display);
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
 }
 .panel[data-diary-system='drd16'] .resizeHandle:hover {
   background: color-mix(in srgb, var(--dd-embed-accent) 35%, transparent);

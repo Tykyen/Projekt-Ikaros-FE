@@ -261,8 +261,8 @@
 }
 
 /* ════════════ 16.2c-F3 — drd16 roll log NESE deníkový skin ════════════
- * Tokenizováno na `--dd-embed-*` (drd16.css) → sleduje vybraný drd16 skin
- * (fantasy pergamen, sci-fi void, retro neon…) barvou, písmem i polaritou.
+ * Tokenizováno na `--dd-embed-*` (defaulty v diary-skins.css, loaded i v embedech)
+ * → sleduje vybraný drd16 skin (fantasy pergamen, sci-fi void…) barvou+písmem+polaritou.
  * Plocha VŽDY opaque (`--dd-embed-surface` = forge gradient), backdrop VYPNUT.
  * Scoped na drd16 → ostatní systémy beze změny. */
 [data-diary-system='drd16'] .panel {
