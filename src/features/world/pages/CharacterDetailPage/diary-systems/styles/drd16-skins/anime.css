@@ -79,6 +79,13 @@
   --dd-font-head: 'Fredoka', system-ui, sans-serif;
   --dd-font-body: 'Quicksand', system-ui, sans-serif;
 
+  /* embed plochy — světlé album, fialový text; titulek sytě (`--dd-gold-hi` je
+     pale levandule → na bílé mizí, proto `--dd-ink-head`). */
+  --dd-embed-text: var(--dd-ink);
+  --dd-embed-muted: var(--dd-ink-soft);
+  --dd-embed-title: var(--dd-ink-head);
+  --dd-embed-num-font: var(--dd-font-body);
+
   /* ── lokální MLP pomocníky (ornamenty + kompozity je čtou) ── */
   --mlp-lavender: #b79ce8;
   --mlp-lavender-d: #8b6fd0;

@@ -73,6 +73,12 @@
   --dd-font-head: 'Chakra Petch', system-ui, sans-serif;
   --dd-font-body: 'Chakra Petch', system-ui, sans-serif;
 
+  /* embed plochy (dice log/token panel/readout/orchestrace) — tmavý void HUD,
+     holo text, mono čísla (ink je tu už světlý). */
+  --dd-embed-text: var(--dd-ink);
+  --dd-embed-muted: var(--dd-ink-soft);
+  --dd-embed-num-font: 'Share Tech Mono', ui-monospace, monospace;
+
   /* ── lokální sci-fi pomocníky (ornamenty + kompozity je čtou) ── */
   --sf-cyan: #34e3ff;
   --sf-cyan-dim: #1c6f86;

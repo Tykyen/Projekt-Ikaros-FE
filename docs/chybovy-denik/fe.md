@@ -667,3 +667,41 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — agent-fleet (1 panel-tokenize + 7 skinů paralelně) škáluje velkou CSS práci; foundation-first zabránil token-drift. Past: **agenti běželi souběžně s tokenizací panelů → 3 viděli „hardcoded" bestie panel** (pre-tokenizační stav) a hlásili neaktuální omezení — řešeno časovým doběhnutím. Past CH-014 znovu (Bash `cd` ↔ PowerShell sdílí cwd → vitest ze špatného rootu) — rychlá náprava `Set-Location` zpět. Roztroušené @importy (scifi/anime→drd16.css, zbytek→diary-skins.css) souběžnými agenty sjednoceny v F3. Špatně/hlídat: **vizuál neověřen** (kontrast/ornamenty na reálném DOM = riziko, čeká uživatel).
 
 ---
+
+### ✅ ŘEŠENÍ — doky nástrojů mapy defaultně sbalené + past „eager LS zápis přebije změnu defaultu" · 2026-06-26
+
+**Co nakonec zabralo:** Tester nahlásil, že doky taktické mapy (🎨 Efekty & kreslení / 🌫️ Mlha / 🖥️ Zobrazení) jsou po načtení **rozbalené**, mají být sbalené. `MapToolDock` měl `defaultCollapsed=false`. Fix = (1) `defaultCollapsed` na třech instancích v `TacticalMapView`, (2) **persist jen při explicitním kliku** na hlavičku (dřív `useEffect` zapisoval stav do LS **eager při každém mountu**), (3) bump prefixu LS klíče `ikr-map-tooldock-` → `…-v2-`.
+
+**Proč to je správně (a ne jen přepnout default):** Eager `useEffect(() => localStorage.setItem(...))` zapisoval výchozí stav do LS hned při prvním zobrazení mapy → každý, kdo mapu už jednou otevřel, měl uloženo `"0"` (rozbaleno), takže pouhá změna `defaultCollapsed` by se ho **netýkala**. Tři opatření řeší tři vrstvy: default = nová hodnota pro nové; persist-on-toggle = past se neopakuje při příští změně defaultu; v2 bump = zahodí už zapsaný (rozbalený) stav u vracejících se testerů. Vedlejší přínos: sbalená Mlha = levý tah zase panuje (otevřený mlha-dok + zapnutá mlha = kreslicí režim, footgun).
+
+**Jak ověřeno:** `MapToolDock.spec` 3/3 ✅ (test „bez propu rozbalený" → param default ponechán `false`, sbalení nastaveno per-call; test persist-po-kliku zelený), `tsc --noEmit` čistý na obou souborech. Reálný stav u testera (jednorázový reset uloženého stavu kvůli v2) čeká na potvrzení.
+
+**Zhodnocení:** dobře, ale poučení reusable: **komponenta, co persistuje UI stav, nesmí zapisovat default eager při mountu** — jinak si „zabetonuje" první vykreslený stav a budoucí změna defaultu je neúčinná, dokud nebumpneš klíč. Vzor: číst LS na init, zapisovat JEN na uživatelskou akci. (Příbuzné [[project_global_form_reset]] / persistence past [[feedback_persist_across_variants]].)
+
+---
+
+### ✅ ŘEŠENÍ — sci-fi skin: dice log (HODY) i ORCHESTRACE průhledné — vadný `var()` + mislabel „solid" tokenu · 2026-06-26
+
+**Co nakonec zabralo:** Tester: u sci-fi skinu (matrix systém) prosvítaly na mapu **HODY** (DiceLogPanel) i **ORCHESTRACE** (MapPjPanel). Dvě nezávislé příčiny:
+1. **HODY** — `[data-diary-system='matrix'] .panel { background: var(--mx-log-surface, var(--mx-panel, transparent), var(--mx-bg, #0e0f1e)); }`. `var()` bere **2** argumenty; čárka ve fallbacku → `background` shorthand to čte jako **dvě vrstvy** (`var(--mx-panel,transparent), var(--mx-bg,…)`) a `<color>` v **ne-poslední** vrstvě je **invalid → celá deklarace spadne na initial `transparent`**. Projevilo se JEN u sci-fi, protože jediný nedefinuje `--mx-log-surface` (8 ostatních skinů ano → trefí platnou 1. větev). Fix = zanoření `var(--mx-log-surface, var(--mx-panel, var(--mx-bg, #0e0f1e)))`.
+2. **ORCHESTRACE** — `background: var(--map-toolbar-bg-solid, …)`, jenže `--map-toolbar-bg-solid: var(--surface-1, #0a0814)` → `--surface-1: var(--theme-surface, …rgba(0,0,0,0.72))`. Token se jmenuje „solid", ale **dědí průhledný theme-surface světa** (i default 0.72 alfa). Pre-existující, ne F3 regrese. Fix komponentně = opaque mapový token `rgb(var(--map-ui-panel-rgb))` (shodný s HODY), bez editu sdíleného/theme tokenu (theme-isolation).
+
+**Proč to je správně:** (1) Zanořený `var()` = jediná platná forma řetězeného fallbacku; opravuje sci-fi a nechává 8 skinů s vlastním `--mx-log-surface` beze změny. (2) `--map-ui-panel-rgb` je RGB triplet → `rgb(var())` je vždy opaque, nezávisle na alfě theme-surface; sjednocuje ORCHESTRACE s ostatním mapovým chrome.
+
+**Jak ověřeno:** DiceLogPanel.spec 5/5 ✅, MapToolDock.spec 3/3 ✅. **Vizuál (průhlednost) testy NEchytí** — čeká živé oko testera na sci-fi+matrix (+ ostatní skiny kontrolně, že 1. větev drží). `mobil-desktop` layout netknut (jen background).
+
+**Zhodnocení:** dobře. Dvě reusable poučení: **(a) `var()` má jen 2 argumenty** — čárka ve fallbacku u `background`/`box-shadow`/… = víc vrstev, ne řetězení; řetězit = ZANOŘIT. Invalid hodnota přes `var()` substituci → property spadne na initial (`background` → `transparent`), tiše. **(b) Token jménem `*-solid` musí být opaque** — `--map-toolbar-bg-solid` dědí průhledný `--theme-surface`, takže název lže. Deeper root (mislabel tokenu) ponechán; nahlášeno uživateli.
+
+---
+
+### ✅ ŘEŠENÍ — drd16 cross-surface embedy nesou deníkový skin (`--dd-embed-*` kontrakt) · 2026-06-26
+
+**Co nakonec zabralo:** Tester (drd16): dice log „HODY", token panel „obal", dice readout i ORCHESTRACE byly natvrdo fantasy pergamen → neměnily se podle vybraného drd16 skinu (sci-fi/steampunk/…), zatímco list a combat panel `--dd-*` čtou a skin sledují. **Kořen:** drd16 token kontrakt (`--dd-parch/ink`) cílí na LIST (světlý papír ve fantasy), kdežto embedy jsou tmavá HUD plocha se světlým textem → naivní tokenizace by dala tmavý text na tmavém. Matrix to řeší dedikovanými `--mx-log-*`; drd16 ekvivalent neměl. Fix = zavést sadu **`--dd-embed-*`** (surface/border/line/text/muted/title/chip/accent/num-font/title-font/pos/neg/neutral): fantasy default v `drd16.css`, **většina generická přes existující per-skin tokeny** (`--dd-forge` = tmavý rám každého skinu, `--dd-gold/crimson`) → auto-adaptuje; ručně per-skin jen `text/muted/num-font`. Tokenizovány 4 plochy (DiceLogPanel, TokenInfoPanel, DiceRollOverlay, MapPjPanel). ORCHESTRACE navíc obalena do **jednoho `DiarySkinScope`** s dice logem (celý `bottomLeftStack`) → nese skin (drd16 `--dd-embed-*`, matrix `--mx-log-*`, ostatní systémy opaque mapový default).
+
+**Proč to je správně (a ne další hardcode):** Token engine = jeden kontrakt reskinuje všechny embedy přes všechny skiny; generická definice přes `--dd-forge/gold` znamená, že nové/upravené skiny dostanou embed zdarma. **Polarita ošetřena:** `--dd-forge` je tmavý u 5 skinů, ale SVĚTLÝ u minimal/anime (papír/bílá) → `--dd-embed-surface` = forge gradient funguje pro obě (tmavé → tmavý HUD, světlé → světlý). `--dd-embed-text` per skin: `var(--dd-ink)` u polaritně sladěných (scifi/retro mají ink už světlý; minimal/anime světlá plocha + tmavý ink), explicitní světlá hodnota u tmavý-embed-světlý-list (fantasy/steampunk/horror/nature). Anime: `--dd-embed-title` přemapován z pale `gold-hi` na `--dd-ink-head` (jinak by titulek na bílé mizel). Plocha VŽDY opaque (forge = opaque hexy).
+
+**Jak ověřeno:** `npm run build` (tsc -b + vite) ✓, `check-csp-hash: OK` (žádné nové fonty/CSP), DiceLogPanel + MapToolDock spec 8/8 ✓. **Vizuál napříč 7 drd16 skiny + matrix čeká živou revizi** (skin práce — kontrast/ornamenty na reálném DOM = riziko, per base.md profi úroveň).
+
+**Zhodnocení:** dobře — token-kontrakt škáluje (1 sada × 7 skinů × 4 plochy), generická definice minimalizovala per-skin práci na 2-3 řádky/skin. Past: **CH-014 cwd drift POTŘETÍ** — Bash `cd "…drd16-skins"` ve for-loopu (čtení palet) přetekl do SDÍLENÉHO cwd → `npx vitest` i background build běžely z `drd16-skins` (build přežil přes npm root-resolve, vitest „No test files found"). **Durable fix: NIKDY `cd` v shell loopu** — iteruj s absolutními cestami nebo v subshellu `(cd … && …)`. Tutéž past mám už 2× zapsanou ([CH-014]) → příště ji musím chytit DŘÍV. Vizuál neověřen (čeká uživatel).
+
+---

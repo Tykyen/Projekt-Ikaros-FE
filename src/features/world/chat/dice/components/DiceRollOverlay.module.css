@@ -211,49 +211,50 @@
   font-family: var(--mx-log-eq-font, var(--mx-font-display, 'Cinzel', serif));
 }
 
-/* ════════════ 16.2b-mapa — drd16 readout nese FANTASY skin ════════════
- * Kožená vazba kolem readoutu, pergamenové kostky, krvavý total. Self-contained.
- * Sémantické +/− drží význam (text), barvy = fantasy paleta. Scoped na drd16. */
+/* ════════════ 16.2c-F3 — drd16 readout NESE deníkový skin ════════════
+ * Tokenizováno na `--dd-embed-*` (drd16.css) → sleduje vybraný drd16 skin
+ * barvou, písmem i polaritou. Plocha opaque. Sémantické +/− drží význam.
+ * Scoped na drd16. */
 [data-diary-system='drd16'] .readout {
-  background-color: #1a130b;
-  background-image: linear-gradient(180deg, #2a2014, #1a130b);
-  border: 1px solid #6f5320;
+  background-color: var(--dd-forge-1);
+  background-image: var(--dd-embed-surface);
+  border: 1px solid var(--dd-embed-border);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 [data-diary-system='drd16'] .faceBadge {
-  background: linear-gradient(180deg, #f1e6cb, #ddca9f);
-  border-color: #6f5320;
-  color: #2a1a0a;
-  font-family: 'IBM Plex Mono', monospace;
+  background: var(--dd-accent-grad);
+  border-color: var(--dd-embed-border);
+  color: var(--dd-ink-deep);
+  font-family: var(--dd-embed-num-font);
 }
 [data-diary-system='drd16'] .faceGeneric {
-  color: #2a1a0a;
+  color: var(--dd-ink-deep);
 }
 [data-diary-system='drd16'] .totalValue {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--dd-embed-num-font);
 }
 [data-diary-system='drd16'] .totalPositive {
-  color: #cb4138;
+  color: var(--dd-embed-pos);
 }
 [data-diary-system='drd16'] .totalNegative {
-  color: #9c6b6b;
+  color: var(--dd-embed-neg);
 }
 [data-diary-system='drd16'] .totalNeutral {
-  color: #c19a3f;
+  color: var(--dd-embed-neutral);
 }
 [data-diary-system='drd16'] .equation {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display);
 }
 [data-diary-system='drd16'] .skillName {
-  color: #f3dd97;
+  color: var(--dd-embed-title);
 }
 [data-diary-system='drd16'] .eqSign {
-  color: #8a7350;
+  color: var(--dd-embed-muted);
 }
 [data-diary-system='drd16'] .rollerName {
-  color: #b09467;
-  font-family: 'Cinzel', serif;
+  color: var(--dd-embed-muted);
+  font-family: var(--dd-font-head);
 }
 
 /* ════════════ 16.2c-F3c — per-skin SIGNATURE readoutu ════════════

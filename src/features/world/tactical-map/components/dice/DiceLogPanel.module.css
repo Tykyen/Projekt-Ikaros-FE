@@ -213,10 +213,15 @@
  * je log v barvě+fontu skinu. Čísla nesou skin (font+barva); +/− znaménko drží
  * význam. Scoped na matrix → ostatní systémy beze změny. */
 [data-diary-system='matrix'] .panel {
-  /* designovaný NEPRŮHLEDNÝ povrch skinu; fallback = panel vrstvený přes plný
-     --mx-bg (retro/minimal mají --mx-panel s alfou → samotný by byl „skrz").
+  /* designovaný NEPRŮHLEDNÝ povrch skinu. ZANOŘENÝ fallback (PLATNÝ `var()`):
+     --mx-log-surface → --mx-panel → --mx-bg. POZOR: `var(name, a), var(name, b)`
+     (3 argumenty / čárka ve fallbacku) by `background` shorthand četl jako DVĚ
+     vrstvy a `<color>` v ne-poslední vrstvě je invalid → celá deklarace spadne
+     na initial `transparent` = panel „skrz". Přesně tím trpěl sci-fi, který
+     `--mx-log-surface` nedefinuje (jeho `--mx-panel` #0e0f1e je opaque); ostatní
+     skiny dodají vlastní opaque `--mx-log-surface`.
      backdrop-filter VYPNUT (na opaque povrchu jen rozmazává mapu). */
-  background: var(--mx-log-surface, var(--mx-panel, transparent), var(--mx-bg, #0e0f1e));
+  background: var(--mx-log-surface, var(--mx-panel, var(--mx-bg, #0e0f1e)));
   border-color: var(--mx-log-border, color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent));
   color: var(--mx-text, #d6def0);
   backdrop-filter: none;
@@ -255,49 +260,50 @@
   color: var(--mx-log-total, var(--mx-gold, #f5c451));
 }
 
-/* ════════════ 16.2b-mapa — drd16 roll log nese FANTASY skin ════════════
- * Tmavá kožená vazba + zlatý rám, pergamenová čísla (mono), krvavý total.
- * Self-contained (drd16 nemá --mx-*; pergamen body jede vlastní paletou).
+/* ════════════ 16.2c-F3 — drd16 roll log NESE deníkový skin ════════════
+ * Tokenizováno na `--dd-embed-*` (drd16.css) → sleduje vybraný drd16 skin
+ * (fantasy pergamen, sci-fi void, retro neon…) barvou, písmem i polaritou.
+ * Plocha VŽDY opaque (`--dd-embed-surface` = forge gradient), backdrop VYPNUT.
  * Scoped na drd16 → ostatní systémy beze změny. */
 [data-diary-system='drd16'] .panel {
-  background: linear-gradient(180deg, #2a2014, #15100a);
-  border-color: #6f5320;
-  color: #e2cfa3;
+  background: var(--dd-embed-surface);
+  border-color: var(--dd-embed-border);
+  color: var(--dd-embed-text);
   backdrop-filter: none;
 }
 [data-diary-system='drd16'] .header {
-  border-bottom-color: rgba(193, 154, 63, 0.22);
+  border-bottom-color: var(--dd-embed-line);
 }
 [data-diary-system='drd16'] .title {
-  color: #f3dd97;
-  font-family: 'Cinzel', serif;
+  color: var(--dd-embed-title);
+  font-family: var(--dd-embed-title-font);
 }
 [data-diary-system='drd16'] .chip {
-  background: rgba(193, 154, 63, 0.12);
-  color: #e2cfa3;
+  background: var(--dd-embed-chip-bg);
+  color: var(--dd-embed-title);
 }
 [data-diary-system='drd16'] .name {
-  color: #b09467;
+  color: var(--dd-embed-muted);
 }
 [data-diary-system='drd16'] .breakdown {
-  color: #c9b486;
-  font-family: 'IBM Plex Mono', monospace;
+  color: var(--dd-embed-muted);
+  font-family: var(--dd-embed-num-font);
 }
 [data-diary-system='drd16'] .faces,
 [data-diary-system='drd16'] .total {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--dd-embed-num-font);
 }
 [data-diary-system='drd16'] .faceNum {
-  color: #e8dab7;
+  color: var(--dd-embed-text);
 }
 [data-diary-system='drd16'] .totalPositive {
-  color: #cb4138;
+  color: var(--dd-embed-pos);
 }
 [data-diary-system='drd16'] .totalNegative {
-  color: #9c6b6b;
+  color: var(--dd-embed-neg);
 }
 [data-diary-system='drd16'] .totalNeutral {
-  color: #c19a3f;
+  color: var(--dd-embed-neutral);
 }
 
 /* ════════════ 16.2c-F3c — per-skin SIGNATURE roll logu ════════════

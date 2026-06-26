@@ -70,6 +70,26 @@
   --dd-bar-bg: linear-gradient(180deg, rgba(255, 252, 242, 0.4), rgba(221, 202, 159, 0.25));
   --dd-hp-grad: linear-gradient(90deg, var(--dd-crimson), var(--dd-crimson-hi));
   --dd-mana-grad: linear-gradient(90deg, var(--dd-sapphire), var(--dd-sapphire-hi));
+
+  /* ─ 16.2c-F3 — EMBED plochy (dice log „HODY", token panel obal, dice readout,
+     orchestrace) = chrome HUD nad mapou, NESE deníkový skin. Vlastní sada,
+     protože --dd-parch/ink cílí na LIST (světlý papír ve fantasy), kdežto tyhle
+     plochy mají polaritu skinu (tmavé skiny tmavý HUD, světlé světlý). Většina
+     genericky přes --dd-forge/gold/crimson → auto per-skin; ručně per-skin jen
+     text/muted/num-font (kontrast závisí na polaritě). Plocha VŽDY opaque. ─ */
+  --dd-embed-surface: linear-gradient(180deg, var(--dd-forge-2), var(--dd-forge-1));
+  --dd-embed-border: var(--dd-gold-deep);
+  --dd-embed-line: color-mix(in srgb, var(--dd-gold) 24%, transparent);
+  --dd-embed-text: #e2cfa3; /* kontrastní text (fantasy cream na tmavém) — skin přebije */
+  --dd-embed-muted: #b09467; /* sekundární text — skin přebije */
+  --dd-embed-title: var(--dd-gold-hi);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--dd-gold) 14%, transparent);
+  --dd-embed-accent: var(--dd-gold);
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace; /* skin přebije */
+  --dd-embed-title-font: var(--dd-font-head);
+  --dd-embed-pos: var(--dd-crimson-hi);
+  --dd-embed-neg: #9c6b6b;
+  --dd-embed-neutral: var(--dd-gold);
 }
 
 [data-diary-system='drd16'] .drd16-sheet {

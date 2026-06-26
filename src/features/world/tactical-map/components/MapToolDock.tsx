@@ -8,7 +8,7 @@
  * vpravo dole a stackuje docky pod sebe (flex-column řeší proměnnou výšku při
  * sbalení bez překryvu).
  */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styles from './MapToolDock.module.css';
 
 interface Props {
@@ -27,20 +27,27 @@ export function MapToolDock({
   defaultCollapsed = false,
   children,
 }: Props): React.ReactElement {
-  const lsKey = `ikr-map-tooldock-${storageKey}`;
+  // v2: dřív se výchozí stav zapisoval do LS hned při mountu (eager) → změna
+  // `defaultCollapsed` by se netýkala nikoho, komu se mapa už jednou otevřela.
+  // Teď persistujeme JEN při explicitním přepnutí; bump prefixu na `v2` zahodí
+  // starý (rozbalený) stav, aby nový default platil i pro vracející se uživatele.
+  const lsKey = `ikr-map-tooldock-v2-${storageKey}`;
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     if (typeof window === 'undefined') return defaultCollapsed;
     const v = localStorage.getItem(lsKey);
     return v === null ? defaultCollapsed : v === '1';
   });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(lsKey, collapsed ? '1' : '0');
-    } catch {
-      // ignore
-    }
-  }, [lsKey, collapsed]);
+  const toggle = (): void =>
+    setCollapsed((v) => {
+      const next = !v;
+      try {
+        localStorage.setItem(lsKey, next ? '1' : '0');
+      } catch {
+        // ignore
+      }
+      return next;
+    });
 
   return (
     <div
@@ -51,7 +58,7 @@ export function MapToolDock({
       <button
         type="button"
         className={styles.header}
-        onClick={() => setCollapsed((v) => !v)}
+        onClick={toggle}
         aria-expanded={!collapsed}
         title={collapsed ? 'Rozbalit nástroje' : 'Sbalit nástroje'}
       >

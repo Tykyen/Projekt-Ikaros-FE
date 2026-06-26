@@ -77,6 +77,11 @@
   --dd-font-display: 'Orbitron', 'Share Tech Mono', sans-serif;
   --dd-font-head: 'Press Start 2P', 'Share Tech Mono', monospace;
   --dd-font-body: 'Share Tech Mono', 'Courier New', monospace;
+
+  /* embed plochy — tmavý synthwave, světlý text (ink je tu už světlý). */
+  --dd-embed-text: var(--dd-ink);
+  --dd-embed-muted: #b69ad6;
+  --dd-embed-num-font: var(--dd-font-num);
   /* čísla = monospace „LED-ish" (DSEG7 odebrán kvůli CSP, viz hlavička) */
   --dd-font-num: 'Share Tech Mono', monospace;
 

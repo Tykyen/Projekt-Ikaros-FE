@@ -2031,7 +2031,11 @@ export function TacticalMapView(): React.ReactElement {
         {/* 15.4 — kreslení je SOUČÁSTÍ docku Efekty (PJ efekty + kresby; hráč
             jen kresby, když scéna povolí). */}
         {scene && (isPJ || canDraw) && (
-          <MapToolDock title="🎨 Efekty & kreslení" storageKey="effects">
+          <MapToolDock
+            title="🎨 Efekty & kreslení"
+            storageKey="effects"
+            defaultCollapsed
+          >
             {isPJ && (
               <EffectsPalette
                 tool={effectTool}
@@ -2053,7 +2057,7 @@ export function TacticalMapView(): React.ReactElement {
           </MapToolDock>
         )}
         {isPJ && scene && (
-          <MapToolDock title="🌫️ Mlha" storageKey="fog">
+          <MapToolDock title="🌫️ Mlha" storageKey="fog" defaultCollapsed>
             <FogPalette
               tool={fogTool}
               fogEnabled={scene.fogEnabled}
@@ -2064,7 +2068,7 @@ export function TacticalMapView(): React.ReactElement {
           </MapToolDock>
         )}
         {/* 15.3 — měření (pravítko) je SOUČÁSTÍ docku Zobrazení (hráč i PJ). */}
-        <MapToolDock title="🖥️ Zobrazení" storageKey="view">
+        <MapToolDock title="🖥️ Zobrazení" storageKey="view" defaultCollapsed>
           <MapZoomControls
             zoom={panZoom.zoom}
             onZoomIn={() => panZoom.setZoom(panZoom.zoom + 0.1)}
@@ -2155,26 +2159,29 @@ export function TacticalMapView(): React.ReactElement {
           aktivní scénu; orchestrace se zobrazí i bez ní (PJ přes ni scény
           aktivuje), proto je kontejner podmíněn `scene || isPJ`. */}
       {worldId && currentUser && (scene || isPJ) && (
-        <div className={styles.bottomLeftStack}>
-          {scene && (
-            <DiarySkinScope worldId={worldId} style={{ display: "contents" }}>
+        // 16.2c-F3 — celý levý sloupec (log hodů + orchestrace) v JEDNOM
+        // DiarySkinScope → oba panely nesou deníkový skin (data-diary-system +
+        // dědičnost --dd-*/--mx-*). display:contents = nemění layout stacku.
+        <DiarySkinScope worldId={worldId} style={{ display: "contents" }}>
+          <div className={styles.bottomLeftStack}>
+            {scene && (
               <DiceLogPanel
                 rolls={scene.diceRolls ?? []}
                 viewer={{ userId: currentUser.id, isPj: isPJ }}
                 visibility={world?.diceVisibility}
                 sceneId={scene.id}
               />
-            </DiarySkinScope>
-          )}
-          {isPJ && (
-            <MapPjPanel
-              worldId={worldId}
-              currentScene={scene}
-              currentUserId={currentUser.id}
-              onStartPlacement={placement.start}
-            />
-          )}
-        </div>
+            )}
+            {isPJ && (
+              <MapPjPanel
+                worldId={worldId}
+                currentScene={scene}
+                currentUserId={currentUser.id}
+                onStartPlacement={placement.start}
+              />
+            )}
+          </div>
+        </DiarySkinScope>
       )}
 
       {/* 10.2j G3 — fullscreen 3D dice overlay (lokální hod + cizí viditelný).

@@ -71,6 +71,11 @@
   --dd-font-head: 'IM Fell English SC', 'Cinzel', serif;
   --dd-font-body: 'IM Fell English', 'Spectral', Georgia, serif;
 
+  /* embed plochy — krvavá tma, kostěný text (list světlý → explicitní světlé). */
+  --dd-embed-text: #cabba6;
+  --dd-embed-muted: #8c7b69;
+  --dd-embed-num-font: var(--dd-font-body);
+
   /* ── kompozity: špinavý pergamen z kůže + rudý nádech rozkladu ── */
   --dd-parch-tex:
     radial-gradient(140% 80% at 12% 6%, rgba(245, 235, 210, 0.4), transparent 50%),

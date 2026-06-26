@@ -100,6 +100,12 @@
   --dd-font-head: 'Cinzel', serif;
   --dd-font-body: 'EB Garamond', Georgia, serif;
 
+  /* embed plochy — tmavá mosazná kůže, světlý brass text (list je světlý → ink
+     je tmavý, proto explicitní světlé hodnoty). */
+  --dd-embed-text: #ead8b0;
+  --dd-embed-muted: #b39a6a;
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace;
+
   /* ── kompozitní textury: kůže korpus + broušená mosaz overlay ── */
   --dd-parch-tex:
     /* horní lesk korpusu */

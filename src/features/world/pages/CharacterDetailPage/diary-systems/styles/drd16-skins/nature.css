@@ -67,6 +67,11 @@
   --dd-font-display: 'Cormorant Garamond', Georgia, serif;
   --dd-font-head: 'Marcellus SC', serif;
   --dd-font-body: 'Spectral', Georgia, serif;
+
+  /* embed plochy — tmavá kůra, světlý mechový pergamenový text (list světlý). */
+  --dd-embed-text: #e8dcc2;
+  --dd-embed-muted: #ab9d80;
+  --dd-embed-num-font: var(--dd-font-body);
   /* lokální: rukopis terénního zápisníku (poznámky, hinty, zaklínadla) */
   --na-font-hand: 'Caveat', cursive;
   /* lokální: mech akcent v plné, hi a deep variantě (žilky, listy, markery) */

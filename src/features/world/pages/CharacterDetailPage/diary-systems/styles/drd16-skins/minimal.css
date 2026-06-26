@@ -78,6 +78,11 @@
   --dd-font-head: 'Spline Sans Mono', ui-monospace, monospace;
   --dd-font-body: 'Newsreader', Georgia, serif;
 
+  /* embed plochy — světlý papír, uhlový text (forge je tu světlý → ink tmavý sedí). */
+  --dd-embed-text: var(--dd-ink);
+  --dd-embed-muted: var(--dd-ink-soft);
+  --dd-embed-num-font: 'Spline Sans Mono', ui-monospace, monospace;
+
   /* ── plochy: textury PRYČ → čistý papír, jemný horní vtisk ── */
   --dd-parch-tex: linear-gradient(180deg, #faf8f3, var(--mn-paper) 42%, var(--mn-paper-2));
   --dd-noise: none;
