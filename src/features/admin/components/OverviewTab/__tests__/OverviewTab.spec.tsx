@@ -7,6 +7,11 @@ import { useAdminStats } from '../../../api/useAdminStats';
 vi.mock('../../../api/useAdminStats', () => ({
   useAdminStats: vi.fn(),
 }));
+// 15B.7 — OverviewTab nově embeduje AnalyticsSection (vlastní React Query hook).
+// Test je o metrikách z useAdminStats, ne o analytics → stub (jinak „No QueryClient").
+vi.mock('../../AnalyticsSection/AnalyticsSection', () => ({
+  AnalyticsSection: () => null,
+}));
 
 const mockHook = vi.mocked(useAdminStats);
 

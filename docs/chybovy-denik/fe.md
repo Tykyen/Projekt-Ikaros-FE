@@ -592,3 +592,27 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Jak ověřeno:** finální grid render ze 4 REÁLNÝCH repo souborů (ne agentových inline overridů) přes všech 7 skinů — neprůhledné, distinktní (fantasy gilt fillet · horor stříbrná bordura+oxblood · steampunk mosaz+nýty · příroda dřevo+lišta+lístek · minimal světlý dossier+ledger · retro CRT double-rám+scanlines · anime duha+ink+bílé chip kostky), čísla nesou skin font+barvu. Build ✓.
 
 **Zhodnocení:** dobře = token kontrakt + paralelní designéři = profi per-skin výsledek rychle, render-verify per skin; přetrvávající průhlednost konečně vyřešena root-cause (backdrop blur, ne alfa). Špatně/hlídat = málem jsem integroval signatury do global CSS (nefungovalo by) — **u CSS Modules: custom-prop token cross-file ANO, selektor na hashovanou třídu JEN v module souboru**. Tester 2× opakoval „stále průhledné" → příště u stížnosti na průhlednost hned hledat backdrop-filter, ne jen alfu.
+
+### ✅ ŘEŠENÍ — 16.2b-mapa drd16: combat panel + d6+ exploding engine + strukturovaný spellbook · 2026-06-25
+**Co nakonec zabralo:** Prototyp (`drd16-mapa-audit.html` v3) = vizuální kontrakt, schválen před kódem; impl. po 6 krocích (engine → dicelog breakdown → spellbook → panel → F3 sdílené plochy → ověření) s průběžným vitestem po každém kroku.
+**Netriviální body:**
+- **d6+ je DUAL-SOURCE union na 4 místech:** `rollEngine.RollKind` + `dicePayload.GenericDicePayload` + `types.ts onRoll` (mapa) + chat-local zrcadlo `rollFromDiary.DiaryRollKind`. `tsc -b` (build) chytil drift v `DiaryRollKind` — bez něj by `rollGenericDice('d6+')` regexem `^(\d*)[dk](\d+)$` neparsoval `+` a tiše spadl na **d20**. Proto vlastní `rollExplodingD6()` + explicitní `d6+` větev v OBOU mostech (`rollFromSheet` i `rollFromDiary`).
+- **Namespace past odhalená ČTENÍM kódu před implementací:** schválil jsem `--mx-*` s fantasy fallbacky, ale Matrixovy `--mx-*` jsou laděné na **tmavý HUD** (světlý text) — combat panel drd16 je **světlý pergamen** → tytéž tokeny nečitelné. Stejný důvod, proč list jede self-contained (162b). → tělo panelu self-contained fantasy, `--mx-*` se nepoužilo nikde; sdílené tmavé plochy řeší scoped blok.
+- **F3 sdílené plochy zdarma:** wrapper (`TokenInfoPanel`), `DiceLogPanel`, `DiceRollOverlay` nesou `data-diary-system` z `preset.id` **systémově agnosticky** → drd16 fantasy = jen scoped `[data-diary-system='drd16']` CSS blok (vzorem matrix bloku), **0 TS změn**.
+- **DiceLog breakdown** rozepsán na `(7) + (6 + 6 + 3) = 22` jen pro číselné tváře; fate/d100 ponechán v `± součet` (rozpis kostek by tam mátl) = 0 regrese Matrixu.
+**Jak ověřeno:** `npm run build` (tsc -b ✓ — chytil oba dual-source drifty), vitest (rollEngine 19, DiceLogPanel +2, Drd16Sheet +2, **Drd16CombatPanel 9/9**), eslint 0. Chrome/log/overlay přes mapové `--map-ui-*` čekají živý test (v static HTML chybí).
+**Zhodnocení:** dobře — prototyp=kontrakt + build jako dual-source guard + čtení kódu odhalilo namespace past PŘED psaním CSS = 0 cyklení. Hlídat: u nového `RollKind` projít VŠECHNY 4 union zdroje (mapa i chat zrcadlo). Pozn.: 48 pre-existujících fail `DiaryTab.spec` (No QueryClient z `useDiarySkin→useWorldStatus`, zavedl commit `e4c056e6` matrix skiny) NESOUVISÍ s touto prací.
+
+---
+
+### ✅ ŘEŠENÍ — oprava 4 pre-existujících rozbitých test souborů (48 testů, 4 různé kořeny) · 2026-06-25
+**Co nakonec zabralo:** Každý soubor jiný kořen — společné téma = **komponenta přibrala React Query hook / embed PO napsání testu, mock zůstal zastaralý**:
+- `DiaryTab.spec` (8×): `useDiarySkin→useWorldStatus` (RQ) přidán v `e4c056e6`, test bez QueryClient → **mock `useDiarySkin`** (stub skin).
+- `nav-guard-matrix.spec` (31×): NE reálný bug. (a) R-20 elevation — globální Sa/Admin bypass dnes vyžaduje `world.elevated===true`; test `makeCtx` měl `world:null` → **`world:{elevated:true}`**. (b) friendly-messaging → `ForbiddenPage`=`ErrorState(403)` s textem „Sem nevidíš/nemáš oprávnění" (žádné literal „403") → **`outcomeOf` detekce přes nový text** (queryAllByText kvůli title+description).
+- `OverviewTab.spec` (3×): nově embeduje `AnalyticsSection` (15B.7 vlastní RQ hook) → **mock AnalyticsSection→null**.
+- `RegisterModal.spec` (6×): **ASYNC `vi.mock` factory** (`await vi.importActual` + `...actual`) se aplikuje POZDĚ → komponenta stihne naimportovat **reálné `api`** → reálný axios → `AxiosError: Network Error` (`api.post` mock se míjí, postCalls=0, banner „Nepodařilo se připojit"). Fix = **SYNC factory** `{api:{post,get}, parseApiErrorCode: inline}` (vzorem procházející LoginModal.spec).
+**Proč to je správně:** nav-guard kořeny jsou v PRODUKČNÍM kódu správně (elevation gate + friendly 403) → opravil jsem TEST (záměr), ne guard. RegisterModal sync mock = identický vzor jako zelený LoginModal.spec.
+**Jak ověřeno:** jednotlivě zeleně — DiaryTab 8/8 · nav-guard 65/65 · OverviewTab 3/3 · RegisterModal 14/14; + plný suite.
+**Zhodnocení:** dobře u 3 (rychlá atribuce + cílený mock). U RegisterModalu **2 chybné hypotézy** (availability hooky, captcha, password validace) než **empirická diagnostika** (log `btn.disabled` + `api.post` call count + skutečná caught chyba v catch) odhalila reálný axios. **Poučení: u „submit nefiruje" instrumentuj (disabled? volá se API? jaká chyba?) HNED, nehádej.** Async `vi.mock` factory s `importActual` = past (pozdní aplikace) — preferuj sync factory.
+
+---

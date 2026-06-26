@@ -1,6 +1,8 @@
 # Spec 16.2b-mapa — DrD 1.6 v taktické mapě (combat panel + d6+ engine + strukturovaný spellbook)
 
-**Status:** 🟡 NÁVRH — čeká schválení. Mechaniky potvrzené uživatelem (NErekonstruovat z paměti, CH-023). Po schválení → HTML prototyp panelu (kontrakt) → impl. plán → kód.
+**Status:** ✅ **HOTOVO 2026-06-25** — prototyp `c:/tmp/drd16-mapa-audit.html` v3 schválen → impl. plán schválen → kód. Ověřeno `npm run build` (tsc -b ✓) + vitest (rollEngine 19, DiceLogPanel, Drd16Sheet, **Drd16CombatPanel 9/9**) + eslint 0. Živý vizuál (chrome/log/overlay přes mapové `--map-ui-*`) potvrdí uživatel po deployi. **Zbývá pro drd16:** bestie + chat napojení + 8 skinů (16.2c-drd16). Mechaniky potvrzené uživatelem (NErekonstruovat z paměti, CH-023).
+
+> **Pozn. k F3 namespace (odchylka od plánu, zjištěno v kódu):** combat panel **tělo** je self-contained fantasy pergamen (NE `--mx-*`) — Matrixovy `--mx-*` skin tokeny jsou laděné na tmavý HUD a na světlém pergamenu nečitelné (stejný důvod jako u listu, 162b). `--mx-*` se nepoužilo nikde; sdílené tmavé plochy (wrapper/log/overlay) skinuje scoped `[data-diary-system='drd16']` blok s fantasy hodnotami. Vícero skinů = 16.2c-drd16.
 **Rozsah:** **FE only.** Combat panel + dvě okna (Schopnosti/Kouzla) + rozšíření dice enginu o `d6+` + strukturovaný spellbook (dotkne se i listu `Drd16Sheet`). **Bez BE** (vše přes volný `customData`; `d6+` je FE dice logika, payload zůstává generický).
 **Repo:** `Projekt-ikaros-FE`, commit na `main`. · **Autor:** PJ + Claude · **Datum:** 2026-06-24
 **Souvisí:** spec-16.2b-denik-drd16 (list) · roadmap2 16.2a drd16 „Taktická mapa" · `tactical-map/.../combatPanels.ts` · vzor `Drd2CombatPanel` · `rollFromSheet.ts` / `rollEngine`.

@@ -56,3 +56,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** Prezentuju „bug v pravidlech" odvozený z paměti; navrhuju opravit výpočet, který reálná tabulka potvrzuje jako správný.
 
 ---
+
+### CH-025 — atribuoval jsem 48 test-fail jako 1 kořen z uťatého background outputu · 2026-06-25
+**Kontext:** Po implementaci 16.2b-mapa drd16 plný vitest hlásil 48 fail / 4 soubory. Reportoval jsem uživateli „48 pre-existujících fail = No QueryClient (useDiarySkin→useWorldStatus)".
+**Co jsem udělal špatně:** Charakterizoval jsem celou množinu jediným kořenem podle **uťatého** background-task outputu (`tail` viděl jen `DiaryTab.spec`; vitest přepisuje řádky `\r`, buffer se ořízl). Extrapoloval jsem root z části dat.
+**Proč to nefungovalo:** Realita = 4 soubory, **3 různé kořeny**: `DiaryTab.spec` (8× No QueryClient — useDiarySkin přidán v `e4c056e6`) · `nav-guard-matrix.spec` (31× — friendly-messaging přepsal 403 text → `outcomeOf` regex `/403|odepřen|forbidden/` nesedí, + možná WMG fallback) · `OverviewTab.spec` (3×) · `RegisterModal.spec` (6×). Jen DiaryTab byl „No QueryClient".
+**Poučení:** Před charakterizací množiny selhání získej ÚPLNÝ seznam padlých souborů — běh přesměruj `2>&1 | tr '\r' '\n' > log` a `grep "^ FAIL "` na souhrn; netipuj root z `tail` background bufferu (ořezává + má `\r`).
+**Příznak cyklení:** tvrdím jeden společný kořen pro multi-file selhání z částečného/background outputu.
+
+---

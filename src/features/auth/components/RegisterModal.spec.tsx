@@ -17,18 +17,30 @@ import {
 import { api } from '@/shared/api/client';
 import { UserRole } from '@/shared/types';
 
-vi.mock('@/shared/api/client', async () => {
-  const actual = await vi.importActual<typeof import('@/shared/api/client')>(
-    '@/shared/api/client',
-  );
-  return {
-    ...actual,
-    api: { post: vi.fn(), get: vi.fn() },
-  };
-});
+// SYNC factory (ne async importActual) — async mock se aplikuje pozdě a
+// komponenta stihne naimportovat REÁLNÉ `api` → reálný axios → „Network Error"
+// (postCalls=0, mock se míjí). `parseApiErrorCode` poskytujeme inline (jediný
+// další import z client v grafu), ať nepotřebujeme `...actual`.
+vi.mock('@/shared/api/client', () => ({
+  api: { post: vi.fn(), get: vi.fn() },
+  parseApiErrorCode: (error: unknown): string | null => {
+    const data = (
+      error as { response?: { data?: { error?: { code?: string } } } }
+    )?.response?.data;
+    return data?.error?.code ?? null;
+  },
+}));
 
 vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
+}));
+
+// Availability check (debounced React Query) byl do RegisterModalu přidán
+// později — bez mocku debounce+query churn zpozdrží submit výsledek za waitFor
+// okno (+ prázdný stav indikátoru). Stub = vždy „available", deterministicky.
+vi.mock('@/features/auth/api/useAvailability', () => ({
+  useCheckUsername: () => ({ data: { available: true }, isFetching: false }),
+  useCheckEmail: () => ({ data: { available: true }, isFetching: false }),
 }));
 
 // D-011 Turnstile mock — v jsdom Cloudflare widget nenačte, `onSuccess` by se

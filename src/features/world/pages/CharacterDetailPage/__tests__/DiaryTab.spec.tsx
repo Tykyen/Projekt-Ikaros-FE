@@ -10,6 +10,11 @@ const mutate = vi.fn();
 vi.mock('@/features/world/context/WorldContext', () => ({
   useWorldContext: () => ({ worldId: 'w1' }),
 }));
+// 16.2c — DiaryTab volá useDiarySkin (→ useWorldStatus = React Query). Stub,
+// ať test nepotřebuje QueryClientProvider (jinak „No QueryClient").
+vi.mock('../diary-systems/skins/useDiarySkin', () => ({
+  useDiarySkin: () => ({ skin: 'fantasy', setSkin: vi.fn(), isPending: false }),
+}));
 vi.mock('../../api/useCharacterSubdocs', () => ({
   useCharacterDiary: () => ({
     data: mockDiary,

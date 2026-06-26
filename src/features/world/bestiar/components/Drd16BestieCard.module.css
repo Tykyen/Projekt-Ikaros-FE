@@ -1,0 +1,316 @@
+/* 16.2b-bestie Cesta B — DrD 1.6 bestie jako řádková „naturalistova deska".
+   Self-contained pergamenová paleta (drd16 „iluminovaný kodex"). Fonty @import
+   (bestiářová stránka neloaduje deníkové skiny). */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=UnifrakturCook:wght@700&display=swap');
+
+.card {
+  --parch-0: #f3e9cf;
+  --parch-1: #e9dcb9;
+  --parch-2: #ddca9f;
+  --parch-edge: #c4ad7e;
+  --ink: #3a2b19;
+  --ink-soft: #6c573a;
+  --gold: #c19a3f;
+  --gold-hi: #f3dd97;
+  --gold-deep: #6f5320;
+  --crimson-deep: #5c1612;
+  --steel-deep: #23344c;
+  --forge-1: #1d160e;
+  --f-display: 'Cinzel Decorative', 'Cinzel', serif;
+  --f-head: 'Cinzel', serif;
+  --f-body: 'EB Garamond', Georgia, serif;
+  --f-init: 'UnifrakturCook', serif;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: 84px 1fr auto;
+  gap: 14px;
+  align-items: stretch;
+  border-radius: 6px;
+  padding: 13px 15px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(255, 250, 235, 0.5), transparent 50%),
+    radial-gradient(120% 120% at 95% 100%, rgba(150, 120, 72, 0.26), transparent 60%),
+    linear-gradient(168deg, var(--parch-0), var(--parch-1) 55%, var(--parch-2));
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px var(--parch-edge),
+    0 0 0 4px var(--forge-1),
+    0 0 0 5px var(--gold-deep),
+    0 16px 36px -18px #000;
+}
+
+/* sigil sloupec */
+.sigil {
+  width: 84px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+.initial {
+  width: 72px;
+  height: 72px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  overflow: hidden;
+  background: radial-gradient(circle at 38% 30%, #2a2014, #140d07);
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-deep) inset;
+}
+.initial::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(193, 154, 63, 0.4);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.initial span {
+  font-family: var(--f-init);
+  font-size: 46px;
+  line-height: 1;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, var(--gold-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.initial img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.xp {
+  font-family: var(--f-head);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.xp b {
+  font-family: var(--f-display);
+  font-size: 13px;
+  color: #2a1a0a;
+}
+
+/* tělo */
+.body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.name {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  color: #241608;
+  background: linear-gradient(180deg, #3a2710, #1f1407);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 16px;
+  font-family: var(--f-head);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid var(--gold-deep);
+}
+.tag b {
+  font-family: var(--f-display);
+  font-size: 13px;
+  color: #2a1a0a;
+}
+
+/* combat řádek */
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+.vital {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 5px;
+  background: radial-gradient(120% 120% at 50% 0%, rgba(255, 252, 242, 0.55), rgba(221, 202, 159, 0.3));
+  border: 1px solid var(--gold-deep);
+}
+.vital .l {
+  font-family: var(--f-head);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.vital .n {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+}
+.hp {
+  border-color: var(--crimson-deep);
+}
+.hp .n {
+  color: var(--crimson-deep);
+}
+.def {
+  border-color: var(--steel-deep);
+}
+.def .n {
+  color: var(--steel-deep);
+}
+.atk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 9px;
+  border-radius: 14px;
+  font-family: var(--f-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: rgba(255, 252, 242, 0.4);
+  border: 1px solid rgba(196, 173, 126, 0.6);
+}
+.atk b {
+  font-family: var(--f-display);
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: #1f1607;
+  border-radius: 11px;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 60%, var(--gold-deep));
+}
+
+/* sekundární piluly */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 11.5px;
+  padding: 2px 8px;
+  border-radius: 11px;
+  background: rgba(111, 83, 32, 0.1);
+  border: 1px solid rgba(196, 173, 126, 0.5);
+}
+.pk {
+  font-family: var(--f-head);
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.pv {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #2a1a0a;
+}
+.pvWord {
+  font-family: var(--f-body);
+  font-weight: 600;
+}
+
+.notes {
+  font-family: var(--f-body);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* akce */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-self: start;
+}
+.btn {
+  font-family: var(--f-head);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  color: #3a2812;
+  background: rgba(255, 252, 242, 0.45);
+  border: 1px solid var(--gold-deep);
+}
+.btn:hover {
+  background: var(--gold-hi);
+}
+.prim {
+  color: #1f1607;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold));
+}
+.danger {
+  color: #5c1612;
+  border-color: rgba(156, 42, 35, 0.5);
+  background: rgba(156, 42, 35, 0.1);
+}
+.danger:hover {
+  background: rgba(156, 42, 35, 0.2);
+}
+
+@media (max-width: 640px) {
+  .card {
+    grid-template-columns: 60px 1fr;
+  }
+  .sigil {
+    width: 60px;
+  }
+  .initial {
+    width: 54px;
+    height: 54px;
+  }
+  .initial span {
+    font-size: 34px;
+  }
+  .actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

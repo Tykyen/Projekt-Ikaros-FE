@@ -56,7 +56,10 @@ function makeCtx(worldRole: WorldRole | null): WorldContextValue {
   return {
     worldId: 'w1',
     worldSlug: 'w1-slug',
-    world: null,
+    // R-20 elevation: globální Sa/Admin obejdou membership JEN když je svět
+    // „nahozený" (world.elevated). Tabulka `exp` testuje bypass path → svět
+    // musí být elevated, jinak by se Sa/Admin chovali jako nečlen.
+    world: { elevated: true } as WorldContextValue['world'],
     isPJ: worldRole != null && worldRole >= WorldRole.PomocnyPJ,
     userRole: worldRole,
     character: null,
@@ -157,7 +160,10 @@ function outcomeOf(make: GuardFn, id: Identity): Outcome | '?' {
   let out: Outcome | '?' = '?';
   if (screen.queryByText('PROTECTED_OK')) out = 'p';
   else if (screen.queryByText('INDEX_SENTINEL')) out = 'r';
-  else if (screen.queryByText(/403|odepřen|forbidden/i)) out = 'f';
+  // ForbiddenPage = friendly ErrorState(403) → text „Sem nevidíš / nemáš
+  // oprávnění" (žádné literal „403"); queryAllByText kvůli title+description.
+  else if (screen.queryAllByText(/Sem nevidíš|nemáš oprávnění/i).length > 0)
+    out = 'f';
   unmount();
   return out;
 }

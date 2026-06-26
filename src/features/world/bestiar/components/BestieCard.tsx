@@ -7,6 +7,7 @@ import { EntityStatbar } from '@/features/world/tactical-map/components/schema-f
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import type { Bestie } from '../types';
 import { getBestieAbilities } from '../lib/bestieAbilities';
+import { Drd16BestieCard } from './Drd16BestieCard';
 import styles from './BestieCard.module.css';
 
 interface Props {
@@ -34,6 +35,19 @@ export function BestieCard({
   onClone,
   onDelete,
 }: Props): React.ReactElement {
+  // 16.2b-bestie Cesta B — drd16 má custom „naturalistova deska" render.
+  if (bestie.systemId === 'drd16') {
+    return (
+      <Drd16BestieCard
+        bestie={bestie}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        onEdit={onEdit}
+        onClone={onClone}
+        onDelete={onDelete}
+      />
+    );
+  }
   const schema = systemEntitySchemaRegistry.get(bestie.systemId, 'bestie');
   const abilities = getBestieAbilities(bestie);
   return (
