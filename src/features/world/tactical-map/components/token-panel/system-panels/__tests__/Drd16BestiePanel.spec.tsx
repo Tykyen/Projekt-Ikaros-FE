@@ -144,7 +144,18 @@ describe('Drd16BestiePanel', () => {
     ).toBeInTheDocument();
   });
 
-  it('!canEdit → bez iniciativy, útoky nehratelné', () => {
+  it('canEdit → „✏ Upravit bestii" otevře editační modál (celý editor)', () => {
+    render(
+      <Drd16BestiePanel {...props} token={makeToken()} onMapRoll={vi.fn()} />,
+    );
+    expect(screen.queryByText(/^Upravit:/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('✏ Upravit bestii'));
+    expect(screen.getByText(/^Upravit: Brouk ostnatec/)).toBeInTheDocument();
+    // modál má pole „Jméno" (jen modál, ne panel)
+    expect(screen.getByLabelText('Jméno')).toBeInTheDocument();
+  });
+
+  it('!canEdit → bez Upravit, bez iniciativy, útoky nehratelné', () => {
     const onMapRoll = vi.fn();
     render(
       <Drd16BestiePanel
@@ -154,6 +165,7 @@ describe('Drd16BestiePanel', () => {
         onMapRoll={onMapRoll}
       />,
     );
+    expect(screen.queryByText('✏ Upravit bestii')).not.toBeInTheDocument();
     expect(screen.queryByTitle('Hodit iniciativu (d6+)')).not.toBeInTheDocument();
     fireEvent.click(screen.getByLabelText('Útok ostny'));
     expect(onMapRoll).not.toHaveBeenCalled();

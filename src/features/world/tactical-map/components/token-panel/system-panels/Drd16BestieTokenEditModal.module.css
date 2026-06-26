@@ -1,0 +1,45 @@
+/* 16.2b Fáze 2 — modál editace drd16 bestie tokenu (na mapě, per instance). */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary, rgb(var(--map-ui-light-rgb, 220 220 255) / 0.7));
+}
+.input,
+.textarea {
+  padding: 7px 9px;
+  background: rgb(var(--map-ui-panel-rgb, 20 14 50) / 0.6);
+  color: var(--text-primary, var(--map-ui-text, #fff));
+  border: 1px solid rgb(var(--map-ui-accent-rgb, 120 100 255) / 0.25);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.input:focus,
+.textarea:focus {
+  border-color: rgb(var(--map-ui-accent-rgb, 120 100 255) / 0.7);
+}
+.textarea {
+  min-height: 96px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}

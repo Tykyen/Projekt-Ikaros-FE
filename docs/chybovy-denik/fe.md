@@ -624,3 +624,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — read-only panel obešel token-schéma sanitizaci (drd16 token-schéma neexistuje); spawn HP key zobecněn přes combatBehavior = funguje pro všechny systémy. Hlídat: nový bestie systém musí mít na HP poli `combatBehavior:'damageable'`, jinak spawn HP = default.
 
 ---
+
+### ✅ ŘEŠENÍ — drd16 bestie EDITOVATELNÁ na mapě (per token) + `drd16:token` schéma · 2026-06-26
+**Co nakonec zabralo:** Tlačítko „✏ Upravit bestii" v `Drd16BestiePanel` → modál `Drd16BestieTokenEditModal` který **reuse bestiářový editor `Drd16BestieForm`** (všechna pole) bound na `token.systemStats` + jméno + popis. Save patchne TENTO token (nezávislá instance). Žádná duplikace editoru — jeden form pro katalog i token.
+**Klíčový nález (reusable):** editace `token.systemStats` → BE `validateForPatch` je **STRICT** a validuje proti `<system>:token` schématu. drd16 mělo jen `drd16:bestie`, ne `drd16:token` → generic:token fallback by drd16 klíče (hp/attacks/defense…) **odmítl (400)**. Fix = vytvořit `drd16/token.json` (= bestie pole, entityType token) + register + export do BE. Token-schéma sanitizace v save drží jen známé klíče.
+**Jak ověřeno:** build ✓; testy 31 (panel 8 vč. Upravit modálu, schema, spawn, form); eslint 0; BE push `drd16-token.json` (3215ca5). Past CH-014 (cwd posun po `cd` pro sed) — eslint selhal z špatného cwd, reset na FE root.
+**Zhodnocení:** dobře — reuse editoru = 0 duplikace; token-schéma = pattern z matrix/drd2 (oba mají bestie.json+token.json). Hlídat: editovatelný bestie token v novém systému potřebuje `<system>:token` schéma (ne jen bestie), jinak save 400.
+
+---

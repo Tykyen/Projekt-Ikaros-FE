@@ -262,7 +262,7 @@
   font-weight: 600;
 }
 
-/* popis (slovní) */
+/* popis (slovní) — read-only */
 .desc {
   margin-top: 4px;
   font-family: 'EB Garamond', Georgia, serif;
@@ -272,4 +272,25 @@
   white-space: pre-wrap;
   border-top: 1px dashed rgba(111, 83, 32, 0.3);
   padding-top: 8px;
+}
+
+/* ✏ Upravit bestii (PJ → modál editoru) */
+.editBtn {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #3a2812;
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.55), rgba(221, 202, 159, 0.32));
+  border: 1px dashed #6f5320;
+  border-radius: 4px;
+  padding: 7px;
+  margin-bottom: 8px;
+}
+.editBtn:hover {
+  border-style: solid;
+  background: rgba(221, 202, 159, 0.5);
 }

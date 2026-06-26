@@ -4,7 +4,11 @@
  */
 import type { SystemEntitySchema } from '../types';
 import { drd16BestieSchema } from './bestie';
+import { drd16TokenSchema } from './token';
 
-export { drd16BestieSchema };
+export { drd16BestieSchema, drd16TokenSchema };
 
-export const drd16Schemas: SystemEntitySchema[] = [drd16BestieSchema];
+export const drd16Schemas: SystemEntitySchema[] = [
+  drd16BestieSchema,
+  drd16TokenSchema,
+];

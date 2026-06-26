@@ -10,8 +10,10 @@
  * viz buildBestieToken schema-aware). Hody přes `performSheetRoll(kind:'d6+')`
  * → `onMapRoll` (3D overlay + dice log), `rollerKind: 'bestie'`.
  */
+import { useState } from 'react';
 import { performSheetRoll } from '../../../utils/rollFromSheet';
 import { useTokenUpdate } from '../../../hooks/useTokenUpdate';
+import { Drd16BestieTokenEditModal } from './Drd16BestieTokenEditModal';
 import type { MapToken, DiceRollCategory } from '../../../types';
 import type { MapRollRequest } from '../../../hooks/useMapDiceRoll';
 import styles from './Drd16BestiePanel.module.css';
@@ -70,6 +72,7 @@ export function Drd16BestiePanel({
   const currentHp = toNum(token.currentHp);
   const rollerName = token.instanceName ?? 'Bestie';
   const interactive = canEdit && !!onMapRoll;
+  const [editing, setEditing] = useState(false);
 
   const roll = (
     label: string,
@@ -115,6 +118,17 @@ export function Drd16BestiePanel({
           title="Hodit iniciativu (d6+)"
         >
           ⚡ Iniciativa
+        </button>
+      )}
+
+      {canEdit && (
+        <button
+          type="button"
+          className={styles.editBtn}
+          onClick={() => setEditing(true)}
+          title="Upravit tuto bestii (jméno, staty, popis)"
+        >
+          ✏ Upravit bestii
         </button>
       )}
 
@@ -225,6 +239,15 @@ export function Drd16BestiePanel({
           <h3 className={styles.title}>Popis</h3>
           <div className={styles.desc}>{token.notes}</div>
         </section>
+      )}
+
+      {editing && (
+        <Drd16BestieTokenEditModal
+          token={token}
+          sceneId={sceneId}
+          worldId={worldId}
+          onClose={() => setEditing(false)}
+        />
       )}
     </div>
   );
