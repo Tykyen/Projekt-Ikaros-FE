@@ -22,8 +22,8 @@ Hodnoty jsou **druhy** kostek (chip labely), ne fyzické počty. Počty z PDF
 | `matrix`          | Matrix                    | `Fate kostky` |
 | `dnd5e`           | D&D 5e                    | `d4, d6, d8, d10, d12, d20, d100 / procenta` |
 | `jad`             | Jeskyně a Draci           | `d4, d6, d8, d10, d12, d20, d100 / procenta` |
-| `drd16`           | Dračí Doupě 1.6           | `d6, d10, d100 / procenta` |
-| `drd-plus`        | Dračí Doupě Plus          | `d6, 2d6` |
+| `drd16`           | Dračí Doupě 1.6           | `d6, d6+, d10, d100 / procenta` |
+| `drd-plus`        | Dračí Doupě Plus          | `d6, 2d6+` |
 | `drd2`            | Dračí Doupě II            | `d6, 2d6, 3d6` |
 | `draci-hlidka`    | Dračí Hlídka              | `d6, d10` |
 | `pi`              | Příběhy Impéria           | `Fate kostky` |
@@ -37,6 +37,10 @@ Hodnoty jsou **druhy** kostek (chip labely), ne fyzické počty. Počty z PDF
 > `2d6/3d6/Pool d6` přidána i bázová `d6` — roller stejně všechno převádí na d6
 > ([worldDiceCatalog.ts](../../../src/features/world/chat/dice/lib/worldDiceCatalog.ts)),
 > ale formulář tím čitelně sděluje „základ je šestka".
+>
+> **`d6+` (DrD 1.6) a `2d6+` (DrD+)** jsou **eskalující kostky** s vlastní roll
+> primitivou (NE statický součet) — viz [spec-16.2-2d6plus](../phase-16/spec-16.2-2d6plus.md).
+> `drd16` proto k `d6` přidává `d6+`; `drd-plus` má `2d6+` místo statického `2d6`.
 
 ## Chování (smart-replace)
 

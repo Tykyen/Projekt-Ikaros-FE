@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import {
   rollFate,
   rollGenericDice,
-  rollExplodingD6,
   type RollKind,
 } from "@/features/world/chat/dice/lib/rollEngine";
 import {
@@ -60,20 +59,20 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
     const r = rollFate();
     total = r.sum + modifier;
     dicePayload = buildFatePayload(r, { label, modifier });
-  } else if (kind === "d6+") {
-    // DrD 1.6 nafukovací k6 (exploding) — kaskáda kostek v generic payloadu.
-    const r = rollExplodingD6();
-    total = r.sum + modifier;
-    dicePayload = buildGenericPayload(r, { label, modifier });
   } else if (
     kind === "d4" ||
     kind === "d6" ||
+    kind === "d6+" ||
+    kind === "2d6+" ||
     kind === "d8" ||
     kind === "d10" ||
     kind === "d12" ||
     kind === "d20" ||
     kind === "d100"
   ) {
+    // d6+ (nafukovací k6) / 2d6+ (otevřený 2k6, DrD+) = eskalující kostky;
+    // rollGenericDice je dispatchne na vlastní primitivu (centralizováno
+    // v rollEngine — payload zůstává generický, pole tváří proměnné délky).
     const r = rollGenericDice(kind);
     total = r.sum + modifier;
     dicePayload = buildGenericPayload(r, { label, modifier });

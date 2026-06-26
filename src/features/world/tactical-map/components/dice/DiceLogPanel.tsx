@@ -99,9 +99,28 @@ function totalClass(total: number): string {
  */
 function renderBreakdown(p: MapDiceRoll["dicePayload"]): string | null {
   const mod = p.modifier ?? 0;
-  if (!p.label && mod === 0) return null;
   const totalStr = p.total >= 0 ? `+${p.total}` : `${p.total}`;
   const prefix = p.label ? `${p.label} ` : "";
+
+  // 2d6+ (otevřený hod, DrD+): faces = [d1, d2, ...kaskáda], ale `sum` NENÍ
+  // součet tváří — eskalace mění výsledek o ±1 za pokračovací kostku. Generický
+  // `(a + b + c)` rozpis níže by tu lhal, proto vlastní „základ páru ± eskalace".
+  // Ukážeme i bez labelu/modu, pokud došlo k eskalaci (jinak kaskáda tváří mate).
+  if (p.type === "2d6+" && p.faces.every((f) => typeof f === "number")) {
+    const f = p.faces as number[];
+    const base = (f[0] ?? 0) + (f[1] ?? 0);
+    const delta = p.sum - base;
+    if (!p.label && mod === 0 && delta === 0) return null;
+    const modPart =
+      mod !== 0 ? `(${mod > 0 ? "+" : "−"}${Math.abs(mod)}) + ` : "";
+    const escPart =
+      delta !== 0
+        ? ` ${delta > 0 ? "▲" : "▼"} ${delta > 0 ? "+" : "−"}${Math.abs(delta)}`
+        : "";
+    return `${prefix}${modPart}(${f[0] ?? 0}+${f[1] ?? 0}${escPart}) = ${totalStr}`;
+  }
+
+  if (!p.label && mod === 0) return null;
 
   const numericFaces =
     p.type !== "fate" &&

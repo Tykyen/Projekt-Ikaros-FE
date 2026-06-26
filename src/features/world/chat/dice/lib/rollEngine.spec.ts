@@ -5,6 +5,7 @@ import {
   rollPool,
   rollMixedDice,
   rollExplodingD6,
+  rollExploding2d6,
   getOverpressureFromRollTotal,
   secureRandomInt,
 } from './rollEngine';
@@ -164,6 +165,56 @@ describe('rollExplodingD6', () => {
     const r = rollExplodingD6();
     expect(r.rolls).toHaveLength(50);
     expect(r.rolls.every((f) => f === 6)).toBe(true);
+  });
+});
+
+describe('rollExploding2d6', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  // Seedy = cílová tvář − 1 (secureRandomInt(6) = seed%6, face = +1):
+  // face 6→seed 5, 5→4, 4→3, 3→2, 2→1, 1→0.
+
+  it('příklad PJ A (nahoru): 2×6 → 4,6,1 = +14', () => {
+    mockSecureSeeds([5, 5, 3, 5, 0]); // 6,6, pak 4,6,1 (1 ukončí)
+    const r = rollExploding2d6();
+    expect(r.rolls).toEqual([6, 6, 4, 6, 1]);
+    expect(r.sum).toBe(14); // 12 + 1 (za 4) + 1 (za 6); 1 jen zastaví
+    expect(r.type).toBe('2d6+');
+    expect(r.symbols).toBe('[6, 6, 4, 6, 1]');
+  });
+
+  it('příklad PJ B (dolů): 2×1 → 1,3,1,2,3,5 = −3 (záporný výsledek)', () => {
+    mockSecureSeeds([0, 0, 0, 2, 0, 1, 2, 4]); // 1,1, pak 1,3,1,2,3,5 (5 ukončí)
+    const r = rollExploding2d6();
+    expect(r.rolls).toEqual([1, 1, 1, 3, 1, 2, 3, 5]);
+    expect(r.sum).toBe(-3); // 2 − 5× (−1); 5 jen zastaví
+  });
+
+  it('jiný úvodní hod než dvojice = prostý součet bez eskalace', () => {
+    mockSecureSeeds([2, 4]); // 3 + 5
+    const r = rollExploding2d6();
+    expect(r.rolls).toEqual([3, 5]);
+    expect(r.sum).toBe(8);
+  });
+
+  it('2×6 + okamžitý low (2) = stop bez bonusu (12)', () => {
+    mockSecureSeeds([5, 5, 1]); // 6,6, pak 2 (low → stop hned)
+    const r = rollExploding2d6();
+    expect(r.rolls).toEqual([6, 6, 2]);
+    expect(r.sum).toBe(12);
+  });
+
+  it('2×1 + okamžitý high (5) = stop bez postihu (2)', () => {
+    mockSecureSeeds([0, 0, 4]); // 1,1, pak 5 (high → stop hned)
+    const r = rollExploding2d6();
+    expect(r.rolls).toEqual([1, 1, 5]);
+    expect(r.sum).toBe(2);
+  });
+
+  it('tvrdý strop 50 hodů (2×6 + samé 6 neskončí donekonečna)', () => {
+    mockSecureSeeds(Array(60).fill(5)); // 6,6 a pak pořád 6 (eskaluje)
+    const r = rollExploding2d6();
+    expect(r.rolls).toHaveLength(50);
   });
 });
 

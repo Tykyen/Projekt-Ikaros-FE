@@ -50,12 +50,19 @@ export const DEFAULT_DICE_KEYS = ['fate', 'd6', 'd20'] as const;
  * — nejsou samostatné chips v pickeru (uživatel klik na d6 a Pool…
  * tlačítko v popoveru). Mapují se na bázovou kostku, ale picker je tak
  * vyfiltruje až přes Pool/Mixed flow.
+ *
+ * `'d6+'` (nafukovací k6) a `'2d6+'` (otevřený 2k6, DrD+) JSOU naopak
+ * samostatné chips — vlastní katalogová položka + vlastní roll primitiva
+ * (`rollExplodingD6` / `rollExploding2d6`). Liší se tím od `'2d6'`/`'3d6'`,
+ * které jsou jen statický součet a mapují se na bázovou `d6`.
  */
 const KEY_ALIASES: Record<string, string> = {
   // Kanonické (no-op)
   fate: 'fate',
   d4: 'd4',
   d6: 'd6',
+  'd6+': 'd6+',
+  '2d6+': '2d6+',
   d8: 'd8',
   d10: 'd10',
   d12: 'd12',
@@ -64,6 +71,9 @@ const KEY_ALIASES: Record<string, string> = {
   // Admin form labely (2.3 BasicInfoTab DICE constant)
   'Fate kostky': 'fate',
   'd100 / procenta': 'd100',
+  // Tolerance pro alternativní zápisy eskalujících kostek
+  'k6+': 'd6+',
+  '2k6+': '2d6+',
   // Pool/mixed/multi-die kompozice → bázová kostka (pool/mixed flow
   // už picker zařídí přes Pool…/Mixed… linky v popoveru)
   '2d6': 'd6',
