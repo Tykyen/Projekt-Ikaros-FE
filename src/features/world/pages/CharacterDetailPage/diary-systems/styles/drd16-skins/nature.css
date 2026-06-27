@@ -51,6 +51,9 @@
 
   /* ── bobule (ŽIVOTY = červená) ── */
   --dd-crimson: #a83c2e; /* berry */
+  /* erb — mechové pole, jantarový kov (auto z --dd-gold) */
+  --dd-erb-field-1: #5e7a32;
+  --dd-erb-field-2: #38531e;
   --dd-crimson-hi: #c95a45; /* berry-hi */
   --dd-crimson-deep: #5f1d14; /* berry-deep */
 

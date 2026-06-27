@@ -56,6 +56,9 @@
 
   /* ── životy: crimson → jade (sémantika stavu, life) ── */
   --dd-crimson: #1fa874;
+  /* erb — tmavé HUD pole, cyan kov (auto z --dd-gold) */
+  --dd-erb-field-1: #15335a;
+  --dd-erb-field-2: #081428;
   --dd-crimson-hi: #3df0a8;
   --dd-crimson-deep: #0c5a3c;
 

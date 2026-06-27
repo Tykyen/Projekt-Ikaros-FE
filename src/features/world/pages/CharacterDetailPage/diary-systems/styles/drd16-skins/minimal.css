@@ -66,6 +66,9 @@
   --dd-gold-deep: var(--mn-acc-deep);
   --dd-crimson: var(--mn-danger);
   --dd-crimson-hi: var(--mn-danger);
+  /* erb — světlé archivní pole, akcentní obrys (auto z --dd-gold) */
+  --dd-erb-field-1: #faf8f3;
+  --dd-erb-field-2: #e7e1d3;
   --dd-crimson-deep: var(--mn-danger);
   --dd-sapphire: var(--mn-acc);
   --dd-sapphire-hi: var(--mn-acc);

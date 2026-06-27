@@ -148,6 +148,13 @@
   height: auto;
   filter: drop-shadow(0 6px 10px rgba(40, 20, 5, 0.45));
 }
+/* 16.2c-fix — erb (heraldický štít) sleduje skin: stop-color SVG gradientů
+   tokenizován (CSS stop-color přebíjí gradient v markupu). Default = skin
+   --dd-crimson (POLE) + --dd-gold (KOV); skin může cílit přebít --dd-erb-*. */
+[data-diary-system='drd16'] .drd16-erb #drd16-shield stop:first-child { stop-color: var(--dd-erb-field-1, var(--dd-crimson, #9c2a23)); }
+[data-diary-system='drd16'] .drd16-erb #drd16-shield stop:last-child  { stop-color: var(--dd-erb-field-2, var(--dd-crimson-deep, #5c1612)); }
+[data-diary-system='drd16'] .drd16-erb #drd16-gold   stop:first-child { stop-color: var(--dd-erb-metal-1, var(--dd-gold-hi, #f3dd97)); }
+[data-diary-system='drd16'] .drd16-erb #drd16-gold   stop:last-child  { stop-color: var(--dd-erb-metal-2, var(--dd-gold-deep, #8a6a26)); }
 [data-diary-system='drd16'] .drd16-erb-banner {
   position: absolute;
   left: 50%;
