@@ -75,7 +75,8 @@
 **Kdy:** mimo 14.9. Zdroj: kap. 15.
 
 ### D-NEW-INV-CLEANUP — Inventura: úklid kódu (drift & mrtvé)
-**Soubory:** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní), `AuditLogTab.tsx` vs `admin-audit-log.interface.ts` (label drift).
+> **audit-log labely SJEDNOCENY 2026-06-27:** FE `AdminAuditAction` (shared/types) srovnáno s BE `admin-audit-log.interface.ts` — doplněno 16 chybějících akcí (DELETE/HARD_DELETE/BULK_*/WORLD_ELEVATION_*/ACCOUNT_*/USER_CREATE/PERMISSIONS_CHANGE/UNDELETE…) + labely + badge třídy (exhaustivní `Record` → TS hlídá úplnost). Dřív se prázdné. `FRIENDSHIP_COOLDOWN_RESET` zůstává FE-only phantom (BE ho nikde neemituje — drobnost: až BE začne logovat reset cooldownu, label je připraven; jinak FE drop). FE tsc ✓, PlatformAdminPage 6/6 ✓. **Zbytek úklidu níže neřešen.**
+**Soubory (zbývá):** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní).
 **Problém:** BE `UserRole` stále drží legacy world role (3–8), FE už vyhodil (drift po D-053); `canEditPlatformPages` se ukládá, ale nikde nevynucuje; admin bypass přes username `=== 'Tyky'`; `getUsers` filtruje až po vytažení stránky (nekonzistentní paginace); MeiliSearch bez Dockeru vrací prázdno bez chyby; favorites toggle zkopírovaný v 3 modulech; audit-log labely se rozcházejí FE↔BE.
 **Dopad:** Nízký — maintainability + 1 provozní past (Meili).
 **Řešení:** vyčistit BE enum; odstranit mrtvý flag; bypass přes roli/flag; paginace v DB dotazu; surface Meili health/chybu; centralizovat favorites; sjednotit audit-log labely.

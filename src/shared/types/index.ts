@@ -192,14 +192,36 @@ export interface AdminUsersListItem {
 
 // D-024 — Admin audit log
 // D-056 — rozšířeno o FRIENDSHIP_COOLDOWN_RESET (admin override per-pair cooldownu)
+// D-NEW-INV-CLEANUP (2026-06-27): srovnáno s BE `admin-audit-log.interface.ts`
+// (zdroj pravdy) — dřív FE znalo jen 10 akcí, takže DELETE/HARD_DELETE/BULK_*/
+// WORLD_ELEVATION_*/ACCOUNT_* z BE se v audit logu zobrazovaly prázdné.
+// Pozn.: `FRIENDSHIP_COOLDOWN_RESET` je FE-only (BE ho zatím nikde neemituje) —
+// ponecháno; až BE začne logovat reset cooldownu, bude mít label připravený.
 export type AdminAuditAction =
   | 'BAN'
   | 'UNBAN'
   | 'ROLE_CHANGE'
+  | 'PERMISSIONS_CHANGE'
   | 'ADMIN_PERMISSIONS_CHANGE'
+  | 'USER_CREATE'
   | 'USERNAME_REQUEST_APPROVED'
   | 'USERNAME_REQUEST_REJECTED'
   | 'FRIENDSHIP_COOLDOWN_RESET'
+  | 'DELETE'
+  | 'UNDELETE'
+  | 'DELETION_REACTIVATED'
+  | 'HARD_DELETE'
+  | 'ACCOUNT_SELF_DELETE_REQUEST'
+  | 'ACCOUNT_DELETE_REQUEST'
+  | 'ACCOUNT_DELETE_CANCEL'
+  | 'ACCOUNT_SELF_REACTIVATE'
+  | 'ACCOUNT_HARD_DELETE'
+  | 'BULK_BAN'
+  | 'BULK_UNBAN'
+  | 'BULK_ROLE_CHANGE'
+  // Elevation — admin „nahodil"/„složil" pravomoci ve světě.
+  | 'WORLD_ELEVATION_ACTIVATED'
+  | 'WORLD_ELEVATION_REVOKED'
   // D-067 — audit nad novinkami Ikaros.
   | 'IKAROS_NEWS_ARCHIVE'
   | 'IKAROS_NEWS_UNARCHIVE'

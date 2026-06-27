@@ -806,3 +806,17 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — **funkce inventura jako cross-check chytila 2 vlastní chyby před commitem** (duplikát + dual-source half). Poučení: před psaním BE helperu grep existující; min-length/validace/whitelist = vždy dual-source FE+BE, měň oba. Past: dluh může být zastaralý → ověř proti kódu, ne slepě „oprav".
 
 ---
+
+### ✅ ŘEŠENÍ — INV-CLEANUP audit-log enum drift (FE 10 vs BE 25) · 2026-06-27
+
+**Kontext:** Dluh tvrdil „audit-log labely se rozcházejí". Realita byla horší — FE `AdminAuditAction` znalo **10** akcí, BE `admin-audit-log.interface.ts` emituje **25** → admin audit log u 16 akcí (DELETE/HARD_DELETE/BULK_*/WORLD_ELEVATION_*/ACCOUNT_*/USER_CREATE/PERMISSIONS_CHANGE…) zobrazoval **prázdné**.
+
+**Co zabralo:** FE union srovnáno s BE (zdroj pravdy) + exhaustivní `ACTION_LABELS`/`ACTION_CLASS` (`Record<AdminAuditAction,_>` → TS **vynutí úplnost**, nelze přidat akci bez labelu). `FRIENDSHIP_COOLDOWN_RESET` ponecháno jako **FE-only phantom** (grep BE = 0 výskytů → BE ho nikde neemituje; aditivní = bez removal-rizika, flagnuto k rozhodnutí drop/BE-log).
+
+**Proč additivní (ne replace):** FE jako superset BE = okamžitě zobrazí vše, co BE pošle, BEZ rizika, že odeberu něco, co BE přece jen emituje jinou cestou. Drift kořen = FE ručně zrcadlí BE enum (dvě nezávislé string-union kopie přes repo hranici → **rozejdou se tiše**, žádná compile chyba).
+
+**Jak ověřeno:** FE tsc -b ✓ (exhaustivní Record by chybějící label nepustil), PlatformAdminPage 6/6 ✓.
+
+**Zhodnocení:** dobře — **exhaustivní `Record<Enum,_>` je ten správný guard** proti tiché ztrátě labelu při příštím přidání akce. Past pro budoucí: kdykoli BE přidá `AdminAuditAction`, FE union + oba Record se MUSÍ doplnit (cross-repo, build to nechytí dokud někdo nerozšíří FE union). Ideál = sdílený typ, ale přes 2 repa nejde.
+
+---
