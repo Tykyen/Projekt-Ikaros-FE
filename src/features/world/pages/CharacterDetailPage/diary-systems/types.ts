@@ -63,8 +63,12 @@ export interface SystemSheetProps {
    * provrahuje tento callback. Klik na dovednost / iniciativu volá
    * `onRoll({ label, modifier, kind })`. Sheet bez tohoto propu (např.
    * CharacterDetailPage) klikatelnost nepouští.
+   *
+   * `initiative: true` → hod se navíc zapíše do `token.initiative` (iniciativní
+   * lišta). Bez flagu se iniciativa detekuje z labelu „Iniciativa" (BC kompat) —
+   * DrD+ má init pod jiným labelem (Boj / zbraňové BČ), proto explicitní flag.
    */
-  onRoll?: (req: { label: string; modifier?: number; kind?: 'fate' | 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100' }) => void;
+  onRoll?: (req: { label: string; modifier?: number; kind?: 'fate' | 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100'; initiative?: boolean }) => void;
 }
 
 /**

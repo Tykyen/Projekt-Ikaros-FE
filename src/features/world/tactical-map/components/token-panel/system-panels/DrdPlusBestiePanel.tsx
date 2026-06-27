@@ -96,8 +96,6 @@ export function DrdPlusBestiePanel({
   const mez = Math.max(1, toNum(ss.mez_zraneni, 1));
   const postih = toNum(ss.postih);
   const injury = toNum(token.injury);
-  const imageUrl = token.characterData?.imageUrl;
-  const glyph = (token.instanceName ?? 'B').trim().charAt(0).toUpperCase();
 
   // ── sanitizace systemStats na klíče `drdplus:token` (BE validateForPatch STRICT) ──
   const sanitize = (stats: Record<string, unknown>): Record<string, unknown> => {
@@ -276,48 +274,19 @@ export function DrdPlusBestiePanel({
         <div className={styles.modeTag}>✏ Režim úprav — měníš hodnoty této potvory</div>
       )}
 
-      {/* hlavička: erb (obrázek bestie) + jméno */}
-      <div className={styles.head}>
-        <svg className={styles.erb} viewBox="0 0 96 112" aria-hidden="true">
-          <defs>
-            <clipPath id={`shield-${token.id}`}>
-              <path d="M6 6 H90 V64 Q90 96 48 108 Q6 96 6 64 Z" />
-            </clipPath>
-          </defs>
-          {imageUrl ? (
-            <image
-              href={imageUrl}
-              x="6"
-              y="6"
-              width="84"
-              height="102"
-              clipPath={`url(#shield-${token.id})`}
-              preserveAspectRatio="xMidYMid slice"
-            />
-          ) : (
-            <text className={styles.glyph} x="48" y="74">
-              {glyph}
-            </text>
-          )}
-          <path
-            className={styles.crest}
-            d="M6 6 H90 V64 Q90 96 48 108 Q6 96 6 64 Z"
+      {/* Jméno bestie — editovatelné jen v edit módu. Ve view módu erb + jméno +
+          „Bestie" vynechány: jméno už nese obal tokenu (TokenInfoPanel chrome). */}
+      {editing && (
+        <div className={styles.head}>
+          <input
+            className={styles.nameEdit}
+            value={dName}
+            onChange={(e) => setDName(e.target.value)}
+            aria-label="Jméno bestie"
+            placeholder="Jméno bestie"
           />
-        </svg>
-        <div className={styles.titles}>
-          {editing ? (
-            <input
-              className={styles.nameEdit}
-              value={dName}
-              onChange={(e) => setDName(e.target.value)}
-              aria-label="Jméno bestie"
-            />
-          ) : (
-            <div className={styles.name}>{token.instanceName ?? 'Bestie'}</div>
-          )}
-          <div className={styles.sub}>Bestie</div>
         </div>
-      </div>
+      )}
 
       {canEdit && (
         <button

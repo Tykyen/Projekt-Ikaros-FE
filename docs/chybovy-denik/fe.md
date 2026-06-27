@@ -918,3 +918,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** uživatel hlásí "X (dice log / chrome / orchestrace) nevypadá jako deník" po dokončení deníku systému; ladím jen `.dp-sheet`/panel, ne embed moduly.
 
 ---
+
+### ✅ ŘEŠENÍ — DrD+ PC/NPC+bestie panel: iniciativa přes explicitní flag (ne label), redundantní hlavička pryč · 2026-06-27
+**Co nakonec zabralo:** (1) **Iniciativa = explicitní flag** `initiative?: boolean` na `onRoll` requestu ([types.ts](../../src/features/world/pages/CharacterDetailPage/diary-systems/types.ts)); `TokenSystemSheet` detekuje `const isInit = req.initiative ?? /iniciativ/i.test(req.label)` — flag pro DrD+ (init je pod labelem „Boj" / zbraňové „BČ"), label fallback drží BC pro drd16/matrix. Flag se do hodu přidává **jen když true** (`...(initiative && { initiative: true })`) → neinit hody volají `onRoll` ve stejném tvaru = nulová test churn. (2) init tlačítko „Iniciativa"→„**Boj**" (hází `2k6+ + boj_b`, číselně = kolonka Boj v deníku); Boj i zbraňové BČ teď zapisují `token.initiative`. (3) **redundantní hlavička panelu pryč** (erb+jméno+profese u combat, erb+jméno+„Bestie" u bestie) — duplikovala `TokenInfoPanel` chrome (jméno+portrét nad panelem); u bestie zachováno přejmenování jen v edit módu.
+**Proč to je správně (a ne další variace):** explicitní flag > křehké matchování labelu — přejmenování „Iniciativa"→„Boj" by string-detekci tiše rozbilo (init by se přestala zapisovat). Conditional-spread (flag jen když true) zabránil rozbití všech `toHaveBeenCalledWith` asercí neinit hodů. Vzor reusable pro každý systém, jehož init není labelovaný „Iniciativa".
+**Jak ověřeno:** 20 testů (DrdPlusCombatPanel+BestiePanel) ✓, `npm run build` ✓.
+**Zhodnocení:** dobře — čisté, zpětně kompatibilní, reusable. Zbytek: mrtvé CSS hlaviček (`.erb`/`.crest`/…) ponecháno (neškodí, uživatel ještě iteruje vizuál).
+
+---

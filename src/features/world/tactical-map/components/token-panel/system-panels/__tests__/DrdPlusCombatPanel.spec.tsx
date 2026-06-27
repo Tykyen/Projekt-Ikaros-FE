@@ -138,6 +138,7 @@ describe('DrdPlusCombatPanel', () => {
       label: 'Meč — BČ',
       modifier: 5,
       kind: '2d6+',
+      initiative: true, // BČ určuje iniciativu
     });
 
     fireEvent.click(screen.getByLabelText('Hodit Meč — ZZ'));
@@ -191,15 +192,18 @@ describe('DrdPlusCombatPanel', () => {
     });
   });
 
-  it('iniciativa → onRoll 2d6+ (s postihem)', () => {
-    mockDiary.mockReturnValue(diaryWith({ drdp_unava_postih: '-1' }));
+  it('Boj → onRoll 2d6+ + Boj (s postihem), nese iniciativu', () => {
+    mockDiary.mockReturnValue(
+      diaryWith({ drdp_boj_b: '4', drdp_unava_postih: '-1' }),
+    );
     const onRoll = vi.fn();
     renderPanel(onRoll);
-    fireEvent.click(screen.getByTitle('Hodit iniciativu (2k6+)'));
+    fireEvent.click(screen.getByRole('button', { name: '⚡ Boj' }));
     expect(onRoll).toHaveBeenCalledWith({
-      label: 'Iniciativa',
-      modifier: -1,
+      label: 'Boj',
+      modifier: 3, // 4 (Boj) + (-1) postih
       kind: '2d6+',
+      initiative: true,
     });
   });
 

@@ -173,8 +173,11 @@ export function DrdPlusCombatPanel({
     label: string,
     baseMod: number,
     kind: '2d6+' | 'd6',
+    initiative = false,
   ): void => {
-    onRoll?.({ label, modifier: baseMod + postih, kind });
+    // `initiative` přidáváme jen když true → neinit hody volají onRoll beze změny
+    // tvaru (konzument: `req.initiative ?? labelRegex`).
+    onRoll?.({ label, modifier: baseMod + postih, kind, ...(initiative && { initiative: true }) });
   };
 
   const has = (arrKey: string): boolean =>
@@ -205,6 +208,7 @@ export function DrdPlusCombatPanel({
     kind: '2d6+' | 'd6',
     label: string,
     zz = false,
+    initiative = false,
   ): ReactNode => {
     const n = toInt(val);
     return (
@@ -212,7 +216,7 @@ export function DrdPlusCombatPanel({
         type="button"
         className={`${styles.chip}${zz ? ' ' + styles.zz : ''}`}
         disabled={!onRoll}
-        onClick={() => doRoll(label, n, kind)}
+        onClick={() => doRoll(label, n, kind, initiative)}
         aria-label={`Hodit ${label}`}
       >
         {lbl}
@@ -551,33 +555,16 @@ export function DrdPlusCombatPanel({
 
   return (
     <div className={styles.root} data-prof={prof}>
-      <div className={styles.head}>
-        <svg className={styles.erb} viewBox="0 0 96 112" aria-hidden="true">
-          <path
-            className={styles.crest}
-            d="M6 6 H90 V64 Q90 96 48 108 Q6 96 6 64 Z"
-          />
-          <text className={styles.glyph} x="48" y="70">
-            {profDef.glyph}
-          </text>
-        </svg>
-        <div>
-          <div className={styles.name}>{g('name') || 'Bez jména'}</div>
-          <div className={styles.sub}>
-            {profDef.label}
-            {g('uroven') ? ` · ${g('uroven')}. úroveň` : ''}
-          </div>
-        </div>
-      </div>
-
+      {/* Hlavička (erb + jméno + profese) vynechána: jméno postavy nese obal
+          tokenu (TokenInfoPanel chrome), profese je v sekci „Profese" níž. */}
       {onRoll && (
         <button
           type="button"
           className={styles.initBtn}
-          onClick={() => doRoll('Iniciativa', 0, '2d6+')}
-          title="Hodit iniciativu (2k6+)"
+          onClick={() => doRoll('Boj', numOr('boj_b'), '2d6+', true)}
+          title="Boj — určuje iniciativu (2k6+ + Boj)"
         >
-          ⚡ Iniciativa
+          ⚡ Boj
         </button>
       )}
 
@@ -585,7 +572,7 @@ export function DrdPlusCombatPanel({
       {weapons.length > 0 && (
         <section className={styles.sec}>
           <h3 className={styles.stitle}>
-            Kombinace zbraní <small>BČ/ÚČ/OČ = 2k6+ · ZZ = 1k6+</small>
+            Kombinace zbraní <small>BČ/ÚČ/OČ = 2k6+ · ZZ = 1k6+ · BČ určí i iniciativu ⚡</small>
           </h3>
           {weapons.map((w, i) => (
             <div className={styles.weap} key={i}>
@@ -593,7 +580,7 @@ export function DrdPlusCombatPanel({
                 {String(w.zbran || '(bez názvu)')}
               </div>
               <div className={styles.chips}>
-                {chip('BČ', w.bc, '2d6+', `${w.zbran || 'Zbraň'} — BČ`)}
+                {chip('BČ', w.bc, '2d6+', `${w.zbran || 'Zbraň'} — BČ`, false, true)}
                 {chip('ÚČ', w.uc, '2d6+', `${w.zbran || 'Zbraň'} — ÚČ`)}
                 {chip('ZZ', w.zz, 'd6', `${w.zbran || 'Zbraň'} — ZZ`, true)}
                 {chip('OČ', w.oc, '2d6+', `${w.zbran || 'Zbraň'} — OČ`)}

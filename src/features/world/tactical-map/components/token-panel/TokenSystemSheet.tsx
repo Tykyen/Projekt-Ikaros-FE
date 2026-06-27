@@ -152,7 +152,8 @@ export function TokenSystemSheet({
       rollerName,
     });
     if (!res) return;
-    const isInit = /iniciativ/i.test(req.label);
+    // Iniciativa: explicitní flag (DrD+ Boj/BČ) NEBO label „Iniciativa" (BC).
+    const isInit = req.initiative ?? /iniciativ/i.test(req.label);
     // 10.2j Task H — hod nasměruj do map dice systému (3D overlay + map log).
     onMapRoll?.({
       category: isInit ? "initiative" : "skill",
