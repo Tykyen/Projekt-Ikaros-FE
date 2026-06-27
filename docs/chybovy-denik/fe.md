@@ -820,3 +820,21 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — **exhaustivní `Record<Enum,_>` je ten správný guard** proti tiché ztrátě labelu při příštím přidání akce. Past pro budoucí: kdykoli BE přidá `AdminAuditAction`, FE union + oba Record se MUSÍ doplnit (cross-repo, build to nechytí dokud někdo nerozšíří FE union). Ideál = sdílený typ, ale přes 2 repa nejde.
 
 ---
+
+### ✅ ŘEŠENÍ — system-id drift POTŘETÍ: COMBAT_PANELS + chat panel minuly 16.2a alias fix · 2026-06-27
+
+**Symptom (uživatel):** „deník u DrD+ máme i v taktické mapě, ale nepropisuje se." Reálně: na stránce postavy se zobrazil hezký `DrdPlusSheet`, ale na mapě (a v chatu) se místo kompaktního `DrdPlusCombatPanel` vyrenderoval **legacy `DiaryTab`** → vypadalo to jako jiný/nepropojený deník.
+
+**Kořen:** `world.system` z nabídky se ukládá jako „dlouhé" id `'drd-plus'` (a `'call-of-cthulhu'`), engine zná krátké `'drdplus'`/`'coc'`. Normalizaci (lowercase + alias) měl **jen** diary registry (`getDiaryPreset`) a map registry (`getMapSystemPlugin`) — každý **vlastní kopii** `SYSTEM_ALIASES`. `COMBAT_PANELS` lookup ([TokenSystemSheet] na mapě + [DiaryRollPanel] v chatu) četl **syrové `world.system`** → `COMBAT_PANELS['drd-plus'] = undefined` → fallback. Postižené = `drd-plus` **a `call-of-cthulhu`** (oba mají panel + dlouhé id). `drd16`/`drd2`/`matrix` fungovaly jen náhodou (krátké id == klíč).
+
+**Proč 16.2a fix tohle minul:** ✅ ŘEŠENÍ „16.2a fix system-id driftu" (2026-06-23) opravil drift přidáním aliasů, ale **jen do 2 ze 4 konzumentů** `world.system` (diary + map registry). COMBAT_PANELS a chat panel zůstaly. Klasická past CH-011 / role-elevation: **fix-by-alias bez grep sweepu VŠECH konzumentů** = oprava půlky.
+
+**Co zabralo:** extrahoval jsem normalizaci do **jediné zdrojové pravdy** `src/features/world/systemId.ts` (`resolveSystemId` + `SYSTEM_ALIASES`); přepojil **4 konzumenty** (diary registry, map registry, `TokenSystemSheet`, chat `DiaryRollPanel`) — žádná lokální kopie aliasů už neexistuje (umořen dluh D-NEW-SYS-ALIAS-DUP). Bonus: bestie větve v `TokenSystemSheet` (`=== "matrix"`/`"drd16"`) taky přes normalizované id (robustnost). Přidán **regresní guard** `combatPanels.test.ts` — paritní test, který COMBAT_PANELS dosud (na rozdíl od obou registry) neměl, takže drift prošel.
+
+**Vědomě NEopraveno:** `worldSystemId` v `TacticalMapView` (`?? "drd2"`) teče do bestiář query klíčů + BE schema lookupu → normalizace naslepo by mohla rozbít FE↔BE kontrakt (BE může držet bestie pod raw `'drd-plus'`). Zaznamenáno jako samostatné riziko v dluzích.
+
+**Jak ověřeno:** vitest 60/60 (oba registry + nový combatPanels + DrdPlusCombatPanel), `npm run build` (tsc -b + vite) ✓.
+
+**Zhodnocení:** dobře — root-cause fix (1 pravda místo 3 kopií) + guard, ne lokální záplata. Poučení (rodina CH-011): **při fixu „přidej alias / přemapuj id" zgrepuj VŠECHNY konzumenty toho id PŘED tím, než prohlásíš hotovo** — drift se schová v tom, který jsi minul, a vrátí se o systém později (`drd-plus` místo `draci-hlidka`). A: nový registry-lookup vždy se stejným paritním guardem jako sourozenci.
+
+---

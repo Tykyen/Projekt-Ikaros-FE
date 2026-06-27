@@ -9,10 +9,13 @@
  * INICIATIVA quick-button. Skryté roleplay sekce (Overview, Inventory, Notes —
  * ty zůstávají v plné `CharacterDetailPage`).
  *
- * Routing:
- *   - bestie token → `BestiePanelView` (schema-driven statblok)
- *   - matrix / dnd5e / coc / drd2 / fate / gurps → per-system `*CombatPanel`
- *   - jiné (jad, drdh, drdplus, pi, sr) → fallback na `DiaryTab` (legacy)
+ * Routing (klíč = `resolveSystemId(world.system)`, ne syrové id — nabídka
+ * ukládá „dlouhá" id jako `drd-plus`/`call-of-cthulhu`):
+ *   - bestie token → `BestiePanelView` (schema-driven statblok); matrix/drd16
+ *     mají vlastní HUD bestie panel
+ *   - matrix / dnd5e / coc / drd2 / drd16 / drdplus / fate / gurps →
+ *     per-system `*CombatPanel`
+ *   - jiné (jad, drdh, pi, sr, generic) → fallback na `DiaryTab` (legacy)
  *
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9g.md §B; rozšíření 9h.
  */
@@ -20,6 +23,7 @@ import { useEffect, useRef } from "react";
 import { DiaryTab } from "@/features/world/pages/CharacterDetailPage/components/DiaryTab";
 import { useCharacterDiary } from "@/features/world/pages/api/useCharacterSubdocs";
 import { useWorldContext } from "@/features/world/context/WorldContext";
+import { resolveSystemId } from "@/features/world/systemId";
 import { performSheetRoll } from "../../utils/rollFromSheet";
 import { useTokenUpdate } from "../../hooks/useTokenUpdate";
 import type { MapToken } from "../../types";
@@ -55,13 +59,17 @@ export function TokenSystemSheet({
   onMapRoll,
 }: Props): React.ReactElement {
   const { world } = useWorldContext();
+  // Canonical id — nabídka ukládá „dlouhá" id (`drd-plus`, `call-of-cthulhu`),
+  // engine i `COMBAT_PANELS` znají krátká. Bez normalizace spadne DrD+/CoC
+  // svět na legacy `DiaryTab` místo dedikovaného panelu (deník „se nepropisuje").
+  const systemId = resolveSystemId(world?.system);
   // 10.2c-edit-9g Fáze E — Matrix-specific sync diary → token. Když user
   // změní `matrix_health` / `matrix_armor` v sheet a uloží, propagujeme
   // do token.currentHp / armor (token HP bar se okamžitě reflektuje;
   // ostatní hráči vidí přes WS broadcast). Reverse sync (token → diary)
   // defer na BE 10.2i (žádný WS pro character diary).
   useMatrixDiaryToTokenSync({
-    enabled: world?.system === "matrix" && canEdit,
+    enabled: systemId === "matrix" && canEdit,
     token,
     sceneId,
     worldId,
@@ -74,7 +82,7 @@ export function TokenSystemSheet({
   if (tokenIsBestie(token)) {
     // 16.2a — Matrix bestie má vlastní HUD panel (HP výpočet, autosave,
     // iniciativa sjednocení); ostatní systémy generický schema engine.
-    if (world?.system === "matrix") {
+    if (systemId === "matrix") {
       return (
         <DiarySkinScope worldId={worldId} className={styles.sheet}>
           <MatrixBestiePanel
@@ -89,7 +97,7 @@ export function TokenSystemSheet({
       );
     }
     // 16.2b Fáze 2 — drd16 bestie: bojové minimum + d6+ (init/útoky/OČ).
-    if (world?.system === "drd16") {
+    if (systemId === "drd16") {
       return (
         <DiarySkinScope worldId={worldId} className={styles.sheet}>
           <Drd16BestiePanel
@@ -108,7 +116,7 @@ export function TokenSystemSheet({
         token={token}
         sceneId={sceneId}
         worldId={worldId}
-        systemId={world?.system ?? "generic"}
+        systemId={systemId || "generic"}
         canEdit={canEdit}
         onMapRoll={onMapRoll}
       />
@@ -154,8 +162,9 @@ export function TokenSystemSheet({
   };
 
   // 10.2c-edit-9h — per-system kompaktní combat panel (Matrix/DnD/CoC/Drd2/
-  // Fate/GURPS). Ostatní systémy fallback na DiaryTab embed (legacy).
-  const SystemPanel = world?.system ? COMBAT_PANELS[world.system] : undefined;
+  // Drd16/DrdPlus/Fate/GURPS). Ostatní systémy fallback na DiaryTab (legacy).
+  // `systemId` je už normalizované (drd-plus→drdplus) — viz nahoře.
+  const SystemPanel = systemId ? COMBAT_PANELS[systemId] : undefined;
 
   if (SystemPanel) {
     return (

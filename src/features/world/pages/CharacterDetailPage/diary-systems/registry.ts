@@ -21,6 +21,7 @@ import { jadPreset } from './presets/jad';
 import { matrixPreset } from './presets/matrix';
 import { piPreset } from './presets/pi';
 import { shadowrunPreset } from './presets/shadowrun';
+import { resolveSystemId } from '@/features/world/systemId';
 import type { DiarySystemPreset, SystemId } from './types';
 
 const REGISTRY: Partial<Record<SystemId, DiarySystemPreset>> = {
@@ -40,36 +41,18 @@ const REGISTRY: Partial<Record<SystemId, DiarySystemPreset>> = {
 };
 
 /**
- * Aliasy pro `world.system` — některé legacy hodnoty z Matrix/Matrix
- * mapují na canonical ID. Aplikuje se v `getDiaryPreset` před lookup.
- */
-const SYSTEM_ALIASES: Record<string, SystemId> = {
-  // legacy DnD ID
-  dnd: 'dnd5e',
-  // legacy PI hodnoty z `world.system`
-  pribehy: 'pi',
-  pribehy_imperia: 'pi',
-  'pribehy-imperia': 'pi',
-  // 16.2a — nabídka (RPG_SYSTEMS) ukládá do `world.system` „dlouhá" id,
-  // engine je zná krátce. Bez těchto aliasů svět spadne na generic sheet.
-  'draci-hlidka': 'drdh',
-  'drd-plus': 'drdplus',
-  'call-of-cthulhu': 'coc',
-};
-
-/**
  * Vrátí preset pro daný `world.system`. Pokud systém není znám
  * (prázdný, neexistující ID, libovolný PJ-zadaný string), vrací
  * `generic` preset — žádný crash, žádný shadow.
+ *
+ * Normalizace (lowercase + aliasy dlouhých/legacy id) je sdílená v
+ * `@/features/world/systemId` — jediná zdrojová pravda napříč registry.
  */
 export function getDiaryPreset(
   systemId: string | undefined | null,
 ): DiarySystemPreset {
-  if (!systemId) return genericPreset;
-  const normalized = systemId.toLowerCase();
-  // Alias rezolve (legacy `dnd` → `dnd5e`, `pribehy_imperia` → `pi`, …)
-  const canonical = SYSTEM_ALIASES[normalized] ?? normalized;
-  if (canonical in REGISTRY) {
+  const canonical = resolveSystemId(systemId);
+  if (canonical && canonical in REGISTRY) {
     return REGISTRY[canonical as SystemId]!;
   }
   return genericPreset;

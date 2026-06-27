@@ -22,6 +22,7 @@ import {
   piPlugin,
   shadowrunPlugin,
 } from './plugins';
+import { resolveSystemId } from '@/features/world/systemId';
 import type { MapSystemPlugin, SystemId } from './types';
 
 const REGISTRY: Partial<Record<SystemId, MapSystemPlugin>> = {
@@ -41,34 +42,17 @@ const REGISTRY: Partial<Record<SystemId, MapSystemPlugin>> = {
 };
 
 /**
- * Aliasy pro `world.system` — identické s diary-systems pro konzistenci.
- *
- * Když PJ vytvoří svět s legacy `system: 'pribehy_imperia'`, oba registry
- * (diary + map) resolvují na canonical `pi`.
- */
-const SYSTEM_ALIASES: Record<string, SystemId> = {
-  dnd: 'dnd5e',
-  pribehy: 'pi',
-  pribehy_imperia: 'pi',
-  'pribehy-imperia': 'pi',
-  // 16.2a — viz diary-systems/registry.ts: nabídka ukládá „dlouhá" id
-  // (draci-hlidka/drd-plus/call-of-cthulhu), engine zná krátká.
-  'draci-hlidka': 'drdh',
-  'drd-plus': 'drdplus',
-  'call-of-cthulhu': 'coc',
-};
-
-/**
  * Vrátí plugin pro daný `world.system`. Neznámé / null → `genericPlugin`.
  * Žádný crash, žádné neexistující komponenty.
+ *
+ * Normalizace (lowercase + aliasy) je sdílená v `@/features/world/systemId`
+ * — identická pro diary registry i `COMBAT_PANELS`, jediná zdrojová pravda.
  */
 export function getMapSystemPlugin(
   systemId: string | undefined | null,
 ): MapSystemPlugin {
-  if (!systemId) return genericPlugin;
-  const normalized = systemId.toLowerCase();
-  const canonical = SYSTEM_ALIASES[normalized] ?? normalized;
-  if (canonical in REGISTRY) {
+  const canonical = resolveSystemId(systemId);
+  if (canonical && canonical in REGISTRY) {
     return REGISTRY[canonical as SystemId]!;
   }
   return genericPlugin;

@@ -4,6 +4,7 @@ import { DiaryTab } from '@/features/world/pages/CharacterDetailPage/components/
 import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
 import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
 import { useWorldContext } from '@/features/world/context/WorldContext';
+import { resolveSystemId } from '@/features/world/systemId';
 import { COMBAT_PANELS } from '@/features/world/tactical-map/components/token-panel/combatPanels';
 import type { MapToken } from '@/features/world/tactical-map/types';
 import { useChatDiaryRoll, type RollAttribution } from './useChatDiaryRoll';
@@ -63,7 +64,9 @@ export function DiaryRollPanel({
   const onRoll = makeOnRoll(attribution);
 
   // Stejné rozhodnutí jako TokenSystemSheet na mapě: má systém kompaktní panel?
-  const CombatPanel = world?.system ? COMBAT_PANELS[world.system] : undefined;
+  // Normalizace `world.system` (drd-plus→drdplus, …) je nutná — bez ní DrD+/CoC
+  // svět spadne na fallback DiaryTab místo dedikovaného panelu.
+  const CombatPanel = COMBAT_PANELS[resolveSystemId(world?.system)];
 
   // Panely čtou/zapisují deník přes `token.characterSlug` (sceneId nepoužit,
   // žádná token perzistence) → stačí mini-token jen se slugem.

@@ -8,10 +8,13 @@
 
 ## Otevřené
 
-### D-NEW-SYS-ALIAS-DUP — alias mapa `SYSTEM_ALIASES` duplikovaná ve 2 FE registry
-> Hlavní `D-NEW-SYS-PRESET-SEED-DRIFT` (BE seed) **vyřešen 2026-06-27** — alias/normalizace v BE `findOne` (option a, commit a97b401): `matrix`→`matrix-custom`, `coc`→`call-of-cthulhu`, `drdh`/`draci-hlidka`→`drd-hero`. `drd16`/`drd2`/`drdplus` zůstávají FE-canonical (soft-mode, bez BE presetu = accepted; plné BE presety = samostatný krok). Viz git log.
+### D-NEW-SYS-WORLDSYSTEMID-RAW — `worldSystemId` v TacticalMapView jede na syrovém `world.system`
+> Sourozenec `D-NEW-SYS-ALIAS-DUP` (alias mapa duplikovaná ve 2 registry) + chybějící normalizace v `COMBAT_PANELS` **vyřešeny 2026-06-27** — sjednoceno do jediné pravdy `src/features/world/systemId.ts` (`resolveSystemId`), přepojeny 4 konzumenti (diary/map registry, TokenSystemSheet, chat DiaryRollPanel) + paritní guard test. Viz git log + chybový deník fe.md (2026-06-27).
 
-`SYSTEM_ALIASES` je samostatná kopie v `diary-systems/registry.ts` i `map-systems/registry.ts` (komentář tvrdí „jediná zdrojová pravda", fakticky 2 kopie → riziko driftu při příštím přidání systému). Extrahovat do sdíleného modulu (blokuje společný `SystemId` typ — dnes 2 nezávislé). Nízká priorita.
+**Soubor:** FE `tactical-map/TacticalMapView.tsx:168` (`const worldSystemId = world?.system ?? "drd2"`).
+**Problém:** `worldSystemId` se NEnormalizuje přes `resolveSystemId` (na rozdíl od deníkových/panelových konzumentů). Teče do bestiář query klíčů (`useBestiar`, `bestiarQueryKey`) a do `systemId` propu (NPC/bestie schema lookup). Pro DrD+/CoC svět má hodnotu `'drd-plus'`/`'call-of-cthulhu'` → bestie/NPC schema na mapě může spadnout na generic.
+**Dopad:** Nízký–střední — týká se jen bestiáře/NPC schema na mapě (ne deníku postavy, ten je opravený). **NEopraveno schválně:** normalizace naslepo může rozbít FE↔BE kontrakt — BE může ukládat bestie pod raw `'drd-plus'` jako `systemId`; je třeba nejdřív ověřit, co BE bestiář očekává jako klíč.
+**Řešení:** ověřit BE bestiář `systemId` kontrakt; pokud BE čeká canonical, normalizovat `worldSystemId` přes `resolveSystemId` (pozor na default `?? "drd2"` — zachovat jako `resolveSystemId(world?.system) || "drd2"`). Nízká priorita.
 
 ---
 
