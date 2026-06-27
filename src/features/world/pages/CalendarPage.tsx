@@ -16,6 +16,7 @@ import {
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useAllWorldGameEvents } from '@/features/world/api/useGameEvents';
 import { useCalendarConfigs } from '@/features/world/api/useCalendarConfigs';
+import { useWorldSettings } from '@/features/world/api/useWorldSettings';
 import {
   useCalendarsAggregate,
   type AggregatedCalendarEvent,
@@ -80,6 +81,7 @@ export default function CalendarPage() {
   const { data: gameEvents = [] } = useAllWorldGameEvents(worldId);
   const { data: aggregate } = useCalendarsAggregate(worldId);
   const { data: configs = [] } = useCalendarConfigs(worldId);
+  const { data: settings } = useWorldSettings(worldId);
   const setColor = useSetCalendarColor(worldId);
 
   // 9.2-followup — entita, jejíž barvu PJ právě edituje (swatch v sidebaru).
@@ -126,8 +128,26 @@ export default function CalendarPage() {
     }
   }, [STORAGE_GROUPS_KEY, expandedGroups]);
 
-  // Dnešní reálný datum → display config přes absDay.
+  // D-NEW-INV-CASCADE-INGAME-DATE — „Dnes" sleduje **in-game datum** světa
+  // (advance-day v Počasí / Nastavit datum), pokud je nastaveno; jinak reálné
+  // dnešní datum. In-game datum je uloženo v timeline kalendáři (UTC pole =
+  // {year, monthIndex, day}); přepočítá se přes absolutní den do prohlíženého
+  // `displayConfig` (stejně jako eventy z jiných kalendářů).
+  const inGameISO = settings?.currentInGameDate ?? null;
+  const timelineSlug = settings?.timelineCalendarSlug ?? null;
   const today = useMemo<FantasyDate>(() => {
+    const inGame = inGameISO ? new Date(inGameISO) : null;
+    if (inGame && !Number.isNaN(inGame.getTime())) {
+      const inGameDate: FantasyDate = {
+        year: inGame.getUTCFullYear(),
+        monthIndex: inGame.getUTCMonth(),
+        day: inGame.getUTCDate(),
+      };
+      const originConfig =
+        (timelineSlug ? configs.find((c) => c.slug === timelineSlug) : null) ??
+        GREGORIAN_DEFAULT_CONFIG;
+      return fromAbsDay(toAbsDay(inGameDate, originConfig), displayConfig);
+    }
     const now = new Date();
     const greg: FantasyDate = {
       year: now.getFullYear(),
@@ -135,7 +155,7 @@ export default function CalendarPage() {
       day: now.getDate(),
     };
     return fromAbsDay(toAbsDay(greg, GREGORIAN_DEFAULT_CONFIG), displayConfig);
-  }, [displayConfig]);
+  }, [inGameISO, timelineSlug, configs, displayConfig]);
 
   // 9.2-followup — pozice se pamatuje per svět v localStorage (přes refresh).
   const STORAGE_CURSOR_KEY = worldId ? `calendar-cursor-${worldId}` : null;

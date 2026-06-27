@@ -2,37 +2,27 @@
 
 > Soubor obsahuje **pouze otevřené a odložené** dluhy.
 > Historie uzavřených dluhů dohledatelná v git logu (`git log --all -- docs/dluhy.md`).
-> Stav k 2026-06-01.
+> Stav k 2026-06-27.
 
 ---
 
 ## Otevřené
 
-### D-NEW-SYS-PRESET-SEED-DRIFT — BE diarySchema seed nemá preset pro 5 systémů
-> **FE část vyřešena 2026-06-23 (16.2a, ✅ ŘEŠENÍ fe.md).** Původní `D-NEW-SYS-DIARY-DRIFT` (Dračí Hlídka) byl jen špička: FE sheet/plugin lookup spadl na generic u **tří** systémů (`draci-hlidka`/`drd-plus`/`call-of-cthulhu`). Opraveno aliasy v obou FE registry + parity guard test. **Zbývá níže popsaná druhá, nezávislá porucha na BE.**
+### D-NEW-SYS-ALIAS-DUP — alias mapa `SYSTEM_ALIASES` duplikovaná ve 2 FE registry
+> Hlavní `D-NEW-SYS-PRESET-SEED-DRIFT` (BE seed) **vyřešen 2026-06-27** — alias/normalizace v BE `findOne` (option a, commit a97b401): `matrix`→`matrix-custom`, `coc`→`call-of-cthulhu`, `drdh`/`draci-hlidka`→`drd-hero`. `drd16`/`drd2`/`drdplus` zůstávají FE-canonical (soft-mode, bez BE presetu = accepted; plné BE presety = samostatný krok). Viz git log.
 
-**Soubor:** `backend/src/modules/system-presets/presets/index.ts` + `system-presets.service.ts` (`findOne`, striktní `p.system === system`) ↔ `world.system` z `RPG_SYSTEMS`.
-**Problém:** Při vytvoření/změně systému světa BE seeduje `diarySchema` přes `SystemPresetsService.findOne(world.system)`. BE presety mají **vlastní, jinou sadu id** (`matrix-custom`, `drd-hero`, `drd16-warrior/wizard/thief/ranger/alchemy`, `call-of-cthulhu`…). Pro uložené `world.system` **`matrix`, `drd16`, `drd2`, `drd-plus`, `draci-hlidka`** BE žádný preset nenajde (`drd2` a `drd-plus` chybí úplně) → **seedne prázdné `diarySchema`**.
-**Dopad:** Nízký–střední — maskováno tím, že per-system schémata jsou canonical na FE (`project_schema_be_fe_sync`) a BE jede soft-mode; reálná data deníku jedou přes FE sheet (ten už funguje). Ale BE seed je mrtvý/nekonzistentní pro tyto systémy a `system-presets` granularita (`drd16` rozpadlý na 5 povolání, `drd-hero` ≠ `drdh`) neodpovídá FE modelu.
-**Řešení (k rozhodnutí):** buď přidat alias/normalizaci i do BE `findOne` (zrcadlo FE), nebo BE `system-presets` přemapovat na FE-canonical id, nebo BE seed úplně opřít o export-schemas z FE a `system-presets` retírovat. **Po BE změně restart** (`feedback_be_restart_required`).
-**Kdy:** Při dotahování BE strany 16.2 (ne blokuje FE grafický průchod 16.2a).
-
-#### Mikro-dluh: alias mapa duplikovaná ve 2 FE registry
 `SYSTEM_ALIASES` je samostatná kopie v `diary-systems/registry.ts` i `map-systems/registry.ts` (komentář tvrdí „jediná zdrojová pravda", fakticky 2 kopie → riziko driftu při příštím přidání systému). Extrahovat do sdíleného modulu (blokuje společný `SystemId` typ — dnes 2 nezávislé). Nízká priorita.
 
 ---
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
-### D-NEW-INV-SEC — Inventura: bezpečnostní nálezy účtu/světa
-> **Z větší části vyřešeno 2026-06-27 (4/5).** Zbývá jen persona-on-server (níže). **Po BE změně restart** ([[feedback_be_restart_required]]).
-- **Heslo** `@MinLength(6)→(8)` na **obou** stranách — BE `register.dto` + FE `registerSchema` (+ spec). Sjednoceno s reset/změnou (už 8). Re-auth `PasswordConfirmDto` zůstává 6 (validuje **stávající** heslo → legacy 6-znaková hesla se nesmí zamknout). ✅
-- **Veřejný profil endpoint** — `GET profile/:id` byl **už odstraněn 2026-06-18** (zůstal jen gated `profile/v14/:id`, JwtAuthGuard + gating + throttle). Nález byl zastaralý. ✅
-- **themeUserOverrides** — `updateMyTheme` teď **reuse existujícího** `sanitizeThemeOverrides` (stejný jako world-level: `--theme-*` prefix, max 200 zn., max 60); `undefined`→`undefined` = BC. (Pozn.: nejdřív jsem napsal duplicitní private sanitizér — funkce inventura ř. 275 ukázala, že funkce už existuje → reuse.) ✅
-- **POST /scenarios** — role-floor `< PomocnyPJ` → 403 (scénáře = PJ storyboard nástroj). Gate na **controlleru** (ne service) → mimo riziko interních volání (CH-011). ✅
-- **Zbývá — persona-on-server:** render-time PJ persona (FE) se neaplikuje na **serverové** cesty (push payload, news/feed, export) → tam může prosáknout reálné jméno PJ. Cross-cutting (`push.service` + news + export + resolver persony) → vlastní krok, ne one-liner.
-**Ověřeno (4/5):** BE typecheck ✓, lint:check + elevation guard ✓, jest `worlds`/`campaign`/`auth` **317/317** ✓ (worlds re-run po reuse 172/172). FE tsc -b ✓, `registerSchema` 11/11 ✓.
-**Kdy:** persona zbytek Fáze 14. Zdroj: `docs/funkce/` kap. 01/02/10/13/15.
+### D-NEW-INV-SEC — persona-on-server (PJ persona neprosakuje do server cest)
+> Zbytek INV-SEC (heslo 6→8 FE+BE, scenarios role-floor, themeUserOverrides sanitizace; profil endpoint byl už opravený) **vyřešen 2026-06-27** — viz git log.
+**Soubory:** BE `push.service` (push payload), news/feed, export + resolver PJ persony.
+**Problém:** render-time PJ persona (FE) se neaplikuje na **serverové** cesty → push notifikace / feed / export může prosáknout reálné jméno PJ místo persony.
+**Dopad:** Nízký — leak reálného jména PJ mimo chat.
+**Řešení:** aplikovat personu i na serverové cesty (cross-cutting). **Kdy:** Fáze 14. Zdroj: kap. 13.
 
 ### D-NEW-INV-PUSH — Inventura: web push spam + chybějící deep-link
 **Soubory:** BE `global-chat.service.ts` (`notifyAll` na každou zprávu), `ikaros-news.service` (`notifyAll` bez `url`), `push.service`; FE `public/sw.js` (deep-link připraven); pošta `ikaros-messages` (bez push).
@@ -48,12 +38,12 @@
 **Řešení:** doplnit FE konzumenty + admin formuláře; zvážit endpoint pro adminskou změnu e-mailu.
 **Kdy:** Fáze 14.7 (export) / 20.2 (GDPR). Zdroj: kap. 01/08.
 
-### D-NEW-INV-PROFILE — Inventura: profil & seznam uživatelů
-> **Částečně vyřešeno 2026-06-27.** `displayName` + `void role` vyřízeny; zbývá worldsCount + komunitní stuby.
-- **`displayName` trim** — FE `headerSchema` (`.trim()`) + BE `UpdateUserDto` (`@Transform` trim, `transform:true`) → „jen mezery" → prázdné (fallback na username). ✅ (BE jest 20/20 vč. trim test, FE+BE typecheck)
-- **`void role` taby** — ZÁMĚR (12.1): všechny role vidí stejné 3 komunitní taby (zafixováno testy); param vestigiální, ne mrtvý nález. ✅ (vyjasněno, bez churnu)
-- **Zbývá:** `FriendsTab` `worldsCount=0` natvrdo (chce BE doplnit count do friend shape — BE change); FE profil „Moje diskuze/články/galerie" stuby (napojit na existující moduly — větší).
-**Dopad:** Nízký — kosmetika. **Kdy:** zbytek Fáze 15.6 / 16.4. Zdroj: kap. 02.
+### D-NEW-INV-PROFILE — worldsCount + komunitní stuby profilu
+> `displayName` trim (FE+BE) + `void role` (vyjasněn jako záměr 12.1) **vyřešeno 2026-06-27** — viz git log.
+**Soubory:** FE `FriendsTab` (`worldsCount=0` natvrdo), FE profil „Moje diskuze/články/galerie" (stub „fáze 3").
+**Problém:** počet světů u přátel natvrdo 0 (chce BE doplnit count do friend shape); komunitní sekce profilu jsou prázdné placeholdery, ač moduly jinde fungují.
+**Dopad:** Nízký — kosmetika + nedotažená featura.
+**Řešení:** doplnit worldsCount do friend shape (BE); napojit sekce na existující moduly. **Kdy:** Fáze 15.6 / 16.4. Zdroj: kap. 02.
 
 ### D-NEW-INV-DATA-SYNC — Inventura: konzistence dat postav/měn
 **Soubory:** BE `map-operations.service.ts` (token→Character sync TODO), `world-currencies` `updateCurrencies` (full-replace), `character-subdocs.service.ts` (finance/inventory create vs. read), `characters.repository.ts` (legacy `/characters/directory`).
@@ -69,17 +59,12 @@
 **Řešení:** doplnit inverse pro chybějící operace; sjednotit role-prahy; vyjasnit jediný zdroj combat order; pathfinding buď doplnit (17.x), nebo opravit spec (rychlý fix).
 **Kdy:** Fáze 17.x. Zdroj: kap. 14.
 
-### D-NEW-INV-CASCADE-INGAME-DATE — in-game datum se nepromítne do „Dnes" v /kalendar
-**Problém:** in-game datum (advance-day v Počasí) se nepromítne do „Dnes" v `/kalendar` — sjednotit zdroj in-game data. (Zbytek kaskád/času z inventury vyřešen plným auditem 14.9, 2026-06-20 — v git logu.)
-**Dopad:** Nízký — UX.
-**Kdy:** mimo 14.9. Zdroj: kap. 15.
-
 ### D-NEW-INV-CLEANUP — Inventura: úklid kódu (drift & mrtvé)
-> **audit-log labely SJEDNOCENY 2026-06-27:** FE `AdminAuditAction` (shared/types) srovnáno s BE `admin-audit-log.interface.ts` — doplněno 16 chybějících akcí (DELETE/HARD_DELETE/BULK_*/WORLD_ELEVATION_*/ACCOUNT_*/USER_CREATE/PERMISSIONS_CHANGE/UNDELETE…) + labely + badge třídy (exhaustivní `Record` → TS hlídá úplnost). Dřív se prázdné. `FRIENDSHIP_COOLDOWN_RESET` zůstává FE-only phantom (BE ho nikde neemituje — drobnost: až BE začne logovat reset cooldownu, label je připraven; jinak FE drop). FE tsc ✓, PlatformAdminPage 6/6 ✓. **Zbytek úklidu níže neřešen.**
-**Soubory (zbývá):** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní).
-**Problém:** BE `UserRole` stále drží legacy world role (3–8), FE už vyhodil (drift po D-053); `canEditPlatformPages` se ukládá, ale nikde nevynucuje; admin bypass přes username `=== 'Tyky'`; `getUsers` filtruje až po vytažení stránky (nekonzistentní paginace); MeiliSearch bez Dockeru vrací prázdno bez chyby; favorites toggle zkopírovaný v 3 modulech; audit-log labely se rozcházejí FE↔BE.
+> audit-log labely (FE `AdminAuditAction` srovnáno s BE, +16 akcí) **sjednoceny 2026-06-27** — viz git log.
+**Soubory:** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní).
+**Problém:** BE `UserRole` stále drží legacy world role (3–8), FE už vyhodil (drift po D-053); `canEditPlatformPages` se ukládá, ale nikde nevynucuje; admin bypass přes username `=== 'Tyky'`; `getUsers` filtruje až po vytažení stránky (nekonzistentní paginace); MeiliSearch bez Dockeru vrací prázdno bez chyby; favorites toggle zkopírovaný v 3 modulech.
 **Dopad:** Nízký — maintainability + 1 provozní past (Meili).
-**Řešení:** vyčistit BE enum; odstranit mrtvý flag; bypass přes roli/flag; paginace v DB dotazu; surface Meili health/chybu; centralizovat favorites; sjednotit audit-log labely.
+**Řešení:** vyčistit BE enum; odstranit mrtvý flag; bypass přes roli/flag; paginace v DB dotazu; surface Meili health/chybu; centralizovat favorites.
 **Kdy:** Fáze 14.9. Zdroj: kap. 02/06/08.
 
 ---
@@ -128,6 +113,6 @@ fallback na Map + testy).
 
 ### D-NEW-color-tokens — Hardcoded barvy → theme tokeny (chrome drift)
 **Plán:** [n2-color-mapping.md](n2-color-mapping.md) (mapa kategorií + tokeny + postup).
-**Stav (2026-06-27):** **Bezpečný první krok HOTOV** — `ALLOW` v `scripts/lint-no-hardcoded-colors.mjs` rozšířen o datové dirs (`/chat/dice/lib/`, `/chat/dice/components/models/`, `polyhedralDice.css`, `/diary-systems/styles/`, `/diary-systems/sheets/`). `npm run lint:colors`: **4397 → 1622** (vyňato 2775 barev datové identity — kostkové skiny + per-system pergamen/HUD palety, záměrně fixní napříč tématy). Číslo narostlo od 2026-06-16 (2340) kvůli novým skinům 16.1d/16.2c.
+> Bezpečný krok (ALLOW datové dirs → `lint:colors` 4397→1622) **hotov 2026-06-27** — viz git log.
 **Zbývá (skutečný chrome drift, ~1622 ve ~160 souborech):** vizuální projití per komponenta napříč 2–3 tématy (proto **ne v automatickém commitu** — riziko rozbití skinů bez živé kontroly). Top cíle: `TemplateEditorModal`, `NotificationCenter`, `PostavaLayout`…
 **Trigger:** sjednocení vzhledu / nový skin odhalí drift. **Měření:** `npm run lint:colors`.
