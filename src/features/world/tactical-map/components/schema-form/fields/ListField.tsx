@@ -62,21 +62,40 @@ export function ListField({
           {subFields.map((sub) => (
             <div key={sub.key} className={styles.listItemField}>
               <label className={styles.listItemLabel}>{sub.label}</label>
-              <input
-                type={sub.type === 'number' ? 'number' : 'text'}
-                className={styles.input}
-                value={
-                  (item[sub.key] as string | number | undefined) ?? ''
-                }
-                onChange={(e) =>
-                  handleUpdateItem(
-                    idx,
-                    sub.key,
-                    sub.type === 'number' ? Number(e.target.value) : e.target.value,
-                  )
-                }
-                disabled={disabled}
-              />
+              {sub.type === 'enum' ? (
+                <select
+                  className={styles.input}
+                  value={
+                    (item[sub.key] as string | undefined) ??
+                    (sub.default as string | undefined) ??
+                    ''
+                  }
+                  onChange={(e) => handleUpdateItem(idx, sub.key, e.target.value)}
+                  disabled={disabled}
+                >
+                  {(sub.enumValues ?? []).map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type={sub.type === 'number' ? 'number' : 'text'}
+                  className={styles.input}
+                  value={(item[sub.key] as string | number | undefined) ?? ''}
+                  onChange={(e) =>
+                    handleUpdateItem(
+                      idx,
+                      sub.key,
+                      sub.type === 'number'
+                        ? Number(e.target.value)
+                        : e.target.value,
+                    )
+                  }
+                  disabled={disabled}
+                />
+              )}
             </div>
           ))}
           <button
