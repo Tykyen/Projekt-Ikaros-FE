@@ -39,10 +39,10 @@ import { useTokenTexture } from '../../hooks/useTokenTexture';
 import { getInitials } from '../../utils/getInitials';
 import { TokenHpBar } from './TokenHpBar';
 import { systemEntitySchemaRegistry } from '../../schemas/registry';
-import { useWorldContext } from '@/features/world/context/WorldContext';
 import { resolveHpWithFallback } from '../../utils/hpTier';
 import { tokenIsBestie } from '../../utils/tokenIsBestie';
 import { resolveCharacterHp } from '../../utils/resolveCharacterHp';
+import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import type { ImageFit } from '@/shared/lib/imageStyle';
 
 /** Výřez obrázku tokenu (bestie focal/zoom/fit z bestiáře). */
@@ -459,8 +459,7 @@ function HpBarForToken({
   config: HexConfig;
   size: number;
 }): React.ReactElement | null {
-  const { world } = useWorldContext();
-  const systemId = world?.system ?? null;
+  const systemId = useResolvedSystemId() || null;
   const schema = systemId
     ? systemEntitySchemaRegistry.get(systemId, 'token')
     : null;

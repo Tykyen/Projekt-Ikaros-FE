@@ -22,8 +22,7 @@
 import { useEffect, useRef } from "react";
 import { DiaryTab } from "@/features/world/pages/CharacterDetailPage/components/DiaryTab";
 import { useCharacterDiary } from "@/features/world/pages/api/useCharacterSubdocs";
-import { useWorldContext } from "@/features/world/context/WorldContext";
-import { resolveSystemId } from "@/features/world/systemId";
+import { useResolvedSystemId } from "@/features/world/useResolvedSystemId";
 import { performSheetRoll } from "../../utils/rollFromSheet";
 import { useTokenUpdate } from "../../hooks/useTokenUpdate";
 import type { MapToken } from "../../types";
@@ -59,11 +58,8 @@ export function TokenSystemSheet({
   onDirtyChange,
   onMapRoll,
 }: Props): React.ReactElement {
-  const { world } = useWorldContext();
-  // Canonical id — nabídka ukládá „dlouhá" id (`drd-plus`, `call-of-cthulhu`),
-  // engine i `COMBAT_PANELS` znají krátká. Bez normalizace spadne DrD+/CoC
-  // svět na legacy `DiaryTab` místo dedikovaného panelu (deník „se nepropisuje").
-  const systemId = resolveSystemId(world?.system);
+  // Canonical systemId přes sdílený hook (D-SYSTEMID-HOOK).
+  const systemId = useResolvedSystemId();
   // 10.2c-edit-9g Fáze E — Matrix-specific sync diary → token. Když user
   // změní `matrix_health` / `matrix_armor` v sheet a uloží, propagujeme
   // do token.currentHp / armor (token HP bar se okamžitě reflektuje;

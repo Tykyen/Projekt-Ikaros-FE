@@ -3,8 +3,7 @@ import { ArrowLeft, X, Pencil } from 'lucide-react';
 import { DiaryTab } from '@/features/world/pages/CharacterDetailPage/components/DiaryTab';
 import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
 import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
-import { useWorldContext } from '@/features/world/context/WorldContext';
-import { resolveSystemId } from '@/features/world/systemId';
+import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import { COMBAT_PANELS } from '@/features/world/tactical-map/components/token-panel/combatPanels';
 import type { MapToken } from '@/features/world/tactical-map/types';
 import { useChatDiaryRoll, type RollAttribution } from './useChatDiaryRoll';
@@ -48,7 +47,6 @@ export function DiaryRollPanel({
   onBack,
   onClose,
 }: Props) {
-  const { world } = useWorldContext();
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [, setDirty] = useState(false);
 
@@ -64,9 +62,8 @@ export function DiaryRollPanel({
   const onRoll = makeOnRoll(attribution);
 
   // Stejné rozhodnutí jako TokenSystemSheet na mapě: má systém kompaktní panel?
-  // Normalizace `world.system` (drd-plus→drdplus, …) je nutná — bez ní DrD+/CoC
-  // svět spadne na fallback DiaryTab místo dedikovaného panelu.
-  const CombatPanel = COMBAT_PANELS[resolveSystemId(world?.system)];
+  // Canonical systemId přes sdílený hook (D-SYSTEMID-HOOK).
+  const CombatPanel = COMBAT_PANELS[useResolvedSystemId()];
 
   // Panely čtou/zapisují deník přes `token.characterSlug` (sceneId nepoužit,
   // žádná token perzistence) → stačí mini-token jen se slugem.

@@ -878,3 +878,34 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — poučení z CH-030 zafungovalo, mrtvý kód chycen předem (ne až nahlášený uživatelem). Prototyp-driven iterace vzhledu měla hodně kol (políčka→číselný wound, edit modal→in-place, grid/box-sizing overflow fixy), ale levné v HTML před React kódem. Vzor pro další per-system bestie panely: **grep všech čtenářů `world.system` = první krok**.
 
 ---
+
+### CH-031 — deklaroval jsem „grep VŠECH konzumentů world.system", ale provedl ho jen pro jeden soubor · 2026-06-27
+
+**Kontext:** 16.2d Fáze 2 DrD+ bestie na mapě. Předchozí ✅ ŘEŠENÍ tvrdilo „drift chycen předem" + „grep všech čtenářů = první krok".
+**Co jsem udělal špatně:** poučení jsem **deklaroval, ale neprovedl** — grep udělal nedůsledně (jen kolem `TacticalMapView`), minul 4 komponenty s vlastním `const systemId = world?.system ?? null`: `MapPjPanel:127` (katalog bestií + spawn), `TokenSprite:463` (HP), `ChatContextRail:69`, `CombatRosterPanel:150` (chat bestie).
+**Proč to nefungovalo:** každá komponenta drží vlastní lokální `systemId` z `world.system` — oprava jednoho místa nestačí. DrD+ Duch (uložen pod canonical `drdplus`) se nezobrazil v orchestraci mapy (hledala pod raw `drd-plus`). Uživatel narazil na bug → „chyceno předem" bylo iluzorní.
+**Poučení:** deklarované poučení MUSÍM i provést. Grep `world\?\.system|world\.system` přes **CELÝ `src`**, spočítat výskyty, každý buď opravit nebo odůvodnit (display/gate). Kořen je architektonický — žádný sdílený resolved-systemId hook, každá komponenta si bere `world.system` sama.
+**Příznak cyklení:** opravím drift v jednom souboru a prohlásím rodinu za vyřešenou; uživatel najde další komponentu se syrovým `world.system`.
+
+---
+
+### ✅ ŘEŠENÍ — system-id drift dotažen přes CELÝ src (4 zbylí konzumenti) · 2026-06-27
+
+**Co nakonec zabralo:** grep `world\?\.system|world\.system` přes celý `src` → 9 lookup-relevantních míst; 5 už canonical (TacticalMapView/TokenSystemSheet/DiaryRollPanel/BestiarPage/COMBAT_PANELS), **4 opraveny teď** na `resolveSystemId`: `MapPjPanel`, `TokenSprite`, `ChatContextRail`, `CombatRosterPanel`. Display/gate místa (WorldDetailInfo, BasicInfoTab, PageViewer `==='matrix'`) ponechána; diary/skin normalizují interně (`getDiaryPreset`/`resolveDefaultSkin`).
+**Proč to je správně:** grep nad celým stromem + klasifikace každého výskytu (lookup vs display), ne bodová oprava. Sjednocuje mapu+chat+bestiář na canonical.
+**Jak ověřeno:** `npm run build` ✓; uživatel ověří refreshem mapy (Duch v „+ z katalogu").
+**Zhodnocení:** dobře že rodina je teď dotažená; špatně že to trvalo 9 výskytů + uživatelský bug. Budoucí dluh: centralizovat do hooku (`useResolvedSystemId`), aby raw `world.system` nešlo použít omylem.
+
+---
+
+### ✅ ŘEŠENÍ — centralizace systemId do `useResolvedSystemId` hooku (uzavírá rodinu system-id drift) · 2026-06-27
+
+**Co nakonec zabralo:** nový hook `src/features/world/useResolvedSystemId.ts` (`resolveSystemId(useWorldContext().world?.system)`) — všech **8 komponentových konzumentů** migrováno z ručního `resolveSystemId(world?.system)` na hook: TacticalMapView, MapPjPanel, TokenSprite, TokenSystemSheet, BestiarPage, DiaryRollPanel, ChatContextRail, CombatRosterPanel. U 5 z nich (jen systemId) odebráno i `const { world } = useWorldContext()`. Registry-resolvery s param `systemId` (map-systems/diary-systems registry) ponechány. Uzavřel dluh D-SYSTEMID-HOOK.
+
+**Proč to je správně (a ne další variace):** kořen rodiny byl architektonický — raw `world.system` roztroušený po komponentách. Hook = jediné místo normalizace; nový konzument volá `useResolvedSystemId()` a nemůže zapomenout. Bodové opravy (CH-030/CH-031) jen hasily výskyty.
+
+**Jak ověřeno:** `npm run build` ✓, eslint 9 souborů (0 errors, jen 1 pre-existující warning set-state-in-effect mimo změnu), vitest 22/22 (combatPanels parita + DrdPlus panel + bestiar).
+
+**Zhodnocení:** dobře — rodina (9 výskytů, CH-011/030/031/113) konečně uzavřená architektonicky, ne záplatou. Zbytek (lint guard proti raw `world.system`) neudělán — hook riziko snižuje dost, guard by byl marginální.
+
+---

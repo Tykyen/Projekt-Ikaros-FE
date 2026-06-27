@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { User } from '@/shared/types';
-import { useWorldContext } from '@/features/world/context/WorldContext';
+import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { buildBestieToken } from '@/features/world/tactical-map/utils/buildSpawnToken';
 import { getBestieAbilities } from '@/features/world/bestiar/lib/bestieAbilities';
@@ -65,8 +65,7 @@ export function ChatContextRail({
   onClose,
   onWideChange,
 }: Props) {
-  const { world } = useWorldContext();
-  const systemId = world?.system ?? null;
+  const systemId = useResolvedSystemId() || null;
   const members = useWorldMembers(worldId);
   const [selected, setSelected] = useState<Selected | null>(null);
   const [tab, setTab] = useState<RailTab>('main');

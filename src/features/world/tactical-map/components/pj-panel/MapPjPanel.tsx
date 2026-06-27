@@ -28,6 +28,7 @@ import { EditSceneModal } from './EditSceneModal';
 import { MapLibraryModal } from './MapLibraryModal';
 import { LoadPreparationDialog } from './LoadPreparationDialog';
 import { ClearSceneDialog } from './ClearSceneDialog';
+import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldRole } from '@/shared/types';
 import type { SpawnPayload } from '../../utils/spawnPayload';
@@ -123,8 +124,8 @@ export function MapPjPanel({
   );
   const queryClient = useQueryClient();
   const { scenes: activeScenes } = useActiveScenes(worldId, expanded);
-  const { world, userRole } = useWorldContext();
-  const systemId = world?.system ?? null;
+  const { userRole } = useWorldContext();
+  const systemId = useResolvedSystemId() || null;
   // R-17 — tvorba/aktivace/mazání scény je na BE PJ(5) (`maps.assertCanManage`).
   // Panel se zobrazuje PomocnyPJ+, ale scene-create akce gatujeme na PJ, ať
   // PomocnyPJ nevidí tlačítka, co skončí 403. (Přiřazení/edit scény = PomocnyPJ.)

@@ -6,7 +6,7 @@
  */
 import { useMemo } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useWorldContext } from '@/features/world/context/WorldContext';
+import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
 import { resolveHp, hpTierCss } from '@/features/world/tactical-map/utils/hpTier';
 import { getInitials } from '@/features/world/tactical-map/utils/getInitials';
@@ -146,8 +146,7 @@ export function CombatRosterPanel({
   onOpenInfo,
   onAdd,
 }: Props) {
-  const { world } = useWorldContext();
-  const systemId = world?.system ?? null;
+  const systemId = useResolvedSystemId() || null;
   useChannelCombatSync(worldId, channelId);
   const { data } = useChannelCombatants(worldId, channelId);
   const combat = useChatCombat(worldId, channelId, data);
