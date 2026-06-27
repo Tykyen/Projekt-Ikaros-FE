@@ -26,6 +26,20 @@
 @import './drd16-skins/retro.css';
 @import './drd16-skins/anime.css';
 
+/* 16.2d-skiny — drdplus skin @importy. POZOR: @import MUSÍ stát PŘED všemi style
+   rules (CSS spec), jinak ho bundler/prohlížeč tiše zahodí jako neplatný (build
+   NEselže). Proto hned tady u drd16-skins — ne až za blokem
+   `[data-diary-system='drd16']` níž (tam spadly = bug 2026-06-27, drdplus skiny se
+   vůbec nebundlovaly). Scoped `[data-diary-system='drdplus'][data-diary-skin='X']`. */
+@import './drdplus-skins/scifi.css';
+@import './drdplus-skins/fantasy.css';
+@import './drdplus-skins/horror.css';
+@import './drdplus-skins/steampunk.css';
+@import './drdplus-skins/nature.css';
+@import './drdplus-skins/minimal.css';
+@import './drdplus-skins/retro.css';
+@import './drdplus-skins/anime.css';
+
 /* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
    dice readout / orchestrace) ════════════
  * ŽIJÍ ZDE, ne v `drd16.css` — ten je lazy (jen deníková stránka), kdežto embedy
@@ -51,19 +65,6 @@
   --dd-embed-neg: #9c6b6b;
   --dd-embed-neutral: var(--dd-gold, #c19a3f);
 }
-
-/* 16.2d-skiny — per-systémové skiny DrD+ (`drdplus-skins/`, scoped
-   `[data-diary-system='drdplus'][data-diary-skin='<skin>']`). Importováno zde,
-   aby se načetly i v embedech (chat rail / mapa / dice), kde `drdplus.css`
-   (list preset) NEběží. Stejný princip jako drd16-skins výš. */
-@import './drdplus-skins/scifi.css';
-@import './drdplus-skins/fantasy.css';
-@import './drdplus-skins/horror.css';
-@import './drdplus-skins/steampunk.css';
-@import './drdplus-skins/nature.css';
-@import './drdplus-skins/minimal.css';
-@import './drdplus-skins/retro.css';
-@import './drdplus-skins/anime.css';
 
 /* ════════════ 16.2d-skiny — drdplus DEFAULT token sada (pergamen „iluminovaný
    kodex") + EMBED tokeny ════════════
