@@ -395,7 +395,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
 - **Dračí Doupě Plus** (`drdplus`) — *stav kódu:* list sheet+testy; mapa jen `onRoll` fallback (bez combat panelu)
   - [x] Reálný list (grafika)
   - [x] Taktická mapa (grafika + zvážit vlastní combat panel)
-  - [ ] Bestie (grafika)
+  - [x] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
 - **Dračí Doupě II** (`drd2`) — *stav kódu:* list sheet+testy, mapa combat panel `Drd2CombatPanel`

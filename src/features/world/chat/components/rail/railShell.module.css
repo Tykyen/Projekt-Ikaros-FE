@@ -98,3 +98,36 @@
     font-size: 1.15rem;
   }
 }
+
+/* ════════════ 16.2d-chat — DrD+ „obalení": rail chrome nese pergamen skin ════════════
+ * Rail (BestieRollPanel/BestieInstancePanel) obalen `DiarySkinScope` (display:contents)
+ * → `[data-diary-system='drdplus']` na předku. Konzumuje `--dd-embed-*` (defaulty
+ * v diary-skins.css, loaded i v chatu). Mirror `TokenInfoPanel` chrome na mapě.
+ * Scoped na drdplus → ostatní systémy drží chat motiv (--theme-*). */
+[data-diary-system='drdplus'] .panel {
+  background: var(--dd-embed-surface);
+  border-left-color: var(--dd-embed-border);
+  color: var(--dd-embed-text);
+}
+[data-diary-system='drdplus'] .identity {
+  border-bottom-color: var(--dd-embed-line);
+  background: color-mix(in srgb, var(--dd-embed-accent) 8%, transparent);
+}
+[data-diary-system='drdplus'] .name {
+  color: var(--dd-embed-title);
+  font-family: var(--dd-embed-title-font);
+}
+[data-diary-system='drdplus'] .iconBtn {
+  color: var(--dd-embed-muted);
+}
+[data-diary-system='drdplus'] .iconBtn:hover {
+  color: var(--dd-embed-title);
+  background: color-mix(in srgb, var(--dd-embed-accent) 16%, transparent);
+}
+[data-diary-system='drdplus'] .avatar {
+  border-color: var(--dd-embed-accent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
+}
+[data-diary-system='drdplus'] .avatarFallback {
+  color: var(--dd-embed-muted);
+}

@@ -926,3 +926,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — čisté, zpětně kompatibilní, reusable. Zbytek: mrtvé CSS hlaviček (`.erb`/`.crest`/…) ponecháno (neškodí, uživatel ještě iteruje vizuál).
 
 ---
+
+### ✅ ŘEŠENÍ — DrD+ bestie v chatu (parita s mapou): sdílené jádro + obalení + log dice · 2026-06-27
+**Co nakonec zabralo:** uzavřel CH-032 vzor pro drdplus chat. (1) **Sdílené jádro** `DrdPlusBestieCombatActions` extrahováno z mapového `DrdPlusBestiePanel` (Útoky/Ochrana/Vlastnosti-Tělo-Smysly/Schopnosti/Poznámky, view+inline-edit) — mapa i chat jeden zdroj (0 drift, vzor drd16 `Drd16BestieCombatActions`); wound zůstává per-panel přes `woundSlot` (mapa `token.injury`, chat `systemStats.injury`). (2) `DrdPlusChatBestiePanel` (`useChatDiaryRoll` 2k6+/d6, BČ→`onResult`→`onPatch({initiative})`, inline edit přes `onPatch`). (3) drdplus větve v `BestieRollPanel`+`BestieInstancePanel`. (4) **„Obalení"**: `DiarySkinScope` (display:contents) nad CELÝM railovým `<aside>` + railShell `[data-diary-system='drdplus']` → chrome (identity/controls) pergamen. (5) **„Log dice"** = `DiceRollOverlay` drdplus větev (hotová dřív, jede přes provider DiarySkinScope).
+**Past (vlastní):** outer `DiarySkinScope` nad aside vynutil QueryClient/WorldContext i na **generic** větvi (přes `useDiarySkin`→`useQuery`) → rozbil `BestieRollPanel.spec` (coc bestie, „No QueryClient"), který scope dřív nepotřeboval. Fix = `vi.mock` DiarySkinScope passthrough. **Poučení:** přidám-li wrapper vyžadující context na SPOLEČNOU cestu, musím projít i testy větví, co ho dřív nepotřebovaly.
+**Pozn. (návrh):** vnitřní DrdPlus panel je pergamen i bez scope (`.root` má self-contained `--dd-*`); DiarySkinScope nad aside je potřeba pro drd16/matrix vnitřní panely (konzumují ancestor tokeny) + drdplus **chrome** (`--dd-embed-*`).
+**Jak ověřeno:** 34 testů (chat+map+rail+combat) ✓, `npm run build` ✓, eslint --fix čistý.
+**Zhodnocení:** dobře — no-drift extrakce, parita napříč deník/mapa/chat. drd16/matrix chrome zatím chat-motiv (neskinováno) = vědomá odchylka (uživatel chtěl drdplus); případný follow-up.
+
+---

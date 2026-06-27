@@ -18,6 +18,7 @@ import { useCombatantMutation } from '../../api/useChannelCombat';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
 import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
+import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import s from './railShell.module.css';
 
 interface Props {
@@ -105,6 +106,10 @@ export function BestieInstancePanel({
   };
 
   return (
+    // 16.2d-chat — „obalení": DiarySkinScope nad CELÝM railem (display:contents,
+    // bez layout boxu) → deníkový skin nese i chrome (identity/controls), ne jen
+    // vnitřní panel. railShell má `[data-diary-system='drdplus']` pergamen override.
+    <DiarySkinScope worldId={worldId} style={{ display: 'contents' }}>
     <aside className={s.panel}>
       <div className={s.controls}>
         {onBack && (
@@ -157,50 +162,51 @@ export function BestieInstancePanel({
 
       <div className={s.scroll}>
         {systemId === 'drd16' ? (
-          // 16.2b-chat — drd16 dostává vlastní bojový panel (d6+ útoky/OČ/
-          // iniciativa, fantasy skin, edit přes Drd16BestieForm modal), parita
-          // s mapou. Ostatní systémy generic statblok (Matrix funguje, fate OK).
-          <DiarySkinScope worldId={worldId}>
-            <Drd16ChatBestiePanel
-              worldId={worldId}
-              channelId={channelId}
-              rollerName={combatant.name}
-              avatarUrl={combatant.imageUrl}
-              systemStats={combatant.systemStats}
-              notes={combatant.notes}
-              canEdit={canEdit}
-              onPatch={(patch) =>
-                mut.mutate({
-                  op: 'update',
-                  combatantId: combatant.id,
-                  patch,
-                })
-              }
-            />
-          </DiarySkinScope>
+          // 16.2b-chat — drd16 vlastní bojový panel (d6+ útoky/OČ/iniciativa,
+          // fantasy skin, edit modal). Skin nese obalení (DiarySkinScope nad aside).
+          <Drd16ChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            rollerName={combatant.name}
+            avatarUrl={combatant.imageUrl}
+            systemStats={combatant.systemStats}
+            notes={combatant.notes}
+            canEdit={canEdit}
+            onPatch={(patch) =>
+              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+            }
+          />
         ) : systemId === 'matrix' ? (
-          // 16.2b-chat (D-NEW-CHAT-BESTIE-MATRIX-UNIFY) — Matrix dostal stejný
-          // drd16-style panel (klik na schopnost = hod, HP klik ±, edit modal).
-          <DiarySkinScope worldId={worldId}>
-            <MatrixChatBestiePanel
-              worldId={worldId}
-              channelId={channelId}
-              systemId={systemId}
-              rollerName={combatant.name}
-              avatarUrl={combatant.imageUrl}
-              systemStats={combatant.systemStats}
-              abilities={combatant.abilities}
-              notes={combatant.notes}
-              canEdit={canEdit}
-              onPatch={(patch) =>
-                mut.mutate({
-                  op: 'update',
-                  combatantId: combatant.id,
-                  patch,
-                })
-              }
-            />
-          </DiarySkinScope>
+          // 16.2b-chat — Matrix drd16-style panel (klik=hod, HP ±, edit modal).
+          <MatrixChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            systemId={systemId}
+            rollerName={combatant.name}
+            avatarUrl={combatant.imageUrl}
+            systemStats={combatant.systemStats}
+            abilities={combatant.abilities}
+            notes={combatant.notes}
+            canEdit={canEdit}
+            onPatch={(patch) =>
+              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+            }
+          />
+        ) : systemId === 'drdplus' ? (
+          // 16.2d-chat — DrD+ pergamen panel (2k6+/d6, BČ→iniciativa), parita s mapou.
+          <DrdPlusChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            rollerName={combatant.name}
+            avatarUrl={combatant.imageUrl}
+            systemStats={combatant.systemStats}
+            abilities={combatant.abilities}
+            notes={combatant.notes}
+            canEdit={canEdit}
+            onPatch={(patch) =>
+              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+            }
+          />
         ) : (
           <BestieStatblock
             token={token}
@@ -225,5 +231,6 @@ export function BestieInstancePanel({
         )}
       </div>
     </aside>
+    </DiarySkinScope>
   );
 }

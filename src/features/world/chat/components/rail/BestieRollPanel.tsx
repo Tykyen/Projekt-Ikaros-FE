@@ -8,6 +8,7 @@ import type { Bestie } from '@/features/world/bestiar/types';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
 import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
+import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import s from './railShell.module.css';
 import b from './BestieRollPanel.module.css';
 
@@ -50,6 +51,9 @@ export function BestieRollPanel({
   });
 
   return (
+    // 16.2d-chat — „obalení": DiarySkinScope nad celým railem (display:contents)
+    // → deníkový skin nese i chrome, ne jen vnitřní panel.
+    <DiarySkinScope worldId={worldId} style={{ display: 'contents' }}>
     <aside className={s.panel}>
       <div className={s.controls}>
         {onBack && (
@@ -92,38 +96,49 @@ export function BestieRollPanel({
       <div className={s.scroll}>
         {systemId === 'drd16' ? (
           // 16.2b-chat — drd16 katalogová bestie: vlastní bojový panel (d6+
-          // útoky/OČ/iniciativa, fantasy skin), read-only (editace patří do
-          // Bestiáře → bez onPatch). Popis renderuje panel sám.
-          <DiarySkinScope worldId={worldId}>
-            <Drd16ChatBestiePanel
-              worldId={worldId}
-              channelId={channelId}
-              rollerName={bestie.name}
-              avatarUrl={bestie.imageUrl}
-              systemStats={bestie.systemStats}
-              notes={bestie.notes}
-              canEdit={false}
-            />
-          </DiarySkinScope>
+          // útoky/OČ/iniciativa), read-only (editace patří do Bestiáře → bez
+          // onPatch). Skin nese obalení (DiarySkinScope nad aside).
+          <Drd16ChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            rollerName={bestie.name}
+            avatarUrl={bestie.imageUrl}
+            systemStats={bestie.systemStats}
+            notes={bestie.notes}
+            canEdit={false}
+          />
         ) : systemId === 'matrix' ? (
-          // 16.2b-chat (D-NEW-CHAT-BESTIE-MATRIX-UNIFY) — Matrix katalogová
-          // bestie: drd16-style panel (klik na schopnost = hod), read-only.
-          <DiarySkinScope worldId={worldId}>
-            <MatrixChatBestiePanel
-              worldId={worldId}
-              channelId={channelId}
-              systemId={systemId}
-              rollerName={bestie.name}
-              avatarUrl={bestie.imageUrl}
-              systemStats={bestie.systemStats}
-              abilities={abilities.map((a) => ({
-                name: a.label,
-                description: a.value,
-              }))}
-              notes={bestie.notes}
-              canEdit={false}
-            />
-          </DiarySkinScope>
+          // 16.2b-chat — Matrix katalogová bestie: drd16-style panel, read-only.
+          <MatrixChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            systemId={systemId}
+            rollerName={bestie.name}
+            avatarUrl={bestie.imageUrl}
+            systemStats={bestie.systemStats}
+            abilities={abilities.map((a) => ({
+              name: a.label,
+              description: a.value,
+            }))}
+            notes={bestie.notes}
+            canEdit={false}
+          />
+        ) : systemId === 'drdplus' ? (
+          // 16.2d-chat — DrD+ katalogová bestie: pergamen panel (2k6+/d6,
+          // BČ→iniciativa), read-only (bez onPatch).
+          <DrdPlusChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            rollerName={bestie.name}
+            avatarUrl={bestie.imageUrl}
+            systemStats={bestie.systemStats}
+            abilities={abilities.map((a) => ({
+              name: a.label,
+              description: a.value,
+            }))}
+            notes={bestie.notes}
+            canEdit={false}
+          />
         ) : (
           <>
             <BestieStatblock
@@ -157,5 +172,6 @@ export function BestieRollPanel({
         )}
       </div>
     </aside>
+    </DiarySkinScope>
   );
 }

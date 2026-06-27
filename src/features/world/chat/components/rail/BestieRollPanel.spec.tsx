@@ -10,6 +10,16 @@ const { mockOnRoll, mockMakeOnRoll } = vi.hoisted(() => {
 vi.mock('./useChatDiaryRoll', () => ({
   useChatDiaryRoll: () => mockMakeOnRoll,
 }));
+// 16.2d-chat — rail je nově obalen DiarySkinScope („obalení" chrome); v unit
+// testu ho přemostíme (netestuje skin, jinak by vyžadoval QueryClient/WorldContext).
+vi.mock(
+  '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope',
+  () => ({
+    DiarySkinScope: ({ children }: { children: import('react').ReactNode }) => (
+      <>{children}</>
+    ),
+  }),
+);
 vi.mock('@/features/world/tactical-map/components/tokens/BestieStatblock', () => ({
   BestieStatblock: ({
     abilities,
