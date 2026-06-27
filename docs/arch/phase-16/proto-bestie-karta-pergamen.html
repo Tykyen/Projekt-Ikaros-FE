@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="cs">
+<!--
+  NÁVRHOVÝ PROTOTYP — bestiární „čtecí/prezentační" karta bytosti (pergamen „iluminovaný kodex").
+  Vytvořeno 2026-06-27 v rámci 16.2d (DrD+ bestie). Pro bestiářový EDITOR se NEPOUŽÍVÁ
+  (tam jede jednoduchý generic form, Cesta A). Tento vzhled je ODLOŽEN k jinému využití
+  (čtecí karta / prezentace / sdílení / PDF) — viz spec-16.2d-bestie-drdplus §7.
+  Self-contained, sladěno s DrD+ skinem deníku (drdplus.css): UnifrakturCook / Cinzel / EB Garamond,
+  pergamenová paleta, per-kategorie akcent (analogie per-profese deníku).
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrD+ Bestiář — prototyp čtecí karty bytosti (pergamen)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cinzel:wght@400;500;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* DrD+ pergamen „iluminovaný kodex" (sjednoceno s drdplus.css) */
+  --paper:#e9ddc3; --paper-2:#e2d4b6; --paper-edge:#cdba93;
+  --ink:#2a2017; --ink-soft:#5a4a36; --ink-faint:#8a7656;
+  --line:#b7a079; --line-soft:#c9b58e; --gold:#9c7b2e; --gold-hi:#caa24a;
+  /* akcent default (knez/zlato) — přepisuje data-cat */
+  --acc:#a8801f; --acc-deep:#765905; --acc-tint:rgba(168,128,31,.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:'EB Garamond',Georgia,serif;
+  color:var(--ink);
+  /* tmavé dřevo/kámen kolem listu, ať karta vynikne jako stránka kodexu */
+  background:
+    radial-gradient(140% 120% at 50% -10%, #2c2418 0%, #1a140c 60%, #0e0a05 100%);
+  padding:40px 20px 80px;
+  line-height:1.5;
+}
+.audit-note{
+  max-width:1180px;margin:0 auto 28px;color:#c9b58e;font-size:13px;
+  font-family:'Cinzel',serif;letter-spacing:.12em;text-transform:uppercase;
+  text-align:center;opacity:.7;
+}
+.audit-note b{color:var(--gold-hi)}
+
+/* ── stránka kodexu ── */
+.bs{
+  position:relative;max-width:1180px;margin:0 auto 56px;
+  background:radial-gradient(120% 80% at 50% -8%, #f1e7cf 0%, var(--paper) 45%, var(--paper-2) 100%);
+  border-radius:6px;
+  padding:34px 38px 48px;
+  box-shadow:
+    inset 0 0 160px 36px rgba(90,64,30,.16),
+    0 0 0 1px var(--paper-edge),
+    0 18px 60px rgba(0,0,0,.55);
+}
+/* zrnitý papír */
+.bs::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.05;border-radius:6px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.bs > *{position:relative;z-index:1}
+/* ozdobné rohy listu */
+.bs::after{
+  content:'';position:absolute;inset:12px;pointer-events:none;border:1px solid var(--line);
+  opacity:.4;border-radius:3px;
+  -webkit-mask:linear-gradient(#000,#000) top left/26px 26px no-repeat,
+        linear-gradient(#000,#000) top right/26px 26px no-repeat,
+        linear-gradient(#000,#000) bottom left/26px 26px no-repeat,
+        linear-gradient(#000,#000) bottom right/26px 26px no-repeat;
+}
+
+/* per-kategorie akcent (signature — analogie per-profese deníku) */
+.bs[data-cat="magicka"]{ --acc:#5b3fa3; --acc-deep:#3c2870; --acc-tint:rgba(91,63,163,.12); }
+.bs[data-cat="ciziras"]{ --acc:#2c569e; --acc-deep:#1d3a6e; --acc-tint:rgba(44,86,158,.12); }
+.bs[data-cat="zvire"]  { --acc:#3d6b3a; --acc-deep:#274a26; --acc-tint:rgba(61,107,58,.12); }
+.bs[data-cat="nemrtvy"]{ --acc:#6b2f5e; --acc-deep:#491f40; --acc-tint:rgba(107,47,94,.12); }
+.bs[data-cat="drak"]   { --acc:#8c2f2f; --acc-deep:#5e1d1d; --acc-tint:rgba(140,47,47,.12); }
+.bs[data-cat="rostlina"]{ --acc:#5a6b22; --acc-deep:#3c4716; --acc-tint:rgba(90,107,34,.12); }
+
+/* ── hlavička: medailon + identita ── */
+.bs-head{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;margin-bottom:8px}
+.bs-medal{width:128px;flex:none;text-align:center}
+.bs-medal svg{width:128px;height:148px;filter:drop-shadow(0 4px 6px rgba(70,48,18,.3))}
+.bs-medal .frame{fill:rgba(255,252,244,.55);stroke:var(--acc);stroke-width:3}
+.bs-medal .frame-in{fill:none;stroke:var(--acc);stroke-width:1;opacity:.5}
+.bs-medal .glyph{font-family:'UnifrakturCook',cursive;font-size:54px;fill:var(--acc-deep);text-anchor:middle;opacity:.92}
+.bs-medal .hatch{stroke:var(--acc);stroke-width:.6;opacity:.18}
+.bs-medal figcaption{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px}
+
+.bs-titles{min-width:0}
+.bs-eyebrow{font-family:'Cinzel',serif;letter-spacing:.34em;text-transform:uppercase;font-size:11px;color:var(--ink-faint);padding-left:.34em}
+.bs-eyebrow b{color:var(--acc-deep);font-weight:700}
+.bs-name{font-family:'UnifrakturCook',cursive;font-size:clamp(38px,6vw,58px);line-height:1.02;color:var(--ink);text-shadow:0 1px 0 rgba(255,255,255,.4);margin:2px 0 6px}
+.bs-tags{display:flex;flex-wrap:wrap;gap:6px}
+.bs-tag{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-deep);background:var(--acc-tint);border:1px solid var(--line-soft);padding:3px 10px;border-radius:0 0 10px 0}
+
+/* dělící ornament */
+.bs-rule{height:0;border:0;margin:18px auto 22px;max-width:420px;border-top:2px solid var(--line);position:relative}
+.bs-rule::after{content:'❧';position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);background:var(--paper);padding:0 16px;color:var(--gold);font-size:19px}
+
+/* ── tělo: statblok | lore ── */
+.bs-body{display:grid;grid-template-columns:340px 1fr;gap:30px;align-items:start}
+
+/* statová deska */
+.statblock{
+  position:relative;
+  background:linear-gradient(180deg,rgba(255,250,238,.6),rgba(220,205,172,.3));
+  border:1.5px solid var(--line);
+  padding:16px 16px 20px;
+  clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%);
+  box-shadow:0 2px 12px rgba(70,48,18,.12),inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.statblock::before{content:'';position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(135deg,transparent 49%,var(--acc) 50%);opacity:.5}
+.statblock::after{content:'';position:absolute;left:7px;bottom:7px;width:16px;height:16px;border-left:2px solid var(--acc);border-bottom:2px solid var(--acc);opacity:.35}
+
+.sb-h{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--acc-deep);margin:18px 0 9px;display:flex;align-items:center;gap:8px}
+.sb-h:first-child{margin-top:2px}
+.sb-h::before{content:'';width:9px;height:9px;flex:none;background:var(--acc);transform:rotate(45deg);opacity:.8}
+.sb-h::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+/* 6 vlastností */
+.abil{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ab{background:rgba(255,252,244,.55);border:1px solid var(--line-soft);text-align:center;padding:7px 2px 6px;border-radius:2px}
+.ab .k{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint)}
+.ab .v{font-family:'EB Garamond',serif;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.ab.main{background:var(--acc-tint);border-color:var(--acc);position:relative}
+.ab.main .v{font-weight:600;color:var(--acc-deep)}
+.ab.main::after{content:'◆';position:absolute;top:2px;right:3px;font-size:7px;color:var(--acc);opacity:.8}
+
+/* bojová čtveřice */
+.combat4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.cb{position:relative;background:linear-gradient(180deg,rgba(255,250,238,.75),var(--acc-tint));border:1.5px solid var(--acc);text-align:center;padding:8px 2px 9px;clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)}
+.cb .k{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-deep)}
+.cb .v{font-family:'EB Garamond',serif;font-size:26px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.05}
+
+/* textové bojové řádky (zranění / nezranitelnost) */
+.kv{display:flex;justify-content:space-between;gap:10px;padding:5px 2px;border-bottom:1px dotted var(--line-soft);font-size:14.5px}
+.kv:last-child{border-bottom:0}
+.kv .kk{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);align-self:center}
+.kv .vv{text-align:right;color:var(--ink)}
+.kv .vv.dash{color:var(--ink-faint);font-style:italic}
+
+/* malé staty (tělo, smysly) */
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.mi{background:rgba(255,252,244,.4);border:1px solid var(--line-soft);text-align:center;padding:5px 2px}
+.mi .k{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-faint)}
+.mi .v{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.mi.special{grid-column:1/-1;text-align:left;padding:6px 9px;display:flex;justify-content:space-between;align-items:center;background:var(--acc-tint);border-color:var(--acc)}
+.mi.special .k{color:var(--acc-deep)}
+.mi.special .v{font-size:15px;font-weight:600;color:var(--acc-deep)}
+
+/* badge hodnota damageable (HP na mapě) */
+.hp-badge{display:inline-flex;align-items:center;gap:5px}
+.hp-badge::before{content:'❤';font-size:11px;color:var(--acc)}
+
+/* ── lore ── */
+.lore{min-width:0}
+.lore-sec{margin-bottom:18px}
+.lore-h{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--acc-deep);margin:0 0 7px;display:flex;align-items:center;gap:9px}
+.lore-h::before{content:'';width:11px;height:11px;flex:none;background:var(--acc);transform:rotate(45deg);opacity:.85}
+.lore-h::after{content:'';flex:1;height:1.5px;background:linear-gradient(90deg,var(--line),transparent);opacity:.6}
+.lore-sec p{margin:0 0 9px;font-size:16px;line-height:1.62;text-align:justify;hyphens:auto}
+/* drop-cap u prvního odstavce Popisu */
+.lore-sec.lead p:first-of-type::first-letter{
+  font-family:'UnifrakturCook',cursive;font-size:56px;line-height:.78;float:left;
+  margin:6px 10px 0 0;color:var(--acc-deep);
+}
+/* Setkání = vsazený dialog (citace) */
+.encounter{background:var(--acc-tint);border-left:3px solid var(--acc);padding:12px 16px;border-radius:0 4px 4px 0}
+.encounter p{font-style:italic;font-size:15.5px;color:var(--ink-soft);margin:0 0 7px}
+.encounter p:last-child{margin-bottom:0}
+/* Zvláštní vlastnosti — mechaniky */
+.special-box{background:rgba(255,250,238,.5);border:1px solid var(--line);border-left:3px solid var(--acc);padding:12px 16px}
+.special-box .name{font-family:'Cinzel',serif;font-weight:600;font-size:13px;color:var(--acc-deep);letter-spacing:.04em}
+.special-box p{font-size:15px;margin:2px 0 12px}
+.special-box p:last-child{margin-bottom:0}
+.dice{font-family:'Fira Code',monospace;font-size:13px;background:var(--ink);color:var(--paper);padding:2px 8px;border-radius:3px;letter-spacing:.02em;display:inline-block;margin-top:2px}
+
+/* patička */
+.bs-foot{margin-top:26px;text-align:center;color:var(--gold);font-size:22px;opacity:.6;letter-spacing:.5em}
+
+/* ── responsivita (base.md: mobile ≤768) ── */
+@media(max-width:860px){
+  .bs-body{grid-template-columns:1fr}
+  .statblock{clip-path:none}
+}
+@media(max-width:768px){
+  .bs{padding:24px 18px 36px}
+  .bs-head{grid-template-columns:1fr;justify-items:center;text-align:center;gap:14px}
+  .bs-tags{justify-content:center}
+  .abil{grid-template-columns:repeat(3,1fr)}
+  .combat4{grid-template-columns:repeat(2,1fr)}
+  .lore-sec p{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<div class="audit-note">Prototyp · DrD+ Bestiář · čtecí karta bytosti <b>(odložený vzhled)</b> · per-kategorie akcent · data ze skenů (Požírač duší · Elf vodní)</div>
+
+<!-- ════════════ MAGICKÁ BYTOST — Požírač duší ════════════ -->
+<article class="bs" data-cat="magicka">
+  <header class="bs-head">
+    <figure class="bs-medal">
+      <svg viewBox="0 0 128 148" aria-hidden="true">
+        <defs>
+          <pattern id="h1" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line class="hatch" x1="0" y1="0" x2="0" y2="7"/>
+          </pattern>
+        </defs>
+        <path class="frame" d="M10 8 H118 V96 Q118 132 64 142 Q10 132 10 96 Z"/>
+        <path class="frame-in" d="M17 15 H111 V94 Q111 125 64 134 Q17 125 17 94 Z"/>
+        <path d="M17 15 H111 V94 Q111 125 64 134 Q17 125 17 94 Z" fill="url(#h1)"/>
+        <text class="glyph" x="64" y="92">P</text>
+      </svg>
+      <figcaption>Rytina · ilustrace</figcaption>
+    </figure>
+    <div class="bs-titles">
+      <div class="bs-eyebrow">Bestiář · <b>Magické bytosti</b></div>
+      <h1 class="bs-name">Požírač duší</h1>
+      <div class="bs-tags">
+        <span class="bs-tag">velmi vzácný</span>
+        <span class="bs-tag">jedinec</span>
+        <span class="bs-tag">aktivní stále</span>
+        <span class="bs-tag">velikost +5</span>
+      </div>
+    </div>
+  </header>
+
+  <hr class="bs-rule">
+
+  <div class="bs-body">
+    <!-- STATBLOK -->
+    <aside class="statblock">
+      <div class="sb-h">Vlastnosti</div>
+      <div class="abil">
+        <div class="ab main"><div class="k">Síla</div><div class="v">5</div></div>
+        <div class="ab"><div class="k">Obr</div><div class="v">7</div></div>
+        <div class="ab"><div class="k">Zrč</div><div class="v">−10</div></div>
+        <div class="ab main"><div class="k">Vůle</div><div class="v">−4</div></div>
+        <div class="ab"><div class="k">Int</div><div class="v">−5</div></div>
+        <div class="ab"><div class="k">Chr</div><div class="v">6</div></div>
+      </div>
+
+      <div class="sb-h">Boj</div>
+      <div class="combat4">
+        <div class="cb"><div class="k">BČ</div><div class="v">4</div></div>
+        <div class="cb"><div class="k">ÚČ</div><div class="v">5</div></div>
+        <div class="cb"><div class="k">OČ</div><div class="v">4</div></div>
+        <div class="cb"><div class="k">Ochr</div><div class="v">2</div></div>
+      </div>
+      <div style="margin-top:9px">
+        <div class="kv"><span class="kk">Zranění</span><span class="vv">3 B · tlama</span></div>
+        <div class="kv"><span class="kk">Nezranitelnost</span><span class="vv">Ψ</span></div>
+      </div>
+
+      <div class="sb-h">Tělo a pohyb</div>
+      <div class="mini">
+        <div class="mi"><div class="k">Odolnost</div><div class="v">7</div></div>
+        <div class="mi"><div class="k">Mez zran.</div><div class="v hp-badge">7</div></div>
+        <div class="mi"><div class="k">Výdrž</div><div class="v">—</div></div>
+        <div class="mi"><div class="k">Rychlost</div><div class="v">−7</div></div>
+        <div class="mi"><div class="k">Velikost</div><div class="v">+5</div></div>
+        <div class="mi"><div class="k">Rozměry</div><div class="v" style="font-size:12px">— / 4 m</div></div>
+      </div>
+
+      <div class="sb-h">Smysly</div>
+      <div class="mini">
+        <div class="mi"><div class="k">Hmat</div><div class="v">−2</div></div>
+        <div class="mi"><div class="k">Chuť</div><div class="v">−5</div></div>
+        <div class="mi"><div class="k">Čich</div><div class="v">−2</div></div>
+        <div class="mi"><div class="k">Sluch</div><div class="v">−2</div></div>
+        <div class="mi"><div class="k">Zrak</div><div class="v">−5</div></div>
+        <div class="mi"><div class="k">&nbsp;</div><div class="v">&nbsp;</div></div>
+        <div class="mi special"><span class="k">Vidění duší</span><span class="v">4</span></div>
+      </div>
+
+      <div class="sb-h">Výskyt a ekologie</div>
+      <div>
+        <div class="kv"><span class="kk">Četnost</span><span class="vv">velmi vzácný</span></div>
+        <div class="kv"><span class="kk">Místo</span><span class="vv">kdekoli</span></div>
+        <div class="kv"><span class="kk">Zařazení</span><span class="vv dash">—</span></div>
+        <div class="kv"><span class="kk">Organizace</span><span class="vv">jedinec</span></div>
+        <div class="kv"><span class="kk">Aktivita</span><span class="vv">stále</span></div>
+      </div>
+    </aside>
+
+    <!-- LORE -->
+    <div class="lore">
+      <section class="lore-sec lead">
+        <h2 class="lore-h">Popis</h2>
+        <p>Astrální sféry jsou matkou i otcem mnoha prazvláštních stvoření. Jedním z nich je i požírač duší. Smrtelníkům se zjevuje v podobě velkého hada nejen s rozeklaným jazykem, ale i rozpůleným ocasem. Jemné šupiny mají šedivou barvu a po celém hřbetu až ke dvěma ocasům se táhne hypnotizující bílá kresba. Hadí oči jsou šedivě kalné, bez duhovek, bez zornic. A tlamu má bezzubou.</p>
+        <p>Když se plazí, udělá rychlý pohyb a hned znehybní, svižně se přesune jinam a zase jakoby zkamení. Je těžké jej spatřit, pohne se vždy, když se na něj nedíváš.</p>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Výskyt</h2>
+        <p>Požírač duší dokáže žít v různých podmínkách. Raději má ale chlad než horko. Denní světlo mu není příjemné, a proto bývá zalezlý v nějaké díře nebo podzemí a ven vylézá až za šera nebo za bouřky.</p>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Chování</h2>
+        <p>Tento kouzelný plaz žije z duší svých obětí. Není nepodobný obyčejným hadům, když se patřičně nasytí, dokáže pak dlouho spát a odpočívat. Sežrané duše v něm trpí, rozkládají se a umírají. Proto je požírač duší tak obávaný, nedopřeje své kořisti ani po smrti klid.</p>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Setkání</h2>
+        <div class="encounter">
+          <p>Alfa křičela, ze zářících očí jí tryskaly slzy, vlasy propletené ostrým světlem jí vířily a z těla jí pomalu vyprchával život. V tu chvíli se Colosus probral z bezvědomí. Nedbal na krev v zátylku a skočil na popelavého hada, jenž do sebe nasával Alfin život.</p>
+          <p>Když had dopadl, zasvítil a z jeho útrob vylétlo tornádo běsnících duší. Kvílely a smály se, pištěly a plakaly. Konečně byly alespoň jejich ostatky svobodné.</p>
+        </div>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Boj</h2>
+        <p>Ke svým obětem se požírač duší neplazí přímo. Využívá terénních překážek, aby nevzbudil pozornost. Jakmile má svou kořist na dosah, vymrští se a omotá ji svým tělem. Dvěma ocasy sváže nohy a své šupiny vtiskne do oběti v děsivém sevření. Jeho hlava se vztyčí nad řvoucím nebožákem a do rozevřené tlamy začne nasávat jeho duši.</p>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Zvláštní vlastnosti</h2>
+        <div class="special-box">
+          <div class="name">Vidění duší</div>
+          <p>Požírač duší má velmi slabý zrak, kterým vidí jen obrysy. Má ale zvláštní smysl, jímž ostře vidí věci s duší, ke kterým vedou vazby života.</p>
+          <div class="name">Vysátí duše</div>
+          <p>Dokud má had svou oběť sevřenou, pokouší se každé kolo vysát její duši. Jedná se o hod na porovnání:</p>
+          <span class="dice">Vol hada + 2k6+ proti Vol oběti + 2k6+</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="bs-foot">⚜</div>
+</article>
+
+
+<!-- ════════════ CIZÍ RASA — Elf vodní ════════════ -->
+<article class="bs" data-cat="ciziras">
+  <header class="bs-head">
+    <figure class="bs-medal">
+      <svg viewBox="0 0 128 148" aria-hidden="true">
+        <defs>
+          <pattern id="h2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line class="hatch" x1="0" y1="0" x2="0" y2="7"/>
+          </pattern>
+        </defs>
+        <path class="frame" d="M10 8 H118 V96 Q118 132 64 142 Q10 132 10 96 Z"/>
+        <path class="frame-in" d="M17 15 H111 V94 Q111 125 64 134 Q17 125 17 94 Z"/>
+        <path d="M17 15 H111 V94 Q111 125 64 134 Q17 125 17 94 Z" fill="url(#h2)"/>
+        <text class="glyph" x="64" y="92">E</text>
+      </svg>
+      <figcaption>Rytina · ilustrace</figcaption>
+    </figure>
+    <div class="bs-titles">
+      <div class="bs-eyebrow">Bestiář · <b>Cizí rasy</b></div>
+      <h1 class="bs-name">Elf vodní</h1>
+      <div class="bs-tags">
+        <span class="bs-tag">neobvyklý</span>
+        <span class="bs-tag">rozvinuté společenství</span>
+        <span class="bs-tag">aktivní ve dne</span>
+        <span class="bs-tag">velikost −1</span>
+      </div>
+    </div>
+  </header>
+
+  <hr class="bs-rule">
+
+  <div class="bs-body">
+    <aside class="statblock">
+      <div class="sb-h">Vlastnosti</div>
+      <div class="abil">
+        <div class="ab"><div class="k">Síla</div><div class="v">1</div></div>
+        <div class="ab main"><div class="k">Obr</div><div class="v">3</div></div>
+        <div class="ab"><div class="k">Zrč</div><div class="v">2</div></div>
+        <div class="ab main"><div class="k">Vůle</div><div class="v">3</div></div>
+        <div class="ab"><div class="k">Int</div><div class="v">3</div></div>
+        <div class="ab"><div class="k">Chr</div><div class="v">2</div></div>
+      </div>
+
+      <div class="sb-h">Boj</div>
+      <div class="combat4">
+        <div class="cb"><div class="k">BČ</div><div class="v">2</div></div>
+        <div class="cb"><div class="k">ÚČ</div><div class="v">1</div></div>
+        <div class="cb"><div class="k">OČ</div><div class="v">2</div></div>
+        <div class="cb"><div class="k">Ochr</div><div class="v">0</div></div>
+      </div>
+      <div style="margin-top:9px">
+        <div class="kv"><span class="kk">Zranění</span><span class="vv">zbraně</span></div>
+        <div class="kv"><span class="kk">Nezranitelnost</span><span class="vv dash">—</span></div>
+      </div>
+
+      <div class="sb-h">Tělo a pohyb</div>
+      <div class="mini">
+        <div class="mi"><div class="k">Odolnost</div><div class="v">1</div></div>
+        <div class="mi"><div class="k">Mez zran.</div><div class="v hp-badge">2</div></div>
+        <div class="mi"><div class="k">Výdrž</div><div class="v">2</div></div>
+        <div class="mi"><div class="k">Rychlost</div><div class="v">+2</div></div>
+        <div class="mi"><div class="k">Velikost</div><div class="v">−1</div></div>
+        <div class="mi"><div class="k">Rozměry</div><div class="v" style="font-size:12px">1,7 m / —</div></div>
+        <div class="mi special"><span class="k">Pohyb pozn.</span><span class="v">+0 plavání</span></div>
+      </div>
+
+      <div class="sb-h">Smysly</div>
+      <div class="mini">
+        <div class="mi"><div class="k">Hmat</div><div class="v">3</div></div>
+        <div class="mi"><div class="k">Chuť</div><div class="v">3</div></div>
+        <div class="mi"><div class="k">Čich</div><div class="v">3</div></div>
+        <div class="mi"><div class="k">Sluch</div><div class="v">5</div></div>
+        <div class="mi"><div class="k">Zrak</div><div class="v">1</div></div>
+        <div class="mi"><div class="k">&nbsp;</div><div class="v">&nbsp;</div></div>
+      </div>
+
+      <div class="sb-h">Výskyt a ekologie</div>
+      <div>
+        <div class="kv"><span class="kk">Četnost</span><span class="vv">neobvyklý</span></div>
+        <div class="kv"><span class="kk">Místo</span><span class="vv" style="font-size:13px">mírné pobřeží, korálový útes</span></div>
+        <div class="kv"><span class="kk">Zařazení</span><span class="vv dash">—</span></div>
+        <div class="kv"><span class="kk">Organizace</span><span class="vv" style="font-size:13px">rozvinuté společenství</span></div>
+        <div class="kv"><span class="kk">Aktivita</span><span class="vv">den</span></div>
+      </div>
+    </aside>
+
+    <div class="lore">
+      <section class="lore-sec lead">
+        <h2 class="lore-h">Popis</h2>
+        <p>Vodní elfové jsou podobní svým suchozemským bratrům. Útlé tělo, jemná tvář, zašpičatělé uši. Životem v mořích se však jejich vzhled odlišil. Kůže získala modrý nádech, mezi prsty se napjala blána a za každým uchem se objevily žábry. Díky nim dokážou elfové přežívat pod hladinou. Plíce jim stále zůstaly, proto vydrží i na souši, ale ne dlouho, protože jejich tělo je až příliš navyklé životu pod vodou.</p>
+        <p>Někteří mívají bledé vlasy, ale častá je i nazelenalá nebo nahnědlá barva. Aby jim nevadily při plavání, svazují si jednotlivé prameny několika kroužky nebo si splétají složité copy.</p>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Výskyt</h2>
+        <p>Žijí takřka v jakýchkoliv slaných vodách. V řekách se nevyskytují, sladká voda jim věru nesvědčí.</p>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Chování</h2>
+        <p>Vodních elfů je na světě málo. Stejně jako suchozemští elfové plodí jen málo dětí, a tak každá ztráta života je pro ně velmi drahá. Elfové uctívají moře, naslouchají mu a v mnohém mu rozumějí. Vodní elfové nemají rádi nikoho, kdo narušuje klid a rovnováhu moří a oceánů. Bedlivě střeží svůj domov před svými nepřáteli, jichž stále přibývá.</p>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Setkání</h2>
+        <div class="encounter">
+          <p>„Elf jako elf, já se o něj postarám,“ prohlásil Cedrik a vytáhl tesák.</p>
+          <p>„Počkej Cedriku, tenhle je nějakej jinej.“</p>
+          <p>„Špičatý uši má a čučí blbě, co bys po něm ještě chtěl?“</p>
+          <p>„Než zbarvíte vodu mou krví,… pomyslete na to, jaké hrůzy vám moře přinese. Voda ti zalije hrdlo dřív, než se nadějеš,“ podíval se elf vážně na Cedrika.</p>
+        </div>
+      </section>
+
+      <section class="lore-sec">
+        <h2 class="lore-h">Boj</h2>
+        <p>Vodní elfové sami málokdy útok začnou, spíše se brání, soupeři jsou však nebezpečnými. Jejich válečníci dobře zacházejí s trojzubci a harpunami. Ve zvláštních případech povolávají na pomoc sílu vodních božstev. Víry a silné proudy dokážou odradit většinu nepřátel. Ve svém prostředí mají vodní elfové proti suchozemským tvorům velkou výhodu. Dobře znají hlubiny, dovedou dýchat pod vodou a jejich smysly, zejména sluch, jsou pod hladinou mnohem citlivější.</p>
+      </section>
+    </div>
+  </div>
+
+  <div class="bs-foot">⚜</div>
+</article>
+
+</body>
+</html>

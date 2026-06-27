@@ -87,6 +87,7 @@ import {
 import type { DicePayload } from "@/features/world/chat/dice/lib/dicePayload";
 import { TokenInfoPanel } from "./components/token-panel/TokenInfoPanel";
 import { TokenSystemSheet } from "./components/token-panel/TokenSystemSheet";
+import { resolveSystemId } from "@/features/world/systemId";
 import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
 import { MapNotebookButton } from "./components/notebook/MapNotebookButton";
 import { MapNotebookOverlay } from "./components/notebook/MapNotebookOverlay";
@@ -165,7 +166,12 @@ function effectCoversHex(
 
 export function TacticalMapView(): React.ReactElement {
   const { worldId, world, userRole, loading, character } = useWorldContext();
-  const worldSystemId = world?.system ?? "drd2";
+  // Normalizace „dlouhých" id z nabídky (drd-plus→drdplus, call-of-cthulhu→coc,
+  // draci-hlidka→drdh) na canonical — jinak per-system panely (combat/bestie) i
+  // bestiář-query na mapě minou (registry/COMBAT_PANELS/bestie větev znají jen
+  // canonical; bestie jsou uložené pod canonical po BestiarPage normalizaci).
+  // Jediná pravda: systemId.ts. (umořuje mapovou část D-NEW-SYS-WORLDSYSTEMID-RAW)
+  const worldSystemId = resolveSystemId(world?.system) || "drd2";
   const currentUser = useAtomValue(currentUserAtom);
   const viewportRef = useRef<HTMLDivElement>(null);
   const theme = useMapTheme();

@@ -189,13 +189,18 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 - **Schopnosti** bestie se editují přes per-system schéma (sekce „Schopnosti" v `bestie.json` → ukládá se do `systemStats.abilities`, list `{label,value}`). To je **jediný zdroj** — čtou ho katalogová karta (`BestieCard`) i spawn na mapu přes sdílený helper `getBestieAbilities` (`bestiar/lib/bestieAbilities.ts`). Spawn (`buildSpawnToken`) je kopíruje do `token.abilities`; token panel (`BestieStatblock`) je zobrazí a umožní **hod kostkou** (🎲 podle hodnoty). Dřívější duplicitní top-level pole `bestie.abilities` (model/DTO/schema) bylo **odstraněno** (D-NEW-BESTIE-ABILITIES-DUP) — editor do něj nikdy nepsal.
 
+**Render editoru/karty (per-system schéma):** editor (`BestieEditorModal` → generický `EntitySchemaForm`) i karta (`BestieCard` → `EntityStatbar`) se generují z `tactical-map/schemas/<system>/bestie.json` přes `systemEntitySchemaRegistry.get(systemId,'bestie')`. Bestie schéma mají: `matrix`, `dnd5e`, `coc`, `drd2`, `drd16`, **`drdplus` (16.2d)**, `fate`, `gurps` (`generic` má jen `token`, ne `bestie` → neznámý systém = „schéma není zaregistrované"). `drd16` má navíc **custom** kartu/form (`Drd16BestieCard`/`Drd16BestieForm`), ostatní jedou generic. Slovní popis bytosti = `Bestie.notes` (vestavěné v editoru, mimo schéma).
+- **DrD+ schéma (`drdplus/bestie.json`, 16.2d):** 6 sekcí — Boj (`mez_zraneni` = `damageable` HP, `ochrana` = `armor-reducer`, `nezranitelnost`, **`utoky`** = list `{name,bc,uc,oc,zz,type}`), Vlastnosti (Sil/Obr/Zrč/Vol/Int/Chr), Tělo a pohyb (`rychlost` = `movement`, Odolnost/Výdrž/Velikost/Rozměry), Smysly (5×), Výskyt a ekologie (Četnost/Aktivita enum + Místo/Organizace), Schopnosti (list `{label,value}`). Spec: `spec-16.2d-bestie-drdplus.md`.
+- **Normalizace `systemId` (16.2d):** `BestiarPage` mapuje `world.system` přes `resolveSystemId` — „dlouhá" id z nabídky (`drd-plus`→`drdplus`, `call-of-cthulhu`→`coc`, `draci-hlidka`→`drdh`) na canonical engine id. Bez toho by schema lookup minul a DrD+/CoC/Dračí hlídka bestiář spadl na „schéma není zaregistrované". BE `bestiae` je pass-through (ukládá/filtruje `systemId` beze změny → konzistentní). (`BestiarPage.tsx:27`, `systemId.ts`)
+
 **Hranice:**
 - Bestie nemá deník/finance/výbavu/kalendář (jen `systemStats` + `abilities` + `notes`).
 - System scope se přes běžné UI needituje — jen Admin platformy.
 - Staty se validují jen v soft mode (viz schema engine).
+- **DrD+ „Mez zranění"** je lineární `damageable` HP, ne věrný 3řádkový pás zranění (bez postihu/postih/kóma) jako u postav — odloženo (D-DRDPLUS-WOUND-LINEAR).
 
 **Stav:** ✅ funguje.
-**Kód:** FE `bestiar/BestiarPage.tsx`, `bestiar/hooks/useBestiar.ts`. BE `bestiae/bestiae.controller.ts`, `bestiae/bestiae.service.ts`.
+**Kód:** FE `bestiar/BestiarPage.tsx`, `bestiar/hooks/useBestiar.ts`, per-system bestie schémata `tactical-map/schemas/<system>/bestie.json` (+ `schemas/bootstrap.ts`, `schemas/registry.ts`). BE `bestiae/bestiae.controller.ts`, `bestiae/bestiae.service.ts`, mirror `backend/assets/schemas/<system>-bestie.json` (flat název, export-schemas).
 
 ---
 
@@ -293,3 +298,5 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 7. **Měny: full-replace PUT** — `updateCurrencies` přepisuje celou sadu; klient musí vždy poslat kompletní seznam, jinak hrozí ztráta měn. Bez delta merge.
 8. **Convert přesnost** — přepočet měn i ceny v obchodě zaokrouhluje na 4 desetinná místa (`round4`); řetězené převody (item currency → account currency) mohou kumulovat zaokrouhlovací chybu. K ověření u drahých položek.
 9. **Bestie update payload nesmí nést immutable pole** — `systemId`/`scope`/`worldId` jsou na BE immutable a nejsou v `UpdateBestieDto`; s `forbidNonWhitelisted` jakékoli pole navíc → **PATCH 400**. FE `BestieEditorModal` proto posílá `systemId` jen do create. (Bylo příčinou 400 při úpravě bestie; opraveno.)
+
+> Vyřešeno 16.2d Fáze 2: ~~DrD+ wound lineární~~ (`DrdPlusBestiePanel` má 3 pásma na mapě, dluh D-DRDPLUS-WOUND-LINEAR uzavřen) · ~~`world.system` raw na mapě~~ (`TacticalMapView` normalizuje přes `resolveSystemId`, dluh D-NEW-SYS-WORLDSYSTEMID-RAW uzavřen).

@@ -9,6 +9,7 @@ import { useAtomValue } from 'jotai';
 import { Button } from '@/shared/ui';
 import { PrintButton } from '@/features/world/export/print';
 import { useWorldContext } from '@/features/world/context/WorldContext';
+import { resolveSystemId } from '@/features/world/systemId';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, WorldRole } from '@/shared/types';
 import { useBestiar } from './hooks/useBestiar';
@@ -24,7 +25,11 @@ type Tab = 'user' | 'world' | 'system';
 export default function BestiarPage(): React.ReactElement {
   const { worldId, world, userRole } = useWorldContext();
   const currentUser = useAtomValue(currentUserAtom);
-  const systemId = world?.system ?? null;
+  // Normalizace „dlouhých" id z nabídky (drd-plus, call-of-cthulhu, draci-hlidka)
+  // na canonical engine id (drdplus, coc, drdh) — jinak schema lookup mine
+  // (registry zná jen canonical). Jediná pravda: systemId.ts. Bez toho DrD+/CoC
+  // bestiář spadne na generic/„schéma není zaregistrované".
+  const systemId = resolveSystemId(world?.system) || null;
   const query = useBestiar(worldId || null, systemId);
   const { softDelete } = useBestieMutations(worldId || null, systemId);
 

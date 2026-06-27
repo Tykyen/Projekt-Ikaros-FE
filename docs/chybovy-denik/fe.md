@@ -838,3 +838,43 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — root-cause fix (1 pravda místo 3 kopií) + guard, ne lokální záplata. Poučení (rodina CH-011): **při fixu „přidej alias / přemapuj id" zgrepuj VŠECHNY konzumenty toho id PŘED tím, než prohlásíš hotovo** — drift se schová v tom, který jsi minul, a vrátí se o systém později (`drd-plus` místo `draci-hlidka`). A: nový registry-lookup vždy se stejným paritním guardem jako sourozenci.
 
 ---
+
+### CH-030 — implementoval jsem DrD+ bestie schéma DŘÍV, než jsem ověřil, jak konzument získává `systemId` (málem mrtvý kód) · 2026-06-27
+
+**Kontext:** 16.2d — nové per-system schéma `drdplus:bestie` do bestiáře. Napsal jsem JSON + wrapper + `bootstrap` registraci + test + spustil build + `export-schemas` do BE — vše zelené, prohlásil bych „hotovo".
+
+**Co jsem udělal špatně:** ověření **napojení** (jak `BestiarPage` resolvuje `systemId`, pod kterým se schéma hledá) jsem nechal až na konec — našel jsem ho náhodou až při zápisu dluhu, když jsem si všiml existujícího `D-NEW-SYS-WORLDSYSTEMID-RAW`.
+
+**Proč to nefungovalo:** `BestiarPage.tsx` bral `world.system` **syrově**; pro DrD+ svět je to `'drd-plus'` (dlouhé id z nabídky `RPG_SYSTEMS`), ale registry/engine zná jen canonical `'drdplus'` → `registry.get('drd-plus','bestie')` MISS → fallback / „schéma není zaregistrované". Celé schéma by se **nikdy nepoužilo** (mrtvý kód), přestože testy i build byly zelené (testují schéma izolovaně, ne jeho napojení).
+
+**Poučení:** u per-system featury (schéma/panel/sheet) je **prvním** krokem zgrepovat, jak konzument získává `systemId` — `world.system` nese „dlouhá" id (`drd-plus`/`call-of-cthulhu`/`draci-hlidka`), canonical je až po `resolveSystemId` (`src/features/world/systemId.ts`). Zelené testy schématu ≠ schéma se reálně renderuje. Tohle je **4. výskyt rodiny system-id drift** (16.2a alias fix, CH-113 `COMBAT_PANELS`, teď bestiář) — rodina se vrací, ber grep konzumentů jako rutinu.
+
+**Příznak cyklení:** dodávám per-system artefakt a spoléhám na izolované zelené testy, aniž bych ověřil, že ho konzument pod správným id najde; v UI by vyskočilo „schéma není zaregistrované" / generic fallback.
+
+---
+
+### ✅ ŘEŠENÍ — DrD+ bestiář napojen normalizací `systemId` v `BestiarPage` (4. výskyt rodiny system-id drift) · 2026-06-27
+
+**Co nakonec zabralo:** `BestiarPage` normalizuje `world.system` přes `resolveSystemId` (jediná pravda v `systemId.ts`, kterou už používaly diary/map registry i `COMBAT_PANELS` po CH-113). Před tím jsem ověřil, že BE modul `bestiae` je **pass-through** (ukládá i filtruje `systemId` beze změny, žádná legacy data dotčených systémů) → normalizace na FE je bezpečná a nerozbije FE↔BE kontrakt (přesně před tím varoval dluh).
+
+**Proč to je správně (a ne další variace):** root fix na úrovni konzumenta, ne registrace schématu pod druhým id. Jedním zásahem se napojí **DrD+ i CoC i Dračí hlídka** bestiář (všechny tři měly stejný MISS) a umoří se bestiář-část dluhu `D-NEW-SYS-WORLDSYSTEMID-RAW` (na mapě `TacticalMapView` zůstává — zapsáno).
+
+**Jak ověřeno:** vitest 19/19 (bestiar specs + nový `drdplus-bestie`), `npm run build` (tsc -b + vite) ✓, `export-schemas` → BE mirror ✓.
+
+**Zhodnocení:** dobře že existující dluh navedl k nálezu dřív, než jsem „hotovo" odeslal; **špatně** že ověření napojení mělo proběhnout v research fázi PŘED implementací (viz CH-030). Rodina system-id drift se opakuje počtvrté → napříště je první krok per-system práce `grep` všech čtenářů `world.system`. Wound-pás DrD+ vědomě odložen (`D-DRDPLUS-WOUND-LINEAR`).
+
+---
+
+### ✅ ŘEŠENÍ — 16.2d Fáze 2 DrD+ bestie na taktické mapě (DrdPlusBestiePanel) + 5. výskyt system-id drift chycen PŘEDEM · 2026-06-27
+
+**Co nakonec zabralo:** Nový `DrdPlusBestiePanel` (pergamen reuse `DrdPlusCombatPanel` stylu): hody `2d6+`/`d6` přes `performSheetRoll`+`onMapRoll`, **BČ zapíše `token.initiative`** (iniciativa z BČ, žádné tlačítko), **číselný wound** (3 pásma dopočet z `injury` vs `mez_zraneni` — škáluje i na mez 50, kde klikací políčka selhávají), **in-place edit** (jeden panel přepne pole na inputy, ne separátní modal), nové `drdplus:token` schéma pro persist editů (sanitizace `systemStats`, BE STRICT). Registrace v `TokenSystemSheet`. Uzavřel dluh `D-DRDPLUS-WOUND-LINEAR`.
+
+**Proč to je správně (a ne další variace):** číselný wound (ne klikací políčka) = správný pivot po tom, co políčka nešla pro mez 50 (uživatelův návrh); jeden panel s edit-toggle je míň kódu i čistší UX než separátní modal (drd16 měl modal).
+
+**KLÍČOVÉ (rodina system-id drift):** `TacticalMapView` `worldSystemId` jel na **syrovém** `world.system` → pro DrD+ svět `'drd-plus'`, takže větev `systemId==='drdplus'` v `TokenSystemSheet` by minula (bestie → generic) a bestiář-query mapy by hledal pod `'drd-plus'`, ač bestie jsou pod `'drdplus'` (po CH-030 fix `BestiarPage`). **Tentokrát chyceno v research fázi PŘED oznámením „hotovo"** — díky poučení CH-030 jsem proaktivně grepl čtenáře `world.system`. Fix = `resolveSystemId(world?.system)` → dokončen celý dluh `D-NEW-SYS-WORLDSYSTEMID-RAW`.
+
+**Jak ověřeno:** vitest 19/19 (9 panel + 10 schema), `npm run build` (tsc -b + vite) ✓, export-schemas 21 schémat → BE.
+
+**Zhodnocení:** dobře — poučení z CH-030 zafungovalo, mrtvý kód chycen předem (ne až nahlášený uživatelem). Prototyp-driven iterace vzhledu měla hodně kol (políčka→číselný wound, edit modal→in-place, grid/box-sizing overflow fixy), ale levné v HTML před React kódem. Vzor pro další per-system bestie panely: **grep všech čtenářů `world.system` = první krok**.
+
+---

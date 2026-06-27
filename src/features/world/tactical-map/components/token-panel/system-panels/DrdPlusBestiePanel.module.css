@@ -1,0 +1,552 @@
+/**
+ * 16.2d Fáze 2 — DrdPlusBestiePanel (pergamen „iluminovaný kodex").
+ * Self-contained paleta `--dd-*` jako DrdPlusCombatPanel (sdílené skin tokeny
+ * jsou laděné na tmavý HUD a na světlém pergamenu nečitelné).
+ */
+.root {
+  --dd-parch-1: #e8dab7;
+  --dd-ink: #3a2b19;
+  --dd-ink-2: #2a1a0a;
+  --dd-ink-deep: #1f1607;
+  --dd-ink-head: #3a2812;
+  --dd-ink-soft: #6c573a;
+  --dd-gold: #c19a3f;
+  --dd-gold-hi: #f3dd97;
+  --dd-gold-deep: #6f5320;
+  --dd-crimson: #9c2a23;
+  --dd-crimson-deep: #5c1612;
+  --dd-line: rgba(196, 173, 126, 0.55);
+  --dd-forge-1: #1d160e;
+  --acc: #5b3fa3;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--dd-ink);
+  background-color: var(--dd-parch-1);
+  background-image:
+    radial-gradient(120% 90% at 18% 8%, rgba(255, 250, 235, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 88% 96%, rgba(150, 120, 72, 0.28), transparent 60%),
+    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f);
+  border-radius: 5px;
+  padding: 13px;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px #c4ad7e,
+    0 0 0 4px var(--dd-forge-1),
+    0 0 0 5px var(--dd-gold-deep);
+}
+.root * {
+  box-sizing: border-box;
+}
+
+.modeTag {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-crimson-deep);
+  background: rgba(156, 42, 35, 0.1);
+  border: 1px solid var(--dd-crimson);
+  border-radius: 3px;
+  padding: 3px 8px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* hlavička / erb */
+.head {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.erb {
+  width: 46px;
+  height: 54px;
+  flex: 0 0 auto;
+}
+.crest {
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 3;
+}
+.glyph {
+  fill: var(--acc);
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 34px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.titles {
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 17px;
+  color: var(--dd-ink-2);
+  line-height: 1.1;
+}
+.nameEdit {
+  width: 100%;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--dd-ink-2);
+  border: 1px solid var(--dd-gold-deep);
+  border-radius: 4px;
+  background: #fff;
+  padding: 4px 7px;
+}
+.sub {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-top: 4px;
+}
+
+/* tlačítko Upravit / Hotovo */
+.editFull {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 5px;
+  border: 1px solid var(--dd-gold-deep);
+  color: var(--dd-ink-deep);
+  background: linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 225, 0.7) inset,
+    0 2px 3px rgba(40, 26, 6, 0.4);
+  transition: filter 0.12s;
+}
+.editFull:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.editFull:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* nadpis sekce */
+.stitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 13px 0 7px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-ink-head);
+}
+.stitle small {
+  font-size: 8px;
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: 400;
+}
+.stitle::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--dd-gold-hi), var(--dd-gold-deep));
+  box-shadow: 0 0 0 1px rgba(60, 40, 10, 0.4);
+}
+.stitle::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--dd-gold), transparent);
+  opacity: 0.5;
+}
+
+/* klikací řádek (hod) */
+.rollRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+  padding: 7px 9px;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: left;
+  font-family: inherit;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.88), rgba(224, 208, 170, 0.55));
+  border: 1px solid var(--dd-gold-deep);
+  box-shadow:
+    0 1px 0 rgba(255, 253, 245, 0.9) inset,
+    0 2px 3px rgba(50, 34, 10, 0.3);
+  transition: transform 0.07s, filter 0.12s;
+}
+.rollRow:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+.rollRow:disabled {
+  cursor: default;
+}
+.rName {
+  font-size: 14px;
+  color: var(--dd-ink);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rVal {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--dd-ink-2);
+  min-width: 30px;
+  text-align: center;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 8px;
+}
+
+/* read řádek */
+.readRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  background: rgba(255, 252, 242, 0.4);
+  border: 1px solid var(--dd-line);
+  margin-bottom: 5px;
+}
+.rk {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft);
+}
+.rv {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--dd-ink-2);
+}
+
+/* útok */
+.weap {
+  padding: 7px 9px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22));
+  border: 1px solid var(--dd-line);
+}
+.weapName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--dd-ink);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.chip {
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 5px;
+  border: 1px solid var(--dd-gold-deep);
+  color: var(--dd-ink-deep);
+  background: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 225, 0.85) inset,
+    0 2px 3px rgba(50, 34, 10, 0.3);
+  transition: transform 0.07s, filter 0.12s;
+}
+.chip:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.chip:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+.chip b {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  margin-left: 3px;
+}
+.chip.zz {
+  border-color: var(--dd-crimson-deep);
+  color: #fff;
+  background: linear-gradient(180deg, #cf6a60, #a83228 55%, #7c1d16);
+}
+.chip.bc {
+  position: relative;
+}
+.chip.bc::after {
+  content: '⚡';
+  position: absolute;
+  top: -6px;
+  right: -5px;
+  font-size: 10px;
+}
+.atkPair {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.atkLbl {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft);
+}
+
+/* mez zranění — číselný režim */
+.wnum {
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  gap: 7px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.wlbl {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.bez .wlbl {
+  color: #3e6b34;
+}
+.postihBand .wlbl {
+  color: #a8761a;
+}
+.koma .wlbl {
+  color: var(--dd-crimson);
+}
+.wbar {
+  height: 15px;
+  border-radius: 3px;
+  border: 1px solid var(--dd-gold-deep);
+  background: rgba(255, 252, 242, 0.5);
+  overflow: hidden;
+}
+.wbar i {
+  display: block;
+  height: 100%;
+}
+.bez .wbar i {
+  background: linear-gradient(180deg, #7bbf6a, #3e6b34);
+}
+.postihBand .wbar i {
+  background: linear-gradient(180deg, #e7b75a, #a8761a);
+}
+.koma .wbar i {
+  background: linear-gradient(180deg, #cb4138, #5c1612);
+}
+.wcount {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 52px;
+  text-align: right;
+  color: var(--dd-ink-2);
+}
+.wsteps {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+  justify-content: flex-end;
+}
+.wsteps button {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  width: 34px;
+  padding: 4px 0;
+  border-radius: 4px;
+  border: 1px solid var(--dd-gold-deep);
+  background: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  color: var(--dd-ink-deep);
+  cursor: pointer;
+}
+.wsteps button:hover {
+  filter: brightness(1.06);
+}
+.postihField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+  padding: 7px 9px;
+  border-radius: 4px;
+  background: rgba(168, 118, 26, 0.12);
+  border: 1px dashed #a8761a;
+}
+.postihField label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a5f12;
+  font-weight: 600;
+}
+.postihField input {
+  width: 50px;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  border: 1px solid #a8761a;
+  border-radius: 3px;
+  background: #fff;
+  color: var(--dd-crimson-deep);
+  padding: 3px;
+}
+.postihField input:disabled {
+  background: rgba(255, 252, 242, 0.6);
+  color: var(--dd-ink-soft);
+}
+
+/* schopnosti / poznámky */
+.ability {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: rgba(255, 252, 242, 0.35);
+  border: 1px solid var(--dd-line);
+  margin-bottom: 4px;
+  font-size: 13.5px;
+}
+.ak {
+  color: var(--dd-ink-2);
+  font-weight: 500;
+}
+.av {
+  font-family: 'Cinzel', serif;
+  color: var(--dd-ink-soft);
+  font-size: 12px;
+  text-align: right;
+}
+.notes {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--dd-ink);
+  background: rgba(255, 252, 242, 0.35);
+  border: 1px solid var(--dd-line);
+  border-radius: 4px;
+  padding: 8px 10px;
+  white-space: pre-wrap;
+}
+.hint {
+  font-size: 12px;
+  color: var(--dd-ink-soft);
+  font-style: italic;
+  margin: 4px 0;
+}
+
+.rule {
+  border: 0;
+  height: 2px;
+  margin: 12px 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dd-gold) 30%,
+    var(--dd-gold-deep) 50%,
+    var(--dd-gold) 70%,
+    transparent
+  );
+  opacity: 0.55;
+}
+
+/* inline edit inputy */
+.ed {
+  flex: 0 0 auto;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+  border: 1px solid var(--dd-gold-deep);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--dd-ink-2);
+  padding: 3px;
+  width: 44px;
+}
+.ed.edTxt {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-weight: 400;
+  text-align: left;
+  width: 100%;
+  min-width: 60px;
+}
+.edWide {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  border: 1px solid var(--dd-gold-deep);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--dd-ink);
+  padding: 6px 8px;
+  resize: vertical;
+}
+.miniAdd {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px dashed var(--dd-gold-deep);
+  color: var(--dd-ink-soft);
+  border-radius: 4px;
+  padding: 6px;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 2px;
+}
+.miniAdd:hover {
+  color: var(--dd-ink-deep);
+  background: rgba(168, 128, 31, 0.1);
+}
+.del {
+  background: none;
+  border: 0;
+  color: var(--dd-crimson);
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+  flex: 0 0 auto;
+}
+.del:hover {
+  opacity: 1;
+}

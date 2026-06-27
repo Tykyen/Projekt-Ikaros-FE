@@ -407,7 +407,9 @@ export function WorldSection() {
         <Tool icon={<Skull size={16} />} title="Bestiář" audience={{ kind: 'pj', label: 'Členové (tvorba PJ)' }} accent="pj">
           <p>
             Knihovna statbloků (bestií) pro taktickou mapu. Bestie drží jméno, avatar,
-            systémové staty a schopnosti. Tři rozsahy: <strong>Můj</strong> (osobní,
+            schopnosti a staty <strong>podle herního systému světa</strong> (Dračí doupě
+            1.6 / Plus / II, D&amp;D, Call of Cthulhu a další) — editor ukáže přesně ta
+            pole, která daný systém má. Tři rozsahy: <strong>Můj</strong> (osobní,
             napříč světy), <strong>Tohoto světa</strong> (PJ tým) a <strong>Systémové</strong>{' '}
             (globální pro herní systém). Vytvoříš, upravíš nebo naklonuješ; mazání je
             do koše. Spawnují se na mapu z palety orchestrace. U obrázku můžeš zvolit{' '}
