@@ -323,33 +323,33 @@
  * Ostatní systémy drží mapový `--map-ui-*` (opaque default výše). Plocha opaque. */
 
 /* ── drd16 ── */
-[data-diary-system='drd16'] .panel,
-[data-diary-system='drd16'] .flyout {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .panel,
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .flyout {
   background: var(--dd-embed-surface);
   border-color: var(--dd-embed-border);
   color: var(--dd-embed-text);
   font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
 }
-[data-diary-system='drd16'] .header,
-[data-diary-system='drd16'] .flyoutHeader {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .header,
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .flyoutHeader {
   background: color-mix(in srgb, var(--dd-embed-accent) 14%, transparent);
   border-bottom-color: var(--dd-embed-line);
 }
-[data-diary-system='drd16'] .title,
-[data-diary-system='drd16'] .flyoutTitle {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .title,
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .flyoutTitle {
   color: var(--dd-embed-title);
   font-family: var(--dd-embed-title-font);
 }
-[data-diary-system='drd16'] .sectionTitle {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .sectionTitle {
   color: var(--dd-embed-muted);
 }
-[data-diary-system='drd16'] .newSceneBtn,
-[data-diary-system='drd16'] .flyoutTrigger {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .newSceneBtn,
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .flyoutTrigger {
   background: color-mix(in srgb, var(--dd-embed-accent) 10%, transparent);
   border-color: var(--dd-embed-line);
   color: var(--dd-embed-text);
 }
-[data-diary-system='drd16'] .flyoutTriggerCount {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .flyoutTriggerCount {
   background: color-mix(in srgb, var(--dd-embed-accent) 22%, transparent);
 }
 

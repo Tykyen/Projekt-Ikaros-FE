@@ -365,7 +365,7 @@
  * Tokenizováno na `--dd-embed-*` (diary-skins.css) → sleduje vybraný drd16 skin
  * barvou i písmem (sladěno s combat/bestie panelem uvnitř). Plocha opaque.
  * Scoped na drd16 → ostatní systémy drží mapový motiv `--map-ui-*`. */
-.panel[data-diary-system='drd16'] {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) {
   background:
     radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--dd-embed-accent) 14%, transparent), transparent 62%),
     var(--dd-embed-surface);
@@ -375,11 +375,11 @@
     -8px 0 32px rgba(0, 0, 0, 0.55),
     0 0 24px color-mix(in srgb, var(--dd-embed-accent) 12%, transparent);
 }
-.panel[data-diary-system='drd16'] .modeDock,
-.panel[data-diary-system='drd16'].modeDock {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeDock,
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']).modeDock {
   border-left-color: var(--dd-embed-border);
 }
-.panel[data-diary-system='drd16'] .header {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .header {
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--dd-embed-accent) 16%, transparent),
@@ -387,50 +387,50 @@
   );
   border-bottom-color: var(--dd-embed-line);
 }
-.panel[data-diary-system='drd16'] .actionBar {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .actionBar {
   background: color-mix(in srgb, var(--dd-embed-accent) 6%, transparent);
   border-bottom-color: var(--dd-embed-line);
 }
-.panel[data-diary-system='drd16'] .modeToggle {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeToggle {
   background: var(--dd-embed-surface);
   border-color: color-mix(in srgb, var(--dd-embed-accent) 50%, transparent);
 }
-.panel[data-diary-system='drd16'] .modeBtn {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeBtn {
   color: var(--dd-embed-muted);
 }
-.panel[data-diary-system='drd16'] .modeBtn:hover,
-.panel[data-diary-system='drd16'] .modeBtnActive {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeBtn:hover,
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeBtnActive {
   background: color-mix(in srgb, var(--dd-embed-accent) 28%, transparent);
   color: var(--dd-embed-title);
 }
-.panel[data-diary-system='drd16'] .closeBtn {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .closeBtn {
   color: var(--dd-embed-muted);
   border-color: var(--dd-embed-line);
 }
-.panel[data-diary-system='drd16'] .closeBtn:hover {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .closeBtn:hover {
   background: color-mix(in srgb, var(--dd-crimson-hi, #cb4138) 18%, transparent);
   border-color: color-mix(in srgb, var(--dd-crimson-hi, #cb4138) 50%, transparent);
   color: var(--dd-crimson-hi, #cb4138);
 }
-.panel[data-diary-system='drd16'] .identity {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .identity {
   border-bottom-color: var(--dd-embed-line);
 }
-.panel[data-diary-system='drd16'] .avatar {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .avatar {
   background: radial-gradient(circle at 40% 30%, var(--dd-parch-0, #f1e6cb), var(--dd-parch-2, #ddca9f));
   border-color: var(--dd-embed-accent);
   box-shadow: 0 0 16px color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
 }
-.panel[data-diary-system='drd16'] .name {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .name {
   color: var(--dd-embed-title);
   font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
 }
-.panel[data-diary-system='drd16'] .resizeHandle:hover {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .resizeHandle:hover {
   background: color-mix(in srgb, var(--dd-embed-accent) 35%, transparent);
 }
-.panel[data-diary-system='drd16'] .body {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .body {
   scrollbar-color: color-mix(in srgb, var(--dd-embed-accent) 30%, transparent) transparent;
 }
-.panel[data-diary-system='drd16'] .body::-webkit-scrollbar-thumb {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .body::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
 }
 

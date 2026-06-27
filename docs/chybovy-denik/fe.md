@@ -909,3 +909,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — rodina (9 výskytů, CH-011/030/031/113) konečně uzavřená architektonicky, ne záplatou. Zbytek (lint guard proti raw `world.system`) neudělán — hook riziko snižuje dost, guard by byl marginální.
 
 ---
+
+### CH-032 — cross-surface embedy (HODY/dicelog/readout/token chrome/ORCHESTRACE) vynechány při grafickém průchodu systému (drdplus 16.2d) · 2026-06-27
+**Kontext:** 16.2d DrD+ grafický průchod — udělal jsem deník (CH-107), combat panel (CH-111), bestii (CH-116), ale obal tokenu + samostatné mapové/chat embedy zůstaly na tmavém mapovém `--map-ui-*`, nesladěné s pergamenem. Uživatel narazil ("hody, dicelog i to kolo bestie není stejné jako deník … není to poprvé").
+**Co jsem udělal špatně:** považoval jsem systém za "hotový" po deníku+combat+bestii a NEpropsal embed skin (sada `--dd-embed-*` + větve `[data-diary-system='drdplus']` ve 4 modulech). U drd16 (CH-105) jsem to udělal, u drdplus zapomněl — opakovaný vzor (předtím sci-fi/embed CH-104/105).
+**Proč to nefungovalo:** embed komponenty (`TokenInfoPanel` chrome, `DiceLogPanel`, `DiceRollOverlay`, `MapPjPanel`) dostávají `data-diary-system='drdplus'`, ale CSS mělo větev jen pro `drd16`/`matrix` → drdplus spadl na mapový default.
+**Poučení:** grafický průchod systému NENÍ hotový po deníku+combat+bestii. **Embed parita je povinný krok**: 5 povrchů (token chrome · HODY/dicelog · dice readout · ORCHESTRACE · chat roll panel) přes 4 moduly (`TokenInfoPanel`/`DiceLogPanel`/`DiceRollOverlay`/`MapPjPanel`.module.css) + token sada `--dd-embed-*` (nebo `--mx-*`). Při novém systému zgrepuj `data-diary-system='drd16'` → ke každé větvi přidej svůj systém. (= šablona-denik-per-system krok 8.)
+**Příznak cyklení:** uživatel hlásí "X (dice log / chrome / orchestrace) nevypadá jako deník" po dokončení deníku systému; ladím jen `.dp-sheet`/panel, ne embed moduly.
+
+---

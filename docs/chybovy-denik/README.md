@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-032.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-033.**
 
 ## Jak je deník členěný
 
@@ -117,3 +117,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-031](fe.md#ch-031--deklaroval-jsem-grep-všech-konzumentů-worldsystem-ale-provedl-ho-jen-pro-jeden-soubor--2026-06-27) | fe | deklaroval „grep VŠECH konzumentů world.system", provedl jen pro 1 soubor → minul 4 (MapPjPanel/TokenSprite/ChatContextRail/CombatRosterPanel) → DrD+ bestie se nepropsala do orchestrace; uživatel narazil | opravím drift v 1 souboru a prohlásím rodinu za vyřešenou |
 | [✅ ŘEŠENÍ](fe.md#-řešení--system-id-drift-dotažen-přes-celý-src-4-zbylí-konzumenti--2026-06-27) | fe | system-id drift dotažen přes CELÝ src: 4 zbylí konzumenti (MapPjPanel/TokenSprite/ChatContextRail/CombatRosterPanel) → resolveSystemId; budoucí dluh = `useResolvedSystemId` hook | — (build ✓) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--centralizace-systemid-do-useresolvedsystemid-hooku-uzavírá-rodinu-system-id-drift--2026-06-27) | fe | **rodina system-id drift UZAVŘENA architektonicky**: `useResolvedSystemId` hook, 8 konzumentů migrováno z ručního resolveSystemId; dluh D-SYSTEMID-HOOK uzavřen | — (build+lint+22 testů) |
+| [CH-032](fe.md#ch-032--cross-surface-embedy-hodydicelogreadouttoken-chromeorchestrace-vynechány-při-grafickém-průchodu-systému-drdplus-162d--2026-06-27) | fe/css | embed parita (HODY/dicelog/readout/token chrome/ORCHESTRACE) vynechána u drdplus 16.2d — větev jen pro drd16/matrix; systém≠hotový po deníku+combat+bestii | uživatel hlásí „X nevypadá jako deník" po dokončení deníku; ladím jen panel, ne embed moduly |

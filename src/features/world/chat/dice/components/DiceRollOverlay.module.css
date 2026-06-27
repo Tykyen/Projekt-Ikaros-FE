@@ -215,44 +215,44 @@
  * Tokenizováno na `--dd-embed-*` (defaulty v diary-skins.css, loaded i v embedech).
  * Syrové `--dd-*` mají fantasy fallback (drd16.css v embedu není). Plocha opaque.
  * Sémantické +/− drží význam. Scoped na drd16. */
-[data-diary-system='drd16'] .readout {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .readout {
   background-color: var(--dd-forge-1, #1d160e);
   background-image: var(--dd-embed-surface);
   border: 1px solid var(--dd-embed-border);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-[data-diary-system='drd16'] .faceBadge {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faceBadge {
   background: var(--dd-accent-grad, linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320));
   border-color: var(--dd-embed-border);
   color: var(--dd-ink-deep, #241509);
   font-family: var(--dd-embed-num-font);
 }
-[data-diary-system='drd16'] .faceGeneric {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faceGeneric {
   color: var(--dd-ink-deep, #241509);
 }
-[data-diary-system='drd16'] .totalValue {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalValue {
   font-family: var(--dd-embed-num-font);
 }
-[data-diary-system='drd16'] .totalPositive {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalPositive {
   color: var(--dd-embed-pos);
 }
-[data-diary-system='drd16'] .totalNegative {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNegative {
   color: var(--dd-embed-neg);
 }
-[data-diary-system='drd16'] .totalNeutral {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNeutral {
   color: var(--dd-embed-neutral);
 }
-[data-diary-system='drd16'] .equation {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .equation {
   font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
 }
-[data-diary-system='drd16'] .skillName {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .skillName {
   color: var(--dd-embed-title);
 }
-[data-diary-system='drd16'] .eqSign {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .eqSign {
   color: var(--dd-embed-muted);
 }
-[data-diary-system='drd16'] .rollerName {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .rollerName {
   color: var(--dd-embed-muted);
   font-family: var(--dd-font-head, 'Cinzel', serif);
 }

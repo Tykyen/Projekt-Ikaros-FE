@@ -52,6 +52,32 @@
   --dd-embed-neutral: var(--dd-gold, #c19a3f);
 }
 
+/* ════════════ 16.2d-F3 — drdplus EMBED tokeny (dice log „HODY" / token panel
+   obal / dice readout / orchestrace) ════════════
+ * drdplus deník (`.dp-sheet`) i mapové combat/bestie panely (`.root`) = pergamen
+ * „iluminovaný kodex" — VŽDY, bez skin variant (DrdPlusSheet na `data-diary-skin`
+ * nereaguje). Embedy proto nesou FIXNÍ pergamen/forge paletu (shodnou s drd16
+ * fantasy defaultem), aby ladily s deníkem. Stejný `--dd-embed-*` kontrakt jako
+ * drd16 → moduly (dice log / token panel / readout / orchestrace) sdílí selektory
+ * `:is([drd16],[drdplus])`. Čísla v serifu (Cinzel), ne mono — pergamen, ne HUD.
+ * Ostatní `--dd-*` (forge/accent-grad/parch/ink/font) mají v modulech korektní
+ * pergamenové fallbacky → není nutné je tu duplikovat. Plocha VŽDY opaque. */
+[data-diary-system='drdplus'] {
+  --dd-embed-surface: linear-gradient(180deg, #271d12, #1d160e);
+  --dd-embed-border: #6f5320;
+  --dd-embed-line: color-mix(in srgb, #c19a3f 24%, transparent);
+  --dd-embed-text: #e2cfa3;
+  --dd-embed-muted: #b09467;
+  --dd-embed-title: #f3dd97;
+  --dd-embed-chip-bg: color-mix(in srgb, #c19a3f 14%, transparent);
+  --dd-embed-accent: #c19a3f;
+  --dd-embed-num-font: 'Cinzel Decorative', 'Cinzel', serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: #cb4138;
+  --dd-embed-neg: #9c6b6b;
+  --dd-embed-neutral: #c19a3f;
+}
+
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */
 .diary-skin-picker {
   position: relative;

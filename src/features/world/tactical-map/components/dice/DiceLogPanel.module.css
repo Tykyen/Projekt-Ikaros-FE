@@ -265,44 +265,44 @@
  * → sleduje vybraný drd16 skin (fantasy pergamen, sci-fi void…) barvou+písmem+polaritou.
  * Plocha VŽDY opaque (`--dd-embed-surface` = forge gradient), backdrop VYPNUT.
  * Scoped na drd16 → ostatní systémy beze změny. */
-[data-diary-system='drd16'] .panel {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .panel {
   background: var(--dd-embed-surface);
   border-color: var(--dd-embed-border);
   color: var(--dd-embed-text);
   backdrop-filter: none;
 }
-[data-diary-system='drd16'] .header {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .header {
   border-bottom-color: var(--dd-embed-line);
 }
-[data-diary-system='drd16'] .title {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .title {
   color: var(--dd-embed-title);
   font-family: var(--dd-embed-title-font);
 }
-[data-diary-system='drd16'] .chip {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .chip {
   background: var(--dd-embed-chip-bg);
   color: var(--dd-embed-title);
 }
-[data-diary-system='drd16'] .name {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .name {
   color: var(--dd-embed-muted);
 }
-[data-diary-system='drd16'] .breakdown {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .breakdown {
   color: var(--dd-embed-muted);
   font-family: var(--dd-embed-num-font);
 }
-[data-diary-system='drd16'] .faces,
-[data-diary-system='drd16'] .total {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faces,
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .total {
   font-family: var(--dd-embed-num-font);
 }
-[data-diary-system='drd16'] .faceNum {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faceNum {
   color: var(--dd-embed-text);
 }
-[data-diary-system='drd16'] .totalPositive {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalPositive {
   color: var(--dd-embed-pos);
 }
-[data-diary-system='drd16'] .totalNegative {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNegative {
   color: var(--dd-embed-neg);
 }
-[data-diary-system='drd16'] .totalNeutral {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNeutral {
   color: var(--dd-embed-neutral);
 }
 
