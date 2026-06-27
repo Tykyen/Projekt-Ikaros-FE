@@ -50,11 +50,11 @@ describe('registerSchema', () => {
     }
   });
 
-  it('odmítne heslo < 6 znaků', () => {
+  it('odmítne heslo < 8 znaků', () => {
     const result = registerSchema.safeParse({
       ...valid,
-      password: 'short',
-      passwordConfirm: 'short',
+      password: 'pass123', // 7 znaků — pod novou hranicí 8 (D-NEW-INV-SEC)
+      passwordConfirm: 'pass123',
     });
     expect(result.success).toBe(false);
   });

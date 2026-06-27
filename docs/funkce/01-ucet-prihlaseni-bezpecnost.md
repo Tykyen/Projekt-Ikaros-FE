@@ -18,7 +18,7 @@
   - Skrytý honeypot field `hp` (anti-bot, max 0 znaků). Vynucený na **obou** stranách: FE zod `max(0)` + BE `RegisterDto.hp` `@MaxLength(0)` — prázdné (reálný uživatel) projde, vyplněné (bot) → 400. *(BE `hp` doplněno 2026-06-19 — dřív chybělo, `forbidNonWhitelisted` PC-07 odmítal `hp:''` → registrace rozbitá.)*
   - Tlačítko „Vytvořit účet" je disabled dokud captcha nedá token nebo je username/email obsazený.
 - **Hranice / co neumí:**
-  - Heslo min **6** znaků (FE i BE `RegisterDto`), což je MÉNĚ než u změny/resetu hesla (min 8) — nekonzistence.
+  - Heslo min **8** znaků (FE `registerSchema` + BE `RegisterDto`) — sjednoceno se změnou/resetem (D-NEW-INV-SEC, 2026-06-27).
   - Indikátor síly hesla je čistě vizuální, slabé heslo registraci neblokuje.
   - Bez ověření e-mailu lze účet plně používat (verify je nepovinný, jen badge v profilu).
 - **Zvláštnosti:**
@@ -77,7 +77,7 @@
   - ResetPasswordPage: nové heslo + potvrzení, indikátor síly, toggle. Bez tokenu v URL → hláška + „Požádat o nový link". Chybový kód → mapovaná hláška (`INVALID_TOKEN`/`EXPIRED_TOKEN`/`ALREADY_USED`) + link na nový.
   - Po úspěchu navigace na `/?openLogin=1`.
 - **Hranice / co neumí:**
-  - Reset heslo min **8** znaků (BE `ResetPasswordDto`, FE schema) — vs registrace 6.
+  - Reset heslo min **8** znaků (BE `ResetPasswordDto`, FE schema) — shodně s registrací (taky 8 od D-NEW-INV-SEC).
   - Token TTL = 1 hodina (`PASSWORD_RESET_TTL_MS`).
   - 1× aktivní token per user+type (nový `issue` invaliduje předchozí).
 - **Zvláštnosti:**
@@ -251,7 +251,7 @@
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-- **Nekonzistence min. délky hesla:** registrace = min **6** (`RegisterDto`/registerSchema), ale změna hesla i reset = min **8** (`ChangePasswordDto`/`ResetPasswordDto`/profileSchemas/resetPasswordSchema). Uživatel může mít heslo o 6 znacích, ale při změně nesmí jít pod 8.
+- **Min. délka hesla SJEDNOCENA** (2026-06-27, D-NEW-INV-SEC): registrace i změna/reset = min **8** (`RegisterDto`/`registerSchema` zvednuto na 8). Re-auth `PasswordConfirmDto` (2FA disable) zůstává 6 — validuje **stávající** heslo, legacy 6-znaková se nesmí zamknout.
 - **GDPR data-export bez FE:** `GET /data-export/me` na BE hotový, ale v celém FE žádné volání → uživatel si data z UI nestáhne. (FE bez BE × BE bez FE: zde BE bez FE.)
 - **`logout-all` bez UI:** `POST /auth/logout-all` existuje, ale Bezpečnost sekce profilu ho nenabízí (žádné „odhlásit všechna zařízení" mimo důvěryhodná zařízení a vypnutí 2FA).
 - ✅ OPRAVENO 2026-06-18 — **Cron doc↔chování:** `account-cleanup.cron` JSDoc tvrdí „1× za hodinu", reálně `@Cron('0 3 * * *')` = denně 03:00.

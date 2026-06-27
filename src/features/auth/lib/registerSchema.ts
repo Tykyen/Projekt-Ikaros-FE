@@ -14,7 +14,8 @@ export const registerSchema = z
       .regex(/^[^@]+$/, 'Přezdívka nesmí obsahovat @'),
     password: z
       .string()
-      .min(6, 'Minimálně 6 znaků')
+      // D-NEW-INV-SEC — sjednoceno s reset/změnou hesla (min 8) i BE RegisterDto.
+      .min(8, 'Minimálně 8 znaků')
       .max(128, 'Maximálně 128 znaků'),
     passwordConfirm: z.string().min(1, 'Potvrď heslo'),
     // D-010 — GDPR souhlas

@@ -13,6 +13,13 @@ const ALLOW = [
   '/tactical-map/components/token-panel/system-panels/', // D-063 — per-system combat
                                   // panely (Matrix neon, CoC parchment, GURPS steel…)
                                   // mají záměrnou systémovou identitu, ne chrome drift.
+  // D-NEW-color-tokens „bezpečný první krok": datová identita kostek a per-system
+  // deníků = záměrně fixní napříč skiny (ne chrome drift, NEtokenizovat).
+  '/chat/dice/lib/',              // kostkové skiny (materiály/barvy hodnot)
+  '/chat/dice/components/models/',// 3D modely kostek
+  'polyhedralDice.css',           // geometrie/barvy kostek
+  '/diary-systems/styles/',       // per-system pergamen/HUD palety deníků
+  '/diary-systems/sheets/',       // self-contained barvy listů (drd16/drdplus…)
 ];
 const HEX_RE = /(?<!var\(--[\w-]*?:\s*?)#[0-9a-fA-F]{3,8}\b/g;
 // `rgb(var(--token) / alpha)` (CSS Color 4) je token-based, ne hardcoded — negative

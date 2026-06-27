@@ -786,3 +786,23 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — jeden zátah, 0 cyklení; reuse (cdAccess + diary komponenty) ušetřil stovky řádků a drift. Jediná vlastní chyba (tsc inkrementální slepota) chycena buildem před koncem. Past dual-source union potvrzena potřetí (d6+→2d6+) — kdyby přibyl další systém s panelem házejícím `2d6+`, union už ho má.
 
 ---
+
+### ✅ ŘEŠENÍ — D-NEW-INV-SEC (4/5) + color-tokens ALLOW krok · 2026-06-27
+
+**Kontext:** Po featuře uživatel zadal „sprav všechny dluhy". Začal jsem bezpečnými: color-tokens ALLOW krok + bezpečnostní inventura D-NEW-INV-SEC (FE+BE).
+
+**Co zabralo:**
+1. **color-tokens** — rozšířen `ALLOW` v `lint-no-hardcoded-colors.mjs` o datové dirs (dice/diary styles+sheets) → `lint:colors` **4397→1622** (vyňato 2775 barev datové identity; zbytek = chrome drift na vizuální projití, ne auto-commit).
+2. **INV-SEC 4/5** — heslo `@MinLength 6→8`; scenarios role-floor `<PomocnyPJ` na **controlleru** (ne service → mimo CH-011 riziko interních volání); themeUserOverrides sanitizace. **Public profile leak = už opravený 2026-06-18** (čtení KÓDU > čtení dluhu — dluh byl zastaralý). Zbývá persona-on-server (cross-cutting).
+
+**Dvě vlastní chyby — obě chycené funkce inventurou (`docs/funkce/`) jako cross-check PŘED commitem:**
+- **Duplicitní sanitizér:** napsal jsem nový `private sanitizeThemeOverrides` v `updateMyTheme`, ač **už existuje exportovaná** `sanitizeThemeOverrides` (world-level, `--theme-*`, max 60) s testy. funkce kap. 10 ř. 275 (nesrovnalost) říkala doslova „aplikuj `sanitizeThemeOverrides`" → reuse místo duplikátu (stejný název = matoucí; typecheck to nechytil, protože existující je module-fn, ne metoda).
+- **Polovičatá změna hesla:** změnil jsem nejdřív jen BE `register.dto`. funkce kap. 01 ř. 21 („FE **i** BE `RegisterDto`") odhalila dual-source → doplnil FE `registerSchema` + spec (jinak FE pustí 7 znaků, BE 400).
+
+**Proč správně:** controller-level gate = nelze způsobit interní-volání regresi (CH-011); reuse existujícího sanitizéru = konzistence s world-level + 0 nové netestované logiky; čtení kódu odhalilo 1 zastaralý nález (profile endpoint) → neřešil jsem už vyřešené.
+
+**Jak ověřeno:** BE typecheck ✓, lint:check + elevation guard ✓, jest `worlds`/`campaign`/`auth` **317/317** (worlds re-run po reuse 172/172) ✓. FE tsc -b ✓, `registerSchema` 11/11 ✓. dluhy.md + funkce kap. 01/02/10/15 srovnány.
+
+**Zhodnocení:** dobře — **funkce inventura jako cross-check chytila 2 vlastní chyby před commitem** (duplikát + dual-source half). Poučení: před psaním BE helperu grep existující; min-length/validace/whitelist = vždy dual-source FE+BE, měň oba. Past: dluh může být zastaralý → ověř proti kódu, ne slepě „oprav".
+
+---

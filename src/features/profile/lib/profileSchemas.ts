@@ -12,8 +12,10 @@ export const characterSchema = z.object({
 });
 
 export const headerSchema = z.object({
-  displayName: z.string().max(32, 'Maximálně 32 znaků').optional(),
-  city: z.string().max(100, 'Maximálně 100 znaků').optional(),
+  // D-NEW-INV-PROFILE — trim: „jen mezery" se normalizují na prázdné (→ fallback
+  // na username), aby neprošlo vizuálně prázdné, ale „neprázdné" jméno.
+  displayName: z.string().trim().max(32, 'Maximálně 32 znaků').optional(),
+  city: z.string().trim().max(100, 'Maximálně 100 znaků').optional(),
 });
 
 export const passwordSchema = z

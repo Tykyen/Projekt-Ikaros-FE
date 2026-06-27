@@ -25,11 +25,14 @@
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
 ### D-NEW-INV-SEC — Inventura: bezpečnostní nálezy účtu/světa
-**Soubory:** auth `register.dto.ts` (heslo `@MinLength(6)` vs reset/změna 8); `users.controller` nechráněný `GET /users/profile/:id`; `worlds.service.ts` `updateMyTheme` (sanitizace `themeUserOverrides`); `campaign.controller` `POST /scenarios`; chat persona render-time (FE) vs push/feed payload.
-**Problém:** drobné, ale reálné mezery — nekonzistentní min. délka hesla; veřejný profil endpoint bez friend-only/tombstone gate (možný leak); `themeUserOverrides` bez serverové sanitizace; storyboard scénář vytvoří i hráč přímým POST (chybí role-floor); render-time PJ persona může mimo chat (push/feed/export) odhalit reálné jméno.
-**Dopad:** Nízký–střední; část je leak k ověření.
-**Řešení:** heslo sjednotit na 8; ověřit a případně zavřít/sloučit veřejný profil endpoint; sanitizovat overrides na BE; role-floor scénářům; aplikovat personu i na serverové cesty.
-**Kdy:** Fáze 14. Zdroj: `docs/funkce/` kap. 01/02/10/13/15.
+> **Z větší části vyřešeno 2026-06-27 (4/5).** Zbývá jen persona-on-server (níže). **Po BE změně restart** ([[feedback_be_restart_required]]).
+- **Heslo** `@MinLength(6)→(8)` na **obou** stranách — BE `register.dto` + FE `registerSchema` (+ spec). Sjednoceno s reset/změnou (už 8). Re-auth `PasswordConfirmDto` zůstává 6 (validuje **stávající** heslo → legacy 6-znaková hesla se nesmí zamknout). ✅
+- **Veřejný profil endpoint** — `GET profile/:id` byl **už odstraněn 2026-06-18** (zůstal jen gated `profile/v14/:id`, JwtAuthGuard + gating + throttle). Nález byl zastaralý. ✅
+- **themeUserOverrides** — `updateMyTheme` teď **reuse existujícího** `sanitizeThemeOverrides` (stejný jako world-level: `--theme-*` prefix, max 200 zn., max 60); `undefined`→`undefined` = BC. (Pozn.: nejdřív jsem napsal duplicitní private sanitizér — funkce inventura ř. 275 ukázala, že funkce už existuje → reuse.) ✅
+- **POST /scenarios** — role-floor `< PomocnyPJ` → 403 (scénáře = PJ storyboard nástroj). Gate na **controlleru** (ne service) → mimo riziko interních volání (CH-011). ✅
+- **Zbývá — persona-on-server:** render-time PJ persona (FE) se neaplikuje na **serverové** cesty (push payload, news/feed, export) → tam může prosáknout reálné jméno PJ. Cross-cutting (`push.service` + news + export + resolver persony) → vlastní krok, ne one-liner.
+**Ověřeno (4/5):** BE typecheck ✓, lint:check + elevation guard ✓, jest `worlds`/`campaign`/`auth` **317/317** ✓ (worlds re-run po reuse 172/172). FE tsc -b ✓, `registerSchema` 11/11 ✓.
+**Kdy:** persona zbytek Fáze 14. Zdroj: `docs/funkce/` kap. 01/02/10/13/15.
 
 ### D-NEW-INV-PUSH — Inventura: web push spam + chybějící deep-link
 **Soubory:** BE `global-chat.service.ts` (`notifyAll` na každou zprávu), `ikaros-news.service` (`notifyAll` bez `url`), `push.service`; FE `public/sw.js` (deep-link připraven); pošta `ikaros-messages` (bez push).
@@ -46,11 +49,11 @@
 **Kdy:** Fáze 14.7 (export) / 20.2 (GDPR). Zdroj: kap. 01/08.
 
 ### D-NEW-INV-PROFILE — Inventura: profil & seznam uživatelů
-**Soubory:** FE profil „Moje diskuze/články/galerie" (stub „fáze 3"), `usersTabs` `visibleTabsForRole`/`defaultTabForRole` (`void role`), `displayName` validace, `FriendsTab` `worldsCount=0`.
-**Problém:** komunitní sekce profilu jsou prázdné placeholdery, ač moduly jinde fungují; per-role taby `/ikaros/uzivatele` ignorují roli (mrtvý param); `displayName` bez min/regex; počet světů u přátel natvrdo 0.
-**Dopad:** Nízký — kosmetika + nedotažená featura.
-**Řešení:** napojit sekce na existující moduly; implementovat per-role taby nebo odstranit mrtvý param; validace displayName; doplnit worldsCount do friend shape.
-**Kdy:** Fáze 15.6 / 16.4. Zdroj: kap. 02.
+> **Částečně vyřešeno 2026-06-27.** `displayName` + `void role` vyřízeny; zbývá worldsCount + komunitní stuby.
+- **`displayName` trim** — FE `headerSchema` (`.trim()`) + BE `UpdateUserDto` (`@Transform` trim, `transform:true`) → „jen mezery" → prázdné (fallback na username). ✅ (BE jest 20/20 vč. trim test, FE+BE typecheck)
+- **`void role` taby** — ZÁMĚR (12.1): všechny role vidí stejné 3 komunitní taby (zafixováno testy); param vestigiální, ne mrtvý nález. ✅ (vyjasněno, bez churnu)
+- **Zbývá:** `FriendsTab` `worldsCount=0` natvrdo (chce BE doplnit count do friend shape — BE change); FE profil „Moje diskuze/články/galerie" stuby (napojit na existující moduly — větší).
+**Dopad:** Nízký — kosmetika. **Kdy:** zbytek Fáze 15.6 / 16.4. Zdroj: kap. 02.
 
 ### D-NEW-INV-DATA-SYNC — Inventura: konzistence dat postav/měn
 **Soubory:** BE `map-operations.service.ts` (token→Character sync TODO), `world-currencies` `updateCurrencies` (full-replace), `character-subdocs.service.ts` (finance/inventory create vs. read), `characters.repository.ts` (legacy `/characters/directory`).
@@ -124,8 +127,6 @@ fallback na Map + testy).
 
 ### D-NEW-color-tokens — Hardcoded barvy → theme tokeny (chrome drift)
 **Plán:** [n2-color-mapping.md](n2-color-mapping.md) (mapa kategorií + tokeny + postup).
-**Stav (2026-06-16):** `npm run lint:colors` hlásí **2340**, ale rozbor ukázal, že jde o dvě věci:
-**1271 datové identity** (kostkové skiny `/chat/dice/` 454 + herní systémy `/diary-systems/` 817) = záměrně fixní napříč tématy, **patří do ALLOW** (stejně jako vyňatý `tactical-map/system-panels`), NE tokenizovat; **1069 skutečný chrome drift** ve 160 souborech k tokenizaci na theme-aware tokeny.
-**Bezpečný první krok (bez vizuálu):** rozšířit `ALLOW` v `scripts/lint-no-hardcoded-colors.mjs` o `/chat/dice/lib/`+`/chat/dice/components/models/`+`polyhedralDice.css`+`/diary-systems/styles/`+`/diary-systems/sheets/` → číslo spadne na ~1069. (Dice UI pickery do ALLOW NE — jsou chrome.)
-**Zbytek:** vizuální projití per komponenta napříč 2–3 tématy (proto ne v automatickém commitu). Top cíle: `TemplateEditorModal`(34), `NotificationCenter`(28), `PostavaLayout`(27)…
+**Stav (2026-06-27):** **Bezpečný první krok HOTOV** — `ALLOW` v `scripts/lint-no-hardcoded-colors.mjs` rozšířen o datové dirs (`/chat/dice/lib/`, `/chat/dice/components/models/`, `polyhedralDice.css`, `/diary-systems/styles/`, `/diary-systems/sheets/`). `npm run lint:colors`: **4397 → 1622** (vyňato 2775 barev datové identity — kostkové skiny + per-system pergamen/HUD palety, záměrně fixní napříč tématy). Číslo narostlo od 2026-06-16 (2340) kvůli novým skinům 16.1d/16.2c.
+**Zbývá (skutečný chrome drift, ~1622 ve ~160 souborech):** vizuální projití per komponenta napříč 2–3 tématy (proto **ne v automatickém commitu** — riziko rozbití skinů bez živé kontroly). Top cíle: `TemplateEditorModal`, `NotificationCenter`, `PostavaLayout`…
 **Trigger:** sjednocení vzhledu / nový skin odhalí drift. **Měření:** `npm run lint:colors`.

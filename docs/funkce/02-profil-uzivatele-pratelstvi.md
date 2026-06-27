@@ -60,7 +60,7 @@
   - `profileVisibility:'friends'` → nepřítel (a ne-admin, ne-self) dostane 403 `PROFILE_FRIENDS_ONLY`.
   - `lastSeenAt` null pro `hiddenPresence` nebo tombstone.
   - `lastLoginAt` jen pro platform admina (1.4 §15).
-- **Hranice / co neumí:** Veřejný profil NENÍ veřejný pro anonyma (route za `requireAuth`). Existuje i `GET /users/profile/:id` (bez guardu) — ale FE ho nepoužívá (používá `profile/v14/:id` za JWT).
+- **Hranice / co neumí:** Veřejný profil NENÍ veřejný pro anonyma (route za `requireAuth`); čte se přes `profile/v14/:id` za JWT (nechráněná `profile/:id` odstraněna 2026-06-18).
 - **Zvláštnosti:** WS `user:identity:changed` (role/ban/username) invaliduje `public-user-profile` (role chip / overlay se obnoví).
 - **Stav:** ✅ funguje.
 - **Kód:** FE `users/pages/PublicUserProfilePage.tsx:21`, `components/PublicProfile/PublicProfileActions.tsx:56`, BE `users.controller.ts:240`, `users.service.ts:430`.
@@ -138,9 +138,9 @@
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
 - **Komunitní placeholdery v profilu = stub:** „Moje diskuze / Moje články / Moje galerie" zobrazují „Bude dostupné v dalším updatu (fáze 3)", žádný request — vydávané jako sekce, ale prázdné. Pro expanzi: napojit na existující moduly (diskuze/články/galerie reálně fungují jinde).
-- **Role nemá vliv na taby `/ikaros/uzivatele`:** `visibleTabsForRole` i `defaultTabForRole` ignorují roli (`void role`) a vracejí všem totéž. Zadání předpokládá per-role viditelnost — reálně je řízena až obsahem „Zpracovat" (BE providery), ne taby.
-- **Dva endpointy veřejného profilu:** `GET /users/profile/:id` (bez guardu, „veřejný") vs `GET /users/profile/v14/:id` (za JWT, friend-only/tombstone logika). FE používá jen v14; nechráněný `profile/:id` je potenciálně širší než zamýšlené (k ověření, kdo a co přes něj vidí, zejm. že nemá friend-only ani tombstone gate).
-- **`displayName` bez min/regex validace:** na rozdíl od username (min 3, regex) má displayName jen max 32 — prázdné/jen mezery projdou.
+- **Role nemá vliv na taby `/ikaros/uzivatele` — ZÁMĚR (12.1):** `visibleTabsForRole`/`defaultTabForRole` všem vracejí stejné 3 komunitní taby (zafixováno testy). `role` param je vestigiální (`void role`) — ponechán kvůli signatuře, ne mrtvý nález k opravě.
+- **Veřejný profil endpoint SJEDNOCEN** (ověřeno 2026-06-27, D-NEW-INV-SEC): nechráněná `GET /users/profile/:id` byla **odstraněna 2026-06-18**; zůstal jen `profile/v14/:id` (JwtAuthGuard + friend-only/tombstone gating + throttle). Leak uzavřen.
+- **`displayName` trim DOPLNĚN** (2026-06-27, D-NEW-INV-PROFILE): FE `headerSchema` + BE `UpdateUserDto` (`@Transform` trim, `transform:true`) → „jen mezery" se normalizují na prázdné (→ fallback na username). Min/regex (jako username) záměrně NE — displayName smí být kratší/volnější.
 - **`FriendsTab` worldsCount = 0 placeholder:** karty přátel zobrazují počet světů jako 0 (BE friend list shape je užší), TODO „per-friend worlds badge (2.x)".
 - **Friend systém bez kategorií:** žádné skupiny/poznámky/oblíbení přátelé — pro expanzi.
 - **`getCalendarMonth`/`updateCalendarMonth` v users controlleru:** zdánlivě nesouvisející kalendářová pole na user endpointu (themeSettings.calendarMonth) — k ověření, zda nepatří jinam (možná legacy z .NET migrace).
