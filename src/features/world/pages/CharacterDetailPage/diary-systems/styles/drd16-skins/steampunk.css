@@ -100,11 +100,23 @@
   --dd-font-head: 'Cinzel', serif;
   --dd-font-body: 'EB Garamond', Georgia, serif;
 
-  /* embed plochy — tmavá mosazná kůže, světlý brass text (list je světlý → ink
-     je tmavý, proto explicitní světlé hodnoty). */
+  /* ════════════ EMBED plochy (dice log/token panel/readout/orchestrace) ═══
+     Tmavá mosazná kůže (list je SVĚTLÝ plát → embed nese tmavou polaritu rodiny):
+     NEPRŮHLEDNÝ kožený korpus, světlý brass text, mosazný rám. Pos/neg = verdigris
+     zelená / výbojová červeň (NE mauve). Bez sady padalo na fantasy default. */
+  --dd-embed-surface: linear-gradient(180deg, #2f2114, #241a10 58%, #160f08);
+  --dd-embed-border: var(--st-brass-deep);
+  --dd-embed-line: color-mix(in srgb, var(--st-brass-1) 24%, transparent);
   --dd-embed-text: #ead8b0;
   --dd-embed-muted: #b39a6a;
+  --dd-embed-title: var(--st-brass-0);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--st-brass-1) 16%, transparent);
+  --dd-embed-accent: var(--st-brass-1);
   --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'IM Fell English SC', 'Cinzel Decorative', serif;
+  --dd-embed-pos: #7bbf6a; /* kladný hod = verdigris zeleň (úspěch) */
+  --dd-embed-neg: var(--dd-crimson-hi); /* záporný hod = výbojová červeň (NE mauve) */
+  --dd-embed-neutral: var(--st-brass-1); /* neutrál = mosaz */
 
   /* ── kompozitní textury: kůže korpus + broušená mosaz overlay ── */
   --dd-parch-tex:

@@ -225,13 +225,21 @@
   background: var(--dd-accent-grad, linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320));
 }
 .statBonus.neg {
-  background: linear-gradient(180deg, #caa0a0, #9c6b6b 60%, #5e3a3a);
-  border-color: #5e3a3a;
-  color: #2a1010;
+  /* záporný bonus — crimson tokeny (per skin přebito: fantasy rudá, scifi mint, anime růžová) */
+  background: linear-gradient(
+    180deg,
+    var(--dd-crimson-hi, #cb4138),
+    var(--dd-crimson, #9c2a23) 60%,
+    var(--dd-crimson-deep, #5c1612)
+  );
+  border-color: var(--dd-crimson-deep, #5c1612);
+  color: var(--dd-ink-deep, #1f1607);
 }
 .statBonus.zero {
-  background: linear-gradient(180deg, #d9cba8, #b8a070 60%, #8c7549);
-  border-color: #8c7549;
+  /* nulový bonus — neutrální tlumený token (žádný akcent gradient), ladí s rámem panelu */
+  background: var(--dd-gold-deep, #8c7549);
+  border-color: var(--dd-gold-deep, #8c7549);
+  color: var(--dd-parch-1, #d9cba8);
 }
 
 /* ── Pohyb & Postřeh ── */

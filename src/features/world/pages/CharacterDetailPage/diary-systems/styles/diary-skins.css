@@ -52,17 +52,73 @@
   --dd-embed-neutral: var(--dd-gold, #c19a3f);
 }
 
-/* ════════════ 16.2d-F3 — drdplus EMBED tokeny (dice log „HODY" / token panel
-   obal / dice readout / orchestrace) ════════════
- * drdplus deník (`.dp-sheet`) i mapové combat/bestie panely (`.root`) = pergamen
- * „iluminovaný kodex" — VŽDY, bez skin variant (DrdPlusSheet na `data-diary-skin`
- * nereaguje). Embedy proto nesou FIXNÍ pergamen/forge paletu (shodnou s drd16
- * fantasy defaultem), aby ladily s deníkem. Stejný `--dd-embed-*` kontrakt jako
- * drd16 → moduly (dice log / token panel / readout / orchestrace) sdílí selektory
- * `:is([drd16],[drdplus])`. Čísla v serifu (Cinzel), ne mono — pergamen, ne HUD.
- * Ostatní `--dd-*` (forge/accent-grad/parch/ink/font) mají v modulech korektní
- * pergamenové fallbacky → není nutné je tu duplikovat. Plocha VŽDY opaque. */
+/* 16.2d-skiny — per-systémové skiny DrD+ (`drdplus-skins/`, scoped
+   `[data-diary-system='drdplus'][data-diary-skin='<skin>']`). Importováno zde,
+   aby se načetly i v embedech (chat rail / mapa / dice), kde `drdplus.css`
+   (list preset) NEběží. Stejný princip jako drd16-skins výš. */
+@import './drdplus-skins/scifi.css';
+@import './drdplus-skins/fantasy.css';
+@import './drdplus-skins/horror.css';
+@import './drdplus-skins/steampunk.css';
+@import './drdplus-skins/nature.css';
+@import './drdplus-skins/minimal.css';
+@import './drdplus-skins/retro.css';
+@import './drdplus-skins/anime.css';
+
+/* ════════════ 16.2d-skiny — drdplus DEFAULT token sada (pergamen „iluminovaný
+   kodex") + EMBED tokeny ════════════
+ * ŽIJE ZDE (ne v lazy `drdplus.css`), aby platila i v embedech (mapa/chat/dice),
+ * kde se `drdplus.css` nenačte. Toto je BASELINE, který skiny přebíjejí na
+ * `[data-diary-system='drdplus'][data-diary-skin='X']`. Combat/bestie panely
+ * (`.root`) mají lokální `--dd-*` ODEBRÁNY → dědí odsud (default) nebo ze skinu.
+ * `--dd-embed-*` = plochy obalu/dice/log (skin override-uje). Plocha VŽDY opaque. */
 [data-diary-system='drdplus'] {
+  /* ── base paleta (pergamen) — combat/bestie panel ── */
+  --dd-parch-1: #e8dab7;
+  --dd-ink: #3a2b19;
+  --dd-ink-2: #2a1a0a;
+  --dd-ink-deep: #1f1607;
+  --dd-ink-head: #3a2812;
+  --dd-ink-soft: #6c573a;
+  --dd-gold: #c19a3f;
+  --dd-gold-hi: #f3dd97;
+  --dd-gold-deep: #6f5320;
+  --dd-crimson: #9c2a23;
+  --dd-crimson-deep: #5c1612;
+  --dd-sapphire: #2c569e;
+  --dd-line: rgba(196, 173, 126, 0.55);
+  --dd-forge-1: #1d160e;
+
+  /* ── fonty (skin je swapuje na mono/sans dle identity) ── */
+  --dd-font-body: 'EB Garamond', Georgia, serif;
+  --dd-font-head: 'Cinzel', serif;
+  --dd-font-display: 'Cinzel Decorative', 'Cinzel', serif;
+
+  /* ── kompozity (plochy/tlačítka/lišty) — skin je přebarvuje ── */
+  --dd-sheet-radius: 5px;
+  --dd-panel-bg:
+    radial-gradient(120% 90% at 18% 8%, rgba(255, 250, 235, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 88% 96%, rgba(150, 120, 72, 0.28), transparent 60%),
+    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f);
+  --dd-panel-frame:
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px #c4ad7e,
+    0 0 0 4px var(--dd-forge-1, #1d160e),
+    0 0 0 5px var(--dd-gold-deep, #6f5320);
+  --dd-row-bg: linear-gradient(180deg, rgba(255, 252, 242, 0.88), rgba(224, 208, 170, 0.55));
+  --dd-card-bg: linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22));
+  --dd-input-bg: #fff;
+  --dd-accent-grad: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e); /* zlaté tlačítko (chip/krok) */
+  --dd-accent-grad-strong: linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320); /* init/edit/iniciativa */
+  --dd-zz-grad: linear-gradient(180deg, #cf6a60, #a83228 55%, #7c1d16); /* ZZ = zranění (červené) */
+  /* ── pásma zranění/únavy (sémantika: ok/postih/kóma) ── */
+  --dd-band-ok: linear-gradient(180deg, #7bbf6a, #3e6b34);
+  --dd-band-ok-ink: #3e6b34;
+  --dd-band-warn: linear-gradient(180deg, #e7b75a, #a8761a);
+  --dd-band-warn-ink: #a8761a;
+  --dd-band-crit: linear-gradient(180deg, #cb4138, #5c1612);
+
+  /* ── embed plochy (obal v TM / dice readout / dicelog) ── */
   --dd-embed-surface: linear-gradient(180deg, #271d12, #1d160e);
   --dd-embed-border: #6f5320;
   --dd-embed-line: color-mix(in srgb, #c19a3f 24%, transparent);
@@ -346,6 +402,30 @@
   --mx-add-border: color-mix(in srgb, #c9a227 40%, transparent);
   --mx-add-hover-bg: color-mix(in srgb, #c9a227 10%, transparent);
 
+  /* fixB N2 — přetlaky: tlumená zeleň → zlato → oxblood (grimoár, žádný neon) */
+  --mx-pr-1: linear-gradient(180deg, #6e8a44, #45611f);
+  --mx-pr-1b: color-mix(in srgb, #6e8a44 55%, transparent);
+  --mx-pr-2: linear-gradient(180deg, #9a9a3a, #6e6e1f);
+  --mx-pr-2b: color-mix(in srgb, #9a9a3a 55%, transparent);
+  --mx-pr-3: linear-gradient(180deg, #e3b94a, #9c7a24);
+  --mx-pr-3b: color-mix(in srgb, #e3b94a 55%, transparent);
+  --mx-pr-4: linear-gradient(180deg, #c47432, #8a4418);
+  --mx-pr-4b: color-mix(in srgb, #c47432 55%, transparent);
+  --mx-pr-5: linear-gradient(180deg, #b4452f, #7c2418);
+  --mx-pr-5b: color-mix(in srgb, #b4452f 60%, transparent);
+  --mx-pr-5-glow: none;
+  /* fixB N7 — heat sladěn na oxblood/zlato grimoáru */
+  --mx-warn-seg: linear-gradient(180deg, #e3b94a, #9c7a24);
+  --mx-warn-seg-b: color-mix(in srgb, #e3b94a 55%, transparent);
+  --mx-crit-seg: linear-gradient(180deg, #b4452f, #7c2418);
+  --mx-crit-seg-b: color-mix(in srgb, #b4452f 60%, transparent);
+  --mx-warn-badge-bg: rgba(227, 185, 74, 0.1);
+  --mx-warn-badge-ink: #e3c060;
+  --mx-warn-badge-b: rgba(227, 185, 74, 0.35);
+  --mx-crit-badge-bg: rgba(180, 69, 47, 0.12);
+  --mx-crit-badge-ink: #d8806a;
+  --mx-crit-badge-b: rgba(180, 69, 47, 0.4);
+
   --lvl-1: #8a7a5a;
   --lvl-2: #9a8a3a;
   --lvl-3: #b08a2a;
@@ -408,6 +488,10 @@
     radial-gradient(circle at right, #e3b94a 1.5px, transparent 2px);
 }
 /* iluminovaná iniciála jména */
+/* fixB N6 — odsazení, ať se zvětšená iniciála (1.3em) neořezává o levou hranu */
+[data-diary-system='matrix'][data-diary-skin='fantasy'] .mx-name {
+  padding-left: 0.16em;
+}
 [data-diary-system='matrix'][data-diary-skin='fantasy'] .mx-name::first-letter {
   font-family: 'Cinzel Decorative', serif;
   font-weight: 900;
@@ -556,6 +640,30 @@
   --mx-add-border: rgba(125, 118, 130, 0.4);
   --mx-add-hover-bg: rgba(106, 81, 112, 0.12);
 
+  /* fixB N2 — přetlaky: chladná fialovo-stříbrná → oxblood (salon, žádný neon) */
+  --mx-pr-1: linear-gradient(180deg, #6a5170, #3e3048);
+  --mx-pr-1b: rgba(106, 81, 112, 0.5);
+  --mx-pr-2: linear-gradient(180deg, #8a6e98, #4a3858);
+  --mx-pr-2b: rgba(138, 110, 152, 0.5);
+  --mx-pr-3: linear-gradient(180deg, #9a5a78, #5e2c44);
+  --mx-pr-3b: rgba(154, 90, 120, 0.5);
+  --mx-pr-4: linear-gradient(180deg, #a2283a, #6e1622);
+  --mx-pr-4b: rgba(162, 40, 58, 0.55);
+  --mx-pr-5: linear-gradient(180deg, #8a2030, #5e1622);
+  --mx-pr-5b: rgba(138, 32, 48, 0.6);
+  --mx-pr-5-glow: none;
+  /* fixB N7 — heat sladěn na oxblood salonu (tlumený, žádná řvavá oranž) */
+  --mx-warn-seg: linear-gradient(180deg, #9a5a78, #5e2c44);
+  --mx-warn-seg-b: rgba(154, 90, 120, 0.5);
+  --mx-crit-seg: linear-gradient(180deg, #a2283a, #5e1622);
+  --mx-crit-seg-b: rgba(162, 40, 58, 0.55);
+  --mx-warn-badge-bg: rgba(154, 90, 120, 0.12);
+  --mx-warn-badge-ink: #c89ab0;
+  --mx-warn-badge-b: rgba(154, 90, 120, 0.4);
+  --mx-crit-badge-bg: rgba(162, 40, 58, 0.12);
+  --mx-crit-badge-ink: #c87080;
+  --mx-crit-badge-b: rgba(162, 40, 58, 0.4);
+
   --lvl-1: #5a4650;
   --lvl-2: #6a3a44;
   --lvl-3: #7a2434;
@@ -650,8 +758,10 @@
     radial-gradient(circle at right, #c8c4cf 1.4px, transparent 2px);
 }
 /* jméno kurzívou + blackletter iniciála (spoře) */
+/* fixB N6 — odsazení pro 1.5em blackletter iniciálu (+ kurzíva táhne doleva) */
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-name {
   font-style: italic;
+  padding-left: 0.22em;
 }
 [data-diary-system='matrix'][data-diary-skin='horror'] .mx-name::first-letter {
   font-family: 'UnifrakturCook', serif;
@@ -844,6 +954,30 @@
   --mx-add-color: #d8b46a;
   --mx-add-border: color-mix(in srgb, #c9a45e 40%, transparent);
   --mx-add-hover-bg: color-mix(in srgb, #c9a45e 10%, transparent);
+
+  /* fixB N2 — přetlaky: verdigris → mosaz → měď-oranžová (mosazný stroj) */
+  --mx-pr-1: linear-gradient(180deg, #5a9a8a, #2e5a50);
+  --mx-pr-1b: color-mix(in srgb, #5a9a8a 50%, transparent);
+  --mx-pr-2: linear-gradient(180deg, #9aa86a, #6e7a3a);
+  --mx-pr-2b: color-mix(in srgb, #9aa86a 50%, transparent);
+  --mx-pr-3: linear-gradient(180deg, #d8b46a, #8a6a2e);
+  --mx-pr-3b: color-mix(in srgb, #d8b46a 50%, transparent);
+  --mx-pr-4: linear-gradient(180deg, #c97a3a, #8a4a1e);
+  --mx-pr-4b: color-mix(in srgb, #c97a3a 55%, transparent);
+  --mx-pr-5: linear-gradient(180deg, #c4642a, #842f10);
+  --mx-pr-5b: color-mix(in srgb, #c4642a 60%, transparent);
+  --mx-pr-5-glow: none;
+  /* fixB N7 — heat sladěn na mosaz/měď (žádná řvavá červeň) */
+  --mx-warn-seg: linear-gradient(180deg, #d8b46a, #8a6a2e);
+  --mx-warn-seg-b: color-mix(in srgb, #d8b46a 50%, transparent);
+  --mx-crit-seg: linear-gradient(180deg, #c4642a, #842f10);
+  --mx-crit-seg-b: color-mix(in srgb, #c4642a 60%, transparent);
+  --mx-warn-badge-bg: rgba(216, 180, 106, 0.1);
+  --mx-warn-badge-ink: #e8c478;
+  --mx-warn-badge-b: rgba(216, 180, 106, 0.35);
+  --mx-crit-badge-bg: rgba(196, 100, 42, 0.12);
+  --mx-crit-badge-ink: #e08a4d;
+  --mx-crit-badge-b: rgba(196, 100, 42, 0.4);
 
   --lvl-1: #8a7a5a;
   --lvl-2: #9a7a3a;
@@ -1057,6 +1191,30 @@
   --mx-add-border: color-mix(in srgb, #82b148 40%, transparent);
   --mx-add-hover-bg: color-mix(in srgb, #82b148 10%, transparent);
 
+  /* fixB N2 — přetlaky: listová zeleň → jantar → hřebíček (sladěno s akcentem) */
+  --mx-pr-1: linear-gradient(180deg, #93cc4a, #5e8a2e);
+  --mx-pr-1b: color-mix(in srgb, #82b148 50%, transparent);
+  --mx-pr-2: linear-gradient(180deg, #b0c850, #82a032);
+  --mx-pr-2b: color-mix(in srgb, #9cb840 50%, transparent);
+  --mx-pr-3: linear-gradient(180deg, #e8b048, #b07e26);
+  --mx-pr-3b: color-mix(in srgb, #e8b048 50%, transparent);
+  --mx-pr-4: linear-gradient(180deg, #d08a3a, #9a5e22);
+  --mx-pr-4b: color-mix(in srgb, #c98f3e 50%, transparent);
+  --mx-pr-5: linear-gradient(180deg, #b9743a, #803e1c);
+  --mx-pr-5b: color-mix(in srgb, #b9743a 60%, transparent);
+  --mx-pr-5-glow: none;
+  /* fixB N7 — heat sladěn na lesní paletu (jantar/hřebíček, žádná řvavá červeň) */
+  --mx-warn-seg: linear-gradient(180deg, #e8b048, #b07e26);
+  --mx-warn-seg-b: color-mix(in srgb, #e8b048 50%, transparent);
+  --mx-crit-seg: linear-gradient(180deg, #b9743a, #803e1c);
+  --mx-crit-seg-b: color-mix(in srgb, #b9743a 60%, transparent);
+  --mx-warn-badge-bg: rgba(232, 176, 72, 0.1);
+  --mx-warn-badge-ink: #e8c060;
+  --mx-warn-badge-b: rgba(232, 176, 72, 0.35);
+  --mx-crit-badge-bg: rgba(185, 116, 58, 0.12);
+  --mx-crit-badge-ink: #d89060;
+  --mx-crit-badge-b: rgba(185, 116, 58, 0.4);
+
   --lvl-1: #6a7a4a;
   --lvl-2: #88983e;
   --lvl-3: #9cb840;
@@ -1124,6 +1282,10 @@
     radial-gradient(circle at right, #82b148 1.5px, transparent 2px);
 }
 /* listová iluminovaná iniciála */
+/* fixB N6 — odsazení, ať se zvětšená iniciála (1.28em) neořezává o levou hranu */
+[data-diary-system='matrix'][data-diary-skin='nature'] .mx-name {
+  padding-left: 0.14em;
+}
 [data-diary-system='matrix'][data-diary-skin='nature'] .mx-name::first-letter {
   font-family: 'Marcellus SC', serif;
   font-size: 1.28em;
@@ -1289,6 +1451,30 @@
   --mx-add-color: #6e5520;
   --mx-add-border: #cabfa8;
   --mx-add-hover-bg: rgba(154, 123, 46, 0.06);
+
+  /* fixB N2 — přetlaky: tlumené zlato/teal stupně (papír) → cihla. Žádný neon. */
+  --mx-pr-1: #6f7d6a;
+  --mx-pr-1b: #5d6a58;
+  --mx-pr-2: #8a8a52;
+  --mx-pr-2b: #777740;
+  --mx-pr-3: #b08f3a;
+  --mx-pr-3b: #97782c;
+  --mx-pr-4: #b06a32;
+  --mx-pr-4b: #985827;
+  --mx-pr-5: #8b3a22;
+  --mx-pr-5b: #762f1b;
+  --mx-pr-5-glow: none;
+  /* fixB N7 — heat sladěn na hnědou/papír (tlumená cihla, žádná řvavá červeň) */
+  --mx-warn-seg: #b08f3a;
+  --mx-warn-seg-b: #97782c;
+  --mx-crit-seg: #8b3a22;
+  --mx-crit-seg-b: #762f1b;
+  --mx-warn-badge-bg: rgba(176, 143, 58, 0.1);
+  --mx-warn-badge-ink: #8a6a1c;
+  --mx-warn-badge-b: rgba(176, 143, 58, 0.4);
+  --mx-crit-badge-bg: rgba(139, 58, 34, 0.1);
+  --mx-crit-badge-ink: #8b3a22;
+  --mx-crit-badge-b: rgba(139, 58, 34, 0.4);
 
   --lvl-1: #cabfa8;
   --lvl-2: #b9b09c;
@@ -1575,6 +1761,31 @@
   --mx-add-color: #ffb627;
   --mx-add-border: rgba(255, 182, 39, 0.4);
   --mx-add-hover-bg: rgba(255, 182, 39, 0.08);
+
+  /* fixB N2 — přetlaky: jantarové LED stupně (slabý→jasný→přepálený). Monochrom,
+     žádná zelená/červená (CRT identita); gradace svítivosti = „víc=horší". */
+  --mx-pr-1: linear-gradient(180deg, #8a5e15, #6e4d1a);
+  --mx-pr-1b: rgba(138, 94, 21, 0.5);
+  --mx-pr-2: linear-gradient(180deg, #c98a1d, #a86a12);
+  --mx-pr-2b: rgba(201, 138, 29, 0.5);
+  --mx-pr-3: linear-gradient(180deg, #ffb627, #e6a821);
+  --mx-pr-3b: rgba(255, 182, 39, 0.5);
+  --mx-pr-4: linear-gradient(180deg, #ff9d1a, #d97300);
+  --mx-pr-4b: rgba(255, 157, 26, 0.55);
+  --mx-pr-5: linear-gradient(180deg, #ff7a14, #c43e00);
+  --mx-pr-5b: rgba(255, 122, 20, 0.6);
+  --mx-pr-5-glow: 0 0 10px -2px rgba(255, 122, 20, 0.6);
+  /* fixB N7 — heat v jantaru: warn = jasný jantar, crit = přepálená oranž */
+  --mx-warn-seg: linear-gradient(180deg, #ffb627, #d97300);
+  --mx-warn-seg-b: rgba(255, 182, 39, 0.5);
+  --mx-crit-seg: linear-gradient(180deg, #ff7a14, #c43e00);
+  --mx-crit-seg-b: rgba(255, 122, 20, 0.6);
+  --mx-warn-badge-bg: rgba(255, 182, 39, 0.1);
+  --mx-warn-badge-ink: #ffc24d;
+  --mx-warn-badge-b: rgba(255, 182, 39, 0.35);
+  --mx-crit-badge-bg: rgba(255, 122, 20, 0.12);
+  --mx-crit-badge-ink: #ff9d4d;
+  --mx-crit-badge-b: rgba(255, 122, 20, 0.4);
 
   --lvl-1: #6e4d1a;
   --lvl-2: #a86a12;
@@ -1959,6 +2170,8 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+  /* fixB N6 — odsazení, ať 2px ink-stroke iniciály nepřečuhuje přes levou hranu */
+  padding-left: 2px;
 }
 [data-diary-system='matrix'][data-diary-skin='anime'] .mx-name::first-letter {
   -webkit-text-fill-color: #ff4d97;

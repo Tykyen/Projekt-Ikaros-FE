@@ -68,10 +68,23 @@
   --dd-font-head: 'Marcellus SC', serif;
   --dd-font-body: 'Spectral', Georgia, serif;
 
-  /* embed plochy — tmavá kůra, světlý mechový pergamenový text (list světlý). */
+  /* ════════════ EMBED plochy (dice log/token panel/readout/orchestrace) ═══
+     Tmavá kůra (list je SVĚTLÝ lýkový arch → embed nese tmavou polaritu rodiny):
+     NEPRŮHLEDNÁ dřevěná deska, světlý mechový text, jantarový rám. Pos/neg = mech
+     zeleň / bobule červeň (NE mauve). Bez sady padalo na fantasy default. */
+  --dd-embed-surface: linear-gradient(180deg, #3c2d1a, #2a2014 58%, #1f170d);
+  --dd-embed-border: var(--dd-gold-deep);
+  --dd-embed-line: color-mix(in srgb, var(--na-leaf-vein) 26%, transparent);
   --dd-embed-text: #e8dcc2;
   --dd-embed-muted: #ab9d80;
+  --dd-embed-title: var(--dd-gold-hi);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--na-moss-hi) 18%, transparent);
+  --dd-embed-accent: var(--dd-gold);
   --dd-embed-num-font: var(--dd-font-body);
+  --dd-embed-title-font: 'Marcellus SC', serif;
+  --dd-embed-pos: var(--na-moss-hi); /* kladný hod = mech zeleň (úspěch/růst) */
+  --dd-embed-neg: var(--dd-crimson-hi); /* záporný hod = bobule červeň (NE mauve) */
+  --dd-embed-neutral: var(--dd-gold-hi); /* neutrál = jantar */
   /* lokální: rukopis terénního zápisníku (poznámky, hinty, zaklínadla) */
   --na-font-hand: 'Caveat', cursive;
   /* lokální: mech akcent v plné, hi a deep variantě (žilky, listy, markery) */

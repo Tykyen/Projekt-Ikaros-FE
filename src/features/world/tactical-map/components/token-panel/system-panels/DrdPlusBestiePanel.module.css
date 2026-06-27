@@ -3,46 +3,36 @@
  * Self-contained paleta `--dd-*` jako DrdPlusCombatPanel (sdílené skin tokeny
  * jsou laděné na tmavý HUD a na světlém pergamenu nečitelné).
  */
+/* 16.2d-skiny — TOKENIZOVÁNO (viz DrdPlusCombatPanel): lokální `--dd-*` odebrány
+   (jinak stíní skin z předka), každá hodnota = `var(--dd-token, <pergamen
+   fallback>)` → bez skinu / neznámý skin = identický pergamen (regrese-safe). */
 .root {
-  --dd-parch-1: #e8dab7;
-  --dd-ink: #3a2b19;
-  --dd-ink-2: #2a1a0a;
-  --dd-ink-deep: #1f1607;
-  --dd-ink-head: #3a2812;
-  --dd-ink-soft: #6c573a;
-  --dd-gold: #c19a3f;
-  --dd-gold-hi: #f3dd97;
-  --dd-gold-deep: #6f5320;
-  --dd-crimson: #9c2a23;
-  --dd-crimson-deep: #5c1612;
-  --dd-line: rgba(196, 173, 126, 0.55);
-  --dd-forge-1: #1d160e;
-  --acc: #5b3fa3;
+  --acc: var(--dd-acc-bestie, #5b3fa3);
 
   position: relative;
   display: flex;
   flex-direction: column;
-  font-family: 'EB Garamond', Georgia, serif;
-  color: var(--dd-ink);
-  background-color: var(--dd-parch-1);
-  background-image:
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+  color: var(--dd-ink, #3a2b19);
+  background-color: var(--dd-parch-1, #e8dab7);
+  background-image: var(--dd-panel-bg,
     radial-gradient(120% 90% at 18% 8%, rgba(255, 250, 235, 0.5), transparent 55%),
     radial-gradient(120% 120% at 88% 96%, rgba(150, 120, 72, 0.28), transparent 60%),
-    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f);
-  border-radius: 5px;
+    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f));
+  border-radius: var(--dd-sheet-radius, 5px);
   padding: 13px;
-  box-shadow:
+  box-shadow: var(--dd-panel-frame,
     0 2px 0 rgba(255, 255, 255, 0.12) inset,
     0 0 0 1px #c4ad7e,
-    0 0 0 4px var(--dd-forge-1),
-    0 0 0 5px var(--dd-gold-deep);
+    0 0 0 4px var(--dd-forge-1, #1d160e),
+    0 0 0 5px var(--dd-gold-deep, #6f5320));
 }
 .root * {
   box-sizing: border-box;
 }
 
 .modeTag {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -74,7 +64,7 @@
 }
 .glyph {
   fill: var(--acc);
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-size: 34px;
   font-weight: 700;
   text-anchor: middle;
@@ -84,23 +74,23 @@
   min-width: 0;
 }
 .name {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-size: 17px;
   color: var(--dd-ink-2);
   line-height: 1.1;
 }
 .nameEdit {
   width: 100%;
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-size: 16px;
   color: var(--dd-ink-2);
   border: 1px solid var(--dd-gold-deep);
   border-radius: 4px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   padding: 4px 7px;
 }
 .sub {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -111,7 +101,7 @@
 /* tlačítko Upravit / Hotovo */
 .editFull {
   width: 100%;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -121,7 +111,7 @@
   border-radius: 5px;
   border: 1px solid var(--dd-gold-deep);
   color: var(--dd-ink-deep);
-  background: linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320);
+  background: var(--dd-accent-grad-strong, linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320));
   box-shadow:
     0 1px 0 rgba(255, 250, 225, 0.7) inset,
     0 2px 3px rgba(40, 26, 6, 0.4);
@@ -141,7 +131,7 @@
   align-items: center;
   gap: 8px;
   margin: 13px 0 7px;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.1em;
@@ -186,7 +176,7 @@
   text-align: left;
   font-family: inherit;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 252, 242, 0.88), rgba(224, 208, 170, 0.55));
+  background: var(--dd-row-bg, linear-gradient(180deg, rgba(255, 252, 242, 0.88), rgba(224, 208, 170, 0.55)));
   border: 1px solid var(--dd-gold-deep);
   box-shadow:
     0 1px 0 rgba(255, 253, 245, 0.9) inset,
@@ -209,7 +199,7 @@
   white-space: nowrap;
 }
 .rVal {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 15px;
   color: var(--dd-ink-2);
@@ -235,14 +225,14 @@
   margin-bottom: 5px;
 }
 .rk {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--dd-ink-soft);
 }
 .rv {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 16px;
   color: var(--dd-ink-2);
@@ -253,7 +243,7 @@
   padding: 7px 9px;
   margin-bottom: 6px;
   border-radius: 4px;
-  background: linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22));
+  background: var(--dd-card-bg, linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22)));
   border: 1px solid var(--dd-line);
 }
 .weapName {
@@ -273,14 +263,14 @@
 }
 .chip {
   cursor: pointer;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 11px;
   font-weight: 600;
   padding: 5px 11px;
   border-radius: 5px;
   border: 1px solid var(--dd-gold-deep);
   color: var(--dd-ink-deep);
-  background: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  background: var(--dd-accent-grad, linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e));
   box-shadow:
     0 1px 0 rgba(255, 250, 225, 0.85) inset,
     0 2px 3px rgba(50, 34, 10, 0.3);
@@ -295,13 +285,13 @@
   opacity: 0.8;
 }
 .chip b {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   margin-left: 3px;
 }
 .chip.zz {
   border-color: var(--dd-crimson-deep);
   color: #fff;
-  background: linear-gradient(180deg, #cf6a60, #a83228 55%, #7c1d16);
+  background: var(--dd-zz-grad, linear-gradient(180deg, #cf6a60, #a83228 55%, #7c1d16));
 }
 .chip.bc {
   position: relative;
@@ -319,7 +309,7 @@
   gap: 4px;
 }
 .atkLbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -335,16 +325,16 @@
   margin-bottom: 4px;
 }
 .wlbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .bez .wlbl {
-  color: #3e6b34;
+  color: var(--dd-band-ok-ink, #3e6b34);
 }
 .postihBand .wlbl {
-  color: #a8761a;
+  color: var(--dd-band-warn-ink, #a8761a);
 }
 .koma .wlbl {
   color: var(--dd-crimson);
@@ -361,16 +351,16 @@
   height: 100%;
 }
 .bez .wbar i {
-  background: linear-gradient(180deg, #7bbf6a, #3e6b34);
+  background: var(--dd-band-ok, linear-gradient(180deg, #7bbf6a, #3e6b34));
 }
 .postihBand .wbar i {
-  background: linear-gradient(180deg, #e7b75a, #a8761a);
+  background: var(--dd-band-warn, linear-gradient(180deg, #e7b75a, #a8761a));
 }
 .koma .wbar i {
-  background: linear-gradient(180deg, #cb4138, #5c1612);
+  background: var(--dd-band-crit, linear-gradient(180deg, #cb4138, #5c1612));
 }
 .wcount {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 12px;
   min-width: 52px;
@@ -384,14 +374,14 @@
   justify-content: flex-end;
 }
 .wsteps button {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 11px;
   font-weight: 600;
   width: 34px;
   padding: 4px 0;
   border-radius: 4px;
   border: 1px solid var(--dd-gold-deep);
-  background: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  background: var(--dd-accent-grad, linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e));
   color: var(--dd-ink-deep);
   cursor: pointer;
 }
@@ -409,7 +399,7 @@
   border: 1px dashed #a8761a;
 }
 .postihField label {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -418,13 +408,13 @@
 }
 .postihField input {
   width: 50px;
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 15px;
   text-align: center;
   border: 1px solid #a8761a;
   border-radius: 3px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   color: var(--dd-crimson-deep);
   padding: 3px;
 }
@@ -451,7 +441,7 @@
   font-weight: 500;
 }
 .av {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   color: var(--dd-ink-soft);
   font-size: 12px;
   text-align: right;
@@ -491,19 +481,19 @@
 /* inline edit inputy */
 .ed {
   flex: 0 0 auto;
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 13px;
   text-align: center;
   border: 1px solid var(--dd-gold-deep);
   border-radius: 3px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   color: var(--dd-ink-2);
   padding: 3px;
   width: 44px;
 }
 .ed.edTxt {
-  font-family: 'EB Garamond', Georgia, serif;
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
   font-weight: 400;
   text-align: left;
   width: 100%;
@@ -515,13 +505,13 @@
   font-size: 13px;
   border: 1px solid var(--dd-gold-deep);
   border-radius: 4px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   color: var(--dd-ink);
   padding: 6px 8px;
   resize: vertical;
 }
 .miniAdd {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;

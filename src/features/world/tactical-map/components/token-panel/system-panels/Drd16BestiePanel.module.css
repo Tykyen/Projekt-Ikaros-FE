@@ -218,7 +218,8 @@
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--dd-steel, #23344c);
+  /* box má vlastní světlé pozadí → text tmavý (ink-deep = "text na světlém akcentu", čitelný v každém skinu); --dd-steel zůstává jen v borderu jako akcent */
+  color: var(--dd-ink-deep, #23344c);
   font-weight: 600;
 }
 .defVal {
@@ -226,7 +227,7 @@
   font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 26px;
-  color: var(--dd-steel, #23344c);
+  color: var(--dd-ink-deep, #23344c);
 }
 
 .noAtk {

@@ -78,10 +78,23 @@
   --dd-font-head: 'Spline Sans Mono', ui-monospace, monospace;
   --dd-font-body: 'Newsreader', Georgia, serif;
 
-  /* embed plochy — světlý papír, uhlový text (forge je tu světlý → ink tmavý sedí). */
+  /* ════════════ EMBED plochy (dice log/token panel/readout/orchestrace) ═══
+     Kostěný papír: NEPRŮHLEDNÁ světlá plocha (ne hnědý fantasy default), uhlový
+     text, hairline rám, JEDINÝ teal akcent. Pos/neg = teal/cihla (sémantika bez
+     pestrosti, drží minimal disciplínu; NE mauve). */
+  --dd-embed-surface: linear-gradient(180deg, #faf8f3, #f4f1ea 55%, #ece7dd);
+  --dd-embed-border: var(--mn-hair-2);
+  --dd-embed-line: var(--mn-hair);
   --dd-embed-text: var(--dd-ink);
   --dd-embed-muted: var(--dd-ink-soft);
+  --dd-embed-title: var(--mn-acc-deep);
+  --dd-embed-chip-bg: var(--mn-acc-wash);
+  --dd-embed-accent: var(--mn-acc);
   --dd-embed-num-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-pos: var(--mn-acc-deep); /* kladný hod = teal (jediný akcent) */
+  --dd-embed-neg: var(--mn-danger); /* záporný hod = cihla (NE mauve) */
+  --dd-embed-neutral: var(--mn-ink-2); /* neutrál = grafitová šeď (zdrženlivý) */
 
   /* ── plochy: textury PRYČ → čistý papír, jemný horní vtisk ── */
   --dd-parch-tex: linear-gradient(180deg, #faf8f3, var(--mn-paper) 42%, var(--mn-paper-2));

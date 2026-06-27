@@ -78,12 +78,26 @@
   --dd-font-head: 'Press Start 2P', 'Share Tech Mono', monospace;
   --dd-font-body: 'Share Tech Mono', 'Courier New', monospace;
 
-  /* embed plochy — tmavý synthwave, světlý text (ink je tu už světlý). */
-  --dd-embed-text: var(--dd-ink);
-  --dd-embed-muted: #b69ad6;
-  --dd-embed-num-font: var(--dd-font-num);
   /* čísla = monospace „LED-ish" (DSEG7 odebrán kvůli CSP, viz hlavička) */
   --dd-font-num: 'Share Tech Mono', monospace;
+
+  /* ════════════ EMBED plochy (dice log/token panel/readout/orchestrace) ═══
+     Synthwave noc: NEPRŮHLEDNÁ tmavě fialová plocha (NE hnědý fantasy default),
+     levandulový text, hot-magenta rám, cyan titulek. Pos/neg = neon růžová/azur
+     drží význam (NE mauve). Bez kompletní sady padalo na fantasy default. */
+  --dd-embed-surface: linear-gradient(180deg, #241148, #1b0f37 58%, #120726);
+  --dd-embed-border: var(--dd-parch-edge);
+  --dd-embed-line: var(--dd-line);
+  --dd-embed-text: var(--dd-ink);
+  --dd-embed-muted: #b69ad6;
+  --dd-embed-title: var(--dd-ink-head);
+  --dd-embed-chip-bg: rgba(123, 63, 176, 0.28);
+  --dd-embed-accent: var(--dd-gold);
+  --dd-embed-num-font: var(--dd-font-num);
+  --dd-embed-title-font: 'Orbitron', 'Share Tech Mono', sans-serif;
+  --dd-embed-pos: #4ade80; /* kladný hod = neon zelená (úspěch) */
+  --dd-embed-neg: var(--dd-crimson); /* záporný hod = neon růžová (NE mauve) */
+  --dd-embed-neutral: var(--dd-gold); /* neutrál = sluneční jantar */
 
   /* ── kompozity: pozadí ploch (synthwave gradient + jemný sun-grid pruh) ──
    * Tento token nese pozadí listu I panelů (.root combat/bestie čte

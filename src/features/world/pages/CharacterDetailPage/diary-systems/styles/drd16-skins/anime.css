@@ -79,12 +79,24 @@
   --dd-font-head: 'Fredoka', system-ui, sans-serif;
   --dd-font-body: 'Quicksand', system-ui, sans-serif;
 
-  /* embed plochy — světlé album, fialový text; titulek sytě (`--dd-gold-hi` je
-     pale levandule → na bílé mizí, proto `--dd-ink-head`). */
+  /* ════════════ EMBED plochy (dice log/token panel/readout/orchestrace) ═══
+     Pastelové album: NEPRŮHLEDNÁ světlá plocha (NE bledý šedo-bílý box z fantasy
+     defaultu), fialový inkoust, levandulový rám, sytý titulek (`--dd-gold-hi` =
+     pale levandule mizí na bílém → `--dd-ink-head`). Bez kompletní sady padalo
+     na fantasy default → bledý box + mauve neg. Pos/neg = mint/růžová (sytě). */
+  --dd-embed-surface: linear-gradient(180deg, #fffafd, #fff4fb 55%, #ffeef8);
+  --dd-embed-border: var(--mlp-lavender);
+  --dd-embed-line: var(--mlp-line);
   --dd-embed-text: var(--dd-ink);
   --dd-embed-muted: var(--dd-ink-soft);
   --dd-embed-title: var(--dd-ink-head);
-  --dd-embed-num-font: var(--dd-font-body);
+  --dd-embed-chip-bg: rgba(183, 156, 232, 0.16);
+  --dd-embed-accent: var(--mlp-lavender-d);
+  --dd-embed-num-font: var(--dd-font-display);
+  --dd-embed-title-font: var(--dd-font-head);
+  --dd-embed-pos: var(--mlp-mint-d); /* kladný hod = mint (sytý, čitelný na bílém) */
+  --dd-embed-neg: var(--mlp-pink-d); /* záporný hod = růžová (NE mauve) */
+  --dd-embed-neutral: var(--mlp-lavender-d); /* neutrál = levandule */
 
   /* ── lokální MLP pomocníky (ornamenty + kompozity je čtou) ── */
   --mlp-lavender: #b79ce8;

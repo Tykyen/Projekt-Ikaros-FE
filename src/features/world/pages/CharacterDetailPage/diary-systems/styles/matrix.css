@@ -360,13 +360,16 @@
   background: var(--mx-hp-on);
   border-color: rgba(74, 222, 128, 0.47);
 }
+/* 16.2c-fixB N7 — heat-stavy vitals (warn/crit) tokenizovány. Default = sci-fi
+   oranžová/červená (regrese-safe). Světlé/hnědé skiny sladí odstín přes
+   tokeny --mx-warn-… a --mx-crit-… v diary-skins.css; sémantika kritu drží. */
 [data-diary-system='matrix'] .mx-seg.hp.warn {
-  background: linear-gradient(180deg, #fbbf24, #d97706);
-  border-color: rgba(251, 191, 36, 0.47);
+  background: var(--mx-warn-seg, linear-gradient(180deg, #fbbf24, #d97706));
+  border-color: var(--mx-warn-seg-b, rgba(251, 191, 36, 0.47));
 }
 [data-diary-system='matrix'] .mx-seg.hp.crit {
-  background: linear-gradient(180deg, #f87171, #dc2626);
-  border-color: rgba(248, 113, 113, 0.47);
+  background: var(--mx-crit-seg, linear-gradient(180deg, #f87171, #dc2626));
+  border-color: var(--mx-crit-seg-b, rgba(248, 113, 113, 0.47));
 }
 [data-diary-system='matrix'] .mx-seg.rune.on {
   background: var(--mx-rune-on);
@@ -397,14 +400,14 @@
   border: 1px solid rgba(74, 222, 128, 0.27);
 }
 [data-diary-system='matrix'] .mx-status .badge.warn {
-  background: rgba(251, 191, 36, 0.09);
-  color: #fcd34d;
-  border-color: rgba(251, 191, 36, 0.27);
+  background: var(--mx-warn-badge-bg, rgba(251, 191, 36, 0.09));
+  color: var(--mx-warn-badge-ink, #fcd34d);
+  border-color: var(--mx-warn-badge-b, rgba(251, 191, 36, 0.27));
 }
 [data-diary-system='matrix'] .mx-status .badge.crit {
-  background: rgba(248, 113, 113, 0.09);
-  color: #fca5a5;
-  border-color: rgba(248, 113, 113, 0.27);
+  background: var(--mx-crit-badge-bg, rgba(248, 113, 113, 0.09));
+  color: var(--mx-crit-badge-ink, #fca5a5);
+  border-color: var(--mx-crit-badge-b, rgba(248, 113, 113, 0.27));
 }
 [data-diary-system='matrix'] .mx-status .scale {
   color: var(--mx-dim);
@@ -511,26 +514,30 @@
   padding: 0;
   cursor: default;
 }
+/* 16.2c-fixB N2 — přetlaková škála (0–5) tokenizována na --mx-pr-1..5 (+ -1b..5b
+   border). Default = sci-fi neon (regrese-safe). Tlumené/světlé skiny přebijí
+   tokeny vlastní paletou v diary-skins.css; sémantika „víc=horší" se drží přes
+   gradaci tokenů k nebezpečí. */
 [data-diary-system='matrix'] .mx-pr-seg.on1 {
-  background: linear-gradient(180deg, #4ade80, #22c55e);
-  border-color: rgba(74, 222, 128, 0.4);
+  background: var(--mx-pr-1, linear-gradient(180deg, #4ade80, #22c55e));
+  border-color: var(--mx-pr-1b, rgba(74, 222, 128, 0.4));
 }
 [data-diary-system='matrix'] .mx-pr-seg.on2 {
-  background: linear-gradient(180deg, #a3e635, #84cc16);
-  border-color: rgba(163, 230, 53, 0.4);
+  background: var(--mx-pr-2, linear-gradient(180deg, #a3e635, #84cc16));
+  border-color: var(--mx-pr-2b, rgba(163, 230, 53, 0.4));
 }
 [data-diary-system='matrix'] .mx-pr-seg.on3 {
-  background: linear-gradient(180deg, #fbbf24, #f59e0b);
-  border-color: rgba(251, 191, 36, 0.4);
+  background: var(--mx-pr-3, linear-gradient(180deg, #fbbf24, #f59e0b));
+  border-color: var(--mx-pr-3b, rgba(251, 191, 36, 0.4));
 }
 [data-diary-system='matrix'] .mx-pr-seg.on4 {
-  background: linear-gradient(180deg, #fb923c, #ea580c);
-  border-color: rgba(251, 146, 60, 0.4);
+  background: var(--mx-pr-4, linear-gradient(180deg, #fb923c, #ea580c));
+  border-color: var(--mx-pr-4b, rgba(251, 146, 60, 0.4));
 }
 [data-diary-system='matrix'] .mx-pr-seg.on5 {
-  background: linear-gradient(180deg, #f87171, #dc2626);
-  border-color: rgba(248, 113, 113, 0.53);
-  box-shadow: 0 0 10px -2px rgba(248, 113, 113, 0.53);
+  background: var(--mx-pr-5, linear-gradient(180deg, #f87171, #dc2626));
+  border-color: var(--mx-pr-5b, rgba(248, 113, 113, 0.53));
+  box-shadow: var(--mx-pr-5-glow, 0 0 10px -2px rgba(248, 113, 113, 0.53));
 }
 [data-diary-system='matrix'] .matrix-sheet[data-mode='edit'] .mx-pr-seg {
   cursor: pointer;

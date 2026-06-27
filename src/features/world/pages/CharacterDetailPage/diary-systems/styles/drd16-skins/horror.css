@@ -1,180 +1,205 @@
-/* Dračí doupě 1.6 — skin „HOROR" (Liber Mortuorum) · 16.2c-drd16.
+/* Dračí doupě 1.6 — skin „HOROR" (Půlnoční salon) · 16.2c-drd16.
  *
- * Reskin deníkového listu (`.drd16-*`) + bojového panelu mapy (Drd16CombatPanel,
- * tokenizovaný) přepisem `--dd-*` tokenů z fantasy defaultu (viz drd16.css /
- * CONTRACT.md). Scoped na `[data-diary-system='drd16'][data-diary-skin='horror']`
- * → vyšší specificita přebije fantasy default, embedy dědí tokeny z wrapperu.
+ * PŘEPRACOVÁNO ze světlého nekro-pergamenu na TMAVÝ aristokratický viktoriánský
+ * salon (rodinná identita s matrix horror + drdplus horror). Reskin deníkového
+ * listu (`.drd16-*`) + bojového panelu mapy (Drd16CombatPanel, tokenizovaný)
+ * přepisem `--dd-*` tokenů. Scoped na
+ * `[data-diary-system='drd16'][data-diary-skin='horror']` → vyšší specificita
+ * přebije fantasy default, embedy dědí tokeny z wrapperu.
  *
- * Koncept: prokletý nekromantský grimoár / kniha mrtvých. Zažloutlá kost-kůže
- * pergamen, krev zaschlá do hnědo-rudé jako AKCENT (lemy/bonusy/markery), nikoli
- * celá plocha → profesionální, ne gore-kýč. Magy = nekromanticky zelené (odliší
- * od krve). Gotické serify (Pirata One blackletter + IM Fell „obtisk").
+ * Koncept (NE gore): rodinný kodex prastarého šlechtického rodu, psaný za půlnoci
+ * v zšeřelém salonu. Pergamen NENÍ světlý — je to TMAVÝ kostěno-uhlový list
+ * (`--dd-parch-*` tmavé), čteno zašlým stříbrem. Oxblood (granát) + studená
+ * fialová jako akcenty. Žádná krev na ploše.
  *
- * Tvarový jazyk (vlastní, láme fantasy zaoblené karty): roztržené/ohořelé okraje
- * listu (clip-path se zuby), levý krvavý lem řádků, zkosené krvavé bonus-destičky.
- * Signature ornament (UNIKÁTNÍ, nesdílet): krvavá pečeť otisku palce + prasklina
- * v pergamenu (hero), krvavý cákanec marker nadpisů.
+ * Paleta: zašlé stříbro #c8c4cf (kov/neutrál/obrana) · oxblood #7a2030
+ * (životy/ZZ/pipa/nebezpečí) · studená fialová #6a5170 (magy/sféry).
+ * Sémantika hodů drží význam: kladný zelený, záporný tlumený oxblood.
+ *
+ * Fonty (rodina): UnifrakturCook (blackletter iniciály), Cormorant SC (kapitálky
+ * nadpisů/eyebrow), Cormorant Garamond (serif jména/tělo), EB Garamond (drobné).
+ *
+ * Tvarový jazyk (vlastní): ostré gotické rohy, stříbrný vícevrstvý rám salonu.
+ * Signature ornament (UNIKÁTNÍ, nesdílet): kovaná gotická STŘÍBRNÁ tracerie ve
+ * 4 rozích panelů (mříž katedrálního okna), stříbrná erbovní PEČEŤ (růže +
+ * netopýří křídla) nahrazující heraldický erb, blackletter iniciála.
  *
  * Pozor — Drd16BestiePanel.module.css je hardcoded (žádné `--dd-*` tokeny), tento
- * override ho NEpřebarví; tokenizace bestie panelu = navazující práce (CONTRACT
- * „TOKENIZOVAT z hardcoded"). Viz docs/dluhy.md.
+ * override ho NEpřebarví; tokenizace bestie panelu = navazující práce. Viz dluhy.
  *
  * Import: statický v diary-skins.css (bundle i mimo deníkovou stránku — mapa/chat).
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cormorant+SC:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
 /* ════════════════════════════════════════════════════════════════════
-   1) KOMPLETNÍ --dd-* OVERRIDE (všechny tokeny z CONTRACT)
+   1) KOMPLETNÍ --dd-* OVERRIDE (Půlnoční salon — TMAVÝ list)
    ════════════════════════════════════════════════════════════════════ */
 [data-diary-system='drd16'][data-diary-skin='horror'] {
-  /* ── rám / „kovárna" → ohořelá uhlová krypta ── */
-  --dd-forge-1: #120a06; /* nejtmavší rám */
-  --dd-forge-2: #1f130b; /* tmavý rám */
-  --dd-forge-edge: #3a2414; /* hrana rámu — ohořelá */
+  /* ── lokální salonní paleta (čitelnost mapování) ── */
+  --h-night-0: #0a060a; /* nejhlubší noc / rám */
+  --h-night-1: #130b11; /* tmavá noc */
+  --h-night-2: #18101a; /* panel base */
+  --h-night-3: #241823; /* panel light */
+  --h-silver: #c8c4cf; /* zašlé stříbro (kov/neutrál) */
+  --h-silver-hi: #eae6ee; /* leštěné stříbro */
+  --h-silver-lo: #7d7986; /* matné stříbro */
+  --h-silver-deep: #4a4750; /* stínové stříbro / rám */
+  --h-violet: #6a5170; /* studená fialová (magy) */
+  --h-violet-hi: #9a7fae; /* fialová lesk */
+  --h-violet-lo: #3a2c40; /* fialová tmavá */
+  --h-oxblood: #7a2030; /* oxblood (životy/pipa/nebezpečí) */
+  --h-oxblood-hi: #a2283a; /* oxblood světlý */
+  --h-oxblood-lo: #5e1622; /* oxblood tmavý */
+  --h-oxblood-deep: #3a0d16; /* oxblood nejhlubší */
 
-  /* ── pergamen → zažloutlá kost / kůže, špinavý ── */
-  --dd-parch-0: #ddcda6; /* nejsvětlejší kost */
-  --dd-parch-1: #c9b48a; /* base */
-  --dd-parch-2: #b39c72; /* tmavší */
-  --dd-parch-edge: #6b5634; /* hrana papíru */
+  /* ── rám / „kovárna" → uhlová noc salonu ── */
+  --dd-forge-1: var(--h-night-0); /* nejtmavší rám */
+  --dd-forge-2: var(--h-night-1); /* tmavý rám */
+  --dd-forge-edge: var(--h-silver-deep); /* hrana rámu — zašlé stříbro */
 
-  /* ── inkoust → smolně černý (kontrast na kosti ~8:1) ── */
-  --dd-ink: #241509; /* hlavní text */
-  --dd-ink-soft: #5a4126; /* tlumený */
-  --dd-ink-faint: #897048; /* nejslabší */
-  --dd-ink-deep: #160c07; /* text na světlém akcentu */
-  --dd-ink-2: #1c0e06; /* tmavý text 2 */
-  --dd-ink-head: #2a1408; /* nadpisy */
+  /* ── „pergamen" → TMAVÝ kostěno-uhlový list (NE světlý pergamen) ── */
+  --dd-parch-0: #241823; /* nejsvětlejší panel */
+  --dd-parch-1: #18101a; /* base */
+  --dd-parch-2: #130b11; /* tmavší */
+  --dd-parch-edge: var(--h-silver-deep); /* hrana — stříbro */
 
-  /* ── primární akcent: ZLATO → ZASCHLÁ KREV ── */
-  --dd-gold: #9c2018; /* primární akcent (borders/markery) */
-  --dd-gold-hi: #b8261a; /* akcent světlý */
-  --dd-gold-deep: #3a0e0a; /* akcent tmavý / borders */
+  /* ── inkoust → zašlé stříbro (kontrast obrácen: světlý na tmavém) ── */
+  --dd-ink: var(--h-silver); /* hlavní text */
+  --dd-ink-soft: var(--h-silver-lo); /* tlumený */
+  --dd-ink-faint: #5f5b67; /* nejslabší — drž čitelný na noci */
+  --dd-ink-deep: var(--h-night-0); /* text NA světlém akcentu (stříbro) — tmavý */
+  --dd-ink-2: var(--h-silver-hi); /* zvýrazněný text (hodnoty) */
+  --dd-ink-head: var(--h-silver-hi); /* nadpisy */
 
-  /* ── životy: rudá (krev živá) ── */
-  --dd-crimson: #6e1410;
-  --dd-crimson-hi: #b8261a;
-  --dd-crimson-deep: #3a0e0a;
+  /* ── primární akcent: ZLATO → ZAŠLÉ STŘÍBRO ── */
+  --dd-gold: var(--h-silver); /* primární akcent (borders/markery) */
+  --dd-gold-hi: var(--h-silver-hi); /* akcent lesk */
+  --dd-gold-deep: var(--h-silver-deep); /* akcent tmavý / borders */
 
-  /* ── magy: safír → NEKROMANTSKÁ ZELEŇ ── */
-  --dd-sapphire: #3c5a30;
-  --dd-sapphire-hi: #6f9a52;
-  --dd-sapphire-deep: #1f2e18;
+  /* ── životy: oxblood (granát) ── */
+  --dd-crimson: var(--h-oxblood);
+  --dd-crimson-hi: var(--h-oxblood-hi);
+  --dd-crimson-deep: var(--h-oxblood-lo);
 
-  /* ── obrana (chladná) → ohořelá ocel/kost ── */
-  --dd-steel: #4a3a24;
+  /* ── magy: safír → STUDENÁ FIALOVÁ (sféry/éterické) ── */
+  --dd-sapphire: var(--h-violet);
+  --dd-sapphire-hi: var(--h-violet-hi);
+  --dd-sapphire-deep: var(--h-violet-lo);
 
-  /* ── fonty: gotický grimoár (Pirata One + IM Fell „obtisk") ── */
-  --dd-font-title: 'Pirata One', 'UnifrakturCook', serif;
-  --dd-font-display: 'IM Fell English SC', 'Spectral', serif;
-  --dd-font-head: 'IM Fell English SC', 'Cinzel', serif;
-  --dd-font-body: 'IM Fell English', 'Spectral', Georgia, serif;
+  /* ── obrana (OČ) → zašlé stříbro (chladný kov) ── */
+  --dd-steel: var(--h-silver-lo);
 
-  /* embed plochy — krvavá tma, kostěný text (list světlý → explicitní světlé). */
-  --dd-embed-text: #cabba6;
-  --dd-embed-muted: #8c7b69;
-  --dd-embed-num-font: var(--dd-font-body);
+  /* ── fonty: salonní serif rodina ── */
+  --dd-font-title: 'UnifrakturCook', 'Cormorant SC', serif;
+  --dd-font-display: 'Cormorant SC', 'Cinzel', serif;
+  --dd-font-head: 'Cormorant SC', 'Cinzel', serif;
+  --dd-font-body: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
 
-  /* ── kompozity: špinavý pergamen z kůže + rudý nádech rozkladu ── */
+  /* ════════════ EMBED plochy (dice log/token panel/readout/orchestrace) ═══
+     Tmavý salon: NEPRŮHLEDNÁ uhlová plocha, zašlé stříbro text, stříbrný rám.
+     Pos/neg = zelená / tlumený oxblood (NE mauve fantasy default). */
+  --dd-embed-surface: linear-gradient(180deg, #241823, #18101a 55%, #130b11);
+  --dd-embed-border: var(--h-silver-deep);
+  --dd-embed-line: color-mix(in srgb, var(--h-silver) 20%, transparent);
+  --dd-embed-text: var(--h-silver);
+  --dd-embed-muted: var(--h-silver-lo);
+  --dd-embed-title: var(--h-silver-hi);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--h-violet) 18%, transparent);
+  --dd-embed-accent: var(--h-silver);
+  --dd-embed-num-font: 'Cormorant Garamond', serif;
+  --dd-embed-title-font: 'Cormorant SC', serif;
+  --dd-embed-pos: #8fbf7a; /* kladný hod — zelená (sémantika úspěchu) */
+  --dd-embed-neg: #d87a86; /* záporný hod — tlumený oxblood (NE mauve) */
+  --dd-embed-neutral: var(--h-silver); /* neutrál — stříbro */
+
+  /* ── kompozity: tmavý salonní list (brokát noci + měkký svit) ── */
   --dd-parch-tex:
-    radial-gradient(140% 80% at 12% 6%, rgba(245, 235, 210, 0.4), transparent 50%),
-    radial-gradient(120% 120% at 92% 96%, rgba(40, 20, 10, 0.42), transparent 55%),
-    radial-gradient(90% 70% at 78% 12%, rgba(110, 20, 16, 0.1), transparent 60%),
-    radial-gradient(60% 50% at 30% 80%, rgba(40, 26, 12, 0.3), transparent 70%),
-    linear-gradient(168deg, var(--dd-parch-0), var(--dd-parch-1) 52%, var(--dd-parch-2));
-  /* zrno: hrubší fractalNoise (špína kůže), silnější než fantasy */
-  --dd-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+    radial-gradient(120% 80% at 50% -8%, rgba(122, 94, 130, 0.16), transparent 56%),
+    radial-gradient(60% 50% at 88% 96%, rgba(94, 22, 34, 0.14), transparent 60%),
+    radial-gradient(50% 44% at 8% 10%, rgba(106, 81, 112, 0.12), transparent 62%),
+    linear-gradient(168deg, var(--dd-parch-0), var(--dd-parch-1) 54%, var(--dd-parch-2));
+  /* zrno: jemný sametový šum (ne hrubá kůže) */
+  --dd-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/></svg>");
 
-  --dd-panel-line: var(--dd-parch-edge);
-  --dd-line: rgba(107, 86, 52, 0.55);
-  --dd-line-soft: rgba(107, 86, 52, 0.45);
-  --dd-row-bg: linear-gradient(90deg, rgba(245, 235, 210, 0.32), rgba(179, 156, 114, 0.16));
-  --dd-row-bg-hover: rgba(179, 156, 114, 0.4);
-  --dd-card-bg: rgba(245, 235, 210, 0.3);
-  --dd-input-bg: rgba(245, 235, 210, 0.45);
-  /* akcent grad → krvavá destička (světlá → zaschlá) */
-  --dd-accent-grad: linear-gradient(180deg, var(--dd-gold-hi), var(--dd-gold) 60%, var(--dd-gold-deep));
-  --dd-step-bg: linear-gradient(180deg, var(--dd-forge-2), #0d0704);
-  --dd-bar-bg: linear-gradient(180deg, rgba(20, 10, 6, 0.55), rgba(40, 26, 14, 0.35));
-  --dd-hp-grad: linear-gradient(90deg, var(--dd-crimson), var(--dd-crimson-hi));
-  --dd-mana-grad: linear-gradient(90deg, var(--dd-sapphire), var(--dd-sapphire-hi));
+  --dd-panel-line: rgba(200, 196, 207, 0.22);
+  --dd-line: rgba(200, 196, 207, 0.2);
+  --dd-line-soft: rgba(200, 196, 207, 0.14);
+  --dd-row-bg: linear-gradient(180deg, rgba(36, 24, 35, 0.85), rgba(24, 16, 26, 0.6));
+  --dd-row-bg-hover: rgba(106, 81, 112, 0.22);
+  --dd-card-bg: linear-gradient(90deg, rgba(36, 24, 35, 0.6), rgba(24, 16, 26, 0.3));
+  --dd-input-bg: #18101a;
+  /* akcent grad → leštěná stříbrná destička */
+  --dd-accent-grad: linear-gradient(180deg, #5a565f, #34303c 55%, #221c26);
+  --dd-step-bg: linear-gradient(180deg, var(--h-night-2), var(--h-night-0));
+  --dd-bar-bg: linear-gradient(180deg, rgba(10, 6, 10, 0.6), rgba(24, 16, 26, 0.4));
+  --dd-hp-grad: linear-gradient(90deg, var(--h-oxblood-lo), var(--h-oxblood-hi));
+  --dd-mana-grad: linear-gradient(90deg, var(--h-violet-lo), var(--h-violet-hi));
 
-  /* ── lokální (skin-only) proměnné ornamentu ── */
-  --h-blood-scab: #3a0e0a;
-  --h-bone: #e8ddc4;
-  /* roztržený/ohořelý okraj listu — zuby pergamenu */
-  --h-tear: polygon(
-    0% 1.2%, 2.4% 0.3%, 5% 1.1%, 9% 0.2%, 14% 1.3%, 21% 0.4%, 30% 1.1%,
-    41% 0.3%, 53% 1%, 64% 0.2%, 74% 1.1%, 83% 0.4%, 91% 1.2%, 96% 0.5%, 100% 1.3%,
-    99% 6%, 99.7% 14%, 98.8% 24%, 99.6% 36%, 98.7% 49%, 99.6% 62%,
-    98.8% 74%, 99.7% 85%, 98.9% 94%, 99.6% 99%,
-    95% 98.7%, 88% 99.6%, 79% 98.8%, 68% 99.7%, 56% 98.8%, 44% 99.6%,
-    33% 98.7%, 23% 99.6%, 14% 98.8%, 7% 99.7%, 2.5% 99%, 0.4% 99.4%,
-    1% 93%, 0.3% 84%, 1.1% 73%, 0.3% 61%, 1.1% 49%, 0.3% 37%,
-    1.1% 26%, 0.3% 16%, 1% 8%
-  );
-  /* signature: krvavá pečeť otisku palce (inline SVG, sdílí list i panel) */
-  --h-bloodseal: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='b' cx='46%25' cy='40%25' r='62%25'><stop offset='0%25' stop-color='%23b8261a'/><stop offset='55%25' stop-color='%236e1410'/><stop offset='100%25' stop-color='%233a0e0a'/></radialGradient></defs><path fill='url(%23b)' opacity='0.92' d='M50 6c10 0 16 8 22 6s14 4 14 14-8 12-6 22 6 16-2 24-18 4-24 10-12 8-22 4-10-12-18-16S4 80 6 70s10-10 8-22S6 32 14 24s16 0 22-6S40 6 50 6z'/><circle cx='84' cy='22' r='3.4' fill='%237a1812'/><circle cx='18' cy='80' r='2.6' fill='%237a1812'/><circle cx='90' cy='62' r='2' fill='%236e1410'/><circle cx='12' cy='40' r='1.8' fill='%236e1410'/><g fill='none' stroke='%232a0807' stroke-width='1.1' opacity='0.55' stroke-linecap='round'><path d='M50 26c-9 0-15 8-15 18s5 22 15 26'/><path d='M50 31c-7 0-11 7-11 15s4 19 12 23'/><path d='M50 36c-5 0-8 6-8 13s3 16 9 20'/><path d='M50 41c-3 0-5 5-5 11s2 13 6 17'/><path d='M52 47c-2 0-3 4-3 8s1 9 4 12'/></g></svg>");
+  /* ── signature: stříbrná erbovní pečeť (růže + netopýří křídla) ──
+     jeden inline data:SVG; tmavý střed → čitelná oxblood růže (matrix horror DNA) */
+  --h-seal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3CradialGradient id='s' cx='42%25' cy='36%25' r='64%25'%3E%3Cstop offset='0%25' stop-color='%233a2c40'/%3E%3Cstop offset='48%25' stop-color='%23241823'/%3E%3Cstop offset='62%25' stop-color='%237a767f'/%3E%3Cstop offset='78%25' stop-color='%2356525c'/%3E%3Cstop offset='100%25' stop-color='%232a2730'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='60' cy='60' r='56' fill='url(%23s)' stroke='%2318121c' stroke-width='2'/%3E%3Ccircle cx='60' cy='60' r='48' fill='none' stroke='%23c8c4cf' stroke-width='1' opacity='.4'/%3E%3Cpath d='M60 60 C40 44 22 50 28 64 C20 58 12 68 24 74 C32 86 50 80 60 66' fill='none' stroke='%23c8c4cf' stroke-width='1.6' opacity='.8'/%3E%3Cpath d='M60 60 C80 44 98 50 92 64 C100 58 108 68 96 74 C88 86 70 80 60 66' fill='none' stroke='%23c8c4cf' stroke-width='1.6' opacity='.8'/%3E%3Cpath d='M34 58 L30 66 M44 54 L42 64 M86 58 L90 66 M76 54 L78 64' stroke='%239a96a2' stroke-width='.8' opacity='.55'/%3E%3Cg%3E%3Ccircle cx='60' cy='58' r='11' fill='%235e1622'/%3E%3Cpath d='M60 49 C66 49 68 55 60 58 C52 55 54 49 60 49Z' fill='%23a2283a'/%3E%3Cpath d='M53 56 C53 50 60 51 60 58 C56 60 53 60 53 56Z' fill='%237a2030'/%3E%3Cpath d='M67 56 C67 50 60 51 60 58 C64 60 67 60 67 56Z' fill='%237a2030'/%3E%3Ccircle cx='60' cy='57' r='2.4' fill='%23d8b0b6'/%3E%3C/g%3E%3C/svg%3E");
+  /* signature: kovaná gotická stříbrná tracerie rohu (1 dlaždice, 4× transform) */
+  --h-tracery-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none' stroke='%23c8c4cf' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 63 L4 22 C4 12 12 4 22 4 L63 4' stroke-width='1.7'/%3E%3Cpath d='M9 63 L9 24 C9 16 16 9 24 9 L63 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 22 C14 22 22 14 22 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%237a2030' stroke='none'/%3E%3C/svg%3E");
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   2) LIST — tvarový jazyk + ornamenty (globální .drd16-* třídy)
+   2) LIST — tmavý salon: stříbrný rám, gotická tracerie, erbovní pečeť
    ════════════════════════════════════════════════════════════════════ */
 
-/* ── roztržený / ohořelý list (láme fantasy border-radius) ── */
+/* ── tmavý salonní list: vícevrstvý stříbrný rám (kov × noc) ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-sheet {
-  border-radius: 0;
-  clip-path: var(--h-tear);
-  /* ohořelá hrana přes inset stíny + vnější mrtvolný stín; ruší zlatý rám fantasy */
+  border-radius: 3px;
+  color: var(--dd-ink);
+  /* ruší zlatý rám fantasy; stříbro × noc + měkký vnitřní stín salonu */
   box-shadow:
-    inset 0 0 0 1px rgba(40, 20, 10, 0.5),
-    inset 0 0 60px -10px rgba(40, 20, 10, 0.55),
-    inset 0 0 160px -40px rgba(20, 8, 4, 0.75),
+    inset 0 0 0 1px rgba(200, 196, 207, 0.18),
+    inset 0 0 0 4px var(--h-night-1),
+    inset 0 0 0 5px var(--h-silver-deep),
+    inset 0 0 0 6px var(--h-night-1),
+    inset 0 0 150px rgba(40, 24, 40, 0.4),
     0 50px 110px -40px #000;
 }
-/* uhlíkově ohořelý lem těsně u natrženého okraje (přepíše fantasy ::before rámeček) */
+/* studený měsíční svit shora (přepíše fantasy ::before rámeček) */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-sheet::before {
   inset: 0;
   border: none;
-  border-radius: 0;
-  clip-path: var(--h-tear);
+  border-radius: 3px;
   background: radial-gradient(
-    100% 100% at 50% 50%,
-    transparent 78%,
-    rgba(42, 26, 16, 0.55) 92%,
-    rgba(22, 12, 7, 0.9) 100%
+    72% 36% at 50% -6%,
+    rgba(122, 94, 130, 0.22),
+    transparent 70%
   );
   box-shadow: none;
 }
-/* špinavé zrno s natrženým ořezem (přepíše fantasy ::after) */
+/* jemné sametové zrno (přepíše fantasy ::after) */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-sheet::after {
-  border-radius: 0;
-  clip-path: var(--h-tear);
-  opacity: 0.1;
+  border-radius: 3px;
+  opacity: 0.32;
+  mix-blend-mode: soft-light;
 }
 
-/* ── HERO: krvavá pečeť otisku palce + krvavý border ── */
+/* ── HERO: stříbrná dělící linka + erbovní pečeť ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hero {
   border-image: linear-gradient(
       90deg,
       transparent,
-      var(--dd-crimson) 16%,
-      var(--dd-crimson-hi) 50%,
-      var(--dd-crimson) 84%,
+      var(--h-silver-deep) 16%,
+      var(--h-silver) 50%,
+      var(--h-silver-deep) 84%,
       transparent
     )
     1;
 }
-/* SIGNATURE ORNAMENT — pečeť otisku palce nahradí fantasy erb (SVG renderuje JSX
-   jako .drd16-erb svg; ten ztlumíme a překryjeme krvavou pečetí + prasklinou) */
+/* SIGNATURE ORNAMENT — stříbrná erbovní pečeť (růže + netopýří křídla) nahradí
+   fantasy erb (SVG renderuje JSX jako .drd16-erb svg; ten ztlumíme, plochu
+   převezme pečeť). Heraldická stuha „Erb" je mimo koncept → skryj. */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-erb {
   position: relative;
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-erb svg {
   opacity: 0; /* skryj heraldický erb fantasy, plochu převezme pečeť */
 }
-/* heraldická stuha „Erb" je mimo koncept knihy mrtvých → skryj */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-erb-banner {
   display: none;
 }
@@ -183,251 +208,262 @@
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: var(--h-bloodseal) center / contain no-repeat;
-  filter: drop-shadow(0 2px 3px rgba(50, 0, 0, 0.6));
+  background: var(--h-seal) center / contain no-repeat;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.6));
   pointer-events: none;
 }
-/* prasklina vybíhající dolů z pečeti */
-[data-diary-system='drd16'][data-diary-skin='horror'] .drd16-erb::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 94%;
-  width: 3px;
-  height: clamp(40px, 7vw, 70px);
-  transform: translateX(-50%);
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.55;
-  background: linear-gradient(180deg, rgba(40, 20, 10, 0.7), transparent);
-  clip-path: polygon(
-    40% 0, 60% 0, 52% 18%, 70% 30%, 48% 46%, 64% 60%, 44% 76%,
-    56% 100%, 44% 100%, 50% 78%, 34% 62%, 52% 48%, 36% 30%, 50% 16%
-  );
-}
-/* eyebrow → krvavě rudá kapitálka */
+/* eyebrow → stříbrná kapitálka (Cormorant SC) */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-eyebrow {
-  color: var(--dd-crimson);
+  font-family: var(--dd-font-head);
+  color: var(--h-oxblood-hi);
   letter-spacing: 0.42em;
 }
-/* jméno → blackletter, krvavá iniciála */
+/* jméno → kurzíva, blackletter stříbrná iniciála */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-name {
-  font-family: var(--dd-font-title);
-  font-weight: 400;
+  font-family: var(--dd-font-body);
+  font-style: italic;
+  font-weight: 500;
   letter-spacing: 0.01em;
-  color: #1c0e06;
+  color: var(--h-silver-hi);
   border-bottom-color: var(--dd-parch-edge);
-  text-shadow: 0 1px 0 rgba(245, 235, 210, 0.3), 0 2px 6px rgba(40, 20, 10, 0.35);
+  text-shadow: 0 1px 0 #0a060a, 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 18px rgba(106, 81, 112, 0.2);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-name::first-letter {
-  color: var(--dd-crimson-hi);
-  text-shadow: 0 0 14px rgba(184, 38, 26, 0.45), 0 1px 0 rgba(245, 235, 210, 0.3);
+  font-family: var(--dd-font-title);
+  font-style: normal;
+  font-size: 1.5em;
+  line-height: 1;
+  background: linear-gradient(180deg, #f4f0f6, var(--h-silver) 52%, var(--h-oxblood-hi) 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
-/* ── plaketky Životy/Magy → destičky vyryté do kosti (zkosený clip) ── */
+/* ── plaketky Životy/Magy → leštěné stříbrné destičky (zkosený clip) ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-plaque {
   border-radius: 0;
-  border-color: #000;
+  border-color: var(--h-night-0);
   background:
-    radial-gradient(120% 100% at 50% 0%, rgba(60, 30, 18, 0.5), transparent 70%),
-    linear-gradient(180deg, var(--dd-forge-2), var(--dd-forge-1));
+    radial-gradient(120% 100% at 50% 0%, rgba(106, 81, 112, 0.3), transparent 70%),
+    linear-gradient(180deg, var(--h-night-3), var(--h-night-1));
   clip-path: polygon(0 6%, 6% 0, 94% 0, 100% 6%, 100% 94%, 94% 100%, 6% 100%, 0 94%);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-plaque.life .pl-val input {
-  color: var(--dd-crimson-hi);
+  color: var(--h-oxblood-hi);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-plaque.magy .pl-val input {
-  color: var(--dd-sapphire-hi);
+  color: var(--h-violet-hi);
 }
 
-/* ── HUD: desky vyryté do kosti, zkosené ── */
+/* ── HUD: stříbrem orámované desky salonu, zkosené ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hud-cell {
   border-radius: 0;
-  border-color: #000;
+  border-color: var(--h-night-0);
   clip-path: polygon(0 10%, 4% 0, 96% 0, 100% 10%, 100% 90%, 96% 100%, 4% 100%, 0 90%);
   box-shadow:
-    inset 0 1px 0 rgba(180, 140, 90, 0.15),
-    inset 0 0 24px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(200, 196, 207, 0.14),
+    inset 0 0 24px rgba(0, 0, 0, 0.55),
     0 5px 14px -8px #000;
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hud-cell.ma .drd16-hud-emblem {
-  color: var(--dd-sapphire-hi);
-  background: radial-gradient(circle at 35% 30%, #2f4a26, #131e10);
+  color: var(--h-violet-hi);
+  background: radial-gradient(circle at 35% 30%, #3a2c40, #1a1320);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hud-cell.oc .drd16-hud-emblem {
-  color: var(--h-bone);
-  background: radial-gradient(circle at 35% 30%, #4a3a24, #1c140a);
+  color: var(--h-silver-hi);
+  background: radial-gradient(circle at 35% 30%, #4a4750, #1c1820);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hud-val {
-  color: #d8c7a2;
+  color: var(--h-silver);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hud-cell.hp .drd16-hud-val {
-  color: #e07a6e;
+  color: #d87a86;
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hud-cell.ma .drd16-hud-val {
-  color: #9fc77f;
+  color: var(--h-violet-hi);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hud-cell.oc .drd16-hud-val {
-  color: var(--h-bone);
+  color: var(--h-silver-hi);
 }
 
-/* ── nadpisy panelů: marker = krvavý cákanec (ne kosočtverec) ── */
+/* ── nadpisy panelů: marker = stříbrná lilie + Cormorant SC kapitálky ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-panel-h {
-  font-family: var(--dd-font-title);
-  font-weight: 400;
-  font-size: 19px;
-  letter-spacing: 0.02em;
-  text-transform: none; /* blackletter funguje lépe bez uppercase */
-  color: var(--dd-ink-head);
+  font-family: var(--dd-font-head);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--h-silver);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-panel-h::before {
-  width: 16px;
+  width: 14px;
   height: 16px;
   transform: none;
-  background: radial-gradient(
-    circle at 45% 40%,
-    var(--dd-crimson-hi),
-    var(--dd-crimson) 55%,
-    var(--h-blood-scab) 100%
-  );
-  /* 16bodový hvězdo-splash cákanec */
-  clip-path: polygon(
-    50% 0, 62% 22%, 86% 14%, 74% 38%, 100% 46%, 76% 58%, 90% 84%, 62% 72%,
-    54% 100%, 44% 74%, 16% 86%, 30% 60%, 4% 50%, 28% 40%, 14% 14%, 40% 24%
-  );
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' fill='none' stroke='%237a2030' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15 L7 5'/%3E%3Cpath d='M7 5 C7 2 8.4 1.2 8.8 1.2 C9.2 2.9 8.2 4.6 7 5Z' fill='%237a2030'/%3E%3Cpath d='M7 7.2 C7 3.6 10.2 2.8 12 3.6 C11.6 7 8.6 7.9 7 7.2Z' fill='%235e1622'/%3E%3Cpath d='M7 7.2 C7 3.6 3.8 2.8 2 3.6 C2.4 7 5.4 7.9 7 7.2Z' fill='%235e1622'/%3E%3Cpath d='M3.6 10 L10.4 10' stroke='%23c8c4cf'/%3E%3C/svg%3E");
+  box-shadow: none;
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-panel-h::after {
-  background: linear-gradient(90deg, var(--dd-crimson), transparent);
-  opacity: 0.5;
+  background: linear-gradient(90deg, var(--h-silver-deep), transparent 88%),
+    radial-gradient(circle at right, var(--h-silver) 1.4px, transparent 2px);
+  opacity: 0.7;
 }
 
-/* ── řádky vlastností: levý krvavý lem místo zlatého rámu ── */
+/* ── řádky vlastností: levý oxblood lem (vryto do kovu) ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-stat-row {
   border-radius: 0;
-  border-left: 3px solid var(--h-blood-scab);
+  border-left: 3px solid var(--h-oxblood-lo);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-stat-row .st-val,
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-stat-row.siz .st-letter {
   background: radial-gradient(
     circle at 50% 36%,
-    rgba(245, 238, 218, 0.9),
-    rgba(179, 156, 114, 0.85)
+    rgba(58, 44, 64, 0.9),
+    rgba(19, 11, 17, 0.85)
   );
-  border-color: var(--dd-parch-edge);
+  border-color: var(--h-silver-deep);
+  color: var(--h-silver-hi);
 }
-/* bonus → zkosená krvavá destička (osmiúhelník) */
+/* bonus → zkosená stříbrná destička (osmiúhelník) */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-bonus {
   border-radius: 0;
-  color: #f3e6d2;
-  border-color: var(--h-blood-scab);
-  background: linear-gradient(180deg, var(--dd-crimson-hi), var(--dd-crimson) 60%, var(--h-blood-scab));
-  box-shadow: inset 0 1px 0 rgba(245, 180, 160, 0.25), 0 2px 4px -2px #000;
+  color: var(--h-night-0);
+  border-color: var(--h-silver-deep);
+  background: linear-gradient(180deg, var(--h-silver-hi), var(--h-silver) 55%, var(--h-silver-lo));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 2px 4px -2px #000;
   text-shadow: none;
   clip-path: polygon(0 18%, 14% 0, 86% 0, 100% 18%, 100% 82%, 86% 100%, 14% 100%, 0 82%);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-bonus.neg {
-  background: linear-gradient(180deg, #4a4a3e, #2c2c22 60%, #161610);
-  border-color: #000;
-  color: #b8b0a0;
+  background: linear-gradient(180deg, #4a3a44, #2c222a 60%, #18121a);
+  border-color: var(--h-night-0);
+  color: #b0a6b0;
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-bonus.zero {
-  background: linear-gradient(180deg, #6e5e44, #4a3e2c 60%, #2c2418);
-  border-color: #1c140a;
-  color: #d9c9a3;
+  background: linear-gradient(180deg, #4a4750, #34303a 60%, #221c26);
+  border-color: var(--h-night-0);
+  color: var(--h-silver);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-stat-row.over .st-val {
-  box-shadow: 0 0 0 2px var(--dd-crimson-hi) inset, 0 1px 3px rgba(40, 20, 10, 0.35) inset;
+  box-shadow: 0 0 0 2px var(--h-oxblood-hi) inset, 0 1px 3px rgba(0, 0, 0, 0.4) inset;
 }
 
-/* ── tabulky boje/postřehu/zbroje: krvavá hlavička ── */
+/* ── tabulky boje/postřehu/zbroje: oxblood hlavička ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-combat th {
-  font-weight: 400;
-  border-bottom-color: var(--h-blood-scab);
+  font-family: var(--dd-font-head);
+  font-weight: 600;
+  border-bottom-color: var(--h-oxblood-lo);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-add {
   border-radius: 0;
-  color: var(--dd-crimson-hi);
-  border-color: var(--h-blood-scab);
+  color: var(--h-silver);
+  border-color: var(--h-silver-deep);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-add:hover {
-  color: #f3e6d2;
-  background: var(--h-blood-scab);
+  color: var(--h-silver-hi);
+  background: var(--h-violet-lo);
 }
 
-/* ── OČ pečeť: krvavý levý lem ── */
+/* ── OČ pečeť: stříbrný levý lem + tmavý salon střed ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-oc-seal {
   border-radius: 0;
-  border-color: var(--h-blood-scab);
-  border-left: 4px solid var(--dd-crimson);
+  border-color: var(--h-silver-deep);
+  border-left: 4px solid var(--h-silver);
   background:
-    radial-gradient(120% 120% at 50% 0%, rgba(110, 20, 16, 0.16), transparent 70%),
-    linear-gradient(180deg, rgba(245, 235, 210, 0.38), rgba(179, 156, 114, 0.22));
+    radial-gradient(120% 120% at 50% 0%, rgba(106, 81, 112, 0.22), transparent 70%),
+    linear-gradient(180deg, rgba(36, 24, 35, 0.7), rgba(19, 11, 17, 0.5));
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-oc-seal input {
-  border-color: var(--h-blood-scab);
-  background: radial-gradient(circle at 50% 34%, rgba(245, 238, 218, 0.95), rgba(179, 156, 114, 0.9));
+  border-color: var(--h-silver-deep);
+  color: var(--h-silver-hi);
+  background: radial-gradient(circle at 50% 34%, rgba(58, 44, 64, 0.9), rgba(19, 11, 17, 0.85));
 }
 
-/* ── žebřík Životy/Magy: tmavé pole, krvavé / nekro příčky ── */
+/* ── žebřík Životy/Magy: tmavé pole, oxblood / fialové příčky ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-rungs {
   border-radius: 0;
-  border-color: var(--h-blood-scab);
-  background: linear-gradient(180deg, rgba(20, 10, 6, 0.6), rgba(40, 26, 14, 0.4));
+  border-color: var(--h-silver-deep);
+  background: linear-gradient(180deg, rgba(10, 6, 10, 0.6), rgba(24, 16, 26, 0.4));
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-rung .rn {
-  color: var(--h-bone);
+  color: var(--h-silver);
   opacity: 0.7;
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-ladder.life .drd16-ladder-h,
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-ladder.life .drd16-ladder-cur {
-  color: var(--dd-crimson-hi);
+  color: var(--h-oxblood-hi);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-ladder.magy .drd16-ladder-h,
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-ladder.magy .drd16-ladder-cur {
-  color: var(--dd-sapphire-hi);
+  color: var(--h-violet-hi);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-rung.maxmark {
-  box-shadow: 0 0 0 1px var(--dd-crimson) inset;
+  box-shadow: 0 0 0 1px var(--h-silver) inset;
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-rung.maxmark::after {
-  content: '✚';
-  color: var(--dd-crimson);
+  content: '✦';
+  color: var(--h-silver);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-ladder-ctl button {
   border-radius: 0;
-  color: #f0e2cc;
-  border-color: var(--h-blood-scab);
-  background: linear-gradient(180deg, var(--dd-forge-2), #0d0704);
+  color: var(--h-silver);
+  border-color: var(--h-silver-deep);
+  background: linear-gradient(180deg, var(--h-night-2), var(--h-night-0));
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-ladder-ctl button:hover {
-  background: var(--h-blood-scab);
+  background: var(--h-violet-lo);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-hpbar {
   border-radius: 0;
-  border-color: var(--h-blood-scab);
+  border-color: var(--h-silver-deep);
 }
 
-/* ── spodní zóna: krvavý horní lem, ohnuté rohy ── */
+/* ── spodní zóna: stříbrný horní lem, kurzíva aspekty ── */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-scroll-panel {
   border-radius: 0;
   border-color: var(--dd-parch-edge);
-  border-top: 3px solid var(--h-blood-scab);
+  border-top: 3px solid var(--h-silver-deep);
 }
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-scroll-panel textarea {
-  background: repeating-linear-gradient(transparent 0 27px, rgba(90, 65, 38, 0.22) 27px 28px);
+  background: repeating-linear-gradient(transparent 0 27px, rgba(106, 81, 112, 0.18) 27px 28px);
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   3) SPELLBOOK karta (Drd16SpellCard) — pokud konzumuje --dd-* tokeny,
-   reskinuje se overridem výše; krvavý lem doplníme přes globální třídu,
-   pokud existuje (karta listu je renderována s globálními .drd16- názvy).
+   3) SIGNATURE: kovaná gotická STŘÍBRNÁ tracerie ve 4 rozích panelů
+   (mříž katedrálního okna / brána sídla). Pseudo ::before kreslí 4 rohy
+   (1 dlaždice ×4 transform přes background-position). z-index pod obsahem.
    ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd16'][data-diary-skin='horror'] .drd16-panel,
+[data-diary-system='drd16'][data-diary-skin='horror'] .drd16-scroll-panel {
+  position: relative;
+  isolation: isolate;
+}
+[data-diary-system='drd16'][data-diary-skin='horror'] .drd16-panel::after,
+[data-diary-system='drd16'][data-diary-skin='horror'] .drd16-scroll-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.8;
+  background-repeat: no-repeat;
+  background-size: 56px 56px;
+  background-position: 3px 3px, calc(100% - 3px) 3px, 3px calc(100% - 3px), calc(100% - 3px) calc(100% - 3px);
+  background-image:
+    var(--h-tracery-tl),
+    var(--h-tracery-tl),
+    var(--h-tracery-tl),
+    var(--h-tracery-tl);
+  /* 4 rohy: TL bez transformace; ostatní zrcadlené přes scale v position-trick
+     není dostupný → použijeme stejnou dlaždici, vizuálně mříž v každém rohu. */
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 6px rgba(200, 196, 207, 0.12));
+}
 
 /* ════════════════════════════════════════════════════════════════════
    4) PANELY MAPY — Drd16CombatPanel (tokenizovaný → reskin přes --dd-*).
    Modulové třídy jsou hashované; barvy řídí výhradně --dd-* override
-   nahoře. Zde jen jemné doladění tokenů, které panel konzumuje na
-   plochách (krvavý cákanec markeru ::before není globálně dosažitelný).
+   nahoře (tmavý salon: stříbro/oxblood/fialová). Tracerie ::before není
+   globálně dosažitelná na hashovaný panel → nese skin přes tokeny.
    ════════════════════════════════════════════════════════════════════ */
 /* (žádná další pravidla — combat panel dědí --dd-* z wrapperu.) */

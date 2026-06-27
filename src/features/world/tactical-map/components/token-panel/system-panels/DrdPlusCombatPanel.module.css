@@ -7,49 +7,40 @@
  * Tlačítka mají 3D reliéf (ražený kov), klikem se zamáčknou.
  */
 
+/* 16.2d-skiny — TOKENIZOVÁNO: lokální `--dd-*` odebrány (jinak stíní skin
+   z předka `[data-diary-system='drdplus'][data-diary-skin='X']`, který obaluje
+   `DiarySkinScope`). Každá hodnota = `var(--dd-token, <pergamen fallback>)` →
+   bez skinu / neznámý skin = identický pergamen (regrese-safe). Skin přebije
+   tokeny na předku. Per-profese `--acc` zůstává (identita povolání, ne skin). */
 .root {
-  --dd-parch-1: #e8dab7;
-  --dd-ink: #3a2b19;
-  --dd-ink-2: #2a1a0a;
-  --dd-ink-deep: #1f1607;
-  --dd-ink-head: #3a2812;
-  --dd-ink-soft: #6c573a;
-  --dd-gold: #c19a3f;
-  --dd-gold-hi: #f3dd97;
-  --dd-gold-deep: #6f5320;
-  --dd-crimson: #9c2a23;
-  --dd-crimson-deep: #5c1612;
-  --dd-sapphire: #2c569e;
-  --dd-line: rgba(196, 173, 126, 0.55);
-  --dd-forge-1: #1d160e;
   --acc: #b8860b;
 
   position: relative;
   display: flex;
   flex-direction: column;
-  font-family: 'EB Garamond', Georgia, serif;
-  color: var(--dd-ink);
-  background-color: var(--dd-parch-1);
-  background-image:
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+  color: var(--dd-ink, #3a2b19);
+  background-color: var(--dd-parch-1, #e8dab7);
+  background-image: var(--dd-panel-bg,
     radial-gradient(120% 90% at 18% 8%, rgba(255, 250, 235, 0.5), transparent 55%),
     radial-gradient(120% 120% at 88% 96%, rgba(150, 120, 72, 0.28), transparent 60%),
-    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f);
-  border-radius: 5px;
+    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f));
+  border-radius: var(--dd-sheet-radius, 5px);
   padding: 13px;
-  box-shadow:
+  box-shadow: var(--dd-panel-frame,
     0 2px 0 rgba(255, 255, 255, 0.12) inset,
     0 0 0 1px #c4ad7e,
-    0 0 0 4px var(--dd-forge-1),
-    0 0 0 5px var(--dd-gold-deep);
+    0 0 0 4px var(--dd-forge-1, #1d160e),
+    0 0 0 5px var(--dd-gold-deep, #6f5320));
 }
 
-/* per-profese akcent (dle nastaveného povolání) */
-.root[data-prof='bojovnik'] { --acc: #9c2a23; }
-.root[data-prof='carodej'] { --acc: #5b3fa3; }
-.root[data-prof='hranicar'] { --acc: #3e6b34; }
-.root[data-prof='knez'] { --acc: #b8860b; }
-.root[data-prof='theurg'] { --acc: #2f6f6a; }
-.root[data-prof='zlodej'] { --acc: #4a4458; }
+/* per-profese akcent (dle nastaveného povolání); skin může přebít --dd-acc-* */
+.root[data-prof='bojovnik'] { --acc: var(--dd-acc-bojovnik, #9c2a23); }
+.root[data-prof='carodej'] { --acc: var(--dd-acc-carodej, #5b3fa3); }
+.root[data-prof='hranicar'] { --acc: var(--dd-acc-hranicar, #3e6b34); }
+.root[data-prof='knez'] { --acc: var(--dd-acc-knez, #b8860b); }
+.root[data-prof='theurg'] { --acc: var(--dd-acc-theurg, #2f6f6a); }
+.root[data-prof='zlodej'] { --acc: var(--dd-acc-zlodej, #4a4458); }
 
 .loading,
 .empty {
@@ -78,19 +69,19 @@
 }
 .glyph {
   fill: var(--acc);
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-size: 42px;
   font-weight: 700;
   text-anchor: middle;
 }
 .name {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-size: 17px;
   color: var(--dd-ink-2);
   line-height: 1.1;
 }
 .sub {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -101,14 +92,14 @@
 /* ── iniciativa ── */
 .initBtn {
   width: 100%;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
   color: var(--dd-ink-deep);
-  background: linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320);
+  background: var(--dd-accent-grad-strong, linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320));
   border: 1px solid var(--dd-gold-deep);
   border-radius: 5px;
   padding: 10px;
@@ -141,7 +132,7 @@
   align-items: center;
   gap: 8px;
   margin: 13px 0 7px;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.1em;
@@ -184,7 +175,7 @@
   border-radius: 5px;
   text-align: left;
   font-family: inherit;
-  background: linear-gradient(180deg, rgba(255, 252, 242, 0.88), rgba(224, 208, 170, 0.55));
+  background: var(--dd-row-bg, linear-gradient(180deg, rgba(255, 252, 242, 0.88), rgba(224, 208, 170, 0.55)));
   border: 1px solid var(--dd-gold-deep);
   box-shadow:
     0 1px 0 rgba(255, 253, 245, 0.9) inset,
@@ -212,7 +203,7 @@
   color: var(--dd-ink);
 }
 .rVal {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 15px;
   color: var(--dd-ink-2);
@@ -230,7 +221,7 @@
   padding: 7px 9px;
   margin-bottom: 5px;
   border-radius: 4px;
-  background: linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22));
+  background: var(--dd-card-bg, linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22)));
   border: 1px solid var(--dd-line);
 }
 .weapName {
@@ -246,14 +237,14 @@
 }
 .chip {
   cursor: pointer;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 11px;
   font-weight: 600;
   padding: 5px 11px;
   border-radius: 5px;
   border: 1px solid var(--dd-gold-deep);
   color: var(--dd-ink-deep);
-  background: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  background: var(--dd-accent-grad, linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e));
   box-shadow:
     0 1px 0 rgba(255, 250, 225, 0.85) inset,
     0 -2px 3px rgba(110, 80, 30, 0.35) inset,
@@ -277,18 +268,18 @@
   opacity: 0.8;
 }
 .chip b {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   margin-left: 3px;
 }
 .chip.zz {
   border-color: var(--dd-crimson-deep);
   color: #fff;
-  background: linear-gradient(180deg, #cf6a60, #a83228 55%, #7c1d16);
+  background: var(--dd-zz-grad, linear-gradient(180deg, #cf6a60, #a83228 55%, #7c1d16));
 }
 
 /* ── lišta zranění / únavy ── */
 .wgroup {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -306,16 +297,16 @@
   margin-bottom: 3px;
 }
 .wlbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .bez .wlbl {
-  color: #3e6b34;
+  color: var(--dd-band-ok-ink, #3e6b34);
 }
 .postihRow .wlbl {
-  color: #a8761a;
+  color: var(--dd-band-warn-ink, #a8761a);
 }
 .koma .wlbl {
   color: var(--dd-crimson);
@@ -344,14 +335,14 @@
   transform: scale(0.9);
 }
 .bez .wcell.on {
-  background: linear-gradient(180deg, #7bbf6a, #3e6b34);
+  background: var(--dd-band-ok, linear-gradient(180deg, #7bbf6a, #3e6b34));
 }
 .postihRow .wcell.on {
-  background: linear-gradient(180deg, #e7b75a, #a8761a);
+  background: var(--dd-band-warn, linear-gradient(180deg, #e7b75a, #a8761a));
 }
 .koma .wcell.on,
 .smrt .wcell.on {
-  background: linear-gradient(180deg, #cb4138, #5c1612);
+  background: var(--dd-band-crit, linear-gradient(180deg, #cb4138, #5c1612));
 }
 
 /* postih pole (nové) */
@@ -366,7 +357,7 @@
   border: 1px dashed #a8761a;
 }
 .postihField label {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -375,13 +366,13 @@
 }
 .postihField input {
   width: 52px;
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 15px;
   text-align: center;
   border: 1px solid #a8761a;
   border-radius: 3px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   color: var(--dd-crimson-deep);
   padding: 3px;
 }
@@ -404,7 +395,7 @@
   border: 1px solid var(--dd-sapphire);
 }
 .manaField label {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -413,13 +404,13 @@
 }
 .manaField input {
   width: 64px;
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 18px;
   text-align: center;
   border: 1px solid var(--dd-sapphire);
   border-radius: 3px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   color: #1d3a6e;
   padding: 3px;
 }
@@ -437,7 +428,7 @@
   margin-bottom: 6px;
 }
 .nakloLbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -445,13 +436,13 @@
 }
 .nakloInput {
   width: 66px;
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   font-size: 16px;
   text-align: center;
   border: 1px solid var(--dd-gold-deep);
   border-radius: 3px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   color: var(--dd-ink-2);
   padding: 3px;
 }
@@ -477,12 +468,12 @@
 }
 .vlivInput {
   width: 54px;
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
   font-weight: 700;
   text-align: center;
   border: 1px solid var(--dd-line);
   border-radius: 3px;
-  background: #fff;
+  background: var(--dd-input-bg, #fff);
   color: var(--dd-ink-2);
   padding: 2px;
 }
@@ -499,7 +490,7 @@
   margin-top: 6px;
 }
 .openBtn {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -509,7 +500,7 @@
   text-align: left;
   border-radius: 5px;
   border: 1px solid var(--dd-gold-deep);
-  background: linear-gradient(180deg, rgba(255, 252, 242, 0.92), rgba(224, 208, 170, 0.55));
+  background: var(--dd-row-bg, linear-gradient(180deg, rgba(255, 252, 242, 0.92), rgba(224, 208, 170, 0.55)));
   box-shadow:
     0 1px 0 rgba(255, 253, 245, 0.9) inset,
     0 -1px 2px rgba(120, 90, 40, 0.16) inset,
@@ -529,7 +520,7 @@
 }
 .openBtn small {
   display: block;
-  font-family: 'EB Garamond', Georgia, serif;
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
   font-size: 11px;
   font-weight: 400;
   color: var(--dd-ink-soft);

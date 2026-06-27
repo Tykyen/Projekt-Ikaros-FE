@@ -73,11 +73,24 @@
   --dd-font-head: 'Chakra Petch', system-ui, sans-serif;
   --dd-font-body: 'Chakra Petch', system-ui, sans-serif;
 
-  /* embed plochy (dice log/token panel/readout/orchestrace) — tmavý void HUD,
-     holo text, mono čísla (ink je tu už světlý). */
+  /* ════════════ EMBED plochy (dice log/token panel/readout/orchestrace) ═══
+     Void HUD: plocha NEPRŮHLEDNÁ a VIDITELNÁ proti tmavému bg mapy — ne čistý
+     void (`--dd-forge-1` = #04060f splývá), ale tmavší-než-bg modrý panel s
+     neon cyan nádechem + zářivý cyan rám. Bez kompletní sady padaly tokeny na
+     fantasy default (mauve neg, hnědý surface) → readout neviditelný. */
+  --dd-embed-surface: linear-gradient(180deg, #0c1730, #070d1e 60%, #050a18);
+  --dd-embed-border: var(--sf-line-hot);
+  --dd-embed-line: var(--sf-line);
   --dd-embed-text: var(--dd-ink);
   --dd-embed-muted: var(--dd-ink-soft);
+  --dd-embed-title: var(--sf-cyan);
+  --dd-embed-chip-bg: rgba(52, 227, 255, 0.1);
+  --dd-embed-accent: var(--sf-cyan);
   --dd-embed-num-font: 'Share Tech Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Orbitron', 'Chakra Petch', sans-serif;
+  --dd-embed-pos: #3df0a8; /* kladný hod = jade (sémantika life/úspěch) */
+  --dd-embed-neg: #ff5a7a; /* záporný hod = rose (NE mauve) */
+  --dd-embed-neutral: #7af1ff; /* neutrál = cyan-hi */
 
   /* ── lokální sci-fi pomocníky (ornamenty + kompozity je čtou) ── */
   --sf-cyan: #34e3ff;
