@@ -4,6 +4,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### CH-034 — drdplus skiny se nebundlovaly (@import za style-rule); sváděl jsem to na cache/deploy · 2026-06-27
+**Kontext:** 8 drdplus deníkových skinů hotových, render-proof zdrojových souborů (přímý `<link>` na `drdplus-skins/scifi.css`) ukázal, že CSS funguje. Ale na live (a po čase i lokálně) se drdplus deník **neměnil žádným skinem** — pořád pergamen, ač picker ukazoval vybraný skin.
+**Co jsem udělal špatně:** ~5 kol jsem příčinu hledal na **uživatelově straně** — service worker cache, „Clear site data", FE deploy timing, BE 404, re-deploy, CDN — místo abych stáhl a zkontroloval **reálný build output**. Render-proof testoval ZDROJOVÉ CSS, ne zbundlovaný `DiaryTab.css`, takže minul, že bundler importy zahazuje. Uživatel správně tušil „je to na tvé straně" a já to opakovaně sváděl na jeho prohlížeč.
+**Proč to nefungovalo (kořen):** CSS spec — `@import` musí předcházet **všem** style rules. Drdplus `@import`y jsem v `diary-skins.css` umístil **ZA** blok `[data-diary-system='drd16'] {…}` → neplatné `@import` → postcss/bundler je **tiše zahodil** (build NEselhal). Drd16 importy byly nahoře (před pravidly) → OK, proto drd16 skiny fungovaly a drdplus ne. Výsledek: `dp-sheet` 0× v nasazeném i lokálním `DiaryTab-*.css`; deploy věrně nasazoval rozbitý build (stejný hash lokálně i na serveru = důkaz, že deploy je OK a chyba je v buildu). Fix = přesun drdplus `@import`ů nahoru k drd16-skins, před jakékoli pravidlo.
+**Poučení:** (1) Když „CSS/skin se nemění po deployi + clear-cache", **stáhni reálný nasazený asset** (`curl` chunk → `grep` selektor) a změř — nehádej cache. Shoda hashe lokál↔server = chyba je v buildu, ne v deployi/cache. (2) **Render-proof zdroje ≠ ověření bundle** — ověřuj zbundlovaný výstup (`dist/**.css`), ne jen `<link>` na zdroj. (3) `@import` VŽDY nad style rules; neplatný @import = warning-less drop (build „prošel" ≠ CSS kompletní). (4) Rodina CH-027/CH-028: „token/import default musí žít na správném MÍSTĚ", teď i ve správném POŘADÍ.
+**Příznak cyklení:** uživatel opakuje „nefunguje" + screenshoty po deploy/clear-cache; já navrhuju další cache/deploy/BE krok místo kontroly vlastního build outputu. ≥5 kol, rostoucí frustrace („nebavíš mě").
+
+---
+
 ### ⚠️ POKUS (NEZABRAL) — fix8 první 3D animace hodu kostkou na taktické mapě · 2026-06-20
 
 > **POZOR: tento záznam byl původně označen `✅ ŘEŠENÍ`, ale fix8 problém NEVYŘEŠIL** (ověřeno na live: deploy zelený + tvrdý refresh → 1. animace pořád chybí). Označení na ✅ bylo předčasné, viz [CH-012](#ch-012). Ponecháno jako poučení o zkoušené (neúspěšné) cestě. Timing race NEBYL ten kořen.

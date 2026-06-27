@@ -439,25 +439,12 @@
   position: relative;
   isolation: isolate;
 }
+/* Tester 2026-06-27: gotická rohová tracerie ODEBRÁNA — lezla do textu panelů
+   (hlavičky + štítky v rozích nečitelné, „navíc"). Signature horroru drží
+   stříbrný rám salonu + měsíční svit + erbovní pečeť, ne rohový ornament. */
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-panel::after,
 [data-diary-system='drd16'][data-diary-skin='horror'] .drd16-scroll-panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.8;
-  background-repeat: no-repeat;
-  background-size: 56px 56px;
-  background-position: 3px 3px, calc(100% - 3px) 3px, 3px calc(100% - 3px), calc(100% - 3px) calc(100% - 3px);
-  background-image:
-    var(--h-tracery-tl),
-    var(--h-tracery-tl),
-    var(--h-tracery-tl),
-    var(--h-tracery-tl);
-  /* 4 rohy: TL bez transformace; ostatní zrcadlené přes scale v position-trick
-     není dostupný → použijeme stejnou dlaždici, vizuálně mříž v každém rohu. */
-  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 6px rgba(200, 196, 207, 0.12));
+  content: none;
 }
 
 /* ════════════════════════════════════════════════════════════════════

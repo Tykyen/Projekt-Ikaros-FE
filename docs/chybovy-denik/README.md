@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-034.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-035.**
 
 ## Jak je deník členěný
 
@@ -121,3 +121,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--drd-pcnpcbestie-panel-iniciativa-přes-explicitní-flag-ne-label-redundantní-hlavička-pryč--2026-06-27) | fe | DrD+ panel: iniciativa přes explicitní `onRoll` flag (ne matchování labelu „Iniciativa"); flag jen když true = nulová test churn; redundantní hlavička (erb+jméno) pryč | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--drd-bestie-v-chatu-parita-s-mapou-sdílené-jádro--obalení--log-dice--2026-06-27) | fe | DrD+ bestie v chatu (uzavírá CH-032 pro drdplus): sdílené jádro `DrdPlusBestieCombatActions` (mapa↔chat, 0 drift) + chat panel + obalení (DiarySkinScope nad aside → chrome pergamen); past = outer scope vynutil QueryClient na generic větvi | — |
 | [CH-033](fe.md#ch-033--displaycontents-wrapper-kolem-aside-rozbil-flex-šířku-pruh-vpravo-u-chat-bestie--2026-06-27) | fe/css | `display:contents` wrapper kolem aside „ukradl" `.tabWrap > :last-child {flex:1}` (box ignorován) → pruh vpravo; fix = atribut přímo na aside (`.panel[data-attr]`) | vizuální pruh/užší obsah po obalovém wrapperu; bez wrapperu OK |
+| [CH-034](fe.md#ch-034--drdplus-skiny-se-nebundlovaly-import-za-style-rule-sváděl-jsem-to-na-cachedeploy--2026-06-27) | fe/css | drdplus `@import`y ZA `[data-diary-system='drd16']` blokem → neplatné → bundler tiše zahodil → drdplus skiny se nebundlovaly (`dp-sheet` 0×); sváděl jsem to ~5 kol na cache/deploy místo kontroly build outputu | uživatel opakuje „nefunguje" po deploy+clear-cache; navrhuju další cache/deploy/BE krok ne čtení vlastního buildu |
