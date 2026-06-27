@@ -3,6 +3,7 @@ import { ArrowLeft, X } from 'lucide-react';
 import { buildBestieToken } from '@/features/world/tactical-map/utils/buildSpawnToken';
 import { BestieStatblock } from '@/features/world/tactical-map/components/tokens/BestieStatblock';
 import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
+import { getDiaryPreset } from '@/features/world/pages/CharacterDetailPage/diary-systems/registry';
 import { getBestieAbilities } from '@/features/world/bestiar/lib/bestieAbilities';
 import type { Bestie } from '@/features/world/bestiar/types';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
@@ -51,10 +52,10 @@ export function BestieRollPanel({
   });
 
   return (
-    // 16.2d-chat — „obalení": DiarySkinScope nad celým railem (display:contents)
-    // → deníkový skin nese i chrome, ne jen vnitřní panel.
-    <DiarySkinScope worldId={worldId} style={{ display: 'contents' }}>
-    <aside className={s.panel}>
+    // 16.2d-chat — „obalení": data-diary-system přímo na aside (NE wrapper —
+    // display:contents by ztratil `.tabWrap > :last-child { flex:1 }` → rozbitá
+    // šířka). railShell `.panel[data-diary-system='drdplus']` skinuje chrome.
+    <aside className={s.panel} data-diary-system={getDiaryPreset(systemId).id}>
       <div className={s.controls}>
         {onBack && (
           <button
@@ -95,34 +96,37 @@ export function BestieRollPanel({
 
       <div className={s.scroll}>
         {systemId === 'drd16' ? (
-          // 16.2b-chat — drd16 katalogová bestie: vlastní bojový panel (d6+
-          // útoky/OČ/iniciativa), read-only (editace patří do Bestiáře → bez
-          // onPatch). Skin nese obalení (DiarySkinScope nad aside).
-          <Drd16ChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            rollerName={bestie.name}
-            avatarUrl={bestie.imageUrl}
-            systemStats={bestie.systemStats}
-            notes={bestie.notes}
-            canEdit={false}
-          />
+          // 16.2b-chat — drd16 katalogová bestie (read-only); panel konzumuje skin
+          // tokeny z předka → vlastní DiarySkinScope.
+          <DiarySkinScope worldId={worldId}>
+            <Drd16ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              notes={bestie.notes}
+              canEdit={false}
+            />
+          </DiarySkinScope>
         ) : systemId === 'matrix' ? (
-          // 16.2b-chat — Matrix katalogová bestie: drd16-style panel, read-only.
-          <MatrixChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            systemId={systemId}
-            rollerName={bestie.name}
-            avatarUrl={bestie.imageUrl}
-            systemStats={bestie.systemStats}
-            abilities={abilities.map((a) => ({
-              name: a.label,
-              description: a.value,
-            }))}
-            notes={bestie.notes}
-            canEdit={false}
-          />
+          // 16.2b-chat — Matrix katalogová bestie (read-only); --mx-* z předka.
+          <DiarySkinScope worldId={worldId}>
+            <MatrixChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              systemId={systemId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              abilities={abilities.map((a) => ({
+                name: a.label,
+                description: a.value,
+              }))}
+              notes={bestie.notes}
+              canEdit={false}
+            />
+          </DiarySkinScope>
         ) : systemId === 'drdplus' ? (
           // 16.2d-chat — DrD+ katalogová bestie: pergamen panel (2k6+/d6,
           // BČ→iniciativa), read-only (bez onPatch).
@@ -172,6 +176,5 @@ export function BestieRollPanel({
         )}
       </div>
     </aside>
-    </DiarySkinScope>
   );
 }

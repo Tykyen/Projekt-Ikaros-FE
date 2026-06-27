@@ -396,7 +396,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Reálný list (grafika)
   - [x] Taktická mapa (grafika + zvážit vlastní combat panel)
   - [x] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
+  - [x] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
 - **Dračí Doupě II** (`drd2`) — *stav kódu:* list sheet+testy, mapa combat panel `Drd2CombatPanel`
   - [ ] Reálný list (grafika)

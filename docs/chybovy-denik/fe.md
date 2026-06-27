@@ -935,3 +935,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — no-drift extrakce, parita napříč deník/mapa/chat. drd16/matrix chrome zatím chat-motiv (neskinováno) = vědomá odchylka (uživatel chtěl drdplus); případný follow-up.
 
 ---
+
+### CH-033 — `display:contents` wrapper kolem aside rozbil flex šířku (pruh vpravo u chat bestie) · 2026-06-27
+**Kontext:** „obalení" chat bestie railu deníkovým skinem (chrome pergamen) — obalil jsem celý `<aside class=panel>` do `<DiarySkinScope style={{display:'contents'}}>`.
+**Co jsem udělal špatně:** `display:contents` wrapper se stal posledním DOM potomkem `.tabWrap`, na který míří `.tabWrap > :last-child { flex:1; min-height:0 }`. Selektor trefil wrapper, ale `display:contents` element **ignoruje vlastní box** (flex/min-height/stretch se neaplikují) → aside (promovaný flex item) nedostal roztažení → obsah užší, **pruh vpravo**. PC (DiaryRollPanel) outer wrapper nemá → bez problému, proto „u PC to není".
+**Proč to nefungovalo:** `display:contents` = element zmizí z layoutu, ale ZŮSTÁVÁ v DOM jako match pro `> :last-child`/`> *` selektory rodiče → „ukradne" pravidlo, které se pak nikam neaplikuje.
+**Poučení:** `display:contents` wrapper NEpoužívat tam, kde rodič cílí PŘÍMÉHO potomka (`> :last-child`, `> *`, nth-child) nebo ho flex/grid dimenzuje. Místo wrapperu dej atribut PŘÍMO na cílový element (`<aside data-diary-system>` + `.panel[data-attr]`, mirror `TokenInfoPanel`). (Pozn.: v `TacticalMapView` display:contents funguje, protože tam rodič přímé potomky takhle necílí.)
+**Příznak cyklení:** vizuální „pruh"/užší obsah po přidání obalového wrapperu; bez wrapperu layout OK.
+
+---

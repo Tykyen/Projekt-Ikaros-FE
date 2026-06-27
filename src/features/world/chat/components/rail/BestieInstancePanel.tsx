@@ -13,6 +13,7 @@ import {
   type AbilityDraft,
 } from '@/features/world/tactical-map/components/tokens/BestieStatblock';
 import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
+import { getDiaryPreset } from '@/features/world/pages/CharacterDetailPage/diary-systems/registry';
 import type { ChatBestieCombatant } from '../../lib/types';
 import { useCombatantMutation } from '../../api/useChannelCombat';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
@@ -106,11 +107,12 @@ export function BestieInstancePanel({
   };
 
   return (
-    // 16.2d-chat — „obalení": DiarySkinScope nad CELÝM railem (display:contents,
-    // bez layout boxu) → deníkový skin nese i chrome (identity/controls), ne jen
-    // vnitřní panel. railShell má `[data-diary-system='drdplus']` pergamen override.
-    <DiarySkinScope worldId={worldId} style={{ display: 'contents' }}>
-    <aside className={s.panel}>
+    // 16.2d-chat — „obalení": data-diary-system přímo na aside (NE wrapper —
+    // display:contents wrapper by ztratil `.tabWrap > :last-child { flex:1 }` →
+    // rozbitá šířka). railShell `.panel[data-diary-system='drdplus']` skinuje chrome.
+    // Pure getDiaryPreset (bez hooku). Vnitřní drd16/matrix panely mají vlastní
+    // DiarySkinScope (skin tokeny); drdplus panel je self-contained.
+    <aside className={s.panel} data-diary-system={getDiaryPreset(systemId).id}>
       <div className={s.controls}>
         {onBack && (
           <button
@@ -162,38 +164,42 @@ export function BestieInstancePanel({
 
       <div className={s.scroll}>
         {systemId === 'drd16' ? (
-          // 16.2b-chat — drd16 vlastní bojový panel (d6+ útoky/OČ/iniciativa,
-          // fantasy skin, edit modal). Skin nese obalení (DiarySkinScope nad aside).
-          <Drd16ChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            rollerName={combatant.name}
-            avatarUrl={combatant.imageUrl}
-            systemStats={combatant.systemStats}
-            notes={combatant.notes}
-            canEdit={canEdit}
-            onPatch={(patch) =>
-              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
-            }
-          />
+          // 16.2b-chat — drd16 panel konzumuje skin tokeny z předka → vlastní scope.
+          <DiarySkinScope worldId={worldId}>
+            <Drd16ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              notes={combatant.notes}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
         ) : systemId === 'matrix' ? (
-          // 16.2b-chat — Matrix drd16-style panel (klik=hod, HP ±, edit modal).
-          <MatrixChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            systemId={systemId}
-            rollerName={combatant.name}
-            avatarUrl={combatant.imageUrl}
-            systemStats={combatant.systemStats}
-            abilities={combatant.abilities}
-            notes={combatant.notes}
-            canEdit={canEdit}
-            onPatch={(patch) =>
-              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
-            }
-          />
+          // 16.2b-chat — Matrix panel konzumuje --mx-* z předka → vlastní scope.
+          <DiarySkinScope worldId={worldId}>
+            <MatrixChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              systemId={systemId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              abilities={combatant.abilities}
+              notes={combatant.notes}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
         ) : systemId === 'drdplus' ? (
-          // 16.2d-chat — DrD+ pergamen panel (2k6+/d6, BČ→iniciativa), parita s mapou.
+          // 16.2d-chat — DrD+ pergamen panel (2k6+/d6, BČ→iniciativa). Self-contained
+          // (`.root` má vlastní --dd-*) → bez scope; chrome skinuje data-diary-system.
           <DrdPlusChatBestiePanel
             worldId={worldId}
             channelId={channelId}
@@ -231,6 +237,5 @@ export function BestieInstancePanel({
         )}
       </div>
     </aside>
-    </DiarySkinScope>
   );
 }
