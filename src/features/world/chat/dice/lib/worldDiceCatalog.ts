@@ -26,7 +26,9 @@ export const DICE_CATALOG: Record<string, DiceCatalogEntry> = {
   // Nafukovací k6 (DrD 1.6) — padne-li 6, házíš znovu a přičteš hodnotu.
   'd6+': { label: 'k6+', glyph: '6+', rollType: 'd6+', glyphSize: 'md' },
   // Otevřený / eskalující 2k6 (DrD+) — dvojice 2×6 eskaluje +1, 2×1 −1.
-  '2d6+': { label: '2k6+', glyph: '2k6﹢', rollType: '2d6+', glyphSize: 'sm' },
+  // Glyf v ASCII (`+`, ne small-plus U+FE62) — font Iceland small-plus nemá,
+  // spadl by na fallback. „Malost" řeší glyphSize `sm` (14px).
+  '2d6+': { label: '2k6+', glyph: '2k6+', rollType: '2d6+', glyphSize: 'sm' },
   d8: { label: 'k8', glyph: '8', rollType: 'd8', glyphSize: 'lg' },
   d10: { label: 'k10', glyph: '10', rollType: 'd10', glyphSize: 'md' },
   d12: { label: 'k12', glyph: '12', rollType: 'd12', glyphSize: 'md' },

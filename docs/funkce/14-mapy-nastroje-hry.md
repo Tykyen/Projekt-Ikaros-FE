@@ -97,10 +97,20 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 
 ### Token modal / panel (3 varianty × view módy)
 - **Panel:** `TokenInfoPanel` — boční panel se 3 zobrazovacími módy: `dock` (ukotvený vpravo, resize), `drag` (volně přesouvatelný), `overlay` (vystředěný, force na mobilu). Otevírá se přes „i" badge tokenu (`openedTokenId`); nezávislé na výběru (`selectedTokenId`).
-- **Obsah (3 varianty dle typu tokenu):** `TokenSystemSheet` přepíná layout dle `world.system` (per-system bojové panely: `CocCombatPanel`, `DndCombatPanel`, `Drd2CombatPanel`, `FateCombatPanel`, `GurpsCombatPanel`, `MatrixCombatPanel`). Bestie má `BestiePanelView`. Deník/poznámky se **embedují** (reuse `TokenDiaryTab`/`TokenNotesTab`, ne kopie).
+- **Obsah (3 varianty dle typu tokenu):** `TokenSystemSheet` přepíná layout dle `world.system` (per-system bojové panely: `CocCombatPanel`, `DndCombatPanel`, `Drd2CombatPanel`, `Drd16CombatPanel`, `DrdPlusCombatPanel`, `FateCombatPanel`, `GurpsCombatPanel`, `MatrixCombatPanel`). Systém bez panelu spadne na plný `TokenDiaryTab`. Bestie má `BestiePanelView`. Deník/poznámky se **embedují** (reuse `TokenDiaryTab`/`TokenNotesTab`, ne kopie).
 - **View módy přístupu:** PJ vidí/edituje vše; vlastník PC vidí/edituje svůj; ostatní limited. Akce v hlavičce (PJ): „V boji / Mimo boj" (jen NPC/bestie — PC jsou v boji vždy), „Zamknout/Odemknout", „Odstranit z mapy".
 - **Body osudu** badge jen pro systém `matrix`.
 - **Kód:** `components/token-panel/{TokenInfoPanel,TokenSystemSheet,BestiePanelView}.tsx`, `system-panels/*`.
+
+### DrD+ bojový panel (`drdplus`, hody 2k6+)
+- **Co to je:** Kompaktní bojová verze deníku DrD+ na taktické mapě (`DrdPlusCombatPanel`). Single source s plným deníkem — čte/zapisuje tentýž `customData` (prefix `drdp_`) přes `characterSlug` (debounced ~500 ms).
+- **Kde:** token-panel na `/takticka-mapa`, jen když `world.system === 'drdplus'`.
+- **Kdo:** PJ edituje vše; vlastník PC svůj; ostatní read (`canEdit` gate). Hody jen když panel dostane `onRoll` (mapa).
+- **Co jde dělat:** klik na **hlavní vlastnost / odvozenou / dovednost / zbraň BČ·ÚČ·OČ / Kněz Síla aspektu·Neovlivnitelnost / iniciativu** = hod **`2d6+`** (otevřený hod DrD+) + příslušná veličina; **zbraň ZZ = `d6`** (1k6) + ZZ. Editace na mapě: políčka životů/únavy, **2 pole postihu** (zranění + únava), Čaroděj „Aktuální magenergie", Theurg náklonnosti, Kněz „Vliv u osob" velikost. Read-only okna „k nahlédnutí" (Modal, reuse deníkových komponent): dle povolání kouzla / obory / finty / zaměření / totem / zázračné schopnosti / formule / démoni / vazby.
+- **Hranice / co neumí:** Velikost a Hmotnost se **nehází**. Mez zranění/únavy se na mapě needituje (jen v deníku). Povolání se na mapě **nevybírá** (bere se z `drdp_profession`, erb = jen identita). Žádné auto-zranění / auto-souboj; magenergie ruční. Okna se ukážou jen když data existují. Bestie/chat napojení drdplus = zatím není.
+- **Zvláštnosti:** **Postih** (`drdp_zraneni_postih` + `drdp_unava_postih`) se **automaticky odečítá od modifieru každého hodu**. Iniciativa v deníku i na mapě = `2d6+` (`SheetInitiativeButton kind`). „Projevy čaroděje" přejmenovány na „Obory" (data `wiz_proj_*` beze změny). Engine `2d6+`/`d6` = FE (`rollEngine` `rollExploding2d6`), payload generický, bez BE.
+- **Stav:** ✅ funguje (spec-16.2d-mapa-drdplus).
+- **Kód:** FE `system-panels/DrdPlusCombatPanel.tsx`(+`.module.css`), registrace `combatPanels.ts:39`, `utils/rollFromSheet.ts:62`, deník `sheets/drdplus/*`. BE: žádné (customData).
 
 ### HP (per-system, visibility toggle)
 - **Co to je:** HP bar pod tokenem (PixiJS). Architektura per-typ: Bestie = snapshot ze `systemStats`; PC/NPC = z deníkového subdokumentu (`customData` per-system klíč) přes enrich (memory `token_hp_architecture`).

@@ -374,6 +374,40 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Co znamenají kostky k6+ a 2k6+ (nafukovací / otevřený hod)?',
+    a: (
+      <>
+        <p>
+          Některé systémy mají <strong>eskalující</strong> kostky — když padne
+          extrém, házíš dál a výsledek se mění:
+        </p>
+        <ul>
+          <li>
+            <strong>k6+</strong> (nafukovací k6, Dračí Doupě 1.6): hodíš k6, a{' '}
+            <strong>padne-li 6</strong>, házíš znovu a <strong>přičteš</strong> i
+            další hod — dokud padají šestky. Výsledek tak může povyletět vysoko
+            (jen nahoru).
+          </li>
+          <li>
+            <strong>2k6+</strong> (otevřený hod, Dračí Doupě Plus): hodíš 2k6.
+            Padne-li <strong>2× šestka</strong>, házíš dál po jedné kostce a za
+            každou 4/5/6 přidáš <strong>+1</strong> (dokud nepadne 1/2/3).
+            Padne-li <strong>2× jednička</strong>, je to naopak — za každou 1/2/3
+            ubereš <strong>−1</strong> (dokud nepadne 4/5/6), takže výsledek může
+            spadnout i <strong>do záporu</strong>. Jakýkoli jiný úvodní hod =
+            prostý součet.
+          </li>
+        </ul>
+        <p>
+          Kde je najdeš: v <strong>🎲 výběru kostky</strong> (chat i taktická
+          mapa), pokud je PJ světu povolil. PJ je zapíná při zakládání nebo v
+          Nastavení světa; u Dračího Doupěte 1.6 a Plus je nabízíme rovnou.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Jak hledám stránky ve světě?',
     a: (
       <>

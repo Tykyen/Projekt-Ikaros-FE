@@ -1,0 +1,560 @@
+/**
+ * 16.2d-mapa — DrdPlusCombatPanel (pergamen „iluminovaný kodex" DrD+).
+ *
+ * Self-contained paleta (`--dd-*`) jako u `Drd16CombatPanel` — sdílené skin
+ * tokeny jsou laděné na tmavý HUD a na světlém pergamenu nečitelné. Akcent
+ * (`--acc`) se mění dle nastaveného povolání (`data-prof`), ne klikem.
+ * Tlačítka mají 3D reliéf (ražený kov), klikem se zamáčknou.
+ */
+
+.root {
+  --dd-parch-1: #e8dab7;
+  --dd-ink: #3a2b19;
+  --dd-ink-2: #2a1a0a;
+  --dd-ink-deep: #1f1607;
+  --dd-ink-head: #3a2812;
+  --dd-ink-soft: #6c573a;
+  --dd-gold: #c19a3f;
+  --dd-gold-hi: #f3dd97;
+  --dd-gold-deep: #6f5320;
+  --dd-crimson: #9c2a23;
+  --dd-crimson-deep: #5c1612;
+  --dd-sapphire: #2c569e;
+  --dd-line: rgba(196, 173, 126, 0.55);
+  --dd-forge-1: #1d160e;
+  --acc: #b8860b;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--dd-ink);
+  background-color: var(--dd-parch-1);
+  background-image:
+    radial-gradient(120% 90% at 18% 8%, rgba(255, 250, 235, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 88% 96%, rgba(150, 120, 72, 0.28), transparent 60%),
+    linear-gradient(165deg, #f1e6cb, #e8dab7 55%, #ddca9f);
+  border-radius: 5px;
+  padding: 13px;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px #c4ad7e,
+    0 0 0 4px var(--dd-forge-1),
+    0 0 0 5px var(--dd-gold-deep);
+}
+
+/* per-profese akcent (dle nastaveného povolání) */
+.root[data-prof='bojovnik'] { --acc: #9c2a23; }
+.root[data-prof='carodej'] { --acc: #5b3fa3; }
+.root[data-prof='hranicar'] { --acc: #3e6b34; }
+.root[data-prof='knez'] { --acc: #b8860b; }
+.root[data-prof='theurg'] { --acc: #2f6f6a; }
+.root[data-prof='zlodej'] { --acc: #4a4458; }
+
+.loading,
+.empty {
+  padding: 16px;
+  text-align: center;
+  font-style: italic;
+  color: var(--dd-ink-soft);
+}
+
+/* ── hlavička / erb ── */
+.head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.erb {
+  width: 50px;
+  height: 58px;
+  flex: 0 0 auto;
+}
+.crest {
+  fill: color-mix(in srgb, var(--acc) 22%, #f1e6cb);
+  stroke: var(--acc);
+  stroke-width: 3;
+}
+.glyph {
+  fill: var(--acc);
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 42px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.name {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 17px;
+  color: var(--dd-ink-2);
+  line-height: 1.1;
+}
+.sub {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-top: 4px;
+}
+
+/* ── iniciativa ── */
+.initBtn {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--dd-ink-deep);
+  background: linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320);
+  border: 1px solid var(--dd-gold-deep);
+  border-radius: 5px;
+  padding: 10px;
+  margin: 8px 0 4px;
+  box-shadow:
+    0 1px 0 rgba(255, 250, 225, 0.7) inset,
+    0 -2px 4px rgba(90, 65, 20, 0.4) inset,
+    0 3px 5px rgba(40, 26, 6, 0.4);
+  transition: transform 0.07s ease, box-shadow 0.07s ease, filter 0.12s;
+}
+.initBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 225, 0.8) inset,
+    0 -2px 4px rgba(90, 65, 20, 0.4) inset,
+    0 6px 10px rgba(40, 26, 6, 0.42);
+}
+.initBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 5px rgba(40, 26, 6, 0.45) inset;
+}
+
+/* ── nadpis sekce ── */
+.sec {
+  margin-top: 4px;
+}
+.stitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 13px 0 7px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-ink-head);
+}
+.stitle small {
+  font-size: 8px;
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+.stitle::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--dd-gold-hi), var(--dd-gold-deep));
+  box-shadow: 0 0 0 1px rgba(60, 40, 10, 0.4);
+}
+.stitle::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--dd-gold), transparent);
+  opacity: 0.5;
+}
+
+/* ── klikací řádek (hod) ── */
+.rollRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  padding: 7px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: left;
+  font-family: inherit;
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.88), rgba(224, 208, 170, 0.55));
+  border: 1px solid var(--dd-gold-deep);
+  box-shadow:
+    0 1px 0 rgba(255, 253, 245, 0.9) inset,
+    0 -1px 2px rgba(120, 90, 40, 0.16) inset,
+    0 2px 3px rgba(50, 34, 10, 0.3);
+  transition: transform 0.07s ease, box-shadow 0.07s ease, filter 0.12s;
+}
+.rollRow:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow:
+    0 1px 0 rgba(255, 253, 245, 1) inset,
+    0 5px 8px rgba(50, 34, 10, 0.32);
+}
+.rollRow:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(50, 34, 10, 0.35) inset;
+}
+.rollRow:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.rName {
+  font-size: 14px;
+  color: var(--dd-ink);
+}
+.rVal {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--dd-ink-2);
+  min-width: 26px;
+  text-align: center;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 8px;
+}
+
+/* ── zbraně ── */
+.weap {
+  padding: 7px 9px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22));
+  border: 1px solid var(--dd-line);
+}
+.weapName {
+  font-size: 14px;
+  color: var(--dd-ink);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.chip {
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 5px;
+  border: 1px solid var(--dd-gold-deep);
+  color: var(--dd-ink-deep);
+  background: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 225, 0.85) inset,
+    0 -2px 3px rgba(110, 80, 30, 0.35) inset,
+    0 2px 3px rgba(50, 34, 10, 0.3);
+  transition: transform 0.07s ease, box-shadow 0.07s ease, filter 0.12s;
+}
+.chip:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 225, 0.95) inset,
+    0 -2px 3px rgba(110, 80, 30, 0.35) inset,
+    0 5px 8px rgba(50, 34, 10, 0.34);
+}
+.chip:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(50, 34, 10, 0.4) inset;
+}
+.chip:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+.chip b {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  margin-left: 3px;
+}
+.chip.zz {
+  border-color: var(--dd-crimson-deep);
+  color: #fff;
+  background: linear-gradient(180deg, #cf6a60, #a83228 55%, #7c1d16);
+}
+
+/* ── lišta zranění / únavy ── */
+.wgroup {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft);
+  margin: 6px 0 4px;
+}
+.wtrack {
+  margin-bottom: 6px;
+}
+.wrow {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+}
+.wlbl {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.bez .wlbl {
+  color: #3e6b34;
+}
+.postihRow .wlbl {
+  color: #a8761a;
+}
+.koma .wlbl {
+  color: var(--dd-crimson);
+}
+.smrt .wlbl {
+  color: var(--dd-crimson-deep);
+}
+.wcells {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.wcell {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  border: 1px solid var(--dd-gold-deep);
+  background: rgba(255, 252, 242, 0.5);
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 253, 245, 0.7) inset,
+    0 1px 2px rgba(50, 34, 10, 0.22);
+  transition: transform 0.06s;
+}
+.wcell:active {
+  transform: scale(0.9);
+}
+.bez .wcell.on {
+  background: linear-gradient(180deg, #7bbf6a, #3e6b34);
+}
+.postihRow .wcell.on {
+  background: linear-gradient(180deg, #e7b75a, #a8761a);
+}
+.koma .wcell.on,
+.smrt .wcell.on {
+  background: linear-gradient(180deg, #cb4138, #5c1612);
+}
+
+/* postih pole (nové) */
+.postihField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+  padding: 7px 9px;
+  border-radius: 4px;
+  background: rgba(168, 118, 26, 0.12);
+  border: 1px dashed #a8761a;
+}
+.postihField label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a5f12;
+  font-weight: 600;
+}
+.postihField input {
+  width: 52px;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  border: 1px solid #a8761a;
+  border-radius: 3px;
+  background: #fff;
+  color: var(--dd-crimson-deep);
+  padding: 3px;
+}
+.postihField input:disabled {
+  background: rgba(255, 252, 242, 0.6);
+  color: var(--dd-ink-soft);
+}
+
+/* ── magenergie (čaroděj) ── */
+.manaField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 2px;
+  padding: 9px 11px;
+  border-radius: 4px;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(44, 86, 158, 0.16), transparent 70%),
+    linear-gradient(180deg, rgba(255, 252, 242, 0.5), rgba(221, 202, 159, 0.3));
+  border: 1px solid var(--dd-sapphire);
+}
+.manaField label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dd-sapphire);
+  font-weight: 600;
+}
+.manaField input {
+  width: 64px;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 18px;
+  text-align: center;
+  border: 1px solid var(--dd-sapphire);
+  border-radius: 3px;
+  background: #fff;
+  color: #1d3a6e;
+  padding: 3px;
+}
+.manaField input:disabled {
+  background: rgba(255, 252, 242, 0.6);
+  color: var(--dd-ink-soft);
+}
+
+/* ── náklonnost (theurg) — číslo ── */
+.naklo {
+  display: grid;
+  grid-template-columns: 90px auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.nakloLbl {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dd-ink-head);
+}
+.nakloInput {
+  width: 66px;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  border: 1px solid var(--dd-gold-deep);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--dd-ink-2);
+  padding: 3px;
+}
+.nakloInput:disabled {
+  background: rgba(255, 252, 242, 0.6);
+  color: var(--dd-ink-soft);
+}
+
+/* ── vliv u osob (kněz) ── */
+.vlivTbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2px;
+}
+.vlivTbl td {
+  padding: 3px 6px;
+  font-size: 13px;
+  color: var(--dd-ink);
+  border-bottom: 1px solid var(--dd-line);
+}
+.vlivName {
+  color: var(--dd-ink-2);
+}
+.vlivInput {
+  width: 54px;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid var(--dd-line);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--dd-ink-2);
+  padding: 2px;
+}
+.vlivInput:disabled {
+  background: rgba(255, 252, 242, 0.6);
+  color: var(--dd-ink-soft);
+}
+
+/* ── okna „k nahlédnutí" (tlačítka) ── */
+.openBtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 6px;
+}
+.openBtn {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 10px 9px;
+  color: var(--dd-ink-head);
+  text-align: left;
+  border-radius: 5px;
+  border: 1px solid var(--dd-gold-deep);
+  background: linear-gradient(180deg, rgba(255, 252, 242, 0.92), rgba(224, 208, 170, 0.55));
+  box-shadow:
+    0 1px 0 rgba(255, 253, 245, 0.9) inset,
+    0 -1px 2px rgba(120, 90, 40, 0.16) inset,
+    0 2px 3px rgba(50, 34, 10, 0.28);
+  transition: transform 0.07s ease, box-shadow 0.07s ease, filter 0.12s;
+}
+.openBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+  box-shadow:
+    0 1px 0 rgba(255, 253, 245, 1) inset,
+    0 5px 9px rgba(50, 34, 10, 0.3);
+}
+.openBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(50, 34, 10, 0.32) inset;
+}
+.openBtn small {
+  display: block;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--dd-ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 2px;
+}
+
+.rule {
+  border: 0;
+  height: 2px;
+  margin: 12px 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dd-gold) 30%,
+    var(--dd-gold-deep) 50%,
+    var(--dd-gold) 70%,
+    transparent
+  );
+  opacity: 0.55;
+}
+.hint {
+  font-size: 12px;
+  color: var(--dd-ink-soft);
+  font-style: italic;
+  margin: 4px 0;
+}

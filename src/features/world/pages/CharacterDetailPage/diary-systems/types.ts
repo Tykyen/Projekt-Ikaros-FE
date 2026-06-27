@@ -64,7 +64,7 @@ export interface SystemSheetProps {
    * `onRoll({ label, modifier, kind })`. Sheet bez tohoto propu (např.
    * CharacterDetailPage) klikatelnost nepouští.
    */
-  onRoll?: (req: { label: string; modifier?: number; kind?: 'fate' | 'd4' | 'd6' | 'd6+' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100' }) => void;
+  onRoll?: (req: { label: string; modifier?: number; kind?: 'fate' | 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100' }) => void;
 }
 
 /**

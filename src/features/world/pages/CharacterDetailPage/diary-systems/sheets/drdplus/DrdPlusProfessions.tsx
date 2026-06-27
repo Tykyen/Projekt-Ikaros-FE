@@ -125,7 +125,7 @@ export function WizardSection({ cda, disabled }: SecProps) {
         </div>
       </div>
       <div className="dp-panel">
-        <h3>Projevy čaroděje</h3>
+        <h3>Obory</h3>
         <p className="dp-hint">Zvládnutí sfér magie (1–10).</p>
         {WIZARD_PROJEVY.map((p) => (
           <CdaScale key={p} cda={cda} k={`wiz_proj_${p}`} max={10} label={p} disabled={disabled} />

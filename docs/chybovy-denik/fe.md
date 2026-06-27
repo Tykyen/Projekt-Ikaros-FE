@@ -753,3 +753,36 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — jeden zátah ve sdílené komponentě (globální i world chat, 11 chat skinů, žádný skin `.actions` nepřebíjí), reuse `KebabMenu`+`EmojiPickerPopover` bottom-sheetů. Hlídat: u responsivních interakčních fixů odlišit `hover`-media od `width`-media (skill `mobil-desktop` defaultně myslí šířku).
 
 ---
+
+### ✅ ŘEŠENÍ — kostka 2d6+ otevřený eskalující hod DrD plus a d6+ v manuálním pickeru · 2026-06-27
+
+**Co nakonec zabralo:** Nová roll primitiva `rollExploding2d6` (trigger jen na dvojici 2×6/2×1, ±1 za pokračovací kostku, směr nahoru/dolů i do záporu, cap 50) + vertical slice napříč ~12 soubory (engine → payload → 3D notace → sheet/diary roll → dice log → katalog → preset → manuální picker). Mechaniku dodal uživatel doslova vč. 2 příkladů (CH-023 — NErekonstruovat z paměti); ověřena oběma (14 a −3).
+**Tři netriviální gotchy (poučení do 16.2 per-system dice):**
+1. **Typ s `+` neprojde `rollGenericDice` regexem** `^(\d*)[dk](\d+)$` → tiše spadne na **default k20**. Řešení = **centralizovat dispatch** (`d6+`→`rollExplodingD6`, `2d6+`→`rollExploding2d6`) přímo v `rollGenericDice`, ne jen v sheet/diary větvích. Jen tak to dostal i **manuální picker** (`DicePickerPopover.performRoll` volá `rollGenericDice`) bez speciální větve. (Rozšíření vzoru `d6+` z 16.2b — viz [✅ ŘEŠENÍ 16.2b-mapa](#-řešení--162b-mapa-drd16-combat-panel--d6-exploding-engine--strukturovaný-spellbook--2026-06-25).)
+2. **`DiceLogPanel.renderBreakdown` sčítá tváře** `(a + b + c)` — pro `2d6+` to **LŽE** (výsledek je `základ páru ± delta`, NE součet tváří; pokračovací kostka nepřičítá hodnotu, jen ±1). Nutná **vlastní větev** `2d6+` (`(6+6 ▲ +2) = +14`) PŘED generickou numeric větví + vynutit rozpis i bez labelu/modu, když delta≠0 (jinak kaskáda 5 tváří bez kontextu mate). `d6+` v generic větvi zůstává správně (tam součet tváří = výsledek).
+3. **Glyf dlaždice `2k6﹢` s U+FE62 (small-plus)** — font **Iceland** ho nemá → fallback font (jiný baseline). Fix = ASCII `+` (`2k6+`); „malost" řeší `glyphSize: sm`. Chyceno **CSS rozborem v `mobil-desktop`**, ne buildem (runtime font coverage je pro tsc/test slepá — rodina CH-024/CH-027).
+**Jak ověřeno:** `npm run build` (tsc -b ✓ — dual-source union `RollKind`/`DiaryRollKind`/`GenericDicePayload.type`/`KEY_ALIASES` build chytá drift jako u `d6+`), vitest 98 (6 nových `rollExploding2d6` vč. obou příkladů + edge + cap, regrese dice/drd16 zelená), HelpPage 25, eslint 0, lint:colors bez nového nálezu.
+**Zhodnocení:** dobře — jeden zátah, 0 cyklení, gotchy chyceny proaktivně (ne po selhání). Centralizace = single source dispatche místo 3 míst. **Zbývá (mimo spec):** TM combat panel pro DrD+ si zavolá `kind:'2d6+'` („pak v TM"). Past: kdyby další systém přidal kostku s `+`/jiným ne-XdN tvarem, MUSÍ dostat větev v `rollGenericDice` + (pokud nesumuje tváře) v `renderBreakdown`.
+
+---
+
+### ✅ ŘEŠENÍ — 16.2d-mapa DrD+ combat panel (2k6+ hody · postih · okna reuse) · 2026-06-27
+
+**Kontext:** „pak v TM" z [16.2-2d6plus](#-řešení--kostka-2d6-otevřený-eskalující-hod-drd-plus-a-d6-v-manuálním-pickeru--2026-06-27) — dostat DrD+ deník na taktickou mapu jako bojový panel. Mechaniky dodal uživatel (spec-16.2d-mapa-drdplus), prototyp `c:/tmp/drdplus-mapa-mockup.html` iterován v chatu (3D tlačítka, postih, přesun zbraní, picker pryč) → schválen → kód.
+
+**Co zabralo (3 nosná rozhodnutí):**
+1. **Single source bez nové write-vrstvy:** panel staví `cda = makeCdAccess(cd, 'drdp_', canEdit ? handleChange : undefined)` a `handleChange` jen sype `customDataPatch` do `pending` + debounced mutace (vzor `Drd16CombatPanel`). Tím panel sdílí PŘESNÉ klíče i delta-merge semantiku s deníkem (prefix `drdp_`) — 0 duplicitní logiky, magenergie/náklonnosti/vliv/postih/životy se propíšou do listu.
+2. **Okna „k nahlédnutí" = reuse deníkových komponent v `disabled` módu** (`SpellList`/`FormuleList`/`DemonList`/`JsonTable`/`Scale`), ne re-implementace. Formule/démoni mají ~300 ř. složitých struktur → vlastní read-view = drift. Komponenty jedou na `.dp-*` třídách scoped na `.dp-sheet` → **statický `import '…/styles/drdplus.css'`** v panelu (scoped, neuniká) + obal `<div className="dp-sheet" data-prof>`. Modal je portál do body, ale scoped CSS je globální → styly sednou i tam.
+3. **Postih = fold do modifieru:** `doRoll(label, base, kind)` počítá `modifier = base + numOr('zraneni_postih') + numOr('unava_postih')`. Engine/payload netknuté — auto-odečet od KAŽDÉHO hodu (R4) bez zásahu do `rollEngine`/`performSheetRoll`. `ZZ = 'd6'` (1k6), ostatní `'2d6+'`.
+
+**Proč správně:** žádná BE změna (vše `customData`), engine `2d6+` už hotový z 16.2-2d6plus → panel je jen UI+wiring. Reuse listových komponent drží paritu deník↔mapa zdarma. Picker povolání na mapě záměrně NENÍ (povolání = `drdp_profession`, mění se v deníku).
+
+**Past (typy, dual-source):** `SystemSheetProps['onRoll']` union **neměl `'2d6+'`** (jen `performSheetRoll`/`RollKind` ano) → bez doplnění by iniciativa `kind="2d6+"` neprošla tsc. Navíc `SheetInitiativeButton` má **vlastní** kind union — taky doplnit. Rodina „dual-source union" jako u `d6+`.
+
+**Vlastní chyba (malá):** `tsc -b` jsem pustil PŘED napsáním testu (inkrementální → test neviděl); plný `npm run build` pak chytil typovou chybu v test-helperu (`ReturnType<typeof vi.fn>` = `Mock` s construct-signaturou není assignable na `onRoll`). Fix = typovat helper přes `SystemSheetProps['onRoll']`. Poučení: po přidání test-souboru spustit build/tsc znovu, ne se spolehnout na předchozí inkrementální zelenou.
+
+**Jak ověřeno:** `npm run build` (tsc -b ✓ + vite ✓ + CSP ✓), vitest DrdPlusCombatPanel **11/11** (rolls 2d6+/d6, postih auto-odečet, Velikost/Hmotnost se nehází, Kněz aspekt, canEdit gating, debounced postih persist) + DrdPlusSheet 10/10 + HelpPage 25/25, eslint 0 na nových/změněných, `mobil-desktop` (CSS analýza — fluidní, 0 fixních šířek), `funkce` (kap. 14) + `napoveda` (WorldSection) aktualizovány.
+
+**Zhodnocení:** dobře — jeden zátah, 0 cyklení; reuse (cdAccess + diary komponenty) ušetřil stovky řádků a drift. Jediná vlastní chyba (tsc inkrementální slepota) chycena buildem před koncem. Past dual-source union potvrzena potřetí (d6+→2d6+) — kdyby přibyl další systém s panelem házejícím `2d6+`, union už ho má.
+
+---

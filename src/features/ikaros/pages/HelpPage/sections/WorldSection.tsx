@@ -313,12 +313,24 @@ export function WorldSection() {
               PJ má <strong>Deník PJ</strong> (world-level, soukromý), hráč{' '}
               <strong>Poznámky své postavy</strong>.
             </p>
+            <p>
+              U systémů <strong>Dračí doupě 1.6</strong> a <strong>Plus</strong> se
+              v panelu ukáže <strong>bojová verze deníku</strong>: klikneš na
+              vlastnost, dovednost, zbraň nebo obranu a <strong>rovnou se hodí</strong>{' '}
+              (DrD+ háže 2k6+; u zbraně je zranění ZZ na 1k6). Životy, únavu a{' '}
+              <strong>postih</strong> upravíš přímo na mapě — postih se sám odečítá od
+              každého hodu. Delší části povolání (kouzla, finty, formule, démony…) si
+              otevřeš tlačítkem „📖" jen k nahlédnutí.
+            </p>
           </MapFeature>
           <MapFeature icon={<Dices size={15} />} title="Hod kostkou">
             <p>
               Tlačítko 🎲 otevře výběr kostky (stejné skiny jako v chatu) — vlastní hod
-              nebo hod schopnosti/iniciativy ze statbaru. Kostky přiletí na plochu (3D)
-              a zapíšou se do logu. Viditelnost hodů řídí Nastavení světa.
+              nebo hod schopnosti/iniciativy ze statbaru. Nabídka = jen kostky, které
+              PJ světu povolil, včetně speciálních <strong>k6+</strong> (nafukovací,
+              Dračí Doupě 1.6) a <strong>2k6+</strong> (otevřený hod, Dračí Doupě Plus —
+              viz FAQ). Kostky přiletí na plochu (3D) a zapíšou se do logu. Viditelnost
+              hodů řídí Nastavení světa.
             </p>
           </MapFeature>
           <MapFeature icon={<Crosshair size={15} />} title="Ping (zaměřovač)">

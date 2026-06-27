@@ -16,6 +16,7 @@ import { DndCombatPanel } from './system-panels/DndCombatPanel';
 import { CocCombatPanel } from './system-panels/CocCombatPanel';
 import { Drd2CombatPanel } from './system-panels/Drd2CombatPanel';
 import { Drd16CombatPanel } from './system-panels/Drd16CombatPanel';
+import { DrdPlusCombatPanel } from './system-panels/DrdPlusCombatPanel';
 import { FateCombatPanel } from './system-panels/FateCombatPanel';
 import { GurpsCombatPanel } from './system-panels/GurpsCombatPanel';
 
@@ -36,6 +37,7 @@ export const COMBAT_PANELS: Record<string, ComponentType<CombatPanelProps>> = {
   coc: CocCombatPanel,
   drd2: Drd2CombatPanel,
   drd16: Drd16CombatPanel,
+  drdplus: DrdPlusCombatPanel,
   fate: FateCombatPanel,
   gurps: GurpsCombatPanel,
 };

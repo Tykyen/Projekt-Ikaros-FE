@@ -56,7 +56,7 @@ export function DrdPlusSheet({ diary, mode, onChange, onRoll }: SystemSheetProps
 
   return (
     <div className={'dp-sheet' + (disabled ? ' is-view' : '')} data-prof={prof}>
-      {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}
+      {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="2d6+" />}
 
       <header className="dp-head">
         <div className="dp-eyebrow">Dračí doupě Plus</div>

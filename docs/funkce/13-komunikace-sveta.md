@@ -82,6 +82,17 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - **Stav:** ✅
 - **Kód:** `chat.service.ts:263-307`, `:1502-1554`.
 
+### Hod kostkou — manuální picker (6.3)
+- **Co to je:** tlačítko 🎲 v composeru konverzace (i v pravém docku taktické mapy) otevře popover „Hod kostkou" — rychlá volba kostky, hod → 3D overlay + zpráva do konverzace / log na mapě.
+- **Kde:** FE `chat/dice/components/DicePickerPopover.tsx` (sdílený chat i mapa); roll engine `chat/dice/lib/rollEngine.ts`, payload `dicePayload.ts`, katalog `worldDiceCatalog.ts`.
+- **Kdo:** každý člen, který vidí konverzaci, smí házet. Picker nabízí **jen kostky z whitelistu `World.dice`** (nastaví PJ při zakládání/editaci světa); prázdný whitelist → hráč vidí „PJ nedovolil kostky", PJ má CTA do nastavení.
+- **Co jde dělat:** klik na dlaždici typu → okamžitý hod (volitelný popis + modifikátor v „Možnosti"); Pool… / Mixed… pro vícekostkové hody; vlastní skin/materiál kostek per-typ (`useDiceSkinMapping`).
+- **Typy kostek (roll engine):** `fate` (4dF), `d4/d6/d8/d10/d12/d20`, `d100`, **`d6+`** (nafukovací k6 — exploding, sčítá hozené hodnoty), **`2d6+`** (otevřený 2k6 DrD+ — dvojice 2×6 → +1 a dál, 2×1 → −1 a dál, jinak prostý součet; výsledek i záporný), `pool-dN`, `mixed`. `d6+`/`2d6+` mají vlastní primitivy (`rollExplodingD6`/`rollExploding2d6`), které `rollGenericDice` dispatchne (jinak by `+` spadl na default k20).
+- **Hranice / co neumí:** picker zobrazí jen typy z `World.dice` přeložené přes `KEY_ALIASES`+`DICE_CATALOG` (neznámé tiše vyfiltruje). `2d6`/`3d6` = statický součet → mapují se na bázovou `d6` dlaždici (ne samostatné chips); `d6+`/`2d6+` JSOU samostatné chips s vlastní mechanikou. Viditelnost hodů řídí `World.diceVisibility`.
+- **Zvláštnosti:** sdílené jádro chat ↔ mapa (DiceBox3D lazy chunk). Hod je závazný výsledek z FE → 3D kostka dopadne na hodnotu (`payloadToNotation`, `@` syntax). Dice log rozepíše kaskádu; pro `2d6+` rozpis = „základ páru ± eskalace" (NE součet tváří — ten by lhal, eskalace je ±1 za pokračovací kostku). `getSkin('d6+'/'2d6+')` → default materiál (fallback, žádná nová skin rodina).
+- **Stav:** ✅
+- **Kód:** FE `chat/dice/components/DicePickerPopover.tsx`, `chat/dice/lib/{rollEngine,dicePayload,diceNotation,worldDiceCatalog}.ts`; mapa `tactical-map/components/dice/DiceLogPanel.tsx`, `hooks/useMapDiceRoll.ts`, `utils/rollFromSheet.ts`.
+
 ### Deník v chatu — kontextový rail (16.1)
 - **Co to je:** pravý panel chatu je kontextový. **Hráč** v něm má svůj deník postavy; **PJ** má Přítomní + jedno pole hledání (NPC + bestie) + klik na člena → načte jeho deník. Z deníku/statbloku jde **klikací hod schopnosti přímo do aktivní konverzace** (3D overlay → zpráva).
 - **Kde:** FE `chat/components/rail/` — `ChatContextRail.tsx` (orchestrátor), `DiaryRollPanel.tsx` (deník PC/NPC = **stejný per-systém combat panel jako taktická mapa**, registr `tactical-map/.../combatPanels.ts` → `MatrixCombatPanel`…; systémy bez panelu fallback `DiaryTab`), `BestieRollPanel.tsx` (statblok bestie z katalogu), `RailEntitySearch.tsx` (hledání NPC+bestie), `useChatDiaryRoll.ts` (most hodu), `dice/lib/rollFromDiary.ts` (roll engine). Tlačítko railu v hlavičce `ChannelView` (PJ ikona Přítomní + presence badge, hráč ikona „Můj deník").

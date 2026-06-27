@@ -1,7 +1,10 @@
 # Spec 16.2 — `2d6+` (otevřený / eskalující hod DrD+) + katalog & preset `d6+`/`2d6+`
 
-**Status:** ✅ **SPEC SCHVÁLEN 2026-06-26** (PJ) — glyf `2d6+` = varianta A (`2k6﹢`). Manuální
-picker IN scope pro obě kostky. → impl. plán → *potvrzení* → kód.
+**Status:** ✅ **HOTOVO 2026-06-27** — spec schválen (glyf A, ASCII `+` kvůli Iceland fallbacku),
+impl. plán potvrzen, kód napsán. Ověřeno: `npm run build` (tsc -b) ✓, vitest (rollEngine vč. 6
+nových `rollExploding2d6` testů + regrese dice/drd16 = 98 ✓), eslint 0, HelpPage 25 ✓, mobil-desktop
+(CSS analýza dlaždic) ✓. Manuální picker IN scope pro obě kostky. `funkce` + `napoveda` aktualizovány.
+**Zbývá (mimo tento spec):** TM combat panel pro DrD+ („pak v TM") si zavolá `kind:'2d6+'`.
 **Rozsah:** **FE only.** Nová roll-engine primitiva `rollExploding2d6` + zařazení `d6+` a `2d6+`
 do katalogu zakládání světa (`DICE`) a do presetů systémů (`drd16`, `drd-plus`). **Bez BE**
 (payload zůstává generický volný objekt, žádná migrace `World.dice`).
@@ -96,9 +99,10 @@ Dlaždice v pickeru jsou kruhové (glyf ve fontu Iceland + malý `label`). Návr
 | key | `label` | `glyph` | `glyphSize` |
 |---|---|---|---|
 | `d6+` | `k6+` | `6+` | `md` |
-| `2d6+` | `2k6+` | `2k6﹢` *(nebo `⚅⚅`)* | `sm` |
+| `2d6+` | `2k6+` | `2k6+` | `sm` |
 
-> Glyf `2d6+` je dlouhý — finální podoba k odsouhlasení (viz otevřená otázka). `d6` zůstává
+> Varianta A schválena. Glyf v **ASCII `+`** (ne small-plus U+FE62) — font Iceland
+> small-plus nemá a spadl by na fallback. „Malost" řeší `glyphSize: sm`. `d6` zůstává
 > glyf `6`, takže `6+` ho čitelně odliší.
 
 ## 5. Presety — cílový stav

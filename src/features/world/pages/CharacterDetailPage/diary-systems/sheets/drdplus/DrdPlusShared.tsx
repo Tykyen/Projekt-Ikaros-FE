@@ -136,6 +136,20 @@ export function WoundGrid({
           </div>
         </div>
       ))}
+      {/* 16.2d-mapa — postih za toto pásmo (číslo, odečítá se od hodů; sdíleno s TM panelem) */}
+      <div className="dp-wctl" style={{ marginTop: 8 }}>
+        <label>Postih</label>
+        <input
+          type="number"
+          value={cda.g(`${prefix}_postih`, '0')}
+          disabled={disabled}
+          aria-label={`Postih (${label})`}
+          onChange={(e) =>
+            cda.set(`${prefix}_postih`, parseInt(e.target.value, 10) || 0)
+          }
+        />
+        <span className="dp-tau">odečítá se od hodů (i na taktické mapě)</span>
+      </div>
     </div>
   );
 }
