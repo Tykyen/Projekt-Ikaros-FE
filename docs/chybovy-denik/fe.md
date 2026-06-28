@@ -4,6 +4,14 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 16.2e bestie DrD2 statblok + schéma + bestiář · 2026-06-28
+**Co nakonec zabralo:** `Drd2BestiePanel` + `Drd2BestieCombatActions` (sdílené jádro mapa↔chat, vzor DrdPlus) dle prototypu (`c:/tmp/drd2-bestie-audit.html`). Model: **Sudba = HP (damageable)**, Hranice T/D/V reference (nehází), **Charakteristiky klik = 2k6 + úroveň**, ZS poznámky, inline edit. Schéma `drd2/bestie.json` rozšířeno (sudba damageable + charakteristiky/ZS list) → bestiář editor (generic `EntitySchemaForm`) + spawn HP automaticky.
+**Proč to je správně (a ne další variace):** (1) Sudba má `combatBehavior:'damageable'` v bestie.json → `buildBestieToken` čte klíč `sudba` (schema-aware, ne hardcoded `health.max`) → token currentHp/maxHp. (2) **Edit `token.systemStats` jde přes BE strict validaci proti `drd2:token` → MUSEL jsem rozšířit i `drd2/token.json`** o sudba/telo/duse/vliv/charakteristiky/zvlastni_schopnosti (jinak `sanitize` dropne / BE 400 — rodina CH drd16 „nutné <system>:token schéma"). (3) `export-schemas` → 21 schémat do `backend/assets/schemas` → BE restart nutný.
+**Jak ověřeno:** `npm run build` + 6 testů (`performSheetRoll` reálný, registr v beforeEach) + eslint + export-schemas OK. Vizuál + BE restart čeká.
+**Zhodnocení:** Zabralo napoprvé, prototyp=kontrakt (pošesté), 0 cyklení. **Past pro budoucí systémy:** per-system bestie = rozšířit OBĚ schémata (`bestie` pro editor/spawn I `token` kvůli BE strict validaci editu na mapě); damageable key v bestie.json řídí HP přes buildBestieToken automaticky.
+
+---
+
 ### ✅ ŘEŠENÍ — 16.2e mapa DrD2 combat panel + embedy dicelog readout obal · 2026-06-28
 **Co nakonec zabralo:** `Drd2CombatPanel` (+`.module.css`) přepsán z generického Matrix portu na fantasy pergamen dle prototypu (`c:/tmp/drd2-mapa-audit.html`), vzor `DrdPlusCombatPanel` (debounced `useUpdateCharacterDiary`, `canEdit` gate). Single source s deníkem (`makeCdAccess('drd2_')`). Povolání = klik na celý řádek → `2d6+` + úroveň; iniciativa `2d6+` bez mod. Vždy viditelné: zdroje/Ohrožení-Výhoda/stavy/povolání; rozevírací: zbraně+ZS read-only, pomocníci+rituály edit.
 **Proč to je správně (a ne další variace):** (1) Starý panel četl ZASTARALÁ pole (`comp_*`, `master_abilities`, `race_ability`) → nový čte NOVÝ model deníku (companions/rituals/special_abilities) = single source neporušen. (2) Embed callsite (`DiceLogPanel`/`DiceRollOverlay.module.css`) je PLNĚ tokenizovaný na `--dd-embed-*` → stačilo přidat `drd2` do `:is([drd16],[drdplus])` + definovat drd2 `--dd-embed-*` SVĚTLÉ (pergamen) v `diary-skins.css` (global bundle, ne lazy — past CH-027/028) + per-skin signature. (3) Povolání řádek = `div role=button` (ne `<button>`), protože uvnitř jsou pip-buttony (button-in-button = nevalidní HTML); pipy `stopPropagation`.

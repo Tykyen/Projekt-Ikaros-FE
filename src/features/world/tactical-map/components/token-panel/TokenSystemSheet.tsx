@@ -32,6 +32,7 @@ import { BestiePanelView } from "./BestiePanelView";
 import { MatrixBestiePanel } from "./system-panels/MatrixBestiePanel";
 import { Drd16BestiePanel } from "./system-panels/Drd16BestiePanel";
 import { DrdPlusBestiePanel } from "./system-panels/DrdPlusBestiePanel";
+import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import styles from "./TokenSystemSheet.module.css";
@@ -118,6 +119,22 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="drdplus"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // 16.2e Fáze 2 — drd2 bestie: fantasy pergamen statblok (Sudba HP,
+    // Hranice reference, Charakteristiky klik=2k6+úroveň, ZS poznámky).
+    if (systemId === "drd2") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <Drd2BestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="drd2"
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

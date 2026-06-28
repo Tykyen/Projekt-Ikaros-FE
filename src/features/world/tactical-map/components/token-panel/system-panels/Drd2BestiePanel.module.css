@@ -1,0 +1,384 @@
+/**
+ * 16.2e — Drd2BestiePanel CSS (fantasy pergamen, sladěné s Drd2CombatPanel).
+ * Scoping: CSS Module — třídy lokální.
+ */
+
+.root {
+  --parch-1: #efe5cd;
+  --parch-2: #e3d5b4;
+  --parch-edge: #c5b083;
+  --ink: #241a10;
+  --ink-soft: #5a4632;
+  --rule: rgba(70, 52, 32, 0.28);
+  --body: #8a2a1e;
+  --soul: #385a86;
+  --infl: #9a7515;
+  --blood: #7c2317;
+  --emer: #2f6b41;
+  --seal: #7a2418;
+  --gold: #9a7515;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  color: var(--ink);
+  font-family: 'EB Garamond', 'Georgia', serif;
+  background:
+    radial-gradient(70% 50% at 20% 6%, rgba(255, 250, 235, 0.5), transparent 60%),
+    linear-gradient(135deg, var(--parch-1), var(--parch-2));
+  border-radius: 5px;
+  border: 1px solid var(--parch-edge);
+}
+.editing {
+  box-shadow: inset 0 0 0 2px rgba(122, 36, 24, 0.35);
+}
+.modeTag {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #f4e3c9;
+  background: var(--seal);
+  border-radius: 4px;
+  padding: 5px 8px;
+  text-align: center;
+}
+.nameEdit {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink);
+  background: rgba(255, 252, 244, 0.6);
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.initBtn,
+.editFull {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 6px 9px;
+}
+.initBtn {
+  align-self: flex-start;
+  background: rgba(122, 36, 24, 0.12);
+  border: 1px solid rgba(122, 36, 24, 0.4);
+  color: var(--seal);
+}
+.initBtn:hover {
+  background: rgba(122, 36, 24, 0.2);
+}
+.editFull {
+  background: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  border: 1px solid #6a5009;
+  color: #3a2812;
+  font-weight: 700;
+}
+.editFull:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.editFull:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Sudba = HP */
+.sudba {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--parch-edge);
+  border-radius: 5px;
+  background: rgba(255, 250, 238, 0.45);
+  padding: 10px 12px;
+  margin: 4px 0 6px;
+}
+.sudbaLbl {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.sudbaEdit {
+  margin-left: auto;
+  width: 70px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--seal);
+  background: rgba(255, 252, 244, 0.7);
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  padding: 2px;
+}
+.hpBar {
+  position: relative;
+  flex: 1;
+  height: 24px;
+  border-radius: 4px;
+  border: 1.5px solid #5e1c14;
+  background: rgba(255, 252, 244, 0.4);
+  overflow: hidden;
+}
+.hpFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #b5392b, var(--blood));
+  transition: width 0.2s;
+}
+.hpTxt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.steps {
+  display: flex;
+  gap: 4px;
+}
+.steps button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid #4a140c;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #f4e3c9;
+  background: radial-gradient(circle at 35% 30%, #9a3022, var(--seal));
+}
+.steps button:hover {
+  filter: brightness(1.12);
+}
+
+/* section title */
+.stitle {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+.stitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--ink), transparent);
+}
+.stitle small {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-soft);
+}
+.hint {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: 0 0 6px;
+}
+
+/* Hranice */
+.hran {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.hcell {
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.42);
+  padding: 7px 6px;
+  text-align: center;
+}
+.hl {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+.body .hl {
+  color: var(--body);
+}
+.soul .hl {
+  color: var(--soul);
+}
+.infl .hl {
+  color: var(--infl);
+}
+.hv {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--ink);
+}
+.hin {
+  width: 100%;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+  background: rgba(255, 252, 244, 0.7);
+  border: 1px solid var(--parch-edge);
+  border-radius: 3px;
+  padding: 1px;
+}
+
+/* Charakteristiky */
+.char {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.42);
+  padding: 7px 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.char:hover:not(:disabled) {
+  border-color: var(--seal);
+  box-shadow: 0 1px 9px rgba(122, 36, 24, 0.14);
+}
+.char:disabled {
+  cursor: default;
+}
+.charName {
+  flex: 1;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+}
+.charLvl {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 14px;
+  color: #fff7e6;
+  background: radial-gradient(circle at 35% 30%, #b5882c, var(--gold));
+  border: 1.5px solid #6a5009;
+}
+.charEdit,
+.zsEdit {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.ed {
+  flex: 1;
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: rgba(255, 252, 244, 0.7);
+  border: 1px solid var(--parch-edge);
+  border-radius: 3px;
+  padding: 5px 7px;
+}
+.ed:focus {
+  outline: none;
+  border-color: var(--seal);
+}
+.edNum {
+  flex: 0 0 56px;
+  text-align: center;
+}
+.edTxt {
+  flex: 1;
+}
+.del {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  color: var(--blood);
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.55;
+  padding: 2px 4px;
+}
+.del:hover {
+  opacity: 1;
+}
+.miniAdd {
+  width: 100%;
+  margin-top: 2px;
+  background: transparent;
+  border: 1px dashed rgba(70, 52, 32, 0.4);
+  border-radius: 3px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 6px;
+  cursor: pointer;
+}
+.miniAdd:hover {
+  background: rgba(122, 36, 24, 0.06);
+  color: var(--seal);
+  border-color: var(--seal);
+}
+
+/* Zvláštní schopnosti */
+.zs {
+  padding: 5px 0;
+  border-bottom: 1px dotted var(--rule);
+}
+.zs:last-of-type {
+  border-bottom: none;
+}
+.zk {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 12px;
+  display: block;
+}
+.zv {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-soft);
+  display: block;
+}
+
+.root :disabled {
+  cursor: default;
+}
