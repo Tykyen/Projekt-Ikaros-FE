@@ -1,89 +1,84 @@
 /**
- * 8.7h — Dračí doupě 2 (DrD II) deník postavy.
+ * 16.2e — Dračí doupě II (DrD II) deník postavy — fantasy pergamenový list.
  *
- * Adaptace z `c:/Matrix/Matrix/frontend/src/components/diary/Drd2CharacterSheet.tsx`.
- * Drd II má kompletní katalog 264 schopností (12 základních povolání × 12 + 10
- * mistrovských × 12) — viz [drd2Abilities.ts](./drd2Abilities.ts). Tento sheet
- * implementuje:
- *   - 3 pilíře (Tělo / Duše / Vliv) s aktuální/max a textovým záznamem jizev
- *   - Mega-boxy (Ohrožení červená / Výhoda smaragdová) — 64px font
- *   - Identita, kategorie, mince, suroviny, XP, pomocník
- *   - Zbraně tabulka
- *   - Profession-cards (basic / advanced / master) s 5-pipovým level trackerem
- *   - ZS tabulka (zvláštní schopnosti) s catalog dropdown z PROFESSION_ABILITIES
- *   - Master ZS tabulka s catalog dropdown z MASTER_ABILITIES
+ * Jeden sloučený list (bez tabů). Předělané z generického HUD (8.7h) na vzhled
+ * věrný papírovému deníku ALTAR, s interaktivními prvky:
+ *   - 3 zdroje (Tělo / Duše / Vliv) — klikací segmentová stupnice 0..max + jizvy
+ *   - Ohrožení / Výhoda — svislá stupnice 1–9
+ *   - Zbraně a zbroje (tabulka, add/remove)
+ *   - Pomocníci (seznam add/remove; každý Pouto 0–11)
+ *   - Rituální předměty (seznam add/remove; každý Náboj 0–5)
+ *   - Zkušenosti (Volné / Celkem)
+ *   - Povolání basic/advanced/master s 5-pip trackerem + odebrání
+ *   - Zvláštní schopnosti — zadávané RUČNĚ (katalog ALTARu je z UI odpojen)
+ *   - Manévry (statická nápověda)
  *
- * Logika unlock grid (auto-detection které pokročilé povolání je dostupné podle
- * basic levels) zachována v `usedLevel` / `advStatus` výpočtech a vizuálně
- * v badge `total-level-display`.
+ * Pozn.: katalog 264 ZS [drd2Abilities.ts](./drd2Abilities.ts) NENÍ importován
+ * (čeká na licenci ALTAR). Seznamy povolání viz [drd2Professions.ts](./drd2Professions.ts).
  */
 import { useState } from 'react';
 import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
-  ADVANCED_PROFESSIONS,
-  BASIC_PROFESSIONS,
-  MASTER_ABILITIES,
-  MASTER_PROFESSIONS,
-  PROFESSION_ABILITIES,
-  type AbilityDef,
-} from './drd2Abilities';
+  ALL_PROF_NAMES,
+  ADVANCED_PROFS,
+  BASIC_PROFS,
+  MASTER_PROFS,
+  type ProfDef,
+} from './drd2Professions';
 
-type Tab = 'stav' | 'schopnosti';
+const MANEUVERS = ['Rychle', 'Přesně', 'Mocně', 'Lstivě', 'Rozsáhle', 'Obrana'];
 
-interface BasicProf {
+interface Weapon {
+  name: string;
+  char: string;
+  note: string;
+}
+interface Companion {
+  char: string;
+  ability: string;
+  bound: string;
+  pay: string;
+  bond: number;
+}
+interface Ritual {
+  name: string;
+  charge: number;
+}
+interface Prof {
   id: string;
   name: string;
   level: number;
   note?: string;
 }
-interface AdvProf extends BasicProf {
-  requires: [string, string];
-}
-interface MasterProf extends BasicProf {
-  requires: string[];
-}
-interface SpecAbility {
+interface Zs {
   name: string;
-  source: string; // profession id
+  source: string;
   type: string;
   description: string;
-  note: string;
 }
-interface MasterAbility {
-  name: string;
-  sourceMaster: string;
-  description: string;
-  isReservedSkill: boolean;
-  note: string;
-}
+
+const num = (s: string, d = 0): number => {
+  const n = parseInt(s, 10);
+  return Number.isNaN(n) ? d : n;
+};
 
 export function Drd2Sheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
   const printMode = usePrintMode();
-  const cd = diary.customData ?? {};
-  const cda = makeCdAccess(cd, 'drd2_', onChange);
+  const cda = makeCdAccess(diary.customData ?? {}, 'drd2_', onChange);
   const { g, set } = cda;
 
-  const [tab, setTab] = useState<Tab>('stav');
-
-  // ── Derived: parsed profession arrays ───────────────────────
-  const basicProfs = cda.parseJsonArr<BasicProf>('basic_professions');
-  const advProfs = cda.parseJsonArr<AdvProf>('advanced_professions');
-  const masterProfs = cda.parseJsonArr<MasterProf>('master_professions');
-  const specAbilities = cda.parseJsonArr<SpecAbility>('special_abilities');
-  const masterAbilities =
-    cda.parseJsonArr<MasterAbility>('master_abilities');
+  const basicProfs = cda.parseJsonArr<Prof>('basic_professions');
+  const advProfs = cda.parseJsonArr<Prof>('advanced_professions');
+  const masterProfs = cda.parseJsonArr<Prof>('master_professions');
 
   const usedLevel =
     basicProfs.reduce((s, p) => s + (p.level || 0), 0) +
     advProfs.reduce((s, p) => s + (p.level || 0), 0) +
     masterProfs.reduce((s, p) => s + (p.level || 0), 0);
 
-  // Tisk: interaktivní inputy/pips/select jsou netisknutelné (hodnota v
-  // `<input value>`, úroveň v barvě pipů). V printMode renderujeme oddělený
-  // statický čitelný dokument se stejnými `drd2_*` daty.
   if (printMode)
     return (
       <Drd2PrintView
@@ -91,597 +86,634 @@ export function Drd2Sheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
         basicProfs={basicProfs}
         advProfs={advProfs}
         masterProfs={masterProfs}
-        specAbilities={specAbilities}
-        masterAbilities={masterAbilities}
         usedLevel={usedLevel}
       />
     );
 
   return (
-    <div className="drd2-dashboard">
-      {/* ═══ HEADER ═══ */}
-      <div className="drd2-header">
-        <div className="identity-block">
-          <label htmlFor="drd2_name">Jméno Postavy</label>
-          <input
-            id="drd2_name"
-            value={g('name')}
-            disabled={disabled}
-            onChange={(e) => set('name', e.target.value)}
-            placeholder="Zadej jméno..."
-          />
+    <div className="drd2-sheet">
+      {/* ═══ HLAVIČKA ═══ */}
+      <header className="drd2-head">
+        <div className="drd2-head__title">
+          <h1>Deník postavy</h1>
+          <span className="sub">Dračí doupě II</span>
         </div>
-        <div className="identity-block">
-          <label htmlFor="drd2_race">Rasa a Kultura</label>
-          <input
-            id="drd2_race"
-            value={g('race')}
-            disabled={disabled}
-            onChange={(e) => set('race', e.target.value)}
-          />
-        </div>
-        <div className="identity-block" style={{ maxWidth: 180 }}>
-          <label>Úroveň (Využitá / Celková)</label>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <div
-              className="total-level-display"
-              style={{ fontSize: 18, padding: '0 8px' }}
-              aria-label="Využitá úroveň"
-            >
-              {usedLevel}
-            </div>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
+        <div className="drd2-head__fields">
+          <div className="field">
+            <label htmlFor="drd2_name">Jméno</label>
             <input
-              style={{
-                width: 60,
-                textAlign: 'center',
-                fontSize: 18,
-                fontWeight: 'bold',
-              }}
-              value={g('total_level')}
+              id="drd2_name"
+              className="hw"
+              value={g('name')}
               disabled={disabled}
-              onChange={(e) => set('total_level', e.target.value)}
-              placeholder={String(usedLevel)}
-              aria-label="Celková úroveň"
+              onChange={(e) => set('name', e.target.value)}
+              placeholder="zadej jméno…"
             />
           </div>
+          <div className="field">
+            <label htmlFor="drd2_race">Rasa (kultura)</label>
+            <input
+              id="drd2_race"
+              className="hw"
+              value={g('race')}
+              disabled={disabled}
+              onChange={(e) => set('race', e.target.value)}
+            />
+          </div>
+          <div className="field field--lvl">
+            <label>Úroveň · využitá / celková</label>
+            <div className="drd2-lvl">
+              <span className="used" aria-label="Využitá úroveň">
+                {usedLevel}
+              </span>
+              <span className="slash">/</span>
+              <input
+                className="hw"
+                value={g('total_level')}
+                disabled={disabled}
+                onChange={(e) => set('total_level', e.target.value)}
+                placeholder={String(usedLevel)}
+                aria-label="Celková úroveň"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="drd2-crest" aria-hidden>
+          <div className="dd">DRAČÍ DOUPĚ</div>
+          <div className="two">II</div>
+        </div>
+      </header>
+
+      {/* ═══ POSTAVA & STAV ═══ */}
+      <div className="drd2-divider">
+        <span>Postava &amp; stav</span>
+      </div>
+      <div className="drd2-grid">
+        {/* Zdroje */}
+        <section className="drd2-card col-4">
+          <h3 className="legend">
+            <span className="glyph">❖</span>Zdroje a jizvy
+          </h3>
+          <SegTrack
+            label="Tělo"
+            curKey="body"
+            maxKey="body_max"
+            scarKey="body_scars"
+            variant="body"
+            cda={cda}
+            disabled={disabled}
+            onRoll={onRoll}
+          />
+          <SegTrack
+            label="Duše"
+            curKey="soul"
+            maxKey="soul_max"
+            scarKey="soul_scars"
+            variant="soul"
+            cda={cda}
+            disabled={disabled}
+            onRoll={onRoll}
+          />
+          <SegTrack
+            label="Vliv"
+            curKey="influence"
+            maxKey="influence_max"
+            scarKey="influence_scars"
+            variant="infl"
+            cda={cda}
+            disabled={disabled}
+            onRoll={onRoll}
+          />
+        </section>
+
+        {/* Boj */}
+        <section className="drd2-card col-8">
+          <h3 className="legend">
+            <span className="glyph">⚔</span>Bojový stav
+            {onRoll && (
+              <button
+                type="button"
+                className="drd2-init"
+                onClick={() =>
+                  onRoll({
+                    label: 'Iniciativa',
+                    modifier: 0,
+                    kind: 'd20',
+                    initiative: true,
+                  })
+                }
+                title="Hodit iniciativu (d20)"
+              >
+                ⚡ Iniciativa
+              </button>
+            )}
+          </h3>
+          <div className="drd2-combat">
+            <Gauge label="Ohrožení" valKey="threat" variant="threat" cda={cda} disabled={disabled} />
+            <div className="drd2-combat__mid">
+              <label htmlFor="drd2_state">Stavy a efekty</label>
+              <textarea
+                id="drd2_state"
+                className="drd2-textarea"
+                value={g('state_effects')}
+                disabled={disabled}
+                onChange={(e) => set('state_effects', e.target.value)}
+                placeholder="otrávení, probíhající kouzla, postižení…"
+              />
+              <p className="hint">
+                Ohrožení &amp; Výhoda určují náklon boje — klikni na stupínek.
+              </p>
+            </div>
+            <Gauge label="Výhoda" valKey="advantage" variant="adv" cda={cda} disabled={disabled} />
+          </div>
+
+          <h3 className="legend" style={{ marginTop: 18 }}>
+            <span className="glyph">⚔</span>Zbraně a zbroje
+          </h3>
+          <WeaponsTable cda={cda} disabled={disabled} />
+        </section>
+
+        {/* Pomocníci */}
+        <section className="drd2-card col-7">
+          <h3 className="legend">
+            <span className="glyph">❖</span>Pomocníci
+          </h3>
+          <CompanionList cda={cda} disabled={disabled} />
+        </section>
+
+        {/* Rituály + Zkušenosti */}
+        <div className="col-5 drd2-stack">
+          <section className="drd2-card">
+            <h3 className="legend">
+              <span className="glyph">✦</span>Rituální předměty{' '}
+              <em className="legend__sub">(zaříkávač)</em>
+            </h3>
+            <RitualList cda={cda} disabled={disabled} />
+          </section>
+          <section className="drd2-card">
+            <h3 className="legend">
+              <span className="glyph">❖</span>Zkušenosti
+            </h3>
+            <div className="drd2-coins">
+              <label className="coin">
+                <span>Volné XP</span>
+                <input
+                  value={g('xp_unused')}
+                  disabled={disabled}
+                  onChange={(e) => set('xp_unused', e.target.value)}
+                  aria-label="Volné XP"
+                />
+              </label>
+              <label className="coin">
+                <span>XP celkem</span>
+                <input
+                  value={g('xp_total')}
+                  disabled={disabled}
+                  onChange={(e) => set('xp_total', e.target.value)}
+                  aria-label="XP celkem"
+                />
+              </label>
+            </div>
+          </section>
         </div>
       </div>
 
-      {/* ═══ TABS ═══ */}
-      <div className="drd2-tabs">
-        <button
-          type="button"
-          className={tab === 'stav' ? 'active' : ''}
-          onClick={() => setTab('stav')}
-        >
-          1. Postava a Stav
-        </button>
-        <button
-          type="button"
-          className={tab === 'schopnosti' ? 'active' : ''}
-          onClick={() => setTab('schopnosti')}
-        >
-          2. Profese a Schopnosti
-        </button>
-        {/* 10.2c-edit-9g — quick init roll (jen tactical-map embed) */}
+      {/* ═══ PROFESE & SCHOPNOSTI ═══ */}
+      <div className="drd2-divider">
+        <span>Profese &amp; schopnosti</span>
+      </div>
+      <div className="drd2-profgrid">
+        <section className="drd2-card">
+          <h3 className="legend">
+            <span className="glyph">❖</span>Základní povolání{' '}
+            <em className="legend__sub">(úroveň 0–5)</em>
+          </h3>
+          <ProfList
+            arrKey="basic_professions"
+            rows={basicProfs}
+            catalog={BASIC_PROFS}
+            cda={cda}
+            disabled={disabled}
+          />
+        </section>
+
+        <section className="drd2-card">
+          <h3 className="legend">
+            <span className="glyph">⚜</span>Pokročilá povolání
+          </h3>
+          <p className="hint">
+            Otevře se při součtu ≥ 6 úrovní ve dvou základech (každý min. 1).
+          </p>
+          <ProfList
+            arrKey="advanced_professions"
+            rows={advProfs}
+            catalog={ADVANCED_PROFS}
+            cda={cda}
+            disabled={disabled}
+          />
+        </section>
+
+        <section className="drd2-card">
+          <h3 className="legend">
+            <span className="glyph">♛</span>Mistrovská povolání
+          </h3>
+          <p className="hint">
+            Otevře se při součtu ≥ 6 úrovní v podmiňujících pokročilých povoláních.
+          </p>
+          <ProfList
+            arrKey="master_professions"
+            rows={masterProfs}
+            catalog={MASTER_PROFS}
+            cda={cda}
+            disabled={disabled}
+          />
+        </section>
+
+        <section className="drd2-card">
+          <h3 className="legend">
+            <span className="glyph">✦</span>Zvláštní schopnosti (ZS)
+          </h3>
+          <p className="hint">
+            Schopnosti zadej ručně — název, povolání, typ a popis.
+          </p>
+          <ZsList cda={cda} disabled={disabled} />
+        </section>
+
+        <section className="drd2-card">
+          <h3 className="legend">
+            <span className="glyph">⚔</span>Manévry{' '}
+            <em className="legend__sub">(nápověda)</em>
+          </h3>
+          <div className="drd2-maneuvers">
+            {MANEUVERS.map((m) => (
+              <span className="man" key={m}>
+                {m}
+              </span>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <SwordOrnament />
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// Segmentová stupnice zdroje (Tělo / Duše / Vliv)
+// ════════════════════════════════════════════════════════════════
+
+interface SegTrackProps {
+  label: string;
+  curKey: string;
+  maxKey: string;
+  scarKey: string;
+  variant: 'body' | 'soul' | 'infl';
+  cda: CdAccess;
+  disabled: boolean;
+  onRoll?: SystemSheetProps['onRoll'];
+}
+
+function SegTrack({
+  label,
+  curKey,
+  maxKey,
+  scarKey,
+  variant,
+  cda,
+  disabled,
+  onRoll,
+}: SegTrackProps) {
+  const { g, set } = cda;
+  const max = Math.max(1, Math.min(20, num(g(maxKey, '10'), 10)));
+  const cur = Math.max(0, Math.min(max, num(g(curKey, '0'), 0)));
+
+  return (
+    <div className={`drd2-pillar ${variant}`}>
+      <div className="drd2-pillar__top">
+        <span className="name">{label}</span>
+        <span className="val">
+          <b>{cur}</b> /{' '}
+          <input
+            className="maxin"
+            value={g(maxKey, '10')}
+            disabled={disabled}
+            onChange={(e) => set(maxKey, e.target.value)}
+            aria-label={`${label} hranice`}
+          />
+        </span>
         {onRoll && (
           <button
             type="button"
-            onClick={() =>
-              onRoll({ label: 'Iniciativa', modifier: 0, kind: 'd20' })
-            }
-            style={{
-              marginLeft: 'auto',
-              padding: '6px 12px',
-              background: 'rgba(120, 100, 255, 0.22)',
-              color: '#fff',
-              border: '1px solid rgba(120, 100, 255, 0.6)',
-              borderRadius: 5,
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-            title="Hodit iniciativu (d20)"
+            className="drd2-roll"
+            onClick={() => onRoll({ label, modifier: cur, kind: 'd20' })}
+            title={`Hodit ${label} (d20 + ${cur})`}
+            aria-label={`Hodit ${label}`}
           >
-            ⚡ Iniciativa
+            🎲
           </button>
         )}
       </div>
+      <div className="drd2-track" role="group" aria-label={`${label} stav`}>
+        {Array.from({ length: max }, (_, i) => i + 1).map((i) => (
+          <button
+            type="button"
+            key={i}
+            className={`seg ${i <= cur ? 'on' : ''}`}
+            disabled={disabled}
+            onClick={() => set(curKey, String(cur === i ? i - 1 : i))}
+            aria-label={`${label} ${i}`}
+            aria-pressed={i <= cur}
+          />
+        ))}
+      </div>
+      <input
+        className="drd2-scar"
+        value={g(scarKey)}
+        disabled={disabled}
+        onChange={(e) => set(scarKey, e.target.value)}
+        placeholder={`jizvy — ${label.toLowerCase()}…`}
+        aria-label={`${label} jizvy`}
+      />
+    </div>
+  );
+}
 
-      {/* ═══ STAV TAB ═══ */}
-      {tab === 'stav' && <StavTab cda={cda} disabled={disabled} onRoll={onRoll} />}
+// ════════════════════════════════════════════════════════════════
+// Stupnice Ohrožení / Výhoda (1–9)
+// ════════════════════════════════════════════════════════════════
 
-      {/* ═══ SCHOPNOSTI TAB ═══ */}
-      {tab === 'schopnosti' && (
-        <SchopnostiTab
-          cda={cda}
-          disabled={disabled}
-          basicProfs={basicProfs}
-          advProfs={advProfs}
-          masterProfs={masterProfs}
-          specAbilities={specAbilities}
-          masterAbilities={masterAbilities}
-        />
+interface GaugeProps {
+  label: string;
+  valKey: string;
+  variant: 'threat' | 'adv';
+  cda: CdAccess;
+  disabled: boolean;
+}
+
+function Gauge({ label, valKey, variant, cda, disabled }: GaugeProps) {
+  const { g, set } = cda;
+  const cur = Math.max(0, Math.min(9, num(g(valKey, '0'), 0)));
+  return (
+    <div className={`drd2-gauge ${variant}`}>
+      <h4>{label}</h4>
+      <div className="big" aria-label={label}>
+        {cur}
+      </div>
+      <div className="ladder" role="group" aria-label={`${label} stupnice`}>
+        {[9, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => (
+          <button
+            type="button"
+            key={i}
+            className={`rung ${i <= cur ? 'on' : ''}`}
+            disabled={disabled}
+            onClick={() => set(valKey, String(cur === i ? i - 1 : i))}
+            aria-label={`${label} ${i}`}
+            aria-pressed={i <= cur}
+          >
+            {i}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// Zbraně a zbroje
+// ════════════════════════════════════════════════════════════════
+
+function WeaponsTable({ cda, disabled }: { cda: CdAccess; disabled: boolean }) {
+  const rows = cda.parseJsonArr<Weapon>('weapons');
+  return (
+    <div className="drd2-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Předmět</th>
+            <th>Charakteristika</th>
+            <th>Poznámka / modifikátory</th>
+            <th aria-hidden />
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {(['name', 'char', 'note'] as const).map((f) => (
+                <td key={f}>
+                  <input
+                    className="line"
+                    value={row[f] || ''}
+                    disabled={disabled}
+                    onChange={(e) =>
+                      cda.updateArr<Weapon>('weapons', i, { [f]: e.target.value })
+                    }
+                    aria-label={`Zbraň ${i + 1} ${f}`}
+                  />
+                </td>
+              ))}
+              <td>
+                {!disabled && (
+                  <button
+                    type="button"
+                    className="drd2-del"
+                    onClick={() => cda.removeArr('weapons', i)}
+                    aria-label="Smazat zbraň"
+                  >
+                    ✕
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!disabled && (
+        <button
+          type="button"
+          className="drd2-addrow"
+          onClick={() =>
+            cda.addArr<Weapon>('weapons', { name: '', char: '', note: '' })
+          }
+        >
+          + přidat zbraň / zbroj
+        </button>
       )}
     </div>
   );
 }
 
 // ════════════════════════════════════════════════════════════════
-// Tab: Stav
+// Pomocníci (seznam)
 // ════════════════════════════════════════════════════════════════
 
-interface SubProps {
-  cda: CdAccess;
-  disabled: boolean;
-}
-
-interface StavTabProps extends SubProps {
-  onRoll?: SystemSheetProps['onRoll'];
-}
-
-function StavTab({ cda, disabled, onRoll }: StavTabProps) {
-  const { g, set, parseJsonArr, updateArr, addArr, removeArr } = cda;
-  const weapons = parseJsonArr<Record<string, string>>('weapons');
-
+function CompanionList({ cda, disabled }: { cda: CdAccess; disabled: boolean }) {
+  const rows = cda.parseJsonArr<Companion>('companions');
   return (
-    <div className="drd2-tab-content drd2-grid">
-      {/* LEVÝ panel-4: 3 pilíře */}
-      <div className="panel-4">
-        <h3>Zdroje a Jizvy</h3>
-        <ResourceCard
-          name="Tělo"
-          curKey="body"
-          maxKey="body_max"
-          scarsKey="body_scars"
-          scarsPlaceholder="Zapiš jizvy na těle..."
-          cda={cda}
-          disabled={disabled}
-          onRoll={onRoll}
-        />
-        <ResourceCard
-          name="Duše"
-          curKey="soul"
-          maxKey="soul_max"
-          scarsKey="soul_scars"
-          scarsPlaceholder="Zapiš jizvy na duši..."
-          cda={cda}
-          disabled={disabled}
-          onRoll={onRoll}
-        />
-        <ResourceCard
-          name="Vliv"
-          curKey="influence"
-          maxKey="influence_max"
-          scarsKey="influence_scars"
-          scarsPlaceholder="Zapiš jizvy ve vlivu..."
-          cda={cda}
-          disabled={disabled}
-          onRoll={onRoll}
-        />
-      </div>
-
-      {/* PRAVÝ panel-8: Combat + Identity + Pomocník + Ekonomika */}
-      <div className="panel-8">
-        <h3>Bojový stav</h3>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 16,
-            marginBottom: 16,
-          }}
-        >
-          <div className="mega-box danger">
-            <h4>Ohrožení</h4>
-            <input
-              value={g('threat')}
-              disabled={disabled}
-              onChange={(e) => set('threat', e.target.value)}
-              placeholder="0"
-              aria-label="Ohrožení"
-            />
-          </div>
-          <div className="mega-box advantage">
-            <h4>Výhoda</h4>
-            <input
-              value={g('advantage')}
-              disabled={disabled}
-              onChange={(e) => set('advantage', e.target.value)}
-              placeholder="0"
-              aria-label="Výhoda"
-            />
-          </div>
-        </div>
-        <div style={{ marginBottom: 24 }}>
-          <h3>Stavy a Efekty</h3>
-          <textarea
-            className="drd2-textarea"
-            value={g('state_effects')}
-            disabled={disabled}
-            onChange={(e) => set('state_effects', e.target.value)}
-            placeholder="Otrávení, probíhající kouzla, stavy..."
-            aria-label="Stavy a efekty"
-          />
-        </div>
-
-        <h3>Zbraně a Zbroje</h3>
-        <div className="drd2-table-container" style={{ marginBottom: 24 }}>
-          <table>
-            <thead>
-              <tr>
-                <th>Předmět</th>
-                <th>Charakteristika</th>
-                <th>Poznámka / Modifikátory</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {weapons.map((row, i) => (
-                <tr key={i}>
-                  {(['name', 'char', 'note'] as const).map((field) => (
-                    <td key={field}>
-                      <input
-                        value={row[field] || ''}
-                        disabled={disabled}
-                        onChange={(e) =>
-                          updateArr<Record<string, string>>('weapons', i, {
-                            [field]: e.target.value,
-                          })
-                        }
-                        aria-label={`Zbraň ${i + 1} ${field}`}
-                      />
-                    </td>
-                  ))}
-                  <td>
-                    {!disabled && (
-                      <button
-                        type="button"
-                        className="del-btn"
-                        onClick={() => removeArr('weapons', i)}
-                        aria-label="Smazat zbraň"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </td>
-                </tr>
+    <>
+      {rows.map((row, i) => {
+        const bond = Math.max(0, Math.min(11, row.bond || 0));
+        return (
+          <div className="drd2-companion" key={i}>
+            {!disabled && (
+              <button
+                type="button"
+                className="drd2-del"
+                onClick={() => cda.removeArr('companions', i)}
+                aria-label="Smazat pomocníka"
+              >
+                ✕
+              </button>
+            )}
+            <div className="drd2-twocol">
+              {(
+                [
+                  ['char', 'Charakter.'],
+                  ['ability', 'Schopnost'],
+                  ['bound', 'Hranice'],
+                  ['pay', 'Platba'],
+                ] as const
+              ).map(([f, lbl]) => (
+                <div className="fieldrow" key={f}>
+                  <label>{lbl}</label>
+                  <input
+                    className="line"
+                    value={(row[f] as string) || ''}
+                    disabled={disabled}
+                    onChange={(e) =>
+                      cda.updateArr<Companion>('companions', i, {
+                        [f]: e.target.value,
+                      })
+                    }
+                    aria-label={`Pomocník ${i + 1} ${lbl}`}
+                  />
+                </div>
               ))}
-            </tbody>
-          </table>
-          {!disabled && (
-            <button
-              type="button"
-              className="add-row-btn"
-              onClick={() =>
-                addArr<Record<string, string>>('weapons', {
-                  name: '',
-                  char: '',
-                  note: '',
-                })
-              }
-            >
-              + Přidat zbraň / zbroj
-            </button>
-          )}
-        </div>
-
-        <h3>Identita a Pomocník</h3>
-        <div
-          className="stats-grid"
-          style={{
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            marginBottom: 16,
-          }}
+            </div>
+            <div className="drd2-bond">
+              <label>Pouto</label>
+              <div className="drd2-pips" role="group" aria-label={`Pomocník ${i + 1} pouto`}>
+                {Array.from({ length: 11 }, (_, k) => k + 1).map((k) => (
+                  <button
+                    type="button"
+                    key={k}
+                    className={`pip-sq ${k <= bond ? 'on' : ''}`}
+                    disabled={disabled}
+                    onClick={() =>
+                      cda.updateArr<Companion>('companions', i, {
+                        bond: bond === k ? k - 1 : k,
+                      })
+                    }
+                    aria-label={`Pouto ${k}`}
+                    aria-pressed={k <= bond}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {!disabled && (
+        <button
+          type="button"
+          className="drd2-addrow"
+          onClick={() =>
+            cda.addArr<Companion>('companions', {
+              char: '',
+              ability: '',
+              bound: '',
+              pay: '',
+              bond: 0,
+            })
+          }
         >
-          <div className="stat-box" style={{ gridColumn: 'span 2' }}>
-            <label htmlFor="drd2_race_ability">Rasová ZS</label>
-            <input
-              id="drd2_race_ability"
-              value={g('race_ability')}
-              disabled={disabled}
-              onChange={(e) => set('race_ability', e.target.value)}
-            />
-          </div>
-          <div className="stat-box" style={{ gridColumn: 'span 2' }}>
-            <label htmlFor="drd2_personality">Povahový rys</label>
-            <input
-              id="drd2_personality"
-              value={g('personality')}
-              disabled={disabled}
-              onChange={(e) => set('personality', e.target.value)}
-            />
-          </div>
-          <div className="stat-box">
-            <label htmlFor="drd2_comp_char">Pomocník</label>
-            <input
-              id="drd2_comp_char"
-              value={g('comp_char')}
-              disabled={disabled}
-              onChange={(e) => set('comp_char', e.target.value)}
-              placeholder="Jméno / typ"
-            />
-          </div>
-          <div className="stat-box">
-            <label htmlFor="drd2_comp_bond">Pouto</label>
-            <input
-              id="drd2_comp_bond"
-              value={g('comp_bond')}
-              disabled={disabled}
-              onChange={(e) => set('comp_bond', e.target.value)}
-            />
-          </div>
-          <div className="stat-box">
-            <label htmlFor="drd2_comp_pay">Platba</label>
-            <input
-              id="drd2_comp_pay"
-              value={g('comp_pay')}
-              disabled={disabled}
-              onChange={(e) => set('comp_pay', e.target.value)}
-            />
-          </div>
-          <div className="stat-box">
-            <label htmlFor="drd2_comp_bound">Hranice Poutu</label>
-            <input
-              id="drd2_comp_bound"
-              value={g('comp_bound')}
-              disabled={disabled}
-              onChange={(e) => set('comp_bound', e.target.value)}
-            />
-          </div>
-          <div className="stat-box" style={{ gridColumn: 'span 2' }}>
-            <label htmlFor="drd2_comp_spec">Schopnost Pomocníka</label>
-            <input
-              id="drd2_comp_spec"
-              value={g('comp_spec')}
-              disabled={disabled}
-              onChange={(e) => set('comp_spec', e.target.value)}
-            />
-          </div>
-        </div>
-
-        <h3>Ekonomika a Zkušenosti</h3>
-        <div className="stats-grid">
-          <div className="stat-box">
-            <label htmlFor="drd2_coins">Groše</label>
-            <input
-              id="drd2_coins"
-              value={g('coins')}
-              disabled={disabled}
-              onChange={(e) => set('coins', e.target.value)}
-            />
-          </div>
-          <div className="stat-box">
-            <label htmlFor="drd2_materials">Suroviny</label>
-            <input
-              id="drd2_materials"
-              value={g('materials')}
-              disabled={disabled}
-              onChange={(e) => set('materials', e.target.value)}
-            />
-          </div>
-          <div className="stat-box">
-            <label htmlFor="drd2_xp_unused">Volné XP</label>
-            <input
-              id="drd2_xp_unused"
-              value={g('xp_unused')}
-              disabled={disabled}
-              onChange={(e) => set('xp_unused', e.target.value)}
-            />
-          </div>
-          <div className="stat-box">
-            <label htmlFor="drd2_xp_total">Celkem XP</label>
-            <input
-              id="drd2_xp_total"
-              value={g('xp_total')}
-              disabled={disabled}
-              onChange={(e) => set('xp_total', e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+          + přidat pomocníka
+        </button>
+      )}
+    </>
   );
 }
 
-// ── Resource card (Tělo / Duše / Vliv) ──────────────────────────
+// ════════════════════════════════════════════════════════════════
+// Rituální předměty (seznam)
+// ════════════════════════════════════════════════════════════════
 
-interface ResourceCardProps {
-  name: string;
-  curKey: string;
-  maxKey: string;
-  scarsKey: string;
-  scarsPlaceholder: string;
-  cda: CdAccess;
-  disabled: boolean;
-  /** 10.2c-edit-9g — optional roll (jen tactical-map embed). */
-  onRoll?: SystemSheetProps['onRoll'];
-}
-
-function ResourceCard({
-  name,
-  curKey,
-  maxKey,
-  scarsKey,
-  scarsPlaceholder,
-  cda,
-  disabled,
-  onRoll,
-}: ResourceCardProps) {
-  const { g, set } = cda;
-  const curValue = parseInt(g(curKey, '0'), 10) || 0;
+function RitualList({ cda, disabled }: { cda: CdAccess; disabled: boolean }) {
+  const rows = cda.parseJsonArr<Ritual>('rituals');
   return (
-    <div className="resource-card">
-      <div className="r-header">
-        <h4>{name}</h4>
-        <div className="r-inputs">
-          <input
-            value={g(curKey)}
-            disabled={disabled}
-            onChange={(e) => set(curKey, e.target.value)}
-            placeholder="Akt."
-            aria-label={`${name} aktuální`}
-          />
-          <span>/</span>
-          <input
-            value={g(maxKey)}
-            disabled={disabled}
-            onChange={(e) => set(maxKey, e.target.value)}
-            placeholder="Max"
-            aria-label={`${name} maximum`}
-          />
-          {onRoll && (
-            <button
-              type="button"
-              onClick={() =>
-                onRoll({ label: name, modifier: curValue, kind: 'd20' })
+    <>
+      {rows.map((row, i) => {
+        const charge = Math.max(0, Math.min(5, row.charge || 0));
+        return (
+          <div className="drd2-ritual" key={i}>
+            <input
+              className="line"
+              value={row.name || ''}
+              disabled={disabled}
+              onChange={(e) =>
+                cda.updateArr<Ritual>('rituals', i, { name: e.target.value })
               }
-              style={{
-                marginLeft: 6,
-                padding: '4px 8px',
-                background: 'rgba(120, 200, 120, 0.18)',
-                color: '#9ddf9d',
-                border: '1px solid rgba(120, 200, 120, 0.5)',
-                borderRadius: 4,
-                fontSize: 13,
-                cursor: 'pointer',
-                minHeight: 28,
-              }}
-              title={`Hodit ${name} (d20 + ${curValue})`}
-              aria-label={`Hodit ${name}`}
-            >
-              🎲
-            </button>
-          )}
-        </div>
-      </div>
-      <div className="jizvy-inputs">
-        <input
-          value={g(scarsKey)}
-          disabled={disabled}
-          onChange={(e) => set(scarsKey, e.target.value)}
-          placeholder={scarsPlaceholder}
-          aria-label={`${name} jizvy`}
-        />
-      </div>
-    </div>
+              placeholder="rituální předmět…"
+              aria-label={`Rituální předmět ${i + 1}`}
+            />
+            <div className="drd2-pips" role="group" aria-label={`Rituál ${i + 1} náboj`}>
+              {[1, 2, 3, 4, 5].map((k) => (
+                <button
+                  type="button"
+                  key={k}
+                  className={`pip-sq charge ${k <= charge ? 'on' : ''}`}
+                  disabled={disabled}
+                  onClick={() =>
+                    cda.updateArr<Ritual>('rituals', i, {
+                      charge: charge === k ? k - 1 : k,
+                    })
+                  }
+                  aria-label={`Náboj ${k}`}
+                  aria-pressed={k <= charge}
+                />
+              ))}
+            </div>
+            {!disabled && (
+              <button
+                type="button"
+                className="drd2-del"
+                onClick={() => cda.removeArr('rituals', i)}
+                aria-label="Smazat rituální předmět"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        );
+      })}
+      {!disabled && (
+        <button
+          type="button"
+          className="drd2-addrow"
+          onClick={() => cda.addArr<Ritual>('rituals', { name: '', charge: 0 })}
+        >
+          + přidat rituální předmět
+        </button>
+      )}
+    </>
   );
 }
 
 // ════════════════════════════════════════════════════════════════
-// Tab: Schopnosti (profese + ZS catalog)
+// Povolání (basic / advanced / master)
 // ════════════════════════════════════════════════════════════════
-
-interface SchopnostiTabProps extends SubProps {
-  basicProfs: BasicProf[];
-  advProfs: AdvProf[];
-  masterProfs: MasterProf[];
-  specAbilities: SpecAbility[];
-  masterAbilities: MasterAbility[];
-}
-
-function SchopnostiTab({
-  cda,
-  disabled,
-  basicProfs,
-  advProfs,
-  masterProfs,
-  specAbilities,
-  masterAbilities,
-}: SchopnostiTabProps) {
-  const { set } = cda;
-
-  return (
-    <div className="drd2-tab-content drd2-grid">
-      <div className="panel-12">
-        <h3>Základní povolání</h3>
-        <ProfList
-          arrKey="basic_professions"
-          rows={basicProfs}
-          catalog={BASIC_PROFESSIONS}
-          setRows={(v) => set('basic_professions', v)}
-          disabled={disabled}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Pokročilá povolání</h3>
-        <ProfList
-          arrKey="advanced_professions"
-          rows={advProfs}
-          catalog={ADVANCED_PROFESSIONS.map((p) => ({
-            ...p,
-            requires: p.requires.join(' + '),
-          }))}
-          setRows={(v) => set('advanced_professions', v)}
-          disabled={disabled}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Mistrovská povolání</h3>
-        <ProfList
-          arrKey="master_professions"
-          rows={masterProfs}
-          catalog={MASTER_PROFESSIONS.map((p) => ({
-            ...p,
-            requires: p.requires.join(' + '),
-          }))}
-          setRows={(v) => set('master_professions', v)}
-          disabled={disabled}
-        />
-
-        <h3 style={{ marginTop: 32 }}>Zvláštní Schopnosti (ZS)</h3>
-        <ZsList
-          rows={specAbilities}
-          catalog={PROFESSION_ABILITIES}
-          setRows={(v) => set('special_abilities', v)}
-          disabled={disabled}
-          sourceLabel="Povolání"
-        />
-
-        <h3 style={{ marginTop: 24 }}>Mistrovské ZS</h3>
-        <ZsList
-          rows={masterAbilities}
-          catalog={MASTER_ABILITIES}
-          setRows={(v) => set('master_abilities', v)}
-          disabled={disabled}
-          sourceLabel="Mistrovství"
-          sourceField="sourceMaster"
-        />
-      </div>
-    </div>
-  );
-}
-
-// ── Profession list (basic / advanced / master) ─────────────────
-
-interface ProfCatalogEntry {
-  id: string;
-  name: string;
-  requires?: string;
-}
 
 interface ProfListProps {
   arrKey: string;
-  rows: BasicProf[];
-  catalog: ProfCatalogEntry[];
-  setRows: (v: BasicProf[]) => void;
+  rows: Prof[];
+  catalog: ProfDef[];
+  cda: CdAccess;
   disabled: boolean;
 }
 
-function ProfList({
-  arrKey,
-  rows,
-  catalog,
-  setRows,
-  disabled,
-}: ProfListProps) {
+function ProfList({ arrKey, rows, catalog, cda, disabled }: ProfListProps) {
   const [addingId, setAddingId] = useState('');
-
+  const setRows = (v: Prof[]) => cda.set(arrKey, JSON.stringify(v));
   const available = catalog.filter((c) => !rows.some((r) => r.id === c.id));
 
   const handleAdd = () => {
@@ -696,62 +728,19 @@ function ProfList({
       {rows.map((row, i) => {
         const def = catalog.find((c) => c.id === row.id);
         return (
-          <div className="prof-card" key={row.id}>
-            <div className="prof-card__head">
-              <div className="prof-card__name">
+          <div className="drd2-prof" key={row.id}>
+            <div className="drd2-prof__seal" aria-hidden>
+              {row.name.charAt(0)}
+            </div>
+            <div className="drd2-prof__body">
+              <div className="drd2-prof__name">
                 {row.name}
                 {def?.requires && (
-                  <span
-                    style={{
-                      fontSize: 11,
-                      marginLeft: 12,
-                      color: 'rgba(255,255,255,0.4)',
-                      textTransform: 'uppercase',
-                      letterSpacing: 1,
-                    }}
-                  >
-                    {def.requires}
-                  </span>
+                  <span className="req"> — {def.requires.join(' + ')}</span>
                 )}
               </div>
-              <div className="prof-card__level">
-                <div className="level-pips">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button
-                      type="button"
-                      key={n}
-                      className={`pip ${row.level >= n ? 'active' : ''}`}
-                      disabled={disabled}
-                      onClick={() => {
-                        const newLevel = row.level === n ? n - 1 : n;
-                        const copy = [...rows];
-                        copy[i] = { ...row, level: newLevel };
-                        setRows(copy);
-                      }}
-                      aria-label={`${row.name} úroveň ${n}`}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
-                {!disabled && (
-                  <button
-                    type="button"
-                    className="del-btn"
-                    onClick={() => {
-                      const copy = [...rows];
-                      copy.splice(i, 1);
-                      setRows(copy);
-                    }}
-                    aria-label={`Odebrat povolání ${row.name}`}
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="prof-card__note">
-              <textarea
+              <input
+                className="drd2-prof__note"
                 value={row.note || ''}
                 disabled={disabled}
                 onChange={(e) => {
@@ -759,159 +748,39 @@ function ProfList({
                   copy[i] = { ...row, note: e.target.value };
                   setRows(copy);
                 }}
-                placeholder="Poznámka k povolání..."
-                aria-label={`Poznámka povolání ${row.name}`}
+                placeholder="poznámka…"
+                aria-label={`Poznámka ${row.name}`}
               />
             </div>
-          </div>
-        );
-      })}
-
-      {!disabled && available.length > 0 && (
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <select
-            className="prof-select"
-            value={addingId}
-            onChange={(e) => setAddingId(e.target.value)}
-            aria-label={`Přidat povolání ${arrKey}`}
-          >
-            <option value="">— Vyber povolání —</option>
-            {available.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-                {c.requires ? ` (${c.requires})` : ''}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            className="add-row-btn"
-            style={{ width: 'auto', padding: '8px 24px', margin: 0 }}
-            disabled={!addingId}
-            onClick={handleAdd}
-          >
-            + Přidat
-          </button>
-        </div>
-      )}
-    </>
-  );
-}
-
-// ── ZS list (special_abilities + master_abilities) ──────────────
-
-interface ZsListProps {
-  rows: (SpecAbility | MasterAbility)[];
-  catalog: Record<string, AbilityDef[]>;
-  setRows: (v: (SpecAbility | MasterAbility)[]) => void;
-  disabled: boolean;
-  sourceLabel: string;
-  /** Field name v ZS objektu pro source profession id (`source` nebo `sourceMaster`). */
-  sourceField?: 'source' | 'sourceMaster';
-}
-
-function ZsList({
-  rows,
-  catalog,
-  setRows,
-  disabled,
-  sourceLabel,
-  sourceField = 'source',
-}: ZsListProps) {
-  const sourceIds = Object.keys(catalog);
-
-  return (
-    <>
-      {rows.map((row, i) => {
-        const srcId = (row as unknown as Record<string, string>)[sourceField] || '';
-        const profAbilities = catalog[srcId] || [];
-        return (
-          <div className="zs-card" key={i}>
-            <div className="zs-card__main">
-              <div className="zs-card__name">
-                <input
-                  value={row.name}
+            <div className="drd2-pips5" role="group" aria-label={`${row.name} úroveň`}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  type="button"
+                  key={n}
+                  className={`dot ${row.level >= n ? 'on' : ''}`}
                   disabled={disabled}
-                  onChange={(e) => {
+                  onClick={() => {
                     const copy = [...rows];
-                    copy[i] = { ...row, name: e.target.value };
+                    copy[i] = { ...row, level: row.level === n ? n - 1 : n };
                     setRows(copy);
                   }}
-                  placeholder="Název schopnosti"
-                  aria-label="Název ZS"
-                />
-              </div>
-              <div className="zs-card__meta">
-                <select
-                  value={srcId}
-                  disabled={disabled}
-                  onChange={(e) => {
-                    const copy = [...rows];
-                    copy[i] = { ...row, [sourceField]: e.target.value };
-                    setRows(copy);
-                  }}
-                  aria-label={sourceLabel}
+                  aria-label={`${row.name} úroveň ${n}`}
+                  aria-pressed={row.level >= n}
                 >
-                  <option value="">— {sourceLabel} —</option>
-                  {sourceIds.map((id) => (
-                    <option key={id} value={id}>
-                      {id}
-                    </option>
-                  ))}
-                </select>
-                {profAbilities.length > 0 && (
-                  <select
-                    value=""
-                    disabled={disabled}
-                    onChange={(e) => {
-                      const ab = profAbilities.find(
-                        (x) => x.id === e.target.value,
-                      );
-                      if (!ab) return;
-                      const copy = [...rows];
-                      copy[i] = {
-                        ...row,
-                        name: ab.name,
-                        description: ab.summary,
-                      };
-                      setRows(copy);
-                    }}
-                    aria-label="Katalog schopností"
-                  >
-                    <option value="">— Z katalogu —</option>
-                    {profAbilities.map((ab) => (
-                      <option key={ab.id} value={ab.id}>
-                        {ab.name}
-                        {ab.isReservedSkill ? ' ★' : ''}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-              <div className="zs-card__desc">
-                <textarea
-                  value={row.description}
-                  disabled={disabled}
-                  onChange={(e) => {
-                    const copy = [...rows];
-                    copy[i] = { ...row, description: e.target.value };
-                    setRows(copy);
-                  }}
-                  placeholder="Popis / efekt"
-                  aria-label="Popis ZS"
-                />
-              </div>
+                  {n}
+                </button>
+              ))}
             </div>
             {!disabled && (
               <button
                 type="button"
-                className="del-btn"
+                className="drd2-del"
                 onClick={() => {
                   const copy = [...rows];
                   copy.splice(i, 1);
                   setRows(copy);
                 }}
-                aria-label="Smazat ZS"
+                aria-label={`Odebrat povolání ${row.name}`}
               >
                 ✕
               </button>
@@ -920,31 +789,123 @@ function ZsList({
         );
       })}
 
+      {!disabled && available.length > 0 && (
+        <div className="drd2-adder">
+          <select
+            value={addingId}
+            onChange={(e) => setAddingId(e.target.value)}
+            aria-label={`Přidat povolání ${arrKey}`}
+          >
+            <option value="">— vyber povolání —</option>
+            {available.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+                {c.requires ? ` (${c.requires.join(' + ')})` : ''}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="drd2-addrow inline"
+            disabled={!addingId}
+            onClick={handleAdd}
+          >
+            + přidat
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// Zvláštní schopnosti — ruční zadávání
+// ════════════════════════════════════════════════════════════════
+
+function ZsList({ cda, disabled }: { cda: CdAccess; disabled: boolean }) {
+  const rows = cda.parseJsonArr<Zs>('special_abilities');
+  return (
+    <>
+      {rows.map((row, i) => (
+        <div className="drd2-zs" key={i}>
+          <input
+            className="zs__name"
+            value={row.name || ''}
+            disabled={disabled}
+            onChange={(e) =>
+              cda.updateArr<Zs>('special_abilities', i, { name: e.target.value })
+            }
+            placeholder="název schopnosti"
+            aria-label={`ZS ${i + 1} název`}
+          />
+          {!disabled && (
+            <button
+              type="button"
+              className="drd2-del"
+              onClick={() => cda.removeArr('special_abilities', i)}
+              aria-label="Smazat schopnost"
+            >
+              ✕
+            </button>
+          )}
+          <div className="zs__top">
+            <select
+              className="zs__prof"
+              value={row.source || ''}
+              disabled={disabled}
+              onChange={(e) =>
+                cda.updateArr<Zs>('special_abilities', i, {
+                  source: e.target.value,
+                })
+              }
+              aria-label={`ZS ${i + 1} povolání`}
+            >
+              <option value="">— povolání —</option>
+              {ALL_PROF_NAMES.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <input
+              className="zs__type"
+              value={row.type || ''}
+              disabled={disabled}
+              onChange={(e) =>
+                cda.updateArr<Zs>('special_abilities', i, { type: e.target.value })
+              }
+              placeholder="typ (aktivní / pasivní…)"
+              aria-label={`ZS ${i + 1} typ`}
+            />
+          </div>
+          <textarea
+            className="zs__desc"
+            value={row.description || ''}
+            disabled={disabled}
+            onChange={(e) =>
+              cda.updateArr<Zs>('special_abilities', i, {
+                description: e.target.value,
+              })
+            }
+            placeholder="popis / efekt"
+            aria-label={`ZS ${i + 1} popis`}
+          />
+        </div>
+      ))}
       {!disabled && (
         <button
           type="button"
-          className="add-row-btn"
-          onClick={() => {
-            const newRow =
-              sourceField === 'sourceMaster'
-                ? ({
-                    name: '',
-                    sourceMaster: '',
-                    description: '',
-                    isReservedSkill: false,
-                    note: '',
-                  } as MasterAbility)
-                : ({
-                    name: '',
-                    source: '',
-                    type: '',
-                    description: '',
-                    note: '',
-                  } as SpecAbility);
-            setRows([...rows, newRow as never]);
-          }}
+          className="drd2-addrow"
+          onClick={() =>
+            cda.addArr<Zs>('special_abilities', {
+              name: '',
+              source: '',
+              type: '',
+              description: '',
+            })
+          }
         >
-          + Přidat schopnost
+          + přidat ZS
         </button>
       )}
     </>
@@ -952,10 +913,29 @@ function ZsList({
 }
 
 // ════════════════════════════════════════════════════════════════
+// Meč ornament
+// ════════════════════════════════════════════════════════════════
+
+function SwordOrnament() {
+  return (
+    <div className="drd2-sword" aria-hidden>
+      <span className="ln" />
+      <svg width="150" height="22" viewBox="0 0 150 22" fill="none">
+        <path d="M2 11 H44" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <rect x="44" y="6" width="6" height="10" rx="1.5" className="hilt" />
+        <path d="M50 11 L132 8 L140 11 L132 14 Z" className="blade" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M140 11 L148 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="47" cy="11" r="3.4" className="hilt" stroke="currentColor" strokeWidth="1" />
+      </svg>
+      <span className="ln" />
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
 // PRINT — statický čitelný dokument (čte stejná `drd2_*` data)
 // ════════════════════════════════════════════════════════════════
 
-/** Úroveň povolání 0..5 jako ●●●○○ (vždy 5 znaků). */
 function levelPips(level: number): string {
   const filled = Math.max(0, Math.min(5, level || 0));
   return '●'.repeat(filled) + '○'.repeat(5 - filled);
@@ -963,11 +943,9 @@ function levelPips(level: number): string {
 
 interface Drd2PrintViewProps {
   cda: CdAccess;
-  basicProfs: BasicProf[];
-  advProfs: AdvProf[];
-  masterProfs: MasterProf[];
-  specAbilities: SpecAbility[];
-  masterAbilities: MasterAbility[];
+  basicProfs: Prof[];
+  advProfs: Prof[];
+  masterProfs: Prof[];
   usedLevel: number;
 }
 
@@ -976,13 +954,13 @@ function Drd2PrintView({
   basicProfs,
   advProfs,
   masterProfs,
-  specAbilities,
-  masterAbilities,
   usedLevel,
 }: Drd2PrintViewProps) {
   const { g } = cda;
-  const weapons = cda.parseJsonArr<Record<string, string>>('weapons');
-
+  const weapons = cda.parseJsonArr<Weapon>('weapons');
+  const companions = cda.parseJsonArr<Companion>('companions');
+  const rituals = cda.parseJsonArr<Ritual>('rituals');
+  const abilities = cda.parseJsonArr<Zs>('special_abilities');
   const allProfs = [...basicProfs, ...advProfs, ...masterProfs];
   const stateEffects = g('state_effects').trim();
 
@@ -995,7 +973,7 @@ function Drd2PrintView({
           <dd>{g('name') || '—'}</dd>
         </div>
         <div>
-          <dt>Rasa a kultura</dt>
+          <dt>Rasa (kultura)</dt>
           <dd>{g('race') || '—'}</dd>
         </div>
         <div>
@@ -1008,40 +986,32 @@ function Drd2PrintView({
 
       <h2>Zdroje a jizvy</h2>
       <dl>
-        <div>
-          <dt>Tělo</dt>
-          <dd>
-            {g('body', '0')} / {g('body_max', '0')}
-            {g('body_scars').trim() ? ` — ${g('body_scars').trim()}` : ''}
-          </dd>
-        </div>
-        <div>
-          <dt>Duše</dt>
-          <dd>
-            {g('soul', '0')} / {g('soul_max', '0')}
-            {g('soul_scars').trim() ? ` — ${g('soul_scars').trim()}` : ''}
-          </dd>
-        </div>
-        <div>
-          <dt>Vliv</dt>
-          <dd>
-            {g('influence', '0')} / {g('influence_max', '0')}
-            {g('influence_scars').trim()
-              ? ` — ${g('influence_scars').trim()}`
-              : ''}
-          </dd>
-        </div>
+        {(
+          [
+            ['Tělo', 'body', 'body_max', 'body_scars'],
+            ['Duše', 'soul', 'soul_max', 'soul_scars'],
+            ['Vliv', 'influence', 'influence_max', 'influence_scars'],
+          ] as const
+        ).map(([lbl, cur, mx, sc]) => (
+          <div key={cur}>
+            <dt>{lbl}</dt>
+            <dd>
+              {g(cur, '0')} / {g(mx, '10')}
+              {g(sc).trim() ? ` — ${g(sc).trim()}` : ''}
+            </dd>
+          </div>
+        ))}
       </dl>
 
       <h2>Bojový stav</h2>
       <dl className="print-cols">
         <div>
           <dt>Ohrožení</dt>
-          <dd>{g('threat') || '—'}</dd>
+          <dd>{g('threat') || '0'}</dd>
         </div>
         <div>
           <dt>Výhoda</dt>
-          <dd>{g('advantage') || '—'}</dd>
+          <dd>{g('advantage') || '0'}</dd>
         </div>
       </dl>
       {stateEffects && (
@@ -1059,7 +1029,7 @@ function Drd2PrintView({
               <tr>
                 <th>Předmět</th>
                 <th>Charakteristika</th>
-                <th>Poznámka / Modifikátory</th>
+                <th>Poznámka / modifikátory</th>
               </tr>
             </thead>
             <tbody>
@@ -1075,54 +1045,56 @@ function Drd2PrintView({
         </>
       )}
 
-      <h2>Identita a pomocník</h2>
-      <dl>
-        <div>
-          <dt>Rasová ZS</dt>
-          <dd>{g('race_ability') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Povahový rys</dt>
-          <dd>{g('personality') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Pomocník</dt>
-          <dd>{g('comp_char') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Pouto</dt>
-          <dd>{g('comp_bond') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Platba</dt>
-          <dd>{g('comp_pay') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Hranice poutu</dt>
-          <dd>{g('comp_bound') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Schopnost pomocníka</dt>
-          <dd>{g('comp_spec') || '—'}</dd>
-        </div>
-      </dl>
+      {companions.length > 0 && (
+        <>
+          <h2>Pomocníci</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Charakteristika</th>
+                <th>Schopnost</th>
+                <th>Hranice</th>
+                <th>Platba</th>
+                <th>Pouto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {companions.map((c, i) => (
+                <tr key={i}>
+                  <td>{c.char || '—'}</td>
+                  <td>{c.ability || '—'}</td>
+                  <td>{c.bound || '—'}</td>
+                  <td>{c.pay || '—'}</td>
+                  <td>{c.bond || 0} / 11</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
 
-      <h2>Ekonomika a zkušenosti</h2>
+      {rituals.length > 0 && (
+        <>
+          <h2>Rituální předměty</h2>
+          <ul className="matrix-print__plain">
+            {rituals.map((r, i) => (
+              <li key={i} className="print-row">
+                <span>{r.name || '—'}</span>
+                <span>náboj {r.charge || 0} / 5</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      <h2>Zkušenosti</h2>
       <dl className="print-cols">
-        <div>
-          <dt>Groše</dt>
-          <dd>{g('coins') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Suroviny</dt>
-          <dd>{g('materials') || '—'}</dd>
-        </div>
         <div>
           <dt>Volné XP</dt>
           <dd>{g('xp_unused') || '—'}</dd>
         </div>
         <div>
-          <dt>Celkem XP</dt>
+          <dt>XP celkem</dt>
           <dd>{g('xp_total') || '—'}</dd>
         </div>
       </dl>
@@ -1130,49 +1102,31 @@ function Drd2PrintView({
       {allProfs.length > 0 && (
         <>
           <h2>Povolání</h2>
-          {basicProfs.length > 0 && (
-            <>
-              <h3>Základní povolání</h3>
-              <ul className="matrix-print__plain">
-                {basicProfs.map((p, i) => (
-                  <li key={i} className="print-row">
-                    <span>{p.name || '—'}</span>
-                    <span>{levelPips(p.level)}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          {advProfs.length > 0 && (
-            <>
-              <h3>Pokročilá povolání</h3>
-              <ul className="matrix-print__plain">
-                {advProfs.map((p, i) => (
-                  <li key={i} className="print-row">
-                    <span>{p.name || '—'}</span>
-                    <span>{levelPips(p.level)}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          {masterProfs.length > 0 && (
-            <>
-              <h3>Mistrovská povolání</h3>
-              <ul className="matrix-print__plain">
-                {masterProfs.map((p, i) => (
-                  <li key={i} className="print-row">
-                    <span>{p.name || '—'}</span>
-                    <span>{levelPips(p.level)}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
+          {(
+            [
+              ['Základní povolání', basicProfs],
+              ['Pokročilá povolání', advProfs],
+              ['Mistrovská povolání', masterProfs],
+            ] as const
+          ).map(([title, list]) =>
+            list.length > 0 ? (
+              <div key={title}>
+                <h3>{title}</h3>
+                <ul className="matrix-print__plain">
+                  {list.map((p, i) => (
+                    <li key={i} className="print-row">
+                      <span>{p.name || '—'}</span>
+                      <span>{levelPips(p.level)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null,
           )}
         </>
       )}
 
-      {specAbilities.length > 0 && (
+      {abilities.length > 0 && (
         <>
           <h2>Zvláštní schopnosti (ZS)</h2>
           <table>
@@ -1180,17 +1134,17 @@ function Drd2PrintView({
               <tr>
                 <th>Název</th>
                 <th>Povolání</th>
+                <th>Typ</th>
                 <th>Popis</th>
               </tr>
             </thead>
             <tbody>
-              {specAbilities.map((a, i) => (
+              {abilities.map((a, i) => (
                 <tr key={i}>
                   <td>{a.name || '—'}</td>
                   <td>{a.source || '—'}</td>
-                  <td style={{ whiteSpace: 'pre-wrap' }}>
-                    {a.description || '—'}
-                  </td>
+                  <td>{a.type || '—'}</td>
+                  <td style={{ whiteSpace: 'pre-wrap' }}>{a.description || '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -1198,33 +1152,8 @@ function Drd2PrintView({
         </>
       )}
 
-      {masterAbilities.length > 0 && (
-        <>
-          <h2>Mistrovské ZS</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Název</th>
-                <th>Mistrovství</th>
-                <th>Vyhrazená</th>
-                <th>Popis</th>
-              </tr>
-            </thead>
-            <tbody>
-              {masterAbilities.map((a, i) => (
-                <tr key={i}>
-                  <td>{a.name || '—'}</td>
-                  <td>{a.sourceMaster || '—'}</td>
-                  <td>{a.isReservedSkill ? '✓' : '○'}</td>
-                  <td style={{ whiteSpace: 'pre-wrap' }}>
-                    {a.description || '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
+      <h2>Manévry</h2>
+      <p>{MANEUVERS.join(' · ')}</p>
     </div>
   );
 }

@@ -2,7 +2,13 @@
  * 8.7h — DrD II kompletní katalog zvláštních schopností všech povolání.
  *
  * 1:1 přenos z `c:/Matrix/Matrix/frontend/src/components/diary/drd2Abilities.ts`
- * — 12 základních povolání × 12 ZS + 10 mistrovských × 12 ZS = 264 schopností.
+ * — 5 základních + 10 pokročilých povolání × 12 ZS + mistrovská = 264 schopností.
+ *
+ * ⚠️ 16.2e — TENTO KATALOG JE ODPOJEN OD UI. `Drd2Sheet` ho NEimportuje;
+ * hráč zadává ZS ručně. Obsah pochází z příruček DrD II (ALTAR) — soubor se
+ * VĚDOMĚ ponechává „k ruce" pro budoucí licenční dohodu s ALTARem (pak se
+ * znovu zapojí jako katalog/dropdown). NEMAZAT bez domluvy. Seznamy povolání
+ * (herní fakta, ne chráněný text) viz [drd2Professions.ts](./drd2Professions.ts).
  */
 
 export interface AbilityDef {

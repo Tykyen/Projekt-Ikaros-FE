@@ -1,728 +1,1069 @@
-/* DrD2 — Temný Les (Dark Forest Emerald Theme)
- * 8.7h — přenos z c:/Matrix/Matrix/frontend/src/styles/Drd2Diary.scss
+/* DrD II — fantasy pergamenový deník (16.2e, reálný list).
+ * Vzhled věrný papírovému deníku ALTAR; default skin `fantasy`.
+ * Scoped pod [data-diary-system='drd2']. Tokenizace na --mx-* přijde v kroku
+ * skiny (16.2c) — zde napevno fantasy paleta.
+ * @import MUSÍ stát před ostatními pravidly (CSS spec). Vzor: dnd5e.css.
  */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@500;600;700&display=swap');
 
-[data-diary-system='drd2'] .drd2-dashboard {
-  color: #c9d1d9;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 16px;
-}
+[data-diary-system='drd2'] .drd2-sheet {
+  --parch-1: #efe5cd;
+  --parch-2: #e3d5b4;
+  --parch-3: #d8c89f;
+  --parch-edge: #c5b083;
+  --ink: #241a10;
+  --ink-soft: #5a4632;
+  --ink-faint: rgba(40, 28, 16, 0.45);
+  --rule: rgba(70, 52, 32, 0.28);
+  --body: #8a2a1e;
+  --soul: #385a86;
+  --infl: #9a7515;
+  --blood: #7c2317;
+  --emer: #2f6b41;
+  --seal: #7a2418;
+  --gold: #9a7515;
+  --shadow: 0 2px 0 rgba(80, 58, 32, 0.18), 0 12px 28px -14px rgba(40, 28, 12, 0.55);
 
-[data-diary-system='drd2'] .drd2-dashboard ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-[data-diary-system='drd2'] .drd2-dashboard ::-webkit-scrollbar-track {
-  background: rgba(5, 15, 8, 0.3);
-}
-[data-diary-system='drd2'] .drd2-dashboard ::-webkit-scrollbar-thumb {
-  background: rgba(80, 200, 120, 0.15);
-  border-radius: 4px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  ::-webkit-scrollbar-thumb:hover {
-  background: rgba(80, 200, 120, 0.3);
-}
-
-[data-diary-system='drd2'] .drd2-dashboard h3 {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* ── Header ─────────────────────────────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .drd2-header {
-  background: rgba(10, 18, 14, 0.88);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 2px solid rgba(80, 200, 120, 0.6);
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-header
-  .identity-block {
-  flex: 1;
-  min-width: 180px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-header
-  .identity-block
-  label {
-  display: block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 6px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-header
-  .identity-block
-  input {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  padding: 8px 12px;
-  font-size: 15px;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-header
-  .identity-block
-  input:focus {
-  outline: none;
-  border-color: rgba(80, 200, 120, 0.6);
-  background: rgba(16, 18, 24, 0.9);
-}
-
-/* ── Tabs ───────────────────────────────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .drd2-tabs {
-  display: flex;
-  overflow-x: auto;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  margin-bottom: 24px;
-  gap: 8px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .drd2-tabs button {
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
   position: relative;
-  transition: color 0.2s;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 30px 32px 26px;
+  color: var(--ink);
+  font-family: 'EB Garamond', 'Georgia', serif;
+  font-size: 16px;
+  line-height: 1.45;
+  border-radius: 5px;
+  background:
+    radial-gradient(80% 60% at 18% 8%, rgba(255, 250, 235, 0.55), transparent 60%),
+    radial-gradient(70% 50% at 92% 96%, rgba(120, 92, 52, 0.2), transparent 55%),
+    radial-gradient(40% 30% at 88% 14%, rgba(120, 80, 40, 0.14), transparent 60%),
+    linear-gradient(135deg, var(--parch-1), var(--parch-2) 55%, var(--parch-3));
+  box-shadow:
+    0 0 0 1px var(--parch-edge),
+    0 0 0 8px rgba(28, 20, 9, 0.4),
+    0 0 0 9px rgba(150, 120, 70, 0.3),
+    0 20px 60px -22px rgba(0, 0, 0, 0.6);
 }
-[data-diary-system='drd2'] .drd2-dashboard .drd2-tabs button:hover {
-  color: #fff;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-tabs
-  button.active {
-  color: #50c878;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-tabs
-  button.active::after {
+/* foxing — stárnoucí skvrny */
+[data-diary-system='drd2'] .drd2-sheet::before {
   content: '';
   position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #50c878;
-  box-shadow: 0 -2px 10px rgba(80, 200, 120, 0.4);
+  inset: 0;
+  border-radius: 5px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 88%, rgba(110, 78, 38, 0.14) 0 5px, transparent 7px),
+    radial-gradient(circle at 76% 22%, rgba(110, 78, 38, 0.1) 0 7px, transparent 9px),
+    radial-gradient(circle at 30% 40%, rgba(110, 78, 38, 0.06) 0 9px, transparent 12px),
+    radial-gradient(circle at 60% 70%, rgba(110, 78, 38, 0.07) 0 6px, transparent 9px);
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+[data-diary-system='drd2'] .drd2-sheet > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* ── Grid ───────────────────────────────────────────────── */
+/* ── Hlavička ─────────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 22px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--ink);
+}
+[data-diary-system='drd2'] .drd2-head__title h1 {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: 1px;
+  margin: 0;
+  line-height: 1;
+}
+[data-diary-system='drd2'] .drd2-head__title .sub {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+[data-diary-system='drd2'] .drd2-head__fields {
+  flex: 1;
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+[data-diary-system='drd2'] .drd2-head__fields .field {
+  flex: 1;
+  min-width: 150px;
+}
+[data-diary-system='drd2'] .drd2-head__fields .field--lvl {
+  flex: 0 0 auto;
+  max-width: 180px;
+}
+[data-diary-system='drd2'] .drd2-head .field > label,
+[data-diary-system='drd2'] .drd2-head .field--lvl > label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+/* rukopisné inputy */
+[data-diary-system='drd2'] .hw {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px dotted var(--ink-faint);
+  font-family: 'Caveat', cursive;
+  font-size: 23px;
+  color: #3a2410;
+  padding: 0 2px 1px;
+  line-height: 1.1;
+}
+[data-diary-system='drd2'] .hw:focus {
+  outline: none;
+  border-bottom-color: var(--seal);
+}
+[data-diary-system='drd2'] .hw::placeholder {
+  color: rgba(40, 28, 16, 0.25);
+}
+[data-diary-system='drd2'] .drd2-lvl {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+[data-diary-system='drd2'] .drd2-lvl .used {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 24px;
+  color: var(--seal);
+  background: rgba(122, 36, 24, 0.1);
+  border: 1.5px solid rgba(122, 36, 24, 0.4);
+  border-radius: 4px;
+  padding: 0 10px;
+  line-height: 1.3;
+}
+[data-diary-system='drd2'] .drd2-lvl .slash {
+  font-size: 20px;
+  color: var(--ink-faint);
+  padding-bottom: 2px;
+}
+[data-diary-system='drd2'] .drd2-lvl .hw {
+  width: 46px;
+  text-align: center;
+  font-size: 22px;
+}
+[data-diary-system='drd2'] .drd2-crest {
+  flex: 0 0 auto;
+  text-align: center;
+  align-self: flex-start;
+  font-family: 'Cinzel', serif;
+  line-height: 0.92;
+}
+[data-diary-system='drd2'] .drd2-crest .dd {
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: 1px;
+}
+[data-diary-system='drd2'] .drd2-crest .two {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--seal);
+  text-shadow: 0 1px 0 rgba(255, 245, 225, 0.5);
+}
 
-[data-diary-system='drd2'] .drd2-dashboard .drd2-grid {
+/* ── Dělící ornament ───────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 26px 2px 18px;
+}
+[data-diary-system='drd2'] .drd2-divider::before,
+[data-diary-system='drd2'] .drd2-divider::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ink) 38%, var(--ink) 62%, transparent);
+}
+[data-diary-system='drd2'] .drd2-divider span {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--seal);
+  white-space: nowrap;
+}
+
+/* ── Grid + karty ──────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 20px;
 }
-[data-diary-system='drd2'] .drd2-dashboard .drd2-grid > div {
-  background: rgba(10, 18, 14, 0.65);
-  border: 1px solid rgba(80, 200, 120, 0.08);
-  border-radius: 8px;
-  padding: 20px;
+[data-diary-system='drd2'] .drd2-profgrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
-[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-4 {
+[data-diary-system='drd2'] .col-4 {
   grid-column: span 4;
 }
-[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-6 {
-  grid-column: span 6;
+[data-diary-system='drd2'] .col-5 {
+  grid-column: span 5;
 }
-[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-8 {
+[data-diary-system='drd2'] .col-7 {
+  grid-column: span 7;
+}
+[data-diary-system='drd2'] .col-8 {
   grid-column: span 8;
 }
-[data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-12 {
-  grid-column: span 12;
+[data-diary-system='drd2'] .drd2-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
+[data-diary-system='drd2'] .drd2-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 250, 238, 0.5), rgba(220, 205, 170, 0.28));
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  padding: 16px 18px 18px;
+  box-shadow: var(--shadow);
+}
+[data-diary-system='drd2'] .drd2-card::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(70, 52, 32, 0.22);
+  border-radius: 2px;
+  pointer-events: none;
+}
+[data-diary-system='drd2'] .drd2-card > * {
+  position: relative;
+}
+[data-diary-system='drd2'] .legend {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 14px;
+}
+[data-diary-system='drd2'] .legend::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--ink), transparent);
+}
+[data-diary-system='drd2'] .legend .glyph {
+  color: var(--seal);
+}
+[data-diary-system='drd2'] .legend__sub {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+[data-diary-system='drd2'] .hint {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin: -6px 0 12px;
+}
+[data-diary-system='drd2'] .drd2-init {
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(122, 36, 24, 0.1);
+  border: 1px solid rgba(122, 36, 24, 0.4);
+  color: var(--seal);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+[data-diary-system='drd2'] .drd2-init:hover {
+  background: rgba(122, 36, 24, 0.18);
+}
+
+/* ── Zdroje (pilíře) ───────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-pillar {
+  margin-bottom: 15px;
+}
+[data-diary-system='drd2'] .drd2-pillar:last-child {
+  margin-bottom: 0;
+}
+[data-diary-system='drd2'] .drd2-pillar__top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+[data-diary-system='drd2'] .drd2-pillar__top .name {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 1px;
+  flex: 1;
+}
+[data-diary-system='drd2'] .drd2-pillar__top .val {
+  font-family: 'Caveat', cursive;
+  font-size: 21px;
+  color: var(--ink-soft);
+}
+[data-diary-system='drd2'] .drd2-pillar__top .val b {
+  font-size: 25px;
+  color: var(--ink);
+}
+[data-diary-system='drd2'] .maxin {
+  width: 34px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted var(--ink-faint);
+  font-family: 'Caveat', cursive;
+  font-size: 21px;
+  color: var(--ink);
+  text-align: center;
+}
+[data-diary-system='drd2'] .maxin:focus {
+  outline: none;
+  border-bottom-color: var(--seal);
+}
+[data-diary-system='drd2'] .drd2-roll {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0 2px;
+}
+[data-diary-system='drd2'] .drd2-track {
+  display: flex;
+  gap: 4px;
+}
+[data-diary-system='drd2'] .drd2-track .seg {
+  flex: 1;
+  height: 22px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1.5px solid rgba(70, 52, 32, 0.45);
+  background: rgba(255, 252, 244, 0.35);
+  transition: transform 0.08s, background 0.15s;
+  padding: 0;
+}
+[data-diary-system='drd2'] .drd2-track .seg:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+[data-diary-system='drd2'] .drd2-track .seg.on {
+  box-shadow: inset 0 0 0 2px rgba(255, 250, 240, 0.6);
+}
+[data-diary-system='drd2'] .drd2-pillar.body .seg.on {
+  background: var(--body);
+  border-color: #5e1c14;
+}
+[data-diary-system='drd2'] .drd2-pillar.soul .seg.on {
+  background: var(--soul);
+  border-color: #26405f;
+}
+[data-diary-system='drd2'] .drd2-pillar.infl .seg.on {
+  background: var(--infl);
+  border-color: #6a5009;
+}
+[data-diary-system='drd2'] .drd2-scar {
+  width: 100%;
+  margin-top: 7px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(124, 35, 23, 0.4);
+  font-family: 'Caveat', cursive;
+  font-size: 17px;
+  color: #7c2317;
+  padding: 1px 2px;
+}
+[data-diary-system='drd2'] .drd2-scar:focus {
+  outline: none;
+  border-bottom-style: solid;
+}
+[data-diary-system='drd2'] .drd2-scar::placeholder {
+  color: rgba(124, 35, 23, 0.3);
+}
+
+/* ── Boj: Ohrožení / Výhoda ────────────────────────────── */
+[data-diary-system='drd2'] .drd2-combat {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+}
+[data-diary-system='drd2'] .drd2-combat__mid {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+[data-diary-system='drd2'] .drd2-combat__mid > label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+[data-diary-system='drd2'] .drd2-gauge {
+  flex: 1;
+  min-width: 92px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  padding: 12px 8px;
+  background: rgba(255, 250, 238, 0.35);
+}
+[data-diary-system='drd2'] .drd2-gauge h4 {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+[data-diary-system='drd2'] .drd2-gauge.threat h4 {
+  color: var(--blood);
+}
+[data-diary-system='drd2'] .drd2-gauge.adv h4 {
+  color: var(--emer);
+}
+[data-diary-system='drd2'] .drd2-gauge .big {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 0.9;
+  margin-bottom: 8px;
+}
+[data-diary-system='drd2'] .drd2-gauge.threat .big {
+  color: var(--blood);
+}
+[data-diary-system='drd2'] .drd2-gauge.adv .big {
+  color: var(--emer);
+}
+[data-diary-system='drd2'] .drd2-gauge .ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+[data-diary-system='drd2'] .drd2-gauge .rung {
+  height: 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-family: 'Cinzel', serif;
+  color: var(--ink-soft);
+  border: 1px solid rgba(70, 52, 32, 0.4);
+  background: rgba(255, 252, 244, 0.4);
+  transition: background 0.12s;
+}
+[data-diary-system='drd2'] .drd2-gauge.threat .rung.on {
+  background: var(--blood);
+  color: #fff;
+  border-color: #5a1810;
+}
+[data-diary-system='drd2'] .drd2-gauge.adv .rung.on {
+  background: var(--emer);
+  color: #fff;
+  border-color: #1f4d2d;
+}
+
+/* ── Společné inputy ───────────────────────────────────── */
+[data-diary-system='drd2'] .line {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  color: #3a2410;
+  padding: 2px 2px 1px;
+}
+[data-diary-system='drd2'] .line:focus {
+  outline: none;
+  border-bottom-color: var(--seal);
+}
+[data-diary-system='drd2'] .line::placeholder {
+  color: rgba(40, 28, 16, 0.25);
+}
+[data-diary-system='drd2'] .drd2-textarea {
+  width: 100%;
+  min-height: 74px;
+  background: rgba(255, 250, 238, 0.4);
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  color: var(--ink);
+  padding: 8px 10px;
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+[data-diary-system='drd2'] .drd2-textarea:focus {
+  outline: none;
+  border-color: var(--seal);
+}
+
+/* ── Tabulka zbraní ────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-table {
+  overflow-x: auto;
+}
+[data-diary-system='drd2'] .drd2-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-diary-system='drd2'] .drd2-table th {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+  text-align: left;
+  padding: 0 6px 5px;
+  border-bottom: 1.5px solid var(--ink);
+}
+[data-diary-system='drd2'] .drd2-table td {
+  padding: 2px 6px;
+  border-bottom: 1px dotted var(--rule);
+}
+[data-diary-system='drd2'] .drd2-table td .line {
+  font-size: 17px;
+}
+
+/* ── Tlačítka přidat / smazat ──────────────────────────── */
+[data-diary-system='drd2'] .drd2-addrow {
+  width: 100%;
+  margin-top: 9px;
+  background: transparent;
+  border: 1px dashed rgba(70, 52, 32, 0.4);
+  border-radius: 3px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 7px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+[data-diary-system='drd2'] .drd2-addrow:hover:not(:disabled) {
+  background: rgba(122, 36, 24, 0.07);
+  color: var(--seal);
+  border-color: var(--seal);
+}
+[data-diary-system='drd2'] .drd2-addrow:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+[data-diary-system='drd2'] .drd2-addrow.inline {
+  width: auto;
+  margin: 0;
+  padding: 7px 18px;
+}
+[data-diary-system='drd2'] .drd2-del {
+  background: none;
+  border: none;
+  color: var(--blood);
+  cursor: pointer;
+  font-size: 15px;
+  opacity: 0.55;
+  line-height: 1;
+  padding: 4px;
+}
+[data-diary-system='drd2'] .drd2-del:hover {
+  opacity: 1;
+}
+
+/* ── Pomocníci ─────────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-companion {
+  position: relative;
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.3);
+  padding: 12px 36px 12px 14px;
+  margin-bottom: 12px;
+}
+[data-diary-system='drd2'] .drd2-companion > .drd2-del {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+}
+[data-diary-system='drd2'] .drd2-twocol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 18px;
+}
+[data-diary-system='drd2'] .fieldrow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: end;
+}
+[data-diary-system='drd2'] .fieldrow > label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  padding-bottom: 3px;
+}
+[data-diary-system='drd2'] .drd2-bond {
+  margin-top: 10px;
+}
+[data-diary-system='drd2'] .drd2-bond > label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+}
+
+/* ── Čtvercové boxy (Pouto / Náboj) ────────────────────── */
+[data-diary-system='drd2'] .drd2-pips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+[data-diary-system='drd2'] .drd2-pips .pip-sq {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(70, 52, 32, 0.5);
+  border-radius: 3px;
+  background: rgba(255, 252, 244, 0.4);
+  cursor: pointer;
+  transition: transform 0.08s, background 0.12s;
+  padding: 0;
+}
+[data-diary-system='drd2'] .drd2-pips .pip-sq:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+[data-diary-system='drd2'] .drd2-pips .pip-sq.on {
+  background: var(--gold);
+  border-color: #6a5009;
+  box-shadow: inset 0 0 0 2px rgba(255, 250, 240, 0.6);
+}
+[data-diary-system='drd2'] .drd2-pips .pip-sq.charge.on {
+  background: var(--soul);
+  border-color: #26405f;
+}
+
+/* ── Rituální řádky ────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-ritual {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px dotted var(--rule);
+  padding: 8px 0;
+}
+[data-diary-system='drd2'] .drd2-ritual:last-of-type {
+  border-bottom: none;
+}
+[data-diary-system='drd2'] .drd2-ritual .line {
+  flex: 1;
+  min-width: 120px;
+}
+[data-diary-system='drd2'] .drd2-ritual .drd2-pips {
+  flex: 0 0 auto;
+}
+
+/* ── Zkušenosti ────────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-coins {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+[data-diary-system='drd2'] .drd2-coins .coin {
+  text-align: center;
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  padding: 8px 6px;
+  background: rgba(255, 250, 238, 0.4);
+}
+[data-diary-system='drd2'] .drd2-coins .coin > span {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+[data-diary-system='drd2'] .drd2-coins .coin input {
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  border: none;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--ink);
+}
+[data-diary-system='drd2'] .drd2-coins .coin input:focus {
+  outline: none;
+}
+
+/* ── Povolání ──────────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-prof {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.4);
+  padding: 11px 14px;
+  margin-bottom: 10px;
+}
+[data-diary-system='drd2'] .drd2-prof__seal {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #9a3022, var(--seal));
+  color: #f4e3c9;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 1px solid #4a140c;
+}
+[data-diary-system='drd2'] .drd2-prof__body {
+  flex: 1;
+  min-width: 0;
+}
+[data-diary-system='drd2'] .drd2-prof__name {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 16px;
+}
+[data-diary-system='drd2'] .drd2-prof__name .req {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+[data-diary-system='drd2'] .drd2-prof__note {
+  width: 100%;
+  margin-top: 4px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted var(--rule);
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  color: #4a3018;
+  padding: 1px 2px;
+}
+[data-diary-system='drd2'] .drd2-prof__note:focus {
+  outline: none;
+  border-bottom-color: var(--seal);
+}
+[data-diary-system='drd2'] .drd2-pips5 {
+  display: flex;
+  gap: 5px;
+  flex: 0 0 auto;
+}
+[data-diary-system='drd2'] .drd2-pips5 .dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1.5px solid rgba(70, 52, 32, 0.45);
+  background: rgba(255, 252, 244, 0.5);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s;
+}
+[data-diary-system='drd2'] .drd2-pips5 .dot:hover:not(:disabled) {
+  transform: scale(1.12);
+}
+[data-diary-system='drd2'] .drd2-pips5 .dot.on {
+  background: radial-gradient(circle at 35% 30%, #b5882c, var(--gold));
+  color: #fff7e6;
+  border-color: #6a5009;
+  box-shadow: 0 0 8px rgba(154, 117, 21, 0.4);
+}
+[data-diary-system='drd2'] .drd2-adder {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+[data-diary-system='drd2'] .drd2-adder select {
+  flex: 1;
+  font-family: 'EB Garamond', serif;
+  font-size: 15px;
+  background: rgba(255, 252, 244, 0.6);
+  border: 1px solid var(--parch-edge);
+  border-radius: 3px;
+  padding: 7px 9px;
+  color: var(--ink);
+}
+[data-diary-system='drd2'] .drd2-adder select:focus {
+  outline: none;
+  border-color: var(--seal);
+}
+
+/* ── ZS karta ──────────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-zs {
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.4);
+  padding: 11px 13px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+}
+[data-diary-system='drd2'] .drd2-zs .zs__name {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 1px 2px;
+}
+[data-diary-system='drd2'] .drd2-zs .zs__name:focus {
+  outline: none;
+  border-bottom-color: var(--seal);
+}
+[data-diary-system='drd2'] .drd2-zs .zs__top {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+[data-diary-system='drd2'] .drd2-zs .zs__prof,
+[data-diary-system='drd2'] .drd2-zs .zs__type {
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+  background: rgba(255, 252, 244, 0.6);
+  border: 1px solid var(--parch-edge);
+  border-radius: 3px;
+  padding: 4px 8px;
+  color: var(--ink);
+}
+[data-diary-system='drd2'] .drd2-zs .zs__type {
+  flex: 1;
+  min-width: 120px;
+}
+[data-diary-system='drd2'] .drd2-zs .zs__prof:focus,
+[data-diary-system='drd2'] .drd2-zs .zs__type:focus {
+  outline: none;
+  border-color: var(--seal);
+}
+[data-diary-system='drd2'] .drd2-zs .zs__desc {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 36px;
+  background: rgba(255, 252, 244, 0.4);
+  border: 1px solid rgba(70, 52, 32, 0.15);
+  border-radius: 3px;
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  color: var(--ink-soft);
+  padding: 6px 8px;
+  resize: vertical;
+}
+[data-diary-system='drd2'] .drd2-zs .zs__desc:focus {
+  outline: none;
+  border-color: var(--seal);
+}
+
+/* ── Manévry ───────────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-maneuvers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+[data-diary-system='drd2'] .drd2-maneuvers .man {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid var(--ink);
+  border-radius: 20px;
+  padding: 5px 15px;
+  color: var(--ink);
+  background: rgba(255, 250, 238, 0.4);
+}
+
+/* ── Meč ornament ──────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-sword {
+  margin: 28px auto 4px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 560px;
+  color: var(--ink);
+}
+[data-diary-system='drd2'] .drd2-sword .ln {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ink) 30%, var(--ink) 70%, transparent);
+}
+[data-diary-system='drd2'] .drd2-sword .blade {
+  fill: #bfae86;
+}
+[data-diary-system='drd2'] .drd2-sword .hilt {
+  fill: var(--seal);
+}
+
+/* ── View mode ─────────────────────────────────────────── */
+[data-diary-system='drd2'] .drd2-sheet input:disabled,
+[data-diary-system='drd2'] .drd2-sheet select:disabled,
+[data-diary-system='drd2'] .drd2-sheet textarea:disabled,
+[data-diary-system='drd2'] .drd2-sheet button:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-4 {
-    grid-column: span 6;
-  }
-  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-8 {
+  [data-diary-system='drd2'] .col-4,
+  [data-diary-system='drd2'] .col-8 {
     grid-column: span 12;
   }
 }
 @media (max-width: 768px) {
-  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-4,
-  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-6,
-  [data-diary-system='drd2'] .drd2-dashboard .drd2-grid .panel-8 {
+  [data-diary-system='drd2'] .col-4,
+  [data-diary-system='drd2'] .col-5,
+  [data-diary-system='drd2'] .col-7,
+  [data-diary-system='drd2'] .col-8 {
     grid-column: span 12;
+  }
+  [data-diary-system='drd2'] .drd2-sheet {
+    padding: 20px 16px;
+  }
+  [data-diary-system='drd2'] .drd2-head {
+    flex-wrap: wrap;
+  }
+  [data-diary-system='drd2'] .drd2-head__fields {
+    order: 3;
+    width: 100%;
+  }
+  [data-diary-system='drd2'] .drd2-twocol {
+    grid-template-columns: 1fr;
+  }
+  /* větší dotykové plochy na mobilu (řadová stupnice neumožní plných 44px) */
+  [data-diary-system='drd2'] .drd2-track .seg {
+    height: 30px;
+  }
+  [data-diary-system='drd2'] .drd2-gauge .rung {
+    height: 26px;
+  }
+  [data-diary-system='drd2'] .drd2-pips .pip-sq {
+    width: 28px;
+    height: 28px;
+  }
+  [data-diary-system='drd2'] .drd2-pips5 .dot {
+    width: 32px;
+    height: 32px;
+  }
+  [data-diary-system='drd2'] .drd2-del {
+    font-size: 18px;
+    padding: 8px;
   }
 }
 
-/* ── Resource cards (3 pilíře) ───────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .resource-card {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .resource-card .r-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .resource-card .r-header h4 {
-  margin: 0;
-  font-size: 15px;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .resource-card .r-inputs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .resource-card
-  .r-inputs
-  input {
-  width: 50px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  padding: 4px;
-  border-radius: 4px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .resource-card
-  .r-inputs
-  input:focus {
-  border-color: #50c878;
-  outline: none;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .resource-card
-  .r-inputs
-  span {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 18px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .resource-card
-  .jizvy-inputs
-  input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px dashed rgba(255, 100, 100, 0.3);
-  color: #ff8888;
-  padding: 6px 0;
-  font-size: 13px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .resource-card
-  .jizvy-inputs
-  input:focus {
-  outline: none;
-  border-bottom: 1px solid #ff6b6b;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .resource-card
-  .jizvy-inputs
-  input::placeholder {
-  color: rgba(255, 100, 100, 0.2);
-}
-
-/* ── Mega boxes ─────────────────────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .mega-box {
-  text-align: center;
-  padding: 24px;
-  border-radius: 8px;
-  background: linear-gradient(
-    135deg,
-    rgba(20, 20, 30, 0.8),
-    rgba(15, 15, 20, 0.8)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box.danger {
-  border-color: rgba(255, 68, 68, 0.3);
-  box-shadow: inset 0 0 40px rgba(255, 0, 0, 0.05);
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box.danger h4 {
-  color: #ff6b6b;
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box.danger input {
-  color: #ff6b6b;
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box.advantage {
-  border-color: rgba(80, 200, 120, 0.3);
-  box-shadow: inset 0 0 40px rgba(80, 200, 120, 0.05);
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box.advantage h4 {
-  color: #50c878;
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box.advantage input {
-  color: #50c878;
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box h4 {
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .mega-box input {
-  background: transparent;
-  border: none;
-  font-size: 64px;
-  font-weight: 800;
-  text-align: center;
-  width: 100%;
-  outline: none;
-  font-family: inherit;
-}
-
-/* ── Tables ─────────────────────────────────────────── */
-
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container {
-  overflow-x: auto;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container
-  table {
-  width: 100%;
-  border-collapse: collapse;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container
-  th {
-  text-align: left;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  padding: 8px;
-  font-weight: 500;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container
-  td {
-  padding: 4px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container
-  td
-  input {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid transparent;
-  color: #fff;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 13px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container
-  td
-  input:focus {
-  background: rgba(0, 0, 0, 0.5);
-  border-color: rgba(255, 255, 255, 0.1);
-  outline: none;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container
-  .add-row-btn {
-  background: transparent;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.5);
-  padding: 8px;
-  width: 100%;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 8px;
+/* ── Print (statický čitelný dokument) ─────────────────── */
+[data-diary-system='drd2'] .drd2-print {
+  color: #1a1a1a;
+  font-family: 'EB Garamond', 'Georgia', serif;
   font-size: 12px;
-  transition: all 0.2s;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .drd2-table-container
-  .add-row-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-[data-diary-system='drd2'] .drd2-dashboard .del-btn {
-  background: transparent;
-  border: none;
-  color: #ff4444;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 8px;
-  opacity: 0.6;
-}
-[data-diary-system='drd2'] .drd2-dashboard .del-btn:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* ── Stats grid & textarea ──────────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 12px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .stat-box {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  padding: 10px;
-  text-align: center;
-}
-[data-diary-system='drd2'] .drd2-dashboard .stat-box label {
-  display: block;
-  font-size: 10px;
-  text-transform: uppercase;
-  color: #8b949e;
-  margin-bottom: 8px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .stat-box input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 16px;
-  text-align: center;
-}
-[data-diary-system='drd2'] .drd2-dashboard .stat-box input:focus {
-  outline: none;
-  border-bottom-color: #50c878;
-}
-
-[data-diary-system='drd2'] .drd2-dashboard .drd2-textarea {
-  width: 100%;
-  min-height: 80px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #c9d1d9;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  resize: vertical;
-  font-family: inherit;
   line-height: 1.5;
 }
-[data-diary-system='drd2'] .drd2-dashboard .drd2-textarea:focus {
-  outline: none;
-  border-color: #50c878;
+[data-diary-system='drd2'] .drd2-print h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  border-bottom: 1.5px solid #1a1a1a;
+  padding-bottom: 3px;
+  margin: 16px 0 8px;
 }
-
-/* ── Profession cards + level pips ──────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .prof-card {
-  background: rgba(5, 12, 8, 0.7);
-  border: 1px solid rgba(80, 200, 120, 0.1);
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 16px;
-  transition:
-    border-color 0.25s,
-    box-shadow 0.25s;
-}
-[data-diary-system='drd2'] .drd2-dashboard .prof-card:hover {
-  border-color: rgba(80, 200, 120, 0.25);
-  box-shadow: 0 2px 20px rgba(80, 200, 120, 0.06);
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .prof-card__head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .prof-card__name {
-  flex: 1;
-  font-size: 17px;
-  font-weight: 700;
-  color: #8872ff;
-  letter-spacing: 0.5px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .prof-card__level {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .level-pips {
-  display: flex;
-  gap: 4px;
-}
-[data-diary-system='drd2'] .drd2-dashboard .prof-card .pip {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+[data-diary-system='drd2'] .drd2-print h3 {
+  font-family: 'Cinzel', serif;
   font-size: 12px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.2);
+  margin: 10px 0 4px;
 }
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .pip.active {
-  background: rgba(80, 200, 120, 0.25);
-  border-color: rgba(80, 200, 120, 0.5);
-  color: #50c878;
-  box-shadow: 0 0 8px rgba(80, 200, 120, 0.15);
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .pip:hover:not(:disabled) {
-  border-color: rgba(80, 200, 120, 0.4);
-  background: rgba(80, 200, 120, 0.1);
-}
-[data-diary-system='drd2'] .drd2-dashboard .prof-card .pip:disabled {
-  cursor: default;
-}
-
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .prof-card__note
-  textarea {
-  width: 100%;
-  min-height: 40px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: #c9d1d9;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 13px;
-  resize: vertical;
-  font-family: inherit;
-  margin-top: 8px;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .prof-card
-  .prof-card__note
-  textarea:focus {
-  outline: none;
-  border-color: rgba(80, 200, 120, 0.3);
-}
-
-/* ── Total level badge ───────────────────────────────── */
-
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .total-level-display {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(80, 200, 120, 0.1);
-  border: 1px solid rgba(80, 200, 120, 0.3);
-  border-radius: 6px;
-  padding: 4px 14px;
-  font-size: 22px;
-  font-weight: 800;
-  color: #50c878;
-  letter-spacing: 1px;
-  min-width: 60px;
-  justify-content: center;
-  text-shadow: 0 0 12px rgba(80, 200, 120, 0.3);
-}
-
-/* ── ZS catalog select ──────────────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .prof-select {
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(80, 200, 120, 0.2);
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  width: 100%;
-  font-family: inherit;
-}
-[data-diary-system='drd2'] .drd2-dashboard .prof-select:focus {
-  outline: none;
-  border-color: #50c878;
-}
-[data-diary-system='drd2'] .drd2-dashboard .prof-select option {
-  background: #0a120e;
-  color: #fff;
-}
-
-/* ── ZS card ─────────────────────────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard .zs-card {
-  background: rgba(5, 12, 8, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 12px;
+[data-diary-system='drd2'] .drd2-print dl {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 18px;
+  margin: 0;
 }
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__name
-  input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 2px 4px;
+[data-diary-system='drd2'] .drd2-print dl.print-cols {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+[data-diary-system='drd2'] .drd2-print dt {
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #555;
+}
+[data-diary-system='drd2'] .drd2-print dd {
+  margin: 0 0 4px;
+}
+[data-diary-system='drd2'] .drd2-print table {
   width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0;
 }
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__name
-  input:focus {
-  outline: none;
-  border-color: #50c878;
-}
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+[data-diary-system='drd2'] .drd2-print th,
+[data-diary-system='drd2'] .drd2-print td {
+  border: 1px solid #bbb;
+  padding: 3px 6px;
+  text-align: left;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
 }
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__meta
-  input,
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__meta
-  select {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-family: inherit;
+[data-diary-system='drd2'] .drd2-print th {
+  background: #eee;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
 }
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__meta
-  input:focus,
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__meta
-  select:focus {
-  outline: none;
-  border-color: rgba(80, 200, 120, 0.3);
+[data-diary-system='drd2'] .drd2-print .matrix-print__plain {
+  list-style: none;
+  margin: 4px 0;
+  padding: 0;
 }
-[data-diary-system='drd2']
-  .drd2-dashboard
-  .zs-card
-  .zs-card__desc
-  textarea {
-  width: 100%;
-  min-height: 36px;
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  color: #c9d1d9;
-  padding: 6px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  resize: vertical;
-  font-family: inherit;
-}
-
-/* ── Disabled (view mode) ─────────────────────────── */
-
-[data-diary-system='drd2'] .drd2-dashboard input:disabled,
-[data-diary-system='drd2'] .drd2-dashboard select:disabled,
-[data-diary-system='drd2'] .drd2-dashboard textarea:disabled,
-[data-diary-system='drd2'] .drd2-dashboard button:disabled {
-  cursor: default;
-  opacity: 0.85;
+[data-diary-system='drd2'] .drd2-print .print-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #ccc;
+  padding: 2px 0;
 }

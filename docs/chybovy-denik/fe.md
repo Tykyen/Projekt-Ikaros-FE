@@ -4,6 +4,14 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 16.2e deník DrD2 reálný list fantasy pergamen jeden list · 2026-06-28
+**Co nakonec zabralo:** Existující DrD2 deník (8.7h adaptace z Matrixu, generický „Dark Forest Emerald HUD") přepsán dle šablony 16.2 krok 3 na fantasy pergamenový **jeden sloučený list** (bez tabů). Postup prototyp→souhlas→kód: standalone HTML (`c:/tmp/drd2-denik-audit.html`) iterativně laděn s uživatelem (5 kol drobností) = vizuální kontrakt, AŽ PAK produkce. Rozsah dle uživatele: VEN Vybavení/Příběh/Původ/Groše/Suroviny; rituály+pomocníci = seznamy add/remove; ZS **ručně**. Soubory: `Drd2Sheet.tsx` přepsán, `drd2.css` fantasy pergamen, `drd2Professions.ts` NOVÝ.
+**Proč to je správně (a ne další variace):** (1) **ALTAR katalog ZS** (`drd2Abilities.ts`, 264 schopností z příruček) = autorskoprávní riziko → uživatel chce v budoucnu licenci s ALTARem → **odpojit od UI, NEmazat** (ponechat „k ruce"). (2) Seznamy povolání (názvy + `requires` = herní fakta, ne chráněný text) odděleny do `drd2Professions.ts`, takže sheet vůbec neimportuje chráněný katalog. (3) Prototyp jako kontrakt zabránil cyklení na vzhledu (rodina CH-015 — necommitnuté změny × prod feedback).
+**Jak ověřeno:** `tsc -b` + `npm run build` + 13 testů (`Drd2Sheet.spec` přepsán) + `eslint --fix` — vše zelené. `mobil-desktop` = statická CSS analýza (breakpointy 1024/768, tabulka overflow-x, twocol→1fr, touch-targety zvětšeny na mobilu); vizuál čeká reálný deploy.
+**Zhodnocení:** Zabralo napoprvé, bez cyklení (prototyp=kontrakt počtvrté — po Matrixu/drd16/drdplus). **Past chycená v testech:** RTL `getByText('Základní povolání')` prošlo i u `<h3><span>❖</span>Základní povolání <em>(…)</em></h3>`, protože `getByText` matchuje jen **přímé text-nody** elementu (glyph span a em jsou vnořené elementy, nepočítají se). Zbývá zbytek šablony 16.2 pro drd2: combat panel `Drd2CombatPanel` redesign, bestie, 7 skinů, pak funkce/napoveda (uzávěr systému).
+
+---
+
 ### CH-034 — drdplus skiny se nebundlovaly (@import za style-rule); sváděl jsem to na cache/deploy · 2026-06-27
 **Kontext:** 8 drdplus deníkových skinů hotových, render-proof zdrojových souborů (přímý `<link>` na `drdplus-skins/scifi.css`) ukázal, že CSS funguje. Ale na live (a po čase i lokálně) se drdplus deník **neměnil žádným skinem** — pořád pergamen, ač picker ukazoval vybraný skin.
 **Co jsem udělal špatně:** ~5 kol jsem příčinu hledal na **uživatelově straně** — service worker cache, „Clear site data", FE deploy timing, BE 404, re-deploy, CDN — místo abych stáhl a zkontroloval **reálný build output**. Render-proof testoval ZDROJOVÉ CSS, ne zbundlovaný `DiaryTab.css`, takže minul, že bundler importy zahazuje. Uživatel správně tušil „je to na tvé straně" a já to opakovaně sváděl na jeho prohlížeč.

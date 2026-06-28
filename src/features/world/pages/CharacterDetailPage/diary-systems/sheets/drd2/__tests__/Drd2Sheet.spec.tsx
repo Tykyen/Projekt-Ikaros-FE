@@ -21,8 +21,8 @@ const commonProps = {
   characterSlug: 'hero1',
 };
 
-describe('Drd2Sheet (8.7h)', () => {
-  it('vyrenderuje 3 pilíře (Tělo, Duše, Vliv) v tabu Stav', () => {
+describe('Drd2Sheet (16.2e — sloučený list)', () => {
+  it('vyrenderuje 3 zdroje (Tělo, Duše, Vliv)', () => {
     render(
       <Drd2Sheet
         {...commonProps}
@@ -36,7 +36,7 @@ describe('Drd2Sheet (8.7h)', () => {
     expect(screen.getByText('Vliv')).toBeInTheDocument();
   });
 
-  it('vyrenderuje mega-boxy Ohrožení (danger) + Výhoda (advantage)', () => {
+  it('vyrenderuje stupnice Ohrožení (threat) + Výhoda (adv)', () => {
     const { container } = render(
       <Drd2Sheet
         {...commonProps}
@@ -45,11 +45,11 @@ describe('Drd2Sheet (8.7h)', () => {
         onChange={() => {}}
       />,
     );
-    expect(container.querySelector('.mega-box.danger')).not.toBeNull();
-    expect(container.querySelector('.mega-box.advantage')).not.toBeNull();
+    expect(container.querySelector('.drd2-gauge.threat')).not.toBeNull();
+    expect(container.querySelector('.drd2-gauge.adv')).not.toBeNull();
   });
 
-  it('přepnutí na Schopnosti tab ukáže 3 sekce povolání + 2 ZS sekce', () => {
+  it('zobrazí všechny sekce povolání + ZS rovnou (bez tabů)', () => {
     render(
       <Drd2Sheet
         {...commonProps}
@@ -58,15 +58,13 @@ describe('Drd2Sheet (8.7h)', () => {
         onChange={() => {}}
       />,
     );
-    fireEvent.click(screen.getByText('2. Profese a Schopnosti'));
     expect(screen.getByText('Základní povolání')).toBeInTheDocument();
     expect(screen.getByText('Pokročilá povolání')).toBeInTheDocument();
     expect(screen.getByText('Mistrovská povolání')).toBeInTheDocument();
-    expect(screen.getByText('Zvláštní Schopnosti (ZS)')).toBeInTheDocument();
-    expect(screen.getByText('Mistrovské ZS')).toBeInTheDocument();
+    expect(screen.getByText('Zvláštní schopnosti (ZS)')).toBeInTheDocument();
   });
 
-  it('used level badge počítá součet levelů ze všech profession kategorií', () => {
+  it('využitá úroveň = součet levelů ze všech kategorií povolání', () => {
     render(
       <Drd2Sheet
         {...commonProps}
@@ -82,20 +80,10 @@ describe('Drd2Sheet (8.7h)', () => {
         onChange={() => {}}
       />,
     );
-    expect(
-      screen.getByLabelText('Využitá úroveň'),
-    ).toHaveTextContent('5');
+    expect(screen.getByLabelText('Využitá úroveň')).toHaveTextContent('5');
   });
 
-  it('view mode disabluje inputy', () => {
-    render(
-      <Drd2Sheet {...commonProps} diary={makeDiary()} mode="view" />,
-    );
-    expect(screen.getByLabelText('Tělo aktuální')).toBeDisabled();
-    expect(screen.getByLabelText('Ohrožení')).toBeDisabled();
-  });
-
-  it('+ Přidat zbraň vytvoří prázdnou položku v drd2_weapons', () => {
+  it('segmentová stupnice Tělo nastaví aktuální hodnotu (klik na 4. segment)', () => {
     const onChange = vi.fn();
     render(
       <Drd2Sheet
@@ -105,17 +93,91 @@ describe('Drd2Sheet (8.7h)', () => {
         onChange={onChange}
       />,
     );
-    fireEvent.click(screen.getByText('+ Přidat zbraň / zbroj'));
+    fireEvent.click(screen.getByLabelText('Tělo 4'));
     expect(onChange).toHaveBeenCalledWith({
-      customDataPatch: expect.objectContaining({
-        drd2_weapons: JSON.stringify([
-          { name: '', char: '', note: '' },
-        ]),
-      }),
+      customDataPatch: { drd2_body: '4' },
     });
   });
 
-  it('profession select dropdown obsahuje 5 základních povolání', () => {
+  it('stupnice Ohrožení nastaví hodnotu (klik na stupínek 3)', () => {
+    const onChange = vi.fn();
+    render(
+      <Drd2Sheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('Ohrožení 3'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: { drd2_threat: '3' },
+    });
+  });
+
+  it('view mode disabluje segmenty i hranici', () => {
+    render(<Drd2Sheet {...commonProps} diary={makeDiary()} mode="view" />);
+    expect(screen.getByLabelText('Tělo 1')).toBeDisabled();
+    expect(screen.getByLabelText('Tělo hranice')).toBeDisabled();
+  });
+
+  it('+ přidat zbraň vytvoří prázdnou položku v drd2_weapons', () => {
+    const onChange = vi.fn();
+    render(
+      <Drd2Sheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ přidat zbraň / zbroj'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drd2_weapons: JSON.stringify([{ name: '', char: '', note: '' }]),
+      },
+    });
+  });
+
+  it('+ přidat pomocníka vytvoří prázdného companiona', () => {
+    const onChange = vi.fn();
+    render(
+      <Drd2Sheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ přidat pomocníka'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drd2_companions: JSON.stringify([
+          { char: '', ability: '', bound: '', pay: '', bond: 0 },
+        ]),
+      },
+    });
+  });
+
+  it('+ přidat rituální předmět vytvoří prázdný rituál', () => {
+    const onChange = vi.fn();
+    render(
+      <Drd2Sheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ přidat rituální předmět'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drd2_rituals: JSON.stringify([{ name: '', charge: 0 }]),
+      },
+    });
+  });
+
+  it('select základních povolání obsahuje 5 povolání', () => {
     render(
       <Drd2Sheet
         {...commonProps}
@@ -124,21 +186,18 @@ describe('Drd2Sheet (8.7h)', () => {
         onChange={() => {}}
       />,
     );
-    fireEvent.click(screen.getByText('2. Profese a Schopnosti'));
-    const select = screen.getByLabelText(
-      'Přidat povolání basic_professions',
-    );
+    const select = screen.getByLabelText('Přidat povolání basic_professions');
     const labels = Array.from(select.querySelectorAll('option')).map(
       (o) => o.textContent,
     );
-    // První option je "— Vyber povolání —", pak 5 základních
+    // 1 placeholder + 5 základních
     expect(labels.length).toBe(6);
     expect(labels).toContain('Bojovník');
     expect(labels).toContain('Lovec');
     expect(labels).toContain('Zaříkávač');
   });
 
-  it('přidání povolání skrz select + tlačítko vyvolá onChange', () => {
+  it('přidání povolání přes select + tlačítko vyvolá onChange', () => {
     const onChange = vi.fn();
     render(
       <Drd2Sheet
@@ -148,18 +207,30 @@ describe('Drd2Sheet (8.7h)', () => {
         onChange={onChange}
       />,
     );
-    fireEvent.click(screen.getByText('2. Profese a Schopnosti'));
-    const select = screen.getByLabelText(
-      'Přidat povolání basic_professions',
-    );
+    const select = screen.getByLabelText('Přidat povolání basic_professions');
     fireEvent.change(select, { target: { value: 'bojovnik' } });
-    // Klik na první „+ Přidat" v tabu Schopnosti (jeden je near select)
-    const addBtns = screen.getAllByText('+ Přidat');
-    fireEvent.click(addBtns[0]);
+    fireEvent.click(screen.getAllByText('+ přidat')[0]);
     expect(onChange).toHaveBeenCalledWith({
       customDataPatch: expect.objectContaining({
         drd2_basic_professions: expect.anything(),
       }),
     });
+  });
+
+  it('ZS se zadávají ručně — žádný katalogový dropdown „z katalogu"', () => {
+    render(
+      <Drd2Sheet
+        {...commonProps}
+        diary={makeDiary({
+          drd2_special_abilities: JSON.stringify([
+            { name: 'Pádný úder', source: 'Bojovník', type: 'aktivní', description: '' },
+          ]),
+        })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.queryByText(/z katalogu/i)).toBeNull();
+    expect(screen.getByText('+ přidat ZS')).toBeInTheDocument();
   });
 });
