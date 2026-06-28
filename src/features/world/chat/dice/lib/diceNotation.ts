@@ -57,10 +57,20 @@ export function payloadToNotation(payload: DicePayload): string | null {
   }
 
   if (payload.type === 'mixed') {
-    const parts = payload.faces.map((f, i) => {
+    // Grupuj tváře per typ kostky → „2d4@a,b+2d6@c,d". Opakované jednotlivé
+    // `1d4@a+1d4@b` přes `+` engine spolehlivě neslepí (ukázal jen 1 kostku);
+    // grupovaný tvar (jako pool `3d6@…`) je ověřeně funkční.
+    const byType = new Map<string, number[]>();
+    payload.faces.forEach((f, i) => {
       const t = (payload.faceTypes[i] || 'd6').toLowerCase();
+      const arr = byType.get(t);
+      if (arr) arr.push(Number(f));
+      else byType.set(t, [Number(f)]);
+    });
+    const parts: string[] = [];
+    byType.forEach((vals, t) => {
       const sides = SIDES[t] ?? 6;
-      return `1d${sides}@${faceNum(sides, Number(f))}`;
+      parts.push(group(sides, vals));
     });
     return parts.join('+');
   }

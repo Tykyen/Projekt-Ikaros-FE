@@ -1017,3 +1017,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře. Past pro příště: `onRoll` kind je DUAL-SOURCE (`SystemSheetProps` + chat `DiaryRollKind`) → rozšíření kostky = OBĚ místa (build to chytil, ne tsc inkrement). Čeká živá kontrola uživatelem + FE commit celého JaD balíku.
 
 ---
+
+### ✅ ŘEŠENÍ — 8.7q follow-up: mixed 3D notace + JaD HP bar · 2026-06-28
+**Co zabralo (notace — čeká živé 3D potvrzení):** Skládaný hod (`mixed`) generoval do 3D enginu notaci `1d4@a+1d4@b+1d6@c+1d6@d` (opakované jednotlivé kostky přes `+`) → engine ukázal jen 1 kostku. Fix: grupovat tváře per typ → `2d4@a,b+2d6@c,d` (tvar jako pool `3d6@…`, ověřeně funkční). Unit test ověřuje notační STRING; **3D render nejde jednotkově (WebGL) → čeká živé potvrzení uživatelem**.
+**HP bar:** `JadCombatPanel` dostal vizuální pruh životů (barva dle zdraví zelená/oranžová/červená) — uživatel chtěl vidět míru zranění (13/20 nic neukazovalo).
+**Otevřené (B):** uživatel hlásí, že fatální úspěch se neukázal u INICIATIVY. V kódu rozdíl není (crit přežívá BE `diceRolls` pass-through, render společný v `DiceLogPanel`) → pravděpodobně nat20-na-kostce vs total, nebo dice-log panel vs iniciativní lišta. Čeká upřesnění/screenshot.
+**Zhodnocení:** mixed notace = poučení (3D engine: grupuj stejné kostky `NdX@a,b`, neopakuj `1dX@a+1dX@b`). NEoznačuji za hotové, dokud uživatel 3D nepotvrdí (vyhýbám se předčasnému ✅ jako CH-012).
+
+---
