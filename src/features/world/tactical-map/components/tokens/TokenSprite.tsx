@@ -450,6 +450,13 @@ export function TokenSprite({
  * visibility dle typu tokenu. Vrací `null` (bez baru) když token nemá HP
  * nebo je daný typ v `scene.config` vypnutý. Default (undefined flag) = zobraz.
  */
+/**
+ * Systémy, které na mapě HP bar NEpoužívají — jejich „zdraví" není jeden
+ * proužek (DrD2 = tři zdroje Tělo/Duše/Vliv u postav, Sudba u bestií; herní
+ * rozhodnutí HP bar vůbec nezobrazovat). Rozšiř o další dle potřeby.
+ */
+const HP_BAR_DISABLED_SYSTEMS = new Set<string>(['drd2']);
+
 function HpBarForToken({
   token,
   config,
@@ -460,6 +467,8 @@ function HpBarForToken({
   size: number;
 }): React.ReactElement | null {
   const systemId = useResolvedSystemId() || null;
+  // DrD2 a spol. — žádný HP bar pro žádný token (bestie / PC / NPC).
+  if (systemId && HP_BAR_DISABLED_SYSTEMS.has(systemId)) return null;
   const schema = systemId
     ? systemEntitySchemaRegistry.get(systemId, 'token')
     : null;
