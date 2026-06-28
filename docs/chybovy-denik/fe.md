@@ -993,3 +993,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — zabralo bez cyklení. **2 reálné nálezy navíc:** (a) drd2 bestie v chatu byla bez `DiarySkinScope` → neoskinovaná (vnější aside měl jen `data-diary-system`, ne `-skin`); rodina CH-032/CH-033, opraveno obalením (parita s mapou) — drdplus má tutéž mezeru → dluh `D-16.2F-DRDPLUS-CHAT-BESTIE-SKIN`. (b) širší font skinu (Orbitron retro) přetlačil `.drd2-prof` na mobilu (grid 1fr track = min-content floor) → base fix `flex-wrap:wrap` v @media 768 (robustní pro všechny skiny). funkce+napoveda doplněny. Zbývá živý `mobil-desktop` + commit.
 
 ---
+
+### ✅ ŘEŠENÍ — 8.7p JaD deník: multipovolání + obory + přidávatelné sekce · 2026-06-28
+**Co nakonec zabralo:** Rozšíření existujícího `JadSheet` (8.7b = 1:1 legacy) o multipovolání — `jad_classes` JSON pole `[{c,l,s}]`, obory z `JAD_CLASSES` (prahová úroveň `sub`), úroveň postavy = auto součet, zázemí `<select>` (16) + „Vlastní…", přidávatelné `jad_profs`/`jad_langs`/`jad_feats` místo volných textarea; jméno/přesvědčení/hráč/pomůcky pryč z UI. Migrace legacy **read-only** (odvození pro zobrazení, zápis až 1. editem). Auto-caster jako **odvozený stav** (`spRaw==='' && hasCaster`), ne side-effect zápis v renderu.
+**Proč to je správně (a ne další variace):** HTML prototyp = kontrakt odsouhlasený předem (rodina drd16/drd2/drdplus „prototyp=kontrakt"); reuse `cdAccess` delta-merge → legacy klíče se z DB nemažou (delta merge nesahá na nezapsané) → stará postava přežije bez data loss; žádný side-effect v renderu = čistý React.
+**Jak ověřeno:** 29 testů zelené (8 nových: multipovolání add, obor lock L1/L3, auto úroveň, zázemí select, migrace `jad_class`/`jad_features`, add prof/lang/feat), build čistý, mobil/desktop screenshoty (produkční `jad.css`).
+**Zhodnocení:** dobře, zabralo napoprvé; jediná ztráta času = honění fantom overflow (viz CH-035). Obory jen jako názvy (bez číselných účinků schopností) = vědomý záměr.
+
+---

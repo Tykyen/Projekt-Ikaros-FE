@@ -1,11 +1,13 @@
 /**
  * 8.7b — JaD (Jeskyně a draci) deník postavy.
+ * 8.7p — redesign: multipovolání + obory, zázemí select, auto úroveň,
+ *        přidávatelné zdatnosti/jazyky/schopnosti, poznámky dole.
+ *        Viz [spec-8.7p](../../../../../../../docs/arch/phase-8/spec-8.7p-jad-redesign.md).
  *
- * Adaptováno z `c:/Matrix/Matrix/frontend/src/components/diary/JadCharacterSheet.tsx`
- * (280 ř, 1:1 layout). Hlavní odlišnosti:
- *   - Save delegujeme parentu (EditStickyBar v `DiaryTab`); `onSave` prop nemá.
- *   - `view` mód disabluje všechny inputy + tlačítka (cycle stavů, add/del row).
- *   - Data v `diary.customData` s prefixem `jad_*` (1:1 vůči legacy).
+ * Data v `diary.customData` s prefixem `jad_*`. Migrace legacy polí
+ * (`jad_class`, `jad_other_profs`, `jad_features`) je read-only — odvodí se
+ * pro zobrazení, do DB se zapíše až prvním editem nového pole. Odebraná pole
+ * (jméno/přesvědčení/hráč/pomůcky) se z DB nemažou, jen je UI neukazuje.
  */
 import { useState } from 'react';
 import { usePrintMode } from '@/features/world/export/print';
@@ -14,6 +16,11 @@ import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
 import {
   ABIL_MAP,
   SKILLS,
+  JAD_CLASSES,
+  JAD_CASTERS,
+  JAD_BACKGROUNDS,
+  type JadClassRow,
+  type JadFeat,
   type JadSpell,
   type JadWeapon,
 } from './constants';
@@ -21,25 +28,48 @@ import { calcMod, calcSaveMod, calcSkillMod, fmtMod } from './formulas';
 
 type Tab = 'main' | 'spells';
 
+// ── Odvozená pole (read-only migrace legacy) ──────────────────────
+function deriveClasses(cda: CdAccess): JadClassRow[] {
+  const arr = cda.parseJsonArr<JadClassRow>('classes');
+  if (arr.length) return arr;
+  const c = cda.g('class');
+  return c ? [{ c, l: cda.g('level') || '1', s: '' }] : [];
+}
+function deriveProfs(cda: CdAccess): string[] {
+  const arr = cda.parseJsonArr<string>('profs');
+  if (arr.length) return arr;
+  const t = cda.g('other_profs');
+  return t ? [t] : [];
+}
+function deriveFeats(cda: CdAccess): JadFeat[] {
+  const arr = cda.parseJsonArr<JadFeat>('feats');
+  if (arr.length) return arr;
+  const t = cda.g('features');
+  return t ? [{ n: '', d: t }] : [];
+}
+function jadTotalLevel(rows: JadClassRow[]): number {
+  return rows.reduce((s, r) => s + (parseInt(r.l || '0', 10) || 0), 0);
+}
+
 export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
   const disabled = mode === 'view';
   const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'jad_', onChange);
   const { g, set, parseJsonArr } = cda;
-  // Backward-compat aliases pro stávající JadSheet kód (přijaty jako props
-  // do SpellLevelBlock — bez refaktoru by se editovaly desítky řádků).
-  const setJson = (key: string, arr: unknown[]) =>
-    set(key, JSON.stringify(arr));
+  const setJson = (key: string, arr: unknown[]) => set(key, JSON.stringify(arr));
   const getJson = <T,>(key: string): T[] => parseJsonArr<T>(key);
-  // Suppress unused-var warning: cda je celá poskytnuta v Components níž.
-  void cda;
 
   const [tab, setTab] = useState<Tab>('main');
 
+  // Zázemí: select, nebo „Vlastní…" text input pokud hodnota není v seznamu.
+  const bgVal = g('background');
+  const [bgCustom, setBgCustom] = useState(
+    bgVal !== '' && !JAD_BACKGROUNDS.includes(bgVal),
+  );
+
   const profBonus = parseInt(g('profBonus', '2'), 10) || 2;
-  const getScore = (k: string) =>
-    parseInt(g(`abi_${k}`, '10'), 10) || 10;
+  const getScore = (k: string) => parseInt(g(`abi_${k}`, '10'), 10) || 10;
   const getModFor = (k: string) => calcMod(getScore(k));
 
   const isSaveProf = (k: string) => g(`save_${k}`) === '1';
@@ -50,11 +80,27 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
   const skillModFor = (n: string, a: string) =>
     calcSkillMod(getModFor(a), skillProf(n), profBonus);
 
-  const spellEnabled = g('spellEnabled') === '1';
-  const weapons = getJson<JadWeapon>('weapons');
+  // Multipovolání
+  const classRows = deriveClasses(cda);
+  const totalLevel = jadTotalLevel(classRows);
+  const writeClasses = (arr: JadClassRow[]) => setJson('classes', arr);
+  const updateClass = (i: number, patch: Partial<JadClassRow>) => {
+    const a = [...classRows];
+    a[i] = { ...a[i], ...patch };
+    writeClasses(a);
+  };
 
-  // Tisk: inputy/number/taby jsou netisknutelné — vyrenderujeme statický
-  // čitelný dokument se spočtenými modifikátory jako text.
+  // Kouzla: odvozený default — zapnuto, je-li mezi povoláními kouzlící a
+  // uživatel na checkbox nikdy nesáhl. Ruční volba ('1'/'0') má přednost.
+  const hasCasterClass = classRows.some((r) => JAD_CASTERS.includes(r.c));
+  const spRaw = g('spellEnabled');
+  const spellEnabled = spRaw === '1' || (spRaw === '' && hasCasterClass);
+
+  const weapons = getJson<JadWeapon>('weapons');
+  const profList = deriveProfs(cda);
+  const langList = getJson<string>('langs');
+  const featList = deriveFeats(cda);
+
   if (printMode) return <JadPrintView cda={cda} />;
 
   return (
@@ -81,9 +127,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
             type="checkbox"
             checked={spellEnabled}
             disabled={disabled}
-            onChange={(e) =>
-              set('spellEnabled', e.target.checked ? '1' : '0')
-            }
+            onChange={(e) => set('spellEnabled', e.target.checked ? '1' : '0')}
           />
           Sesilatel / Alchymista
         </label>
@@ -91,36 +135,158 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
 
       {tab === 'main' && (
         <>
+          {/* ── HLAVIČKA (identita) ───────────────────────────── */}
           <div className="jad-header">
-            <div className="jad-header-main">
-              <label htmlFor="jad_charName">Jméno postavy</label>
-              <input
-                id="jad_charName"
-                value={g('charName')}
-                disabled={disabled}
-                onChange={(e) => set('charName', e.target.value)}
-              />
-            </div>
-            <div className="jad-header-grid">
-              {[
-                { key: 'race', label: 'Rasa' },
-                { key: 'class', label: 'Povolání' },
-                { key: 'level', label: 'Úroveň' },
-                { key: 'background', label: 'Zázemí' },
-                { key: 'alignment', label: 'Přesvědčení' },
-                { key: 'player', label: 'Hráč' },
-                { key: 'xp', label: 'Zkušenosti' },
-              ].map((f) => (
-                <div className="jad-field" key={f.key}>
-                  <label htmlFor={`jad_${f.key}`}>{f.label}</label>
+            <div className="jad-identity">
+              <div className="jad-field">
+                <label htmlFor="jad_race">Rasa</label>
+                <input
+                  id="jad_race"
+                  value={g('race')}
+                  disabled={disabled}
+                  onChange={(e) => set('race', e.target.value)}
+                />
+              </div>
+              <div className="jad-field">
+                <label htmlFor="jad_background">Zázemí</label>
+                <select
+                  id="jad_background"
+                  value={bgCustom ? '__custom__' : bgVal}
+                  disabled={disabled}
+                  onChange={(e) => {
+                    if (e.target.value === '__custom__') {
+                      setBgCustom(true);
+                    } else {
+                      setBgCustom(false);
+                      set('background', e.target.value);
+                    }
+                  }}
+                >
+                  <option value="">— vyber —</option>
+                  {JAD_BACKGROUNDS.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                  <option value="__custom__">Vlastní…</option>
+                </select>
+                {bgCustom && (
                   <input
-                    id={`jad_${f.key}`}
-                    value={g(f.key)}
+                    style={{ marginTop: 6 }}
+                    value={bgVal}
                     disabled={disabled}
-                    onChange={(e) => set(f.key, e.target.value)}
+                    placeholder="Vlastní zázemí"
+                    aria-label="Vlastní zázemí"
+                    onChange={(e) => set('background', e.target.value)}
                   />
-                </div>
-              ))}
+                )}
+              </div>
+              <div className="jad-field">
+                <label htmlFor="jad_xp">Zkušenosti</label>
+                <input
+                  id="jad_xp"
+                  value={g('xp')}
+                  disabled={disabled}
+                  onChange={(e) => set('xp', e.target.value)}
+                />
+              </div>
+              <div className="jad-level-badge">
+                <div className="num">{totalLevel}</div>
+                <div className="cap">Úroveň</div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── MULTIPOVOLÁNÍ ─────────────────────────────────── */}
+          <h3>Povolání a obory</h3>
+          <div className="jad-panel" style={{ marginBottom: 24 }}>
+            <div className="jad-prof-list">
+              {classRows.map((row, i) => {
+                const meta = JAD_CLASSES[row.c];
+                const lvl = parseInt(row.l || '0', 10) || 0;
+                const locked = !meta || lvl < meta.sub;
+                return (
+                  <div className="jad-prof-row" key={i}>
+                    <div className="pcol">
+                      <span className="pcap">Povolání</span>
+                      <select
+                        value={row.c}
+                        disabled={disabled}
+                        aria-label="Povolání"
+                        onChange={(e) => updateClass(i, { c: e.target.value })}
+                      >
+                        <option value="">— vyber —</option>
+                        {Object.keys(JAD_CLASSES).map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="pcol pcol-lvl">
+                      <span className="pcap">Úroveň</span>
+                      <input
+                        type="number"
+                        min={1}
+                        value={row.l}
+                        disabled={disabled}
+                        aria-label="Úroveň povolání"
+                        onChange={(e) => updateClass(i, { l: e.target.value })}
+                      />
+                    </div>
+                    <div className="pcol pcol-sub">
+                      <span className="pcap">Obor / specializace</span>
+                      <select
+                        value={row.s}
+                        disabled={disabled || locked}
+                        aria-label="Obor"
+                        onChange={(e) => updateClass(i, { s: e.target.value })}
+                      >
+                        <option value="">{meta ? '— vyber obor —' : '—'}</option>
+                        {meta?.list.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                      {meta && locked && (
+                        <div className="jad-sub-hint">
+                          obor od {meta.sub}. úrovně
+                        </div>
+                      )}
+                    </div>
+                    {!disabled && (
+                      <button
+                        type="button"
+                        className="del-btn"
+                        onClick={() => {
+                          const a = [...classRows];
+                          a.splice(i, 1);
+                          writeClasses(a);
+                        }}
+                        aria-label="Odebrat povolání"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {!disabled && (
+              <button
+                type="button"
+                className="add-link"
+                onClick={() =>
+                  writeClasses([...classRows, { c: '', l: '', s: '' }])
+                }
+              >
+                + Přidat povolání
+              </button>
+            )}
+            <div className="jad-foot-hint">
+              Úroveň postavy = součet úrovní povolání. Obor se odemkne na
+              prahové úrovni povolání.
             </div>
           </div>
 
@@ -131,9 +297,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
               <div className="jad-stats">
                 {ABIL_MAP.map(({ k, l }) => (
                   <div key={k} className="jad-stat-box">
-                    <span className="lbl">
-                      {l.substring(0, 3).toUpperCase()}
-                    </span>
+                    <span className="lbl">{l.substring(0, 3).toUpperCase()}</span>
                     <input
                       type="number"
                       value={getScore(k)}
@@ -150,11 +314,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                 <div className="jad-list-row">
                   <span className="lbl">Zdatnostní bonus</span>
                   <input
-                    style={{
-                      width: 50,
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}
+                    style={{ width: 50, textAlign: 'center', fontWeight: 'bold' }}
                     value={profBonus}
                     disabled={disabled}
                     onChange={(e) => set('profBonus', e.target.value)}
@@ -169,8 +329,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                     style={{
                       width: 24,
                       height: 24,
-                      background:
-                        g('insp') === '1' ? 'var(--jad-accent)' : '#fff',
+                      background: g('insp') === '1' ? 'var(--jad-accent)' : '#fff',
                     }}
                     onClick={() => set('insp', g('insp') === '1' ? '0' : '1')}
                     aria-label="Přepnout inspiraci"
@@ -186,9 +345,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                       type="button"
                       className="prof"
                       disabled={disabled}
-                      onClick={() =>
-                        set(`save_${k}`, isSaveProf(k) ? '0' : '1')
-                      }
+                      onClick={() => set(`save_${k}`, isSaveProf(k) ? '0' : '1')}
                       aria-label={`Záchrana ${l}: ${isSaveProf(k) ? 'zdatný' : 'nezdatný'}`}
                     >
                       {isSaveProf(k) ? '●' : '○'}
@@ -202,21 +359,15 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
               <h3>Pasivní vnímání a smysly</h3>
               <div className="jad-panel">
                 <div className="jad-list-row">
-                  <span className="mod">
-                    {10 + skillModFor('Vnímání', 'wis')}
-                  </span>
+                  <span className="mod">{10 + skillModFor('Vnímání', 'wis')}</span>
                   <span className="lbl">Pasivní Vnímání</span>
                 </div>
                 <div className="jad-list-row">
-                  <span className="mod">
-                    {10 + skillModFor('Vhled', 'wis')}
-                  </span>
+                  <span className="mod">{10 + skillModFor('Vhled', 'wis')}</span>
                   <span className="lbl">Pasivní Vhled</span>
                 </div>
                 <div className="jad-list-row" style={{ border: 0 }}>
-                  <span className="mod">
-                    {10 + skillModFor('Pátrání', 'int')}
-                  </span>
+                  <span className="mod">{10 + skillModFor('Pátrání', 'int')}</span>
                   <span className="lbl">Pasivní Pátrání</span>
                 </div>
               </div>
@@ -288,12 +439,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                   <div className="hp-box">
                     <label>Záchrany proti smrti</label>
                     <div
-                      style={{
-                        display: 'flex',
-                        gap: 8,
-                        marginTop: 8,
-                        fontSize: 12,
-                      }}
+                      style={{ display: 'flex', gap: 8, marginTop: 8, fontSize: 12 }}
                     >
                       <div style={{ flex: 1 }}>
                         Záchr.{' '}
@@ -330,9 +476,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                         type="button"
                         className="prof"
                         disabled={disabled}
-                        onClick={() =>
-                          set(`skill_${n}`, String((prof + 1) % 3))
-                        }
+                        onClick={() => set(`skill_${n}`, String((prof + 1) % 3))}
                         aria-label={`Dovednost ${n}: ${prof === 0 ? 'žádná' : prof === 1 ? 'zdatnost' : 'expertíza'}`}
                       >
                         {prof === 0 ? '○' : prof === 1 ? '●' : '◉'}
@@ -346,38 +490,42 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
               </div>
             </div>
 
-            {/* COLUMN 3 — Spell quick-ref, weapons, notes */}
+            {/* COLUMN 3 — Spell quick-ref, weapons, profs/langs/feats */}
             <div>
-              <h3>Rychlý přehled kouzlení / Alchymie</h3>
-              <div className="jad-panel" style={{ marginBottom: 24 }}>
-                <div className="jad-list-row">
-                  <span className="lbl">Sesílací / Útočná vlastnost</span>
-                  <input
-                    style={{ width: 80, textAlign: 'center' }}
-                    value={g('qc_ss_abi')}
-                    disabled={disabled}
-                    onChange={(e) => set('qc_ss_abi', e.target.value)}
-                  />
-                </div>
-                <div className="jad-list-row">
-                  <span className="lbl">Útočný bonus</span>
-                  <input
-                    style={{ width: 60, textAlign: 'center' }}
-                    value={g('qc_ss_atk')}
-                    disabled={disabled}
-                    onChange={(e) => set('qc_ss_atk', e.target.value)}
-                  />
-                </div>
-                <div className="jad-list-row" style={{ border: 0 }}>
-                  <span className="lbl">Stupeň obtížnosti (SO)</span>
-                  <input
-                    style={{ width: 60, textAlign: 'center' }}
-                    value={g('qc_ss_dc')}
-                    disabled={disabled}
-                    onChange={(e) => set('qc_ss_dc', e.target.value)}
-                  />
-                </div>
-              </div>
+              {spellEnabled && (
+                <>
+                  <h3>Rychlý přehled kouzlení / Alchymie</h3>
+                  <div className="jad-panel" style={{ marginBottom: 24 }}>
+                    <div className="jad-list-row">
+                      <span className="lbl">Sesílací / Útočná vlastnost</span>
+                      <input
+                        style={{ width: 80, textAlign: 'center' }}
+                        value={g('qc_ss_abi')}
+                        disabled={disabled}
+                        onChange={(e) => set('qc_ss_abi', e.target.value)}
+                      />
+                    </div>
+                    <div className="jad-list-row">
+                      <span className="lbl">Útočný bonus</span>
+                      <input
+                        style={{ width: 60, textAlign: 'center' }}
+                        value={g('qc_ss_atk')}
+                        disabled={disabled}
+                        onChange={(e) => set('qc_ss_atk', e.target.value)}
+                      />
+                    </div>
+                    <div className="jad-list-row" style={{ border: 0 }}>
+                      <span className="lbl">Stupeň obtížnosti (SO)</span>
+                      <input
+                        style={{ width: 60, textAlign: 'center' }}
+                        value={g('qc_ss_dc')}
+                        disabled={disabled}
+                        onChange={(e) => set('qc_ss_dc', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
               <h3>Zbraně a Doplňky</h3>
               <div className="jad-panel" style={{ marginBottom: 24 }}>
@@ -394,50 +542,19 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                   <tbody>
                     {weapons.map((w, i) => (
                       <tr key={i}>
-                        <td>
-                          <input
-                            value={w.n}
-                            disabled={disabled}
-                            onChange={(e) => {
-                              const arr = [...weapons];
-                              arr[i] = { ...arr[i], n: e.target.value };
-                              setJson('weapons', arr);
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            value={w.b}
-                            disabled={disabled}
-                            onChange={(e) => {
-                              const arr = [...weapons];
-                              arr[i] = { ...arr[i], b: e.target.value };
-                              setJson('weapons', arr);
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            value={w.d}
-                            disabled={disabled}
-                            onChange={(e) => {
-                              const arr = [...weapons];
-                              arr[i] = { ...arr[i], d: e.target.value };
-                              setJson('weapons', arr);
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            value={w.o}
-                            disabled={disabled}
-                            onChange={(e) => {
-                              const arr = [...weapons];
-                              arr[i] = { ...arr[i], o: e.target.value };
-                              setJson('weapons', arr);
-                            }}
-                          />
-                        </td>
+                        {(['n', 'b', 'd', 'o'] as const).map((field) => (
+                          <td key={field}>
+                            <input
+                              value={w[field]}
+                              disabled={disabled}
+                              onChange={(e) => {
+                                const arr = [...weapons];
+                                arr[i] = { ...arr[i], [field]: e.target.value };
+                                setJson('weapons', arr);
+                              }}
+                            />
+                          </td>
+                        ))}
                         <td>
                           {!disabled && (
                             <button
@@ -474,54 +591,54 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                 )}
               </div>
 
-              <h3>Poznámky k hraní postavy</h3>
+              <h3>Zdatnosti (zbroje, zbraně, nástroje)</h3>
               <div className="jad-panel" style={{ marginBottom: 24 }}>
-                <textarea
-                  style={{
-                    width: '100%',
-                    minHeight: 120,
-                    border: 'none',
-                    resize: 'vertical',
-                  }}
-                  value={g('play_notes')}
+                <StringListRows
+                  items={profList}
                   disabled={disabled}
-                  onChange={(e) => set('play_notes', e.target.value)}
-                  placeholder="Taktika, aktivní efekty, nápady do boje..."
+                  placeholder="Lehké zbroje, dýky, zlodějské náčiní…"
+                  addLabel="+ Přidat zdatnost"
+                  onWrite={(a) => setJson('profs', a)}
                 />
               </div>
 
-              <h3>Ostatní zdatnosti a Pomůcky</h3>
+              <h3>Jazyky</h3>
               <div className="jad-panel" style={{ marginBottom: 24 }}>
-                <textarea
-                  style={{
-                    width: '100%',
-                    minHeight: 100,
-                    border: 'none',
-                    resize: 'vertical',
-                  }}
-                  value={g('other_profs')}
+                <StringListRows
+                  items={langList}
                   disabled={disabled}
-                  onChange={(e) => set('other_profs', e.target.value)}
-                  placeholder="Jazyky, nástroje, zbroje..."
+                  placeholder="Obecná řeč, elfština…"
+                  addLabel="+ Přidat jazyk"
+                  onWrite={(a) => setJson('langs', a)}
                 />
               </div>
 
-              <h3>Záznam Schopností (Třídní / Rasové)</h3>
+              <h3>Schopnosti</h3>
               <div className="jad-panel">
-                <textarea
-                  style={{
-                    width: '100%',
-                    minHeight: 200,
-                    border: 'none',
-                    resize: 'vertical',
-                  }}
-                  value={g('features')}
+                <FeatRows
+                  items={featList}
                   disabled={disabled}
-                  onChange={(e) => set('features', e.target.value)}
-                  placeholder="Výpis schopností postavy..."
+                  onWrite={(a) => setJson('feats', a)}
                 />
               </div>
             </div>
+          </div>
+
+          {/* ── POZNÁMKY (plná šířka, úplně dole) ─────────────── */}
+          <h3 style={{ marginTop: 24 }}>Poznámky k hraní postavy</h3>
+          <div className="jad-panel jad-notes-full">
+            <textarea
+              style={{
+                width: '100%',
+                minHeight: 140,
+                border: 'none',
+                resize: 'vertical',
+              }}
+              value={g('play_notes')}
+              disabled={disabled}
+              onChange={(e) => set('play_notes', e.target.value)}
+              placeholder="Taktika, aktivní efekty, vztahy, příběhové poznámky…"
+            />
           </div>
         </>
       )}
@@ -551,7 +668,6 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
             <SpellLevelBlock
               key={lvl}
               lvl={lvl}
-              cd={cd}
               g={g}
               set={set}
               setJson={setJson}
@@ -565,9 +681,135 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
   );
 }
 
+// ════════════════════════════════════════════════════════════════
+// Přidávatelné sekce (zdatnosti / jazyky / schopnosti)
+// ════════════════════════════════════════════════════════════════
+
+interface StringListProps {
+  items: string[];
+  disabled: boolean;
+  placeholder: string;
+  addLabel: string;
+  onWrite: (arr: string[]) => void;
+}
+
+function StringListRows({
+  items,
+  disabled,
+  placeholder,
+  addLabel,
+  onWrite,
+}: StringListProps) {
+  return (
+    <>
+      {items.map((v, i) => (
+        <div className="jad-tag-row" key={i}>
+          <span className="bullet">◦</span>
+          <input
+            value={v}
+            disabled={disabled}
+            placeholder={placeholder}
+            onChange={(e) => {
+              const a = [...items];
+              a[i] = e.target.value;
+              onWrite(a);
+            }}
+          />
+          {!disabled && (
+            <button
+              type="button"
+              className="del-btn"
+              onClick={() => {
+                const a = [...items];
+                a.splice(i, 1);
+                onWrite(a);
+              }}
+              aria-label="Smazat položku"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      ))}
+      {!disabled && (
+        <button
+          type="button"
+          className="add-link"
+          onClick={() => onWrite([...items, ''])}
+        >
+          {addLabel}
+        </button>
+      )}
+    </>
+  );
+}
+
+interface FeatRowsProps {
+  items: JadFeat[];
+  disabled: boolean;
+  onWrite: (arr: JadFeat[]) => void;
+}
+
+function FeatRows({ items, disabled, onWrite }: FeatRowsProps) {
+  return (
+    <>
+      {items.map((f, i) => (
+        <div className="jad-feat" key={i}>
+          <div className="jad-feat-head">
+            <input
+              value={f.n}
+              disabled={disabled}
+              placeholder="Název schopnosti (např. Zuřivost, Akční vlna)"
+              aria-label="Název schopnosti"
+              onChange={(e) => {
+                const a = [...items];
+                a[i] = { ...a[i], n: e.target.value };
+                onWrite(a);
+              }}
+            />
+            {!disabled && (
+              <button
+                type="button"
+                className="del-btn"
+                onClick={() => {
+                  const a = [...items];
+                  a.splice(i, 1);
+                  onWrite(a);
+                }}
+                aria-label="Smazat schopnost"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <textarea
+            value={f.d}
+            disabled={disabled}
+            placeholder="Popis / účinek…"
+            aria-label="Popis schopnosti"
+            onChange={(e) => {
+              const a = [...items];
+              a[i] = { ...a[i], d: e.target.value };
+              onWrite(a);
+            }}
+          />
+        </div>
+      ))}
+      {!disabled && (
+        <button
+          type="button"
+          className="add-link"
+          onClick={() => onWrite([...items, { n: '', d: '' }])}
+        >
+          + Přidat schopnost
+        </button>
+      )}
+    </>
+  );
+}
+
 interface SpellLevelBlockProps {
   lvl: number;
-  cd: Record<string, unknown>;
   g: CdAccess['g'];
   set: CdAccess['set'];
   setJson: (key: string, arr: unknown[]) => void;
@@ -591,9 +833,7 @@ function SpellLevelBlock({
         <h4>{lvl === 0 ? 'Triky' : `${lvl}. Stupeň`}</h4>
         {lvl > 0 && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span
-              style={{ fontSize: 12, fontWeight: 'bold', color: '#7b6f5e' }}
-            >
+            <span style={{ fontSize: 12, fontWeight: 'bold', color: '#7b6f5e' }}>
               Pozice:
             </span>
             <input
@@ -710,16 +950,7 @@ function SpellLevelBlock({
           onClick={() =>
             setJson(`spl_${lvl}`, [
               ...spells,
-              {
-                p: false,
-                s: false,
-                n: '',
-                u: '',
-                d: '',
-                z: '',
-                r: '',
-                t: '',
-              },
+              { p: false, s: false, n: '', u: '', d: '', z: '', r: '', t: '' },
             ])
           }
         >
@@ -733,16 +964,6 @@ function SpellLevelBlock({
 // ════════════════════════════════════════════════════════════════
 // PRINT — statický čitelný dokument (čte stejná `jad_*` data)
 // ════════════════════════════════════════════════════════════════
-
-const JAD_HEADER_FIELDS: { key: string; label: string }[] = [
-  { key: 'race', label: 'Rasa' },
-  { key: 'class', label: 'Povolání' },
-  { key: 'level', label: 'Úroveň' },
-  { key: 'background', label: 'Zázemí' },
-  { key: 'alignment', label: 'Přesvědčení' },
-  { key: 'player', label: 'Hráč' },
-  { key: 'xp', label: 'Zkušenosti' },
-];
 
 /** Zdatnost dovednosti: 0 = žádná, 1 = zdatnost, 2 = expertíza. */
 const JAD_PROF_LABEL = ['', 'zdatnost', 'expertíza'];
@@ -759,26 +980,38 @@ function JadPrintView({ cda }: { cda: CdAccess }) {
   const skillModFor = (n: string, a: string) =>
     calcSkillMod(getModFor(a), skillProf(n), profBonus);
 
-  const spellEnabled = g('spellEnabled') === '1';
+  const classRows = deriveClasses(cda);
+  const totalLevel = jadTotalLevel(classRows);
+  const profList = deriveProfs(cda);
+  const langList = cda.parseJsonArr<string>('langs');
+  const featList = deriveFeats(cda).filter((f) => f.n.trim() || f.d.trim());
+
+  const hasCasterClass = classRows.some((r) => JAD_CASTERS.includes(r.c));
+  const spRaw = g('spellEnabled');
+  const spellEnabled = spRaw === '1' || (spRaw === '' && hasCasterClass);
   const weapons = cda.parseJsonArr<JadWeapon>('weapons');
 
   const playNotes = g('play_notes').trim();
-  const otherProfs = g('other_profs').trim();
-  const features = g('features').trim();
 
   return (
     <div className="jad-print">
       <dl>
         <div>
-          <dt>Jméno postavy</dt>
-          <dd>{g('charName') || '—'}</dd>
+          <dt>Rasa</dt>
+          <dd>{g('race') || '—'}</dd>
         </div>
-        {JAD_HEADER_FIELDS.map((f) => (
-          <div key={f.key}>
-            <dt>{f.label}</dt>
-            <dd>{g(f.key) || '—'}</dd>
-          </div>
-        ))}
+        <div>
+          <dt>Zázemí</dt>
+          <dd>{g('background') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Úroveň</dt>
+          <dd>{totalLevel}</dd>
+        </div>
+        <div>
+          <dt>Zkušenosti</dt>
+          <dd>{g('xp') || '—'}</dd>
+        </div>
         <div>
           <dt>Zdatnostní bonus</dt>
           <dd>{fmtMod(profBonus)}</dd>
@@ -788,6 +1021,23 @@ function JadPrintView({ cda }: { cda: CdAccess }) {
           <dd>{g('insp') === '1' ? 'ano' : 'ne'}</dd>
         </div>
       </dl>
+
+      <h2>Povolání a obory</h2>
+      {classRows.length > 0 ? (
+        <ul className="matrix-print__plain">
+          {classRows.map((r, i) => (
+            <li key={i} className="print-row">
+              <span>
+                {r.c || '—'}
+                {r.s ? ` — ${r.s}` : ''}
+              </span>
+              <span>{r.l ? `${r.l}. úr.` : '—'}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>—</p>
+      )}
 
       <h2>Hlavní vlastnosti</h2>
       <dl className="print-cols">
@@ -883,21 +1133,25 @@ function JadPrintView({ cda }: { cda: CdAccess }) {
         </li>
       </ul>
 
-      <h2>Rychlý přehled kouzlení / Alchymie</h2>
-      <dl>
-        <div>
-          <dt>Sesílací / Útočná vlastnost</dt>
-          <dd>{g('qc_ss_abi') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Útočný bonus</dt>
-          <dd>{g('qc_ss_atk') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Stupeň obtížnosti (SO)</dt>
-          <dd>{g('qc_ss_dc') || '—'}</dd>
-        </div>
-      </dl>
+      {spellEnabled && (
+        <>
+          <h2>Rychlý přehled kouzlení / Alchymie</h2>
+          <dl>
+            <div>
+              <dt>Sesílací / Útočná vlastnost</dt>
+              <dd>{g('qc_ss_abi') || '—'}</dd>
+            </div>
+            <div>
+              <dt>Útočný bonus</dt>
+              <dd>{g('qc_ss_atk') || '—'}</dd>
+            </div>
+            <div>
+              <dt>Stupeň obtížnosti (SO)</dt>
+              <dd>{g('qc_ss_dc') || '—'}</dd>
+            </div>
+          </dl>
+        </>
+      )}
 
       {weapons.length > 0 && (
         <>
@@ -925,24 +1179,44 @@ function JadPrintView({ cda }: { cda: CdAccess }) {
         </>
       )}
 
+      {profList.length > 0 && (
+        <>
+          <h2>Zdatnosti</h2>
+          <ul>
+            {profList.map((p, i) => (
+              <li key={i}>{p || '—'}</li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {langList.length > 0 && (
+        <>
+          <h2>Jazyky</h2>
+          <ul>
+            {langList.map((p, i) => (
+              <li key={i}>{p || '—'}</li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {featList.length > 0 && (
+        <>
+          <h2>Schopnosti</h2>
+          {featList.map((f, i) => (
+            <div key={i}>
+              {f.n.trim() && <h3>{f.n}</h3>}
+              {f.d.trim() && <p style={{ whiteSpace: 'pre-wrap' }}>{f.d}</p>}
+            </div>
+          ))}
+        </>
+      )}
+
       {playNotes && (
         <>
           <h2>Poznámky k hraní postavy</h2>
           <p style={{ whiteSpace: 'pre-wrap' }}>{playNotes}</p>
-        </>
-      )}
-
-      {otherProfs && (
-        <>
-          <h2>Ostatní zdatnosti a pomůcky</h2>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{otherProfs}</p>
-        </>
-      )}
-
-      {features && (
-        <>
-          <h2>Záznam schopností (třídní / rasové)</h2>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{features}</p>
         </>
       )}
 

@@ -70,3 +70,115 @@ export interface JadSpell {
   r: string; // Dosah
   t: string; // Trvání
 }
+
+// ════════════════════════════════════════════════════════════════
+// 8.7p — Multipovolání, obory, zázemí, přidávatelné sekce
+// Zdroj: JaD „přehled povolání a oborů pro hráče" (veřejné SRD).
+// ════════════════════════════════════════════════════════════════
+
+/** Definice povolání: prahová úroveň výběru oboru + seznam oborů. */
+export interface JadClassDef {
+  /** Úroveň, na které se vybírá hlavní specializace (obor). */
+  sub: number;
+  /** Dostupné obory / specializace. */
+  list: string[];
+}
+
+/** 11 povolání JaD → kdy se větví obor + jaké obory. */
+export const JAD_CLASSES: Record<string, JadClassDef> = {
+  Alchymista: { sub: 3, list: ['Divotvůrce', 'Pyrofor', 'Theurg'] },
+  Barbar: { sub: 3, list: ['Berserk', 'Bijec', 'Kmenový válečník', 'Ničitel'] },
+  Bard: {
+    sub: 3,
+    list: ['Kolej dramatu', 'Kolej romance', 'Kolej písní světských'],
+  },
+  Bojovník: {
+    sub: 3,
+    list: [
+      'Gardista',
+      'Chodec',
+      'Chrámový rytíř',
+      'Šampion',
+      'Střelec',
+      'Veterán',
+      'Vojevůdce',
+    ],
+  },
+  'Čaroděj': {
+    sub: 1,
+    list: ['Fantaskní magie', 'Sférický čaroděj', 'Živlový čaroděj'],
+  },
+  'Černokněžník': {
+    sub: 1,
+    list: ['Bouřný titán', 'Pradávný drak', 'Ztracený mistr'],
+  },
+  Druid: { sub: 2, list: ['Kruh bylin', 'Kruh města', 'Kruh pohromy'] },
+  Klerik: { sub: 1, list: ['Inkvizitor', 'Kazatel', 'Misionář'] },
+  'Kouzelník': {
+    sub: 2,
+    list: ['Mistr svitků / Škola svitků', 'Průzkumník', 'Psychický mág'],
+  },
+  'Lovec netvorů': {
+    sub: 3,
+    list: [
+      'Řád bestie',
+      'Řád konečné smrti',
+      'Řád pozměněnců',
+      'Řád zaprodanců',
+    ],
+  },
+  'Tulák': {
+    sub: 3,
+    list: [
+      'Kejklíř',
+      'Mistr zloděje',
+      'Šedá eminence',
+      'Svatokupec',
+      'Vykradač hrobek',
+    ],
+  },
+};
+
+/** Povolání pracující s kouzly / alchymií (auto-zapnou sekci kouzel). */
+export const JAD_CASTERS = [
+  'Alchymista',
+  'Bard',
+  'Čaroděj',
+  'Černokněžník',
+  'Druid',
+  'Klerik',
+  'Kouzelník',
+];
+
+/** 16 osobních zázemí JaD (výběr v hlavičce). */
+export const JAD_BACKGROUNDS = [
+  'Akolyta',
+  'Bylinkář',
+  'Dělník',
+  'Strážce',
+  'Lovec',
+  'Chovatel',
+  'Kramář',
+  'Mudrc',
+  'Pobuda',
+  'Právník',
+  'Sluha',
+  'Šlechtic',
+  'Úředník',
+  'Voják',
+  'Zasvěcenec',
+  'Zbojník',
+];
+
+/** Jeden řádek multipovolání v `jad_classes` JSON poli. */
+export interface JadClassRow {
+  c: string; // povolání
+  l: string; // úroveň v povolání
+  s: string; // obor / specializace
+}
+
+/** Jedna schopnost v `jad_feats` JSON poli. */
+export interface JadFeat {
+  n: string; // název
+  d: string; // popis / účinek
+}

@@ -21,7 +21,7 @@ const commonProps = {
   characterSlug: 'aragorn',
 };
 
-describe('JadSheet (8.7b)', () => {
+describe('JadSheet (8.7b / 8.7p)', () => {
   it('vyrenderuje 6 atributů (SÍL/OBR/ODO/INT/MOU/CHA) a všech 18 dovedností', () => {
     render(
       <JadSheet
@@ -32,25 +32,18 @@ describe('JadSheet (8.7b)', () => {
       />,
     );
 
-    // 6 atributů (zkráceno na 3 písmena upper)
     ['SÍL', 'OBR', 'ODO', 'INT', 'MOU', 'CHA'].forEach((abbr) => {
       expect(screen.getByText(abbr)).toBeInTheDocument();
     });
 
-    // První a poslední dovednost ze seznamu
     expect(screen.getByText('Akrobacie')).toBeInTheDocument();
     expect(screen.getByText('Zastrašování')).toBeInTheDocument();
   });
 
   it('view mode disabluje inputy i tlačítka', () => {
-    render(
-      <JadSheet {...commonProps} diary={makeDiary()} mode="view" />,
-    );
-    expect(screen.getByLabelText('Jméno postavy')).toBeDisabled();
-    // Tlačítka pro cycle dovednosti / save proficience musí být disabled
-    expect(
-      screen.getByLabelText('Přepnout inspiraci'),
-    ).toBeDisabled();
+    render(<JadSheet {...commonProps} diary={makeDiary()} mode="view" />);
+    expect(screen.getByLabelText('Rasa')).toBeDisabled();
+    expect(screen.getByLabelText('Přepnout inspiraci')).toBeDisabled();
   });
 
   it('edit mode volá onChange při změně Síly', () => {
@@ -64,7 +57,7 @@ describe('JadSheet (8.7b)', () => {
       />,
     );
 
-    // Najdi všechny number inputy — první šestice jsou atributy v pořadí ABIL_MAP.
+    // Bez povolání není žádný number input pro úroveň → první spinbutton = Síla.
     const numberInputs = screen.getAllByRole('spinbutton');
     expect(numberInputs.length).toBeGreaterThanOrEqual(6);
     fireEvent.change(numberInputs[0], { target: { value: '15' } });
@@ -74,7 +67,7 @@ describe('JadSheet (8.7b)', () => {
     });
   });
 
-  it('vypočítá modifier správně (Síla 14 → +2 v boxu vlevo od inputu)', () => {
+  it('vypočítá modifier správně (Síla 14 → +2)', () => {
     render(
       <JadSheet
         {...commonProps}
@@ -82,7 +75,6 @@ describe('JadSheet (8.7b)', () => {
         mode="view"
       />,
     );
-    // První `.jad-stat-box` je SÍL — najdi v něm mod span s "+2"
     const silLabel = screen.getByText('SÍL');
     const statBox = silLabel.parentElement!;
     expect(within(statBox).getByText('+2')).toBeInTheDocument();
@@ -110,9 +102,7 @@ describe('JadSheet (8.7b)', () => {
         onChange={() => {}}
       />,
     );
-    expect(
-      screen.queryByText('Kouzla / Truhla'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Kouzla / Truhla')).not.toBeInTheDocument();
 
     rerender(
       <JadSheet
@@ -136,7 +126,6 @@ describe('JadSheet (8.7b)', () => {
       />,
     );
 
-    // Najdi Akrobacie a jeho prof button (v same row)
     const akr = screen.getByText('Akrobacie');
     const row = akr.parentElement!;
     const profBtn = within(row).getByRole('button');
@@ -165,5 +154,146 @@ describe('JadSheet (8.7b)', () => {
         ]),
       }),
     });
+  });
+
+  // ── 8.7p: hlavička bez jména / přesvědčení / hráče ──────────────
+  it('8.7p: hlavička neobsahuje jméno postavy, přesvědčení ani hráče', () => {
+    render(<JadSheet {...commonProps} diary={makeDiary()} mode="view" />);
+    expect(screen.queryByLabelText('Jméno postavy')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Přesvědčení')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Hráč')).not.toBeInTheDocument();
+  });
+
+  // ── 8.7p: zázemí jako select ────────────────────────────────────
+  it('8.7p: zázemí je select s 16 osobními zázemími', () => {
+    render(<JadSheet {...commonProps} diary={makeDiary()} mode="view" />);
+    const bg = screen.getByLabelText('Zázemí');
+    expect(bg.tagName).toBe('SELECT');
+    expect(screen.getByRole('option', { name: 'Akolyta' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Zbojník' })).toBeInTheDocument();
+  });
+
+  // ── 8.7p: multipovolání ─────────────────────────────────────────
+  it('8.7p: + Přidat povolání zapíše prázdný řádek do jad_classes', () => {
+    const onChange = vi.fn();
+    render(
+      <JadSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ Přidat povolání'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: expect.objectContaining({
+        jad_classes: JSON.stringify([{ c: '', l: '', s: '' }]),
+      }),
+    });
+  });
+
+  it('8.7p: úroveň postavy = součet úrovní povolání', () => {
+    render(
+      <JadSheet
+        {...commonProps}
+        diary={makeDiary({
+          jad_classes: JSON.stringify([
+            { c: 'Bojovník', l: '3', s: '' },
+            { c: 'Tulák', l: '2', s: '' },
+          ]),
+        })}
+        mode="view"
+      />,
+    );
+    const badge = screen.getByText('Úroveň', { selector: '.cap' })
+      .parentElement!;
+    expect(within(badge).getByText('5')).toBeInTheDocument();
+  });
+
+  it('8.7p: obor je zamčený pod prahovou úrovní (Bojovník L1) a volný od L3', () => {
+    const { rerender } = render(
+      <JadSheet
+        {...commonProps}
+        diary={makeDiary({
+          jad_classes: JSON.stringify([{ c: 'Bojovník', l: '1', s: '' }]),
+        })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.getByLabelText('Obor')).toBeDisabled();
+    expect(screen.getByText('obor od 3. úrovně')).toBeInTheDocument();
+
+    rerender(
+      <JadSheet
+        {...commonProps}
+        diary={makeDiary({
+          jad_classes: JSON.stringify([{ c: 'Bojovník', l: '3', s: '' }]),
+        })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.getByLabelText('Obor')).not.toBeDisabled();
+    expect(
+      screen.getByRole('option', { name: 'Šampion' }),
+    ).toBeInTheDocument();
+  });
+
+  it('8.7p: migrace legacy jad_class → první řádek povolání + úroveň', () => {
+    render(
+      <JadSheet
+        {...commonProps}
+        diary={makeDiary({ jad_class: 'Bojovník', jad_level: '5' })}
+        mode="view"
+      />,
+    );
+    expect((screen.getByLabelText('Povolání') as HTMLSelectElement).value).toBe(
+      'Bojovník',
+    );
+    const badge = screen.getByText('Úroveň', { selector: '.cap' })
+      .parentElement!;
+    expect(within(badge).getByText('5')).toBeInTheDocument();
+  });
+
+  // ── 8.7p: přidávatelné sekce ────────────────────────────────────
+  it('8.7p: + Přidat zdatnost / jazyk / schopnost zapisují svá pole', () => {
+    const onChange = vi.fn();
+    render(
+      <JadSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('+ Přidat zdatnost'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: expect.objectContaining({ jad_profs: JSON.stringify(['']) }),
+    });
+
+    fireEvent.click(screen.getByText('+ Přidat jazyk'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: expect.objectContaining({ jad_langs: JSON.stringify(['']) }),
+    });
+
+    fireEvent.click(screen.getByText('+ Přidat schopnost'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: expect.objectContaining({
+        jad_feats: JSON.stringify([{ n: '', d: '' }]),
+      }),
+    });
+  });
+
+  it('8.7p: migrace legacy jad_features → jedna schopnost s popisem', () => {
+    render(
+      <JadSheet
+        {...commonProps}
+        diary={makeDiary({ jad_features: 'Temný zrak 18 m' })}
+        mode="view"
+      />,
+    );
+    expect(screen.getByDisplayValue('Temný zrak 18 m')).toBeInTheDocument();
   });
 });

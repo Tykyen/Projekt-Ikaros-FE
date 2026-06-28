@@ -65,3 +65,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** tvrdím jeden společný kořen pro multi-file selhání z částečného/background outputu.
 
 ---
+
+### CH-035 — Chrome headless screenshot ořez vypadal jako horizontální overflow · 2026-06-28
+**Kontext:** `mobil-desktop` ověření JaD deníku; screenshot na `--window-size=375` ukazoval pravou stranu (Zázemí, meta, HP) oříznutou.
+**Co jsem udělal špatně:** předpokládal jsem horizontální overflow a 3× re-screenshotoval + 2× upravil CSS (meta zmenšení, grid/table `min-width:0`) na základě obrázku — místo abych overflow ověřil měřením.
+**Proč to nefungovalo:** Chrome headless nejde pod ~482 px šířku okna (OS/engine minimum). Renderoval viewport 482, ale `--screenshot` uložil jen 375px výřez → pravá strana „chyběla" kvůli ořezu screenshotu, ne kvůli scrollu. Injektovaná diagnostika ukázala `scrollWidth === clientWidth === 482` a prázdný seznam přetékajících prvků = žádné přetečení.
+**Poučení:** responsivitu ověřuj MĚŘENÍM (`documentElement.scrollWidth` vs `clientWidth` + JS výpis prvků s `right > clientWidth`), ne okem z headless screenshotu. Pro užší než ~482 px buď DevTools-protocol device metrics, nebo full-width screenshot ≥482 (mobilní media queries jsou stejně aktivní). Tři identické screenshoty po CSS změně = signál, že problém je ve screenshotu, ne v CSS.
+**Příznak cyklení:** opakované re-screenshoty „pořád to přetéká" + obrázek identický i po CSS úpravě.
+
+---

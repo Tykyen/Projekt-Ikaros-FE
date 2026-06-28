@@ -6,16 +6,24 @@
 [data-diary-system='jad'] .jad-diary {
   font-family: 'Inter', system-ui, sans-serif;
   color: #2c2925;
-  background: #fdfbf7;
+  background:
+    radial-gradient(80% 60% at 18% -5%, rgba(255, 255, 255, 0.5), transparent 60%),
+    radial-gradient(60% 50% at 100% 100%, rgba(154, 107, 47, 0.08), transparent 60%),
+    #f3ead7;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2d9cd;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid #b89b6d;
 
-  --jad-accent: #6b2e1e;
-  --jad-border: #dccdb3;
-  --jad-panel-bg: #f6eedf;
+  --jad-accent: #8a2b22;
+  --jad-accent-soft: #b5564b;
+  --jad-gold: #9a6b2f;
+  --jad-border: #cdbb97;
+  --jad-border-soft: #e0d3b4;
+  --jad-panel-bg: #efe3c9;
+  --jad-box: #f7f0df;
   --jad-highlight: #ede2cf;
+  --jad-ink-soft: #6e5b46;
 }
 
 [data-diary-system='jad'] .jad-diary * {
@@ -39,11 +47,22 @@
 
 [data-diary-system='jad'] .jad-diary h3 {
   font-family: 'Cinzel', serif;
-  font-size: 1.1rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--jad-accent);
-  border-bottom: 2px solid var(--jad-border);
-  margin: 0 0 16px;
+  border-bottom: 1px solid var(--jad-border);
+  margin: 0 0 14px;
   padding-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+[data-diary-system='jad'] .jad-diary h3::before {
+  content: '◆';
+  color: var(--jad-gold);
+  font-size: 0.7em;
 }
 
 [data-diary-system='jad'] .jad-diary input,
@@ -145,56 +164,184 @@
   background: var(--jad-panel-bg);
   border: 1px solid var(--jad-border);
   border-radius: 8px;
-  padding: 24px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-bottom: 24px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
 }
 
-[data-diary-system='jad'] .jad-diary .jad-header-main {
-  flex: 1;
-  min-width: 250px;
-}
-[data-diary-system='jad'] .jad-diary .jad-header-main label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #7b6f5e;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-[data-diary-system='jad'] .jad-diary .jad-header-main input {
-  width: 100%;
-  font-size: 1.5rem;
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  border: none;
-  border-bottom: 2px solid var(--jad-border);
-  background: transparent;
-  padding: 4px 0;
-}
-
-[data-diary-system='jad'] .jad-diary .jad-header-grid {
-  flex: 2;
+[data-diary-system='jad'] .jad-diary .jad-identity {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1.4fr 1.4fr 1fr auto;
+  gap: 20px;
+  align-items: end;
 }
-[data-diary-system='jad'] .jad-diary .jad-header-grid .jad-field label {
+[data-diary-system='jad'] .jad-diary .jad-field label {
   display: block;
-  font-size: 0.75rem;
-  color: #7b6f5e;
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: var(--jad-ink-soft);
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
-[data-diary-system='jad'] .jad-diary .jad-header-grid .jad-field input {
+[data-diary-system='jad'] .jad-diary .jad-field input,
+[data-diary-system='jad'] .jad-diary .jad-field select {
   width: 100%;
   border: none;
   border-bottom: 1px solid var(--jad-border);
+  border-radius: 0;
   background: transparent;
-  padding: 4px;
+  padding: 4px 2px;
   font-weight: 600;
+}
+
+[data-diary-system='jad'] .jad-diary .jad-level-badge {
+  text-align: center;
+  background: #34281c;
+  color: #f3ead7;
+  border-radius: 8px;
+  padding: 6px 18px;
+  min-width: 92px;
+  box-shadow: 0 4px 14px rgba(52, 40, 28, 0.25);
+}
+[data-diary-system='jad'] .jad-diary .jad-level-badge .num {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+[data-diary-system='jad'] .jad-diary .jad-level-badge .cap {
+  font-family: 'Cinzel', serif;
+  font-size: 0.56rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* ── Multipovolání ───────────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-prof-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+[data-diary-system='jad'] .jad-diary .jad-prof-row {
+  display: grid;
+  grid-template-columns: 1.4fr 76px 1.7fr 28px;
+  gap: 14px;
+  align-items: start;
+}
+[data-diary-system='jad'] .jad-diary .jad-prof-row .pcap {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--jad-ink-soft);
+  margin-bottom: 3px;
+}
+[data-diary-system='jad'] .jad-diary .jad-prof-row select,
+[data-diary-system='jad'] .jad-diary .jad-prof-row input {
+  width: 100%;
+}
+[data-diary-system='jad'] .jad-diary .jad-prof-row .pcol-lvl input {
+  text-align: center;
+}
+[data-diary-system='jad'] .jad-diary .jad-prof-row .del-btn {
+  align-self: center;
+  margin-top: 14px;
+  background: transparent;
+  border: none;
+  color: var(--jad-accent);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+[data-diary-system='jad'] .jad-diary .jad-sub-hint {
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--jad-accent-soft);
+  margin-top: 3px;
+}
+[data-diary-system='jad'] .jad-diary .jad-foot-hint {
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--jad-ink-soft);
+  margin-top: 12px;
+}
+
+/* ── Přidávatelné řádky (zdatnosti / jazyky) ─────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--jad-border-soft);
+}
+[data-diary-system='jad'] .jad-diary .jad-tag-row .bullet {
+  color: var(--jad-gold);
+}
+[data-diary-system='jad'] .jad-diary .jad-tag-row input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 3px 2px;
+}
+[data-diary-system='jad'] .jad-diary .jad-tag-row input:focus {
+  border-bottom-color: var(--jad-accent);
+  box-shadow: none;
+}
+[data-diary-system='jad'] .jad-diary .jad-tag-row .del-btn {
+  background: transparent;
+  border: none;
+  color: var(--jad-accent);
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+/* ── Schopnosti (karty) ──────────────────────────────────────── */
+
+[data-diary-system='jad'] .jad-diary .jad-feat {
+  background: var(--jad-panel-bg);
+  border: 1px solid var(--jad-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+[data-diary-system='jad'] .jad-diary .jad-feat-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+[data-diary-system='jad'] .jad-diary .jad-feat-head input {
+  flex: 1;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  border: none;
+  border-bottom: 1px solid var(--jad-border);
+  border-radius: 0;
+  background: transparent;
+  padding: 2px;
+}
+[data-diary-system='jad'] .jad-diary .jad-feat-head .del-btn {
+  background: transparent;
+  border: none;
+  color: var(--jad-accent);
+  cursor: pointer;
+}
+[data-diary-system='jad'] .jad-diary .jad-feat textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  min-height: 44px;
+  color: var(--jad-ink-soft);
+}
+
+[data-diary-system='jad'] .jad-diary .jad-notes-full {
+  margin-bottom: 0;
 }
 
 /* ── Main grid ───────────────────────────────────────────────── */
@@ -204,6 +351,11 @@
   grid-template-columns: 2fr 3fr 3fr;
   gap: 24px;
 }
+/* Grid-potomek musí jít zmáčknout pod min-content (jinak široké tabulky /
+   inputy roztáhnou celý list a vznikne horizontální scroll na mobilu). */
+[data-diary-system='jad'] .jad-diary .jad-grid > div {
+  min-width: 0;
+}
 
 @media (max-width: 1100px) {
   [data-diary-system='jad'] .jad-diary .jad-grid {
@@ -212,11 +364,11 @@
 }
 
 [data-diary-system='jad'] .jad-diary .jad-panel {
-  background: #fff;
+  background: var(--jad-box);
   border: 1px solid var(--jad-border);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 0 #fffaf0, 0 4px 14px rgba(52, 40, 28, 0.06);
 }
 
 /* ── COL 1: stats & abilities ────────────────────────────────── */
@@ -296,7 +448,7 @@
 }
 
 [data-diary-system='jad'] .jad-diary .jad-hp-panel {
-  background: #fff;
+  background: var(--jad-box);
   border: 2px solid var(--jad-accent);
   border-radius: 8px;
   padding: 20px;
@@ -347,6 +499,7 @@
 }
 [data-diary-system='jad'] .jad-diary .jad-table td input {
   width: 100%;
+  min-width: 0;
 }
 [data-diary-system='jad'] .jad-diary .jad-table .del-btn {
   background: transparent;
@@ -462,4 +615,74 @@
   font-family: 'Cinzel', serif;
   color: var(--jad-accent);
   font-size: 1.2rem;
+}
+
+/* ── Responsivita (mobil/tablet) ─────────────────────────────── */
+
+@media (max-width: 768px) {
+  [data-diary-system='jad'] .jad-diary {
+    padding: 16px;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-identity {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-level-badge {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-prof-row {
+    grid-template-columns: 1fr 76px;
+    gap: 8px 12px;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-prof-row .pcol-sub {
+    grid-column: 1 / -1;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-prof-row .del-btn {
+    grid-column: 2;
+    justify-self: end;
+    margin-top: 0;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-tabs {
+    flex-wrap: wrap;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-tabs .jad-tab-toggle {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Combat meta + HP: zmenšit a povolit zmáčknutí (jinak roztáhnou stránku) */
+  [data-diary-system='jad'] .jad-diary .jad-top-meta {
+    gap: 8px;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-meta-box {
+    min-width: 0;
+    padding: 10px 4px;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-meta-box label {
+    font-size: 0.54rem;
+    letter-spacing: 0.02em;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-meta-box input,
+  [data-diary-system='jad'] .jad-diary .jad-meta-box span.val {
+    font-size: 1.15rem;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-hp-panel .hp-row {
+    gap: 8px;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-hp-panel .hp-box {
+    min-width: 0;
+  }
+  [data-diary-system='jad'] .jad-diary .jad-hp-panel .hp-box input {
+    font-size: 1.4rem;
+    padding: 8px 4px;
+  }
+  /* Grid prvky nikdy nepřetékají rodiče */
+  [data-diary-system='jad'] .jad-diary .jad-prof-row select,
+  [data-diary-system='jad'] .jad-diary .jad-prof-row input,
+  [data-diary-system='jad'] .jad-diary .jad-field select,
+  [data-diary-system='jad'] .jad-diary .jad-field input {
+    min-width: 0;
+  }
 }

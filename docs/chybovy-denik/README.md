@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-035.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-036.**
 
 ## Jak je deník členěný
 
@@ -127,3 +127,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--162e-bestie-drd2-statblok--schéma--bestiář--2026-06-28) | fe | 16.2e DrD2 bestie: Sudba=HP(damageable), Charakteristiky klik=2k6+úroveň, ZS poznámky; rozšířit OBĚ schémata (bestie pro editor/spawn + token kvůli BE strict edit); buildBestieToken schema-aware `sudba` | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--162e-chat-drd2-bestie-panel--pc-npc-zdarma--2026-06-28) | fe | 16.2e DrD2 chat: PC/NPC zdarma (Drd2CombatPanel přes DiaryRollPanel/COMBAT_PANELS) + Drd2ChatBestiePanel (reuse jádro; Sudba HP ze systemStats ne token.currentHp) | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--162f-drd2-deníkové-skiny-7-stylů-tokenizace-panelů--agent-fleet-chat-bestie-parita--mobil-fix--2026-06-28) | fe | 16.2f DrD2 7 deníkových skinů (tokenizace panelů + agent fleet + dicelog/readout signature); chat-bestie `DiarySkinScope` parita s mapou; mobil `.drd2-prof` flex-wrap; povrchové tokeny mimo baseline (per-site fallback = 0 regrese) | — |
+| [✅ ŘEŠENÍ](fe.md#-řešení--87p-jad-deník-multipovolání--obory--přidávatelné-sekce--2026-06-28) | fe | JaD deník 8.7p: multipovolání (`jad_classes`) + obory (práh) + auto úroveň + přidávatelné profs/langs/feats; migrace legacy read-only; auto-caster odvozený ne side-effect | — (zabralo napoprvé) |
+| [CH-035](proces.md#ch-035--chrome-headless-screenshot-ořez-vypadal-jako-horizontální-overflow--2026-06-28) | proces | „overflow" na mobilu byl jen ořez Chrome headless screenshotu (min okno ~482px); měř `scrollWidth`, nehádej z obrázku | 3 identické re-screenshoty „pořád přetéká" po CSS změně |

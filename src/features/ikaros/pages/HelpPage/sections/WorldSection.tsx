@@ -245,6 +245,15 @@ export function WorldSection() {
             <strong>přepočítat kurzem</strong> (zůstatek i historii), nebo jen
             přeznačit.
           </CalloutBox>
+          <CalloutBox variant="tip" title="Deník Jeskyně a draci">
+            U světů na systému <strong>Jeskyně a draci</strong> umí deník provést
+            tvorbou postavy: přidáš si <strong>víc povolání najednou</strong>{' '}
+            (multipovolání), u každého zvolíš úroveň a <strong>obor</strong> — obor
+            se odemkne, až povolání dosáhne potřebné úrovně. Celková úroveň se{' '}
+            <strong>sečte sama</strong>. Vybíráš <strong>osobní zázemí</strong> a
+            vedeš si vlastní seznamy <strong>zdatností, jazyků a schopností</strong>;
+            kouzla zapneš přepínačem „Sesilatel / Alchymista".
+          </CalloutBox>
         </Tool>
         <Tool icon={<Backpack size={16} />} title="Osobní výbava" audience={{ kind: 'hrac', label: 'Hráč + PJ' }}>
           <p>

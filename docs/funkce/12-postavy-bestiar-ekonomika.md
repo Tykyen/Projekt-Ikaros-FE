@@ -161,6 +161,31 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 ---
 
+### JaD deník — tvorba postavy (multipovolání, obory)
+
+**Co to je:** Dedikovaný list systému `jad` (Jeskyně a draci = český port D&D 5e SRD). Od 8.7p umí multipovolání, výběr oboru/specializace dle JaD pravidel, osobní zázemí a strukturované přidávatelné sekce (dřív 1:1 přenos legacy listu).
+
+**Kde:** Deník postavy (`DiaryTab`) ve světě s `world.system = 'jad'` → záložka Deník. Tab „Hlavní zápisník postavy" + volitelný tab „Kouzla / Truhla".
+
+**Kdo:** Vidí člen světa s přístupem k postavě; edituje vlastník PC / PJ+ (gating řeší `DiaryTab`; sheet jen renderuje `mode=view|edit`, ve view jsou všechny vstupy/akce disabled).
+
+**Co jde dělat:**
+- **Multipovolání:** přidat/odebrat libovolný počet povolání (11 povolání), každé s vlastní úrovní a oborem. Úroveň postavy = **auto součet** úrovní povolání (read-only badge).
+- **Obor/specializace:** select plněný dle zvoleného povolání; **zamčený**, dokud úroveň povolání nedosáhne prahu (Čaroděj/Černokněžník/Klerik od 1., Druid/Kouzelník od 2., ostatní od 3.) — pod prahem hint „obor od N. úrovně".
+- **Zázemí:** select 16 osobních zázemí + „Vlastní…" (volný text).
+- 6 vlastností (auto modifikátor), záchrany (zdatnost pip), 18 dovedností (cyklus žádná/zdatnost/expertíza), pasivní smysly (auto `10+mod`), OČ/iniciativa/rychlost, HP/kostky obnovy/záchrany proti smrti.
+- **Přidávatelné sekce:** Zdatnosti (zbroje/zbraně/nástroje), Jazyky, Schopnosti (název+popis), Zbraně (tabulka). Poznámky k hraní na celou šířku úplně dole.
+- **Kouzla** (tab, jen je-li zapnut „Sesilatel / Alchymista"): pozice 0.–9. stupně, max/použité sloty, seznam kouzel. Sekce se sama nabídne, je-li mezi povoláními kouzlící (`JAD_CASTERS`), dokud uživatel toggle ručně nepřepne.
+
+**Hranice / co neumí:** Obory jen jako jména — bez číselných účinků schopností (záměr, dohledává se v příručce). Nepočítá legálnost multiclassu (sloty kouzel, vstupní podmínky) — list je evidence, ne pravidlový engine. JaD zatím bez vlastních skinů (jen baseline pergamen, default `jad→fantasy`).
+
+**Zvláštnosti:** Migrace legacy je **read-only** — starý `jad_class`/`jad_other_profs`/`jad_features` se odvodí pro zobrazení a do nových polí (`jad_classes`, `jad_profs`, `jad_feats`) se zapíše až prvním editem; odebraná pole (jméno/přesvědčení/hráč/pomůcky) se z DB **nemažou**, jen se neukazují. Data v `customData` prefix `jad_*` (delta merge přes `makeCdAccess`).
+
+**Stav:** ✅ funguje (8.7p).
+**Kód:** FE `diary-systems/sheets/jad/JadSheet.tsx`, `jad/constants.ts` (`JAD_CLASSES`/`JAD_BACKGROUNDS`/`JAD_CASTERS`), `jad/formulas.ts`, `styles/jad.css`. Spec `docs/arch/phase-8/spec-8.7p-jad-redesign.md`.
+
+---
+
 ### Skin deníku (vizuální „kabát" listu)
 
 **Co to je:** Vizuální styl per-system listu, nezávislý na obsahu/datech. Rodina **8 skinů** (`scifi · fantasy · horror · steampunk · nature · minimal · retro · anime`=MLP); každý vlastní paleta + tvarový jazyk + signature ornament, identita drží napříč systémy.
