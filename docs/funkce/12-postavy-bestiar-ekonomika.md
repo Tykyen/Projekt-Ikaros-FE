@@ -165,7 +165,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Co to je:** Dedikovaný list systému `jad` (Jeskyně a draci = český port D&D 5e SRD). Od 8.7p umí multipovolání, výběr oboru/specializace dle JaD pravidel, osobní zázemí a strukturované přidávatelné sekce (dřív 1:1 přenos legacy listu).
 
-**Kde:** Deník postavy (`DiaryTab`) ve světě s `world.system = 'jad'` → záložka Deník. Tab „Hlavní zápisník postavy" + volitelný tab „Kouzla / Truhla".
+**Kde:** Deník postavy (`DiaryTab`) ve světě s `world.system = 'jad'` → záložka Deník. Tab „Hlavní zápisník postavy" + volitelný tab „Kouzla".
 
 **Kdo:** Vidí člen světa s přístupem k postavě; edituje vlastník PC / PJ+ (gating řeší `DiaryTab`; sheet jen renderuje `mode=view|edit`, ve view jsou všechny vstupy/akce disabled).
 

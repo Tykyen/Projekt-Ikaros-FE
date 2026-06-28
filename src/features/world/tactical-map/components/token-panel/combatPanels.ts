@@ -13,6 +13,7 @@ import type { SystemSheetProps } from '@/features/world/pages/CharacterDetailPag
 import type { MapToken } from '../../types';
 import { MatrixCombatPanel } from './system-panels/MatrixCombatPanel';
 import { DndCombatPanel } from './system-panels/DndCombatPanel';
+import { JadCombatPanel } from './system-panels/JadCombatPanel';
 import { CocCombatPanel } from './system-panels/CocCombatPanel';
 import { Drd2CombatPanel } from './system-panels/Drd2CombatPanel';
 import { Drd16CombatPanel } from './system-panels/Drd16CombatPanel';
@@ -34,6 +35,7 @@ export interface CombatPanelProps {
 export const COMBAT_PANELS: Record<string, ComponentType<CombatPanelProps>> = {
   matrix: MatrixCombatPanel,
   dnd5e: DndCombatPanel,
+  jad: JadCombatPanel,
   coc: CocCombatPanel,
   drd2: Drd2CombatPanel,
   drd16: Drd16CombatPanel,

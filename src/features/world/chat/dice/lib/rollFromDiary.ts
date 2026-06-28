@@ -9,12 +9,14 @@
  * Schválně chat-local (ne import z `tactical-map`) — chat nemá záviset na
  * mapě; sdílíme jen úroveň `chat/dice/lib` (rollEngine + dicePayload + format).
  *
- * Pool/mixed se z deníku nehází (parita s mapou) → `null`.
+ * 8.7q — `mixed` (JaD skládaný zásah) a `critOnD20` (JaD fatální úspěch/neúspěch)
+ * zrcadlí `rollFromSheet`, ať combat panel funguje v chatu stejně jako na mapě.
  */
-import { rollFate, rollGenericDice } from './rollEngine';
+import { rollFate, rollGenericDice, rollMixedDice } from './rollEngine';
 import {
   buildFatePayload,
   buildGenericPayload,
+  buildMixedPayload,
   type DicePayload,
 } from './dicePayload';
 import { formatFateMessage, formatGenericDiceMessage } from './formatMessage';
@@ -30,7 +32,8 @@ export type DiaryRollKind =
   | 'd10'
   | 'd12'
   | 'd20'
-  | 'd100';
+  | 'd100'
+  | 'mixed';
 
 export interface DiaryRollRequest {
   /** Lidský popisek — jméno schopnosti / „Iniciativa". */
@@ -39,6 +42,10 @@ export interface DiaryRollRequest {
   modifier?: number;
   /** Typ kostky. Default `fate` (Matrix/Fate). */
   kind?: DiaryRollKind;
+  /** JaD (8.7q): u k20 detekuj fatální úspěch (nat 20) / neúspěch (nat 1). */
+  critOnD20?: boolean;
+  /** JaD (8.7q) skládaný hod zásahu (`kind:'mixed'`): počty kostek. */
+  mixed?: Record<string, number>;
 }
 
 export interface DiaryRollResult {
@@ -64,12 +71,27 @@ export function rollDiaryRequest(
     };
   }
 
+  // JaD skládaný zásah (2k10+2k6+2k4+číslo).
+  if (kind === 'mixed') {
+    const r = rollMixedDice(req.mixed ?? {});
+    return {
+      dicePayload: buildMixedPayload(r, { label, modifier }),
+      content: formatGenericDiceMessage(label, modifier, r),
+    };
+  }
+
   // d4..d100 i eskalující d6+/2d6+ → rollGenericDice; dispatch na nafukovací
   // (`d6+`) / otevřenou (`2d6+`) primitivu je centralizovaný v rollEngine
   // (jejich `+` by jinak neprošel regexem XdN a spadl na default d20).
   const r = rollGenericDice(kind);
+  // JaD fatální úspěch/neúspěch: jediná k20, přirozená 20 / 1.
+  let crit: 'success' | 'fail' | undefined;
+  if (kind === 'd20' && req.critOnD20 && r.rolls.length === 1) {
+    if (r.rolls[0] === 20) crit = 'success';
+    else if (r.rolls[0] === 1) crit = 'fail';
+  }
   return {
-    dicePayload: buildGenericPayload(r, { label, modifier }),
+    dicePayload: buildGenericPayload(r, { label, modifier, crit }),
     content: formatGenericDiceMessage(label, modifier, r),
   };
 }

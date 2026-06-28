@@ -13,9 +13,9 @@
  * ukládá „dlouhá" id jako `drd-plus`/`call-of-cthulhu`):
  *   - bestie token → `BestiePanelView` (schema-driven statblok); matrix/drd16
  *     mají vlastní HUD bestie panel
- *   - matrix / dnd5e / coc / drd2 / drd16 / drdplus / fate / gurps →
+ *   - matrix / dnd5e / jad / coc / drd2 / drd16 / drdplus / fate / gurps →
  *     per-system `*CombatPanel`
- *   - jiné (jad, drdh, pi, sr, generic) → fallback na `DiaryTab` (legacy)
+ *   - jiné (drdh, pi, sr, generic) → fallback na `DiaryTab` (legacy)
  *
  * Plán: docs/arch/phase-10/plan-10.2c-edit-9g.md §B; rozšíření 9h.
  */
@@ -166,6 +166,8 @@ export function TokenSystemSheet({
       label: req.label,
       modifier: req.modifier,
       kind: req.kind,
+      critOnD20: req.critOnD20,
+      mixed: req.mixed,
       rollerName,
     });
     if (!res) return;
@@ -182,11 +184,19 @@ export function TokenSystemSheet({
     // 10.2f — hod iniciativy z panelu se propíše do token.initiative
     // (objeví se v iniciativní liště). Detekce dle labelu „Iniciativa".
     if (isInit) {
+      // 8.7q JaD: fatální úspěch = absolutně první, fatální neúspěch = poslední
+      // (lišta řadí dle čísla; ±100 přebije běžný rozsah k20+mod).
+      const initValue =
+        res.crit === "success"
+          ? res.total + 100
+          : res.crit === "fail"
+            ? res.total - 100
+            : res.total;
       // 10.2j — skipInvalidate: běží paralelně s `dice.roll` (onMapRoll výš).
       // Bez toho invalidate refetch sestřelí ještě nepersistovaný hod z logu.
       initiativeUpdate.mutate({
         tokenId: token.id,
-        patch: { initiative: res.total },
+        patch: { initiative: initValue },
         skipInvalidate: true,
       });
     }

@@ -222,6 +222,7 @@ export function DiceLogPanel({
             visible.map((r) => {
               const recent = now - new Date(r.rolledAt).getTime() < RECENT_MS;
               const total = r.dicePayload.total;
+              const crit = r.dicePayload.crit;
               const breakdown = renderBreakdown(r.dicePayload);
               return (
                 <div
@@ -241,8 +242,20 @@ export function DiceLogPanel({
                     <span className={styles.faces}>
                       {renderFaces(r.dicePayload.faces)}
                     </span>
-                    <span className={`${styles.total} ${totalClass(total)}`}>
-                      {total}
+                    <span
+                      className={`${styles.total} ${
+                        crit === "success"
+                          ? styles.critSuccess
+                          : crit === "fail"
+                            ? styles.critFail
+                            : totalClass(total)
+                      }`}
+                    >
+                      {crit === "success"
+                        ? "Fatální úspěch"
+                        : crit === "fail"
+                          ? "Fatální neúspěch"
+                          : total}
                     </span>
                   </div>
                   {breakdown && (

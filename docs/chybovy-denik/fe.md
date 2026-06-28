@@ -1001,3 +1001,19 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře, zabralo napoprvé; jediná ztráta času = honění fantom overflow (viz CH-035). Obory jen jako názvy (bez číselných účinků schopností) = vědomý záměr.
 
 ---
+
+### ✅ ŘEŠENÍ — 8.7q fáze A: JaD bojový panel na taktické mapě · 2026-06-28
+**Co nakonec zabralo:** `JadCombatPanel` (vzor `DndCombatPanel` — JaD = český DnD 5e, stejná k20 mechanika) + registrace `combatPanels.ts` (`jad`). Čte deník přes `token.characterSlug` prefix `jad_*`, reuse `jad/formulas` + `jad/constants`. Klik na vlastnost/ZH/dovednost/iniciativu/zbraň → `onRoll({kind:'d20', modifier})` → existující `performSheetRoll` → 3D overlay + dice log (+ `token.initiative`). Jen aktivní dovednosti (prof>0), HP ± edit, sbalitelné zdatnosti/jazyky/schopnosti.
+**Proč to je správně:** JaD je 5e → DnD panel je 1:1 vzor, nulová nová roll infra (k20 už pipeline umí). Combat panel = samostatná komponenta nad `jad_*` daty, deník (`JadSheet`) netknut → 0 regrese. Typový kontrakt `onRoll = SystemSheetProps['onRoll']` (široký) místo lokálního užšího = bez kontravariance problému v registru.
+**Jak ověřeno:** build čistý (tsc -b), 5 smoke testů (klik=k20+mod, ZH, iniciativa initiative:true, jen aktivní dovednosti, view=disabled) přes `vi.hoisted` mock `useCharacterDiary`/`useUpdateCharacterDiary`.
+**Zhodnocení:** dobře, zabralo napoprvé. Zbývá fáze B (fatální úspěch/neúspěch nat20/nat1 — cross-cutting do dice payloadu/logu, JaD-only flag) a C (skládaný hod zásahu `2k10+2k6+2k4+č` — `rollMixedDice` UŽ existuje, chybí parser + onRoll mixed větev). Pozn: Explore agent tvrdil „engine neumí kombinaci kostek" = NEPRAVDA, `rollMixedDice` v rollEngine.ts existuje — ověřuj agentní závěry čtením.
+
+---
+
+### ✅ ŘEŠENÍ — 8.7q fáze B+C: fatální hody + skládaný zásah · 2026-06-28
+**Co nakonec zabralo:** B (fatální úspěch/neúspěch): k20 `nat20→success`/`nat1→fail` detekce v `performSheetRoll` + `rollDiaryRequest` (flag `critOnD20`, JaD-only), `crit` přidán na `DicePayloadBase`, render textu „Fatální úspěch/neúspěch" v `DiceLogPanel` místo součtu, iniciativa tie-break ±100 v `TokenSystemSheet`. C (skládaný zásah): `rollMixedDice`/`buildMixedPayload` UŽ existovaly → jen parser `parseDamageFormula` (jad/formulas, sdílený panel+deník) + `mixed` větev v obou roll pipeline + `onRoll` kontrakt rozšířen (kind `'mixed'` + counts); JadCombatPanel zbraň = 2 tlačítka (útok k20 / zásah mixed), formule z deníkového sloupce „Zásah".
+**Proč to je správně:** cross-cutting JaD-only přes opt-in flagy (`critOnD20`, `mixed`) → ostatní d20 systémy (DnD/CoC) i fate beze změny. Chat pipeline (`rollFromDiary`) zrcadlí mapovou (`rollFromSheet`) → combat panel v chatu = parita. `crit`/`mixed` na sdílených payload typech jsou optional → 0 regrese renderu.
+**Jak ověřeno:** build čistý + 47 testů (parser 6, mixed klik, critOnD20 flag, fatální render text místo součtu + 0 regrese existujících). Past chycená buildem: chat `DiaryRollKind` union nemělo `'mixed'` (dual-source vůči `SystemSheetProps.onRoll`) → dorovnáno.
+**Zhodnocení:** dobře. Past pro příště: `onRoll` kind je DUAL-SOURCE (`SystemSheetProps` + chat `DiaryRollKind`) → rozšíření kostky = OBĚ místa (build to chytil, ne tsc inkrement). Čeká živá kontrola uživatelem + FE commit celého JaD balíku.
+
+---

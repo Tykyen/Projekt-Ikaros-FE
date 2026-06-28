@@ -68,7 +68,16 @@ export interface SystemSheetProps {
    * lišta). Bez flagu se iniciativa detekuje z labelu „Iniciativa" (BC kompat) —
    * DrD+ má init pod jiným labelem (Boj / zbraňové BČ), proto explicitní flag.
    */
-  onRoll?: (req: { label: string; modifier?: number; kind?: 'fate' | 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100'; initiative?: boolean }) => void;
+  onRoll?: (req: {
+    label: string;
+    modifier?: number;
+    kind?: 'fate' | 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100' | 'mixed';
+    initiative?: boolean;
+    /** JaD (8.7q): u k20 detekuj fatální úspěch (nat 20) / neúspěch (nat 1). */
+    critOnD20?: boolean;
+    /** JaD (8.7q) skládaný hod zásahu (`kind:'mixed'`): počty kostek, např. `{ d10: 2, d6: 2 }`. */
+    mixed?: Record<string, number>;
+  }) => void;
 }
 
 /**

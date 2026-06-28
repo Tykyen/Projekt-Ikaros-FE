@@ -102,7 +102,7 @@ describe('JadSheet (8.7b / 8.7p)', () => {
         onChange={() => {}}
       />,
     );
-    expect(screen.queryByText('Kouzla / Truhla')).not.toBeInTheDocument();
+    expect(screen.queryByText('Kouzla')).not.toBeInTheDocument();
 
     rerender(
       <JadSheet
@@ -112,7 +112,7 @@ describe('JadSheet (8.7b / 8.7p)', () => {
         onChange={() => {}}
       />,
     );
-    expect(screen.getByText('Kouzla / Truhla')).toBeInTheDocument();
+    expect(screen.getByText('Kouzla')).toBeInTheDocument();
   });
 
   it('kliknutí na cycle tlačítko dovednosti zvýší prof level (0 → 1)', () => {

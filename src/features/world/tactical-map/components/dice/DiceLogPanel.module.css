@@ -845,3 +845,19 @@
 [data-diary-system='matrix'][data-diary-skin='anime'] .total.totalPositive { color: #ff4d97; }
 [data-diary-system='matrix'][data-diary-skin='anime'] .total.totalNegative { color: #ff5d6c; }
 [data-diary-system='matrix'][data-diary-skin='anime'] .entry { border-bottom: 1.5px solid rgba(22, 22, 46, 0.2); }
+
+/* 8.7q — JaD fatální úspěch / neúspěch (text místo součtu). */
+.critSuccess,
+.critFail {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.critSuccess {
+  color: rgb(var(--map-ui-accent-bright-rgb) / 0.95);
+}
+.critFail {
+  color: rgb(var(--map-ui-danger-rgb) / 0.95);
+}

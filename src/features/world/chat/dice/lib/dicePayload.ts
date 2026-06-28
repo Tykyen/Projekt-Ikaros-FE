@@ -30,6 +30,12 @@ export interface DicePayloadBase {
   label?: string;
   /** Volitelný modifier (`+2`, `−1`). */
   modifier?: number;
+  /**
+   * JaD (8.7q): fatální úspěch (přirozená 20) / neúspěch (přirozená 1) na k20.
+   * Render zobrazí text místo součtu. Nastavuje jen JaD roll (flag `critOnD20`),
+   * ostatní d20 systémy ho nemají → beze změny.
+   */
+  crit?: 'success' | 'fail';
 }
 
 export interface FateDicePayload extends DicePayloadBase {
@@ -95,7 +101,7 @@ export function buildFatePayload(
 
 export function buildGenericPayload(
   roll: GenericRollResult,
-  opts: { label?: string; modifier?: number } = {},
+  opts: { label?: string; modifier?: number; crit?: 'success' | 'fail' } = {},
 ): GenericDicePayload | PoolDicePayload | D100DicePayload {
   const modifier = opts.modifier ?? 0;
   const total = roll.sum + modifier;
@@ -132,6 +138,7 @@ export function buildGenericPayload(
     total,
     label: opts.label,
     modifier,
+    crit: opts.crit,
   };
 }
 

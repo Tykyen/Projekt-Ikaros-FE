@@ -1,0 +1,354 @@
+/* 8.7q — JaD bojový panel (pergamen, kompaktní). Baseline vzhled (JaD bez skinů). */
+
+.root {
+  --jc-parch: #f3ead7;
+  --jc-box: #f7f0df;
+  --jc-accent: #8a2b22;
+  --jc-border: #cdbb97;
+  --jc-border-soft: #e0d3b4;
+  --jc-ink: #34281c;
+  --jc-ink-soft: #6e5b46;
+  --jc-gold: #9a6b2f;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--jc-ink);
+  background: var(--jc-parch);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.muted {
+  color: var(--jc-ink-soft);
+  font-size: 0.85rem;
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* ── Hlavička ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--jc-border);
+  padding-bottom: 8px;
+}
+.profLine {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--jc-accent);
+}
+.levelBadge {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--jc-ink);
+  color: var(--jc-parch);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.initBtn {
+  margin-left: auto;
+  border: 1px solid var(--jc-accent);
+  background: var(--jc-box);
+  color: var(--jc-accent);
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.initBtn:hover {
+  background: var(--jc-accent);
+  color: #fff;
+}
+
+/* ── Staty ── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 8px;
+}
+.statCard {
+  background: var(--jc-box);
+  border: 1px solid var(--jc-border);
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.statCard.accent {
+  border-color: var(--jc-accent);
+}
+.statLabel {
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--jc-ink-soft);
+}
+.statValue {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1.1;
+}
+.statValue.small {
+  font-size: 1rem;
+}
+.hpRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hpStep {
+  border: 1px solid var(--jc-border);
+  background: var(--jc-parch);
+  color: var(--jc-accent);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+}
+.hpStep:hover {
+  background: var(--jc-accent);
+  color: #fff;
+}
+.hpInput {
+  width: 42px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--jc-accent);
+  border: 1px solid var(--jc-border);
+  border-radius: 6px;
+  background: var(--jc-parch);
+  padding: 2px;
+}
+.hpMax {
+  font-size: 0.74rem;
+  color: var(--jc-ink-soft);
+}
+
+/* ── Sekce ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sectionTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jc-accent);
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--jc-border-soft);
+}
+
+/* ── Vlastnosti ── */
+.abilGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+}
+.abilCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.abilMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: var(--jc-box);
+  border: 1px solid var(--jc-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.abilMain:hover:not(:disabled) {
+  border-color: var(--jc-accent);
+}
+.abilMain:disabled,
+.zhBtn:disabled,
+.skillRow:disabled,
+.weaponRow:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.abilName {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.abilMod {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--jc-accent);
+}
+.zhBtn {
+  border: 1px solid var(--jc-border);
+  background: transparent;
+  color: var(--jc-ink-soft);
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.zhBtn:hover:not(:disabled) {
+  border-color: var(--jc-accent);
+  color: var(--jc-accent);
+}
+.zhBtn.proficient {
+  border-color: var(--jc-gold);
+  color: var(--jc-gold);
+}
+
+/* ── Dovednosti ── */
+.skillList {
+  display: flex;
+  flex-direction: column;
+}
+.skillRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted var(--jc-border-soft);
+  padding: 5px 2px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.skillRow:hover:not(:disabled) {
+  background: var(--jc-box);
+}
+.skillBubble {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.skillBubble.profHalf {
+  background: var(--jc-gold);
+}
+.skillBubble.profFull {
+  background: var(--jc-accent);
+}
+.skillBonus {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--jc-accent);
+  min-width: 30px;
+  text-align: right;
+}
+.skillName {
+  flex: 1;
+  font-size: 0.9rem;
+}
+.skillAbil {
+  font-size: 0.72rem;
+  color: var(--jc-ink-soft);
+}
+
+/* ── Zbraně ── */
+.weaponRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--jc-box);
+  border: 1px solid var(--jc-border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+}
+.weaponName {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 0;
+}
+.weaponAtk,
+.weaponDmg {
+  border: 1px solid var(--jc-border);
+  background: var(--jc-parch);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.weaponAtk {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--jc-accent);
+}
+.weaponDmg {
+  color: var(--jc-ink);
+}
+.weaponAtk:hover:not(:disabled),
+.weaponDmg:hover:not(:disabled) {
+  border-color: var(--jc-accent);
+  background: var(--jc-highlight);
+}
+.weaponAtk:disabled,
+.weaponDmg:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* ── Sbalitelné sekce ── */
+.collapse {
+  background: var(--jc-box);
+  border: 1px solid var(--jc-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+.collapse > summary {
+  font-family: 'Cinzel', serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--jc-accent);
+  cursor: pointer;
+}
+.tagList {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 0.88rem;
+}
+.tagList li {
+  margin-bottom: 2px;
+}
+.featList {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.featItem strong {
+  font-family: 'Cinzel', serif;
+  color: var(--jc-ink);
+}
+.featItem p {
+  margin: 2px 0 0;
+  font-size: 0.86rem;
+  color: var(--jc-ink-soft);
+  white-space: pre-wrap;
+}

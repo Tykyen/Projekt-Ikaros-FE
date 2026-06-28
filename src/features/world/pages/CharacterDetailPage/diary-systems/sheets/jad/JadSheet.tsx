@@ -119,7 +119,7 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
             className={tab === 'spells' ? 'active' : ''}
             onClick={() => setTab('spells')}
           >
-            Kouzla / Truhla
+            Kouzla
           </button>
         )}
         <label className="jad-tab-toggle">
@@ -1225,14 +1225,14 @@ function JadPrintView({ cda }: { cda: CdAccess }) {
   );
 }
 
-/** Kouzla (taby „Kouzla / Truhla") — vytištěno jen je-li sesilatel zapnut. */
+/** Kouzla (tab „Kouzla") — vytištěno jen je-li sesilatel zapnut. */
 function JadSpellsPrint({ cda }: { cda: CdAccess }) {
   const { g } = cda;
   const levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   return (
     <>
-      <h2>Kouzla / Truhla</h2>
+      <h2>Kouzla</h2>
       <dl>
         <div>
           <dt>Povolání</dt>

@@ -118,6 +118,36 @@ describe("DiceLogPanel", () => {
     expect(screen.getByText("Magie (+1) + 0 = +1")).toBeTruthy();
   });
 
+  it("8.7q: fatální úspěch/neúspěch zobrazí text místo součtu", () => {
+    const crit = (c: "success" | "fail"): MapDiceRoll => ({
+      id: "crit-" + c,
+      rolledAt: "2026-05-31T08:00:00.000Z",
+      byUserId: "me",
+      rollerName: "me",
+      rollerKind: "pc",
+      category: "skill",
+      dicePayload: {
+        type: "d20",
+        faces: [c === "success" ? 20 : 1],
+        sum: c === "success" ? 20 : 1,
+        total: c === "success" ? 23 : 4,
+        crit: c,
+      } as never,
+    });
+    render(
+      <DiceLogPanel
+        rolls={[crit("success"), crit("fail")]}
+        viewer={{ userId: "me", isPj: false }}
+        visibility={undefined}
+        sceneId="s-crit"
+      />,
+    );
+    expect(screen.getByText("Fatální úspěch")).toBeInTheDocument();
+    expect(screen.getByText("Fatální neúspěch")).toBeInTheDocument();
+    // Součet (23 / 4) se NEzobrazí jako hlavní výsledek.
+    expect(screen.queryByText("23")).not.toBeInTheDocument();
+  });
+
   it("PJ vidí všechny hody", () => {
     const rolls = [
       mkRoll("pc", "me"),

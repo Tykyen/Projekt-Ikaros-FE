@@ -4,6 +4,7 @@ import {
   calcSaveMod,
   calcSkillMod,
   fmtMod,
+  parseDamageFormula,
 } from '../formulas';
 
 describe('JaD formulas (8.7b)', () => {
@@ -55,6 +56,40 @@ describe('JaD formulas (8.7b)', () => {
     });
     it('přidá profBonus se zdatností', () => {
       expect(calcSaveMod(1, true, 2)).toBe(3);
+    });
+  });
+
+  describe('parseDamageFormula (8.7q)', () => {
+    it('naparsuje 2k10+2k6+2k4+5', () => {
+      expect(parseDamageFormula('2k10+2k6+2k4+5')).toEqual({
+        mixed: { d10: 2, d6: 2, d4: 2 },
+        modifier: 5,
+      });
+    });
+    it('akceptuje d i mezery', () => {
+      expect(parseDamageFormula('1d8 + 3')).toEqual({
+        mixed: { d8: 1 },
+        modifier: 3,
+      });
+    });
+    it('záporný modifikátor', () => {
+      expect(parseDamageFormula('1k6-1')).toEqual({
+        mixed: { d6: 1 },
+        modifier: -1,
+      });
+    });
+    it('sečte stejné kostky', () => {
+      expect(parseDamageFormula('1k6+1k6')).toEqual({
+        mixed: { d6: 2 },
+        modifier: 0,
+      });
+    });
+    it('jen číslo', () => {
+      expect(parseDamageFormula('4')).toEqual({ mixed: {}, modifier: 4 });
+    });
+    it('prázdný / nesmysl → null', () => {
+      expect(parseDamageFormula('')).toBeNull();
+      expect(parseDamageFormula('xyz')).toBeNull();
     });
   });
 });
