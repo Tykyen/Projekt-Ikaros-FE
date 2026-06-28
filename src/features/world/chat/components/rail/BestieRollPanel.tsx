@@ -145,16 +145,18 @@ export function BestieRollPanel({
             canEdit={false}
           />
         ) : systemId === 'drd2' ? (
-          // 16.2e-chat — DrD II katalogová bestie: pergamen panel (2k6+,
-          // charakteristiky), read-only (bez onPatch).
-          <Drd2ChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            rollerName={bestie.name}
-            avatarUrl={bestie.imageUrl}
-            systemStats={bestie.systemStats}
-            canEdit={false}
-          />
+          // 16.2f-chat — DrD II katalogová bestie (read-only); konzumuje skin
+          // tokeny (--dd-*) z předka → vlastní DiarySkinScope (data-diary-skin).
+          <DiarySkinScope worldId={worldId}>
+            <Drd2ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              canEdit={false}
+            />
+          </DiarySkinScope>
         ) : (
           <>
             <BestieStatblock

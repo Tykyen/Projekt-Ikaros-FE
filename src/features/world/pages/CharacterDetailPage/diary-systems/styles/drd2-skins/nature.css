@@ -1,0 +1,635 @@
+/* Dračí doupě II — skin „Příroda" 🌿 · DRUIDSKÝ HERBÁŘ / ŽIVÝ LETOPIS (16.2f).
+ *
+ * Fantasy pergamenový deník DrD II přepracovaný na lisovaný LÝKOVÝ arch terénního
+ * zápisníku přírodního kouzelníka — ruční krémový papír, inkoust z duběnek, mech,
+ * hlína, pryskyřice. List „roste": rohy organicky asymetrické (okvětní lístek),
+ * žilková (midrib) linka, medová MÍZA / jantar jako akcent.
+ *
+ * NEsdílí nic s fantasy (pergamen na kovárně) ani s Matrix nature (úponek podél
+ * CELÉ hrany). Sourodé s drd16 / drdplus skinem „nature" (stejné DNA), přepracované
+ * do listu DrD II.
+ *
+ * Mechanika: skin = blok `[data-diary-system='drd2'][data-diary-skin='nature']`
+ * na KAŽDÉM pravidle (vyšší specificita přebije pergamenový default v drd2.css).
+ *   (1) `--*` lokální tokeny na .drd2-sheet  → deníkový list (substrát + sémantika).
+ *   (2) plocha/rám/textura na .drd2-sheet + ::before  → lýkový arch.
+ *   (3) signature ornamenty CSS/SVG na globální .drd2-* třídy listu.
+ *   (4) `--dd-*` na [ds][dsk]  → combat/bestie panely (mapa + chat) dědí tokeny.
+ *   (5) `--dd-embed-*` na [ds][dsk]  → obal v TM / dice readout / dicelog (opaque).
+ * Pouze CSS/SVG, žádný JS.
+ *
+ * SIGNATURE (nesdílet):
+ *   - rašící ÚPONEK z dřevěného SUKU (patička místo meče, úponek z paty erbu);
+ *   - LETOKRUHOVÝ terč (řez kmenem) na pečeti povolání;
+ *   - trojlístkový marker nadpisů (legend / divider);
+ *   - semínkové / kapkové pipy (border-radius 50% / 62% 62% 38% 38%);
+ *   - organické asymetrické rohy + žilková linka.
+ * Paleta: mech #5a7d3a/#86ab52 (OBRANA/VÝHODA/nadpisy/žilky/kladný hod) · míza/jantar
+ *   #c98a2e (VLIV/bonus/Pouto) · bobule #a83c2e (TĚLO/OHROŽENÍ/Sudba/záporný hod) ·
+ *   rosa/lišejník #3e7d6e (DUŠE/Náboj).
+ * Typografie: Cormorant Garamond (H1/jména/iniciála) · Marcellus SC (labely/legend) ·
+ *   Spectral (tělo/čísla) · Caveat (rukopis terénního zápisníku).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@500;600;700&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1) DENÍK LIST — lokální tokeny + plocha + rám + lýková textura
+   `drd2.css` definuje lokální tokeny přímo na .drd2-sheet; přebíjíme je zde.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sheet {
+  /* lýkový arch (substrát papíru) */
+  --parch-1: #efe6cb;
+  --parch-2: #e4d6b2;
+  --parch-3: #d8c89f;
+  --parch-edge: #cdbb8e;
+  /* inkoust z duběnek */
+  --ink: #33301d;
+  --ink-soft: #5e5736;
+  --ink-faint: rgba(137, 127, 87, 0.85);
+  /* jemné linky = žilková zeleň */
+  --rule: rgba(155, 187, 99, 0.42);
+  /* sémantika zdrojů: Tělo = bobule, Duše = rosa, Vliv = jantar */
+  --body: #a83c2e;
+  --soul: #3e7d6e;
+  --infl: #c98a2e;
+  /* boj: Ohrožení = bobule, Výhoda = mech */
+  --blood: #a83c2e;
+  --emer: #5a7d3a;
+  /* pečeti / akcenty: seal = mech-deep, gold = míza/jantar */
+  --seal: #37501f;
+  --gold: #c98a2e;
+  /* dřevěný rám: lýko hrana → dřevo → jantarová nit → tmavé dřevo */
+  --shadow:
+    0 5px 14px -10px #000,
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+
+  /* lokální herbářové barvy pro ornamenty tohoto skinu */
+  --na-bark-0: #2a2014;
+  --na-bark-1: #3c2d1a;
+  --na-bark-edge: #6b4f2e;
+  --na-moss: #5a7d3a;
+  --na-moss-hi: #86ab52;
+  --na-moss-deep: #37501f;
+  --na-leaf-vein: #9bbb63;
+  --na-amber: #c98a2e;
+  --na-amber-hi: #eac066;
+  --na-amber-deep: #7e5418;
+  --na-berry: #a83c2e;
+  --na-berry-deep: #5f1d14;
+  --na-dew: #3e7d6e;
+  --na-dew-deep: #1c4338;
+
+  font-family: 'Spectral', Georgia, serif;
+  /* okvětní asymetrické zaoblení archu */
+  border-radius: 34px 14px 34px 14px;
+  /* lýková plocha: vlákna + foxing + měkké světlo */
+  background:
+    radial-gradient(120% 80% at 16% 6%, rgba(255, 253, 242, 0.6), transparent 52%),
+    radial-gradient(130% 120% at 90% 98%, rgba(120, 98, 52, 0.22), transparent 60%),
+    radial-gradient(40% 30% at 72% 22%, rgba(150, 120, 60, 0.1), transparent 70%),
+    linear-gradient(168deg, #f6f1df, var(--parch-1) 56%, var(--parch-2));
+  /* dřevěný rám se zelenou lýkovou nití + jantarovou linkou */
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.35) inset,
+    0 -30px 70px -46px rgba(60, 46, 18, 0.6) inset,
+    0 46px 100px -42px #000,
+    0 0 0 1px var(--parch-edge),
+    0 0 0 8px var(--na-bark-1),
+    0 0 0 9px var(--na-amber-deep),
+    0 0 0 12px var(--na-bark-0);
+}
+/* lýková vlákna + jemné foxing skvrny přes celý arch (přepis fantasy ::before) */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sheet::before {
+  border-radius: 34px 14px 34px 14px;
+  mix-blend-mode: normal;
+  opacity: 0.5;
+  background:
+    radial-gradient(circle at 12% 88%, rgba(110, 88, 38, 0.1) 0 5px, transparent 7px),
+    radial-gradient(circle at 78% 24%, rgba(110, 88, 38, 0.08) 0 7px, transparent 9px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014 0.16' numOctaves='4' seed='11'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+/* vnitřní rytá žilková linka (deckle) — nový pseudoprvek na obsahu z-index pod */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sheet > *:first-child {
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2) HLAVIČKA — Cormorant nadpisy + listová iluminovaná iniciála + žilková linka
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-head {
+  border-bottom: 2px solid;
+  border-image: linear-gradient(90deg, var(--na-moss), var(--na-leaf-vein) 50%, transparent) 1;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-head__title h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #2a2812;
+}
+/* listová iluminovaná iniciála (zelený gradient) */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-head__title h1::first-letter {
+  font-size: 1.16em;
+  background: linear-gradient(180deg, #9ec85a, var(--na-moss) 60%, var(--na-moss-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-head .field > label,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-head .field--lvl > label {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+}
+/* využitá úroveň = dřevěný štítek (organický roh, mechový lem) */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-lvl .used {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 700;
+  color: var(--na-moss-deep);
+  background: rgba(90, 125, 58, 0.14);
+  border: 1.5px solid rgba(90, 125, 58, 0.45);
+  border-radius: 10px 3px 10px 3px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-lvl .hw {
+  font-family: 'Caveat', cursive;
+}
+
+/* ── erb: textový „DRAČÍ DOUPĚ II" → dřevěný LETOKRUHOVÝ štít + úponek z paty ── */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-crest {
+  position: relative;
+  width: 96px;
+  height: 118px;
+  overflow: visible;
+  /* skryj textový obsah, zobraz SVG štít */
+  font-size: 0;
+  color: transparent;
+  background: no-repeat center top / 96px 118px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='118' viewBox='0 0 96 118' fill='none'%3E%3Cpath d='M48 5 L88 18 V56 C88 86 70 102 48 110 C26 102 8 86 8 56 V18 Z' fill='%23523715' stroke='%232a2014' stroke-width='2'/%3E%3Cellipse cx='48' cy='52' rx='30' ry='34' fill='none' stroke='%237c521e' stroke-width='1.6'/%3E%3Cellipse cx='48' cy='52' rx='22' ry='25' fill='none' stroke='%23a86e2a' stroke-width='1.4'/%3E%3Cellipse cx='48' cy='52' rx='14' ry='16' fill='none' stroke='%23c98a38' stroke-width='1.2'/%3E%3Ccircle cx='48' cy='52' r='5' fill='%23f2cf78'/%3E%3Cpath d='M48 110 C46 118 52 122 56 126' stroke='%237ba450' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3Cpath d='M54 118 C62 116 68 120 71 126 C63 128 56 124 54 118Z' fill='%2386ab52' stroke='%23537a30' stroke-width='.8'/%3E%3Ccircle cx='56' cy='126' r='2.4' fill='%23eac066'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 5px 9px rgba(30, 40, 16, 0.45));
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-crest .dd,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-crest .two {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3) DĚLÍCÍ ORNAMENT — mech-deep + SIGNATURE trojlístkový marker + žilková linka
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-divider::before,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-divider::after {
+  background: linear-gradient(90deg, transparent, var(--na-moss) 30%, var(--na-moss) 70%, transparent);
+  opacity: 0.6;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-divider span {
+  font-family: 'Marcellus SC', serif;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  color: var(--na-moss-deep);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-divider span::before {
+  content: '';
+  width: 17px;
+  height: 17px;
+  flex: none;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 18 18'%3E%3Cpath d='M9 17 V10' stroke='%2337501f' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M9 10 C9 5 5 3 3 4 C3 8 5 10 9 10Z' fill='%237ba450'/%3E%3Cpath d='M9 10 C9 5 13 3 15 4 C15 8 13 10 9 10Z' fill='%235a7d3a'/%3E%3Cpath d='M9 9 C9 4 9 2 9 1 C7 3 7 6 9 9Z' fill='%2386ab52'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4) KARTY — organický asymetrický radius + žilková hrana
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-card {
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.66), rgba(228, 214, 178, 0.4));
+  border: 1px solid var(--parch-edge);
+  border-radius: 18px 5px 18px 5px;
+  box-shadow:
+    0 5px 14px -10px #000,
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+/* vnitřní rám → žilková (mech) linka místo hnědé */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-card::before {
+  inset: 6px;
+  border: 1px solid rgba(90, 125, 58, 0.3);
+  border-radius: 13px 3px 13px 3px;
+}
+
+/* ── legend: trojlístkový marker místo ❖ glyfu + žilková linka ── */
+[data-diary-system='drd2'][data-diary-skin='nature'] .legend {
+  font-family: 'Marcellus SC', serif;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--na-moss-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .legend::after {
+  background: linear-gradient(90deg, var(--na-moss), transparent);
+  opacity: 0.55;
+}
+/* nahraď znak ❖ trojlístkem (skryj znak, vykresli SVG na boxu .glyph) */
+[data-diary-system='drd2'][data-diary-skin='nature'] .legend .glyph {
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  font-size: 0;
+  color: transparent;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 18 18'%3E%3Cpath d='M9 17 V10' stroke='%2337501f' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M9 10 C9 5 5 3 3 4 C3 8 5 10 9 10Z' fill='%237ba450'/%3E%3Cpath d='M9 10 C9 5 13 3 15 4 C15 8 13 10 9 10Z' fill='%235a7d3a'/%3E%3Cpath d='M9 9 C9 4 9 2 9 1 C7 3 7 6 9 9Z' fill='%2386ab52'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .legend__sub {
+  font-family: 'Spectral', Georgia, serif;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .hint {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  font-style: normal;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+/* iniciativa = dřevěný štítek (organický roh, mechový lem) */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-init {
+  font-family: 'Marcellus SC', serif;
+  background: rgba(90, 125, 58, 0.14);
+  border: 1px solid rgba(90, 125, 58, 0.45);
+  color: var(--na-moss-deep);
+  border-radius: 8px 3px 8px 3px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-init:hover {
+  background: rgba(90, 125, 58, 0.24);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5) ZDROJE (pilíře) — herbářová sémantika + organické segmenty
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar__top .name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar.body .name {
+  color: var(--na-berry-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar.soul .name {
+  color: var(--na-dew-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar.infl .name {
+  color: var(--na-amber-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar__top .val,
+[data-diary-system='drd2'][data-diary-skin='nature'] .maxin {
+  font-family: 'Caveat', cursive;
+}
+/* organické segmenty + jemné gradienty pilířů */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-track .seg {
+  border-radius: 4px 1px 4px 1px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar.body .seg.on {
+  background: linear-gradient(180deg, #c95a45, var(--body));
+  border-color: var(--na-berry-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar.soul .seg.on {
+  background: linear-gradient(180deg, #6aaa98, var(--soul));
+  border-color: var(--na-dew-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pillar.infl .seg.on {
+  background: linear-gradient(180deg, var(--na-amber-hi), var(--infl));
+  border-color: var(--na-amber-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-scar {
+  font-family: 'Caveat', cursive;
+  border-bottom: 1px dashed rgba(168, 60, 46, 0.4);
+  color: var(--na-berry);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6) BOJ — měřáky Ohrožení (bobule) / Výhoda (mech), organické rohy
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-combat__mid > label {
+  font-family: 'Marcellus SC', serif;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge {
+  border: 1.5px solid var(--na-moss);
+  border-radius: 14px 4px 14px 4px;
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.7), rgba(90, 125, 58, 0.1));
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge h4 {
+  font-family: 'Marcellus SC', serif;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge.threat {
+  border-color: var(--na-berry);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge.threat h4,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge.threat .big {
+  color: var(--na-berry);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge.adv h4,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge.adv .big {
+  color: var(--na-moss-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge .big {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge .rung {
+  border-radius: 3px 1px 3px 1px;
+  font-family: 'Marcellus SC', serif;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge.threat .rung.on {
+  background: linear-gradient(180deg, #c95a45, var(--na-berry));
+  border-color: var(--na-berry-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-gauge.adv .rung.on {
+  background: linear-gradient(180deg, var(--na-moss-hi), var(--na-moss));
+  border-color: var(--na-moss-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-textarea {
+  border-radius: 9px 3px 9px 3px;
+}
+
+/* ── společné inputy ── */
+[data-diary-system='drd2'][data-diary-skin='nature'] .line {
+  font-family: 'Caveat', cursive;
+  border-bottom: 1px solid var(--rule);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .line:focus,
+[data-diary-system='drd2'][data-diary-skin='nature'] .hw:focus,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-scar:focus,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-textarea:focus {
+  border-color: var(--na-moss);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7) TABULKA + tlačítka přidat / smazat
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-table th {
+  font-family: 'Marcellus SC', serif;
+  border-bottom: 1.5px solid var(--na-moss);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-table td {
+  border-bottom: 1px dotted var(--rule);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-addrow {
+  font-family: 'Marcellus SC', serif;
+  border: 1px dashed var(--na-moss);
+  border-radius: 9px 3px 9px 3px;
+  color: var(--na-moss-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-addrow:hover:not(:disabled) {
+  background: rgba(90, 125, 58, 0.12);
+  color: #2a2812;
+  border-color: var(--na-moss);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-del {
+  color: var(--na-berry);
+}
+
+/* ── pomocníci ── */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-companion {
+  border: 1px solid var(--parch-edge);
+  border-radius: 13px 4px 13px 4px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .fieldrow > label,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-bond > label {
+  font-family: 'Marcellus SC', serif;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8) PIPY — SIGNATURE semínkový / kapkový tvar (Pouto = jantar, Náboj = rosa)
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pips .pip-sq {
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; /* semínko */
+  border: 1.5px solid rgba(70, 52, 32, 0.5);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pips .pip-sq.on {
+  background: radial-gradient(circle at 36% 30%, var(--na-amber-hi), var(--na-amber-deep));
+  border-color: var(--na-amber-deep);
+  box-shadow: inset 0 0 0 2px rgba(255, 250, 240, 0.5);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pips .pip-sq.charge.on {
+  background: radial-gradient(circle at 36% 30%, #6aaa98, var(--na-dew-deep));
+  border-color: var(--na-dew-deep);
+}
+
+/* ── zkušenosti (ražené dřevěné boxy) ── */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-coins .coin {
+  border: 1px solid var(--parch-edge);
+  border-radius: 12px 3px 12px 3px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-coins .coin > span {
+  font-family: 'Marcellus SC', serif;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-coins .coin input {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9) POVOLÁNÍ — SIGNATURE letokruhová pečeť (řez kmenem) místo voskové
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-prof {
+  border: 1px solid var(--parch-edge);
+  border-radius: 13px 4px 13px 4px;
+  background: rgba(255, 250, 238, 0.42);
+}
+/* letokruh: vnořené prstence přes vrstvený box-shadow + jantarové jádro */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-prof__seal {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #f2cf78 0 14%, transparent 14%),
+    radial-gradient(circle at 50% 50%, #3a2a14, #523715);
+  color: #eac066;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  border: 1px solid #1c1308;
+  box-shadow:
+    0 0 0 2px #7c521e inset,
+    0 0 0 4px #3a2a14 inset,
+    0 0 0 6px #a86e2a inset,
+    0 2px 4px rgba(30, 40, 16, 0.4);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-prof__name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-prof__name .req {
+  font-family: 'Spectral', Georgia, serif;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-prof__note {
+  font-family: 'Caveat', cursive;
+  border-bottom: 1px dotted var(--rule);
+}
+/* pipy úrovně povolání = SIGNATURE semínko (jantar) */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pips5 .dot {
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  font-family: 'Marcellus SC', serif;
+  border: 1.5px solid rgba(70, 52, 32, 0.45);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-pips5 .dot.on {
+  background: radial-gradient(circle at 36% 30%, var(--na-amber-hi), var(--na-amber-deep));
+  color: #fff7e6;
+  border-color: var(--na-amber-deep);
+  box-shadow: 0 0 8px rgba(201, 138, 46, 0.4);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-adder select {
+  border: 1px solid var(--parch-edge);
+  border-radius: 7px 2px 7px 2px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-adder select:focus {
+  border-color: var(--na-moss);
+}
+
+/* ── ZS karty ── */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-zs {
+  border: 1px solid var(--parch-edge);
+  border-radius: 13px 4px 13px 4px;
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-zs .zs__name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  color: var(--na-moss-deep);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-zs .zs__prof,
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-zs .zs__type {
+  border: 1px solid var(--parch-edge);
+  border-radius: 7px 2px 7px 2px;
+}
+
+/* ── manévry = listové pilulky (mech border, organický roh) ── */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-maneuvers .man {
+  font-family: 'Marcellus SC', serif;
+  border: 1px solid var(--na-moss);
+  border-radius: 18px 6px 18px 6px;
+  color: var(--na-moss-deep);
+  background: rgba(90, 125, 58, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10) PATIČKA — SIGNATURE rašící ÚPONEK z dřevěného SUKU místo meče
+   `.drd2-sword` má vlastní vnitřní SVG meč → skryj ho, vykresli úponek na ::before.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sword {
+  position: relative;
+  color: var(--na-moss);
+}
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sword .ln {
+  background: linear-gradient(90deg, transparent, var(--na-moss) 30%, var(--na-moss) 70%, transparent);
+  opacity: 0.6;
+}
+/* skryj vnitřní SVG meč */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sword svg {
+  visibility: hidden;
+  width: 120px;
+}
+/* úponek: suk uprostřed + listy + jantarová semínka na koncích */
+[data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sword::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 34px;
+  pointer-events: none;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34' fill='none'%3E%3Cellipse cx='60' cy='17' rx='9' ry='8' fill='%23523c22' stroke='%232a2014' stroke-width='1.2'/%3E%3Cellipse cx='60' cy='17' rx='5' ry='4.2' fill='none' stroke='%236b4f2e' stroke-width='1'/%3E%3Cellipse cx='60' cy='17' rx='2' ry='1.6' fill='%236b4f2e'/%3E%3Cpath d='M51 17 C40 17 30 13 22 17 C30 21 40 21 51 17Z' fill='%235a7d3a' stroke='%2337501f' stroke-width='.8'/%3E%3Cpath d='M69 17 C80 17 90 13 98 17 C90 21 80 21 69 17Z' fill='%237ba450' stroke='%23537a30' stroke-width='.8'/%3E%3Cpath d='M40 13 C36 8 30 7 26 9 M80 13 C84 8 90 7 94 9' stroke='%2386ab52' stroke-width='1.6' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='22' cy='17' r='2.4' fill='%23eac066'/%3E%3Ccircle cx='98' cy='17' r='2.4' fill='%23eac066'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 2px 3px rgba(20, 30, 10, 0.35));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11) PANELY na mapě + chatu (combat + bestie) — --dd-* token override.
+   [ds][dsk] BEZ .drd2-sheet → hashované panely zdědí tokeny z předka.
+   Mapa i chat sdílí TYTÉŽ panely → reskin JEDNÍM tahem (obě identicky).
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='drd2'][data-diary-skin='nature'] {
+  /* ── base paleta — combat/bestie panel = lýkový arch ── */
+  --dd-parch-1: #efe6cb;
+  --dd-parch-2: #e4d6b2;
+  --dd-parch-edge: #cdbb8e;
+  --dd-ink: #33301d;
+  --dd-ink-soft: #5e5736;
+  --dd-ink-hand: #3a2410;
+  --dd-rule: rgba(155, 187, 99, 0.42);
+
+  /* ── zdroje / boj (sémantika drží) ── */
+  --dd-body: #a83c2e; /* Tělo = bobule */
+  --dd-soul: #3e7d6e; /* Duše = rosa */
+  --dd-infl: #c98a2e; /* Vliv = jantar */
+  --dd-blood: #a83c2e; /* Ohrožení = bobule */
+  --dd-emer: #5a7d3a; /* Výhoda = mech */
+  --dd-seal: #37501f; /* pečeť = mech-deep */
+  --dd-gold: #c98a2e; /* pip úrovně / Pouto = jantar */
+
+  /* ── border odstíny ── */
+  --dd-body-bd: #5f1d14;
+  --dd-soul-bd: #1c4338;
+  --dd-gold-bd: #7e5418;
+  --dd-blood-bd: #5f1d14;
+  --dd-emer-bd: #37501f;
+  --dd-seal-bd: #16210c;
+
+  /* ── inky textů na akcentech ── */
+  --dd-seal-ink: #f0ead4;
+  --dd-gold-ink: #fff7e6;
+  --dd-accent-ink: #2a2812;
+
+  /* ── gradienty ── */
+  --dd-seal-grad: radial-gradient(circle at 35% 30%, #6a8a3e, #37501f); /* pečeť povolání / HP kroky = mech */
+  --dd-gold-grad: radial-gradient(circle at 36% 30%, #eac066, #7e5418); /* pip úrovně = jantar */
+  --dd-accent-grad: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #c98a2e);
+  --dd-accent-grad-strong: linear-gradient(180deg, #eac066, #c98a2e 60%, #7e5418); /* init / „✏ Upravit bestii" */
+  --dd-hpfill-grad: linear-gradient(90deg, #a83c2e, #c95a45); /* Sudba HP proužek = bobule */
+
+  /* ── POVRCHY (nutné — jinak panel zůstane pergamen na mém pozadí) ── */
+  --dd-panel-bg:
+    radial-gradient(120% 90% at 18% 8%, rgba(255, 253, 244, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 88% 96%, rgba(120, 98, 52, 0.28), transparent 60%),
+    linear-gradient(165deg, #f6f1df, #efe6cb 55%, #e4d6b2);
+  --dd-card-bg: linear-gradient(90deg, rgba(255, 253, 244, 0.5), rgba(228, 214, 178, 0.22));
+  --dd-row-bg: linear-gradient(180deg, rgba(255, 253, 244, 0.88), rgba(228, 214, 178, 0.55));
+  --dd-input-bg: #fffdf4;
+  --dd-seal-soft: rgba(90, 125, 58, 0.12); /* seal-tint bg = mech */
+  --dd-seal-line: rgba(90, 125, 58, 0.45); /* seal-tint border = mech */
+
+  /* ── fonty ── */
+  --dd-font-head: 'Marcellus SC', serif;
+  --dd-font-body: 'Spectral', Georgia, serif;
+  --dd-font-hand: 'Caveat', cursive;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     12) EMBEDY (obal v TM / dice readout / dicelog) — VŽDY NEPRŮHLEDNÉ.
+     Tmavá kůra, světlý mechový text. pos = mech (kladný), neg = bobule (záporný),
+     neutral = jantar. Sémantika Výhoda/Ohrožení + +/− hod drží.
+     ════════════════════════════════════════════════════════════════════════ */
+  --dd-forge-1: #2a2014; /* fallback pod readout bg (tmavá kůra) */
+  --dd-ink-deep: #26280f;
+  --dd-embed-surface: linear-gradient(180deg, #3c2d1a, #2a2014 58%, #1f170d); /* opaque kůra */
+  --dd-embed-border: #7e5418;
+  --dd-embed-line: rgba(201, 138, 46, 0.32);
+  --dd-embed-text: #e8dcc2;
+  --dd-embed-muted: #ab9d80;
+  --dd-embed-title: #86ab52; /* mechový titulek */
+  --dd-embed-chip-bg: rgba(134, 171, 82, 0.16);
+  --dd-embed-accent: #c98a2e; /* míza */
+  --dd-embed-num-font: 'Spectral', Georgia, serif;
+  --dd-embed-title-font: 'Marcellus SC', serif;
+  --dd-embed-pos: #86ab52; /* kladný hod = mech zeleň (úspěch / růst) */
+  --dd-embed-neg: #c95a45; /* záporný hod = bobule červeň */
+  --dd-embed-neutral: #eac066; /* neutrál = jantar */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   13) RESPONSIVE — dotykové plochy a organické rohy na úzkém archu (≤640px)
+   (drd2.css už řeší 1-sloupcový grid na 768; zde jen jemné doladění)
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  [data-diary-system='drd2'][data-diary-skin='nature'] .drd2-sheet {
+    border-radius: 22px 10px 22px 10px;
+  }
+  [data-diary-system='drd2'][data-diary-skin='nature'] .drd2-card {
+    border-radius: 14px 4px 14px 4px;
+  }
+}

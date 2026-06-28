@@ -131,6 +131,22 @@ export function WorldSection() {
             <strong>„Zpět na vzhled PJ"</strong> tě kdykoli vrátí na výchozí podobu.
           </p>
         </Tool>
+        <Tool icon={<NotebookPen size={16} />} title="Vzhled deníku — skin tvého listu" audience={{ kind: 'vse', label: 'Členové' }}>
+          <p>
+            U herních systémů s vlastním listem (Matrix, Dračí doupě 1.6, Plus a II)
+            si na <strong>deníku postavy</strong> přepneš paletkou{' '}
+            <strong>🎨 Vzhled</strong> mezi osmi styly: <strong>Sci-fi</strong>,{' '}
+            <strong>Fantasy</strong>, <strong>Horor</strong>, <strong>Steampunk</strong>,{' '}
+            <strong>Příroda</strong>, <strong>Minimal</strong>, <strong>Retro</strong> a{' '}
+            <strong>MLP</strong>. Každý má vlastní tvar i ornament, ne jen barvy.
+          </p>
+          <p>
+            Skin se propíše i do <strong>bojového panelu na mapě i v chatu</strong>{' '}
+            (postava i bestie vypadají stejně na obou) a do <strong>vyčíslení hodu</strong>{' '}
+            a <strong>logu kostek</strong>. Platí <strong>jen tobě a jen v tomhle světě</strong>;
+            bez volby se použije výchozí styl podle systému světa.
+          </p>
+        </Tool>
         <Tool icon={<FileText size={16} />} title="Wiki stránky — čtení" audience={{ kind: 'vse', label: 'Členové' }} accent="corrector">
           <p>
             Encyklopedie světa — lokace, lore, novinky, galerie, rodokmen. Layout se

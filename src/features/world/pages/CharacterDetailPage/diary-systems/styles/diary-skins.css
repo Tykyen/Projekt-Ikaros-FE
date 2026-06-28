@@ -40,6 +40,17 @@
 @import './drdplus-skins/retro.css';
 @import './drdplus-skins/anime.css';
 
+/* 16.2f-skiny — DrD II skin @importy (fantasy = baseline `[data-diary-system='drd2']`
+   níž, nemá soubor). Scoped `[data-diary-system='drd2'][data-diary-skin='X']`.
+   @import nahoře (CSS spec) — viz drdplus poznámka výš. */
+@import './drd2-skins/scifi.css';
+@import './drd2-skins/horror.css';
+@import './drd2-skins/steampunk.css';
+@import './drd2-skins/nature.css';
+@import './drd2-skins/minimal.css';
+@import './drd2-skins/retro.css';
+@import './drd2-skins/anime.css';
+
 /* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
    dice readout / orchestrace) ════════════
  * ŽIJÍ ZDE, ne v `drd16.css` — ten je lazy (jen deníková stránka), kdežto embedy
@@ -158,6 +169,44 @@
   --dd-embed-neg: #7c2317; /* Ohrožení = krev */
   --dd-embed-neutral: #9a7515;
   --dd-accent-grad: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+
+  /* ── 16.2f panel baseline (pergamen) ── combat/bestie panel (hashované module
+   * třídy) čtou tyto --dd-* z předka; skin je přebíjí na
+   * [data-diary-system='drd2'][data-diary-skin='X']. Hodnoty = původní literály
+   * panelů → výchozí (fantasy) vzhled beze změny (regrese-safe). */
+  --dd-parch-1: #efe5cd;
+  --dd-parch-2: #e3d5b4;
+  --dd-parch-edge: #c5b083;
+  --dd-ink: #241a10;
+  --dd-ink-soft: #5a4632;
+  --dd-ink-hand: #3a2410;
+  --dd-rule: rgba(70, 52, 32, 0.28);
+  --dd-body: #8a2a1e;
+  --dd-soul: #385a86;
+  --dd-infl: #9a7515;
+  --dd-blood: #7c2317;
+  --dd-emer: #2f6b41;
+  --dd-seal: #7a2418;
+  --dd-gold: #9a7515;
+  --dd-body-bd: #5e1c14;
+  --dd-soul-bd: #26405f;
+  --dd-gold-bd: #6a5009;
+  --dd-blood-bd: #5a1810;
+  --dd-emer-bd: #1f4d2d;
+  --dd-seal-bd: #4a140c;
+  --dd-seal-ink: #f4e3c9;
+  --dd-gold-ink: #fff7e6;
+  --dd-panel-bg: radial-gradient(70% 50% at 20% 6%, rgba(255, 250, 235, 0.5), transparent 60%), linear-gradient(135deg, #efe5cd, #e3d5b4);
+  /* Povrchy (--dd-card-bg/--dd-row-bg/--dd-input-bg/--dd-seal-soft/--dd-seal-line)
+   * ZÁMĚRNĚ nejsou v baseline — mají per-site `var(--dd-x, původní literál)`
+   * fallback (různé alfy) → default beze změny; skin je definuje pro reskin. */
+  --dd-seal-grad: radial-gradient(circle at 35% 30%, #9a3022, #7a2418);
+  --dd-gold-grad: radial-gradient(circle at 35% 30%, #b5882c, #9a7515);
+  --dd-accent-grad-strong: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  --dd-hpfill-grad: linear-gradient(180deg, #b5392b, #7c2317);
+  --dd-font-head: 'Cinzel', serif;
+  --dd-font-body: 'EB Garamond', 'Georgia', serif;
+  --dd-font-hand: 'Caveat', cursive;
 }
 
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */

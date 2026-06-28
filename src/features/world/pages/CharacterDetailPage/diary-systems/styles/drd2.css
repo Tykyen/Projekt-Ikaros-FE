@@ -980,6 +980,15 @@
   [data-diary-system='drd2'] .drd2-twocol {
     grid-template-columns: 1fr;
   }
+  /* Povolání: na úzkém mobilu nech řádek zalomit (pečeť+název nahoře, pipy úrovně
+   * + ✕ dolů) — jinak neměnné `.drd2-pips5` (180px) + jednoslovný název přetlačí
+   * šířku (grid 1fr track = min-content floor); řve u skinů se širším fontem. */
+  [data-diary-system='drd2'] .drd2-prof {
+    flex-wrap: wrap;
+  }
+  [data-diary-system='drd2'] .drd2-prof__body {
+    flex-basis: calc(100% - 48px);
+  }
   /* větší dotykové plochy na mobilu (řadová stupnice neumožní plných 44px) */
   [data-diary-system='drd2'] .drd2-track .seg {
     height: 30px;

@@ -161,6 +161,19 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 ---
 
+### Skin deníku (vizuální „kabát" listu)
+
+**Co to je:** Vizuální styl per-system listu, nezávislý na obsahu/datech. Rodina **8 skinů** (`scifi · fantasy · horror · steampunk · nature · minimal · retro · anime`=MLP); každý vlastní paleta + tvarový jazyk + signature ornament, identita drží napříč systémy.
+
+**Volba:** per **uživatel × svět** (`WorldMembership.diarySkin`); bez volby padá na default systému (`DEFAULT_SKIN_BY_SYSTEM`: matrix→scifi, drd16/drdplus/drd2/jad/drdh→fantasy, coc→horror). User-facing picker `DiarySkinSelector` („🎨 Vzhled") na `DiaryTab` jen pro skinovatelné systémy (do tisku/PDF nejde). Registr `diary-systems/skins/registry.ts`, BE whitelist `update-member.dto.ts` (`@IsIn`, 8 ID).
+
+**Jak se aplikuje:** `DiarySystemProvider` (deník) i `DiarySkinScope` (embedy: mapa/chat/dice) dají na předka `data-diary-system` + `data-diary-skin`; CSS sady (`styles/diary-skins.css` + `<sys>-skins/<id>.css`) přebíjí přes compound selektor `[data-diary-system][data-diary-skin]` přes tokeny `--mx-*` (HUD) / `--dd-*` (pergamen) / `--dd-embed-*` (embed plochy). Pokrývá: **deník list + bojový/bestie panel na mapě i v chatu (PC/NPC/Bestie stejně) + obal v TM + vyčíslení hodu + log kostek**.
+
+**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**. Ostatní systémy: list bez skinů (jen default vzhled). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
+**Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2}-skins/`.
+
+---
+
 ### Bestiář
 
 **Co to je:** Katalog bestií (tvorů/nepřátel) se statistikami per herní systém, ve **3 scope**.

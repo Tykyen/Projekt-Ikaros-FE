@@ -10,6 +10,15 @@
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
+### D-16.2F-DRDPLUS-CHAT-BESTIE-SKIN — DrD+ bestie v chatu se neoskinuje
+**Soubory:** `src/features/world/chat/components/rail/BestieInstancePanel.tsx` + `BestieRollPanel.tsx` — drdplus větev bestie panelu v chatu.
+**Problém:** drdplus bestie v chatu se renderuje BEZ `DiarySkinScope` (vnější `<aside>` nese jen `data-diary-system`, ne `data-diary-skin`) → compound selektor skinu `[data-diary-system='drdplus'][data-diary-skin='X']` nesedne a bestie zůstane na default vzhledu bez ohledu na zvolený skin. Nekonzistence: na mapě (TokenSystemSheet) je drdplus bestie scoped správně, v chatu ne. Stejnou mezeru měl drd2 — opravená v 16.2f obalením `DiarySkinScope`; drdplus zbývá.
+**Dopad:** Nízký — kosmetika; bestie v chatu nedrží zvolený skin (jen u drdplus).
+**Řešení:** obalit `DrdPlusChatBestiePanel` v obou souborech `<DiarySkinScope worldId={worldId}>…</DiarySkinScope>` (vzor drd16/matrix/drd2 větve). ~4 řádky/soubor.
+**Kdy:** při příští práci na drdplus skinech / chatu, nebo v rámci uzávěru drdplus skinů (jejich `mobil-desktop`/funkce/napoveda je taky pending).
+
+---
+
 ### D-NEW-INV-SEC — persona-on-server (PJ persona neprosakuje do server cest)
 > Zbytek INV-SEC (heslo 6→8 FE+BE, scenarios role-floor, themeUserOverrides sanitizace; profil endpoint byl už opravený) **vyřešen 2026-06-27** — viz git log.
 **Soubory:** BE `push.service` (push payload), news/feed, export + resolver PJ persony.

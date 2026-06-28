@@ -1,46 +1,37 @@
 /**
  * 16.2e-mapa — Drd2CombatPanel CSS (fantasy pergamen, sladěné s deníkem Drd2Sheet).
  *
- * Scoping: CSS Module — třídy automaticky lokální. Self-contained pergamen
- * paleta (tokenizace na skin přijde s embed tokeny --dd-embed-* / krok skiny).
+ * 16.2f — TOKENIZOVÁNO (regrese-safe): barvy/fonty/povrchy čtou `--dd-*` z předka
+ * (`[data-diary-system='drd2']` baseline v diary-skins.css; skin přebíjí na
+ * `[…][data-diary-skin='X']`). Každý `var(--dd-x, <literál>)` má fallback = původní
+ * literál → bez skinu vzhled beze změny. Mapa i chat sdílí tenhle soubor.
+ * Scoping: CSS Module — třídy automaticky lokální.
  */
 
 .root {
-  --parch-1: #efe5cd;
-  --parch-2: #e3d5b4;
-  --parch-edge: #c5b083;
-  --ink: #241a10;
-  --ink-soft: #5a4632;
-  --rule: rgba(70, 52, 32, 0.28);
-  --body: #8a2a1e;
-  --soul: #385a86;
-  --infl: #9a7515;
-  --blood: #7c2317;
-  --emer: #2f6b41;
-  --seal: #7a2418;
-  --gold: #9a7515;
-
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 12px;
-  color: var(--ink);
-  font-family: 'EB Garamond', 'Georgia', serif;
-  background:
+  color: var(--dd-ink, #241a10);
+  font-family: var(--dd-font-body, 'EB Garamond', 'Georgia', serif);
+  background: var(
+    --dd-panel-bg,
     radial-gradient(70% 50% at 20% 6%, rgba(255, 250, 235, 0.5), transparent 60%),
-    linear-gradient(135deg, var(--parch-1), var(--parch-2));
+    linear-gradient(135deg, #efe5cd, #e3d5b4)
+  );
   border-radius: 5px;
-  border: 1px solid var(--parch-edge);
+  border: 1px solid var(--dd-parch-edge, #c5b083);
 }
 
 .loading,
 .empty {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 12px;
   letter-spacing: 1px;
   text-align: center;
   padding: 24px 8px;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
 }
 
 /* hlavička */
@@ -48,45 +39,46 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 2px solid var(--dd-ink, #241a10);
   padding-bottom: 8px;
   margin-bottom: 4px;
 }
 .lvl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 900;
   font-size: 13px;
-  color: var(--seal);
-  background: rgba(122, 36, 24, 0.1);
-  border: 1.5px solid rgba(122, 36, 24, 0.4);
+  color: var(--dd-seal, #7a2418);
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.1));
+  border: 1.5px solid var(--dd-seal-line, rgba(122, 36, 24, 0.4));
   border-radius: 4px;
   padding: 2px 8px;
 }
 .initBtn {
   margin-left: auto;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   cursor: pointer;
-  background: rgba(122, 36, 24, 0.12);
-  border: 1px solid rgba(122, 36, 24, 0.4);
-  color: var(--seal);
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.12));
+  border: 1px solid var(--dd-seal-line, rgba(122, 36, 24, 0.4));
+  color: var(--dd-seal, #7a2418);
   border-radius: 4px;
   padding: 5px 9px;
 }
 .initBtn:hover {
-  background: rgba(122, 36, 24, 0.2);
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.2));
+  filter: brightness(0.96);
 }
 
 /* legend */
 .lg {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 10.5px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--dd-ink, #241a10);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -96,23 +88,23 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, var(--ink), transparent);
+  background: linear-gradient(90deg, var(--dd-ink, #241a10), transparent);
 }
 .lg small {
-  font-family: 'EB Garamond', serif;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
   font-style: italic;
   font-weight: 400;
   font-size: 10px;
   letter-spacing: 0;
   text-transform: none;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
 }
 .sub {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
   margin: 6px 0 5px;
 }
 
@@ -127,18 +119,18 @@
   margin-bottom: 5px;
 }
 .resName {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 12px;
 }
 .resVal {
-  font-family: 'Caveat', cursive;
+  font-family: var(--dd-font-hand, 'Caveat', cursive);
   font-size: 16px;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
   margin-left: auto;
 }
 .resVal b {
-  color: var(--ink);
+  color: var(--dd-ink, #241a10);
   font-size: 18px;
 }
 .track {
@@ -151,36 +143,37 @@
   height: 20px;
   border-radius: 3px;
   cursor: pointer;
-  border: 1.5px solid rgba(70, 52, 32, 0.45);
-  background: rgba(255, 252, 244, 0.35);
+  border: 1.5px solid var(--dd-rule, rgba(70, 52, 32, 0.45));
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.35));
   padding: 0;
   transition: transform 0.08s, background 0.12s;
 }
 .seg:hover:not(:disabled) {
   transform: translateY(-2px);
-  background: rgba(255, 252, 244, 0.6);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.6));
+  filter: brightness(1.04);
 }
 .body .seg.on {
-  background: var(--body);
-  border-color: #5e1c14;
+  background: var(--dd-body, #8a2a1e);
+  border-color: var(--dd-body-bd, #5e1c14);
 }
 .soul .seg.on {
-  background: var(--soul);
-  border-color: #26405f;
+  background: var(--dd-soul, #385a86);
+  border-color: var(--dd-soul-bd, #26405f);
 }
 .infl .seg.on {
-  background: var(--infl);
-  border-color: #6a5009;
+  background: var(--dd-infl, #9a7515);
+  border-color: var(--dd-gold-bd, #6a5009);
 }
 .scar {
   width: 100%;
   margin-top: 4px;
   background: transparent;
   border: none;
-  border-bottom: 1px dashed rgba(124, 35, 23, 0.35);
-  font-family: 'Caveat', cursive;
+  border-bottom: 1px dashed var(--dd-seal-line, rgba(124, 35, 23, 0.35));
+  font-family: var(--dd-font-hand, 'Caveat', cursive);
   font-size: 14px;
-  color: #7c2317;
+  color: var(--dd-blood, #7c2317);
   padding: 0 2px;
 }
 .scar:focus {
@@ -196,30 +189,30 @@
   margin-bottom: 6px;
 }
 .gaugeLbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 10px;
   letter-spacing: 1px;
   text-transform: uppercase;
   width: 62px;
 }
 .threat .gaugeLbl {
-  color: var(--blood);
+  color: var(--dd-blood, #7c2317);
 }
 .adv .gaugeLbl {
-  color: var(--emer);
+  color: var(--dd-emer, #2f6b41);
 }
 .gaugeBig {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 900;
   font-size: 20px;
   width: 22px;
   text-align: center;
 }
 .threat .gaugeBig {
-  color: var(--blood);
+  color: var(--dd-blood, #7c2317);
 }
 .adv .gaugeBig {
-  color: var(--emer);
+  color: var(--dd-emer, #2f6b41);
 }
 .rungs {
   display: flex;
@@ -232,40 +225,40 @@
   border-radius: 2px;
   cursor: pointer;
   font-size: 9px;
-  font-family: 'Cinzel', serif;
-  color: var(--ink-soft);
-  border: 1px solid rgba(70, 52, 32, 0.4);
-  background: rgba(255, 252, 244, 0.4);
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  color: var(--dd-ink-soft, #5a4632);
+  border: 1px solid var(--dd-rule, rgba(70, 52, 32, 0.4));
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.4));
   padding: 0;
 }
 .threat .rung.on {
-  background: var(--blood);
+  background: var(--dd-blood, #7c2317);
   color: #fff;
-  border-color: #5a1810;
+  border-color: var(--dd-blood-bd, #5a1810);
 }
 .adv .rung.on {
-  background: var(--emer);
+  background: var(--dd-emer, #2f6b41);
   color: #fff;
-  border-color: #1f4d2d;
+  border-color: var(--dd-emer-bd, #1f4d2d);
 }
 
 /* stavy */
 .states {
   width: 100%;
   min-height: 40px;
-  background: rgba(255, 250, 238, 0.4);
-  border: 1px solid var(--parch-edge);
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.4));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
   border-radius: 4px;
-  font-family: 'EB Garamond', serif;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
   font-size: 12.5px;
-  color: var(--ink);
+  color: var(--dd-ink, #241a10);
   padding: 6px 8px;
   resize: vertical;
   margin-bottom: 4px;
 }
 .states:focus {
   outline: none;
-  border-color: var(--seal);
+  border-color: var(--dd-seal, #7a2418);
 }
 
 /* povolání — klikací řádek */
@@ -273,17 +266,17 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid var(--parch-edge);
+  border: 1px solid var(--dd-parch-edge, #c5b083);
   border-radius: 4px;
-  background: rgba(255, 250, 238, 0.42);
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.42));
   padding: 6px 8px;
   margin-bottom: 6px;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .prof:hover {
-  border-color: var(--seal);
-  box-shadow: 0 1px 9px rgba(122, 36, 24, 0.14);
+  border-color: var(--dd-seal, #7a2418);
+  box-shadow: 0 1px 9px var(--dd-seal-line, rgba(122, 36, 24, 0.14));
 }
 .prof:active {
   transform: translateY(1px);
@@ -296,16 +289,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 35% 30%, #9a3022, var(--seal));
-  color: #f4e3c9;
-  font-family: 'Cinzel', serif;
+  background: var(--dd-seal-grad, radial-gradient(circle at 35% 30%, #9a3022, #7a2418));
+  color: var(--dd-seal-ink, #f4e3c9);
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 11px;
-  border: 1px solid #4a140c;
+  border: 1px solid var(--dd-seal-bd, #4a140c);
 }
 .profName {
   flex: 1;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 13px;
   min-width: 0;
@@ -320,9 +313,9 @@
   height: 18px;
   border-radius: 50%;
   cursor: pointer;
-  border: 1.5px solid rgba(70, 52, 32, 0.45);
-  background: rgba(255, 252, 244, 0.5);
-  font-family: 'Cinzel', serif;
+  border: 1.5px solid var(--dd-rule, rgba(70, 52, 32, 0.45));
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.5));
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   font-weight: 700;
   color: rgba(40, 28, 16, 0.45);
@@ -332,16 +325,16 @@
   padding: 0;
 }
 .dot.on {
-  background: radial-gradient(circle at 35% 30%, #b5882c, var(--gold));
-  color: #fff7e6;
-  border-color: #6a5009;
+  background: var(--dd-gold-grad, radial-gradient(circle at 35% 30%, #b5882c, #9a7515));
+  color: var(--dd-gold-ink, #fff7e6);
+  border-color: var(--dd-gold-bd, #6a5009);
 }
 
 /* rozevírací sekce */
 .coll {
-  border: 1px solid var(--parch-edge);
+  border: 1px solid var(--dd-parch-edge, #c5b083);
   border-radius: 4px;
-  background: rgba(255, 250, 238, 0.32);
+  background: var(--dd-row-bg, rgba(255, 250, 238, 0.32));
   margin-bottom: 7px;
   overflow: hidden;
 }
@@ -357,35 +350,35 @@
   text-align: left;
 }
 .collH:hover {
-  background: rgba(122, 36, 24, 0.05);
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.05));
 }
 .collTitle {
   flex: 1;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--dd-ink, #241a10);
 }
 .collCount {
-  font-family: 'EB Garamond', serif;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
   font-size: 11px;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
 }
 .collMode {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 8px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   background: rgba(70, 52, 32, 0.12);
-  color: var(--ink-soft);
-  border: 1px solid rgba(70, 52, 32, 0.25);
+  color: var(--dd-ink-soft, #5a4632);
+  border: 1px solid var(--dd-rule, rgba(70, 52, 32, 0.25));
   border-radius: 8px;
   padding: 1px 6px;
 }
 .collArr {
-  color: var(--seal);
+  color: var(--dd-seal, #7a2418);
   font-size: 11px;
   transition: transform 0.18s;
 }
@@ -399,31 +392,31 @@
 /* read-only řádek */
 .roRow {
   padding: 5px 0;
-  border-bottom: 1px dotted var(--rule);
+  border-bottom: 1px dotted var(--dd-rule, rgba(70, 52, 32, 0.28));
 }
 .roRow:last-child {
   border-bottom: none;
 }
 .roRow b {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 12px;
 }
 .roRow span {
-  font-family: 'EB Garamond', serif;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
   font-size: 12px;
   font-style: italic;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
   display: block;
 }
 .tag {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 8px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-style: normal;
-  background: rgba(122, 36, 24, 0.12);
-  color: var(--seal);
-  border: 1px solid rgba(122, 36, 24, 0.3);
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.12));
+  color: var(--dd-seal, #7a2418);
+  border: 1px solid var(--dd-seal-line, rgba(122, 36, 24, 0.3));
   border-radius: 8px;
   padding: 1px 6px;
   margin-left: 6px;
@@ -431,9 +424,9 @@
 
 /* editovatelná karta (pomocníci / rituály) */
 .edCard {
-  border: 1px solid var(--parch-edge);
+  border: 1px solid var(--dd-parch-edge, #c5b083);
   border-radius: 3px;
-  background: rgba(255, 252, 244, 0.4);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.4));
   padding: 7px 8px;
   margin-bottom: 6px;
   position: relative;
@@ -450,34 +443,34 @@
   align-items: end;
 }
 .fr > span {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 8.5px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
   padding-bottom: 2px;
 }
 .edLine {
   width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--rule);
-  font-family: 'Caveat', cursive;
+  border-bottom: 1px solid var(--dd-rule, rgba(70, 52, 32, 0.28));
+  font-family: var(--dd-font-hand, 'Caveat', cursive);
   font-size: 15px;
-  color: #3a2410;
+  color: var(--dd-ink-hand, #3a2410);
   padding: 1px 2px;
   margin-bottom: 3px;
 }
 .edLine:focus {
   outline: none;
-  border-bottom-color: var(--seal);
+  border-bottom-color: var(--dd-seal, #7a2418);
 }
 .bondLbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 8.5px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
   margin-top: 6px;
   margin-bottom: 4px;
 }
@@ -489,19 +482,19 @@
 .pipSq {
   width: 16px;
   height: 16px;
-  border: 1.5px solid rgba(70, 52, 32, 0.5);
+  border: 1.5px solid var(--dd-rule, rgba(70, 52, 32, 0.5));
   border-radius: 2px;
-  background: rgba(255, 252, 244, 0.4);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.4));
   cursor: pointer;
   padding: 0;
 }
 .pipSq.on {
-  background: var(--gold);
-  border-color: #6a5009;
+  background: var(--dd-gold, #9a7515);
+  border-color: var(--dd-gold-bd, #6a5009);
 }
 .pipSq.charge.on {
-  background: var(--soul);
-  border-color: #26405f;
+  background: var(--dd-soul, #385a86);
+  border-color: var(--dd-soul-bd, #26405f);
 }
 .del {
   position: absolute;
@@ -509,7 +502,7 @@
   right: 6px;
   background: none;
   border: none;
-  color: var(--blood);
+  color: var(--dd-blood, #7c2317);
   cursor: pointer;
   font-size: 12px;
   opacity: 0.55;
@@ -521,20 +514,20 @@
   width: 100%;
   margin-top: 5px;
   background: transparent;
-  border: 1px dashed rgba(70, 52, 32, 0.4);
+  border: 1px dashed var(--dd-rule, rgba(70, 52, 32, 0.4));
   border-radius: 3px;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 9px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--dd-ink-soft, #5a4632);
   padding: 6px;
   cursor: pointer;
 }
 .add:hover {
-  background: rgba(122, 36, 24, 0.06);
-  color: var(--seal);
-  border-color: var(--seal);
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.06));
+  color: var(--dd-seal, #7a2418);
+  border-color: var(--dd-seal, #7a2418);
 }
 
 /* view mode */

@@ -215,19 +215,21 @@ export function BestieInstancePanel({
             }
           />
         ) : systemId === 'drd2' ? (
-          // 16.2e-chat — DrD II pergamen panel (2k6+, charakteristiky, Sudba HP).
-          // Self-contained (`.root` má vlastní pergamen) → bez scope.
-          <Drd2ChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            rollerName={combatant.name}
-            avatarUrl={combatant.imageUrl}
-            systemStats={combatant.systemStats}
-            canEdit={canEdit}
-            onPatch={(patch) =>
-              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
-            }
-          />
+          // 16.2f-chat — DrD II bestie konzumuje skin tokeny (--dd-*) z předka →
+          // vlastní DiarySkinScope (data-diary-skin), aby chat = mapa i u bestie.
+          <DiarySkinScope worldId={worldId}>
+            <Drd2ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
         ) : (
           <BestieStatblock
             token={token}

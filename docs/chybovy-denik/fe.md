@@ -985,3 +985,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** vizuální „pruh"/užší obsah po přidání obalového wrapperu; bez wrapperu layout OK.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.2f DrD2 deníkové skiny (7 stylů) tokenizace panelů + agent fleet; chat-bestie parita + mobil fix · 2026-06-28
+**Co nakonec zabralo:** Krok 8 playbooku per-system: (1) sám tokenizoval `Drd2CombatPanel/BestiePanel.module.css` na `var(--dd-x, <orig>)` (fallback=originál → 0 regrese) + `--dd-*` pergamen baseline do `diary-skins.css`; (2) 7 paralelních opus agentů = 1 skin/soubor z odsouhlasených HTML mockupů + sesterských drd16/drdplus; (3) 1 agent dicelog+readout signature. Panely sdílí mapa↔chat → tokenizace oskinuje OBA jedním zásahem.
+**Proč to je správně (a ne další variace):** povrchové tokeny s RŮZNOU hodnotou per místo (`--dd-card-bg/-input-bg/-seal-soft/-seal-line/-row-bg`) jsem ZÁMĚRNĚ nedal do baseline → každé místo má per-site `var(--dd-x, originál)` fallback → default pixel-identický (regrese-safe), skin je definuje pro reskin. (Kdybych je dal do baseline jednou hodnotou, zploštím alfy = změna defaultu.) Agent fleet z mockupu = profesionální kvalita bez cyklení (mockup=kontrakt, vzor jako 16.1d-F3/16.2c).
+**Jak ověřeno:** build zelený (tsc -b+vite, 4×); 7 skinů vyrenderováno na REÁLNÉM `.drd2-*` markupu (statický harness linkuje skutečný `drd2.css`+skin, ne mockup CSS) → žádný fantasy bleed-through; mobil 390px overflow-check 7/7 OK.
+**Zhodnocení:** dobře — zabralo bez cyklení. **2 reálné nálezy navíc:** (a) drd2 bestie v chatu byla bez `DiarySkinScope` → neoskinovaná (vnější aside měl jen `data-diary-system`, ne `-skin`); rodina CH-032/CH-033, opraveno obalením (parita s mapou) — drdplus má tutéž mezeru → dluh `D-16.2F-DRDPLUS-CHAT-BESTIE-SKIN`. (b) širší font skinu (Orbitron retro) přetlačil `.drd2-prof` na mobilu (grid 1fr track = min-content floor) → base fix `flex-wrap:wrap` v @media 768 (robustní pro všechny skiny). funkce+napoveda doplněny. Zbývá živý `mobil-desktop` + commit.
+
+---
