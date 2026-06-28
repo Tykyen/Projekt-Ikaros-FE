@@ -4,6 +4,14 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 16.2e mapa DrD2 combat panel + embedy dicelog readout obal · 2026-06-28
+**Co nakonec zabralo:** `Drd2CombatPanel` (+`.module.css`) přepsán z generického Matrix portu na fantasy pergamen dle prototypu (`c:/tmp/drd2-mapa-audit.html`), vzor `DrdPlusCombatPanel` (debounced `useUpdateCharacterDiary`, `canEdit` gate). Single source s deníkem (`makeCdAccess('drd2_')`). Povolání = klik na celý řádek → `2d6+` + úroveň; iniciativa `2d6+` bez mod. Vždy viditelné: zdroje/Ohrožení-Výhoda/stavy/povolání; rozevírací: zbraně+ZS read-only, pomocníci+rituály edit.
+**Proč to je správně (a ne další variace):** (1) Starý panel četl ZASTARALÁ pole (`comp_*`, `master_abilities`, `race_ability`) → nový čte NOVÝ model deníku (companions/rituals/special_abilities) = single source neporušen. (2) Embed callsite (`DiceLogPanel`/`DiceRollOverlay.module.css`) je PLNĚ tokenizovaný na `--dd-embed-*` → stačilo přidat `drd2` do `:is([drd16],[drdplus])` + definovat drd2 `--dd-embed-*` SVĚTLÉ (pergamen) v `diary-skins.css` (global bundle, ne lazy — past CH-027/028) + per-skin signature. (3) Povolání řádek = `div role=button` (ne `<button>`), protože uvnitř jsou pip-buttony (button-in-button = nevalidní HTML); pipy `stopPropagation`.
+**Jak ověřeno:** `tsc -b` + `npm run build` + 7 testů (přepsány) + eslint. Vizuál čeká deploy.
+**Zhodnocení:** Zabralo napoprvé, prototyp=kontrakt (popáté), 0 cyklení. Past pro budoucí systémy: per-system combat panel MUSÍ číst stejný `customData` model jako redesignovaný deník (jinak rozjezd dat); embed = jen `:is()` + světlé/tmavé `--dd-embed-*` dle polarity skinu.
+
+---
+
 ### ✅ ŘEŠENÍ — 16.2e deník DrD2 reálný list fantasy pergamen jeden list · 2026-06-28
 **Co nakonec zabralo:** Existující DrD2 deník (8.7h adaptace z Matrixu, generický „Dark Forest Emerald HUD") přepsán dle šablony 16.2 krok 3 na fantasy pergamenový **jeden sloučený list** (bez tabů). Postup prototyp→souhlas→kód: standalone HTML (`c:/tmp/drd2-denik-audit.html`) iterativně laděn s uživatelem (5 kol drobností) = vizuální kontrakt, AŽ PAK produkce. Rozsah dle uživatele: VEN Vybavení/Příběh/Původ/Groše/Suroviny; rituály+pomocníci = seznamy add/remove; ZS **ručně**. Soubory: `Drd2Sheet.tsx` přepsán, `drd2.css` fantasy pergamen, `drd2Professions.ts` NOVÝ.
 **Proč to je správně (a ne další variace):** (1) **ALTAR katalog ZS** (`drd2Abilities.ts`, 264 schopností z příruček) = autorskoprávní riziko → uživatel chce v budoucnu licenci s ALTARem → **odpojit od UI, NEmazat** (ponechat „k ruce"). (2) Seznamy povolání (názvy + `requires` = herní fakta, ne chráněný text) odděleny do `drd2Professions.ts`, takže sheet vůbec neimportuje chráněný katalog. (3) Prototyp jako kontrakt zabránil cyklení na vzhledu (rodina CH-015 — necommitnuté změny × prod feedback).

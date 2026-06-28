@@ -1,10 +1,11 @@
 /**
- * 10.2c-edit-9g — Drd2CombatPanel tests.
+ * 16.2e-mapa — Drd2CombatPanel testy (redesign).
  *
  * Pokrývá:
- *   - render canEdit=true / false varianty (inputy disabled / enabled)
- *   - klik na profesi triggers `onRoll({ kind: 'd6' })` s úrovní jako modifier
- *   - HP / FP (Tělo / Duše) edit triggers debounced mutate
+ *   - loading / empty stavy
+ *   - canEdit true/false (segmenty enabled/disabled, žádná iniciativa bez onRoll)
+ *   - klik na povolání → onRoll({ kind: '2d6+', modifier: úroveň })
+ *   - klik na segment Tělo → debounced mutate s customDataPatch
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
@@ -13,28 +14,20 @@ import type { PropsWithChildren } from 'react';
 import { Drd2CombatPanel } from '../Drd2CombatPanel';
 import type { MapToken } from '../../../../types';
 
-// ── Mocks ───────────────────────────────────────────────────────
 const mockDiary = vi.fn();
 vi.mock('@/features/world/pages/api/useCharacterSubdocs', () => ({
-  useCharacterDiary: (worldId: string, slug: string) =>
-    mockDiary(worldId, slug),
+  useCharacterDiary: (worldId: string, slug: string) => mockDiary(worldId, slug),
 }));
 
 const mockMutate = vi.fn();
 vi.mock('@/features/world/pages/api/useCharacterMutations', () => ({
-  useUpdateCharacterDiary: () => ({
-    mutate: mockMutate,
-  }),
+  useUpdateCharacterDiary: () => ({ mutate: mockMutate }),
 }));
 
 vi.mock('sonner', () => ({
-  toast: {
-    error: vi.fn(),
-    success: vi.fn(),
-  },
+  toast: { error: vi.fn(), success: vi.fn() },
 }));
 
-// ── Helpers ─────────────────────────────────────────────────────
 function makeToken(overrides: Partial<MapToken> = {}): MapToken {
   return {
     id: 't1',
@@ -60,9 +53,7 @@ function makeToken(overrides: Partial<MapToken> = {}): MapToken {
 }
 
 function makeWrapper() {
-  const qc = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return ({ children }: PropsWithChildren) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
@@ -74,52 +65,45 @@ beforeEach(() => {
   vi.useFakeTimers();
 });
 
-describe('Drd2CombatPanel', () => {
+describe('Drd2CombatPanel (16.2e)', () => {
   it('loading state se vyrenderuje, dokud data nedorazí', () => {
     mockDiary.mockReturnValue({ data: undefined, isLoading: true });
-    const Wrapper = makeWrapper();
     render(
-      <Drd2CombatPanel
-        token={makeToken()}
-        sceneId="s1"
-        worldId="w1"
-        canEdit
-      />,
-      { wrapper: Wrapper },
+      <Drd2CombatPanel token={makeToken()} sceneId="s1" worldId="w1" canEdit />,
+      { wrapper: makeWrapper() },
     );
     expect(screen.getByText(/NAČÍTÁM DATA/)).toBeInTheDocument();
   });
 
-  it('canEdit=true → inputy enabled', () => {
+  it('empty diary → fallback message', () => {
+    mockDiary.mockReturnValue({ data: null, isLoading: false });
+    render(
+      <Drd2CombatPanel token={makeToken()} sceneId="s1" worldId="w1" canEdit />,
+      { wrapper: makeWrapper() },
+    );
+    expect(screen.getByText(/Deník postavy nedostupný/)).toBeInTheDocument();
+  });
+
+  it('canEdit=true → segmenty enabled, hodnota odpovídá datům', () => {
     mockDiary.mockReturnValue({
       data: {
         id: 'd1',
         characterId: 'c1',
         worldId: 'w1',
         sections: [],
-        customData: {
-          drd2_body: '4',
-          drd2_body_max: '5',
-        },
+        customData: { drd2_body: '4', drd2_body_max: '5' },
       },
       isLoading: false,
     });
-    const Wrapper = makeWrapper();
     render(
-      <Drd2CombatPanel
-        token={makeToken()}
-        sceneId="s1"
-        worldId="w1"
-        canEdit
-      />,
-      { wrapper: Wrapper },
+      <Drd2CombatPanel token={makeToken()} sceneId="s1" worldId="w1" canEdit />,
+      { wrapper: makeWrapper() },
     );
-    const teloCur = screen.getByLabelText('Tělo aktuální') as HTMLInputElement;
-    expect(teloCur).not.toBeDisabled();
-    expect(teloCur.value).toBe('4');
+    expect(screen.getByLabelText('Tělo 1')).not.toBeDisabled();
+    expect(screen.getByLabelText('Tělo stav')).toHaveTextContent('4 / 5');
   });
 
-  it('canEdit=false → inputy disabled, žádné iniciativy', () => {
+  it('canEdit=false → segmenty disabled, bez iniciativy', () => {
     mockDiary.mockReturnValue({
       data: {
         id: 'd1',
@@ -130,7 +114,6 @@ describe('Drd2CombatPanel', () => {
       },
       isLoading: false,
     });
-    const Wrapper = makeWrapper();
     render(
       <Drd2CombatPanel
         token={makeToken()}
@@ -138,15 +121,14 @@ describe('Drd2CombatPanel', () => {
         worldId="w1"
         canEdit={false}
       />,
-      { wrapper: Wrapper },
+      { wrapper: makeWrapper() },
     );
-    expect(screen.getByLabelText('Tělo aktuální')).toBeDisabled();
-    expect(screen.getByLabelText('Ohrožení')).toBeDisabled();
-    // bez onRoll = bez Iniciativa buttonu
+    expect(screen.getByLabelText('Tělo 1')).toBeDisabled();
+    expect(screen.getByLabelText('Ohrožení 1')).toBeDisabled();
     expect(screen.queryByText(/Iniciativa/)).not.toBeInTheDocument();
   });
 
-  it('klik na základní povolání triggers onRoll s úrovní jako modifier (kind=d6)', () => {
+  it('klik na povolání → onRoll s úrovní jako modifier (kind=2d6+)', () => {
     mockDiary.mockReturnValue({
       data: {
         id: 'd1',
@@ -162,27 +144,56 @@ describe('Drd2CombatPanel', () => {
       isLoading: false,
     });
     const onRoll = vi.fn();
-    const Wrapper = makeWrapper();
     render(
       <Drd2CombatPanel
-        token={makeToken({ instanceName: 'Kovář' })}
+        token={makeToken()}
         sceneId="s1"
         worldId="w1"
         canEdit
         onRoll={onRoll}
       />,
-      { wrapper: Wrapper },
+      { wrapper: makeWrapper() },
     );
-    fireEvent.click(screen.getByLabelText('Povolání Bojovník úroveň 3'));
-    expect(onRoll).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByLabelText('Hodit povolání Bojovník'));
     expect(onRoll).toHaveBeenCalledWith({
-      label: 'Kovář — Povolání: Bojovník',
+      label: 'Bojovník',
       modifier: 3,
-      kind: 'd6',
+      kind: '2d6+',
     });
   });
 
-  it('edit Tělo (HP) triggers debounced mutate s customDataPatch', () => {
+  it('iniciativa → onRoll 2d6+ bez modifikátoru s initiative flag', () => {
+    mockDiary.mockReturnValue({
+      data: {
+        id: 'd1',
+        characterId: 'c1',
+        worldId: 'w1',
+        sections: [],
+        customData: {},
+      },
+      isLoading: false,
+    });
+    const onRoll = vi.fn();
+    render(
+      <Drd2CombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+      { wrapper: makeWrapper() },
+    );
+    fireEvent.click(screen.getByText(/Iniciativa/));
+    expect(onRoll).toHaveBeenCalledWith({
+      label: 'Iniciativa',
+      modifier: 0,
+      kind: '2d6+',
+      initiative: true,
+    });
+  });
+
+  it('klik na segment Tělo → debounced mutate s customDataPatch', () => {
     mockDiary.mockReturnValue({
       data: {
         id: 'd1',
@@ -193,48 +204,18 @@ describe('Drd2CombatPanel', () => {
       },
       isLoading: false,
     });
-    const Wrapper = makeWrapper();
     render(
-      <Drd2CombatPanel
-        token={makeToken()}
-        sceneId="s1"
-        worldId="w1"
-        canEdit
-      />,
-      { wrapper: Wrapper },
+      <Drd2CombatPanel token={makeToken()} sceneId="s1" worldId="w1" canEdit />,
+      { wrapper: makeWrapper() },
     );
-    const teloCur = screen.getByLabelText('Tělo aktuální');
-    fireEvent.change(teloCur, { target: { value: '2' } });
-
-    // Debounce není dosud uplynul → mutate ještě nevolán
+    fireEvent.click(screen.getByLabelText('Tělo 2'));
     expect(mockMutate).not.toHaveBeenCalled();
-
-    // Posuň čas přes debounce window
     act(() => {
       vi.advanceTimersByTime(600);
     });
-
     expect(mockMutate).toHaveBeenCalledTimes(1);
-    const call = mockMutate.mock.calls[0][0];
-    expect(call).toEqual({
+    expect(mockMutate.mock.calls[0][0]).toEqual({
       customDataPatch: { drd2_body: '2' },
     });
-  });
-
-  it('empty diary → fallback message', () => {
-    mockDiary.mockReturnValue({ data: null, isLoading: false });
-    const Wrapper = makeWrapper();
-    render(
-      <Drd2CombatPanel
-        token={makeToken()}
-        sceneId="s1"
-        worldId="w1"
-        canEdit
-      />,
-      { wrapper: Wrapper },
-    );
-    expect(
-      screen.getByText(/Deník postavy nedostupný/),
-    ).toBeInTheDocument();
   });
 });

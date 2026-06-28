@@ -1,39 +1,27 @@
 /**
- * 10.2c-edit-9g — Drd2CombatPanel.
+ * 16.2e-mapa — Drd2CombatPanel (Dračí doupě II na taktické mapě).
  *
- * Kompaktní bojový panel pro Dračí doupě II — port 1:1 vizuálu ze starého
- * Matrix `c:/Matrix/Matrix/frontend/src/components/Map/Drd2MapDiaryOverlay.tsx`.
+ * Kompaktní bojový panel sladěný s deníkem `Drd2Sheet` (fantasy pergamen).
+ * Single source s listem — čte/zapisuje tentýž `diary.customData` přes
+ * `token.characterSlug`, prefix `drd2_` (`makeCdAccess`). Stejný datový model
+ * jako nový deník (companions/rituals/special_abilities seznamy).
  *
- * V tactical-map TokenInfoPanelu nahrazuje plný Drd2Sheet (který byl
- * určen pro plnou CharacterDetailPage). Tady chceme jen kompaktní statblok
- * pro PJ/hráče v boji:
- *   - Celková úroveň (využitá / celková)
- *   - 3 zdroje: Tělo / Duše / Vliv (akt/max + jizvy)
- *   - Ohrožení + Výhoda mega boxy
- *   - Rasová ZS + Povahový rys (jen pokud vyplněno)
- *   - Zbraně a Zbroje (klik = roll s bonusem z `char` pole)
- *   - Pomocník (jen pokud vyplněno)
- *   - Základní / Pokročilá povolání — klik na řádek = roll s úrovní jako mod
- *   - Mistrovská povolání — group badge (info-only)
- *   - Zvláštní schopnosti
- *   - Poznámky (stavy a efekty)
+ * Hody: vše **`2d6+`** (otevřený hod DrD). Povolání = klik na řádek → `2d6+`
+ * + úroveň povolání. Iniciativa = `⚡` → `2d6+` bez modifikátoru.
  *
- * Data flow:
- *   1. `useCharacterDiary` → `diary.customData.drd2_*`
- *   2. Edits → debounced (~500ms) `useUpdateCharacterDiary({ customDataPatch })`
- *   3. Roll → `onRoll({ label, modifier, kind: 'd6' })` (engine = 2k6+ ekvivalent
- *      přes generic dice; modifier z úrovně povolání).
- *
- * Permission gate:
- *   - `canEdit === false` → readonly view, žádné edit inputy ani roll buttons.
- *   - `canEdit === true` → plně interaktivní.
+ * Data flow vzorem `DrdPlusCombatPanel`: `useCharacterDiary` → debounced
+ * (~500 ms) `useUpdateCharacterDiary({customDataPatch})`. `canEdit === false`
+ * → readonly.
  */
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import {
-  useCharacterDiary,
-} from '@/features/world/pages/api/useCharacterSubdocs';
+import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
 import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
+import type { SystemSheetProps } from '@/features/world/pages/CharacterDetailPage/diary-systems/types';
+import {
+  makeCdAccess,
+  type CdAccess,
+} from '@/features/world/pages/CharacterDetailPage/diary-systems/_shared/cdAccess';
 import type { MapToken } from '../../../types';
 import styles from './Drd2CombatPanel.module.css';
 
@@ -42,76 +30,43 @@ interface Props {
   sceneId: string;
   worldId: string;
   canEdit: boolean;
-  onRoll?: (req: {
-    label: string;
-    modifier: number;
-    kind: 'fate' | 'd20' | 'd6' | 'd10';
-  }) => void;
+  onRoll?: SystemSheetProps['onRoll'];
 }
 
-interface BasicProf {
+const DEBOUNCE_MS = 500;
+
+interface Weapon {
+  name?: string;
+  char?: string;
+  note?: string;
+}
+interface Companion {
+  char?: string;
+  ability?: string;
+  bound?: string;
+  pay?: string;
+  bond?: number;
+}
+interface Ritual {
+  name?: string;
+  charge?: number;
+}
+interface Prof {
   id: string;
   name: string;
   level: number;
 }
-interface AdvProf extends BasicProf {
-  requires?: string[];
-}
-interface MasterAbility {
-  name: string;
-  sourceMaster: string;
-  isReservedSkill?: boolean;
-}
-interface SpecAbility {
-  name: string;
-  description: string;
+interface Zs {
+  name?: string;
   source?: string;
   type?: string;
-}
-interface Weapon {
-  name: string;
-  char?: string;
-  note?: string;
+  description?: string;
 }
 
-const MASTER_PROF_NAMES: Record<string, string> = {
-  cernokneznik: 'Černokněžník',
-  divotvurce: 'Divotvůrce',
-  inkvizitor: 'Inkvizitor',
-  mstitel: 'Mstitel',
-  nicitel: 'Ničitel',
-  paladin: 'Paladin',
-  stin: 'Stín',
-  vudce: 'Vůdce',
-  zivlomag: 'Živlomág',
-  zrec: 'Žrec',
+const num = (s: string, d = 0): number => {
+  const n = parseInt(s, 10);
+  return Number.isNaN(n) ? d : n;
 };
-
-const RESOURCE_COLORS = {
-  body: '#e74c3c',
-  soul: '#8872ff',
-  influence: '#f1c40f',
-} as const;
-
-const DEBOUNCE_MS = 500;
-
-function safeParseArr<T>(v: unknown): T[] {
-  if (Array.isArray(v)) return v as T[];
-  if (typeof v === 'string') {
-    try {
-      const p = JSON.parse(v);
-      return Array.isArray(p) ? (p as T[]) : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
-
-function asStr(v: unknown, fallback = ''): string {
-  if (v === undefined || v === null) return fallback;
-  return String(v);
-}
 
 export function Drd2CombatPanel({
   token,
@@ -125,9 +80,9 @@ export function Drd2CombatPanel({
   );
   const updateMut = useUpdateCharacterDiary(worldId, token.characterSlug);
 
-  // ── Local pending patch (debounced flush) ──
   const [pending, setPending] = useState<Record<string, unknown>>({});
   const flushTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     return () => {
@@ -135,16 +90,14 @@ export function Drd2CombatPanel({
     };
   }, []);
 
-  function scheduleFlush(nextPending: Record<string, unknown>): void {
+  function scheduleFlush(next: Record<string, unknown>): void {
     if (flushTimer.current) clearTimeout(flushTimer.current);
     flushTimer.current = setTimeout(() => {
-      if (Object.keys(nextPending).length === 0) return;
+      if (Object.keys(next).length === 0) return;
       updateMut.mutate(
-        { customDataPatch: nextPending },
+        { customDataPatch: next },
         {
-          onSuccess: () => {
-            setPending({});
-          },
+          onSuccess: () => setPending({}),
           onError: (e) =>
             toast.error(
               `Uložení selhalo: ${e instanceof Error ? e.message : 'neznámá chyba'}`,
@@ -153,21 +106,6 @@ export function Drd2CombatPanel({
       );
     }, DEBOUNCE_MS);
   }
-
-  function writeField(key: string, value: string): void {
-    if (!canEdit) return;
-    setPending((prev) => {
-      const next = { ...prev, [key]: value };
-      scheduleFlush(next);
-      return next;
-    });
-  }
-
-  // ── Effective customData = base z BE merged s pending edits ──
-  const baseCd = diary?.customData ?? {};
-  const cd: Record<string, unknown> = { ...baseCd, ...pending };
-
-  const str = (k: string): string => asStr(cd[k]);
 
   if (isLoading) {
     return (
@@ -184,449 +122,537 @@ export function Drd2CombatPanel({
     );
   }
 
-  const basicProfs = safeParseArr<BasicProf>(cd['drd2_basic_professions']);
-  const advProfs = safeParseArr<AdvProf>(cd['drd2_advanced_professions']);
-  const masterAbilities = safeParseArr<MasterAbility>(
-    cd['drd2_master_abilities'],
-  );
-  const specAbilities = safeParseArr<SpecAbility>(cd['drd2_special_abilities']);
-  const weapons = safeParseArr<Weapon>(cd['drd2_weapons']);
-  const usedLevel =
-    basicProfs.reduce((s, p) => s + (Number(p.level) || 0), 0) +
-    advProfs.reduce((s, p) => s + (Number(p.level) || 0), 0);
+  const cd: Record<string, unknown> = { ...(diary.customData ?? {}), ...pending };
 
-  // Master groups by sourceMaster
-  const masterGroups: Record<string, MasterAbility[]> = {};
-  masterAbilities.forEach((a) => {
-    if (!masterGroups[a.sourceMaster]) masterGroups[a.sourceMaster] = [];
-    masterGroups[a.sourceMaster].push(a);
-  });
-
-  const rollerName =
-    token.instanceName ?? token.characterData?.name ?? 'Postava';
-
-  const doRoll = (label: string, modifier: number): void => {
-    if (!onRoll) return;
-    onRoll({ label: `${rollerName} — ${label}`, modifier, kind: 'd6' });
+  const handleChange: SystemSheetProps['onChange'] = (nextChange) => {
+    if (!('customDataPatch' in nextChange)) return;
+    setPending((prev) => {
+      const merged = { ...prev, ...nextChange.customDataPatch };
+      scheduleFlush(merged);
+      return merged;
+    });
   };
+  const cda: CdAccess = makeCdAccess(
+    cd,
+    'drd2_',
+    canEdit ? handleChange : undefined,
+  );
+
+  const basicProfs = cda.parseJsonArr<Prof>('basic_professions');
+  const advProfs = cda.parseJsonArr<Prof>('advanced_professions');
+  const masterProfs = cda.parseJsonArr<Prof>('master_professions');
+  const usedLevel =
+    basicProfs.reduce((s, p) => s + (p.level || 0), 0) +
+    advProfs.reduce((s, p) => s + (p.level || 0), 0) +
+    masterProfs.reduce((s, p) => s + (p.level || 0), 0);
+
+  const weapons = cda.parseJsonArr<Weapon>('weapons');
+  const companions = cda.parseJsonArr<Companion>('companions');
+  const rituals = cda.parseJsonArr<Ritual>('rituals');
+  const abilities = cda.parseJsonArr<Zs>('special_abilities');
+
+  const doRoll = (label: string, mod: number, initiative = false): void => {
+    onRoll?.({
+      label,
+      modifier: mod,
+      kind: '2d6+',
+      ...(initiative && { initiative: true }),
+    });
+  };
+
+  const toggle = (key: string): void =>
+    setOpen((p) => ({ ...p, [key]: !p[key] }));
 
   return (
     <div className={styles.root}>
-      {/* Iniciativa quick-roll */}
-      {onRoll && (
-        <div className={styles.initRow}>
+      {/* Hlavička: úroveň + iniciativa (jméno nese token chrome) */}
+      <div className={styles.head}>
+        <span className={styles.lvl} aria-label="Využitá úroveň">
+          Ú {usedLevel}/{cda.g('total_level') || usedLevel}
+        </span>
+        {onRoll && (
           <button
             type="button"
             className={styles.initBtn}
-            onClick={() => doRoll('Iniciativa', 0)}
-            title="Hodit iniciativu (d6)"
+            onClick={() => doRoll('Iniciativa', 0, true)}
+            title="Iniciativa (2k6)"
           >
             ⚡ Iniciativa
           </button>
-        </div>
-      )}
-
-      {/* Celková úroveň */}
-      <div className={styles.totalLevel}>
-        <span className={styles.totalLevelLabel}>
-          Úroveň (využitá / celková)
-        </span>
-        <div className={styles.totalLevelValue}>
-          <span className={styles.totalLevelUsed} aria-label="Využitá úroveň">
-            {usedLevel}
-          </span>
-          <span className={styles.totalLevelSep}>/</span>
-          <input
-            className={styles.totalLevelInput}
-            value={str('drd2_total_level') || String(usedLevel)}
-            disabled={!canEdit}
-            onChange={(e) => writeField('drd2_total_level', e.target.value)}
-            aria-label="Celková úroveň"
-          />
-        </div>
+        )}
       </div>
 
-      <div className={styles.grid}>
-        {/* LEVÝ SLOUPEC */}
-        <div className={styles.column}>
-          {/* Zdroje */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Zdroje</h3>
-            <ResourceBar
-              label="Tělo"
-              color={RESOURCE_COLORS.body}
-              curKey="drd2_body"
-              maxKey="drd2_body_max"
-              scarsKey="drd2_body_scars"
-              cd={cd}
-              canEdit={canEdit}
-              writeField={writeField}
-            />
-            <ResourceBar
-              label="Duše"
-              color={RESOURCE_COLORS.soul}
-              curKey="drd2_soul"
-              maxKey="drd2_soul_max"
-              scarsKey="drd2_soul_scars"
-              cd={cd}
-              canEdit={canEdit}
-              writeField={writeField}
-            />
-            <ResourceBar
-              label="Vliv"
-              color={RESOURCE_COLORS.influence}
-              curKey="drd2_influence"
-              maxKey="drd2_influence_max"
-              scarsKey="drd2_influence_scars"
-              cd={cd}
-              canEdit={canEdit}
-              writeField={writeField}
-            />
+      {/* Zdroje */}
+      <h3 className={styles.lg}>Zdroje a jizvy</h3>
+      <SegTrack label="Tělo" k="body" variant="body" cda={cda} canEdit={canEdit} />
+      <SegTrack label="Duše" k="soul" variant="soul" cda={cda} canEdit={canEdit} />
+      <SegTrack label="Vliv" k="influence" variant="infl" cda={cda} canEdit={canEdit} />
+
+      {/* Boj */}
+      <h3 className={styles.lg}>Boj</h3>
+      <Gauge label="Ohrožení" k="threat" variant="threat" cda={cda} canEdit={canEdit} />
+      <Gauge label="Výhoda" k="advantage" variant="adv" cda={cda} canEdit={canEdit} />
+      <textarea
+        className={styles.states}
+        value={cda.g('state_effects')}
+        disabled={!canEdit}
+        onChange={(e) => cda.set('state_effects', e.target.value)}
+        placeholder="stavy a efekty…"
+        aria-label="Stavy a efekty"
+      />
+
+      {/* Povolání — klik = 2k6 + úroveň */}
+      <h3 className={styles.lg}>
+        Povolání <small>klik = 2k6 + úroveň</small>
+      </h3>
+      {basicProfs.length > 0 && <div className={styles.sub}>Základní</div>}
+      {basicProfs.map((p, i) => (
+        <ProfRow
+          key={p.id}
+          prof={p}
+          arrKey="basic_professions"
+          idx={i}
+          rows={basicProfs}
+          cda={cda}
+          canEdit={canEdit}
+          onRoll={onRoll ? () => doRoll(p.name, p.level || 0) : undefined}
+        />
+      ))}
+      {advProfs.length > 0 && <div className={styles.sub}>Pokročilá</div>}
+      {advProfs.map((p, i) => (
+        <ProfRow
+          key={p.id}
+          prof={p}
+          arrKey="advanced_professions"
+          idx={i}
+          rows={advProfs}
+          cda={cda}
+          canEdit={canEdit}
+          onRoll={onRoll ? () => doRoll(p.name, p.level || 0) : undefined}
+        />
+      ))}
+      {masterProfs.length > 0 && <div className={styles.sub}>Mistrovská</div>}
+      {masterProfs.map((p, i) => (
+        <ProfRow
+          key={p.id}
+          prof={p}
+          arrKey="master_professions"
+          idx={i}
+          rows={masterProfs}
+          cda={cda}
+          canEdit={canEdit}
+          onRoll={onRoll ? () => doRoll(p.name, p.level || 0) : undefined}
+        />
+      ))}
+
+      {/* Zbraně — rozevírací, read-only */}
+      <CollSection
+        title="Zbraně a zbroje"
+        count={weapons.length}
+        readonly
+        open={!!open.weap}
+        onToggle={() => toggle('weap')}
+      >
+        {weapons.map((w, i) => (
+          <div className={styles.roRow} key={i}>
+            <b>{w.name || '—'}</b>
+            <span>{[w.char, w.note].filter(Boolean).join(' · ') || '—'}</span>
           </div>
+        ))}
+      </CollSection>
 
-          {/* Ohrožení / Výhoda */}
-          <div className={styles.section}>
-            <div className={styles.megaGrid}>
-              <div className={`${styles.megaBox} ${styles.megaBoxDanger}`}>
-                <div
-                  className={`${styles.megaLabel} ${styles.megaLabelDanger}`}
-                >
-                  Ohrožení
-                </div>
-                <input
-                  className={`${styles.megaInput} ${styles.megaInputDanger}`}
-                  value={str('drd2_threat')}
-                  disabled={!canEdit}
-                  onChange={(e) => writeField('drd2_threat', e.target.value)}
-                  aria-label="Ohrožení"
-                />
-              </div>
-              <div className={`${styles.megaBox} ${styles.megaBoxAdvantage}`}>
-                <div
-                  className={`${styles.megaLabel} ${styles.megaLabelAdvantage}`}
-                >
-                  Výhoda
-                </div>
-                <input
-                  className={`${styles.megaInput} ${styles.megaInputAdvantage}`}
-                  value={str('drd2_advantage')}
-                  disabled={!canEdit}
-                  onChange={(e) => writeField('drd2_advantage', e.target.value)}
-                  aria-label="Výhoda"
-                />
-              </div>
-            </div>
-          </div>
+      {/* Pomocníci — rozevírací, editovatelné */}
+      <CollSection
+        title="Pomocníci"
+        count={companions.length}
+        open={!!open.comp}
+        onToggle={() => toggle('comp')}
+      >
+        {companions.map((c, i) => (
+          <CompanionCard key={i} row={c} idx={i} cda={cda} canEdit={canEdit} />
+        ))}
+        {canEdit && (
+          <button
+            type="button"
+            className={styles.add}
+            onClick={() =>
+              cda.addArr<Companion>('companions', {
+                char: '',
+                ability: '',
+                bound: '',
+                pay: '',
+                bond: 0,
+              })
+            }
+          >
+            + přidat pomocníka
+          </button>
+        )}
+      </CollSection>
 
-          {/* Rasa & Povaha */}
-          {(str('drd2_race_ability') || str('drd2_personality')) && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Rasa a Povaha</h3>
-              <div className={styles.identityCard}>
-                {str('drd2_race_ability') && (
-                  <div
-                    className={`${styles.identityLine} ${styles.identityLineRace}`}
-                  >
-                    <strong>Rasová ZS:</strong> {str('drd2_race_ability')}
-                  </div>
-                )}
-                {str('drd2_personality') && (
-                  <div
-                    className={`${styles.identityLine} ${styles.identityLinePersonality}`}
-                  >
-                    <strong>Rys:</strong> {str('drd2_personality')}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+      {/* Rituály — rozevírací, editovatelné */}
+      <CollSection
+        title="Rituální předměty"
+        count={rituals.length}
+        open={!!open.rit}
+        onToggle={() => toggle('rit')}
+      >
+        {rituals.map((r, i) => (
+          <RitualCard key={i} row={r} idx={i} cda={cda} canEdit={canEdit} />
+        ))}
+        {canEdit && (
+          <button
+            type="button"
+            className={styles.add}
+            onClick={() => cda.addArr<Ritual>('rituals', { name: '', charge: 0 })}
+          >
+            + přidat rituální předmět
+          </button>
+        )}
+      </CollSection>
 
-          {/* Zbraně */}
-          {weapons.length > 0 && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Zbraně a Zbroje</h3>
-              {weapons.map((w, i) => {
-                const charMod = parseInt(asStr(w.char), 10) || 0;
-                const interactive = !!onRoll && !!w.name;
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    className={styles.weaponRow}
-                    style={
-                      interactive
-                        ? undefined
-                        : { cursor: 'default', pointerEvents: 'none' }
-                    }
-                    disabled={!interactive}
-                    onClick={() => {
-                      if (interactive) {
-                        doRoll(`Zbraň: ${w.name}`, charMod);
-                      }
-                    }}
-                    aria-label={`Zbraň ${w.name}`}
-                  >
-                    <div className={styles.weaponName}>
-                      {w.name || '(bez názvu)'}
-                    </div>
-                    {(w.char || w.note) && (
-                      <div className={styles.weaponMeta}>
-                        {w.char && (
-                          <span>
-                            Char: <b>{w.char}</b>
-                          </span>
-                        )}
-                        {w.note && <span>Pozn: {w.note}</span>}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Pomocník */}
-          {str('drd2_comp_char') && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Pomocník</h3>
-              <div className={styles.identityCard}>
-                <div className={styles.identityLineRace}>
-                  <strong>{str('drd2_comp_char')}</strong>
-                </div>
-                {str('drd2_comp_bond') && (
-                  <div>Pouto: {str('drd2_comp_bond')}</div>
-                )}
-                {str('drd2_comp_pay') && (
-                  <div>Platba: {str('drd2_comp_pay')}</div>
-                )}
-                {str('drd2_comp_bound') && (
-                  <div>Hranice: {str('drd2_comp_bound')}</div>
-                )}
-                {str('drd2_comp_spec') && (
-                  <div>ZS: {str('drd2_comp_spec')}</div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* PRAVÝ SLOUPEC */}
-        <div className={styles.column}>
-          {/* Základní povolání */}
-          {basicProfs.length > 0 && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Základní Povolání</h3>
-              {basicProfs.map((p, i) => (
-                <ProfessionRow
-                  key={`b-${i}`}
-                  name={p.name}
-                  level={Number(p.level) || 0}
-                  variant="basic"
-                  onClick={
-                    onRoll
-                      ? () =>
-                          doRoll(`Povolání: ${p.name}`, Number(p.level) || 0)
-                      : undefined
-                  }
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Pokročilá povolání */}
-          {advProfs.length > 0 && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Pokročilá Povolání</h3>
-              {advProfs.map((p, i) => (
-                <ProfessionRow
-                  key={`a-${i}`}
-                  name={p.name}
-                  level={Number(p.level) || 0}
-                  variant="advanced"
-                  onClick={
-                    onRoll
-                      ? () =>
-                          doRoll(`Povolání: ${p.name}`, Number(p.level) || 0)
-                      : undefined
-                  }
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Mistrovská povolání */}
-          {Object.keys(masterGroups).length > 0 && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Mistrovská Povolání</h3>
-              <div className={styles.masterGroupList}>
-                {Object.entries(masterGroups).map(([mpId, abilities]) => (
-                  <div key={mpId} className={styles.masterRow}>
-                    <span className={styles.masterName}>
-                      {MASTER_PROF_NAMES[mpId] ?? mpId}
-                    </span>
-                    <span className={styles.masterSep}>–</span>
-                    <span className={styles.masterCount}>
-                      {abilities.length} ZS
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Zvláštní schopnosti */}
-          {specAbilities.length > 0 && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Zvláštní schopnosti</h3>
-              {specAbilities.map(
-                (za, i) =>
-                  za.name && (
-                    <div key={i} className={styles.specRow}>
-                      <div className={styles.specName}>{za.name}</div>
-                      {za.description && (
-                        <div className={styles.specDesc}>{za.description}</div>
-                      )}
-                    </div>
-                  ),
+      {/* Zvláštní schopnosti — rozevírací, read-only */}
+      <CollSection
+        title="Zvláštní schopnosti"
+        count={abilities.length}
+        readonly
+        open={!!open.zs}
+        onToggle={() => toggle('zs')}
+      >
+        {abilities.map((a, i) => (
+          <div className={styles.roRow} key={i}>
+            <b>
+              {a.name || '—'}
+              {(a.source || a.type) && (
+                <span className={styles.tag}>
+                  {[a.source, a.type].filter(Boolean).join(' · ')}
+                </span>
               )}
-            </div>
-          )}
+            </b>
+            {a.description && <span>{a.description}</span>}
+          </div>
+        ))}
+      </CollSection>
+    </div>
+  );
+}
 
-          {/* Stavy a efekty (poznámky) */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Stavy a efekty</h3>
-            <textarea
-              className={styles.notesArea}
-              value={str('drd2_state_effects')}
+// ── Segmentová stupnice zdroje ──────────────────────────────────────────
+
+interface SegProps {
+  label: string;
+  k: string;
+  variant: 'body' | 'soul' | 'infl';
+  cda: CdAccess;
+  canEdit: boolean;
+}
+
+function SegTrack({ label, k, variant, cda, canEdit }: SegProps): React.ReactElement {
+  const max = Math.max(1, Math.min(20, num(cda.g(`${k}_max`, '10'), 10)));
+  const cur = Math.max(0, Math.min(max, num(cda.g(k, '0'), 0)));
+  return (
+    <div className={`${styles.res} ${styles[variant]}`}>
+      <div className={styles.resTop}>
+        <span className={styles.resName}>{label}</span>
+        <span className={styles.resVal} aria-label={`${label} stav`}>
+          <b>{cur}</b> / {max}
+        </span>
+      </div>
+      <div className={styles.track} role="group" aria-label={`${label} stupnice`}>
+        {Array.from({ length: max }, (_, i) => i + 1).map((i) => (
+          <button
+            type="button"
+            key={i}
+            className={`${styles.seg}${i <= cur ? ' ' + styles.on : ''}`}
+            disabled={!canEdit}
+            onClick={() => cda.set(k, String(cur === i ? i - 1 : i))}
+            aria-label={`${label} ${i}`}
+            aria-pressed={i <= cur}
+          />
+        ))}
+      </div>
+      <input
+        className={styles.scar}
+        value={cda.g(`${k}_scars`)}
+        disabled={!canEdit}
+        onChange={(e) => cda.set(`${k}_scars`, e.target.value)}
+        placeholder="jizvy…"
+        aria-label={`${label} jizvy`}
+      />
+    </div>
+  );
+}
+
+// ── Stupnice Ohrožení / Výhoda (1–9) ────────────────────────────────────
+
+interface GaugeProps {
+  label: string;
+  k: string;
+  variant: 'threat' | 'adv';
+  cda: CdAccess;
+  canEdit: boolean;
+}
+
+function Gauge({ label, k, variant, cda, canEdit }: GaugeProps): React.ReactElement {
+  const cur = Math.max(0, Math.min(9, num(cda.g(k, '0'), 0)));
+  return (
+    <div className={`${styles.gauge} ${styles[variant]}`}>
+      <span className={styles.gaugeLbl}>{label}</span>
+      <span className={styles.gaugeBig} aria-label={label}>
+        {cur}
+      </span>
+      <div className={styles.rungs} role="group" aria-label={`${label} stupnice`}>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+          <button
+            type="button"
+            key={i}
+            className={`${styles.rung}${i <= cur ? ' ' + styles.on : ''}`}
+            disabled={!canEdit}
+            onClick={() => cda.set(k, String(cur === i ? i - 1 : i))}
+            aria-label={`${label} ${i}`}
+            aria-pressed={i <= cur}
+          >
+            {i}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Řádek povolání (klik = hod 2k6 + úroveň) ────────────────────────────
+
+interface ProfRowProps {
+  prof: Prof;
+  arrKey: string;
+  idx: number;
+  rows: Prof[];
+  cda: CdAccess;
+  canEdit: boolean;
+  onRoll?: () => void;
+}
+
+function ProfRow({
+  prof,
+  arrKey,
+  idx,
+  rows,
+  cda,
+  canEdit,
+  onRoll,
+}: ProfRowProps): React.ReactElement {
+  const setLevel = (lvl: number): void => {
+    const copy = [...rows];
+    copy[idx] = { ...prof, level: lvl };
+    cda.set(arrKey, JSON.stringify(copy));
+  };
+  return (
+    <div
+      className={styles.prof}
+      role="button"
+      tabIndex={onRoll ? 0 : -1}
+      aria-label={`Hodit povolání ${prof.name}`}
+      onClick={() => onRoll?.()}
+      onKeyDown={(e) => {
+        if (onRoll && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onRoll();
+        }
+      }}
+    >
+      <span className={styles.profSeal} aria-hidden>
+        {prof.name.charAt(0)}
+      </span>
+      <span className={styles.profName}>{prof.name}</span>
+      <div className={styles.pips} role="group" aria-label={`${prof.name} úroveň`}>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            type="button"
+            key={n}
+            className={`${styles.dot}${prof.level >= n ? ' ' + styles.on : ''}`}
+            disabled={!canEdit}
+            onClick={(e) => {
+              e.stopPropagation();
+              setLevel(prof.level === n ? n - 1 : n);
+            }}
+            aria-label={`${prof.name} úroveň ${n}`}
+            aria-pressed={prof.level >= n}
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Rozevírací sekce ────────────────────────────────────────────────────
+
+interface CollProps {
+  title: string;
+  count: number;
+  readonly?: boolean;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
+
+function CollSection({
+  title,
+  count,
+  readonly,
+  open,
+  onToggle,
+  children,
+}: CollProps): React.ReactElement {
+  return (
+    <div className={`${styles.coll}${open ? ' ' + styles.collOpen : ''}`}>
+      <button
+        type="button"
+        className={styles.collH}
+        onClick={onToggle}
+        aria-expanded={open}
+      >
+        <span className={styles.collTitle}>{title}</span>
+        <span className={styles.collCount}>{count}</span>
+        <span className={styles.collMode}>{readonly ? 'jen čtení' : 'úpravy'}</span>
+        <span className={styles.collArr}>▸</span>
+      </button>
+      {open && <div className={styles.collBody}>{children}</div>}
+    </div>
+  );
+}
+
+// ── Karta pomocníka (edit) ──────────────────────────────────────────────
+
+interface CompanionCardProps {
+  row: Companion;
+  idx: number;
+  cda: CdAccess;
+  canEdit: boolean;
+}
+
+function CompanionCard({
+  row,
+  idx,
+  cda,
+  canEdit,
+}: CompanionCardProps): React.ReactElement {
+  const bond = Math.max(0, Math.min(11, row.bond || 0));
+  const fields: [keyof Companion, string][] = [
+    ['char', 'Charakter.'],
+    ['ability', 'Schopnost'],
+    ['bound', 'Hranice'],
+    ['pay', 'Platba'],
+  ];
+  return (
+    <div className={styles.edCard}>
+      {canEdit && (
+        <button
+          type="button"
+          className={styles.del}
+          onClick={() => cda.removeArr('companions', idx)}
+          aria-label="Smazat pomocníka"
+        >
+          ✕
+        </button>
+      )}
+      <div className={styles.edGrid}>
+        {fields.map(([f, lbl]) => (
+          <label className={styles.fr} key={f}>
+            <span>{lbl}</span>
+            <input
+              className={styles.edLine}
+              value={(row[f] as string) || ''}
               disabled={!canEdit}
               onChange={(e) =>
-                writeField('drd2_state_effects', e.target.value)
+                cda.updateArr<Companion>('companions', idx, {
+                  [f]: e.target.value,
+                })
               }
-              placeholder="Otrávení, probíhající kouzla, stavy…"
-              aria-label="Stavy a efekty"
+              aria-label={`Pomocník ${idx + 1} ${lbl}`}
             />
-          </div>
-        </div>
+          </label>
+        ))}
+      </div>
+      <div className={styles.bondLbl}>Pouto</div>
+      <div className={styles.pipRow} role="group" aria-label={`Pomocník ${idx + 1} pouto`}>
+        {Array.from({ length: 11 }, (_, k) => k + 1).map((k) => (
+          <button
+            type="button"
+            key={k}
+            className={`${styles.pipSq}${k <= bond ? ' ' + styles.on : ''}`}
+            disabled={!canEdit}
+            onClick={() =>
+              cda.updateArr<Companion>('companions', idx, {
+                bond: bond === k ? k - 1 : k,
+              })
+            }
+            aria-label={`Pouto ${k}`}
+            aria-pressed={k <= bond}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────
-// ResourceBar (Tělo / Duše / Vliv)
-// ────────────────────────────────────────────────────────────────────────
+// ── Karta rituálu (edit) ────────────────────────────────────────────────
 
-interface ResourceBarProps {
-  label: string;
-  color: string;
-  curKey: string;
-  maxKey: string;
-  scarsKey: string;
-  cd: Record<string, unknown>;
+interface RitualCardProps {
+  row: Ritual;
+  idx: number;
+  cda: CdAccess;
   canEdit: boolean;
-  writeField: (k: string, v: string) => void;
 }
 
-function ResourceBar({
-  label,
-  color,
-  curKey,
-  maxKey,
-  scarsKey,
-  cd,
+function RitualCard({
+  row,
+  idx,
+  cda,
   canEdit,
-  writeField,
-}: ResourceBarProps): React.ReactElement {
-  const curStr = asStr(cd[curKey]);
-  const maxStr = asStr(cd[maxKey]);
-  const scarsStr = asStr(cd[scarsKey]);
-  const cur = parseInt(curStr, 10) || 0;
-  const max = parseInt(maxStr, 10) || 0;
-  const pct = max > 0 ? Math.max(0, Math.min(100, (cur / max) * 100)) : 0;
-
+}: RitualCardProps): React.ReactElement {
+  const charge = Math.max(0, Math.min(5, row.charge || 0));
   return (
-    <div className={styles.resource}>
-      <div className={styles.resourceHeader}>
-        <span className={styles.resourceLabel} style={{ color }}>
-          {label}
-        </span>
-        <div className={styles.resourceInputs}>
-          <input
-            className={styles.resourceInputCur}
-            style={{ color }}
-            value={curStr}
-            disabled={!canEdit}
-            onChange={(e) => writeField(curKey, e.target.value)}
-            aria-label={`${label} aktuální`}
-          />
-          <span className={styles.resourceSep}>/</span>
-          <input
-            className={styles.resourceInputMax}
-            value={maxStr}
-            disabled={!canEdit}
-            onChange={(e) => writeField(maxKey, e.target.value)}
-            aria-label={`${label} maximum`}
-          />
-        </div>
-      </div>
-      <div className={styles.resourceBar}>
-        <div
-          className={styles.resourceBarFill}
-          style={{ width: `${pct}%`, background: color }}
-        />
-      </div>
-      {scarsStr && (
-        <div className={styles.resourceScars}>Jizvy: {scarsStr}</div>
+    <div className={styles.edCard}>
+      {canEdit && (
+        <button
+          type="button"
+          className={styles.del}
+          onClick={() => cda.removeArr('rituals', idx)}
+          aria-label="Smazat rituální předmět"
+        >
+          ✕
+        </button>
       )}
+      <input
+        className={styles.edLine}
+        value={row.name || ''}
+        disabled={!canEdit}
+        onChange={(e) =>
+          cda.updateArr<Ritual>('rituals', idx, { name: e.target.value })
+        }
+        placeholder="rituální předmět…"
+        aria-label={`Rituál ${idx + 1} název`}
+      />
+      <div className={styles.bondLbl}>Náboj</div>
+      <div className={styles.pipRow} role="group" aria-label={`Rituál ${idx + 1} náboj`}>
+        {[1, 2, 3, 4, 5].map((k) => (
+          <button
+            type="button"
+            key={k}
+            className={`${styles.pipSq} ${styles.charge}${k <= charge ? ' ' + styles.on : ''}`}
+            disabled={!canEdit}
+            onClick={() =>
+              cda.updateArr<Ritual>('rituals', idx, {
+                charge: charge === k ? k - 1 : k,
+              })
+            }
+            aria-label={`Náboj ${k}`}
+            aria-pressed={k <= charge}
+          />
+        ))}
+      </div>
     </div>
-  );
-}
-
-// ────────────────────────────────────────────────────────────────────────
-// ProfessionRow
-// ────────────────────────────────────────────────────────────────────────
-
-interface ProfessionRowProps {
-  name: string;
-  level: number;
-  variant: 'basic' | 'advanced';
-  onClick?: () => void;
-}
-
-function ProfessionRow({
-  name,
-  level,
-  variant,
-  onClick,
-}: ProfessionRowProps): React.ReactElement {
-  const interactive = !!onClick;
-  return (
-    <button
-      type="button"
-      className={`${styles.professionRow} ${variant === 'advanced' ? styles.professionRowAdvanced : ''}`.trim()}
-      onClick={onClick}
-      disabled={!interactive}
-      style={
-        interactive ? undefined : { cursor: 'default', pointerEvents: 'none' }
-      }
-      aria-label={`Povolání ${name} úroveň ${level}`}
-    >
-      <span
-        className={`${styles.professionName} ${variant === 'advanced' ? styles.professionNameAdv : ''}`.trim()}
-      >
-        {name}
-      </span>
-      <span className={styles.professionRight}>
-        <span className={styles.pipRow}>
-          {[0, 1, 2, 3, 4].map((i) => (
-            <span
-              key={i}
-              className={`${styles.pip} ${i < level ? styles.pipActive : ''}`.trim()}
-            />
-          ))}
-        </span>
-        <span className={styles.professionLevel}>{level}</span>
-      </span>
-    </button>
   );
 }

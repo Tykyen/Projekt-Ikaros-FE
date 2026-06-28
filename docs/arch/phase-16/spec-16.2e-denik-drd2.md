@@ -56,6 +56,19 @@ Předělat generický „Dark Forest Emerald HUD" deníku DrD II na **fantasy pe
 
 `tsc -b` · `npm run build` · `vitest Drd2Sheet` · `eslint`. Vizuál po deployi + `mobil-desktop`.
 
+## Krok 4 — Combat panel na taktické mapě (`Drd2CombatPanel`)
+
+**Stav:** schváleno (prototyp `c:/tmp/drd2-mapa-audit.html`). Vzor = `DrdPlusCombatPanel` (single source s deníkem přes `makeCdAccess('drd2_')`, debounced `useUpdateCharacterDiary`, `canEdit` gate, `onRoll`). Přepisuje existující generický `Drd2CombatPanel` (port z Matrixu, čte zastaralá pole `comp_*`/`master_abilities`/`race_ability`).
+
+**Hody:** vše **`2d6+`** (otevřený hod DrD). **Povolání = klik na celý řádek → `2d6+` + úroveň povolání** (pipy nastavují úroveň). **Iniciativa** = `⚡` tlačítko → `2d6+` bez modifikátoru (`initiative:true`). Žádné viditelné „2k6" labely na ovladačích.
+
+**Sekce:**
+- Vždy viditelné + editovatelné: úroveň (využitá/celková), **Zdroje** Tělo/Duše/Vliv (segmentové stupnice klik + jizvy), **Ohrožení/Výhoda** (1–9), stavy a efekty, **Povolání** (klik=hod).
+- Rozevírací (collapsible): **Zbraně a zbroje** = read-only · **Pomocníci** = editovatelné · **Rituální předměty** = editovatelné · **Zvláštní schopnosti** = read-only.
+- Datový model = **shodný s deníkem** (`drd2_*`: companions/rituals/special_abilities seznamy, ne staré `comp_*`). Single source.
+
+**Embedy (F3, krok 8 částečně):** obal mapy + dice log + readout dědí fantasy pergamen přes `DiarySkinScope` (auto `data-diary-system='drd2'`) + tokeny `--dd-embed-*` v `diary-skins.css` (global bundle, NE lazy) + bloky v `DiceLogPanel.module.css` a `DiceRollOverlay.module.css`. Pasti: `@import` před style-rules, tokeny tam kde se konzument načítá (CH-027/028/034).
+
 ## Návaznost (šablona 16.2)
 
-Krok 3 (reálný list) = tato spec. Pak krok 4 combat panel, 5–6 bestie, 8 skiny (7 stylů), 9 funkce+napoveda. Default skin `fantasy` (skins/registry.ts).
+Krok 3 (reálný list) ✅ + krok 4 (combat panel) = tato spec. Pak 5–6 bestie, 8 skiny (7 stylů), 9 funkce+napoveda. Default skin `fantasy` (skins/registry.ts).

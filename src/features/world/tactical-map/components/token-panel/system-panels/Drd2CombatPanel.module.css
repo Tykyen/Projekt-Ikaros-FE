@@ -1,498 +1,544 @@
 /**
- * 10.2c-edit-9g — Drd2CombatPanel CSS (fantasy classic, dark theme s gold/brown akcentem).
+ * 16.2e-mapa — Drd2CombatPanel CSS (fantasy pergamen, sladěné s deníkem Drd2Sheet).
  *
- * Port 1:1 z Matrix `Drd2MapDiaryOverlay.tsx` (Drd II — Tělo/Duše/Vliv resource
- * bars, Ohrožení/Výhoda mega boxes, profession pip rows, weapons list).
- *
- * Scoping: CSS Module — třídy automaticky lokální.
+ * Scoping: CSS Module — třídy automaticky lokální. Self-contained pergamen
+ * paleta (tokenizace na skin přijde s embed tokeny --dd-embed-* / krok skiny).
  */
 
 .root {
+  --parch-1: #efe5cd;
+  --parch-2: #e3d5b4;
+  --parch-edge: #c5b083;
+  --ink: #241a10;
+  --ink-soft: #5a4632;
+  --rule: rgba(70, 52, 32, 0.28);
+  --body: #8a2a1e;
+  --soul: #385a86;
+  --infl: #9a7515;
+  --blood: #7c2317;
+  --emer: #2f6b41;
+  --seal: #7a2418;
+  --gold: #9a7515;
+
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 4px 2px 16px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 12px;
-  line-height: 1.4;
+  gap: 4px;
+  padding: 12px;
+  color: var(--ink);
+  font-family: 'EB Garamond', 'Georgia', serif;
+  background:
+    radial-gradient(70% 50% at 20% 6%, rgba(255, 250, 235, 0.5), transparent 60%),
+    linear-gradient(135deg, var(--parch-1), var(--parch-2));
+  border-radius: 5px;
+  border: 1px solid var(--parch-edge);
 }
 
 .loading,
 .empty {
-  padding: 24px 16px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
   text-align: center;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.45);
-  letter-spacing: 0.5px;
+  padding: 24px 8px;
+  color: var(--ink-soft);
 }
 
-/* ── Layout: 2 columns na desktopu, 1 sloupec na mobilu ───────── */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.column {
+/* hlavička */
+.head {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
-}
-
-@media (max-width: 760px) {
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-/* ── Section ───────────────────────────────────────────────────── */
-.section {
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+}
+.lvl {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--seal);
+  background: rgba(122, 36, 24, 0.1);
+  border: 1.5px solid rgba(122, 36, 24, 0.4);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.initBtn {
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: rgba(122, 36, 24, 0.12);
+  border: 1px solid rgba(122, 36, 24, 0.4);
+  color: var(--seal);
+  border-radius: 4px;
+  padding: 5px 9px;
+}
+.initBtn:hover {
+  background: rgba(122, 36, 24, 0.2);
 }
 
-.sectionTitle {
-  margin: 0;
-  font-size: 10px;
-  font-weight: 800;
+/* legend */
+.lg {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 10.5px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #d4af37; /* gold akcent */
-  border-bottom: 1px solid rgba(212, 175, 55, 0.18);
-  padding-bottom: 4px;
-}
-
-/* ── Total level header ────────────────────────────────────────── */
-.totalLevel {
+  color: var(--ink);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(80, 200, 120, 0.05);
-  border: 1px solid rgba(80, 200, 120, 0.15);
-  border-radius: 6px;
+  gap: 8px;
+  margin: 12px 0 8px;
 }
-
-.totalLevelLabel {
+.lg::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--ink), transparent);
+}
+.lg small {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-soft);
+}
+.sub {
+  font-family: 'Cinzel', serif;
   font-size: 9px;
-  text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 6px 0 5px;
 }
 
-.totalLevelValue {
+/* zdroje — segmentová stupnice */
+.res {
+  margin-bottom: 10px;
+}
+.resTop {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 6px;
+  margin-bottom: 5px;
 }
-
-.totalLevelUsed {
-  font-size: 18px;
+.resName {
+  font-family: 'Cinzel', serif;
   font-weight: 700;
-  color: #e2e8f0;
+  font-size: 12px;
 }
-
-.totalLevelSep {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.3);
+.resVal {
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin-left: auto;
 }
-
-.totalLevelInput {
-  width: 44px;
-  text-align: center;
+.resVal b {
+  color: var(--ink);
+  font-size: 18px;
+}
+.track {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+.seg {
+  flex: 1;
+  height: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1.5px solid rgba(70, 52, 32, 0.45);
+  background: rgba(255, 252, 244, 0.35);
+  padding: 0;
+  transition: transform 0.08s, background 0.12s;
+}
+.seg:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(255, 252, 244, 0.6);
+}
+.body .seg.on {
+  background: var(--body);
+  border-color: #5e1c14;
+}
+.soul .seg.on {
+  background: var(--soul);
+  border-color: #26405f;
+}
+.infl .seg.on {
+  background: var(--infl);
+  border-color: #6a5009;
+}
+.scar {
+  width: 100%;
+  margin-top: 4px;
   background: transparent;
   border: none;
-  color: #50c878;
-  font-size: 18px;
-  font-weight: 800;
-  padding: 0;
+  border-bottom: 1px dashed rgba(124, 35, 23, 0.35);
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  color: #7c2317;
+  padding: 0 2px;
+}
+.scar:focus {
   outline: none;
+  border-bottom-style: solid;
 }
 
-.totalLevelInput:focus {
-  background: rgba(80, 200, 120, 0.08);
-  border-radius: 4px;
-}
-
-/* ── Resource bars (Tělo / Duše / Vliv) ────────────────────────── */
-.resource {
+/* boj — Ohrožení / Výhoda */
+.gauge {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.resourceHeader {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
 }
-
-.resourceLabel {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
+.gaugeLbl {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
   letter-spacing: 1px;
+  text-transform: uppercase;
+  width: 62px;
 }
-
-.resourceInputs {
-  display: flex;
-  gap: 4px;
-  align-items: center;
+.threat .gaugeLbl {
+  color: var(--blood);
 }
-
-.resourceInputCur,
-.resourceInputMax {
-  width: 36px;
+.adv .gaugeLbl {
+  color: var(--emer);
+}
+.gaugeBig {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 20px;
+  width: 22px;
   text-align: center;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 3px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: inherit;
-  outline: none;
 }
-
-.resourceInputMax {
-  background: rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
+.threat .gaugeBig {
+  color: var(--blood);
 }
-
-.resourceInputCur:disabled,
-.resourceInputMax:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+.adv .gaugeBig {
+  color: var(--emer);
 }
-
-.resourceSep {
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 12px;
+.rungs {
+  display: flex;
+  gap: 2px;
+  flex: 1;
 }
-
-.resourceBar {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.06);
+.rung {
+  flex: 1;
+  height: 18px;
   border-radius: 2px;
+  cursor: pointer;
+  font-size: 9px;
+  font-family: 'Cinzel', serif;
+  color: var(--ink-soft);
+  border: 1px solid rgba(70, 52, 32, 0.4);
+  background: rgba(255, 252, 244, 0.4);
+  padding: 0;
+}
+.threat .rung.on {
+  background: var(--blood);
+  color: #fff;
+  border-color: #5a1810;
+}
+.adv .rung.on {
+  background: var(--emer);
+  color: #fff;
+  border-color: #1f4d2d;
+}
+
+/* stavy */
+.states {
+  width: 100%;
+  min-height: 40px;
+  background: rgba(255, 250, 238, 0.4);
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  font-family: 'EB Garamond', serif;
+  font-size: 12.5px;
+  color: var(--ink);
+  padding: 6px 8px;
+  resize: vertical;
+  margin-bottom: 4px;
+}
+.states:focus {
+  outline: none;
+  border-color: var(--seal);
+}
+
+/* povolání — klikací řádek */
+.prof {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.42);
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.prof:hover {
+  border-color: var(--seal);
+  box-shadow: 0 1px 9px rgba(122, 36, 24, 0.14);
+}
+.prof:active {
+  transform: translateY(1px);
+}
+.profSeal {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #9a3022, var(--seal));
+  color: #f4e3c9;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 11px;
+  border: 1px solid #4a140c;
+}
+.profName {
+  flex: 1;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 0;
+}
+.pips {
+  display: flex;
+  gap: 3px;
+  flex: 0 0 auto;
+}
+.dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1.5px solid rgba(70, 52, 32, 0.45);
+  background: rgba(255, 252, 244, 0.5);
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(40, 28, 16, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.dot.on {
+  background: radial-gradient(circle at 35% 30%, #b5882c, var(--gold));
+  color: #fff7e6;
+  border-color: #6a5009;
+}
+
+/* rozevírací sekce */
+.coll {
+  border: 1px solid var(--parch-edge);
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.32);
+  margin-bottom: 7px;
   overflow: hidden;
 }
-
-.resourceBarFill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.3s ease;
+.collH {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+.collH:hover {
+  background: rgba(122, 36, 24, 0.05);
+}
+.collTitle {
+  flex: 1;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.collCount {
+  font-family: 'EB Garamond', serif;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.collMode {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: rgba(70, 52, 32, 0.12);
+  color: var(--ink-soft);
+  border: 1px solid rgba(70, 52, 32, 0.25);
+  border-radius: 8px;
+  padding: 1px 6px;
+}
+.collArr {
+  color: var(--seal);
+  font-size: 11px;
+  transition: transform 0.18s;
+}
+.collOpen .collArr {
+  transform: rotate(90deg);
+}
+.collBody {
+  padding: 2px 10px 10px;
 }
 
-.resourceScars {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.35);
+/* read-only řádek */
+.roRow {
+  padding: 5px 0;
+  border-bottom: 1px dotted var(--rule);
+}
+.roRow:last-child {
+  border-bottom: none;
+}
+.roRow b {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+}
+.roRow span {
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
   font-style: italic;
+  color: var(--ink-soft);
+  display: block;
+}
+.tag {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-style: normal;
+  background: rgba(122, 36, 24, 0.12);
+  color: var(--seal);
+  border: 1px solid rgba(122, 36, 24, 0.3);
+  border-radius: 8px;
+  padding: 1px 6px;
+  margin-left: 6px;
 }
 
-/* ── Mega boxes (Ohrožení / Výhoda) ────────────────────────────── */
-.megaGrid {
+/* editovatelná karta (pomocníci / rituály) */
+.edCard {
+  border: 1px solid var(--parch-edge);
+  border-radius: 3px;
+  background: rgba(255, 252, 244, 0.4);
+  padding: 7px 8px;
+  margin-bottom: 6px;
+  position: relative;
+}
+.edGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 2px 10px;
 }
-
-.megaBox {
-  padding: 10px;
-  border-radius: 6px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.fr {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 5px;
+  align-items: end;
 }
-
-.megaBoxDanger {
-  background: rgba(231, 76, 60, 0.08);
-  border: 1px solid rgba(231, 76, 60, 0.2);
-}
-
-.megaBoxAdvantage {
-  background: rgba(80, 200, 120, 0.06);
-  border: 1px solid rgba(80, 200, 120, 0.2);
-}
-
-.megaLabel {
-  font-size: 9px;
+.fr > span {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  padding-bottom: 2px;
 }
-
-.megaLabelDanger {
-  color: rgba(231, 76, 60, 0.7);
-}
-
-.megaLabelAdvantage {
-  color: rgba(80, 200, 120, 0.7);
-}
-
-.megaInput {
-  width: 48px;
-  margin: 0 auto;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 4px;
-  border-radius: 4px;
-  font-size: 18px;
-  font-weight: 800;
-  font-family: inherit;
-  outline: none;
-}
-
-.megaInputDanger {
-  border: 1px solid rgba(231, 76, 60, 0.3);
-  color: #e74c3c;
-}
-
-.megaInputAdvantage {
-  border: 1px solid rgba(80, 200, 120, 0.3);
-  color: #50c878;
-}
-
-.megaInput:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* ── Identity card (Rasa, Povaha, Pomocník) ────────────────────── */
-.identityCard {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.75);
-  background: rgba(0, 0, 0, 0.18);
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.identityLine strong {
-  font-weight: 700;
-}
-
-.identityLineRace strong {
-  color: #50c878;
-}
-
-.identityLinePersonality strong {
-  color: #c4b5ff;
-}
-
-/* ── Weapons list ──────────────────────────────────────────────── */
-.weaponRow {
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.weaponName {
-  font-size: 13px;
-  font-weight: 600;
-  color: #e2e8f0;
-}
-
-.weaponMeta {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
-  margin-top: 2px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.weaponMeta b {
-  color: #fff;
-  font-weight: 600;
-}
-
-/* ── Professions ───────────────────────────────────────────────── */
-.professionRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+.edLine {
   width: 100%;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: #3a2410;
+  padding: 1px 2px;
+  margin-bottom: 3px;
 }
-
-.professionRow:hover:not(:disabled) {
-  background: rgba(212, 175, 55, 0.08);
-  border-color: rgba(212, 175, 55, 0.3);
+.edLine:focus {
+  outline: none;
+  border-bottom-color: var(--seal);
 }
-
-.professionRow:disabled {
-  cursor: default;
+.bondLbl {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+  margin-bottom: 4px;
 }
-
-.professionRowAdvanced {
-  background: rgba(136, 114, 255, 0.05);
-  border-color: rgba(136, 114, 255, 0.1);
-}
-
-.professionName {
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.professionNameAdv {
-  color: #c4b5ff;
-}
-
-.professionRight {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .pipRow {
   display: flex;
   gap: 3px;
-}
-
-.pip {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.pipActive {
-  background: #50c878;
-  border-color: rgba(80, 200, 120, 0.4);
-}
-
-.professionLevel {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  min-width: 20px;
-  text-align: right;
-}
-
-/* ── Master groups ─────────────────────────────────────────────── */
-.masterRow {
-  padding: 6px 12px;
-  background: rgba(255, 200, 50, 0.06);
-  border: 1px solid rgba(255, 200, 50, 0.18);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.masterName {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ffc832;
-}
-
-.masterSep {
-  font-size: 11px;
-  color: rgba(255, 200, 50, 0.5);
-}
-
-.masterCount {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ffc832;
-}
-
-.masterGroupList {
-  display: flex;
   flex-wrap: wrap;
-  gap: 6px;
 }
-
-/* ── Spec abilities ────────────────────────────────────────────── */
-.specRow {
-  padding: 6px 8px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-}
-
-.specName {
-  font-size: 12px;
-  font-weight: 600;
-  color: #e2e8f0;
-}
-
-.specDesc {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 2px;
-  line-height: 1.35;
-}
-
-/* ── Notes textarea ────────────────────────────────────────────── */
-.notesArea {
-  width: 100%;
-  min-height: 80px;
-  resize: vertical;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  color: rgba(255, 255, 255, 0.85);
-  font: inherit;
-  font-size: 12px;
-  padding: 8px 10px;
-  outline: none;
-}
-
-.notesArea:focus {
-  border-color: rgba(212, 175, 55, 0.4);
-}
-
-.notesArea:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* ── Init button (top) ─────────────────────────────────────────── */
-.initRow {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.initBtn {
-  flex: 1;
-  padding: 8px 14px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  background: rgba(212, 175, 55, 0.16);
-  color: #d4af37;
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  border-radius: 6px;
+.pipSq {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(70, 52, 32, 0.5);
+  border-radius: 2px;
+  background: rgba(255, 252, 244, 0.4);
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
+  padding: 0;
+}
+.pipSq.on {
+  background: var(--gold);
+  border-color: #6a5009;
+}
+.pipSq.charge.on {
+  background: var(--soul);
+  border-color: #26405f;
+}
+.del {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: var(--blood);
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0.55;
+}
+.del:hover {
+  opacity: 1;
+}
+.add {
+  width: 100%;
+  margin-top: 5px;
+  background: transparent;
+  border: 1px dashed rgba(70, 52, 32, 0.4);
+  border-radius: 3px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 6px;
+  cursor: pointer;
+}
+.add:hover {
+  background: rgba(122, 36, 24, 0.06);
+  color: var(--seal);
+  border-color: var(--seal);
 }
 
-.initBtn:hover:not(:disabled) {
-  background: rgba(212, 175, 55, 0.3);
-}
-
-.initBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* view mode */
+.root :disabled {
+  cursor: default;
+  opacity: 0.9;
 }

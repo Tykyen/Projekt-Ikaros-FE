@@ -135,6 +135,31 @@
   --dd-embed-neutral: #c19a3f;
 }
 
+/* ════════════ 16.2e-F3 — drd2 EMBED tokeny (fantasy pergamen, SVĚTLÁ polarita) ═══
+ * Žijí ZDE (global bundle), ne v lazy `drd2.css` — embedy běží na MAPĚ/CHATU,
+ * kde se `drd2.css` nenačte (jinak `var(--dd-embed-surface)` invalid → transparent).
+ * Na rozdíl od drd16/drdplus (tmavý forge) je drd2 list SVĚTLÝ pergamen → embed
+ * drží stejnou polaritu (konzistence s combat panelem). `--dd-forge-1` zde světlý
+ * = fallback pod readout `background-color`, ať neprosvítá tmavá. Plocha opaque. */
+[data-diary-system='drd2'] {
+  --dd-forge-1: #e3d5b4;
+  --dd-ink-deep: #241a10;
+  --dd-embed-surface: linear-gradient(180deg, #efe5cd, #d8c89f);
+  --dd-embed-border: #c5b083;
+  --dd-embed-line: rgba(70, 52, 32, 0.28);
+  --dd-embed-text: #241a10;
+  --dd-embed-muted: #5a4632;
+  --dd-embed-title: #7a2418;
+  --dd-embed-chip-bg: rgba(122, 36, 24, 0.12);
+  --dd-embed-accent: #9a7515;
+  --dd-embed-num-font: 'Cinzel', serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: #2f6b41; /* Výhoda = smaragd */
+  --dd-embed-neg: #7c2317; /* Ohrožení = krev */
+  --dd-embed-neutral: #9a7515;
+  --dd-accent-grad: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+}
+
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */
 .diary-skin-picker {
   position: relative;

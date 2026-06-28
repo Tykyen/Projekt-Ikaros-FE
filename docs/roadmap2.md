@@ -400,7 +400,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Skiny (→ 16.2c)
 - **Dračí Doupě II** (`drd2`) — *stav kódu:* list sheet+testy, mapa combat panel `Drd2CombatPanel`
   - [x] **Reálný list (grafika)** — ✅ 2026-06-28 fantasy pergamenový list (spec-16.2e; JEDEN sloučený list bez tabů; Tělo/Duše/Vliv klikací segmentové stupnice + jizvy / Ohrožení/Výhoda 1–9 / zbraně tabulka / pomocníci + rituální předměty = seznamy add/remove / povolání basic→advanced→master s 5-pip + odebrání / ZS **ručně** — katalog ALTAR odpojen od UI, ponechán k licenci; využitá úroveň auto-součet; meč ornament + erb). Ověřeno tsc+build+13 testů+eslint; vizuál po deployi.
-  - [ ] Taktická mapa (grafika)
+  - [x] **Taktická mapa (grafika)** — ✅ 2026-06-28 `Drd2CombatPanel` redesign (spec-16.2e; fantasy pergamen, single source s deníkem `makeCdAccess('drd2_')`; vždy: zdroje/Ohrožení-Výhoda/stavy/povolání · rozevírací: zbraně+ZS read-only, pomocníci+rituály edit; **povolání klik = 2k6+úroveň**, iniciativa 2k6; nový model companions/rituals, ne staré `comp_*`). **Embedy F3:** dice log + readout + obal dědí pergamen přes `:is()` + drd2 `--dd-embed-*` světlé (diary-skins.css global). Ověřeno tsc+build+7 testů+eslint; vizuál po deployi.
   - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)

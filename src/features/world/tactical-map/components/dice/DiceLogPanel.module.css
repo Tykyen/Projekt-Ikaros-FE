@@ -268,44 +268,44 @@
  * → sleduje vybraný drd16 skin (fantasy pergamen, sci-fi void…) barvou+písmem+polaritou.
  * Plocha VŽDY opaque (`--dd-embed-surface` = forge gradient), backdrop VYPNUT.
  * Scoped na drd16 → ostatní systémy beze změny. */
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .panel {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .panel {
   background: var(--dd-embed-surface);
   border-color: var(--dd-embed-border);
   color: var(--dd-embed-text);
   backdrop-filter: none;
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .header {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .header {
   border-bottom-color: var(--dd-embed-line);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .title {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .title {
   color: var(--dd-embed-title);
   font-family: var(--dd-embed-title-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .chip {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .chip {
   background: var(--dd-embed-chip-bg);
   color: var(--dd-embed-title);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .name {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .name {
   color: var(--dd-embed-muted);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .breakdown {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .breakdown {
   color: var(--dd-embed-muted);
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faces,
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .total {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .faces,
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .total {
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faceNum {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .faceNum {
   color: var(--dd-embed-text);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalPositive {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .totalPositive {
   color: var(--dd-embed-pos);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNegative {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .totalNegative {
   color: var(--dd-embed-neg);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNeutral {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .totalNeutral {
   color: var(--dd-embed-neutral);
 }
 
@@ -320,6 +320,13 @@
   box-shadow: 0 0 0 1px #150e05, 0 0 0 3px #6e5020, 0 0 0 4px #1e1409, 0 0 0 5px #4a3412,
     0 8px 28px -4px rgba(0, 0, 0, 0.7), inset 0 0 22px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
+}
+
+/* 16.2e — drd2 fantasy: světlý pergamen s inkoustovým dvojrámem */
+[data-diary-system='drd2'][data-diary-skin='fantasy'] .panel {
+  box-shadow: 0 0 0 1px #c5b083, 0 0 0 4px rgba(28, 20, 9, 0.5),
+    0 0 0 5px rgba(150, 120, 70, 0.3), 0 8px 28px -4px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
 }
 
 /* scifi — chamfer/neon HUD rám + jemný scanline + glow na totalu */

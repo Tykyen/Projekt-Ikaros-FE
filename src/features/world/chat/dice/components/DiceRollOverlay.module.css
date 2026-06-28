@@ -224,44 +224,44 @@
  * Tokenizováno na `--dd-embed-*` (defaulty v diary-skins.css, loaded i v embedech).
  * Syrové `--dd-*` mají fantasy fallback (drd16.css v embedu není). Plocha opaque.
  * Sémantické +/− drží význam. Scoped na drd16. */
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .readout {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .readout {
   background-color: var(--dd-forge-1, #1d160e);
   background-image: var(--dd-embed-surface);
   border: 1px solid var(--dd-embed-border);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faceBadge {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .faceBadge {
   background: var(--dd-accent-grad, linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320));
   border-color: var(--dd-embed-border);
   color: var(--dd-ink-deep, #241509);
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .faceGeneric {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .faceGeneric {
   color: var(--dd-ink-deep, #241509);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalValue {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .totalValue {
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalPositive {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .totalPositive {
   color: var(--dd-embed-pos);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNegative {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .totalNegative {
   color: var(--dd-embed-neg);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .totalNeutral {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .totalNeutral {
   color: var(--dd-embed-neutral);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .equation {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .equation {
   font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .skillName {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .skillName {
   color: var(--dd-embed-title);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .eqSign {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .eqSign {
   color: var(--dd-embed-muted);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .rollerName {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2']) .rollerName {
   color: var(--dd-embed-muted);
   font-family: var(--dd-font-head, 'Cinzel', serif);
 }
@@ -277,6 +277,13 @@
 [data-diary-system='drd16'][data-diary-skin='fantasy'] .readout {
   box-shadow: 0 0 0 1px #100a03, 0 0 0 3px #9a7330, 0 0 0 5px #1a1207, 0 0 0 6px #6a4c1c,
     0 20px 60px -10px rgba(0, 0, 0, 0.85), inset 0 0 36px rgba(0, 0, 0, 0.45);
+  border-radius: 4px;
+}
+
+/* 16.2e — drd2 fantasy: světlý pergamen s inkoustovým dvojrámem */
+[data-diary-system='drd2'][data-diary-skin='fantasy'] .readout {
+  box-shadow: 0 0 0 1px #c5b083, 0 0 0 5px rgba(28, 20, 9, 0.45),
+    0 0 0 6px rgba(150, 120, 70, 0.3), 0 18px 50px -14px rgba(0, 0, 0, 0.7);
   border-radius: 4px;
 }
 
