@@ -1,0 +1,330 @@
+/* 8.7r — JaD bestie panel (pergamen, k20). */
+
+.root {
+  --jb-parch: #f3ead7;
+  --jb-box: #f7f0df;
+  --jb-accent: #8a2b22;
+  --jb-border: #cdbb97;
+  --jb-border-soft: #e0d3b4;
+  --jb-ink: #34281c;
+  --jb-ink-soft: #6e5b46;
+  --jb-gold: #9a6b2f;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--jb-ink);
+  background: var(--jb-parch);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.editing {
+  outline: 2px dashed var(--jb-gold);
+  outline-offset: -4px;
+}
+.modeTag {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--jb-gold);
+  text-align: center;
+}
+.nameEdit {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--jb-accent);
+  border: 1px solid var(--jb-border);
+  border-radius: 6px;
+  background: var(--jb-box);
+  padding: 6px 8px;
+}
+
+.header {
+  border-bottom: 2px solid var(--jb-ink);
+  padding-bottom: 6px;
+}
+.bestieName {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--jb-accent);
+}
+.tags {
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--jb-ink-soft);
+}
+
+.topRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.initBtn,
+.editBtn {
+  border: 1px solid var(--jb-accent);
+  background: var(--jb-box);
+  color: var(--jb-accent);
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.initBtn:hover,
+.editBtn:hover {
+  background: var(--jb-accent);
+  color: #fff;
+}
+.editBtn {
+  margin-left: auto;
+  border-color: var(--jb-gold);
+  color: var(--jb-gold);
+}
+.editBtn:hover {
+  background: var(--jb-gold);
+}
+
+/* HP */
+.hpWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hpLbl {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--jb-ink-soft);
+}
+.hpBar {
+  position: relative;
+  flex: 1;
+  min-width: 120px;
+  height: 18px;
+  background: rgba(52, 40, 28, 0.18);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.hpFill {
+  height: 100%;
+  transition: width 0.2s ease;
+}
+.hpTxt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--jb-ink);
+  text-shadow: 0 0 3px rgba(243, 234, 215, 0.8);
+}
+.steps {
+  display: flex;
+  gap: 3px;
+}
+.steps button {
+  border: 1px solid var(--jb-border);
+  background: var(--jb-parch);
+  color: var(--jb-accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.steps button:hover {
+  background: var(--jb-accent);
+  color: #fff;
+}
+
+.statline {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--jb-border-soft);
+}
+.statline span {
+  font-weight: 600;
+}
+
+/* ── Combat actions jádro ── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.secTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jb-accent);
+  margin: 0;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--jb-border-soft);
+}
+
+.abilGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 6px;
+}
+.abil {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  background: var(--jb-box);
+  border: 1px solid var(--jb-border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.abil:hover:not(:disabled) {
+  border-color: var(--jb-accent);
+}
+.abil:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+.abilLbl {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+.abilMod {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--jb-accent);
+}
+
+.attack {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: var(--jb-box);
+  border: 1px solid var(--jb-border);
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+.attackName {
+  font-weight: 600;
+  font-size: 0.88rem;
+  flex: 1;
+  min-width: 0;
+}
+.attackBtn,
+.dmgBtn {
+  border: 1px solid var(--jb-border);
+  background: var(--jb-parch);
+  border-radius: 5px;
+  padding: 3px 7px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.attackBtn {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--jb-accent);
+}
+.attackBtn:hover:not(:disabled),
+.dmgBtn:hover:not(:disabled) {
+  border-color: var(--jb-accent);
+}
+.attackBtn:disabled,
+.dmgBtn:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.attackMeta {
+  font-size: 0.72rem;
+  color: var(--jb-ink-soft);
+  width: 100%;
+}
+.attackEfekt {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--jb-ink-soft);
+  width: 100%;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.chip {
+  border: 1px solid var(--jb-border);
+  background: var(--jb-box);
+  color: var(--jb-ink);
+  border-radius: 12px;
+  padding: 3px 9px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.chip:hover:not(:disabled) {
+  border-color: var(--jb-accent);
+  color: var(--jb-accent);
+}
+.chip:disabled {
+  cursor: default;
+}
+.chipSkill {
+  border-color: var(--jb-border-soft);
+  color: var(--jb-ink-soft);
+}
+
+.meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  font-size: 0.82rem;
+}
+.meta dt {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--jb-ink-soft);
+  align-self: center;
+}
+.meta dd {
+  margin: 0;
+}
+
+.feat {
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+.feat strong {
+  font-family: 'Cinzel', serif;
+  color: var(--jb-ink);
+}
+.spellHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--jb-ink-soft);
+  margin-bottom: 4px;
+}
+.spellMeta {
+  font-size: 0.74rem;
+  color: var(--jb-ink-soft);
+}

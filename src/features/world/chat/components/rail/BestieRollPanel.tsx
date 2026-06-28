@@ -11,6 +11,7 @@ import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
+import { JadChatBestiePanel } from './JadChatBestiePanel';
 import s from './railShell.module.css';
 import b from './BestieRollPanel.module.css';
 
@@ -149,6 +150,17 @@ export function BestieRollPanel({
           // tokeny (--dd-*) z předka → vlastní DiarySkinScope (data-diary-skin).
           <DiarySkinScope worldId={worldId}>
             <Drd2ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              canEdit={false}
+            />
+          </DiarySkinScope>
+        ) : systemId === 'jad' ? (
+          <DiarySkinScope worldId={worldId}>
+            <JadChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               rollerName={bestie.name}

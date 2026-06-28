@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-036.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-037.**
 
 ## Jak je deník členěný
 
@@ -134,3 +134,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--87q-fáze-bc-fatální-hody--skládaný-zásah--2026-06-28) | fe | JaD combat B (fatální nat20/nat1 text + init tie-break, `critOnD20` JaD-only) + C (skládaný zásah `parseDamageFormula`+mixed, zbraň 2 akce); chat pipeline parita; 47 testů | — (dual-source kind chycen buildem) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--87q-follow-up-mixed-3d-notace--jad-hp-bar--2026-06-28) | fe | mixed 3D notace grupovat per typ (`1d4@a+1d4@b`→`2d4@a,b`; engine neslepí opakované `1dX`) + JaD HP bar; init-crit otevřeno | — (3D nejde unit-test, čeká živé) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--87q-fatální-text-i-v-overlay-readoutu-ne-jen-dice-log--2026-06-28) | fe | fatální crit text doplněn do `DiceRollOverlay.Readout` (byl jen v `DiceLogPanel`); výsledek hodu = 2 render místa | — |
+| [CH-036](fe.md#ch-036--mixed-3d-grupování-hypotéza-nezabrala-měl-jsem-číst-knihovnu-místo-hádat--2026-06-28) | fe | mixed 3D grupování (`2d4@..+2d6@..`) hádáno bez čtení knihovny → ukázalo jen 2k4; dice-box `split("@")[0]` bere 1 skupinu | 2. „oprava notace", pořád ne všechny kostky |
+| [✅ ŘEŠENÍ](fe.md#-řešení--mixed-hod-bez-3d-knihovna-neumí-predetermined-multi-type-readout-ukáže-odznaky--2026-06-28) | fe | mixed → `null` (bez 3D), overlay fallback ukáže všechny kostky odznaky se správnými hodnotami; knihovna neumí `@` multi-type | — (ověřeno čtením parseru) |
+| [✅ ŘEŠENÍ](fe.md#-řešení--87r-krok-1-jad-bestie-schéma-registrováno-bestie--token--2026-06-28) | fe | JaD bestie+token schéma (ZH/ZD list, útoky/kouzla jako PC, combat behaviors) + bootstrap + export; pre-existující drd2-bestie.test sladěn (16.2e); 35 testů | — (krok 2 = statblok+panel) |
+| [✅ ŘEŠENÍ](fe.md#-řešení--87r-krok-2-jad-bestie-panel-mapa--chat-k20-statblok--2026-06-28) | fe | JaD bestie panel mapa+chat (JadBestieCombatActions jádro, k20+fatální+mixed zásah, iniciativa, HP±, edit schema-form); routing 3 soubory; 5 testů | — (vzor Drd2, 0 drift) |

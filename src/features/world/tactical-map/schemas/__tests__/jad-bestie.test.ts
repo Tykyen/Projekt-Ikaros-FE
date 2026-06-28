@@ -1,0 +1,69 @@
+import { describe, it, expect } from 'vitest';
+import { jadBestieSchema, jadTokenSchema } from '../jad';
+
+const beFields = jadBestieSchema.sections.flatMap((s) => s.fields);
+const tokFields = jadTokenSchema.sections.flatMap((s) => s.fields);
+
+describe('jadBestieSchema (8.7r)', () => {
+  it('meta', () => {
+    expect(jadBestieSchema.systemId).toBe('jad');
+    expect(jadBestieSchema.entityType).toBe('bestie');
+  });
+
+  it('Výdrž = damageable HP, povinné', () => {
+    const f = beFields.find((f) => f.key === 'vydrz');
+    expect(f?.combatBehavior).toBe('damageable');
+    expect(f?.required).toBe(true);
+  });
+
+  it('Obratnost = iniciativa, Rychlost = pohyb, OČ = cíl útoku', () => {
+    expect(beFields.find((f) => f.key === 'attributes.dex')?.combatBehavior).toBe(
+      'initiative',
+    );
+    expect(beFields.find((f) => f.key === 'rychlost')?.combatBehavior).toBe(
+      'movement',
+    );
+    expect(beFields.find((f) => f.key === 'obranne_cislo')?.combatBehavior).toBe(
+      'roll-target',
+    );
+  });
+
+  it('N/Ob/PV jsou čísla, Přesvědčení/Velikost jsou výběr', () => {
+    expect(beFields.find((f) => f.key === 'nebezpecnost')?.type).toBe('number');
+    expect(beFields.find((f) => f.key === 'pasivni_vnimani')?.type).toBe('number');
+    expect(beFields.find((f) => f.key === 'presvedceni')?.type).toBe('enum');
+    expect(beFields.find((f) => f.key === 'velikost')?.type).toBe('enum');
+  });
+
+  it('ZH = list (vlastnost + bonus), ZD = list (dovednost + bonus)', () => {
+    const zh = beFields.find((f) => f.key === 'zachrany');
+    expect(zh?.type).toBe('list');
+    expect(zh?.listItemFields?.map((f) => f.key)).toEqual(['vlastnost', 'bonus']);
+    const zd = beFields.find((f) => f.key === 'zdatnosti');
+    expect(zd?.listItemFields?.map((f) => f.key)).toEqual(['dovednost', 'bonus']);
+  });
+
+  it('schopnosti mají typ (Akce/Reakce/Legendární jako speciální)', () => {
+    const ab = beFields.find((f) => f.key === 'abilities');
+    const typ = ab?.listItemFields?.find((f) => f.key === 'typ');
+    expect(typ?.enumValues).toContain('Akce');
+    expect(typ?.enumValues).toContain('Reakce');
+    expect(typ?.enumValues).toContain('Legendární akce');
+  });
+});
+
+describe('jadTokenSchema (8.7r)', () => {
+  it('health.current = damageable (runtime HP)', () => {
+    expect(tokFields.find((f) => f.key === 'health.current')?.combatBehavior).toBe(
+      'damageable',
+    );
+  });
+
+  it('nese bestie pole pro snapshot (BE strict edit)', () => {
+    const keys = tokFields.map((f) => f.key);
+    expect(keys).toContain('vydrz');
+    expect(keys).toContain('attributes.str');
+    expect(keys).toContain('utoky');
+    expect(keys).toContain('abilities');
+  });
+});

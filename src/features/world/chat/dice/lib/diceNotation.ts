@@ -57,22 +57,14 @@ export function payloadToNotation(payload: DicePayload): string | null {
   }
 
   if (payload.type === 'mixed') {
-    // Grupuj tváře per typ kostky → „2d4@a,b+2d6@c,d". Opakované jednotlivé
-    // `1d4@a+1d4@b` přes `+` engine spolehlivě neslepí (ukázal jen 1 kostku);
-    // grupovaný tvar (jako pool `3d6@…`) je ověřeně funkční.
-    const byType = new Map<string, number[]>();
-    payload.faces.forEach((f, i) => {
-      const t = (payload.faceTypes[i] || 'd6').toLowerCase();
-      const arr = byType.get(t);
-      if (arr) arr.push(Number(f));
-      else byType.set(t, [Number(f)]);
-    });
-    const parts: string[] = [];
-    byType.forEach((vals, t) => {
-      const sides = SIDES[t] ?? 6;
-      parts.push(group(sides, vals));
-    });
-    return parts.join('+');
+    // 3D engine (@drdreo/dice-box-threejs) NEumí PŘEDURČENÉ hodnoty (`@`) pro
+    // víc typů kostek v jednom hodu: `parseNotation` volá `split("@")[0]` →
+    // bere jen PRVNÍ skupinu (`2d4@…`), zbytek (`+2d6@…`) zahodí (proto se
+    // ukázaly jen 2k4). Notace bez `@` (`2d4+2d6`) by hodila všechny, ale s
+    // NÁHODNÝMI hodnotami ≠ náš výsledek (3D by lhalo proti readoutu).
+    // → mixed bez 3D (`null`); overlay fallback ukáže všechny kostky jako
+    //   odznaky v readoutu (správné hodnoty z payloadu).
+    return null;
   }
 
   if (payload.type === 'd6+' || payload.type === '2d6+') {

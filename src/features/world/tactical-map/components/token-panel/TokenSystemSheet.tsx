@@ -33,6 +33,7 @@ import { MatrixBestiePanel } from "./system-panels/MatrixBestiePanel";
 import { Drd16BestiePanel } from "./system-panels/Drd16BestiePanel";
 import { DrdPlusBestiePanel } from "./system-panels/DrdPlusBestiePanel";
 import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
+import { JadBestiePanel } from "./system-panels/JadBestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import styles from "./TokenSystemSheet.module.css";
@@ -135,6 +136,22 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="drd2"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // 8.7r krok 2 — JaD bestie: pergamen statblok, k20 (fatální), klikací
+    // útoky (k20 + mixed zásah) a záchrany/zdatnosti, iniciativa k20 + Obr.
+    if (systemId === "jad") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <JadBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="jad"
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

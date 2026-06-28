@@ -1032,3 +1032,37 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Jak ověřeno:** build + 11 testů (overlay readout crit success/fail + dice log). Reálný nat20/nat1 + 3D kostky čekají nasazení FE.
 
 ---
+
+### CH-036 — mixed 3D „grupování" hypotéza nezabrala; měl jsem číst knihovnu místo hádat · 2026-06-28
+**Kontext:** skládaný hod (mixed) ukázal v 3D jen 1 kostku; opravoval jsem notaci pro dice-box.
+**Co jsem udělal špatně:** hypotézu „grupovat per typ" (`2d4@a,b+2d6@c,d`) jsem nasadil BEZ ověření, jak knihovna parsuje notaci → po nasazení ukázalo 2k4 (jen první skupina), pořád ne všechny 4.
+**Proč to nefungovalo:** `@drdreo/dice-box-threejs` `parseNotation` dělá `split("@")[0]` → bere JEN první `NdM` před prvním `@`; `+` mezi skupinami s predetermined `@` hodnotami nepodporuje. Grupování i původní `1dX@a+1dX@b` narazí na totéž.
+**Poučení:** u 3rd-party (dice notace) ČTI parser knihovny PŘED fixem (`node -e` extrakce z minifikovaného dist), nehádej formát z analogie. Rodina CH-027/CH-034 (nehádej, ověř realitu kódu/knihovny).
+**Příznak cyklení:** druhá „oprava notace" za sebou, uživatel pořád „ne všechny kostky".
+
+---
+
+### ✅ ŘEŠENÍ — mixed hod bez 3D (knihovna neumí predetermined multi-type), readout ukáže odznaky · 2026-06-28
+**Co nakonec zabralo:** `payloadToNotation` pro `mixed` vrací `null` → overlay 2D fallback ukáže VŠECHNY kostky jako odznaky v readoutu (správné hodnoty z payloadu `4 4 6 5`). 
+**Proč to je správně (a ne další variace notace):** ověřeno ČTENÍM parseru knihovny (`parseNotation` konstruktor volá 1×, `split("@")[0]`) — žádná notace víc typů s `@` nefunguje. Alternativa „bez `@`" (`2d4+2d6`) hodí NÁHODNÉ hodnoty ≠ readout (3D by lhalo proti výsledku). Fallback readout je jediný tvar, kde uživatel vidí všechny kostky se SPRÁVNÝMI hodnotami.
+**Jak ověřeno:** build + 8 testů (mixed→null). 
+**Zhodnocení:** dobře (po CH-036). Trade-off: mixed (skládaný zásah) nemá 3D animaci kostek, jen readout odznaky — prokomunikováno. Jednotypé hody (k20 vlastnosti/dovednosti) 3D mají dál.
+
+---
+
+### ✅ ŘEŠENÍ — 8.7r krok 1: JaD bestie schéma registrováno (bestie + token) · 2026-06-28
+**Co zabralo:** JaD per-system bestie + token schéma dle uživatelovy šablony (`jad/bestie.json` + `token.json`, typed wrappery, `index.ts`, bootstrap registrace, export do BE). Combat napojení: Výdrž=damageable HP, Rychlost=movement, Obratnost=initiative, OČ=roll-target. ZH/ZD = list (vlastnost/dovednost + bonus), útoky/kouzla/schopnosti zrcadlí PC strukturu, schopnosti mají typ (Akce/Reakce/Legendární). Token = `health.current/max` + snapshot bestie polí (kvůli BE strict editu).
+**Proč to je správně:** vzor dnd5e/drd2 (JaD = český 5e); `export-schemas` auto-discovery najde `jad/` sám; BE soft-mode validace (i bez BE deploye bestie projde pass-through).
+**Jak ověřeno:** build čistý + 35 schema testů (jad bestie/token combat behaviors + ZH/ZD/typy). 
+**Past (pre-existující):** `drd2-bestie.test` byl rozbitý od 16.2e (testoval Matrix-legacy `main-stats` strukturu, realita = `stav`/`sudba`/version 2) — sladěn s aktuálem (5 failů → zelené). Nesouviselo s JaD, ale blokovalo zelenou suite.
+**Zhodnocení:** dobře. Krok 1 = schéma + generic render/panel (4dF iniciativa = nedokonalé pro JaD). Zbývá krok 2: dedikovaný JaD statblok (čistý vizuál, frontend-design) + `JadBestiePanel` (k20 hody, klikací útoky/záchrany jako DrD2) + chat bestie. Čeká BE deploy (strict validace) + živé ověření.
+
+---
+
+### ✅ ŘEŠENÍ — 8.7r krok 2: JaD bestie panel (mapa + chat, k20 statblok) · 2026-06-28
+**Co zabralo:** Dedikovaný JaD bestie panel — `JadBestieCombatActions` (sdílené jádro mapa↔chat: čistý statblok vlastnosti/útoky/záchrany/zdatnosti/schopnosti seskupené dle typu/kouzla, klikací **k20** + fatální + **mixed zásah**), `JadBestiePanel` (mapa: HP±, iniciativa k20+Obr → `token.initiative` s fatálním tie-break, edit přes generic `EntitySchemaForm`), `JadChatBestiePanel` (chat: HP ze `systemStats` vydrz/vydrz_cur, `useChatDiaryRoll`). Routing v `TokenSystemSheet` + `BestieRollPanel` + `BestieInstancePanel`.
+**Proč to je správně:** vzor `Drd2BestiePanel`/`Drd2BestieCombatActions` (jádro sdílené mapa↔chat = 0 drift); reuse JadCombatPanel k20/crit/mixed patterns + `EntitySchemaForm` pro edit (méně kódu než DrD2 custom inline draft); pergamen CSS sdílen panel↔chat (chat importuje mapStyles).
+**Jak ověřeno:** build čistý + 5 testů (klik vlastnost k20+crit, zásah mixed, ZH k20, schopnosti grupování dle typu, disabled).
+**Zhodnocení:** dobře. Bestiář JaD funkčně kompletní (schéma krok 1 + statblok/panel krok 2). Zbývá: funkce+napoveda, BE deploy (strict validace), živé ověření vzhledu (případný frontend-design polish dle předlohy). Edit = generic schema form (ne custom inline) — pokud chce uživatel hezčí editaci, dořešit.
+
+---

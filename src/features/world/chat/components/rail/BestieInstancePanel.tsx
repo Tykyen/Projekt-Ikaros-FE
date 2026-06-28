@@ -21,6 +21,7 @@ import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
+import { JadChatBestiePanel } from './JadChatBestiePanel';
 import s from './railShell.module.css';
 
 interface Props {
@@ -219,6 +220,20 @@ export function BestieInstancePanel({
           // vlastní DiarySkinScope (data-diary-skin), aby chat = mapa i u bestie.
           <DiarySkinScope worldId={worldId}>
             <Drd2ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
+        ) : systemId === 'jad' ? (
+          <DiarySkinScope worldId={worldId}>
+            <JadChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               rollerName={combatant.name}

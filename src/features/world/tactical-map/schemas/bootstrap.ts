@@ -15,6 +15,7 @@ import { drdplusSchemas } from './drdplus';
 import { genericSchemas } from './generic';
 import { matrixSchemas } from './matrix';
 import { dnd5eSchemas } from './dnd5e';
+import { jadSchemas } from './jad';
 import { cocSchemas } from './coc';
 import { fateSchemas } from './fate';
 import { gurpsSchemas } from './gurps';
@@ -47,6 +48,9 @@ export function bootstrapSchemas(): void {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of dnd5eSchemas) {
+    systemEntitySchemaRegistry.register(schema);
+  }
+  for (const schema of jadSchemas) {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of cocSchemas) {
