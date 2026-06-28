@@ -1025,3 +1025,10 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** mixed notace = poučení (3D engine: grupuj stejné kostky `NdX@a,b`, neopakuj `1dX@a+1dX@b`). NEoznačuji za hotové, dokud uživatel 3D nepotvrdí (vyhýbám se předčasnému ✅ jako CH-012).
 
 ---
+
+### ✅ ŘEŠENÍ — 8.7q fatální text i v overlay readoutu (ne jen dice log) · 2026-06-28
+**Co zabralo:** Fatální úspěch/neúspěch (`crit`) jsem nejdřív dal jen do `DiceLogPanel` (panel „Hody"). Ale uživatel kouká hlavně na velký 3D **overlay readout** (`DiceRollOverlay.Readout`) — tam `crit` chyběl → u nat 1/20 pořád výpočet `… = +4`. Doplněn `crit` i tam: při crit nahradí celý výpočet (`label (mod) sum = total`) textem „Fatální úspěch/neúspěch" (kostky + label zůstanou).
+**Poučení:** výsledek hodu se renderuje na DVOU místech — `DiceLogPanel` (perzistovaný log na mapě) i `DiceRollOverlay.Readout` (3D overlay vyčíslení, vidí ho hráč hned po hodu). Změna ZOBRAZENÍ hodu = OBĚ místa (jako dual-source `onRoll` kind).
+**Jak ověřeno:** build + 11 testů (overlay readout crit success/fail + dice log). Reálný nat20/nat1 + 3D kostky čekají nasazení FE.
+
+---

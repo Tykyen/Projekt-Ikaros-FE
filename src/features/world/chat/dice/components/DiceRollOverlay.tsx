@@ -161,6 +161,8 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
         : styles.totalNeutral;
   const isFate = roll.payload.type === 'fate';
   const faces = roll.payload.faces;
+  // 8.7q JaD: fatální úspěch (nat 20) / neúspěch (nat 1) — místo výpočtu text.
+  const crit = roll.payload.crit;
 
   return (
     <div className={styles.overlay}>
@@ -193,34 +195,49 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
           })}
         </div>
 
-        <div className={styles.equation}>
-          {roll.payload.label && (
-            <>
+        {crit ? (
+          <div className={styles.equation}>
+            {roll.payload.label && (
               <span className={styles.skillName}>{roll.payload.label}</span>
-              {roll.payload.modifier !== undefined &&
-                roll.payload.modifier !== 0 && (
-                  <span className={styles.skillMod}>
-                    ({roll.payload.modifier > 0 ? '+' : ''}
-                    {roll.payload.modifier})
-                  </span>
-                )}
-            </>
-          )}
-          {/* 16.1a — součet kostek jako samostatný operand, ať je vidět co je
-              hod a co velikost schopnosti (`schopnost (mod) hod = total`).
-              Jen při modifieru ≠ 0 — bez něj `sum === total`, breakdown = šum. */}
-          {roll.payload.modifier !== undefined &&
-            roll.payload.modifier !== 0 && (
-              <span className={styles.diceSum}>
-                {roll.payload.sum > 0 ? '+' : ''}
-                {roll.payload.sum}
-              </span>
             )}
-          <span className={styles.eqSign}>=</span>
-          <span className={`${styles.totalValue} ${totalColorClass}`}>
-            {total > 0 ? `+${total}` : total === 0 ? '0' : total}
-          </span>
-        </div>
+            <span
+              className={
+                crit === 'success' ? styles.critSuccess : styles.critFail
+              }
+            >
+              {crit === 'success' ? 'Fatální úspěch' : 'Fatální neúspěch'}
+            </span>
+          </div>
+        ) : (
+          <div className={styles.equation}>
+            {roll.payload.label && (
+              <>
+                <span className={styles.skillName}>{roll.payload.label}</span>
+                {roll.payload.modifier !== undefined &&
+                  roll.payload.modifier !== 0 && (
+                    <span className={styles.skillMod}>
+                      ({roll.payload.modifier > 0 ? '+' : ''}
+                      {roll.payload.modifier})
+                    </span>
+                  )}
+              </>
+            )}
+            {/* 16.1a — součet kostek jako samostatný operand, ať je vidět co je
+                hod a co velikost schopnosti (`schopnost (mod) hod = total`).
+                Jen při modifieru ≠ 0 — bez něj `sum === total`, breakdown = šum. */}
+            {roll.payload.modifier !== undefined &&
+              roll.payload.modifier !== 0 && (
+                <span className={styles.diceSum}>
+                  {roll.payload.sum > 0 ? '+' : ''}
+                  {roll.payload.sum}
+                </span>
+              )}
+            <span className={styles.eqSign}>=</span>
+            <span className={`${styles.totalValue} ${totalColorClass}`}>
+              {total > 0 ? `+${total}` : total === 0 ? '0' : total}
+            </span>
+          </div>
+        )}
 
         <div className={styles.rollerName}>{roll.rollerName}</div>
       </div>

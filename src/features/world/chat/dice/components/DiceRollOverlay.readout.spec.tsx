@@ -48,4 +48,37 @@ describe('DiceRollOverlay Readout — breakdown rovnice (16.1a)', () => {
     const { container } = render(<Readout roll={event(payload)} show={false} />);
     expect(container.firstChild).toBeNull();
   });
+
+  it('8.7q: crit=success → „Fatální úspěch" místo výpočtu', () => {
+    const payload = {
+      type: 'd20',
+      faces: [20],
+      sum: 20,
+      total: 23,
+      label: 'Iniciativa',
+      modifier: 3,
+      crit: 'success',
+    } as DicePayload;
+    const { getByText, queryByText } = render(
+      <Readout roll={event(payload)} show />,
+    );
+    expect(getByText('Fatální úspěch')).toBeTruthy();
+    // Výpočet (=, total) se NEzobrazí.
+    expect(queryByText('=')).toBeNull();
+    expect(queryByText('+23')).toBeNull();
+  });
+
+  it('8.7q: crit=fail → „Fatální neúspěch"', () => {
+    const payload = {
+      type: 'd20',
+      faces: [1],
+      sum: 1,
+      total: 4,
+      label: 'Iniciativa',
+      modifier: 3,
+      crit: 'fail',
+    } as DicePayload;
+    const { getByText } = render(<Readout roll={event(payload)} show />);
+    expect(getByText('Fatální neúspěch')).toBeTruthy();
+  });
 });
