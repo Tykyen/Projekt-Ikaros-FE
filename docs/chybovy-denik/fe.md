@@ -4,6 +4,14 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 16.2e chat DrD2 bestie panel + PC NPC zdarma · 2026-06-28
+**Co nakonec zabralo:** PC/NPC deník v chatu = **ZDARMA** (`DiaryRollPanel` bere `COMBAT_PANELS['drd2']`=Drd2CombatPanel, single source — drd2 registrovaný už v kroku 4 → 0 práce). Bestie chat = `Drd2ChatBestiePanel.tsx` (reuse jádro `Drd2BestieCombatActions` + CSS z mapy, vzor `DrdPlusChatBestiePanel`) + branche v `BestieInstancePanel` (instance, edit) + `BestieRollPanel` (katalog, read-only).
+**Proč to je správně (a ne další variace):** (1) Chat deník systémově agnostický (COMBAT_PANELS registry) → PC/NPC zdarma. (2) **Sudba HP v chatu žije v `systemStats.sudba`/`sudba_cur`** — combatant NEMÁ `token.currentHp` jako mapa, takže HP track vlastní v panelu (ne reuse mapové Sudby). (3) Combatant systemStats je VOLNÝ (žádná BE strict validace jako mapa token) → bez sanitize.
+**Jak ověřeno:** `npm run build` + eslint. Vizuál čeká deploy.
+**Zhodnocení:** Zabralo napoprvé, reuse jádra (vzor=kontrakt), 0 cyklení. **Past:** chat bestie HP ≠ mapa (systemStats vs token.currentHp — dvojí instance, OK); PC/NPC chat je zdarma, jakmile je per-system combat panel registrovaný v `COMBAT_PANELS`.
+
+---
+
 ### ✅ ŘEŠENÍ — 16.2e bestie DrD2 statblok + schéma + bestiář · 2026-06-28
 **Co nakonec zabralo:** `Drd2BestiePanel` + `Drd2BestieCombatActions` (sdílené jádro mapa↔chat, vzor DrdPlus) dle prototypu (`c:/tmp/drd2-bestie-audit.html`). Model: **Sudba = HP (damageable)**, Hranice T/D/V reference (nehází), **Charakteristiky klik = 2k6 + úroveň**, ZS poznámky, inline edit. Schéma `drd2/bestie.json` rozšířeno (sudba damageable + charakteristiky/ZS list) → bestiář editor (generic `EntitySchemaForm`) + spawn HP automaticky.
 **Proč to je správně (a ne další variace):** (1) Sudba má `combatBehavior:'damageable'` v bestie.json → `buildBestieToken` čte klíč `sudba` (schema-aware, ne hardcoded `health.max`) → token currentHp/maxHp. (2) **Edit `token.systemStats` jde přes BE strict validaci proti `drd2:token` → MUSEL jsem rozšířit i `drd2/token.json`** o sudba/telo/duse/vliv/charakteristiky/zvlastni_schopnosti (jinak `sanitize` dropne / BE 400 — rodina CH drd16 „nutné <system>:token schéma"). (3) `export-schemas` → 21 schémat do `backend/assets/schemas` → BE restart nutný.

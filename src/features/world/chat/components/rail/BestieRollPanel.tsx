@@ -10,6 +10,7 @@ import { useChatDiaryRoll } from './useChatDiaryRoll';
 import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
+import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import s from './railShell.module.css';
 import b from './BestieRollPanel.module.css';
 
@@ -141,6 +142,17 @@ export function BestieRollPanel({
               description: a.value,
             }))}
             notes={bestie.notes}
+            canEdit={false}
+          />
+        ) : systemId === 'drd2' ? (
+          // 16.2e-chat — DrD II katalogová bestie: pergamen panel (2k6+,
+          // charakteristiky), read-only (bez onPatch).
+          <Drd2ChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            rollerName={bestie.name}
+            avatarUrl={bestie.imageUrl}
+            systemStats={bestie.systemStats}
             canEdit={false}
           />
         ) : (

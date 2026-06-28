@@ -20,6 +20,7 @@ import { useChatDiaryRoll } from './useChatDiaryRoll';
 import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
+import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import s from './railShell.module.css';
 
 interface Props {
@@ -208,6 +209,20 @@ export function BestieInstancePanel({
             systemStats={combatant.systemStats}
             abilities={combatant.abilities}
             notes={combatant.notes}
+            canEdit={canEdit}
+            onPatch={(patch) =>
+              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+            }
+          />
+        ) : systemId === 'drd2' ? (
+          // 16.2e-chat — DrD II pergamen panel (2k6+, charakteristiky, Sudba HP).
+          // Self-contained (`.root` má vlastní pergamen) → bez scope.
+          <Drd2ChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            rollerName={combatant.name}
+            avatarUrl={combatant.imageUrl}
+            systemStats={combatant.systemStats}
             canEdit={canEdit}
             onPatch={(patch) =>
               mut.mutate({ op: 'update', combatantId: combatant.id, patch })
