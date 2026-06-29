@@ -219,6 +219,8 @@ Po implementaci projeď renderem a hledej:
 - **Tlumené/světlé skiny:** neon (přetlaky/heat) tam ŘVE → ztlum do palety skinu (gradace drž).
 - **List ↔ panel konzistence:** panel nesmí být o stupeň pod deníkem (matrix měl generický ◆ místo skin signature).
 - **Erb/štít:** per-skin přebarvit (drd16 reziduum: červeno-zlatý SVG i ve scifi/minimal).
+- **⚠️ OBALENÍ (chrome) — POVINNĚ render čtveřice PC×bestie × mapa×chat:** vyrenderuj **obal v TM** (D = `TokenInfoPanel`) i **chat rail obal** (G = railShell) kolem **PC combat panelu I bestie panelu**, v OBOU kontextech (mapa + chat) — potvrď, že CHROME (hlavička avatar+jméno + pozadí obalu) nese skin, ne jen vnitřní obsah panelu. **Chrome ≠ obsah:** obsah (`.section`) může být naskinovaný a obal přitom baseline/tmavý (token na něj nedosáhne — past §9.18). Tahle čtveřice (PC×mapa, PC×chat, bestie×mapa, bestie×chat) se NEJSNÁZ zapomene — v praxi ji chytil uživatel, ne audit.
+- **⚠️ HODY (E = `DiceRollOverlay`) + ORCHESTRACE (H = `MapPjPanel`) — POVINNĚ render:** potvrď, že nesou skin — readout = barva + signature TVAR; orchestrace = barva/font (BEZ ornamentu, policy §3). Ne „naimplementoval jsem" — render je důkaz.
 
 ---
 
@@ -281,6 +283,21 @@ pravidle, jen CSS/SVG, regrese-safe), výstup `styles/<sys>-skins/<id>.css`. 1 a
     dostat: „tokeny `--corner-*` NEEXISTUJÍ, použij inline" + „embed nedosáhne na `.<sys>-diary` tokeny"
     + „povinný render-verify s OBALENÝM markupem". Jinak vyrobí tiše-rozbitý kód, co projde buildem.
 
+### Pasti z 2026-06-29 (obalení v mapě/chatu + mockup placeholdery — pi skiny)
+18. **Obal/chrome NEDOSÁHNE na per-skin tokeny (chat rail i obal v TM).** `--<sys>-log-*` (skin override)
+    žijí na `DiarySkinScope` (POTOMEK), ale obal `.panel` chrome je jeho PŘEDEK → CSS proměnné tečou jen
+    DOLŮ → chrome spadne na baseline (tmavá) pro VŠECHNY skiny, i když obsah panelu (`.section`) JE
+    naskinovaný. **To je nejčastější „skin se neprojevil" — obsah OK, obal tmavý.** Fix: per-skin
+    `.panel:has([data-diary-system='<sys>'][data-diary-skin='X'])` s LITERÁLNÍMI barvami skinu (vzor dd
+    rodin v `railShell.module.css`). Chat obal = JEN barva (ornament policy §3). U obalu v TM
+    (`TokenInfoPanel`) bývají atributy PŘÍMO na `.panel` (compound) — ověř scope renderem (past §9.13).
+19. **Mockup-odvozené skiny míří na PLACEHOLDER třídy, co v reálném DOM neexistují.** Mockup používá
+    náhradní názvy za hashované modulové třídy (`.cp-section`/`.cp-title`/`.ro-readout`); agent je zkopíruje
+    do skin souboru → ornament panelu/readoutu je TICHO MRTVÝ (build OK, barva OK, TVAR chybí). Reálné
+    třídy jsou `.section`/`.title`/`.readout` v `*.module.css`. **Ornament panelu/readoutu PATŘÍ do jeho
+    `.module.css`** na reálné třídy (scoped `[data-diary-system][data-diary-skin] .section`), NE do skin
+    souboru na `.cp-*`. Render-verify VŽDY proti reálnému zdrojovému CSS, ne proti mockupu (rodina §9.12).
+
 ---
 
 ## 10. Checklist nového systému (zaškrtávací)
@@ -290,10 +307,11 @@ pravidle, jen CSS/SVG, regrese-safe), výstup `styles/<sys>-skins/<id>.css`. 1 a
 - [ ] Krok 1b: **HP bar fill** = `--dd-hpfill-grad` (NE hardcoded JS `hpColor`); **list tokeny** `--<sys>-hp/spell/insp` v base `<sys>.css`
 - [ ] Krok 2: build ✓ + default render beze změny
 - [ ] Krok 3: 8× `<sys>-skins/<id>.css` (token+font+ornament listu) + 8× @import
-- [ ] Krok 4: **readout** (E) + **obal v TM** (D) per-skin signature TVAR; **dicelog (F) + orchestrace (H) BEZ ornamentu** — jen barva/font (ornament policy §3)
+- [ ] Krok 4: **readout (E) + obal v TM (D)** per-skin signature TVAR; **chat rail obal (G) per-skin BARVA** přes `:has()` (chrome nedosáhne na tokeny, past §9.18); **dicelog (F) + orchestrace (H) BEZ ornamentu** — jen barva/font (ornament policy §3)
 - [ ] Krok 4b: **HP bar na mapě** (I) — `case '<sys>'` v `resolveCharacterHp` s REÁLNÝMI klíči + test proti reálným datům
 - [ ] Krok 5: harness render 8 skinů + default + mobil ✓ — **markup OBALEN správně** (compound vs descendant scope, past §9.13); ověř, že ornament je VIDĚT (ne `var()` bez fallbacku, past §9.10)
 - [ ] Krok 6: audit checklist projet (vč. grep `style={{`/hex v TSX, past §9.15), nálezy opraveny
+- [ ] Krok 6b: **OBALENÍ render-ověřeno** — PC combat panel **i** bestie panel **obalené** v MAPĚ (D=`TokenInfoPanel`) **i** CHATU (G=railShell); chrome (hlavička+pozadí obalu) nese skin, ne jen obsah (past §9.18). **+ HODY (E) + ORCHESTRACE (H)** renderem potvrzené (§7). Tahle čtveřice se NEJSNÁZ zapomene.
 - [ ] Krok 7: mobil-desktop · funkce · napoveda · build ✓ · commit
 - [ ] Reziduum/dluhy zapsány
 </content>

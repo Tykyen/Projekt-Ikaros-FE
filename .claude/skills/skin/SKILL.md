@@ -15,15 +15,17 @@ Vytvoření + kontrola. **Raději dvakrát než vůbec.**
 Systém je hotový s jedním vzhledem (skill `system`). Pokud ne → nejdřív `system`.
 
 ## Povrchy, které KAŽDÝ skin pokrývá (§3)
-deník list · combat panel (PC/NPC) · bestie panel · **obal v TM** (TokenInfoPanel) · **dice readout** ·
-dicelog · orchestrace (MapPjPanel) · chat + obal.
+deník list · combat panel (PC/NPC) · bestie panel · **obal PC+bestie v TM** (TokenInfoPanel) ·
+**obal PC+bestie v chatu** (chat rail) · **dice readout (hody)** · dicelog · orchestrace (MapPjPanel).
 ⚠️ **Ornament policy:** TVAR (rohy/scanline/nýt/…) jen na list/panel/**obal TM**/**readout**.
 **dicelog + orchestrace + chat obal = JEN barva/font** (žádný `::before/::after` ornament — §3).
+⚠️ **OBALENÍ se NEJSNÁZ zapomene:** čtveřice PC×bestie × mapa×chat (obal v TM + chat rail) + hody +
+orchestrace musí v závěrečné kontrole projít renderem — obal (chrome) nese skin, ne jen obsah panelu.
 
 ## Železné principy
 1. **Tvrdá brána.** Identita/mockup skinu → **schválení** → impl → render-ověření → doladění → další skin. Žádný auto-postup mezi 8 skiny.
 2. **Každý skin originál** — vlastní tvarový jazyk + 1 signature ornament; NEsdílet ornament mezi skiny; STEJNÝ skin napříč systémy ano (rodina §2).
-3. **Build ≠ vidět.** `var()` bez fallbacku / token na `.<sys>-diary` scope nedosáhne na embed / inline `style={{}}` → tiše se nevykreslí, build projde (pasti §9.10–9.15). **Render-verify povinný.**
+3. **Build ≠ vidět.** `var()` bez fallbacku / token na `.<sys>-diary` scope nedosáhne na embed / inline `style={{}}` → tiše se nevykreslí, build projde (pasti §9.10–9.15). **Render-verify povinný.** Pozor: **obal/chrome (chat rail, obal v TM) NEDOSÁHNE na per-skin tokeny z potomka** (`DiarySkinScope`) → obsah panelu může být naskinovaný a obal přitom tmavý/baseline; per-skin chrome řeš `:has()`/compound (past §9.18).
 4. **Tokeny, ne hardcode.** Embed barvy přes `--dd-embed-*`/`--mx-log-*` (OPAQUE!); ornament na embed = **inline** (corner SVG NEEXISTUJE jako token — §9.10).
 5. Flexibilní vstup: `skin: dolaď orchestraci drd2` = jdi rovnou na ten skin/povrch.
 
@@ -47,7 +49,7 @@ dicelog · orchestrace (MapPjPanel) · chat + obal.
 **Po dokončení všech 8 skinů NESkonči — proveď úplný re-audit.** Cíl: doložit, že KAŽDÝ skin × KAŽDÝ povrch se reálně vykresluje A sedí s návrhem. Nestačí „implementoval jsem".
 
 1. **Statická past-kontrola** (grep, §9): žádný `var(--tvarový/corner-token)` BEZ fallbacku · žádný osiřelý odkaz na token z `.<sys>-diary` scope na embedu · žádný inline `style={{ background:hpColor }}` hardcode v TSX panelů · ornament policy drží (0 `::before/::after` v dicelog/orchestrace).
-2. **Render-audit** (§7 checklist) — vyrenderuj **8 skinů × všechny povrchy** (fan-out: 1 agent = 1 systém/skin, postaví harnessy, screenshoty), posuď proti NÁVRHU (mockup) i proti laťce sesterského systému. Hledej: čitelnost (void-na-voidu), embed surface OPAQUE, signature PŘÍTOMEN (ne jen přebarveno), žádný hardcoded leak, tlumené/světlé skiny neon-ztlumen, list↔panel konzistence, erb per-skin.
+2. **Render-audit** (§7 checklist) — vyrenderuj **8 skinů × všechny povrchy** (fan-out: 1 agent = 1 systém/skin, postaví harnessy, screenshoty), posuď proti NÁVRHU (mockup) i proti laťce sesterského systému. Hledej: čitelnost (void-na-voidu), embed surface OPAQUE, signature PŘÍTOMEN (ne jen přebarveno), žádný hardcoded leak, tlumené/světlé skiny neon-ztlumen, list↔panel konzistence, erb per-skin. **POVINNĚ ověř OBALENÍ (chrome): obal PC combat panelu I bestie panelu v MAPĚ (TokenInfoPanel) I CHATU (chat rail) — chrome (hlavička + pozadí obalu) nese skin, ne jen obsah panelu (past §9.18); + HODY (readout) + ORCHESTRACE (MapPjPanel) renderem potvrzené.** Tahle čtveřice PC×bestie × mapa×chat se NEJSNÁZ zapomene (v praxi ji chytil uživatel, ne audit).
 3. **Tabulka nálezů** per skin × povrch (✅ sedí / ⚠️ odchylka / ❌ nevykresluje-nebo-nesedí) s PNG cestami. Každé ⚠️/❌ je VADA, ne „mez".
 4. **Oprav nálezy → znovu render-ověř** dotčené (druhé kolo). Opakuj, dokud není tabulka čistá.
 5. **Až je tabulka čistá:** `mobil-desktop` · `funkce` + `napoveda` · `chybovy-denik` ✅ ŘEŠENÍ (pasti) · build ✓.
