@@ -4,6 +4,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### CH-038 — skin systému = jen deník + skin soubory; vynechal jsem cross-surface embed enumerace (dice log/readout) · 2026-06-29
+**Kontext:** 8.7s dnd5e = JaD twin vč. 8 skinů. Naklonoval jsem `jad-skins/*`→`dnd5e-skins/*` + deníkové CSS a prohlásil skiny za hotové.
+**Co jsem udělal špatně:** Skin se do EMBEDŮ (dice log, dice readout, combat/bestie panel plocha) NEpromítá přes skin soubory, ale přes **enumerovaný `:is([data-diary-system='drd16'],[drdplus],[drd2],[jad]) .panel { background: var(--dd-embed-surface) }`** v `DiceLogPanel.module.css` + `DiceRollOverlay.module.css` a přes **baseline `[data-diary-system='jad'] { --dd-* }` blok** v `diary-skins.css`. Tyto jsou MIMO skin soubory → klon skinů je nepokryl → **dnd5e v enumeraci chyběl** → skin se neprojevil na mapě/hodech/dicelog (uživatel: „to vůbec nemáš").
+**Proč to nefungovalo:** token sady skinu existovaly, ale konzument (embed plocha) je aktivuje jen pro VYJMENOVANÉ systémy; dnd5e nebyl v seznamu.
+**Poučení:** Skin ≠ deník. Při novém systému se skiny: `grep "data-diary-system='jad'"` napříč **VŠEMI .module.css + diary-skins.css** a přidej nový systém do KAŽDÉHO `:is()` + zkopíruj baseline `--dd-*` blok. Cross-surface konzumenti = DiceLogPanel, DiceRollOverlay, (railShell/TokenInfoPanel/MapPjPanel dle systému), diary-skins baseline.
+**Příznak cyklení:** uživatel hlásí „skin se neprojevuje na mapě/dicelog" po „dokončení" systému. **RODINA [CH-032](#ch-032--cross-surface-embedy-hodydicelogreadouttoken-chromeorchestrace-vynechány-při-grafickém-průchodu-systému-drdplus-162d--2026-06-27)** (drdplus měl tentýž problém) — podruhé = STOP, dělej embed-paritu hned při klonu systému.
+
+---
+
 ### ✅ ŘEŠENÍ — 8.7s D&D 5e = ÚPLNÉ dvojče JaD (deník+mapa+chat+bestie+8 skinů) přes sed klon · 2026-06-29
 **Co nakonec zabralo:** Uživatel po pár kolech upřesnil: *„celý systém JaD je to samé jako D&D 5e, jediný rozdíl je v zázemí a povolání."* → místo úpravy vlastního dnd sheetu jsem naklonoval **CELÝ JaD systém** mechanickým `sed`em (`jad_`→`dnd_`, `.jad-`→`.dnd-`, `[data-diary-system='jad']`→`'dnd5e'`, `Jad`→`Dnd`, `JAD_`→`DND_`, `jadf`→`dndf` u skinů) napříč: deník (JadSheet+jad.css), 8 skinů (jad-skins), combat panel PC (mapa+chat), bestie (schémata+panel+chat+combat-actions). Obsahově odlišné jen `constants.ts` (DND_CLASSES/BACKGROUNDS, ruční) + warlock 2-osý select + wiring (TokenSystemSheet/BestieInstancePanel/BestieRollPanel dnd5e větve, diary-skins @importy, skin default).
 **Proč to je správně (a ne další variace):** sed klon je deterministický a rychlý pro ~25 souborů; ruční přepis 1300ř deníku = chybové. Po každém klonu grep na zbytky `jad` (0). **Kritické rozhodnutí:** combat/bestie panely sdílí s deníkem `dnd_*` klíče → musel jsem přepsat i starý DndCombatPanel z JaD modelu (jinak desync se starými `attacks`/`ability_*`/`deathSuccess`).

@@ -224,44 +224,44 @@
  * Tokenizováno na `--dd-embed-*` (defaulty v diary-skins.css, loaded i v embedech).
  * Syrové `--dd-*` mají fantasy fallback (drd16.css v embedu není). Plocha opaque.
  * Sémantické +/− drží význam. Scoped na drd16. */
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .readout {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .readout {
   background-color: var(--dd-forge-1, #1d160e);
   background-image: var(--dd-embed-surface);
   border: 1px solid var(--dd-embed-border);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .faceBadge {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .faceBadge {
   background: var(--dd-accent-grad, linear-gradient(180deg, #f3dd97, #c19a3f 60%, #6f5320));
   border-color: var(--dd-embed-border);
   color: var(--dd-ink-deep, #241509);
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .faceGeneric {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .faceGeneric {
   color: var(--dd-ink-deep, #241509);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .totalValue {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .totalValue {
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .totalPositive {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .totalPositive {
   color: var(--dd-embed-pos);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .totalNegative {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .totalNegative {
   color: var(--dd-embed-neg);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .totalNeutral {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .totalNeutral {
   color: var(--dd-embed-neutral);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .equation {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .equation {
   font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .skillName {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .skillName {
   color: var(--dd-embed-title);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .eqSign {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .eqSign {
   color: var(--dd-embed-muted);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad']) .rollerName {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .rollerName {
   color: var(--dd-embed-muted);
   font-family: var(--dd-font-head, 'Cinzel', serif);
 }
@@ -281,7 +281,7 @@
 }
 
 /* 16.2e — drd2 fantasy: světlý pergamen s inkoustovým dvojrámem */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='fantasy'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='fantasy'] .readout {
   box-shadow: 0 0 0 1px #c5b083, 0 0 0 5px rgba(28, 20, 9, 0.45),
     0 0 0 6px rgba(150, 120, 70, 0.3), 0 18px 50px -14px rgba(0, 0, 0, 0.7);
   border-radius: 4px;
@@ -323,13 +323,13 @@
 
 /* 16.2e — drd2 scifi: TÝŽ chamfer klín + scanline + tech-bracket roh
    (.readout je position:fixed → NEPŘEPISOVAT position; paleta z drd2 --sf-) */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='scifi'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='scifi'] .readout {
   clip-path: var(--sf-clip, polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px));
   border-radius: 0;
   box-shadow: inset 0 0 0 1px var(--sf-line-hot, rgba(52, 227, 255, 0.42)),
     inset 0 0 40px -22px rgba(52, 227, 255, 0.45), 0 18px 50px rgba(0, 0, 0, 0.7);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='scifi'] .readout::before {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='scifi'] .readout::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -338,7 +338,7 @@
   clip-path: inherit;
   background: repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.05) 0 1px, transparent 1px 3px);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='scifi'] .readout::after {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='scifi'] .readout::after {
   content: '';
   position: absolute;
   bottom: 7px;
@@ -351,7 +351,7 @@
   pointer-events: none;
   z-index: 2;
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='scifi'] .totalPositive {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='scifi'] .totalPositive {
   text-shadow: 0 0 12px rgba(52, 227, 255, 0.6), 0 0 24px rgba(52, 227, 255, 0.35);
 }
 
@@ -379,14 +379,14 @@
 }
 
 /* 16.2e — drd2 steampunk: TÁŽ mosazná deska + 4 rohové nýty (paleta z drd2 --st-) */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='steampunk'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='steampunk'] .readout {
   isolation: isolate;
   border-radius: 4px;
   box-shadow: inset 0 1px 0 rgba(231, 205, 143, 0.42), inset 0 -1px 0 rgba(0, 0, 0, 0.5),
     inset 1px 0 0 rgba(231, 205, 143, 0.18), inset -1px 0 0 rgba(0, 0, 0, 0.4),
     0 16px 44px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--st-brass-deep, #6e5224);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='steampunk'] .readout::before {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='steampunk'] .readout::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -410,7 +410,7 @@
 }
 
 /* 16.2e — drd2 horror: TÁŽ stříbrná tracerie (outline) + oxblood glow */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='horror'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='horror'] .readout {
   outline: 1px solid rgba(90, 84, 96, 0.4);
   outline-offset: 4px;
   box-shadow: inset 0 0 28px rgba(94, 22, 34, 0.4), inset 0 0 0 1px rgba(90, 84, 96, 0.18),
@@ -445,14 +445,14 @@
 }
 
 /* 16.2e — drd2 nature: TÝŽ organický rám + letokruh + lísteček (paleta z drd2 --na-) */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='nature'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='nature'] .readout {
   border-width: 2px;
   border-radius: 14px 6px 14px 6px;
   box-shadow: inset 0 0 0 1px rgba(155, 187, 99, 0.32), inset 0 0 0 3px var(--na-moss-deep, #37501f),
     inset 0 0 20px rgba(0, 0, 0, 0.45), 0 8px 30px rgba(0, 0, 0, 0.6);
   padding-left: 34px;
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='nature'] .readout::before {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='nature'] .readout::before {
   content: '';
   position: absolute;
   left: 7px;
@@ -467,7 +467,7 @@
   opacity: 0.8;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='nature'] .faceBadge {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='nature'] .faceBadge {
   border-radius: 5px 2px 5px 2px;
 }
 
@@ -489,10 +489,10 @@
 }
 
 /* 16.2e — drd2 minimal: TÝŽ ledger rám archivní karty (paleta z drd2 --mn-) */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='minimal'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='minimal'] .readout {
   overflow: visible;
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='minimal'] .readout::after {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='minimal'] .readout::after {
   content: '';
   position: absolute;
   inset: 3px;
@@ -501,7 +501,7 @@
   border-radius: 1px;
   z-index: 0;
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='minimal'] .skillName {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='minimal'] .skillName {
   color: var(--mn-acc, #9a7b2e);
 }
 
@@ -532,14 +532,14 @@
 
 /* 16.2e — drd2 retro: TÝŽ synthwave double-rám + CRT scanline + LED total
    (paleta z drd2 retro tokenů --rt- / --dd-forge-1; position NEpřepisovat) */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='retro'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='retro'] .readout {
   border-radius: 0;
   overflow: visible;
   box-shadow: 0 0 0 1px var(--rt-pink, #ff2e97), 0 0 0 3px var(--dd-forge-1, #160a2b),
     0 0 0 4px var(--rt-screen-edge, #6f3aa8), 0 0 24px -2px rgba(255, 46, 151, 0.5),
     0 10px 40px rgba(0, 0, 0, 0.9);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='retro'] .readout::after {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='retro'] .readout::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -547,11 +547,11 @@
   z-index: 1;
   background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.32) 2px 3px);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='retro'] .faceBadge {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='retro'] .faceBadge {
   border-radius: 0;
   text-shadow: 0 0 6px rgba(125, 240, 255, 0.7);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='retro'] .totalValue {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='retro'] .totalValue {
   letter-spacing: 2px;
   text-shadow: 0 0 10px rgba(255, 179, 71, 0.55);
 }
@@ -590,14 +590,14 @@
 
 /* 16.2e — drd2 anime: TÝŽ duhový cel rám + ink obrys + bílé chip kostky/total
    (ink #16162e z drd2 --dd-parch-edge; rainbow z --mlp-rainbow fallback) */
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='anime'] .readout {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='anime'] .readout {
   border: 3px solid #ffffff;
   border-radius: 18px;
   box-shadow: 0 0 0 5px var(--dd-parch-edge, #16162e), 0 6px 0 -1px rgba(22, 22, 46, 0.22),
     0 16px 30px -8px rgba(26, 20, 80, 0.5);
   overflow: visible;
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='anime'] .readout::before {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='anime'] .readout::before {
   content: '';
   position: absolute;
   top: -3px;
@@ -609,14 +609,14 @@
   z-index: 2;
   pointer-events: none;
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='anime'] .faceBadge {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='anime'] .faceBadge {
   background: #ffffff;
   border: 2.5px solid var(--dd-parch-edge, #16162e);
   border-radius: 10px;
   box-shadow: 0 3px 0 var(--dd-parch-edge, #16162e), 0 4px 8px rgba(26, 20, 80, 0.25);
   color: var(--dd-parch-edge, #16162e);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'])[data-diary-skin='anime'] .totalValue {
+:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'])[data-diary-skin='anime'] .totalValue {
   -webkit-text-stroke: 1.5px var(--dd-parch-edge, #16162e);
   text-shadow: 0 3px 0 var(--dd-parch-edge, #16162e);
 }

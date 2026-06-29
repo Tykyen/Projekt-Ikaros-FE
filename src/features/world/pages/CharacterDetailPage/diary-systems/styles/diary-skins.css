@@ -257,6 +257,27 @@
   --dd-font-body: 'Inter', system-ui, sans-serif;
 }
 
+/* ════════════ 8.7s — D&D 5e panel baseline = KLON JaD (dvojče) ════════════
+ * dnd5e combat/bestie panely (klon jad modulů) čtou tytéž --dd-* z předka.
+ * Dice log / readout dnd5e enumerovány v DiceLogPanel/DiceRollOverlay
+ * (vedle jad). Skin override na [data-diary-system='dnd5e'][data-diary-skin='X']
+ * v dnd5e-skins/*.css. Hodnoty = shodné s JaD (regrese-safe, default fantasy). */
+[data-diary-system='dnd5e'] {
+  --dd-panel-bg: #f3ead7;
+  --dd-card-bg: #f7f0df;
+  --dd-accent: #8a2b22;
+  --dd-parch-edge: #cdbb97;
+  --dd-rule: #e0d3b4;
+  --dd-ink: #34281c;
+  --dd-ink-soft: #6e5b46;
+  --dd-gold: #9a6b2f;
+  --dd-row-bg: #ede2cf;
+  --dd-hpbar-track: rgba(52, 40, 28, 0.18);
+  --dd-hptxt-glow: rgba(243, 234, 215, 0.8);
+  --dd-font-head: 'Cinzel', serif;
+  --dd-font-body: 'Inter', system-ui, sans-serif;
+}
+
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */
 .diary-skin-picker {
   position: relative;

@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-038.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-039.**
 
 ## Jak je deník členěný
 
@@ -141,3 +141,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-037](fe.md#ch-037) | fe/css | replace_all CSS selektoru spolkl mezeru `) .panel`→`).panel` (potomek→compound) → rozbil base embed blok VŠECH systémů; udělal jsem to 2× po sobě | spolknutá mezera u 2.+ souboru za sebou; embed plochy ztratí barvu napříč systémy |
 | [✅ ŘEŠENÍ](fe.md#-řešení--87s-dd-5e-deník-multipovolání--obory--přidávatelné-sekce--2026-06-29) | fe | 8.7s D&D 5e deník: port JaD 8.7p (multipovolání+obory+auto úroveň+přidávatelné sekce); Černokněžník 2 osy (patron+pakt) přes optional sub2; migrace read-only; 32+205 testů | — (zabralo napoprvé) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--87s-dd-5e--úplné-dvojče-jad-denníkmapachatbestie8-skinů-přes-sed-klon--2026-06-29) | fe | 8.7s D&D 5e = ÚPLNÉ dvojče JaD (deník+mapa+chat+bestie+8 skinů) sed klonem; jediný rozdíl povolání(warlock 2 osy)+zázemí; combat panel přepsán kvůli sdíleným dnd_* klíčům; past: neopomenout spec páry | — |
+| [CH-038](fe.md#ch-038--skin-systému--jen-deník--skin-soubory-vynechal-jsem-cross-surface-embed-enumerace-dice-logreadout--2026-06-29) | fe/css | skin systému: vynechal jsem dnd5e v enumerovaných `:is([drd16],[drdplus],[drd2],[jad])` embed pravidlech (DiceLogPanel/DiceRollOverlay) + baseline `--dd-*` blok → skin se neprojevil na mapě/dicelog. RODINA CH-032 | uživatel „skin nevidět na mapě/dicelog" po dokončení systému |
