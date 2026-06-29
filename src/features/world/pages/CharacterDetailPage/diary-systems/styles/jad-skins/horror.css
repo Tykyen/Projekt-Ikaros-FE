@@ -131,6 +131,7 @@
   --dd-ink: var(--h-silver); /* text na tmavém → zašlé stříbro */
   --dd-ink-soft: var(--h-silver-lo);
   --dd-hpbar-track: #150d12; /* kolejnice HP lišty (tmavá) */
+  --dd-hpfill-grad: linear-gradient(90deg, var(--h-oxblood), var(--h-oxblood-hi)); /* HP fill = oxblood (granát) */
   --dd-hptxt-glow: rgba(122, 32, 48, 0.55); /* glow HP čísla — na TMAVÉM ZTLUMENO (oxblood) */
   --dd-font-head: 'Cormorant SC', 'Cinzel', serif;
   --dd-font-body: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
@@ -146,6 +147,7 @@
   --jad-accent: var(--h-oxblood); /* vínová role → oxblood */
   --jad-accent-soft: var(--h-oxblood-hi);
   --jad-gold: var(--h-gold); /* Inspirace / zlatý detail */
+  --jad-spell: var(--h-violet-hi); /* kouzla = studená fialová (éterické) */
   --jad-border: var(--h-parch-line);
   --jad-border-soft: var(--h-parch-line-soft);
   --jad-panel-bg: #c9c0cb; /* damašek (header/box plocha) */

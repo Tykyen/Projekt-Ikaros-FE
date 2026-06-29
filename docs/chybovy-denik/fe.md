@@ -1100,3 +1100,27 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** stejná „spolknutá mezera/znak" chyba u 2.+ souboru za sebou; nebo embed plochy „prosvítají"/ztratí barvu napříč systémy po úpravě selektoru.
 
 ---
+
+### ✅ ŘEŠENÍ — HP bar PC+bestie (JaD/DnD) hardcoded inline → skin token; audit propásl, protože byl statický · 2026-06-29
+**Kontext:** Uživatel hlásil „HP bar se nepropisuje u PC" a „JaD deníky se vůbec nepropisují do TM/Chat". Předcházel statický audit skinů (5 systémů × 7 povrchů), který prohlásil embed pokrytí za OK (token coverage `--dd-embed-*` 13/13).
+**Vlastní chyba (kořen dojmu):** audit kontroloval CSS tokeny a `:is()` enumerace, ale **HP bar fill barvu nastavoval inline JS** `style={{ background: hpColor }}` s hardcoded teploměrem `hpColor = pct>50?'#5a7d3a':pct>25?'#c08a2e':'#9d2932'` — to je pro CSS/token audit NEVIDITELNÉ (inline styl navíc přebíjí jakýkoli skin). Statická shoda ≠ vizuální propsání. Uživatel musel narazit sám.
+**Co zabralo (oprava):** (1) zahodit `hpColor` z 6 míst (`JadCombatPanel`/`DndCombatPanel` PC + `Jad/DndBestiePanel` TM + `Jad/DndChatBestiePanel` chat; chat sdílí `mapStyles` → CSS jen 2× pokryje TM i chat), inline `style` ponechán jen `width`. (2) `.hpBarFill`/`.hpFill` → `background: var(--dd-hpfill-grad, <fantasy crimson fallback>)` — dědí se z `[data-diary-skin]` na TokenInfoPanel/aside rootu. (3) **token drift** sjednocen: fantasy měl HP fill pod MRTVÝM `--dd-hpbar-fill` (0 konzumentů), horror neměl nic → přejmenováno/doplněno na kanonický `--dd-hpfill-grad` (8/8 jad + 8/8 dnd). (4) navíc mrtvé selektory `#jad_hpCur`→`#dnd_hpCur` (dnd anime/nature, klon-leftover z `sed` dvojčete) + steampunk komentář.
+**Proč to je správně:** návrh (`jad-skins/fantasy/index.html` sekce B+C i G) kreslí HP bar jako jednolitý **crimson gradient skinu**, NE teploměr — bestie i PC stejně. Drd16 to tak dělal už dřív (`--dd-hp-grad`). Tmavý fantasy embed panel je naopak dle návrhu správně (`.forged` = kožená vazba grimoáru) — nebyl to bug, jen HP bar.
+**Jak ověřeno:** `npm run build` 2× zelená (TS i CSP), grep „žádný hardcoded `hpColor`/`#5a7d3a` nezbyl". Živé render ověření (přepnutí skinu v TM + chat) předáno uživateli.
+**Zhodnocení:** dobře jako oprava, ale **chyba v metodě auditu** = rodina CH-032/CH-038 (cross-surface embed se nepropíše po „dokončení" systému), s NOVÝM kořenem: inline JS `style` hardcode je mimo dosah CSS/token grepu. **Poučení:** u tvrzení „propisuje se skin do X?" NESTAČÍ grep tokenů — buď render, nebo aspoň grep `style={{` / `background:` / hex literálů v TSX daného povrchu. „13/13 token coverage" neznamená „vizuálně sedí".
+**Příznak cyklení:** uživatel opakuje „nevidím skin na X" po auditu, který tvrdí „OK"; hledat inline `style`/hex v TSX, ne další CSS tokeny.
+
+---
+
+### ✅ ŘEŠENÍ — dotažení skin-auditu: HP list (#2) + kouzla 8 skinů + DrD+ dice signature (#1) + MLP sticker (#4) · 2026-06-29
+**Co zabralo:**
+- **#2 HP list** (`#jad_hpCur`/`#dnd_hpCur` + pip Inspirace + rám Kouzel padaly na accent): JEDNA centrální definice `--jad-hp/spell/insp` v base `jad.css`/`dnd5e.css` přes **fallback řetěz** na sémantické `--dd-*` (`var(--dd-crimson, var(--dd-hp, var(--jad-accent)))` atd.) — per-skin scope je přepisuje (1 def místo 48). scifi nemá crimson/dd-hp → override `--jad-hp:var(--sf-life)` (jade) + `--jad-spell:var(--sf-mag)` na `.jad-diary` scope.
+- **Kouzla 8 skinů:** rozšířený řetěz `var(--dd-sapphire, var(--dd-spell, var(--dd-mag, var(--accent))))` (nature/steampunk=`--dd-spell`, minimal=`--dd-mag`) + horror override `--h-violet-hi`.
+- **#1 DrD+ dice signature:** `drdplus` přidán do 46 per-skin `:is([drd2],[jad],[dnd5e])[skin]` selektorů v `DiceLogPanel`+`DiceRollOverlay` (`replace_all` patternu `[dnd5e'])[data-diary-skin=` — compound `)[`, ŽÁDNÝ descendant kombinátor → bezpečné vůči CH-037).
+- **#4 MLP (drd16 anime) dice:** tvrdý ink obrys (`border ink-deep` + `box-shadow 0 Npx 0` + `-webkit-text-stroke`) → měkký `--mlp-lavender` sticker okraj + rozostřený pillow stín (notes.md zakazuje ink obrys).
+**Past (chycena PŘED přidáním):** slepé přidání drdplus do signaturních selektorů by dalo **drdplus fantasy bílou plochu** — fantasy signature čte `var(--dd-forge-2, #ffffff)` a drdplus fantasy `--dd-forge-2` NEMĚL (fallback=bílá). Před `replace_all` jsem vygripoval VŠECHNY tvarové tokeny (`--sf-*/--rt-*/--st-*/--na-*/--mn-*/--mlp-*/--dd-forge*`) čtené v signaturních blocích a porovnal s drdplus coverage → 3 chybějící fantasy tokeny doplněny z drdplus vlastní `--fa-*` palety (`--dd-forge-2:var(--fa-bind-2)` atd.); nature/anime fallbacky (mech/lavender) ponechány jako univerzální.
+**Jak ověřeno:** `npm run build` 4× zelená; grep „0 rozbitých `).panel`" (CH-037 guard), „0 zbylých ink-deep v drd16 anime", „drdplus 22+24 signatur, base descendant `) .panel` nedotčen".
+**Zhodnocení:** dobře. Klíč = **ověřit fallback hodnoty PŘED přidáním systému do cizích tokenových selektorů** — `var(--x)` bez kontroly fallbacku může tiše vykreslit bílou/rozbitou plochu. Spell u 4 skinů zůstával na accent jen kvůli token-drift v pojmenování (`--dd-spell` vs `--dd-mag` vs `--dd-sapphire`) — fallback řetěz to sjednotil bez přejmenovávání.
+**Příznak cyklení:** „X má jen barvu, ne tvar" u systému, který sdílí dice moduly přes `:is()` — chybí v signaturních selektorech, NEBO mu chybí tvarové tokeny (pak padá na fallback hex jiného systému).
+
+---

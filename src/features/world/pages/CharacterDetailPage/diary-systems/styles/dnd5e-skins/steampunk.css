@@ -507,8 +507,8 @@
   background: transparent;
   border: none;
 }
-/* SIGNATURE: OČ box = chladná mosaz manometr. Reálné DOM (JadSheet.tsx): OČ je
-   `.dnd-meta-box:nth-child(2)` s `#jad_ac` (žádná `.oc` třída) — cílíme pořadím.
+/* SIGNATURE: OČ box = chladná mosaz manometr. Reálné DOM (DndSheet.tsx): OČ je
+   `.dnd-meta-box:nth-child(2)` s `#dnd_ac` (žádná `.oc` třída) — cílíme pořadím.
    Tmavá deska + mosazný 2px rám = manometrová pečeť OČ v bojové liště. */
 [data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:nth-child(2) {
   background: linear-gradient(180deg, #2f2114, #1c130a);

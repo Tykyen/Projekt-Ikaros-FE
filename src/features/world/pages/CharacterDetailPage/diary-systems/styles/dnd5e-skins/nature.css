@@ -426,7 +426,7 @@
   border-radius: 10px 3px 10px 3px;
 }
 /* aktuální Životy (BV) = bobulové číslo + rám — přebij inline mech accent */
-[data-diary-system='dnd5e'][data-diary-skin='nature'] .dnd-diary .dnd-hp-panel #jad_hpCur {
+[data-diary-system='dnd5e'][data-diary-skin='nature'] .dnd-diary .dnd-hp-panel #dnd_hpCur {
   color: var(--na-berry) !important;
   border-color: var(--na-berry) !important;
   background: rgba(168, 60, 46, 0.06);

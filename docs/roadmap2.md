@@ -409,7 +409,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Taktická mapa (grafika + funkčně doplnit hody / panel)
   - [x] Bestie (grafika)
   - [x] Chat (→ 16.1)
-  - [ ] Skiny (→ 16.2c)
+  - [x] Skiny (→ 16.2c)
 - **Příběhy Impéria** (`pi`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
@@ -423,11 +423,11 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
 - **D&D 5e** (`dnd5e`) — *stav kódu:* list sheet+testy (+formulas), mapa combat panel `DndCombatPanel`
-  - [ ] Reálný list (grafika)
-  - [ ] Taktická mapa (grafika)
-  - [ ] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
-  - [ ] Skiny (→ 16.2c)
+  - [x] Reálný list (grafika)
+  - [x] Taktická mapa (grafika)
+  - [x] Bestie (grafika)
+  - [x] Chat (→ 16.1)
+  - [x] Skiny (→ 16.2c)
 - **Shadowrun** (`shadowrun`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)

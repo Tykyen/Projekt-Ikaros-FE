@@ -61,7 +61,6 @@ export function DndBestiePanel({
   const maxHp = toNum(token.maxHp);
   const currentHp = toNum(token.currentHp);
   const pct = maxHp > 0 ? Math.max(0, Math.min(100, (currentHp / maxHp) * 100)) : 0;
-  const hpColor = pct > 50 ? '#5a7d3a' : pct > 25 ? '#c08a2e' : '#9d2932';
   const obrMod = calcMod(toNum(ss['attributes.dex'], 10));
 
   const sanitize = (stats: Record<string, unknown>): Record<string, unknown> => {
@@ -209,7 +208,7 @@ export function DndBestiePanel({
             <div className={styles.hpBar}>
               <div
                 className={styles.hpFill}
-                style={{ width: `${pct}%`, background: hpColor }}
+                style={{ width: `${pct}%` }}
               />
               <div className={styles.hpTxt}>
                 {currentHp} / {maxHp}

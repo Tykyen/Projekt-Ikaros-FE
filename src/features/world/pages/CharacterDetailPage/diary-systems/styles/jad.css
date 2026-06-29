@@ -20,6 +20,13 @@
   --jad-gold: #9a6b2f;
   --jad-border: #cdbb97;
   --jad-border-soft: #e0d3b4;
+
+  /* 16.2 — sémantické barvy pro inline styly listu (#jad_hpCur = Aktuální Životy,
+     pip Inspirace, rám použitých pozic Kouzel). Per-skin scope přepisuje
+     `--dd-crimson/--dd-hp/--dd-sapphire/--dd-gold`; bez nich padá na accent. */
+  --jad-hp: var(--dd-crimson, var(--dd-hp, var(--jad-accent)));
+  --jad-spell: var(--dd-sapphire, var(--dd-spell, var(--dd-mag, var(--jad-accent))));
+  --jad-insp: var(--dd-gold, var(--jad-gold));
   --jad-panel-bg: #efe3c9;
   --jad-box: #f7f0df;
   --jad-highlight: #ede2cf;

@@ -106,7 +106,7 @@
   --dd-crimson-hi: var(--jadf-crimson-hi);
   --dd-crimson-deep: var(--jadf-crimson-deep);
   --dd-hpbar-track: #160f08; /* kolejnice HP lišty (tmavá deska) */
-  --dd-hpbar-fill: linear-gradient(90deg, var(--jadf-crimson), var(--jadf-crimson-hi));
+  --dd-hpfill-grad: linear-gradient(90deg, var(--jadf-crimson), var(--jadf-crimson-hi)); /* HP fill (list + combat panel TM) = krev grimoáru */
   --dd-hptxt: #eaa39a; /* HP číslo na tmavém */
   --dd-hptxt-glow: 0 0 6px -2px rgba(203, 65, 56, 0.4); /* ztlumený glow na tmavém */
 

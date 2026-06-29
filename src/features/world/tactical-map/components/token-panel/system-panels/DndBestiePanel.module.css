@@ -117,6 +117,11 @@
 }
 .hpFill {
   height: 100%;
+  /* 16.2c — HP fill nese DENÍKOVÝ SKIN (sdíleno TM panel i chat rail bestie). */
+  background: var(
+    --dd-hpfill-grad,
+    linear-gradient(90deg, var(--dd-crimson, #a23a26), var(--dd-crimson-hi, #cb4138))
+  );
   transition: width 0.2s ease;
 }
 .hpTxt {

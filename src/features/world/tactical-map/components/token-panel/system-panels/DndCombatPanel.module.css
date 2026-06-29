@@ -154,6 +154,13 @@
 .hpBarFill {
   height: 100%;
   border-radius: 3px;
+  /* 16.2c — HP fill nese DENÍKOVÝ SKIN (crimson/oxblood/jade…), ne hardcoded
+     teploměr. `--dd-hpfill-grad` se dědí z `[data-diary-skin]` na TokenInfoPanel
+     rootu; fallback = fantasy crimson. */
+  background: var(
+    --dd-hpfill-grad,
+    linear-gradient(90deg, var(--dd-crimson, #a23a26), var(--dd-crimson-hi, #cb4138))
+  );
   transition: width 0.2s ease;
 }
 

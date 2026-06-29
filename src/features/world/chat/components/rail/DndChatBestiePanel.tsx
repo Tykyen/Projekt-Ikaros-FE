@@ -70,7 +70,6 @@ export function DndChatBestiePanel({
   const vydrzCur =
     ss.vydrz_cur != null ? Math.max(0, toNum(ss.vydrz_cur)) : vydrzMax;
   const pct = vydrzMax > 0 ? Math.max(0, Math.min(100, (vydrzCur / vydrzMax) * 100)) : 0;
-  const hpColor = pct > 50 ? '#5a7d3a' : pct > 25 ? '#c08a2e' : '#9d2932';
   const obrMod = calcMod(toNum(ss['attributes.dex'], 10));
 
   // k20 / mixed hod → chat (iniciativa navíc persist přes onResult).
@@ -167,7 +166,7 @@ export function DndChatBestiePanel({
             <div className={mapStyles.hpBar}>
               <div
                 className={mapStyles.hpFill}
-                style={{ width: `${pct}%`, background: hpColor }}
+                style={{ width: `${pct}%` }}
               />
               <div className={mapStyles.hpTxt}>
                 {vydrzCur} / {vydrzMax}

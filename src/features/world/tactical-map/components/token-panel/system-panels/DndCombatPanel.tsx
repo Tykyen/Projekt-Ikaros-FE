@@ -144,8 +144,6 @@ export function DndCombatPanel({
   const hpMaxNum = parseInt(getStr(cd0, 'hpMax', '0'), 10) || 0;
   const hpPct =
     hpMaxNum > 0 ? Math.max(0, Math.min(100, (hpCurNum / hpMaxNum) * 100)) : 0;
-  const hpColor =
-    hpPct > 50 ? '#5a7d3a' : hpPct > 25 ? '#c08a2e' : '#9d2932';
   const classRows = parseJson<DndClassRow>(cd, 'classes');
   const totalLevel = classRows.reduce(
     (s, r) => s + (parseInt(r.l || '0', 10) || 0),
@@ -265,7 +263,7 @@ export function DndCombatPanel({
           >
             <div
               className={styles.hpBarFill}
-              style={{ width: `${hpPct}%`, background: hpColor }}
+              style={{ width: `${hpPct}%` }}
             />
           </div>
         </div>

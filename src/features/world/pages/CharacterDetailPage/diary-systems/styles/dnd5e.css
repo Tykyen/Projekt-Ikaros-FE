@@ -20,6 +20,13 @@
   --dnd-gold: #9a6b2f;
   --dnd-border: #cdbb97;
   --dnd-border-soft: #e0d3b4;
+
+  /* 16.2 — sémantické barvy pro inline styly listu (#dnd_hpCur = Aktuální Životy,
+     pip Inspirace, rám použitých pozic Kouzel). Per-skin scope přepisuje
+     `--dd-crimson/--dd-hp/--dd-sapphire/--dd-gold`; bez nich padá na accent. */
+  --dnd-hp: var(--dd-crimson, var(--dd-hp, var(--dnd-accent)));
+  --dnd-spell: var(--dd-sapphire, var(--dd-spell, var(--dd-mag, var(--dnd-accent))));
+  --dnd-insp: var(--dd-gold, var(--dnd-gold));
   --dnd-panel-bg: #efe3c9;
   --dnd-box: #f7f0df;
   --dnd-highlight: #ede2cf;

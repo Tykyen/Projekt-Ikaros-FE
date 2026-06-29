@@ -71,6 +71,9 @@
   --sf-life-deep: #0c5a3c;
   --sf-mag: #7aa2ff; /* kouzla / pozice = safír */
   --sf-mag-2: #9b6bff;
+  /* list inline tokeny: scifi nemá crimson/dd-hp → HP = jade, kouzla = safír */
+  --jad-hp: var(--sf-life);
+  --jad-spell: var(--sf-mag);
   --sf-warn: #ffb648; /* zámek oboru / postih = amber */
   --sf-neg: #ff5a7a;
   --sf-gold: #ffd27a;

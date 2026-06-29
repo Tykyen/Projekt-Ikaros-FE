@@ -75,6 +75,10 @@
   --dd-sapphire: #3a5f9e; /* MAGY */
   --dd-line: rgba(182, 151, 95, 0.55);
   --dd-forge-1: var(--fa-bind-1);
+  /* 16.2 — tvarové tokeny pro dice signature (DiceLog/Overlay fantasy větev) */
+  --dd-forge-2: var(--fa-bind-2); /* kovárna (2. krok forge gradientu) */
+  --dd-parch-edge: var(--fa-gold-shadow); /* zlatý rám desky */
+  --dd-sapphire-deep: #1c2f54; /* tmavá safírová (fatální/safír detail) */
 
   /* ── fonty rodiny ── */
   --dd-font-body: 'EB Garamond', Georgia, serif;

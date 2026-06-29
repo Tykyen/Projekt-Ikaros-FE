@@ -131,6 +131,7 @@
   --dd-ink: var(--h-silver); /* text na tmavém → zašlé stříbro */
   --dd-ink-soft: var(--h-silver-lo);
   --dd-hpbar-track: #150d12; /* kolejnice HP lišty (tmavá) */
+  --dd-hpfill-grad: linear-gradient(90deg, var(--h-oxblood), var(--h-oxblood-hi)); /* HP fill = oxblood (granát) */
   --dd-hptxt-glow: rgba(122, 32, 48, 0.55); /* glow HP čísla — na TMAVÉM ZTLUMENO (oxblood) */
   --dd-font-head: 'Cormorant SC', 'Cinzel', serif;
   --dd-font-body: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
@@ -146,6 +147,7 @@
   --dnd-accent: var(--h-oxblood); /* vínová role → oxblood */
   --dnd-accent-soft: var(--h-oxblood-hi);
   --dnd-gold: var(--h-gold); /* Inspirace / zlatý detail */
+  --dnd-spell: var(--h-violet-hi); /* kouzla = studená fialová (éterické) */
   --dnd-border: var(--h-parch-line);
   --dnd-border-soft: var(--h-parch-line-soft);
   --dnd-panel-bg: #c9c0cb; /* damašek (header/box plocha) */

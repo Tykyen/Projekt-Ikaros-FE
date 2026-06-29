@@ -544,8 +544,8 @@
   background: var(--mlp-empty);
   box-shadow: inset 0 0 0 2px var(--mlp-ink);
 }
-/* Aktuální Životy (#jad_hpCur) — přebij inline var(--dnd-accent) na červenou HP */
-[data-diary-system='dnd5e'][data-diary-skin='anime'] .dnd-diary #jad_hpCur {
+/* Aktuální Životy (#dnd_hpCur) — přebij inline var(--dnd-accent) na červenou HP */
+[data-diary-system='dnd5e'][data-diary-skin='anime'] .dnd-diary #dnd_hpCur {
   border-color: var(--mlp-hp) !important;
   color: var(--mlp-hp) !important;
   box-shadow: inset 0 0 0 2.5px var(--mlp-hp);
