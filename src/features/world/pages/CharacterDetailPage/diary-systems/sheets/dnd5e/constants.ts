@@ -53,18 +53,6 @@ export const SKILLS: DndSkillDef[] = [
   { name: 'Zastrašování', ability: 'cha' },
 ];
 
-/** Personality blocky (textarea) — D&D specifikum, zůstává. */
-export const DND_PERSONALITY_FIELDS: {
-  key: string;
-  label: string;
-  rows: number;
-}[] = [
-  { key: 'traits', label: 'Osobnostní rysy', rows: 3 },
-  { key: 'ideals', label: 'Ideály', rows: 2 },
-  { key: 'bonds', label: 'Pouta', rows: 2 },
-  { key: 'flaws', label: 'Vady', rows: 2 },
-];
-
 /** Útok v `dnd_attacks` JSON poli. */
 export interface DndAttack {
   name: string;

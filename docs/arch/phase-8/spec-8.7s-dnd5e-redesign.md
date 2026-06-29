@@ -7,7 +7,7 @@
 
 ## 1. Cíl
 
-Posunout D&D 5e deník z 1:1 přenosu legacy listu na **funkční tvorbu postavy**: multipovolání s obory (subclass), osobní zázemí jako výběr, auto-úroveň a strukturované přidávatelné sekce místo volných textarea. Funkčně shodné s JaD 8.7p, ale **zachovává vlastní vzhled** (Arcane Parchment, vínová `--dnd-accent`) i D&D specifika, která JaD nemá: bloky osobnosti (Rysy/Ideály/Pouta/Vady) a death-save pipy.
+Posunout D&D 5e deník z 1:1 přenosu legacy listu na **funkční tvorbu postavy**: multipovolání s obory (subclass), osobní zázemí jako výběr, auto-úroveň a strukturované přidávatelné sekce místo volných textarea. Funkčně shodné s JaD 8.7p, ale **zachovává vlastní vzhled** (Arcane Parchment, vínová `--dnd-accent`) i D&D specifikum, které JaD nemá: death-save pipy. (Bloky osobnosti Rysy/Ideály/Pouta/Vady **odebrány na přání uživatele** — jako JaD.)
 
 ## 2. Změny v hlavičce
 
@@ -82,7 +82,7 @@ Legacy klíče zůstanou v DB.
 - Identita (hlavička) → **multipovolání panel (plná šířka)** → 3-sloupcový grid (zachovat stávající dnd rozložení) → **Poznámky (`dnd_play_notes`, plná šířka, úplně dole)**.
 - Sloupec 1: vlastnosti (6), inspirace + zdatnostní bonus, záchranné hody, pasivní smysly (Vnímání/Vhled/Pátrání).
 - Sloupec 2: boj (OČ/Iniciativa/Rychlost), životy, kostky životů + záchrany proti smrti (pipy), útoky.
-- Sloupec 3: rychlý přehled kouzlení (jen caster), osobnost (Rysy/Ideály/Pouta/Vady — **zůstává**), zdatnosti, jazyky, schopnosti.
+- Sloupec 3: rychlý přehled kouzlení (jen caster), zdatnosti, jazyky, schopnosti.
 - Kouzla (tab „Sesílání kouzel") — **beze změny** funkčně; auto-enable dle casterů (§3).
 
 ## 6. Vizuál
@@ -91,14 +91,14 @@ Scope `[data-diary-system='dnd5e']`, paleta beze změny. Nové třídy (theme va
 
 ## 7. Print view
 
-`DndPrintView` aktualizovat: odebrat jméno/hráče; nahradit `classLevel` multipovoláním (Povolání L úr. — obor [/ pakt]); zázemí; auto-úroveň; zdatnosti/jazyky list; schopnosti (název: popis); poznámky. Zachovat osobnost, útoky, kouzla.
+`DndPrintView` aktualizovat: odebrat jméno/hráče; nahradit `classLevel` multipovoláním (Povolání L úr. — obor [/ pakt]); zázemí; auto-úroveň; zdatnosti/jazyky list; schopnosti (název: popis); poznámky. Zachovat útoky, kouzla.
 
 ## 8. Akceptační kritéria (DoD)
 
 1. Hlavička bez jména/hráče/přesvědčení; zázemí = select + vlastní; úroveň = auto badge; rasa/XP zůstávají.
 2. Multipovolání: přidat/smazat řádek, obory dle povolání, zámek oboru pod prahem, auto součet úrovní.
 3. Černokněžník zobrazí 2 selecty (Patron od 1., Pakt od 3. úr); Totemový/Kruh země vypsané jako kombinace.
-4. Zdatnosti/jazyky/schopnosti = přidávatelné; osobnost (Rysy/Ideály/Pouta/Vady) zůstává; poznámky dole.
+4. Zdatnosti/jazyky/schopnosti = přidávatelné; bloky osobnosti odebrány; poznámky dole.
 5. Caster povolání auto-zapne tab kouzel; ruční přepínač má přednost.
 6. Legacy D&D postava se zobrazí bez ztráty dat (migrace read-only), první edit uloží nová pole.
 7. View mode disabluje vše; print view čte stejná data.

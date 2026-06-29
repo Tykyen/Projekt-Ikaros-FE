@@ -710,49 +710,6 @@
   opacity: 0.5;
 }
 
-/* ── Personality ───────────────────────────────────────────── */
-
-[data-diary-system='dnd5e'] .dnd-diary .dnd-personality {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-[data-diary-system='dnd5e'] .dnd-diary .dnd-personality__block {
-  background: var(--dnd-surface);
-  border: 1px solid var(--dnd-border);
-  border-radius: 10px;
-  padding: 10px 12px;
-}
-[data-diary-system='dnd5e'] .dnd-diary .dnd-personality__block label {
-  display: block;
-  font-family: 'Cinzel', serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--dnd-accent);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-}
-[data-diary-system='dnd5e'] .dnd-diary .dnd-personality__block textarea {
-  width: 100%;
-  border: none;
-  background: var(--dnd-surface-alt);
-  border-radius: 6px;
-  padding: 8px;
-  font-size: 0.85rem;
-  color: var(--dnd-text);
-  resize: vertical;
-  outline: none;
-  font-family: 'Inter', sans-serif;
-  line-height: 1.5;
-}
-[data-diary-system='dnd5e']
-  .dnd-diary
-  .dnd-personality__block
-  textarea:focus {
-  box-shadow: inset 0 0 0 1px var(--dnd-gold);
-}
-
 /* ── Proficiencies & Features ──────────────────────────────── */
 
 [data-diary-system='dnd5e'] .dnd-diary .dnd-proficiencies textarea,

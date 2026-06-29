@@ -17,7 +17,6 @@ import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 import {
   ABILITY_KEYS,
   ABILITY_LABELS,
-  DND_PERSONALITY_FIELDS,
   DND_CLASSES,
   DND_CASTERS,
   DND_BACKGROUNDS,
@@ -749,22 +748,6 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 </div>
               )}
 
-              {/* Personality */}
-              <div className="dnd-personality">
-                {DND_PERSONALITY_FIELDS.map((f) => (
-                  <div key={f.key} className="dnd-personality__block">
-                    <label htmlFor={`dnd_${f.key}`}>{f.label}</label>
-                    <textarea
-                      id={`dnd_${f.key}`}
-                      value={g(f.key)}
-                      disabled={disabled}
-                      onChange={(e) => set(f.key, e.target.value)}
-                      rows={f.rows}
-                    />
-                  </div>
-                ))}
-              </div>
-
               {/* Zdatnosti */}
               <div className="dnd-panel">
                 <h3>Zdatnosti (zbroje, zbraně, nástroje)</h3>
@@ -1400,17 +1383,6 @@ function DndPrintView({ cda }: { cda: CdAccess }) {
           </table>
         </>
       )}
-
-      {/* ═══ Osobnost ═══ */}
-      <h2>Osobnost</h2>
-      <dl>
-        {DND_PERSONALITY_FIELDS.map((f) => (
-          <div key={f.key}>
-            <dt>{f.label}</dt>
-            <dd style={{ whiteSpace: 'pre-wrap' }}>{g(f.key) || '—'}</dd>
-          </div>
-        ))}
-      </dl>
 
       {/* ═══ Zdatnosti / jazyky / schopnosti ═══ */}
       {profList.length > 0 && (
