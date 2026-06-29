@@ -97,7 +97,7 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 
 ### Token modal / panel (3 varianty × view módy)
 - **Panel:** `TokenInfoPanel` — boční panel se 3 zobrazovacími módy: `dock` (ukotvený vpravo, resize), `drag` (volně přesouvatelný), `overlay` (vystředěný, force na mobilu). Otevírá se přes „i" badge tokenu (`openedTokenId`); nezávislé na výběru (`selectedTokenId`).
-- **Obsah (3 varianty dle typu tokenu):** `TokenSystemSheet` přepíná layout dle `world.system` (per-system bojové panely: `CocCombatPanel`, `DndCombatPanel`, `Drd2CombatPanel`, `Drd16CombatPanel`, `DrdPlusCombatPanel`, `FateCombatPanel`, `GurpsCombatPanel`, `MatrixCombatPanel`). Systém bez panelu spadne na plný `TokenDiaryTab`. Bestie má `BestiePanelView`. Deník/poznámky se **embedují** (reuse `TokenDiaryTab`/`TokenNotesTab`, ne kopie).
+- **Obsah (3 varianty dle typu tokenu):** `TokenSystemSheet` přepíná layout dle `world.system` (per-system bojové panely: `CocCombatPanel`, `DndCombatPanel`, `Drd2CombatPanel`, `Drd16CombatPanel`, `DrdPlusCombatPanel`, `FateCombatPanel`, `GurpsCombatPanel`, `MatrixCombatPanel`, `PiCombatPanel`). Systém bez panelu spadne na plný `TokenDiaryTab`. Bestie má `BestiePanelView`. Deník/poznámky se **embedují** (reuse `TokenDiaryTab`/`TokenNotesTab`, ne kopie).
 - **View módy přístupu:** PJ vidí/edituje vše; vlastník PC vidí/edituje svůj; ostatní limited. Akce v hlavičce (PJ): „V boji / Mimo boj" (jen NPC/bestie — PC jsou v boji vždy), „Zamknout/Odemknout", „Odstranit z mapy".
 - **Body osudu** badge jen pro systém `matrix`.
 - **Kód:** `components/token-panel/{TokenInfoPanel,TokenSystemSheet,BestiePanelView}.tsx`, `system-panels/*`.
@@ -121,6 +121,16 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Zvláštnosti:** HP/spawn schema-aware přes `combatBehavior:'damageable'` na `mez_zraneni` (`buildBestieToken`); erb = obrázek bestie (`token.characterData.imageUrl`), fallback iniciála. Vyřešilo dluh D-DRDPLUS-WOUND-LINEAR (3 pásma na mapě).
 - **Stav:** ✅ funguje (spec-16.2d-bestie-drdplus §9).
 - **Kód:** FE `system-panels/DrdPlusBestiePanel.tsx`(+`.module.css`), registrace `TokenSystemSheet.tsx`, schéma `schemas/drdplus/token.json`. BE: mirror `assets/schemas/drdplus-token.json` (export-schemas + restart).
+
+### Příběhy Impéria bojový panel (`pi`, hody 4dF)
+- **Co to je:** Kompaktní bojová verze deníku pi na taktické mapě (`PiCombatPanel`) — osekaný Matrix panel. Single source s plným deníkem (tentýž `customData` prefix `pi_` přes `characterSlug`, debounced ~500 ms).
+- **Kde:** token-panel `/takticka-mapa` + světový chat (combat registr 1:1), jen když `world.system === 'pi'`.
+- **Kdo:** PJ edituje vše; vlastník PC svůj; **cizí hráč vidí jen STATY readonly** (zbytek skrytý). Hody jen když panel dostane `onRoll`.
+- **Co jde dělat:** STATY (Životy 0–5 + postih za zranění, Ochrana 0–1) vždy; pro `canEdit`: klik na **schopnost** = hod `4dF + stupeň`, **⚡ Iniciativa** = `4dF + ⌊nabité aspekty/2⌋`, **aspekty** Nabitý/Vybitý toggle.
+- **Hranice / co neumí:** bez únavy / runy / přetlaků / magie (osekáno vs Matrix). Bez skinů (sci-fi default). Bestie na mapě zatím přes generický `BestiePanelView` + `pi` token schéma (žádný dedikovaný pi bestie panel).
+- **Zvláštnosti:** Iniciativa modifier = ⌊nabité aspekty / 2⌋. HP bar tokenu = `pi_health` (max konstanta 5) přes `resolveCharacterHp` case `pi`. Engine 4dF = `onRoll({kind:'fate'})`, payload generický, bez BE.
+- **Stav:** ✅ funguje.
+- **Kód:** FE `system-panels/PiCombatPanel.tsx`(+`.module.css`), registrace `combatPanels.ts`, HP `utils/resolveCharacterHp.ts` (case `pi`), bestie schéma `schemas/pi/{bestie,token}.json` (+`bootstrap.ts`). BE: žádné (customData).
 
 ### HP (per-system, visibility toggle)
 - **Co to je:** HP bar pod tokenem (PixiJS). Architektura per-typ: Bestie = snapshot ze `systemStats`; PC/NPC = z deníkového subdokumentu (`customData` per-system klíč) přes enrich (memory `token_hp_architecture`).

@@ -186,11 +186,35 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 ---
 
+### Příběhy Impéria deník (`pi`) — osekaný Matrix-derivát
+
+**Co to je:** Dedikovaný list systému `pi` (Příběhy Impéria). Přepsán z dřívějšího Fate-like wrapperu (`FateLikeSheet`, viktoriánské brass) na **osekaný derivát Matrixu** — sci-fi cyan HUD sladěný s `MatrixSheet`.
+
+**Kde:** Deník postavy (`DiaryTab`) ve světě s `world.system = 'pi'` (nabídka „Příběhy Impéria"; raw id i alias `pribehy-imperia` → `pi`).
+
+**Kdo:** Vidí člen světa s přístupem k postavě; edituje vlastník PC / PJ+ (gating `DiaryTab`; sheet jen `mode=view|edit`).
+
+**Co jde dělat:**
+- **Hero:** jméno z entity postavy (`character.name`, ne deníkové pole), Stát + Povolání (deníková pole `pi_bornWhere`/`pi_profession`), Body osudu 0–3 (★).
+- **Fyzický stav:** Životy 0–5 + postih za zranění (4–5→0, 2–3→−1, 1→−2, 0→SMRT, dynamický readout) · **Ochrana = jediné políčko** (0–1).
+- **Body schopností:** trojúhelník (úroveň N = 1+2+…+N) + každý aspekt nad 3 = 6 b., progress bar utraceno/strop.
+- **Schopnosti:** pips 1–7 (PC) / 1–10 (NPC) + číslo + **slovní stupeň** (Nováček/Učeň/Tovaryš/Zkušený/Mistr oboru/Veterán/Legenda + 8–10 entity) v tooltipu na hover.
+- **Aspekty:** chip Nabitý/Vybitý (toggle). Poznámky (textarea). Print režim (statický `PiPrintView`).
+
+**Hranice / co neumí:** Oproti Matrixu ZÁMĚRNĚ chybí **jazyky, únava, přetlaky, runa, magie** (genom i 📘 flag). Deník sám **nehází kostkou ani iniciativu** (to combat panel na mapě). Bez skinů — zatím jen default sci-fi (8 skinů přijde se skin workflow). Stará Fate `pi_*` data (jiné klíče) se v novém listu nezobrazí (zůstávají v DB).
+
+**Zvláštnosti:** Data `customData` prefix `pi_*` (delta merge `makeCdAccess`); 0 migrace registrů. Iniciativa (jen v combat panelu) = ⌊nabité aspekty / 2⌋. Schopnost > počtu aspektů → warn „toohigh".
+
+**Stav:** ✅ funguje.
+**Kód:** FE `diary-systems/sheets/pi/PiSheet.tsx`, `pi/constants.ts` (`PI_SKILL_LEVELS`, `piLevelName`), `styles/pi.css`, preset `presets/pi.ts`. BE: žádné (customData pass-through pro dedikované systémy).
+
+---
+
 ### Skin deníku (vizuální „kabát" listu)
 
 **Co to je:** Vizuální styl per-system listu, nezávislý na obsahu/datech. Rodina **8 skinů** (`scifi · fantasy · horror · steampunk · nature · minimal · retro · anime`=MLP); každý vlastní paleta + tvarový jazyk + signature ornament, identita drží napříč systémy.
 
-**Volba:** per **uživatel × svět** (`WorldMembership.diarySkin`); bez volby padá na default systému (`DEFAULT_SKIN_BY_SYSTEM`: matrix→scifi, drd16/drdplus/drd2/jad/drdh→fantasy, coc→horror). User-facing picker `DiarySkinSelector` („🎨 Vzhled") na `DiaryTab` jen pro skinovatelné systémy (do tisku/PDF nejde). Registr `diary-systems/skins/registry.ts`, BE whitelist `update-member.dto.ts` (`@IsIn`, 8 ID).
+**Volba:** per **uživatel × svět** (`WorldMembership.diarySkin`); bez volby padá na default systému (`DEFAULT_SKIN_BY_SYSTEM`: matrix→scifi, **pi→scifi** (osekaný Matrix), drd16/drdplus/drd2/jad/drdh→fantasy, coc→horror). User-facing picker `DiarySkinSelector` („🎨 Vzhled") na `DiaryTab` jen pro skinovatelné systémy (do tisku/PDF nejde). Registr `diary-systems/skins/registry.ts`, BE whitelist `update-member.dto.ts` (`@IsIn`, 8 ID).
 
 **Jak se aplikuje:** `DiarySystemProvider` (deník) i `DiarySkinScope` (embedy: mapa/chat/dice) dají na předka `data-diary-system` + `data-diary-skin`; CSS sady (`styles/diary-skins.css` + `<sys>-skins/<id>.css`) přebíjí přes compound selektor `[data-diary-system][data-diary-skin]` přes tokeny `--mx-*` (HUD) / `--dd-*` (pergamen) / `--dd-embed-*` (embed plochy). Pokrývá: **deník list + bojový/bestie panel na mapě i v chatu (PC/NPC/Bestie stejně) + obal v TM + vyčíslení hodu + log kostek**.
 
