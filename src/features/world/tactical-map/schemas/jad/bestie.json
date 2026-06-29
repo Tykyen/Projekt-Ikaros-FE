@@ -150,7 +150,7 @@
                 "Akrobacie", "Atletika", "Čachry", "Historie", "Klamání",
                 "Lékařství", "Mystika", "Náboženství", "Nenápadnost",
                 "Ovládání zvířat", "Pátrání", "Přesvědčování", "Přežití",
-                "Příroda", "Skrytí", "Vhled", "Vnímání", "Vystupování", "Zastrašování"
+                "Příroda", "Vhled", "Vnímání", "Vystupování", "Zastrašování"
               ],
               "required": true
             },
