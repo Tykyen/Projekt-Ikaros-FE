@@ -14,6 +14,7 @@ import { drd16Schemas } from './drd16';
 import { drdplusSchemas } from './drdplus';
 import { genericSchemas } from './generic';
 import { matrixSchemas } from './matrix';
+import { piSchemas } from './pi';
 import { dnd5eSchemas } from './dnd5e';
 import { jadSchemas } from './jad';
 import { cocSchemas } from './coc';
@@ -45,6 +46,9 @@ export function bootstrapSchemas(): void {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of matrixSchemas) {
+    systemEntitySchemaRegistry.register(schema);
+  }
+  for (const schema of piSchemas) {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of dnd5eSchemas) {

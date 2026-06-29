@@ -9,7 +9,7 @@ vi.mock('@/features/world/export/print', () => ({
   usePrintMode: () => false,
 }));
 vi.mock('@/features/world/pages/api/useCharacter', () => ({
-  useCharacter: () => ({ data: { isNpc: false } }),
+  useCharacter: () => ({ data: { isNpc: false, name: 'Kael Vorr' } }),
 }));
 
 function makeDiary(
@@ -76,6 +76,14 @@ describe('PiSheet (Příběhy Impéria — Matrix derivát)', () => {
         pi_aspects: JSON.stringify([{ label: '', value: 'Vybitý' }]),
       },
     });
+  });
+
+  it('jméno postavy se bere z entity (character.name), ne z pi_name', () => {
+    render(
+      <PiSheet {...commonProps} diary={makeDiary()} mode="view" />,
+    );
+    expect(screen.getByText('Kael Vorr')).toBeInTheDocument();
+    expect(screen.queryByText('Bez jména')).not.toBeInTheDocument();
   });
 
   it('postih za zranění se počítá z životů (2 → −1)', () => {

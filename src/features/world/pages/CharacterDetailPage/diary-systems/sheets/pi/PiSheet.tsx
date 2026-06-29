@@ -43,7 +43,7 @@ export function PiSheet({
 
   return (
     <div className="pi-sheet" data-mode={mode}>
-      <Hero cda={cda} editing={editing} />
+      <Hero cda={cda} editing={editing} characterName={character?.name} />
       <VitalsPanel cda={cda} editing={editing} />
       <BudgetPanel cda={cda} editing={editing} />
       <SkillsPanel cda={cda} editing={editing} isNpc={isNpc} />
@@ -151,9 +151,10 @@ function VitalTrack({
 
 // ── Hero ─────────────────────────────────────────────────
 
-function Hero({ cda, editing }: SubProps) {
+function Hero({ cda, editing, characterName }: SubProps & { characterName?: string }) {
   const { g, set } = cda;
-  const name = g('name');
+  // Jméno je kmenové (entita postavy), ne deníkové — fallback na legacy pi_name.
+  const name = characterName || g('name');
   const initials =
     name
       .split(/\s+/)
