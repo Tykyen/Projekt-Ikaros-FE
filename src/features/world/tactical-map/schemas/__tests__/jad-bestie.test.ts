@@ -28,11 +28,17 @@ describe('jadBestieSchema (8.7r)', () => {
     );
   });
 
-  it('N/Ob/PV jsou čísla, Přesvědčení/Velikost jsou výběr', () => {
+  it('N/Ob/PV jsou čísla, Přesvědčení = výběr, Velikost = text (zapsání)', () => {
     expect(beFields.find((f) => f.key === 'nebezpecnost')?.type).toBe('number');
     expect(beFields.find((f) => f.key === 'pasivni_vnimani')?.type).toBe('number');
     expect(beFields.find((f) => f.key === 'presvedceni')?.type).toBe('enum');
-    expect(beFields.find((f) => f.key === 'velikost')?.type).toBe('enum');
+    expect(beFields.find((f) => f.key === 'velikost')?.type).toBe('string');
+  });
+
+  it('vlastnosti mají computed bonus (floor((skóre-10)/2))', () => {
+    const mod = beFields.find((f) => f.key === 'attributes.str_mod');
+    expect(mod?.type).toBe('computed');
+    expect(mod?.formula).toBe('floor((attributes.str - 10) / 2)');
   });
 
   it('ZH = list (vlastnost + bonus), ZD = list (dovednost + bonus)', () => {
