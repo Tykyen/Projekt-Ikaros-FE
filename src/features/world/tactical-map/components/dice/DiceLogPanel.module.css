@@ -329,25 +329,6 @@
     0 14px 36px -18px #000;
   border-radius: 4px;
 }
-/* SIGNATURE fantasy — filigránové rohové KOVÁNÍ (návrh `.forged::before`, --corner-*
-   SVG 44px stack; zlato e3b94a + perla f7e7a8). Literal hex = skutečná barva
-   (token --corner-* je na .jad-diary, k .panel nedosáhne). */
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='fantasy'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-  background-repeat: no-repeat;
-  background-size: 40px 40px;
-  background-position: 5px 5px, calc(100% - 5px) 5px, 5px calc(100% - 5px), calc(100% - 5px) calc(100% - 5px);
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='.8' opacity='.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 0) scale(-1 1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='.8' opacity='.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(0 44) scale(1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='.8' opacity='.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 44) scale(-1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='.8' opacity='.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
-}
 
 /* scifi — chamfer/neon HUD rám + jemný scanline + glow na totalu */
 [data-diary-system='drd16'][data-diary-skin='scifi'] .panel {
@@ -355,29 +336,6 @@
   border-radius: 0;
   box-shadow: inset 0 0 0 1px var(--sf-line-hot, rgba(52, 227, 255, 0.42)),
     inset 0 0 34px -18px rgba(52, 227, 255, 0.4), 0 8px 30px rgba(0, 0, 0, 0.7);
-}
-[data-diary-system='drd16'][data-diary-skin='scifi'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  clip-path: inherit;
-  background: repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.05) 0 1px, transparent 1px 3px);
-}
-/* tech-bracket TL cyan / BR violet (asymetrický dvoubarevný roh) */
-[data-diary-system='drd16'][data-diary-skin='scifi'] .panel::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 14px;
-  height: 14px;
-  border-top: 2px solid var(--sf-cyan, #34e3ff);
-  border-left: 2px solid var(--sf-cyan, #34e3ff);
-  box-shadow: -1px -1px 8px -1px var(--sf-cyan, #34e3ff);
-  pointer-events: none;
-  z-index: 51;
 }
 [data-diary-system='drd16'][data-diary-skin='scifi'] .totalPositive {
   text-shadow: 0 0 8px rgba(52, 227, 255, 0.5);
@@ -389,32 +347,6 @@
   border-radius: 0;
   box-shadow: inset 0 0 0 1px var(--sf-line-hot, rgba(52, 227, 255, 0.42)),
     inset 0 0 34px -18px rgba(52, 227, 255, 0.4), 0 8px 30px rgba(0, 0, 0, 0.7);
-}
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='scifi'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  clip-path: inherit;
-  background: repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.05) 0 1px, transparent 1px 3px);
-}
-/* SIGNATURE scifi — tech-brackets (návrh `.dicelog::before/::after`): TL cyan +
-   BR violet roh. Dvě L-SVG kotvy v jednom `::after` (TL cyan 34e3ff, BR violet
-   9b6bff) + glow. */
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='scifi'] .panel::after {
-  content: '';
-  position: absolute;
-  inset: 7px;
-  pointer-events: none;
-  z-index: 51;
-  background-repeat: no-repeat;
-  background-size: 15px 15px;
-  background-position: 0 0, 100% 100%;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='none' stroke='%2334e3ff' stroke-width='2'%3E%3Cpath d='M1 14 L1 1 L14 1'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='none' stroke='%239b6bff' stroke-width='2'%3E%3Cpath d='M14 1 L14 14 L1 14'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 6px rgba(52, 227, 255, 0.6)) drop-shadow(0 0 6px rgba(155, 107, 255, 0.5));
 }
 :is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='scifi'] .totalPositive {
   text-shadow: 0 0 8px rgba(52, 227, 255, 0.5);
@@ -428,20 +360,6 @@
     inset 1px 0 0 rgba(231, 205, 143, 0.18), inset -1px 0 0 rgba(0, 0, 0, 0.4),
     0 6px 26px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--st-brass-deep, #6e5224);
 }
-[data-diary-system='drd16'][data-diary-skin='steampunk'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
-  border-radius: inherit;
-  --_nyt: var(--st-rivet, radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%));
-  background-image: var(--_nyt), var(--_nyt), var(--_nyt), var(--_nyt);
-  background-repeat: no-repeat;
-  background-size: 10px 10px;
-  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
-}
 
 /* 16.2e — drd2 steampunk: mosazná deska + nýtová KOLEJNICE (návrh `.dicelog`
    dvojrám brass-shadow/brass-deep + `.dicelog::before` rivet rail) */
@@ -451,39 +369,12 @@
   box-shadow: 0 0 0 1px var(--st-brass-shadow, #473311), 0 0 0 4px var(--st-brass-deep, #6e5224),
     inset 0 1px 0 rgba(231, 205, 143, 0.35), 0 24px 50px -22px #000;
 }
-/* SIGNATURE steampunk — nýtová kolejnice po obvodu (horní + dolní řada mosazných
-   nýtů, 20px rozteč; radial-gradient z návrhu --st-rivet). */
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='steampunk'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 5px;
-  pointer-events: none;
-  z-index: 10;
-  border-radius: 6px;
-  background-image:
-    radial-gradient(circle, var(--st-brass-1, #caa45f) 1.1px, transparent 1.8px),
-    radial-gradient(circle, var(--st-brass-1, #caa45f) 1.1px, transparent 1.8px);
-  background-position: 0 0, 0 100%;
-  background-size: 20px 7px;
-  background-repeat: repeat-x;
-  opacity: 0.42;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
-}
 
 /* horror — stříbrná tracerie (outline) + oxblood vnitřní glow */
 [data-diary-system='drd16'][data-diary-skin='horror'] .panel {
   border-radius: 2px;
   box-shadow: inset 0 0 20px rgba(94, 22, 34, 0.3), inset 0 0 0 1px rgba(90, 84, 96, 0.22),
     0 8px 32px rgba(0, 0, 0, 0.8);
-}
-[data-diary-system='drd16'][data-diary-skin='horror'] .panel::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  pointer-events: none;
-  border: 1px solid rgba(140, 123, 105, 0.28);
-  border-radius: 1px;
-  z-index: 0;
 }
 
 /* 16.2e — drd2 horror: stříbrná tracerie + oxblood vnitřní glow (návrh `.h-card`
@@ -494,46 +385,12 @@
     inset 0 0 0 2px var(--h-silver-deep, #5a5460), inset 0 0 0 3px var(--h-night-0, #100a12),
     inset 0 0 34px rgba(0, 0, 0, 0.6), 0 18px 50px -20px #000;
 }
-/* SIGNATURE horror — kovaná gotická TRACERIE ve 4 rozích (stříbro cfcbd6 +
-   oxblood pecka a2283a; 52px SVG stack z návrhu, 4× rotace). */
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='horror'] .panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 6;
-  background-repeat: no-repeat;
-  background-size: 52px 52px;
-  background-position: 5px 5px, calc(100% - 5px) 5px, 5px calc(100% - 5px), calc(100% - 5px) calc(100% - 5px);
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 57 L2 23 C2 12 12 2 23 2 L57 2' stroke-width='1.5'/%3E%3Cpath d='M8 57 L8 25 C8 16 16 8 25 8 L57 8' stroke-width='.7' opacity='.5'/%3E%3Cpath d='M2 23 C13 23 23 13 23 2' stroke-width='.7' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(58 0) scale(-1 1)'%3E%3Cpath d='M2 57 L2 23 C2 12 12 2 23 2 L57 2' stroke-width='1.5'/%3E%3Cpath d='M8 57 L8 25 C8 16 16 8 25 8 L57 8' stroke-width='.7' opacity='.5'/%3E%3Cpath d='M2 23 C13 23 23 13 23 2' stroke-width='.7' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 58) scale(1 -1)'%3E%3Cpath d='M2 57 L2 23 C2 12 12 2 23 2 L57 2' stroke-width='1.5'/%3E%3Cpath d='M8 57 L8 25 C8 16 16 8 25 8 L57 8' stroke-width='.7' opacity='.5'/%3E%3Cpath d='M2 23 C13 23 23 13 23 2' stroke-width='.7' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(58 58) scale(-1 -1)'%3E%3Cpath d='M2 57 L2 23 C2 12 12 2 23 2 L57 2' stroke-width='1.5'/%3E%3Cpath d='M8 57 L8 25 C8 16 16 8 25 8 L57 8' stroke-width='.7' opacity='.5'/%3E%3Cpath d='M2 23 C13 23 23 13 23 2' stroke-width='.7' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
-  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 6px rgba(200, 196, 207, 0.14));
-  opacity: 0.92;
-}
 
 /* nature — organický rám + letokruhová mechová lišta na vrchu */
 [data-diary-system='drd16'][data-diary-skin='nature'] .panel {
   border-radius: 14px 6px 14px 6px;
   box-shadow: inset 0 0 0 1px rgba(155, 187, 99, 0.3), inset 0 0 18px rgba(0, 0, 0, 0.3),
     0 8px 30px rgba(0, 0, 0, 0.6);
-}
-[data-diary-system='drd16'][data-diary-skin='nature'] .panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent 0%, var(--na-moss-deep, #37501f) 14%,
-    var(--na-moss, #5a7d3a) 38%, var(--na-leaf-vein, #9bbb63) 50%, var(--na-moss, #5a7d3a) 62%,
-    var(--na-moss-deep, #37501f) 86%, transparent 100%);
-  border-radius: 14px 6px 0 0;
-  opacity: 0.85;
-  z-index: 2;
-  pointer-events: none;
 }
 
 /* 16.2e — drd2 nature: asymetrický organický rám + KŮROVÝ dvojrám (návrh `.dicelog`
@@ -543,35 +400,10 @@
   box-shadow: 0 0 0 1px #0c1408, 0 0 0 2px var(--na-bark-edge, #4a6a2e), 0 0 0 5px #14200e,
     inset 0 0 18px rgba(0, 0, 0, 0.3), 0 24px 50px -22px #000;
 }
-/* SIGNATURE nature — letokruhová mechová lišta na vrchu (mech 5a7d3a + žilka 9bbb63). */
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='nature'] .panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent 0%, var(--na-moss-deep, #37501f) 14%,
-    var(--na-moss, #5a7d3a) 38%, var(--na-leaf-vein, #9bbb63) 50%, var(--na-moss, #5a7d3a) 62%,
-    var(--na-moss-deep, #37501f) 86%, transparent 100%);
-  border-radius: 18px 6px 0 0;
-  opacity: 0.85;
-  z-index: 2;
-  pointer-events: none;
-}
 
 /* minimal — dvojitý ledger rám archivní karty + tenké rohové rysky */
 [data-diary-system='drd16'][data-diary-skin='minimal'] .panel {
   border-radius: 2px;
-}
-[data-diary-system='drd16'][data-diary-skin='minimal'] .panel::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  pointer-events: none;
-  border: 1px solid var(--mn-hair, #d7d2c6);
-  border-radius: 1px;
-  z-index: 0;
 }
 [data-diary-system='drd16'][data-diary-skin='minimal'] .title {
   color: var(--mn-acc, #0b6b66);
@@ -581,25 +413,6 @@
    `.dlog::after` inset border + 4 soutiskové značky v rozích). */
 :is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='minimal'] .panel {
   border-radius: 2px;
-}
-/* SIGNATURE minimal — archivní registrační kříže (soutiskové značky 9a7b2e)
-   v rozích inset ledger rámu. */
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='minimal'] .panel::after {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  pointer-events: none;
-  border: 1px solid var(--mn-hair, #c4bfb2);
-  border-radius: 1px;
-  z-index: 6;
-  background-repeat: no-repeat;
-  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
-  background-size: 9px 9px;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E");
 }
 :is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='minimal'] .title {
   color: var(--mn-acc, #9a7b2e);
@@ -611,14 +424,6 @@
   box-shadow: 0 0 0 1px var(--dd-crimson, #ff2e97), 0 0 0 3px var(--dd-forge-1, #0d0420),
     0 0 0 4px var(--dd-sapphire-deep, #0e7c92), 0 0 22px -2px rgba(255, 46, 151, 0.45),
     0 6px 24px rgba(0, 0, 0, 0.9);
-}
-[data-diary-system='drd16'][data-diary-skin='retro'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.32) 2px 3px);
 }
 [data-diary-system='drd16'][data-diary-skin='retro'] .faceNum {
   text-shadow: 0 0 6px rgba(125, 240, 255, 0.6);
@@ -636,32 +441,6 @@
     0 0 0 4px var(--rt-screen-edge, #6f3aa8), 0 0 22px -2px rgba(255, 46, 151, 0.45),
     0 6px 24px rgba(0, 0, 0, 0.9);
 }
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='retro'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.32) 2px 3px);
-}
-/* SIGNATURE retro — neonové rohové sun-grid L (cyan 22d3ee TL/BR, pink ff2e97
-   TR/BL; 18px SVG z návrhu `.root::before`), nad CRT scanline. */
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='retro'] .panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 51;
-  background-repeat: no-repeat;
-  background-size: 18px 18px;
-  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M2 17 L2 2 L17 2'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23ff2e97' stroke-width='2'%3E%3Cpath d='M16 17 L16 2 L1 2'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23ff2e97' stroke-width='2'%3E%3Cpath d='M2 1 L2 16 L17 16'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M16 1 L16 16 L1 16'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 4px rgba(255, 46, 151, 0.5));
-}
 :is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='retro'] .faceNum {
   text-shadow: 0 0 6px rgba(125, 240, 255, 0.6);
 }
@@ -676,18 +455,6 @@
   border-radius: 16px;
   box-shadow: 0 0 0 4px var(--mlp-lavender, #b79ce8), var(--mlp-pillow, 0 6px 0 -1px rgba(170, 140, 210, 0.22)),
     0 12px 26px -8px rgba(143, 108, 196, 0.45);
-}
-[data-diary-system='drd16'][data-diary-skin='anime'] .panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--mlp-rainbow, linear-gradient(100deg, #ffb3d4, #ffc6a8, #ffe9a8, #9fe6c8, #a9d9ff, #b79ce8, #ffb3d4));
-  border-radius: 13px 13px 0 0;
-  z-index: 2;
-  pointer-events: none;
 }
 [data-diary-system='drd16'][data-diary-skin='anime'] .chip {
   background: #ffffff;
@@ -722,18 +489,6 @@
   border-radius: 16px;
   box-shadow: 0 0 0 4px var(--dd-parch-edge, #16162e), 0 6px 0 -1px rgba(22, 22, 46, 0.22),
     0 12px 26px -8px rgba(26, 20, 80, 0.45);
-}
-:is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='anime'] .panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--mlp-rainbow, linear-gradient(100deg, #ff5d6c, #ff9a4d, #ffe14d, #5bd47e, #3ac0ff, #7a6bff, #ff6ad5));
-  border-radius: 13px 13px 0 0;
-  z-index: 2;
-  pointer-events: none;
 }
 :is([data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='drdplus'])[data-diary-skin='anime'] .chip {
   background: #ffffff;
@@ -788,63 +543,15 @@
     0 6px 28px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.5);
   border-radius: 4px;
 }
-[data-diary-system='matrix'][data-diary-skin='steampunk'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
-  border-radius: inherit;
-  --_nyt: radial-gradient(circle at 38% 36%, #f4e0a0 0%, #c9a45e 38%, #7a5a2a 72%, #3a2610 100%);
-  background-image: var(--_nyt), var(--_nyt), var(--_nyt), var(--_nyt);
-  background-repeat: no-repeat;
-  background-size: 10px 10px;
-  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
-}
 /* N4 steampunk — světlejší mosazný sekundární text (jméno/rozpis) na tmavém panelu. */
 [data-diary-system='matrix'][data-diary-skin='steampunk'] .name,
 [data-diary-system='matrix'][data-diary-skin='steampunk'] .breakdown { color: #e0c694; }
-
-/* nature — mechová dřevěná lišta na vrchu */
-[data-diary-system='matrix'][data-diary-skin='nature'] .panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent 0%, #4e6a2c 15%, #7aa840 40%, #9ec85a 50%, #7aa840 60%, #4e6a2c 85%, transparent 100%);
-  border-radius: 12px 12px 0 0;
-  opacity: 0.8;
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* minimal — dvojitý ledger rám archivní karty */
-[data-diary-system='matrix'][data-diary-skin='minimal'] .panel::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  pointer-events: none;
-  border: 1px solid #ddd6c7;
-  border-radius: 1px;
-  z-index: 0;
-}
 
 /* retro — terminálový double-rám + scanlines + jantarové detaily */
 [data-diary-system='matrix'][data-diary-skin='retro'] .panel {
   box-shadow: 0 0 0 1px #4a2e08, 0 0 0 2px #0c0601, 0 0 0 3px #8a5e15, 0 0 0 4px #0c0601,
     0 0 0 5px rgba(255, 178, 39, 0.15), 0 6px 24px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(255, 100, 0, 0.04);
   border-radius: 0;
-}
-[data-diary-system='matrix'][data-diary-skin='retro'] .panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  background: repeating-linear-gradient(0deg, transparent 0, transparent 1.8px, rgba(0, 0, 0, 0.2) 1.8px, rgba(0, 0, 0, 0.2) 2.8px);
 }
 [data-diary-system='matrix'][data-diary-skin='retro'] .faceNum {
   font-size: 1.05rem;

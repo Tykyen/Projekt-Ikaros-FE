@@ -77,11 +77,30 @@ sesterský soubor (`drd16-skins/<id>.css` / `drdplus-skins/<id>.css` / matrix bl
 | E | **Hody** (dice readout) | `DiceRollOverlay.module.css` | tokeny + per-skin signature blok uvnitř |
 | F | **Dicelog** | `DiceLogPanel.module.css` | tokeny + per-skin signature blok uvnitř |
 | G | **Chat** | tytéž panely B/C/E/F užší (bestie = TÝŽ plný panel jako mapa) | dědí automaticky |
+| H | **Orchestrace** (PJ panel) | `MapPjPanel.module.css` | čte `--dd-embed-*` (per-SYSTÉM blok `:is(...) .panel`) |
+| I | **HP bar na TOKENU** na mapě | `resolveCharacterHp.ts` + `TokenSprite`/`TokenHpBar` | NE CSS — JS resolver mapuje `systemId → HP klíče` |
 
 > **Bestie v chatu = TÝŽ panel jako na mapě (povrch C), jen v užším railu** — plný statblok,
 > NE zúžená karta (jen Výdrž+útoky). Skin ho řeší identicky (stejné tokeny i ornament).
 > V mockupu i v implementaci ukazuj chat-bestie jako kopii mapového statbloku, ne osekanou
 > variantu. (Platí i pro PC/NPC combat panel: chat = týž panel jen užší rail.)
+
+> ### ⚠️ ORNAMENT POLICY (rozhodnutí uživatele 2026-06-29) — kde signature TVAR ano/ne
+> - **ANO ornament** (rohy/scanline/nýt/tracerie/…): deník list (A), combat/bestie panel (B/C),
+>   **obal v TM** (D = `TokenInfoPanel`), **dice readout** (E = `DiceRollOverlay`).
+> - **NE ornament — jen barva/font/rám:** **dicelog** (F = `DiceLogPanel`), **orchestrace**
+>   (H = `MapPjPanel`), **chat obal** (railShell chrome). V těch malých funkčních panelech
+>   boční/rohové ornamenty „dělají zle" → drž je čisté, skin nese jen `--dd-embed-*` paletu+font.
+>   (Per-skin `::before`/`::after` v `DiceLogPanel`/`MapPjPanel` byly odstraněny — NEvracej je.)
+
+> ### HP bar na mapě (povrch I) — `resolveCharacterHp.ts`
+> PC/NPC token má `currentHp/maxHp = 0`; HP žije v deníku (`token.characterData.customData`),
+> per-systém pod klíčem **`<prefix>_hpCur` / `<prefix>_hpMax`** (prefix = `makeCdAccess(cd,'<sys>_')`,
+> NE vymyšlený `<sys>_currentHP`!). Nový systém s klasickým HP = přidej `case '<sys>'` čtoucí
+> reálné klíče (+ legacy fallback bez prefixu). **drd2 = jediný v `HP_BAR_DISABLED_SYSTEMS`**
+> (3 zdroje, ne HP). fate/drdplus = `null` (tracker, ne HP) — pokud nemá `current/max`.
+> **Test MUSÍ používat klíče, co se REÁLNĚ ukládají** (grep `save({...})` + `set('hp…')`),
+> ne vymyšlené — jinak zelený test maskuje, že HP bar nejede (CH-2026-06-29).
 
 ---
 
@@ -100,8 +119,23 @@ sesterský soubor (`drd16-skins/<id>.css` / `drdplus-skins/<id>.css` / matrix bl
 /* per-povolání */  --dd-acc-<profese>… (dle systému)
 /* embed plochy */  --dd-embed-surface(OPAQUE!) -border -line -text -muted -title -chip-bg
                   -accent -num-font -title-font -pos -neg -neutral
+/* HP bar fill */   --dd-hpfill-grad  ← combat+bestie panel HP lišta (NE hardcoded JS barva!)
+/* list inline */   --<sys>-hp --<sys>-spell --<sys>-insp  ← #..._hpCur pole / pip Inspirace / rám Kouzel
 ```
 Default (pergamen) = blok `[data-diary-system='<sys>'] { … }` v `diary-skins.css`.
+
+**List sémantické tokeny (`--<sys>-hp/spell/insp`)** — list TSX čte inline `var(--<sys>-hp, var(--<sys>-accent))`
+na poli „Aktuální Životy" (`#<sys>_hpCur`), pip Inspirace, rámu Použitých kouzel. Když je NEdefinuješ,
+spadnou na accent (zlatá/cyan místo červené!). Definuj JEDNOU v base `<sys>.css` `.<sys>-diary` přes
+fallback řetěz na sémantické `--dd-*`:
+```
+--<sys>-hp:    var(--dd-crimson, var(--dd-hp, var(--<sys>-accent)));
+--<sys>-spell: var(--dd-sapphire, var(--dd-spell, var(--dd-mag, var(--<sys>-accent))));
+--<sys>-insp:  var(--dd-gold, var(--<sys>-gold));
+```
+Skin, který nemá crimson/sapphire (scifi=jade, horror=violet), přepíše `--<sys>-hp/spell` na svém scope.
+**HP bar fill** (`.hpBarFill`/`.hpFill` v combat/bestie module) = `var(--dd-hpfill-grad, <crimson grad>)` —
+NIKDY hardcoded `style={{background: hpColor}}` v TSX (inline styl přebíjí skin a build to NEodhalí).
 
 ### 4b. HUD systémy (`--mx-*`)
 ```
@@ -218,17 +252,48 @@ pravidle, jen CSS/SVG, regrese-safe), výstup `styles/<sys>-skins/<id>.css`. 1 a
 8. **Browser render ≠ build** — postcss je striktní, browser odpustí. Vždy `npm run build` sám.
 9. **Per uživatel×svět**, ne globální/per-postava. Sémantické barvy drží význam.
 
+### Pasti z 2026-06-29 (ornament parita embedů + HP na mapě)
+10. **`var(--x)` BEZ fallbacku na neexistující/nedosažitelný token = TICHÉ NIC.** `background-image:
+    var(--corner-tl)` kde `--corner-tl` neexistuje → invalid value → property ignored → ornament
+    se NEVYKRESLÍ, ale **build projde** (validní syntax). VŽDY `var(--x, <konkrétní hodnota>)` nebo
+    inline. Agenti `--*-corner-*` HALUCINUJÍ (tokeny jsou jen v HTML návrhu, NE v repo) — dej inline SVG.
+11. **Tvarové tokeny (`--sf-*`, `--h-*`, `--corner-*`) jsou na `.<sys>-diary` scope** (deníkový
+    kořen) → z EMBEDU (`.panel`/`.readout`, jiná větev DOM) jsou NEDOSAŽITELNÉ. Na embed dej
+    ornament jako **inline** hodnotu, NEBO token definuj na embed-dosažitelný scope
+    (`[data-diary-system][data-diary-skin] .panel { --x: … }`).
+12. **Build = nutná, NE dostatečná podmínka pro grafiku.** `var()` bez fallbacku, inline `style={{}}`
+    hardcode, špatný scope — nic z toho build nezachytí. **Render-verify je POVINNÝ** (i izolovaný
+    harness §6). „Implementoval jsem ornament + build OK" ≠ „uživatel ho vidí".
+13. **Render harness scope MUSÍ kopírovat reálnou DOM hierarchii.** `TokenInfoPanel` = atributy
+    PŘÍMO na `.panel` (compound `.panel[data-diary-system='jad']`). `DiceRollOverlay`/chat rail =
+    atributy na PŘEDKOVI (`DiarySkinScope`), selektor je descendant `[ds][dsk] .readout`. Když dáš
+    atributy na špatný element, ornament se nezobrazí → FALEŠNÝ závěr „nefunguje". Obal markup správně.
+14. **HP na mapě (povrch I):** resolver čte VYMYŠLENÉ klíče = HP bar tiše nejede a **zelený test to
+    maskuje** (test psaný proti stejné fikci). Ověř reálně ukládané klíče (`save({...})` + `makeCdAccess`
+    prefix). Test = reálná data, ne hodnoty z hlavy.
+15. **Inline `style={{}}` v TSX přebíjí skin a je MIMO dosah CSS/token grepu.** HP bar fill byl
+    hardcoded teploměr v JS (`hpColor = pct>50?'#5a7d3a'…`) → token-audit ho nenašel. Při auditu
+    „propisuje se skin?" grepuj i `style={{` / hex literály v TSX, ne jen CSS tokeny.
+16. **Token drift v pojmenování:** stejný koncept pod víc názvy (`--dd-hpbar-fill` mrtvý vs
+    `--dd-hpfill-grad` živý; `--dd-spell` vs `--dd-mag` vs `--dd-sapphire`). Před přidáním tokenu
+    grepni, jestli už neexistuje pod jiným jménem; fallback řetěz `var(--a, var(--b, …))` sjednotí bez přejmenování.
+17. **Fan-out agenti pracují IZOLOVANĚ bez ověřeného kontextu o scope/existenci tokenů** → musí
+    dostat: „tokeny `--corner-*` NEEXISTUJÍ, použij inline" + „embed nedosáhne na `.<sys>-diary` tokeny"
+    + „povinný render-verify s OBALENÝM markupem". Jinak vyrobí tiše-rozbitý kód, co projde buildem.
+
 ---
 
 ## 10. Checklist nového systému (zaškrtávací)
 
 - [ ] Krok 0: přečteno base + playbook + sesterské skiny
 - [ ] Krok 1: combat+bestie panel tokenizovány (regrese-safe), default blok v diary-skins.css
+- [ ] Krok 1b: **HP bar fill** = `--dd-hpfill-grad` (NE hardcoded JS `hpColor`); **list tokeny** `--<sys>-hp/spell/insp` v base `<sys>.css`
 - [ ] Krok 2: build ✓ + default render beze změny
-- [ ] Krok 3: 8× `<sys>-skins/<id>.css` (token+font+ornament) + 8× @import
-- [ ] Krok 4: dicelog+readout per-skin signature
-- [ ] Krok 5: harness render 8 skinů + default + mobil ✓
-- [ ] Krok 6: audit checklist projet, nálezy opraveny
+- [ ] Krok 3: 8× `<sys>-skins/<id>.css` (token+font+ornament listu) + 8× @import
+- [ ] Krok 4: **readout** (E) + **obal v TM** (D) per-skin signature TVAR; **dicelog (F) + orchestrace (H) BEZ ornamentu** — jen barva/font (ornament policy §3)
+- [ ] Krok 4b: **HP bar na mapě** (I) — `case '<sys>'` v `resolveCharacterHp` s REÁLNÝMI klíči + test proti reálným datům
+- [ ] Krok 5: harness render 8 skinů + default + mobil ✓ — **markup OBALEN správně** (compound vs descendant scope, past §9.13); ověř, že ornament je VIDĚT (ne `var()` bez fallbacku, past §9.10)
+- [ ] Krok 6: audit checklist projet (vč. grep `style={{`/hex v TSX, past §9.15), nálezy opraveny
 - [ ] Krok 7: mobil-desktop · funkce · napoveda · build ✓ · commit
 - [ ] Reziduum/dluhy zapsány
 </content>
