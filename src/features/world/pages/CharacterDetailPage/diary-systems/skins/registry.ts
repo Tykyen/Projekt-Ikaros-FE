@@ -65,8 +65,13 @@ export const DEFAULT_SKIN_BY_SYSTEM: Record<string, DiarySkinId> = {
   drd2: 'fantasy',
   jad: 'fantasy',
   dnd5e: 'fantasy',
-  drdh: 'fantasy',
-  coc: 'horror',
+  drdh: 'fantasy', // Dračí hlídka
+  pi: 'scifi', // Příběhy impéria — osekaný derivát Matrixu (sci-fi HUD)
+  coc: 'horror', // Call of Cthulhu
+  gurps: 'scifi',
+  fate: 'scifi',
+  shadowrun: 'scifi',
+  generic: 'minimal', // „vlastní" / custom systém
 };
 
 /**

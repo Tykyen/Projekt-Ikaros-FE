@@ -1,370 +1,733 @@
-/* Příběhy Impéria — Povidíčky Říše (Victorian Literary Brass Theme)
- * 8.7j — přenos z c:/Matrix/Matrix/frontend/src/styles/PiDiary.scss
- * Sdílí strukturu s Fate (.pi-dashboard třídy), jen jiné barvy + serif font.
+/* Příběhy Impéria (pi) deník — „operátorský HUD" (osekaný derivát Matrixu).
+ *
+ * Self-contained: veškerá grafika scoped na [data-diary-system='pi'], vlastní
+ * barvy (NE theme tokeny) — deník se renderuje nad libovolným skinem světa a
+ * musí být čitelný všude.
+ *
+ * `--pi-*` + `--lvl-*` defaulty žijí v `:where(...)` (specificita 0), aby je
+ * pozdější skin sady `[data-diary-skin]` mohly přebít nezávisle na pořadí
+ * načtení CSS. Sci-fi defaulty ve fallbacku → i bez skinu vypadá deník jako HUD.
+ *
+ * Oproti Matrixu ZÁMĚRNĚ chybí: jazyky, přetlaky, runa, únava, magie.
  */
 
-[data-diary-system='pi'] .pi-dashboard {
-  color: #e5e7eb;
-  font-family: 'Merriweather', 'Georgia', serif;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 24px;
-  background: radial-gradient(circle at center, #1e1b18 0%, #12100d 100%);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* ── Sci-fi defaulty (fallback bez aktivního skinu) ────── */
+:where([data-diary-system='pi']) {
+  --pi-bg: linear-gradient(180deg, #0b0b18, #08080f);
+  --pi-panel: #0e0f1e;
+  --pi-text: #d6def0;
+  --pi-muted: #76809a;
+  --pi-dim: #444b63;
+  --pi-accent: #38e0ff;
+  --pi-violet: #a78bfa;
+  --pi-gold: #fbbf24;
+  --pi-danger: #f87171;
+  --pi-line: rgba(255, 255, 255, 0.08);
+  --pi-line-strong: rgba(56, 224, 255, 0.27);
+
+  --pi-font-display: 'Chakra Petch', system-ui, sans-serif;
+  --pi-font-body: 'Chakra Petch', system-ui, sans-serif;
+  --pi-font-num: 'IBM Plex Mono', monospace;
+
+  --pi-sheet-radius: 8px;
+  --pi-sheet-shadow: 0 30px 80px -30px #000, inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --pi-overlay: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, rgba(56, 224, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(56, 224, 255, 0.03) 1px, transparent 1px);
+  --pi-overlay-size: 100% 3px, 28px 28px, 28px 28px;
+  --pi-overlay-opacity: 0.5;
+  --pi-overlay-blend: screen;
+
+  --pi-panel-bg: linear-gradient(180deg, rgba(17, 18, 36, 0.25), rgba(12, 13, 24, 0.25)), #0e0f1e;
+  --pi-panel-border: 1px solid rgba(255, 255, 255, 0.08);
+  --pi-clip: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  --pi-clip-hero: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  --pi-clip-small: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+
+  --pi-title-color: #aeb8d4;
+  --pi-marker-glow: 0 0 10px #38e0ff;
+
+  --pi-hero-bg: radial-gradient(600px 200px at 0% 0%, rgba(167, 139, 250, 0.09), transparent 70%),
+    linear-gradient(180deg, #12132a, #0b0b16);
+  --pi-hero-border: 1px solid rgba(167, 139, 250, 0.2);
+  --pi-name-color: #f0f3ff;
+  --pi-name-glow: 0 0 22px rgba(167, 139, 250, 0.33);
+  --pi-portrait-bg: linear-gradient(135deg, #1a1c38, #0c0d1a);
+  --pi-portrait-border: 1px solid color-mix(in srgb, var(--pi-accent) 33%, transparent);
+  --pi-portrait-shadow: 0 0 24px -8px color-mix(in srgb, var(--pi-accent) 40%, transparent);
+  --pi-portrait-ink: #5b6790;
+  --pi-portrait-scan: repeating-linear-gradient(0deg, rgba(56, 224, 255, 0.06) 0 2px, transparent 2px 4px);
+
+  --pi-row-bg: linear-gradient(90deg, #10111f, #0d0e1a);
+  --pi-pip-glow: 0 0 8px -1px var(--lvlc);
+  --pi-seg-off: #1a1d2e;
+  --pi-seg-radius: 2px;
+  --pi-hp-on: linear-gradient(180deg, #4ade80, #16a34a);
+  --pi-arm-on: linear-gradient(180deg, #a78bfa, #7c3aed);
+  --pi-charged: #86efac;
+  --pi-depleted: #c47c7c;
+  --pi-chip-glow: 0 0 12px -3px rgba(74, 222, 128, 0.6);
+
+  --pi-accent-border: rgba(56, 224, 255, 0.18);
+  --pi-accent-shadow: inset 0 0 0 1px rgba(56, 224, 255, 0.06), 0 0 30px -16px rgba(56, 224, 255, 0.33);
+  --pi-fate-border: rgba(251, 191, 36, 0.33);
+  --pi-fate-bg: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.13), transparent 70%);
+  --pi-fate-lab: #d6b14f;
+  --pi-fate-num: #fde08a;
+  --pi-fate-glow: rgba(251, 191, 36, 0.47);
+  --pi-budget-val: #c5b3ff;
+  --pi-budget-glow: rgba(167, 139, 250, 0.53);
+  --pi-gear-text: #aeb6cf;
+  --pi-gear-bg: #0b0c16;
+  --pi-input-bg: #0a0b16;
+  --pi-input-focus-border: rgba(56, 224, 255, 0.53);
+  --pi-add-color: #7fd9ef;
+  --pi-add-border: rgba(56, 224, 255, 0.33);
+  --pi-add-hover-bg: rgba(56, 224, 255, 0.08);
+
+  --lvl-1: #8a8f9c;
+  --lvl-2: #4ade80;
+  --lvl-3: #38e0ff;
+  --lvl-4: #3b82f6;
+  --lvl-5: #a78bfa;
+  --lvl-6: #ec4899;
+  --lvl-7: #fbbf24;
+  --lvl-8: #ffffff;
+  --lvl-9: #ffffff;
+  --lvl-10: #ffffff;
 }
 
-[data-diary-system='pi'] .pi-dashboard ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-[data-diary-system='pi'] .pi-dashboard ::-webkit-scrollbar-track {
-  background: transparent;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  ::-webkit-scrollbar-thumb {
-  background: rgba(189, 169, 137, 0.3);
-  border-radius: 4px;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  ::-webkit-scrollbar-thumb:hover {
-  background: rgba(189, 169, 137, 0.6);
-}
-
-[data-diary-system='pi'] .pi-dashboard h3 {
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: #bda989;
-  margin: 0 0 20px 0;
-  font-weight: 300;
-  text-transform: uppercase;
-  font-family: 'Inter', sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-[data-diary-system='pi'] .pi-dashboard h3::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid rgba(189, 169, 137, 0.2);
-}
-
-[data-diary-system='pi'] .pi-dashboard input,
-[data-diary-system='pi'] .pi-dashboard textarea {
-  font-family: 'Inter', sans-serif;
-}
-
-/* ── Identity (centered name) ──────────────────────────────── */
-
-[data-diary-system='pi'] .pi-dashboard .pi-identity {
-  text-align: center;
-  margin-bottom: 40px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .pi-identity
-  input.name-input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px dotted rgba(189, 169, 137, 0.4);
-  color: #fff;
-  font-size: 32px;
-  font-family: 'Merriweather', 'Georgia', serif;
-  text-align: center;
-  width: 100%;
-  max-width: 500px;
-  padding: 8px;
-  transition: all 0.3s;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .pi-identity
-  input.name-input:focus {
-  outline: none;
-  border-bottom-color: #bda989;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .pi-identity
-  input.name-input::placeholder {
-  color: rgba(255, 255, 255, 0.1);
-  font-style: italic;
-}
-
-/* ── Grid ──────────────────────────────────────────────────── */
-
-[data-diary-system='pi'] .pi-dashboard .pi-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-@media (max-width: 900px) {
-  [data-diary-system='pi'] .pi-dashboard .pi-grid {
-    grid-template-columns: 1fr;
-  }
-}
-[data-diary-system='pi'] .pi-dashboard .pi-column {
+[data-diary-system='pi'] .pi-sheet {
+  width: min(100%, 940px);
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-}
-
-/* ── Aspects / Goals list ──────────────────────────────────── */
-
-[data-diary-system='pi'] .pi-dashboard .pi-list-block .p-item {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .pi-list-block
-  .p-item
-  input.text-item {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e5e7eb;
-  font-size: 14px;
-  padding: 10px 14px;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .pi-list-block
-  .p-item
-  input.text-item:focus {
-  outline: none;
-  background: rgba(0, 0, 0, 0.4);
-  border-color: rgba(189, 169, 137, 0.5);
-}
-
-[data-diary-system='pi'] .pi-dashboard .pi-list-block .add-btn,
-[data-diary-system='pi'] .pi-dashboard .skills-list + .add-btn {
-  background: transparent;
-  border: none;
-  color: rgba(189, 169, 137, 0.6);
-  cursor: pointer;
-  font-size: 12px;
-  font-family: 'Inter', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 4px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .pi-list-block
-  .add-btn:hover,
-[data-diary-system='pi']
-  .pi-dashboard
-  .skills-list
-  + .add-btn:hover {
-  color: #bda989;
-}
-
-[data-diary-system='pi'] .pi-dashboard .del-btn {
-  background: transparent;
-  border: none;
-  color: rgba(255, 60, 60, 0.5);
-  cursor: pointer;
-  padding: 10px;
-}
-[data-diary-system='pi'] .pi-dashboard .del-btn:hover {
-  color: #ff3c3c;
-}
-
-/* ── Skill row ─────────────────────────────────────────────── */
-
-[data-diary-system='pi'] .pi-dashboard .skills-list .skill-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 4px;
-  padding: 6px 12px;
-  border-left: 2px solid transparent;
-  transition: all 0.2s;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .skills-list
-  .skill-row:focus-within {
-  border-left-color: #bda989;
-  background: rgba(255, 255, 255, 0.04);
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .skills-list
-  .skill-row
-  .s-name {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  outline: none;
-}
-
-/* Skill pips (brass) */
-[data-diary-system='pi'] .pi-dashboard .s-tracker {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-right: 12px;
-}
-[data-diary-system='pi'] .pi-dashboard .s-tracker .pip {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 1px solid rgba(189, 169, 137, 0.5);
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-  padding: 0;
-}
-[data-diary-system='pi'] .pi-dashboard .s-tracker .pip.filled {
-  background: #bda989;
-  box-shadow: 0 0 8px rgba(189, 169, 137, 0.6);
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .s-tracker
-  .pip:hover:not(:disabled) {
-  transform: scale(1.2);
-}
-[data-diary-system='pi'] .pi-dashboard .s-tracker .pip:disabled {
-  cursor: default;
-}
-
-/* ── Conflict track (brass + danger/critical) ────────────── */
-
-[data-diary-system='pi'] .pi-dashboard .conflict-track {
-  display: flex;
-  justify-content: space-between;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  padding: 16px;
+  gap: 16px;
+  padding: clamp(0.85rem, 3vw, 1.25rem);
+  background: var(--pi-bg);
+  border: 1px solid var(--pi-line);
+  border-radius: var(--pi-sheet-radius);
   position: relative;
+  box-shadow: var(--pi-sheet-shadow);
+  color: var(--pi-text);
+  font-family: var(--pi-font-body);
 }
-[data-diary-system='pi'] .pi-dashboard .conflict-track::before {
+[data-diary-system='pi'] .pi-sheet * {
+  box-sizing: border-box;
+}
+[data-diary-system='pi'] .pi-sheet::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 30px;
-  right: 30px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.05);
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: var(--pi-overlay);
+  background-size: var(--pi-overlay-size);
+  mix-blend-mode: var(--pi-overlay-blend);
+  opacity: var(--pi-overlay-opacity);
   z-index: 0;
-  transform: translateY(-50%);
 }
-[data-diary-system='pi'] .pi-dashboard .state-node {
+[data-diary-system='pi'] .pi-sheet > * {
   position: relative;
   z-index: 1;
+}
+
+/* ── Panel (cut-corner HUD) ───────────────────────────── */
+[data-diary-system='pi'] .pi-panel {
+  position: relative;
+  background: var(--pi-panel-bg);
+  border: var(--pi-panel-border);
+  clip-path: var(--pi-clip);
+  padding: 16px 18px;
+}
+[data-diary-system='pi'] .pi-panel--accent {
+  border-color: var(--pi-accent-border);
+  box-shadow: var(--pi-accent-shadow);
+}
+[data-diary-system='pi'] .pi-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font: 700 13px/1 var(--pi-font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pi-title-color);
+}
+[data-diary-system='pi'] .pi-title::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: var(--pi-accent);
+  box-shadow: var(--pi-marker-glow);
+  transform: rotate(45deg);
+}
+[data-diary-system='pi'] .pi-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--pi-line-strong), transparent);
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+[data-diary-system='pi'] .pi-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: stretch;
+  background: var(--pi-hero-bg);
+  border: var(--pi-hero-border);
+  clip-path: var(--pi-clip-hero);
+  padding: 18px 22px;
+}
+[data-diary-system='pi'] .pi-portrait {
+  width: 92px;
+  height: 92px;
+  flex: none;
+  border: var(--pi-portrait-border);
+  border-radius: 4px;
+  background: var(--pi-portrait-bg);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--pi-portrait-shadow);
+}
+[data-diary-system='pi'] .pi-portrait span {
+  font: 700 30px var(--pi-font-display);
+  color: var(--pi-portrait-ink);
+  letter-spacing: 0.05em;
+}
+[data-diary-system='pi'] .pi-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--pi-portrait-scan);
+  pointer-events: none;
+}
+[data-diary-system='pi'] .pi-id {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+[data-diary-system='pi'] .pi-name {
+  margin: 0;
+  font: 700 30px/0.95 var(--pi-font-display);
+  letter-spacing: 0.04em;
+  color: var(--pi-name-color);
+  text-shadow: var(--pi-name-glow);
+}
+[data-diary-system='pi'] .pi-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: 500 13px/1.2 var(--pi-font-num);
+}
+[data-diary-system='pi'] .pi-meta .line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+[data-diary-system='pi'] .pi-meta .k {
+  color: var(--pi-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+[data-diary-system='pi'] .pi-meta .v {
+  color: var(--pi-text);
+}
+[data-diary-system='pi'] .pi-fate {
+  align-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4px;
+  padding: 12px 18px;
+  border: 1px solid var(--pi-fate-border);
+  background: var(--pi-fate-bg);
+  clip-path: var(--pi-clip-small);
+}
+[data-diary-system='pi'] .pi-fate .lab {
+  font: 600 10px var(--pi-font-display);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pi-fate-lab);
+}
+[data-diary-system='pi'] .pi-fate .num {
+  font: 700 34px/1 var(--pi-font-num);
+  color: var(--pi-fate-num);
+  text-shadow: 0 0 18px var(--pi-fate-glow);
+}
+[data-diary-system='pi'] .pi-fate .star {
+  color: var(--pi-gold);
+  font-size: 14px;
+  filter: drop-shadow(0 0 6px var(--pi-fate-glow));
+}
+
+/* ── Vitals (Životy + Ochrana) ────────────────────────── */
+[data-diary-system='pi'] .pi-vit-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+[data-diary-system='pi'] .pi-vit {
+  flex: 1 1 0;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  cursor: pointer;
-  width: 20%;
-  background: transparent;
-  border: none;
+}
+[data-diary-system='pi'] .pi-vit__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+[data-diary-system='pi'] .pi-vit__label {
+  font: 600 11px var(--pi-font-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pi-muted);
+}
+[data-diary-system='pi'] .pi-vit__num {
+  font: 700 18px/1 var(--pi-font-num);
+  color: var(--pi-text);
+}
+[data-diary-system='pi'] .pi-vit__num small {
+  color: var(--pi-dim);
+  font-size: 12px;
+}
+[data-diary-system='pi'] .pi-track {
+  display: flex;
+  gap: 4px;
+}
+[data-diary-system='pi'] .pi-seg {
+  flex: 1;
+  height: 18px;
+  background: var(--pi-seg-off);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--pi-seg-radius);
+}
+[data-diary-system='pi'] .pi-seg.hp.on {
+  background: var(--pi-hp-on);
+  border-color: rgba(74, 222, 128, 0.47);
+}
+[data-diary-system='pi'] .pi-seg.hp.warn {
+  background: var(--pi-warn-seg, linear-gradient(180deg, #fbbf24, #d97706));
+  border-color: var(--pi-warn-seg-b, rgba(251, 191, 36, 0.47));
+}
+[data-diary-system='pi'] .pi-seg.hp.crit {
+  background: var(--pi-crit-seg, linear-gradient(180deg, #f87171, #dc2626));
+  border-color: var(--pi-crit-seg-b, rgba(248, 113, 113, 0.47));
+}
+[data-diary-system='pi'] .pi-seg.arm.on {
+  background: var(--pi-arm-on);
+  border-color: rgba(167, 139, 250, 0.47);
+  box-shadow: 0 0 10px -2px rgba(167, 139, 250, 0.53);
+}
+[data-diary-system='pi'] .pi-status {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font: 600 11px var(--pi-font-num);
+  letter-spacing: 0.06em;
+}
+[data-diary-system='pi'] .pi-status .badge {
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: rgba(74, 222, 128, 0.09);
+  color: #6ee7a0;
+  border: 1px solid rgba(74, 222, 128, 0.27);
+}
+[data-diary-system='pi'] .pi-status .badge.warn {
+  background: var(--pi-warn-badge-bg, rgba(251, 191, 36, 0.09));
+  color: var(--pi-warn-badge-ink, #fcd34d);
+  border-color: var(--pi-warn-badge-b, rgba(251, 191, 36, 0.27));
+}
+[data-diary-system='pi'] .pi-status .badge.crit {
+  background: var(--pi-crit-badge-bg, rgba(248, 113, 113, 0.09));
+  color: var(--pi-crit-badge-ink, #fca5a5);
+  border-color: var(--pi-crit-badge-b, rgba(248, 113, 113, 0.27));
+}
+[data-diary-system='pi'] .pi-status .scale {
+  color: var(--pi-dim);
+}
+[data-diary-system='pi'] .pi-status .scale b {
+  color: var(--pi-muted);
+  font-weight: 600;
+}
+
+/* ── Budget ───────────────────────────────────────────── */
+[data-diary-system='pi'] .pi-budget {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+[data-diary-system='pi'] .pi-budget .blk {
+  flex: 1 1 240px;
+}
+[data-diary-system='pi'] .pi-budget__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+[data-diary-system='pi'] .pi-budget__lab {
+  font: 600 11px var(--pi-font-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pi-muted);
+}
+[data-diary-system='pi'] .pi-budget__val {
+  font: 700 14px var(--pi-font-num);
+  color: var(--pi-budget-val);
+}
+[data-diary-system='pi'] .pi-budget__val.over {
+  color: #fca5a5;
+}
+[data-diary-system='pi'] .pi-budget__bar {
+  height: 10px;
+  background: #15172a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+}
+[data-diary-system='pi'] .pi-budget__fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--pi-violet), var(--pi-accent));
+  box-shadow: 0 0 14px var(--pi-budget-glow);
+}
+[data-diary-system='pi'] .pi-budget__fill.over {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.6);
+}
+[data-diary-system='pi'] .pi-budget__warn {
+  display: block;
+  margin-top: 7px;
+  font: 600 11px var(--pi-font-num);
+  color: #fca5a5;
+  letter-spacing: 0.03em;
+}
+[data-diary-system='pi'] .pi-budget .upd {
+  font: 500 12px var(--pi-font-num);
+  color: var(--pi-muted);
+  white-space: nowrap;
+}
+[data-diary-system='pi'] .pi-budget .upd b {
+  color: var(--pi-text);
+  font-weight: 600;
+}
+
+/* ── Schopnosti ───────────────────────────────────────── */
+[data-diary-system='pi'] .pi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+[data-diary-system='pi'] .pi-skill {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  background: var(--pi-row-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--lvlc, var(--pi-line));
+  border-radius: 2px;
+}
+[data-diary-system='pi'] .pi-skill.toohigh {
+  border-left-color: var(--pi-danger) !important;
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.19);
+}
+[data-diary-system='pi'] .pi-skill__name {
+  font: 500 14px var(--pi-font-body);
+  color: var(--pi-text);
+}
+[data-diary-system='pi'] .pi-pips {
+  display: flex;
+  gap: 3px;
+}
+[data-diary-system='pi'] .pi-pip {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--pi-seg-off);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   padding: 0;
 }
-[data-diary-system='pi'] .pi-dashboard .state-node:disabled {
+[data-diary-system='pi'] .pi-pip.on {
+  background: var(--lvlc);
+  border-color: rgba(255, 255, 255, 0.27);
+  box-shadow: var(--pi-pip-glow);
+}
+[data-diary-system='pi'] .pi-pip.entity.on {
+  animation: pi-pulse 1.4s ease-in-out infinite;
+}
+@keyframes pi-pulse {
+  0%, 100% { box-shadow: 0 0 6px #fff; }
+  50% { box-shadow: 0 0 16px #fff, 0 0 28px #a78bfa; }
+}
+[data-diary-system='pi'] .pi-sheet[data-mode='edit'] .pi-pip {
+  cursor: pointer;
+}
+[data-diary-system='pi'] .pi-sheet[data-mode='edit'] .pi-pip:hover {
+  border-color: rgba(56, 224, 255, 0.6);
+  box-shadow: 0 0 8px -2px rgba(56, 224, 255, 0.6);
+}
+[data-diary-system='pi'] .pi-skill__lvl {
+  font: 700 14px var(--pi-font-num);
+  color: var(--lvlc, var(--pi-muted));
+  min-width: 22px;
+  text-align: right;
+}
+
+/* tooltip stupně — elegantní box (řádek nemá clip-path → bez ořezu) */
+[data-diary-system='pi'] .pi-skill[data-rank]::after {
+  content: attr(data-rank);
+  position: absolute;
+  right: 10px;
+  bottom: calc(100% + 9px);
+  font: 600 12px var(--pi-font-display);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #eaf4ff;
+  background: linear-gradient(180deg, #16203a, #0a0e1c);
+  border: 1px solid var(--pi-accent);
+  border-top: 2px solid var(--pi-accent);
+  border-radius: 5px;
+  padding: 8px 15px;
+  white-space: nowrap;
+  z-index: 30;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px #0008, 0 10px 26px #000c, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.14s, transform 0.14s;
+}
+[data-diary-system='pi'] .pi-skill[data-rank]::before {
+  content: '';
+  position: absolute;
+  right: 28px;
+  bottom: calc(100% + 3px);
+  width: 10px;
+  height: 10px;
+  background: #0c1322;
+  border-right: 1px solid var(--pi-accent);
+  border-bottom: 1px solid var(--pi-accent);
+  transform: rotate(45deg);
+  z-index: 31;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.14s;
+}
+[data-diary-system='pi'] .pi-skill[data-rank]:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-diary-system='pi'] .pi-skill[data-rank]:hover::before {
+  opacity: 1;
+}
+
+/* ── Aspekty ──────────────────────────────────────────── */
+[data-diary-system='pi'] .pi-aspect {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--pi-row-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+[data-diary-system='pi'] .pi-aspect__name {
+  font: 500 13.5px var(--pi-font-body);
+  color: var(--pi-text);
+}
+[data-diary-system='pi'] .pi-chip {
+  font: 700 10px var(--pi-font-num);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+[data-diary-system='pi'] .pi-chip.charged {
+  background: color-mix(in srgb, var(--pi-charged) 14%, transparent);
+  color: var(--pi-charged);
+  border-color: color-mix(in srgb, var(--pi-charged) 40%, transparent);
+  box-shadow: var(--pi-chip-glow);
+}
+[data-diary-system='pi'] .pi-chip.depleted {
+  background: color-mix(in srgb, var(--pi-depleted) 8%, transparent);
+  color: var(--pi-depleted);
+  border-color: color-mix(in srgb, var(--pi-depleted) 25%, transparent);
+}
+
+/* ── Poznámky ─────────────────────────────────────────── */
+[data-diary-system='pi'] .pi-gear {
+  width: 100%;
+  min-height: 160px;
+  font: 400 13.5px/1.6 var(--pi-font-num);
+  color: var(--pi-gear-text);
+  background: var(--pi-gear-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  padding: 14px 16px;
+  resize: vertical;
+  outline: none;
+}
+[data-diary-system='pi'] .pi-gear:focus {
+  border-color: var(--pi-input-focus-border);
+}
+[data-diary-system='pi'] .pi-gear[readonly] {
+  white-space: pre-wrap;
+  resize: none;
   cursor: default;
 }
-[data-diary-system='pi']
-  .pi-dashboard
-  .state-node
-  .node-circle {
+
+/* ── Edit prvky ───────────────────────────────────────── */
+[data-diary-system='pi'] .pi-input {
+  font: 500 13px var(--pi-font-body);
+  color: var(--pi-gear-text);
+  background: var(--pi-input-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  padding: 6px 9px;
+  outline: none;
+}
+[data-diary-system='pi'] .pi-input:focus {
+  border-color: var(--pi-input-focus-border);
+  box-shadow: 0 0 10px -3px var(--pi-input-focus-border);
+}
+[data-diary-system='pi'] .pi-input.name {
+  flex: 1;
+  min-width: 0;
+}
+[data-diary-system='pi'] .pi-num {
+  width: 60px;
+  text-align: center;
+  font-family: var(--pi-font-num);
+  box-sizing: border-box;
+  padding: 6px 4px;
+}
+[data-diary-system='pi'] .hero-in {
+  width: 170px;
+  max-width: 60%;
+}
+[data-diary-system='pi'] .pi-del {
+  cursor: pointer;
   width: 24px;
   height: 24px;
-  border-radius: 50%;
-  background: #111215;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  background: rgba(248, 113, 113, 0.09);
+  color: #fca5a5;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  font: 700 12px var(--pi-font-num);
 }
-[data-diary-system='pi']
-  .pi-dashboard
-  .state-node
-  .node-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  text-align: center;
-  transition: all 0.3s;
+[data-diary-system='pi'] .pi-del:hover {
+  background: rgba(248, 113, 113, 0.19);
 }
-[data-diary-system='pi']
-  .pi-dashboard
-  .state-node.active
-  .node-circle {
-  background: #bda989;
-  border-color: #fff;
-  box-shadow: 0 0 15px rgba(189, 169, 137, 0.4);
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .state-node.active
-  .node-label {
-  color: #fff;
-  font-weight: bold;
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .state-node.active.danger
-  .node-circle {
-  background: #eab308;
-  box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
-}
-[data-diary-system='pi']
-  .pi-dashboard
-  .state-node.active.critical
-  .node-circle {
-  background: #ef4444;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-}
-
-/* ── Notes textarea ────────────────────────────────────────── */
-
-[data-diary-system='pi'] .pi-dashboard .pi-textarea {
+[data-diary-system='pi'] .pi-add {
+  margin-top: 8px;
+  cursor: pointer;
   width: 100%;
-  min-height: 250px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e5e7eb;
-  padding: 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-  line-height: 1.6;
-  resize: vertical;
+  font: 600 12px var(--pi-font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--pi-add-color);
+  border: 1px dashed var(--pi-add-border);
 }
-[data-diary-system='pi'] .pi-dashboard .pi-textarea:focus {
-  outline: none;
-  border-color: rgba(189, 169, 137, 0.4);
-  background: rgba(0, 0, 0, 0.4);
+[data-diary-system='pi'] .pi-add:hover {
+  background: var(--pi-add-hover-bg);
+  border-style: solid;
+}
+[data-diary-system='pi'] .pi-skill.edit,
+[data-diary-system='pi'] .pi-aspect.edit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+[data-diary-system='pi'] .pi-warn {
+  margin-top: 8px;
+  padding: 8px 11px;
+  font: 600 11px/1.4 var(--pi-font-num);
+  color: #fca5a5;
+  background: rgba(248, 113, 113, 0.06);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 3px;
+  letter-spacing: 0.02em;
 }
 
-/* ── Disabled (view) ──────────────────────────────────────── */
+/* ── Print ────────────────────────────────────────────── */
+[data-diary-system='pi'] .pi-print {
+  color: #111;
+  font-family: 'Georgia', serif;
+}
+[data-diary-system='pi'] .pi-print dl {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 24px;
+}
+[data-diary-system='pi'] .pi-print dt {
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #555;
+}
+[data-diary-system='pi'] .pi-print .print-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  padding: 3px 0;
+}
+[data-diary-system='pi'] .pi-print__plain {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-[data-diary-system='pi'] .pi-dashboard input:disabled,
-[data-diary-system='pi'] .pi-dashboard textarea:disabled,
-[data-diary-system='pi'] .pi-dashboard button:disabled {
-  cursor: default;
-  opacity: 0.85;
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 768px) {
+  [data-diary-system='pi'] .pi-hero {
+    grid-template-columns: auto 1fr;
+  }
+  [data-diary-system='pi'] .pi-fate {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+  [data-diary-system='pi'] .pi-vit-group {
+    flex-direction: column;
+  }
+}
+@media (max-width: 480px) {
+  [data-diary-system='pi'] .pi-portrait {
+    width: 64px;
+    height: 64px;
+  }
+  [data-diary-system='pi'] .pi-name {
+    font-size: 24px;
+  }
 }
