@@ -126,9 +126,9 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Co to je:** Kompaktní bojová verze deníku pi na taktické mapě (`PiCombatPanel`) — osekaný Matrix panel. Single source s plným deníkem (tentýž `customData` prefix `pi_` přes `characterSlug`, debounced ~500 ms).
 - **Kde:** token-panel `/takticka-mapa` + světový chat (combat registr 1:1), jen když `world.system === 'pi'`.
 - **Kdo:** PJ edituje vše; vlastník PC svůj; **cizí hráč vidí jen STATY readonly** (zbytek skrytý). Hody jen když panel dostane `onRoll`.
-- **Co jde dělat:** STATY (Životy 0–5 + postih za zranění, Ochrana 0–1) vždy; pro `canEdit`: klik na **schopnost** = hod `4dF + stupeň`, **⚡ Iniciativa** = `4dF + ⌊nabité aspekty/2⌋`, **aspekty** Nabitý/Vybitý toggle.
+- **Co jde dělat:** STATY (Životy 0–5 + postih za zranění, Ochrana 0–1) vždy; pro `canEdit`: klik na **schopnost** = hod `4dF + stupeň`, **⚡ Iniciativa** = čistý `4dF` (PC, bez bonusů), **aspekty** Nabitý/Vybitý toggle.
 - **Hranice / co neumí:** bez únavy / runy / přetlaků / magie (osekáno vs Matrix). Bez skinů (sci-fi default). Bestie na mapě zatím přes generický `BestiePanelView` + `pi` token schéma (žádný dedikovaný pi bestie panel).
-- **Zvláštnosti:** Iniciativa modifier = ⌊nabité aspekty / 2⌋. HP bar tokenu = `pi_health` (max konstanta 5) přes `resolveCharacterHp` case `pi`. Engine 4dF = `onRoll({kind:'fate'})`, payload generický, bez BE.
+- **Zvláštnosti:** Iniciativa PC = hod `4dF` bez modifieru (oproti Matrixu, kde je +⌊nabité aspekty/2⌋). Aspekty Nabitý/Vybitý zůstávají, ale iniciativu neovlivňují. HP bar tokenu = `pi_health` (max konstanta 5) přes `resolveCharacterHp` case `pi`. Engine 4dF = `onRoll({kind:'fate'})`, payload generický, bez BE.
 - **Stav:** ✅ funguje.
 - **Kód:** FE `system-panels/PiCombatPanel.tsx`(+`.module.css`), registrace `combatPanels.ts`, HP `utils/resolveCharacterHp.ts` (case `pi`), bestie schéma `schemas/pi/{bestie,token}.json` (+`bootstrap.ts`). BE: žádné (customData).
 

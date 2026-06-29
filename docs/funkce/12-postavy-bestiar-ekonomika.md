@@ -203,7 +203,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Hranice / co neumí:** Oproti Matrixu ZÁMĚRNĚ chybí **jazyky, únava, přetlaky, runa, magie** (genom i 📘 flag). Deník sám **nehází kostkou ani iniciativu** (to combat panel na mapě). Bez skinů — zatím jen default sci-fi (8 skinů přijde se skin workflow). Stará Fate `pi_*` data (jiné klíče) se v novém listu nezobrazí (zůstávají v DB).
 
-**Zvláštnosti:** Data `customData` prefix `pi_*` (delta merge `makeCdAccess`); 0 migrace registrů. Iniciativa (jen v combat panelu) = ⌊nabité aspekty / 2⌋. Schopnost > počtu aspektů → warn „toohigh".
+**Zvláštnosti:** Data `customData` prefix `pi_*` (delta merge `makeCdAccess`); 0 migrace registrů. Iniciativa PC (jen v combat panelu) = čistý hod `4dF` bez bonusů. Schopnost > počtu aspektů → warn „toohigh".
 
 **Stav:** ✅ funguje.
 **Kód:** FE `diary-systems/sheets/pi/PiSheet.tsx`, `pi/constants.ts` (`PI_SKILL_LEVELS`, `piLevelName`), `styles/pi.css`, preset `presets/pi.ts`. BE: žádné (customData pass-through pro dedikované systémy).

@@ -411,9 +411,9 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Chat (→ 16.1)
   - [x] Skiny (→ 16.2c)
 - **Příběhy Impéria** (`pi`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
-  - [ ] Reálný list (grafika)
-  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
-  - [ ] Bestie (grafika)
+  - [x] Reálný list (grafika)
+  - [x] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [x] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
 - **Dračí Hlídka** (`drdh`) — *stav kódu:* list sheet+testy (`onRoll`); mapa ⚠️ **id drift** `draci-hlidka`≠`drdh` → svět dostane `generic`, deník/panel se NENAPOJÍ (D-NEW-SYS-DIARY-DRIFT, **fix první**)

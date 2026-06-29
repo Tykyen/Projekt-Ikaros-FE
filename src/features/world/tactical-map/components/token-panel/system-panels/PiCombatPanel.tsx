@@ -164,12 +164,9 @@ export function PiCombatPanel({
     return v !== 'vybitý' && v !== 'vybity' && v.toUpperCase() !== 'V';
   };
 
-  // Iniciativa modifier = ⌊nabitých aspektů / 2⌋
-  const chargedAspectsCount = aspects.filter((a) => isAspectCharged(a.value || '')).length;
-  const initiativeModifier = Math.floor(chargedAspectsCount / 2);
-
+  // PI: iniciativa PC = čistý hod 4dF, BEZ bonusů (rozhodnutí uživatele).
   const handleInitiative = (): void => {
-    onRoll?.({ label: 'Iniciativa', modifier: initiativeModifier, kind: 'fate' });
+    onRoll?.({ label: 'Iniciativa', modifier: 0, kind: 'fate' });
   };
   const handleSkillRoll = (ability: PiTagValue): void => {
     const mod = parseInt(ability.value, 10) || 0;
@@ -202,7 +199,7 @@ export function PiCombatPanel({
               type="button"
               className={styles.initBtn}
               onClick={handleInitiative}
-              title={`Iniciativa = 4dF + ⌊nabité aspekty (${chargedAspectsCount}) / 2⌋ = +${initiativeModifier}`}
+              title="Iniciativa = hod 4dF (bez bonusů)"
             >
               ⚡ Iniciativa
             </button>
