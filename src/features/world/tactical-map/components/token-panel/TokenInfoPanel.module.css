@@ -365,7 +365,7 @@
  * Tokenizováno na `--dd-embed-*` (diary-skins.css) → sleduje vybraný drd16 skin
  * barvou i písmem (sladěno s combat/bestie panelem uvnitř). Plocha opaque.
  * Scoped na drd16 → ostatní systémy drží mapový motiv `--map-ui-*`. */
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) {
   background:
     radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--dd-embed-accent) 14%, transparent), transparent 62%),
     var(--dd-embed-surface);
@@ -375,11 +375,11 @@
     -8px 0 32px rgba(0, 0, 0, 0.55),
     0 0 24px color-mix(in srgb, var(--dd-embed-accent) 12%, transparent);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeDock,
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']).modeDock {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .modeDock,
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']).modeDock {
   border-left-color: var(--dd-embed-border);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .header {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .header {
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--dd-embed-accent) 16%, transparent),
@@ -387,50 +387,50 @@
   );
   border-bottom-color: var(--dd-embed-line);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .actionBar {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .actionBar {
   background: color-mix(in srgb, var(--dd-embed-accent) 6%, transparent);
   border-bottom-color: var(--dd-embed-line);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeToggle {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .modeToggle {
   background: var(--dd-embed-surface);
   border-color: color-mix(in srgb, var(--dd-embed-accent) 50%, transparent);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeBtn {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .modeBtn {
   color: var(--dd-embed-muted);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeBtn:hover,
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .modeBtnActive {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .modeBtn:hover,
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .modeBtnActive {
   background: color-mix(in srgb, var(--dd-embed-accent) 28%, transparent);
   color: var(--dd-embed-title);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .closeBtn {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .closeBtn {
   color: var(--dd-embed-muted);
   border-color: var(--dd-embed-line);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .closeBtn:hover {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .closeBtn:hover {
   background: color-mix(in srgb, var(--dd-crimson-hi, #cb4138) 18%, transparent);
   border-color: color-mix(in srgb, var(--dd-crimson-hi, #cb4138) 50%, transparent);
   color: var(--dd-crimson-hi, #cb4138);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .identity {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .identity {
   border-bottom-color: var(--dd-embed-line);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .avatar {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .avatar {
   background: radial-gradient(circle at 40% 30%, var(--dd-parch-0, #f1e6cb), var(--dd-parch-2, #ddca9f));
   border-color: var(--dd-embed-accent);
   box-shadow: 0 0 16px color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .name {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .name {
   color: var(--dd-embed-title);
   font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .resizeHandle:hover {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .resizeHandle:hover {
   background: color-mix(in srgb, var(--dd-embed-accent) 35%, transparent);
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .body {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .body {
   scrollbar-color: color-mix(in srgb, var(--dd-embed-accent) 30%, transparent) transparent;
 }
-.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus']) .body::-webkit-scrollbar-thumb {
+.panel:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e']) .body::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
 }
 
