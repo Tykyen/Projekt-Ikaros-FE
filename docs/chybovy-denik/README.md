@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-040.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-041.**
 
 ## Jak je deník členěný
 
@@ -147,3 +147,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-039](fe.md#ch-039) | fe/css | fleet agentů (ornament parita 5 povrchů) halucinoval neexistující `--corner-*` tokeny → `var()` bez fallbacku se TIŠE nevykreslí, build NEodhalí. Opraveno inline SVG + render-verify (Chrome headless harness). Tvarové tokeny na `.jad-diary` scope nedosáhnou na embed | „implementoval jsem ornament" + build OK, ale uživatel ho nevidí → grep `var(--x)` bez fallbacku, render-verify ne build |
 | [✅ ŘEŠENÍ](fe.md#-řešení--pc-hp-bar-na-mapě-jaddnd5e-se-nezobrazoval-resolver-měl-fikční-klíče--jad-chyběl-zelený-test-potvrzoval-fikci--2026-06-29) | fe | PC HP bar na mapě (JaD+dnd5e) se nezobrazoval: `resolveCharacterHp` měl JaD chybějící + dnd5e fikční klíče (`dnd_maxHP` co nikdo neukládá; reálně `dnd_hpCur/hpMax`). Zelený test potvrzoval fikci → nechytil bug. Fix + reálné klíče + legacy fallback, 20/20 | „test zelený, ale nefunguje" → ověř že testovaná data = reálně ukládaná (grep `save({...})`), ne hodnoty vymyšlené v testu |
 | [✅ ŘEŠENÍ](fe.md#-řešení--příběhy-impéria-pi-přepis-na-osekaný-matrix-derivát-fáze-0-zachytila-alias-drift-past--2026-06-29) | fe | Příběhy Impéria (`pi`) přepis Fate-like→osekaný Matrix-derivát; **fáze 0 zachytila alias `pribehy-imperia→pi`** (nový systém by byl mrtvý duplikát); reuse `pi_` prefix, vlastní `--pi-*` scoped, slovní stupně; 9+45 testů+build | „nový systém X" → nejdřív grep id+aliasů; existující alias = přepiš obsah, ne zakládej nový |
+| [CH-040](fe.md#ch-040--bug-mazání-tokenu-g-jsem-diagnostikoval-naslepo-přes-be-authorizer-reálný-kořen--fe-render-crash-alabeltrim-na-undefined--2026-06-29) | fe | mazání tokenu „G" (cross-system) shodilo CELOU mapu: `BestiePanelView` mapuje `token.abilities`→`{label:a.name}`, jiný snapshot tvar (`name` undefined) → `a.label.trim()` render crash. **Hádal jsem BE authorizer naslepo místo vyžádat konzoli.** Fix robustní mapování+guard | „hodí chybu" bez textu → čtu BE guard a hádám kořen; rodina CH-022/24/25 |

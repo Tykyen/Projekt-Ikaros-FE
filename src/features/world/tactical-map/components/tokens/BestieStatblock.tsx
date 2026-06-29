@@ -152,7 +152,7 @@ export function BestieStatblock({
                       type="button"
                       className={styles.abilityIconBtn}
                       onClick={() => onRollAbility(a)}
-                      disabled={disabled || !a.label.trim()}
+                      disabled={disabled || !(a.label ?? '').trim()}
                       title={`Hodit: ${a.label || '?'} (4dF + ${a.value || 0})`}
                     >
                       🎲

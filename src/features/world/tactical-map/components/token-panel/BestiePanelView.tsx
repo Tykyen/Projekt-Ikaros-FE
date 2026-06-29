@@ -60,12 +60,23 @@ export function BestiePanelView({
   }
 
   const [stats, setStats] = useState<Record<string, unknown>>(baseStats);
-  // Schopnosti instance — z token snapshotu ({name,description}), v UI {label,value}.
+  // Schopnosti instance — z token snapshotu, v UI {label,value}. Token tvar je
+  // {name,description}, ALE cross-system / starší snapshoty drží {label,value} →
+  // čteme robustně oba tvary a coerce na string, ať `undefined` label neshodí
+  // render (BestieStatblock volá `a.label.trim()`). Bez toho spadne celá mapa.
   const [abilities, setAbilities] = useState<AbilityDraft[]>(
-    (token.abilities ?? []).map((a) => ({
-      label: a.name,
-      value: a.description,
-    })),
+    (token.abilities ?? []).map((a) => {
+      const raw = a as {
+        name?: string;
+        description?: string;
+        label?: string;
+        value?: string;
+      };
+      return {
+        label: raw.name ?? raw.label ?? '',
+        value: raw.description ?? raw.value ?? '',
+      };
+    }),
   );
   const [notes, setNotes] = useState<string>(token.notes ?? "");
   const update = useTokenUpdate(sceneId, worldId);
