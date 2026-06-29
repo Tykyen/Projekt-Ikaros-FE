@@ -1,0 +1,208 @@
+/**
+ * Příběhy Impéria (pi) combat panel (taktická mapa), sci-fi HUD sladěný s
+ * PiSheet listem. Kompaktní (úzký token panel). Stavy přes data-atributy.
+ *
+ * Tokenizováno přes `--pi-*` z předka `[data-diary-skin]` (až přijdou pi skiny);
+ * každé `var(--pi-x, <sci-fi>)` má fallback = bez skinu vypadá jako sci-fi HUD.
+ * Sémantické heat barvy (warn/crit) zůstávají hardcoded — nesou stav, ne skin.
+ */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--pi-text, #d6def0);
+  font-family: var(--pi-font-body, 'Chakra Petch', system-ui, sans-serif);
+}
+
+.loading,
+.error {
+  padding: 16px;
+  font: 500 13px var(--pi-font-num, 'IBM Plex Mono', monospace);
+  color: var(--pi-muted, #76809a);
+  text-align: center;
+}
+.error { color: var(--pi-danger, #fca5a5); }
+
+/* ── panel (cut-corner) ── */
+.section {
+  position: relative;
+  background: var(--pi-log-surface, var(--pi-panel, var(--pi-bg, #0e0f1e)));
+  border: var(--pi-panel-border, 1px solid var(--pi-line, rgba(255, 255, 255, 0.08)));
+  clip-path: var(--pi-clip-small, polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px));
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  isolation: isolate;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0;
+  font: 700 11px var(--pi-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pi-title-color, #aeb8d4);
+}
+.title::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--pi-accent, #38e0ff);
+  box-shadow: var(--pi-marker-glow, 0 0 8px #38e0ff);
+  transform: rotate(45deg);
+}
+.title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--pi-line-strong, rgba(56, 224, 255, 0.27)), transparent);
+}
+.initBtn {
+  cursor: pointer;
+  font: 700 9.5px var(--pi-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--pi-violet, #7864ff) 22%, transparent);
+  color: var(--pi-text, #dcebff);
+  border: 1px solid color-mix(in srgb, var(--pi-violet, #7864ff) 55%, transparent);
+}
+.initBtn:hover { background: color-mix(in srgb, var(--pi-violet, #7864ff) 34%, transparent); }
+
+/* ── vitals ── */
+.vit { display: flex; flex-direction: column; gap: 5px; }
+.vitHead { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.vitLab {
+  font: 600 10px var(--pi-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--pi-muted, #76809a);
+}
+.vitNum {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 700 16px/1 var(--pi-font-num, 'IBM Plex Mono', monospace);
+  color: var(--pi-text, #d6def0);
+}
+.vitNum small { color: var(--pi-dim, #444b63); font-size: 11px; }
+.num {
+  width: 46px;
+  text-align: center;
+  font: 700 15px var(--pi-font-num, 'IBM Plex Mono', monospace);
+  background: var(--pi-input-bg, #0a0b16);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  color: var(--pi-text, #e6ecff);
+  padding: 3px;
+  outline: none;
+  box-sizing: border-box;
+}
+.num:focus { border-color: var(--pi-input-focus-border, rgba(56, 224, 255, 0.5)); box-shadow: 0 0 8px -3px var(--pi-input-focus-border, rgba(56, 224, 255, 0.5)); }
+
+.track { display: flex; gap: 3px; }
+.seg {
+  flex: 1;
+  height: 15px;
+  background: var(--pi-seg-off, #1a1d2e);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--pi-seg-radius, 2px);
+}
+.seg[data-on='true'][data-kind='hp'] { background: var(--pi-hp-on, linear-gradient(180deg, #4ade80, #16a34a)); border-color: rgba(74, 222, 128, 0.5); }
+.seg[data-on='true'][data-kind='hp'][data-mod='warn'] { background: var(--pi-warn-seg, linear-gradient(180deg, #fbbf24, #d97706)); }
+.seg[data-on='true'][data-kind='hp'][data-mod='crit'] { background: var(--pi-crit-seg, linear-gradient(180deg, #f87171, #dc2626)); }
+.seg[data-on='true'][data-kind='arm'] { background: var(--pi-arm-on, linear-gradient(180deg, #a78bfa, #7c3aed)); border-color: rgba(167, 139, 250, 0.5); }
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: 600 10px var(--pi-font-num, 'IBM Plex Mono', monospace);
+}
+.badge {
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: rgba(74, 222, 128, 0.1);
+  color: #6ee7a0;
+  border: 1px solid rgba(74, 222, 128, 0.27);
+}
+.badge[data-mod='warn'] { background: rgba(251, 191, 36, 0.1); color: #fcd34d; border-color: rgba(251, 191, 36, 0.27); }
+.badge[data-mod='crit'] { background: rgba(248, 113, 113, 0.1); color: #fca5a5; border-color: rgba(248, 113, 113, 0.27); }
+
+/* ── schopnosti ── */
+.list { display: flex; flex-direction: column; gap: 5px; }
+.skill {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  background: var(--pi-row-bg, linear-gradient(90deg, #10111f, #0d0e1a));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--lvlc, var(--pi-line, #2a2e44));
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: background 0.12s, box-shadow 0.12s;
+}
+.skill:hover:not(:disabled) { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pi-accent, #38e0ff) 25%, transparent); }
+.skill:disabled { cursor: default; }
+.skillName { font: 500 13px var(--pi-font-body, 'Chakra Petch', sans-serif); color: var(--pi-text, #d6def0); }
+.skillRight { display: flex; align-items: center; gap: 7px; }
+.skillLvl { font: 700 12px var(--pi-font-num, 'IBM Plex Mono', monospace); color: var(--lvlc, var(--pi-muted, #9aa4c0)); min-width: 14px; text-align: right; cursor: help; }
+
+.pips { display: flex; gap: 2.5px; }
+.pip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--pi-seg-off, #20233a);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.pip[data-on='true'] {
+  border-color: rgba(255, 255, 255, 0.27);
+  background: var(--lvlc);
+  box-shadow: var(--pi-pip-glow, 0 0 6px -1px var(--lvlc));
+}
+
+/* ── aspekty ── */
+.aspect {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--pi-row-bg, #0d0e1a);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid transparent;
+  border-radius: 2px;
+}
+.aspect[data-charged='true'] { border-left-color: var(--pi-charged, #4ade80); }
+.aspect[data-charged='false'] { border-left-color: var(--pi-depleted, #f87171); }
+.aspectName { font: 500 12.5px var(--pi-font-body, 'Chakra Petch', sans-serif); color: var(--pi-text, #cdd5ea); }
+.chip {
+  cursor: pointer;
+  font: 700 9px var(--pi-font-num, 'IBM Plex Mono', monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+.chip[data-charged='true'] { background: color-mix(in srgb, var(--pi-charged, #4ade80) 12%, transparent); color: var(--pi-charged, #86efac); border-color: color-mix(in srgb, var(--pi-charged, #4ade80) 33%, transparent); box-shadow: var(--pi-chip-glow, 0 0 10px -3px rgba(74, 222, 128, 0.6)); }
+.chip[data-charged='false'] { background: color-mix(in srgb, var(--pi-depleted, #f87171) 8%, transparent); color: var(--pi-depleted, #c47c7c); border-color: color-mix(in srgb, var(--pi-depleted, #f87171) 22%, transparent); }

@@ -13,6 +13,17 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
     expect(resolveCharacterHp('matrix', {})).toEqual({ current: 5, max: 5 });
   });
 
+  it('pi: pi_health z customData, max konstanta 5', () => {
+    expect(resolveCharacterHp('pi', { pi_health: '3' })).toEqual({
+      current: 3,
+      max: 5,
+    });
+  });
+
+  it('pi: chybějící health → default 5 (plné)', () => {
+    expect(resolveCharacterHp('pi', {})).toEqual({ current: 5, max: 5 });
+  });
+
   it('jad: jad_hpCur / jad_hpMax (prefix deníku)', () => {
     expect(
       resolveCharacterHp('jad', { jad_hpCur: '52', jad_hpMax: '71' }),

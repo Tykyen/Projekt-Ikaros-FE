@@ -49,6 +49,11 @@ export function resolveCharacterHp(
       const current = readNum(cd, 'matrix_health', 5);
       return { current, max: 5 };
     }
+    case 'pi': {
+      // Příběhy Impéria — Životy konstanta 5 (PiCombatPanel max={5}), klíč pi_health.
+      const current = readNum(cd, 'pi_health', 5);
+      return { current, max: 5 };
+    }
     case 'jad': {
       // JaD deník ukládá s prefixem `jad_` (makeCdAccess). Fallback na legacy
       // bez prefixu pro starší data.

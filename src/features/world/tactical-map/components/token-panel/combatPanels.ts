@@ -12,6 +12,7 @@ import type { ComponentType } from 'react';
 import type { SystemSheetProps } from '@/features/world/pages/CharacterDetailPage/diary-systems/types';
 import type { MapToken } from '../../types';
 import { MatrixCombatPanel } from './system-panels/MatrixCombatPanel';
+import { PiCombatPanel } from './system-panels/PiCombatPanel';
 import { DndCombatPanel } from './system-panels/DndCombatPanel';
 import { JadCombatPanel } from './system-panels/JadCombatPanel';
 import { CocCombatPanel } from './system-panels/CocCombatPanel';
@@ -34,6 +35,7 @@ export interface CombatPanelProps {
 /** Per-system kompaktní combat panel registry. Klíč = `world.system`. */
 export const COMBAT_PANELS: Record<string, ComponentType<CombatPanelProps>> = {
   matrix: MatrixCombatPanel,
+  pi: PiCombatPanel,
   dnd5e: DndCombatPanel,
   jad: JadCombatPanel,
   coc: CocCombatPanel,
