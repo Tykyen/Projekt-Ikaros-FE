@@ -1,16 +1,21 @@
 /* 8.7r — JaD bestie panel (pergamen, k20). */
 
 .root {
-  --jb-parch: #f3ead7;
-  --jb-box: #f7f0df;
-  --jb-accent: #8a2b22;
-  --jb-border: #cdbb97;
-  --jb-border-soft: #e0d3b4;
-  --jb-ink: #34281c;
-  --jb-ink-soft: #6e5b46;
-  --jb-gold: #9a6b2f;
+  /* 16.2g — TOKENIZOVÁNO (regrese-safe): lokální --jb-* derivují z --dd-*
+   * (předek [data-diary-system='jad'] baseline; skin přebíjí na
+   * [...][data-diary-skin='X']). Fallback = původní literál → bez skinu beze
+   * změny. Mapa i chat sdílí tenhle soubor. */
+  --jb-parch: var(--dd-panel-bg, #f3ead7);
+  --jb-box: var(--dd-card-bg, #f7f0df);
+  --jb-accent: var(--dd-accent, #8a2b22);
+  --jb-border: var(--dd-parch-edge, #cdbb97);
+  --jb-border-soft: var(--dd-rule, #e0d3b4);
+  --jb-ink: var(--dd-ink, #34281c);
+  --jb-ink-soft: var(--dd-ink-soft, #6e5b46);
+  --jb-gold: var(--dd-gold, #9a6b2f);
+  --jb-hpbar-track: var(--dd-hpbar-track, rgba(52, 40, 28, 0.18));
 
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--dd-font-body, 'Inter', system-ui, sans-serif);
   color: var(--jb-ink);
   background: var(--jb-parch);
   padding: 12px;
@@ -30,7 +35,7 @@
 }
 .nameEdit {
   width: 100%;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--jb-accent);
@@ -46,7 +51,7 @@
 }
 .bestieName {
   display: block;
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--jb-accent);
@@ -95,7 +100,7 @@
   flex-wrap: wrap;
 }
 .hpLbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 0.62rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -106,7 +111,7 @@
   flex: 1;
   min-width: 120px;
   height: 18px;
-  background: rgba(52, 40, 28, 0.18);
+  background: var(--jb-hpbar-track);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -123,7 +128,7 @@
   font-weight: 700;
   font-size: 0.8rem;
   color: var(--jb-ink);
-  text-shadow: 0 0 3px rgba(243, 234, 215, 0.8);
+  text-shadow: 0 0 3px var(--dd-hptxt-glow, rgba(243, 234, 215, 0.8));
 }
 .steps {
   display: flex;
@@ -167,7 +172,7 @@
   gap: 5px;
 }
 .secTitle {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -202,12 +207,12 @@
   opacity: 0.9;
 }
 .abilLbl {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 600;
   font-size: 0.72rem;
 }
 .abilMod {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   color: var(--jb-accent);
 }
@@ -239,7 +244,7 @@
   white-space: nowrap;
 }
 .attackBtn {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   color: var(--jb-accent);
 }
@@ -298,7 +303,7 @@
   font-size: 0.82rem;
 }
 .meta dt {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   font-size: 0.68rem;
   text-transform: uppercase;
   color: var(--jb-ink-soft);
@@ -313,7 +318,7 @@
   line-height: 1.4;
 }
 .feat strong {
-  font-family: 'Cinzel', serif;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
   color: var(--jb-ink);
 }
 .spellHead {

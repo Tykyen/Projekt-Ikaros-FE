@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-037.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-038.**
 
 ## Jak je deník členěný
 
@@ -138,3 +138,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--mixed-hod-bez-3d-knihovna-neumí-predetermined-multi-type-readout-ukáže-odznaky--2026-06-28) | fe | mixed → `null` (bez 3D), overlay fallback ukáže všechny kostky odznaky se správnými hodnotami; knihovna neumí `@` multi-type | — (ověřeno čtením parseru) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--87r-krok-1-jad-bestie-schéma-registrováno-bestie--token--2026-06-28) | fe | JaD bestie+token schéma (ZH/ZD list, útoky/kouzla jako PC, combat behaviors) + bootstrap + export; pre-existující drd2-bestie.test sladěn (16.2e); 35 testů | — (krok 2 = statblok+panel) |
 | [✅ ŘEŠENÍ](fe.md#-řešení--87r-krok-2-jad-bestie-panel-mapa--chat-k20-statblok--2026-06-28) | fe | JaD bestie panel mapa+chat (JadBestieCombatActions jádro, k20+fatální+mixed zásah, iniciativa, HP±, edit schema-form); routing 3 soubory; 5 testů | — (vzor Drd2, 0 drift) |
+| [CH-037](fe.md#ch-037) | fe/css | replace_all CSS selektoru spolkl mezeru `) .panel`→`).panel` (potomek→compound) → rozbil base embed blok VŠECH systémů; udělal jsem to 2× po sobě | spolknutá mezera u 2.+ souboru za sebou; embed plochy ztratí barvu napříč systémy |

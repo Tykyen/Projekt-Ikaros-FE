@@ -51,6 +51,18 @@
 @import './drd2-skins/retro.css';
 @import './drd2-skins/anime.css';
 
+/* 16.2g-skiny — JaD skin @importy (fantasy = NOVÝ default jad, má vlastní soubor —
+   na rozdíl od drd2). Scoped `[data-diary-system='jad'][data-diary-skin='X']`.
+   @import nahoře (CSS spec) — viz drdplus poznámka výš. */
+@import './jad-skins/scifi.css';
+@import './jad-skins/fantasy.css';
+@import './jad-skins/horror.css';
+@import './jad-skins/steampunk.css';
+@import './jad-skins/nature.css';
+@import './jad-skins/minimal.css';
+@import './jad-skins/retro.css';
+@import './jad-skins/anime.css';
+
 /* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
    dice readout / orchestrace) ════════════
  * ŽIJÍ ZDE, ne v `drd16.css` — ten je lazy (jen deníková stránka), kdežto embedy
@@ -207,6 +219,31 @@
   --dd-font-head: 'Cinzel', serif;
   --dd-font-body: 'EB Garamond', 'Georgia', serif;
   --dd-font-hand: 'Caveat', cursive;
+}
+
+/* ════════════ 16.2g-skiny — JaD panel baseline (světlý pergamen) ════════════
+ * Combat/bestie panel (hashované module třídy) čtou tyto --dd-* z předka přes
+ * indirekci lokálních --jc-x / --jb-x; skin je přebíjí na
+ * [data-diary-system='jad'][data-diary-skin='X']. Hodnoty = původní literály
+ * panelů → výchozí vzhled beze změny (regrese-safe).
+ * EMBED tokeny (--dd-embed-*) ZÁMĚRNĚ nejsou v baseline — bez skinu padají na
+ * module fallback (= dnešní stav); každý skin (vč. defaultního fantasy) je sám
+ * nastaví. JaD default skin = fantasy (registry DEFAULT_SKIN_BY_SYSTEM).
+ * List `.jad-diary` (jad.css) skiny přebíjejí přímo na vyšší specificitě. */
+[data-diary-system='jad'] {
+  --dd-panel-bg: #f3ead7;
+  --dd-card-bg: #f7f0df;
+  --dd-accent: #8a2b22;
+  --dd-parch-edge: #cdbb97;
+  --dd-rule: #e0d3b4;
+  --dd-ink: #34281c;
+  --dd-ink-soft: #6e5b46;
+  --dd-gold: #9a6b2f;
+  --dd-row-bg: #ede2cf;
+  --dd-hpbar-track: rgba(52, 40, 28, 0.18);
+  --dd-hptxt-glow: rgba(243, 234, 215, 0.8);
+  --dd-font-head: 'Cinzel', serif;
+  --dd-font-body: 'Inter', system-ui, sans-serif;
 }
 
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */

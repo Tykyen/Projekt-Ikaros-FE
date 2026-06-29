@@ -1,0 +1,671 @@
+/* Jeskyně a draci (JaD) — skin „Příroda" 🌿 · DRUIDSKÝ HERBÁŘ / ŽIVÝ LETOPIS.
+ *
+ * Světlý pergamenový list JaD (D&D 5e-like: vlastnosti, dovednosti, multipovolání,
+ * kouzla 0.–9. stupně, hody k20) přepracovaný na lisovaný LÝKOVÝ arch terénního
+ * zápisníku přírodního kouzelníka — ruční krémový papír, inkoust z duběnek, mech,
+ * hlína, pryskyřice. List „roste": rohy organicky asymetrické (okvětní lístek),
+ * žilková (midrib) linka, medová MÍZA / jantar jako akcent.
+ *
+ * Sourodé s drdplus / drd2 / drd16 / matrix skinem „nature" (stejné DNA), přepracované
+ * do listu JaD. NEsdílí ornament s jinými skiny.
+ *
+ * Mechanika: skin = blok [data-diary-system='jad'][data-diary-skin='nature'] na KAŽDÉM
+ * pravidle (specificita 0,2,0 přebije pergamenový default v jad.css).
+ *   (A) lokální tokeny --jad-* na .jad-diary  → substrát listu + sémantika.
+ *   (B) plocha / rám / textura na .jad-diary + ornamenty na globálních .jad-* třídách.
+ *   (C) --dd-* a --dd-embed-* na [ds][dsk]  → combat / bestie panely + obal / dice / log.
+ * Pouze CSS / SVG, žádný JS.
+ *
+ * SIGNATURE (nesdílet):
+ *   - rašící ÚPONEK z dřevěného SUKU (poznámkový panel);
+ *   - LETOKRUHOVÝ terč (řez kmenem) na Úroveň badge a OČ;
+ *   - trojlístkový marker nadpisů (h3 místo ◆);
+ *   - semínkové / kapkové pipy (border-radius 50% / 62% 62% 38% 38%);
+ *   - organické asymetrické rohy + žilková linka.
+ *
+ * Sémantika (drží i v herbářové paletě):
+ *   ŽIVOTY / HP = bobule #a83c2e  ·  KOUZLA / sloty / magie = rosa #3e7d6e  ·
+ *   OBRANA / OČ · nadpisy · kladný hod = mech #5a7d3a  ·  INICIATIVA / bonus = jantar #c98a2e  ·
+ *   fatální úspěch = zlatá · fatální neúspěch / záporný hod = krvavá bobule.
+ *
+ * Typografie: Cormorant Garamond (jména / iniciála / spell-level h4) · Marcellus SC
+ *   (labely / kapitálky) · Spectral (tělo / čísla) · Caveat (rukopis terénního zápisníku).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@500;600;700&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   A) DENÍK LIST — lokální tokeny + plocha + dřevěný rám + lýková textura
+   jad.css definuje tokeny --jad-* přímo na .jad-diary; přebíjíme je zde.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary {
+  /* substrát + sémantika listu (přepis pergamenu) */
+  --jad-accent: #37501f; /* mech-deep — nadpisy, focus, akcentní rámy */
+  --jad-accent-soft: #a83c2e; /* bobule — sub-hint, varovné akcenty */
+  --jad-gold: #c98a2e; /* míza / jantar — bullety, ornamenty */
+  --jad-border: rgba(155, 187, 99, 0.42); /* žilková zeleň */
+  --jad-border-soft: rgba(155, 187, 99, 0.3);
+  --jad-panel-bg: #efe6cb; /* lýko base */
+  --jad-box: #f6f1df; /* lýko světlé */
+  --jad-highlight: #ede2cf;
+  --jad-ink-soft: #5e5736; /* tlumený inkoust */
+
+  /* herbářové barvy pro ornamenty tohoto skinu */
+  --na-bark-0: #2a2014;
+  --na-bark-1: #3c2d1a;
+  --na-bark-edge: #6b4f2e;
+  --na-parch-0: #f6f1df;
+  --na-parch-1: #efe6cb;
+  --na-parch-2: #e4d6b2;
+  --na-parch-edge: #cdbb8e;
+  --na-ink: #33301d;
+  --na-ink-num: #2a2812;
+  --na-ink-faint: #897f57;
+  --na-moss: #5a7d3a;
+  --na-moss-hi: #86ab52;
+  --na-moss-deep: #37501f;
+  --na-leaf-vein: #9bbb63;
+  --na-amber: #c98a2e;
+  --na-amber-hi: #eac066;
+  --na-amber-deep: #7e5418;
+  --na-berry: #a83c2e;
+  --na-berry-hi: #c95a45;
+  --na-berry-deep: #5f1d14;
+  --na-dew: #3e7d6e;
+  --na-dew-hi: #6aaa98;
+  --na-dew-deep: #1c4338;
+  --na-line: rgba(155, 187, 99, 0.42);
+  --na-line-soft: rgba(155, 187, 99, 0.3);
+
+  position: relative;
+  font-family: 'Spectral', Georgia, serif;
+  color: var(--na-ink);
+  /* okvětní asymetrické zaoblení archu */
+  border-radius: 34px 14px 34px 14px;
+  border: 1px solid var(--na-parch-edge);
+  /* lýková plocha: vlákna + foxing + měkké světlo */
+  background:
+    radial-gradient(120% 80% at 16% 6%, rgba(255, 253, 242, 0.6), transparent 52%),
+    radial-gradient(130% 120% at 90% 98%, rgba(120, 98, 52, 0.22), transparent 60%),
+    radial-gradient(40% 30% at 72% 22%, rgba(150, 120, 60, 0.1), transparent 70%),
+    linear-gradient(168deg, var(--na-parch-0), var(--na-parch-1) 56%, var(--na-parch-2));
+  /* dřevěný rám: lýko hrana → dřevo → jantarová nit → tmavé dřevo */
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.35) inset,
+    0 -30px 70px -46px rgba(60, 46, 18, 0.6) inset,
+    0 24px 60px -36px #000,
+    0 0 0 1px var(--na-parch-edge),
+    0 0 0 8px var(--na-bark-1),
+    0 0 0 9px var(--na-amber-deep),
+    0 0 0 12px var(--na-bark-0);
+}
+/* lýková vlákna přes celý arch */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 34px 14px 34px 14px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014 0.16' numOctaves='4' seed='11'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+/* vnitřní rytá žilková linka (deckle) */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border-radius: 26px 10px 26px 10px;
+  border: 1px solid rgba(90, 125, 58, 0.32);
+  box-shadow: 0 0 0 1px rgba(255, 253, 242, 0.4) inset;
+  pointer-events: none;
+  z-index: 0;
+}
+/* obsah nad texturou */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── scrollbar do mechové zeleně ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary ::-webkit-scrollbar-thumb {
+  background: rgba(55, 80, 31, 0.28);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary ::-webkit-scrollbar-thumb:hover {
+  background: rgba(55, 80, 31, 0.5);
+}
+
+/* ── společné inputy / textarea / select — lýková řádka ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary input,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary textarea,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary select {
+  background: rgba(255, 253, 244, 0.6);
+  border: 1px solid var(--na-line);
+  border-radius: 7px 2px 7px 2px;
+  color: var(--na-ink);
+  font-family: 'Spectral', Georgia, serif;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary input:focus,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary textarea:focus,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary select:focus {
+  border-color: var(--na-moss);
+  box-shadow: 0 0 0 2px rgba(90, 125, 58, 0.14);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary input:disabled,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary textarea:disabled,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary select:disabled {
+  background: rgba(228, 214, 178, 0.35);
+  color: var(--na-ink-soft);
+}
+
+/* ── nadpisy h3 — SIGNATURE trojlístkový marker místo ◆ + žilková linka ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary h3 {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.14em;
+  color: var(--na-moss-deep);
+  border-bottom: 1px solid;
+  border-image: linear-gradient(90deg, var(--na-moss), var(--na-leaf-vein) 45%, transparent) 1;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary h3::before {
+  content: '';
+  width: 17px;
+  height: 17px;
+  flex: none;
+  color: transparent;
+  font-size: 0;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 18 18'%3E%3Cpath d='M9 17 V10' stroke='%2337501f' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M9 10 C9 5 5 3 3 4 C3 8 5 10 9 10Z' fill='%237ba450'/%3E%3Cpath d='M9 10 C9 5 13 3 15 4 C15 8 13 10 9 10Z' fill='%235a7d3a'/%3E%3Cpath d='M9 9 C9 4 9 2 9 1 C7 3 7 6 9 9Z' fill='%2386ab52'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+/* ── taby — Cormorant názvy + listový marker + žilková linka ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tabs {
+  border-bottom: 2px solid;
+  border-image: linear-gradient(90deg, var(--na-moss), var(--na-leaf-vein) 50%, transparent) 1;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tabs button {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--na-ink-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tabs button::before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  flex: none;
+  opacity: 0.85;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 18 18'%3E%3Cpath d='M9 17 V10' stroke='%2337501f' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M9 10 C9 5 5 3 3 4 C3 8 5 10 9 10Z' fill='%237ba450'/%3E%3Cpath d='M9 10 C9 5 13 3 15 4 C15 8 13 10 9 10Z' fill='%235a7d3a'/%3E%3Cpath d='M9 9 C9 4 9 2 9 1 C7 3 7 6 9 9Z' fill='%2386ab52'/%3E%3C/svg%3E");
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tabs button.active {
+  color: var(--na-moss-deep);
+  border-bottom-color: var(--na-moss);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tabs button:hover:not(.active) {
+  color: var(--na-moss-deep);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tabs .jad-tab-toggle {
+  font-family: 'Marcellus SC', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--na-moss-deep);
+  background: rgba(90, 125, 58, 0.12);
+  border: 1px solid rgba(90, 125, 58, 0.4);
+  border-radius: 9px 3px 9px 3px;
+  padding: 6px 12px;
+}
+
+/* ── hlavička / identita ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-header {
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.66), rgba(228, 214, 178, 0.4));
+  border: 1px solid var(--na-parch-edge);
+  border-radius: 18px 5px 18px 5px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-field label {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.12em;
+  color: var(--na-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-field input,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-field select {
+  background: rgba(255, 253, 244, 0.55);
+  border: none;
+  border-bottom: 1px solid var(--na-line);
+  border-radius: 0;
+  font-weight: 600;
+}
+
+/* ── SIGNATURE: Úroveň badge = ražený dřevěný LETOKRUH (řez kmenem) ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-level-badge {
+  width: 104px;
+  min-width: 104px;
+  height: 104px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle at 46% 42%,
+      transparent 0 4.4px,
+      rgba(46, 29, 14, 0.7) 4.4px 5.6px,
+      transparent 5.6px 10px,
+      rgba(58, 38, 17, 0.5) 10px 10.5px,
+      transparent 10.5px 13px
+    ),
+    radial-gradient(circle at 46% 42%, #3a2c17, #2a2014 78%, #1c150c);
+  box-shadow:
+    inset 0 2px 6px rgba(246, 218, 138, 0.28),
+    inset 0 -7px 14px rgba(0, 0, 0, 0.5),
+    0 6px 14px -4px #000,
+    0 0 0 2px #1e1408,
+    0 0 0 4px #4a6a2e,
+    0 0 0 6px #1e2c14;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-level-badge .num {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 700;
+  font-size: 2.4rem;
+  line-height: 0.9;
+  color: #f3e6c2;
+  text-shadow: 0 1px 0 #000, 0 0 12px rgba(234, 192, 102, 0.4);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-level-badge .cap {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--na-moss-hi);
+  opacity: 1;
+}
+
+/* ── multipovolání — list jako lisovaný list (organické rohy) ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-prof-row .pcap {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.1em;
+  color: var(--na-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-prof-row .pcol-lvl input {
+  text-align: center;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-prof-row .del-btn {
+  color: var(--na-berry);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-sub-hint {
+  font-family: 'Caveat', cursive;
+  font-style: normal;
+  font-size: 0.95rem;
+  color: var(--na-berry);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-foot-hint {
+  font-family: 'Caveat', cursive;
+  font-style: normal;
+  font-size: 0.95rem;
+  color: var(--na-ink-soft);
+}
+
+/* ── panely = lisovaný list (organický roh + žilková hrana) ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-panel {
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.66), rgba(228, 214, 178, 0.4));
+  border: 1px solid var(--na-parch-edge);
+  border-radius: 18px 5px 18px 5px;
+  box-shadow:
+    0 5px 14px -10px #000,
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
+/* ── vlastnosti (6 boxů) — organické rohy + mechový label ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-stat-box {
+  background: radial-gradient(circle at 50% 25%, rgba(255, 253, 242, 0.9), rgba(228, 214, 178, 0.6));
+  border: 1px solid var(--na-line);
+  border-radius: 12px 3px 12px 3px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-stat-box span.lbl {
+  font-family: 'Marcellus SC', serif;
+  color: var(--na-moss-deep);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-stat-box span.mod {
+  font-family: 'Spectral', Georgia, serif;
+  color: var(--na-moss-deep);
+  font-variant-numeric: tabular-nums;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-stat-box input {
+  font-family: 'Spectral', Georgia, serif;
+  color: var(--na-ink-num);
+}
+
+/* ── osobní profily / záchrany / pasivní — list-row + SIGNATURE semínkové pipy ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-list-row {
+  border-bottom-color: var(--na-line-soft);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-list-row button.prof {
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; /* semínko */
+  border: 1.5px solid rgba(70, 52, 32, 0.5);
+  background: rgba(120, 98, 52, 0.12);
+  color: var(--na-moss-deep);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-list-row button.prof:not(:disabled):hover {
+  border-color: var(--na-moss);
+  background: rgba(90, 125, 58, 0.18);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-list-row span.mod {
+  font-family: 'Spectral', Georgia, serif;
+  color: var(--na-ink-num);
+  font-variant-numeric: tabular-nums;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-list-row span.sub {
+  font-family: 'Marcellus SC', serif;
+  color: var(--na-ink-faint);
+}
+
+/* ── top-meta: Iniciativa (jantar) · OČ (mech letokruh) · Rychlost ──
+   Pořadí v markupu: 1=Iniciativa, 2=Obranné číslo, 3=Rychlost. */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box {
+  border: 1.5px solid var(--na-moss);
+  border-radius: 16px 4px 16px 4px;
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.7), rgba(90, 125, 58, 0.1));
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box label {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.1em;
+  color: var(--na-moss-deep);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box span.val,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box input {
+  font-family: 'Spectral', Georgia, serif;
+  color: var(--na-ink-num);
+  font-variant-numeric: tabular-nums;
+}
+/* Iniciativa = jantar (svižná energie) */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box:first-child {
+  border-color: var(--na-amber);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box:first-child label,
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box:first-child span.val {
+  color: var(--na-amber-deep);
+}
+/* OČ (2. box) = SIGNATURE letokruhový terč (mech, klidná obrana) */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box:nth-child(2) {
+  position: relative;
+  border-color: var(--na-moss);
+  background:
+    radial-gradient(circle at 50% 78%, rgba(90, 125, 58, 0.22) 0 18px, transparent 19px),
+    radial-gradient(circle at 50% 78%, transparent 0 22px, rgba(155, 187, 99, 0.18) 22px 23px, transparent 24px),
+    linear-gradient(180deg, rgba(255, 253, 244, 0.7), rgba(90, 125, 58, 0.12));
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box:nth-child(2) label {
+  color: var(--na-moss-deep);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-meta-box:nth-child(2) input {
+  color: var(--na-moss-deep);
+  font-weight: 800;
+}
+
+/* ── HP panel — SIGNATURE bobulová míza (rám + aktuální Životy = bobule) ──
+   Aktuální Životy input má inline color/borderColor=var(--jad-accent) → přebij na bobuli
+   (mech accent listu by HP zezelenal; HP musí zůstat červené). */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-hp-panel {
+  border: 2px solid var(--na-berry);
+  border-radius: 18px 5px 18px 5px;
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.62), rgba(168, 60, 46, 0.07));
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-hp-panel .hp-box label {
+  font-family: 'Marcellus SC', serif;
+  color: var(--na-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-hp-panel .hp-box input {
+  font-family: 'Spectral', Georgia, serif;
+  font-variant-numeric: tabular-nums;
+  background: rgba(255, 253, 244, 0.65);
+  border-color: var(--na-line);
+  border-radius: 10px 3px 10px 3px;
+}
+/* aktuální Životy (BV) = bobulové číslo + rám — přebij inline mech accent */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-hp-panel #jad_hpCur {
+  color: var(--na-berry) !important;
+  border-color: var(--na-berry) !important;
+  background: rgba(168, 60, 46, 0.06);
+}
+
+/* ── tabulky (zbraně / kouzla) — Marcellus hlavičky + tečkovaná žilka ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-table th {
+  font-family: 'Marcellus SC', serif;
+  color: var(--na-ink-faint);
+  border-bottom: 1.5px solid var(--na-moss);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-table td {
+  border-bottom: 1px dotted var(--na-line);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-table .del-btn {
+  color: var(--na-berry);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-table .del-btn:hover {
+  color: var(--na-berry-deep);
+}
+
+/* ── přidávací odkaz = dashed listový roh ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .add-link {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.08em;
+  color: var(--na-moss-deep);
+  border: 1px dashed var(--na-moss);
+  border-radius: 9px 3px 9px 3px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .add-link:hover {
+  background: rgba(90, 125, 58, 0.12);
+}
+
+/* ── tag rows (zdatnosti / jazyky) — jantarový bullet ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tag-row {
+  border-bottom: 1px dotted var(--na-line);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tag-row .bullet {
+  color: var(--na-moss);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-tag-row .del-btn {
+  color: var(--na-berry);
+}
+
+/* ── schopnosti (karty) — Cormorant název + organický roh ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-feat {
+  background: rgba(255, 253, 244, 0.4);
+  border: 1px solid var(--na-parch-edge);
+  border-radius: 13px 4px 13px 4px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-feat-head input {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  color: var(--na-moss-deep);
+  border-bottom-color: var(--na-line);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-feat-head .del-btn {
+  color: var(--na-berry);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-feat textarea {
+  color: var(--na-ink-soft);
+}
+
+/* ── SIGNATURE: Poznámky = panel se SUKEM + rašícím úponkem (levý horní roh) ── */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-notes-full {
+  position: relative;
+  overflow: visible;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-notes-full::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: -12px;
+  width: 76px;
+  height: 94px;
+  pointer-events: none;
+  z-index: 2;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='94' viewBox='0 0 78 96' fill='none'%3E%3Cellipse cx='14' cy='15' rx='11' ry='10' fill='%23523c22' stroke='%232a2014' stroke-width='1.4'/%3E%3Cellipse cx='14' cy='15' rx='6.5' ry='5.6' fill='none' stroke='%236b4f2e' stroke-width='1.1'/%3E%3Cellipse cx='14' cy='15' rx='2.6' ry='2.2' fill='%236b4f2e'/%3E%3Cpath d='M16 23 C20 36 14 46 22 58 C28 67 24 78 32 88' stroke='%2337501f' stroke-width='4' stroke-linecap='round' fill='none' opacity='0.55'/%3E%3Cpath d='M16 23 C20 36 14 46 22 58 C28 67 24 78 32 88' stroke='%237ba450' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M18 40 C30 38 40 44 47 54 C35 58 22 54 18 42Z' fill='%2386ab52' stroke='%23537a30' stroke-width='1'/%3E%3Cpath d='M20 62 C9 60 2 50 0 42 C12 41 24 47 24 60Z' fill='%235a7d3a' stroke='%2337501f' stroke-width='1'/%3E%3Cpath d='M27 78 C39 76 49 82 55 91 C44 95 30 92 26 80Z' fill='%237ba450' stroke='%23537a30' stroke-width='1'/%3E%3Cpath d='M22 47 L43 53 M28 45 L40 56' stroke='%23dcf09a' stroke-width='0.9' opacity='0.8'/%3E%3Cpath d='M16 50 L4 44 M16 54 L8 49' stroke='%23cfe89a' stroke-width='0.9' opacity='0.7'/%3E%3Cpath d='M27 78 C39 76 49 82 55 91 C44 95 30 92 26 80Z' opacity='0'/%3E%3Ccircle cx='32' cy='88' r='3' fill='%23eac066'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 2px 3px rgba(20, 30, 10, 0.4));
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-notes-full h3 {
+  padding-left: 36px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-notes-full textarea {
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;
+  line-height: 28px;
+  color: var(--na-ink-soft);
+  background:
+    repeating-linear-gradient(transparent 0 27px, rgba(90, 125, 58, 0.16) 27px 28px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KOUZLA tab — rosa modrozeleň (magie), spell-level rosný rám
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .spell-header {
+  background: linear-gradient(180deg, rgba(62, 125, 110, 0.1), rgba(255, 253, 244, 0.4));
+  border: 1px solid var(--na-dew);
+  border-radius: 16px 4px 16px 4px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .spell-header div label {
+  font-family: 'Marcellus SC', serif;
+  color: var(--na-dew-deep);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .spell-level {
+  background: rgba(255, 253, 244, 0.4);
+  border: 1px solid var(--na-parch-edge);
+  border-radius: 16px 4px 16px 4px;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .sl-title {
+  border-bottom: 2px solid;
+  border-image: linear-gradient(90deg, var(--na-dew), transparent) 1;
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .sl-title h4 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  color: var(--na-dew-deep);
+}
+/* Pozice (spell sloty) = rosný input */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .sl-title input {
+  border-color: var(--na-dew);
+  color: var(--na-dew-deep);
+}
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .sl-title input:focus {
+  border-color: var(--na-dew);
+  box-shadow: 0 0 0 2px rgba(62, 125, 110, 0.18);
+}
+/* Připraveno / V kouzelníkovi checkboxy = rosné */
+[data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-spells .jad-table input[type='checkbox'] {
+  accent-color: var(--na-dew);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   B) PANELY na mapě + chatu (combat + bestie) — --dd-* token override.
+   [ds][dsk] BEZ .jad-diary → hashované panely zdědí tokeny z předka.
+   Mapa i chat sdílí TYTÉŽ panely → reskin JEDNÍM tahem.
+   + EMBEDY (obal v TM / dice readout / dicelog) — VŽDY NEPRŮHLEDNÉ.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='nature'] {
+  /* ── base paleta — panel = lýkový arch ── */
+  --dd-parch-1: #efe6cb;
+  --dd-parch-2: #e4d6b2;
+  --dd-parch-edge: #cdbb8e;
+  --dd-ink: #33301d;
+  --dd-ink-soft: #5e5736;
+  --dd-ink-hand: #3a2410;
+  --dd-rule: rgba(155, 187, 99, 0.42);
+
+  /* ── sémantika rolí (drží) ── */
+  --dd-accent: #5a7d3a; /* mech — tituly, OČ, accent rámy, kladný */
+  --dd-gold: #c98a2e; /* jantar — iniciativa, zdatnostní bonus, sekundární */
+  --dd-hp: #a83c2e; /* Životy / HP = bobule */
+  --dd-spell: #3e7d6e; /* kouzla / magie = rosa */
+  --dd-seal: #37501f; /* pečeť = mech-deep */
+
+  /* ── border odstíny ── */
+  --dd-accent-bd: #37501f;
+  --dd-gold-bd: #7e5418;
+  --dd-hp-bd: #5f1d14;
+  --dd-spell-bd: #1c4338;
+
+  /* ── inky textů na akcentech ── */
+  --dd-seal-ink: #f0ead4;
+  --dd-gold-ink: #2a1d08;
+  --dd-accent-ink: #0e150a;
+
+  /* ── gradienty ── */
+  --dd-accent-grad: radial-gradient(circle at 35% 30%, #6a8a3e, #37501f); /* OČ / mech kroky */
+  --dd-gold-grad: linear-gradient(180deg, #eac066, #7e5418); /* iniciativa / zdatnost */
+  --dd-gold-grad-strong: linear-gradient(180deg, #eac066, #c98a2e 60%, #7e5418);
+  --dd-hpbar-track: #16210c; /* kolejnice HP lišty (tmavá kůra) */
+  --dd-hpfill-grad: linear-gradient(90deg, #a83c2e, #c95a45); /* HP proužek = bobule */
+  --dd-hptxt-glow: 0 0 6px rgba(201, 90, 69, 0.35); /* ztlumený glow na tmavém */
+
+  /* ── POVRCHY panelu (nutné — jinak panel zůstane pergamen) ── */
+  --dd-panel-bg:
+    radial-gradient(120% 90% at 18% 8%, rgba(255, 253, 244, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 88% 96%, rgba(120, 98, 52, 0.28), transparent 60%),
+    linear-gradient(165deg, #f6f1df, #efe6cb 55%, #e4d6b2);
+  --dd-card-bg: linear-gradient(90deg, rgba(255, 253, 244, 0.5), rgba(228, 214, 178, 0.22));
+  --dd-row-bg: linear-gradient(180deg, rgba(255, 253, 244, 0.88), rgba(228, 214, 178, 0.55));
+  --dd-input-bg: #fffdf4;
+  --dd-seal-soft: rgba(90, 125, 58, 0.12);
+  --dd-seal-line: rgba(90, 125, 58, 0.45);
+
+  /* ── fonty ── */
+  --dd-font-head: 'Marcellus SC', serif;
+  --dd-font-body: 'Spectral', Georgia, serif;
+  --dd-font-hand: 'Caveat', cursive;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     EMBEDY (obal v TM / dice readout / dicelog) — tmavá kůra, světlý mechový
+     text, VŽDY NEPRŮHLEDNÉ. pos = mech (kladný), neg = bobule (záporný),
+     neutral = jantar; fatál: úspěch = jantar, neúspěch = bobule.
+     ════════════════════════════════════════════════════════════════════════ */
+  --dd-forge-1: #2a2014; /* fallback pod readout (tmavá kůra) */
+  --dd-ink-deep: #26280f;
+  --dd-embed-surface: linear-gradient(180deg, #3c2d1a, #2a2014 58%, #1f170d); /* opaque kůra */
+  --dd-embed-border: #7e5418;
+  --dd-embed-line: rgba(201, 138, 46, 0.32);
+  --dd-embed-text: #e8dcc2;
+  --dd-embed-muted: #ab9d80;
+  --dd-embed-title: #86ab52; /* mechový titulek */
+  --dd-embed-chip-bg: rgba(134, 171, 82, 0.16);
+  --dd-embed-accent: #c98a2e; /* míza */
+  --dd-embed-num-font: 'Spectral', Georgia, serif;
+  --dd-embed-title-font: 'Marcellus SC', serif;
+  --dd-embed-pos: #86ab52; /* kladný hod = mech zeleň (úspěch / růst) */
+  --dd-embed-neg: #c95a45; /* záporný hod = bobule červeň */
+  --dd-embed-neutral: #eac066; /* neutrál = jantar */
+  --dd-embed-hp: #c95a45; /* HP číslo v embedu = bobule */
+  --dd-embed-spell: #6aaa98; /* kouzla / magie chip = rosa */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   C) RESPONSIVE — dotykové plochy a organické rohy na úzkém archu.
+   jad.css už řeší 1-sloupcový grid (1100) a meta/HP zmáčknutí (560);
+   zde jen zjemnění rámu a badge na mobilu.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  [data-diary-system='jad'][data-diary-skin='nature'] .jad-diary {
+    border-radius: 22px 10px 22px 10px;
+  }
+  [data-diary-system='jad'][data-diary-skin='nature'] .jad-diary::before {
+    border-radius: 16px 7px 16px 7px;
+  }
+  [data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-level-badge {
+    width: 88px;
+    min-width: 88px;
+    height: 88px;
+  }
+  [data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-level-badge .num {
+    font-size: 2rem;
+  }
+  [data-diary-system='jad'][data-diary-skin='nature'] .jad-diary .jad-notes-full::before {
+    width: 60px;
+    height: 74px;
+    left: -6px;
+    top: -8px;
+  }
+}

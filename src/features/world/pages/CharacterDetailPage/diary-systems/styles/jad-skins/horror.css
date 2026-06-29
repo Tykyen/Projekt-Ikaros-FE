@@ -1,0 +1,595 @@
+/* Jeskyně a draci (JaD) — skin „HOROR" (Půlnoční salon) · 8.7q-jad.
+ *
+ * Reskin pergamenového deníku JaD (`.jad-diary` list + lokální tokeny
+ * `--jad-*`) a jeho mapových/chatových povrchů (combat/bestie panel přes
+ * `--dd-*`, embedy přes `--dd-embed-*`) do aristokratické viktoriánské
+ * upířiny. Scoped na `[data-diary-system='jad'][data-diary-skin='horror']`
+ * (specificita 0,2,0) → přebije baseline `[data-diary-system='jad']` (0,1,0)
+ * i jad.css `.jad-diary` overrides; embedy/panely dědí tokeny z wrapperu.
+ *
+ * Koncept (NE gore, elegance): deník = rodinný kodex prastarého šlechtického
+ * rodu, psaný za půlnoci v zšeřelém salonu. Pergamen se NEpřebarvuje na černo —
+ * mění se v „damaškový salonní list za půlnoci": studeně šedo-fialový brokát
+ * (ne žlutý), stříbrný vícevrstvý rám, oxblood (granátový) akcent. Embed plochy
+ * (panel mapy, obal, dice, log, chat, bestie) zůstávají TMAVÉ dle DNA rodiny →
+ * kontrast „světlý list × tmavý salon" je záměrný a drží napříč systémy.
+ *
+ * Paleta: zašlé stříbro #c8c4cf (kov/neutrál/OBRANA OČ) · oxblood #7a2030
+ * (Životy HP/nebezpečí/pipa/fatální neúspěch) · studená fialová #6a5170
+ * (Kouzla/pozice/SO/éterické) · zašlé staré zlato #b59a5a (Fatální úspěch/
+ * Inspirace/Legendární akce). Sémantika hodů drží význam (ZTLUMENO, žádný neon):
+ * kladný zelený #8fbf7a, záporný tlumený oxblood #d87a86, neutrál stříbro.
+ *
+ * Fonty (rodina): UnifrakturCook (blackletter H1/iniciály/pečeť), Cormorant SC
+ * (kapitálky nadpisů/eyebrow/štítky/labely), Cormorant Garamond (serif jména/
+ * tělo/čísla/modifikátory — nahrazuje Inter/Cinzel), EB Garamond (drobné tělo).
+ *
+ * Tvarový jazyk (vlastní): ostré gotické rohy, stříbrný vícevrstvý rám salonu.
+ * Signature ornament (UNIKÁTNÍ, nesdílet): (1) kovaná gotická STŘÍBRNÁ tracerie
+ * ve 4 VNĚJŠÍCH rozích listu (mříž katedrálního okna / brána sídla, oxblood
+ * pip), (2) stříbrná erbovní PEČEŤ (růže + netopýří křídla) u identity listu.
+ * Sekundární marker = stříbrná lilie u nadpisů (h3::before nahradí ◆), ❦ v
+ * dělící lince hlavičky.
+ *
+ * Tracerie jen ve VNĚJŠÍCH rozích listu (offset, daleko od textu) — poučení
+ * z drd16 horror, kde rohová tracerie uvnitř obsahových panelů lezla do textu.
+ *
+ * Import: statický v diary-skins.css (bundle i mimo deníkovou stránku — mapa/chat).
+ * Pouze CSS/SVG, žádný JS.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cormorant+SC:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════
+   0) WRAPPER — lokální paleta + EMBED a PANEL --dd-* tokeny.
+   Žijí ZDE (na wrapperu), aby fungovaly i v embedech/panelech mapy a chatu,
+   kde se lazy `jad.css` nenačítá. Combat/bestie panel a embedy je dědí.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='horror'] {
+  /* půlnoc — rám / scéna / embedy / panely */
+  --h-night-0: #0a060a;
+  --h-night-1: #130b11;
+  --h-night-2: #18101a;
+  --h-night-3: #241823;
+
+  /* zašlé stříbro — signature kov / neutrál / OBRANA (OČ) */
+  --h-silver: #c8c4cf;
+  --h-silver-hi: #eae6ee;
+  --h-silver-lo: #7d7986;
+  --h-silver-deep: #4a4750;
+
+  /* oxblood — granát: ŽIVOTY (HP) / nebezpečí / pipa / fatální neúspěch */
+  --h-oxblood: #7a2030;
+  --h-oxblood-hi: #a2283a;
+  --h-oxblood-lo: #5e1622;
+  --h-oxblood-deep: #3a0d16;
+
+  /* studená fialová — KOUZLA / pozice / SO / éterické */
+  --h-violet: #6a5170;
+  --h-violet-hi: #9a7fae;
+  --h-violet-lo: #3a2c40;
+
+  /* zašlé staré zlato — FATÁLNÍ ÚSPĚCH / Inspirace / Legendární akce */
+  --h-gold: #b59a5a;
+  --h-gold-hi: #d8bd7e;
+  --h-gold-lo: #6e5a2a;
+
+  /* sémantika hodu (drží význam, ztlumeno do palety) */
+  --h-pos: #8fbf7a;
+  --h-neg: #d87a86;
+
+  /* damaškový salonní list (studeně šedo-fialový, NE žlutý pergamen) */
+  --h-parch-0: #d7d0d8;
+  --h-parch-1: #c9c0cb;
+  --h-parch-2: #b6acbb;
+  --h-parch-edge: #8a8090;
+  --h-parch-ink: #241820;
+  --h-parch-ink-soft: #52414e;
+  --h-parch-ink-faint: #7d6b78;
+  --h-parch-line: #9a8e9c;
+  --h-parch-line-soft: #b6acbb;
+
+  /* ── signature: stříbrná erbovní pečeť (růže + netopýří křídla) ──
+     jeden inline data:SVG; tmavý střed → čitelná oxblood růže (DNA horror). */
+  --h-seal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3CradialGradient id='s' cx='42%25' cy='36%25' r='64%25'%3E%3Cstop offset='0%25' stop-color='%233a2c40'/%3E%3Cstop offset='48%25' stop-color='%23241823'/%3E%3Cstop offset='62%25' stop-color='%237a767f'/%3E%3Cstop offset='78%25' stop-color='%2356525c'/%3E%3Cstop offset='100%25' stop-color='%232a2730'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='60' cy='60' r='56' fill='url(%23s)' stroke='%2318121c' stroke-width='2'/%3E%3Ccircle cx='60' cy='60' r='48' fill='none' stroke='%23c8c4cf' stroke-width='1' opacity='.4'/%3E%3Cpath d='M60 60 C40 44 22 50 28 64 C20 58 12 68 24 74 C32 86 50 80 60 66' fill='none' stroke='%23c8c4cf' stroke-width='1.6' opacity='.8'/%3E%3Cpath d='M60 60 C80 44 98 50 92 64 C100 58 108 68 96 74 C88 86 70 80 60 66' fill='none' stroke='%23c8c4cf' stroke-width='1.6' opacity='.8'/%3E%3Cpath d='M34 58 L30 66 M44 54 L42 64 M86 58 L90 66 M76 54 L78 64' stroke='%239a96a2' stroke-width='.8' opacity='.55'/%3E%3Cg%3E%3Ccircle cx='60' cy='58' r='11' fill='%235e1622'/%3E%3Cpath d='M60 49 C66 49 68 55 60 58 C52 55 54 49 60 49Z' fill='%23a2283a'/%3E%3Cpath d='M53 56 C53 50 60 51 60 58 C56 60 53 60 53 56Z' fill='%237a2030'/%3E%3Cpath d='M67 56 C67 50 60 51 60 58 C64 60 67 60 67 56Z' fill='%237a2030'/%3E%3Ccircle cx='60' cy='57' r='2.4' fill='%23d8b0b6'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* ── lilie marker (stříbrná, oxblood listy) pro nadpisy ── */
+  --h-lily: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' fill='none' stroke='%237a2030' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15 L7 5'/%3E%3Cpath d='M7 5 C7 2 8.4 1.2 8.8 1.2 C9.2 2.9 8.2 4.6 7 5Z' fill='%237a2030'/%3E%3Cpath d='M7 7.2 C7 3.6 10.2 2.8 12 3.6 C11.6 7 8.6 7.9 7 7.2Z' fill='%235e1622'/%3E%3Cpath d='M7 7.2 C7 3.6 3.8 2.8 2 3.6 C2.4 7 5.4 7.9 7 7.2Z' fill='%235e1622'/%3E%3Cpath d='M3.6 10 L10.4 10' stroke='%23a8a3b0'/%3E%3C/svg%3E");
+
+  /* ════════════ EMBED plochy (obal v TM / dice readout / dicelog) ════════════
+     tmavý salon; plocha NEPRŮHLEDNÁ (plný gradient), text zašlé stříbro.
+     pos/neg = zelená / tlumený oxblood (sémantika hodu, ne skin).
+     fatální: nat20 zlatá / nat1 oxblood (řeší dice readout/dicelog modul). */
+  --dd-forge-1: var(--h-night-1); /* fallback pod readout bg → tmavý (ne prosvit) */
+  --dd-embed-surface: linear-gradient(180deg, #241823, #18101a 55%, #130b11);
+  --dd-embed-border: var(--h-silver-deep);
+  --dd-embed-line: color-mix(in srgb, var(--h-silver) 20%, transparent);
+  --dd-embed-text: var(--h-silver);
+  --dd-embed-muted: var(--h-silver-lo);
+  --dd-embed-title: var(--h-silver-hi);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--h-violet) 18%, transparent);
+  --dd-embed-accent: var(--h-silver);
+  --dd-embed-num-font: 'Cormorant Garamond', serif;
+  --dd-embed-title-font: 'Cormorant SC', serif;
+  --dd-embed-pos: var(--h-pos); /* kladný hod — zelená (sémantika) */
+  --dd-embed-neg: var(--h-neg); /* záporný hod — tlumený oxblood */
+  --dd-embed-neutral: var(--h-silver); /* neutrál — stříbro */
+
+  /* ════════════ PANEL --dd-* (combat / bestie mapy + chatu) ════════════
+     JadCombatPanel / JadBestiePanel module třídy čtou tyto --dd-* (s fallbacky).
+     Tmavý salon. Per-stat HP/OČ barvy a fonty řídí výhradně tyto tokeny. */
+  --dd-panel-bg:
+    radial-gradient(120% 90% at 18% 8%, rgba(200, 196, 207, 0.08), transparent 55%),
+    radial-gradient(120% 120% at 88% 96%, rgba(10, 6, 10, 0.5), transparent 60%),
+    linear-gradient(168deg, #241823, #18101a 55%, #130b11);
+  --dd-card-bg: linear-gradient(180deg, #1a1118, #150e13); /* karty/boxy/staty */
+  --dd-row-bg: linear-gradient(180deg, rgba(36, 24, 35, 0.85), rgba(24, 16, 26, 0.6)); /* hover/highlight */
+  --dd-accent: var(--h-oxblood-hi); /* tituly, hodnoty, accent rámy, prof pip — oxblood */
+  --dd-gold: var(--h-gold); /* sekundární / zlatý detail */
+  --dd-parch-edge: var(--h-silver-deep); /* border karet/rámu */
+  --dd-rule: rgba(200, 196, 207, 0.18); /* jemný/dotted border */
+  --dd-ink: var(--h-silver); /* text na tmavém → zašlé stříbro */
+  --dd-ink-soft: var(--h-silver-lo);
+  --dd-hpbar-track: #150d12; /* kolejnice HP lišty (tmavá) */
+  --dd-hptxt-glow: rgba(122, 32, 48, 0.55); /* glow HP čísla — na TMAVÉM ZTLUMENO (oxblood) */
+  --dd-font-head: 'Cormorant SC', 'Cinzel', serif;
+  --dd-font-body: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   A) DENÍK LIST `.jad-diary` — token override + plocha / rám / textura.
+   Damaškový salonní list za půlnoci: studeně šedo-fialový brokát,
+   vícevrstvý stříbrný rám, oxblood akcenty, gotická tracerie ve vnějších rozích.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary {
+  /* lokální tokeny JaD listu — přebarvení do salonní palety */
+  --jad-accent: var(--h-oxblood); /* vínová role → oxblood */
+  --jad-accent-soft: var(--h-oxblood-hi);
+  --jad-gold: var(--h-gold); /* Inspirace / zlatý detail */
+  --jad-border: var(--h-parch-line);
+  --jad-border-soft: var(--h-parch-line-soft);
+  --jad-panel-bg: #c9c0cb; /* damašek (header/box plocha) */
+  --jad-box: rgba(255, 253, 255, 0.42); /* panel plocha (translucentní damašek) */
+  --jad-highlight: var(--h-parch-2);
+  --jad-ink-soft: var(--h-parch-ink-soft);
+
+  position: relative;
+  isolation: isolate;
+  border-radius: 3px;
+  color: var(--h-parch-ink);
+  font-family: 'Cormorant Garamond', serif;
+  /* studeně šedo-fialový brokát + jemný damaškový vzorek (NE žlutý pergamen) */
+  background:
+    radial-gradient(closest-side, rgba(122, 32, 48, 0.05) 96%, transparent),
+    radial-gradient(closest-side, rgba(106, 81, 112, 0.05) 96%, transparent),
+    radial-gradient(120% 80% at 50% -10%, var(--h-parch-0) 0%, var(--h-parch-1) 46%, var(--h-parch-2) 100%);
+  background-size: 38px 38px, 38px 38px, 100% 100%;
+  background-position: 0 0, 19px 19px, 0 0;
+  /* vícevrstvý stříbrný rám (kov × noc) + měkký vnitřní stín salonu */
+  border: 1px solid var(--h-parch-edge);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 0 0 4px var(--h-night-1),
+    inset 0 0 0 5px var(--h-silver-deep),
+    inset 0 0 0 6px var(--h-night-1),
+    inset 0 0 150px rgba(40, 24, 40, 0.3),
+    0 46px 100px -34px #000;
+  overflow: hidden;
+}
+
+/* studený měsíční svit shora + sametové zrno (POD obsahem), místo pergamenu */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 3px;
+  mix-blend-mode: soft-light;
+  background-image:
+    radial-gradient(66% 30% at 50% -4%, rgba(122, 94, 130, 0.18), transparent 70%),
+    radial-gradient(44% 22% at 50% 104%, rgba(94, 22, 34, 0.12), transparent 72%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* obsah listu nad texturou i tracerií */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   A·2) SIGNATURE — kovaná gotická STŘÍBRNÁ tracerie ve 4 rozích listu.
+   Mříž katedrálního okna / brána sídla; 1 dlaždice + 3× zrcadlení transform.
+   Drží se VENKOVNÍCH rohů (offset), daleko od textu, z-index 0 pod obsahem.
+   ::after listu (::before nese měsíční svit/zrno výše). Oxblood varianta.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 58px 58px;
+  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 59 L2 24 C2 12 12 2 24 2 L59 2' stroke-width='1.7'/%3E%3Cpath d='M8 59 L8 26 C8 17 17 8 26 8 L59 8' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 24 C14 24 24 14 24 2' stroke-width='.8' opacity='.6'/%3E%3Ccircle cx='13' cy='13' r='2.4' fill='%237a2030' stroke='none'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(60 0) scale(-1 1)'%3E%3Cpath d='M2 59 L2 24 C2 12 12 2 24 2 L59 2' stroke-width='1.7'/%3E%3Cpath d='M8 59 L8 26 C8 17 17 8 26 8 L59 8' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 24 C14 24 24 14 24 2' stroke-width='.8' opacity='.6'/%3E%3Ccircle cx='13' cy='13' r='2.4' fill='%237a2030' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 60) scale(1 -1)'%3E%3Cpath d='M2 59 L2 24 C2 12 12 2 24 2 L59 2' stroke-width='1.7'/%3E%3Cpath d='M8 59 L8 26 C8 17 17 8 26 8 L59 8' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 24 C14 24 24 14 24 2' stroke-width='.8' opacity='.6'/%3E%3Ccircle cx='13' cy='13' r='2.4' fill='%237a2030' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(60 60) scale(-1 -1)'%3E%3Cpath d='M2 59 L2 24 C2 12 12 2 24 2 L59 2' stroke-width='1.7'/%3E%3Cpath d='M8 59 L8 26 C8 17 17 8 26 8 L59 8' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 24 C14 24 24 14 24 2' stroke-width='.8' opacity='.6'/%3E%3Ccircle cx='13' cy='13' r='2.4' fill='%237a2030' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 0.5px rgba(255, 255, 255, 0.5));
+  opacity: 0.9;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   A·3) NADPISY h3 — stříbrná lilie marker místo ◆ + Cormorant SC kapitálky.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary h3 {
+  font-family: 'Cormorant SC', serif;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--h-oxblood-lo);
+  border-bottom: 1px solid var(--h-parch-line);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary h3::before {
+  content: '';
+  width: 14px;
+  height: 16px;
+  flex: none;
+  background: var(--h-lily) no-repeat center / contain;
+  /* zruš původní ◆ glyf (text v ::before nahradíme prázdným obsahem + obrázkem) */
+  font-size: 0;
+}
+
+/* inputy / textarea / select — damaškový list místo bílého papíru */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary input,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary textarea,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary select {
+  background: rgba(255, 253, 255, 0.5);
+  border: 1px solid var(--h-parch-line-soft);
+  border-radius: 0;
+  color: var(--h-parch-ink);
+  font-family: 'Cormorant Garamond', serif;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary input:focus,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary textarea:focus,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary select:focus {
+  border-color: var(--h-oxblood);
+  box-shadow: 0 0 0 2px rgba(122, 32, 48, 0.12);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary input:disabled,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary textarea:disabled,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary select:disabled {
+  background: rgba(182, 172, 187, 0.28);
+  color: var(--h-parch-ink-faint);
+  font-style: italic;
+}
+
+/* scrollbar → oxblood thumb */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary ::-webkit-scrollbar-thumb {
+  background: rgba(122, 32, 48, 0.28);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary ::-webkit-scrollbar-thumb:hover {
+  background: rgba(122, 32, 48, 0.5);
+}
+
+/* ── TABY — Cormorant SC kapitálky, oxblood aktivní podtržení ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tabs {
+  border-bottom: 1px solid var(--h-parch-line);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tabs button,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tabs .jad-tab-toggle {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--h-parch-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tabs button.active {
+  color: var(--h-oxblood-lo);
+  border-bottom-color: var(--h-oxblood);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tabs button:hover:not(.active) {
+  color: var(--h-oxblood);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tabs .jad-tab-toggle {
+  font-family: 'Cormorant Garamond', serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── HLAVIČKA + IDENTITA: damaškový blok, stříbrná dělící linka s ❦ ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.5), rgba(182, 172, 187, 0.2));
+  border: 1px solid var(--h-parch-line);
+  border-radius: 0;
+}
+/* ❦ dělící marker na spodní lince hlavičky */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-header::after {
+  content: '❦';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  background: var(--h-parch-1);
+  padding: 0 14px;
+  color: var(--h-oxblood);
+  font-size: 16px;
+  line-height: 1.2;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-field label {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.12em;
+  color: var(--h-parch-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-field input,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-field select {
+  border: none;
+  border-bottom: 1px solid var(--h-parch-line-soft);
+  background: transparent;
+  font-weight: 600;
+}
+
+/* ── LEVEL BADGE: hardcoded tmavý box #34281c → stříbrno-noční salon ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-level-badge {
+  background: linear-gradient(180deg, #34303c, #241823);
+  color: var(--h-silver-hi);
+  border: 1px solid var(--h-silver-deep);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 rgba(200, 196, 207, 0.18), 0 4px 8px -3px #000;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-level-badge .num {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--h-silver-hi);
+  font-variant-numeric: tabular-nums;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-level-badge .cap {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.2em;
+  color: var(--h-silver-lo);
+  opacity: 1;
+}
+
+/* ── SIGNATURE PEČEŤ u identity: erbovní pečeť (růže + netopýří křídla).
+   JaD identita nemá vlastní crest element jako drd2 — pečeť vsadíme jako
+   ozdobu PŘED hlavičku přes .jad-header::before (čitelnost polí nedotčena;
+   pečeť je dekorativní akcent vpravo nahoře, mimo grid identity). ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-header::before {
+  content: '';
+  position: absolute;
+  top: -18px;
+  right: 14px;
+  width: 64px;
+  height: 64px;
+  background: var(--h-seal) center / contain no-repeat;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.45));
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.96;
+}
+
+/* ── MULTIPOVOLÁNÍ ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-prof-row .pcap {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.1em;
+  color: var(--h-parch-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-prof-row .del-btn {
+  color: var(--h-oxblood);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-sub-hint {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--h-oxblood-hi);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-foot-hint {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--h-parch-ink-faint);
+}
+
+/* ── PANEL listu: gotická salonní deska, ostré rohy (zruš pergamenový shadow) ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-panel {
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.42), rgba(182, 172, 187, 0.2));
+  border: 1px solid var(--h-parch-line);
+  border-radius: 0;
+  box-shadow: 0 2px 10px rgba(40, 24, 40, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+/* ── VLASTNOSTI (stat-box): oxblood levý lem, salonní deska ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-stat-box {
+  background: rgba(255, 253, 255, 0.5);
+  border: 1px solid var(--h-parch-line-soft);
+  border-left: 3px solid var(--h-oxblood-lo);
+  border-radius: 0;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-stat-box span.lbl {
+  font-family: 'Cormorant SC', serif;
+  color: var(--h-oxblood-lo);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-stat-box span.mod {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--h-parch-ink);
+  font-variant-numeric: tabular-nums;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-stat-box input {
+  font-family: 'Cormorant Garamond', serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── TOP-META (Iniciativa / OČ / Rychlost): clip-path gotický roh ──
+   OČ = klidné stříbro, Iniciativa = oxblood (svižné), dle §7. ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-meta-box {
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.6), rgba(182, 172, 187, 0.16));
+  border: 1px solid var(--h-parch-line);
+  border-radius: 0;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-meta-box label {
+  font-family: 'Cormorant SC', serif;
+  color: var(--h-parch-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-meta-box input,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-meta-box span.val {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--h-parch-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── HP PANEL: oxblood akcentní rám (Životy = oxblood, §7) ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-hp-panel {
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.6), rgba(122, 32, 48, 0.1));
+  border: 2px solid var(--h-oxblood);
+  border-radius: 0;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-hp-panel .hp-box label {
+  font-family: 'Cormorant SC', serif;
+  color: var(--h-parch-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-hp-panel .hp-box input {
+  background: rgba(255, 253, 255, 0.55);
+  border-color: var(--h-oxblood-lo);
+  color: var(--h-oxblood-lo);
+  font-family: 'Cormorant Garamond', serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── TABULKY (zbraně/kouzla): oxblood hlavičky ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-table th {
+  font-family: 'Cormorant SC', serif;
+  color: var(--h-parch-ink-faint);
+  border-bottom-color: var(--h-oxblood-lo);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-table td {
+  color: var(--h-parch-ink);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-table .del-btn {
+  color: var(--h-oxblood);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-table .del-btn:hover {
+  color: var(--h-oxblood-hi);
+}
+
+/* ── ADD-LINK (dashed) ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .add-link {
+  font-family: 'Cormorant SC', serif;
+  border: 1px dashed var(--h-parch-line);
+  border-radius: 0;
+  color: var(--h-parch-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .add-link:hover {
+  background: rgba(122, 32, 48, 0.07);
+  color: var(--h-oxblood-lo);
+  border-color: var(--h-oxblood-lo);
+}
+
+/* ── LIST-ROW (záchrany / dovednosti): pipy zdatnosti ○ / ● oxblood / ◉ zlato ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row {
+  border-bottom-color: var(--h-parch-line-soft);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row button.prof {
+  background: rgba(255, 253, 255, 0.6);
+  border: 1px solid var(--h-parch-line);
+  color: var(--h-oxblood);
+}
+/* zdatná (active) pipa = plný oxblood */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row button.prof.active,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row button.prof.on,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row button.prof.prof {
+  background: var(--h-oxblood);
+  border-color: var(--h-oxblood-lo);
+  color: #f4eaec;
+}
+/* expertíza = zlato v oxbloodu */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row button.prof.exp,
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row button.prof.expert {
+  background: radial-gradient(circle at 50% 50%, var(--h-gold-hi) 0 32%, var(--h-oxblood) 34%);
+  border-color: var(--h-oxblood-lo);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row span.mod {
+  font-family: 'Cormorant Garamond', serif;
+  font-variant-numeric: tabular-nums;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row span.lbl {
+  font-family: 'Cormorant Garamond', serif;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-list-row span.sub {
+  font-family: 'Cormorant SC', serif;
+  color: var(--h-parch-ink-faint);
+}
+
+/* ── TAG-ROW (zdatnosti/jazyky): ◦ odrážka oxblood ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tag-row {
+  border-bottom-color: var(--h-parch-line-soft);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tag-row .bullet {
+  color: var(--h-oxblood-lo);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tag-row input:focus {
+  border-bottom-color: var(--h-oxblood);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-tag-row .del-btn {
+  color: var(--h-oxblood);
+}
+
+/* ── SCHOPNOSTI (feat karty) ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-feat {
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.45), rgba(182, 172, 187, 0.16));
+  border: 1px solid var(--h-parch-line);
+  border-radius: 0;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-feat-head input {
+  font-family: 'Cormorant SC', serif;
+  font-weight: 600;
+  color: var(--h-oxblood-lo);
+  border-bottom-color: var(--h-parch-line-soft);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-feat-head .del-btn {
+  color: var(--h-oxblood);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-feat textarea {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--h-parch-ink-soft);
+}
+
+/* ── KOUZLA (tab): studená fialová role (Kouzla/pozice/SO, §7) ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-spells .spell-header {
+  background: rgba(106, 81, 112, 0.1);
+  border: 1px solid var(--h-violet-lo);
+  border-radius: 0;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-spells .spell-header div label {
+  font-family: 'Cormorant SC', serif;
+  color: #4a3a5e;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-spells .spell-level {
+  background: rgba(255, 253, 255, 0.45);
+  border: 1px solid var(--h-violet-lo);
+  border-radius: 0;
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-spells .sl-title {
+  border-bottom-color: var(--h-violet-lo);
+}
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-spells .sl-title h4 {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.1em;
+  color: var(--h-violet);
+}
+
+/* ── POZNÁMKY (notes-full): linkovaný damašek ── */
+[data-diary-system='jad'][data-diary-skin='horror'] .jad-diary .jad-notes-full textarea {
+  background: repeating-linear-gradient(transparent 0 27px, rgba(122, 32, 48, 0.12) 27px 28px);
+  font-family: 'Cormorant Garamond', serif;
+  line-height: 28px;
+  color: var(--h-parch-ink);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   B) PANELY MAPY / CHATU — JadCombatPanel / JadBestiePanel.
+   Konzumují --dd-* (tokenizované hooky s fallbacky), reskin řídí výhradně
+   --dd-* override na wrapperu (§0). Bez globálních selektorů na hashované
+   třídy. Embedy (dice readout / dicelog) dědí --dd-embed-* z wrapperu.
+   ════════════════════════════════════════════════════════════════════ */
+/* (žádná další pravidla — panely a embedy dědí --dd-* / --dd-embed-* z wrapperu.) */

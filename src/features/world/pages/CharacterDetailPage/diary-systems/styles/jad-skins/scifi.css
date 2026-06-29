@@ -1,0 +1,795 @@
+/**
+ * Jeskyně a draci (JaD / D&D 5e-like) — skin „Sci-fi" (8.7-skiny):
+ * HOLOGRAFICKÝ VELITELSKÝ HUD / datapad.
+ *
+ * Pergamenový D&D list JaD (světlý, vínová + zlatá, nadpisy Cinzel s ◆) přeložen
+ * do tmavého sci-fi datapadu operátora: void modročerná plocha, světlý holo
+ * inkoust (kontrast OBRÁCEN), neon cyan #38e0ff + violet #9b6bff, chamfer klín
+ * místo zaoblených rohů. Override lokálních tokenů listu (.jad-diary) + plocha/
+ * rám/scanline + signature ornamenty na .jad-* třídy + `--dd-*` tokeny panelů
+ * (combat/bestie na mapě i chatu) + `--dd-embed-*` (obal/dice/log).
+ *
+ * Scoped na `[data-diary-system='jad'][data-diary-skin='scifi']` (compound 0,2,0
+ * → přebije světlý pergamenový default `[data-diary-system='jad']` z jad.css).
+ * KAŽDÉ pravidlo nese ten prefix. Pouze CSS/SVG, žádný JS. Regrese-safe — jen
+ * přidává overrides pod compound prefixem.
+ *
+ * D&D 5e prvky překlopené do HUD jazyka (NE přebarvený pergamen):
+ *   úrovňový badge (tmavý box) → ražený holo box s mono číslem + telemetrickou lištou,
+ *   obory / specializace povolání → hranatý holo seal (cyan glow) před povoláním,
+ *   HP panel → jade životní rám (sémantika stavu „life"),
+ *   kouzla → safírový / violet datový kanál oddělený od bojových dat (cyan),
+ *   dovednostní pip ○ -> ● -> ◉ → kosočtvercová holo buňka.
+ * Sémantika drží: Životy / HP = jade, kouzla / pozice = modrá rodina (safír +
+ * violet), OČ + iniciativa = cyan akcent, kladný / záporný / neutrální hod =
+ * jade / rose / cyan, fatální úspěch = zlatá, fatální neúspěch = krvavá rose.
+ * Rodinná identita = matrix + drd16-skins/scifi + drdplus-skins/scifi +
+ * drd2-skins/scifi (tentýž svět napříč systémy).
+ *
+ * Signature ornament = rohové tech-brackets (TL cyan, BR violet) + datový
+ * scanline nadpisů + diamantový marker + HUD mřížka + driftující scanline rám.
+ * POZN: v komentáři se nepíše sekvence hvězda-lomítko (uzavřela by blok).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) LIST — lokální tokeny `.jad-diary` override + plocha / rám / scanline.
+   Pergamen → void HUD; tmavý inkoust → světlý holo (kontrast obrácen).
+   --jad-accent (vínová) → cyan; --jad-gold (zlaté ◆) → cyan diamant; pergamenové
+   plochy → tmavé HUD panely. Pomocné --sf-* tokeny čtou ornamenty níž.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary {
+  /* ── override lokálních tokenů jad.css ── */
+  --jad-accent: #38e0ff; /* vínová → cyan (NEpřebírá barvu povolání) */
+  --jad-accent-soft: #7af1ff;
+  --jad-gold: #38e0ff; /* zlaté ◆ + bullety → cyan diamant */
+  --jad-border: rgba(94, 160, 210, 0.16);
+  --jad-border-soft: rgba(94, 160, 210, 0.1);
+  --jad-panel-bg: #0d1530; /* HUD dlaždice */
+  --jad-box: #0b1124;
+  --jad-highlight: #080d1e;
+  --jad-ink-soft: #9fb4dd;
+
+  /* ── lokální sci-fi pomocníci (ornamenty + kompozity je čtou) ── */
+  --sf-void-0: #04060f;
+  --sf-panel-1: #0b1124;
+  --sf-panel-2: #080d1e;
+  --sf-ink: #d7e7ff;
+  --sf-ink-2: #eaf4ff;
+  --sf-ink-soft: #9fb4dd;
+  --sf-ink-faint: #6c7fae;
+  --sf-ink-deep: #04101e;
+  --sf-cyan: #38e0ff;
+  --sf-cyan-hi: #7af1ff;
+  --sf-cyan-dim: #1c6f86;
+  --sf-cyan-deep: #0a90b8;
+  --sf-violet: #9b6bff;
+  --sf-violet-hi: #c3a4ff;
+  --sf-violet-deep: #5b32c4;
+  --sf-life: #3df0a8; /* Životy / HP = jade */
+  --sf-life-deep: #0c5a3c;
+  --sf-mag: #7aa2ff; /* kouzla / pozice = safír */
+  --sf-mag-2: #9b6bff;
+  --sf-warn: #ffb648; /* zámek oboru / postih = amber */
+  --sf-neg: #ff5a7a;
+  --sf-gold: #ffd27a;
+  --sf-line: rgba(94, 160, 210, 0.16);
+  --sf-line-hot: rgba(56, 224, 255, 0.42);
+  --sf-grid: rgba(78, 150, 200, 0.07);
+  --sf-num: 'Share Tech Mono', ui-monospace, monospace;
+  --sf-title: 'Orbitron', 'Chakra Petch', sans-serif;
+  /* chamfer klín — signature tvar (useknuté protilehlé rohy) */
+  --sf-chamf: 14px;
+  --sf-clip: polygon(
+    var(--sf-chamf) 0,
+    100% 0,
+    100% calc(100% - var(--sf-chamf)),
+    calc(100% - var(--sf-chamf)) 100%,
+    0 100%,
+    0 var(--sf-chamf)
+  );
+  --sf-clip-s: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  --sf-clip-row: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+  --sf-clip-3: polygon(3px 0, 100% 0, 100% 100%, 0 100%, 0 3px);
+  --sf-diamond: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+
+  /* font jádra listu (přebíjeno na třídách níž) = tech sans */
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+  color: var(--sf-ink);
+  border: 0;
+  border-radius: 0;
+  /* void plátno s neon záři místo pergamenového radialu */
+  background:
+    radial-gradient(120% 80% at 50% -8%, #0c1c3a 0%, transparent 52%),
+    radial-gradient(100% 70% at 88% 110%, rgba(123, 80, 220, 0.16) 0%, transparent 55%),
+    radial-gradient(90% 60% at 8% 100%, rgba(20, 150, 190, 0.12) 0%, transparent 55%),
+    linear-gradient(180deg, #0d1530, #0b1124 55%, #080d1e);
+  /* tenký cyan rám + chamfer klín (signature tvar) + neon inset */
+  clip-path: var(--sf-clip);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 255, 0.08),
+    inset 0 0 70px -32px rgba(56, 224, 255, 0.34),
+    0 30px 80px -40px #000,
+    0 0 0 1px var(--sf-line-hot);
+  position: relative;
+  overflow: hidden;
+}
+
+/* driftující scanline + HUD mřížka vnitřní rám (signature A) — mizí dolů */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  pointer-events: none;
+  z-index: 0;
+  border: 1px solid var(--sf-line);
+  box-shadow: inset 0 0 0 1px rgba(56, 224, 255, 0.06);
+  clip-path: var(--sf-clip);
+  background:
+    linear-gradient(var(--sf-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sf-grid) 1px, transparent 1px),
+    repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.045) 0 1px, transparent 1px 3px);
+  background-size: 46px 46px, 46px 46px, 100% 3px;
+  -webkit-mask-image: radial-gradient(150% 110% at 50% 0%, #000 30%, transparent 94%);
+  mask-image: radial-gradient(150% 110% at 50% 0%, #000 30%, transparent 94%);
+  animation: jad-sf-scan 9s linear infinite;
+}
+@keyframes jad-sf-scan {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 0, 0 0, 0 480px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary::before {
+    animation: none;
+  }
+}
+/* obsah nad scanline rámem */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── formulářové prvky → tmavá holo pole (chamfer, světlý text) ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary input,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary textarea,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary select {
+  background: rgba(4, 10, 26, 0.7);
+  border: 1px solid var(--sf-line);
+  border-radius: 0;
+  clip-path: var(--sf-clip-s);
+  color: var(--sf-ink-2);
+  font-family: var(--sf-num);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary input:focus,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary textarea:focus,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary select:focus {
+  border-color: var(--sf-cyan);
+  box-shadow: 0 0 0 1px rgba(56, 224, 255, 0.4), inset 0 0 18px -10px var(--sf-cyan);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary input:disabled,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary textarea:disabled,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary select:disabled {
+  background: rgba(8, 14, 34, 0.6);
+  color: var(--sf-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary input::placeholder,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary textarea::placeholder {
+  color: var(--sf-ink-faint);
+}
+/* scrollbar → cyan datový proužek */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary ::-webkit-scrollbar-thumb {
+  background: rgba(56, 224, 255, 0.3);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary ::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 224, 255, 0.5);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) FONTY + NADPISY listu. Cinzel → Orbitron (technický display); ◆ zlatý
+   → cyan diamant (clip-path kosočtverec) + datový scanline proužek.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary h3 {
+  font-family: var(--sf-title);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--sf-cyan);
+  border-bottom: 0;
+  gap: 12px;
+}
+/* ◆ glyph → cyan diamant clip; datový proužek za nadpisem */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary h3::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  flex: none;
+  background: var(--sf-cyan);
+  clip-path: var(--sf-diamond);
+  box-shadow: 0 0 10px var(--sf-cyan);
+  font-size: 1em;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary h3::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--sf-cyan-dim) 0 5px, transparent 5px 9px);
+  opacity: 0.55;
+}
+
+/* ── Taby → Orbitron, cyan aktivní s glow ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tabs {
+  border-bottom: 1px solid var(--sf-line);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tabs button,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tabs .jad-tab-toggle {
+  font-family: var(--sf-title);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sf-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tabs button.active {
+  color: var(--sf-cyan);
+  border-bottom-color: var(--sf-cyan);
+  text-shadow: 0 0 12px rgba(56, 224, 255, 0.4);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tabs button:hover:not(.active) {
+  color: var(--sf-cyan-hi);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tabs .jad-tab-toggle {
+  font-family: var(--sf-num);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE ORNAMENTY na globální `.jad-*` třídy.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── HLAVIČKA / identita → HUD rám + telemetrická spodní lišta ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-header {
+  position: relative;
+  background: linear-gradient(180deg, rgba(12, 26, 54, 0.5), rgba(6, 12, 30, 0.6));
+  border: 1px solid var(--sf-line);
+  border-radius: 0;
+  clip-path: var(--sf-clip);
+  box-shadow: inset 0 0 36px -20px rgba(56, 224, 255, 0.34);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background:
+    linear-gradient(90deg, transparent, var(--sf-line-hot) 20%, var(--sf-line-hot) 80%, transparent),
+    repeating-linear-gradient(90deg, var(--sf-cyan-dim) 0 6px, transparent 6px 11px);
+  opacity: 0.6;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-field label {
+  font-family: var(--sf-title);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--sf-ink-soft);
+}
+/* identitní pole = podtržené holo pole (bez plného boxu) */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-field input,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-field select {
+  background: rgba(4, 10, 26, 0.55);
+  border: 0;
+  border-bottom: 1px solid var(--sf-line-hot);
+  clip-path: none;
+  color: var(--sf-ink-2);
+}
+
+/* ── ÚROVŇOVÝ BADGE → ražený holo box (radial cyan záře + mono číslo) ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-level-badge {
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(56, 224, 255, 0.16), transparent 70%),
+    rgba(6, 14, 34, 0.8);
+  color: var(--sf-ink-soft);
+  border: 1px solid var(--sf-line-hot);
+  border-radius: 0;
+  clip-path: var(--sf-clip-s);
+  box-shadow: inset 0 0 26px -16px rgba(56, 224, 255, 0.5);
+}
+/* telemetrická spodní lišta (datový tok) */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-level-badge::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 5px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--sf-cyan-dim) 0 5px, transparent 5px 9px);
+  opacity: 0.6;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-level-badge .num {
+  font-family: var(--sf-num);
+  font-weight: 400;
+  color: var(--sf-cyan-hi);
+  text-shadow: 0 0 20px rgba(56, 224, 255, 0.6);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-level-badge .cap {
+  font-family: var(--sf-title);
+  letter-spacing: 0.2em;
+  color: var(--sf-ink-soft);
+  opacity: 1;
+}
+
+/* ── PANEL → chamfer klín + rohové tech-brackets (TL cyan, BR violet) ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-panel {
+  position: relative;
+  background: linear-gradient(180deg, rgba(18, 34, 70, 0.3), rgba(7, 13, 32, 0.5)), var(--sf-panel-1);
+  border: 1px solid var(--sf-line);
+  border-radius: 0;
+  clip-path: var(--sf-clip);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 255, 0.07),
+    inset 0 0 34px -20px rgba(56, 224, 255, 0.3);
+}
+/* TL cyan bracket */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-panel::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid var(--sf-cyan);
+  border-left: 2px solid var(--sf-cyan);
+  box-shadow: -1px -1px 8px -1px var(--sf-cyan);
+  pointer-events: none;
+  z-index: 3;
+}
+/* BR violet bracket → dvoubarevný asymetrický rám */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-panel::after {
+  content: '';
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid var(--sf-violet);
+  border-right: 2px solid var(--sf-violet);
+  box-shadow: 1px 1px 8px -1px var(--sf-violet);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ── MULTIPOVOLÁNÍ → datový řádek (levý cyan border) + holo seal oboru ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row {
+  position: relative;
+  background: linear-gradient(90deg, rgba(14, 28, 58, 0.5), rgba(8, 14, 34, 0.35));
+  border: 1px solid var(--sf-line);
+  border-left: 2px solid var(--sf-cyan-dim);
+  clip-path: var(--sf-clip-row);
+  padding: 11px 13px;
+  align-items: start;
+}
+/* hranatý holo seal (šestiúhelník) — signature, dekorativní marker povolání */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row .pcol:first-child {
+  position: relative;
+  padding-left: 44px;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row .pcol:first-child::before {
+  content: '◈';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  font-family: var(--sf-title);
+  font-size: 14px;
+  color: var(--sf-cyan-hi);
+  background: linear-gradient(135deg, #15335a, #081428);
+  border: 1px solid var(--sf-line-hot);
+  clip-path: polygon(50% 2px, calc(100% - 4px) 26%, calc(100% - 4px) 74%, 50% calc(100% - 2px), 4px 74%, 4px 26%);
+  text-shadow: 0 0 12px var(--sf-cyan);
+  box-shadow: 0 0 14px -4px var(--sf-cyan);
+  pointer-events: none;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row .pcap {
+  font-family: var(--sf-title);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--sf-ink-soft);
+}
+/* zamčený obor (disabled select) → amber warn styl */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row .pcol-sub select:disabled {
+  color: var(--sf-warn);
+  border-color: rgba(255, 182, 72, 0.4);
+  background: rgba(255, 182, 72, 0.06);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-sub-hint {
+  font-family: var(--sf-num);
+  font-style: normal;
+  color: var(--sf-warn);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-foot-hint {
+  font-family: var(--sf-num);
+  font-style: normal;
+  color: var(--sf-ink-faint);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row .del-btn {
+  color: var(--sf-neg);
+}
+
+/* ── ADD-LINK → dashed cyan HUD chip ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .add-link {
+  font-family: var(--sf-title);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sf-cyan);
+  background: rgba(56, 224, 255, 0.05);
+  border: 1px dashed var(--sf-line-hot);
+  border-radius: 0;
+  clip-path: var(--sf-clip-row);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .add-link:hover {
+  background: rgba(56, 224, 255, 0.13);
+}
+
+/* ── VLASTNOSTI (stat-box) → klikací datový řádek, mod cyan-hi mono ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-stat-box {
+  background: linear-gradient(90deg, rgba(14, 28, 58, 0.6), rgba(8, 14, 34, 0.4));
+  border: 1px solid var(--sf-line);
+  border-left: 2px solid var(--sf-cyan-dim);
+  border-radius: 0;
+  clip-path: var(--sf-clip-row);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-stat-box span.lbl {
+  font-family: var(--sf-title);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--sf-ink-2);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-stat-box span.mod {
+  font-family: var(--sf-num);
+  color: var(--sf-cyan-hi);
+  text-shadow: 0 0 10px rgba(56, 224, 255, 0.4);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-stat-box input {
+  font-family: var(--sf-num);
+  color: var(--sf-ink-2);
+}
+
+/* ── LIST-ROW (záchrany / dovednosti / profily) + pip → kosočtvercová buňka ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-list-row {
+  border-bottom: 1px solid var(--sf-line);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-list-row span.mod {
+  font-family: var(--sf-num);
+  color: var(--sf-cyan-hi);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-list-row span.lbl {
+  color: var(--sf-ink);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-list-row span.sub {
+  font-family: var(--sf-num);
+  color: var(--sf-ink-faint);
+}
+/* pip ○ / ● / ◉ → hranatá kosočtvercová holo buňka (cyan svit), žádný kruh */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-list-row button.prof {
+  width: 20px;
+  height: 20px;
+  background: rgba(4, 10, 26, 0.7);
+  border: 1px solid var(--sf-line-hot);
+  border-radius: 0;
+  clip-path: var(--sf-diamond);
+  color: var(--sf-cyan);
+  font-size: 11px;
+  text-shadow: 0 0 8px var(--sf-cyan);
+}
+
+/* ── TOP-META (Iniciativa / OČ / Rychlost) → chamfer box + telemetrická lišta ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-meta-box {
+  position: relative;
+  background: linear-gradient(180deg, rgba(12, 26, 54, 0.6), rgba(6, 12, 30, 0.7));
+  border: 1px solid var(--sf-line-hot);
+  border-radius: 0;
+  clip-path: var(--sf-clip-s);
+  box-shadow: inset 0 0 26px -16px rgba(56, 224, 255, 0.4);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-meta-box::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--sf-cyan-dim) 0 6px, transparent 6px 10px);
+  opacity: 0.6;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-meta-box label {
+  font-family: var(--sf-title);
+  letter-spacing: 0.14em;
+  color: var(--sf-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-meta-box input,
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-meta-box span.val {
+  font-family: var(--sf-num);
+  font-weight: 400;
+  color: var(--sf-cyan-hi);
+  text-shadow: 0 0 16px rgba(56, 224, 255, 0.5);
+  clip-path: none;
+  background: transparent;
+  border: 0;
+}
+
+/* ── HP PANEL → jade rám + jade TL bracket + violet BR bracket ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-hp-panel {
+  /* lokálně přebij accent na JADE → inline `var(--jad-accent)` u Aktuálních
+     Životů (TSX) se vyhodnotí jako jade #3df0a8 (sémantika stavu „life"). */
+  --jad-accent: #3df0a8;
+  position: relative;
+  background: linear-gradient(180deg, rgba(15, 40, 32, 0.4), rgba(6, 18, 14, 0.55)), var(--sf-panel-1);
+  border: 1px solid rgba(61, 240, 168, 0.4);
+  border-radius: 0;
+  clip-path: var(--sf-clip);
+  box-shadow: inset 0 0 40px -22px rgba(61, 240, 168, 0.5);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-hp-panel::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid var(--sf-life);
+  border-left: 2px solid var(--sf-life);
+  box-shadow: -1px -1px 8px -1px var(--sf-life);
+  pointer-events: none;
+  z-index: 3;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-hp-panel::after {
+  content: '';
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid var(--sf-violet);
+  border-right: 2px solid var(--sf-violet);
+  box-shadow: 1px 1px 8px -1px var(--sf-violet);
+  pointer-events: none;
+  z-index: 3;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-hp-panel .hp-box label {
+  font-family: var(--sf-title);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--sf-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-hp-panel .hp-box input {
+  font-family: var(--sf-num);
+  color: var(--sf-ink-2);
+  background: rgba(4, 14, 10, 0.7);
+  border-color: var(--sf-line);
+}
+
+/* ── TABULKA (zbraně) → neon hlavička, mono buňky, dmg sloupec rose ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-table th {
+  font-family: var(--sf-title);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--sf-ink-soft);
+  border-bottom: 1px solid var(--sf-line-hot);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-table td {
+  border-bottom: 1px solid var(--sf-line);
+  color: var(--sf-ink);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-table .del-btn {
+  color: var(--sf-neg);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-table .del-btn:hover {
+  color: #ff8aa0;
+}
+
+/* ── TAG-ROW (zdatnosti / jazyky) → cyan bullet, dotted holo linka ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tag-row {
+  border-bottom: 1px dotted var(--sf-line);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tag-row .bullet {
+  color: var(--sf-cyan);
+  font-family: var(--sf-num);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tag-row input {
+  color: var(--sf-ink);
+  background: transparent;
+  clip-path: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tag-row input:focus {
+  border-bottom-color: var(--sf-cyan);
+  box-shadow: none;
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-tag-row .del-btn {
+  color: var(--sf-neg);
+}
+
+/* ── SCHOPNOSTI (feat) → violet TL akcent, název Orbitron violet-hi ── */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-feat {
+  position: relative;
+  background: rgba(20, 18, 52, 0.4);
+  border: 1px solid var(--sf-line);
+  border-left: 2px solid var(--sf-violet);
+  border-radius: 0;
+  clip-path: var(--sf-clip-s);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-feat-head input {
+  font-family: var(--sf-title);
+  font-weight: 600;
+  color: var(--sf-violet-hi);
+  background: transparent;
+  clip-path: none;
+  border: 0;
+  border-bottom: 1px solid var(--sf-line);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-feat-head input:focus {
+  border-bottom-color: var(--sf-violet);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-feat-head .del-btn {
+  color: var(--sf-neg);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-feat textarea {
+  color: var(--sf-ink-soft);
+  background: transparent;
+  clip-path: none;
+  border: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3b) TAB KOUZLA → safírové qb boxy, violet datový kanál (oddělen od boje)
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-spells .spell-header {
+  background: rgba(20, 18, 52, 0.45);
+  border: 1px solid rgba(122, 162, 255, 0.3);
+  border-radius: 0;
+  clip-path: var(--sf-clip-s);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-spells .spell-header div label {
+  font-family: var(--sf-title);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sf-mag);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-spells .spell-header div input {
+  color: var(--sf-mag);
+  text-shadow: 0 0 12px rgba(122, 162, 255, 0.4);
+}
+/* úroveň kouzla = violet datový panel (levý akcent) */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-spells .spell-level {
+  background: linear-gradient(180deg, rgba(20, 18, 52, 0.4), rgba(8, 8, 26, 0.5));
+  border: 1px solid var(--sf-line);
+  border-left: 2px solid var(--sf-mag-2);
+  border-radius: 0;
+  clip-path: var(--sf-clip);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-spells .sl-title {
+  border-bottom: 1px solid var(--sf-line-hot);
+}
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-spells .sl-title h4 {
+  font-family: var(--sf-title);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sf-violet-hi);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+/* violet diamant marker u titulu úrovně kouzel */
+[data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-spells .sl-title h4::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex: none;
+  background: var(--sf-mag-2);
+  clip-path: var(--sf-diamond);
+  box-shadow: 0 0 9px var(--sf-mag-2);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) PANELY na mapě / chatu (combat + bestie) — `--dd-*` tokeny na [ds][dsk]
+   (BEZ .jad-diary; panely je dědí z předka). Pergamen → void HUD panel, světlý
+   text. Sémantika JaD → nejbližší sci-fi role. Tytéž panely sdílí mapa i chat.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='scifi'] {
+  /* ── base paleta (pergamen → void HUD panel, světlý text) ── */
+  --dd-parch-1: #0b1124;
+  --dd-parch-2: #080d1e;
+  --dd-parch-edge: rgba(94, 160, 210, 0.34);
+  --dd-rule: rgba(94, 160, 210, 0.24);
+  --dd-ink: #d7e7ff;
+  --dd-ink-soft: #9fb4dd;
+
+  /* ── role JaD (drží význam ve studené paletě) ── */
+  --dd-accent: #38e0ff; /* tituly, hodnoty, accent rámy, OČ = cyan */
+  --dd-gold: #ffd27a; /* ½-zdatnost / sekundární = zlatá */
+  --dd-hpbar-track: rgba(4, 14, 10, 0.8);
+  --dd-hptxt-glow: 0 0 0 transparent; /* na tmavém panelu glow ztlumen */
+
+  /* ── plochy panelu (NEJSOU v baseline — bez nich zůstane pergamen) ── */
+  --dd-panel-bg:
+    linear-gradient(180deg, rgba(18, 34, 70, 0.34), rgba(7, 13, 32, 0.52)),
+    #0b1124;
+  --dd-card-bg: rgba(6, 12, 30, 0.55);
+  --dd-row-bg: linear-gradient(90deg, rgba(14, 28, 58, 0.6), rgba(8, 14, 34, 0.4));
+  --dd-input-bg: rgba(4, 10, 26, 0.7);
+
+  /* ── HP lišta (PC i bestie Výdrž) = jade (sémantika „life") ── */
+  --dd-hp-grad: linear-gradient(90deg, #0c5a3c, #3df0a8);
+  --dd-hpfill-grad: linear-gradient(90deg, #0c5a3c, #3df0a8);
+
+  /* ── fonty ── */
+  --dd-font-head: 'Chakra Petch', system-ui, sans-serif;
+  --dd-font-body: 'Chakra Petch', system-ui, sans-serif;
+
+  /* ── lokální sci-fi pomocníky (kdyby je modulové kompozity četly) ── */
+  --sf-cyan: #38e0ff;
+  --sf-cyan-hi: #7af1ff;
+  --sf-cyan-dim: #1c6f86;
+  --sf-violet: #9b6bff;
+  --sf-life: #3df0a8;
+  --sf-line: rgba(94, 160, 210, 0.16);
+  --sf-line-hot: rgba(56, 224, 255, 0.42);
+  --sf-gold: #ffd27a;
+  --sf-num: 'Share Tech Mono', ui-monospace, monospace;
+
+  /* ════════════════════════════════════════════════════════════════════
+     5) EMBED plochy (obal v TM / dice readout / dicelog) — `--dd-embed-*`.
+     Plocha VŽDY NEPRŮHLEDNÁ (plný gradient), jinak prosvítá na mapu.
+     `--dd-forge-1` = tmavý fallback pod readout. pos / neg / neutral =
+     jade / rose / cyan; fatální úspěch = zlatá, neúspěch = krvavá rose.
+     ════════════════════════════════════════════════════════════════════ */
+  --dd-forge-1: #05091a;
+  --dd-embed-surface: linear-gradient(180deg, #0a122a, #070d1e 60%, #050a18); /* opaque void HUD */
+  --dd-embed-border: var(--sf-line-hot);
+  --dd-embed-line: var(--sf-line);
+  --dd-embed-text: var(--dd-ink);
+  --dd-embed-muted: var(--dd-ink-soft);
+  --dd-embed-title: var(--sf-cyan);
+  --dd-embed-chip-bg: rgba(56, 224, 255, 0.1);
+  --dd-embed-accent: var(--sf-cyan);
+  --dd-embed-num-font: 'Share Tech Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Orbitron', 'Chakra Petch', sans-serif;
+  --dd-embed-pos: #3df0a8; /* kladný hod = jade */
+  --dd-embed-neg: #ff5a7a; /* záporný hod = rose */
+  --dd-embed-neutral: #7af1ff; /* neutrál = cyan-hi */
+  --dd-embed-fatal-up: #ffd27a; /* fatální úspěch (nat 20) = zlatá */
+  --dd-embed-fatal-dn: #ff4d68; /* fatální neúspěch (nat 1) = krvavá rose */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) RESPONSIVE — kolaps gridu + dotykové plochy řeší jad.css (selektor
+   `[data-diary-system='jad']` platí i pod skinem). Zde jen jistota, že holo
+   seal oboru nepřetéká na úzkém prof-row a pip má dotykovou plochu.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  [data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row .pcol:first-child {
+    padding-left: 40px;
+  }
+  [data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-prof-row .pcol:first-child::before {
+    width: 28px;
+    height: 28px;
+  }
+  [data-diary-system='jad'][data-diary-skin='scifi'] .jad-diary .jad-list-row button.prof {
+    width: 26px;
+    height: 26px;
+  }
+}

@@ -76,7 +76,12 @@ sesterský soubor (`drd16-skins/<id>.css` / `drdplus-skins/<id>.css` / matrix bl
 | D | **Obal v TM** (chrome) | `TokenInfoPanel.module.css` | čte `--dd-embed-*` / `--mx-*` (už hotové `:is([drd16],[drdplus])`) |
 | E | **Hody** (dice readout) | `DiceRollOverlay.module.css` | tokeny + per-skin signature blok uvnitř |
 | F | **Dicelog** | `DiceLogPanel.module.css` | tokeny + per-skin signature blok uvnitř |
-| G | **Chat** | tytéž panely B/C/E/F užší | dědí automaticky |
+| G | **Chat** | tytéž panely B/C/E/F užší (bestie = TÝŽ plný panel jako mapa) | dědí automaticky |
+
+> **Bestie v chatu = TÝŽ panel jako na mapě (povrch C), jen v užším railu** — plný statblok,
+> NE zúžená karta (jen Výdrž+útoky). Skin ho řeší identicky (stejné tokeny i ornament).
+> V mockupu i v implementaci ukazuj chat-bestie jako kopii mapového statbloku, ne osekanou
+> variantu. (Platí i pro PC/NPC combat panel: chat = týž panel jen užší rail.)
 
 ---
 

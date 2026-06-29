@@ -1066,3 +1066,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře. Bestiář JaD funkčně kompletní (schéma krok 1 + statblok/panel krok 2). Zbývá: funkce+napoveda, BE deploy (strict validace), živé ověření vzhledu (případný frontend-design polish dle předlohy). Edit = generic schema form (ne custom inline) — pokud chce uživatel hezčí editaci, dořešit.
 
 ---
+
+### CH-037 — replace_all u CSS selektoru spolkl mezeru descendant kombinátoru → rozbil base embed blok všech systémů · 2026-06-29
+**Kontext:** 16.2g JaD skiny — přidával jsem `jad` do per-skin signature i base bloků v `DiceLogPanel.module.css` + `DiceRollOverlay.module.css` přes `:is([drd2],[jad])`.
+**Co jsem udělal špatně:** u base bloku jsem dal `replace_all` old=`[data-diary-system='drd2']) ` (paren **+ koncová mezera**, = descendant kombinátor před `.panel`/`.readout`) → new=`[data-diary-system='drd2'], [data-diary-system='jad'])` **BEZ koncové mezery**. Výsledek: `) .panel` (potomek) → `).panel` (compound) → selektor cílí element, který je SOUČASNĚ `[data-diary-system]` i `.panel` (nikdy) → base embed blok (surface/text/title…) přestal platit pro VŠECHNY systémy (drd16/drdplus/drd2/jad).
+**Proč to nefungovalo:** v CSS je mezera významový kombinátor; spolknout ji v náhradě = jiný selektor. A udělal jsem to **2× po sobě** (nejdřív DiceRollOverlay, pak hned stejně DiceLogPanel) — po první chybě jsem nezkontroloval, jestli ji neopakuju.
+**Poučení:** při `replace_all` CSS selektorů musí `new_string` zachovat PŘESNĚ stejný okolní whitespace jako `old_string` (zvlášť mezeru u descendant kombinátoru `) .trida`). Po první takové chybě u jednoho souboru rovnou zkontroluj/oprav i ostatní soubory se stejným patternem, ne až po zopakování. Fix = `replace_all` `[jad']).` → `[jad']) .` (mezera jen před třídou, ne před `[data-diary-skin`). Ověřeno gripem (base `) .panel` × per-skin `)[data-diary-skin`) + build.
+**Příznak cyklení:** stejná „spolknutá mezera/znak" chyba u 2.+ souboru za sebou; nebo embed plochy „prosvítají"/ztratí barvu napříč systémy po úpravě selektoru.
+
+---

@@ -177,7 +177,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - **Přidávatelné sekce:** Zdatnosti (zbroje/zbraně/nástroje), Jazyky, Schopnosti (název+popis), Zbraně (tabulka). Poznámky k hraní na celou šířku úplně dole.
 - **Kouzla** (tab, jen je-li zapnut „Sesilatel / Alchymista"): pozice 0.–9. stupně, max/použité sloty, seznam kouzel. Sekce se sama nabídne, je-li mezi povoláními kouzlící (`JAD_CASTERS`), dokud uživatel toggle ručně nepřepne.
 
-**Hranice / co neumí:** Obory jen jako jména — bez číselných účinků schopností (záměr, dohledává se v příručce). Nepočítá legálnost multiclassu (sloty kouzel, vstupní podmínky) — list je evidence, ne pravidlový engine. JaD zatím bez vlastních skinů (jen baseline pergamen, default `jad→fantasy`).
+**Hranice / co neumí:** Obory jen jako jména — bez číselných účinků schopností (záměr, dohledává se v příručce). Nepočítá legálnost multiclassu (sloty kouzel, vstupní podmínky) — list je evidence, ne pravidlový engine. JaD má **8 vlastních skinů** (16.2g — viz „Skin deníku" níž; fantasy = nový default, dnešní světlý pergamen = no-skin fallback).
 
 **Zvláštnosti:** Migrace legacy je **read-only** — starý `jad_class`/`jad_other_profs`/`jad_features` se odvodí pro zobrazení a do nových polí (`jad_classes`, `jad_profs`, `jad_feats`) se zapíše až prvním editem; odebraná pole (jméno/přesvědčení/hráč/pomůcky) se z DB **nemažou**, jen se neukazují. Data v `customData` prefix `jad_*` (delta merge přes `makeCdAccess`).
 
@@ -194,8 +194,8 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Jak se aplikuje:** `DiarySystemProvider` (deník) i `DiarySkinScope` (embedy: mapa/chat/dice) dají na předka `data-diary-system` + `data-diary-skin`; CSS sady (`styles/diary-skins.css` + `<sys>-skins/<id>.css`) přebíjí přes compound selektor `[data-diary-system][data-diary-skin]` přes tokeny `--mx-*` (HUD) / `--dd-*` (pergamen) / `--dd-embed-*` (embed plochy). Pokrývá: **deník list + bojový/bestie panel na mapě i v chatu (PC/NPC/Bestie stejně) + obal v TM + vyčíslení hodu + log kostek**.
 
-**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**. Ostatní systémy: list bez skinů (jen default vzhled). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
-**Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2}-skins/`.
+**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**, **jad ✅ (16.2g — 8 skinů, fantasy = nový default; světlý pergamen = no-skin fallback)**. Ostatní systémy: list bez skinů (jen default vzhled). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
+**Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2,jad}-skins/`. Bestie panel v chatu = TÝŽ plný statblok jako na mapě (ne osekaná varianta).
 
 ---
 

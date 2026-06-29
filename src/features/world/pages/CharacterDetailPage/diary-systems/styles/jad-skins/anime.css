@@ -1,0 +1,872 @@
+/* ════════════════════════════════════════════════════════════════════════
+ * JaD skin „MLP" (id `anime`, 16.x-skiny) — DUHOVÝ HOLOGRAFICKÝ CEL-SHADE.
+ *
+ * Světlý pergamenový JaD list (Cinzel kapitálky + vínová/zlatá + ◆ marker) se
+ * mění na lesklou holografickou sběratelskou „key visual" kartu: bílé
+ * ink-outlined cel-karty (#16162e) + TVRDÝ spodní cel-stín (0 7px 0 → karta
+ * „stojí" nad duhou) + lesklý gloss highlight, vše na plné duze
+ * (#ff5d6c → #ff6ad5). Disciplinované ink obrysy + bílý text na sytých plochách
+ * → veselé a zářivé, ale VKUSNÉ a PROFESIONÁLNÍ, ne dětská čmáranice.
+ * Tatáž MLP identita jako matrix/drdplus/drd2 anime — jeden svět napříč systémy.
+ *
+ * JaD = D&D 5e-like. Klíčové prvky přepracované do MLP jazyka:
+ *   - Vlastnosti (SÍL/OBR/ODL/INT/MDR/CHA) = bílé cel-boxy s duhovým proužkem,
+ *   - Úroveň postavy = velký STAR-BURST medailon osudu (.jad-level-badge),
+ *   - OČ / Iniciativa / Rychlost = meta-boxy s barevným ink žebrem,
+ *   - HP / Životy = červený srdíčko-bar (.jad-hp-panel),
+ *   - Multipovolání = řádky s mini star-burst pečetí oboru,
+ *   - Kouzla 0.-9. stupně = safírové karty + „Pozice" safírová pilulka,
+ *   - Fatální úspěch/neúspěch na k20 = zlatá/krvavá (řeší readout modul).
+ *
+ * Signature trojice (napříč VŠEMI povrchy — deník, mapa, chat):
+ *   1) STAR-BURST medailon osudu — zlatá 20-cípá hvězda (clip-path) + lesklý
+ *      conic duhový disk s ink prstencem + gloss. Hlavní emblém: velký = úroveň
+ *      (.jad-level-badge), mini = pečeť povolání (combat/bestie panel řeší modul).
+ *   2) AKČNÍ SWOOSH + ✦ SPARKLES — vícebarevné ink-outlined speed-lines v rohu
+ *      listu (.jad-diary::after) + roztroušené ✦ hvězdičky; echo = ✦ marker
+ *      nadpisů h3.
+ *   3) CEL-SHADE gloss + spodní stupeň — každá karta lesklý highlight nahoře +
+ *      tmavší stínový stupeň dole (plastová sběratelská karta) + duhový rail.
+ *
+ * Sémantika JaD DRŽÍ i v duhové paletě: HP/Životy červená · kouzla/pozice
+ * safír · OČ levandule (akcent) · iniciativa zlatá/jantar · kladný hod mint ·
+ * záporný magenta · fatální úspěch zlatá / neúspěch krvavá.
+ *
+ * Scope: compound `[data-diary-system='jad'][data-diary-skin='anime']`
+ * (specifita 0,2,0 → přebije pergamenový default `[data-diary-system='jad']`).
+ * Tokeny dědí list (.jad-*) i tokenizované panely (combat/bestie přes
+ * var(--dd-*)) + embedy (chrome/dice/log přes var(--dd-embed-*)). Mapa a chat
+ * sdílí TYTÉŽ panely → --dd-* je oskinuje OBA identicky. Pouze CSS/SVG, žádný JS.
+ * Tento motiv se NESDÍLÍ s žádným jiným skinem (vlastní tvar + ornament).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) LIST (.jad-diary) — lokální token override + DUHOVÁ PLOCHA + INK OBRYS.
+   Pergamen → bílá smetanová cel-karta na duhovém holografickém rámu.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary {
+  /* ── pergamen tokeny → cel-shade; border = signature ink #16162e ── */
+  --jad-accent: #7a6bff; /* OČ/obrana levandule — skin-fixní akcent listu */
+  --jad-accent-soft: #9a8cff;
+  --jad-gold: #ffd23e;
+  --jad-border: #16162e; /* jednotný ink obrys místo pergamenového béžu */
+  --jad-border-soft: rgba(22, 22, 46, 0.18);
+  --jad-panel-bg: #ffffff;
+  --jad-box: #ffffff;
+  --jad-highlight: #eef3ff;
+  --jad-ink-soft: #6a6a8a;
+
+  /* ── lokální MLP pomocníci (ornamenty + kompozity je čtou) ── */
+  --mlp-ink: #16162e; /* signature ink obrys — NIKDY čistá černá */
+  --mlp-ink-2: #2b2a55; /* tělo textu */
+  --mlp-faint: #9b95a8;
+  --mlp-cel: #d9d2c4; /* spodní cel-stupeň (karta „odlepená" od duhy) */
+  --mlp-empty: #efeadc; /* prázdná buňka / pip */
+  --mlp-empty-sh: #c9c2b2;
+  /* ── JaD sémantické role (cel-shade syté podoby) ── */
+  --mlp-hp: #ff4d56; /* Životy / HP */
+  --mlp-hp-2: #ff7a85;
+  --mlp-hp-low: #ff4d97; /* klesající HP → magenta varování */
+  --mlp-spell: #3a8dff; /* kouzla / pozice / magie = safír */
+  --mlp-spell-2: #6eb0ff;
+  --mlp-ac: #7a6bff; /* OČ = levandule (akcent) */
+  --mlp-ac-2: #9a8cff;
+  --mlp-init: #ffb524; /* iniciativa = zlatá/jantar */
+  --mlp-init-2: #ffd270;
+  --mlp-gold: #ffd23e; /* fate / neutrál / fatální úspěch */
+  --mlp-gold-deep: #b8901a;
+  --mlp-green: #1faf5a; /* kladný hod / zdatnost */
+  --mlp-green-2: #4fd17e;
+  --mlp-pink: #ff4d97; /* záporný hod / postih / magenta detail */
+  --mlp-sky: #3ac0ff; /* rychlost */
+  --mlp-crit-fail: #c01030; /* fatální neúspěch */
+
+  /* plná holografická duha (signature podklad) */
+  --mlp-rainbow: linear-gradient(
+    135deg,
+    #ff5d6c 0%,
+    #ff9a4d 15%,
+    #ffe14d 31%,
+    #5bd47e 48%,
+    #3ac0ff 64%,
+    #7a6bff 80%,
+    #ff6ad5 100%
+  );
+  --mlp-rainbow-90: linear-gradient(90deg, #ff5d6c, #ff9a4d, #ffe14d, #5bd47e, #3ac0ff, #7a6bff, #ff6ad5);
+  --mlp-conic: conic-gradient(from 200deg, #ff5d6c, #ff9a4d, #ffe14d, #5bd47e, #3ac0ff, #7a6bff, #ff6ad5, #ff5d6c);
+  /* vrstvené cel-stíny (signature tvrdý spodní stupeň) */
+  --mlp-cel-card: 0 0 0 3px var(--mlp-ink), 0 7px 0 0 var(--mlp-cel), 0 8px 0 3px var(--mlp-ink),
+    0 18px 26px -14px rgba(26, 20, 80, 0.4);
+  --mlp-cel-sm: 0 0 0 2.5px var(--mlp-ink), 0 4px 0 0 var(--mlp-cel), 0 5px 0 2.5px var(--mlp-ink);
+  --mlp-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0) 30%);
+  --mlp-celshade: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 58%,
+    rgba(43, 42, 85, 0.06) 58%,
+    rgba(43, 42, 85, 0.08) 100%
+  );
+  /* 20-cípá star-burst hvězda (signature clip-path) */
+  --mlp-star: polygon(
+    50% 0%, 58% 33%, 79% 12%, 67% 40%, 100% 38%, 70% 50%, 100% 62%, 67% 60%,
+    79% 88%, 58% 67%, 50% 100%, 42% 67%, 21% 88%, 33% 60%, 0% 62%, 30% 50%,
+    0% 38%, 33% 40%, 21% 12%, 42% 33%
+  );
+
+  /* ── PLOCHA listu = duhový holografický rám s vrstveným ink+bílým prstencem ── */
+  position: relative;
+  font-family: 'Outfit', system-ui, sans-serif;
+  color: var(--mlp-ink-2);
+  isolation: isolate;
+  overflow: hidden;
+  border: 0;
+  border-radius: 24px;
+  padding: 16px;
+  background:
+    radial-gradient(60% 45% at 50% -8%, rgba(255, 255, 255, 0.5), transparent 60%),
+    var(--mlp-rainbow);
+  box-shadow:
+    0 0 0 4px var(--mlp-ink),
+    0 0 0 9px #fff,
+    0 0 0 12px var(--mlp-ink),
+    0 34px 70px -20px rgba(26, 20, 80, 0.7);
+}
+
+/* holografická diagonální gloss vrstva přes celý list (screen blend) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 24px;
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 26%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.16) 100%
+  );
+}
+
+/* SIGNATURE: akční swoosh + ✦ sparkles v pravém dolním rohu listu */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: right -20px bottom -20px, 4% 5%, 96% 26%, 92% 88%;
+  background-size: 260px 150px, 22px 22px, 15px 15px, 13px 13px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='170' viewBox='0 0 300 170' fill='none'%3E%3Cpath d='M6 24 C90 18 200 48 294 150' stroke='%2316162e' stroke-width='13' stroke-linecap='round'/%3E%3Cpath d='M14 22 C98 16 206 44 296 146' stroke='%23ff4d97' stroke-width='7.5' stroke-linecap='round'/%3E%3Cpath d='M2 54 C100 50 214 80 286 162' stroke='%2316162e' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M10 52 C108 48 220 76 288 158' stroke='%233aa7ff' stroke-width='5.5' stroke-linecap='round'/%3E%3Cpath d='M4 88 C124 86 232 116 282 176' stroke='%2316162e' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M12 86 C130 84 236 112 286 172' stroke='%23ffd23e' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffffff' stroke='%2316162e' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffffff' stroke='%2316162e' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffd23e' stroke='%2316162e' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 4px 6px rgba(26, 20, 80, 0.25));
+}
+@media (max-width: 480px) {
+  [data-diary-system='jad'][data-diary-skin='anime'] .jad-diary::after {
+    background-image: none;
+  }
+}
+
+/* obsah listu nad duhou */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* společné scrollbary v duhovém ladění */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary ::-webkit-scrollbar-thumb {
+  background: rgba(122, 107, 255, 0.45);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary ::-webkit-scrollbar-thumb:hover {
+  background: rgba(122, 107, 255, 0.7);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) NADPISY h3 — Bricolage + ✦ marker (magenta s ink obrysem) + duhový rail.
+   Pergamenový ◆ zlatý marker → ✦ sparkle.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary h3 {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--mlp-ink);
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary h3::before {
+  content: '\2726';
+  color: var(--mlp-pink);
+  -webkit-text-stroke: 1.4px var(--mlp-ink);
+  text-shadow: 0 1.4px 0 var(--mlp-ink);
+  font-size: 0.95em;
+}
+/* duhový rail za nadpisem */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary h3::after {
+  content: '';
+  flex: 1;
+  height: 5px;
+  border-radius: 5px;
+  background: var(--mlp-rainbow-90);
+  box-shadow: 0 0 0 2px var(--mlp-ink);
+}
+
+/* společné inputy / selecty / textarea → bílé cel-pole s ink obrysem */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary input,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary textarea,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary select {
+  background: #fff;
+  border: 0;
+  border-radius: 9px;
+  color: var(--mlp-ink-2);
+  font-family: 'Outfit', system-ui, sans-serif;
+  box-shadow: 0 0 0 2px var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary input:focus,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary textarea:focus,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary select:focus {
+  border: 0;
+  box-shadow: 0 0 0 2.5px var(--mlp-ac);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary input:disabled,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary textarea:disabled,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary select:disabled {
+  background: var(--mlp-highlight, #f3f1fb);
+  color: #5c5870;
+  opacity: 0.92;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) TABY — bílé cel-záložky s ink obrysem, aktivní = levandulová cel-karta.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tabs {
+  border-bottom: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tabs button,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tabs .jad-tab-toggle {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--mlp-ink);
+  background: #fff;
+  border: 0;
+  border-radius: 11px 11px 0 0;
+  margin-bottom: 0;
+  padding: 9px 16px;
+  box-shadow: 0 0 0 2.5px var(--mlp-ink), 0 4px 0 0 var(--mlp-cel), 0 5px 0 2.5px var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tabs button.active {
+  color: #fff;
+  border-bottom-color: transparent;
+  background: linear-gradient(180deg, #8c7dff, var(--mlp-ac));
+  box-shadow: 0 0 0 2.5px var(--mlp-ink), 0 4px 0 0 #4a3db8, 0 5px 0 2.5px var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tabs button:hover:not(.active) {
+  color: var(--mlp-ac);
+}
+/* toggle Sesilatel/Alchymista → pilulka s ink obrysem */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tabs .jad-tab-toggle {
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--mlp-ink);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tabs .jad-tab-toggle input {
+  accent-color: var(--mlp-green);
+  box-shadow: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) HLAVIČKA (.jad-header / .jad-identity) — světle modrá hero cel-karta.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-header {
+  background: linear-gradient(180deg, #ffffff, #eef3ff 60%, #e6edff 100%);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: var(--mlp-cel-sm);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-field label {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--mlp-ink-soft);
+  text-transform: uppercase;
+}
+/* identitní pole — Bricolage 700 + čárkované podtržení (cel-shade disciplína) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-field input,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-field select {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--mlp-ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px dashed rgba(22, 22, 46, 0.28);
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-field input:focus,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-field select:focus {
+  border-bottom-color: var(--mlp-ac);
+  box-shadow: none;
+}
+
+/* ── SIGNATURE: úroveň (.jad-level-badge) → velký STAR-BURST medailon osudu ──
+   Tmavý pergamenový box překryjeme rotující zlatou hvězdou + conic duhovým
+   diskem s ink prstencem; číslo úrovně (.num) a popisek (.cap) leží navrch. */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  filter: drop-shadow(0 6px 10px rgba(122, 107, 255, 0.3));
+  isolation: isolate;
+}
+/* zlatá 20-cípá hvězda (rotuje) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -2;
+  background: var(--mlp-gold);
+  clip-path: var(--mlp-star);
+  filter: drop-shadow(2px 2px 0 var(--mlp-ink)) drop-shadow(-2px -2px 0 var(--mlp-ink))
+    drop-shadow(0 0 8px rgba(255, 210, 62, 0.56));
+  animation: jad-mlp-spin 40s linear infinite;
+}
+/* lesklý conic duhový disk s ink prstencem */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--mlp-conic);
+  box-shadow: 0 0 0 3px var(--mlp-ink), inset 0 -10px 0 rgba(0, 0, 0, 0.18),
+    inset 0 10px 14px rgba(255, 255, 255, 0.5);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge .num {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 2px 2px 0 var(--mlp-ink), 0 0 10px rgba(255, 255, 255, 0.5);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge .cap {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #fff;
+  opacity: 1;
+  text-shadow: 0 1px 0 var(--mlp-ink);
+}
+@keyframes jad-mlp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge::before {
+    animation: none;
+  }
+}
+@media (max-width: 640px) {
+  [data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge {
+    width: 96px;
+    height: 96px;
+  }
+  [data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-level-badge .num {
+    font-size: 1.6rem;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) PANELY (.jad-panel) — bílá cel-karta + ink obrys + TVRDÝ spodní cel-stín
+   + gloss highlight. Hero podklad sloupců.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-panel {
+  position: relative;
+  background: var(--mlp-panel, #fff);
+  border: 0;
+  border-radius: 16px;
+  box-shadow: var(--mlp-cel-card);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-panel::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 13px;
+  pointer-events: none;
+  background: var(--mlp-celshade), var(--mlp-gloss);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) VLASTNOSTI (.jad-stat-box) — bílé cel-boxy s duhovým proužkem nahoře.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-stat-box {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border: 0;
+  border-radius: 13px;
+  box-shadow: var(--mlp-cel-sm);
+}
+/* duhový proužek nahoře (signature dlaždice) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-stat-box::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 5px;
+  background: var(--mlp-rainbow-90);
+  box-shadow: inset 0 -1px 0 rgba(22, 22, 46, 0.2);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-stat-box span.lbl {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--mlp-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-stat-box span.mod {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-stat-box input {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--mlp-ink);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) TOP META (Iniciativa / OČ / Rychlost) — cel-boxy s barevným ink žebrem.
+   DOM nemá modifikátory tříd → cílíme přes pořadí (1=Inic 2=OČ 3=Rych).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-meta-box {
+  position: relative;
+  background: #fff;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: var(--mlp-cel-sm);
+  border-left: 7px solid var(--mlp-ac);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-top-meta .jad-meta-box:nth-child(1) {
+  border-left-color: var(--mlp-init);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-top-meta .jad-meta-box:nth-child(2) {
+  border-left-color: var(--mlp-ac);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-top-meta .jad-meta-box:nth-child(3) {
+  border-left-color: var(--mlp-sky);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-meta-box label {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--mlp-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-meta-box input,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-meta-box span.val {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-meta-box input {
+  background: transparent;
+  box-shadow: none;
+}
+/* Iniciativa hodnota = zlatá; OČ hodnota = levandule (sémantika) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-top-meta .jad-meta-box:nth-child(1) span.val {
+  color: var(--mlp-gold-deep);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-top-meta .jad-meta-box:nth-child(2) input {
+  color: var(--mlp-ac);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) HP PANEL (.jad-hp-panel) — červený srdíčko-bar (sémantika životů).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-hp-panel {
+  position: relative;
+  background: #fff;
+  border: 0;
+  border-left: 7px solid var(--mlp-hp);
+  border-radius: 16px;
+  box-shadow: var(--mlp-cel-card);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-hp-panel::before {
+  content: '';
+  position: absolute;
+  inset: 3px 3px 3px 0;
+  border-radius: 13px;
+  pointer-events: none;
+  background: var(--mlp-gloss);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-hp-panel > * {
+  position: relative;
+  z-index: 1;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-hp-panel .hp-box label {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--mlp-ink-soft);
+}
+/* srdíčko ♥ před prvním HP labelem (signature) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-hp-panel .hp-row:first-child .hp-box:first-child label::before {
+  content: '\2665 ';
+  -webkit-text-stroke: 1.1px var(--mlp-ink);
+  color: var(--mlp-hp);
+  text-shadow: 0 1.1px 0 var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-hp-panel .hp-box input {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--mlp-ink);
+  background: var(--mlp-empty);
+  box-shadow: inset 0 0 0 2px var(--mlp-ink);
+}
+/* Aktuální Životy (#jad_hpCur) — přebij inline var(--jad-accent) na červenou HP */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary #jad_hpCur {
+  border-color: var(--mlp-hp) !important;
+  color: var(--mlp-hp) !important;
+  box-shadow: inset 0 0 0 2.5px var(--mlp-hp);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) SEZNAMOVÉ ŘÁDKY (.jad-list-row) — záchrany / dovednosti / profily.
+   pip ○/●/◉ → cel-disky (zdatnost zelená, expertíza zlatá).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-list-row {
+  border-bottom: 1px dashed rgba(22, 22, 46, 0.14);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-list-row button.prof {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--mlp-empty);
+  color: var(--mlp-ink-soft);
+  box-shadow: inset 0 0 0 2px var(--mlp-ink), inset 0 -2px 0 var(--mlp-empty-sh);
+}
+/* ● zdatnost = zelená, ◉ expertíza = zlatá (rozlišeno přes obsah pseudo nelze;
+   barvíme jen základ — JaD vykresluje glyf přímo v buttonu) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-list-row span.mod {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-list-row span.sub {
+  color: var(--mlp-faint);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+/* inspirace toggle (button.prof, inline var(--jad-accent)) → zlatá při ON */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary button[aria-label='Přepnout inspiraci'] {
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary button[aria-label='Přepnout inspiraci'][style*='--jad-accent'] {
+  background: linear-gradient(180deg, var(--mlp-init-2), var(--mlp-init)) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) MULTIPOVOLÁNÍ (.jad-prof-row) — bílé cel-řádky; popisky Bricolage.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-prof-row .pcap {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--mlp-ink-soft);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-prof-row .del-btn {
+  color: var(--mlp-pink);
+  font-weight: 800;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-sub-hint {
+  color: var(--mlp-pink);
+  font-style: italic;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-foot-hint {
+  color: var(--mlp-ink-soft);
+  font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   11) PŘIDÁVATELNÉ ŘÁDKY (.jad-tag-row) — zdatnosti / jazyky; ◦ → levandule.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tag-row {
+  border-bottom: 1px dotted rgba(22, 22, 46, 0.18);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tag-row .bullet {
+  color: var(--mlp-ac);
+  font-weight: 800;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tag-row input {
+  border: 0;
+  border-bottom: 2px dotted rgba(22, 22, 46, 0.22);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tag-row input:focus {
+  border-bottom-color: var(--mlp-ac);
+  box-shadow: none;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-tag-row .del-btn {
+  color: var(--mlp-pink);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   12) SCHOPNOSTI (.jad-feat) — bílá cel-karta s levandulovým ink žebrem.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-feat {
+  position: relative;
+  background: #fff;
+  border: 0;
+  border-left: 7px solid var(--mlp-ac);
+  border-radius: 13px;
+  box-shadow: var(--mlp-cel-sm);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-feat-head input {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px dashed rgba(22, 22, 46, 0.22);
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-feat-head input:focus {
+  border-bottom-color: var(--mlp-ac);
+  box-shadow: none;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-feat-head .del-btn {
+  color: var(--mlp-pink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-feat textarea {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--mlp-ink-soft);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   13) TABULKA (.jad-table) — bílé řádkové cel-reliéfy s ink obrysem.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table {
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table th {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--mlp-ink-soft);
+  border-bottom: 2px solid var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table td {
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--mlp-ink);
+  padding: 7px 8px;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table td:first-child {
+  border-radius: 9px 0 0 9px;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table td:last-child {
+  border-radius: 0 9px 9px 0;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table td input {
+  box-shadow: none;
+  border-radius: 6px;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table .del-btn {
+  color: var(--mlp-pink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-table .del-btn:hover {
+  color: var(--mlp-crit-fail);
+}
+
+/* tlačítko přidat (.add-link) → dashed levandulová cel-pilulka */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .add-link {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--mlp-ac);
+  background: linear-gradient(180deg, #fff, #f3f1fb);
+  border: 2px dashed var(--mlp-ac);
+  border-radius: 12px;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .add-link:hover {
+  border-style: solid;
+  background: rgba(122, 107, 255, 0.08);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   14) KOUZLA (.jad-spells) — safírové karty + „Pozice" safír pilulka.
+   Sémantika magie = safír/modrá DRŽÍ.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-spells .spell-header {
+  background: #fff;
+  border: 0;
+  border-left: 7px solid var(--mlp-spell);
+  border-radius: 12px;
+  box-shadow: var(--mlp-cel-sm);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-spells .spell-header div label {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--mlp-spell);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-spells .spell-header div input {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-spells .spell-level {
+  position: relative;
+  background: #fff;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: var(--mlp-cel-sm);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-spells .sl-title {
+  border-bottom: 0;
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-spells .sl-title h4 {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink);
+}
+/* „Pozice" použité (#spl_used, inline var(--jad-accent)) → safír (magie) */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary input[aria-label^='Použité pozice'] {
+  border-color: var(--mlp-spell) !important;
+  color: var(--mlp-spell);
+  box-shadow: inset 0 0 0 2.5px var(--mlp-spell);
+}
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary input[aria-label^='Maximální pozice'] {
+  box-shadow: inset 0 0 0 2px var(--mlp-spell);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   15) `--dd-*` PANELY (combat + bestie na MAPĚ i v CHATU) — tokenizované, dědí.
+   Base paleta + role + border odstíny + inky + POVRCHY + gradienty + fonty.
+   Mapa a chat sdílí TYTÉŽ panely → oskinuje je OBA identicky. Ink obrys #16162e.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] {
+  /* ── base paleta ── */
+  --dd-parch-1: #fbf7ef;
+  --dd-parch-2: #ffffff;
+  --dd-parch-edge: #16162e;
+  --dd-ink: #2b2a55;
+  --dd-ink-soft: #6a6a8a;
+  --dd-rule: rgba(22, 22, 46, 0.16);
+
+  /* ── role (HP červená · kouzla safír · OČ levandule · iniciativa zlatá) ── */
+  --dd-accent: #7a6bff; /* OČ / obrana / akcent rámů, prof ● = levandule */
+  --dd-gold: #ffb524; /* iniciativa / sekundární */
+  --dd-crimson: #ff4d56; /* HP / Životy / Sudba */
+  --dd-sapphire: #3a8dff; /* kouzla / pozice */
+
+  /* ── inky ── */
+  --dd-ink-deep: #16162e;
+  --dd-ink-head: #16162e;
+
+  /* ── POVRCHY (NEJSOU v baseline — MUSÍ být, jinak panel zůstane pergamen) ── */
+  --dd-panel-bg:
+    radial-gradient(70% 50% at 100% 0%, rgba(122, 107, 255, 0.08), transparent 60%),
+    #fbf7ef;
+  --dd-card-bg: #ffffff;
+  --dd-row-bg: #ffffff;
+  --dd-input-bg: #ffffff;
+
+  /* ── HP lišta ── */
+  --dd-hpbar-track: #efeadc;
+  --dd-hpfill-grad: linear-gradient(90deg, #ff7a85, #ff4d56);
+  --dd-hptxt-glow: 0 1px 0 #fff; /* na světlé ploše → jemné, ne neon */
+
+  /* ── gradienty ── */
+  --dd-seal-grad: conic-gradient(from 200deg, #ff5d6c, #ff9a4d, #ffe14d, #5bd47e, #3ac0ff, #7a6bff, #ff6ad5, #ff5d6c);
+  --dd-accent-grad: linear-gradient(180deg, #ffe07a, #ffb524); /* zlaté init tlačítko */
+  --dd-accent-grad-strong: linear-gradient(180deg, #ffe07a, #ffd23e 60%, #b8901a);
+  --dd-step-minus: linear-gradient(180deg, #ff8aaf, #ff4d97); /* HP −krok magenta */
+  --dd-step-plus: linear-gradient(180deg, #4fd17e, #1faf5a); /* HP +krok zelená */
+
+  /* ── kompozity ── */
+  --dd-sheet-radius: 16px;
+  --dd-panel-frame:
+    0 0 0 3px #16162e,
+    0 22px 40px -18px rgba(0, 0, 0, 0.6);
+
+  /* ── fonty ── */
+  --dd-font-body: 'Outfit', system-ui, sans-serif;
+  --dd-font-head: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+
+  /* ════════════════════════════════════════════════════════════════════
+     16) EMBED plochy (chrome obal v TM / dice readout / dicelog / chat).
+     Plocha VŽDY NEPRŮHLEDNÁ (smetanová karta), aby neprosvítala mapu.
+     Sémantika: pos=zelená, neg=magenta, neutral=zlatá; fatální zlatá/krvavá.
+     ════════════════════════════════════════════════════════════════════ */
+  --dd-forge-1: #16162e; /* tmavý fallback pod readout (drží ink obrys) */
+  --dd-embed-surface: linear-gradient(180deg, #fefcf7, #fbf7ef); /* OPAQUE */
+  --dd-embed-border: #16162e;
+  --dd-embed-line: rgba(22, 22, 46, 0.16);
+  --dd-embed-text: #2b2a55;
+  --dd-embed-muted: #6a6a8a;
+  --dd-embed-title: #16162e;
+  --dd-embed-chip-bg: #ffffff;
+  --dd-embed-accent: #ffd23e;
+  --dd-embed-num-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-title-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-pos: #1faf5a; /* kladný hod = mint-green */
+  --dd-embed-neg: #ff4d97; /* záporný hod = magenta */
+  --dd-embed-neutral: #ffd23e; /* neutrální total = zlatá */
+  /* fatální (JaD specialita na k20) */
+  --dd-embed-crit: #b8901a; /* fatální úspěch nat20 = zlatá */
+  --dd-embed-crit-bg: #ffd23e;
+  --dd-embed-fumble: #c01030; /* fatální neúspěch nat1 = krvavá */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   17) VIEW MODE — drž čitelnost (ink obrys zůstává, jen kurzor default).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary input:disabled,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary select:disabled,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary textarea:disabled,
+[data-diary-system='jad'][data-diary-skin='anime'] .jad-diary button:disabled {
+  cursor: default;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   18) Mobilní dotykové plochy — větší pipy/boxy (vzor jad.css breakpointy).
+   (Grid kolaps + sheet padding řeší jad.css; zde jen cel-shade prvky.)
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  [data-diary-system='jad'][data-diary-skin='anime'] .jad-diary .jad-list-row button.prof {
+    width: 28px;
+    height: 28px;
+  }
+}

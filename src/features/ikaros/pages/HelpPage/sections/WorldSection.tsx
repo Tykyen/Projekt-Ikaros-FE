@@ -133,8 +133,8 @@ export function WorldSection() {
         </Tool>
         <Tool icon={<NotebookPen size={16} />} title="Vzhled deníku — skin tvého listu" audience={{ kind: 'vse', label: 'Členové' }}>
           <p>
-            U herních systémů s vlastním listem (Matrix, Dračí doupě 1.6, Plus a II)
-            si na <strong>deníku postavy</strong> přepneš paletkou{' '}
+            U herních systémů s vlastním listem (Matrix, Dračí doupě 1.6, Plus, II
+            a Jeskyně a draci) si na <strong>deníku postavy</strong> přepneš paletkou{' '}
             <strong>🎨 Vzhled</strong> mezi osmi styly: <strong>Sci-fi</strong>,{' '}
             <strong>Fantasy</strong>, <strong>Horor</strong>, <strong>Steampunk</strong>,{' '}
             <strong>Příroda</strong>, <strong>Minimal</strong>, <strong>Retro</strong> a{' '}

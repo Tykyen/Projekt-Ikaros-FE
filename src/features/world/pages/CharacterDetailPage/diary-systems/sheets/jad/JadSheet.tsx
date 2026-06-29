@@ -329,7 +329,10 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                     style={{
                       width: 24,
                       height: 24,
-                      background: g('insp') === '1' ? 'var(--jad-accent)' : '#fff',
+                      background:
+                        g('insp') === '1'
+                          ? 'var(--jad-insp, var(--jad-accent))'
+                          : '#fff',
                     }}
                     onClick={() => set('insp', g('insp') === '1' ? '0' : '1')}
                     aria-label="Přepnout inspiraci"
@@ -416,8 +419,8 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                     <input
                       id="jad_hpCur"
                       style={{
-                        borderColor: 'var(--jad-accent)',
-                        color: 'var(--jad-accent)',
+                        borderColor: 'var(--jad-hp, var(--jad-accent))',
+                        color: 'var(--jad-hp, var(--jad-accent))',
                       }}
                       value={g('hpCur')}
                       disabled={disabled}
@@ -848,7 +851,7 @@ function SpellLevelBlock({
               style={{
                 width: 40,
                 textAlign: 'center',
-                borderColor: 'var(--jad-accent)',
+                borderColor: 'var(--jad-spell, var(--jad-accent))',
               }}
               value={g(`spl_used_${lvl}`)}
               disabled={disabled}
