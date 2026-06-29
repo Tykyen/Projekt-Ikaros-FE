@@ -4,6 +4,14 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 8.7s D&D 5e deník: multipovolání + obory + přidávatelné sekce · 2026-06-29
+**Co nakonec zabralo:** Port JaD 8.7p vzoru na dnd5e deník (z 8.7d 1:1 legacy): `dnd_classes` JSON multipovolání + obory s prahovou úrovní odemčení, zázemí `<select>`+vlastní, auto-úroveň badge (`Σ l`), přidávatelné `dnd_profs`/`dnd_langs`/`dnd_feats` místo textarea, poznámky dole. **Černokněžník = 2 osy** (patron+pakt) → rozšíření modelu `DndClassDef` o volitelné `sub2`/`list2`/`label2` + pole `s2` v řádku; **Totemový/Kruh země vypsané jako kombinace** v listu oboru (0 změn modelu). Zachován vlastní dnd vzhled + D&D specifika (osobnost Rysy/Ideály/Pouta/Vady, death-pipy, spell-tab).
+**Proč to je správně (a ne další variace):** (1) Reuse osvědčeného JaD vzoru (cdAccess delta-merge, derive-* migrace read-only) = 0 BE změn, žádný data-loss starých `dnd_classLevel`/`otherProf`/`features`. (2) 2. osa jako **volitelná** pole modelu → ostatní povolání mají 1 select, jen Černokněžník 2 (žádný hack/flatten). (3) Auto-caster ODVOZENÝ stav (`spRaw===''&&hasCaster`), ruční `0/1` přebíjí — ne side-effect zápis v renderu.
+**Jak ověřeno:** `npm run build` čistý, ESLint čistý, **32/32** dnd5e testů + **205/205** celý diary-systems; strukturální mobil-desktop audit (grid 3→1, identity 4→2 sloupce, prof-row stack ≤600px, žádný horizontální scroll).
+**Zhodnocení:** Zabralo napoprvé, 0 cyklení (prototyp=vzor JaD=kontrakt). Drobná **test-chyba**: použil jsem `rerender` u testu „Vlastní zázemí", ale `bgCustom` se inicializuje z `useState` jen při mountu → stará hodnota → rozdělil na 2 čerstvé mounty (komponenta byla OK, ne kód). **Past pro příště:** stav odvozený z props v `useState` initializeru nelze testovat přes `rerender` (jen fresh `render`). Čeká: živý mobil-desktop na zařízení + `funkce`/`napoveda` po živé kontrole + commit.
+
+---
+
 ### ✅ ŘEŠENÍ — 16.2e chat DrD2 bestie panel + PC NPC zdarma · 2026-06-28
 **Co nakonec zabralo:** PC/NPC deník v chatu = **ZDARMA** (`DiaryRollPanel` bere `COMBAT_PANELS['drd2']`=Drd2CombatPanel, single source — drd2 registrovaný už v kroku 4 → 0 práce). Bestie chat = `Drd2ChatBestiePanel.tsx` (reuse jádro `Drd2BestieCombatActions` + CSS z mapy, vzor `DrdPlusChatBestiePanel`) + branche v `BestieInstancePanel` (instance, edit) + `BestieRollPanel` (katalog, read-only).
 **Proč to je správně (a ne další variace):** (1) Chat deník systémově agnostický (COMBAT_PANELS registry) → PC/NPC zdarma. (2) **Sudba HP v chatu žije v `systemStats.sudba`/`sudba_cur`** — combatant NEMÁ `token.currentHp` jako mapa, takže HP track vlastní v panelu (ne reuse mapové Sudby). (3) Combatant systemStats je VOLNÝ (žádná BE strict validace jako mapa token) → bez sanitize.

@@ -1,6 +1,7 @@
 /**
- * 8.7d — D&D 5e konstanty.
- * 1:1 z `c:/Matrix/Matrix/frontend/src/components/diary/DndCharacterSheet.tsx`.
+ * 8.7d — D&D 5e konstanty (atributy, dovednosti, spell typy).
+ * 8.7s — multipovolání + obory, zázemí select, přidávatelné sekce.
+ *        Data povolání/zázemí dle zadání uživatele (D&D 5e CZ).
  */
 
 export const ABILITY_KEYS = [
@@ -52,17 +53,7 @@ export const SKILLS: DndSkillDef[] = [
   { name: 'Zastrašování', ability: 'cha' },
 ];
 
-/** Header fields (Identity). */
-export const DND_HEADER_FIELDS: { key: string; label: string }[] = [
-  { key: 'classLevel', label: 'Povolání a úroveň' },
-  { key: 'background', label: 'Zázemí' },
-  { key: 'playerName', label: 'Jméno hráče' },
-  { key: 'race', label: 'Rasa' },
-  { key: 'alignment', label: 'Přesvědčení' },
-  { key: 'xp', label: 'Body zkušeností' },
-];
-
-/** Personality blocky (textarea). */
+/** Personality blocky (textarea) — D&D specifikum, zůstává. */
 export const DND_PERSONALITY_FIELDS: {
   key: string;
   label: string;
@@ -93,4 +84,184 @@ export interface DndSpellLevel {
   totalSlots: number;
   usedSlots: number;
   spells: DndSpellEntry[];
+}
+
+// ════════════════════════════════════════════════════════════════
+// 8.7s — Multipovolání, obory, zázemí, přidávatelné sekce
+// ════════════════════════════════════════════════════════════════
+
+/** Definice povolání: prahová úroveň výběru oboru + seznam oborů. */
+export interface DndClassDef {
+  /** Úroveň, na které se vybírá obor (1. osa). */
+  sub: number;
+  /** Dostupné obory / specializace (1. osa). */
+  list: string[];
+  /** Popisek 1. osy (default „Obor"). */
+  label?: string;
+  /** Práh 2. osy (jen Černokněžník — pakt). */
+  sub2?: number;
+  /** Seznam 2. osy. */
+  list2?: string[];
+  /** Popisek 2. osy. */
+  label2?: string;
+}
+
+/** 12 povolání D&D 5e → práh oboru + obory (a u Černokněžníka 2. osa). */
+export const DND_CLASSES: Record<string, DndClassDef> = {
+  Barbar: {
+    sub: 3,
+    label: 'Stezka',
+    list: [
+      'Berserkr',
+      'Totemový — Medvěd',
+      'Totemový — Vlk',
+      'Totemový — Orel',
+      'Totemový — Los',
+      'Totemový — Tygr',
+      'Bojechtivec',
+    ],
+  },
+  Bard: { sub: 3, label: 'Kolej', list: ['Bojový', 'Znalostní'] },
+  Bojovník: {
+    sub: 3,
+    label: 'Archetyp',
+    list: ['Čaroknecht', 'Šampión', 'Taktik', 'Rytíř'],
+  },
+  'Čaroděj': {
+    sub: 1,
+    label: 'Původ',
+    list: ['Divoká magie', 'Démoní rod', 'Bouřný čaroděj'],
+  },
+  'Černokněžník': {
+    sub: 1,
+    label: 'Patron',
+    list: ['Arcivíla', 'Běs', 'Prastarý', 'Nehynoucí'],
+    sub2: 3,
+    label2: 'Pakt',
+    list2: ['Pakt čepele', 'Pakt rukověti', 'Pakt řetězu'],
+  },
+  Druid: {
+    sub: 2,
+    label: 'Kruh',
+    list: [
+      'Kruh měsíce',
+      'Kruh země — Arktida',
+      'Kruh země — Bažina',
+      'Kruh země — Hory',
+      'Kruh země — Lesy',
+      'Kruh země — Pláně',
+      'Kruh země — Pobřeží',
+      'Kruh země — Poušť',
+      'Kruh země — Podzemí',
+    ],
+  },
+  'Hraničář': {
+    sub: 3,
+    label: 'Archetyp',
+    list: ['Lovec', 'Pán zvířat'],
+  },
+  Klerik: {
+    sub: 1,
+    label: 'Doména',
+    list: [
+      'Bouře',
+      'Příroda',
+      'Světlo',
+      'Šalba',
+      'Válka',
+      'Znalost',
+      'Život',
+      'Mystika',
+    ],
+  },
+  'Kouzelník': {
+    sub: 2,
+    label: 'Škola',
+    list: [
+      'Škola iluze',
+      'Škola nekromancie',
+      'Škola očarování',
+      'Škola transmutace',
+      'Škola věštění',
+      'Škola vymítání',
+      'Škola zaklínání',
+      'Zpěv meče',
+    ],
+  },
+  'Mnich': {
+    sub: 3,
+    label: 'Tradice',
+    list: [
+      'Cesta čtyř živlů',
+      'Cesta otevřené ruky',
+      'Cesta stínů',
+      'Cesta dlouhé smrti',
+      'Sluneční duše',
+    ],
+  },
+  Paladin: {
+    sub: 3,
+    label: 'Přísaha',
+    list: ['Oddanost', 'Pomsta', 'Starověku', 'Koruny'],
+  },
+  'Tulák': {
+    sub: 3,
+    label: 'Archetyp',
+    list: ['Mystický šejdíř', 'Vrah', 'Lupič', 'Šibal', 'Švihák'],
+  },
+};
+
+/** Povolání pracující s kouzly (auto-zapnou sekci kouzel). Plné + půlcasteři. */
+export const DND_CASTERS = [
+  'Bard',
+  'Čaroděj',
+  'Černokněžník',
+  'Druid',
+  'Klerik',
+  'Kouzelník',
+  'Paladin',
+  'Hraničář',
+];
+
+/** Osobní zázemí D&D 5e (výběr v hlavičce). */
+export const DND_BACKGROUNDS = [
+  'Agent frakce',
+  'Akolyta',
+  'Bavič',
+  'Cechovní řemeslník',
+  'Daleký cestovatel',
+  'Dědic',
+  'Dvořan',
+  'Hlubinný šlechtic',
+  'Chodec',
+  'Klanový řemeslník',
+  'Klášterní učenec',
+  'Lidový hrdina',
+  'Městská hlídka',
+  'Mudrc',
+  'Nájemný lovec',
+  'Námořník',
+  'Poustevník',
+  'Příslušník kmene',
+  'Rytíř řádu',
+  'Šarlatán',
+  'Šlechtic',
+  'Uličník',
+  'Voják',
+  'Zločinec',
+  'Žoldnéř',
+];
+
+/** Jeden řádek multipovolání v `dnd_classes` JSON poli. */
+export interface DndClassRow {
+  c: string; // povolání
+  l: string; // úroveň v povolání
+  s: string; // obor / specializace (1. osa)
+  s2: string; // 2. osa (jen Černokněžník — pakt)
+}
+
+/** Jedna schopnost v `dnd_feats` JSON poli. */
+export interface DndFeat {
+  n: string; // název
+  d: string; // popis / účinek
 }

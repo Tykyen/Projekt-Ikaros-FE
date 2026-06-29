@@ -979,7 +979,418 @@
 /* ── Disabled states (view mode) ───────────────────────────── */
 
 [data-diary-system='dnd5e'] .dnd-diary input:disabled,
-[data-diary-system='dnd5e'] .dnd-diary textarea:disabled {
+[data-diary-system='dnd5e'] .dnd-diary textarea:disabled,
+[data-diary-system='dnd5e'] .dnd-diary select:disabled {
   cursor: default;
   opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   8.7s — Multipovolání, identita, přidávatelné sekce
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Bare section headings (mimo panel) ────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-section-h {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dnd-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 10px 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--dnd-border);
+}
+
+/* ── Sdílené select styly ──────────────────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary select {
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.9rem;
+  background: var(--dnd-surface-alt);
+  color: var(--dnd-text);
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+[data-diary-system='dnd5e'] .dnd-diary select:focus {
+  border-color: var(--dnd-gold);
+}
+
+/* ── Identita (hlavička) ───────────────────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-identity {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 14px;
+  align-items: end;
+}
+@media (max-width: 700px) {
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-identity {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-field label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  margin-bottom: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-field input,
+[data-diary-system='dnd5e'] .dnd-diary .dnd-field select {
+  width: 100%;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-field > input {
+  border: none;
+  border-bottom: 1px solid var(--dnd-border-light);
+  background: transparent;
+  padding: 5px 0;
+  font-size: 0.95rem;
+  color: var(--dnd-text);
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-field > input:focus {
+  border-bottom-color: var(--dnd-gold);
+}
+
+/* ── Level badge ───────────────────────────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-level-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  padding: 8px 14px;
+  border: 2px solid var(--dnd-accent);
+  border-radius: 12px;
+  background: rgba(139, 32, 32, 0.04);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-level-badge .num {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--dnd-accent);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-level-badge .cap {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--dnd-text-muted);
+  margin-top: 4px;
+}
+@media (max-width: 700px) {
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-level-badge {
+    flex-direction: row;
+    gap: 8px;
+    grid-column: 1 / -1;
+  }
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-level-badge .cap {
+    margin-top: 0;
+  }
+}
+
+/* ── Multipovolání panel ───────────────────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-classes-panel {
+  margin-bottom: 1.25rem;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-legacy-hint {
+  font-size: 0.8rem;
+  color: var(--dnd-text-muted);
+  background: rgba(184, 134, 11, 0.08);
+  border: 1px dashed var(--dnd-gold);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-prof-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-prof-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--dnd-border-light);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-prof-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .pcol {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 120px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .pcol-lvl {
+  flex: 0 0 70px;
+  min-width: 70px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .pcol-sub {
+  flex: 1.4;
+}
+[data-diary-system='dnd5e'] .dnd-diary .pcap {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dnd-text-muted);
+  margin-bottom: 4px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .pcol input,
+[data-diary-system='dnd5e'] .dnd-diary .pcol select {
+  width: 100%;
+}
+[data-diary-system='dnd5e'] .dnd-diary .pcol-lvl input {
+  text-align: center;
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 6px;
+  font-weight: 600;
+  background: var(--dnd-surface-alt);
+  color: var(--dnd-text);
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .pcol-lvl
+  input::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .pcol-lvl
+  input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-sub-hint {
+  font-size: 0.65rem;
+  color: var(--dnd-text-muted);
+  font-style: italic;
+  margin-top: 3px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-foot-hint {
+  font-size: 0.72rem;
+  color: var(--dnd-text-muted);
+  margin-top: 10px;
+}
+@media (max-width: 600px) {
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-prof-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  [data-diary-system='dnd5e'] .dnd-diary .pcol,
+  [data-diary-system='dnd5e'] .dnd-diary .pcol-lvl,
+  [data-diary-system='dnd5e'] .dnd-diary .pcol-sub {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+/* ── Add link / delete button ──────────────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .add-link {
+  border: 1px dashed var(--dnd-border);
+  background: transparent;
+  color: var(--dnd-text-muted);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.15s;
+}
+[data-diary-system='dnd5e'] .dnd-diary .add-link:hover {
+  border-color: var(--dnd-gold);
+  color: var(--dnd-gold);
+  background: rgba(184, 134, 11, 0.04);
+}
+[data-diary-system='dnd5e'] .dnd-diary .del-btn {
+  border: none;
+  background: transparent;
+  color: var(--dnd-accent-light);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0 6px;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+  align-self: center;
+}
+[data-diary-system='dnd5e'] .dnd-diary .del-btn:hover {
+  opacity: 1;
+}
+
+/* ── Přidávatelné: zdatnosti / jazyky (tag rows) ───────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tag-row .bullet {
+  color: var(--dnd-gold);
+  font-size: 0.9rem;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tag-row input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 4px 2px;
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-tag-row input:focus {
+  border-bottom-color: var(--dnd-gold);
+}
+
+/* ── Přidávatelné: schopnosti (feat) ───────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-feat {
+  border: 1px solid var(--dnd-border-light);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: var(--dnd-surface-alt);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-feat-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-feat-head input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--dnd-border);
+  background: transparent;
+  padding: 4px 2px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--dnd-text);
+  outline: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-feat-head input:focus {
+  border-bottom-color: var(--dnd-accent);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-feat textarea {
+  width: 100%;
+  border: none;
+  background: var(--dnd-surface);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.82rem;
+  color: var(--dnd-text);
+  resize: vertical;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+  min-height: 48px;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-feat textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--dnd-gold);
+}
+
+/* ── Rychlý přehled kouzlení (quick-ref panel) ─────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-quick-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(212, 203, 184, 0.4);
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-quick-row:last-child {
+  border-bottom: none;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-quick-row .lbl {
+  font-size: 0.75rem;
+  color: var(--dnd-text-muted);
+  font-weight: 600;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-quick-row input {
+  width: 90px;
+  text-align: center;
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: var(--dnd-surface-alt);
+  color: var(--dnd-purple);
+  outline: none;
+  -moz-appearance: textfield;
+}
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-quick-row
+  input::-webkit-inner-spin-button,
+[data-diary-system='dnd5e']
+  .dnd-diary
+  .dnd-quick-row
+  input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── Poznámky (plná šířka) ─────────────────────────────────── */
+[data-diary-system='dnd5e'] .dnd-diary .dnd-notes-full textarea {
+  width: 100%;
+  min-height: 140px;
+  border: none;
+  background: var(--dnd-surface-alt);
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 0.88rem;
+  color: var(--dnd-text);
+  resize: vertical;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+}
+[data-diary-system='dnd5e'] .dnd-diary .dnd-notes-full textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--dnd-gold);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Dotykové cíle na touch zařízeních (a11y) — oprava pre-exist.
+   dluhu (pipy/toggly < 44 px). Cílíme (hover:none)+(pointer:coarse)
+   = telefon/tablet, NE šířku okna (desktop s jemným kurzorem
+   ponechá kompaktní vzhled). Desktop vizuál beze změny.
+   ═══════════════════════════════════════════════════════════ */
+@media (hover: none) and (pointer: coarse) {
+  /* glyph toggle dovednosti — má místo na plných 44 px */
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-skill-row__prof {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+  /* checkboxy: záchrany, inspirace, sesilatel, připravené kouzlo */
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-save-row__prof input,
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-meta-item__checkbox-label input,
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-tab--toggle input,
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-spell-prepared input {
+    width: 24px;
+    height: 24px;
+  }
+  /* vizuální pipy (záchrany proti smrti, sloty) z 18–20 → 28 px */
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-pip,
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-slot-pip {
+    width: 28px;
+    height: 28px;
+  }
+  /* mazací (✕/×) a přidávací tlačítka */
+  [data-diary-system='dnd5e'] .dnd-diary .del-btn,
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-x {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.2rem;
+  }
+  [data-diary-system='dnd5e'] .dnd-diary .add-link,
+  [data-diary-system='dnd5e'] .dnd-diary .dnd-add {
+    min-height: 44px;
+  }
 }

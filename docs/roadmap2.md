@@ -405,10 +405,10 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] **Chat (→ 16.1)** — ✅ 2026-06-28 PC/NPC deník v chatu **zdarma** (`DiaryRollPanel` → `COMBAT_PANELS['drd2']`=Drd2CombatPanel, single source). Bestie chat panel `Drd2ChatBestiePanel` (reuse jádro `Drd2BestieCombatActions` + CSS z mapy; Sudba HP ze `systemStats`, hody 2k6+ přes `useChatDiaryRoll`, iniciativa→roster). Branche v `BestieInstancePanel` (instance edit) + `BestieRollPanel` (katalog read-only). Ověřeno build+eslint; vizuál po deployi.
   - [x] Skiny (→ 16.2c)
 - **Jeskyně a Draci** (`jad`) — *stav kódu:* list sheet+testy (+formulas); mapa fallback BEZ `onRoll`
-  - [ ] Reálný list (grafika)
-  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
-  - [ ] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
+  - [x] Reálný list (grafika)
+  - [x] Taktická mapa (grafika + funkčně doplnit hody / panel)
+  - [x] Bestie (grafika)
+  - [x] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
 - **Příběhy Impéria** (`pi`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
   - [ ] Reálný list (grafika)
