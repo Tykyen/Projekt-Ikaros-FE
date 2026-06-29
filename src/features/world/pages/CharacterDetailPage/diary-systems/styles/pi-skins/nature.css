@@ -1,0 +1,298 @@
+/* ════════════════════════════════════════════════════════════════════════
+ * PI · skin „NATURE" — lesní herbář / řez kmenem
+ * ════════════════════════════════════════════════════════════════════════
+ * Sourozenec matrix/nature: lesní zeleň + jantar, organické rohy (kapka/list),
+ * vyrůstající úponek s listy podél levé hrany panelů, letokruhový terč osudu.
+ * Heat (zranění) ZTLUMEN do jantaru/hřebíčku — žádná řvavá červeň.
+ * Fonty (Marcellus SC / Cormorant Garamond / Spectral) jsou v globálním
+ * @import diary-skins.css — zde se NEimportují.
+ *
+ * Pozn.: pi.css nekonzumuje --pi-panel-radius/-shadow, --pi-row-radius,
+ * --pi-pip-radius, --pi-bar-* → tyto vlastnosti aplikuji přímo na .pi-* prvky.
+ */
+
+[data-diary-system='pi'][data-diary-skin='nature'] {
+  --pi-bg: radial-gradient(130% 75% at 50% -6%, #2c3a1e 0%, #1a2412 52%, #0f1709 100%);
+  --pi-panel: linear-gradient(180deg, #2f3c20, #26301a);
+  --pi-text: #edefd4;
+  --pi-muted: #bccb98;
+  --pi-dim: #8a9a66;
+  --pi-accent: #82b148;
+  --pi-violet: #9cc274;
+  --pi-gold: #e8b048;
+  --pi-danger: #b9743a;
+  --pi-line: #36492f;
+  --pi-line-strong: #56784a;
+
+  --pi-font-display: 'Marcellus SC', serif;
+  --pi-font-body: 'Cormorant Garamond', serif;
+  --pi-font-num: 'Spectral', serif;
+
+  --pi-sheet-radius: 18px 22px 16px 20px;
+  --pi-sheet-shadow: 0 44px 96px -34px #000, inset 0 0 0 2px #0c1408, inset 0 0 0 3px #4a6a2e,
+    inset 0 0 0 6px #1e2c14, inset 0 0 140px #00000060;
+  --pi-overlay: radial-gradient(48% 34% at 28% 2%, rgba(212, 242, 154, 0.23), transparent 64%),
+    radial-gradient(110% 60% at 50% 118%, rgba(0, 0, 0, 0.5), transparent 58%);
+  --pi-overlay-size: auto;
+  --pi-overlay-opacity: 1;
+  --pi-overlay-blend: overlay;
+
+  --pi-panel-bg: linear-gradient(180deg, transparent 50%, rgba(64, 48, 22, 0.25) 100%),
+    radial-gradient(120% 92% at 16% 0%, #43521f 0%, #313e1a 48%, #251f12 100%);
+  --pi-panel-border: 1px solid #0c1408;
+  --pi-clip: none;
+  --pi-clip-hero: none;
+  --pi-clip-small: none;
+
+  --pi-title-color: #82b148;
+  --pi-marker-glow: none;
+
+  --pi-hero-bg: linear-gradient(180deg, transparent 50%, rgba(64, 48, 22, 0.25) 100%),
+    radial-gradient(120% 92% at 16% 0%, #43521f 0%, #313e1a 48%, #251f12 100%);
+  --pi-hero-border: 1px solid #0c1408;
+  --pi-name-color: #eef0d4;
+  --pi-name-glow: 0 1px 0 #4a6a28, 0 2px 1px #000;
+  --pi-portrait-bg: linear-gradient(135deg, #3a4a26, #1d2712);
+  --pi-portrait-border: 1px solid #0c1408;
+  --pi-portrait-shadow: inset 0 0 0 1px #0c1408, inset 0 0 0 3px #5e8038, inset 0 0 0 4px #0c1408,
+    inset 0 0 22px #000000a0;
+  --pi-portrait-ink: #bce070;
+  --pi-portrait-scan: none;
+
+  --pi-row-bg: linear-gradient(180deg, #2f3c20, #26301a);
+  --pi-seg-off: linear-gradient(180deg, #0e150a, #161f0d);
+  --pi-seg-radius: 7px;
+  --pi-hp-on: linear-gradient(180deg, #93cc4a, #487420);
+  --pi-arm-on: linear-gradient(180deg, #c98f3e, #7a5416);
+  --pi-charged: #b8d878;
+  --pi-depleted: #c79a5a;
+  --pi-chip-glow: none;
+  --pi-pip-glow: 0 0 3px -1px var(--lvlc);
+
+  --pi-accent-border: color-mix(in srgb, #82b148 35%, transparent);
+  --pi-accent-shadow: inset 0 0 0 2px #5e8038, inset 0 0 0 3px #14200e, inset 0 0 28px #00000060;
+  --pi-fate-border: transparent;
+  --pi-fate-bg: transparent;
+  --pi-fate-lab: #fff0c0;
+  --pi-fate-num: #3a2206;
+  --pi-fate-glow: transparent;
+  --pi-budget-val: #b6c84e;
+  --pi-budget-glow: color-mix(in srgb, #82b148 40%, transparent);
+  --pi-gear-text: #edefd4;
+  --pi-gear-bg: #1a2412;
+  --pi-input-bg: #1a2412;
+  --pi-input-focus-border: color-mix(in srgb, #82b148 60%, transparent);
+  --pi-add-color: #b6c84e;
+  --pi-add-border: color-mix(in srgb, #82b148 40%, transparent);
+  --pi-add-hover-bg: color-mix(in srgb, #82b148 10%, transparent);
+
+  /* heat ZTLUMEN na lesní paletu — jantar / hřebíček */
+  --pi-warn-seg: linear-gradient(180deg, #e8b048, #b07e26);
+  --pi-warn-seg-b: color-mix(in srgb, #e8b048 50%, transparent);
+  --pi-crit-seg: linear-gradient(180deg, #b9743a, #803e1c);
+  --pi-crit-seg-b: color-mix(in srgb, #b9743a 60%, transparent);
+  --pi-warn-badge-bg: rgba(232, 176, 72, 0.1);
+  --pi-warn-badge-ink: #e8c060;
+  --pi-warn-badge-b: rgba(232, 176, 72, 0.35);
+  --pi-crit-badge-bg: rgba(185, 116, 58, 0.12);
+  --pi-crit-badge-ink: #d89060;
+  --pi-crit-badge-b: rgba(185, 116, 58, 0.4);
+
+  --lvl-1: #6a7a4a;
+  --lvl-2: #88983e;
+  --lvl-3: #9cb840;
+  --lvl-4: #b6c84e;
+  --lvl-5: #d2b84e;
+  --lvl-6: #e4c652;
+  --lvl-7: #f4d662;
+  --lvl-8: #f8e890;
+  --lvl-9: #faf0b8;
+  --lvl-10: #fff4cc;
+
+  /* EMBED kontrakt (dice readout / dicelog / orchestrace / obal v TM / chat) */
+  --pi-log-surface: linear-gradient(180deg, #2f3d1c 0%, #26321a 42%, #1e2813 72%, #171e0f 100%);
+  --pi-log-border: #5e8038;
+  --pi-log-title: #b8e070;
+  --pi-log-chip: #2e4218;
+  --pi-log-num: #f0c060;
+  --pi-log-num-font: 'Cormorant Garamond', serif;
+  --pi-log-total: #f2c04a;
+  --pi-log-total-pos: #f2c04a;
+  --pi-log-total-neg: #d07a3a;
+  --pi-log-total-shadow: 0 0 10px rgba(232, 176, 72, 0.55), 0 1px 0 rgba(0, 0, 0, 0.8);
+  --pi-log-eq-font: 'Marcellus', serif;
+  --pi-log-skillmod: #9cc274;
+  --pi-log-eq: #9aa874;
+}
+
+/* panel radius/shadow (pi.css passthrough nemá) */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-panel {
+  border-radius: 26px 6px 26px 6px;
+  box-shadow: inset 0 0 0 2px #5e8038, inset 0 0 0 3px #14200e,
+    inset 0 -14px 26px rgba(42, 28, 14, 0.25), inset 0 0 28px #00000060, 0 3px 0 #00000055;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-hero {
+  border-radius: 26px 6px 26px 6px;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-portrait {
+  border-radius: 50% 8px 50% 8px;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-skill,
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-aspect {
+  border-radius: 12px 3px 12px 3px;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-pip {
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-budget__bar {
+  background: #10180b;
+  border-color: #2a3a1e;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-budget__fill {
+  background: linear-gradient(90deg, #487420, #93cc4a);
+}
+
+/* obsah panelů odsazen vlevo na úponek (signature roste v levém okraji) */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-panel,
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-hero {
+  padding-left: 52px;
+}
+
+/* SIGNATURE: vyrůstající úponek s listy podél levé hrany */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-panel::before,
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-hero::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  bottom: -3px;
+  width: 60px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='66' height='240' viewBox='0 0 66 240' preserveAspectRatio='xMinYMax meet' fill='none'%3E%3Cg stroke='%23aed85e' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M18 238 C14 210 24 196 18 178 C13 162 24 150 18 132 C13 116 24 104 18 86 C14 70 22 54 17 38 C14 26 22 18 32 16'/%3E%3C/g%3E%3Cg stroke='%238fbe50' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M18 178 C30 178 41 171 50 158'/%3E%3Cpath d='M18 132 C30 132 41 126 49 113'/%3E%3Cpath d='M18 86 C30 86 41 80 50 67'/%3E%3C/g%3E%3Cg fill='%23a8d854' stroke='%23618a2e' stroke-width='1.1'%3E%3Cpath d='M50 158 C62 149 64 132 64 121 C49 126 38 139 43 156 C45 159 47 160 50 158Z'/%3E%3Cpath d='M49 113 C61 104 63 87 63 76 C48 81 37 94 42 111 C44 114 46 115 49 113Z'/%3E%3Cpath d='M50 67 C62 58 64 41 64 30 C49 35 38 48 43 65 C45 68 47 69 50 67Z'/%3E%3C/g%3E%3Cg fill='%23dcf09a'%3E%3Ccircle cx='18' cy='110' r='2.6'/%3E%3Ccircle cx='32' cy='16' r='2.8'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.69));
+}
+
+/* listový titulek (zelený gradient) + klíčící lístek marker */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-title {
+  font-family: 'Marcellus SC', serif;
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  font-weight: 400;
+  padding-left: 6px;
+  background: linear-gradient(180deg, #cae885, #82b148 70%, #56802e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.44));
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-title::before {
+  width: 14px;
+  height: 14px;
+  -webkit-text-fill-color: initial;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  border-radius: 0;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18' fill='none'%3E%3Cpath d='M9 17 L9 8' stroke='%239ec85a' stroke-width='1.7' stroke-linecap='round'/%3E%3Cpath d='M9 9 C9 4 14 2 16 2 C16 7 13 10 9 10Z' fill='%23bce070'/%3E%3Cpath d='M9 12 C9 8 5 6 3 6 C3 10 5 13 9 13Z' fill='%238fbe50'/%3E%3C/svg%3E");
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-title::after {
+  -webkit-text-fill-color: initial;
+  height: 2px;
+  background: linear-gradient(90deg, #4a6a28, transparent 92%),
+    radial-gradient(circle at right, #82b148 1.5px, transparent 2px);
+}
+
+/* listová iluminovaná iniciála */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-name {
+  font-weight: 400;
+  padding-left: 0.14em;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-name::first-letter {
+  font-family: 'Marcellus SC', serif;
+  font-size: 1.28em;
+  line-height: 1;
+  background: linear-gradient(180deg, #e2f6a4, #9ec85a 52%, #56802e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* SIGNATURE Body osudu = letokruhový terč (řez kmenem) */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate {
+  width: 110px;
+  height: 110px;
+  min-width: 110px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  clip-path: none;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  isolation: isolate;
+  background: repeating-radial-gradient(circle at 44% 40%, transparent 0 5.5px, #2e1d0e 5.5px 7px,
+      transparent 7px 12px, rgba(58, 38, 17, 0.67) 12px 12.6px, transparent 12.6px 16px),
+    radial-gradient(circle at 44% 40%, #f2cf78 0%, #e3ad50 14%, #c98a38 34%, #a86e2a 56%, #7c521e 78%, #523715 100%);
+  box-shadow: inset 0 2px 6px rgba(246, 218, 138, 0.33), inset 0 -7px 14px rgba(0, 0, 0, 0.58),
+    0 4px 12px -2px #000, 0 0 0 2px #1e1408, 0 0 0 3px #4a6a2e, 0 0 0 5px #1e2c14;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate::before {
+  content: '';
+  position: absolute;
+  inset: 26px;
+  border-radius: 50%;
+  z-index: 1;
+  background: radial-gradient(circle at 40% 34%, #fff4cc, #f3c75c 46%, #c2882e 82%, #9a6620 100%);
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.44),
+    0 0 12px rgba(243, 199, 92, 0.47), 0 0 0 1.5px rgba(110, 74, 22, 0.67);
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate .lab,
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate .num,
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate .star {
+  position: relative;
+  z-index: 2;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate .lab {
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  color: #fff0c0;
+  text-shadow: 0 1px 2px #000;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate .num {
+  text-shadow: 0 1px 0 #ffe9a0, 0 0 6px rgba(255, 223, 128, 0.33);
+  color: #3a2206;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-fate .star {
+  color: #7c521e;
+}
+
+/* míza tekoucí ve žlábku (vitals tray) */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-track {
+  padding: 2px;
+  background: #10180b;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(74, 106, 46, 0.2), inset 0 1px 3px #000;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-seg.on {
+  position: relative;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-seg.on::after {
+  content: '';
+  position: absolute;
+  inset: 1px 2px 52% 2px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* organické chipy */
+[data-diary-system='pi'][data-diary-skin='nature'] .pi-chip {
+  border-radius: 8px 2px 8px 2px;
+}

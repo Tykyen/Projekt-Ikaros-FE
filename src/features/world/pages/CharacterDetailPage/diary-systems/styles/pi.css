@@ -49,6 +49,24 @@
   --pi-title-color: #aeb8d4;
   --pi-marker-glow: 0 0 10px #38e0ff;
 
+  /* ── Embed / dice kontrakt (sdílené plochy: dice readout, dicelog, orchestrace,
+     obal v TM, chat rail). Konzumují je MODULY přes var(--pi-log-*). Povrch VŽDY
+     OPAQUE (žádná alfa) — jinak prosvítá mapu. Sci-fi baseline; per-skin přebíjí
+     pi-skins/<id>.css. (Zrcadlí --mx-log-* matrixu.) */
+  --pi-log-surface: #0e0f1e;
+  --pi-log-border: rgba(56, 224, 255, 0.3);
+  --pi-log-title: #aeb8d4;
+  --pi-log-chip: #11121f;
+  --pi-log-num: #d6def0;
+  --pi-log-num-font: 'IBM Plex Mono', monospace;
+  --pi-log-total: #fbbf24;
+  --pi-log-total-pos: #38e0ff;
+  --pi-log-total-neg: #f87171;
+  --pi-log-total-shadow: 0 0 12px rgba(56, 224, 255, 0.5);
+  --pi-log-eq-font: 'Chakra Petch', system-ui, sans-serif;
+  --pi-log-skillmod: #a78bfa;
+  --pi-log-eq: #8893b0;
+
   --pi-hero-bg: radial-gradient(600px 200px at 0% 0%, rgba(167, 139, 250, 0.09), transparent 70%),
     linear-gradient(180deg, #12132a, #0b0b16);
   --pi-hero-border: 1px solid rgba(167, 139, 250, 0.2);

@@ -1,0 +1,287 @@
+/* Příběhy Impéria (pi) — skin „steampunk" 🕰️ (mosazný mechanický deník).
+ * Signature: rohové mosazné nýty (4 cvočky), mosazný titulek s ozubeným kolem,
+ * kovová tlaková koryta, Body osudu = manometr ozubeného kola (ciferník + rysky +
+ * ručička). Scoped [data-diary-system='pi'][data-diary-skin='steampunk'].
+ *
+ * Fonty: IM Fell English SC / Special Elite / IBM Plex Mono / Cinzel Decorative.
+ * 'IM Fell English SC' NENÍ v globálním @import diary-skins.css — display fallback
+ * = serif drží čitelnost (doplnit centrálně).
+ */
+
+[data-diary-system='pi'][data-diary-skin='steampunk'] {
+  --pi-bg: radial-gradient(120% 70% at 50% 0%, #2e2114 0%, #1d140c 60%, #150e07 100%);
+  --pi-panel: linear-gradient(180deg, #3a2c1a, #2a1f12);
+  --pi-text: #e8d6b0;
+  --pi-muted: #a8895e;
+  --pi-dim: #80693f;
+  --pi-accent: #d8b46a;
+  --pi-violet: #c9a45e;
+  --pi-gold: #d8b46a;
+  --pi-danger: #c4642a;
+  --pi-line: #5a4226;
+  --pi-line-strong: #8a6a36;
+
+  --pi-font-display: 'IM Fell English SC', 'Cinzel', serif;
+  --pi-font-body: 'Special Elite', serif;
+  --pi-font-num: 'IBM Plex Mono', monospace;
+
+  --pi-sheet-radius: 5px;
+  --pi-sheet-shadow: 0 40px 90px -30px #000, inset 0 0 0 2px #120c06, inset 0 0 0 5px #5a4426,
+    inset 0 0 0 6px #2a1d10, inset 0 0 110px #00000070;
+  --pi-overlay: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  --pi-overlay-size: 140px 140px;
+  --pi-overlay-opacity: 1;
+  --pi-overlay-blend: overlay;
+
+  --pi-panel-bg: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.04) 50%, transparent 60%),
+    linear-gradient(180deg, #3a2c1a, #2a1f12);
+  --pi-panel-border: 1px solid #6e5226;
+  --pi-panel-radius: 3px;
+  --pi-panel-shadow: inset 0 1px 0 #c9a45e55, inset 0 0 0 1px #120c06, inset 0 -3px 6px #00000080,
+    0 2px 5px #00000080;
+  --pi-clip: none;
+  --pi-clip-hero: none;
+  --pi-clip-small: none;
+
+  --pi-title-color: #d8b46a;
+  --pi-title-weight: 700;
+  --pi-title-spacing: 0.08em;
+  --pi-marker-glow: none;
+
+  --pi-hero-bg: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.04) 50%, transparent 60%),
+    linear-gradient(180deg, #3a2c1a, #2a1f12);
+  --pi-hero-border: 1px solid #6e5226;
+  --pi-name-color: #f0d89a;
+  --pi-name-weight: 700;
+  --pi-name-glow: 0 1px 0 #6e5226, 0 2px 2px #000;
+  --pi-portrait-radius: 3px;
+  --pi-portrait-bg: linear-gradient(135deg, #3a2c18, #20160b);
+  --pi-portrait-border: 1px solid #120c06;
+  --pi-portrait-shadow: inset 0 1px 0 #c9a45e66, inset 0 0 0 1px #120c06, inset 0 0 0 3px #7a5a2a,
+    inset 0 0 0 4px #120c06, inset 0 -3px 8px #00000090;
+  --pi-portrait-ink: #c49a52;
+  --pi-portrait-scan: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.05) 50%, transparent 60%);
+
+  --pi-row-bg: linear-gradient(180deg, #2c2014, #241a10);
+  --pi-seg-off: linear-gradient(180deg, #1a120a, #221810);
+  --pi-seg-radius: 1px;
+  --pi-hp-on: linear-gradient(180deg, #c97a3a, #7a4420);
+  --pi-arm-on: linear-gradient(180deg, #d8b46a, #8a6a2e);
+  --pi-charged: #9ec46a;
+  --pi-depleted: #c98a5a;
+  --pi-chip-glow: none;
+  --pi-pip-glow: 0 0 3px -1px var(--lvlc);
+
+  --pi-accent-border: color-mix(in srgb, #d8b46a 35%, transparent);
+  --pi-accent-shadow: inset 0 1px 0 #c9a45e55, inset 0 0 0 1px #120c06, inset 0 -3px 6px #00000080,
+    0 2px 5px #00000080;
+  --pi-fate-border: transparent;
+  --pi-fate-bg: radial-gradient(circle at 50% 0%, rgba(216, 180, 106, 0.12), transparent 70%);
+  --pi-fate-glow: transparent;
+  --pi-fate-lab: #f4e0a0;
+  --pi-fate-num: #f4e0a0;
+  --pi-budget-val: #e8c478;
+  --pi-budget-glow: color-mix(in srgb, #c9a45e 40%, transparent);
+  --pi-bar-bg: #1a120a;
+  --pi-bar-border: #3a2c18;
+  --pi-bar-fill: linear-gradient(90deg, #8a6a2e, #d8b46a);
+  --pi-gear-text: #e8d6b0;
+  --pi-gear-bg: #211810;
+  --pi-input-bg: #1f160e;
+  --pi-input-focus-border: color-mix(in srgb, #d8b46a 55%, transparent);
+  --pi-add-color: #d8b46a;
+  --pi-add-border: color-mix(in srgb, #d8b46a 40%, transparent);
+  --pi-add-hover-bg: rgba(216, 180, 106, 0.08);
+
+  /* heat — tlumený (mosaz+rez), gradace „víc = horší" */
+  --pi-warn-seg: linear-gradient(180deg, #d8b46a, #8a6a2e);
+  --pi-crit-seg: linear-gradient(180deg, #c4642a, #842f10);
+  --pi-warn-badge-bg: rgba(216, 180, 106, 0.1);
+  --pi-warn-badge-ink: #e8c478;
+  --pi-warn-badge-b: rgba(216, 180, 106, 0.35);
+  --pi-crit-badge-bg: rgba(196, 100, 42, 0.12);
+  --pi-crit-badge-ink: #e08a4d;
+  --pi-crit-badge-b: rgba(196, 100, 42, 0.4);
+
+  --lvl-1: #8a7a5a;
+  --lvl-2: #9a7a3a;
+  --lvl-3: #b0843a;
+  --lvl-4: #c9a45e;
+  --lvl-5: #d8b46a;
+  --lvl-6: #e8c478;
+  --lvl-7: #f4e0a0;
+  --lvl-8: #f8e8b8;
+  --lvl-9: #fcf0d0;
+  --lvl-10: #fff8e0;
+
+  /* ── embed / dice kontrakt (OPAQUE surface) ── */
+  --pi-log-surface: linear-gradient(180deg, #382818 0%, #2c1d10 55%, #201209 100%);
+  --pi-log-border: #9a7830;
+  --pi-log-title: #e0bc72;
+  --pi-log-chip: rgba(120, 88, 34, 0.65);
+  --pi-log-num: #f0d080;
+  --pi-log-num-font: 'Cinzel Decorative', serif;
+  --pi-log-total: #7ecfad;
+  --pi-log-total-pos: #7ecfad;
+  --pi-log-total-neg: #c4642a;
+  --pi-log-total-shadow: 0 1px 0 rgba(0, 0, 0, 0.85), 0 0 12px rgba(200, 160, 60, 0.5);
+  --pi-log-eq-font: 'Special Elite', serif;
+  --pi-log-skillmod: #c9a45e;
+  --pi-log-eq: #a8895e;
+}
+
+/* pi.css nečte --pi-panel-radius/-shadow ani --pi-bar-* → re-aplikace přímo,
+   aby mosazný rám + mosazný budget bar seděly s mockupem na produkčním listu */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-panel,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-hero {
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 #c9a45e55, inset 0 0 0 1px #120c06, inset 0 -3px 6px #00000080,
+    0 2px 5px #00000080;
+  isolation: isolate;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-section {
+  isolation: isolate;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-portrait {
+  border-radius: 3px;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-budget__bar {
+  background: #1a120a;
+  border-color: #3a2c18;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-budget__fill {
+  background: linear-gradient(90deg, #8a6a2e, #d8b46a);
+}
+
+/* SIGNATURE: rohové mosazné nýty — 4 cvočky v 1 ::before */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-panel::before,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-hero::before,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-size: 13px 13px;
+  background-position: 8px 8px, calc(100% - 8px) 8px, 8px calc(100% - 8px), calc(100% - 8px) calc(100% - 8px);
+  background-image: radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%),
+    radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%),
+    radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%),
+    radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.67));
+}
+
+/* mosazný titulek + ozubené kolo */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-title {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 0 #00000080, 0 0 1px rgba(240, 216, 154, 0.27);
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title::before,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-title::before {
+  content: '\2699';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: #c9a45e;
+  font-size: 15px;
+  text-shadow: 0 1px 1px #000;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title::after,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-title::after {
+  height: 2px;
+  background: linear-gradient(90deg, #6e5226, transparent 92%),
+    radial-gradient(circle at right, #c9a45e 1.5px, transparent 2px);
+}
+
+/* kovová tlaková koryta */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-track,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-track {
+  padding: 2px;
+  background: #160f08;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(110, 82, 38, 0.27);
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-seg.on,
+[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-seg.on {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), inset 0 -2px 3px rgba(0, 0, 0, 0.38);
+}
+
+/* SIGNATURE Body osudu = manometr ozubeného kola (ciferník + rysky + ručička) */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-fate {
+  width: 106px;
+  height: 106px;
+  min-width: 106px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  clip-path: none;
+  justify-content: center;
+  gap: 1px;
+  position: relative;
+  background: radial-gradient(circle, #241a0e 0 53%, transparent 54%),
+    repeating-conic-gradient(from -108deg, #d8b46a 0 1.3deg, transparent 1.3deg 13.5deg),
+    radial-gradient(circle at 40% 34%, #e8c478, #9a7530 72%, #4a3418 100%);
+  box-shadow: inset 0 2px 4px rgba(240, 216, 154, 0.33), inset 0 -5px 10px rgba(0, 0, 0, 0.56),
+    0 4px 12px -2px #000, 0 0 0 2px #2a1d10;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-fate::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 34px;
+  background: linear-gradient(180deg, #c4642a, #7a3a18);
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) rotate(38deg);
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 0 3px #000;
+  z-index: 2;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-fate .lab {
+  position: relative;
+  z-index: 4;
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  color: #f4e0a0;
+  text-shadow: 0 1px 2px #000;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-fate .num {
+  position: relative;
+  z-index: 4;
+  font-family: 'Cinzel Decorative', serif;
+  color: #f4e0a0;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-fate .star {
+  display: none;
+}
+
+/* readout: broušená mosazná deska + 4 rohové nýty */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .ro-readout {
+  isolation: isolate;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(231, 205, 143, 0.42), inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 16px 44px rgba(0, 0, 0, 0.65), 0 0 0 1px #6e5224;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .ro-readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  background-image: radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%),
+    radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%),
+    radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%),
+    radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%);
+  background-repeat: no-repeat;
+  background-size: 11px 11px;
+  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+}

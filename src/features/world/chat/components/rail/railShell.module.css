@@ -133,6 +133,41 @@
   color: var(--dd-embed-muted);
 }
 
+/* ════════════ PI (Příběhy Impéria) „obalení": rail chrome nese HUD skin ════════════
+ * Sourozenec matrixu (--pi-* HUD). `data-diary-system='pi'` je PŘÍMO na `.panel`
+ * (aside) — proto compound `.panel:is([data-diary-system='pi'])`, NE descendant
+ * (mirror DrD+ vzoru). Konzumuje token kontrakt --pi-log-* / --pi-* (pi-skins/*.css,
+ * loaded i v chatu) → per-skin barva/font přijde automaticky. JEN barva/font, žádný
+ * ornament (ornament policy §3). Surface OPAQUE (--pi-log-surface bez alfy).
+ * Scoped na pi → ostatní systémy drží chat motiv (--theme-*). */
+.panel:is([data-diary-system='pi']) {
+  background: var(--pi-log-surface, var(--pi-panel, #0e0f1e));
+  border-left-color: var(--pi-log-border, color-mix(in srgb, var(--pi-accent, #38e0ff) 30%, transparent));
+  color: var(--pi-text, #d6def0);
+}
+.panel:is([data-diary-system='pi']) .identity {
+  border-bottom-color: var(--pi-log-border, color-mix(in srgb, var(--pi-accent, #38e0ff) 22%, transparent));
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 8%, transparent);
+}
+.panel:is([data-diary-system='pi']) .name {
+  color: var(--pi-log-title, var(--pi-name-color, #f0f3ff));
+  font-family: var(--pi-font-display, 'Chakra Petch', sans-serif);
+}
+.panel:is([data-diary-system='pi']) .iconBtn {
+  color: var(--pi-muted, #76809a);
+}
+.panel:is([data-diary-system='pi']) .iconBtn:hover {
+  color: var(--pi-log-title, var(--pi-accent, #38e0ff));
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 16%, transparent);
+}
+.panel:is([data-diary-system='pi']) .avatar {
+  border-color: var(--pi-accent, #38e0ff);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--pi-accent, #38e0ff) 30%, transparent);
+}
+.panel:is([data-diary-system='pi']) .avatarFallback {
+  color: var(--pi-muted, #76809a);
+}
+
 /* ════════════ 16.2e — CHAT OBAL (rail): per-skin SIGNATURE ornament ════════════
  * Parita s ORCHESTRACE (MapPjPanel) + deníkem. Skin nese vlastní TVAR, ne jen
  * barvu. Zdroj pravdy: file:///C:/tmp/<sys>-skins/<skin>/index.html sekce

@@ -1,0 +1,292 @@
+/* ════════════════════════════════════════════════════════════════════════
+ * PI · skin „RETRO" — CRT terminál / synthwave fosfor
+ * ════════════════════════════════════════════════════════════════════════
+ * Monochromní jantarový fosfor: scanline + slot-mask + vignette + glare NAD
+ * obsahem, ASCII rohové glyfy panelů, terminálový prompt „>", USR:// jméno,
+ * 7-segmentový LED display jako medailon osudu. Heat ZTLUMEN do jantaru
+ * (monochrom CRT) — žádná modrá/zelená, jen teplý oranž.
+ * Fonty (VT323 / Share Tech Mono) jsou v globálním @import diary-skins.css —
+ * zde se NEimportují.
+ */
+
+[data-diary-system='pi'][data-diary-skin='retro'] {
+  --pi-bg: radial-gradient(120% 130% at 50% 42%, #43290a 0%, #2c1b07 52%, #1a1004 78%, #0f0902 100%);
+  --pi-panel: linear-gradient(180deg, rgba(40, 24, 6, 0.13), rgba(26, 16, 3, 0.2));
+  --pi-text: #ffce63;
+  --pi-muted: #c98a1d;
+  --pi-dim: #8a5e15;
+  --pi-accent: #ffb627;
+  --pi-violet: #f59e1b;
+  --pi-gold: #ffb627;
+  --pi-danger: #ff7a14;
+  --pi-line: #5a3f15;
+  --pi-line-strong: #8a5e15;
+
+  --pi-font-display: 'VT323', monospace;
+  --pi-font-body: 'Share Tech Mono', monospace;
+  --pi-font-num: 'VT323', monospace;
+
+  --pi-sheet-radius: 26px / 30px;
+  --pi-sheet-shadow: 0 50px 120px -36px #000, 0 0 0 1px #3a2c18, inset 0 1px 0 #5a4824,
+    inset 0 0 0 2px #0c0904, inset 0 0 0 14px #0c0a06, inset 0 0 60px 14px rgba(0, 0, 0, 0.75);
+  --pi-overlay: radial-gradient(80% 60% at 50% 32%, rgba(255, 157, 26, 0.05), transparent 70%);
+  --pi-overlay-size: auto;
+  --pi-overlay-opacity: 1;
+  --pi-overlay-blend: normal;
+
+  --pi-panel-bg: radial-gradient(80% 60% at 50% 0%, rgba(255, 157, 26, 0.05), transparent 70%),
+    linear-gradient(180deg, rgba(32, 19, 4, 0.13), rgba(21, 13, 2, 0.2));
+  --pi-panel-border: none;
+  --pi-clip: none;
+  --pi-clip-hero: none;
+  --pi-clip-small: none;
+
+  --pi-title-color: #ffb627;
+  --pi-marker-glow: none;
+
+  --pi-hero-bg: radial-gradient(80% 60% at 50% 0%, rgba(255, 157, 26, 0.05), transparent 70%),
+    linear-gradient(180deg, rgba(32, 19, 4, 0.13), rgba(21, 13, 2, 0.2));
+  --pi-hero-border: none;
+  --pi-name-color: #ffc24d;
+  --pi-name-glow: 0 0 8px rgba(255, 157, 26, 0.44), 0 0 2px #ffd98a, 0 1px 0 #000;
+  --pi-portrait-bg: repeating-linear-gradient(0deg, #2a1a05 0px, #2a1a05 2px, #1c1104 3px, #1c1104 4px);
+  --pi-portrait-border: none;
+  --pi-portrait-shadow: inset 0 0 0 1px rgba(138, 94, 21, 0.38), inset 0 0 0 2px #1a0f02,
+    inset 0 0 0 3px rgba(110, 77, 26, 0.25), inset 0 0 22px rgba(0, 0, 0, 0.69);
+  --pi-portrait-ink: #ffb627;
+  --pi-portrait-scan: none;
+
+  --pi-row-bg: linear-gradient(180deg, rgba(32, 19, 4, 0.15), rgba(21, 13, 2, 0.2));
+  --pi-seg-off: #1a0f02;
+  --pi-seg-radius: 1px;
+  --pi-hp-on: linear-gradient(180deg, #ffd061, #ff7a14);
+  --pi-arm-on: linear-gradient(180deg, #caa044, #8a5e15);
+  --pi-charged: #ffc24d;
+  --pi-depleted: #a8761a;
+  --pi-chip-glow: none;
+  --pi-pip-glow: none;
+
+  --pi-accent-border: rgba(255, 182, 39, 0.35);
+  --pi-accent-shadow: inset 0 0 0 1px rgba(110, 77, 26, 0.33), inset 0 0 0 2px #1a0f02,
+    inset 0 0 26px rgba(0, 0, 0, 0.31);
+  --pi-fate-border: transparent;
+  --pi-fate-bg: linear-gradient(180deg, #0a0601, #050301);
+  --pi-fate-lab: #c98a1d;
+  --pi-fate-num: #ffb627;
+  --pi-fate-glow: rgba(255, 157, 26, 0.56);
+  --pi-budget-val: #ffc24d;
+  --pi-budget-glow: rgba(255, 157, 26, 0.5);
+  --pi-gear-text: #ffc24d;
+  --pi-gear-bg: #120a02;
+  --pi-input-bg: #120a02;
+  --pi-input-focus-border: rgba(255, 182, 39, 0.6);
+  --pi-add-color: #ffc24d;
+  --pi-add-border: rgba(255, 182, 39, 0.4);
+  --pi-add-hover-bg: rgba(255, 157, 26, 0.08);
+
+  /* heat ZTLUMEN do jantaru (monochrom CRT) */
+  --pi-warn-seg: linear-gradient(180deg, #ffb627, #d97300);
+  --pi-crit-seg: linear-gradient(180deg, #ff7a14, #c43e00);
+  --pi-warn-badge-bg: rgba(255, 182, 39, 0.1);
+  --pi-warn-badge-ink: #ffc24d;
+  --pi-warn-badge-b: rgba(255, 182, 39, 0.35);
+  --pi-crit-badge-bg: rgba(255, 122, 20, 0.12);
+  --pi-crit-badge-ink: #ff9d4d;
+  --pi-crit-badge-b: rgba(255, 122, 20, 0.4);
+
+  --lvl-1: #6e4d1a;
+  --lvl-2: #a86a12;
+  --lvl-3: #c98a1d;
+  --lvl-4: #e6a821;
+  --lvl-5: #ffb627;
+  --lvl-6: #ffc24d;
+  --lvl-7: #ffd98a;
+  --lvl-8: #ffe7b8;
+  --lvl-9: #fff0d0;
+  --lvl-10: #fff8e8;
+
+  /* EMBED kontrakt — CRT terminál */
+  --pi-log-surface: #0d0701;
+  --pi-log-border: #8a5e15;
+  --pi-log-title: #ffb627;
+  --pi-log-chip: #1e1002;
+  --pi-log-num: #ffc24d;
+  --pi-log-num-font: 'VT323', monospace;
+  --pi-log-total: #ffd98a;
+  --pi-log-total-pos: #ffe7b8;
+  --pi-log-total-neg: #ff9d4d;
+  --pi-log-total-shadow: 0 0 8px rgba(255, 220, 150, 0.9), 0 0 20px rgba(255, 157, 26, 0.6), 0 0 3px #fff;
+  --pi-log-eq-font: 'Share Tech Mono', monospace;
+  --pi-log-skillmod: #f59e1b;
+  --pi-log-eq: #c98a1d;
+}
+
+/* panel radius (passthrough nemá) */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-panel,
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-hero {
+  border-radius: 4px;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-panel {
+  box-shadow: inset 0 0 0 1px rgba(110, 77, 26, 0.33), inset 0 0 0 2px #1a0f02,
+    inset 0 0 0 3px rgba(138, 94, 21, 0.19), inset 0 0 26px rgba(0, 0, 0, 0.31);
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-portrait {
+  border-radius: 4px;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-skill,
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-aspect {
+  border-radius: 2px;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-pip {
+  border-radius: 0;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-budget__bar {
+  background: #120a02;
+  border-color: #3a2c18;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-budget__fill {
+  background: linear-gradient(90deg, #8a5e15, #ffb627);
+}
+
+/* sklo = stacking context; globální fosforový bloom */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-sheet {
+  isolation: isolate;
+  text-shadow: 0 0 1px rgba(255, 182, 39, 0.38), 0 0 6px rgba(255, 157, 26, 0.19);
+}
+
+/* SIGNATURE: scanline + slot-mask + vignette + glare NAD obsahem */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  z-index: 50;
+  pointer-events: none;
+  border-radius: 18px / 22px;
+  box-shadow: inset 0 0 100px 8px rgba(0, 0, 0, 0.28);
+  background: radial-gradient(125% 135% at 50% 45%, transparent 58%, rgba(0, 0, 0, 0.16) 78%, rgba(0, 0, 0, 0.5) 100%),
+    radial-gradient(70% 38% at 32% 8%, rgba(255, 231, 184, 0.1), transparent 62%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 1.7px, rgba(0, 0, 0, 0.4) 1.8px, rgba(0, 0, 0, 0.4) 2.8px, rgba(0, 0, 0, 0) 2.9px),
+    repeating-linear-gradient(90deg, rgba(255, 122, 0, 0.06) 0px, rgba(255, 122, 0, 0.06) 1px, rgba(0, 0, 0, 0.04) 1px, rgba(0, 0, 0, 0.04) 2px, transparent 2px, transparent 3px);
+}
+
+/* SIGNATURE B: ASCII rohové glyfy panelů */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-panel::before,
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+  background-position: 5px 5px, calc(100% - 5px) 5px, 5px calc(100% - 5px), calc(100% - 5px) calc(100% - 5px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M2 15 L2 2 L15 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M14 15 L14 2 L1 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M2 1 L2 14 L15 14'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M14 1 L14 14 L1 14'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 4px rgba(255, 157, 26, 0.63));
+}
+
+/* terminálový titulek: prompt > */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-title {
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  font-weight: 400;
+  text-shadow: 0 0 6px rgba(255, 157, 26, 0.5), 0 0 1px #ffd98a;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-title::before {
+  content: '>';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: #f59e1b;
+  text-shadow: 0 0 6px rgba(255, 157, 26, 0.56);
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-title::after {
+  height: 0;
+  background: none;
+  border-top: 2px dotted rgba(124, 82, 16, 0.4);
+}
+
+/* jméno = USR:// prompt */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-name {
+  font-weight: 400;
+  text-transform: uppercase;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-name::before {
+  content: 'USR://';
+  font-size: 0.42em;
+  color: #b3720f;
+  letter-spacing: 0.12em;
+  margin-right: 0.4em;
+  vertical-align: 34%;
+  text-shadow: 0 0 5px rgba(255, 157, 26, 0.38);
+}
+
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-skill__name::before {
+  content: '\00B7\00A0';
+  color: #8a5e15;
+}
+
+/* SIGNATURE Body osudu = 7-segmentový LED display */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-fate {
+  width: 104px;
+  height: 96px;
+  min-width: 104px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  clip-path: none;
+  justify-content: center;
+  justify-self: center;
+  gap: 2px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(110, 77, 26, 0.25), inset 0 0 0 2px #000, inset 0 3px 10px #000,
+    inset 0 -2px 6px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(74, 58, 30, 0.19);
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-fate .lab {
+  font-family: 'VT323', monospace;
+  letter-spacing: 0.12em;
+  color: #ffc24d;
+  font-size: 11px;
+  white-space: nowrap;
+  text-shadow: 0 0 5px rgba(255, 157, 26, 0.6);
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-fate .num {
+  font-size: 54px;
+  color: #ffb627;
+  text-shadow: 0 0 2px #ffd98a, 0 0 8px #ff9d1a, 0 0 16px rgba(255, 138, 0, 0.56);
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-fate .star {
+  color: #ffb627;
+  filter: drop-shadow(0 0 4px #ff9d1a);
+}
+
+/* LED bar-graf glow */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-seg.on {
+  position: relative;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-seg.on::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.38), 0 0 5px -1px rgba(255, 157, 26, 0.7);
+}
+
+/* chipy v [ ] závorkách */
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-chip {
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  border-radius: 0;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-chip::before {
+  content: '[';
+  opacity: 0.6;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .pi-chip::after {
+  content: ']';
+  opacity: 0.6;
+}

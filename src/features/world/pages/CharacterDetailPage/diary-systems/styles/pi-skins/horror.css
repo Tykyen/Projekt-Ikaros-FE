@@ -1,0 +1,329 @@
+/* Příběhy Impéria (pi) — skin „horror" 🦇 (půlnoční salon, viktoriánská upířina).
+ * Signature: kovaná gotická stříbrná tracerie ve 4 rozích, studený měsíční svit,
+ * stříbrný titulek s krvavým markerem, blackletter iniciála, Body osudu = zašlá
+ * stříbrná erbovní pečeť. Scoped [data-diary-system='pi'][data-diary-skin='horror'].
+ *
+ * Fonty: Cormorant SC / EB Garamond / Cormorant Garamond / UnifrakturCook — vše
+ * v globálním @import diary-skins.css.
+ */
+
+[data-diary-system='pi'][data-diary-skin='horror'] {
+  --pi-bg: radial-gradient(120% 78% at 50% -4%, #20121a 0%, #130b11 52%, #0a060a 100%);
+  --pi-panel: linear-gradient(180deg, #241823, #18101a);
+  --pi-text: #ddd2d6;
+  --pi-muted: #ad9aa2;
+  --pi-dim: #7c6770;
+  --pi-accent: #c8c4cf;
+  --pi-violet: #8a6e98;
+  --pi-gold: #c8c4cf;
+  --pi-danger: #a2283a;
+  --pi-line: rgba(125, 118, 130, 0.2);
+  --pi-line-strong: #6d6a76;
+
+  --pi-font-display: 'Cormorant SC', serif;
+  --pi-font-body: 'EB Garamond', serif;
+  --pi-font-num: 'Cormorant Garamond', serif;
+
+  --pi-sheet-radius: 4px;
+  --pi-sheet-shadow: 0 46px 100px -34px #000, inset 0 0 0 2px #0a0509, inset 0 0 0 3px #4a4750,
+    inset 0 0 0 5px #100a0e, inset 0 0 150px #00000090;
+  --pi-overlay: radial-gradient(125% 92% at 50% 50%, transparent 38%, rgba(0, 0, 0, 0.67) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  --pi-overlay-size: cover, 150px 150px;
+  --pi-overlay-opacity: 0.85;
+  --pi-overlay-blend: overlay;
+
+  --pi-panel-bg: linear-gradient(180deg, #241823, #18101a);
+  --pi-panel-border: 1px solid #0a0509;
+  --pi-panel-radius: 3px;
+  --pi-panel-shadow: inset 0 1px 0 rgba(200, 196, 207, 0.13), inset 0 0 0 2px #7a7682, inset 0 0 0 3px #0a0509,
+    inset 0 0 34px #000000a0, 0 2px 6px #00000080;
+  --pi-clip: none;
+  --pi-clip-hero: none;
+  --pi-clip-small: none;
+
+  --pi-title-color: #c8c4cf;
+  --pi-title-weight: 600;
+  --pi-title-spacing: 0.2em;
+  --pi-marker-glow: none;
+
+  --pi-hero-bg: linear-gradient(180deg, #241823, #18101a);
+  --pi-hero-border: 1px solid #0a0509;
+  --pi-name-color: #ece2e6;
+  --pi-name-weight: 600;
+  --pi-name-glow: 0 1px 0 #3a0d16, 0 2px 2px #000, 0 0 18px rgba(106, 81, 112, 0.2);
+  --pi-portrait-radius: 3px;
+  --pi-portrait-bg: linear-gradient(135deg, #241620, #110a0f);
+  --pi-portrait-border: 1px solid #0a0509;
+  --pi-portrait-shadow: inset 0 0 0 2px #6d6a76, inset 0 0 0 3px #0a0509, inset 0 0 26px #000000c0;
+  --pi-portrait-ink: #9a7f8a;
+  --pi-portrait-scan: radial-gradient(60% 40% at 50% 14%, rgba(234, 230, 238, 0.08), transparent 60%);
+
+  --pi-row-bg: linear-gradient(180deg, #1a1118, #150e13);
+  --pi-seg-off: linear-gradient(180deg, #0c070a, #150d12);
+  --pi-hp-on: linear-gradient(180deg, #a2283a, #5e1622);
+  --pi-arm-on: linear-gradient(180deg, #d6d2de, #7a767f);
+  --pi-charged: #c6b2d2;
+  --pi-depleted: #c08a92;
+  --pi-chip-glow: none;
+  --pi-pip-glow: 0 0 4px -1px var(--lvlc);
+
+  --pi-accent-border: rgba(125, 118, 130, 0.3);
+  --pi-accent-shadow: inset 0 1px 0 rgba(200, 196, 207, 0.13), inset 0 0 0 2px #7a7682, inset 0 0 0 3px #0a0509,
+    inset 0 0 34px #000000a0;
+  --pi-fate-border: transparent;
+  --pi-fate-bg: radial-gradient(circle at 50% 0%, rgba(106, 81, 112, 0.13), transparent 70%);
+  --pi-fate-glow: transparent;
+  --pi-fate-lab: #bca9b0;
+  --pi-fate-num: #ece2e6;
+  --pi-budget-val: #c6b2d2;
+  --pi-budget-glow: rgba(106, 81, 112, 0.4);
+  --pi-bar-bg: #0c070a;
+  --pi-bar-border: #2a2230;
+  --pi-bar-fill: linear-gradient(90deg, #5e2c44, #a2283a);
+  --pi-gear-text: #ddd2d6;
+  --pi-gear-bg: #130b11;
+  --pi-input-bg: #130b11;
+  --pi-input-focus-border: rgba(125, 118, 130, 0.55);
+  --pi-add-color: #c8c4cf;
+  --pi-add-border: rgba(125, 118, 130, 0.4);
+  --pi-add-hover-bg: rgba(125, 118, 130, 0.08);
+
+  /* heat — tlumený (oxblood), gradace „víc = horší" */
+  --pi-warn-seg: linear-gradient(180deg, #9a5a78, #5e2c44);
+  --pi-crit-seg: linear-gradient(180deg, #a2283a, #5e1622);
+  --pi-warn-badge-bg: rgba(154, 90, 120, 0.12);
+  --pi-warn-badge-ink: #c89ab0;
+  --pi-warn-badge-b: rgba(154, 90, 120, 0.4);
+  --pi-crit-badge-bg: rgba(162, 40, 58, 0.12);
+  --pi-crit-badge-ink: #c87080;
+  --pi-crit-badge-b: rgba(162, 40, 58, 0.4);
+
+  --lvl-1: #5a4650;
+  --lvl-2: #6a3a44;
+  --lvl-3: #7a2434;
+  --lvl-4: #8a2030;
+  --lvl-5: #a83a4a;
+  --lvl-6: #c25060;
+  --lvl-7: #d87080;
+  --lvl-8: #e090a0;
+  --lvl-9: #ece2e6;
+  --lvl-10: #f6f2fa;
+
+  /* ── embed / dice kontrakt (OPAQUE surface) ── */
+  --pi-log-surface: linear-gradient(160deg, #1e1118 0%, #180e14 45%, #120a10 100%);
+  --pi-log-border: #5a5460;
+  --pi-log-title: #c8c4cf;
+  --pi-log-chip: #2c1520;
+  --pi-log-num: #e8dfd4;
+  --pi-log-num-font: 'Cormorant Garamond', Georgia, serif;
+  --pi-log-total: #c8506a;
+  --pi-log-total-pos: #c8506a;
+  --pi-log-total-neg: #a2283a;
+  --pi-log-total-shadow: 0 0 10px rgba(162, 40, 58, 0.55), 0 1px 0 rgba(0, 0, 0, 0.9);
+  --pi-log-eq-font: 'Cormorant SC', Georgia, serif;
+  --pi-log-skillmod: #8a6e98;
+  --pi-log-eq: #ad9aa2;
+}
+
+/* pi.css nečte --pi-panel-radius/-shadow ani --pi-bar-* → re-aplikace přímo,
+   aby stříbrný kovový rám + krvavý budget bar seděly s mockupem na produkčním listu */
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-panel,
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-hero {
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 rgba(200, 196, 207, 0.13), inset 0 0 0 2px #7a7682, inset 0 0 0 3px #0a0509,
+    inset 0 0 34px #000000a0, 0 2px 6px #00000080;
+  isolation: isolate;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-section {
+  isolation: isolate;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-portrait {
+  border-radius: 3px;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-budget__bar {
+  background: #0c070a;
+  border-color: #2a2230;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-budget__fill {
+  background: linear-gradient(90deg, #5e2c44, #a2283a);
+}
+
+/* studený měsíční svit shora */
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+  mix-blend-mode: screen;
+  background-image: radial-gradient(66% 34% at 50% -8%, rgba(122, 94, 130, 0.25), transparent 72%),
+    radial-gradient(44% 24% at 50% 106%, rgba(94, 22, 34, 0.13), transparent 74%);
+}
+
+/* SIGNATURE: kovaná gotická stříbrná tracerie ve 4 rozích */
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-panel::before,
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-hero::before,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: 60px 60px;
+  background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 0)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 0) scale(-1 1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 72) scale(1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 72) scale(-1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.67)) drop-shadow(0 0 7px rgba(200, 196, 207, 0.15));
+}
+
+/* elegantní stříbrný titulek + odsazení od tracerie */
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-title,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-title {
+  font-family: 'Cormorant SC', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  padding-left: 30px;
+  background: linear-gradient(180deg, #eae6ee, #c8c4cf 60%, #7d7986);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.56));
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-title::before,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-title::before {
+  width: 14px;
+  height: 14px;
+  background: #7a2030;
+  -webkit-text-fill-color: initial;
+  box-shadow: 0 0 4px rgba(122, 32, 48, 0.5);
+  transform: rotate(45deg);
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-title::after,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-title::after {
+  -webkit-text-fill-color: initial;
+  background: linear-gradient(90deg, #6d6a76, transparent 88%),
+    radial-gradient(circle at right, #c8c4cf 1.4px, transparent 2px);
+}
+
+/* jméno kurzívou + blackletter iniciála */
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-name {
+  font-weight: 600;
+  font-style: italic;
+  padding-left: 0.22em;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-name::first-letter {
+  font-family: 'UnifrakturCook', serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 1.5em;
+  line-height: 1;
+  background: linear-gradient(180deg, #f4f0f6, #c8c4cf 52%, #8a3040 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-portrait span {
+  font-family: 'UnifrakturCook', serif;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-meta .v {
+  font-style: italic;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-aspect__name,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-aspectName {
+  font-style: italic;
+}
+
+/* SIGNATURE Body osudu = zašlá stříbrná erbovní pečeť (tmavý střed, čitelné číslo) */
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-fate {
+  width: 104px;
+  height: 104px;
+  min-width: 104px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  clip-path: none;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  background: radial-gradient(circle at 38% 30%, #321f2a 0%, #261822 44%, #7a7682 55%, #56525c 72%, #2a2730 100%);
+  box-shadow: inset 0 1px 2px rgba(234, 230, 238, 0.22), inset 0 -7px 14px rgba(0, 0, 0, 0.6),
+    0 5px 16px -3px #000, 0 0 0 1px #16101a, 0 0 0 2px #5a565f, 0 0 0 3px #18121c;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-fate::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 196, 207, 0.3);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-fate .lab {
+  font-family: 'Cormorant SC', serif;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  color: #bca9b0;
+  text-shadow: 0 1px 1px #000;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-fate .num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 34px;
+  line-height: 1;
+  color: #ece2e6;
+  text-shadow: 0 1px 2px #000, 0 0 12px rgba(106, 81, 112, 0.55);
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-fate .star {
+  display: none;
+}
+
+/* sametová koryta */
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-track,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-track {
+  padding: 2px;
+  background: #0c070a;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(109, 106, 118, 0.2), inset 0 1px 3px #000;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-seg.on,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-seg.on {
+  position: relative;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-seg.on::after,
+[data-diary-system='pi'][data-diary-skin='horror'] .cp-seg.on::after {
+  content: '';
+  position: absolute;
+  inset: 1px 1px 55% 1px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* readout: stříbrná tracerie (outline offset) + oxblood glow */
+[data-diary-system='pi'][data-diary-skin='horror'] .ro-readout {
+  outline: 1px solid rgba(90, 84, 96, 0.4);
+  outline-offset: 4px;
+  box-shadow: inset 0 0 28px rgba(94, 22, 34, 0.4), inset 0 0 0 1px rgba(90, 84, 96, 0.18),
+    0 24px 60px rgba(0, 0, 0, 0.85);
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .ro-readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-size: 50px 50px;
+  background-position: 3px 3px, calc(100% - 3px) 3px, 3px calc(100% - 3px), calc(100% - 3px) calc(100% - 3px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 0)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 0) scale(-1 1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 72) scale(1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(72 72) scale(-1 -1)'%3E%3Cpath d='M5 71 L5 26 C5 14 14 5 26 5 L71 5' stroke-width='1.9'/%3E%3Cpath d='M11 71 L11 28 C11 19 19 11 28 11 L71 11' stroke-width='1' opacity='0.55'/%3E%3Ccircle cx='13' cy='13' r='2.2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.6));
+}

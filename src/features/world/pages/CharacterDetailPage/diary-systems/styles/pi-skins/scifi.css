@@ -1,0 +1,194 @@
+/* Příběhy Impéria (pi) — skin „scifi" 🛸 (holografický velitelský HUD).
+ * = nativní vzhled pi; formalizuje sci-fi tokeny + --pi-log- embed sadu.
+ * Signature: cyan tracer-roh + scanline na heru, fialový BR bracket na panelech,
+ * chamferovaný readout. Scoped [data-diary-system='pi'][data-diary-skin='scifi'].
+ *
+ * Font display = Orbitron (fallback 'Chakra Petch'); Orbitron NENÍ v globálním
+ * @import diary-skins.css — fallback drží čitelnost (doplnit centrálně).
+ */
+
+[data-diary-system='pi'][data-diary-skin='scifi'] {
+  --pi-bg: linear-gradient(180deg, #0b0b18, #08080f);
+  --pi-panel: #0e0f1e;
+  --pi-text: #d6def0;
+  --pi-muted: #76809a;
+  --pi-dim: #444b63;
+  --pi-accent: #38e0ff;
+  --pi-violet: #a78bfa;
+  --pi-gold: #fbbf24;
+  --pi-danger: #f87171;
+  --pi-line: rgba(255, 255, 255, 0.08);
+  --pi-line-strong: rgba(56, 224, 255, 0.27);
+
+  --pi-font-display: 'Orbitron', 'Chakra Petch', system-ui, sans-serif;
+  --pi-font-body: 'Chakra Petch', system-ui, sans-serif;
+  --pi-font-num: 'IBM Plex Mono', monospace;
+
+  --pi-sheet-radius: 8px;
+  --pi-sheet-shadow: 0 30px 80px -30px #000, inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --pi-overlay: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, rgba(56, 224, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(56, 224, 255, 0.03) 1px, transparent 1px);
+  --pi-overlay-size: 100% 3px, 28px 28px, 28px 28px;
+  --pi-overlay-opacity: 0.5;
+  --pi-overlay-blend: screen;
+
+  --pi-panel-bg: linear-gradient(180deg, rgba(17, 18, 36, 0.25), rgba(12, 13, 24, 0.25)), #0e0f1e;
+  --pi-panel-border: 1px solid rgba(255, 255, 255, 0.08);
+  --pi-clip: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  --pi-clip-hero: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  --pi-clip-small: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+
+  --pi-title-color: #aeb8d4;
+  --pi-marker-glow: 0 0 10px #38e0ff;
+
+  --pi-hero-bg: radial-gradient(600px 200px at 0% 0%, rgba(167, 139, 250, 0.09), transparent 70%),
+    linear-gradient(180deg, #12132a, #0b0b16);
+  --pi-hero-border: 1px solid rgba(167, 139, 250, 0.2);
+  --pi-name-color: #f0f3ff;
+  --pi-name-glow: 0 0 22px rgba(167, 139, 250, 0.33);
+  --pi-portrait-bg: linear-gradient(135deg, #1a1c38, #0c0d1a);
+  --pi-portrait-border: 1px solid color-mix(in srgb, var(--pi-accent) 33%, transparent);
+  --pi-portrait-shadow: 0 0 24px -8px color-mix(in srgb, var(--pi-accent) 40%, transparent);
+  --pi-portrait-ink: #5b6790;
+  --pi-portrait-scan: repeating-linear-gradient(0deg, rgba(56, 224, 255, 0.06) 0 2px, transparent 2px 4px);
+
+  --pi-row-bg: linear-gradient(90deg, #10111f, #0d0e1a);
+  --pi-pip-glow: 0 0 8px -1px var(--lvlc);
+  --pi-seg-off: #1a1d2e;
+  --pi-seg-radius: 2px;
+  --pi-hp-on: linear-gradient(180deg, #4ade80, #16a34a);
+  --pi-arm-on: linear-gradient(180deg, #a78bfa, #7c3aed);
+  --pi-charged: #86efac;
+  --pi-depleted: #c47c7c;
+  --pi-chip-glow: 0 0 12px -3px rgba(74, 222, 128, 0.6);
+
+  --pi-accent-border: rgba(56, 224, 255, 0.18);
+  --pi-accent-shadow: inset 0 0 0 1px rgba(56, 224, 255, 0.06), 0 0 30px -16px rgba(56, 224, 255, 0.33);
+  --pi-fate-border: rgba(251, 191, 36, 0.33);
+  --pi-fate-bg: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.13), transparent 70%);
+  --pi-fate-lab: #d6b14f;
+  --pi-fate-num: #fde08a;
+  --pi-fate-glow: rgba(251, 191, 36, 0.47);
+  --pi-budget-val: #c5b3ff;
+  --pi-budget-glow: rgba(167, 139, 250, 0.53);
+  --pi-gear-text: #aeb6cf;
+  --pi-gear-bg: #0b0c16;
+  --pi-input-bg: #0a0b16;
+  --pi-input-focus-border: rgba(56, 224, 255, 0.53);
+  --pi-add-color: #7fd9ef;
+  --pi-add-border: rgba(56, 224, 255, 0.33);
+  --pi-add-hover-bg: rgba(56, 224, 255, 0.08);
+
+  /* heat — neon sci-fi gradace (víc = horší) */
+  --pi-warn-seg: linear-gradient(180deg, #fbbf24, #d97706);
+  --pi-warn-seg-b: rgba(251, 191, 36, 0.47);
+  --pi-crit-seg: linear-gradient(180deg, #f87171, #dc2626);
+  --pi-crit-seg-b: rgba(248, 113, 113, 0.47);
+  --pi-warn-badge-bg: rgba(251, 191, 36, 0.09);
+  --pi-warn-badge-ink: #fcd34d;
+  --pi-warn-badge-b: rgba(251, 191, 36, 0.27);
+  --pi-crit-badge-bg: rgba(248, 113, 113, 0.09);
+  --pi-crit-badge-ink: #fca5a5;
+  --pi-crit-badge-b: rgba(248, 113, 113, 0.27);
+
+  --lvl-1: #8a8f9c;
+  --lvl-2: #4ade80;
+  --lvl-3: #38e0ff;
+  --lvl-4: #3b82f6;
+  --lvl-5: #a78bfa;
+  --lvl-6: #ec4899;
+  --lvl-7: #fbbf24;
+  --lvl-8: #ffffff;
+  --lvl-9: #ffffff;
+  --lvl-10: #ffffff;
+
+  /* ── embed / dice kontrakt (OPAQUE surface) ── */
+  --pi-log-surface: #0e0f1e;
+  --pi-log-border: rgba(56, 224, 255, 0.3);
+  --pi-log-title: #aeb8d4;
+  --pi-log-chip: #11121f;
+  --pi-log-num: #d6def0;
+  --pi-log-num-font: 'IBM Plex Mono', monospace;
+  --pi-log-total: #fbbf24;
+  --pi-log-total-pos: #38e0ff;
+  --pi-log-total-neg: #f87171;
+  --pi-log-total-shadow: 0 0 12px rgba(56, 224, 255, 0.5);
+  --pi-log-eq-font: 'Chakra Petch', system-ui, sans-serif;
+  --pi-log-skillmod: #a78bfa;
+  --pi-log-eq: #8893b0;
+}
+
+/* ── SIGNATURE: hero cyan tracer-roh (TL) + scanline ── */
+[data-diary-system='pi'][data-diary-skin='scifi'] .pi-hero {
+  position: relative;
+}
+[data-diary-system='pi'][data-diary-skin='scifi'] .pi-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: var(--pi-clip-hero);
+  z-index: 2;
+  background: linear-gradient(90deg, #38e0ff 0 18px, transparent 18px) 10px 10px / 20px 2px no-repeat,
+    linear-gradient(180deg, #38e0ff 0 18px, transparent 18px) 10px 10px / 2px 20px no-repeat;
+  filter: drop-shadow(0 0 6px #38e0ff);
+}
+
+/* SIGNATURE: fialový BR bracket na panelech */
+[data-diary-system='pi'][data-diary-skin='scifi'] .pi-panel::after,
+[data-diary-system='pi'][data-diary-skin='scifi'] .cp-section::after {
+  content: '';
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid #a78bfa;
+  border-right: 2px solid #a78bfa;
+  box-shadow: 1px 1px 8px -1px #a78bfa;
+  pointer-events: none;
+  z-index: 2;
+}
+[data-diary-system='pi'][data-diary-skin='scifi'] .pi-name {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+
+/* budget bar = violet→cyan HUD (zrcadlí pi.css default; pojistka kdyby modul
+   četl --pi-bar-*) */
+[data-diary-system='pi'][data-diary-skin='scifi'] .pi-budget__fill {
+  background: linear-gradient(90deg, var(--pi-violet), var(--pi-accent));
+}
+
+/* ── readout: chamfer + TL cyan bracket + scanline + BR fialový roh ── */
+[data-diary-system='pi'][data-diary-skin='scifi'] .ro-readout {
+  border-radius: 0;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  box-shadow: inset 0 0 0 1px rgba(56, 224, 255, 0.42), inset 0 0 40px -22px rgba(56, 224, 255, 0.45),
+    0 18px 50px rgba(0, 0, 0, 0.7);
+}
+[data-diary-system='pi'][data-diary-skin='scifi'] .ro-readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  clip-path: inherit;
+  background: linear-gradient(90deg, #38e0ff 0 12px, transparent 12px) 7px 7px / 14px 2px no-repeat,
+    linear-gradient(180deg, #38e0ff 0 12px, transparent 12px) 7px 7px / 2px 14px no-repeat,
+    repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.05) 0 1px, transparent 1px 3px);
+  filter: drop-shadow(0 0 6px #38e0ff);
+}
+[data-diary-system='pi'][data-diary-skin='scifi'] .ro-readout::after {
+  content: '';
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid #a78bfa;
+  border-right: 2px solid #a78bfa;
+  box-shadow: 1px 1px 8px -1px #a78bfa;
+  pointer-events: none;
+  z-index: 2;
+}

@@ -11,7 +11,7 @@
  *
  * Fonty: CDN přes @import (PWA self-host = otevřená otázka spec H4 / F2).
  */
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cinzel+Decorative:wght@400;700&family=Special+Elite&family=Lora:ital,wght@0,400;0,600;1,400&family=VT323&family=Marcellus&family=Marcellus+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600&family=Share+Tech+Mono&family=Cormorant+SC:wght@500;600;700&family=UnifrakturCook:wght@700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cinzel+Decorative:wght@400;700&family=Special+Elite&family=Lora:ital,wght@0,400;0,600;1,400&family=VT323&family=Marcellus&family=Marcellus+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600&family=Share+Tech+Mono&family=Cormorant+SC:wght@500;600;700&family=UnifrakturCook:wght@700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=IM+Fell+English+SC&display=swap');
 
 /* 16.2c-drd16 — per-systémové skiny DrD 1.6 (vlastní `--dd-*` token sady +
    signature ornamenty). Žijí v `drd16-skins/`, scoped
@@ -73,6 +73,19 @@
 @import './dnd5e-skins/minimal.css';
 @import './dnd5e-skins/retro.css';
 @import './dnd5e-skins/anime.css';
+
+/* pi (Příběhy Impéria) skiny — HUD systém (`--pi-*`, sourozenec matrixu). Žijí
+   v `pi-skins/`, scoped `[data-diary-system='pi'][data-diary-skin='X']`. Importy
+   zde (ne v pi.css), aby se načetly i v embedech (chat/mapa/dice), kde pi.css
+   neběží. @import nahoře (CSS spec) — viz drdplus poznámka výš. */
+@import './pi-skins/scifi.css';
+@import './pi-skins/fantasy.css';
+@import './pi-skins/horror.css';
+@import './pi-skins/steampunk.css';
+@import './pi-skins/nature.css';
+@import './pi-skins/minimal.css';
+@import './pi-skins/retro.css';
+@import './pi-skins/anime.css';
 
 /* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
    dice readout / orchestrace) ════════════

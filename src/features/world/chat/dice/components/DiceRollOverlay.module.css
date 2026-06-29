@@ -951,6 +951,281 @@
    Sjednocuje rovnici do cel-shade ink jazyka; žádný fialový leak. */
 [data-diary-system='matrix'][data-diary-skin='anime'] .skillMod { color: #16162e; }
 
+/* ════════════ 16.2c-F3 — pi readout (vyčíslení hodu) NESE deníkový skin ═══
+ * Port sourozeneckého matrixu (--mx-* → --pi-*). pi = HUD systém `--pi-*`.
+ * Obaleno `DiarySkinScope`. Skinuje se jen RÁM readout boxu + neutrální text
+ * (jméno/=); SÉMANTICKÉ +/−/total (cyan/červená/jantar) zůstávají = nesou
+ * výsledek. Scoped na pi → ostatní systémy beze změny. */
+[data-diary-system='pi'] .readout {
+  /* designovaný NEPRŮHLEDNÝ povrch skinu. --pi-log-surface dává skin (MUSÍ být
+     opaque); fallback = panel vrstvený přes plný --pi-bg. backdrop-filter VYPNUT:
+     na neprůhledném povrchu jen rozmazává mapu = vypadá „průhledně". */
+  background: var(--pi-log-surface,
+    var(--pi-panel-bg, linear-gradient(180deg, rgba(14, 12, 40, 0.95), rgba(10, 8, 32, 0.98))), var(--pi-bg, #0e0f1e));
+  border: 1px solid var(--pi-log-border, color-mix(in srgb, var(--pi-accent, #38e0ff) 30%, transparent));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-diary-system='pi'] .faceBadge {
+  background: var(--pi-log-chip, color-mix(in srgb, var(--pi-panel, #0e0f1e) 92%, var(--pi-bg, #0e0f1e)));
+  border-color: var(--pi-log-border, color-mix(in srgb, var(--pi-accent, #38e0ff) 35%, transparent));
+  font-family: var(--pi-log-num-font, var(--pi-font-num, 'IBM Plex Mono', monospace));
+  color: var(--pi-log-num, var(--pi-text, #d6def0));
+}
+[data-diary-system='pi'] .faceGeneric { color: var(--pi-log-num, var(--pi-text, #d6def0)); }
+/* čísla nesou skin (font+barva); znaménko +/− drží význam, ne barva */
+[data-diary-system='pi'] .totalValue { font-family: var(--pi-log-num-font, var(--pi-font-num, 'IBM Plex Mono', monospace)); }
+[data-diary-system='pi'] .totalPositive {
+  color: var(--pi-log-total-pos, var(--pi-accent, #38e0ff));
+  text-shadow: var(--pi-log-total-shadow, 0 0 12px color-mix(in srgb, var(--pi-accent, #38e0ff) 60%, transparent));
+}
+[data-diary-system='pi'] .totalNegative { color: var(--pi-log-total-neg, var(--pi-danger, #f87171)); }
+[data-diary-system='pi'] .totalNeutral {
+  color: var(--pi-log-total, var(--pi-gold, #fbbf24));
+  text-shadow: var(--pi-log-total-shadow, 0 0 12px color-mix(in srgb, var(--pi-gold, #fbbf24) 55%, transparent));
+}
+[data-diary-system='pi'] .equation { font-family: var(--pi-log-eq-font, var(--pi-font-display, 'Chakra Petch', sans-serif)); }
+[data-diary-system='pi'] .skillName { color: var(--pi-log-title, var(--pi-text, #d6def0)); }
+/* velikost schopnosti v rovnici tokenizována; bez tokenu dědí --pi-violet
+   (skin) → žádný sci-fi fialový leak do tmavých/světlých skinů. */
+[data-diary-system='pi'] .skillMod {
+  color: var(--pi-log-skillmod, var(--pi-violet, rgba(167, 139, 250, 0.9)));
+}
+/* součet kostek čitelný i na tmavých skinech (text místo muted modré). */
+[data-diary-system='pi'] .diceSum { color: var(--pi-log-num, var(--pi-text, rgba(168, 213, 255, 0.85))); }
+[data-diary-system='pi'] .eqSign { color: var(--pi-muted, rgba(150, 180, 255, 0.55)); }
+/* jméno hráče: čtitelný sekundární text (text/muted mix), ne tlumené --pi-muted
+   samo → na horror/steampunk readout dostatečný kontrast. */
+[data-diary-system='pi'] .rollerName {
+  color: var(--pi-log-eq, color-mix(in srgb, var(--pi-text, #d6def0) 62%, var(--pi-muted, rgba(180, 200, 255, 0.55))));
+  font-family: var(--pi-log-eq-font, var(--pi-font-display, 'Chakra Petch', sans-serif));
+}
+
+/* ════════════ 16.2c-F3c — per-skin SIGNATURE readoutu (pi) ════════════
+ * Port matrixu VERBATIM (jen selektor matrix→pi). Tvarové ornamenty
+ * (rámy/nýty/scanlines/lístek) musí být ZDE (hashovaná třída `.readout` nejde
+ * zacílit z globálního diary-skins.css). Paletu+čísla řeší tokeny --pi-log-*.
+ * Hardcoded skin barvy + SVG = skin-intrinsic (ne system tokeny) → beze změny.
+ * POZN.: `.readout` je position:fixed (overlay) → NEPŘEPISOVAT position (jen
+ * ::before/::after, fixed je positioned). Rodina drží napříč systémy. */
+
+/* fantasy — dvojitý zlatý fillet (kožená vazba grimoáru) */
+[data-diary-system='pi'][data-diary-skin='fantasy'] .readout {
+  --corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/svg%3E");
+  --corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 0) scale(-1 1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(0 44) scale(1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 44) scale(-1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  box-shadow: 0 0 0 1px #100a03, 0 0 0 3px #9a7330, 0 0 0 5px #1a1207, 0 0 0 6px #6a4c1c,
+    0 20px 60px -10px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(200, 150, 50, 0.08);
+  border-radius: 4px;
+}
+[data-diary-system='pi'][data-diary-skin='fantasy'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-size: 44px 44px;
+  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
+  background-image: var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+}
+
+/* horror — filigránová bordura + oxblood vnitřní glow */
+[data-diary-system='pi'][data-diary-skin='horror'] .readout {
+  outline: 1px solid rgba(90, 84, 96, 0.45);
+  outline-offset: 4px;
+  box-shadow: inset 0 0 28px rgba(94, 22, 34, 0.38), inset 0 0 0 1px rgba(90, 84, 96, 0.15),
+    0 24px 64px rgba(0, 0, 0, 0.85), 0 4px 14px rgba(0, 0, 0, 0.75);
+}
+/* SIGNATURE — kovaná gotická stříbrná tracerie ve 4 rozích + oxblood nýt
+   (návrh horror `.h-tracery-dark::before`, 4× SVG verbatim) */
+[data-diary-system='pi'][data-diary-skin='horror'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-size: 50px 50px;
+  background-position: 3px 3px, calc(100% - 3px) 3px, 3px calc(100% - 3px), calc(100% - 3px) calc(100% - 3px);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(58 0) scale(-1 1)'%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 58) scale(1 -1)'%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(58 58) scale(-1 -1)'%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 6px rgba(200, 196, 207, 0.14));
+  opacity: 0.9;
+}
+/* horror — stříbrno-vínový text na tmavém povrchu: skillMod jako oxblood
+   (ne tmavá --pi-violet), jméno/= světlejší stříbrná než syrový --pi-muted. */
+[data-diary-system='pi'][data-diary-skin='horror'] .skillMod { color: #c8506a; }
+[data-diary-system='pi'][data-diary-skin='horror'] .rollerName { color: #c8c4cf; }
+[data-diary-system='pi'][data-diary-skin='horror'] .skillName { color: #ece7ee; }
+
+/* steampunk — kovová deska + rohové mosazné nýty */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .readout {
+  isolation: isolate;
+  box-shadow: inset 0 1px 0 rgba(210, 175, 90, 0.42), inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    inset 1px 0 0 rgba(210, 175, 90, 0.18), inset -1px 0 0 rgba(0, 0, 0, 0.4),
+    0 6px 28px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+/* steampunk — teplý mosazný text na tmavém povrchu: skillMod mosaz
+   (ne fialová), jméno/= světlejší než syrový --pi-muted. */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .skillMod { color: #d8b46a; }
+[data-diary-system='pi'][data-diary-skin='steampunk'] .rollerName { color: #e0c694; }
+[data-diary-system='pi'][data-diary-skin='steampunk'] .skillName { color: #f0e4c8; }
+/* 4 rohové nýty + SIGNATURE nýtová kolejnice (horní/dolní hrana; návrh `.dice::before`) */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: inherit;
+  --_nyt: radial-gradient(circle at 38% 36%, #f4e0a0 0%, #c9a45e 38%, #7a5a2a 72%, #3a2610 100%);
+  --_rail: radial-gradient(circle, #c9a45e 1.1px, transparent 1.8px);
+  background-image: var(--_nyt), var(--_nyt), var(--_nyt), var(--_nyt), var(--_rail), var(--_rail);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat-x, repeat-x;
+  background-size: 10px 10px, 10px 10px, 10px 10px, 10px 10px, 20px 7px, 20px 7px;
+  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), 18px 5px, 18px calc(100% - 5px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+}
+
+/* nature — organický rám + letokruhová lišta + lísteček + dřevěné políčko */
+[data-diary-system='pi'][data-diary-skin='nature'] .readout {
+  border-width: 2px;
+  border-radius: 14px 6px 14px 6px;
+  box-shadow: inset 0 0 0 1px #2a3a18, inset 0 0 0 3px #4e6a2c, inset 0 0 20px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(0, 0, 0, 0.7);
+  padding-left: 32px;
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .readout::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 22px;
+  height: 28px;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='28' viewBox='0 0 22 28' fill='none'%3E%3Cpath d='M11 27 L11 14' stroke='%234e6a2c' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M11 15 C11 9 17 6 20 5 C20 11 16 15 11 16Z' fill='%237aa840' opacity='0.75'/%3E%3Cpath d='M11 20 C11 15 6 12 3 12 C3 17 6 21 11 21Z' fill='%235e8832' opacity='0.68'/%3E%3Ccircle cx='11' cy='27' r='1.5' fill='%234e6a2c'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.7;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .faceBadge {
+  background: linear-gradient(180deg, #2a3818 0%, #1e2c12 100%), #161c0b;
+  border: 1.5px solid #5e8038;
+  box-shadow: inset 0 1px 0 rgba(158, 200, 90, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 4px 2px 4px 2px;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+/* minimal — dvojitý ledger rám archivní karty (position NEpřepisovat) */
+[data-diary-system='pi'][data-diary-skin='minimal'] .readout {
+  overflow: visible;
+}
+[data-diary-system='pi'][data-diary-skin='minimal'] .readout::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  pointer-events: none;
+  border: 1px solid #ddd6c7;
+  border-radius: 1px;
+  z-index: 0;
+  /* SIGNATURE — 4 soutiskové registrační kříže „+" v rozích (návrh minimal `.dice::after`) */
+  background-repeat: no-repeat;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-size: 9px 9px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E");
+}
+
+/* retro — terminálový double-rám + scanlines (position NEpřepisovat) */
+[data-diary-system='pi'][data-diary-skin='retro'] .readout {
+  box-shadow: 0 0 0 1px #4a2e08, 0 0 0 2px #0c0601, 0 0 0 3px #8a5e15, 0 0 0 4px #0c0601,
+    0 0 0 5px rgba(255, 178, 39, 0.2), 0 10px 40px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(255, 100, 0, 0.06);
+  border-radius: 0;
+  overflow: visible;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .readout::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: repeating-linear-gradient(0deg, transparent 0, transparent 1.8px, rgba(0, 0, 0, 0.28) 1.8px, rgba(0, 0, 0, 0.28) 2.8px);
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .faceBadge {
+  font-size: 1.3rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
+  text-shadow: 0 0 6px rgba(255, 194, 77, 0.8), 0 0 14px rgba(255, 122, 0, 0.5);
+  border-color: #8a5e15;
+  background: #160e02;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .skillName {
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .totalValue {
+  font-size: 2rem;
+  letter-spacing: 2px;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .rollerName {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* anime/MLP — cel-shade ink rám + bílé chip kostky + ink-outlined total */
+[data-diary-system='pi'][data-diary-skin='anime'] .readout {
+  border: 3px solid #16162e;
+  border-radius: 18px;
+  box-shadow: 0 0 0 6px #ffffff, 0 0 0 9px #16162e, 0 8px 0 9px #16162e, 0 16px 32px -8px rgba(26, 20, 80, 0.5);
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .faceBadge {
+  background: #ffffff;
+  border: 2.5px solid #16162e;
+  border-radius: 10px;
+  box-shadow: 0 3px 0 #16162e, 0 4px 8px rgba(26, 20, 80, 0.25);
+  color: #16162e;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 900;
+  width: 36px;
+  height: 36px;
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .totalValue {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 900;
+  font-size: 2rem;
+  -webkit-text-stroke: 2px #16162e;
+  text-shadow: 0 3px 0 #16162e;
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .totalPositive {
+  color: #ff4d97;
+  -webkit-text-stroke: 2px #16162e;
+  text-shadow: 0 3px 0 #16162e;
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .totalNegative {
+  color: #ff5d6c;
+  -webkit-text-stroke: 2px #16162e;
+  text-shadow: 0 3px 0 #16162e;
+}
+/* anime — skillMod ink (sladí s ostatním textem readoutu), ne periwinkle.
+   Sjednocuje rovnici do cel-shade ink jazyka; žádný fialový leak. */
+[data-diary-system='pi'][data-diary-skin='anime'] .skillMod { color: #16162e; }
+
 /* 8.7q — JaD fatální úspěch / neúspěch v readoutu (místo výpočtu). */
 .critSuccess,
 .critFail {

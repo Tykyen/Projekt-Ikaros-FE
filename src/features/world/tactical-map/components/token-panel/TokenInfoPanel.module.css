@@ -434,6 +434,86 @@
   background: color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
 }
 
+/* ════════════ pi (Příběhy Impéria) wrapper chrome NESE deníkový skin ════════════
+ * Port sourozeneckého matrixu (--mx-* → --pi-*). pi = HUD systém `--pi-*`.
+ * Color remap base: chrome (panel, header, badge, akce, mode toggle, close,
+ * identity, avatar, name, body) sleduje vybraný pi skin barvou i písmem
+ * (sladěno s combat/bestie panelem uvnitř). Surface OPAQUE:
+ * var(--pi-log-surface ...) → fallback plný panel přes --pi-bg (NE průhledný).
+ * Scoped na pi → ostatní systémy drží mapový motiv --map-ui-* beze změny. */
+.panel[data-diary-system='pi'] {
+  background: var(--pi-log-surface, var(--pi-panel, #0e0f1e));
+  border-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 32%, transparent);
+  color: var(--pi-text, #d6def0);
+  box-shadow:
+    -8px 0 32px rgba(0, 0, 0, 0.55),
+    0 0 24px color-mix(in srgb, var(--pi-accent, #38e0ff) 12%, transparent);
+}
+.panel[data-diary-system='pi'] .modeDock,
+.panel[data-diary-system='pi'].modeDock {
+  border-left-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 40%, transparent);
+}
+.panel[data-diary-system='pi'] .header {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pi-accent, #38e0ff) 18%, transparent),
+    color-mix(in srgb, var(--pi-accent, #38e0ff) 9%, transparent)
+  );
+  border-bottom-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 40%, transparent);
+}
+.panel[data-diary-system='pi'] .badge {
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 45%, transparent);
+  color: var(--pi-text, #d6def0);
+  font-family: var(--pi-font-display, inherit);
+}
+.panel[data-diary-system='pi'] .actionBar {
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 6%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 18%, transparent);
+}
+.panel[data-diary-system='pi'] .modeToggle {
+  background: var(--pi-log-surface, var(--pi-panel, #0e0f1e));
+  border-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 50%, transparent);
+}
+.panel[data-diary-system='pi'] .modeBtn {
+  color: var(--pi-muted, #76809a);
+}
+.panel[data-diary-system='pi'] .modeBtn:hover,
+.panel[data-diary-system='pi'] .modeBtnActive {
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 28%, transparent);
+  color: var(--pi-text, #d6def0);
+}
+.panel[data-diary-system='pi'] .closeBtn {
+  color: var(--pi-muted, #76809a);
+  border-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 25%, transparent);
+}
+.panel[data-diary-system='pi'] .closeBtn:hover {
+  background: color-mix(in srgb, var(--pi-danger, #f87171) 18%, transparent);
+  border-color: color-mix(in srgb, var(--pi-danger, #f87171) 50%, transparent);
+  color: var(--pi-danger, #f87171);
+}
+.panel[data-diary-system='pi'] .identity {
+  border-bottom-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 16%, transparent);
+}
+.panel[data-diary-system='pi'] .avatar {
+  background: var(--pi-log-surface, var(--pi-panel, #0e0f1e));
+  border-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 45%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--pi-accent, #38e0ff) 18%, transparent);
+}
+.panel[data-diary-system='pi'] .name {
+  color: var(--pi-name-color, var(--pi-text, #f0f3ff));
+  font-family: var(--pi-font-display, inherit);
+}
+.panel[data-diary-system='pi'] .resizeHandle:hover {
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 35%, transparent);
+}
+.panel[data-diary-system='pi'] .body {
+  scrollbar-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 30%, transparent) transparent;
+}
+.panel[data-diary-system='pi'] .body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 30%, transparent);
+}
+
 /* ════════════════════════════════════════════════════════════════════════
  * ORNAMENT PARITA — per-skin tvarový ornament obalu (replikuje signature
  * z deníkových návrhů na .X-panel::before/::after). `.panel` nese
@@ -784,6 +864,307 @@
   border-radius: 50%;
   border-color: var(--mlp-lavender, #b79ce8);
   box-shadow: 0 0 0 3px #ffffff;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * pi (Příběhy Impéria) — per-skin SIGNATURE OBALU mapy
+ * Atributy PŘÍMO na `.panel` (compound `.panel[data-diary-system='pi'][data-diary-skin='X']`).
+ * Tvary REUSE z pi readoutu (DiceRollOverlay.module.css) → obal (D) a readout (E)
+ * sdílí tvarový jazyk v rámci skinu. Hardcoded skin barvy + SVG data-uri
+ * (skin-intrinsic, ne system tokeny). Ornament = ::before/::after, absolute,
+ * pointer-events:none → přežije overflow:hidden, nepřebíjí position:fixed dock.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* ──────────────────── pi FANTASY — filigránové zlaté rohové kování ─────────
+ * REUSE readout fantasy `.readout::before` (4 rohy, antické zlato #e3b94a +
+ * perla #f7e7a8). Kovaná hlavička + zlatá iniciála jména. */
+.panel[data-diary-system='pi'][data-diary-skin='fantasy']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background-repeat: no-repeat;
+  background-size: 40px 40px;
+  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 0) scale(-1 1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(0 44) scale(1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 44) scale(-1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}
+.panel[data-diary-system='pi'][data-diary-skin='fantasy'] .header {
+  background: linear-gradient(180deg, #3d2e18, #271d12);
+  border-bottom: 1px solid #6e5326;
+}
+.panel[data-diary-system='pi'][data-diary-skin='fantasy'] .avatar {
+  border-radius: 4px;
+  background: linear-gradient(135deg, #3a2c16, #20160b);
+  box-shadow: 0 0 0 1px #6e5326 inset;
+}
+.panel[data-diary-system='pi'][data-diary-skin='fantasy'] .avatarFallback {
+  color: #e3b94a;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+}
+.panel[data-diary-system='pi'][data-diary-skin='fantasy'] .name {
+  color: #f3e2b4;
+}
+
+/* ──────────────────── pi SCIFI — tech-brackety (cyan TL + violet BR) ───────
+ * REUSE readout scifi (clip chamfer + cyan/violet rohové brackety). HUD glow. */
+.panel[data-diary-system='pi'][data-diary-skin='scifi']::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 5;
+  border-top: 2px solid #38e0ff;
+  border-left: 2px solid #38e0ff;
+  box-shadow: -1px -1px 8px -1px #38e0ff;
+}
+.panel[data-diary-system='pi'][data-diary-skin='scifi']::after {
+  content: '';
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 5;
+  border-bottom: 2px solid #a78bfa;
+  border-right: 2px solid #a78bfa;
+  box-shadow: 1px 1px 8px -1px #a78bfa;
+}
+.panel[data-diary-system='pi'][data-diary-skin='scifi'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #38e0ff 14%, transparent), transparent);
+  border-bottom: 1px solid rgba(94, 160, 210, 0.4);
+}
+.panel[data-diary-system='pi'][data-diary-skin='scifi'] .avatar {
+  border-radius: 3px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.panel[data-diary-system='pi'][data-diary-skin='scifi'] .name {
+  color: #f0f3ff;
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+
+/* ──────────────────── pi STEAMPUNK — 4 rohové mosazné nýty ─────────────────
+ * REUSE readout steampunk nýt (radial mosaz #c9a45e). Kovaná deska hlavičky. */
+.panel[data-diary-system='pi'][data-diary-skin='steampunk']::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 5;
+  --_pi-nyt: radial-gradient(circle at 38% 36%, #f4e0a0 0%, #c9a45e 38%, #7a5a2a 72%, #3a2610 100%);
+  background-image: var(--_pi-nyt), var(--_pi-nyt), var(--_pi-nyt), var(--_pi-nyt);
+  background-repeat: no-repeat;
+  background-size: 9px 9px;
+  background-position: 2px 2px, calc(100% - 2px) 2px, 2px calc(100% - 2px), calc(100% - 2px) calc(100% - 2px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+.panel[data-diary-system='pi'][data-diary-skin='steampunk'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #d8b46a 26%, transparent), color-mix(in srgb, #6e5224 18%, transparent));
+  border-bottom: 2px solid #6e5224;
+}
+.panel[data-diary-system='pi'][data-diary-skin='steampunk'] .avatar {
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px #6e5224 inset;
+}
+.panel[data-diary-system='pi'][data-diary-skin='steampunk'] .name {
+  color: #f0d89a;
+}
+
+/* ──────────────────── pi NATURE — letokruhový růžek + lísteček ─────────────
+ * REUSE readout nature (organický rožek + listová žilka, mech #5a7d3a). */
+.panel[data-diary-system='pi'][data-diary-skin='nature']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 26px;
+  height: 26px;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(135deg, transparent 48%, #5a7d3a 50%);
+  opacity: 0.5;
+}
+.panel[data-diary-system='pi'][data-diary-skin='nature']::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  width: 22px;
+  height: 28px;
+  pointer-events: none;
+  z-index: 5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='28' viewBox='0 0 22 28' fill='none'%3E%3Cpath d='M11 27 L11 14' stroke='%234e6a2c' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M11 15 C11 9 17 6 20 5 C20 11 16 15 11 16Z' fill='%237aa840' opacity='0.75'/%3E%3Cpath d='M11 20 C11 15 6 12 3 12 C3 17 6 21 11 21Z' fill='%235e8832' opacity='0.68'/%3E%3Ccircle cx='11' cy='27' r='1.5' fill='%234e6a2c'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+.panel[data-diary-system='pi'][data-diary-skin='nature'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #5a7d3a 18%, transparent), transparent);
+  border-bottom: 1px solid color-mix(in srgb, #86ab52 45%, transparent);
+}
+.panel[data-diary-system='pi'][data-diary-skin='nature'] .avatar {
+  border-radius: 18px 5px 18px 5px;
+  border-color: #86ab52;
+}
+.panel[data-diary-system='pi'][data-diary-skin='nature'] .name {
+  color: #eef0d4;
+}
+
+/* ──────────────────── pi MINIMAL — registrační kříže v rozích + tenký rám ──
+ * REUSE readout minimal (soutiskové „+" kříže + hairline rám, #9a7b2e). */
+.panel[data-diary-system='pi'][data-diary-skin='minimal']::after {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  pointer-events: none;
+  z-index: 5;
+  border: 1px solid #ddd6c7;
+  background-repeat: no-repeat;
+  background-position: -4px -4px, calc(100% + 4px) -4px, -4px calc(100% + 4px), calc(100% + 4px) calc(100% + 4px);
+  background-size: 9px 9px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E");
+}
+.panel[data-diary-system='pi'][data-diary-skin='minimal'] .header {
+  background: #f4f1ea;
+  border-bottom: 1px solid #cabfa8;
+}
+.panel[data-diary-system='pi'][data-diary-skin='minimal'] .avatar {
+  border-radius: 1px;
+  border-color: #cabfa8;
+  box-shadow: none;
+}
+.panel[data-diary-system='pi'][data-diary-skin='minimal'] .name {
+  color: #20211f;
+}
+
+/* ──────────────────── pi RETRO — terminálový double-rám + scanlines ────────
+ * REUSE readout retro (jantarový CRT rám + skenovací linky, #ffb627/#8a5e15). */
+.panel[data-diary-system='pi'][data-diary-skin='retro']::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 5;
+  border: 1px solid #8a5e15;
+  box-shadow:
+    0 0 0 1px #0c0601,
+    0 0 10px -2px rgba(255, 178, 39, 0.5) inset;
+}
+.panel[data-diary-system='pi'][data-diary-skin='retro']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: repeating-linear-gradient(0deg, transparent 0, transparent 1.8px, rgba(0, 0, 0, 0.28) 1.8px, rgba(0, 0, 0, 0.28) 2.8px);
+}
+.panel[data-diary-system='pi'][data-diary-skin='retro'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #ffb627 14%, transparent), transparent);
+  border-bottom: 1px solid #8a5e15;
+}
+.panel[data-diary-system='pi'][data-diary-skin='retro'] .avatarFallback {
+  color: #ffce63;
+  text-shadow: 0 0 8px rgba(255, 122, 0, 0.6);
+}
+.panel[data-diary-system='pi'][data-diary-skin='retro'] .name {
+  color: #ffc24d;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ──────────────────── pi HORROR — gotická stříbrná tracerie + oxblood nýt ──
+ * REUSE readout horror (stříbrná tracerie #cfcbd6 ve 4 rozích + oxblood pečeť
+ * #a2283a). Vnitřní oxblood glow + tmavá hlavička. */
+.panel[data-diary-system='pi'][data-diary-skin='horror']::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 5;
+  background-repeat: no-repeat;
+  background-size: 50px 50px;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(58 0) scale(-1 1)'%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 58) scale(1 -1)'%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 58 58' fill='none' stroke='%23cfcbd6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(58 58) scale(-1 -1)'%3E%3Cpath d='M4 57 L4 21 C4 12 12 4 21 4 L57 4' stroke-width='1.6'/%3E%3Cpath d='M9 57 L9 23 C9 16 16 9 23 9 L57 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M4 21 C13 21 21 13 21 4' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='12.5' cy='12.5' r='2' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 6px rgba(200, 196, 207, 0.14));
+  opacity: 0.9;
+}
+.panel[data-diary-system='pi'][data-diary-skin='horror']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  box-shadow: inset 0 0 28px rgba(94, 22, 34, 0.32);
+}
+.panel[data-diary-system='pi'][data-diary-skin='horror'] .header {
+  background:
+    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, #5e1622 28%, transparent), transparent 60%),
+    linear-gradient(180deg, color-mix(in srgb, #130b11 50%, transparent), transparent);
+  border-bottom: 1px solid #4a4750;
+}
+.panel[data-diary-system='pi'][data-diary-skin='horror'] .avatar {
+  border-color: #4a4750;
+  box-shadow:
+    0 0 0 1px #130b11,
+    0 0 16px color-mix(in srgb, #5e1622 50%, transparent);
+}
+.panel[data-diary-system='pi'][data-diary-skin='horror'] .name {
+  color: #ece2e6;
+}
+
+/* ──────────────────── pi ANIME/MLP — cel-shade ink rám + sparkle ───────────
+ * REUSE readout anime jazyk (silný ink #16162e rám + conic gloss). Rohová
+ * ✦ jiskra (z návrhu anime `.pi-sheet::after`). */
+.panel[data-diary-system='pi'][data-diary-skin='anime']::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  z-index: 5;
+  border: 2.5px solid #16162e;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.55), inset 0 18px 28px -18px rgba(43, 42, 85, 0.18);
+}
+.panel[data-diary-system='pi'][data-diary-skin='anime']::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 6;
+  top: 11px;
+  right: 11px;
+  width: 22px;
+  height: 22px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffd23e' stroke='%2316162e' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+  filter: drop-shadow(0 2px 3px rgba(26, 20, 80, 0.25));
+}
+.panel[data-diary-system='pi'][data-diary-skin='anime'] .header {
+  background: linear-gradient(180deg, #ffffff, #ffe9f4);
+  border-bottom: 2px solid #16162e;
+}
+.panel[data-diary-system='pi'][data-diary-skin='anime'] .avatar {
+  border-radius: 14px;
+  box-shadow: 0 0 0 2.5px #16162e;
+}
+.panel[data-diary-system='pi'][data-diary-skin='anime'] .name {
+  color: #16162e;
+  font-family: 'Bricolage Grotesque', sans-serif;
 }
 
 /* ── Responsive: mobile force overlay ──────────────────────────── */

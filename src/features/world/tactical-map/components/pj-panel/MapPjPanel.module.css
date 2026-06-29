@@ -372,3 +372,27 @@
 [data-diary-system='matrix'] .sectionTitle {
   color: var(--mx-muted, #76809a);
 }
+
+/* ── pi (Příběhy Impéria) ── sourozenec matrixu (--pi-* HUD).
+ * JEN barva/font přes token kontrakt --pi-log-* / --pi-* z předka; žádný
+ * ornament (ornament policy §3). Plocha OPAQUE (--pi-log-surface bez alfy).
+ * Matrix nemá per-skin MapPjPanel bloky → pi taky ne; per-skin barvy přijdou
+ * z --pi-log-* automaticky. Scoped na pi → ostatní systémy beze změny. */
+[data-diary-system='pi'] .panel,
+[data-diary-system='pi'] .flyout {
+  background: var(--pi-log-surface, var(--pi-panel, #0e0f1e));
+  border-color: var(--pi-log-border, color-mix(in srgb, var(--pi-accent, #38e0ff) 30%, transparent));
+  color: var(--pi-text, #d6def0);
+}
+[data-diary-system='pi'] .header,
+[data-diary-system='pi'] .flyoutHeader {
+  background: color-mix(in srgb, var(--pi-accent, #38e0ff) 12%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 18%, transparent);
+}
+[data-diary-system='pi'] .title,
+[data-diary-system='pi'] .flyoutTitle {
+  color: var(--pi-log-title, var(--pi-accent, #38e0ff));
+}
+[data-diary-system='pi'] .sectionTitle {
+  color: var(--pi-muted, #76809a);
+}
