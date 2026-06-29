@@ -1,0 +1,763 @@
+/* Jeskyně a draci (JaD) — skin „STEAMPUNK" = Mosazný mechanický deník.
+ *
+ * JEDEN soubor reskinuje LIST JaD (`.dnd-diary` + `.dnd-*` ornamenty), PANELY
+ * mapy/chatu (combat/bestie přes `--dd-*` token override) i EMBEDY (obal/dice/
+ * dicelog přes `--dd-embed-*`). Vzhled = schválený mockup `c:/tmp/dnd-skins/steampunk/`.
+ *
+ * SCOPE: vše scoped na `[data-diary-system='dnd5e'][data-diary-skin='steampunk']`
+ * (specificita 0,2,0) → přebíjí baseline `[data-diary-system='dnd5e']` (0,1,0) i
+ * `.dnd-diary` overrides z jad.css. Pouze CSS/SVG, žádný JS.
+ *
+ * IDENTITA (rodina drd16/drdplus/drd2 steampunk): kožený korpus sevřený nýtovanou
+ * mosaznou kostrou, do něj zasazené broušené mosazné desky (panely/karty) se
+ * zkosenými rohy a rohovými nýty. Čísla = přístrojový display (IBM Plex Mono).
+ * ŽIVOTY/HP = výbojová červeň kotle · KOUZLA/magie = patina/verdigris · OČ = chladná
+ * mosaz · INICIATIVA = svižná měď.
+ *
+ * SIGNATURE (vlastní, nesdílené): „manometr ozubeného kola" (cog-gauge) — cog-crest
+ * erb úrovně, mosazné ciferníkové vlastnostní štítky, OČ manometr s rudou ručičkou,
+ * tlakoměr kotle životů, nýtová kolejnice po obvodu listu, ryté mosazné cedulky,
+ * punch-card perforace karet kouzel, klíč+kolo v patičce. Fonty: IM Fell English SC
+ * (titulky) · IBM Plex Mono (čísla) · Cinzel (kapitálky) · EB Garamond (tělo).
+ *
+ * IMPORT: registrováno přes `@import './dnd-skins/steampunk.css';` v
+ * `diary-skins.css` (skin bundle; loaduje se na listu i embedech) — řeší zadavatel.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English+SC&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKEN OVERRIDE — `--dd-*` (panely combat/bestie + embedy) na compound
+   selektoru BEZ `.dnd-diary`. Panely mají hash module třídy → reskin JEN přes
+   tokeny (čtou je z předka). Mapování JaD role → steampunk:
+     parch  → mosazný plát desky (broušená mosaz)
+     ink    → rytina (sépiový inkoust)
+     life   → výbojová červeň (kotel)            ← ŽIVOTY / HP
+     mana   → patina / verdigris (éter)          ← KOUZLA / magie
+     steel  → chladná mosaz                       ← OČ / obrana
+     init   → svižná měď                          ← INICIATIVA
+     gold   → mosaz                               ← akcent
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] {
+  /* ── lokální surovinová paleta (pro čitelnost mapování níže) ── */
+  --st-leather-0: #160f08;
+  --st-leather-1: #241a10;
+  --st-leather-2: #2f2114;
+  --st-leather-edge: #3c2a18;
+  --st-brass-0: #e7cd8f;
+  --st-brass-1: #caa45f;
+  --st-brass-2: #a07c3e;
+  --st-brass-deep: #6e5224;
+  --st-brass-shadow: #473311;
+  --st-copper: #b06a3a;
+  --st-copper-hi: #d68a52;
+  --st-copper-deep: #6e3c1e;
+  --st-plate-0: #d8be84;
+  --st-plate-1: #c8ac6e;
+  --st-plate-2: #b4965a;
+  --st-plate-edge: #8a6e38;
+  --st-dial: #efe2c2;
+  --st-dial-shadow: #bda874;
+  --st-rivet: radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%);
+  /* JaD sémantika */
+  --st-life: #b4452a;
+  --st-life-hi: #d76a42;
+  --st-life-deep: #5e2113; /* ŽIVOTY / HP = výbojová červeň kotle */
+  --st-mana: #3f7d72;
+  --st-mana-hi: #5fa99b;
+  --st-mana-deep: #1f4a43; /* KOUZLA / magie = patina / verdigris */
+  --st-steel: #a07c3e;
+  --st-steel-hi: #caa45f;
+  --st-steel-deep: #6e5224; /* OČ / obrana = chladná mosaz */
+  --st-init: #d68a52;
+  --st-init-deep: #6e3c1e; /* INICIATIVA = svižná měď */
+
+  /* ── base paleta panelu: rytina + mosazný plát (kanonické JaD --dd-* názvy
+       sjednocené se sourozenci dnd-skins/*, jinak panel zůstane pergamen) ── */
+  --dd-parch-1: var(--st-plate-0);
+  --dd-parch-2: var(--st-plate-1);
+  --dd-parch-edge: var(--st-plate-edge);
+  --dd-ink: #2b1f10;
+  --dd-ink-soft: #5a4426;
+  --dd-ink-deep: #1c1308;
+  --dd-ink-hand: #5a4426; /* mono čísla = přístroj, ne rukopis */
+  --dd-rule: rgba(138, 110, 56, 0.4);
+
+  /* ── JaD sémantika: accent=OČ/tituly/akcent, gold=iniciativa/zdatnost,
+       hp=Životy, spell=kouzla, seal=pečeť ── */
+  --dd-accent: var(--st-steel-hi); /* OČ / tituly / accent rámy / kladný = chladná mosaz */
+  --dd-gold: var(--st-brass-1); /* iniciativa / zdatnostní bonus / sekundární = mosaz */
+  --dd-hp: var(--st-life); /* ŽIVOTY / HP = výbojová červeň kotle */
+  --dd-spell: var(--st-mana); /* kouzla / magie = patina / verdigris */
+  --dd-seal: var(--st-brass-deep); /* pečeť / akcent = mosaz tmavá */
+
+  /* border odstíny barevných ploch */
+  --dd-accent-bd: var(--st-brass-deep);
+  --dd-gold-bd: var(--st-brass-deep);
+  --dd-hp-bd: #4a1810;
+  --dd-spell-bd: #163a34;
+
+  /* inky (text na barevných plochách) */
+  --dd-seal-ink: #f7ecd0; /* text na mosazné pečeti */
+  --dd-gold-ink: #1c130a; /* text na mosazi (tmavý) */
+  --dd-accent-ink: #1c130a; /* text na akcentu (tlačítka „Upravit bestii") */
+
+  /* gradienty (akcent kroky / iniciativa pip / HP) */
+  --dd-accent-grad: linear-gradient(180deg, var(--st-brass-0), var(--st-brass-1) 58%, var(--st-brass-deep)); /* OČ / mosazné kroky */
+  --dd-gold-grad: radial-gradient(circle at 35% 30%, var(--st-brass-0), var(--st-brass-1)); /* iniciativa / zdatnost */
+  --dd-gold-grad-strong: linear-gradient(180deg, var(--st-brass-0), var(--st-brass-1) 60%, var(--st-brass-deep));
+  --dd-hpbar-track: #16100a; /* kolejnice HP lišty (tmavá kůže) */
+  --dd-hpfill-grad: linear-gradient(90deg, var(--st-life-deep), var(--st-life-hi)); /* HP proužek = kotel */
+  --dd-hptxt-glow: 0 0 6px rgba(215, 106, 66, 0.3); /* ztlumený glow na tmavém */
+
+  /* POVRCHY (NEJSOU v baseline → nutno nastavit; jinak panel zůstane pergamen).
+     Kožený korpus + mosazný plát + tmavé okénko inputů. */
+  --dd-panel-bg:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    radial-gradient(140% 100% at 18% 0%, rgba(110, 78, 38, 0.4), transparent 55%),
+    linear-gradient(165deg, var(--st-leather-2), var(--st-leather-1) 55%, var(--st-leather-0));
+  --dd-card-bg:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 248, 222, 0.22), transparent 50%),
+    linear-gradient(180deg, var(--st-plate-0), var(--st-plate-1) 55%, var(--st-plate-2));
+  --dd-row-bg: linear-gradient(90deg, rgba(110, 82, 36, 0.22), rgba(40, 28, 16, 0.32));
+  --dd-input-bg: rgba(255, 248, 222, 0.45);
+  --dd-seal-soft: rgba(110, 82, 36, 0.18); /* seal-tint plocha */
+  --dd-seal-line: rgba(138, 110, 56, 0.4); /* seal-tint border */
+
+  /* ── fonty: viktoriánská serif + mono ciferníky ── */
+  --dd-font-head: 'Cinzel', serif;
+  --dd-font-body: 'EB Garamond', Georgia, serif;
+  --dd-font-hand: 'IBM Plex Mono', ui-monospace, monospace; /* čísla = přístroj */
+
+  /* ════════════ EMBED plochy (obal v TM / dice readout / dicelog) ═══
+     JaD baseline má SVĚTLÝ embed (pergamen). Rodina steampunk drží embed v
+     TMAVÉ polaritě (kožený korpus, světlý brass text) — sjednoceno s drd16/
+     drdplus/drd2. Plocha NEPRŮHLEDNÁ (jinak prosvítá mapa). pos=zeleň,
+     neg=výbojová červeň, neutrál=mosaz; fatální úspěch zlatá / neúspěch krvavá. ── */
+  --dd-forge-1: #241a10; /* tmavý fallback pod readout bg (kožený korpus) */
+  --dd-embed-surface: linear-gradient(180deg, #2f2114, #241a10 58%, #160f08);
+  --dd-embed-border: var(--st-brass-deep);
+  --dd-embed-line: color-mix(in srgb, var(--st-brass-1) 26%, transparent);
+  --dd-embed-text: #ead8b0;
+  --dd-embed-muted: #b39a6a;
+  --dd-embed-title: var(--st-brass-0);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--st-brass-1) 16%, transparent);
+  --dd-embed-accent: var(--st-copper-hi);
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'IM Fell English SC', 'Cinzel', serif;
+  --dd-embed-pos: #7ec96a; /* kladný hod = zeleň */
+  --dd-embed-neg: var(--st-life-hi); /* záporný hod = výbojová červeň */
+  --dd-embed-neutral: var(--st-brass-0); /* neutrál = mosaz */
+  --dd-embed-hp: var(--st-life-hi); /* HP číslo v embedu = výbojová červeň */
+  --dd-embed-spell: var(--st-mana-hi); /* kouzla / magie chip = patina */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) LIST `.dnd-diary` — lokální token override + kožený korpus, mosazný rám
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary {
+  /* lokální tokeny listu (jad.css je definuje na `.dnd-diary`) */
+  --dnd-accent: #b4452a; /* akcent boje/HP = výbojová červeň */
+  --dnd-accent-soft: #d76a42;
+  --dnd-gold: #caa45f; /* glyf / mosaz */
+  --dnd-border: #8a6e38;
+  --dnd-border-soft: rgba(138, 110, 56, 0.4);
+  --dnd-panel-bg: #d8be84; /* mosazný plát desky */
+  --dnd-box: #c8ac6e;
+  --dnd-highlight: #ede2cf;
+  --dnd-ink-soft: #5a4426; /* sépiová rytina */
+
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #2b1f10;
+  /* kožený korpus + jemné soustružení mosazi (kontrast pod světlými deskami) */
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    radial-gradient(140% 100% at 18% 0%, rgba(110, 78, 38, 0.4), transparent 55%),
+    linear-gradient(165deg, var(--st-leather-2), var(--st-leather-1) 55%, var(--st-leather-0));
+  border: none;
+  border-radius: 10px;
+  position: relative;
+  box-shadow:
+    0 2px 0 rgba(255, 240, 200, 0.08) inset,
+    inset 0 0 130px rgba(0, 0, 0, 0.55),
+    0 50px 100px -40px #000,
+    0 0 0 1px var(--st-leather-edge),
+    0 0 0 7px var(--st-brass-deep),
+    0 0 0 9px var(--st-brass-shadow),
+    0 0 0 10px #160f08;
+}
+/* SIGNATURE: nýtová kolejnice po CELÉM obvodu listu */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  background:
+    radial-gradient(circle, var(--st-brass-1) 1.5px, transparent 2.3px) 0 0 / 26px 8px repeat-x,
+    radial-gradient(circle, var(--st-brass-1) 1.5px, transparent 2.3px) 0 100% / 26px 8px repeat-x,
+    radial-gradient(circle, var(--st-brass-1) 1.5px, transparent 2.3px) 0 0 / 8px 26px repeat-y,
+    radial-gradient(circle, var(--st-brass-1) 1.5px, transparent 2.3px) 100% 0 / 8px 26px repeat-y;
+}
+/* obsah nad kolejnicí */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* SIGNATURE: nadpisy sekcí — mini ozubené kolo místo glyfu ◆ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary h3 {
+  font-family: 'Cinzel', serif;
+  color: var(--st-leather-1);
+  border-bottom-color: var(--st-brass-deep);
+  text-shadow: 0 1px 0 rgba(255, 248, 222, 0.5);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary h3::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, var(--st-plate-1) 0 26%, transparent 27%),
+    conic-gradient(from 0deg, var(--st-brass-2) 0 18deg, var(--st-brass-deep) 18deg 30deg);
+  box-shadow: 0 0 0 1px var(--st-plate-edge);
+}
+
+/* identifikační / běžné inputy = světlá mosaz (rytina), mono čísla */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary input,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary textarea,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary select {
+  background: rgba(255, 248, 222, 0.5);
+  border: 1px solid var(--st-plate-edge);
+  border-radius: 3px;
+  color: #2b1f10;
+  font-family: 'EB Garamond', Georgia, serif;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary input:focus,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary textarea:focus,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary select:focus {
+  border-color: var(--st-copper);
+  box-shadow: 0 0 0 2px rgba(176, 106, 58, 0.18);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary input:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary textarea:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary select:disabled {
+  background: rgba(255, 248, 222, 0.32);
+  color: #4a3a22;
+}
+
+/* ── Taby: viktoriánská serif + ciferníkové kolečko ── */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs {
+  border-bottom: 2px solid var(--st-brass-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs button,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs .dnd-tab-toggle {
+  font-family: 'IM Fell English SC', 'Cinzel', serif;
+  font-weight: 400;
+  color: #9c8155;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs button::before {
+  content: '';
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  flex: none;
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 50% 50%, var(--st-leather-1) 0 26%, transparent 27%),
+    conic-gradient(from 0deg, var(--st-brass-2) 0 18deg, var(--st-brass-deep) 18deg 30deg);
+  box-shadow: 0 0 0 1px var(--st-brass-shadow);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs button.active {
+  color: var(--st-brass-0);
+  border-bottom-color: var(--st-copper-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs button.active::before {
+  opacity: 1;
+  background:
+    radial-gradient(circle at 50% 50%, var(--st-leather-1) 0 26%, transparent 27%),
+    conic-gradient(from 0deg, var(--st-brass-0) 0 18deg, var(--st-brass-deep) 18deg 30deg);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs button:hover:not(.active) {
+  color: var(--st-brass-1);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tabs .dnd-tab-toggle {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-brass-2);
+}
+
+/* ── Hlavička listu: kožená lišta s mosaznými kapitálkami ── */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-header {
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, rgba(60, 42, 24, 0.55), rgba(20, 14, 8, 0.7));
+  border: 1px solid var(--st-brass-deep);
+  box-shadow: inset 0 1px 0 rgba(202, 164, 95, 0.18), 0 4px 14px -8px #000;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-field label {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-2);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-field input,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-field select {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-weight: 600;
+  color: var(--st-brass-0);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--st-brass-deep);
+  border-radius: 0;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-field input:focus,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-field select:focus {
+  border-bottom-color: var(--st-copper);
+  box-shadow: none;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-field input:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-field select:disabled {
+  background: transparent;
+  color: #cbb78a;
+}
+
+/* SIGNATURE: úroveň badge = cog-crest (ražený mosazný display, součet úrovní) */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-level-badge {
+  position: relative;
+  background: linear-gradient(180deg, #3c2a18, #241a10);
+  color: var(--st-brass-0);
+  border: 1px solid var(--st-brass-deep);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(202, 164, 95, 0.25);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-level-badge .num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+  color: var(--st-brass-0);
+  text-shadow: 0 1px 0 #000, 0 0 14px rgba(202, 164, 95, 0.3);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-level-badge .cap {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-2);
+  opacity: 1;
+}
+
+/* ── Multipovolání řádky: ciferníkové selecty + mono úrovně ── */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-prof-row {
+  border-bottom: 1px dotted rgba(138, 110, 56, 0.4);
+  padding-bottom: 8px;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-prof-row .pcap {
+  font-family: 'Cinzel', serif;
+  color: var(--st-ink-soft, #5a4426);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-prof-row .pcol-lvl input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-prof-row .del-btn {
+  color: var(--st-life);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-sub-hint {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  color: var(--st-copper-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-foot-hint {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  color: var(--st-ink-soft, #5a4426);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) PANELY `.dnd-panel` — broušená mosaz, zkosené rohy, rohové nýty
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-panel {
+  position: relative;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 5px),
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 248, 222, 0.22), transparent 50%),
+    linear-gradient(180deg, var(--st-plate-0), var(--st-plate-1) 55%, var(--st-plate-2));
+  border: 1px solid var(--st-plate-edge);
+  /* zkosené (notched) rohy na všech 4 rozích */
+  clip-path: polygon(
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px),
+    0 10px
+  );
+  box-shadow:
+    0 8px 18px -10px #000,
+    inset 0 1px 0 rgba(255, 248, 222, 0.55),
+    inset 0 -4px 10px rgba(70, 40, 12, 0.28);
+}
+/* SIGNATURE: 4 rohové nýty na desce */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-panel::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--st-rivet), var(--st-rivet), var(--st-rivet), var(--st-rivet);
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position:
+    2px 2px,
+    calc(100% - 2px) 2px,
+    2px calc(100% - 2px),
+    calc(100% - 2px) calc(100% - 2px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+/* obsah panelu nad nýty (h3 už je z-index 1 přes .dnd-diary > *, ale panel je
+   vnořený — proto pojistka na přímé potomky panelu) */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-panel > * {
+  position: relative;
+  z-index: 1;
+}
+/* nadpis uvnitř panelu: sépiová rytina na mosazi (kontrast přebíjí accent z h3) */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-panel h3 {
+  color: var(--st-leather-1);
+  border-bottom-color: var(--st-brass-deep);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) SIGNATURE: VLASTNOSTI `.dnd-stat-box` = ražený mosazný ciferníkový štítek
+   (input nemá pseudoelementy → box dostane ciferníkový rám, skóre input = mono,
+   štítek modifikátoru = ražená mosaz)
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-stat-box {
+  position: relative;
+  background:
+    radial-gradient(120% 80% at 18% 0%, rgba(255, 248, 222, 0.4), transparent 55%),
+    linear-gradient(180deg, rgba(216, 190, 132, 0.92), rgba(180, 150, 90, 0.85));
+  border: 1px solid var(--st-plate-edge);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 222, 0.5), 0 2px 6px -3px #000;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-stat-box span.lbl {
+  font-family: 'Cinzel', serif;
+  color: var(--st-leather-1);
+}
+/* skóre uprostřed = ciferníkové sklo + mono číslo (manometrový pocit) */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-stat-box input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+  color: var(--st-leather-1);
+  background: radial-gradient(circle at 42% 36%, var(--st-dial), var(--st-dial-shadow) 84%);
+  border: 1px solid var(--st-brass-deep);
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 248, 222, 0.5),
+    inset 0 -3px 6px rgba(70, 40, 12, 0.4),
+    0 0 0 1px var(--st-brass-shadow);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-stat-box input:disabled {
+  background: radial-gradient(circle at 42% 36%, var(--st-dial), var(--st-dial-shadow) 84%);
+  color: var(--st-leather-1);
+}
+/* modifikátor = ražený mosazný štítek */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-stat-box span.mod {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+  color: #1c130a;
+  padding: 5px 6px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--st-brass-0), var(--st-brass-2));
+  border: 1px solid var(--st-brass-deep);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 222, 0.5);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) BOJOVÁ META `.dnd-top-meta` / `.dnd-meta-box` — manometry; OČ = cog-gauge
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 248, 222, 0.42), rgba(180, 150, 90, 0.2));
+  border: 1px solid var(--st-plate-edge);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 222, 0.5);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box label {
+  font-family: 'Cinzel', serif;
+  color: var(--st-ink-soft, #5a4426);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box input,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box span.val {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-leather-1);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box input {
+  background: transparent;
+  border: none;
+}
+/* SIGNATURE: OČ box = chladná mosaz manometr. Reálné DOM (JadSheet.tsx): OČ je
+   `.dnd-meta-box:nth-child(2)` s `#jad_ac` (žádná `.oc` třída) — cílíme pořadím.
+   Tmavá deska + mosazný 2px rám = manometrová pečeť OČ v bojové liště. */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:nth-child(2) {
+  background: linear-gradient(180deg, #2f2114, #1c130a);
+  border: 2px solid var(--st-steel-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:nth-child(2) label {
+  color: var(--st-steel-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:nth-child(2) input,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:nth-child(2) span.val {
+  color: var(--st-steel-hi);
+  text-shadow: 0 1px 0 #000;
+}
+/* Iniciativa box (1.) = svižná měď; Rychlost (3.) drží mosaznou neutralitu */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:first-child {
+  border-color: var(--st-init);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:first-child input,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-meta-box:first-child span.val {
+  color: var(--st-copper-deep);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) SIGNATURE: ŽIVOTY `.dnd-hp-panel` = TLAKOMĚR KOTLE (výbojová červeň)
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-hp-panel {
+  background: linear-gradient(180deg, #2f2114, #1c130a);
+  border: 2px solid var(--st-life);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px -8px #000, inset 0 0 30px rgba(94, 33, 19, 0.25);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-hp-panel .hp-box label {
+  font-family: 'Cinzel', serif;
+  color: var(--st-life-hi);
+}
+/* HP inputy = přístrojový display na tlakové trubici */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-hp-panel .hp-box input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+  color: var(--st-life-hi);
+  background:
+    repeating-linear-gradient(90deg, rgba(43, 31, 16, 0.5) 0 1px, transparent 1px 12px),
+    linear-gradient(180deg, rgba(20, 14, 8, 0.85), rgba(40, 28, 16, 0.6));
+  border: 2px solid var(--st-brass-1);
+  border-radius: 6px;
+  text-shadow: 0 0 12px rgba(215, 106, 66, 0.4);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-hp-panel .hp-box input:disabled {
+  color: var(--st-life-hi);
+  background:
+    repeating-linear-gradient(90deg, rgba(43, 31, 16, 0.5) 0 1px, transparent 1px 12px),
+    linear-gradient(180deg, rgba(20, 14, 8, 0.85), rgba(40, 28, 16, 0.6));
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) Tabulky / přidávací řádky / štítkové řádky / schopnosti / poznámky
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-table th {
+  font-family: 'Cinzel', serif;
+  color: var(--st-ink-soft, #5a4426);
+  border-bottom-color: var(--st-brass-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-table td {
+  border-bottom: 1px dotted rgba(138, 110, 56, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-table td input {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: rgba(255, 248, 222, 0.32);
+  border: 1px solid rgba(138, 110, 56, 0.45);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-table .del-btn {
+  color: var(--st-life);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-table .del-btn:hover {
+  color: var(--st-life-hi);
+}
+/* přidávací odkaz = mosazná dashed cedulka */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .add-link {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-deep);
+  background: linear-gradient(180deg, rgba(255, 248, 222, 0.35), rgba(180, 150, 90, 0.2));
+  border: 1px dashed var(--st-brass-deep);
+  border-radius: 2px;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .add-link:hover {
+  color: var(--st-leather-1);
+  border-style: solid;
+  background: rgba(202, 164, 95, 0.3);
+}
+/* štítkové řádky (zdatnosti / jazyky) */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tag-row {
+  border-bottom-color: rgba(138, 110, 56, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tag-row .bullet {
+  color: var(--st-brass-2);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tag-row input {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tag-row input:focus {
+  border-bottom-color: var(--st-copper);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-tag-row .del-btn {
+  color: var(--st-life);
+}
+/* schopnosti = mosazná deska se zkosenými rohy */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-feat {
+  background: rgba(255, 248, 222, 0.4);
+  border: 1px solid var(--st-plate-edge);
+  border-radius: 4px;
+  clip-path: polygon(
+    7px 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% calc(100% - 7px),
+    calc(100% - 7px) 100%,
+    7px 100%,
+    0 calc(100% - 7px),
+    0 7px
+  );
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-feat-head input {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--st-leather-1);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(138, 110, 56, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-feat-head .del-btn {
+  color: var(--st-life);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-feat textarea {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-ink-soft, #5a4426);
+  background: transparent;
+}
+/* poznámky plná šířka = linkovaný papír v mosazné desce */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-notes-full textarea,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-feat .dnd-notes-full {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-ink, #2b1f10);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) Záchrany / dovednosti `.dnd-list-row` — mosazné / měděné pipy, mono mody
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-list-row {
+  border-bottom: 1px solid rgba(138, 110, 56, 0.22);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-list-row span.mod {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-leather-1);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-list-row span.lbl {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-leather-1);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-list-row span.sub {
+  font-family: 'Cinzel', serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--st-ink-soft, #5a4426);
+}
+/* pip dovednosti / záchrany = ciferníkové kolečko; ○ prázdný · ● zdatnost mosaz ·
+   ◉ expertíza měď. Reálný marker je textová značka uvnitř button.prof — barvíme
+   button na mosaz a aktivní stav (text obsah ●/◉) měděný glow přes background. */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-list-row button.prof {
+  color: var(--st-brass-1);
+  background: rgba(20, 14, 8, 0.25);
+  border: 1.5px solid var(--st-brass-deep);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-list-row button.prof:not(:disabled):hover {
+  border-color: var(--st-copper);
+  color: var(--st-copper-hi);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) Kouzla tab `.dnd-spells` — patina/verdigris + punch-card perforace
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-spells .spell-header {
+  background: linear-gradient(180deg, rgba(63, 125, 114, 0.16), rgba(31, 74, 67, 0.1));
+  border: 1px solid var(--st-mana);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-spells .spell-header div label {
+  font-family: 'Cinzel', serif;
+  color: var(--st-mana-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-spells .spell-header div input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+  color: var(--st-mana-deep);
+  background: rgba(255, 248, 222, 0.5);
+  border: 1px solid var(--st-mana);
+  text-align: center;
+}
+/* SIGNATURE: karta stupně kouzel = patina deska s punch-card perforací nahoře */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-spells .spell-level {
+  position: relative;
+  background: rgba(255, 248, 222, 0.4);
+  border: 1px solid var(--st-plate-edge);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-spells .spell-level::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 16px;
+  right: 16px;
+  height: 6px;
+  pointer-events: none;
+  opacity: 0.4;
+  background: radial-gradient(circle, #1c130a 0 2px, transparent 2.6px) 0 0 / 14px 6px repeat-x;
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-spells .sl-title {
+  border-bottom: 2px solid var(--st-mana);
+}
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-spells .sl-title h4 {
+  font-family: 'IM Fell English SC', 'Cinzel', serif;
+  font-weight: 400;
+  color: var(--st-mana-deep);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) View mode — drobné ztišení (statický readout)
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary input:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary select:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary textarea:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary button:disabled {
+  opacity: 0.95;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   11) Mobil — kde signature plocha kolabuje (zbytek řeší jad.css grid breakpointy)
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 560px) {
+  /* cog skóre vlastnosti se zmenší, ať se vejde do zúžené dlaždice */
+  [data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-stat-box input {
+    width: 42px;
+    height: 42px;
+  }
+  /* HP trubice neroztáhne stránku */
+  [data-diary-system='dnd5e'][data-diary-skin='steampunk'] .dnd-diary .dnd-hp-panel .hp-box input {
+    border-width: 1.5px;
+  }
+}

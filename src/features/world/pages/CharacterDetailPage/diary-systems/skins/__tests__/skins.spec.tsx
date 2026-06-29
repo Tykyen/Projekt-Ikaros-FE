@@ -42,7 +42,7 @@ describe('skins/registry', () => {
     expect(resolveDefaultSkin('jad')).toBe('fantasy');
     expect(resolveDefaultSkin('drdh')).toBe('fantasy');
     expect(resolveDefaultSkin('coc')).toBe('horror');
-    expect(resolveDefaultSkin('dnd5e')).toBe('scifi');
+    expect(resolveDefaultSkin('dnd5e')).toBe('fantasy');
     expect(resolveDefaultSkin('xyz')).toBe('scifi');
   });
 

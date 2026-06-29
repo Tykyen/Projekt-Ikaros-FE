@@ -1,51 +1,45 @@
 /**
- * 8.7d — D&D 5e deník postavy.
- * 8.7s — redesign: multipovolání + obory, zázemí select, auto úroveň,
- *        přidávatelné zdatnosti/jazyky/schopnosti, poznámky dole.
+ * 8.7s — D&D 5e deník postavy = KLON JaD (`sheets/jad/JadSheet.tsx`).
+ *        Jediný rozdíl proti JaD: povolání (`DND_CLASSES`, Černokněžník 2 osy
+ *        patron+pakt) a zázemí (`DND_BACKGROUNDS`). Vše ostatní identické:
+ *        multipovolání + obory, zázemí select, auto úroveň, přidávatelné
+ *        zdatnosti/jazyky/schopnosti, poznámky dole.
  *        Viz [spec-8.7s](../../../../../../../docs/arch/phase-8/spec-8.7s-dnd5e-redesign.md).
  *
- * Data v `diary.customData` s prefixem `dnd_*`. Migrace legacy polí
- * (`dnd_classLevel`, `dnd_otherProf`, `dnd_features`) je read-only — odvodí
- * se pro zobrazení, do DB se zapíše až prvním editem nového pole. Odebraná
- * pole (jméno/hráč/přesvědčení) se z DB nemažou, jen je UI neukazuje.
+ * Data v `diary.customData` s prefixem `dnd_*` (shodné klíče s JaD, sdílí je
+ * combat panel mapy/chatu). Migrace legacy polí read-only; odebraná pole
+ * (jméno/přesvědčení/hráč) se z DB nemažou, jen je UI neukazuje.
  */
 import { useState } from 'react';
 import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
-import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 import {
-  ABILITY_KEYS,
-  ABILITY_LABELS,
+  ABIL_MAP,
+  SKILLS,
   DND_CLASSES,
   DND_CASTERS,
   DND_BACKGROUNDS,
-  SKILLS,
-  type AbilityKey,
-  type DndAttack,
   type DndClassRow,
   type DndFeat,
-  type DndSpellLevel,
-  type DndSpellEntry,
+  type DndSpell,
+  type DndWeapon,
 } from './constants';
-import { abilityMod, calcSaveMod, calcSkillMod, fmtMod } from './formulas';
+import { calcMod, calcSaveMod, calcSkillMod, fmtMod } from './formulas';
 
 type Tab = 'main' | 'spells';
 
-const DEFAULT_SPELL_LEVEL: DndSpellLevel = {
-  totalSlots: 0,
-  usedSlots: 0,
-  spells: [],
-};
-
 // ── Odvozená pole (read-only migrace legacy) ──────────────────────
 function deriveClasses(cda: CdAccess): DndClassRow[] {
-  return cda.parseJsonArr<DndClassRow>('classes');
+  const arr = cda.parseJsonArr<DndClassRow>('classes');
+  if (arr.length) return arr;
+  const c = cda.g('class');
+  return c ? [{ c, l: cda.g('level') || '1', s: '', s2: '' }] : [];
 }
 function deriveProfs(cda: CdAccess): string[] {
   const arr = cda.parseJsonArr<string>('profs');
   if (arr.length) return arr;
-  const t = cda.g('otherProf');
+  const t = cda.g('other_profs');
   return t ? [t] : [];
 }
 function deriveFeats(cda: CdAccess): DndFeat[] {
@@ -54,17 +48,18 @@ function deriveFeats(cda: CdAccess): DndFeat[] {
   const t = cda.g('features');
   return t ? [{ n: '', d: t }] : [];
 }
-function dndTotalLevel(rows: DndClassRow[]): number {
+function jadTotalLevel(rows: DndClassRow[]): number {
   return rows.reduce((s, r) => s + (parseInt(r.l || '0', 10) || 0), 0);
 }
 
-export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
+export function DndSheet({ diary, mode, onChange }: SystemSheetProps) {
   const disabled = mode === 'view';
   const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'dnd_', onChange);
   const { g, set, parseJsonArr } = cda;
   const setJson = (key: string, arr: unknown[]) => set(key, JSON.stringify(arr));
+  const getJson = <T,>(key: string): T[] => parseJsonArr<T>(key);
 
   const [tab, setTab] = useState<Tab>('main');
 
@@ -74,35 +69,27 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
     bgVal !== '' && !DND_BACKGROUNDS.includes(bgVal),
   );
 
-  // ── Derived ─────────────────────────────────────────────────
   const profBonus = parseInt(g('profBonus', '2'), 10) || 2;
+  const getScore = (k: string) => parseInt(g(`abi_${k}`, '10'), 10) || 10;
+  const getModFor = (k: string) => calcMod(getScore(k));
 
-  const getScore = (k: AbilityKey) =>
-    parseInt(g(`ability_${k}`, '10'), 10) || 10;
-  const getAbilityModFor = (k: AbilityKey) => abilityMod(getScore(k));
+  const isSaveProf = (k: string) => g(`save_${k}`) === '1';
+  const saveModFor = (k: string) =>
+    calcSaveMod(getModFor(k), isSaveProf(k), profBonus);
 
-  const isSaveProf = (k: AbilityKey) => g(`save_prof_${k}`) === '1';
-  const saveModFor = (k: AbilityKey) =>
-    calcSaveMod(getAbilityModFor(k), isSaveProf(k), profBonus);
+  const skillProf = (n: string) => parseInt(g(`skill_${n}`, '0'), 10) || 0;
+  const skillModFor = (n: string, a: string) =>
+    calcSkillMod(getModFor(a), skillProf(n), profBonus);
 
-  const skillProfFor = (name: string) =>
-    parseInt(g(`skill_prof_${name}`, '0'), 10) || 0;
-  const skillModFor = (name: string, ability: AbilityKey) =>
-    calcSkillMod(getAbilityModFor(ability), skillProfFor(name), profBonus);
-
-  // ── Multipovolání ───────────────────────────────────────────
+  // Multipovolání
   const classRows = deriveClasses(cda);
-  const totalLevel = dndTotalLevel(classRows);
-  // Legacy volný text „Povolání a úroveň" — nelze mapovat na select; zobraz
-  // jako jednorázový read-only hint, dokud nejsou zadána nová povolání.
-  const legacyClassLevel =
-    classRows.length === 0 ? g('classLevel').trim() : '';
+  const totalLevel = jadTotalLevel(classRows);
   const writeClasses = (arr: DndClassRow[]) => setJson('classes', arr);
   const updateClass = (i: number, patch: Partial<DndClassRow>) => {
     const a = [...classRows];
     a[i] = { ...a[i], ...patch };
+    // změna povolání → starý obor/pakt už neplatí
     if ('c' in patch) {
-      // změna povolání → starý obor/pakt už neplatí
       a[i].s = '';
       a[i].s2 = '';
     }
@@ -115,79 +102,47 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const spRaw = g('spellEnabled');
   const spellEnabled = spRaw === '1' || (spRaw === '' && hasCasterClass);
 
-  // ── Attacks ─────────────────────────────────────────────────
-  const attacks = parseJsonArr<DndAttack>('attacks');
-  const setAttacks = (arr: DndAttack[]) => set('attacks', JSON.stringify(arr));
-
-  // ── Přidávatelné sekce ──────────────────────────────────────
+  const weapons = getJson<DndWeapon>('weapons');
   const profList = deriveProfs(cda);
-  const langList = parseJsonArr<string>('langs');
+  const langList = getJson<string>('langs');
   const featList = deriveFeats(cda);
 
-  // ── Spell data ──────────────────────────────────────────────
-  const getSpellLevel = (lvl: number): DndSpellLevel => {
-    const raw = g(`spellLevel_${lvl}`);
-    if (!raw) return { ...DEFAULT_SPELL_LEVEL, spells: [] };
-    try {
-      const parsed = JSON.parse(raw);
-      return {
-        totalSlots: parsed.totalSlots ?? 0,
-        usedSlots: parsed.usedSlots ?? 0,
-        spells: Array.isArray(parsed.spells) ? parsed.spells : [],
-      };
-    } catch {
-      return { ...DEFAULT_SPELL_LEVEL, spells: [] };
-    }
-  };
-  const setSpellLevel = (lvl: number, data: DndSpellLevel) =>
-    set(`spellLevel_${lvl}`, JSON.stringify(data));
-
-  const cantrips = parseJsonArr<string>('cantrips');
-  const setCantrips = (arr: string[]) => set('cantrips', JSON.stringify(arr));
-
-  // ── Death saves ─────────────────────────────────────────────
-  const deathSuccess = parseInt(g('deathSuccess', '0'), 10) || 0;
-  const deathFail = parseInt(g('deathFail', '0'), 10) || 0;
-
-  // Tisk: interaktivní sheet je netisknutelný — render statického dokumentu.
   if (printMode) return <DndPrintView cda={cda} />;
 
   return (
     <div className="dnd-diary">
-      {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}
-      {/* ── Tabs ── */}
       <div className="dnd-tabs">
         <button
           type="button"
-          className={`dnd-tab ${tab === 'main' ? 'active' : ''}`}
+          className={tab === 'main' ? 'active' : ''}
           onClick={() => setTab('main')}
         >
-          📜 Hlavní deník
+          Hlavní zápisník postavy
         </button>
         {spellEnabled && (
           <button
             type="button"
-            className={`dnd-tab ${tab === 'spells' ? 'active' : ''}`}
+            className={tab === 'spells' ? 'active' : ''}
             onClick={() => setTab('spells')}
           >
-            ✨ Sesílání kouzel
+            Kouzla
           </button>
         )}
-        <label className="dnd-tab dnd-tab--toggle">
+        <label className="dnd-tab-toggle">
           <input
             type="checkbox"
             checked={spellEnabled}
             disabled={disabled}
             onChange={(e) => set('spellEnabled', e.target.checked ? '1' : '0')}
           />
-          Sesilatel kouzel
+          Sesilatel / Alchymista
         </label>
       </div>
 
       {tab === 'main' && (
-        <div className="dnd-main">
-          {/* ═══ IDENTITA ═══ */}
-          <section className="dnd-header">
+        <>
+          {/* ── HLAVIČKA (identita) ───────────────────────────── */}
+          <div className="dnd-header">
             <div className="dnd-identity">
               <div className="dnd-field">
                 <label htmlFor="dnd_race">Rasa</label>
@@ -233,7 +188,7 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 )}
               </div>
               <div className="dnd-field">
-                <label htmlFor="dnd_xp">Body zkušeností</label>
+                <label htmlFor="dnd_xp">Zkušenosti</label>
                 <input
                   id="dnd_xp"
                   value={g('xp')}
@@ -246,22 +201,17 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 <div className="cap">Úroveň</div>
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* ═══ MULTIPOVOLÁNÍ ═══ */}
-          <h3 className="dnd-section-h">Povolání a obory</h3>
-          <div className="dnd-panel dnd-classes-panel">
-            {legacyClassLevel && (
-              <div className="dnd-legacy-hint">
-                Dřívější zápis: <strong>{legacyClassLevel}</strong> — přepiš ho
-                do polí níže.
-              </div>
-            )}
+          {/* ── MULTIPOVOLÁNÍ ─────────────────────────────────── */}
+          <h3>Povolání a obory</h3>
+          <div className="dnd-panel" style={{ marginBottom: 24 }}>
             <div className="dnd-prof-list">
               {classRows.map((row, i) => {
                 const meta = DND_CLASSES[row.c];
                 const lvl = parseInt(row.l || '0', 10) || 0;
                 const locked = !meta || lvl < meta.sub;
+                // 2. osa (jen Černokněžník — pakt): vlastní práh `sub2`.
                 const locked2 =
                   !meta?.list2 || lvl < (meta.sub2 ?? Number.MAX_SAFE_INTEGER);
                 return (
@@ -294,14 +244,14 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                       />
                     </div>
                     <div className="pcol pcol-sub">
-                      <span className="pcap">{meta?.label ?? 'Obor'}</span>
+                      <span className="pcap">Obor / specializace</span>
                       <select
                         value={row.s}
                         disabled={disabled || locked}
-                        aria-label={meta?.label ?? 'Obor'}
+                        aria-label="Obor"
                         onChange={(e) => updateClass(i, { s: e.target.value })}
                       >
-                        <option value="">{meta ? '— vyber —' : '—'}</option>
+                        <option value="">{meta ? '— vyber obor —' : '—'}</option>
                         {meta?.list.map((s) => (
                           <option key={s} value={s}>
                             {s}
@@ -310,14 +260,13 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                       </select>
                       {meta && locked && (
                         <div className="dnd-sub-hint">
-                          {(meta.label ?? 'obor').toLowerCase()} od {meta.sub}.
-                          úrovně
+                          obor od {meta.sub}. úrovně
                         </div>
                       )}
                     </div>
                     {meta?.list2 && (
                       <div className="pcol pcol-sub">
-                        <span className="pcap">{meta.label2}</span>
+                        <span className="pcap">{meta.label2 ?? 'Pakt'}</span>
                         <select
                           value={row.s2 ?? ''}
                           disabled={disabled || locked2}
@@ -364,10 +313,7 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 type="button"
                 className="add-link"
                 onClick={() =>
-                  writeClasses([
-                    ...classRows,
-                    { c: '', l: '', s: '', s2: '' },
-                  ])
+                  writeClasses([...classRows, { c: '', l: '', s: '', s2: '' }])
                 }
               >
                 + Přidat povolání
@@ -379,297 +325,271 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
             </div>
           </div>
 
-          {/* ═══ MAIN GRID ═══ */}
           <div className="dnd-grid">
-            {/* ── LEFT COLUMN ── */}
-            <div className="dnd-col-left">
-              {/* Abilities */}
-              <div className="dnd-abilities">
-                {ABILITY_KEYS.map((k) => {
-                  const score = getScore(k);
-                  const mod = abilityMod(score);
-                  return (
-                    <div className="dnd-ability" key={k}>
-                      <span className="dnd-ability__label">
-                        {ABILITY_LABELS[k]}
-                      </span>
-                      <span className="dnd-ability__mod">{fmtMod(mod)}</span>
-                      <input
-                        className="dnd-ability__score"
-                        type="number"
-                        value={score}
-                        disabled={disabled}
-                        onChange={(e) => set(`ability_${k}`, e.target.value)}
-                        aria-label={`${ABILITY_LABELS[k]} skóre`}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Inspiration & Prof bonus */}
-              <div className="dnd-meta-row">
-                <div className="dnd-meta-item">
-                  <label className="dnd-meta-item__checkbox-label">
+            {/* COLUMN 1 — Stats, save, passive senses */}
+            <div>
+              <h3>Hlavní vlastnosti</h3>
+              <div className="dnd-stats">
+                {ABIL_MAP.map(({ k, l }) => (
+                  <div key={k} className="dnd-stat-box">
+                    <span className="lbl">{l.substring(0, 3).toUpperCase()}</span>
                     <input
-                      type="checkbox"
-                      checked={g('inspiration') === '1'}
+                      type="number"
+                      value={getScore(k)}
                       disabled={disabled}
-                      onChange={(e) =>
-                        set('inspiration', e.target.checked ? '1' : '0')
-                      }
+                      onChange={(e) => set(`abi_${k}`, e.target.value)}
                     />
-                    Inspirace
-                  </label>
-                </div>
-                <div className="dnd-meta-item">
-                  <span className="dnd-meta-item__label">Zdatnostní bonus</span>
-                  <input
-                    className="dnd-meta-item__input"
-                    type="number"
-                    value={profBonus}
-                    disabled={disabled}
-                    onChange={(e) => set('profBonus', e.target.value)}
-                    aria-label="Zdatnostní bonus"
-                  />
-                </div>
-              </div>
-
-              {/* Saves */}
-              <div className="dnd-panel dnd-saves">
-                <h3>Záchranné hody</h3>
-                {ABILITY_KEYS.map((k) => (
-                  <div className="dnd-save-row" key={k}>
-                    <label className="dnd-save-row__prof">
-                      <input
-                        type="checkbox"
-                        checked={isSaveProf(k)}
-                        disabled={disabled}
-                        onChange={(e) =>
-                          set(`save_prof_${k}`, e.target.checked ? '1' : '0')
-                        }
-                        aria-label={`Záchrana ${ABILITY_LABELS[k]}: zdatnost`}
-                      />
-                    </label>
-                    <span className="dnd-save-row__mod">
-                      {fmtMod(saveModFor(k))}
-                    </span>
-                    <span className="dnd-save-row__name">
-                      {ABILITY_LABELS[k]}
-                    </span>
+                    <span className="mod">{fmtMod(getModFor(k))}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Skills */}
-              <div className="dnd-panel dnd-skills">
-                <h3>Dovednosti</h3>
-                {SKILLS.map((sk) => {
-                  const prof = skillProfFor(sk.name);
-                  const mod = skillModFor(sk.name, sk.ability);
+              <h3>Osobní profily</h3>
+              <div className="dnd-panel" style={{ marginBottom: 24 }}>
+                <div className="dnd-list-row">
+                  <span className="lbl">Zdatnostní bonus</span>
+                  <input
+                    style={{ width: 50, textAlign: 'center', fontWeight: 'bold' }}
+                    value={profBonus}
+                    disabled={disabled}
+                    onChange={(e) => set('profBonus', e.target.value)}
+                  />
+                </div>
+                <div className="dnd-list-row" style={{ border: 0 }}>
+                  <span className="lbl">Inspirace</span>
+                  <button
+                    type="button"
+                    className="prof"
+                    disabled={disabled}
+                    style={{
+                      width: 24,
+                      height: 24,
+                      background:
+                        g('insp') === '1'
+                          ? 'var(--dnd-insp, var(--dnd-accent))'
+                          : '#fff',
+                    }}
+                    onClick={() => set('insp', g('insp') === '1' ? '0' : '1')}
+                    aria-label="Přepnout inspiraci"
+                  />
+                </div>
+              </div>
+
+              <h3>Záchranné hody</h3>
+              <div className="dnd-panel" style={{ marginBottom: 24 }}>
+                {ABIL_MAP.map(({ k, l }) => (
+                  <div key={k} className="dnd-list-row">
+                    <button
+                      type="button"
+                      className="prof"
+                      disabled={disabled}
+                      onClick={() => set(`save_${k}`, isSaveProf(k) ? '0' : '1')}
+                      aria-label={`Záchrana ${l}: ${isSaveProf(k) ? 'zdatný' : 'nezdatný'}`}
+                    >
+                      {isSaveProf(k) ? '●' : '○'}
+                    </button>
+                    <span className="mod">{fmtMod(saveModFor(k))}</span>
+                    <span className="lbl">{l}</span>
+                  </div>
+                ))}
+              </div>
+
+              <h3>Pasivní vnímání a smysly</h3>
+              <div className="dnd-panel">
+                <div className="dnd-list-row">
+                  <span className="mod">{10 + skillModFor('Vnímání', 'wis')}</span>
+                  <span className="lbl">Pasivní Vnímání</span>
+                </div>
+                <div className="dnd-list-row">
+                  <span className="mod">{10 + skillModFor('Vhled', 'wis')}</span>
+                  <span className="lbl">Pasivní Vhled</span>
+                </div>
+                <div className="dnd-list-row" style={{ border: 0 }}>
+                  <span className="mod">{10 + skillModFor('Pátrání', 'int')}</span>
+                  <span className="lbl">Pasivní Pátrání</span>
+                </div>
+              </div>
+            </div>
+
+            {/* COLUMN 2 — Combat meta, HP, skills */}
+            <div>
+              <div className="dnd-top-meta">
+                <div className="dnd-meta-box">
+                  <label>Iniciativa</label>
+                  <span className="val">{fmtMod(getModFor('dex'))}</span>
+                </div>
+                <div className="dnd-meta-box">
+                  <label htmlFor="dnd_ac">Obranné číslo</label>
+                  <input
+                    id="dnd_ac"
+                    value={g('ac', '10')}
+                    disabled={disabled}
+                    onChange={(e) => set('ac', e.target.value)}
+                  />
+                </div>
+                <div className="dnd-meta-box">
+                  <label htmlFor="dnd_speed">Rychlost</label>
+                  <input
+                    id="dnd_speed"
+                    value={g('speed', '9 m')}
+                    disabled={disabled}
+                    onChange={(e) => set('speed', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="dnd-hp-panel">
+                <div className="hp-row">
+                  <div className="hp-box">
+                    <label htmlFor="dnd_hpMax">VBD / Max Životy</label>
+                    <input
+                      id="dnd_hpMax"
+                      value={g('hpMax')}
+                      disabled={disabled}
+                      onChange={(e) => set('hpMax', e.target.value)}
+                    />
+                  </div>
+                  <div className="hp-box" style={{ flex: 1.5 }}>
+                    <label htmlFor="dnd_hpCur">Aktuální Životy (BV)</label>
+                    <input
+                      id="dnd_hpCur"
+                      style={{
+                        borderColor: 'var(--dnd-hp, var(--dnd-accent))',
+                        color: 'var(--dnd-hp, var(--dnd-accent))',
+                      }}
+                      value={g('hpCur')}
+                      disabled={disabled}
+                      onChange={(e) => set('hpCur', e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="hp-row" style={{ marginBottom: 0 }}>
+                  <div className="hp-box">
+                    <label htmlFor="dnd_hd">Kostky obnovy</label>
+                    <input
+                      id="dnd_hd"
+                      style={{ fontSize: '1.2rem' }}
+                      value={g('hd')}
+                      disabled={disabled}
+                      onChange={(e) => set('hd', e.target.value)}
+                    />
+                  </div>
+                  <div className="hp-box">
+                    <label>Záchrany proti smrti</label>
+                    <div
+                      style={{ display: 'flex', gap: 8, marginTop: 8, fontSize: 12 }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        Záchr.{' '}
+                        <input
+                          value={g('ds_s')}
+                          disabled={disabled}
+                          onChange={(e) => set('ds_s', e.target.value)}
+                          style={{ width: '100%', fontSize: '1rem' }}
+                          placeholder="0/3"
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        Selh.{' '}
+                        <input
+                          value={g('ds_f')}
+                          disabled={disabled}
+                          onChange={(e) => set('ds_f', e.target.value)}
+                          style={{ width: '100%', fontSize: '1rem' }}
+                          placeholder="0/3"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3>Dovednosti</h3>
+              <div className="dnd-panel">
+                {SKILLS.map(({ n, a }) => {
+                  const prof = skillProf(n);
                   return (
-                    <div className="dnd-skill-row" key={sk.name}>
+                    <div key={n} className="dnd-list-row">
                       <button
                         type="button"
-                        className={`dnd-skill-row__prof ${prof === 1 ? 'half' : ''} ${prof === 2 ? 'full' : ''}`}
+                        className="prof"
                         disabled={disabled}
-                        onClick={() => {
-                          const next = (prof + 1) % 3;
-                          set(`skill_prof_${sk.name}`, String(next));
-                        }}
-                        title={
-                          prof === 0
-                            ? 'Bez zdatnosti'
-                            : prof === 1
-                              ? 'Zdatnost'
-                              : 'Expertíza'
-                        }
-                        aria-label={`Dovednost ${sk.name}: ${prof === 0 ? 'žádná' : prof === 1 ? 'zdatnost' : 'expertíza'}`}
+                        onClick={() => set(`skill_${n}`, String((prof + 1) % 3))}
+                        aria-label={`Dovednost ${n}: ${prof === 0 ? 'žádná' : prof === 1 ? 'zdatnost' : 'expertíza'}`}
                       >
                         {prof === 0 ? '○' : prof === 1 ? '●' : '◉'}
                       </button>
-                      <span className="dnd-skill-row__mod">{fmtMod(mod)}</span>
-                      <span className="dnd-skill-row__name">{sk.name}</span>
-                      <span className="dnd-skill-row__ability">
-                        ({ABILITY_LABELS[sk.ability].slice(0, 3)})
-                      </span>
+                      <span className="mod">{fmtMod(skillModFor(n, a))}</span>
+                      <span className="lbl">{n}</span>
+                      <span className="sub">({a.toUpperCase()})</span>
                     </div>
                   );
                 })}
               </div>
-
-              {/* Passive senses */}
-              <div className="dnd-passive">
-                <span className="dnd-passive__val">
-                  {10 + skillModFor('Vnímání', 'wis')}
-                </span>
-                <span className="dnd-passive__label">Pasivní vnímání</span>
-              </div>
-              <div className="dnd-passive">
-                <span className="dnd-passive__val">
-                  {10 + skillModFor('Vhled', 'wis')}
-                </span>
-                <span className="dnd-passive__label">Pasivní vhled</span>
-              </div>
-              <div className="dnd-passive">
-                <span className="dnd-passive__val">
-                  {10 + skillModFor('Pátrání', 'int')}
-                </span>
-                <span className="dnd-passive__label">Pasivní pátrání</span>
-              </div>
             </div>
 
-            {/* ── CENTER COLUMN ── */}
-            <div className="dnd-col-center">
-              {/* Combat */}
-              <div className="dnd-combat">
-                <div className="dnd-combat__stat">
-                  <span className="dnd-combat__label">OČ</span>
-                  <input
-                    className="dnd-combat__val"
-                    type="number"
-                    value={g('ac', '10')}
-                    disabled={disabled}
-                    onChange={(e) => set('ac', e.target.value)}
-                    aria-label="Obranné číslo"
-                  />
-                </div>
-                <div className="dnd-combat__stat">
-                  <span className="dnd-combat__label">Iniciativa</span>
-                  <span className="dnd-combat__val dnd-combat__val--computed">
-                    {fmtMod(getAbilityModFor('dex'))}
-                  </span>
-                </div>
-                <div className="dnd-combat__stat">
-                  <span className="dnd-combat__label">Rychlost</span>
-                  <input
-                    className="dnd-combat__val"
-                    value={g('speed', '9 m')}
-                    disabled={disabled}
-                    onChange={(e) => set('speed', e.target.value)}
-                    aria-label="Rychlost"
-                  />
-                </div>
-              </div>
-
-              {/* Hit Points */}
-              <div className="dnd-hp">
-                <div className="dnd-hp__row">
-                  <div className="dnd-hp__block">
-                    <label htmlFor="dnd_maxHP">Maximum životů</label>
-                    <input
-                      id="dnd_maxHP"
-                      type="number"
-                      value={g('maxHP', '0')}
-                      disabled={disabled}
-                      onChange={(e) => set('maxHP', e.target.value)}
-                    />
-                  </div>
-                  <div className="dnd-hp__block dnd-hp__block--current">
-                    <label htmlFor="dnd_currentHP">Aktuální životy</label>
-                    <input
-                      id="dnd_currentHP"
-                      type="number"
-                      value={g('currentHP', '0')}
-                      disabled={disabled}
-                      onChange={(e) => set('currentHP', e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="dnd-hp__block dnd-hp__block--temp">
-                  <label htmlFor="dnd_tempHP">Dočasné životy</label>
-                  <input
-                    id="dnd_tempHP"
-                    type="number"
-                    value={g('tempHP', '0')}
-                    disabled={disabled}
-                    onChange={(e) => set('tempHP', e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Hit Dice & Death Saves */}
-              <div className="dnd-death-row">
-                <div className="dnd-hitdice">
-                  <label htmlFor="dnd_hitDice">Kostky životů</label>
-                  <input
-                    id="dnd_hitDice"
-                    value={g('hitDice')}
-                    disabled={disabled}
-                    onChange={(e) => set('hitDice', e.target.value)}
-                    placeholder="např. 3k10"
-                  />
-                </div>
-                <div className="dnd-death-saves">
-                  <span className="dnd-death-saves__title">
-                    Záchrany proti smrti
-                  </span>
-                  <div className="dnd-death-saves__line">
-                    <span>Úspěchy</span>
-                    <div className="dnd-death-pips">
-                      {[1, 2, 3].map((i) => (
-                        <button
-                          type="button"
-                          key={`s${i}`}
-                          className={`dnd-pip ${deathSuccess >= i ? 'filled' : ''}`}
-                          disabled={disabled}
-                          onClick={() =>
-                            set(
-                              'deathSuccess',
-                              String(deathSuccess >= i ? i - 1 : i),
-                            )
-                          }
-                          aria-label={`Úspěch ${i} z 3`}
-                        />
-                      ))}
+            {/* COLUMN 3 — Spell quick-ref, weapons, profs/langs/feats */}
+            <div>
+              {spellEnabled && (
+                <>
+                  <h3>Rychlý přehled kouzlení / Alchymie</h3>
+                  <div className="dnd-panel" style={{ marginBottom: 24 }}>
+                    <div className="dnd-list-row">
+                      <span className="lbl">Sesílací / Útočná vlastnost</span>
+                      <input
+                        style={{ width: 80, textAlign: 'center' }}
+                        value={g('qc_ss_abi')}
+                        disabled={disabled}
+                        onChange={(e) => set('qc_ss_abi', e.target.value)}
+                      />
+                    </div>
+                    <div className="dnd-list-row">
+                      <span className="lbl">Útočný bonus</span>
+                      <input
+                        style={{ width: 60, textAlign: 'center' }}
+                        value={g('qc_ss_atk')}
+                        disabled={disabled}
+                        onChange={(e) => set('qc_ss_atk', e.target.value)}
+                      />
+                    </div>
+                    <div className="dnd-list-row" style={{ border: 0 }}>
+                      <span className="lbl">Stupeň obtížnosti (SO)</span>
+                      <input
+                        style={{ width: 60, textAlign: 'center' }}
+                        value={g('qc_ss_dc')}
+                        disabled={disabled}
+                        onChange={(e) => set('qc_ss_dc', e.target.value)}
+                      />
                     </div>
                   </div>
-                  <div className="dnd-death-saves__line">
-                    <span>Neúspěchy</span>
-                    <div className="dnd-death-pips">
-                      {[1, 2, 3].map((i) => (
-                        <button
-                          type="button"
-                          key={`f${i}`}
-                          className={`dnd-pip fail ${deathFail >= i ? 'filled' : ''}`}
-                          disabled={disabled}
-                          onClick={() =>
-                            set('deathFail', String(deathFail >= i ? i - 1 : i))
-                          }
-                          aria-label={`Neúspěch ${i} z 3`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
 
-              {/* Attacks */}
-              <div className="dnd-panel dnd-attacks">
-                <h3>Útoky a kouzla</h3>
-                <table className="dnd-attacks__table">
+              <h3>Zbraně a Doplňky</h3>
+              <div className="dnd-panel" style={{ marginBottom: 24 }}>
+                <table className="dnd-table">
                   <thead>
                     <tr>
-                      <th>Jméno</th>
-                      <th>Út. bonus</th>
-                      <th>Zranění / typ</th>
+                      <th>Zbraň</th>
+                      <th style={{ width: 40 }}>Bon</th>
+                      <th style={{ width: 60 }}>Zásah</th>
+                      <th style={{ width: 40 }}>OČ</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {attacks.map((a, i) => (
+                    {weapons.map((w, i) => (
                       <tr key={i}>
-                        {(['name', 'bonus', 'damage'] as const).map((field) => (
+                        {(['n', 'b', 'd', 'o'] as const).map((field) => (
                           <td key={field}>
                             <input
-                              value={a[field]}
+                              value={w[field]}
                               disabled={disabled}
                               onChange={(e) => {
-                                const u = [...attacks];
-                                u[i] = { ...u[i], [field]: e.target.value };
-                                setAttacks(u);
+                                const arr = [...weapons];
+                                arr[i] = { ...arr[i], [field]: e.target.value };
+                                setJson('weapons', arr);
                               }}
-                              aria-label={`Útok ${i + 1} — ${field}`}
                             />
                           </td>
                         ))}
@@ -677,15 +597,15 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                           {!disabled && (
                             <button
                               type="button"
-                              className="dnd-x"
+                              className="del-btn"
                               onClick={() => {
-                                const u = [...attacks];
-                                u.splice(i, 1);
-                                setAttacks(u);
+                                const arr = [...weapons];
+                                arr.splice(i, 1);
+                                setJson('weapons', arr);
                               }}
-                              aria-label="Smazat útok"
+                              aria-label="Smazat zbraň"
                             >
-                              ×
+                              ✕
                             </button>
                           )}
                         </td>
@@ -696,61 +616,21 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 {!disabled && (
                   <button
                     type="button"
-                    className="dnd-add"
+                    className="add-link"
                     onClick={() =>
-                      setAttacks([
-                        ...attacks,
-                        { name: '', bonus: '', damage: '' },
+                      setJson('weapons', [
+                        ...weapons,
+                        { n: '', b: '', d: '', t: '', r: '', o: '' },
                       ])
                     }
                   >
-                    + Přidat útok
+                    + Přidat Zbraň
                   </button>
                 )}
               </div>
-            </div>
 
-            {/* ── RIGHT COLUMN ── */}
-            <div className="dnd-col-right">
-              {/* Spell quick-ref (jen caster) */}
-              {spellEnabled && (
-                <div className="dnd-panel dnd-spell-quick">
-                  <h3>Rychlý přehled kouzlení</h3>
-                  <div className="dnd-quick-row">
-                    <span className="lbl">Sesílací vlastnost</span>
-                    <input
-                      value={g('spellAbility')}
-                      disabled={disabled}
-                      onChange={(e) => set('spellAbility', e.target.value)}
-                      placeholder="např. Moudrost"
-                      aria-label="Sesílací vlastnost"
-                    />
-                  </div>
-                  <div className="dnd-quick-row">
-                    <span className="lbl">SO záchrany kouzel</span>
-                    <input
-                      type="number"
-                      value={g('spellDC', '0')}
-                      disabled={disabled}
-                      onChange={(e) => set('spellDC', e.target.value)}
-                      aria-label="SO záchrany kouzel"
-                    />
-                  </div>
-                  <div className="dnd-quick-row">
-                    <span className="lbl">Útočný bonus kouzla</span>
-                    <input
-                      value={g('spellAttack', '0')}
-                      disabled={disabled}
-                      onChange={(e) => set('spellAttack', e.target.value)}
-                      aria-label="Útočný bonus kouzla"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Zdatnosti */}
-              <div className="dnd-panel">
-                <h3>Zdatnosti (zbroje, zbraně, nástroje)</h3>
+              <h3>Zdatnosti (zbroje, zbraně, nástroje)</h3>
+              <div className="dnd-panel" style={{ marginBottom: 24 }}>
                 <StringListRows
                   items={profList}
                   disabled={disabled}
@@ -760,9 +640,8 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 />
               </div>
 
-              {/* Jazyky */}
-              <div className="dnd-panel">
-                <h3>Jazyky</h3>
+              <h3>Jazyky</h3>
+              <div className="dnd-panel" style={{ marginBottom: 24 }}>
                 <StringListRows
                   items={langList}
                   disabled={disabled}
@@ -772,9 +651,8 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 />
               </div>
 
-              {/* Schopnosti a rysy */}
+              <h3>Schopnosti</h3>
               <div className="dnd-panel">
-                <h3>Schopnosti a rysy</h3>
                 <FeatRows
                   items={featList}
                   disabled={disabled}
@@ -784,227 +662,57 @@ export function DndSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
             </div>
           </div>
 
-          {/* ── POZNÁMKY (plná šířka, úplně dole) ── */}
-          <h3 className="dnd-section-h" style={{ marginTop: 24 }}>
-            Poznámky k hraní postavy
-          </h3>
+          {/* ── POZNÁMKY (plná šířka, úplně dole) ─────────────── */}
+          <h3 style={{ marginTop: 24 }}>Poznámky k hraní postavy</h3>
           <div className="dnd-panel dnd-notes-full">
             <textarea
+              style={{
+                width: '100%',
+                minHeight: 140,
+                border: 'none',
+                resize: 'vertical',
+              }}
               value={g('play_notes')}
               disabled={disabled}
               onChange={(e) => set('play_notes', e.target.value)}
               placeholder="Taktika, aktivní efekty, vztahy, příběhové poznámky…"
-              aria-label="Poznámky k hraní postavy"
             />
           </div>
-        </div>
+        </>
       )}
 
-      {/* ═══ SPELLS TAB ═══ */}
       {tab === 'spells' && spellEnabled && (
         <div className="dnd-spells">
-          <div className="dnd-spells-header">
-            <div className="dnd-sh-field">
-              <label htmlFor="dnd_spellAbility">Sesílací vlastnost</label>
-              <input
-                id="dnd_spellAbility"
-                value={g('spellAbility')}
-                disabled={disabled}
-                onChange={(e) => set('spellAbility', e.target.value)}
-                placeholder="např. Moudrost"
-              />
-            </div>
-            <div className="dnd-sh-field dnd-sh-field--accent">
-              <label htmlFor="dnd_spellDC">SO záchrany kouzel</label>
-              <input
-                id="dnd_spellDC"
-                type="number"
-                value={g('spellDC', '0')}
-                disabled={disabled}
-                onChange={(e) => set('spellDC', e.target.value)}
-              />
-            </div>
-            <div className="dnd-sh-field dnd-sh-field--accent">
-              <label htmlFor="dnd_spellAttack">Útočný bonus kouzla</label>
-              <input
-                id="dnd_spellAttack"
-                value={g('spellAttack', '0')}
-                disabled={disabled}
-                onChange={(e) => set('spellAttack', e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Cantrips */}
-          <div className="dnd-spell-level">
-            <div className="dnd-spell-level__header">
-              <h4>Triky</h4>
-            </div>
-            <div className="dnd-spell-list">
-              {cantrips.map((c, i) => (
-                <div className="dnd-spell-entry" key={i}>
-                  <input
-                    value={c}
-                    disabled={disabled}
-                    onChange={(e) => {
-                      const u = [...cantrips];
-                      u[i] = e.target.value;
-                      setCantrips(u);
-                    }}
-                    placeholder="Název triku"
-                    aria-label={`Trik ${i + 1}`}
-                  />
-                  {!disabled && (
-                    <button
-                      type="button"
-                      className="dnd-x"
-                      onClick={() => {
-                        const u = [...cantrips];
-                        u.splice(i, 1);
-                        setCantrips(u);
-                      }}
-                      aria-label="Smazat trik"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              ))}
-              {!disabled && (
-                <button
-                  type="button"
-                  className="dnd-add"
-                  onClick={() => setCantrips([...cantrips, ''])}
-                >
-                  + Přidat trik
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Spell levels 1-9 */}
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => {
-            const data = getSpellLevel(lvl);
-            return (
-              <div className="dnd-spell-level" key={lvl}>
-                <div className="dnd-spell-level__header">
-                  <h4>{lvl}. úroveň</h4>
-                  <div className="dnd-slots">
-                    <label>Sloty:</label>
-                    <input
-                      type="number"
-                      className="dnd-slots__total"
-                      min={0}
-                      max={9}
-                      value={data.totalSlots}
-                      disabled={disabled}
-                      onChange={(e) =>
-                        setSpellLevel(lvl, {
-                          ...data,
-                          totalSlots: parseInt(e.target.value, 10) || 0,
-                        })
-                      }
-                      aria-label={`${lvl}. úroveň — celkem slotů`}
-                    />
-                    <div className="dnd-slots__pips">
-                      {Array.from({ length: data.totalSlots }).map((_, i) => (
-                        <button
-                          type="button"
-                          key={i}
-                          className={`dnd-slot-pip ${i < data.usedSlots ? 'used' : ''}`}
-                          disabled={disabled}
-                          onClick={() =>
-                            setSpellLevel(lvl, {
-                              ...data,
-                              usedSlots: data.usedSlots === i + 1 ? i : i + 1,
-                            })
-                          }
-                          aria-label={`Slot ${i + 1} ${i < data.usedSlots ? 'použit' : 'volný'}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="dnd-spell-list">
-                  {data.spells.map((sp, i) => (
-                    <div className="dnd-spell-entry" key={i}>
-                      <label className="dnd-spell-prepared">
-                        <input
-                          type="checkbox"
-                          checked={sp.prepared}
-                          disabled={disabled}
-                          onChange={(e) => {
-                            const u = { ...data, spells: [...data.spells] };
-                            u.spells[i] = {
-                              ...u.spells[i],
-                              prepared: e.target.checked,
-                            };
-                            setSpellLevel(lvl, u);
-                          }}
-                          aria-label={`Kouzlo ${sp.name || i + 1} — připravené`}
-                        />
-                      </label>
-                      <input
-                        className="dnd-spell-name"
-                        value={sp.name}
-                        placeholder="Název kouzla"
-                        disabled={disabled}
-                        onChange={(e) => {
-                          const u = { ...data, spells: [...data.spells] };
-                          u.spells[i] = { ...u.spells[i], name: e.target.value };
-                          setSpellLevel(lvl, u);
-                        }}
-                        aria-label={`Kouzlo ${i + 1} — název`}
-                      />
-                      <input
-                        className="dnd-spell-note"
-                        value={sp.note}
-                        placeholder="Poznámka"
-                        disabled={disabled}
-                        onChange={(e) => {
-                          const u = { ...data, spells: [...data.spells] };
-                          u.spells[i] = { ...u.spells[i], note: e.target.value };
-                          setSpellLevel(lvl, u);
-                        }}
-                        aria-label={`Kouzlo ${i + 1} — poznámka`}
-                      />
-                      {!disabled && (
-                        <button
-                          type="button"
-                          className="dnd-x"
-                          onClick={() => {
-                            const u = { ...data, spells: [...data.spells] };
-                            u.spells.splice(i, 1);
-                            setSpellLevel(lvl, u);
-                          }}
-                          aria-label="Smazat kouzlo"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  {!disabled && (
-                    <button
-                      type="button"
-                      className="dnd-add"
-                      onClick={() =>
-                        setSpellLevel(lvl, {
-                          ...data,
-                          spells: [
-                            ...data.spells,
-                            { name: '', prepared: false, note: '' },
-                          ],
-                        })
-                      }
-                    >
-                      + Přidat kouzlo
-                    </button>
-                  )}
-                </div>
+          <div className="spell-header">
+            {[
+              { key: 'sp_class', label: 'Povolání' },
+              { key: 'sp_abi', label: 'Sesílací Vlastnost' },
+              { key: 'sp_atk', label: 'Útočný Bonus' },
+              { key: 'sp_dc', label: 'S.O. Záchrany' },
+            ].map((f) => (
+              <div key={f.key}>
+                <label htmlFor={`dnd_${f.key}`}>{f.label}</label>
+                <input
+                  id={`dnd_${f.key}`}
+                  value={g(f.key)}
+                  disabled={disabled}
+                  onChange={(e) => set(f.key, e.target.value)}
+                />
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => (
+            <SpellLevelBlock
+              key={lvl}
+              lvl={lvl}
+              g={g}
+              set={set}
+              setJson={setJson}
+              getJson={getJson}
+              disabled={disabled}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -1138,73 +846,193 @@ function FeatRows({ items, disabled, onWrite }: FeatRowsProps) {
   );
 }
 
+interface SpellLevelBlockProps {
+  lvl: number;
+  g: CdAccess['g'];
+  set: CdAccess['set'];
+  setJson: (key: string, arr: unknown[]) => void;
+  getJson: <T>(key: string) => T[];
+  disabled: boolean;
+}
+
+function SpellLevelBlock({
+  lvl,
+  g,
+  set,
+  setJson,
+  getJson,
+  disabled,
+}: SpellLevelBlockProps) {
+  const spells = getJson<DndSpell>(`spl_${lvl}`);
+
+  return (
+    <div className="spell-level">
+      <div className="sl-title">
+        <h4>{lvl === 0 ? 'Triky' : `${lvl}. Stupeň`}</h4>
+        {lvl > 0 && (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 'bold', color: '#7b6f5e' }}>
+              Pozice:
+            </span>
+            <input
+              style={{ width: 40, textAlign: 'center' }}
+              value={g(`spl_slots_${lvl}`)}
+              disabled={disabled}
+              onChange={(e) => set(`spl_slots_${lvl}`, e.target.value)}
+              placeholder="Max"
+              aria-label={`Maximální pozice ${lvl}. stupně`}
+            />
+            <input
+              style={{
+                width: 40,
+                textAlign: 'center',
+                borderColor: 'var(--dnd-spell, var(--dnd-accent))',
+              }}
+              value={g(`spl_used_${lvl}`)}
+              disabled={disabled}
+              onChange={(e) => set(`spl_used_${lvl}`, e.target.value)}
+              placeholder="Pou."
+              aria-label={`Použité pozice ${lvl}. stupně`}
+            />
+          </div>
+        )}
+      </div>
+      <table className="dnd-table">
+        <thead>
+          <tr>
+            {lvl > 0 && <th style={{ width: 30 }}>P</th>}
+            <th style={{ width: 30 }}>S</th>
+            <th>Název</th>
+            <th style={{ width: 80 }}>Úto/SO</th>
+            <th>Doba</th>
+            <th>Dosah</th>
+            <th>Trv.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {spells.map((sp, i) => (
+            <tr key={i}>
+              {lvl > 0 && (
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={sp.p}
+                    disabled={disabled}
+                    onChange={(e) => {
+                      const a = [...spells];
+                      a[i] = { ...a[i], p: e.target.checked };
+                      setJson(`spl_${lvl}`, a);
+                    }}
+                    aria-label="Připravené"
+                  />
+                </td>
+              )}
+              <td>
+                <input
+                  type="checkbox"
+                  checked={sp.s}
+                  disabled={disabled}
+                  onChange={(e) => {
+                    const a = [...spells];
+                    a[i] = { ...a[i], s: e.target.checked };
+                    setJson(`spl_${lvl}`, a);
+                  }}
+                  aria-label="V kouzelníkovi"
+                />
+              </td>
+              {[
+                ['n', 'Název kouzla'],
+                ['u', 'Útok / SO'],
+                ['d', 'Doba sesílání'],
+                ['r', 'Dosah'],
+                ['t', 'Trvání'],
+              ].map(([field, label]) => (
+                <td key={field}>
+                  <input
+                    value={(sp[field as keyof DndSpell] as string) ?? ''}
+                    disabled={disabled}
+                    aria-label={label}
+                    onChange={(e) => {
+                      const a = [...spells];
+                      a[i] = { ...a[i], [field]: e.target.value };
+                      setJson(`spl_${lvl}`, a);
+                    }}
+                  />
+                </td>
+              ))}
+              <td>
+                {!disabled && (
+                  <button
+                    type="button"
+                    className="del-btn"
+                    onClick={() => {
+                      const a = [...spells];
+                      a.splice(i, 1);
+                      setJson(`spl_${lvl}`, a);
+                    }}
+                    aria-label="Smazat kouzlo"
+                  >
+                    ✕
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!disabled && (
+        <button
+          type="button"
+          className="add-link"
+          onClick={() =>
+            setJson(`spl_${lvl}`, [
+              ...spells,
+              { p: false, s: false, n: '', u: '', d: '', z: '', r: '', t: '' },
+            ])
+          }
+        >
+          + Přidat {lvl === 0 ? 'Trik' : 'Kouzlo'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ════════════════════════════════════════════════════════════════
 // PRINT — statický čitelný dokument (čte stejná `dnd_*` data)
 // ════════════════════════════════════════════════════════════════
-
-/** Death save 0..3 jako ●●○ (vždy 3 znaky). */
-function deathPips(val: number): string {
-  const filled = Math.max(0, Math.min(3, val));
-  return '●'.repeat(filled) + '○'.repeat(3 - filled);
-}
-
-/** Parsuje jednu spell level (stejně jako getSpellLevel ve sheetu). */
-function parseSpellLevel(raw: string): DndSpellLevel {
-  if (!raw) return { totalSlots: 0, usedSlots: 0, spells: [] };
-  try {
-    const parsed = JSON.parse(raw);
-    return {
-      totalSlots: parsed.totalSlots ?? 0,
-      usedSlots: parsed.usedSlots ?? 0,
-      spells: Array.isArray(parsed.spells) ? parsed.spells : [],
-    };
-  } catch {
-    return { totalSlots: 0, usedSlots: 0, spells: [] };
-  }
-}
 
 /** Zdatnost dovednosti: 0 = žádná, 1 = zdatnost, 2 = expertíza. */
 const DND_PROF_LABEL = ['', 'zdatnost', 'expertíza'];
 
 function DndPrintView({ cda }: { cda: CdAccess }) {
-  const { g, parseJsonArr } = cda;
-
+  const { g } = cda;
   const profBonus = parseInt(g('profBonus', '2'), 10) || 2;
-  const getScore = (k: AbilityKey) =>
-    parseInt(g(`ability_${k}`, '10'), 10) || 10;
-  const getMod = (k: AbilityKey) => abilityMod(getScore(k));
-  const isSaveProf = (k: AbilityKey) => g(`save_prof_${k}`) === '1';
-  const skillProfFor = (name: string) =>
-    parseInt(g(`skill_prof_${name}`, '0'), 10) || 0;
+  const getScore = (k: string) => parseInt(g(`abi_${k}`, '10'), 10) || 10;
+  const getModFor = (k: string) => calcMod(getScore(k));
+  const isSaveProf = (k: string) => g(`save_${k}`) === '1';
+  const saveModFor = (k: string) =>
+    calcSaveMod(getModFor(k), isSaveProf(k), profBonus);
+  const skillProf = (n: string) => parseInt(g(`skill_${n}`, '0'), 10) || 0;
+  const skillModFor = (n: string, a: string) =>
+    calcSkillMod(getModFor(a), skillProf(n), profBonus);
 
   const classRows = deriveClasses(cda);
-  const totalLevel = dndTotalLevel(classRows);
+  const totalLevel = jadTotalLevel(classRows);
   const profList = deriveProfs(cda);
-  const langList = parseJsonArr<string>('langs');
+  const langList = cda.parseJsonArr<string>('langs');
   const featList = deriveFeats(cda).filter((f) => f.n.trim() || f.d.trim());
-
-  const deathSuccess = parseInt(g('deathSuccess', '0'), 10) || 0;
-  const deathFail = parseInt(g('deathFail', '0'), 10) || 0;
-
-  const attacks = parseJsonArr<DndAttack>('attacks');
-  const cantrips = parseJsonArr<string>('cantrips');
 
   const hasCasterClass = classRows.some((r) => DND_CASTERS.includes(r.c));
   const spRaw = g('spellEnabled');
   const spellEnabled = spRaw === '1' || (spRaw === '' && hasCasterClass);
-
-  const passivePerception =
-    10 + calcSkillMod(getMod('wis'), skillProfFor('Vnímání'), profBonus);
-  const passiveInsight =
-    10 + calcSkillMod(getMod('wis'), skillProfFor('Vhled'), profBonus);
-  const passiveInvestigation =
-    10 + calcSkillMod(getMod('int'), skillProfFor('Pátrání'), profBonus);
+  const weapons = cda.parseJsonArr<DndWeapon>('weapons');
 
   const playNotes = g('play_notes').trim();
 
   return (
     <div className="dnd-print">
-      {/* ═══ Identita ═══ */}
       <dl>
         <div>
           <dt>Rasa</dt>
@@ -1219,164 +1047,169 @@ function DndPrintView({ cda }: { cda: CdAccess }) {
           <dd>{totalLevel}</dd>
         </div>
         <div>
-          <dt>Body zkušeností</dt>
+          <dt>Zkušenosti</dt>
           <dd>{g('xp') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Inspirace</dt>
-          <dd>{g('inspiration') === '1' ? 'ano' : 'ne'}</dd>
         </div>
         <div>
           <dt>Zdatnostní bonus</dt>
           <dd>{fmtMod(profBonus)}</dd>
         </div>
+        <div>
+          <dt>Inspirace</dt>
+          <dd>{g('insp') === '1' ? 'ano' : 'ne'}</dd>
+        </div>
       </dl>
 
-      {/* ═══ Povolání ═══ */}
       <h2>Povolání a obory</h2>
       {classRows.length > 0 ? (
         <ul className="matrix-print__plain">
-          {classRows.map((r, i) => {
-            const sub = [r.s, r.s2].filter(Boolean).join(' · ');
-            return (
-              <li key={i} className="print-row">
-                <span>
-                  {r.c || '—'}
-                  {sub ? ` — ${sub}` : ''}
-                </span>
-                <span>{r.l ? `${r.l}. úr.` : '—'}</span>
-              </li>
-            );
-          })}
+          {classRows.map((r, i) => (
+            <li key={i} className="print-row">
+              <span>
+                {r.c || '—'}
+                {r.s ? ` — ${r.s}` : ''}
+              </span>
+              <span>{r.l ? `${r.l}. úr.` : '—'}</span>
+            </li>
+          ))}
         </ul>
       ) : (
-        <p>{g('classLevel') || '—'}</p>
+        <p>—</p>
       )}
 
-      {/* ═══ Vlastnosti ═══ */}
-      <h2>Vlastnosti</h2>
-      <ul className="matrix-print__plain">
-        {ABILITY_KEYS.map((k) => (
-          <li key={k} className="print-row">
-            <span>{ABILITY_LABELS[k]}</span>
-            <span>
-              {getScore(k)} ({fmtMod(getMod(k))})
-            </span>
-          </li>
+      <h2>Hlavní vlastnosti</h2>
+      <dl className="print-cols">
+        {ABIL_MAP.map(({ k, l }) => (
+          <div key={k}>
+            <dt>{l}</dt>
+            <dd>
+              {getScore(k)} ({fmtMod(getModFor(k))})
+            </dd>
+          </div>
         ))}
-      </ul>
+      </dl>
 
-      {/* ═══ Záchranné hody ═══ */}
+      <h2>Bojové údaje</h2>
+      <dl className="print-cols">
+        <div>
+          <dt>Iniciativa</dt>
+          <dd>{fmtMod(getModFor('dex'))}</dd>
+        </div>
+        <div>
+          <dt>Obranné číslo</dt>
+          <dd>{g('ac', '10') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Rychlost</dt>
+          <dd>{g('speed', '9 m') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Max Životy (VBD)</dt>
+          <dd>{g('hpMax') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Aktuální Životy</dt>
+          <dd>{g('hpCur') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Kostky obnovy</dt>
+          <dd>{g('hd') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Záchr. proti smrti (úspěch)</dt>
+          <dd>{g('ds_s') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Záchr. proti smrti (selhání)</dt>
+          <dd>{g('ds_f') || '—'}</dd>
+        </div>
+      </dl>
+
       <h2>Záchranné hody</h2>
       <ul className="matrix-print__plain">
-        {ABILITY_KEYS.map((k) => (
+        {ABIL_MAP.map(({ k, l }) => (
           <li key={k} className="print-row">
             <span>
-              {ABILITY_LABELS[k]}
-              {isSaveProf(k) ? ' (zdatnost)' : ''}
+              {l}
+              {isSaveProf(k) ? ' (zdatný)' : ''}
             </span>
-            <span>
-              {fmtMod(calcSaveMod(getMod(k), isSaveProf(k), profBonus))}
-            </span>
+            <span>{fmtMod(saveModFor(k))}</span>
           </li>
         ))}
       </ul>
 
-      {/* ═══ Dovednosti ═══ */}
       <h2>Dovednosti</h2>
       <ul className="matrix-print__plain">
-        {SKILLS.map((sk) => {
-          const prof = skillProfFor(sk.name);
-          const mod = calcSkillMod(getMod(sk.ability), prof, profBonus);
+        {SKILLS.map(({ n, a }) => {
+          const prof = skillProf(n);
           const profText = DND_PROF_LABEL[prof] ?? '';
           return (
-            <li key={sk.name} className="print-row">
+            <li key={n} className="print-row">
               <span>
-                {sk.name} ({ABILITY_LABELS[sk.ability].slice(0, 3)})
+                {n} ({a.toUpperCase()})
                 {profText ? ` — ${profText}` : ''}
               </span>
-              <span>{fmtMod(mod)}</span>
+              <span>{fmtMod(skillModFor(n, a))}</span>
             </li>
           );
         })}
       </ul>
 
-      {/* ═══ Pasivní smysly ═══ */}
-      <h2>Pasivní smysly</h2>
+      <h2>Pasivní vnímání a smysly</h2>
       <ul className="matrix-print__plain">
         <li className="print-row">
-          <span>Pasivní vnímání</span>
-          <span>{passivePerception}</span>
+          <span>Pasivní Vnímání</span>
+          <span>{10 + skillModFor('Vnímání', 'wis')}</span>
         </li>
         <li className="print-row">
-          <span>Pasivní vhled</span>
-          <span>{passiveInsight}</span>
+          <span>Pasivní Vhled</span>
+          <span>{10 + skillModFor('Vhled', 'wis')}</span>
         </li>
         <li className="print-row">
-          <span>Pasivní pátrání</span>
-          <span>{passiveInvestigation}</span>
+          <span>Pasivní Pátrání</span>
+          <span>{10 + skillModFor('Pátrání', 'int')}</span>
         </li>
       </ul>
 
-      {/* ═══ Boj ═══ */}
-      <h2>Boj</h2>
-      <dl className="print-cols">
-        <div>
-          <dt>OČ</dt>
-          <dd>{g('ac', '10')}</dd>
-        </div>
-        <div>
-          <dt>Iniciativa</dt>
-          <dd>{fmtMod(getMod('dex'))}</dd>
-        </div>
-        <div>
-          <dt>Rychlost</dt>
-          <dd>{g('speed', '9 m')}</dd>
-        </div>
-        <div>
-          <dt>Maximum životů</dt>
-          <dd>{g('maxHP', '0')}</dd>
-        </div>
-        <div>
-          <dt>Aktuální životy</dt>
-          <dd>{g('currentHP', '0')}</dd>
-        </div>
-        <div>
-          <dt>Dočasné životy</dt>
-          <dd>{g('tempHP', '0')}</dd>
-        </div>
-        <div>
-          <dt>Kostky životů</dt>
-          <dd>{g('hitDice') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Záchrany — úspěchy</dt>
-          <dd>{deathPips(deathSuccess)}</dd>
-        </div>
-        <div>
-          <dt>Záchrany — neúspěchy</dt>
-          <dd>{deathPips(deathFail)}</dd>
-        </div>
-      </dl>
-
-      {/* ═══ Útoky ═══ */}
-      {attacks.length > 0 && (
+      {spellEnabled && (
         <>
-          <h2>Útoky a kouzla</h2>
+          <h2>Rychlý přehled kouzlení / Alchymie</h2>
+          <dl>
+            <div>
+              <dt>Sesílací / Útočná vlastnost</dt>
+              <dd>{g('qc_ss_abi') || '—'}</dd>
+            </div>
+            <div>
+              <dt>Útočný bonus</dt>
+              <dd>{g('qc_ss_atk') || '—'}</dd>
+            </div>
+            <div>
+              <dt>Stupeň obtížnosti (SO)</dt>
+              <dd>{g('qc_ss_dc') || '—'}</dd>
+            </div>
+          </dl>
+        </>
+      )}
+
+      {weapons.length > 0 && (
+        <>
+          <h2>Zbraně a doplňky</h2>
           <table>
             <thead>
               <tr>
-                <th>Jméno</th>
-                <th>Út. bonus</th>
-                <th>Zranění / typ</th>
+                <th>Zbraň</th>
+                <th>Bon</th>
+                <th>Zásah</th>
+                <th>OČ</th>
               </tr>
             </thead>
             <tbody>
-              {attacks.map((a, i) => (
+              {weapons.map((w, i) => (
                 <tr key={i}>
-                  <td>{a.name || '—'}</td>
-                  <td>{a.bonus || '—'}</td>
-                  <td>{a.damage || '—'}</td>
+                  <td>{w.n || '—'}</td>
+                  <td>{w.b || '—'}</td>
+                  <td>{w.d || '—'}</td>
+                  <td>{w.o || '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -1384,7 +1217,6 @@ function DndPrintView({ cda }: { cda: CdAccess }) {
         </>
       )}
 
-      {/* ═══ Zdatnosti / jazyky / schopnosti ═══ */}
       {profList.length > 0 && (
         <>
           <h2>Zdatnosti</h2>
@@ -1409,7 +1241,7 @@ function DndPrintView({ cda }: { cda: CdAccess }) {
 
       {featList.length > 0 && (
         <>
-          <h2>Schopnosti a rysy</h2>
+          <h2>Schopnosti</h2>
           {featList.map((f, i) => (
             <div key={i}>
               {f.n.trim() && <h3>{f.n}</h3>}
@@ -1426,73 +1258,81 @@ function DndPrintView({ cda }: { cda: CdAccess }) {
         </>
       )}
 
-      {/* ═══ Sesílání kouzel ═══ */}
-      {spellEnabled && (
-        <>
-          <h2>Sesílání kouzel</h2>
-          <dl className="print-cols">
-            <div>
-              <dt>Sesílací vlastnost</dt>
-              <dd>{g('spellAbility') || '—'}</dd>
-            </div>
-            <div>
-              <dt>SO záchrany kouzel</dt>
-              <dd>{g('spellDC', '0')}</dd>
-            </div>
-            <div>
-              <dt>Útočný bonus kouzla</dt>
-              <dd>{g('spellAttack', '0')}</dd>
-            </div>
-          </dl>
-
-          {cantrips.filter((c) => c.trim()).length > 0 && (
-            <>
-              <h3>Triky</h3>
-              <ul className="matrix-print__plain">
-                {cantrips
-                  .filter((c) => c.trim())
-                  .map((c, i) => (
-                    <li key={i} className="print-row">
-                      <span>{c}</span>
-                      <span />
-                    </li>
-                  ))}
-              </ul>
-            </>
-          )}
-
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => {
-            const data = parseSpellLevel(g(`spellLevel_${lvl}`));
-            const named = data.spells.filter(
-              (sp: DndSpellEntry) => (sp.name || '').trim(),
-            );
-            if (data.totalSlots === 0 && named.length === 0) return null;
-            return (
-              <div key={lvl}>
-                <h3>
-                  {lvl}. úroveň — sloty:{' '}
-                  {'●'.repeat(Math.min(data.usedSlots, data.totalSlots)) +
-                    '○'.repeat(Math.max(0, data.totalSlots - data.usedSlots)) ||
-                    '—'}
-                </h3>
-                {named.length > 0 && (
-                  <ul className="matrix-print__plain">
-                    {named.map((sp: DndSpellEntry, i: number) => (
-                      <li key={i} className="print-row">
-                        <span>
-                          {sp.prepared ? '(připraveno) ' : ''}
-                          {sp.name}
-                        </span>
-                        <span>{sp.note || ''}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
-        </>
-      )}
+      {spellEnabled && <DndSpellsPrint cda={cda} />}
     </div>
+  );
+}
+
+/** Kouzla (tab „Kouzla") — vytištěno jen je-li sesilatel zapnut. */
+function DndSpellsPrint({ cda }: { cda: CdAccess }) {
+  const { g } = cda;
+  const levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  return (
+    <>
+      <h2>Kouzla</h2>
+      <dl>
+        <div>
+          <dt>Povolání</dt>
+          <dd>{g('sp_class') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Sesílací vlastnost</dt>
+          <dd>{g('sp_abi') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Útočný bonus</dt>
+          <dd>{g('sp_atk') || '—'}</dd>
+        </div>
+        <div>
+          <dt>S.O. záchrany</dt>
+          <dd>{g('sp_dc') || '—'}</dd>
+        </div>
+      </dl>
+
+      {levels.map((lvl) => {
+        const spells = cda.parseJsonArr<DndSpell>(`spl_${lvl}`);
+        if (spells.length === 0) return null;
+        const slotsMax = g(`spl_slots_${lvl}`);
+        const slotsUsed = g(`spl_used_${lvl}`);
+        const title = lvl === 0 ? 'Triky' : `${lvl}. Stupeň`;
+        const slotInfo =
+          lvl > 0 && (slotsMax || slotsUsed)
+            ? ` (pozice: ${slotsUsed || '0'} / ${slotsMax || '0'})`
+            : '';
+        return (
+          <div key={lvl}>
+            <h3>
+              {title}
+              {slotInfo}
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  {lvl > 0 && <th>Přip.</th>}
+                  <th>Název</th>
+                  <th>Úto/SO</th>
+                  <th>Doba</th>
+                  <th>Dosah</th>
+                  <th>Trvání</th>
+                </tr>
+              </thead>
+              <tbody>
+                {spells.map((sp, i) => (
+                  <tr key={i}>
+                    {lvl > 0 && <td>{sp.p ? 'ano' : '—'}</td>}
+                    <td>{sp.n || '—'}</td>
+                    <td>{sp.u || '—'}</td>
+                    <td>{sp.d || '—'}</td>
+                    <td>{sp.r || '—'}</td>
+                    <td>{sp.t || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
+    </>
   );
 }

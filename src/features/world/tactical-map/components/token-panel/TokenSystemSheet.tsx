@@ -34,6 +34,7 @@ import { Drd16BestiePanel } from "./system-panels/Drd16BestiePanel";
 import { DrdPlusBestiePanel } from "./system-panels/DrdPlusBestiePanel";
 import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
 import { JadBestiePanel } from "./system-panels/JadBestiePanel";
+import { DndBestiePanel } from "./system-panels/DndBestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import styles from "./TokenSystemSheet.module.css";
@@ -152,6 +153,21 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="jad"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // 8.7s — D&D 5e bestie = klon JaD (pergamen statblok, k20 fatální, mixed zásah).
+    if (systemId === "dnd5e") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <DndBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="dnd5e"
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

@@ -1,0 +1,596 @@
+/* JaD skin „FANTASY" — Iluminovaný grimoár (kovaný kožený kodex) · DEFAULT skin JaD.
+ *
+ * Bohatý krémový pergamen (#ecdab0) vsazený do TMAVÉ kované kožené vazby pod antickým
+ * zlatem — tmavší, „grimoárovější" než světlý baseline jad.css (ten je Minimal). Embedy
+ * (mapa/chat/hod/log) jsou stejná tmavá kovaná deska; pergamen je vyhrazen velkému listu
+ * postavy (vizuální vlajková loď). Rodinná DNA shodná s drdplus/fantasy a drd2.
+ *
+ * JEDEN soubor: (1) @import fontů, (2) lokální paleta + rohové kování SVG na scope,
+ * (3) override `--dd-*` panelů (combat/bestie/chat), (4) `--dd-embed-*` embedy OPAQUE,
+ * (5) override `--dnd-*` listu + vellum plocha + kovaná vazba, (6) signature CSS/SVG
+ * ornamenty na reálné `.dnd-*` třídy (kosočtverec, pečeť OČ, drahokamové nýty, crimson HP).
+ *
+ * SCOPE: KAŽDÉ pravidlo na `[data-diary-system='dnd5e'][data-diary-skin='fantasy']`
+ * (specificita 0,2,0) → přebíjí baseline `[data-diary-system='dnd5e']` (0,1,0) i jad.css
+ * `.dnd-diary` overrides. Pouze CSS/SVG, ŽÁDNÝ JS. Regrese-safe: jen overrides pod prefixem.
+ *
+ * SIGNATURE (vlastní, nesdílené): FILIGRÁNOVÉ ZLATÉ ROHOVÉ KOVÁNÍ (4 rohy v jednom SVG
+ * stacku, antické zlato #e3b94a + nýt #f7e7a8) na panelech a obvodu listu; iluminovaná
+ * iniciála jména, pečetní kruhový medailon OČ, drahokamové nýty (pip = radial gem),
+ * smaltované rýhované ukazatele, dvojité zlaté knihařské linkování.
+ *
+ * SÉMANTIKA (drží napříč skiny): Životy/HP/záporný hod/fatální neúspěch = crimson #a23a26;
+ * Kouzla/pozice/magie = safír #3a5f9e; OČ/iniciativa/akcent/neutrální hod = zlato #e3b94a;
+ * fatální úspěch = silná zlatá + glow; kladný hod/zdatnost = emerald #4f7a3a.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=UnifrakturCook:wght@700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   0) LOKÁLNÍ PALETA + ROHOVÉ KOVÁNÍ — SVG proměnné na compound scope.
+   Filigrán: tah %23e3b94a (zlato) + nýt %23f7e7a8 (světlé zlato). Čtou je
+   ornamenty panelů i listu níž (přes var()).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] {
+  /* ── kožená vazba / rám ── */
+  --dndf-bind-1: #1a1107; /* nejhlubší kůže */
+  --dndf-bind-2: #271d12; /* kovárna */
+  --dndf-bind-3: #3d2e18; /* líc kůže */
+  --dndf-bind-edge: #6e4f24; /* zlatá rytina vazby */
+
+  /* ── pergamen kodexu (bohatý, tmavší než Minimal) ── */
+  --dndf-vellum-0: #ecdab0;
+  --dndf-vellum-1: #e2cb9b;
+  --dndf-vellum-2: #d4b67e;
+  --dndf-vellum-edge: #b6975f;
+
+  /* ── inkoust ── */
+  --dndf-ink: #38260f;
+  --dndf-ink-soft: #6c5128;
+  --dndf-ink-faint: #927542;
+
+  /* ── antické zlato (signature kov) ── */
+  --dndf-gold: #e3b94a;
+  --dndf-gold-hi: #f7e7a8;
+  --dndf-gold-mid: #c9a227;
+  --dndf-gold-deep: #9c7a24;
+  --dndf-gold-shadow: #6e5326;
+
+  /* ── sémantika (drží napříč skiny) ── */
+  --dndf-crimson: #a23a26; /* ŽIVOTY / záporný hod / fatální neúspěch */
+  --dndf-crimson-hi: #cb4138;
+  --dndf-crimson-deep: #5c1612;
+  --dndf-sapphire: #3a5f9e; /* KOUZLA / pozice / magie */
+  --dndf-sapphire-hi: #6e96d6;
+  --dndf-sapphire-deep: #1c2f54;
+  --dndf-emerald: #4f7a3a; /* kladný hod / zdatnost */
+  --dndf-emerald-hi: #7aa654;
+  --dndf-amber: #c79a2f; /* postih / varování */
+
+  /* ── šum (pergamen pod patinou) ── */
+  --dndf-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+
+  /* ── SIGNATURE: filigránové rohové kování (4 rohy, jeden stack) ── */
+  --dndf-corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/svg%3E");
+  --dndf-corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 0) scale(-1 1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --dndf-corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(0 44) scale(1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --dndf-corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 44) scale(-1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) PANEL/EMBED TOKENY `--dd-*` (combat/bestie/chat panely + spell card)
+   Panely čtou `--dd-*` přes var() → reskin čistě tokeny (hash třídy NEJDOU cílit).
+   Baseline = původní světlý pergamen; tady přebíjíme na tmavý grimoár.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] {
+  /* ── plochy panelu ── */
+  --dd-panel-bg: linear-gradient(180deg, var(--dndf-bind-2), var(--dndf-bind-1));
+  --dd-card-bg: linear-gradient(180deg, #271c10, #211810);
+  --dd-row-bg: linear-gradient(90deg, #2c2014, #1d150c);
+
+  /* ── role / akcenty ── */
+  --dd-accent: var(--dndf-gold); /* vínová role grimoáru = antické zlato: tituly, hodnoty, rámy, prof ● */
+  --dd-accent-hi: var(--dndf-gold-hi);
+  --dd-accent-deep: var(--dndf-gold-deep);
+  --dd-gold: var(--dndf-gold); /* sekundární / ½-zdatnost */
+  --dd-gold-deep: var(--dndf-gold-deep);
+
+  /* ── struktura / inkoust ── */
+  --dd-parch-edge: var(--dndf-gold-shadow); /* border desky */
+  --dd-rule: color-mix(in srgb, var(--dndf-gold) 16%, transparent); /* jemný/dotted border */
+  --dd-ink: var(--dndf-vellum-0);
+  --dd-ink-soft: #b09467;
+
+  /* ── HP lišta (sémantika: Životy = červená) ── */
+  --dd-crimson: var(--dndf-crimson);
+  --dd-crimson-hi: var(--dndf-crimson-hi);
+  --dd-crimson-deep: var(--dndf-crimson-deep);
+  --dd-hpbar-track: #160f08; /* kolejnice HP lišty (tmavá deska) */
+  --dd-hpbar-fill: linear-gradient(90deg, var(--dndf-crimson), var(--dndf-crimson-hi));
+  --dd-hptxt: #eaa39a; /* HP číslo na tmavém */
+  --dd-hptxt-glow: 0 0 6px -2px rgba(203, 65, 56, 0.4); /* ztlumený glow na tmavém */
+
+  /* ── kouzla / magie = safír ── */
+  --dd-sapphire: var(--dndf-sapphire);
+  --dd-sapphire-hi: var(--dndf-sapphire-hi);
+  --dd-sapphire-deep: var(--dndf-sapphire-deep);
+
+  /* ── fonty rodiny ── */
+  --dd-font-head: 'Cinzel', serif; /* Cinzel náhrada (tituly, headery) */
+  --dd-font-body: 'EB Garamond', Georgia, serif; /* Inter náhrada (tělo) */
+  --dd-font-display: 'Cinzel Decorative', 'Cinzel', serif; /* iniciála, čísla, TOTAL */
+
+  /* ── kompozity (tlačítka / chip / lišta) ── */
+  --dd-accent-grad: linear-gradient(180deg, var(--dndf-gold-hi), var(--dndf-gold) 60%, var(--dndf-gold-deep)); /* zlaté tlačítko/chip */
+  --dd-accent-grad-strong: linear-gradient(180deg, var(--dndf-gold-hi), var(--dndf-gold) 58%, var(--dndf-gold-deep)); /* iniciativa/edit */
+  --dd-dmg-grad: linear-gradient(180deg, #cb4138, #a23a26 55%, #5c1612); /* zásah / zranění */
+
+  /* ════════ EMBED plochy (obal v TM / dice readout / dicelog) ════════
+     OPAQUE plocha (plný gradient) → log/obal/readout NEprosvítá na mapu. */
+  --dd-forge-1: var(--dndf-bind-1); /* tmavý fallback pod readout */
+  --dd-embed-surface: linear-gradient(180deg, var(--dndf-bind-2), #1d160e); /* OPAQUE */
+  --dd-embed-border: var(--dndf-gold-shadow);
+  --dd-embed-line: color-mix(in srgb, var(--dndf-gold) 24%, transparent);
+  --dd-embed-text: var(--dndf-vellum-0);
+  --dd-embed-muted: #b09467;
+  --dd-embed-title: var(--dndf-gold-hi);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--dndf-gold) 14%, transparent);
+  --dd-embed-accent: var(--dndf-gold);
+  --dd-embed-num-font: 'Cinzel Decorative', 'Cinzel', serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: var(--dndf-emerald-hi); /* kladný hod / léčení */
+  --dd-embed-neg: var(--dndf-crimson-hi); /* záporný hod / ZZ */
+  --dd-embed-neutral: var(--dndf-gold); /* neutrální TOTAL */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) LIST — bohatý krémový pergamen v TMAVÉ kované kožené vazbě.
+   Override `--dnd-*` tokenů na `.dnd-diary` + plocha (vellum) + kovaný rám +
+   dvojité zlaté knihařské linkování (::after).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary {
+  /* override lokálních tokenů jad.css */
+  --dnd-accent: var(--dndf-gold-deep); /* primární akcent listu = zlatá deep (nadpisy, rámy) */
+  --dnd-accent-soft: var(--dndf-gold);
+  --dnd-gold: var(--dndf-gold);
+  --dnd-border: var(--dndf-vellum-edge);
+  --dnd-border-soft: #c9b58e;
+  --dnd-panel-bg: var(--dndf-vellum-1);
+  --dnd-box: var(--dndf-vellum-0);
+  --dnd-highlight: #ede2cf;
+  --dnd-ink-soft: var(--dndf-ink-soft);
+
+  position: relative;
+  isolation: isolate;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--dndf-ink);
+  border: none;
+  border-radius: 6px;
+
+  /* bohatá vellum plocha (tmavší než světlý Minimal) */
+  background:
+    radial-gradient(120% 90% at 16% 6%, rgba(255, 248, 226, 0.55), transparent 52%),
+    radial-gradient(120% 120% at 90% 98%, rgba(120, 88, 40, 0.3), transparent 58%),
+    radial-gradient(55% 45% at 62% 42%, rgba(140, 108, 56, 0.14), transparent 72%),
+    linear-gradient(162deg, var(--dndf-vellum-0), var(--dndf-vellum-1) 52%, var(--dndf-vellum-2));
+
+  /* kovaná kožená vazba: pergamen → okraj → kůže → zlatá rytina → nejhlubší kůže */
+  box-shadow:
+    0 2px 0 rgba(255, 248, 226, 0.18) inset,
+    0 -34px 64px -42px rgba(70, 36, 12, 0.7) inset,
+    0 0 0 1px var(--dndf-vellum-edge),
+    0 0 0 8px var(--dndf-bind-2),
+    0 0 0 9px var(--dndf-gold-shadow),
+    0 0 0 12px var(--dndf-bind-1),
+    0 44px 96px -42px #000;
+}
+
+/* multiply šum (pergamen pod patinou) */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 6px;
+  background: var(--dndf-noise);
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
+
+/* SIGNATURE: dvojité zlaté knihařské linkování (inner fillet) po obvodu listu */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 4px;
+  border: 1px solid rgba(110, 83, 38, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(255, 248, 226, 0.32) inset,
+    0 0 0 4px rgba(157, 122, 36, 0.32) inset;
+}
+
+/* obsah nad ornamenty pozadí */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── scrollbar v grimoáru ── */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary ::-webkit-scrollbar-thumb {
+  background: rgba(110, 83, 38, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary ::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 83, 38, 0.6);
+}
+
+/* ── nadpisy h3: ražený zlatý kosočtverec místo ◆, zlatá deep + zlatý spodní lem ── */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary h3 {
+  font-family: 'Cinzel', serif;
+  color: #3a2812;
+  border-bottom: 1.5px solid transparent;
+  border-image: linear-gradient(
+      90deg,
+      var(--dndf-gold-deep),
+      var(--dndf-gold) 30%,
+      var(--dndf-gold-hi) 50%,
+      var(--dndf-gold) 70%,
+      transparent
+    )
+    1;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary h3::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  border-radius: 1px;
+  background: linear-gradient(135deg, var(--dndf-gold-hi), var(--dndf-gold-deep));
+  box-shadow: 0 0 0 1px rgba(60, 40, 10, 0.4);
+  font-size: 0;
+}
+
+/* nadpisy kouzel h4 (Cinzel) → zlatá deep, safírová varianta řešena níž v sekci kouzel */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary h4 {
+  font-family: 'Cinzel', serif;
+}
+
+/* ── inputy / textarea / select: krémový pergamen místo bílé, zlatý focus ── */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary input,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary textarea,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary select {
+  background: rgba(255, 252, 244, 0.62);
+  border-color: var(--dndf-vellum-edge);
+  color: var(--dndf-ink);
+  font-family: 'EB Garamond', Georgia, serif;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary input:focus,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary textarea:focus,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary select:focus {
+  border-color: var(--dndf-gold-deep);
+  background: #fffaf0;
+  box-shadow: 0 0 0 2px rgba(227, 185, 74, 0.18);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary input:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary textarea:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary select:disabled {
+  background: rgba(212, 182, 126, 0.32);
+  color: #7a6748;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) TABY — Cinzel, zlatý aktivní jazýček + ražený kosočtverec na aktivním
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tabs {
+  border-bottom: 2px solid var(--dndf-gold-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tabs button,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tabs .dnd-tab-toggle {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-ink-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tabs button.active {
+  color: var(--dndf-gold-deep);
+  border-bottom-color: var(--dndf-gold);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tabs button.active::before {
+  content: '◆';
+  font-size: 0.6em;
+  color: var(--dndf-gold);
+  margin-right: 7px;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tabs button:hover:not(.active) {
+  color: #4e3a1e;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) HLAVIČKA / IDENTITA — pergamenový panel, iluminovaná iniciála, zlaté pole
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-header {
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(227, 185, 74, 0.12), transparent 70%),
+    linear-gradient(180deg, rgba(255, 250, 235, 0.55), rgba(212, 182, 126, 0.3));
+  border: 1.5px solid var(--dndf-vellum-edge);
+  box-shadow:
+    0 2px 10px rgba(70, 48, 18, 0.12),
+    0 0 0 1px rgba(255, 248, 226, 0.25) inset;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-field label {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-ink-soft);
+}
+
+/* ── úroveň badge: ražený tmavý box se zlatým číslem (mockup .lvl-badge) ── */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-level-badge {
+  background: linear-gradient(180deg, var(--dndf-bind-3), var(--dndf-bind-1));
+  border: 1px solid var(--dndf-gold-shadow);
+  border-radius: 7px;
+  box-shadow:
+    0 5px 14px -5px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 235, 190, 0.12) inset;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-level-badge .num {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--dndf-gold-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-level-badge .cap {
+  font-family: 'Cinzel', serif;
+  color: #9a865f;
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) MULTIPOVOLÁNÍ — pergamenové řádky, zlaté kapitálky, zlatá přidávací linka
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-prof-row .pcap {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-ink-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-prof-row .del-btn {
+  color: var(--dndf-crimson);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-sub-hint {
+  color: var(--dndf-ink-faint);
+  font-style: italic;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-foot-hint {
+  color: var(--dndf-ink-faint);
+  font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) SIGNATURE: panely listu — kovaná pergamenová deska s rohovým kováním.
+   `.dnd-panel` dostane `isolation:isolate` → kování kreslíme pod obsah (z-index:-1).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-panel {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.55), rgba(212, 182, 126, 0.28));
+  border: 1.5px solid var(--dndf-vellum-edge);
+  border-radius: 4px;
+  box-shadow:
+    0 2px 10px rgba(70, 48, 18, 0.12),
+    0 0 0 1px rgba(255, 248, 226, 0.25) inset;
+}
+/* SIGNATURE: filigránové ZLATÉ ROHOVÉ KOVÁNÍ — 4 rohy v jednom ::before */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-repeat: no-repeat;
+  background-size: 38px 38px;
+  background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  background-image: var(--dndf-corner-tl), var(--dndf-corner-tr), var(--dndf-corner-bl), var(--dndf-corner-br);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) VLASTNOSTI — ražené pergamenové dlaždice, zlatá kapitálka, Cinzel Decorative skóre
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-stat-box {
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.6), rgba(212, 182, 126, 0.3));
+  border: 1px solid var(--dndf-vellum-edge);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-stat-box span.lbl {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-gold-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-stat-box span.mod {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: #2a1a0a;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-stat-box input {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: #2a1a0a;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) BOJ / META — zlaté pečetní boxy; OČ meta box = signature pečetní medailon
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-meta-box {
+  position: relative;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(227, 185, 74, 0.16), transparent 70%),
+    linear-gradient(180deg, rgba(255, 250, 235, 0.55), rgba(212, 182, 126, 0.3));
+  border: 1.5px solid var(--dndf-gold-deep);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-meta-box label {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-ink-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-meta-box input,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-meta-box span.val {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: #2a1a0a;
+}
+/* SIGNATURE: pečetní ražený prstenec uvnitř OČ/meta boxu (kovová klidná obrana) */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-meta-box::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  border-radius: 5px;
+  border: 1px dashed rgba(110, 83, 38, 0.45);
+}
+
+/* ── HP panel: crimson rám (Životy = červená), aktuální Životy crimson ── */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-hp-panel {
+  position: relative;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(162, 58, 38, 0.14), transparent 64%),
+    linear-gradient(180deg, rgba(255, 250, 235, 0.6), rgba(212, 182, 126, 0.32));
+  border: 2px solid var(--dndf-crimson);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 4px 14px -8px rgba(92, 22, 18, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-hp-panel .hp-box label {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-ink-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-hp-panel .hp-box input {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  background: linear-gradient(180deg, rgba(203, 65, 56, 0.12), rgba(92, 22, 18, 0.06));
+  border-color: rgba(162, 58, 38, 0.4);
+  color: var(--dndf-crimson);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) SIGNATURE: drahokamové nýty — zdatnostní pip na záchrany/dovednosti.
+   `button.prof` = kruhový gem ○ / ● (.active = zdatnost). Mockup ○/●/◉.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row {
+  border-bottom-color: rgba(182, 151, 95, 0.3);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row button.prof {
+  background: radial-gradient(circle at 40% 35%, rgba(255, 250, 232, 0.7), rgba(182, 151, 95, 0.5));
+  border: 1.5px solid var(--dndf-gold-shadow);
+  color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset;
+}
+/* zdatnost zapnutá (● / ◉) — drahokam svítí; cílíme na běžné aktivní stavy */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row button.prof.active,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row button.prof.on,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row button.prof.is-on,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row button.prof.prof-on,
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row button.prof.expert {
+  background: radial-gradient(circle at 40% 32%, var(--dndf-gold-hi), var(--dndf-gold) 55%, var(--dndf-gold-deep));
+  border-color: var(--dndf-gold-deep);
+  color: #2a1a0a;
+  box-shadow:
+    0 1px 1px rgba(255, 250, 220, 0.6) inset,
+    0 0 5px -1px var(--dndf-gold);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row span.mod {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: #2a1a0a;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-list-row span.sub {
+  color: var(--dndf-ink-faint);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) TABULKY / PŘIDÁVACÍ LINKY — zlaté podtržení hlaviček, zlatá dashed linka
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-table th {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-ink-soft);
+  border-bottom: 1.5px solid var(--dndf-gold-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-table .del-btn {
+  color: var(--dndf-crimson);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-table .del-btn:hover {
+  color: var(--dndf-crimson-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .add-link {
+  font-family: 'Cinzel', serif;
+  border: 1px dashed var(--dndf-gold-shadow);
+  color: var(--dndf-gold-deep);
+  background: rgba(227, 185, 74, 0.07);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .add-link:hover {
+  border-color: var(--dndf-gold-deep);
+  background: rgba(227, 185, 74, 0.14);
+  color: #3a2812;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   11) TAGY (zdatnosti / jazyky) — zlatá odrážka, tečkovaný oddělovač
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tag-row {
+  border-bottom: 1px dotted rgba(182, 151, 95, 0.5);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tag-row .bullet {
+  color: var(--dndf-gold-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-tag-row .del-btn {
+  color: var(--dndf-crimson);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   12) SCHOPNOSTI (karty) — pergamenová karta se zlatým levým lemem, Cinzel název
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-feat {
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.55), rgba(212, 182, 126, 0.3));
+  border: 1px solid var(--dndf-vellum-edge);
+  border-left: 4px solid var(--dndf-gold-deep);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-feat-head input {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-gold-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-feat textarea {
+  color: var(--dndf-ink-soft);
+  font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   13) KOUZLA — spell header + level safírové (magie = modrá); sl-title safír
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-spells .spell-header {
+  background: linear-gradient(180deg, rgba(58, 95, 158, 0.12), rgba(28, 47, 84, 0.06));
+  border: 1px solid var(--dndf-sapphire);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-spells .spell-header div label {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-sapphire-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-spells .spell-level {
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.55), rgba(212, 182, 126, 0.3));
+  border: 1px solid var(--dndf-vellum-edge);
+  border-left: 4px solid var(--dndf-sapphire);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-spells .sl-title {
+  border-bottom: 2px solid var(--dndf-sapphire);
+}
+[data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-spells .sl-title h4 {
+  font-family: 'Cinzel', serif;
+  color: var(--dndf-sapphire-deep);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   14) RESPONSIVITA — list grid kolabuje (řeší jad.css); tady jen pojistka,
+   že kovaná deska + linkování + kování zůstanou nedotčené na úzkém viewportu.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  [data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary::after {
+    inset: 8px;
+  }
+  [data-diary-system='dnd5e'][data-diary-skin='fantasy'] .dnd-diary .dnd-panel::before {
+    background-size: 32px 32px;
+  }
+}

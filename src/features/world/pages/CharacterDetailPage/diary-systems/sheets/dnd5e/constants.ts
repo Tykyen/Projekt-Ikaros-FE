@@ -1,91 +1,89 @@
 /**
- * 8.7d — D&D 5e konstanty (atributy, dovednosti, spell typy).
- * 8.7s — multipovolání + obory, zázemí select, přidávatelné sekce.
- *        Data povolání/zázemí dle zadání uživatele (D&D 5e CZ).
+ * 8.7s — D&D 5e konstanty. Klon JaD (`sheets/jad/constants.ts`) — STEJNÝ tvar,
+ * jediný rozdíl = povolání (`DND_CLASSES`) a zázemí (`DND_BACKGROUNDS`).
+ * D&D specifikum: Černokněžník má 2 osy (patron + pakt) přes optional `sub2/list2`.
  */
 
-export const ABILITY_KEYS = [
-  'str',
-  'dex',
-  'con',
-  'int',
-  'wis',
-  'cha',
-] as const;
-
-export type AbilityKey = (typeof ABILITY_KEYS)[number];
-
-export const ABILITY_LABELS: Record<AbilityKey, string> = {
-  str: 'Síla',
-  dex: 'Obratnost',
-  con: 'Odolnost',
-  int: 'Inteligence',
-  wis: 'Moudrost',
-  cha: 'Charisma',
-};
-
-export interface DndSkillDef {
-  /** Český název dovednosti — slouží i jako klíč v customData (`dnd_skill_prof_<name>`). */
-  name: string;
-  /** Navázaná ability (`str` / `dex` / …). */
-  ability: AbilityKey;
+export interface AbilityDef {
+  /** Krátký klíč (`str`, `dex`, …) — používá se v customData (např. `dnd_abi_str`). */
+  k: string;
+  /** Plný český název (zobrazený v UI). */
+  l: string;
 }
 
-/** 18 dovedností D&D 5e (česky). */
-export const SKILLS: DndSkillDef[] = [
-  { name: 'Akrobacie', ability: 'dex' },
-  { name: 'Atletika', ability: 'str' },
-  { name: 'Čachry', ability: 'dex' },
-  { name: 'Historie', ability: 'int' },
-  { name: 'Klamání', ability: 'cha' },
-  { name: 'Lékařství', ability: 'wis' },
-  { name: 'Mystika', ability: 'int' },
-  { name: 'Náboženství', ability: 'int' },
-  { name: 'Nenápadnost', ability: 'dex' },
-  { name: 'Ovládání zvířat', ability: 'wis' },
-  { name: 'Pátrání', ability: 'int' },
-  { name: 'Přesvědčování', ability: 'cha' },
-  { name: 'Přežití', ability: 'wis' },
-  { name: 'Příroda', ability: 'int' },
-  { name: 'Umění', ability: 'cha' },
-  { name: 'Vhled', ability: 'wis' },
-  { name: 'Vnímání', ability: 'wis' },
-  { name: 'Zastrašování', ability: 'cha' },
+/** 6 hlavních atributů (D&D 5e). */
+export const ABIL_MAP: AbilityDef[] = [
+  { k: 'str', l: 'Síla' },
+  { k: 'dex', l: 'Obratnost' },
+  { k: 'con', l: 'Odolnost' },
+  { k: 'int', l: 'Inteligence' },
+  { k: 'wis', l: 'Moudrost' },
+  { k: 'cha', l: 'Charisma' },
 ];
 
-/** Útok v `dnd_attacks` JSON poli. */
-export interface DndAttack {
-  name: string;
-  bonus: string;
-  damage: string;
+export interface SkillDef {
+  /** Český název dovednosti (zobrazený). Slouží i jako klíč v customData. */
+  n: string;
+  /** Navázaná ability (`str` / `dex` / `con` / `int` / `wis` / `cha`). */
+  a: string;
 }
 
-/** Jedno kouzlo v `dnd_spellLevel_<lvl>.spells`. */
-export interface DndSpellEntry {
-  name: string;
-  prepared: boolean;
-  note: string;
+/** 18 dovedností (česky), s navázanou ability — shodné s JaD. */
+export const SKILLS: SkillDef[] = [
+  { n: 'Akrobacie', a: 'dex' },
+  { n: 'Atletika', a: 'str' },
+  { n: 'Čachry', a: 'dex' },
+  { n: 'Historie', a: 'int' },
+  { n: 'Klamání', a: 'cha' },
+  { n: 'Lékařství', a: 'wis' },
+  { n: 'Mystika', a: 'int' },
+  { n: 'Náboženství', a: 'int' },
+  { n: 'Nenápadnost', a: 'dex' },
+  { n: 'Ovládání zvířat', a: 'wis' },
+  { n: 'Pátrání', a: 'int' },
+  { n: 'Přesvědčování', a: 'cha' },
+  { n: 'Přežití', a: 'wis' },
+  { n: 'Příroda', a: 'int' },
+  { n: 'Vhled', a: 'wis' },
+  { n: 'Vnímání', a: 'wis' },
+  { n: 'Vystupování', a: 'cha' },
+  { n: 'Zastrašování', a: 'cha' },
+];
+
+/** Tvar jedné zbraně v `dnd_weapons` JSON poli. */
+export interface DndWeapon {
+  n: string; // název
+  b: string; // bonus k zásahu
+  d: string; // zranění
+  t: string; // typ zranění (legacy field)
+  r: string; // dosah (legacy field)
+  o: string; // OČ (defense override) nebo poznámka
 }
 
-/** Celá spell level data v `dnd_spellLevel_<lvl>` (JSON object). */
-export interface DndSpellLevel {
-  totalSlots: number;
-  usedSlots: number;
-  spells: DndSpellEntry[];
+/** Tvar jednoho kouzla v `dnd_spl_<level>` JSON poli. */
+export interface DndSpell {
+  p: boolean; // Prepared (jen pro lvl > 0)
+  s: boolean; // V kouzelníkovi (spellbook)
+  n: string; // Název
+  u: string; // Útok / SO
+  d: string; // Doba sesílání
+  z: string; // (rezervovaný field)
+  r: string; // Dosah
+  t: string; // Trvání
 }
 
 // ════════════════════════════════════════════════════════════════
-// 8.7s — Multipovolání, obory, zázemí, přidávatelné sekce
+// Multipovolání, obory, zázemí, přidávatelné sekce
+// Jediný rozdíl proti JaD — D&D 5e povolání a zázemí (zadání uživatele).
 // ════════════════════════════════════════════════════════════════
 
-/** Definice povolání: prahová úroveň výběru oboru + seznam oborů. */
+/** Definice povolání: prahová úroveň výběru oboru + seznam oborů.
+ *  Černokněžník navíc 2. osa (pakt) přes `sub2`/`list2`/`label2`. */
 export interface DndClassDef {
   /** Úroveň, na které se vybírá obor (1. osa). */
   sub: number;
   /** Dostupné obory / specializace (1. osa). */
   list: string[];
-  /** Popisek 1. osy (default „Obor"). */
-  label?: string;
   /** Práh 2. osy (jen Černokněžník — pakt). */
   sub2?: number;
   /** Seznam 2. osy. */
@@ -94,11 +92,10 @@ export interface DndClassDef {
   label2?: string;
 }
 
-/** 12 povolání D&D 5e → práh oboru + obory (a u Černokněžníka 2. osa). */
+/** 12 povolání D&D 5e → práh oboru + obory (Černokněžník 2 osy). */
 export const DND_CLASSES: Record<string, DndClassDef> = {
   Barbar: {
     sub: 3,
-    label: 'Stezka',
     list: [
       'Berserkr',
       'Totemový — Medvěd',
@@ -109,20 +106,14 @@ export const DND_CLASSES: Record<string, DndClassDef> = {
       'Bojechtivec',
     ],
   },
-  Bard: { sub: 3, label: 'Kolej', list: ['Bojový', 'Znalostní'] },
-  Bojovník: {
-    sub: 3,
-    label: 'Archetyp',
-    list: ['Čaroknecht', 'Šampión', 'Taktik', 'Rytíř'],
-  },
+  Bard: { sub: 3, list: ['Bojový', 'Znalostní'] },
+  Bojovník: { sub: 3, list: ['Čaroknecht', 'Šampión', 'Taktik', 'Rytíř'] },
   'Čaroděj': {
     sub: 1,
-    label: 'Původ',
     list: ['Divoká magie', 'Démoní rod', 'Bouřný čaroděj'],
   },
   'Černokněžník': {
     sub: 1,
-    label: 'Patron',
     list: ['Arcivíla', 'Běs', 'Prastarý', 'Nehynoucí'],
     sub2: 3,
     label2: 'Pakt',
@@ -130,7 +121,6 @@ export const DND_CLASSES: Record<string, DndClassDef> = {
   },
   Druid: {
     sub: 2,
-    label: 'Kruh',
     list: [
       'Kruh měsíce',
       'Kruh země — Arktida',
@@ -143,14 +133,9 @@ export const DND_CLASSES: Record<string, DndClassDef> = {
       'Kruh země — Podzemí',
     ],
   },
-  'Hraničář': {
-    sub: 3,
-    label: 'Archetyp',
-    list: ['Lovec', 'Pán zvířat'],
-  },
+  'Hraničář': { sub: 3, list: ['Lovec', 'Pán zvířat'] },
   Klerik: {
     sub: 1,
-    label: 'Doména',
     list: [
       'Bouře',
       'Příroda',
@@ -164,7 +149,6 @@ export const DND_CLASSES: Record<string, DndClassDef> = {
   },
   'Kouzelník': {
     sub: 2,
-    label: 'Škola',
     list: [
       'Škola iluze',
       'Škola nekromancie',
@@ -178,7 +162,6 @@ export const DND_CLASSES: Record<string, DndClassDef> = {
   },
   'Mnich': {
     sub: 3,
-    label: 'Tradice',
     list: [
       'Cesta čtyř živlů',
       'Cesta otevřené ruky',
@@ -187,14 +170,9 @@ export const DND_CLASSES: Record<string, DndClassDef> = {
       'Sluneční duše',
     ],
   },
-  Paladin: {
-    sub: 3,
-    label: 'Přísaha',
-    list: ['Oddanost', 'Pomsta', 'Starověku', 'Koruny'],
-  },
+  Paladin: { sub: 3, list: ['Oddanost', 'Pomsta', 'Starověku', 'Koruny'] },
   'Tulák': {
     sub: 3,
-    label: 'Archetyp',
     list: ['Mystický šejdíř', 'Vrah', 'Lupič', 'Šibal', 'Švihák'],
   },
 };
@@ -211,7 +189,7 @@ export const DND_CASTERS = [
   'Hraničář',
 ];
 
-/** Osobní zázemí D&D 5e (výběr v hlavičce). */
+/** 25 osobních zázemí D&D 5e (výběr v hlavičce). */
 export const DND_BACKGROUNDS = [
   'Agent frakce',
   'Akolyta',

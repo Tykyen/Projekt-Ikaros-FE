@@ -22,6 +22,7 @@ import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
+import { DndChatBestiePanel } from './DndChatBestiePanel';
 import s from './railShell.module.css';
 
 interface Props {
@@ -234,6 +235,20 @@ export function BestieInstancePanel({
         ) : systemId === 'jad' ? (
           <DiarySkinScope worldId={worldId}>
             <JadChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
+        ) : systemId === 'dnd5e' ? (
+          <DiarySkinScope worldId={worldId}>
+            <DndChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               rollerName={combatant.name}

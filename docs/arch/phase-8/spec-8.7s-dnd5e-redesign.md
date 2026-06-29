@@ -1,107 +1,53 @@
-# Spec 8.7s — D&D 5e deník: multipovolání, obory, přidávatelné sekce
+# Spec 8.7s — D&D 5e = úplné dvojče JaD (deník + mapa + chat + bestie + skiny)
 
-**Status:** ✅ implementováno (2026-06-29) — sheet + constants + CSS + 32 testů zelené, build čistý, strukturální mobil-desktop OK; touch-target a11y fix doplněn. Čeká: živý mobil-desktop na zařízení + `funkce`/`napoveda` + commit.
-**Předchůdce:** 8.7d (D&D 5e preset — 1:1 přenos legacy) — viz [spec-8.7](spec-8.7-diary-system-presets.md)
-**Vzor:** 8.7p (JaD redesign) — viz [spec-8.7p](spec-8.7p-jad-redesign.md)
-**Rozsah:** pouze systém `dnd5e`. Mění `sheets/dnd5e/*`, `styles/dnd5e.css`. Žádný jiný systém ani sdílené moduly. **Combat panel + bestiář NE** (později, jako JaD 8.7q/8.7r).
+**Status:** ✅ implementováno (2026-06-29) — build čistý, testy zelené (deník 21 + bestie schéma 9 + combat/bestie panely + skiny). Čeká: živý mobil-desktop na zařízení + `funkce`/`napoveda` + BE deploy.
+**Vzor:** JaD — 8.7p (deník), 8.7q (combat panel), 8.7r (bestie). Viz [spec-8.7p](spec-8.7p-jad-redesign.md), [spec-8.7q](spec-8.7q-jad-combat-panel.md).
 
-## 1. Cíl
+## 1. Cíl a princip
 
-Posunout D&D 5e deník z 1:1 přenosu legacy listu na **funkční tvorbu postavy**: multipovolání s obory (subclass), osobní zázemí jako výběr, auto-úroveň a strukturované přidávatelné sekce místo volných textarea. Funkčně shodné s JaD 8.7p, ale **zachovává vlastní vzhled** (Arcane Parchment, vínová `--dnd-accent`) i D&D specifikum, které JaD nemá: death-save pipy. (Bloky osobnosti Rysy/Ideály/Pouta/Vady **odebrány na přání uživatele** — jako JaD.)
+Uživatel: *„celý systém JaD je to samé jako D&D 5e, jediný rozdíl je v zázemí a povolání."*
+→ dnd5e je **úplný klon JaD** napříč všemi plochami (deník, taktická mapa PC, chat PC, bestie na mapě i v chatu, 8 skinů). **Jediný rozdíl proti JaD:** povolání (`DND_CLASSES`) a zázemí (`DND_BACKGROUNDS`). Vše ostatní (layout, datový model `dnd_*`, k20 mechanika, fatální hody, mixed zásah, pergamen + 8 skinů) je 1:1 přejmenovaný JaD (`jad_`→`dnd_`, `.jad-`→`.dnd-`, `[data-diary-system='jad']`→`'dnd5e'`).
 
-## 2. Změny v hlavičce
+## 2. Povolání + zázemí (jediný rozdíl)
 
-| Pole | Dnes | Cíl |
+**`DND_CLASSES`** (12, `sheets/dnd5e/constants.ts`) — práh oboru + obory:
+
+| Povolání | sub | obory |
 |---|---|---|
-| Jméno postavy (`dnd_charName`) | input | **odebráno z UI** (řeší stránka postavy) |
-| Jméno hráče (`dnd_playerName`) | input | **odebráno z UI** |
-| Povolání a úroveň (`dnd_classLevel`) | volný text | **nahrazeno** multipovolání panelem (§3) |
-| Rasa (`dnd_race`) | input | beze změny |
-| Přesvědčení (`dnd_alignment`) | input | **odebráno z UI** (na přání) |
-| Zázemí (`dnd_background`) | volný text | **`<select>`** zázemí + „Vlastní…" |
-| Body zkušeností (`dnd_xp`) | input | beze změny |
-| Úroveň | — | **auto = součet úrovní povolání** (read-only badge) |
+| Barbar | 3 | Berserkr · Totemový — Medvěd/Vlk/Orel/Los/Tygr · Bojechtivec |
+| Bard | 3 | Bojový · Znalostní |
+| Bojovník | 3 | Čaroknecht · Šampión · Taktik · Rytíř |
+| Čaroděj | 1 | Divoká magie · Démoní rod · Bouřný čaroděj |
+| Černokněžník | 1 / **3** | **Patron** (Arcivíla/Běs/Prastarý/Nehynoucí) + **Pakt** (čepele/rukověti/řetězu) |
+| Druid | 2 | Kruh měsíce · Kruh země — 8 terénů |
+| Hraničář | 3 | Lovec · Pán zvířat |
+| Klerik | 1 | Bouře · Příroda · Světlo · Šalba · Válka · Znalost · Život · Mystika |
+| Kouzelník | 2 | 7 škol + Zpěv meče |
+| Mnich | 3 | Cesta čtyř živlů / otevřené ruky / stínů / dlouhé smrti · Sluneční duše |
+| Paladin | 3 | Oddanost · Pomsta · Starověku · Koruny |
+| Tulák | 3 | Mystický šejdíř · Vrah · Lupič · Šibal · Švihák |
 
-⚠️ Odebraná pole z UI **nemažeme z DB** (delta merge nesahá na klíče, které UI nezapisuje) — žádný data loss.
+**Černokněžník = jediná strukturní odchylka:** 2 osy (patron od 1. úr + pakt od 3. úr) přes optional `DndClassDef.sub2/list2/label2` a pole `DndClassRow.s2`. Spadá pod „povolání a jeho věci" (odsouhlaseno). Ostatní povolání = jeden select jako JaD.
 
-## 3. Multipovolání + obory
+**`DND_BACKGROUNDS`** = 25 zázemí (`Agent frakce … Žoldnéř`). **Casteři** (auto-tab kouzel) = Bard/Čaroděj/Černokněžník/Druid/Klerik/Kouzelník/Paladin/Hraničář.
 
-**Nové pole:** `dnd_classes` = JSON pole `[{ c, l, s, s2 }]`
-- `c` = povolání, `l` = úroveň v povolání, `s` = obor (1. osa), `s2` = 2. osa (jen Černokněžník: pakt)
+## 3. Klonované soubory (jad → dnd5e)
 
-**Model** (`sheets/dnd5e/constants.ts`):
-```ts
-interface DndClassDef {
-  sub: number;      // práh úrovně pro 1. osu (obor)
-  list: string[];   // 1. osa
-  label?: string;   // popisek 1. osy (default 'Obor')
-  sub2?: number;    // práh 2. osy (jen Černokněžník)
-  list2?: string[]; // 2. osa
-  label2?: string;  // popisek 2. osy
-}
-```
+- **Deník:** `sheets/dnd5e/{DndSheet.tsx, constants.ts, formulas.ts}` + spec; `styles/dnd5e.css`.
+- **Skiny:** `styles/dnd5e-skins/*.css` (8) + `@import` v `diary-skins.css` + `DEFAULT_SKIN_BY_SYSTEM.dnd5e='fantasy'`.
+- **Combat panel PC (mapa+chat):** `system-panels/DndCombatPanel.tsx` + `.module.css` + spec (registr `combatPanels.ts['dnd5e']`).
+- **Bestie:** `schemas/dnd5e/{bestie.json, token.json}` (systemId `dnd5e`, jinak = JaD) + `system-panels/DndBestiePanel.tsx` + `.module.css` + `DndBestieCombatActions.tsx` + spec; chat `rail/DndChatBestiePanel.tsx`; test `schemas/__tests__/dnd5e-bestie.test.ts`.
+- **Routing:** `TokenSystemSheet.tsx` (dnd5e bestie větev), `BestieInstancePanel.tsx` + `BestieRollPanel.tsx` (dnd5e chat bestie větev). Bootstrap už `dnd5eSchemas` registroval.
 
-**12 povolání** (pořadí dle zadání), s prahem oboru a popiskem osy:
+## 4. Sdílený datový kontrakt
 
-| Povolání | sub | osa (label) | obory |
-|---|---|---|---|
-| Barbar | 3 | Stezka | Berserkr · Totemový — Medvěd/Vlk/Orel/Los/Tygr · Bojechtivec |
-| Bard | 3 | Kolej | Bojový · Znalostní |
-| Bojovník | 3 | Archetyp | Čaroknecht · Šampión · Taktik · Rytíř |
-| Čaroděj | 1 | Původ | Divoká magie · Démoní rod · Bouřný čaroděj |
-| Černokněžník | 1 / **3** | **Patron** + **Pakt** | Patron: Arcivíla/Běs/Prastarý/Nehynoucí · Pakt: čepele/rukověti/řetězu |
-| Druid | 2 | Kruh | Kruh měsíce · Kruh země — Arktida/Bažina/Hory/Lesy/Pláně/Pobřeží/Poušť/Podzemí |
-| Hraničář | 3 | Archetyp | Lovec · Pán zvířat |
-| Klerik | 1 | Doména | Bouře · Příroda · Světlo · Šalba · Válka · Znalost · Život · Mystika |
-| Kouzelník | 2 | Škola | Iluze · Nekromancie · Očarování · Transmutace · Věštění · Vymítání · Zaklínání · Zpěv meče |
-| Mnich | 3 | Tradice | Cesta čtyř živlů · otevřené ruky · stínů · dlouhé smrti · Sluneční duše |
-| Paladin | 3 | Přísaha | Oddanost · Pomsta · Starověku · Koruny |
-| Tulák | 3 | Archetyp | Mystický šejdíř · Vrah · Lupič · Šibal · Švihák |
+Deník i combat/bestie panely čtou stejná `dnd_*` data (`abi_*`, `save_*`, `skill_*`, `classes`, `weapons`, `spl_*`, `hpCur/hpMax`, `ds_s/ds_f`, `qc_ss_dc`, …). Proto byl combat panel přepsán z JaD modelu (ne ponechán starý dnd `attacks`/`deathSuccess`), aby nevznikl desync. Migrace legacy 8.7d polí (`classLevel`, `otherProf`, `features`) read-only přes JaD-style derive (jiné klíče → no-op, data v DB nedotčená).
 
-**Chování:**
-- Řádek: `<select povolání>` + `<input úroveň>` + `<select obor>` [+ `<select pakt>` jen u Černokněžníka] + smazat.
-- Obor `<select>` plněn z `list`. **Zamčený** (disabled), dokud `l < sub`; pod ním hint „obor od N. úrovně". 2. osa stejně proti `sub2`.
-- „+ Přidat povolání" přidá řádek; smazání odebere.
-- **Úroveň postavy** (badge) = `Σ l`.
-- **Casteři** (auto-zapnou kouzla, nenastaví-li uživatel ručně): Bard, Čaroděj, Černokněžník, Druid, Klerik, Kouzelník, Paladin, Hraničář. Subclass-casteři (Čaroknecht, Mystický šejdíř, Cesta čtyř živlů) → ruční přepínač.
+## 5. Akceptační kritéria (DoD)
 
-**Migrace (read-only, bez side-effectu):** `dnd_classLevel` je volný text → nelze spolehlivě mapovat na select. Je-li `dnd_classes` prázdné a `dnd_classLevel` má text → zobraz **jednorázový read-only hint** „Dřívější zápis: …" nad panelem + jeden prázdný editovatelný řádek. První edit uloží `dnd_classes`; `dnd_classLevel` zůstane v DB nedotčený.
-
-## 4. Přidávatelné sekce (místo textarea)
-
-| Sekce | Dnes | Nové pole | Tvar | Migrace (read-only) |
-|---|---|---|---|---|
-| Zdatnosti (zbroje/zbraně/nástroje) | `dnd_otherProf` textarea | `dnd_profs` | `string[]` | otherProf text → 1 řádek |
-| Jazyky | — (součást textarea) | `dnd_langs` | `string[]` | — (nové, prázdné) |
-| Schopnosti a rysy | `dnd_features` textarea | `dnd_feats` | `[{ n, d }]` | features text → `{ n:'', d: features }` |
-
-Legacy klíče zůstanou v DB.
-
-## 5. Layout
-
-- Identita (hlavička) → **multipovolání panel (plná šířka)** → 3-sloupcový grid (zachovat stávající dnd rozložení) → **Poznámky (`dnd_play_notes`, plná šířka, úplně dole)**.
-- Sloupec 1: vlastnosti (6), inspirace + zdatnostní bonus, záchranné hody, pasivní smysly (Vnímání/Vhled/Pátrání).
-- Sloupec 2: boj (OČ/Iniciativa/Rychlost), životy, kostky životů + záchrany proti smrti (pipy), útoky.
-- Sloupec 3: rychlý přehled kouzlení (jen caster), zdatnosti, jazyky, schopnosti.
-- Kouzla (tab „Sesílání kouzel") — **beze změny** funkčně; auto-enable dle casterů (§3).
-
-## 6. Vizuál
-
-Scope `[data-diary-system='dnd5e']`, paleta beze změny. Nové třídy (theme vars dnd): `dnd-identity`, `dnd-level-badge`, `dnd-prof-list`, `dnd-prof-row`, `pcol`/`pcap`, `dnd-sub-hint`, `dnd-foot-hint`, `dnd-tag-row`, `dnd-feat`, `add-link`, `del-btn`, `dnd-notes-full`. Responsivita dle `base.md` (3→1 sloupec, prof-row stack na mobilu). Po implementaci → `mobil-desktop`.
-
-## 7. Print view
-
-`DndPrintView` aktualizovat: odebrat jméno/hráče; nahradit `classLevel` multipovoláním (Povolání L úr. — obor [/ pakt]); zázemí; auto-úroveň; zdatnosti/jazyky list; schopnosti (název: popis); poznámky. Zachovat útoky, kouzla.
-
-## 8. Akceptační kritéria (DoD)
-
-1. Hlavička bez jména/hráče/přesvědčení; zázemí = select + vlastní; úroveň = auto badge; rasa/XP zůstávají.
-2. Multipovolání: přidat/smazat řádek, obory dle povolání, zámek oboru pod prahem, auto součet úrovní.
-3. Černokněžník zobrazí 2 selecty (Patron od 1., Pakt od 3. úr); Totemový/Kruh země vypsané jako kombinace.
-4. Zdatnosti/jazyky/schopnosti = přidávatelné; bloky osobnosti odebrány; poznámky dole.
-5. Caster povolání auto-zapne tab kouzel; ruční přepínač má přednost.
-6. Legacy D&D postava se zobrazí bez ztráty dat (migrace read-only), první edit uloží nová pole.
-7. View mode disabluje vše; print view čte stejná data.
-8. Testy zelené (přepsaný `DndSheet.spec.tsx`); build čistý; mobil i desktop OK.
-9. Aktualizovat `funkce` (kap. deníky) + `napoveda` (Detail postavy) po živé kontrole.
-```
+1. Deník = JaD layout (multipovolání+obory, zázemí select, auto úroveň, přidávatelné sekce, kouzla tab); Černokněžník 2 osy.
+2. Mapa PC + chat PC = DndCombatPanel (k20, fatální, mixed zásah, iniciativa).
+3. Bestie mapa + chat = pergamen statblok (k20, HP±, edit).
+4. 8 skinů (fantasy default) přes `data-diary-skin`.
+5. Build čistý, testy zelené, ESLint čistý, `export-schemas` proběhl (BE deploy nutný).
+6. `funkce` + `napoveda` po živé kontrole.

@@ -1,0 +1,683 @@
+/* Jeskyně a draci (JaD) — skin „RETRO" (CRT terminál / synthwave 80s arkáda) — 16.2 JaD skiny.
+ *
+ * Přebarvuje + ornamentuje světlý pergamenový list JaD (`.dnd-*` + lokální tokeny na
+ * `.dnd-diary`) a jeho mapové/chatové povrchy (`--dd-*` combat/bestie panely +
+ * `--dd-embed-*` obal/dice/log) z pergamenu na ROZSVÍCENOU FOSFOROVOU OBRAZOVKU
+ * arkádového kabinetu. Tmavá fialovo-noční obrazovka (čitelně rozsvícená, jemná
+ * scanline — čitelnost vyšší než efekt), neon SUN-GRID horizont, 7-seg LED čísla.
+ * Postava se „bootuje" jako herní save (USR:: LOAD CHARACTER.DAT … OK).
+ *
+ * JaD baseline (světlý pergamen + Cinzel + vínová/zlatá + kosočtverec u nadpisů) je
+ * PŘEPRACOVÁN, ne přebarven:
+ *   kosočtverec u nadpisu     -. `>` terminálový prompt (h3 cyan)
+ *   úroveň badge tmavý box    -. 7-seg LED displej + zkosený chevron řez (jantar)
+ *   vlastnosti                -. LED readout (skóre cyan + modifikátor fosfor zelená/růžová)
+ *   OČ / iniciativa / rychlost-. chunky neon jantarové boxy
+ *   HP panel                  -. růžový neon rám + LED Aktuální Životy + damageable lišta
+ *   dovednosti/záchrany pip    -. pixelové LED pipy (zdatnost zelená, expertíza jantar)
+ *
+ * Rodinná DNA (RETRO = tentýž svět v matrix / drd16 / drdplus / drd2 / jad):
+ *   scanline + fosfor glow · ASCII rohy hran · 7-seg LED (VT323) · USR:: / `>` /
+ *   `.` prompt · pixelové pipy · neon SUN-GRID horizont · synthwave paleta ·
+ *   šikmé chevron řezy. Hodnoty palety sdíleny s drd2-retro pro rodinnou shodu.
+ *
+ * Sémantika JaD:  Životy/HP=neon růžová · kouzla/pozice/SO=cyan · OČ=jantar ·
+ *   fatální neúspěch=krvavá rudá (rozlišena od HP růžové) · fatální úspěch=zlatá ·
+ *   kladný hod/zdatnost=fosfor zelená · záporný hod/postih=růžová · neutrální=jantar.
+ *
+ * Fonty: jen Google Fonts (Orbitron / Share Tech Mono / VT323). DSEG7 (pravý
+ *   7-segment) NEpoužit — cdn.jsdelivr.net porušuje CSP -. blokovaný @import shazoval
+ *   DiaryTab chunk. VT323 + glow dává LED dojem v rámci povolených fonts.googleapis.com.
+ *
+ * Scope: KAŽDÉ pravidlo `[data-diary-system='dnd5e'][data-diary-skin='retro']` (vyšší
+ *   specificita než default pergamen na `[data-diary-system='dnd5e'] .dnd-diary` -.
+ *   přebíjí bez ohledu na pořadí načtení). Pouze CSS/SVG, žádný JS. Regrese-safe:
+ *   jen overrides pod compound selektorem. Mapa i chat sdílí TYTÉŽ panely -. `--dd-*`
+ *   je oskinují OBA identicky.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=VT323&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 1) PALETA — lokální `--rt-*` proměnné (zdroj pravdy mockupu) na kořeni skinu.
+ *    Definuju je na compound selektoru -. zdědí list i panely i embedy.
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] {
+  /* noc / kabinet */
+  --rt-night-0: #0a0414; /* nejhlubší vnější rám */
+  --rt-night-1: #140a26; /* tmavý rám / kabinet */
+  --rt-night-2: #1c1033; /* obrazovka base */
+
+  /* plochy panelů (papír -. tmavá obrazovka, ČITELNĚJŠÍ než noc) */
+  --rt-screen-0: #241445; /* nejsvětlejší panel */
+  --rt-screen-1: #1b0f33; /* base panel */
+  --rt-screen-2: #130a24; /* inset / zápust */
+  --rt-screen-edge: #6f3aa8;
+
+  /* text */
+  --rt-ink: #f4ecff;
+  --rt-ink-soft: #c3aee0;
+  --rt-ink-faint: #8a72ad;
+  --rt-ink-deep: #0a0414; /* text na světlém neonu */
+
+  /* jantar / akcent / OČ (zlatá rodina) */
+  --rt-amber: #ffb347;
+  --rt-amber-hi: #ffe07a;
+  --rt-amber-deep: #7a5418;
+
+  /* Životy (HP) — neon růžová (červená rodina) */
+  --rt-pink: #ff2e97;
+  --rt-pink-hi: #ff8ec9;
+  --rt-pink-deep: #a01060;
+
+  /* kouzla / pozice / SO — cyan (safírová rodina) */
+  --rt-cyan: #22d3ee;
+  --rt-cyan-hi: #8af3ff;
+  --rt-cyan-deep: #0c6b80;
+
+  /* fatální neúspěch — krvavá rudá (rudší než HP růžová) */
+  --rt-blood: #ff5252;
+  --rt-blood-hi: #ff8a8a;
+  --rt-blood-deep: #8a1414;
+
+  /* kladný hod / zdatnost — fosfor zelená */
+  --rt-emer: #3ddc84;
+  --rt-emer-hi: #8af5b6;
+  --rt-emer-deep: #147a47;
+
+  --rt-line: rgba(111, 58, 168, 0.55);
+  --rt-line-soft: rgba(74, 42, 115, 0.5);
+
+  --rt-f-title: 'Orbitron', 'Share Tech Mono', sans-serif;
+  --rt-f-head: 'Share Tech Mono', monospace;
+  --rt-f-body: 'Share Tech Mono', 'Courier New', monospace;
+  --rt-f-num: 'VT323', monospace; /* LED čísla */
+
+  /* sun-grid + neon texture pro plochy (vetkáno -. dorazí i na embedy/panely) */
+  --rt-screen-tex:
+    radial-gradient(120% 62% at 50% 0%, rgba(255, 46, 151, 0.13), transparent 60%),
+    radial-gradient(90% 50% at 50% 100%, rgba(34, 211, 238, 0.1), transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(34, 211, 238, 0.045) 39px 40px),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 46, 151, 0.04) 31px 32px),
+    linear-gradient(180deg, #231043, #160a2b 80%);
+  /* CRT scanline (jemná — čitelnost) */
+  --rt-scan: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, 0.3) 2px 3px);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 2) LIST `.dnd-diary` — override lokálních tokenů (pergamen -. obrazovka) +
+ *    plocha / chunky neon rám / sun-grid podlaha (::before) + scanline (::after).
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary {
+  /* lokální `--dnd-*` tokeny (jad.css je definuje na .dnd-diary) */
+  --dnd-accent: #ff2e97; /* vínová -. neon růžová (HP/akcent) */
+  --dnd-accent-soft: #ff8ec9;
+  --dnd-gold: #ffb347; /* pečeti / pipy / bullet -. jantar */
+  --dnd-border: rgba(111, 58, 168, 0.55);
+  --dnd-border-soft: rgba(74, 42, 115, 0.5);
+  --dnd-panel-bg: #1b0f33; /* papír je teď TMAVÝ */
+  --dnd-box: #1b0f33;
+  --dnd-highlight: #241445;
+  --dnd-ink-soft: #c3aee0;
+
+  position: relative;
+  isolation: isolate;
+  color: var(--rt-ink);
+  font-family: var(--rt-f-body);
+  border-radius: 14px;
+  /* rozsvícená obrazovka + sun-grid vetkaný do textury */
+  background: var(--rt-screen-tex);
+  background-color: #160a2b;
+  /* chunky neon bevel rám (přebíjí pergamenový box-shadow + 1px border) */
+  border: 1px solid var(--rt-night-0);
+  box-shadow:
+    0 0 0 1px var(--rt-pink),
+    0 0 0 5px var(--rt-night-0),
+    0 0 0 6px var(--rt-cyan-deep),
+    0 0 28px -2px rgba(255, 46, 151, 0.45),
+    0 0 60px -6px rgba(34, 211, 238, 0.28),
+    0 40px 90px -30px #000;
+}
+
+/* SIGNATURE: sun-grid podlaha (perspektivní mřížka mizící do dálky) na dně listu. */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 220px;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 0 0 14px 14px;
+  overflow: hidden;
+  background:
+    linear-gradient(0deg, rgba(13, 4, 32, 0) 0 40%, #0e0722 92%),
+    repeating-linear-gradient(90deg, transparent 0 38px, rgba(34, 211, 238, 0.18) 38px 39px),
+    repeating-linear-gradient(0deg, transparent 0 30px, rgba(255, 46, 151, 0.15) 30px 31px);
+  -webkit-mask-image: linear-gradient(0deg, #000 0 55%, transparent 100%);
+  mask-image: linear-gradient(0deg, #000 0 55%, transparent 100%);
+  transform-origin: bottom;
+  transform: perspective(420px) rotateX(62deg);
+}
+
+/* SIGNATURE: CRT scanline + vinětace přes celou obrazovku (jemné, opacity <= .5). */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  border-radius: 14px;
+  background:
+    var(--rt-scan),
+    radial-gradient(130% 120% at 50% 45%, transparent 60%, rgba(0, 0, 0, 0.42) 100%);
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+/* obsah listu nad ornamenty */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Společné inputy / select / textarea -. terminálová obrazovka ────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary input,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary textarea,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary select {
+  background: var(--rt-screen-2);
+  border: 1px solid var(--rt-line);
+  border-radius: 3px;
+  color: var(--rt-ink);
+  font-family: var(--rt-f-body);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary input:focus,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary textarea:focus,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary select:focus {
+  border-color: var(--rt-cyan);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.18);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary input:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary textarea:disabled,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary select:disabled {
+  background: var(--rt-screen-1);
+  color: var(--rt-ink-soft);
+  opacity: 0.95;
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary input::placeholder,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary textarea::placeholder {
+  color: var(--rt-ink-faint);
+}
+/* scrollbar -. neon */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary ::-webkit-scrollbar-thumb {
+  background: rgba(255, 46, 151, 0.35);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 46, 151, 0.55);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 3) SIGNATURE ORNAMENTY + fonty na globální `.dnd-*` třídy.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Nadpisy h3: Orbitron + `>` terminálový prompt (přebíjí kosočtverec) ─── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary h3 {
+  font-family: var(--rt-f-title);
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: 0.12em;
+  color: var(--rt-cyan-hi);
+  border-bottom: 1px solid var(--rt-line);
+  text-shadow: 0 0 8px var(--rt-cyan);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary h3::before {
+  content: '>';
+  color: var(--rt-pink);
+  font-family: var(--rt-f-body);
+  font-size: 1em;
+  text-shadow: 0 0 6px var(--rt-pink);
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tabs {
+  border-bottom-color: var(--rt-line);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tabs button,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tabs .dnd-tab-toggle {
+  font-family: var(--rt-f-title);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--rt-ink-faint);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tabs button.active {
+  color: var(--rt-cyan-hi);
+  border-bottom-color: var(--rt-cyan);
+  text-shadow: 0 0 8px var(--rt-cyan);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tabs button:hover:not(.active) {
+  color: var(--rt-ink-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tabs .dnd-tab-toggle {
+  font-family: var(--rt-f-head);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--rt-amber-hi);
+  text-transform: uppercase;
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tabs .dnd-tab-toggle input {
+  accent-color: var(--rt-amber);
+}
+
+/* ── Header / identity: `.` marker u labelu ─────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-header {
+  background: var(--rt-screen-1);
+  border: 1px solid var(--rt-line);
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-field label {
+  font-family: var(--rt-f-head);
+  letter-spacing: 0.14em;
+  color: var(--rt-ink-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-field label::before {
+  content: '\250C '; /* ASCII roh ┌ */
+  color: var(--rt-cyan-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-field input,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-field select {
+  border: none;
+  border-bottom: 1px solid var(--rt-line);
+  border-radius: 3px 3px 0 0;
+  background: var(--rt-screen-2);
+  color: var(--rt-ink);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-field select {
+  color: var(--rt-cyan-hi);
+}
+
+/* ── Úroveň badge: 7-seg LED + zkosený chevron řez (jantar) ─────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-level-badge {
+  background: linear-gradient(180deg, var(--rt-screen-0), var(--rt-screen-2));
+  color: var(--rt-amber-hi);
+  border: 1.5px solid var(--rt-amber-deep);
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.7), 0 0 12px -3px var(--rt-amber);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-level-badge .num {
+  font-family: var(--rt-f-num);
+  font-weight: 400;
+  font-size: 2.4rem;
+  color: var(--rt-amber-hi);
+  text-shadow: 0 0 14px var(--rt-amber);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-level-badge .cap {
+  font-family: var(--rt-f-head);
+  letter-spacing: 0.18em;
+  color: var(--rt-ink-faint);
+  opacity: 1;
+}
+
+/* ── Panel: ASCII rohy ┌┐└┘ (SIGNATURE) ─────────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-panel {
+  position: relative;
+  background: var(--rt-screen-1);
+  border: 1px solid var(--rt-line);
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px var(--rt-line-soft), inset 0 0 22px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-panel::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M2 13 L2 2 L13 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M12 13 L12 2 L1 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M2 1 L2 12 L13 12'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M12 1 L12 12 L1 12'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 3px rgba(255, 179, 71, 0.5));
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-panel > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Multipovolání: `.` marker, jantarový select, LED úroveň ────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-prof-row .pcap {
+  font-family: var(--rt-f-head);
+  letter-spacing: 0.1em;
+  color: var(--rt-ink-faint);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-prof-row .pcap::before {
+  content: '\250C '; /* ┌ */
+  color: var(--rt-cyan-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-prof-row select {
+  color: var(--rt-amber-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-prof-row .pcol-lvl input {
+  font-family: var(--rt-f-num);
+  font-size: 18px;
+  color: var(--rt-cyan);
+  text-shadow: 0 0 5px var(--rt-cyan);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-sub-hint {
+  font-family: var(--rt-f-head);
+  font-style: normal;
+  color: var(--rt-amber);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-foot-hint {
+  font-family: var(--rt-f-head);
+  font-style: normal;
+  color: var(--rt-ink-faint);
+}
+
+/* ── add-link / del-btn ──────────────────────────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .add-link {
+  font-family: var(--rt-f-head);
+  letter-spacing: 0.06em;
+  color: var(--rt-cyan-hi);
+  border: 1px dashed var(--rt-cyan-deep);
+  border-radius: 3px;
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .add-link:hover {
+  color: var(--rt-ink-deep);
+  background: var(--rt-cyan);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-prof-row .del-btn,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tag-row .del-btn,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-feat-head .del-btn {
+  color: var(--rt-pink);
+  text-shadow: 0 0 6px var(--rt-pink);
+}
+
+/* ── COL 1: vlastnosti = LED readout boxy ────────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-stat-box {
+  background: var(--rt-screen-2);
+  border: 1px solid var(--rt-line-soft);
+  border-radius: 4px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-stat-box span.lbl {
+  font-family: var(--rt-f-head);
+  font-weight: 700;
+  color: var(--rt-amber-hi);
+  letter-spacing: 0.06em;
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-stat-box span.mod {
+  font-family: var(--rt-f-num);
+  font-size: 1.6rem;
+  color: var(--rt-emer); /* modifikátor = fosfor zelená (kladný) */
+  text-shadow: 0 0 6px var(--rt-emer);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-stat-box span.mod.neg {
+  color: var(--rt-pink); /* záporný = růžová */
+  text-shadow: 0 0 6px var(--rt-pink);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-stat-box input {
+  font-family: var(--rt-f-num);
+  font-size: 1.5rem;
+  color: var(--rt-cyan); /* skóre = cyan LED */
+  text-shadow: 0 0 6px var(--rt-cyan);
+  background: var(--rt-night-1);
+  border: 1px solid var(--rt-line-soft);
+}
+
+/* ── Seznamy (záchrany / dovednosti / pasivní) — pixel LED pipy ──────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row {
+  border-bottom: 1px solid var(--rt-line-soft);
+}
+/* pip ○/●/◉ -. hranatý pixel LED: vyp = zápust, zdatnost = zelená, expertíza = jantar */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row button.prof {
+  border-radius: 0;
+  border: none;
+  background: var(--rt-screen-2);
+  box-shadow: inset 0 0 0 1.5px var(--rt-screen-edge);
+  color: transparent; /* skryj znak ○; svítí jen plocha */
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row button.prof.proficient,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row button.prof.on {
+  background: var(--rt-emer);
+  box-shadow: 0 0 7px var(--rt-emer);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row button.prof.expertise,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row button.prof.exp {
+  background: var(--rt-amber);
+  box-shadow: 0 0 7px var(--rt-amber);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row span.mod {
+  font-family: var(--rt-f-num);
+  font-size: 1.1rem;
+  color: var(--rt-cyan-hi);
+  text-shadow: 0 0 5px var(--rt-cyan);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row span.mod.neg {
+  color: var(--rt-pink);
+  text-shadow: 0 0 5px var(--rt-pink);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row span.lbl {
+  color: var(--rt-ink);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row span.sub {
+  font-family: var(--rt-f-head);
+  color: var(--rt-ink-faint);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-list-row input {
+  font-family: var(--rt-f-num);
+  font-size: 1.1rem;
+  color: var(--rt-amber-hi);
+  text-shadow: 0 0 5px var(--rt-amber);
+  text-align: center;
+}
+
+/* ── COL 2: combat meta = chunky neon jantarové boxy (OČ) ───────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-meta-box {
+  background: linear-gradient(180deg, var(--rt-screen-0), var(--rt-screen-2));
+  border: 1.5px solid var(--rt-amber);
+  box-shadow: 0 0 14px -3px var(--rt-amber), inset 0 0 18px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-meta-box label {
+  font-family: var(--rt-f-head);
+  letter-spacing: 0.08em;
+  color: var(--rt-amber-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-meta-box input,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-meta-box span.val {
+  font-family: var(--rt-f-num);
+  font-size: 2.1rem;
+  font-weight: 400;
+  color: var(--rt-amber-hi);
+  text-shadow: 0 0 12px var(--rt-amber);
+}
+/* iniciativa = svižná akce -. fosfor zelený LED */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-meta-box.init input,
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-meta-box.init span.val {
+  color: var(--rt-emer);
+  text-shadow: 0 0 12px var(--rt-emer);
+}
+
+/* ── HP panel: růžový neon rám + LED Aktuální Životy ─────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-hp-panel {
+  background: var(--rt-screen-1);
+  border: 2px solid var(--rt-pink);
+  box-shadow: 0 0 16px -4px var(--rt-pink), inset 0 0 18px rgba(0, 0, 0, 0.5);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-hp-panel .hp-box label {
+  font-family: var(--rt-f-head);
+  color: var(--rt-ink-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-hp-panel .hp-box input {
+  font-family: var(--rt-f-num);
+  color: var(--rt-pink); /* Životy = neon růžová LED */
+  text-shadow: 0 0 12px var(--rt-pink);
+  background: var(--rt-night-1);
+  border: 1px solid var(--rt-pink-deep);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Tabulky ─────────────────────────────────────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-table th {
+  font-family: var(--rt-f-head);
+  color: var(--rt-ink-soft);
+  border-bottom: 2px solid var(--rt-pink-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-table td {
+  border-bottom: 1px solid var(--rt-line-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-table .del-btn {
+  color: var(--rt-pink);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-table .del-btn:hover {
+  color: var(--rt-blood);
+}
+
+/* ── Tag-row (zdatnosti / jazyky) — bullet -. jantar pixel ──────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tag-row {
+  border-bottom: 1px dotted var(--rt-line-soft);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tag-row .bullet {
+  color: var(--rt-amber);
+  text-shadow: 0 0 5px var(--rt-amber);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tag-row input {
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--rt-ink);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-tag-row input:focus {
+  border-bottom-color: var(--rt-cyan);
+}
+
+/* ── Schopnosti (feat karty) — jantarový akcent levého okraje ────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-feat {
+  background: var(--rt-screen-2);
+  border: 1px solid var(--rt-line);
+  border-left: 3px solid var(--rt-amber);
+  border-radius: 6px;
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-feat-head input {
+  font-family: var(--rt-f-title);
+  font-weight: 700;
+  color: var(--rt-amber-hi);
+  border-bottom: 1px solid var(--rt-line);
+  background: transparent;
+  text-shadow: 0 0 6px var(--rt-amber);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-feat textarea {
+  background: transparent;
+  border: none;
+  color: var(--rt-ink-soft);
+  font-family: var(--rt-f-body);
+}
+
+/* ── Notes ───────────────────────────────────────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-notes-full textarea {
+  background-image: repeating-linear-gradient(transparent 0 25px, rgba(255, 46, 151, 0.1) 25px 26px);
+  color: var(--rt-ink-soft);
+}
+
+/* ── Kouzla (Spells tab) — cyan ──────────────────────────────────────────── */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-spells .spell-header {
+  background: var(--rt-screen-1);
+  border: 1px solid var(--rt-line);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-spells .spell-header div label {
+  font-family: var(--rt-f-head);
+  color: var(--rt-cyan-hi);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-spells .spell-header div input {
+  font-family: var(--rt-f-num);
+  font-size: 18px;
+  color: var(--rt-cyan);
+  text-shadow: 0 0 5px var(--rt-cyan);
+  text-align: center;
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-spells .spell-level {
+  background: var(--rt-screen-1);
+  border: 1px solid var(--rt-cyan-deep);
+  box-shadow: 0 0 12px -5px var(--rt-cyan), inset 0 0 14px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-spells .sl-title {
+  border-bottom: 2px solid var(--rt-cyan-deep);
+}
+[data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary .dnd-spells .sl-title h4 {
+  font-family: var(--rt-f-title);
+  font-weight: 700;
+  color: var(--rt-cyan-hi);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 8px var(--rt-cyan);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 4) PANELY na mapě/chatu (combat + bestie) — `--dd-*` token override.
+ *    Hashované `.root` třídy NEJDOU cílit globálně -. reskin JEN přes tokeny.
+ *    Mapa i chat sdílí tytéž panely -. tento blok je oskinuje OBA identicky.
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] {
+  /* base paleta */
+  --dd-panel-bg: var(--rt-screen-tex), #160a2b; /* plocha panelu (sun-grid dorazí) */
+  --dd-card-bg: linear-gradient(180deg, var(--rt-screen-0), var(--rt-screen-2)); /* karty/boxy */
+  --dd-row-bg: linear-gradient(90deg, rgba(36, 20, 69, 0.85), rgba(19, 10, 36, 0.7)); /* hover */
+  --dd-ink: #f4ecff;
+  --dd-ink-soft: #c3aee0;
+  --dd-parch-edge: #6f3aa8; /* border */
+  --dd-rule: rgba(111, 58, 168, 0.55);
+
+  /* role: vínová akcent -. neon růžová (HP/tituly/hodnoty/prof) · gold -. jantar (OČ/½-zdat.) */
+  --dd-accent: #ff2e97;
+  --dd-accent-bd: #a01060;
+  --dd-gold: #ffb347;
+  --dd-gold-bd: #7a5418;
+
+  /* doplňkové role (drží sémantiku napříč panely) */
+  --dd-sapphire: #22d3ee; /* kouzla / pozice / SO */
+  --dd-sapphire-bd: #0c6b80;
+  --dd-blood: #ff5252; /* fatální neúspěch / ohrožení */
+  --dd-blood-bd: #8a1414;
+  --dd-emer: #3ddc84; /* kladný hod / zdatnost */
+  --dd-emer-bd: #147a47;
+
+  /* HP lišta (bestie Výdrž je damageable -. růžová) */
+  --dd-hpbar-track: #130a24;
+  --dd-hpfill-grad: linear-gradient(90deg, var(--rt-pink-deep), var(--rt-pink));
+  --dd-hptxt-glow: 0 0 8px rgba(255, 46, 151, 0.55); /* na TMAVÉM ztlumeno */
+
+  /* fonty — terminál (mono) */
+  --dd-font-head: var(--rt-f-head);
+  --dd-font-body: var(--rt-f-body);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 5) EMBED plochy (obal v TM / dice readout / dicelog / chat) — `--dd-embed-*`.
+ *    Plocha NEPRŮHLEDNÁ (plný gradient) -. nesmí prosvítat na mapu.
+ *    Sémantika: pos = kladný hod / fatální úspěch (fosfor zelená / jantar) ·
+ *    neg = záporný / fatální neúspěch (růžová / krvavá) · neutral = iniciativa (jantar).
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='dnd5e'][data-diary-skin='retro'] {
+  --dd-forge-1: #160a2b; /* tmavý fallback pod readout bg */
+  --dd-embed-surface: linear-gradient(180deg, #241148, #1b0f37 58%, #120726); /* OPAQUE */
+  --dd-embed-border: var(--rt-screen-edge);
+  --dd-embed-line: rgba(111, 58, 168, 0.45);
+  --dd-embed-text: var(--rt-ink);
+  --dd-embed-muted: var(--rt-ink-soft);
+  --dd-embed-title: var(--rt-cyan-hi);
+  --dd-embed-chip-bg: rgba(255, 179, 71, 0.1);
+  --dd-embed-accent: var(--rt-amber);
+  --dd-embed-num-font: var(--rt-f-num);
+  --dd-embed-title-font: var(--rt-f-title);
+  --dd-embed-pos: #3ddc84; /* kladný hod / fatální úspěch = fosfor zelená (zlatý glow níže) */
+  --dd-embed-neg: var(--rt-pink); /* záporný / postih = neon růžová */
+  --dd-embed-neutral: var(--rt-amber-hi); /* neutrální / iniciativa = jantar */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 6) RESPONSIVITA — ornament/plocha, co kolabuje (grid 3-.1 a identity 4-.2
+ *    řeší jad.css; tady jen doplňky pro neon sun-grid podlahu na mobilu).
+ * ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 560px) {
+  /* nižší sun-grid horizont na úzké obrazovce, ať nepřekrývá obsah */
+  [data-diary-system='dnd5e'][data-diary-skin='retro'] .dnd-diary::before {
+    height: 150px;
+  }
+}

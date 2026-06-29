@@ -64,6 +64,7 @@ export const DEFAULT_SKIN_BY_SYSTEM: Record<string, DiarySkinId> = {
   drdplus: 'fantasy',
   drd2: 'fantasy',
   jad: 'fantasy',
+  dnd5e: 'fantasy',
   drdh: 'fantasy',
   coc: 'horror',
 };

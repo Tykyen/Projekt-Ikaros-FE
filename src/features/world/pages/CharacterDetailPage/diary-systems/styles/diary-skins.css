@@ -63,6 +63,17 @@
 @import './jad-skins/retro.css';
 @import './jad-skins/anime.css';
 
+/* 8.7s — D&D 5e skiny = KLON JaD (jediný rozdíl povolání/zázemí; skiny shodné).
+   Scoped `[data-diary-system='dnd5e'][data-diary-skin='X']`. */
+@import './dnd5e-skins/scifi.css';
+@import './dnd5e-skins/fantasy.css';
+@import './dnd5e-skins/horror.css';
+@import './dnd5e-skins/steampunk.css';
+@import './dnd5e-skins/nature.css';
+@import './dnd5e-skins/minimal.css';
+@import './dnd5e-skins/retro.css';
+@import './dnd5e-skins/anime.css';
+
 /* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
    dice readout / orchestrace) ════════════
  * ŽIJÍ ZDE, ne v `drd16.css` — ten je lazy (jen deníková stránka), kdežto embedy

@@ -1,24 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import {
-  abilityMod,
+  calcMod,
   calcSaveMod,
   calcSkillMod,
   fmtMod,
+  parseDamageFormula,
 } from '../formulas';
 
-describe('DnD5e formulas (8.7d)', () => {
-  describe('abilityMod', () => {
+describe('JaD formulas (8.7b)', () => {
+  describe('calcMod', () => {
     it('vrátí 0 pro score 10', () => {
-      expect(abilityMod(10)).toBe(0);
+      expect(calcMod(10)).toBe(0);
     });
-    it('vrátí +2 pro score 14', () => {
-      expect(abilityMod(14)).toBe(2);
+    it('vrátí +1 pro score 12', () => {
+      expect(calcMod(12)).toBe(1);
     });
-    it('vrátí -1 pro score 9', () => {
-      expect(abilityMod(9)).toBe(-1);
+    it('vrátí -1 pro score 8', () => {
+      expect(calcMod(8)).toBe(-1);
     });
-    it('vrátí +4 pro score 18', () => {
-      expect(abilityMod(18)).toBe(4);
+    it('vrátí +3 pro score 16', () => {
+      expect(calcMod(16)).toBe(3);
+    });
+    it('vrátí -5 pro score 1', () => {
+      expect(calcMod(1)).toBe(-5);
     });
   });
 
@@ -26,7 +30,7 @@ describe('DnD5e formulas (8.7d)', () => {
     it('formátuje kladné s plusem', () => {
       expect(fmtMod(3)).toBe('+3');
     });
-    it('formátuje záporné s minusem', () => {
+    it('formátuje zápor s minusem (default JS)', () => {
       expect(fmtMod(-2)).toBe('-2');
     });
     it('formátuje nulu jako +0', () => {
@@ -52,6 +56,40 @@ describe('DnD5e formulas (8.7d)', () => {
     });
     it('přidá profBonus se zdatností', () => {
       expect(calcSaveMod(1, true, 2)).toBe(3);
+    });
+  });
+
+  describe('parseDamageFormula (8.7q)', () => {
+    it('naparsuje 2k10+2k6+2k4+5', () => {
+      expect(parseDamageFormula('2k10+2k6+2k4+5')).toEqual({
+        mixed: { d10: 2, d6: 2, d4: 2 },
+        modifier: 5,
+      });
+    });
+    it('akceptuje d i mezery', () => {
+      expect(parseDamageFormula('1d8 + 3')).toEqual({
+        mixed: { d8: 1 },
+        modifier: 3,
+      });
+    });
+    it('záporný modifikátor', () => {
+      expect(parseDamageFormula('1k6-1')).toEqual({
+        mixed: { d6: 1 },
+        modifier: -1,
+      });
+    });
+    it('sečte stejné kostky', () => {
+      expect(parseDamageFormula('1k6+1k6')).toEqual({
+        mixed: { d6: 2 },
+        modifier: 0,
+      });
+    });
+    it('jen číslo', () => {
+      expect(parseDamageFormula('4')).toEqual({ mixed: {}, modifier: 4 });
+    });
+    it('prázdný / nesmysl → null', () => {
+      expect(parseDamageFormula('')).toBeNull();
+      expect(parseDamageFormula('xyz')).toBeNull();
     });
   });
 });
