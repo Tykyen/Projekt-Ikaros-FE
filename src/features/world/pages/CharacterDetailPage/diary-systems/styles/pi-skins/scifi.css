@@ -136,8 +136,7 @@
 }
 
 /* SIGNATURE: fialový BR bracket na panelech */
-[data-diary-system='pi'][data-diary-skin='scifi'] .pi-panel::after,
-[data-diary-system='pi'][data-diary-skin='scifi'] .cp-section::after {
+[data-diary-system='pi'][data-diary-skin='scifi'] .pi-panel::after {
   content: '';
   position: absolute;
   right: 9px;

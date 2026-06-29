@@ -138,9 +138,6 @@
     inset 0 0 26px #00000050, 0 2px 0 #00000060;
   isolation: isolate;
 }
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-section {
-  isolation: isolate;
-}
 [data-diary-system='pi'][data-diary-skin='fantasy'] .pi-portrait {
   border-radius: 3px;
 }
@@ -154,8 +151,7 @@
 
 /* SIGNATURE: filigránové zlaté rohové kování — 4 rohy v 1 ::before */
 [data-diary-system='pi'][data-diary-skin='fantasy'] .pi-panel::before,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-hero::before,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-section::before {
+[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-hero::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -172,8 +168,7 @@
 }
 
 /* iluminovaný zlatý titulek + fleuron marker */
-[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-title,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-title {
+[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-title {
   font-weight: 600;
   letter-spacing: 0.14em;
   background: linear-gradient(180deg, #f4e0a0, #c9a227 70%, #9c7a24);
@@ -182,8 +177,7 @@
   color: transparent;
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
 }
-[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-title::before,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-title::before {
+[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-title::before {
   content: '\2756';
   width: auto;
   height: auto;
@@ -194,8 +188,7 @@
   -webkit-text-fill-color: #e3b94a;
   font-size: 13px;
 }
-[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-title::after,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-title::after {
+[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-title::after {
   -webkit-text-fill-color: initial;
   height: 2px;
   background: linear-gradient(90deg, #8a6a36, transparent 92%),
@@ -260,8 +253,7 @@
 }
 
 /* drahokamové (cabochon) pipy */
-[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-pip.on,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-pip.on {
+[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-pip.on {
   border-color: transparent;
   background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.8), transparent 38%),
     radial-gradient(circle at 50% 50%, var(--lvlc), color-mix(in srgb, var(--lvlc) 50%, #000) 95%);
@@ -269,12 +261,10 @@
 }
 
 /* smaltované rýhované ukazatele */
-[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-seg.on,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-seg.on {
+[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-seg.on {
   position: relative;
 }
-[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-seg.on::after,
-[data-diary-system='pi'][data-diary-skin='fantasy'] .cp-seg.on::after {
+[data-diary-system='pi'][data-diary-skin='fantasy'] .pi-seg.on::after {
   content: '';
   position: absolute;
   inset: 1px 1px 50% 1px;

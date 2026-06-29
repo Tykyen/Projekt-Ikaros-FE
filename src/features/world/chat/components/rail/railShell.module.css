@@ -168,6 +168,204 @@
   color: var(--pi-muted, #76809a);
 }
 
+/* ════════════ PI per-skin CHAT CHROME (jen barva/font, žádný ornament — policy §3)
+ * `--pi-log-*` skinu žijí na POTOMKU (DiarySkinScope), na `.panel` chrome nedosáhnou
+ * (tokeny tečou dolů). Proto per-skin cílíme `.panel:has([…][data-diary-skin='X'])`
+ * (čte potomka) s LITERÁLNÍMI hodnotami skinu = barva chrome sleduje skin. Surface
+ * OPAQUE. Bez per-skin bloku by chrome spadl na sci-fi baseline (#0e0f1e) pro vše. */
+.panel:has([data-diary-system='pi'][data-diary-skin='scifi']) {
+  background: #0e0f1e;
+  border-left-color: rgba(56, 224, 255, 0.3);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='scifi']) .identity {
+  border-bottom-color: rgba(56, 224, 255, 0.22);
+  background: color-mix(in srgb, #38e0ff 8%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='scifi']) .name {
+  color: #f0f3ff;
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='scifi']) .avatar {
+  border-color: #38e0ff;
+  box-shadow: 0 0 16px color-mix(in srgb, #38e0ff 30%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='scifi']) .iconBtn { color: #76809a; }
+.panel:has([data-diary-system='pi'][data-diary-skin='scifi']) .iconBtn:hover {
+  color: #aeb8d4;
+  background: color-mix(in srgb, #38e0ff 16%, transparent);
+}
+
+/* fantasy — grimoár pergamen + zlato */
+.panel:has([data-diary-system='pi'][data-diary-skin='fantasy']) {
+  background: radial-gradient(ellipse 90% 60% at 15% 20%, #3d2c14 0%, transparent 55%),
+    linear-gradient(160deg, #2e2010 0%, #261a0c 40%, #1e1409 70%, #221709 100%);
+  border-left-color: #9a7330;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='fantasy']) .identity {
+  border-bottom-color: #9a7330;
+  background: color-mix(in srgb, #e3b94a 8%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='fantasy']) .name {
+  color: #e3c06a;
+  font-family: 'Cinzel', serif;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='fantasy']) .avatar {
+  border-color: #e3b94a;
+  box-shadow: 0 0 16px color-mix(in srgb, #e3b94a 30%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='fantasy']) .iconBtn { color: #b89a6a; }
+.panel:has([data-diary-system='pi'][data-diary-skin='fantasy']) .iconBtn:hover {
+  color: #e3c06a;
+  background: color-mix(in srgb, #e3b94a 16%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='fantasy']) .avatarFallback { color: #b89a6a; }
+
+/* horror — půlnoční salon, stříbro + oxblood */
+.panel:has([data-diary-system='pi'][data-diary-skin='horror']) {
+  background: linear-gradient(160deg, #1e1118 0%, #180e14 45%, #120a10 100%);
+  border-left-color: #5a5460;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='horror']) .identity {
+  border-bottom-color: #5a5460;
+  background: color-mix(in srgb, #a2283a 8%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='horror']) .name {
+  color: #c8c4cf;
+  font-family: 'Cormorant SC', serif;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='horror']) .avatar {
+  border-color: #c8c4cf;
+  box-shadow: 0 0 16px color-mix(in srgb, #a2283a 30%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='horror']) .iconBtn { color: #ad9aa2; }
+.panel:has([data-diary-system='pi'][data-diary-skin='horror']) .iconBtn:hover {
+  color: #ece2e6;
+  background: color-mix(in srgb, #a2283a 16%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='horror']) .avatarFallback { color: #ad9aa2; }
+
+/* steampunk — mosaz/bronz */
+.panel:has([data-diary-system='pi'][data-diary-skin='steampunk']) {
+  background: linear-gradient(180deg, #382818 0%, #2c1d10 55%, #201209 100%);
+  border-left-color: #9a7830;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='steampunk']) .identity {
+  border-bottom-color: #9a7830;
+  background: color-mix(in srgb, #d8b46a 8%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='steampunk']) .name {
+  color: #e0bc72;
+  font-family: 'IM Fell English SC', 'Cinzel', serif;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='steampunk']) .avatar {
+  border-color: #d8b46a;
+  box-shadow: 0 0 16px color-mix(in srgb, #d8b46a 30%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='steampunk']) .iconBtn { color: #a8895e; }
+.panel:has([data-diary-system='pi'][data-diary-skin='steampunk']) .iconBtn:hover {
+  color: #e0bc72;
+  background: color-mix(in srgb, #d8b46a 16%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='steampunk']) .avatarFallback { color: #a8895e; }
+
+/* nature — druidský herbář, lesní zeleň */
+.panel:has([data-diary-system='pi'][data-diary-skin='nature']) {
+  background: linear-gradient(180deg, #2f3d1c 0%, #26321a 42%, #1e2813 72%, #171e0f 100%);
+  border-left-color: #5e8038;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='nature']) .identity {
+  border-bottom-color: #5e8038;
+  background: color-mix(in srgb, #82b148 8%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='nature']) .name {
+  color: #b8e070;
+  font-family: 'Marcellus SC', serif;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='nature']) .avatar {
+  border-color: #82b148;
+  box-shadow: 0 0 16px color-mix(in srgb, #82b148 30%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='nature']) .iconBtn { color: #bccb98; }
+.panel:has([data-diary-system='pi'][data-diary-skin='nature']) .iconBtn:hover {
+  color: #eef0d4;
+  background: color-mix(in srgb, #82b148 16%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='nature']) .avatarFallback { color: #bccb98; }
+
+/* minimal — světlý papír, tmavý text (POZOR: světlý surface) */
+.panel:has([data-diary-system='pi'][data-diary-skin='minimal']) {
+  background: #f6f2e9;
+  border-left-color: #cabfa8;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='minimal']) .identity {
+  border-bottom-color: #cabfa8;
+  background: color-mix(in srgb, #9a7b2e 7%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='minimal']) .name {
+  color: #20211f;
+  font-family: 'Fraunces', serif;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='minimal']) .avatar {
+  border-color: #9a7b2e;
+  box-shadow: 0 0 14px color-mix(in srgb, #9a7b2e 22%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='minimal']) .iconBtn { color: #8d8779; }
+.panel:has([data-diary-system='pi'][data-diary-skin='minimal']) .iconBtn:hover {
+  color: #4d4a42;
+  background: color-mix(in srgb, #9a7b2e 12%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='minimal']) .avatarFallback { color: #8d8779; }
+
+/* retro — CRT jantarový fosfor */
+.panel:has([data-diary-system='pi'][data-diary-skin='retro']) {
+  background: #0d0701;
+  border-left-color: #8a5e15;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='retro']) .identity {
+  border-bottom-color: #8a5e15;
+  background: color-mix(in srgb, #ffb627 8%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='retro']) .name {
+  color: #ffc24d;
+  font-family: 'VT323', monospace;
+  letter-spacing: 0.04em;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='retro']) .avatar {
+  border-color: #ffb627;
+  box-shadow: 0 0 16px color-mix(in srgb, #ffb627 30%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='retro']) .iconBtn { color: #c98a1d; }
+.panel:has([data-diary-system='pi'][data-diary-skin='retro']) .iconBtn:hover {
+  color: #ffb627;
+  background: color-mix(in srgb, #ffb627 16%, transparent);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='retro']) .avatarFallback { color: #c98a1d; }
+
+/* anime (MLP) — duhový povrch, ink text (POZOR: pestrý surface) */
+.panel:has([data-diary-system='pi'][data-diary-skin='anime']) {
+  background: linear-gradient(135deg, #ff5d6c 0%, #ff9a4d 16%, #ffe14d 33%, #5bd47e 50%, #3ac0ff 66%, #7a6bff 82%, #ff6ad5 100%);
+  border-left-color: #16162e;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='anime']) .identity {
+  border-bottom-color: #16162e;
+  background: rgba(255, 255, 255, 0.18);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='anime']) .name {
+  color: #16162e;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='anime']) .avatar {
+  border-color: #16162e;
+  box-shadow: 0 0 0 2px #16162e, 0 4px 10px rgba(26, 20, 80, 0.35);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='anime']) .iconBtn { color: #2b2a55; }
+.panel:has([data-diary-system='pi'][data-diary-skin='anime']) .iconBtn:hover {
+  color: #16162e;
+  background: rgba(255, 255, 255, 0.35);
+}
+.panel:has([data-diary-system='pi'][data-diary-skin='anime']) .avatarFallback { color: #2b2a55; }
+
 /* ════════════ 16.2e — CHAT OBAL (rail): per-skin SIGNATURE ornament ════════════
  * Parita s ORCHESTRACE (MapPjPanel) + deníkem. Skin nese vlastní TVAR, ne jen
  * barvu. Zdroj pravdy: file:///C:/tmp/<sys>-skins/<skin>/index.html sekce

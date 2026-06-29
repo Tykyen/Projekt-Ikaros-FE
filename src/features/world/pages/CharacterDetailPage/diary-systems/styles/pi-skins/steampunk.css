@@ -139,9 +139,6 @@
     0 2px 5px #00000080;
   isolation: isolate;
 }
-[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-section {
-  isolation: isolate;
-}
 [data-diary-system='pi'][data-diary-skin='steampunk'] .pi-portrait {
   border-radius: 3px;
 }
@@ -155,8 +152,7 @@
 
 /* SIGNATURE: rohové mosazné nýty — 4 cvočky v 1 ::before */
 [data-diary-system='pi'][data-diary-skin='steampunk'] .pi-panel::before,
-[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-hero::before,
-[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-section::before {
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-hero::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -173,14 +169,12 @@
 }
 
 /* mosazný titulek + ozubené kolo */
-[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title,
-[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-title {
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-shadow: 0 1px 0 #00000080, 0 0 1px rgba(240, 216, 154, 0.27);
 }
-[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title::before,
-[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-title::before {
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title::before {
   content: '\2699';
   width: auto;
   height: auto;
@@ -191,23 +185,20 @@
   font-size: 15px;
   text-shadow: 0 1px 1px #000;
 }
-[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title::after,
-[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-title::after {
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-title::after {
   height: 2px;
   background: linear-gradient(90deg, #6e5226, transparent 92%),
     radial-gradient(circle at right, #c9a45e 1.5px, transparent 2px);
 }
 
 /* kovová tlaková koryta */
-[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-track,
-[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-track {
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-track {
   padding: 2px;
   background: #160f08;
   border-radius: 3px;
   box-shadow: inset 0 0 0 1px rgba(110, 82, 38, 0.27);
 }
-[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-seg.on,
-[data-diary-system='pi'][data-diary-skin='steampunk'] .cp-seg.on {
+[data-diary-system='pi'][data-diary-skin='steampunk'] .pi-seg.on {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), inset 0 -2px 3px rgba(0, 0, 0, 0.38);
 }
 

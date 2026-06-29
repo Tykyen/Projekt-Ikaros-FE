@@ -1168,3 +1168,18 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Jak ověřeno:** build mapa ✓ (exit 0) + build chat + ESLint 0. Vizuál uživatel na serveru.
 **Zhodnocení:** špatně jsem **aktivně argumentoval PROTI** správnému řešení z chybného předpokladu. Když uživatel řekne „stejné jako X" a X je na profesionální úrovni (HUD), „stejné" = replikuj profesionální vzhled, NE spoléhej na generický fallback.
 **Příznak cyklení:** tvrdím „generický/sdílený vzhled je OK/konzistentní" u systému, který má jinde (matrix) dedikovaný HUD → STOP; base pravidla chtějí profesionální per-systém vzhled, generický = dočasný dluh, ne cíl.
+
+---
+
+### ✅ ŘEŠENÍ — 8 skinů systému pi (Příběhy Impéria) napříč všemi povrchy · 2026-06-29
+**Co nakonec zabralo:** Port rodiny matrix → pi (`--mx-*`→`--pi-*`, `--mx-log-*`→`--pi-log-*`) přes 5 disjunktních fan-out agentů (2× list `pi-skins/*.css`, 1× readout, 1× obal TM, 1× color embedy dicelog/orchestrace/rail) nad foundation, kterou jsem udělal sám (baseline `--pi-log-*` v pi.css + 8 stubů + 8 @import + build zelený). Per-skin signatury readoutu/obalu = matrix bloky VERBATIM (jen selektor `matrix`→`pi`, hardcoded skin barvy/SVG jsou skin-intrinsic). Schválený HTML mockup = kontrakt.
+**Proč to je správně:** disjunktní soubory = 0 konfliktů při paralelním fan-outu; matrix je battle-tested sourozenec (HUD `--mx-*`), takže port = rodinná konzistence zdarma; foundation napřed = agenti stavěli na zeleném buildu.
+**3 pasti (rodiny už v deníku) + 1 NOVÁ:**
+- NOVÁ — **mockup-odvozené skiny míří na PLACEHOLDER třídy, co v reálném DOM neexistují**: mockup používal `.cp-section`/`.cp-title`/`.ro-readout` jako náhradu hashovaných modulových tříd; agenti je zkopírovali do produkčních skin souborů → ornament combat/bestie/scifi-readoutu byl TICHO MRTVÝ (build OK, barva OK, tvar chybí). Reálné třídy jsou `.section`/`.title`/`.readout` v `*.module.css`. **Poučení: render-verify proti REÁLNÉMU zdrojovému CSS (ne mockupu), ornament panelu/readoutu PATŘÍ do jeho `.module.css`** (rodina „hashované třídy nejdou z global CSS").
+- rodina CH-028 — **chat rail chrome nedosáhl na `--pi-log-*`**: tokeny žijí na potomku `DiarySkinScope`, chrome `.panel` je předek → CSS proměnné tečou jen dolů. Fix = per-skin `.panel:has([data-diary-system='pi'][data-diary-skin='X'])` s LITERÁLNÍMI barvami skinu (vzor dd rodin). 
+- rodina CH-024/sci-fi — 3-arg `var(a, b, c)` v `background` shorthandu = `transparent` (audit chytil latentně v pi readoutu, přepsáno na zanořené `var()`).
+- chybějící fonty (Orbitron/IM Fell English SC) v globálním @import → doplněno (graceful fallback držel čitelnost).
+**Jak ověřeno:** konsolidovaný `npm run build` ✓ (CSP OK) + render-audit 8 skinů × 8 povrchů proti zdrojovému CSS (tabulka nálezů, opraveno) + mobil 482px (hero stackuje, 0 overflow) + 2 živé screenshoty uživatele (chat chrome). 
+**Zhodnocení:** dobře — gated workflow (mockup→souhlas→impl) + fan-out disjunktních souborů + závěrečný render-audit chytil přesně to, co build neviděl (mrtvé `.cp-*`, chat chrome, 3-arg var). Uživatel sám nezávisle potvrdil chat-chrome nález = audit byl správný. Špatně: skin agenti zdědili placeholder třídy z mockupu (měl jsem v briefu explicitněji říct „ornament panelů do .module.css na reálné třídy, ne do skin souboru").
+
+---

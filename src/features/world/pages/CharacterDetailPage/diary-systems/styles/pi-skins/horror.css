@@ -135,9 +135,6 @@
     inset 0 0 34px #000000a0, 0 2px 6px #00000080;
   isolation: isolate;
 }
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-section {
-  isolation: isolate;
-}
 [data-diary-system='pi'][data-diary-skin='horror'] .pi-portrait {
   border-radius: 3px;
 }
@@ -164,8 +161,7 @@
 
 /* SIGNATURE: kovaná gotická stříbrná tracerie ve 4 rozích */
 [data-diary-system='pi'][data-diary-skin='horror'] .pi-panel::before,
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-hero::before,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-section::before {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-hero::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -182,8 +178,7 @@
 }
 
 /* elegantní stříbrný titulek + odsazení od tracerie */
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-title,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-title {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-title {
   font-family: 'Cormorant SC', serif;
   font-size: 16px;
   font-weight: 600;
@@ -195,8 +190,7 @@
   color: transparent;
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.56));
 }
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-title::before,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-title::before {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-title::before {
   width: 14px;
   height: 14px;
   background: #7a2030;
@@ -204,8 +198,7 @@
   box-shadow: 0 0 4px rgba(122, 32, 48, 0.5);
   transform: rotate(45deg);
 }
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-title::after,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-title::after {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-title::after {
   -webkit-text-fill-color: initial;
   background: linear-gradient(90deg, #6d6a76, transparent 88%),
     radial-gradient(circle at right, #c8c4cf 1.4px, transparent 2px);
@@ -235,8 +228,7 @@
 [data-diary-system='pi'][data-diary-skin='horror'] .pi-meta .v {
   font-style: italic;
 }
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-aspect__name,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-aspectName {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-aspect__name {
   font-style: italic;
 }
 
@@ -284,19 +276,16 @@
 }
 
 /* sametová koryta */
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-track,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-track {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-track {
   padding: 2px;
   background: #0c070a;
   border-radius: 3px;
   box-shadow: inset 0 0 0 1px rgba(109, 106, 118, 0.2), inset 0 1px 3px #000;
 }
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-seg.on,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-seg.on {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-seg.on {
   position: relative;
 }
-[data-diary-system='pi'][data-diary-skin='horror'] .pi-seg.on::after,
-[data-diary-system='pi'][data-diary-skin='horror'] .cp-seg.on::after {
+[data-diary-system='pi'][data-diary-skin='horror'] .pi-seg.on::after {
   content: '';
   position: absolute;
   inset: 1px 1px 55% 1px;

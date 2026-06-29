@@ -206,3 +206,309 @@
 }
 .chip[data-charged='true'] { background: color-mix(in srgb, var(--pi-charged, #4ade80) 12%, transparent); color: var(--pi-charged, #86efac); border-color: color-mix(in srgb, var(--pi-charged, #4ade80) 33%, transparent); box-shadow: var(--pi-chip-glow, 0 0 10px -3px rgba(74, 222, 128, 0.6)); }
 .chip[data-charged='false'] { background: color-mix(in srgb, var(--pi-depleted, #f87171) 8%, transparent); color: var(--pi-depleted, #c47c7c); border-color: color-mix(in srgb, var(--pi-depleted, #f87171) 22%, transparent); }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * pi (Příběhy Impéria) — per-skin SIGNATURE TVAR combat panelu (.section)
+ * --------------------------------------------------------------------------
+ * Hashovaná `.section` nejde zacílit z globálního pi-skins/*.css → ornament
+ * žije ZDE. SCOPE = DESCENDANT `[data-diary-system='pi'][data-diary-skin='X'] .section`
+ * (atributy na PŘEDKOVI: mapa TokenInfoPanel.panel, chat DiarySkinScope).
+ * Tvarový jazyk REUSE z listu/readoutu/obalu daného skinu (rohy + titulek).
+ * `.section` je positioned + isolation:isolate → ::before/::after overlay drží.
+ * Ornament ÚMĚRNÝ malému panelu (jemné rohy). Inline SVG, hardcoded skin barvy.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* ── FANTASY — filigránové zlaté rohové kování (4 rohy) + iluminovaný titulek ── */
+[data-diary-system='pi'][data-diary-skin='fantasy'] .section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: 26px 26px;
+  background-position: 3px 3px, calc(100% - 3px) 3px, 3px calc(100% - 3px), calc(100% - 3px) calc(100% - 3px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cpath d='M4 29 L4 10 C4 6 6 4 10 4 L29 4' stroke-width='1.4'/%3E%3Cpath d='M4 20 C4 13 11 12 13 17 C15 22 8 23 8 18' stroke-width='1.1'/%3E%3Ccircle cx='6.5' cy='6.5' r='1.9' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='6.5' cy='6.5' r='3.1' stroke-width='0.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(30 0) scale(-1 1)'%3E%3Cpath d='M4 29 L4 10 C4 6 6 4 10 4 L29 4' stroke-width='1.4'/%3E%3Cpath d='M4 20 C4 13 11 12 13 17 C15 22 8 23 8 18' stroke-width='1.1'/%3E%3Ccircle cx='6.5' cy='6.5' r='1.9' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='6.5' cy='6.5' r='3.1' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(0 30) scale(1 -1)'%3E%3Cpath d='M4 29 L4 10 C4 6 6 4 10 4 L29 4' stroke-width='1.4'/%3E%3Cpath d='M4 20 C4 13 11 12 13 17 C15 22 8 23 8 18' stroke-width='1.1'/%3E%3Ccircle cx='6.5' cy='6.5' r='1.9' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='6.5' cy='6.5' r='3.1' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(30 30) scale(-1 -1)'%3E%3Cpath d='M4 29 L4 10 C4 6 6 4 10 4 L29 4' stroke-width='1.4'/%3E%3Cpath d='M4 20 C4 13 11 12 13 17 C15 22 8 23 8 18' stroke-width='1.1'/%3E%3Ccircle cx='6.5' cy='6.5' r='1.9' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='6.5' cy='6.5' r='3.1' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}
+[data-diary-system='pi'][data-diary-skin='fantasy'] .title {
+  background: linear-gradient(180deg, #f4e0a0, #c9a227 70%, #9c7a24);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+}
+[data-diary-system='pi'][data-diary-skin='fantasy'] .title::before {
+  content: '\2756';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: #e3b94a;
+  -webkit-text-fill-color: #e3b94a;
+  font-size: 12px;
+}
+[data-diary-system='pi'][data-diary-skin='fantasy'] .title::after {
+  -webkit-text-fill-color: initial;
+  height: 2px;
+  background: linear-gradient(90deg, #8a6a36, transparent 92%),
+    radial-gradient(circle at right, #e3b94a 1.5px, transparent 2px);
+}
+
+/* ── HORROR — gotická stříbrná tracerie (4 rohy) + krvavý kosočtverec marker ── */
+[data-diary-system='pi'][data-diary-skin='horror'] .section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: 34px 34px;
+  background-position: 2px 2px, calc(100% - 2px) 2px, 2px calc(100% - 2px), calc(100% - 2px) calc(100% - 2px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 39 L3 15 C3 8 8 3 15 3 L39 3' stroke-width='1.5'/%3E%3Cpath d='M7 39 L7 16 C7 11 11 7 16 7 L39 7' stroke-width='0.8' opacity='0.55'/%3E%3Ccircle cx='9' cy='9' r='1.8' fill='%23a2283a' stroke='none'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(40 0) scale(-1 1)'%3E%3Cpath d='M3 39 L3 15 C3 8 8 3 15 3 L39 3' stroke-width='1.5'/%3E%3Cpath d='M7 39 L7 16 C7 11 11 7 16 7 L39 7' stroke-width='0.8' opacity='0.55'/%3E%3Ccircle cx='9' cy='9' r='1.8' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 40) scale(1 -1)'%3E%3Cpath d='M3 39 L3 15 C3 8 8 3 15 3 L39 3' stroke-width='1.5'/%3E%3Cpath d='M7 39 L7 16 C7 11 11 7 16 7 L39 7' stroke-width='0.8' opacity='0.55'/%3E%3Ccircle cx='9' cy='9' r='1.8' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23d2ced8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(40 40) scale(-1 -1)'%3E%3Cpath d='M3 39 L3 15 C3 8 8 3 15 3 L39 3' stroke-width='1.5'/%3E%3Cpath d='M7 39 L7 16 C7 11 11 7 16 7 L39 7' stroke-width='0.8' opacity='0.55'/%3E%3Ccircle cx='9' cy='9' r='1.8' fill='%23a2283a' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.6));
+  opacity: 0.92;
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .title {
+  padding-left: 22px;
+  background: linear-gradient(180deg, #eae6ee, #c8c4cf 60%, #7d7986);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.56));
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .title::before {
+  width: 11px;
+  height: 11px;
+  background: #7a2030;
+  -webkit-text-fill-color: initial;
+  box-shadow: 0 0 4px rgba(122, 32, 48, 0.5);
+  transform: rotate(45deg);
+}
+[data-diary-system='pi'][data-diary-skin='horror'] .title::after {
+  -webkit-text-fill-color: initial;
+  background: linear-gradient(90deg, #6d6a76, transparent 88%),
+    radial-gradient(circle at right, #c8c4cf 1.4px, transparent 2px);
+}
+
+/* ── STEAMPUNK — 4 rohové mosazné nýty + ozubené kolo marker ── */
+[data-diary-system='pi'][data-diary-skin='steampunk'] .section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  --_pi-nyt: radial-gradient(circle at 36% 34%, #f4e0a0, #c9a45e 42%, #6e4f24 78%, #4a3418 100%);
+  background-image: var(--_pi-nyt), var(--_pi-nyt), var(--_pi-nyt), var(--_pi-nyt);
+  background-repeat: no-repeat;
+  background-size: 9px 9px;
+  background-position: 5px 5px, calc(100% - 5px) 5px, 5px calc(100% - 5px), calc(100% - 5px) calc(100% - 5px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.67));
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .title {
+  text-shadow: 0 1px 0 #00000080, 0 0 1px rgba(240, 216, 154, 0.27);
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .title::before {
+  content: '\2699';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: #c9a45e;
+  font-size: 14px;
+  text-shadow: 0 1px 1px #000;
+}
+[data-diary-system='pi'][data-diary-skin='steampunk'] .title::after {
+  height: 2px;
+  background: linear-gradient(90deg, #6e5226, transparent 92%),
+    radial-gradient(circle at right, #c9a45e 1.5px, transparent 2px);
+}
+
+/* ── SCIFI — tech-brackety (TL cyan ┌ / BR violet ┘); .section má clip-path ── */
+[data-diary-system='pi'][data-diary-skin='scifi'] .section::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+  z-index: 2;
+  border-top: 2px solid #38e0ff;
+  border-left: 2px solid #38e0ff;
+  box-shadow: -1px -1px 8px -1px #38e0ff;
+}
+[data-diary-system='pi'][data-diary-skin='scifi'] .section::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+  z-index: 2;
+  border-bottom: 2px solid #a78bfa;
+  border-right: 2px solid #a78bfa;
+  box-shadow: 1px 1px 8px -1px #a78bfa;
+}
+
+/* ── NATURE — listový úponek v TL rohu + listový titulek ── */
+[data-diary-system='pi'][data-diary-skin='nature'] .section::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 30px;
+  height: 38px;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='44' viewBox='0 0 34 44' fill='none'%3E%3Cpath d='M6 4 C9 14 5 22 11 32 C15 38 13 42 17 44' stroke='%237ba450' stroke-width='2' stroke-linecap='round' fill='none'/%3E%3Cpath d='M7 14 C16 12 24 17 29 26 C20 29 11 25 7 15Z' fill='%2386ab52' stroke='%23537a30' stroke-width='0.8'/%3E%3Cpath d='M9 30 C2 28 0 21 0 16 C9 15 17 20 17 30Z' fill='%235a7d3a' stroke='%2337501f' stroke-width='0.8'/%3E%3Ccircle cx='6' cy='4' r='2' fill='%23dcf09a'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .title {
+  padding-left: 20px;
+  background: linear-gradient(180deg, #cae885, #82b148 70%, #56802e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.44));
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .title::before {
+  width: 13px;
+  height: 13px;
+  -webkit-text-fill-color: initial;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18' fill='none'%3E%3Cpath d='M9 17 L9 8' stroke='%239ec85a' stroke-width='1.7' stroke-linecap='round'/%3E%3Cpath d='M9 9 C9 4 14 2 16 2 C16 7 13 10 9 10Z' fill='%23bce070'/%3E%3Cpath d='M9 12 C9 8 5 6 3 6 C3 10 5 13 9 13Z' fill='%238fbe50'/%3E%3C/svg%3E");
+}
+[data-diary-system='pi'][data-diary-skin='nature'] .title::after {
+  -webkit-text-fill-color: initial;
+  height: 2px;
+  background: linear-gradient(90deg, #4a6a28, transparent 92%),
+    radial-gradient(circle at right, #82b148 1.5px, transparent 2px);
+}
+
+/* ── MINIMAL — vlasový ledger rám + registrační kříže (4 rohy) + tick titulek ── */
+[data-diary-system='pi'][data-diary-skin='minimal'] .section {
+  background: #f6f2e9;
+  border-color: #ddd6c7;
+}
+[data-diary-system='pi'][data-diary-skin='minimal'] .section::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  z-index: 0;
+  border: 1px solid color-mix(in srgb, #9a7b2e 38%, transparent);
+  background-repeat: no-repeat;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-size: 9px 9px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E");
+}
+[data-diary-system='pi'][data-diary-skin='minimal'] .title {
+  color: #4d4a42;
+}
+[data-diary-system='pi'][data-diary-skin='minimal'] .title::before {
+  width: 16px;
+  height: 2px;
+  background: #9a7b2e;
+  box-shadow: none;
+  transform: none;
+}
+[data-diary-system='pi'][data-diary-skin='minimal'] .title::after {
+  background: #ddd6c7;
+}
+
+/* ── RETRO — ASCII rohové glyfy ┌┐└┘ (4 rohy) + prompt > titulek ── */
+[data-diary-system='pi'][data-diary-skin='retro'] .section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-size: 13px 13px;
+  background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M2 12 L2 2 L12 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M11 12 L11 2 L1 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M2 1 L2 11 L12 11'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%23ffb627' stroke-width='2'%3E%3Cpath d='M11 1 L11 11 L1 11'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 4px rgba(255, 157, 26, 0.63));
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .title {
+  text-shadow: 0 0 6px rgba(255, 157, 26, 0.5), 0 0 1px #ffd98a;
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .title::before {
+  content: '>';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: #f59e1b;
+  text-shadow: 0 0 6px rgba(255, 157, 26, 0.56);
+}
+[data-diary-system='pi'][data-diary-skin='retro'] .title::after {
+  height: 0;
+  background: none;
+  border-top: 2px dotted rgba(124, 82, 16, 0.4);
+}
+
+/* ── ANIME (MLP) — ink cel rám + ✦ sparkle v rohu + duhový titulek rail ── */
+[data-diary-system='pi'][data-diary-skin='anime'] .section {
+  background: #fbf7ef;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 2.5px #16162e, 0 4px 0 0 #d9d2c4, 0 5px 0 2.5px #16162e;
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .section::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 3;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffd23e' stroke='%2316162e' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 2px 3px rgba(26, 20, 80, 0.25));
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .title {
+  color: #16162e;
+  font-weight: 800;
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .title::before {
+  content: '\2726';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  font-size: 13px;
+  color: #ff4d97;
+  -webkit-text-stroke: 1.2px #16162e;
+}
+[data-diary-system='pi'][data-diary-skin='anime'] .title::after {
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ff5d6c, #ff9a4d, #ffe14d, #5bd47e, #3ac0ff, #7a6bff, #ff6ad5);
+  box-shadow: 0 0 0 1.5px #16162e;
+}

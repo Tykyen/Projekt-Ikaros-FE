@@ -201,7 +201,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - **Schopnosti:** pips 1–7 (PC) / 1–10 (NPC) + číslo + **slovní stupeň** (Nováček/Učeň/Tovaryš/Zkušený/Mistr oboru/Veterán/Legenda + 8–10 entity) v tooltipu na hover.
 - **Aspekty:** chip Nabitý/Vybitý (toggle). Poznámky (textarea). Print režim (statický `PiPrintView`).
 
-**Hranice / co neumí:** Oproti Matrixu ZÁMĚRNĚ chybí **jazyky, únava, přetlaky, runa, magie** (genom i 📘 flag). Deník sám **nehází kostkou ani iniciativu** (to combat panel na mapě). Bez skinů — zatím jen default sci-fi (8 skinů přijde se skin workflow). Stará Fate `pi_*` data (jiné klíče) se v novém listu nezobrazí (zůstávají v DB).
+**Hranice / co neumí:** Oproti Matrixu ZÁMĚRNĚ chybí **jazyky, únava, přetlaky, runa, magie** (genom i 📘 flag). Deník sám **nehází kostkou ani iniciativu** (to combat panel na mapě). **8 vlastních skinů** (viz „Skin deníku" níž; scifi = default = osekaný Matrix HUD). Stará Fate `pi_*` data (jiné klíče) se v novém listu nezobrazí (zůstávají v DB).
 
 **Zvláštnosti:** Data `customData` prefix `pi_*` (delta merge `makeCdAccess`); 0 migrace registrů. Iniciativa PC (jen v combat panelu) = čistý hod `4dF` bez bonusů. Schopnost > počtu aspektů → warn „toohigh".
 
@@ -218,8 +218,8 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Jak se aplikuje:** `DiarySystemProvider` (deník) i `DiarySkinScope` (embedy: mapa/chat/dice) dají na předka `data-diary-system` + `data-diary-skin`; CSS sady (`styles/diary-skins.css` + `<sys>-skins/<id>.css`) přebíjí přes compound selektor `[data-diary-system][data-diary-skin]` přes tokeny `--mx-*` (HUD) / `--dd-*` (pergamen) / `--dd-embed-*` (embed plochy). Pokrývá: **deník list + bojový/bestie panel na mapě i v chatu (PC/NPC/Bestie stejně) + obal v TM + vyčíslení hodu + log kostek**.
 
-**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**, **jad ✅ (16.2g — 8 skinů, fantasy = nový default; světlý pergamen = no-skin fallback)**. Ostatní systémy: list bez skinů (jen default vzhled). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
-**Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2,jad}-skins/`. Bestie panel v chatu = TÝŽ plný statblok jako na mapě (ne osekaná varianta).
+**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**, **jad ✅ (16.2g — 8 skinů, fantasy = nový default; světlý pergamen = no-skin fallback)**, **pi ✅ (8 skinů; scifi = default = osekaný Matrix HUD; port rodiny matrix→pi přes `--pi-*`/`--pi-log-*`)**. Ostatní systémy: list bez skinů (jen default vzhled). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
+**Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2,jad,pi}-skins/`. Bestie panel v chatu = TÝŽ plný statblok jako na mapě (ne osekaná varianta). pi embed signatury (readout/obal TM) v `*.module.css`; chat rail chrome per-skin přes `:has()`; dicelog/orchestrace/rail jen barva (ornament policy).
 
 ---
 
