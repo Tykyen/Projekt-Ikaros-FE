@@ -127,10 +127,20 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Kde:** token-panel `/takticka-mapa` + světový chat (combat registr 1:1), jen když `world.system === 'pi'`.
 - **Kdo:** PJ edituje vše; vlastník PC svůj; **cizí hráč vidí jen STATY readonly** (zbytek skrytý). Hody jen když panel dostane `onRoll`.
 - **Co jde dělat:** STATY (Životy 0–5 + postih za zranění, Ochrana 0–1) vždy; pro `canEdit`: klik na **schopnost** = hod `4dF + stupeň`, **⚡ Iniciativa** = čistý `4dF` (PC, bez bonusů), **aspekty** Nabitý/Vybitý toggle.
-- **Hranice / co neumí:** bez únavy / runy / přetlaků / magie (osekáno vs Matrix). Bez skinů (sci-fi default). Bestie na mapě zatím přes generický `BestiePanelView` + `pi` token schéma (žádný dedikovaný pi bestie panel).
+- **Hranice / co neumí:** bez únavy / runy / přetlaků / magie (osekáno vs Matrix). Bez skinů (sci-fi default). Bestie má vlastní dedikovaný HUD panel — viz „Příběhy Impéria bestie panel" níž.
 - **Zvláštnosti:** Iniciativa PC = hod `4dF` bez modifieru (oproti Matrixu, kde je +⌊nabité aspekty/2⌋). Aspekty Nabitý/Vybitý zůstávají, ale iniciativu neovlivňují. HP bar tokenu = `pi_health` (max konstanta 5) přes `resolveCharacterHp` case `pi`. Engine 4dF = `onRoll({kind:'fate'})`, payload generický, bez BE.
 - **Stav:** ✅ funguje.
 - **Kód:** FE `system-panels/PiCombatPanel.tsx`(+`.module.css`), registrace `combatPanels.ts`, HP `utils/resolveCharacterHp.ts` (case `pi`), bestie schéma `schemas/pi/{bestie,token}.json` (+`bootstrap.ts`). BE: žádné (customData).
+
+### Příběhy Impéria bestie panel (`pi`, mapa + chat)
+- **Co to je:** Dedikovaný sci-fi HUD statblok pro **pi bestie** (`PiBestiePanel`) — derivát `MatrixBestiePanel`, sladěný s `PiCombatPanel`. Nahradil generický `BestiePanelView` (ten byl „přebarvený sdílený vzhled"). V chatu zrcadlo `PiChatBestiePanel`.
+- **Kde:** token-panel `/takticka-mapa` (`TokenSystemSheet` bestie větev, `world.system === 'pi'`) + rail světového chatu (`BestieRollPanel` katalog read-only · `BestieInstancePanel` instance v boji).
+- **Kdo:** hody i editace jen PJ (`canEdit`); cizí hráč read.
+- **Co jde dělat:** ZDRAVÍ (Životy track + „Zbroj pohlcuje" skrytá vrstva), BOJ (Max HP/Zbroj/Zranění/Pohyb/Iniciativa bonus, edit), SCHOPNOSTI (pips 1–10 + slovní stupeň + klik/🎲 = hod `4dF + stupeň`), ⚡ Iniciativa = `4dF + bonus`, Poznámky (autosave). Chat: Životy ±, „✏ Upravit" modal (reuse generický `MatrixChatBestieEditModal` se schématem `pi:token`).
+- **Hranice / co neumí:** HP odvozené `clamp(maxHP+zbroj−zranění)` (jako Matrix). Bez skinů (sci-fi default; per-skin ornamenty až se skin workflow). Schopnosti = nezávislá instance (snapshot, ne katalog).
+- **Zvláštnosti:** Robustní coerce abilities (`name??label`, CH-040) proti cross-system crashi. Reuse: chat panel dědí mapový `PiBestiePanel.module.css` (HUD), edit modal je systemId-agnostický.
+- **Stav:** ✅ funguje.
+- **Kód:** FE mapa `system-panels/PiBestiePanel.tsx`(+`.module.css`), registrace `TokenSystemSheet.tsx`; chat `chat/components/rail/PiChatBestiePanel.tsx`, registrace `BestieRollPanel.tsx`/`BestieInstancePanel.tsx`. BE: žádné (token customData/systemStats).
 
 ### HP (per-system, visibility toggle)
 - **Co to je:** HP bar pod tokenem (PixiJS). Architektura per-typ: Bestie = snapshot ze `systemStats`; PC/NPC = z deníkového subdokumentu (`customData` per-system klíč) přes enrich (memory `token_hp_architecture`).

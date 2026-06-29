@@ -9,6 +9,7 @@ import type { Bestie } from '@/features/world/bestiar/types';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
 import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
+import { PiChatBestiePanel } from './PiChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
@@ -116,6 +117,24 @@ export function BestieRollPanel({
           // 16.2b-chat — Matrix katalogová bestie (read-only); --mx-* z předka.
           <DiarySkinScope worldId={worldId}>
             <MatrixChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              systemId={systemId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              abilities={abilities.map((a) => ({
+                name: a.label,
+                description: a.value,
+              }))}
+              notes={bestie.notes}
+              canEdit={false}
+            />
+          </DiarySkinScope>
+        ) : systemId === 'pi' ? (
+          // Příběhy Impéria — pi katalogová bestie (read-only); sci-fi HUD.
+          <DiarySkinScope worldId={worldId}>
+            <PiChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               systemId={systemId}

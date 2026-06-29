@@ -16,5 +16,20 @@ export function getBestieAbilities(
   bestie: Pick<Bestie, 'systemStats'>,
 ): BestieAbility[] {
   const a = bestie.systemStats?.abilities;
-  return Array.isArray(a) ? (a as BestieAbility[]) : [];
+  if (!Array.isArray(a)) return [];
+  // Robustní coerce: schéma drží {label,value}, ale cross-system / starší
+  // snapshoty mívají {name,description} → čteme oba tvary a coerce na string,
+  // ať `undefined` label neshodí render konzumentů (`a.label.trim()`).
+  return a.map((it) => {
+    const raw = it as {
+      label?: string;
+      value?: string;
+      name?: string;
+      description?: string;
+    };
+    return {
+      label: raw.label ?? raw.name ?? '',
+      value: raw.value ?? raw.description ?? '',
+    };
+  });
 }

@@ -30,6 +30,7 @@ import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
 import { tokenIsBestie } from "../../utils/tokenIsBestie";
 import { BestiePanelView } from "./BestiePanelView";
 import { MatrixBestiePanel } from "./system-panels/MatrixBestiePanel";
+import { PiBestiePanel } from "./system-panels/PiBestiePanel";
 import { Drd16BestiePanel } from "./system-panels/Drd16BestiePanel";
 import { DrdPlusBestiePanel } from "./system-panels/DrdPlusBestiePanel";
 import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
@@ -90,6 +91,21 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="matrix"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // Příběhy Impéria — pi bestie HUD (osekaný Matrix derivát, sci-fi).
+    if (systemId === "pi") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <PiBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="pi"
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

@@ -1,0 +1,179 @@
+/**
+ * Příběhy Impéria (pi) bestie statblok (mapa), sci-fi HUD sladěný s
+ * PiCombatPanel/PiSheet. Derivát MatrixBestiePanel — base (per-skin ornamenty
+ * přijdou až se skin workflow). `var(--pi-x, <sci-fi>)` fallback = bez skinu HUD.
+ */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--pi-text, #d6def0);
+  font-family: var(--pi-font-body, 'Chakra Petch', system-ui, sans-serif);
+}
+
+.section {
+  position: relative;
+  background: var(--pi-log-surface, var(--pi-panel, var(--pi-bg, #0e0f1e)));
+  border: var(--pi-panel-border, 1px solid var(--pi-line, rgba(255, 255, 255, 0.08)));
+  clip-path: var(--pi-clip-small, polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px));
+  padding: 11px 12px;
+  isolation: isolate;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+  font: 700 11px var(--pi-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pi-title-color, #aeb8d4);
+}
+.title::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--pi-accent, #38e0ff);
+  box-shadow: var(--pi-marker-glow, 0 0 8px #38e0ff);
+  transform: rotate(45deg);
+}
+.title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--pi-line-strong, rgba(56, 224, 255, 0.27)), transparent);
+}
+.init {
+  margin-left: auto;
+  cursor: pointer;
+  font: 700 9.5px var(--pi-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--pi-violet, #7864ff) 22%, transparent);
+  color: var(--pi-text, #dcebff);
+  border: 1px solid color-mix(in srgb, var(--pi-violet, #7864ff) 55%, transparent);
+}
+.init:hover { background: color-mix(in srgb, var(--pi-violet, #7864ff) 34%, transparent); }
+
+/* zdraví */
+.hpHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.hpLab { font: 600 10px var(--pi-font-display, 'Chakra Petch', sans-serif); letter-spacing: 0.13em; text-transform: uppercase; color: var(--pi-muted, #76809a); }
+.hpNum { font: 700 16px/1 var(--pi-font-num, 'IBM Plex Mono', monospace); color: var(--pi-text, #d6def0); }
+.hpNum small { color: var(--pi-dim, #444b63); font-size: 11px; }
+.track { display: flex; gap: 3px; flex-wrap: wrap; }
+.seg { width: 15px; height: 15px; background: var(--pi-seg-off, #1a1d2e); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: var(--pi-seg-radius, 2px); flex: none; }
+.seg[data-on='true'] { background: var(--pi-hp-on, linear-gradient(180deg, #4ade80, #16a34a)); border-color: rgba(74, 222, 128, 0.5); }
+.seg[data-on='true'][data-mod='warn'] { background: linear-gradient(180deg, #fbbf24, #d97706); }
+.seg[data-on='true'][data-mod='crit'] { background: linear-gradient(180deg, #f87171, #dc2626); }
+.absorb { margin-top: 7px; font: 600 10px var(--pi-font-num, 'IBM Plex Mono', monospace); color: var(--pi-violet, #a78bfa); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.absorbPill { padding: 2px 7px; border-radius: 3px; background: color-mix(in srgb, var(--pi-violet, #a78bfa) 12%, transparent); border: 1px solid color-mix(in srgb, var(--pi-violet, #a78bfa) 30%, transparent); }
+.absorbHint { color: var(--pi-dim, #444b63); }
+
+/* boj */
+.boj { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.fld { display: flex; flex-direction: column; gap: 4px; }
+.fld label { font: 600 9.5px var(--pi-font-display, 'Chakra Petch', sans-serif); letter-spacing: 0.1em; text-transform: uppercase; color: var(--pi-muted, #76809a); }
+.fldHint { font: 600 9px var(--pi-font-num, 'IBM Plex Mono', monospace); color: var(--pi-dim, #444b63); text-transform: none; letter-spacing: 0; }
+.num {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  font: 700 15px var(--pi-font-num, 'IBM Plex Mono', monospace);
+  background: var(--pi-input-bg, #0a0b16);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  color: var(--pi-text, #e6ecff);
+  padding: 5px;
+  outline: none;
+}
+.num:focus { border-color: var(--pi-input-focus-border, rgba(56, 224, 255, 0.5)); box-shadow: 0 0 8px -3px var(--pi-input-focus-border, rgba(56, 224, 255, 0.5)); }
+
+/* schopnosti */
+.list { display: flex; flex-direction: column; gap: 5px; }
+.skill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--pi-row-bg, linear-gradient(90deg, #10111f, #0d0e1a));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--lvlc, var(--pi-line, #2a2e44));
+  border-radius: 2px;
+}
+.skillName { flex: 1; min-width: 0; font: 500 13px var(--pi-font-body, 'Chakra Petch', sans-serif); color: var(--pi-text, #d6def0); }
+.skillInput { flex: 1; min-width: 0; background: transparent; border: none; color: var(--pi-text, #d6def0); font: 500 13px var(--pi-font-body, 'Chakra Petch', sans-serif); outline: none; }
+.skillInput:focus { border-bottom: 1px solid var(--pi-input-focus-border, rgba(56, 224, 255, 0.4)); }
+.pips { display: flex; gap: 2.5px; }
+.pip { width: 9px; height: 9px; border-radius: 50%; background: var(--pi-seg-off, #20233a); border: 1px solid rgba(255, 255, 255, 0.07); padding: 0; }
+.pip[data-on='true'] { border-color: rgba(255, 255, 255, 0.27); background: var(--lvlc); box-shadow: var(--pi-pip-glow, 0 0 6px -1px var(--lvlc)); }
+button.pip { cursor: pointer; }
+button.pip:hover { border-color: color-mix(in srgb, var(--pi-accent, #38e0ff) 60%, transparent); }
+.lvl { font: 700 12px var(--pi-font-num, 'IBM Plex Mono', monospace); color: var(--lvlc, var(--pi-muted, #9aa4c0)); min-width: 14px; text-align: right; cursor: help; }
+.roll {
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  background: color-mix(in srgb, var(--pi-charged, #78c878) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pi-charged, #78c878) 40%, transparent);
+  border-radius: 3px;
+  padding: 3px 6px;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pi-charged, #78c878) 50%, transparent));
+}
+.roll:hover { background: color-mix(in srgb, var(--pi-charged, #78c878) 22%, transparent); }
+.del {
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--pi-danger, #f87171) 9%, transparent);
+  color: var(--pi-danger, #fca5a5);
+  border: 1px solid color-mix(in srgb, var(--pi-danger, #f87171) 25%, transparent);
+  font: 700 11px var(--pi-font-num, 'IBM Plex Mono', monospace);
+}
+.del:hover { background: color-mix(in srgb, var(--pi-danger, #f87171) 19%, transparent); }
+.add {
+  margin-top: 8px;
+  cursor: pointer;
+  width: 100%;
+  font: 600 12px var(--pi-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--pi-add-color, #7fd9ef);
+  border: 1px dashed var(--pi-add-border, rgba(56, 224, 255, 0.33));
+}
+.add:hover { background: var(--pi-add-hover-bg, rgba(56, 224, 255, 0.08)); border-style: solid; }
+
+/* poznámky */
+.notes {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 70px;
+  font: 400 12.5px/1.5 var(--pi-font-num, 'IBM Plex Mono', monospace);
+  color: var(--pi-gear-text, #aeb6cf);
+  background: var(--pi-gear-bg, #0b0c16);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  padding: 10px;
+  resize: vertical;
+  outline: none;
+}
+.notes:focus { border-color: var(--pi-input-focus-border, rgba(56, 224, 255, 0.5)); }
+.tmpl {
+  margin-top: 8px;
+  font: 400 11px/1.4 var(--pi-font-num, 'IBM Plex Mono', monospace);
+  color: var(--pi-muted, #8a93ab);
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+.tmpl b { color: var(--pi-gear-text, #aeb6cf); font-weight: 600; }
+.tmplHint { color: var(--pi-dim, #444b63); }

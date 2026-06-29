@@ -19,6 +19,7 @@ import { useCombatantMutation } from '../../api/useChannelCombat';
 import { useChatDiaryRoll } from './useChatDiaryRoll';
 import { Drd16ChatBestiePanel } from './Drd16ChatBestiePanel';
 import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
+import { PiChatBestiePanel } from './PiChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
@@ -66,7 +67,21 @@ export function BestieInstancePanel({
     combatant.systemStats,
   );
   const [abilities, setAbilities] = useState<AbilityDraft[]>(() =>
-    combatant.abilities.map((a) => ({ label: a.name, value: a.description })),
+    // Robustní coerce (jako BestiePanelView/getBestieAbilities): instance snapshot
+    // bývá {name,description}, ale cross-system tvar má `name` undefined →
+    // `label:undefined` by shodil BestieStatblock (`a.label.trim()`).
+    combatant.abilities.map((a) => {
+      const raw = a as {
+        name?: string;
+        description?: string;
+        label?: string;
+        value?: string;
+      };
+      return {
+        label: raw.name ?? raw.label ?? '',
+        value: raw.description ?? raw.value ?? '',
+      };
+    }),
   );
   const [notes, setNotes] = useState(combatant.notes);
 
@@ -186,6 +201,24 @@ export function BestieInstancePanel({
           // 16.2b-chat — Matrix panel konzumuje --mx-* z předka → vlastní scope.
           <DiarySkinScope worldId={worldId}>
             <MatrixChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              systemId={systemId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              abilities={combatant.abilities}
+              notes={combatant.notes}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
+        ) : systemId === 'pi' ? (
+          // Příběhy Impéria — pi bestie instance v boji (HP ±, edit, sci-fi HUD).
+          <DiarySkinScope worldId={worldId}>
+            <PiChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               systemId={systemId}
