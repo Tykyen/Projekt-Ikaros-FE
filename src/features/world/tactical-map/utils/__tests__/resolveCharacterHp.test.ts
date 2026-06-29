@@ -13,14 +13,38 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
     expect(resolveCharacterHp('matrix', {})).toEqual({ current: 5, max: 5 });
   });
 
-  it('dnd5e: currentHP / maxHP', () => {
+  it('jad: jad_hpCur / jad_hpMax (prefix deníku)', () => {
     expect(
-      resolveCharacterHp('dnd5e', { dnd_currentHP: '14', dnd_maxHP: '28' }),
-    ).toEqual({ current: 14, max: 28 });
+      resolveCharacterHp('jad', { jad_hpCur: '52', jad_hpMax: '71' }),
+    ).toEqual({ current: 52, max: 71 });
   });
 
-  it('dnd5e: bez maxHP → null (žádný bar)', () => {
-    expect(resolveCharacterHp('dnd5e', { dnd_currentHP: '14' })).toBeNull();
+  it('jad: bez max → null (žádný bar)', () => {
+    expect(resolveCharacterHp('jad', { jad_hpCur: '52' })).toBeNull();
+  });
+
+  it('jad: legacy klíče bez prefixu (fallback pro starší data)', () => {
+    expect(resolveCharacterHp('jad', { hpCur: '5', hpMax: '10' })).toEqual({
+      current: 5,
+      max: 10,
+    });
+  });
+
+  it('dnd5e: dnd_hpCur / dnd_hpMax (prefix deníku)', () => {
+    expect(
+      resolveCharacterHp('dnd5e', { dnd_hpCur: '12', dnd_hpMax: '20' }),
+    ).toEqual({ current: 12, max: 20 });
+  });
+
+  it('dnd5e: bez max → null (žádný bar)', () => {
+    expect(resolveCharacterHp('dnd5e', { dnd_hpCur: '12' })).toBeNull();
+  });
+
+  it('dnd5e: legacy klíče bez prefixu (fallback)', () => {
+    expect(resolveCharacterHp('dnd5e', { hpCur: '3', hpMax: '8' })).toEqual({
+      current: 3,
+      max: 8,
+    });
   });
 
   it('coc: hp_cur / hp_max', () => {
@@ -48,20 +72,29 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
   });
 
   it('current chybí → default = max (plné HP)', () => {
-    expect(resolveCharacterHp('dnd5e', { dnd_maxHP: '30' })).toEqual({
+    expect(resolveCharacterHp('dnd5e', { dnd_hpMax: '30' })).toEqual({
       current: 30,
       max: 30,
     });
   });
 
+  it('jad: current chybí → default = max', () => {
+    expect(resolveCharacterHp('jad', { jad_hpMax: '40' })).toEqual({
+      current: 40,
+      max: 40,
+    });
+  });
+
   it('podporuje i číselné hodnoty (ne jen string)', () => {
     expect(
-      resolveCharacterHp('dnd5e', { dnd_currentHP: 5, dnd_maxHP: 10 }),
+      resolveCharacterHp('dnd5e', { dnd_hpCur: 5, dnd_hpMax: 10 }),
     ).toEqual({ current: 5, max: 10 });
   });
 });
 
 describe('resolveCharacterHp — systémy bez klasického HP', () => {
+  // drd2 je navíc tvrdě vypnuté v HP_BAR_DISABLED_SYSTEMS (TokenSprite).
+  // fate (stres) a drdplus (tracker výdrže) nemají current/max → null.
   it.each(['fate', 'drd2', 'drdplus', 'neznamy'])(
     '%s → null (mapování je herní rozhodnutí)',
     (system) => {

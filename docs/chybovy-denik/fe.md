@@ -1124,3 +1124,21 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** „X má jen barvu, ne tvar" u systému, který sdílí dice moduly přes `:is()` — chybí v signaturních selektorech, NEBO mu chybí tvarové tokeny (pak padá na fallback hex jiného systému).
 
 ---
+
+### CH-039 — fleet agentů (ornament parita) halucinoval neexistující CSS tokeny → `var()` bez fallbacku se tiše nevykreslí; build to NEodhalí · 2026-06-29
+**Kontext:** Uživatel chtěl plnou ornament paritu embed povrchů (token panel / dice readout / dicelog / orchestr / chat) s HTML návrhy. Nasadil jsem 4 agenty (worktree, 1 povrchový soubor each) na replikaci per-skin ornamentů.
+**Co se pokazilo:** `TokenInfoPanel` agent psal `background-image: var(--jadf-corner-tl), …` **bez fallbacku** a v komentáři tvrdil „tokeny `--*-corner-*` jsou na elementu dostupné" — ale `--corner-*` v repo **NEEXISTUJÍ** (jen v HTML návrhu). Výsledek: 19 rozbitých refs → rohové kování/nýty/pečeť se **tiše nevykreslí** (`var()` bez fallbacku na neexistující token = invalid value → property ignored). Navíc tvarové tokeny (`--sf-*`, `--h-*`) jsou v repo na scope `.jad-diary` (deníkový kořen), který **není předkem embedů** → z `.panel`/`.readout` nedosažitelné.
+**Proč build neselhal:** `var(--x)` bez fallbacku je VALIDNÍ CSS syntax → `npm run build` projde, jen se ornament nevykreslí. **Build = nutná, ne dostatečná podmínka.**
+**Jak odhaleno + opraveno:** render-verify (Chrome headless izolovaný harness s reálnými CSS pravidly + simulovaný `.panel`/`.readout` markup) → screenshot ukázal prázdné panely. Fix: `TokenInfoPanel` corner refs → **inline SVG** (verbatim z návrhu), ostatní 7 refs (`--st-rivet`/`--h-seal`/`--mlp-*`) → inline fallback. Po fixu render ukázal rohy/nýty/brackety/pečeť + fantasy readout rohy+fleur.
+**Druhá past (harness, ne kód):** první readout harness dal `data-diary-*` PŘÍMO na `.readout`, ale selektor je `[ds][dsk] .readout` (DESCENDANT — atributy na PŘEDKOVI = reálný `DiarySkinScope`). Prázdný render → falešný závěr „nefunguje". Fix: obalit `.readout` scope divem. Pak ornament viditelný.
+**Poučení:** (1) Izolovaný agent NEMÁ ověřený kontext o existenci/scope tokenů — MUSÍ použít fallback `var(--x, <konkrétní hodnota>)` nebo inline, nikdy `var(--x)` holé. (2) U grafiky build NESTAČÍ — render-verify (i izolovaný harness) je povinný. (3) Harness scope musí kopírovat reálnou DOM hierarchii (compound `.panel[attr]` vs descendant `[attr] .readout`).
+**Příznak cyklení:** „implementoval jsem ornament" + build OK, ale uživatel ho nevidí → grep `var(--x)` bez fallbacku na tvarové/corner tokeny; render-verify, ne další build.
+
+---
+
+### ✅ ŘEŠENÍ — PC HP bar na mapě (JaD+dnd5e) se nezobrazoval: resolver měl fikční klíče + JaD chyběl; zelený test potvrzoval fikci · 2026-06-29
+**Co zabralo:** `resolveCharacterHp` (token HP bar na taktické mapě, PC/NPC) — **JaD úplně chyběl** ve switchi (`default: return null` → nikdy HP bar) a **dnd5e četl `dnd_maxHP`/`dnd_currentHP`**, což jsou klíče, které v reálném kódu **nikdo neukládá** (deník přes `makeCdAccess(cd,'dnd_')` + combat panel `save({dnd_hpCur})` ukládají `dnd_hpCur`/`dnd_hpMax`). Fix: přidat `jad` case + opravit dnd5e klíče, oboje s **legacy fallbackem** bez prefixu (`var prefix → bez prefixu`) pro starší data. drd2 zůstává jediný v `HP_BAR_DISABLED_SYSTEMS` (dle uživatele správně).
+**Vlastní chyba (kořen):** existující test `resolveCharacterHp.test.ts` testoval dnd5e s `dnd_currentHP`/`dnd_maxHP` — **fikční klíče, co neodpovídají realitě** → test byl ZELENÝ, ale funkce v praxi vracela null (deník ukládá jiné klíče). Klasické „test potvrzuje implementaci, ne realitu" → zelený CI nechytil, že PC nemají HP na mapě. Rodina CH-038/HP-bar (statika/test ≠ render).
+**Jak ověřeno:** přepsal test na REÁLNÉ klíče (`dnd_hpCur`/`dnd_hpMax`, `jad_hpCur`/`jad_hpMax`) + legacy fallback + číselné hodnoty → `npx vitest run --pool=threads` **20/20 passed**. (Pozn.: default forks pool padá na worker-timeout v této infře → `--pool=threads`.)
+**Zhodnocení:** dobře. Klíč = ověřit, co se REÁLNĚ ukládá (`grep` zápisů `save({...})` + `makeCdAccess` prefix), ne věřit klíčům v testu. Klíč v testu byl vymyšlený a maskoval bug.
+**Příznak cyklení:** „test je zelený, ale uživatel hlásí, že to nefunguje" → ověř, že testovaná data = reálně ukládaná data (grep zápisů), ne hodnoty vymyšlené v testu.

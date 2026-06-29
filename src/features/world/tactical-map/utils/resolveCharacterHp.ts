@@ -49,10 +49,25 @@ export function resolveCharacterHp(
       const current = readNum(cd, 'matrix_health', 5);
       return { current, max: 5 };
     }
-    case 'dnd5e': {
-      const max = readNum(cd, 'dnd_maxHP', 0);
+    case 'jad': {
+      // JaD deník ukládá s prefixem `jad_` (makeCdAccess). Fallback na legacy
+      // bez prefixu pro starší data.
+      const max = readNum(cd, 'jad_hpMax', readNum(cd, 'hpMax', 0));
       if (max <= 0) return null;
-      return { current: readNum(cd, 'dnd_currentHP', max), max };
+      return {
+        current: readNum(cd, 'jad_hpCur', readNum(cd, 'hpCur', max)),
+        max,
+      };
+    }
+    case 'dnd5e': {
+      // DnD5e deník ukládá s prefixem `dnd_` (makeCdAccess `dnd_hpMax/hpCur`).
+      // Fallback na legacy bez prefixu pro starší data.
+      const max = readNum(cd, 'dnd_hpMax', readNum(cd, 'hpMax', 0));
+      if (max <= 0) return null;
+      return {
+        current: readNum(cd, 'dnd_hpCur', readNum(cd, 'hpCur', max)),
+        max,
+      };
     }
     case 'coc': {
       const max = readNum(cd, 'coc_hp_max', 0);
