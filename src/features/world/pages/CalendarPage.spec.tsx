@@ -32,6 +32,11 @@ vi.mock('@/features/world/api/useCalendarsAggregate', () => ({
 vi.mock('@/features/world/pages/api/useCharacterMutations', () => ({
   useSetCalendarColor: () => ({ mutate: vi.fn(), isPending: false }),
 }));
+// CalendarPage přibral `useWorldSettings` (RQ hook) po napsání tohoto specu —
+// bez mocku běží reálný useQuery bez QueryClientu → crash (rodina CH-025).
+vi.mock('@/features/world/api/useWorldSettings', () => ({
+  useWorldSettings: () => ({ data: undefined, isLoading: false }),
+}));
 
 describe('CalendarPage (9.2d aggregate)', () => {
   beforeEach(() => {
