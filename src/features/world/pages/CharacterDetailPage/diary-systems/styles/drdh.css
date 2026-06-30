@@ -1,534 +1,1093 @@
-/* DrdH — Dračí Hlídka (Heroic Golden Theme)
- * 8.7e — přenos z c:/Matrix/Matrix/frontend/src/styles/DrdhDiary.scss
- */
+/* ════════════════════════════════════════════════════════════════
+   Dračí Hlídka (DrdH) — „Pergamenový rozkaz Hlídky" (fantasy, default)
+   Port schváleného prototypu `c:/tmp/drdh-denik-audit.html`.
+   Scope: [data-diary-system='drdh'] (+ root wrapper .drdh-sheet).
+   Signature: stuhové bannery + kruhové pečetě-medailony + štítový erb DH.
 
-[data-diary-system='drdh'] .drdh-dashboard {
-  color: #c9d1d9;
-  font-family: 'Inter', 'Roboto', sans-serif;
+   Skin-readiness (playbook §4): sémantické list tokeny --drdh-hp/spell/res
+   definované zde jako fantasy default → skin je smí přebarvit na svém
+   compound scope. var() vždy s fallbackem (past §9.10).
+   ════════════════════════════════════════════════════════════════ */
+
+[data-diary-system='drdh'] {
+  /* ── kovárna / strážnice (chrome / pozadí panelů) ── */
+  --drdh-forge-0: #15100a;
+  --drdh-forge-1: #1f160d;
+  --drdh-forge-2: #2b1f12;
+  --drdh-forge-edge: #3d2c19;
+
+  /* ── pergamen (deska) ── */
+  --drdh-parch-0: #f2e7cd;
+  --drdh-parch-1: #e9dab8;
+  --drdh-parch-2: #dcc89c;
+  --drdh-parch-edge: #c2aa78;
+
+  /* ── inkoust ── */
+  --drdh-ink: #372616;
+  --drdh-ink-soft: #6a5436;
+  --drdh-ink-faint: #94795a;
+
+  /* ── heraldika ── */
+  --drdh-gold: #cf9f3a;
+  --drdh-gold-hi: #f4dd92;
+  --drdh-gold-deep: #6d5018;
+  --drdh-brass: #b07a31;
+  --drdh-crimson: #922a23;
+  --drdh-crimson-hi: #c0392f;
+  --drdh-crimson-deep: #561310;
+  --drdh-sapphire: #2f5390;
+  --drdh-sapphire-hi: #5d86cf;
+  --drdh-emerald: #3c7a4e;
+  --drdh-emerald-hi: #5fae73;
+
+  /* text na strážnici */
+  --drdh-on-forge: #dcc6a0;
+  --drdh-on-forge-dim: #9c8861;
+
+  /* ── sémantické list tokeny (skin smí přebít) ── */
+  --drdh-hp: var(--drdh-crimson-hi, #c0392f); /* životy */
+  --drdh-hp-cur: #eaa39a;
+  --drdh-res: var(--drdh-gold-hi, #f4dd92); /* sekundární zdroj */
+  --drdh-res-alt: var(--drdh-emerald-hi, #5fae73); /* suroviny */
+  --drdh-spell: var(--drdh-sapphire-hi, #5d86cf); /* magie */
+
+  --drdh-font-display: 'Cinzel Decorative', 'Cinzel', serif;
+  --drdh-font-head: 'Cinzel', serif;
+  --drdh-font-body: 'EB Garamond', Georgia, serif;
+
+  --drdh-parch-tex: radial-gradient(
+      120% 90% at 16% 6%,
+      rgba(255, 250, 235, 0.55),
+      transparent 55%
+    ),
+    radial-gradient(120% 120% at 90% 98%, rgba(150, 118, 70, 0.3), transparent 60%),
+    radial-gradient(55% 45% at 62% 42%, rgba(196, 165, 110, 0.1), transparent 70%),
+    linear-gradient(
+      165deg,
+      var(--drdh-parch-0),
+      var(--drdh-parch-1) 55%,
+      var(--drdh-parch-2)
+    );
+}
+
+/* ── root wrapper (strážnice) ── */
+[data-diary-system='drdh'] .drdh-sheet {
   box-sizing: border-box;
   width: 100%;
-  max-width: 1500px;
+  font-family: var(--drdh-font-body);
+  color: var(--drdh-on-forge);
+}
+[data-diary-system='drdh'] .drdh-sheet * {
+  box-sizing: border-box;
+}
+
+/* ── list (pergamen) ── */
+[data-diary-system='drdh'] .drdh-sheet .sheet {
+  position: relative;
+  z-index: 1;
+  max-width: 1220px;
   margin: 0 auto;
-  padding: 16px;
+  background: var(--drdh-parch-tex);
+  color: var(--drdh-ink);
+  border-radius: 5px;
+  padding: clamp(16px, 2.4vw, 32px);
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 -30px 60px -40px rgba(60, 30, 10, 0.7) inset,
+    0 40px 90px -40px #000,
+    0 0 0 1px var(--drdh-parch-edge),
+    0 0 0 7px var(--drdh-forge-1),
+    0 0 0 8px var(--drdh-gold-deep);
+}
+[data-diary-system='drdh'] .drdh-sheet .sheet::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  pointer-events: none;
+  border-radius: 3px;
+  border: 1px solid rgba(111, 83, 32, 0.35);
+  box-shadow: 0 0 0 1px rgba(255, 250, 235, 0.25) inset;
 }
 
-[data-diary-system='drdh'] .drdh-dashboard ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-[data-diary-system='drdh'] .drdh-dashboard ::-webkit-scrollbar-track {
-  background: rgba(15, 10, 5, 0.3);
-}
-[data-diary-system='drdh'] .drdh-dashboard ::-webkit-scrollbar-thumb {
-  background: rgba(255, 170, 0, 0.15);
-  border-radius: 4px;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 170, 0, 0.3);
-}
-
-[data-diary-system='drdh'] .drdh-dashboard h3 {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 8px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-/* ── Grid layout (3 zones) ─────────────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard .drdh-grid-layout {
+/* ════ HERO — erb + stuhy + meta ════ */
+[data-diary-system='drdh'] .drdh-sheet .hero {
+  position: relative;
+  z-index: 20;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: auto 1fr;
+  gap: clamp(14px, 2.4vw, 30px);
+  align-items: center;
+  padding: 8px 6px 22px;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--drdh-gold) 18%,
+      var(--drdh-gold-hi) 50%,
+      var(--drdh-gold) 82%,
+      transparent
+    )
+    1;
 }
 
-@media (max-width: 1200px) {
-  [data-diary-system='drdh'] .drdh-dashboard .drdh-grid-layout {
-    grid-template-columns: 1fr 1.5fr;
-  }
-  [data-diary-system='drdh']
-    .drdh-dashboard
-    .drdh-grid-layout
-    .center-zone {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  [data-diary-system='drdh']
-    .drdh-dashboard
-    .drdh-grid-layout
-    .right-zone {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  [data-diary-system='drdh']
-    .drdh-dashboard
-    .drdh-grid-layout
-    .left-zone {
-    grid-column: span 2;
-    grid-row: 2;
-  }
+/* erb DH — štít hlídky */
+[data-diary-system='drdh'] .drdh-sheet .erb {
+  position: relative;
+  width: 106px;
 }
-
-@media (max-width: 800px) {
-  [data-diary-system='drdh'] .drdh-dashboard .drdh-grid-layout {
-    grid-template-columns: 1fr;
-  }
-  [data-diary-system='drdh']
-    .drdh-dashboard
-    .drdh-grid-layout
-    .center-zone,
-  [data-diary-system='drdh']
-    .drdh-dashboard
-    .drdh-grid-layout
-    .right-zone,
-  [data-diary-system='drdh']
-    .drdh-dashboard
-    .drdh-grid-layout
-    .left-zone {
-    grid-column: 1;
-  }
+[data-diary-system='drdh'] .drdh-sheet .erb[role='button'] {
+  cursor: pointer;
 }
-
-/* ── Common ────────────────────────────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard .drdh-panel {
-  background: rgba(20, 16, 10, 0.75);
-  border: 1px solid rgba(255, 170, 0, 0.1);
-  border-top: 2px solid rgba(255, 170, 0, 0.4);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  margin-bottom: 24px;
-}
-
-[data-diary-system='drdh'] .drdh-dashboard .form-group {
-  margin-bottom: 12px;
-}
-[data-diary-system='drdh'] .drdh-dashboard .form-group label {
+[data-diary-system='drdh'] .drdh-sheet .erb svg {
   display: block;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 4px;
-}
-[data-diary-system='drdh'] .drdh-dashboard .form-group input,
-[data-diary-system='drdh'] .drdh-dashboard .form-group select {
   width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  padding: 8px 12px;
-  font-size: 14px;
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgba(40, 20, 5, 0.45));
+}
+[data-diary-system='drdh'] .drdh-sheet .erb-glyph {
+  position: absolute;
+  top: 41%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .erb-banner {
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%);
+  font-family: var(--drdh-font-head);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f6eccf;
+  background: linear-gradient(180deg, var(--drdh-crimson-hi), var(--drdh-crimson));
+  padding: 3px 14px;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  clip-path: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 50%,
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 50%
+  );
+}
+[data-diary-system='drdh'] .drdh-sheet .erb-pop {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 10px;
+  z-index: 30;
+  min-width: 172px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #241a10, #161009);
+  border: 1px solid var(--drdh-gold-deep);
+  box-shadow: 0 14px 32px -10px #000;
+}
+[data-diary-system='drdh'] .drdh-sheet .erb-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  font-family: var(--drdh-font-head);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--drdh-on-forge);
+  background: transparent;
+  border: none;
   border-radius: 4px;
-  transition: border-color 0.2s;
+  padding: 7px 9px;
+  cursor: pointer;
 }
-[data-diary-system='drdh'] .drdh-dashboard .form-group input:focus,
-[data-diary-system='drdh'] .drdh-dashboard .form-group select:focus {
-  outline: none;
-  border-color: rgba(255, 170, 0, 0.6);
+[data-diary-system='drdh'] .drdh-sheet .erb-item:hover {
+  background: rgba(207, 159, 58, 0.18);
+  color: var(--drdh-gold-hi);
 }
-[data-diary-system='drdh'] .drdh-dashboard .form-group option {
-  background: #111;
-  color: #fff;
+[data-diary-system='drdh'] .drdh-sheet .erb-item.sel {
+  color: var(--drdh-gold-hi);
+  background: rgba(207, 159, 58, 0.12);
+}
+[data-diary-system='drdh'] .drdh-sheet .erb-item .g {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
 }
 
-[data-diary-system='drdh'] .drdh-dashboard .flex-row {
+[data-diary-system='drdh'] .drdh-sheet .hero-ident {
+  min-width: 0;
+}
+
+/* signature stuha — jméno na vlajícím praporu */
+[data-diary-system='drdh'] .drdh-sheet .ribbon {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--drdh-crimson-hi),
+    var(--drdh-crimson) 60%,
+    var(--drdh-crimson-deep)
+  );
+  padding: 7px 30px;
+  margin: 0 0 14px;
+  box-shadow:
+    0 4px 12px -4px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 220, 180, 0.18) inset;
+  clip-path: polygon(
+    14px 0,
+    calc(100% - 14px) 0,
+    100% 50%,
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0 50%
+  );
+}
+[data-diary-system='drdh'] .drdh-sheet .ribbon input {
+  font-family: var(--drdh-font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 3.2vw, 32px);
+  color: #fbeeca;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  letter-spacing: 0.02em;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .ribbon input::placeholder {
+  color: #f0d9b0;
+  opacity: 0.6;
+}
+
+[data-diary-system='drdh'] .drdh-sheet .ident-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: flex-end;
+}
+[data-diary-system='drdh'] .drdh-sheet .field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+[data-diary-system='drdh'] .drdh-sheet .field > label {
+  font-family: var(--drdh-font-head);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--drdh-ink-soft);
+}
+[data-diary-system='drdh'] .drdh-sheet .ident-line input,
+[data-diary-system='drdh'] .drdh-sheet .ident-line select {
+  font-family: var(--drdh-font-body);
+  font-size: 16px;
+  color: var(--drdh-ink);
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid var(--drdh-parch-edge);
+  border-radius: 2px;
+  padding: 6px 9px;
+  min-width: 96px;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .ident-line input:focus,
+[data-diary-system='drdh'] .drdh-sheet .ident-line select:focus {
+  border-color: var(--drdh-gold-deep);
+}
+[data-diary-system='drdh'] .drdh-sheet .field.num input {
+  width: 74px;
+  text-align: center;
+  min-width: 0;
+  font-family: var(--drdh-font-display);
+  font-weight: 600;
+}
+[data-diary-system='drdh'] .drdh-sheet .spec-field.locked {
+  position: relative;
+  opacity: 0.72;
+}
+[data-diary-system='drdh'] .drdh-sheet .spec-field.locked select {
+  pointer-events: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .spec-lock {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--drdh-font-head);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--drdh-crimson);
+  margin-top: 3px;
+}
+[data-diary-system='drdh'] .drdh-sheet .spec-field.locked .spec-lock {
+  display: flex;
+}
+
+/* ════ HUD — Životy + per-povolání zdroj ════ */
+[data-diary-system='drdh'] .drdh-sheet .hud {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 2fr;
+  gap: 14px;
+  margin: 20px 2px 22px;
+}
+[data-diary-system='drdh'] .drdh-sheet .mega {
+  position: relative;
+  padding: 12px 16px 13px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, var(--drdh-forge-2), var(--drdh-forge-1));
+  border: 1px solid var(--drdh-forge-edge);
+  box-shadow:
+    0 6px 18px -10px #000,
+    0 1px 0 rgba(255, 235, 190, 0.1) inset;
+}
+[data-diary-system='drdh'] .drdh-sheet .mega > .mega-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+  font-family: var(--drdh-font-head);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--drdh-on-forge-dim);
+}
+[data-diary-system='drdh'] .drdh-sheet .mega.life {
+  border-color: var(--drdh-crimson-deep);
+}
+[data-diary-system='drdh'] .drdh-sheet .mega.life .mega-h {
+  color: #dfa097;
+}
+
+[data-diary-system='drdh'] .drdh-sheet .hp-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+[data-diary-system='drdh'] .drdh-sheet .hp-row input {
+  font-family: var(--drdh-font-display);
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--drdh-gold-deep);
+  text-align: center;
+  color: var(--drdh-hp-cur);
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .hp-row .hp-cur {
+  width: 64px;
+  font-size: 34px;
+  color: var(--drdh-hp);
+}
+[data-diary-system='drdh'] .drdh-sheet .hp-row .hp-sep {
+  font-size: 24px;
+  color: var(--drdh-on-forge-dim);
+}
+[data-diary-system='drdh'] .drdh-sheet .hp-row .hp-max {
+  width: 52px;
+  font-size: 22px;
+  color: #c98b83;
+}
+[data-diary-system='drdh'] .drdh-sheet .hp-death {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 9px;
+  font-family: var(--drdh-font-head);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drdh-on-forge-dim);
+}
+[data-diary-system='drdh'] .drdh-sheet .hp-death input {
+  width: 46px;
+  text-align: center;
+  font-family: var(--drdh-font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: #dfa097;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--drdh-crimson);
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .hp-death .calc {
+  font-style: normal;
+  color: var(--drdh-gold-deep);
+  cursor: help;
+}
+
+/* per-povolání zdroj — dynamický obsah */
+[data-diary-system='drdh'] .drdh-sheet .res-wrap {
   display: flex;
   gap: 12px;
+  height: 100%;
 }
-[data-diary-system='drdh'] .drdh-dashboard .flex-row > * {
+[data-diary-system='drdh'] .drdh-sheet .res-box {
   flex: 1;
 }
-
-/* ── Mega boxes ────────────────────────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard .combat-header {
+[data-diary-system='drdh'] .drdh-sheet .res-pair {
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-[data-diary-system='drdh'] .drdh-dashboard .mega-box {
-  flex: 1;
-  text-align: center;
-  padding: 16px;
-  border-radius: 8px;
-  background: linear-gradient(
-    135deg,
-    rgba(20, 20, 30, 0.8),
-    rgba(15, 15, 20, 0.8)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
+  align-items: baseline;
   justify-content: center;
+  gap: 8px;
 }
-
-[data-diary-system='drdh'] .drdh-dashboard .mega-box h4 {
-  margin: 0 0 12px 0;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-[data-diary-system='drdh'] .drdh-dashboard .mega-box input {
+[data-diary-system='drdh'] .drdh-sheet .res-pair input {
+  font-family: var(--drdh-font-display);
+  font-weight: 700;
   background: transparent;
   border: none;
-  font-weight: 800;
-  outline: none;
-  font-family: inherit;
-  padding: 0;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box
-  input::placeholder {
-  color: rgba(255, 255, 255, 0.1);
-}
-
-/* Health */
-[data-diary-system='drdh'] .drdh-dashboard .mega-box.health {
-  border-color: rgba(255, 68, 68, 0.3);
-  border-top: 2px solid #ff4444;
-  box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.05);
-}
-[data-diary-system='drdh'] .drdh-dashboard .mega-box.health h4 {
-  color: #ff6b6b;
-}
-[data-diary-system='drdh'] .drdh-dashboard .mega-box.health .hp-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.health
-  .hp-row
-  input.hp-main {
-  font-size: 42px;
-  color: #ff6b6b;
-  width: 80px;
-  text-align: right;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.health
-  .hp-row
-  span {
-  color: rgba(255, 100, 100, 0.4);
-  font-size: 24px;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.health
-  .hp-row
-  input.hp-max {
-  font-size: 24px;
-  color: rgba(255, 255, 255, 0.8);
-  width: 60px;
-  text-align: left;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.health
-  .hp-death {
-  margin-top: 8px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.health
-  .hp-death
-  input {
-  width: 40px;
-  font-size: 12px;
-  padding: 2px;
-}
-
-/* Resource */
-[data-diary-system='drdh'] .drdh-dashboard .mega-box.resource {
-  border-color: rgba(100, 180, 255, 0.3);
-  border-top: 2px solid #64b4ff;
-}
-[data-diary-system='drdh'] .drdh-dashboard .mega-box.resource h4 {
-  color: #64b4ff;
-  margin: 0 0 8px 0;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.resource
-  .res-inputs {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.resource
-  .res-inputs
-  input.res-main {
-  font-size: 32px;
-  color: #64b4ff;
-  width: 60px;
+  border-bottom: 1px dashed var(--drdh-gold-deep);
   text-align: center;
+  color: var(--drdh-res);
+  outline: none;
 }
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.resource
-  .res-inputs
-  input.res-max {
+[data-diary-system='drdh'] .drdh-sheet .res-pair .r-cur {
+  width: 58px;
+  font-size: 30px;
+}
+[data-diary-system='drdh'] .drdh-sheet .res-pair .r-sep {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.6);
-  width: 45px;
-  text-align: center;
+  color: var(--drdh-on-forge-dim);
 }
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.resource
-  .res-sub {
+[data-diary-system='drdh'] .drdh-sheet .res-pair .r-max {
+  width: 46px;
+  font-size: 19px;
+  color: var(--drdh-on-forge-dim);
+}
+[data-diary-system='drdh'] .drdh-sheet .res-note {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--drdh-on-forge-dim);
+}
+[data-diary-system='drdh'] .drdh-sheet .res-mini {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
   margin-top: 8px;
 }
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .mega-box.resource
-  .res-sub
-  input {
-  width: 100%;
-  font-size: 11px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.4);
-  border: none;
-  background: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* ── Attributes ────────────────────────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard .attrs-box {
+[data-diary-system='drdh'] .drdh-sheet .res-mini label {
+  font-family: var(--drdh-font-head);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drdh-on-forge-dim);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-[data-diary-system='drdh'] .drdh-dashboard .attr-row {
-  display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  padding: 8px 12px;
+  gap: 3px;
 }
-[data-diary-system='drdh'] .drdh-dashboard .attr-row .attr-name {
-  flex: 1;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  font-size: 12px;
-}
-[data-diary-system='drdh'] .drdh-dashboard .attr-row .attr-vals {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .attr-row
-  .attr-vals
-  input {
-  width: 45px;
+[data-diary-system='drdh'] .drdh-sheet .res-mini input {
+  width: 48px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 14px;
-  padding: 4px;
-  border-radius: 4px;
-}
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .attr-row
-  .attr-vals
-  input:focus {
-  border-color: rgba(255, 170, 0, 0.6);
+  font-family: var(--drdh-font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--drdh-res);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--drdh-forge-edge);
+  border-radius: 3px;
+  padding: 3px;
   outline: none;
 }
-[data-diary-system='drdh']
-  .drdh-dashboard
-  .attr-row
-  .attr-vals
-  input.attr-mod {
-  color: #ffaa00;
-  font-weight: bold;
-  background: rgba(255, 170, 0, 0.05);
+
+/* adrenalin track 1-20 */
+[data-diary-system='drdh'] .drdh-sheet .adr-track {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  margin-top: 4px;
+}
+[data-diary-system='drdh'] .drdh-sheet .adr-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--drdh-font-body);
+  font-size: 10px;
+  color: var(--drdh-on-forge-dim);
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--drdh-forge-edge);
+  border-radius: 3px;
+  transition: 0.1s;
+}
+[data-diary-system='drdh'] .drdh-sheet .adr-cell.on {
+  color: #1a120a;
+  background: linear-gradient(180deg, #e07a3a, #a8431b);
+  border-color: #e07a3a;
+  font-weight: 700;
+  box-shadow: 0 0 8px -2px #e07a3a;
+}
+[data-diary-system='drdh'] .drdh-sheet .adr-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 7px;
+  font-family: var(--drdh-font-head);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--drdh-on-forge-dim);
+}
+[data-diary-system='drdh'] .drdh-sheet .adr-foot b {
+  font-family: var(--drdh-font-display);
+  font-size: 18px;
+  color: #ef9b5c;
 }
 
-/* ── Tables ────────────────────────────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table {
-  width: 100%;
-  margin-bottom: 16px;
+/* klerik checkboxy ráno/odpoledne/večer */
+[data-diary-system='drdh'] .drdh-sheet .prizen-times {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 9px;
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table table {
+[data-diary-system='drdh'] .drdh-sheet .prizen-times label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--drdh-font-head);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drdh-on-forge-dim);
+  cursor: pointer;
+}
+[data-diary-system='drdh'] .drdh-sheet .prizen-times .box {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--drdh-gold-deep);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  display: grid;
+  place-items: center;
+  color: var(--drdh-gold-hi);
+  font-size: 14px;
+}
+[data-diary-system='drdh'] .drdh-sheet .prizen-times input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+[data-diary-system='drdh'] .drdh-sheet .prizen-times input:checked + .box {
+  background: linear-gradient(180deg, var(--drdh-gold-hi), var(--drdh-gold));
+  color: #1a120a;
+}
+
+/* kostýmy seznam */
+[data-diary-system='drdh'] .drdh-sheet .costume-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+[data-diary-system='drdh'] .drdh-sheet .costume-list .crow {
+  display: flex;
+  gap: 6px;
+}
+[data-diary-system='drdh'] .drdh-sheet .costume-list input {
+  flex: 1;
+  font-family: var(--drdh-font-body);
+  font-size: 14px;
+  color: var(--drdh-on-forge);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--drdh-forge-edge);
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .costume-list .del {
+  background: none;
+  border: none;
+  color: var(--drdh-crimson-hi);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+/* ════ MŘÍŽKA 3 sloupce ════ */
+[data-diary-system='drdh'] .drdh-sheet .grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 0.95fr 1.3fr 1fr;
+  gap: clamp(12px, 1.6vw, 22px);
+}
+[data-diary-system='drdh'] .drdh-sheet .panel {
+  position: relative;
+  padding-top: 2px;
+  margin-bottom: 22px;
+}
+
+/* nadpis sekce — kruhový pečetní medailon + linka (signature) */
+[data-diary-system='drdh'] .drdh-sheet .panel-h {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 12px;
+  font-family: var(--drdh-font-head);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3a2812;
+}
+[data-diary-system='drdh'] .drdh-sheet .seal {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: #2a1a0a;
+  background: radial-gradient(
+    circle at 38% 32%,
+    var(--drdh-gold-hi),
+    var(--drdh-gold) 55%,
+    var(--drdh-gold-deep)
+  );
+  border: 1px solid var(--drdh-gold-deep);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 220, 0.6) inset,
+    0 2px 5px -2px rgba(0, 0, 0, 0.5);
+}
+[data-diary-system='drdh'] .drdh-sheet .seal.crimson {
+  background: radial-gradient(
+    circle at 38% 32%,
+    #d05a4e,
+    var(--drdh-crimson) 55%,
+    var(--drdh-crimson-deep)
+  );
+  color: #fbeeca;
+  border-color: var(--drdh-crimson-deep);
+}
+[data-diary-system='drdh'] .drdh-sheet .panel-h::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--drdh-gold), transparent);
+  opacity: 0.55;
+}
+
+/* ── atributy: stupeň + oprava ── */
+[data-diary-system='drdh'] .drdh-sheet .attr-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 252, 242, 0.5),
+    rgba(232, 218, 183, 0.25)
+  );
+  border: 1px solid rgba(194, 170, 120, 0.55);
+}
+[data-diary-system='drdh'] .drdh-sheet .attr-row .a-name {
+  font-size: 16px;
+  color: var(--drdh-ink);
+  font-weight: 500;
+}
+[data-diary-system='drdh'] .drdh-sheet .attr-row .a-name small {
+  display: block;
+  font-family: var(--drdh-font-head);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: var(--drdh-ink-faint);
+}
+[data-diary-system='drdh'] .drdh-sheet .attr-row .a-deg {
+  width: 46px;
+  height: 36px;
+  text-align: center;
+  font-family: var(--drdh-font-display);
+  font-weight: 600;
+  font-size: 17px;
+  color: #2a1a0a;
+  background: rgba(255, 252, 240, 0.7);
+  border: 1px solid var(--drdh-parch-edge);
+  border-radius: 4px;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .attr-row .a-deg:focus {
+  border-color: var(--drdh-gold-deep);
+}
+[data-diary-system='drdh'] .drdh-sheet .attr-row .a-mod {
+  width: 46px;
+  height: 36px;
+  text-align: center;
+  font-family: var(--drdh-font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: #1f1607;
+  background: radial-gradient(
+    circle at 50% 38%,
+    var(--drdh-gold-hi),
+    var(--drdh-gold) 60%,
+    var(--drdh-gold-deep)
+  );
+  border: 1px solid var(--drdh-gold-deep);
+  border-radius: 50%;
+  box-shadow: 0 1px 0 rgba(255, 250, 220, 0.6) inset;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .attr-head {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 9px;
+  padding: 0 8px 4px;
+  font-family: var(--drdh-font-head);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drdh-ink-faint);
+}
+[data-diary-system='drdh'] .drdh-sheet .attr-head span:nth-child(2),
+[data-diary-system='drdh'] .drdh-sheet .attr-head span:nth-child(3) {
+  width: 46px;
+  text-align: center;
+}
+
+/* ── tabulky ── */
+[data-diary-system='drdh'] .drdh-sheet .tbl {
   width: 100%;
   border-collapse: collapse;
+  margin-bottom: 6px;
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table th {
-  text-align: left;
-  font-size: 10px;
+[data-diary-system='drdh'] .drdh-sheet .tbl th {
+  font-family: var(--drdh-font-head);
+  font-size: 9px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  padding: 4px 8px;
-  font-weight: 500;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--drdh-ink-soft);
+  font-weight: 600;
+  text-align: center;
+  padding: 4px 3px;
+  border-bottom: 1.5px solid var(--drdh-gold-deep);
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table td {
-  padding: 4px;
+[data-diary-system='drdh'] .drdh-sheet .tbl th:first-child {
+  text-align: left;
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table td input {
+[data-diary-system='drdh'] .drdh-sheet .tbl td {
+  padding: 2px;
+}
+[data-diary-system='drdh'] .drdh-sheet .tbl input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid transparent;
-  color: #c9d1d9;
-  padding: 6px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table td input:focus {
-  background: rgba(0, 0, 0, 0.5);
-  border-color: rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-family: var(--drdh-font-body);
+  font-size: 14px;
+  color: var(--drdh-ink);
+  background: rgba(255, 252, 242, 0.4);
+  border: 1px solid rgba(194, 170, 120, 0.5);
+  border-radius: 2px;
+  padding: 5px 4px;
   outline: none;
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table td.td-slim {
-  width: 50px;
+[data-diary-system='drdh'] .drdh-sheet .tbl input:focus {
+  border-color: var(--drdh-gold-deep);
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table td.td-mid {
-  width: 80px;
+[data-diary-system='drdh'] .drdh-sheet .tbl input.l {
+  text-align: left;
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table th.td-slim {
-  width: 50px;
+[data-diary-system='drdh'] .drdh-sheet .tbl td:first-child,
+[data-diary-system='drdh'] .drdh-sheet .tbl th:first-child {
+  width: 55%;
 }
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table th.td-mid {
-  width: 80px;
-}
-
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table .add-btn {
-  background: transparent;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.5);
-  padding: 6px;
-  width: 100%;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 8px;
-  font-size: 11px;
-  text-transform: uppercase;
-  transition: all 0.2s;
-}
-[data-diary-system='drdh'] .drdh-dashboard .drdh-table .add-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-[data-diary-system='drdh'] .drdh-dashboard .del-btn {
-  background: transparent;
+[data-diary-system='drdh'] .drdh-sheet .tbl .del {
+  background: none;
   border: none;
-  color: #ff4444;
+  color: var(--drdh-crimson-hi);
   cursor: pointer;
   font-size: 14px;
-  padding: 6px;
-  opacity: 0.5;
+  padding: 0 4px;
 }
-[data-diary-system='drdh'] .drdh-dashboard .del-btn:hover {
-  opacity: 1;
-  transform: scale(1.1);
+[data-diary-system='drdh'] .drdh-sheet .tbl input[readonly] {
+  background: rgba(207, 159, 58, 0.16);
+  font-weight: 700;
+  color: #3a2812;
 }
-
-/* ── Coins ─────────────────────────────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard .coins-panel {
-  display: flex;
-  gap: 12px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-[data-diary-system='drdh'] .drdh-dashboard .coin {
-  flex: 1;
-  text-align: center;
-}
-[data-diary-system='drdh'] .drdh-dashboard .coin label {
-  display: block;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-[data-diary-system='drdh'] .drdh-dashboard .coin input {
+[data-diary-system='drdh'] .drdh-sheet .tbl select {
   width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-align: center;
+  text-align-last: center;
+  font-family: var(--drdh-font-head);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--drdh-ink);
+  background: rgba(255, 252, 242, 0.4);
+  border: 1px solid rgba(194, 170, 120, 0.5);
+  border-radius: 2px;
+  padding: 6px 4px;
+  cursor: pointer;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .tbl td:nth-child(2) {
+  width: 64px;
+}
+
+[data-diary-system='drdh'] .drdh-sheet .add-btn {
+  width: 100%;
+  margin: 2px 0 4px;
+  padding: 8px;
+  font-family: var(--drdh-font-head);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--drdh-gold-deep);
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.4),
+    rgba(221, 202, 159, 0.3)
+  );
+  border: 1px dashed var(--drdh-gold-deep);
+  border-radius: 3px;
+}
+[data-diary-system='drdh'] .drdh-sheet .add-btn:hover {
+  color: #3a2812;
+  border-style: solid;
+  background: rgba(221, 202, 159, 0.5);
+}
+
+/* dovednostní body */
+[data-diary-system='drdh'] .drdh-sheet .skill-pts {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 9px;
+  padding: 7px 12px;
+  border-radius: 4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.5),
+    rgba(221, 202, 159, 0.3)
+  );
+  border: 1px solid var(--drdh-gold-deep);
+}
+[data-diary-system='drdh'] .drdh-sheet .skill-pts label {
+  font-family: var(--drdh-font-head);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #3a2812;
+  font-weight: 600;
+}
+[data-diary-system='drdh'] .drdh-sheet .skill-pts input {
+  margin-left: auto;
+  width: 60px;
+  text-align: center;
+  font-family: var(--drdh-font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: #2a1a0a;
   background: transparent;
   border: none;
-  border-bottom: 2px solid;
-  text-align: center;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
-  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--drdh-gold-deep);
   outline: none;
 }
-[data-diary-system='drdh'] .drdh-dashboard .coin.z input {
-  border-color: #ffd700;
-  color: #ffd700;
+
+/* ════ per-povolání hlavní blok (full width) ════ */
+[data-diary-system='drdh'] .drdh-sheet .prof-block {
+  position: relative;
+  z-index: 2;
+  margin: 4px 2px 22px;
 }
-[data-diary-system='drdh'] .drdh-dashboard .coin.s input {
-  border-color: #c0c0c0;
-}
-[data-diary-system='drdh'] .drdh-dashboard .coin.m input {
-  border-color: #cd7f32;
-  color: #cd7f32;
+[data-diary-system='drdh'] .drdh-sheet .prof-block .panel-h .seal {
+  background: radial-gradient(
+    circle at 38% 32%,
+    #d6b85a,
+    var(--drdh-brass) 55%,
+    #6a4716
+  );
+  border-color: #6a4716;
 }
 
-/* ── Notes area ────────────────────────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard .notes-area {
+/* ════ spodní zóna — schopnosti / magické předměty / poznámky ════ */
+[data-diary-system='drdh'] .drdh-sheet .bottom {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 1.6vw, 22px);
+  margin-top: 4px;
+}
+[data-diary-system='drdh'] .drdh-sheet .scroll-panel {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.5),
+    rgba(221, 202, 159, 0.25)
+  );
+  border: 1px solid var(--drdh-parch-edge);
+  border-radius: 4px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+}
+[data-diary-system='drdh'] .drdh-sheet .scroll-panel .panel-h {
+  margin-bottom: 8px;
+}
+[data-diary-system='drdh'] .drdh-sheet .scroll-panel textarea {
   width: 100%;
-  min-height: 120px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 13px;
+  min-height: 150px;
   resize: vertical;
-  font-family: inherit;
+  font-family: var(--drdh-font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--drdh-ink);
+  background: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(150, 120, 72, 0.18) 27px 28px
+  );
+  border: none;
+  padding: 0;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet .scroll-panel textarea::placeholder {
+  color: var(--drdh-ink-soft);
+  opacity: 0.7;
+  font-style: italic;
+}
+[data-diary-system='drdh'] .drdh-sheet .notes {
+  grid-column: 1 / -1;
+}
+[data-diary-system='drdh'] .drdh-sheet .notes textarea {
+  min-height: 90px;
+}
+
+/* ── režim náhledu (data-mode='view') ── */
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] input,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] select,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] textarea {
+  pointer-events: none;
+}
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .ident-line input,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .ident-line select,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .tbl input,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .tbl select,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .res-mini input,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .costume-list input {
+  border-color: transparent !important;
+  background: transparent !important;
+}
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .adr-cell,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .erb,
+[data-diary-system='drdh'] .drdh-sheet[data-mode='view'] .prizen-times label {
+  cursor: default;
+}
+[data-diary-system='drdh'] .drdh-sheet input:disabled,
+[data-diary-system='drdh'] .drdh-sheet select:disabled,
+[data-diary-system='drdh'] .drdh-sheet textarea:disabled {
+  cursor: default;
+  opacity: 0.95;
+}
+
+/* ════ responsivita ════ */
+@media (max-width: 980px) {
+  [data-diary-system='drdh'] .drdh-sheet .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  [data-diary-system='drdh'] .drdh-sheet .hud {
+    grid-template-columns: 1fr;
+  }
+  [data-diary-system='drdh'] .drdh-sheet .bottom {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 680px) {
+  [data-diary-system='drdh'] .drdh-sheet .grid {
+    grid-template-columns: 1fr;
+  }
+  [data-diary-system='drdh'] .drdh-sheet .hero {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  [data-diary-system='drdh'] .drdh-sheet .res-wrap {
+    flex-direction: column;
+  }
+  [data-diary-system='drdh'] .drdh-sheet .ident-line {
+    justify-content: center;
+  }
+}
+
+/* ── Print (statický čitelný dokument) ─────────────────── */
+[data-diary-system='drdh'] .drdh-print {
+  color: #1a1a1a;
+  font-family: 'EB Garamond', 'Georgia', serif;
+  font-size: 12px;
   line-height: 1.5;
 }
-[data-diary-system='drdh'] .drdh-dashboard .notes-area:focus {
-  outline: none;
-  border-color: rgba(255, 170, 0, 0.5);
+[data-diary-system='drdh'] .drdh-print h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  border-bottom: 1.5px solid #1a1a1a;
+  padding-bottom: 3px;
+  margin: 16px 0 8px;
 }
-
-/* ── Disabled states (view mode) ───────────────────────────── */
-
-[data-diary-system='drdh'] .drdh-dashboard input:disabled,
-[data-diary-system='drdh'] .drdh-dashboard select:disabled,
-[data-diary-system='drdh'] .drdh-dashboard textarea:disabled,
-[data-diary-system='drdh'] .drdh-dashboard button:disabled {
-  cursor: default;
-  opacity: 0.85;
+[data-diary-system='drdh'] .drdh-print dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 18px;
+  margin: 0;
+}
+[data-diary-system='drdh'] .drdh-print dt {
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #555;
+}
+[data-diary-system='drdh'] .drdh-print dd {
+  margin: 0 0 4px;
+}
+[data-diary-system='drdh'] .drdh-print table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0;
+}
+[data-diary-system='drdh'] .drdh-print th,
+[data-diary-system='drdh'] .drdh-print td {
+  border: 1px solid #bbb;
+  padding: 3px 6px;
+  text-align: left;
+  font-size: 11px;
+}
+[data-diary-system='drdh'] .drdh-print th {
+  background: #eee;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+}
+[data-diary-system='drdh'] .drdh-print .matrix-print__plain {
+  list-style: none;
+  margin: 4px 0;
+  padding: 0;
+}
+[data-diary-system='drdh'] .drdh-print .print-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #ccc;
+  padding: 2px 0;
 }

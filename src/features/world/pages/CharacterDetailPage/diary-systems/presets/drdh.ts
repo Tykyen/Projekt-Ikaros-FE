@@ -10,10 +10,11 @@ export const drdhPreset: DiarySystemPreset = {
   id: 'drdh',
   name: 'Dračí Hlídka',
   description:
-    'Heroic golden téma, 5 atributů, 6 povolání (Válečník, Hraničář, ' +
-    'Alchymista, Kouzelník, Zloděj, Klerik) — každé s vlastním sekundárním ' +
-    'zdrojem (Adrenalin / Duševní síla / Mana + Suroviny / Mana / Kostýmy / ' +
-    'Přízeň) a vlastní profession-tabulkou (triky / kouzla / recepty / prosby).',
+    'Pergamenový rozkaz Hlídky (fantasy), 5 atributů, 6 povolání (Válečník, ' +
+    'Hraničář, Alchymista, Kouzelník, Zloděj, Klerik) — výběr přes interaktivní ' +
+    'erb. Každé povolání má vlastní sekundární zdroj (Adrenalin track / Duševní ' +
+    'síla / Mana + Suroviny / Mana / Kostýmy / Přízeň) a vlastní profession-tabulku ' +
+    '(triky / kouzla / recepty / prosby).',
   SystemSheet: DrdhSheet,
   loadStyles: () => import('../styles/drdh.css'),
 };

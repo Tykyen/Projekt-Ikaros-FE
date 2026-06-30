@@ -21,7 +21,7 @@ const commonProps = {
   characterSlug: 'aragorn',
 };
 
-describe('DrdhSheet (8.7e)', () => {
+describe('DrdhSheet (16b — prototyp parity)', () => {
   it('vyrenderuje 5 atributů (Síla, Obratnost, Odolnost, Inteligence, Charisma)', () => {
     render(
       <DrdhSheet
@@ -38,8 +38,23 @@ describe('DrdhSheet (8.7e)', () => {
     );
   });
 
-  it('default profession je Válečník + ukáže Válečníkovy triky', () => {
+  it('oprava atributu je auto = ⌊stupeň/2⌋ − 5 (read-only)', () => {
     render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({ drdh_attr_str: '16' })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    // 16 → ⌊16/2⌋−5 = 3
+    const mod = screen.getByLabelText('Síla oprava') as HTMLInputElement;
+    expect(mod.value).toBe('+3');
+    expect(mod).toHaveAttribute('readonly');
+  });
+
+  it('default profession je Válečník + ukáže Válečníkovy triky + Adrenalin track', () => {
+    const { container } = render(
       <DrdhSheet
         {...commonProps}
         diary={makeDiary()}
@@ -48,25 +63,33 @@ describe('DrdhSheet (8.7e)', () => {
       />,
     );
     expect(screen.getByText('Válečníkovy triky')).toBeInTheDocument();
+    // erb banner = Válečník
+    expect(container.querySelector('.erb-banner')!.textContent).toContain(
+      'Válečník',
+    );
+    // adrenalin track má 20 buněk
+    expect(container.querySelectorAll('.adr-cell')).toHaveLength(20);
   });
 
-  it('změna profession na Hraničář aktualizuje sekundární zdroj na Duševní Sílu a tabulku na Kouzla', () => {
-    const { container, rerender } = render(
+  it('erb popover přepne povolání přes onChange(drdh_profession_id)', () => {
+    const onChange = vi.fn();
+    render(
       <DrdhSheet
         {...commonProps}
         diary={makeDiary()}
         mode="edit"
-        onChange={() => {}}
+        onChange={onChange}
       />,
     );
-    // Default = válečník → mega-box header říká „Adrenalin" (h4 + sloupec
-    // tabulky stejnojmenný; ověřuju přímo přes mega-box.resource h4).
-    const resourceBox = container.querySelector('.mega-box.resource');
-    expect(resourceBox).not.toBeNull();
-    expect(resourceBox!.querySelector('h4')!.textContent).toBe('Adrenalin');
+    fireEvent.click(screen.getByTitle('Klikni pro výběr povolání'));
+    fireEvent.click(screen.getByRole('option', { name: /Hraničář/ }));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: { drdh_profession_id: 'hranicar' },
+    });
+  });
 
-    // Přepnutí na hraničáře
-    rerender(
+  it('hraničář ukazuje Duševní sílu + Hraničářova kouzla', () => {
+    const { container } = render(
       <DrdhSheet
         {...commonProps}
         diary={makeDiary({ drdh_profession_id: 'hranicar' })}
@@ -74,8 +97,8 @@ describe('DrdhSheet (8.7e)', () => {
         onChange={() => {}}
       />,
     );
-    const resBox2 = container.querySelector('.mega-box.resource');
-    expect(resBox2!.querySelector('h4')!.textContent).toBe('Duševní Síla');
+    const resBox = container.querySelector('.mega.resource');
+    expect(resBox!.textContent).toContain('Duševní síla');
     expect(screen.getByText('Hraničářova kouzla')).toBeInTheDocument();
   });
 
@@ -88,78 +111,202 @@ describe('DrdhSheet (8.7e)', () => {
         onChange={() => {}}
       />,
     );
-    // alchymista renderuje 2 mega-boxy resource (Mana + Suroviny)
-    expect(container.querySelectorAll('.mega-box.resource')).toHaveLength(2);
-    // „Suroviny" se v UI vyskytuje jen v header alchymisty, „Mana" je i
-    // ve sloupci tabulky → ověřuju Suroviny + recept název.
-    expect(screen.getByText('Suroviny')).toBeInTheDocument();
+    const resBox = container.querySelector('.mega.resource')!;
+    expect(within(resBox as HTMLElement).getByText('Mana')).toBeInTheDocument();
+    expect(
+      within(resBox as HTMLElement).getByText('Suroviny'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Alchymistovy recepty')).toBeInTheDocument();
   });
 
-  it('view mode disabluje inputy, select a skryje add/del tlačítka', () => {
-    render(
-      <DrdhSheet {...commonProps} diary={makeDiary()} mode="view" />,
-    );
-    expect(screen.getByLabelText('Maximum životů')).toBeDisabled();
-    // Select povolání disabled
-    expect(screen.getByRole('combobox')).toBeDisabled();
-    // Add button schovaný
-    expect(screen.queryByText('+ Přidat Zbraň')).not.toBeInTheDocument();
-    expect(screen.queryByText('+ Přidat Trik')).not.toBeInTheDocument();
-  });
-
-  it('+ Přidat Zbraň přidá prázdnou položku do drdh_weapons', () => {
-    const onChange = vi.fn();
+  it('zloděj má kostýmy jako seznam (žádný číselný zdroj)', () => {
     render(
       <DrdhSheet
         {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={onChange}
-      />,
-    );
-    fireEvent.click(screen.getByText('+ Přidat Zbraň'));
-    expect(onChange).toHaveBeenCalledWith({
-      customDataPatch: expect.objectContaining({
-        drdh_weapons: JSON.stringify([
-          { name: '', atk: '', dmg: '', def: '', uc: '', oc: '' },
-        ]),
-      }),
-    });
-  });
-
-  it('+ Přidat Trik (válečník) přidá row s name/adr/use/check/note polem', () => {
-    const onChange = vi.fn();
-    render(
-      <DrdhSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={onChange}
-      />,
-    );
-    fireEvent.click(screen.getByText('+ Přidat Trik'));
-    expect(onChange).toHaveBeenCalledWith({
-      customDataPatch: expect.objectContaining({
-        drdh_w_triky: JSON.stringify([
-          { name: '', adr: '', use: '', check: '', note: '' },
-        ]),
-      }),
-    });
-  });
-
-  it('coins panel obsahuje 3 mince (Zlaťáky, Stříbrňáky, Měďáky)', () => {
-    render(
-      <DrdhSheet
-        {...commonProps}
-        diary={makeDiary()}
+        diary={makeDiary({
+          drdh_profession_id: 'zlodej',
+          drdh_costumes: JSON.stringify(['Žebrák']),
+        })}
         mode="edit"
         onChange={() => {}}
       />,
     );
-    expect(screen.getByText('Zlaťáky')).toBeInTheDocument();
-    expect(screen.getByText('Stříbrňáky')).toBeInTheDocument();
-    expect(screen.getByText('Měďáky')).toBeInTheDocument();
+    expect(
+      screen.getByText('+ Přidat kostým'),
+    ).toBeInTheDocument();
+    expect(
+      (screen.getByLabelText('Kostým 1') as HTMLInputElement).value,
+    ).toBe('Žebrák');
+  });
+
+  it('klerik má 3 denní checkboxy (Ráno/Odpoledne/Večer)', () => {
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({ drdh_profession_id: 'klerik' })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.getByLabelText('Ráno')).toBeInTheDocument();
+    expect(screen.getByLabelText('Odpoledne')).toBeInTheDocument();
+    expect(screen.getByLabelText('Večer')).toBeInTheDocument();
+  });
+
+  it('hranice smrti se auto počítá = −(10 + oprava ODO)', () => {
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({ drdh_attr_con: '14' })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    // 14 → ⌊14/2⌋−5 = 2 → hranice = −(10+2) = −12
+    const death = screen.getByLabelText('Hranice smrti') as HTMLInputElement;
+    expect(death.value).toBe('-12');
+  });
+
+  it('specializace je zamčená dokud úroveň < 6', () => {
+    const { rerender } = render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({ drdh_lvl: '4' })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.getByLabelText('Specializace')).toBeDisabled();
+    rerender(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({ drdh_lvl: '6' })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.getByLabelText('Specializace')).not.toBeDisabled();
+  });
+
+  it('view mode disabluje inputy a skryje add/del tlačítka', () => {
+    render(<DrdhSheet {...commonProps} diary={makeDiary()} mode="view" />);
+    expect(screen.getByLabelText('Maximum životů')).toBeDisabled();
+    expect(screen.queryByText('+ Přidat zbraň')).not.toBeInTheDocument();
+    expect(screen.queryByText('+ Přidat trik')).not.toBeInTheDocument();
+  });
+
+  it('+ Přidat zbraň přidá prázdnou položku do drdh_weapons', () => {
+    const onChange = vi.fn();
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ Přidat zbraň'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drdh_weapons: JSON.stringify([
+          { name: '', atk: '', dmg: '', def: '', uc: '', oc: '' },
+        ]),
+      },
+    });
+  });
+
+  it('+ Přidat zbroj / štít přidá řádek s polem zo', () => {
+    const onChange = vi.fn();
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ Přidat zbroj / štít'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drdh_armors: JSON.stringify([
+          { name: '', quality: '', zo: '', note: '' },
+        ]),
+      },
+    });
+  });
+
+  it('+ Přidat trik (válečník) přidá row se sloupci name/adr/use/req/check/note', () => {
+    const onChange = vi.fn();
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ Přidat trik'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drdh_w_triky: JSON.stringify([
+          { name: '', adr: '', use: '', req: '', check: '', note: '' },
+        ]),
+      },
+    });
+  });
+
+  it('dovednost: součet = oprava atributu + stupeň (auto, read-only)', () => {
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({
+          drdh_attr_dex: '12', // ⌊12/2⌋−5 = 1
+          drdh_skills: JSON.stringify([{ name: 'Plížení', attr: 'OBR', deg: '3' }]),
+        })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    // součet = 1 + 3 = +4
+    const sum = screen.getByLabelText('Dovednost 1 — součet') as HTMLInputElement;
+    expect(sum.value).toBe('+4');
+    expect(sum).toHaveAttribute('readonly');
+  });
+
+  it('+ Přidat dovednost přidá row s polem attr', () => {
+    const onChange = vi.fn();
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ Přidat dovednost'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drdh_skills: JSON.stringify([{ name: '', attr: 'OBR', deg: '' }]),
+      },
+    });
+  });
+
+  it('+ Přidat schopnost přidá row do drdh_abilities', () => {
+    const onChange = vi.fn();
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('+ Přidat schopnost'));
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: {
+        drdh_abilities: JSON.stringify([{ name: '', desc: '' }]),
+      },
+    });
   });
 
   it('změna jména volá onChange s drdh_name klíčem', () => {
@@ -172,33 +319,11 @@ describe('DrdhSheet (8.7e)', () => {
         onChange={onChange}
       />,
     );
-    const nameInput = screen.getByLabelText('Jméno');
-    fireEvent.change(nameInput, { target: { value: 'Aragorn' } });
-    expect(onChange).toHaveBeenCalledWith({
-      customDataPatch: expect.objectContaining({ drdh_name: 'Aragorn' }),
+    fireEvent.change(screen.getByLabelText('Jméno'), {
+      target: { value: 'Aragorn' },
     });
-  });
-
-  it('všech 6 povolání je v select dropdownu', () => {
-    render(
-      <DrdhSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
-    );
-    const select = screen.getByLabelText('Povolání');
-    const labels = within(select)
-      .getAllByRole('option')
-      .map((o) => o.textContent);
-    expect(labels).toEqual([
-      'Válečník',
-      'Hraničář',
-      'Alchymista',
-      'Kouzelník',
-      'Zloděj',
-      'Klerik',
-    ]);
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: { drdh_name: 'Aragorn' },
+    });
   });
 });
