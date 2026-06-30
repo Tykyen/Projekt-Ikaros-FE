@@ -684,3 +684,35 @@
     inset 0 0 0 2.5px var(--dd-ink, #16162e),
     inset 0 -3px 0 var(--dd-parch-2, #c9c2b2);
 }
+
+/* ── KOREKCE AKČNÍCH AKCENTŮ (živý audit): Iniciativa / +/− / roll nesou
+ *    PRIMÁRNÍ akcent skinu, ne amber gold. nature = zelená, horror = stříbro-
+ *    fialová + kontrast. (Ostatní skiny: gold/cyan už sedí.) Hodnoty (bonus,
+ *    Obnova) drží gold. ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .init,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .roll,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .step {
+  border-color: var(--dd-emer, #6e9a3a);
+  color: var(--dd-emer, #4f7a26);
+  background: rgba(94, 136, 50, 0.12);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .init:hover,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .roll:hover,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .step:hover {
+  background: var(--dd-emer, #5e8832);
+  color: #f3ead0;
+}
+
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .init,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .roll,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .step {
+  border-color: var(--dd-sapphire, #9a8fc0);
+  color: var(--dd-sapphire, #cabfe0);
+  background: rgba(110, 96, 150, 0.16);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .init:hover,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .roll:hover,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .step:hover {
+  background: var(--dd-sapphire, #5b4a7a);
+  color: #fff;
+}

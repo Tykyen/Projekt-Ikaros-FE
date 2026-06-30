@@ -128,7 +128,7 @@ Tisk entity v **samostatném tiskovém okně** (`window.open` → prohlížeč n
 - Wiki stránka (11) — obsah + sekce + odemčené AKJ záložky.
 - **Lokace / Ostatní** (`OstatniLayout`) — v tisku pořadí **obrázek → datová tabulka (boxík) → text** (na obrazovce je obrázek/tabulka v bočním sidebaru).
 - Deník PC/NPC (2, 5) a **záložky postavy/NPC** (3, 6) — print rozbalí všechny subdoc taby + odemčené AKJ lineárně, **každá záložka na vlastní stránce**; kalendář **opt-in**. Viz kap. 12.
-- **12 systémových diary sheetů** (matrix/coc/dnd5e/drd2/drd16/drdh/drdplus/fate/gurps/jad/pi/shadowrun) má **tiskový render** — hodnoty z `<input>` jako text, pips/tracky jako `●●●○○`, NE prázdná políčka.
+- **13 systémových diary sheetů** (matrix/coc/dnd5e/drd2/drd16/drdh/drdplus/fae/fate/gurps/jad/pi/shadowrun) má **tiskový render** — hodnoty z `<input>` jako text, pips/tracky jako `●●●○○`, NE prázdná políčka.
 - **Kalendář** s rozsahem (1–12 měsíců) — v tisku vynucen detail mód (názvy akcí) + mřížka (`print-cal-grid`); respektuje filtr entit (4, kap. 15).
 - **Bestiář** + **obchod** (ceník) — tiskne zobrazené (scope/složka/search; 7, 8, 14; kap. 12).
 - **Mapy atlas** (9, kap. 14), **Storyboard** vybraný scénář (13), **Pavučina** snapshot 2D grafu (12), **Hvězdná mapa** seznam těles (10).

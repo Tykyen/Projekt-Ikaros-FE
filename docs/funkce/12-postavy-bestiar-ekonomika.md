@@ -210,15 +210,39 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 ---
 
+### FATE — deník + bestiář + mapa + chat (`fae` + `fate`)
+
+**Co to je:** Systém FATE ve **dvou variantách** sdílejících jednu kostru: `fae` = **Fate Accelerated** (6 fixních Přístupů Pečlivě/Chytře/Oslnivě/Rázně/Rychle/Lstivě), `fate` = **Fate Core** (volné Dovednosti + slovní žebříček). V nabídce „Herní systém" dvě samostatné položky (dřív 1 sloučená „Fate Core / Accelerated"). Default vzhled **„Karty osudu"** (slonovina + sépiové serify + signature 4dF kostky −/0/+).
+
+**Kde:** Svět s `world.system = 'fae'` nebo `'fate'`. Deník (`DiaryTab`), bestiář (`/svet/:slug/bestiar`), taktická mapa (token panel), chat (rail).
+
+**Kdo:** Jako ostatní systémy — člen s přístupem k postavě; edituje vlastník PC / PJ+. Bestiář dle 3 scope (viz „Bestiář").
+
+**Co jde dělat:**
+- **Deník** (`FateLikeSheet`, variant `fae`/`core`): Hlavní koncept + Problém + další aspekty · 6 Přístupů (+N) NEBO volné Dovednosti · Triky (název+popis) · Stres (sized boxy, default 3) · Následky (Drobný 2 / Mírný 4 / Vážný 6) · Obnova (★) · Deník/Poznámky. **Bez kostek** (záznam, ne boj). Print režim.
+- **Bestiář** (`FateBestieCard`, „Karty osudu"): 2 schémata (`fae`/`fate:bestie`) řízená `world.system` — Hlavní koncept + aspekty + Přístupy/Dovednosti + Triky + Stres + Následky; editor přes generický `EntitySchemaForm`.
+- **Taktická mapa**: PC combat panel (`FateCombatPanel` v `COMBAT_PANELS`) + bestie panel (`FateBestiePanel`) — sdílené UI jádro `FateCombatBody`; **hod 🎲 = 4dF + bonus**, klikací stres, Body osudu počítadlo, Iniciativa = prosté 4dF.
+- **Chat**: PC zdarma přes `DiaryRollPanel`→`COMBAT_PANELS`; bestie přes `FateChatBestiePanel` (katalog read-only + instance v boji editovatelná). Sdílí `fateBestieView` s mapou (0 drift).
+- **8 skinů** (default `minimal`) — viz „Skin deníku".
+
+**Hranice / co neumí:** List = evidence, ne pravidlový engine (nepočítá útraty Obnovy ani limity triků). **HP bar na tokenu = žádný** (stres ≠ HP, `resolveCharacterHp` vrací `null` — herní rozhodnutí). Iniciativa bez statu (prosté 4dF). Fate Core = zjednodušen na **jeden** stres track (ne kanonické dva). Bestie data = `systemStats` (neprefix), deník = `customData` prefix `fae_*`/`fate_*` — jiné vrstvy.
+
+**Zvláštnosti:** Deník+panel+bestie+chat sdílí 3 komponenty (`FateLikeSheet`, `FateCombatBody`, `fateBestieView`) přes `variant`/prefix → 0 drift. Bestie token = superset profilu v `systemStats` (BE `token.update` REPLACE + strict patch → schéma musí být superset). 4dF = fudge kostky (−/0/+).
+
+**Stav:** ✅ funguje.
+**Kód:** FE `_shared/FateLikeSheet.tsx`, `sheets/{fae/FaeSheet,fate/FateSheet}.tsx`, `presets/{fae,fate}.ts`, `styles/fate.css`; `bestiar/components/FateBestieCard.tsx`; `tactical-map/.../system-panels/{FateCombatPanel,FateBestiePanel}.tsx` + `fate/{FateCombatBody,fateBestieView}`; `chat/.../rail/FateChatBestiePanel.tsx`; schémata `tactical-map/schemas/{fae,fate}/`. BE: `fae/fate` token+bestie schémata v `backend/assets/schemas/` (export-schemas), jinak pass-through.
+
+---
+
 ### Skin deníku (vizuální „kabát" listu)
 
 **Co to je:** Vizuální styl per-system listu, nezávislý na obsahu/datech. Rodina **8 skinů** (`scifi · fantasy · horror · steampunk · nature · minimal · retro · anime`=MLP); každý vlastní paleta + tvarový jazyk + signature ornament, identita drží napříč systémy.
 
-**Volba:** per **uživatel × svět** (`WorldMembership.diarySkin`); bez volby padá na default systému (`DEFAULT_SKIN_BY_SYSTEM`: matrix→scifi, **pi→scifi** (osekaný Matrix), drd16/drdplus/drd2/jad/drdh→fantasy, coc→horror). User-facing picker `DiarySkinSelector` („🎨 Vzhled") na `DiaryTab` jen pro skinovatelné systémy (do tisku/PDF nejde). Registr `diary-systems/skins/registry.ts`, BE whitelist `update-member.dto.ts` (`@IsIn`, 8 ID).
+**Volba:** per **uživatel × svět** (`WorldMembership.diarySkin`); bez volby padá na default systému (`DEFAULT_SKIN_BY_SYSTEM`: matrix→scifi, **pi→scifi** (osekaný Matrix), drd16/drdplus/drd2/jad/drdh→fantasy, coc→horror, **fae/fate→minimal** (≈ Karty osudu)). User-facing picker `DiarySkinSelector` („🎨 Vzhled") na `DiaryTab` jen pro skinovatelné systémy (do tisku/PDF nejde). Registr `diary-systems/skins/registry.ts`, BE whitelist `update-member.dto.ts` (`@IsIn`, 8 ID).
 
 **Jak se aplikuje:** `DiarySystemProvider` (deník) i `DiarySkinScope` (embedy: mapa/chat/dice) dají na předka `data-diary-system` + `data-diary-skin`; CSS sady (`styles/diary-skins.css` + `<sys>-skins/<id>.css`) přebíjí přes compound selektor `[data-diary-system][data-diary-skin]` přes tokeny `--mx-*` (HUD) / `--dd-*` (pergamen) / `--dd-embed-*` (embed plochy). Pokrývá: **deník list + bojový/bestie panel na mapě i v chatu (PC/NPC/Bestie stejně) + obal v TM + vyčíslení hodu + log kostek**.
 
-**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**, **jad ✅ (16.2g — 8 skinů, fantasy = nový default; světlý pergamen = no-skin fallback)**, **pi ✅ (8 skinů; scifi = default = osekaný Matrix HUD; port rodiny matrix→pi přes `--pi-*`/`--pi-log-*`)**. Ostatní systémy: list bez skinů (jen default vzhled). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
+**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**, **jad ✅ (16.2g — 8 skinů, fantasy = nový default; světlý pergamen = no-skin fallback)**, **pi ✅ (8 skinů; scifi = default = osekaný Matrix HUD; port rodiny matrix→pi přes `--pi-*`/`--pi-log-*`)**, **fae/fate ✅ (8 skinů; minimal = default; `--dd-*` rodina, deník+panel render-ověřeno, embedy přes `:is()` enumerace + živý audit, panel akce nesou primární akcent skinu)**. Ostatní systémy: list bez skinů (jen default vzhled). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
 **Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2,jad,pi}-skins/`. Bestie panel v chatu = TÝŽ plný statblok jako na mapě (ne osekaná varianta). pi embed signatury (readout/obal TM) v `*.module.css`; chat rail chrome per-skin přes `:has()`; dicelog/orchestrace/rail jen barva (ornament policy).
 
 ---

@@ -440,12 +440,18 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
-- **Fate** (`fate`) — *stav kódu:* list sheet+testy, mapa combat panel `FateCombatPanel` (hody řeší panel; sheet sám bez `onRoll`)
-  - [ ] Reálný list (grafika)
-  - [ ] Taktická mapa (grafika)
-  - [ ] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
-  - [ ] Skiny (→ 16.2c)
+- **Fate Accelerated** (`fae`) — *HOTOVO:* deník „Karty osudu" (6 Přístupů) + bestiář + mapa (`FateCombatPanel`/`FateBestiePanel`, hod 4dF) + chat (`FateChatBestiePanel`) + 8 skinů (default `minimal`). Sdílí komponenty s `fate` přes `variant`. **POZN.: FATE = DVA samostatné systémy** (`fae` + `fate`), split z původní sloučené „Fate Core / Accelerated".
+  - [x] Reálný list (grafika)
+  - [x] Taktická mapa (grafika)
+  - [x] Bestie (grafika)
+  - [x] Chat (→ 16.1)
+  - [x] Skiny (→ 16.2c) — deník+panel render-ověřeno; embedy/chrome čekají živý audit
+- **Fate Core** (`fate`) — *HOTOVO:* tatáž kostra, varianta **Dovednosti** (žebříček) místo Přístupů.
+  - [x] Reálný list (grafika)
+  - [x] Taktická mapa (grafika)
+  - [x] Bestie (grafika)
+  - [x] Chat (→ 16.1)
+  - [x] Skiny (→ 16.2c)
 - **Call of Cthulhu** (`coc`) — *stav kódu:* list sheet+testy, mapa combat panel `CocCombatPanel`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
@@ -509,7 +515,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 - [ ] **Dungeons & Dragons 5e** (`dnd5e`) — d20 + modifikátory. ☐ Deník ☐ Bestiář
 - [ ] **Shadowrun** (`shadowrun`) — d6 pool. ☐ Deník ☐ Bestiář
 - [ ] **GURPS** (`gurps`) — 3d6 roll-under. ☐ Deník ☐ Bestiář
-- [ ] **Fate Core / Accelerated** (`fate`) — 4dF (fudge). ☐ Deník ☐ Bestiář
+- [x] **Fate Accelerated** (`fae`) — 4dF (fudge), 6 Přístupů. ☑ Deník ☑ Bestiář
+- [x] **Fate Core** (`fate`) — 4dF (fudge), Dovednosti. ☑ Deník ☑ Bestiář
 - [ ] **Call of Cthulhu** (`call-of-cthulhu`) — k% + sanity. ☐ Deník ☐ Bestiář
 ##### Engine pro vlastní systém
 - [ ] **Vlastní systém** (`vlastni` / `generic`) — nedotahovat obsah, dát PJ **nástroje** (editor schématu listu + custom bestie). Most k Fázi 21 (komunitní tvorba).
