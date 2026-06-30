@@ -1302,3 +1302,23 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Jak ověřeno:** `npm run build` (tsc -b + vite + csp) ✓ 2× (po deník sadách, po povrchech). Render reálného produkčního CSS přes headless harness NEPROVEDEN (playwright/Chrome MCP nedostupný) → dle skill §6 brzdy vyžádáno živé vizuální potvrzení uživatele přes selektor „Vzhled" (uživatel testuje prod). NEtvrdím „sedí" bez renderu.
 
 **Zhodnocení:** dobře — galerie-první gate + token baseline konzument (úspora kódu) + fan-out disjunktních souborů + agenti drželi opaque surface; pasti (`*/`, DiarySkinScope, struktura) chyceny. Špatně — dávkoval jsem povrchy v galerii (uživatel musel opakovat „chci tam vše"), měl jsem od začátku §3 kompletní; MLP tmavý/světlý jsem netrefil napoprvé (MLP = vždy světlý duhový). Zbývá: render-audit (živě) + mobil-desktop + funkce(skiny=grafika, jen pozn.)/commit.
+
+---
+
+## CH-043 — cyklil jsem na shadowrun skinech po jednom screenshotu, ignoroval CH-015 + CH-038 (vlastní deník) — 2026-06-30
+
+**Co se stalo:** Po implementaci 8 shadowrun skinů jsem je předal uživateli BEZ render-verify. Uživatel testoval naživo a posílal screenshot po screenshotu: „bestie tmavá" → „MLP tmavé boxy" → „HRANA černá" → „DETAILY tmavé" → „PC chat tmavé" → „bestie překryv" → „scifi/fantasy ornament vyčuhuje". Já opravoval VŽDY JEN ten jeden nahlášený prvek → další screenshot → další prvek. ≥5 kol. Uživatel mě napomenul: „je past CH-15 a tu si nehlídáš? nač máš chybový deník, když se z chyb nepoučíš."
+
+**Kořen (proč):**
+1. **List/panel/bestie NEbyly plně tokenizované** na `var(--mx-*)` — zůstaly hardcoded tmavé: `.sr-bigstat` + `.sr-derv .d` (`#0c0d1a`), `.chip input` (`#0a0b16`, HRANA edit = černý box u PJ), `.openbtn` DETAILY (`#0c0d1a`), bestie body self-contained `--srb-*` (celá tmavá), hover `#13152a`, `.rpool` `#c4b1ff`. Na SVĚTLÝCH skinech (minimal/MLP) tmavé prvky prosvítaly.
+2. **Ornamenty vyčuhovaly** — `.sr-hero`/`.sr-panel` měly `clip-path: var(--mx-clip)`, ale skiny s `--mx-clip: none` neořezávaly → ornamenty ven; hero ornamenty vpravo nahoře kolidovaly s boxy Hrana/Esence.
+3. **Žádné render-verify před předáním** = přesně CH-015 (cyklení na vzhledu, uživatel testuje, ladím po jednom).
+
+**Co jsem měl udělat (poučení z deníku, které jsem ignoroval):**
+- **CH-015:** vizuál nasaď/ověř renderem PŘED dalším feedbackem, jinak nelze zkonvergovat.
+- **CH-038/045:** skin audit MUSÍ projít VŠECHNY povrchy renderem (ne build); hledej inline/hardcoded barvy v module CSS, ne jen tokeny; „světlý skin prosvítá tmavé chrome".
+- Plně tokenizovat list/panel/bestie OD ZAČÁTKU (žádný self-contained `--srb-*`, žádný hardcoded `#xxxxxx` background na prvcích).
+
+**Fix:** systematická tokenizace všech hardcoded barev → `var(--mx-*, fallback)`; `overflow:hidden` na `.sr-hero`/`.sr-panel` baseline (ořez napříč skiny); kolidující hero ornamenty zrušeny (fantasy/steampunk/nature); `--mx-input-bg`/`--mx-panel-bg` doplněny do světlých skinů (anime/minimal); pak **render-verify Chrome headless harness** (8 skinů × deník/combat/bestie) PŘED dalším předáním.
+
+**Zhodnocení:** špatně — ZNAL jsem CH-015 i CH-038 (sám jsem je psal) a stejně cyklil; měl jsem deník přečíst před skiny a render-verify udělat sám. STOP: tutéž třídu chyby (netokenizovaný prvek) jsem „opravil" 5× po jednom → změna přístupu na systematický render-verify. Dobře (až teď) — systematická tokenizace + render harness místo dalšího po-jednom.

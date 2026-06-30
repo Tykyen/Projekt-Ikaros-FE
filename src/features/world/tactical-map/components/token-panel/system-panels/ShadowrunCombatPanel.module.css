@@ -175,8 +175,8 @@
 }
 .chip input {
   width: 100%;
-  background: #0a0b16;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--mx-input-bg, #0a0b16);
+  border: 1px solid var(--mx-line, rgba(255, 255, 255, 0.14));
   color: inherit;
   text-align: center;
   font: 700 14px var(--mx-font-num, monospace);
@@ -202,7 +202,7 @@
   cursor: pointer;
 }
 .attr.click:hover {
-  background: #13152a;
+  filter: brightness(1.12);
 }
 .attr.mental {
   border-bottom-color: var(--mx-violet, #a78bfa);
@@ -263,7 +263,7 @@
 }
 .rowbtn:hover {
   border-color: var(--mx-line-strong, rgba(56, 224, 255, 0.4));
-  background: #13152a;
+  filter: brightness(1.12);
 }
 .rowbtn:disabled {
   cursor: default;
@@ -305,7 +305,7 @@
 }
 .rpool b {
   font-size: 16px;
-  color: #c4b1ff;
+  color: var(--mx-violet, #c4b1ff);
 }
 .rpool small {
   color: var(--mx-dim, #444b63);
@@ -324,7 +324,7 @@
   align-items: center;
   gap: 7px;
   cursor: pointer;
-  background: #0c0d1a;
+  background: var(--mx-row-bg, #0c0d1a);
   border: 1px solid var(--mx-line, rgba(255, 255, 255, 0.08));
   color: var(--mx-text, #d6def0);
   font: 600 11px var(--mx-font-body, sans-serif);
@@ -333,7 +333,7 @@
 }
 .openbtn:hover {
   border-color: var(--mx-line-strong, rgba(56, 224, 255, 0.4));
-  background: #13152a;
+  filter: brightness(1.12);
 }
 .openbtn .cnt {
   margin-left: auto;

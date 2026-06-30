@@ -33,6 +33,8 @@
   --mx-row-bg: #eae5da;
   --mx-seg-off: #ddd8cb;
   --mx-accent-border: rgba(40, 38, 32, 0.4);
+  --mx-input-bg: #ffffff;
+  --mx-panel-bg: #efebe1;
   --mx-clip: none;
 
   /* embed / dice (OPAQUE, světlý) */

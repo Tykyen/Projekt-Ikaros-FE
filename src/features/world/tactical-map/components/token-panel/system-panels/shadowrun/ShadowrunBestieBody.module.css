@@ -91,6 +91,8 @@
 
 /* sekce */
 .sec {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 7px;
