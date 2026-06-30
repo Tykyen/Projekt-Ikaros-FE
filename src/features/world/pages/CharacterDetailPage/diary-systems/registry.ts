@@ -14,6 +14,7 @@ import { drd2Preset } from './presets/drd2';
 import { drd16Preset } from './presets/drd16';
 import { drdhPreset } from './presets/drdh';
 import { drdplusPreset } from './presets/drdplus';
+import { faePreset } from './presets/fae';
 import { fatePreset } from './presets/fate';
 import { genericPreset } from './presets/generic';
 import { gurpsPreset } from './presets/gurps';
@@ -33,6 +34,7 @@ const REGISTRY: Partial<Record<SystemId, DiarySystemPreset>> = {
   drd16: drd16Preset,
   drdh: drdhPreset,
   drdplus: drdplusPreset,
+  fae: faePreset,
   fate: fatePreset,
   gurps: gurpsPreset,
   jad: jadPreset,

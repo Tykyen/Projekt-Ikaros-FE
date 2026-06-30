@@ -23,6 +23,7 @@ export const SYSTEM_IDS = [
   'drdh',
   'drdplus',
   'drd16',
+  'fae',
   'fate',
   'pi',
   'gurps',

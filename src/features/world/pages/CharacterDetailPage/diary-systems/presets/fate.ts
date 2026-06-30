@@ -1,8 +1,11 @@
 /**
- * 8.7i — Preset pro Fate Core.
- * Neural sleek ledově modré téma (#60a5fa), 2-sloupcový layout
- * (Aspekty / Konflikt / Cíle | Dovednosti / Deník). Sdílí strukturu
- * s PI (Příběhy Impéria) — viz `_shared/FateLikeSheet.tsx`.
+ * Preset pro Fate Core.
+ *
+ * Vzhled „Karty osudu" (stará slonovina + sépiové serify), sdílený s FAE
+ * (styles/fate.css scoped na `fate` i `fae`). Liší se JEDINÝ blok: Core =
+ * volné Dovednosti + žebříček (FAE = 6 fixních Přístupů). Vše ostatní
+ * (Hlavní koncept + Problém + aspekty, Triky, Stres, Následky, Obnova, Deník)
+ * sdílí `_shared/FateLikeSheet.tsx`. Data v customData s prefixem `fate_*`.
  */
 import type { DiarySystemPreset } from '../types';
 import { FateSheet } from '../sheets/fate/FateSheet';
@@ -11,10 +14,9 @@ export const fatePreset: DiarySystemPreset = {
   id: 'fate',
   name: 'Fate Core',
   description:
-    'Neural sleek ledově modré téma. 2 sloupce: Aspekty + 5-stavový ' +
-    'konflikt tracker + Cíle (dlouhodobé/krátkodobé s checkboxy); ' +
-    'Dovednosti se 6-pip trackerem + Deník. Data v customData s ' +
-    'prefixem `fate_*`.',
+    'Karty osudu (slonovina + sépiové serify). Dovednosti se žebříčkem + ' +
+    'Hlavní koncept + Problém + aspekty, Triky, Stres (sized boxy), Následky ' +
+    '(2/4/6) a Obnova. Data v customData s prefixem `fate_*`.',
   SystemSheet: FateSheet,
   loadStyles: () => import('../styles/fate.css'),
 };

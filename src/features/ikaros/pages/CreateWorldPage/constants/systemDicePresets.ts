@@ -23,6 +23,7 @@ export const SYSTEM_DICE_PRESETS: Record<string, readonly DiceOption[]> = {
   pi: ['Fate kostky'],
   shadowrun: ['d6', 'Pool d6'],
   gurps: ['d6', '3d6'],
+  fae: ['Fate kostky'],
   fate: ['Fate kostky'],
   'call-of-cthulhu': ['d4', 'd6', 'd8', 'd10', 'd20', 'd100 / procenta'],
 };

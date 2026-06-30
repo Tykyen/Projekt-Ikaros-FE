@@ -54,6 +54,7 @@ describe("getMapSystemPlugin", () => {
 
   it("FATE-based systémy mají defaultDice=fate", () => {
     expect(getMapSystemPlugin("fate").defaultDice).toContain("fate");
+    expect(getMapSystemPlugin("fae").defaultDice).toContain("fate");
     expect(getMapSystemPlugin("pi").defaultDice).toContain("fate");
     expect(getMapSystemPlugin("matrix").defaultDice).toContain("fate");
   });
@@ -68,10 +69,11 @@ describe("getMapSystemPlugin", () => {
 });
 
 describe("listMapSystems", () => {
-  it("vrací všech 13 registrovaných systémů", () => {
+  it("vrací všech 14 registrovaných systémů", () => {
     const list = listMapSystems();
-    expect(list).toHaveLength(13);
+    expect(list).toHaveLength(14);
     expect(list).toContain("matrix");
+    expect(list).toContain("fae");
     expect(list).toContain("generic");
   });
 });

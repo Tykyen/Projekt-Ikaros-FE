@@ -65,7 +65,14 @@ export const drdplusPlugin: MapSystemPlugin = {
 
 export const fatePlugin: MapSystemPlugin = {
   id: "fate",
-  label: "Fate",
+  label: "Fate Core",
+  defaultDice: ["fate"],
+  rollCategories: ["skill", "initiative", "custom"],
+};
+
+export const faePlugin: MapSystemPlugin = {
+  id: "fae",
+  label: "Fate Accelerated",
   defaultDice: ["fate"],
   rollCategories: ["skill", "initiative", "custom"],
 };

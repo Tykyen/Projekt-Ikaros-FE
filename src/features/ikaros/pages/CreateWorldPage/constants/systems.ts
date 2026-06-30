@@ -19,7 +19,8 @@ export const RPG_SYSTEMS: RpgSystem[] = [
   { id: 'pi',              label: 'Příběhy Impéria' },
   { id: 'shadowrun',       label: 'Shadowrun' },
   { id: 'gurps',           label: 'GURPS' },
-  { id: 'fate',            label: 'Fate Core / Accelerated' },
+  { id: 'fae',             label: 'Fate Accelerated' },
+  { id: 'fate',            label: 'Fate Core' },
   { id: 'call-of-cthulhu', label: 'Call of Cthulhu' },
   { id: 'vlastni',         label: 'Vlastní Systém' },
 ];
