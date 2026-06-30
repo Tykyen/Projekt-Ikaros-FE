@@ -1261,3 +1261,24 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — gated workflow (mockup→souhlas→impl) + fan-out disjunktních souborů + závěrečný render-audit chytil přesně to, co build neviděl (mrtvé `.cp-*`, chat chrome, 3-arg var). Uživatel sám nezávisle potvrdil chat-chrome nález = audit byl správný. Špatně: skin agenti zdědili placeholder třídy z mockupu (měl jsem v briefu explicitněji říct „ornament panelů do .module.css na reálné třídy, ne do skin souboru").
 
 ---
+
+---
+
+## ✅ ŘEŠENÍ — Shadowrun fáze 2+4: bestie schéma + statblok panel (mapa/chat, sdílené jádro) — 2026-06-30
+
+**Co:** Shadowrun 6e bestie — chybělo celé (schémata, statblok, napojení). Stavba fáze 2 (bestiář) + 4 (statblok na mapě) + chat naráz jako jeden vertikální průřez.
+
+**Co zabralo / jak postaveno:**
+- **Schémata** `schemas/shadowrun/{bestie,token}.json` + `.ts` wrappery + `index.ts` + bootstrap registrace. `bestie.json` má **dvojroli**: (1) generuje tvořící formulář v bestiáři přes `EntitySchemaForm` (sekce→pole→listy, žádný custom form jako matrix/jad/fae), (2) spawn snapshot → `token.systemStats`.
+- **Sdílené jádro mapa↔chat** (vzor FATE): `shadowrunBestieView.ts` (pure adaptér systemStats→view-model + `shadowrunPhysTogglePatch`/`shadowrunStunTogglePatch`) + `ShadowrunBestieBody.tsx`/`.module.css` (presentational statblok). Mapa `ShadowrunBestiePanel` (token.systemStats, useTokenUpdate, performSheetRoll `pool-d6`) i chat `ShadowrunChatBestiePanel` (combatant/bestie.systemStats, useChatDiaryRoll) renderují TÝŽ Body → **0 drift**. Chat = týž plný panel, jen užší rail (skill fáze 5), NE osekaná karta.
+- **Napojení** 3 switche: `TokenSystemSheet` bestie větev + `BestieRollPanel` (read-only katalog) + `BestieInstancePanel` (editovatelná instance přes onPatch).
+- **Datový model rozhodnutí:** bestie drží **přímý pool** (k6 počet) u útoků/dovedností a **přímá odvozená pole** (Obrana/Pohyb/Zbroj/Init/záznamník-max), NE počítá z atributů jako PC combat panel. Atributy = klikací readonly chips (klik = pool o velikosti atributu). Sdílené s PC zůstává jen `rollPool` (SR6 success-pool engine) + `woundPenalty` (floor(filled/3)). Důvod: SR6 grunt statbloky uvádějí hotové pooly; PJ zadá 1 číslo místo mapování 8 atributů; jednodušší formulář.
+- **Fyzický záznamník** = damageable `health.current` (zbývá = max − zaplněné, count model jako FATE stres) → HP bar na tokenu z toho čte. Omráčení = `stun_cur` (jen postih). Jantarový akcent (`--srb-bestie`) odděluje tvora od PC modré/fialové.
+
+**Pasti chycené PŘEDEM (poučení z minula):**
+- **Rodina CH-030/31** (schéma napsané dřív než ověřen konzument = mrtvý kód): Explore agent zmapoval `resolveSystemId`/`bootstrap`/`BestiarPage`/`TokenSystemSheet` PŘED psaním → potvrzeno, že `shadowrun` je canonical id bez aliasu, konzumenti ho najdou. Žádný mrtvý kód.
+- **Token = superset** (rodina FATE fáze 3/4): BE `token.update` = REPLACE systemStats + `validateForPatch` STRICT (neznámé klíče → reject). `token.json` proto zrcadlí `bestie.json` + přidává `health.current`/`stun_cur`/`initiative.current`. Jinak by se celý profil zahodil / 400.
+
+**Jak ověřeno:** `npm run build` (tsc -b) exit 0 · 8 view-model unit testů (wound penalty, damageable boxy, parsing, patch helpery) + 4 panel render+interakce testy (pool hod, autosave, readonly disabled) zelené · `export-schemas` 29 schémat → BE · BE commit+push 5db1b33. Drobný fix vedle: ikonka 🎲 z PC combat panelu pryč (kosmetika, na žádost).
+
+**Zhodnocení:** dobře — gated workflow (HTML statblok mock → schválení → kód), kompletní vertikální průřez (žádný dluh), sdílené jádro = 0 drift, **obě historické pasti (mrtvý kód + token superset) chyceny v návrhu, ne až buildem/uživatelem**. Korekce po cestě: 1. mock railu jsem zprvně ukázal jako osekanou kartu (uživatel správně připomněl skill fázi 5) → opraveno na týž panel stejnou funkcí; 2. uživatel ověřoval, zda PC panel je v chatu — byl (COMBAT_PANELS z fáze 3, „zdarma"). Render reálného produkčního CSS přes headless harness NEproveden (mock=kontrakt, CSS věrný přepis) → živé doladění + `mobil-desktop` po naplnění daty.
