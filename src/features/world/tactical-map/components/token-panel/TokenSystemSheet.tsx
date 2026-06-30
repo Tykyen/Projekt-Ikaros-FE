@@ -36,6 +36,7 @@ import { DrdPlusBestiePanel } from "./system-panels/DrdPlusBestiePanel";
 import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
 import { JadBestiePanel } from "./system-panels/JadBestiePanel";
 import { DndBestiePanel } from "./system-panels/DndBestiePanel";
+import { FateBestiePanel } from "./system-panels/FateBestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import styles from "./TokenSystemSheet.module.css";
@@ -169,6 +170,21 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="jad"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // FATE (fae + fate) bestie — „Karty osudu" combat panel (sdílí jádro s PC).
+    if (systemId === "fae" || systemId === "fate") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <FateBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId={systemId}
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />
