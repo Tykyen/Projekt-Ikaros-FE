@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Plus,
   Trash2,
@@ -53,6 +53,8 @@ interface Props {
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
   onBackToProfil: () => void;
+  /** Horní „Hotovo" registruje aktuální save tabu (true=OK / false=fail). */
+  onProvideSave?: (save: (() => Promise<boolean>) | null) => void;
 }
 
 function fmtDate(iso?: string | Date): string {
@@ -81,6 +83,7 @@ export function FinanceTab({
   onExitEdit,
   onDirtyChange,
   onBackToProfil,
+  onProvideSave,
 }: Props) {
   const { worldId, userRole } = useWorldContext();
   const isPJ = (userRole ?? -1) >= WorldRole.PomocnyPJ;
@@ -141,6 +144,7 @@ export function FinanceTab({
               onExitEdit={onExitEdit}
               onDirtyChange={onDirtyChange}
               onBackToProfil={onBackToProfil}
+              onProvideSave={onProvideSave}
             />
           ) : (
             <AccountView
@@ -580,6 +584,7 @@ interface EditProps {
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
   onBackToProfil: () => void;
+  onProvideSave?: Props['onProvideSave'];
 }
 
 function AccountEdit({
@@ -589,6 +594,7 @@ function AccountEdit({
   isPJ,
   onExitEdit,
   onDirtyChange,
+  onProvideSave,
 }: EditProps) {
   const updateMut = useUpdateAccount(worldId, account.id);
   const undo = useAccountUndo(worldId, account.id);
@@ -639,18 +645,39 @@ function AccountEdit({
     touch();
   }
 
+  // Async save = Promise wrapper nad mutací (resolve true=OK / false=fail).
+  // Deps drží aktuální label/entries/notes (žádná stale closure).
+  const saveAsync = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        updateMut.mutate(
+          { label, incomeEntries, expenseEntries, notes },
+          {
+            onSuccess: () => {
+              setDirty(false);
+              toast.success('Účet uložen');
+              resolve(true);
+            },
+            onError: () => {
+              toast.error('Uložení selhalo');
+              resolve(false);
+            },
+          },
+        );
+      }),
+    [updateMut, label, incomeEntries, expenseEntries, notes],
+  );
+
   function handleSave() {
-    updateMut.mutate(
-      { label, incomeEntries, expenseEntries, notes },
-      {
-        onSuccess: () => {
-          setDirty(false);
-          toast.success('Účet uložen');
-        },
-        onError: () => toast.error('Uložení selhalo'),
-      },
-    );
+    void saveAsync();
   }
+
+  // Horní „Hotovo" — registruj aktuální save; při unmountu (i přepnutí účtu)
+  // vynuluj, aby starý handler nepřetekl.
+  useEffect(() => {
+    onProvideSave?.(saveAsync);
+    return () => onProvideSave?.(null);
+  }, [onProvideSave, saveAsync]);
 
   function runUndo() {
     undo.mutate(undefined, {

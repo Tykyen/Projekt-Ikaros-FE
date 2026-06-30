@@ -19,7 +19,7 @@ export const SYSTEM_DICE_PRESETS: Record<string, readonly DiceOption[]> = {
   drd16: ['d6', 'd6+', 'd10', 'd100 / procenta'],
   'drd-plus': ['d6', '2d6+'],
   drd2: ['d6', '2d6', '3d6'],
-  'draci-hlidka': ['d6', 'd10'],
+  'draci-hlidka': ['d6', 'd6+', 'd10'],
   pi: ['Fate kostky'],
   shadowrun: ['d6', 'Pool d6'],
   gurps: ['d6', '3d6'],

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Spinner, Button, Modal, ConfirmDialog, Badge } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
@@ -42,6 +42,11 @@ interface Props {
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
   /**
+   * Horní „Hotovo" (PostavaLayout) registruje aktuální save tabu. Async save
+   * vrací true=uloženo, false=chyba. `null` při unmountu (cleanup).
+   */
+  onProvideSave?: (save: (() => Promise<boolean>) | null) => void;
+  /**
    * 10.2c-edit-9g — optional roll handler. Pokud DiaryTab je embeddovaný
    * v tactical-map TokenInfoPanel, konzument provrahuje callback. Per-system
    * sheets (MatrixSheet, ...) ukáží klikatelné rolly. CharacterDetailPage
@@ -57,7 +62,14 @@ interface Props {
  *   - akce „Vlastní šablona" / „Vrátit ke světové" / „Upravit šablonu"
  *   - inline editor schématu přes Modal (sdílená komponenta `DiarySchemaEditor`)
  */
-export function DiaryTab({ slug, mode, onExitEdit, onDirtyChange, onRoll }: Props) {
+export function DiaryTab({
+  slug,
+  mode,
+  onExitEdit,
+  onDirtyChange,
+  onProvideSave,
+  onRoll,
+}: Props) {
   const { worldId, worldSlug, world } = useWorldContext();
   const { data: diary, isLoading, isError } = useCharacterDiary(worldId, slug);
   const activeWorldSchema = useActiveDiarySchema(worldId);
@@ -109,6 +121,7 @@ export function DiaryTab({ slug, mode, onExitEdit, onDirtyChange, onRoll }: Prop
             isOverride={diary.personalDiarySchema != null}
             onExitEdit={onExitEdit}
             onDirtyChange={onDirtyChange}
+            onProvideSave={onProvideSave}
             onRoll={onRoll}
           />
         </>
@@ -247,6 +260,7 @@ interface EditProps {
   isOverride: boolean;
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  onProvideSave?: Props['onProvideSave'];
   onRoll?: Props['onRoll'];
 }
 
@@ -259,6 +273,7 @@ function DiaryTabEdit({
   isOverride,
   onExitEdit,
   onDirtyChange,
+  onProvideSave,
   onRoll,
 }: EditProps) {
   const { preset } = useDiarySystem();
@@ -309,26 +324,47 @@ function DiaryTabEdit({
     setDirty(true);
   }
 
+  // Async save = Promise wrapper nad mutací (resolve true=OK, false=fail).
+  // Sdílí ho dolní EditStickyBar i horní „Hotovo" (PostavaLayout). Deps drží
+  // AKTUÁLNÍ stav (sections/customDataPatch), aby se neukládala stará data.
+  const saveAsync = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        // D-040-followup: posíláme jen patch (delta), ne celý customData.
+        // Prázdný patch je no-op pro customData; sections projdou vždy.
+        mutation.mutate(
+          {
+            sections,
+            ...(Object.keys(customDataPatch).length > 0
+              ? { customDataPatch }
+              : {}),
+          },
+          {
+            onSuccess: () => {
+              setDirty(false);
+              setCustomDataPatch({}); // po save vynulujeme patch — base z BE má novou pravdu
+              toast.success('Deník uložen');
+              resolve(true);
+            },
+            onError: (err) => {
+              toast.error(parseApiError(err));
+              resolve(false);
+            },
+          },
+        );
+      }),
+    [mutation, sections, customDataPatch],
+  );
+
   function handleSave() {
-    // D-040-followup: posíláme jen patch (delta), ne celý customData.
-    // Prázdný patch je no-op pro customData; sections projdou vždy.
-    mutation.mutate(
-      {
-        sections,
-        ...(Object.keys(customDataPatch).length > 0
-          ? { customDataPatch }
-          : {}),
-      },
-      {
-        onSuccess: () => {
-          setDirty(false);
-          setCustomDataPatch({}); // po úspěšném save vynulujeme patch — base z BE má novou pravdu
-          toast.success('Deník uložen');
-        },
-        onError: (err) => toast.error(parseApiError(err)),
-      },
-    );
+    void saveAsync();
   }
+
+  // Horní „Hotovo" — registruj aktuální save; při unmountu tabu vynuluj.
+  useEffect(() => {
+    onProvideSave?.(saveAsync);
+    return () => onProvideSave?.(null);
+  }, [onProvideSave, saveAsync]);
 
   function handleEnableOverride() {
     setConfirmEnable(false);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { Spinner, EmptyState } from '@/shared/ui';
@@ -22,6 +22,8 @@ interface Props {
   onDirtyChange: (dirty: boolean) => void;
   /** Hráč bez `canEdit` nevidí inline qty stepper ani edit režim. */
   canEdit: boolean;
+  /** Horní „Hotovo" registruje aktuální save tabu (true=OK / false=fail). */
+  onProvideSave?: (save: (() => Promise<boolean>) | null) => void;
 }
 
 /**
@@ -40,6 +42,7 @@ export function InventoryTab({
   onExitEdit,
   onDirtyChange,
   canEdit,
+  onProvideSave,
 }: Props) {
   const { worldId } = useWorldContext();
   const { data, isLoading, isError, error, refetch } = useCharacterInventory(
@@ -67,6 +70,7 @@ export function InventoryTab({
         worldId={worldId}
         onExitEdit={onExitEdit}
         onDirtyChange={onDirtyChange}
+        onProvideSave={onProvideSave}
       />
     );
   }
@@ -329,6 +333,7 @@ interface EditProps {
   worldId: string;
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  onProvideSave?: Props['onProvideSave'];
 }
 
 function InventoryTabEdit({
@@ -337,6 +342,7 @@ function InventoryTabEdit({
   worldId,
   onExitEdit,
   onDirtyChange,
+  onProvideSave,
 }: EditProps) {
   const mutation = useUpdateCharacterInventory(worldId, page.slug);
 
@@ -356,18 +362,38 @@ function InventoryTabEdit({
     setDirty(true);
   }
 
+  // Async save = Promise wrapper nad mutací (resolve true=OK / false=fail).
+  // Deps drží aktuální sections/notes (žádná stale closure).
+  const saveAsync = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        mutation.mutate(
+          { sections, notes },
+          {
+            onSuccess: () => {
+              setDirty(false);
+              toast.success('Výbava uložena');
+              resolve(true);
+            },
+            onError: () => {
+              toast.error('Uložení se nezdařilo');
+              resolve(false);
+            },
+          },
+        );
+      }),
+    [mutation, sections, notes],
+  );
+
   function handleSave() {
-    mutation.mutate(
-      { sections, notes },
-      {
-        onSuccess: () => {
-          setDirty(false);
-          toast.success('Výbava uložena');
-        },
-        onError: () => toast.error('Uložení se nezdařilo'),
-      },
-    );
+    void saveAsync();
   }
+
+  // Horní „Hotovo" — registruj aktuální save; při unmountu tabu vynuluj.
+  useEffect(() => {
+    onProvideSave?.(saveAsync);
+    return () => onProvideSave?.(null);
+  }, [onProvideSave, saveAsync]);
 
   return (
     <div className={s.invShell}>

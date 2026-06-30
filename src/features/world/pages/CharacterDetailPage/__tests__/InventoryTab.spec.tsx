@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { InventoryTab } from '../components/InventoryTab';
 import type { CharacterInventory } from '../../api/characters.types';
 import type { Page } from '../../api/pages.types';
@@ -249,5 +249,68 @@ describe('InventoryTab (8.1d + 8.1-FIR)', () => {
     );
     fireEvent.click(screen.getByText('Zrušit'));
     expect(onExitEdit).toHaveBeenCalledOnce();
+  });
+
+  // Bug fix (testeři) — horní „Hotovo" v hlavičce PostavaLayoutu musí
+  // rozeditovaný tab ULOŽIT. Tab proto registruje async save přes
+  // `onProvideSave`; jeho zavolání spustí mutaci s aktuálními daty.
+  it('edit — registruje onProvideSave; zavolání uloží aktuální data + vrátí true', async () => {
+    let registered: (() => Promise<boolean>) | null = null;
+    render(
+      <InventoryTab
+        page={PAGE}
+        mode="edit"
+        onExitEdit={noop}
+        onDirtyChange={noop}
+        canEdit
+        onProvideSave={(fn) => {
+          registered = fn;
+        }}
+      />,
+    );
+    expect(registered).toBeTypeOf('function');
+
+    // Změna → aktuální stav (žádná stale closure).
+    fireEvent.change(screen.getByDisplayValue('Zbraně'), {
+      target: { value: 'Vybavení' },
+    });
+
+    mutate.mockImplementation((_input, opts) => opts.onSuccess?.());
+    let result: boolean | undefined;
+    await act(async () => {
+      result = await registered!();
+    });
+
+    expect(result).toBe(true);
+    expect(mutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sections: expect.arrayContaining([
+          expect.objectContaining({ title: 'Vybavení' }),
+        ]),
+      }),
+      expect.anything(),
+    );
+  });
+
+  it('edit — chyba mutace → onProvideSave save vrátí false', async () => {
+    let registered: (() => Promise<boolean>) | null = null;
+    render(
+      <InventoryTab
+        page={PAGE}
+        mode="edit"
+        onExitEdit={noop}
+        onDirtyChange={noop}
+        canEdit
+        onProvideSave={(fn) => {
+          registered = fn;
+        }}
+      />,
+    );
+    mutate.mockImplementation((_input, opts) => opts.onError?.(new Error('x')));
+    let result: boolean | undefined;
+    await act(async () => {
+      result = await registered!();
+    });
+    expect(result).toBe(false);
   });
 });

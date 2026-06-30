@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Spinner } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
@@ -17,6 +17,11 @@ interface Props {
   onExitEdit?: () => void;
   /** Pro dirty discard guard při navigaci. */
   onDirtyChange: (dirty: boolean) => void;
+  /**
+   * Horní „Hotovo" registruje okamžitý save (flush pending debounce).
+   * Notes jinak autosaveují; tohle jen vynutí uložení teď a hned.
+   */
+  onProvideSave?: (save: (() => Promise<boolean>) | null) => void;
 }
 
 const AUTOSAVE_DEBOUNCE_MS = 800;
@@ -29,7 +34,7 @@ const AUTOSAVE_DEBOUNCE_MS = 800;
  *
  * Permission gating řeší `PostavaLayout` (canSeePrivate = PJ/PomocnyPJ/vlastník).
  */
-export function NotesTab({ slug, onDirtyChange }: Props) {
+export function NotesTab({ slug, onDirtyChange, onProvideSave }: Props) {
   const { worldId } = useWorldContext();
   const { data, isLoading, isError, error, refetch } = useCharacterNotes(
     worldId,
@@ -54,6 +59,7 @@ export function NotesTab({ slug, onDirtyChange }: Props) {
       worldId={worldId}
       slug={slug}
       onDirtyChange={onDirtyChange}
+      onProvideSave={onProvideSave}
     />
   );
 }
@@ -63,6 +69,7 @@ interface InlineProps {
   worldId: string;
   slug: string;
   onDirtyChange: (dirty: boolean) => void;
+  onProvideSave?: Props['onProvideSave'];
 }
 
 function NotesTabInline({
@@ -70,6 +77,7 @@ function NotesTabInline({
   worldId,
   slug,
   onDirtyChange,
+  onProvideSave,
 }: InlineProps) {
   const mutation = useUpdateCharacterNotes(worldId, slug);
   const [content, setContent] = useState(initialContent);
@@ -110,6 +118,42 @@ function NotesTabInline({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, dirty]);
+
+  // Horní „Hotovo" — okamžitý flush pending autosave. Když není co uložit,
+  // resolve(true) hned. Jinak zruš debounce a ulož teď.
+  const saveAsync = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        if (!dirty) {
+          resolve(true);
+          return;
+        }
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        setStatus('saving');
+        mutation.mutate(
+          { content },
+          {
+            onSuccess: () => {
+              setSavedContent(content);
+              setStatus('saved');
+              setTimeout(() => setStatus('idle'), 1500);
+              resolve(true);
+            },
+            onError: () => {
+              setStatus('idle');
+              toast.error('Uložení poznámek selhalo');
+              resolve(false);
+            },
+          },
+        );
+      }),
+    [dirty, content, mutation],
+  );
+
+  useEffect(() => {
+    onProvideSave?.(saveAsync);
+    return () => onProvideSave?.(null);
+  }, [onProvideSave, saveAsync]);
 
   return (
     <div className={s.notebookShell}>

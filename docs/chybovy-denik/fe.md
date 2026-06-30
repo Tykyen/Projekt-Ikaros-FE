@@ -4,6 +4,16 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — Dračí Hlídka (drdh) deník: redesign dle oficiálních pokročilých deníků (skill `system` fáze 1) · 2026-06-30
+**Kontext:** Stávající `DrdhSheet` (8.7e port) byl proti oficiálním pokročilým deníkům špatně — chyběly sekce (zvláštní schopnosti/magické předměty), zloděj „kostýmy" byl číselný resource místo seznamu, adrenalin max/akt místo tracku, klerik bez 3× denně, kouzelník bez úroveň/nasátí, válečníkovy triky bez „Vyžaduje", zlodějovy „Činnost" místo „Četnost".
+**Co zabralo:** HTML prototyp (`c:\tmp\drdh-denik-audit.html`) jako kontrakt, iterovaný živě s autorem (peníze/bojové vzorce/vybavení škrtnuty, rasa ruční, portrét vynechán) → produkční přepis `DrdhSheet.tsx` + `constants.ts` + `drdh.css` (delegováno agentovi s jednoznačným HTML kontraktem). Per-povolání zdroj dle pravidel (adrenalin track 1–20, duševní síla, mana+suroviny, mana+úroveň/nasátí, kostýmy=seznam, přízeň+3 denní checkboxy); **interaktivní erb mění povolání** (klik→popover, jako DrD+); specializace rozpojená, zamčená do 6. úrovně; auto-výpočty (oprava=⌊stupeň/2⌋−5, hranice smrti=−(10+ODO), dovednost součet). Net research (Roll20+onge.cz) potvrdil vzorce.
+**Proč to je správně:** vlastní tvarový jazyk (stuha+pečeť+štítový erb DH) ≠ přebarvený drd16; sémantické tokeny `--drdh-*` v base CSS = skin-ready; `customData` schema-less → 0 BE změn pro deník; klíče `drdh_*` zachovány.
+**Pasti:** nativní `<select>` chevron ořezával text atributu (→ `appearance:none`); erb popover se kreslil za HUD (→ `z-index` na `.hero`, ne uvnitř); dice preset `draci-hlidka` chybělo `d6+` (explodující k6 — útok/obrana; iniciativa plain d6).
+**Jak ověřeno:** `tsc -b` ✓ (sám, po všech změnách), `npm run build` ✓ + `vitest` 18/18 ✓ (agent), render Chrome headless desktop+mobil ✓. Vizuál čeká živé potvrzení autora po deployi.
+**Zhodnocení:** Dobře — prototyp=kontrakt ušetřil cyklení (autor ladil na živém HTML, ne v React buildu, ~8 rychlých škrtů bez rebuildu); delegace přepisu agentovi s HTML kontraktem fungovala (build+testy zelené napoprvé). **BE odloženo na fázi bestiáře** (kostky `['d6','d10']` v `DEFAULT_DICE_BY_SYSTEM` + schémata `drdh-bestie/token.json`, 1 dávka/1 restart). **Zbývá** (skill `system`): bestie → TM combat panel (PC+NPC) → chat → uzávěr (`funkce`+`napoveda`) → 8 skinů.
+
+---
+
 ### ✅ ŘEŠENÍ — Shadowrun fáze 3: TM combat panel + SR6 success-pool engine · 2026-06-30
 **Kontext:** Skill `system` fáze 3 (combat panel na mapě + chatu). Po iteraci s autorem zamčen návrh: kompaktní CELÝ deník (ne „bojové minimum") — bojové jádro vždy + Detaily v centrovaném modalu jako kouzla v DrD+; hody do dicelogu (ten vizuál autor schválil); bez ✎ toggle (atributy klik=test, edit dat v modalech/deníku).
 **Co zabralo (engine — cross-cutting, opatrně):** `rollEngine.rollPoolHits` (úspěchy ≥5 + glitch = víc než půlka jedniček + kritický glitch); `PoolDicePayload` rozšířen o hits/ones/glitch/criticalGlitch/hitThreshold + `buildPoolHitsPayload` (total=hits); `kind:'pool-d6'`+`pool` v `performSheetRoll` (rollFromSheet) i `rollDiaryRequest` (rollFromDiary) + onRoll union (types.ts); vykreslení v **DiceLogPanel** (faceHit/faceOne/totalGlitch + poolBreakdown) i **DiceRollOverlay** readout (faceHit/glitchTag). Sdílené komponenty → testy ostatních systémů zelené (regrese 0).
@@ -1322,3 +1332,19 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Fix:** systematická tokenizace všech hardcoded barev → `var(--mx-*, fallback)`; `overflow:hidden` na `.sr-hero`/`.sr-panel` baseline (ořez napříč skiny); kolidující hero ornamenty zrušeny (fantasy/steampunk/nature); `--mx-input-bg`/`--mx-panel-bg` doplněny do světlých skinů (anime/minimal); pak **render-verify Chrome headless harness** (8 skinů × deník/combat/bestie) PŘED dalším předáním.
 
 **Zhodnocení:** špatně — ZNAL jsem CH-015 i CH-038 (sám jsem je psal) a stejně cyklil; měl jsem deník přečíst před skiny a render-verify udělat sám. STOP: tutéž třídu chyby (netokenizovaný prvek) jsem „opravil" 5× po jednom → změna přístupu na systematický render-verify. Dobře (až teď) — systematická tokenizace + render harness místo dalšího po-jednom.
+
+## ✅ ŘEŠENÍ — horní „Hotovo" v PostavaLayoutu ukládá rozeditovaný subdoc tab (saveRef registry) — 2026-06-30
+
+**Problém (dlouhodobý bug, štval testery):** v detailu postavy/NPC bylo nahoře tlačítko „Hotovo" (přepínač edit→view). Při rozeditovaném subdoc tabu (Deník/Finance/Výbava/Kalendář/Poznámky) horní „Hotovo" změny NEULOŽILO — jen otevřelo dialog „Neuložené změny / Zahodit změny". Uložení (`mutation.mutate`) bylo jen v DOLNÍM `EditStickyBar` (per-tab `handleSave`). Uživatel musel scrollovat dolů a kliknout „Uložit změny"; horní „Hotovo" pro něj znamenalo ztrátu práce.
+
+**Řešení — saveRef registry pattern:**
+- `PostavaLayout`: `saveActiveTabRef = useRef<null | (() => Promise<boolean>)>(null)` + STABILNÍ `provideSave = useCallback((fn)=>{ ref.current = fn }, [])`. `requestToggleEdit` přepsán na async: při dirty + registrovaném save → `await ref.current()`; po `true` zavře edit, po `false` zůstane v editu (tab si ukázal vlastní error toast). Guard proti dvojkliku (`savingViaDone`). Fallback (bez registrovaného save) ponechán = původní discard guard.
+- Každý z 5 subdoc tabů: nový optional prop `onProvideSave?: (save: (()=>Promise<boolean>)|null)=>void`; existující save přepsán/obalen do `saveAsync = useCallback(() => new Promise(resolve => mutation.mutate(input, { onSuccess: ()=>{...; resolve(true)}, onError: ()=>{...; resolve(false)} })), [mutation, ...aktuální stav])`; `useEffect(() => { onProvideSave?.(saveAsync); return () => onProvideSave?.(null); }, [onProvideSave, saveAsync])` (cleanup nuluje ref při unmountu/přepnutí tabu).
+- `requestTabChange` / `blocker` / `confirmGuard` (odchod jinam / opuštění stránky) ZÁMĚRNĚ netknuté — pojistný discard dialog tam zůstává.
+- Specifika: FinanceTab má save v subkomponentě `AccountEdit` (prop provrahnut přes FinanceTab; bez aktivního účtu se save neregistruje → fallback exit, není co uložit). NotesTab autosaveuje (debounce 800 ms) → jeho `saveAsync` jen flushne pending content okamžitě (když není dirty, resolve(true) hned).
+
+**Pasti pochyceny:** stale closure (deps `useCallback` drží aktuální `sections`/`customDataPatch`/entries/...); `onProvideSave` stabilní reference (jinak effect běží pořád); race při probíhajícím save (guard).
+
+**Jak ověřeno:** `npx tsc -b` ✓, `npm run build` ✓ (CSP hash OK). Testy: nový `PostavaLayout.spec.tsx` (3 testy — dirty+Hotovo volá registrovaný save a zavře edit · save=false zůstane v editu · čistý Hotovo zavře bez save) + rozšíření `__tests__/InventoryTab.spec.tsx` o 2 testy onProvideSave (registrace + ukládá aktuální data + true/false). Relevantní sada 41/41 zeleně (PostavaLayout + 5 tabů). `eslint --fix` na změněných souborech.
+
+**Zhodnocení:** dobře — řešení jedním vzorem napříč všemi 5 taby (žádný half-done jeden tab), optional prop = nulová regrese ostatních konzumentů (TokenInfoPanel/chat rail/embed/LokaceLayout). Past: vitest mock `react-router-dom`/`@tanstack/react-query` musí být PARTIAL (`importOriginal`), jinak se přes `useBlocker`/`useQuery` vtáhne celý router a spadne; `require()` v mock factory zakázán ESLintem → top-level `import React` + JSX.

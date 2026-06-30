@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useBlocker } from 'react-router-dom';
 import { useIsFetching } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
@@ -109,6 +109,20 @@ export function PostavaLayout({ page }: Props) {
   const layoutRef = useRef<HTMLDivElement>(null);
   const noop = () => {};
 
+  // Horní „Hotovo" musí rozeditovaný subdoc tab ULOŽIT (ne otevřít discard
+  // dialog). Aktivní tab si přes `onProvideSave` zaregistruje svůj async save
+  // (resolve true=OK, false=fail). Ref se nuluje při unmountu tabu (cleanup
+  // v tabu), aby starý handler nepřetekl po přepnutí tabu.
+  const saveActiveTabRef = useRef<null | (() => Promise<boolean>)>(null);
+  const provideSave = useCallback(
+    (fn: (() => Promise<boolean>) | null) => {
+      saveActiveTabRef.current = fn;
+    },
+    [],
+  );
+  // Guard proti dvojkliku během probíhajícího save.
+  const [savingViaDone, setSavingViaDone] = useState(false);
+
   // „Tisk všech záložek": subdoc taby (deník/finance/výbava/poznámky) si po
   // mountu samy dotahují data. Počkáme, až VŠECHNY fetche doběhnou
   // (`useIsFetching`), teprve pak tiskneme — jinak by se vytiskl loading/prázdno.
@@ -150,16 +164,33 @@ export function PostavaLayout({ page }: Props) {
     if (id === 'profil') setEditMode(false);
   }
 
-  function requestToggleEdit() {
+  async function requestToggleEdit() {
     if (!editMode) {
       setEditMode(true);
       return;
     }
-    if (activeTabDirty) {
-      setPendingNav({ type: 'exit' });
+    if (savingViaDone) return; // probíhá save → neduplikuj
+    if (!activeTabDirty) {
+      setEditMode(false);
       return;
     }
-    setEditMode(false);
+    // Dirty + tab zaregistroval save → horní „Hotovo" ULOŽÍ a zavře edit.
+    if (saveActiveTabRef.current) {
+      setSavingViaDone(true);
+      try {
+        const ok = await saveActiveTabRef.current();
+        if (ok) {
+          setActiveTabDirty(false);
+          setEditMode(false);
+        }
+        // ok=false → zůstaň v editu; tab si zobrazil vlastní error toast.
+      } finally {
+        setSavingViaDone(false);
+      }
+      return;
+    }
+    // Fallback (tab save neregistruje) — původní discard guard.
+    setPendingNav({ type: 'exit' });
   }
 
   function handleExitEdit() {
@@ -390,6 +421,7 @@ export function PostavaLayout({ page }: Props) {
               mode={tabMode}
               onExitEdit={handleExitEdit}
               onDirtyChange={setActiveTabDirty}
+              onProvideSave={provideSave}
             />
           )}
           {activeTab === 'finance' && character && canSeePrivate && (
@@ -399,6 +431,7 @@ export function PostavaLayout({ page }: Props) {
               onExitEdit={handleExitEdit}
               onDirtyChange={setActiveTabDirty}
               onBackToProfil={() => setActiveTab('profil')}
+              onProvideSave={provideSave}
             />
           )}
           {activeTab === 'vybava' && character && canSeePrivate && (
@@ -408,6 +441,7 @@ export function PostavaLayout({ page }: Props) {
               onExitEdit={handleExitEdit}
               onDirtyChange={setActiveTabDirty}
               canEdit={canEdit}
+              onProvideSave={provideSave}
             />
           )}
           {activeTab === 'kalendar' && character && canSeePrivate && (
@@ -416,6 +450,7 @@ export function PostavaLayout({ page }: Props) {
               mode={tabMode}
               onExitEdit={handleExitEdit}
               onDirtyChange={setActiveTabDirty}
+              onProvideSave={provideSave}
             />
           )}
           {activeTab === 'poznamky' && character && canSeePrivate && (
@@ -424,6 +459,7 @@ export function PostavaLayout({ page }: Props) {
               mode={tabMode}
               onExitEdit={handleExitEdit}
               onDirtyChange={setActiveTabDirty}
+              onProvideSave={provideSave}
             />
           )}
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Modal, Spinner } from '@/shared/ui';
 import {
@@ -28,6 +28,8 @@ interface Props {
   mode: 'view' | 'edit';
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  /** Horní „Hotovo" registruje aktuální save tabu (true=OK / false=fail). */
+  onProvideSave?: (save: (() => Promise<boolean>) | null) => void;
 }
 
 function newId(): string {
@@ -47,7 +49,13 @@ function newId(): string {
  * Kalendář je vybrán per `world.defaultCalendarConfigSlug`. PJ může
  * přepnout zobrazený kalendář v gridu (multi-config UX).
  */
-export function CalendarTab({ slug, mode, onExitEdit, onDirtyChange }: Props) {
+export function CalendarTab({
+  slug,
+  mode,
+  onExitEdit,
+  onDirtyChange,
+  onProvideSave,
+}: Props) {
   const { worldId, world } = useWorldContext();
   const { data, isLoading, isError } = useCharacterCalendar(worldId, slug);
   const { data: configs = [] } = useCalendarConfigs(worldId);
@@ -80,6 +88,7 @@ export function CalendarTab({ slug, mode, onExitEdit, onDirtyChange }: Props) {
         onConfigChange={setActiveSlug}
         onExitEdit={onExitEdit}
         onDirtyChange={onDirtyChange}
+        onProvideSave={onProvideSave}
       />
     );
   }
@@ -163,6 +172,7 @@ interface EditProps {
   onConfigChange: (slug: string) => void;
   onExitEdit: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  onProvideSave?: Props['onProvideSave'];
 }
 
 interface EventFormState {
@@ -186,6 +196,7 @@ function CalendarTabEdit({
   onConfigChange,
   onExitEdit,
   onDirtyChange,
+  onProvideSave,
 }: EditProps) {
   const mutation = useUpdateCharacterCalendar(worldId, slug);
 
@@ -253,22 +264,42 @@ function CalendarTabEdit({
     setEditing(null);
   }
 
+  // Async save = Promise wrapper nad mutací (resolve true=OK / false=fail).
+  // Deps drží aktuální events/color/defaultView (žádná stale closure).
+  const saveAsync = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        mutation.mutate(
+          {
+            events,
+            color,
+            displaySettings: { ...calendar.displaySettings, defaultView },
+          },
+          {
+            onSuccess: () => {
+              setDirty(false);
+              toast.success('Kalendář uložen');
+              resolve(true);
+            },
+            onError: () => {
+              toast.error('Uložení se nezdařilo');
+              resolve(false);
+            },
+          },
+        );
+      }),
+    [mutation, events, color, defaultView, calendar.displaySettings],
+  );
+
   function handleSave() {
-    mutation.mutate(
-      {
-        events,
-        color,
-        displaySettings: { ...calendar.displaySettings, defaultView },
-      },
-      {
-        onSuccess: () => {
-          setDirty(false);
-          toast.success('Kalendář uložen');
-        },
-        onError: () => toast.error('Uložení se nezdařilo'),
-      },
-    );
+    void saveAsync();
   }
+
+  // Horní „Hotovo" — registruj aktuální save; při unmountu tabu vynuluj.
+  useEffect(() => {
+    onProvideSave?.(saveAsync);
+    return () => onProvideSave?.(null);
+  }, [onProvideSave, saveAsync]);
 
   return (
     <div className={s.wrap}>
