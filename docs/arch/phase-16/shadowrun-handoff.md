@@ -9,11 +9,11 @@
 | Fáze | Stav |
 |---|---|
 | 1. Deník (list) | ✅ HOTOVO + ověřeno (build, 9 testů, render desktop/mobil) |
-| 2. Bestie (schémata + panel) | ❌ **ZBÝVÁ — další na řadě** |
+| 2. Bestie (schémata + panel) | ✅ HOTOVO + ověřeno (build, 12 testů, BE push 5db1b33) |
 | 3. TM combat panel (PC) | ✅ HOTOVO + ověřeno (build, 78 testů, render reálného CSS) |
-| 4. Bestie statblok na mapě | ❌ ZBÝVÁ (po fázi 2) |
-| 5. Chat | ✅ HOTOVO zdarma (combat panel dědí přes `COMBAT_PANELS`) |
-| 6. Uzávěr (`funkce`+`napoveda`) | ❌ ZBÝVÁ (pool dice + combat panel jsou funkční změny, ještě nezaneseno) |
+| 4. Bestie statblok na mapě | ✅ HOTOVO (sdílí jádro s fází 2, `ShadowrunBestiePanel`) |
+| 5. Chat | ✅ HOTOVO (PC zdarma přes `COMBAT_PANELS`; bestie `ShadowrunChatBestiePanel`) |
+| 6. Uzávěr (`funkce`+`napoveda`) | ❌ **ZBÝVÁ — další na řadě** (pool dice + combat panel + bestie = funkční změny, nezaneseno) |
 | poté: 8 skinů (skill `skin`) | ❌ ZBÝVÁ |
 
 **Git:** vše pushnuto na `main` (origin) — `c3a0781e "TM Run"` (fáze 3) na `4f3c6e78 "Shadowrun"` (deník+embed). Uživatel commituje RUČNĚ (nikdy necommituj sám). BE netknut, restart netřeba.
