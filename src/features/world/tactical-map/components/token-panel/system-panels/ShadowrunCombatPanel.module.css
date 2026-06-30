@@ -499,8 +499,9 @@
 /* ── MINIMAL — dvojitý ledger rám sekce + registrační kříž (TR) ── */
 [data-diary-system='shadowrun'][data-diary-skin='minimal'] .sec {
   position: relative;
-  outline: 1px solid var(--mx-accent, rgba(40, 38, 32, 0.4));
-  outline-offset: -4px;
+  /* ledger outline zrušen — bez paddingu sekce protínal nadpis/čtverečky (CH-043).
+     Minimal signaturu zde drží registrační kříž + v rohu; ledger rám je na
+     deníkových panelech (.sr-panel), které padding mají. */
 }
 [data-diary-system='shadowrun'][data-diary-skin='minimal'] .sec::after {
   content: '+';

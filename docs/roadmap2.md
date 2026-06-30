@@ -438,7 +438,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] **Taktická mapa (grafika + hody)** — ✅ 2026-06-30 `ShadowrunCombatPanel` (kompaktní celý deník: stav/atributy/odvozené/útoky/dovednosti + detaily Kouzla/Matrix/Augmentace/Kvality/Kontakty/Identita v centrovaném `Modal`u reusujícím deníkové sekce; sdílená matematika `shared.ts` = 0 drift s listem). **Roll-engine rozšířen o SR6 success-pool** (`rollPoolHits` úspěchy 5–6 + glitch; `kind:'pool-d6'`+`pool` v performSheetRoll/rollFromDiary; vykreslení v DiceLogPanel + DiceRollOverlay — kostky 5–6 zvýrazněné, glitch). HP bar na tokenu = fyzický záznamník (`resolveCharacterHp` case shadowrun). Registrováno v `COMBAT_PANELS`. Ověřeno build+78 testů+render. **Chat dědí panel zdarma** (DiaryRollPanel → COMBAT_PANELS).
   - [x] Bestie (grafika)
   - [x] Chat (→ 16.1) — ✅ zdarma s combat panelem (`DiaryRollPanel` → `COMBAT_PANELS['shadowrun']`, hody → chat přes `rollFromDiary` pool); čeká živé potvrzení
-  - [ ] Skiny (→ 16.2c)
+  - [x] Skiny (→ 16.2c)
 - **GURPS** (`gurps`) — *stav kódu:* list sheet+testy, mapa combat panel `GurpsCombatPanel`
   - [ ] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
