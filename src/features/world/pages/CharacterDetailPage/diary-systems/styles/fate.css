@@ -10,17 +10,19 @@
  */
 
 .fate-sheet {
-  --fate-paper-1: #f5edd9;
-  --fate-paper-2: #ece0c2;
-  --fate-edge: #d9c8a0;
-  --fate-ink: #2a2014;
-  --fate-ink-soft: #6f6048;
-  --fate-ink-faint: #9b8a6c;
-  --fate-gold: #9a7b3f;
-  --fate-gold-bright: #b8923f;
-  --fate-trouble: #8a2f2f;
-  --fate-trouble-soft: #b06a4a;
-  --fate-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  /* tokeny sourcené z --dd-* (skin override z předka), fallback = „Karty osudu" */
+  --fate-paper-1: var(--dd-parch-1, #f5edd9);
+  --fate-paper-2: var(--dd-parch-2, #ece0c2);
+  --fate-edge: var(--dd-parch-edge, #d9c8a0);
+  --fate-ink: var(--dd-ink, #2a2014);
+  --fate-ink-soft: var(--dd-ink-soft, #6f6048);
+  --fate-ink-faint: var(--dd-ink-faint, #9b8a6c);
+  --fate-gold: var(--dd-gold, #9a7b3f);
+  --fate-gold-bright: var(--dd-gold-hi, #b8923f);
+  --fate-trouble: var(--dd-crimson, #8a2f2f);
+  --fate-trouble-soft: var(--dd-crimson-soft, #b06a4a);
+  --fate-serif: var(--dd-font-body, 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif);
+  --fate-font-head: var(--dd-font-head, system-ui, sans-serif);
 
   box-sizing: border-box;
   width: 100%;

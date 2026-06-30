@@ -1,0 +1,643 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap');
+
+/* FATE — skin „Minimal" (DEFAULT FATE), Fáze A: deníkový list + tokeny.
+ *
+ * Koncept: archivní karta / architektonický rýsovací list. Minimalismus jako
+ * PRECIZNOST (Pentagon dossier), ne prázdno. Čistý kostěný papír #f4f1ea,
+ * JEDINÝ tlumený akcent = antické zlato #9a7b2e. Sémantika FATE červené
+ * (Problém · Vážný následek · zaškrtnutý stres) drží přes cihlu #9a3b2e.
+ *
+ * Signature „archivní kalibrace" (rodinná DNA matrix/drd2/drd16/drdplus):
+ *   1. dvojitý LEDGER rám listu (.fate-sheet--after) + 4 REGISTRAČNÍ KŘÍŽE v rozích
+ *      (soutiskové plus-značky v kroužku, data- SVG ve zlaté),
+ *   2. letterpress TICK-RULE — zlatý plný marker + měřítková linka se svislými
+ *      ryskami maskovanými do horních ~58 procent (.fate-sec__h, .fate-rule),
+ *   3. ražené dvojkroužkové RAZÍTKO místo voskové pečeti (.fate-badge),
+ *   4. registrační rohy na kartách/buňkách (.fate-aspect-card, .fate-appr, .fate-stunt).
+ *   4dF kostky reinterpretovány do RAŽENÝCH registračních polí (.fate-fudge) —
+ *   minus/zero/plus jako vyryté rýsovací značky, ne hravé kostky.
+ *
+ * Mechanika (IMPL brief): override běží na compound prefixu
+ * :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal']
+ * (specificita 0,3,0 > default 0,2,0, nezávislé na pořadí načtení). LIST přes
+ * .fate-sheet; tokeny panelů+embedů na compound scope BEZ .fate-sheet (panely
+ * je dědí z předka). Ornamenty PANELU + READOUTU řeší jejich module CSS — zde NE.
+ * Pouze CSS/SVG. var(--x, fallback) všude (chybějící token = tiché nic).
+ *
+ * Fonty: Fraunces (display serif) · Spline Sans Mono (popisky/čísla) ·
+ * Newsreader (tělo). Rukopis se s archivem nepojí → serif místo Caveat.
+ */
+
+/* ════════════════════════════════════════════════════════════════════
+   1. TOKENY — na compound scope BEZ .fate-sheet. Panely (FateCombatBody /
+      FateBestieCard) + embedy (obal TM / readout / dicelog / orchestrace /
+      chat obal) je čtou z předka přes var(). Lokální --mn- pro čitelnost.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] {
+  /* ── lokální minimal paleta ── */
+  --mn-paper: #f4f1ea; /* hlavní archivní list */
+  --mn-paper-hi: #faf8f3; /* světlejší vrch */
+  --mn-paper-2: #ece7dd; /* sotva tmavší vtisk */
+  --mn-input: #fbfaf6; /* vstupní / buňka plocha */
+  --mn-ink: #20211f; /* primární text / čísla — uhel */
+  --mn-ink-2: #4d4a42; /* sekundární text */
+  --mn-ink-3: #8d8779; /* muted / mono popisky */
+  --mn-hair: #ddd6c7; /* vlasová linka */
+  --mn-hair-2: #cabfa8; /* silnější linka / obrys */
+  --mn-acc: #9a7b2e; /* JEDINÝ akcent — antické zlato */
+  --mn-acc-deep: #6e5520; /* tmavší zlato — čísla, hover */
+  --mn-acc-ink: #4e3d12; /* nejtmavší zlato */
+  --mn-acc-wash: rgba(154, 123, 46, 0.07);
+  --mn-acc-line: rgba(154, 123, 46, 0.3);
+  --mn-crimson: #9a3b2e; /* SÉMANTIKA — Problém / Vážný / zaškrtnutý stres */
+  --mn-crimson-deep: #6e261c;
+  --mn-crimson-wash: rgba(154, 59, 46, 0.06);
+  --mn-crimson-line: rgba(154, 59, 46, 0.28);
+  --mn-pos: #4e6b2f; /* kladný hod = oliva */
+  --mn-neg: #9a3b2e; /* záporný hod = cihla (nebezpečí) */
+
+  /* ── base tokeny panelů/listu (--dd- → mapování) ── */
+  --dd-parch-1: var(--mn-paper, #f4f1ea);
+  --dd-parch-2: var(--mn-paper-2, #ece7dd);
+  --dd-parch-edge: var(--mn-hair-2, #cabfa8);
+  --dd-ink: var(--mn-ink, #20211f);
+  --dd-ink-soft: var(--mn-ink-2, #4d4a42);
+  --dd-ink-faint: var(--mn-ink-3, #8d8779);
+  --dd-gold: var(--mn-acc, #9a7b2e);
+  --dd-gold-hi: var(--mn-acc-deep, #6e5520);
+  --dd-crimson: var(--mn-crimson, #9a3b2e);
+  --dd-crimson-soft: var(--mn-crimson-line, rgba(154, 59, 46, 0.28));
+  --dd-font-body: 'Newsreader', Georgia, serif;
+  --dd-font-head: 'Spline Sans Mono', ui-monospace, monospace;
+
+  /* ════════════ EMBED plochy (obal TM / readout / dicelog / orch / chat obal)
+     Kostěný archiv: NEPRŮHLEDNÁ světlá plocha (jinak prosvítá mapa), uhlový
+     text, mono čísla. Pos = oliva, neg = cihla (nebezpečí), neutral = grafit. */
+  --dd-embed-surface: linear-gradient(180deg, var(--mn-paper-hi, #faf8f3), var(--mn-paper-2, #ece7dd));
+  --dd-embed-border: var(--mn-hair-2, #cabfa8);
+  --dd-embed-line: var(--mn-hair, #ddd6c7);
+  --dd-embed-text: var(--mn-ink, #20211f);
+  --dd-embed-muted: var(--mn-ink-3, #8d8779);
+  --dd-embed-title: var(--mn-acc-deep, #6e5520);
+  --dd-embed-chip-bg: var(--mn-acc-wash, rgba(154, 123, 46, 0.07));
+  --dd-embed-accent: var(--mn-acc-deep, #6e5520);
+  --dd-embed-num-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-pos: var(--mn-pos, #4e6b2f); /* kladný hod = oliva */
+  --dd-embed-neg: var(--mn-neg, #9a3b2e); /* záporný hod = cihla (nebezpečí) */
+  --dd-embed-neutral: var(--mn-ink-2, #4d4a42); /* neutrál = grafit */
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   2. LIST .fate-sheet — plochý kostěný papír + hairline rám + měkký stín.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-sheet {
+  --parch-1: var(--mn-paper-hi, #faf8f3);
+  --parch-2: var(--mn-paper, #f4f1ea);
+  --parch-edge: var(--mn-hair-2, #cabfa8);
+  --ink: var(--mn-ink, #20211f);
+  --ink-soft: var(--mn-ink-2, #4d4a42);
+  --ink-faint: var(--mn-ink-3, #8d8779);
+  --gold: var(--mn-acc, #9a7b2e);
+  --gold-bright: var(--mn-acc-deep, #6e5520);
+  --trouble: var(--mn-crimson, #9a3b2e);
+
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--mn-ink, #20211f);
+  border: 0;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--mn-paper-hi, #faf8f3), var(--mn-paper, #f4f1ea) 42%, var(--mn-paper-2, #ece7dd));
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 0 0 1px var(--mn-hair-2, #cabfa8),
+    0 34px 78px -36px rgba(40, 34, 22, 0.55),
+    0 8px 24px -14px rgba(40, 34, 22, 0.3);
+}
+
+/* SIGNATURE 1: dvojitý LEDGER rám + 4 REGISTRAČNÍ KŘÍŽE v rozích (inline SVG) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 1px;
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  /* dvojité odsazení: papírová mezera → vlasová linka (ledger) */
+  box-shadow:
+    inset 0 0 0 4px var(--mn-paper, #f4f1ea),
+    inset 0 0 0 5px var(--mn-hair, #ddd6c7);
+  background-repeat: no-repeat;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-size: 14px 14px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 0V14M0 7H14' stroke='%239a7b2e' stroke-width='1'/%3E%3Ccircle cx='7' cy='7' r='3' fill='none' stroke='%239a7b2e' stroke-width='.7'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 0V14M0 7H14' stroke='%239a7b2e' stroke-width='1'/%3E%3Ccircle cx='7' cy='7' r='3' fill='none' stroke='%239a7b2e' stroke-width='.7'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 0V14M0 7H14' stroke='%239a7b2e' stroke-width='1'/%3E%3Ccircle cx='7' cy='7' r='3' fill='none' stroke='%239a7b2e' stroke-width='.7'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 0V14M0 7H14' stroke='%239a7b2e' stroke-width='1'/%3E%3Ccircle cx='7' cy='7' r='3' fill='none' stroke='%239a7b2e' stroke-width='.7'/%3E%3C/svg%3E");
+}
+@media (max-width: 640px) {
+  :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-sheet::after {
+    inset: 10px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   3. SIGNATURE 4dF (.fate-fudge) — ražená registrační pole s vyrytou značkou.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-fudge-row {
+  display: inline-flex;
+  gap: 5px;
+  vertical-align: middle;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-fudge {
+  width: 17px;
+  height: 17px;
+  border-radius: 1px;
+  border: 1px solid var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+  background: var(--mn-input, #fbfaf6);
+  box-shadow: inset 0 0 0 2px var(--mn-paper, #f4f1ea);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent; /* skryj případný textový +/- glyf, značku nese SVG */
+  font-size: 0;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-fudge::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  background: center / 9px no-repeat;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-fudge.minus::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M1 4.5H8' stroke='%236e5520' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-fudge.plus::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 1V8M1 4.5H8' stroke='%236e5520' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+/* neutrál (žádná .plus/.minus třída) → vyrytý kroužek */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-fudge:not(.plus):not(.minus)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Ccircle cx='4.5' cy='4.5' r='2.4' fill='none' stroke='%238d8779' stroke-width='1.1'/%3E%3C/svg%3E");
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   4. SEKCE + NADPIS + LINKA — mono kapitálky + ■ marker; .fate-rule → tick-rule.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-sec__h h2 {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--mn-ink-2, #4d4a42);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-sec__h h2::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  background: var(--mn-acc, #9a7b2e);
+}
+/* .fate-rule → letterpress tick-rule (vlasová linka + maskované svislé rysky) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-rule {
+  flex: 1;
+  height: 8px;
+  border: 0;
+  align-self: center;
+  background:
+    linear-gradient(var(--mn-hair-2, #cabfa8), var(--mn-hair-2, #cabfa8)) no-repeat,
+    linear-gradient(90deg, var(--mn-hair-2, #cabfa8) 1px, transparent 1px) repeat-x;
+  background-position: 0 3px, 0 0;
+  background-size: 100% 1px, 13px 100%;
+  -webkit-mask: linear-gradient(180deg, #000 0 58%, transparent 58%);
+  mask: linear-gradient(180deg, #000 0 58%, transparent 58%);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   5. HERO — editorial Fraunces jméno; mono kicker; tick-rule baseline.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-hero {
+  position: relative;
+  border-bottom: 0;
+  padding-bottom: 24px;
+}
+/* SIGNATURE 2: tick-rule baseline pod hero (■ zlatý marker + maskované rysky) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  height: 8px;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--mn-acc, #9a7b2e), var(--mn-acc, #9a7b2e)),
+    linear-gradient(var(--mn-hair-2, #cabfa8), var(--mn-hair-2, #cabfa8)),
+    linear-gradient(90deg, var(--mn-hair-2, #cabfa8) 1px, transparent 1px);
+  background-repeat: no-repeat, no-repeat, repeat-x;
+  background-position: 0 1px, 12px 3px, 12px 0;
+  background-size: 6px 6px, calc(100% - 12px) 1px, 13px 100%;
+  -webkit-mask:
+    linear-gradient(#000 0 0) 0 0 / 12px 100% no-repeat,
+    linear-gradient(180deg, #000 0 58%, transparent 58%) 12px 0 / calc(100% - 12px) 100% no-repeat;
+  mask:
+    linear-gradient(#000 0 0) 0 0 / 12px 100% no-repeat,
+    linear-gradient(180deg, #000 0 58%, transparent 58%) 12px 0 / calc(100% - 12px) 100% no-repeat;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-hero__kicker {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--mn-acc-deep, #6e5520);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-hero__name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 500;
+  font-size: 42px;
+  letter-spacing: -0.015em;
+  color: var(--mn-ink, #20211f);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-hero__name:focus {
+  outline: none;
+  box-shadow: 0 2px 0 var(--mn-acc, #9a7b2e);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   6. OBNOVA badge — SIGNATURE 3: ražené dvojkroužkové razítko.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-badge {
+  position: relative;
+  text-align: center;
+  min-width: 96px;
+  padding: 12px 14px 10px;
+  border: 0;
+  border-radius: 1px;
+  background: var(--mn-paper, #f4f1ea);
+  box-shadow:
+    inset 0 0 0 1.25px var(--mn-acc, #9a7b2e),
+    inset 0 0 0 4px var(--mn-paper, #f4f1ea),
+    inset 0 0 0 4.75px var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-badge__lab {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mn-ink-3, #8d8779);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-badge__val,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-badge__in {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--mn-acc-deep, #6e5520);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-badge__in:focus {
+  outline: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-badge__stars {
+  color: var(--mn-acc, #9a7b2e);
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   7. ASPEKTY — ražené karty + registrační roh; Problém = cihla (sémantika).
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card {
+  position: relative;
+  background: var(--mn-input, #fbfaf6);
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  padding: 14px 16px;
+}
+/* registrační roh vpravo nahoře (precizní rýsovací značka) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 9px;
+  height: 9px;
+  border-right: 1px solid var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+  border-top: 1px solid var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+  pointer-events: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card.trouble {
+  border-color: var(--mn-crimson-line, rgba(154, 59, 46, 0.28));
+  background: var(--mn-crimson-wash, rgba(154, 59, 46, 0.06));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card.trouble::after {
+  border-color: var(--mn-crimson-line, rgba(154, 59, 46, 0.28));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card__lab {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mn-ink-3, #8d8779);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card.trouble .fate-aspect-card__lab {
+  color: var(--mn-crimson, #9a3b2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card__txt {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.35;
+  color: var(--mn-ink, #20211f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-card__txt:focus {
+  outline: none;
+  box-shadow: 0 2px 0 var(--mn-acc, #9a7b2e);
+}
+
+/* řádkové aspekty — otevřený ledger řádek, zlatá index značka */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-row {
+  border: 1px solid transparent;
+  border-left: 2px solid var(--mn-acc, #9a7b2e);
+  border-radius: 0 1px 1px 0;
+  background: var(--mn-input, #fbfaf6);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-row__bullet {
+  width: 6px;
+  height: 6px;
+  background: var(--mn-acc, #9a7b2e);
+  color: transparent;
+  font-size: 0;
+  border-radius: 0;
+  flex-shrink: 0;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-row__txt {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--mn-ink, #20211f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-aspect-row__txt:focus {
+  outline: none;
+  box-shadow: 0 2px 0 var(--mn-acc, #9a7b2e);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   8. PŘÍSTUPY (FAE) — ražené archivní buňky + registrační roh; mono čísla.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-appr {
+  position: relative;
+  background: var(--mn-input, #fbfaf6);
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  padding: 14px 10px 12px;
+  text-align: center;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-appr::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-left: 1px solid var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+  border-top: 1px solid var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+}
+/* zlatá baseline u nejvyšší hodnoty */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-appr.hi::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 7px;
+  height: 2px;
+  background: var(--mn-acc, #9a7b2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-appr__name {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mn-ink-3, #8d8779);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-appr__bonus {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--mn-ink, #20211f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-appr.hi .fate-appr__bonus {
+  color: var(--mn-acc-deep, #6e5520);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-step {
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  background: var(--mn-input, #fbfaf6);
+  color: var(--mn-acc-deep, #6e5520);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   9. DOVEDNOSTI (Core varianta) — hairline řádek; mono žebřík + číslo.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-skill {
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  background: var(--mn-input, #fbfaf6);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-skill__nm {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 16px;
+  color: var(--mn-ink, #20211f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-skill__nm:focus {
+  outline: none;
+  box-shadow: 0 2px 0 var(--mn-acc, #9a7b2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-skill__ladder {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mn-ink-3, #8d8779);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-skill__bonus {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--mn-acc-deep, #6e5520);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   10. TRIKY — hairline box + registrační roh; Fraunces název + ■ glyf.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stunt {
+  position: relative;
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  background: var(--mn-input, #fbfaf6);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stunt::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+  border-top: 1px solid var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+  pointer-events: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stunt__nm {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--mn-ink, #20211f);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stunt__nm::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  background: var(--mn-acc, #9a7b2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stunt__desc {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--mn-ink-2, #4d4a42);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stunt__nm:focus,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stunt__desc:focus {
+  outline: none;
+  box-shadow: 0 1px 0 var(--mn-acc, #9a7b2e);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   11. STRES — ražené registrační buňky; zaškrtnutý = cihla + vyrytý ✕ (sémantika).
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stress-box {
+  position: relative;
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  background: var(--mn-input, #fbfaf6);
+  color: var(--mn-ink-3, #8d8779);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 3px var(--mn-paper-hi, #faf8f3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stress-box.on {
+  background: var(--mn-crimson, #9a3b2e);
+  border-color: var(--mn-crimson-deep, #6e261c);
+  color: #fff;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+/* zaškrtnutí = vyrytý ✕ jako razítko „použito" (přes .fate-stress-box__hit, fallback ::after) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stress-box.on .fate-stress-box__hit,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stress-box.on::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: center / 22px no-repeat;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M5 5L17 17M17 5L5 17' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' opacity='.85'/%3E%3C/svg%3E");
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stress-box__sz {
+  position: relative;
+  z-index: 1;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-stress-add {
+  border: 1px dashed var(--mn-acc-line, rgba(154, 123, 46, 0.3));
+  border-radius: 1px;
+  background: transparent;
+  color: var(--mn-acc-deep, #6e5520);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   12. NÁSLEDKY — ledger řádek; ražené číslo cihlou (Vážný = sémantika).
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-cons {
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  background: var(--mn-input, #fbfaf6);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-cons.filled {
+  background: var(--mn-crimson-wash, rgba(154, 59, 46, 0.06));
+  border-color: var(--mn-crimson-line, rgba(154, 59, 46, 0.28));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-cons__nm {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mn-ink-3, #8d8779);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-cons__v {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--mn-crimson, #9a3b2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-cons__txt {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--mn-ink, #20211f);
+  border-bottom: 1px dashed var(--mn-hair-2, #cabfa8);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-cons.filled .fate-cons__txt {
+  border-bottom-color: var(--mn-crimson-line, rgba(154, 59, 46, 0.28));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-cons__txt:focus {
+  outline: none;
+  box-shadow: 0 2px 0 var(--mn-acc, #9a7b2e);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   13. DENÍK + AKČNÍ PRVKY — plochý archivní box; zlaté mono „+ přidat".
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-notes {
+  background: var(--mn-input, #fbfaf6);
+  border: 1px solid var(--mn-hair-2, #cabfa8);
+  border-radius: 1px;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--mn-ink, #20211f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-notes:focus {
+  outline: none;
+  border-color: var(--mn-acc, #9a7b2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-notes::placeholder {
+  color: var(--mn-ink-3, #8d8779);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-add {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--mn-hair, #ddd6c7);
+  border-radius: 0;
+  color: var(--mn-acc-deep, #6e5520);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-add:hover {
+  color: var(--mn-acc, #9a7b2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='minimal'] .fate-del {
+  color: var(--mn-crimson, #9a3b2e);
+  background: none;
+  border: 0;
+}

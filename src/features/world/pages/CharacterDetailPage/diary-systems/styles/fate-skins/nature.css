@@ -1,0 +1,494 @@
+/* FATE (fae + fate) — skin „Příroda" 🌿 · DRUIDSKÝ HERBÁŘ / ŽIVÝ LETOPIS.
+ *
+ * „Karty osudu" (pergamenový default Fate) přepracované na lisovaný LÝKOVÝ arch
+ * terénního zápisníku přírodního kouzelníka — ruční krémový papír, inkoust
+ * z duběnek, mech, hlína, pryskyřice. List „roste": rohy organicky asymetrické,
+ * žilková (midrib) linka, medová MÍZA / jantar jako akcent, bobule = nebezpečí.
+ *
+ * Sourodé s drd2-skins/nature.css (stejné DNA: paleta, fonty, ornamenty),
+ * přepracované do listu Fate. NESdílí ornament s fantasy ani jiným systémem.
+ *
+ * Mechanika (per impl-brief):
+ *   (1) Tokeny --dd-* + VŠECHNY --dd-embed-* na COMPOUND scope BEZ .fate-sheet
+ *       → přebijí baseline z diary-skins.css; list (.fate-sheet) i panely
+ *       (FateCombatBody / FateBestieCard) i embedy je dědí z předka.
+ *   (2) Deníkové ornamenty (tvar) na REÁLNÉ .fate-* třídy s compound prefixem
+ *       (specificita 0,3,0 > base .fate-sheet 0,2,0 → přebije).
+ * Panel / readout ornamenty (hashované module třídy) řeší samostatná fáze —
+ * ZDE NEJSOU. Pouze CSS/SVG, žádný JS. var(--x, fallback) všude.
+ *
+ * SIGNATURE (nesdílet):
+ *   - rašící ÚPONEK z dřevěného SUKU (řada 4dF v hero kicker / sec linka patičky);
+ *   - LETOKRUHOVÝ terč (řez kmenem) na badge Obnova;
+ *   - trojlístkový marker nadpisů sekcí;
+ *   - semínkové / kapkové reinterpretace 4dF (.fate-fudge) + organické rohy;
+ *   - organické asymetrické rohy + žilková linka.
+ * Paleta: mech #5e8832 / #86ab52 (nadpisy / kladný hod / Výhoda) · míza/jantar
+ *   #c98a2e (akcent / bonus / Obnova) · bobule #a83c2e (Problém / Vážný / stres /
+ *   záporný hod = nebezpečí, DRŽÍ) · rosa/lišejník #3e7d6e (doplněk).
+ * Typografie: Cormorant Garamond (H1 / jména / iniciála) · Marcellus SC (labely) ·
+ *   Spectral (tělo / čísla) · Caveat (rukopis poznámek).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Caveat:wght@500;600;700&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1) TOKENY — compound scope BEZ .fate-sheet
+   Přebijí FATE baseline (--dd-* / --dd-embed-*) z diary-skins.css. List čte
+   lokální --fate-* sourcené z --dd-*; panely/embedy je dědí z předka.
+   --dd-embed-* surface VŽDY OPAQUE (gradient tmavé kůry).
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] {
+  /* -- list / panel paleta (lýkový arch + duběnkový inkoust) -- */
+  --dd-parch-1: #f6f1df;
+  --dd-parch-2: #efe6cb;
+  --dd-parch-edge: #cdbb8e;
+  --dd-ink: #33301d;
+  --dd-ink-soft: #5e5736;
+  --dd-ink-faint: #897f57;
+  /* -- akcent = míza / jantar -- */
+  --dd-gold: #c98a2e;
+  --dd-gold-hi: #7e5418;
+  /* -- SÉMANTIKA červené = jeřabina / bobule (nebezpečí DRŽÍ) -- */
+  --dd-crimson: #a83c2e;
+  --dd-crimson-soft: #c95a45;
+  /* -- fonty -- */
+  --dd-font-body: 'Spectral', Georgia, serif;
+  --dd-font-head: 'Cormorant Garamond', Georgia, serif;
+
+  /* ── EMBED plochy (obal v TM / readout / dicelog / orchestrace / chat obal) ──
+     OPAQUE tmavá kůra; mechový titulek, semínkové akcenty.
+     pos = mech (kladný hod / Výhoda) · neg = bobule (záporný / Ohrožení) ·
+     neutral = jantar. */
+  --dd-embed-surface: linear-gradient(180deg, #3c2d1a, #2a2014 58%, #1f170d);
+  --dd-embed-border: #7e5418;
+  --dd-embed-line: rgba(201, 138, 46, 0.32);
+  --dd-embed-text: #e8dcc2;
+  --dd-embed-muted: #ab9d80;
+  --dd-embed-title: #86ab52;
+  --dd-embed-chip-bg: rgba(134, 171, 82, 0.16);
+  --dd-embed-accent: #c98a2e;
+  --dd-embed-num-font: 'Spectral', Georgia, serif;
+  --dd-embed-title-font: 'Marcellus SC', serif;
+  --dd-embed-pos: #86ab52;
+  --dd-embed-neg: #c95a45;
+  --dd-embed-neutral: #eac066;
+
+  /* -- lokální herbářové barvy pro ornamenty tohoto skinu (jen list) -- */
+  --na-moss: #5e8832;
+  --na-moss-hi: #86ab52;
+  --na-moss-deep: #37501f;
+  --na-leaf-vein: #9bbb63;
+  --na-amber: #c98a2e;
+  --na-amber-hi: #eac066;
+  --na-amber-deep: #7e5418;
+  --na-berry: #a83c2e;
+  --na-berry-hi: #c95a45;
+  --na-berry-deep: #5f1d14;
+  --na-bark-edge: #6b4f2e;
+  --na-rule: rgba(94, 136, 50, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2) DENÍK LIST — substrát + rám + organické rohy
+   Přebíjí .fate-sheet (base 0,2,0) compound prefixem (0,3,0).
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-sheet {
+  border-radius: 34px 14px 34px 14px;
+  background:
+    radial-gradient(120% 80% at 16% 6%, rgba(255, 253, 242, 0.6), transparent 52%),
+    radial-gradient(130% 120% at 90% 98%, rgba(120, 98, 52, 0.22), transparent 60%),
+    radial-gradient(40% 30% at 72% 22%, rgba(150, 120, 60, 0.1), transparent 70%),
+    linear-gradient(168deg, #f8f3e3, var(--dd-parch-1, #f6f1df) 56%, var(--dd-parch-2, #efe6cb));
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.4) inset,
+    0 -32px 72px -46px rgba(60, 46, 18, 0.55) inset,
+    0 46px 100px -42px #000,
+    0 0 0 1px var(--dd-parch-edge, #cdbb8e),
+    0 0 0 8px #3c2d1a,
+    0 0 0 9px var(--na-amber-deep, #7e5418),
+    0 0 0 13px #2a2014;
+}
+/* organický roh i pro vnitřní rám (.fate-sheet::after) + žilková (mech) linka */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-sheet::after {
+  inset: 7px;
+  border-radius: 26px 8px 26px 8px;
+  border-color: var(--na-rule, rgba(94, 136, 50, 0.4));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE — 4dF reinterpretace jako SEMÍNKOVÉ / KAPKOVÉ žetony
+   + = mech (růst) · − = bobule (úbytek) · 0 = jantarové jádro (klid).
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-fudge-row {
+  gap: 6px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-fudge {
+  width: 19px;
+  height: 19px;
+  /* semínkový tvar */
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  border: 1.5px solid var(--na-bark-edge, #6b4f2e);
+  background: radial-gradient(circle at 36% 28%, var(--na-amber-hi, #eac066), var(--na-amber-deep, #7e5418));
+  color: #3a2a10;
+  font: 700 12px/1 'Spectral', Georgia, serif;
+  box-shadow:
+    0 1px 2px rgba(30, 40, 16, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-fudge.plus {
+  background: radial-gradient(circle at 36% 28%, var(--na-moss-hi, #86ab52), var(--na-moss-deep, #37501f));
+  border-color: var(--na-moss-deep, #37501f);
+  color: #fff7e6;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-fudge.minus {
+  background: radial-gradient(circle at 36% 28%, var(--na-berry-hi, #c95a45), var(--na-berry-deep, #5f1d14));
+  border-color: var(--na-berry-deep, #5f1d14);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4) NADPIS SEKCE — Marcellus SC + SIGNATURE trojlístkový marker + žilková linka
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-sec__h h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font: 400 14px/1 'Marcellus SC', serif;
+  letter-spacing: 0.16em;
+  color: var(--na-moss-deep, #37501f);
+}
+/* trojlístek před nadpisem (skryje se na default; zde signature) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-sec__h h2::before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  flex: none;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 18 18'%3E%3Cpath d='M9 17 V10' stroke='%2337501f' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M9 10 C9 5 5 3 3 4 C3 8 5 10 9 10Z' fill='%237ba450'/%3E%3Cpath d='M9 10 C9 5 13 3 15 4 C15 8 13 10 9 10Z' fill='%235a7d3a'/%3E%3Cpath d='M9 9 C9 4 9 2 9 1 C7 3 7 6 9 9Z' fill='%2386ab52'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-rule {
+  border-top-color: var(--na-rule, rgba(94, 136, 50, 0.4));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5) HERO — Cormorant nadpis + listová iluminovaná iniciála + žilková linka
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-hero {
+  border-bottom: 2px solid;
+  border-image: linear-gradient(90deg, var(--na-moss, #5e8832), var(--na-leaf-vein, #9bbb63) 50%, transparent) 1;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-hero__kicker {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.12em;
+  color: var(--na-moss-deep, #37501f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-hero__name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  font-size: 46px;
+  letter-spacing: 0.01em;
+  color: #2a2812;
+}
+/* listová iluminovaná iniciála */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-hero__name::first-letter {
+  font-size: 1.18em;
+  background: linear-gradient(180deg, #9ec85a, var(--na-moss, #5e8832) 60%, var(--na-moss-deep, #37501f));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── badge Obnova = SIGNATURE LETOKRUHOVÝ terč (řez kmenem) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-badge {
+  border: none;
+  background: none;
+  min-width: 108px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-badge__lab {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.14em;
+  color: var(--dd-ink-soft, #5e5736);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-badge__val,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-badge__in {
+  width: 84px;
+  height: 84px;
+  margin: 2px auto 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  font: 700 34px/1 'Cormorant Garamond', Georgia, serif;
+  color: #f6e2a6;
+  text-shadow: 0 1px 2px #000;
+  /* letokruh: jantarové jádro + vnořené prstence přes box-shadow */
+  background:
+    radial-gradient(circle at 50% 50%, #f2cf78 0 12%, transparent 12%),
+    radial-gradient(circle at 50% 50%, #3a2a14, #523715);
+  box-shadow:
+    0 0 0 2px #7c521e inset,
+    0 0 0 4px #3a2a14 inset,
+    0 0 0 6px #a86e2a inset,
+    0 0 0 8px #3a2a14 inset,
+    0 4px 10px rgba(30, 40, 16, 0.45);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-badge__stars {
+  color: var(--na-amber, #c98a2e);
+  letter-spacing: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6) ASPEKTY — organické rohy + žilková hrana; trouble = bobule (DRŽÍ)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card {
+  position: relative;
+  border: 1px solid var(--dd-parch-edge, #cdbb8e);
+  border-radius: 18px 5px 18px 5px;
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.66), rgba(228, 214, 178, 0.4));
+  box-shadow:
+    0 5px 14px -10px #000,
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+/* žilková vnitřní linka */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(94, 136, 50, 0.3);
+  border-radius: 13px 3px 13px 3px;
+  pointer-events: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card.trouble {
+  border-color: rgba(168, 60, 46, 0.45);
+  background: linear-gradient(180deg, rgba(168, 60, 46, 0.1), rgba(168, 60, 46, 0.02));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card.trouble::before {
+  border-color: rgba(168, 60, 46, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card__lab {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.14em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card.trouble .fate-aspect-card__lab {
+  color: var(--na-berry, #a83c2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card__txt {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-row {
+  border-left: 3px solid var(--na-moss, #5e8832);
+  background: rgba(94, 136, 50, 0.07);
+  border-radius: 0 12px 4px 0;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-row__bullet {
+  color: var(--na-moss, #5e8832);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-row__txt {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7) PŘÍSTUPY (FAE) + DOVEDNOSTI (Core) — organické rohy + jantar akcent
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-appr {
+  position: relative;
+  border: 1px solid var(--dd-parch-edge, #cdbb8e);
+  border-radius: 16px 5px 16px 5px;
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.62), rgba(228, 214, 178, 0.3));
+  box-shadow:
+    0 4px 12px -10px #000,
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-appr__name {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.1em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-appr__bonus {
+  font: 700 34px/1 'Cormorant Garamond', Georgia, serif;
+}
+/* nejvyšší přístup = jantarové zvýraznění + signature semínko v rohu */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-appr.hi {
+  border-color: var(--na-amber-deep, #7e5418);
+  background: linear-gradient(180deg, rgba(201, 138, 46, 0.14), rgba(255, 253, 244, 0.4));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-appr.hi .fate-appr__bonus {
+  color: var(--na-amber-deep, #7e5418);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-appr.hi::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 9px;
+  height: 11px;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 36% 30%, var(--na-amber-hi, #eac066), var(--na-amber-deep, #7e5418));
+  box-shadow: 0 0 6px rgba(201, 138, 46, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-step {
+  border: 1px solid var(--na-moss, #5e8832);
+  border-radius: 8px 3px 8px 3px;
+  background: rgba(94, 136, 50, 0.1);
+  color: var(--na-moss-deep, #37501f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-step:hover {
+  background: var(--na-moss, #5e8832);
+  color: #fff7e6;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-skill {
+  border: 1px solid var(--dd-parch-edge, #cdbb8e);
+  border-radius: 12px 4px 12px 4px;
+  background: rgba(94, 136, 50, 0.06);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-skill__nm {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-skill__ladder {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.06em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-skill__bonus {
+  font: 700 20px/1 'Cormorant Garamond', Georgia, serif;
+  color: var(--na-amber-deep, #7e5418);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8) TRIKY — organické rohy + trojlístek místo ✦
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-stunt {
+  border: 1px solid var(--dd-parch-edge, #cdbb8e);
+  border-radius: 16px 5px 16px 5px;
+  background: linear-gradient(180deg, rgba(255, 253, 244, 0.5), rgba(228, 214, 178, 0.24));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-stunt__nm {
+  font: 700 19px/1.2 'Cormorant Garamond', Georgia, serif;
+  color: var(--na-moss-deep, #37501f);
+}
+/* ✦ glyf → trojlístkový marker (skryj znak barvou, vykresli SVG na ::before boxu) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-stunt__nm::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 18 18'%3E%3Cpath d='M9 17 V10' stroke='%2337501f' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M9 10 C9 5 5 3 3 4 C3 8 5 10 9 10Z' fill='%237ba450'/%3E%3Cpath d='M9 10 C9 5 13 3 15 4 C15 8 13 10 9 10Z' fill='%235a7d3a'/%3E%3Cpath d='M9 9 C9 4 9 2 9 1 C7 3 7 6 9 9Z' fill='%2386ab52'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-stunt__desc {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--dd-ink-soft, #5e5736);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9) STRES — SIGNATURE semínka / dřevěné perly; on = bobule (nebezpečí DRŽÍ)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-stress-box__hit {
+  border: 2px solid var(--na-bark-edge, #6b4f2e);
+  /* semínkový / kapkový tvar */
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 38% 28%, rgba(255, 255, 255, 0.5), rgba(228, 214, 178, 0.4));
+  color: var(--dd-ink-soft, #5e5736);
+  font-family: 'Spectral', Georgia, serif;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-stress-box.on .fate-stress-box__hit {
+  border-color: var(--na-berry-deep, #5f1d14);
+  background: radial-gradient(circle at 38% 28%, var(--na-berry-hi, #c95a45), var(--na-berry-deep, #5f1d14));
+  color: #fff;
+  box-shadow:
+    0 0 12px rgba(168, 60, 46, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-stress-add {
+  border: 2px dashed var(--na-moss, #5e8832);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  color: var(--na-moss-deep, #37501f);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10) NÁSLEDKY — organické rohy; Vážný/filled = bobule (nebezpečí DRŽÍ)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-cons {
+  border: 1px solid var(--dd-parch-edge, #cdbb8e);
+  border-radius: 11px 3px 11px 3px;
+  background: rgba(94, 136, 50, 0.06);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-cons.filled {
+  background: linear-gradient(90deg, rgba(168, 60, 46, 0.1), transparent);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-cons__nm {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.06em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-cons__v {
+  font: 700 24px/1 'Cormorant Garamond', Georgia, serif;
+  color: var(--na-berry, #a83c2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-cons__txt {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-cons.filled .fate-cons__txt {
+  border-bottom-color: rgba(168, 60, 46, 0.4);
+  color: var(--na-berry-deep, #5f1d14);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11) DENÍK / POZNÁMKY — rukopis Caveat na linkovaném archu + organický roh
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-notes {
+  border: 1px solid var(--dd-parch-edge, #cdbb8e);
+  border-radius: 14px 4px 14px 4px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(94, 136, 50, 0.16) 27px 28px),
+    rgba(255, 253, 244, 0.4);
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-notes:focus {
+  border-color: var(--na-moss, #5e8832);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   12) tlačítka add / del + iniciála — herbářová paleta
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-add {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.06em;
+  color: var(--na-moss-deep, #37501f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-add:hover {
+  color: var(--na-moss, #5e8832);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-del {
+  color: var(--na-berry, #a83c2e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-del:hover {
+  color: var(--na-berry-deep, #5f1d14);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   13) RESPONSIVE — jemnější organické rohy na úzkém archu (≤640px)
+   (fate.css už řeší 1-sloupcový grid; zde jen doladění tvaru)
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-sheet {
+    border-radius: 22px 10px 22px 10px;
+  }
+  :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-aspect-card,
+  :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='nature'] .fate-appr {
+    border-radius: 14px 4px 14px 4px;
+  }
+}

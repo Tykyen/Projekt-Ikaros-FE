@@ -1,0 +1,482 @@
+/* FATE (fae + fate) — skin „HOROR" (Půlnoční salon) · fáze A.
+ *
+ * Reskin „Karet osudu" (default fate.css: slonovina + sépiové serify + 4dF
+ * ornament) do aristokratické viktoriánské upířiny. Scoped na OBA systémy
+ * (fae = Přístupy, fate = Dovednosti) přes `:is()` kombinátor:
+ *   :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror']
+ * Compound prefix (0,3,0 s .fate-X) přebije default `.fate-sheet .fate-X` (0,2,0).
+ *
+ * Koncept (NE gore, elegance): list = rodinný kodex prastarého šlechtického
+ * rodu, psaný za půlnoci v zšeřelém salonu. Slonovina se NEpřebarvuje na černo —
+ * mění se v damaškový salonní list: studeně šedo-fialový brokát (ne žlutý),
+ * vícevrstvý stříbrný rám, oxblood (granátový) akcent. Embed plochy (obal v TM,
+ * readout, dicelog, orchestrace, chat obal) zůstávají TMAVÉ dle DNA rodiny →
+ * kontrast „světlý list × tmavý salon" je záměrný a drží napříč systémy.
+ *
+ * Paleta: zašlé stříbro #c8c4cf (kov/neutrál) · oxblood #7a2030 (Problém/Vážný
+ * následek/zaškrtnutý stres/nebezpečí) · studená fialová #6a5170 (magy/éterické)
+ * · tlumený smaragd #4f8f6e (kladný hod). Sémantika hodu/nebezpečí drží význam.
+ *
+ * Fonty (rodina): UnifrakturCook (blackletter iniciála/pečeť), Cormorant SC
+ * (kapitálky nadpisů/eyebrow), Cormorant Garamond (serif jména/tělo/čísla).
+ *
+ * Tvarový jazyk (vlastní): ostré gotické rohy, stříbrný vícevrstvý rám salonu.
+ * Signature ornament (UNIKÁTNÍ): (1) kovaná gotická STŘÍBRNÁ tracerie ve 4 rozích
+ * listu (mříž katedrálního okna), (2) stříbrná erbovní PEČEŤ (růže + netopýří
+ * křídla) v hero, (3) blackletter iniciála jména, (4) 4dF kostky → ražené
+ * stříbrné rytinkové ŽETONY.
+ *
+ * Pozn.: ornamenty PANELU (FateCombatBody) a READOUTU řeší jejich module CSS
+ * (hashované třídy) — sem nepatří. Skin soubor = LIST ornamenty + VŠECHNY tokeny.
+ * Pouze CSS/SVG, žádný JS.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cormorant+SC:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════
+   0) TOKENY — compound scope BEZ .fate-sheet (panely+embedy dědí z předka).
+   List (fate.css) sourcuje --fate-* / --paper-* z těchto --dd-*; panely
+   (FateCombatBody/FateBestieCard) a embedy je čtou taktéž z předka.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] {
+  /* damaškový salonní list (studeně šedo-fialový místo slonoviny) */
+  --dd-parch-1: #d7d0d8;
+  --dd-parch-2: #c9c0cb;
+  --dd-parch-edge: #8a8090;
+
+  /* text na listu */
+  --dd-ink: #241820;
+  --dd-ink-soft: #52414e;
+  --dd-ink-faint: #7d6b78;
+
+  /* akcent / čísla — zašlé staré zlato (drží „gold" sémantiku tokenu) */
+  --dd-gold: #b59a5a;
+  --dd-gold-hi: #d8bd7e;
+
+  /* SÉMANTIKA červené — oxblood granát: Problém / Vážný / zaškrtnutý stres */
+  --dd-crimson: #7a2030;
+  --dd-crimson-soft: #a2283a;
+
+  /* fonty (salonní serif rodina) */
+  --dd-font-body: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  --dd-font-head: 'Cormorant SC', 'Cinzel', serif;
+
+  /* ── EMBED plochy (obal v TM / readout / dicelog / orchestrace / chat obal) ──
+     surface NEPRŮHLEDNÁ (plný tmavý gradient salonu), text zašlé stříbro;
+     pos = smaragd, neg = tlumený oxblood (sémantika hodu/nebezpečí drží). */
+  --dd-embed-surface: linear-gradient(180deg, #241823, #18101a 55%, #130b11);
+  --dd-embed-border: #4a4750;
+  --dd-embed-line: rgba(200, 196, 207, 0.2);
+  --dd-embed-text: #c8c4cf;
+  --dd-embed-muted: #7d7986;
+  --dd-embed-title: #eae6ee;
+  --dd-embed-chip-bg: rgba(106, 81, 112, 0.18);
+  --dd-embed-accent: #c8c4cf;
+  --dd-embed-num-font: 'Cormorant Garamond', serif;
+  --dd-embed-title-font: 'Cormorant SC', serif;
+  --dd-embed-pos: #8fbf7a; /* kladný hod — tlumený smaragd */
+  --dd-embed-neg: #d87a86; /* záporný hod / nebezpečí — tlumený oxblood */
+  --dd-embed-neutral: #c8c4cf; /* neutrál — stříbro */
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   1) LIST `.fate-sheet` — plocha / vícevrstvý stříbrný rám / textura.
+   Damaškový salonní list za půlnoci. Lokální --fate-* už nesou --dd-* shora.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-sheet {
+  isolation: isolate;
+  border: 1px solid var(--dd-parch-edge, #8a8090);
+  border-radius: 3px;
+  /* studeně šedo-fialový brokát (přebije pruhovanou slonovinu defaultu) */
+  background:
+    radial-gradient(120% 80% at 50% -10%, #d7d0d8 0%, var(--dd-parch-1, #c9c0cb) 46%, #b6acbb 100%);
+  /* vícevrstvý stříbrný rám (kov × noc) + měkký vnitřní stín salonu */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 0 0 4px #130b11,
+    inset 0 0 0 5px #4a4750,
+    inset 0 0 0 6px #130b11,
+    inset 0 0 170px rgba(40, 24, 40, 0.3),
+    0 50px 110px -36px #000;
+}
+
+/* SIGNATURE: default `.fate-sheet::after` (vnitřní rámeček) → kovaná gotická
+   STŘÍBRNÁ tracerie ve 4 rozích (1 dlaždice + 3× zrcadlení). Drží se vnějších
+   rohů (offset, daleko od textu), z-index pod obsahem. Corner SVG INLINE. */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-sheet::after {
+  inset: 0;
+  z-index: 0;
+  border: none;
+  border-radius: 3px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 64px 64px;
+  background-position: 9px 9px, calc(100% - 9px) 9px, 9px calc(100% - 9px), calc(100% - 9px) calc(100% - 9px);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 63 L2 26 C2 13 13 2 26 2 L63 2' stroke-width='1.8'/%3E%3Cpath d='M9 63 L9 28 C9 18 18 9 28 9 L63 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 26 C15 26 26 15 26 2' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='14' cy='14' r='2.5' fill='%237a2030' stroke='none'/%3E%3Cpath d='M14 6 L14 22 M6 14 L22 14' stroke-width='.6' opacity='.45'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cpath d='M2 63 L2 26 C2 13 13 2 26 2 L63 2' stroke-width='1.8'/%3E%3Cpath d='M9 63 L9 28 C9 18 18 9 28 9 L63 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 26 C15 26 26 15 26 2' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='14' cy='14' r='2.5' fill='%237a2030' stroke='none'/%3E%3Cpath d='M14 6 L14 22 M6 14 L22 14' stroke-width='.6' opacity='.45'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cpath d='M2 63 L2 26 C2 13 13 2 26 2 L63 2' stroke-width='1.8'/%3E%3Cpath d='M9 63 L9 28 C9 18 18 9 28 9 L63 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 26 C15 26 26 15 26 2' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='14' cy='14' r='2.5' fill='%237a2030' stroke='none'/%3E%3Cpath d='M14 6 L14 22 M6 14 L22 14' stroke-width='.6' opacity='.45'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none' stroke='%23823042' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cpath d='M2 63 L2 26 C2 13 13 2 26 2 L63 2' stroke-width='1.8'/%3E%3Cpath d='M9 63 L9 28 C9 18 18 9 28 9 L63 9' stroke-width='.8' opacity='.5'/%3E%3Cpath d='M2 26 C15 26 26 15 26 2' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='14' cy='14' r='2.5' fill='%237a2030' stroke='none'/%3E%3Cpath d='M14 6 L14 22 M6 14 L22 14' stroke-width='.6' opacity='.45'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 0.5px rgba(234, 230, 238, 0.55));
+  opacity: 0.9;
+}
+/* obsah listu nad tracerii/rámem */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-sheet > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   2) SIGNATURE: 4dF kostky → ražené stříbrné rytinkové ŽETONY
+   (.fate-fudge .plus/.minus/.zero). Kruhové ražené žetony, oxblood/smaragd
+   sémantika znaku, neutrál stříbro.
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-fudge {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--dd-embed-border, #4a4750);
+  background: radial-gradient(circle at 38% 30%, #d9d5df, #a7a3ae 58%, #6c6874);
+  color: #241820;
+  font-family: 'Cormorant SC', serif;
+  font-weight: 700;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-fudge.plus {
+  color: #2c5240;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-fudge.minus {
+  color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-fudge.zero::before {
+  content: '·';
+  font-size: 18px;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   3) HERO — blackletter jméno + iniciála, stříbrná dělící linka, pečeť
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-hero {
+  border-bottom: 1px solid var(--dd-embed-border, #4a4750);
+  position: relative;
+}
+/* stříbrná dělící linka pod hlavičkou */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c8c4cf 18%, #7d7986 50%, #c8c4cf 82%, transparent);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-hero__kicker {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.36em;
+  color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-hero__name {
+  font-family: 'UnifrakturCook', 'Cormorant SC', serif;
+  font-weight: 400;
+  font-size: 48px;
+  letter-spacing: 0.5px;
+  color: var(--dd-ink, #241820);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 8px rgba(40, 24, 40, 0.3);
+}
+/* blackletter iniciála — oxblood (TSX nemá .ini span → ::first-letter) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-hero__name::first-letter {
+  color: var(--dd-crimson-soft, #a2283a);
+}
+/* SIGNATURE: stříbrná erbovní pečeť (růže + netopýří křídla) ve stats bloku */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-hero__stats {
+  position: relative;
+  align-items: center;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-hero__stats::before {
+  content: '';
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3CradialGradient id='s' cx='42%25' cy='36%25' r='64%25'%3E%3Cstop offset='0%25' stop-color='%233a2c40'/%3E%3Cstop offset='48%25' stop-color='%23241823'/%3E%3Cstop offset='62%25' stop-color='%237a767f'/%3E%3Cstop offset='78%25' stop-color='%2356525c'/%3E%3Cstop offset='100%25' stop-color='%232a2730'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='60' cy='60' r='56' fill='url(%23s)' stroke='%2318121c' stroke-width='2'/%3E%3Ccircle cx='60' cy='60' r='48' fill='none' stroke='%23c8c4cf' stroke-width='1' opacity='.4'/%3E%3Cpath d='M60 60 C40 44 22 50 28 64 C20 58 12 68 24 74 C32 86 50 80 60 66' fill='none' stroke='%23c8c4cf' stroke-width='1.6' opacity='.8'/%3E%3Cpath d='M60 60 C80 44 98 50 92 64 C100 58 108 68 96 74 C88 86 70 80 60 66' fill='none' stroke='%23c8c4cf' stroke-width='1.6' opacity='.8'/%3E%3Cg%3E%3Ccircle cx='60' cy='58' r='11' fill='%235e1622'/%3E%3Cpath d='M60 49 C66 49 68 55 60 58 C52 55 54 49 60 49Z' fill='%23a2283a'/%3E%3Cpath d='M53 56 C53 50 60 51 60 58 C56 60 53 60 53 56Z' fill='%237a2030'/%3E%3Cpath d='M67 56 C67 50 60 51 60 58 C64 60 67 60 67 56Z' fill='%237a2030'/%3E%3Ccircle cx='60' cy='57' r='2.4' fill='%23d8b0b6'/%3E%3C/g%3E%3C/svg%3E")
+      center / contain no-repeat;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.45));
+  pointer-events: none;
+}
+
+/* badge „Obnova" — stříbrný okraj, oxblood číslo + hvězdy */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-badge {
+  border: 1px solid var(--dd-embed-border, #4a4750);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.45), rgba(182, 172, 187, 0.16));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-badge__lab {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.22em;
+  color: var(--dd-ink-soft, #52414e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-badge__val,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-badge__in {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-badge__stars {
+  color: var(--dd-crimson, #7a2030);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   4) NADPISY SEKCÍ — stříbrná lilie marker + Cormorant SC kapitálky
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-sec__h h2 {
+  font-family: 'Cormorant SC', serif;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--dd-crimson, #7a2030);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-sec__h h2::before {
+  content: '';
+  width: 14px;
+  height: 16px;
+  flex: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' fill='none' stroke='%237a2030' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15 L7 5'/%3E%3Cpath d='M7 5 C7 2 8.4 1.2 8.8 1.2 C9.2 2.9 8.2 4.6 7 5Z' fill='%237a2030'/%3E%3Cpath d='M7 7.2 C7 3.6 10.2 2.8 12 3.6 C11.6 7 8.6 7.9 7 7.2Z' fill='%235e1622'/%3E%3Cpath d='M7 7.2 C7 3.6 3.8 2.8 2 3.6 C2.4 7 5.4 7.9 7 7.2Z' fill='%235e1622'/%3E%3Cpath d='M3.6 10 L10.4 10' stroke='%23a8a3b0'/%3E%3C/svg%3E")
+      no-repeat center / contain;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-rule {
+  border-top: 1px solid var(--dd-embed-border, #4a4750);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   5) ASPEKTY — ostré gotické karty, oxblood lem u „trouble" (sémantika)
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-card {
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.45), rgba(182, 172, 187, 0.16));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-card.trouble {
+  border-color: rgba(122, 32, 48, 0.45);
+  border-left: 3px solid var(--dd-crimson, #7a2030);
+  background: linear-gradient(180deg, rgba(122, 32, 48, 0.1), rgba(122, 32, 48, 0.02));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-card__lab {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.18em;
+  color: var(--dd-ink-soft, #52414e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-card.trouble .fate-aspect-card__lab {
+  color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-card__txt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  color: var(--dd-ink, #241820);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-card__txt:focus {
+  border-bottom-color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-row {
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+  border-left: 3px solid #7d7986;
+  border-radius: 0;
+  background: rgba(255, 253, 255, 0.32);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-row__bullet {
+  color: #7d7986;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-row__txt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  color: var(--dd-ink, #241820);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-aspect-row__txt:focus {
+  border-bottom-color: var(--dd-crimson, #7a2030);
+}
+
+/* ── add / del tlačítka ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-add {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.14em;
+  color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-add:hover {
+  color: var(--dd-crimson-soft, #a2283a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-del {
+  color: var(--dd-crimson-soft, #a2283a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-del:hover {
+  color: var(--dd-crimson, #7a2030);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   6) PŘÍSTUPY (FAE) — ostré salonní desky, oxblood u „hi"
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-appr {
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(255, 253, 255, 0.42), rgba(182, 172, 187, 0.14));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-appr__name {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.16em;
+  color: var(--dd-ink-soft, #52414e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-appr__bonus {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--dd-ink, #241820);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-appr.hi {
+  border-color: var(--dd-embed-border, #4a4750);
+  background: linear-gradient(180deg, rgba(122, 94, 130, 0.14), rgba(182, 172, 187, 0.14));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-appr.hi .fate-appr__bonus {
+  color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-step {
+  border: 1px solid var(--dd-embed-border, #4a4750);
+  border-radius: 2px;
+  background: rgba(200, 196, 207, 0.16);
+  color: var(--dd-ink-soft, #52414e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-step:hover {
+  background: var(--dd-crimson, #7a2030);
+  color: #f4eaec;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   7) DOVEDNOSTI (Core / fate) — řádky se stříbrným okrajem
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-skill {
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+  border-radius: 0;
+  background: rgba(255, 253, 255, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-skill__nm {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  color: var(--dd-ink, #241820);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-skill__ladder {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.1em;
+  color: var(--dd-ink-soft, #52414e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-skill__bonus {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--dd-crimson, #7a2030);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   8) TRIKY — gotická salonní deska, lilie marker místo ✦
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stunt {
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+  border-radius: 0;
+  background: rgba(255, 253, 255, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stunt__nm {
+  font-family: 'Cormorant SC', serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--dd-ink, #241820);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stunt__nm::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 14px;
+  margin-right: 7px;
+  vertical-align: -1px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' fill='none' stroke='%237a2030' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15 L7 5'/%3E%3Cpath d='M7 5 C7 2 8.4 1.2 8.8 1.2 C9.2 2.9 8.2 4.6 7 5Z' fill='%237a2030'/%3E%3Cpath d='M7 7.2 C7 3.6 10.2 2.8 12 3.6 C11.6 7 8.6 7.9 7 7.2Z' fill='%235e1622'/%3E%3Cpath d='M7 7.2 C7 3.6 3.8 2.8 2 3.6 C2.4 7 5.4 7.9 7 7.2Z' fill='%235e1622'/%3E%3C/svg%3E")
+      no-repeat center / contain;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stunt__desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--dd-ink-soft, #52414e);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   9) STRES — stříbrné čtverce; zaškrtnutý = oxblood (sémantika nebezpečí)
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stress-box__hit {
+  border: 1.5px solid var(--dd-embed-border, #4a4750);
+  border-radius: 2px;
+  background: rgba(255, 253, 255, 0.22);
+  color: var(--dd-ink-faint, #7d6b78);
+  font-family: 'Cormorant Garamond', serif;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stress-box.on .fate-stress-box__hit {
+  background: var(--dd-crimson, #7a2030);
+  border-color: var(--dd-crimson, #7a2030);
+  color: #f4eaec;
+  box-shadow: 0 0 14px rgba(122, 32, 48, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stress-box__del {
+  background: var(--dd-parch-1, #d7d0d8);
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-stress-add {
+  border: 1.5px dashed #7d7986;
+  border-radius: 2px;
+  color: #7d7986;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   10) NÁSLEDKY — oxblood číslo (Vážný = nebezpečí); vyplněný = oxblood prosvit
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-cons {
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+  border-radius: 0;
+  background: rgba(255, 253, 255, 0.22);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-cons.filled {
+  background: linear-gradient(180deg, rgba(122, 32, 48, 0.08), transparent);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-cons__nm {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 0.12em;
+  color: var(--dd-ink-soft, #52414e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-cons__v {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--dd-crimson, #7a2030);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-cons__txt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--dd-ink, #241820);
+  border-bottom-color: var(--dd-parch-edge, #9a8e9c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-cons__txt:focus {
+  border-bottom-color: var(--dd-crimson, #7a2030);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   11) DENÍK / POZNÁMKY — linkovaný salonní list (oxblood linkování)
+   ════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-notes {
+  border: 1px solid var(--dd-parch-edge, #9a8e9c);
+  border-radius: 0;
+  background: rgba(255, 253, 255, 0.2);
+  background-image: repeating-linear-gradient(transparent 0 27px, rgba(122, 32, 48, 0.1) 27px 28px);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--dd-ink, #241820);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='horror'] .fate-notes:focus {
+  border-color: var(--dd-crimson, #7a2030);
+}

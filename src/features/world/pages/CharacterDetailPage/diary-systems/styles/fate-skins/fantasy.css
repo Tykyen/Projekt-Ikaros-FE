@@ -1,0 +1,551 @@
+/* FATE skin „FANTASY" — Iluminovaný grimoár (kovaná kožená vazba) · fantasy = pergamenový default rodiny.
+ *
+ * Bohatý krémový pergamen (#ecdab0) pod antickým zlatem #e3b94a, vsazený do tmavé kované
+ * kožené vazby. Rodinná DNA shodná s jad/fantasy + drd2 + drdplus. Platí pro OBĚ Fate
+ * varianty (fae = Přístupy, fate = Dovednosti) přes :is() kombinátor.
+ *
+ * JEDEN soubor: (1) @import fontů, (2) lokální paleta + rohové kování SVG na compound scope,
+ * (3) override --dd-* panelů + VŠECHNY --dd-embed-* OPAQUE (panely/embedy je čtou z předka),
+ * (4) override .fate-sheet listu + vellum plocha + kovaná vazba, (5) signature ornamenty
+ * (filigránové kování, pečetní medailon, iluminovaná iniciála, drahokamové 4dF) na reálné
+ * .fate-* třídy.
+ *
+ * SCOPE: KAŽDÉ pravidlo na :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'].
+ * Specificita listu = 0,3,0 (atribut + atribut + .fate-sheet) > baseline fate.css .fate-sheet (0,2,0)
+ * → přebíjí. Pouze CSS/SVG, ŽÁDNÝ JS. Regrese-safe: jen overrides pod prefixem.
+ *
+ * SIGNATURE (vlastní): filigránové zlaté rohové kování listu/karet; iluminovaná iniciála jména;
+ * pečetní kruhový medailon (badge Obnova); drahokamové reinterpretace 4dF (smaragd plus, rubín
+ * minus, dýmový křišťál neutrál); dvojité zlaté knihařské linkování.
+ *
+ * SÉMANTIKA (drží napříč skiny): Problém / Vážný následek / zaškrtnutý stres / záporný hod
+ * = oxblood crimson #8e2424. Akcent / čísla / kladný = antické zlato. Embed surface NEPRŮHLEDNÁ.
+ *
+ * Pozn. ornamenty PANELU (FateCombatBody) a READOUTU řeší samostatná fáze v jejich module CSS
+ * (hashované třídy odsud nedosáhneme) — tady jen LIST ornamenty + VŠECHNY tokeny.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   0) LOKÁLNÍ PALETA + ROHOVÉ KOVÁNÍ — proměnné na compound scope.
+   Filigrán: tah %23e3b94a (zlato) + nýt %23f7e7a8 (světlé zlato). Čte je list níž.
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] {
+  /* ── kožená vazba / rám ── */
+  --fatef-bind-1: #1a1107; /* nejhlubší kůže */
+  --fatef-bind-2: #271d12; /* kovárna */
+  --fatef-bind-3: #3d2e18; /* líc kůže */
+
+  /* ── pergamen kodexu (bohatý) ── */
+  --fatef-vellum-0: #efe0bb;
+  --fatef-vellum-1: #e2cf9f;
+  --fatef-vellum-2: #d4b67e;
+  --fatef-vellum-edge: #c2a86f;
+
+  /* ── inkoust ── */
+  --fatef-ink: #3a2a17;
+  --fatef-ink-soft: #6a5234;
+  --fatef-ink-faint: #9a8052;
+
+  /* ── antické zlato (signature kov) ── */
+  --fatef-gold: #e3b94a;
+  --fatef-gold-hi: #f7e3a0;
+  --fatef-gold-mid: #c9a227;
+  --fatef-gold-deep: #b88a2c;
+  --fatef-gold-shadow: #7c5a1c;
+
+  /* ── sémantika (drží napříč skiny) ── */
+  --fatef-crimson: #8e2424; /* PROBLÉM / Vážný / zaškrtnutý stres / záporný hod */
+  --fatef-crimson-hi: #b8553e;
+  --fatef-crimson-deep: #5a1414;
+  --fatef-emerald: #3f8f5c; /* kladný hod 4dF plus */
+  --fatef-emerald-hi: #7aa654;
+  --fatef-smoke: #6e6a86; /* neutrál 4dF 0 (dýmový křišťál) */
+
+  /* ── SIGNATURE: filigránové rohové kování (4 rohy, jeden stack) ── */
+  --fatef-corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e3a0' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/svg%3E");
+  --fatef-corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 0) scale(-1 1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e3a0' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --fatef-corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(0 44) scale(1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e3a0' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --fatef-corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 44) scale(-1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e3a0' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* ── SIGNATURE: pečetní medailon (rytá osmihrotá hvězda) — badge Obnova ── */
+  --fatef-seal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none'%3E%3Ccircle cx='20' cy='20' r='18' stroke='%23b88a2c' stroke-width='1.4'/%3E%3Ccircle cx='20' cy='20' r='13' stroke='%237c5a1c' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M20 5 L22 18 L35 20 L22 22 L20 35 L18 22 L5 20 L18 18 Z' stroke='%23e3b94a' stroke-width='1' opacity='0.8'/%3E%3C/svg%3E");
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) PANEL/EMBED TOKENY --dd-* (combat/bestie/chat panely + obal + readout/log/orch)
+   Panely čtou --dd-* přes var() → reskin čistě tokeny (hash třídy NEJDOU cílit).
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] {
+  /* ── plochy karty/panelu (list je čte přes --fate-paper-*) ── */
+  --dd-parch-1: var(--fatef-vellum-0, #efe0bb);
+  --dd-parch-2: var(--fatef-vellum-1, #e2cf9f);
+  --dd-parch-edge: var(--fatef-vellum-edge, #c2a86f);
+
+  /* ── inkoust ── */
+  --dd-ink: var(--fatef-ink, #3a2a17);
+  --dd-ink-soft: var(--fatef-ink-soft, #6a5234);
+  --dd-ink-faint: var(--fatef-ink-faint, #9a8052);
+
+  /* ── akcent / čísla = antické zlato ── */
+  --dd-gold: var(--fatef-gold, #e3b94a);
+  --dd-gold-hi: var(--fatef-gold-deep, #b88a2c); /* --fate-gold-bright (čísla) = zlatá deep pro kontrast na pergamenu */
+  --dd-gold-deep: var(--fatef-gold-deep, #b88a2c);
+  --dd-accent: var(--fatef-gold, #e3b94a);
+
+  /* ── SÉMANTIKA červené (Problém / Vážný / stres / záporný) ── */
+  --dd-crimson: var(--fatef-crimson, #8e2424);
+  --dd-crimson-soft: var(--fatef-crimson-hi, #b8553e);
+  --dd-crimson-hi: var(--fatef-crimson-hi, #b8553e);
+  --dd-crimson-deep: var(--fatef-crimson-deep, #5a1414);
+
+  /* ── fonty rodiny ── */
+  --dd-font-head: 'Cinzel', serif; /* tituly, kapitálky */
+  --dd-font-body: 'EB Garamond', Georgia, serif; /* tělo */
+  --dd-font-display: 'Cinzel Decorative', 'Cinzel', serif; /* iniciála, čísla, TOTAL */
+
+  /* ════════ EMBED plochy (obal v TM / chat obal / readout / dicelog / orchestrace) ════════
+     surface NEPRŮHLEDNÁ (plný gradient) → log/obal/readout NEprosvítá na mapu/chat. */
+  --dd-embed-surface: linear-gradient(155deg, var(--fatef-vellum-0, #efe0bb), var(--fatef-vellum-1, #e2cf9f)); /* OPAQUE */
+  --dd-embed-border: var(--fatef-vellum-edge, #c2a86f);
+  --dd-embed-line: rgba(184, 138, 44, 0.32);
+  --dd-embed-text: var(--fatef-ink, #3a2a17);
+  --dd-embed-muted: var(--fatef-ink-soft, #6a5234);
+  --dd-embed-title: var(--fatef-gold-deep, #b88a2c);
+  --dd-embed-chip-bg: rgba(227, 185, 74, 0.14);
+  --dd-embed-accent: var(--fatef-gold, #e3b94a);
+  --dd-embed-num-font: 'Cinzel Decorative', 'Cinzel', serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: var(--fatef-emerald, #3f8f5c); /* kladný hod */
+  --dd-embed-neg: var(--fatef-crimson, #8e2424); /* záporný hod = červená/nebezpečí */
+  --dd-embed-neutral: var(--fatef-gold-deep, #b88a2c); /* neutrální TOTAL */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) LIST — bohatý krémový pergamen v kované kožené vazbě.
+   Override .fate-sheet plochy + kovaný rám + dvojité zlaté knihařské linkování.
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet {
+  position: relative;
+  isolation: isolate;
+  color: var(--fatef-ink, #3a2a17);
+  border: none;
+  border-radius: 8px;
+
+  /* bohatá vellum plocha */
+  background:
+    radial-gradient(140% 90% at 12% -6%, rgba(255, 252, 240, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 92% 100%, rgba(124, 90, 28, 0.16), transparent 58%),
+    repeating-linear-gradient(0deg, rgba(120, 90, 40, 0.022) 0 2px, transparent 2px 5px),
+    linear-gradient(155deg, var(--fatef-vellum-0, #efe0bb), var(--fatef-vellum-1, #e2cf9f) 55%, var(--fatef-vellum-2, #d4b67e));
+
+  /* kovaná kožená vazba: pergamen → okraj → kůže → zlatá rytina → nejhlubší kůže */
+  box-shadow:
+    0 2px 0 rgba(255, 252, 240, 0.2) inset,
+    0 -34px 64px -42px rgba(70, 36, 12, 0.5) inset,
+    0 0 0 1px var(--fatef-vellum-edge, #c2a86f),
+    0 0 0 8px var(--fatef-bind-2, #271d12),
+    0 0 0 9px var(--fatef-gold-shadow, #7c5a1c),
+    0 0 0 12px var(--fatef-bind-1, #1a1107),
+    0 44px 96px -42px #000;
+}
+
+/* SIGNATURE: filigránové ZLATÉ ROHOVÉ KOVÁNÍ listu — 4 rohy v jednom ::before */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-size: 44px 44px;
+  background-position: 6px 6px, calc(100% - 6px) 6px, 6px calc(100% - 6px), calc(100% - 6px) calc(100% - 6px);
+  background-image: var(--fatef-corner-tl, none), var(--fatef-corner-tr, none), var(--fatef-corner-bl, none),
+    var(--fatef-corner-br, none);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+/* SIGNATURE: dvojité zlaté knihařské linkování (inner fillet) po obvodu listu */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet::after {
+  inset: 12px;
+  border: 1px solid rgba(184, 138, 44, 0.5);
+  border-radius: 5px;
+  box-shadow:
+    0 0 0 3px rgba(255, 252, 240, 0.28) inset,
+    0 0 0 4px rgba(184, 138, 44, 0.18) inset;
+}
+
+/* obsah nad ornamenty rohů/linkování */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE 4dF — drahokamové ryté žetony.
+   .fate-fudge bez modifikátoru = neutrál (0, dýmový křišťál); .plus = smaragd;
+   .minus = rubín. Reinterpretace default rámečku na gradientový gem.
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-fudge {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.4px solid var(--fatef-gold, #e3b94a);
+  color: var(--fatef-gold-hi, #f7e3a0);
+  font: 700 12px/1 'Cinzel', serif;
+  background: radial-gradient(circle at 40% 32%, var(--fatef-smoke, #6e6a86), #33304a 75%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 1px 1px rgba(255, 255, 255, 0.3) inset;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-fudge.plus {
+  background: radial-gradient(circle at 40% 32%, var(--fatef-emerald-hi, #7aa654), #1d4e30 75%);
+  color: #e8ffef;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-fudge.minus {
+  background: radial-gradient(circle at 40% 32%, var(--fatef-crimson-hi, #b8553e), var(--fatef-crimson-deep, #5a1414) 75%);
+  color: #ffe1db;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) SEKCE / NADPISY — Cinzel, ražený zlatý kosočtverec, zlatá knihařská linka
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-sec__h h2 {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--fatef-gold-deep, #b88a2c);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-sec__h h2::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  transform: rotate(45deg);
+  border-radius: 1px;
+  background: linear-gradient(135deg, var(--fatef-gold-hi, #f7e3a0), var(--fatef-gold-shadow, #7c5a1c));
+  box-shadow: 0 0 0 1px rgba(124, 90, 28, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-rule {
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(
+      90deg,
+      var(--fatef-gold-deep, #b88a2c),
+      var(--fatef-gold, #e3b94a) 30%,
+      var(--fatef-gold-hi, #f7e3a0) 50%,
+      var(--fatef-gold, #e3b94a) 70%,
+      transparent
+    )
+    1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) HERO — iluminovaná iniciála jména + zlatá podlinka, Cinzel Decorative
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-hero {
+  border-bottom: 2px solid var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-hero__kicker {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.28em;
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-hero__name {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--fatef-ink, #3a2a17);
+  text-shadow: 0 1px 0 rgba(255, 252, 240, 0.5);
+}
+/* SIGNATURE: iluminovaná iniciála (první písmeno jména) — zlatá kapitálka */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-hero__name::first-letter {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 1.22em;
+  color: var(--fatef-gold-deep, #b88a2c);
+  background: linear-gradient(160deg, var(--fatef-gold-hi, #f7e3a0), var(--fatef-gold, #e3b94a) 45%, var(--fatef-gold-shadow, #7c5a1c));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+/* ── Obnova badge = pečetní medailon (signature), Cinzel Decorative číslo ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-badge {
+  position: relative;
+  border: 1px solid var(--fatef-gold-deep, #b88a2c);
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.7), rgba(226, 207, 159, 0.32));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 2px 8px rgba(60, 40, 15, 0.16);
+}
+/* SIGNATURE: pečetní medailon raženě v rohu badge Obnova */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-badge::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  background: var(--fatef-seal, none) center / contain no-repeat;
+  opacity: 0.55;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-badge__lab {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.18em;
+  color: var(--fatef-ink-soft, #6a5234);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-badge__val,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-badge__in {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-badge__stars {
+  color: var(--fatef-gold, #e3b94a);
+  text-shadow: 0 0 5px rgba(227, 185, 74, 0.5);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) ASPEKTY — pergamenové karty se zlatým filigránovým rámečkem; Problém crimson
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card {
+  position: relative;
+  border: 1px solid var(--fatef-gold-deep, #b88a2c);
+  background: linear-gradient(180deg, rgba(255, 250, 236, 0.65), rgba(226, 207, 159, 0.2));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 3px 10px rgba(60, 40, 15, 0.1);
+}
+/* drobný zlatý filigránový vnitřní rámeček karty */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  border-radius: 7px;
+  border: 1px solid rgba(184, 138, 44, 0.25);
+}
+/* SÉMANTIKA: Problém = oxblood crimson */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card.trouble {
+  border-color: var(--fatef-crimson, #8e2424);
+  background: linear-gradient(180deg, rgba(142, 36, 36, 0.12), rgba(142, 36, 36, 0.03));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card.trouble::after {
+  border-color: rgba(142, 36, 36, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card__lab {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.18em;
+  color: var(--fatef-ink-soft, #6a5234);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card.trouble .fate-aspect-card__lab {
+  color: var(--fatef-crimson, #8e2424);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card__txt {
+  color: var(--fatef-ink, #3a2a17);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-card__txt:focus {
+  border-bottom-color: var(--fatef-gold, #e3b94a);
+}
+
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-row {
+  border: 1px solid var(--fatef-vellum-edge, #c2a86f);
+  border-left: 3px solid var(--fatef-gold, #e3b94a);
+  background: linear-gradient(90deg, rgba(255, 250, 236, 0.5), rgba(226, 207, 159, 0.16));
+  box-shadow: 0 1px 4px rgba(60, 40, 15, 0.08);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-row__bullet {
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-row__txt {
+  color: var(--fatef-ink, #3a2a17);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-aspect-row__txt:focus {
+  border-bottom-color: var(--fatef-gold, #e3b94a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) PŘÍSTUPY (FAE) / DOVEDNOSTI (Core) — pergamenové dlaždice, Cinzel Decorative skóre
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-appr {
+  border: 1px solid var(--fatef-vellum-edge, #c2a86f);
+  background: linear-gradient(180deg, rgba(255, 250, 236, 0.6), rgba(226, 207, 159, 0.18));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 2px 8px rgba(60, 40, 15, 0.1);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-appr.hi {
+  border-color: var(--fatef-gold-deep, #b88a2c);
+  background: linear-gradient(180deg, rgba(247, 227, 160, 0.5), rgba(227, 185, 74, 0.16));
+  box-shadow:
+    0 0 0 1px rgba(184, 138, 44, 0.35) inset,
+    0 3px 12px rgba(184, 138, 44, 0.2);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-appr__name {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.18em;
+  color: var(--fatef-ink-soft, #6a5234);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-appr.hi .fate-appr__name {
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-appr__bonus {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--fatef-ink, #3a2a17);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-appr.hi .fate-appr__bonus {
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-step {
+  border-color: var(--fatef-gold-deep, #b88a2c);
+  background: rgba(227, 185, 74, 0.14);
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-step:hover {
+  background: var(--fatef-gold, #e3b94a);
+  color: #2a1a0a;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-skill {
+  border: 1px solid var(--fatef-vellum-edge, #c2a86f);
+  background: linear-gradient(90deg, rgba(255, 250, 236, 0.5), rgba(226, 207, 159, 0.16));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-skill__ladder {
+  font-family: 'Cinzel', serif;
+  color: var(--fatef-ink-soft, #6a5234);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-skill__bonus {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) TRIKY — pergamenová karta se zlatým signature ✦, Cinzel název
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stunt {
+  border: 1px solid var(--fatef-vellum-edge, #c2a86f);
+  background: linear-gradient(180deg, rgba(255, 250, 236, 0.5), rgba(226, 207, 159, 0.14));
+  box-shadow: 0 1px 4px rgba(60, 40, 15, 0.08);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stunt__nm {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--fatef-ink, #3a2a17);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stunt__nm::before {
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stunt__desc {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--fatef-ink-soft, #6a5234);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) STRES — drahokamové pečetě; zaškrtnutý = oxblood (sémantika)
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stress-box__hit {
+  border: 2px solid var(--fatef-gold-deep, #b88a2c);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 250, 236, 0.45), rgba(226, 207, 159, 0.15));
+  color: var(--fatef-ink-soft, #6a5234);
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+/* SÉMANTIKA: zaškrtnutý stres = oxblood */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stress-box.on .fate-stress-box__hit {
+  border-color: var(--fatef-crimson, #8e2424);
+  color: var(--fatef-gold-hi, #f7e3a0);
+  background: radial-gradient(circle at 50% 35%, #c5403a, var(--fatef-crimson, #8e2424) 70%);
+  box-shadow:
+    0 0 14px rgba(142, 36, 36, 0.55),
+    0 1px 0 rgba(255, 200, 180, 0.3) inset;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stress-box__del {
+  background: var(--fatef-vellum-0, #efe0bb);
+  border-color: var(--fatef-vellum-edge, #c2a86f);
+  color: var(--fatef-crimson, #8e2424);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-stress-add {
+  border-color: var(--fatef-gold, #e3b94a);
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) NÁSLEDKY — pergamenové sloty; Vážný hodnota crimson; vyplněný = oxblood lem
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-cons {
+  border: 1px solid var(--fatef-vellum-edge, #c2a86f);
+  background: linear-gradient(180deg, rgba(255, 250, 236, 0.45), rgba(226, 207, 159, 0.12));
+}
+/* SÉMANTIKA: vyplněný následek = oxblood */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-cons.filled {
+  border-color: var(--fatef-crimson, #8e2424);
+  background: linear-gradient(180deg, rgba(142, 36, 36, 0.1), transparent);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-cons__nm {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.1em;
+  color: var(--fatef-ink-soft, #6a5234);
+}
+/* SÉMANTIKA: hodnota následku (Vážný 6 atd.) = crimson */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-cons__v {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--fatef-crimson, #8e2424);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-cons__txt {
+  color: var(--fatef-ink, #3a2a17);
+  border-bottom-color: var(--fatef-ink-faint, #9a8052);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-cons__txt:focus {
+  border-bottom-color: var(--fatef-gold, #e3b94a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   11) DENÍK — linkovaný pergamen (zlaté řádkování), EB Garamond
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-notes {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--fatef-ink, #3a2a17);
+  border: 1px solid var(--fatef-vellum-edge, #c2a86f);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 30px, rgba(184, 138, 44, 0.16) 30px 31px),
+    linear-gradient(180deg, rgba(255, 250, 236, 0.35), rgba(226, 207, 159, 0.1));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-notes:focus {
+  border-color: var(--fatef-gold, #e3b94a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   12) ADD / DEL — zlatá linka, crimson del (sémantika nebezpečí)
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-add {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.1em;
+  color: var(--fatef-gold-deep, #b88a2c);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-add:hover {
+  color: var(--fatef-gold, #e3b94a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-del {
+  color: var(--fatef-crimson-hi, #b8553e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet .fate-del:hover {
+  color: var(--fatef-crimson, #8e2424);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   13) RESPONSIVITA — pojistka, aby kovaná deska + linkování + kování držely na úzku
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 560px) {
+  :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet::after {
+    inset: 8px;
+  }
+  :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='fantasy'] .fate-sheet::before {
+    background-size: 34px 34px;
+  }
+}

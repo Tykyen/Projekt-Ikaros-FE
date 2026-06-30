@@ -2,16 +2,17 @@
  * Kompaktní řádková karta do bestiáře, obdoba Drd16BestieCard. */
 
 .card {
-  --paper-1: #f5edd9;
-  --paper-2: #ece0c2;
-  --edge: #d9c8a0;
-  --ink: #2a2014;
-  --ink-soft: #6f6048;
-  --ink-faint: #9b8a6c;
-  --gold: #9a7b3f;
-  --gold-bright: #b8923f;
-  --trouble: #8a2f2f;
-  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  /* tokeny sourcené z --dd-* (skin override z předka), fallback = „Karty osudu" */
+  --paper-1: var(--dd-parch-1, #f5edd9);
+  --paper-2: var(--dd-parch-2, #ece0c2);
+  --edge: var(--dd-parch-edge, #d9c8a0);
+  --ink: var(--dd-ink, #2a2014);
+  --ink-soft: var(--dd-ink-soft, #6f6048);
+  --ink-faint: var(--dd-ink-faint, #9b8a6c);
+  --gold: var(--dd-gold, #9a7b3f);
+  --gold-bright: var(--dd-gold-hi, #b8923f);
+  --trouble: var(--dd-crimson, #8a2f2f);
+  --serif: var(--dd-font-body, 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif);
 
   display: flex;
   gap: 16px;

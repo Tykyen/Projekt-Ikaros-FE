@@ -1,0 +1,593 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+/**
+ * Fate rodina — skin "Sci-fi" (holografický velitelský HUD / datapad).
+ *
+ * Pergamenový list "Karty osudu" (světlý, sépiové serify, 4dF kostky) přeložen
+ * do tmavého sci-fi datapadu: void modročerná plocha, světlý holo inkoust
+ * (kontrast OBRÁCEN, AA+), neon cyan #34e3ff + violet #9b6bff, chamfer klín
+ * místo zaobleného pergamenu. 4dF kostky reinterpretovány jako svítící datové
+ * kostky (kladný = jade, záporný = rose, neutrál = cyan).
+ *
+ * Platí pro OBA systémy Fate (fae + fate) přes :is() kombinátor. KAŽDÉ pravidlo
+ * nese compound prefix (specificita 0,3,0 list / 0,2,0 tokeny přebije default).
+ * Pure CSS/SVG, žádný JS. Regrese-safe — jen overrides.
+ *
+ * Sémantika nebezpečí (rose) DRŽÍ napříč paletou: Problém, Vážný následek,
+ * zaškrtnutý stres, záporný hod = rose. Pozitivní (Obnova, kladný hod) = cyan/jade.
+ *
+ * Signature ornament = rohové tech-brackets (TL cyan, BR violet) + chamfer klín
+ * + datový scanline nadpisů + diamantový marker + HUD mřížka + driftující rám.
+ * Pozn.: ornamenty PANELU (FateCombatBody) a READOUTU řeší jejich module CSS
+ * (hashované třídy) — tady jen list ornamenty + VŠECHNY --dd- tokeny.
+ * Rodinná identita = drd2-skins/scifi.css (tentýž svět, stejné --dd- mapování).
+ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKENY na compound scope (BEZ .fate-sheet) — list, panely i embedy je
+   dědí z předka. Pergamen → void HUD; tmavý ink → světlý holo (obrácený
+   kontrast); crimson = rose (sémantika nebezpečí); gold = cyan akcent.
+   POZN: nepiš sekvenci hvězda-lomítko v komentáři (uzavřela by blok).
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] {
+  /* plochy — pergamen → tmavé HUD panely (světlý text NA tmavém) */
+  --dd-parch-1: #0d1530;
+  --dd-parch-2: #0b1124;
+  --dd-parch-edge: rgba(94, 160, 210, 0.34);
+  /* inkoust — tmavý → světlý holo (AA+ na #0b1124) */
+  --dd-ink: #e3eeff;
+  --dd-ink-soft: #9fb4dd;
+  --dd-ink-faint: #6c7fae;
+  /* akcent / čísla — sépie → neon cyan */
+  --dd-gold: #34e3ff;
+  --dd-gold-hi: #7af1ff;
+  /* SÉMANTIKA červené — drž nebezpečí (rose) */
+  --dd-crimson: #ff5a7a;
+  --dd-crimson-soft: #ff8aa3;
+  /* fonty */
+  --dd-font-body: 'Chakra Petch', system-ui, sans-serif;
+  --dd-font-head: 'Orbitron', 'Chakra Petch', sans-serif;
+
+  /* ── lokální sci-fi pomocníci (čtou je ornamenty listu níž) ── */
+  --sf-cyan: #34e3ff;
+  --sf-cyan-hi: #7af1ff;
+  --sf-cyan-dim: #1c6f86;
+  --sf-cyan-deep: #0a90b8;
+  --sf-violet: #9b6bff;
+  --sf-violet-hi: #c3a4ff;
+  --sf-violet-deep: #5b32c4;
+  --sf-jade: #3df0a8;
+  --sf-rose: #ff5a7a;
+  --sf-rose-hi: #ff8aa3;
+  --sf-rose-deep: #7a2238;
+  --sf-line: rgba(94, 160, 210, 0.16);
+  --sf-line-hot: rgba(52, 227, 255, 0.42);
+  --sf-grid: rgba(78, 150, 200, 0.07);
+  --sf-num: 'Share Tech Mono', ui-monospace, monospace;
+
+  /* ════════════════════════════════════════════════════════════════════
+     2) EMBED plochy (obal v TM / readout / dicelog / orchestrace / chat
+     obal) — VŠECHNY nastav, surface VŽDY NEPRŮHLEDNÁ (jinak prosvítá mapa).
+     pos/neg/neutral = jade/rose/cyan (kladný/záporný/neutrální hod).
+     ════════════════════════════════════════════════════════════════════ */
+  --dd-embed-surface: linear-gradient(180deg, #0c1730, #070d1e 60%, #050a18);
+  --dd-embed-border: rgba(52, 227, 255, 0.42);
+  --dd-embed-line: rgba(94, 160, 210, 0.16);
+  --dd-embed-text: #e3eeff;
+  --dd-embed-muted: #9fb4dd;
+  --dd-embed-title: #34e3ff;
+  --dd-embed-chip-bg: rgba(52, 227, 255, 0.1);
+  --dd-embed-accent: #34e3ff;
+  --dd-embed-num-font: 'Share Tech Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Orbitron', 'Chakra Petch', sans-serif;
+  --dd-embed-pos: #3df0a8;
+  --dd-embed-neg: #ff5a7a;
+  --dd-embed-neutral: #7af1ff;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) LIST — plocha + signature ornamenty na REÁLNÉ .fate- třídy.
+   Specificita 0,3,0 (compound 0,2,0 + .fate-sheet) přebije default 0,1,0.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── plátno listu: void HUD + chamfer klín + neon rám ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet {
+  border: 0;
+  border-radius: 0;
+  color: var(--dd-ink, #e3eeff);
+  background:
+    radial-gradient(120% 80% at 50% -8%, #0c1c3a 0%, transparent 52%),
+    radial-gradient(100% 70% at 88% 110%, rgba(123, 80, 220, 0.14) 0%, transparent 55%),
+    radial-gradient(90% 60% at 8% 100%, rgba(20, 150, 190, 0.1) 0%, transparent 55%),
+    linear-gradient(180deg, var(--dd-parch-1, #0d1530), var(--dd-parch-2, #0b1124) 55%, #080d1e);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 255, 0.08),
+    inset 0 0 80px -36px rgba(52, 227, 255, 0.3),
+    0 30px 90px -42px #000,
+    0 0 0 1px var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  overflow: hidden;
+}
+/* rám ::after → driftující scanline + HUD mřížka (mizí dolů) = signature A */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet::after {
+  inset: 9px;
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-radius: 0;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  background:
+    linear-gradient(var(--sf-grid, rgba(78, 150, 200, 0.07)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sf-grid, rgba(78, 150, 200, 0.07)) 1px, transparent 1px),
+    repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.045) 0 1px, transparent 1px 3px);
+  background-size: 46px 46px, 46px 46px, 100% 3px;
+  -webkit-mask-image: radial-gradient(150% 110% at 50% 0%, #000 30%, transparent 94%);
+  mask-image: radial-gradient(150% 110% at 50% 0%, #000 30%, transparent 94%);
+  animation: fate-sf-scan 9s linear infinite;
+}
+@keyframes fate-sf-scan {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 0, 0 0, 0 480px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet::after {
+    animation: none;
+  }
+}
+/* signature B: rohové tech-brackets karty (TL cyan / BR violet) — inline */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 30px;
+  height: 30px;
+  border-top: 2px solid var(--sf-cyan, #34e3ff);
+  border-left: 2px solid var(--sf-cyan, #34e3ff);
+  box-shadow: -2px -2px 14px -3px var(--sf-cyan, #34e3ff);
+  pointer-events: none;
+  z-index: 4;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-hero::before {
+  content: '';
+  position: absolute;
+  right: -22px;
+  bottom: 30px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 2px solid var(--sf-violet, #9b6bff);
+  border-right: 2px solid var(--sf-violet, #9b6bff);
+  box-shadow: 2px 2px 14px -3px var(--sf-violet, #9b6bff);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ── FONTY listu (natvrdo na třídách, nejsou tokeny) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-hero__name,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sec__h h2,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge__val,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge__in,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr__bonus,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-skill__bonus,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons__v,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stunt__nm {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+  letter-spacing: 0.04em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-hero__kicker,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge__lab,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr__name,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-skill__ladder,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card__lab,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons__nm,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-notes,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stress-box__sz {
+  font-family: var(--sf-num, 'Share Tech Mono', ui-monospace, monospace);
+}
+
+/* ── 4dF KOSTKY → svítící datové kostky (signature reinterpretace) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-fudge-row {
+  gap: 6px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-fudge {
+  width: 18px;
+  height: 18px;
+  border-radius: 0;
+  border: 1px solid var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  background: rgba(4, 10, 26, 0.7);
+  color: var(--sf-cyan-hi, #7af1ff);
+  font-family: var(--sf-num, 'Share Tech Mono', ui-monospace, monospace);
+  font-size: 13px;
+  clip-path: polygon(3px 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%, 0 3px);
+}
+/* kladný = jade, záporný = rose, neutrál = cyan (drží sémantiku hodu) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-fudge.plus {
+  color: var(--sf-jade, #3df0a8);
+  border-color: rgba(61, 240, 168, 0.5);
+  box-shadow: 0 0 8px -2px var(--sf-jade, #3df0a8);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-fudge.minus {
+  color: var(--sf-rose-hi, #ff8aa3);
+  border-color: rgba(255, 90, 122, 0.5);
+  box-shadow: 0 0 8px -2px var(--sf-rose, #ff5a7a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-fudge.zero {
+  color: var(--sf-cyan-hi, #7af1ff);
+  box-shadow: 0 0 8px -2px var(--sf-cyan, #34e3ff);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-fudge.zero::before {
+  content: '0';
+}
+
+/* ── NADPIS sekce → diamant marker + datová scanline linka ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sec__h h2 {
+  color: var(--sf-cyan, #34e3ff);
+  letter-spacing: 0.22em;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sec__h h2::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex: none;
+  background: var(--sf-cyan, #34e3ff);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  box-shadow: 0 0 10px var(--sf-cyan, #34e3ff);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-rule {
+  height: 3px;
+  border-top: 0;
+  opacity: 0.55;
+  background: repeating-linear-gradient(90deg, var(--sf-cyan-dim, #1c6f86) 0 5px, transparent 5px 9px);
+}
+
+/* ── HERO → holo titulek (glow) + neon eyebrow + datová spodní linka ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-hero {
+  border-bottom: 0;
+  position: relative;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background:
+    linear-gradient(90deg, transparent, var(--sf-line-hot, rgba(52, 227, 255, 0.42)) 18%, var(--sf-line-hot, rgba(52, 227, 255, 0.42)) 82%, transparent),
+    repeating-linear-gradient(90deg, var(--sf-cyan-dim, #1c6f86) 0 6px, transparent 6px 11px);
+  opacity: 0.7;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-hero__name {
+  color: #eaf4ff;
+  font-weight: 800;
+  text-shadow: 0 0 26px rgba(52, 227, 255, 0.3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-hero__kicker {
+  color: var(--sf-violet, #9b6bff);
+  letter-spacing: 0.3em;
+}
+
+/* ── OBNOVA badge → chamfer holo dlaždice, cyan hodnota ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge {
+  border: 1px solid var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  border-radius: 0;
+  background: rgba(6, 14, 34, 0.6);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow: inset 0 0 24px -14px var(--sf-cyan, #34e3ff);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge__val,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge__in {
+  color: var(--sf-cyan-hi, #7af1ff);
+  text-shadow: 0 0 16px rgba(52, 227, 255, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge__in {
+  background: rgba(4, 10, 26, 0.7);
+  border: 1px solid var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  border-radius: 0;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-badge__stars {
+  color: var(--sf-cyan, #34e3ff);
+  text-shadow: 0 0 10px var(--sf-cyan, #34e3ff);
+}
+
+/* ── ASPEKTY: definující karty → holo karta + tech-bracket rohy ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card {
+  position: relative;
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(18, 34, 70, 0.3), rgba(7, 13, 32, 0.5)), var(--dd-parch-2, #0b1124);
+  clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid var(--sf-cyan, #34e3ff);
+  border-left: 2px solid var(--sf-cyan, #34e3ff);
+  box-shadow: -1px -1px 8px -1px var(--sf-cyan, #34e3ff);
+  pointer-events: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card::after {
+  content: '';
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid var(--sf-violet, #9b6bff);
+  border-right: 2px solid var(--sf-violet, #9b6bff);
+  box-shadow: 1px 1px 8px -1px var(--sf-violet, #9b6bff);
+  pointer-events: none;
+}
+/* Problém = rose (sémantika nebezpečí) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card.trouble {
+  border-color: rgba(255, 90, 122, 0.4);
+  background: linear-gradient(180deg, rgba(255, 90, 122, 0.1), rgba(255, 90, 122, 0.02)), var(--dd-parch-2, #0b1124);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card.trouble::before {
+  border-top-color: var(--sf-rose, #ff5a7a);
+  border-left-color: var(--sf-rose, #ff5a7a);
+  box-shadow: -1px -1px 8px -1px var(--sf-rose, #ff5a7a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card.trouble::after {
+  border-bottom-color: var(--sf-rose-deep, #7a2238);
+  border-right-color: var(--sf-rose-deep, #7a2238);
+  box-shadow: 1px 1px 8px -1px var(--sf-rose, #ff5a7a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card__lab {
+  color: var(--dd-ink-soft, #9fb4dd);
+  letter-spacing: 0.16em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card.trouble .fate-aspect-card__lab {
+  color: var(--sf-rose-hi, #ff8aa3);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card__txt {
+  color: #eaf4ff;
+  font-style: normal;
+  font-family: var(--dd-font-body, 'Chakra Petch', sans-serif);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-card__txt:focus {
+  border-bottom-color: var(--sf-cyan, #34e3ff);
+}
+
+/* ── ASPEKT řádek → holo řádek (chamfer, cyan border-left, diamant bullet) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-row {
+  border-radius: 0;
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-left: 2px solid var(--sf-cyan-dim, #1c6f86);
+  background: linear-gradient(90deg, rgba(14, 28, 58, 0.5), rgba(8, 14, 34, 0.35));
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-row__bullet {
+  color: var(--sf-cyan, #34e3ff);
+  text-shadow: 0 0 8px var(--sf-cyan, #34e3ff);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-row__txt {
+  color: var(--dd-ink, #e3eeff);
+  font-style: normal;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-aspect-row__txt:focus {
+  border-bottom-color: var(--sf-cyan, #34e3ff);
+}
+
+/* ── tlačítka add / del ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-add {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+  color: var(--sf-cyan, #34e3ff);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-add:hover {
+  color: var(--sf-cyan-hi, #7af1ff);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-del {
+  color: var(--sf-rose, #ff5a7a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-del:hover {
+  color: var(--sf-rose-hi, #ff8aa3);
+}
+
+/* ── PŘÍSTUPY → holo buňka (chamfer + tech-bracket rohy) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr {
+  position: relative;
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(18, 34, 70, 0.3), rgba(7, 13, 32, 0.5)), var(--dd-parch-2, #0b1124);
+  clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid var(--sf-cyan, #34e3ff);
+  border-left: 2px solid var(--sf-cyan, #34e3ff);
+  box-shadow: -1px -1px 7px -1px var(--sf-cyan, #34e3ff);
+  pointer-events: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 12px;
+  height: 12px;
+  border-bottom: 2px solid var(--sf-violet, #9b6bff);
+  border-right: 2px solid var(--sf-violet, #9b6bff);
+  box-shadow: 1px 1px 7px -1px var(--sf-violet, #9b6bff);
+  pointer-events: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr__name {
+  color: var(--dd-ink-soft, #9fb4dd);
+  letter-spacing: 0.14em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr__bonus {
+  color: var(--sf-cyan-hi, #7af1ff);
+  font-weight: 800;
+  text-shadow: 0 0 14px rgba(52, 227, 255, 0.4);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr.hi {
+  border-color: var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 255, 0.07),
+    inset 0 0 34px -16px rgba(52, 227, 255, 0.45);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-appr.hi .fate-appr__bonus {
+  text-shadow: 0 0 20px rgba(52, 227, 255, 0.7);
+}
+/* stepper +/- → cyan HUD chip (chamfer) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-step {
+  border: 1px solid var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  border-radius: 0;
+  background: rgba(52, 227, 255, 0.07);
+  color: var(--sf-cyan, #34e3ff);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-step:hover {
+  background: rgba(52, 227, 255, 0.18);
+  color: var(--sf-cyan-hi, #7af1ff);
+}
+
+/* ── DOVEDNOSTI (Core) → holo řádek ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-skill {
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-left: 2px solid var(--sf-cyan-dim, #1c6f86);
+  border-radius: 0;
+  background: linear-gradient(90deg, rgba(14, 28, 58, 0.5), rgba(8, 14, 34, 0.35));
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-skill__nm {
+  color: var(--dd-ink, #e3eeff);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-skill__ladder {
+  color: var(--dd-ink-faint, #6c7fae);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-skill__bonus {
+  color: var(--sf-cyan-hi, #7af1ff);
+  text-shadow: 0 0 10px rgba(52, 227, 255, 0.4);
+}
+
+/* ── TRIKY → holo karta + tech-bracket rohy, diamant marker místo hvězdy ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stunt {
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(18, 34, 70, 0.3), rgba(7, 13, 32, 0.5)), var(--dd-parch-2, #0b1124);
+  clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stunt::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 12px;
+  height: 12px;
+  border-bottom: 2px solid var(--sf-violet, #9b6bff);
+  border-right: 2px solid var(--sf-violet, #9b6bff);
+  box-shadow: 1px 1px 7px -1px var(--sf-violet, #9b6bff);
+  pointer-events: none;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stunt__nm {
+  color: #eaf4ff;
+  font-weight: 700;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stunt__nm::before {
+  content: '◆ ';
+  color: var(--sf-violet, #9b6bff);
+  text-shadow: 0 0 9px var(--sf-violet, #9b6bff);
+  font-size: 11px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stunt__desc {
+  color: var(--dd-ink-soft, #9fb4dd);
+  font-family: var(--dd-font-body, 'Chakra Petch', sans-serif);
+}
+
+/* ── STRES → holo datová buňka; ON = rose (sémantika nebezpečí) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stress-box__hit {
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-radius: 0;
+  background: rgba(4, 10, 26, 0.6);
+  color: var(--dd-ink-faint, #6c7fae);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stress-box.on .fate-stress-box__hit {
+  border-color: var(--sf-rose, #ff5a7a);
+  background: linear-gradient(135deg, var(--sf-rose, #ff5a7a), var(--sf-rose-deep, #7a2238));
+  color: #fff;
+  box-shadow: 0 0 16px -3px var(--sf-rose, #ff5a7a), inset 0 0 14px -8px #fff;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stress-box__del {
+  background: var(--dd-parch-1, #0d1530);
+  border: 1px solid var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  color: var(--sf-rose, #ff5a7a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-stress-add {
+  border: 2px dashed var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  border-radius: 0;
+  color: var(--sf-cyan, #34e3ff);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+
+/* ── NÁSLEDKY → holo řádek; hodnota = rose; filled = rose glow + bracket ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons {
+  position: relative;
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-left: 2px solid var(--sf-rose, #ff5a7a);
+  border-radius: 0;
+  background: rgba(6, 12, 30, 0.5);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons.filled {
+  background: linear-gradient(180deg, rgba(255, 90, 122, 0.1), transparent), var(--dd-parch-2, #0b1124);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons__nm {
+  color: var(--dd-ink-soft, #9fb4dd);
+  letter-spacing: 0.1em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons__v {
+  color: var(--sf-rose-hi, #ff8aa3);
+  font-weight: 800;
+  text-shadow: 0 0 12px rgba(255, 90, 122, 0.4);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons__txt {
+  color: #eaf4ff;
+  font-style: normal;
+  border-bottom: 1px dashed var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-cons__txt:focus {
+  border-bottom-color: var(--sf-cyan, #34e3ff);
+}
+
+/* ── DENÍK → tmavé holo pole (chamfer, mono) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-notes {
+  border: 1px solid var(--sf-line, rgba(94, 160, 210, 0.16));
+  border-radius: 0;
+  background: rgba(4, 9, 22, 0.7);
+  color: var(--dd-ink, #e3eeff);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  letter-spacing: 0.01em;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-notes:focus {
+  border-color: var(--sf-line-hot, rgba(52, 227, 255, 0.42));
+  box-shadow: inset 0 0 22px -12px var(--sf-cyan, #34e3ff);
+}
+
+/* ── placeholders / disabled (čitelnost ve view módu) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet input::placeholder,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet textarea::placeholder {
+  color: var(--dd-ink-faint, #6c7fae);
+  font-style: normal;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet input:disabled,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='scifi'] .fate-sheet textarea:disabled {
+  -webkit-text-fill-color: var(--dd-ink, #e3eeff);
+}

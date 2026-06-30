@@ -4,6 +4,25 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — FATE 8 skinů: deník (Fáze A render-ověřeno) + embedy zapojeny (Fáze B) · 2026-06-30
+**Kontext:** Po schválení mockup galerie (deník + povrchy) produkce 8 skinů FATE (fae+fate) přes všechny povrchy.
+**Co zabralo (Fáze A — deník list):** 8× `styles/fate-skins/<id>.css` přes fan-out (1 agent = 1 skin, reuse mockup kontextu přes SendMessage). Scope `:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='<id>']` na KAŽDÉM pravidle (specificita 0,3,0 > default 0,2,0). Override `--dd-*` (list+panel dědí přes Krok-1 tokenizaci) + `--dd-embed-*` + ornamenty na REÁLNÉ `.fate-*` třídy (NE mockup placeholdery, past §9.19). **Render-ověřeno na reálném deníku všech 8** (minimal/fantasy/scifi/horror/steampunk/nature/retro/anime), sémantika červené drží.
+**Co zabralo (Fáze B — embedy):** FATE je `--dd-*` rodina → přidání `[data-diary-system='fae'], [data-diary-system='fate']` do existujících `:is(...)` enumerací: readout (DiceRollOverlay, base+per-skin signature), dicelog (DiceLogPanel, base=barva), chat obal (railShell `.panel:is()`), obal v TM (TokenInfoPanel), orchestrace (MapPjPanel) → FATE dědí ověřený drd2/jad treatment + vlastní `--dd-embed-*`. Build ✓.
+**Pasti potkané:** (1) `*/` v komentáři (`--fate-*/--paper-*`) zavřel blok → build fail (RODINA §9.1/CH-037, potřetí). (2) **Fan-out agenti si paralelně registrovali `@import` v diary-skins.css** — 7/8 OK, ale 1. agent (minimal) ho NEpřidal → minimal skin by se nenačetl; doplněno ručně. Poučení: po fan-outu, co píše do sdíleného souboru, VŽDY zkontroluj dedup/úplnost (`grep -c @import`). (3) replace_all s kontextovým old_string chytil jen 1 výskyt — pro VŠECHNY výskyty enumerace dej bare `:is()` string.
+**Jak ověřeno:** build ✓ (postcss strict na 8 skinech + 5 module enumeracích), render deníku 8/8 na reálných třídách.
+**Zbývá (poctivě):** (a) per-skin signature TVAR PANELU v `FateCombatBody.module.css` (panel teď nese jen paletu z tokenů, ne vlastní tvar — §7 „panel ne o stupeň pod deníkem"); (b) **render-audit vnořeného chrome obalu** (PC×bestie × mapa×chat) — staticky nejde čistě (`.panel` kolize mezi moduly) → ověřit ŽIVĚ po deployi; (c) `mobil-desktop` + `funkce`/`napoveda` na uzávěru. **Zhodnocení:** flagship (deník) hotový+ověřený, embedy zapojené přes ověřený rodinný mechanismus; finální vizuální potvrzení embedů/panelu = živá appka.
+
+---
+
+### ✅ ŘEŠENÍ — FATE skiny Krok 1: tokenizace base na --dd-* (regrese-safe) · 2026-06-30
+**Kontext:** Start skill `skin` pro FATE (fae+fate). FATE default „Karty osudu" měl `--fate-*` literály LOKÁLNĚ na `.fate-sheet`/`.panel`/`.card` → skiny by je nepřebily (lokální def stíní ancestor override, past §9.4).
+**Co zabralo:** `--fate-*`/`--paper-*` token bloky ve 3 souborech (fate.css, FateCombatBody.module.css, FateBestieCard.module.css) → `var(--dd-<token>, <původní literál>)` (sourcuje z předka, fallback = beze změny). fae/fate `--dd-*` + `--dd-embed-*` baseline blok v diary-skins.css (parchment hodnoty = default). Default skin fae/fate = `minimal` (DEFAULT_SKIN_BY_SYSTEM; bylo scifi-fallback).
+**Past:** komentář `--fate-*/--paper-*` obsahoval `*/` → **předčasně uzavřel CSS komentář** → lightningcss build fail (RODINA §9.1 / [CH-037](#ch-037)). Fix = `--fate- / --paper-` (mezera). Potřetí+ tahle past — při psaní CSS komentáře s tokeny NIKDY nepsat `*` těsně před `/`.
+**Jak ověřeno:** build ✓, render default deník = identický „Karty osudu" (harness bez ancestoru → fallbacky).
+**Zhodnocení:** Foundation hotová, regrese-safe. **Zbývá:** 8 skin CSS souborů (port sester drd2/jad na `.fate-*` třídy, scope `[ds='fae'/'fate'][dsk='X']`) + fae/fate do enumerací embedů (DiceLog/Readout/MapPjPanel/railShell, RODINA CH-038) + render-audit 8×povrchy.
+
+---
+
 ### ✅ ŘEŠENÍ — FATE Fáze 5: chat embedy (PC zdarma + bestie panel), 0 drift s mapou · 2026-06-30
 **Kontext:** Skill `system` Fáze 5 (chat rail) pro fae+fate.
 **Co zabralo:** **PC v chatu = ZDARMA** — `DiaryRollPanel` renderuje `COMBAT_PANELS[systemId]`, a fae+fate jsem registroval ve Fázi 3 → nula práce. **Bestie v chatu** = nový `FateChatBestiePanel` (chat/rail), props-driven (systemStats + canEdit + onPatch), napojený do `BestieRollPanel` (katalog, read-only) i `BestieInstancePanel` (instance v boji, editovatelná přes combatant patch). Reuse: nový `FateChatBestiePanel` i mapový `FateBestiePanel` sdílí **`fateBestieView`** (pure adaptér systemStats→view-model + patch helpery) + `FateCombatBody` → 1:1 mapa↔chat, 0 drift. Refactoroval jsem i `FateBestiePanel` na ten helper.

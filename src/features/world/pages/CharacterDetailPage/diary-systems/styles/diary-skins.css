@@ -87,6 +87,19 @@
 @import './pi-skins/retro.css';
 @import './pi-skins/anime.css';
 
+/* FATE (fae + fate) skiny — default „Karty osudu" = baseline (fate.css, nemá
+   soubor). Skiny scoped `:is([data-diary-system='fae'],[data-diary-system='fate'])
+   [data-diary-skin='X']`. Importy zde (ne ve fate.css), aby se načetly i v
+   embedech (chat/mapa/dice). @import nahoře (CSS spec) — viz drdplus poznámka výš. */
+@import './fate-skins/minimal.css';
+@import './fate-skins/fantasy.css';
+@import './fate-skins/horror.css';
+@import './fate-skins/scifi.css';
+@import './fate-skins/steampunk.css';
+@import './fate-skins/nature.css';
+@import './fate-skins/anime.css';
+@import './fate-skins/retro.css';
+
 /* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
    dice readout / orchestrace) ════════════
  * ŽIJÍ ZDE, ne v `drd16.css` — ten je lazy (jen deníková stránka), kdežto embedy
@@ -289,6 +302,43 @@
   --dd-hptxt-glow: rgba(243, 234, 215, 0.8);
   --dd-font-head: 'Cinzel', serif;
   --dd-font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* ════════════ FATE (fae + fate) panel baseline = „Karty osudu" (pergamen) ═══
+ * Deník (.fate-sheet), combat/bestie panel (FateCombatBody) a bestie karta
+ * (FateBestieCard) čtou lokální --fate- / --paper- tokeny sourcené z těchto --dd-*
+ * (var fallback = původní literály → default beze změny, regrese-safe). Skin
+ * override na [data-diary-system='fae'/'fate'][data-diary-skin='X'] v
+ * fate-skins/*.css. Default skin = minimal (DEFAULT_SKIN_BY_SYSTEM).
+ * --dd-embed-* = pergamen plochy embedů (obal v TM / readout / dicelog /
+ * orchestrace) — aktivují se až po enumeraci fae/fate v module CSS (skin krok 4). */
+[data-diary-system='fae'],
+[data-diary-system='fate'] {
+  --dd-parch-1: #f5edd9;
+  --dd-parch-2: #ece0c2;
+  --dd-parch-edge: #d9c8a0;
+  --dd-ink: #2a2014;
+  --dd-ink-soft: #6f6048;
+  --dd-ink-faint: #9b8a6c;
+  --dd-gold: #9a7b3f;
+  --dd-gold-hi: #b8923f;
+  --dd-crimson: #8a2f2f;
+  --dd-crimson-soft: #b06a4a;
+  --dd-font-body: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --dd-font-head: system-ui, sans-serif;
+  --dd-embed-surface: linear-gradient(180deg, #f5edd9, #e6d8b8);
+  --dd-embed-border: #d9c8a0;
+  --dd-embed-line: rgba(70, 52, 32, 0.24);
+  --dd-embed-text: #2a2014;
+  --dd-embed-muted: #6f6048;
+  --dd-embed-title: #9a7b3f;
+  --dd-embed-chip-bg: rgba(154, 123, 63, 0.12);
+  --dd-embed-accent: #9a7b3f;
+  --dd-embed-num-font: 'Iowan Old Style', Georgia, serif;
+  --dd-embed-title-font: system-ui, sans-serif;
+  --dd-embed-pos: #3a6b41;
+  --dd-embed-neg: #8a2f2f;
+  --dd-embed-neutral: #9a7b3f;
 }
 
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */

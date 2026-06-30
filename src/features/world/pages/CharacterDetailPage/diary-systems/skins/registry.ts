@@ -69,7 +69,8 @@ export const DEFAULT_SKIN_BY_SYSTEM: Record<string, DiarySkinId> = {
   pi: 'scifi', // Příběhy impéria — osekaný derivát Matrixu (sci-fi HUD)
   coc: 'horror', // Call of Cthulhu
   gurps: 'scifi',
-  fate: 'scifi',
+  fae: 'minimal', // Fate Accelerated — „Karty osudu" pergamen ≈ minimal
+  fate: 'minimal', // Fate Core — tatáž rodina
   shadowrun: 'scifi',
   generic: 'minimal', // „vlastní" / custom systém
 };

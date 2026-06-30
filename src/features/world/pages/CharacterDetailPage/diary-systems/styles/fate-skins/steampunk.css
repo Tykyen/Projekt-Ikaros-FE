@@ -1,0 +1,587 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English+SC&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* FATE (fae + fate) — skin „STEAMPUNK" = Mosazný mechanický deník.
+ *
+ * JEDEN soubor reskinuje LIST `.fate-sheet` (+ `.fate-*` ornamenty) i dodává
+ * VŠECHNY tokeny (`--dd-*` + `--dd-embed-*`), které čtou z předka panely
+ * (FateCombatBody / FateBestieCard) i embedy (obal v TM / readout / dicelog /
+ * orchestrace / chat obal). Vzhled = schválené mockupy
+ * `c:/tmp/fate-skins/steampunk.html` + `steampunk-surfaces.html`.
+ *
+ * SCOPE: vše scoped na
+ * `:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk']`
+ * → vyšší specificita než default fate.css (`.fate-sheet` = 0,1,0; compound = 0,3,0
+ * resp. 0,4,0 s `.fate-sheet`), proto skin přebíjí pergamen „Karty osudu".
+ * Pouze CSS/SVG, žádný JS.
+ *
+ * IDENTITA (rodina drd2/jad/drd16 steampunk): kožený korpus sevřený nýtovanou
+ * mosaznou kostrou; do něj zasazené broušené mosazné desky (karty) se zkosenými
+ * rohy a rohovými nýty. Čísla = přístrojový display (IBM Plex Mono). Stres /
+ * Problém / Vážný následek = výbojová červeň kotle; triky/magie = patina (verdigris);
+ * akcent = mosaz / jantar.
+ *
+ * SIGNATURE (vlastní, nesdílené): „manometr ozubeného kola" (cog-gauge) — Obnova =
+ * cog-gauge, 4dF kostky reinterpretované na mosazné ozubené žetony (−/0/+), nýtová
+ * kolejnice po obvodu listu, ryté mosazné cedulky nadpisů, zkosené plechy + rohové
+ * nýty na kartách, tlakové segmenty stresu, mini ozubená kola u sekcí/triků.
+ * Fonty: IM Fell English SC (jméno) · Cinzel (kapitálky) · IBM Plex Mono (čísla) ·
+ * EB Garamond (tělo).
+ *
+ * IMPORT: registrováno přes `@import './fate-skins/steampunk.css';` v
+ * `diary-skins.css` (skin bundle; loaduje se na listu i embedech).
+ *
+ * Pozn.: ornamenty PANELU (FateCombatBody) a READOUTU řeší samostatná fáze v jejich
+ * module CSS (hashované třídy sem nedosáhnou) — tento soubor = list ornamenty +
+ * VŠECHNY tokeny.
+ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKENY — `--dd-*` + `--dd-embed-*` na compound scope BEZ `.fate-sheet`.
+   List i panely/embedy je čtou z předka. Mapování fate role → steampunk:
+     parch  -  broušená mosaz (plát desky)
+     ink    -  rytina (sépiový inkoust)
+     gold   -  mosaz / jantar (akcent / čísla)
+     crimson - výbojová červeň kotle (SÉMANTIKA nebezpečí)
+     embed  -  TMAVÁ polarita (kožený korpus, světlý brass text), surface OPAQUE
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] {
+  /* ── lokální surovinová paleta (pro čitelnost mapování níže) ── */
+  --st-leather-0: #160f08;
+  --st-leather-1: #241a10;
+  --st-leather-2: #2f2114;
+  --st-leather-edge: #3c2a18;
+  --st-brass-0: #e7cd8f;
+  --st-brass-1: #caa45f;
+  --st-brass-2: #a07c3e;
+  --st-brass-deep: #6e5224;
+  --st-brass-shadow: #473311;
+  --st-copper: #b06a3a;
+  --st-plate-0: #d8be84;
+  --st-plate-1: #c8ac6e;
+  --st-plate-2: #b4965a;
+  --st-plate-edge: #8a6e38;
+  --st-dial: #efe2c2;
+  --st-dial-shadow: #bda874;
+  --st-body: #b4452a;
+  --st-body-hi: #d76a42;
+  --st-body-deep: #5e2113;
+  --st-patina: #3f7d72;
+  --st-patina-hi: #5fa99b;
+
+  /* ── base paleta (rytina + mosazný plát) — list + panely ── */
+  --dd-parch-1: #d8be84;
+  --dd-parch-2: #c8ac6e;
+  --dd-parch-edge: #8a6e38;
+  --dd-ink: #2b1f10;
+  --dd-ink-soft: #5a4426;
+  --dd-ink-faint: #8c7544;
+  --dd-gold: #caa45f;
+  --dd-gold-hi: #e7cd8f;
+
+  /* ── SÉMANTIKA červené = výbojová červeň kotle (drží nebezpečí) ── */
+  --dd-crimson: #b4452a;
+  --dd-crimson-soft: #d76a42;
+
+  /* ── fonty: viktoriánská serif (jméno = IM Fell) + mono ciferníky ── */
+  --dd-font-body: 'EB Garamond', Georgia, serif;
+  --dd-font-head: 'IM Fell English SC', 'Cinzel', serif;
+
+  /* ════════════ EMBED plochy (obal v TM / readout / dicelog / orchestrace /
+     chat obal). Rodina steampunk drží embed v TMAVÉ polaritě (kožený korpus,
+     světlý brass text) — sjednoceno s drd2/drd16/drdplus. Plocha NEPRŮHLEDNÁ
+     (jinak prosvítá mapa). pos=Výhoda/kladný hod zeleň, neg=Ohrožení/záporný
+     výbojová červeň, neutrál=mosaz. ── */
+  --dd-embed-surface: linear-gradient(180deg, #2f2114, #241a10 58%, #160f08);
+  --dd-embed-border: #6e5224;
+  --dd-embed-line: color-mix(in srgb, #caa45f 26%, transparent);
+  --dd-embed-text: #ead8b0;
+  --dd-embed-muted: #b39a6a;
+  --dd-embed-title: #e7cd8f;
+  --dd-embed-chip-bg: color-mix(in srgb, #caa45f 16%, transparent);
+  --dd-embed-accent: #d68a52;
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'IM Fell English SC', 'Cinzel', serif;
+  --dd-embed-pos: #7ec96a;
+  --dd-embed-neg: #d76a42;
+  --dd-embed-neutral: #e7cd8f;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) LIST `.fate-sheet` — kožený korpus + nýtovaná mosazná kostra
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet {
+  /* lokální tokeny listu drží na fate- prefixu (fate.css je definuje na .fate-sheet);
+     base mapování zajišťují --dd- tokeny výš; fonty přebíjíme cíleně níž */
+  color: var(--dd-ink, #2b1f10);
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+  border-radius: 10px;
+  border: 1px solid var(--st-leather-edge, #3c2a18);
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    radial-gradient(140% 100% at 18% 0%, rgba(110, 78, 38, 0.42), transparent 55%),
+    linear-gradient(165deg, var(--st-leather-2, #2f2114), var(--st-leather-1, #241a10) 55%, var(--st-leather-0, #160f08));
+  box-shadow:
+    0 2px 0 rgba(255, 240, 200, 0.08) inset,
+    inset 0 0 150px rgba(0, 0, 0, 0.55),
+    0 50px 110px -42px #000,
+    0 0 0 1px var(--st-leather-edge, #3c2a18),
+    0 0 0 7px var(--st-brass-deep, #6e5224),
+    0 0 0 9px var(--st-brass-shadow, #473311),
+    0 0 0 10px #160f08;
+}
+/* SIGNATURE: nýtová kolejnice po CELÉM obvodu listu (nahrazuje vnitřní rám) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet::after {
+  inset: 6px;
+  border: none;
+  border-radius: 6px;
+  opacity: 0.5;
+  background:
+    radial-gradient(circle, var(--st-brass-1, #caa45f) 1.6px, transparent 2.4px) 0 0 / 28px 9px repeat-x,
+    radial-gradient(circle, var(--st-brass-1, #caa45f) 1.6px, transparent 2.4px) 0 100% / 28px 9px repeat-x,
+    radial-gradient(circle, var(--st-brass-1, #caa45f) 1.6px, transparent 2.4px) 0 0 / 9px 28px repeat-y,
+    radial-gradient(circle, var(--st-brass-1, #caa45f) 1.6px, transparent 2.4px) 100% 0 / 9px 28px repeat-y;
+}
+
+/* ── SIGNATURE: 4dF = mosazné ozubené žetony (cog token) −/0/+ ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-fudge {
+  position: relative;
+  width: 21px;
+  height: 21px;
+  border: none;
+  border-radius: 50%;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--st-leather-1, #241a10);
+  background:
+    radial-gradient(circle at 50% 50%, var(--st-dial, #efe2c2) 0 56%, transparent 57% 63%, var(--st-brass-1, #caa45f) 64% 72%, transparent 73%),
+    repeating-conic-gradient(from 0deg, var(--st-brass-2, #a07c3e) 0 14deg, var(--st-brass-deep, #6e5224) 14deg 24deg);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 248, 222, 0.5),
+    inset 0 -2px 4px rgba(70, 40, 12, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--st-brass-shadow, #473311);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-fudge.minus::before {
+  content: '−';
+  color: var(--st-body-deep, #5e2113);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-fudge.plus::before {
+  content: '+';
+  color: var(--st-patina-hi, #5fa99b);
+  text-shadow: 0 0 4px rgba(95, 169, 155, 0.4);
+}
+
+/* ── HERO ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-hero {
+  border-bottom: 2px solid var(--st-brass-deep, #6e5224);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-hero__kicker {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-1, #caa45f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-hero__name {
+  font-family: 'IM Fell English SC', 'Cinzel', serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--st-brass-0, #e7cd8f);
+  text-shadow: 0 1px 0 #000, 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* SIGNATURE: Obnova badge = mosazný manometr (cog-gauge) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-badge {
+  position: relative;
+  min-width: 104px;
+  border: none;
+  border-radius: 50%;
+  width: 104px;
+  height: 104px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background:
+    repeating-conic-gradient(from 0deg, var(--st-brass-deep, #6e5224) 0 7deg, transparent 7deg 18deg),
+    radial-gradient(circle, transparent 0 68%, var(--st-brass-1, #caa45f) 69% 80%, transparent 81%),
+    radial-gradient(circle at 42% 36%, var(--st-dial, #efe2c2), var(--st-dial-shadow, #bda874) 84%);
+  box-shadow:
+    inset 0 2px 6px rgba(255, 248, 222, 0.45),
+    inset 0 -7px 16px rgba(70, 40, 12, 0.45),
+    0 6px 18px -5px #000,
+    0 0 0 2px var(--st-brass-shadow, #473311);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-badge__lab {
+  font-family: 'Cinzel', serif;
+  color: var(--st-leather-1, #241a10);
+  margin-bottom: 1px;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-badge__val,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-badge__in {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 700;
+  color: var(--st-body-deep, #5e2113);
+  background: transparent;
+  border: none;
+  text-shadow: 0 1px 0 rgba(255, 248, 222, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-badge__stars {
+  color: var(--st-leather-1, #241a10);
+}
+
+/* ── nadpis sekce = rytá mosazná cedulka (clip-path šíp) + mini cog ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-sec__h h2 {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: #1c130a;
+  padding: 5px 16px;
+  background: linear-gradient(180deg, var(--st-brass-0, #e7cd8f), var(--st-brass-1, #caa45f) 60%, var(--st-brass-deep, #6e5224));
+  border: 1px solid var(--st-brass-deep, #6e5224);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 222, 0.5), 0 2px 5px rgba(0, 0, 0, 0.45);
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+}
+/* mini ozubené kolo za nadpisem (signature) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-sec__h h2::after {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 9px;
+  vertical-align: -2px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, var(--st-plate-1, #c8ac6e) 0 26%, transparent 27%),
+    repeating-conic-gradient(from 0deg, var(--st-brass-deep, #6e5224) 0 16deg, #1c130a 16deg 28deg);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-rule {
+  border-top: 1px solid var(--st-brass-deep, #6e5224);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) ASPEKTY — broušená mosaz, zkosené rohy, rohové nýty; Problém = červeň
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card {
+  position: relative;
+  border: 1px solid var(--st-plate-edge, #8a6e38);
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 248, 222, 0.22), transparent 50%),
+    linear-gradient(180deg, var(--st-plate-0, #d8be84), var(--st-plate-1, #c8ac6e) 55%, var(--st-plate-2, #b4965a));
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px),
+    calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  box-shadow: 0 8px 18px -10px #000, inset 0 1px 0 rgba(255, 248, 222, 0.55), inset 0 -4px 10px rgba(70, 40, 12, 0.26);
+}
+/* SIGNATURE: 4 rohové nýty na desce */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%), radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%), radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%), radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%);
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position: 2px 2px, calc(100% - 2px) 2px, 2px calc(100% - 2px), calc(100% - 2px) calc(100% - 2px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+/* Problém = výbojová červeň kotle (tmavá deska, rudé nýty) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card.trouble {
+  border-color: var(--st-body-deep, #5e2113);
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 80% at 20% 0%, rgba(215, 106, 66, 0.18), transparent 55%),
+    linear-gradient(180deg, #3a201a, #2a1610);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card.trouble::before {
+  background: radial-gradient(circle at 38% 34%, #f0b090 0%, #b4452a 42%, #5e2113 78%, #2a0f08 100%), radial-gradient(circle at 38% 34%, #f0b090 0%, #b4452a 42%, #5e2113 78%, #2a0f08 100%), radial-gradient(circle at 38% 34%, #f0b090 0%, #b4452a 42%, #5e2113 78%, #2a0f08 100%), radial-gradient(circle at 38% 34%, #f0b090 0%, #b4452a 42%, #5e2113 78%, #2a0f08 100%);
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position: 2px 2px, calc(100% - 2px) 2px, 2px calc(100% - 2px), calc(100% - 2px) calc(100% - 2px);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card__lab {
+  position: relative;
+  z-index: 1;
+  font-family: 'Cinzel', serif;
+  color: var(--st-ink-soft, #5a4426);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card.trouble .fate-aspect-card__lab {
+  color: var(--st-body-hi, #d76a42);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card__txt {
+  position: relative;
+  z-index: 1;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-leather-1, #241a10);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card.trouble .fate-aspect-card__txt {
+  color: #f0d9c8;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-card__txt:focus {
+  border-bottom-color: var(--st-copper, #b06a3a);
+}
+
+/* řádkové aspekty = ryté mosazné lišty s nýtem */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-row {
+  border-radius: 0 4px 4px 0;
+  border: 1px solid rgba(138, 110, 56, 0.4);
+  border-left: 3px solid var(--st-brass-1, #caa45f);
+  background: linear-gradient(90deg, rgba(110, 82, 36, 0.22), rgba(40, 28, 16, 0.34));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-row__bullet {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  color: transparent;
+  background: radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-row__txt {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-brass-0, #e7cd8f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-aspect-row__txt:focus {
+  border-bottom-color: var(--st-copper, #b06a3a);
+}
+
+/* ── tlačítka add / del ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-add {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-1, #caa45f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-add:hover {
+  color: var(--st-brass-0, #e7cd8f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-del {
+  color: var(--st-body, #b4452a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-del:hover {
+  color: var(--st-body-hi, #d76a42);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) PŘÍSTUPY / DOVEDNOSTI — ciferníkové buňky, mono displej bonusu
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-appr {
+  position: relative;
+  border: 1px solid var(--st-plate-edge, #8a6e38);
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 248, 222, 0.22), transparent 50%),
+    linear-gradient(180deg, var(--st-plate-0, #d8be84), var(--st-plate-1, #c8ac6e) 55%, var(--st-plate-2, #b4965a));
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px),
+    calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+  box-shadow: 0 6px 14px -9px #000, inset 0 1px 0 rgba(255, 248, 222, 0.55);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-appr__name {
+  font-family: 'Cinzel', serif;
+  color: var(--st-ink-soft, #5a4426);
+}
+/* bonus = ražený mono displej v tmavém okénku */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-appr__bonus {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-brass-0, #e7cd8f);
+  background: linear-gradient(180deg, #1c140c, #120c06);
+  border: 1px solid var(--st-brass-deep, #6e5224);
+  border-radius: 3px;
+  padding: 2px 8px;
+  text-shadow: 0 0 8px rgba(231, 205, 143, 0.3);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-appr.hi .fate-appr__bonus {
+  color: var(--st-brass-0, #e7cd8f);
+  border-color: var(--st-brass-1, #caa45f);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 0 10px rgba(202, 164, 95, 0.35);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-appr.hi .fate-appr__name {
+  color: var(--st-brass-2, #a07c3e);
+}
+/* krokové tlačítko = manometrové kolečko */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-step {
+  border-radius: 50%;
+  border: 1px solid var(--st-brass-deep, #6e5224);
+  color: var(--st-leather-1, #241a10);
+  background: radial-gradient(circle at 40% 34%, var(--st-dial, #efe2c2), var(--st-dial-shadow, #bda874) 82%);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-step:hover {
+  background: radial-gradient(circle at 40% 34%, var(--st-brass-0, #e7cd8f), var(--st-brass-1, #caa45f) 82%);
+  color: #1c130a;
+}
+
+/* DOVEDNOSTI (Core varianta) = ryté lišty + mono bonus */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-skill {
+  border: 1px solid rgba(138, 110, 56, 0.4);
+  border-left: 3px solid var(--st-brass-1, #caa45f);
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(90deg, rgba(110, 82, 36, 0.22), rgba(40, 28, 16, 0.34));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-skill__nm {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-brass-0, #e7cd8f);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-skill__ladder {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-2, #a07c3e);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-skill__bonus {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-brass-0, #e7cd8f);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) TRIKY — broušená mosaz; cog ozdoba (patina = magie)
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stunt {
+  position: relative;
+  border: 1px solid var(--st-plate-edge, #8a6e38);
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 248, 222, 0.2), transparent 50%),
+    linear-gradient(180deg, var(--st-plate-0, #d8be84), var(--st-plate-1, #c8ac6e) 55%, var(--st-plate-2, #b4965a));
+  clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px),
+    calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px);
+  box-shadow: 0 6px 14px -9px #000, inset 0 1px 0 rgba(255, 248, 222, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stunt__nm {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--st-leather-1, #241a10);
+}
+/* cog (patina) místo ✦ glyfu */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stunt__nm::before {
+  content: '';
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 8px;
+  vertical-align: -1px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, var(--st-plate-1, #c8ac6e) 0 26%, transparent 27%),
+    repeating-conic-gradient(from 0deg, var(--st-patina-hi, #5fa99b) 0 16deg, var(--st-patina, #3f7d72) 16deg 28deg);
+  box-shadow: 0 0 0 1px var(--st-brass-shadow, #473311), 0 0 5px rgba(95, 169, 155, 0.35);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stunt__desc {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-ink-soft, #5a4426);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) STRES — tlakové segmenty kotle (zaškrtnutý = výbojová červeň)
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stress-box__hit {
+  position: relative;
+  border: 2px solid rgba(70, 40, 12, 0.6);
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-ink-faint, #8c7544);
+  background: linear-gradient(180deg, #1c140c, #150f08);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.55);
+}
+/* malý ventil/nýt v rohu segmentu */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stress-box__hit::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%);
+  opacity: 0.7;
+}
+/* zaškrtnutý stres = výbojová červeň kotle (SÉMANTIKA nebezpečí) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stress-box.on .fate-stress-box__hit {
+  color: #fff;
+  border-color: #4a1810;
+  background: linear-gradient(180deg, var(--st-body-hi, #d76a42), var(--st-body-deep, #5e2113));
+  box-shadow: inset 0 1px 2px rgba(255, 200, 170, 0.4), 0 0 16px rgba(215, 106, 66, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stress-box.on .fate-stress-box__hit::after {
+  background: radial-gradient(circle at 38% 34%, #f0b090 0%, #b4452a 42%, #5e2113 78%, #2a0f08 100%);
+  opacity: 0.9;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stress-box__del {
+  background: var(--st-brass-0, #e7cd8f);
+  border: 1px solid var(--st-brass-deep, #6e5224);
+  color: #1c130a;
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-stress-add {
+  border: 2px dashed var(--st-brass-deep, #6e5224);
+  border-radius: 4px;
+  color: var(--st-brass-1, #caa45f);
+  background: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) NÁSLEDKY — ryté mosazné cedulky; Vážný / vyplněný = výbojová červeň
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons {
+  position: relative;
+  border: 1px solid rgba(138, 110, 56, 0.4);
+  border-radius: 3px;
+  background: linear-gradient(90deg, rgba(110, 82, 36, 0.2), rgba(40, 28, 16, 0.3));
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons.filled {
+  border-color: var(--st-body-deep, #5e2113);
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 80% at 20% 0%, rgba(215, 106, 66, 0.16), transparent 55%),
+    linear-gradient(180deg, #3a201a, #2a1610);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons__nm {
+  font-family: 'Cinzel', serif;
+  color: var(--st-ink-soft, #5a4426);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons.filled .fate-cons__nm {
+  color: var(--st-body-hi, #d76a42);
+}
+/* hodnota slotu = mono displej, výbojová červeň (drží i Vážný 6) */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons__v {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-body, #b4452a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons.filled .fate-cons__v {
+  color: var(--st-body-hi, #d76a42);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons__txt {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-brass-0, #e7cd8f);
+  border-bottom-color: rgba(138, 110, 56, 0.55);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons.filled .fate-cons__txt {
+  color: #f0d9c8;
+  border-bottom-color: rgba(215, 106, 66, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-cons__txt:focus {
+  border-bottom-color: var(--st-copper, #b06a3a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) DENÍK — tmavé okénko s mosaznou hranou
+   ════════════════════════════════════════════════════════════════════════ */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-notes {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--st-brass-0, #e7cd8f);
+  background: linear-gradient(180deg, #1c140c, #150f08);
+  border: 1px solid var(--st-brass-deep, #6e5224);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-notes:focus {
+  border-color: var(--st-copper, #b06a3a);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet input::placeholder,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet textarea::placeholder {
+  color: rgba(202, 164, 95, 0.4);
+}
+
+/* ── view mode: ráž zdrojů čitelná (mono brass na tmavém okénku) ── */
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet input:disabled,
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet textarea:disabled {
+  -webkit-text-fill-color: var(--st-leather-1, #241a10);
+}
+:is([data-diary-system='fae'], [data-diary-system='fate'])[data-diary-skin='steampunk'] .fate-sheet .fate-notes:disabled {
+  -webkit-text-fill-color: var(--st-brass-0, #e7cd8f);
+}
