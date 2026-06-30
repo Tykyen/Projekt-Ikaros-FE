@@ -8,6 +8,7 @@ import { getImageStyle } from '@/shared/lib/imageStyle';
 import type { Bestie } from '../types';
 import { getBestieAbilities } from '../lib/bestieAbilities';
 import { Drd16BestieCard } from './Drd16BestieCard';
+import { FateBestieCard } from './FateBestieCard';
 import styles from './BestieCard.module.css';
 
 interface Props {
@@ -39,6 +40,19 @@ export function BestieCard({
   if (bestie.systemId === 'drd16') {
     return (
       <Drd16BestieCard
+        bestie={bestie}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        onEdit={onEdit}
+        onClone={onClone}
+        onDelete={onDelete}
+      />
+    );
+  }
+  // Fate rodina (fae + fate) — „Karty osudu" kompaktní karta.
+  if (bestie.systemId === 'fae' || bestie.systemId === 'fate') {
+    return (
+      <FateBestieCard
         bestie={bestie}
         canEdit={canEdit}
         canDelete={canDelete}

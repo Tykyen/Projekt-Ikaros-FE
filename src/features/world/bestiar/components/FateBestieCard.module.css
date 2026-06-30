@@ -1,0 +1,262 @@
+/* Fate (fae+fate) bestie karta — „Karty osudu" (slonovina + sépiové serify).
+ * Kompaktní řádková karta do bestiáře, obdoba Drd16BestieCard. */
+
+.card {
+  --paper-1: #f5edd9;
+  --paper-2: #ece0c2;
+  --edge: #d9c8a0;
+  --ink: #2a2014;
+  --ink-soft: #6f6048;
+  --ink-faint: #9b8a6c;
+  --gold: #9a7b3f;
+  --gold-bright: #b8923f;
+  --trouble: #8a2f2f;
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  padding: 14px 16px;
+  color: var(--ink);
+  font-family: var(--serif);
+  background:
+    repeating-linear-gradient(0deg, rgba(120, 95, 50, 0.018) 0 2px, transparent 2px 4px),
+    linear-gradient(155deg, var(--paper-1), var(--paper-2));
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* sigil sloupec */
+.sigil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.initial {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  border: 1px solid var(--edge);
+  background: rgba(255, 255, 255, 0.4);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.initial img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.initial span {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.fudge {
+  display: flex;
+  gap: 4px;
+}
+.die {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1.4px solid var(--gold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 10px/1 system-ui, sans-serif;
+  color: var(--gold);
+  background: rgba(154, 123, 63, 0.08);
+}
+.minus::before { content: '−'; }
+.plus::before { content: '+'; }
+
+/* tělo */
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.top {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.name {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.tag {
+  font: 11px/1 system-ui, sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  padding: 3px 7px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.tag b { color: var(--gold-bright); font-size: 13px; }
+
+.hc {
+  margin: 0;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.aspects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.achip {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--edge);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  padding: 3px 9px;
+}
+
+/* přístupy (fae) */
+.appr {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.ap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--edge);
+  border-radius: 7px;
+  padding: 5px 2px;
+  background: rgba(255, 255, 255, 0.32);
+}
+.apN {
+  font: 8.5px/1.1 system-ui, sans-serif;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: center;
+}
+.apB {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold-bright);
+}
+
+/* dovednosti (fate) */
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sk {
+  font-size: 13px;
+  color: var(--ink);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  padding: 3px 9px;
+  background: rgba(255, 255, 255, 0.32);
+}
+.sk b { color: var(--gold-bright); }
+
+/* triky */
+.stunts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.stunt {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.stuntN {
+  font-weight: 700;
+  color: var(--ink);
+}
+.stuntN::before { content: '✦ '; color: var(--gold); font-size: 11px; }
+.stuntD {
+  color: var(--ink-soft);
+  margin-left: 6px;
+}
+
+/* následky */
+.cons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.consChip {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(138, 47, 47, 0.08), transparent);
+  border: 1px solid rgba(138, 47, 47, 0.3);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+.consChip b { color: var(--trouble); font-style: normal; }
+
+.notes {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* akce */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.btn {
+  font: 12px/1 system-ui, sans-serif;
+  border: 1px solid var(--edge);
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.7); }
+.prim {
+  border-color: var(--gold);
+  background: rgba(154, 123, 63, 0.14);
+  color: var(--gold);
+  font-weight: 700;
+}
+.prim:hover { background: var(--gold); color: #1c150a; }
+.danger { color: var(--trouble); border-color: rgba(138, 47, 47, 0.4); }
+.danger:hover { background: var(--trouble); color: #fff; }
+
+@media (max-width: 640px) {
+  .card { flex-wrap: wrap; }
+  .appr { grid-template-columns: repeat(3, 1fr); }
+  .actions { flex-direction: row; width: 100%; }
+}

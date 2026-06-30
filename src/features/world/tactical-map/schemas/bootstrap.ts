@@ -18,6 +18,7 @@ import { piSchemas } from './pi';
 import { dnd5eSchemas } from './dnd5e';
 import { jadSchemas } from './jad';
 import { cocSchemas } from './coc';
+import { faeSchemas } from './fae';
 import { fateSchemas } from './fate';
 import { gurpsSchemas } from './gurps';
 
@@ -61,6 +62,9 @@ export function bootstrapSchemas(): void {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of fateSchemas) {
+    systemEntitySchemaRegistry.register(schema);
+  }
+  for (const schema of faeSchemas) {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of gurpsSchemas) {
