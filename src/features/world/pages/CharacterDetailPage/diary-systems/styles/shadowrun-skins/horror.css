@@ -1,0 +1,97 @@
+/* Shadowrun 6e — skin „horror" 🦇 (půlnoční salon, viktoriánská upířina, ELEGANCE).
+ * Přepisuje sci-fi `--mx-*` tokeny + `--sr-log-*` embed sadu na temně fialovou
+ * salonní paletu se stříbrnou traceríí a krvavě vínovými akcenty (ne gore).
+ * Signature: gotická stříbrná diagonální tracerie na heru, erbovní pečeť ☩ na
+ * panelech, gotická iniciála jména. Fonty Cormorant + UnifrakturCook (globální
+ * @import diary-skins.css). Scoped [data-diary-system='shadowrun'][data-diary-skin='horror'].
+ */
+[data-diary-system='shadowrun'][data-diary-skin='horror'] {
+  --mx-bg: linear-gradient(180deg, #15131a, #0d0b11);
+  --mx-panel: #181520;
+  --mx-text: #cfcad6;
+  --mx-muted: #8a8494;
+  --mx-dim: #5a5466;
+  --mx-accent: #c8c4cf;
+  --mx-violet: #9a6a8a;
+  --mx-gold: #c8a04a;
+  --mx-danger: #7a2030;
+  --mx-green: #6a8a6a;
+  --mx-line: rgba(200, 196, 207, 0.12);
+  --mx-line-strong: rgba(200, 196, 207, 0.3);
+
+  --mx-font-display: 'Cormorant SC', serif;
+  --mx-font-body: 'Cormorant Garamond', serif;
+  --mx-font-num: 'Cormorant SC', serif;
+  --mx-font-brand: 'UnifrakturCook', cursive;
+
+  --mx-sheet-radius: 2px;
+  --mx-title-color: #c8c4cf;
+  --mx-hero-bg: radial-gradient(420px 190px at 50% 0, rgba(122, 32, 48, 0.22), transparent 65%),
+    linear-gradient(180deg, #1c1820, #120f16);
+  --mx-hero-border: 1px solid rgba(200, 196, 207, 0.2);
+  --mx-name-color: #e4dfe9;
+  --mx-name-glow: 0 0 14px rgba(122, 32, 48, 0.5);
+  --mx-row-bg: #14111a;
+  --mx-seg-off: #221d2a;
+  --mx-accent-border: rgba(200, 196, 207, 0.3);
+  --mx-clip: none;
+
+  /* embed / dice (OPAQUE) */
+  --sr-log-surface: #181520;
+  --sr-log-border: rgba(200, 196, 207, 0.3);
+  --sr-log-title: #c8c4cf;
+  --sr-log-chip: #221d2a;
+  --sr-log-num: #cfcad6;
+  --sr-log-num-font: 'Cormorant SC', serif;
+  --sr-log-total: #c8c4cf;
+  --sr-log-total-pos: #c8c4cf;
+  --sr-log-total-neg: #7a2030;
+  --sr-log-total-shadow: 0 0 10px rgba(122, 32, 48, 0.5);
+  --sr-log-eq-font: 'Cormorant Garamond', serif;
+  --sr-log-skillmod: #9a6a8a;
+  --sr-log-eq: #8a8494;
+  --sr-log-head-font: 'Cormorant SC', serif;
+}
+
+/* ── SIGNATURE: gotická stříbrná diagonální tracerie na heru ── */
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sr-hero {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sr-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  border: 3px solid transparent;
+  border-image: repeating-linear-gradient(
+      45deg,
+      rgba(200, 196, 207, 0.4) 0 4px,
+      transparent 4px 9px
+    )
+    1;
+}
+/* SIGNATURE: erbovní pečeť ☩ v pravém horním rohu panelů */
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sr-panel {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sr-panel::after {
+  content: '☩';
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 16px;
+  line-height: 1;
+  color: rgba(200, 196, 207, 0.7);
+  text-shadow: 0 0 8px rgba(122, 32, 48, 0.4);
+  pointer-events: none;
+  z-index: 2;
+}
+/* SIGNATURE: gotická iniciála jména */
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sr-name {
+  font-family: 'Cormorant SC', serif;
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sr-name::first-letter {
+  font-family: 'UnifrakturCook', cursive;
+  color: #e4dfe9;
+}

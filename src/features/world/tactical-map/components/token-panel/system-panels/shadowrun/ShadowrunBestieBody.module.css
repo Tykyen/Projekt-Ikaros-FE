@@ -368,3 +368,207 @@
   font: 500 10px var(--srb-fnum);
   color: var(--srb-dim);
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * shadowrun — per-skin SIGNATURE TVAR bestie panelu (.sec / .stitle)
+ * --------------------------------------------------------------------------
+ * Týž tvarový jazyk jako ShadowrunCombatPanel (sourozenec) — konzistence.
+ * SCOPE = DESCENDANT [data-diary-system='shadowrun'][data-diary-skin='X'] .sec
+ * (atributy na PŘEDKOVI: mapa TokenInfoPanel; chat BestieInstancePanel přes
+ * DiarySkinScope). Bestie nese vlastní --srb-* (jantar); ornament barvu ber
+ * z var(--mx-accent, var(--srb-bestie)) → dědí SKIN když je scope, jinak jantar.
+ * var() VŽDY s fallbackem (bez fallbacku se tiše nevykreslí). Inline, žádný token.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* ── SCIFI — fialový BR bracket + accent title glow ── */
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .sec {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .sec::after {
+  content: '';
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 12px;
+  height: 12px;
+  border-bottom: 2px solid var(--mx-violet, #a78bfa);
+  border-right: 2px solid var(--mx-violet, #a78bfa);
+  box-shadow: 1px 1px 7px -1px var(--mx-violet, #a78bfa);
+  pointer-events: none;
+}
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .stitle::before {
+  box-shadow: 0 0 7px var(--mx-accent, var(--srb-bestie));
+}
+
+/* ── FANTASY — filigránové zlaté kování v levém horním rohu sekce ── */
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sec {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sec::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 15px;
+  height: 15px;
+  background: linear-gradient(180deg, var(--mx-accent, #e3b94a), var(--mx-gold, #caa64a)) left top / 2px 15px
+      no-repeat,
+    linear-gradient(90deg, var(--mx-accent, #e3b94a), var(--mx-gold, #caa64a)) left top / 15px 2px no-repeat;
+  filter: drop-shadow(0 0 3px rgba(227, 185, 74, 0.5));
+  pointer-events: none;
+}
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .stitle::before {
+  content: '\2756';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: var(--mx-accent, #e3b94a);
+  font-size: 11px;
+}
+
+/* ── HORROR — erbovní pečeť ☩ v pravém horním rohu sekce ── */
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sec {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .sec::after {
+  content: '\2629';
+  position: absolute;
+  right: 2px;
+  top: 7px;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--mx-accent, #c8c4cf);
+  opacity: 0.7;
+  text-shadow: 0 0 7px rgba(122, 32, 48, 0.4);
+  pointer-events: none;
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .stitle {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .stitle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 2px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--mx-accent, #c8c4cf) 0 3px,
+    transparent 3px 6px
+  );
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── STEAMPUNK — ozubené kolo ⚙ (TR) + nýtová kolejnice (spodek sekce) ── */
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sec {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sec::before {
+  content: '\2699';
+  position: absolute;
+  right: 2px;
+  top: 6px;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--mx-accent, #c98a3c);
+  text-shadow: 0 0 7px rgba(201, 138, 60, 0.5);
+  pointer-events: none;
+}
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sec::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  height: 4px;
+  background: radial-gradient(circle at center, var(--mx-accent, #c98a3c) 0 1.6px, transparent 2.1px) 0 center /
+    13px 4px repeat-x;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ── NATURE — rašící úponek (zaoblený roh) v levém horním rohu sekce ── */
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sec {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sec::after {
+  content: '';
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid var(--mx-accent, #7ba83a);
+  border-right: 2px solid var(--mx-accent, #7ba83a);
+  border-radius: 0 0 100% 0;
+  filter: drop-shadow(0 0 4px rgba(123, 168, 58, 0.45));
+  pointer-events: none;
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .stitle::before {
+  content: '\2767';
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  transform: rotate(12deg);
+  color: var(--mx-accent, #7ba83a);
+  font-size: 12px;
+}
+
+/* ── MINIMAL — dvojitý ledger rám sekce + registrační kříž (TR) ── */
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sec {
+  position: relative;
+  outline: 1px solid var(--mx-accent, rgba(40, 38, 32, 0.4));
+  outline-offset: -4px;
+}
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sec::after {
+  content: '+';
+  position: absolute;
+  right: 4px;
+  top: 3px;
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--mx-accent, rgba(40, 38, 32, 0.55));
+  pointer-events: none;
+}
+
+/* ── RETRO — synthwave scanline horizont na spodku sekce ── */
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .sec {
+  position: relative;
+  overflow: hidden;
+}
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .sec::after {
+  content: '';
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -6px;
+  height: 30px;
+  background: linear-gradient(180deg, transparent, rgba(255, 79, 163, 0.22)),
+    repeating-linear-gradient(90deg, var(--mx-accent, #36f0d0) 0 1px, transparent 1px 18px);
+  transform: perspective(36px) rotateX(40deg);
+  transform-origin: bottom center;
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+/* ── ANIME — sparkle ✦ (TR) + tvrdý spodní cel-stín sekce ── */
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sec {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sec::after {
+  content: '\2726';
+  position: absolute;
+  right: 4px;
+  top: 8px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--mx-violet, #ff6ad5);
+  text-shadow: 0 0 7px var(--mx-violet, rgba(255, 106, 213, 0.7));
+  pointer-events: none;
+}

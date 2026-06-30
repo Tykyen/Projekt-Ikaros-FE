@@ -311,17 +311,21 @@ export function BestieInstancePanel({
           />
         ) : systemId === 'shadowrun' ? (
           // Shadowrun bestie instance v boji — jantarový statblok, editovatelná (onPatch).
-          <ShadowrunChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            rollerName={combatant.name}
-            avatarUrl={combatant.imageUrl}
-            systemStats={combatant.systemStats}
-            canEdit={canEdit}
-            onPatch={(patch) =>
-              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
-            }
-          />
+          // DiarySkinScope → data-diary-skin + --mx-* pro per-skin signature ornament
+          // (.sec) shodně s mapou (ShadowrunBestieBody.module.css).
+          <DiarySkinScope worldId={worldId}>
+            <ShadowrunChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
         ) : (
           <BestieStatblock
             token={token}

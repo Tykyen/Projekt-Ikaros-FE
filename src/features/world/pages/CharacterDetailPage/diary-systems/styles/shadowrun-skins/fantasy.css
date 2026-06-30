@@ -1,0 +1,107 @@
+/* Shadowrun 6e — skin „fantasy" (iluminovaný grimoár).
+ * Pergamenová paleta, zlatá filigrán, serify Cinzel/EB Garamond; přepisuje
+ * sci-fi `--mx-*` tokeny + `--sr-log-*` embed sadu. Signature: filigránové
+ * zlaté kování ve VŠECH 4 rozích panelů + kruhový pečetní medailon na heru +
+ * iluminovaná iniciála jména. Scoped na
+ * [data-diary-system='shadowrun'][data-diary-skin='fantasy'].
+ * Fonty z globálního @import diary-skins.css (žádný lokální import).
+ */
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] {
+  --mx-bg: radial-gradient(700px 320px at 50% 0, #2a2113, #1a140a);
+  --mx-panel: #241c0e;
+  --mx-text: #ecdab0;
+  --mx-muted: #b09a6f;
+  --mx-dim: #7c6a44;
+  --mx-accent: #e3b94a;
+  --mx-violet: #c9962f;
+  --mx-gold: #e3b94a;
+  --mx-danger: #b5532a;
+  --mx-green: #8a9a4a;
+  --mx-line: rgba(227, 185, 74, 0.18);
+  --mx-line-strong: rgba(227, 185, 74, 0.4);
+
+  --mx-font-display: 'Cinzel', serif;
+  --mx-font-body: 'EB Garamond', serif;
+  --mx-font-num: 'Cinzel', serif;
+  --mx-font-brand: 'Cinzel Decorative', serif;
+
+  --mx-sheet-radius: 3px;
+  --mx-title-color: #e3c77a;
+  --mx-hero-bg: linear-gradient(180deg, #33280f, #241a0c);
+  --mx-hero-border: 1px solid rgba(227, 185, 74, 0.35);
+  --mx-name-color: #f3e4b8;
+  --mx-name-glow: 0 1px 0 #000;
+  --mx-row-bg: #221908;
+  --mx-seg-off: #2b2412;
+  --mx-accent-border: rgba(227, 185, 74, 0.45);
+  --mx-clip: none;
+
+  /* embed / dice (OPAQUE) */
+  --sr-log-surface: #241c0e;
+  --sr-log-border: rgba(227, 185, 74, 0.4);
+  --sr-log-title: #e3c77a;
+  --sr-log-chip: #2b2412;
+  --sr-log-num: #ecdab0;
+  --sr-log-num-font: 'Cinzel', serif;
+  --sr-log-total: #e3b94a;
+  --sr-log-total-pos: #e3b94a;
+  --sr-log-total-neg: #b5532a;
+  --sr-log-total-shadow: 0 0 10px rgba(227, 185, 74, 0.5);
+  --sr-log-eq-font: 'EB Garamond', serif;
+  --sr-log-skillmod: #c9962f;
+  --sr-log-eq: #b09a6f;
+  --sr-log-head-font: 'Cinzel', serif;
+}
+
+/* ── SIGNATURE: filigránové zlaté kování ve všech 4 rozích panelů ── */
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-panel {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-panel::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, #e3b94a, #caa64a) left top / 2px 15px no-repeat,
+    linear-gradient(90deg, #e3b94a, #caa64a) left top / 15px 2px no-repeat,
+    linear-gradient(180deg, #e3b94a, #caa64a) right top / 2px 15px no-repeat,
+    linear-gradient(90deg, #caa64a, #e3b94a) right top / 15px 2px no-repeat,
+    linear-gradient(0deg, #e3b94a, #caa64a) left bottom / 2px 15px no-repeat,
+    linear-gradient(90deg, #e3b94a, #caa64a) left bottom / 15px 2px no-repeat,
+    linear-gradient(0deg, #e3b94a, #caa64a) right bottom / 2px 15px no-repeat,
+    linear-gradient(90deg, #caa64a, #e3b94a) right bottom / 15px 2px no-repeat;
+  filter: drop-shadow(0 0 4px rgba(227, 185, 74, 0.55));
+}
+
+/* ── SIGNATURE: kruhový pečetní medailon v pravém horním rohu heru ── */
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-hero {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-hero::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #e3b94a;
+  background: radial-gradient(circle at 50% 38%, rgba(227, 185, 74, 0.55), rgba(227, 185, 74, 0.08) 70%, transparent);
+  box-shadow:
+    0 0 10px rgba(227, 185, 74, 0.5),
+    inset 0 0 6px rgba(227, 185, 74, 0.4);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── SIGNATURE: iluminovaná iniciála jména ── */
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-name {
+  font-family: 'Cinzel', serif;
+}
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-name::first-letter {
+  font-family: 'Cinzel Decorative', serif;
+  color: #f3d57a;
+  font-size: 1.35em;
+}

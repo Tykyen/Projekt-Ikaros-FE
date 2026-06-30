@@ -1,0 +1,100 @@
+/* Shadowrun 6e — skin „steampunk" 🕰️ (mosazný mechanický deník).
+ * Přepisuje sci-fi `--mx-*` tokeny + `--sr-log-*` embed sadu na mosaz/patina
+ * paletu. Signature: ozubené kolo a rohové nýty na heru, spodní nýtová
+ * kolejnice na panelech. Scoped [data-diary-system='shadowrun'][data-diary-skin='steampunk'].
+ * Font display = Cinzel (v globálním @import diary-skins.css).
+ */
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] {
+  --mx-bg: linear-gradient(180deg, #241a10, #180f08);
+  --mx-panel: #241a0e;
+  --mx-text: #e8d3ac;
+  --mx-muted: #b09064;
+  --mx-dim: #7c6038;
+  --mx-accent: #c98a3c;
+  --mx-violet: #6e8a6a;
+  --mx-gold: #d6a45a;
+  --mx-danger: #c0432a;
+  --mx-green: #6e8a6a;
+  --mx-line: rgba(201, 138, 60, 0.18);
+  --mx-line-strong: rgba(201, 138, 60, 0.4);
+
+  --mx-font-display: 'Cinzel', serif;
+  --mx-font-body: 'IM Fell English SC', serif;
+  --mx-font-num: 'IBM Plex Mono', monospace;
+  --mx-font-brand: 'Cinzel', serif;
+
+  --mx-sheet-radius: 2px;
+  --mx-title-color: #d6a45a;
+  --mx-hero-bg: linear-gradient(180deg, #33260f, #241a0c);
+  --mx-hero-border: 1px solid rgba(201, 138, 60, 0.35);
+  --mx-name-color: #f0d6a0;
+  --mx-name-glow: 0 1px 0 #000;
+  --mx-row-bg: #221708;
+  --mx-seg-off: #2b2010;
+  --mx-accent-border: rgba(201, 138, 60, 0.4);
+  --mx-clip: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+
+  /* embed / dice (OPAQUE) */
+  --sr-log-surface: #241a0e;
+  --sr-log-border: rgba(201, 138, 60, 0.4);
+  --sr-log-title: #d6a45a;
+  --sr-log-chip: #2b2010;
+  --sr-log-num: #e8d3ac;
+  --sr-log-num-font: 'IBM Plex Mono', monospace;
+  --sr-log-total: #c98a3c;
+  --sr-log-total-pos: #c98a3c;
+  --sr-log-total-neg: #c0432a;
+  --sr-log-total-shadow: 0 0 10px rgba(201, 138, 60, 0.5);
+  --sr-log-eq-font: 'IM Fell English SC', serif;
+  --sr-log-skillmod: #6e8a6a;
+  --sr-log-eq: #b09064;
+  --sr-log-head-font: 'Cinzel', serif;
+}
+
+/* ── SIGNATURE: ozubené kolo + rohové nýty na heru ── */
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-hero {
+  position: relative;
+}
+/* rohové nýty ve 4 rozích */
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) 9px 9px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) right 9px top 9px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) 9px bottom 9px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) right 9px bottom 9px / 6px 6px no-repeat;
+}
+/* ozubené kolo ⚙ v pravém horním rohu */
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-hero::after {
+  content: '\2699';
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 24px;
+  line-height: 1;
+  color: #c98a3c;
+  text-shadow: 0 0 10px rgba(201, 138, 60, 0.6);
+  pointer-events: none;
+  z-index: 2;
+}
+/* SIGNATURE: spodní nýtová kolejnice na panelech */
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-panel {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-panel::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 5px;
+  height: 5px;
+  background: radial-gradient(circle at center, #c98a3c 0 2px, transparent 2.5px) 0 center / 14px 5px repeat-x;
+  pointer-events: none;
+  z-index: 2;
+}
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-name {
+  font-family: 'Cinzel', serif;
+}

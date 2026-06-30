@@ -1167,6 +1167,393 @@
   font-family: 'Bricolage Grotesque', sans-serif;
 }
 
+/* ════════════ shadowrun wrapper chrome NESE deníkový skin ════════════
+ * Port sourozeneckého pi (pi tokeny na sr-log a mx tokeny). shadowrun = sci-fi
+ * HUD systém; embed/dice plochy jedou přes vlastní sr-log sadu (per skin v
+ * shadowrun-skins/<skin>.css). Chrome (panel, header, badge, akce, mode toggle,
+ * close, identity, avatar, name, body) sleduje vybraný skin barvou i písmem.
+ * Surface OPAQUE: var(--sr-log-surface, fallback) plný panel (NE průhledný).
+ * Scoped na shadowrun, ostatní systémy drží mapový motiv. */
+.panel[data-diary-system='shadowrun'] {
+  background: var(--sr-log-surface, var(--mx-panel, #0e0f1e));
+  border-color: var(--sr-log-border, color-mix(in srgb, var(--mx-accent, #38e0ff) 32%, transparent));
+  color: var(--mx-text, #d6def0);
+  box-shadow:
+    -8px 0 32px rgba(0, 0, 0, 0.55),
+    0 0 24px color-mix(in srgb, var(--mx-accent, #38e0ff) 12%, transparent);
+}
+.panel[data-diary-system='shadowrun'] .modeDock,
+.panel[data-diary-system='shadowrun'].modeDock {
+  border-left-color: var(--sr-log-border, color-mix(in srgb, var(--mx-accent, #38e0ff) 40%, transparent));
+}
+.panel[data-diary-system='shadowrun'] .header {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--mx-accent, #38e0ff) 18%, transparent),
+    color-mix(in srgb, var(--mx-accent, #38e0ff) 9%, transparent)
+  );
+  border-bottom-color: var(--sr-log-border, color-mix(in srgb, var(--mx-accent, #38e0ff) 40%, transparent));
+}
+.panel[data-diary-system='shadowrun'] .badge {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 45%, transparent);
+  color: var(--mx-text, #d6def0);
+  font-family: var(--mx-font-display, inherit);
+}
+.panel[data-diary-system='shadowrun'] .actionBar {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 6%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 18%, transparent);
+}
+.panel[data-diary-system='shadowrun'] .modeToggle {
+  background: var(--sr-log-surface, var(--mx-panel, #0e0f1e));
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 50%, transparent);
+}
+.panel[data-diary-system='shadowrun'] .modeBtn {
+  color: var(--mx-muted, #76809a);
+}
+.panel[data-diary-system='shadowrun'] .modeBtn:hover,
+.panel[data-diary-system='shadowrun'] .modeBtnActive {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 28%, transparent);
+  color: var(--mx-text, #d6def0);
+}
+.panel[data-diary-system='shadowrun'] .closeBtn {
+  color: var(--mx-muted, #76809a);
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 25%, transparent);
+}
+.panel[data-diary-system='shadowrun'] .closeBtn:hover {
+  background: color-mix(in srgb, var(--mx-danger, #f87171) 18%, transparent);
+  border-color: color-mix(in srgb, var(--mx-danger, #f87171) 50%, transparent);
+  color: var(--mx-danger, #f87171);
+}
+.panel[data-diary-system='shadowrun'] .identity {
+  border-bottom-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 16%, transparent);
+}
+.panel[data-diary-system='shadowrun'] .avatar {
+  background: var(--sr-log-surface, var(--mx-panel, #0e0f1e));
+  border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 45%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--mx-accent, #38e0ff) 18%, transparent);
+}
+.panel[data-diary-system='shadowrun'] .name {
+  color: var(--mx-name-color, var(--mx-text, #f0f3ff));
+  font-family: var(--mx-font-display, inherit);
+}
+.panel[data-diary-system='shadowrun'] .resizeHandle:hover {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 35%, transparent);
+}
+.panel[data-diary-system='shadowrun'] .body {
+  scrollbar-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent) transparent;
+}
+.panel[data-diary-system='shadowrun'] .body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * shadowrun — per-skin SIGNATURE OBALU mapy
+ * Compound `.panel[data-diary-system='shadowrun'][data-diary-skin='X']`.
+ * Tvary REUSE z deníkových shadowrun-skins/<skin>.css (.sr-hero/.sr-panel) →
+ * obal (D) i readout (E) sdílí tvarový jazyk skinu. Hardcoded skin barvy + SVG
+ * (skin-intrinsic, ne system tokeny). Ornament = ::before/::after, absolute,
+ * pointer-events:none → přežije overflow:hidden, nepřebíjí position:fixed dock.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* ── shadowrun SCIFI — tech-brackety (cyan TL + violet BR) ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='scifi']::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 5;
+  border-top: 2px solid #38e0ff;
+  border-left: 2px solid #38e0ff;
+  box-shadow: -1px -1px 8px -1px #38e0ff;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='scifi']::after {
+  content: '';
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 5;
+  border-bottom: 2px solid #a78bfa;
+  border-right: 2px solid #a78bfa;
+  box-shadow: 1px 1px 8px -1px #a78bfa;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='scifi'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #38e0ff 14%, transparent), transparent);
+  border-bottom: 1px solid rgba(94, 160, 210, 0.4);
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='scifi'] .avatar {
+  border-radius: 3px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='scifi'] .name {
+  color: #f0f3ff;
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+
+/* ── shadowrun FANTASY — filigránové zlaté kování ve 4 rozích (REUSE .sr-panel::after) ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='fantasy']::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 5;
+  background:
+    linear-gradient(180deg, #e3b94a, #caa64a) left top / 2px 17px no-repeat,
+    linear-gradient(90deg, #e3b94a, #caa64a) left top / 17px 2px no-repeat,
+    linear-gradient(180deg, #e3b94a, #caa64a) right top / 2px 17px no-repeat,
+    linear-gradient(90deg, #caa64a, #e3b94a) right top / 17px 2px no-repeat,
+    linear-gradient(0deg, #e3b94a, #caa64a) left bottom / 2px 17px no-repeat,
+    linear-gradient(90deg, #e3b94a, #caa64a) left bottom / 17px 2px no-repeat,
+    linear-gradient(0deg, #e3b94a, #caa64a) right bottom / 2px 17px no-repeat,
+    linear-gradient(90deg, #caa64a, #e3b94a) right bottom / 17px 2px no-repeat;
+  filter: drop-shadow(0 0 4px rgba(227, 185, 74, 0.55));
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .header {
+  background: linear-gradient(180deg, #3d2e18, #271d12);
+  border-bottom: 1px solid #6e5326;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .avatar {
+  border-radius: 4px;
+  background: linear-gradient(135deg, #3a2c16, #20160b);
+  box-shadow: 0 0 0 1px #6e5326 inset;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .avatarFallback {
+  color: #e3b94a;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .name {
+  color: #f3e4b8;
+}
+
+/* ── shadowrun HORROR — gotická stříbrná tracerie + erbovní pečeť ☩ (REUSE .sr-hero/.sr-panel) ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='horror']::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 5;
+  border: 3px solid transparent;
+  border-image: repeating-linear-gradient(45deg, rgba(200, 196, 207, 0.4) 0 4px, transparent 4px 9px) 1;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='horror']::after {
+  content: '☩';
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(200, 196, 207, 0.7);
+  text-shadow: 0 0 8px rgba(122, 32, 48, 0.4);
+  pointer-events: none;
+  z-index: 6;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='horror'] .header {
+  background:
+    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, #7a2030 28%, transparent), transparent 60%),
+    linear-gradient(180deg, color-mix(in srgb, #120f16 50%, transparent), transparent);
+  border-bottom: 1px solid #4a4750;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='horror'] .avatar {
+  border-color: #4a4750;
+  box-shadow:
+    0 0 0 1px #130b11,
+    0 0 16px color-mix(in srgb, #7a2030 50%, transparent);
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='horror'] .name {
+  color: #e4dfe9;
+  font-family: 'Cormorant SC', serif;
+}
+
+/* ── shadowrun STEAMPUNK — rohové mosazné nýty + ⚙ kolo (REUSE .sr-hero ornament) ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='steampunk']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) 9px 9px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) right 9px top 9px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) 9px bottom 9px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) right 9px bottom 9px / 6px 6px no-repeat;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='steampunk']::after {
+  content: '\2699';
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 22px;
+  line-height: 1;
+  color: #c98a3c;
+  text-shadow: 0 0 10px rgba(201, 138, 60, 0.6);
+  pointer-events: none;
+  z-index: 6;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #d6a45a 26%, transparent), color-mix(in srgb, #6e5224 18%, transparent));
+  border-bottom: 2px solid #6e5224;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .avatar {
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px #6e5224 inset;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .name {
+  color: #f0d6a0;
+}
+
+/* ── shadowrun NATURE — rašící úponek roh (REUSE .sr-panel::after) + ❧ list ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='nature']::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 9px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 5;
+  border-bottom: 2px solid rgba(123, 168, 58, 0.5);
+  border-right: 2px solid rgba(123, 168, 58, 0.5);
+  border-radius: 0 0 100% 0;
+  filter: drop-shadow(0 0 5px rgba(123, 168, 58, 0.45));
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='nature']::after {
+  content: '\2767';
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  font-size: 22px;
+  line-height: 1;
+  color: #9bc24a;
+  transform: rotate(12deg);
+  text-shadow: 0 0 10px rgba(123, 168, 58, 0.4);
+  pointer-events: none;
+  z-index: 6;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='nature'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #7ba83a 18%, transparent), transparent);
+  border-bottom: 1px solid color-mix(in srgb, #9bc24a 45%, transparent);
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='nature'] .avatar {
+  border-radius: 18px 5px 18px 5px;
+  border-color: #9bc24a;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='nature'] .name {
+  color: #e6eecb;
+}
+
+/* ── shadowrun MINIMAL — dvojitý ledger rám + registrační kříže (REUSE .sr-panel + .sr-hero) ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='minimal']::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 5;
+  border: 1px solid rgba(40, 38, 32, 0.4);
+  background-repeat: no-repeat;
+  background-position: -4px -4px, calc(100% + 4px) -4px, -4px calc(100% + 4px), calc(100% + 4px) calc(100% + 4px);
+  background-size: 9px 9px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E");
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='minimal'] .header {
+  background: #f4f1ea;
+  border-bottom: 1px solid #cabfa8;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='minimal'] .avatar {
+  border-radius: 1px;
+  border-color: #cabfa8;
+  box-shadow: none;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='minimal'] .name {
+  color: #23211c;
+}
+
+/* ── shadowrun RETRO — CRT double-rám + scanlines + sun-grid horizont (REUSE .sr-panel::after) ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='retro']::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 5;
+  border: 1px solid #ff4fa3;
+  box-shadow:
+    0 0 0 1px #0e7c92,
+    0 0 10px -2px rgba(255, 79, 163, 0.5) inset;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='retro']::after {
+  content: '';
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -6px;
+  height: 42px;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(180deg, transparent, rgba(255, 79, 163, 0.28)),
+    repeating-linear-gradient(90deg, rgba(54, 240, 208, 0.55) 0 1px, transparent 1px 22px);
+  transform: perspective(40px) rotateX(40deg);
+  transform-origin: bottom center;
+  opacity: 0.4;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='retro'] .header {
+  background: linear-gradient(180deg, color-mix(in srgb, #ff4fa3 14%, transparent), color-mix(in srgb, #36f0d0 12%, transparent));
+  border-bottom: 1px solid #36f0d0;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='retro'] .avatarFallback {
+  color: #36f0d0;
+  text-shadow: 0 0 8px #36f0d0;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='retro'] .name {
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* ── shadowrun ANIME/MLP — cel-shade ink rám + conic star-burst + sparkle ✦ (REUSE .sr-hero/.sr-panel) ── */
+.panel[data-diary-system='shadowrun'][data-diary-skin='anime']::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  z-index: 5;
+  border: 2.5px solid #16162e;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.55), inset 0 18px 28px -18px rgba(43, 42, 85, 0.18);
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='anime']::after {
+  content: '✦';
+  position: absolute;
+  pointer-events: none;
+  z-index: 6;
+  top: 11px;
+  right: 13px;
+  font-size: 16px;
+  line-height: 1;
+  color: #ff6ad5;
+  text-shadow: 0 0 7px rgba(255, 106, 213, 0.7);
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='anime'] .header {
+  background: linear-gradient(180deg, #ffffff, #ffe9f4);
+  border-bottom: 2px solid #16162e;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='anime'] .avatar {
+  border-radius: 14px;
+  box-shadow: 0 0 0 2.5px #16162e;
+}
+.panel[data-diary-system='shadowrun'][data-diary-skin='anime'] .name {
+  color: #16162e;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
 /* ── Responsive: mobile force overlay ──────────────────────────── */
 @media (max-width: 640px) {
   .modeDock,

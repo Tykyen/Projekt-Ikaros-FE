@@ -150,7 +150,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Jak vypadá listina:** Per-system React sheet komponenta (např. `MatrixSheet`, `DndSheet`, `CocSheet` …) čte hodnoty z `diary.customData` přes prefixovaný accessor `makeCdAccess(cd, 'matrix_', …)`; cizí prefixy z jiných presetů render neovlivní. Personal override schéma (`personalDiarySchema`) má přednost před schématem světa.
 
-**Shadowrun 6e (2026-06-30):** `ShadowrunSheet` přepsán z legacy portu na cyberpunk HUD (sci-fi rodina `--mx-*`, třídy `.sr-*`) s **výpočetním jádrem** — 8 atributů → odvozené hodnoty (iniciativa REA+INT, HO=Tělo+zbroj, Composure/Odhad/Paměť/Zvedání) + velikosti záznamníků (8+⌈atr/2⌉); zranění −1 za 3 boxy se promítá do dice poolů; pool dovednosti/zbraně = atribut + hodnocení (+2 specializace). View/edit/print, PC/NPC, `sr_` klíče (reuse legacy). **Hody se v deníku nezobrazují** (kostky až v TM/chatu) — `rollPool` zatím neumí počítat úspěchy (5–6)/glitch, doplní se s combat panelem. (`sheets/shadowrun/ShadowrunSheet.tsx`, `styles/shadowrun.css`, `sheets/shadowrun/constants.ts`)
+**Shadowrun 6e (2026-06-30):** `ShadowrunSheet` přepsán z legacy portu na cyberpunk HUD (sci-fi rodina `--mx-*`, třídy `.sr-*`) s **výpočetním jádrem** — 8 atributů → odvozené hodnoty (iniciativa REA+INT, HO=Tělo+zbroj, Composure/Odhad/Paměť/Zvedání) + velikosti záznamníků (8+⌈atr/2⌉); zranění −1 za 3 boxy se promítá do dice poolů; pool dovednosti/zbraně = atribut + hodnocení (+2 specializace). View/edit/print, PC/NPC, `sr_` klíče (reuse legacy). **Hody se v deníku nezobrazují** (kostky až v TM/chatu — záměr). SR6 success-pool engine + combat panel + bestie viz samostatný blok „Shadowrun 6e (success pool)" níže. (`sheets/shadowrun/ShadowrunSheet.tsx`, `styles/shadowrun.css`, `sheets/shadowrun/constants.ts`, `sheets/shadowrun/shared.ts`)
 
 **Per-postava override:** Postava může mít vlastní `personalDiarySchema` (override nad světovým). `resolveAllowedKeys` (`character-subdocs.service.ts:98-110`): nejdřív personal, pak aktivní verze schématu světa, jinak `null` = pass-through (bez filtru — bezpečnější než ztratit data).
 
@@ -233,6 +233,31 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Stav:** ✅ funguje.
 **Kód:** FE `_shared/FateLikeSheet.tsx`, `sheets/{fae/FaeSheet,fate/FateSheet}.tsx`, `presets/{fae,fate}.ts`, `styles/fate.css`; `bestiar/components/FateBestieCard.tsx`; `tactical-map/.../system-panels/{FateCombatPanel,FateBestiePanel}.tsx` + `fate/{FateCombatBody,fateBestieView}`; `chat/.../rail/FateChatBestiePanel.tsx`; schémata `tactical-map/schemas/{fae,fate}/`. BE: `fae/fate` token+bestie schémata v `backend/assets/schemas/` (export-schemas), jinak pass-through.
+
+---
+
+### Shadowrun 6e (success pool)
+
+**Co to je:** Plné herní pokrytí systému Shadowrun 6e (Sixth World) — deník, taktická mapa, chat, bestiář — postavené na **success-pool** mechanice (hod hromadou k6, úspěchy = tváře 5–6), narozdíl od součtových (d20/2k6) systémů.
+
+**Kde:** Svět s `world.system = 'shadowrun'`. Deník (`DiaryTab`), bestiář (`/svet/:slug/bestiar`), taktická mapa (token panel), chat (rail). Default skin `scifi`.
+
+**Kdo:** Jako ostatní systémy — člen s přístupem k postavě; edituje vlastník PC / PJ+. Bestiář dle 3 scope.
+
+**Co jde dělat:**
+- **Deník** (`ShadowrunSheet`): viz blok „Per-system schema engine" výše (HUD `.sr-*`, výpočetní jádro, bez kostek v deníku).
+- **SR6 dice engine** (`rollPoolHits(count, sides=6, threshold=5)`): hodí pool kostek, počítá **úspěchy** (tvář ≥5), **glitch** (víc než polovina kostek = 1), **kritický glitch** (glitch + 0 úspěchů). Reusable i pro jiné success-pool systémy (WoD d10/threshold 8). Roll flow `kind:'pool-d6'` + `pool` v `performSheetRoll` (TM) i `rollDiaryRequest` (chat); vykreslení úspěchů/glitche v `DiceLogPanel` + `DiceRollOverlay`. **Iniciativa = Reakce+Intuice + 1k6 (součet, `kind:'d6'`)**, NE pool.
+- **Taktická mapa — PC** (`ShadowrunCombatPanel` v `COMBAT_PANELS`): kompaktní celý deník (bojové jádro + Detaily Kouzla/Matrix/Augmentace/Kvality/Kontakty/Identita v centrovaném `Modal`u reusujícím deníkové sekce). Klik na atribut/dovednost/útok = SR6 pool hod → dicelog. HP bar tokenu = fyzický záznamník (`resolveCharacterHp` case `shadowrun`: max = 8+⌈Tělo/2⌉, zbývá = max − `sr_cond_phys`).
+- **Taktická mapa — bestie** (`ShadowrunBestiePanel`): jantarový statblok (`--srb-*`) — fyzický záznamník (damageable HP) + omráčení (postih), Obrana/Zbroj/Pohyb/Iniciativa, 8 atributů (klik = pool), útoky/dovednosti (přímý pool, klik = hod), schopnosti (powers, readonly), poznámky.
+- **Bestiář** (2 schémata `shadowrun:bestie`/`shadowrun:token`): editor přes generický `EntitySchemaForm` (sekce Profil & boj / Atributy / Útoky / Dovednosti / Schopnosti); bestie drží **přímý pool** u útoků/dovedností a přímá odvozená pole (NE počítá z atributů jako PC).
+- **Chat**: PC zdarma přes `DiaryRollPanel`→`COMBAT_PANELS`; bestie přes `ShadowrunChatBestiePanel` (katalog read-only + instance v boji editovatelná přes `onPatch`). Sdílí `shadowrunBestieView` + `ShadowrunBestieBody` s mapou (0 drift) — týž plný panel, jen užší rail.
+
+**Hranice / co neumí:** Hod ukáže jen **počet úspěchů + glitch** — práh obtížnosti (kolik úspěchů je potřeba) řeší PJ ad hoc, neukládá se do statbloku. Bestie útoky/dovednosti = předpočítaný pool (nepočítá se z atributů). Edge (Hrana) v deníku evidovaná, ale boj ji automaticky neutrácí (PJ ručně). Práh úspěchu kostky pevně 5 (SR6); Attack/Defense Rating + auto-Edge nejsou modelované. 8 skinů zatím NEhotové (jen default scifi).
+
+**Zvláštnosti:** Deník+combat panel sdílí výpočetní jádro `sheets/shadowrun/shared.ts` (`readAttrs/poolOf/woundPenalty/srDerived`) → 0 drift list↔panel. Bestie+chat sdílí `shadowrunBestieView` + `ShadowrunBestieBody`. Bestie token = superset profilu v `systemStats` (BE `token.update` REPLACE + strict patch → `token.json` musí být superset `bestie.json` + `health.current`/`stun_cur`/`initiative.current`). Bestie HP = damageable `health.current` (PC HP = odvozené z fyzického záznamníku přes `resolveCharacterHp`, jiná vrstva).
+
+**Stav:** ✅ funguje (8 skinů zbývají).
+**Kód:** FE `sheets/shadowrun/{ShadowrunSheet,constants,shared}.ts(x)`; dice `chat/dice/lib/{rollEngine,dicePayload}.ts` + `rollFromSheet.ts`/`rollFromDiary.ts`; `tactical-map/.../system-panels/ShadowrunCombatPanel.tsx` + `shadowrun/{ShadowrunBestieBody,shadowrunBestieView}` + `ShadowrunBestiePanel.tsx`; `chat/.../rail/ShadowrunChatBestiePanel.tsx`; `utils/resolveCharacterHp.ts`; schémata `tactical-map/schemas/shadowrun/`. BE: `shadowrun` token+bestie schémata v `backend/assets/schemas/` (export-schemas, push 5db1b33), jinak pass-through.
 
 ---
 

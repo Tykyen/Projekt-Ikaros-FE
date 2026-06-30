@@ -1,0 +1,116 @@
+/* Shadowrun 6e — skin „nature" 🌿 (druidský herbář / živý letopis).
+ * Přepisuje sci-fi `--mx-*` tokeny mechovou paletou + `--sr-log-*` embed sadu.
+ * Signature: rašící úponek v TL rohu panelů, list a letokruhový terč na heru.
+ * Scoped [data-diary-system='shadowrun'][data-diary-skin='nature'].
+ * Font display = Marcellus SC, body = Spectral (v globálním @import diary-skins.css).
+ */
+[data-diary-system='shadowrun'][data-diary-skin='nature'] {
+  --mx-bg: linear-gradient(180deg, #16200f, #0d150a);
+  --mx-panel: #172310;
+  --mx-text: #d8e0c2;
+  --mx-muted: #8fa074;
+  --mx-dim: #5e6e48;
+  --mx-accent: #7ba83a;
+  --mx-violet: #d29a3a;
+  --mx-gold: #d29a3a;
+  --mx-danger: #b5472a;
+  --mx-green: #7ba83a;
+  --mx-line: rgba(123, 168, 58, 0.16);
+  --mx-line-strong: rgba(123, 168, 58, 0.34);
+
+  --mx-font-display: 'Marcellus SC', serif;
+  --mx-font-body: 'Spectral', serif;
+  --mx-font-num: 'Spectral', serif;
+  --mx-font-brand: 'Marcellus SC', serif;
+
+  --mx-sheet-radius: 7px;
+  --mx-title-color: #9bc24a;
+  --mx-hero-bg: radial-gradient(420px 190px at 50% 0, rgba(210, 154, 58, 0.14), transparent 65%),
+    linear-gradient(180deg, #1d2912, #13200c);
+  --mx-hero-border: 1px solid rgba(123, 168, 58, 0.3);
+  --mx-name-color: #e6eecb;
+  --mx-name-glow: 0 0 12px rgba(123, 168, 58, 0.4);
+  --mx-row-bg: #13200c;
+  --mx-seg-off: #1f2c14;
+  --mx-accent-border: rgba(123, 168, 58, 0.4);
+  --mx-clip: none;
+
+  /* embed / dice (OPAQUE) */
+  --sr-log-surface: #172310;
+  --sr-log-border: rgba(123, 168, 58, 0.36);
+  --sr-log-title: #9bc24a;
+  --sr-log-chip: #1f2c14;
+  --sr-log-num: #d8e0c2;
+  --sr-log-num-font: 'Spectral', serif;
+  --sr-log-total: #7ba83a;
+  --sr-log-total-pos: #7ba83a;
+  --sr-log-total-neg: #b5472a;
+  --sr-log-total-shadow: 0 0 10px rgba(123, 168, 58, 0.5);
+  --sr-log-eq-font: 'Spectral', serif;
+  --sr-log-skillmod: #d29a3a;
+  --sr-log-eq: #8fa074;
+  --sr-log-head-font: 'Marcellus SC', serif;
+}
+
+/* ── SIGNATURE: hero letokruhový terč (TL) + list (TR) ── */
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-hero {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-hero::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    transparent 0 6px,
+    rgba(155, 194, 74, 0.5) 6px 8px,
+    transparent 8px 14px,
+    rgba(123, 168, 58, 0.5) 14px 16px,
+    transparent 16px 22px,
+    rgba(155, 194, 74, 0.4) 22px 24px,
+    transparent 24px 30px,
+    rgba(123, 168, 58, 0.35) 30px 32px,
+    transparent 32px
+  );
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 2;
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-hero::after {
+  content: '\2767';
+  position: absolute;
+  right: 14px;
+  top: 10px;
+  font-size: 26px;
+  line-height: 1;
+  color: #9bc24a;
+  transform: rotate(12deg);
+  text-shadow: 0 0 10px rgba(123, 168, 58, 0.4);
+  pointer-events: none;
+  z-index: 2;
+}
+/* SIGNATURE: rašící úponek v TL rohu panelů */
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-panel {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-panel::after {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 9px;
+  width: 16px;
+  height: 16px;
+  border-bottom: 2px solid rgba(123, 168, 58, 0.5);
+  border-right: 2px solid rgba(123, 168, 58, 0.5);
+  border-radius: 0 0 100% 0;
+  filter: drop-shadow(0 0 5px rgba(123, 168, 58, 0.45));
+  pointer-events: none;
+  z-index: 2;
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-name {
+  font-family: 'Marcellus SC', serif;
+}

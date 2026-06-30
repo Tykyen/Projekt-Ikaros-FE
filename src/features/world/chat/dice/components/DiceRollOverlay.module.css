@@ -1293,6 +1293,312 @@
    Sjednocuje rovnici do cel-shade ink jazyka; žádný fialový leak. */
 [data-diary-system='pi'][data-diary-skin='anime'] .skillMod { color: #16162e; }
 
+/* ════════════ shadowrun readout (vyčíslení hodu) NESE deníkový skin ═══════
+ * Port sourozeneckého pi (--pi-* → --sr-log-*). shadowrun = sci-fi `--mx-*` HUD,
+ * embed/dice tokeny ale jedou přes vlastní `--sr-log-*` sadu (per skin v
+ * shadowrun-skins/<skin>.css). Skinuje se RÁM readout boxu + neutrální text
+ * (jméno/=); SÉMANTICKÉ +/− drží význam barvou. Surface OPAQUE: var(--sr-log-surface
+ * ...) → ZANOŘENÝ fallback (jednoargumentový var), NE `var(a), var(b)` — čárka ve
+ * fallbacku by `background` shorthand četl jako 2 vrstvy a spadl na transparent.
+ * Scoped na shadowrun → ostatní systémy beze změny. */
+[data-diary-system='shadowrun'] .readout {
+  background: var(--sr-log-surface, var(--mx-panel, #0e0f1e));
+  border: 1px solid var(--sr-log-border, color-mix(in srgb, var(--mx-accent, #38e0ff) 30%, transparent));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-diary-system='shadowrun'] .faceBadge {
+  background: var(--sr-log-chip, color-mix(in srgb, var(--mx-panel, #0e0f1e) 92%, var(--mx-bg, #0e0f1e)));
+  border-color: var(--sr-log-border, color-mix(in srgb, var(--mx-accent, #38e0ff) 35%, transparent));
+  font-family: var(--sr-log-num-font, var(--mx-font-num, 'IBM Plex Mono', monospace));
+  color: var(--sr-log-num, var(--mx-text, #d6def0));
+}
+[data-diary-system='shadowrun'] .faceGeneric { color: var(--sr-log-num, var(--mx-text, #d6def0)); }
+/* čísla nesou skin (font+barva); znaménko +/− drží význam, ne barva */
+[data-diary-system='shadowrun'] .totalValue { font-family: var(--sr-log-num-font, var(--mx-font-num, 'IBM Plex Mono', monospace)); }
+[data-diary-system='shadowrun'] .totalPositive {
+  color: var(--sr-log-total-pos, var(--mx-accent, #38e0ff));
+  text-shadow: var(--sr-log-total-shadow, 0 0 12px color-mix(in srgb, var(--mx-accent, #38e0ff) 60%, transparent));
+}
+[data-diary-system='shadowrun'] .totalNegative { color: var(--sr-log-total-neg, var(--mx-danger, #f87171)); }
+[data-diary-system='shadowrun'] .totalNeutral {
+  color: var(--sr-log-total, var(--mx-gold, #fbbf24));
+  text-shadow: var(--sr-log-total-shadow, 0 0 12px color-mix(in srgb, var(--mx-gold, #fbbf24) 55%, transparent));
+}
+/* SR6 pool výsledek: úspěchy nesou skin total-pos, glitch drží sémantiku */
+[data-diary-system='shadowrun'] .totalHits {
+  color: var(--sr-log-total-pos, var(--mx-accent, #38e0ff));
+  text-shadow: var(--sr-log-total-shadow, 0 0 12px color-mix(in srgb, var(--mx-accent, #38e0ff) 60%, transparent));
+}
+[data-diary-system='shadowrun'] .equation { font-family: var(--sr-log-eq-font, var(--mx-font-body, 'Chakra Petch', sans-serif)); }
+[data-diary-system='shadowrun'] .skillName { color: var(--sr-log-title, var(--mx-text, #d6def0)); }
+[data-diary-system='shadowrun'] .skillMod {
+  color: var(--sr-log-skillmod, var(--mx-violet, rgba(167, 139, 250, 0.9)));
+}
+[data-diary-system='shadowrun'] .diceSum { color: var(--sr-log-num, var(--mx-text, rgba(168, 213, 255, 0.85))); }
+[data-diary-system='shadowrun'] .eqSign { color: var(--sr-log-eq, var(--mx-muted, rgba(150, 180, 255, 0.55))); }
+[data-diary-system='shadowrun'] .rollerName {
+  color: var(--sr-log-eq, color-mix(in srgb, var(--mx-text, #d6def0) 62%, var(--mx-muted, rgba(180, 200, 255, 0.55))));
+  font-family: var(--sr-log-eq-font, var(--mx-font-body, 'Chakra Petch', sans-serif));
+}
+
+/* ════════════ shadowrun per-skin SIGNATURE readoutu ════════════
+ * Tvarové ornamenty musí být ZDE (hashovaná `.readout` nejde z globálního CSS).
+ * Barvu+čísla řeší --sr-log-*; tvar = ::before/::after. Týž tvarový jazyk jako
+ * deníkové shadowrun-skins/<skin>.css (.sr-hero/.sr-panel) → list↔panel↔readout
+ * konzistentní. POZN.: `.readout` je position:fixed (overlay) → NEPŘEPISOVAT
+ * position (jen ::before/::after, fixed je positioned). */
+
+/* scifi — chamfer klín + TL cyan tracer + scanline + BR violet bracket */
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .readout {
+  border-radius: 0;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  box-shadow: inset 0 0 0 1px rgba(56, 224, 255, 0.42), inset 0 0 40px -22px rgba(56, 224, 255, 0.45),
+    0 18px 50px rgba(0, 0, 0, 0.7);
+}
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  clip-path: inherit;
+  background: linear-gradient(90deg, #38e0ff 0 12px, transparent 12px) 7px 7px / 14px 2px no-repeat,
+    linear-gradient(180deg, #38e0ff 0 12px, transparent 12px) 7px 7px / 2px 14px no-repeat,
+    repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.05) 0 1px, transparent 1px 3px);
+  filter: drop-shadow(0 0 6px #38e0ff);
+}
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .readout::after {
+  content: '';
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid #a78bfa;
+  border-right: 2px solid #a78bfa;
+  box-shadow: 1px 1px 8px -1px #a78bfa;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* fantasy — pergamen + filigránové zlaté kování ve všech 4 rozích (REUSE .sr-panel::after) */
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .readout {
+  box-shadow: 0 0 0 1px #100a03, 0 0 0 3px #9a7330, 0 0 0 5px #1a1207, 0 0 0 6px #6a4c1c,
+    0 20px 60px -10px rgba(0, 0, 0, 0.85), inset 0 0 36px rgba(0, 0, 0, 0.45);
+  border-radius: 4px;
+}
+[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, #e3b94a, #caa64a) left top / 2px 15px no-repeat,
+    linear-gradient(90deg, #e3b94a, #caa64a) left top / 15px 2px no-repeat,
+    linear-gradient(180deg, #e3b94a, #caa64a) right top / 2px 15px no-repeat,
+    linear-gradient(90deg, #caa64a, #e3b94a) right top / 15px 2px no-repeat,
+    linear-gradient(0deg, #e3b94a, #caa64a) left bottom / 2px 15px no-repeat,
+    linear-gradient(90deg, #e3b94a, #caa64a) left bottom / 15px 2px no-repeat,
+    linear-gradient(0deg, #e3b94a, #caa64a) right bottom / 2px 15px no-repeat,
+    linear-gradient(90deg, #caa64a, #e3b94a) right bottom / 15px 2px no-repeat;
+  filter: drop-shadow(0 0 4px rgba(227, 185, 74, 0.55));
+}
+
+/* horror — oxblood glow + gotická stříbrná diagonální tracerie (REUSE .sr-hero::after) + ☩ pečeť */
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .readout {
+  box-shadow: inset 0 0 28px rgba(122, 32, 48, 0.4), 0 24px 60px rgba(0, 0, 0, 0.85);
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  border: 3px solid transparent;
+  border-image: repeating-linear-gradient(45deg, rgba(200, 196, 207, 0.4) 0 4px, transparent 4px 9px) 1;
+}
+[data-diary-system='shadowrun'][data-diary-skin='horror'] .readout::after {
+  content: '☩';
+  position: absolute;
+  top: 4px;
+  right: 9px;
+  font-size: 15px;
+  line-height: 1;
+  color: rgba(200, 196, 207, 0.7);
+  text-shadow: 0 0 8px rgba(122, 32, 48, 0.4);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* steampunk — mosazná deska + rohové nýty + ⚙ kolo (REUSE .sr-hero ornament) */
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .readout {
+  isolation: isolate;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(231, 205, 143, 0.42), inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 16px 44px rgba(0, 0, 0, 0.65), 0 0 0 1px #6e5224;
+}
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  background: radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) 8px 8px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) right 8px top 8px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) 8px bottom 8px / 6px 6px no-repeat,
+    radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) right 8px bottom 8px / 6px 6px no-repeat;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+}
+[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .readout::after {
+  content: '\2699';
+  position: absolute;
+  top: 5px;
+  right: 9px;
+  font-size: 18px;
+  line-height: 1;
+  color: #c98a3c;
+  text-shadow: 0 0 10px rgba(201, 138, 60, 0.6);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* nature — organický rám + rašící úponek roh (REUSE .sr-panel::after) + ❧ list */
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .readout {
+  border-width: 2px;
+  border-radius: 14px 6px 14px 6px;
+  box-shadow: inset 0 0 0 1px rgba(123, 168, 58, 0.32), inset 0 0 0 3px #37501f,
+    inset 0 0 20px rgba(0, 0, 0, 0.45), 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .readout::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 9px;
+  width: 16px;
+  height: 16px;
+  border-bottom: 2px solid rgba(123, 168, 58, 0.5);
+  border-right: 2px solid rgba(123, 168, 58, 0.5);
+  border-radius: 0 0 100% 0;
+  filter: drop-shadow(0 0 5px rgba(123, 168, 58, 0.45));
+  pointer-events: none;
+  z-index: 2;
+}
+[data-diary-system='shadowrun'][data-diary-skin='nature'] .readout::after {
+  content: '\2767';
+  position: absolute;
+  right: 11px;
+  top: 6px;
+  font-size: 18px;
+  line-height: 1;
+  color: #9bc24a;
+  transform: rotate(12deg);
+  text-shadow: 0 0 10px rgba(123, 168, 58, 0.4);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* minimal — dvojitý ledger rám archivní karty + registrační kříže (REUSE .sr-hero + .sr-panel) */
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .readout {
+  overflow: visible;
+}
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .readout::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  border: 1px solid rgba(40, 38, 32, 0.4);
+  border-radius: 1px;
+  z-index: 0;
+  /* 4 soutiskové registrační kříže „+" v rozích */
+  background-repeat: no-repeat;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-size: 9px 9px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0V9M0 4.5H9' stroke='%239a7b2e' stroke-width='.9'/%3E%3C/svg%3E");
+}
+
+/* retro — CRT synthwave double-rám + sun-grid horizont + scanlines (REUSE .sr-panel::after) */
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .readout {
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #ff4fa3, 0 0 0 3px #0d0320, 0 0 0 4px #0e7c92,
+    0 0 24px -2px rgba(255, 79, 163, 0.5), 0 10px 40px rgba(0, 0, 0, 0.9);
+}
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .readout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.32) 2px 3px);
+}
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .readout::after {
+  content: '';
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -6px;
+  height: 42px;
+  background: linear-gradient(180deg, transparent, rgba(255, 79, 163, 0.28)),
+    repeating-linear-gradient(90deg, rgba(54, 240, 208, 0.55) 0 1px, transparent 1px 22px);
+  transform: perspective(40px) rotateX(40deg);
+  transform-origin: bottom center;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* anime/MLP — cel-shade ink rám + conic star-burst + sparkle ✦ (REUSE .sr-hero/.sr-panel) */
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .readout {
+  border: 3px solid #16162e;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 0 0 5px #ffffff, 0 0 0 8px #16162e, 0 6px 0 8px #16162e,
+    0 16px 30px -8px rgba(26, 20, 80, 0.5);
+}
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .readout::before {
+  content: '';
+  position: absolute;
+  top: -70px;
+  right: -70px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+  background: conic-gradient(
+    from 220deg,
+    rgba(255, 255, 255, 0) 0deg,
+    rgba(255, 255, 255, 0.55) 30deg,
+    rgba(255, 255, 255, 0) 60deg,
+    rgba(255, 255, 255, 0.35) 110deg,
+    rgba(255, 255, 255, 0) 150deg,
+    rgba(255, 255, 255, 0.6) 210deg,
+    rgba(255, 255, 255, 0) 250deg,
+    rgba(255, 255, 255, 0.3) 320deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+}
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .readout::after {
+  content: '✦';
+  position: absolute;
+  top: 6px;
+  right: 11px;
+  z-index: 2;
+  font-size: 14px;
+  line-height: 1;
+  color: #ff6ad5;
+  pointer-events: none;
+  text-shadow: 0 0 7px rgba(255, 106, 213, 0.7);
+}
+
 /* 8.7q — JaD fatální úspěch / neúspěch v readoutu (místo výpočtu). */
 .critSuccess,
 .critFail {

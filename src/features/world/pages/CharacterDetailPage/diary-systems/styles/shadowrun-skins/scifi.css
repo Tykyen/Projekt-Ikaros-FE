@@ -1,0 +1,89 @@
+/* Shadowrun 6e — skin „scifi" 🛸 (holografický velitelský HUD).
+ * = nativní vzhled shadowrunu; formalizuje sci-fi `--mx-*` tokeny + `--sr-log-*`
+ * embed sadu. Signature: cyan tracer-roh + scanline na heru, fialový BR bracket
+ * na panelech. Scoped [data-diary-system='shadowrun'][data-diary-skin='scifi'].
+ * Font display = Orbitron (v globálním @import diary-skins.css).
+ */
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] {
+  --mx-bg: radial-gradient(1200px 500px at 80% -10%, rgba(167, 139, 250, 0.07), transparent 60%),
+    linear-gradient(180deg, #0b0b18, #08080f);
+  --mx-panel: #0e0f1e;
+  --mx-text: #d6def0;
+  --mx-muted: #76809a;
+  --mx-dim: #444b63;
+  --mx-accent: #38e0ff;
+  --mx-violet: #a78bfa;
+  --mx-gold: #fbbf24;
+  --mx-danger: #f87171;
+  --mx-green: #4ade80;
+  --mx-line: rgba(255, 255, 255, 0.08);
+  --mx-line-strong: rgba(56, 224, 255, 0.27);
+
+  --mx-font-display: 'Orbitron', 'Chakra Petch', system-ui, sans-serif;
+  --mx-font-body: 'Chakra Petch', system-ui, sans-serif;
+  --mx-font-num: 'IBM Plex Mono', monospace;
+  --mx-font-brand: 'Orbitron', sans-serif;
+
+  --mx-sheet-radius: 8px;
+  --mx-title-color: #aeb8d4;
+  --mx-hero-bg: radial-gradient(600px 200px at 0% 0%, rgba(167, 139, 250, 0.09), transparent 70%),
+    linear-gradient(180deg, #12132a, #0b0b16);
+  --mx-hero-border: 1px solid rgba(167, 139, 250, 0.2);
+  --mx-name-color: #f0f3ff;
+  --mx-name-glow: 0 0 22px rgba(167, 139, 250, 0.33);
+  --mx-row-bg: linear-gradient(90deg, #10111f, #0d0e1a);
+  --mx-seg-off: #1a1d2e;
+  --mx-accent-border: rgba(56, 224, 255, 0.18);
+  --mx-clip: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+
+  /* embed / dice (OPAQUE) */
+  --sr-log-surface: #0e0f1e;
+  --sr-log-border: rgba(56, 224, 255, 0.3);
+  --sr-log-title: #aeb8d4;
+  --sr-log-chip: #11121f;
+  --sr-log-num: #d6def0;
+  --sr-log-num-font: 'IBM Plex Mono', monospace;
+  --sr-log-total: #fbbf24;
+  --sr-log-total-pos: #38e0ff;
+  --sr-log-total-neg: #f87171;
+  --sr-log-total-shadow: 0 0 12px rgba(56, 224, 255, 0.5);
+  --sr-log-eq-font: 'Chakra Petch', system-ui, sans-serif;
+  --sr-log-skillmod: #a78bfa;
+  --sr-log-eq: #8893b0;
+  --sr-log-head-font: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+
+/* ── SIGNATURE: hero cyan tracer-roh (TL) ── */
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .sr-hero {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .sr-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(90deg, #38e0ff 0 18px, transparent 18px) 10px 10px / 20px 2px no-repeat,
+    linear-gradient(180deg, #38e0ff 0 18px, transparent 18px) 10px 10px / 2px 20px no-repeat;
+  filter: drop-shadow(0 0 6px #38e0ff);
+}
+/* SIGNATURE: fialový BR bracket na panelech */
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .sr-panel {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .sr-panel::after {
+  content: '';
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid #a78bfa;
+  border-right: 2px solid #a78bfa;
+  box-shadow: 1px 1px 8px -1px #a78bfa;
+  pointer-events: none;
+  z-index: 2;
+}
+[data-diary-system='shadowrun'][data-diary-skin='scifi'] .sr-name {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}

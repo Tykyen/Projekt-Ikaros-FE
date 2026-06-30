@@ -1282,3 +1282,23 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Jak ověřeno:** `npm run build` (tsc -b) exit 0 · 8 view-model unit testů (wound penalty, damageable boxy, parsing, patch helpery) + 4 panel render+interakce testy (pool hod, autosave, readonly disabled) zelené · `export-schemas` 29 schémat → BE · BE commit+push 5db1b33. Drobný fix vedle: ikonka 🎲 z PC combat panelu pryč (kosmetika, na žádost).
 
 **Zhodnocení:** dobře — gated workflow (HTML statblok mock → schválení → kód), kompletní vertikální průřez (žádný dluh), sdílené jádro = 0 drift, **obě historické pasti (mrtvý kód + token superset) chyceny v návrhu, ne až buildem/uživatelem**. Korekce po cestě: 1. mock railu jsem zprvně ukázal jako osekanou kartu (uživatel správně připomněl skill fázi 5) → opraveno na týž panel stejnou funkcí; 2. uživatel ověřoval, zda PC panel je v chatu — byl (COMBAT_PANELS z fáze 3, „zdarma"). Render reálného produkčního CSS přes headless harness NEproveden (mock=kontrakt, CSS věrný přepis) → živé doladění + `mobil-desktop` po naplnění daty.
+
+---
+
+## ✅ ŘEŠENÍ — Shadowrun 8 skinů (port pi rodiny, fan-out) + MLP rework na světlý — 2026-06-30
+
+**Co:** 8 vizuálních skinů systému shadowrun (scifi/fantasy/horror/steampunk/nature/minimal/retro/anime=MLP) napříč všemi povrchy (deník · combat panel PC · bestie · obal TM · chat rail PC+NPC · dicelog · readout · orchestrace). Skill `skin`.
+
+**Postup (co zabralo):**
+- **Galerie-první gate:** standalone HTML galerie 8 skinů × všechny povrchy (`c:/tmp/shadowrun-skins/_GALERIE.html`) iterativně doladěná dle uživatele (deník neúplný → věrný `ShadowrunSheet`; PC/bestie osekané → celé; chyběly dicelog/hody/orchestrace/obaly → doplněny) → schválení = kontrakt. Lekce: od začátku pokrýt VŠECHNY povrchy §3, ne dávkovat (uživatel musel opakovat).
+- **Token architektura:** shadowrun = `--mx-*` HUD rodina (jako matrix), ne `--pi-*`. Skin sady `shadowrun-skins/<id>.css` přepisují `--mx-*` (list) + nový `--sr-log-*` embed namespace (baseline v `shadowrun.css :where(...)`). **Color-only povrchy (dicelog/orchestrace/chat-obal) = 1 baseline `var(--sr-log-*)` konzument per modul** → skin přepíše token a barva se mění sama (méně kódu než pi per-skin literály). TVAR povrchy (readout/obalTM/combat/bestie) = per-skin signature bloky v module CSS.
+- **Fan-out:** 7 agentů (1 disjunktní skin sada each) + 3 agenti na sdílené povrchové soubory (readout+obalTM / combat+bestie ornament / chat+dicelog+orchestrace). scifi flagship sám = vzor. Agent navíc správně doplnil chybějící `DiarySkinScope` na chat bestie panel (parita s mapou).
+- **MLP rework:** původně tmavý (tmavé bg + jen duhový hero) — uživatel zachytil, že MLP = SVĚTLÝ duhový cel-shade. Přepis `anime.css` + `railShell` anime na světlou (bílé karty, ink obrys #2a2350, tvrdý cel-stín, duhový hero/portrét, ✦ sparkles, text tmavě fialový). 2. světlý skin vedle minimalu (jiná identita).
+
+**Pasti chycené:**
+- **`*/` v komentáři** (`--sr-log-*/--mx-*` → `*/` předčasně ukončil blok) shodila PostCSS build (`Unknown word --mx-*`). Rodina CH-034/037. Fix + preventivní grep `-\*/` napříč module CSS (žádná další).
+- **Galerie ≠ realita struktura:** první deník v galerii byl jednosloupcový výřez, reálný `ShadowrunSheet` je 2-sloupcový (hero 4 boxy, atributy pip-bary, odvozené). Opraveno na věrný markup → galerie = skutečný kontrakt.
+
+**Jak ověřeno:** `npm run build` (tsc -b + vite + csp) ✓ 2× (po deník sadách, po povrchech). Render reálného produkčního CSS přes headless harness NEPROVEDEN (playwright/Chrome MCP nedostupný) → dle skill §6 brzdy vyžádáno živé vizuální potvrzení uživatele přes selektor „Vzhled" (uživatel testuje prod). NEtvrdím „sedí" bez renderu.
+
+**Zhodnocení:** dobře — galerie-první gate + token baseline konzument (úspora kódu) + fan-out disjunktních souborů + agenti drželi opaque surface; pasti (`*/`, DiarySkinScope, struktura) chyceny. Špatně — dávkoval jsem povrchy v galerii (uživatel musel opakovat „chci tam vše"), měl jsem od začátku §3 kompletní; MLP tmavý/světlý jsem netrefil napoprvé (MLP = vždy světlý duhový). Zbývá: render-audit (živě) + mobil-desktop + funkce(skiny=grafika, jen pozn.)/commit.

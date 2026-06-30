@@ -1,0 +1,96 @@
+/* Shadowrun 6e — skin „retro" 🎮 (CRT terminál / synthwave 80s).
+ * Přepis sci-fi `--mx-*` tokenů + `--sr-log-*` embed sady do neonové
+ * cyan/magenta CRT palety s mono fonty (VT323, Share Tech Mono, Orbitron).
+ * Signature: ASCII USR prompt rám dole na heru, sun-grid horizont na panelech.
+ * Scoped [data-diary-system='shadowrun'][data-diary-skin='retro'].
+ * Fonty z globálního @import v diary-skins.css; bez vlastního @import.
+ */
+[data-diary-system='shadowrun'][data-diary-skin='retro'] {
+  --mx-bg: linear-gradient(180deg, #0a0118, #05010d);
+  --mx-panel: #0d0320;
+  --mx-text: #e6f0ff;
+  --mx-muted: #7a86b8;
+  --mx-dim: #4a5288;
+  --mx-accent: #36f0d0;
+  --mx-violet: #ff4fa3;
+  --mx-gold: #fbe84a;
+  --mx-danger: #ff4fa3;
+  --mx-green: #36f0d0;
+  --mx-line: rgba(54, 240, 208, 0.18);
+  --mx-line-strong: rgba(54, 240, 208, 0.4);
+
+  --mx-font-display: 'Orbitron', sans-serif;
+  --mx-font-body: 'Share Tech Mono', monospace;
+  --mx-font-num: 'VT323', monospace;
+  --mx-font-brand: 'Orbitron', sans-serif;
+
+  --mx-sheet-radius: 0;
+  --mx-title-color: #36f0d0;
+  --mx-hero-bg: linear-gradient(180deg, rgba(255, 79, 163, 0.16), transparent), #0d0320;
+  --mx-hero-border: 1px solid rgba(255, 79, 163, 0.4);
+  --mx-name-color: #ffffff;
+  --mx-name-glow: 0 0 14px #ff4fa3, 0 0 4px #36f0d0;
+  --mx-row-bg: #0a0118;
+  --mx-seg-off: #1a0a30;
+  --mx-accent-border: rgba(54, 240, 208, 0.45);
+  --mx-clip: none;
+
+  /* embed / dice (OPAQUE) */
+  --sr-log-surface: #0d0320;
+  --sr-log-border: rgba(54, 240, 208, 0.4);
+  --sr-log-title: #36f0d0;
+  --sr-log-chip: #1a0a30;
+  --sr-log-num: #e6f0ff;
+  --sr-log-num-font: 'VT323', monospace;
+  --sr-log-total: #fbe84a;
+  --sr-log-total-pos: #36f0d0;
+  --sr-log-total-neg: #ff4fa3;
+  --sr-log-total-shadow: 0 0 12px #36f0d0;
+  --sr-log-eq-font: 'Share Tech Mono', monospace;
+  --sr-log-skillmod: #ff4fa3;
+  --sr-log-eq: #7a86b8;
+  --sr-log-head-font: 'Orbitron', sans-serif;
+}
+
+/* ── SIGNATURE: ASCII USR prompt rám dole na heru (CRT terminál) ── */
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .sr-hero {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .sr-hero::after {
+  content: '┌─ USR://VEX ──┐';
+  position: absolute;
+  left: 12px;
+  bottom: 6px;
+  font-family: 'VT323', monospace;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #36f0d0;
+  text-shadow: 0 0 8px #36f0d0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── SIGNATURE: sun-grid synthwave horizont dole na panelech ── */
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .sr-panel {
+  position: relative;
+  overflow: hidden;
+}
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .sr-panel::after {
+  content: '';
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -6px;
+  height: 42px;
+  background: linear-gradient(180deg, transparent, rgba(255, 79, 163, 0.28)),
+    repeating-linear-gradient(90deg, rgba(54, 240, 208, 0.55) 0 1px, transparent 1px 22px);
+  transform: perspective(40px) rotateX(40deg);
+  transform-origin: bottom center;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-diary-system='shadowrun'][data-diary-skin='retro'] .sr-name {
+  font-family: 'Orbitron', sans-serif;
+}

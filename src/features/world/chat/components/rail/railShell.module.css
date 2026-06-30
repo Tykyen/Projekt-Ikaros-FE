@@ -366,6 +366,206 @@
 }
 .panel:has([data-diary-system='pi'][data-diary-skin='anime']) .avatarFallback { color: #2b2a55; }
 
+/* ════════════ SHADOWRUN per-skin CHAT CHROME (jen barva/font, žádný ornament — policy §3)
+ * Stejná mechanika jako pi: `--sr-log-*` skinu žijí na POTOMKU (DiarySkinScope),
+ * na chrome `.panel` nedosáhnou → per-skin cílíme `.panel:has([…][data-diary-skin='X'])`
+ * s LITERÁLNÍMI hodnotami skinu (= z shadowrun-skins/X.css). Surface OPAQUE.
+ * Bez per-skin bloku by chrome spadl na baseline scifi pro všechny skiny. */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='scifi']) {
+  background: #0e0f1e;
+  border-left-color: rgba(56, 224, 255, 0.3);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='scifi']) .identity {
+  border-bottom-color: rgba(56, 224, 255, 0.22);
+  background: color-mix(in srgb, #38e0ff 8%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='scifi']) .name {
+  color: #aeb8d4;
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='scifi']) .avatar {
+  border-color: #38e0ff;
+  box-shadow: 0 0 16px color-mix(in srgb, #38e0ff 30%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='scifi']) .iconBtn { color: #76809a; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='scifi']) .iconBtn:hover {
+  color: #aeb8d4;
+  background: color-mix(in srgb, #38e0ff 16%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='scifi']) .avatarFallback { color: #76809a; }
+
+/* fantasy — pergamen + zlato */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='fantasy']) {
+  background: #241c0e;
+  border-left-color: rgba(227, 185, 74, 0.4);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='fantasy']) .identity {
+  border-bottom-color: rgba(227, 185, 74, 0.3);
+  background: color-mix(in srgb, #e3b94a 8%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='fantasy']) .name {
+  color: #e3c77a;
+  font-family: 'Cinzel', serif;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='fantasy']) .avatar {
+  border-color: #e3b94a;
+  box-shadow: 0 0 16px color-mix(in srgb, #e3b94a 30%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='fantasy']) .iconBtn { color: #b89a6a; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='fantasy']) .iconBtn:hover {
+  color: #e3c77a;
+  background: color-mix(in srgb, #e3b94a 16%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='fantasy']) .avatarFallback { color: #b89a6a; }
+
+/* horror — půlnoční stříbro + oxblood */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='horror']) {
+  background: #181520;
+  border-left-color: rgba(200, 196, 207, 0.3);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='horror']) .identity {
+  border-bottom-color: rgba(200, 196, 207, 0.22);
+  background: color-mix(in srgb, #a2283a 8%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='horror']) .name {
+  color: #c8c4cf;
+  font-family: 'Cormorant SC', serif;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='horror']) .avatar {
+  border-color: #c8c4cf;
+  box-shadow: 0 0 16px color-mix(in srgb, #a2283a 30%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='horror']) .iconBtn { color: #ad9aa2; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='horror']) .iconBtn:hover {
+  color: #ece2e6;
+  background: color-mix(in srgb, #a2283a 16%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='horror']) .avatarFallback { color: #ad9aa2; }
+
+/* steampunk — mosaz/bronz */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='steampunk']) {
+  background: #241a0e;
+  border-left-color: rgba(201, 138, 60, 0.4);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='steampunk']) .identity {
+  border-bottom-color: rgba(201, 138, 60, 0.3);
+  background: color-mix(in srgb, #c98a3c 8%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='steampunk']) .name {
+  color: #d6a45a;
+  font-family: 'Cinzel', serif;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='steampunk']) .avatar {
+  border-color: #c98a3c;
+  box-shadow: 0 0 16px color-mix(in srgb, #c98a3c 30%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='steampunk']) .iconBtn { color: #a8895e; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='steampunk']) .iconBtn:hover {
+  color: #d6a45a;
+  background: color-mix(in srgb, #c98a3c 16%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='steampunk']) .avatarFallback { color: #a8895e; }
+
+/* nature — lesní zeleň */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='nature']) {
+  background: #172310;
+  border-left-color: rgba(123, 168, 58, 0.36);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='nature']) .identity {
+  border-bottom-color: rgba(123, 168, 58, 0.28);
+  background: color-mix(in srgb, #7ba83a 8%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='nature']) .name {
+  color: #9bc24a;
+  font-family: 'Marcellus SC', serif;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='nature']) .avatar {
+  border-color: #7ba83a;
+  box-shadow: 0 0 16px color-mix(in srgb, #7ba83a 30%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='nature']) .iconBtn { color: #bccb98; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='nature']) .iconBtn:hover {
+  color: #eef0d4;
+  background: color-mix(in srgb, #7ba83a 16%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='nature']) .avatarFallback { color: #bccb98; }
+
+/* minimal — světlý papír, tmavý text (POZOR: světlý surface) */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='minimal']) {
+  background: #efebe1;
+  border-left-color: rgba(40, 38, 32, 0.45);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='minimal']) .identity {
+  border-bottom-color: rgba(40, 38, 32, 0.18);
+  background: color-mix(in srgb, #5a5346 7%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='minimal']) .name {
+  color: #282620;
+  font-family: 'Fraunces', serif;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='minimal']) .avatar {
+  border-color: #5a5346;
+  box-shadow: 0 0 14px color-mix(in srgb, #5a5346 22%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='minimal']) .iconBtn { color: #8d8779; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='minimal']) .iconBtn:hover {
+  color: #4d4a42;
+  background: color-mix(in srgb, #5a5346 12%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='minimal']) .avatarFallback { color: #8d8779; }
+
+/* retro — neon cyan na temně fialové */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='retro']) {
+  background: #0d0320;
+  border-left-color: rgba(54, 240, 208, 0.4);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='retro']) .identity {
+  border-bottom-color: rgba(54, 240, 208, 0.3);
+  background: color-mix(in srgb, #36f0d0 8%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='retro']) .name {
+  color: #36f0d0;
+  font-family: 'VT323', monospace;
+  letter-spacing: 0.04em;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='retro']) .avatar {
+  border-color: #36f0d0;
+  box-shadow: 0 0 16px color-mix(in srgb, #36f0d0 30%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='retro']) .iconBtn { color: #2aa896; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='retro']) .iconBtn:hover {
+  color: #36f0d0;
+  background: color-mix(in srgb, #36f0d0 16%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='retro']) .avatarFallback { color: #2aa896; }
+
+/* anime = MLP SVĚTLÝ duhový cel-shade (bílý rail, ink obrys, duhová identity) */
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) {
+  background: #fffafd;
+  border-left-color: #2a2350;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) .identity {
+  border-bottom-color: #2a2350;
+  background: linear-gradient(110deg, #ffd1ec, #e3d3ff 48%, #cfeeff);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) .name {
+  color: #ffffff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  text-shadow: 0 2px 0 #2a2350;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) .avatar {
+  border: 2px solid #2a2350;
+  background: linear-gradient(135deg, #ff9ad8, #5ad1ff);
+  color: #fff;
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) .iconBtn { color: #8f7fb5; }
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) .iconBtn:hover {
+  color: #c44bbf;
+  background: color-mix(in srgb, #ff6ad5 14%, transparent);
+}
+.panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) .avatarFallback { color: #fff; }
+
 /* ════════════ 16.2e — CHAT OBAL (rail): per-skin SIGNATURE ornament ════════════
  * Parita s ORCHESTRACE (MapPjPanel) + deníkem. Skin nese vlastní TVAR, ne jen
  * barvu. Zdroj pravdy: file:///C:/tmp/<sys>-skins/<skin>/index.html sekce

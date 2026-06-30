@@ -1,0 +1,128 @@
+/* Shadowrun 6e — skin „anime" 🦄 (= MLP, id zůstává `anime`).
+ * SVĚTLÝ + DUHOVÝ cel-shade key visual: pastelová obloha, bílé karty s tmavě
+ * fialovým ink obrysem (#2a2350) + tvrdý spodní cel-stín, duhový hero/portrét,
+ * ✦ sparkles, holografický gloss. Text tmavě fialový (čitelný na světlém).
+ * Scoped [data-diary-system='shadowrun'][data-diary-skin='anime'].
+ * Font display = Bricolage Grotesque (v globálním @import diary-skins.css).
+ */
+[data-diary-system='shadowrun'][data-diary-skin='anime'] {
+  --mx-bg: radial-gradient(900px 380px at 80% -10%, #ffe3f4, transparent 60%),
+    radial-gradient(700px 320px at 10% 0%, #dbecff, transparent 55%),
+    linear-gradient(170deg, #fbf3ff, #eaf3ff);
+  --mx-panel: #fffafd;
+  --mx-text: #3b2f5c;
+  --mx-muted: #8f7fb5;
+  --mx-dim: #b6a9d4;
+  --mx-accent: #ff6ad5;
+  --mx-violet: #a06aff;
+  --mx-gold: #ffb02e;
+  --mx-danger: #ff5d72;
+  --mx-green: #37cf8a;
+  --mx-line: rgba(160, 106, 255, 0.16);
+  --mx-line-strong: #2a2350;
+
+  --mx-font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --mx-font-body: 'Outfit', system-ui, sans-serif;
+  --mx-font-num: 'Outfit', system-ui, sans-serif;
+  --mx-font-brand: 'Bricolage Grotesque', sans-serif;
+
+  --mx-sheet-radius: 16px;
+  --mx-title-color: #c44bbf;
+  --mx-hero-bg: linear-gradient(110deg, #ffd1ec, #e3d3ff 48%, #cfeeff);
+  --mx-hero-border: 2px solid #2a2350;
+  --mx-name-color: #ffffff;
+  --mx-name-glow: 0 2px 0 #2a2350, 0 0 16px rgba(255, 255, 255, 0.6);
+  --mx-row-bg: #fbf6ff;
+  --mx-seg-off: #ece2fb;
+  --mx-accent-border: #2a2350;
+  --mx-clip: none;
+
+  /* sémantické záznamníky (cel-shade) */
+  --sr-phys-fill: linear-gradient(180deg, #ff9ab0, #ff5d72);
+  --sr-stun-fill: linear-gradient(180deg, #ffd76a, #ffb02e);
+  --sr-attr-bar: linear-gradient(180deg, #6fd1ff, #3fb9ff);
+  --sr-attr-bar-m: linear-gradient(180deg, #c4a6ff, #a06aff);
+  --sr-edge-on: linear-gradient(180deg, #ff9ad8, #ff6ad5);
+
+  /* embed / dice (OPAQUE světlý) */
+  --sr-log-surface: #fffafd;
+  --sr-log-border: rgba(160, 106, 255, 0.3);
+  --sr-log-title: #c44bbf;
+  --sr-log-chip: #f7eeff;
+  --sr-log-num: #3b2f5c;
+  --sr-log-num-font: 'Outfit', sans-serif;
+  --sr-log-total: #ffb02e;
+  --sr-log-total-pos: #3fb9ff;
+  --sr-log-total-neg: #ff5d72;
+  --sr-log-total-shadow: 0 0 10px rgba(255, 106, 213, 0.4);
+  --sr-log-eq-font: 'Outfit', sans-serif;
+  --sr-log-skillmod: #a06aff;
+  --sr-log-eq: #8f7fb5;
+  --sr-log-head-font: 'Bricolage Grotesque', sans-serif;
+}
+
+/* ── panely = bílá karta, ink obrys + tvrdý spodní cel-stín ── */
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sr-panel {
+  position: relative;
+  border: 2px solid #2a2350;
+  box-shadow: 0 5px 0 -1px #2a2350;
+}
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sr-hero {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #2a2350;
+}
+/* SIGNATURE: holografický conic star-burst gloss (TR) */
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sr-hero::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -50px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: overlay;
+  background: conic-gradient(
+    from 220deg,
+    rgba(255, 255, 255, 0) 0deg,
+    rgba(255, 255, 255, 0.6) 30deg,
+    rgba(255, 255, 255, 0) 60deg,
+    rgba(255, 255, 255, 0.4) 110deg,
+    rgba(255, 255, 255, 0) 150deg,
+    rgba(255, 255, 255, 0.65) 210deg,
+    rgba(255, 255, 255, 0) 250deg,
+    rgba(255, 255, 255, 0.35) 320deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+}
+/* SIGNATURE: ✦ sparkle na heru */
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sr-hero::before {
+  content: '✦';
+  position: absolute;
+  left: 13px;
+  bottom: 8px;
+  z-index: 3;
+  font-size: 16px;
+  line-height: 1;
+  color: #fff;
+  pointer-events: none;
+  text-shadow: 0 0 8px #3fb9ff, 0 1px 0 #2a2350;
+}
+/* SIGNATURE: růžový ✦ sparkle na sekcích */
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sr-panel::after {
+  content: '✦';
+  position: absolute;
+  right: 11px;
+  top: 11px;
+  z-index: 2;
+  font-size: 12px;
+  line-height: 1;
+  color: #ff6ad5;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #2a2350;
+}
+[data-diary-system='shadowrun'][data-diary-skin='anime'] .sr-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+}

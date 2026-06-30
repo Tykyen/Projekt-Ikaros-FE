@@ -1,0 +1,87 @@
+/* Shadowrun 6e — skin „minimal" 📜 (archivní karta / rýsovací list).
+ * Jediný SVĚTLÝ skin: tmavý text na světlém papíru, preciznost ne zdoba.
+ * Paleta = pergamenový papír + sépiová hnědo-zlatá inkoustová linka.
+ * Signature: dvojitý ledger rám na panelech + registrační kříže v rozích heru.
+ * Scoped [data-diary-system='shadowrun'][data-diary-skin='minimal'].
+ * Fonty Fraunces / Newsreader / Spline Sans Mono (v globálním @import diary-skins.css).
+ */
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] {
+  --mx-bg: #f4f1ea;
+  --mx-panel: #efebe1;
+  --mx-text: #2b2a26;
+  --mx-muted: #6e6a5e;
+  --mx-dim: #a09a88;
+  --mx-accent: #9a7b2e;
+  --mx-violet: #9a7b2e;
+  --mx-gold: #9a7b2e;
+  --mx-danger: #a4442a;
+  --mx-green: #5a7d3a;
+  --mx-line: rgba(40, 38, 32, 0.14);
+  --mx-line-strong: rgba(40, 38, 32, 0.4);
+
+  --mx-font-display: 'Fraunces', serif;
+  --mx-font-body: 'Newsreader', serif;
+  --mx-font-num: 'Spline Sans Mono', monospace;
+  --mx-font-brand: 'Fraunces', serif;
+
+  --mx-sheet-radius: 0;
+  --mx-title-color: #5a5346;
+  --mx-hero-bg: #efebe1;
+  --mx-hero-border: 1px solid rgba(40, 38, 32, 0.4);
+  --mx-name-color: #23211c;
+  --mx-name-glow: none;
+  --mx-row-bg: #eae5da;
+  --mx-seg-off: #ddd8cb;
+  --mx-accent-border: rgba(40, 38, 32, 0.4);
+  --mx-clip: none;
+
+  /* embed / dice (OPAQUE, světlý) */
+  --sr-log-surface: #efebe1;
+  --sr-log-border: rgba(40, 38, 32, 0.45);
+  --sr-log-title: #5a5346;
+  --sr-log-chip: #eae5da;
+  --sr-log-num: #2b2a26;
+  --sr-log-num-font: 'Spline Sans Mono', monospace;
+  --sr-log-total: #9a7b2e;
+  --sr-log-total-pos: #5a7d3a;
+  --sr-log-total-neg: #a4442a;
+  --sr-log-total-shadow: none;
+  --sr-log-eq-font: 'Newsreader', serif;
+  --sr-log-skillmod: #9a7b2e;
+  --sr-log-eq: #6e6a5e;
+  --sr-log-head-font: 'Fraunces', serif;
+}
+
+/* ── SIGNATURE: registrační kříže v rozích heru (rýsovací list) ── */
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sr-hero {
+  position: relative;
+}
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sr-hero::after,
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sr-hero::before {
+  content: '+';
+  position: absolute;
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 15px;
+  line-height: 1;
+  color: rgba(40, 38, 32, 0.55);
+  pointer-events: none;
+  z-index: 2;
+}
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sr-hero::after {
+  top: 7px;
+  right: 8px;
+}
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sr-hero::before {
+  bottom: 7px;
+  left: 8px;
+}
+
+/* ── SIGNATURE: dvojitý ledger rám na panelech ── */
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sr-panel {
+  position: relative;
+  outline: 1px solid rgba(40, 38, 32, 0.4);
+  outline-offset: -5px;
+}
+[data-diary-system='shadowrun'][data-diary-skin='minimal'] .sr-name {
+  font-family: 'Fraunces', serif;
+}

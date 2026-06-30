@@ -214,16 +214,20 @@ export function BestieRollPanel({
             canEdit={false}
           />
         ) : systemId === 'shadowrun' ? (
-          // Shadowrun katalogová bestie (read-only) — jantarový statblok, self-contained.
-          <ShadowrunChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            rollerName={bestie.name}
-            avatarUrl={bestie.imageUrl}
-            systemStats={bestie.systemStats}
-            notes={bestie.notes}
-            canEdit={false}
-          />
+          // Shadowrun katalogová bestie (read-only) — jantarový statblok.
+          // DiarySkinScope → data-diary-skin + --mx-* pro per-skin signature ornament
+          // (.sec) shodně s mapou (ShadowrunBestieBody.module.css).
+          <DiarySkinScope worldId={worldId}>
+            <ShadowrunChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              notes={bestie.notes}
+              canEdit={false}
+            />
+          </DiarySkinScope>
         ) : (
           <>
             <BestieStatblock

@@ -77,6 +77,24 @@
   --sr-attr-bar: linear-gradient(180deg, #5fe9ff, #0ea5c4);
   --sr-attr-bar-m: linear-gradient(180deg, #c4b1ff, #7c3aed);
   --sr-edge-on: linear-gradient(180deg, #fde08a, #fbbf24);
+
+  /* ── Embed / dice kontrakt (OPAQUE surface!) — sourozenec --pi-log-* / --mx-log-*.
+     Čte ho dicelog / readout / obal v TM / chat rail / orchestrace přes
+     `[data-diary-system='shadowrun']` baseline bloky; skin sady přebijí. ── */
+  --sr-log-surface: #0e0f1e;
+  --sr-log-border: rgba(56, 224, 255, 0.3);
+  --sr-log-title: #aeb8d4;
+  --sr-log-chip: #11121f;
+  --sr-log-num: #d6def0;
+  --sr-log-num-font: 'IBM Plex Mono', monospace;
+  --sr-log-total: #fbbf24;
+  --sr-log-total-pos: #38e0ff;
+  --sr-log-total-neg: #f87171;
+  --sr-log-total-shadow: 0 0 12px rgba(56, 224, 255, 0.5);
+  --sr-log-eq-font: 'Chakra Petch', system-ui, sans-serif;
+  --sr-log-skillmod: #a78bfa;
+  --sr-log-eq: #8893b0;
+  --sr-log-head-font: 'Chakra Petch', system-ui, sans-serif;
 }
 
 /* ── Shell ────────────────────────────────────────────── */

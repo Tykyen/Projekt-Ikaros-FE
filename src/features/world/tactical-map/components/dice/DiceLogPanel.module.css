@@ -327,6 +327,53 @@
   color: var(--pi-log-total, var(--pi-gold, #fbbf24));
 }
 
+/* ════════════ SHADOWRUN roll log NESE deníkový skin ════════════
+ * Sourozenec matrix/pi (--sr-log-* token kontrakt). Obaleno DiarySkinScope →
+ * baseline čte --sr-log-* (v shadowrun.css), skin sady (shadowrun-skins/X.css)
+ * je přebijí → log sleduje skin barvou+fontem bez per-skin bloku. ŽÁDNÝ ornament
+ * (jen barva/font — policy §3); čísla nesou skin, +/− drží význam. Surface VŽDY
+ * OPAQUE (bez alfy) — jinak prosvítá mapu; backdrop VYPNUT. Scoped na shadowrun. */
+[data-diary-system='shadowrun'] .panel {
+  background: var(--sr-log-surface, #0e0f1e);
+  border-color: var(--sr-log-border, color-mix(in srgb, #38e0ff 30%, transparent));
+  color: var(--sr-log-eq, #d6def0);
+  backdrop-filter: none;
+}
+[data-diary-system='shadowrun'] .header {
+  border-bottom-color: var(--sr-log-border, color-mix(in srgb, #38e0ff 22%, transparent));
+}
+[data-diary-system='shadowrun'] .title {
+  color: var(--sr-log-title, #aeb8d4);
+  font-family: var(--sr-log-head-font, 'Chakra Petch', system-ui, sans-serif);
+}
+[data-diary-system='shadowrun'] .chip {
+  background: var(--sr-log-chip, color-mix(in srgb, #38e0ff 14%, transparent));
+  color: var(--sr-log-title, #aeb8d4);
+}
+/* jméno + rozpis výpočtu = sekundární text skinu (token --sr-log-eq) */
+[data-diary-system='shadowrun'] .name,
+[data-diary-system='shadowrun'] .breakdown {
+  color: var(--sr-log-eq, #8893b0);
+  font-family: var(--sr-log-eq-font, 'Chakra Petch', system-ui, sans-serif);
+}
+/* čísla nesou skin (font + barva) */
+[data-diary-system='shadowrun'] .faces,
+[data-diary-system='shadowrun'] .total {
+  font-family: var(--sr-log-num-font, monospace);
+}
+[data-diary-system='shadowrun'] .faceNum {
+  color: var(--sr-log-num, #d6def0);
+}
+[data-diary-system='shadowrun'] .totalPositive {
+  color: var(--sr-log-total-pos, #38e0ff);
+}
+[data-diary-system='shadowrun'] .totalNegative {
+  color: var(--sr-log-total-neg, #f87171);
+}
+[data-diary-system='shadowrun'] .totalNeutral {
+  color: var(--sr-log-total, #fbbf24);
+}
+
 /* ════════════ 16.2c-F3 — drd16 roll log NESE deníkový skin ════════════
  * Tokenizováno na `--dd-embed-*` (defaulty v diary-skins.css, loaded i v embedech)
  * → sleduje vybraný drd16 skin (fantasy pergamen, sci-fi void…) barvou+písmem+polaritou.

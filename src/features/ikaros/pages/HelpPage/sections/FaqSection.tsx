@@ -408,6 +408,44 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Jak fungují hody v Shadowrunu (hromada k6, úspěchy)?',
+    a: (
+      <>
+        <p>
+          Shadowrun používá <strong>úspěchový hod</strong> (success pool) — místo
+          jedné kostky a překonání cílového čísla házíš <strong>hromadu k6</strong>:
+        </p>
+        <ul>
+          <li>
+            Číslo u dovednosti nebo útoku (např. <strong>9 k6</strong>) = kolik
+            kostek hodíš.
+          </li>
+          <li>
+            Každá kostka, co padne <strong>5 nebo 6</strong>, je jeden{' '}
+            <strong>úspěch</strong>. Ostatní (1–4) se zahodí. Výsledek hodu = počet
+            úspěchů.
+          </li>
+          <li>
+            Kolik úspěchů potřebuješ, určuje <strong>PJ</strong> podle obtížnosti
+            akce — proto se „cíl" neukládá do statbloku.
+          </li>
+          <li>
+            <strong>Glitch</strong> (komplikace) = víc než polovina kostek padne na{' '}
+            <strong>1</strong>; <strong>kritický glitch</strong> = glitch a zároveň
+            žádný úspěch.
+          </li>
+        </ul>
+        <p>
+          Na taktické mapě i v chatu klikni na <strong>atribut, dovednost nebo
+          útok</strong> ve statbaru postavy/tvora — hod proběhne a v záznamu kostek
+          uvidíš počet úspěchů (a případný glitch). <strong>Iniciativa</strong> je
+          výjimka: Reakce + Intuice + 1k6 (prostý součet, ne úspěchy).
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Jak hledám stránky ve světě?',
     a: (
       <>
