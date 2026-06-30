@@ -24,6 +24,7 @@ import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
 import { DndChatBestiePanel } from './DndChatBestiePanel';
+import { FateChatBestiePanel } from './FateChatBestiePanel';
 import s from './railShell.module.css';
 
 interface Props {
@@ -293,6 +294,20 @@ export function BestieInstancePanel({
               }
             />
           </DiarySkinScope>
+        ) : systemId === 'fae' || systemId === 'fate' ? (
+          // FATE bestie instance v boji — „Karty osudu", editovatelná (onPatch).
+          <FateChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            systemId={systemId}
+            rollerName={combatant.name}
+            avatarUrl={combatant.imageUrl}
+            systemStats={combatant.systemStats}
+            canEdit={canEdit}
+            onPatch={(patch) =>
+              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+            }
+          />
         ) : (
           <BestieStatblock
             token={token}

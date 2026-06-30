@@ -4,6 +4,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — FATE Fáze 5: chat embedy (PC zdarma + bestie panel), 0 drift s mapou · 2026-06-30
+**Kontext:** Skill `system` Fáze 5 (chat rail) pro fae+fate.
+**Co zabralo:** **PC v chatu = ZDARMA** — `DiaryRollPanel` renderuje `COMBAT_PANELS[systemId]`, a fae+fate jsem registroval ve Fázi 3 → nula práce. **Bestie v chatu** = nový `FateChatBestiePanel` (chat/rail), props-driven (systemStats + canEdit + onPatch), napojený do `BestieRollPanel` (katalog, read-only) i `BestieInstancePanel` (instance v boji, editovatelná přes combatant patch). Reuse: nový `FateChatBestiePanel` i mapový `FateBestiePanel` sdílí **`fateBestieView`** (pure adaptér systemStats→view-model + patch helpery) + `FateCombatBody` → 1:1 mapa↔chat, 0 drift. Refactoroval jsem i `FateBestiePanel` na ten helper.
+**Proč správně:** Chat combatant `systemStats` se plní z `buildBestieToken` (plný profil) v `ChatContextRail.addBestie` → panel z něj čte. Chat = BEZ strict schema validace (embedded doc v channel.combatants, ne map token) → onPatch píše volně, **0 BE změn** tuhle fázi. Self-contained module CSS (--fate-*) → bez DiarySkinScope (jako drdplus).
+**Jak ověřeno:** build ✓, 18 testů (chat panel fae+core+editable+readonly, refactor mapy regrese, combat panel). Render = totéž `FateCombatBody` (ověřeno Fáze 3) v railShellu.
+**Zhodnocení:** Dobře — sdílený `fateBestieView` zabránil 3. kopii parse logiky (deník/mapa/chat). **Systém FATE má teď deník + bestiář + mapu + chat.** Zbývá 8 skinů + uzávěr (`funkce`+`napoveda`). PC chat zdarma = výplata za reuse `COMBAT_PANELS` ve fázi 3.
+
+---
+
 ### ✅ ŘEŠENÍ — FATE Fáze 3+4: combat panel (PC) + bestie panel na mapě, sdílené UI jádro · 2026-06-30
 **Kontext:** Skill `system` Fáze 3 (PC combat panel) + 4 (bestie panel na mapě) pro fae+fate. Uživatel: „udělej bestii stejně jako combat panel" → sdílet vzhled.
 **Co zabralo:** Jedno UI jádro `system-panels/fate/FateCombatBody.tsx` (+module.css, Karty osudu, props-driven) sdílí PC i bestie — 0 drift. Dva adaptéry: **PC** `FateCombatPanel` (`FaeCombatPanel`+`FateCombatPanel`, data z deníku `customData` prefix, debounced write) registrované v `COMBAT_PANELS` (fae+fate); **bestie** `FateBestiePanel` (data z `token.systemStats`, autosave) napojený v `TokenSystemSheet` bestie větvi. Combat panel HÁZÍ (🎲 4dF+bonus přes onRoll/onMapRoll) — narozdíl od deníku (záznam). Body osudu počítadlo (default=Obnova), stres klik, následky editovatelné.

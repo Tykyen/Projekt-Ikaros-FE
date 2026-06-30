@@ -14,6 +14,7 @@ import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
 import { DndChatBestiePanel } from './DndChatBestiePanel';
+import { FateChatBestiePanel } from './FateChatBestiePanel';
 import s from './railShell.module.css';
 import b from './BestieRollPanel.module.css';
 
@@ -200,6 +201,17 @@ export function BestieRollPanel({
               canEdit={false}
             />
           </DiarySkinScope>
+        ) : systemId === 'fae' || systemId === 'fate' ? (
+          // FATE katalogová bestie (read-only) — „Karty osudu", self-contained.
+          <FateChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            systemId={systemId}
+            rollerName={bestie.name}
+            avatarUrl={bestie.imageUrl}
+            systemStats={bestie.systemStats}
+            canEdit={false}
+          />
         ) : (
           <>
             <BestieStatblock
