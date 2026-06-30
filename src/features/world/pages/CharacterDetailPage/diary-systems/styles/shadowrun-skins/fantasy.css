@@ -75,26 +75,8 @@
   filter: drop-shadow(0 0 4px rgba(227, 185, 74, 0.55));
 }
 
-/* ── SIGNATURE: kruhový pečetní medailon v pravém horním rohu heru ── */
-[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-hero {
-  position: relative;
-}
-[data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-hero::after {
-  content: '';
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px solid #e3b94a;
-  background: radial-gradient(circle at 50% 38%, rgba(227, 185, 74, 0.55), rgba(227, 185, 74, 0.08) 70%, transparent);
-  box-shadow:
-    0 0 10px rgba(227, 185, 74, 0.5),
-    inset 0 0 6px rgba(227, 185, 74, 0.4);
-  pointer-events: none;
-  z-index: 2;
-}
+/* (Pečetní medailon na heru zrušen — kolidoval s boxy Hrana/Esence vpravo nahoře.
+   Fantasy signature drží 4-rohové filigránové kování panelů + iluminovaná iniciála.) */
 
 /* ── SIGNATURE: iluminovaná iniciála jména ── */
 [data-diary-system='shadowrun'][data-diary-skin='fantasy'] .sr-name {

@@ -70,6 +70,7 @@
 /* SIGNATURE: fialový BR bracket na panelech */
 [data-diary-system='shadowrun'][data-diary-skin='scifi'] .sr-panel {
   position: relative;
+  overflow: hidden;
 }
 [data-diary-system='shadowrun'][data-diary-skin='scifi'] .sr-panel::after {
   content: '';

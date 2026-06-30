@@ -5,20 +5,25 @@
  * JANTAROVÝ akcent (oddělí tvora od PC modré/fialové na mapě).
  */
 .root {
-  --srb-text: #d6def0;
-  --srb-muted: #76809a;
-  --srb-dim: #444b63;
-  --srb-accent: #38e0ff;
-  --srb-violet: #a78bfa;
-  --srb-gold: #fbbf24;
-  --srb-danger: #f87171;
-  --srb-green: #4ade80;
+  /* tokeny DĚDÍ aktivní skin přes var(--mx-*) (DiarySkinScope na předku);
+     fallback = sci-fi default (bez skinu). JANTAR --srb-bestie zůstává napříč
+     skiny jako AKCENT (tvor-signál: border atributů/řádků, marker, init). */
+  --srb-text: var(--mx-text, #d6def0);
+  --srb-muted: var(--mx-muted, #76809a);
+  --srb-dim: var(--mx-dim, #444b63);
+  --srb-accent: var(--mx-accent, #38e0ff);
+  --srb-violet: var(--mx-violet, #a78bfa);
+  --srb-gold: var(--mx-gold, #fbbf24);
+  --srb-danger: var(--mx-danger, #f87171);
+  --srb-green: var(--mx-green, #4ade80);
   --srb-bestie: #fb923c;
-  --srb-power: #a78bfa;
-  --srb-seg-off: #1a1d2e;
-  --srb-line: rgba(255, 255, 255, 0.08);
-  --srb-fn: 'Chakra Petch', system-ui, sans-serif;
-  --srb-fnum: 'IBM Plex Mono', ui-monospace, monospace;
+  --srb-power: var(--mx-violet, #a78bfa);
+  --srb-seg-off: var(--mx-seg-off, #1a1d2e);
+  --srb-line: var(--mx-line, rgba(255, 255, 255, 0.08));
+  --srb-surface: var(--mx-bg, linear-gradient(180deg, #160f0c, #0d0a08));
+  --srb-row: var(--mx-row-bg, linear-gradient(90deg, #181009, #120c08));
+  --srb-fn: var(--mx-font-body, 'Chakra Petch', system-ui, sans-serif);
+  --srb-fnum: var(--mx-font-num, 'IBM Plex Mono', ui-monospace, monospace);
   --srb-clip: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
 
   position: relative;
@@ -27,8 +32,8 @@
   gap: 11px;
   padding: 13px;
   color: var(--srb-text);
-  background: linear-gradient(180deg, #160f0c, #0d0a08);
-  border: 1px solid rgba(251, 146, 60, 0.3);
+  background: var(--srb-surface);
+  border: 1px solid var(--mx-accent-border, rgba(251, 146, 60, 0.3));
   box-shadow: 0 20px 60px -30px #000, inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 .root::before {
@@ -57,7 +62,7 @@
   margin: 0;
   font: 700 17px var(--srb-fn);
   letter-spacing: 0.04em;
-  color: #ffe8d6;
+  color: var(--mx-name-color, #ffe8d6);
   line-height: 1.1;
 }
 .sub {
@@ -103,7 +108,7 @@
   font: 700 10px var(--srb-fn);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #d9b89c;
+  color: var(--mx-title-color, #d9b89c);
 }
 .stitle::before {
   content: '';
@@ -203,7 +208,7 @@
   flex: 1 1 0;
   min-width: 58px;
   text-align: center;
-  background: #140d0a;
+  background: var(--srb-row);
   border: 1px solid var(--srb-line);
   padding: 5px 7px;
   clip-path: var(--srb-clip);
@@ -245,7 +250,7 @@
   text-align: center;
   cursor: pointer;
   padding: 5px 6px;
-  background: linear-gradient(90deg, #181009, #120c08);
+  background: var(--srb-row);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-bottom: 2px solid var(--srb-bestie);
   color: var(--srb-text);
@@ -285,7 +290,7 @@
   text-align: left;
   cursor: pointer;
   padding: 6px 9px;
-  background: linear-gradient(90deg, #181009, #120c08);
+  background: var(--srb-row);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-left: 2px solid var(--srb-bestie);
   color: var(--srb-text);
@@ -328,11 +333,11 @@
   align-items: baseline;
   gap: 3px;
   font: 700 13px var(--srb-fnum);
-  color: #c4b1ff;
+  color: var(--mx-violet, #c4b1ff);
 }
 .rpool b {
   font-size: 16px;
-  color: #c4b1ff;
+  color: var(--mx-violet, #c4b1ff);
 }
 .rpool small {
   color: var(--srb-dim);
@@ -343,13 +348,13 @@
 /* schopnosti */
 .power {
   padding: 6px 9px;
-  background: #120c08;
+  background: var(--srb-row);
   border: 1px solid var(--srb-line);
   border-left: 2px solid var(--srb-power);
 }
 .powerName {
   font: 600 11px var(--srb-fn);
-  color: #cbb6f5;
+  color: var(--mx-violet, #cbb6f5);
 }
 .powerDesc {
   margin-top: 2px;
@@ -358,7 +363,7 @@
 }
 .notes {
   padding: 8px 10px;
-  background: #120c08;
+  background: var(--srb-row);
   border: 1px solid var(--srb-line);
   font: 500 11px/1.6 var(--srb-fnum);
   color: var(--srb-muted);

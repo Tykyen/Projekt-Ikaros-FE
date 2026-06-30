@@ -139,6 +139,7 @@
   background: var(--mx-panel-bg);
   border: var(--mx-panel-border);
   clip-path: var(--mx-clip);
+  overflow: hidden;
   padding: 16px 18px;
 }
 [data-diary-system='shadowrun'] .sr-panel--accent {
@@ -201,6 +202,7 @@
   background: var(--mx-hero-bg);
   border: var(--mx-hero-border);
   clip-path: var(--mx-clip-hero);
+  overflow: hidden;
   padding: 18px 22px;
 }
 [data-diary-system='shadowrun'] .sr-portrait {
@@ -296,7 +298,7 @@
   gap: 12px;
   padding: 7px 12px;
   border: 1px solid var(--mx-line);
-  background: #0c0d1a;
+  background: var(--mx-row-bg, #0c0d1a);
   clip-path: var(--mx-clip-small);
 }
 [data-diary-system='shadowrun'] .sr-bigstat .lab {
@@ -428,7 +430,7 @@
   justify-content: space-between;
   gap: 8px;
   padding: 8px 11px;
-  background: #0c0d1a;
+  background: var(--mx-row-bg, #0c0d1a);
   border: 1px solid var(--mx-line);
 }
 [data-diary-system='shadowrun'] .sr-derv .d .lab {

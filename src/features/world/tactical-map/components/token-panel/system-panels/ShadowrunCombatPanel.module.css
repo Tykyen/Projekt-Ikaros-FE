@@ -146,7 +146,7 @@
 }
 .chip {
   flex: 1;
-  background: #0c0d1a;
+  background: var(--mx-row-bg, #0c0d1a);
   border: 1px solid var(--mx-line, rgba(255, 255, 255, 0.08));
   padding: 5px 7px;
   text-align: center;
@@ -223,7 +223,7 @@
   gap: 5px;
 }
 .derv .d {
-  background: #0c0d1a;
+  background: var(--mx-row-bg, #0c0d1a);
   border: 1px solid var(--mx-line, rgba(255, 255, 255, 0.08));
   padding: 5px 7px;
   display: flex;

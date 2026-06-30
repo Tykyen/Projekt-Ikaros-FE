@@ -67,19 +67,8 @@
     radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) 9px bottom 9px / 6px 6px no-repeat,
     radial-gradient(circle at center, #e0a85a 0 2.5px, transparent 3px) right 9px bottom 9px / 6px 6px no-repeat;
 }
-/* ozubené kolo ⚙ v pravém horním rohu */
-[data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-hero::after {
-  content: '\2699';
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 24px;
-  line-height: 1;
-  color: #c98a3c;
-  text-shadow: 0 0 10px rgba(201, 138, 60, 0.6);
-  pointer-events: none;
-  z-index: 2;
-}
+/* (Ozubené kolo ⚙ na heru zrušeno — kolidovalo s boxy Hrana/Esence vpravo nahoře.
+   Steampunk signature drží rohové nýty hera + spodní nýtová kolejnice panelů.) */
 /* SIGNATURE: spodní nýtová kolejnice na panelech */
 [data-diary-system='shadowrun'][data-diary-skin='steampunk'] .sr-panel {
   position: relative;

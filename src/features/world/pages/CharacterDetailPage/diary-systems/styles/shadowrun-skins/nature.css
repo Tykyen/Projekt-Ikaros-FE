@@ -52,48 +52,10 @@
   --sr-log-head-font: 'Marcellus SC', serif;
 }
 
-/* ── SIGNATURE: hero letokruhový terč (TL) + list (TR) ── */
-[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-hero {
-  position: relative;
-}
-[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-hero::before {
-  content: '';
-  position: absolute;
-  left: 12px;
-  top: 12px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    transparent 0 6px,
-    rgba(155, 194, 74, 0.5) 6px 8px,
-    transparent 8px 14px,
-    rgba(123, 168, 58, 0.5) 14px 16px,
-    transparent 16px 22px,
-    rgba(155, 194, 74, 0.4) 22px 24px,
-    transparent 24px 30px,
-    rgba(123, 168, 58, 0.35) 30px 32px,
-    transparent 32px
-  );
-  opacity: 0.4;
-  pointer-events: none;
-  z-index: 2;
-}
-[data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-hero::after {
-  content: '\2767';
-  position: absolute;
-  right: 14px;
-  top: 10px;
-  font-size: 26px;
-  line-height: 1;
-  color: #9bc24a;
-  transform: rotate(12deg);
-  text-shadow: 0 0 10px rgba(123, 168, 58, 0.4);
-  pointer-events: none;
-  z-index: 2;
-}
-/* SIGNATURE: rašící úponek v TL rohu panelů */
+/* (Letokruhový terč + list ❧ na heru zrušeny — terč překrýval portrét, list
+   kolidoval s boxy Hrana/Esence. Nature signature drží rašící úponek panelů.) */
+
+/* ── SIGNATURE: rašící úponek v TL rohu panelů ── */
 [data-diary-system='shadowrun'][data-diary-skin='nature'] .sr-panel {
   position: relative;
 }
