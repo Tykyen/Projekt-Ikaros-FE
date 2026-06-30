@@ -12,11 +12,17 @@
  * 8.7q — `mixed` (JaD skládaný zásah) a `critOnD20` (JaD fatální úspěch/neúspěch)
  * zrcadlí `rollFromSheet`, ať combat panel funguje v chatu stejně jako na mapě.
  */
-import { rollFate, rollGenericDice, rollMixedDice } from './rollEngine';
+import {
+  rollFate,
+  rollGenericDice,
+  rollMixedDice,
+  rollPoolHits,
+} from './rollEngine';
 import {
   buildFatePayload,
   buildGenericPayload,
   buildMixedPayload,
+  buildPoolHitsPayload,
   type DicePayload,
 } from './dicePayload';
 import { formatFateMessage, formatGenericDiceMessage } from './formatMessage';
@@ -33,7 +39,8 @@ export type DiaryRollKind =
   | 'd12'
   | 'd20'
   | 'd100'
-  | 'mixed';
+  | 'mixed'
+  | 'pool-d6';
 
 export interface DiaryRollRequest {
   /** Lidský popisek — jméno schopnosti / „Iniciativa". */
@@ -46,6 +53,8 @@ export interface DiaryRollRequest {
   critOnD20?: boolean;
   /** JaD (8.7q) skládaný hod zásahu (`kind:'mixed'`): počty kostek. */
   mixed?: Record<string, number>;
+  /** Shadowrun success-pool (`kind:'pool-d6'`): počet kostek (úspěchy 5–6 + glitch). */
+  pool?: number;
 }
 
 export interface DiaryRollResult {
@@ -62,6 +71,21 @@ export function rollDiaryRequest(
   req: DiaryRollRequest,
 ): DiaryRollResult | null {
   const { label, modifier = 0, kind = 'fate' } = req;
+
+  // Shadowrun success-pool: `pool` × k6, úspěchy (5–6) + glitch (ne součet).
+  if (typeof req.pool === 'number' && kind.startsWith('pool-')) {
+    const sides = parseInt(kind.replace('pool-d', ''), 10) || 6;
+    const r = rollPoolHits(req.pool, sides);
+    const gl = r.criticalGlitch
+      ? ' · KRITICKÝ GLITCH'
+      : r.glitch
+        ? ' · glitch'
+        : '';
+    return {
+      dicePayload: buildPoolHitsPayload(r, { label }),
+      content: `🎲 ${label}: ${r.hits} úspěchů (${req.pool}k6)${gl}`,
+    };
+  }
 
   if (kind === 'fate') {
     const r = rollFate();

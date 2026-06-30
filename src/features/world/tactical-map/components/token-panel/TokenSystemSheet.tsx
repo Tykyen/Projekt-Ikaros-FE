@@ -234,6 +234,7 @@ export function TokenSystemSheet({
       kind: req.kind,
       critOnD20: req.critOnD20,
       mixed: req.mixed,
+      pool: req.pool,
       rollerName,
     });
     if (!res) return;

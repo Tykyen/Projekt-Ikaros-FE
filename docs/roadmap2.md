@@ -435,9 +435,9 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Skiny (→ 16.2c)
 - **Shadowrun** (`shadowrun`) — *přes skill `system`; default skin scifi (HUD --mx- rodina)*
   - [x] **Reálný list (grafika)** — ✅ 2026-06-30 cyberpunk HUD redesign (přepis legacy 8.7k portu → tokenizovaný `.sr-*`, výpočetní jádro: 8 atr→odvozené hodnoty + záznamníky 8+⌈atr/2⌉, zranění −1/3 do poolů, pool dovednosti/zbraně = atr+dov+spec; Matrix A/M/Z/F+záznamník, kouzla/adept, augmentace s esencí, HO=Tělo+zbroj). View/edit/print, PC/NPC, `sr_` klíče reuse. Ověřeno build+9 testů+render desktop/mobil; vizuál po deployi. **Bez hodů v deníku** (kostky až TM/chat). **⚠️ DLUH:** roll-engine `rollPool` neumí úspěchy(5–6)/glitch → SR6 hody zapojit s rozšířením enginu ve fázi mapa/chat.
-  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel + pool-hit engine)
+  - [x] **Taktická mapa (grafika + hody)** — ✅ 2026-06-30 `ShadowrunCombatPanel` (kompaktní celý deník: stav/atributy/odvozené/útoky/dovednosti + detaily Kouzla/Matrix/Augmentace/Kvality/Kontakty/Identita v centrovaném `Modal`u reusujícím deníkové sekce; sdílená matematika `shared.ts` = 0 drift s listem). **Roll-engine rozšířen o SR6 success-pool** (`rollPoolHits` úspěchy 5–6 + glitch; `kind:'pool-d6'`+`pool` v performSheetRoll/rollFromDiary; vykreslení v DiceLogPanel + DiceRollOverlay — kostky 5–6 zvýrazněné, glitch). HP bar na tokenu = fyzický záznamník (`resolveCharacterHp` case shadowrun). Registrováno v `COMBAT_PANELS`. Ověřeno build+78 testů+render. **Chat dědí panel zdarma** (DiaryRollPanel → COMBAT_PANELS).
   - [ ] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
+  - [x] Chat (→ 16.1) — ✅ zdarma s combat panelem (`DiaryRollPanel` → `COMBAT_PANELS['shadowrun']`, hody → chat přes `rollFromDiary` pool); čeká živé potvrzení
   - [ ] Skiny (→ 16.2c)
 - **GURPS** (`gurps`) — *stav kódu:* list sheet+testy, mapa combat panel `GurpsCombatPanel`
   - [ ] Reálný list (grafika)

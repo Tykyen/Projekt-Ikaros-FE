@@ -1,0 +1,352 @@
+/* Shadowrun 6e — kompaktní combat panel (taktická mapa + chat rail).
+ *
+ * Sci-fi HUD rodina (--mx-* tokeny). Panel je uvnitř DiarySkinScope
+ * [data-diary-system='shadowrun'] → token defaulty z shadowrun.css (statický
+ * import) jsou dostupné; module třídy jsou hashované, paletu berou přes var().
+ *
+ * Bojové jádro vždy nahoře (stav · atributy · odvozené · útoky · dovednosti),
+ * detaily (Kouzla/Matrix/Augmentace/Kvality/Kontakty/Identita) v centrovaném
+ * modalu (reuse deníkových sekcí). Klik na atribut/dovednost/útok = SR6 pool
+ * hod → dicelog. Stavy přes data-* atributy.
+ */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  font-family: var(--mx-font-body, 'Chakra Petch', sans-serif);
+  color: var(--mx-text, #d6def0);
+}
+.loading,
+.empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--mx-muted, #76809a);
+  font: 500 13px var(--mx-font-num, monospace);
+}
+
+.phead {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.initBtn {
+  cursor: pointer;
+  border: 1px solid var(--mx-line-strong, rgba(56, 224, 255, 0.4));
+  background: var(--mx-log-chip, rgba(56, 224, 255, 0.1));
+  color: var(--mx-accent, #bdefff);
+  font: 700 11px var(--mx-font-num, monospace);
+  letter-spacing: 0.04em;
+  padding: 6px 11px;
+}
+.initBtn:hover {
+  filter: brightness(1.2);
+}
+
+.sec {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-top: 1px solid var(--mx-line, rgba(255, 255, 255, 0.08));
+  padding-top: 9px;
+}
+.sec.first {
+  border-top: 0;
+  padding-top: 0;
+}
+.stitle {
+  font: 700 10px var(--mx-font-display, 'Chakra Petch', sans-serif);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mx-title-color, #aeb8d4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.stitle::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--mx-accent, #38e0ff);
+  transform: rotate(45deg);
+}
+.stitle.atk {
+  color: #fca5a5;
+}
+.stitle .hint {
+  font: 500 9px var(--mx-font-num, monospace);
+  letter-spacing: 0.04em;
+  color: var(--mx-dim, #444b63);
+  text-transform: none;
+}
+
+/* condition tracks */
+.cond {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.chead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.clab {
+  font: 600 10px var(--mx-font-display, sans-serif);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.clab.phys {
+  color: var(--sr-phys, #f87171);
+}
+.clab.stun {
+  color: var(--sr-stun, #fbbf24);
+}
+.cpen {
+  font: 700 11px var(--mx-font-num, monospace);
+  color: var(--mx-danger, #f87171);
+}
+.track {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.box {
+  width: 19px;
+  height: 19px;
+  background: var(--mx-seg-off, #1a1d2e);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+}
+.box.click {
+  cursor: pointer;
+}
+.box.onPhys {
+  background: var(--sr-phys-fill, linear-gradient(180deg, #fb8787, #dc2626));
+  border-color: rgba(248, 113, 113, 0.6);
+}
+.box.onStun {
+  background: var(--sr-stun-fill, linear-gradient(180deg, #fcd34d, #d97706));
+  border-color: rgba(251, 191, 36, 0.6);
+}
+.penTotal {
+  font: 600 10px var(--mx-font-num, monospace);
+  color: var(--mx-muted, #76809a);
+  margin-top: 5px;
+}
+.penTotal b {
+  color: var(--mx-danger, #f87171);
+  font-size: 13px;
+}
+
+.chips {
+  display: flex;
+  gap: 7px;
+}
+.chip {
+  flex: 1;
+  background: #0c0d1a;
+  border: 1px solid var(--mx-line, rgba(255, 255, 255, 0.08));
+  padding: 5px 7px;
+  text-align: center;
+}
+.chip .l {
+  font: 600 9px var(--mx-font-display, sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mx-muted, #76809a);
+  display: block;
+}
+.chip .v {
+  font: 700 15px var(--mx-font-num, monospace);
+}
+.chip.edge .v {
+  color: var(--mx-gold, #fbbf24);
+}
+.chip.def .v {
+  color: var(--mx-accent, #38e0ff);
+}
+.chip.arm .v {
+  color: var(--mx-violet, #a78bfa);
+}
+.chip.ess .v {
+  color: var(--mx-accent, #38e0ff);
+}
+.chip input {
+  width: 100%;
+  background: #0a0b16;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: inherit;
+  text-align: center;
+  font: 700 14px var(--mx-font-num, monospace);
+  padding: 1px;
+}
+
+/* atributy grid */
+.attrs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.attr {
+  background: var(--mx-row-bg, linear-gradient(90deg, #10111f, #0d0e1a));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 2px solid var(--mx-accent, #38e0ff);
+  padding: 5px 6px;
+  text-align: center;
+  color: inherit;
+  font: inherit;
+}
+.attr.click {
+  cursor: pointer;
+}
+.attr.click:hover {
+  background: #13152a;
+}
+.attr.mental {
+  border-bottom-color: var(--mx-violet, #a78bfa);
+}
+.attr .c {
+  font: 600 9px var(--mx-font-num, monospace);
+  color: var(--mx-muted, #76809a);
+}
+.attr .v {
+  font: 700 17px var(--mx-font-num, monospace);
+  color: var(--mx-text, #d6def0);
+}
+
+/* odvozené */
+.derv {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+.derv .d {
+  background: #0c0d1a;
+  border: 1px solid var(--mx-line, rgba(255, 255, 255, 0.08));
+  padding: 5px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.derv .d .l {
+  font: 600 8px var(--mx-font-display, sans-serif);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mx-muted, #76809a);
+}
+.derv .d .v {
+  font: 700 13px var(--mx-font-num, monospace);
+  color: var(--mx-accent, #38e0ff);
+}
+.derv .d .v small {
+  color: var(--mx-dim, #444b63);
+  font-size: 9px;
+}
+
+/* rows (skills/weapons) — celé klikací = hod */
+.rowbtn {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  background: var(--mx-row-bg, linear-gradient(90deg, #10111f, #0d0e1a));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--mx-accent, #38e0ff);
+  padding: 6px 9px;
+  color: var(--mx-text, #d6def0);
+  font: inherit;
+}
+.rowbtn:hover {
+  border-color: var(--mx-line-strong, rgba(56, 224, 255, 0.4));
+  background: #13152a;
+}
+.rowbtn:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.rowbtn.atk {
+  border-left-color: var(--sr-phys, #f87171);
+}
+.rn {
+  font: 500 12px var(--mx-font-body, sans-serif);
+}
+.rn small {
+  display: block;
+  color: var(--mx-dim, #444b63);
+  font: 500 9px var(--mx-font-num, monospace);
+}
+.rchip {
+  font: 700 9px var(--mx-font-num, monospace);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 1px solid var(--mx-line-strong, rgba(56, 224, 255, 0.27));
+  color: var(--mx-accent, #38e0ff);
+  background: rgba(56, 224, 255, 0.06);
+  white-space: nowrap;
+}
+.rchip.dmg {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.08);
+}
+.rpool {
+  font: 700 13px var(--mx-font-num, monospace);
+  color: var(--mx-violet, #a78bfa);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+.rpool b {
+  font-size: 16px;
+  color: #c4b1ff;
+}
+.rpool small {
+  color: var(--mx-dim, #444b63);
+  font-weight: 500;
+  font-size: 9px;
+}
+.rpool .die {
+  margin-left: 3px;
+  opacity: 0.85;
+}
+
+/* detaily tlačítka */
+.openbtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.openbtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  background: #0c0d1a;
+  border: 1px solid var(--mx-line, rgba(255, 255, 255, 0.08));
+  color: var(--mx-text, #d6def0);
+  font: 600 11px var(--mx-font-body, sans-serif);
+  padding: 9px 11px;
+  text-align: left;
+}
+.openbtn:hover {
+  border-color: var(--mx-line-strong, rgba(56, 224, 255, 0.4));
+  background: #13152a;
+}
+.openbtn .cnt {
+  margin-left: auto;
+  font: 600 9px var(--mx-font-num, monospace);
+  color: var(--mx-dim, #444b63);
+}
+
+/* modal scope (obsah shared Modalu) — obaleno [data-diary-system='shadowrun'] */
+.modalScope {
+  display: flex;
+  flex-direction: column;
+}

@@ -180,6 +180,21 @@
   color: rgb(var(--map-ui-muted-rgb) / 0.7);
 }
 
+/* SR6 success-pool: úspěch (5–6) zvýrazněn, jednička ztlumeně červená. */
+.faceHit {
+  color: rgb(var(--map-ui-accent-bright-rgb) / 0.95);
+  text-shadow: 0 0 6px rgb(var(--map-ui-accent-rgb) / 0.45);
+}
+.faceOne {
+  color: rgb(var(--map-ui-danger-rgb) / 0.7);
+}
+.totalGlitch {
+  color: rgb(var(--map-ui-gold-rgb) / 0.95);
+}
+.totalCritGlitch {
+  color: rgb(var(--map-ui-danger-rgb) / 0.95);
+}
+
 .total {
   font-weight: 900;
   margin-left: auto;

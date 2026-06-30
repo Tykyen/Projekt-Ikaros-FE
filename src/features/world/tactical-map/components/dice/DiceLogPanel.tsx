@@ -12,7 +12,11 @@
 import { useState } from "react";
 import { canSeeRoll } from "../../utils/diceVisibility";
 import type { MapDiceRoll } from "../../types";
-import type { DiceFaceValue } from "@/features/world/chat/dice/lib/dicePayload";
+import type {
+  DiceFaceValue,
+  DicePayload,
+  PoolDicePayload,
+} from "@/features/world/chat/dice/lib/dicePayload";
 import type { WorldDiceVisibility } from "@/shared/types";
 import styles from "./DiceLogPanel.module.css";
 
@@ -85,6 +89,40 @@ function totalClass(total: number): string {
   if (total > 0) return styles.totalPositive;
   if (total < 0) return styles.totalNegative;
   return styles.totalNeutral;
+}
+
+/** SR6 success-pool payload (počítají se úspěchy) — jinak `null`. */
+function asPoolHits(p: DicePayload): PoolDicePayload | null {
+  return p.type.startsWith("pool-") &&
+    typeof (p as PoolDicePayload).hits === "number"
+    ? (p as PoolDicePayload)
+    : null;
+}
+
+/** Tváře poolu: úspěch (≥ threshold) zvýrazněn, jednička ztlumena. */
+function renderPoolFaces(faces: number[], threshold: number): React.ReactNode {
+  return faces.map((f, i) => (
+    <span
+      key={i}
+      className={
+        f >= threshold ? styles.faceHit : f === 1 ? styles.faceOne : styles.faceNum
+      }
+    >
+      {f}
+    </span>
+  ));
+}
+
+/** Rozpis poolu: „Střelba · 8k6 · 3× úspěch · glitch". */
+function poolBreakdown(p: PoolDicePayload): string {
+  const n = p.faces.length;
+  const prefix = p.label ? `${p.label} · ` : "";
+  const gl = p.criticalGlitch
+    ? " · KRIT. GLITCH"
+    : p.glitch
+      ? " · glitch"
+      : "";
+  return `${prefix}${n}k6 · ${p.hits ?? 0}× úspěch${gl}`;
 }
 
 /**
@@ -223,7 +261,10 @@ export function DiceLogPanel({
               const recent = now - new Date(r.rolledAt).getTime() < RECENT_MS;
               const total = r.dicePayload.total;
               const crit = r.dicePayload.crit;
-              const breakdown = renderBreakdown(r.dicePayload);
+              const pool = asPoolHits(r.dicePayload);
+              const breakdown = pool
+                ? poolBreakdown(pool)
+                : renderBreakdown(r.dicePayload);
               return (
                 <div
                   key={r.id}
@@ -240,23 +281,46 @@ export function DiceLogPanel({
                   </div>
                   <div className={styles.result}>
                     <span className={styles.faces}>
-                      {renderFaces(r.dicePayload.faces)}
+                      {pool
+                        ? renderPoolFaces(pool.faces, pool.hitThreshold ?? 5)
+                        : renderFaces(r.dicePayload.faces)}
                     </span>
-                    <span
-                      className={`${styles.total} ${
-                        crit === "success"
-                          ? styles.critSuccess
+                    {pool ? (
+                      <span
+                        className={`${styles.total} ${
+                          pool.criticalGlitch
+                            ? styles.totalCritGlitch
+                            : pool.glitch
+                              ? styles.totalGlitch
+                              : styles.totalPositive
+                        }`}
+                        title={
+                          pool.criticalGlitch
+                            ? "Kritický glitch"
+                            : pool.glitch
+                              ? "Glitch"
+                              : undefined
+                        }
+                      >
+                        {pool.hits ?? 0} ú.
+                      </span>
+                    ) : (
+                      <span
+                        className={`${styles.total} ${
+                          crit === "success"
+                            ? styles.critSuccess
+                            : crit === "fail"
+                              ? styles.critFail
+                              : totalClass(total)
+                        }`}
+                      >
+                        {crit === "success"
+                          ? "Fatální úspěch"
                           : crit === "fail"
-                            ? styles.critFail
-                            : totalClass(total)
-                      }`}
-                    >
-                      {crit === "success"
-                        ? "Fatální úspěch"
-                        : crit === "fail"
-                          ? "Fatální neúspěch"
-                          : total}
-                    </span>
+                            ? "Fatální neúspěch"
+                            : total}
+                      </span>
+                    )}
                   </div>
                   {breakdown && (
                     <div className={styles.breakdown}>{breakdown}</div>

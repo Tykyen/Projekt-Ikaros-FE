@@ -101,6 +101,24 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
       resolveCharacterHp('dnd5e', { dnd_hpCur: 5, dnd_hpMax: 10 }),
     ).toEqual({ current: 5, max: 10 });
   });
+
+  // SR6 HP bar = fyzický záznamník: max = 8 + ⌈Tělo/2⌉, zbývá = max − zranění.
+  it('shadowrun: max = 8 + ⌈Tělo/2⌉, zbývá = max − sr_cond_phys', () => {
+    // Tělo 4 → max 10; 3 boxy zranění → zbývá 7.
+    expect(
+      resolveCharacterHp('shadowrun', { sr_attr_bod: '4', sr_cond_phys: '3' }),
+    ).toEqual({ current: 7, max: 10 });
+  });
+
+  it('shadowrun: liché Tělo → ⌈/2⌉ (Tělo 5 → max 11)', () => {
+    expect(
+      resolveCharacterHp('shadowrun', { sr_attr_bod: '5', sr_cond_phys: '0' }),
+    ).toEqual({ current: 11, max: 11 });
+  });
+
+  it('shadowrun: bez dat → min track 8 (plný)', () => {
+    expect(resolveCharacterHp('shadowrun', {})).toEqual({ current: 8, max: 8 });
+  });
 });
 
 describe('resolveCharacterHp — systémy bez klasického HP', () => {

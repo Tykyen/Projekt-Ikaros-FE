@@ -95,6 +95,14 @@ export function resolveCharacterHp(
       if (max <= 0) return null;
       return { current: readNum(cd, 'hp_current', max), max };
     }
+    case 'shadowrun': {
+      // SR6 HP bar = FYZICKÝ záznamník: max = 8 + ⌈Tělo/2⌉, zbývá = max − zranění
+      // (`sr_cond_phys` = počet zaplněných boxů). Omračovací track je zvlášť (ne na baru).
+      const bod = readNum(cd, 'sr_attr_bod', 0);
+      const max = 8 + Math.ceil(bod / 2);
+      const filled = readNum(cd, 'sr_cond_phys', 0);
+      return { current: Math.max(0, max - filled), max };
+    }
     // fate / drd2 / drdplus — bez klasického HP, mapování je herní rozhodnutí.
     default:
       return null;

@@ -13,6 +13,7 @@ import type {
   FateRollResult,
   GenericRollResult,
   MixedRollResult,
+  PoolHitsResult,
 } from './rollEngine';
 
 export type DiceFaceValue = number | '+' | '-' | '0';
@@ -53,6 +54,18 @@ export interface GenericDicePayload extends DicePayloadBase {
 export interface PoolDicePayload extends DicePayloadBase {
   type: `pool-d${number}`;
   faces: number[];
+  /**
+   * SR6 success-pool: pokud je `hits` definováno, hod se NEsčítá — počítají se
+   * **úspěchy** (tvář ≥ `hitThreshold`). `total` pak nese `hits`. Render
+   * (dicelog/readout) zvýrazní tváře ≥ threshold a jedničky a ukáže „X úspěchů"
+   * + glitch. Bez `hits` = klasický součtový pool (beze změny).
+   */
+  hits?: number;
+  ones?: number;
+  glitch?: boolean;
+  criticalGlitch?: boolean;
+  /** Práh úspěchu (5 pro SR6) — render zvýrazní tváře ≥ threshold. */
+  hitThreshold?: number;
 }
 
 export interface MixedDicePayload extends DicePayloadBase {
@@ -139,6 +152,28 @@ export function buildGenericPayload(
     label: opts.label,
     modifier,
     crit: opts.crit,
+  };
+}
+
+/**
+ * SR6 success-pool payload — `total`/`sum` nesou počet úspěchů (`hits`),
+ * `faces` jsou hozené k6. Render zvýrazní tváře ≥ threshold + jedničky.
+ */
+export function buildPoolHitsPayload(
+  roll: PoolHitsResult,
+  opts: { label?: string } = {},
+): PoolDicePayload {
+  return {
+    type: roll.type as `pool-d${number}`,
+    faces: roll.rolls,
+    sum: roll.hits,
+    total: roll.hits,
+    label: opts.label,
+    hits: roll.hits,
+    ones: roll.ones,
+    glitch: roll.glitch,
+    criticalGlitch: roll.criticalGlitch,
+    hitThreshold: roll.threshold,
   };
 }
 

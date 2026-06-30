@@ -72,12 +72,26 @@ export interface SystemSheetProps {
   onRoll?: (req: {
     label: string;
     modifier?: number;
-    kind?: 'fate' | 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100' | 'mixed';
+    kind?:
+      | 'fate'
+      | 'd4'
+      | 'd6'
+      | 'd6+'
+      | '2d6+'
+      | 'd8'
+      | 'd10'
+      | 'd12'
+      | 'd20'
+      | 'd100'
+      | 'mixed'
+      | 'pool-d6';
     initiative?: boolean;
     /** JaD (8.7q): u k20 detekuj fatální úspěch (nat 20) / neúspěch (nat 1). */
     critOnD20?: boolean;
     /** JaD (8.7q) skládaný hod zásahu (`kind:'mixed'`): počty kostek, např. `{ d10: 2, d6: 2 }`. */
     mixed?: Record<string, number>;
+    /** Shadowrun success-pool (`kind:'pool-d6'`): počet kostek; počítají se úspěchy 5–6 + glitch. */
+    pool?: number;
   }) => void;
 }
 

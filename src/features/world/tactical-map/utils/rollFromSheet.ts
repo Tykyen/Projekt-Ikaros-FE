@@ -15,12 +15,14 @@ import {
   rollFate,
   rollGenericDice,
   rollMixedDice,
+  rollPoolHits,
   type RollKind,
 } from "@/features/world/chat/dice/lib/rollEngine";
 import {
   buildFatePayload,
   buildGenericPayload,
   buildMixedPayload,
+  buildPoolHitsPayload,
   type DicePayload,
 } from "@/features/world/chat/dice/lib/dicePayload";
 
@@ -50,6 +52,13 @@ export interface RollRequest {
    * `useMapDiceRoll` z vieweru). Ponecháno kvůli zpětné kompatibilitě volajících.
    */
   rollerName?: string;
+  /**
+   * Shadowrun (a jiné success-pool systémy): počet kostek **poolu**. Když je
+   * zadán a `kind` je `pool-d6` (nebo jiné `pool-dN`), hodí se pool a počítají
+   * se **úspěchy** (5–6) + glitch místo součtu. `modifier` se pro pool nepoužívá
+   * (pool už zahrnuje atribut+dovednost−postih z volajícího).
+   */
+  pool?: number;
 }
 
 /**
@@ -70,6 +79,15 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
   let total: number;
   let dicePayload: DicePayload;
   let crit: 'success' | 'fail' | undefined;
+
+  // Shadowrun success-pool: `kind:'pool-d6'` + `pool` (počet kostek) → úspěchy
+  // (5–6) + glitch místo součtu. Musí být PŘED generic větví (pool-d6 by jinak
+  // spadl do rollGenericDice, který jen sčítá).
+  if (typeof req.pool === "number" && kind.startsWith("pool-")) {
+    const sides = parseInt(kind.replace("pool-d", ""), 10) || 6;
+    const r = rollPoolHits(req.pool, sides);
+    return { total: r.hits, dicePayload: buildPoolHitsPayload(r, { label }) };
+  }
 
   if (kind === "fate") {
     const r = rollFate();

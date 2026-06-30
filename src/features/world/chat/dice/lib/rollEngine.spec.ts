@@ -3,6 +3,7 @@ import {
   rollFate,
   rollGenericDice,
   rollPool,
+  rollPoolHits,
   rollMixedDice,
   rollExplodingD6,
   rollExploding2d6,
@@ -237,5 +238,43 @@ describe('getOverpressureFromRollTotal', () => {
   it('13+ → 12 (cap)', () => {
     expect(getOverpressureFromRollTotal(13)).toBe(12);
     expect(getOverpressureFromRollTotal(99)).toBe(12);
+  });
+});
+
+describe('rollPoolHits — SR6 success-pool', () => {
+  it('prázdný pool (0 kostek) → 0 úspěchů, žádný glitch', () => {
+    const r = rollPoolHits(0);
+    expect(r.rolls).toEqual([]);
+    expect(r.hits).toBe(0);
+    expect(r.glitch).toBe(false);
+    expect(r.criticalGlitch).toBe(false);
+    expect(r.threshold).toBe(5);
+    expect(r.type).toBe('pool-d6');
+  });
+
+  it('invarianty platí přes mnoho hodů (úspěchy/jedničky/glitch dopočítané z rolls)', () => {
+    for (const n of [1, 3, 8, 12, 20]) {
+      for (let iter = 0; iter < 40; iter++) {
+        const r = rollPoolHits(n);
+        expect(r.rolls).toHaveLength(n);
+        expect(r.rolls.every((d) => d >= 1 && d <= 6)).toBe(true);
+        // hits = tváře ≥ 5 (5–6)
+        expect(r.hits).toBe(r.rolls.filter((d) => d >= 5).length);
+        // ones = počet jedniček
+        expect(r.ones).toBe(r.rolls.filter((d) => d === 1).length);
+        // glitch = víc než polovina kostek je 1
+        expect(r.glitch).toBe(r.ones > n / 2);
+        // kritický glitch = glitch a 0 úspěchů
+        expect(r.criticalGlitch).toBe(r.glitch && r.hits === 0);
+      }
+    }
+  });
+
+  it('vlastní threshold/sides (WoD: d10, úspěch 8+)', () => {
+    const r = rollPoolHits(6, 10, 8);
+    expect(r.type).toBe('pool-d10');
+    expect(r.threshold).toBe(8);
+    expect(r.rolls.every((d) => d >= 1 && d <= 10)).toBe(true);
+    expect(r.hits).toBe(r.rolls.filter((d) => d >= 8).length);
   });
 });

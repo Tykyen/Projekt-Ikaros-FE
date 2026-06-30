@@ -236,6 +236,46 @@ export function rollPool(sides: number, count: number): GenericRollResult {
   };
 }
 
+/** Výsledek SR-style pool hodu (počítají se úspěchy, ne součet). */
+export interface PoolHitsResult {
+  /** Hozené tváře (k zobrazení + 3D). */
+  rolls: number[];
+  /** Počet úspěchů (tvář ≥ threshold, default 5–6). */
+  hits: number;
+  /** Počet jedniček (glitch kontrola). */
+  ones: number;
+  /** Glitch = víc než polovina kostek jsou jedničky. */
+  glitch: boolean;
+  /** Kritický glitch = glitch a zároveň 0 úspěchů. */
+  criticalGlitch: boolean;
+  /** Práh úspěchu (5 pro SR6). */
+  threshold: number;
+  type: string;
+}
+
+/**
+ * Shadowrun-style **pool hod**: hoď `count` × dN, počítej **úspěchy** (tvář ≥
+ * `threshold`, SR6 = 5–6), ne součet. **Glitch** = víc než polovina kostek
+ * padlo na 1; **kritický glitch** = glitch a 0 úspěchů.
+ *
+ * Sdílí `secureRandomInt` s ostatními hody. Použitelné i pro jiné success-pool
+ * systémy (WoD = d10, threshold 8) přes `sides`/`threshold`.
+ */
+export function rollPoolHits(
+  count: number,
+  sides = 6,
+  threshold = 5,
+): PoolHitsResult {
+  const n = Math.max(0, Math.floor(count));
+  const rolls: number[] = [];
+  for (let i = 0; i < n; i++) rolls.push(secureRandomInt(sides) + 1);
+  const hits = rolls.filter((d) => d >= threshold).length;
+  const ones = rolls.filter((d) => d === 1).length;
+  const glitch = n > 0 && ones > n / 2;
+  const criticalGlitch = glitch && hits === 0;
+  return { rolls, hits, ones, glitch, criticalGlitch, threshold, type: `pool-d${sides}` };
+}
+
 /** Mixed roll — různé počty různých typů kostek v jednom hodu. */
 export function rollMixedDice(counts: Record<string, number>): MixedRollResult {
   const rolls: number[] = [];

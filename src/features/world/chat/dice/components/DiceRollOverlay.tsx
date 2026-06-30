@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
-import type { DicePayload } from '../lib/dicePayload';
+import type { DicePayload, PoolDicePayload } from '../lib/dicePayload';
 import { payloadToNotation } from '../lib/diceNotation';
 import { getDice3dTheme, isWebGLAvailable } from '../lib/dice3dThemes';
 import styles from './DiceRollOverlay.module.css';
@@ -163,12 +163,33 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
   const faces = roll.payload.faces;
   // 8.7q JaD: fatální úspěch (nat 20) / neúspěch (nat 1) — místo výpočtu text.
   const crit = roll.payload.crit;
+  // Shadowrun success-pool: počítají se úspěchy (5–6) + glitch.
+  const pool =
+    roll.payload.type.startsWith('pool-') &&
+    typeof (roll.payload as PoolDicePayload).hits === 'number'
+      ? (roll.payload as PoolDicePayload)
+      : null;
+  const hitThreshold = pool?.hitThreshold ?? 5;
 
   return (
     <div className={styles.overlay}>
       <div className={styles.readout}>
         <div className={styles.facesRow}>
           {faces.map((f, j) => {
+            if (pool) {
+              const n = Number(f);
+              const cls =
+                n >= hitThreshold
+                  ? styles.faceHit
+                  : n === 1
+                    ? styles.faceOne
+                    : styles.faceGeneric;
+              return (
+                <span key={j} className={`${styles.faceBadge} ${cls}`}>
+                  {f}
+                </span>
+              );
+            }
             if (isFate) {
               const cls =
                 f === '+' || f === 1
@@ -195,7 +216,25 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
           })}
         </div>
 
-        {crit ? (
+        {pool ? (
+          <div className={styles.equation}>
+            {roll.payload.label && (
+              <span className={styles.skillName}>{roll.payload.label}</span>
+            )}
+            <span className={`${styles.totalValue} ${styles.totalHits}`}>
+              {pool.hits ?? 0} úsp.
+            </span>
+            {pool.criticalGlitch ? (
+              <span className={`${styles.glitchTag} ${styles.glitchCrit}`}>
+                KRIT. GLITCH
+              </span>
+            ) : pool.glitch ? (
+              <span className={`${styles.glitchTag} ${styles.glitchWarn}`}>
+                glitch
+              </span>
+            ) : null}
+          </div>
+        ) : crit ? (
           <div className={styles.equation}>
             {roll.payload.label && (
               <span className={styles.skillName}>{roll.payload.label}</span>

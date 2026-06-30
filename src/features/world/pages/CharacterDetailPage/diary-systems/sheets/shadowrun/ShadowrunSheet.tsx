@@ -28,47 +28,17 @@ import {
   SR_WOUND_STEP,
   ceilHalf,
 } from './constants';
-
-// ── data shapes ────────────────────────────────────────────────
-interface SrSkill {
-  name: string;
-  attr: string;
-  val: string;
-  spec: string;
-}
-interface SrWeapon {
-  name: string;
-  type: string;
-  ar: string;
-  dmg: string;
-  attr: string;
-  val: string;
-  spec: string;
-}
-interface SrSpell {
-  name: string;
-  type: string;
-  rng: string;
-  dur: string;
-  drain: string;
-}
-interface SrRow3 {
-  name: string;
-  a: string;
-  b: string;
-}
-
-const int = (s: string): number => parseInt(s, 10) || 0;
-
-type Attrs = Record<string, number>;
-function readAttrs(cda: CdAccess): Attrs {
-  const o: Attrs = {};
-  for (const k of SR_ATTR_KEYS) o[k] = int(cda.g(`attr_${k}`, '0'));
-  return o;
-}
-function poolOf(attrs: Attrs, attr: string, val: string, spec: string, woundPen: number): number {
-  return Math.max(0, (attrs[attr] ?? 0) + int(val) + (spec ? 2 : 0) - woundPen);
-}
+import {
+  type SrSkill,
+  type SrWeapon,
+  type SrSpell,
+  type SrRow3,
+  type Attrs,
+  int,
+  readAttrs,
+  poolOf,
+  HERO_META,
+} from './shared';
 
 // ════════════════════════════════════════════════════════════════
 export function ShadowrunSheet({
@@ -141,21 +111,12 @@ export function ShadowrunSheet({
 }
 
 // ── shared types ───────────────────────────────────────────────
-interface PanelProps {
+export interface PanelProps {
   cda: CdAccess;
   editing: boolean;
 }
 
 // ── Hero ───────────────────────────────────────────────────────
-const HERO_META: { key: string; label: string }[] = [
-  { key: 'realname', label: 'Jméno' },
-  { key: 'race', label: 'Metarasa' },
-  { key: 'role_note', label: 'Archetyp' },
-  { key: 'rep', label: 'Pověst' },
-  { key: 'notoriety', label: 'Hledanost' },
-  { key: 'public', label: 'Veřejné povědomí' },
-];
-
 function Hero({ cda, editing, isNpc }: PanelProps & { isNpc: boolean }) {
   const { g, set } = cda;
   const alias = g('name');
@@ -685,7 +646,7 @@ function ArmorPanel({
 }
 
 // ── Magie ──────────────────────────────────────────────────────
-function MagicPanel({ cda, editing }: PanelProps) {
+export function MagicPanel({ cda, editing }: PanelProps) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
   const spells = parseJsonArr<SrSpell>('spells');
   const powers = parseJsonArr<SrRow3>('powers');
@@ -804,7 +765,7 @@ function MagicPanel({ cda, editing }: PanelProps) {
 }
 
 // ── Matrix ─────────────────────────────────────────────────────
-function MatrixPanel({ cda, editing }: PanelProps) {
+export function MatrixPanel({ cda, editing }: PanelProps) {
   const { g, set } = cda;
   const dmg = int(g('mat_dmg', '0'));
   return (
@@ -892,7 +853,7 @@ function MatrixPanel({ cda, editing }: PanelProps) {
 }
 
 // ── Augmentace ─────────────────────────────────────────────────
-function AugPanel({ cda, editing }: PanelProps) {
+export function AugPanel({ cda, editing }: PanelProps) {
   return (
     <section className="sr-panel">
       <h2 className="sr-title">
@@ -918,7 +879,7 @@ function AugPanel({ cda, editing }: PanelProps) {
 }
 
 // ── Kvality ────────────────────────────────────────────────────
-function QualitiesPanel({ cda, editing }: PanelProps) {
+export function QualitiesPanel({ cda, editing }: PanelProps) {
   return (
     <section className="sr-panel">
       <h2 className="sr-title">Kvality</h2>
@@ -943,7 +904,7 @@ function QualitiesPanel({ cda, editing }: PanelProps) {
 }
 
 // ── Kontakty ───────────────────────────────────────────────────
-function ContactsPanel({ cda, editing }: PanelProps) {
+export function ContactsPanel({ cda, editing }: PanelProps) {
   return (
     <section className="sr-panel">
       <h2 className="sr-title">Kontakty</h2>
@@ -963,7 +924,7 @@ function ContactsPanel({ cda, editing }: PanelProps) {
 }
 
 // ── Identita ───────────────────────────────────────────────────
-function IdentityPanel({ cda, editing }: PanelProps) {
+export function IdentityPanel({ cda, editing }: PanelProps) {
   const { g, set } = cda;
   if (editing) {
     return (

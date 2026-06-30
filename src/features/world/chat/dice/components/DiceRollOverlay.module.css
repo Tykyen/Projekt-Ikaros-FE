@@ -94,6 +94,35 @@
   color: #fff;
 }
 
+/* SR6 success-pool: úspěch (5–6) zvýrazněn cyan, jednička ztlumeně červená. */
+.faceHit {
+  color: #22d3ee;
+  border-color: rgba(34, 211, 238, 0.6);
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.55);
+}
+.faceOne {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+  opacity: 0.85;
+}
+/* SR6 pool výsledek: úspěchy / glitch / kritický glitch. */
+.totalHits {
+  color: #22d3ee;
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.7), 0 0 24px rgba(34, 211, 238, 0.4);
+}
+.glitchTag {
+  font-family: 'Iceland', monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+.glitchWarn {
+  color: rgba(255, 220, 40, 0.95);
+}
+.glitchCrit {
+  color: #f43f5e;
+}
+
 .equation {
   display: inline-flex;
   flex-wrap: wrap;

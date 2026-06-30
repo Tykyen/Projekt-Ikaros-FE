@@ -21,6 +21,7 @@ import { Drd16CombatPanel } from './system-panels/Drd16CombatPanel';
 import { DrdPlusCombatPanel } from './system-panels/DrdPlusCombatPanel';
 import { FateCombatPanel, FaeCombatPanel } from './system-panels/FateCombatPanel';
 import { GurpsCombatPanel } from './system-panels/GurpsCombatPanel';
+import { ShadowrunCombatPanel } from './system-panels/ShadowrunCombatPanel';
 
 export interface CombatPanelProps {
   token: MapToken;
@@ -45,4 +46,5 @@ export const COMBAT_PANELS: Record<string, ComponentType<CombatPanelProps>> = {
   fae: FaeCombatPanel,
   fate: FateCombatPanel,
   gurps: GurpsCombatPanel,
+  shadowrun: ShadowrunCombatPanel,
 };
