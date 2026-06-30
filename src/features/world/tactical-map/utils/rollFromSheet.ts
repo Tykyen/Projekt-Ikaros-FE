@@ -59,6 +59,17 @@ export interface RollRequest {
    * (pool už zahrnuje atribut+dovednost−postih z volajícího).
    */
   pool?: number;
+  /**
+   * 16b (DrdH) — rozepsané složky modifieru (`útoč +6`, `Sil −1`) pro rozpis
+   * hodu v dicelog/readout. Jen se předá dál do `dicePayload`, výpočet
+   * neovlivní. Volitelné → ostatní systémy beze změny.
+   */
+  breakdown?: { label: string; value: number }[];
+  /**
+   * 16b (DrdH) — zranění útoku se znaménkem (`'+1'`/`'−1'`) k zobrazení za
+   * výsledkem. Jen se předá dál do `dicePayload`.
+   */
+  damage?: string;
 }
 
 /**
@@ -86,7 +97,9 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
   if (typeof req.pool === "number" && kind.startsWith("pool-")) {
     const sides = parseInt(kind.replace("pool-d", ""), 10) || 6;
     const r = rollPoolHits(req.pool, sides);
-    return { total: r.hits, dicePayload: buildPoolHitsPayload(r, { label }) };
+    const payload = buildPoolHitsPayload(r, { label });
+    attachBreakdown(payload, req);
+    return { total: r.hits, dicePayload: payload };
   }
 
   if (kind === "fate") {
@@ -126,9 +139,22 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
     return null;
   }
 
+  // 16b (DrdH) — předej dál rozpis složek + zranění (jen zobrazení, neovlivní
+  // total ani faces). Ostatní systémy req.breakdown/damage neposílají → no-op.
+  attachBreakdown(dicePayload, req);
+
   // 10.2j — žádný toast: hod se ukáže ve 3D overlayi + zapíše do dice logu
   // (rozpis výpočtu `label (mod) ± kostky = total` renderuje DiceLogPanel).
   // 10.2f/10.2j — vrací total (zápis iniciativy do `token.initiative`) +
   // dicePayload (směrování do map dice overlay / logu přes onMapRoll).
   return { total, dicePayload, crit };
+}
+
+/**
+ * 16b — připne volitelný `breakdown` (složky modifieru) + `damage` (zranění)
+ * z requestu na payload. Mutuje payload in-place (čerstvý objekt z builderu).
+ */
+function attachBreakdown(payload: DicePayload, req: RollRequest): void {
+  if (req.breakdown && req.breakdown.length > 0) payload.breakdown = req.breakdown;
+  if (req.damage) payload.damage = req.damage;
 }

@@ -92,6 +92,18 @@ export interface SystemSheetProps {
     mixed?: Record<string, number>;
     /** Shadowrun success-pool (`kind:'pool-d6'`): počet kostek; počítají se úspěchy 5–6 + glitch. */
     pool?: number;
+    /**
+     * 16b (DrdH) — rozepsané složky modifieru pro rozpis hodu v dicelog/readout
+     * (`label · útoč +6 + Sil −1 + hod … = total`). Volitelné → ostatní systémy
+     * beze změny. Hodnoty se zobrazují se znaménkem; `modifier` (celkový mod)
+     * zůstává zdrojem pravdy pro `total`.
+     */
+    breakdown?: { label: string; value: number }[];
+    /**
+     * 16b (DrdH) — zranění útoku, už naformátované se znaménkem (`'+1'`/`'−1'`).
+     * Zobrazí se za výsledkem (`… = total / +1`). Obrana ho neposílá.
+     */
+    damage?: string;
   }) => void;
 }
 

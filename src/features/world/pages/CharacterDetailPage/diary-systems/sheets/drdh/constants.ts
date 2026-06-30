@@ -46,7 +46,7 @@ export interface DrdhAttrDef {
   /** customData suffix (`drdh_attr_<id>` = stupeň). */
   id: string;
   label: string;
-  /** Zkratka zobrazená v UI (SIL/OBR/ODO/INT/CHAR). */
+  /** Zkratka zobrazená v UI (Sil/Obr/Odl/Int/Char). */
   abbr: string;
 }
 
@@ -55,24 +55,24 @@ export interface DrdhAttrDef {
  * Stupeň se ukládá pod `drdh_attr_<id>`; oprava se NEukládá (auto = ⌊st/2⌋−5).
  */
 export const DRDH_ATTRS: DrdhAttrDef[] = [
-  { id: 'str', label: 'Síla', abbr: 'SIL' },
-  { id: 'dex', label: 'Obratnost', abbr: 'OBR' },
-  { id: 'con', label: 'Odolnost', abbr: 'ODO' },
-  { id: 'int', label: 'Inteligence', abbr: 'INT' },
-  { id: 'cha', label: 'Charisma', abbr: 'CHAR' },
+  { id: 'str', label: 'Síla', abbr: 'Sil' },
+  { id: 'dex', label: 'Obratnost', abbr: 'Obr' },
+  { id: 'con', label: 'Odolnost', abbr: 'Odl' },
+  { id: 'int', label: 'Inteligence', abbr: 'Int' },
+  { id: 'cha', label: 'Charisma', abbr: 'Char' },
 ];
 
 /** Zkratky atributů (pro dovednostní select). */
-export const DRDH_ATTR_ABBRS = ['SIL', 'OBR', 'ODO', 'INT', 'CHAR'] as const;
+export const DRDH_ATTR_ABBRS = ['Sil', 'Obr', 'Odl', 'Int', 'Char'] as const;
 export type DrdhAttrAbbr = (typeof DRDH_ATTR_ABBRS)[number];
 
 /** Mapování zkratky atributu → customData suffix (pro lookup opravy). */
 export const DRDH_ABBR_TO_ID: Record<DrdhAttrAbbr, string> = {
-  SIL: 'str',
-  OBR: 'dex',
-  ODO: 'con',
-  INT: 'int',
-  CHAR: 'cha',
+  Sil: 'str',
+  Obr: 'dex',
+  Odl: 'con',
+  Int: 'int',
+  Char: 'cha',
 };
 
 /** Oprava atributu = ⌊stupeň/2⌋ − 5. */
@@ -203,7 +203,7 @@ export const DRDH_PROF_TABLE: Record<DrdhProfessionId, DrdhProfTable> = {
   },
 };
 
-/** Typ zbraně — řídí útočný atribut (melee=SIL, ranged=OBR). */
+/** Typ zbraně — řídí útočný atribut (melee=Sil, ranged=Obr). */
 export type DrdhWeaponKind = 'melee' | 'ranged';
 
 /**
@@ -211,16 +211,16 @@ export type DrdhWeaponKind = 'melee' | 'ranged';
  *
  * Drží JEN 3 čísla: útočnost (`atk`), zranění (`dmg`), obrana (`def`) — žádný
  * výpočet, v deníku/chatu se zobrazují tak, jak jsou. Při HODU v combat panelu
- * se k `atk`/`def` přičte oprava atributu (útok: SIL pro melee / OBR pro ranged;
- * obrana: vždy OBR). Pole `kind` určuje typ (`'melee'` na blízko / `'ranged'`
- * střelná); chybějící `kind` se bere jako `'melee'`.
+ * se k `atk`/`def` přičte oprava atributu (útok: Sil pro melee / Obr pro ranged;
+ * obrana: vždy Obr). Pole `kind` určuje typ (`'melee'` blízko / `'ranged'`
+ * dálka); chybějící `kind` se bere jako `'melee'`.
  *
  * BC: starší záznamy mohou nést zrušená pole `uc`/`oc` — ignorují se (čteme jen
  * name/kind/atk/dmg/def).
  */
 export interface DrdhWeapon {
   name: string;
-  /** Typ zbraně (`'melee'` na blízko / `'ranged'` střelná). */
+  /** Typ zbraně (`'melee'` blízko / `'ranged'` dálka). */
   kind: string;
   /** Útočnost (číslo k atk hodu). */
   atk: string;
@@ -242,7 +242,7 @@ export interface DrdhArmor {
 /** Dovednost v `drdh_skills` JSON poli. Součet = oprava atributu + stupeň (auto). */
 export interface DrdhSkill {
   name: string;
-  /** Zkratka atributu (SIL/OBR/ODO/INT/CHAR). */
+  /** Zkratka atributu (Sil/Obr/Odl/Int/Char). */
   attr: string;
   /** Stupeň dovednosti. */
   deg: string;

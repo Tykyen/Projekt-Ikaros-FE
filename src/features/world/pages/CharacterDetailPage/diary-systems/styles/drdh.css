@@ -832,7 +832,7 @@
   -moz-appearance: none;
   text-align: center;
   text-align-last: center;
-  /* Garamond (užší než Cinzel) + 0 letter-spacing → i „CHAR" se vejde do úzké buňky */
+  /* Garamond (užší než Cinzel) + 0 letter-spacing → i „Char" se vejde do úzké buňky */
   font-family: var(--drdh-font-body);
   font-size: 13px;
   font-weight: 600;
@@ -970,6 +970,57 @@
 [data-diary-system='drdh'] .drdh-sheet .scroll-panel textarea::placeholder {
   color: var(--drdh-ink-soft);
   opacity: 0.7;
+  font-style: italic;
+}
+
+/* zvláštní schopnosti — karty s textarea účinkem (zalamuje, vidíš celý text) */
+[data-diary-system='drdh'] .drdh-sheet .ability-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+[data-diary-system='drdh'] .drdh-sheet .ability-card {
+  background: rgba(255, 252, 242, 0.4);
+  border: 1px solid rgba(194, 170, 120, 0.5);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+[data-diary-system='drdh'] .drdh-sheet .ability-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+[data-diary-system='drdh'] .drdh-sheet .ability-name {
+  flex: 1;
+  font-family: var(--drdh-font-head);
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a2812;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(194, 170, 120, 0.5);
+  padding: 3px 2px;
+  outline: none;
+}
+/* přebíjí .scroll-panel textarea (linkovaný, min-height:150) → kompaktní účinek */
+[data-diary-system='drdh'] .drdh-sheet textarea.ability-desc {
+  width: 100%;
+  min-height: 2.8em;
+  resize: vertical;
+  font-family: var(--drdh-font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--drdh-ink);
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(194, 170, 120, 0.4);
+  border-radius: 3px;
+  padding: 5px 7px;
+  outline: none;
+}
+[data-diary-system='drdh'] .drdh-sheet textarea.ability-desc::placeholder {
+  color: var(--drdh-ink-soft);
+  opacity: 0.6;
   font-style: italic;
 }
 [data-diary-system='drdh'] .drdh-sheet .notes {

@@ -90,6 +90,77 @@ describe("DiceLogPanel", () => {
     ).toBeTruthy();
   });
 
+  it("16b DrdH: rozpis útoku zbraně se složkami + zranění se znaménkem", () => {
+    const roll: MapDiceRoll = {
+      id: "drdh-atk",
+      rolledAt: "2026-05-31T08:00:00.000Z",
+      byUserId: "me",
+      rollerName: "me",
+      rollerKind: "pc",
+      category: "skill",
+      dicePayload: {
+        type: "d6+",
+        faces: [3],
+        sum: 3,
+        total: 8,
+        label: "Útok: Květinový meč",
+        modifier: 5,
+        breakdown: [
+          { label: "útoč", value: 6 },
+          { label: "Sil", value: -1 },
+        ],
+        damage: "+1",
+      } as never,
+    };
+    render(
+      <DiceLogPanel
+        rolls={[roll]}
+        viewer={{ userId: "me", isPj: false }}
+        visibility={undefined}
+        sceneId="s-drdh-atk"
+      />,
+    );
+    expect(
+      screen.getByText(
+        "Útok: Květinový meč · útoč +6 + Sil −1 + hod (3) = 8 / +1",
+      ),
+    ).toBeTruthy();
+  });
+
+  it("16b DrdH: rozpis obrany BEZ zranění", () => {
+    const roll: MapDiceRoll = {
+      id: "drdh-def",
+      rolledAt: "2026-05-31T08:00:00.000Z",
+      byUserId: "me",
+      rollerName: "me",
+      rollerKind: "pc",
+      category: "skill",
+      dicePayload: {
+        type: "d6+",
+        faces: [4],
+        sum: 4,
+        total: 7,
+        label: "Obrana: Štít",
+        modifier: 3,
+        breakdown: [
+          { label: "obr", value: 2 },
+          { label: "Obr", value: 1 },
+        ],
+      } as never,
+    };
+    render(
+      <DiceLogPanel
+        rolls={[roll]}
+        viewer={{ userId: "me", isPj: false }}
+        visibility={undefined}
+        sceneId="s-drdh-def"
+      />,
+    );
+    expect(
+      screen.getByText("Obrana: Štít · obr +2 + Obr +1 + hod (4) = 7"),
+    ).toBeTruthy();
+  });
+
   it("fate rozpis zůstává v ± součet tvaru (žádná regrese Matrix)", () => {
     const roll: MapDiceRoll = {
       id: "r2",

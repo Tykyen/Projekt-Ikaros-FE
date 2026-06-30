@@ -215,7 +215,7 @@ describe('DrdhSheet (16b — prototyp parity)', () => {
     });
   });
 
-  it('zbraně tabulka: typ select (na blízko / střelná) + útočnost/zranění/obrana, žádné ÚČ/OČ', () => {
+  it('zbraně tabulka: typ select (blízko / dálka) + útočnost/zranění/obrana, žádné ÚČ/OČ', () => {
     render(
       <DrdhSheet
         {...commonProps}
@@ -245,10 +245,10 @@ describe('DrdhSheet (16b — prototyp parity)', () => {
     // typ select drží uloženou hodnotu + obě možnosti
     expect(typeSel.value).toBe('ranged');
     expect(
-      within(typeSel).getByRole('option', { name: 'na blízko' }),
+      within(typeSel).getByRole('option', { name: 'blízko' }),
     ).toBeInTheDocument();
     expect(
-      within(typeSel).getByRole('option', { name: 'střelná' }),
+      within(typeSel).getByRole('option', { name: 'dálka' }),
     ).toBeInTheDocument();
     // jen čísla, žádný výpočet
     expect(
@@ -262,7 +262,7 @@ describe('DrdhSheet (16b — prototyp parity)', () => {
     expect(screen.queryByLabelText('Zbraň 1 — oc')).not.toBeInTheDocument();
   });
 
-  it('zbraně BC: starý záznam s uc/oc + bez kind se načte jako na blízko a uc/oc se ignoruje', () => {
+  it('zbraně BC: starý záznam s uc/oc + bez kind se načte jako blízko a uc/oc se ignoruje', () => {
     render(
       <DrdhSheet
         {...commonProps}
@@ -329,7 +329,7 @@ describe('DrdhSheet (16b — prototyp parity)', () => {
         {...commonProps}
         diary={makeDiary({
           drdh_attr_dex: '12', // ⌊12/2⌋−5 = 1
-          drdh_skills: JSON.stringify([{ name: 'Plížení', attr: 'OBR', deg: '3' }]),
+          drdh_skills: JSON.stringify([{ name: 'Plížení', attr: 'Obr', deg: '3' }]),
         })}
         mode="edit"
         onChange={() => {}}
@@ -354,7 +354,7 @@ describe('DrdhSheet (16b — prototyp parity)', () => {
     fireEvent.click(screen.getByText('+ Přidat dovednost'));
     expect(onChange).toHaveBeenCalledWith({
       customDataPatch: {
-        drdh_skills: JSON.stringify([{ name: '', attr: 'OBR', deg: '' }]),
+        drdh_skills: JSON.stringify([{ name: '', attr: 'Obr', deg: '' }]),
       },
     });
   });

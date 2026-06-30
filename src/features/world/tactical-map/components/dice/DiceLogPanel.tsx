@@ -135,8 +135,30 @@ function poolBreakdown(p: PoolDicePayload): string {
  * vidět celá kaskáda: „Útok (+7) + (6 + 6 + 3) = +22". Fate (+/−/0) a d100
  * (tens/ones) si drží původní `± součet` tvar (rozpis kostek by tam mátl).
  */
+/** Znaménkový tvar složky (`+6`, `−1`, `0`) — `−` je U+2212 (sjednocený minus). */
+function fmtSigned(n: number): string {
+  return n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : "0";
+}
+
 function renderBreakdown(p: MapDiceRoll["dicePayload"]): string | null {
   const mod = p.modifier ?? 0;
+
+  // 16b (DrdH) — rozepsaný hod zbraně: `label · útoč +6 + Sil −1 + hod (3) = 8`
+  // (+ ` / +1` zranění, pokud je). Složky se znaménkem; `total` jako prosté
+  // číslo. Číselné tváře rozepíšeme `(a + b + c)`. Ostatní systémy `breakdown`
+  // neposílají → větev se přeskočí.
+  if (p.breakdown && p.breakdown.length > 0) {
+    const prefix = p.label ? `${p.label} · ` : "";
+    const parts = p.breakdown
+      .map((b) => `${b.label} ${fmtSigned(b.value)}`)
+      .join(" + ");
+    const dice = p.faces.every((f) => typeof f === "number")
+      ? `(${(p.faces as number[]).join(" + ")})`
+      : `${p.sum}`;
+    const dmg = p.damage ? ` / ${p.damage}` : "";
+    return `${prefix}${parts} + hod ${dice} = ${p.total}${dmg}`;
+  }
+
   const totalStr = p.total >= 0 ? `+${p.total}` : `${p.total}`;
   const prefix = p.label ? `${p.label} ` : "";
 

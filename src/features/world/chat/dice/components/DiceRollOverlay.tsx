@@ -170,6 +170,11 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
       ? (roll.payload as PoolDicePayload)
       : null;
   const hitThreshold = pool?.hitThreshold ?? 5;
+  // 16b (DrdH) — rozepsané složky modifieru (`útoč +6 + Sil −1`) + zranění.
+  const breakdown = roll.payload.breakdown;
+  const damage = roll.payload.damage;
+  const fmtComp = (n: number): string =>
+    n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '0';
 
   return (
     <div className={styles.overlay}>
@@ -246,6 +251,31 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
             >
               {crit === 'success' ? 'Fatální úspěch' : 'Fatální neúspěch'}
             </span>
+          </div>
+        ) : breakdown && breakdown.length > 0 ? (
+          /* 16b (DrdH) — rozepsaný hod zbraně: `label · útoč +6 + Sil −1 +
+             hod ±s = total / +1`. Složky se znaménkem; zranění (damage) za
+             výsledkem, jen útok (obrana ho neposílá). */
+          <div className={styles.equation}>
+            {roll.payload.label && (
+              <span className={styles.skillName}>{roll.payload.label}</span>
+            )}
+            {breakdown.map((b, i) => (
+              <span key={i} className={styles.skillMod}>
+                {b.label} {fmtComp(b.value)}
+              </span>
+            ))}
+            <span className={styles.diceSum}>
+              hod {roll.payload.sum > 0 ? '+' : ''}
+              {roll.payload.sum}
+            </span>
+            <span className={styles.eqSign}>=</span>
+            <span className={`${styles.totalValue} ${totalColorClass}`}>
+              {total > 0 ? `+${total}` : total === 0 ? '0' : total}
+            </span>
+            {damage && (
+              <span className={styles.damageValue}>/ {damage}</span>
+            )}
           </div>
         ) : (
           <div className={styles.equation}>

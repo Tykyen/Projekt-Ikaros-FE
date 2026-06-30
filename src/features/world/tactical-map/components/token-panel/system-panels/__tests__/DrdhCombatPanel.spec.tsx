@@ -155,7 +155,7 @@ describe('DrdhCombatPanel', () => {
       diaryWith({
         drdh_attr_str: '16',
         drdh_skills: JSON.stringify([
-          { name: 'Atletika', attr: 'SIL', deg: '3' },
+          { name: 'Atletika', attr: 'Sil', deg: '3' },
         ]),
       }),
     );
@@ -170,8 +170,8 @@ describe('DrdhCombatPanel', () => {
       />,
       { wrapper: makeWrapper() },
     );
-    // Rozklad bonusu: "SIL +3 · výcvik +3".
-    expect(screen.getByText(/SIL \+3 · výcvik \+3/)).toBeInTheDocument();
+    // Rozklad bonusu: "Sil +3 · výcvik +3".
+    expect(screen.getByText(/Sil \+3 · výcvik \+3/)).toBeInTheDocument();
     fireEvent.click(screen.getByLabelText('Hodit Atletika'));
     expect(onRoll).toHaveBeenCalledWith({
       label: 'Atletika',
@@ -206,6 +206,11 @@ describe('DrdhCombatPanel', () => {
       label: 'Útok: Krátký meč',
       modifier: 7,
       kind: 'd6+',
+      breakdown: [
+        { label: 'útoč', value: 4 },
+        { label: 'Sil', value: 3 },
+      ],
+      damage: '+1',
     });
   });
 
@@ -236,6 +241,11 @@ describe('DrdhCombatPanel', () => {
       label: 'Útok: Krátký luk',
       modifier: 6,
       kind: 'd6+',
+      breakdown: [
+        { label: 'útoč', value: 5 },
+        { label: 'Obr', value: 1 },
+      ],
+      damage: '+1',
     });
   });
 
@@ -265,6 +275,10 @@ describe('DrdhCombatPanel', () => {
       label: 'Obrana: Krátký meč',
       modifier: 3,
       kind: 'd6+',
+      breakdown: [
+        { label: 'obr', value: 2 },
+        { label: 'Obr', value: 1 },
+      ],
     });
   });
 
@@ -290,11 +304,103 @@ describe('DrdhCombatPanel', () => {
       { wrapper: makeWrapper() },
     );
     fireEvent.click(screen.getByLabelText('Útok Pěst'));
+    // modifier = útočnost 0 + Sil +3 = 3; zranění (+1) jde JEN do `damage`,
+    // ne do modifieru ani do breakdown složek.
     expect(onRoll).toHaveBeenCalledWith({
       label: 'Útok: Pěst',
       modifier: 3,
       kind: 'd6+',
+      breakdown: [
+        { label: 'útoč', value: 0 },
+        { label: 'Sil', value: 3 },
+      ],
+      damage: '+1',
     });
+  });
+
+  it('zranění bez znaménka (dmg "1") se v damage normalizuje na "+1"', () => {
+    mockDiary.mockReturnValue(
+      diaryWith({
+        drdh_attr_str: '16',
+        drdh_weapons: JSON.stringify([
+          { name: 'Kyj', kind: 'melee', atk: '2', dmg: '1', def: '1' },
+        ]),
+      }),
+    );
+    const onRoll = vi.fn();
+    render(
+      <DrdhCombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+      { wrapper: makeWrapper() },
+    );
+    fireEvent.click(screen.getByLabelText('Útok Kyj'));
+    expect(onRoll).toHaveBeenCalledWith(
+      expect.objectContaining({ damage: '+1' }),
+    );
+  });
+
+  it('záporné zranění (dmg "-1") zůstane "-1"; prázdné zranění → bez damage', () => {
+    mockDiary.mockReturnValue(
+      diaryWith({
+        drdh_attr_str: '16',
+        drdh_weapons: JSON.stringify([
+          { name: 'Tupý nůž', kind: 'melee', atk: '0', dmg: '-1', def: '0' },
+          { name: 'Hůl', kind: 'melee', atk: '0', dmg: '', def: '0' },
+        ]),
+      }),
+    );
+    const onRoll = vi.fn();
+    render(
+      <DrdhCombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+      { wrapper: makeWrapper() },
+    );
+    fireEvent.click(screen.getByLabelText('Útok Tupý nůž'));
+    expect(onRoll).toHaveBeenLastCalledWith(
+      expect.objectContaining({ damage: '-1' }),
+    );
+    fireEvent.click(screen.getByLabelText('Útok Hůl'));
+    // prázdné dmg → klíč damage je undefined (rozpis ho neukáže).
+    expect(onRoll.mock.calls[1][0].damage).toBeUndefined();
+  });
+
+  it('obrana NEposílá damage (jen breakdown obr + Obr)', () => {
+    mockDiary.mockReturnValue(
+      diaryWith({
+        drdh_attr_dex: '12',
+        drdh_weapons: JSON.stringify([
+          { name: 'Štít', kind: 'melee', atk: '0', dmg: '+2', def: '4' },
+        ]),
+      }),
+    );
+    const onRoll = vi.fn();
+    render(
+      <DrdhCombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+      { wrapper: makeWrapper() },
+    );
+    fireEvent.click(screen.getByLabelText('Obrana Štít'));
+    const arg = onRoll.mock.calls[0][0];
+    expect(arg.damage).toBeUndefined();
+    expect(arg.breakdown).toEqual([
+      { label: 'obr', value: 4 },
+      { label: 'Obr', value: 1 },
+    ]);
   });
 
   it('ÚČ/OČ jsou zrušené: žádné drdh_oc, žádný ÚČ/OČ text v panelu', () => {

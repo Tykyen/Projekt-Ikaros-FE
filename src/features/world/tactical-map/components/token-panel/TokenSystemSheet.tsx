@@ -250,6 +250,8 @@ export function TokenSystemSheet({
       critOnD20: req.critOnD20,
       mixed: req.mixed,
       pool: req.pool,
+      breakdown: req.breakdown,
+      damage: req.damage,
       rollerName,
     });
     if (!res) return;

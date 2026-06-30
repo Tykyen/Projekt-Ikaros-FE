@@ -158,6 +158,15 @@
   font-family: 'Iceland', monospace;
 }
 
+/* 16b (DrdH) — zranění útoku za výsledkem (`= total / +1`). Teplý akcent,
+   ať se odliší od součtu/totalu; dědí skin přes `.totalValue` sousedství. */
+.damageValue {
+  color: rgba(255, 170, 90, 0.95);
+  font-weight: 800;
+  font-family: 'Iceland', monospace;
+  font-size: 1.05rem;
+}
+
 .totalValue {
   font-family: 'Iceland', monospace;
   font-weight: 900;

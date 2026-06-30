@@ -37,6 +37,18 @@ export interface DicePayloadBase {
    * ostatní d20 systémy ho nemají → beze změny.
    */
   crit?: 'success' | 'fail';
+  /**
+   * 16b (DrdH) — rozepsané složky modifieru (`útoč +6`, `Sil −1`). Pokud je
+   * definováno, render (dicelog/readout) ukáže rozpis složek místo holého
+   * modifieru: `label · útoč +6 + Sil −1 + hod … = total`. Volitelné →
+   * ostatní systémy beze změny.
+   */
+  breakdown?: { label: string; value: number }[];
+  /**
+   * 16b (DrdH) — zranění útoku se znaménkem (`'+1'`/`'−1'`); zobrazí se za
+   * výsledkem (`… = total / +1`). Jen útok zbraní; obrana ho nemá.
+   */
+  damage?: string;
 }
 
 export interface FateDicePayload extends DicePayloadBase {

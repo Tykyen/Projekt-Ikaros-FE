@@ -50,7 +50,7 @@ export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const prof = (g('profession_id') || 'valecnik') as DrdhProfessionId;
   const profDef = DRDH_PROF_BY_ID[prof] ?? DRDH_PROF_BY_ID.valecnik;
 
-  // Oprava ODO → hranice smrti = −(10 + oprava ODO).
+  // Oprava Odl → hranice smrti = −(10 + oprava Odl).
   const odoMod = drdhAttrMod(g('attr_con'));
   const autoDeath = -(10 + odoMod);
 
@@ -749,8 +749,8 @@ function WeaponsTable({ cda, disabled }: SubProps) {
                   }
                   aria-label={`Zbraň ${i + 1} — typ`}
                 >
-                  <option value="melee">na blízko</option>
-                  <option value="ranged">střelná</option>
+                  <option value="melee">blízko</option>
+                  <option value="ranged">dálka</option>
                 </select>
               </td>
               {(['atk', 'dmg', 'def'] as const).map((field) => (
@@ -911,7 +911,7 @@ function SkillsTable({ cda, disabled }: SubProps) {
               </td>
               <td>
                 <select
-                  value={row.attr || 'OBR'}
+                  value={row.attr || 'Obr'}
                   disabled={disabled}
                   onChange={(e) =>
                     updateArr<DrdhSkill>('skills', i, { attr: e.target.value })
@@ -964,7 +964,7 @@ function SkillsTable({ cda, disabled }: SubProps) {
           type="button"
           className="add-btn"
           onClick={() =>
-            addArr<DrdhSkill>('skills', { name: '', attr: 'OBR', deg: '' })
+            addArr<DrdhSkill>('skills', { name: '', attr: 'Obr', deg: '' })
           }
         >
           + Přidat dovednost
@@ -978,50 +978,44 @@ function AbilitiesTable({ cda, disabled }: SubProps) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
   const rows = parseJsonArr<DrdhAbility>('abilities');
   return (
-    <>
-      <table className="tbl">
-        <thead>
-          <tr>
-            <th>Název</th>
-            <th>Popis / účinek</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, i) => (
-            <tr key={i}>
-              {(['name', 'desc'] as const).map((field) => (
-                <td key={field}>
-                  <input
-                    className="l"
-                    value={row[field] || ''}
-                    disabled={disabled}
-                    onChange={(e) =>
-                      updateArr<DrdhAbility>('abilities', i, {
-                        [field]: e.target.value,
-                      } as Partial<DrdhAbility>)
-                    }
-                    placeholder={field === 'name' ? 'Název' : 'Účinek…'}
-                    aria-label={`Schopnost ${i + 1} — ${field}`}
-                  />
-                </td>
-              ))}
-              <td>
-                {!disabled && (
-                  <button
-                    type="button"
-                    className="del"
-                    onClick={() => removeArr('abilities', i)}
-                    aria-label="Smazat schopnost"
-                  >
-                    ✕
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="ability-list">
+      {rows.map((row, i) => (
+        <div className="ability-card" key={i}>
+          <div className="ability-head">
+            <input
+              className="ability-name"
+              value={row.name || ''}
+              disabled={disabled}
+              onChange={(e) =>
+                updateArr<DrdhAbility>('abilities', i, { name: e.target.value })
+              }
+              placeholder="Název schopnosti"
+              aria-label={`Schopnost ${i + 1} — název`}
+            />
+            {!disabled && (
+              <button
+                type="button"
+                className="del"
+                onClick={() => removeArr('abilities', i)}
+                aria-label="Smazat schopnost"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <textarea
+            className="ability-desc"
+            value={row.desc || ''}
+            disabled={disabled}
+            onChange={(e) =>
+              updateArr<DrdhAbility>('abilities', i, { desc: e.target.value })
+            }
+            placeholder="Účinek… (zalomí se, vidíš celý text)"
+            aria-label={`Schopnost ${i + 1} — účinek`}
+            rows={2}
+          />
+        </div>
+      ))}
       {!disabled && (
         <button
           type="button"
@@ -1033,7 +1027,7 @@ function AbilitiesTable({ cda, disabled }: SubProps) {
           + Přidat schopnost
         </button>
       )}
-    </>
+    </div>
   );
 }
 
@@ -1298,7 +1292,7 @@ function DrdhPrintView({
               {weapons.map((w, i) => (
                 <tr key={i}>
                   <td>{w.name || '—'}</td>
-                  <td>{w.kind === 'ranged' ? 'střelná' : 'na blízko'}</td>
+                  <td>{w.kind === 'ranged' ? 'dálka' : 'blízko'}</td>
                   <td>{w.atk || '—'}</td>
                   <td>{w.dmg || '—'}</td>
                   <td>{w.def || '—'}</td>

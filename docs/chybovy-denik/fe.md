@@ -4,6 +4,18 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — DrDH iterace po živém testu: zkratky atributů + labely zbraní + karty schopností + select fix · 2026-06-30
+**Kontext:** Autor testoval DrDH deník+panel živě (deployed) a hlásil drobné UX vady (všechno FE, 0 BE).
+**Co opraveno:**
+- **Zkratky atributů** SIL/OBR/ODO/INT/CHAR → **Sil/Obr/Odl/Int/Char** (mixed-case = užší, vejdou se do úzkého ATR selectu v dovednostech). `constants.ts`: `DRDH_ATTRS.abbr`, `DRDH_ATTR_ABBRS`, klíče `DRDH_ABBR_TO_ID` (`id` str/dex/con… nezměněno, to jsou customData klíče); display labely v panelu (Obr/Sil). Systém nový bez dat → bez migrace.
+- **Labely typu zbraně** „na blízko"/„střelná" → **„blízko"/„dálka"** (kratší; hodnoty `melee`/`ranged` stejné).
+- **Zvláštní schopnosti** = tabulka → **karty** (název + zalamovací `textarea` účinku přes celou šířku panelu) — účinek se ořezával v jednořádkovém inputu; teď celý text + roste. `textarea.ability-desc` přebíjí `.scroll-panel textarea` (override min-height 150→2.8em vyšší specificitou).
+- **ATR select** font Cinzel→**Garamond** + 0 letter-spacing. **Izolovaná reprodukce** (`drdh-select-test.html`) ukázala, že 64px + `appearance:none` už „OBR/CHAR" pojme → autorův ořez „OD/OE" byl **stale build** (rodina CH-015 — testuje verzi ≠ kód), ne CSS bug; Garamond je navíc robustnější rezerva.
+**Jak ověřeno (sám):** `tsc -b` 0 + `npm run test:run` 37/37 (DrdhSheet+DrdhCombatPanel) + DrdhSheet 20/20 (abilities karty) + render prototypu (karty zobrazí celý účinek).
+**Zhodnocení:** Dobře — drobné UX iterace po živém testu, prototypy srovnány s produkcí; reprodukce odlišila stale-build od CSS bugu (nehádal jsem). **Navazuje:** rozpis hodu zbraně (útoč+vlastnost+hod=výsledek/zranění se znaménkem) — běží, dopíšu po dokončení.
+
+---
+
 ### ✅ ŘEŠENÍ — Dračí Hlídka (drdh) combat panel na taktické mapě (PC+NPC, skill `system` fáze 3) · 2026-06-30
 **Kontext:** Skill `system` fáze 3 — bojový panel DrDH na mapě (i v chatu zdarma přes COMBAT_PANELS). Po deníku (fáze 1).
 **Co zabralo:** prototyp=kontrakt (`c:\tmp\drdh-mapa-audit.html`) iterovaný s autorem (přidána sekce Dovednosti + rozklad bonusu „SIL +3 · výcvik +3") → delegace agentovi. `DrdhCombatPanel.tsx`+`.module.css` (fantasy „Strážní pole", pečetě = signature, adrenalin track), registrace `COMBAT_PANELS['drdh']`, `resolveCharacterHp` case 'drdh' (už existoval správný — `drdh_hp`/`_hp_max`). **Reuse constants deníku** (`drdhAttrMod`/`DRDH_*`) = hody panelu shodné s deníkem (single source). Hody: vlastnost/dovednost `d10`, zbraň/obrana `d6+` (exploduje), iniciativa `d6` (neexploduje). Per-povolání zdroj dle `DRDH_RESOURCE_BY_PROF.kind`.
