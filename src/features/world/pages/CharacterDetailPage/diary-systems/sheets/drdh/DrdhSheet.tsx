@@ -718,35 +718,55 @@ function WeaponsTable({ cda, disabled }: SubProps) {
       <table className="tbl">
         <thead>
           <tr>
-            <th>Zbraň</th>
-            <th>Útoč.</th>
-            <th>Zran.</th>
-            <th>Obr.</th>
-            <th>ÚČ</th>
-            <th>OČ</th>
+            <th>Název</th>
+            <th>Typ</th>
+            <th>Útočnost</th>
+            <th>Zranění</th>
+            <th>Obrana</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
-              {(['name', 'atk', 'dmg', 'def', 'uc', 'oc'] as const).map(
-                (field) => (
-                  <td key={field}>
-                    <input
-                      className={field === 'name' ? 'l' : undefined}
-                      value={row[field] || ''}
-                      disabled={disabled}
-                      onChange={(e) =>
-                        updateArr<DrdhWeapon>('weapons', i, {
-                          [field]: e.target.value,
-                        } as Partial<DrdhWeapon>)
-                      }
-                      aria-label={`Zbraň ${i + 1} — ${field}`}
-                    />
-                  </td>
-                ),
-              )}
+              <td>
+                <input
+                  className="l"
+                  value={row.name || ''}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<DrdhWeapon>('weapons', i, { name: e.target.value })
+                  }
+                  aria-label={`Zbraň ${i + 1} — název`}
+                />
+              </td>
+              <td>
+                <select
+                  value={row.kind === 'ranged' ? 'ranged' : 'melee'}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<DrdhWeapon>('weapons', i, { kind: e.target.value })
+                  }
+                  aria-label={`Zbraň ${i + 1} — typ`}
+                >
+                  <option value="melee">na blízko</option>
+                  <option value="ranged">střelná</option>
+                </select>
+              </td>
+              {(['atk', 'dmg', 'def'] as const).map((field) => (
+                <td key={field}>
+                  <input
+                    value={row[field] || ''}
+                    disabled={disabled}
+                    onChange={(e) =>
+                      updateArr<DrdhWeapon>('weapons', i, {
+                        [field]: e.target.value,
+                      } as Partial<DrdhWeapon>)
+                    }
+                    aria-label={`Zbraň ${i + 1} — ${field}`}
+                  />
+                </td>
+              ))}
               <td>
                 {!disabled && (
                   <button
@@ -770,11 +790,10 @@ function WeaponsTable({ cda, disabled }: SubProps) {
           onClick={() =>
             addArr<DrdhWeapon>('weapons', {
               name: '',
+              kind: 'melee',
               atk: '',
               dmg: '',
               def: '',
-              uc: '',
-              oc: '',
             })
           }
         >
@@ -1268,23 +1287,21 @@ function DrdhPrintView({
           <table>
             <thead>
               <tr>
-                <th>Zbraň</th>
-                <th>Útoč.</th>
-                <th>Zran.</th>
-                <th>Obr.</th>
-                <th>ÚČ</th>
-                <th>OČ</th>
+                <th>Název</th>
+                <th>Typ</th>
+                <th>Útočnost</th>
+                <th>Zranění</th>
+                <th>Obrana</th>
               </tr>
             </thead>
             <tbody>
               {weapons.map((w, i) => (
                 <tr key={i}>
                   <td>{w.name || '—'}</td>
+                  <td>{w.kind === 'ranged' ? 'střelná' : 'na blízko'}</td>
                   <td>{w.atk || '—'}</td>
                   <td>{w.dmg || '—'}</td>
                   <td>{w.def || '—'}</td>
-                  <td>{w.uc || '—'}</td>
-                  <td>{w.oc || '—'}</td>
                 </tr>
               ))}
             </tbody>

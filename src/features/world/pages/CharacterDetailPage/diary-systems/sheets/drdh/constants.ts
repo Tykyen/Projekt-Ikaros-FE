@@ -203,14 +203,31 @@ export const DRDH_PROF_TABLE: Record<DrdhProfessionId, DrdhProfTable> = {
   },
 };
 
-/** Zbraň v `drdh_weapons` JSON poli. */
+/** Typ zbraně — řídí útočný atribut (melee=SIL, ranged=OBR). */
+export type DrdhWeaponKind = 'melee' | 'ranged';
+
+/**
+ * Zbraň v `drdh_weapons` JSON poli.
+ *
+ * Drží JEN 3 čísla: útočnost (`atk`), zranění (`dmg`), obrana (`def`) — žádný
+ * výpočet, v deníku/chatu se zobrazují tak, jak jsou. Při HODU v combat panelu
+ * se k `atk`/`def` přičte oprava atributu (útok: SIL pro melee / OBR pro ranged;
+ * obrana: vždy OBR). Pole `kind` určuje typ (`'melee'` na blízko / `'ranged'`
+ * střelná); chybějící `kind` se bere jako `'melee'`.
+ *
+ * BC: starší záznamy mohou nést zrušená pole `uc`/`oc` — ignorují se (čteme jen
+ * name/kind/atk/dmg/def).
+ */
 export interface DrdhWeapon {
   name: string;
+  /** Typ zbraně (`'melee'` na blízko / `'ranged'` střelná). */
+  kind: string;
+  /** Útočnost (číslo k atk hodu). */
   atk: string;
+  /** Zranění (zobrazení / overlay, NEjde do modifieru hodu). */
   dmg: string;
+  /** Obrana (číslo k obrana hodu). */
   def: string;
-  uc: string;
-  oc: string;
 }
 
 /** Zbroj / štít v `drdh_armors` JSON poli. */

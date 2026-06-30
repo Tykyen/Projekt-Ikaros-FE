@@ -832,14 +832,16 @@
   -moz-appearance: none;
   text-align: center;
   text-align-last: center;
-  font-family: var(--drdh-font-head);
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  /* Garamond (užší než Cinzel) + 0 letter-spacing → i „CHAR" se vejde do úzké buňky */
+  font-family: var(--drdh-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--drdh-ink);
   background: rgba(255, 252, 242, 0.4);
   border: 1px solid rgba(194, 170, 120, 0.5);
   border-radius: 2px;
-  padding: 6px 4px;
+  padding: 6px 2px;
   cursor: pointer;
   outline: none;
 }

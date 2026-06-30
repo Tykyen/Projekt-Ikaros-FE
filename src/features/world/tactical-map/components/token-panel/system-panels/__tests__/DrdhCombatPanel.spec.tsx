@@ -7,8 +7,9 @@
  *   - klik na vlastnost → onRoll({ kind:'d10' }) s drdhAttrMod jako modifier
  *   - klik na dovednost → onRoll({ kind:'d10' }) s (oprava atributu + stupeň);
  *     rozklad bonusu v textu (ATR oprava · výcvik +stupeň)
- *   - per-zbraň: ⚔ Útok → onRoll({ kind:'d6+', modifier:uc }); ⛨ Obrana →
- *     onRoll({ kind:'d6+', modifier:oc }); samostatný OČ button už neexistuje
+ *   - per-zbraň: ⚔ Útok → onRoll({ kind:'d6+', modifier: atk + oprava SIL/OBR
+ *     dle typu }); ⛨ Obrana → onRoll({ kind:'d6+', modifier: def + oprava OBR });
+ *     zranění (dmg) jde jen do zobrazení; ÚČ/OČ jsou zrušené
  *   - per-povolání zdroj: válečník = adrenalin track, alchymista = mana+suroviny
  *   - HP ± step (debounced mutate na drdh_hp); canEdit=false → bez init/±
  *   - okno triků (modal) zobrazí profession tabulku
@@ -179,11 +180,13 @@ describe('DrdhCombatPanel', () => {
     });
   });
 
-  it('per-zbraň útok → onRoll ÚČ (uc) + d6+ (exploduje)', () => {
+  it('per-zbraň útok (melee) → onRoll (útočnost + oprava SIL) + d6+ (exploduje)', () => {
+    // SIL 16 → oprava +3; útočnost 4 → modifier 7.
     mockDiary.mockReturnValue(
       diaryWith({
+        drdh_attr_str: '16',
         drdh_weapons: JSON.stringify([
-          { name: 'Krátký meč', atk: '', dmg: '+1', def: '', uc: '7', oc: '5' },
+          { name: 'Krátký meč', kind: 'melee', atk: '4', dmg: '+1', def: '2' },
         ]),
       }),
     );
@@ -206,11 +209,43 @@ describe('DrdhCombatPanel', () => {
     });
   });
 
-  it('per-zbraň obrana → onRoll OČ (oc) + d6+ (exploduje)', () => {
+  it('per-zbraň útok (ranged) → oprava jde z OBR, ne SIL', () => {
+    // OBR 12 → oprava +1; útočnost 5 → modifier 6. SIL by dalo jiné číslo.
     mockDiary.mockReturnValue(
       diaryWith({
+        drdh_attr_str: '20', // pokud by se omylem použila SIL, modifier by byl jiný
+        drdh_attr_dex: '12',
         drdh_weapons: JSON.stringify([
-          { name: 'Krátký meč', atk: '', dmg: '+1', def: '', uc: '7', oc: '5' },
+          { name: 'Krátký luk', kind: 'ranged', atk: '5', dmg: '+1', def: '0' },
+        ]),
+      }),
+    );
+    const onRoll = vi.fn();
+    render(
+      <DrdhCombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+      { wrapper: makeWrapper() },
+    );
+    fireEvent.click(screen.getByLabelText('Útok Krátký luk'));
+    expect(onRoll).toHaveBeenCalledWith({
+      label: 'Útok: Krátký luk',
+      modifier: 6,
+      kind: 'd6+',
+    });
+  });
+
+  it('per-zbraň obrana → onRoll (obrana + oprava OBR) + d6+ (exploduje)', () => {
+    // OBR 12 → oprava +1; obrana 2 → modifier 3.
+    mockDiary.mockReturnValue(
+      diaryWith({
+        drdh_attr_dex: '12',
+        drdh_weapons: JSON.stringify([
+          { name: 'Krátký meč', kind: 'melee', atk: '4', dmg: '+1', def: '2' },
         ]),
       }),
     );
@@ -228,14 +263,50 @@ describe('DrdhCombatPanel', () => {
     fireEvent.click(screen.getByLabelText('Obrana Krátký meč'));
     expect(onRoll).toHaveBeenCalledWith({
       label: 'Obrana: Krátký meč',
-      modifier: 5,
+      modifier: 3,
       kind: 'd6+',
     });
   });
 
-  it('samostatný OČ button/sekce Obrana už neexistuje (obrana je per-zbraň)', () => {
-    mockDiary.mockReturnValue(diaryWith({ drdh_oc: '5' }));
+  it('zranění (dmg) NEvstupuje do modifieru útoku (jen útočnost + atribut)', () => {
+    // útočnost 0 + SIL 16 (+3) = 3; dmg +1 se NEpřičítá.
+    mockDiary.mockReturnValue(
+      diaryWith({
+        drdh_attr_str: '16',
+        drdh_weapons: JSON.stringify([
+          { name: 'Pěst', kind: 'melee', atk: '0', dmg: '+1', def: '0' },
+        ]),
+      }),
+    );
+    const onRoll = vi.fn();
     render(
+      <DrdhCombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+      { wrapper: makeWrapper() },
+    );
+    fireEvent.click(screen.getByLabelText('Útok Pěst'));
+    expect(onRoll).toHaveBeenCalledWith({
+      label: 'Útok: Pěst',
+      modifier: 3,
+      kind: 'd6+',
+    });
+  });
+
+  it('ÚČ/OČ jsou zrušené: žádné drdh_oc, žádný ÚČ/OČ text v panelu', () => {
+    mockDiary.mockReturnValue(
+      diaryWith({
+        drdh_oc: '5', // legacy pole se ignoruje
+        drdh_weapons: JSON.stringify([
+          { name: 'Meč', kind: 'melee', atk: '4', dmg: '+1', def: '2' },
+        ]),
+      }),
+    );
+    const { container } = render(
       <DrdhCombatPanel
         token={makeToken()}
         sceneId="s1"
@@ -247,6 +318,9 @@ describe('DrdhCombatPanel', () => {
     );
     expect(screen.queryByLabelText('Hodit obranu')).not.toBeInTheDocument();
     expect(screen.queryByText('Obranné číslo')).not.toBeInTheDocument();
+    // tlačítka už nezobrazují „ÚČ"/„OČ" labely
+    expect(container.textContent).not.toContain('ÚČ');
+    expect(container.textContent).not.toContain('OČ');
   });
 
   it('válečník → adrenalin track (klik na buňku zapíše res_adr, debounced)', () => {

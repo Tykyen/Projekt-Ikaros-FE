@@ -15,8 +15,11 @@
  *   - Vlastnost  = `d10` + oprava atributu (⌊st/2⌋−5)
  *   - Dovednost  = `d10` + oprava atributu dovednosti + stupeň dovednosti
  *                  (single source = `drdhAttrMod`, shodné s deníkovým součtem)
- *   - Obrana     = `d6+` + OČ (exploduje)
- *   - Zbraň      = `d6+` + ÚČ (exploduje); zranění = `dmg` v labelu/tooltipu
+ *   - Útok zbraní  = `d6+` + (útočnost zbraně `atk` + oprava útočného atributu:
+ *                    SIL pro `kind==='melee'`, OBR pro `kind==='ranged'`)
+ *   - Obrana zbraní= `d6+` + (obrana zbraně `def` + oprava OBR)
+ *   - zranění (`dmg`) jde JEN do zobrazení/labelu, NE do modifieru hodu
+ *   (ÚČ/OČ jsou ZRUŠENÉ — zbraň drží jen 3 čísla útočnost/zranění/obrana)
  *
  * Data flow vzorem `Drd16CombatPanel`: `useCharacterDiary` → debounced (~500 ms)
  * `useUpdateCharacterDiary({ customDataPatch })`. `canEdit === false` → readonly.
@@ -356,28 +359,37 @@ export function DrdhCombatPanel({
         </div>
       </section>
 
-      {/* ── Zbraně (útok ÚČ · obrana OČ — obojí k6+, oba exploding) ── */}
-      {/* OČ NENÍ samostatné pole: dle pravidel je obrana = ZO + obrana zbraně +
-          štít, tedy vázaná na konkrétní zbraň/štít (`drdh_weapons[].oc`). */}
+      {/* ── Zbraně (útok +vlastnost · obrana +OBR — obojí k6+, oba exploding) ── */}
+      {/* Zbraň drží jen 3 čísla (útočnost/zranění/obrana); ÚČ/OČ zrušené. Při
+          hodu se přičte oprava atributu: útok = atk + SIL (melee) / OBR (ranged),
+          obrana = def + OBR. Zranění (dmg) jde jen do zobrazení, ne do modifieru. */}
       {weapons.length > 0 && (
         <section className={styles.section}>
           <h3 className={styles.title}>
             <span className={`${styles.seal} ${styles.crimson}`} aria-hidden="true">
               ⚔
             </span>
-            Zbraně <small>útok ÚČ · obrana OČ (k6+)</small>
+            Zbraně <small>útok +vlastnost · obrana +OBR (k6+)</small>
           </h3>
           {weapons.map((w, i) => {
-            const uc = parseInt(w.uc, 10) || 0;
-            const oc = parseInt(w.oc, 10) || 0;
-            const meta = [w.dmg ? `zranění ${w.dmg}` : '', w.atk]
+            const ranged = w.kind === 'ranged';
+            const atkAbbr = ranged ? 'OBR' : 'SIL';
+            const atkAttrMod = drdhAttrMod(str(ranged ? 'attr_dex' : 'attr_str'));
+            const atkMod = (parseInt(w.atk, 10) || 0) + atkAttrMod;
+            const defMod = (parseInt(w.def, 10) || 0) + obrMod;
+            const meta = [
+              ranged ? 'střelná' : 'na blízko',
+              `útoč. ${w.atk || '0'} +${atkAbbr}`,
+              `obr. ${w.def || '0'} +OBR`,
+              w.dmg ? `zranění ${w.dmg}` : '',
+            ]
               .filter(Boolean)
               .join(' · ');
             return (
               <div key={`${w.name}-${i}`} className={styles.weapRow}>
                 <div className={styles.weapName}>
                   {w.name || '(bez názvu)'}
-                  {meta && <small>{meta}</small>}
+                  <small>{meta}</small>
                 </div>
                 <div className={styles.wacts}>
                   <button
@@ -389,11 +401,13 @@ export function DrdhCombatPanel({
                         ? undefined
                         : { cursor: 'default', pointerEvents: 'none' }
                     }
-                    onClick={() => doRoll(`Útok: ${w.name || 'zbraň'}`, uc, 'd6+')}
+                    onClick={() =>
+                      doRoll(`Útok: ${w.name || 'zbraň'}`, atkMod, 'd6+')
+                    }
                     aria-label={w.name ? `Útok ${w.name}` : 'Útok zbraní'}
-                    title={`Útok ${w.name || 'zbraň'} (k6+ ${fmtMod(uc)})${w.dmg ? ` · zranění ${w.dmg}` : ''}`}
+                    title={`Útok ${w.name || 'zbraň'} (k6+ ${fmtMod(atkMod)})${w.dmg ? ` · zranění ${w.dmg}` : ''}`}
                   >
-                    ⚔ Útok <b>ÚČ {w.uc || '0'}</b>
+                    ⚔ Útok <b>{fmtMod(atkMod)}</b>
                   </button>
                   <button
                     type="button"
@@ -405,12 +419,12 @@ export function DrdhCombatPanel({
                         : { cursor: 'default', pointerEvents: 'none' }
                     }
                     onClick={() =>
-                      doRoll(`Obrana: ${w.name || 'zbraň'}`, oc, 'd6+')
+                      doRoll(`Obrana: ${w.name || 'zbraň'}`, defMod, 'd6+')
                     }
                     aria-label={w.name ? `Obrana ${w.name}` : 'Obrana zbraní'}
-                    title={`Obrana ${w.name || 'zbraň'} (k6+ ${fmtMod(oc)})`}
+                    title={`Obrana ${w.name || 'zbraň'} (k6+ ${fmtMod(defMod)})`}
                   >
-                    ⛨ Obrana <b>OČ {w.oc || '0'}</b>
+                    ⛨ Obrana <b>{fmtMod(defMod)}</b>
                   </button>
                 </div>
               </div>

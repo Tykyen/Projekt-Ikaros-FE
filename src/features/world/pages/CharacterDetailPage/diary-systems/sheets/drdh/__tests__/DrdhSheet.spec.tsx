@@ -195,7 +195,7 @@ describe('DrdhSheet (16b — prototyp parity)', () => {
     expect(screen.queryByText('+ Přidat trik')).not.toBeInTheDocument();
   });
 
-  it('+ Přidat zbraň přidá prázdnou položku do drdh_weapons', () => {
+  it('+ Přidat zbraň přidá prázdnou položku do drdh_weapons (kind=melee, bez uc/oc)', () => {
     const onChange = vi.fn();
     render(
       <DrdhSheet
@@ -209,10 +209,78 @@ describe('DrdhSheet (16b — prototyp parity)', () => {
     expect(onChange).toHaveBeenCalledWith({
       customDataPatch: {
         drdh_weapons: JSON.stringify([
-          { name: '', atk: '', dmg: '', def: '', uc: '', oc: '' },
+          { name: '', kind: 'melee', atk: '', dmg: '', def: '' },
         ]),
       },
     });
+  });
+
+  it('zbraně tabulka: typ select (na blízko / střelná) + útočnost/zranění/obrana, žádné ÚČ/OČ', () => {
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({
+          drdh_weapons: JSON.stringify([
+            { name: 'Luk', kind: 'ranged', atk: '5', dmg: '+1', def: '0' },
+          ]),
+        })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    // scope na tabulku zbraní (přes typ select konkrétní zbraně)
+    const typeSel = screen.getByLabelText('Zbraň 1 — typ') as HTMLSelectElement;
+    const weaponTable = typeSel.closest('table') as HTMLTableElement;
+    const tbl = within(weaponTable);
+    // hlavičky 5 sloupců (bez ÚČ/OČ)
+    ['Název', 'Typ', 'Útočnost', 'Zranění', 'Obrana'].forEach((h) =>
+      expect(tbl.getByRole('columnheader', { name: h })).toBeInTheDocument(),
+    );
+    expect(
+      tbl.queryByRole('columnheader', { name: 'ÚČ' }),
+    ).not.toBeInTheDocument();
+    expect(
+      tbl.queryByRole('columnheader', { name: 'OČ' }),
+    ).not.toBeInTheDocument();
+    // typ select drží uloženou hodnotu + obě možnosti
+    expect(typeSel.value).toBe('ranged');
+    expect(
+      within(typeSel).getByRole('option', { name: 'na blízko' }),
+    ).toBeInTheDocument();
+    expect(
+      within(typeSel).getByRole('option', { name: 'střelná' }),
+    ).toBeInTheDocument();
+    // jen čísla, žádný výpočet
+    expect(
+      (screen.getByLabelText('Zbraň 1 — atk') as HTMLInputElement).value,
+    ).toBe('5');
+    expect(
+      (screen.getByLabelText('Zbraň 1 — def') as HTMLInputElement).value,
+    ).toBe('0');
+    // žádné uc/oc input pole
+    expect(screen.queryByLabelText('Zbraň 1 — uc')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Zbraň 1 — oc')).not.toBeInTheDocument();
+  });
+
+  it('zbraně BC: starý záznam s uc/oc + bez kind se načte jako na blízko a uc/oc se ignoruje', () => {
+    render(
+      <DrdhSheet
+        {...commonProps}
+        diary={makeDiary({
+          drdh_weapons: JSON.stringify([
+            { name: 'Meč', atk: '4', dmg: '+1', def: '2', uc: '7', oc: '5' },
+          ]),
+        })}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    // chybějící kind → default melee
+    expect(
+      (screen.getByLabelText('Zbraň 1 — typ') as HTMLSelectElement).value,
+    ).toBe('melee');
+    // čteme jen atk/def, uc/oc se nikde nezobrazí jako pole
+    expect(screen.queryByLabelText('Zbraň 1 — uc')).not.toBeInTheDocument();
   });
 
   it('+ Přidat zbroj / štít přidá řádek s polem zo', () => {
