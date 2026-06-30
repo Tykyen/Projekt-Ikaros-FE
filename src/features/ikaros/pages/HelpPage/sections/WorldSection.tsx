@@ -347,6 +347,13 @@ export function WorldSection() {
               každého hodu. Delší části povolání (kouzla, finty, formule, démony…) si
               otevřeš tlačítkem „📖" jen k nahlédnutí.
             </p>
+            <p>
+              U <strong>své postavy</strong> máš nad deníkem na mapě i v chatu tlačítka{' '}
+              <strong>🎒 Výbava</strong> a <strong>💰 Finance</strong> — otevřou okno, kde
+              za běhu hry upravíš věci v batohu (množství) nebo provedeš vklad/výběr a
+              převod peněz, aniž bys odcházel na stránku postavy. (NPC a bestie Výbavu ani
+              Finance nemají.)
+            </p>
           </MapFeature>
           <MapFeature icon={<Dices size={15} />} title="Hod kostkou">
             <p>

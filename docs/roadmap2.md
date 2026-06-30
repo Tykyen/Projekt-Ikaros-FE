@@ -358,6 +358,11 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Rozsah:** BE 3 pole + whitelist na `/chat/appearance` (vzor `chatSkin` z 16.1d) · FE override resolverů + přepínač v hlavičce + sekce „Jak čtu ostatní" v `AppearancePopover`.
 **Co ne:** OpenDyslexic font (chce font load — možné rozšíření), override barvy, PJ vynucení, per-konverzace volba.
 
+#### - [~] 16.1g Výbava + Finance v herním embedu (mapa + chat) — 🟡 funkčně 2026-06-30 [dopad střední · náklad střední] · *zpětná vazba autora*
+> **🟡 Funkčně hotovo 2026-06-30 (mimo původní plán — žádost autora při stavbě Shadowrunu).** Za běhu hry (taktická mapa + chat rail) potřebuje hráč u postavy vidět/měnit **Výbavu** (inventář, množství) a **Finance** (zůstatek, vklad/výběr) — ty jinak žijí jen jako taby plné stránky postavy. **Klíč:** `InventoryTab`+`FinanceTab` jsou soběstačné (data si tahají dle slugu, samy ukládají) → stačí je namountovat do modalu. Sdílená lišta `EmbedSubdocsBar` (🎒 Výbava / 💰 Finance) → `Modal` s taby, fetch přes `usePage`. Zapojeno v **TM** (`TokenSystemSheet`, PC/NPC; bestie ne) i **chatu** (`DiaryRollPanel`). Napříč **všemi systémy** (sdílený modal, ne per-systém). Ověřeno build+render (chrome bere embed tokeny skinu: scifi/fantasy), bez regrese (ChatContextRail+combatPanels). Detail: `project_embed_subdocs_vybava_finance`.
+**Cíl:** Rychlý přístup k Výbavě a Financím postavy přímo z deníku na mapě a v chatu, bez odchodu na plnou stránku postavy — tam, kde to má reálný dopad na hru.
+**⚠️ Zbývá (následný krok):** plné **per-skin sladění vnitřku** `InventoryTab`/`FinanceTab` (mají vlastní module CSS, ne embed tokeny) → tokenizovat na `--dd-embed-*`/`--mx-log-*` a render-ověřit napříč 8 skiny; vyžaduje živé potvrzení autora. Zatím vnitřek drží světový vzhled (funkčně 100 %).
+
 ### - [ ] 16.2 👑 Hloubková podpora RPG systémů — [E2 · dopad vysoký · náklad velký] 🔁
 > **Reorganizováno 2026-06-22 — rozpad „per pilíř", ne „per systém".** Pilíř = sdílená infrastruktura; postavit engine jednou a naplnit napříč systémy je efektivnější než stavět ho u každého systému znovu. **Dva pilíře:** 16.2a Deník · 16.2b Bestiář. **3. pilíř „Dodatky k pravidlům" VYŘAZEN z 16.2** — design je nejasný (jak by fungoval); vrátí se jako vlastní pozdější bod, až bude promyšlený. Progress per systém = matice na konci.
 **Cíl:** Každý systém s deníkem dotáhnout ve **dvou pilířích**: deníkový list s kostkovými mechanikami + bestiář (statbloky v tvaru systému, spawnovatelné na mapu).
@@ -428,9 +433,9 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Bestie (grafika)
   - [x] Chat (→ 16.1)
   - [x] Skiny (→ 16.2c)
-- **Shadowrun** (`shadowrun`) — *stav kódu:* list sheet+testy; mapa fallback BEZ `onRoll`
-  - [ ] Reálný list (grafika)
-  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel)
+- **Shadowrun** (`shadowrun`) — *přes skill `system`; default skin scifi (HUD --mx- rodina)*
+  - [x] **Reálný list (grafika)** — ✅ 2026-06-30 cyberpunk HUD redesign (přepis legacy 8.7k portu → tokenizovaný `.sr-*`, výpočetní jádro: 8 atr→odvozené hodnoty + záznamníky 8+⌈atr/2⌉, zranění −1/3 do poolů, pool dovednosti/zbraně = atr+dov+spec; Matrix A/M/Z/F+záznamník, kouzla/adept, augmentace s esencí, HO=Tělo+zbroj). View/edit/print, PC/NPC, `sr_` klíče reuse. Ověřeno build+9 testů+render desktop/mobil; vizuál po deployi. **Bez hodů v deníku** (kostky až TM/chat). **⚠️ DLUH:** roll-engine `rollPool` neumí úspěchy(5–6)/glitch → SR6 hody zapojit s rozšířením enginu ve fázi mapa/chat.
+  - [ ] Taktická mapa (grafika + funkčně doplnit hody / panel + pool-hit engine)
   - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)

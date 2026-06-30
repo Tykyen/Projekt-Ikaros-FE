@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, X, Pencil } from 'lucide-react';
 import { DiaryTab } from '@/features/world/pages/CharacterDetailPage/components/DiaryTab';
 import { DiarySkinScope } from '@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope';
+import { EmbedSubdocsBar } from '@/features/world/pages/CharacterDetailPage/components/embed/EmbedSubdocsBar';
 import { usePersonaDirectory } from '@/features/world/pages/api/usePersonaDirectory';
 import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import { COMBAT_PANELS } from '@/features/world/tactical-map/components/token-panel/combatPanels';
@@ -149,6 +150,9 @@ export function DiaryRollPanel({
 
       <div className={s.scroll}>
         <DiarySkinScope worldId={worldId}>
+          {attribution.kind !== 'npc' && (
+            <EmbedSubdocsBar worldId={worldId} slug={slug} canEdit={canEdit} />
+          )}
           {CombatPanel ? (
             <CombatPanel
               token={miniToken}

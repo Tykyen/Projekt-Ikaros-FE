@@ -1,0 +1,85 @@
+/* Výbava/Finance embed lišta + modal chrome.
+ * Bere skin deníku přes embed tokeny (--dd-embed-* / --mx-log-*) s neutrálními
+ * fallbacky, aby fungovala v každém systému. Lišta je uvnitř DiarySkinScope
+ * (předek nese data-diary-system/skin), modal scope si atributy nese sám. */
+
+.bar {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 10px;
+  flex-wrap: wrap;
+}
+.barBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 7px 12px;
+  font: 600 12px/1 system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  border-radius: 5px;
+  color: var(--dd-embed-text, var(--mx-log-num, #cdd6f0));
+  background: var(--dd-embed-chip-bg, var(--mx-log-chip, rgba(255, 255, 255, 0.06)));
+  border: 1px solid var(--dd-embed-border, var(--mx-log-border, rgba(255, 255, 255, 0.16)));
+  transition: filter 0.12s;
+}
+.barBtn:hover {
+  filter: brightness(1.18);
+}
+
+/* ── Modal scope (obal obsahu uvnitř shared Modalu) ── */
+.scope {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+}
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--dd-embed-line, var(--mx-log-border, rgba(255, 255, 255, 0.12)));
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  padding: 8px 16px;
+  font: 600 13px/1 system-ui, sans-serif;
+  border-radius: 6px 6px 0 0;
+  color: var(--dd-embed-muted, var(--mx-log-num, #8b93ab));
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+.tab:hover {
+  color: var(--dd-embed-text, #cdd6f0);
+}
+.tabOn {
+  color: var(--dd-embed-title, var(--mx-log-title, #f0f3ff));
+  background: var(--dd-embed-chip-bg, var(--mx-log-chip, rgba(255, 255, 255, 0.06)));
+  border-color: var(--dd-embed-border, var(--mx-log-border, rgba(255, 255, 255, 0.16)));
+  box-shadow: inset 0 2px 0 var(--dd-embed-accent, var(--mx-log-total, #38e0ff));
+}
+.tabSpacer {
+  flex: 1;
+}
+.editToggle {
+  cursor: pointer;
+  padding: 7px 14px;
+  font: 600 12px/1 system-ui, sans-serif;
+  border-radius: 5px;
+  color: var(--dd-embed-accent, var(--mx-log-total, #38e0ff));
+  background: transparent;
+  border: 1px solid var(--dd-embed-accent, var(--mx-log-total, rgba(56, 224, 255, 0.5)));
+}
+.editToggle:hover {
+  filter: brightness(1.15);
+}
+.content {
+  flex: 1;
+  min-height: 0;
+  padding-top: 12px;
+}

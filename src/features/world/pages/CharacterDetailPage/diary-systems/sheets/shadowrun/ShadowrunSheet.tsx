@@ -1,1261 +1,1248 @@
 /**
- * 8.7k — Shadowrun deník postavy.
+ * Shadowrun 6e (Sixth World) — deník postavy. Sci-fi HUD (styles/shadowrun.css,
+ * scoped [data-diary-system='shadowrun'], token rodina --mx-*).
  *
- * Adaptace z `c:/Matrix/Matrix/frontend/src/components/diary/ShadowrunCharacterSheet.tsx`
- * (502 ř). Cyberpunk neon magenta + cyan tema. 2 taby (Postava+Vlastnosti
- * / Matrix+Magie+Boj). Custom renderery:
- *   - Condition Track (Phys + Stun) s -1 penalty per 3 boxy
- *   - Matrix panel (Device + 4 attrs + programs + 12-box damage track)
- *   - Quick Combat block (3 sekce: Pancíř / Ranged / Melee)
+ * Výpočetní jádro (krok B): atributy → odvozené hodnoty (iniciativa, HO,
+ * Composure/Judge/Memory/Lift) + velikosti záznamníků (8+⌈atr/2⌉) se počítají;
+ * zranění v záznamníku dává −1 za každé 3 boxy do VŠECH dice poolů; pool
+ * dovednosti/zbraně = atribut + hodnocení (+2 specializace) − penalizace.
  *
- * Data v `diary.customData` s prefixem `sr_*` (1:1 vůči legacy).
+ * Hody (klikací pool d6 → úspěchy 5–6 + glitch) se NEzobrazují v klasickém
+ * deníku — patří do TM combat panelu + chatu (pozdější fáze + rozšíření
+ * roll-enginu o počítání úspěchů). Deník ukazuje pool jako informaci.
+ *
+ * Data v `diary.customData` s prefixem `sr_` (reuse legacy klíčů → bez migrace).
+ * 3 režimy: view · edit · print (oddělený `ShadowrunPrintView`).
  */
-import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { usePrintMode } from '@/features/world/export/print';
+import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
-import { SR_CORE_ATTRS, SR_SPECIAL_ATTRS } from './constants';
+import {
+  SR_CORE_ATTRS,
+  SR_ATTR_BY_KEY,
+  SR_ATTR_KEYS,
+  SR_MATRIX_STATS,
+  SR_MATRIX_TRACK,
+  SR_WOUND_STEP,
+  ceilHalf,
+} from './constants';
 
-type Tab = 'core' | 'gear';
+// ── data shapes ────────────────────────────────────────────────
+interface SrSkill {
+  name: string;
+  attr: string;
+  val: string;
+  spec: string;
+}
+interface SrWeapon {
+  name: string;
+  type: string;
+  ar: string;
+  dmg: string;
+  attr: string;
+  val: string;
+  spec: string;
+}
+interface SrSpell {
+  name: string;
+  type: string;
+  rng: string;
+  dur: string;
+  drain: string;
+}
+interface SrRow3 {
+  name: string;
+  a: string;
+  b: string;
+}
 
+const int = (s: string): number => parseInt(s, 10) || 0;
+
+type Attrs = Record<string, number>;
+function readAttrs(cda: CdAccess): Attrs {
+  const o: Attrs = {};
+  for (const k of SR_ATTR_KEYS) o[k] = int(cda.g(`attr_${k}`, '0'));
+  return o;
+}
+function poolOf(attrs: Attrs, attr: string, val: string, spec: string, woundPen: number): number {
+  return Math.max(0, (attrs[attr] ?? 0) + int(val) + (spec ? 2 : 0) - woundPen);
+}
+
+// ════════════════════════════════════════════════════════════════
 export function ShadowrunSheet({
   diary,
   mode,
+  worldId,
+  characterSlug,
   onChange,
 }: SystemSheetProps) {
-  const disabled = mode === 'view';
   const printMode = usePrintMode();
+  const { data: character } = useCharacter(worldId, characterSlug);
+  const isNpc = !!character?.isNpc;
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'sr_', onChange);
-  const { g, set } = cda;
 
-  const [tab, setTab] = useState<Tab>('core');
-
-  // Tisk: inputy/tracky (barva)/taby jsou netisknutelné — vyrenderujeme
-  // statický čitelný dokument; oba taby najednou (tisk nezná aktivní tab).
   if (printMode) return <ShadowrunPrintView cda={cda} />;
 
+  const editing = mode === 'edit';
+  const attrs = readAttrs(cda);
+  const physFilled = int(cda.g('cond_phys', '0'));
+  const stunFilled = int(cda.g('cond_stun', '0'));
+  const woundPen =
+    Math.floor(physFilled / SR_WOUND_STEP) + Math.floor(stunFilled / SR_WOUND_STEP);
+  const armorTotal = cda
+    .parseJsonArr<SrRow3>('armor')
+    .reduce((sum, a) => sum + int(a.a), 0);
+
   return (
-    <div className="sr-dashboard">
-      {/* ═══ HEADER ═══ */}
-      <div className="sr-header">
-        <div className="id-col" style={{ flex: 2 }}>
-          <div className="form-group">
-            <label htmlFor="sr_name">Hlavní Alias / Jméno</label>
-            <input
-              id="sr_name"
-              className="h1-style"
-              value={g('name')}
-              disabled={disabled}
-              onChange={(e) => set('name', e.target.value)}
-              placeholder="Neon..."
-            />
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div className="form-group" style={{ flex: 1 }}>
-              <label htmlFor="sr_player">Hráč</label>
-              <input
-                id="sr_player"
-                value={g('player')}
-                disabled={disabled}
-                onChange={(e) => set('player', e.target.value)}
-              />
+    <div className="sr-sheet" data-mode={mode}>
+      <Hero cda={cda} editing={editing} isNpc={isNpc} />
+
+      <div className="sr-grid2">
+        <AttributesPanel cda={cda} editing={editing} attrs={attrs} />
+        <DerivedPanel
+          cda={cda}
+          editing={editing}
+          attrs={attrs}
+          armorTotal={armorTotal}
+          physFilled={physFilled}
+          stunFilled={stunFilled}
+          woundPen={woundPen}
+        />
+      </div>
+
+      <SkillsPanel cda={cda} editing={editing} attrs={attrs} woundPen={woundPen} />
+
+      <div className="sr-grid2">
+        <WeaponsPanel cda={cda} editing={editing} attrs={attrs} woundPen={woundPen} />
+        <ArmorPanel cda={cda} editing={editing} attrs={attrs} armorTotal={armorTotal} />
+      </div>
+
+      <div className="sr-grid2">
+        <MagicPanel cda={cda} editing={editing} />
+        <MatrixPanel cda={cda} editing={editing} />
+      </div>
+
+      <div className="sr-grid2">
+        <AugPanel cda={cda} editing={editing} />
+        <QualitiesPanel cda={cda} editing={editing} />
+      </div>
+
+      <div className="sr-grid2">
+        <ContactsPanel cda={cda} editing={editing} />
+        <IdentityPanel cda={cda} editing={editing} />
+      </div>
+
+      <NotesPanel cda={cda} editing={editing} />
+    </div>
+  );
+}
+
+// ── shared types ───────────────────────────────────────────────
+interface PanelProps {
+  cda: CdAccess;
+  editing: boolean;
+}
+
+// ── Hero ───────────────────────────────────────────────────────
+const HERO_META: { key: string; label: string }[] = [
+  { key: 'realname', label: 'Jméno' },
+  { key: 'race', label: 'Metarasa' },
+  { key: 'role_note', label: 'Archetyp' },
+  { key: 'rep', label: 'Pověst' },
+  { key: 'notoriety', label: 'Hledanost' },
+  { key: 'public', label: 'Veřejné povědomí' },
+];
+
+function Hero({ cda, editing, isNpc }: PanelProps & { isNpc: boolean }) {
+  const { g, set } = cda;
+  const alias = g('name');
+  const initials =
+    alias
+      .split(/\s+/)
+      .map((w) => w[0] ?? '')
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || '?';
+  const edgeMax = int(g('attr_edg', '0'));
+  const edgeCur = Math.min(int(g('edge_cur', '0')), edgeMax || 99);
+
+  return (
+    <header className="sr-hero">
+      <div className="sr-portrait">
+        <span>{initials}</span>
+      </div>
+      <div className="sr-hero-id">
+        {editing ? (
+          <input
+            className="sr-name"
+            value={alias}
+            onChange={(e) => set('name', e.target.value)}
+            placeholder="Alias / přezdívka"
+            aria-label="Alias"
+          />
+        ) : (
+          <h1 className="sr-name">{alias || (isNpc ? 'NPC' : 'Bez aliasu')}</h1>
+        )}
+        <div className="sr-meta">
+          {HERO_META.map((m) => (
+            <div className="cell" key={m.key}>
+              <span className="k">{m.label}</span>
+              {editing ? (
+                <input
+                  className="v"
+                  value={g(m.key)}
+                  onChange={(e) => set(m.key, e.target.value)}
+                  aria-label={m.label}
+                />
+              ) : (
+                <span className="v">{g(m.key) || '—'}</span>
+              )}
             </div>
-            <div className="form-group" style={{ flex: 2 }}>
-              <label htmlFor="sr_role_note">Poznámka (Role)</label>
-              <input
-                id="sr_role_note"
-                value={g('role_note')}
-                disabled={disabled}
-                onChange={(e) => set('role_note', e.target.value)}
-              />
-            </div>
-          </div>
+          ))}
         </div>
-        <div className="id-col">
-          <div className="form-group">
-            <label htmlFor="sr_race">Metarasa</label>
-            <input
-              id="sr_race"
-              value={g('race')}
-              disabled={disabled}
-              onChange={(e) => set('race', e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="sr_ethnicity">Etnicita</label>
-            <input
-              id="sr_ethnicity"
-              value={g('ethnicity')}
-              disabled={disabled}
-              onChange={(e) => set('ethnicity', e.target.value)}
-            />
-          </div>
+      </div>
+      <div className="sr-hero-stats">
+        <div className="sr-bigstat edge">
+          <span className="lab">Hrana</span>
+          <span className="sr-edge-pips" role="group" aria-label="Hrana">
+            {Array.from({ length: Math.max(edgeMax, 1) }, (_, i) =>
+              editing ? (
+                <button
+                  type="button"
+                  key={i}
+                  className={i < edgeCur ? 'on' : ''}
+                  onClick={() => set('edge_cur', String(i + 1 === edgeCur ? i : i + 1))}
+                  aria-label={`Hrana ${i + 1}`}
+                />
+              ) : (
+                <i key={i} className={i < edgeCur ? 'on' : ''} />
+              ),
+            )}
+          </span>
+          <span className="num">
+            {editing ? (
+              <input
+                value={g('attr_edg')}
+                onChange={(e) => set('attr_edg', e.target.value)}
+                aria-label="Hrana max"
+              />
+            ) : (
+              edgeCur
+            )}
+            <small>/{edgeMax || '—'}</small>
+          </span>
         </div>
-        <div className="id-col">
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div className="form-group">
-              <label htmlFor="sr_notoriety">Hledanost</label>
+        <HeroStat cda={cda} editing={editing} cls="ess" label="Esence" field="attr_ess" />
+        <HeroStat cda={cda} editing={editing} cls="mag" label="Magie / Rez." field="attr_mag" />
+        <div className="sr-bigstat">
+          <span className="lab">Karma</span>
+          <span className="num">
+            {editing ? (
               <input
-                id="sr_notoriety"
-                value={g('notoriety')}
-                disabled={disabled}
-                onChange={(e) => set('notoriety', e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="sr_rep">Pověst</label>
-              <input
-                id="sr_rep"
-                value={g('rep')}
-                disabled={disabled}
-                onChange={(e) => set('rep', e.target.value)}
-              />
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div className="form-group">
-              <label htmlFor="sr_karma">Zbývá Karma</label>
-              <input
-                id="sr_karma"
                 value={g('karma')}
-                disabled={disabled}
                 onChange={(e) => set('karma', e.target.value)}
-                style={{ color: '#ec4899', fontWeight: 'bold' }}
+                aria-label="Karma"
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="sr_karma_total">Celkem K.</label>
-              <input
-                id="sr_karma_total"
-                value={g('karma_total')}
-                disabled={disabled}
-                onChange={(e) => set('karma_total', e.target.value)}
-              />
-            </div>
-          </div>
+            ) : (
+              g('karma') || '0'
+            )}
+            <small>/{g('karma_total') || '—'}</small>
+          </span>
         </div>
       </div>
+    </header>
+  );
+}
 
-      {/* ═══ TABS ═══ */}
-      <div className="sr-tabs">
-        <button
-          type="button"
-          className={tab === 'core' ? 'active' : ''}
-          onClick={() => setTab('core')}
-        >
-          1. Postava a Vlastnosti
-        </button>
-        <button
-          type="button"
-          className={tab === 'gear' ? 'active' : ''}
-          onClick={() => setTab('gear')}
-        >
-          2. Matrix, Magie a Boj
-        </button>
-      </div>
-
-      {tab === 'core' && <CoreTab cda={cda} disabled={disabled} />}
-      {tab === 'gear' && <GearTab cda={cda} disabled={disabled} />}
+function HeroStat({
+  cda,
+  editing,
+  cls,
+  label,
+  field,
+}: PanelProps & { cls: string; label: string; field: string }) {
+  const { g, set } = cda;
+  return (
+    <div className={`sr-bigstat ${cls}`}>
+      <span className="lab">{label}</span>
+      <span className="num">
+        {editing ? (
+          <input value={g(field)} onChange={(e) => set(field, e.target.value)} aria-label={label} />
+        ) : (
+          g(field) || '0'
+        )}
+      </span>
     </div>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
-// Tab: Core (Postava a Vlastnosti)
-// ════════════════════════════════════════════════════════════════
-
-interface SubProps {
-  cda: CdAccess;
-  disabled: boolean;
-}
-
-function CoreTab({ cda, disabled }: SubProps) {
-  const { g, set } = cda;
-  const physMax = parseInt(g('cond_phys_max', '10'), 10) || 10;
-  const stunMax = parseInt(g('cond_stun_max', '10'), 10) || 10;
-
+// ── Atributy ───────────────────────────────────────────────────
+function AttributesPanel({ cda, editing, attrs }: PanelProps & { attrs: Attrs }) {
+  const { set } = cda;
   return (
-    <div className="sr-tab-content sr-grid">
-      {/* Quick combat (panel-12) */}
-      <div className="panel-12">
-        <div className="quick-combat">
-          <QcBox cda={cda} disabled={disabled} variant="armor" />
-          <QcBox cda={cda} disabled={disabled} variant="ranged" />
-          <QcBox cda={cda} disabled={disabled} variant="melee" />
-        </div>
-      </div>
-
-      {/* Atributy (panel-4) */}
-      <div className="panel-4">
-        <h3>Atributy (Základní)</h3>
-        <div className="attrs-box">
-          {SR_CORE_ATTRS.map((a) => (
-            <div className="attr-row" key={a.key}>
-              <div className="attr-name">{a.label}</div>
-              <div className="attr-vals">
+    <section className="sr-panel sr-panel--accent">
+      <h2 className="sr-title">
+        Atributy <span className="sr-hint">(1–6 norm, 7+ augment)</span>
+      </h2>
+      <div className="sr-attr-grid">
+        {SR_CORE_ATTRS.map((a) => {
+          const v = attrs[a.key] ?? 0;
+          return (
+            <div className={`sr-attr ${a.group}`} key={a.key}>
+              <div className="ahead">
+                <span className="alab">{a.label}</span>
+                <span className="acode">{a.code}</span>
+              </div>
+              {editing ? (
                 <input
-                  value={g(`attr_${a.key}`)}
-                  disabled={disabled}
-                  onChange={(e) => set(`attr_${a.key}`, e.target.value)}
+                  className="aval"
+                  type="number"
+                  min={0}
+                  value={v}
+                  onChange={(e) => set(`attr_${a.key}`, String(Math.max(0, int(e.target.value))))}
                   aria-label={a.label}
                 />
-              </div>
+              ) : (
+                <div className="aval">{v}</div>
+              )}
+              <Bar value={v} />
             </div>
-          ))}
-        </div>
-
-        <h3>Speciální &amp; Odvozené</h3>
-        <div className="attrs-box sec-attrs">
-          {SR_SPECIAL_ATTRS.map((a) => (
-            <div className="attr-row" key={a.key}>
-              <div className="attr-name">{a.label}</div>
-              <div className="attr-vals">
-                <input
-                  value={g(`attr_${a.key}`)}
-                  disabled={disabled}
-                  onChange={(e) => set(`attr_${a.key}`, e.target.value)}
-                  aria-label={a.label}
-                />
-              </div>
-            </div>
-          ))}
-          <div className="attr-row" style={{ gridColumn: 'span 2' }}>
-            <div className="attr-name">Hodnocení Obrany (HO)</div>
-            <div className="attr-vals">
-              <input
-                value={g('attr_def')}
-                disabled={disabled}
-                onChange={(e) => set('attr_def', e.target.value)}
-                aria-label="Hodnocení Obrany"
-              />
-            </div>
-          </div>
-        </div>
-
-        <textarea
-          className="sr-textarea"
-          style={{ marginTop: 16 }}
-          value={g('notes')}
-          disabled={disabled}
-          onChange={(e) => set('notes', e.target.value)}
-          placeholder="Obecné poznámky postavy..."
-          aria-label="Poznámky"
-        />
+          );
+        })}
       </div>
+    </section>
+  );
+}
 
-      {/* Condition + Eco (panel-4) */}
-      <div className="panel-4">
-        <ConditionTrack
-          fieldKey="cond_phys"
-          maxBoxes={physMax}
-          title="Fyzický záznamník zranění"
-          stunVariant={false}
-          cda={cda}
-          disabled={disabled}
-        />
-        <ConditionTrack
-          fieldKey="cond_stun"
-          maxBoxes={stunMax}
-          title="Záznamník omráčení (Stun)"
-          stunVariant
-          cda={cda}
-          disabled={disabled}
-        />
-
-        <div
-          className="eco-panel"
-          style={{
-            background: 'rgba(16, 185, 129, 0.05)',
-            borderRadius: 4,
-            padding: 16,
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            borderLeft: '4px solid #10b981',
-          }}
-        >
-          <h3 style={{ color: '#10b981' }}>Finance &amp; Životní styl</h3>
-          <div style={{ marginBottom: 12 }}>
-            <label
-              style={{
-                fontSize: 10,
-                color: '#9ca3af',
-                display: 'block',
-                marginBottom: 4,
-              }}
-              htmlFor="sr_eco_nuyen"
-            >
-              Nuyeny (Hotovost / Účty)
-            </label>
-            <input
-              id="sr_eco_nuyen"
-              value={g('eco_nuyen')}
-              disabled={disabled}
-              onChange={(e) => set('eco_nuyen', e.target.value)}
-              style={{
-                width: '100%',
-                background: 'rgba(0,0,0,0.5)',
-                border: '1px solid rgba(16,185,129,0.3)',
-                color: '#10b981',
-                padding: 8,
-                fontSize: 18,
-                fontWeight: 'bold',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <label
-              style={{
-                fontSize: 10,
-                color: '#9ca3af',
-                display: 'block',
-                marginBottom: 4,
-              }}
-              htmlFor="sr_eco_lifestyle"
-            >
-              Primární životní styl
-            </label>
-            <input
-              id="sr_eco_lifestyle"
-              value={g('eco_lifestyle')}
-              disabled={disabled}
-              onChange={(e) => set('eco_lifestyle', e.target.value)}
-              style={{
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                borderBottom: '1px solid rgba(255,255,255,0.2)',
-                color: '#fff',
-                padding: 4,
-                outline: 'none',
-              }}
-            />
-          </div>
-          <div>
-            <label
-              style={{
-                fontSize: 10,
-                color: '#9ca3af',
-                display: 'block',
-                marginBottom: 4,
-              }}
-              htmlFor="sr_eco_sins"
-            >
-              Falešné SIN a Licence (Přehled)
-            </label>
-            <textarea
-              id="sr_eco_sins"
-              value={g('eco_sins')}
-              disabled={disabled}
-              onChange={(e) => set('eco_sins', e.target.value)}
-              style={{
-                width: '100%',
-                minHeight: 100,
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: '#d1d5db',
-                padding: 8,
-                fontSize: 12,
-                resize: 'vertical',
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Skills/Qualities/Contacts (panel-4) */}
-      <div className="panel-4">
-        <h3>Dovednosti</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="skills"
-          cols={[
-            ['name', 'Dovednost'],
-            ['val', 'Hodn.', 'td-s'],
-            ['attr', 'Atr', 'td-s'],
-            ['type', 'Typ (A/Z/K)', 'td-m'],
-          ]}
-          addLabel="+ Přidat dovednost"
-          template={{ name: '', val: '', attr: '', type: '' }}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Kvality</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="qualities"
-          cols={[
-            ['name', 'Kvalita'],
-            ['type', 'Typ', 'td-s'],
-            ['note', 'Poznámka', 'td-m'],
-          ]}
-          addLabel="+ Přidat kvalitu"
-          template={{ name: '', type: '', note: '' }}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Kontakty</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="contacts"
-          cols={[
-            ['name', 'Jméno / Spojka'],
-            ['loy', 'Loaj', 'td-s'],
-            ['con', 'Konx', 'td-s'],
-          ]}
-          addLabel="+ Přidat kontakt"
-          template={{ name: '', loy: '', con: '' }}
-        />
-      </div>
+function Bar({ value }: { value: number }) {
+  return (
+    <div className="sr-bar">
+      {Array.from({ length: 6 }, (_, i) => (
+        <i key={i} className={i < value ? 'on' : ''} />
+      ))}
     </div>
   );
 }
 
-// ════════════════════════════════════════════════════════════════
-// Tab: Gear (Matrix, Magie, Boj)
-// ════════════════════════════════════════════════════════════════
+// ── Odvozené + záznamníky ──────────────────────────────────────
+function DerivedPanel({
+  cda,
+  editing,
+  attrs,
+  armorTotal,
+  physFilled,
+  stunFilled,
+  woundPen,
+}: PanelProps & {
+  attrs: Attrs;
+  armorTotal: number;
+  physFilled: number;
+  stunFilled: number;
+  woundPen: number;
+}) {
+  const init = (attrs.rea ?? 0) + (attrs.int ?? 0);
+  const dr = (attrs.bod ?? 0) + armorTotal;
+  const physMax = 8 + ceilHalf(attrs.bod ?? 0);
+  const stunMax = 8 + ceilHalf(attrs.wil ?? 0);
+  const physPen = Math.floor(physFilled / SR_WOUND_STEP);
+  const stunPen = Math.floor(stunFilled / SR_WOUND_STEP);
 
-function GearTab({ cda, disabled }: SubProps) {
-  const { g, set } = cda;
-  const matDmg = parseInt(g('mat_dmg'), 10) || 0;
+  const derived: [string, ReactNode][] = [
+    ['Iniciativa', <>{init} <small>+ 1k6</small></>],
+    ['Hodnocení obrany', dr],
+    ['Composure', (attrs.wil ?? 0) + (attrs.cha ?? 0)],
+    ['Odhad lidí', (attrs.wil ?? 0) + (attrs.int ?? 0)],
+    ['Paměť', (attrs.log ?? 0) + (attrs.wil ?? 0)],
+    ['Zvedání/nošení', (attrs.str ?? 0) + (attrs.bod ?? 0)],
+  ];
 
   return (
-    <div className="sr-tab-content sr-grid">
-      {/* Matrix + Magic (panel-7) */}
-      <div className="panel-7">
-        <div
-          className="matrix-panel"
-          style={{ padding: 20, borderRadius: 4, marginBottom: 24 }}
-        >
-          <h3>Matrix a Zařízení (Cyberdeck / Komlink)</h3>
-          <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-            <div style={{ flex: 2 }}>
-              <label
-                style={{ fontSize: 10, color: '#06b6d4' }}
-                htmlFor="sr_mat_device"
-              >
-                Komlink / Cyberdeck Název
-              </label>
-              <input
-                id="sr_mat_device"
-                value={g('mat_device')}
-                disabled={disabled}
-                onChange={(e) => set('mat_device', e.target.value)}
-                style={{
-                  width: '100%',
-                  border: 'none',
-                  borderBottom: '1px solid rgba(6,182,212,0.5)',
-                  background: 'transparent',
-                  color: '#fff',
-                  padding: 4,
-                  outline: 'none',
-                  fontSize: 16,
-                }}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label
-                style={{ fontSize: 10, color: '#06b6d4' }}
-                htmlFor="sr_mat_dev_rating"
-              >
-                Hodnocení
-              </label>
-              <input
-                id="sr_mat_dev_rating"
-                value={g('mat_dev_rating')}
-                disabled={disabled}
-                onChange={(e) => set('mat_dev_rating', e.target.value)}
-                style={{
-                  width: '100%',
-                  border: 'none',
-                  borderBottom: '1px solid rgba(6,182,212,0.5)',
-                  background: 'transparent',
-                  color: '#fff',
-                  padding: 4,
-                  outline: 'none',
-                  fontSize: 16,
-                }}
-              />
-            </div>
+    <section className="sr-panel">
+      <h2 className="sr-title">
+        Odvozené hodnoty <span className="sr-hint">počítá se z atributů</span>
+      </h2>
+      <div className="sr-derv">
+        {derived.map(([lab, val]) => (
+          <div className="d" key={lab}>
+            <span className="lab">{lab}</span>
+            <span className="val">{val}</span>
           </div>
+        ))}
+      </div>
 
-          <div className="m-stats">
-            {(
-              [
-                ['mat_atk', 'Útok (A)'],
-                ['mat_slz', 'Maskování (S)'],
-                ['mat_dp', 'Zprac. (D)'],
-                ['mat_fw', 'Firewall (F)'],
-              ] as const
-            ).map(([key, label]) => (
-              <div className="m-stat" key={key}>
-                <label htmlFor={`sr_${key}`}>{label}</label>
-                <input
-                  id={`sr_${key}`}
-                  value={g(key)}
-                  disabled={disabled}
-                  onChange={(e) => set(key, e.target.value)}
-                  aria-label={label}
-                />
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: 20 }}>
-            <div style={{ flex: 2 }}>
-              <label
-                style={{
-                  fontSize: 10,
-                  color: '#06b6d4',
-                  display: 'block',
-                  marginBottom: 8,
-                }}
-              >
-                Nainstalované Programy
-              </label>
-              <SrTable
-                cda={cda}
-                disabled={disabled}
-                arrKey="mat_progs"
-                cols={[['name', 'Program']]}
-                addLabel="+ Program"
-                template={{ name: '' }}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label
-                style={{
-                  fontSize: 10,
-                  color: '#06b6d4',
-                  display: 'block',
-                  marginBottom: 8,
-                }}
-              >
-                Matrix Záznamník (12 boxů)
-              </label>
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 4,
-                  flexWrap: 'wrap',
-                  background: 'rgba(0,0,0,0.4)',
-                  padding: 8,
-                  borderRadius: 4,
-                  border: '1px solid rgba(6,182,212,0.3)',
-                }}
-              >
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <button
-                    type="button"
-                    key={i}
-                    onClick={() =>
-                      set('mat_dmg', matDmg === i + 1 ? String(i) : String(i + 1))
-                    }
-                    disabled={disabled}
-                    style={{
-                      width: 20,
-                      height: 20,
-                      cursor: disabled ? 'default' : 'pointer',
-                      border: '1px solid #06b6d4',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      background: i < matDmg ? '#06b6d4' : 'transparent',
-                      color: i < matDmg ? '#fff' : 'transparent',
-                      fontSize: 10,
-                      padding: 0,
-                    }}
-                    aria-label={`Matrix damage box ${i + 1}`}
-                  >
-                    X
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+      <div style={{ marginTop: 12 }}>
+        <ConditionTrack
+          cda={cda}
+          editing={editing}
+          kind="phys"
+          field="cond_phys"
+          label="⬡ Fyzický záznamník"
+          filled={physFilled}
+          size={physMax}
+          penalty={physPen}
+        />
+        <ConditionTrack
+          cda={cda}
+          editing={editing}
+          kind="stun"
+          field="cond_stun"
+          label="◐ Záznamník omráčení (Stun)"
+          filled={stunFilled}
+          size={stunMax}
+          penalty={stunPen}
+        />
+        <div className="sr-pen-total">
+          Celková penalizace do všech poolů: <b className="pen">−{woundPen}</b>
+          {' · '}Overflow: <b className="over">0/{attrs.bod ?? 0}</b>
         </div>
-
-        <h3 style={{ marginTop: 24 }}>
-          Magie: Kouzla / Výtvory / Rituály / KF
-        </h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="spells"
-          cols={[
-            ['name', 'Jméno (K/V/R/KF)'],
-            ['type', 'Typ/Cíl', 'td-s'],
-            ['rng', 'Dosah', 'td-s'],
-            ['dur', 'Trvání', 'td-s'],
-            ['drain', 'Odliv', 'td-s'],
-          ]}
-          addLabel="+ Přidat formu / kouzlo"
-          template={{ name: '', type: '', rng: '', dur: '', drain: '' }}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Adeptské síly a další schopnosti</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="powers"
-          cols={[
-            ['name', 'Název schopnosti'],
-            ['lvl', 'Úroveň', 'td-s'],
-            ['note', 'Poznámky', 'td-m'],
-          ]}
-          addLabel="+ Přidat sílu"
-          template={{ name: '', lvl: '', note: '' }}
-        />
       </div>
-
-      {/* Weapons + Armor + Aug + Vehicles (panel-5) */}
-      <div className="panel-5">
-        <h3>Střelné zbraně</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="ranged"
-          cols={[
-            ['name', 'Zbraň'],
-            ['dmg', 'HP', 'td-s'],
-            ['ar', 'HÚ', 'td-s'],
-            ['ammo', 'Munice', 'td-s'],
-          ]}
-          addLabel="+ Střelná zbraň"
-          template={{ name: '', dmg: '', ar: '', ammo: '' }}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Zbraně na blízko</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="melee"
-          cols={[
-            ['name', 'Zbraň'],
-            ['dmg', 'HP', 'td-s'],
-            ['reach', 'Dosah', 'td-s'],
-          ]}
-          addLabel="+ Kontaktní zbraň"
-          template={{ name: '', dmg: '', reach: '' }}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Hlavní Pancíř / Zbroj</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="armor"
-          cols={[
-            ['name', 'Pancíř'],
-            ['val', 'Hodn.', 'td-s'],
-            ['note', 'Poznámka', 'td-m'],
-          ]}
-          addLabel="+ Část zbroje"
-          template={{ name: '', val: '', note: '' }}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Augmentace (Cyber/Bioware)</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="aug"
-          cols={[
-            ['name', 'Zlepšení'],
-            ['val', 'Hodn.', 'td-s'],
-            ['ess', 'Esence', 'td-s'],
-          ]}
-          addLabel="+ Přidat augmentaci"
-          template={{ name: '', val: '', ess: '' }}
-        />
-
-        <h3 style={{ marginTop: 24 }}>Dopravní prostředky / Droni</h3>
-        <SrTable
-          cda={cda}
-          disabled={disabled}
-          arrKey="vehicle"
-          cols={[
-            ['name', 'Model'],
-            ['speed', 'Max Y.', 'td-s'],
-            ['bod', 'Tělo/Pan', 'td-s'],
-          ]}
-          addLabel="+ Vůz / Dron"
-          template={{ name: '', speed: '', bod: '' }}
-        />
-      </div>
-    </div>
+    </section>
   );
-}
-
-// ── Condition track ─────────────────────────────────────────────
-
-interface ConditionTrackProps {
-  fieldKey: string;
-  maxBoxes: number;
-  title: string;
-  stunVariant: boolean;
-  cda: CdAccess;
-  disabled: boolean;
 }
 
 function ConditionTrack({
-  fieldKey,
-  maxBoxes,
-  title,
-  stunVariant,
   cda,
-  disabled,
-}: ConditionTrackProps) {
-  const { g, set } = cda;
-  const currentNum = parseInt(g(fieldKey), 10) || 0;
-
-  const toggleBox = (index: number) => {
-    if (disabled) return;
-    set(fieldKey, currentNum === index + 1 ? String(index) : String(index + 1));
+  editing,
+  kind,
+  field,
+  label,
+  filled,
+  size,
+  penalty,
+}: PanelProps & {
+  kind: 'phys' | 'stun' | 'matrix';
+  field: string;
+  label: string;
+  filled: number;
+  size: number;
+  penalty: number;
+}) {
+  const { set } = cda;
+  const click = (i: number) => {
+    if (!editing) return;
+    set(field, String(i + 1 === filled ? i : i + 1));
   };
-
   return (
-    <div
-      className="condition-panel"
-      style={
-        stunVariant
-          ? {
-              borderColor: 'rgba(236,72,153,0.3)',
-              borderTopColor: '#ec4899',
-              boxShadow: 'inset 0 0 20px rgba(236,72,153,0.05)',
-            }
-          : undefined
-      }
-    >
-      <h4 style={stunVariant ? { color: '#ec4899' } : undefined}>{title}</h4>
-      <div className="track-wrapper">
-        <div className="track-row">
-          {Array.from({ length: maxBoxes }).map((_, i) => {
-            const isPenaltyBox = (i + 1) % 3 === 0;
-            const penalty = Math.floor((i + 1) / 3);
-            return (
-              <div key={i} style={{ display: 'flex' }}>
-                <button
-                  type="button"
-                  className={`c-box ${i < currentNum ? 'checked' : ''}`}
-                  onClick={() => toggleBox(i)}
-                  disabled={disabled}
-                  style={{
-                    borderColor:
-                      stunVariant && i < currentNum ? '#ec4899' : undefined,
-                  }}
-                  aria-label={`${title} box ${i + 1}`}
-                  aria-pressed={i < currentNum}
-                >
-                  {i < currentNum ? 'X' : ''}
-                </button>
-                {isPenaltyBox && i < maxBoxes - 1 && (
-                  <div className="c-penalty">-{penalty}</div>
-                )}
-              </div>
-            );
-          })}
+    <div className={`sr-cond ${kind}`} style={kind === 'stun' ? { marginTop: 18 } : undefined}>
+      <div className="chead">
+        <span className="clab">{label}</span>
+        <span className="cpen">−{penalty}</span>
+      </div>
+      <div className="sr-track">
+        {Array.from({ length: Math.max(size, filled) }, (_, i) => {
+          const isMark = (i + 1) % SR_WOUND_STEP === 0;
+          return (
+            <button
+              type="button"
+              key={i}
+              className={`sr-box ${i < filled ? 'on' : ''}`}
+              onClick={() => click(i)}
+              disabled={!editing}
+              aria-label={`${label} box ${i + 1}`}
+              aria-pressed={i < filled}
+            >
+              {i < filled ? '✕' : ''}
+              {isMark && <span className="mk">−{(i + 1) / SR_WOUND_STEP}</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Dovednosti ─────────────────────────────────────────────────
+function SkillsPanel({
+  cda,
+  editing,
+  attrs,
+  woundPen,
+}: PanelProps & { attrs: Attrs; woundPen: number }) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const skills = parseJsonArr<SrSkill>('skills');
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title">
+        Dovednosti{' '}
+        <span className="sr-hint">pool = atribut + dovednost (+2 specializace) − penalizace</span>
+      </h2>
+      {skills.length === 0 && !editing && (
+        <div className="sr-empty">Žádné dovednosti.</div>
+      )}
+      {skills.map((s, i) => {
+        const pool = poolOf(attrs, s.attr, s.val, s.spec, woundPen);
+        if (editing) {
+          return (
+            <div className="sr-row skill edit" key={i}>
+              <input
+                className="sr-input nm"
+                value={s.name}
+                onChange={(e) => updateArr<SrSkill>('skills', i, { name: e.target.value })}
+                placeholder="Dovednost"
+              />
+              <select
+                className="sr-input sm"
+                style={{ width: 'auto' }}
+                value={SR_ATTR_KEYS.includes(s.attr) ? s.attr : 'agi'}
+                onChange={(e) => updateArr<SrSkill>('skills', i, { attr: e.target.value })}
+                aria-label="Atribut"
+              >
+                {SR_CORE_ATTRS.map((a) => (
+                  <option key={a.key} value={a.key}>
+                    {a.code}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="sr-input sm"
+                type="number"
+                value={s.val}
+                onChange={(e) => updateArr<SrSkill>('skills', i, { val: e.target.value })}
+                aria-label="Hodnocení"
+              />
+              <input
+                className="sr-input"
+                style={{ width: 140 }}
+                value={s.spec}
+                onChange={(e) => updateArr<SrSkill>('skills', i, { spec: e.target.value })}
+                placeholder="specializace"
+              />
+              <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('skills', i)}>
+                ✕
+              </span>
+            </div>
+          );
+        }
+        return (
+          <div className="sr-row skill" key={i}>
+            <div className="nm">
+              {s.name || '—'}
+              {s.spec && <small>specializace: {s.spec} (+2)</small>}
+            </div>
+            <span className="sr-chip">{SR_ATTR_BY_KEY[s.attr]?.code ?? '?'}</span>
+            <span className="sr-rate">{int(s.val)}</span>
+            <span className="sr-pool">
+              = <b>{pool}</b> <small>k6</small>
+            </span>
+          </div>
+        );
+      })}
+      {editing && (
+        <button
+          type="button"
+          className="sr-add"
+          onClick={() => addArr<SrSkill>('skills', { name: '', attr: 'agi', val: '0', spec: '' })}
+        >
+          + Přidat dovednost
+        </button>
+      )}
+    </section>
+  );
+}
+
+// ── Zbraně ─────────────────────────────────────────────────────
+function WeaponsPanel({
+  cda,
+  editing,
+  attrs,
+  woundPen,
+}: PanelProps & { attrs: Attrs; woundPen: number }) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const weapons = parseJsonArr<SrWeapon>('weapons');
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title sr-title--phys">
+        Zbraně <span className="sr-hint">HÚ = hodnocení útoku · HP = poškození</span>
+      </h2>
+      {weapons.length === 0 && !editing && <div className="sr-empty">Žádné zbraně.</div>}
+      {weapons.map((w, i) => {
+        const pool = poolOf(attrs, w.attr, w.val, w.spec, woundPen);
+        if (editing) {
+          return (
+            <div className="sr-row weapon edit" key={i}>
+              <input
+                className="sr-input nm"
+                value={w.name}
+                onChange={(e) => updateArr<SrWeapon>('weapons', i, { name: e.target.value })}
+                placeholder="Zbraň"
+              />
+              <input
+                className="sr-input sm"
+                style={{ width: 90 }}
+                value={w.type}
+                onChange={(e) => updateArr<SrWeapon>('weapons', i, { type: e.target.value })}
+                placeholder="typ"
+              />
+              <input
+                className="sr-input sm"
+                style={{ width: 110 }}
+                value={w.ar}
+                onChange={(e) => updateArr<SrWeapon>('weapons', i, { ar: e.target.value })}
+                placeholder="HÚ"
+              />
+              <input
+                className="sr-input sm"
+                style={{ width: 60 }}
+                value={w.dmg}
+                onChange={(e) => updateArr<SrWeapon>('weapons', i, { dmg: e.target.value })}
+                placeholder="HP"
+              />
+              <select
+                className="sr-input sm"
+                style={{ width: 'auto' }}
+                value={SR_ATTR_KEYS.includes(w.attr) ? w.attr : 'agi'}
+                onChange={(e) => updateArr<SrWeapon>('weapons', i, { attr: e.target.value })}
+                aria-label="Atribut"
+              >
+                {SR_CORE_ATTRS.map((a) => (
+                  <option key={a.key} value={a.key}>
+                    {a.code}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="sr-input sm"
+                type="number"
+                value={w.val}
+                onChange={(e) => updateArr<SrWeapon>('weapons', i, { val: e.target.value })}
+                aria-label="Dovednost"
+              />
+              <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('weapons', i)}>
+                ✕
+              </span>
+            </div>
+          );
+        }
+        return (
+          <div className="sr-row weapon" key={i}>
+            <div className="nm">
+              {w.name || '—'}
+              <small>
+                {[w.type, w.ar && `HÚ ${w.ar}`].filter(Boolean).join(' · ')}
+              </small>
+            </div>
+            <span className="sr-chip dmg">{w.dmg || '—'}</span>
+            <span className="sr-pool">
+              = <b>{pool}</b> <small>k6</small>
+            </span>
+          </div>
+        );
+      })}
+      {editing && (
+        <button
+          type="button"
+          className="sr-add"
+          onClick={() =>
+            addArr<SrWeapon>('weapons', {
+              name: '',
+              type: '',
+              ar: '',
+              dmg: '',
+              attr: 'agi',
+              val: '0',
+              spec: '',
+            })
+          }
+        >
+          + Přidat zbraň
+        </button>
+      )}
+    </section>
+  );
+}
+
+// ── Zbroj + obrana ─────────────────────────────────────────────
+function ArmorPanel({
+  cda,
+  editing,
+  attrs,
+  armorTotal,
+}: PanelProps & { attrs: Attrs; armorTotal: number }) {
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title">Zbroj &amp; obrana</h2>
+      <ArrTable
+        cda={cda}
+        editing={editing}
+        arrKey="armor"
+        cols={[
+          { k: 'name', label: 'Pancíř / kus' },
+          { k: 'a', label: 'Hodn.' },
+          { k: 'b', label: 'Pozn.' },
+        ]}
+        addLabel="+ Přidat zbroj"
+      />
+      <div className="sr-pen-total" style={{ marginTop: 12 }}>
+        Hodnocení obrany (HO) = Tělo + zbroj ={' '}
+        <b style={{ color: 'var(--mx-accent)', fontSize: 15 }}>{(attrs.bod ?? 0) + armorTotal}</b>
+        <div className="sr-note-line">Když HÚ útočníka ≥ HO + 4 → útočník získá Hranu.</div>
+      </div>
+    </section>
+  );
+}
+
+// ── Magie ──────────────────────────────────────────────────────
+function MagicPanel({ cda, editing }: PanelProps) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const spells = parseJsonArr<SrSpell>('spells');
+  const powers = parseJsonArr<SrRow3>('powers');
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title sr-title--magic">
+        Magie <span className="sr-hint">odpor odlivu = Vůle + Charisma · DV = síla odlivu</span>
+      </h2>
+      {spells.length === 0 && !editing && (
+        <div className="sr-empty">Žádná kouzla / rituály (postava nemusí být mág).</div>
+      )}
+      {spells.map((sp, i) =>
+        editing ? (
+          <div className="sr-row spell edit" key={i}>
+            <input
+              className="sr-input nm"
+              value={sp.name}
+              onChange={(e) => updateArr<SrSpell>('spells', i, { name: e.target.value })}
+              placeholder="Kouzlo / rituál / KF"
+            />
+            <input
+              className="sr-input sm"
+              style={{ width: 90 }}
+              value={sp.type}
+              onChange={(e) => updateArr<SrSpell>('spells', i, { type: e.target.value })}
+              placeholder="typ/cíl"
+            />
+            <input
+              className="sr-input sm"
+              style={{ width: 80 }}
+              value={sp.dur}
+              onChange={(e) => updateArr<SrSpell>('spells', i, { dur: e.target.value })}
+              placeholder="trvání"
+            />
+            <input
+              className="sr-input sm"
+              style={{ width: 70 }}
+              value={sp.drain}
+              onChange={(e) => updateArr<SrSpell>('spells', i, { drain: e.target.value })}
+              placeholder="odliv"
+            />
+            <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('spells', i)}>
+              ✕
+            </span>
+          </div>
+        ) : (
+          <div className="sr-row spell" key={i}>
+            <div className="nm">
+              {sp.name || '—'}
+              <small>{[sp.type, sp.dur].filter(Boolean).join(' · ')}</small>
+            </div>
+            <span className="sr-rate">{sp.rng || ''}</span>
+            <span className="sr-chip">{sp.dur || '—'}</span>
+            <span className="sr-pool">
+              <small>odliv</small> <b>{sp.drain || '—'}</b>
+            </span>
+          </div>
+        ),
+      )}
+      {editing && (
+        <button
+          type="button"
+          className="sr-add"
+          onClick={() =>
+            addArr<SrSpell>('spells', { name: '', type: '', rng: '', dur: '', drain: '' })
+          }
+        >
+          + Přidat kouzlo / rituál / KF
+        </button>
+      )}
+
+      <h3 className="sr-title" style={{ marginTop: 16, fontSize: 12 }}>
+        Adeptské síly
+      </h3>
+      {powers.length === 0 && !editing && <div className="sr-empty">Žádné síly.</div>}
+      {powers.map((p, i) =>
+        editing ? (
+          <div className="sr-row power edit" key={i}>
+            <input
+              className="sr-input nm"
+              value={p.name}
+              onChange={(e) => updateArr<SrRow3>('powers', i, { name: e.target.value })}
+              placeholder="Síla / schopnost"
+            />
+            <input
+              className="sr-input sm"
+              value={p.a}
+              onChange={(e) => updateArr<SrRow3>('powers', i, { a: e.target.value })}
+              placeholder="úroveň"
+            />
+            <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('powers', i)}>
+              ✕
+            </span>
+          </div>
+        ) : (
+          <div className="sr-row power" key={i}>
+            <div className="nm">
+              {p.name || '—'}
+              {p.b && <small>{p.b}</small>}
+            </div>
+            <span className="sr-rate">{p.a || ''}</span>
+          </div>
+        ),
+      )}
+      {editing && (
+        <button
+          type="button"
+          className="sr-add"
+          onClick={() => addArr<SrRow3>('powers', { name: '', a: '', b: '' })}
+        >
+          + Přidat sílu
+        </button>
+      )}
+    </section>
+  );
+}
+
+// ── Matrix ─────────────────────────────────────────────────────
+function MatrixPanel({ cda, editing }: PanelProps) {
+  const { g, set } = cda;
+  const dmg = int(g('mat_dmg', '0'));
+  return (
+    <section className="sr-panel sr-panel--accent">
+      <h2 className="sr-title">
+        Matrix <span className="sr-hint">A/M/Z/F · vlastní záznamník</span>
+      </h2>
+      <div className="sr-mtx-device">
+        Zařízení:{' '}
+        {editing ? (
+          <>
+            <input
+              value={g('mat_device')}
+              onChange={(e) => set('mat_device', e.target.value)}
+              placeholder="Komlink / cyberdeck"
+              aria-label="Zařízení"
+            />
+            <input
+              style={{ width: 60 }}
+              value={g('mat_dev_rating')}
+              onChange={(e) => set('mat_dev_rating', e.target.value)}
+              placeholder="hodn."
+              aria-label="Hodnocení zařízení"
+            />
+          </>
+        ) : (
+          <>
+            <b>{g('mat_device') || '—'}</b>
+            {g('mat_dev_rating') && <span>· Hodn. {g('mat_dev_rating')}</span>}
+          </>
+        )}
+      </div>
+      <div className="sr-mtxgrid">
+        {SR_MATRIX_STATS.map((m) => (
+          <div className="m" key={m.key}>
+            <div className="l">
+              {m.label} ({m.code})
+            </div>
+            {editing ? (
+              <input
+                value={g(m.key)}
+                onChange={(e) => set(m.key, e.target.value)}
+                aria-label={m.label}
+              />
+            ) : (
+              <div className="n">{g(m.key) || '0'}</div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="sr-cond matrix">
+        <div className="chead">
+          <span className="clab">▣ Matrix záznamník</span>
+          <span className="cmeta">
+            {dmg} / {SR_MATRIX_TRACK}
+          </span>
+        </div>
+        <div className="sr-track">
+          {Array.from({ length: SR_MATRIX_TRACK }, (_, i) => (
+            <button
+              type="button"
+              key={i}
+              className={`sr-box ${i < dmg ? 'on' : ''}`}
+              onClick={() => editing && set('mat_dmg', String(i + 1 === dmg ? i : i + 1))}
+              disabled={!editing}
+              aria-label={`Matrix box ${i + 1}`}
+              aria-pressed={i < dmg}
+            >
+              {i < dmg ? '✕' : ''}
+            </button>
+          ))}
         </div>
       </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <span
-          style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}
-        >
-          Max Políček:
-        </span>
-        <input
-          type="number"
-          style={{
-            width: 50,
-            background: 'rgba(0,0,0,0.5)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: '#fff',
-            padding: 4,
-            textAlign: 'center',
-          }}
-          value={g(`${fieldKey}_max`, '10')}
-          disabled={disabled}
-          onChange={(e) => set(`${fieldKey}_max`, e.target.value)}
-          aria-label={`${title} max boxes`}
+      <div style={{ marginTop: 12 }}>
+        <ArrTable
+          cda={cda}
+          editing={editing}
+          arrKey="mat_progs"
+          cols={[{ k: 'name', label: 'Nainstalované programy' }]}
+          addLabel="+ Program"
         />
       </div>
-    </div>
+    </section>
   );
 }
 
-// ── Quick combat box ────────────────────────────────────────────
-
-interface QcBoxProps extends SubProps {
-  variant: 'armor' | 'ranged' | 'melee';
+// ── Augmentace ─────────────────────────────────────────────────
+function AugPanel({ cda, editing }: PanelProps) {
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title">
+        Augmentace <span className="sr-hint">esence klesá → ovlivní Magii</span>
+      </h2>
+      <ArrTable
+        cda={cda}
+        editing={editing}
+        arrKey="aug"
+        cols={[
+          { k: 'name', label: 'Cyber / Bioware' },
+          { k: 'a', label: 'Hodn.' },
+          {
+            k: 'b',
+            label: 'Esence',
+            render: (v) => <span className="sr-ess-cost">−{v || '0'}</span>,
+          },
+        ]}
+        addLabel="+ Přidat augmentaci"
+      />
+    </section>
+  );
 }
 
-function QcBox({ cda, disabled, variant }: QcBoxProps) {
+// ── Kvality ────────────────────────────────────────────────────
+function QualitiesPanel({ cda, editing }: PanelProps) {
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title">Kvality</h2>
+      <ArrTable
+        cda={cda}
+        editing={editing}
+        arrKey="qualities"
+        cols={[
+          { k: 'name', label: 'Kvalita' },
+          {
+            k: 'a',
+            label: 'Typ',
+            render: (v) => (
+              <span className={v === '−' || v === '-' ? 'sr-neg' : 'sr-pos'}>{v || '+'}</span>
+            ),
+          },
+        ]}
+        addLabel="+ Přidat kvalitu"
+      />
+    </section>
+  );
+}
+
+// ── Kontakty ───────────────────────────────────────────────────
+function ContactsPanel({ cda, editing }: PanelProps) {
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title">Kontakty</h2>
+      <ArrTable
+        cda={cda}
+        editing={editing}
+        arrKey="contacts"
+        cols={[
+          { k: 'name', label: 'Spojka' },
+          { k: 'a', label: 'Loaj.' },
+          { k: 'b', label: 'Konx.' },
+        ]}
+        addLabel="+ Přidat kontakt"
+      />
+    </section>
+  );
+}
+
+// ── Identita ───────────────────────────────────────────────────
+function IdentityPanel({ cda, editing }: PanelProps) {
   const { g, set } = cda;
-  if (variant === 'armor') {
+  if (editing) {
     return (
-      <div className="qc-box">
-        <div className="qc-title">Hlavní Pancíř</div>
-        <div className="qc-inputs">
-          <div className="qi">
-            <label htmlFor="sr_qc_armor">Název</label>
-            <input
-              id="sr_qc_armor"
-              value={g('qc_armor')}
-              disabled={disabled}
-              onChange={(e) => set('qc_armor', e.target.value)}
-            />
-          </div>
-          <div className="qi" style={{ maxWidth: 80 }}>
-            <label htmlFor="sr_qc_armor_val">Hodnocení</label>
-            <input
-              id="sr_qc_armor_val"
-              value={g('qc_armor_val')}
-              disabled={disabled}
-              onChange={(e) => set('qc_armor_val', e.target.value)}
-              style={{ color: '#ec4899', fontSize: 18, fontWeight: 'bold' }}
-            />
-          </div>
+      <section className="sr-panel">
+        <h2 className="sr-title">Identita &amp; styl</h2>
+        <div className="sr-ident-edit">
+          <input
+            className="sr-input"
+            value={g('eco_lifestyle')}
+            onChange={(e) => set('eco_lifestyle', e.target.value)}
+            placeholder="Životní styl"
+          />
+          <input
+            className="sr-input"
+            value={g('eco_sins')}
+            onChange={(e) => set('eco_sins', e.target.value)}
+            placeholder="Falešné SIN"
+          />
+          <input
+            className="sr-input"
+            value={g('licenses')}
+            onChange={(e) => set('licenses', e.target.value)}
+            placeholder="Licence"
+          />
         </div>
-      </div>
-    );
-  }
-  if (variant === 'ranged') {
-    return (
-      <div className="qc-box" style={{ flex: 2 }}>
-        <div className="qc-title">Rychlá Zbraň na dálku</div>
-        <div className="qc-inputs">
-          <div className="qi">
-            <label htmlFor="sr_qc_ranged">Zbraň</label>
-            <input
-              id="sr_qc_ranged"
-              value={g('qc_ranged')}
-              disabled={disabled}
-              onChange={(e) => set('qc_ranged', e.target.value)}
-            />
-          </div>
-          <div className="qi" style={{ maxWidth: 60 }}>
-            <label htmlFor="sr_qc_r_dmg">HP</label>
-            <input
-              id="sr_qc_r_dmg"
-              value={g('qc_r_dmg')}
-              disabled={disabled}
-              onChange={(e) => set('qc_r_dmg', e.target.value)}
-            />
-          </div>
-          <div className="qi" style={{ maxWidth: 50 }}>
-            <label htmlFor="sr_qc_r_mod">Mód</label>
-            <input
-              id="sr_qc_r_mod"
-              value={g('qc_r_mod')}
-              disabled={disabled}
-              onChange={(e) => set('qc_r_mod', e.target.value)}
-            />
-          </div>
-          <div className="qi" style={{ maxWidth: 60 }}>
-            <label htmlFor="sr_qc_r_ammo">Záchyt</label>
-            <input
-              id="sr_qc_r_ammo"
-              value={g('qc_r_ammo')}
-              disabled={disabled}
-              onChange={(e) => set('qc_r_ammo', e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
+      </section>
     );
   }
   return (
-    <div className="qc-box">
-      <div className="qc-title">Rychlá Zbraň na blízko</div>
-      <div className="qc-inputs">
-        <div className="qi">
-          <label htmlFor="sr_qc_melee">Zbraň</label>
-          <input
-            id="sr_qc_melee"
-            value={g('qc_melee')}
-            disabled={disabled}
-            onChange={(e) => set('qc_melee', e.target.value)}
-          />
-        </div>
-        <div className="qi" style={{ maxWidth: 60 }}>
-          <label htmlFor="sr_qc_m_dmg">HP</label>
-          <input
-            id="sr_qc_m_dmg"
-            value={g('qc_m_dmg')}
-            disabled={disabled}
-            onChange={(e) => set('qc_m_dmg', e.target.value)}
-          />
-        </div>
+    <section className="sr-panel">
+      <h2 className="sr-title">Identita &amp; styl</h2>
+      <div className="sr-ident">
+        Životní styl: <b>{g('eco_lifestyle') || '—'}</b>
+        <br />
+        Falešné SIN: <b>{g('eco_sins') || '—'}</b>
+        <br />
+        Licence: <b>{g('licenses') || '—'}</b>
       </div>
-    </div>
+    </section>
   );
 }
 
-// ── Generic table helper ────────────────────────────────────────
-
-interface SrTableProps {
-  cda: CdAccess;
-  disabled: boolean;
-  arrKey: string;
-  /** Tuples [field, label, optional class `td-s`/`td-m`]. */
-  cols: [string, string, string?][];
-  addLabel: string;
-  template: Record<string, string>;
+// ── Poznámky ───────────────────────────────────────────────────
+function NotesPanel({ cda, editing }: PanelProps) {
+  const { g, set } = cda;
+  return (
+    <section className="sr-panel">
+      <h2 className="sr-title">Poznámky</h2>
+      <textarea
+        className="sr-textarea"
+        value={g('notes')}
+        readOnly={!editing}
+        onChange={(e) => set('notes', e.target.value)}
+        placeholder="Životopis, tajemství, mise, RP detaily..."
+        aria-label="Poznámky"
+      />
+    </section>
+  );
 }
 
-function SrTable({
+// ── Generic editovatelná tabulka ───────────────────────────────
+interface ArrCol {
+  k: string;
+  label: string;
+  render?: (v: string) => ReactNode;
+}
+function ArrTable({
   cda,
-  disabled,
+  editing,
   arrKey,
   cols,
   addLabel,
-  template,
-}: SrTableProps) {
+}: PanelProps & { arrKey: string; cols: ArrCol[]; addLabel: string }) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
   const rows = parseJsonArr<Record<string, string>>(arrKey);
+  const template: Record<string, string> = Object.fromEntries(cols.map((c) => [c.k, '']));
 
   return (
-    <div className="sr-table">
-      <table>
+    <>
+      <table className="sr-table">
         <thead>
           <tr>
-            {cols.map(([k, label, cls]) => (
-              <th key={k} className={cls}>
-                {label}
-              </th>
+            {cols.map((c) => (
+              <th key={c.k}>{c.label}</th>
             ))}
-            <th></th>
+            {editing && <th className="td-del" aria-label="akce" />}
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 && !editing && (
+            <tr>
+              <td colSpan={cols.length} style={{ color: 'var(--mx-dim)' }}>
+                —
+              </td>
+            </tr>
+          )}
           {rows.map((row, i) => (
             <tr key={i}>
-              {cols.map(([k, label, cls]) => (
-                <td key={k} className={cls}>
-                  <input
-                    value={row[k] || ''}
-                    disabled={disabled}
-                    onChange={(e) =>
-                      updateArr<Record<string, string>>(arrKey, i, {
-                        [k]: e.target.value,
-                      })
-                    }
-                    aria-label={`${label} ${i + 1}`}
-                  />
+              {cols.map((c) => (
+                <td key={c.k}>
+                  {editing ? (
+                    <input
+                      className="sr-input"
+                      value={row[c.k] ?? ''}
+                      onChange={(e) =>
+                        updateArr<Record<string, string>>(arrKey, i, { [c.k]: e.target.value })
+                      }
+                      aria-label={`${c.label} ${i + 1}`}
+                    />
+                  ) : c.render ? (
+                    c.render(row[c.k] ?? '')
+                  ) : (
+                    row[c.k] || '—'
+                  )}
                 </td>
               ))}
-              <td>
-                {!disabled && (
-                  <button
-                    type="button"
-                    className="del-btn"
-                    onClick={() => removeArr(arrKey, i)}
-                    aria-label="Smazat řádek"
-                  >
+              {editing && (
+                <td className="td-del">
+                  <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr(arrKey, i)}>
                     ✕
-                  </button>
-                )}
-              </td>
+                  </span>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
-      {!disabled && (
-        <button
-          type="button"
-          className="add-btn"
-          onClick={() => addArr(arrKey, template)}
-        >
+      {editing && (
+        <button type="button" className="sr-add" onClick={() => addArr(arrKey, template)}>
           {addLabel}
         </button>
       )}
-    </div>
+    </>
   );
 }
 
 // ════════════════════════════════════════════════════════════════
-// PRINT — statický čitelný dokument (čte stejná `sr_*` data)
+// PRINT — statický čitelný dokument (čte stejná `sr_` data)
 // ════════════════════════════════════════════════════════════════
-
-const SR_HEADER_FIELDS: { key: string; label: string }[] = [
-  { key: 'name', label: 'Alias / Jméno' },
-  { key: 'player', label: 'Hráč' },
-  { key: 'role_note', label: 'Poznámka (Role)' },
-  { key: 'race', label: 'Metarasa' },
-  { key: 'ethnicity', label: 'Etnicita' },
-  { key: 'notoriety', label: 'Hledanost' },
-  { key: 'rep', label: 'Pověst' },
-  { key: 'karma', label: 'Zbývá Karma' },
-  { key: 'karma_total', label: 'Celkem Karma' },
-];
-
-/** Tiskové sloupce odpovídají `cols` v SrTable (field, label). */
-type SrPrintCol = [string, string];
-
-function SrPrintTable({
-  cda,
-  arrKey,
-  cols,
-}: {
-  cda: CdAccess;
-  arrKey: string;
-  cols: SrPrintCol[];
-}) {
-  const rows = cda.parseJsonArr<Record<string, string>>(arrKey);
-  if (rows.length === 0) return <p>—</p>;
-  return (
-    <table>
-      <thead>
-        <tr>
-          {cols.map(([k, label]) => (
-            <th key={k}>{label}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, i) => (
-          <tr key={i}>
-            {cols.map(([k]) => (
-              <td key={k}>{row[k] || '—'}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
 function ShadowrunPrintView({ cda }: { cda: CdAccess }) {
   const { g } = cda;
-  const physCur = parseInt(g('cond_phys'), 10) || 0;
-  const physMax = parseInt(g('cond_phys_max', '10'), 10) || 10;
-  const stunCur = parseInt(g('cond_stun'), 10) || 0;
-  const stunMax = parseInt(g('cond_stun_max', '10'), 10) || 10;
-  const matDmg = parseInt(g('mat_dmg'), 10) || 0;
+  const attrs = readAttrs(cda);
+  const physFilled = int(g('cond_phys', '0'));
+  const stunFilled = int(g('cond_stun', '0'));
+  const physMax = 8 + ceilHalf(attrs.bod ?? 0);
+  const stunMax = 8 + ceilHalf(attrs.wil ?? 0);
+  const armorTotal = cda.parseJsonArr<SrRow3>('armor').reduce((s, a) => s + int(a.a), 0);
   const notes = g('notes').trim();
-  const ecoSins = g('eco_sins').trim();
 
   return (
     <div className="sr-print">
       <dl>
-        {SR_HEADER_FIELDS.map((f) => (
-          <div key={f.key}>
-            <dt>{f.label}</dt>
-            <dd>{g(f.key) || '—'}</dd>
+        <div>
+          <dt>Alias</dt>
+          <dd>{g('name') || '—'}</dd>
+        </div>
+        {HERO_META.map((m) => (
+          <div key={m.key}>
+            <dt>{m.label}</dt>
+            <dd>{g(m.key) || '—'}</dd>
           </div>
         ))}
+        <div>
+          <dt>Esence</dt>
+          <dd>{g('attr_ess') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Magie / Rez.</dt>
+          <dd>{g('attr_mag') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Hrana</dt>
+          <dd>
+            {g('edge_cur') || '0'} / {g('attr_edg') || '—'}
+          </dd>
+        </div>
+        <div>
+          <dt>Karma</dt>
+          <dd>
+            {g('karma') || '0'} / {g('karma_total') || '—'}
+          </dd>
+        </div>
       </dl>
 
-      <h2>Atributy (Základní)</h2>
+      <h2>Atributy</h2>
       <dl className="print-cols">
         {SR_CORE_ATTRS.map((a) => (
           <div key={a.key}>
             <dt>{a.label}</dt>
-            <dd>{g(`attr_${a.key}`) || '—'}</dd>
+            <dd>{attrs[a.key] ?? 0}</dd>
           </div>
         ))}
       </dl>
 
-      <h2>Speciální &amp; Odvozené</h2>
+      <h2>Odvozené hodnoty</h2>
       <dl className="print-cols">
-        {SR_SPECIAL_ATTRS.map((a) => (
-          <div key={a.key}>
-            <dt>{a.label}</dt>
-            <dd>{g(`attr_${a.key}`) || '—'}</dd>
-          </div>
-        ))}
         <div>
-          <dt>Hodnocení Obrany (HO)</dt>
-          <dd>{g('attr_def') || '—'}</dd>
+          <dt>Iniciativa</dt>
+          <dd>{(attrs.rea ?? 0) + (attrs.int ?? 0)} + 1k6</dd>
+        </div>
+        <div>
+          <dt>HO</dt>
+          <dd>{(attrs.bod ?? 0) + armorTotal}</dd>
+        </div>
+        <div>
+          <dt>Composure</dt>
+          <dd>{(attrs.wil ?? 0) + (attrs.cha ?? 0)}</dd>
+        </div>
+        <div>
+          <dt>Odhad lidí</dt>
+          <dd>{(attrs.wil ?? 0) + (attrs.int ?? 0)}</dd>
+        </div>
+        <div>
+          <dt>Paměť</dt>
+          <dd>{(attrs.log ?? 0) + (attrs.wil ?? 0)}</dd>
+        </div>
+        <div>
+          <dt>Zvedání</dt>
+          <dd>{(attrs.str ?? 0) + (attrs.bod ?? 0)}</dd>
         </div>
       </dl>
 
       <h2>Záznamník zranění</h2>
-      <ul className="matrix-print__plain">
-        <li className="print-row">
-          <span>Fyzický záznamník</span>
-          <span>
-            {physCur} / {physMax} (penalty -{Math.floor(physCur / 3)})
-          </span>
-        </li>
-        <li className="print-row">
-          <span>Záznamník omráčení (Stun)</span>
-          <span>
-            {stunCur} / {stunMax} (penalty -{Math.floor(stunCur / 3)})
-          </span>
-        </li>
-      </ul>
-
-      <h2>Finance &amp; Životní styl</h2>
       <dl>
         <div>
-          <dt>Nuyeny (Hotovost / Účty)</dt>
-          <dd>{g('eco_nuyen') || '—'}</dd>
+          <dt>Fyzický</dt>
+          <dd>
+            {physFilled} / {physMax} (postih −{Math.floor(physFilled / SR_WOUND_STEP)})
+          </dd>
         </div>
         <div>
-          <dt>Primární životní styl</dt>
-          <dd>{g('eco_lifestyle') || '—'}</dd>
+          <dt>Omráčení</dt>
+          <dd>
+            {stunFilled} / {stunMax} (postih −{Math.floor(stunFilled / SR_WOUND_STEP)})
+          </dd>
         </div>
       </dl>
-      {ecoSins && (
-        <>
-          <h3>Falešné SIN a Licence</h3>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{ecoSins}</p>
-        </>
-      )}
 
-      <h2>Dovednosti</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="skills"
-        cols={[
-          ['name', 'Dovednost'],
-          ['val', 'Hodn.'],
-          ['attr', 'Atr'],
-          ['type', 'Typ (A/Z/K)'],
-        ]}
-      />
+      <PrintTable cda={cda} title="Dovednosti" arrKey="skills" cols={[['name', 'Dovednost'], ['attr', 'Atr'], ['val', 'Hodn.'], ['spec', 'Specializace']]} />
+      <PrintTable cda={cda} title="Zbraně" arrKey="weapons" cols={[['name', 'Zbraň'], ['type', 'Typ'], ['ar', 'HÚ'], ['dmg', 'HP']]} />
+      <PrintTable cda={cda} title="Zbroj" arrKey="armor" cols={[['name', 'Pancíř'], ['a', 'Hodn.'], ['b', 'Pozn.']]} />
+      <PrintTable cda={cda} title="Kouzla / rituály" arrKey="spells" cols={[['name', 'Název'], ['type', 'Typ'], ['dur', 'Trvání'], ['drain', 'Odliv']]} />
+      <PrintTable cda={cda} title="Adeptské síly" arrKey="powers" cols={[['name', 'Síla'], ['a', 'Úroveň']]} />
 
-      <h2>Kvality</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="qualities"
-        cols={[
-          ['name', 'Kvalita'],
-          ['type', 'Typ'],
-          ['note', 'Poznámka'],
-        ]}
-      />
-
-      <h2>Kontakty</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="contacts"
-        cols={[
-          ['name', 'Jméno / Spojka'],
-          ['loy', 'Loaj'],
-          ['con', 'Konx'],
-        ]}
-      />
-
-      <h2>Matrix a Zařízení</h2>
-      <dl>
+      <h2>Matrix</h2>
+      <dl className="print-cols">
         <div>
-          <dt>Komlink / Cyberdeck</dt>
+          <dt>Zařízení</dt>
           <dd>{g('mat_device') || '—'}</dd>
         </div>
+        {SR_MATRIX_STATS.map((m) => (
+          <div key={m.key}>
+            <dt>
+              {m.label} ({m.code})
+            </dt>
+            <dd>{g(m.key) || '0'}</dd>
+          </div>
+        ))}
+      </dl>
+      <PrintTable cda={cda} title="Programy" arrKey="mat_progs" cols={[['name', 'Program']]} />
+      <PrintTable cda={cda} title="Augmentace" arrKey="aug" cols={[['name', 'Cyber/Bioware'], ['a', 'Hodn.'], ['b', 'Esence']]} />
+      <PrintTable cda={cda} title="Kvality" arrKey="qualities" cols={[['name', 'Kvalita'], ['a', 'Typ']]} />
+      <PrintTable cda={cda} title="Kontakty" arrKey="contacts" cols={[['name', 'Spojka'], ['a', 'Loaj.'], ['b', 'Konx.']]} />
+
+      <h2>Identita &amp; styl</h2>
+      <dl>
         <div>
-          <dt>Hodnocení</dt>
-          <dd>{g('mat_dev_rating') || '—'}</dd>
+          <dt>Životní styl</dt>
+          <dd>{g('eco_lifestyle') || '—'}</dd>
         </div>
         <div>
-          <dt>Útok (A)</dt>
-          <dd>{g('mat_atk') || '—'}</dd>
+          <dt>Falešné SIN</dt>
+          <dd>{g('eco_sins') || '—'}</dd>
         </div>
         <div>
-          <dt>Maskování (S)</dt>
-          <dd>{g('mat_slz') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Zpracování (D)</dt>
-          <dd>{g('mat_dp') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Firewall (F)</dt>
-          <dd>{g('mat_fw') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Matrix záznamník (poškození)</dt>
-          <dd>{matDmg} / 12</dd>
+          <dt>Licence</dt>
+          <dd>{g('licenses') || '—'}</dd>
         </div>
       </dl>
-
-      <h3>Nainstalované programy</h3>
-      <SrPrintTable cda={cda} arrKey="mat_progs" cols={[['name', 'Program']]} />
-
-      <h2>Magie: Kouzla / Výtvory / Rituály / KF</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="spells"
-        cols={[
-          ['name', 'Jméno (K/V/R/KF)'],
-          ['type', 'Typ/Cíl'],
-          ['rng', 'Dosah'],
-          ['dur', 'Trvání'],
-          ['drain', 'Odliv'],
-        ]}
-      />
-
-      <h2>Adeptské síly a další schopnosti</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="powers"
-        cols={[
-          ['name', 'Název schopnosti'],
-          ['lvl', 'Úroveň'],
-          ['note', 'Poznámky'],
-        ]}
-      />
-
-      <h2>Střelné zbraně</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="ranged"
-        cols={[
-          ['name', 'Zbraň'],
-          ['dmg', 'HP'],
-          ['ar', 'HÚ'],
-          ['ammo', 'Munice'],
-        ]}
-      />
-
-      <h2>Zbraně na blízko</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="melee"
-        cols={[
-          ['name', 'Zbraň'],
-          ['dmg', 'HP'],
-          ['reach', 'Dosah'],
-        ]}
-      />
-
-      <h2>Hlavní Pancíř / Zbroj</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="armor"
-        cols={[
-          ['name', 'Pancíř'],
-          ['val', 'Hodn.'],
-          ['note', 'Poznámka'],
-        ]}
-      />
-
-      <h2>Augmentace (Cyber/Bioware)</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="aug"
-        cols={[
-          ['name', 'Zlepšení'],
-          ['val', 'Hodn.'],
-          ['ess', 'Esence'],
-        ]}
-      />
-
-      <h2>Dopravní prostředky / Droni</h2>
-      <SrPrintTable
-        cda={cda}
-        arrKey="vehicle"
-        cols={[
-          ['name', 'Model'],
-          ['speed', 'Max Y.'],
-          ['bod', 'Tělo/Pan'],
-        ]}
-      />
 
       {notes && (
         <>
@@ -1264,5 +1251,43 @@ function ShadowrunPrintView({ cda }: { cda: CdAccess }) {
         </>
       )}
     </div>
+  );
+}
+
+function PrintTable({
+  cda,
+  title,
+  arrKey,
+  cols,
+}: {
+  cda: CdAccess;
+  title: string;
+  arrKey: string;
+  cols: [string, string][];
+}) {
+  const rows = cda.parseJsonArr<Record<string, string>>(arrKey);
+  if (rows.length === 0) return null;
+  return (
+    <>
+      <h3>{title}</h3>
+      <table>
+        <thead>
+          <tr>
+            {cols.map(([k, label]) => (
+              <th key={k}>{label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {cols.map(([k]) => (
+                <td key={k}>{row[k] || '—'}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }

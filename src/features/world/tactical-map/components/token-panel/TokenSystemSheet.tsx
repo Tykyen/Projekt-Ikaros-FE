@@ -39,6 +39,7 @@ import { DndBestiePanel } from "./system-panels/DndBestiePanel";
 import { FateBestiePanel } from "./system-panels/FateBestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
+import { EmbedSubdocsBar } from "@/features/world/pages/CharacterDetailPage/components/embed/EmbedSubdocsBar";
 import styles from "./TokenSystemSheet.module.css";
 
 interface Props {
@@ -275,6 +276,9 @@ export function TokenSystemSheet({
   if (SystemPanel) {
     return (
       <DiarySkinScope worldId={worldId} className={styles.sheet}>
+        {!token.isNpc && (
+          <EmbedSubdocsBar worldId={worldId} slug={token.characterSlug} canEdit={canEdit} />
+        )}
         <SystemPanel
           token={token}
           sceneId={sceneId}
@@ -288,6 +292,7 @@ export function TokenSystemSheet({
 
   return (
     <DiarySkinScope worldId={worldId} className={styles.sheet}>
+      <EmbedSubdocsBar worldId={worldId} slug={token.characterSlug} canEdit={canEdit} />
       <DiaryTab
         slug={token.characterSlug}
         mode={canEdit ? "edit" : "view"}

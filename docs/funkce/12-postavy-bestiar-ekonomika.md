@@ -150,6 +150,8 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Jak vypadá listina:** Per-system React sheet komponenta (např. `MatrixSheet`, `DndSheet`, `CocSheet` …) čte hodnoty z `diary.customData` přes prefixovaný accessor `makeCdAccess(cd, 'matrix_', …)`; cizí prefixy z jiných presetů render neovlivní. Personal override schéma (`personalDiarySchema`) má přednost před schématem světa.
 
+**Shadowrun 6e (2026-06-30):** `ShadowrunSheet` přepsán z legacy portu na cyberpunk HUD (sci-fi rodina `--mx-*`, třídy `.sr-*`) s **výpočetním jádrem** — 8 atributů → odvozené hodnoty (iniciativa REA+INT, HO=Tělo+zbroj, Composure/Odhad/Paměť/Zvedání) + velikosti záznamníků (8+⌈atr/2⌉); zranění −1 za 3 boxy se promítá do dice poolů; pool dovednosti/zbraně = atribut + hodnocení (+2 specializace). View/edit/print, PC/NPC, `sr_` klíče (reuse legacy). **Hody se v deníku nezobrazují** (kostky až v TM/chatu) — `rollPool` zatím neumí počítat úspěchy (5–6)/glitch, doplní se s combat panelem. (`sheets/shadowrun/ShadowrunSheet.tsx`, `styles/shadowrun.css`, `sheets/shadowrun/constants.ts`)
+
 **Per-postava override:** Postava může mít vlastní `personalDiarySchema` (override nad světovým). `resolveAllowedKeys` (`character-subdocs.service.ts:98-110`): nejdřív personal, pak aktivní verze schématu světa, jinak `null` = pass-through (bez filtru — bezpečnější než ztratit data).
 
 **Hranice:**
@@ -371,6 +373,16 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 **Stav:** ✅ funguje.
 **Kód:** BE `character-subdocs/character-accounts.controller.ts`, `character-accounts.service.ts`. FE `CharacterDetailPage/components/accounts/`, `FinanceTab.tsx`.
 
+### Výbava + Finance v herním embedu (taktická mapa + chat)
+- **Co to je:** Tlačítka 🎒 Výbava / 💰 Finance přímo v deníku **hráčské postavy (PC)** na **taktické mapě** a v **chat railu** — otevřou modal s plnou Výbavou / Financemi, bez odchodu na stránku postavy. Reuse: modal mountuje existující `InventoryTab` / `FinanceTab` (soběstačné, data dle slugu).
+- **Kde:** lišta `EmbedSubdocsBar` v `TokenSystemSheet` (mapa) + `DiaryRollPanel` (chat rail). Modal = sdílený `@/shared/ui` Modal, fetch `usePage(worldId, slug)`.
+- **Kdo:** lišta se zobrazí **jen u PC** (NPC ani bestie Výbavu/Finance nemají — záměr, viz nesrovnalost #6; gate `!token.isNpc` / `attribution.kind !== 'npc'`); editace dle `canEdit` (vlastník/PJ, stejné gating jako panel). Finance vklad/výběr dál řídí BE per-akce.
+- **Co jde dělat:** otevřít Výbavu (sekce + množství) i Finance (zůstatek, vklad/výběr, transfer, transakce) v modalu; přepínat taby; edit toggle (canEdit).
+- **Hranice / co neumí:** vnitřek modalu zatím **není per-skin tokenizovaný** (drží světový vzhled); chrome lišty/tabů skin bere přes `--dd-embed-*`/`--mx-log-*`. Plné per-skin sladění vnitřku = následný krok.
+- **Zvláštnosti:** modal portaluje do fullscreen elementu (funguje i v TM fullscreenu).
+- **Stav:** 🚧 funkční pro PC (per-skin vnitřek čeká).
+- **Kód:** FE `CharacterDetailPage/components/embed/EmbedSubdocsBar.tsx`, integrace `tactical-map/.../TokenSystemSheet.tsx` + `chat/components/rail/DiaryRollPanel.tsx`.
+
 ---
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
@@ -380,7 +392,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 3. **Staty PC/NPC se z taktické mapy neukládají zpět** — `token.update` se `systemStats` pro PC/NPC jen loguje debug (`map-operations.service.ts:618-631`); `Character.systemStats` jako pole „zatím není rozšířené". Staty PC/NPC reálně žijí v `diary.customData`. Změna HP/statů tokenu na mapě se tedy nepropíše do listiny postavy (kromě bestií, které mají snapshot na tokenu). Potenciální nekonzistence k ověření.
 4. **Soft-mode validace statů** — bez exportovaného BE schématu (`scripts/export-schemas.mjs`) se `systemStats` bestií i tokenů nevaliduje (`errors._schema` → skip). Záměrné, ale znamená, že nesprávná data projdou pro systémy bez schématu.
 5. **Per-system listina = 13 dedikovaných sheetů** (`registry.ts`), neznámý `world.system` spadne na `generic`. Ověřit, zda všechny systémy v `SYSTEM_PRESETS` (BE) mají odpovídající FE preset a naopak (dvojí zdroj pravdy: FE registry vs. BE SYSTEM_PRESETS).
-6. **Finance/Výbava NPC/Lokace → 404 `*_NOT_APPLICABLE`** je záměr, ne bug — ale FE musí 404 odlišit od skutečné chyby (SubdocErrorState). Budoucí „NPC obchodník / Lokace sklad" = odebrat gate v `getFinance`/`getInventory` (`character-subdocs.service.ts:407,486`).
+6. **Finance/Výbava NPC/Lokace → 404 `*_NOT_APPLICABLE`** je záměr, ne bug — ale FE musí 404 odlišit od skutečné chyby (SubdocErrorState). Budoucí „NPC obchodník / Lokace sklad" = odebrat gate v `getFinance`/`getInventory` (`character-subdocs.service.ts:407,486`). (Embed lišta Výbava/Finance v TM+chatu proto cílí **jen na PC** — rozhodnutí autora 2026-06-30, že NPC Výbavu/Finance mít nebudou.)
 7. **Měny: full-replace PUT** — `updateCurrencies` přepisuje celou sadu; klient musí vždy poslat kompletní seznam, jinak hrozí ztráta měn. Bez delta merge.
 8. **Convert přesnost** — přepočet měn i ceny v obchodě zaokrouhluje na 4 desetinná místa (`round4`); řetězené převody (item currency → account currency) mohou kumulovat zaokrouhlovací chybu. K ověření u drahých položek.
 9. **Bestie update payload nesmí nést immutable pole** — `systemId`/`scope`/`worldId` jsou na BE immutable a nejsou v `UpdateBestieDto`; s `forbidNonWhitelisted` jakékoli pole navíc → **PATCH 400**. FE `BestieEditorModal` proto posílá `systemId` jen do create. (Bylo příčinou 400 při úpravě bestie; opraveno.)
