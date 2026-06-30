@@ -76,6 +76,17 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
     ).toEqual({ current: 5, max: 20 });
   });
 
+  it('drdh: bez max → null (žádný bar)', () => {
+    expect(resolveCharacterHp('drdh', { drdh_hp: '5' })).toBeNull();
+  });
+
+  it('drdh: current chybí → default = max (plné HP)', () => {
+    expect(resolveCharacterHp('drdh', { drdh_hp_max: '28' })).toEqual({
+      current: 28,
+      max: 28,
+    });
+  });
+
   it('drd16: hp_current / hp_max (bez prefixu)', () => {
     expect(
       resolveCharacterHp('drd16', { hp_current: '3', hp_max: '8' }),

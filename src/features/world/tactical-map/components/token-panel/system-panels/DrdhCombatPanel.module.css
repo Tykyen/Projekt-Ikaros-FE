@@ -1,0 +1,529 @@
+/**
+ * 16b — DrdhCombatPanel (fantasy „Strážní pole" — pergamen + zlato, pečetě).
+ *
+ * Port HTML prototypu `c:/tmp/drdh-mapa-audit.html`. Self-contained pergamenová
+ * paleta přes `--dd-*` tokeny s fallbackem (NE sdílené `--mx-*` HUD tokeny — ty
+ * jsou laděné na tmavý chrome a na světlém pergamenu by byly nečitelné; stejný
+ * důvod jako Drd16/DrD+). Skin tokenizace = pozdější skin fáze; tmavé sdílené
+ * plochy (wrapper/log/overlay) skin nesou (F3). Pergamen tělo sedí v tmavém
+ * leather wrapperu (TokenInfoPanel, scoped `[data-diary-system='drdh']`).
+ *
+ * DrDH signature vs Drd16: sekce nadpis má KRUHOVOU PEČEŤ (medailon) místo
+ * kosočtverce; válečník = adrenalin track 1–20.
+ */
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+  color: var(--dd-ink, #372616);
+  background-color: var(--dd-parch-1, #e9dab8);
+  background-image: var(
+    --dd-parch-tex,
+    radial-gradient(120% 90% at 16% 6%, rgba(255, 250, 235, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 90% 98%, rgba(150, 118, 70, 0.3), transparent 60%),
+    linear-gradient(165deg, #f2e7cd, #e9dab8 55%, #dcc89c)
+  );
+  border-radius: 5px;
+  padding: 12px;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px var(--dd-parch-edge, #c2aa78),
+    0 0 0 4px var(--dd-forge-1, #1f160d),
+    0 0 0 5px var(--dd-gold-deep, #6d5018);
+}
+
+.loading,
+.empty {
+  padding: 16px;
+  text-align: center;
+  font-style: italic;
+  color: var(--dd-ink-soft, #6a5436);
+}
+
+/* ── Iniciativa ── */
+.initBtn {
+  width: 100%;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--dd-ink-deep, #1f1607);
+  background: var(--dd-accent-grad, linear-gradient(180deg, #f4dd92, #cf9f3a 60%, #6d5018));
+  border: 1px solid var(--dd-gold-deep, #6d5018);
+  border-radius: 4px;
+  padding: 9px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 0 rgba(255, 250, 220, 0.6) inset;
+}
+.initBtn:hover {
+  filter: brightness(1.06);
+}
+.initBtn small {
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.85;
+}
+
+/* ── Section header — kruhová pečeť (DrDH signature) ── */
+.section {
+  margin-top: 4px;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 13px 0 7px;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-ink-head, #3a2812);
+}
+.title small {
+  font-size: 8px;
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+}
+.title::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--dd-gold, #cf9f3a), transparent);
+  opacity: 0.5;
+}
+.seal {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: var(--dd-seal-ink, #2a1a0a);
+  background: var(
+    --dd-seal-grad,
+    radial-gradient(circle at 38% 32%, #f4dd92, #cf9f3a 55%, #6d5018)
+  );
+  border: 1px solid var(--dd-gold-deep, #6d5018);
+  box-shadow: 0 1px 0 rgba(255, 250, 220, 0.6) inset;
+}
+.seal.crimson {
+  color: var(--dd-seal-crimson-ink, #fbeeca);
+  background: var(
+    --dd-seal-crimson-grad,
+    radial-gradient(circle at 38% 32%, #d05a4e, #922a23 55%, #561310)
+  );
+  border-color: var(--dd-crimson-deep, #561310);
+}
+
+/* ── Vitals (HP + zdrojové bary) ── */
+.vital {
+  display: grid;
+  grid-template-columns: 54px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.vitalLab {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.vital.hp .vitalLab {
+  color: var(--dd-crimson, #922a23);
+}
+.vital.res .vitalLab {
+  color: var(--dd-sapphire, #2f5390);
+}
+.vital.res2 .vitalLab {
+  color: var(--dd-emerald, #3c7a4e);
+}
+.vbar {
+  position: relative;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid var(--dd-gold-deep, #6d5018);
+  background: var(
+    --dd-bar-bg,
+    linear-gradient(180deg, rgba(255, 252, 242, 0.4), rgba(221, 202, 159, 0.25))
+  );
+}
+.vbarFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  transition: width 0.18s;
+}
+.vital.hp .vbarFill {
+  background: var(--dd-hpfill-grad, linear-gradient(90deg, #922a23, #c0392f));
+}
+.vital.res .vbarFill {
+  background: var(--dd-resfill-grad, linear-gradient(90deg, #2f5390, #5d86cf));
+}
+.vital.res2 .vbarFill {
+  background: var(--dd-res2fill-grad, linear-gradient(90deg, #3c7a4e, #5fae73));
+}
+.vbarTxt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--dd-ink-deep, #241509);
+  text-shadow: 0 1px 0 rgba(255, 250, 235, 0.5);
+}
+.vsteps {
+  display: flex;
+  gap: 3px;
+}
+.vsteps button {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 24px;
+  padding: 3px 0;
+  color: var(--dd-ink-2, #2a1a0a);
+  background: var(--dd-step-bg, linear-gradient(180deg, #f2e7cd, #dcc89c));
+  border: 1px solid var(--dd-gold-deep, #6d5018);
+  border-radius: 3px;
+}
+.vsteps button:hover {
+  background: var(--dd-gold-hi, #f4dd92);
+}
+
+/* ── Hranice smrti ── */
+.hpDeath {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dd-ink-faint, #94795a);
+  text-align: right;
+  margin: -3px 0 4px;
+}
+.hpDeath b {
+  color: var(--dd-crimson-deep, #561310);
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+}
+
+/* ── Adrenalin track (válečník — signature) ── */
+.adrWrap {
+  margin-bottom: 4px;
+}
+.adrTrack {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+.adrCell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+  font-size: 9px;
+  color: var(--dd-ink-faint, #94795a);
+  background: var(--dd-adr-cell-bg, rgba(255, 252, 242, 0.4));
+  border: 1px solid var(--dd-line, rgba(196, 173, 126, 0.55));
+  border-radius: 3px;
+  transition: 0.1s;
+}
+.adrCell:disabled {
+  cursor: default;
+}
+.adrCell.on {
+  color: var(--dd-ink-deep, #1a120a);
+  font-weight: 700;
+  background: var(--dd-adr-grad, linear-gradient(180deg, #e07a3a, #a8431b));
+  border-color: var(--dd-adr, #e07a3a);
+  box-shadow: 0 0 7px -2px var(--dd-adr, #e07a3a);
+}
+.adrFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #6a5436);
+}
+.adrFoot b {
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  font-size: 16px;
+  color: var(--dd-adr-deep, #a8431b);
+}
+
+/* ── Zdrojové poznámky / mini ── */
+.resNote {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--dd-ink-faint, #94795a);
+  text-align: center;
+  margin: 2px 0 6px;
+}
+.resMini {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 4px 0 6px;
+}
+.resMini span {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #6a5436);
+}
+.resMini b {
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  color: var(--dd-ink-head, #3a2812);
+}
+
+/* ── Vlastnosti / Dovednosti (klik = hod) ── */
+.statRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 6px 9px;
+  cursor: pointer;
+  border-radius: 3px;
+  text-align: left;
+  background: var(
+    --dd-row-bg,
+    linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.25))
+  );
+  border: 1px solid var(--dd-line, rgba(196, 173, 126, 0.55));
+}
+.statRow:hover:not(:disabled) {
+  border-color: var(--dd-gold-deep, #6d5018);
+  background: var(--dd-row-bg-hover, rgba(221, 202, 159, 0.45));
+}
+.statRow.skill {
+  grid-template-columns: 1fr auto;
+}
+.statName {
+  font-size: 14px;
+  color: var(--dd-ink, #372616);
+}
+.statName small {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--dd-ink-faint, #94795a);
+  margin-left: 5px;
+}
+.statVal {
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--dd-ink-2, #2a1a0a);
+  width: 22px;
+  text-align: center;
+}
+.statBonus {
+  min-width: 30px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--dd-ink-deep, #1f1607);
+  border-radius: 3px;
+  border: 1px solid var(--dd-gold-deep, #6d5018);
+  background: var(--dd-accent-grad, linear-gradient(180deg, #f4dd92, #cf9f3a 60%, #6d5018));
+}
+.statBonus.neg {
+  background: linear-gradient(
+    180deg,
+    var(--dd-crimson-hi, #c0392f),
+    var(--dd-crimson, #922a23) 60%,
+    var(--dd-crimson-deep, #561310)
+  );
+  border-color: var(--dd-crimson-deep, #561310);
+  color: var(--dd-neg-ink, #2a1010);
+}
+.statBonus.zero {
+  background: var(--dd-zero-bg, #8c7549);
+  border-color: var(--dd-zero-bg, #8c7549);
+  color: var(--dd-parch-1, #d9cba8);
+}
+
+/* ── Pohyb / Velikost ── */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.infoCard {
+  padding: 7px 9px;
+  border-radius: 3px;
+  background: var(--dd-card-bg, rgba(255, 252, 242, 0.42));
+  border: 1px solid var(--dd-line-soft, rgba(196, 173, 126, 0.5));
+}
+.infoLab {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #6a5436);
+}
+.infoVal {
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--dd-ink-2, #2a1a0a);
+}
+
+/* ── Zbraně (útok ÚČ · obrana OČ — dvě akce per řádek) ── */
+.weapRow {
+  padding: 7px 9px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  background: var(
+    --dd-row-bg,
+    linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.22))
+  );
+  border: 1px solid var(--dd-line, rgba(196, 173, 126, 0.55));
+}
+.weapName {
+  font-size: 14px;
+  color: var(--dd-ink, #372616);
+  font-weight: 500;
+}
+.weapName small {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dd-ink-faint, #94795a);
+  margin-left: 6px;
+}
+.wacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 6px;
+}
+.watk,
+.wdef {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 3px;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.watk {
+  color: var(--dd-seal-crimson-ink, #fbeeca);
+  background: var(
+    --dd-watk-grad,
+    linear-gradient(180deg, #c0392f, #922a23)
+  );
+  border: 1px solid var(--dd-crimson-deep, #561310);
+}
+.wdef {
+  color: var(--dd-ink-2, #2a1a0a);
+  background: var(
+    --dd-wdef-grad,
+    linear-gradient(180deg, rgba(255, 252, 242, 0.6), rgba(221, 202, 159, 0.35))
+  );
+  border: 1px solid var(--dd-gold-deep, #6d5018);
+}
+.watk:hover:not(:disabled),
+.wdef:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+.watk b,
+.wdef b {
+  font-family: var(--dd-font-display, 'Cinzel Decorative', 'Cinzel', serif);
+  font-size: 13px;
+}
+
+/* ── Okna (tlačítka) ── */
+.winBtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.winBtn {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 10px 8px;
+  color: var(--dd-ink-head, #3a2812);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 242, 0.55),
+    rgba(221, 202, 159, 0.32)
+  );
+  border: 1px solid var(--dd-gold-deep, #6d5018);
+  border-radius: 4px;
+}
+.winBtn:hover {
+  background: var(--dd-gold-hi, #f4dd92);
+}
+
+/* ── Obsah oken (tabulky) ── */
+.modalEmpty {
+  font-family: var(--dd-font-body, 'EB Garamond', Georgia, serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--dd-ink-soft, #6a5436);
+}
+.mtbl {
+  width: 100%;
+  border-collapse: collapse;
+}
+.mtbl th {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #6a5436);
+  text-align: left;
+  padding: 5px 6px;
+  border-bottom: 1.5px solid var(--dd-gold-deep, #6d5018);
+}
+.mtbl td {
+  padding: 6px;
+  font-size: 14px;
+  color: var(--dd-ink, #372616);
+  border-bottom: 1px solid var(--dd-line-soft, rgba(196, 173, 126, 0.4));
+}
+.mtbl td:first-child {
+  font-weight: 600;
+  color: var(--dd-ink-head, #3a2812);
+}

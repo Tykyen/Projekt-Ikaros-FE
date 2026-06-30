@@ -4,6 +4,16 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — Dračí Hlídka (drdh) combat panel na taktické mapě (PC+NPC, skill `system` fáze 3) · 2026-06-30
+**Kontext:** Skill `system` fáze 3 — bojový panel DrDH na mapě (i v chatu zdarma přes COMBAT_PANELS). Po deníku (fáze 1).
+**Co zabralo:** prototyp=kontrakt (`c:\tmp\drdh-mapa-audit.html`) iterovaný s autorem (přidána sekce Dovednosti + rozklad bonusu „SIL +3 · výcvik +3") → delegace agentovi. `DrdhCombatPanel.tsx`+`.module.css` (fantasy „Strážní pole", pečetě = signature, adrenalin track), registrace `COMBAT_PANELS['drdh']`, `resolveCharacterHp` case 'drdh' (už existoval správný — `drdh_hp`/`_hp_max`). **Reuse constants deníku** (`drdhAttrMod`/`DRDH_*`) = hody panelu shodné s deníkem (single source). Hody: vlastnost/dovednost `d10`, zbraň/obrana `d6+` (exploduje), iniciativa `d6` (neexploduje). Per-povolání zdroj dle `DRDH_RESOURCE_BY_PROF.kind`.
+**Proč to je správně:** diary-backed (PC i NPC přes `characterSlug`) → **0 BE změn**; HP/zdroj fill přes `var(--dd-hpfill-grad,…)` (ne inline hardcode, past §9.15); system-id alias `draci-hlidka→drdh` řeší konzument přes `useResolvedSystemId` (po CH-119, netřeba měnit).
+**OČ (obrana) = per-zbraň** (rozhodnutí autora, dotaženo): zrušeno samostatné `drdh_oc`; každá zbraň (`drdh_weapons` má `uc`+`oc`) má ⚔ Útok (modifier `uc`) i ⛨ Obrana (modifier `oc`), oba `d6+`. Dle pravidel OČ = ZO + obrana zbraně + štít, takže obrana patří ke konkrétní zbrani/štítu. Test: per-zbraň útok/obrana + guard, že samostatný OČ button už neexistuje.
+**Jak ověřeno:** `tsc -b` 0 (sám), `npm run build` ✓ (agent), `npm run test:run` **45/45** (sám: DrdhCombatPanel 14 + resolveCharacterHp + combatPanels guard), eslint ✓. Vizuál čeká živé potvrzení.
+**Zhodnocení:** Dobře — prototyp=kontrakt, 0 cyklení; korekce dovedností (rozklad) zapracována za běhu agenta přes SendMessage. **Zbývá** (skill `system`): fáze 4 bestie + **BE dávka** (kostky `['d6','d10']` v `DEFAULT_DICE_BY_SYSTEM` + schémata `drdh-bestie/token.json`, 1 restart) → chat (PC zdarma, bestie panel) → uzávěr (`funkce`+`napoveda`) → 8 skinů.
+
+---
+
 ### ✅ ŘEŠENÍ — Dračí Hlídka (drdh) deník: redesign dle oficiálních pokročilých deníků (skill `system` fáze 1) · 2026-06-30
 **Kontext:** Stávající `DrdhSheet` (8.7e port) byl proti oficiálním pokročilým deníkům špatně — chyběly sekce (zvláštní schopnosti/magické předměty), zloděj „kostýmy" byl číselný resource místo seznamu, adrenalin max/akt místo tracku, klerik bez 3× denně, kouzelník bez úroveň/nasátí, válečníkovy triky bez „Vyžaduje", zlodějovy „Činnost" místo „Četnost".
 **Co zabralo:** HTML prototyp (`c:\tmp\drdh-denik-audit.html`) jako kontrakt, iterovaný živě s autorem (peníze/bojové vzorce/vybavení škrtnuty, rasa ruční, portrét vynechán) → produkční přepis `DrdhSheet.tsx` + `constants.ts` + `drdh.css` (delegováno agentovi s jednoznačným HTML kontraktem). Per-povolání zdroj dle pravidel (adrenalin track 1–20, duševní síla, mana+suroviny, mana+úroveň/nasátí, kostýmy=seznam, přízeň+3 denní checkboxy); **interaktivní erb mění povolání** (klik→popover, jako DrD+); specializace rozpojená, zamčená do 6. úrovně; auto-výpočty (oprava=⌊stupeň/2⌋−5, hranice smrti=−(10+ODO), dovednost součet). Net research (Roll20+onge.cz) potvrdil vzorce.
