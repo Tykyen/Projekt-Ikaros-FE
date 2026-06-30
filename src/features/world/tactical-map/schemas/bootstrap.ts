@@ -21,6 +21,7 @@ import { cocSchemas } from './coc';
 import { faeSchemas } from './fae';
 import { fateSchemas } from './fate';
 import { gurpsSchemas } from './gurps';
+import { shadowrunSchemas } from './shadowrun';
 
 let bootstrapped = false;
 
@@ -68,6 +69,9 @@ export function bootstrapSchemas(): void {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of gurpsSchemas) {
+    systemEntitySchemaRegistry.register(schema);
+  }
+  for (const schema of shadowrunSchemas) {
     systemEntitySchemaRegistry.register(schema);
   }
   bootstrapped = true;

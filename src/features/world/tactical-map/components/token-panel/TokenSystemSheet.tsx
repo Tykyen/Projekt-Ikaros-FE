@@ -37,6 +37,7 @@ import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
 import { JadBestiePanel } from "./system-panels/JadBestiePanel";
 import { DndBestiePanel } from "./system-panels/DndBestiePanel";
 import { FateBestiePanel } from "./system-panels/FateBestiePanel";
+import { ShadowrunBestiePanel } from "./system-panels/ShadowrunBestiePanel";
 import { COMBAT_PANELS, type CombatPanelProps } from "./combatPanels";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import { EmbedSubdocsBar } from "@/features/world/pages/CharacterDetailPage/components/embed/EmbedSubdocsBar";
@@ -186,6 +187,20 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId={systemId}
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // Shadowrun 6e bestie — jantarový statblok (sdílí jádro s PC combat panelem).
+    if (systemId === "shadowrun") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <ShadowrunBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

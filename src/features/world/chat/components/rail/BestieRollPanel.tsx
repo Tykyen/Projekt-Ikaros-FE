@@ -15,6 +15,7 @@ import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
 import { DndChatBestiePanel } from './DndChatBestiePanel';
 import { FateChatBestiePanel } from './FateChatBestiePanel';
+import { ShadowrunChatBestiePanel } from './ShadowrunChatBestiePanel';
 import s from './railShell.module.css';
 import b from './BestieRollPanel.module.css';
 
@@ -210,6 +211,17 @@ export function BestieRollPanel({
             rollerName={bestie.name}
             avatarUrl={bestie.imageUrl}
             systemStats={bestie.systemStats}
+            canEdit={false}
+          />
+        ) : systemId === 'shadowrun' ? (
+          // Shadowrun katalogová bestie (read-only) — jantarový statblok, self-contained.
+          <ShadowrunChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
+            rollerName={bestie.name}
+            avatarUrl={bestie.imageUrl}
+            systemStats={bestie.systemStats}
+            notes={bestie.notes}
             canEdit={false}
           />
         ) : (

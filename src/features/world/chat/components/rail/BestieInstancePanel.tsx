@@ -25,6 +25,7 @@ import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
 import { DndChatBestiePanel } from './DndChatBestiePanel';
 import { FateChatBestiePanel } from './FateChatBestiePanel';
+import { ShadowrunChatBestiePanel } from './ShadowrunChatBestiePanel';
 import s from './railShell.module.css';
 
 interface Props {
@@ -300,6 +301,19 @@ export function BestieInstancePanel({
             worldId={worldId}
             channelId={channelId}
             systemId={systemId}
+            rollerName={combatant.name}
+            avatarUrl={combatant.imageUrl}
+            systemStats={combatant.systemStats}
+            canEdit={canEdit}
+            onPatch={(patch) =>
+              mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+            }
+          />
+        ) : systemId === 'shadowrun' ? (
+          // Shadowrun bestie instance v boji — jantarový statblok, editovatelná (onPatch).
+          <ShadowrunChatBestiePanel
+            worldId={worldId}
+            channelId={channelId}
             rollerName={combatant.name}
             avatarUrl={combatant.imageUrl}
             systemStats={combatant.systemStats}

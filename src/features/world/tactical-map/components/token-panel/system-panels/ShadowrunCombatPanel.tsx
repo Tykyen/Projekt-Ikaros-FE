@@ -296,7 +296,6 @@ export function ShadowrunCombatPanel({
                     <span className={s.rpool}>
                       <b>{pool}</b>
                       <small>k6</small>
-                      <span className={s.die}>🎲</span>
                     </span>
                   </button>
                 );
@@ -326,7 +325,6 @@ export function ShadowrunCombatPanel({
                     <span className={s.rpool}>
                       <b>{pool}</b>
                       <small>k6</small>
-                      <span className={s.die}>🎲</span>
                     </span>
                   </button>
                 );

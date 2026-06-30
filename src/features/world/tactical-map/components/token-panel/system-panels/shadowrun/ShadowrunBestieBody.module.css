@@ -1,0 +1,370 @@
+/**
+ * Shadowrun 6e bestie statblok — sdílené UI mapa + chat rail (vzor FateCombatBody).
+ * TÝŽ panel na obou povrchech; liší se jen šířka sloupce (skill `system` fáze 5).
+ * Self-contained tokeny (--srb-*) → nezávislé na DiarySkinScope. Bestie nese
+ * JANTAROVÝ akcent (oddělí tvora od PC modré/fialové na mapě).
+ */
+.root {
+  --srb-text: #d6def0;
+  --srb-muted: #76809a;
+  --srb-dim: #444b63;
+  --srb-accent: #38e0ff;
+  --srb-violet: #a78bfa;
+  --srb-gold: #fbbf24;
+  --srb-danger: #f87171;
+  --srb-green: #4ade80;
+  --srb-bestie: #fb923c;
+  --srb-power: #a78bfa;
+  --srb-seg-off: #1a1d2e;
+  --srb-line: rgba(255, 255, 255, 0.08);
+  --srb-fn: 'Chakra Petch', system-ui, sans-serif;
+  --srb-fnum: 'IBM Plex Mono', ui-monospace, monospace;
+  --srb-clip: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 13px;
+  color: var(--srb-text);
+  background: linear-gradient(180deg, #160f0c, #0d0a08);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  box-shadow: 0 20px 60px -30px #000, inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: screen;
+  background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px);
+  background-size: 100% 3px;
+}
+.root > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* hlavička */
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.name {
+  margin: 0;
+  font: 700 17px var(--srb-fn);
+  letter-spacing: 0.04em;
+  color: #ffe8d6;
+  line-height: 1.1;
+}
+.sub {
+  margin-top: 2px;
+  font: 600 10px var(--srb-fnum);
+  letter-spacing: 0.06em;
+  color: var(--srb-bestie);
+}
+.initBtn {
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid rgba(251, 146, 60, 0.4);
+  background: rgba(251, 146, 60, 0.12);
+  color: #fed7aa;
+  font: 700 11px var(--srb-fnum);
+  padding: 6px 10px;
+  clip-path: var(--srb-clip);
+}
+.initBtn:hover {
+  background: rgba(251, 146, 60, 0.22);
+}
+.initBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* sekce */
+.sec {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-top: 1px solid var(--srb-line);
+  padding-top: 9px;
+}
+.secFirst {
+  border-top: 0;
+  padding-top: 0;
+}
+.stitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 700 10px var(--srb-fn);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #d9b89c;
+}
+.stitle::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--srb-bestie);
+  transform: rotate(45deg);
+  box-shadow: 0 0 8px var(--srb-bestie);
+}
+.stitleAtk {
+  color: #fca5a5;
+}
+.stitleHint {
+  font: 500 9px var(--srb-fnum);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--srb-dim);
+}
+
+/* záznamníky */
+.cond {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.chead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.clab {
+  font: 600 10px var(--srb-fn);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.condPhys .clab {
+  color: var(--srb-danger);
+}
+.condStun .clab {
+  color: var(--srb-gold);
+}
+.cpen {
+  font: 700 11px var(--srb-fnum);
+  color: var(--srb-danger);
+}
+.track {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.box {
+  width: 19px;
+  height: 19px;
+  padding: 0;
+  position: relative;
+  background: var(--srb-seg-off);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+.box:disabled {
+  cursor: default;
+}
+.condPhys .boxOn {
+  background: linear-gradient(180deg, #fb8787, #dc2626);
+  border-color: rgba(248, 113, 113, 0.6);
+}
+.condStun .boxOn {
+  background: linear-gradient(180deg, #fcd34d, #d97706);
+  border-color: rgba(251, 191, 36, 0.6);
+}
+.mk {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font: 600 8px var(--srb-fnum);
+  color: var(--srb-dim);
+}
+.totpen {
+  margin-top: 7px;
+  font: 600 10px var(--srb-fnum);
+  color: var(--srb-muted);
+}
+.totpen b {
+  color: var(--srb-danger);
+  font-size: 13px;
+}
+
+/* chips */
+.chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.chip {
+  flex: 1 1 0;
+  min-width: 58px;
+  text-align: center;
+  background: #140d0a;
+  border: 1px solid var(--srb-line);
+  padding: 5px 7px;
+  clip-path: var(--srb-clip);
+}
+.chipL {
+  display: block;
+  font: 600 9px var(--srb-fn);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--srb-muted);
+}
+.chipV {
+  font: 700 15px var(--srb-fnum);
+}
+.chipV small {
+  color: var(--srb-dim);
+  font-size: 9px;
+}
+.chipDef .chipV {
+  color: var(--srb-accent);
+}
+.chipArm .chipV {
+  color: var(--srb-violet);
+}
+.chipMov .chipV {
+  color: var(--srb-green);
+}
+.chipIni .chipV {
+  color: var(--srb-gold);
+}
+
+/* atributy */
+.attrs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.attr {
+  text-align: center;
+  cursor: pointer;
+  padding: 5px 6px;
+  background: linear-gradient(90deg, #181009, #120c08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 2px solid var(--srb-bestie);
+  color: var(--srb-text);
+  font: inherit;
+}
+.attr:hover {
+  background: #1d130c;
+}
+.attr:disabled {
+  cursor: default;
+}
+.attrMental {
+  border-bottom-color: var(--srb-violet);
+}
+.attrCode {
+  font: 600 9px var(--srb-fnum);
+  letter-spacing: 0.05em;
+  color: var(--srb-muted);
+}
+.attrVal {
+  font: 700 17px var(--srb-fnum);
+  color: var(--srb-text);
+}
+
+/* řádky útoků/dovedností */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rowbtn {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  padding: 6px 9px;
+  background: linear-gradient(90deg, #181009, #120c08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--srb-bestie);
+  color: var(--srb-text);
+  font: inherit;
+}
+.rowbtn:hover {
+  border-color: rgba(251, 146, 60, 0.5);
+  background: #1d130c;
+}
+.rowbtn:disabled {
+  cursor: default;
+}
+.rowbtnAtk {
+  border-left-color: var(--srb-danger);
+}
+.rn {
+  font: 500 12px var(--srb-fn);
+}
+.rn small {
+  display: block;
+  color: var(--srb-dim);
+  font: 500 9px var(--srb-fnum);
+}
+.rchip {
+  font: 700 9px var(--srb-fnum);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 1px solid rgba(251, 146, 60, 0.4);
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.08);
+}
+.rchipDmg {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.08);
+}
+.rpool {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  font: 700 13px var(--srb-fnum);
+  color: #c4b1ff;
+}
+.rpool b {
+  font-size: 16px;
+  color: #c4b1ff;
+}
+.rpool small {
+  color: var(--srb-dim);
+  font-weight: 500;
+  font-size: 9px;
+}
+
+/* schopnosti */
+.power {
+  padding: 6px 9px;
+  background: #120c08;
+  border: 1px solid var(--srb-line);
+  border-left: 2px solid var(--srb-power);
+}
+.powerName {
+  font: 600 11px var(--srb-fn);
+  color: #cbb6f5;
+}
+.powerDesc {
+  margin-top: 2px;
+  font: 500 10px/1.5 var(--srb-fnum);
+  color: var(--srb-muted);
+}
+.notes {
+  padding: 8px 10px;
+  background: #120c08;
+  border: 1px solid var(--srb-line);
+  font: 500 11px/1.6 var(--srb-fnum);
+  color: var(--srb-muted);
+  white-space: pre-wrap;
+}
+.empty {
+  font: 500 10px var(--srb-fnum);
+  color: var(--srb-dim);
+}
