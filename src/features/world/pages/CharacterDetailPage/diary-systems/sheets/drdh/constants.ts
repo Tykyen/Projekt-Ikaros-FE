@@ -1,6 +1,9 @@
 /**
- * 8.7e — Dračí Hlídka (DrdH) konstanty.
- * 1:1 přenos z `c:/Matrix/Matrix/frontend/src/components/diary/DrdhCharacterSheet.tsx`.
+ * 8.7e / 16b — Dračí Hlídka (DrdH) konstanty.
+ *
+ * Datový model = schválený prototyp `c:/tmp/drdh-denik-audit.html`.
+ * 6 povolání, každé s vlastním sekundárním zdrojem (mega-box vpravo od HP)
+ * a vlastní profession-tabulkou (full-width blok).
  */
 
 export type DrdhProfessionId =
@@ -11,78 +14,99 @@ export type DrdhProfessionId =
   | 'zlodej'
   | 'klerik';
 
-export const DRDH_PROFESSIONS: { id: DrdhProfessionId; label: string }[] = [
-  { id: 'valecnik', label: 'Válečník' },
-  { id: 'hranicar', label: 'Hraničář' },
-  { id: 'alchymista', label: 'Alchymista' },
-  { id: 'kouzelnik', label: 'Kouzelník' },
-  { id: 'zlodej', label: 'Zloděj' },
-  { id: 'klerik', label: 'Klerik' },
+export interface DrdhProfessionDef {
+  id: DrdhProfessionId;
+  label: string;
+  /** Symbol povolání (glyph na erbu + pečeti). */
+  glyph: string;
+  /** Specializace dostupné od 6. úrovně. */
+  spec: string[];
+}
+
+export const DRDH_PROFESSIONS: DrdhProfessionDef[] = [
+  { id: 'valecnik', label: 'Válečník', glyph: '⚔', spec: ['Berserker', 'Šermíř', 'Rytíř'] },
+  { id: 'hranicar', label: 'Hraničář', glyph: '🍃', spec: ['Chodec', 'Druid', 'Pán zvířat'] },
+  { id: 'alchymista', label: 'Alchymista', glyph: '⚗', spec: ['Medicus', 'Pyromant', 'Theurg'] },
+  { id: 'kouzelnik', label: 'Kouzelník', glyph: '✦', spec: ['Bojový mág', 'Čaroděj', 'Nekromant'] },
+  { id: 'zlodej', label: 'Zloděj', glyph: '🗝', spec: ['Assassin', 'Lupič', 'Sicco'] },
+  { id: 'klerik', label: 'Klerik', glyph: '✝', spec: ['Bojový mnich', 'Exorcista', 'Kněz'] },
 ];
+
+/** Mapa id → def pro rychlý lookup. */
+export const DRDH_PROF_BY_ID: Record<DrdhProfessionId, DrdhProfessionDef> =
+  DRDH_PROFESSIONS.reduce(
+    (acc, p) => {
+      acc[p.id] = p;
+      return acc;
+    },
+    {} as Record<DrdhProfessionId, DrdhProfessionDef>,
+  );
 
 export interface DrdhAttrDef {
+  /** customData suffix (`drdh_attr_<id>` = stupeň). */
   id: string;
   label: string;
+  /** Zkratka zobrazená v UI (SIL/OBR/ODO/INT/CHAR). */
+  abbr: string;
 }
 
-/** 5 hlavních atributů DrdH. */
+/**
+ * 5 hlavních atributů DrdH (pořadí dle prototypu).
+ * Stupeň se ukládá pod `drdh_attr_<id>`; oprava se NEukládá (auto = ⌊st/2⌋−5).
+ */
 export const DRDH_ATTRS: DrdhAttrDef[] = [
-  { id: 'str', label: 'Síla' },
-  { id: 'dex', label: 'Obratnost' },
-  { id: 'con', label: 'Odolnost' },
-  { id: 'int', label: 'Inteligence' },
-  { id: 'cha', label: 'Charisma' },
+  { id: 'str', label: 'Síla', abbr: 'SIL' },
+  { id: 'dex', label: 'Obratnost', abbr: 'OBR' },
+  { id: 'con', label: 'Odolnost', abbr: 'ODO' },
+  { id: 'int', label: 'Inteligence', abbr: 'INT' },
+  { id: 'cha', label: 'Charisma', abbr: 'CHAR' },
 ];
 
-/** Konfigurace sekundárního zdroje per povolání. */
-export interface DrdhResourceConfig {
-  title: string;
-  /** klíč suffix v customData (`drdh_<key>` + `_max`, `_note`) */
-  valueKey: string;
-  maxKey: string;
-  noteKey: string;
-  notePlaceholder: string;
+/** Zkratky atributů (pro dovednostní select). */
+export const DRDH_ATTR_ABBRS = ['SIL', 'OBR', 'ODO', 'INT', 'CHAR'] as const;
+export type DrdhAttrAbbr = (typeof DRDH_ATTR_ABBRS)[number];
+
+/** Mapování zkratky atributu → customData suffix (pro lookup opravy). */
+export const DRDH_ABBR_TO_ID: Record<DrdhAttrAbbr, string> = {
+  SIL: 'str',
+  OBR: 'dex',
+  ODO: 'con',
+  INT: 'int',
+  CHAR: 'cha',
+};
+
+/** Oprava atributu = ⌊stupeň/2⌋ − 5. */
+export function drdhAttrMod(degree: string | number): number {
+  const d = typeof degree === 'number' ? degree : parseInt(degree, 10);
+  if (Number.isNaN(d)) return 0;
+  return Math.floor(d / 2) - 5;
 }
 
-/** Mapování povolání → sekundární zdroj (jeden box). Alchymista má 2 (řešen samostatně). */
-export const DRDH_RESOURCE_BY_PROF: Partial<
-  Record<DrdhProfessionId, DrdhResourceConfig>
+/** Formátuje opravu se znaménkem (+3 / 0 / -2). */
+export function fmtMod(m: number): string {
+  return m > 0 ? `+${m}` : String(m);
+}
+
+/** Typ sekundárního zdroje (řídí render mega-boxu). */
+export type DrdhResourceKind =
+  | 'adrenalin'
+  | 'dusevni'
+  | 'mana_sur'
+  | 'mana'
+  | 'kostymy'
+  | 'prizen';
+
+/** Per-povolání sekundární zdroj (pečeť + typ). */
+export const DRDH_RESOURCE_BY_PROF: Record<
+  DrdhProfessionId,
+  { kind: DrdhResourceKind; title: string }
 > = {
-  valecnik: {
-    title: 'Adrenalin',
-    valueKey: 'res_adr',
-    maxKey: 'res_adr_max',
-    noteKey: 'res_adr_note',
-    notePlaceholder: 'Kola nebo spotřeba',
-  },
-  hranicar: {
-    title: 'Duševní Síla',
-    valueKey: 'res_ds',
-    maxKey: 'res_ds_max',
-    noteKey: 'res_ds_note',
-    notePlaceholder: 'Obnova odpočinkem',
-  },
-  kouzelnik: {
-    title: 'Mana',
-    valueKey: 'res_mana',
-    maxKey: 'res_mana_max',
-    noteKey: 'res_mana_note',
-    notePlaceholder: 'Denní nasátí',
-  },
-  zlodej: {
-    title: 'Kostýmy',
-    valueKey: 'res_costume',
-    maxKey: 'res_costume_max',
-    noteKey: 'res_costume_note',
-    notePlaceholder: 'Aktivní kostýmové efekty',
-  },
-  klerik: {
-    title: 'Přízeň',
-    valueKey: 'res_favor',
-    maxKey: 'res_favor_max',
-    noteKey: 'res_favor_note',
-    notePlaceholder: 'Dopoledne / Odpoledne',
-  },
+  valecnik: { kind: 'adrenalin', title: 'Adrenalin' },
+  hranicar: { kind: 'dusevni', title: 'Duševní síla' },
+  alchymista: { kind: 'mana_sur', title: 'Mana & Suroviny' },
+  kouzelnik: { kind: 'mana', title: 'Mana' },
+  zlodej: { kind: 'kostymy', title: 'Kostýmy' },
+  klerik: { kind: 'prizen', title: 'Přízeň' },
 };
 
 /** Profession-specific tabulka — definice sloupců. */
@@ -91,8 +115,6 @@ export interface DrdhProfTableCol {
   key: string;
   /** Sloupcový header (česky). */
   header: string;
-  /** Width class: `td-slim` (50px) / `td-mid` (80px) nebo undefined. */
-  width?: 'td-slim' | 'td-mid';
 }
 
 export interface DrdhProfTable {
@@ -106,76 +128,77 @@ export interface DrdhProfTable {
   cols: DrdhProfTableCol[];
 }
 
-/** Definice profession-tabulky per povolání. */
+/** Definice profession-tabulky per povolání (sloupce dle prototypu). */
 export const DRDH_PROF_TABLE: Record<DrdhProfessionId, DrdhProfTable> = {
   valecnik: {
     arrKey: 'w_triky',
     title: 'Válečníkovy triky',
-    addLabel: '+ Přidat Trik',
+    addLabel: '+ Přidat trik',
     cols: [
       { key: 'name', header: 'Název' },
-      { key: 'adr', header: 'Adrenalin', width: 'td-slim' },
+      { key: 'adr', header: 'Adrenalin' },
       { key: 'use', header: 'Použití' },
+      { key: 'req', header: 'Vyžaduje' },
       { key: 'check', header: 'Ověření' },
-      { key: 'note', header: 'Poznámka', width: 'td-mid' },
+      { key: 'note', header: 'Poznámka' },
     ],
   },
   hranicar: {
     arrKey: 'r_kouzla',
     title: 'Hraničářova kouzla',
-    addLabel: '+ Přidat Kouzlo',
+    addLabel: '+ Přidat kouzlo',
     cols: [
       { key: 'name', header: 'Název' },
-      { key: 'power', header: 'Síla', width: 'td-slim' },
+      { key: 'power', header: 'Duševní síla' },
       { key: 'diff', header: 'Obtížnost' },
-      { key: 'note', header: 'Poznámka', width: 'td-mid' },
+      { key: 'note', header: 'Poznámka' },
     ],
   },
   alchymista: {
     arrKey: 'a_recepty',
     title: 'Alchymistovy recepty',
-    addLabel: '+ Přidat Recept',
+    addLabel: '+ Přidat recept',
     cols: [
       { key: 'name', header: 'Název' },
-      { key: 'mana', header: 'Mana', width: 'td-slim' },
-      { key: 'sur', header: 'Surovina', width: 'td-slim' },
+      { key: 'mana', header: 'Mana' },
+      { key: 'sur', header: 'Suroviny' },
       { key: 'zak', header: 'Základ' },
       { key: 'diff', header: 'Obtížnost' },
-      { key: 'note', header: 'Pozn', width: 'td-mid' },
+      { key: 'note', header: 'Poznámka' },
     ],
   },
   kouzelnik: {
     arrKey: 'm_kouzla',
     title: 'Kouzelníkova kouzla',
-    addLabel: '+ Přidat Kouzlo',
+    addLabel: '+ Přidat kouzlo',
     cols: [
       { key: 'name', header: 'Název' },
-      { key: 'mana', header: 'Mana', width: 'td-slim' },
+      { key: 'mana', header: 'Mana' },
       { key: 'diff', header: 'Obtížnost' },
-      { key: 'note', header: 'Poznámka', width: 'td-mid' },
+      { key: 'note', header: 'Poznámka' },
     ],
   },
   zlodej: {
     arrKey: 't_triky',
     title: 'Zlodějovy triky',
-    addLabel: '+ Přidat Trik',
+    addLabel: '+ Přidat trik',
     cols: [
       { key: 'name', header: 'Název' },
-      { key: 'action', header: 'Činnost' },
+      { key: 'freq', header: 'Četnost' },
       { key: 'use', header: 'Použití' },
       { key: 'check', header: 'Ověření' },
-      { key: 'note', header: 'Poznámka', width: 'td-mid' },
+      { key: 'note', header: 'Poznámka' },
     ],
   },
   klerik: {
     arrKey: 'c_prosby',
     title: 'Klerikovy prosby',
-    addLabel: '+ Přidat Prosbu',
+    addLabel: '+ Přidat prosbu',
     cols: [
       { key: 'name', header: 'Název' },
-      { key: 'favor', header: 'Přízeň', width: 'td-slim' },
+      { key: 'favor', header: 'Přízeň' },
       { key: 'diff', header: 'Obtížnost' },
-      { key: 'note', header: 'Poznámka', width: 'td-mid' },
+      { key: 'note', header: 'Poznámka' },
     ],
   },
 };
@@ -190,18 +213,26 @@ export interface DrdhWeapon {
   oc: string;
 }
 
-/** Zbroj v `drdh_armors` JSON poli. */
+/** Zbroj / štít v `drdh_armors` JSON poli. */
 export interface DrdhArmor {
   name: string;
   quality: string;
-  def: string;
+  /** Základ obrany (ZO). */
+  zo: string;
   note: string;
 }
 
-/** Dovednost v `drdh_skills` JSON poli. */
+/** Dovednost v `drdh_skills` JSON poli. Součet = oprava atributu + stupeň (auto). */
 export interface DrdhSkill {
   name: string;
-  lvl: string;
-  sum: string;
-  pts: string;
+  /** Zkratka atributu (SIL/OBR/ODO/INT/CHAR). */
+  attr: string;
+  /** Stupeň dovednosti. */
+  deg: string;
+}
+
+/** Zvláštní schopnost v `drdh_abilities` JSON poli. */
+export interface DrdhAbility {
+  name: string;
+  desc: string;
 }

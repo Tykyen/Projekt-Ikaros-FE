@@ -1,28 +1,42 @@
 /**
- * 8.7e — Dračí Hlídka (DrdH) deník postavy.
+ * 8.7e / 16b — Dračí Hlídka (DrdH) deník postavy.
  *
- * Adaptováno z `c:/Matrix/Matrix/frontend/src/components/diary/DrdhCharacterSheet.tsx`
- * (459 ř). Save delegujeme parentu; `onSave` prop nemá.
- * Data v `diary.customData` s prefixem `drdh_*` (1:1 vůči legacy).
+ * Vizuál i datový model = schválený prototyp `c:/tmp/drdh-denik-audit.html`
+ * („Pergamenový rozkaz Hlídky"). Data v `diary.customData` (prefix `drdh_*`).
  *
- * 6 povolání (Válečník, Hraničář, Alchymista, Kouzelník, Zloděj, Klerik),
- * každé má vlastní sekundární zdroj (mega-box vpravo od HP) a vlastní
- * profession-tabulku (vlevo).
+ * Klíčové prvky proti dřívějšku:
+ *  - HERO: interaktivní erb (klik → popover s 6 povoláními) místo selectu;
+ *    jméno na crimson stuze (ribbon); Specializace (select, zamčená < 6. úr.).
+ *  - HUD: Životy (Hranice smrti auto = −(10 + oprava ODO)) + sekundární zdroj
+ *    per povolání (adrenalin track / duševní síla / mana+suroviny / mana /
+ *    kostýmy seznam / přízeň + denní checkboxy).
+ *  - Atributy: stupeň (edit) + oprava (auto = ⌊st/2⌋−5, read-only).
+ *  - Boj: zbraně + zbroj/štít. Dovednosti: globální body + tabulka s auto
+ *    součtem (oprava atributu + stupeň). Full-width blok povolání.
+ *  - Spodní zóna: zvláštní schopnosti / magické předměty / poznámky.
+ *  - ŽÁDNÉ peníze, vybavení ani bojové vzorce (vynecháno dle prototypu).
  */
+import { useState } from 'react';
 import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
+import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 import {
+  DRDH_ABBR_TO_ID,
+  DRDH_ATTR_ABBRS,
   DRDH_ATTRS,
+  DRDH_PROF_BY_ID,
   DRDH_PROF_TABLE,
   DRDH_PROFESSIONS,
   DRDH_RESOURCE_BY_PROF,
+  drdhAttrMod,
+  fmtMod,
+  type DrdhAbility,
   type DrdhArmor,
   type DrdhProfessionId,
   type DrdhSkill,
   type DrdhWeapon,
 } from './constants';
-import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 
 export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const disabled = mode === 'view';
@@ -31,84 +45,195 @@ export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
   const cda = makeCdAccess(cd, 'drdh_', onChange);
   const { g, set } = cda;
 
-  const prof = (g('profession_id') || 'valecnik') as DrdhProfessionId;
+  const [profOpen, setProfOpen] = useState(false);
 
-  // Tisk: interaktivní inputy/tabulky jsou netisknutelné (hodnota v
-  // `<input value>`). V printMode renderujeme oddělený statický čitelný
-  // dokument se stejnými `drdh_*` daty.
+  const prof = (g('profession_id') || 'valecnik') as DrdhProfessionId;
+  const profDef = DRDH_PROF_BY_ID[prof] ?? DRDH_PROF_BY_ID.valecnik;
+
+  // Oprava ODO → hranice smrti = −(10 + oprava ODO).
+  const odoMod = drdhAttrMod(g('attr_con'));
+  const autoDeath = -(10 + odoMod);
+
+  // Tisk: interaktivní inputy/tabulky jsou netisknutelné — renderujeme
+  // oddělený statický čitelný dokument se stejnými `drdh_*` daty.
   if (printMode) return <DrdhPrintView cda={cda} prof={prof} />;
 
+  const lvl = parseInt(g('lvl'), 10) || 0;
+  const specLocked = lvl < 6;
+
+  function pickProf(id: DrdhProfessionId) {
+    set('profession_id', id);
+    setProfOpen(false);
+  }
+
   return (
-    <div className="drdh-dashboard">
-      {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}
-      <div className="drdh-grid-layout">
-        {/* ═══ CENTER ZONE ═══ */}
-        <div className="center-zone">
-          {/* Identita */}
-          <div className="drdh-panel">
-            <h3>Identita Postavy</h3>
-            <div className="form-group">
-              <label htmlFor="drdh_name">Jméno</label>
+    <div className="drdh-sheet" data-mode={mode}>
+      {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d6" />}
+
+      <div className="sheet">
+        {/* ════ HERO ════ */}
+        <div className="hero">
+          <div
+            className="erb"
+            role={disabled ? undefined : 'button'}
+            tabIndex={disabled ? undefined : 0}
+            title={disabled ? undefined : 'Klikni pro výběr povolání'}
+            onClick={(e) => {
+              if (disabled) return;
+              e.stopPropagation();
+              setProfOpen((o) => !o);
+            }}
+            onKeyDown={(e) => {
+              if (disabled) return;
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setProfOpen((o) => !o);
+              }
+            }}
+          >
+            <svg viewBox="0 0 100 120" aria-hidden="true">
+              <defs>
+                <linearGradient id="drdhShield" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#1f3a6b" />
+                  <stop offset="1" stopColor="#12233f" />
+                </linearGradient>
+                <linearGradient id="drdhGold" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#f4dd92" />
+                  <stop offset="1" stopColor="#8a6a26" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M50 5 L92 17 V56 C92 86 72 105 50 115 C28 105 8 86 8 56 V17 Z"
+                fill="url(#drdhShield)"
+                stroke="url(#drdhGold)"
+                strokeWidth="3.5"
+              />
+              <path
+                d="M50 13 L85 23 V55 C85 80 68 96 50 105 C32 96 15 80 15 55 V23 Z"
+                fill="none"
+                stroke="rgba(244,221,146,.4)"
+                strokeWidth="1"
+              />
+              <text
+                x="50"
+                y="101"
+                textAnchor="middle"
+                fontFamily="'Cinzel Decorative',serif"
+                fontWeight="700"
+                fontSize="8.5"
+                fill="rgba(244,221,146,.72)"
+              >
+                DH
+              </text>
+            </svg>
+            <div className="erb-glyph" aria-hidden="true">
+              {profDef.glyph}
+            </div>
+            <span className="erb-banner">
+              {profDef.label} {disabled ? '' : '▾'}
+            </span>
+            {profOpen && !disabled && (
+              <div
+                className="erb-pop open"
+                role="listbox"
+                aria-label="Výběr povolání"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {DRDH_PROFESSIONS.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    role="option"
+                    aria-selected={p.id === prof}
+                    className={`erb-item${p.id === prof ? ' sel' : ''}`}
+                    onClick={() => pickProf(p.id)}
+                  >
+                    <span className="g">{p.glyph}</span>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="hero-ident">
+            <div className="ribbon">
               <input
-                id="drdh_name"
                 value={g('name')}
                 disabled={disabled}
                 onChange={(e) => set('name', e.target.value)}
-                placeholder="Zadej jméno..."
-                style={{ fontSize: 18, fontWeight: 'bold', padding: 12 }}
+                placeholder="Jméno postavy…"
+                aria-label="Jméno"
               />
             </div>
-            <div className="flex-row">
-              <div className="form-group">
-                <label htmlFor="drdh_profession_id">Povolání</label>
+            <div className="ident-line">
+              <div className={`field spec-field${specLocked ? ' locked' : ''}`}>
+                <label htmlFor="drdh_specialization">Specializace</label>
                 <select
-                  id="drdh_profession_id"
-                  value={prof}
-                  disabled={disabled}
-                  onChange={(e) => set('profession_id', e.target.value)}
+                  id="drdh_specialization"
+                  value={g('specialization')}
+                  disabled={disabled || specLocked}
+                  onChange={(e) => set('specialization', e.target.value)}
+                  aria-label="Specializace"
                 >
-                  {DRDH_PROFESSIONS.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.label}
+                  <option value="">—</option>
+                  {profDef.spec.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
                     </option>
                   ))}
                 </select>
+                <span className="spec-lock">🔒 od 6. úrovně</span>
               </div>
-              <div className="form-group">
+              <div className="field">
                 <label htmlFor="drdh_race">Rasa</label>
                 <input
                   id="drdh_race"
                   value={g('race')}
                   disabled={disabled}
                   onChange={(e) => set('race', e.target.value)}
-                  placeholder="..."
+                  placeholder="Rasa…"
                 />
               </div>
-            </div>
-            <div className="flex-row">
-              <div className="form-group">
+              <div className="field num">
                 <label htmlFor="drdh_lvl">Úroveň</label>
                 <input
                   id="drdh_lvl"
+                  inputMode="numeric"
                   value={g('lvl')}
                   disabled={disabled}
                   onChange={(e) => set('lvl', e.target.value)}
-                  style={{ textAlign: 'center' }}
                 />
               </div>
-              <div className="form-group">
+              <div className="field num">
                 <label htmlFor="drdh_xp">Zkušenosti</label>
                 <input
                   id="drdh_xp"
+                  inputMode="numeric"
                   value={g('xp')}
                   disabled={disabled}
                   onChange={(e) => set('xp', e.target.value)}
-                  style={{ textAlign: 'center' }}
                 />
               </div>
-            </div>
-            <div className="flex-row">
-              <div className="form-group">
+              <div className="field num">
+                <label htmlFor="drdh_size">Velikost</label>
+                <input
+                  id="drdh_size"
+                  value={g('size')}
+                  disabled={disabled}
+                  onChange={(e) => set('size', e.target.value)}
+                />
+              </div>
+              <div className="field num">
+                <label htmlFor="drdh_mobility">Pohyblivost</label>
+                <input
+                  id="drdh_mobility"
+                  value={g('mobility')}
+                  disabled={disabled}
+                  onChange={(e) => set('mobility', e.target.value)}
+                />
+              </div>
+              <div className="field num">
                 <label htmlFor="drdh_encumbrance">Naložení</label>
                 <input
                   id="drdh_encumbrance"
@@ -117,7 +242,7 @@ export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                   onChange={(e) => set('encumbrance', e.target.value)}
                 />
               </div>
-              <div className="form-group">
+              <div className="field num">
                 <label htmlFor="drdh_fatigue">Únava</label>
                 <input
                   id="drdh_fatigue"
@@ -127,192 +252,167 @@ export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 />
               </div>
             </div>
-            <div className="flex-row">
-              <div className="form-group">
-                <label htmlFor="drdh_size">Velikost</label>
-                <input
-                  id="drdh_size"
-                  value={g('size')}
-                  disabled={disabled}
-                  onChange={(e) => set('size', e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="drdh_mobility">Pohyblivost</label>
-                <input
-                  id="drdh_mobility"
-                  value={g('mobility')}
-                  disabled={disabled}
-                  onChange={(e) => set('mobility', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Atributy + mince */}
-          <div className="drdh-panel">
-            <h3>Atributy</h3>
-            <div className="attrs-box">
-              {DRDH_ATTRS.map((a) => (
-                <div key={a.id} className="attr-row">
-                  <div className="attr-name">{a.label}</div>
-                  <div className="attr-vals">
-                    <input
-                      value={g(`attr_${a.id}`)}
-                      disabled={disabled}
-                      onChange={(e) => set(`attr_${a.id}`, e.target.value)}
-                      placeholder="St."
-                      aria-label={`${a.label} stupeň`}
-                    />
-                    <input
-                      className="attr-mod"
-                      value={g(`attr_${a.id}_mod`)}
-                      disabled={disabled}
-                      onChange={(e) =>
-                        set(`attr_${a.id}_mod`, e.target.value)
-                      }
-                      placeholder="Opr."
-                      aria-label={`${a.label} oprava`}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <h3 style={{ marginTop: 32 }}>Mince</h3>
-            <div className="coins-panel">
-              <div className="coin z">
-                <label htmlFor="drdh_coin_z">Zlaťáky</label>
-                <input
-                  id="drdh_coin_z"
-                  value={g('coin_z')}
-                  disabled={disabled}
-                  onChange={(e) => set('coin_z', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-              <div className="coin s">
-                <label htmlFor="drdh_coin_s">Stříbrňáky</label>
-                <input
-                  id="drdh_coin_s"
-                  value={g('coin_s')}
-                  disabled={disabled}
-                  onChange={(e) => set('coin_s', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-              <div className="coin m">
-                <label htmlFor="drdh_coin_m">Měďáky</label>
-                <input
-                  id="drdh_coin_m"
-                  value={g('coin_m')}
-                  disabled={disabled}
-                  onChange={(e) => set('coin_m', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* ═══ RIGHT ZONE ═══ */}
-        <div className="right-zone">
-          {/* HP + sekundární zdroj */}
-          <div className="combat-header">
-            <div className="mega-box health">
-              <h4>Životy</h4>
-              <div className="hp-row">
-                <input
-                  className="hp-main"
-                  value={g('hp')}
-                  disabled={disabled}
-                  onChange={(e) => set('hp', e.target.value)}
-                  placeholder="0"
-                  aria-label="Aktuální životy"
-                />
-                <span>/</span>
-                <input
-                  className="hp-max"
-                  value={g('hp_max')}
-                  disabled={disabled}
-                  onChange={(e) => set('hp_max', e.target.value)}
-                  placeholder="Max"
-                  aria-label="Maximum životů"
-                />
-              </div>
-              <div className="hp-death">
-                Hranice smrti{' '}
-                <input
-                  value={g('hp_death')}
-                  disabled={disabled}
-                  onChange={(e) => set('hp_death', e.target.value)}
-                  placeholder="0"
-                  aria-label="Hranice smrti"
-                />
-              </div>
+        {/* ════ HUD — Životy + zdroj povolání ════ */}
+        <div className="hud">
+          <div className="mega life">
+            <div className="mega-h">
+              <span className="seal crimson">✚</span>Životy
             </div>
-
-            <SecondaryResource prof={prof} cda={cda} disabled={disabled} />
+            <div className="hp-row">
+              <input
+                className="hp-cur"
+                inputMode="numeric"
+                value={g('hp')}
+                disabled={disabled}
+                onChange={(e) => set('hp', e.target.value)}
+                aria-label="Aktuální životy"
+              />
+              <span className="hp-sep">/</span>
+              <input
+                className="hp-max"
+                inputMode="numeric"
+                value={g('hp_max')}
+                disabled={disabled}
+                onChange={(e) => set('hp_max', e.target.value)}
+                aria-label="Maximum životů"
+              />
+            </div>
+            <div className="hp-death">
+              Hranice smrti
+              <input
+                inputMode="numeric"
+                value={g('hp_death') || String(autoDeath)}
+                disabled={disabled}
+                onChange={(e) => set('hp_death', e.target.value)}
+                aria-label="Hranice smrti"
+              />
+              <span
+                className="calc"
+                title="Hranice smrti = −(10 + oprava ODO). 0 životů = bezvědomí."
+              >
+                ⓘ
+              </span>
+            </div>
           </div>
 
-          {/* Souboj + zbraně */}
-          <div className="drdh-panel" style={{ padding: 16 }}>
-            <h3>Souboj a zbraně</h3>
-            <div className="flex-row" style={{ marginBottom: 16 }}>
-              <div className="form-group">
-                <label htmlFor="drdh_combat_melee">Tváří v tvář</label>
-                <input
-                  id="drdh_combat_melee"
-                  value={g('combat_melee')}
-                  disabled={disabled}
-                  onChange={(e) => set('combat_melee', e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="drdh_combat_ranged">Střelba</label>
-                <input
-                  id="drdh_combat_ranged"
-                  value={g('combat_ranged')}
-                  disabled={disabled}
-                  onChange={(e) => set('combat_ranged', e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="drdh_combat_init">Iniciativa</label>
-                <input
-                  id="drdh_combat_init"
-                  value={g('combat_init')}
-                  disabled={disabled}
-                  onChange={(e) => set('combat_init', e.target.value)}
-                />
-              </div>
-            </div>
+          <ResourceBox prof={prof} cda={cda} disabled={disabled} />
+        </div>
 
-            <WeaponsTable cda={cda} disabled={disabled} />
-
-            <h3 style={{ marginTop: 24, fontSize: 11 }}>Zbroj a Štít</h3>
-            <ArmorsTable cda={cda} disabled={disabled} />
+        {/* ════ MŘÍŽKA 3 sloupce ════ */}
+        <div className="grid">
+          {/* SLOUPEC 1 — atributy */}
+          <div>
+            <section className="panel">
+              <h3 className="panel-h">
+                <span className="seal">★</span>Atributy
+              </h3>
+              <div className="attr-head">
+                <span>Vlastnost</span>
+                <span>Stup.</span>
+                <span>Opr.</span>
+              </div>
+              <div className="attrs">
+                {DRDH_ATTRS.map((a) => {
+                  const mod = drdhAttrMod(g(`attr_${a.id}`));
+                  return (
+                    <div key={a.id} className="attr-row">
+                      <span className="a-name">
+                        {a.label}
+                        <small>{a.abbr}</small>
+                      </span>
+                      <input
+                        className="a-deg"
+                        value={g(`attr_${a.id}`)}
+                        disabled={disabled}
+                        onChange={(e) => set(`attr_${a.id}`, e.target.value)}
+                        aria-label={`${a.label} stupeň`}
+                      />
+                      <input
+                        className="a-mod"
+                        readOnly
+                        tabIndex={-1}
+                        value={fmtMod(mod)}
+                        aria-label={`${a.label} oprava`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           </div>
 
-          {/* Dovednosti */}
-          <div className="drdh-panel" style={{ padding: 16 }}>
-            <h3>Dovednosti</h3>
-            <SkillsTable cda={cda} disabled={disabled} />
+          {/* SLOUPEC 2 — boj */}
+          <div>
+            <section className="panel">
+              <h3 className="panel-h">
+                <span className="seal crimson">⚔</span>Zbraně
+              </h3>
+              <WeaponsTable cda={cda} disabled={disabled} />
+            </section>
+            <section className="panel">
+              <h3 className="panel-h">
+                <span className="seal">⛨</span>Zbroj a štít
+              </h3>
+              <ArmorsTable cda={cda} disabled={disabled} />
+            </section>
+          </div>
+
+          {/* SLOUPEC 3 — dovednosti */}
+          <div>
+            <section className="panel">
+              <h3 className="panel-h">
+                <span className="seal">🗡</span>Dovednosti
+              </h3>
+              <div className="skill-pts">
+                <label htmlFor="drdh_skill_points">Dovednostní body</label>
+                <input
+                  id="drdh_skill_points"
+                  value={g('skill_points')}
+                  disabled={disabled}
+                  onChange={(e) => set('skill_points', e.target.value)}
+                  aria-label="Dovednostní body"
+                />
+              </div>
+              <SkillsTable cda={cda} disabled={disabled} />
+            </section>
           </div>
         </div>
 
-        {/* ═══ LEFT ZONE ═══ */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <ProfessionTable prof={prof} cda={cda} disabled={disabled} />
+        {/* ════ PER-POVOLÁNÍ hlavní blok ════ */}
+        <ProfessionTable prof={prof} cda={cda} disabled={disabled} />
 
-          <div className="drdh-panel left-zone" style={{ flex: 1 }}>
-            <h3>Poznámky hlídkaře</h3>
+        {/* ════ SPODNÍ ZÓNA ════ */}
+        <div className="bottom">
+          <div className="scroll-panel">
+            <h3 className="panel-h">
+              <span className="seal">✦</span>Zvláštní schopnosti
+            </h3>
+            <AbilitiesTable cda={cda} disabled={disabled} />
+          </div>
+          <div className="scroll-panel">
+            <h3 className="panel-h">
+              <span className="seal">💍</span>Magické předměty
+            </h3>
             <textarea
-              className="notes-area"
+              value={g('magic_items')}
+              disabled={disabled}
+              onChange={(e) => set('magic_items', e.target.value)}
+              placeholder="Magické předměty, jejich účinky a nabití…"
+              aria-label="Magické předměty"
+            />
+          </div>
+          <div className="scroll-panel notes">
+            <h3 className="panel-h">
+              <span className="seal crimson">✒</span>Poznámky hlídkaře
+            </h3>
+            <textarea
               value={g('notes')}
               disabled={disabled}
               onChange={(e) => set('notes', e.target.value)}
-              placeholder="Rychlé poznámky o misích, stavech, nebo lidech..."
+              placeholder="Mise, kontakty, sliby, dluhy, tajemství…"
               aria-label="Poznámky hlídkaře"
             />
           </div>
@@ -329,100 +429,281 @@ interface SubProps {
   disabled: boolean;
 }
 
-function SecondaryResource({
+function ResourcePair({
+  cda,
+  disabled,
+  curKey,
+  maxKey,
+  curStyle,
+  curLabel,
+  maxLabel,
+}: SubProps & {
+  curKey: string;
+  maxKey: string;
+  curStyle?: React.CSSProperties;
+  curLabel: string;
+  maxLabel: string;
+}) {
+  const { g, set } = cda;
+  return (
+    <div className="res-pair">
+      <input
+        className="r-cur"
+        style={curStyle}
+        value={g(curKey)}
+        disabled={disabled}
+        onChange={(e) => set(curKey, e.target.value)}
+        aria-label={curLabel}
+      />
+      <span className="r-sep">/</span>
+      <input
+        className="r-max"
+        value={g(maxKey)}
+        disabled={disabled}
+        onChange={(e) => set(maxKey, e.target.value)}
+        aria-label={maxLabel}
+      />
+    </div>
+  );
+}
+
+function ResourceBox({
   prof,
   cda,
   disabled,
 }: SubProps & { prof: DrdhProfessionId }) {
-  const { g, set } = cda;
+  const { g, set, bool } = cda;
+  const cfg = DRDH_RESOURCE_BY_PROF[prof];
+  const sealGlyph = DRDH_PROF_BY_ID[prof]?.glyph ?? '⚡';
 
-  // Alchymista má dva (Mana + Suroviny)
-  if (prof === 'alchymista') {
-    return (
-      <div style={{ display: 'flex', gap: 8, flex: 1 }}>
-        <div className="mega-box resource" style={{ padding: 8 }}>
-          <h4 style={{ fontSize: 10 }}>Mana</h4>
-          <div className="res-inputs">
-            <input
-              className="res-main"
-              style={{ fontSize: 24 }}
-              value={g('res_mana')}
+  let body: React.ReactNode = null;
+
+  switch (cfg.kind) {
+    case 'adrenalin': {
+      const cur = parseInt(g('res_adr'), 10) || 0;
+      body = (
+        <>
+          <div className="adr-track">
+            {Array.from({ length: 20 }, (_, idx) => {
+              const n = idx + 1;
+              return (
+                <div
+                  key={n}
+                  className={`adr-cell${n <= cur ? ' on' : ''}`}
+                  role="button"
+                  tabIndex={disabled ? undefined : 0}
+                  aria-pressed={n <= cur}
+                  aria-label={`Adrenalin ${n}`}
+                  onClick={() => {
+                    if (disabled) return;
+                    set('res_adr', String(cur === n ? n - 1 : n));
+                  }}
+                  onKeyDown={(e) => {
+                    if (disabled) return;
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      set('res_adr', String(cur === n ? n - 1 : n));
+                    }
+                  }}
+                >
+                  {n}
+                </div>
+              );
+            })}
+          </div>
+          <div className="adr-foot">
+            <span>+1 za každé kolo boje · max 20</span>
+            <span>
+              Aktuální: <b>{cur}</b>
+            </span>
+          </div>
+        </>
+      );
+      break;
+    }
+    case 'dusevni':
+      body = (
+        <>
+          <ResourcePair
+            cda={cda}
+            disabled={disabled}
+            curKey="res_ds"
+            maxKey="res_ds_max"
+            curLabel="Duševní síla aktuální"
+            maxLabel="Duševní síla max"
+          />
+          <div className="res-note">Plné doplnění spánkem</div>
+        </>
+      );
+      break;
+    case 'mana_sur':
+      body = (
+        <div className="res-wrap">
+          <div className="res-box">
+            <div className="res-note" style={{ margin: '0 0 4px' }}>
+              Mana
+            </div>
+            <ResourcePair
+              cda={cda}
               disabled={disabled}
-              onChange={(e) => set('res_mana', e.target.value)}
-              aria-label="Mana aktuální"
+              curKey="res_mana"
+              maxKey="res_mana_max"
+              curLabel="Mana aktuální"
+              maxLabel="Mana max"
             />
-            <input
-              className="res-max"
-              value={g('res_mana_max')}
+          </div>
+          <div className="res-box">
+            <div className="res-note" style={{ margin: '0 0 4px' }}>
+              Suroviny
+            </div>
+            <ResourcePair
+              cda={cda}
               disabled={disabled}
-              onChange={(e) => set('res_mana_max', e.target.value)}
-              aria-label="Mana max"
+              curKey="res_sur"
+              maxKey="res_sur_max"
+              curStyle={{ color: 'var(--drdh-res-alt, #5fae73)' }}
+              curLabel="Suroviny aktuální"
+              maxLabel="Suroviny max"
             />
           </div>
         </div>
-        <div
-          className="mega-box resource"
-          style={{
-            padding: 8,
-            borderColor: 'rgba(255,150,50,0.3)',
-            borderTopColor: '#ff9632',
-          }}
-        >
-          <h4 style={{ fontSize: 10, color: '#ff9632' }}>Suroviny</h4>
-          <div className="res-inputs">
-            <input
-              className="res-main"
-              style={{ fontSize: 24, color: '#ff9632' }}
-              value={g('res_sur')}
-              disabled={disabled}
-              onChange={(e) => set('res_sur', e.target.value)}
-              aria-label="Suroviny aktuální"
-            />
-            <input
-              className="res-max"
-              value={g('res_sur_max')}
-              disabled={disabled}
-              onChange={(e) => set('res_sur_max', e.target.value)}
-              aria-label="Suroviny max"
-            />
+      );
+      break;
+    case 'mana':
+      body = (
+        <>
+          <ResourcePair
+            cda={cda}
+            disabled={disabled}
+            curKey="res_mana"
+            maxKey="res_mana_max"
+            curLabel="Mana aktuální"
+            maxLabel="Mana max"
+          />
+          <div className="res-mini">
+            <label>
+              Úroveň
+              <input
+                value={g('res_mana_lvl')}
+                disabled={disabled}
+                onChange={(e) => set('res_mana_lvl', e.target.value)}
+                aria-label="Úroveň many"
+              />
+            </label>
+            <label>
+              Nasátí
+              <input
+                value={g('res_mana_nasati')}
+                disabled={disabled}
+                onChange={(e) => set('res_mana_nasati', e.target.value)}
+                aria-label="Nasátí many"
+              />
+            </label>
           </div>
-        </div>
-      </div>
-    );
+          <div className="res-note">
+            Nasávání 1k6 denně · plné doplnění meditací
+          </div>
+        </>
+      );
+      break;
+    case 'kostymy': {
+      const costumes = cda.parseJsonArr<string>('costumes');
+      body = (
+        <>
+          <div className="costume-list">
+            {costumes.map((c, i) => (
+              <div key={i} className="crow">
+                <input
+                  value={c}
+                  disabled={disabled}
+                  onChange={(e) => {
+                    const next = [...costumes];
+                    next[i] = e.target.value;
+                    set('costumes', JSON.stringify(next));
+                  }}
+                  placeholder="Kostým / přestrojení…"
+                  aria-label={`Kostým ${i + 1}`}
+                />
+                {!disabled && (
+                  <button
+                    type="button"
+                    className="del"
+                    onClick={() => {
+                      const next = costumes.filter((_, j) => j !== i);
+                      set('costumes', JSON.stringify(next));
+                    }}
+                    aria-label="Smazat kostým"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          {!disabled && (
+            <button
+              type="button"
+              className="add-btn"
+              style={{ marginTop: 6 }}
+              onClick={() => set('costumes', JSON.stringify([...costumes, '']))}
+            >
+              + Přidat kostým
+            </button>
+          )}
+          <div className="res-note">
+            Zloděj nemá magický zdroj — kostýmy jsou seznam přestrojení
+          </div>
+        </>
+      );
+      break;
+    }
+    case 'prizen':
+      body = (
+        <>
+          <ResourcePair
+            cda={cda}
+            disabled={disabled}
+            curKey="res_favor"
+            maxKey="res_favor_max"
+            curLabel="Přízeň aktuální"
+            maxLabel="Přízeň max"
+          />
+          <div className="prizen-times">
+            {(
+              [
+                ['prizen_rano', '☀', 'Ráno'],
+                ['prizen_odpoledne', '⛅', 'Odpoledne'],
+                ['prizen_vecer', '☾', 'Večer'],
+              ] as const
+            ).map(([key, icon, label]) => (
+              <label key={key}>
+                <input
+                  type="checkbox"
+                  checked={bool(key)}
+                  disabled={disabled}
+                  onChange={(e) => set(key, e.target.checked)}
+                  aria-label={label}
+                />
+                <span className="box">{icon}</span>
+                {label}
+              </label>
+            ))}
+          </div>
+          <div className="res-note">3× denně lze obnovit 1/3 přízně</div>
+        </>
+      );
+      break;
   }
 
-  const cfg = DRDH_RESOURCE_BY_PROF[prof];
-  if (!cfg) return null;
   return (
-    <div className="mega-box resource">
-      <h4>{cfg.title}</h4>
-      <div className="res-inputs">
-        <input
-          className="res-main"
-          value={g(cfg.valueKey)}
-          disabled={disabled}
-          onChange={(e) => set(cfg.valueKey, e.target.value)}
-          placeholder="0"
-          aria-label={`${cfg.title} aktuální`}
-        />
-        <input
-          className="res-max"
-          value={g(cfg.maxKey)}
-          disabled={disabled}
-          onChange={(e) => set(cfg.maxKey, e.target.value)}
-          placeholder="Max"
-          aria-label={`${cfg.title} max`}
-        />
+    <div className="mega resource">
+      <div className="mega-h">
+        <span className="seal" aria-hidden="true">
+          {sealGlyph}
+        </span>
+        <span>{cfg.title}</span>
       </div>
-      <div className="res-sub">
-        <input
-          value={g(cfg.noteKey)}
-          disabled={disabled}
-          onChange={(e) => set(cfg.noteKey, e.target.value)}
-          placeholder={cfg.notePlaceholder}
-          aria-label={`${cfg.title} poznámka`}
-        />
-      </div>
+      <div className="res-body">{body}</div>
     </div>
   );
 }
@@ -433,16 +714,16 @@ function WeaponsTable({ cda, disabled }: SubProps) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
   const rows = parseJsonArr<DrdhWeapon>('weapons');
   return (
-    <div className="drdh-table">
-      <table>
+    <>
+      <table className="tbl">
         <thead>
           <tr>
             <th>Zbraň</th>
-            <th className="td-slim">Útoč</th>
-            <th className="td-slim">Zran</th>
-            <th className="td-slim">Obrana</th>
-            <th className="td-slim">ÚČ</th>
-            <th className="td-slim">OČ</th>
+            <th>Útoč.</th>
+            <th>Zran.</th>
+            <th>Obr.</th>
+            <th>ÚČ</th>
+            <th>OČ</th>
             <th></th>
           </tr>
         </thead>
@@ -453,6 +734,7 @@ function WeaponsTable({ cda, disabled }: SubProps) {
                 (field) => (
                   <td key={field}>
                     <input
+                      className={field === 'name' ? 'l' : undefined}
                       value={row[field] || ''}
                       disabled={disabled}
                       onChange={(e) =>
@@ -469,7 +751,7 @@ function WeaponsTable({ cda, disabled }: SubProps) {
                 {!disabled && (
                   <button
                     type="button"
-                    className="del-btn"
+                    className="del"
                     onClick={() => removeArr('weapons', i)}
                     aria-label="Smazat zbraň"
                   >
@@ -496,10 +778,10 @@ function WeaponsTable({ cda, disabled }: SubProps) {
             })
           }
         >
-          + Přidat Zbraň
+          + Přidat zbraň
         </button>
       )}
-    </div>
+    </>
   );
 }
 
@@ -507,23 +789,24 @@ function ArmorsTable({ cda, disabled }: SubProps) {
   const { parseJsonArr, updateArr, addArr, removeArr } = cda;
   const rows = parseJsonArr<DrdhArmor>('armors');
   return (
-    <div className="drdh-table">
-      <table>
+    <>
+      <table className="tbl">
         <thead>
           <tr>
-            <th>Zbroj / Štít</th>
+            <th>Zbroj / štít</th>
             <th>Kvalita</th>
-            <th>Základ obrany</th>
-            <th className="td-mid">Pozn</th>
+            <th>ZO</th>
+            <th>Pozn.</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
-              {(['name', 'quality', 'def', 'note'] as const).map((field) => (
+              {(['name', 'quality', 'zo', 'note'] as const).map((field) => (
                 <td key={field}>
                   <input
+                    className={field === 'name' ? 'l' : undefined}
                     value={row[field] || ''}
                     disabled={disabled}
                     onChange={(e) =>
@@ -539,7 +822,7 @@ function ArmorsTable({ cda, disabled }: SubProps) {
                 {!disabled && (
                   <button
                     type="button"
-                    className="del-btn"
+                    className="del"
                     onClick={() => removeArr('armors', i)}
                     aria-label="Smazat zbroj"
                   >
@@ -559,55 +842,93 @@ function ArmorsTable({ cda, disabled }: SubProps) {
             addArr<DrdhArmor>('armors', {
               name: '',
               quality: '',
-              def: '',
+              zo: '',
               note: '',
             })
           }
         >
-          + Přidat Zbroj
+          + Přidat zbroj / štít
         </button>
       )}
-    </div>
+    </>
   );
 }
 
 function SkillsTable({ cda, disabled }: SubProps) {
-  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const { g, parseJsonArr, updateArr, addArr, removeArr } = cda;
   const rows = parseJsonArr<DrdhSkill>('skills');
+  // Součet = oprava zvoleného atributu + stupeň (auto, neukládá se).
+  const sumOf = (s: DrdhSkill): string => {
+    const id = DRDH_ABBR_TO_ID[s.attr as keyof typeof DRDH_ABBR_TO_ID];
+    const mod = id ? drdhAttrMod(g(`attr_${id}`)) : 0;
+    const deg = parseInt(s.deg, 10) || 0;
+    return fmtMod(mod + deg);
+  };
   return (
-    <div className="drdh-table">
-      <table>
+    <>
+      <table className="tbl">
         <thead>
           <tr>
-            <th>Název dovednosti</th>
-            <th className="td-slim">Stupeň</th>
-            <th className="td-slim">Součet</th>
-            <th className="td-slim">Body</th>
+            <th>Dovednost</th>
+            <th>Atr.</th>
+            <th>Stup.</th>
+            <th>Souč.</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
-              {(['name', 'lvl', 'sum', 'pts'] as const).map((field) => (
-                <td key={field}>
-                  <input
-                    value={row[field] || ''}
-                    disabled={disabled}
-                    onChange={(e) =>
-                      updateArr<DrdhSkill>('skills', i, {
-                        [field]: e.target.value,
-                      } as Partial<DrdhSkill>)
-                    }
-                    aria-label={`Dovednost ${i + 1} — ${field}`}
-                  />
-                </td>
-              ))}
+              <td>
+                <input
+                  className="l"
+                  value={row.name || ''}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<DrdhSkill>('skills', i, { name: e.target.value })
+                  }
+                  aria-label={`Dovednost ${i + 1} — název`}
+                />
+              </td>
+              <td>
+                <select
+                  value={row.attr || 'OBR'}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<DrdhSkill>('skills', i, { attr: e.target.value })
+                  }
+                  aria-label={`Dovednost ${i + 1} — atribut`}
+                >
+                  {DRDH_ATTR_ABBRS.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+              </td>
+              <td>
+                <input
+                  value={row.deg || ''}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    updateArr<DrdhSkill>('skills', i, { deg: e.target.value })
+                  }
+                  aria-label={`Dovednost ${i + 1} — stupeň`}
+                />
+              </td>
+              <td>
+                <input
+                  readOnly
+                  tabIndex={-1}
+                  value={sumOf(row)}
+                  aria-label={`Dovednost ${i + 1} — součet`}
+                />
+              </td>
               <td>
                 {!disabled && (
                   <button
                     type="button"
-                    className="del-btn"
+                    className="del"
                     onClick={() => removeArr('skills', i)}
                     aria-label="Smazat dovednost"
                   >
@@ -624,22 +945,80 @@ function SkillsTable({ cda, disabled }: SubProps) {
           type="button"
           className="add-btn"
           onClick={() =>
-            addArr<DrdhSkill>('skills', {
-              name: '',
-              lvl: '',
-              sum: '',
-              pts: '',
-            })
+            addArr<DrdhSkill>('skills', { name: '', attr: 'OBR', deg: '' })
           }
         >
-          + Přidat Dovednost
+          + Přidat dovednost
         </button>
       )}
-    </div>
+    </>
   );
 }
 
-// ── Profession-specific table (left zone) ──────────────────────
+function AbilitiesTable({ cda, disabled }: SubProps) {
+  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
+  const rows = parseJsonArr<DrdhAbility>('abilities');
+  return (
+    <>
+      <table className="tbl">
+        <thead>
+          <tr>
+            <th>Název</th>
+            <th>Popis / účinek</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {(['name', 'desc'] as const).map((field) => (
+                <td key={field}>
+                  <input
+                    className="l"
+                    value={row[field] || ''}
+                    disabled={disabled}
+                    onChange={(e) =>
+                      updateArr<DrdhAbility>('abilities', i, {
+                        [field]: e.target.value,
+                      } as Partial<DrdhAbility>)
+                    }
+                    placeholder={field === 'name' ? 'Název' : 'Účinek…'}
+                    aria-label={`Schopnost ${i + 1} — ${field}`}
+                  />
+                </td>
+              ))}
+              <td>
+                {!disabled && (
+                  <button
+                    type="button"
+                    className="del"
+                    onClick={() => removeArr('abilities', i)}
+                    aria-label="Smazat schopnost"
+                  >
+                    ✕
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!disabled && (
+        <button
+          type="button"
+          className="add-btn"
+          onClick={() =>
+            addArr<DrdhAbility>('abilities', { name: '', desc: '' })
+          }
+        >
+          + Přidat schopnost
+        </button>
+      )}
+    </>
+  );
+}
+
+// ── Profession-specific table (full-width blok) ────────────────
 
 function ProfessionTable({
   prof,
@@ -651,77 +1030,73 @@ function ProfessionTable({
   if (!def) return null;
 
   const rows = parseJsonArr<Record<string, string>>(def.arrKey);
-  // Template = pole klíčů sloupců, vše prázdné string
   const template: Record<string, string> = def.cols.reduce(
     (acc, c) => ({ ...acc, [c.key]: '' }),
     {},
   );
+  const profGlyph = DRDH_PROF_BY_ID[prof]?.glyph ?? '⚡';
 
   return (
-    <div className="drdh-panel left-zone">
-      <h3>{def.title}</h3>
-      <div className="drdh-table">
-        <table>
-          <thead>
-            <tr>
-              {def.cols.map((c) => (
-                <th
-                  key={c.key}
-                  className={c.width === 'td-slim' ? 'td-slim' : c.width === 'td-mid' ? 'td-mid' : undefined}
-                >
-                  {c.header}
-                </th>
-              ))}
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={i}>
-                {def.cols.map((c) => (
-                  <td
-                    key={c.key}
-                    className={c.width === 'td-slim' ? 'td-slim' : c.width === 'td-mid' ? 'td-mid' : undefined}
-                  >
-                    <input
-                      value={row[c.key] || ''}
-                      disabled={disabled}
-                      onChange={(e) =>
-                        updateArr<Record<string, string>>(def.arrKey, i, {
-                          [c.key]: e.target.value,
-                        })
-                      }
-                      aria-label={`${def.title} ${i + 1} — ${c.header}`}
-                    />
-                  </td>
-                ))}
-                <td>
-                  {!disabled && (
-                    <button
-                      type="button"
-                      className="del-btn"
-                      onClick={() => removeArr(def.arrKey, i)}
-                      aria-label={`Smazat ${def.title.toLowerCase()}`}
-                    >
-                      ✕
-                    </button>
-                  )}
-                </td>
-              </tr>
+    <section className="panel prof-block">
+      <h3 className="panel-h">
+        <span className="seal" aria-hidden="true">
+          {profGlyph}
+        </span>
+        <span>{def.title}</span>
+      </h3>
+      <table className="tbl">
+        <thead>
+          <tr>
+            {def.cols.map((c) => (
+              <th key={c.key}>{c.header}</th>
             ))}
-          </tbody>
-        </table>
-        {!disabled && (
-          <button
-            type="button"
-            className="add-btn"
-            onClick={() => addArr(def.arrKey, template)}
-          >
-            {def.addLabel}
-          </button>
-        )}
-      </div>
-    </div>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {def.cols.map((c) => (
+                <td key={c.key}>
+                  <input
+                    className={c.key === 'name' ? 'l' : undefined}
+                    value={row[c.key] || ''}
+                    disabled={disabled}
+                    onChange={(e) =>
+                      updateArr<Record<string, string>>(def.arrKey, i, {
+                        [c.key]: e.target.value,
+                      })
+                    }
+                    aria-label={`${def.title} ${i + 1} — ${c.header}`}
+                  />
+                </td>
+              ))}
+              <td>
+                {!disabled && (
+                  <button
+                    type="button"
+                    className="del"
+                    onClick={() => removeArr(def.arrKey, i)}
+                    aria-label={`Smazat ${def.title.toLowerCase()}`}
+                  >
+                    ✕
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!disabled && (
+        <button
+          type="button"
+          className="add-btn"
+          onClick={() => addArr(def.arrKey, template)}
+        >
+          {def.addLabel}
+        </button>
+      )}
+    </section>
   );
 }
 
@@ -736,44 +1111,75 @@ function DrdhPrintView({
   cda: CdAccess;
   prof: DrdhProfessionId;
 }) {
-  const { g } = cda;
-  const profLabel =
-    DRDH_PROFESSIONS.find((p) => p.id === prof)?.label || prof;
+  const { g, bool } = cda;
+  const profDef = DRDH_PROF_BY_ID[prof] ?? DRDH_PROF_BY_ID.valecnik;
 
   const weapons = cda.parseJsonArr<DrdhWeapon>('weapons');
   const armors = cda.parseJsonArr<DrdhArmor>('armors');
   const skills = cda.parseJsonArr<DrdhSkill>('skills');
+  const abilities = cda.parseJsonArr<DrdhAbility>('abilities');
+  const costumes = cda.parseJsonArr<string>('costumes');
 
-  // Sekundární zdroj per povolání (alchymista má dva).
+  const odoMod = drdhAttrMod(g('attr_con'));
+  const death = g('hp_death') || String(-(10 + odoMod));
+
+  // Sekundární zdroj per povolání → čitelné řádky.
+  const cfg = DRDH_RESOURCE_BY_PROF[prof];
   const resourceLines: { label: string; value: string }[] = [];
-  if (prof === 'alchymista') {
-    resourceLines.push({
-      label: 'Mana',
-      value: `${g('res_mana', '0')} / ${g('res_mana_max', '0')}`,
-    });
-    resourceLines.push({
-      label: 'Suroviny',
-      value: `${g('res_sur', '0')} / ${g('res_sur_max', '0')}`,
-    });
-  } else {
-    const cfg = DRDH_RESOURCE_BY_PROF[prof];
-    if (cfg) {
-      const note = g(cfg.noteKey).trim();
+  switch (cfg.kind) {
+    case 'adrenalin':
+      resourceLines.push({ label: 'Adrenalin', value: `${g('res_adr', '0')} / 20` });
+      break;
+    case 'dusevni':
       resourceLines.push({
-        label: cfg.title,
-        value:
-          `${g(cfg.valueKey, '0')} / ${g(cfg.maxKey, '0')}` +
-          (note ? ` — ${note}` : ''),
+        label: 'Duševní síla',
+        value: `${g('res_ds', '0')} / ${g('res_ds_max', '0')}`,
       });
+      break;
+    case 'mana_sur':
+      resourceLines.push({
+        label: 'Mana',
+        value: `${g('res_mana', '0')} / ${g('res_mana_max', '0')}`,
+      });
+      resourceLines.push({
+        label: 'Suroviny',
+        value: `${g('res_sur', '0')} / ${g('res_sur_max', '0')}`,
+      });
+      break;
+    case 'mana':
+      resourceLines.push({
+        label: 'Mana',
+        value:
+          `${g('res_mana', '0')} / ${g('res_mana_max', '0')}` +
+          ` · Úroveň ${g('res_mana_lvl', '0')} · Nasátí ${g('res_mana_nasati', '0')}`,
+      });
+      break;
+    case 'kostymy':
+      resourceLines.push({
+        label: 'Kostýmy',
+        value: costumes.filter((c) => c.trim()).join(', ') || '—',
+      });
+      break;
+    case 'prizen': {
+      const times = [
+        bool('prizen_rano') ? 'Ráno' : '',
+        bool('prizen_odpoledne') ? 'Odpoledne' : '',
+        bool('prizen_vecer') ? 'Večer' : '',
+      ].filter(Boolean);
+      resourceLines.push({
+        label: 'Přízeň',
+        value:
+          `${g('res_favor', '0')} / ${g('res_favor_max', '0')}` +
+          (times.length ? ` · ${times.join(', ')}` : ''),
+      });
+      break;
     }
   }
 
-  // Profession-specific tabulka.
   const profTable = DRDH_PROF_TABLE[prof];
-  const profRows = profTable
-    ? cda.parseJsonArr<Record<string, string>>(profTable.arrKey)
-    : [];
+  const profRows = cda.parseJsonArr<Record<string, string>>(profTable.arrKey);
 
+  const magicItems = g('magic_items').trim();
   const notes = g('notes').trim();
 
   return (
@@ -786,7 +1192,11 @@ function DrdhPrintView({
         </div>
         <div>
           <dt>Povolání</dt>
-          <dd>{profLabel}</dd>
+          <dd>{profDef.label}</dd>
+        </div>
+        <div>
+          <dt>Specializace</dt>
+          <dd>{g('specialization') || '—'}</dd>
         </div>
         <div>
           <dt>Rasa</dt>
@@ -801,14 +1211,6 @@ function DrdhPrintView({
           <dd>{g('xp') || '—'}</dd>
         </div>
         <div>
-          <dt>Naložení</dt>
-          <dd>{g('encumbrance') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Únava</dt>
-          <dd>{g('fatigue') || '—'}</dd>
-        </div>
-        <div>
           <dt>Velikost</dt>
           <dd>{g('size') || '—'}</dd>
         </div>
@@ -816,35 +1218,29 @@ function DrdhPrintView({
           <dt>Pohyblivost</dt>
           <dd>{g('mobility') || '—'}</dd>
         </div>
+        <div>
+          <dt>Naložení</dt>
+          <dd>{g('encumbrance') || '—'}</dd>
+        </div>
+        <div>
+          <dt>Únava</dt>
+          <dd>{g('fatigue') || '—'}</dd>
+        </div>
       </dl>
 
       <h2>Atributy</h2>
       <ul className="matrix-print__plain">
         {DRDH_ATTRS.map((a) => (
           <li key={a.id} className="print-row">
-            <span>{a.label}</span>
             <span>
-              {g(`attr_${a.id}`) || '—'} ({g(`attr_${a.id}_mod`) || '—'})
+              {a.label} ({a.abbr})
+            </span>
+            <span>
+              {g(`attr_${a.id}`) || '—'} ({fmtMod(drdhAttrMod(g(`attr_${a.id}`)))})
             </span>
           </li>
         ))}
       </ul>
-
-      <h2>Mince</h2>
-      <dl className="print-cols">
-        <div>
-          <dt>Zlaťáky</dt>
-          <dd>{g('coin_z', '0')}</dd>
-        </div>
-        <div>
-          <dt>Stříbrňáky</dt>
-          <dd>{g('coin_s', '0')}</dd>
-        </div>
-        <div>
-          <dt>Měďáky</dt>
-          <dd>{g('coin_m', '0')}</dd>
-        </div>
-      </dl>
 
       <h2>Bojový stav</h2>
       <dl>
@@ -856,7 +1252,7 @@ function DrdhPrintView({
         </div>
         <div>
           <dt>Hranice smrti</dt>
-          <dd>{g('hp_death', '0')}</dd>
+          <dd>{death}</dd>
         </div>
         {resourceLines.map((r) => (
           <div key={r.label}>
@@ -864,18 +1260,6 @@ function DrdhPrintView({
             <dd>{r.value}</dd>
           </div>
         ))}
-        <div>
-          <dt>Tváří v tvář</dt>
-          <dd>{g('combat_melee') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Střelba</dt>
-          <dd>{g('combat_ranged') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Iniciativa</dt>
-          <dd>{g('combat_init') || '—'}</dd>
-        </div>
       </dl>
 
       {weapons.length > 0 && (
@@ -885,9 +1269,9 @@ function DrdhPrintView({
             <thead>
               <tr>
                 <th>Zbraň</th>
-                <th>Útoč</th>
-                <th>Zran</th>
-                <th>Obrana</th>
+                <th>Útoč.</th>
+                <th>Zran.</th>
+                <th>Obr.</th>
                 <th>ÚČ</th>
                 <th>OČ</th>
               </tr>
@@ -914,9 +1298,9 @@ function DrdhPrintView({
           <table>
             <thead>
               <tr>
-                <th>Zbroj / Štít</th>
+                <th>Zbroj / štít</th>
                 <th>Kvalita</th>
-                <th>Základ obrany</th>
+                <th>ZO</th>
                 <th>Pozn.</th>
               </tr>
             </thead>
@@ -925,7 +1309,7 @@ function DrdhPrintView({
                 <tr key={i}>
                   <td>{a.name || '—'}</td>
                   <td>{a.quality || '—'}</td>
-                  <td>{a.def || '—'}</td>
+                  <td>{a.zo || '—'}</td>
                   <td>{a.note || '—'}</td>
                 </tr>
               ))}
@@ -934,33 +1318,39 @@ function DrdhPrintView({
         </>
       )}
 
+      <h2>Dovednosti</h2>
+      <div>
+        <strong>Dovednostní body:</strong> {g('skill_points') || '—'}
+      </div>
       {skills.length > 0 && (
-        <>
-          <h2>Dovednosti</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Název dovednosti</th>
-                <th>Stupeň</th>
-                <th>Součet</th>
-                <th>Body</th>
-              </tr>
-            </thead>
-            <tbody>
-              {skills.map((s, i) => (
+        <table>
+          <thead>
+            <tr>
+              <th>Dovednost</th>
+              <th>Atr.</th>
+              <th>Stupeň</th>
+              <th>Součet</th>
+            </tr>
+          </thead>
+          <tbody>
+            {skills.map((s, i) => {
+              const id = DRDH_ABBR_TO_ID[s.attr as keyof typeof DRDH_ABBR_TO_ID];
+              const mod = id ? drdhAttrMod(g(`attr_${id}`)) : 0;
+              const deg = parseInt(s.deg, 10) || 0;
+              return (
                 <tr key={i}>
                   <td>{s.name || '—'}</td>
-                  <td>{s.lvl || '—'}</td>
-                  <td>{s.sum || '—'}</td>
-                  <td>{s.pts || '—'}</td>
+                  <td>{s.attr || '—'}</td>
+                  <td>{s.deg || '—'}</td>
+                  <td>{fmtMod(mod + deg)}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
+              );
+            })}
+          </tbody>
+        </table>
       )}
 
-      {profTable && profRows.length > 0 && (
+      {profRows.length > 0 && (
         <>
           <h2>{profTable.title}</h2>
           <table>
@@ -981,6 +1371,35 @@ function DrdhPrintView({
               ))}
             </tbody>
           </table>
+        </>
+      )}
+
+      {abilities.length > 0 && (
+        <>
+          <h2>Zvláštní schopnosti</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Název</th>
+                <th>Popis / účinek</th>
+              </tr>
+            </thead>
+            <tbody>
+              {abilities.map((a, i) => (
+                <tr key={i}>
+                  <td>{a.name || '—'}</td>
+                  <td>{a.desc || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {magicItems && (
+        <>
+          <h2>Magické předměty</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{magicItems}</p>
         </>
       )}
 
