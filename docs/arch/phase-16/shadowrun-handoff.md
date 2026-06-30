@@ -28,7 +28,15 @@
 
 **Výbava/Finance v embedu (mimo `system`, žádost autora):** `CharacterDetailPage/components/embed/EmbedSubdocsBar.tsx` (+`.module.css`) — tlačítka 🎒/💰 v TM (`TokenSystemSheet`) + chatu (`DiaryRollPanel`), **JEN PC** (NPC nemají Finance/Výbavu — BE gate). Modal mountuje soběstačné `InventoryTab`/`FinanceTab`. Roadmap bod **16.1g**.
 
-## DALŠÍ KROK: fáze 2 — Bestie
+## ✅ Fáze 2+4 HOTOVÁ (bestie) — 2026-06-30
+
+Postaveno: `schemas/shadowrun/{bestie,token}.json`+`.ts`+`index.ts`+bootstrap · sdílené jádro `system-panels/shadowrun/shadowrunBestieView.ts`+`ShadowrunBestieBody.tsx`/`.module.css` · mapa `ShadowrunBestiePanel` · chat `ShadowrunChatBestiePanel` · napojeno v `TokenSystemSheet`+`BestieRollPanel`+`BestieInstancePanel`. Bestie drží přímý pool/odvozené (ne z atributů); sdílí `rollPool`+`woundPenalty`; jantar `--srb-*`. Token=superset (strict patch). Ověřeno build+12 testů; **BE push 5db1b33 → nutný BE restart**. Návrh `c:/tmp/shadowrun-bestie-audit.html`.
+
+## DALŠÍ KROK: fáze 6 — uzávěr (`funkce` + `napoveda`)
+
+`funkce` (kap. 12 + dice engine + bestie) + `napoveda` (SR6 hody v boji, combat panel, bestie) — pool dice + combat panel + bestie jsou funkční změny, ještě nezaneseno. Pak 8 skinů (skill `skin`). Drobnost: zastaralý komentář `DiaryRollPanel.tsx:36` (`sr` mezi systémy bez combat panelu — neplatí od fáze 3).
+
+<details><summary>Archiv: původní návod na fázi 2 (hotovo)</summary>
 
 Per `sablona-denik-per-system.md` kroky 5+6 a `system` skill fáze 2+4:
 1. **Schémata** `tactical-map/schemas/shadowrun/token.json` + `bestie.json` (NEEXISTUJÍ — každý jiný systém je má). Vzor: `schemas/matrix/` nebo `schemas/jad/`. Sekce + fields + `combatBehavior` (damageable HP = fyzický záznamník, armor, movement, initiative). Pak `schemas/bootstrap.ts` + `registry.ts` + `npm run export-schemas` + BE restart.
@@ -38,6 +46,8 @@ Per `sablona-denik-per-system.md` kroky 5+6 a `system` skill fáze 2+4:
 
 > ⚠️ **Past (rodina CH-030/31):** než píšeš bestie schéma, ověř že konzument (`BestiarPage`, `buildBestieToken`, `TokenSystemSheet`) ho najde pod canonical `shadowrun` id (resolveSystemId). Schéma napsané dřív = mrtvý kód.
 > ⚠️ **BE token.update = REPLACE systemStats + strict validace** → `token.json` musí být SUPERSET všeho, co panel patchuje (rodina FATE fáze 3/4 řešení).
+
+</details>
 
 ## Pak: uzávěr + skiny
 

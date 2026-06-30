@@ -12,7 +12,7 @@ const mockTokenMutate = vi.fn();
 vi.mock('../../../../hooks/useTokenUpdate', () => ({
   useTokenUpdate: () => ({ mutate: mockTokenMutate, isPending: false }),
 }));
-const mockPerform = vi.fn(() => ({ total: 3, dicePayload: { type: 'pool-d6' } }));
+const mockPerform = vi.fn((_req: unknown) => ({ total: 3, dicePayload: { type: 'pool-d6' } }));
 vi.mock('../../../../utils/rollFromSheet', () => ({
   performSheetRoll: (req: unknown) => mockPerform(req),
 }));

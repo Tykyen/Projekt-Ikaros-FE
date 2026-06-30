@@ -74,3 +74,17 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** opakované re-screenshoty „pořád to přetéká" + obrázek identický i po CSS úpravě.
 
 ---
+
+---
+
+## CH-042 — full build PŘED napsáním testu → tsc -b test nezkontroloval, vitest run type-check nedělá → CI fail — 2026-06-30
+
+**Co se stalo:** Po dokončení shadowrun bestie jsem spustil full `npm run build` (tsc -b + vite + csp) a dostal exit 0. AŽ POTÉ jsem napsal `ShadowrunBestiePanel.spec.tsx`. Ten obsahoval TS chybu: `const mockPerform = vi.fn(() => …)` má inferovanou 0-arg signaturu, ale volal jsem `mockPerform(req)` → `TS2554: Expected 0 arguments, but got 1`. Ověřil jsem ho jen `vitest run` (zelený) a prohlásil hotovo.
+
+**Proč to proklouzlo:** `vitest run` transpiluje přes esbuild **bez striktního type-checku** → runtime test běží i s TS chybou. `tsc -b` (v `npm run build`) type-check DĚLÁ — ale můj build proběhl, než test existoval. CI Docker build (`RUN npm run build`) ho pak zachytil → exit 2, deploy spadl.
+
+**Fix:** `vi.fn((_req: unknown) => …)` (parametr v implementaci → signatura přijímá argument). Full build poté zelený (tsc -b ✓, vite ✓, csp ✓).
+
+**Poučení:** `vitest run` ≠ type-check. **Po napsání/úpravě každého .spec znovu `npm run build`** (ne jen vitest), protože testy jsou v tsc -b projektu. Pořadí „kód → build → testy → hotovo" je špatně; správně „kód + testy → build → hotovo". Rodina [project_fe_test_precommit] (vitest bez striktního type-checku) + [project_fe_build_preexisting_errors] (tsc --noEmit/dílčí běh nestačí, nutný plný `npm run build`).
+
+**Zhodnocení:** špatně — předčasné „hotovo + build✓" (build byl stale vůči pozdějšímu testu); chytil to až uživatel CI logem. Dobře — reprodukováno lokálně jedním plným buildem (ne hádáno z uťatého CI screenshotu), kořen jednoznačný, fix triviální.
