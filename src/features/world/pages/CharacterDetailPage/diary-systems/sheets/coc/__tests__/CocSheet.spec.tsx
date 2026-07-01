@@ -21,8 +21,8 @@ const commonProps = {
   characterSlug: 'inv1',
 };
 
-describe('CocSheet (8.7c)', () => {
-  it('vyrenderuje titulek a všech 8 vlastností (SIL/ODL/OBR/INT/VEL/VŮL/VZH/VZD)', () => {
+describe('CocSheet (8.7t redesign)', () => {
+  it('vyrenderuje spisovou pásku a všech 8 vlastností (SIL/ODL/OBR/INT/VEL/VŮL/VZH/VZD)', () => {
     render(
       <CocSheet
         {...commonProps}
@@ -32,7 +32,7 @@ describe('CocSheet (8.7c)', () => {
       />,
     );
 
-    expect(screen.getByText('Vyšetřovatel – 20. léta')).toBeInTheDocument();
+    expect(screen.getByText(/Deník vyšetřovatele/)).toBeInTheDocument();
 
     ['SIL', 'ODL', 'OBR', 'INT', 'VEL', 'VŮL', 'VZH', 'VZD'].forEach(
       (abbr) => {
@@ -50,13 +50,11 @@ describe('CocSheet (8.7c)', () => {
         onChange={() => {}}
       />,
     );
-    // První: Účetnictví
     expect(screen.getByText(/Účetnictví/)).toBeInTheDocument();
-    // Poslední: Stopování
     expect(screen.getByText(/Stopování/)).toBeInTheDocument();
   });
 
-  it('vyrenderuje 6 status checkboxů (šílenství, zranění, …)', () => {
+  it('vyrenderuje 6 status pečetí (šílenství, zranění, …)', () => {
     render(
       <CocSheet
         {...commonProps}
@@ -70,20 +68,43 @@ describe('CocSheet (8.7c)', () => {
     expect(screen.getByText('Umírá')).toBeInTheDocument();
   });
 
-  it('view mode disabluje inputy a skryje add/del tlačítka', () => {
+  it('vyrenderuje sekci Souhrn postavy (Vzezření, Fóbie & mánie, Tajuplné knihy)', () => {
     render(
-      <CocSheet {...commonProps} diary={makeDiary()} mode="view" />,
+      <CocSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={() => {}}
+      />,
     );
-    // Header input
+    expect(screen.getByLabelText('Vzezření')).toBeInTheDocument();
+    expect(screen.getByLabelText('Fóbie & mánie')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Tajuplné knihy/),
+    ).toBeInTheDocument();
+  });
+
+  it('vyrenderuje Vybavení & majetek (Hotovost, Majetek)', () => {
+    render(
+      <CocSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.getByText('Hotovost')).toBeInTheDocument();
+    expect(screen.getByText('Majetek')).toBeInTheDocument();
+  });
+
+  it('view mode disabluje inputy a skryje add tlačítka', () => {
+    render(<CocSheet {...commonProps} diary={makeDiary()} mode="view" />);
     const jmeno = screen.getByLabelText(/^Jméno/i);
     expect(jmeno).toBeDisabled();
-    // Add button schovaný
     expect(
       screen.queryByText('+ Přidat dovednost'),
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText('+ Přidat zbraň'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('+ Přidat zbraň')).not.toBeInTheDocument();
   });
 
   it('edit mode volá onChange při změně SIL hodnoty', () => {
@@ -103,7 +124,27 @@ describe('CocSheet (8.7c)', () => {
     });
   });
 
-  it('status checkbox: kliknutí přepne `coc_temp_insanity` na true', () => {
+  it('edit mode: změna Vzezření volá onChange s coc_appearance', () => {
+    const onChange = vi.fn();
+    render(
+      <CocSheet
+        {...commonProps}
+        diary={makeDiary()}
+        mode="edit"
+        onChange={onChange}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('Vzezření'), {
+      target: { value: 'Hubená postava' },
+    });
+    expect(onChange).toHaveBeenCalledWith({
+      customDataPatch: expect.objectContaining({
+        coc_appearance: 'Hubená postava',
+      }),
+    });
+  });
+
+  it('status pečeť: kliknutí přepne `coc_temp_insanity` na true', () => {
     const onChange = vi.fn();
     render(
       <CocSheet
@@ -169,7 +210,7 @@ describe('CocSheet (8.7c)', () => {
     });
   });
 
-  it('Sanity vital box má třídu is-sanity (purpurová)', () => {
+  it('Příčetnost vital box má třídu is-sanity (indigo)', () => {
     const { container } = render(
       <CocSheet
         {...commonProps}
@@ -182,7 +223,7 @@ describe('CocSheet (8.7c)', () => {
     expect(sanityLabel.parentElement).toHaveClass('is-sanity');
   });
 
-  it('HP vital box má třídu is-danger (červená)', () => {
+  it('Životy vital box má třídu is-danger (krev)', () => {
     const { container } = render(
       <CocSheet
         {...commonProps}

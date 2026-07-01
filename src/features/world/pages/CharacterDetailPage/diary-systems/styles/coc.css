@@ -1,490 +1,823 @@
-/* Call of Cthulhu 7e Character Sheet — Czech Translation
- * Parchment-inspired dark theme with Lovecraftian aesthetics.
- * 8.7c — přenos z c:/Matrix/Matrix/frontend/src/styles/CocDiary.scss
+/* Call of Cthulhu 7e — Deník vyšetřovatele (8.7t redesign).
+ *
+ * „Důvěrný spis · Miskatonická univerzita · 20. léta" — art deco dossier +
+ * pergamen + kosmický dread. Self-contained: veškerá grafika scoped na
+ * [data-diary-system='coc'], vlastní `--coc-*` tokeny (NE theme tokeny) →
+ * deník je čitelný nad libovolným skinem světa.
+ *
+ * Sémantické tokeny (--coc-hp/mp/sanity/luck) drží barvy vitals nezávisle na
+ * accentu (8.7t / sablona-skiny §4). 8 skinů řeší až následný skill `skin`.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
 [data-diary-system='coc'] .coc-sheet {
-  color: #d4c9a8;
-  font-family: 'EB Garamond', 'Garamond', 'Georgia', serif;
+  --coc-ink: #12171a;
+  --coc-parch: #dcc9a4;
+  --coc-parch-dim: rgba(220, 201, 164, 0.52);
+  --coc-parch-faint: rgba(220, 201, 164, 0.28);
+  --coc-accent: #b8934e;
+  --coc-accent-bright: #e4c07f;
+  --coc-line: rgba(184, 147, 78, 0.26);
+  --coc-line-faint: rgba(184, 147, 78, 0.1);
+  --coc-panel: rgba(28, 34, 33, 0.55);
+  --coc-panel-2: rgba(20, 25, 24, 0.6);
+  --coc-input: rgba(0, 0, 0, 0.24);
+  /* sémantické (vitals) */
+  --coc-hp: #9c2b2b;
+  --coc-hp-bright: #c94a3d;
+  --coc-mp: #3f7d6f;
+  --coc-mp-bright: #6fb3a3;
+  --coc-sanity: #7d6bb0;
+  --coc-sanity-bright: #a596d6;
+  --coc-luck: #b8934e;
+  --coc-luck-bright: #e4c07f;
+
+  position: relative;
   box-sizing: border-box;
   width: 100%;
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 24px;
-  background: linear-gradient(
-    135deg,
-    rgba(30, 25, 18, 0.97),
-    rgba(20, 18, 14, 0.98)
-  );
-  border-radius: 12px;
-  border: 2px solid rgba(180, 150, 100, 0.2);
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.6),
-    inset 0 0 80px rgba(0, 0, 0, 0.3);
-  position: relative;
-
-  --coc-accent: #c9a84c;
-  --coc-accent-dim: rgba(201, 168, 76, 0.3);
-  --coc-danger: #a83232;
-  --coc-sanity: #6b5bcd;
-  --coc-panel-bg: rgba(255, 255, 255, 0.025);
-  --coc-border: rgba(180, 150, 100, 0.15);
-  --coc-input-bg: rgba(0, 0, 0, 0.25);
+  padding: 0 0 34px;
+  color: var(--coc-parch);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.45;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(184, 147, 78, 0.06), transparent 50%),
+    linear-gradient(180deg, rgba(22, 27, 26, 0.97), rgba(14, 18, 17, 0.98));
+  border: 1px solid var(--coc-line);
+  box-shadow: 0 40px 120px -40px #000, inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
-
 [data-diary-system='coc'] .coc-sheet * {
   box-sizing: border-box;
 }
-
-[data-diary-system='coc'] .coc-sheet::before,
-[data-diary-system='coc'] .coc-sheet::after {
-  content: '✦';
-  position: absolute;
-  font-size: 24px;
-  color: rgba(201, 168, 76, 0.15);
-  pointer-events: none;
-}
+/* pergamenový šum (uvnitř sheetu, neleaká do appky) */
 [data-diary-system='coc'] .coc-sheet::before {
-  top: 8px;
-  left: 12px;
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
 }
+/* art deco dvojrámeček */
 [data-diary-system='coc'] .coc-sheet::after {
-  bottom: 8px;
-  right: 12px;
+  content: '';
+  position: absolute;
+  inset: 9px;
+  pointer-events: none;
+  border: 1px solid rgba(184, 147, 78, 0.14);
+  z-index: 0;
+}
+[data-diary-system='coc'] .coc-sheet > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* ── TITLE ─────────────────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-title {
-  text-align: center;
-  font-size: 22px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  color: var(--coc-accent);
-  border-bottom: 2px solid var(--coc-accent-dim);
-  padding-bottom: 12px;
-  margin-bottom: 20px;
-  text-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
-}
-
-/* ── HEADER ────────────────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-header {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px 16px;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  background: var(--coc-panel-bg);
-  border: 1px solid var(--coc-border);
-  border-radius: 8px;
-}
-
-@media (max-width: 700px) {
-  [data-diary-system='coc'] .coc-sheet .coc-header {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-[data-diary-system='coc'] .coc-sheet .coc-header-field {
+/* ── SPISOVÁ PÁSKA ─────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-filestrip {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-[data-diary-system='coc'] .coc-sheet .coc-header-field label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: rgba(212, 201, 168, 0.5);
-  font-weight: 600;
-}
-[data-diary-system='coc'] .coc-sheet .coc-header-field input {
-  background: var(--coc-input-bg);
-  border: none;
-  border-bottom: 1px solid rgba(180, 150, 100, 0.2);
-  color: #e8dcc4;
-  padding: 6px 4px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s;
-}
-[data-diary-system='coc'] .coc-sheet .coc-header-field input:focus {
-  border-bottom-color: var(--coc-accent);
-}
-
-/* ── SECTION TITLE ─────────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-section-title {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  color: var(--coc-accent);
-  margin: 24px 0 12px 0;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--coc-border);
-  font-weight: 700;
-}
-
-/* ── CHARACTERISTICS ───────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-chars-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-@media (max-width: 700px) {
-  [data-diary-system='coc'] .coc-sheet .coc-chars-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-[data-diary-system='coc'] .coc-sheet .coc-char-box {
-  background: var(--coc-panel-bg);
-  border: 1px solid var(--coc-border);
-  border-radius: 6px;
-  padding: 8px;
-  text-align: center;
-}
-[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--coc-accent);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-values {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-}
-[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-values input {
-  width: 42px;
-  text-align: center;
-  background: var(--coc-input-bg);
-  border: 1px solid rgba(180, 150, 100, 0.1);
-  color: #e8dcc4;
-  padding: 4px 2px;
-  border-radius: 3px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-}
-[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-values input:focus {
-  border-color: var(--coc-accent);
-}
-[data-diary-system='coc'] .coc-sheet .coc-char-box .coc-char-sub {
-  font-size: 8px;
-  color: rgba(212, 201, 168, 0.4);
-  text-align: center;
-  display: block;
-  margin-top: 1px;
-}
-
-/* ── VITALS ────────────────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-vitals-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
-}
-@media (max-width: 700px) {
-  [data-diary-system='coc'] .coc-sheet .coc-vitals-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-[data-diary-system='coc'] .coc-sheet .coc-vital-box {
-  background: var(--coc-panel-bg);
-  border: 1px solid var(--coc-border);
-  border-radius: 6px;
-  padding: 10px;
-  text-align: center;
-}
-[data-diary-system='coc'] .coc-sheet .coc-vital-box.is-sanity {
-  border-color: rgba(107, 91, 205, 0.25);
-}
-[data-diary-system='coc']
-  .coc-sheet
-  .coc-vital-box.is-sanity
-  .coc-vital-label {
-  color: var(--coc-sanity);
-}
-[data-diary-system='coc'] .coc-sheet .coc-vital-box.is-danger {
-  border-color: rgba(168, 50, 50, 0.25);
-}
-[data-diary-system='coc']
-  .coc-sheet
-  .coc-vital-box.is-danger
-  .coc-vital-label {
-  color: var(--coc-danger);
-}
-[data-diary-system='coc'] .coc-sheet .coc-vital-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--coc-accent);
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-[data-diary-system='coc'] .coc-sheet .coc-vital-pair {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-[data-diary-system='coc'] .coc-sheet .coc-vital-col {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-}
-[data-diary-system='coc'] .coc-sheet .coc-vital-col span {
-  font-size: 8px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 26px;
+  border-bottom: 1px solid var(--coc-line);
+  font-family: 'Cinzel', serif;
   text-transform: uppercase;
-  color: rgba(212, 201, 168, 0.4);
+  letter-spacing: 0.32em;
+  font-size: 11px;
+  color: var(--coc-accent);
 }
-[data-diary-system='coc'] .coc-sheet .coc-vital-col input {
-  width: 44px;
-  text-align: center;
-  background: var(--coc-input-bg);
-  border: 1px solid rgba(180, 150, 100, 0.1);
-  color: #e8dcc4;
-  padding: 5px 2px;
-  border-radius: 3px;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: inherit;
+[data-diary-system='coc'] .coc-dossier {
+  letter-spacing: 0.24em;
+  color: var(--coc-parch-dim);
+}
+
+/* ── HERO ──────────────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-hero {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 22px;
+  align-items: center;
+  padding: 26px 28px 22px;
+}
+[data-diary-system='coc'] .coc-portrait {
+  width: 120px;
+  height: 150px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.25) 0 2px, transparent 2px 5px),
+    radial-gradient(circle at 50% 35%, #2a2620, #16130f);
+  border: 1px solid var(--coc-line);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
+}
+[data-diary-system='coc'] .coc-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(184, 147, 78, 0.18);
+}
+[data-diary-system='coc'] .coc-portrait span {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--coc-parch-faint);
+}
+[data-diary-system='coc'] .coc-name {
+  display: block;
+  width: 100%;
+  margin: 0 0 2px;
+  padding: 0;
+  background: transparent;
+  border: none;
   outline: none;
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  font-size: 34px;
+  line-height: 1.05;
+  color: #f0e4c8;
+  text-shadow: 0 2px 30px rgba(184, 147, 78, 0.28);
 }
-[data-diary-system='coc'] .coc-sheet .coc-vital-col input:focus {
-  border-color: var(--coc-accent);
+[data-diary-system='coc'] .coc-occ {
+  display: block;
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--coc-accent);
 }
-
-/* ── STATUS CHECKBOXES ─────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-status-row {
+[data-diary-system='coc'] .coc-name::placeholder,
+[data-diary-system='coc'] .coc-occ::placeholder {
+  color: var(--coc-parch-faint);
+}
+[data-diary-system='coc'] .coc-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding: 8px 12px;
-  background: var(--coc-panel-bg);
-  border: 1px solid var(--coc-border);
-  border-radius: 6px;
+  gap: 6px 26px;
 }
-[data-diary-system='coc'] .coc-sheet .coc-status-row label {
+[data-diary-system='coc'] .coc-meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 90px;
+}
+[data-diary-system='coc'] .coc-meta-field label {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--coc-parch-faint);
+}
+[data-diary-system='coc'] .coc-meta-field input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--coc-line);
+  color: var(--coc-parch);
+  font-family: inherit;
+  font-size: 16px;
+  padding: 2px 0;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-meta-field input:focus {
+  border-bottom-color: var(--coc-accent);
+}
+[data-diary-system='coc'] .coc-stamp {
+  font-family: 'Cinzel', serif;
+  text-align: center;
+  transform: rotate(7deg);
+  border: 2px solid rgba(156, 43, 43, 0.5);
+  color: rgba(201, 74, 61, 0.75);
+  padding: 8px 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 11px;
+  line-height: 1.25;
+  filter: saturate(0.8);
+  box-shadow: 0 0 0 3px rgba(156, 43, 43, 0.05);
+}
+[data-diary-system='coc'] .coc-stamp b {
+  display: block;
+  font-size: 15px;
+  letter-spacing: 0.22em;
+}
+
+/* ── ODDĚLOVAČ SEKCÍ ───────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-divider {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  color: rgba(212, 201, 168, 0.7);
+  gap: 14px;
+  margin: 6px 28px 16px;
+}
+[data-diary-system='coc'] .coc-divider::before,
+[data-diary-system='coc'] .coc-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, transparent, var(--coc-line), transparent);
+}
+[data-diary-system='coc'] .coc-divider-glyph svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--coc-accent);
+  fill: none;
+  stroke-width: 1.3;
+  display: block;
+}
+[data-diary-system='coc'] .coc-divider h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--coc-accent);
+  margin: 0;
+  white-space: nowrap;
+}
+[data-diary-system='coc'] .coc-section {
+  padding: 0 28px;
+  margin-bottom: 26px;
+}
+
+/* ── VLASTNOSTI ────────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-chars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+[data-diary-system='coc'] .coc-derived {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+[data-diary-system='coc'] .coc-char {
+  position: relative;
+  padding: 12px 10px 10px;
+  text-align: center;
+  background: var(--coc-panel);
+  border: 1px solid var(--coc-line);
+  clip-path: polygon(
+    10px 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0 100%,
+    0 10px
+  );
+}
+[data-diary-system='coc'] .coc-char.is-derived {
+  background: var(--coc-panel-2);
+}
+[data-diary-system='coc'] .coc-char.is-derived .coc-char-label {
+  color: var(--coc-mp-bright);
+}
+[data-diary-system='coc'] .coc-char-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--coc-accent);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+[data-diary-system='coc'] .coc-char-main {
+  width: 66px;
+  height: 46px;
+  text-align: center;
+  font-family: inherit;
+  font-size: 30px;
+  font-weight: 600;
+  color: #f0e4c8;
+  background: var(--coc-input);
+  border: 1px solid var(--coc-line);
+  outline: none;
+}
+[data-diary-system='coc'] .coc-char-main:focus {
+  border-color: var(--coc-accent);
+}
+[data-diary-system='coc'] .coc-char-sub {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+[data-diary-system='coc'] .coc-char-sub div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+[data-diary-system='coc'] .coc-char-sub span {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--coc-parch-faint);
+}
+[data-diary-system='coc'] .coc-char-sub input {
+  width: 40px;
+  text-align: center;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--coc-parch-dim);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--coc-line-faint);
+  outline: none;
+}
+[data-diary-system='coc'] .coc-char-sub input:focus {
+  border-color: var(--coc-accent);
+}
+
+/* ── STAV / VITALS ─────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-vitals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+[data-diary-system='coc'] .coc-vital {
+  padding: 14px 12px;
+  background: var(--coc-panel);
+  border: 1px solid var(--coc-line);
+  text-align: center;
+}
+[data-diary-system='coc'] .coc-vital-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--coc-accent);
+  margin-bottom: 10px;
+}
+[data-diary-system='coc'] .coc-vital.is-danger {
+  border-color: color-mix(in srgb, var(--coc-hp) 45%, transparent);
+}
+[data-diary-system='coc'] .coc-vital.is-danger .coc-vital-label {
+  color: var(--coc-hp-bright);
+}
+[data-diary-system='coc'] .coc-vital.is-sanity {
+  border-color: color-mix(in srgb, var(--coc-sanity) 45%, transparent);
+}
+[data-diary-system='coc'] .coc-vital.is-sanity .coc-vital-label {
+  color: var(--coc-sanity-bright);
+}
+[data-diary-system='coc'] .coc-vital-nums {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px;
+}
+[data-diary-system='coc'] .coc-vital-nums .cur {
+  font-family: inherit;
+  font-size: 32px;
+  font-weight: 600;
+  color: #f0e4c8;
+  background: transparent;
+  border: none;
+  width: 58px;
+  text-align: right;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-vital-nums .slash {
+  color: var(--coc-parch-faint);
+  font-size: 22px;
+}
+[data-diary-system='coc'] .coc-vital-nums .max {
+  font-family: inherit;
+  font-size: 20px;
+  color: var(--coc-parch-dim);
+  background: transparent;
+  border: none;
+  width: 50px;
+  text-align: left;
+  outline: none;
+}
+[data-diary-system='coc'] .coc-vital-nums input:focus {
+  color: var(--coc-accent-bright);
+}
+[data-diary-system='coc'] .coc-vital-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--coc-parch-faint);
+  margin-top: 2px;
+}
+[data-diary-system='coc'] .coc-vital-track {
+  height: 5px;
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+[data-diary-system='coc'] .coc-vital-track i {
+  display: block;
+  height: 100%;
+  transition: width 0.25s;
+}
+[data-diary-system='coc'] .coc-vital.is-danger .coc-vital-track i {
+  background: linear-gradient(90deg, var(--coc-hp), var(--coc-hp-bright));
+}
+[data-diary-system='coc'] .coc-vital.is-sanity .coc-vital-track i {
+  background: linear-gradient(90deg, var(--coc-sanity), var(--coc-sanity-bright));
+}
+[data-diary-system='coc'] .coc-vital.is-mp .coc-vital-track i {
+  background: linear-gradient(90deg, var(--coc-mp), var(--coc-mp-bright));
+}
+[data-diary-system='coc'] .coc-vital.is-luck .coc-vital-track i {
+  background: linear-gradient(90deg, var(--coc-luck), var(--coc-luck-bright));
+}
+
+/* ── STATUS PEČETI ─────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-seals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+[data-diary-system='coc'] .coc-seal {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   cursor: pointer;
   user-select: none;
-  transition: color 0.2s;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--coc-parch-faint);
+  padding: 5px 12px;
+  border: 1px dashed rgba(184, 147, 78, 0.2);
+  transition: 0.18s;
 }
-[data-diary-system='coc']
-  .coc-sheet
-  .coc-status-row
-  label
-  input[type='checkbox'] {
-  accent-color: var(--coc-accent);
-  cursor: pointer;
+[data-diary-system='coc'] .coc-seal input {
+  display: none;
 }
-[data-diary-system='coc']
-  .coc-sheet
-  .coc-status-row
-  label:has(input:checked) {
-  color: var(--coc-danger);
-  font-weight: 600;
-}
-
-/* ── SKILLS ────────────────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-skills-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px 12px;
-  margin-bottom: 20px;
-}
-@media (max-width: 900px) {
-  [data-diary-system='coc'] .coc-sheet .coc-skills-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 600px) {
-  [data-diary-system='coc'] .coc-sheet .coc-skills-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-[data-diary-system='coc'] .coc-sheet .coc-skill-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 4px;
-  border-bottom: 1px dotted rgba(180, 150, 100, 0.08);
-  transition: background 0.15s;
-}
-[data-diary-system='coc'] .coc-sheet .coc-skill-row:hover {
-  background: rgba(201, 168, 76, 0.03);
-}
-[data-diary-system='coc'] .coc-sheet .coc-skill-check {
-  accent-color: var(--coc-accent);
-  cursor: pointer;
+[data-diary-system='coc'] .coc-seal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--coc-parch-faint);
   flex-shrink: 0;
 }
-[data-diary-system='coc'] .coc-sheet .coc-skill-name {
-  font-size: 12px;
-  color: rgba(212, 201, 168, 0.8);
-  flex: 1;
-  min-width: 0;
+[data-diary-system='coc'] .coc-seal:has(input:checked) {
+  color: var(--coc-hp-bright);
+  border-color: color-mix(in srgb, var(--coc-hp) 50%, transparent);
+  border-style: solid;
+  background: color-mix(in srgb, var(--coc-hp) 8%, transparent);
+}
+[data-diary-system='coc'] .coc-seal:has(input:checked) .coc-seal-dot {
+  background: var(--coc-hp-bright);
+  border-color: var(--coc-hp-bright);
+  box-shadow: 0 0 10px rgba(201, 74, 61, 0.6);
+}
+
+/* ── DOVEDNOSTI ────────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-skills {
+  columns: 2;
+  column-gap: 26px;
+}
+[data-diary-system='coc'] .coc-skill {
+  break-inside: avoid;
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  border-bottom: 1px dotted rgba(184, 147, 78, 0.1);
+}
+[data-diary-system='coc'] .coc-skill.is-custom {
+  grid-template-columns: 16px 1fr auto 24px;
+}
+[data-diary-system='coc'] .coc-skill:hover {
+  background: rgba(184, 147, 78, 0.04);
+}
+[data-diary-system='coc'] .coc-skill-chk {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--coc-accent);
+  cursor: pointer;
+}
+[data-diary-system='coc'] .coc-skill-name {
+  font-size: 15px;
+  color: var(--coc-parch);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
-[data-diary-system='coc'] .coc-sheet .coc-skill-inputs {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-}
-[data-diary-system='coc'] .coc-sheet .coc-skill-inputs input {
-  width: 32px;
-  text-align: center;
-  background: var(--coc-input-bg);
-  border: 1px solid rgba(180, 150, 100, 0.08);
-  color: #e8dcc4;
-  padding: 2px 1px;
-  border-radius: 2px;
+[data-diary-system='coc'] .coc-skill-name b {
+  color: var(--coc-parch-faint);
+  font-weight: 400;
   font-size: 12px;
+}
+[data-diary-system='coc'] .coc-skill-name-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted var(--coc-line-faint);
   font-family: inherit;
+  padding: 2px 2px;
   outline: none;
 }
-[data-diary-system='coc'] .coc-sheet .coc-skill-inputs input:focus {
+[data-diary-system='coc'] .coc-skill.is-mythos .coc-skill-name {
+  color: var(--coc-mp-bright);
+}
+[data-diary-system='coc'] .coc-skill-vals {
+  display: flex;
+  gap: 3px;
+}
+[data-diary-system='coc'] .coc-skill-vals input {
+  width: 34px;
+  text-align: center;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--coc-parch);
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--coc-line-faint);
+  outline: none;
+}
+[data-diary-system='coc'] .coc-skill-vals input.reg {
+  color: #f0e4c8;
+  font-weight: 600;
+}
+[data-diary-system='coc'] .coc-skill-vals input:focus {
   border-color: var(--coc-accent);
 }
 
-/* ── COMBAT TABLE ──────────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-combat-table {
+/* ── BOJ ───────────────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-combat table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 16px;
 }
-[data-diary-system='coc'] .coc-sheet .coc-combat-table th {
-  text-align: left;
-  font-size: 10px;
+[data-diary-system='coc'] .coc-combat th {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(212, 201, 168, 0.4);
+  color: var(--coc-parch-faint);
+  text-align: left;
   padding: 6px 8px;
-  border-bottom: 1px solid var(--coc-border);
+  border-bottom: 1px solid var(--coc-line);
 }
-[data-diary-system='coc'] .coc-sheet .coc-combat-table td {
-  padding: 3px 4px;
-  border-bottom: 1px solid rgba(180, 150, 100, 0.05);
+[data-diary-system='coc'] .coc-combat td {
+  padding: 3px 5px;
+  border-bottom: 1px solid rgba(184, 147, 78, 0.06);
 }
-[data-diary-system='coc'] .coc-sheet .coc-combat-table td input {
+[data-diary-system='coc'] .coc-combat td input {
   width: 100%;
-  background: var(--coc-input-bg);
+  background: rgba(0, 0, 0, 0.2);
   border: 1px solid transparent;
-  color: #e8dcc4;
-  padding: 5px 6px;
-  border-radius: 3px;
-  font-size: 12px;
+  color: var(--coc-parch);
   font-family: inherit;
+  font-size: 14px;
+  padding: 5px 6px;
   outline: none;
 }
-[data-diary-system='coc'] .coc-sheet .coc-combat-table td input:focus {
+[data-diary-system='coc'] .coc-combat td input:focus {
   border-color: var(--coc-accent);
 }
-
-/* ── COMBAT DERIVED ────────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-combat-derived {
+[data-diary-system='coc'] .coc-combat-derived {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-top: 14px;
 }
-[data-diary-system='coc'] .coc-sheet .coc-derived-item {
+[data-diary-system='coc'] .coc-cd-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--coc-panel-bg);
-  border: 1px solid var(--coc-border);
-  border-radius: 4px;
-  padding: 6px 12px;
+  gap: 8px;
+  background: var(--coc-panel);
+  border: 1px solid var(--coc-line);
+  padding: 7px 14px;
 }
-[data-diary-system='coc'] .coc-sheet .coc-derived-item span {
-  font-size: 12px;
-  color: rgba(212, 201, 168, 0.6);
+[data-diary-system='coc'] .coc-cd-item span {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  color: var(--coc-parch-dim);
 }
-[data-diary-system='coc'] .coc-sheet .coc-derived-item input {
-  width: 50px;
+[data-diary-system='coc'] .coc-cd-item input {
+  width: 54px;
   text-align: center;
-  background: var(--coc-input-bg);
-  border: 1px solid rgba(180, 150, 100, 0.1);
-  color: #e8dcc4;
-  padding: 4px 2px;
-  border-radius: 3px;
-  font-size: 14px;
-  font-weight: 700;
   font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f0e4c8;
+  background: var(--coc-input);
+  border: 1px solid var(--coc-line);
   outline: none;
 }
-[data-diary-system='coc'] .coc-sheet .coc-derived-item input:focus {
+[data-diary-system='coc'] .coc-cd-item input:focus {
   border-color: var(--coc-accent);
 }
+[data-diary-system='coc'] .coc-cd-triple {
+  display: flex;
+  gap: 3px;
+}
+[data-diary-system='coc'] .coc-cd-triple input {
+  width: 40px;
+}
 
-/* ── ADD/DEL BUTTONS ───────────────────────────────────────── */
-
-[data-diary-system='coc'] .coc-sheet .coc-add-btn {
-  background: transparent;
-  border: 1px dashed var(--coc-border);
-  color: var(--coc-accent);
-  padding: 6px 16px;
-  border-radius: 4px;
-  cursor: pointer;
+/* ── SOUHRN (investigation) ────────────────────────────────────── */
+[data-diary-system='coc'] .coc-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+[data-diary-system='coc'] .coc-note {
+  background: var(--coc-panel-2);
+  border: 1px solid var(--coc-line);
+  padding: 12px 14px;
+}
+[data-diary-system='coc'] .coc-note.is-wide {
+  grid-column: 1 / -1;
+}
+[data-diary-system='coc'] .coc-note-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
   font-size: 11px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 8px;
+  color: var(--coc-accent);
+  margin-bottom: 8px;
+}
+[data-diary-system='coc'] .coc-note-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--coc-accent);
+  fill: none;
+  stroke-width: 1.3;
+  flex-shrink: 0;
+}
+[data-diary-system='coc'] .coc-note-area {
   width: 100%;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-[data-diary-system='coc'] .coc-sheet .coc-add-btn:hover {
-  background: rgba(201, 168, 76, 0.05);
-  border-color: rgba(201, 168, 76, 0.3);
-}
-[data-diary-system='coc'] .coc-sheet .coc-add-btn:disabled {
-  cursor: default;
-  opacity: 0.5;
-}
-
-[data-diary-system='coc'] .coc-sheet .coc-del-btn {
+  min-height: 62px;
+  resize: vertical;
   background: transparent;
   border: none;
-  color: rgba(168, 50, 50, 0.4);
+  color: var(--coc-parch);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.75;
+  outline: none;
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(184, 147, 78, 0.09) 27px 28px
+  );
+}
+[data-diary-system='coc'] .coc-note-area.is-tall {
+  min-height: 120px;
+}
+[data-diary-system='coc'] .coc-note.is-forbidden {
+  border-color: color-mix(in srgb, var(--coc-mp) 45%, transparent);
+}
+[data-diary-system='coc'] .coc-note.is-forbidden .coc-note-title,
+[data-diary-system='coc'] .coc-note.is-forbidden .coc-note-title svg {
+  color: var(--coc-mp-bright);
+  stroke: var(--coc-mp-bright);
+}
+[data-diary-system='coc'] .coc-note.is-forbidden .coc-note-area {
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(63, 125, 111, 0.12) 27px 28px
+  );
+}
+
+/* ── VYBAVENÍ / MAJETEK ────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-gear {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+}
+[data-diary-system='coc'] .coc-money-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px dotted rgba(184, 147, 78, 0.12);
+}
+[data-diary-system='coc'] .coc-money-row label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--coc-parch-dim);
+}
+[data-diary-system='coc'] .coc-money-row input {
+  background: transparent;
+  border: none;
+  color: #f0e4c8;
+  font-family: inherit;
+  font-size: 16px;
+  text-align: right;
+  width: 120px;
+  outline: none;
+}
+
+/* ── ADD / DEL ─────────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-add {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--coc-accent);
+  background: transparent;
+  border: 1px dashed var(--coc-line);
+  padding: 8px 0;
+  width: 100%;
+  margin-top: 12px;
   cursor: pointer;
-  padding: 4px 6px;
+  transition: 0.18s;
+}
+[data-diary-system='coc'] .coc-add:hover {
+  background: rgba(184, 147, 78, 0.06);
+  color: var(--coc-accent-bright);
+}
+[data-diary-system='coc'] .coc-del {
+  background: transparent;
+  border: none;
+  color: rgba(156, 43, 43, 0.5);
+  cursor: pointer;
   font-size: 14px;
+  padding: 2px 4px;
   transition: color 0.2s;
 }
-[data-diary-system='coc'] .coc-sheet .coc-del-btn:hover {
-  color: var(--coc-danger);
+[data-diary-system='coc'] .coc-del:hover {
+  color: var(--coc-hp-bright);
 }
 
-/* ── DISABLED STATES (view mode) ───────────────────────────── */
-
+/* ── VIEW MÓD ──────────────────────────────────────────────────── */
 [data-diary-system='coc'] .coc-sheet input:disabled,
 [data-diary-system='coc'] .coc-sheet textarea:disabled {
   cursor: default;
   opacity: 0.85;
+}
+
+/* ── PRINT ─────────────────────────────────────────────────────── */
+[data-diary-system='coc'] .coc-print dl {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px 20px;
+  margin: 0 0 12px;
+}
+[data-diary-system='coc'] .coc-print dt {
+  font-weight: 600;
+  font-size: 12px;
+}
+[data-diary-system='coc'] .coc-print dd {
+  margin: 0 0 6px;
+}
+
+/* ── RESPONSIVE (mobil ≤ 768) ──────────────────────────────────── */
+@media (max-width: 768px) {
+  [data-diary-system='coc'] .coc-hero {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  [data-diary-system='coc'] .coc-stamp {
+    display: none;
+  }
+  [data-diary-system='coc'] .coc-meta {
+    justify-content: center;
+  }
+  [data-diary-system='coc'] .coc-name {
+    text-align: center;
+    font-size: 28px;
+  }
+  [data-diary-system='coc'] .coc-occ {
+    text-align: center;
+  }
+  [data-diary-system='coc'] .coc-chars {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  [data-diary-system='coc'] .coc-vitals {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  [data-diary-system='coc'] .coc-skills {
+    columns: 1;
+  }
+  [data-diary-system='coc'] .coc-summary {
+    grid-template-columns: 1fr;
+  }
+  [data-diary-system='coc'] .coc-gear {
+    grid-template-columns: 1fr;
+  }
+  [data-diary-system='coc'] .coc-combat {
+    overflow-x: auto;
+  }
+  [data-diary-system='coc'] .coc-combat table {
+    min-width: 560px;
+  }
 }

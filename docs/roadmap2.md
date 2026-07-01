@@ -444,7 +444,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Taktická mapa (grafika)
   - [x] Bestie (grafika)
   - [x] Chat (→ 16.1)
-  - [ ] Skiny (→ 16.2c)
+  - [x] Skiny (→ 16.2c)
 - **Fate Accelerated** (`fae`) — *HOTOVO:* deník „Karty osudu" (6 Přístupů) + bestiář + mapa (`FateCombatPanel`/`FateBestiePanel`, hod 4dF) + chat (`FateChatBestiePanel`) + 8 skinů (default `minimal`). Sdílí komponenty s `fate` přes `variant`. **POZN.: FATE = DVA samostatné systémy** (`fae` + `fate`), split z původní sloučené „Fate Core / Accelerated".
   - [x] Reálný list (grafika)
   - [x] Taktická mapa (grafika)

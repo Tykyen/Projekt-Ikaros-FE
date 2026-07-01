@@ -119,3 +119,51 @@ export interface CocCustomSkill {
   fifth: string;
   chk: string; // 'true' / 'false'
 }
+
+/* ─────────────────────────────────────────────────────────────
+ * 8.7t — investigation vrstva (Souhrn postavy + Vybavení & majetek).
+ * Aditivní textová pole; prefix `coc_`, žádná migrace.
+ * ───────────────────────────────────────────────────────────── */
+
+/** Meta pole identity v hero (mimo jméno/povolání — ta jsou prominentní). */
+export const COC_META_FIELDS: { key: string; label: string }[] = [
+  { key: 'age', label: 'Věk' },
+  { key: 'pronoun', label: 'Zájmeno' },
+  { key: 'residence', label: 'Bydliště' },
+  { key: 'birthplace', label: 'Místo narození' },
+];
+
+/** Pole „Souhrn postavy" — víceřádkový prostý text. */
+export interface CocNoteField {
+  key: string;
+  label: string;
+  /** „Zakázané vědění" → měděnkové zvýraznění. */
+  forbidden?: boolean;
+  /** Roztáhnout přes obě kolony. */
+  wide?: boolean;
+}
+
+export const COC_SUMMARY_FIELDS: CocNoteField[] = [
+  { key: 'appearance', label: 'Vzezření' },
+  { key: 'traits', label: 'Rysy' },
+  { key: 'ideology', label: 'Ideologie / názory' },
+  { key: 'important_people', label: 'Důležité osoby' },
+  { key: 'phobias_manias', label: 'Fóbie & mánie' },
+  { key: 'injuries_scars', label: 'Zranění & jizvy' },
+  {
+    key: 'forbidden_lore',
+    label: 'Tajuplné knihy, kouzla & artefakty',
+    forbidden: true,
+    wide: true,
+  },
+  { key: 'significant_places', label: 'Významná místa' },
+  { key: 'treasured_possessions', label: 'Opatrované věci' },
+  { key: 'encounters', label: 'Setkání s podivnými bytostmi', wide: true },
+];
+
+/** Hotovost & majetek (Majetnost zůstává dovednost `sk_credit_rating`). */
+export const COC_MONEY_FIELDS: { key: string; label: string }[] = [
+  { key: 'cash', label: 'Hotovost' },
+  { key: 'assets', label: 'Majetek' },
+  { key: 'expenses', label: 'Výše výdajů' },
+];
