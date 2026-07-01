@@ -4,6 +4,23 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### CH-044 — 2× jsem tvrdil „stale build" u ořezaného typu zbraně, ale byl to reálný bug (reprodukce na moc široké šířce) · 2026-07-01
+**Kontext:** Autor hlásil ořez „blí" (typ zbraně „blízko") v deníku. Reprodukoval jsem select izolovaně na **420px** → „blízko" se vešlo → prohlásil jsem to za **stale build** (CH-015). Autor to zopakoval + poslal screenshot, kde je vidět **„Odl"** (moje čerstvá BC oprava) → tzn. testuje AKTUÁLNÍ kód (dev/HMR), ne stale.
+**Co jsem udělal špatně:** (1) reprodukoval jsem na **jedné, moc široké** šířce (420px) — reálný 3-sloupcový deník má boj sloupec ~320px; (2) když test na 420px prošel, uzavřel jsem to jako „stale" **místo abych zúžil reprodukci** na reálné podmínky; (3) výmluvu „stale build" jsem použil **2×** za sebou.
+**Proč to nefungovalo:** `table-layout:auto` v úzkém sloupci stlačí sloupec s dlouhým sousedem (Zbraň 55%) → 64px na „Typ" se zmenší → ořez. Na 420px byl prostor, na 320px ne.
+**Poučení:** Reprodukuj v **reálných rozměrech** (změř cílový kontejner), ne jednou „rozumnou" šířkou. Když autor **opakuje** stejnou stížnost, „stale build" je poslední, ne první hypotéza — hlavně když zároveň vidí jinou mou čerstvou změnu (= má aktuální kód). Iteruj reprodukci šířkou dolů, dokud bug nevyskočí.
+**Příznak cyklení:** říkám „stale build / po deployi OK" podruhé u téhož vizuálního nálezu; autor „tvrdil jsi že opravils, nikoliv".
+
+---
+
+### ✅ ŘEŠENÍ — typ zbraně se ořezával v úzkém deníku: `table-layout:fixed` cíleně na zbraně (uzavírá CH-044) · 2026-07-01
+**Co nakonec zabralo:** Reprodukce zúžena na **320px** (`drdh-weapons-test.html`) → auto layout ořezal „blí" (přesně autorův bug), fixed neořezal. Fix: **`.tbl.selcol`** třída jen na zbraně tabulku (`table-layout:fixed` + `td:first-child 40%` + `td/th:nth-child(2) 94px`) + kompaktnější `.tbl select` (Garamond 12px/500, letter-spacing −.01, padding 6px 1px). Cílené na zbraně (class), aby to nerozbilo prof/zbroj tabulky (2. sloupec = číslo, ne select).
+**Proč to je správně (a ne další variace):** table-layout:auto je **kořen** (stlačí definované šířky když je tabulka úzká) — fixed je jediné, co šířku garantuje. Reprodukce na reálné šířce to odlišila od „stale build".
+**Jak ověřeno:** render prototypu na úzké šířce (boj sloupec ~320px) → „blízko" celé; `tsc -b` 0, `npm run build` ✓, DrdhSheet 20/20.
+**Zhodnocení:** Dobře nakonec — ale po **2 chybných „stale" hypotézách** (CH-044). Lekce: reprodukce musí kopírovat reálné rozměry.
+
+---
+
 ### ✅ ŘEŠENÍ — DrDH iterace po živém testu: zkratky atributů + labely zbraní + karty schopností + select fix · 2026-06-30
 **Kontext:** Autor testoval DrDH deník+panel živě (deployed) a hlásil drobné UX vady (všechno FE, 0 BE).
 **Co opraveno:**

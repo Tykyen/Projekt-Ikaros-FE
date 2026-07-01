@@ -716,7 +716,7 @@ function WeaponsTable({ cda, disabled }: SubProps) {
   const rows = parseJsonArr<DrdhWeapon>('weapons');
   return (
     <>
-      <table className="tbl">
+      <table className="tbl selcol">
         <thead>
           <tr>
             <th>Název</th>

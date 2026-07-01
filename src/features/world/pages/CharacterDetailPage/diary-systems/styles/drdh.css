@@ -832,21 +832,34 @@
   -moz-appearance: none;
   text-align: center;
   text-align-last: center;
-  /* Garamond (užší než Cinzel) + 0 letter-spacing → i „Char" se vejde do úzké buňky */
+  /* Garamond (užší než Cinzel), kompaktní → „blízko"/„Char" se vejde do úzké buňky */
   font-family: var(--drdh-font-body);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   color: var(--drdh-ink);
   background: rgba(255, 252, 242, 0.4);
   border: 1px solid rgba(194, 170, 120, 0.5);
   border-radius: 2px;
-  padding: 6px 2px;
+  padding: 6px 1px;
   cursor: pointer;
   outline: none;
 }
 [data-diary-system='drdh'] .drdh-sheet .tbl td:nth-child(2) {
   width: 64px;
+}
+/* zbraně (tabulka se selectem) — fixed layout garantuje šířku „Typ" i v úzkém
+   3-sloupcovém deníku, kde table-layout:auto sloupec stlačí („blí"). */
+[data-diary-system='drdh'] .drdh-sheet .tbl.selcol {
+  table-layout: fixed;
+}
+[data-diary-system='drdh'] .drdh-sheet .tbl.selcol td:first-child,
+[data-diary-system='drdh'] .drdh-sheet .tbl.selcol th:first-child {
+  width: 40%;
+}
+[data-diary-system='drdh'] .drdh-sheet .tbl.selcol td:nth-child(2),
+[data-diary-system='drdh'] .drdh-sheet .tbl.selcol th:nth-child(2) {
+  width: 94px;
 }
 
 [data-diary-system='drdh'] .drdh-sheet .add-btn {
