@@ -45,6 +45,7 @@ import {
   DRDH_RESOURCE_BY_PROF,
   drdhAttrMod,
   fmtMod,
+  normDrdhAttr,
   type DrdhAbility,
   type DrdhProfessionId,
   type DrdhProfTable,
@@ -345,7 +346,7 @@ export function DrdhCombatPanel({
                 <span className={styles.statName}>
                   {s.name || '(bez názvu)'}
                   <small>
-                    {s.attr} {fmtMod(attrM)} · výcvik +{deg}
+                    {normDrdhAttr(s.attr)} {fmtMod(attrM)} · výcvik +{deg}
                   </small>
                 </span>
                 <span

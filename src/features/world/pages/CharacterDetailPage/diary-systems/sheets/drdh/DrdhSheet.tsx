@@ -25,6 +25,7 @@ import {
   DRDH_ABBR_TO_ID,
   DRDH_ATTR_ABBRS,
   DRDH_ATTRS,
+  normDrdhAttr,
   DRDH_PROF_BY_ID,
   DRDH_PROF_TABLE,
   DRDH_PROFESSIONS,
@@ -911,7 +912,7 @@ function SkillsTable({ cda, disabled }: SubProps) {
               </td>
               <td>
                 <select
-                  value={row.attr || 'Obr'}
+                  value={normDrdhAttr(row.attr) || 'Obr'}
                   disabled={disabled}
                   onChange={(e) =>
                     updateArr<DrdhSkill>('skills', i, { attr: e.target.value })
@@ -1351,7 +1352,7 @@ function DrdhPrintView({
               return (
                 <tr key={i}>
                   <td>{s.name || '—'}</td>
-                  <td>{s.attr || '—'}</td>
+                  <td>{normDrdhAttr(s.attr) || '—'}</td>
                   <td>{s.deg || '—'}</td>
                   <td>{fmtMod(mod + deg)}</td>
                 </tr>

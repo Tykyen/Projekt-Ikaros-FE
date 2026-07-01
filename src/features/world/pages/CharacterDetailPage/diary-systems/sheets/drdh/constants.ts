@@ -66,14 +66,37 @@ export const DRDH_ATTRS: DrdhAttrDef[] = [
 export const DRDH_ATTR_ABBRS = ['Sil', 'Obr', 'Odl', 'Int', 'Char'] as const;
 export type DrdhAttrAbbr = (typeof DRDH_ATTR_ABBRS)[number];
 
-/** Mapování zkratky atributu → customData suffix (pro lookup opravy). */
-export const DRDH_ABBR_TO_ID: Record<DrdhAttrAbbr, string> = {
+/**
+ * Mapování zkratky atributu → customData suffix (pro lookup opravy).
+ * Velké legacy zkratky (SIL/OBR/ODO/INT/CHAR — data z doby před zkrácením)
+ * drženy jako BC aliasy → stejné id, aby staré dovednosti nespadly na opravu 0.
+ */
+export const DRDH_ABBR_TO_ID: Record<string, string> = {
   Sil: 'str',
   Obr: 'dex',
   Odl: 'con',
   Int: 'int',
   Char: 'cha',
+  SIL: 'str',
+  OBR: 'dex',
+  ODO: 'con',
+  INT: 'int',
+  CHAR: 'cha',
 };
+
+/** Legacy zkratka (SIL/OBR/ODO/INT/CHAR) → aktuální (Sil/Obr/Odl/Int/Char). */
+const DRDH_LEGACY_ABBR: Record<string, DrdhAttrAbbr> = {
+  SIL: 'Sil',
+  OBR: 'Obr',
+  ODO: 'Odl',
+  INT: 'Int',
+  CHAR: 'Char',
+};
+
+/** Normalizuje zkratku atributu na aktuální tvar (BC — data se starými zkratkami). */
+export function normDrdhAttr(abbr: string): string {
+  return DRDH_LEGACY_ABBR[abbr] ?? abbr;
+}
 
 /** Oprava atributu = ⌊stupeň/2⌋ − 5. */
 export function drdhAttrMod(degree: string | number): number {
