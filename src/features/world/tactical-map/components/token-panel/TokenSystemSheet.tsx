@@ -36,6 +36,7 @@ import { DrdPlusBestiePanel } from "./system-panels/DrdPlusBestiePanel";
 import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
 import { DrdhBestiePanel } from "./system-panels/DrdhBestiePanel";
 import { GurpsBestiePanel } from "./system-panels/GurpsBestiePanel";
+import { CocBestiePanel } from "./system-panels/CocBestiePanel";
 import { JadBestiePanel } from "./system-panels/JadBestiePanel";
 import { DndBestiePanel } from "./system-panels/DndBestiePanel";
 import { FateBestiePanel } from "./system-panels/FateBestiePanel";
@@ -207,6 +208,22 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="gurps"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // Call of Cthulhu bestie — horror-dossier „karta netvora" (Vlastnosti klik=
+    // d100 percentile, SAN loss signature, Útoky zásah+škody, iniciativa = OBR).
+    if (systemId === "coc") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <CocBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="coc"
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

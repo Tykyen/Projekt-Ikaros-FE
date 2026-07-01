@@ -1,0 +1,552 @@
+/**
+ * 8.7v — CoC statblok bestie (taktická mapa + chat rail).
+ *
+ * Horror-dossier jazyk sladěný s deníkem/combat panelem, „karta netvora":
+ * pergamen text, mosaz accent, krev (HP/útoky), indigo (SAN loss = signature),
+ * měděnka (Mýtus/schopnosti). Vždy tmavý overlay → self-contained barvy. Font
+ * bez @import (CSP, CH-027). HP/bary = CSS gradient (ne inline, §9.15).
+ */
+
+.root {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #dcc9a4;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.root * {
+  box-sizing: border-box;
+}
+.root.editing {
+  outline: 1px dashed rgba(184, 147, 78, 0.4);
+  outline-offset: 2px;
+}
+.modeTag {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e4c07f;
+  background: rgba(184, 147, 78, 0.12);
+  border: 1px solid rgba(184, 147, 78, 0.3);
+  padding: 5px 9px;
+  text-align: center;
+}
+
+/* ── hlavička netvora ── */
+.beastHead {
+  position: relative;
+  padding: 4px 2px 8px;
+  border-bottom: 1px solid rgba(184, 147, 78, 0.26);
+}
+.kind {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6fb3a3;
+  margin-bottom: 2px;
+}
+.bname {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #f0e4c8;
+  line-height: 1.1;
+}
+.nameEdit {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(184, 147, 78, 0.26);
+  color: #f0e4c8;
+  font-family: inherit;
+  font-size: 16px;
+  padding: 4px 6px;
+  outline: none;
+}
+
+/* ── tlačítka iniciativa / edit ── */
+.initBtn,
+.editFull {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: 0.15s;
+  width: 100%;
+}
+.initBtn {
+  color: #e4c07f;
+  background: rgba(184, 147, 78, 0.12);
+  border: 1px solid rgba(184, 147, 78, 0.3);
+}
+.initBtn:hover {
+  background: rgba(184, 147, 78, 0.24);
+}
+.editFull {
+  color: rgba(220, 201, 164, 0.7);
+  background: transparent;
+  border: 1px dashed rgba(184, 147, 78, 0.26);
+}
+.editFull:hover:not(:disabled) {
+  color: #e4c07f;
+  border-color: rgba(184, 147, 78, 0.5);
+}
+.editFull:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── HP ── */
+.hp {
+  background: rgba(24, 26, 30, 0.6);
+  border: 1px solid rgba(156, 43, 43, 0.4);
+  padding: 8px 10px;
+}
+.hpLbl {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c94a3d;
+  display: block;
+  margin-bottom: 6px;
+}
+.hpBar {
+  position: relative;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.hpFill {
+  height: 100%;
+  background: linear-gradient(90deg, #9c2b2b, #c94a3d);
+  transition: width 0.2s;
+}
+.hpTxt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f0e4c8;
+  text-shadow: 0 1px 3px #000;
+}
+.hpEdit {
+  width: 70px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(184, 147, 78, 0.26);
+  color: #f0e4c8;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 3px 6px;
+  outline: none;
+}
+.steps {
+  display: flex;
+  gap: 5px;
+  margin-top: 7px;
+}
+.steps button {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(184, 147, 78, 0.14);
+  color: rgba(220, 201, 164, 0.65);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.steps button:hover {
+  border-color: #c94a3d;
+  color: #c94a3d;
+}
+
+/* ── SAN / MP / Štěstí mini ── */
+.mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.miniBox {
+  background: rgba(24, 26, 30, 0.6);
+  border: 1px solid rgba(184, 147, 78, 0.2);
+  padding: 5px 3px;
+  text-align: center;
+}
+.miniK {
+  display: block;
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(220, 201, 164, 0.5);
+}
+.miniV {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0e4c8;
+}
+.miniBox.san {
+  border-color: rgba(125, 107, 176, 0.4);
+}
+.miniBox.san .miniK,
+.miniBox.san .miniV {
+  color: #a596d6;
+}
+
+/* ── sekční titulky ── */
+.stitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #b8934e;
+  border-bottom: 1px solid rgba(184, 147, 78, 0.2);
+  padding-bottom: 4px;
+  margin-top: 3px;
+}
+.stitle small {
+  font-family: 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(220, 201, 164, 0.4);
+}
+
+/* ── vlastnosti (klik = hod) ── */
+.charGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.statBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(184, 147, 78, 0.12);
+  padding: 5px 2px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.15s;
+}
+.statBtn:hover:not(:disabled) {
+  border-color: #b8934e;
+  background: rgba(184, 147, 78, 0.1);
+}
+.statBtn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.statName {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b8934e;
+}
+.statVal {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f0e4c8;
+}
+.statEdit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.statEdit span {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b8934e;
+}
+.edNum {
+  width: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(184, 147, 78, 0.2);
+  color: #f0e4c8;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 3px 2px;
+  outline: none;
+}
+
+/* ── SAN loss — signature ── */
+.sanLoss {
+  background: linear-gradient(180deg, rgba(125, 107, 176, 0.14), rgba(0, 0, 0, 0.25));
+  border: 1px solid rgba(125, 107, 176, 0.4);
+  padding: 9px 11px;
+}
+.sanTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #a596d6;
+  margin-bottom: 7px;
+}
+.sanTitle svg {
+  width: 14px;
+  height: 14px;
+  stroke: #a596d6;
+  fill: none;
+  stroke-width: 1.3;
+  flex-shrink: 0;
+}
+.sanRows {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.sanRow {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.sanRow span {
+  font-size: 11px;
+  color: rgba(220, 201, 164, 0.55);
+}
+.sanRow b {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #a596d6;
+}
+.sanEdit {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(125, 107, 176, 0.4);
+  color: #a596d6;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 2px 5px;
+  outline: none;
+}
+
+/* ── útoky ── */
+.atkRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px;
+  background: rgba(24, 26, 30, 0.6);
+  border: 1px solid rgba(184, 147, 78, 0.2);
+  margin-bottom: 5px;
+}
+.atkName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: #f0e4c8;
+  font-weight: 600;
+}
+.atkName small {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(220, 201, 164, 0.45);
+}
+.atkBtn {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #c94a3d;
+  background: rgba(156, 43, 43, 0.14);
+  border: 1px solid rgba(156, 43, 43, 0.3);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: 0.15s;
+  white-space: nowrap;
+}
+.atkBtn b {
+  color: #f0e4c8;
+  font-size: 13px;
+}
+.atkBtn:hover:not(:disabled) {
+  background: rgba(156, 43, 43, 0.28);
+}
+.atkBtn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.dmgBtn {
+  color: var(--accent-bright, #e4c07f);
+  background: rgba(184, 147, 78, 0.12);
+  border-color: rgba(184, 147, 78, 0.3);
+}
+.dmgBtn:hover:not(:disabled) {
+  background: rgba(184, 147, 78, 0.24);
+}
+.dmgTxt {
+  font-size: 12px;
+  color: rgba(220, 201, 164, 0.55);
+  min-width: 52px;
+  text-align: right;
+}
+.atkEdit {
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr 0.8fr 1fr auto;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.ed,
+.atkEdit .edNum {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(184, 147, 78, 0.2);
+  color: #f0e4c8;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 3px 5px;
+  outline: none;
+  min-width: 0;
+}
+.del {
+  background: transparent;
+  border: none;
+  color: rgba(156, 43, 43, 0.55);
+  cursor: pointer;
+  font-size: 14px;
+}
+.del:hover {
+  color: #c94a3d;
+}
+.miniAdd {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #b8934e;
+  background: transparent;
+  border: 1px dashed rgba(184, 147, 78, 0.26);
+  padding: 6px 0;
+  width: 100%;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.miniAdd:hover {
+  background: rgba(184, 147, 78, 0.06);
+}
+.hint {
+  font-size: 12px;
+  color: rgba(220, 201, 164, 0.4);
+  font-style: italic;
+  margin: 4px 0;
+}
+
+/* ── boj (obrana/dovednosti) ── */
+.defRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+.defBtn,
+.defCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(184, 147, 78, 0.12);
+  padding: 5px 2px;
+  font-family: inherit;
+}
+.defBtn {
+  cursor: pointer;
+  transition: 0.15s;
+}
+.defBtn:hover:not(:disabled) {
+  border-color: #b8934e;
+  background: rgba(184, 147, 78, 0.1);
+}
+.defBtn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.defLab {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(220, 201, 164, 0.5);
+}
+.defBtn .defLab {
+  color: #b8934e;
+}
+.defVal {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f0e4c8;
+}
+.defEdit {
+  width: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(184, 147, 78, 0.2);
+  color: #f0e4c8;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 2px;
+  outline: none;
+}
+
+/* ── zvláštnosti ── */
+.winBtn {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6fb3a3;
+  background: rgba(63, 125, 111, 0.1);
+  border: 1px solid rgba(63, 125, 111, 0.3);
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: 0.15s;
+  width: 100%;
+}
+.winBtn:hover {
+  background: rgba(63, 125, 111, 0.2);
+}
+.abilList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.abilItem {
+  padding: 8px 10px;
+  background: rgba(63, 125, 111, 0.07);
+  border-left: 2px solid rgba(63, 125, 111, 0.4);
+}
+.abilName {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #6fb3a3;
+  margin-bottom: 2px;
+}
+.abilDesc {
+  font-size: 14px;
+  color: rgba(220, 201, 164, 0.75);
+  line-height: 1.45;
+}

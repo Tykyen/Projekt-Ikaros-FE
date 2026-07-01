@@ -17,6 +17,7 @@ import { DndChatBestiePanel } from './DndChatBestiePanel';
 import { FateChatBestiePanel } from './FateChatBestiePanel';
 import { ShadowrunChatBestiePanel } from './ShadowrunChatBestiePanel';
 import { GurpsChatBestiePanel } from './GurpsChatBestiePanel';
+import { CocChatBestiePanel } from './CocChatBestiePanel';
 import s from './railShell.module.css';
 import b from './BestieRollPanel.module.css';
 
@@ -207,6 +208,18 @@ export function BestieRollPanel({
           // GURPS katalogová bestie (read-only) — cold-steel statblok.
           <DiarySkinScope worldId={worldId}>
             <GurpsChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              canEdit={false}
+            />
+          </DiarySkinScope>
+        ) : systemId === 'coc' ? (
+          // CoC katalogová bestie (read-only) — horror-dossier statblok.
+          <DiarySkinScope worldId={worldId}>
+            <CocChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               rollerName={bestie.name}

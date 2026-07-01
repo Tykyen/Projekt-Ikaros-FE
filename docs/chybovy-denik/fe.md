@@ -1511,3 +1511,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** „funguje na mapě/prototypu, ale ne v chatu"; „hodnota se změní až po refreshi"; „bar na tokenu ≠ číslo v panelu".
 
 ---
+
+### ✅ ŘEŠENÍ — 8.7v CoC bestie: statblok mapa + chat (1:1 vzor GURPS) · 2026-07-01
+**Co nakonec zabralo:** CoC byl jediný systém bez dedikovaného bestie panelu (generický schema-engine → holý formulář, žádné hody, SAN loss ztracený). Postavil jsem horror-dossier „kartu netvora" **přesně dle architektury GURPS bestie** (8.7r): sdílené jádro `CocBestieCombatActions` (mapa↔chat, 0 drift) + mapový `CocBestiePanel` (HP±, iniciativa OBR flat, inline edit, `sanitize`) + chatový `CocChatBestiePanel` (sourozenec, `useChatDiaryRoll`, `onPatch`). Hody = **d100 percentile** (8.7u engine), škody = `mixed{dY}` (`parseCocDamage`), iniciativa = OBR flat. Napojeno na 3 místech: `TokenSystemSheet` (mapa), `BestieInstancePanel` (chat v boji), `BestieRollPanel` (chat katalog).
+**Proč to je správně:** reuse GURPS vzoru = 0 vymýšlení, 0 drift (stejná struktura panel→jádro→3 napojení); **token.json = SUPERSET** (v2) — mapa PATCH prochází `sanitize` proti token schématu (BE strict), pole mimo schéma by se při editaci zahodila (GURPS past „token=superset"); reuse 8.7u percentile enginu (bestie hody = totéž co PC); SAN loss jako signature blok (indigo), Mýtus schopnosti měděnkově.
+**Jak ověřeno:** `npm run build` (tsc -b) čistý = 9 nových/změněných souborů + napojení typují; CocBestiePanel 8 testů (render/hod vlastnost/hod útok/HP±/read-only + parseCocDamage: XKY→mixed, +BZ ignor, d3→null); schema 64 testů zelené (token.json v2 nic nerozbil); ESLint čistý (1 warning = `parseCocDamage` export z jádra, stejné jako GURPS). Module CSS (hashované třídy) → render-harness nejde; stojí na schváleném prototypu + build + testech; živé čeká uživatele. 0 BE.
+**Pasti:** (1) `token.json` MUSÍ být superset (sanitize zahodí ne-schema klíče při editaci); (2) `cd /c/tmp` (start serveru) přesunul Bash cwd → `npm run build` padl na `C:\tmp\package.json` (**CH-014 počtvrté** — po `cd` do jiného dir vždy `cd` zpět před build); (3) `npx eslint` stáhl eslint@10 (globální) místo projektového → použít `./node_modules/.bin/eslint`.
+**Zhodnocení:** dobře — velký kus (bestie napříč mapa+chat+schema+3 napojení) bez cyklení díky kompletnímu GURPS vzoru; prototyp=kontrakt (uživatel schválil předem). Zbývá živé ověření + fáze 5 (chat propsání širší) + 8 skinů.
+
+---

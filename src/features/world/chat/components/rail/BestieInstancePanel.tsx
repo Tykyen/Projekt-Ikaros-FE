@@ -24,6 +24,7 @@ import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
 import { DrdhChatBestiePanel } from './DrdhChatBestiePanel';
 import { GurpsChatBestiePanel } from './GurpsChatBestiePanel';
+import { CocChatBestiePanel } from './CocChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
 import { DndChatBestiePanel } from './DndChatBestiePanel';
 import { FateChatBestiePanel } from './FateChatBestiePanel';
@@ -317,6 +318,21 @@ export function BestieInstancePanel({
           // GURPS bestie instance v boji — cold-steel statblok, editovatelná (onPatch).
           <DiarySkinScope worldId={worldId}>
             <GurpsChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
+        ) : systemId === 'coc' ? (
+          // CoC bestie instance v boji — horror-dossier statblok, editovatelná (onPatch).
+          <DiarySkinScope worldId={worldId}>
+            <CocChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               rollerName={combatant.name}
