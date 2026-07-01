@@ -1,0 +1,16 @@
+/* DrDH skin „FANTASY" — Pergamenový rozkaz Hlídky (default) · 16b-skiny.
+ *
+ * DEFAULT skin pro drdh (registry DEFAULT_SKIN_BY_SYSTEM: drdh -> fantasy).
+ * Výchozí (fantasy) vzhled = BASE `drdh.css` (list) + panel/embed baseline
+ * `[data-diary-system='drdh']` v `diary-skins.css`. Fantasy tedy NEMUSÍ nic
+ * přebíjet — base JE fantasy. Soubor je záměrně prázdný placeholder, aby:
+ *   1) registrace @import v diary-skins.css byla symetrická s ostatními systémy;
+ *   2) měl kam růst, kdyby fantasy potřebovala embed-only doladění nad base.
+ *
+ * SCOPE (kdyby se plnil): KAŽDÉ pravidlo na
+ * `[data-diary-system='drdh'][data-diary-skin='fantasy']` → vyšší specificita
+ * než drdh default → přebíjí. Pouze CSS/SVG, žádný JS. Regrese-safe.
+ *
+ * Ostatních 7 skinů (scifi/horror/steampunk/nature/minimal/retro/anime) přijde
+ * v samostatné skin fázi (krok 3 playbooku) jako sesterské soubory zde.
+ */

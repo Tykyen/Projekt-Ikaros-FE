@@ -139,7 +139,7 @@
   font-family: var(--dd-font-head, 'Cinzel', serif);
   font-weight: 700;
   font-size: 13px;
-  color: #fff;
+  color: var(--dd-hpfill-ink, #fff);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 .steps {
@@ -312,13 +312,13 @@
   background: var(--dd-gold-grad, linear-gradient(180deg, #f4dd92, #cf9f3a 60%, #6d5018));
 }
 .statBonus.neg {
-  color: #2a1010;
-  border-color: #5e3a3a;
-  background: linear-gradient(180deg, #caa0a0, #9c6b6b 60%, #5e3a3a);
+  color: var(--dd-neg-ink, #2a1010);
+  border-color: var(--dd-neg-bd, #5e3a3a);
+  background: var(--dd-neg-grad, linear-gradient(180deg, #caa0a0, #9c6b6b 60%, #5e3a3a));
 }
 .statBonus.zero {
-  border-color: #8c7549;
-  background: linear-gradient(180deg, #d9cba8, #b8a070 60%, #8c7549);
+  border-color: var(--dd-zero-bd, #8c7549);
+  background: var(--dd-zero-grad, linear-gradient(180deg, #d9cba8, #b8a070 60%, #8c7549));
 }
 .statEdit {
   display: flex;
@@ -463,7 +463,7 @@
   padding: 2px 6px;
   border-radius: 2px;
   flex: 0 0 auto;
-  color: #fff;
+  color: var(--dd-res-kind-ink, #fff);
 }
 .resTag.rez {
   background: var(--dd-res-rez-bg, rgba(47, 83, 144, 0.12));

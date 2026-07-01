@@ -424,7 +424,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
 - **Dračí Hlídka** (`drdh`) — *stav kódu:* list sheet+testy (`onRoll`); mapa ⚠️ **id drift** `draci-hlidka`≠`drdh` → svět dostane `generic`, deník/panel se NENAPOJÍ (D-NEW-SYS-DIARY-DRIFT, **fix první**)
   - [x] Reálný list (grafika)
   - [x] Taktická mapa (grafika — **až po fixu driftu**)
-  - [ ] Bestie (grafika)
+  - [x] Bestie (grafika)
   - [ ] Chat (→ 16.1)
   - [ ] Skiny (→ 16.2c)
 - **D&D 5e** (`dnd5e`) — *stav kódu:* list sheet+testy (+formulas), mapa combat panel `DndCombatPanel`

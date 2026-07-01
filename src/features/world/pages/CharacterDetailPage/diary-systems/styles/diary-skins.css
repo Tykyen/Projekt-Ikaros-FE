@@ -74,6 +74,19 @@
 @import './dnd5e-skins/retro.css';
 @import './dnd5e-skins/anime.css';
 
+/* 16b — DrDH (Dračí Hlídka) skiny. Default = fantasy (base drdh.css + panel/embed
+   baseline `[data-diary-system='drdh']` níž). fantasy.css je placeholder (base JE
+   fantasy). Ostatních 7 skinů přijde v skin fázi. Scoped
+   `[data-diary-system='drdh'][data-diary-skin='X']`. @import nahoře (CSS spec). */
+@import './drdh-skins/fantasy.css';
+@import './drdh-skins/scifi.css';
+@import './drdh-skins/horror.css';
+@import './drdh-skins/steampunk.css';
+@import './drdh-skins/nature.css';
+@import './drdh-skins/minimal.css';
+@import './drdh-skins/retro.css';
+@import './drdh-skins/anime.css';
+
 /* pi (Příběhy Impéria) skiny — HUD systém (`--pi-*`, sourozenec matrixu). Žijí
    v `pi-skins/`, scoped `[data-diary-system='pi'][data-diary-skin='X']`. Importy
    zde (ne v pi.css), aby se načetly i v embedech (chat/mapa/dice), kde pi.css
@@ -352,6 +365,144 @@
   --dd-embed-pos: #3a6b41;
   --dd-embed-neg: #8a2f2f;
   --dd-embed-neutral: #9a7b3f;
+}
+
+/* ════════════ 16b-skiny — DrDH (Dračí Hlídka) panel + EMBED baseline ════════════
+ * Foundation (krok 1): PLNÁ default `--dd-*` sada pro combat/bestie panel
+ * (hashované module třídy → čtou z předka) + `--dd-embed-*` plochy (obal v TM /
+ * dice readout / dicelog / orchestrace). ŽIJE ZDE (ne v lazy `drdh.css`), aby
+ * platila i v embedech (mapa/chat/dice), kde se `drdh.css` nenačte.
+ * Hodnoty = PŮVODNÍ literály z DrdhCombatPanel/DrdhBestiePanel fallbacků →
+ * default (fantasy) vzhled IDENTICKÝ (regrese-safe). Skiny přebijí na
+ * `[data-diary-system='drdh'][data-diary-skin='X']` v drdh-skins/*.css.
+ * Polarita: pergamenový list ve tmavém forge obalu (jako drd16/drdplus) →
+ * embed drží tmavou forge polaritu, text krémový. Plocha VŽDY opaque. */
+[data-diary-system='drdh'] {
+  /* ── base paleta panelů (pergamen) ──
+     POZN. token-drift (playbook §9.4 / §9.16): combat/bestie panel čtou část
+     `--dd-*` tokenů s RŮZNÝM ad-hoc fallbackem (buď mezi panely — combat drdh
+     paleta vs bestie drd2-derivovaná — nebo i UVNITŘ jednoho panelu na víc
+     místech: např. `--dd-input-bg` s alfou 0.4/0.6/0.7). Panely NEmají jednotný
+     token-contract. Proto do baseline dáváme JEN tokeny s JEDNOTNÝM fallbackem
+     napříč všemi místy → tam je baseline = literál = 0 regrese. Tokeny s víc
+     fallbacky (`--dd-ink`, `--dd-ink-soft`, `--dd-ink-deep`, `--dd-parch-1`,
+     `--dd-parch-edge`, `--dd-card-bg`, `--dd-input-bg`, `--dd-line-soft`,
+     `--dd-rule`, `--dd-hpfill-grad`, `--dd-seal-grad`, `--dd-seal-ink`,
+     `--dd-seal-bd`, `--dd-seal-line`, `--dd-seal-soft`) jsou ZÁMĚRNĚ vynechány
+     → drží svůj fallback (0 regrese). Skin je přebije na compound scope
+     `[data-diary-system='drdh'][data-diary-skin='X']` (předek OBOU panelů → jedna
+     hodnota se propíše do obou; sjednocení je tam ZÁMĚR reskinu). */
+  --dd-ink-2: #2a1a0a;
+  --dd-ink-head: #3a2812;
+  --dd-ink-faint: #94795a;
+  --dd-gold: #cf9f3a;
+  --dd-gold-hi: #f4dd92;
+  --dd-gold-deep: #6d5018;
+  --dd-gold-bd: #6a5009;
+  --dd-gold-ink: #1f1607;
+  --dd-crimson: #922a23;
+  --dd-crimson-hi: #c0392f;
+  --dd-crimson-deep: #561310;
+  --dd-sapphire: #2f5390;
+  --dd-emerald: #3c7a4e;
+  --dd-forge-1: #1f160d;
+  --dd-line: rgba(196, 173, 126, 0.55);
+
+  /* ── fonty (skin je swapuje dle identity) ── */
+  --dd-font-body: 'EB Garamond', Georgia, serif;
+  --dd-font-head: 'Cinzel', serif;
+  --dd-font-display: 'Cinzel Decorative', 'Cinzel', serif;
+
+  /* ── plochy / textury / karty / řádky ── */
+  --dd-parch-tex:
+    radial-gradient(120% 90% at 16% 6%, rgba(255, 250, 235, 0.5), transparent 55%),
+    radial-gradient(120% 120% at 90% 98%, rgba(150, 118, 70, 0.3), transparent 60%),
+    linear-gradient(165deg, #f2e7cd, #e9dab8 55%, #dcc89c);
+  --dd-panel-bg:
+    radial-gradient(70% 50% at 20% 6%, rgba(255, 250, 235, 0.5), transparent 60%),
+    linear-gradient(135deg, #efe5cd, #e3d5b4);
+  --dd-row-bg: linear-gradient(90deg, rgba(255, 252, 242, 0.5), rgba(232, 218, 183, 0.25));
+  --dd-row-bg-hover: rgba(221, 202, 159, 0.45);
+  --dd-bar-bg: linear-gradient(180deg, rgba(255, 252, 242, 0.4), rgba(221, 202, 159, 0.25));
+  --dd-step-bg: linear-gradient(180deg, #f2e7cd, #dcc89c);
+
+  /* ── tlačítka / akcenty / pečetě ── */
+  --dd-accent-grad: linear-gradient(180deg, #f4dd92, #cf9f3a 60%, #6d5018);
+  --dd-accent-grad-strong: linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e);
+  --dd-accent-ink: #3a2812;
+  /* POZOR — `--dd-seal-grad`/`--dd-seal-ink` mají v combat panelu (zlatá pečeť
+     nadpisu `.seal`) a v bestie panelu (crimson akční tlačítka `.steps`/`.atkBtn`)
+     KONFLIKTNÍ fallback (token-drift, playbook §9.16). V baseline je ZÁMĚRNĚ
+     NEuvádíme → každé použití drží svůj původní fallback (0 regrese). Skin,
+     který je chce přebít, musí cílit konkrétní panel, ne baseline. */
+  --dd-seal-crimson-ink: #fbeeca;
+  --dd-seal-crimson-grad: radial-gradient(circle at 38% 32%, #d05a4e, #922a23 55%, #561310);
+  --dd-gold-grad: linear-gradient(180deg, #f4dd92, #cf9f3a 60%, #6d5018);
+
+  /* ── HP / zdrojové bary (HP fill = sémantická červená) ──
+     `--dd-hpfill-grad` vynecháno (combat 90deg vs bestie 180deg crimson —
+     token-drift, viz pozn. výš); `--dd-hpfill-ink` shodné (#fff) → OK. */
+  --dd-hpfill-ink: #fff;
+  --dd-resfill-grad: linear-gradient(90deg, #2f5390, #5d86cf);
+  --dd-res2fill-grad: linear-gradient(90deg, #3c7a4e, #5fae73);
+
+  /* ── adrenalin (válečník signature — oranžová) ── */
+  --dd-adr: #e07a3a;
+  --dd-adr-deep: #a8431b;
+  --dd-adr-grad: linear-gradient(180deg, #e07a3a, #a8431b);
+  --dd-adr-cell-bg: rgba(255, 252, 242, 0.4);
+
+  /* ── bonus badge záporný / nulový ── */
+  --dd-neg-ink: #2a1010;
+  --dd-neg-bd: #5e3a3a;
+  --dd-neg-grad: linear-gradient(180deg, #caa0a0, #9c6b6b 60%, #5e3a3a);
+  --dd-zero-bg: #8c7549;
+  --dd-zero-bd: #8c7549;
+  --dd-zero-grad: linear-gradient(180deg, #d9cba8, #b8a070 60%, #8c7549);
+
+  /* ── zbraně (útok crimson / obrana pergamen) ── */
+  --dd-watk-grad: linear-gradient(180deg, #c0392f, #922a23);
+  --dd-wdef-grad: linear-gradient(180deg, rgba(255, 252, 242, 0.6), rgba(221, 202, 159, 0.35));
+
+  /* ── bestie panel (drd2-styl seal/body/gold) ──
+     `--dd-seal-bd/-line/-soft` vynechány (víc fallbacků uvnitř bestie panelu —
+     token-drift, viz pozn. výš). `--dd-seal` jednotné (#7a2418) → OK. */
+  --dd-body: #8a2a1e;
+  --dd-body-bd: #5e1c14;
+  --dd-blood: #7c2317;
+  --dd-seal: #7a2418;
+
+  /* ── odolnosti bestií (sémantika: rez=safír / imu=smaragd / slab=crimson) ── */
+  --dd-res-kind-ink: #fff;
+  --dd-res-rez: #2f5390;
+  --dd-res-rez-bg: rgba(47, 83, 144, 0.12);
+  --dd-res-rez-bd: rgba(47, 83, 144, 0.35);
+  --dd-res-rez-ink: #2a3a5a;
+  --dd-res-imu: #3c7a4e;
+  --dd-res-imu-bg: rgba(60, 122, 78, 0.12);
+  --dd-res-imu-bd: rgba(60, 122, 78, 0.35);
+  --dd-res-imu-ink: #2a4a34;
+  --dd-res-slab: #922a23;
+  --dd-res-slab-bg: rgba(146, 42, 35, 0.12);
+  --dd-res-slab-bd: rgba(146, 42, 35, 0.35);
+  --dd-res-slab-ink: #5a2420;
+
+  /* ════════ EMBED plochy (obal v TM / dice readout / dicelog / orchestrace) ════════
+     Tmavá forge polarita (list je pergamen v tmavém obalu). Plocha OPAQUE →
+     log/obal NEprosvítá na mapu. Skiny přebijí ve svých souborech. */
+  --dd-embed-surface: linear-gradient(180deg, #2b1f12, #1f160d);
+  --dd-embed-border: #6d5018;
+  --dd-embed-line: color-mix(in srgb, #cf9f3a 24%, transparent);
+  --dd-embed-text: #dcc6a0;
+  --dd-embed-muted: #9c8861;
+  --dd-embed-title: #f4dd92;
+  --dd-embed-chip-bg: color-mix(in srgb, #cf9f3a 14%, transparent);
+  --dd-embed-accent: #cf9f3a;
+  --dd-embed-num-font: 'Cinzel Decorative', 'Cinzel', serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: #3c7a4e; /* kladný hod / úspěch = smaragd */
+  --dd-embed-neg: #c0392f; /* záporný hod / neúspěch = krev */
+  --dd-embed-neutral: #cf9f3a;
 }
 
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */
