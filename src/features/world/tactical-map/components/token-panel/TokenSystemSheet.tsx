@@ -34,6 +34,7 @@ import { PiBestiePanel } from "./system-panels/PiBestiePanel";
 import { Drd16BestiePanel } from "./system-panels/Drd16BestiePanel";
 import { DrdPlusBestiePanel } from "./system-panels/DrdPlusBestiePanel";
 import { Drd2BestiePanel } from "./system-panels/Drd2BestiePanel";
+import { DrdhBestiePanel } from "./system-panels/DrdhBestiePanel";
 import { JadBestiePanel } from "./system-panels/JadBestiePanel";
 import { DndBestiePanel } from "./system-panels/DndBestiePanel";
 import { FateBestiePanel } from "./system-panels/FateBestiePanel";
@@ -156,6 +157,23 @@ export function TokenSystemSheet({
             sceneId={sceneId}
             worldId={worldId}
             systemId="drd2"
+            canEdit={canEdit}
+            onMapRoll={onMapRoll}
+          />
+        </DiarySkinScope>
+      );
+    }
+    // 16b — Dračí Hlídka bestie: fantasy pergamen „Strážní bestiář" (HP
+    // damageable, Atributy klik=k10+oprava, Útoky klik=ÚČ+k6+, Obrana ZO/OČ,
+    // Odolnosti rez/imu/slab, okna schopnosti+taktika, iniciativa k6+Obr).
+    if (systemId === "drdh") {
+      return (
+        <DiarySkinScope worldId={worldId} className={styles.sheet}>
+          <DrdhBestiePanel
+            token={token}
+            sceneId={sceneId}
+            worldId={worldId}
+            systemId="drdh"
             canEdit={canEdit}
             onMapRoll={onMapRoll}
           />

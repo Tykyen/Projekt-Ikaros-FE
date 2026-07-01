@@ -1,0 +1,639 @@
+/**
+ * 16b bestie — DrdhBestiePanel CSS (fantasy pergamen „Strážní bestiář",
+ * sladěno s DrdhCombatPanel/DrdhSheet). TOKENIZOVÁNO: čte `--dd-*` z předka
+ * (baseline v diary-skins.css; skin přebíjí na `[…][data-diary-skin='X']`).
+ * `var(--dd-x, <literál>)` fallback = původní literál → bez skinu beze změny.
+ * Mapa i chat (DrdhBestieCombatActions/DrdhChatBestiePanel) sdílí tenhle soubor.
+ * Scoping: CSS Module — třídy lokální.
+ */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  color: var(--dd-ink, #241a10);
+  font-family: var(--dd-font-body, 'EB Garamond', 'Georgia', serif);
+  background: var(
+    --dd-panel-bg,
+    radial-gradient(70% 50% at 20% 6%, rgba(255, 250, 235, 0.5), transparent 60%),
+    linear-gradient(135deg, #efe5cd, #e3d5b4)
+  );
+  border-radius: 5px;
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+}
+.editing {
+  box-shadow: inset 0 0 0 2px var(--dd-seal-line, rgba(122, 36, 24, 0.35));
+}
+.modeTag {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--dd-seal-ink, #f4e3c9);
+  background: var(--dd-seal, #7a2418);
+  border-radius: 4px;
+  padding: 5px 8px;
+  text-align: center;
+}
+.nameEdit {
+  width: 100%;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--dd-ink, #241a10);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.6));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.initBtn,
+.editFull {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 6px 9px;
+}
+.initBtn {
+  align-self: flex-start;
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.12));
+  border: 1px solid var(--dd-seal-line, rgba(122, 36, 24, 0.4));
+  color: var(--dd-seal, #7a2418);
+}
+.initBtn:hover {
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.2));
+  filter: brightness(0.96);
+}
+.editFull {
+  background: var(--dd-accent-grad-strong, linear-gradient(180deg, #f6e6b4, #d9b566 55%, #b88f3e));
+  border: 1px solid var(--dd-gold-bd, #6a5009);
+  color: var(--dd-accent-ink, #3a2812);
+  font-weight: 700;
+}
+.editFull:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.editFull:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Životy = HP (damageable) */
+.hp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 5px;
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.45));
+  padding: 10px 12px;
+  margin: 4px 0 4px;
+}
+.hpLbl {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--dd-body, #8a2a1e);
+}
+.hpEdit {
+  margin-left: auto;
+  width: 70px;
+  text-align: center;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--dd-seal, #7a2418);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.7));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 4px;
+  padding: 2px;
+}
+.hpBar {
+  position: relative;
+  flex: 1;
+  height: 24px;
+  border-radius: 4px;
+  border: 1.5px solid var(--dd-body-bd, #5e1c14);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.4));
+  overflow: hidden;
+}
+.hpFill {
+  position: absolute;
+  inset: 0;
+  background: var(--dd-hpfill-grad, linear-gradient(180deg, #b5392b, #7c2317));
+  transition: width 0.2s;
+}
+.hpTxt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.steps {
+  display: flex;
+  gap: 4px;
+}
+.steps button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--dd-seal-bd, #4a140c);
+  cursor: pointer;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--dd-seal-ink, #f4e3c9);
+  background: var(--dd-seal-grad, radial-gradient(circle at 35% 30%, #9a3022, #7a2418));
+}
+.steps button:hover {
+  filter: brightness(1.12);
+}
+.hpDeath {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #5a4632);
+  text-align: right;
+  margin: -2px 0 6px;
+}
+.hpDeath b {
+  color: var(--dd-body, #8a2a1e);
+  font-weight: 900;
+}
+
+/* section title */
+.stitle {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dd-ink, #241a10);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+.stitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--dd-ink, #241a10), transparent);
+}
+.stitle small {
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dd-ink-soft, #5a4632);
+}
+.hint {
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--dd-ink-soft, #5a4632);
+  margin: 0 0 6px;
+}
+
+/* Meta grid (úroveň · velikost · pohyb · typ · výskyt · XP) */
+.meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.metaCard {
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.42));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  text-align: center;
+}
+.metaLab {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #5a4632);
+  display: block;
+}
+.metaVal {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--dd-ink, #241a10);
+}
+.metaVal.small {
+  font-size: 12px;
+}
+.metaEdit {
+  width: 100%;
+  text-align: center;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 12px;
+  color: var(--dd-ink, #241a10);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.7));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+
+/* Atributy (klik = k10 + oprava) */
+.statGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+.statBtn {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: left;
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.42));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.statBtn:hover:not(:disabled) {
+  border-color: var(--dd-seal, #7a2418);
+  box-shadow: 0 1px 9px var(--dd-seal-line, rgba(122, 36, 24, 0.14));
+}
+.statBtn:disabled {
+  cursor: default;
+}
+.statName {
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 12px;
+  color: var(--dd-ink, #241a10);
+}
+.statName small {
+  display: block;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--dd-ink-soft, #5a4632);
+}
+.statVal {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--dd-ink, #241a10);
+}
+.statBonus {
+  min-width: 26px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0 5px;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 900;
+  font-size: 12px;
+  color: var(--dd-gold-ink, #1f1607);
+  border-radius: 3px;
+  border: 1.5px solid var(--dd-gold-bd, #6a5009);
+  background: var(--dd-gold-grad, linear-gradient(180deg, #f4dd92, #cf9f3a 60%, #6d5018));
+}
+.statBonus.neg {
+  color: #2a1010;
+  border-color: #5e3a3a;
+  background: linear-gradient(180deg, #caa0a0, #9c6b6b 60%, #5e3a3a);
+}
+.statBonus.zero {
+  border-color: #8c7549;
+  background: linear-gradient(180deg, #d9cba8, #b8a070 60%, #8c7549);
+}
+.statEdit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.42));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+}
+.statEdit span {
+  flex: 1;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 12px;
+}
+
+/* Obrana ZO/OČ */
+.defRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.defCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.5));
+  border: 1px solid var(--dd-gold-bd, #6a5009);
+}
+.defLab {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--dd-ink, #241a10);
+  font-weight: 700;
+}
+.defVal {
+  margin-left: auto;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--dd-ink, #241a10);
+}
+.defEdit {
+  margin-left: auto;
+  width: 52px;
+  text-align: center;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--dd-ink, #241a10);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.7));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 3px;
+  padding: 1px;
+}
+
+/* Útoky (klik = ÚČ + k6+) */
+.atkRow {
+  padding: 7px 9px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.42));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+}
+.atkName {
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dd-ink, #241a10);
+}
+.atkName small {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #5a4632);
+  margin-left: 6px;
+}
+.atkBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 3px;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--dd-seal-ink, #f4e3c9);
+  background: var(--dd-seal-grad, linear-gradient(180deg, #c0392f, #922a23));
+  border: 1px solid var(--dd-seal-bd, #561310);
+}
+.atkBtn:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+.atkBtn:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+.atkBtn b {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-weight: 900;
+  font-size: 13px;
+}
+.atkEdit {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 52px 60px auto;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+/* Odolnosti tagy */
+.resGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.resTag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border-radius: 3px;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 13px;
+}
+.resKind {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  flex: 0 0 auto;
+  color: #fff;
+}
+.resTag.rez {
+  background: var(--dd-res-rez-bg, rgba(47, 83, 144, 0.12));
+  border: 1px solid var(--dd-res-rez-bd, rgba(47, 83, 144, 0.35));
+  color: var(--dd-res-rez-ink, #2a3a5a);
+}
+.resTag.rez .resKind {
+  background: var(--dd-res-rez, #2f5390);
+}
+.resTag.imu {
+  background: var(--dd-res-imu-bg, rgba(60, 122, 78, 0.12));
+  border: 1px solid var(--dd-res-imu-bd, rgba(60, 122, 78, 0.35));
+  color: var(--dd-res-imu-ink, #2a4a34);
+}
+.resTag.imu .resKind {
+  background: var(--dd-res-imu, #3c7a4e);
+}
+.resTag.slab {
+  background: var(--dd-res-slab-bg, rgba(146, 42, 35, 0.12));
+  border: 1px solid var(--dd-res-slab-bd, rgba(146, 42, 35, 0.35));
+  color: var(--dd-res-slab-ink, #5a2420);
+}
+.resTag.slab .resKind {
+  background: var(--dd-res-slab, #922a23);
+}
+.resEdit {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.resSelect {
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 12px;
+  color: var(--dd-ink, #241a10);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.7));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 3px;
+  padding: 4px;
+}
+
+/* Okna (buttons) */
+.winBtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.winBtn {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  padding: 10px 8px;
+  color: var(--dd-ink, #241a10);
+  background: var(--dd-card-bg, rgba(255, 250, 238, 0.5));
+  border: 1px solid var(--dd-gold-bd, #6a5009);
+  border-radius: 4px;
+}
+.winBtn:hover {
+  filter: brightness(1.04);
+}
+
+/* Edit shared inputs */
+.ed {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 13px;
+  color: var(--dd-ink, #241a10);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.7));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 3px;
+  padding: 5px 7px;
+}
+.ed:focus {
+  outline: none;
+  border-color: var(--dd-seal, #7a2418);
+}
+.edNum {
+  text-align: center;
+}
+.edArea {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--dd-ink, #241a10);
+  background: var(--dd-input-bg, rgba(255, 252, 244, 0.7));
+  border: 1px solid var(--dd-parch-edge, #c5b083);
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+.del {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  color: var(--dd-blood, #7c2317);
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.55;
+  padding: 2px 4px;
+}
+.del:hover {
+  opacity: 1;
+}
+.miniAdd {
+  width: 100%;
+  margin-top: 2px;
+  background: transparent;
+  border: 1px dashed var(--dd-rule, rgba(70, 52, 32, 0.4));
+  border-radius: 3px;
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #5a4632);
+  padding: 6px;
+  cursor: pointer;
+}
+.miniAdd:hover {
+  background: var(--dd-seal-soft, rgba(122, 36, 24, 0.06));
+  color: var(--dd-seal, #7a2418);
+  border-color: var(--dd-seal, #7a2418);
+}
+
+/* Modal tělo (schopnosti / taktika) */
+.modalEmpty {
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-style: italic;
+  color: var(--dd-ink-soft, #5a4632);
+}
+.mtbl {
+  width: 100%;
+  border-collapse: collapse;
+}
+.mtbl th {
+  font-family: var(--dd-font-head, 'Cinzel', serif);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--dd-ink-soft, #5a4632);
+  text-align: left;
+  padding: 5px 6px;
+  border-bottom: 1.5px solid var(--dd-gold-bd, #6a5009);
+}
+.mtbl td {
+  padding: 6px;
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 14px;
+  color: var(--dd-ink, #241a10);
+  border-bottom: 1px solid var(--dd-rule, rgba(196, 173, 126, 0.4));
+  vertical-align: top;
+}
+.mtbl td:first-child {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tactic {
+  font-family: var(--dd-font-body, 'EB Garamond', serif);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--dd-ink, #241a10);
+  white-space: pre-wrap;
+}
+
+.root :disabled {
+  cursor: default;
+}

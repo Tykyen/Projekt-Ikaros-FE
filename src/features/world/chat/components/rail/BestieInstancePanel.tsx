@@ -22,6 +22,7 @@ import { MatrixChatBestiePanel } from './MatrixChatBestiePanel';
 import { PiChatBestiePanel } from './PiChatBestiePanel';
 import { DrdPlusChatBestiePanel } from './DrdPlusChatBestiePanel';
 import { Drd2ChatBestiePanel } from './Drd2ChatBestiePanel';
+import { DrdhChatBestiePanel } from './DrdhChatBestiePanel';
 import { JadChatBestiePanel } from './JadChatBestiePanel';
 import { DndChatBestiePanel } from './DndChatBestiePanel';
 import { FateChatBestiePanel } from './FateChatBestiePanel';
@@ -256,6 +257,22 @@ export function BestieInstancePanel({
           // vlastní DiarySkinScope (data-diary-skin), aby chat = mapa i u bestie.
           <DiarySkinScope worldId={worldId}>
             <Drd2ChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={combatant.name}
+              avatarUrl={combatant.imageUrl}
+              systemStats={combatant.systemStats}
+              canEdit={canEdit}
+              onPatch={(patch) =>
+                mut.mutate({ op: 'update', combatantId: combatant.id, patch })
+              }
+            />
+          </DiarySkinScope>
+        ) : systemId === 'drdh' ? (
+          // 16b-chat — Dračí Hlídka bestie konzumuje skin tokeny (--dd-*) z předka
+          // → vlastní DiarySkinScope (data-diary-skin), aby chat = mapa i u bestie.
+          <DiarySkinScope worldId={worldId}>
+            <DrdhChatBestiePanel
               worldId={worldId}
               channelId={channelId}
               rollerName={combatant.name}
