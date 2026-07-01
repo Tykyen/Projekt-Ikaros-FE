@@ -18,68 +18,72 @@ function makeDiary(
 const commonProps = {
   worldId: 'w1',
   worldSlug: 'testw',
-  characterSlug: 'agent1',
+  characterSlug: 'kaelen',
 };
 
-describe('GurpsSheet (8.7g)', () => {
-  it('vyrenderuje 6 hlavních atributů (ST/DX/IQ/HT/Will/Per)', () => {
+describe('GurpsSheet (GURPS 4E)', () => {
+  it('vyrenderuje 4 hlavní atributy (ST/DX/IQ/HT) + Vůle/Vnímání', () => {
     render(
-      <GurpsSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />,
     );
-    ['Síla (ST)', 'Obratnost (DX)', 'Inteligence (IQ)', 'Zdraví (HT)', 'Vůle (Will)', 'Vnímání (Per)'].forEach(
-      (l) => {
-        expect(screen.getByLabelText(l)).toBeInTheDocument();
-      },
-    );
+    ['Síla (ST)', 'Obratnost (DX)', 'Inteligence (IQ)', 'Zdraví (HT)'].forEach((l) => {
+      expect(screen.getByLabelText(l)).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText('Vůle (Will)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Vnímání (Per)')).toBeInTheDocument();
   });
 
-  it('vyrenderuje HP a FP boxy s aktuální + max input', () => {
+  it('vyrenderuje HP a FP boxy s aktuální + max inputem', () => {
     render(
-      <GurpsSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />,
     );
-    expect(screen.getByLabelText('HP (Životy) aktuální')).toBeInTheDocument();
-    expect(screen.getByLabelText('HP (Životy) max')).toBeInTheDocument();
-    expect(screen.getByLabelText('FP (Únava) aktuální')).toBeInTheDocument();
-    expect(screen.getByLabelText('FP (Únava) max')).toBeInTheDocument();
+    expect(screen.getByLabelText('HP (=ST) aktuální')).toBeInTheDocument();
+    expect(screen.getByLabelText('HP (=ST) max')).toBeInTheDocument();
+    expect(screen.getByLabelText('FP (=HT) aktuální')).toBeInTheDocument();
+    expect(screen.getByLabelText('FP (=HT) max')).toBeInTheDocument();
   });
 
-  it('vyrenderuje encumbrance tabulku s 5 úrovněmi (Žádné až Velmi těžké)', () => {
-    render(
-      <GurpsSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
-    );
-    ['Žádné (0)', 'Lehké (1)', 'Střední (2)', 'Těžké (3)', 'Velmi těžké (4)'].forEach(
-      (l) => {
-        expect(screen.getByText(l)).toBeInTheDocument();
-      },
-    );
+  it('vyrenderuje tabulku naložení s 5 úrovněmi', () => {
+    render(<GurpsSheet {...commonProps} diary={makeDiary()} mode="view" />);
+    ['Žádné (0)', 'Lehké (1)', 'Střední (2)', 'Těžké (3)', 'V. těžké (4)'].forEach((l) => {
+      expect(screen.getByText(l)).toBeInTheDocument();
+    });
   });
 
-  it('view mode disabluje inputy a skryje add tlačítka', () => {
+  it('vyrenderuje zbroj DR po částech těla (edit inputy)', () => {
     render(
-      <GurpsSheet {...commonProps} diary={makeDiary()} mode="view" />,
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />,
     );
-    expect(screen.getByLabelText('Jméno postavy (Name)')).toBeDisabled();
-    expect(
-      screen.queryByText('+ Přidat dovednost'),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText('+ Přidat výhodu'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText('DR Trup')).toBeInTheDocument();
+    expect(screen.getByLabelText('DR Hlava')).toBeInTheDocument();
+  });
+
+  it('auto-výpočet: Úhyb default z rychlosti (placeholder)', () => {
+    // default vše 10 → speed 5 → dodge 8
+    render(
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />,
+    );
+    expect(screen.getByLabelText('Úhyb (Dodge)')).toHaveAttribute('placeholder', '8');
+  });
+
+  it('auto-výpočet: Úder z tabulky škod (ST 10 → 1k-2)', () => {
+    render(
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />,
+    );
+    expect(screen.getByLabelText('Úder (thrust)')).toHaveAttribute('placeholder', '1k-2');
+  });
+
+  it('bodový účet: cena atributů se počítá (DX 14 → 80)', () => {
+    render(<GurpsSheet {...commonProps} diary={makeDiary({ gurps_dx: '14' })} mode="view" />);
+    const row = screen.getByText('Atributy + sekundární').closest('.row');
+    expect(row).toHaveTextContent('80');
+  });
+
+  it('view mode: žádné atr. inputy, žádná add tlačítka', () => {
+    render(<GurpsSheet {...commonProps} diary={makeDiary()} mode="view" />);
+    expect(screen.queryByLabelText('Síla (ST)')).not.toBeInTheDocument();
+    expect(screen.queryByText('+ Přidat dovednost')).not.toBeInTheDocument();
+    expect(screen.queryByText('+ Přidat výhodu')).not.toBeInTheDocument();
   });
 
   it('změna Síly volá onChange s gurps_st klíčem', () => {
@@ -92,9 +96,7 @@ describe('GurpsSheet (8.7g)', () => {
         onChange={onChange}
       />,
     );
-    fireEvent.change(screen.getByLabelText('Síla (ST)'), {
-      target: { value: '14' },
-    });
+    fireEvent.change(screen.getByLabelText('Síla (ST)'), { target: { value: '14' } });
     expect(onChange).toHaveBeenCalledWith({
       customDataPatch: expect.objectContaining({ gurps_st: '14' }),
     });
@@ -103,66 +105,32 @@ describe('GurpsSheet (8.7g)', () => {
   it('+ Přidat dovednost přidá prázdný řádek do gurps_skills', () => {
     const onChange = vi.fn();
     render(
-      <GurpsSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={onChange}
-      />,
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={onChange} />,
     );
     fireEvent.click(screen.getByText('+ Přidat dovednost'));
     expect(onChange).toHaveBeenCalledWith({
       customDataPatch: expect.objectContaining({
-        gurps_skills: JSON.stringify([{ name: '', lvl: '', base: '' }]),
+        gurps_skills: JSON.stringify([{ name: '', base: '', pts: '', lvl: '' }]),
       }),
     });
   });
 
-  it('+ Přidat výhodu / nevýhodu / modifikátor jsou separate (4 tabulky)', () => {
+  it('výhody / nevýhody / zvláštnosti mají samostatná add tlačítka', () => {
     render(
-      <GurpsSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />,
     );
     expect(screen.getByText('+ Přidat výhodu')).toBeInTheDocument();
     expect(screen.getByText('+ Přidat nevýhodu')).toBeInTheDocument();
-    expect(screen.getByText('+ Přidat modifikátor')).toBeInTheDocument();
-    expect(screen.getByText('+ Přidat jazyk')).toBeInTheDocument();
+    expect(screen.getByText('+ Přidat zvláštnost')).toBeInTheDocument();
   });
 
   it('vyrenderuje obě tabulky zbraní (melee + ranged)', () => {
     render(
-      <GurpsSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={() => {}}
-      />,
+      <GurpsSheet {...commonProps} diary={makeDiary()} mode="edit" onChange={() => {}} />,
     );
     expect(screen.getByText('Zbraně na blízko')).toBeInTheDocument();
-    expect(screen.getByText('Střelné zbraně')).toBeInTheDocument();
-    // Ranged tabulka má sloupec „RoF" — unique
-    expect(screen.getByText('RoF')).toBeInTheDocument();
-  });
-
-  it('inventory totals — celková váha + cena jsou editovatelné', () => {
-    const onChange = vi.fn();
-    render(
-      <GurpsSheet
-        {...commonProps}
-        diary={makeDiary()}
-        mode="edit"
-        onChange={onChange}
-      />,
-    );
-    fireEvent.change(screen.getByLabelText('Celková váha inventáře'), {
-      target: { value: '42' },
-    });
-    expect(onChange).toHaveBeenCalledWith({
-      customDataPatch: expect.objectContaining({ gurps_inv_wgt: '42' }),
-    });
+    expect(screen.getByText('Střelné / vrhací zbraně')).toBeInTheDocument();
+    // ranged má unikátní sloupec „Náboje"
+    expect(screen.getByText('Náboje')).toBeInTheDocument();
   });
 });

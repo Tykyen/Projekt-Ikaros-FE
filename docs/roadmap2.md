@@ -425,8 +425,8 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Reálný list (grafika)
   - [x] Taktická mapa (grafika — **až po fixu driftu**)
   - [x] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
-  - [ ] Skiny (→ 16.2c)
+  - [x] Chat (→ 16.1)
+  - [x] Skiny (→ 16.2c)
 - **D&D 5e** (`dnd5e`) — *stav kódu:* list sheet+testy (+formulas), mapa combat panel `DndCombatPanel`
   - [x] Reálný list (grafika)
   - [x] Taktická mapa (grafika)

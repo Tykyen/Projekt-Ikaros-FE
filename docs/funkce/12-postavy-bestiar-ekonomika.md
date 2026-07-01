@@ -261,6 +261,36 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 ---
 
+### Dračí Hlídka (`drdh` / `draci-hlidka`) — deník + combat panel + bestiář (součtový k6/k10)
+
+**Co to je:** Plné pokrytí českého systému Dračí Hlídka — deník, taktická mapa (PC/NPC), chat, bestiář. Součtová mechanika (hod + oprava atributu), redesign dle **oficiálních pokročilých deníků** (6 povolání, každé s vlastním zdrojem). Vlastní vizuální identita „Pergamenový rozkaz Hlídky" (stuhové bannery + kruhové pečetě + štítový erb DH).
+
+**Kde:** Svět s `world.system = 'draci-hlidka'` (canonical engine id `drdh` přes `resolveSystemId`/`systemId.ts`). Deník (`DiaryTab`→`DrdhSheet`), bestiář (`/svet/:slug/bestiar`), taktická mapa (token panel), chat (rail). Default skin `fantasy`.
+
+**Kdo:** Jako ostatní systémy — člen s přístupem k postavě; edituje vlastník PC / PJ+. Bestiář dle 3 scope.
+
+**Mechaniky (single-source `drdhAttrMod` v `sheets/drdh/constants.ts`, reuse deník↔panel = 0 drift):**
+- **Oprava atributu** = ⌊stupeň/2⌋ − 5. **Zkratky** Sil/Obr/Odl/Int/Char (legacy SIL/OBR/ODO čteny přes `normDrdhAttr` — BC bez migrace).
+- **Hranice smrti** = −(10 + Odl). **Iniciativa** = oprava Obr + k6 (NEexploduje). **Útok/obrana** = k6 (exploduje, dice `d6+`). **Dovednost** = k10 + oprava + stupeň výcviku (rozklad „Sil +3 · výcvik +3" v deníku i panelu).
+- **Zbraň** = Typ (blízko/dálka) · Útočnost · Zranění · Obrana. Deník/chat ukazují jen čísla; **hod útoku** = útočnost + Sil (blízko) / Obr (dálka) + k6+ (rozpis „útoč + vlastnost + hod = výsledek / zranění se znaménkem"); **obrana** = obrana + Obr + k6+. Bestie útok = ÚČ (finální) + k6+.
+
+**Co jde dělat:**
+- **Deník** (`DrdhSheet`, `customData` prefix `drdh_`, schema-less delta-merge): hero se **štítovým erbem DH — klik → popover mění povolání** (žádné pole „Povolání"); rasa ruční vstup; **Specializace** select zamčený do 6. úrovně. 6 povolání, každé vlastní **zdroj**: válečník = adrenalin track 1–20, hraničář = duševní síla, kouzelník = mana (úroveň/nasátí), alchymista = mana + suroviny, zloděj = kostýmy (seznam), klerik = přízeň (3× denně). Zvláštní schopnosti = **karty s textareou** (celý účinek). Záměrně škrtnuto: peníze, bojové vzorce, vybavení, portrét.
+- **Taktická mapa — PC/NPC** (`DrdhCombatPanel` v `COMBAT_PANELS`): diary-backed bojové jádro (atributy/dovednosti/zbraně/zdroj), klik = k6+/k10 hod s rozpisem → dicelog. HP bar tokenu = `resolveCharacterHp` case `drdh` (max `drdh_hp_max`, zbývá `drdh_hp`).
+- **Taktická mapa — bestie** (`DrdhBestiePanel` + `DrdhBestieCombatActions`): medailon nestvůry + odolnosti (rez/imu/slab) místo erbu/zdroje; damageable HP, útoky (ÚČ + k6+), atributy (klik = hod), schopnosti, taktika.
+- **Bestiář** (2 schémata `drdh:bestie`/`drdh:token`): editor přes generický `EntitySchemaForm` (sekce Boj/Tělo/Atributy/Odolnosti/Meta/Popis). Bestie drží **finální ÚČ** u útoků (nepočítá z atributů jako PC).
+- **Chat**: PC/NPC zdarma přes `DiaryRollPanel`→`COMBAT_PANELS`; bestie přes `DrdhChatBestiePanel` (sdílí jádro s mapou = 0 drift — týž plný panel, jen užší rail).
+- **8 skinů** (fantasy default) — viz „Skin deníku" níž.
+
+**Hranice / co neumí:** List je evidence, ne pravidlový engine — obsah povolání (triky/kouzla/recepty/prosby, per-rasa atributy) se dohledává v příručce (přesná čísla nebyla v podkladech). Combat panel PC/NPC je diary-backed (0 BE — hody čtou `customData`). Práh úspěchu/pásma zranění řeší PJ ad hoc.
+
+**Zvláštnosti:** Deník+combat panel sdílí `constants.ts` (`drdhAttrMod`/`normDrdhAttr`) → hody single-source. Bestie token = superset (`schemas/drdh/token.json` ⊇ `bestie.json` + `health.current`) kvůli BE strict `token.update`. Erb popover z-index nad HUD (`.hero z-index`); ATR select `appearance:none` (chevron neořezával text).
+
+**Stav:** ✅ funguje (deník + combat panel PC/NPC + bestie + 8 skinů, render+mobil ověřeno).
+**Kód:** FE `sheets/drdh/{DrdhSheet.tsx,constants.ts}` + `presets/drdh.ts` + `styles/drdh.css`; `system-panels/DrdhCombatPanel.tsx` (+`.module.css`); `system-panels/{DrdhBestiePanel,DrdhBestieCombatActions}.tsx`; `chat/.../rail/DrdhChatBestiePanel.tsx`; `utils/resolveCharacterHp.ts` (case `drdh`); schémata `tactical-map/schemas/drdh/{bestie,token}.ts`; 8 skinů `styles/drdh-skins/`. Dice preset `draci-hlidka: ['d6','d6+','d10']`. BE: `drdh` schémata v `backend/assets/schemas/` (push `7cf5578`) + kostky (`24fb950`), jinak pass-through `customData`.
+
+---
+
 ### Skin deníku (vizuální „kabát" listu)
 
 **Co to je:** Vizuální styl per-system listu, nezávislý na obsahu/datech. Rodina **8 skinů** (`scifi · fantasy · horror · steampunk · nature · minimal · retro · anime`=MLP); každý vlastní paleta + tvarový jazyk + signature ornament, identita drží napříč systémy.

@@ -1,96 +1,72 @@
 /**
- * 8.7g — GURPS konstanty.
- * Adaptováno z `c:/Matrix/Matrix/frontend/src/components/Map/GurpsMapDiaryOverlay.tsx`
- * (overlay v Matrix/Matrix sloužil i jako primary display — Ikaros si z něj
- * staví full editovatelný sheet).
+ * GURPS 4E — konstanty deníku.
+ *
+ * Data v `diary.customData` s prefixem `gurps_*`. 4. edice: 4 hlavní atributy
+ * (ST/DX/IQ/HT) + sekundární charakteristiky (Vůle/Vnímání), zbroj jen DR po
+ * částech těla (4E zrušilo pasivní obranu). Odvozené hodnoty viz `formulas.ts`.
  */
 
 export interface GurpsAttrDef {
   /** klíč v customData (`gurps_<key>`) */
   key: string;
-  /** český label + zkratka v závorce */
+  /** český název */
   label: string;
+  /** originální zkratka (ST/DX/…) */
+  abbr: string;
 }
 
-/** 6 hlavních atributů GURPS (česky + EN zkratka). */
+/** 4 hlavní atributy GURPS 4E. */
 export const GURPS_CORE_ATTRS: GurpsAttrDef[] = [
-  { key: 'st', label: 'Síla (ST)' },
-  { key: 'dx', label: 'Obratnost (DX)' },
-  { key: 'iq', label: 'Inteligence (IQ)' },
-  { key: 'ht', label: 'Zdraví (HT)' },
-  { key: 'will', label: 'Vůle (Will)' },
-  { key: 'per', label: 'Vnímání (Per)' },
+  { key: 'st', label: 'Síla', abbr: 'ST' },
+  { key: 'dx', label: 'Obratnost', abbr: 'DX' },
+  { key: 'iq', label: 'Inteligence', abbr: 'IQ' },
+  { key: 'ht', label: 'Zdraví', abbr: 'HT' },
 ];
 
-/** Konfigurace sekundárního atributu. */
-export interface GurpsSecAttrDef {
-  key: string;
-  label: string;
-  /** Výchozí (zobrazený fallback). */
-  fallback?: string;
-}
-
-/** Sekundární atributy zobrazené v defenses row. */
-export const GURPS_DEFENSES: GurpsSecAttrDef[] = [
-  { key: 'dr', label: 'DR (Zbroj)', fallback: '0' },
-  { key: 'parry', label: 'Odražení', fallback: '0' },
-  { key: 'block', label: 'Blok', fallback: '0' },
-  { key: 'tl', label: 'TL', fallback: '0' },
+/** Sekundární charakteristiky (default = IQ). */
+export const GURPS_SECONDARY: GurpsAttrDef[] = [
+  { key: 'will', label: 'Vůle', abbr: 'Will' },
+  { key: 'per', label: 'Vnímání', abbr: 'Per' },
 ];
 
-/** Sekundární derived attrs (BL, Thrust, Swing). */
-export const GURPS_DERIVED: GurpsSecAttrDef[] = [
-  { key: 'basic_lift', label: 'BL (Nosnost)', fallback: '0' },
-  { key: 'dmg_thr', label: 'Thr (Bodnutí)', fallback: '0' },
-  { key: 'dmg_sw', label: 'Sw (Švih)', fallback: '0' },
-];
+/** Meta pole v hlavičce (mimo Jméno/Hráč, které mají vlastní řádek). */
+export const GURPS_META_FIELDS: { key: string; label: string; wide?: boolean }[] =
+  [
+    { key: 'desc', label: 'Popis', wide: true },
+    { key: 'race', label: 'Rasa / TL' },
+  ];
 
-/** Encumbrance levels (5×). */
-export const GURPS_ENC_LEVELS: { label: string; m: string; d: string }[] = [
-  { label: 'Žádné (0)', m: 'enc_move_0', d: 'enc_dodge_0' },
-  { label: 'Lehké (1)', m: 'enc_move_1', d: 'enc_dodge_1' },
-  { label: 'Střední (2)', m: 'enc_move_2', d: 'enc_dodge_2' },
-  { label: 'Těžké (3)', m: 'enc_move_3', d: 'enc_dodge_3' },
-  { label: 'Velmi těžké (4)', m: 'enc_move_4', d: 'enc_dodge_4' },
-];
-
-/** Meta info pole v header. */
-export const GURPS_META_FIELDS: { key: string; label: string }[] = [
+/** Malé čipy v pravém rohu hlavičky (Věk/SM jsou volné, body dopočet). */
+export const GURPS_CHIP_FIELDS: { key: string; label: string }[] = [
   { key: 'age', label: 'Věk' },
-  { key: 'height', label: 'Výška' },
-  { key: 'weight', label: 'Váha' },
   { key: 'sm', label: 'SM' },
-  { key: 'appearance', label: 'Vzhled' },
-  { key: 'culture', label: 'Kultura' },
 ];
 
-/** Skill row v `gurps_skills`. */
+/** Části těla pro zbroj (DR). */
+export const GURPS_ARMOR_LOCS: { key: string; label: string }[] = [
+  { key: 'head', label: 'Hlava' },
+  { key: 'torso', label: 'Trup' },
+  { key: 'arms', label: 'Paže' },
+  { key: 'legs', label: 'Nohy' },
+  { key: 'hands', label: 'Ruce' },
+  { key: 'feet', label: 'Chodidla' },
+];
+
+/** Dovednost v `gurps_skills` (base = např. „DX/A", pts = body, lvl = úroveň). */
 export interface GurpsSkill {
   name: string;
-  lvl: string;
   base: string;
+  pts: string;
+  lvl: string;
 }
 
-/** Trait (advantage/disadvantage) row. */
+/** Trait (výhoda/nevýhoda/zvláštnost) — pts je signed (výhody +, ostatní −). */
 export interface GurpsTrait {
   name: string;
-  note: string;
+  pts: string;
 }
 
-/** Reaction modifier row. */
-export interface GurpsReactionMod {
-  name: string;
-  val: string;
-}
-
-/** Language row. */
-export interface GurpsLanguage {
-  name: string;
-  spk: string; // mluvený
-  wrt: string; // psaný
-}
-
-/** Melee weapon row. */
+/** Zbraň na blízko. */
 export interface GurpsMelee {
   name: string;
   dmg: string;
@@ -98,20 +74,11 @@ export interface GurpsMelee {
   parry: string;
 }
 
-/** Ranged weapon row. */
+/** Střelná / vrhací zbraň. */
 export interface GurpsRanged {
   name: string;
   dmg: string;
   acc: string;
-  rng: string;
-  rof: string;
+  range: string;
   shots: string;
-}
-
-/** Armor / inventory row. */
-export interface GurpsArmor {
-  name: string;
-  loc: string;
-  wgt: string;
-  cost: string;
 }

@@ -446,6 +446,39 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Jak se hází v Dračí Hlídce (útok, obrana, dovednosti)?',
+    a: (
+      <>
+        <p>
+          Dračí Hlídka je <strong>součtový</strong> systém — házíš kostkou a přičítáš{' '}
+          <strong>opravu atributu</strong> (⌊stupeň/2⌋ − 5). Kostka se liší podle akce:
+        </p>
+        <ul>
+          <li>
+            <strong>Útok a obrana</strong>: <strong>nafukovací k6</strong> (padne-li 6,
+            házíš dál a přičítáš — viz otázka o k6+ výše). Útok = útočnost zbraně +{' '}
+            <strong>Síla</strong> (na blízko) / <strong>Obratnost</strong> (na dálku) + k6+;
+            obrana = obrana zbraně + Obratnost + k6+.
+          </li>
+          <li>
+            <strong>Dovednost</strong>: <strong>k10</strong> + oprava atributu + stupeň
+            výcviku (deník i panel ukazují rozklad, např. „Sil +3 · výcvik +3").
+          </li>
+          <li>
+            <strong>Iniciativa</strong>: oprava Obratnosti + k6 (obyčejná, nenafukuje).
+          </li>
+        </ul>
+        <p>
+          V deníku a chatu vidíš u zbraně <strong>jen čísla</strong> (útočnost / zranění /
+          obrana); <strong>vlastnost se přičte až při hodu</strong>. Na taktické mapě i v
+          chatu klikni na atribut, dovednost nebo zbraň ve statbaru — v záznamu kostek
+          uvidíš rozpis „útoč + vlastnost + hod = výsledek / zranění".
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Jak hledám stránky ve světě?',
     a: (
       <>

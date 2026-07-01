@@ -1,561 +1,841 @@
 /**
- * 8.7g — GURPS deník postavy.
+ * GURPS 4E — deník postavy (Ikaros).
  *
- * Adaptováno z `c:/Matrix/Matrix/frontend/src/components/Map/GurpsMapDiaryOverlay.tsx`
- * (405 ř — Matrix/Matrix měl jen overlay, žádný full sheet; Ikaros si z něj
- * staví full editovatelný sheet s vlastním stylem `.gurps-dashboard`).
+ * Data v `diary.customData` s prefixem `gurps_*`. Layout kopíruje klasický
+ * character sheet (atributy / škody / obrana / naložení / zbroj / dovednosti /
+ * výhody-nevýhody-zvláštnosti / shrnutí bodů) v tmavém „cold-steel" tématu.
  *
- * Data v `diary.customData` s prefixem `gurps_*` (1:1 vůči legacy).
+ * Odvozené hodnoty (rychlost, pohyb, úhyb, škody, naložení, bodový účet) jsou
+ * "hybrid": počítají se z atributů (viz `formulas.ts`), ale hráč je smí přepsat
+ * (prázdný override → auto). Škody Úder/Mách se berou z 4E tabulky ST→kostky.
  */
+import type { ReactNode } from 'react';
 import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
-import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
 import {
+  GURPS_ARMOR_LOCS,
+  GURPS_CHIP_FIELDS,
   GURPS_CORE_ATTRS,
-  GURPS_DEFENSES,
-  GURPS_DERIVED,
-  GURPS_ENC_LEVELS,
   GURPS_META_FIELDS,
-  type GurpsArmor,
-  type GurpsLanguage,
+  GURPS_SECONDARY,
   type GurpsMelee,
   type GurpsRanged,
-  type GurpsReactionMod,
   type GurpsSkill,
   type GurpsTrait,
 } from './constants';
+import {
+  attributeCost,
+  basicLift,
+  basicMove,
+  basicSpeed,
+  dodge,
+  encTable,
+  int,
+  num,
+  pointSummary,
+  signed,
+  swing,
+  thrust,
+} from './formulas';
 
-export function GurpsSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
-  const disabled = mode === 'view';
+/** Číslo s desetinnou čárkou (6.25 → „6,25"). */
+const fmt = (n: number) => String(n).replace('.', ',');
+
+export function GurpsSheet({ diary, mode, onChange }: SystemSheetProps) {
   const printMode = usePrintMode();
   const cd = diary.customData ?? {};
   const cda = makeCdAccess(cd, 'gurps_', onChange);
-  const { g, set } = cda;
+  const { g } = cda;
 
-  // Tisk: interaktivní sheet (inputy v tabulkách/atributech) je netisknutelný —
-  // hodnoty jsou v `<input value>` (replaced element). V printMode renderujeme
-  // oddělený statický čitelný dokument (čte stejná `gurps_*` data).
   if (printMode) return <GurpsPrintView cda={cda} />;
+
+  const editing = mode === 'edit';
+
+  // ── efektivní hodnoty (override || auto) ──
+  const st = int(g('st', '10'), 10);
+  const dx = int(g('dx', '10'), 10);
+  const iq = int(g('iq', '10'), 10);
+  const ht = int(g('ht', '10'), 10);
+  const willEff = g('will') ? int(g('will'), iq) : iq;
+  const perEff = g('per') ? int(g('per'), iq) : iq;
+  const hpMaxEff = g('hp_max') ? int(g('hp_max'), st) : st;
+  const fpMaxEff = g('fp_max') ? int(g('fp_max'), ht) : ht;
+
+  const speedComputed = basicSpeed(dx, ht);
+  const speedEff = g('basic_speed') ? num(g('basic_speed'), speedComputed) : speedComputed;
+  const moveComputed = basicMove(speedEff);
+  const moveEff = g('basic_move') ? int(g('basic_move'), moveComputed) : moveComputed;
+  const dodgeComputed = dodge(speedEff);
+  const dodgeEff = g('dodge') ? int(g('dodge'), dodgeComputed) : dodgeComputed;
+  const bl = basicLift(st);
+  const enc = encTable(st, moveEff, dodgeEff);
+
+  // ── bodový účet ──
+  const skills = cda.parseJsonArr<GurpsSkill>('skills');
+  const advs = cda.parseJsonArr<GurpsTrait>('advs');
+  const disadvs = cda.parseJsonArr<GurpsTrait>('disadvs');
+  const quirks = cda.parseJsonArr<GurpsTrait>('quirks');
+  const attrCost = attributeCost({
+    st, dx, iq, ht,
+    will: willEff, per: perEff,
+    hp: hpMaxEff, fp: fpMaxEff,
+    speed: speedEff, move: moveEff,
+  });
+  const summary = pointSummary({
+    attrCost,
+    advantages: advs,
+    disadvantages: disadvs,
+    quirks,
+    skills,
+  });
+  const budget = int(g('points_budget'), 0);
+  const unspent = budget - summary.total;
+
+  const attrPointCost: Record<string, number> = {
+    st: (st - 10) * 10,
+    dx: (dx - 10) * 20,
+    iq: (iq - 10) * 20,
+    ht: (ht - 10) * 10,
+  };
 
   return (
     <div className="gurps-dashboard">
-      {onRoll && <SheetInitiativeButton onRoll={onRoll} kind="d20" />}
       {/* ═══ HEADER ═══ */}
-      <div className="gurps-header">
-        <div className="identity-column">
-          <div className="name-row">
-            <div style={{ flex: 2 }}>
-              <label htmlFor="gurps_name">Jméno postavy (Name)</label>
-              <input
-                id="gurps_name"
-                value={g('name')}
-                disabled={disabled}
-                onChange={(e) => set('name', e.target.value)}
-                placeholder="Zadej jméno..."
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label htmlFor="gurps_player">Hráč (Player)</label>
-              <input
-                id="gurps_player"
-                value={g('player')}
-                disabled={disabled}
-                onChange={(e) => set('player', e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="meta-column">
-            {GURPS_META_FIELDS.map((f) => (
-              <div key={f.key}>
-                <label htmlFor={`gurps_${f.key}`}>{f.label}</label>
+      <div className="g-head">
+        <div className="g-brand">
+          <span className="gg">GURPS</span>
+          <span className="sub">Deník postavy</span>
+          <span className="ed">4. edice</span>
+        </div>
+
+        <div className="g-idfields">
+          <Field cda={cda} k="name" label="Jméno postavy" editing={editing} wide />
+          <Field cda={cda} k="player" label="Hráč" editing={editing} />
+          {GURPS_META_FIELDS.map((f) => (
+            <Field
+              key={f.key}
+              cda={cda}
+              k={f.key}
+              label={f.label}
+              editing={editing}
+              wide={f.wide}
+            />
+          ))}
+        </div>
+
+        <div className="g-chips">
+          {GURPS_CHIP_FIELDS.map((f) => (
+            <div className="chip" key={f.key}>
+              <div className="k">{f.label}</div>
+              {editing ? (
                 <input
-                  id={`gurps_${f.key}`}
+                  className="chip-in"
                   value={g(f.key)}
-                  disabled={disabled}
-                  onChange={(e) => set(f.key, e.target.value)}
+                  onChange={(e) => cda.set(f.key, e.target.value)}
+                  aria-label={f.label}
                 />
+              ) : (
+                <div className="n sm">{g(f.key) || '—'}</div>
+              )}
+            </div>
+          ))}
+          <div className="chip unspent">
+            <div className="k">Nevyužité</div>
+            <div className="n">{unspent}</div>
+          </div>
+          <div className="chip total">
+            <div className="k">Bodů celkem</div>
+            {editing ? (
+              <input
+                className="chip-in"
+                value={g('points_budget')}
+                placeholder="0"
+                onChange={(e) => cda.set('points_budget', e.target.value)}
+                aria-label="Bodů celkem (rozpočet)"
+              />
+            ) : (
+              <div className="n">{budget || '—'}</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ MAIN ═══ */}
+      <div className="g-main">
+        {/* LEFT — stat spine */}
+        <div className="g-stack">
+          <div className="g-card">
+            <h3>Atributy</h3>
+            <div className="g-attrs">
+              {GURPS_CORE_ATTRS.map((a) => (
+                <div className="g-attr" key={a.key}>
+                  <div className="lab">
+                    {a.label}
+                    <small>{a.abbr}</small>
+                  </div>
+                  {editing ? (
+                    <input
+                      className="num"
+                      value={g(a.key, '10')}
+                      onChange={(e) => cda.set(a.key, e.target.value)}
+                      aria-label={`${a.label} (${a.abbr})`}
+                    />
+                  ) : (
+                    <div className="num">{g(a.key, '10')}</div>
+                  )}
+                  <div className="pt">{signed(attrPointCost[a.key])}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="g-sec2">
+              {GURPS_SECONDARY.map((s) => (
+                <Override
+                  key={s.key}
+                  cda={cda}
+                  k={s.key}
+                  computed={s.key === 'will' ? willEff : perEff}
+                  editing={editing}
+                  boxLabel={`${s.label} (${s.abbr})`}
+                  box
+                />
+              ))}
+            </div>
+
+            <div className="g-mini">
+              <Vital
+                cda={cda}
+                curK="hp"
+                maxK="hp_max"
+                maxComputed={hpMaxEff}
+                editing={editing}
+                label="HP (=ST)"
+                variant="hp"
+              />
+              <Vital
+                cda={cda}
+                curK="fp"
+                maxK="fp_max"
+                maxComputed={fpMaxEff}
+                editing={editing}
+                label="FP (=HT)"
+                variant="fp"
+              />
+            </div>
+          </div>
+
+          <div className="g-card">
+            <h3>Škody</h3>
+            <div className="g-kv damage">
+              <Row label="Úder" sub="thrust">
+                <Override cda={cda} k="dmg_thr" computed={thrust(st)} editing={editing} boxLabel="Úder (thrust)" />
+              </Row>
+              <Row label="Mách" sub="swing">
+                <Override cda={cda} k="dmg_sw" computed={swing(st)} editing={editing} boxLabel="Mách (swing)" />
+              </Row>
+            </div>
+          </div>
+
+          <div className="g-card">
+            <h3>Pohyb</h3>
+            <div className="g-kv">
+              <Row label="Zákl. rychlost" sub="(HT+DX)/4">
+                <Override cda={cda} k="basic_speed" computed={fmt(speedComputed)} editing={editing} boxLabel="Základní rychlost" />
+              </Row>
+              <Row label="Pohyb" sub="Move">
+                <Override cda={cda} k="basic_move" computed={moveComputed} editing={editing} boxLabel="Pohyb (Move)" />
+              </Row>
+              <Row label="Nosnost (BL)" sub="ST²/5">
+                <span className="v">{fmt(bl)} lb</span>
+              </Row>
+            </div>
+          </div>
+
+          <div className="g-card">
+            <h3>Aktivní obrana</h3>
+            <div className="g-adef">
+              <div className="d">
+                <div className="n">
+                  <Override cda={cda} k="dodge" computed={dodgeComputed} editing={editing} boxLabel="Úhyb (Dodge)" />
+                </div>
+                <div className="k">Úhyb</div>
+                <div className="frm">rychlost+3</div>
               </div>
-            ))}
+              <div className="d">
+                <div className="n">
+                  <Edit cda={cda} k="parry" label="Kryt zbraní (Parry)" editing={editing} className="ov" />
+                </div>
+                <div className="k">Kryt zbraní</div>
+                <div className="frm">dov./2+3</div>
+              </div>
+              <div className="d">
+                <div className="n">
+                  <Edit cda={cda} k="block" label="Kryt štítem (Block)" editing={editing} className="ov" />
+                </div>
+                <div className="k">Kryt štítem</div>
+                <div className="frm">dov./2+3</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="points-column">
-          <div className="points-row">
-            <label htmlFor="gurps_points_total">Celkem Bodů (Total)</label>
-            <input
-              id="gurps_points_total"
-              value={g('points_total')}
-              disabled={disabled}
-              onChange={(e) => set('points_total', e.target.value)}
-              placeholder="0"
+        {/* CENTER — naložení + zbroj + zbraně */}
+        <div className="g-stack">
+          <div className="g-card">
+            <h3>Naložení a Úhyb</h3>
+            <table className="g-tbl">
+              <thead>
+                <tr>
+                  <th>Úroveň</th>
+                  <th>Váha</th>
+                  <th className="num">Limit</th>
+                  <th className="num">Pohyb</th>
+                  <th className="num">Úhyb</th>
+                </tr>
+              </thead>
+              <tbody>
+                {enc.map((e) => (
+                  <tr key={e.key}>
+                    <td>{e.label}</td>
+                    <td className="dim">{e.mult}</td>
+                    <td className="num">{e.limit} lb</td>
+                    <td className="num">{e.move}</td>
+                    <td className="num dodge">{e.dodge}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="g-card">
+            <h3>
+              Zbroj <span className="tag">DR po částech těla</span>
+            </h3>
+            <table className="g-tbl armor">
+              <thead>
+                <tr>
+                  <th></th>
+                  {GURPS_ARMOR_LOCS.map((l) => (
+                    <th key={l.key} className="num">
+                      {l.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="dr">DR</td>
+                  {GURPS_ARMOR_LOCS.map((l) => (
+                    <td key={l.key} className="num dr-cell">
+                      {editing ? (
+                        <input
+                          value={g(`dr_${l.key}`)}
+                          placeholder="0"
+                          onChange={(e) => cda.set(`dr_${l.key}`, e.target.value)}
+                          aria-label={`DR ${l.label}`}
+                        />
+                      ) : (
+                        g(`dr_${l.key}`, '0')
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+            <div className="g-kv" style={{ marginTop: 8 }}>
+              <Row label="Štít — bonus obrany (DB)">
+                <Edit cda={cda} k="shield_db" label="Štít (DB)" editing={editing} className="ov" />
+              </Row>
+            </div>
+          </div>
+
+          <div className="g-card">
+            <h3>Zbraně na blízko</h3>
+            <RowsTable
+              cda={cda}
+              editing={editing}
+              arrKey="melee"
+              cols={[
+                { key: 'name', label: 'Zbraň' },
+                { key: 'dmg', label: 'Škody' },
+                { key: 'reach', label: 'Dosah', num: true },
+                { key: 'parry', label: 'Kryt', num: true },
+              ]}
+              addLabel="+ Přidat zbraň"
+              template={{ name: '', dmg: '', reach: '', parry: '' }}
             />
           </div>
-          <div className="points-row">
-            <label htmlFor="gurps_points_unspent">Neutracené (Unspent)</label>
-            <input
-              id="gurps_points_unspent"
-              value={g('points_unspent')}
-              disabled={disabled}
-              onChange={(e) => set('points_unspent', e.target.value)}
-              placeholder="0"
-              style={{ color: '#38bdf8' }}
+
+          <div className="g-card">
+            <h3>Střelné / vrhací zbraně</h3>
+            <RowsTable
+              cda={cda}
+              editing={editing}
+              arrKey="ranged"
+              cols={[
+                { key: 'name', label: 'Zbraň' },
+                { key: 'dmg', label: 'Škody' },
+                { key: 'acc', label: 'Přs', num: true },
+                { key: 'range', label: 'Dostřel', num: true },
+                { key: 'shots', label: 'Náboje', num: true },
+              ]}
+              addLabel="+ Přidat střelnou zbraň"
+              template={{ name: '', dmg: '', acc: '', range: '', shots: '' }}
+            />
+          </div>
+        </div>
+
+        {/* RIGHT — dovednosti */}
+        <div className="g-col-skills">
+          <div className="g-card">
+            <h3>
+              Dovednosti <span className="hint">body · úroveň</span>
+            </h3>
+            <RowsTable
+              cda={cda}
+              editing={editing}
+              arrKey="skills"
+              cols={[
+                { key: 'name', label: 'Dovednost' },
+                { key: 'base', label: 'Zákl.' },
+                { key: 'pts', label: 'Body', num: true },
+                { key: 'lvl', label: 'Úroveň', num: true, accent: true },
+              ]}
+              addLabel="+ Přidat dovednost"
+              template={{ name: '', base: '', pts: '', lvl: '' }}
             />
           </div>
         </div>
       </div>
 
-      {/* ═══ MAIN GRID ═══ */}
-      <div className="gurps-grid">
-        {/* Core attributes (left, panel-4) */}
-        <div className="panel-4">
-          <h3>Hlavní atributy</h3>
-          <div className="core-attrs">
-            {GURPS_CORE_ATTRS.map((a) => (
-              <div className="attr-box" key={a.key}>
-                <label htmlFor={`gurps_${a.key}`}>{a.label}</label>
-                <input
-                  id={`gurps_${a.key}`}
-                  type="text"
-                  value={g(a.key, '10')}
-                  disabled={disabled}
-                  onChange={(e) => set(a.key, e.target.value)}
-                  aria-label={a.label}
-                />
-              </div>
-            ))}
-          </div>
-
-          <h3 style={{ marginTop: 20 }}>HP / FP</h3>
-          <div className="sec-attrs">
-            <VitalBox
-              variant="vital"
-              label="HP (Životy)"
-              curKey="hp"
-              maxKey="hp_max"
-              cda={cda}
-              disabled={disabled}
-            />
-            <VitalBox
-              variant="fatigue"
-              label="FP (Únava)"
-              curKey="fp"
-              maxKey="fp_max"
-              cda={cda}
-              disabled={disabled}
-            />
-          </div>
-
-          <h3 style={{ marginTop: 20 }}>Obrana &amp; TL</h3>
-          <div className="sm-grid">
-            {GURPS_DEFENSES.map((d) => (
-              <div className="lbl-input" key={d.key}>
-                <label htmlFor={`gurps_${d.key}`}>{d.label}</label>
-                <input
-                  id={`gurps_${d.key}`}
-                  value={g(d.key, d.fallback)}
-                  disabled={disabled}
-                  onChange={(e) => set(d.key, e.target.value)}
-                />
-              </div>
-            ))}
-          </div>
-
-          <h3 style={{ marginTop: 20 }}>Derived</h3>
-          <div className="sm-grid">
-            <div className="lbl-input">
-              <label htmlFor="gurps_basic_speed">Rychlost</label>
-              <input
-                id="gurps_basic_speed"
-                value={g('basic_speed', '5.0')}
-                disabled={disabled}
-                onChange={(e) => set('basic_speed', e.target.value)}
-              />
-            </div>
-            <div className="lbl-input">
-              <label htmlFor="gurps_basic_move">Pohyb</label>
-              <input
-                id="gurps_basic_move"
-                value={g('basic_move', '5')}
-                disabled={disabled}
-                onChange={(e) => set('basic_move', e.target.value)}
-              />
-            </div>
-            {GURPS_DERIVED.map((d) => (
-              <div className="lbl-input" key={d.key}>
-                <label htmlFor={`gurps_${d.key}`}>{d.label}</label>
-                <input
-                  id={`gurps_${d.key}`}
-                  value={g(d.key, d.fallback)}
-                  disabled={disabled}
-                  onChange={(e) => set(d.key, e.target.value)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Encumbrance + tabulky (right, panel-8) */}
-        <div className="panel-8">
-          <h3>Zatížení a Úhyb</h3>
-          <div className="encumb-table">
-            <div className="e-row e-head">
-              <div className="e-cell e-fixed">Úroveň</div>
-              <div className="e-cell">Move</div>
-              <div className="e-cell">Dodge</div>
-            </div>
-            {GURPS_ENC_LEVELS.map((enc) => (
-              <div className="e-row" key={enc.label}>
-                <div className="e-cell e-fixed">{enc.label}</div>
-                <div className="e-cell">
-                  <input
-                    value={g(enc.m, '-')}
-                    disabled={disabled}
-                    onChange={(e) => set(enc.m, e.target.value)}
-                    aria-label={`${enc.label} Move`}
-                  />
-                </div>
-                <div className="e-cell">
-                  <input
-                    value={g(enc.d, '-')}
-                    disabled={disabled}
-                    onChange={(e) => set(enc.d, e.target.value)}
-                    style={{ color: '#00e5ff', fontWeight: 'bold' }}
-                    aria-label={`${enc.label} Dodge`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <h3 style={{ marginTop: 24 }}>Dovednosti (Skills)</h3>
-          <GurpsTable
+      {/* ═══ TRAITS ═══ */}
+      <div className="g-card g-full">
+        <h3>Výhody · Nevýhody · Zvláštnosti</h3>
+        <div className="g-traits">
+          <TraitCol
             cda={cda}
-            disabled={disabled}
-            arrKey="skills"
-            cols={[
-              ['name', 'Dovednost'],
-              ['lvl', 'Úroveň'],
-              ['base', 'Základ'],
-            ]}
-            addLabel="+ Přidat dovednost"
-            template={{ name: '', lvl: '', base: '' } as Record<string, string>}
-          />
-        </div>
-
-        {/* Advantages & Disadvantages (panel-6) */}
-        <div className="panel-6">
-          <h3>Výhody</h3>
-          <GurpsTable
-            cda={cda}
-            disabled={disabled}
+            editing={editing}
             arrKey="advs"
-            cols={[
-              ['name', 'Výhoda'],
-              ['note', 'Poznámka / Body'],
-            ]}
+            title="Výhody"
+            tone="accent"
+            sum={summary.advantages}
             addLabel="+ Přidat výhodu"
-            template={{ name: '', note: '' } as Record<string, string>}
           />
-        </div>
-        <div className="panel-6">
-          <h3>Nevýhody</h3>
-          <GurpsTable
+          <TraitCol
             cda={cda}
-            disabled={disabled}
+            editing={editing}
             arrKey="disadvs"
-            cols={[
-              ['name', 'Nevýhoda'],
-              ['note', 'Poznámka / Body'],
-            ]}
+            title="Nevýhody"
+            tone="hp"
+            sum={summary.disadvantages}
             addLabel="+ Přidat nevýhodu"
-            template={{ name: '', note: '' } as Record<string, string>}
+            defaultPts="-5"
           />
+          <TraitCol
+            cda={cda}
+            editing={editing}
+            arrKey="quirks"
+            title="Zvláštnosti"
+            tone="fp"
+            sum={summary.quirks}
+            addLabel="+ Přidat zvláštnost"
+            defaultPts="-1"
+          />
+        </div>
+      </div>
+
+      {/* ═══ BOTTOM ═══ */}
+      <div className="g-bottom">
+        <div className="g-card">
+          <h3>Poznámky k postavě</h3>
+          {editing ? (
+            <textarea
+              className="g-textarea"
+              value={g('notes')}
+              onChange={(e) => cda.set('notes', e.target.value)}
+              placeholder="Poznámky, historie, motivace…"
+              aria-label="Poznámky"
+            />
+          ) : (
+            <div className="g-notes-ro">{g('notes') || '—'}</div>
+          )}
         </div>
 
-        {/* Reaction mods + languages (panel-6 + panel-6) */}
-        <div className="panel-6">
-          <h3>Reakční modifikátory</h3>
-          <GurpsTable
-            cda={cda}
-            disabled={disabled}
-            arrKey="react_mods"
-            cols={[
-              ['name', 'Situace / Skupina'],
-              ['val', 'Modifikátor'],
-            ]}
-            addLabel="+ Přidat modifikátor"
-            template={{ name: '', val: '' } as Record<string, string>}
-          />
-        </div>
-        <div className="panel-6">
-          <h3>Jazyky</h3>
-          <GurpsTable
-            cda={cda}
-            disabled={disabled}
-            arrKey="langs"
-            cols={[
-              ['name', 'Jazyk'],
-              ['spk', 'Mluvený'],
-              ['wrt', 'Psaný'],
-            ]}
-            addLabel="+ Přidat jazyk"
-            template={
-              { name: '', spk: '', wrt: '' } as Record<string, string>
-            }
-          />
-        </div>
-
-        {/* Melee + Ranged (panel-6 + panel-6) */}
-        <div className="panel-6">
-          <h3>Zbraně na blízko</h3>
-          <GurpsTable
-            cda={cda}
-            disabled={disabled}
-            arrKey="melee"
-            cols={[
-              ['name', 'Zbraň'],
-              ['dmg', 'DMG'],
-              ['reach', 'Dosah'],
-              ['parry', 'Parry'],
-            ]}
-            addLabel="+ Přidat zbraň"
-            template={
-              { name: '', dmg: '', reach: '', parry: '' } as Record<
-                string,
-                string
-              >
-            }
-          />
-        </div>
-        <div className="panel-6">
-          <h3>Střelné zbraně</h3>
-          <GurpsTable
-            cda={cda}
-            disabled={disabled}
-            arrKey="ranged"
-            cols={[
-              ['name', 'Zbraň'],
-              ['dmg', 'DMG'],
-              ['acc', 'Acc'],
-              ['rng', 'Rng'],
-              ['rof', 'RoF'],
-              ['shots', 'Shots'],
-            ]}
-            addLabel="+ Přidat zbraň"
-            template={
-              {
-                name: '',
-                dmg: '',
-                acc: '',
-                rng: '',
-                rof: '',
-                shots: '',
-              } as Record<string, string>
-            }
-          />
-        </div>
-
-        {/* Armor + inventory totals (panel-12) */}
-        <div className="panel-12">
-          <h3>Zbroj a majetek</h3>
-          <GurpsTable
-            cda={cda}
-            disabled={disabled}
-            arrKey="armor"
-            cols={[
-              ['name', 'Předmět'],
-              ['loc', 'Lokace'],
-              ['wgt', 'Váha (lb)'],
-              ['cost', 'Cena ($)'],
-            ]}
-            addLabel="+ Přidat předmět"
-            template={
-              { name: '', loc: '', wgt: '', cost: '' } as Record<
-                string,
-                string
-              >
-            }
-          />
-          <div
-            style={{
-              marginTop: 8,
-              fontSize: 13,
-              color: 'rgba(255,255,255,0.6)',
-              display: 'flex',
-              gap: 16,
-              justifyContent: 'flex-end',
-            }}
-          >
-            <div>
-              Celková váha:{' '}
-              <input
-                value={g('inv_wgt')}
-                disabled={disabled}
-                onChange={(e) => set('inv_wgt', e.target.value)}
-                style={{
-                  background: 'rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#fff',
-                  padding: '4px 8px',
-                  borderRadius: 4,
-                  width: 80,
-                }}
-                aria-label="Celková váha inventáře"
-              />
-            </div>
-            <div>
-              Celková cena:{' '}
-              <input
-                value={g('inv_cost')}
-                disabled={disabled}
-                onChange={(e) => set('inv_cost', e.target.value)}
-                style={{
-                  background: 'rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#fbbf24',
-                  padding: '4px 8px',
-                  borderRadius: 4,
-                  width: 80,
-                }}
-                aria-label="Celková cena inventáře"
-              />
-              $
-            </div>
+        <div className="g-card g-summary">
+          <h3>Shrnutí bodů</h3>
+          <div className="row">
+            <span>Atributy + sekundární</span>
+            <span className="v">{summary.attributes}</span>
+          </div>
+          <div className="row">
+            <span>Výhody</span>
+            <span className="v">{summary.advantages}</span>
+          </div>
+          <div className="row">
+            <span>Nevýhody</span>
+            <span className="v neg">{summary.disadvantages}</span>
+          </div>
+          <div className="row">
+            <span>Zvláštnosti</span>
+            <span className="v neg">{summary.quirks}</span>
+          </div>
+          <div className="row">
+            <span>Dovednosti</span>
+            <span className="v">{summary.skills}</span>
+          </div>
+          <div className="row tot">
+            <span>Celkem</span>
+            <span className="v">{summary.total}</span>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
 
-        {/* Notes (panel-12) */}
-        <div className="panel-12">
-          <h3>Poznámky k postavě</h3>
-          <textarea
-            className="gurps-textarea"
-            value={g('notes')}
-            disabled={disabled}
-            onChange={(e) => set('notes', e.target.value)}
-            placeholder="Poznámky, historie, motivace..."
-            aria-label="Poznámky"
+// ── Helpery ───────────────────────────────────────────────────────
+
+/** Textové editovatelné pole (input v editu, text ve view). */
+function Field({
+  cda,
+  k,
+  label,
+  editing,
+  wide,
+  center,
+}: {
+  cda: CdAccess;
+  k: string;
+  label: string;
+  editing: boolean;
+  wide?: boolean;
+  center?: boolean;
+}) {
+  const v = cda.g(k);
+  return (
+    <div className={`g-field${wide ? ' wide' : ''}`}>
+      <label htmlFor={`gurps_${k}`}>{label}</label>
+      {editing ? (
+        <input
+          id={`gurps_${k}`}
+          className={center ? 'center' : ''}
+          value={v}
+          onChange={(e) => cda.set(k, e.target.value)}
+          aria-label={label}
+        />
+      ) : (
+        <div className={`v${center ? ' center' : ''}`}>{v || '—'}</div>
+      )}
+    </div>
+  );
+}
+
+/** Bezlabelové editovatelné pole (input v editu, text ve view). */
+function Edit({
+  cda,
+  k,
+  label,
+  editing,
+  placeholder = '—',
+  className = '',
+}: {
+  cda: CdAccess;
+  k: string;
+  label: string;
+  editing: boolean;
+  placeholder?: string;
+  className?: string;
+}) {
+  const v = cda.g(k);
+  return editing ? (
+    <input
+      className={className}
+      value={v}
+      placeholder={placeholder}
+      onChange={(e) => cda.set(k, e.target.value)}
+      aria-label={label}
+    />
+  ) : (
+    <span className="v">{v || placeholder}</span>
+  );
+}
+
+/** Odvozená hodnota s override (prázdný input = auto = `computed`). */
+function Override({
+  cda,
+  k,
+  computed,
+  editing,
+  boxLabel,
+  box,
+}: {
+  cda: CdAccess;
+  k: string;
+  computed: string | number;
+  editing: boolean;
+  boxLabel: string;
+  box?: boolean;
+}) {
+  const stored = cda.g(k);
+  const inner = editing ? (
+    <input
+      className="ov"
+      value={stored}
+      placeholder={String(computed)}
+      onChange={(e) => cda.set(k, e.target.value)}
+      aria-label={boxLabel}
+    />
+  ) : (
+    <span className="v">{stored || String(computed)}</span>
+  );
+  if (!box) return inner;
+  return (
+    <div className="g-box">
+      <div className="k">{boxLabel}</div>
+      <div className="val">{inner}</div>
+    </div>
+  );
+}
+
+/** Životy / únava (aktuální / max), max default = computed. */
+function Vital({
+  cda,
+  curK,
+  maxK,
+  maxComputed,
+  editing,
+  label,
+  variant,
+}: {
+  cda: CdAccess;
+  curK: string;
+  maxK: string;
+  maxComputed: number;
+  editing: boolean;
+  label: string;
+  variant: 'hp' | 'fp';
+}) {
+  const maxStored = cda.g(maxK);
+  const maxShown = maxStored || String(maxComputed);
+  const curStored = cda.g(curK);
+  const curShown = curStored || maxShown;
+  return (
+    <div className={`g-box ${variant}`}>
+      <div className="k">{label}</div>
+      {editing ? (
+        <div className="vital-in">
+          <input
+            value={curStored}
+            placeholder={maxShown}
+            onChange={(e) => cda.set(curK, e.target.value)}
+            aria-label={`${label} aktuální`}
+          />
+          <span>/</span>
+          <input
+            value={maxStored}
+            placeholder={String(maxComputed)}
+            onChange={(e) => cda.set(maxK, e.target.value)}
+            aria-label={`${label} max`}
           />
         </div>
-      </div>
+      ) : (
+        <div className="val">
+          {curShown} / {maxShown}
+        </div>
+      )}
     </div>
   );
 }
 
-// ── Vital box (HP / FP) ─────────────────────────────────────────
-
-interface VitalBoxProps {
-  variant: 'vital' | 'fatigue';
-  label: string;
-  curKey: string;
-  maxKey: string;
-  cda: CdAccess;
-  disabled: boolean;
-}
-
-function VitalBox({
-  variant,
+/** Řádek štítek → hodnota. */
+function Row({
   label,
-  curKey,
-  maxKey,
-  cda,
-  disabled,
-}: VitalBoxProps) {
-  const { g, set } = cda;
+  sub,
+  children,
+}: {
+  label: string;
+  sub?: string;
+  children: ReactNode;
+}) {
   return (
-    <div className={`sec-box ${variant}`}>
-      <label htmlFor={`gurps_${curKey}`}>{label}</label>
-      <div className="h-row">
-        <input
-          id={`gurps_${curKey}`}
-          value={g(curKey, '10')}
-          disabled={disabled}
-          onChange={(e) => set(curKey, e.target.value)}
-          aria-label={`${label} aktuální`}
-        />
-        <span>/</span>
-        <input
-          value={g(maxKey, '10')}
-          disabled={disabled}
-          onChange={(e) => set(maxKey, e.target.value)}
-          aria-label={`${label} max`}
-        />
-      </div>
+    <div className="row">
+      <span className="k">
+        {label}
+        {sub && <small> {sub}</small>}
+      </span>
+      {children}
     </div>
   );
 }
 
-// ── Generic table helper ────────────────────────────────────────
-
-interface GurpsTableProps {
-  cda: CdAccess;
-  disabled: boolean;
-  arrKey: string;
-  cols: [string, string][];
-  addLabel: string;
-  template: Record<string, string>;
+interface Col {
+  key: string;
+  label: string;
+  num?: boolean;
+  accent?: boolean;
 }
 
-function GurpsTable({
+/** Editovatelná tabulka řádků (input v editu, text ve view). */
+function RowsTable({
   cda,
-  disabled,
+  editing,
   arrKey,
   cols,
   addLabel,
   template,
-}: GurpsTableProps) {
-  const { parseJsonArr, updateArr, addArr, removeArr } = cda;
-  const rows = parseJsonArr<Record<string, string>>(arrKey);
-
+}: {
+  cda: CdAccess;
+  editing: boolean;
+  arrKey: string;
+  cols: Col[];
+  addLabel: string;
+  template: Record<string, string>;
+}) {
+  const rows = cda.parseJsonArr<Record<string, string>>(arrKey);
   return (
-    <div className="gurps-table-container">
-      <table>
+    <div className="g-table">
+      <table className="g-tbl">
         <thead>
           <tr>
-            {cols.map(([k, label]) => (
-              <th key={k}>{label}</th>
+            {cols.map((c) => (
+              <th key={c.key} className={c.num ? 'num' : ''}>
+                {c.label}
+              </th>
             ))}
-            <th></th>
+            {editing && <th className="del-col" />}
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 && !editing && (
+            <tr>
+              <td colSpan={cols.length} className="empty">
+                —
+              </td>
+            </tr>
+          )}
           {rows.map((row, i) => (
             <tr key={i}>
-              {cols.map(([k, label]) => (
-                <td key={k}>
-                  <input
-                    value={row[k] || ''}
-                    disabled={disabled}
-                    onChange={(e) =>
-                      updateArr<Record<string, string>>(arrKey, i, {
-                        [k]: e.target.value,
-                      })
-                    }
-                    aria-label={`${label} ${i + 1}`}
-                  />
+              {cols.map((c) => (
+                <td
+                  key={c.key}
+                  className={`${c.num ? 'num' : ''}${c.accent ? ' accent' : ''}`}
+                >
+                  {editing ? (
+                    <input
+                      value={row[c.key] || ''}
+                      onChange={(e) =>
+                        cda.updateArr<Record<string, string>>(arrKey, i, {
+                          [c.key]: e.target.value,
+                        })
+                      }
+                      aria-label={`${c.label} ${i + 1}`}
+                    />
+                  ) : (
+                    row[c.key] || '—'
+                  )}
                 </td>
               ))}
-              <td>
-                {!disabled && (
+              {editing && (
+                <td className="del-col">
                   <button
                     type="button"
-                    className="del-btn"
-                    onClick={() => removeArr(arrKey, i)}
+                    className="del"
+                    onClick={() => cda.removeArr(arrKey, i)}
                     aria-label="Smazat řádek"
                   >
                     ✕
                   </button>
-                )}
-              </td>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
-      {!disabled && (
+      {editing && (
         <button
           type="button"
-          className="add-row-btn"
-          onClick={() => addArr(arrKey, template)}
+          className="add"
+          onClick={() => cda.addArr(arrKey, template)}
+        >
+          {addLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Sloupec traitů (výhody/nevýhody/zvláštnosti) s bodovým součtem. */
+function TraitCol({
+  cda,
+  editing,
+  arrKey,
+  title,
+  tone,
+  sum,
+  addLabel,
+  defaultPts = '',
+}: {
+  cda: CdAccess;
+  editing: boolean;
+  arrKey: string;
+  title: string;
+  tone: 'accent' | 'hp' | 'fp';
+  sum: number;
+  addLabel: string;
+  defaultPts?: string;
+}) {
+  const rows = cda.parseJsonArr<GurpsTrait>(arrKey);
+  return (
+    <div className={`g-trait-col tone-${tone}`}>
+      <h4>
+        {title} <span className="badge">{signed(sum)}</span>
+      </h4>
+      <ul>
+        {rows.length === 0 && !editing && <li className="empty">—</li>}
+        {rows.map((row, i) => (
+          <li key={i}>
+            {editing ? (
+              <>
+                <input
+                  className="t-name"
+                  value={row.name || ''}
+                  onChange={(e) =>
+                    cda.updateArr<GurpsTrait>(arrKey, i, { name: e.target.value })
+                  }
+                  aria-label={`${title} ${i + 1}`}
+                />
+                <input
+                  className="t-pts"
+                  value={row.pts || ''}
+                  onChange={(e) =>
+                    cda.updateArr<GurpsTrait>(arrKey, i, { pts: e.target.value })
+                  }
+                  aria-label={`${title} body ${i + 1}`}
+                />
+                <button
+                  type="button"
+                  className="del"
+                  onClick={() => cda.removeArr(arrKey, i)}
+                  aria-label="Smazat řádek"
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              <>
+                <span>{row.name || '—'}</span>
+                <span className="p">{row.pts || ''}</span>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+      {editing && (
+        <button
+          type="button"
+          className="add"
+          onClick={() => cda.addArr(arrKey, { name: '', pts: defaultPts })}
         >
           {addLabel}
         </button>
@@ -568,8 +848,7 @@ function GurpsTable({
 // PRINT — statický čitelný dokument (čte stejná `gurps_*` data)
 // ════════════════════════════════════════════════════════════════
 
-/** Tiskové vykreslení JSON pole jako semantická tabulka se statickým textem. */
-function GurpsPrintTable({
+function PrintTable({
   cda,
   arrKey,
   cols,
@@ -604,6 +883,28 @@ function GurpsPrintTable({
 
 function GurpsPrintView({ cda }: { cda: CdAccess }) {
   const { g } = cda;
+  const st = int(g('st', '10'), 10);
+  const dx = int(g('dx', '10'), 10);
+  const ht = int(g('ht', '10'), 10);
+  const iq = int(g('iq', '10'), 10);
+  const willEff = g('will') ? int(g('will'), iq) : iq;
+  const perEff = g('per') ? int(g('per'), iq) : iq;
+  const hpMaxEff = g('hp_max') ? int(g('hp_max'), st) : st;
+  const fpMaxEff = g('fp_max') ? int(g('fp_max'), ht) : ht;
+  const speedEff = g('basic_speed') ? num(g('basic_speed'), basicSpeed(dx, ht)) : basicSpeed(dx, ht);
+  const moveEff = g('basic_move') ? int(g('basic_move'), basicMove(speedEff)) : basicMove(speedEff);
+  const dodgeEff = g('dodge') ? int(g('dodge'), dodge(speedEff)) : dodge(speedEff);
+  const attrCost = attributeCost({
+    st, dx, iq, ht, will: willEff, per: perEff,
+    hp: hpMaxEff, fp: fpMaxEff, speed: speedEff, move: moveEff,
+  });
+  const summary = pointSummary({
+    attrCost,
+    advantages: cda.parseJsonArr<GurpsTrait>('advs'),
+    disadvantages: cda.parseJsonArr<GurpsTrait>('disadvs'),
+    quirks: cda.parseJsonArr<GurpsTrait>('quirks'),
+    skills: cda.parseJsonArr<GurpsSkill>('skills'),
+  });
   const notes = g('notes').trim();
 
   return (
@@ -624,186 +925,137 @@ function GurpsPrintView({ cda }: { cda: CdAccess }) {
           </div>
         ))}
         <div>
-          <dt>Celkem bodů</dt>
-          <dd>{g('points_total') || '—'}</dd>
-        </div>
-        <div>
-          <dt>Neutracené body</dt>
-          <dd>{g('points_unspent') || '—'}</dd>
+          <dt>Bodů celkem</dt>
+          <dd>{g('points_budget') || summary.total}</dd>
         </div>
       </dl>
 
-      <h2>Hlavní atributy</h2>
+      <h2>Atributy</h2>
       <dl className="print-cols">
         {GURPS_CORE_ATTRS.map((a) => (
           <div key={a.key}>
-            <dt>{a.label}</dt>
+            <dt>
+              {a.label} ({a.abbr})
+            </dt>
             <dd>{g(a.key, '10')}</dd>
           </div>
         ))}
-      </dl>
-
-      <h2>HP / FP</h2>
-      <dl className="print-cols">
         <div>
-          <dt>HP (Životy)</dt>
+          <dt>Vůle (Will)</dt>
+          <dd>{willEff}</dd>
+        </div>
+        <div>
+          <dt>Vnímání (Per)</dt>
+          <dd>{perEff}</dd>
+        </div>
+        <div>
+          <dt>HP</dt>
           <dd>
-            {g('hp', '10')} / {g('hp_max', '10')}
+            {g('hp') || hpMaxEff} / {hpMaxEff}
           </dd>
         </div>
         <div>
-          <dt>FP (Únava)</dt>
+          <dt>FP</dt>
           <dd>
-            {g('fp', '10')} / {g('fp_max', '10')}
+            {g('fp') || fpMaxEff} / {fpMaxEff}
           </dd>
+        </div>
+        <div>
+          <dt>Úder / Mách</dt>
+          <dd>
+            {g('dmg_thr') || thrust(st)} / {g('dmg_sw') || swing(st)}
+          </dd>
+        </div>
+        <div>
+          <dt>Rychlost / Pohyb / Úhyb</dt>
+          <dd>
+            {fmt(speedEff)} / {moveEff} / {dodgeEff}
+          </dd>
+        </div>
+        <div>
+          <dt>Nosnost (BL)</dt>
+          <dd>{fmt(basicLift(st))} lb</dd>
         </div>
       </dl>
 
-      <h2>Obrana &amp; TL</h2>
+      <h2>Zbroj (DR)</h2>
       <dl className="print-cols">
-        {GURPS_DEFENSES.map((d) => (
-          <div key={d.key}>
-            <dt>{d.label}</dt>
-            <dd>{g(d.key, d.fallback ?? '—')}</dd>
+        {GURPS_ARMOR_LOCS.map((l) => (
+          <div key={l.key}>
+            <dt>{l.label}</dt>
+            <dd>{g(`dr_${l.key}`, '0')}</dd>
           </div>
         ))}
       </dl>
 
-      <h2>Derived</h2>
-      <dl className="print-cols">
-        <div>
-          <dt>Rychlost</dt>
-          <dd>{g('basic_speed', '5.0')}</dd>
-        </div>
-        <div>
-          <dt>Pohyb</dt>
-          <dd>{g('basic_move', '5')}</dd>
-        </div>
-        {GURPS_DERIVED.map((d) => (
-          <div key={d.key}>
-            <dt>{d.label}</dt>
-            <dd>{g(d.key, d.fallback ?? '—')}</dd>
-          </div>
-        ))}
-      </dl>
-
-      <h2>Zatížení a Úhyb</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Úroveň</th>
-            <th>Move</th>
-            <th>Dodge</th>
-          </tr>
-        </thead>
-        <tbody>
-          {GURPS_ENC_LEVELS.map((enc) => (
-            <tr key={enc.label}>
-              <td>{enc.label}</td>
-              <td>{g(enc.m, '—')}</td>
-              <td>{g(enc.d, '—')}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <h2>Dovednosti (Skills)</h2>
-      <GurpsPrintTable
+      <h2>Dovednosti</h2>
+      <PrintTable
         cda={cda}
         arrKey="skills"
         cols={[
           ['name', 'Dovednost'],
+          ['base', 'Zákl.'],
+          ['pts', 'Body'],
           ['lvl', 'Úroveň'],
-          ['base', 'Základ'],
         ]}
       />
 
       <h2>Výhody</h2>
-      <GurpsPrintTable
-        cda={cda}
-        arrKey="advs"
-        cols={[
-          ['name', 'Výhoda'],
-          ['note', 'Poznámka / Body'],
-        ]}
-      />
-
+      <PrintTable cda={cda} arrKey="advs" cols={[['name', 'Výhoda'], ['pts', 'Body']]} />
       <h2>Nevýhody</h2>
-      <GurpsPrintTable
-        cda={cda}
-        arrKey="disadvs"
-        cols={[
-          ['name', 'Nevýhoda'],
-          ['note', 'Poznámka / Body'],
-        ]}
-      />
-
-      <h2>Reakční modifikátory</h2>
-      <GurpsPrintTable
-        cda={cda}
-        arrKey="react_mods"
-        cols={[
-          ['name', 'Situace / Skupina'],
-          ['val', 'Modifikátor'],
-        ]}
-      />
-
-      <h2>Jazyky</h2>
-      <GurpsPrintTable
-        cda={cda}
-        arrKey="langs"
-        cols={[
-          ['name', 'Jazyk'],
-          ['spk', 'Mluvený'],
-          ['wrt', 'Psaný'],
-        ]}
-      />
+      <PrintTable cda={cda} arrKey="disadvs" cols={[['name', 'Nevýhoda'], ['pts', 'Body']]} />
+      <h2>Zvláštnosti</h2>
+      <PrintTable cda={cda} arrKey="quirks" cols={[['name', 'Zvláštnost'], ['pts', 'Body']]} />
 
       <h2>Zbraně na blízko</h2>
-      <GurpsPrintTable
+      <PrintTable
         cda={cda}
         arrKey="melee"
         cols={[
           ['name', 'Zbraň'],
-          ['dmg', 'DMG'],
+          ['dmg', 'Škody'],
           ['reach', 'Dosah'],
-          ['parry', 'Parry'],
+          ['parry', 'Kryt'],
         ]}
       />
-
-      <h2>Střelné zbraně</h2>
-      <GurpsPrintTable
+      <h2>Střelné / vrhací zbraně</h2>
+      <PrintTable
         cda={cda}
         arrKey="ranged"
         cols={[
           ['name', 'Zbraň'],
-          ['dmg', 'DMG'],
-          ['acc', 'Acc'],
-          ['rng', 'Rng'],
-          ['rof', 'RoF'],
-          ['shots', 'Shots'],
+          ['dmg', 'Škody'],
+          ['acc', 'Přs'],
+          ['range', 'Dostřel'],
+          ['shots', 'Náboje'],
         ]}
       />
 
-      <h2>Zbroj a majetek</h2>
-      <GurpsPrintTable
-        cda={cda}
-        arrKey="armor"
-        cols={[
-          ['name', 'Předmět'],
-          ['loc', 'Lokace'],
-          ['wgt', 'Váha (lb)'],
-          ['cost', 'Cena ($)'],
-        ]}
-      />
+      <h2>Shrnutí bodů</h2>
       <dl className="print-cols">
         <div>
-          <dt>Celková váha</dt>
-          <dd>{g('inv_wgt') || '—'}</dd>
+          <dt>Atributy + sekundární</dt>
+          <dd>{summary.attributes}</dd>
         </div>
         <div>
-          <dt>Celková cena</dt>
-          <dd>{g('inv_cost') || '—'}</dd>
+          <dt>Výhody</dt>
+          <dd>{summary.advantages}</dd>
+        </div>
+        <div>
+          <dt>Nevýhody</dt>
+          <dd>{summary.disadvantages}</dd>
+        </div>
+        <div>
+          <dt>Zvláštnosti</dt>
+          <dd>{summary.quirks}</dd>
+        </div>
+        <div>
+          <dt>Dovednosti</dt>
+          <dd>{summary.skills}</dd>
+        </div>
+        <div>
+          <dt>Celkem</dt>
+          <dd>{summary.total}</dd>
         </div>
       </dl>
 
@@ -817,14 +1069,4 @@ function GurpsPrintView({ cda }: { cda: CdAccess }) {
   );
 }
 
-// Re-export typů, aby caller mohl typovat customData (TS not used aktivně,
-// ale součást veřejného API constants.ts.)
-export type {
-  GurpsArmor,
-  GurpsLanguage,
-  GurpsMelee,
-  GurpsRanged,
-  GurpsReactionMod,
-  GurpsSkill,
-  GurpsTrait,
-};
+export type { GurpsMelee, GurpsRanged, GurpsSkill, GurpsTrait };
