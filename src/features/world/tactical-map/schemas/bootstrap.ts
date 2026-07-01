@@ -11,6 +11,7 @@
 import { systemEntitySchemaRegistry } from './registry';
 import { drd2Schemas } from './drd2';
 import { drd16Schemas } from './drd16';
+import { drdhSchemas } from './drdh';
 import { drdplusSchemas } from './drdplus';
 import { genericSchemas } from './generic';
 import { matrixSchemas } from './matrix';
@@ -42,6 +43,9 @@ export function bootstrapSchemas(): void {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of drd16Schemas) {
+    systemEntitySchemaRegistry.register(schema);
+  }
+  for (const schema of drdhSchemas) {
     systemEntitySchemaRegistry.register(schema);
   }
   for (const schema of drdplusSchemas) {
