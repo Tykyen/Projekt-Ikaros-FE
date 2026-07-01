@@ -1,0 +1,338 @@
+/* GURPS 4E — skin „STEAMPUNK" = Mosazný mechanický deník (16.2c-skiny).
+ *
+ * Rodina 8 skinů, TENTÝŽ svět napříč systémy: sourozenec
+ * `drdh-skins/steampunk.css` + `drdplus-skins/steampunk.css` + `drd16-skins/…`,
+ * přeložený do GURPS „cold-steel" listu. Galerie (schválený vzhled):
+ * `c:/tmp/gurps-skins-gallery.html` sekce steampunk — na rozdíl od pergamenových
+ * systémů je GURPS list TMAVÝ, takže steampunk = TMAVÁ broušená mosaz (bronz
+ * korpus `--surface:#1d150c`, akcent mosaz `--accent:#c98b3a`), NE světlý plát.
+ *
+ * SIGNATURE (rodinný TVAR, drží FUNKCI GURPS tříd):
+ *  - `.g-card` → broušená bronzová deska: rohové nýty (radial-gradient v 4 rozích)
+ *    + horní punch-card perforace nadpisu (rytá kolejnice).
+ *  - `.g-brand .gg` (BRAND) → mosazný manometr ozubeného kola (cog-gauge):
+ *    ozubený conic prstenec za měděně gradovaným nápisem GURPS.
+ *  - `.g-attr` / `.g-adef .d` → zkosené (notched) bronzové plotny s mosaznou hranou.
+ *  Životy = výbojová červeň (kotel / tlak), FP = patina (verdigris), akcent = mosaz.
+ *  Fonty: IM Fell English SC (titulky/tělo) · Cinzel (kapitálky nadpisů) ·
+ *  IBM Plex Mono (čísla = přístrojový display).
+ *
+ * SCOPE (past §9.13): každé pravidlo nese compound prefix
+ *  `[data-diary-system='gurps'][data-diary-skin='steampunk']`.
+ *   - List override + ornament: … `.gurps-dashboard` / `.g-card` / `.g-brand .gg` …
+ *   - Panel + embed tokeny (`--dd-embed-*`): BEZ `.gurps-dashboard` (panely/embed
+ *     chrome je dědí z předka — hashované module třídy).
+ *  Pouze CSS/SVG, žádný JS. Regrese-safe (jen přidává overrides).
+ *
+ * IMPORT: registruje orchestrátor přes `@import './gurps-skins/steampunk.css';`
+ * v `diary-skins.css` (skin bundle; loaduje se na listu i embedech).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=IM+Fell+English+SC&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) PANEL + EMBED tokeny (`--dd-embed-*`) — bez `.gurps-dashboard`.
+   Combat/bestie panel + embed chrome (hashované module třídy) je čtou z předka.
+   Plocha VŽDY OPAQUE (log/obal NEprosvítá mapu, past §9). Mapování galerie →
+   produkce: accent=mosaz · surface=tmavý bronz · hp=výbojová červeň · fp=patina.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] {
+  /* ── lokální surovinová paleta (sdílená s rodinou steampunk) ── */
+  --st-brass-0: #e6b56a;
+  --st-brass-1: #c98b3a;
+  --st-brass-2: #a06e2c;
+  --st-brass-deep: #7c5020;
+  --st-brass-shadow: #5a3e1e;
+  --st-copper-hi: #d6a45a;
+  --st-bronze-0: #241a0f;
+  --st-bronze-1: #1d150c;
+  --st-bronze-2: #140e07;
+  --st-bronze-edge: #3c2a18;
+  --st-dial: #f0d6a0;
+  --st-dial-shadow: #c2a670;
+  --st-rivet: radial-gradient(circle at 38% 34%, #f0d6a0 0%, #c98b3a 40%, #7c5020 76%, #3e2c12 100%);
+
+  /* ── EMBED plochy (obal v TM / dice readout / dicelog / orchestrace / chat rail).
+     Bez tvaru (jen barva/font — dicelog + orchestrace + chat obal). ── */
+  --dd-embed-surface: linear-gradient(180deg, #2f2114, #241a0f 58%, #140e07);
+  --dd-embed-border: var(--st-brass-deep, #7c5020);
+  --dd-embed-line: color-mix(in srgb, var(--st-brass-1, #c98b3a) 26%, transparent);
+  --dd-embed-text: #ead8b0;
+  --dd-embed-muted: #b39a6a;
+  --dd-embed-title: var(--st-brass-0, #e6b56a);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--st-brass-1, #c98b3a) 16%, transparent);
+  --dd-embed-accent: var(--st-copper-hi, #d6a45a);
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'IM Fell English SC', 'Cinzel', serif;
+  --dd-embed-pos: #8fae5a; /* kladný hod / úspěch = patina zeleň (drží význam) */
+  --dd-embed-neg: #d76a42; /* záporný hod / neúspěch = výbojová červeň */
+  --dd-embed-neutral: var(--st-brass-0, #e6b56a); /* neutrál = mosaz */
+
+  /* HP/FP bar fill (combat + bestie panel čtou přes var()) — život=kotel, FP=patina */
+  --dd-hpfill-grad: linear-gradient(90deg, #7a2812, #d9633f);
+  --dd-fpfill-grad: linear-gradient(90deg, #4a6244, #8fae5a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) LIST `.gurps-dashboard` — `--gurps-*` override + font (compound 0,2,0
+   přebíjí default `[data-diary-system='gurps']` z gurps.css).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard {
+  /* akcent = mosaz / měď */
+  --gurps-accent: #c98b3a;
+  --gurps-accent-soft: rgba(201, 139, 58, 0.14);
+  /* životy = výbojová červeň (kotel / tlak) · FP = patina (verdigris) */
+  --gurps-hp: #d9633f;
+  --gurps-fp: #8fae5a;
+  --gurps-dodge: #c59a4a;
+  /* text = rytina na bronzu (teplý pergamenový ink) */
+  --gurps-ink: #efe0c6;
+  --gurps-ink-dim: #a98a5f;
+  /* linky = mosazné rysky */
+  --gurps-line: rgba(201, 139, 58, 0.3);
+  --gurps-line-strong: rgba(201, 139, 58, 0.55);
+  /* plochy = tmavý bronz korpus (broušená mosaz) */
+  --gurps-panel: rgba(36, 26, 15, 0.6);
+  --gurps-panel-2: rgba(20, 14, 7, 0.55);
+
+  /* viktoriánská serif tělo; kožený bronzový podklad pod deskami */
+  font-family: 'IM Fell English SC', 'EB Garamond', Georgia, serif;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 90% at 50% 0%, rgba(201, 139, 58, 0.1), transparent 60%),
+    linear-gradient(180deg, #2a1e10, #140e07);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow:
+    inset 0 0 90px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--st-bronze-edge, #3c2a18),
+    0 0 0 6px var(--st-brass-deep, #7c5020),
+    0 0 0 8px var(--st-brass-shadow, #5a3e1e);
+}
+
+/* ── čísla = přístrojový display (mono) ── */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-attr .num,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-adef .d .n,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-adef .d .n input,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-box .val,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-box .ov,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-kv .row .v,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-kv .row .ov,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-tbl td.num,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-tbl td.num input,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .chip .n,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-summary .row .v {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* nadpisy sekcí / hlaviček = kapitálky Cinzel */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-card > h3,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-trait-col h4,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-field label,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-tbl th {
+  font-family: 'Cinzel', serif;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE brand: `.g-brand .gg` = MANOMETR OZUBENÉHO KOLA (cog-gauge)
+   za měděně gradovaným nápisem GURPS.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-brand {
+  position: relative;
+  padding-left: 44px;
+  border-right-color: var(--st-brass-deep, #7c5020);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-brand .gg {
+  position: relative;
+  font-family: 'IM Fell English SC', 'Cinzel', serif;
+  font-weight: 400;
+  background: linear-gradient(180deg, #f0d6a0, #c98b3a 55%, #7c5020);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55));
+}
+/* ozubený prstenec cog-gauge za značkou */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-brand .gg::before {
+  content: '';
+  position: absolute;
+  left: -40px;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+  background:
+    repeating-conic-gradient(from 0deg, var(--st-brass-deep, #7c5020) 0 8deg, transparent 8deg 20deg),
+    radial-gradient(circle, transparent 0 56%, var(--st-brass-1, #c98b3a) 57% 72%, transparent 73%),
+    radial-gradient(circle at 42% 36%, var(--st-dial, #f0d6a0), var(--st-dial-shadow, #c2a670) 82%);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-brand .sub {
+  color: var(--st-brass-2, #a06e2c);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-brand .ed {
+  color: var(--st-copper-hi, #d6a45a);
+  letter-spacing: 2px;
+}
+
+/* ── identita: pole = tmavá okénka s mosaznou hranou, mono číselné vstupy ── */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-field .v {
+  background: rgba(20, 14, 7, 0.5);
+  border-color: var(--st-brass-shadow, #5a3e1e);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard input,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard textarea {
+  background: rgba(20, 14, 7, 0.42);
+  border-color: var(--st-brass-shadow, #5a3e1e);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard input:focus,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard textarea:focus {
+  border-color: var(--st-copper-hi, #d6a45a);
+  background: rgba(20, 14, 7, 0.6);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) SIGNATURE karty `.g-card` = broušená bronzová deska: rohové nýty +
+   punch-card perforace pod nadpisem.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-card {
+  position: relative;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, var(--st-bronze-0, #241a0f), var(--st-bronze-2, #140e07));
+  border-color: var(--st-brass-shadow, #5a3e1e);
+  border-radius: 5px;
+  box-shadow:
+    0 6px 18px -10px #000,
+    inset 0 1px 0 rgba(201, 139, 58, 0.16);
+}
+/* 4 rohové nýty (signature rodiny steampunk) */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-card::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    var(--st-rivet, radial-gradient(circle, #c98b3a 1.5px, transparent 2.5px)),
+    var(--st-rivet, radial-gradient(circle, #c98b3a 1.5px, transparent 2.5px)),
+    var(--st-rivet, radial-gradient(circle, #c98b3a 1.5px, transparent 2.5px)),
+    var(--st-rivet, radial-gradient(circle, #c98b3a 1.5px, transparent 2.5px));
+  background-repeat: no-repeat;
+  background-size: 7px 7px;
+  background-position: 1px 1px, calc(100% - 1px) 1px, 1px calc(100% - 1px), calc(100% - 1px) calc(100% - 1px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+}
+/* obsah nad nýty */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-card > * {
+  position: relative;
+  z-index: 1;
+}
+/* nadpis karty = rytá cedulka + punch-card perforace na podtržení */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-card > h3 {
+  color: var(--st-brass-0, #e6b56a);
+  border-bottom-color: var(--st-brass-deep, #7c5020);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-card .tag {
+  background: rgba(201, 139, 58, 0.16);
+  border-color: var(--st-brass-deep, #7c5020);
+  color: var(--st-brass-0, #e6b56a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) ATRIBUTY / OBRANA / BOXY = zkosené bronzové plotny s mosaznou hranou
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-attr {
+  background: linear-gradient(180deg, rgba(201, 139, 58, 0.16), rgba(20, 14, 7, 0.2));
+  border-color: var(--st-brass-shadow, #5a3e1e);
+  border-left-color: var(--st-brass-1, #c98b3a);
+  /* zkosené (notched) rohy — mosazná plotna */
+  clip-path: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 8px
+  );
+  border-radius: 0;
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-attr .num {
+  color: var(--st-brass-0, #e6b56a);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-box {
+  background: rgba(20, 14, 7, 0.4);
+  border-color: var(--st-brass-shadow, #5a3e1e);
+  border-radius: 3px;
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-adef .d {
+  background: rgba(20, 14, 7, 0.4);
+  border-color: var(--st-brass-shadow, #5a3e1e);
+  border-radius: 3px;
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-adef .d .n {
+  color: var(--st-brass-0, #e6b56a);
+}
+
+/* ── klíč/hodnota + shrnutí ── */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-kv .row {
+  border-bottom-color: var(--st-brass-shadow, #5a3e1e);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-summary .row {
+  border-bottom-color: var(--st-brass-shadow, #5a3e1e);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-summary .row.tot {
+  border-top-color: var(--st-brass-deep, #7c5020);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-summary .row.tot .v {
+  color: var(--st-copper-hi, #d6a45a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) TABULKY / TRAITY / POZNÁMKY = mosazné podtržení + ražená add-btn
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-tbl th,
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-tbl td {
+  border-bottom-color: var(--st-brass-shadow, #5a3e1e);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-tbl th {
+  color: var(--st-brass-2, #a06e2c);
+  border-bottom-color: var(--st-brass-deep, #7c5020);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-tbl td.accent {
+  color: var(--st-copper-hi, #d6a45a);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .add {
+  font-family: 'Cinzel', serif;
+  border-color: var(--st-brass-deep, #7c5020);
+  color: var(--st-brass-2, #a06e2c);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .add:hover {
+  background: rgba(201, 139, 58, 0.18);
+  color: var(--st-brass-0, #e6b56a);
+  border-color: var(--st-brass-1, #c98b3a);
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-trait-col li {
+  background: rgba(20, 14, 7, 0.4);
+  border-color: var(--st-brass-shadow, #5a3e1e);
+  border-radius: 3px;
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .g-trait-col.tone-accent h4 {
+  color: var(--st-brass-0, #e6b56a);
+}
+
+/* ── čipy hlavičky (věk / SM / body) ── */
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .chip {
+  background: rgba(20, 14, 7, 0.5);
+  border-color: var(--st-brass-shadow, #5a3e1e);
+  border-radius: 3px;
+}
+[data-diary-system='gurps'][data-diary-skin='steampunk'] .gurps-dashboard .chip.total .n {
+  color: var(--st-copper-hi, #d6a45a);
+}

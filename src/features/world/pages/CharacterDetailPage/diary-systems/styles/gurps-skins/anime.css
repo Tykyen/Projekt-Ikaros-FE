@@ -1,0 +1,451 @@
+/* ════════════════════════════════════════════════════════════════════════
+ * GURPS 4E — skin „MLP" (id `anime`): SVĚTLÝ DUHOVÝ CEL-SHADE.
+ *
+ * Sourozenec `drdh-skins/anime.css` + `drdplus-skins/anime.css` + `drd16-skins/
+ * anime.css` (TENTÝŽ svět) — přeložený do GURPS listu/panelů. GURPS deník je
+ * jinak TMAVÝ „cold-steel" list; anime jej OTÁČÍ na SVĚTLOU holografickou
+ * sběratelskou „key visual" kartu: bílé ink-outlined cel-plochy (obrys #16162e)
+ * na plné pastelové duze, TVRDÝ spodní cel-stín (karta „stojí" nad podkladem) +
+ * lesklý gloss. Disciplinované ink obrysy drží duhu pohromadě → veselé, ale
+ * profesionální (NE dětská čmáranice, NE tmavé pozadí).
+ *
+ * Vizuální kontrakt = galerie `c:/tmp/gurps-skins-gallery.html` sekce
+ * `[data-skin=anime]`: světlá pastelová DUHA podklad, tmavý ink #2a2350 na
+ * světlém, akcent magenta #c44bbf, tmavý obrys #16162e, dodge = sky #3d95c9.
+ * Fonty Bricolage Grotesque / Outfit.
+ *
+ * MLP signature (drží FUNKCI GURPS listu):
+ *   1) `.g-card` = bílá cel-„samolepková" karta: ink obrys + TVRDÝ spodní
+ *      cel-stín (0 6px 0 → odlepená od podkladu).
+ *   2) `.g-card > h3` = duhové podtržení (border-image linear rainbow) + ✦
+ *      sparkle marker (h3::after).
+ *   3) `.g-brand .gg` = duhový text-clip brand; conic-duhové medailony na
+ *      atributových číslech (`.g-attr .num`) a aktivní obraně (`.g-adef .d`).
+ *
+ * Scope: compound `[data-diary-system='gurps'][data-diary-skin='anime']`
+ * (specifita 0,2,0 → přebije cold-steel default `[data-diary-system='gurps']`).
+ * List (.gurps-dashboard) přebíjí `--gurps-*`; tokenizované panely (combat/
+ * bestie) + embedy dědí `--dd-embed-*` z `[ds][dsk]`. Pouze CSS/SVG, žádný JS.
+ * Regrese-safe (jen overrides). Motiv se NESDÍLÍ s žádným jiným skinem.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) LIST (.gurps-dashboard) — `--gurps-*` token override + DUHOVÁ PLOCHA.
+   Cold-steel tmavý list → SVĚTLÁ pastelová duha, tmavý ink, magenta akcent.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard {
+  /* ── akcent = magenta; dodge = sky; HP korál / FP baby-blue ── */
+  --gurps-accent: #c44bbf;
+  --gurps-accent-soft: rgba(196, 75, 191, 0.12);
+  --gurps-hp: #e63a4a; /* životy = teplá červená (sémantika drží i ve světlé paletě) */
+  --gurps-fp: #3d95c9; /* únava = sytější sky (čitelná na světlém) */
+  --gurps-dodge: #3d95c9;
+
+  /* ── inkoust → tmavá indigová tříska na světlém (galerie --ink #2a2350) ── */
+  --gurps-ink: #2a2350;
+  --gurps-ink-dim: #8f7fb5;
+
+  /* ── linky/rámy → ink obrys #16162e (signature) ── */
+  --gurps-line: rgba(22, 22, 46, 0.16);
+  --gurps-line-strong: rgba(22, 22, 46, 0.42);
+
+  /* ── plochy → bílé cel-karty (base panel jen fallback pod ornament) ── */
+  --gurps-panel: #ffffff;
+  --gurps-panel-2: #ffffff;
+
+  /* ── lokální MLP pomocníci (ornamenty + kompozity je čtou) ── */
+  --mlp-ink: #16162e;
+  --mlp-cel: #ded3ef; /* spodní cel-stupeň (karta „odlepená" od podkladu) */
+  --mlp-pink: #ff6ad5;
+  --mlp-pink-2: #ff8090;
+  --mlp-sky: #5ad1ff;
+  --mlp-butter: #ffb84a;
+  --mlp-green: #4fc79b;
+  --mlp-lilac: #a06aff;
+  /* plná holografická duha (signature podtržení / raily / text-clip) */
+  --mlp-rainbow: linear-gradient(
+    100deg,
+    #ff8090 0%,
+    #ffb84a 17%,
+    #ffe14d 33%,
+    #4fc79b 50%,
+    #5ad1ff 66%,
+    #a06aff 82%,
+    #ff6ad5 100%
+  );
+  --mlp-rainbow-90: linear-gradient(90deg, #ff8090, #ffb84a, #ffe14d, #4fc79b, #5ad1ff, #a06aff, #ff6ad5);
+  --mlp-conic: conic-gradient(from 200deg, #ff6ad5, #a06aff, #5ad1ff, #ffb84a, #ff6ad5);
+  /* vrstvené cel-stíny (signature tvrdý spodní stupeň) */
+  --mlp-cel-card: 0 0 0 2.5px var(--mlp-ink, #16162e), 0 6px 0 0 var(--mlp-cel, #ded3ef),
+    0 7px 0 2.5px var(--mlp-ink, #16162e), 0 16px 26px -16px rgba(160, 106, 255, 0.45);
+  --mlp-cel-sm: 0 0 0 2px var(--mlp-ink, #16162e), 0 4px 0 0 var(--mlp-cel, #ded3ef),
+    0 5px 0 2px var(--mlp-ink, #16162e);
+
+  /* ── PLOCHA listu = SVĚTLÝ pastel duha (galerie: radial růžová + baby-blue
+       + linear fialovo-modrá); obal = duhový rám s ink+bílým prstencem ── */
+  font-family: 'Outfit', system-ui, sans-serif;
+  color: var(--gurps-ink, #2a2350);
+  isolation: isolate;
+  border-radius: 20px;
+  padding: 18px;
+  background:
+    radial-gradient(720px 340px at 84% -6%, #ffe3f4, transparent 60%),
+    radial-gradient(640px 320px at 6% 2%, #dbecff, transparent 55%),
+    linear-gradient(170deg, #fbf3ff, #eaf3ff);
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.7) inset,
+    0 0 0 3px var(--mlp-ink, #16162e),
+    0 0 0 8px #ffffff,
+    0 0 0 10px var(--mlp-ink, #16162e),
+    0 30px 60px -26px rgba(160, 106, 255, 0.6);
+}
+
+/* ── shared inputs = bílé nálepky s ink obrysem (přebijí tmavé cold-steel) ── */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard input,
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard textarea {
+  color: var(--gurps-ink, #2a2350);
+  background: #ffffff;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard input:focus,
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard textarea:focus {
+  background: #ffffff;
+  border: 0;
+  box-shadow: 0 0 0 2.5px var(--gurps-accent, #c44bbf), 0 0 0 4.5px rgba(196, 75, 191, 0.2);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard input::placeholder,
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard textarea::placeholder {
+  color: var(--gurps-ink-dim, #8f7fb5);
+  opacity: 0.75;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) HLAVIČKA — brand duhový text-clip, ink podtržení, bílá pole.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-head {
+  border-bottom: 3px solid var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-brand {
+  border-right: 2px solid var(--mlp-ink, #16162e);
+}
+/* BRAND „GURPS" — duhový pop-nápis (text-clip; fallback magenta akcent) */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-brand .gg {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--gurps-accent, #c44bbf);
+  background: var(--mlp-rainbow, linear-gradient(90deg, #ff8090, #ffb84a, #4fc79b, #5ad1ff, #a06aff, #ff6ad5));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(1px 2px 0 rgba(22, 22, 46, 0.22));
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-brand .sub {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-brand .ed {
+  color: var(--gurps-accent, #c44bbf);
+  opacity: 1;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-field label {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+/* readonly value pole (.v) = bílá nálepka s ink obrysem */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-field .v {
+  background: #ffffff;
+  border: 0;
+  border-radius: 9px;
+  box-shadow: 0 0 0 2px var(--mlp-ink, #16162e);
+}
+
+/* ── chips (věk / SM / nevyužité / celkem) = bílé cel-nálepky ── */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .chip {
+  background: #ffffff;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .chip .k {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .chip .n {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .chip.total .n {
+  color: var(--gurps-accent, #c44bbf);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .chip.unspent .n {
+  color: #e0902a; /* nevyužité = jantarová (čitelná na bílém) */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE — `.g-card` = bílá cel-„samolepková" karta (ink obrys + tvrdý
+   spodní cel-stín). `.g-card > h3` = duhové podtržení + ✦ sparkle marker.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-card {
+  background: #ffffff;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: var(--mlp-cel-card, 0 0 0 2.5px #16162e, 0 6px 0 0 #ded3ef, 0 7px 0 2.5px #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-card > h3 {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--gurps-accent, #c44bbf);
+  /* duhové podtržení nadpisu (border-image linear rainbow) */
+  border-bottom: 3px solid;
+  border-image: var(--mlp-rainbow-90, linear-gradient(90deg, #ff8090, #ffb84a, #4fc79b, #5ad1ff, #a06aff, #ff6ad5)) 1;
+}
+/* ✦ sparkle marker za nadpisem (echo napříč povrchy) */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-card > h3::after {
+  content: ' \2726';
+  color: var(--mlp-butter, #ffb84a);
+  -webkit-text-fill-color: var(--mlp-butter, #ffb84a);
+  -webkit-text-stroke: 0.6px var(--mlp-ink, #16162e);
+  font-size: 12px;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-card .tag {
+  background: #ffffff;
+  border: 0;
+  box-shadow: 0 0 0 1.5px var(--mlp-ink, #16162e);
+  color: var(--gurps-accent, #c44bbf);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-card .hint {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) ATRIBUTY — bílé cel-řádky s ink obrysem; číslo = conic-duhový medailon.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-attr {
+  background: #ffffff;
+  border: 0;
+  border-left: 0;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-attr .lab {
+  color: var(--gurps-ink, #2a2350);
+  font-weight: 600;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-attr .lab small {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-attr .num {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--gurps-ink, #2a2350);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-attr input.num:focus {
+  background: rgba(196, 75, 191, 0.1);
+  box-shadow: inset 0 0 0 2px var(--gurps-accent, #c44bbf);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-attr .pt {
+  color: var(--gurps-accent, #c44bbf);
+  font-weight: 700;
+}
+
+/* ── boxy (sekundární / HP / FP / pohyb) = bílé cel-nálepky s ink obrysem ── */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box {
+  background: #ffffff;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box .k {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box .val {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box.hp {
+  border-top: 3px solid var(--gurps-hp, #e63a4a);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box.hp .val {
+  color: var(--gurps-hp, #e63a4a);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box.fp {
+  border-top: 3px solid var(--gurps-fp, #3d95c9);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box.fp .val {
+  color: var(--gurps-fp, #3d95c9);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-box .vital-in span {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+
+/* ── key/value řádky (škody / pohyb) — ink tečkované linky ── */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-kv .row {
+  border-bottom-color: var(--gurps-line, rgba(22, 22, 46, 0.16));
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-kv .row .k {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-kv .row .v {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-kv.damage .row .v,
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-kv.damage .row .ov {
+  color: var(--gurps-accent, #c44bbf);
+}
+
+/* ── aktivní obrana — bílé cel-medailony s conic-duhovým ink prstencem ── */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-adef .d {
+  background: #ffffff;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-adef .d .n {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--gurps-ink, #2a2350);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-adef .d .k {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-adef .d .frm {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) TABULKY — ink hlavička, bílá vstupní pole, dodge = sky / accent = magenta.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl th {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--gurps-ink-dim, #8f7fb5);
+  border-bottom: 2px solid var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl th,
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl td {
+  border-bottom-color: var(--gurps-line, rgba(22, 22, 46, 0.16));
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl td.num,
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl td.accent {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl td.dim {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl td.dodge {
+  color: var(--gurps-dodge, #3d95c9);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl td.accent {
+  color: var(--gurps-accent, #c44bbf);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .armor .dr {
+  color: var(--gurps-dodge, #3d95c9);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-tbl td input {
+  box-shadow: 0 0 0 1.5px var(--mlp-ink, #16162e);
+}
+/* add-row = duhově-lemované dashed tlačítko */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .add {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--gurps-accent, #c44bbf);
+  background: linear-gradient(180deg, #ffffff, #f3ebff);
+  border: 2px dashed var(--gurps-accent, #c44bbf);
+  border-radius: 10px;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .add:hover {
+  color: var(--gurps-ink, #2a2350);
+  border-style: solid;
+  background: rgba(196, 75, 191, 0.12);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .del {
+  color: var(--gurps-hp, #e63a4a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) TRAITY — bílé cel-nálepky s ink obrysem; tóny drží sémantiku.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-trait-col h4 {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-trait-col.tone-accent h4 {
+  color: var(--gurps-accent, #c44bbf);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-trait-col.tone-hp h4 {
+  color: var(--gurps-hp, #e63a4a);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-trait-col.tone-fp h4 {
+  color: var(--gurps-fp, #3d95c9);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-trait-col h4 .badge {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-trait-col li {
+  background: #ffffff;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-trait-col li .p {
+  color: var(--gurps-ink-dim, #8f7fb5);
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) SPODNÍ ZÓNA — poznámky (světlá plocha) + shrnutí bodů.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-textarea {
+  background: #fbf6ff;
+  border: 0;
+  box-shadow: inset 0 0 0 2px var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-textarea:focus {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2px var(--gurps-accent, #c44bbf);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-notes-ro {
+  color: var(--gurps-ink-dim, #8f7fb5);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-summary .row {
+  border-bottom-color: var(--gurps-line, rgba(22, 22, 46, 0.16));
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-summary .row .v {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-summary .row .v.neg {
+  color: var(--gurps-hp, #e63a4a);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-summary .row.tot {
+  border-top: 2px solid var(--mlp-ink, #16162e);
+}
+[data-diary-system='gurps'][data-diary-skin='anime'] .gurps-dashboard .g-summary .row.tot .v {
+  color: var(--gurps-accent, #c44bbf);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) PANEL + EMBED tokeny (combat/bestie panel + obal v TM / dice readout /
+   dicelog / orchestrace / chat rail) — tokenizované `--dd-embed-*`, dědí se.
+   SVĚTLÝ pastel, VŽDY OPAQUE (log neprosvítá mapu). Ink obrys #16162e, tmavý
+   text na světlém. Sémantika pos/neg drží (kladný=mint / záporný=korál).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='anime'] {
+  --dd-embed-surface: linear-gradient(180deg, #fffafd, #fbf3ff 55%, #f3ebff);
+  --dd-embed-border: #16162e;
+  --dd-embed-line: rgba(22, 22, 46, 0.16);
+  --dd-embed-text: #2a2350;
+  --dd-embed-muted: #8f7fb5;
+  --dd-embed-title: #c44bbf;
+  --dd-embed-chip-bg: #ffffff;
+  --dd-embed-accent: #c44bbf;
+  --dd-embed-num-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-title-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-pos: #2f9f78; /* kladný hod / úspěch = mint (čitelný na světlém) */
+  --dd-embed-neg: #e63a4a; /* záporný hod / neúspěch = korálově-červená */
+  --dd-embed-neutral: #c44bbf; /* neutrál = magenta */
+
+  /* HP/FP bar fill (combat + bestie panel čtou přes var()) — sémantika drží */
+  --dd-hpfill-grad: linear-gradient(90deg, #ff8090, #e63a4a); /* životy = korál→červená */
+  --dd-fpfill-grad: linear-gradient(90deg, #8fdcff, #3d95c9); /* únava = baby-blue→sky */
+}

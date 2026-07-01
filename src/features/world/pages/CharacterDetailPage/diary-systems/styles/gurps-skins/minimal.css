@@ -1,0 +1,470 @@
+/* GURPS 4E — skin „Minimal" (archivní karta / rýsovací list).
+ *
+ * POZOR: na rozdíl od ostatních GURPS skinů je minimal SVĚTLÝ. Cold-steel
+ * tmavý list se překlápí na čistý archivní papír #f4f1ea, uhlový inkoust
+ * na světlém, JEDINÝ tlumený akcent = antické zlato #9a7b2e (Pentagon
+ * dossier). NE prázdný minimalismus — minimalismus jako PRECIZNOST. Textury
+ * pryč, gradienty zploštěné na hairline plochy, tabular mono čísla.
+ * Sourozenec drdh-skins/minimal + drdplus-skins/minimal — TENTÝŽ archivní
+ * svět, jen přeložený do GURPS listu/panelů.
+ *
+ * Signature (rodinná „archivní kalibrace" — maximální zdrženlivost, to JE
+ * identita): dvojitý LEDGER rám sekcí (.g-card box-shadow inset) + 4
+ * REGISTRAČNÍ KŘÍŽE „+" v rozích (.g-card ::before/::after). Brand .g-brand
+ * .gg = plochý uhlový Fraunces (žádný chromovaný gradient). Ornamenty se
+ * mezi skiny NESDÍLEJÍ (fantasy = filigrán, retro = CRT scanline…).
+ *
+ * Mechanika (IMPL_BRIEF): override běží na compound prefixu
+ * `[data-diary-system='gurps'][data-diary-skin='minimal']` (specificita 0,2,0
+ * > default 0,1,0 z gurps.css). LIST tokeny `--gurps-*` + třídy přepisujeme
+ * na `[ds][dsk] .gurps-dashboard`, panely/embedy reskinujeme VÝHRADNĚ přes
+ * `--dd-embed-*` na `[ds][dsk]` (hashované modulové třídy NECÍLÍME). Pouze
+ * CSS/SVG, žádný JS.
+ *
+ * Sémantika drží i ve zlaté paletě: HP = teplá cihla, FP = tlumený len,
+ * kladný hod = oliva, záporný = cihla. Akcent = antické zlato.
+ *
+ * Fonty: Fraunces (display serif) · Newsreader (tělo) · Spline Sans Mono
+ * (popisky/čísla). Krása v přesnosti a prázdnotě.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════
+   1. PANEL + EMBED TOKENY — `--dd-embed-*` + HP/FP fill. Běží na compound
+      scope BEZ `.gurps-dashboard` (předek panelů/embedu — jedna hodnota do
+      obou). Lokální `--gmn-*` = čitelnost mapování. Plocha OPAQUE (světlý
+      archiv NEprosvítá mapu).
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] {
+  /* ── lokální minimal paleta (dle galerie gurps minimal) ── */
+  --gmn-paper: #f4f1ea; /* hlavní archivní list */
+  --gmn-paper-hi: #faf8f2; /* světlejší vrch */
+  --gmn-paper-2: #f1eee4; /* sotva tmavší vtisk */
+  --gmn-ink: #20211d; /* primární text/čísla — uhel */
+  --gmn-ink-2: #55524a; /* sekundární text */
+  --gmn-ink-3: #7c7a6f; /* muted / mono popisky */
+  --gmn-hair: rgba(30, 30, 20, 0.16); /* vlasová linka */
+  --gmn-hair-2: rgba(154, 123, 46, 0.5); /* silnější zlatá linka / obrys */
+  --gmn-acc: #9a7b2e; /* JEDINÝ akcent — antické zlato */
+  --gmn-acc-hi: #b89a4a; /* světlejší zlato */
+  --gmn-acc-deep: #7a6122; /* tmavší zlato — čísla, hover */
+  --gmn-acc-wash: rgba(154, 123, 46, 0.09); /* zlatý chip nádech */
+  --gmn-hp: #a54a3a; /* HP — teplá cihla (sémantika životů) */
+  --gmn-hp-hi: #c26a56;
+  --gmn-fp: #9a8d63; /* FP — tlumený len/khaki (vlastní tón) */
+  --gmn-fp-hi: #bcae82;
+  --gmn-pos: #5a7d3a; /* oliva — kladný hod / úspěch */
+  --gmn-neg: #a54a3a; /* cihla — záporný hod / neúspěch */
+  --gmn-input: #efebe1; /* vstupní/buňka plocha */
+
+  /* ════════ EMBED plochy (obal v TM / dice readout / dicelog / orchestrace)
+     SVĚTLÝ archiv, plocha NEPRŮHLEDNÁ (plný gradient — jinak log prosvítá na
+     mapu), uhlový text, mono čísla, jediné zlato. Pos/neg = oliva/cihla. ════ */
+  --dd-embed-surface: linear-gradient(180deg, var(--gmn-paper-hi, #faf8f2), var(--gmn-paper-2, #f1eee4));
+  --dd-embed-border: var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+  --dd-embed-line: var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  --dd-embed-text: var(--gmn-ink, #20211d);
+  --dd-embed-muted: var(--gmn-ink-3, #7c7a6f);
+  --dd-embed-title: var(--gmn-ink, #20211d);
+  --dd-embed-chip-bg: var(--gmn-acc-wash, rgba(154, 123, 46, 0.09));
+  --dd-embed-accent: var(--gmn-acc-deep, #7a6122);
+  --dd-embed-num-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-pos: var(--gmn-pos, #5a7d3a); /* kladný hod / úspěch = oliva */
+  --dd-embed-neg: var(--gmn-neg, #a54a3a); /* záporný hod / neúspěch = cihla */
+  --dd-embed-neutral: var(--gmn-acc-deep, #7a6122);
+
+  /* HP/FP bar fill (combat + bestie panel čtou přes var()) — ploché sémantické */
+  --dd-hpfill-grad: linear-gradient(90deg, var(--gmn-hp, #a54a3a), var(--gmn-hp-hi, #c26a56));
+  --dd-fpfill-grad: linear-gradient(90deg, var(--gmn-fp, #9a8d63), var(--gmn-fp-hi, #bcae82));
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   2. LIST — `--gurps-*` override + font. Tmavý cold-steel list → světlý
+      archivní papír, uhlový ink, JEDINÉ zlato místo studené modré.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard {
+  --gurps-accent: var(--gmn-acc, #9a7b2e);
+  --gurps-accent-soft: var(--gmn-acc-wash, rgba(154, 123, 46, 0.09));
+  --gurps-hp: var(--gmn-hp, #a54a3a);
+  --gurps-fp: var(--gmn-fp, #9a8d63);
+  --gurps-dodge: var(--gmn-acc-deep, #7a6122);
+  --gurps-ink: var(--gmn-ink, #20211d);
+  --gurps-ink-dim: var(--gmn-ink-3, #7c7a6f);
+  --gurps-line: var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  --gurps-line-strong: var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+  --gurps-panel: var(--gmn-paper-hi, #faf8f2);
+  --gurps-panel-2: var(--gmn-paper, #f4f1ea);
+
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--gmn-ink-2, #55524a);
+  /* archivní deska: plochý kostěný papír + hairline rám + měkký drop shadow */
+  background: linear-gradient(180deg, var(--gmn-paper-hi, #faf8f2), var(--gmn-paper, #f4f1ea) 46%, var(--gmn-paper-2, #f1eee4));
+  border: 1px solid var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+  border-radius: 2px;
+  padding: clamp(14px, 2.4vw, 26px);
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 24px 60px -34px rgba(40, 34, 22, 0.45);
+}
+
+/* ── hlavička: dělící linka hairline, brand plochý uhel (žádný chrom grad) ── */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-head {
+  border-bottom: 1px solid var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-brand {
+  border-right: 1px solid var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+}
+/* BRAND (signature): chromovaný modrý gradient → plochý uhlový Fraunces */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-brand .gg {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-brand .sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.24em;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-brand .ed {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-acc-deep, #7a6122);
+  opacity: 1;
+}
+
+/* ── identity pole: mono kapitálkové labely, plochý papír vstup ── */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-field label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.16em;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-field .v {
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+  color: var(--gmn-ink, #20211d);
+}
+
+/* ── shared inputs: tmavá průhledná plocha → plochý papír ── */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard input,
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard textarea {
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--gmn-ink, #20211d);
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard input:focus,
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard textarea:focus {
+  background: var(--gmn-paper-hi, #faf8f2);
+  border-color: var(--gmn-acc, #9a7b2e);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard input::placeholder {
+  color: var(--gmn-ink-3, #7c7a6f);
+  opacity: 0.7;
+}
+
+/* ── chips (věk/SM/nevyužité/celkem): plochý papír, mono čísla ── */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .chip {
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .chip .k {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .chip .n {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .chip.total .n {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .chip.unspent .n {
+  color: var(--gmn-fp, #9a8d63);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   3. SEKCE (.g-card) — SIGNATURE: dvojitý LEDGER rám (inset box-shadow) +
+      4 REGISTRAČNÍ KŘÍŽE „+" v rozích (::before levý horní, ::after pravý
+      dolní). Nadpis mono kapitálky se zlatou hairline.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-card {
+  position: relative;
+  background: var(--gmn-paper-hi, #faf8f2);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+  /* SIGNATURE dvojitý ledger rám: hairline → papírová mezera → hairline */
+  box-shadow:
+    inset 0 0 0 1px var(--gmn-hair, rgba(30, 30, 20, 0.16)),
+    inset 0 0 0 4px var(--gmn-paper-hi, #faf8f2),
+    inset 0 0 0 5px var(--gmn-hair, rgba(30, 30, 20, 0.16));
+}
+/* SIGNATURE registrační kříž „+" — levý horní roh */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-card::before {
+  content: '+';
+  position: absolute;
+  top: 1px;
+  left: 5px;
+  color: var(--gmn-acc, #9a7b2e);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.85;
+  pointer-events: none;
+}
+/* SIGNATURE registrační kříž „+" — pravý dolní roh */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-card::after {
+  content: '+';
+  position: absolute;
+  bottom: 0;
+  right: 5px;
+  color: var(--gmn-acc, #9a7b2e);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.85;
+  pointer-events: none;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-card > h3 {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--gmn-acc-deep, #7a6122);
+  border-bottom: 1px solid var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-card > h3 small {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-card .tag {
+  background: var(--gmn-acc-wash, rgba(154, 123, 46, 0.09));
+  border: 1px solid var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+  border-radius: 2px;
+  color: var(--gmn-acc-deep, #7a6122);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-card .hint {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   4. ATRIBUTY — studený modrý gradient + levý akcent pruh → plochá ledger
+      buňka, hairline, mono číslo, zlatý levý index.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-attr {
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-left: 3px solid var(--gmn-acc, #9a7b2e);
+  border-radius: 1px;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-attr .lab {
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-attr .lab small {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-attr .num {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-attr .pt {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-acc-deep, #7a6122);
+}
+
+/* ── sekundární / HP / FP boxy: tmavé destičky → ploché ledger buňky ── */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-box {
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-box .k {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-box .val {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-box.hp {
+  border-top: 2px solid var(--gmn-hp, #a54a3a);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-box.hp .val {
+  color: var(--gmn-hp, #a54a3a);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-box.fp {
+  border-top: 2px solid var(--gmn-fp, #9a8d63);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-box.fp .val {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+
+/* ── key/value řádky: tečkovaná linka hairline, mono, škody zlaté ── */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-kv .row .k {
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-kv .row .v,
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-kv .row .ov {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-kv.damage .row .v,
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-kv.damage .row .ov {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   5. AKTIVNÍ OBRANA — tmavé buňky → ploché ledger buňky, mono číslo.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-adef .d {
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-adef .d .n {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-adef .d .k {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-adef .d .frm {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   6. TABULKY — studené linky → hairline, mono čísla, úhyb/akcent zlaté.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl th {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  color: var(--gmn-ink-3, #7c7a6f);
+  border-bottom: 1px solid var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl td {
+  border-bottom: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl td.num,
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl th.num {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl td.dim {
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl td.dodge {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl td.accent {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .armor .dr,
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .armor .dr-cell input {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl td input {
+  font-family: 'Newsreader', Georgia, serif;
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-tbl td.num input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+}
+
+/* „+ přidat" řádek: studený dashed → zlaté podtržené mono */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .add {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  color: var(--gmn-acc-deep, #7a6122);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 0;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .add:hover {
+  color: var(--gmn-acc-deep, #7a6122);
+  background: var(--gmn-acc-wash, rgba(154, 123, 46, 0.09));
+  border-color: var(--gmn-acc, #9a7b2e);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .del {
+  color: var(--gmn-neg, #a54a3a);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   7. TRAITY — výhody/nevýhody/zvláštnosti. Tmavé řádky → ploché ledger
+      položky. Tón nadpisů: výhody zlato, nevýhody cihla, zvláštnosti len.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-trait-col h4 {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.12em;
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-trait-col.tone-accent h4 {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-trait-col.tone-hp h4 {
+  color: var(--gmn-neg, #a54a3a);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-trait-col.tone-fp h4 {
+  color: var(--gmn-fp, #9a8d63);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-trait-col h4 .badge {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-trait-col li {
+  background: var(--gmn-input, #efebe1);
+  border: 1px solid var(--gmn-hair, rgba(30, 30, 20, 0.16));
+  border-radius: 1px;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-trait-col li .p {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink-3, #7c7a6f);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   8. SPODNÍ ZÓNA — poznámky + shrnutí bodů. Textarea čistá plocha,
+      shrnutí mono, celkem zlaté, záporné cihlové.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-textarea {
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--gmn-ink, #20211d);
+  background: var(--gmn-paper-hi, #faf8f2);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-notes-ro {
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--gmn-ink-2, #55524a);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-summary .row .v {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--gmn-ink, #20211d);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-summary .row .v.neg {
+  color: var(--gmn-neg, #a54a3a);
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-summary .row.tot {
+  border-top: 2px solid var(--gmn-hair-2, rgba(154, 123, 46, 0.5));
+}
+[data-diary-system='gurps'][data-diary-skin='minimal'] .gurps-dashboard .g-summary .row.tot .v {
+  color: var(--gmn-acc-deep, #7a6122);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   9. PANELY embedů (combat/bestie/chat) = CSS Moduly s hash třídami.
+      Reskin běží VÝHRADNĚ přes `--dd-embed-*` token override z bloku 1
+      (moduly je čtou přes var()) — hashované modulové třídy ZÁMĚRNĚ
+      NECÍLÍME. Token sada už panelům dává: světlý archivní papír OPAQUE
+      + hairline rám, uhlový ink + mono čísla, JEDINÉ zlato, HP cihla /
+      FP len. (Shodný kompromis jako drdh/drdplus minimal.)
+   ════════════════════════════════════════════════════════════════════ */

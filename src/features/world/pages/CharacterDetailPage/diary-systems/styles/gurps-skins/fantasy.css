@@ -1,0 +1,293 @@
+/* GURPS 4E skin „FANTASY" — Iluminovaný grimoár (kovaná kožená vazba) · 16.2c-skiny.
+ *
+ * GURPS default je „cold-steel" (viz gurps.css + baseline v diary-skins.css),
+ * NE fantasy → tenhle skin je PLNÝ (žádný placeholder): přebíjí CELÝ `--gurps-*`
+ * list + PLNOU `--dd-embed-*` sadu panelů/embedů na antické zlato + krémový ink
+ * na tmavě-kožené / grimoárové desce. Sourozenec drdplus-skins/fantasy.css.
+ *
+ * SCOPE: KAŽDÉ pravidlo nese compound prefix
+ * `[data-diary-system='gurps'][data-diary-skin='fantasy']` → vyšší specificita
+ * než default (`[data-diary-system='gurps']` / `.gurps-dashboard`) → přebíjí.
+ * Pouze CSS/SVG, ŽÁDNÝ JS. Regrese-safe (jen overrides pod prefixem).
+ *
+ * SIGNATURE (vlastní, nesdílená): FILIGRÁNOVÉ ZLATÉ ROHOVÉ KOVÁNÍ na `.g-card`
+ * (4 rohy v jednom SVG stacku, antické zlato #e3b94a + nýt #f7e7a8) + brand
+ * `.g-brand .gg` v Cinzel Decorative se zlatou ražbou. Paleta/fonty dle galerie
+ * blok `[data-skin=fantasy]` (zlato/krém, Cinzel/Cinzel Decorative/EB Garamond).
+ *
+ * IMPORT: registrováno přes `@import './gurps-skins/fantasy.css';` v diary-skins.css.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   0) ROHOVÉ KOVÁNÍ — sdílené SVG proměnné (filigrán: tah #e3b94a + nýt #f7e7a8)
+   Definováno na compound scope; čtou je ornamenty `.g-card` níž.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] {
+  --fa-corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/svg%3E");
+  --fa-corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 0) scale(-1 1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --fa-corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(0 44) scale(1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --fa-corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 44 44' fill='none' stroke='%23e3b94a' stroke-linecap='round'%3E%3Cg transform='translate(44 44) scale(-1 -1)'%3E%3Cpath d='M5 43 L5 13 C5 8 8 5 13 5 L43 5' stroke-width='1.7'/%3E%3Cpath d='M9 41 L9 15 C9 11 11 9 15 9 L41 9' stroke-width='0.8' opacity='0.6'/%3E%3Cpath d='M5 28 C5 18 15 17 17 24 C19 31 9 33 9 25' stroke-width='1.3'/%3E%3Cpath d='M28 5 C18 5 17 15 24 17 C31 19 33 9 25 9' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='8' r='2.7' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='8' cy='8' r='4.4' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* ── lokální surovinová paleta grimoáru (galerie [data-skin=fantasy]) ── */
+  --fa-gold: #e3b94a; /* antické zlato = akcent */
+  --fa-gold-hi: #f7e7a8; /* zlatý lesk / nýt */
+  --fa-gold-deep: #9c7a24; /* zapuštěné zlato */
+  --fa-gold-shadow: #6e5326; /* zlatý stín / rám */
+  --fa-cream: #ecdab0; /* krémový ink (hlavní text) */
+  --fa-cream-dim: #a58a5e; /* tlumený ink */
+  --fa-dodge: #e3d08a; /* úhyb / DR = světlé zlato */
+  --fa-surf-1: #1b140b; /* kůže deska 1 */
+  --fa-surf-2: #221a0e; /* kůže deska 2 (líc) */
+  --fa-leather-1: #140d06; /* nejhlubší kůže (embed) */
+  --fa-leather-2: #271d12; /* kovárna (embed 2. krok) */
+  --fa-hp: #b23b3b; /* životy (červená) */
+  --fa-hp-2: #d66666; /* HP lesk */
+  --fa-fp: #c99a3a; /* únava (jantar) */
+  --fa-fp-2: #e2c375; /* FP lesk */
+  --fa-pos: #8fbf6a; /* kladný hod (zelená) */
+  --fa-neg: #cc9966; /* záporný v paletě (teplá) — sémantika neg = HP červená */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) LIST — override `--gurps-*` na `.gurps-dashboard` (0,2,0 přebije default)
+   Krémový ink na tmavě-kožené grimoárové desce, zlatý akcent, Cinzel/Garamond.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard {
+  --gurps-accent: var(--fa-gold, #e3b94a);
+  --gurps-accent-soft: rgba(227, 185, 74, 0.14);
+  --gurps-hp: var(--fa-hp, #b23b3b);
+  --gurps-fp: var(--fa-fp, #c99a3a);
+  --gurps-dodge: var(--fa-dodge, #e3d08a);
+  --gurps-ink: var(--fa-cream, #ecdab0);
+  --gurps-ink-dim: var(--fa-cream-dim, #a58a5e);
+  --gurps-line: rgba(227, 185, 74, 0.28);
+  --gurps-line-strong: rgba(227, 185, 74, 0.55);
+  --gurps-panel: rgba(34, 26, 14, 0.62);
+  --gurps-panel-2: rgba(27, 20, 11, 0.55);
+
+  font-family: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  /* grimoárová plocha listu — tmavá kožená vazba pod antickým zlatem */
+  background:
+    radial-gradient(120% 90% at 16% 4%, rgba(227, 185, 74, 0.08), transparent 54%),
+    radial-gradient(120% 120% at 90% 98%, rgba(110, 83, 38, 0.28), transparent 60%),
+    radial-gradient(circle at 50% 0, #2a1f10, #140d06);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow:
+    0 0 0 1px var(--fa-gold-shadow, #6e5326),
+    0 0 0 4px var(--fa-leather-1, #140d06),
+    0 30px 80px -40px #000;
+}
+
+/* ── nadpisy sekcí: ražený serif ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card > h3 {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1.2px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) SIGNATURE — brand + iluminovaná hlavička (Cinzel Decorative, zlatá ražba)
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-brand .gg {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 900;
+  background: linear-gradient(180deg, #fbeebd, var(--fa-gold, #e3b94a) 55%, var(--fa-gold-deep, #9c7a24));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.45));
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-brand .sub {
+  font-family: 'Cinzel', serif;
+  color: var(--fa-cream-dim, #a58a5e);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-brand .ed {
+  color: var(--fa-gold-deep, #9c7a24);
+  opacity: 1;
+}
+
+/* ── identifikační pole / hodnoty ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-field label {
+  font-family: 'Cinzel', serif;
+  color: var(--fa-cream-dim, #a58a5e);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-field .v {
+  background: rgba(20, 13, 6, 0.42);
+}
+
+/* ── chips (věk / SM / body celkem) ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .chip .n {
+  font-family: 'Cinzel', serif;
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .chip.total .n {
+  color: var(--fa-gold, #e3b94a);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE — `.g-card` = kovaná deska s filigránovým zlatým rohovým kováním
+   Karta je `position:relative` (má padding), kování malujeme přes ::before,
+   dvojité zlaté knihařské linkování přes ::after.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, var(--fa-surf-2, #221a0e), var(--fa-surf-1, #1b140b));
+  border: 1px solid var(--fa-gold-shadow, #6e5326);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 248, 226, 0.05) inset;
+}
+/* filigránové ZLATÉ ROHOVÉ KOVÁNÍ — 4 rohy v jednom ::before (pod obsah) */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: 34px 34px;
+  background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  background-image: var(--fa-corner-tl), var(--fa-corner-tr), var(--fa-corner-bl), var(--fa-corner-br);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}
+/* dvojité zlaté knihařské linkování (inner fillet) */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 6px;
+  border: 1px solid rgba(157, 122, 36, 0.3);
+  box-shadow: 0 0 0 2px rgba(227, 185, 74, 0.08) inset;
+}
+/* obsah karty nad kováním */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── štítek / hint v hlavičce karty ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card .tag {
+  background: rgba(227, 185, 74, 0.14);
+  color: var(--fa-gold, #e3b94a);
+  border-color: var(--fa-gold-shadow, #6e5326);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) ATRIBUTY / BOXY / HP / FP — pečetní ražba, zlatý lem
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-attr {
+  background: linear-gradient(180deg, rgba(227, 185, 74, 0.12), transparent);
+  border-color: var(--fa-gold-shadow, #6e5326);
+  border-left-color: var(--fa-gold, #e3b94a);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-attr .num {
+  font-family: 'Cinzel', serif;
+  color: var(--fa-cream, #ecdab0);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-box {
+  background: rgba(20, 13, 6, 0.4);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-box .val {
+  font-family: 'Cinzel', serif;
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-box.hp {
+  border-top-color: var(--fa-hp, #b23b3b);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-box.fp {
+  border-top-color: var(--fa-fp, #c99a3a);
+}
+
+/* ── klíč/hodnota (škody / pohyb) ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-kv.damage .row .v,
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-kv.damage .row .ov {
+  color: var(--fa-gold, #e3b94a);
+}
+
+/* ── aktivní obrana: pečetní boxy ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-adef .d {
+  background: rgba(20, 13, 6, 0.4);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-adef .d .n {
+  font-family: 'Cinzel', serif;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) TABULKY / ZBROJ / DOVEDNOSTI — zlaté podtržení hlaviček
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-tbl th {
+  color: var(--fa-cream-dim, #a58a5e);
+  border-bottom-color: var(--fa-gold-shadow, #6e5326);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-tbl td.accent {
+  color: var(--fa-gold, #e3b94a);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-tbl td.dodge,
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .armor .dr {
+  color: var(--fa-dodge, #e3d08a);
+}
+
+/* ── traity: zlatý/červený/jantarový tón nadpisů ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-trait-col h4 {
+  font-family: 'Cinzel', serif;
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-trait-col li {
+  background: rgba(20, 13, 6, 0.36);
+}
+
+/* ── shrnutí bodů ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-summary .row.tot .v {
+  color: var(--fa-gold, #e3b94a);
+}
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-summary .row .v.neg {
+  color: var(--fa-hp, #b23b3b);
+}
+
+/* ── tlačítko „přidat řádek" ── */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .add:hover {
+  background: rgba(227, 185, 74, 0.14);
+  border-color: var(--fa-gold, #e3b94a);
+  color: var(--fa-cream, #ecdab0);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) PANEL + EMBED tokeny `--dd-embed-*` — combat/bestie panel, dice readout,
+   dicelog, orchestrace, obal TM/chat rail. PLNÁ sada; surface VŽDY OPAQUE.
+   BEZ `.gurps-dashboard` (chrome dědí z předka, hashované module třídy).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='fantasy'] {
+  /* OPAQUE grimoárová deska (plný gradient → embed neprosvítá mapu) */
+  --dd-embed-surface: linear-gradient(180deg, var(--fa-leather-2, #271d12), var(--fa-leather-1, #140d06));
+  --dd-embed-border: var(--fa-gold-shadow, #6e5326);
+  --dd-embed-line: rgba(227, 185, 74, 0.24);
+  --dd-embed-text: var(--fa-cream, #ecdab0);
+  --dd-embed-muted: var(--fa-cream-dim, #a58a5e);
+  --dd-embed-title: var(--fa-gold-hi, #f7e7a8);
+  --dd-embed-chip-bg: rgba(227, 185, 74, 0.12);
+  --dd-embed-accent: var(--fa-gold, #e3b94a);
+  --dd-embed-num-font: 'Cinzel Decorative', 'Cinzel', serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: var(--fa-pos, #8fbf6a);
+  --dd-embed-neg: var(--fa-hp, #b23b3b);
+  --dd-embed-neutral: var(--fa-gold, #e3b94a);
+
+  /* HP/FP bar fill (combat + bestie panel čtou přes var()) */
+  --dd-hpfill-grad: linear-gradient(90deg, var(--fa-hp, #b23b3b), var(--fa-hp-2, #d66666));
+  --dd-fpfill-grad: linear-gradient(90deg, var(--fa-fp, #c99a3a), var(--fa-fp-2, #e2c375));
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) RESPONSIVITA — kování/linkování drží v rozích i na úzkém viewportu.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 560px) {
+  [data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card::before {
+    background-size: 28px 28px;
+  }
+  [data-diary-system='gurps'][data-diary-skin='fantasy'] .gurps-dashboard .g-card::after {
+    inset: 4px;
+  }
+}

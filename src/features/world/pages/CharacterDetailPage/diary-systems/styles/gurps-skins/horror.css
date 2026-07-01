@@ -1,0 +1,187 @@
+/* GURPS 4E — skin „HOROR" (Půlnoční salon) · 16b-skiny.
+ *
+ * Reskin GURPS „cold-steel" listu (`.gurps-*` + `--gurps-*` v gurps.css) a
+ * mapových/chatových povrchů (combat/bestie panel + embedy přes `--dd-embed-*`)
+ * z modré ocelové polarity do aristokratické viktoriánské upíriny. RODINA:
+ * sourozenec `drdh-skins/horror.css` + `drdplus-skins/horror.css` (tentýž svět),
+ * jen přeložený do GURPS listu/panelů. Scoped na
+ * `[data-diary-system='gurps'][data-diary-skin='horror']` → vyšší specificita
+ * (0,2,0 na `.gurps-dashboard`) přebije baseline `[data-diary-system='gurps']`.
+ *
+ * Koncept (NE gore, elegance): deník = půlnoční salon prastarého šlechtického
+ * rodu — zašlé stříbro místo modré oceli, oxblood (granát) pro životy, studená
+ * fialová pro únavu/éter. Embed plochy tmavý salon (OPAQUE) dle DNA rodiny.
+ *
+ * Paleta (galerie horror): zašlé stříbro #c8c4cf (kov/akcent/neutrál/obrana) ·
+ * oxblood #7a2030 (životy/nebezpečí) · studená fialová #6b6478 (únava/FP).
+ * Sémantika hodů drží: kladný zelený (#9ab0a0), záporný tlumený oxblood (#b23b4a).
+ *
+ * Fonty (rodina): UnifrakturCook (blackletter brand `.gg`), Cormorant SC
+ * (kapitálky nadpisů/eyebrow), Cormorant Garamond (serif jména/tělo/čísla).
+ *
+ * Signature ornament (dle galerie .card::before + rodiny): kovaná gotická
+ * STŘÍBRNÁ tracerie ve 4 rozích `.g-card` (mříž katedrálního okna přes inset rám
+ * + radiální rohová maska) + blackletter brand `.g-brand .gg` (UnifrakturCook).
+ *
+ * Import: statický v diary-skins.css (bundle i mimo deník — mapa/chat).
+ * Pouze CSS/SVG, žádný JS. Regrese-safe (jen přidává overrides).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cormorant+SC:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════
+   1) LIST (deník `.gurps-dashboard`) — --gurps-* override + font.
+   Compound `.gurps-dashboard` (0,2,0) přebije default `[data-diary-system='gurps']`.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard {
+  /* zašlé stříbro = akcent (galerie --accent #c8c4cf) */
+  --gurps-accent: #c8c4cf;
+  --gurps-accent-soft: rgba(200, 196, 207, 0.12);
+  /* životy → oxblood (galerie --hp #7a2030); FP → studená fialová (--fp #6b6478) */
+  --gurps-hp: #a83b4a;
+  --gurps-fp: #8e88a0;
+  /* obrana → stříbro (galerie --dodge #b9b4c4) */
+  --gurps-dodge: #b9b4c4;
+  /* inkoust světlý na tmavém salonu */
+  --gurps-ink: #d7d3dd;
+  --gurps-ink-dim: #8a8494;
+  --gurps-line: rgba(200, 196, 207, 0.16);
+  --gurps-line-strong: rgba(122, 32, 48, 0.6);
+  /* tmavý salon místo modré oceli (galerie --surface / --surface2) */
+  --gurps-panel: rgba(23, 19, 32, 0.6);
+  --gurps-panel-2: rgba(18, 16, 26, 0.62);
+
+  /* salonní serif tělo */
+  font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  /* studený měsíční nádech shora + oxblood záře zdola (galerie horror pozadí) */
+  background:
+    radial-gradient(720px 460px at 50% -12%, rgba(122, 32, 48, 0.14), transparent 60%),
+    radial-gradient(60% 40% at 88% 100%, rgba(106, 81, 112, 0.12), transparent 66%);
+}
+
+/* nadpisy sekcí → salonní kapitálka Cormorant SC (zašlé stříbro drží z accent) */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-card > h3 {
+  font-family: 'Cormorant SC', serif;
+  letter-spacing: 2px;
+}
+
+/* ── SIGNATURE: kovaná gotická STŘÍBRNÁ tracerie ve 4 rozích karty ──
+   inset stříbrný rám ořezaný radiální maskou v rozích = mříž katedrálního okna
+   (galerie .card::before). Jemný noční brokát pod obsahem. */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-card {
+  position: relative;
+  isolation: isolate;
+  border-color: var(--gurps-line, rgba(200, 196, 207, 0.16));
+  background:
+    radial-gradient(70% 50% at 20% 6%, rgba(200, 196, 207, 0.06), transparent 60%),
+    linear-gradient(180deg, rgba(23, 19, 32, 0.6), rgba(18, 16, 26, 0.62));
+}
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-card::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(200, 196, 207, 0.16);
+  border-radius: 8px;
+  /* rohová maska: rám viditelný jen v rozích (gotická okenní tracerie) */
+  -webkit-mask:
+    radial-gradient(circle at 0 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 0 100%, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 100%, #000 13px, transparent 14px);
+  -webkit-mask-composite: source-over;
+  mask:
+    radial-gradient(circle at 0 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 0 100%, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 100%, #000 13px, transparent 14px);
+}
+/* oxblood pip do rohů tracerie (rodinný signature detail) */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-card::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 11px 11px, rgba(122, 32, 48, 0.85) 1.6px, transparent 2.4px),
+    radial-gradient(circle at calc(100% - 11px) 11px, rgba(122, 32, 48, 0.85) 1.6px, transparent 2.4px),
+    radial-gradient(circle at 11px calc(100% - 11px), rgba(122, 32, 48, 0.85) 1.6px, transparent 2.4px),
+    radial-gradient(circle at calc(100% - 11px) calc(100% - 11px), rgba(122, 32, 48, 0.85) 1.6px, transparent 2.4px);
+  background-repeat: no-repeat;
+}
+/* obsah karty nad tracerii */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SIGNATURE: brand → blackletter UnifrakturCook, zašlé stříbro (galerie .brand) ── */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-brand .gg {
+  font-family: 'UnifrakturCook', 'Cormorant SC', serif;
+  font-weight: 700;
+  font-size: 34px;
+  background: linear-gradient(180deg, #eae6ee, #b6b1c0 60%, #8a8494);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 8px rgba(122, 94, 130, 0.25);
+}
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-brand .sub,
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-brand .ed {
+  font-family: 'Cormorant SC', serif;
+}
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-brand .ed {
+  color: var(--gurps-accent, #c8c4cf);
+}
+
+/* eyebrow / labely / hlavičky tabulek → salonní kapitálka */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-field label,
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-tbl th,
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-box .k,
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .chip .k,
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-adef .d .k {
+  font-family: 'Cormorant SC', serif;
+}
+
+/* atribut: oxblood levý lem (vryto do kovu) místo modrého */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-attr {
+  border-left-color: var(--gurps-hp, #a83b4a);
+}
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-attr .lab small {
+  font-family: 'Cormorant SC', serif;
+}
+
+/* velká čísla (atributy / obrana) → salonní serif */
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-attr .num,
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .g-adef .d .n,
+[data-diary-system='gurps'][data-diary-skin='horror'] .gurps-dashboard .chip .n {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   2) PANELY MAPY/CHATU + EMBED — PLNÁ --dd-embed-* sada (na wrapperu,
+   BEZ `.gurps-dashboard`; panely dědí z předka, hashované module třídy).
+   Plocha VŽDY OPAQUE (log/obal neprosvítá mapu). Sémantika pos/neg drží.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='horror'] {
+  /* tmavý salon; plný gradient (OPAQUE), text zašlé stříbro */
+  --dd-embed-surface: linear-gradient(180deg, #241823, #18101a 55%, #130b11);
+  --dd-embed-border: #4a4750;
+  --dd-embed-line: color-mix(in srgb, #c8c4cf 20%, transparent);
+  --dd-embed-text: #d7d3dd;
+  --dd-embed-muted: #8a8494;
+  --dd-embed-title: #e4dfe9;
+  --dd-embed-chip-bg: color-mix(in srgb, #6b6478 18%, transparent);
+  --dd-embed-accent: #c8c4cf;
+  --dd-embed-num-font: 'Cormorant Garamond', Georgia, serif;
+  --dd-embed-title-font: 'Cormorant SC', serif;
+  --dd-embed-pos: #9ab0a0; /* kladný hod / úspěch — zelená (sémantika) */
+  --dd-embed-neg: #b23b4a; /* záporný hod / neúspěch — oxblood (sémantika) */
+  --dd-embed-neutral: #c8c4cf; /* neutrál — stříbro */
+
+  /* HP/FP bar fill (combat + bestie panel čtou přes var()) */
+  --dd-hpfill-grad: linear-gradient(90deg, #7a2030, #a83b4a); /* oxblood životy */
+  --dd-fpfill-grad: linear-gradient(90deg, #4a4356, #8e88a0); /* studená fialová únava */
+}

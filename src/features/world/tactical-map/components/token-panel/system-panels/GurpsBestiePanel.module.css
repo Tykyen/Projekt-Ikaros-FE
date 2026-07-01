@@ -1,16 +1,19 @@
 /* GURPS 4E bestie panel (mapa + chat). Cold-steel + teplý akcent = bestie. */
 
 .root {
-  --g-accent: #4ea3ff;
-  --g-accent-soft: rgba(78, 163, 255, 0.16);
-  --g-beast: #c98b5a;
-  --g-beast-soft: rgba(201, 139, 90, 0.16);
-  --g-ink: #dfe7f2;
-  --g-dim: #93a3ba;
-  --g-line: rgba(120, 150, 190, 0.22);
-  --g-line2: rgba(140, 175, 220, 0.42);
-  --g-panel: rgba(9, 13, 21, 0.5);
-  --g-hp: #ff5d6c;
+  /* Tokenizováno na sdílené --dd-embed-* (skiny přebijí přes [ds][dsk]);
+     fallback = cold-steel → 0 regrese. Bestie akcent (--g-beast) se sjednotí
+     se skinovým akcentem (skin nese vlastní tvarový jazyk, ne teplá vs modrá). */
+  --g-accent: var(--dd-embed-accent, #4ea3ff);
+  --g-accent-soft: color-mix(in srgb, var(--dd-embed-accent, #4ea3ff) 16%, transparent);
+  --g-beast: var(--dd-embed-accent, #c98b5a);
+  --g-beast-soft: color-mix(in srgb, var(--dd-embed-accent, #c98b5a) 16%, transparent);
+  --g-ink: var(--dd-embed-text, #dfe7f2);
+  --g-dim: var(--dd-embed-muted, #93a3ba);
+  --g-line: var(--dd-embed-line, rgba(120, 150, 190, 0.22));
+  --g-line2: var(--dd-embed-border, rgba(140, 175, 220, 0.42));
+  --g-panel: var(--dd-embed-chip-bg, rgba(9, 13, 21, 0.5));
+  --g-hp: var(--dd-embed-neg, #ff5d6c);
   --g-dodge: #39e0ff;
 
   color: var(--g-ink);

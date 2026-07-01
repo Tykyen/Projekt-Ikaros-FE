@@ -113,6 +113,19 @@
 @import './shadowrun-skins/retro.css';
 @import './shadowrun-skins/anime.css';
 
+/* GURPS 4E skiny — default = scifi (base gurps.css „cold-steel" + panel/embed
+   baseline `[data-diary-system='gurps']` níž). Skiny scoped
+   `[data-diary-system='gurps'][data-diary-skin='X']`. Importy zde (ne v gurps.css),
+   aby se načetly i v embedech (chat/mapa/dice). @import nahoře (CSS spec). */
+@import './gurps-skins/scifi.css';
+@import './gurps-skins/fantasy.css';
+@import './gurps-skins/horror.css';
+@import './gurps-skins/steampunk.css';
+@import './gurps-skins/nature.css';
+@import './gurps-skins/minimal.css';
+@import './gurps-skins/retro.css';
+@import './gurps-skins/anime.css';
+
 /* FATE (fae + fate) skiny — default „Karty osudu" = baseline (fate.css, nemá
    soubor). Skiny scoped `:is([data-diary-system='fae'],[data-diary-system='fate'])
    [data-diary-skin='X']`. Importy zde (ne ve fate.css), aby se načetly i v
@@ -503,6 +516,30 @@
   --dd-embed-pos: #3c7a4e; /* kladný hod / úspěch = smaragd */
   --dd-embed-neg: #c0392f; /* záporný hod / neúspěch = krev */
   --dd-embed-neutral: #cf9f3a;
+}
+
+/* ════════════ GURPS 4E — panel + EMBED baseline (default „cold-steel") ════════════
+ * GURPS deník je TMAVÝ list (`--gurps-*` v gurps.css); panely (combat/bestie)
+ * konzumují `--dd-embed-*` (tokenizované `--g-*` → `var(--dd-embed-*, literál)`).
+ * Baseline = výchozí cold-steel; skiny přebijí na `[ds='gurps'][dsk='X']`.
+ * Plocha VŽDY OPAQUE (embed neprosvítá mapu). Sémantika: pos=zelená / neg=červená. */
+[data-diary-system='gurps'] {
+  --dd-embed-surface: linear-gradient(180deg, #0e1524, #090d16);
+  --dd-embed-border: #2a3c58;
+  --dd-embed-line: rgba(120, 150, 190, 0.22);
+  --dd-embed-text: #dfe7f2;
+  --dd-embed-muted: #93a3ba;
+  --dd-embed-title: #4ea3ff;
+  --dd-embed-chip-bg: rgba(0, 0, 0, 0.28);
+  --dd-embed-accent: #4ea3ff;
+  --dd-embed-num-font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --dd-embed-title-font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --dd-embed-pos: #57d38c;
+  --dd-embed-neg: #ff5d6c;
+  --dd-embed-neutral: #4ea3ff;
+  /* HP/FP bar fill (combat + bestie panel čtou přes var()) */
+  --dd-hpfill-grad: linear-gradient(90deg, #ff5d6c, #ff8a94);
+  --dd-fpfill-grad: linear-gradient(90deg, #ffcf5d, #ffe29a);
 }
 
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */

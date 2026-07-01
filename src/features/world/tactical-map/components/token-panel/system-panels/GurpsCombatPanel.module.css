@@ -1,16 +1,18 @@
 /* GURPS 4E — kompaktní bojový panel (mapa + chat rail). Cold-steel téma. */
 
 .root {
-  --g-accent: #4ea3ff;
-  --g-accent-soft: rgba(78, 163, 255, 0.16);
-  --g-ink: #dfe7f2;
-  --g-dim: #93a3ba;
-  --g-line: rgba(120, 150, 190, 0.22);
-  --g-line2: rgba(140, 175, 220, 0.42);
-  --g-panel: rgba(9, 13, 21, 0.55);
-  --g-hp: #ff5d6c;
+  /* Tokenizováno na sdílené --dd-embed-* (skiny je přebijí přes [ds][dsk]);
+     fallback = původní cold-steel → 0 regrese bez skinu. */
+  --g-accent: var(--dd-embed-accent, #4ea3ff);
+  --g-accent-soft: color-mix(in srgb, var(--dd-embed-accent, #4ea3ff) 16%, transparent);
+  --g-ink: var(--dd-embed-text, #dfe7f2);
+  --g-dim: var(--dd-embed-muted, #93a3ba);
+  --g-line: var(--dd-embed-line, rgba(120, 150, 190, 0.22));
+  --g-line2: var(--dd-embed-border, rgba(140, 175, 220, 0.42));
+  --g-panel: var(--dd-embed-chip-bg, rgba(9, 13, 21, 0.55));
+  --g-hp: var(--dd-embed-neg, #ff5d6c);
   --g-fp: #ffcf5d;
-  --g-ok: #57d38c;
+  --g-ok: var(--dd-embed-pos, #57d38c);
   --g-warn: #ffb454;
 
   color: var(--g-ink);

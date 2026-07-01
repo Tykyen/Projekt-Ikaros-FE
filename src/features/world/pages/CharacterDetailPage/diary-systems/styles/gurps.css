@@ -31,10 +31,17 @@
 
 /* ── card ── */
 [data-diary-system='gurps'] .gurps-dashboard .g-card {
+  position: relative;
   background: var(--gurps-panel-2);
   border: 1px solid var(--gurps-line);
   border-radius: 10px;
   padding: 10px 12px;
+}
+/* Obsah karty nad případný rohový/plošný skin ornament (::before/::after) →
+   text nikdy nezakrytý (fantasy filigrán / nature úponek / horror tracerie). */
+[data-diary-system='gurps'] .gurps-dashboard .g-card > * {
+  position: relative;
+  z-index: 1;
 }
 [data-diary-system='gurps'] .gurps-dashboard .g-card > h3 {
   margin: 0 0 8px;

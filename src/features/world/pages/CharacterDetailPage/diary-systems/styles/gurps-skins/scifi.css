@@ -1,0 +1,288 @@
+/**
+ * GURPS 4E — skin „Sci-fi": HOLOGRAFICKÝ VELITELSKÝ HUD / datapad.
+ *
+ * GURPS „cold-steel" list přeladěn na void HUD: neon cyan #38e0ff akcent,
+ * violet #a06bff sekundár, chamfer klín (useknuté protilehlé rohy) místo
+ * zaoblených karet, datový scanline + rohové tech-brackets ⌐¬ jako signature.
+ * Override `--gurps-*` (list `.gurps-dashboard`) + signature ornament na
+ * `.g-card`/`.g-brand .gg` + PLNÁ `--dd-embed-*` sada (panely/embed na [ds][dsk]).
+ *
+ * Scope: `[data-diary-system='gurps'][data-diary-skin='scifi']` (compound 0,2,0
+ * přebije default `[data-diary-system='gurps']` z gurps.css + baseline v
+ * diary-skins.css). KAŽDÉ pravidlo nese ten prefix. Pouze CSS/SVG, žádný JS.
+ * Regrese-safe — jen přidává overrides pod svým selektorem.
+ *
+ * Vizuální kontrakt = galerie `c:/tmp/gurps-skins-gallery.html` sekce scifi
+ * (paleta cyan #38e0ff / violet #a06bff, HP rose #ff5d6c, FP amber #ffcf5d;
+ * fonty Orbitron / Chakra Petch / Share Tech Mono; tvar chamfer; signature
+ * ornament chamfer + ⌐¬ brackety + scanline). Rodinná identita =
+ * drdh-skins/scifi.css + drdplus-skins/scifi.css (tentýž svět napříč systémy).
+ *
+ * Sémantika drží: HP = rose (nebezpečí i ve studené paletě), FP = amber,
+ * kladný hod = jade, záporný = rose; akcent/úhyb = cyan.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) LIST — `--gurps-*` override na `.gurps-dashboard`.
+   Studený steel → void HUD; modrý akcent → neon cyan; font Inter → tech sans.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard {
+  --gurps-accent: #38e0ff;
+  --gurps-accent-soft: rgba(56, 224, 255, 0.12);
+  --gurps-hp: #ff5d6c; /* životy = rose (drží význam nebezpečí) */
+  --gurps-fp: #ffcf5d; /* únava = amber */
+  --gurps-dodge: #39e0ff;
+  --gurps-ink: #d6ecff;
+  --gurps-ink-dim: #6f8bb0;
+  --gurps-line: rgba(56, 224, 255, 0.16);
+  --gurps-line-strong: rgba(56, 224, 255, 0.4);
+  --gurps-panel: #0a121f;
+  --gurps-panel-2: #0c1728;
+
+  /* ── lokální sci-fi pomocníky (ornamenty je čtou) ── */
+  --sf-cyan: #38e0ff;
+  --sf-cyan-hi: #9ff0ff;
+  --sf-cyan-dim: #1a7fa0;
+  --sf-violet: #a06bff;
+  --sf-line: rgba(56, 224, 255, 0.16);
+  --sf-line-hot: rgba(56, 224, 255, 0.4);
+  --sf-grid: rgba(120, 200, 255, 0.05);
+  --sf-num: 'Share Tech Mono', ui-monospace, monospace;
+  /* chamfer klín — signature tvar (useknuté protilehlé rohy) */
+  --sf-chamf: 9px;
+  --sf-clip: polygon(
+    var(--sf-chamf, 9px) 0,
+    100% 0,
+    100% calc(100% - var(--sf-chamf, 9px)),
+    calc(100% - var(--sf-chamf, 9px)) 100%,
+    0 100%,
+    0 var(--sf-chamf, 9px)
+  );
+
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+  color: var(--gurps-ink, #d6ecff);
+}
+
+/* ── list plátno = void s neon září (za deníkem) ── */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard {
+  background:
+    radial-gradient(1000px 500px at 80% -10%, rgba(56, 224, 255, 0.1), transparent 60%),
+    radial-gradient(760px 380px at 8% 108%, rgba(160, 107, 255, 0.1), transparent 58%),
+    linear-gradient(180deg, #070d17, #05090f);
+  padding: 14px;
+  border: 1px solid var(--sf-line-hot, rgba(56, 224, 255, 0.4));
+  border-radius: 0;
+  clip-path: var(--sf-clip, polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px));
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) SIGNATURE ORNAMENT — `.g-card` = chamfer klín + datový scanline +
+   rohové tech-brackets ⌐¬ (TL cyan, BR violet). Nadpis `.g-card > h3` nese
+   ⌐¬ glyf (galerie). Brand `.g-brand .gg` = holo Orbitron s neon glow.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-card {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(18, 34, 70, 0.28), rgba(7, 13, 32, 0.5)),
+    var(--gurps-panel-2, #0c1728);
+  border: 1px solid var(--sf-line, rgba(56, 224, 255, 0.16));
+  border-radius: 0;
+  clip-path: var(--sf-clip, polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px));
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 255, 0.07),
+    inset 0 0 34px -20px rgba(56, 224, 255, 0.34);
+  overflow: hidden;
+}
+/* datový scanline přes kartu (signature HUD atmosféra, mizí dolů) */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(var(--sf-grid, rgba(120, 200, 255, 0.05)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sf-grid, rgba(120, 200, 255, 0.05)) 1px, transparent 1px),
+    repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.04) 0 1px, transparent 1px 3px);
+  background-size: 44px 44px, 44px 44px, 100% 3px;
+  -webkit-mask-image: radial-gradient(150% 100% at 50% 0%, #000 24%, transparent 92%);
+  mask-image: radial-gradient(150% 100% at 50% 0%, #000 24%, transparent 92%);
+}
+/* rohové tech-brackety ⌐¬ — TL cyan, BR violet (signature dvoubarevný rám) */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-card::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(var(--sf-cyan, #38e0ff), var(--sf-cyan, #38e0ff)) left top / 14px 2px no-repeat,
+    linear-gradient(var(--sf-cyan, #38e0ff), var(--sf-cyan, #38e0ff)) left top / 2px 14px no-repeat,
+    linear-gradient(var(--sf-violet, #a06bff), var(--sf-violet, #a06bff)) right bottom / 14px 2px no-repeat,
+    linear-gradient(var(--sf-violet, #a06bff), var(--sf-violet, #a06bff)) right bottom / 2px 14px no-repeat;
+  filter: drop-shadow(0 0 4px rgba(56, 224, 255, 0.5));
+}
+/* obsah karty nad scanline/brackety */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-card > * {
+  position: relative;
+  z-index: 2;
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-card > h3 {
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+  color: var(--sf-cyan, #38e0ff);
+  letter-spacing: 0.16em;
+  border-bottom: 1px solid var(--sf-line-hot, rgba(56, 224, 255, 0.4));
+}
+/* galerie: nadpis nese ⌐¬ glyf (signature) */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-card > h3::after {
+  content: ' ⌐¬';
+  color: var(--sf-cyan, #38e0ff);
+  opacity: 0.4;
+  font-family: var(--sf-num, 'Share Tech Mono', monospace);
+}
+
+/* brand — holo Orbitron s cyan→violet přechodem a neon glow */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-brand {
+  border-right: 1px solid var(--sf-line-hot, rgba(56, 224, 255, 0.4));
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-brand .gg {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #9ff0ff, var(--sf-cyan, #38e0ff) 55%, var(--sf-violet, #a06bff));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(56, 224, 255, 0.45));
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-brand .ed {
+  color: var(--sf-cyan, #38e0ff);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) LIST detaily — mono čísla, chamfer dlaždice, neon rám (drží HUD jazyk).
+   ════════════════════════════════════════════════════════════════════════ */
+/* identita pole */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-field .v {
+  background: rgba(4, 10, 26, 0.6);
+  border: 1px solid var(--sf-line, rgba(56, 224, 255, 0.16));
+  border-radius: 0;
+}
+/* horní chipy (věk/SM/nevyužité/celkem) — chamfer hrot */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .chip {
+  background: rgba(4, 10, 26, 0.6);
+  border: 1px solid var(--sf-line, rgba(56, 224, 255, 0.16));
+  border-radius: 0;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .chip .n {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+
+/* atributová dlaždice — zaříznutý levý hrot, cyan-dim border, mono číslo */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-attr {
+  background: linear-gradient(90deg, rgba(14, 28, 58, 0.6), rgba(8, 14, 34, 0.4));
+  border: 1px solid var(--sf-line, rgba(56, 224, 255, 0.16));
+  border-left: 3px solid var(--sf-cyan, #38e0ff);
+  border-radius: 0;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-attr .num {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+
+/* sekundární / HP / FP boxy — chamfer hrot, mono hodnota */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-box {
+  background: rgba(4, 10, 26, 0.55);
+  border: 1px solid var(--sf-line, rgba(56, 224, 255, 0.16));
+  border-radius: 0;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-box .val {
+  font-family: var(--sf-num, 'Share Tech Mono', monospace);
+}
+
+/* aktivní obrana — chamfer dlaždice, cyan úhyb */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-adef .d {
+  background: rgba(4, 10, 26, 0.55);
+  border: 1px solid var(--sf-line, rgba(56, 224, 255, 0.16));
+  border-radius: 0;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-adef .d .n {
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+
+/* tabulky — neon hlavička, mono čísla */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-tbl th {
+  border-bottom: 1.5px solid var(--sf-line-hot, rgba(56, 224, 255, 0.4));
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-tbl td.num {
+  font-family: var(--sf-num, 'Share Tech Mono', monospace);
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-tbl td.accent {
+  color: var(--sf-cyan, #38e0ff);
+  text-shadow: 0 0 10px rgba(56, 224, 255, 0.4);
+}
+
+/* traity — chamfer položky */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-trait-col li {
+  background: rgba(4, 10, 26, 0.5);
+  border: 1px solid var(--sf-line, rgba(56, 224, 255, 0.16));
+  border-radius: 0;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-trait-col h4 {
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+/* shrnutí bodů — mono, neon součet */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-summary .row .v {
+  font-family: var(--sf-num, 'Share Tech Mono', monospace);
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-summary .row.tot {
+  border-top: 2px solid var(--sf-line-hot, rgba(56, 224, 255, 0.4));
+}
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .g-summary .row.tot .v {
+  text-shadow: 0 0 12px rgba(56, 224, 255, 0.4);
+}
+
+/* přidat řádek — dashed chamfer */
+[data-diary-system='gurps'][data-diary-skin='scifi'] .gurps-dashboard .add {
+  border: 1px dashed var(--sf-line-hot, rgba(56, 224, 255, 0.4));
+  color: var(--sf-cyan, #38e0ff);
+  border-radius: 0;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) PANEL + EMBED — PLNÁ `--dd-embed-*` sada na [ds][dsk] (BEZ
+   `.gurps-dashboard` — panely/embed chrome je dědí z předka).
+   Void HUD: surface VŽDY OPAQUE (plný gradient) → log NEprosvítá mapu.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='gurps'][data-diary-skin='scifi'] {
+  /* ── EMBED plochy (obal v TM / dice readout / dicelog / orchestrace / chat rail) ── */
+  --dd-embed-surface: linear-gradient(180deg, #0c1730, #070d1e 60%, #050a18); /* opaque void HUD */
+  --dd-embed-border: rgba(56, 224, 255, 0.4);
+  --dd-embed-line: rgba(56, 224, 255, 0.16);
+  --dd-embed-text: #d6ecff;
+  --dd-embed-muted: #6f8bb0;
+  --dd-embed-title: #38e0ff;
+  --dd-embed-chip-bg: rgba(56, 224, 255, 0.1);
+  --dd-embed-accent: #38e0ff;
+  --dd-embed-num-font: 'Share Tech Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Orbitron', 'Chakra Petch', sans-serif;
+  --dd-embed-pos: #5affc9; /* kladný hod / úspěch = jade */
+  --dd-embed-neg: #ff6a78; /* záporný hod / neúspěch = rose */
+  --dd-embed-neutral: #9ff0ff; /* neutrál = cyan-hi */
+
+  /* ── HP / FP bar fill (combat + bestie panel čtou přes var()) ── */
+  --dd-hpfill-grad: linear-gradient(90deg, #ff5d6c, #ff8a94); /* rose life */
+  --dd-fpfill-grad: linear-gradient(90deg, #ffcf5d, #ffe29a); /* amber únava */
+}
