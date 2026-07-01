@@ -224,11 +224,14 @@ export function CocCombatPanel({
   }
 
   const weapons = parseWeapons(cd);
-  const hpCur = gNum(cd, 'hp_cur');
   const hpMax = gNum(cd, 'hp_max');
-  const sanCur = gNum(cd, 'san_cur');
   const sanMax = gNum(cd, 'san_start');
   const dexReg = gNum(cd, 'dex_reg');
+  // Rvačka (default útok beze zbraně) — vždy dostupná. Cíl = wpn0_skill, jinak
+  // dovednost Boj zblízka (Rvačka).
+  const brawlName = gString(cd, 'wpn0_name', 'Rvačka') || 'Rvačka';
+  const brawlSkill = gNum(cd, 'wpn0_skill') ?? gNum(cd, 'sk_fighting_brawl_reg');
+  const brawlDmg = gString(cd, 'wpn0_dmg', '1K3 + BZ') || '1K3 + BZ';
 
   // ── Vital bar renderer (HP / SAN — bar + ±) ──────────────────────
 
@@ -241,8 +244,11 @@ export function CocCombatPanel({
     curKey: string,
     maxLabel: string,
     max: number | null,
-    cur: number | null,
   ): React.ReactElement {
+    // Bar čte DRAFT (živá hodnota), ne server cur → ± / typing se projeví hned,
+    // ne až po refetchi (8.7u-fix1).
+    const draftNum = parseInt(draft, 10);
+    const barCur = Number.isFinite(draftNum) ? draftNum : null;
     function adjust(delta: number): void {
       if (!canEdit) return;
       const base = parseInt(draft, 10) || 0;
@@ -262,7 +268,7 @@ export function CocCombatPanel({
         <div className={styles.vitalBar}>
           <i
             className={styles.vitalBarFill}
-            style={{ width: `${pct(cur, max)}%` }}
+            style={{ width: `${pct(barCur, max)}%` }}
           />
         </div>
         <div className={styles.vitalPm}>
@@ -373,7 +379,6 @@ export function CocCombatPanel({
           'hp_cur',
           'Aktuální životy',
           hpMax,
-          hpCur,
         )}
         {vitalBar(
           'san',
@@ -384,7 +389,6 @@ export function CocCombatPanel({
           'san_cur',
           'Aktuální příčetnost',
           sanMax,
-          sanCur,
         )}
       </div>
       <div className={styles.minRow}>
@@ -488,33 +492,47 @@ export function CocCombatPanel({
         </div>
       </div>
 
-      {/* ═══ ZBRANĚ ═══ */}
-      {weapons.length > 0 && (
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>Zbraně</div>
-          {weapons.map((w, i) => {
-            const skillNum = parseInt(w.skill ?? '', 10);
-            const name = w.name || `Zbraň ${i + 1}`;
-            const clickable =
-              !!onRoll && Number.isFinite(skillNum) && skillNum > 0;
-            return (
-              <div key={i} className={styles.weaponRow}>
-                <span className={styles.weaponName}>{name}</span>
-                <button
-                  type="button"
-                  className={styles.weaponSkill}
-                  disabled={!clickable}
-                  onClick={() => clickable && rollTarget(name, skillNum)}
-                  aria-label={`Hod útok ${name}`}
-                >
-                  {w.skill || '—'}
-                </button>
-                <span className={styles.weaponDmg}>{w.dmg || '—'}</span>
-              </div>
-            );
-          })}
+      {/* ═══ ZBRANĚ (vždy vč. Rvačky) ═══ */}
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>Zbraně</div>
+        {/* Default útok beze zbraně — Rvačka */}
+        <div className={styles.weaponRow}>
+          <span className={styles.weaponName}>{brawlName}</span>
+          <button
+            type="button"
+            className={styles.weaponSkill}
+            disabled={!onRoll || brawlSkill == null}
+            onClick={() =>
+              brawlSkill != null && rollTarget(brawlName, brawlSkill)
+            }
+            aria-label={`Hod útok ${brawlName}`}
+          >
+            {brawlSkill ?? '—'}
+          </button>
+          <span className={styles.weaponDmg}>{brawlDmg}</span>
         </div>
-      )}
+        {weapons.map((w, i) => {
+          const skillNum = parseInt(w.skill ?? '', 10);
+          const name = w.name || `Zbraň ${i + 1}`;
+          const clickable =
+            !!onRoll && Number.isFinite(skillNum) && skillNum > 0;
+          return (
+            <div key={i} className={styles.weaponRow}>
+              <span className={styles.weaponName}>{name}</span>
+              <button
+                type="button"
+                className={styles.weaponSkill}
+                disabled={!clickable}
+                onClick={() => clickable && rollTarget(name, skillNum)}
+                aria-label={`Hod útok ${name}`}
+              >
+                {w.skill || '—'}
+              </button>
+              <span className={styles.weaponDmg}>{w.dmg || '—'}</span>
+            </div>
+          );
+        })}
+      </div>
 
       {/* ═══ BOJ — odvozené ═══ */}
       <div className={styles.section}>

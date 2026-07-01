@@ -414,19 +414,28 @@ describe('CocCombatPanel — weapons', () => {
     });
   });
 
-  it('bez coc_weapons — sekce Zbraně se neukáže', () => {
+  it('bez coc_weapons — ukáže default Rvačku a hodí dle Boje zblízka', () => {
     mockDiary.mockReturnValue({
-      data: makeDiary({}),
+      data: makeDiary({ coc_sk_fighting_brawl_reg: '45' }),
       isLoading: false,
     });
+    const onRoll = vi.fn();
     render(
       <CocCombatPanel
         token={makeToken()}
         sceneId="s1"
         worldId="w1"
         canEdit
+        onRoll={onRoll}
       />,
     );
-    expect(screen.queryByText('Zbraně')).not.toBeInTheDocument();
+    expect(screen.getByText('Zbraně')).toBeInTheDocument();
+    // „Rvačka" je i dovednost i zbraň → cílíme na útočné tlačítko (jednoznačné).
+    fireEvent.click(screen.getByRole('button', { name: 'Hod útok Rvačka' }));
+    expect(onRoll).toHaveBeenCalledWith({
+      label: 'Rvačka',
+      target: 45,
+      kind: 'd100',
+    });
   });
 });

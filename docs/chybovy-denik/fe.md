@@ -1496,3 +1496,17 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Jak ověřeno:** rollEngine 41 (8 nových percentile: extrém/výrazný/běžný/neúspěch/01/100/96-cíl<50/96-cíl≥50) · CocCombatPanel 15 · DiceLogPanel 8 · DiceRollOverlay readout 7 · `npm run build` (tsc -b) čistý = žádná typová regrese v systémech sdílejících engine · ESLint čistý. Combat panel je CSS-module (hashované třídy) → produkční render-harness jako u deníku nejde; stojí na schváleném prototypu + build + testech; živé na mapě/chatu čeká uživatele.
 **Pasti:** (1) **`npm run test:run -- <a> <b> <c>` (víc cest) selže** stejně jako `npx vitest` z [CH-029](fe.md#ch-029--fe-testy-spuštěné-přes-npx-vitest-run-file-spadly-na-setupts-aftereach-špatný-kontext--2026-06-26) („failed to find current suite", 0 test) → spouštět **1 cesta = 1 běh** (nebo 1 adresář); (2) HP/SAN bar fill = CSS gradient v module (ne inline `style`, past §9.15); (3) font v module bez `@import` (CSP, CH-027).
 **Zhodnocení:** dobře — nález (zavádějící d100) chycen právě proto, že jsem před impl četl engine, ne jen přebarvoval panel; rozsah vyšší než „přepiš panel", ale je to jediné správné řešení (CoC bez úrovní úspěchu není CoC). 0 cyklení. Zbývá živé ověření + fáze 4/5 (bestie, chat) + skiny.
+
+---
+
+### CH-045 — 8.7u combat panel: 3 bugy chycené AŽ živým testem v chat railu · 2026-07-01
+**Kontext:** Po nasazení 8.7u uživatel otevřel combat panel v CHAT railu (ne na mapě) → 3 vady, které build/testy/prototyp nechytily.
+**Co jsem udělal špatně:**
+1. **HP/SAN bar četl server `cur`, ne `draft`** → po `±`/typingu se číslo změnilo hned (draft), ale bar až po refetchi (server cur). Fix: bar width z `draft` (`parseInt`), ne z `hpCur`/`sanCur`.
+2. **Grid-děti bez `min-width:0`** → v úzkém chat railu 2. sloupec (Příčetnost) + Init přetekly a ořízly se (grid item default `min-width:auto` = nezmenší se pod obsah). Fix: `min-width:0` na grid children + `width:100%`/`box-sizing` na root.
+3. **Combat panel neukazoval default Rvačku** (jen `coc_weapons[]`) → postava bez přidané zbraně = žádný útok v panelu. Fix: Rvačka (wpn0/`fighting_brawl`) vždy jako první řádek.
+**Proč to nefungovalo:** ověřoval jsem panel jen prototypem v ŠIROKÉM kontejneru + jsdom testy (bez layoutu) → úzký rail overflow ani „bar vs draft" (vizuál) se neprojevily. Prototyp měl bar i číslo z jednoho stavu, produkce je rozdělila (draft × server).
+**Poučení:** combat panel MÁ dva kontejnery (mapa TokenInfoPanel = široký, chat rail = úzký) → ověřit v OBOU (min-width:0 na gridech je povinnost pro rail); živé/optimistické hodnoty čti z draftu, ne ze serveru; default útok (Rvačka) patří i do bojového panelu, ne jen do deníku.
+**Příznak cyklení:** „funguje na mapě/prototypu, ale ne v chatu"; „hodnota se změní až po refreshi".
+
+---
