@@ -1,324 +1,428 @@
 /**
- * 10.2c-edit-9g — CoC kompaktní bojový panel.
+ * 8.7u — CoC bojový panel (taktická mapa / chat rail).
  *
- * Port vizuálu ze starého `C:/Matrix/Matrix/frontend/src/components/Map/
- * CocMapDiaryOverlay.tsx` (inline styly v `s` objektu). Zachováváme:
- * - serif font (EB Garamond) pro mystical/horror vibe
- * - tlumené béžovo-zlaté `#d4c9a8` / `#c9a84c`
- * - vital boxy s accent rámečky (HP rudý, Sanity fialovo-purpurový)
- *
- * Light/dark theme — používá CSS proměnné z Ikaros, nicméně panel je vždy
- * dark (mapa overlay) → hardcoded gradient/border barvy.
+ * Horror-dossier jazyk sladěný s deníkem 8.7t (pergamen text, mosaz accent,
+ * krev/indigo vitals), ořez na bojové minimum. Panel je vždy tmavý (mapový
+ * overlay) → self-contained barvy (ne theme tokeny). Font bez @import (CSP,
+ * CH-027) — 'EB Garamond'/'Cinzel' pokud načteny deníkem, jinak serif fallback.
+ * HP/SAN bar fill = CSS gradient (NE inline style — past sablona-skiny §9.15).
  */
 
 .root {
   font-family: 'EB Garamond', Georgia, serif;
-  color: #d4c9a8;
+  color: #dcc9a4;
   padding: 8px 4px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 11px;
 }
 
 .loading,
 .empty {
   padding: 24px 12px;
   text-align: center;
-  font-size: 12px;
-  color: rgba(212, 201, 168, 0.55);
+  font-size: 13px;
+  color: rgba(220, 201, 164, 0.5);
+  font-style: italic;
 }
 
-/* ── Vitals row ──────────────────────────────────────────────────── */
+/* ── Vitals (HP / SAN — bar + ±) ─────────────────────────────────── */
 
 .vitalsRow {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
 .vital {
-  flex: 1 1 0;
-  min-width: 70px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(180, 150, 100, 0.15);
-  border-radius: 6px;
-  padding: 6px 4px;
-  text-align: center;
+  background: rgba(20, 25, 24, 0.55);
+  border: 1px solid rgba(184, 147, 78, 0.26);
+  padding: 7px 8px;
+}
+.vital.hp {
+  border-color: rgba(156, 43, 43, 0.45);
+}
+.vital.san {
+  border-color: rgba(125, 107, 176, 0.45);
+}
+
+.vitalTop {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: space-between;
+  margin-bottom: 5px;
 }
-
-.vitalDanger {
-  border-color: rgba(168, 50, 50, 0.4);
-  background: linear-gradient(
-    180deg,
-    rgba(168, 50, 50, 0.12),
-    rgba(0, 0, 0, 0.25)
-  );
-}
-
-.vitalSanity {
-  border-color: rgba(107, 91, 205, 0.45);
-  background: linear-gradient(
-    180deg,
-    rgba(107, 91, 205, 0.14),
-    rgba(0, 0, 0, 0.25)
-  );
-}
-
 .vitalLabel {
+  font-family: 'Cinzel', 'EB Garamond', serif;
   font-size: 9px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(212, 201, 168, 0.55);
+  color: #b8934e;
+}
+.vital.hp .vitalLabel {
+  color: #c94a3d;
+}
+.vital.san .vitalLabel {
+  color: #a596d6;
+}
+.vitalNum {
+  font-size: 15px;
   font-weight: 600;
+  color: #f0e4c8;
+}
+.vitalNum small {
+  font-size: 11px;
+  color: rgba(220, 201, 164, 0.5);
 }
 
-.vitalSanity .vitalLabel {
-  color: rgba(170, 150, 235, 0.75);
+.vitalBar {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.vitalBarFill {
+  display: block;
+  height: 100%;
+  transition: width 0.2s;
+}
+.vital.hp .vitalBarFill {
+  background: linear-gradient(90deg, #9c2b2b, #c94a3d);
+}
+.vital.san .vitalBarFill {
+  background: linear-gradient(90deg, #7d6bb0, #a596d6);
 }
 
+.vitalPm {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.vitalPm button {
+  width: 26px;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(184, 147, 78, 0.18);
+  color: rgba(220, 201, 164, 0.6);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1;
+  padding: 3px 0;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.vitalPm button:hover:not(:disabled) {
+  border-color: #b8934e;
+  color: #e4c07f;
+}
+.vitalPm button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
 .vitalInput {
-  width: 44px;
+  flex: 1;
+  min-width: 0;
   text-align: center;
   background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(180, 150, 100, 0.18);
-  color: #e8dcc4;
+  border: 1px solid rgba(184, 147, 78, 0.18);
+  color: #f0e4c8;
   padding: 3px;
-  border-radius: 3px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   font-family: inherit;
   outline: none;
 }
-
 .vitalInput:focus {
-  border-color: rgba(201, 168, 76, 0.55);
+  border-color: rgba(184, 147, 78, 0.55);
 }
-
 .vitalInput:read-only {
   cursor: default;
   opacity: 0.85;
 }
 
-.vitalMax {
-  font-size: 0.7rem;
-  color: rgba(180, 150, 100, 0.55);
+/* ── MP / Luck (malé) ────────────────────────────────────────────── */
+
+.minRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.minVital {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(20, 25, 24, 0.5);
+  border: 1px solid rgba(184, 147, 78, 0.2);
+  padding: 5px 9px;
+}
+.minLabel {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(220, 201, 164, 0.55);
+}
+.minVital.mp .minLabel {
+  color: #6fb3a3;
+}
+.minVital.luck .minLabel {
+  color: #e4c07f;
+}
+.minNums {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.minInput {
+  width: 34px;
+  text-align: right;
+  background: transparent;
+  border: none;
+  color: #f0e4c8;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+}
+.minInput:focus {
+  color: #e4c07f;
+}
+.minMax {
+  font-size: 11px;
+  color: rgba(220, 201, 164, 0.45);
 }
 
-/* ── Status badges ────────────────────────────────────────────────── */
+/* ── Status pečeti ───────────────────────────────────────────────── */
 
-.statusRow {
+.seals {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
-
-.statusBadge {
-  padding: 3px 9px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(212, 201, 168, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  user-select: none;
+.seal {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(220, 201, 164, 0.4);
+  padding: 3px 8px;
+  border: 1px dashed rgba(184, 147, 78, 0.2);
+  background: transparent;
   cursor: pointer;
-  transition: all 0.18s;
-  font-family: inherit;
+  transition: 0.15s;
 }
-
-.statusBadge:disabled {
+.seal:disabled {
   cursor: default;
 }
-
-.statusBadgeActive {
-  background: rgba(168, 50, 50, 0.28);
-  color: #ff8a8a;
-  border-color: rgba(168, 50, 50, 0.5);
+.sealOn {
+  color: #c94a3d;
+  border-color: rgba(156, 43, 43, 0.5);
+  border-style: solid;
+  background: rgba(156, 43, 43, 0.1);
 }
 
-/* ── Sections ─────────────────────────────────────────────────────── */
+/* ── Sekce ───────────────────────────────────────────────────────── */
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
-
 .sectionTitle {
-  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #c9a84c;
-  font-weight: 700;
-  border-bottom: 1px solid rgba(180, 150, 100, 0.18);
+  color: #b8934e;
+  border-bottom: 1px solid rgba(184, 147, 78, 0.2);
   padding-bottom: 4px;
 }
+.initBtn {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e4c07f;
+  background: rgba(184, 147, 78, 0.12);
+  border: 1px solid rgba(184, 147, 78, 0.26);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.initBtn:hover:not(:disabled) {
+  background: rgba(184, 147, 78, 0.24);
+}
+.initBtn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
 
-/* ── Characteristics grid ─────────────────────────────────────────── */
+/* ── Vlastnosti (klik = hod) ─────────────────────────────────────── */
 
 .charsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  gap: 5px;
 }
-
-@media (max-width: 480px) {
-  .charsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.charBox {
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(180, 150, 100, 0.1);
-  border-radius: 4px;
-  padding: 4px;
-  text-align: center;
-}
-
-.charLabel {
-  font-size: 9px;
-  color: #c9a84c;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.charVal {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #e8dcc4;
-}
-
-/* ── Skills list ──────────────────────────────────────────────────── */
-
-.skillsList {
+.charChip {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(184, 147, 78, 0.12);
+  padding: 5px 2px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.15s;
+}
+.charChip:hover:not(:disabled) {
+  border-color: #b8934e;
+  background: rgba(184, 147, 78, 0.1);
+}
+.charChip:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.charKey {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b8934e;
+}
+.charVal {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0e4c8;
 }
 
-.skillRow {
+/* ── Dovednosti (klik = hod) ─────────────────────────────────────── */
+
+.skillsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
+}
+.skill {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
-  padding: 3px 0;
-  border-bottom: 1px dotted rgba(180, 150, 100, 0.08);
-}
-
-.skillRow:last-child {
-  border-bottom: none;
-}
-
-.skillName {
-  font-size: 11px;
-  color: rgba(212, 201, 168, 0.78);
-  flex: 1;
-  font-family: inherit;
-}
-
-.skillVal {
-  font-size: 12px;
-  font-weight: 600;
-  color: #e8dcc4;
-  min-width: 30px;
-  text-align: center;
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 3px 6px;
   background: transparent;
   border: 1px solid transparent;
-  font-family: inherit;
-}
-
-.skillValClickable {
   cursor: pointer;
-  background: rgba(201, 168, 76, 0.1);
-  border-color: rgba(201, 168, 76, 0.18);
-  transition: all 0.15s;
+  font-family: inherit;
+  transition: 0.15s;
+}
+.skill:hover:not(:disabled) {
+  border-color: rgba(184, 147, 78, 0.26);
+  background: rgba(184, 147, 78, 0.06);
+}
+.skill:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.skillName {
+  font-size: 13px;
+  color: #dcc9a4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.skillCombat .skillName {
+  color: #f0e4c8;
+}
+.skillMythos .skillName {
+  color: #6fb3a3;
+}
+.skillVal {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e4c07f;
+  min-width: 24px;
+  text-align: right;
 }
 
-.skillValClickable:hover {
-  background: rgba(201, 168, 76, 0.22);
-  border-color: rgba(201, 168, 76, 0.4);
-}
-
-/* ── Combat derived row ───────────────────────────────────────────── */
-
-.combatDerived {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.combatDerived .charBox {
-  flex: 1 1 60px;
-  min-width: 60px;
-}
-
-/* ── Weapons ──────────────────────────────────────────────────────── */
+/* ── Zbraně ──────────────────────────────────────────────────────── */
 
 .weaponRow {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(180, 150, 100, 0.1);
-  border-radius: 4px;
-  font-size: 11px;
+  gap: 8px;
+  padding: 5px 7px;
+  background: rgba(20, 25, 24, 0.5);
+  border: 1px solid rgba(184, 147, 78, 0.2);
 }
-
 .weaponName {
   flex: 1;
-  color: #e8dcc4;
+  font-size: 13px;
+  color: #f0e4c8;
   font-weight: 600;
 }
-
 .weaponSkill {
-  font-weight: 700;
-  color: #c9a84c;
-  min-width: 32px;
-  text-align: center;
-  padding: 2px 6px;
-  border-radius: 3px;
-  background: rgba(201, 168, 76, 0.1);
-  border: 1px solid rgba(201, 168, 76, 0.2);
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e4c07f;
+  background: rgba(184, 147, 78, 0.12);
+  border: 1px solid rgba(184, 147, 78, 0.26);
+  padding: 2px 8px;
   cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
+  transition: 0.15s;
 }
-
 .weaponSkill:hover:not(:disabled) {
-  background: rgba(201, 168, 76, 0.25);
+  background: rgba(184, 147, 78, 0.24);
 }
-
 .weaponSkill:disabled {
   cursor: default;
-  opacity: 0.7;
+  opacity: 0.6;
 }
-
 .weaponDmg {
-  color: rgba(212, 201, 168, 0.7);
-  font-size: 10px;
-  min-width: 60px;
+  font-size: 11px;
+  color: rgba(220, 201, 164, 0.6);
+  min-width: 56px;
   text-align: right;
 }
 
-/* ── Mobile tweaks ────────────────────────────────────────────────── */
+/* ── Boj derived ─────────────────────────────────────────────────── */
+
+.derived {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.dBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(184, 147, 78, 0.12);
+  padding: 5px 2px;
+}
+.dKey {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(220, 201, 164, 0.5);
+}
+.dVal {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f0e4c8;
+}
+
+/* ── Mobil ───────────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-  .vital {
-    min-width: 64px;
-  }
-
-  .vitalInput {
-    width: 38px;
-    font-size: 1rem;
-  }
-
-  .skillName {
-    font-size: 10px;
+  .charsGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

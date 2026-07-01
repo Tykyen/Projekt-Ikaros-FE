@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import type { DicePayload, PoolDicePayload } from '../lib/dicePayload';
 import { payloadToNotation } from '../lib/diceNotation';
 import { getDice3dTheme, isWebGLAvailable } from '../lib/dice3dThemes';
+import { PERCENTILE_LEVEL_LABEL } from '../lib/rollEngine';
 import styles from './DiceRollOverlay.module.css';
 
 /**
@@ -172,6 +173,8 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
   const hitThreshold = pool?.hitThreshold ?? 5;
   // GURPS roll-under (3k6 pod cíl) — součet vs cíl + úspěch/margin/krit.
   const ru = roll.payload.rollUnder;
+  // CoC percentile (1k100 pod cíl) — hod vs cíl + úroveň úspěchu.
+  const pc = roll.payload.percentile;
   const isFlat = roll.payload.type === 'flat';
   // 16b (DrdH) — rozepsané složky modifieru (`útoč +6 + Sil −1`) + zranění.
   const breakdown = roll.payload.breakdown;
@@ -241,6 +244,28 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
                 glitch
               </span>
             ) : null}
+          </div>
+        ) : pc ? (
+          <div className={styles.equation}>
+            {roll.payload.label && (
+              <span className={styles.skillName}>{roll.payload.label}</span>
+            )}
+            <span className={styles.diceSum}>
+              {roll.payload.sum} vs {pc.target}
+            </span>
+            <span
+              className={
+                pc.level === 'critical' || pc.level === 'extreme'
+                  ? styles.critSuccess
+                  : pc.level === 'hard' || pc.level === 'regular'
+                    ? styles.totalPositive
+                    : pc.level === 'fumble'
+                      ? styles.critFail
+                      : styles.totalNegative
+              }
+            >
+              {PERCENTILE_LEVEL_LABEL[pc.level]}
+            </span>
           </div>
         ) : ru ? (
           <div className={styles.equation}>

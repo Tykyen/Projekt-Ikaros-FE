@@ -458,7 +458,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Chat (→ 16.1)
   - [x] Skiny (→ 16.2c)
 - **Call of Cthulhu** (`coc`) — *stav kódu:* list sheet+testy, mapa combat panel `CocCombatPanel`
-  - [ ] Reálný list (grafika)
+  - [x] Reálný list (grafika)
   - [ ] Taktická mapa (grafika)
   - [ ] Bestie (grafika)
   - [ ] Chat (→ 16.1)

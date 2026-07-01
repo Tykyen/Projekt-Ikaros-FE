@@ -17,6 +17,10 @@ import type {
   DicePayload,
   PoolDicePayload,
 } from "@/features/world/chat/dice/lib/dicePayload";
+import {
+  PERCENTILE_LEVEL_LABEL,
+  type PercentileLevel,
+} from "@/features/world/chat/dice/lib/rollEngine";
 import type { WorldDiceVisibility } from "@/shared/types";
 import styles from "./DiceLogPanel.module.css";
 
@@ -122,6 +126,22 @@ function rollUnderBreakdown(p: MapDiceRoll["dicePayload"]): string | null {
     ? `(${(p.faces as number[]).join(" + ")})`
     : `${p.sum}`;
   return `${prefix}3k6 ${dice} = ${p.sum} vs ${ru.target}`;
+}
+
+/** CoC percentile rozpis: „Postřeh · 1k100 = 23 vs 65". */
+function percentileBreakdown(p: MapDiceRoll["dicePayload"]): string | null {
+  const pc = p.percentile;
+  if (!pc) return null;
+  const prefix = p.label ? `${p.label} · ` : "";
+  return `${prefix}1k100 = ${p.sum} vs ${pc.target}`;
+}
+
+/** CSS třída výsledku dle úrovně úspěchu CoC (reuse existujících barev). */
+function percentileTotalClass(level: PercentileLevel): string {
+  if (level === "critical" || level === "extreme") return styles.critSuccess;
+  if (level === "hard" || level === "regular") return styles.totalPositive;
+  if (level === "fumble") return styles.critFail;
+  return styles.totalNegative;
 }
 
 /** Rozpis poolu: „Střelba · 8k6 · 3× úspěch · glitch". */
@@ -296,14 +316,17 @@ export function DiceLogPanel({
               const crit = r.dicePayload.crit;
               const pool = asPoolHits(r.dicePayload);
               const ru = r.dicePayload.rollUnder;
+              const pc = r.dicePayload.percentile;
               const isFlat = r.dicePayload.type === "flat";
               const breakdown = pool
                 ? poolBreakdown(pool)
                 : ru
                   ? rollUnderBreakdown(r.dicePayload)
-                  : isFlat
-                    ? null
-                    : renderBreakdown(r.dicePayload);
+                  : pc
+                    ? percentileBreakdown(r.dicePayload)
+                    : isFlat
+                      ? null
+                      : renderBreakdown(r.dicePayload);
               return (
                 <div
                   key={r.id}
@@ -342,6 +365,12 @@ export function DiceLogPanel({
                         }
                       >
                         {pool.hits ?? 0} ú.
+                      </span>
+                    ) : pc ? (
+                      <span
+                        className={`${styles.total} ${percentileTotalClass(pc.level)}`}
+                      >
+                        {PERCENTILE_LEVEL_LABEL[pc.level]}
                       </span>
                     ) : ru ? (
                       <span

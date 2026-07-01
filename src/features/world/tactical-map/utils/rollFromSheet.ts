@@ -15,6 +15,7 @@ import {
   rollFate,
   rollGenericDice,
   rollMixedDice,
+  rollPercentile,
   rollPoolHits,
   rollTarget,
   type RollKind,
@@ -24,6 +25,7 @@ import {
   buildFlatPayload,
   buildGenericPayload,
   buildMixedPayload,
+  buildPercentilePayload,
   buildPoolHitsPayload,
   buildRollUnderPayload,
   type DicePayload,
@@ -121,6 +123,15 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
       dicePayload: payload,
       crit: r.crit ?? undefined,
     };
+  }
+
+  // CoC percentile: `kind:'d100'` + `target` (% dovednosti/vlastnosti) → 1k100
+  // „pod cíl" s úrovní úspěchu. Bez `target` zůstává starý součtový d100 (BC).
+  if (kind === "d100" && typeof req.target === "number") {
+    const r = rollPercentile(req.target);
+    const payload = buildPercentilePayload(r, { label });
+    attachBreakdown(payload, req);
+    return { total: r.roll, dicePayload: payload };
   }
 
   // Plochý hod (GURPS iniciativa = Základní rychlost, bez kostek).

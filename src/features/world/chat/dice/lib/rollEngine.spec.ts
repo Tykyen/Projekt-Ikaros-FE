@@ -8,6 +8,7 @@ import {
   rollExplodingD6,
   rollExploding2d6,
   rollTarget,
+  rollPercentile,
   getOverpressureFromRollTotal,
   secureRandomInt,
 } from './rollEngine';
@@ -326,5 +327,64 @@ describe('rollTarget (GURPS 3k6 roll-under)', () => {
     expect(rollTarget(15).crit).toBe('success');
     mockSecureSeeds([1, 1, 0]);
     expect(rollTarget(14).crit).toBeNull();
+  });
+});
+
+describe('rollPercentile (CoC d100 roll-under)', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('≤ ½ cíle = výrazný úspěch (hard)', () => {
+    mockSecureSeeds([2, 3]); // tens 20, ones 3 → 23
+    const r = rollPercentile(65); // ½ = 32, ⅕ = 13
+    expect(r.roll).toBe(23);
+    expect(r.level).toBe('hard');
+    expect(r.success).toBe(true);
+  });
+
+  it('≤ ⅕ cíle = extrémní úspěch', () => {
+    mockSecureSeeds([0, 5]); // 05
+    const r = rollPercentile(60); // ⅕ = 12
+    expect(r.roll).toBe(5);
+    expect(r.level).toBe('extreme');
+    expect(r.success).toBe(true);
+  });
+
+  it('≤ cíl (nad ½) = běžný úspěch (regular)', () => {
+    mockSecureSeeds([5, 0]); // 50
+    const r = rollPercentile(60); // ½ = 30
+    expect(r.roll).toBe(50);
+    expect(r.level).toBe('regular');
+    expect(r.success).toBe(true);
+  });
+
+  it('> cíl = neúspěch', () => {
+    mockSecureSeeds([7, 0]); // 70
+    const r = rollPercentile(60);
+    expect(r.roll).toBe(70);
+    expect(r.level).toBe('fail');
+    expect(r.success).toBe(false);
+  });
+
+  it('01 = kritický úspěch (vždy)', () => {
+    mockSecureSeeds([0, 1]); // 01
+    const r = rollPercentile(40);
+    expect(r.roll).toBe(1);
+    expect(r.level).toBe('critical');
+    expect(r.success).toBe(true);
+  });
+
+  it('100 = krach (vždy)', () => {
+    mockSecureSeeds([0, 0]); // 00 + 0 = 100
+    const r = rollPercentile(40);
+    expect(r.roll).toBe(100);
+    expect(r.level).toBe('fumble');
+    expect(r.success).toBe(false);
+  });
+
+  it('96–99 = krach jen při cíli < 50', () => {
+    mockSecureSeeds([9, 6]); // 96
+    expect(rollPercentile(30).level).toBe('fumble');
+    mockSecureSeeds([9, 6]); // 96, cíl ≥ 50 → jen neúspěch
+    expect(rollPercentile(60).level).toBe('fail');
   });
 });

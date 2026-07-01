@@ -333,6 +333,68 @@ export function rollTarget(target: number): RollUnderResult {
   return { rolls, sum, target: t, success, margin: t - sum, crit, type: '3d6' };
 }
 
+/** Úroveň úspěchu percentilového (d100) hodu „pod cíl" — Call of Cthulhu 7e. */
+export type PercentileLevel =
+  | 'critical' // 01 — kritický úspěch
+  | 'extreme' // ≤ ⅕ cíle
+  | 'hard' // ≤ ½ cíle
+  | 'regular' // ≤ cíl
+  | 'fail' // > cíl
+  | 'fumble'; // 100, nebo 96–99 při cíli < 50 (krach)
+
+/** Výsledek d100 „pod cíl" (CoC): hod vs cíl → úroveň úspěchu. */
+export interface PercentileResult {
+  /** Hodnota 1k100 (1–100). */
+  roll: number;
+  tens: number;
+  ones: number;
+  /** Cílová % dovednosti/vlastnosti. */
+  target: number;
+  level: PercentileLevel;
+  success: boolean;
+  type: 'd100';
+}
+
+/**
+ * CoC 7e hod „pod cíl": hoď **1k100**, porovnej s cílem (% dovednosti/vlastnosti).
+ * ≤ ⅕ = extrémní, ≤ ½ = výrazný, ≤ cíl = běžný úspěch, jinak neúspěch.
+ * Speciály: **01** = kritický úspěch (vždy); **100** = krach (vždy); **96–99**
+ * = krach, jen když je cíl < 50.
+ */
+export function rollPercentile(target: number): PercentileResult {
+  const tens = secureRandomInt(10) * 10;
+  const ones = secureRandomInt(10);
+  const roll = tens === 0 && ones === 0 ? 100 : tens + ones;
+  const t = Math.max(0, Math.round(target));
+  const fumbleFloor = t < 50 ? 96 : 100;
+
+  let level: PercentileLevel;
+  if (roll === 1) level = 'critical';
+  else if (roll >= fumbleFloor) level = 'fumble';
+  else if (roll <= Math.floor(t / 5)) level = 'extreme';
+  else if (roll <= Math.floor(t / 2)) level = 'hard';
+  else if (roll <= t) level = 'regular';
+  else level = 'fail';
+
+  const success =
+    level === 'critical' ||
+    level === 'extreme' ||
+    level === 'hard' ||
+    level === 'regular';
+
+  return { roll, tens, ones, target: t, level, success, type: 'd100' };
+}
+
+/** České názvy úrovní úspěchu CoC hodu — dicelog / 3D readout / chat zpráva. */
+export const PERCENTILE_LEVEL_LABEL: Record<PercentileLevel, string> = {
+  critical: 'Kritický úspěch',
+  extreme: 'Extrémní úspěch',
+  hard: 'Výrazný úspěch',
+  regular: 'Běžný úspěch',
+  fail: 'Neúspěch',
+  fumble: 'Krach',
+};
+
 /** Mixed roll — různé počty různých typů kostek v jednom hodu. */
 export function rollMixedDice(counts: Record<string, number>): MixedRollResult {
   const rolls: number[] = [];

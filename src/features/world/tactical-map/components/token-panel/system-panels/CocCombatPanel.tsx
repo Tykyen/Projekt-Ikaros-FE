@@ -1,27 +1,16 @@
 /**
- * 10.2c-edit-9g — CoC kompaktní bojový panel pro TokenInfoPanel.
+ * 8.7u — CoC bojový panel pro taktickou mapu (a chat rail).
  *
- * Port 1:1 ze starého `C:/Matrix/Matrix/frontend/src/components/Map/
- * CocMapDiaryOverlay.tsx` (port flow z `useCharacterDiary` místo
- * `characterData` propu, debounced `useUpdateCharacterDiary().mutate
- * ({ customDataPatch })` místo `onCommit`).
+ * Redesign legacy 10.2c panelu do horror-dossier jazyka deníku (8.7t).
+ * Combat panel je HERNÍ PULT — hází se odsud:
+ *   - klik na vlastnost / dovednost / zbraň → `onRoll({kind:'d100', target})`,
+ *     roll engine vyhodnotí CoC úroveň úspěchu (Extrémní/Výrazný/Běžný/
+ *     Neúspěch/Krach) a zobrazí v dicelogu + 3D readoutu (8.7u percentile).
+ *   - Iniciativa = OBR (v CoC se nehází, jen řadí) → `kind:'flat'`.
+ *   - Životy + Příčetnost = bar s ± (rychlé odečtení zranění / ztráty SAN).
  *
- * Vrstvy:
- *   1. Vitals: HP / Sanity / MP / Luck (editable, debounce 500ms; draft state
- *      proti server overwrite uprostřed typingu).
- *   2. Status badges: 5 toggle flagů (Doč/Neurč šílenství, Těžké zranění,
- *      Bezvědomí, Umírá). Klik → toggle (jen `canEdit`).
- *   3. Charakteristiky: 8 boxů readonly (STR/CON/DEX/INT/SIZ/POW/APP/EDU).
- *   4. Klíčové dovednosti: 16 řádků, hodnota klik = d100 roll vůči % targetu.
- *   5. Boj — derived: Pohyb / Stavba / Úhyb / BZ readonly.
- *
- * Permission gate: `canEdit=false` skryje inputy (readonly), nepustí toggle
- * statusů, nezobrazuje editovatelnost (skills zůstávají klikatelné, protože
- * roll je samostatná oprávnění → kontrolovaná přes přítomnost `onRoll`).
- *
- * CoC kostka: **d100** (`kind: 'd100'`) — `rollEngine` podporuje, není potřeba
- * fallback na d20. Modifier je % target hodnota (engine je generic dice +
- * modifier; toast zobrazí výsledek a hráč si interpretuje úspěch ručně).
+ * Data: `useCharacterDiary` (customData `coc_*`), debounced patch 500ms s draft
+ * state proti server-overwrite uprostřed typingu. Permission gate `canEdit`.
  */
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -30,7 +19,7 @@ import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacter
 import type { MapToken } from '../../../types';
 import styles from './CocCombatPanel.module.css';
 
-// ── Konstanty (1:1 port ze starého overlay) ──────────────────────────
+// ── Konstanty ────────────────────────────────────────────────────────
 
 const COC_CHARS = [
   { key: 'str', label: 'SIL' },
@@ -44,18 +33,18 @@ const COC_CHARS = [
 ] as const;
 
 const COC_MAP_SKILLS = [
-  { key: 'spot_hidden', name: 'Postřeh' },
+  { key: 'spot_hidden', name: 'Postřeh', combat: true },
   { key: 'listen', name: 'Naslouchání' },
-  { key: 'dodge', name: 'Úhyb' },
-  { key: 'fighting_brawl', name: 'Rvačka' },
-  { key: 'firearms_handgun', name: 'Pistole' },
-  { key: 'firearms_rifle', name: 'Puška' },
+  { key: 'dodge', name: 'Úhyb', combat: true },
+  { key: 'fighting_brawl', name: 'Rvačka', combat: true },
+  { key: 'firearms_handgun', name: 'Pistole', combat: true },
+  { key: 'firearms_rifle', name: 'Puška', combat: true },
   { key: 'stealth', name: 'Plížení' },
   { key: 'first_aid', name: 'První pomoc' },
   { key: 'psychology', name: 'Psychologie' },
   { key: 'library_use', name: 'Knihovna' },
   { key: 'occult', name: 'Okultismus' },
-  { key: 'cthulhu_mythos', name: 'Mýtus Cthulhu' },
+  { key: 'cthulhu_mythos', name: 'Mýtus Cthulhu', mythos: true },
   { key: 'persuade', name: 'Přesvědčování' },
   { key: 'fast_talk', name: 'Ukecávání' },
   { key: 'navigate', name: 'Navigace' },
@@ -82,7 +71,7 @@ interface CocWeapon {
   malf?: string;
 }
 
-// ── Props (kontrakt s TokenInfoPanel / future TokenSystemSheet) ──────
+// ── Props ─────────────────────────────────────────────────────────────
 
 export interface CocCombatPanelProps {
   token: MapToken;
@@ -91,8 +80,12 @@ export interface CocCombatPanelProps {
   canEdit: boolean;
   onRoll?: (req: {
     label: string;
-    modifier: number;
-    kind: 'fate' | 'd20' | 'd6' | 'd10' | 'd100';
+    /** CoC: cíl % dovednosti/vlastnosti (roll „pod cíl"). */
+    target?: number;
+    /** Iniciativa (OBR) = plochá hodnota bez hodu. */
+    modifier?: number;
+    kind: 'd100' | 'flat';
+    initiative?: boolean;
   }) => void;
 }
 
@@ -113,6 +106,11 @@ function gBool(cd: Record<string, unknown>, key: string): boolean {
   return v === true || v === 'true';
 }
 
+function gNum(cd: Record<string, unknown>, key: string): number | null {
+  const n = parseInt(gString(cd, key), 10);
+  return Number.isFinite(n) ? n : null;
+}
+
 function parseWeapons(cd: Record<string, unknown>): CocWeapon[] {
   const raw = cd['coc_weapons'];
   if (Array.isArray(raw)) return raw as CocWeapon[];
@@ -125,6 +123,11 @@ function parseWeapons(cd: Record<string, unknown>): CocWeapon[] {
     }
   }
   return [];
+}
+
+function pct(cur: number | null, max: number | null): number {
+  if (cur == null || max == null || max <= 0) return 0;
+  return Math.max(0, Math.min(100, (cur / max) * 100));
 }
 
 // ── Komponenta ────────────────────────────────────────────────────────
@@ -143,8 +146,6 @@ export function CocCombatPanel({
 
   const cd: Record<string, unknown> = diary?.customData ?? {};
 
-  // Drafts pro 4 vitals — drží lokální string mezi typingem aby
-  // debounced mutace nezahodila rozepsanou hodnotu.
   const [hpDraft, setHpDraft] = useState('0');
   const [sanDraft, setSanDraft] = useState('0');
   const [mpDraft, setMpDraft] = useState('0');
@@ -155,10 +156,8 @@ export function CocCombatPanel({
   const mpFocus = useRef(false);
   const luckFocus = useRef(false);
 
-  // Debounce timery (per-key) — jediný in-flight timer per pole.
   const timersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  // Sync drafts ← server, ale jen pokud uživatel pole needituje.
   useEffect(() => {
     if (!hpFocus.current) setHpDraft(gString(cd, 'hp_cur', '0'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -176,7 +175,6 @@ export function CocCombatPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cd['coc_luck_cur']]);
 
-  // Cleanup timers na unmount.
   useEffect(() => {
     const timers = timersRef.current;
     return () => {
@@ -184,46 +182,31 @@ export function CocCombatPanel({
     };
   }, []);
 
-  // Debounced patch — 500ms idle před PATCH.
   function debouncedPatch(key: string, value: unknown): void {
     if (!canEdit) return;
     const fullKey = `coc_${key}`;
-    if (timersRef.current[fullKey]) {
-      clearTimeout(timersRef.current[fullKey]);
-    }
+    if (timersRef.current[fullKey]) clearTimeout(timersRef.current[fullKey]);
     timersRef.current[fullKey] = setTimeout(() => {
       updateDiary.mutate(
         { customDataPatch: { [fullKey]: value } },
-        {
-          onError: () => toast.error('Uložení selhalo'),
-        },
+        { onError: () => toast.error('Uložení selhalo') },
       );
       delete timersRef.current[fullKey];
     }, DEBOUNCE_MS);
   }
 
-  // Okamžitý patch (status toggle) — bez debounce.
   function immediatePatch(key: string, value: unknown): void {
     if (!canEdit) return;
     updateDiary.mutate(
       { customDataPatch: { [`coc_${key}`]: value } },
-      {
-        onError: () => toast.error('Uložení selhalo'),
-      },
+      { onError: () => toast.error('Uložení selhalo') },
     );
   }
 
-  // Skill roll — d100 vs target %.
-  function rollSkill(skillName: string, percent: number): void {
-    if (!onRoll) return;
-    onRoll({
-      label: skillName,
-      modifier: percent,
-      kind: 'd100',
-    });
+  /** Hod „pod cíl" (dovednost / vlastnost / zbraň). */
+  function rollTarget(label: string, target: number): void {
+    onRoll?.({ label, target, kind: 'd100' });
   }
-
-  // ── Render: loading / empty ──────────────────────────────────────
 
   if (isLoading) {
     return (
@@ -232,7 +215,6 @@ export function CocCombatPanel({
       </div>
     );
   }
-
   if (!diary) {
     return (
       <div className={styles.root}>
@@ -242,44 +224,139 @@ export function CocCombatPanel({
   }
 
   const weapons = parseWeapons(cd);
+  const hpCur = gNum(cd, 'hp_cur');
+  const hpMax = gNum(cd, 'hp_max');
+  const sanCur = gNum(cd, 'san_cur');
+  const sanMax = gNum(cd, 'san_start');
+  const dexReg = gNum(cd, 'dex_reg');
 
-  // ── Vital input renderer ─────────────────────────────────────────
+  // ── Vital bar renderer (HP / SAN — bar + ±) ──────────────────────
 
-  function vitalInput(
+  function vitalBar(
+    variant: 'hp' | 'san',
+    label: string,
     draft: string,
     setDraft: (v: string) => void,
     focusRef: React.MutableRefObject<boolean>,
-    commitKey: string,
+    curKey: string,
+    maxLabel: string,
+    max: number | null,
+    cur: number | null,
+  ): React.ReactElement {
+    function adjust(delta: number): void {
+      if (!canEdit) return;
+      const base = parseInt(draft, 10) || 0;
+      const next = Math.max(0, max != null ? Math.min(max, base + delta) : base + delta);
+      setDraft(String(next));
+      debouncedPatch(curKey, String(next));
+    }
+    return (
+      <div className={`${styles.vital} ${styles[variant]}`}>
+        <div className={styles.vitalTop}>
+          <span className={styles.vitalLabel}>{label}</span>
+          <span className={styles.vitalNum}>
+            {draft}
+            <small> / {max ?? '?'}</small>
+          </span>
+        </div>
+        <div className={styles.vitalBar}>
+          <i
+            className={styles.vitalBarFill}
+            style={{ width: `${pct(cur, max)}%` }}
+          />
+        </div>
+        <div className={styles.vitalPm}>
+          <button
+            type="button"
+            disabled={!canEdit}
+            onClick={() => adjust(-1)}
+            aria-label={`${label} −1`}
+          >
+            −
+          </button>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="\d*"
+            className={styles.vitalInput}
+            value={draft}
+            onChange={(e) => {
+              if (!canEdit) return;
+              const v = e.target.value;
+              if (/^\d*$/.test(v)) {
+                setDraft(v);
+                debouncedPatch(curKey, v || '0');
+              }
+            }}
+            onFocus={() => {
+              focusRef.current = true;
+            }}
+            onBlur={() => {
+              focusRef.current = false;
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+            }}
+            readOnly={!canEdit}
+            autoComplete="off"
+            aria-label={maxLabel}
+          />
+          <button
+            type="button"
+            disabled={!canEdit}
+            onClick={() => adjust(1)}
+            aria-label={`${label} +1`}
+          >
+            +
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  function minVital(
+    variant: 'mp' | 'luck',
+    label: string,
+    draft: string,
+    setDraft: (v: string) => void,
+    focusRef: React.MutableRefObject<boolean>,
+    curKey: string,
+    maxKey: string | null,
     ariaLabel: string,
   ): React.ReactElement {
     return (
-      <input
-        type="text"
-        inputMode="numeric"
-        pattern="\d*"
-        className={styles.vitalInput}
-        value={draft}
-        onChange={(e) => {
-          if (!canEdit) return;
-          const v = e.target.value;
-          if (/^\d*$/.test(v)) {
-            setDraft(v);
-            debouncedPatch(commitKey, v || '0');
-          }
-        }}
-        onFocus={() => {
-          focusRef.current = true;
-        }}
-        onBlur={() => {
-          focusRef.current = false;
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-        }}
-        readOnly={!canEdit}
-        autoComplete="off"
-        aria-label={ariaLabel}
-      />
+      <div className={`${styles.minVital} ${styles[variant]}`}>
+        <span className={styles.minLabel}>{label}</span>
+        <span className={styles.minNums}>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="\d*"
+            className={styles.minInput}
+            value={draft}
+            onChange={(e) => {
+              if (!canEdit) return;
+              const v = e.target.value;
+              if (/^\d*$/.test(v)) {
+                setDraft(v);
+                debouncedPatch(curKey, v || '0');
+              }
+            }}
+            onFocus={() => {
+              focusRef.current = true;
+            }}
+            onBlur={() => {
+              focusRef.current = false;
+            }}
+            readOnly={!canEdit}
+            autoComplete="off"
+            aria-label={ariaLabel}
+          />
+          {maxKey && (
+            <span className={styles.minMax}>/ {gString(cd, maxKey, '?')}</span>
+          )}
+        </span>
+      </div>
     );
   }
 
@@ -287,55 +364,43 @@ export function CocCombatPanel({
     <div className={styles.root}>
       {/* ═══ VITALS ═══ */}
       <div className={styles.vitalsRow}>
-        <div className={`${styles.vital} ${styles.vitalDanger}`}>
-          <span className={styles.vitalLabel}>Životy</span>
-          {vitalInput(hpDraft, setHpDraft, hpFocus, 'hp_cur', 'Aktuální životy')}
-          <span className={styles.vitalMax}>
-            / {gString(cd, 'hp_max', '?')}
-          </span>
-        </div>
-        <div className={`${styles.vital} ${styles.vitalSanity}`}>
-          <span className={styles.vitalLabel}>Příčetnost</span>
-          {vitalInput(
-            sanDraft,
-            setSanDraft,
-            sanFocus,
-            'san_cur',
-            'Aktuální příčetnost',
-          )}
-          <span className={styles.vitalMax}>
-            / {gString(cd, 'san_start', '?')}
-          </span>
-        </div>
-        <div className={styles.vital}>
-          <span className={styles.vitalLabel}>Magie</span>
-          {vitalInput(mpDraft, setMpDraft, mpFocus, 'mp_cur', 'Aktuální magie')}
-          <span className={styles.vitalMax}>
-            / {gString(cd, 'mp_max', '?')}
-          </span>
-        </div>
-        <div className={styles.vital}>
-          <span className={styles.vitalLabel}>Štěstí</span>
-          {vitalInput(
-            luckDraft,
-            setLuckDraft,
-            luckFocus,
-            'luck_cur',
-            'Aktuální štěstí',
-          )}
-        </div>
+        {vitalBar(
+          'hp',
+          'Životy',
+          hpDraft,
+          setHpDraft,
+          hpFocus,
+          'hp_cur',
+          'Aktuální životy',
+          hpMax,
+          hpCur,
+        )}
+        {vitalBar(
+          'san',
+          'Příčetnost',
+          sanDraft,
+          setSanDraft,
+          sanFocus,
+          'san_cur',
+          'Aktuální příčetnost',
+          sanMax,
+          sanCur,
+        )}
+      </div>
+      <div className={styles.minRow}>
+        {minVital('mp', 'Magie', mpDraft, setMpDraft, mpFocus, 'mp_cur', 'mp_max', 'Aktuální magie')}
+        {minVital('luck', 'Štěstí', luckDraft, setLuckDraft, luckFocus, 'luck_cur', null, 'Aktuální štěstí')}
       </div>
 
-      {/* ═══ STATUS BADGES ═══ */}
-      <div className={styles.statusRow}>
+      {/* ═══ STATUS PEČETI ═══ */}
+      <div className={styles.seals}>
         {STATUS_FLAGS.map((flag) => {
           const active = gBool(cd, flag.key);
-          const cls = `${styles.statusBadge} ${active ? styles.statusBadgeActive : ''}`;
           return (
             <button
               key={flag.key}
               type="button"
-              className={cls}
+              className={`${styles.seal} ${active ? styles.sealOn : ''}`}
               disabled={!canEdit}
               onClick={() => immediatePatch(flag.key, String(!active))}
               aria-pressed={active}
@@ -346,74 +411,101 @@ export function CocCombatPanel({
         })}
       </div>
 
-      {/* ═══ CHARACTERISTICS ═══ */}
+      {/* ═══ VLASTNOSTI (klik = hod) ═══ */}
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Vlastnosti</div>
-        <div className={styles.charsGrid}>
-          {COC_CHARS.map((c) => (
-            <div key={c.key} className={styles.charBox}>
-              <div className={styles.charLabel}>{c.label}</div>
-              <div className={styles.charVal}>
-                {gString(cd, `${c.key}_reg`, '—')}
-              </div>
-            </div>
-          ))}
+        <div className={styles.sectionTitle}>
+          Vlastnosti · hod
+          <button
+            type="button"
+            className={styles.initBtn}
+            disabled={!onRoll || dexReg == null}
+            onClick={() =>
+              dexReg != null &&
+              onRoll?.({
+                label: 'Iniciativa',
+                modifier: dexReg,
+                kind: 'flat',
+                initiative: true,
+              })
+            }
+            title="Iniciativa dle OBR (v CoC se nehází)"
+            aria-label="Iniciativa"
+          >
+            Init ▶ {dexReg ?? '—'}
+          </button>
         </div>
-      </div>
-
-      {/* ═══ KEY SKILLS ═══ */}
-      <div className={styles.section}>
-        <div className={styles.sectionTitle}>Klíčové dovednosti</div>
-        <div className={styles.skillsList}>
-          {COC_MAP_SKILLS.map((sk) => {
-            const valStr = gString(cd, `sk_${sk.key}_reg`, '');
-            const valNum = parseInt(valStr, 10);
-            const hasValue = valStr !== '' && !Number.isNaN(valNum);
-            const clickable = !!onRoll && hasValue;
-            const cls = `${styles.skillVal} ${clickable ? styles.skillValClickable : ''}`;
+        <div className={styles.charsGrid}>
+          {COC_CHARS.map((c) => {
+            const val = gNum(cd, `${c.key}_reg`);
+            const clickable = !!onRoll && val != null;
             return (
-              <div key={sk.key} className={styles.skillRow}>
-                <span className={styles.skillName}>{sk.name}</span>
-                <button
-                  type="button"
-                  className={cls}
-                  disabled={!clickable}
-                  onClick={() => clickable && rollSkill(sk.name, valNum)}
-                  title={
-                    clickable ? `Hod d100 vs ${valStr} %` : 'Není nastavena hodnota'
-                  }
-                  aria-label={`Hod ${sk.name}`}
-                >
-                  {hasValue ? valStr : '—'}
-                </button>
-              </div>
+              <button
+                key={c.key}
+                type="button"
+                className={styles.charChip}
+                disabled={!clickable}
+                onClick={() => val != null && rollTarget(c.label, val)}
+                title={clickable ? `Hod 1k100 vs ${val} %` : 'Bez hodnoty'}
+                aria-label={`Hod ${c.label}`}
+              >
+                <span className={styles.charKey}>{c.label}</span>
+                <span className={styles.charVal}>{val ?? '—'}</span>
+              </button>
             );
           })}
         </div>
       </div>
 
-      {/* ═══ WEAPONS ═══ */}
+      {/* ═══ DOVEDNOSTI (klik = hod) ═══ */}
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>Dovednosti · hod</div>
+        <div className={styles.skillsGrid}>
+          {COC_MAP_SKILLS.map((sk) => {
+            const val = gNum(cd, `sk_${sk.key}_reg`);
+            const clickable = !!onRoll && val != null;
+            const cls = [
+              styles.skill,
+              'combat' in sk && sk.combat ? styles.skillCombat : '',
+              'mythos' in sk && sk.mythos ? styles.skillMythos : '',
+            ]
+              .filter(Boolean)
+              .join(' ');
+            return (
+              <button
+                key={sk.key}
+                type="button"
+                className={cls}
+                disabled={!clickable}
+                onClick={() => val != null && rollTarget(sk.name, val)}
+                title={clickable ? `Hod 1k100 vs ${val} %` : 'Bez hodnoty'}
+                aria-label={`Hod ${sk.name}`}
+              >
+                <span className={styles.skillName}>{sk.name}</span>
+                <span className={styles.skillVal}>{val ?? '—'}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ═══ ZBRANĚ ═══ */}
       {weapons.length > 0 && (
         <div className={styles.section}>
           <div className={styles.sectionTitle}>Zbraně</div>
           {weapons.map((w, i) => {
             const skillNum = parseInt(w.skill ?? '', 10);
-            const skillClickable =
-              !!onRoll && !Number.isNaN(skillNum) && skillNum > 0;
+            const name = w.name || `Zbraň ${i + 1}`;
+            const clickable =
+              !!onRoll && Number.isFinite(skillNum) && skillNum > 0;
             return (
               <div key={i} className={styles.weaponRow}>
-                <span className={styles.weaponName}>
-                  {w.name || `Zbraň ${i + 1}`}
-                </span>
+                <span className={styles.weaponName}>{name}</span>
                 <button
                   type="button"
                   className={styles.weaponSkill}
-                  disabled={!skillClickable}
-                  onClick={() =>
-                    skillClickable &&
-                    rollSkill(w.name || `Zbraň ${i + 1}`, skillNum)
-                  }
-                  aria-label={`Hod útok ${w.name || `Zbraň ${i + 1}`}`}
+                  disabled={!clickable}
+                  onClick={() => clickable && rollTarget(name, skillNum)}
+                  aria-label={`Hod útok ${name}`}
                 >
                   {w.skill || '—'}
                 </button>
@@ -424,29 +516,27 @@ export function CocCombatPanel({
         </div>
       )}
 
-      {/* ═══ COMBAT DERIVED ═══ */}
+      {/* ═══ BOJ — odvozené ═══ */}
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Boj</div>
-        <div className={styles.combatDerived}>
-          <div className={styles.charBox}>
-            <div className={styles.charLabel}>Pohyb</div>
-            <div className={styles.charVal}>{gString(cd, 'move', '—')}</div>
+        <div className={styles.derived}>
+          <div className={styles.dBox}>
+            <span className={styles.dKey}>Pohyb</span>
+            <span className={styles.dVal}>{gString(cd, 'move', '—')}</span>
           </div>
-          <div className={styles.charBox}>
-            <div className={styles.charLabel}>Stavba</div>
-            <div className={styles.charVal}>{gString(cd, 'build', '—')}</div>
+          <div className={styles.dBox}>
+            <span className={styles.dKey}>Stavba</span>
+            <span className={styles.dVal}>{gString(cd, 'build', '—')}</span>
           </div>
-          <div className={styles.charBox}>
-            <div className={styles.charLabel}>Úhyb</div>
-            <div className={styles.charVal}>
-              {gString(cd, 'dodge_reg', '—')}
-            </div>
+          <div className={styles.dBox}>
+            <span className={styles.dKey}>Úhyb</span>
+            <span className={styles.dVal}>{gString(cd, 'dodge_reg', '—')}</span>
           </div>
-          <div className={styles.charBox}>
-            <div className={styles.charLabel}>BZ</div>
-            <div className={styles.charVal}>
+          <div className={styles.dBox}>
+            <span className={styles.dKey}>BZ</span>
+            <span className={styles.dVal}>
               {gString(cd, 'damage_bonus', '—')}
-            </div>
+            </span>
           </div>
         </div>
       </div>

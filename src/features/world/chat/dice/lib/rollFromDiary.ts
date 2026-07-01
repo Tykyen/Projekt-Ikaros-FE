@@ -16,14 +16,17 @@ import {
   rollFate,
   rollGenericDice,
   rollMixedDice,
+  rollPercentile,
   rollPoolHits,
   rollTarget,
+  PERCENTILE_LEVEL_LABEL,
 } from './rollEngine';
 import {
   buildFatePayload,
   buildFlatPayload,
   buildGenericPayload,
   buildMixedPayload,
+  buildPercentilePayload,
   buildPoolHitsPayload,
   buildRollUnderPayload,
   type DicePayload,
@@ -70,6 +73,7 @@ export interface DiaryRollResult {
   content: string;
 }
 
+
 /**
  * Provede hod podle požadavku z deníku. Vrací payload (pro overlay + render)
  * a content (text). `null` pro nepodporovaný typ kostky.
@@ -107,6 +111,15 @@ export function rollDiaryRequest(
     return {
       dicePayload: buildRollUnderPayload(r, { label }),
       content: `🎲 ${label}: 3k6 = ${r.sum} vs ${r.target} → ${outcome}`,
+    };
+  }
+
+  // CoC percentile: `kind:'d100'` + `target` (% dovednosti) → 1k100 „pod cíl".
+  if (kind === 'd100' && typeof req.target === 'number') {
+    const r = rollPercentile(req.target);
+    return {
+      dicePayload: buildPercentilePayload(r, { label }),
+      content: `🎲 ${label}: 1k100 = ${r.roll} vs ${r.target} → ${PERCENTILE_LEVEL_LABEL[r.level]}`,
     };
   }
 

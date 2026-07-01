@@ -13,6 +13,8 @@ import type {
   FateRollResult,
   GenericRollResult,
   MixedRollResult,
+  PercentileLevel,
+  PercentileResult,
   PoolHitsResult,
   RollUnderResult,
 } from './rollEngine';
@@ -56,6 +58,12 @@ export interface DicePayloadBase {
    * roll-high rovnice (GURPS nesčítá k cíli). `crit` nese kritický/fatální.
    */
   rollUnder?: { target: number; success: boolean; margin: number };
+  /**
+   * Call of Cthulhu 7e — d100 hod „pod cíl". Pokud je definováno, render
+   * (dicelog/readout) ukáže „hod vs cíl → úroveň úspěchu" (Extrémní/Výrazný/
+   * Běžný/Neúspěch/Krach) místo součtové rovnice. `success` = běžný a lepší.
+   */
+  percentile?: { target: number; level: PercentileLevel; success: boolean };
 }
 
 export interface FateDicePayload extends DicePayloadBase {
@@ -215,6 +223,31 @@ export function buildRollUnderPayload(
       target: roll.target,
       success: roll.success,
       margin: roll.margin,
+    },
+  };
+}
+
+/**
+ * CoC percentile payload — `type:'d100'` s `percentile` (cíl + úroveň + úspěch).
+ * `sum`/`total` nesou hod 1k100 (bez modifieru — CoC nesčítá). Render ukáže
+ * „hod vs cíl → Extrémní/Výrazný/Běžný/Neúspěch/Krach".
+ */
+export function buildPercentilePayload(
+  roll: PercentileResult,
+  opts: { label?: string } = {},
+): D100DicePayload {
+  return {
+    type: 'd100',
+    faces: [roll.tens, roll.ones],
+    tens: roll.tens,
+    ones: roll.ones,
+    sum: roll.roll,
+    total: roll.roll,
+    label: opts.label,
+    percentile: {
+      target: roll.target,
+      level: roll.level,
+      success: roll.success,
     },
   };
 }

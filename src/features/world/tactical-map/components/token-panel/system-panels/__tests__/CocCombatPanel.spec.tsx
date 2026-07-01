@@ -180,8 +180,55 @@ describe('CocCombatPanel — interakce', () => {
     fireEvent.click(btn);
     expect(onRoll).toHaveBeenCalledWith({
       label: 'Postřeh',
-      modifier: 60,
+      target: 60,
       kind: 'd100',
+    });
+  });
+
+  it('klik na vlastnost volá onRoll s kind=d100 a target', () => {
+    mockDiary.mockReturnValue({
+      data: makeDiary({ coc_str_reg: '55' }),
+      isLoading: false,
+    });
+    const onRoll = vi.fn();
+    render(
+      <CocCombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Hod SIL' }));
+    expect(onRoll).toHaveBeenCalledWith({
+      label: 'SIL',
+      target: 55,
+      kind: 'd100',
+    });
+  });
+
+  it('iniciativa (OBR) volá onRoll s kind=flat, initiative', () => {
+    mockDiary.mockReturnValue({
+      data: makeDiary({ coc_dex_reg: '65' }),
+      isLoading: false,
+    });
+    const onRoll = vi.fn();
+    render(
+      <CocCombatPanel
+        token={makeToken()}
+        sceneId="s1"
+        worldId="w1"
+        canEdit
+        onRoll={onRoll}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciativa' }));
+    expect(onRoll).toHaveBeenCalledWith({
+      label: 'Iniciativa',
+      modifier: 65,
+      kind: 'flat',
+      initiative: true,
     });
   });
 
@@ -362,7 +409,7 @@ describe('CocCombatPanel — weapons', () => {
     fireEvent.click(revolverBtn);
     expect(onRoll).toHaveBeenCalledWith({
       label: 'Revolver',
-      modifier: 40,
+      target: 40,
       kind: 'd100',
     });
   });
