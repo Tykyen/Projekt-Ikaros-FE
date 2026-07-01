@@ -14,9 +14,12 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
 import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
-import type { MapToken } from '../../../types';
+import { mapSceneQueryKey } from '../../../hooks/useMapScene';
+import { applyOperationToScene } from '../../../utils/applyOperationToScene';
+import type { MapScene, MapToken } from '../../../types';
 import styles from './CocCombatPanel.module.css';
 
 // ── Konstanty ────────────────────────────────────────────────────────
@@ -143,8 +146,37 @@ export function CocCombatPanel({
     token.characterSlug,
   );
   const updateDiary = useUpdateCharacterDiary(worldId, token.characterSlug);
+  const qc = useQueryClient();
 
   const cd: Record<string, unknown> = diary?.customData ?? {};
+
+  // Token HP bar na mapě čte `token.characterData.customData.coc_hp_cur`
+  // (BE enrich snapshot ze spawnu), který deníková mutace neobnoví → zelený
+  // bar zamrzne na staré hodnotě. Optimisticky propíšeme HP do scény cache, ať
+  // token reaguje hned (8.7u-fix4). Jen na mapě (scéna existuje); v chatu no-op.
+  // Deník zůstává zdrojem pravdy — snapshot se dorovná při příštím refetchi.
+  function syncTokenHp(value: string): void {
+    const sceneKey = mapSceneQueryKey(worldId);
+    const scene = qc.getQueryData<MapScene | null>(sceneKey);
+    if (!scene) return;
+    const tk = scene.tokens.find((t) => t.id === token.id);
+    if (!tk) return;
+    const nextCharData = {
+      ...(tk.characterData ?? {}),
+      customData: {
+        ...(tk.characterData?.customData ?? {}),
+        coc_hp_cur: value,
+      },
+    };
+    qc.setQueryData(
+      sceneKey,
+      applyOperationToScene(scene, {
+        type: 'token.update',
+        tokenId: token.id,
+        patch: { characterData: nextCharData } as Partial<MapToken>,
+      }),
+    );
+  }
 
   const [hpDraft, setHpDraft] = useState('0');
   const [sanDraft, setSanDraft] = useState('0');
@@ -255,6 +287,7 @@ export function CocCombatPanel({
       const next = Math.max(0, max != null ? Math.min(max, base + delta) : base + delta);
       setDraft(String(next));
       debouncedPatch(curKey, String(next));
+      if (curKey === 'hp_cur') syncTokenHp(String(next));
     }
     return (
       <div className={`${styles.vital} ${styles[variant]}`}>
@@ -292,6 +325,7 @@ export function CocCombatPanel({
               if (/^\d*$/.test(v)) {
                 setDraft(v);
                 debouncedPatch(curKey, v || '0');
+                if (curKey === 'hp_cur') syncTokenHp(v || '0');
               }
             }}
             onFocus={() => {

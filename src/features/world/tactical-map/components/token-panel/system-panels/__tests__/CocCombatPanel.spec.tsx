@@ -28,6 +28,16 @@ vi.mock('@/features/world/pages/api/useCharacterMutations', () => ({
   useUpdateCharacterDiary: () => ({ mutate: mockMutate }),
 }));
 
+// syncTokenHp (8.7u-fix4) používá useQueryClient; v testu bez scény = no-op.
+// importOriginal zachová QueryClient/useQuery (tranzitivní importy map hooků).
+vi.mock('@tanstack/react-query', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tanstack/react-query')>()),
+  useQueryClient: () => ({
+    getQueryData: () => undefined,
+    setQueryData: () => {},
+  }),
+}));
+
 // ── Token fixture ──────────────────────────────────────────────────
 
 function makeToken(overrides: Partial<MapToken> = {}): MapToken {
