@@ -379,44 +379,44 @@
  * → sleduje vybraný drd16 skin (fantasy pergamen, sci-fi void…) barvou+písmem+polaritou.
  * Plocha VŽDY opaque (`--dd-embed-surface` = forge gradient), backdrop VYPNUT.
  * Scoped na drd16 → ostatní systémy beze změny. */
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .panel {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .panel {
   background: var(--dd-embed-surface);
   border-color: var(--dd-embed-border);
   color: var(--dd-embed-text);
   backdrop-filter: none;
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .header {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .header {
   border-bottom-color: var(--dd-embed-line);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .title {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .title {
   color: var(--dd-embed-title);
   font-family: var(--dd-embed-title-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .chip {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .chip {
   background: var(--dd-embed-chip-bg);
   color: var(--dd-embed-title);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .name {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .name {
   color: var(--dd-embed-muted);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .breakdown {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .breakdown {
   color: var(--dd-embed-muted);
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .faces,
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .total {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .faces,
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .total {
   font-family: var(--dd-embed-num-font);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .faceNum {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .faceNum {
   color: var(--dd-embed-text);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .totalPositive {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .totalPositive {
   color: var(--dd-embed-pos);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .totalNegative {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .totalNegative {
   color: var(--dd-embed-neg);
 }
-:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .totalNeutral {
+:is([data-diary-system='drd16'], [data-diary-system='drdplus'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .totalNeutral {
   color: var(--dd-embed-neutral);
 }
 

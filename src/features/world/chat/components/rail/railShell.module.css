@@ -105,31 +105,31 @@
  * descendant (jinak by display:contents wrapper rozbil `.tabWrap` flex šířku).
  * Konzumuje `--dd-embed-*` (diary-skins.css, loaded i v chatu). Scoped na drdplus
  * → ostatní systémy drží chat motiv (--theme-*). */
-.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) {
+.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) {
   background: var(--dd-embed-surface);
   border-left-color: var(--dd-embed-border);
   color: var(--dd-embed-text);
 }
-.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .identity {
+.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .identity {
   border-bottom-color: var(--dd-embed-line);
   background: color-mix(in srgb, var(--dd-embed-accent) 8%, transparent);
 }
-.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .name {
+.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .name {
   color: var(--dd-embed-title);
   font-family: var(--dd-embed-title-font);
 }
-.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .iconBtn {
+.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .iconBtn {
   color: var(--dd-embed-muted);
 }
-.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .iconBtn:hover {
+.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .iconBtn:hover {
   color: var(--dd-embed-title);
   background: color-mix(in srgb, var(--dd-embed-accent) 16%, transparent);
 }
-.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .avatar {
+.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .avatar {
   border-color: var(--dd-embed-accent);
   box-shadow: 0 0 16px color-mix(in srgb, var(--dd-embed-accent) 30%, transparent);
 }
-.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps']) .avatarFallback {
+.panel:is([data-diary-system='drdplus'], [data-diary-system='drd16'], [data-diary-system='drd2'], [data-diary-system='jad'], [data-diary-system='dnd5e'], [data-diary-system='fae'], [data-diary-system='fate'], [data-diary-system='drdh'], [data-diary-system='gurps'], [data-diary-system='coc']) .avatarFallback {
   color: var(--dd-embed-muted);
 }
 
@@ -565,6 +565,214 @@
   background: color-mix(in srgb, #ff6ad5 14%, transparent);
 }
 .panel:has([data-diary-system='shadowrun'][data-diary-skin='anime']) .avatarFallback { color: #fff; }
+
+/* ════════════ CoC (Call of Cthulhu) per-skin CHAT CHROME (jen barva/font, žádný ornament — policy §3)
+ * Stejná mechanika jako pi/shadowrun: `--dd-embed-*` skinu žijí na POTOMKU
+ * (DiarySkinScope), na chrome `.panel` (PŘEDEK skin scope) nedosáhnou → per-skin
+ * cílíme `.panel:has([…][data-diary-skin='X'])` s LITERÁLNÍMI hodnotami skinu
+ * (surface/text/accent z coc-skins/X.css --dd-embed-*). Bez per-skin bloku by chrome
+ * spadl na dd-embed baseline pro všech 8 skinů. Světlé skiny (minimal/anime) =
+ * SVĚTLÝ obal. Surface OPAQUE (log/obal NEprosvítá). */
+.panel:has([data-diary-system='coc'][data-diary-skin='scifi']) {
+  background: linear-gradient(180deg, #0c1730, #070d1e 60%, #05070d);
+  border-left-color: rgba(56, 224, 255, 0.4);
+  color: #cfe8f2;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='scifi']) .identity {
+  border-bottom-color: rgba(56, 224, 255, 0.16);
+  background: color-mix(in srgb, #38e0ff 8%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='scifi']) .name {
+  color: #38e0ff;
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='scifi']) .avatar {
+  border-color: #38e0ff;
+  box-shadow: 0 0 16px color-mix(in srgb, #38e0ff 30%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='scifi']) .iconBtn { color: #7f9bb0; }
+.panel:has([data-diary-system='coc'][data-diary-skin='scifi']) .iconBtn:hover {
+  color: #cfe8f2;
+  background: color-mix(in srgb, #38e0ff 16%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='scifi']) .avatarFallback { color: #7f9bb0; }
+
+/* fantasy — světlý pergamen + zlato (POZOR: světlý surface) */
+.panel:has([data-diary-system='coc'][data-diary-skin='fantasy']) {
+  background: linear-gradient(155deg, #efe0bb, #e2cf9f);
+  border-left-color: #c2a86f;
+  color: #3a2a17;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='fantasy']) .identity {
+  border-bottom-color: rgba(184, 138, 44, 0.4);
+  background: color-mix(in srgb, #b88a2c 8%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='fantasy']) .name {
+  color: #b88a2c;
+  font-family: 'Cinzel', serif;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='fantasy']) .avatar {
+  border-color: #b88a2c;
+  box-shadow: 0 0 14px color-mix(in srgb, #b88a2c 24%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='fantasy']) .iconBtn { color: #6a5234; }
+.panel:has([data-diary-system='coc'][data-diary-skin='fantasy']) .iconBtn:hover {
+  color: #3a2a17;
+  background: color-mix(in srgb, #b88a2c 14%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='fantasy']) .avatarFallback { color: #6a5234; }
+
+/* horror — půlnoční salon, stříbro + oxblood */
+.panel:has([data-diary-system='coc'][data-diary-skin='horror']) {
+  background: linear-gradient(180deg, #221a2c, #17111d 55%, #120c14);
+  border-left-color: #4a4750;
+  color: #d7d2df;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='horror']) .identity {
+  border-bottom-color: color-mix(in srgb, #c8c4cf 20%, transparent);
+  background: color-mix(in srgb, #a2283a 8%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='horror']) .name {
+  color: #e6e2ec;
+  font-family: 'Cormorant SC', serif;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='horror']) .avatar {
+  border-color: #c8c4cf;
+  box-shadow: 0 0 16px color-mix(in srgb, #a2283a 30%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='horror']) .iconBtn { color: #8f8a9c; }
+.panel:has([data-diary-system='coc'][data-diary-skin='horror']) .iconBtn:hover {
+  color: #e6e2ec;
+  background: color-mix(in srgb, #a2283a 16%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='horror']) .avatarFallback { color: #8f8a9c; }
+
+/* steampunk — mosaz/bronz */
+.panel:has([data-diary-system='coc'][data-diary-skin='steampunk']) {
+  background: linear-gradient(180deg, #302a20, #241d13 58%, #14100a);
+  border-left-color: #8a6a2e;
+  color: #e5d3ab;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='steampunk']) .identity {
+  border-bottom-color: rgba(199, 155, 75, 0.26);
+  background: color-mix(in srgb, #d6a45a 8%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='steampunk']) .name {
+  color: #ecca79;
+  font-family: 'Cinzel', serif;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='steampunk']) .avatar {
+  border-color: #d6a45a;
+  box-shadow: 0 0 16px color-mix(in srgb, #d6a45a 30%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='steampunk']) .iconBtn { color: #a9926a; }
+.panel:has([data-diary-system='coc'][data-diary-skin='steampunk']) .iconBtn:hover {
+  color: #ecca79;
+  background: color-mix(in srgb, #d6a45a 16%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='steampunk']) .avatarFallback { color: #a9926a; }
+
+/* nature — druidský herbář, tmavá lesní deska */
+.panel:has([data-diary-system='coc'][data-diary-skin='nature']) {
+  background: linear-gradient(180deg, #2f2416, #241a10 58%, #20281a);
+  border-left-color: #5a4527;
+  color: #e6d9bc;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='nature']) .identity {
+  border-bottom-color: color-mix(in srgb, #7ba641 26%, transparent);
+  background: color-mix(in srgb, #7ba641 8%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='nature']) .name {
+  color: #7ba641;
+  font-family: 'Marcellus SC', serif;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='nature']) .avatar {
+  border-color: #7ba641;
+  box-shadow: 0 0 16px color-mix(in srgb, #7ba641 30%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='nature']) .iconBtn { color: #a99e82; }
+.panel:has([data-diary-system='coc'][data-diary-skin='nature']) .iconBtn:hover {
+  color: #e6d9bc;
+  background: color-mix(in srgb, #7ba641 16%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='nature']) .avatarFallback { color: #a99e82; }
+
+/* minimal — světlý papír, tmavý text (POZOR: světlý surface) */
+.panel:has([data-diary-system='coc'][data-diary-skin='minimal']) {
+  background: linear-gradient(180deg, #faf8f2, #efeadf);
+  border-left-color: #cabf9f;
+  color: #211d16;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='minimal']) .identity {
+  border-bottom-color: rgba(202, 191, 159, 0.6);
+  background: color-mix(in srgb, #7a6122 7%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='minimal']) .name {
+  color: #211d16;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='minimal']) .avatar {
+  border-color: #7a6122;
+  box-shadow: 0 0 14px color-mix(in srgb, #7a6122 22%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='minimal']) .iconBtn { color: #7c745f; }
+.panel:has([data-diary-system='coc'][data-diary-skin='minimal']) .iconBtn:hover {
+  color: #211d16;
+  background: color-mix(in srgb, #7a6122 12%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='minimal']) .avatarFallback { color: #7c745f; }
+
+/* retro — neon fosfor na temně fialové */
+.panel:has([data-diary-system='coc'][data-diary-skin='retro']) {
+  background: linear-gradient(180deg, #241445, #130a24);
+  border-left-color: #c04bff;
+  color: #f4ecff;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='retro']) .identity {
+  border-bottom-color: rgba(111, 58, 168, 0.55);
+  background: color-mix(in srgb, #ff2e97 8%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='retro']) .name {
+  color: #8af3ff;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.03em;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='retro']) .avatar {
+  border-color: #ff2e97;
+  box-shadow: 0 0 16px color-mix(in srgb, #ff2e97 30%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='retro']) .iconBtn { color: #c3aee0; }
+.panel:has([data-diary-system='coc'][data-diary-skin='retro']) .iconBtn:hover {
+  color: #8af3ff;
+  background: color-mix(in srgb, #ff2e97 16%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='retro']) .avatarFallback { color: #c3aee0; }
+
+/* anime (MLP) — světlý pastelový povrch, ink text (POZOR: světlý surface) */
+.panel:has([data-diary-system='coc'][data-diary-skin='anime']) {
+  background: linear-gradient(180deg, #fffafd, #fbf3ff 55%, #f3ebff);
+  border-left-color: #16162e;
+  color: #2e2650;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='anime']) .identity {
+  border-bottom-color: rgba(160, 106, 255, 0.24);
+  background: color-mix(in srgb, #a06aff 8%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='anime']) .name {
+  color: #a06aff;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='anime']) .avatar {
+  border-color: #a06aff;
+  box-shadow: 0 0 0 2px #16162e, 0 4px 10px rgba(46, 38, 80, 0.25);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='anime']) .iconBtn { color: #8b7bb2; }
+.panel:has([data-diary-system='coc'][data-diary-skin='anime']) .iconBtn:hover {
+  color: #a06aff;
+  background: color-mix(in srgb, #a06aff 14%, transparent);
+}
+.panel:has([data-diary-system='coc'][data-diary-skin='anime']) .avatarFallback { color: #8b7bb2; }
 
 /* ════════════ 16.2e — CHAT OBAL (rail): per-skin SIGNATURE ornament ════════════
  * Parita s ORCHESTRACE (MapPjPanel) + deníkem. Skin nese vlastní TVAR, ne jen

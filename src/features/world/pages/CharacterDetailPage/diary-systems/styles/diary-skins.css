@@ -126,6 +126,18 @@
 @import './gurps-skins/retro.css';
 @import './gurps-skins/anime.css';
 
+/* Call of Cthulhu skiny — default = horror (base coc.css „dossier" + panel/embed
+   baseline `[data-diary-system='coc']` níž). Skiny scoped
+   `[data-diary-system='coc'][data-diary-skin='X']`. Importy zde (embedy je čtou). */
+@import './coc-skins/scifi.css';
+@import './coc-skins/fantasy.css';
+@import './coc-skins/horror.css';
+@import './coc-skins/steampunk.css';
+@import './coc-skins/nature.css';
+@import './coc-skins/minimal.css';
+@import './coc-skins/retro.css';
+@import './coc-skins/anime.css';
+
 /* FATE (fae + fate) skiny — default „Karty osudu" = baseline (fate.css, nemá
    soubor). Skiny scoped `:is([data-diary-system='fae'],[data-diary-system='fate'])
    [data-diary-skin='X']`. Importy zde (ne ve fate.css), aby se načetly i v
@@ -540,6 +552,27 @@
   /* HP/FP bar fill (combat + bestie panel čtou přes var()) */
   --dd-hpfill-grad: linear-gradient(90deg, #ff5d6c, #ff8a94);
   --dd-fpfill-grad: linear-gradient(90deg, #ffcf5d, #ffe29a);
+}
+
+/* CoC panel/embed baseline — dnešní „dossier" horror barvy (regrese-safe;
+   `var(--dd-embed-*)` v CocCombat/BestiePanel drží i bez aktivního skinu).
+   Skiny přebijí na `[data-diary-system='coc'][data-diary-skin='X']`. */
+[data-diary-system='coc'] {
+  --dd-embed-surface: linear-gradient(180deg, #161b1a, #0e1211);
+  --dd-embed-border: #3a3730;
+  --dd-embed-line: rgba(184, 147, 78, 0.22);
+  --dd-embed-text: #dcc9a4;
+  --dd-embed-muted: #9a8f74;
+  --dd-embed-title: #e4c07f;
+  --dd-embed-chip-bg: rgba(0, 0, 0, 0.28);
+  --dd-embed-accent: #b8934e;
+  --dd-embed-num-font: 'EB Garamond', Georgia, serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: #8fd0bd; /* úspěch — zelená (sémantika) */
+  --dd-embed-neg: #c94a3d; /* neúspěch / krev — (sémantika) */
+  --dd-embed-neutral: #b8934e;
+  /* HP bar fill (combat + bestie panel čtou přes var()) */
+  --dd-hpfill-grad: linear-gradient(90deg, #9c2b2b, #c94a3d);
 }
 
 /* ════════════ Selector „🎨 Vzhled" (neutrální, nezávislý na skinu) ═══ */

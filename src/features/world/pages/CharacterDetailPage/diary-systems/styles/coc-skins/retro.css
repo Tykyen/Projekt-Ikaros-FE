@@ -1,0 +1,724 @@
+/* Call of Cthulhu 7e — skin „RETRO" (CRT terminál / synthwave 80s) — CoC skiny.
+ *
+ * Přebarvuje + ornamentuje art-deco „dossier / pergamen" CoC list
+ * (`.coc-*` + `--coc-*`) a jeho mapové/chatové povrchy (`--dd-embed-*`
+ * combat/bestie panel + obal/dice/log/orchestrace/chat rail) z pergamenu
+ * na ROZSVÍCENOU FOSFOROVOU OBRAZOVKU — vyšetřovatelský spis jako záznam
+ * ve starém počítačovém terminálu (ARKHAM.SYS). Lovecraft potkává CRT.
+ *
+ * Rodinná DNA (RETRO = tentýž svět napříč systémy):
+ *   gurps-retro / drdh-retro → CRT scanline + fosfor glow + vinětace, ASCII
+ *     rohy ┌┐└┘, 7-seg LED čísla (VT323), USR:// / `> ` prompt, chunky neon
+ *     bevel rám, sun-grid horizont. Paleta (fialová noc + neon) sdílena.
+ *
+ * Mapování CoC rolí (drží sémantiku):
+ *   Životy/HP    → neon RŮŽOVÁ/magenta (--rt-pink)
+ *   Body magie   → CYAN (--rt-cyan)
+ *   Štěstí       → JANTAR (--rt-amber)
+ *   PŘÍČETNOST   → SIGNATURE: purpur/violet glitch (--rt-san) + status
+ *                  readout „SANITY: STABLE" (glitch text-shadow).
+ *   Mýtus Cthulhu → purpur (zakázané vědění).
+ *
+ * Signature ornament (jen tento skin, jen na LIST přes ::before/::after):
+ *   scanline overlay přes celý list · sun-grid horizont u paty · ASCII rohy
+ *   ┌┐└┘ přes obsahové karty · 7-seg LED číslice na hodnotách · USR:// prompt
+ *   na spisové pásce · SANITY status glitch. Embed = JEN barva/font.
+ *
+ * Fonty: jen Google Fonts (Orbitron / Share Tech Mono / VT323). VT323 + glow
+ *   dává 7-seg LED dojem v rámci povolených fonts.googleapis.com.
+ *
+ * Scope: KAŽDÉ pravidlo `[data-diary-system='coc'][data-diary-skin='retro']`
+ *   (compound → vyšší specificita než default `[data-diary-system='coc']` →
+ *   přebíjí bez ohledu na pořadí načtení). Pouze CSS/SVG, žádný JS.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=VT323&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 1) PALETA — lokální `--rt-*` proměnné (zdroj pravdy galerie) na kořeni skinu.
+ *    Definuju je na compound selektoru → zdědí list i panely i embedy.
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] {
+  /* noc / kabinet (vnější rám) */
+  --rt-night-0: #0a0414;
+  --rt-night-1: #140a26;
+
+  /* obrazovkové plochy (čitelnější než noc, NEPRŮHLEDNÉ) */
+  --rt-screen-0: #241445; /* nejsvětlejší panel */
+  --rt-screen-1: #1b0f33; /* base panel */
+  --rt-screen-2: #130a24; /* inset / zápust */
+  --rt-screen-3: #0e0722; /* nejhlubší track */
+  --rt-screen-edge: #6f3aa8;
+
+  /* text */
+  --rt-ink: #f4ecff;
+  --rt-ink-soft: #c3aee0;
+  --rt-ink-faint: #8a72ad;
+  --rt-ink-deep: #0a0414;
+
+  /* jantar = akcent + Štěstí (zlatá rodina) */
+  --rt-amber: #ffb347;
+  --rt-amber-hi: #ffe07a;
+  --rt-amber-deep: #7a5418;
+
+  /* neon růžová/magenta = Životy / nebezpečí / krach */
+  --rt-pink: #ff2e97;
+  --rt-pink-hi: #ff8ec9;
+  --rt-pink-deep: #a01060;
+
+  /* cyan = Body magie / kladné / běžný úspěch */
+  --rt-cyan: #22d3ee;
+  --rt-cyan-hi: #8af3ff;
+  --rt-cyan-deep: #0c6b80;
+
+  /* krvavá rudá = kritické (rudší než růžová) */
+  --rt-blood: #ff5252;
+  --rt-blood-hi: #ff8a8a;
+  --rt-blood-deep: #8a1414;
+
+  /* fosfor zelená = úspěch */
+  --rt-emer: #3ddc84;
+  --rt-emer-hi: #8af5b6;
+  --rt-emer-deep: #147a47;
+
+  /* PŘÍČETNOST signature = purpur/violet glitch (odlišná od HP růžové) */
+  --rt-san: #c04bff;
+  --rt-san-hi: #e2a8ff;
+  --rt-san-deep: #5e1d8f;
+
+  --rt-line: rgba(111, 58, 168, 0.55);
+  --rt-line-soft: rgba(74, 42, 115, 0.5);
+
+  --rt-f-title: 'Orbitron', 'Share Tech Mono', sans-serif;
+  --rt-f-head: 'Share Tech Mono', monospace;
+  --rt-f-body: 'Share Tech Mono', 'Courier New', monospace;
+  --rt-f-term: 'VT323', monospace; /* terminálový text */
+  --rt-f-num: 'VT323', monospace; /* 7-seg LED číslice */
+
+  /* sun-grid + neon textura plochy (vetkáno → dorazí i na embedy) */
+  --rt-screen-tex:
+    radial-gradient(120% 62% at 50% 0%, rgba(255, 46, 151, 0.13), transparent 60%),
+    radial-gradient(90% 50% at 50% 100%, rgba(34, 211, 238, 0.1), transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(34, 211, 238, 0.045) 39px 40px),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 46, 151, 0.04) 31px 32px),
+    linear-gradient(180deg, #231043, #160a2b 80%);
+  /* CRT scanline (jemná — čitelnost) */
+  --rt-scan: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.3) 2px 3px);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 2) LIST — `.coc-sheet`: `--coc-*` override (pergamen → tmavá obrazovka/neon)
+ *    + font + rozsvícená obrazovka + chunky neon bevel rám.
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-sheet {
+  --coc-ink: var(--rt-ink-deep, #0a0414);
+  --coc-parch: var(--rt-ink, #f4ecff);
+  --coc-parch-dim: var(--rt-ink-soft, #c3aee0);
+  --coc-parch-faint: var(--rt-ink-faint, #8a72ad);
+  --coc-accent: var(--rt-cyan-hi, #8af3ff);
+  --coc-accent-bright: var(--rt-amber-hi, #ffe07a);
+  --coc-line: var(--rt-line, rgba(111, 58, 168, 0.55));
+  --coc-line-faint: var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+  --coc-panel: var(--rt-screen-1, #1b0f33);
+  --coc-panel-2: var(--rt-screen-2, #130a24);
+  --coc-input: var(--rt-screen-3, #0e0722);
+  /* sémantické vitals → neon sémantika */
+  --coc-hp: var(--rt-pink-deep, #a01060); /* Životy = magenta */
+  --coc-hp-bright: var(--rt-pink, #ff2e97);
+  --coc-mp: var(--rt-cyan-deep, #0c6b80); /* Body magie = cyan */
+  --coc-mp-bright: var(--rt-cyan, #22d3ee);
+  --coc-sanity: var(--rt-san-deep, #5e1d8f); /* Příčetnost = purpur */
+  --coc-sanity-bright: var(--rt-san, #c04bff);
+  --coc-luck: var(--rt-amber-deep, #7a5418); /* Štěstí = jantar */
+  --coc-luck-bright: var(--rt-amber, #ffb347);
+
+  isolation: isolate;
+  color: var(--rt-ink, #f4ecff);
+  font-family: var(--rt-f-body, 'Share Tech Mono', monospace);
+  /* rozsvícená obrazovka + sun-grid vetkaný do textury (OPAQUE base) */
+  background: var(--rt-screen-tex, linear-gradient(180deg, #231043, #160a2b));
+  background-color: #160a2b;
+  /* chunky neon bevel rám (přebíjí plochý pergamen) */
+  border: none;
+  box-shadow:
+    0 0 0 1px var(--rt-pink, #ff2e97),
+    0 0 0 5px var(--rt-night-0, #0a0414),
+    0 0 0 6px var(--rt-san-deep, #5e1d8f),
+    0 0 30px -2px rgba(255, 46, 151, 0.42),
+    0 0 64px -6px rgba(192, 75, 255, 0.3),
+    0 44px 96px -30px #000;
+}
+/* přebij pergamenový šum → CRT sun-grid horizont u paty listu */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-sheet::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  inset: auto 0 0 0;
+  height: 210px;
+  z-index: 0;
+  opacity: 1;
+  mix-blend-mode: normal;
+  pointer-events: none;
+  background-image:
+    linear-gradient(0deg, rgba(13, 4, 32, 0) 0 40%, #0e0722 92%),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(34, 211, 238, 0.16) 34px 35px),
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(255, 46, 151, 0.14) 27px 28px);
+  -webkit-mask-image: linear-gradient(0deg, #000 0 55%, transparent 100%);
+  mask-image: linear-gradient(0deg, #000 0 55%, transparent 100%);
+  transform-origin: bottom;
+  transform: perspective(420px) rotateX(62deg);
+}
+/* přebij art-deco dvojrámeček → SIGNATURE: CRT scanline + vinětace přes list */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  border: none;
+  background:
+    var(--rt-scan, repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.3) 2px 3px)),
+    radial-gradient(130% 120% at 50% 45%, transparent 60%, rgba(0, 0, 0, 0.42) 100%);
+  opacity: 0.48;
+  mix-blend-mode: multiply;
+}
+
+/* vstupy: terminál pole */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-sheet input,
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-sheet textarea {
+  font-family: var(--rt-f-body, 'Share Tech Mono', monospace);
+  color: var(--rt-ink, #f4ecff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-sheet input:focus,
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-sheet textarea:focus {
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 3) SPISOVÁ PÁSKA — USR:// prompt (galerie .usr) + neon dossier tag
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-filestrip {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  letter-spacing: 0.18em;
+  color: var(--rt-ink-faint, #8a72ad);
+  border-bottom: 1px dashed var(--rt-line, rgba(111, 58, 168, 0.55));
+}
+/* SIGNATURE: USR:// prompt marker před obsahem pásky */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-filestrip::before {
+  content: 'USR://';
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  letter-spacing: 0.08em;
+  color: var(--rt-amber, #ffb347);
+  text-shadow: 0 0 6px var(--rt-amber, #ffb347);
+  margin-right: 4px;
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-dossier {
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: 0 0 7px var(--rt-san, #c04bff);
+  border: 1px solid var(--rt-san-deep, #5e1d8f);
+  border-radius: 3px;
+  padding: 3px 9px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 4) HERO — Orbitron neon jméno + terminálový portrét + purpur razítko
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-portrait {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(34, 211, 238, 0.1) 3px 4px),
+    linear-gradient(155deg, var(--rt-screen-0, #241445), var(--rt-screen-2, #130a24));
+  border: 1.5px solid var(--rt-san-deep, #5e1d8f);
+  border-radius: 5px;
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.6), 0 0 16px -6px var(--rt-san, #c04bff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-portrait::after {
+  border-color: rgba(192, 75, 255, 0.25);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-portrait span {
+  font-family: var(--rt-f-term, 'VT323', monospace);
+  font-size: 13px;
+  color: var(--rt-ink-faint, #8a72ad);
+  text-shadow: 0 0 6px rgba(138, 114, 173, 0.6);
+}
+/* SIGNATURE: neon Orbitron jméno (přebíjí Cinzel Decorative) */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-name {
+  font-family: var(--rt-f-title, 'Orbitron', sans-serif);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: var(--rt-ink, #f4ecff);
+  text-shadow: 0 0 14px rgba(192, 75, 255, 0.5), 2px 2px 0 var(--rt-cyan-deep, #0c6b80);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-occ {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  letter-spacing: 0.1em;
+  color: var(--rt-amber-hi, #ffe07a);
+  text-shadow: 0 0 7px var(--rt-amber, #ffb347);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-meta-field label {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 5px var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-meta-field input {
+  border-bottom: 1px solid var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+  color: var(--rt-ink, #f4ecff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-meta-field input:focus {
+  border-bottom-color: var(--rt-cyan, #22d3ee);
+}
+/* razítko DŮVĚRNÉ → purpur neon kruh */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-stamp {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  border: 2px solid var(--rt-san, #c04bff);
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: 0 0 6px var(--rt-san, #c04bff);
+  box-shadow: 0 0 16px -3px var(--rt-san, #c04bff), inset 0 0 14px rgba(192, 75, 255, 0.2);
+  filter: none;
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-stamp b {
+  font-family: var(--rt-f-title, 'Orbitron', sans-serif);
+  font-weight: 700;
+  color: var(--rt-san-hi, #e2a8ff);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 5) ODDĚLOVAČ SEKCÍ — `> ` prompt nadpis + neon linka + cyan glyf
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-divider::before,
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-divider::after {
+  background: linear-gradient(90deg, transparent, var(--rt-cyan-deep, #0c6b80), transparent);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-divider-glyph svg {
+  stroke: var(--rt-cyan, #22d3ee);
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.6));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-divider h2 {
+  font-family: var(--rt-f-title, 'Orbitron', sans-serif);
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 10px var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-divider h2::before {
+  content: '> ';
+  color: var(--rt-amber, #ffb347);
+  text-shadow: 0 0 6px var(--rt-amber, #ffb347);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 6) VLASTNOSTI — 7-seg LED čísla (VT323) + ASCII rohy ┌┐└┘ na kartách
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char {
+  background: var(--rt-screen-1, #1b0f33);
+  border: 1px solid var(--rt-line, rgba(111, 58, 168, 0.55));
+  box-shadow: inset 0 0 0 1px var(--rt-line-soft, rgba(74, 42, 115, 0.5)), inset 0 0 18px rgba(0, 0, 0, 0.4);
+}
+/* SIGNATURE: ASCII rohy ┌┐└┘ přes obsahovou kartu (4 SVG rohy) */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-size: 11px 11px;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M2 10 L2 2 L10 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M9 10 L9 2 L1 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M2 1 L2 9 L10 9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M9 1 L9 9 L1 9'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 3px rgba(255, 179, 71, 0.5));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char-label {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 6px var(--rt-cyan, #22d3ee);
+}
+/* 7-seg LED hlavní hodnota (galerie .char .main) */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char-main {
+  font-family: var(--rt-f-num, 'VT323', monospace);
+  font-weight: 400;
+  font-size: 38px;
+  color: var(--rt-amber-hi, #ffe07a);
+  text-shadow: 0 0 14px var(--rt-amber, #ffb347);
+  background: var(--rt-screen-3, #0e0722);
+  border: 1px solid var(--rt-line, rgba(111, 58, 168, 0.55));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char-main:focus {
+  border-color: var(--rt-amber, #ffb347);
+}
+/* odvozené vlastnosti (galerie .char.derived) — cyan LED */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char.is-derived .coc-char-label {
+  color: var(--rt-cyan-hi, #8af3ff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char.is-derived .coc-char-main {
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 12px var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char-sub span {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-ink-faint, #8a72ad);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-char-sub input {
+  font-family: var(--rt-f-num, 'VT323', monospace);
+  color: var(--rt-ink-soft, #c3aee0);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 7) STAV / VITALS — Životy magenta · Body magie cyan · Štěstí jantar ·
+ *    PŘÍČETNOST = SIGNATURE purpur glitch + „SANITY: STABLE" status readout
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital {
+  position: relative;
+  background: var(--rt-screen-1, #1b0f33);
+  border: 1px solid var(--rt-line, rgba(111, 58, 168, 0.55));
+  box-shadow: inset 0 0 0 1px var(--rt-line-soft, rgba(74, 42, 115, 0.5)), inset 0 0 18px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital-label {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 6px var(--rt-cyan, #22d3ee);
+}
+/* 7-seg LED čísla stavu (galerie .vital .nums) */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital-nums .cur,
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital-nums .max {
+  font-family: var(--rt-f-num, 'VT323', monospace);
+  color: var(--rt-ink, #f4ecff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital-nums .cur {
+  font-size: 34px;
+  font-weight: 400;
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital-nums .slash {
+  color: var(--rt-ink-faint, #8a72ad);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital-sub {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-ink-faint, #8a72ad);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital-track {
+  background: var(--rt-screen-3, #0e0722);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+/* Životy = magenta */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-danger {
+  border-color: color-mix(in srgb, var(--rt-pink, #ff2e97) 45%, transparent);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-danger .coc-vital-label {
+  color: var(--rt-pink-hi, #ff8ec9);
+  text-shadow: 0 0 6px var(--rt-pink, #ff2e97);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-danger .coc-vital-nums .cur {
+  color: var(--rt-pink-hi, #ff8ec9);
+  text-shadow: 0 0 10px var(--rt-pink, #ff2e97);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-danger .coc-vital-track i {
+  background: linear-gradient(90deg, var(--rt-pink-deep, #a01060), var(--rt-pink, #ff2e97));
+  box-shadow: 0 0 10px var(--rt-pink, #ff2e97);
+}
+/* Body magie = cyan */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-mp .coc-vital-nums .cur {
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 10px var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-mp .coc-vital-track i {
+  background: linear-gradient(90deg, var(--rt-cyan-deep, #0c6b80), var(--rt-cyan, #22d3ee));
+  box-shadow: 0 0 10px var(--rt-cyan, #22d3ee);
+}
+/* Štěstí = jantar */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-luck .coc-vital-nums .cur {
+  color: var(--rt-amber-hi, #ffe07a);
+  text-shadow: 0 0 10px var(--rt-amber, #ffb347);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-luck .coc-vital-track i {
+  background: linear-gradient(90deg, var(--rt-amber-deep, #7a5418), var(--rt-amber, #ffb347));
+  box-shadow: 0 0 10px var(--rt-amber, #ffb347);
+}
+
+/* PŘÍČETNOST = SIGNATURE purpur glitch */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-sanity {
+  border-color: var(--rt-san, #c04bff);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(192, 75, 255, 0.16), transparent 70%),
+    var(--rt-screen-1, #1b0f33);
+  box-shadow:
+    inset 0 0 0 1px rgba(192, 75, 255, 0.35),
+    inset 0 0 20px rgba(0, 0, 0, 0.4),
+    0 0 18px -5px var(--rt-san, #c04bff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-sanity .coc-vital-label {
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: 0 0 7px var(--rt-san, #c04bff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-sanity .coc-vital-nums .cur {
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: 0 0 12px var(--rt-san, #c04bff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-sanity .coc-vital-track i {
+  background: linear-gradient(90deg, var(--rt-san-deep, #5e1d8f), var(--rt-san, #c04bff));
+  box-shadow: 0 0 12px var(--rt-san, #c04bff);
+}
+/* SIGNATURE: „SANITY: STABLE" status readout s glitch text-shadow po číslech */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-sanity .coc-vital-sub {
+  position: relative;
+  margin-top: 9px;
+  padding: 5px 8px;
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  letter-spacing: 0.14em;
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: 0 0 7px var(--rt-san, #c04bff);
+  background: var(--rt-screen-3, #0e0722);
+  border: 1px solid var(--rt-san-deep, #5e1d8f);
+  border-radius: 3px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-vital.is-sanity .coc-vital-sub::after {
+  content: 'SANITY: STABLE';
+  display: block;
+  margin-top: 3px;
+  font-family: var(--rt-f-title, 'Orbitron', sans-serif);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: -1px 0 4px var(--rt-cyan, #22d3ee), 1px 0 4px var(--rt-pink, #ff2e97), 0 0 10px var(--rt-san, #c04bff);
+  animation: coc-rt-sanglitch 2.6s steps(2) infinite;
+}
+@keyframes coc-rt-sanglitch {
+  0%, 90%, 100% {
+    transform: translateX(0);
+  }
+  92% {
+    transform: translateX(1.5px);
+  }
+  94% {
+    transform: translateX(-1.5px);
+  }
+  96% {
+    transform: translateX(1px);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 8) STATUS PEČETI — LED indikátory, aktivní = magenta (nebezpečí)
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-seal {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-ink-faint, #8a72ad);
+  background: var(--rt-screen-1, #1b0f33);
+  border: 1px solid var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+  border-radius: 3px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-seal-dot {
+  border-radius: 2px;
+  border-color: var(--rt-screen-edge, #6f3aa8);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-seal:has(input:checked) {
+  color: var(--rt-pink-hi, #ff8ec9);
+  border-color: var(--rt-pink-deep, #a01060);
+  text-shadow: 0 0 6px var(--rt-pink, #ff2e97);
+  background: linear-gradient(180deg, rgba(255, 46, 151, 0.12), var(--rt-screen-1, #1b0f33));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-seal:has(input:checked) .coc-seal-dot {
+  background: var(--rt-pink, #ff2e97);
+  border-color: var(--rt-pink, #ff2e97);
+  box-shadow: 0 0 8px var(--rt-pink, #ff2e97);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 9) DOVEDNOSTI — LED hodnoty · Mýtus Cthulhu = SIGNATURE purpur
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill {
+  border-bottom: 1px dotted var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill:hover {
+  background: rgba(34, 211, 238, 0.05);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill-chk {
+  accent-color: var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill-name {
+  color: var(--rt-ink, #f4ecff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill-name b {
+  color: var(--rt-ink-faint, #8a72ad);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill-vals input {
+  font-family: var(--rt-f-num, 'VT323', monospace);
+  font-size: 17px;
+  color: var(--rt-amber-hi, #ffe07a);
+  text-shadow: 0 0 6px var(--rt-amber, #ffb347);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill-vals input.reg {
+  color: var(--rt-amber-hi, #ffe07a);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill-vals input:focus {
+  border-color: var(--rt-amber, #ffb347);
+}
+/* Mýtus Cthulhu = signature purpur */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill.is-mythos .coc-skill-name {
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: 0 0 6px var(--rt-san, #c04bff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-skill.is-mythos .coc-skill-vals input {
+  color: var(--rt-san-hi, #e2a8ff);
+  text-shadow: 0 0 8px var(--rt-san, #c04bff);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 10) BOJ — mono hlavičky, LED čísla, magenta škoda
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-combat th {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 5px var(--rt-cyan, #22d3ee);
+  border-bottom: 1px solid var(--rt-line, rgba(111, 58, 168, 0.55));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-combat td {
+  border-bottom: 1px solid var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-combat td input:focus {
+  border-color: var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-cd-item {
+  background: var(--rt-screen-1, #1b0f33);
+  border: 1px solid var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-cd-item span {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 5px var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-cd-item input {
+  font-family: var(--rt-f-num, 'VT323', monospace);
+  font-size: 20px;
+  color: var(--rt-amber-hi, #ffe07a);
+  text-shadow: 0 0 7px var(--rt-amber, #ffb347);
+  background: var(--rt-screen-3, #0e0722);
+  border: 1px solid var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-cd-item input:focus {
+  border-color: var(--rt-amber, #ffb347);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 11) SOUHRN — poznámková pole (řádkovaná obrazovka) · zakázané = purpur
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note {
+  background: var(--rt-screen-1, #1b0f33);
+  border: 1px solid var(--rt-line, rgba(111, 58, 168, 0.55));
+  box-shadow: inset 0 0 0 1px var(--rt-line-soft, rgba(74, 42, 115, 0.5)), inset 0 0 16px rgba(0, 0, 0, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note-title {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-cyan-hi, #8af3ff);
+  text-shadow: 0 0 6px var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note-title::before {
+  content: '» ';
+  color: var(--rt-amber, #ffb347);
+  text-shadow: 0 0 5px var(--rt-amber, #ffb347);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note-title svg {
+  stroke: var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note-area {
+  color: var(--rt-ink-soft, #c3aee0);
+  font-family: var(--rt-f-body, 'Share Tech Mono', monospace);
+  background-image: repeating-linear-gradient(transparent 0 27px, rgba(34, 211, 238, 0.09) 27px 28px);
+}
+/* zakázané vědění = signature purpur */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note.is-forbidden {
+  border-color: var(--rt-san, #c04bff);
+  background: linear-gradient(180deg, rgba(192, 75, 255, 0.12), var(--rt-screen-1, #1b0f33));
+  box-shadow:
+    inset 0 0 0 1px rgba(192, 75, 255, 0.3),
+    inset 0 0 16px rgba(0, 0, 0, 0.4),
+    0 0 14px -6px var(--rt-san, #c04bff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note.is-forbidden .coc-note-title,
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note.is-forbidden .coc-note-title svg {
+  color: var(--rt-san-hi, #e2a8ff);
+  stroke: var(--rt-san, #c04bff);
+  text-shadow: 0 0 7px var(--rt-san, #c04bff);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-note.is-forbidden .coc-note-area {
+  color: var(--rt-san-hi, #e2a8ff);
+  background-image: repeating-linear-gradient(transparent 0 27px, rgba(192, 75, 255, 0.14) 27px 28px);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 12) VYBAVENÍ / MAJETEK — LED částky
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-money-row {
+  border-bottom: 1px dashed var(--rt-line-soft, rgba(74, 42, 115, 0.5));
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-money-row label {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-ink-soft, #c3aee0);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-money-row input {
+  font-family: var(--rt-f-num, 'VT323', monospace);
+  font-size: 20px;
+  color: var(--rt-amber-hi, #ffe07a);
+  text-shadow: 0 0 7px var(--rt-amber, #ffb347);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 13) ADD / DEL — terminál akce
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-add {
+  font-family: var(--rt-f-head, 'Share Tech Mono', monospace);
+  color: var(--rt-cyan-hi, #8af3ff);
+  border: 1px dashed var(--rt-cyan-deep, #0c6b80);
+  border-radius: 4px;
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-add:hover {
+  color: var(--rt-ink-deep, #0a0414);
+  background: var(--rt-cyan, #22d3ee);
+  border-style: solid;
+  border-color: var(--rt-cyan, #22d3ee);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-del {
+  color: var(--rt-pink-deep, #a01060);
+}
+[data-diary-system='coc'][data-diary-skin='retro'] .coc-del:hover {
+  color: var(--rt-pink, #ff2e97);
+  text-shadow: 0 0 6px var(--rt-pink, #ff2e97);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 14) PANEL + EMBED tokeny (combat/bestie panel + obal TM / dice readout /
+ *     dicelog / orchestrace / chat rail) — PLNÁ `--dd-embed-*` sada.
+ *     Plocha VŽDY OPAQUE (plný gradient) → nesmí prosvítat na mapu.
+ *     Sémantika: pos = úspěch (fosfor zelená) / neg = neúspěch/krev (červená)
+ *     / neutral = jantar. Ornament TVAR dědí embed z rodinných :is() bloků —
+ *     tady JEN barvy/fonty. Fosfor OPAQUE, čitelný neon.
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='retro'] {
+  --dd-embed-surface: linear-gradient(180deg, #241445, #130a24); /* OPAQUE fosfor */
+  --dd-embed-border: var(--rt-san, #c04bff);
+  --dd-embed-line: rgba(111, 58, 168, 0.55);
+  --dd-embed-text: var(--rt-ink, #f4ecff);
+  --dd-embed-muted: var(--rt-ink-soft, #c3aee0);
+  --dd-embed-title: var(--rt-cyan-hi, #8af3ff);
+  --dd-embed-chip-bg: rgba(255, 46, 151, 0.1);
+  --dd-embed-accent: var(--rt-pink, #ff2e97);
+  --dd-embed-num-font: var(--rt-f-num, 'VT323', monospace);
+  --dd-embed-title-font: var(--rt-f-title, 'Orbitron', sans-serif);
+  --dd-embed-pos: var(--rt-emer-hi, #8af5b6); /* úspěch = fosfor zelená */
+  --dd-embed-neg: var(--rt-blood-hi, #ff8a8a); /* neúspěch / krev = červená */
+  --dd-embed-neutral: var(--rt-amber-hi, #ffe07a); /* neutrál = jantar */
+  /* HP bar fill (combat + bestie panel čtou přes var()) = magenta */
+  --dd-hpfill-grad: linear-gradient(90deg, var(--rt-pink-deep, #a01060), var(--rt-pink, #ff2e97));
+  --dd-mpfill-grad: linear-gradient(90deg, var(--rt-cyan-deep, #0c6b80), var(--rt-cyan, #22d3ee));
+}

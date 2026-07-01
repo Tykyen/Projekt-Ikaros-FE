@@ -1,0 +1,658 @@
+/* Call of Cthulhu — skin „anime" (id `anime`): MLP DUHOVÝ CEL-SHADE.
+ *
+ * Sourozenec gurps-skins/anime.css + drdh/drdplus/drd16 anime.css (TENTÝŽ svět)
+ * — přeložený do CoC deníkového spisu. CoC baseline je jinak TMAVÝ art-deco
+ * dossier na pergamenu; anime jej OTÁČÍ na SVĚTLOU, hravou, kreslenou
+ * „magical-girl" kartu: bílé ink-outlined cel-plochy (obrys #16162e) na plné
+ * pastelové duze, TVRDÝ spodní cel-stín (karta „stojí" nad podkladem) + gloss.
+ * Disciplinovaný ink obrys drží duhu pohromadě → veselé, ale profesionální
+ * zpracování lovecraftovského hororu (NE dětská čmáranice, NE tmavé pozadí).
+ *
+ * Vizuální kontrakt = galerie c:/tmp/coc-skins/anime.html:
+ *   plná duha #ff5d6c→#ff6ad5, ink #16162e, text #2e2650, Životy jasná červená
+ *   #ff4d63, PŘÍČETNOST = levandulová/fialová #a06aff „friendship meter"
+ *   (signature CoC blok). Fonty Bricolage Grotesque / Outfit.
+ *
+ * MLP signature (drží FUNKCI CoC listu):
+ *   1) karty (.coc-char / .coc-vital / .coc-cd-item / .coc-note) = bílé cel-
+ *      nálepky: ink obrys + TVRDÝ spodní cel-stín (odlepené od podkladu).
+ *   2) holografický conic star-burst medailon v hero (.coc-hero::after) +
+ *      duhový hero podklad; ✦ sparkle markery na oddělovačích/kartách.
+ *   3) PŘÍČETNOST = levandulová „friendship meter" — signature váha
+ *      (glow bar + ♡ + ✦ sparkles); duhový text-clip jména.
+ *
+ * SCOPE: KAŽDÉ pravidlo nese compound prefix
+ * `[data-diary-system='coc'][data-diary-skin='anime']` (specifita 0,2,0 →
+ * přebije baseline `[data-diary-system='coc']` 0,1,0). List (.coc-sheet)
+ * přebíjí `--coc-*`; embedy dědí `--dd-embed-*` z `[ds][dsk]`. Pouze CSS/SVG,
+ * ŽÁDNÝ JS. Regrese-safe (jen overrides). Motiv se NESDÍLÍ s jiným skinem.
+ *
+ * IMPORT: registrováno přes `@import './coc-skins/anime.css';` v diary-skins.css.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   0) DUHOVÁ PALETA + cel-stíny (galerie anime.html). Lokální MLP pomocníci —
+   ornamenty i kompozity je čtou. Nesdílí se s žádným jiným skinem.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-sheet,
+[data-diary-system='coc'][data-diary-skin='anime'] {
+  --mlp-ink: #16162e; /* obrys / text tmavý */
+  --mlp-ink-soft: #4b3f6e;
+  --mlp-paper: #fffafd;
+  --mlp-paper-2: #ffffff;
+  --mlp-text: #2e2650;
+  --mlp-muted: #8b7bb2;
+  --mlp-dim: #b6a9d4;
+
+  --mlp-pink: #ff5d6c; /* rainbow start */
+  --mlp-pink-hot: #ff6ad5; /* rainbow end / sparkle */
+  --mlp-peach: #ff9a5d;
+  --mlp-gold: #ffc23e;
+  --mlp-lime: #7fe06a;
+  --mlp-teal: #34d6d0;
+  --mlp-sky: #45b6ff;
+  --mlp-violet: #a06aff;
+  --mlp-lavender: #c79bff;
+
+  /* sémantika (drží význam napříč skiny) */
+  --mlp-hp: #ff4d63; /* Životy = jasná červená/pink */
+  --mlp-hp-2: #ff8aa0;
+  --mlp-mp: #45b6ff; /* Body magie = modrá */
+  --mlp-luck: #ffc23e; /* Štěstí = zlatá */
+  --mlp-san: #a06aff; /* Příčetnost = levandulová/fialová (SIGNATURE) */
+  --mlp-san-2: #c79bff;
+  --mlp-ok: #2fb56a; /* úspěch */
+  --mlp-bad: #ff4d63; /* neúspěch / krev */
+
+  /* plná holografická duha (páska, medailony, text-clip, bar fill) */
+  --mlp-rainbow: linear-gradient(
+    100deg,
+    #ff5d6c,
+    #ff9a5d 22%,
+    #ffc23e 40%,
+    #7fe06a 58%,
+    #34d6d0 72%,
+    #45b6ff 84%,
+    #ff6ad5
+  );
+  --mlp-rainbow-90: linear-gradient(90deg, #ff5d6c, #ff9a5d, #ffc23e, #7fe06a, #34d6d0, #45b6ff, #ff6ad5);
+  /* holografický conic star-burst (hero medailon) */
+  --mlp-conic-star: conic-gradient(
+    from 210deg,
+    rgba(255, 255, 255, 0) 0deg,
+    rgba(255, 255, 255, 0.7) 28deg,
+    rgba(255, 255, 255, 0) 58deg,
+    rgba(255, 255, 255, 0.45) 108deg,
+    rgba(255, 255, 255, 0) 148deg,
+    rgba(255, 255, 255, 0.72) 208deg,
+    rgba(255, 255, 255, 0) 248deg,
+    rgba(255, 255, 255, 0.4) 318deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+
+  /* vrstvené cel-stíny (signature tvrdý spodní stupeň) */
+  --mlp-cel-card: 0 0 0 2px var(--mlp-ink, #16162e), 0 5px 0 0 var(--mlp-ink, #16162e),
+    0 12px 22px -12px rgba(160, 106, 255, 0.5);
+  --mlp-cel-sm: 0 0 0 1.5px var(--mlp-ink, #16162e), 0 3px 0 0 var(--mlp-ink, #16162e);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) LIST — override `--coc-*` na .coc-sheet (0,2,0 přebije baseline 0,1,0).
+   Tmavý art-deco dossier → SVĚTLÁ pastelová duha, ink text, plná duha akcent.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-sheet {
+  --coc-ink: var(--mlp-ink, #16162e);
+  --coc-parch: var(--mlp-text, #2e2650); /* text na světlém = tmavý ink */
+  --coc-parch-dim: var(--mlp-muted, #8b7bb2);
+  --coc-parch-faint: var(--mlp-dim, #b6a9d4);
+  --coc-accent: var(--mlp-violet, #a06aff);
+  --coc-accent-bright: var(--mlp-pink-hot, #ff6ad5);
+  --coc-line: rgba(160, 106, 255, 0.26);
+  --coc-line-faint: rgba(160, 106, 255, 0.12);
+  --coc-panel: var(--mlp-paper-2, #ffffff);
+  --coc-panel-2: var(--mlp-paper-2, #ffffff);
+  --coc-input: #f4ecff;
+  /* sémantické (vitals) */
+  --coc-hp: var(--mlp-hp, #ff4d63);
+  --coc-hp-bright: var(--mlp-hp-2, #ff8aa0);
+  --coc-mp: var(--mlp-mp, #45b6ff);
+  --coc-mp-bright: #8cd2ff;
+  --coc-sanity: var(--mlp-san, #a06aff);
+  --coc-sanity-bright: var(--mlp-san-2, #c79bff);
+  --coc-luck: var(--mlp-luck, #ffc23e);
+  --coc-luck-bright: #ffe08a;
+
+  font-family: 'Outfit', system-ui, sans-serif;
+  color: var(--mlp-text, #2e2650);
+  /* PLOCHA listu = SVĚTLÝ pastel duha (galerie: radial růžová + baby-blue +
+     máslová + linear fialovo-modrá); obal = ink+bílý dvojprstenec + duhová záře */
+  background:
+    radial-gradient(1100px 460px at 84% -8%, #ffe3f4, transparent 60%),
+    radial-gradient(820px 380px at 8% 2%, #dbecff, transparent 55%),
+    radial-gradient(700px 400px at 50% 108%, #fff2cf, transparent 60%),
+    linear-gradient(168deg, #fbf3ff, #eaf3ff);
+  border: none;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.7) inset,
+    0 0 0 3px var(--mlp-ink, #16162e),
+    0 0 0 8px #ffffff,
+    0 0 0 10px var(--mlp-ink, #16162e),
+    0 30px 70px -28px rgba(160, 106, 255, 0.6);
+}
+/* baseline pergamenový šum → jemná duhová záře (přebij tmavý overlay na světlý) */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-sheet::before {
+  opacity: 0.5;
+  mix-blend-mode: normal;
+  background:
+    radial-gradient(70% 50% at 12% -6%, rgba(255, 255, 255, 0.5), transparent 55%),
+    radial-gradient(60% 50% at 100% 104%, rgba(160, 106, 255, 0.08), transparent 60%);
+}
+/* art-deco dvojrámeček → tenký ink dvojrám s duhovým vnitřkem */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-sheet::after {
+  inset: 6px;
+  border: 2px solid rgba(22, 22, 46, 0.14);
+  border-radius: 6px;
+}
+
+/* ── SPISOVÁ PÁSKA = duhový header s ink obrysem ─────────────────── */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-filestrip {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  letter-spacing: 0.14em;
+  color: #ffffff;
+  background: var(--mlp-rainbow, linear-gradient(100deg, #ff5d6c, #ffc23e, #34d6d0, #45b6ff, #ff6ad5));
+  border-bottom: 2px solid var(--mlp-ink, #16162e);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-dossier {
+  color: var(--mlp-san, #a06aff);
+  background: var(--mlp-paper-2, #ffffff);
+  border-radius: 999px;
+  padding: 3px 11px;
+  box-shadow: 0 0 0 1.5px var(--mlp-ink, #16162e);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) HERO — duhový podklad + holografický conic star-burst medailon (SIGNATURE),
+   duhový text-clip jména, bílé cel-pole, pečetní razítko v levandulové.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(112deg, #ffd1ec, #e3d3ff 46%, #cfeeff);
+  border-bottom: 2px solid var(--mlp-ink, #16162e);
+}
+/* SIGNATURE holografický conic star-burst medailon (TR) */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-hero::after {
+  content: '';
+  position: absolute;
+  top: -70px;
+  right: -56px;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+  background: var(--mlp-conic-star);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-hero > * {
+  position: relative;
+  z-index: 1;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-portrait {
+  border: 2px solid var(--mlp-ink, #16162e);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.47), transparent 60%),
+    var(--mlp-rainbow, linear-gradient(100deg, #ff5d6c, #ffc23e, #34d6d0, #45b6ff, #ff6ad5));
+  box-shadow: var(--mlp-cel-sm, 0 3px 0 0 #16162e), inset 0 0 0 4px #ffffff;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-portrait::after {
+  border-color: rgba(255, 255, 255, 0.55);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-portrait span {
+  color: rgba(255, 255, 255, 0.92);
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  text-shadow: 0 1px 0 var(--mlp-ink, #16162e);
+}
+/* jméno = duhový pop-nápis (text-clip; fallback ink) */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-name {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--mlp-ink, #16162e);
+  background: var(--mlp-rainbow, linear-gradient(90deg, #ff5d6c, #ffc23e, #45b6ff, #ff6ad5));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 0 rgba(22, 22, 46, 0.28));
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-occ {
+  color: var(--mlp-san, #a06aff);
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-name::placeholder,
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-occ::placeholder {
+  color: var(--mlp-dim, #b6a9d4);
+  -webkit-text-fill-color: var(--mlp-dim, #b6a9d4);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-meta-field label {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--mlp-ink-soft, #4b3f6e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-meta-field input {
+  color: var(--mlp-ink, #16162e);
+  border-bottom: 2px solid rgba(22, 22, 46, 0.2);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-meta-field input:focus {
+  border-bottom-color: var(--mlp-san, #a06aff);
+}
+/* pečetní razítko → levandulová cel-nálepka (friendship dossier) */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-stamp {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  transform: rotate(7deg);
+  color: var(--mlp-pink, #ff5d6c);
+  border: 2.5px solid var(--mlp-pink, #ff5d6c);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
+  filter: none;
+  box-shadow: 0 3px 0 -1px var(--mlp-ink, #16162e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-stamp b {
+  color: var(--mlp-san, #a06aff);
+}
+
+/* ── ODDĚLOVAČE — duhové linky, ✦ sparkle glyph, ink nadpis ──────── */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-divider::before,
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-divider::after {
+  background: var(--mlp-rainbow-90, linear-gradient(90deg, #ff5d6c, #ffc23e, #45b6ff, #ff6ad5));
+  height: 2px;
+  opacity: 0.55;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-divider-glyph svg {
+  stroke: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-divider h2 {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: var(--mlp-ink, #16162e);
+}
+/* ✦ sparkle za nadpisem (echo napříč povrchy) */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-divider h2::after {
+  content: ' \2726';
+  color: var(--mlp-pink-hot, #ff6ad5);
+  -webkit-text-stroke: 0.6px var(--mlp-ink, #16162e);
+  font-size: 12px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE — karty = bílé cel-„samolepky": ink obrys + TVRDÝ spodní stín.
+   Cíl = .coc-char / .coc-vital / .coc-cd-item / .coc-note (nesou padding).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-char,
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital,
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-cd-item,
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note {
+  background: var(--mlp-paper-2, #ffffff);
+  border: none;
+  border-radius: 14px;
+  clip-path: none;
+  box-shadow: var(--mlp-cel-sm, 0 0 0 1.5px #16162e, 0 3px 0 0 #16162e);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) VLASTNOSTI — bílé cel-karty; label = levandulová pilulka, ink číslo.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-char-label {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  background: var(--mlp-san, #a06aff);
+  border: 1.5px solid var(--mlp-ink, #16162e);
+  border-radius: 999px;
+  display: inline-block;
+  padding: 1px 12px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-char.is-derived .coc-char-label {
+  color: var(--mlp-san, #a06aff);
+  background: var(--mlp-paper-2, #ffffff);
+  border-color: var(--coc-line, rgba(160, 106, 255, 0.26));
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-char-main {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink, #16162e);
+  background: var(--coc-input, #f4ecff);
+  border: 1.5px solid var(--coc-line, rgba(160, 106, 255, 0.26));
+  border-radius: 8px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-char-main:focus {
+  border-color: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-char-sub input {
+  color: var(--mlp-san, #a06aff);
+  font-weight: 700;
+  background: #f6eeff;
+  border: 1.5px solid var(--coc-line-faint, rgba(160, 106, 255, 0.12));
+  border-radius: 6px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-char-sub span {
+  color: var(--mlp-muted, #8b7bb2);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) STAV / VITALS — bílé cel-karty; PŘÍČETNOST = levandulová friendship meter.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital-label {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--mlp-ink, #16162e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital-nums .cur {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink, #16162e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital-nums .max {
+  color: var(--mlp-muted, #8b7bb2);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital-nums input:focus {
+  color: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital-track {
+  background: #eee3f7;
+  border: 1.5px solid var(--mlp-ink, #16162e);
+  border-radius: 999px;
+  height: 8px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital-track i {
+  border-radius: 999px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-danger {
+  border-color: var(--mlp-hp, #ff4d63);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-danger .coc-vital-label {
+  color: var(--mlp-hp, #ff4d63);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-danger .coc-vital-track i {
+  background: linear-gradient(180deg, var(--mlp-hp-2, #ff8aa0), var(--mlp-hp, #ff4d63));
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-mp .coc-vital-track i {
+  background: linear-gradient(180deg, #8cd2ff, var(--mlp-mp, #45b6ff));
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-luck .coc-vital-track i {
+  background: linear-gradient(180deg, #ffe08a, var(--mlp-luck, #ffc23e));
+}
+/* SIGNATURE PŘÍČETNOST — friendship meter: levandulová deska, glow bar, ♡ + ✦ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--mlp-san, #a06aff);
+  background: linear-gradient(180deg, #fbf3ff, #f3e9ff);
+  box-shadow: 0 5px 0 0 var(--mlp-san, #a06aff), 0 0 0 1.5px var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity .coc-vital-label {
+  color: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity .coc-vital-label::after {
+  content: ' \2661'; /* ♡ */
+  color: var(--mlp-san, #a06aff);
+  font-size: 13px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity .coc-vital-nums .cur {
+  color: var(--mlp-san, #a06aff);
+  text-shadow: 0 0 12px rgba(160, 106, 255, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity .coc-vital-track {
+  border-color: var(--mlp-san, #a06aff);
+  background: #efe4ff;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity .coc-vital-track i {
+  background: linear-gradient(90deg, var(--mlp-san, #a06aff), var(--mlp-san-2, #c79bff), #ff9ad8);
+  box-shadow: 0 0 8px rgba(160, 106, 255, 0.6);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity::before {
+  content: '\2726 \2726 \2726'; /* ✦ ✦ ✦ */
+  position: absolute;
+  right: 8px;
+  bottom: 18px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--mlp-san-2, #c79bff);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ── STATUS PEČETI — bílé cel-pilulky, duhová tečka při aktivaci ──── */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-seal {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--mlp-ink-soft, #4b3f6e);
+  background: var(--mlp-paper-2, #ffffff);
+  border: 2px solid var(--mlp-ink, #16162e);
+  border-radius: 999px;
+  box-shadow: 0 2px 0 -0.5px var(--mlp-ink, #16162e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-seal-dot {
+  border: 1.5px solid var(--mlp-ink, #16162e);
+  background: #efe7fb;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-seal:has(input:checked) {
+  color: var(--mlp-ink, #16162e);
+  border-color: var(--mlp-san, #a06aff);
+  border-style: solid;
+  background: linear-gradient(180deg, #fbf3ff, #f4ecff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-seal:has(input:checked) .coc-seal-dot {
+  background: var(--mlp-san, #a06aff);
+  border-color: var(--mlp-ink, #16162e);
+  box-shadow: 0 0 6px var(--mlp-san-2, #c79bff);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) DOVEDNOSTI — bílé cel-řádky; Mýtus Cthulhu = levandulová váha + ✦.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill {
+  border-bottom: 1px dotted rgba(160, 106, 255, 0.2);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill:hover {
+  background: rgba(160, 106, 255, 0.06);
+  border-radius: 8px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill-chk {
+  accent-color: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill-name {
+  color: var(--mlp-text, #2e2650);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill-name b {
+  color: var(--mlp-muted, #8b7bb2);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill-vals input {
+  color: var(--mlp-text, #2e2650);
+  background: #f4ecff;
+  border: 1.5px solid var(--coc-line-faint, rgba(160, 106, 255, 0.12));
+  border-radius: 6px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill-vals input.reg {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill-vals input:focus {
+  border-color: var(--mlp-san, #a06aff);
+}
+/* Mýtus Cthulhu = levandulová váha (kontrapunkt hravosti) */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill.is-mythos {
+  background: linear-gradient(90deg, rgba(160, 106, 255, 0.14), transparent 70%);
+  border-bottom-color: rgba(160, 106, 255, 0.5);
+  border-radius: 8px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill.is-mythos .coc-skill-name {
+  color: var(--mlp-san, #a06aff);
+  font-weight: 600;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill.is-mythos .coc-skill-name::before {
+  content: '\2726 '; /* ✦ */
+  color: var(--mlp-pink-hot, #ff6ad5);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-skill.is-mythos .coc-skill-vals input.reg {
+  color: #ffffff;
+  background: var(--mlp-san, #a06aff);
+  border-color: var(--mlp-ink, #16162e);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) BOJ — ink hlavička, bílá vstupní pole, ink cel-medailony pro odvozené.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-combat th {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--mlp-violet, #a06aff);
+  border-bottom: 2px solid var(--mlp-ink, #16162e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-combat td {
+  border-bottom: 1px dotted rgba(160, 106, 255, 0.2);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-combat td input {
+  color: var(--mlp-text, #2e2650);
+  background: #f4ecff;
+  border-radius: 8px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-combat td input:focus {
+  border-color: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-cd-item span {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--mlp-ink-soft, #4b3f6e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-cd-item input {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink, #16162e);
+  background: var(--coc-input, #f4ecff);
+  border: 1.5px solid var(--coc-line, rgba(160, 106, 255, 0.26));
+  border-radius: 8px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-cd-item input:focus {
+  border-color: var(--mlp-san, #a06aff);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) SOUHRN / POZNÁMKY — bílé cel-karty; Zakázané vědění = levandulová váha.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note-title {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--mlp-ink, #16162e);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note-title svg {
+  stroke: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note-area {
+  color: var(--mlp-text, #2e2650);
+  background-image: repeating-linear-gradient(transparent 0 27px, rgba(160, 106, 255, 0.14) 27px 28px);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note.is-forbidden {
+  border-color: var(--mlp-san, #a06aff);
+  background: linear-gradient(180deg, #faf3ff, #f4ecff);
+  box-shadow: 0 3px 0 0 var(--mlp-san, #a06aff), 0 0 0 1.5px var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note.is-forbidden .coc-note-title,
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note.is-forbidden .coc-note-title svg {
+  color: var(--mlp-san, #a06aff);
+  stroke: var(--mlp-san, #a06aff);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-note.is-forbidden .coc-note-area {
+  font-style: italic;
+  background-image: repeating-linear-gradient(transparent 0 27px, rgba(160, 106, 255, 0.18) 27px 28px);
+}
+
+/* ── VYBAVENÍ / MAJETEK ────────────────────────────────────────── */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-money-row {
+  border-bottom: 1px dashed rgba(160, 106, 255, 0.2);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-money-row label {
+  color: var(--mlp-ink-soft, #4b3f6e);
+  font-weight: 600;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-money-row input {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  color: var(--mlp-ink, #16162e);
+}
+
+/* ── ADD / DEL ─────────────────────────────────────────────────── */
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-add {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--mlp-san, #a06aff);
+  background: linear-gradient(180deg, #ffffff, #f3ebff);
+  border: 2px dashed var(--mlp-san, #a06aff);
+  border-radius: 10px;
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-add:hover {
+  color: var(--mlp-ink, #16162e);
+  border-style: solid;
+  background: rgba(160, 106, 255, 0.12);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-del {
+  color: rgba(255, 77, 99, 0.6);
+}
+[data-diary-system='coc'][data-diary-skin='anime'] .coc-del:hover {
+  color: var(--mlp-hp, #ff4d63);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) EMBED tokeny `--dd-embed-*` — combat/bestie panel, dice readout, dicelog,
+   orchestrace, obal TM/chat rail. PLNÁ sada; surface VŽDY OPAQUE (log neprosvítá
+   mapu). SVĚTLÝ cel-shade, ink obrys #16162e, tmavý text. TVAR obalu/readoutu
+   dědí z rodinných `:is()` bloků — zde JEN barvy. Sémantika pos/neg drží.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='anime'] {
+  /* OPAQUE světlá cel-shade deska (embed neprosvítá mapu) */
+  --dd-embed-surface: linear-gradient(180deg, #fffafd, #fbf3ff 55%, #f3ebff);
+  --dd-embed-border: #16162e;
+  --dd-embed-line: rgba(160, 106, 255, 0.24);
+  --dd-embed-text: #2e2650;
+  --dd-embed-muted: #8b7bb2;
+  --dd-embed-title: #a06aff;
+  --dd-embed-chip-bg: #ffffff;
+  --dd-embed-accent: #a06aff;
+  --dd-embed-num-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-title-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-pos: #2fb56a; /* úspěch = mint (čitelný na světlém) */
+  --dd-embed-neg: #ff4d63; /* neúspěch / krev = jasná červená */
+  --dd-embed-neutral: #a06aff; /* neutrál = levandulová */
+
+  /* HP bar fill (combat + bestie panel čtou přes var()) — jasná červená */
+  --dd-hpfill-grad: linear-gradient(90deg, #ff8aa0, #ff4d63); /* Životy = pink→červená */
+  --dd-sanfill-grad: linear-gradient(90deg, #c79bff, #a06aff 55%, #ff9ad8); /* Příčetnost = levandulová glow */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   10) RESPONSIVITA — cel-stíny drží i na úzkém viewportu (jemnější stupeň).
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  [data-diary-system='coc'][data-diary-skin='anime'] .coc-sheet::after {
+    inset: 4px;
+  }
+  [data-diary-system='coc'][data-diary-skin='anime'] .coc-vital.is-sanity::before {
+    display: none;
+  }
+}

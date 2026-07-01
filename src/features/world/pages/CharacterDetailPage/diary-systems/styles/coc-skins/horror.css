@@ -1,0 +1,334 @@
+/* Call of Cthulhu 7e — skin „HORROR" (Půlnoční salon) · DEFAULT skin CoC.
+ *
+ * Reskin CoC „art deco dossier" listu (`.coc-*` + `--coc-*` v coc.css) a
+ * mapových/chatových povrchů (combat/bestie panel + embedy přes `--dd-embed-*`)
+ * z pergamenového spisu do aristokratické viktoriánské upiriny BEZ gore.
+ * RODINA: sourozenec `gurps-skins/horror.css` (tentýž půlnoční salon), jen
+ * přeložený do CoC listu/panelů. Scoped na compound
+ * `[data-diary-system='coc'][data-diary-skin='horror']` → vyšší specificita
+ * (0,3,1 na `.coc-sheet`) přebije baseline `[data-diary-system='coc']`.
+ *
+ * Koncept: deník vyšetřovatele = půlnoční salon prastarého šlechtického rodu.
+ * Zašlé stříbro místo zlata, oxblood (granát) pro Životy, studená fialová jako
+ * SIGNATURE Příčetnosti (šílenství = éterická aura). Embed plochy tmavý salon
+ * (OPAQUE) dle DNA rodiny.
+ *
+ * Paleta (galerie horror): zašlé stříbro #c8c4cf (kov/akcent/labely) · oxblood
+ * #7a2030 / #a83a4c (Životy/nebezpečí) · studená fialová #7b5cc4 / #a487e8 /
+ * #b79bff (Příčetnost — signature) · zašlé zlato #9c7f4e (pečeť/iniciála).
+ * Sémantika hodů drží: úspěch zelený (#6fae7a), neúspěch oxblood (#b3495b).
+ *
+ * Fonty (rodina): UnifrakturCook (blackletter jméno/iniciála), Cormorant SC
+ * (salonní kapitálky labelů/nadpisů), Cormorant Garamond (serif tělo/čísla).
+ *
+ * Signature ornament (dle galerie): kovaná gotická STŘÍBRNÁ rohová tracerie na
+ * .coc-note / .coc-char (radiální rohová maska + oxblood pip) · voskový erb
+ * .coc-stamp (růže + netopýří křídla) · blackletter iluminovaná .coc-name.
+ *
+ * Import: statický v diary-skins.css (bundle i mimo deník — mapa/chat).
+ * Pouze CSS/SVG, žádný JS. Regrese-safe (jen přidává overrides).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cormorant+SC:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════
+   1) LIST (deník `.coc-sheet`) — --coc-* override + font + pozadí.
+   Compound `.coc-sheet` (0,3,1) přebije default `[data-diary-system='coc']`.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet {
+  /* inkoust světlý na tmavém salonu (galerie --ink / --ink-soft / --ink-faint) */
+  --coc-ink: #ece7f2;
+  --coc-parch: #d7d2df;
+  --coc-parch-dim: rgba(215, 210, 223, 0.58);
+  --coc-parch-faint: rgba(215, 210, 223, 0.32);
+  /* zašlé stříbro = akcent (galerie --silver #c8c4cf) */
+  --coc-accent: #c8c4cf;
+  --coc-accent-bright: #e6e2ec;
+  --coc-line: rgba(200, 196, 207, 0.2);
+  --coc-line-faint: rgba(200, 196, 207, 0.09);
+  /* tmavý salon místo pergamenu (galerie --panel / --panel-2) */
+  --coc-panel: rgba(27, 21, 34, 0.62);
+  --coc-panel-2: rgba(20, 16, 25, 0.66);
+  --coc-input: rgba(0, 0, 0, 0.32);
+  /* sémantické (vitals) */
+  --coc-hp: #7a2030; /* oxblood — Životy */
+  --coc-hp-bright: #a83a4c;
+  --coc-mp: #3a5a86; /* studená ocelová modř — Magie */
+  --coc-mp-bright: #6f9bd6;
+  --coc-sanity: #7b5cc4; /* studená fialová — Příčetnost (SIGNATURE) */
+  --coc-sanity-bright: #b79bff;
+  --coc-luck: #9c7f4e; /* zašlé zlato — Štěstí */
+  --coc-luck-bright: #d0ad6a;
+
+  color: var(--coc-parch);
+  /* salonní serif tělo */
+  font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  /* noční kabinet: fialový nádech shora + oxblood záře zdola (galerie body) */
+  background:
+    radial-gradient(120% 90% at 20% -6%, rgba(123, 92, 196, 0.14), transparent 60%),
+    radial-gradient(90% 60% at 92% 100%, rgba(122, 32, 48, 0.13), transparent 62%),
+    linear-gradient(180deg, rgba(23, 18, 31, 0.98), rgba(18, 14, 24, 0.99));
+  border: 1px solid rgba(200, 196, 207, 0.24);
+  box-shadow:
+    0 40px 120px -40px #000,
+    0 0 0 5px #0d0a12,
+    0 0 0 6px rgba(200, 196, 207, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+/* pergamenový šum → jemný noční brokát (galerie .diary::before) */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet::before {
+  opacity: 0.5;
+  mix-blend-mode: normal;
+  background-image:
+    radial-gradient(circle at 30% 18%, rgba(123, 92, 196, 0.06), transparent 42%),
+    repeating-linear-gradient(45deg, rgba(200, 196, 207, 0.016) 0 2px, transparent 2px 22px),
+    repeating-linear-gradient(-45deg, rgba(200, 196, 207, 0.016) 0 2px, transparent 2px 22px);
+}
+/* art deco dvojrámeček → stříbrný salonní rám */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet::after {
+  border-color: rgba(200, 196, 207, 0.16);
+}
+
+/* spisová páska: oxblood podklad (galerie .d-strip) */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-filestrip {
+  font-family: 'Cormorant SC', serif;
+  color: var(--coc-accent);
+  background: linear-gradient(180deg, rgba(122, 32, 48, 0.14), transparent);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-dossier {
+  color: var(--coc-hp-bright);
+}
+
+/* ── SIGNATURE: blackletter iluminované jméno (galerie .d-name .illum) ── */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-name {
+  font-family: 'UnifrakturCook', 'Cormorant Garamond', serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #efeaf6;
+  text-shadow: 0 0 18px rgba(164, 135, 232, 0.32);
+}
+/* iluminovaná první litera — fialová záře (galerie .illum) */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-name::first-letter {
+  color: var(--coc-sanity-bright);
+  text-shadow: 0 0 14px rgba(164, 135, 232, 0.5);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-occ {
+  font-family: 'Cormorant SC', serif;
+  color: var(--coc-sanity-bright);
+}
+
+/* labely/nadpisy → salonní kapitálka Cormorant SC (galerie --caps) */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-portrait span,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-meta-field label,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-divider h2,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char-label,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char-sub span,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital-label,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital-sub,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-seal,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-combat th,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-cd-item span,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note-title,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-money-row label,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-add {
+  font-family: 'Cormorant SC', serif;
+}
+
+/* portrét → salonní rám, měsíční kabinet (galerie .d-portrait) */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-portrait {
+  background:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.25) 0 2px, transparent 2px 5px),
+    radial-gradient(circle at 50% 34%, #2a2233, #16121e);
+  box-shadow:
+    0 0 0 4px #0e0b14,
+    0 0 0 5px rgba(200, 196, 207, 0.16),
+    inset 0 0 34px rgba(0, 0, 0, 0.72);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-portrait::after {
+  border-color: rgba(200, 196, 207, 0.18);
+}
+
+/* voskový erb (galerie .d-stamp) — DŮVĚRNÉ razítko, oxblood vosk */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-stamp {
+  font-family: 'Cormorant SC', serif;
+  border-color: rgba(122, 32, 48, 0.55);
+  color: rgba(168, 58, 76, 0.85);
+  filter: none;
+  box-shadow: 0 0 0 3px rgba(122, 32, 48, 0.08);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-stamp b {
+  color: var(--coc-hp-bright);
+}
+
+/* oddělovač sekcí — stříbrné vlásky + kapitálka */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-divider-glyph svg {
+  stroke: var(--coc-accent);
+}
+
+/* ── VLASTNOSTI: gotická STŘÍBRNÁ rohová tracerie (SIGNATURE, galerie .card) ──
+   inset stříbrný rám ořezaný radiální maskou v rozích = gotická okenní tracerie,
+   + oxblood pip v rozích (rodinný detail). */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char {
+  clip-path: none;
+  background: linear-gradient(180deg, var(--coc-panel), var(--coc-panel-2));
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(200, 196, 207, 0.2);
+  -webkit-mask:
+    radial-gradient(circle at 0 0, #000 11px, transparent 12px),
+    radial-gradient(circle at 100% 0, #000 11px, transparent 12px),
+    radial-gradient(circle at 0 100%, #000 11px, transparent 12px),
+    radial-gradient(circle at 100% 100%, #000 11px, transparent 12px);
+  mask:
+    radial-gradient(circle at 0 0, #000 11px, transparent 12px),
+    radial-gradient(circle at 100% 0, #000 11px, transparent 12px),
+    radial-gradient(circle at 0 100%, #000 11px, transparent 12px),
+    radial-gradient(circle at 100% 100%, #000 11px, transparent 12px);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 9px 9px, rgba(122, 32, 48, 0.85) 1.5px, transparent 2.4px),
+    radial-gradient(circle at calc(100% - 9px) 9px, rgba(122, 32, 48, 0.85) 1.5px, transparent 2.4px),
+    radial-gradient(circle at 9px calc(100% - 9px), rgba(122, 32, 48, 0.85) 1.5px, transparent 2.4px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), rgba(122, 32, 48, 0.85) 1.5px, transparent 2.4px);
+  background-repeat: no-repeat;
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char > * {
+  position: relative;
+  z-index: 1;
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char.is-derived {
+  background: linear-gradient(180deg, rgba(123, 92, 196, 0.1), var(--coc-panel-2));
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-char.is-derived .coc-char-label {
+  color: var(--coc-sanity-bright);
+}
+
+/* ── STAV / VITALS: Příčetnost = SIGNATURE éterická fialová aura ── */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital {
+  background: linear-gradient(180deg, var(--coc-panel), var(--coc-panel-2));
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital.is-danger .coc-vital-nums .cur {
+  color: var(--coc-hp-bright);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital.is-sanity {
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(123, 92, 196, 0.22), transparent 70%),
+    linear-gradient(180deg, #1a1327, #130f1c);
+  border-color: rgba(123, 92, 196, 0.5);
+  box-shadow: 0 0 22px rgba(123, 92, 196, 0.2), inset 0 0 0 1px rgba(164, 135, 232, 0.14);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital.is-sanity .coc-vital-nums .cur {
+  color: var(--coc-sanity-bright);
+  text-shadow: 0 0 14px rgba(183, 155, 255, 0.5);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital.is-sanity .coc-vital-track {
+  height: 7px;
+  box-shadow: inset 0 0 0 1px rgba(164, 135, 232, 0.3);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-vital.is-sanity .coc-vital-track i {
+  box-shadow: 0 0 10px rgba(164, 135, 232, 0.65);
+}
+
+/* ── DOVEDNOSTI: Mýtus Cthulhu = fialový éter (galerie .skill.mythos) ── */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-skill.is-mythos {
+  border-radius: 3px;
+  background:
+    radial-gradient(120% 120% at 0% 50%, rgba(123, 92, 196, 0.14), transparent 60%),
+    rgba(19, 15, 28, 0.7);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-skill.is-mythos .coc-skill-name {
+  color: var(--coc-sanity-bright);
+  font-style: italic;
+}
+
+/* ── SOUHRN: rohová tracerie i na poznámkách (rodinný signature) ── */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, var(--coc-panel), var(--coc-panel-2));
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(200, 196, 207, 0.16);
+  -webkit-mask:
+    radial-gradient(circle at 0 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 0 100%, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 100%, #000 13px, transparent 14px);
+  mask:
+    radial-gradient(circle at 0 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 0, #000 13px, transparent 14px),
+    radial-gradient(circle at 0 100%, #000 13px, transparent 14px),
+    radial-gradient(circle at 100% 100%, #000 13px, transparent 14px);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note > * {
+  position: relative;
+  z-index: 1;
+}
+/* Zakázané vědění → zašlé zlato (galerie .note.forbidden) */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note.is-forbidden {
+  border-color: rgba(156, 127, 78, 0.5);
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgba(156, 127, 78, 0.1), transparent 55%),
+    linear-gradient(180deg, #1a1520, #130f18);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note.is-forbidden .coc-note-title,
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note.is-forbidden .coc-note-title svg {
+  color: var(--coc-luck-bright);
+  stroke: var(--coc-luck-bright);
+}
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note.is-forbidden .coc-note-area {
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(156, 127, 78, 0.12) 27px 28px
+  );
+}
+
+/* linkovaný papír pod textem → jemné stříbrné vlásky */
+[data-diary-system='coc'][data-diary-skin='horror'] .coc-sheet .coc-note-area {
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(200, 196, 207, 0.08) 27px 28px
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   2) PANELY MAPY/CHATU + EMBED — PLNÁ --dd-embed-* sada (na wrapperu,
+   BEZ `.coc-sheet`; panely dědí z předka, hashované module třídy).
+   Plocha VŽDY OPAQUE (log/obal neprosvítá mapu). Sémantika pos/neg drží.
+   Ornament TVAR obalu/readoutu dědí z rodinných :is() bloků — sem JEN barvy.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='horror'] {
+  /* tmavý salon; plný gradient (OPAQUE), text zašlé stříbro */
+  --dd-embed-surface: linear-gradient(180deg, #221a2c, #17111d 55%, #120c14);
+  --dd-embed-border: #4a4750;
+  --dd-embed-line: color-mix(in srgb, #c8c4cf 20%, transparent);
+  --dd-embed-text: #d7d2df;
+  --dd-embed-muted: #8f8a9c;
+  --dd-embed-title: #e6e2ec;
+  --dd-embed-chip-bg: color-mix(in srgb, #7b5cc4 18%, transparent);
+  --dd-embed-accent: #c8c4cf;
+  --dd-embed-num-font: 'Cormorant Garamond', Georgia, serif;
+  --dd-embed-title-font: 'Cormorant SC', serif;
+  --dd-embed-pos: #6fae7a; /* úspěch — zelená (sémantika) */
+  --dd-embed-neg: #b3495b; /* neúspěch / krev — oxblood (sémantika) */
+  --dd-embed-neutral: #c8c4cf; /* neutrál — stříbro */
+
+  /* HP bar fill (combat + bestie panel čtou přes var()) — oxblood Životy */
+  --dd-hpfill-grad: linear-gradient(90deg, #7a2030, #a83a4c);
+}

@@ -1,0 +1,473 @@
+/* Call of Cthulhu 7e — skin „STEAMPUNK" = Mosazný mechanický deník (skiny).
+ *
+ * Rodina 8 skinů, TENTÝŽ svět napříč systémy: sourozenec
+ * `gurps-skins/steampunk.css` + `drdh-skins/…` + `jad-skins/…`, přeložený do
+ * CoC „dossier" listu. Galerie (schválený vzhled): `c:/tmp/coc-skins/steampunk.html`.
+ * CoC list je TMAVÝ dossier — steampunk = tmavý bronz korpus + světlé pergamenové
+ * pláty pod nadpisy, mosaz/měď akcent, NE světlý plát celoplošně.
+ *
+ * SIGNATURE (rodinný TVAR, drží FUNKCI CoC tříd):
+ *  - `.coc-sheet` → mosazný rám: dvojitá mosazná obruba (box-shadow prstence) +
+ *    levá + pravá nýtová kolejnice (repeating-radial-gradient nýtů podél okrajů).
+ *  - `.coc-char` / `.coc-vital` → zkosené (notched) bronzové plotny s cog-gauge
+ *    manometrem (ozubené kolo z conic-gradientu) v rohu — SIGNATURE ornament.
+ *  - `.coc-stamp` → mosazné kruhové razítko (dvojrámeček + patina).
+ *  - `.coc-divider-glyph` → ozubené kolečko v mosazném prstenci.
+ *  Životy = výbojová červeň (kotel / tlak) · Příčetnost & Body magie = patina /
+ *  verdigris (měděnka — SIGNATURE, nese váhu) · Štěstí = mosaz.
+ *  Fonty: IM Fell English SC (tělo/titulky) · Cinzel (kapitálky) ·
+ *  IBM Plex Mono (čísla = přístrojový display).
+ *
+ * SCOPE (past): každé pravidlo nese compound prefix
+ *  `[data-diary-system='coc'][data-diary-skin='steampunk']`.
+ *   - List override + ornament: … `.coc-sheet` / `.coc-char` / `.coc-vital` …
+ *   - Embed tokeny (`--dd-embed-*`): přímo na compound wrapperu (panely/embed
+ *     chrome je dědí z předka — hashované module třídy).
+ *  Pouze CSS/SVG, žádný JS. Regrese-safe (jen přidává overrides).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=IM+Fell+English+SC&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) LIST `.coc-sheet` — `--coc-*` override + font + mosazné pozadí + ornamenty.
+   Compound (0,2,1) přebíjí default `[data-diary-system='coc'] .coc-sheet`.
+   Mapování galerie → produkce: accent=mosaz · hp=výbojová červeň ·
+   sanity/mp=verdigris (patina, signature) · luck=mosaz.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-sheet {
+  /* ── surovinová paleta (sdílená s rodinou steampunk) ── */
+  --st-brass-0: #ecca79;
+  --st-brass-1: #c79b4b;
+  --st-brass-2: #a06e2c;
+  --st-brass-deep: #8a6a2e;
+  --st-brass-shadow: #5a3e1e;
+  --st-copper: #a5642f;
+  --st-copper-hi: #d6a45a;
+  --st-bronze: #6e4a24;
+  --st-bronze-edge: #3c2a18;
+  --st-paper: #e9dcc0;
+  --st-paper-2: #ddcba4;
+  --st-dial: #f0d68e;
+  --st-dial-shadow: #b98f42;
+  --st-rivet: radial-gradient(circle at 38% 34%, #f0d68e 0%, #b98f42 38%, #6f5220 72%, #40300f 100%);
+  --st-verdigris: #3f9b86;
+  --st-verdigris-hi: #6fd7bd;
+  --st-verdigris-lo: #256b5c;
+
+  /* ── CoC list tokeny přeložené do steampunku ── */
+  --coc-ink: #2a2013;
+  --coc-parch: #e5d3ab; /* teplý pergamenový ink na bronzu */
+  --coc-parch-dim: rgba(229, 211, 171, 0.62);
+  --coc-parch-faint: rgba(169, 146, 106, 0.72);
+  --coc-accent: #c79b4b; /* mosaz */
+  --coc-accent-bright: #ecca79;
+  --coc-line: rgba(199, 155, 75, 0.32);
+  --coc-line-faint: rgba(199, 155, 75, 0.14);
+  --coc-panel: rgba(43, 36, 25, 0.6); /* tmavý bronz plát */
+  --coc-panel-2: rgba(33, 27, 18, 0.62);
+  --coc-input: rgba(20, 14, 7, 0.36);
+  /* sémantické (vitals) — hp=výbojová červeň, sanity/mp=verdigris patina */
+  --coc-hp: #c1352b;
+  --coc-hp-bright: #ff6a4d;
+  --coc-mp: #3f9b86;
+  --coc-mp-bright: #6fd7bd;
+  --coc-sanity: #3f9b86; /* Příčetnost = měděnka (SIGNATURE) */
+  --coc-sanity-bright: #6fd7bd;
+  --coc-luck: #c79b4b;
+  --coc-luck-bright: #ecca79;
+
+  font-family: 'IM Fell English SC', 'EB Garamond', Georgia, serif;
+  /* zakouřený mosazný plech pod skleněnou deskou */
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 90% at 50% 0%, rgba(199, 155, 75, 0.1), transparent 55%),
+    linear-gradient(180deg, #2c261c, #14100a);
+  border-color: var(--st-brass-shadow, #5a3e1e);
+  /* dvojitá mosazná obruba (mechanický rám) */
+  box-shadow:
+    0 40px 120px -40px #000,
+    inset 0 1px 0 rgba(236, 202, 121, 0.14),
+    0 0 0 1px var(--st-bronze-edge, #3c2a18),
+    0 0 0 5px var(--st-brass-deep, #8a6a2e),
+    0 0 0 7px var(--st-brass-shadow, #5a3e1e);
+}
+
+/* pergamenový šum přebarvíme na teplejší mosaznou patinu (jemně) */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-sheet::before {
+  opacity: 0.28;
+  mix-blend-mode: soft-light;
+}
+/* art deco dvojrámeček → mosazný vnitřní rám */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-sheet::after {
+  border-color: rgba(199, 155, 75, 0.22);
+  inset: 12px;
+}
+
+/* ── SIGNATURE: nýtové kolejnice podél levého + pravého okraje listu ──
+   Vlastní pseudo-vrstva ve .coc-filestrip (první dítě), aby neobsadila
+   sheet::before/::after (šum + rámeček). */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-filestrip {
+  position: relative;
+  border-bottom-color: var(--st-brass-deep, #8a6a2e);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-brass-0, #ecca79);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-filestrip::before,
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-filestrip::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  width: 12px;
+  height: 640px;
+  max-height: calc(100vh);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.85;
+  border-radius: 3px;
+  background:
+    repeating-radial-gradient(
+      circle at 6px 12px,
+      #d8b25e 0 2.2px,
+      #7a5a24 2.2px 3.2px,
+      transparent 3.2px 4px
+    ) 0 0 / 12px 26px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-filestrip::before {
+  left: -18px;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-filestrip::after {
+  right: -18px;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-dossier {
+  color: var(--st-verdigris-hi, #6fd7bd);
+}
+
+/* ── HERO ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-name {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: #f4e6c2;
+  text-shadow: 0 1px 0 #000, 0 2px 26px rgba(199, 155, 75, 0.3);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-occ {
+  font-family: 'Cinzel', serif;
+  color: var(--st-copper-hi, #d6a45a);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-portrait {
+  border: 3px solid var(--st-bronze, #6e4a24);
+  background:
+    repeating-linear-gradient(45deg, rgba(201, 180, 135, 0.14) 0 8px, rgba(192, 169, 124, 0.1) 8px 16px),
+    radial-gradient(circle at 50% 35%, #2a2620, #16130f);
+  box-shadow: inset 0 0 30px rgba(80, 50, 20, 0.5);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-portrait::after {
+  border-color: rgba(236, 202, 121, 0.4);
+}
+
+/* SIGNATURE razítko = mosazné kruhové razítko s patinou */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-stamp {
+  border: 3px double var(--st-copper, #a5642f);
+  color: rgba(214, 164, 90, 0.9);
+  filter: saturate(0.9);
+  box-shadow: 0 0 0 3px rgba(165, 100, 47, 0.06), inset 0 0 0 1px rgba(165, 100, 47, 0.35);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-stamp b {
+  color: var(--st-copper-hi, #d6a45a);
+}
+
+/* ── ODDĚLOVAČ: mosazné ozubené kolečko v prstenci ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-divider::before,
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-divider::after {
+  background: linear-gradient(90deg, transparent, var(--st-brass-deep, #8a6a2e), transparent);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-divider-glyph {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* ozubené kolo za glyfem (conic zuby + mosazný prstenec) */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-divider-glyph::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.9;
+  background:
+    repeating-conic-gradient(from 0deg, var(--st-brass-deep, #8a6a2e) 0 9deg, transparent 9deg 22deg),
+    radial-gradient(circle, transparent 0 54%, var(--st-brass-1, #c79b4b) 55% 70%, transparent 71%),
+    radial-gradient(circle at 42% 36%, var(--st-dial, #f0d68e), var(--st-dial-shadow, #b98f42) 84%);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-divider-glyph svg {
+  position: relative;
+  z-index: 1;
+  stroke: #2a2013;
+  width: 15px;
+  height: 15px;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-divider h2 {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-0, #ecca79);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) SIGNATURE: cog-gauge manometr na `.coc-char` + `.coc-vital`.
+   Zkosené (notched) bronzové plotny (char už má clip-path — zesílíme hranou) +
+   ozubené kolečko manometru v pravém horním rohu.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--st-paper, #e9dcc0), var(--st-paper-2, #ddcba4));
+  border-color: var(--st-brass-deep, #8a6a2e);
+  box-shadow: inset 0 0 0 1px rgba(180, 140, 70, 0.28), 0 3px 8px -4px #000;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char.is-derived {
+  background: linear-gradient(160deg, rgba(43, 36, 25, 0.72), rgba(33, 27, 18, 0.78));
+  box-shadow: inset 0 0 0 1px rgba(180, 140, 70, 0.18), 0 3px 8px -4px #000;
+}
+/* cog-gauge manometr — ozubené kolečko v rohu plotny */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+  background:
+    repeating-conic-gradient(from 0deg, var(--st-brass-deep, #8a6a2e) 0 10deg, transparent 10deg 24deg),
+    radial-gradient(circle, transparent 0 52%, var(--st-brass-1, #c79b4b) 53% 70%, transparent 71%),
+    radial-gradient(circle at 42% 36%, var(--st-dial, #f0d68e), var(--st-dial-shadow, #b98f42) 84%);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char > * {
+  position: relative;
+  z-index: 1;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char-label {
+  font-family: 'Cinzel', serif;
+  color: var(--st-bronze, #6e4a24);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char.is-derived .coc-char-label {
+  color: var(--st-verdigris-lo, #256b5c);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char-main {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: #241c10;
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(110, 74, 36, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char.is-derived .coc-char-main {
+  color: #f0e4c8;
+  background: var(--coc-input, rgba(20, 14, 7, 0.36));
+  text-shadow: none;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char-sub input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-copper, #a5642f);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(110, 74, 36, 0.3);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char.is-derived .coc-char-sub input {
+  color: var(--coc-parch-dim, rgba(229, 211, 171, 0.62));
+  background: rgba(0, 0, 0, 0.2);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-char-sub span {
+  font-family: 'Cinzel', serif;
+}
+
+/* ── DERIVED (Nápad / Znalosti) ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-derived .coc-char {
+  border-style: dashed;
+  border-color: var(--st-copper, #a5642f);
+}
+
+/* ── STAV / VITALS — cog-gauge + zkosené pláty ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2b2419, #211b12);
+  border-color: var(--st-brass-deep, #8a6a2e);
+  clip-path: polygon(
+    9px 0,
+    100% 0,
+    100% calc(100% - 9px),
+    calc(100% - 9px) 100%,
+    0 100%,
+    0 9px
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+/* cog-gauge manometr v rohu vitalu (signature) */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  background:
+    repeating-conic-gradient(from 0deg, var(--st-brass-deep, #8a6a2e) 0 10deg, transparent 10deg 24deg),
+    radial-gradient(circle, transparent 0 52%, var(--st-brass-1, #c79b4b) 53% 70%, transparent 71%),
+    radial-gradient(circle at 42% 36%, var(--st-dial, #f0d68e), var(--st-dial-shadow, #b98f42) 84%);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital > * {
+  position: relative;
+  z-index: 1;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital-label {
+  font-family: 'Cinzel', serif;
+  color: var(--st-brass-0, #ecca79);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital-nums .cur,
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital-nums .max {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital-track {
+  background: #140f08;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital.is-danger .coc-vital-track i {
+  background: linear-gradient(90deg, #7a1a12, var(--coc-hp, #c1352b), var(--coc-hp-bright, #ff6a4d));
+  box-shadow: 0 0 10px rgba(255, 90, 60, 0.6);
+}
+/* Příčetnost — signature verdigris manometr (patina má váhu) */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital.is-sanity {
+  background: linear-gradient(180deg, #1c2a26, #15211d);
+  border-color: var(--st-verdigris, #3f9b86);
+  box-shadow:
+    inset 0 0 24px rgba(63, 155, 134, 0.16),
+    0 0 0 1px rgba(111, 215, 189, 0.16);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital.is-sanity .coc-vital-label {
+  color: var(--st-verdigris-hi, #6fd7bd);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital.is-sanity .coc-vital-track i {
+  background: linear-gradient(90deg, var(--st-verdigris-lo, #256b5c), var(--coc-sanity, #3f9b86), var(--coc-sanity-bright, #6fd7bd));
+  box-shadow: 0 0 12px rgba(111, 215, 189, 0.6);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital.is-mp .coc-vital-track i {
+  background: linear-gradient(90deg, var(--st-verdigris-lo, #256b5c), var(--coc-mp-bright, #6fd7bd));
+  box-shadow: 0 0 8px rgba(90, 166, 160, 0.5);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-vital.is-luck .coc-vital-track i {
+  background: linear-gradient(90deg, var(--st-brass-deep, #8a6a2e), var(--st-brass-0, #ecca79));
+  box-shadow: 0 0 8px rgba(236, 202, 121, 0.5);
+}
+
+/* ── STATUS PEČETI ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-seal {
+  font-family: 'Cinzel', serif;
+  border-color: rgba(199, 155, 75, 0.32);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-seal-dot {
+  background: radial-gradient(circle at 40% 35%, #e0c078, #8a6a2e);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+/* ── DOVEDNOSTI ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-skill {
+  border-bottom-color: rgba(199, 155, 75, 0.12);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-skill:hover {
+  background: rgba(199, 155, 75, 0.06);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-skill-vals input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-skill.is-mythos .coc-skill-name {
+  color: var(--st-verdigris-hi, #6fd7bd);
+  font-weight: 600;
+}
+
+/* ── BOJ ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-combat th {
+  font-family: 'Cinzel', serif;
+  color: var(--st-bronze, #6e4a24);
+  border-bottom-color: var(--st-copper, #a5642f);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-combat td input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-cd-item span {
+  font-family: 'Cinzel', serif;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-cd-item input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-copper-hi, #d6a45a);
+}
+
+/* ── SOUHRN / POZNÁMKY ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-note-title {
+  font-family: 'Cinzel', serif;
+  color: var(--st-bronze, #6e4a24);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-note-title svg {
+  stroke: var(--st-copper, #a5642f);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-note.is-forbidden {
+  border-color: color-mix(in srgb, var(--st-verdigris, #3f9b86) 55%, transparent);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-note.is-forbidden .coc-note-title,
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-note.is-forbidden .coc-note-title svg {
+  color: var(--st-verdigris-hi, #6fd7bd);
+  stroke: var(--st-verdigris-hi, #6fd7bd);
+}
+
+/* ── VYBAVENÍ / MAJETEK ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-money-row label {
+  font-family: 'Cinzel', serif;
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-money-row input {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-brass-0, #ecca79);
+}
+
+/* ── ADD / DEL ── */
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-add {
+  font-family: 'Cinzel', serif;
+  border-color: var(--st-brass-deep, #8a6a2e);
+  color: var(--st-brass-2, #a06e2c);
+}
+[data-diary-system='coc'][data-diary-skin='steampunk'] .coc-add:hover {
+  background: rgba(199, 155, 75, 0.14);
+  color: var(--st-brass-0, #ecca79);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) EMBED tokeny (`--dd-embed-*`) — přímo na compound wrapperu.
+   Combat/bestie panel + obal v TM + dice readout + dicelog + orchestrace +
+   chat rail (hashované module třídy) je čtou z předka. Plocha VŽDY OPAQUE
+   (log/obal NEprosvítá mapu, past). Ornament TVAR embed obalu dědí z rodinných
+   `:is()` bloků (coc je tam) — tady JEN barvy.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='steampunk'] {
+  /* EMBED plochy — OPAQUE tmavý bronz/mosaz plát */
+  --dd-embed-surface: linear-gradient(180deg, #302a20, #241d13 58%, #14100a);
+  --dd-embed-border: #8a6a2e;
+  --dd-embed-line: rgba(199, 155, 75, 0.26);
+  --dd-embed-text: #e5d3ab;
+  --dd-embed-muted: #a9926a;
+  --dd-embed-title: #ecca79;
+  --dd-embed-chip-bg: rgba(199, 155, 75, 0.16);
+  --dd-embed-accent: #d6a45a;
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: #8fce9a; /* úspěch hodu = zelená (drží sémantiku) */
+  --dd-embed-neg: #ff6a4d; /* neúspěch / krev = výbojová červeň */
+  --dd-embed-neutral: #ecca79; /* neutrál = mosaz */
+  /* HP bar fill (combat + bestie panel čtou přes var()) — život = výbojová červeň */
+  --dd-hpfill-grad: linear-gradient(90deg, #7a1a12, #c1352b, #ff6a4d);
+}

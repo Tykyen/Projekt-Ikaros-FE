@@ -1,0 +1,516 @@
+/* Call of Cthulhu 7e — skin „nature" 🌿 · DRUIDSKÝ HERBÁŘ / ŽIVÝ LETOPIS.
+ *
+ * Rodina „Příroda": vyšetřovatelský deník jako přírodovědcův zápisník rostlin
+ * a nálezů — pergamen z rostlinných vláken, organický rám s rašícími úponky
+ * ze suku, letokruhové terče u statů. CoC tajemno = „nález nepřirozeného
+ * v přírodě". Na rozdíl od tmavého GURPS listu je CoC list SVĚTLÝ herbářový
+ * pergamen (jako DrDH/DrD+ nature), jen přeložený do CoC struktury.
+ *
+ * Sesterský k `gurps-skins/nature.css` — sdílené herbářové DNA (mech + jantar
+ * + bobule, rašící úponek ze suku, letokruhový terč, semínkové pipy),
+ * přeložené do světlého CoC pergamenu.
+ *
+ * Paleta (schválená galerie): lesní zeleň #5e8832 (signature) / #3f5f22 /
+ * #7ba641 · medová míza / jantar #c98a2b / #e0a94a / #f0c463 (accent) ·
+ * lýko/kůra #5a4527 / #755a33 / #977748 · pergamen #efe6d0 / #e6d9bc / #dccba7 ·
+ * inkoust #33271a. Sémantika: Životy = bobule červená #a5312b, Příčetnost =
+ * houbová/bobulová fialová #4a2755 / #7a4a8c (SIGNATURE), Body magie = tůňová
+ * modrozeleň #2f6e6a, Štěstí = zlatavý jantar #b7862a, Mýtus = houbová fialová.
+ * Fonty: Cormorant Garamond (tělo) · Marcellus SC (labely/head) · Spectral
+ * (display/čísla).
+ *
+ * SIGNATURE (nesdílet): rašící úponek ze suku v rozích listu (::before/::after),
+ * letokruhový terč pod hodnotou vlastnosti, semínkové/výtrusové pipy na baru
+ * Příčetnosti + houbová fialová jako váha Příčetnosti/Mýtu.
+ * Pouze CSS/SVG, žádný JS. Regrese-safe (jen přidává overrides přes compound).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1) LIST — --coc-* override na .coc-sheet (0,2,0 přebije default dossier)
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-sheet {
+  /* ── inkoust: hnědočerný na pergamenu ── */
+  --coc-ink: #33271a;
+  --coc-parch: #33271a;
+  --coc-parch-dim: rgba(90, 69, 39, 0.72);
+  --coc-parch-faint: rgba(117, 90, 51, 0.55);
+
+  /* ── akcent = medová míza / jantar ── */
+  --coc-accent: #a6741f;
+  --coc-accent-bright: #c98a2b;
+
+  /* ── žilkové linky (lýko do ztracena) ── */
+  --coc-line: rgba(90, 69, 39, 0.32);
+  --coc-line-faint: rgba(90, 69, 39, 0.16);
+
+  /* ── panely: světlé kartičky z rostlinných vláken ── */
+  --coc-panel: rgba(255, 255, 255, 0.34);
+  --coc-panel-2: rgba(220, 203, 167, 0.42);
+  --coc-input: rgba(255, 255, 255, 0.5);
+
+  /* ── sémantické (vitals) ── */
+  --coc-hp: #a5312b; /* Životy = bobule červená */
+  --coc-hp-bright: #c8463c;
+  --coc-mp: #2f6e6a; /* Body magie = tůňová modrozeleň */
+  --coc-mp-bright: #3f8f89;
+  --coc-sanity: #4a2755; /* Příčetnost = houbová/bobulová fialová (SIGNATURE) */
+  --coc-sanity-bright: #7a4a8c;
+  --coc-luck: #b7862a; /* Štěstí = zlatavý jantar */
+  --coc-luck-bright: #f0c463;
+
+  color: var(--coc-ink, #33271a);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+
+  /* světlá herbářová deska: pergamen z rostlinných vláken + mechový/mízní svit */
+  background:
+    radial-gradient(420px 260px at 12% 0%, rgba(123, 166, 65, 0.1), transparent 70%),
+    radial-gradient(300px 380px at 100% 100%, rgba(201, 138, 43, 0.1), transparent 70%),
+    linear-gradient(178deg, #efe6d0 0%, #e6d9bc 60%, #dccba7 100%);
+  border: 1px solid #977748;
+  border-radius: 22px 6px 20px 8px;
+  box-shadow:
+    0 40px 120px -40px #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 0 5px #2f2416,
+    0 0 0 6px #755a33;
+}
+
+/* pergamenový šum → rostlinné žilkování (subtle, uvnitř sheetu) */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-sheet::before {
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image:
+    repeating-linear-gradient(64deg, rgba(90, 69, 39, 0.035) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(-58deg, rgba(90, 69, 39, 0.028) 0 1px, transparent 1px 22px);
+}
+
+/* SIGNATURE: rašící úponek ze suku v rozích listu (přebije art-deco dvojrám) */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: none;
+  z-index: 2;
+  /* dva rohové úponky (levý horní + pravý dolní) přes background-image */
+  background-repeat: no-repeat;
+  background-position: -4px -6px, right -4px bottom -6px;
+  background-size: 78px 78px, 78px 78px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='78' height='78' viewBox='0 0 74 74' fill='none'%3E%3Cpath d='M12 62 C12 42 20 34 34 32 C48 30 50 20 44 12' stroke='%233f5f22' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M34 32 C26 28 22 30 20 38 M34 32 C40 28 42 32 40 40' stroke='%235e8832' stroke-width='1.8' stroke-linecap='round'/%3E%3Cellipse cx='44' cy='12' rx='6' ry='9' fill='%237ba641' transform='rotate(-30 44 12)'/%3E%3Cellipse cx='18' cy='40' rx='4' ry='6' fill='%235e8832' transform='rotate(40 18 40)'/%3E%3Cellipse cx='41' cy='42' rx='3.5' ry='5' fill='%237ba641' transform='rotate(-20 41 42)'/%3E%3Ccircle cx='12' cy='62' r='3.5' fill='%235a4527'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='78' height='78' viewBox='0 0 74 74' fill='none'%3E%3Cg transform='rotate(180 37 37)'%3E%3Cpath d='M12 62 C12 42 20 34 34 32 C48 30 50 20 44 12' stroke='%233f5f22' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M34 32 C26 28 22 30 20 38 M34 32 C40 28 42 32 40 40' stroke='%235e8832' stroke-width='1.8' stroke-linecap='round'/%3E%3Cellipse cx='44' cy='12' rx='6' ry='9' fill='%237ba641' transform='rotate(-30 44 12)'/%3E%3Cellipse cx='18' cy='40' rx='4' ry='6' fill='%235e8832' transform='rotate(40 18 40)'/%3E%3Ccircle cx='12' cy='62' r='3.5' fill='%235a4527'/%3E%3C/g%3E%3C/svg%3E");
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+/* ── SPISOVÁ PÁSKA → herbářová páska ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-filestrip {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.14em;
+  color: #755a33;
+  border-bottom: 1px dashed var(--coc-line, rgba(90, 69, 39, 0.32));
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-dossier {
+  color: #3f5f22;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(94, 136, 50, 0.5);
+  background: rgba(94, 136, 50, 0.08);
+  padding: 2px 10px;
+  border-radius: 2px 8px 2px 8px;
+}
+
+/* ── HERO: jméno = Spectral display, povolání = Marcellus SC ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-name {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  color: #33271a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-occ {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.05em;
+  color: #3f5f22;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-meta-field label {
+  font-family: 'Marcellus SC', serif;
+  color: #755a33;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-portrait {
+  background:
+    repeating-linear-gradient(45deg, rgba(90, 69, 39, 0.14) 0 2px, transparent 2px 5px),
+    radial-gradient(circle at 50% 34%, #6f5a3a, #40301c 78%);
+  border: 2px solid #977748;
+  border-radius: 14px 4px 14px 4px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), 0 0 0 4px rgba(239, 230, 208, 0.55);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-portrait::after {
+  border-color: rgba(239, 230, 208, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-portrait span {
+  font-family: 'Marcellus SC', serif;
+  color: #e6d9bc;
+}
+/* razítko DŮVĚRNÉ → letokruhová pečeť herbáře (mízní zeleň místo krve) */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-stamp {
+  font-family: 'Marcellus SC', serif;
+  border: 2px solid rgba(63, 95, 34, 0.55);
+  color: rgba(63, 95, 34, 0.85);
+  box-shadow: 0 0 0 3px rgba(94, 136, 50, 0.06);
+  filter: none;
+}
+
+/* ── ODDĚLOVAČ SEKCÍ ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-divider::before,
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-divider::after {
+  background: linear-gradient(90deg, transparent, #977748, transparent);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-divider-glyph svg {
+  stroke: #5e8832;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-divider h2 {
+  font-family: 'Spectral', serif;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: none;
+  color: #3c2f1d;
+  font-size: 16px;
+}
+
+/* ── VLASTNOSTI: letokruhový terč pod hodnotou (SIGNATURE) ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char {
+  /* SIGNATURE: letokruhový terč (bullseye) — bílé jádro → jantarový prstenec →
+     letokruhy (::before) níž. Dle galerie `.char` (radial terč nad pergamenem). */
+  background:
+    radial-gradient(
+      circle at 50% 46%,
+      rgba(255, 255, 255, 0.55) 0 30%,
+      rgba(201, 138, 43, 0.1) 30% 40%,
+      transparent 40%
+    ),
+    linear-gradient(180deg, rgba(239, 230, 208, 0.6), rgba(220, 203, 167, 0.5));
+  border: 1px solid var(--coc-line, rgba(90, 69, 39, 0.32));
+  border-radius: 14px;
+  clip-path: none;
+  overflow: hidden;
+}
+/* letokruhy (soustředné řezy kmenem) pod číslem */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 44px;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 5px, rgba(117, 90, 51, 0.16) 5px 6px);
+  opacity: 0.55;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char > * {
+  position: relative;
+  z-index: 1;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char.is-derived {
+  background: linear-gradient(180deg, rgba(94, 136, 50, 0.12), rgba(94, 136, 50, 0.06));
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char.is-derived::before {
+  display: none;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char.is-derived .coc-char-label {
+  color: #3f5f22;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char-label {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.1em;
+  color: #3f5f22;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char-main {
+  font-family: 'Spectral', serif;
+  font-weight: 700;
+  color: #33271a;
+  background: var(--coc-input, rgba(255, 255, 255, 0.5));
+  border: 1px solid var(--coc-line, rgba(90, 69, 39, 0.32));
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char-sub span {
+  font-family: 'Marcellus SC', serif;
+  color: #977748;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-char-sub input {
+  color: #755a33;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ── STAV / VITALS ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(220, 203, 167, 0.4));
+  border: 1px solid var(--coc-line, rgba(90, 69, 39, 0.32));
+  border-radius: 14px 4px 14px 4px;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital-label {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.08em;
+  color: #755a33;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital-nums .cur {
+  font-family: 'Spectral', serif;
+  font-weight: 700;
+  color: #33271a;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital-nums .max {
+  font-family: 'Spectral', serif;
+  color: #977748;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital-nums .slash {
+  color: #977748;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital-sub {
+  font-family: 'Marcellus SC', serif;
+  color: #977748;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital-track {
+  height: 9px;
+  border-radius: 6px;
+  background: rgba(60, 47, 29, 0.22);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18) inset;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital-track i {
+  border-radius: 6px;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital.is-danger .coc-vital-nums .cur {
+  color: var(--coc-hp, #a5312b);
+}
+
+/* Příčetnost — SIGNATURE: houbová bobule + výtrusový povrch baru */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital.is-sanity {
+  background:
+    radial-gradient(120px 80px at 85% 10%, rgba(122, 74, 140, 0.22), transparent 70%),
+    linear-gradient(180deg, rgba(74, 39, 85, 0.14), rgba(74, 39, 85, 0.06));
+  border-color: rgba(74, 39, 85, 0.4);
+  box-shadow: 0 0 0 1px rgba(122, 74, 140, 0.25) inset, 0 3px 12px rgba(74, 39, 85, 0.18);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital.is-sanity .coc-vital-label {
+  color: var(--coc-sanity, #4a2755);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital.is-sanity .coc-vital-nums .cur {
+  color: var(--coc-sanity, #4a2755);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital.is-sanity .coc-vital-track {
+  background: rgba(74, 39, 85, 0.2);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital.is-sanity .coc-vital-track i {
+  position: relative;
+  background: linear-gradient(90deg, var(--coc-sanity, #4a2755), var(--coc-sanity-bright, #7a4a8c));
+  box-shadow: 0 0 8px rgba(122, 74, 140, 0.6);
+}
+/* výtrusové / semínkové pipy na baru Příčetnosti */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-vital.is-sanity .coc-vital-track i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(201, 166, 214, 0.85) 0 1px, transparent 1.6px);
+  background-size: 8px 8px;
+  opacity: 0.55;
+}
+
+/* ── STATUS PEČETI → semínkové pipy (kapkovitý dot) ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-seal {
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #5a4a35;
+  border: 1px dashed rgba(117, 90, 51, 0.32);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-seal-dot {
+  border-radius: 0 50% 50% 50%;
+  transform: rotate(45deg);
+  border: 1.5px solid #977748;
+  background: rgba(255, 255, 255, 0.4);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-seal:has(input:checked) {
+  color: var(--coc-hp, #a5312b);
+  border-color: color-mix(in srgb, var(--coc-hp, #a5312b) 50%, transparent);
+  background: color-mix(in srgb, var(--coc-hp, #a5312b) 8%, transparent);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-seal:has(input:checked) .coc-seal-dot {
+  background: radial-gradient(circle at 40% 35%, var(--coc-hp-bright, #c8463c), var(--coc-hp, #a5312b));
+  border-color: var(--coc-hp, #a5312b);
+  box-shadow: 0 0 7px rgba(197, 70, 60, 0.6);
+}
+
+/* ── DOVEDNOSTI ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill {
+  border-radius: 8px 3px 8px 3px;
+  border-bottom: 1px dotted var(--coc-line, rgba(90, 69, 39, 0.32));
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill:hover {
+  background: rgba(94, 136, 50, 0.07);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill-chk {
+  accent-color: #5e8832;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill-name {
+  color: #33271a;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill-name b {
+  color: #977748;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill-vals input.reg {
+  color: #3f5f22;
+  font-weight: 700;
+  background: rgba(94, 136, 50, 0.14);
+}
+/* Mýtus Cthulhu → houbová fialová */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill.is-mythos {
+  background: linear-gradient(90deg, rgba(90, 44, 102, 0.14), rgba(90, 44, 102, 0.04));
+  border: 1px solid rgba(90, 44, 102, 0.4);
+  border-radius: 8px 3px 8px 3px;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill.is-mythos .coc-skill-name {
+  color: #5a2c66;
+  font-family: 'Spectral', serif;
+  font-style: italic;
+  font-weight: 600;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-skill.is-mythos .coc-skill-vals input.reg {
+  color: #5a2c66;
+  background: rgba(90, 44, 102, 0.2);
+}
+
+/* ── BOJ ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-combat th {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.08em;
+  color: #755a33;
+  border-bottom: 2px solid #977748;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-combat td {
+  border-bottom: 1px dotted var(--coc-line, rgba(90, 69, 39, 0.32));
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-combat tr:hover td {
+  background: rgba(94, 136, 50, 0.06);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-cd-item {
+  background: rgba(94, 136, 50, 0.08);
+  border: 1px solid var(--coc-line, rgba(90, 69, 39, 0.32));
+  border-radius: 10px 3px 10px 3px;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-cd-item span {
+  font-family: 'Marcellus SC', serif;
+  color: #755a33;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-cd-item input {
+  font-family: 'Spectral', serif;
+  font-weight: 700;
+  color: #33271a;
+}
+
+/* ── SOUHRN → herbářové kartičky ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(230, 217, 188, 0.5));
+  border: 1px solid var(--coc-line, rgba(90, 69, 39, 0.32));
+  border-radius: 12px 3px 12px 3px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note-title {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.06em;
+  color: #3f5f22;
+  border-bottom: 1px solid var(--coc-line, rgba(90, 69, 39, 0.32));
+  padding-bottom: 5px;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note-title svg {
+  stroke: #5e8832;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note-area {
+  color: #5a4a35;
+  font-style: italic;
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(90, 69, 39, 0.1) 27px 28px
+  );
+}
+/* zakázané vědění → houbová/měděnková fialová */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note.is-forbidden {
+  background:
+    radial-gradient(200px 120px at 90% 0%, rgba(90, 44, 102, 0.16), transparent 70%),
+    linear-gradient(180deg, rgba(74, 39, 85, 0.1), rgba(74, 39, 85, 0.04));
+  border-color: rgba(90, 44, 102, 0.45);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note.is-forbidden .coc-note-title,
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note.is-forbidden .coc-note-title svg {
+  color: #5a2c66;
+  stroke: #5a2c66;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-note.is-forbidden .coc-note-area {
+  color: #5c3f66;
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(90, 44, 102, 0.14) 27px 28px
+  );
+}
+
+/* ── VYBAVENÍ / MAJETEK ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-money-row {
+  border-bottom: 1px dotted var(--coc-line, rgba(90, 69, 39, 0.32));
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-money-row label {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.05em;
+  color: #755a33;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-money-row input {
+  font-family: 'Spectral', serif;
+  font-weight: 600;
+  color: #33271a;
+}
+
+/* ── ADD / DEL ── */
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-add {
+  font-family: 'Marcellus SC', serif;
+  color: #3f5f22;
+  border: 1px dashed var(--coc-line, rgba(90, 69, 39, 0.32));
+  border-radius: 9px 3px 9px 3px;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-add:hover {
+  background: rgba(94, 136, 50, 0.08);
+  border-color: #5e8832;
+  color: #3c2f1d;
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-del {
+  color: rgba(165, 49, 43, 0.5);
+}
+[data-diary-system='coc'][data-diary-skin='nature'] .coc-del:hover {
+  color: var(--coc-hp-bright, #c8463c);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2) EMBED — PLNÁ --dd-embed-* sada na [ds][dsk] (BEZ .coc-sheet).
+      Combat/bestie panel + obal v TM / dice readout / dicelog / orchestrace /
+      chat rail konzumují tyto tokeny. Herbář embed = OPAQUE tmavá lesní deska
+      (kůra/lýko — embed neprosvítá mapu). Sémantika: pos=mech zeleň
+      (úspěch/růst), neg=bobule (neúspěch/krev), neutral=medová míza.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='nature'] {
+  /* OPAQUE tmavá lesní deska (log/obal NEprosvítá mapu) */
+  --dd-embed-surface: linear-gradient(180deg, #2f2416, #241a10 58%, #20281a);
+  --dd-embed-border: #5a4527;
+  --dd-embed-line: color-mix(in srgb, #7ba641 26%, transparent);
+  --dd-embed-text: #e6d9bc;
+  --dd-embed-muted: #a99e82;
+  --dd-embed-title: #7ba641; /* mechový titulek */
+  --dd-embed-chip-bg: color-mix(in srgb, #5e8832 16%, transparent);
+  --dd-embed-accent: #7ba641; /* mech (akcent) */
+  --dd-embed-num-font: 'Spectral', Georgia, serif;
+  --dd-embed-title-font: 'Marcellus SC', serif;
+  --dd-embed-pos: #8cc14a; /* úspěch / růst = mech zeleň */
+  --dd-embed-neg: #c8463c; /* neúspěch / krev = bobule */
+  --dd-embed-neutral: #e0a94a; /* neutrál = medová míza / jantar */
+
+  /* HP bar fill (combat + bestie panel čtou přes var()) = bobule červená */
+  --dd-hpfill-grad: linear-gradient(90deg, #a5312b, #c8463c);
+}

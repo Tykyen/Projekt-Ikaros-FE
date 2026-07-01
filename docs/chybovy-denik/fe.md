@@ -1520,3 +1520,16 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — velký kus (bestie napříč mapa+chat+schema+3 napojení) bez cyklení díky kompletnímu GURPS vzoru; prototyp=kontrakt (uživatel schválil předem). Zbývá živé ověření + fáze 5 (chat propsání širší) + 8 skinů.
 
 ---
+
+### ✅ ŘEŠENÍ — CoC 8 skinů (skill `skin`) přes všechny povrchy · 2026-07-01
+**Co nakonec zabralo:** 8 skinů CoC (scifi/fantasy/horror/steampunk/nature/minimal/retro/anime-MLP) přes všechny povrchy (deník list · combat/bestie panel · obal TM · dice readout · dicelog · orchestrace · chat obal). Postup:
+1. **HTML galerie-kontrakt** (fan-out 8 agentů → `c:\tmp\coc-skins\<id>.html`) — plné povrchy per skin, schváleno uživatelem PŘED impl.
+2. **Foundation (regrese-safe, SÁM):** `diary-skins.css` baseline `[data-diary-system='coc']` (`--dd-embed-*` + `--dd-hpfill-grad`, dnešní dossier barvy) + 8 `@import`; enumerace `coc` do 5 embed `:is()` seznamů (railShell/DiceLog/MapPj/TokenInfoPanel/DiceRollOverlay — replace `gurps'])`→`gurps'],coc'])`); tokenizace panelů (text/accent/hp-fill/chip-bg → `var(--dd-embed-*, orig)`). Build = default beze změny.
+3. **Fan-out 8 agentů** (1 = 1 skin) → `coc-skins/<id>.css` (list `--coc-*` override + ornamenty na `.coc-*` + `--dd-embed-*` sada). Build CENTRÁLNĚ.
+4. **Render-audit** (2 agenti: deník-list + embed) → tabulka nálezů. Opraveno: (a) mapový obal ornament chyběl 4 skinům (`coc` do jejich `:is()` v TokenInfoPanel), (b) **chat obal nenesl skin** (railShell `.panel` je PŘEDEK skin scope → `:has()` past §9.18 → 56 per-skin `:has()` bloků s literálními barvami dle pi/shadowrun), (c) nature letokruh, (d) světlé skiny tmavé dlaždice → `--dd-embed-chip-bg`.
+**Proč to je správně:** foundation regrese-safe (var fallback = original + baseline coc = default identický, build potvrdil); reuse GURPS/dd rodinného vzoru (enumerace `:is()` + skin struktura) = 0 drift; galerie=kontrakt (schváleno předem); chat obal `:has()` = jediná cesta (chrome nedosáhne na tokeny potomka, §9.18).
+**Jak ověřeno:** `npm run build` čistý (8 skinů + foundation, postcss striktní); past-sweep (0× `*/` v komentáři, `@import` první, tvarové tokeny definované); **render-audit 2 agenti** — deník-list 8/8 vykresluje (signature přítomen, čitelnost, sémantika), embed panely/readout/dicelog/orchestrace 8/8, mapový obal 8/8. Živé na mapě/chatu čeká uživatele.
+**Pasti:** (1) **chat obal (railShell) `.panel` = PŘEDEK skin scope** → nečte `--dd-embed-*` potomka → per-skin `:has()` s literálními barvami (§9.18); (2) enumerace `coc` do `:is()` přes replace `gurps'])` NEZASÁHNE bloky bez gurps (4 ornament bloky fantasy/nature/retro/anime → ručně); (3) 1 skin agent (anime) spadl na API spojení (stub zůstal) → re-spawn; (4) foundation agent spadl s 0 akcí (flaky prostředí) → udělal jsem SÁM; (5) `npx eslint` stáhl v10 → `./node_modules/.bin/eslint`.
+**Zhodnocení:** dobře — fan-out (8 galerií + 8 skinů + 2 audit + 1 oprava agenti) zvládl obří rozsah; foundation SÁM (regrese-safe kritická). **Reziduum:** PC deník rail obal (`DiaryRollPanel`) nemá `data-diary-system` vůbec → chat obal PC deníku baseline u VŠECH dd-systémů (sdílený dd dluh, ne coc-specifické) — mimo scope, [dluh]. Zbývá živé ověření + uzávěr (mobil-desktop drží — skiny nemění layout; funkce/napoveda = skin volba je existující featura).
+
+---

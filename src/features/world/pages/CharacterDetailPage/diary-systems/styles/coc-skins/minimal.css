@@ -1,0 +1,535 @@
+/* Call of Cthulhu 7e — skin „Minimal" (archivní karta / registrační list).
+ *
+ * POZOR: na rozdíl od většiny CoC skinů je minimal SVĚTLÝ. Tmavý pergamenový
+ * dossier se překlápí na čistý archivní papír #f4f1ea, uhlový inkoust na
+ * světlém, JEDINÝ tlumený akcent = antické zlato #9a7b2e (Miskatonic archiv).
+ * NE prázdný minimalismus — minimalismus jako PRECIZNOST. Textury pryč,
+ * gradienty zploštěné na hairline plochy, tabular mono čísla. Sourozenec
+ * gurps-/drdh-/drdplus-skins minimal — TENTÝŽ archivní svět, přeložený do CoC
+ * listu/panelů.
+ *
+ * Signature (rodinná „archivní kalibrace" — maximální zdrženlivost, to JE
+ * identita): dvojitý LEDGER rám listu (.coc-sheet ::after inset linka) + 4
+ * REGISTRAČNÍ KŘÍŽE ✛ v rozích (.coc-sheet ::before conic-gradient masky) +
+ * letterpress tick-rule na oddělovačích + ražené razítko „DŮVĚRNÉ" (.coc-stamp).
+ * Ornamenty se mezi skiny NESDÍLEJÍ.
+ *
+ * Mechanika (IMPL_BRIEF): override na compound prefixu
+ * `[data-diary-system='coc'][data-diary-skin='minimal']` (specificita 0,2,0 >
+ * default 0,1,0 z coc.css). LIST tokeny `--coc-*` + třídy na `.coc-sheet`,
+ * panely/embedy VÝHRADNĚ přes `--dd-embed-*` na compoundu (hashované modulové
+ * třídy NECÍLÍME). Pouze CSS/SVG, žádný JS.
+ *
+ * Sémantika drží i ve zlaté paletě: Životy = tlumená cihla, Příčetnost =
+ * tlumená modrofialová (SIGNATURE, střídmě), úspěch = tlumená oliva, neúspěch
+ * = cihla. Akcent = antické zlato.
+ *
+ * Fonty: Fraunces (display serif) · Newsreader (tělo) · Spline Sans Mono
+ * (popisky/čísla). Krása v přesnosti a prázdnotě.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════
+   1. LIST — `.coc-sheet`: `--coc-*` override + font + světlý papír +
+      SIGNATURE ornamenty (dvojitý ledger rám + registrační kříže ✛).
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet {
+  /* ── lokální minimal paleta (dle galerie coc minimal) ── */
+  --cmn-paper: #f4f1ea; /* čistý světlý papír */
+  --cmn-paper-hi: #faf8f2; /* zvednutá karta */
+  --cmn-paper-2: #efeadf; /* panely / mírně tmavší */
+  --cmn-paper-3: #e8e2d4; /* rámečky / vpichy */
+  --cmn-ink: #211d16; /* hlavní inkoust */
+  --cmn-ink-2: #4a4436; /* sekundární text */
+  --cmn-ink-3: #7c745f; /* tichý / meta */
+  --cmn-rule: #cabf9f; /* dělítka / linky */
+  --cmn-rule-soft: #ddd4bd;
+  --cmn-gold: #9a7b2e; /* JEDINÝ akcent — antické zlato */
+  --cmn-gold-soft: #b79a4f;
+  --cmn-gold-deep: #7a6122;
+  --cmn-gold-wash: #ede3c8; /* zlatý podklad */
+  --cmn-stamp: #9a3c30; /* razítko DŮVĚRNÉ */
+
+  /* ── list tokeny (přebij baseline `--coc-*` na .coc-sheet) ── */
+  --coc-ink: var(--cmn-ink, #211d16);
+  --coc-parch: var(--cmn-ink-2, #4a4436); /* „parch" = tělo textu na světlém */
+  --coc-parch-dim: var(--cmn-ink-3, #7c745f);
+  --coc-parch-faint: var(--cmn-ink-3, #7c745f);
+  --coc-accent: var(--cmn-gold, #9a7b2e);
+  --coc-accent-bright: var(--cmn-gold-deep, #7a6122);
+  --coc-line: var(--cmn-rule, #cabf9f);
+  --coc-line-faint: var(--cmn-rule-soft, #ddd4bd);
+  --coc-panel: var(--cmn-paper-hi, #faf8f2);
+  --coc-panel-2: var(--cmn-paper-2, #efeadf);
+  --coc-input: var(--cmn-paper-hi, #faf8f2);
+  /* sémantické (tlumené, drží význam) */
+  --coc-hp: #a23a30; /* Životy — tlumená cihla */
+  --coc-hp-bright: #a23a30;
+  --coc-mp: #3f6a63; /* Body magie — tlumená patina */
+  --coc-mp-bright: #3f6a63;
+  --coc-sanity: #4a4a86; /* Příčetnost — tlumená modrofialová (SIGNATURE) */
+  --coc-sanity-bright: #4a4a86;
+  --coc-luck: #8a6a1f; /* Štěstí — tlumené zlato */
+  --coc-luck-bright: #8a6a1f;
+
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--cmn-ink-2, #4a4436);
+  /* archivní deska: kostěný papír + jemná mřížka rýsovacího listu, vnější
+     uhlový ledger rám, měkký drop shadow */
+  background:
+    linear-gradient(rgba(154, 123, 46, 0.035) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, rgba(154, 123, 46, 0.028) 1px, transparent 1px) 0 0 / 26px 100%,
+    linear-gradient(180deg, var(--cmn-paper-hi, #faf8f2), var(--cmn-paper, #f4f1ea));
+  border: 1.5px solid var(--cmn-ink, #211d16);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 24px 60px -34px rgba(40, 34, 22, 0.4);
+}
+
+/* SIGNATURE registrační kříže ✛ v rozích — přebij pergamenový šum (::before).
+   4 křížky přes radial masky v rozích, zlaté, tenké. */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 13px;
+  z-index: 2;
+  opacity: 1;
+  mix-blend-mode: normal;
+  pointer-events: none;
+  background-image:
+    /* horní/dolní ramena křížů (svislé úsečky) */
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e)),
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e)),
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e)),
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e)),
+    /* vodorovná ramena křížů */
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e)),
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e)),
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e)),
+    linear-gradient(var(--cmn-gold, #9a7b2e), var(--cmn-gold, #9a7b2e));
+  background-repeat: no-repeat;
+  background-size:
+    1px 14px, 1px 14px, 1px 14px, 1px 14px, /* svislé */
+    14px 1px, 14px 1px, 14px 1px, 14px 1px; /* vodorovné */
+  background-position:
+    left 6px top 0, right 6px top 0, left 6px bottom 0, right 6px bottom 0,
+    left 0 top 6px, right 0 top 6px, left 0 bottom 6px, right 0 bottom 6px;
+}
+
+/* SIGNATURE dvojitý ledger rám — přebij art deco dvojrámeček (::after) na
+   tenkou vnitřní papírovou linku. */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  z-index: 0;
+  border: 1px solid var(--cmn-rule-soft, #ddd4bd);
+  pointer-events: none;
+}
+
+/* ── SPISOVÁ PÁSKA — mono kapitálky, hairline linka ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-filestrip {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  color: var(--cmn-ink-3, #7c745f);
+  border-bottom: 1px solid var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-dossier {
+  color: var(--cmn-gold-deep, #7a6122);
+}
+
+/* ── HERO — jméno plochý Fraunces (žádný chromovaný gradient/glow) ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--cmn-ink, #211d16);
+  text-shadow: none;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-occ {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--cmn-ink-2, #4a4436);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-portrait {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 9px, rgba(154, 123, 46, 0.05) 9px 10px),
+    var(--cmn-paper-2, #efeadf);
+  border: 1px solid var(--cmn-rule, #cabf9f);
+  box-shadow: none;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-portrait::after {
+  border-color: var(--cmn-rule-soft, #ddd4bd);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-portrait span {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-meta-field label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-meta-field input {
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--cmn-ink, #211d16);
+  border-bottom: 1px dotted var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-meta-field input:focus {
+  border-bottom-color: var(--cmn-gold, #9a7b2e);
+}
+
+/* SIGNATURE ražené razítko „DŮVĚRNÉ" — cihlově červený letterpress rám */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-stamp {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  transform: rotate(-6deg);
+  border: 2px solid var(--cmn-stamp, #9a3c30);
+  color: var(--cmn-stamp, #9a3c30);
+  border-radius: 3px;
+  letter-spacing: 0.16em;
+  opacity: 0.82;
+  filter: none;
+  mix-blend-mode: multiply;
+  box-shadow: none;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-stamp b {
+  letter-spacing: 0.2em;
+}
+
+/* ── ODDĚLOVAČ SEKCÍ — letterpress tick-rule (jemná dělítka) ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-divider::before,
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-divider::after {
+  height: 8px;
+  align-self: center;
+  background:
+    repeating-linear-gradient(90deg, var(--cmn-rule, #cabf9f) 0 1px, transparent 1px 7px) 0 bottom / auto 8px repeat-x;
+  border-bottom: 1px solid var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-divider-glyph svg {
+  stroke: var(--cmn-gold, #9a7b2e);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-divider h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--cmn-ink, #211d16);
+}
+
+/* ── VLASTNOSTI — ploché ledger buňky, mono čísla, hranaté rohy ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char {
+  background: var(--cmn-paper-hi, #faf8f2);
+  border: 1px solid var(--cmn-rule, #cabf9f);
+  clip-path: none; /* archivní disciplína = pravé úhly */
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char.is-derived {
+  background: var(--cmn-gold-wash, #ede3c8);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char.is-derived .coc-char-label {
+  color: var(--cmn-gold-deep, #7a6122);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.18em;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char-main {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--cmn-ink, #211d16);
+  background: transparent;
+  border: 1px solid transparent;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char-main:focus {
+  background: var(--cmn-paper-2, #efeadf);
+  border-color: var(--cmn-gold, #9a7b2e);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char-sub {
+  border-top: 1px dotted var(--cmn-rule, #cabf9f);
+  padding-top: 6px;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char-sub span {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char-sub input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-2, #4a4436);
+  background: var(--cmn-paper-2, #efeadf);
+  border: 1px solid var(--cmn-rule-soft, #ddd4bd);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-char-sub input:focus {
+  border-color: var(--cmn-gold, #9a7b2e);
+}
+
+/* ── STAV / VITALS — ploché buňky, levý sémantický pruh, mono čísla ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital {
+  position: relative;
+  background: var(--cmn-paper-hi, #faf8f2);
+  border: 1px solid var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital.is-danger::before {
+  background: var(--coc-hp, #a23a30);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital.is-sanity::before {
+  background: var(--coc-sanity, #4a4a86);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital.is-mp::before {
+  background: var(--coc-mp, #3f6a63);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital.is-luck::before {
+  background: var(--coc-luck, #8a6a1f);
+}
+/* SIGNATURE: Příčetnost dostane tlumený „diagnostický" tón (modrofialová) */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital.is-sanity {
+  border-color: color-mix(in srgb, var(--coc-sanity, #4a4a86) 40%, var(--cmn-rule, #cabf9f));
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.18em;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital.is-danger .coc-vital-label {
+  color: var(--coc-hp, #a23a30);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital.is-sanity .coc-vital-label {
+  color: var(--coc-sanity, #4a4a86);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital-nums .cur {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--cmn-ink, #211d16);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital-nums .slash {
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital-nums .max {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-2, #4a4436);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital-nums input:focus {
+  color: var(--cmn-gold-deep, #7a6122);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital-sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-vital-track {
+  background: var(--cmn-paper-3, #e8e2d4);
+  border: 1px solid var(--cmn-rule-soft, #ddd4bd);
+}
+
+/* ── STATUS PEČETI — mono kapitálky, aktivní = cihla ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-seal {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  color: var(--cmn-ink-3, #7c745f);
+  background: var(--cmn-paper-hi, #faf8f2);
+  border: 1px solid var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-seal-dot {
+  border-color: var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-seal:has(input:checked) {
+  color: var(--cmn-stamp, #9a3c30);
+  border-color: var(--cmn-stamp, #9a3c30);
+  background: rgba(154, 60, 48, 0.06);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-seal:has(input:checked) .coc-seal-dot {
+  background: var(--cmn-stamp, #9a3c30);
+  border-color: var(--cmn-stamp, #9a3c30);
+  box-shadow: 0 0 0 2px rgba(154, 60, 48, 0.12);
+}
+
+/* ── DOVEDNOSTI — tečkovaná hairline, mono hodnoty, Mýtus zlatý wash ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill {
+  border-bottom: 1px dotted var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill:hover {
+  background: var(--cmn-gold-wash, #ede3c8);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill-chk {
+  accent-color: var(--cmn-gold, #9a7b2e);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill-name {
+  color: var(--cmn-ink, #211d16);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill-name b {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill.is-mythos {
+  background: var(--cmn-gold-wash, #ede3c8);
+  border: 1px solid var(--cmn-gold-soft, #b79a4f);
+  border-radius: 2px;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill.is-mythos .coc-skill-name {
+  color: var(--cmn-gold-deep, #7a6122);
+  font-style: italic;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill-vals input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-2, #4a4436);
+  background: var(--cmn-paper-2, #efeadf);
+  border: 1px solid var(--cmn-rule-soft, #ddd4bd);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill-vals input.reg {
+  color: var(--cmn-ink, #211d16);
+  font-weight: 600;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill-vals input:focus {
+  border-color: var(--cmn-gold, #9a7b2e);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-skill.is-mythos .coc-skill-vals input.reg {
+  color: var(--cmn-gold-deep, #7a6122);
+}
+
+/* ── BOJ — mono čísla, hairline linky ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-combat th {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  color: var(--cmn-ink-3, #7c745f);
+  border-bottom: 1.5px solid var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-combat td {
+  border-bottom: 1px dotted var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-combat td input {
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--cmn-ink, #211d16);
+  background: var(--cmn-paper-2, #efeadf);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-combat td input:focus {
+  border-color: var(--cmn-gold, #9a7b2e);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-cd-item {
+  background: var(--cmn-paper-hi, #faf8f2);
+  border: 1px solid var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-cd-item span {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-cd-item input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--cmn-ink, #211d16);
+  background: var(--cmn-paper-2, #efeadf);
+  border: 1px solid var(--cmn-rule-soft, #ddd4bd);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-cd-item input:focus {
+  border-color: var(--cmn-gold, #9a7b2e);
+}
+
+/* ── SOUHRN (investigation) — ploché notes, „zakázané" v patině ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note {
+  background: var(--cmn-paper-hi, #faf8f2);
+  border: 1px solid var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note-title {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  color: var(--cmn-ink-3, #7c745f);
+  border-bottom: 1px dotted var(--cmn-rule, #cabf9f);
+  padding-bottom: 6px;
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note-title svg {
+  stroke: var(--cmn-gold, #9a7b2e);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note-area {
+  color: var(--cmn-ink-2, #4a4436);
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(154, 123, 46, 0.1) 27px 28px
+  );
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note.is-forbidden {
+  border-color: color-mix(in srgb, var(--coc-mp, #3f6a63) 45%, var(--cmn-rule, #cabf9f));
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note.is-forbidden .coc-note-title,
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note.is-forbidden .coc-note-title svg {
+  color: var(--coc-mp, #3f6a63);
+  stroke: var(--coc-mp, #3f6a63);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-note.is-forbidden .coc-note-area {
+  font-style: italic;
+  background-image: repeating-linear-gradient(
+    transparent 0 27px,
+    rgba(63, 106, 99, 0.12) 27px 28px
+  );
+}
+
+/* ── VYBAVENÍ / MAJETEK — mono peníze, tečkované řádky ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-money-row {
+  border-bottom: 1px dotted var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-money-row label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  color: var(--cmn-ink-3, #7c745f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-money-row input {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--cmn-ink, #211d16);
+}
+
+/* ── ADD / DEL ── */
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-add {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  color: var(--cmn-gold-deep, #7a6122);
+  border: 1px dashed var(--cmn-rule, #cabf9f);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-add:hover {
+  background: var(--cmn-gold-wash, #ede3c8);
+  border-color: var(--cmn-gold, #9a7b2e);
+  color: var(--cmn-gold-deep, #7a6122);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-del {
+  color: rgba(162, 58, 48, 0.55);
+}
+[data-diary-system='coc'][data-diary-skin='minimal'] .coc-sheet .coc-del:hover {
+  color: var(--coc-hp, #a23a30);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   2. EMBED / PANELY (combat / bestie / obal TM / readout / dicelog /
+      orchestrace / chat) — reskin VÝHRADNĚ přes `--dd-embed-*` tokeny na
+      compound scope (moduly je čtou přes var(); hashované třídy NECÍLÍME).
+      Plocha SVĚTLÝ archiv OPAQUE (neprosvítá mapu), uhlový ink, mono čísla,
+      JEDINÉ zlato. Úspěch = oliva, neúspěch/krev = cihla. Ornament TVAR
+      (dvojitý ledger rám + kříže ✛) dědí embed obal z rodinných :is() bloků.
+   ════════════════════════════════════════════════════════════════════ */
+[data-diary-system='coc'][data-diary-skin='minimal'] {
+  --dd-embed-surface: linear-gradient(180deg, #faf8f2, #efeadf);
+  --dd-embed-border: #cabf9f;
+  --dd-embed-line: rgba(202, 191, 159, 0.6);
+  --dd-embed-text: #211d16;
+  --dd-embed-muted: #7c745f;
+  --dd-embed-title: #211d16;
+  --dd-embed-chip-bg: #ede3c8;
+  --dd-embed-accent: #7a6122;
+  --dd-embed-num-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-pos: #3d6b3a; /* úspěch = tlumená oliva */
+  --dd-embed-neg: #a23a30; /* neúspěch / krev = tlumená cihla */
+  --dd-embed-neutral: #7a6122; /* neutrál = tmavší zlato */
+
+  /* HP bar fill (combat + bestie panel čtou přes var()) — tlumená cihla */
+  --dd-hpfill-grad: linear-gradient(90deg, #a23a30, #b8574a);
+}

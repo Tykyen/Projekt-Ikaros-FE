@@ -10,7 +10,7 @@
 
 .root {
   font-family: 'EB Garamond', Georgia, serif;
-  color: #dcc9a4;
+  color: var(--dd-embed-text, #dcc9a4);
   padding: 8px 4px;
   display: flex;
   flex-direction: column;
@@ -50,7 +50,7 @@
 }
 
 .vital {
-  background: rgba(20, 25, 24, 0.55);
+  background: var(--dd-embed-chip-bg, rgba(20, 25, 24, 0.55));
   border: 1px solid rgba(184, 147, 78, 0.26);
   padding: 7px 8px;
 }
@@ -72,7 +72,7 @@
   font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #b8934e;
+  color: var(--dd-embed-accent, #b8934e);
 }
 .vital.hp .vitalLabel {
   color: #c94a3d;
@@ -102,7 +102,7 @@
   transition: width 0.2s;
 }
 .vital.hp .vitalBarFill {
-  background: linear-gradient(90deg, #9c2b2b, #c94a3d);
+  background: var(--dd-hpfill-grad, linear-gradient(90deg, #9c2b2b, #c94a3d));
 }
 .vital.san .vitalBarFill {
   background: linear-gradient(90deg, #7d6bb0, #a596d6);
@@ -127,7 +127,7 @@
   transition: 0.15s;
 }
 .vitalPm button:hover:not(:disabled) {
-  border-color: #b8934e;
+  border-color: var(--dd-embed-accent, #b8934e);
   color: #e4c07f;
 }
 .vitalPm button:disabled {
@@ -166,7 +166,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(20, 25, 24, 0.5);
+  background: var(--dd-embed-chip-bg, rgba(20, 25, 24, 0.5));
   border: 1px solid rgba(184, 147, 78, 0.2);
   padding: 5px 9px;
 }
@@ -252,7 +252,7 @@
   font-size: 9px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #b8934e;
+  color: var(--dd-embed-accent, #b8934e);
   border-bottom: 1px solid rgba(184, 147, 78, 0.2);
   padding-bottom: 4px;
 }
@@ -296,7 +296,7 @@
   transition: 0.15s;
 }
 .charChip:hover:not(:disabled) {
-  border-color: #b8934e;
+  border-color: var(--dd-embed-accent, #b8934e);
   background: rgba(184, 147, 78, 0.1);
 }
 .charChip:disabled {
@@ -308,7 +308,7 @@
   font-size: 8px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #b8934e;
+  color: var(--dd-embed-accent, #b8934e);
 }
 .charVal {
   font-size: 14px;
@@ -345,7 +345,7 @@
 }
 .skillName {
   font-size: 13px;
-  color: #dcc9a4;
+  color: var(--dd-embed-text, #dcc9a4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -371,7 +371,7 @@
   align-items: center;
   gap: 8px;
   padding: 5px 7px;
-  background: rgba(20, 25, 24, 0.5);
+  background: var(--dd-embed-chip-bg, rgba(20, 25, 24, 0.5));
   border: 1px solid rgba(184, 147, 78, 0.2);
 }
 .weaponName {
