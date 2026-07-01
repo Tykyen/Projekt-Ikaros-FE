@@ -113,11 +113,16 @@ describe('GurpsBestiePanel', () => {
     );
   });
 
-  it('HP −5 → mutate currentHp', () => {
+  it('HP −5 → mutate currentHp + systemStats.health.current (bar čte damageable)', () => {
     render(<GurpsBestiePanel {...props} token={makeToken()} onMapRoll={vi.fn()} />);
     fireEvent.click(screen.getByLabelText('Životy -5'));
     expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ patch: { currentHp: 17 } }),
+      expect.objectContaining({
+        patch: expect.objectContaining({
+          currentHp: 17,
+          systemStats: expect.objectContaining({ 'health.current': 17 }),
+        }),
+      }),
     );
   });
 

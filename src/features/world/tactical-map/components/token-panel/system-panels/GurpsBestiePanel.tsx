@@ -138,7 +138,16 @@ export function GurpsBestiePanel({
       maxHp > 0
         ? Math.max(0, Math.min(maxHp, currentHp + delta))
         : Math.max(0, currentHp + delta);
-    update.mutate({ tokenId: token.id, patch: { currentHp: next } });
+    // Zelený bar na tokenu čte `systemStats['health.current']` (damageable pole
+    // token schématu) — musíme updatovat JEHO, ne jen `token.currentHp`, jinak
+    // bar nereaguje. Držíme oba v sync (currentHp = combat roster / init lišta).
+    update.mutate({
+      tokenId: token.id,
+      patch: {
+        currentHp: next,
+        systemStats: sanitize({ ...ss, 'health.current': next }),
+      },
+    });
   };
 
   // ── inline edit ──
@@ -149,14 +158,19 @@ export function GurpsBestiePanel({
   };
   const saveEdit = (): void => {
     const newMax = toNum(dStats['health.max'], maxHp);
+    const newCur = Math.min(toNum(dStats['health.current'], currentHp), newMax);
     update.mutate(
       {
         tokenId: token.id,
         patch: {
           instanceName: dName.trim() || token.instanceName,
-          systemStats: sanitize(dStats),
+          systemStats: sanitize({
+            ...dStats,
+            'health.current': newCur,
+            'health.max': newMax,
+          }),
           maxHp: newMax,
-          currentHp: Math.min(currentHp, newMax),
+          currentHp: newCur,
         },
       },
       {

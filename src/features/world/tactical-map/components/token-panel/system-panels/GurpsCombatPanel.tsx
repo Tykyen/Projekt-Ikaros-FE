@@ -37,7 +37,10 @@ import {
 } from '@/features/world/pages/CharacterDetailPage/diary-systems/sheets/gurps/formulas';
 import { GurpsSheet } from '@/features/world/pages/CharacterDetailPage/diary-systems/sheets/gurps/GurpsSheet';
 import { Modal } from '@/shared/ui/Modal/Modal';
-import type { MapToken } from '../../../types';
+import { useQueryClient } from '@tanstack/react-query';
+import { mapSceneQueryKey } from '../../../hooks/useMapScene';
+import { applyOperationToScene } from '../../../utils/applyOperationToScene';
+import type { MapScene, MapToken } from '../../../types';
 // Detaily modal reusuje deníkový sheet (.gurps-* scoped na [data-diary-system]).
 import '@/features/world/pages/CharacterDetailPage/diary-systems/styles/gurps.css';
 import s from './GurpsCombatPanel.module.css';
@@ -73,6 +76,7 @@ export function GurpsCombatPanel({
     token.characterSlug,
   );
   const updateMut = useUpdateCharacterDiary(worldId, token.characterSlug);
+  const qc = useQueryClient();
 
   const [pending, setPending] = useState<Record<string, unknown>>({});
   const flushTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -176,11 +180,39 @@ export function GurpsCombatPanel({
     });
   };
 
+  // PC HP bar na tokenu čte `token.characterData.customData` (BE enrich snapshot),
+  // který deníková mutace neobnoví → optimisticky ho propíšeme do scény cache, ať
+  // zelený bar reaguje hned. Jen na mapě (scéna existuje); v chatu no-op. Deník
+  // zůstává zdrojem pravdy — snapshot se dorovná při příštím refetchi scény.
+  const syncTokenHp = (cdKey: string, value: string): void => {
+    const sceneKey = mapSceneQueryKey(worldId);
+    const scene = qc.getQueryData<MapScene | null>(sceneKey);
+    if (!scene) return;
+    const tk = scene.tokens.find((t) => t.id === token.id);
+    if (!tk) return;
+    const nextCharData = {
+      ...(tk.characterData ?? {}),
+      customData: {
+        ...(tk.characterData?.customData ?? {}),
+        [cdKey]: value,
+      },
+    };
+    qc.setQueryData(
+      sceneKey,
+      applyOperationToScene(scene, {
+        type: 'token.update',
+        tokenId: token.id,
+        patch: { characterData: nextCharData } as Partial<MapToken>,
+      }),
+    );
+  };
+
   // ── HP/FP ± ──
   const setVital = (curKey: string, value: number, max: number): void => {
     if (!canEdit) return;
     const v = Math.min(max, value);
     cda.set(curKey, String(v));
+    syncTokenHp(`gurps_${curKey}`, String(v));
   };
 
   const hpPct = hpMax > 0 ? Math.max(0, Math.min(100, (hpCur / hpMax) * 100)) : 0;

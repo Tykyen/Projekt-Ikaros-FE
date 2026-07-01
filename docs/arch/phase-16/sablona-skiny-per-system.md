@@ -108,6 +108,12 @@ sesterský soubor (`drd16-skins/<id>.css` / `drdplus-skins/<id>.css` / matrix bl
 > (`gurps: gurps_hp_max ?? gurps_st`). Ověř na postavě, která NEsáhla na HP pole (ne jen na testu s max).
 > **Bestie:** bar jede přes token schéma s `combatBehavior:'damageable'` (`resolveHp`/`hpTier`) —
 > každé nové bestie `token.json` MUSÍ mít damageable HP pole, jinak bestie bar nejede.
+> ⚠️ **Bar čte damageable pole ze `systemStats`, ne `token.currentHp`** (má-li token schéma damageable).
+> Panel HP ± tedy MUSÍ psát do `systemStats['<damageable>']` (FATE vzor), ne jen `currentHp` (DrDH vzor —
+> ten funguje jen bez damageable v token schématu). Před copy-paste jiného systému ověř `resolveHpWithFallback`.
+> **PC bar** = `resolveCharacterHp(token.characterData.customData)` (BE enrich snapshot) — deníková mutace
+> ho neobnoví; pro živý update optimisticky propiš `token.characterData.customData` do scény cache
+> (`qc.setQueryData` + `applyOperationToScene`, guard = jen na mapě).
 > **Test MUSÍ používat klíče, co se REÁLNĚ ukládají** (grep `save({...})` + `set('hp…')`),
 > ne vymyšlené — jinak zelený test maskuje, že HP bar nejede (CH-2026-06-29).
 
