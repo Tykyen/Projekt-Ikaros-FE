@@ -134,7 +134,7 @@ export function WorldSection() {
         <Tool icon={<NotebookPen size={16} />} title="Vzhled deníku — skin tvého listu" audience={{ kind: 'vse', label: 'Členové' }}>
           <p>
             U herních systémů s vlastním listem (Matrix, Dračí doupě 1.6, Plus, II,
-            Jeskyně a draci a Příběhy Impéria) si na <strong>deníku postavy</strong> přepneš paletkou{' '}
+            Jeskyně a draci, Příběhy Impéria, Dračí Hlídka a GURPS) si na <strong>deníku postavy</strong> přepneš paletkou{' '}
             <strong>🎨 Vzhled</strong> mezi osmi styly: <strong>Sci-fi</strong>,{' '}
             <strong>Fantasy</strong>, <strong>Horor</strong>, <strong>Steampunk</strong>,{' '}
             <strong>Příroda</strong>, <strong>Minimal</strong>, <strong>Retro</strong> a{' '}
@@ -346,6 +346,13 @@ export function WorldSection() {
               <strong>postih</strong> upravíš přímo na mapě — postih se sám odečítá od
               každého hodu. Delší části povolání (kouzla, finty, formule, démony…) si
               otevřeš tlačítkem „📖" jen k nahlédnutí.
+            </p>
+            <p>
+              Bojovou verzi deníku mají i další systémy — např. <strong>GURPS</strong>{' '}
+              háže <strong>3k6 „pod cíl"</strong> (úspěch, když padne pod tvou hodnotu; viz
+              FAQ), přímo v panelu upravíš <strong>životy (HP), únavu (FP)</strong> a
+              modifikátor hodu, stav (Zmožen / Vyčerpán) se dopočítá sám a plný list
+              otevřeš tlačítkem „Detaily".
             </p>
             <p>
               U <strong>své postavy</strong> máš nad deníkem na mapě i v chatu tlačítka{' '}
@@ -665,7 +672,7 @@ export function WorldSection() {
           <p>
             Definuje atributy postav světa (HP, staty, vlastní bloky). Tři panely:
             seznam bloků s drag&amp;drop, konfigurace bloku, živý náhled. Verzování,
-            Import/Export JSON. Pokud má svět jeden z 12 podporovaných systémů, použije
+            Import/Export JSON. Pokud má svět jeden z podporovaných herních systémů, použije
             se dedikovaný systémový sheet místo bloků.
           </p>
         </Tool>

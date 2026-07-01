@@ -479,6 +479,41 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Jak fungují hody v GURPS (3k6 „pod cíl", úspěch a rozdíl)?',
+    a: (
+      <>
+        <p>
+          GURPS je <strong>opačný</strong> než součtové systémy: neházíš vysoko, ale{' '}
+          <strong>nízko</strong>. Většina hodů = <strong>3k6</strong> a snažíš se hodit{' '}
+          <strong>stejně nebo méně</strong> než své cílové číslo (hodnota atributu nebo
+          dovednosti):
+        </p>
+        <ul>
+          <li>
+            <strong>Úspěch</strong> = součet 3k6 je ≤ cíl. <strong>Rozdíl</strong> (o kolik
+            jsi to zvládl, cíl − hod) říká, jak dobře — v záznamu kostek ho vidíš.
+          </li>
+          <li>
+            <strong>Kritický úspěch / selhání</strong> řeší pravidla GURPS automaticky
+            (velmi nízké hody = kriticky výborně, 17–18 = kriticky špatně).
+          </li>
+          <li>
+            <strong>Postihy/bonusy</strong> nastavíš v bojovém panelu (± u hodu) — přičtou
+            se rovnou k cíli, takže nemusíš počítat.
+          </li>
+        </ul>
+        <p>
+          Výjimky: <strong>zranění</strong> se hází <strong>normálně vysoko</strong>{' '}
+          (např. 2k6 + bonus, čím víc tím lépe) a <strong>iniciativa</strong> se nehází
+          vůbec — je to tvá <strong>Základní rychlost</strong>. Na taktické mapě i v chatu
+          klikni na atribut, dovednost nebo útok ve statbaru; v záznamu kostek uvidíš, zda
+          hod prošel „pod cíl" a s jakým rozdílem.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Jak hledám stránky ve světě?',
     a: (
       <>

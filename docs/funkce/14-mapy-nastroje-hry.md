@@ -142,11 +142,30 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Stav:** ✅ funguje.
 - **Kód:** FE mapa `system-panels/PiBestiePanel.tsx`(+`.module.css`), registrace `TokenSystemSheet.tsx`; chat `chat/components/rail/PiChatBestiePanel.tsx`, registrace `BestieRollPanel.tsx`/`BestieInstancePanel.tsx`. BE: žádné (token customData/systemStats).
 
+### GURPS combat panel (`gurps`, mapa + chat) — PRVNÍ roll-under systém
+- **Co to je:** Cold-steel bojový panel pro GURPS 4E PC/NPC (`GurpsCombatPanel`). Ořez deníku na boj: HP/FP ± + **auto stav** (Zmožen ≤⅓HP / Vyčerpán ≤⅓FP / Bezvědomí ≤0), útoky (zásah = **auto-match dovednosti dle jména zbraně**, škody), obrana (Úhyb/Kryt/Blok + DR pasivní), rychlé hody atributů (ST/DX/IQ/HT+Vůle/Vním), dovednosti, iniciativa; Detaily = celý `GurpsSheet` v `Modal`u.
+- **Kde:** token-panel `/takticka-mapa` (`TokenSystemSheet`, `world.system==='gurps'`) + chat rail (přes `COMBAT_PANELS`).
+- **Kdo:** PJ vše; vlastník PC svůj; cizí hráč jen **Stav readonly**. Hody jen s `onRoll`.
+- **Zvláštnosti (roll-under engine):** GURPS je **1. roll-under systém** — hod = **3k6 „pod cíl"** (`kind:'3d6'`+`target`; `rollTarget` počítá úspěch/margin/krity dle 4E), iniciativa = `kind:'flat'` (= Základní rychlost, GURPS NEhází). Škody jsou roll-HIGH → `kind:'mixed'{d6:N}`+mod. Readout i dicelog mají větev roll-under (`payload.rollUnder`). Engine FE, bez BE. HP bar živě (optimistický sync `token.characterData.customData` do scény cache).
+- **Hranice / co neumí:** bez plného systému manévrů (1 modifier stepper + preset „Útok naplno +4"). Modifikátor foldnut do cíle. **8 skinů** (`gurps-skins/*`).
+- **Stav:** ✅ (deník render ověřen 8/8; živé ověření panelu na mapě/chatu čeká).
+- **Kód:** FE `system-panels/GurpsCombatPanel.tsx`(+`.module.css`), registrace `combatPanels.ts`, engine `chat/dice/lib/rollEngine.ts`(`rollTarget`)+`utils/rollFromSheet.ts`+`chat/dice/lib/rollFromDiary.ts`+`dicePayload.ts`(`buildRollUnderPayload`/`buildFlatPayload`), deník `sheets/gurps/{GurpsSheet,formulas,constants}.tsx`. BE: žádné (customData free-form).
+
+### GURPS bestie panel (`gurps`, mapa + chat)
+- **Co to je:** Cold-steel statblok pro gurps bestii (`GurpsBestiePanel`); jádro `GurpsBestieCombatActions` sdílené mapa↔chat (`GurpsChatBestiePanel`). Meta (typ/SM/pohyb) / Atributy (klik = 3k6) / Útoky (zásah 3k6 + škody mixed) / Obrana (Úhyb/Kryt/Blok/DR + thr/sw) / Zvláštnosti+Taktika (okna), HP ± + iniciativa (flat).
+- **Kde:** `TokenSystemSheet` bestie větev (`world.system==='gurps'`) + chat (`BestieRollPanel` katalog · `BestieInstancePanel` instance).
+- **Zvláštnosti:** HP bar přes token schéma `combatBehavior:'damageable'` (`health.current`) — panel updatuje `systemStats['health.current']` I `token.currentHp` (bar živě, past bar↔panel jiné pole). `token.json` = **superset** bestie (BE strict `validateForPatch`). systemStats = ploché tečkové klíče (`attributes.st`).
+- **Stav:** ✅ (schéma v2 + panely; živé ověření čeká).
+- **Kód:** FE `system-panels/{GurpsBestiePanel,GurpsBestieCombatActions}.tsx`(+`.module.css`), chat `rail/GurpsChatBestiePanel.tsx`, schéma `schemas/gurps/{bestie,token}.json` v2. BE: mirror `assets/schemas/gurps-{bestie,token}.json` (export-schemas + restart, push `3656306`).
+
 ### HP (per-system, visibility toggle)
 - **Co to je:** HP bar pod tokenem (PixiJS). Architektura per-typ: Bestie = snapshot ze `systemStats`; PC/NPC = z deníkového subdokumentu (`customData` per-system klíč) přes enrich (memory `token_hp_architecture`).
 - HP bar render-only (`TokenHpBar`), resolve current/max + tier barva řeší volající; per-scéna visibility toggle.
+- **PC/NPC coverage (`resolveCharacterHp`):** matrix/pi (konst. 5) · jad/dnd5e/coc/drdh/drd16 (deníkové klíče) · **gurps** (`gurps_hp`, fallback `gurps_hp_max ?? gurps_st`) · shadowrun (fyzický záznamník) · **fate/fae** (stres boxy = zbývající) · **drdplus** (mez zranění − rány). **Jediná výjimka bez baru = drd2** (`HP_BAR_DISABLED_SYSTEMS`, `TokenSprite.tsx:458`) — životy tam existují, ale bar se záměrně nekreslí.
+- **Bestie coverage:** token schéma `combatBehavior:'damageable'` značí HP pole → `resolveHpWithFallback` (damageable field ze `systemStats` NEBO fallback `token.currentHp`). ⚠️ Past: bar musí číst STEJNÉ pole, které panel zapisuje (gurps bestie: `health.current` I `currentHp`).
+- **Realtime:** změna HP z panelu = optimistický patch scény cache (`applyOperationToScene` + invalidace) → bar se hne bez čekání na WS/refetch (řeší dřívější bug „životy se nezměnily").
 - Hráč smí editovat jen `currentHp`, `injury`, `initiative` vlastního (a neodemčeného) tokenu (BE whitelist `operations-authorizer.ts:145`).
-- **Kód:** `components/tokens/TokenHpBar.tsx`, `utils/hpTier.ts`.
+- **Kód:** `components/tokens/TokenSprite.tsx:458-477`, `utils/hpTier.ts` (`resolveHpWithFallback`), `utils/resolveCharacterHp.ts`.
 
 ### Fog of war (hybrid)
 - **Co to je:** Mlha války. `fogEnabled` master přepínač (PJ). `revealedHexes` = odhalené hexy. Efektivně odhalené = `revealedHexes ∪ hexy PC tokenů` (`effectivelyRevealed`, hybrid — PC vždy vidí kolem sebe).
@@ -199,7 +218,8 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 
 ### Kostky na mapě
 - 3D dice overlay (sdílí jádro s chatem), log hodů (cap 50, persist v `scene.diceRolls`). Op `dice.roll` — BE kontroluje spoofing (`byUserId === user.id`) a házení za cizí token (`operations-authorizer.ts:160`). Viditelnost hodů dle `world.diceVisibility` + `canSeeRoll`.
-- **Kód:** `components/dice/{DiceLogPanel,DiceRollButton}.tsx`, `hooks/useMapDiceRoll.ts`, `utils/diceVisibility.ts`.
+- **Roll typy (`rollEngine`):** fate `4dF` · generic `XdN` · `d6+`/`2d6+` (exploding) · `pool-dN` (SR6 úspěchy+glitch) · `mixed` · **`3d6` (GURPS roll-under: `rollTarget` = hod „pod cíl" + margin + krity dle 4E)** · **`flat`** (bez kostek — GURPS iniciativa = Základní rychlost). Readout (`DiceRollOverlay`) i dicelog (`DiceLogPanel`) mají větve pro pool/crit/**rollUnder**. GURPS = **1. roll-under systém** platformy.
+- **Kód:** `components/dice/{DiceLogPanel,DiceRollButton}.tsx`, `hooks/useMapDiceRoll.ts`, `utils/diceVisibility.ts`, engine `chat/dice/lib/{rollEngine,dicePayload,diceNotation}.ts`.
 
 ### Ambient zvuky na mapě
 - PJ vysílá playlist (op `sound.playlist` / `scene.sounds.set`) → hráči slyší (`SceneSoundPlayer`). Čerpá ze zvukové databáze (14.4).

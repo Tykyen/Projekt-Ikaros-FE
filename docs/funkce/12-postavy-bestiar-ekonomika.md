@@ -291,16 +291,48 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 ---
 
+### GURPS 4E (`gurps`) — deník + combat panel + bestiář (roll-under 3k6) — PRVNÍ roll-under systém
+
+**Co to je:** Plné pokrytí GURPS **4. edice** (uživatel explicitně zvolil 4E, ne 3E Lite) — deník, taktická mapa (PC/NPC + bestie), chat, bestiář. **Roll-under** mechanika (hoď 3k6 **pod** cílové číslo = úspěch; margin = cíl − hod), narozdíl od všech ostatních součtových/pool systémů. Vlastní vizuální identita „cold-steel" (tmavý ocelový list, default skin `scifi`).
+
+**Kde:** Svět s `world.system = 'gurps'`. Deník (`DiaryTab`→`GurpsSheet`), bestiář (`/svet/:slug/bestiar`), taktická mapa (token panel), chat (rail). Default skin `scifi`.
+
+**Kdo:** Jako ostatní systémy — člen s přístupem k postavě; edituje vlastník PC / PJ+. Bestiář dle 3 scope. Cizí hráč v combat panelu vidí jen Stav readonly.
+
+**Mechaniky (čisté funkce `sheets/gurps/formulas.ts`, reuse deník↔panel↔print = 0 drift):**
+- **4 primární atributy** ST/DX/IQ/HT + **sekundární charakteristiky** Vůle/Vnímání (default = IQ). HP = ST, FP = HT.
+- **Odvozená pole (hybrid override):** prázdný override = auto-výpočet, vyplněný = ruční. Základní rychlost = (DX+HT)/4, Základní pohyb = ⌊rychlost⌋, Úhyb = ⌊rychlost⌋+3, Základní nosnost = ST²/5, tabulka nákladu, thrust/swing zranění (4E tabulka 1–30 clamp).
+- **Bodový účet:** `attributeCost` (4E per-level ceny) + traits → `pointSummary` (auto součet, nezadává se ručně).
+- **Zbroj = jen DR po částech těla** (6 lokací) — 4E zrušilo pasivní obranu/PO (odklon od 3E, prokomunikováno).
+- **Roll-under engine:** hod atributu/dovednosti/zásahu = `kind:'3d6'` + `target` → `rollTarget` počítá úspěch + margin + **krity 4E** (3–4 krit úspěch, 5@≥15, 6@≥16, 18 krit selhání, 17@≤15, margin≤−10 selhání). Iniciativa = `kind:'flat'` (= Základní rychlost, GURPS nehází kostkou). **Škody jsou roll-HIGH** → `kind:'mixed'{d6:N}`+mod (NE roll-under).
+
+**Co jde dělat:**
+- **Deník** (`GurpsSheet`, `customData` prefix `gurps_`, schema-less delta-merge): boxový list dle oficiálního character sheetu (view/edit/print), atributy + sekundární, DR po lokacích, dovednosti/přednosti-nevýhody/zbraně (blízko/dálka), auto bodový účet.
+- **Taktická mapa — PC/NPC** (`GurpsCombatPanel` v `COMBAT_PANELS`): bojové jádro (HP/FP ± steppery, auto Stav Zmožen/Vyčerpán/Bezvědomí z HP/FP, útoky = auto-match dovednosti dle jména zbraně → 3k6 zásah + škody, obrany Úhyb/Kryt/Blok + DR, modifier stepper, rychlé hody atributů/dovedností, iniciativa flat), Detaily = celý `GurpsSheet` v `Modal`u. HP bar tokenu = `resolveCharacterHp` case `gurps` (`gurps_hp`, fallback `gurps_hp_max ?? gurps_st`).
+- **Taktická mapa — bestie** (`GurpsBestiePanel` + `GurpsBestieCombatActions`): cold-steel statblok — meta (typ/SM/pohyb), atributy (klik = 3k6), útoky (zásah + škody), obrana (Úhyb/Kryt/Blok/DR + thr/sw), zvláštnosti + taktika, damageable HP (`health.current`) + iniciativa flat.
+- **Bestiář** (2 schémata `gurps:bestie`/`gurps:token`): editor přes generický `EntitySchemaForm`. Schéma v2 přidalo `attacks`/`creature_type`/`tactic`; bestie drží přímé hodnoty útoků (nepočítá z atributů jako PC).
+- **Chat**: PC/NPC zdarma přes `DiaryRollPanel`→`COMBAT_PANELS`; bestie přes `GurpsChatBestiePanel` (sdílí jádro `GurpsBestieCombatActions` s mapou = 0 drift — týž plný panel, jen užší rail).
+- **8 skinů** (scifi default) — viz „Skin deníku" níž.
+
+**Hranice / co neumí:** List je evidence, ne pravidlový engine — obsah přednosti/nevýhody/dovednosti se dohledává v příručce. Bez plného systému manévrů (1 modifier stepper + preset „Útok naplno +4"). Práh úspěchu řeší margin automaticky, ale detailní pravidla obrany/postihů řeší PJ ad hoc. Combat panel PC/NPC diary-backed (0 BE — hody čtou `customData`).
+
+**Zvláštnosti:** GURPS = **1. roll-under systém** platformy → do sdíleného dice enginu přidány `kind:'3d6'` (`rollTarget`) + `kind:'flat'`; readout + dicelog mají větev `payload.rollUnder`. Deník+panel+print sdílí `formulas.ts` → hody single-source. Bestie token = superset (`schemas/gurps/token.json` ⊇ `bestie.json` + `health.current`) kvůli BE strict `token.update`. ⚠️ systemStats klíče = ploché tečkové stringy (`stats['attributes.st']`), NE nested. HP realtime přes optimistický patch scény cache.
+
+**Stav:** ✅ funguje (deník + combat panel PC/NPC + bestie + roll-under engine + 8 skinů; deník render 8/8 ověřen, živé ověření panelů na mapě/chatu + BE restart bestie schématu čeká).
+**Kód:** FE `sheets/gurps/{GurpsSheet.tsx,constants.ts,formulas.ts}` + `presets/gurps.ts` + `styles/gurps.css`; `system-panels/GurpsCombatPanel.tsx` (+`.module.css`); `system-panels/{GurpsBestiePanel,GurpsBestieCombatActions}.tsx`; `chat/.../rail/GurpsChatBestiePanel.tsx`; engine `chat/dice/lib/{rollEngine,dicePayload,diceNotation}.ts` + `rollFromSheet.ts`/`rollFromDiary.ts`; `utils/resolveCharacterHp.ts` (case `gurps`); schémata `tactical-map/schemas/gurps/{bestie,token}.json`; 8 skinů `styles/gurps-skins/`. BE: `gurps` schémata v `backend/assets/schemas/` (export-schemas, push `3656306`), jinak pass-through `customData`.
+
+---
+
 ### Skin deníku (vizuální „kabát" listu)
 
 **Co to je:** Vizuální styl per-system listu, nezávislý na obsahu/datech. Rodina **8 skinů** (`scifi · fantasy · horror · steampunk · nature · minimal · retro · anime`=MLP); každý vlastní paleta + tvarový jazyk + signature ornament, identita drží napříč systémy.
 
-**Volba:** per **uživatel × svět** (`WorldMembership.diarySkin`); bez volby padá na default systému (`DEFAULT_SKIN_BY_SYSTEM`: matrix→scifi, **pi→scifi** (osekaný Matrix), drd16/drdplus/drd2/jad/drdh→fantasy, coc→horror, **fae/fate→minimal** (≈ Karty osudu)). User-facing picker `DiarySkinSelector` („🎨 Vzhled") na `DiaryTab` jen pro skinovatelné systémy (do tisku/PDF nejde). Registr `diary-systems/skins/registry.ts`, BE whitelist `update-member.dto.ts` (`@IsIn`, 8 ID).
+**Volba:** per **uživatel × svět** (`WorldMembership.diarySkin`); bez volby padá na default systému (`DEFAULT_SKIN_BY_SYSTEM`: matrix→scifi, **pi→scifi** (osekaný Matrix), **gurps→scifi** (cold-steel), drd16/drdplus/drd2/jad/drdh→fantasy, coc→horror, **fae/fate→minimal** (≈ Karty osudu)). User-facing picker `DiarySkinSelector` („🎨 Vzhled") na `DiaryTab` jen pro skinovatelné systémy (do tisku/PDF nejde). Registr `diary-systems/skins/registry.ts`, BE whitelist `update-member.dto.ts` (`@IsIn`, 8 ID).
 
 **Jak se aplikuje:** `DiarySystemProvider` (deník) i `DiarySkinScope` (embedy: mapa/chat/dice) dají na předka `data-diary-system` + `data-diary-skin`; CSS sady (`styles/diary-skins.css` + `<sys>-skins/<id>.css`) přebíjí přes compound selektor `[data-diary-system][data-diary-skin]` přes tokeny `--mx-*` (HUD) / `--dd-*` (pergamen) / `--dd-embed-*` (embed plochy). Pokrývá: **deník list + bojový/bestie panel na mapě i v chatu (PC/NPC/Bestie stejně) + obal v TM + vyčíslení hodu + log kostek**.
 
-**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**, **jad ✅ (16.2g — 8 skinů, fantasy = nový default; světlý pergamen = no-skin fallback)**, **pi ✅ (8 skinů; scifi = default = osekaný Matrix HUD; port rodiny matrix→pi přes `--pi-*`/`--pi-log-*`)**, **fae/fate ✅ (8 skinů; minimal = default; `--dd-*` rodina, deník+panel render-ověřeno, embedy přes `:is()` enumerace + živý audit, panel akce nesou primární akcent skinu)**, **drdh ✅ (16b — 8 skinů; fantasy = default; `--dd-*`/`--drdh-*` rodina sourozenec drdplus/drd16; render-audit 8×9 povrchů + mobil 375/768 bez overflow; embed baseline+`:is()` enumerace v 5 modulech, readout signature + obal avatar opraveny drdh-scoped)**. Ostatní systémy: list bez skinů (jen default vzhled; shadowrun 8 skinů zbývá). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
-**Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2,jad,pi,drdh}-skins/`. Bestie panel v chatu = TÝŽ plný statblok jako na mapě (ne osekaná varianta). pi/drdh embed signatury (readout/obal TM) v `*.module.css`; chat rail chrome per-skin přes `:has()`; dicelog/orchestrace/rail jen barva (ornament policy). drdh: readout signature = `drdh` přidán do per-skin `:is()` skupin v `DiceRollOverlay.module.css` (aliasy dědí z compound scope), obal avatar drdh-scoped v `TokenInfoPanel.module.css` (`--dd-embed-*`).
+**Stav per systém:** matrix ✅, drd16 ✅ (7 skinů), drdplus ✅ (8), **drd2 ✅ (16.2f — 7 skinů, fantasy = baseline listu)**, **jad ✅ (16.2g — 8 skinů, fantasy = nový default; světlý pergamen = no-skin fallback)**, **pi ✅ (8 skinů; scifi = default = osekaný Matrix HUD; port rodiny matrix→pi přes `--pi-*`/`--pi-log-*`)**, **fae/fate ✅ (8 skinů; minimal = default; `--dd-*` rodina, deník+panel render-ověřeno, embedy přes `:is()` enumerace + živý audit, panel akce nesou primární akcent skinu)**, **drdh ✅ (16b — 8 skinů; fantasy = default; `--dd-*`/`--drdh-*` rodina sourozenec drdplus/drd16; render-audit 8×9 povrchů + mobil 375/768 bez overflow; embed baseline+`:is()` enumerace v 5 modulech, readout signature + obal avatar opraveny drdh-scoped)**, **gurps ✅ (8 skinů; scifi = default; `--dd-*`/`--gurps-*` cold-steel rodina; deník render 8/8, baseline `[data-diary-system='gurps']` + `:is()` enumerace v 5 embed modulech; MLP = SVĚTLÁ duha; živé ověření panelů na mapě/chatu čeká)**. Ostatní systémy: list bez skinů (jen default vzhled; shadowrun 8 skinů zbývá). Playbook: `docs/arch/phase-16/sablona-skiny-per-system.md`; spec drd2: `spec-16.2f-skiny-drd2.md`.
+**Kód:** FE `diary-systems/skins/` (`registry.ts`, `DiarySkinSelector.tsx`, `useDiarySkin.ts`), `diary-systems/DiarySkinScope.tsx`, `styles/diary-skins.css` + `styles/{matrix,drd16,drdplus,drd2,jad,pi,drdh,gurps}-skins/`. Bestie panel v chatu = TÝŽ plný statblok jako na mapě (ne osekaná varianta). pi/drdh embed signatury (readout/obal TM) v `*.module.css`; chat rail chrome per-skin přes `:has()`; dicelog/orchestrace/rail jen barva (ornament policy). drdh: readout signature = `drdh` přidán do per-skin `:is()` skupin v `DiceRollOverlay.module.css` (aliasy dědí z compound scope), obal avatar drdh-scoped v `TokenInfoPanel.module.css` (`--dd-embed-*`).
 
 ---
 
