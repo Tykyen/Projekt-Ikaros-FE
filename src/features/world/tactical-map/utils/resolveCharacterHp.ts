@@ -80,7 +80,10 @@ export function resolveCharacterHp(
       return { current: readNum(cd, 'coc_hp_cur', max), max };
     }
     case 'gurps': {
-      const max = readNum(cd, 'gurps_hp_max', 0);
+      // HP se v GURPS 4E odvozuje od ST; deník auto-default (hpMax = ST) do
+      // customData NEukládá → fallback na gurps_st, ať se bar ukáže i bez
+      // explicitně vyplněného gurps_hp_max (jinak čerstvá postava = žádný bar).
+      const max = readNum(cd, 'gurps_hp_max', readNum(cd, 'gurps_st', 0));
       if (max <= 0) return null;
       return { current: readNum(cd, 'gurps_hp', max), max };
     }

@@ -70,6 +70,19 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
     ).toEqual({ current: 9, max: 11 });
   });
 
+  it('gurps: bez hp_max → fallback na gurps_st (HP = ST, auto-default se neukládá)', () => {
+    expect(resolveCharacterHp('gurps', { gurps_st: '10' })).toEqual({
+      current: 10,
+      max: 10,
+    });
+  });
+
+  it('gurps: current chybí → default = max', () => {
+    expect(
+      resolveCharacterHp('gurps', { gurps_st: '12', gurps_hp_max: '12' }),
+    ).toEqual({ current: 12, max: 12 });
+  });
+
   it('drdh: drdh_hp / drdh_hp_max', () => {
     expect(
       resolveCharacterHp('drdh', { drdh_hp: '5', drdh_hp_max: '20' }),

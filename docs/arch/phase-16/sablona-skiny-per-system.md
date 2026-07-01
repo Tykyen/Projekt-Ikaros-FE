@@ -97,8 +97,17 @@ sesterský soubor (`drd16-skins/<id>.css` / `drdplus-skins/<id>.css` / matrix bl
 > PC/NPC token má `currentHp/maxHp = 0`; HP žije v deníku (`token.characterData.customData`),
 > per-systém pod klíčem **`<prefix>_hpCur` / `<prefix>_hpMax`** (prefix = `makeCdAccess(cd,'<sys>_')`,
 > NE vymyšlený `<sys>_currentHP`!). Nový systém s klasickým HP = přidej `case '<sys>'` čtoucí
-> reálné klíče (+ legacy fallback bez prefixu). **drd2 = jediný v `HP_BAR_DISABLED_SYSTEMS`**
-> (3 zdroje, ne HP). fate/drdplus = `null` (tracker, ne HP) — pokud nemá `current/max`.
+> reálné klíče (+ legacy fallback bez prefixu).
+> **⛳ PRAVIDLO (uživatel, závazné): HP bar (zelenost) MUSÍ být vidět u POSTAV i BESTIÍ ve VŠECH
+> systémech. Jediná výjimka = `drd2`** (3 zdroje Tělo/Duše/Vliv, ne jedno HP → jediný v
+> `HP_BAR_DISABLED_SYSTEMS`). I „trackerové" systémy (fate/fae stres, drdplus zranění) mají mít
+> bar mapovaný na svůj vyčerpatelný zdroj; `null` jen když systém opravdu žádnou takovou veličinu nemá.
+> ⚠️ **Auto-default max se NEUKLÁDÁ (past):** když deník max jen DOPOČÍTÁ a neuloží (GURPS
+> `hpMax = ST`, `hp = max`) a hráč HP pole needituje, `<sys>_hpMax` v customData CHYBÍ → resolver
+> vrátí `null` → **čerstvá postava BEZ baru**. Fix = fallback na zdrojový atribut
+> (`gurps: gurps_hp_max ?? gurps_st`). Ověř na postavě, která NEsáhla na HP pole (ne jen na testu s max).
+> **Bestie:** bar jede přes token schéma s `combatBehavior:'damageable'` (`resolveHp`/`hpTier`) —
+> každé nové bestie `token.json` MUSÍ mít damageable HP pole, jinak bestie bar nejede.
 > **Test MUSÍ používat klíče, co se REÁLNĚ ukládají** (grep `save({...})` + `set('hp…')`),
 > ne vymyšlené — jinak zelený test maskuje, že HP bar nejede (CH-2026-06-29).
 
