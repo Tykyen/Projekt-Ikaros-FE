@@ -126,6 +126,44 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
     ).toEqual({ current: 5, max: 10 });
   });
 
+  it('fate: stres boxy — current = nezaškrtnuté / max = celkem', () => {
+    const stress = JSON.stringify([
+      { size: 1, on: true },
+      { size: 2, on: false },
+      { size: 3, on: false },
+    ]);
+    expect(resolveCharacterHp('fate', { fate_stress: stress })).toEqual({
+      current: 2,
+      max: 3,
+    });
+  });
+
+  it('fae: bez stresu → default 3 boxy (plné)', () => {
+    expect(resolveCharacterHp('fae', {})).toEqual({ current: 3, max: 3 });
+  });
+
+  it('fae: stres jako pole (ne JSON string)', () => {
+    expect(
+      resolveCharacterHp('fae', { fae_stress: [{ on: true }, { on: true }] }),
+    ).toEqual({ current: 0, max: 2 });
+  });
+
+  it('drdplus: mez zranění − zaplněné rány', () => {
+    expect(
+      resolveCharacterHp('drdplus', {
+        drdp_zraneni_mez: '10',
+        drdp_zraneni_val: '3',
+      }),
+    ).toEqual({ current: 7, max: 10 });
+  });
+
+  it('drdplus: bez ran → plná mez', () => {
+    expect(resolveCharacterHp('drdplus', { drdp_zraneni_mez: '12' })).toEqual({
+      current: 12,
+      max: 12,
+    });
+  });
+
   // SR6 HP bar = fyzický záznamník: max = 8 + ⌈Tělo/2⌉, zbývá = max − zranění.
   it('shadowrun: max = 8 + ⌈Tělo/2⌉, zbývá = max − sr_cond_phys', () => {
     // Tělo 4 → max 10; 3 boxy zranění → zbývá 7.
@@ -146,9 +184,10 @@ describe('resolveCharacterHp — systémy s klasickým HP', () => {
 });
 
 describe('resolveCharacterHp — systémy bez klasického HP', () => {
-  // drd2 je navíc tvrdě vypnuté v HP_BAR_DISABLED_SYSTEMS (TokenSprite).
-  // fate (stres) a drdplus (tracker výdrže) nemají current/max → null.
-  it.each(['fate', 'drd2', 'drdplus', 'neznamy'])(
+  // drd2 = 3 zdroje (Tělo/Duše/Vliv), navíc tvrdě vypnuté v HP_BAR_DISABLED_SYSTEMS.
+  // fate/fae (stres) i drdplus (mez zranění) UŽ bar mají (viz výše) — jediná
+  // výjimka je drd2 (+ neznámý systém).
+  it.each(['drd2', 'neznamy'])(
     '%s → null (mapování je herní rozhodnutí)',
     (system) => {
       expect(resolveCharacterHp(system, { anything: '5' })).toBeNull();

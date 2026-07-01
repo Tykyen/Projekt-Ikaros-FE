@@ -106,7 +106,35 @@ export function resolveCharacterHp(
       const filled = readNum(cd, 'sr_cond_phys', 0);
       return { current: Math.max(0, max - filled), max };
     }
-    // fate / drd2 / drdplus — bez klasického HP, mapování je herní rozhodnutí.
+    case 'fae':
+    case 'fate': {
+      // Fate: „zdraví" = stres boxy (absorpční kapacita), ne HP. Bar = zbývající
+      // (nezaškrtnuté) boxy / celkem — konzistentní s bestií („zbývající kapacita").
+      const raw = cd[`${systemId}_stress`];
+      let boxes: { on?: boolean }[] = [];
+      if (Array.isArray(raw)) {
+        boxes = raw as { on?: boolean }[];
+      } else if (typeof raw === 'string' && raw) {
+        try {
+          const p: unknown = JSON.parse(raw);
+          if (Array.isArray(p)) boxes = p as { on?: boolean }[];
+        } catch {
+          /* nevalidní JSON → default níže */
+        }
+      }
+      const max = boxes.length || 3; // default 3 stres boxy (DEFAULT_BOXES panelu)
+      const filled = boxes.filter((b) => b && b.on).length;
+      return { current: Math.max(0, max - filled), max };
+    }
+    case 'drdplus': {
+      // DrD+: „zdraví" = mez zranění (práh 1. pásma „Bez postihu"). Bar = zbývající
+      // do postihu (mez − zaplněné rány). Hlubší pásma (postih/koma) → bar 0.
+      const max = readNum(cd, 'drdp_zraneni_mez', 10);
+      if (max <= 0) return null;
+      const val = readNum(cd, 'drdp_zraneni_val', 0);
+      return { current: Math.max(0, max - val), max };
+    }
+    // drd2 — 3 zdroje (Tělo/Duše/Vliv), ne jedno HP; navíc HP_BAR_DISABLED_SYSTEMS.
     default:
       return null;
   }

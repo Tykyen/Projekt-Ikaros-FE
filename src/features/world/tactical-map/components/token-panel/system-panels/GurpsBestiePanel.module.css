@@ -1,0 +1,429 @@
+/* GURPS 4E bestie panel (mapa + chat). Cold-steel + teplý akcent = bestie. */
+
+.root {
+  --g-accent: #4ea3ff;
+  --g-accent-soft: rgba(78, 163, 255, 0.16);
+  --g-beast: #c98b5a;
+  --g-beast-soft: rgba(201, 139, 90, 0.16);
+  --g-ink: #dfe7f2;
+  --g-dim: #93a3ba;
+  --g-line: rgba(120, 150, 190, 0.22);
+  --g-line2: rgba(140, 175, 220, 0.42);
+  --g-panel: rgba(9, 13, 21, 0.5);
+  --g-hp: #ff5d6c;
+  --g-dodge: #39e0ff;
+
+  color: var(--g-ink);
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13px;
+}
+.root * {
+  box-sizing: border-box;
+}
+.editing {
+  outline: 1px dashed var(--g-beast);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+.modeTag {
+  font-size: 11px;
+  color: var(--g-beast);
+  background: var(--g-beast-soft);
+  border: 1px solid var(--g-line);
+  border-radius: 7px;
+  padding: 5px 8px;
+  text-align: center;
+}
+.nameEdit {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--g-line2);
+  color: var(--g-ink);
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.initBtn,
+.editFull {
+  width: 100%;
+  border-radius: 8px;
+  padding: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--g-line2);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--g-ink);
+}
+.initBtn:hover,
+.editFull:hover {
+  border-color: var(--g-beast);
+  background: var(--g-beast-soft);
+}
+
+/* HP */
+.hp {
+  border: 1px solid var(--g-line);
+  border-radius: 10px;
+  background: var(--g-panel);
+  padding: 9px 10px;
+}
+.hpLbl {
+  font-size: 9.5px;
+  color: var(--g-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.hpBar {
+  position: relative;
+  height: 16px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--g-line);
+  overflow: hidden;
+  margin-top: 5px;
+}
+.hpFill {
+  height: 100%;
+  background: var(--dd-hpfill-grad, linear-gradient(90deg, #ff5d6c, #ff8a94));
+  transition: width 0.2s;
+}
+.hpTxt {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+.hpEdit {
+  width: 100%;
+  margin-top: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  border-radius: 6px;
+  padding: 5px 7px;
+}
+.steps {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.steps button {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  border-radius: 7px;
+  padding: 4px 0;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.steps button:hover {
+  border-color: var(--g-accent);
+}
+
+/* section title */
+.stitle {
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--g-beast);
+  font-weight: 700;
+  border-bottom: 1px solid var(--g-line);
+  padding-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.stitle small {
+  font-size: 9px;
+  color: var(--g-dim);
+  letter-spacing: 0;
+  font-weight: 400;
+  text-transform: none;
+}
+
+/* meta */
+.meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.metaCard {
+  background: var(--g-panel);
+  border: 1px solid var(--g-line);
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+.metaLab {
+  font-size: 9px;
+  color: var(--g-dim);
+  text-transform: uppercase;
+}
+.metaVal {
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+.metaEdit {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  border-radius: 5px;
+  padding: 3px 5px;
+  font-size: 12px;
+}
+
+/* attributes */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.statBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border: 1px solid var(--g-line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 6px 2px;
+  cursor: pointer;
+  color: var(--g-ink);
+}
+.statBtn:hover:not(:disabled) {
+  border-color: var(--g-accent);
+  background: var(--g-accent-soft);
+}
+.statBtn:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+.statName {
+  font-size: 9.5px;
+  color: var(--g-dim);
+  text-transform: uppercase;
+}
+.statVal {
+  font-size: 17px;
+  font-weight: 800;
+}
+.statEdit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border: 1px solid var(--g-line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.24);
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* attacks */
+.atkRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--g-line);
+}
+.atkRow + .atkRow {
+  margin-top: 6px;
+}
+.atkName {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 0;
+}
+.atkName small {
+  display: block;
+  color: var(--g-dim);
+  font-size: 10px;
+  font-weight: 400;
+}
+.atkBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--g-line2);
+  border-radius: 7px;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: var(--g-ink);
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.atkBtn:hover:not(:disabled) {
+  border-color: var(--g-accent);
+  background: var(--g-accent-soft);
+}
+.atkBtn:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+.dmgBtn {
+  color: var(--g-accent);
+}
+.atkEdit {
+  display: grid;
+  grid-template-columns: 1fr 56px 64px 56px auto;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+.ed,
+.edNum {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  border-radius: 5px;
+  padding: 4px 6px;
+  font-size: 12px;
+  width: 100%;
+}
+.edNum {
+  text-align: center;
+}
+.edArea {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 13px;
+  resize: vertical;
+  font-family: inherit;
+}
+.del {
+  background: transparent;
+  border: none;
+  color: var(--g-hp);
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.del:hover {
+  opacity: 1;
+}
+.miniAdd {
+  background: transparent;
+  border: 1px dashed var(--g-line2);
+  color: var(--g-dim);
+  padding: 6px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.miniAdd:hover {
+  color: var(--g-ink);
+  border-color: var(--g-accent);
+}
+
+/* defense */
+.defRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.defCard {
+  text-align: center;
+  border: 1px solid var(--g-line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 6px 2px;
+}
+.defLab {
+  font-size: 9px;
+  color: var(--g-dim);
+  text-transform: uppercase;
+  display: block;
+}
+.defVal {
+  font-size: 18px;
+  font-weight: 800;
+}
+.defEdit {
+  width: 100%;
+  margin-top: 2px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  border-radius: 5px;
+  padding: 3px;
+  text-align: center;
+  font-size: 13px;
+}
+.drline {
+  font-size: 11px;
+  color: var(--g-dim);
+}
+.drline b {
+  color: var(--g-accent);
+}
+
+/* windows */
+.winBtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.winBtn {
+  border: 1px solid var(--g-line2);
+  background: transparent;
+  color: var(--g-ink);
+  border-radius: 8px;
+  padding: 7px 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.winBtn:hover {
+  background: var(--g-beast-soft);
+  border-color: var(--g-beast);
+}
+.mtbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.mtbl th,
+.mtbl td {
+  border: 1px solid var(--g-line);
+  padding: 5px 8px;
+  text-align: left;
+}
+.mtbl th {
+  color: var(--g-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.tactic {
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.hint {
+  font-size: 12px;
+  color: var(--g-dim);
+  text-align: center;
+  margin: 4px 0;
+}
