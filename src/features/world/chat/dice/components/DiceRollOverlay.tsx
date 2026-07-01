@@ -170,6 +170,9 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
       ? (roll.payload as PoolDicePayload)
       : null;
   const hitThreshold = pool?.hitThreshold ?? 5;
+  // GURPS roll-under (3k6 pod cíl) — součet vs cíl + úspěch/margin/krit.
+  const ru = roll.payload.rollUnder;
+  const isFlat = roll.payload.type === 'flat';
   // 16b (DrdH) — rozepsané složky modifieru (`útoč +6 + Sil −1`) + zranění.
   const breakdown = roll.payload.breakdown;
   const damage = roll.payload.damage;
@@ -238,6 +241,43 @@ export function Readout({ roll, show }: { roll: DiceRollEvent; show: boolean }) 
                 glitch
               </span>
             ) : null}
+          </div>
+        ) : ru ? (
+          <div className={styles.equation}>
+            {roll.payload.label && (
+              <span className={styles.skillName}>{roll.payload.label}</span>
+            )}
+            <span className={styles.diceSum}>
+              {roll.payload.sum} vs {ru.target}
+            </span>
+            <span
+              className={
+                crit === 'success'
+                  ? styles.critSuccess
+                  : crit === 'fail'
+                    ? styles.critFail
+                    : ru.success
+                      ? styles.totalPositive
+                      : styles.totalNegative
+              }
+            >
+              {crit === 'success'
+                ? 'Kritický úspěch'
+                : crit === 'fail'
+                  ? 'Fatální neúspěch'
+                  : ru.success
+                    ? `úspěch o ${ru.margin}`
+                    : `neúspěch o ${-ru.margin}`}
+            </span>
+          </div>
+        ) : isFlat ? (
+          <div className={styles.equation}>
+            {roll.payload.label && (
+              <span className={styles.skillName}>{roll.payload.label}</span>
+            )}
+            <span className={`${styles.totalValue} ${styles.totalNeutral}`}>
+              {roll.payload.total}
+            </span>
           </div>
         ) : crit ? (
           <div className={styles.equation}>

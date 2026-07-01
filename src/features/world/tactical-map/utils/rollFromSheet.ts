@@ -16,13 +16,16 @@ import {
   rollGenericDice,
   rollMixedDice,
   rollPoolHits,
+  rollTarget,
   type RollKind,
 } from "@/features/world/chat/dice/lib/rollEngine";
 import {
   buildFatePayload,
+  buildFlatPayload,
   buildGenericPayload,
   buildMixedPayload,
   buildPoolHitsPayload,
+  buildRollUnderPayload,
   type DicePayload,
 } from "@/features/world/chat/dice/lib/dicePayload";
 
@@ -59,6 +62,12 @@ export interface RollRequest {
    * (pool už zahrnuje atribut+dovednost−postih z volajícího).
    */
   pool?: number;
+  /**
+   * GURPS (`kind:'3d6'`): efektivní cíl (dovednost/atribut ± modifikátor).
+   * Hodí se 3k6 „pod cíl" — úspěch součet ≤ target, margin + krity. `modifier`
+   * už je zafoldovaný do `target` volajícím.
+   */
+  target?: number;
   /**
    * 16b (DrdH) — rozepsané složky modifieru (`útoč +6`, `Sil −1`) pro rozpis
    * hodu v dicelog/readout. Jen se předá dál do `dicePayload`, výpočet
@@ -100,6 +109,24 @@ export function performSheetRoll(req: RollRequest): SheetRollResult | null {
     const payload = buildPoolHitsPayload(r, { label });
     attachBreakdown(payload, req);
     return { total: r.hits, dicePayload: payload };
+  }
+
+  // GURPS roll-under: `kind:'3d6'` + `target` → 3k6 „pod cíl" (úspěch/margin/krit).
+  if (kind === "3d6") {
+    const r = rollTarget(req.target ?? 0);
+    const payload = buildRollUnderPayload(r, { label });
+    attachBreakdown(payload, req);
+    return {
+      total: r.sum,
+      dicePayload: payload,
+      crit: r.crit ?? undefined,
+    };
+  }
+
+  // Plochý hod (GURPS iniciativa = Základní rychlost, bez kostek).
+  if (kind === "flat") {
+    const payload = buildFlatPayload({ label, value: modifier });
+    return { total: modifier, dicePayload: payload };
   }
 
   if (kind === "fate") {

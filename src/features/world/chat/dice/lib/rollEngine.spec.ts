@@ -7,6 +7,7 @@ import {
   rollMixedDice,
   rollExplodingD6,
   rollExploding2d6,
+  rollTarget,
   getOverpressureFromRollTotal,
   secureRandomInt,
 } from './rollEngine';
@@ -276,5 +277,54 @@ describe('rollPoolHits — SR6 success-pool', () => {
     expect(r.threshold).toBe(8);
     expect(r.rolls.every((d) => d >= 1 && d <= 10)).toBe(true);
     expect(r.hits).toBe(r.rolls.filter((d) => d >= 8).length);
+  });
+});
+
+describe('rollTarget (GURPS 3k6 roll-under)', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('úspěch + margin (součet ≤ cíl)', () => {
+    mockSecureSeeds([3, 2, 2]); // faces 4,3,3 = 10
+    const r = rollTarget(14);
+    expect(r.sum).toBe(10);
+    expect(r.success).toBe(true);
+    expect(r.margin).toBe(4);
+    expect(r.crit).toBeNull();
+  });
+
+  it('běžný neúspěch (součet > cíl)', () => {
+    mockSecureSeeds([3, 3, 3]); // 12
+    const r = rollTarget(10);
+    expect(r.success).toBe(false);
+    expect(r.margin).toBe(-2);
+    expect(r.crit).toBeNull();
+  });
+
+  it('3–4 = kritický úspěch (i při nízkém cíli)', () => {
+    mockSecureSeeds([0, 0, 0]); // 3
+    const r = rollTarget(8);
+    expect(r.success).toBe(true);
+    expect(r.crit).toBe('success');
+  });
+
+  it('18 = fatální neúspěch', () => {
+    mockSecureSeeds([5, 5, 5]); // 18
+    const r = rollTarget(20);
+    expect(r.success).toBe(false);
+    expect(r.crit).toBe('fail');
+  });
+
+  it('neúspěch o 10+ = fatální', () => {
+    mockSecureSeeds([5, 4, 4]); // 16
+    const r = rollTarget(6);
+    expect(r.success).toBe(false);
+    expect(r.crit).toBe('fail');
+  });
+
+  it('5 je kritický úspěch jen při cíli ≥15', () => {
+    mockSecureSeeds([1, 1, 0]); // 5
+    expect(rollTarget(15).crit).toBe('success');
+    mockSecureSeeds([1, 1, 0]);
+    expect(rollTarget(14).crit).toBeNull();
   });
 });

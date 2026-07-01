@@ -113,6 +113,17 @@ function renderPoolFaces(faces: number[], threshold: number): React.ReactNode {
   ));
 }
 
+/** GURPS roll-under rozpis: „Nůž · 3k6 (4 + 3 + 3) = 10 vs 14". */
+function rollUnderBreakdown(p: MapDiceRoll["dicePayload"]): string | null {
+  const ru = p.rollUnder;
+  if (!ru) return null;
+  const prefix = p.label ? `${p.label} · ` : "";
+  const dice = p.faces.every((f) => typeof f === "number")
+    ? `(${(p.faces as number[]).join(" + ")})`
+    : `${p.sum}`;
+  return `${prefix}3k6 ${dice} = ${p.sum} vs ${ru.target}`;
+}
+
 /** Rozpis poolu: „Střelba · 8k6 · 3× úspěch · glitch". */
 function poolBreakdown(p: PoolDicePayload): string {
   const n = p.faces.length;
@@ -284,9 +295,15 @@ export function DiceLogPanel({
               const total = r.dicePayload.total;
               const crit = r.dicePayload.crit;
               const pool = asPoolHits(r.dicePayload);
+              const ru = r.dicePayload.rollUnder;
+              const isFlat = r.dicePayload.type === "flat";
               const breakdown = pool
                 ? poolBreakdown(pool)
-                : renderBreakdown(r.dicePayload);
+                : ru
+                  ? rollUnderBreakdown(r.dicePayload)
+                  : isFlat
+                    ? null
+                    : renderBreakdown(r.dicePayload);
               return (
                 <div
                   key={r.id}
@@ -325,6 +342,26 @@ export function DiceLogPanel({
                         }
                       >
                         {pool.hits ?? 0} ú.
+                      </span>
+                    ) : ru ? (
+                      <span
+                        className={`${styles.total} ${
+                          crit === "success"
+                            ? styles.critSuccess
+                            : crit === "fail"
+                              ? styles.critFail
+                              : ru.success
+                                ? styles.totalPositive
+                                : styles.totalNegative
+                        }`}
+                      >
+                        {crit === "success"
+                          ? "Krit. úspěch"
+                          : crit === "fail"
+                            ? "Fatální"
+                            : ru.success
+                              ? `úspěch o ${ru.margin}`
+                              : `neúspěch o ${-ru.margin}`}
                       </span>
                     ) : (
                       <span

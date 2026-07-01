@@ -14,6 +14,7 @@ import type {
   GenericRollResult,
   MixedRollResult,
   PoolHitsResult,
+  RollUnderResult,
 } from './rollEngine';
 
 export type DiceFaceValue = number | '+' | '-' | '0';
@@ -49,6 +50,12 @@ export interface DicePayloadBase {
    * výsledkem (`… = total / +1`). Jen útok zbraní; obrana ho nemá.
    */
   damage?: string;
+  /**
+   * GURPS 4E — hod „pod cíl" (roll-under 3k6). Pokud je definováno, render
+   * (dicelog/readout) ukáže „součet vs cíl · úspěch/neúspěch o M" místo
+   * roll-high rovnice (GURPS nesčítá k cíli). `crit` nese kritický/fatální.
+   */
+  rollUnder?: { target: number; success: boolean; margin: number };
 }
 
 export interface FateDicePayload extends DicePayloadBase {
@@ -59,7 +66,7 @@ export interface FateDicePayload extends DicePayloadBase {
 }
 
 export interface GenericDicePayload extends DicePayloadBase {
-  type: 'd4' | 'd6' | 'd6+' | '2d6+' | 'd8' | 'd10' | 'd12' | 'd20';
+  type: 'd4' | 'd6' | 'd6+' | '2d6+' | '3d6' | 'flat' | 'd8' | 'd10' | 'd12' | 'd20';
   faces: number[];
 }
 
@@ -186,6 +193,46 @@ export function buildPoolHitsPayload(
     glitch: roll.glitch,
     criticalGlitch: roll.criticalGlitch,
     hitThreshold: roll.threshold,
+  };
+}
+
+/**
+ * GURPS roll-under payload — `total`/`sum` nesou součet 3k6, `rollUnder` drží
+ * cíl + úspěch + margin, `crit` kritický/fatální. Render ukáže „vs cíl · úspěch".
+ */
+export function buildRollUnderPayload(
+  roll: RollUnderResult,
+  opts: { label?: string } = {},
+): GenericDicePayload {
+  return {
+    type: '3d6',
+    faces: roll.rolls,
+    sum: roll.sum,
+    total: roll.sum,
+    label: opts.label,
+    crit: roll.crit ?? undefined,
+    rollUnder: {
+      target: roll.target,
+      success: roll.success,
+      margin: roll.margin,
+    },
+  };
+}
+
+/**
+ * „Plochý" hod bez kostek — jen nastaví hodnotu (GURPS iniciativa = Základní
+ * rychlost, nehází se). `faces` prázdné → bez 3D; render ukáže „label = value".
+ */
+export function buildFlatPayload(opts: {
+  label?: string;
+  value: number;
+}): GenericDicePayload {
+  return {
+    type: 'flat',
+    faces: [],
+    sum: opts.value,
+    total: opts.value,
+    label: opts.label,
   };
 }
 

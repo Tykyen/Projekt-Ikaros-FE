@@ -33,6 +33,8 @@ export type RollKind =
   | 'd6'
   | 'd6+'
   | '2d6+'
+  | '3d6'
+  | 'flat'
   | 'd8'
   | 'd10'
   | 'd12'
@@ -274,6 +276,61 @@ export function rollPoolHits(
   const glitch = n > 0 && ones > n / 2;
   const criticalGlitch = glitch && hits === 0;
   return { rolls, hits, ones, glitch, criticalGlitch, threshold, type: `pool-d${sides}` };
+}
+
+/** Výsledek GURPS 3k6 hodu „pod cíl" (roll-under). */
+export interface RollUnderResult {
+  /** 3 hozené k6. */
+  rolls: number[];
+  /** Součet 3k6 (3–18). */
+  sum: number;
+  /** Efektivní cíl (dovednost/atribut + modifikátor). */
+  target: number;
+  /** Úspěch = součet ≤ cíl (s výjimkami 3–4 vždy / 17–18 nikdy). */
+  success: boolean;
+  /** Rozdíl cíl − součet (kladný = úspěch o, záporný = neúspěch o). */
+  margin: number;
+  /** Kritický úspěch / fatální neúspěch dle GURPS pravidel. */
+  crit: 'success' | 'fail' | null;
+  type: '3d6';
+}
+
+/**
+ * GURPS 4E hod „pod cíl": hoď **3k6**, uspěješ když součet ≤ efektivní cíl.
+ * Pravidla kritů: 3–4 vždy kritický úspěch; 5 při cíli ≥15; 6 při cíli ≥16.
+ * 18 vždy fatální; 17 fatální při cíli ≤15 (jinak běžný neúspěch); neúspěch
+ * o 10+ je fatální. 3–4 vždy uspějí, 17–18 vždy selžou (nezávisle na cíli).
+ */
+export function rollTarget(target: number): RollUnderResult {
+  const rolls = [
+    secureRandomInt(6) + 1,
+    secureRandomInt(6) + 1,
+    secureRandomInt(6) + 1,
+  ];
+  const sum = rolls[0] + rolls[1] + rolls[2];
+  const t = Math.round(target);
+  let success: boolean;
+  let crit: 'success' | 'fail' | null = null;
+
+  if (sum <= 4) {
+    success = true;
+    crit = 'success';
+  } else if (sum >= 18) {
+    success = false;
+    crit = 'fail';
+  } else if (sum === 17) {
+    success = false;
+    crit = t <= 15 ? 'fail' : null;
+  } else {
+    success = sum <= t;
+    if (success) {
+      if ((sum === 5 && t >= 15) || (sum === 6 && t >= 16)) crit = 'success';
+    } else if (sum - t >= 10) {
+      crit = 'fail';
+    }
+  }
+
+  return { rolls, sum, target: t, success, margin: t - sum, crit, type: '3d6' };
 }
 
 /** Mixed roll — různé počty různých typů kostek v jednom hodu. */

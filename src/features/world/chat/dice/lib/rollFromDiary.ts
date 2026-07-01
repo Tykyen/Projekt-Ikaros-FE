@@ -17,12 +17,15 @@ import {
   rollGenericDice,
   rollMixedDice,
   rollPoolHits,
+  rollTarget,
 } from './rollEngine';
 import {
   buildFatePayload,
+  buildFlatPayload,
   buildGenericPayload,
   buildMixedPayload,
   buildPoolHitsPayload,
+  buildRollUnderPayload,
   type DicePayload,
 } from './dicePayload';
 import { formatFateMessage, formatGenericDiceMessage } from './formatMessage';
@@ -34,6 +37,8 @@ export type DiaryRollKind =
   | 'd6'
   | 'd6+'
   | '2d6+'
+  | '3d6'
+  | 'flat'
   | 'd8'
   | 'd10'
   | 'd12'
@@ -55,6 +60,8 @@ export interface DiaryRollRequest {
   mixed?: Record<string, number>;
   /** Shadowrun success-pool (`kind:'pool-d6'`): počet kostek (úspěchy 5–6 + glitch). */
   pool?: number;
+  /** GURPS (`kind:'3d6'`): efektivní cíl (dovednost/atribut ± modifikátor). */
+  target?: number;
 }
 
 export interface DiaryRollResult {
@@ -84,6 +91,30 @@ export function rollDiaryRequest(
     return {
       dicePayload: buildPoolHitsPayload(r, { label }),
       content: `🎲 ${label}: ${r.hits} úspěchů (${req.pool}k6)${gl}`,
+    };
+  }
+
+  // GURPS roll-under: 3k6 „pod cíl" (úspěch/margin/krit).
+  if (kind === '3d6') {
+    const r = rollTarget(req.target ?? 0);
+    const outcome = r.crit
+      ? r.crit === 'success'
+        ? 'KRITICKÝ ÚSPĚCH'
+        : 'FATÁLNÍ NEÚSPĚCH'
+      : r.success
+        ? `úspěch o ${r.margin}`
+        : `neúspěch o ${-r.margin}`;
+    return {
+      dicePayload: buildRollUnderPayload(r, { label }),
+      content: `🎲 ${label}: 3k6 = ${r.sum} vs ${r.target} → ${outcome}`,
+    };
+  }
+
+  // Plochý hod (GURPS iniciativa = Základní rychlost, bez kostek).
+  if (kind === 'flat') {
+    return {
+      dicePayload: buildFlatPayload({ label, value: modifier }),
+      content: `${label}: ${modifier}`,
     };
   }
 

@@ -78,6 +78,8 @@ export interface SystemSheetProps {
       | 'd6'
       | 'd6+'
       | '2d6+'
+      | '3d6'
+      | 'flat'
       | 'd8'
       | 'd10'
       | 'd12'
@@ -92,6 +94,8 @@ export interface SystemSheetProps {
     mixed?: Record<string, number>;
     /** Shadowrun success-pool (`kind:'pool-d6'`): počet kostek; počítají se úspěchy 5–6 + glitch. */
     pool?: number;
+    /** GURPS (`kind:'3d6'`): efektivní cíl (dovednost/atribut ± modifikátor) pro hod „pod cíl". */
+    target?: number;
     /**
      * 16b (DrdH) — rozepsané složky modifieru pro rozpis hodu v dicelog/readout
      * (`label · útoč +6 + Sil −1 + hod … = total`). Volitelné → ostatní systémy
