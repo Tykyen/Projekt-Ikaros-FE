@@ -4,6 +4,16 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — Dračí Hlídka (drdh) bestie: schéma + panel mapa↔chat + napojení (skill `system` fáze 4) · 2026-07-01
+**Co zabralo:** prototyp=kontrakt (`c:\tmp\drdh-bestie-audit.html`) → delegace agentovi (vzor **drd2**). Schéma FE canonical `schemas/drdh/{bestie,token}.json` (bestie: sekce Boj/Tělo/Atributy/Odolnosti/Meta/Popis; `hp` damageable, `movement`, `initiative`); **token = SUPERSET** (health.* + combat + sekce `drdh-bestie` se snapshotem VŠECH bestie polí). `DrdhBestiePanel` (mapa) + sdílené jádro `DrdhBestieCombatActions` + `DrdhChatBestiePanel` (chat, 0 drift). Napojení: `bootstrap` registrace + `TokenSystemSheet`/`BestieInstancePanel` if-blok `drdh` + bestiář (`BestiarPage`/`EditorModal`/`Card`) čte schéma **generickky z registry → 0 branch**. Vlastní vzhled: medailon nestvůry místo erbu, Odolnosti (rez/imu/slab tagy) místo per-prof zdroje.
+**Proč to je správně:** token superset = BE strict validace (`token.update` REPLACE) edit nezahodí (rodina CH-FATE/drd16); canonical `drdh` přes `useResolvedSystemId` u VŠECH konzumentů (rodina CH-030/119); HP schema-aware (`combatBehavior:'damageable'` → `buildBestieToken`).
+**Hody:** atribut `d10`+`drdhAttrMod`, útok `d6+`(exploduje)+`uc` (ÚČ finální, žádné +atribut) + `dmg` damage span, iniciativa `d6`+OBR (`initiative:true`, neexploduje). Reuse `drdhAttrMod`/`fmtMod` = single source s deníkem.
+**Jak ověřeno (sám):** `tsc -b` 0 + `npm run build` ✓ + `npm run test:run` **47/47** (bestie 18 + deník + panel) + agentových 236 regrese; `export-schemas` → `backend/assets/schemas/drdh-bestie.json` + `drdh-token.json` vznikly.
+**Otevřený limit (pre-existující, ne novinka):** chat útok BEZ damage spanu — `rollDiaryRequest` (chat bridge) neforwarduje `damage`/`breakdown`; týká se VŠECH DrDH hodů v chatu (i PC panelu), ne jen bestie. Mimo scope, nechal beze změny.
+**Zhodnocení:** Dobře — prototyp=kontrakt, vzor drd2, 0 cyklení. **Fáze 4 hotová.** Zbývá skill `system`: chat (PC zdarma přes COMBAT_PANELS, bestie panel hotový) → uzávěr (`funkce`+`napoveda`+`mobil-desktop`) → 8 skinů (skill `skin`). BE: kostky pushnuté (`24fb950`), schémata čekají commit + restart.
+
+---
+
 ### CH-044 — 2× jsem tvrdil „stale build" u ořezaného typu zbraně, ale byl to reálný bug (reprodukce na moc široké šířce) · 2026-07-01
 **Kontext:** Autor hlásil ořez „blí" (typ zbraně „blízko") v deníku. Reprodukoval jsem select izolovaně na **420px** → „blízko" se vešlo → prohlásil jsem to za **stale build** (CH-015). Autor to zopakoval + poslal screenshot, kde je vidět **„Odl"** (moje čerstvá BC oprava) → tzn. testuje AKTUÁLNÍ kód (dev/HMR), ne stale.
 **Co jsem udělal špatně:** (1) reprodukoval jsem na **jedné, moc široké** šířce (420px) — reálný 3-sloupcový deník má boj sloupec ~320px; (2) když test na 420px prošel, uzavřel jsem to jako „stale" **místo abych zúžil reprodukci** na reálné podmínky; (3) výmluvu „stale build" jsem použil **2×** za sebou.
