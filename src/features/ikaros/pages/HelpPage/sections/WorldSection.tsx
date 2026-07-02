@@ -255,6 +255,40 @@ export function WorldSection() {
             kouzla zapneš přepínačem „Sesilatel / Alchymista".
           </CalloutBox>
         </Tool>
+        <Tool
+          icon={<NotebookPen size={16} />}
+          title="Vlastní systém — postav si vlastní deník"
+          audience={{ kind: 'vse', label: 'PJ staví · hráč vyplní' }}
+        >
+          <p>
+            Když má svět systém <strong>„Vlastní Systém"</strong>, nedostaneš
+            hotový list — <strong>poskládáš si vlastní</strong>. V{' '}
+            <strong>Nastavení světa → Šablona deníku</strong> přidáváš pole
+            (bloky) a určuješ, jak deník vypadá pro všechny postavy světa. Prázdný
+            začátek ti nabídne <strong>startovní šablony</strong> (Fantasy,
+            Sci-fi, Minimal), nebo stavíš od nuly.
+          </p>
+          <p>
+            Typy polí: číslo, krátký i dlouhý text, výběr ze seznamu, pruh
+            (životy / energie), obrázek, <strong>odkaz na jinou postavu</strong> a{' '}
+            <strong>dopočítávané pole</strong>. Pole slož do{' '}
+            <strong>sekcí</strong> (např. „Vlastnosti", „Boj") a ulož jako novou
+            verzi — starší verze se schovají do historie. Hráč pak v deníku své
+            postavy jen vyplní hodnoty.
+          </p>
+          <CalloutBox variant="tip" title="Dopočítávaná pole a odkazy">
+            Pole typu <strong>vzorec</strong> se počítá samo z ostatních čísel
+            (třeba procenta životů z „životy ÷ maximum") — hráč ho nepřepisuje,
+            jen se dívá. Pole typu <strong>odkaz</strong> nabídne výběr jiné
+            postavy světa. Jednotlivá postava může dostat i vlastní šablonu, když
+            potřebuje výjimku.
+          </CalloutBox>
+          <p>
+            Zatím si takhle stavíš <strong>deník</strong>. Vlastní bestiář, bojový
+            panel na taktické mapě, propsání do chatu a vlastní vzhledy (skiny)
+            pro tvůj systém <strong>připravujeme</strong>. 🚧
+          </p>
+        </Tool>
         <Tool icon={<Backpack size={16} />} title="Osobní výbava" audience={{ kind: 'hrac', label: 'Hráč + PJ' }}>
           <p>
             Výbava postavy je sklápěcí sekce s položkami a počítadlem; množství

@@ -51,6 +51,11 @@ describe('getDiaryPreset', () => {
   it('neznámý systém → generic (žádný crash)', () => {
     expect(getDiaryPreset('mysterygame').id).toBe('generic');
   });
+
+  it('16.2g — „vlastni" (Vlastní Systém) → generic engine (explicitní alias)', () => {
+    expect(getDiaryPreset('vlastni').id).toBe('generic');
+    expect(getDiaryPreset('VLASTNI').id).toBe('generic');
+  });
 });
 
 describe('parita s nabídkou RPG_SYSTEMS', () => {

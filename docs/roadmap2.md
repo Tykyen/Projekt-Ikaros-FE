@@ -358,7 +358,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Rozsah:** BE 3 pole + whitelist na `/chat/appearance` (vzor `chatSkin` z 16.1d) · FE override resolverů + přepínač v hlavičce + sekce „Jak čtu ostatní" v `AppearancePopover`.
 **Co ne:** OpenDyslexic font (chce font load — možné rozšíření), override barvy, PJ vynucení, per-konverzace volba.
 
-#### - [~] 16.1g Výbava + Finance v herním embedu (mapa + chat) — 🟡 funkčně 2026-06-30 [dopad střední · náklad střední] · *zpětná vazba autora*
+#### - [x] 16.1g Výbava + Finance v herním embedu (mapa + chat) — 🟡 funkčně 2026-06-30 [dopad střední · náklad střední] · *zpětná vazba autora*
 > **🟡 Funkčně hotovo 2026-06-30 (mimo původní plán — žádost autora při stavbě Shadowrunu).** Za běhu hry (taktická mapa + chat rail) potřebuje hráč u postavy vidět/měnit **Výbavu** (inventář, množství) a **Finance** (zůstatek, vklad/výběr) — ty jinak žijí jen jako taby plné stránky postavy. **Klíč:** `InventoryTab`+`FinanceTab` jsou soběstačné (data si tahají dle slugu, samy ukládají) → stačí je namountovat do modalu. Sdílená lišta `EmbedSubdocsBar` (🎒 Výbava / 💰 Finance) → `Modal` s taby, fetch přes `usePage`. Zapojeno v **TM** (`TokenSystemSheet`, PC/NPC; bestie ne) i **chatu** (`DiaryRollPanel`). Napříč **všemi systémy** (sdílený modal, ne per-systém). Ověřeno build+render (chrome bere embed tokeny skinu: scifi/fantasy), bez regrese (ChatContextRail+combatPanels). Detail: `project_embed_subdocs_vybava_finance`.
 **Cíl:** Rychlý přístup k Výbavě a Financím postavy přímo z deníku na mapě a v chatu, bez odchodu na plnou stránku postavy — tam, kde to má reálný dopad na hru.
 **⚠️ Zbývá (následný krok):** plné **per-skin sladění vnitřku** `InventoryTab`/`FinanceTab` (mají vlastní module CSS, ne embed tokeny) → tokenizovat na `--dd-embed-*`/`--mx-log-*` a render-ověřit napříč 8 skiny; vyžaduje živé potvrzení autora. Zatím vnitřek drží světový vzhled (funkčně 100 %).
@@ -460,15 +460,16 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
 - **Call of Cthulhu** (`coc`) — *stav kódu:* list sheet+testy, mapa combat panel `CocCombatPanel`
   - [x] Reálný list (grafika)
   - [x] Taktická mapa (grafika)
-  - [ ] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
-  - [ ] Skiny (→ 16.2c)
-- **Vlastní / generic** (`vlastni` / `generic`) — engine, ne obsah; *stav kódu:* generic `DiaryBlockView` (PJ schéma), mapa `DiaryTab` fallback
-  - [ ] Reálný list (grafika nástrojů, ne dotahovat obsah)
-  - [ ] Taktická mapa (grafika)
-  - [ ] Bestie (grafika)
-  - [ ] Chat (→ 16.1)
-  - [ ] Skiny (→ 16.2c)
+  - [x] Bestie (grafika)
+  - [x] Chat (→ 16.1)
+  - [x] Skiny (→ 16.2c)
+- **Vlastní / generic** (`vlastni` / `generic`) — engine, ne obsah; *stav kódu:* generic `DiaryBlockView` (PJ schéma), mapa `DiaryTab` fallback. **Rozpracováno jako 16.2g (F1–F6), rozsah odsouhlasen celý.**
+  - [x] **Deník builder — funkčně (16.2g F1, 2026-07-02)** — všech 9 typů polí editovatelných (oprava number/textarea/relation-picker/formula), formula end-to-end (dřív mrtvá), sekce (`layoutArea`), alias `vlastni→generic`, prázdný stav + 3 startovní šablony. Grafika/skiny = F6. Živý vizuál po deployi.
+  - [ ] Bestie builder (F2)
+  - [ ] Taktická mapa / combat readout (F3)
+  - [ ] Kostky / hod (F4)
+  - [ ] Chat obal (F5 → 16.1)
+  - [ ] Skiny (F6 → 16.2c)
 
 **Pozn. k stavu kódu (výchozí bod, ne TODO):** funkčně má list+testy **12/12**; v mapě je combat panel u **6** (`matrix`, `drd2`, `dnd5e`, `gurps`, `fate`, `coc`), jen `onRoll` fallback u **2** (`drd16`, `drdplus`), bez klikacích hodů **3** (`jad`, `pi`, `shadowrun`), drift blokuje **1** (`drdh`); chat **0/12** (vše 16.1). Grafický průchod se dělá u všech bez ohledu na tento stav.
 
@@ -509,20 +510,20 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 #### Matice systémů (progress; pilíře Deník · Bestiář — Dodatky vyřazeny)
 ##### Prioritně — české (příkop)
-- [ ] **Matrix / Ikaros pravidla** (`matrix`) — vlastní systém platformy. ☐ Deník ☐ Bestiář
-- [ ] **Dračí Doupě 1.6** (`drd16`) — k6/k%, postih/bonus, pasti. ☐ Deník ☐ Bestiář
-- [ ] **Dračí Doupě Plus** (`drd-plus`) — ☐ Deník ☐ Bestiář
-- [ ] **Dračí Doupě II** (`drd2`) — ☐ Deník ☐ Bestiář
-- [ ] **Jeskyně a Draci** (`jad`) — ☐ Deník ☐ Bestiář
-- [ ] **Příběhy Impéria** (`pi`) — ☐ Deník ☐ Bestiář
-- [ ] **Dračí Hlídka** (`draci-hlidka` / deník pod `drdh`) — ⚠️ **id drift** (D-NEW-SYS-DIARY-DRIFT): sjednotit id, pak dotáhnout. Deník (DrdhSheet, 6 povolání) už existuje. ☐ Deník ☐ Bestiář
+- [ ] **Matrix / Ikaros pravidla** (`matrix`) — vlastní systém platformy. 
+- [ ] **Dračí Doupě 1.6** (`drd16`) — k6/k%, postih/bonus, pasti. 
+- [ ] **Dračí Doupě Plus** (`drd-plus`) — 
+- [ ] **Dračí Doupě II** (`drd2`) — 
+- [ ] **Jeskyně a Draci** (`jad`) — 
+- [ ] **Příběhy Impéria** (`pi`) — 
+- [ ] **Dračí Hlídka** (`draci-hlidka` / deník pod `drdh`) — ⚠️ **id drift** (D-NEW-SYS-DIARY-DRIFT): sjednotit id, pak dotáhnout. Deník (DrdhSheet, 6 povolání) už existuje. 
 ##### Parita — zahraniční
-- [ ] **Dungeons & Dragons 5e** (`dnd5e`) — d20 + modifikátory. ☐ Deník ☐ Bestiář
-- [ ] **Shadowrun** (`shadowrun`) — d6 pool. ☐ Deník ☐ Bestiář
-- [ ] **GURPS** (`gurps`) — 3d6 roll-under. ☐ Deník ☐ Bestiář
-- [x] **Fate Accelerated** (`fae`) — 4dF (fudge), 6 Přístupů. ☑ Deník ☑ Bestiář
-- [x] **Fate Core** (`fate`) — 4dF (fudge), Dovednosti. ☑ Deník ☑ Bestiář
-- [ ] **Call of Cthulhu** (`call-of-cthulhu`) — k% + sanity. ☐ Deník ☐ Bestiář
+- [ ] **Dungeons & Dragons 5e** (`dnd5e`) — d20 + modifikátory. 
+- [ ] **Shadowrun** (`shadowrun`) — d6 pool. 
+- [ ] **GURPS** (`gurps`) — 3d6 roll-under. 
+- [ ] **Fate Accelerated** (`fae`) — 4dF (fudge), 6 Přístupů. 
+- [ ] **Fate Core** (`fate`) — 4dF (fudge), Dovednosti. 
+- [ ] **Call of Cthulhu** (`call-of-cthulhu`) — k% + sanity. 
 ##### Engine pro vlastní systém
 - [ ] **Vlastní systém** (`vlastni` / `generic`) — nedotahovat obsah, dát PJ **nástroje** (editor schématu listu + custom bestie). Most k Fázi 21 (komunitní tvorba).
 

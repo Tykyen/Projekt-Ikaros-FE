@@ -92,6 +92,7 @@ export function BlockConfigPanel({
   const isList = block.type === 'list';
   const isBar = block.type === 'bar';
   const isImage = block.type === 'image';
+  const isFormula = block.type === 'formula';
 
   const keyIsDuplicate =
     knownKeys && block.key !== '' && knownKeys.has(block.key);
@@ -315,6 +316,27 @@ export function BlockConfigPanel({
             />
             <small style={{ color: 'var(--text-muted, rgba(255,255,255,0.5))' }}>
               Defaultní obrázek pro všechny postavy. Postava ho může individuálně přepsat.
+            </small>
+          </div>
+        )}
+
+        {isFormula && (
+          <div className={s.fieldRow}>
+            <label className={s.fieldLabel}>Vzorec</label>
+            <Input
+              value={block.config?.expression ?? ''}
+              disabled={readOnly}
+              placeholder="např. hp / hp_max * 100"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setConfigField('expression', e.target.value || undefined)
+              }
+            />
+            <small
+              style={{ color: 'var(--text-muted, rgba(255,255,255,0.5))' }}
+            >
+              Počítá z klíčů číselných bloků (statistika / číslo / pruh).
+              Operátory + − * / a závorky. Hodnota se jen zobrazuje, nedá se
+              ručně přepsat.
             </small>
           </div>
         )}

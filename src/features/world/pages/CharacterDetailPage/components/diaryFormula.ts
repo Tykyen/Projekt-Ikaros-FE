@@ -170,3 +170,27 @@ export function evalFormula(
   if (state.pos !== tokens.length) return null; // unconsumed tokens = syntax error
   return result;
 }
+
+/**
+ * 16.2g F1a — sestaví numerický kontext pro `formula` bloky. Čísla z bloků
+ * typu `stat`/`bar`/`number` naklíčovaná pod `key` (na `key` odkazuje uživatel
+ * ve výrazu; fallback `id` pro starší bloky bez key). Nečíselné / prázdné
+ * hodnoty se vynechají — `evalFormula` pak vrátí `null` a náhled ukáže „—".
+ */
+export function buildNumericContext(
+  blocks: Array<{ id: string; key?: string; type: string }>,
+  customData: Record<string, unknown> | undefined,
+): Record<string, number> {
+  const ctx: Record<string, number> = {};
+  if (!customData) return ctx;
+  for (const b of blocks) {
+    if (b.type !== 'stat' && b.type !== 'bar' && b.type !== 'number') continue;
+    const raw = customData[b.id];
+    if (raw === undefined || raw === null || raw === '') continue;
+    const n = Number(raw);
+    if (Number.isNaN(n)) continue;
+    ctx[b.key ?? b.id] = n;
+    ctx[b.id] = n; // tolerantní: výraz smí odkazovat i na id
+  }
+  return ctx;
+}

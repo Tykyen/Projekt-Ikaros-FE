@@ -41,6 +41,56 @@
   padding: var(--space-lg, 24px);
   text-align: center;
   color: var(--text-muted, rgb(var(--white-rgb) / 0.6));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md, 16px);
+}
+
+/* 16.2g F1d — výběr startovní šablony v prázdném stavu. */
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-sm, 12px);
+  width: 100%;
+  max-width: 640px;
+}
+
+.templateCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  text-align: left;
+  border: 1px solid var(--frame-border, rgb(var(--white-rgb) / 0.12));
+  border-radius: 10px;
+  background: var(--surface-2, rgb(var(--white-rgb) / 0.04));
+  color: var(--text-primary);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.templateCard:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.templateCard:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.templateTitle {
+  font-family: var(--font-display, inherit);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.templateHint {
+  font-size: 0.8rem;
+  color: var(--text-muted, rgb(var(--white-rgb) / 0.6));
 }
 
 .errorBox {

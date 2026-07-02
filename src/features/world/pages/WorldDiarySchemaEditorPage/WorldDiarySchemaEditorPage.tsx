@@ -17,6 +17,7 @@ import {
   validateSchema,
   detectRenamedKeys,
 } from './utils/schemaValidation';
+import { STARTER_TEMPLATES } from './templates/starterTemplates';
 import s from './WorldDiarySchemaEditorPage.module.css';
 
 /**
@@ -161,9 +162,30 @@ export default function WorldDiarySchemaEditorPage() {
 
       {!detailQ.isLoading && !detailQ.data && versionsQ.data?.length === 0 && (
         <div className={s.empty}>
-          <p>Šablona deníku zatím neexistuje. Vytvoř první verzi.</p>
-          <Button onClick={() => createMut.mutate({ schema: [] })}>
-            Založit prázdnou verzi
+          <p>
+            Šablona deníku zatím neexistuje. Vyber startovní šablonu k úpravě,
+            nebo začni od nuly.
+          </p>
+          <div className={s.templateGrid}>
+            {STARTER_TEMPLATES.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                className={s.templateCard}
+                disabled={createMut.isPending}
+                onClick={() => createMut.mutate({ schema: t.build() })}
+              >
+                <span className={s.templateTitle}>{t.label}</span>
+                <span className={s.templateHint}>{t.hint}</span>
+              </button>
+            ))}
+          </div>
+          <Button
+            variant="ghost"
+            disabled={createMut.isPending}
+            onClick={() => createMut.mutate({ schema: [] })}
+          >
+            Začít od nuly (prázdná)
           </Button>
         </div>
       )}

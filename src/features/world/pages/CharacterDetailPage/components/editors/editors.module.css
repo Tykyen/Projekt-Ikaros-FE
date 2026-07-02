@@ -250,3 +250,26 @@
   flex-direction: column;
   gap: 6px;
 }
+
+/* 16.2g F1a — formula (computed) read-only náhled v edit módu. */
+.computed {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding: 7px 10px;
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.computedValue {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  color: var(--text-primary);
+}
+
+.computedHint {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+}

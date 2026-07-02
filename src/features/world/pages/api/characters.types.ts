@@ -73,6 +73,9 @@ export interface ConvertCharacterInput {
 /** Dynamický blok osobního schématu deníku (stat / bar / list / text / image). */
 export interface CustomDiaryBlock {
   id: string;
+  /** 16.2g F1a — slug bloku (na `key` odkazují `formula` výrazy). Volitelný
+   *  kvůli starším override bez key — pak `formula` referuje `id`. */
+  key?: string;
   type: string;
   label: string;
   description?: string;

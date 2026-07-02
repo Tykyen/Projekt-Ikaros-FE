@@ -11,6 +11,7 @@ import type { CustomDiaryBlock } from '../../api/characters.types';
 export function flattenSchemaBlock(b: DiarySchemaBlock): CustomDiaryBlock {
   return {
     id: b.id ?? b.key,
+    key: b.key,
     type: b.type,
     label: b.label,
     description: b.config?.description,
@@ -21,6 +22,8 @@ export function flattenSchemaBlock(b: DiarySchemaBlock): CustomDiaryBlock {
     order: b.order,
     layoutArea: b.config?.layoutArea,
     imageUrl: b.config?.imageUrl,
+    // 16.2g F1a — dřív se `expression` ztrácela → formula nikdy nefungovala.
+    expression: b.config?.expression,
   };
 }
 
@@ -37,9 +40,10 @@ export function nestCustomBlock(b: CustomDiaryBlock): DiarySchemaBlock {
   if (b.options !== undefined) config.options = b.options;
   if (b.layoutArea !== undefined) config.layoutArea = b.layoutArea;
   if (b.imageUrl !== undefined) config.imageUrl = b.imageUrl;
+  if (b.expression !== undefined) config.expression = b.expression;
   return {
     id: b.id,
-    key: slugify(b.label) || b.id,
+    key: b.key || slugify(b.label) || b.id,
     label: b.label,
     type: b.type as DiaryBlockType,
     order: b.order,

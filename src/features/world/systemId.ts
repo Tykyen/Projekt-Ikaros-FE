@@ -28,6 +28,10 @@ export const SYSTEM_ALIASES: Record<string, string> = {
   'draci-hlidka': 'drdh',
   'drd-plus': 'drdplus',
   'call-of-cthulhu': 'coc',
+  // 16.2g F1b — „Vlastní Systém" (uložené `world.system='vlastni'`) běží na
+  // generic schema-driven engine. Dřív fungoval jen náhodou fallbacku
+  // (`vlastni` není v registry → generic); teď explicitně.
+  vlastni: 'generic',
 };
 
 /**

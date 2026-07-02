@@ -43,6 +43,9 @@ export interface DiaryBlockConfig {
   layoutArea?: string;
   /** D-DIARY-3 — defaultní obrázek pro `image` blok. */
   imageUrl?: string;
+  /** 16.2g F1a — `formula` výraz (např. `hp / hp_max * 100`) nad `key` jiných
+   *  číselných bloků. BE `config` je volný objekt → ukládá se bez BE změny. */
+  expression?: string;
 }
 
 export interface DiarySchemaBlock {

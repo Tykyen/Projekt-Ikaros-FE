@@ -2,10 +2,12 @@ import { useRef } from 'react';
 import { toast } from 'sonner';
 import { useUploadImage, parseApiError } from '@/shared/api';
 import { Button } from '@/shared/ui';
+import { PagePicker } from '@/features/world/components/PagePicker/PagePicker';
 import s from './editors.module.css';
 
 interface Props {
-  /** Typ bloku schématu — `stat` | `bar` | `list` | `text` | `image` | … */
+  /** Typ bloku schématu — `stat` | `bar` | `number` | `list` | `text` |
+   *  `textarea` | `image` | `relation` | `formula`. */
   type: string;
   label: string;
   value: unknown;
@@ -15,11 +17,20 @@ interface Props {
   /** D-DIARY-3 — defaultní URL pro `image` blok (ze schématu). Per-postava
    *  override se ukládá do `value`; pokud chybí, použije se `defaultImageUrl`. */
   defaultImageUrl?: string;
+  /** 16.2g F1a — `relation` picker bere postavy/stránky tohoto světa. */
+  worldId?: string;
+  /** 16.2g F1a — `formula` je computed (read-only). Hodnotu dopočítá parent
+   *  (`DiaryTab`) z ostatních bloků a předá sem; editor ji jen zobrazí. */
+  computedValue?: number | null;
 }
 
 /**
  * 8.1 + 8.5 — Editor hodnoty jednoho bloku schématu. Vstup se mění podle
- * `type`. `image` typ (D-DIARY-3) podporuje upload + reset na default.
+ * `type`. `image` (D-DIARY-3) podporuje upload + reset na default.
+ *
+ * 16.2g F1a — doplněny chybějící editory: `number` (číselný input),
+ * `textarea` (víceřádkový), `relation` (picker postav, ne ruční slug) a
+ * `formula` (read-only — computed, nesmí jít přepsat, jinak koruptuje eval).
  */
 export function SchemaValueEditor({
   type,
@@ -29,6 +40,8 @@ export function SchemaValueEditor({
   maxValue,
   minValue,
   defaultImageUrl,
+  worldId,
+  computedValue,
 }: Props) {
   const id = `schema-${label}`;
   const fileRef = useRef<HTMLInputElement>(null);
@@ -87,7 +100,35 @@ export function SchemaValueEditor({
         </div>
       );
     }
-    if (type === 'stat' || type === 'bar') {
+    // 16.2g F1a — formula je computed: read-only náhled, žádný zápis do
+    // customData (jinak by uživatelský string přebil eval a rozbil kontext).
+    if (type === 'formula') {
+      const display =
+        typeof computedValue === 'number' && !Number.isNaN(computedValue)
+          ? String(Math.round(computedValue * 100) / 100)
+          : '—';
+      return (
+        <div className={s.computed} aria-readonly="true">
+          <span className={s.computedValue}>{display}</span>
+          <span className={s.computedHint}>🔒 dopočítává se automaticky</span>
+        </div>
+      );
+    }
+    // 16.2g F1a — relation: výběr postavy/stránky přes sdílený PagePicker
+    // (reuse, žádná nová kopie). Ukládá slug, jak čeká DiaryBlockView.
+    if (type === 'relation') {
+      if (!worldId) return null;
+      return (
+        <PagePicker
+          worldId={worldId}
+          value={typeof value === 'string' && value ? value : null}
+          onChange={(slug) => onChange(slug ?? undefined)}
+          placeholder="Vyhledej postavu / stránku…"
+        />
+      );
+    }
+    // 16.2g F1a — `number` patří k číselným typům (dřív spadl na string input).
+    if (type === 'stat' || type === 'bar' || type === 'number') {
       return (
         <input
           id={id}
@@ -119,6 +160,18 @@ export function SchemaValueEditor({
                 .filter(Boolean),
             )
           }
+        />
+      );
+    }
+    // 16.2g F1a — textarea: víceřádkový vstup (dřív jednořádkový string input).
+    if (type === 'textarea') {
+      return (
+        <textarea
+          id={id}
+          className={s.field}
+          rows={4}
+          value={value === undefined || value === null ? '' : String(value)}
+          onChange={(e) => onChange(e.target.value || undefined)}
         />
       );
     }

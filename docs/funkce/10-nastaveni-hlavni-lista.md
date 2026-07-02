@@ -103,13 +103,14 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 - **Hranice:** dědí jen NOVÁ scéna; změna defaultů nepřepíše existující scény.
 - **Kód:** FE `tabs/MapDefaultsTab.tsx`; BE `worlds` (schema/interface/dto/repo `mapDefaults`) + `maps/maps.service.ts` (seed v `create`).
 
-### Tab Šablona deníku (diary schema editor)
-- **Co to je:** editor schématu deníku postavy (8.5). Záložka jen pro svět se systémem **„Vlastní Systém"** (`SYSTEM_CUSTOM_ID = 'vlastni'`) — u presetů je schema seedované automaticky.
-- **Co jde dělat:** definovat bloky schématu (key/label/type/config/order).
-- **Kdo (FE):** PJ + `minSystem='vlastni'`. **Kdo (BE):** verzování přes `POST /worlds/:id/diary-schema-versions` → **PJ+** (`worlds.controller.ts:548-561`). Vytvoření nové verze archivuje předchozí a inkrementuje `version`.
-- **Hranice:** u presetových systémů tab vůbec není (gate `minSystem`). Změna systému v Základní info re-seeduje schema.
-- **Stav:** ✅
-- **Kód:** FE `pages/WorldDiarySchemaEditorPage`; BE `worlds.service.ts` diarySchemaVersion metody.
+### Tab Šablona deníku (diary schema editor) — základ „Vlastního systému" (16.2g F1)
+- **Co to je:** editor schématu deníku postavy (8.5) — jádro **„Vlastního systému"** (meta-systém 16.2g). Záložka jen pro svět se systémem **„Vlastní Systém"** (`SYSTEM_CUSTOM_ID = 'vlastni'`, explicitní alias → `generic` engine v `systemId.ts`) — u presetů je schema seedované automaticky.
+- **Co jde dělat:** definovat bloky schématu (key/label/type/config/order) — **9 typů**: `stat`/`number`/`bar`/`list`/`text`/`textarea`/`image`/`relation`/`formula`; seskupit bloky do **sekcí** (`config.layoutArea`); u `formula` zadat **vzorec** (`config.expression`, počítá z `key` číselných bloků); import/export JSON; verzování (archiv předchozích, remap klíčů). **Prázdný svět nabídne 3 startovní šablony** (Fantasy/Sci-fi/Minimal) nebo start od nuly.
+- **Vyplňování hodnot postavy:** hráč v deníku postavy (`DiaryTab`) vyplní hodnoty všech typů — `number` číselný input, `textarea` víceřádkový, `relation` **picker postavy** (`PagePicker`, ukládá slug), `formula` je **read-only** (dopočítává se z ostatních polí, nejde ručně přepsat). Bloky se zobrazí seskupené do sekcí. Per-postava override schématu přes „Vlastní šablona".
+- **Kdo (FE):** PJ + `minSystem='vlastni'`. **Kdo (BE):** verzování přes `POST /worlds/:id/diary-schema-versions` → **PJ+**. Vytvoření nové verze archivuje předchozí a inkrementuje `version`. `config` je na BE **volný objekt** (`MixedArraySubSchema` `strict:false`, DTO `@IsObject`) → `expression` projde bez BE změny/restartu.
+- **Hranice:** u presetových systémů tab vůbec není (gate `minSystem`). Změna systému v Základní info re-seeduje schema. `formula` odkazuje na `key` číselných bloků (identifikátor bez diakritiky/pomlček); vzorec umí `+ − * / %` a závorky, **ne funkce**. Zatím JEN deník — **bestie / combat na taktické mapě / chat / skiny** vlastního systému = **F2–F6** (roadmap 16.2g, zatím 🚧). Živý vizuál po deployi.
+- **Stav:** ✅ deník builder (F1) · 🚧 F2–F6 (bestie/combat/chat/skiny)
+- **Kód:** FE `pages/WorldDiarySchemaEditorPage` (+`templates/starterTemplates.ts`, `components/{BlockConfigPanel,SchemaPreview}.tsx`, `utils/schemaMappers.ts`), `CharacterDetailPage/components/{DiaryTab,DiaryBlockView,diaryFormula}.tsx` + `editors/SchemaValueEditor.tsx`, `world/systemId.ts` (alias `vlastni→generic`); BE `worlds.service.ts` diarySchemaVersion metody, `diary-schema-versions.schema.ts` (config volný). Spec `docs/arch/phase-16/spec-16.2g-vlastni-system.md`.
 
 ### Tab Emoty světa
 - **Co to je:** správa custom emotů světa pro chat (6.4c). Mřížka, počítadlo (`EMOTE_LIMIT_PER_WORLD`), upload/edit/copy/delete.

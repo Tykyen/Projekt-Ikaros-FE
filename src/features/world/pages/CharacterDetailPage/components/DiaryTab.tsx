@@ -33,6 +33,7 @@ import { EditModeBanner } from './EditModeBanner';
 import { SectionListEditor } from './editors/SectionListEditor';
 import { SchemaValueEditor } from './editors/SchemaValueEditor';
 import { DiaryBlockView } from './DiaryBlockView';
+import { buildNumericContext, evalFormula } from './diaryFormula';
 import s from './DiaryTab.module.css';
 import ed from './editors/editors.module.css';
 
@@ -148,6 +149,29 @@ export function DiaryTab({
   );
 }
 
+/**
+ * 16.2g F1c — seskupí bloky podle `layoutArea` (zachová pořadí prvního
+ * výskytu skupiny i pořadí bloků). Bloky bez `layoutArea` spadnou do výchozí
+ * skupiny (`''` → nadpis „Atributy"). Umožní PJ postavit strukturovaný list.
+ */
+function groupByLayoutArea(
+  blocks: CustomDiaryBlock[],
+): { area: string; blocks: CustomDiaryBlock[] }[] {
+  const groups: { area: string; blocks: CustomDiaryBlock[] }[] = [];
+  const byArea = new Map<string, { area: string; blocks: CustomDiaryBlock[] }>();
+  for (const b of blocks) {
+    const area = b.layoutArea?.trim() || '';
+    let g = byArea.get(area);
+    if (!g) {
+      g = { area, blocks: [] };
+      byArea.set(area, g);
+      groups.push(g);
+    }
+    g.blocks.push(b);
+  }
+  return groups;
+}
+
 // ── View ───────────────────────────────────────────────────────────
 
 function DiaryTabView({
@@ -194,6 +218,8 @@ function DiaryTabView({
 
   // Generic flow — současný blockový view.
   const blocks = [...effectiveBlocks].sort((a, b) => a.order - b.order);
+  // 16.2g F1a — kontext pro `formula` bloky (čísla ze všech skupin).
+  const numericContext = buildNumericContext(blocks, diary.customData);
 
   if (blocks.length === 0 && sections.length === 0) {
     return <p className={s.empty}>Deník je zatím prázdný.</p>;
@@ -201,22 +227,24 @@ function DiaryTabView({
 
   return (
     <div className={s.wrap}>
-      {blocks.length > 0 && (
-        <section className={s.section}>
-          <h2 className={s.sectionTitle}>Atributy</h2>
+      {groupByLayoutArea(blocks).map((g) => (
+        <section key={g.area || '_default'} className={s.section}>
+          <h2 className={s.sectionTitle}>{g.area || 'Atributy'}</h2>
           {/* `print-cols` = stabilní tisková třída: CSS-module grid v tisku
               nestyluje (hash), tahle drží mřížku i v tiskovém okně (printDoc.css). */}
           <div className={`${s.blockGrid} print-cols`}>
-            {blocks.map((block) => (
+            {g.blocks.map((block) => (
               <DiaryBlockView
                 key={block.id}
                 block={block}
                 value={diary.customData?.[block.id]}
+                numericContext={numericContext}
+                worldSlug={worldSlug}
               />
             ))}
           </div>
         </section>
-      )}
+      ))}
 
       {sections.map((section) => (
         <DiarySectionView key={section.id} section={section} />
@@ -312,6 +340,11 @@ function DiaryTabEdit({
   const blocks = useMemo(
     () => [...effectiveBlocks].sort((a, b) => a.order - b.order),
     [effectiveBlocks],
+  );
+  // 16.2g F1a — `formula` náhled se přepočítává z aktuálně editovaných hodnot.
+  const numericContext = useMemo(
+    () => buildNumericContext(blocks, displayCustomData),
+    [blocks, displayCustomData],
   );
 
   function changeSections(next: PageSection[]) {
@@ -462,23 +495,31 @@ function DiaryTabEdit({
           }}
         />
       ) : blocks.length > 0 ? (
-        <section className={s.section}>
-          <h2 className={s.sectionTitle}>Atributy</h2>
-          <div className={ed.grid}>
-            {blocks.map((block) => (
-              <SchemaValueEditor
-                key={block.id}
-                type={block.type}
-                label={block.label}
-                value={displayCustomData[block.id]}
-                maxValue={block.maxValue}
-                minValue={block.minValue}
-                defaultImageUrl={block.imageUrl}
-                onChange={(value) => changeBlockValue(block.id, value)}
-              />
-            ))}
-          </div>
-        </section>
+        groupByLayoutArea(blocks).map((g) => (
+          <section key={g.area || '_default'} className={s.section}>
+            <h2 className={s.sectionTitle}>{g.area || 'Atributy'}</h2>
+            <div className={ed.grid}>
+              {g.blocks.map((block) => (
+                <SchemaValueEditor
+                  key={block.id}
+                  type={block.type}
+                  label={block.label}
+                  value={displayCustomData[block.id]}
+                  maxValue={block.maxValue}
+                  minValue={block.minValue}
+                  defaultImageUrl={block.imageUrl}
+                  worldId={worldId}
+                  computedValue={
+                    block.type === 'formula' && block.expression
+                      ? evalFormula(block.expression, numericContext)
+                      : undefined
+                  }
+                  onChange={(value) => changeBlockValue(block.id, value)}
+                />
+              ))}
+            </div>
+          </section>
+        ))
       ) : null}
 
       <section className={s.section}>
