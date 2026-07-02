@@ -255,7 +255,13 @@ export function BestieRollPanel({
             />
           </DiarySkinScope>
         ) : (
-          <>
+          // „Vlastní systém" (generic) katalogová bestie (read-only). Obal do
+          // DiarySkinScope → nastaví `data-diary-skin` na potomka, takže chat
+          // obal `.panel:has([data-diary-system='generic'][data-diary-skin=X])`
+          // v railShell.module.css zachytí skin (chrome nedosáhne na --dd-embed-*
+          // z potomka → per-skin literální barvy). Bez scope by data-diary-skin
+          // nikdy nevzniklo a obal by zůstal nenaskinovaný (tmavý neutrál).
+          <DiarySkinScope worldId={worldId}>
             <BestieStatblock
               token={token}
               worldId={worldId}
@@ -283,7 +289,7 @@ export function BestieRollPanel({
                 <p className={b.loreBody}>{bestie.notes}</p>
               </section>
             )}
-          </>
+          </DiarySkinScope>
         )}
       </div>
     </aside>

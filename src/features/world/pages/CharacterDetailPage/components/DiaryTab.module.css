@@ -14,9 +14,10 @@
 
 .sectionTitle {
   margin: 0;
-  font-family: var(--font-display);
+  /* 16.2g F6 — tokenizace pro generic skiny (fallback = dnešní vzhled). */
+  font-family: var(--gen-font-head, var(--font-display));
   font-size: var(--text-md);
-  color: var(--text-primary);
+  color: var(--gen-title, var(--text-primary));
 }
 
 .empty {
@@ -40,43 +41,45 @@
   flex-direction: column;
   gap: 6px;
   padding: var(--sp-3);
-  border: 1px solid var(--frame-border);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
+  /* 16.2g F6 — generic skin tokeny (fallback = dnešní vzhled = nulová regrese). */
+  border: 1px solid var(--gen-card-border, var(--frame-border));
+  border-radius: var(--gen-radius, var(--radius-md));
+  background: var(--gen-card-bg, var(--surface-2));
 }
 
 .blockLabel {
-  font-family: var(--font-display);
+  font-family: var(--gen-font-head, var(--font-display));
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  color: var(--gen-label, var(--text-secondary));
 }
 
 .blockValue {
   font-size: var(--text-md);
-  color: var(--text-primary);
+  color: var(--gen-value, var(--text-primary));
   font-weight: var(--weight-semi);
+  font-family: var(--gen-font-body, inherit);
 }
 
 .blockList {
   margin: 0;
   padding-left: 1.1rem;
   font-size: var(--text-sm);
-  color: var(--text-primary);
+  color: var(--gen-value, var(--text-primary));
 }
 
 .barTrack {
   width: 100%;
   height: 8px;
   border-radius: var(--radius-full);
-  background: var(--surface-3, rgb(var(--white-rgb) / 0.08));
+  background: var(--gen-bar-track, var(--surface-3, rgb(var(--white-rgb) / 0.08)));
   overflow: hidden;
 }
 
 .barFill {
   height: 100%;
-  background: var(--accent);
+  background: var(--gen-hp, var(--accent));
   border-radius: var(--radius-full);
   transition: width 0.2s ease;
 }

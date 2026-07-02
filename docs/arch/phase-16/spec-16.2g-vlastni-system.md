@@ -1,7 +1,17 @@
 # 16.2g — Vlastní systém (meta-systém): engine pro deník/bestii/mapu/chat/skiny na míru
 
-**Status:** F1 + F2 HOTOVO (2026-07-02, čeká živé ověření + BE restart) · F3–F6 čekají · **Vytvořeno:** 2026-07-02
+**Status:** F1 + F2 + F6 HOTOVO (2026-07-02, čeká živé ověření + BE restart) · F3 render funguje fallbackem · F4 (kostky) čeká · **Vytvořeno:** 2026-07-02
 **Rozsah odsouhlasen:** celé (Úroveň 3), po krocích F1–F6, žádný dluh.
+
+> **F6 dokončeno 2026-07-02** — 8 skinů generic (blokové karty) napříč VŠEMI povrchy.
+> Generic byl mimo skin engine → tokenizace navíc (F1 skinů): `--gen-*` list
+> (`DiaryTab.module`), `--dd-embed-*` bestie panel, `generic` do `:is()` seznamů
+> 5 embed modulů, baseline `[data-diary-system='generic']` blok. Pak 8×
+> `styles/generic-skins/<id>.css` (fan-out) + signature readout/obal TM + chat
+> obal `:has()` (8× v railShell) + `BestieRollPanel` do DiarySkinScope.
+> **Render-audit Chrome headless 8/8 všech povrchů** (deník/readout/dicelog/
+> orchestrace/obal TM/obal chat PC+bestie); past §9.18 (chat obal) opravena.
+> MLP = světlý/bílý+duhový (přání uživatele). Zbývá F4 (vlastní kostky).
 
 > **F2 dokončeno 2026-07-02** — bestie schema builder + render na TM a v chatu.
 > **Zjištění z průzkumu:** deník i bestie na taktické mapě a v chatu už fungovaly

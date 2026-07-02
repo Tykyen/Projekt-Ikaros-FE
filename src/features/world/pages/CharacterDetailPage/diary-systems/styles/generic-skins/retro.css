@@ -1,0 +1,318 @@
+/* Generic („Vlastní systém") — skin „RETRO" 🎮 (CRT terminál / synthwave 80s).
+ *
+ * Generic list = BLOKOVÉ KARTY (`.diary-block` + `.diary-block__*`), ne
+ * systémová anatomie. Skin reskinuje karty na ROZSVÍCENOU FOSFOROVOU
+ * OBRAZOVKU arkádového kabinetu: scanline, sun-grid horizont, ASCII rohy
+ * ┌┐└┘, 7-seg LED čísla, USR:// prompt, pixelové pipy.
+ *
+ * Rodinná DNA (RETRO napříč systémy): scanline + fosfor glow · neon sun-grid
+ * horizont · ASCII rohy ┌┐└┘ · 7-seg LED (VT323) · USR:// / `>` prompt ·
+ * pixelové pipy · monospace terminál. Paleta sdílena s ostatními RETRO skiny
+ * (drdplus/drd16) — noc + neon růžová (HP) / cyan (MP) / jantar (OČ/slunce).
+ *
+ * Sémantika (drží význam, posunuto do neonu):
+ *   HP / bar-fill  → neon RŮŽOVÁ   (--gen-hp)
+ *   +hod / úspěch  → CYAN          (embed pos)  ← generic list: hodnota=cyan LED
+ *   −hod / neúspěch→ ČERVENÁ/RŮŽOVÁ (embed neg)
+ *   neutrální      → JANTAR        (embed neutral)
+ *
+ * Fonty: JEN Google Fonts (Orbitron / Share Tech Mono / VT323). Žádné
+ * jsdelivr/cdnjs — CSP block shodil chunk (viz drdplus retro poznámka).
+ * VT323 + glow dává LED dojem v rámci povolených `fonts.googleapis.com`.
+ *
+ * Scope: KAŽDÉ pravidlo `[data-diary-system='generic'][data-diary-skin='retro']`
+ * (compound prefix povinný — vyšší specificita než generic baseline na
+ * `[data-diary-system='generic']`). Pouze CSS/SVG, žádný JS. Regrese-safe.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=VT323&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 1) PALETA — lokální `--rt-*` proměnné (zdroj pravdy) na compound scope.
+ *    Zdědí je list (`.diary-block`) i embed tokeny níž.
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='retro'] {
+  /* noc / kabinet */
+  --rt-night-0: #0a0414; /* nejhlubší vnější rám */
+  --rt-night-1: #140a26; /* tmavý rám */
+  --rt-night-edge: #3a1d5a;
+
+  /* obrazovka (karty — tmavá, ČITELNÁ) */
+  --rt-screen-0: #241445; /* nejsvětlejší plocha */
+  --rt-screen-1: #1b0f33; /* base karta */
+  --rt-screen-2: #130a24; /* inset / track */
+  --rt-screen-edge: #6f3aa8;
+
+  /* text */
+  --rt-ink: #f4ecff;
+  --rt-ink-soft: #c3aee0;
+  --rt-ink-faint: #8a72ad;
+  --rt-ink-deep: #0a0414; /* text na světlém neonu */
+
+  /* jantar / akcent (fosfor slunce) */
+  --rt-amber: #ffb347;
+  --rt-amber-hi: #ffe07a;
+  --rt-amber-deep: #7a5418;
+
+  /* HP (neon růžová) */
+  --rt-pink: #ff2e97;
+  --rt-pink-hi: #ff8ec9;
+  --rt-pink-deep: #a01060;
+
+  /* MP / hodnoty (cyan) */
+  --rt-cyan: #22d3ee;
+  --rt-cyan-hi: #8af3ff;
+  --rt-cyan-deep: #0c6b80;
+
+  --rt-line: rgba(111, 58, 168, 0.55);
+  --rt-line-soft: rgba(74, 42, 115, 0.5);
+
+  --rt-f-title: 'Orbitron', 'Share Tech Mono', sans-serif;
+  --rt-f-head: 'Share Tech Mono', monospace;
+  --rt-f-body: 'Share Tech Mono', 'Courier New', monospace;
+  --rt-f-num: 'VT323', monospace; /* LED čísla */
+
+  /* CRT scanline (jemná — čitelnost > efekt) */
+  --rt-scan: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, 0.28) 2px 3px);
+  /* sun-grid / neon texture pro plochy karet */
+  --rt-screen-tex:
+    radial-gradient(120% 70% at 50% 0%, rgba(255, 46, 151, 0.1), transparent 62%),
+    radial-gradient(90% 55% at 50% 100%, rgba(34, 211, 238, 0.08), transparent 72%),
+    linear-gradient(180deg, var(--rt-screen-0), var(--rt-screen-1) 78%);
+
+  /* ── LIST tokeny (blokové karty) ── */
+  --gen-card-bg: var(--rt-screen-1);
+  --gen-card-border: var(--rt-screen-edge);
+  --gen-radius: 6px;
+  --gen-title: var(--rt-cyan-hi);
+  --gen-label: var(--rt-amber-hi);
+  --gen-value: var(--rt-ink);
+  --gen-hp: linear-gradient(90deg, var(--rt-pink), var(--rt-pink-hi));
+  --gen-font-head: var(--rt-f-title);
+  --gen-font-body: var(--rt-f-body);
+  --gen-bar-track: var(--rt-screen-2);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 2) NADPIS SEKCE — Orbitron neon + `>` terminál prompt + fosfor glow.
+ *    (Konzumuje `--gen-title`/`--gen-font-head`; sem přidáváme jen glow +
+ *    prompt marker, které token neumí předat.)
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='retro'] .sectionTitle,
+[data-diary-system='generic'][data-diary-skin='retro'] [class*='sectionTitle'] {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rt-cyan-hi);
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.7), 0 0 2px rgba(34, 211, 238, 0.9);
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .sectionTitle::before,
+[data-diary-system='generic'][data-diary-skin='retro'] [class*='sectionTitle']::before {
+  content: '> ';
+  color: var(--rt-pink);
+  font-family: var(--rt-f-body);
+  text-shadow: 0 0 8px var(--rt-pink);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 3) BLOKOVÁ KARTA `.diary-block` — obrazovka + neon glow rám + SIGNATURE
+ *    ornament (ASCII rohy ┌┐└┘ ::before, scanline overlay ::after).
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block {
+  position: relative;
+  isolation: isolate;
+  padding: 14px 15px 13px;
+  border: 1px solid var(--rt-screen-edge);
+  border-radius: 6px;
+  color: var(--rt-ink);
+  font-family: var(--rt-f-body);
+  /* rozsvícená obrazovka + sun-grid texture */
+  background: var(--rt-screen-tex);
+  background-color: var(--rt-screen-1);
+  /* chunky neon bevel: růžový vlas → tmavý rám → cyan vlas → glow */
+  box-shadow:
+    inset 0 0 0 1px var(--rt-line-soft),
+    inset 0 0 20px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 46, 151, 0.45),
+    0 0 14px -3px rgba(255, 46, 151, 0.4),
+    0 0 26px -8px rgba(34, 211, 238, 0.3);
+}
+
+/* SIGNATURE A: ASCII rohy ┌┐└┘ ve 4 rozích karty (1 ::before, 4 SVG vrstvy).
+ * Inline SVG (žádné --corner-* tokeny). Jantar fosfor glow. */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 13px 13px;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M2 12 L2 2 L12 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%23ffb347' stroke-width='2'%3E%3Cpath d='M11 12 L11 2 L1 2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M2 1 L2 11 L12 11'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M11 1 L11 11 L1 11'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 3px rgba(255, 179, 71, 0.55));
+}
+
+/* SIGNATURE B: CRT scanline + jemná vinětace přes celou kartu (opacity ≤ .5). */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 6px;
+  background:
+    var(--rt-scan),
+    radial-gradient(130% 120% at 50% 40%, transparent 58%, rgba(0, 0, 0, 0.4) 100%);
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+/* obsah karty nad ornamenty */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── label: jantar terminál klíč ─────────────────────────────────────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__label {
+  font-family: var(--rt-f-head);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rt-amber-hi);
+  text-shadow: 0 0 6px rgba(255, 179, 71, 0.5);
+}
+
+/* ── hodnota: 7-seg LED cyan ─────────────────────────────────────────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__value {
+  font-family: var(--rt-f-num);
+  font-size: 24px;
+  line-height: 1.05;
+  font-weight: 400;
+  color: var(--rt-cyan);
+  text-shadow: 0 0 9px rgba(34, 211, 238, 0.75), 0 0 2px rgba(34, 211, 238, 0.9);
+}
+
+/* ── seznam: monospace řádky s pixel odrážkou ────────────────────────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__list {
+  font-family: var(--rt-f-body);
+  color: var(--rt-ink-soft);
+  list-style: none;
+  padding-left: 0;
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__list li {
+  position: relative;
+  padding-left: 16px;
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  background: var(--rt-pink);
+  box-shadow: 0 0 5px var(--rt-pink);
+  /* pixelová (čtvercová) odrážka */
+  border-radius: 0;
+}
+
+/* ── bar: pixel track + neon RŮŽOVÝ (HP) fill s glow ─────────────────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__bar-track {
+  height: 10px;
+  border-radius: 2px;
+  background: var(--rt-screen-2);
+  border: 1px solid var(--rt-line-soft);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__bar-fill {
+  border-radius: 0;
+  background: linear-gradient(90deg, var(--rt-pink), var(--rt-pink-hi));
+  box-shadow: 0 0 10px rgba(255, 46, 151, 0.7);
+  /* pixelové segmenty (dělící mezery přes overlay) */
+  background-image:
+    linear-gradient(90deg, var(--rt-pink), var(--rt-pink-hi)),
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(10, 4, 20, 0.55) 7px 8px);
+}
+
+/* ── relation: neon link s pixel řetězem ─────────────────────────────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__relation {
+  font-family: var(--rt-f-body);
+  font-size: 14px;
+  color: var(--rt-cyan-hi) !important;
+  text-decoration: none !important;
+  text-shadow: 0 0 7px rgba(34, 211, 238, 0.6);
+  border-bottom: 1px dashed var(--rt-cyan-deep);
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__relation:hover {
+  color: var(--rt-ink) !important;
+  border-bottom-color: var(--rt-cyan);
+  text-shadow: 0 0 10px var(--rt-cyan);
+}
+
+/* ── formula: jantar LED (odvozená hodnota) ──────────────────────────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__formula {
+  font-family: var(--rt-f-num);
+  font-size: 24px;
+  color: var(--rt-amber-hi);
+  text-shadow: 0 0 9px rgba(255, 179, 71, 0.7);
+}
+/* prefix `Σ` prompt pro odvozenou hodnotu */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__formula::before {
+  content: 'Σ ';
+  font-family: var(--rt-f-head);
+  font-size: 12px;
+  color: var(--rt-cyan);
+  text-shadow: 0 0 6px var(--rt-cyan);
+  vertical-align: 2px;
+}
+
+/* ── image: pixel rám + scanline zůstává přes ::after karty ───────────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block__image {
+  border-radius: 3px !important;
+  border: 1px solid var(--rt-cyan-deep);
+  box-shadow: 0 0 12px -3px var(--rt-cyan), inset 0 0 0 1px rgba(34, 211, 238, 0.25);
+  filter: saturate(1.05) contrast(1.03);
+}
+
+/* ── barevný typový akcent per data-block-type (levý neon proužek) ────── */
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block[data-block-type='bar'] {
+  border-left: 3px solid var(--rt-pink);
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block[data-block-type='formula'] {
+  border-left: 3px solid var(--rt-amber);
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block[data-block-type='relation'] {
+  border-left: 3px solid var(--rt-cyan);
+}
+[data-diary-system='generic'][data-diary-skin='retro'] .diary-block[data-block-type='image'] {
+  border-left: 3px solid var(--rt-cyan-hi);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 4) EMBED plochy (obal v TM / dice readout / dicelog / chat) — `--dd-embed-*`.
+ *    Plocha NEPRŮHLEDNÁ (plný gradient) → nesmí prosvítat na mapu.
+ *    Sémantika: pos = úspěch/+hod (cyan-zelený fosfor) / neg = −hod (růžová) /
+ *    neutral = jantar.
+ * ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='retro'] {
+  --dd-embed-surface: linear-gradient(180deg, #241445, #130a24); /* OPAQUE */
+  --dd-embed-border: var(--rt-screen-edge);
+  --dd-embed-line: rgba(111, 58, 168, 0.45);
+  --dd-embed-track: var(--rt-screen-2);
+  --dd-embed-text: var(--rt-ink);
+  --dd-embed-muted: var(--rt-ink-soft);
+  --dd-embed-title: var(--rt-cyan-hi);
+  --dd-embed-chip-bg: rgba(255, 179, 71, 0.1);
+  --dd-embed-accent: var(--rt-amber);
+  --dd-embed-num-font: var(--rt-f-num);
+  --dd-embed-title-font: var(--rt-f-title);
+  --dd-embed-pos: #3ddc84; /* +hod / úspěch = fosfor zelená */
+  --dd-embed-neg: var(--rt-pink); /* −hod / neúspěch = neon růžová */
+  --dd-embed-neutral: var(--rt-amber-hi); /* neutrální = jantar */
+}

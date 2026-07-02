@@ -1,0 +1,338 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap');
+
+/**
+ * Generic („Vlastní systém") — skin „MLP" (id `anime`) 🦄: DUHOVÝ CEL-SHADE
+ * na SVĚTLÉM / BÍLÉM podkladu.
+ *
+ * ⚠️ POLARITA: SVĚTLÁ. Plochy bílé / krémové (#ffffff / #fdf7ff), text tmavý
+ * ink (#16162e / #2b2a55), DUHA jen jako AKCENT (rámy, raily, markery) — NIKDY
+ * jako celoplošné pozadí. To je nejdůležitější požadavek tohoto skinu.
+ *
+ * Generic list = BLOKOVÉ KARTY (`.diary-block`), NE listový arch. Rodinná
+ * identita MLP (napříč systémy — viz drdplus-skins/anime.css) přeložena na
+ * kartový jazyk: bílá ink-outlined cel-karta + TVRDÝ spodní cel-stín (karta
+ * „stojí" nad podkladem) + gloss highlight nahoře + holografický duhový rám +
+ * ✦ sparkles + star-burst medailon v rohu + akční swoosh.
+ *
+ * Signature trojice (echo rodiny přeložené na kartu):
+ *   1) STAR-BURST medailon — conic duhový disk s ink prstencem v rohu karty.
+ *   2) ✦ SPARKLES + duhový RAIL za labelem (echo titulkového railu rodiny).
+ *   3) CEL-SHADE — gloss highlight nahoře + tvrdý spodní ink+cel stupeň
+ *      (plastová sběratelská karta) + duhový holo rám.
+ *
+ * Scoped na `[data-diary-system='generic'][data-diary-skin='anime']` (compound
+ * 0,2,0 → přebije neutrální default `[data-diary-system='generic']`). KAŽDÉ
+ * pravidlo nese ten prefix. Pure CSS/SVG, žádný JS. Regrese-safe — jen
+ * overrides pod scopem. Tento motiv se NESDÍLÍ s žádným jiným skinem.
+ *
+ * Tokeny tečou do listu (`--gen-*`) I do embedů mapa/chat/dice (`--dd-embed-*`).
+ * Embed plocha VŽDY OPAQUE a SVĚTLÁ (plný světlý gradient, TMAVÝ text), jinak
+ * log „prosvítá" na mapu / nečitelný. Sémantika: HP = růžová (#ff5d6c),
+ * +hod = zelená, −hod = růžová/červená. Rodinná paleta = drdplus-skins/anime.css.
+ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKENY na compound scope — list `--gen-*` + embed `--dd-embed-*`
+   + lokální MLP pomocníci (ornamenty + kompozity je čtou).
+   ⚠️ VŠE SVĚTLÉ: karty bílé, text tmavý ink, duha = akcent.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] {
+  /* ── lokální MLP paleta / pomocníci (ornamenty + kompozity je čtou) ── */
+  --mlpg-ink: #16162e; /* signature obrys / tmavý text */
+  --mlpg-ink-soft: #4a4a72; /* měkčí ink (labely) */
+  --mlpg-ink-faint: #8a86a8; /* nejjemnější ink (noty) */
+  --mlpg-paper: #ffffff; /* bílá karta */
+  --mlpg-paper-2: #fdf7ff; /* krémově-levandulová (jemné plochy) */
+  --mlpg-cel: #d9d2e6; /* spodní cel-stupeň (karta „odlepená" od podkladu) */
+  --mlpg-pink: #ff5d6c; /* HP / záporný hod */
+  --mlpg-pink-2: #ff6ad5; /* magenta akcent */
+  --mlpg-green: #1faf5a; /* kladný hod */
+  --mlpg-sky: #66d9e8; /* studený akcent */
+  --mlpg-violet: #c58cff; /* fialový akcent */
+  --mlpg-gold: #ffb86c; /* zlatá / neutrál */
+
+  /* plná holografická duha (signature AKCENT — rámy / raily, ne pozadí) */
+  --mlpg-rainbow: linear-gradient(
+    100deg,
+    #ff5d6c 0%,
+    #ff6ad5 17%,
+    #ffb86c 34%,
+    #ffe14d 50%,
+    #8ce99a 64%,
+    #66d9e8 80%,
+    #c58cff 100%
+  );
+  --mlpg-rainbow-90: linear-gradient(
+    90deg,
+    #ff5d6c,
+    #ff6ad5,
+    #ffb86c,
+    #8ce99a,
+    #66d9e8,
+    #c58cff
+  );
+  /* holografický conic disk (star-burst medailon) */
+  --mlpg-conic: conic-gradient(
+    from 210deg,
+    #ff5d6c,
+    #ffb86c,
+    #ffe14d,
+    #8ce99a,
+    #66d9e8,
+    #c58cff,
+    #ff6ad5,
+    #ff5d6c
+  );
+  /* vrstvený cel-stín (signature TVRDÝ spodní stupeň — ink prstenec + krok) */
+  --mlpg-cel-card:
+    0 0 0 2.5px var(--mlpg-ink),
+    0 6px 0 0 var(--mlpg-cel),
+    0 7px 0 2.5px var(--mlpg-ink),
+    0 16px 24px -14px rgba(26, 20, 80, 0.38);
+  --mlpg-gloss: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0) 34%
+  );
+  --mlpg-celshade: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(22, 22, 46, 0.05) 60%,
+    rgba(22, 22, 46, 0.07) 100%
+  );
+
+  /* ── LIST tokeny (`--gen-*`) — tečou do `.diary-block` + section title ──
+     KARTY BÍLÉ, TEXT TMAVÝ INK, rám duhový, HP růžová. */
+  --gen-card-bg: linear-gradient(180deg, var(--mlpg-paper) 0%, var(--mlpg-paper-2) 100%);
+  --gen-card-border: transparent; /* rám kreslí duhový ::before níž (border token by přebil inline block.color) */
+  --gen-radius: 16px; /* větší, měkčí — cel-shade karta */
+  --gen-title: var(--mlpg-ink); /* nadpis sekce = tmavý ink (na světlém) */
+  --gen-label: var(--mlpg-ink-soft);
+  --gen-value: var(--mlpg-ink); /* hodnota = tmavý ink (čitelná na bílé) */
+  --gen-hp: linear-gradient(90deg, #ff8aaf, var(--mlpg-pink) 62%, #ff3d6c); /* HP = růžová */
+  --gen-font-head: 'Bricolage Grotesque', system-ui, sans-serif;
+  --gen-font-body: 'Outfit', system-ui, sans-serif;
+  --gen-bar-track: #efeaf6; /* světlá kolej */
+
+  /* ── EMBED tokeny (`--dd-embed-*`) — obal v TM / dice readout / dicelog ──
+     ⚠️ Plocha VŽDY OPAQUE a SVĚTLÁ (plný světlý gradient), text TMAVÝ ink →
+     čitelný na bílé, nic „neprosvítá" na mapu. */
+  --dd-embed-surface: linear-gradient(180deg, #ffffff, #fdf7ff);
+  --dd-embed-border: var(--mlpg-ink);
+  --dd-embed-line: rgba(22, 22, 46, 0.14);
+  --dd-embed-track: #efeaf6;
+  --dd-embed-text: #2b2a55; /* TMAVÝ ink na světlé ploše */
+  --dd-embed-muted: var(--mlpg-ink-soft);
+  --dd-embed-title: var(--mlpg-ink);
+  --dd-embed-chip-bg: #fdf7ff; /* světlá čipová plocha */
+  --dd-embed-accent: var(--mlpg-pink-2); /* duhová magenta */
+  --dd-embed-num-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-title-font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --dd-embed-pos: var(--mlpg-green); /* kladný hod = zelená */
+  --dd-embed-neg: var(--mlpg-pink); /* záporný hod = růžová */
+  --dd-embed-neutral: #d98b2e; /* neutrál = jantar (čitelný na bílé, ne světlá zlatá) */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) SIGNATURE ORNAMENT na `.diary-block` karty — bílá cel-karta s ink
+   obrysem + TVRDÝ spodní cel-stín + gloss highlight + DUHOVÝ HOLO RÁM
+   (::before) + star-burst medailon (::after). Vše na SVĚTLÉM podkladu.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block {
+  position: relative;
+  isolation: isolate;
+  /* bílá karta, měkký roh, ink obrys + tvrdý spodní cel-stín (signature) */
+  border: 0 !important; /* přebij shared border (inline block.color řešíme níž) */
+  box-shadow: var(--mlpg-cel-card);
+}
+
+/* DUHOVÝ HOLO RÁM + gloss + spodní cel-stupeň (signature vrstva, přes obsah) */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  /* jemný duhový rám = 2px linka po obvodu (mask „vyřízne" střed) */
+  padding: 2px;
+  background: var(--mlpg-rainbow);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.95;
+}
+
+/* gloss highlight nahoře + spodní stínový stupeň (cel-shading) + ✦ sparkles +
+   star-burst medailon v pravém horním rohu — jedna vrstva ::after. */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-repeat: no-repeat;
+  background-position:
+    0 0, /* gloss (celá karta) */
+    0 0, /* spodní cel-stupeň (celá karta) */
+    right 8px top 8px, /* star-burst medailon */
+    right 30px top 14px, /* ✦ sparkle velká */
+    right 20px top 30px; /* ✦ sparkle malá */
+  background-size:
+    100% 100%,
+    100% 100%,
+    26px 26px,
+    12px 12px,
+    8px 8px;
+  background-image:
+    var(--mlpg-gloss),
+    var(--mlpg-celshade),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff6ad5'/%3E%3Cstop offset='.5' stop-color='%23ffb86c'/%3E%3Cstop offset='1' stop-color='%2366d9e8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(13 13)'%3E%3Cpath d='M0 -12 L2.6 -2.6 L12 0 L2.6 2.6 L0 12 L-2.6 2.6 L-12 0 L-2.6 -2.6 Z' fill='url(%23g)' stroke='%2316162e' stroke-width='1.4' stroke-linejoin='round'/%3E%3Ccircle r='2.4' fill='%23ffffff' stroke='%2316162e' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffffff' stroke='%2316162e' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 22 22'%3E%3Cpath d='M11 0 C12 7 15 10 22 11 C15 12 12 15 11 22 C10 15 7 12 0 11 C7 10 10 7 11 0Z' fill='%23ffb86c' stroke='%2316162e' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+@media (max-width: 480px) {
+  /* na mobilu ubereme medailon + sparkles (šetříme šířku), rám + gloss zůstává */
+  [data-diary-system='generic'][data-diary-skin='anime'] .diary-block::after {
+    background-image: var(--mlpg-gloss), var(--mlpg-celshade);
+    background-size: 100% 100%, 100% 100%;
+    background-position: 0 0, 0 0;
+  }
+}
+
+/* obsahové uzly nad ornamentálními vrstvami (::before rám + ::after gloss) */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__label,
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__list,
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__bar-track,
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__image {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) LABEL — Bricolage head + ✦ marker (magenta s ink obrysem) + duhový rail.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--gen-font-head);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--mlpg-ink);
+}
+/* ✦ marker před labelem — magenta cel-hvězda s ink obrysem */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__label::before {
+  content: '\2726';
+  flex: none;
+  color: var(--mlpg-pink-2);
+  -webkit-text-stroke: 1.4px var(--mlpg-ink);
+  text-shadow: 0 1.4px 0 var(--mlpg-ink);
+  font-size: 14px;
+  line-height: 1;
+}
+/* duhový rail za labelem (echo titulkového railu rodiny) */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__label::after {
+  content: '';
+  flex: 1;
+  height: 5px;
+  min-width: 18px;
+  border-radius: 5px;
+  background: var(--mlpg-rainbow-90);
+  box-shadow: 0 0 0 2px var(--mlpg-ink);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) TYPOGRAFIE polí — číselné hodnoty do Bricolage display (tmavý ink).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__value {
+  font-family: var(--gen-font-body);
+  color: var(--mlpg-ink);
+}
+/* number / bar hodnota / formule → Bricolage display číslice, sytější ink */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block[data-block-type='number'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block[data-block-type='bar'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__formula {
+  font-family: var(--gen-font-head);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--mlpg-ink);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) HP / BAR LIŠTA — světlá kolej s ink obrysem + růžový cel fill + gloss.
+   (fill background dodává --gen-hp token; zde tvar / track / obrys / lesk.)
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__bar-track {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--gen-bar-track);
+  box-shadow: inset 0 0 0 2px var(--mlpg-ink), inset 0 -2px 0 rgba(22, 22, 46, 0.08);
+  overflow: hidden;
+}
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__bar-fill {
+  border-radius: 5px;
+  /* růžový cel fill (drží význam „HP") + horní gloss proužek */
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 46%),
+    var(--gen-hp);
+  box-shadow: inset 0 0 0 1px rgba(22, 22, 46, 0.28);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) SEZNAM (list bloky) — ✦ cel-hvězdičkové odrážky (magenta s ink obrysem).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__list {
+  list-style: none;
+  padding-left: 0.2rem;
+}
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__list li {
+  position: relative;
+  padding-left: 1.3rem;
+  color: var(--mlpg-ink);
+}
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__list li::before {
+  content: '\2726';
+  position: absolute;
+  left: 0;
+  top: 0.02em;
+  color: var(--mlpg-pink-2);
+  -webkit-text-stroke: 1.2px var(--mlpg-ink);
+  text-shadow: 0 1.2px 0 var(--mlpg-ink);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) RELATION odkaz — duhová magenta link (přebíjí inline var(--accent))
+   + ink podtržení. Čitelný ink na světlém.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__relation {
+  color: var(--mlpg-pink-2) !important;
+  font-weight: 700;
+  text-decoration-color: var(--mlpg-ink);
+  text-underline-offset: 2px;
+}
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__relation:hover {
+  color: var(--mlpg-pink) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) OBRÁZEK — duhový holo rám + ink obrys + měkký roh (cel-karta).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='anime'] .diary-block__image {
+  border-radius: 12px !important;
+  box-shadow:
+    0 0 0 2.5px var(--mlpg-ink),
+    0 0 0 6px #ffffff,
+    0 0 0 8px var(--mlpg-pink-2),
+    0 8px 16px -8px rgba(26, 20, 80, 0.4);
+}

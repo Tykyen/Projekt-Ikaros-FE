@@ -5,6 +5,8 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* 16.2g F6 — generic skin: text bere embed token (fallback = dnešní inherit). */
+  color: var(--dd-embed-text, inherit);
 }
 
 .section {
@@ -21,7 +23,8 @@
   opacity: 0.5;
   margin: 0;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+  border-bottom: 1px solid
+    var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.15));
 }
 
 .fieldsList {
@@ -36,7 +39,7 @@
   justify-content: space-between;
   gap: 8px;
   padding: 4px 6px;
-  background: rgb(var(--map-ui-panel-deep-rgb) / 0.3);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-panel-deep-rgb) / 0.3));
   border-radius: 4px;
 }
 
@@ -60,7 +63,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 4px 6px;
-  background: rgb(var(--map-ui-panel-deep-rgb) / 0.3);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-panel-deep-rgb) / 0.3));
   border-radius: 4px;
 }
 
@@ -74,10 +77,11 @@
 .barTrack {
   position: relative;
   height: 8px;
-  background: rgb(var(--map-ui-light-rgb) / 0.05);
+  background: var(--dd-embed-track, rgb(var(--map-ui-light-rgb) / 0.05));
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+  border: 1px solid
+    var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.15));
 }
 
 .barFill {

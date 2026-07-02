@@ -469,7 +469,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Taktická mapa (F3) — deník i bestie render **fallbackem** (`DiaryTab` / `BestiePanelView` z world/generic schématu); klikací combat hody = F4
   - [ ] Kostky / hod — vlastní mechanika (F4; teď 4dF/generic)
   - [x] Chat obal (F5) — deník i bestie render fallbackem; skin dotažení = F6
-  - [ ] Skiny (F6 → 16.2c)
+  - [x] **Skiny (16.2g F6, 2026-07-02)** — 8 skinů generic (blokové karty) napříč povrchy: `--gen-*` list + `--dd-embed-*` embed, `generic` v `:is()` seznamech, `styles/generic-skins/<id>.css` ×8 + signature readout/obal TM + chat obal `:has()`. Render-ověřeno 8/8 všech povrchů vč. obalení (past §9.18 chat opravena). MLP světlý+duhový. Živý vizuál po deployi.
 
 **Pozn. k stavu kódu (výchozí bod, ne TODO):** funkčně má list+testy **12/12**; v mapě je combat panel u **6** (`matrix`, `drd2`, `dnd5e`, `gurps`, `fate`, `coc`), jen `onRoll` fallback u **2** (`drd16`, `drdplus`), bez klikacích hodů **3** (`jad`, `pi`, `shadowrun`), drift blokuje **1** (`drdh`); chat **0/12** (vše 16.1). Grafický průchod se dělá u všech bez ohledu na tento stav.
 
@@ -490,7 +490,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 - **16.2b-2 Komunitní vrstva:** 4. `community` scope (autor edituje) + katalog + „pošli si k sobě" klon + povýšení do systémových. Sdílí grant/moderaci s **21.1/21.4**.
 - **16.2b-3 Reveal (volitelně, později):** PJ zpřístupní bestii/lore vybraným hráčům přes mapu nebo odkaz v chatu. ⚠️ Info-reveal, ne bestiář-data — blíž AKJ clearance; vyčlenit, ať nezatíží jádro.
 
-#### - [ ] 16.2c Skiny deníku — volitelný vizuální styl (sci-fi / fantasy / horor / …)
+#### - [x] 16.2c Skiny deníku — volitelný vizuální styl (sci-fi / fantasy / horor / …)
 **Cíl:** Hráč (později i PJ) si zvolí **vizuální styl deníku** — výrazný sci-fi HUD (16.2a) nesedne každému. Nabídnout sadu stylů jako přepnutelnou „kůži" nad stejným listem (obsah/mechanika beze změny).
 **Proč:** Tester (2026-06-23): HUD je „příliš zářící / sci-fi"; fantasáci chtějí klasiku (reference **Heroes of Might & Magic III**). Vzhled ≠ obsah; deník je tokenizovaný → styl je **levná vrstva s velkým dopadem na pocit „tohle je MŮJ svět"**.
 **8 stylů (1. vlna):**

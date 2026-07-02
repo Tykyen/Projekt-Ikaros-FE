@@ -151,6 +151,20 @@
 @import './fate-skins/anime.css';
 @import './fate-skins/retro.css';
 
+/* Generic („Vlastní systém") skiny — list = BLOKOVÉ KARTY (`.diary-block`),
+   NE systémová anatomie. Default = minimal (DEFAULT_SKIN_BY_SYSTEM). Skiny
+   scoped `[data-diary-system='generic'][data-diary-skin='X']`. Import zde (ne v
+   generic.css), aby se `--dd-embed-*` načetly i v embedech (chat/mapa/dice).
+   @import nahoře (CSS spec) — viz drdplus poznámka výš. */
+@import './generic-skins/scifi.css';
+@import './generic-skins/fantasy.css';
+@import './generic-skins/horror.css';
+@import './generic-skins/steampunk.css';
+@import './generic-skins/nature.css';
+@import './generic-skins/minimal.css';
+@import './generic-skins/retro.css';
+@import './generic-skins/anime.css';
+
 /* ════════════ 16.2c-F3 — drd16 EMBED tokeny (dice log „HODY" / token panel obal /
    dice readout / orchestrace) ════════════
  * ŽIJÍ ZDE, ne v `drd16.css` — ten je lazy (jen deníková stránka), kdežto embedy
@@ -175,6 +189,39 @@
   --dd-embed-pos: var(--dd-crimson-hi, #cb4138);
   --dd-embed-neg: #9c6b6b;
   --dd-embed-neutral: var(--dd-gold, #c19a3f);
+}
+
+/* ════════════ 16.2g-F1 — „Vlastní systém" (generic) BASELINE token sada ════════════
+ * ŽIJE ZDE (ne v lazy systémovém CSS), aby platila i v embedech (mapa/chat/dice),
+ * kde se deníkové CSS nenačte — jinak by `--dd-embed-*` byly nedefinované a plocha
+ * „skrz" (transparent). Neutrální TMAVÁ paleta (NE pergamen), aby generic seděl do
+ * tmavého mapového chromu i tmavého chatu bez ohledu na motiv. `--gen-*` = deníkový
+ * LIST (fallback = app tokeny → default list beze změny). Skiny (F2) přebijí na
+ * `[data-diary-system='generic'][data-diary-skin='X']`. Plocha opaque. */
+[data-diary-system='generic'] {
+  /* list (fallback = app tokeny → default list beze změny) */
+  --gen-card-bg: var(--surface-2);
+  --gen-card-border: var(--frame-border);
+  --gen-radius: var(--radius-md);
+  --gen-title: var(--text-primary);
+  --gen-label: var(--text-secondary);
+  --gen-value: var(--text-primary);
+  --gen-hp: var(--accent);
+  /* embed (neutrální tmavá baseline) */
+  --dd-embed-surface: linear-gradient(180deg, #1b1e27, #141620);
+  --dd-embed-border: #3a4059;
+  --dd-embed-line: rgb(255 255 255 / 0.1);
+  --dd-embed-track: rgb(255 255 255 / 0.06);
+  --dd-embed-text: #e2e6f2;
+  --dd-embed-muted: #9aa1b8;
+  --dd-embed-title: #f0f2fa;
+  --dd-embed-chip-bg: rgb(255 255 255 / 0.05);
+  --dd-embed-accent: #8892ff;
+  --dd-embed-num-font: ui-monospace, 'JetBrains Mono', monospace;
+  --dd-embed-title-font: inherit;
+  --dd-embed-pos: #6ee7a8;
+  --dd-embed-neg: #f0788c;
+  --dd-embed-neutral: #e6c46b;
 }
 
 /* ════════════ 16.2d-skiny — drdplus DEFAULT token sada (pergamen „iluminovaný

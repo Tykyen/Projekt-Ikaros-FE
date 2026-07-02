@@ -1,0 +1,322 @@
+/* Generic (Vlastní systém) skin „STEAMPUNK" = Mosazný mechanický deník.
+ *
+ * PRVNÍ produkční skin generického deníku (blokové karty). Generic list není
+ * strukturovaný kodex jako drdplus — je to mřížka volných „blokových karet"
+ * (`.diary-block`) s labelem, hodnotou a případně barem/listem/obrázkem/relací.
+ * Identitu steampunk (z `drdplus-skins/steampunk.css`) proto ADAPTUJI z desek
+ * kodexu na samostatné mosazné plechové cedulky: každá karta = broušený mosazný
+ * plát se zkosenými (notched) rohy, rohovými nýty a mini manometrem ozubeného
+ * kola (cog-gauge) v rohu labelu. Nadpis sekce = rytá cedulka.
+ *
+ * SCOPE: KAŽDÉ pravidlo scoped na compound
+ *   `[data-diary-system='generic'][data-diary-skin='steampunk']`
+ * (vyšší specificita než generic baseline `[data-diary-system='generic']`
+ * v diary-skins.css → skin přebíjí neutrální tmavou baseline). Token override
+ * reskinuje LIST (`--gen-*`) i embedy (`--dd-embed-*`, konzumované na mapě/chatu/
+ * dice, kde list CSS neběží → proto na compound scope, ne pod .diary-block).
+ *
+ * IDENTITA: mosaz / měď / bronz; ŽIVOT (HP bar) = výbojová červeň, MAGIE /
+ * kladná hodnota = patina / verdigris (zelená), záporná = výbojová červeň.
+ * SIGNATURE (vlastní tvar, nesdílený): rohové nýty (radial-gradient nýty),
+ * zkosené plechy (clip-path notch), cog-gauge akcent u labelu, nýtová kolejnice
+ * u nadpisu sekce. Fonty: IM Fell English SC (head) · IBM Plex Mono (čísla mono)
+ * · Cinzel (akcent). Pure CSS/SVG, žádný JS. Hodnoty inline (žádné --corner-*).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=IM+Fell+English+SC&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKENY na compound scope — LIST (--gen-*) + EMBED (--dd-embed-*, OPAQUE).
+   Compound (ne pod .diary-block), aby --dd-embed-* platily i v embedech
+   (mapa/chat/dice), kde deníkové CSS neběží. Mapování surovin:
+     mosaz/měď/bronz → akcenty a rámy · kůže → tmavý embed korpus
+     výbojová červeň → ŽIVOTY (HP) · patina/verdigris → magie / +hodnota
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='steampunk'] {
+  /* ── lokální surovinová paleta ── */
+  --st-leather-0: #160f08;
+  --st-leather-1: #241a10;
+  --st-leather-2: #2f2114;
+  --st-leather-edge: #3c2a18;
+  --st-brass-0: #e7cd8f;
+  --st-brass-1: #caa45f;
+  --st-brass-2: #a07c3e;
+  --st-brass-deep: #6e5224;
+  --st-brass-shadow: #473311;
+  --st-copper: #b06a3a;
+  --st-copper-hi: #d68a52;
+  --st-plate-0: #d8be84;
+  --st-plate-1: #c8ac6e;
+  --st-plate-2: #b4965a;
+  --st-plate-edge: #8a6e38;
+  --st-dial: #efe2c2;
+  --st-dial-shadow: #bda874;
+  --st-ink: #2b1f10;
+  --st-ink-soft: #5a4426;
+  --st-verdigris: #3f7d72;
+  --st-verdigris-hi: #5fa99b;
+  --st-verdigris-deep: #1f4a43;
+  --st-crimson: #b4452a;
+  --st-crimson-hi: #d76a42;
+  --st-crimson-deep: #5e2113;
+  /* nýt (rohový) = radiální mosazný knoflík */
+  --st-rivet: radial-gradient(circle at 38% 34%, #f3e2a8 0%, #caa45f 40%, #7c5c2a 76%, #3e2c12 100%);
+
+  /* ── LIST tokeny (blokové karty konzumují v DiaryTab.module.css) ── */
+  --gen-card-bg:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 5px),
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 248, 222, 0.22), transparent 50%),
+    linear-gradient(180deg, var(--st-plate-0), var(--st-plate-1) 55%, var(--st-plate-2));
+  --gen-card-border: var(--st-plate-edge);
+  --gen-radius: 2px;
+  --gen-title: var(--st-brass-0);
+  --gen-label: var(--st-ink-soft);
+  --gen-value: var(--st-ink);
+  --gen-hp: linear-gradient(90deg, var(--st-crimson-deep), var(--st-crimson-hi));
+  --gen-font-head: 'IM Fell English SC', 'Cinzel', serif;
+  --gen-font-body: 'IBM Plex Mono', ui-monospace, monospace;
+  --gen-bar-track:
+    repeating-linear-gradient(90deg, rgba(43, 31, 16, 0.45) 0 1px, transparent 1px 9px),
+    linear-gradient(180deg, rgba(20, 14, 8, 0.85), rgba(40, 28, 16, 0.6));
+
+  /* ── EMBED plochy (obal v TM / dice readout / dicelog) — NEPRŮHLEDNÉ ── */
+  --dd-embed-surface: linear-gradient(180deg, var(--st-leather-2), var(--st-leather-0));
+  --dd-embed-border: var(--st-brass-deep);
+  --dd-embed-line: color-mix(in srgb, var(--st-brass-1) 30%, transparent);
+  --dd-embed-track: rgba(20, 14, 8, 0.6);
+  --dd-embed-text: #ead8b0;
+  --dd-embed-muted: #b39a6a;
+  --dd-embed-title: var(--st-brass-0);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--st-brass-1) 16%, transparent);
+  --dd-embed-accent: var(--st-copper-hi);
+  --dd-embed-num-font: 'IBM Plex Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: var(--st-verdigris-hi); /* kladný hod = patina / verdigris (sémantika) */
+  --dd-embed-neg: var(--st-crimson-hi); /* záporný hod = výbojová červeň (sémantika) */
+  --dd-embed-neutral: var(--st-brass-0); /* neutrál = mosaz */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) NADPIS SEKCE — rytá mosazná cedulka s nýtovou kolejnicí (signature)
+   Tokeny (--gen-title/--gen-font-head) už kreslí barvu+font; tady přidáváme
+   ornament. `.sectionTitle` je hashovaná module třída → cílíme přes tag h3
+   uvnitř scoped listu (DiaryTab renderuje nadpis jako <h3 class=sectionTitle>).
+   Bez znalosti hashe cílíme obecně na nadpisy sekcí generic listu.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='steampunk'] h3[class*='sectionTitle'] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 12px 5px;
+  font-family: 'IM Fell English SC', 'Cinzel', serif;
+  color: var(--st-brass-0);
+  text-shadow: 0 1px 0 #000, 0 2px 6px rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid var(--st-brass-deep);
+}
+/* SIGNATURE: mini ozubené kolo (cog) místo odrážky před nadpisem */
+[data-diary-system='generic'][data-diary-skin='steampunk'] h3[class*='sectionTitle']::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, var(--st-plate-1) 0 26%, transparent 27%),
+    conic-gradient(from 0deg, var(--st-brass-1) 0 18deg, var(--st-brass-deep) 18deg 30deg);
+  box-shadow: 0 0 0 1px var(--st-brass-shadow), 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+/* SIGNATURE: nýtová kolejnice pod nadpisem (řádek mosazných nýtů) */
+[data-diary-system='generic'][data-diary-skin='steampunk'] h3[class*='sectionTitle']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 4px;
+  pointer-events: none;
+  opacity: 0.6;
+  background: radial-gradient(circle, var(--st-brass-1) 1px, transparent 1.6px) 0 50% / 12px 4px repeat-x;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) BLOKOVÁ KARTA `.diary-block` — broušený mosazný plát: zkosené rohy,
+   rohové nýty, cog-gauge u labelu. Layout (flex, gap, padding) drží module
+   CSS; tady přidáváme ornament + texturu + tvar.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block {
+  position: relative;
+  /* notch na VŠECH rozích = zkosený plech (překrývá --gen-radius, ten drží
+     jen pro prohlížeče bez clip-path) */
+  clip-path: polygon(
+    9px 0,
+    calc(100% - 9px) 0,
+    100% 9px,
+    100% calc(100% - 9px),
+    calc(100% - 9px) 100%,
+    9px 100%,
+    0 calc(100% - 9px),
+    0 9px
+  );
+  box-shadow:
+    0 8px 18px -10px #000,
+    inset 0 1px 0 rgba(255, 248, 222, 0.55),
+    inset 0 -4px 10px rgba(70, 40, 12, 0.28);
+}
+/* SIGNATURE: 4 rohové nýty na plátu (radiální mosazné knoflíky) */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--st-rivet), var(--st-rivet), var(--st-rivet), var(--st-rivet);
+  background-repeat: no-repeat;
+  background-size: 7px 7px;
+  background-position:
+    2px 2px,
+    calc(100% - 2px) 2px,
+    2px calc(100% - 2px),
+    calc(100% - 2px) calc(100% - 2px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+/* obsah karty nad nýty */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── LABEL: rytá cedulka s mini cog-gauge (signature akcent) ── */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--st-ink-soft);
+  text-shadow: 0 1px 0 rgba(255, 248, 222, 0.5);
+}
+/* SIGNATURE: manometr ozubeného kola (cog-gauge) před labelem — ozubený
+   prstenec + ciferníkové sklo + rudá ručička tlaku */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__label::before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 0deg, var(--st-brass-deep) 0 7deg, transparent 7deg 18deg),
+    radial-gradient(circle, transparent 0 58%, var(--st-brass-1) 59% 72%, transparent 73%),
+    radial-gradient(circle at 42% 36%, var(--st-dial), var(--st-dial-shadow) 82%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 248, 222, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--st-brass-shadow);
+}
+/* rudá ručička tlakoměru přes sklo cog-gauge */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__label::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  width: 1.5px;
+  height: 6px;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--st-crimson-hi), var(--st-crimson-deep));
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) rotate(42deg);
+  border-radius: 1px 1px 0 0;
+}
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__label {
+  position: relative;
+}
+
+/* ── HODNOTA: přístrojový display (mono, sépiový inkoust) ── */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__value {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--st-ink);
+}
+
+/* ── SEZNAM: mosazné odrážky, mono číslice ── */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__list {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-ink);
+}
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__list li::marker {
+  color: var(--st-copper);
+}
+
+/* ── BAR: tlakoměrná trubice — track = tmavé sklo s ryskami, fill = kotel ──
+   fill barvu kreslí --gen-hp (výbojová červeň = ŽIVOTY, sémantika). Overlay
+   dává skleněný lesk + segmentaci tlakoměru. */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__bar-track {
+  border: 1px solid var(--st-brass-deep);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__bar-fill {
+  background: var(--gen-hp);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(94, 33, 19, 0.5);
+  /* segmentace tlakoměru přes maskovaný pruh mřížky */
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 8px),
+    var(--gen-hp);
+}
+
+/* ── RELACE (link-out): měděný odkaz s rytým podtržením ── */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__relation {
+  color: var(--st-copper-hi);
+  text-decoration-color: var(--st-brass-deep);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* ── FORMULE: vyleptaná mosazná destička výsledku (accent verdigris) ── */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__formula {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--st-verdigris-deep);
+  background: color-mix(in srgb, var(--st-verdigris) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-verdigris) 45%, transparent);
+  border-radius: 2px;
+  padding: 1px 8px;
+  align-self: flex-start;
+  text-shadow: 0 1px 0 rgba(255, 248, 222, 0.4);
+}
+
+/* ── OBRÁZEK: mosazný rámeček se zkosenými rohy + nýtová linka ── */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block__image {
+  border: 2px solid var(--st-brass-deep);
+  outline: 1px solid var(--st-brass-shadow);
+  border-radius: 3px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 248, 222, 0.25),
+    0 4px 12px -4px #000;
+  filter: sepia(0.12) saturate(0.95);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) BLOK dle TYPU — jemné akcenty (levý plech přebarvený dle sémantiky).
+   `data-block-type` na kartě. Sémantika: bar = ŽIVOT (červeň), formula/number
+   = přístroj (mosaz), relation = měď.
+   ════════════════════════════════════════════════════════════════════════ */
+/* bar blok = tlaková nádoba: levá hrana výbojová červeň (ŽIVOT) */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block[data-block-type='bar'] {
+  border-left: 3px solid var(--st-crimson);
+}
+/* formula blok = kondenzátor: levá hrana patina (verdigris) */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block[data-block-type='formula'] {
+  border-left: 3px solid var(--st-verdigris);
+}
+/* relation blok = potrubní spoj: levá hrana měď */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block[data-block-type='relation'] {
+  border-left: 3px solid var(--st-copper);
+}
+/* stat/number blok = ciferník: levá hrana mosaz */
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block[data-block-type='stat'],
+[data-diary-system='generic'][data-diary-skin='steampunk'] .diary-block[data-block-type='number'] {
+  border-left: 3px solid var(--st-brass-1);
+}

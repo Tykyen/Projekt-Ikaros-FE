@@ -78,7 +78,11 @@ export function DiaryTab({
   // systémy s dedikovaným skinovatelným listem (dnes matrix); ostatní systémy
   // skin zatím vizuálně nemění (F3), tak nemateme volbou bez efektu.
   const { skin, setSkin, isPending: skinPending } = useDiarySkin(worldId);
-  const skinnable = Boolean(getDiaryPreset(world?.system).SystemSheet);
+  // 16.2g F6 — „Vlastní Systém" (generic) má vlastní 8 skinů → selektor i bez
+  // dedikovaného sheetu (generic blokový list + embedy reagují na skin).
+  const diaryPreset = getDiaryPreset(world?.system);
+  const skinnable =
+    Boolean(diaryPreset.SystemSheet) || diaryPreset.id === 'generic';
 
   if (isLoading) return <Spinner center />;
   if (isError || !diary) {

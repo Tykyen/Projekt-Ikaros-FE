@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+/**
+ * Generic („Vlastní systém") — skin „Sci-fi" 🛸: HOLOGRAFICKÝ VELITELSKÝ HUD / DATAPAD.
+ *
+ * Generic list = BLOKOVÉ KARTY (`.diary-block`), NE listový arch. Rodinná identita
+ * scifi (napříč systémy) přeložena na kartový jazyk: void modročerná plocha, holo
+ * cyan #38e0ff akcent + violet, chamfer (zkosené) hrany + rohové tech-brackets ⌐¬
+ * + jemný scanline. Fonty Orbitron (head) · Chakra Petch (body) · Share Tech Mono (čísla).
+ *
+ * Scoped na `[data-diary-system='generic'][data-diary-skin='scifi']` (compound
+ * 0,2,0 → přebije neutrální default `[data-diary-system='generic']`). KAŽDÉ pravidlo
+ * nese ten prefix. Pure CSS/SVG, žádný JS. Regrese-safe — jen overrides pod scopem.
+ *
+ * Tokeny tečou do listu (`--gen-*`) I do embedů mapa/chat/dice (`--dd-embed-*`).
+ * Embed plocha VŽDY OPAQUE (plný gradient), jinak log „prosvítá" na mapu.
+ * Sémantika: HP = red-ish laděná (crimson→rose s neon nádechem), +hod = zeleno-cyan
+ * (jade), −hod = red (rose). Rodinná paleta = drdplus-skins/scifi.css.
+ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKENY na compound scope — list `--gen-*` + embed `--dd-embed-*`
+   + lokální sci-fi pomocníci (ornamenty je čtou).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='scifi'] {
+  /* ── lokální sci-fi paleta / pomocníci (ornamenty + kompozity je čtou) ── */
+  --sfg-void: #0a1122;
+  --sfg-void-2: #070d1c;
+  --sfg-cyan: #38e0ff;
+  --sfg-cyan-hi: #8af3ff;
+  --sfg-cyan-dim: #1a6e86;
+  --sfg-violet: #9b6bff;
+  --sfg-violet-deep: #5b32c4;
+  --sfg-ink: #d9e8ff;
+  --sfg-ink-soft: #9fb4dd;
+  --sfg-hp: #ff5a6e; /* HP = red-ish laděná do neonu (drží význam „životy/nebezpečí") */
+  --sfg-line: rgba(94, 160, 210, 0.16);
+  --sfg-line-hot: rgba(56, 224, 255, 0.42);
+  --sfg-grid: rgba(78, 150, 200, 0.07);
+  --sfg-num: 'Share Tech Mono', ui-monospace, monospace;
+  --sfg-font-head: 'Orbitron', 'Chakra Petch', sans-serif;
+  --sfg-font-body: 'Chakra Petch', system-ui, sans-serif;
+  /* chamfer klín — signature tvar (useknuté protilehlé rohy TL + BR) */
+  --sfg-chamf: 12px;
+  --sfg-clip: polygon(
+    var(--sfg-chamf) 0,
+    100% 0,
+    100% calc(100% - var(--sfg-chamf)),
+    calc(100% - var(--sfg-chamf)) 100%,
+    0 100%,
+    0 var(--sfg-chamf)
+  );
+
+  /* ── LIST tokeny (`--gen-*`) — tečou do `.diary-block` + section title ── */
+  --gen-card-bg:
+    linear-gradient(180deg, rgba(18, 34, 70, 0.34), rgba(7, 13, 32, 0.55)),
+    var(--sfg-void);
+  --gen-card-border: var(--sfg-line-hot);
+  --gen-radius: 0px; /* chamfer nese clip-path, ne radius */
+  --gen-title: var(--sfg-cyan);
+  --gen-label: var(--sfg-ink-soft);
+  --gen-value: var(--sfg-ink);
+  --gen-hp: linear-gradient(90deg, #7c1d33, var(--sfg-hp) 60%, #ff9db0);
+  --gen-font-head: var(--sfg-font-head);
+  --gen-font-body: var(--sfg-font-body);
+  --gen-bar-track: rgba(4, 10, 26, 0.72);
+
+  /* ── EMBED tokeny (`--dd-embed-*`) — obal v TM / dice readout / dicelog ──
+     Plocha VŽDY NEPRŮHLEDNÁ (plný gradient void), jinak log prosvítá na mapu. */
+  --dd-embed-surface: linear-gradient(180deg, #0a1228, #05091a);
+  --dd-embed-border: var(--sfg-line-hot);
+  --dd-embed-line: var(--sfg-line);
+  --dd-embed-track: rgba(4, 10, 26, 0.72);
+  --dd-embed-text: var(--sfg-ink);
+  --dd-embed-muted: var(--sfg-ink-soft);
+  --dd-embed-title: var(--sfg-cyan);
+  --dd-embed-chip-bg: rgba(56, 224, 255, 0.1);
+  --dd-embed-accent: var(--sfg-cyan);
+  --dd-embed-num-font: 'Share Tech Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Orbitron', 'Chakra Petch', sans-serif;
+  --dd-embed-pos: #3df0a8; /* kladný hod = jade (zeleno-cyan) */
+  --dd-embed-neg: #ff5a6e; /* záporný hod = rose (red) */
+  --dd-embed-neutral: var(--sfg-cyan-hi); /* neutrál = cyan-hi */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) SEKČNÍ NADPIS (.sectionTitle je hashovaná → cílíme přes tokeny výše,
+   ale glow/tracking dodáme přes atribut-nesoucí kontejner není možné →
+   řešíme tokenem --gen-title + font. Doplníme tvar u karet níž.)
+   Pozn.: nadpis nemá stabilní třídu, ovládáme ho tokenem --gen-title /
+   --gen-font-head (nastaveno výše). Žádné pravidlo zde není potřeba.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE ORNAMENT na `.diary-block` karty — chamfer klín (clip-path)
+   + rohové tech-brackets ⌐¬ (TL cyan, BR violet) + jemný scanline overlay.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block {
+  position: relative;
+  /* chamfer klín — signature TVAR (useknuté protilehlé rohy) */
+  clip-path: var(--sfg-clip);
+  /* void plocha + jemná HUD mřížka + statický scanline vrstvený PŘES --gen-card-bg
+     (necháme card-bg token jako spodní plochu, mřížku dáme sem jako background).
+     Signature scanline nese ::after (animovaný proužek). */
+  background:
+    linear-gradient(var(--sfg-grid) 1px, transparent 1px) 0 0 / 34px 34px,
+    linear-gradient(90deg, var(--sfg-grid) 1px, transparent 1px) 0 0 / 34px 34px,
+    var(--gen-card-bg);
+  /* tenký cyan rám + neon inset (border token nese barvu, glow přidáme sem) */
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 255, 0.08),
+    inset 0 0 34px -22px rgba(56, 224, 255, 0.4);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* TL tech-bracket ⌐ (cyan) — kotvený k rohu karty */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid var(--sfg-cyan);
+  border-left: 2px solid var(--sfg-cyan);
+  box-shadow: -1px -1px 8px -1px var(--sfg-cyan);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* signature animovaný scanline overlay (driftující datový proužek přes celou kartu).
+   TL bracket = ::before, BR bracket = .diary-block__label::before níž. */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(120, 200, 255, 0.05) 0 1px, transparent 1px 3px);
+  -webkit-mask-image: radial-gradient(150% 100% at 50% 0%, #000 24%, transparent 94%);
+  mask-image: radial-gradient(150% 100% at 50% 0%, #000 24%, transparent 94%);
+  animation: sfg-scan 9s linear infinite;
+}
+@keyframes sfg-scan {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 240px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-diary-system='generic'][data-diary-skin='scifi'] .diary-block::after {
+    animation: none;
+  }
+}
+
+/* BR tech-bracket ¬ (violet) — nesen labelem::before kotveným k pravému-dolnímu
+   rohu karty (label je první obsahový uzel; kotvíme absolutně vůči kartě). */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__label {
+  position: static;
+  z-index: 2;
+  text-shadow: 0 0 12px rgba(56, 224, 255, 0.28);
+}
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__label::before {
+  content: '';
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 14px;
+  height: 14px;
+  border-right: 2px solid var(--sfg-violet);
+  border-bottom: 2px solid var(--sfg-violet);
+  box-shadow: 1px 1px 8px -1px var(--sfg-violet);
+  pointer-events: none;
+  z-index: 3;
+}
+/* diamant marker před labelem — HUD datový bod (cyan) */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__label::after {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 7px;
+  vertical-align: middle;
+  background: var(--sfg-cyan);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  box-shadow: 0 0 8px var(--sfg-cyan);
+}
+
+/* obsahové uzly nad scanline vrstvou */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__list,
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__bar-track,
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__image {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) TYPOGRAFIE polí — číselné hodnoty do mono display, holo glow akcenty.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__value {
+  text-shadow: 0 0 14px rgba(56, 224, 255, 0.14);
+}
+/* number / bar hodnota / formule → mono display (Share Tech Mono) + cyan glow */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block[data-block-type='number'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block[data-block-type='bar'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__formula {
+  font-family: var(--sfg-num);
+  color: var(--sfg-cyan-hi);
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 16px rgba(56, 224, 255, 0.45);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) HP LIŠTA — void track s chamfer hrotem + red-ish neon fill + glow.
+   (fill background dodává --gen-hp token; zde tvar/track/glow + scanline.)
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__bar-track {
+  height: 9px;
+  border-radius: 0;
+  border: 1px solid var(--sfg-line);
+  border-left: 2px solid var(--sfg-cyan-dim);
+  background: var(--sfg-void-2);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__bar-fill {
+  border-radius: 0;
+  /* segmentový telemetrický proužek přes red-ish fill (drží význam „životy") */
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0 2px, transparent 2px 7px),
+    var(--gen-hp);
+  box-shadow: 0 0 12px -2px var(--sfg-hp);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) SEZNAM (list bloky) — holo odrážky (diamant cyan místo disku).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__list {
+  list-style: none;
+  padding-left: 0.2rem;
+}
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__list li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  background: var(--sfg-cyan);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  box-shadow: 0 0 7px -1px var(--sfg-cyan);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) RELATION odkaz — holo link cyan (přebíjí inline var(--accent)) + brackety.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__relation {
+  color: var(--sfg-cyan) !important;
+  text-decoration-color: var(--sfg-line-hot);
+  text-shadow: 0 0 12px rgba(56, 224, 255, 0.35);
+}
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__relation:hover {
+  color: var(--sfg-cyan-hi) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) OBRÁZEK — chamfer rám + cyan holo obrys.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='scifi'] .diary-block__image {
+  border-radius: 0 !important;
+  border: 1px solid var(--sfg-line-hot);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow: 0 0 22px -10px rgba(56, 224, 255, 0.5);
+}

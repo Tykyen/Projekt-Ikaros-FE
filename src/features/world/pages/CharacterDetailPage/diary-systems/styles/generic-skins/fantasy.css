@@ -1,0 +1,298 @@
+/* Generic („Vlastní systém") skin „FANTASY" — Iluminovaný grimoár (kovaná kožená vazba).
+ *
+ * VLASTNÍ SYSTÉM (generic) list = BLOKOVÉ KARTY (`.diary-block`), ne strukturovaný
+ * list jako drdplus. Tento skin adaptuje grimoárovou paletu/font/signature z
+ * `drdplus-skins/fantasy.css` NA blokové karty: každá karta = list pergamenu vsazený
+ * do tmavé kožené vazby pod antickým zlatem, s FILIGRÁNOVÝM ZLATÝM ROHOVÝM KOVÁNÍM,
+ * pečetním medailonem u labelu, iluminovanou iniciálou hodnoty a drahokamovými pipy.
+ *
+ * SCOPE: KAŽDÉ pravidlo na `[data-diary-system='generic'][data-diary-skin='fantasy']`
+ * (compound prefix POVINNÝ) → vyšší specificita než baseline `[data-diary-system='generic']`
+ * (diary-skins.css) i shared module `.block`, proto přebíjí. Pouze CSS/SVG, ŽÁDNÝ JS.
+ *
+ * SIGNATURE (vlastní tvarový jazyk, nesdílený): filigránové zlaté rohové kování s
+ * úponkovým listem (odlišný ornament než drdplus „spirála"), pečetní kruhový medailon
+ * u labelu, iluminovaná iniciála (::first-letter) hodnoty, drahokamové pipy v seznamu.
+ *
+ * IMPORT: registruj přes `@import './generic-skins/fantasy.css';` v `diary-skins.css`
+ * (globální bundle; loaduje se na listu i embedech). Default generic skin je 'minimal'
+ * (registry) → fantasy se aktivuje výběrem ve „🎨 Vzhled".
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+/* ════════════════════════════════════════════════════════════════════════
+   0) TOKENY + lokální paleta na compound scope.
+   `--gen-*` tečou do LISTU (blokové karty čtou přes var v DiaryTab.module.css),
+   `--dd-embed-*` do EMBEDŮ (obal v TM / dice readout / dicelog / orchestrace).
+   Lokální `--fa-*` = surovina grimoáru; čtou je ornamenty níž.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='fantasy'] {
+  /* ── lokální paleta grimoáru (kožená vazba + antické zlato + krémový ink) ── */
+  --fa-bind-1: #1a1107; /* nejhlubší kůže */
+  --fa-bind-2: #271d12; /* kovárna */
+  --fa-bind-3: #3d2e18; /* líc kůže */
+  --fa-vellum-0: #ecdab0; /* krém 0 (nejsvětlejší) */
+  --fa-vellum-1: #e2cb9b; /* krém 1 */
+  --fa-vellum-2: #d4b67e; /* krém 2 */
+  --fa-vellum-edge: #b6975f; /* okraj pergamenu */
+  --fa-gold: #e3b94a; /* antické zlato */
+  --fa-gold-hi: #f7e7a8; /* zlatý highlight / nýt */
+  --fa-gold-mid: #c9a227;
+  --fa-gold-deep: #9c7a24;
+  --fa-gold-shadow: #6e5326;
+  --fa-ink: #38260f; /* krémový ink (tmavý na pergamenu) */
+  --fa-ink-soft: #6c5128;
+  --fa-ink-faint: #927542;
+
+  /* ── FILIGRÁNOVÉ ZLATÉ ROHOVÉ KOVÁNÍ — vlastní tvar: úponek + trojlist + nýt.
+     Odlišné od drdplus „spirály": rovné okování + rozvětvený úponek se třemi lístky
+     (heraldický fleuron). 4 varianty = zrcadlení jednoho glyfu do rohů. ── */
+  --fa-corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23e3b94a' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 39 L4 12 C4 7 7 4 12 4 L39 4' stroke-width='1.6'/%3E%3Cpath d='M8 37 L8 14 C8 10 10 8 14 8 L37 8' stroke-width='0.7' opacity='0.55'/%3E%3Cpath d='M4 24 C11 24 15 20 15 13' stroke-width='1.1'/%3E%3Cpath d='M15 13 C15 9 12 8 11 11 C10 14 14 15 15 13' stroke-width='1'/%3E%3Cpath d='M8 20 C8 16 5 15 5 18' stroke-width='0.9'/%3E%3Cpath d='M20 5 C20 12 24 15 30 15' stroke-width='1.1' opacity='0.7'/%3E%3Ccircle cx='7' cy='7' r='2.4' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='7' cy='7' r='3.9' stroke-width='0.9'/%3E%3C/svg%3E");
+  --fa-corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23e3b94a' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(40 0) scale(-1 1)'%3E%3Cpath d='M4 39 L4 12 C4 7 7 4 12 4 L39 4' stroke-width='1.6'/%3E%3Cpath d='M8 37 L8 14 C8 10 10 8 14 8 L37 8' stroke-width='0.7' opacity='0.55'/%3E%3Cpath d='M4 24 C11 24 15 20 15 13' stroke-width='1.1'/%3E%3Cpath d='M15 13 C15 9 12 8 11 11 C10 14 14 15 15 13' stroke-width='1'/%3E%3Cpath d='M8 20 C8 16 5 15 5 18' stroke-width='0.9'/%3E%3Cpath d='M20 5 C20 12 24 15 30 15' stroke-width='1.1' opacity='0.7'/%3E%3Ccircle cx='7' cy='7' r='2.4' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='7' cy='7' r='3.9' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E");
+  --fa-corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23e3b94a' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 40) scale(1 -1)'%3E%3Cpath d='M4 39 L4 12 C4 7 7 4 12 4 L39 4' stroke-width='1.6'/%3E%3Cpath d='M8 37 L8 14 C8 10 10 8 14 8 L37 8' stroke-width='0.7' opacity='0.55'/%3E%3Cpath d='M4 24 C11 24 15 20 15 13' stroke-width='1.1'/%3E%3Cpath d='M15 13 C15 9 12 8 11 11 C10 14 14 15 15 13' stroke-width='1'/%3E%3Cpath d='M8 20 C8 16 5 15 5 18' stroke-width='0.9'/%3E%3Cpath d='M20 5 C20 12 24 15 30 15' stroke-width='1.1' opacity='0.7'/%3E%3Ccircle cx='7' cy='7' r='2.4' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='7' cy='7' r='3.9' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E");
+  --fa-corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none' stroke='%23e3b94a' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(40 40) scale(-1 -1)'%3E%3Cpath d='M4 39 L4 12 C4 7 7 4 12 4 L39 4' stroke-width='1.6'/%3E%3Cpath d='M8 37 L8 14 C8 10 10 8 14 8 L37 8' stroke-width='0.7' opacity='0.55'/%3E%3Cpath d='M4 24 C11 24 15 20 15 13' stroke-width='1.1'/%3E%3Cpath d='M15 13 C15 9 12 8 11 11 C10 14 14 15 15 13' stroke-width='1'/%3E%3Cpath d='M8 20 C8 16 5 15 5 18' stroke-width='0.9'/%3E%3Cpath d='M20 5 C20 12 24 15 30 15' stroke-width='1.1' opacity='0.7'/%3E%3Ccircle cx='7' cy='7' r='2.4' fill='%23f7e7a8' stroke='none'/%3E%3Ccircle cx='7' cy='7' r='3.9' stroke-width='0.9'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* ── pergamenová textura (jemný multiply šum) sdílená kartami ── */
+  --fa-vellum-tex:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+
+  /* ════════ LIST — blokové karty (`--gen-*`, čte DiaryTab.module.css) ════════ */
+  --gen-card-bg:
+    radial-gradient(120% 90% at 16% 6%, rgba(255, 248, 226, 0.5), transparent 52%),
+    radial-gradient(120% 120% at 90% 98%, rgba(120, 88, 40, 0.28), transparent 58%),
+    var(--fa-vellum-tex),
+    linear-gradient(162deg, var(--fa-vellum-0), var(--fa-vellum-1) 52%, var(--fa-vellum-2));
+  --gen-card-border: var(--fa-vellum-edge);
+  --gen-radius: 5px;
+  --gen-title: var(--fa-gold-hi);
+  --gen-label: var(--fa-ink-soft);
+  --gen-value: var(--fa-ink);
+  --gen-hp: linear-gradient(180deg, #cb4138, #a23a26 55%, #5c1612); /* HP = krvavá červená (sémantika) */
+  --gen-bar-track: rgba(70, 48, 18, 0.22);
+  --gen-font-head: 'Cinzel', serif;
+  --gen-font-body: 'EB Garamond', Georgia, serif;
+
+  /* ════════ EMBED plochy (obal v TM / dice readout / dicelog / orchestrace) ════════
+     OPAQUE tmavá kovaná deska (grimoár) → log/obal NEprosvítá na mapu. Skin drží
+     tmavou forge polaritu (list je pergamen v tmavém obalu). Sémantika: pos=zelená,
+     neg=červená, HP/neutral=zlato. */
+  --dd-embed-surface: linear-gradient(180deg, var(--fa-bind-2), #1d160e);
+  --dd-embed-border: var(--fa-gold-shadow);
+  --dd-embed-line: color-mix(in srgb, var(--fa-gold) 24%, transparent);
+  --dd-embed-track: rgb(255 255 255 / 0.06);
+  --dd-embed-text: var(--fa-vellum-0);
+  --dd-embed-muted: #b09467;
+  --dd-embed-title: var(--fa-gold-hi);
+  --dd-embed-chip-bg: color-mix(in srgb, var(--fa-gold) 14%, transparent);
+  --dd-embed-accent: var(--fa-gold);
+  --dd-embed-num-font: 'Cinzel Decorative', 'Cinzel', serif;
+  --dd-embed-title-font: 'Cinzel', serif;
+  --dd-embed-pos: #7aa654; /* kladný hod = zelená (sémantika) */
+  --dd-embed-neg: #cb4138; /* záporný hod = červená (sémantika) */
+  --dd-embed-neutral: var(--fa-gold);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) SEKCE — nadpis strany: iluminovaný zlatý titul + zlatý fleuron odrážka.
+   Nadpis sekce je hash (`.sectionTitle`) → cílíme přes globální `.diary-block`
+   sourozence? Ne — hash třídu NEcílíme; barvu/font řeší token `--gen-title` /
+   `--gen-font-head` výš. Zde jen ozdobný zlatý spodní lem sekce přes obal.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='fantasy'] {
+  isolation: isolate;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) SIGNATURE: bloková karta = list pergamenu ve zlatém kování.
+   `.diary-block` dostane `isolation:isolate` → kování kreslíme pod obsah
+   (z-index:-1 v ::before). Vlastní tvarový jazyk grimoáru.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block {
+  position: relative;
+  isolation: isolate;
+  padding: 14px 15px 13px;
+  border-width: 1.5px;
+  box-shadow:
+    0 2px 10px rgba(30, 18, 6, 0.28),
+    0 0 0 1px rgba(255, 248, 226, 0.28) inset,
+    0 -20px 40px -30px rgba(70, 36, 12, 0.6) inset;
+}
+/* SIGNATURE: filigránové ZLATÉ ROHOVÉ KOVÁNÍ — 4 rohy v jednom ::before (pod obsah) */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-repeat: no-repeat;
+  background-size: 36px 36px;
+  background-position:
+    4px 4px,
+    calc(100% - 4px) 4px,
+    4px calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px);
+  background-image: var(--fa-corner-tl), var(--fa-corner-tr), var(--fa-corner-bl), var(--fa-corner-br);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}
+/* SIGNATURE: dvojité zlaté knihařské linkování (inner fillet) po obvodu karty */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 3px;
+  border: 1px solid rgba(110, 83, 38, 0.45);
+  box-shadow:
+    0 0 0 2px rgba(255, 248, 226, 0.26) inset,
+    0 0 0 3px rgba(157, 122, 36, 0.24) inset;
+}
+/* obsah karty nad linkováním */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE: pečetní medailon u labelu + iluminovaná iniciála hodnoty.
+   Label dostane malý ražený zlatý pečetní disk vlevo; hodnota iluminovanou
+   iniciálu (::first-letter) v antickém zlatě.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+}
+/* pečetní medailon — kulatý ražený zlatý disk s vroubkem */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__label::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 32%, var(--fa-gold-hi), var(--fa-gold) 52%, var(--fa-gold-deep) 100%);
+  border: 1px solid var(--fa-gold-shadow);
+  box-shadow:
+    0 0 0 2px rgba(110, 83, 38, 0.3),
+    0 1px 1px rgba(255, 250, 220, 0.6) inset,
+    0 -1px 1px rgba(0, 0, 0, 0.25) inset;
+}
+
+/* hodnota: iluminovaná iniciála v antickém zlatě (Cinzel Decorative) */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__value {
+  font-weight: 600;
+}
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__value::first-letter {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 1.32em;
+  line-height: 1;
+  padding-right: 1px;
+  /* F3 fix: zlatá iniciála mizela na zlaté kartě (první znak neviditelný) →
+     rubrikovaná krvavá iluminace (kontrast na pergamenu) + zlatý lem. */
+  color: #a8321f;
+  text-shadow: 0 1px 1px rgba(255, 235, 175, 0.6);
+}
+/* relation a formula: iniciála by rozbila 🔗/číslo → vypni iluminaci, drž zlatou */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__relation::first-letter,
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__formula::first-letter {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  -webkit-text-fill-color: currentColor;
+  color: inherit;
+  background: none;
+}
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__relation {
+  color: var(--fa-gold-deep) !important;
+  text-decoration-color: var(--fa-gold);
+}
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__formula {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  color: var(--fa-ink);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) SIGNATURE: seznam s drahokamovými pipy + bar = krvavý smaltovaný ukazatel.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__list {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__list li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--fa-ink);
+}
+/* drahokamový pip = radial gem v antickém zlatě */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  transform: translateY(-50%) rotate(45deg);
+  background: radial-gradient(circle at 40% 32%, var(--fa-gold-hi), var(--fa-gold) 55%, var(--fa-gold-deep));
+  border: 1px solid var(--fa-gold-shadow);
+  box-shadow:
+    0 1px 1px rgba(255, 250, 220, 0.6) inset,
+    0 0 4px -1px var(--fa-gold);
+}
+
+/* bar: smaltovaný krvavý ukazatel v ražené zlaté koleji */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__bar-track {
+  height: 10px;
+  border: 1px solid var(--fa-gold-shadow);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.25) inset,
+    0 1px 0 rgba(255, 248, 226, 0.4);
+}
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__bar-fill {
+  position: relative;
+  /* krvavá červená (HP sémantika) — přebíjí inline block.color jen když není zadán */
+  background: linear-gradient(180deg, #cb4138, #a23a26 55%, #5c1612);
+}
+/* smaltovaný horní lesk na výplni baru */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 1px 1px 55% 1px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+}
+
+/* obrázkový blok: zlatý rám + pergamenové paspartování */
+[data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block__image {
+  border: 1px solid var(--fa-gold-deep) !important;
+  border-radius: 3px !important;
+  box-shadow:
+    0 0 0 3px rgba(255, 248, 226, 0.3),
+    0 2px 8px rgba(30, 18, 6, 0.35);
+  background: rgba(255, 250, 235, 0.4);
+  padding: 3px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) RESPONSIVITA — grid kolabuje na 1 sloupec (kování drží v rozích karty).
+   Na úzkém viewportu zmenši kování + fillet, ať zůstanou v proporcích.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  [data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block::before {
+    background-size: 30px 30px;
+  }
+  [data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block::after {
+    inset: 5px;
+  }
+  [data-diary-system='generic'][data-diary-skin='fantasy'] .diary-block {
+    padding: 12px 13px 11px;
+  }
+}

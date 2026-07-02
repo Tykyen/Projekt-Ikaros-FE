@@ -2,10 +2,12 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* 16.2g F6 — generic skin: text bere embed token (fallback = dnešní inherit). */
+  color: var(--dd-embed-text, inherit);
 }
 
 .empty {
-  color: rgb(var(--map-ui-danger-rgb) / 0.85);
+  color: var(--dd-embed-neg, rgb(var(--map-ui-danger-rgb) / 0.85));
   font-size: 13px;
   font-style: italic;
   margin: 0;
@@ -13,8 +15,8 @@
 
 .abilitiesSection {
   padding: 10px 12px;
-  background: rgb(var(--map-ui-accent-rgb) / 0.06);
-  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.18);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-accent-rgb) / 0.06));
+  border: 1px solid var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.18));
   border-radius: 6px;
 }
 
@@ -24,7 +26,7 @@
   font-weight: 700;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: rgb(var(--map-ui-accent-bright-rgb) / 0.9);
+  color: var(--dd-embed-title, rgb(var(--map-ui-accent-bright-rgb) / 0.9));
 }
 
 .abilitiesList {
@@ -42,7 +44,7 @@
   gap: 10px;
   font-size: 13px;
   line-height: 1.4;
-  color: var(--text-primary, var(--map-ui-accent-text));
+  color: var(--dd-embed-text, var(--text-primary, var(--map-ui-accent-text)));
 }
 
 .abilityRollBtn {
@@ -52,8 +54,8 @@
   gap: 10px;
   width: 100%;
   padding: 4px 8px;
-  background: rgb(var(--map-ui-accent-rgb) / 0.1);
-  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-accent-rgb) / 0.1));
+  border: 1px solid var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.25));
   border-radius: 5px;
   color: inherit;
   font: inherit;
@@ -66,7 +68,7 @@
 
 .abilityRollBtn:hover:not(:disabled) {
   background: rgb(var(--map-ui-accent-rgb) / 0.2);
-  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.5);
+  border-color: var(--dd-embed-accent, rgb(var(--map-ui-accent-bright-rgb) / 0.5));
 }
 
 .abilityRollBtn:disabled {
@@ -101,10 +103,10 @@
 .abilityValueInput {
   min-width: 0;
   padding: 5px 8px;
-  background: rgb(var(--map-ui-accent-rgb) / 0.08);
-  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-accent-rgb) / 0.08));
+  border: 1px solid var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.25));
   border-radius: 5px;
-  color: var(--text-primary, var(--map-ui-accent-text));
+  color: var(--dd-embed-text, var(--text-primary, var(--map-ui-accent-text)));
   font: inherit;
   font-size: 13px;
 }
@@ -123,7 +125,7 @@
 .abilityValueInput:focus,
 .notesTextarea:focus {
   outline: none;
-  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.6);
+  border-color: var(--dd-embed-accent, rgb(var(--map-ui-accent-bright-rgb) / 0.6));
   background: rgb(var(--map-ui-accent-rgb) / 0.14);
 }
 
@@ -135,8 +137,8 @@
   width: 30px;
   height: 30px;
   padding: 0;
-  background: rgb(var(--map-ui-accent-rgb) / 0.1);
-  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-accent-rgb) / 0.1));
+  border: 1px solid var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.25));
   border-radius: 5px;
   font-size: 14px;
   line-height: 1;
@@ -148,7 +150,7 @@
 
 .abilityIconBtn:hover:not(:disabled) {
   background: rgb(var(--map-ui-accent-rgb) / 0.2);
-  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.5);
+  border-color: var(--dd-embed-accent, rgb(var(--map-ui-accent-bright-rgb) / 0.5));
 }
 
 .abilityIconBtn:disabled {
@@ -158,17 +160,17 @@
 
 .abilityRemoveBtn:hover:not(:disabled) {
   background: rgb(var(--map-ui-danger-rgb) / 0.2);
-  border-color: rgb(var(--map-ui-danger-rgb) / 0.55);
+  border-color: var(--dd-embed-neg, rgb(var(--map-ui-danger-rgb) / 0.55));
 }
 
 .addAbilityBtn {
   margin-top: 8px;
   width: 100%;
   padding: 6px 10px;
-  background: rgb(var(--map-ui-accent-rgb) / 0.12);
-  border: 1px dashed rgb(var(--map-ui-accent-rgb) / 0.4);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-accent-rgb) / 0.12));
+  border: 1px dashed var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.4));
   border-radius: 5px;
-  color: rgb(var(--map-ui-accent-bright-rgb) / 0.95);
+  color: var(--dd-embed-accent, rgb(var(--map-ui-accent-bright-rgb) / 0.95));
   font: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -180,7 +182,7 @@
 
 .addAbilityBtn:hover:not(:disabled) {
   background: rgb(var(--map-ui-accent-rgb) / 0.22);
-  border-color: rgb(var(--map-ui-accent-bright-rgb) / 0.6);
+  border-color: var(--dd-embed-accent, rgb(var(--map-ui-accent-bright-rgb) / 0.6));
 }
 
 .addAbilityBtn:disabled {
@@ -191,10 +193,10 @@
 .notesTextarea {
   width: 100%;
   padding: 7px 9px;
-  background: rgb(var(--map-ui-accent-rgb) / 0.06);
-  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-accent-rgb) / 0.06));
+  border: 1px solid var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.25));
   border-radius: 5px;
-  color: var(--text-primary, var(--map-ui-accent-text));
+  color: var(--dd-embed-text, var(--text-primary, var(--map-ui-accent-text)));
   font: inherit;
   font-size: 13px;
   line-height: 1.5;
@@ -205,8 +207,8 @@
 .notesSection {
   margin-top: 8px;
   padding: 10px 12px;
-  background: rgb(var(--map-ui-accent-rgb) / 0.08);
-  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.22);
+  background: var(--dd-embed-chip-bg, rgb(var(--map-ui-accent-rgb) / 0.08));
+  border: 1px solid var(--dd-embed-line, rgb(var(--map-ui-accent-rgb) / 0.22));
   border-radius: 6px;
 }
 
@@ -216,7 +218,7 @@
   font-weight: 700;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: rgb(var(--map-ui-accent-bright-rgb) / 0.9);
+  color: var(--dd-embed-title, rgb(var(--map-ui-accent-bright-rgb) / 0.9));
 }
 
 .notesBody {
@@ -224,7 +226,7 @@
   font-size: 13px;
   line-height: 1.5;
   white-space: pre-wrap;
-  color: var(--text-primary, var(--map-ui-accent-text));
+  color: var(--dd-embed-text, var(--text-primary, var(--map-ui-accent-text)));
 }
 
 .notesHint {

@@ -1,0 +1,285 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap');
+
+/**
+ * Generic („Vlastní systém") — skin „Minimal" 📜: ARCHIVNÍ KARTA / RÝSOVACÍ LIST.
+ *
+ * !!! VÝCHOZÍ SKIN generic systému (DEFAULT_SKIN_BY_SYSTEM['generic']='minimal') → musí
+ * být čistý a bezvadný. NE prázdný minimalismus — minimalismus jako PRECIZNOST.
+ *
+ * Generic list = BLOKOVÉ KARTY (`.diary-block`), NE listový arch. Rodinná identita
+ * minimal (napříč systémy = drdplus-skins/minimal.css) přeložena na kartový jazyk:
+ * čistý SVĚTLÝ kostěný papír #f4f1ea, JEDINÝ tlumený akcent = antické zlato #9a7b2e.
+ * Žádné textury, gradienty zploštěné na hairline plochy, tabular mono čísla.
+ * Fonty: Fraunces (display serif, head) · Spline Sans Mono (popisky/čísla) ·
+ * Newsreader (tělo). Krása v přesnosti a prázdnotě.
+ *
+ * Signature (čtyřdílná „archivní kalibrace") na kartě `.diary-block`:
+ *   1. dvojitý LEDGER rám karty (double border přes box-shadow inset — papírová
+ *      mezera → vlasová linka),
+ *   2. 4 REGISTRAČNÍ KŘÍŽE (soutiskové „+") v rozích karty (::after, data:SVG zlaté),
+ *   3. letterpress TICK-RULE baseline pod labelem (::before) — ■ zlatý index marker
+ *      + měřítková linka s ryskami maskovanými do dolních ~40 %,
+ *   4. ražené dvojkroužkové RAZÍTKO na labelu (::after, inline SVG OČ pečeť).
+ *   Ornamenty se mezi skiny NESDÍLEJÍ (scifi = tech-brackets, horror = tracerie…).
+ *
+ * Scoped na `[data-diary-system='generic'][data-diary-skin='minimal']` (compound
+ * 0,2,0 → přebije neutrální default `[data-diary-system='generic']`). KAŽDÉ pravidlo
+ * nese ten prefix. Pure CSS/SVG, žádný JS. Regrese-safe — jen overrides pod scopem.
+ *
+ * Tokeny tečou do listu (`--gen-*`) I do embedů mapa/chat/dice (`--dd-embed-*`).
+ * minimal je SVĚTLÝ → text TMAVÝ (uhel), plochy světlé, embed surface SVĚTLÁ OPAQUE
+ * (plný gradient), jinak log „prosvítá" na mapu. Sémantika: HP = tlumená cihla,
+ * +hod = oliva (zelená), −hod = cihla (červená). JEDINÝ akcent zlato.
+ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   1) TOKENY na compound scope — list `--gen-*` + embed `--dd-embed-*`
+   + lokální minimal paleta (ornamenty + kompozity je čtou).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] {
+  /* ── lokální minimal paleta (ornamenty + kompozity je čtou) ── */
+  --mng-paper: #f4f1ea; /* hlavní archivní list */
+  --mng-paper-hi: #faf8f3; /* světlejší vrch */
+  --mng-paper-2: #ece7dd; /* sotva tmavší vtisk */
+  --mng-ink: #20211f; /* primární text/čísla — uhel */
+  --mng-ink-2: #4d4a42; /* sekundární text */
+  --mng-ink-3: #8d8779; /* muted / mono popisky */
+  --mng-hair: #ddd6c7; /* vlasová linka */
+  --mng-hair-2: #cabfa8; /* silnější linka / obrys */
+  --mng-acc: #9a7b2e; /* JEDINÝ akcent — antické zlato */
+  --mng-acc-deep: #6e5520; /* tmavší zlato — čísla, hover */
+  --mng-acc-ink: #4e3d12; /* nejtmavší zlato */
+  --mng-acc-wash: rgba(154, 123, 46, 0.07);
+  --mng-acc-line: rgba(154, 123, 46, 0.32);
+  --mng-danger: #9a3b2e; /* cihla — HP / kritické / záporný hod */
+  --mng-pos: #4e6b2f; /* oliva — kladný hod */
+  --mng-input: #fbfaf6; /* vstupní/buňka plocha */
+  --mng-num: 'Spline Sans Mono', ui-monospace, monospace;
+  --mng-font-head: 'Fraunces', Georgia, serif;
+  --mng-font-body: 'Newsreader', Georgia, serif;
+
+  /* ── LIST tokeny (`--gen-*`) — tečou do `.diary-block` + section title ── */
+  --gen-card-bg:
+    linear-gradient(180deg, var(--mng-paper-hi), var(--mng-paper) 46%, var(--mng-paper-2));
+  --gen-card-border: var(--mng-hair-2);
+  --gen-radius: 2px; /* archivní ostrost — jen sotva zaoblený roh */
+  --gen-title: var(--mng-ink);
+  --gen-label: var(--mng-ink-3);
+  --gen-value: var(--mng-ink);
+  --gen-hp: linear-gradient(90deg, var(--mng-danger), #b85647); /* tlumená cihla */
+  --gen-font-head: var(--mng-font-head);
+  --gen-font-body: var(--mng-font-body);
+  --gen-bar-track: var(--mng-paper-2);
+
+  /* ── EMBED tokeny (`--dd-embed-*`) — obal v TM / dice readout / dicelog ──
+     minimal = SVĚTLÁ polarita. Plocha VŽDY NEPRŮHLEDNÁ (plný gradient papír),
+     text TMAVÝ (uhel) — čitelný na světlé ploše, jinak by log prosvítal na mapu. */
+  --dd-embed-surface: linear-gradient(180deg, var(--mng-paper-hi), var(--mng-paper-2));
+  --dd-embed-border: var(--mng-hair-2);
+  --dd-embed-line: var(--mng-hair);
+  --dd-embed-track: var(--mng-paper-2);
+  --dd-embed-text: var(--mng-ink); /* TMAVÝ text na světlé ploše */
+  --dd-embed-muted: var(--mng-ink-3);
+  --dd-embed-title: var(--mng-ink);
+  --dd-embed-chip-bg: var(--mng-acc-wash);
+  --dd-embed-accent: var(--mng-acc-deep);
+  --dd-embed-num-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-title-font: 'Spline Sans Mono', ui-monospace, monospace;
+  --dd-embed-pos: var(--mng-pos); /* kladný hod = oliva */
+  --dd-embed-neg: var(--mng-danger); /* záporný hod = cihla */
+  --dd-embed-neutral: var(--mng-acc-deep); /* neutrál = zlato */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   2) SEKČNÍ NADPIS (.sectionTitle je hashovaná → ovládáme tokenem --gen-title
+   + --gen-font-head nastaveným výše: Fraunces editorial serif, uhlový inkoust.
+   Žádné pravidlo zde není potřeba — token stačí.)
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   3) SIGNATURE ORNAMENT na `.diary-block` karty — dvojitý LEDGER rám
+   (box-shadow inset: papírová mezera → vlasová linka) + 4 REGISTRAČNÍ KŘÍŽE
+   v rozích (::after, data:SVG „+" ve zlaté). Preciznost, minimalismus.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block {
+  position: relative;
+  /* dvojitý ledger rám: token nese vnější hairline (--gen-card-border), sem
+     přidáme vnitřní papírovou mezeru + druhou vlasovou linku + jemný vtisk. */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    inset 0 0 0 4px var(--mng-paper),
+    inset 0 0 0 5px var(--mng-hair),
+    0 1px 2px -1px rgba(40, 34, 22, 0.14);
+  isolation: isolate;
+}
+
+/* 4 REGISTRAČNÍ KŘÍŽE (soutiskové „+") v rozích karty — signature, data:SVG
+   zlaté, kotvené do všech 4 rohů uvnitř vnitřního rámu. */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block::after {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  pointer-events: none;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+  background-size: 11px 11px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpath d='M5.5 0V11M0 5.5H11' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpath d='M5.5 0V11M0 5.5H11' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpath d='M5.5 0V11M0 5.5H11' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpath d='M5.5 0V11M0 5.5H11' stroke='%239a7b2e' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* obsahové uzly nad rámovou/křížovou vrstvou (registrační kříže jsou z-index:2,
+   proto obsah zvedneme na 3, aby zůstal interaktivní i čitelný). */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__label,
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__list,
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__bar-track,
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__image {
+  position: relative;
+  z-index: 3;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   4) LABEL — mono kapitálkový popisek + letterpress TICK-RULE baseline
+   (■ zlatý index marker + měřítková linka s maskovanými ryskami) + ražené
+   dvojkroužkové RAZÍTKO (OČ pečeť, inline SVG) v pravém horním rohu karty.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__label {
+  font-family: var(--mng-num);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mng-ink-3);
+  padding-bottom: 8px;
+}
+
+/* letterpress TICK-RULE baseline pod labelem — ■ marker + měřítková linka
+   s ryskami maskovanými do dolních ~40 % (rytina rýsovacího listu). */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 7px;
+  background-image:
+    linear-gradient(var(--mng-acc), var(--mng-acc)),
+    linear-gradient(var(--mng-hair-2), var(--mng-hair-2)),
+    linear-gradient(90deg, var(--mng-hair-2) 1px, transparent 1px);
+  background-repeat: no-repeat, no-repeat, repeat-x;
+  background-position: 0 1px, 10px 3px, 10px 0;
+  background-size: 5px 5px, calc(100% - 10px) 1px, 12px 100%;
+  -webkit-mask:
+    linear-gradient(#000 0 0) 0 0 / 10px 100% no-repeat,
+    linear-gradient(180deg, #000 0 60%, transparent 60%) 10px 0 / calc(100% - 10px) 100% no-repeat;
+  mask:
+    linear-gradient(#000 0 0) 0 0 / 10px 100% no-repeat,
+    linear-gradient(180deg, #000 0 60%, transparent 60%) 10px 0 / calc(100% - 10px) 100% no-repeat;
+}
+
+/* ražené dvojkroužkové RAZÍTKO (OČ archivní pečeť) — inline SVG ve zlaté,
+   kotveno do pravého horního rohu karty; nekoliduje s registračními kříži
+   (ty sedí přesně v rozích, razítko je s odsazením ~13px). */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__label::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+  pointer-events: none;
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cg fill='none' stroke='%239a7b2e' stroke-width='0.9'%3E%3Ccircle cx='10' cy='10' r='8.5'/%3E%3Ccircle cx='10' cy='10' r='6'/%3E%3Cpath d='M10 3.5v13M3.5 10h13' stroke-width='0.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5) HODNOTY polí — tělo Newsreader, čísla/formule do Spline Sans Mono
+   (tabular archivní čísla), uhlový inkoust. JEDINÝ zlatý akcent u formulí.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__value {
+  font-family: var(--mng-font-body);
+  color: var(--mng-ink);
+}
+/* number / bar hodnota / formule → mono display (Spline Sans Mono), tabular */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block[data-block-type='number'] .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block[data-block-type='bar'] .diary-block__value {
+  font-family: var(--mng-num);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--mng-ink);
+  font-variant-numeric: tabular-nums;
+}
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__formula {
+  font-family: var(--mng-num);
+  font-weight: 600;
+  color: var(--mng-acc-deep); /* odvozená hodnota = zlato (jediný akcent) */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   6) HP / BAR LIŠTA — hairline archivní track + tlumená cihlová fill
+   (--gen-hp token nese barvu; zde tvar/track/hairline). HP = význam „životy".
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__bar-track {
+  height: 7px;
+  border-radius: 1px;
+  border: 1px solid var(--mng-hair-2);
+  background: var(--mng-input);
+}
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__bar-fill {
+  border-radius: 0;
+  /* jemný tick-raster přes cihlovou fill (rýsovací měřítko), drží význam HP */
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px 8px),
+    var(--gen-hp);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7) SEZNAM (list bloky) — zlatý ■ index marker místo disku (archivní odrážka).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__list {
+  list-style: none;
+  padding-left: 0.1rem;
+  font-family: var(--mng-font-body);
+  color: var(--mng-ink);
+}
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__list li {
+  position: relative;
+  padding-left: 1rem;
+}
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  background: var(--mng-acc);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8) RELATION odkaz — tlumený zlatý link (přebíjí inline var(--accent)),
+   podtržení hairline. Zdrženlivost: jediný akcent zlato.
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__relation {
+  color: var(--mng-acc-deep) !important;
+  text-decoration-color: var(--mng-acc-line);
+}
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__relation:hover {
+  color: var(--mng-acc-ink) !important;
+  text-decoration-color: var(--mng-acc);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9) OBRÁZEK — archivní hairline rám + jemný vtisk (žádné zaoblení nad 2px).
+   ════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='minimal'] .diary-block__image {
+  border-radius: 2px !important;
+  border: 1px solid var(--mng-hair-2);
+  box-shadow: 0 1px 2px -1px rgba(40, 34, 22, 0.2);
+}

@@ -1,0 +1,226 @@
+/* GENERIC (Vlastní systém) — skin „Příroda" 🌿 · DRUIDSKÝ HERBÁŘ / ŽIVÝ LETOPIS.
+ *
+ * Blokové karty PJ-definovaného deníku (8.5) přepracované na lisované LÝKOVÉ
+ * lístky terénního herbáře přírodního letopisce — ruční krémový arch, inkoust
+ * z duběnek, mech, medová míza, jantar, bobule. Karta „roste": rohy organicky
+ * asymetrické, z dřevěného SUKU v rohu raší úponek, uvnitř prosvítá letokruhový
+ * terč (řez kmenem). Bobule = životy.
+ *
+ * SIGNATURE (nesdílet s jiným skinem): rašící úponek z dřevěného suku v ROHU
+ * karty (rohový, NE podél hrany) · letokruhový terč (soustředné kruhy) jako
+ * podklad · semínkové pipy (border-radius 62%62%38%38%) · organické zaoblené
+ * rohy (18px 5px 18px 5px) · žilková (midrib) hrana.
+ *
+ * Paleta: lýko/kůra #efe6cb·#e4d6b2 · lesní zeleň #5e8832/#5a7d3a · mech #86ab52 ·
+ * medová míza/jantar #c98a2e·#eac066 · bobule (životy) #a83c2e · rosa/lišejník
+ * #3e7d6e. Typografie: Cormorant Garamond (tělo) · Marcellus SC (nadpisy/labely) ·
+ * Spectral (akcent/čísla).
+ *
+ * Mechanika: KAŽDÉ pravidlo scoped compound
+ *   [data-diary-system='generic'][data-diary-skin='nature'].
+ * `--gen-*` = LIST (blokové karty). `--dd-embed-*` = obal v TM / dice readout /
+ * dicelog (VŽDY opaque = tmavá kůra + světlý mechový text). Pouze CSS/SVG.
+ *
+ * REGISTRACE: aby se skin dostal do bundlu (i do embedů, kde list CSS neběží),
+ * musí být tenhle soubor @importován v diary-skins.css (blok generic-skins).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1) TOKENY — list (--gen-*) + embed (--dd-embed-*) na compound scope
+      Compound scope přebije generic baseline v diary-skins.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='nature'] {
+  /* ── LIST (blokové karty) ── */
+  --gen-card-bg:
+    radial-gradient(120% 90% at 16% 8%, rgba(255, 253, 244, 0.62), transparent 54%),
+    radial-gradient(130% 130% at 88% 96%, rgba(120, 98, 52, 0.24), transparent 60%),
+    linear-gradient(165deg, #f6f1df, #efe6cb 56%, #e4d6b2);
+  --gen-card-border: #cdbb8e;
+  --gen-radius: 18px 5px 18px 5px; /* organický asymetrický roh */
+  --gen-title: #37501f; /* nadpis sekce = mech-deep */
+  --gen-label: #5a7d3a; /* label karty = mech */
+  --gen-value: #33301d; /* hodnota = duběnkový inkoust */
+  --gen-hp: linear-gradient(180deg, #c95a45, #a83c2e 55%, #5f1d14); /* bobule = životy */
+  --gen-font-head: 'Marcellus SC', serif;
+  --gen-font-body: 'Cormorant Garamond', Georgia, serif;
+  --gen-bar-track: rgba(90, 125, 58, 0.16); /* žilková zeleň, poloprůhledná */
+
+  /* interní herbářové odstíny (jen tenhle soubor) */
+  --nt-moss: #5a7d3a;
+  --nt-moss-hi: #86ab52;
+  --nt-moss-deep: #37501f;
+  --nt-amber: #c98a2e;
+  --nt-amber-hi: #eac066;
+  --nt-amber-deep: #7e5418;
+  --nt-berry: #a83c2e;
+  --nt-berry-deep: #5f1d14;
+  --nt-bark: #2a2014;
+  --nt-ink-soft: #5e5736;
+  --nt-vein: rgba(90, 125, 58, 0.34);
+
+  /* ── EMBED (obal v TM / dice readout / dicelog) — VŽDY OPAQUE ──
+     Tmavá kůra + světlý mechový text. Sémantika pos/neg drží význam. */
+  --dd-embed-surface: linear-gradient(180deg, #3c2d1a, #2a2014); /* opaque kůra */
+  --dd-embed-border: #7e5418;
+  --dd-embed-line: color-mix(in srgb, #c98a2e 24%, transparent);
+  --dd-embed-track: color-mix(in srgb, #86ab52 18%, transparent);
+  --dd-embed-text: #e8dcc2;
+  --dd-embed-muted: #ab9d80;
+  --dd-embed-title: #86ab52; /* mechový titulek */
+  --dd-embed-chip-bg: color-mix(in srgb, #86ab52 16%, transparent);
+  --dd-embed-accent: #c98a2e; /* míza */
+  --dd-embed-num-font: 'Spectral', Georgia, serif;
+  --dd-embed-title-font: 'Marcellus SC', serif;
+  --dd-embed-pos: #86ab52; /* kladný hod = mech zeleň */
+  --dd-embed-neg: #c95a45; /* záporný hod = uschlá bobule */
+  --dd-embed-neutral: #c98a2e; /* neutrál = míza */
+}
+
+/* Nadpis sekce (.sectionTitle v modulu) konzumuje --gen-title + --gen-font-head
+   → přebarven Marcellus SC / mech-deep tokeny z bloku (1). Marker přes ::before
+   nejde bez editace module CSS (třída je hashovaná, ne globální) → vynecháno. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3) BLOKOVÁ KARTA `.diary-block` — lýkový lístek: organický roh, letokruhový
+      terč (::after podklad), žilková hrana, rašící úponek ze suku (::before).
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block {
+  position: relative;
+  overflow: visible;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  /* karta = lýkový arch; border/radius jedou přes --gen-* tokeny výš, tady
+     doladíme rám (žilková + jantarová nit + kůra) a světlo */
+  border-color: var(--gen-card-border);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 6px 16px -12px rgba(30, 40, 16, 0.7),
+    0 0 0 1px rgba(90, 125, 58, 0.18);
+}
+/* letokruhový terč (řez kmenem) — soustředné kruhy prosvítající zpod obsahu */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  width: 62px;
+  height: 62px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.16;
+  background: no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='62' height='62' viewBox='0 0 62 62' fill='none'%3E%3Cg stroke='%2337501f' stroke-width='1.1' fill='none'%3E%3Ccircle cx='31' cy='31' r='29'/%3E%3Ccircle cx='30' cy='32' r='23'/%3E%3Ccircle cx='32' cy='30' r='17'/%3E%3Ccircle cx='30.5' cy='31.5' r='11'/%3E%3Ccircle cx='31' cy='31' r='5.5'/%3E%3C/g%3E%3Ccircle cx='31' cy='31' r='2' fill='%237e5418'/%3E%3Cpath d='M31 3 Q34 16 31 29' stroke='%237e5418' stroke-width='0.9' fill='none' opacity='0.7'/%3E%3C/svg%3E");
+}
+/* rašící úponek z dřevěného SUKU v levém horním rohu — SIGNATURE tvar */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: -10px;
+  width: 58px;
+  height: 72px;
+  pointer-events: none;
+  z-index: 2;
+  background: no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='72' viewBox='0 0 58 72' fill='none'%3E%3Cellipse cx='12' cy='13' rx='9' ry='8.2' fill='%23523c22' stroke='%232a2014' stroke-width='1.3'/%3E%3Cellipse cx='12' cy='13' rx='5.2' ry='4.6' fill='none' stroke='%236b4f2e' stroke-width='1'/%3E%3Cellipse cx='12' cy='13' rx='2' ry='1.8' fill='%236b4f2e'/%3E%3Cpath d='M14 20 C17 30 12 38 18 47 C23 55 20 62 25 68' stroke='%2337501f' stroke-width='3.4' stroke-linecap='round' fill='none' opacity='0.55'/%3E%3Cpath d='M14 20 C17 30 12 38 18 47 C23 55 20 62 25 68' stroke='%237ba450' stroke-width='2.1' stroke-linecap='round' fill='none'/%3E%3Cpath d='M15 33 C25 31 33 36 39 44 C29 48 19 44 15 34Z' fill='%2386ab52' stroke='%23537a30' stroke-width='0.9'/%3E%3Cpath d='M17 50 C8 48 2 40 0 33 C10 32 20 37 20 48Z' fill='%235a7d3a' stroke='%2337501f' stroke-width='0.9'/%3E%3Cpath d='M18 38 L35 43 M23 36 L33 46' stroke='%23dcf09a' stroke-width='0.8' opacity='0.8'/%3E%3Cpath d='M13 41 L3 36 M13 45 L6 40' stroke='%23cfe89a' stroke-width='0.8' opacity='0.7'/%3E%3Ccircle cx='25' cy='68' r='2.6' fill='%23eac066'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 2px 3px rgba(20, 30, 10, 0.4));
+}
+/* obsah karty nad terč + úponek; label uhne úponku z rohu */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block > * {
+  position: relative;
+  z-index: 1;
+}
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__label {
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.14em;
+  color: var(--gen-label);
+  padding-left: 26px; /* uvolní místo úponku vlevo nahoře */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4) HODNOTY / LISTY / RELACE / FORMULE — herbářová typografie + sémantika
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__value {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  color: var(--gen-value);
+  /* F3 fix: úponek (vlevo nahoře, 72px) kolidoval s hodnotou → symetricky
+     k labelu odsadíme value. */
+  padding-left: 26px;
+}
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__list {
+  font-family: 'Spectral', Georgia, serif;
+  color: var(--nt-ink-soft);
+}
+/* semínkové odrážky listu */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__list li::marker {
+  color: var(--nt-moss);
+  content: '❧ ';
+}
+/* relace = link na cíl — mízová podtržená stopka místo systémové --accent */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__relation {
+  color: var(--nt-amber-deep) !important; /* inline style barvy z TSX přebít */
+  text-decoration-color: var(--nt-amber);
+  font-family: 'Marcellus SC', serif;
+  letter-spacing: 0.02em;
+}
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__relation:hover {
+  color: var(--nt-moss-deep) !important;
+}
+/* formule = odvozené číslo → mízový akcent (Spectral číslice) */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__formula {
+  font-family: 'Spectral', Georgia, serif;
+  color: var(--nt-amber-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5) BAR (životy/zdroje) — žilkový žlab + bobulová výplň (HP), letokruhový lem
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__bar-track {
+  background: var(--gen-bar-track);
+  border: 1px solid rgba(90, 125, 58, 0.34);
+  box-shadow: 0 1px 2px rgba(30, 40, 16, 0.2) inset;
+  height: 9px;
+}
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__bar-fill {
+  /* HP = bobulová červená (sémantika životů); inline barva z bloku ji může
+     přebít pro non-HP zdroje — pak zůstává tokenizovaný default zde */
+  background: var(--gen-hp);
+  box-shadow: 0 0 6px rgba(168, 60, 46, 0.4);
+}
+/* bar-typové karty: zvýrazni hodnotu jako „X / Y" mízou */
+[data-diary-system='generic'][data-diary-skin='nature']
+  .diary-block[data-block-type='bar']
+  .diary-block__value {
+  color: var(--nt-berry-deep);
+  font-family: 'Spectral', Georgia, serif;
+  font-variant-numeric: tabular-nums;
+}
+/* stat/number karty: číslo v mízovém jantaru */
+[data-diary-system='generic'][data-diary-skin='nature']
+  .diary-block[data-block-type='stat']
+  .diary-block__value,
+[data-diary-system='generic'][data-diary-skin='nature']
+  .diary-block[data-block-type='number']
+  .diary-block__value {
+  color: var(--nt-amber-deep);
+  font-family: 'Spectral', Georgia, serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6) OBRÁZKOVÁ KARTA — lisovaný list: žilková pasparta + jantarový cvoček
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-diary-system='generic'][data-diary-skin='nature']
+  .diary-block[data-block-type='image'] {
+  padding-bottom: calc(var(--sp-3) + 2px);
+}
+[data-diary-system='generic'][data-diary-skin='nature'] .diary-block__image {
+  border: 1px solid var(--nt-vein);
+  border-radius: 10px 3px 10px 3px !important; /* organický roh přebít inline 6px */
+  box-shadow:
+    0 2px 8px -4px rgba(30, 40, 16, 0.55),
+    0 0 0 3px rgba(255, 253, 244, 0.6);
+}
