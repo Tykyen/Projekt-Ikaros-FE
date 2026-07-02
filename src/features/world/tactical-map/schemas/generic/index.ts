@@ -10,8 +10,16 @@
  * Vesta, Body osudu, ...) přijdou jako dedikovaná schémata.
  */
 import tokenJson from './token.json';
+import bestieJson from './bestie.json';
 import type { SystemEntitySchema } from '../types';
 
 export const genericTokenSchema = tokenJson as SystemEntitySchema;
+// 16.2g F2 — generic bestie schéma (fallback, když svět nemá vlastní šablonu
+// bestie). Dřív chybělo → `registry.get('generic','bestie')` vracelo null a
+// editor/spawn bestie u „Vlastního Systému" hlásil „schéma není registrované".
+export const genericBestieSchema = bestieJson as SystemEntitySchema;
 
-export const genericSchemas: SystemEntitySchema[] = [genericTokenSchema];
+export const genericSchemas: SystemEntitySchema[] = [
+  genericTokenSchema,
+  genericBestieSchema,
+];

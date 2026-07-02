@@ -19,6 +19,7 @@ import {
   Download,
   Map as MapIcon,
   Swords,
+  Skull,
 } from 'lucide-react';
 import { Spinner, Tabs, type TabItem } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
@@ -53,6 +54,12 @@ const CalendarConfigsPage = lazy(
 );
 const WorldDiarySchemaEditorPage = lazy(
   () => import('@/features/world/pages/WorldDiarySchemaEditorPage'),
+);
+const WorldEntitySchemaEditorPage = lazy(
+  () =>
+    import(
+      '@/features/world/pages/WorldEntitySchemaEditorPage/WorldEntitySchemaEditorPage'
+    ),
 );
 const WorldEmotesAdminPage = lazy(
   () => import('@/features/world/pages/WorldEmotesAdminPage/WorldEmotesAdminPage'),
@@ -175,6 +182,16 @@ const TABS: SettingsTab[] = [
     minRole: WorldRole.PJ,
     minSystem: SYSTEM_CUSTOM_ID,
     render: () => <WorldDiarySchemaEditorPage />,
+  },
+  {
+    // 16.2g F2 — editor schématu bestie. Jen „Vlastní Systém" (u presetů je
+    // bestie schema v assets). Statblok se renderuje na mapě i v chatu.
+    id: 'sablona-bestie',
+    label: 'Šablona bestie',
+    icon: <Skull size={18} />,
+    minRole: WorldRole.PJ,
+    minSystem: SYSTEM_CUSTOM_ID,
+    render: () => <WorldEntitySchemaEditorPage />,
   },
   {
     // Sdílený motiv světa = brand světa → jen vedení (PomocnyPJ+). Bug-fix:

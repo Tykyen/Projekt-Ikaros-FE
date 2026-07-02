@@ -13,7 +13,7 @@ import { BestieStatblock } from "../tokens/BestieStatblock";
 import type { AbilityDraft } from "../tokens/BestieStatblock";
 import { useTokenUpdate } from "../../hooks/useTokenUpdate";
 import { performSheetRoll } from "../../utils/rollFromSheet";
-import { systemEntitySchemaRegistry } from "../../schemas/registry";
+import { useResolvedEntitySchema } from "../../schemas/useEntitySchemaVersions";
 import type { MapToken } from "../../types";
 import type { MapRollRequest } from "../../hooks/useMapDiceRoll";
 import styles from "./TokenSystemSheet.module.css";
@@ -80,15 +80,16 @@ export function BestiePanelView({
   );
   const [notes, setNotes] = useState<string>(token.notes ?? "");
   const update = useTokenUpdate(sceneId, worldId);
+  // 16.2g F2 — world-scoped token schéma (Vlastní Systém) pro sanitizaci klíčů.
+  const tokenSchema = useResolvedEntitySchema(worldId, systemId, "token");
 
   const handleSave = (): void => {
     // Sanitizace systemStats na klíče známé schématu. BE `validateForPatch` je
     // STRICT — odmítne neznámý klíč. Starší tokeny mají v systemStats legacy
     // smetí (zaseknuté `abilities`, odebrané `health.base`) → bez filtru by save
     // spadl na „Unknown field". Filtr drží jen pole z `<system>:token` schématu.
-    const schema = systemEntitySchemaRegistry.get(systemId, "token");
     const knownKeys = new Set(
-      schema?.sections.flatMap((s) => s.fields.map((f) => f.key)) ?? [],
+      tokenSchema?.sections.flatMap((s) => s.fields.map((f) => f.key)) ?? [],
     );
     const cleanStats =
       knownKeys.size > 0

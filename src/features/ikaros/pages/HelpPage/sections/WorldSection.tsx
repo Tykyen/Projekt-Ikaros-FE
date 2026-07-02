@@ -284,9 +284,16 @@ export function WorldSection() {
             potřebuje výjimku.
           </CalloutBox>
           <p>
-            Zatím si takhle stavíš <strong>deník</strong>. Vlastní bestiář, bojový
-            panel na taktické mapě, propsání do chatu a vlastní vzhledy (skiny)
-            pro tvůj systém <strong>připravujeme</strong>. 🚧
+            Kromě deníku si stejně poskládáš i <strong>šablonu bestie</strong>{' '}
+            (Nastavení světa → Šablona bestie) — statblok (životy, zbroj,
+            iniciativa, vlastní pole) se pak vykreslí v bestiáři, na{' '}
+            <strong>taktické mapě</strong> i v <strong>chatu</strong>. Deník i
+            bestie tvého systému už tedy fungují všude.
+          </p>
+          <p>
+            Vlastní <strong>kostkové mechaniky</strong> (jak se u tvého systému
+            hází) a vlastní <strong>vzhledy (skiny)</strong> pro tvůj systém
+            zatím <strong>připravujeme</strong>. 🚧
           </p>
         </Tool>
         <Tool icon={<Backpack size={16} />} title="Osobní výbava" audience={{ kind: 'hrac', label: 'Hráč + PJ' }}>

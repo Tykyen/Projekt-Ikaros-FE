@@ -22,7 +22,7 @@ import { bestiarQueryKey } from '@/features/world/bestiar/hooks/useBestiar';
 import type { BestiarResponse } from '@/features/world/bestiar/types';
 import { EntitySchemaForm } from '../schema-form/EntitySchemaForm';
 import { EntityStatbar } from '../schema-form/EntityStatbar';
-import { systemEntitySchemaRegistry } from '../../schemas/registry';
+import { useResolvedEntitySchema } from '../../schemas/useEntitySchemaVersions';
 import type { MapToken } from '../../types';
 import styles from './BestieStatblock.module.css';
 
@@ -81,7 +81,8 @@ export function BestieStatblock({
   // Šablonové poznámky — read-only společný lore, jen PJ.
   const templateNotes = canEdit ? bestie?.notes : undefined;
 
-  const schema = systemEntitySchemaRegistry.get(systemId, 'token');
+  // 16.2g F2 — world-scoped schéma pro „Vlastní Systém" (jinak statický registry).
+  const schema = useResolvedEntitySchema(worldId, systemId, 'token');
 
   if (!schema) {
     return (

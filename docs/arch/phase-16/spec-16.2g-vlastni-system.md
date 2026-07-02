@@ -1,7 +1,21 @@
 # 16.2g — Vlastní systém (meta-systém): engine pro deník/bestii/mapu/chat/skiny na míru
 
-**Status:** F1 HOTOVO (2026-07-02, čeká živé ověření po deployi) · F2–F6 čekají · **Vytvořeno:** 2026-07-02
+**Status:** F1 + F2 HOTOVO (2026-07-02, čeká živé ověření + BE restart) · F3–F6 čekají · **Vytvořeno:** 2026-07-02
 **Rozsah odsouhlasen:** celé (Úroveň 3), po krocích F1–F6, žádný dluh.
+
+> **F2 dokončeno 2026-07-02** — bestie schema builder + render na TM a v chatu.
+> **Zjištění z průzkumu:** deník i bestie na taktické mapě a v chatu už fungovaly
+> fallbackem (generic `DiaryTab` / `BestiePanelView` z `generic:token`). Reálná
+> práce byla jen **editor šablony bestie (B)**: nová BE kolekce
+> `entity_schema_versions` (per-svět verzované `SystemEntitySchema.sections`) +
+> modul (repo/service/controller/DTO) + `SystemStatsValidator` `*WithSchema`
+> metody + `BestiaeService` world-scoped validace. FE: hook `useResolvedEntitySchema`
+> (world custom → jinak registry fallback; token fallbackuje na world `bestie`),
+> napojený do `BestieStatblock` (mapa+chat), `BestiePanelView`, `BestieEditorModal`;
+> editor `EntitySchemaEditor` + tab „Šablona bestie" (jen `vlastni`, PJ+);
+> `generic/bestie.json` fallback. Ověřeno: BE typecheck+prettier+eslint, FE tsc +
+> 853 testů + eslint. **Nutný BE restart** (nová kolekce/modul). Hody z bestie
+> zůstávají 4dF (mechanika = F4).
 
 > **F1 dokončeno 2026-07-02** — čistě FE (BE `config` je volný objekt, `expression`
 > projde bez BE změny). Ověřeno: `tsc -b`, 341 testů, `eslint`. Živý vizuál po deployi.

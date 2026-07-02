@@ -14,7 +14,7 @@
  */
 import { useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
+import { useResolvedEntitySchema } from '@/features/world/tactical-map/schemas/useEntitySchemaVersions';
 import { EntitySchemaForm } from '@/features/world/tactical-map/components/schema-form/EntitySchemaForm';
 import { Drd16BestieForm } from './Drd16BestieForm';
 import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/HeroUploadCard';
@@ -45,7 +45,8 @@ export function BestieEditorModal({
   onClose,
   onSaved,
 }: Props): React.ReactElement {
-  const schema = systemEntitySchemaRegistry.get(systemId, 'bestie');
+  // 16.2g F2 — world-scoped bestie schéma pro „Vlastní Systém" (jinak registry).
+  const schema = useResolvedEntitySchema(worldId, systemId, 'bestie');
   const { create, update } = useBestieMutations(worldId, systemId);
   const currentUser = useAtomValue(currentUserAtom);
   const isGlobalAdmin =

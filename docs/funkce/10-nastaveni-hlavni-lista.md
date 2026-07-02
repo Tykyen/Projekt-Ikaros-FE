@@ -112,6 +112,16 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 - **Stav:** ✅ deník builder (F1) · 🚧 F2–F6 (bestie/combat/chat/skiny)
 - **Kód:** FE `pages/WorldDiarySchemaEditorPage` (+`templates/starterTemplates.ts`, `components/{BlockConfigPanel,SchemaPreview}.tsx`, `utils/schemaMappers.ts`), `CharacterDetailPage/components/{DiaryTab,DiaryBlockView,diaryFormula}.tsx` + `editors/SchemaValueEditor.tsx`, `world/systemId.ts` (alias `vlastni→generic`); BE `worlds.service.ts` diarySchemaVersion metody, `diary-schema-versions.schema.ts` (config volný). Spec `docs/arch/phase-16/spec-16.2g-vlastni-system.md`.
 
+### Tab Šablona bestie (16.2g F2) — jen „Vlastní Systém"
+- **Co to je:** editor per-svět schématu bestie (statblok) pro „Vlastní Systém". Analog „Šablony deníku", ale drží bohatší `SystemEntitySchema.sections` (pole s `combatBehavior` → HP bar / iniciativa na mapě). Statblok se z něj vykreslí v bestiáři, na taktické mapě i v chatu.
+- **Co jde dělat:** definovat sekce → pole (název/klíč/typ `number|string|enum|boolean|computed`, `combatBehavior`, min/max, možnosti enumu, vzorec, povinné); živý náhled přes `EntityStatbar`; start ze základní šablony (HP/zbroj/pohyb/iniciativa) nebo z prázdné. Uložení = nová verze (archivuje předchozí).
+- **Kdo (FE):** PJ + `minSystem='vlastni'`. **Kdo (BE):** `POST /worlds/:id/entity-schema-versions` → **PJ+** (`EntitySchemaVersionsService` přes `WorldsService.assertCanAdminWorld`); read = member. Kolekce `entity_schema_versions` (worldId+entityType+version).
+- **Render:** FE `useResolvedEntitySchema(worldId, systemId, entityType)` — pro `vlastni` vezme world verzi (token fallbackuje na world `bestie` = jedno schéma katalog+mapa), jinak/dokud nedorazí statický registry (`generic:bestie`/`generic:token`). Napojeno v `BestieStatblock` (mapa+chat), `BestiePanelView`, `BestieEditorModal`.
+- **Validace bestií:** `BestiaeService` validuje `systemStats` scope='world' proti world schématu (`SystemStatsValidator.*WithSchema`), jinak registry; soft-mode (chybí schéma → projde).
+- **Hranice:** jen deník + bestie statblok; **hody z bestie = 4dF** (vlastní kostková mechanika = F4). Vzhled panelů = generický (skiny = F6). U presetových systémů tab není. **Vyžaduje BE restart** (nová kolekce/modul).
+- **Stav:** ✅ editor + render (F2) · 🚧 F3–F6
+- **Kód:** FE `pages/WorldEntitySchemaEditorPage/{WorldEntitySchemaEditorPage,EntitySchemaEditor}.tsx`, `tactical-map/schemas/{useEntitySchemaVersions,entitySchemaVersions.types}.ts` + `generic/bestie.json`; BE `modules/entity-schema-versions/*`, `bestiae.service.ts` (validateStats), `system-stats-validator.service.ts` (`*WithSchema`). Spec `docs/arch/phase-16/spec-16.2g-vlastni-system.md`.
+
 ### Tab Emoty světa
 - **Co to je:** správa custom emotů světa pro chat (6.4c). Mřížka, počítadlo (`EMOTE_LIMIT_PER_WORLD`), upload/edit/copy/delete.
 - **Co jde dělat:** nahrát/upravit/smazat emote, zkopírovat z jiného světa.

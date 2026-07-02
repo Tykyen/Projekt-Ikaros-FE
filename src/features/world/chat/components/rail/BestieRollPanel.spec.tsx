@@ -44,12 +44,13 @@ vi.mock('@/features/world/tactical-map/components/tokens/BestieStatblock', () =>
 
 import { BestieRollPanel } from './BestieRollPanel';
 
-// Systém bez dedikovaného chat bestie panelu (drd16/matrix mají vlastní) →
-// ověřuje GENERICKOU katalogovou cestu (BestieStatblock + lore + fate).
+// „Vlastní Systém" (generic) — nemá dedikovaný chat bestie panel → ověřuje
+// GENERICKOU katalogovou cestu (BestieStatblock + lore + fate). Dřív `coc`,
+// ten ale od 8.7v dedikovaný panel má (drift → test padal na CocChatBestiePanel).
 const bestie = {
   id: 'b1',
   scope: 'world',
-  systemId: 'coc',
+  systemId: 'vlastni',
   name: 'Skřet',
   imageUrl: 'http://x/s.png',
   notes: 'Zlý skřet.',
@@ -64,7 +65,7 @@ describe('BestieRollPanel (16.1c)', () => {
       <BestieRollPanel
         worldId="w1"
         channelId="c1"
-        systemId="coc"
+        systemId="vlastni"
         bestie={bestie}
       />,
     );
@@ -87,7 +88,7 @@ describe('BestieRollPanel (16.1c)', () => {
       <BestieRollPanel
         worldId="w1"
         channelId="c1"
-        systemId="coc"
+        systemId="vlastni"
         bestie={bestie}
       />,
     );

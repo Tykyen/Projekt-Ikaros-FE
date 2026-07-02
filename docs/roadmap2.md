@@ -465,10 +465,10 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] Skiny (→ 16.2c)
 - **Vlastní / generic** (`vlastni` / `generic`) — engine, ne obsah; *stav kódu:* generic `DiaryBlockView` (PJ schéma), mapa `DiaryTab` fallback. **Rozpracováno jako 16.2g (F1–F6), rozsah odsouhlasen celý.**
   - [x] **Deník builder — funkčně (16.2g F1, 2026-07-02)** — všech 9 typů polí editovatelných (oprava number/textarea/relation-picker/formula), formula end-to-end (dřív mrtvá), sekce (`layoutArea`), alias `vlastni→generic`, prázdný stav + 3 startovní šablony. Grafika/skiny = F6. Živý vizuál po deployi.
-  - [ ] Bestie builder (F2)
-  - [ ] Taktická mapa / combat readout (F3)
-  - [ ] Kostky / hod (F4)
-  - [ ] Chat obal (F5 → 16.1)
+  - [x] **Bestie builder + render na TM/chatu (16.2g F2, 2026-07-02)** — editor šablony bestie (BE kolekce `entity_schema_versions` per-svět verzovaná; FE `useResolvedEntitySchema` → BestieStatblock/panel/editor; tab „Šablona bestie" PJ+; `generic/bestie.json`). **Nutný BE restart.** Živý vizuál po deployi.
+  - [x] Taktická mapa (F3) — deník i bestie render **fallbackem** (`DiaryTab` / `BestiePanelView` z world/generic schématu); klikací combat hody = F4
+  - [ ] Kostky / hod — vlastní mechanika (F4; teď 4dF/generic)
+  - [x] Chat obal (F5) — deník i bestie render fallbackem; skin dotažení = F6
   - [ ] Skiny (F6 → 16.2c)
 
 **Pozn. k stavu kódu (výchozí bod, ne TODO):** funkčně má list+testy **12/12**; v mapě je combat panel u **6** (`matrix`, `drd2`, `dnd5e`, `gurps`, `fate`, `coc`), jen `onRoll` fallback u **2** (`drd16`, `drdplus`), bez klikacích hodů **3** (`jad`, `pi`, `shadowrun`), drift blokuje **1** (`drdh`); chat **0/12** (vše 16.1). Grafický průchod se dělá u všech bez ohledu na tento stav.
