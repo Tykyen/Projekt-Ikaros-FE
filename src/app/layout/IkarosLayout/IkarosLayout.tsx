@@ -887,8 +887,9 @@ export function IkarosLayout() {
       <div
         className={clsx(
           s.body,
-          (isChat || isAdmin) && s.bodyNoRight,
-          isAdminChat && s.bodyFull,
+          // Admin chat = full-bleed (jen 1 sloupec); jinak chat/admin = bez
+          // pravého panelu. Výlučně, ať se konfliktní grid třídy nepřekrývají.
+          isAdminChat ? s.bodyFull : (isChat || isAdmin) && s.bodyNoRight,
         )}
       >
         <aside className={s.sidebar} data-frame-panel="sidebar">
