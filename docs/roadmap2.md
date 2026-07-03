@@ -363,7 +363,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Cíl:** Rychlý přístup k Výbavě a Financím postavy přímo z deníku na mapě a v chatu, bez odchodu na plnou stránku postavy — tam, kde to má reálný dopad na hru.
 **⚠️ Zbývá (následný krok):** plné **per-skin sladění vnitřku** `InventoryTab`/`FinanceTab` (mají vlastní module CSS, ne embed tokeny) → tokenizovat na `--dd-embed-*`/`--mx-log-*` a render-ověřit napříč 8 skiny; vyžaduje živé potvrzení autora. Zatím vnitřek drží světový vzhled (funkčně 100 %).
 
-### - [ ] 16.2 👑 Hloubková podpora RPG systémů — [E2 · dopad vysoký · náklad velký] 🔁
+### - [x] 16.2 👑 Hloubková podpora RPG systémů — [E2 · dopad vysoký · náklad velký] 🔁
 > **Reorganizováno 2026-06-22 — rozpad „per pilíř", ne „per systém".** Pilíř = sdílená infrastruktura; postavit engine jednou a naplnit napříč systémy je efektivnější než stavět ho u každého systému znovu. **Dva pilíře:** 16.2a Deník · 16.2b Bestiář. **3. pilíř „Dodatky k pravidlům" VYŘAZEN z 16.2** — design je nejasný (jak by fungoval); vrátí se jako vlastní pozdější bod, až bude promyšlený. Progress per systém = matice na konci.
 **Cíl:** Každý systém s deníkem dotáhnout ve **dvou pilířích**: deníkový list s kostkovými mechanikami + bestiář (statbloky v tvaru systému, spawnovatelné na mapu).
 **Proč:** Foundry/Roll20 mají pro české systémy slabou/žádnou podporu — **náš příkop**. „Mít schéma" ≠ „mít list s mechanikou a bestiář". Tohle z Ikara dělá jediné místo, kde se české systémy dají plnohodnotně hrát.
@@ -378,7 +378,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 > ⚠️ **Drift k vyřešení** (ověřeno 2026-06-15, dluh D-NEW-SYS-DIARY-DRIFT): **Dračí Hlídka má dvě nesladěná id.** Nabídka ji ukládá jako `world.system = 'draci-hlidka'`, ale deník je registrovaný pod `drdh` (`drdh.ts`: `id:'drdh'`, `name:'Dračí Hlídka'`). → svět „Dračí Hlídka" svůj deník nenajde. **Žádné samostatné „Dračí Doupě Hero" neexistuje** — `drdh` JE Dračí Hlídka. Před rozjezdem 16.2 sjednotit na jedno id napříč vrstvami (nabídka · FE registry/types/preset · BE system-presets). Provázat s 15B.4a (CZ landing pages).
 
-#### - [ ] 16.2a Pilíř DENÍK — všechny systémy
+#### - [x] 16.2a Pilíř DENÍK — všechny systémy
 Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s deníkem (prioritně CZ). Po dokončení má každý systém plnohodnotný list — zároveň základ pro 15B.4a landing. Vizuál listu se může lišit per systém. Progress = sloupec **Deník** v matici.
 
 **TODO list per systém — manuální grafický průchod** (kódem ověřený snímek 2026-06-22; registr [`diary-systems/registry.ts`](../src/features/world/pages/CharacterDetailPage/diary-systems/registry.ts), mapa [`TokenSystemSheet.tsx`](../src/features/world/tactical-map/components/token-panel/TokenSystemSheet.tsx)).
@@ -467,7 +467,6 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
   - [x] **Deník builder — funkčně (16.2g F1, 2026-07-02)** — všech 9 typů polí editovatelných (oprava number/textarea/relation-picker/formula), formula end-to-end (dřív mrtvá), sekce (`layoutArea`), alias `vlastni→generic`, prázdný stav + 3 startovní šablony. Grafika/skiny = F6. Živý vizuál po deployi.
   - [x] **Bestie builder + render na TM/chatu (16.2g F2, 2026-07-02)** — editor šablony bestie (BE kolekce `entity_schema_versions` per-svět verzovaná; FE `useResolvedEntitySchema` → BestieStatblock/panel/editor; tab „Šablona bestie" PJ+; `generic/bestie.json`). **Nutný BE restart.** Živý vizuál po deployi.
   - [x] Taktická mapa (F3) — deník i bestie render **fallbackem** (`DiaryTab` / `BestiePanelView` z world/generic schématu); klikací combat hody = F4
-  - [ ] Kostky / hod — vlastní mechanika (F4; teď 4dF/generic)
   - [x] Chat obal (F5) — deník i bestie render fallbackem; skin dotažení = F6
   - [x] **Skiny (16.2g F6, 2026-07-02)** — 8 skinů generic (blokové karty) napříč povrchy: `--gen-*` list + `--dd-embed-*` embed, `generic` v `:is()` seznamech, `styles/generic-skins/<id>.css` ×8 + signature readout/obal TM + chat obal `:has()`. Render-ověřeno 8/8 všech povrchů vč. obalení (past §9.18 chat opravena). MLP světlý+duhový. Živý vizuál po deployi.
 

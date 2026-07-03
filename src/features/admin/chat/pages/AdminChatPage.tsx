@@ -16,7 +16,6 @@ import {
   FileText,
   Upload,
   Download,
-  Maximize2,
   Trash2,
   Pencil,
   Check,
@@ -35,10 +34,12 @@ import {
 import {
   useAdminDocuments,
   useUploadDocument,
+  useRenameDocument,
   useDeleteDocument,
 } from '../api/useAdminDocuments';
 import {
   useAdminTasks,
+  useAdminStaff,
   useCreateTask,
   useUpdateTask,
   useDeleteTask,
@@ -57,18 +58,6 @@ function fmtTime(iso: string | Date): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
-}
-
-function fmtSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} kB`;
-  return `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} MB`;
-}
-
-function fmtDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric' });
 }
 
 const AVATAR_PALETTE = [
@@ -97,7 +86,6 @@ export default function AdminChatPage() {
   const { data: channels } = useAdminChatChannels();
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [view, setView] = useState<'chat' | 'docs'>('chat');
-  const [readingDoc, setReadingDoc] = useState<PlatformDocument | null>(null);
   const [messageText, setMessageText] = useState('');
 
   useEffect(() => {
@@ -122,7 +110,6 @@ export default function AdminChatPage() {
 
   const openChat = () => {
     setView('chat');
-    setReadingDoc(null);
   };
 
   const handleSend = () => {
@@ -307,9 +294,6 @@ export default function AdminChatPage() {
             </div>
           ) : (
             <DocumentsView
-              readingDoc={readingDoc}
-              onOpen={setReadingDoc}
-              onBackToList={() => setReadingDoc(null)}
               onBackToChat={openChat}
               currentUserId={user?.id}
               isSuperadmin={isSuperadmin}
@@ -333,6 +317,7 @@ function TasksPanel({
   isSuperadmin: boolean;
 }) {
   const { data: tasks } = useAdminTasks();
+  const { data: staff } = useAdminStaff();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -344,35 +329,33 @@ function TasksPanel({
   const [editText, setEditText] = useState('');
 
   const groups = useMemo(() => {
-    const map = new Map<
-      string,
-      { ownerId: string; ownerName: string; tasks: AdminTask[] }
-    >();
+    const byOwner = new Map<string, AdminTask[]>();
     for (const t of tasks ?? []) {
-      const g = map.get(t.ownerId) ?? {
-        ownerId: t.ownerId,
-        ownerName: t.ownerName,
-        tasks: [],
-      };
-      g.tasks.push(t);
-      map.set(t.ownerId, g);
+      const arr = byOwner.get(t.ownerId) ?? [];
+      arr.push(t);
+      byOwner.set(t.ownerId, arr);
     }
-    // Vlastní skupina vždy (i prázdná) — ať si můžu přidat úkol.
-    if (currentUserId && !map.has(currentUserId)) {
-      map.set(currentUserId, {
-        ownerId: currentUserId,
-        ownerName: 'Ty',
-        tasks: [],
-      });
-    }
-    const arr = Array.from(map.values());
-    arr.sort((a, b) => {
+    // Základ = všichni admini (i bez úkolů). Fallback na ownery z úkolů,
+    // dokud se seznam členů nenačte.
+    const members =
+      staff && staff.length > 0
+        ? staff.map((m) => ({
+            ownerId: m.id,
+            ownerName: m.username,
+            tasks: byOwner.get(m.id) ?? [],
+          }))
+        : Array.from(byOwner.entries()).map(([id, ts]) => ({
+            ownerId: id,
+            ownerName: ts[0]?.ownerName ?? '?',
+            tasks: ts,
+          }));
+    members.sort((a, b) => {
       if (a.ownerId === currentUserId) return -1;
       if (b.ownerId === currentUserId) return 1;
       return a.ownerName.localeCompare(b.ownerName, 'cs');
     });
-    return arr;
-  }, [tasks, currentUserId]);
+    return members;
+  }, [tasks, staff, currentUserId]);
 
   const togglePerson = (id: string) =>
     setCollapsed((prev) => {
@@ -547,22 +530,17 @@ function TasksPanel({
 
 // ── Dokumenty (napojené na BE) ────────────────────────────────────────────
 function DocumentsView({
-  readingDoc,
-  onOpen,
-  onBackToList,
   onBackToChat,
   currentUserId,
   isSuperadmin,
 }: {
-  readingDoc: PlatformDocument | null;
-  onOpen: (d: PlatformDocument) => void;
-  onBackToList: () => void;
   onBackToChat: () => void;
   currentUserId?: string;
   isSuperadmin: boolean;
 }) {
   const { data: docs } = useAdminDocuments();
   const uploadMut = useUploadDocument();
+  const renameMut = useRenameDocument();
   const deleteMut = useDeleteDocument();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -572,40 +550,17 @@ function DocumentsView({
     e.target.value = '';
   };
 
-  if (readingDoc) {
-    return (
-      <div className={s.docs}>
-        <div className={s.chhead}>
-          <button type="button" className={s.backbtn} onClick={onBackToList}>
-            <ArrowLeft size={15} aria-hidden /> Zpět na dokumenty
-          </button>
-          <div className={s.chHeadMeta}>
-            <div className={s.chTitle}>{readingDoc.filename}</div>
-            <div className={s.chSub}>
-              {fmtSize(readingDoc.sizeBytes)} · nahrál {readingDoc.uploaderName}
-            </div>
-          </div>
-          <div className={s.spacer} />
-          <a
-            className={s.docbtn}
-            href={readingDoc.url}
-            target="_blank"
-            rel="noreferrer"
-            download
-          >
-            <Download size={15} aria-hidden /> Stáhnout
-          </a>
-        </div>
-        <div className={s.readerBody}>
-          <iframe
-            className={s.pdfFrame}
-            src={readingDoc.url}
-            title={readingDoc.filename}
-          />
-        </div>
-      </div>
-    );
-  }
+  // Cloudinary raw PDF blokuje naše CSP v <iframe> → otevřít v nové kartě
+  // (nativní PDF viewer prohlížeče).
+  const openDoc = (d: PlatformDocument) =>
+    window.open(d.url, '_blank', 'noopener,noreferrer');
+
+  const renameDoc = (d: PlatformDocument) => {
+    const name = window.prompt('Nový název dokumentu:', d.filename)?.trim();
+    if (name && name !== d.filename) {
+      renameMut.mutate({ id: d.id, filename: name });
+    }
+  };
 
   return (
     <div className={s.docs}>
@@ -616,7 +571,7 @@ function DocumentsView({
         <div className={s.chHeadMeta}>
           <div className={s.chTitle}>Sdílené dokumenty</div>
           <div className={s.chSub}>
-            PDF dostupné všem adminům · klikni na dokument pro čtení
+            PDF dostupné všem adminům · klikni na dokument pro otevření
           </div>
         </div>
         <div className={s.spacer} />
@@ -638,42 +593,35 @@ function DocumentsView({
         </button>
       </div>
       <div className={s.doctable}>
-        <div className={`${s.docrow} ${s.docrowHead}`}>
-          <span>Název</span>
-          <span>Velikost</span>
-          <span>Nahrál</span>
-          <span className={s.right}>Akce</span>
-        </div>
         {(docs ?? []).map((d) => {
-          const canDelete = isSuperadmin || d.uploaderId === currentUserId;
+          const canManage = isSuperadmin || d.uploaderId === currentUserId;
           return (
             <div
               key={d.id}
               className={s.docrow}
-              onClick={() => onOpen(d)}
+              onClick={() => openDoc(d)}
               role="button"
               tabIndex={0}
+              title={d.filename}
             >
               <span className={s.docname}>
                 <span className={s.docPdf}>PDF</span>
                 <span className={s.docNm}>{d.filename}</span>
               </span>
-              <span className={s.docmeta}>{fmtSize(d.sizeBytes)}</span>
-              <span className={s.docby}>
-                {d.uploaderName} · {fmtDate(d.createdAt)}
-              </span>
               <span className={s.docact}>
-                <button
-                  type="button"
-                  className={s.miniAct}
-                  title="Přečíst"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpen(d);
-                  }}
-                >
-                  <Maximize2 size={14} aria-hidden />
-                </button>
+                {canManage && (
+                  <button
+                    type="button"
+                    className={s.miniAct}
+                    title="Přejmenovat"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      renameDoc(d);
+                    }}
+                  >
+                    <Pencil size={14} aria-hidden />
+                  </button>
+                )}
                 <a
                   className={s.miniAct}
                   href={d.url}
@@ -685,7 +633,7 @@ function DocumentsView({
                 >
                   <Download size={14} aria-hidden />
                 </a>
-                {canDelete && (
+                {canManage && (
                   <button
                     type="button"
                     className={s.miniAct}

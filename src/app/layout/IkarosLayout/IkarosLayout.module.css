@@ -158,6 +158,15 @@
   grid-template-columns: var(--sidebar-w, 280px) 1fr;
 }
 
+/* 20.5 — admin chat = full-bleed přes celou plochu (i bez levé navigace),
+   jako světový chat. Musí být ZA `.bodyNoRight` (přebije jeho grid). */
+.bodyFull {
+  grid-template-columns: 1fr;
+}
+.bodyFull .sidebar {
+  display: none;
+}
+
 .main {
   overflow-y: auto;
   min-width: 0;

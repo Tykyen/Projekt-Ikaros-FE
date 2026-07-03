@@ -16,6 +16,14 @@ export function isSeedChannel(ch: AdminChatChannel): boolean {
   return ch.type === 'staff-main' || ch.type === 'staff-vedeni';
 }
 
+/** 20.5 — člen týmu správy pro panel úkolů (Superadmin/Admin). */
+export interface StaffMember {
+  id: string;
+  username: string;
+  avatarUrl?: string;
+  role: number;
+}
+
 /** 20.5 — úkol v panelu „Úkoly týmu" (zrcadlí BE `AdminTask`). */
 export interface AdminTask {
   id: string;

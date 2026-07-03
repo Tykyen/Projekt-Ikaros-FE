@@ -884,7 +884,13 @@ export function IkarosLayout() {
         {isAuthenticated ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </header>
 
-      <div className={clsx(s.body, (isChat || isAdmin) && s.bodyNoRight)}>
+      <div
+        className={clsx(
+          s.body,
+          (isChat || isAdmin) && s.bodyNoRight,
+          isAdminChat && s.bodyFull,
+        )}
+      >
         <aside className={s.sidebar} data-frame-panel="sidebar">
           <PanelCorners />
           <SidebarContent isAuthenticated={isAuthenticated} />

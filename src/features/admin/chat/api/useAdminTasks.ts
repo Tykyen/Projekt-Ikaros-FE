@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { AdminTask } from '../lib/types';
+import type { AdminTask, StaffMember } from '../lib/types';
 
 const BASE = '/admin-chat/tasks';
 
 export const adminTaskKeys = {
   list: ['admin-chat', 'tasks'] as const,
+  staff: ['admin-chat', 'staff'] as const,
 };
 
 /** Všechny úkoly týmu (veřejné mezi adminy). */
@@ -13,6 +14,14 @@ export function useAdminTasks() {
   return useQuery({
     queryKey: adminTaskKeys.list,
     queryFn: () => api.get<AdminTask[]>(BASE),
+  });
+}
+
+/** Všichni členové týmu správy (Superadmin+Admin) — i bez úkolů. */
+export function useAdminStaff() {
+  return useQuery({
+    queryKey: adminTaskKeys.staff,
+    queryFn: () => api.get<StaffMember[]>(`${BASE}/staff`),
   });
 }
 

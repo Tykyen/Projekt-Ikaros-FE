@@ -29,6 +29,16 @@ export function useUploadDocument() {
   });
 }
 
+/** Přejmenování dokumentu (BE gate: nahravatel nebo superadmin). */
+export function useRenameDocument() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, filename }: { id: string; filename: string }) =>
+      api.patch<PlatformDocument>(`${BASE}/${id}`, { filename }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: adminDocKeys.list }),
+  });
+}
+
 /** Smazání dokumentu (BE gate: nahravatel nebo superadmin). */
 export function useDeleteDocument() {
   const qc = useQueryClient();
