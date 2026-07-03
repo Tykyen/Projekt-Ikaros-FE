@@ -1,0 +1,172 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část III — DSA, moderace a diskuse</div>
+    <h2>Notice-and-action a odůvodnění zásahu</h2>
+  </div>
+
+  <p class="lead">Předchozí kapitola vymezila, které povinnosti DSA na Ikaros vůbec dopadají. Tato je provede do provozu: postaví <strong>oznamovací mechanismus</strong> podle <span class="mono">čl. 16</span>, definuje <strong>pole hlásicího formuláře</strong>, sepíše <strong>odůvodnění zásahu</strong> podle <span class="mono">čl. 17</span> (statement of reasons) a napojí <strong>kontaktní místa</strong> (<span class="mono">čl. 11–12</span>), <strong>oznámení trestného činu</strong> (<span class="mono">čl. 18</span>) a <strong>reakci na příkazy orgánů</strong> (<span class="mono">čl. 9–10</span>). Cíl: každý příspěvek nahlasitelný, každé rozhodnutí odůvodněné, každý krok doložitelný. Notice-and-action a odůvodnění nezruší ani výjimka mikro/malý podle <span class="mono">čl. 19</span> — jsou to hostingové povinnosti, které platí i pro nejmenší projekt.</p>
+
+  <h3>Oznamovací mechanismus (čl. 16)</h3>
+  <p>Poskytovatel hostingu musí zavést mechanismus, jímž <strong>kdokoli</strong> — jednotlivec i organizace — oznámí konkrétní položky obsahu, které považuje za protiprávní. DSA klade na formu tři tvrdé nároky: mechanismus musí být <strong>snadno přístupný, uživatelsky přívětivý</strong> a umožnit podání <strong>výlučně elektronicky</strong>. Pro Ikaros to znamená nahlásit obsah přímo u příspěvku — ne někde v zápatí schovaný e-mail.</p>
+
+  <div class="callout cyan">
+    <div class="t">Umístění, ne jen existence</div>
+    <p>DSA nestačí splnit tím, že „formulář někde je". Tlačítko <strong>Nahlásit</strong> patří přímo k příspěvku, komentáři, profilu, mapě i položce veřejné knihovny — všude, kde vzniká veřejně šířený UGC. URL/ID obsahu se do formuláře <strong>předvyplní automaticky</strong>, aby oznamovatel neopisoval odkaz ručně a nespletl se.</p>
+  </div>
+
+  <h3>Pole hlásicího formuláře</h3>
+  <p><span class="mono">Čl. 16 odst. 2</span> vyžaduje, aby oznámení bylo <strong>dostatečně přesné a náležitě odůvodněné</strong>. Formulář proto musí vést oznamovatele k tomu, aby dodal čtyři zákonné prvky (a–d níže). Kategorii přidáváme navíc pro priorizaci a přidělení týmu — DSA ji nevyžaduje, provoz ano.</p>
+
+  <div class="feat">
+    <h4>Struktura formuláře „Nahlásit obsah"</h4>
+    <ul>
+      <li><b>Kategorie</b> — autorská práva / osobní údaj / obtěžování / ohrožení nezletilých / jiný nelegální obsah / spam. <em>(provozní, ne zákonný prvek; řídí SLA a eskalaci)</em></li>
+      <li><b>URL nebo ID obsahu</b> — <span class="mono">čl. 16(2)(b)</span>: „jasné určení přesné elektronické polohy, například přesná URL". Předvyplněno.</li>
+      <li><b>Popis / odůvodnění</b> — <span class="mono">čl. 16(2)(a)</span>: dostatečně podložené vysvětlení, proč je obsah protiprávní.</li>
+      <li><b>Jméno + e-mail oznamovatele</b> — <span class="mono">čl. 16(2)(c)</span>: povinné, <b>s výjimkou</b> obsahu spadajícího pod trestné činy proti dětem (<span class="mono">čl. 3–7 směrnice 2011/93/EU</span>) — tam smí být anonymní.</li>
+      <li><b>Prohlášení o dobré víře</b> — <span class="mono">čl. 16(2)(d)</span>: potvrzení, že údaje a tvrzení jsou dle nejlepšího vědomí správné a úplné. (Zaškrtávátko.)</li>
+      <li><b>Důkaz / oprávnění jednat</b> — u autorskoprávních nároků: doložení práv nebo zmocnění držitele. <em>(podmínka pro copyright kategorii)</em></li>
+      <li><b>Volba „informovat mě o výsledku"</b> — je-li vyplněn kontakt, systém tak jako tak potvrdí přijetí a sdělí rozhodnutí (<span class="mono">čl. 16(4) a (5)</span>).</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Anonymita u trestných činů proti dětem</div>
+    <p>Jediná zákonná výjimka z povinného kontaktu je obsah týkající se pohlavního zneužívání dětí (<span class="mono">čl. 3–7 směrnice 2011/93/EU</span>). Formulář musí umožnit takové oznámení <strong>bez jména a e-mailu</strong> — kdo naráží na CSAM, nesmí být nucen se identifikovat. U všech ostatních kategorií je kontakt povinný.</p>
+  </div>
+
+  <h3>Co se stane po odeslání — proces (čl. 16 odst. 3–6)</h3>
+  <div class="phase"><div class="num">1</div><div class="body"><b>Potvrzení přijetí.</b> Je-li vyplněn kontakt, systém bez zbytečného odkladu pošle potvrzení o přijetí oznámení (<span class="mono">čl. 16(4)</span>). Automatická, časově orazítkovaná zpráva s ID hlášení.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Vyhodnocení.</b> Hlášení se zpracuje <b>včas, s náležitou péčí, nesvévolně a objektivně</b> (<span class="mono">čl. 16(6)</span>). Podle kategorie se přidělí SLA a moderátorovi (viz kapitola 30, stupně M0–M7).</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Rozhodnutí + informace o nápravě.</b> Systém oznamovateli sdělí rozhodnutí a <b>možnosti nápravy</b> proti němu (<span class="mono">čl. 16(5)</span>). Byla-li použita automatizovaná detekce, uvede se to.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Odůvodnění zásahu autorovi.</b> Došlo-li k zásahu do dotčeného obsahu, dostane <b>autor</b> obsahu statement of reasons podle <span class="mono">čl. 17</span> (viz níže) — to je samostatná povinnost vůči jiné osobě než oznamovateli.</div></div>
+  <div class="phase"><div class="num flag">5</div><div class="body"><b>Zaevidování.</b> ID obsahu, kategorie, rozhodnutí, moderátor, čas, obě notifikace a případné odvolání se uloží do moderačního logu jako důkaz konzistence.</div></div>
+
+  <h3>Vzorové znění — potvrzení a rozhodnutí oznamovateli</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>Potvrzení přijetí (čl. 16/4)</h4>
+      <p class="small">Přijali jsme vaše oznámení č. <span class="mono">[ID]</span> ze dne <span class="mono">[datum]</span> týkající se obsahu <span class="mono">[URL/ID]</span>. Kategorie: <span class="mono">[kategorie]</span>. Hlášení posoudíme bez zbytečného odkladu a o výsledku vás vyrozumíme na <span class="mono">[e-mail]</span>.</p>
+    </div>
+    <div class="card">
+      <h4>Rozhodnutí + náprava (čl. 16/5)</h4>
+      <p class="small">K oznámení č. <span class="mono">[ID]</span> jsme rozhodli: <span class="mono">[obsah skryt / odstraněn / ponechán — bez porušení]</span>. Důvod: <span class="mono">[stručně]</span>. Nesouhlasíte-li, můžete se obrátit na kontaktní místo pro uživatele: <span class="mono">[kontakt]</span>. <em>[Bylo/nebylo] použito automatizované posouzení.</em></p>
+    </div>
+  </div>
+
+  <h3>Odůvodnění zásahu — statement of reasons (čl. 17)</h3>
+  <p>Omezí-li Ikaros obsah z důvodu protiprávnosti <strong>nebo</strong> rozporu s podmínkami — tj. skryje, odstraní, znepřístupní, sníží viditelnost (demote), omezí monetizaci, pozastaví/ukončí službu nebo účet — musí dotčenému příjemci poskytnout <strong>jasné a konkrétní odůvodnění</strong>. Odůvodnění musí být srozumitelné a co nejpřesnější a umožnit adresátovi <strong>reálně využít nápravu</strong>.</p>
+
+  <div class="feat">
+    <h4>Povinný obsah odůvodnění (čl. 17 odst. 3)</h4>
+    <ul>
+      <li><b>Typ a rozsah zásahu</b> — zda jde o odstranění, znepřístupnění, snížení viditelnosti, omezení monetizace, pozastavení/ukončení; <b>územní rozsah</b> a <b>doba trvání</b>, je-li relevantní.</li>
+      <li><b>Skutečnosti a okolnosti</b>, o něž se rozhodnutí opírá — včetně toho, zda vzešlo z <b>oznámení podle čl. 16</b>, nebo z <b>vlastní iniciativy</b>; a je-li to <b>nezbytně nutné</b>, identita oznamovatele.</li>
+      <li><b>Použití automatizovaných prostředků</b> — zda byl obsah detekován nebo rozhodnutí přijato automaticky.</li>
+      <li><b>Právní nebo smluvní důvod</b> — konkrétní ustanovení zákona nebo bod podmínek užití, a <b>vysvětlení</b>, proč se obsah považuje za protiprávní či neslučitelný.</li>
+      <li><b>Možnosti nápravy</b> — vnitřní přezkum, mimosoudní řešení, soud; u malého ne-VLOP alespoň vnitřní kontaktní místo a soudní cesta.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Ochrana identity oznamovatele</div>
+    <p><span class="mono">Čl. 17</span> dovoluje uvést identitu oznamovatele v odůvodnění <strong>jen je-li to nezbytně nutné</strong>. Default pro Ikaros: <strong>identitu oznamovatele autorovi neprozrazovat</strong>. Autor se dozví, že přišlo oznámení a proč byl obsah zasažen — ne kdo hlásil. Prozrazení jen výjimečně a po zvážení bezpečnosti oznamovatele (obtěžování, odveta).</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Vzor odůvodnění moderace (statement of reasons)</div>
+    <p><strong>Obsah:</strong> <span class="mono">[ID/URL]</span> · <strong>Datum zásahu:</strong> <span class="mono">[datum]</span> · <strong>Rozhodl:</strong> <span class="mono">[moderátor/role]</span><br>
+    <strong>Zásah:</strong> obsah skryt (znepřístupněn), dočasně, do posouzení; územní rozsah: celá platforma.<br>
+    <strong>Podnět:</strong> oznámení č. <span class="mono">[ID]</span> podle čl. 16 <em>(identita oznamovatele nesdělena)</em>.<br>
+    <strong>Automatizace:</strong> ne — posouzeno člověkem.<br>
+    <strong>Důvod:</strong> rozpor s pravidly komunity, bod <span class="mono">[X]</span> (zákaz zveřejnění soukromých údajů) a § <span class="mono">[…]</span> OZ (ochrana soukromí).<br>
+    <strong>Vysvětlení:</strong> příspěvek obsahoval civilní jméno a bydliště jiného uživatele bez jeho souhlasu.<br>
+    <strong>Náprava:</strong> proti rozhodnutí se lze ohradit na kontaktním místě pro uživatele <span class="mono">[kontakt]</span>; případně soudní cesta.</p>
+  </div>
+
+  <h3>Kontaktní místa (čl. 11 a 12)</h3>
+  <p>Ikaros musí zřídit <strong>dvě jednotná kontaktní místa</strong>. Nejde o totéž — jedno míří k orgánům, druhé k uživatelům, a mají různé nároky.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Čl. 11 — pro orgány</h4>
+      <p class="small">Jednotné kontaktní místo pro přímou <strong>elektronickou</strong> komunikaci s orgány členských států, Komisí a sborem.</p>
+      <ul>
+        <li>Zveřejnit potřebné údaje a jazyk(y) komunikace.</li>
+        <li>Alespoň jeden úřední jazyk státu hlavní provozovny + jeden široce srozumitelný jazyk Unie.</li>
+        <li>Cíl: orgán ví, kam poslat příkaz či dotaz.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Čl. 12 — pro uživatele</h4>
+      <p class="small">Jednotné kontaktní místo pro <strong>přímou a rychlou</strong> komunikaci s příjemci služby, elektronicky a <strong>uživatelsky přívětivě</strong>.</p>
+      <ul>
+        <li><b>Nesmí spoléhat výhradně na automatizované nástroje</b> — čistě chatbot nestačí, musí být cesta k člověku.</li>
+        <li>Potřebné údaje zveřejnit, snadno přístupné, udržovat aktuální.</li>
+        <li>Toto je i cíl nápravy z odůvodnění (čl. 17).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Oznámení podezření na trestný čin (čl. 18)</h3>
+  <p>Dozví-li se Ikaros o informaci vzbuzující podezření na <strong>trestný čin ohrožující život nebo bezpečí</strong> osoby či osob, musí <strong>neprodleně informovat orgány činné v trestním řízení</strong> (policejní nebo justiční) dotčeného členského státu a poskytnout <strong>všechny dostupné relevantní informace</strong>.</p>
+  <div class="callout gold">
+    <div class="t">Práh je vysoký, reakce rychlá</div>
+    <p><span class="mono">Čl. 18</span> se týká <strong>ohrožení života/bezpečí</strong> — výhrůžky násilím, sebevražedné signály s reálným rizikem, plán útoku, ohrožení dítěte. Není to hlásicí povinnost na jakýkoli nezákonný obsah. Nelze-li spolehlivě určit stát, informuje se orgán státu provozovny / právního zástupce, případně <strong>Europol</strong>. Vazba na moderaci: stupeň <strong>M7</strong> (eskalace mimo platformu) — zajistit důkazy, důvěrnost, přizvat právníka. Viz kapitola 30.</p>
+  </div>
+
+  <h3>Příkazy orgánů (čl. 9 a 10)</h3>
+  <p>Orgány mohou Ikaru zaslat závazný příkaz. DSA rozlišuje dva typy a stanoví, co příkaz musí obsahovat i jak reagovat.</p>
+  <table>
+    <thead>
+      <tr><th>Příkaz</th><th>Musí obsahovat</th><th>Reakce Ikara</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Čl. 9 — zásah proti nelegálnímu obsahu</strong></td>
+        <td>Právní základ; <strong>odůvodnění protiprávnosti</strong> odkazem na konkrétní ustanovení; identifikaci orgánu; <strong>přesnou URL/ID</strong> obsahu; poučení o nápravě pro poskytovatele i pro autora.</td>
+        <td>Bez zbytečného odkladu <strong>informovat orgán o provedení</strong> (zda a kdy bylo příkazu vyhověno).</td>
+      </tr>
+      <tr>
+        <td><strong>Čl. 10 — poskytnutí informací</strong></td>
+        <td>Právní základ + odůvodnění; <strong>konkrétní příjemce</strong> a účel; poučení o nápravě; <strong>lhůtu</strong> pro poskytnutí. Nesmí žádat obsahová data ani historii prohlížení nad rámec identifikace.</td>
+        <td>Informovat orgán o provedení a <strong>vyrozumět dotčeného uživatele</strong> nejpozději v okamžiku poskytnutí (nebrání-li tomu zákon).</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="callout cyan">
+    <div class="t">Příkaz ověřit, ne slepě vykonat</div>
+    <p>Ikaros by měl u příkazu ověřit, že má náležitosti podle <span class="mono">čl. 9/10</span> a nejde nad rámec (zejména územní rozsah a druh dat). Chybí-li odůvodnění, URL nebo lhůta, je namístě vyžádat doplnění a věc konzultovat s právníkem. Vyrozumění dotčeného uživatele je součástí transparentnosti — pokud jej zákon nebo orgán z dobrého důvodu nepozastaví.</p>
+  </div>
+
+  <h3>Shrnutí — co musí systém umět</h3>
+  <div class="feat">
+    <h4>Technický a procesní kontrolní seznam</h4>
+    <ul>
+      <li>Tlačítko <b>Nahlásit</b> u každého veřejného příspěvku; formulář s poli a–d (čl. 16) + kategorií.</li>
+      <li>Anonymní varianta pro CSAM (<span class="mono">čl. 3–7 směrnice 2011/93/EU</span>).</li>
+      <li>Automatické <b>potvrzení přijetí</b> + <b>oznámení rozhodnutí s nápravou</b> (čl. 16/4,5).</li>
+      <li>Generátor <b>odůvodnění zásahu</b> se všemi prvky čl. 17; identitu oznamovatele default skrýt.</li>
+      <li>Dvě <b>kontaktní místa</b> (orgány / uživatelé), lidská cesta u uživatelů (čl. 12).</li>
+      <li><b>Eskalační kanál M7</b> pro čl. 18; postup pro <b>příkazy</b> čl. 9/10 s ověřením náležitostí.</li>
+      <li><b>Moderační log</b>: ID, kategorie, rozhodnutí, moderátor, čas, obě notifikace, odvolání.</li>
+    </ul>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">4</div><div class="l">povinné prvky oznámení (čl. 16/2 a–d)</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">skupiny prvků odůvodnění (čl. 17/3)</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">jednotná kontaktní místa (čl. 11 + 12)</div></div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Vazba na zbytek knihy</div>
+    <p>Moderační stupně M0–M7, SLA a matice reakcí jsou v <strong>kap. 30 (Diskuse, moderace a odpovědnost)</strong>. Odpovědnost hostingu, Good Samaritan a zákaz obecného monitoringu v <strong>kap. 32</strong>. Plná znění formuláře nahlášení, potvrzení, rozhodnutí a vzoru odůvodnění jsou v <strong>Části VIII (Formuláře a vzory)</strong> jako kopírovatelné šablony.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení (EU) 2022/2065 (DSA) — <span class="mono">čl. 16</span> (oznamovací mechanismus, prvky a–d, potvrzení a rozhodnutí), <span class="mono">čl. 17</span> (odůvodnění zásahu / statement of reasons, prvky odst. 3), <span class="mono">čl. 11</span> (kontaktní místo pro orgány), <span class="mono">čl. 12</span> (kontaktní místo pro uživatele), <span class="mono">čl. 18</span> (oznámení podezření na trestný čin), <span class="mono">čl. 9</span> (příkaz k zásahu proti obsahu), <span class="mono">čl. 10</span> (příkaz k poskytnutí informací). Ověřeno proti znění DSA.</li>
+    <li>Směrnice 2011/93/EU, <span class="mono">čl. 3–7</span> — trestné činy proti dětem (výjimka z povinné identifikace oznamovatele podle čl. 16/2/c).</li>
+    <li>Fact-check ledger Provozní rámec v1.0 — položky A3, A4 (DSA přímo použitelné od 17. 2. 2024; per-feature; výjimka mikro/malý čl. 19 neruší notice-and-action ani odůvodnění).</li>
+    <li>Navazuje: <strong>kap. 30</strong> (moderační matice, stupně M0–M7, SLA), <strong>kap. 32</strong> (hostingová odpovědnost, Good Samaritan), <strong>Část VIII</strong> (formuláře a vzory).</li>
+  </ul>
+</section>

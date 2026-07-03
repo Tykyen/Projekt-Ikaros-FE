@@ -1,0 +1,259 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část I — Web a jeho minimum</div>
+    <h2>Podmínky užití — co v nich musí být</h2>
+  </div>
+
+  <p class="lead">Podmínky užití jsou nejdůležitější dokument, který Ikaros vydá dřív, než pustí prvního cizího uživatele dovnitř. Jsou to současně <strong>smlouva</strong> (co si obě strany slíbily), <strong>compliance dokument</strong> (jak plníme DSA, GDPR a spotřebitelské právo) a — pro komunitu jako naše — <strong>dokument důvěry</strong>: hráči a vypravěči do Ikara vloží roky práce, soukromé poznámky a osobní data a nejdřív si přečtou, komu to patří, co s tím smíme, a co se stane, když odejdou. Tato kapitola je <strong>rozbor</strong>: projde oblast po oblasti, řekne, <strong>co</strong> musí každá řešit a <strong>jaké je riziko</strong>, když chybí. Plné vzorové znění článků 1–14 je v <strong>Části VIII</strong> (kap. 80, Vzorové znění podmínek) — sem patří struktura a zásady, ne finální odstavce.</p>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta pro celý tým</div>
+    <p>Podmínky užití nejsou právnická formalita „na konec" — jsou to <strong>závazek platformy vůči komunitě i vůči regulátorovi zároveň</strong>. Musí být <strong>jasné, srozumitelné a v uživatelsky vstřícné podobě</strong> (to je přímý požadavek DSA), přijaté <strong>před</strong> vznikem smlouvy, a musí komunitě dát jistotu ve třech věcech, na které je nejcitlivější: <strong>vlastnictví obsahu, export, a AI</strong>. Cokoli, co komunita vnímá jako tichý „grab", je pro Ikaros vyloučeno.</p>
+  </div>
+
+  <h3>Proč podmínky vůbec platí: přijetí před vznikem smlouvy</h3>
+  <p>Obchodní podmínky se stanou součástí smlouvy jen tehdy, když s nimi uživatel <strong>projevil souhlas a měl možnost se s nimi seznámit před uzavřením</strong> (<span class="mono">§ 1751 OZ</span>). Prakticky to znamená: při registraci <strong>aktivní, nezaškrtnutý checkbox</strong> s odkazem na plné znění podmínek i zásad ochrany údajů, žádný předvyplněný souhlas, a evidence <strong>které verze</strong> podmínek uživatel přijal a kdy. Bez toho podmínky nezavazují — a všechna omezení, licence a pravidla, o která se opíráme, visí ve vzduchu.</p>
+
+  <h3>Struktura podmínek: čtrnáct oblastí</h3>
+  <p>Následující bloky nejsou nepovinné „hezké mít". Každý zavírá konkrétní právní nebo komunitní díru. Pořadí zhruba kopíruje logiku čtenáře: kdo jsi → co nabízíš → co je účet → čí je obsah → jak se chováme → co když se něco pokazí.</p>
+
+  <div class="feat">
+    <h4>1) Identifikace provozovatele a kontakt</h4>
+    <ul>
+      <li><b>Co řešit:</b> kdo Ikaros provozuje (název/jméno, IČO, sídlo), <b>funkční kontakt</b> pro rychlou komunikaci (e-mail), a kontaktní místo pro <b>oznamování obsahu</b> a pro orgány dle DSA.</li>
+      <li><b>Proč:</b> u spotřebitelských smluv je předsmluvní identifikace povinná (<span class="mono">§ 1811, § 1820 OZ</span>); DSA vyžaduje jednotné kontaktní místo. Anonymní provozovatel = nedůvěryhodný a nezákonný.</li>
+      <li><span class="pill">otevřená otázka</span> přesnou identitu doplnit do vzoru (ledger, část C).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>2) Vymezení služby + NEOFICIÁLNÍ povaha podpory systémů</h4>
+    <ul>
+      <li><b>Co řešit:</b> co Ikaros je (komunitní webová RPG platforma — světy, kroniky, chaty, mapy, deníky) a co <b>není</b>. Výslovně: podpora herních systémů je <b>neoficiální</b> — Ikaros <b>není oficiální produkt</b> značek jako D&amp;D, GURPS, Shadowrun apod., názvy jsou užity <b>jen popisně</b> (kompatibilita).</li>
+      <li><b>Proč:</b> tvrdit oficiálnost cizí značky = riziko vyvolání nebezpečí záměny a nekalé soutěže (<span class="mono">§ 2981 OZ</span>) a porušení práv k ochranné známce. Disclaimer je štít.</li>
+      <li>Detail per systém viz <strong>Kompatibilita se systémy</strong> a <strong>Karty 14 systémů</strong> (Část IV).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>3) Definice pojmů</h4>
+    <ul>
+      <li><b>Co řešit:</b> jednoznačně definovat <b>uživatel</b>, <b>tvůrce světa</b> / <b>vypravěč (PJ)</b>, <b>UGC</b> (uživatelský obsah), <b>veřejný</b> vs. <b>soukromý</b> obsah, <b>moderace</b>, <b>partner</b>. Tyto pojmy se pak v celém textu používají konzistentně.</li>
+      <li><b>Proč:</b> DSA i spotřebitelské právo žádají <b>jednoznačnost</b> — smlouva nesmí umožňovat různý výklad. Nedefinovaný „obsah" nebo „veřejný" je zdroj sporů o to, co jsme vlastně směli.</li>
+      <li>Klíčové pojmy patří i do <strong>Slovníčku</strong> (dodatek).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>4) Účet, registrace, VĚK a role</h4>
+    <ul>
+      <li><b>Co řešit:</b> jak vzniká účet, pravdivé údaje, zabezpečení (heslo, 2FA), <b>věková hranice</b> a <b>role</b>. Věk digitálního souhlasu v ČR je <b>15 let</b> (<span class="mono">§ 7 z. 110/2019</span>); pod 15 nutný souhlas zákonného zástupce. Zvláštní <b>DDM / institucionální režim</b> pro kroužky a školská zařízení, kde účet zakládá organizace.</li>
+      <li><b>Proč:</b> bez věkové brány zpracováváme data dětí bez titulu; bez definice rolí nevíme, kdo smí co (PJ governance, moderace).</li>
+      <li><span class="pill">otevřená otázka</span> hranice veřejné registrace (15+/16+) — rozhodnutí ovlivní podmínky, GDPR i foto režim. Detail v kap. <strong>Nezletilí a DPIA</strong> (Část II).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>5) Práva a povinnosti uživatele</h4>
+    <ul>
+      <li><b>Co řešit:</b> co uživatel smí (užívat službu, tvořit obsah, sdílet dle režimů) a co musí (dodržovat pravidla a etický kodex, respektovat práva jiných, neobcházet zabezpečení, nezneužívat cizí účty). Rovnováha: podmínky nejsou jen výčet zákazů.</li>
+      <li><b>Proč:</b> jasná pravidla jsou předpoklad férové moderace — nelze potrestat porušení pravidla, které nikde nebylo.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Jádro důvěry: UGC, autorská práva a „žádný tichý grab"</div>
+    <p>Tohle je oblast, kterou si komunita přečte nejpozorněji a podle které Ikaros posoudí. Musí zaznít <strong>jednoznačně a bez právnických úniků</strong>: <strong>obsah zůstává uživateli</strong> — Ikaros nezískává vlastnictví ani autorská práva; uživatel uděluje jen <strong>provozní (platformní) licenci</strong>, úzce vymezenou na to, co je nutné pro <strong>fungování služby</strong> (hosting, zálohy, technické kopie, zobrazení oprávněným, náhledy, indexace, vyhledávání, konverze, moderace). <strong>Žádný trénink AI bez opt-in</strong>, <strong>žádný komerční prodej ani marketingové užití UGC</strong> bez samostatného souhlasu. Cokoli navíc = <strong>krok navíc</strong>, který v provozní licenci není.</p>
+  </div>
+
+  <div class="feat">
+    <h4>6) UGC a autorská práva — provozní licence, ne převod</h4>
+    <ul>
+      <li><b>Co řešit:</b> uživatel <b>vlastní</b> svůj obsah; Ikaros má jen <b>provozní licenci</b> (nevýhradní, pro provoz služby). <b>Osobnostní práva</b> (<span class="mono">§ 11 AZ</span>) jsou nepřevoditelná — od uživatelů bereme <b>vlastní licenční ujednání</b>, ne cizí CC. <b>Trénink AI</b> na soukromém obsahu jen s <b>opt-in</b>. <b>Marketing / prodej UGC</b> jen se samostatným souhlasem.</li>
+      <li><b>Proč:</b> tichý široký grab je pro komunitní projekt sebevražda důvěry a právně křehký; soukromý obsah nelze trénovat bez titulu (zpracovatel = DPA, <span class="mono">čl. 28 GDPR</span>).</li>
+      <li>Plný rozbor: <strong>Uživatelský obsah a licence</strong> (Část IV), trénink AI <strong>Databáze, anti-scraping a AI trénink</strong> (Část IV), marketing <strong>Screenshoty do promo</strong> (Část VI).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>7) Viditelnost, soukromí a sdílení</h4>
+    <ul>
+      <li><b>Co řešit:</b> režimy obsahu — <b>veřejný</b>, <b>soukromý</b>, <b>sdílený se skupinou</b> — a co který znamená pro to, kdo obsah vidí a jak s ním smíme nakládat. Default je <b>soukromí</b>; zveřejnění je aktivní volba uživatele.</li>
+      <li><b>Proč:</b> režim viditelnosti určuje i právní klasifikaci dle DSA (veřejné šíření = platforma, soukromé = jen hosting) a rozsah zpracování. Nejasné režimy = únik soukromého obsahu.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>8) Zakázaný obsah a jednání</h4>
+    <ul>
+      <li><b>Co řešit:</b> <b>konkrétní výčet</b> — nezákonný obsah, nenávistný projev, obtěžování, doxxing, CSAM a NCII, deepfake reálných osob, spam, malware, porušování cizích práv, cizí osobní údaje a zvláštní kategorie (<span class="mono">čl. 9 GDPR</span>) bez titulu. Rozlišit <b>temnou fikci</b> (přípustná) od <b>reálného útoku</b> (nikdy).</li>
+      <li><b>Proč:</b> bez jasného výčtu nelze zasáhnout ani doložit důvod; CSAM/NCII prohibice je i trestněprávní (oznamovací povinnost, <span class="mono">DSA čl. 18</span>).</li>
+      <li>Hranice fikce vs. realita: <strong>Etický kodex</strong> (Část VII).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>9) Moderace, opatření, odůvodnění a odvolání</h4>
+    <ul>
+      <li><b>Co řešit:</b> že a jak Ikaros <b>moderuje</b> (zásady, postupy, nástroje, role algoritmu vs. člověka — přímý požadavek <span class="mono">DSA čl. 14</span>), jaká <b>opatření</b> hrozí (skrytí, smazání, omezení, ban), povinné <b>odůvodnění</b> zásahu (<span class="mono">DSA čl. 17</span>) a <b>odvolání</b> (interní systém stížností).</li>
+      <li><b>Proč:</b> zásah bez popsané pravomoci a bez odůvodnění je v rozporu s DSA a působí jako svévole. Dobrovolná pečlivá moderace neruší bezpečný přístav (Good Samaritan, <span class="mono">DSA čl. 7</span>).</li>
+      <li>Plný rozbor: <strong>Moderační matice, SLA, odvolání</strong> (Část III).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>10) Oznamování obsahu (notice-and-action)</h4>
+    <ul>
+      <li><b>Co řešit:</b> viditelný, snadný mechanismus, jak <b>nahlásit</b> nezákonný obsah, a jak Ikaros na oznámení reaguje (<span class="mono">DSA čl. 16</span>). Platí i pro mikro/malý podnik — výjimka čl. 19 neosvobozuje od notice-and-action ani od odůvodnění.</li>
+      <li><b>Proč:</b> bez mechanismu ztrácí Ikaros bezpečný přístav pro nahlášený obsah a porušuje přímo použitelné nařízení.</li>
+      <li>Detail: <strong>Notice-and-action a odůvodnění zásahu</strong> (Část III).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>11) AI funkce a AI obsah</h4>
+    <ul>
+      <li><b>Co řešit:</b> které funkce používají AI, že AI výstup je <b>strojově a viditelně značen</b> (<span class="mono">AI Act čl. 50</span>), že <b>čistě AI výstup není autorské dílo</b> (nepřiřazovat autorství), zákaz AI podoby reálné osoby a deepfake, a že <b>trénink na uživatelském obsahu je opt-in</b>.</li>
+      <li><b>Proč:</b> čl. 50 je vymahatelný od 2.8.2026 (sankce až 15 M€ / 3 %); netransparentní AI a trénink bez titulu = právní i důvěryhodnostní riziko.</li>
+      <li>Plný rozbor: <strong>Část V</strong> (AI: obsah a transparentnost).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>12) Děti / DDM</h4>
+    <ul>
+      <li><b>Co řešit:</b> zvláštní pravidla pro nezletilé — srozumitelný jazyk (DSA žádá vysvětlit podmínky způsobem, kterému nezletilí rozumějí, je-li služba jimi využívána), rodičovský souhlas pod 15, <b>institucionální DDM režim</b>, default neveřejnost obsahu dětí.</li>
+      <li><b>Proč:</b> děti + moderace + AI = pravděpodobně povinná <b>DPIA</b> (WP248); chybná práce s daty dětí je nejcitlivější compliance riziko.</li>
+      <li>Detail: <strong>Nezletilí a DPIA</strong> (Část II), <strong>Děti a mladiství</strong> (Část VI).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>13) Placené funkce (spotřebitel)</h4>
+    <ul>
+      <li><b>Co řešit:</b> jsou-li placené funkce — cena a její jasné uvedení, <b>právo na odstoupení</b> a jeho zánik u digitálního obsahu (výslovný souhlas + poučení + potvrzení, <span class="mono">§ 1837 písm. l OZ</span>), reklamace. Pozor: i <b>účet zdarma</b> může spadat do spotřebitelského režimu, pokud jsou data protiplnění (<span class="mono">§ 2389a OZ</span> — cílení/analytika/trénink).</li>
+      <li><b>Proč:</b> chybí-li info o odstoupení, lhůta se prodlužuje z 14 dnů na <b>rok a 14 dnů</b>; chybí-li info o ceně, spotřebitel <b>nehradí</b> (<span class="mono">§ 1829/2 OZ</span>); sankce ČOI až 5 mil. Kč.</li>
+      <li>Plný rozbor: kap. <strong>Spotřebitel, placené funkce, odstoupení</strong> (kap. 12, tato část).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>14) Export, mazání účtu, zálohy, ukončení služby</h4>
+    <ul>
+      <li><b>Co řešit:</b> právo na <b>strukturovaný export</b> (deníky, postavy, světy — nad rámec ZIP, <span class="mono">Data Act 2023/2854</span>), <b>smazání účtu</b> a co se stane s obsahem, zálohovací a retenční politika, a co nastane při <b>ukončení služby</b> ze strany Ikara (oznámení, okno na export).</li>
+      <li><b>Proč:</b> export a čisté mazání jsou pro komunitu <b>test důvěry</b> („nejsem tu vězeň"); jsou i právním nárokem (Data Act, právo na výmaz GDPR).</li>
+      <li>Detail: <strong>Práva subjektů, export a incident</strong> (Část II).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>15) Dostupnost, beta, změny, odpovědnost; rozhodné právo</h4>
+    <ul>
+      <li><b>Co řešit:</b> že služba běží „jak stojí a leží" bez záruky nepřetržité dostupnosti, <b>beta</b> povaha některých funkcí, jak a s jakým <b>předstihem</b> se mění podmínky (a jak se to oznamuje), <b>omezení odpovědnosti</b> (v mezích, které vůči spotřebiteli nesmí být zneužívající, <span class="mono">§ 1813 OZ</span>), a <b>rozhodné právo</b> (české) + řešení sporů.</li>
+      <li><b>Proč:</b> bez klauzule o změnách nemůžeme podmínky legitimně aktualizovat; zneužívající omezení odpovědnosti vůči spotřebiteli je neplatné a přitahuje ČOI.</li>
+    </ul>
+  </div>
+
+  <h3>Přehled: oblast × co musí řešit × riziko bez toho</h3>
+  <table>
+    <thead>
+      <tr><th>Oblast</th><th>Co musí řešit</th><th>Riziko bez toho</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Identifikace + přijetí</strong></td>
+        <td>Kdo provozuje, kontakt; aktivní souhlas před vznikem smlouvy (<span class="mono">§ 1751</span>).</td>
+        <td>Podmínky nezavazují; předsmluvní info porušeno; anonymní provozovatel.</td>
+      </tr>
+      <tr>
+        <td><strong>Vymezení + neoficiálnost</strong></td>
+        <td>Co služba je; systémy podporovány <strong>neoficiálně</strong>, značky popisně.</td>
+        <td>Záměna s oficiální značkou (<span class="mono">§ 2981</span>), spor o známku.</td>
+      </tr>
+      <tr>
+        <td><strong>Definice pojmů</strong></td>
+        <td>Uživatel, PJ, UGC, veřejný/soukromý, moderace, partner.</td>
+        <td>Různý výklad; spory o rozsah oprávnění a viditelnosti.</td>
+      </tr>
+      <tr>
+        <td><strong>Účet, věk, role</strong></td>
+        <td>Registrace, 15+/rodičovský souhlas, DDM režim, role.</td>
+        <td>Zpracování dat dětí bez titulu; nejasná pravomoc rolí.</td>
+      </tr>
+      <tr>
+        <td><strong>Práva a povinnosti</strong></td>
+        <td>Co uživatel smí a musí; vazba na kodex.</td>
+        <td>Nelze férově moderovat; potrestání bez pravidla.</td>
+      </tr>
+      <tr class="us">
+        <td class="us"><strong>UGC a autorská práva</strong></td>
+        <td class="us">Obsah zůstává uživateli; jen <strong>provozní licence</strong>; AI trénink opt-in; žádný tichý marketing/prodej UGC.</td>
+        <td class="us">Ztráta důvěry komunity; neplatný grab; trénink/marketing bez titulu.</td>
+      </tr>
+      <tr>
+        <td><strong>Viditelnost a sdílení</strong></td>
+        <td>Režimy veřejný/soukromý/sdílený; default soukromí.</td>
+        <td>Únik soukromého obsahu; špatná DSA klasifikace.</td>
+      </tr>
+      <tr>
+        <td><strong>Zakázaný obsah</strong></td>
+        <td>Konkrétní výčet; CSAM/NCII/deepfake; fikce vs. útok.</td>
+        <td>Nelze zasáhnout ani doložit důvod; trestněprávní riziko.</td>
+      </tr>
+      <tr>
+        <td><strong>Moderace a odvolání</strong></td>
+        <td>Zásady, opatření, odůvodnění (<span class="mono">čl. 17</span>), odvolání.</td>
+        <td>Zásah v rozporu s DSA; dojem svévole.</td>
+      </tr>
+      <tr>
+        <td><strong>Oznamování obsahu</strong></td>
+        <td>Notice-and-action (<span class="mono">čl. 16</span>) i pro malý podnik.</td>
+        <td>Ztráta bezpečného přístavu; porušení nařízení.</td>
+      </tr>
+      <tr>
+        <td><strong>AI funkce a obsah</strong></td>
+        <td>Značení (<span class="mono">čl. 50</span>), neautorství AI, zákaz deepfake, opt-in trénink.</td>
+        <td>Sankce až 15 M€/3 %; netransparentnost; ztráta důvěry.</td>
+      </tr>
+      <tr>
+        <td><strong>Děti / DDM</strong></td>
+        <td>Srozumitelný jazyk, rodičovský souhlas, institucionální režim.</td>
+        <td>Chybějící DPIA; nejcitlivější compliance selhání.</td>
+      </tr>
+      <tr>
+        <td><strong>Placené funkce</strong></td>
+        <td>Cena, odstoupení a jeho zánik (<span class="mono">§ 1837 l</span>); data jako platba (<span class="mono">§ 2389a</span>).</td>
+        <td>Lhůta 1 rok + 14 dní; spotřebitel nehradí; ČOI až 5 mil.</td>
+      </tr>
+      <tr>
+        <td><strong>Export a mazání</strong></td>
+        <td>Strukturovaný export (Data Act), výmaz, zálohy, ukončení služby.</td>
+        <td>Ztráta důvěry („vězeň"); porušení Data Act a práva na výmaz.</td>
+      </tr>
+      <tr>
+        <td><strong>Dostupnost, změny, odpovědnost</strong></td>
+        <td>Beta, oznámení změn, mez odpovědnosti, rozhodné právo.</td>
+        <td>Nelze legitimně měnit; zneužívající klauzule neplatné.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Test důvěry: čtyři věty, které komunita hledá jako první</div>
+    <p>Než tester dočte celé podmínky, hledá odpověď na čtyři otázky — a Ikaros na ně musí umět ukázat prstem do konkrétního článku: <strong>(1) „Zůstane můj svět můj?"</strong> — ano, jen provozní licence. <strong>(2) „Můžu si všechno odnést a smazat?"</strong> — ano, strukturovaný export + výmaz. <strong>(3) „Necháte na mém obsahu trénovat AI?"</strong> — ne, leda že to sám zapnu (opt-in). <strong>(4) „Uvidí někdo moje soukromé poznámky?"</strong> — ne, soukromé je default. Když tyhle čtyři odpovědi v podmínkách chybí nebo jsou vágní, komunita to čte jako varování — a technicky bezvadné podmínky selžou jako dokument důvěry.</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Rozsah této kapitoly vs. plné znění</div>
+    <p>Tato kapitola je <strong>rozbor struktury a účelu</strong> — mapa, podle které se plné podmínky píší a kontrolují. <strong>Vzorové znění článků 1–14</strong> (finální odstavce k převzetí) je v <strong>Části VIII, kap. 80</strong>. <strong>Rizikový registr a „červené stopky"</strong> (kdy podmínky ještě nejsou hotové k publikaci) je v Části VIII rovněž. Otevřené otázky, které je nutné rozhodnout před finalizací (identita provozovatele, věková hranice, zda budou placené funkce a AI, cookie režim), jsou vedeny v ledgeru (část C).</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení (EU) 2022/2065 (DSA) — <span class="mono">čl. 14</span> (smluvní podmínky: jasné, jednoznačné, srozumitelné, uživatelsky vstřícné; popis moderace a role algoritmu; srozumitelně pro nezletilé), <span class="mono">čl. 16</span> (notice-and-action), <span class="mono">čl. 17</span> (odůvodnění zásahu), <span class="mono">čl. 7–8</span> (bezpečný přístav, zákaz obecného monitoringu), <span class="mono">čl. 18</span> (oznámení trestného činu), <span class="mono">čl. 19</span> (výjimka mikro/malý neruší čl. 16–17).</li>
+    <li>Zákon č. 89/2012 Sb. (OZ) — <span class="mono">§ 1751</span> (obchodní podmínky součástí smlouvy jen při souhlasu a možnosti seznámení), <span class="mono">§ 1811, § 1820</span> (předsmluvní informace spotřebiteli), <span class="mono">§ 1813</span> (zneužívající ujednání), <span class="mono">§ 1829/2, § 1837 l</span> (odstoupení a jeho zánik u digitálního obsahu), <span class="mono">§ 2389a</span> (data jako protiplnění), <span class="mono">§ 2981</span> (vyvolání nebezpečí záměny); zákon č. 121/2000 Sb. (AZ) — <span class="mono">§ 11</span> (osobnostní práva nepřevoditelná).</li>
+    <li>GDPR (2016/679) — <span class="mono">čl. 8</span> (souhlas dítěte), <span class="mono">čl. 9</span> (zvláštní kategorie), <span class="mono">čl. 28</span> (zpracovatel/DPA), <span class="mono">čl. 35</span> (DPIA); zákon č. 110/2019 Sb. <span class="mono">§ 7</span> (věk 15 let); AI Act (2024/1689) <span class="mono">čl. 50</span> (značení AI); Data Act (2023/2854) (strukturovaný export).</li>
+    <li>Fact-check ledger v1.0 — přejaté pozice <span class="mono">A1, A3–A14</span> (DSA per-feature, věk, DPIA/RoPA, AI jako zpracovatel, osobnostní práva, data jako platba, spotřebitel, Data Act, NCII/CSAM, značky popisně) a <span class="mono">B9</span> (marketing UGC nekryje provozní licence); otevřené otázky část C (identita, věk, placené funkce/AI, cookies).</li>
+    <li>ČOI, ÚOOÚ, MPO — praxe k předsmluvním informacím, spotřebitelským podmínkám a DSA (sekundární, k ověření proti primárním předpisům).</li>
+    <li>Navazuje: <strong>Spotřebitel, placené funkce, odstoupení</strong> (kap. 12) · <strong>Cookies a správa souhlasu</strong> (Část I) · <strong>DSA, moderace a diskuse</strong> (Část III) · <strong>Uživatelský obsah a licence</strong> (Část IV) · <strong>AI: obsah a transparentnost</strong> (Část V) · <strong>Vzorové znění podmínek</strong> (Část VIII, kap. 80).</li>
+  </ul>
+</section>

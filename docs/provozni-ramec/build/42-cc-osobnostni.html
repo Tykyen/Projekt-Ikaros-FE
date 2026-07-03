@@ -1,0 +1,207 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část IV — Obsah, UGC a licence</div>
+    <h2>Creative Commons a osobnostní práva</h2>
+  </div>
+
+  <p class="lead">Creative Commons je nejznámější standard veřejných licencí a Ikaros ho potřebuje umět číst dvojím směrem: <strong>dovnitř</strong> (RPG systémy pod CC, ze kterých platforma legálně čerpá) i <strong>ven</strong> (autoři, kteří chtějí svůj obsah pod CC pustit do komunity). Celá kapitola stojí na jedné neúprosné hranici: <strong>CC licencuje pouze majetková práva</strong>. Osobnostní práva podle <span class="mono">§ 11 AZ</span> jsou v českém právu nepřevoditelná a nelze se jich vzdát — proto od uživatelů bereme <strong>vlastní licenční ujednání</strong> a nikdy nespoléháme na to, že „obsah nese nějaké CC" třetí strany.</p>
+
+  <h3>Čtyři stavební prvky CC</h3>
+
+  <p>Každá CC licence se skládá z modulů. <strong>BY</strong> (uveď původ) je jádro přítomné ve všech aktuálních variantách; k němu se přidávají tři podmínky, které postupně užití zužují. Pro platformu je zásadní vědět, co která podmínka <strong>dovolí</strong> a co <strong>zakáže</strong> — protože z toho plyne, zda obsah smíme zařadit do klonovací funkce a případné budoucí monetizace.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>BY — uveď původ</h4>
+      <p class="small">Attribution. Základ všech aktuálních CC licencí.</p>
+      <ul>
+        <li>Užití, úpravy i komerce <strong>povoleny</strong> při <b>uvedení autora</b>, odkazu na licenci a vyznačení případných změn.</li>
+        <li>Pro Ikaros <strong>nejvhodnější</strong> — atribuci umíme zafixovat technicky (genealogie klonu).</li>
+        <li>Riziko jen v úplnosti a formě atribuce, ne v rozsahu užití.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SA — zachovej licenci (copyleft)</h4>
+      <p class="small">ShareAlike. Odvozené dílo musí nést stejnou (nebo kompatibilní) licenci.</p>
+      <ul>
+        <li>Adaptace i komerce povoleny, ale výsledek je <strong>vázán stejnou licencí</strong>.</li>
+        <li>Chová se jako <b>„nákaza"</b> — jednou v řetězci, vždy v řetězci (viz níže).</li>
+        <li>Pro Ikaros použitelné, ale klonovací funkce musí hlídat kompatibilitu.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>NC — nekomerčně</h4>
+      <p class="small">NonCommercial. Zakazuje užití směřující ke komerčnímu prospěchu.</p>
+      <ul>
+        <li>Vylučuje <strong>komerční užití</strong> — a „komerční" je vykládáno široce.</li>
+        <li><b>Konflikt s budoucí monetizací</b>: právnická osoba, dobrovolné příspěvky, tisk materiálů, merch, partneři.</li>
+        <li>Pro platformu, která si nechce zavřít dveře, <strong>riziková</strong>.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>ND — beze změn</h4>
+      <p class="small">NoDerivatives. Šířit lze jen doslovné (verbatim) kopie.</p>
+      <ul>
+        <li><strong>Zakazuje odvozená díla</strong> — žádný remix, žádná adaptace.</li>
+        <li>Přímo <b>popírá smysl klonování s úpravami</b>, které je jádrem Ikarosu.</li>
+        <li>Pro komunitní knihovnu <strong>nevhodné</strong>; přípustné jen u obsahu, který se nemá měnit.</li>
+      </ul>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>CC varianta</th><th>Úprava / remix</th><th>Komerce</th><th>Copyleft</th><th class="us">Vhodnost pro Ikaros</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>CC BY</strong> <span class="mono">4.0</span></td>
+        <td><span class="yes">ano</span></td>
+        <td><span class="yes">ano</span></td>
+        <td>ne</td>
+        <td class="us"><span class="yes">Ideální</span> — klonování i budoucí monetizace bez překážek</td>
+      </tr>
+      <tr>
+        <td><strong>CC BY-SA</strong> <span class="mono">4.0</span></td>
+        <td><span class="yes">ano</span></td>
+        <td><span class="yes">ano</span></td>
+        <td><span class="partial">ano</span></td>
+        <td class="us"><span class="partial">Vhodné s hlídáním</span> — copyleft se přenáší na klon</td>
+      </tr>
+      <tr>
+        <td><strong>CC BY-NC</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td><span class="no">ne</span></td>
+        <td>ne</td>
+        <td class="us"><span class="no">Konflikt s monetizací</span> — jen izolovaně, nikdy do produktu</td>
+      </tr>
+      <tr>
+        <td><strong>CC BY-ND</strong></td>
+        <td><span class="no">ne</span></td>
+        <td><span class="yes">ano</span></td>
+        <td>ne</td>
+        <td class="us"><span class="no">Nevhodné pro remix</span> — brání klonování s úpravami</td>
+      </tr>
+      <tr>
+        <td><strong>CC BY-NC-SA / -ND</strong></td>
+        <td>dle složky</td>
+        <td><span class="no">ne</span></td>
+        <td>dle složky</td>
+        <td class="us"><span class="no">Dvojí zádrhel</span> — NC i SA/ND najednou</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Závěr matice: pro komunitní obsah, který má být klonovatelný a případně jednou vydělávat, je <strong>čisté CC BY</strong> jediná bezstarostná volba; <strong>BY-SA</strong> je použitelné, ale za cenu kompatibilitního hlídání; složky <strong>NC</strong> a <strong>ND</strong> patří mimo hlavní tok platformy. CC ale <strong>není povinný default</strong> — je to volitelná vrstva nad platformní a komunitní licencí (viz kap. 41).</p>
+
+  <h3>Klíč: CC nekryje osobnostní práva (§ 11 AZ)</h3>
+
+  <p>Nejčastější a nejnebezpečnější omyl je, že „CC vyřeší všechno". Nevyřeší. Autorské právo se v ČR dělí na dvě větve a CC se dotýká jen jedné z nich.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Majetková práva — CC je licencuje</h4>
+      <ul>
+        <li>Právo dílo užít, rozmnožovat, rozšiřovat, sdělovat, upravovat.</li>
+        <li>Jsou <b>disponovatelná</b> — lze je licencovat, i veřejně a neodvolatelně (přesně to CC dělá).</li>
+        <li>Tady CC funguje: převezmeme-li SRD pod CC BY, majetkovou vrstvu máme pokrytou.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Osobnostní práva — CC je NEřeší</h4>
+      <ul>
+        <li>Právo osobovat si autorství, rozhodnout o zveřejnění, na <b>nedotknutelnost díla</b>.</li>
+        <li>Podle <span class="mono">§ 11 odst. 4 AZ</span> se jich autor <strong>nemůže vzdát, jsou nepřevoditelná</strong> a zanikají smrtí autora.</li>
+        <li>CC do nich <strong>nesahá</strong> — cizí CC třetí strany osobnostní vrstvu nepokrývá.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Provozní důsledek — vlastní licenční ujednání, ne cizí CC</div>
+    <p><strong>Od uživatelů berte VŽDY vlastní licenční ujednání Ikarosu</strong> a nespoléhejte na to, že jejich obsah „nese CC". Cizí CC řeší jen majetkovou vrstvu a jen ve vztahu k původnímu autorovi; osobnostní vrstvu (nedotknutelnost díla, právo na autorství), přiměřenost vůči českému spotřebiteli a vazbu na provoz platformy musí pokrýt <strong>podmínky Ikarosu</strong>. Prakticky: uživatel může svůj obsah <em>navíc</em> označit CC značkou, ale právní vztah k platformě a ke komunitě zakládá platformní a komunitní licence z kap. 41 — ne ta značka.</p>
+  </div>
+
+  <h3>Copyleft „nákaza" u BY-SA — hlídat řetězec remixů</h3>
+
+  <p>Modul <strong>SA</strong> zavazuje: kdo BY-SA obsah upraví a šíří, <strong>musí</strong> výsledek zveřejnit pod stejnou (nebo výslovně kompatibilní) licencí. To má směr — a klonovací funkce Ikarosu ho musí respektovat.</p>
+
+  <div class="callout cyan">
+    <div class="t">Směr „nákazy" — jedním směrem ano, druhým ne</div>
+    <p>Obsah pod <span class="mono">CC BY</span> lze zamíchat do výsledku, který skončí pod přísnějším <span class="mono">CC BY-SA</span> — volnější „vstoupí" do přísnějšího bez problému. Naopak to <strong>nejde</strong>: obsah pod <span class="mono">CC BY-SA</span> <strong>nelze „převléct" do volnějšího BY</strong> ani ho smíchat s <span class="mono">NC</span> či <span class="mono">ND</span> obsahem tak, aby výsledek přestal být BY-SA. Klon proto musí <strong>zdědit nejpřísnější licenci ze všech zdrojů</strong>, ze kterých vznikl.</p>
+  </div>
+
+  <div class="feat">
+    <h4>Co musí umět klonovací funkce (kompatibilitní brána)</h4>
+    <ul>
+      <li><b>Zafixovat licenci zdroje</b> do snapshotu při klonování — pozdější změna zdroje klon neruší.</li>
+      <li><b>Odmítnout nekompatibilní mix</b> — např. spojení BY-SA obsahu s ND obsahem do jednoho odvozeného díla.</li>
+      <li><b>Propagovat SA na výsledek</b> — je-li v řetězci jediná BY-SA položka, klon je BY-SA.</li>
+      <li><b>Ukázat výsledný licenční stav</b> uživateli <em>před</em> potvrzením klonu, ne až po.</li>
+    </ul>
+  </div>
+
+  <p>Bez této brány vznikne <strong>licenčně vadný klon</strong>, který platforma šíří — a odpovědnost za to nese provozovatel, ne původní autor. Přenos režimu zdrojové položky na klon je zároveň součástí licenční karty (viz kap. 40).</p>
+
+  <h3>RPG systémy pod CC — jak správně atribuovat</h3>
+
+  <p>Do platformy proudí i obsah z RPG systémů, které jejich vydavatelé sami uvolnili pod CC. Tři pilotní systémy jsou „čisté" — ale i u nich je atribuce <strong>přesně předepsaná</strong> a chyba v ní znamená porušení licence.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4><span class="mono">dnd5e</span> — SRD pod CC BY 4.0</h4>
+      <ul>
+        <li>SRD <b>5.1 i 5.2.1</b> jsou pod <span class="mono">CC BY 4.0</span> (neodvolatelná); povoleno označení „5E compatible".</li>
+        <li><strong>Atribuci verzí NEKOMBINOVAT</strong> — použij text odpovídající skutečně převzatému SRD, ne směs 5.1 a 5.2.</li>
+        <li><strong>Vynechat Product Identity</strong> — beholder, mind flayer, githyanki a spol. v SRD nejsou a nejsou licencovány.</li>
+        <li>Značky „D&amp;D" a logo dračího ampersandu <b>nepoužívat</b>.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="mono">fate</span> / <span class="mono">fae</span> — SRD pod CC BY 3.0 Unported</h4>
+      <ul>
+        <li>Fate Core SRD i FAE SRD jsou pod <span class="mono">CC BY 3.0 Unported</span> — <b>ne 4.0</b>; adaptace i komerce povoleny.</li>
+        <li>Povinná <strong>verbatim atribuce</strong> na kanonický zdroj <span class="mono">http://www.faterpg.com</span>.</li>
+        <li>Uvádět <b>správnou verzi</b> licence (3.0); záměna za 4.0 je vada.</li>
+        <li>Atribuční blok lze sdílet mezi <span class="mono">fate</span> a <span class="mono">fae</span>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Podmíněné systémy — tolerance, ne CC</div>
+    <p>Zbylé systémy <strong>nejsou pod CC</strong> a nesmí se tak označovat. Stojí na individuální licenci (<span class="mono">jad</span>), oficiálně posvěceném SRD (<span class="mono">drd2</span> — <span class="mono">drd2srd.d20.cz</span>), fan policy (<span class="mono">call-of-cthulhu</span> — web-deník ano, VTT/apps ne) nebo pouhé <strong>toleranci</strong> vydavatele (<span class="mono">drd16</span>, <span class="mono">pi</span> — vlastní engine + prázdné šablony + referenční název s ®, žádný verbatim text). Tvrzení „je to CC BY-SA" u drd2 nebo pi je <strong>rozšířený omyl z Wikipedie</strong> — detail per systém řeší Část II Právního rámce.</p>
+  </div>
+
+  <h3>Autorství čistě AI výstupů</h3>
+
+  <p>Zvláštní případ, který CC vůbec nedokáže vyřešit: <strong>čistě AI vygenerovaný výstup není autorské dílo</strong>. Autorem může být jen fyzická osoba (<span class="mono">§ 5 AZ</span>), prompt je pouze námět (<span class="mono">§ 2/6 AZ</span>) — takový výstup je <strong>volný</strong> a nemá autora, kterému by šlo přiřadit CC nebo osobnostní práva. Uživateli proto <strong>nepřiřazujeme autorství</strong> AI výstupu a licenční karta to musí umět zachytit. Podrobně — včetně judikátu <span class="mono">MS Praha 10 C 13/2023</span> a značení podle AI Act — viz <strong>Část V</strong>.</p>
+
+  <div class="callout gold">
+    <div class="t">Osobní údaje ≠ autorská práva</div>
+    <p>Nesměšovat dvě roviny: <strong>CC a osobnostní práva autora</strong> (§ 11 AZ) řeší tato kapitola. <strong>Osobní údaje na fotografii</strong> nebo v obsahu (GDPR, podoba člověka dle § 84–90 OZ) jsou úplně jiná větev — obsah může být licenčně čistý a přitom porušovat ochranu osobnosti nebo GDPR. Datovou rovinu řeší <strong>Část II</strong>.</p>
+  </div>
+
+  <h3>Praktický režim pro Ikaros</h3>
+
+  <div class="feat">
+    <h4>Pravidla pro práci s CC na platformě</h4>
+    <ul>
+      <li><b>Default není CC</b> — základ je platformní + komunitní licence Ikarosu (kap. 41); CC je volitelná vrstva navrch.</li>
+      <li><b>Preferuj CC BY</b> — je-li autor rozhodnut jít CC cestou; BY-SA jen s kompatibilitní bránou, NC/ND mimo hlavní tok.</li>
+      <li><b>Vždy vlastní ujednání</b> — nikdy nespoléhat na cizí CC jako náhradu vztahu k platformě a osobnostní vrstvy.</li>
+      <li><b>Atribuce technicky pevná</b> — genealogie klonu, snapshot licenčního stavu (kap. 41), ne závislá na dobré vůli editora.</li>
+      <li><b>Kompatibilitní brána u klonu</b> — dědit nejpřísnější licenci, blokovat nekompatibilní mix, ukázat výsledek předem.</li>
+      <li><b>Systémový obsah jen v rozsahu licence</b> — správná verze CC a přesná atribuce (dnd5e 4.0 / fate·fae 3.0 Unported), Product Identity a značky ven.</li>
+    </ul>
+  </div>
+
+  <ul class="sources">
+    <li>Autorský zákon č. 121/2000 Sb. — <span class="mono">§ 2, § 6</span> (dílo, námět), <span class="mono">§ 5</span> (autor = fyzická osoba), <span class="mono">§ 11</span> (osobnostní práva; odst. 4: nelze se vzdát, nepřevoditelná, zanikají smrtí autora).</li>
+    <li>Creative Commons — právní kódy <span class="mono">CC BY 4.0</span>, <span class="mono">CC BY-SA 4.0</span> (ShareAlike / copyleft, kompatibilní licence), <span class="mono">CC BY 3.0 Unported</span>; moduly BY / SA / NC / ND, mez ND (jen verbatim kopie).</li>
+    <li>RPG systémy pod CC — WotC SRD 5.1 / 5.2.1 <span class="mono">CC BY 4.0</span> (atribuce nekombinovat verze, vynechat Product Identity); Evil Hat Fate / FAE SRD <span class="mono">CC BY 3.0 Unported</span>, atribuce <span class="mono">http://www.faterpg.com</span> (fate-srd.com/official-licensing-fate).</li>
+    <li>Fact-check ledger v1.0 — <span class="mono">A10</span> (CC jen majetková práva, § 11 AZ nepřevoditelná, copyleft „nákaza"), <span class="mono">A15</span> (systémy pod CC, atribuce), <span class="mono">A2</span> (AI výstup není dílo).</li>
+    <li>Judikatura — Městský soud v Praze <span class="mono">10 C 13/2023</span> (čistě AI výstup není autorské dílo).</li>
+    <li>Navazuje: kap. 40 (licenční karta · režimy viditelnosti), kap. 41 (licence uživatelů — platformní a komunitní), kap. 43 a Část V (AI obsah a AI Act), Část II (osobní údaje ≠ autorská práva).</li>
+  </ul>
+</section>

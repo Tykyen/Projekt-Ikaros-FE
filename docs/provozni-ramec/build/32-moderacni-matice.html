@@ -1,0 +1,322 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část III — DSA, moderace a diskuse</div>
+    <h2>Moderační matice, SLA a odvolání</h2>
+  </div>
+
+  <p class="lead">Moderace není o vkusu ani o náladě moderátora. Je to <strong>rozhodovací proces s právními důsledky</strong>: každý zásah do cizího obsahu je zásahem do práv uživatele a zároveň podmínkou toho, aby Ikaros neztratil bezpečný přístav podle DSA. Tato kapitola překládá právní teorii z předchozí kapitoly do jednoho spustitelného aparátu — <strong>osm stupňů zásahu (M0–M7)</strong>, interních lhůt (SLA), transparentní matice kategorií, evidenčního režimu a odvolání. Cílem je, aby dva různí moderátoři nad stejným hlášením došli ke stejnému rozhodnutí — a aby toto rozhodnutí obstálo, kdyby se na něj někdo ptal soudu.</p>
+
+  <h3>Osm zásad, na kterých moderace stojí</h3>
+  <p>Než přijde první hlášení, musí být jasné, čím se moderátor řídí. Těchto osm zásad není dekorace — dohromady tvoří <strong>právní argument pro bezpečný přístav</strong>: kdo moderuje podle nich, dělá to „pečlivě a v dobré víře" ve smyslu <span class="mono">čl. 7 DSA</span> (Good Samaritan), a nesahá tak o svobodný obsah svévolně.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>1 · Přiměřenost</h4>
+      <p class="small">Zásah musí odpovídat závažnosti. Za první off-topic se nemaže účet. Sáhni po nejnižším stupni, který problém vyřeší — eskaluj, až když nižší nestačí.</p>
+    </div>
+    <div class="card">
+      <h4>2 · Důkaznost</h4>
+      <p class="small">Každý zásah stojí na konkrétním obsahu (URL/ID), ne na dojmu. Co nelze doložit, nelze bránit. Log moderace = důkazní materiál.</p>
+    </div>
+    <div class="card">
+      <h4>3 · Nestrannost</h4>
+      <p class="small">Moderátor osobně zapojený do sporu se od případu odpojí. Nikdo nerozhoduje o hlášení, které se týká jeho vlastní osoby, jeho světa nebo jeho konfliktu.</p>
+    </div>
+    <div class="card">
+      <h4>4 · Důvěrnost</h4>
+      <p class="small">Identita oznamovatele se u citlivých hlášení nesmí zbytečně prozradit. Obsah řešíme, oznamovatele chráníme — zvlášť u obtěžování a hrozeb.</p>
+    </div>
+    <div class="card">
+      <h4>5 · Ochrana oběti</h4>
+      <p class="small">U doxxingu, deepfake, obtěžování a hrozeb je prvořadá ochrana zasažené osoby. Raději dočasně skrýt hned než čekat na dokonalé posouzení.</p>
+    </div>
+    <div class="card">
+      <h4>6 · Odvolání</h4>
+      <p class="small">Každé omezení obsahu je napadnutelné. Uživatel musí vědět, že se může odvolat, a odvolání posuzuje jiný moderátor.</p>
+    </div>
+    <div class="card">
+      <h4>7 · Transparentnost</h4>
+      <p class="small">Rozhodnutí má odůvodnění (<span class="mono">čl. 17 DSA</span>): co, proč, na jakém základě, na jak dlouho, jak se bránit. Bez odůvodnění vzniká pocit svévole.</p>
+    </div>
+    <div class="card">
+      <h4>8 · Konzistence</h4>
+      <p class="small">Pravidla platí stejně pro nováčka, správce světa i známého člena komunity. Nekonzistence je nejsnazší cesta k žalobě z „cenzury".</p>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Proč je konzistence právní argument, ne jen slušnost</div>
+    <p>Bezpečný přístav i obrana proti nároku z nerovného zacházení stojí na tom, že zásahy jsou <strong>doložitelné, odůvodněné a stejné pro všechny</strong>. Jakmile Ikaros jednou skryje pomluvu běžného uživatele a podruhé nechá stejnou pomluvu od kamaráda správce, ztrácí obojí — právní obhajitelnost i důvěru komunity. Moderační log proto není administrativa navíc; je to hlavní důkaz, že proces existuje a běží stejně pokaždé.</p>
+  </div>
+
+  <h3>Stupně zásahu M0–M7</h3>
+  <p>Osa zásahu jde od „nic nedělám" po „volám mimo platformu". Vždy začínáme <strong>nejnižším stupněm, který situaci vyřeší</strong>, a stoupáme jen tehdy, když nižší selže nebo když závažnost skočí (hrozba, obsah týkající se dětí). Vyšší stupeň neznamená horší moderátor — znamená vážnější obsah.</p>
+
+  <table>
+    <thead>
+      <tr><th>Stupeň</th><th>Kdy</th><th>Zásah</th><th>Evidence</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pill">M0</span> bez zásahu</td>
+        <td>Obsah je legální a v souladu s pravidly, jen subjektivně nevhodný nebo nepříjemný</td>
+        <td>Nic; případně doporučit oznamovateli osobní blokaci/ignorování</td>
+        <td>Žádný nebo minimální záznam (uzavření hlášení)</td>
+      </tr>
+      <tr>
+        <td><span class="pill">M1</span> měkké upozornění</td>
+        <td>Lehký off-topic, hraniční tón, první drobný incident bez škody</td>
+        <td>Soukromé upozornění autorovi nebo veřejné připomenutí pravidel</td>
+        <td>Řádek v moderátorském logu (kdo, kdy, proč)</td>
+      </tr>
+      <tr>
+        <td><span class="pill">M2</span> editace / skrytí části</td>
+        <td>Prozrazený osobní údaj, neoznačený spoiler, jeden nevhodný výrok v jinak v pořádku příspěvku</td>
+        <td>Skrýt/začernit část, nebo požádat autora o úpravu</td>
+        <td>Odůvodnění uživateli, záznam změny</td>
+      </tr>
+      <tr>
+        <td><span class="pill">M3</span> dočasné skrytí</td>
+        <td>Autorská stížnost, obvinění bez důkazu (pomluva), nejasné osobní údaje, AI deepfake — do posouzení</td>
+        <td>Dočasně znepřístupnit obsah, dokud se věc nevyjasní</td>
+        <td>Záznam, lhůta revize, oznámení autorovi a možnost doložit</td>
+      </tr>
+      <tr>
+        <td><span class="pill">M4</span> odstranění</td>
+        <td>Zjevné porušení práv, doxxing, cizí příručka/statblock/ilustrace, odkaz na pirátský obsah nebo malware</td>
+        <td>Trvale odstranit nebo znepřístupnit obsah</td>
+        <td>Odůvodnění (<span class="mono">čl. 17</span>), poučení o odvolání</td>
+      </tr>
+      <tr>
+        <td><span class="pill">M5</span> omezení účtu</td>
+        <td>Opakované porušování, spam, obtěžování — vzorec, ne jednorázový výrok</td>
+        <td>Dočasný timeout: zákaz publikace, zákaz zpráv, ztlumení na určenou dobu</td>
+        <td>Důkazní záznam vzorce chování + délka a rozsah opatření</td>
+      </tr>
+      <tr>
+        <td><span class="pill">M6</span> ukončení účtu</td>
+        <td>Vážné jednorázové porušení nebo trvalá recidiva po M5; bezpečnostní hrozba pro komunitu</td>
+        <td>Ukončení účtu podle podmínek užití</td>
+        <td>Přezkum druhou osobou/správcem, kompletní právní evidence</td>
+      </tr>
+      <tr>
+        <td><span class="pill">M7</span> eskalace mimo platformu</td>
+        <td>Hrozba života/bezpečí, sexualizace dětí (CSAM), distribuce malware, závažná trestná činnost</td>
+        <td>Okamžitě zajistit důkazy, informovat odpovědnou osobu; podle případu orgány (<span class="mono">čl. 18 DSA</span>)</td>
+        <td>Striktní přístup, důvěrnost, zapojení právníka; neničit důkazy</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">M7 obchází žebřík — neeskaluje se postupně</div>
+    <p>Stupně M0–M6 jsou žebřík: stoupá se po nich. <strong>M7 je poplach, ne příčka.</strong> Hrozba života, obsah týkající se zneužití dětí nebo aktivně škodlivý malware se řeší <strong>okamžitě a mimo obvyklou frontu</strong> — nečeká se na M4, neposílá se předběžné upozornění pachateli, který by mohl zahladit stopy. Zároveň se u M7 nikdy nemaže „na potkání": důkazy je nutné <strong>zajistit</strong>, protože mohou být předány orgánům.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Nejnižší účinný stupeň (zásada přiměřenosti v praxi)</div>
+    <p>Trvalé nebo neurčité zablokování účtu za drobné porušení je klasický příklad <strong>nepřiměřeného zásahu</strong> — enforcement musí odpovídat závažnosti, ne rozčílení moderátora. Graduovaný žebřík (upozornění → skrytí → timeout → ukončení) není měkkost; je to jak nástroj proti eskalaci konfliktu, tak doklad, že Ikaros zasahuje uměřeně. Skok o dva stupně výš než situace žádá je stejná chyba jako nezasáhnout.</p>
+  </div>
+
+  <h3>Interní lhůty (SLA)</h3>
+  <p>SLA nejsou závazek vůči uživateli („vyřídíme do 24 h") — jsou to <strong>interní priority</strong>, aby se nestalo, že deepfake reálné osoby leží ve frontě týden, zatímco tým řeší spam. Lhůta se počítá od chvíle, kdy má tým hlášení k dispozici. U nejzávažnějších kategorií žádná lhůta neexistuje, protože jediná správná odpověď je „hned".</p>
+
+  <table>
+    <thead>
+      <tr><th>Kategorie hlášení</th><th>Interní SLA</th><th>Poznámka</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Hrozba života/bezpečí, obsah týkající se zneužití dětí (CSAM), aktivní malware</td>
+        <td class="us"><span class="pill green">Okamžitě / nejvyšší priorita</span></td>
+        <td>M7. Eskalovat vedení, zajistit důkazy, podle případu orgány (<span class="mono">čl. 18 DSA</span>)</td>
+      </tr>
+      <tr>
+        <td>Doxxing, osobní údaje, deepfake reálné osoby</td>
+        <td>Do 24 hodin</td>
+        <td>Dočasné skrytí (M3) je často vhodnější než čekat na dokonalé posouzení</td>
+      </tr>
+      <tr>
+        <td>Autorská práva s doložením nároku</td>
+        <td>Do 48 hodin</td>
+        <td>Skrýt do posouzení, kontaktovat nahrávajícího, vyžádat oprávnění/licenci</td>
+      </tr>
+      <tr>
+        <td>Obtěžování a osobní útoky</td>
+        <td>Do 72 hodin</td>
+        <td>Záleží na intenzitě a opakování; u eskalace zvednout prioritu</td>
+      </tr>
+      <tr>
+        <td>Spam a reklama</td>
+        <td>Průběžně / automatizace</td>
+        <td>Pozor na možnost odvolání u falešně pozitivních zásahů automatu</td>
+      </tr>
+      <tr>
+        <td>Obecná nespokojenost s názorem</td>
+        <td>Bez pevné lhůty</td>
+        <td>Není automaticky porušením pravidel; často M0</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Rychlost neomlouvá bezmyšlenkovitost — a naopak</div>
+    <p>Automatizace u spamu je nutná (objem), ale každý automatický zásah musí být <strong>odvolatelný</strong>, protože filtry dělají chyby (false positive). U nejvyšší priority je to obráceně: <strong>rychlost je součást ochrany oběti</strong>, ale ani spěch nesmí vést ke zničení důkazů u M7. Obojí drží stejný princip — zásah je vždy doložitelný a napravitelný.</p>
+  </div>
+
+  <h3>Transparentní moderační matice</h3>
+  <p>Zatímco žebřík M0–M7 popisuje <em>sílu</em> zásahu, tato matice mapuje <em>typ problému</em> na výchozí reakci a eskalační cestu. Je to referenční tabulka, kterou má moderátor po ruce — pro každou kategorii dává <strong>bezpečný default</strong> a jméno, komu předat, když věc přesahuje moderátora.</p>
+
+  <table>
+    <thead>
+      <tr><th>Kategorie</th><th>Příklad</th><th>Výchozí zásah</th><th>Eskalace</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Autorská práva</strong></td>
+        <td>Nahraná celá stránka pravidel, cizí ilustrace z příručky, statblock, mapa</td>
+        <td>Skrýt do posouzení (M3); vyžádat oprávnění/licenci</td>
+        <td>Právník / držitel práv</td>
+      </tr>
+      <tr>
+        <td><strong>Osobní údaje</strong></td>
+        <td>Civilní jméno hráče, adresa, telefon, škola, foto bez souhlasu</td>
+        <td>Anonymizovat nebo skrýt (M2/M3)</td>
+        <td>Osoba odpovědná za GDPR / DPO</td>
+      </tr>
+      <tr>
+        <td><strong>Ochrana osobnosti</strong></td>
+        <td>Pomluva, obvinění bez důkazu, ponižující AI obrázek reálné osoby</td>
+        <td>Skrýt do posouzení (M3), vyzvat k doložení</td>
+        <td>Právník</td>
+      </tr>
+      <tr>
+        <td><strong>Bezpečnost</strong></td>
+        <td>Výhrůžky, hrozba násilím, hrozba života</td>
+        <td>Okamžitě skrýt a zajistit důkazy (M7)</td>
+        <td>Vedení + podle případu orgány</td>
+      </tr>
+      <tr>
+        <td><strong>Spam / bot</strong></td>
+        <td>Hromadné odkazy, reklama, botnet, odkaz na malware</td>
+        <td>Skrýt, omezit účet (M4/M5)</td>
+        <td>Technická ochrana / automatizace</td>
+      </tr>
+      <tr>
+        <td><strong>Nevhodné chování</strong></td>
+        <td>Urážky, flame, obtěžování, osobní útoky</td>
+        <td>Varování → dočasné omezení (M1→M5)</td>
+        <td>Moderátorský tým</td>
+      </tr>
+      <tr>
+        <td><strong>AI obsah</strong></td>
+        <td>Neoznačený deepfake, napodobenina reálné osoby, syntetický obsah bez značení</td>
+        <td>Skrýt, vyžádat označení/souhlas (M3)</td>
+        <td>Podle případu GDPR / právník (AI Act čl. 50)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">„Za obsah odpovídají jen uživatelé" tým nezbavuje ničeho</div>
+    <p>Klauzule v podmínkách, že za obsah odpovídá uživatel, je užitečná <strong>vůči uživateli</strong>, ale <strong>nezbavuje Ikaros</strong> povinností podle DSA, GDPR ani autorského práva a nezruší soudní příkaz. Matice výše proto neřeší „čí je to vina" — řeší, co musí platforma udělat, jakmile se o obsahu dozví. Rozdíl mezi krátkou citací do diskuse a nahranou celou tabulkou kouzel je přesně to, co moderátor v kategorii „Autorská práva" posuzuje.</p>
+  </div>
+
+  <h3>Odůvodnění zásahu (DSA čl. 17)</h3>
+  <p>Jakmile Ikaros omezí viditelnost, odstraní, znepřístupní obsah nebo pozastaví účet, DSA vyžaduje <strong>jasné a konkrétní odůvodnění</strong> dotčenému uživateli. To není formalita pro velké platformy — u malé komunity je odůvodnění tím, co odlišuje spravovaný proces od svévole. Odůvodnění je zároveň to, co uživatel dostane do ruky, když se chce odvolat.</p>
+
+  <div class="feat">
+    <h4>Co musí obsahovat rozhodnutí moderátora</h4>
+    <ul>
+      <li><b>ID obsahu</b> a datum zásahu — přesné určení, čeho se rozhodnutí týká.</li>
+      <li><b>Typ zásahu a jeho rozsah</b> — skrytí části / odstranění / omezení účtu, a na jak dlouho.</li>
+      <li><b>Právní nebo smluvní důvod</b> — porušení konkrétního bodu pravidel nebo právního předpisu (<span class="mono">čl. 17 odst. 3</span> žádá odkaz na právní či smluvní základ).</li>
+      <li><b>Stručné vysvětlení</b> — proč je obsah považován za protiprávní/porušující, opřené o fakta a okolnosti, ne jen o odkaz.</li>
+      <li><b>Poučení o nápravě a odvolání</b> — jak a do kdy se lze bránit.</li>
+      <li><b>Ochrana identity oznamovatele</b> — u citlivých hlášení se v odůvodnění nesmí zbytečně prozradit, kdo nahlásil.</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Šablona, ne esej</div>
+    <p>Odůvodnění nemá být právní pojednání — má být <strong>šablona s vyplněnými poli</strong>, aby ho moderátor napsal za minutu a aby vypadalo pokaždé stejně. Konzistentní formát je sám o sobě důkazem, že proces existuje. Provazbu na notice-and-action (<span class="mono">čl. 16</span>) a klasifikaci služby per-feature řeší kapitola <em>Diskuse, moderace a DSA</em>; profesní pravidla moderátora (podjatost, mlčenlivost) upravuje <strong>etický kodex v Části VII</strong>.</p>
+  </div>
+
+  <h3>Evidence moderace a retence</h3>
+  <p>Evidence musí být dostatečná pro právní obranu, ale nesmí se zvrhnout v nekonečné shromažďování osobních údajů. Ukládá se to, co doloží, že zásah proběhl správně — a jen po dobu, kterou určí právník. Technicky by měl systém u každého zásahu uchovat:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Co se loguje</h4>
+      <ul>
+        <li><b>ID obsahu</b> a kategorie zásahu (dle matice)</li>
+        <li><b>Důvod</b> a odkaz na porušené pravidlo/předpis</li>
+        <li><b>Identita moderátora</b>, který rozhodl</li>
+        <li><b>Čas</b> zásahu a případná lhůta revize</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Co se dokládá k rozhodnutí</h4>
+      <ul>
+        <li><b>Oznámení uživateli</b> (odeslané odůvodnění)</li>
+        <li><b>Odvolání</b> a jeho výsledek</li>
+        <li><b>Snapshot obsahu</b> u M4–M7 (důkaz, ne živý obsah)</li>
+        <li><b>Retenční lhůta</b> a titul jejího uchování</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Retence není „navždy"</div>
+    <p>Uchovávat důkaz zásahu déle, než je nutné pro právní obranu, je samo o sobě porušení minimalizace (<span class="mono">GDPR čl. 5</span>). Konkrétní lhůty — jak dlouho držet log běžného zásahu vs. snapshot u M7 s možnou trestněprávní stopou — <strong>určí advokát</strong>. Do té doby platí: logovat účelně, ne sběračsky.</p>
+  </div>
+
+  <h3>Odvolání</h3>
+  <p>Právo odvolat se je jedna z osmi zásad — a zároveň nejsilnější pojistka proti chybě. Uživatel, jehož obsah byl omezen, musí z odůvodnění vědět, že se může bránit, jak a do kdy. Klíčové pravidlo: <strong>odvolání posuzuje jiný moderátor než ten, který zásah provedl</strong>, a nikdy ne osoba do věci osobně zapojená.</p>
+
+  <div class="feat">
+    <h4>Pravidla odvolacího přezkumu</h4>
+    <ul>
+      <li><b>Jiná osoba</b> — přezkum dělá jiný moderátor, aby se nekontroloval sám. U malého týmu, kde „jiný" nejde, posuzuje správce/vedení.</li>
+      <li><b>Nestrannost</b> — kdo je do sporu osobně zapojen (jeho svět, jeho konflikt, on sám je oběť/pachatel), se přezkumu neúčastní.</li>
+      <li><b>Doložený výsledek</b> — odvolání i jeho výsledek se zapisuje k původnímu rozhodnutí (potvrzeno / zmírněno / zrušeno).</li>
+      <li><b>Náprava chyby</b> — potvrdí-li přezkum, že zásah byl chybný, obsah se obnoví a zápis se opraví; to není prohra, to je fungující kontrola.</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Odvolání ≠ interní systém stížností podle čl. 20</div>
+    <p>Formální <strong>interní systém vyřizování stížností (<span class="mono">čl. 20 DSA</span>)</strong> a mimosoudní řešení sporů (<span class="mono">čl. 21</span>) jsou dodatečné povinnosti online platforem, od nichž mikro/malý Ikaros nárokuje výjimku (<span class="mono">čl. 19</span>). To ale <strong>neruší</strong> odůvodnění zásahu (<span class="mono">čl. 17</span>) ani rozumnou možnost nápravy. Odvolání zde popsané je dobrovolný, ale silný standard: levnější než spor a nejlepší doklad, že Ikaros nemoderuje svévolně.</p>
+  </div>
+
+  <h3>Životní cyklus hlášení — od podnětu k uzavření</h3>
+  <p>Celý aparát dohromady tvoří jeden opakovatelný běh. Každé hlášení projde stejnými kroky, ať jde o spam, nebo o hrozbu — liší se jen rychlost a stupeň.</p>
+
+  <div class="phase"><div class="num">1</div><div class="body"><b>Přijetí a potvrzení.</b> Uživatel nahlásí obsah přímo u příspěvku (URL/ID, kategorie, popis). Systém potvrdí přijetí a přidělí hlášení podle kategorie a SLA.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Triáž a priorita.</b> Zařazení do kategorie transparentní matice → přiřazení SLA. Hrozba života / CSAM / malware → okamžitě M7, mimo frontu.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Posouzení.</b> Moderátor ověří obsah, zkontroluje nestrannost (nejsem-li zapojen). Sporný právní nárok → dočasné skrytí (M3) a eskalace dle matice.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Rozhodnutí a zásah.</b> Zvolí nejnižší účinný stupeň M0–M7. Provede zásah a zapíše ho do logu.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>Odůvodnění uživateli.</b> Odešle statement of reasons (<span class="mono">čl. 17</span>) s poučením o odvolání; identitu oznamovatele chrání.</div></div>
+  <div class="phase"><div class="num">6</div><div class="body"><b>Odvolání (je-li).</b> Přezkoumá jiný, nezapojený moderátor. Výsledek (potvrzeno/zmírněno/zrušeno) se dopíše k rozhodnutí; chybný zásah se napraví.</div></div>
+  <div class="phase"><div class="num flag">7</div><div class="body"><b>Uzavření a retence.</b> Hlášení se uzavře, evidence se uloží na určenou dobu a po jejím uplynutí smaže. U M7 se důkazy zajistí pro případné orgány.</div></div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">8</div><div class="l">stupňů zásahu (M0–M7)</div></div>
+    <div class="stat"><div class="n">24 h</div><div class="l">SLA na doxxing a deepfake reálné osoby</div></div>
+    <div class="stat"><div class="n">čl. 17</div><div class="l">DSA — povinné odůvodnění každého zásahu</div></div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta, kterou si má zapamatovat každý moderátor</div>
+    <p><strong>Sáhni po nejnižším stupni, který problém vyřeší; zapiš, proč jsi to udělal; a rozhodni stejně, jako bys rozhodl o komkoli jiném.</strong> Přiměřenost, evidence a konzistence dohromady drží bezpečný přístav — a zároveň je to nejlevnější prevence sporu.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení Evropského parlamentu a Rady (EU) 2022/2065 (DSA) — přímo použitelné od 17. 2. 2024; zejména <span class="mono">čl. 7</span> (Good Samaritan), <span class="mono">čl. 8</span> (zákaz obecného monitoringu), <span class="mono">čl. 16</span> (notice-and-action), <span class="mono">čl. 17</span> (odůvodnění zásahu, vč. odst. 3 — právní/smluvní základ, fakta a okolnosti), <span class="mono">čl. 18</span> (oznámení podezření na trestný čin), <span class="mono">čl. 19</span> (výjimka mikro/malý), <span class="mono">čl. 20–21</span> (interní stížnosti a mimosoudní řešení — na Ikaros nedopadají).</li>
+    <li>Zákon č. 89/2012 Sb., občanský zákoník — ochrana osobnosti a podoba člověka (<span class="mono">§ 84–90</span>): rámec pro kategorie osobní údaje / ochrana osobnosti / AI deepfake.</li>
+    <li>Nařízení (EU) 2016/679 (GDPR) — <span class="mono">čl. 5</span> (minimalizace, retence logu moderace), <span class="mono">čl. 6/9</span> (tituly u osobních a zvláštních údajů v UGC).</li>
+    <li>Nařízení (EU) 2024/1689 (AI Act) — <span class="mono">čl. 50</span> (značení AI výstupů), <span class="mono">čl. 5</span> (zákaz NCII/CSAM) — kategorie AI obsah.</li>
+    <li>Fact-check ledger Provozní rámec v1.0 — položky A3, A4 (DSA per-feature, výjimka čl. 19), A5 (Good Samaritan + zákaz monitoringu), A14 (NCII/CSAM, oznámení dle čl. 18).</li>
+    <li>Ostrom, graduated sanctions (přiměřenost a graduovaný žebřík zásahů jako nástroj správy commons); Council of Europe — Content Moderation; DSA transparency database (formát statement of reasons dle čl. 17). Navazuje: kapitola <strong>Diskuse, moderace a DSA</strong> (notice-and-action, klasifikace služby) a <strong>etický kodex</strong> v Části VII.</li>
+  </ul>
+</section>

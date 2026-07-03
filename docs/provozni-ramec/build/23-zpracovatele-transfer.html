@@ -1,0 +1,198 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Osobní údaje a GDPR</div>
+    <h2>Zpracovatelé a předání do třetí země</h2>
+  </div>
+
+  <p class="lead">Ikaros nezpracovává osobní údaje sám. Hosting běží u poskytovatele serverů, e-maily odesílá SMTP služba, notifikace protéká push branou, prompty putují do cizího LLM, obrázky leží v cloudu. Každý takový dodavatel, který sáhne na osobní údaje uživatelů, je <strong>zpracovatel</strong> — a s každým musí být uzavřená <strong>zpracovatelská smlouva podle <span class="mono">čl. 28</span> GDPR</strong>. Jakmile navíc data odejdou mimo EU/EHP (typicky do USA), přidává se druhá vrstva: <strong>mechanismus předání do třetí země</strong> podle <span class="mono">kapitoly V</span> GDPR. Tato kapitola je provozní návod, jak obě vrstvy ošetřit dřív, než dodavatele napojíme.</p>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta, kterou si musí zapamatovat celý tým</div>
+    <p>Žádného dodavatele, který se dotkne osobních údajů, <strong>nenapojíme dřív, než máme podepsanou zpracovatelskou smlouvu (DPA)</strong> — a pokud zpracovává mimo EU/EHP, i doložený mechanismus předání (adekvátnost / SCC + posouzení dopadu). „Vyzkoušíme to a papíry doděláme" je u osobních údajů porušení GDPR, ne provozní zkratka.</p>
+  </div>
+
+  <h3>Správce vs. zpracovatel: kdo je kdo</h3>
+  <p>GDPR rozlišuje dvě role. <strong>Správce</strong> určuje účely a prostředky zpracování — rozhoduje <em>proč</em> a <em>jak</em> se data zpracovávají. <strong>Zpracovatel</strong> zpracovává osobní údaje <em>jménem správce</em> a jen podle jeho pokynů; sám o účelu nerozhoduje. Ikaros je vůči údajům svých uživatelů <strong>správce</strong>. Dodavatelé, kteří pro Ikaros technicky provozují dílčí funkci (server, odeslání mailu, uložení souboru), jsou <strong>zpracovatelé</strong>.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Zpracovatel — jedná za nás</h4>
+      <p class="small">Dodavatel zpracovává data <strong>jménem Ikara</strong>, podle našich pokynů, k účelu, který určíme my.</p>
+      <ul>
+        <li>Hosting, SMTP, push, cloud úložiště, LLM API, error tracking.</li>
+        <li>Nesmí data použít pro vlastní účely (např. trénink modelu, profilování).</li>
+        <li>Vztah <strong>musí</strong> pokrýt DPA dle <span class="mono">čl. 28</span>.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Samostatný správce — jedná za sebe</h4>
+      <p class="small">Protistrana o účelech rozhoduje <strong>sama</strong> a nese vlastní odpovědnost — DPA se nehodí, jde o jiný vztah.</p>
+      <ul>
+        <li>Banka/platební brána u vlastní AML/regulační role.</li>
+        <li>Orgán veřejné moci, kterému data předáváme ze zákona.</li>
+        <li>Analytická síť, která data agreguje pro <b>své</b> cíle (pozor — pak spíš společní správci).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Past: role se určuje podle reality, ne podle nálepky ve smlouvě</div>
+    <p>To, že dodavatel svůj dokument nazve „DPA", z něj zpracovatele automaticky nedělá — a naopak. Rozhoduje <strong>kdo fakticky určuje účel</strong>. Velcí poskytovatelé (analytika, platby, některé AI služby) často zpracovávají data <strong>i pro vlastní účely</strong>; pak nejsou čistým zpracovatelem, ale samostatným nebo společným správcem, a samotná DPA nestačí. U každého dodavatele si proto ověříme, <em>co s daty dělá nad rámec naší zakázky</em> — to určí správný smluvní režim.</p>
+  </div>
+
+  <h3>Zpracovatelská smlouva (DPA) podle čl. 28</h3>
+  <p>Zapojit zpracovatele lze jen na základě <strong>písemné smlouvy</strong> (i elektronické), která poskytovatele zaváže ke konkrétním povinnostem. <span class="mono">Čl. 28 odst. 3</span> vyjmenovává povinné minimum. Dobrá DPA přitom <strong>neopisuje jen text nařízení</strong> — konkretizuje, jak se každá povinnost splní a jaká úroveň zabezpečení platí.</p>
+
+  <div class="feat">
+    <h4>Povinné jádro DPA (čl. 28 odst. 3) — co musí smlouva obsahovat</h4>
+    <ul>
+      <li><b>Předmět a rámec:</b> předmět, doba trvání, povaha a účel zpracování, druh osobních údajů a kategorie subjektů.</li>
+      <li><b>Jen podle pokynů:</b> zpracovatel zpracovává <b>výhradně dle doložených pokynů</b> správce (včetně předání do třetí země) — nikdy pro vlastní účely.</li>
+      <li><b>Mlčenlivost:</b> osoby oprávněné zpracovávat data jsou zavázány k <b>důvěrnosti</b>.</li>
+      <li><b>Bezpečnost:</b> vhodná technická a organizační opatření dle <span class="mono">čl. 32</span> (šifrování, řízení přístupu, odolnost).</li>
+      <li><b>Sub-zpracovatelé:</b> jen s <b>předchozím souhlasem</b> správce (konkrétním nebo obecným s právem námitky); stejné povinnosti se řetězí i na ně.</li>
+      <li><b>Součinnost při právech subjektů:</b> pomoc správci vyřídit žádosti o přístup, opravu, výmaz, přenositelnost, námitku.</li>
+      <li><b>Součinnost při bezpečnosti a incidentech:</b> pomoc s <span class="mono">čl. 32–36</span> — zabezpečení, hlášení porušení, DPIA, konzultace s úřadem.</li>
+      <li><b>Výmaz nebo vrácení:</b> po skončení služby data dle volby správce <b>smazat nebo vrátit</b> a odstranit kopie.</li>
+      <li><b>Doložení a audit:</b> poskytnout správci informace potřebné k prokázání souladu a <b>umožnit audit / inspekci</b>.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <div class="t">Prakticky u Ikara</div>
+    <p>DPA neznamená vždy vyjednávat vlastní text. Velcí poskytovatelé nabízejí <strong>standardizovanou DPA k akceptaci</strong> (často jako součást podmínek). Naše práce je: <strong>DPA aktivně přijmout</strong> (u řady služeb není default), zkontrolovat, že pokrývá celé jádro <span class="mono">čl. 28</span>, ověřit seznam <strong>sub-zpracovatelů</strong> a nastavení <strong>bez tréninku / bez sekundárního užití</strong>, a smlouvu <strong>archivovat</strong> jako důkaz pro RoPA.</p>
+  </div>
+
+  <h3>Typičtí zpracovatelé Ikara a co u každého ošetřit</h3>
+  <p>Následující přehled mapuje dodavatelský řetězec platformy. U každého článku uvádíme, jaké osobní údaje se ho dotknou a co musí smluvně i technicky sedět. Sloupec <span class="mono">třetí země</span> značí, zda typicky vzniká předání mimo EU/EHP (řeší se pak i druhá vrstva níže).</p>
+
+  <table>
+    <thead>
+      <tr><th>Zpracovatel</th><th>Osobní údaje</th><th>Co ošetřit</th><th class="us">Třetí země?</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Hosting / servery</strong></td>
+        <td>Vše uložené: účty, obsah, logy, IP, zálohy</td>
+        <td>DPA, umístění datacenter v EU, šifrování, řízení přístupu, retence záloh</td>
+        <td class="us">Volitelně — vybrat <span class="mono">EU region</span></td>
+      </tr>
+      <tr>
+        <td><strong>E-mail / SMTP</strong></td>
+        <td>E-mail, jméno, obsah transakčních zpráv, IP</td>
+        <td>DPA, oddělit provozní vs. marketing, retence logů doručování, anti-spam</td>
+        <td class="us">Často <span class="no">ANO</span> (US služby)</td>
+      </tr>
+      <tr>
+        <td><strong>Analytika</strong></td>
+        <td>IP, identifikátory, chování, zařízení</td>
+        <td>Volba EU-first nástroje, anonymizace/pseudonymizace, cookie souhlas, ověřit roli (často spol. správce)</td>
+        <td class="us">Často <span class="no">ANO</span></td>
+      </tr>
+      <tr>
+        <td><strong>Push notifikace</strong></td>
+        <td>Push token, ID zařízení, obsah upozornění</td>
+        <td>DPA, minimalizace obsahu v notifikaci, mazání tokenů po odhlášení</td>
+        <td class="us">Často <span class="no">ANO</span> (FCM/APNs)</td>
+      </tr>
+      <tr>
+        <td><strong>AI / LLM API</strong></td>
+        <td>Prompty, jména, obsah světů, deníky</td>
+        <td>DPA, <strong>zákaz tréninku</strong> na datech Ikara, minimalizace vstupu, krátká retence, ne-log soukromého obsahu</td>
+        <td class="us">Zpravidla <span class="no">ANO</span></td>
+      </tr>
+      <tr>
+        <td><strong>Cloud úložiště souborů</strong></td>
+        <td>Avatary, přílohy, mapy, obrázky (mohou nést podobu osob)</td>
+        <td>DPA, EU region / adekvátnost, přístupová práva, mazání při výmazu účtu</td>
+        <td class="us">Volitelně — vybrat <span class="mono">EU</span></td>
+      </tr>
+      <tr>
+        <td><strong>Platební / darovací brána</strong></td>
+        <td>Jméno, e-mail, částka, doklad; kartová data drží brána</td>
+        <td>Ověřit roli (často <strong>samostatný správce</strong> pro AML), PCI na straně brány, jen nutné minimum na naší straně</td>
+        <td class="us">Dle poskytovatele</td>
+      </tr>
+      <tr>
+        <td><strong>Error / crash tracking</strong></td>
+        <td>Stack trace, IP, kontext requestu — může nést osobní údaj</td>
+        <td>DPA, <strong>scrubbing PII</strong> z chybových hlášek, krátká retence, EU region je-li dostupný</td>
+        <td class="us">Často <span class="no">ANO</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">AI/LLM poskytovatel je zpracovatel — a musí mít zakázán trénink</div>
+    <p>Jakmile AI funkce pošle do externího modelu prompt s osobními údaji (jméno postavy = reálné jméno, obsah deníku, soukromá konverzace), stává se poskytovatel LLM <strong>zpracovatelem</strong>. Kromě DPA (<span class="mono">čl. 28</span>) je klíčové smluvně i nastavením vypnout <strong>trénink modelu na datech Ikara</strong> a sekundární užití. Soukromý obsah uživatelů se do tréninku nesmí dostat bez výslovného <strong>opt-in</strong> souhlasu. Detailní režim AI zpracovatele řeší <strong>Část V (AI zpracovatel)</strong>; tato kapitola drží obecné pravidlo pro celý dodavatelský řetězec.</p>
+  </div>
+
+  <h3>Druhá vrstva: předání do USA a jiné třetí země</h3>
+  <p>Uzavřít DPA nestačí, pokud zpracovatel data zpracovává <strong>mimo EU/EHP</strong>. Podle <span class="mono">kapitoly V (čl. 44–49)</span> GDPR je takové předání přípustné jen při splnění jednoho z mechanismů. Pořadí není libovolné — jede se odshora:</p>
+
+  <div class="phase"><div class="num">45</div><div class="body"><b>Rozhodnutí o odpovídající ochraně (adekvátnost, čl. 45).</b> Nejjednodušší cesta: cílová země (nebo certifikovaný importér) má rozhodnutí Komise o adekvátnosti — data plynou jako uvnitř EU. Pro USA existuje <strong>EU-US Data Privacy Framework</strong> (viz níže).</div></div>
+  <div class="phase"><div class="num">46</div><div class="body"><b>Vhodné záruky (čl. 46).</b> Není-li adekvátnost, nejběžnější nástroj jsou <strong>standardní smluvní doložky (SCC)</strong> Komise, případně závazná podniková pravidla (BCR). SCC ale samy o sobě nestačí — viz TIA.</div></div>
+  <div class="phase"><div class="num">49</div><div class="body"><b>Výjimky (čl. 49).</b> Úzké, jednorázové derogace (výslovný souhlas subjektu, nezbytnost pro smlouvu). <strong>Ne pro systematické předávání</strong> — pro běžný provoz Ikara se na ně nespoléhá.</div></div>
+
+  <div class="callout cyan">
+    <div class="t">Stav EU-US Data Privacy Framework (ověřeno 2026)</div>
+    <p>DPF je <strong>platné rozhodnutí o adekvátnosti</strong> (Komise 10. 7. 2023). US importér, který je <strong>DPF-certifikovaný</strong>, umožňuje předání na základě adekvátnosti bez SCC. <strong>Ale rámec je pod tlakem:</strong> Tribunál EU dne <strong>3. 9. 2025</strong> zamítl žalobu (Latombe) a DPF potvrdil; žalobce se <strong>31. 10. 2025 odvolal</strong> k Soudnímu dvoru EU (věc <span class="mono">C-703/25 P</span>, „Schrems III"), k květnu 2026 bez termínu jednání. Hrozí scénář jako u Safe Harbor a Privacy Shield — proto DPF <strong>nebrat jako trvalou jistotu</strong> a u každého US dodavatele mít <strong>SCC jako záložní mechanismus</strong>.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Když je importér DPF-certifikovaný</h4>
+      <ul>
+        <li>Ověřit <strong>aktivní certifikaci</strong> na <span class="mono">dataprivacyframework.gov</span> pro daný typ dat.</li>
+        <li>Předání kryje adekvátnost (čl. 45) — SCC/TIA netřeba, ale…</li>
+        <li>…mít <strong>SCC připravené jako fallback</strong> pro případ pádu rámce.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Když certifikace není (nebo padne)</h4>
+      <ul>
+        <li>Uzavřít <strong>SCC</strong> (Komise, moduly dle vztahu správce↔zpracovatel).</li>
+        <li>Provést <strong>TIA</strong> — posouzení dopadu transferu (Schrems II).</li>
+        <li>Doplnit <strong>doplňková opatření</strong> (šifrování, pseudonymizace, minimalizace).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>TIA — posouzení dopadu transferu (Schrems II)</h3>
+  <p>Po rozsudku <strong>Schrems II</strong> (2020, který zneplatnil Privacy Shield a potvrdil SCC) platí: kdo předává na základě <span class="mono">čl. 46</span> (SCC/BCR), musí <strong>posoudit úroveň ochrany v cílové zemi</strong> a potřebu doplňkových záruk. Formální podpis SCC sám nestačí. <strong>TIA</strong> (Transfer Impact Assessment) je písemný test, který zdokumentuje: jaká data odcházejí, do jaké země, jaké tam platí zákony o přístupu státní moci (u USA zejména FISA 702), a zda naše <strong>doplňková opatření</strong> mezeru vyrovnají. Bez TIA je předání na SCC neobhajitelné.</p>
+
+  <div class="callout">
+    <div class="t">Minimalizace: nejlepší transfer je ten, který se nekoná</div>
+    <p>Před řešením mechanismu se ptáme, <strong>jestli data vůbec musí ven</strong>. Čím méně osobních údajů opustí EU, tím menší je riziko i důkazní zátěž. Konkrétně u Ikara: preferovat <strong>EU regiony</strong> hostingu a úložiště; <strong>pseudonymizovat</strong> a <strong>minimalizovat</strong> prompty do LLM; <strong>scrubovat PII</strong> z error trackingu; do notifikací nedávat citlivý obsah. Doplňková opatření (šifrování, minimalizace) nejsou jen položka do TIA — u Ikara jsou první linie obrany.</p>
+  </div>
+
+  <div class="phase">
+    <div class="num flag">✓</div>
+    <div class="body"><b>Než napojíme nového dodavatele</b> — kontrolní sekvence:
+      <ul>
+        <li><b>1. Role:</b> Je to zpracovatel, samostatný nebo společný správce? Co dělá s daty nad rámec naší zakázky?</li>
+        <li><b>2. DPA:</b> Je uzavřená a pokrývá celé jádro <span class="mono">čl. 28</span> (pokyny, mlčenlivost, bezpečnost, sub-zpracovatelé, výmaz, součinnost, audit)?</li>
+        <li><b>3. Sub-zpracovatelé:</b> Známe seznam a máme právo námitky proti změnám?</li>
+        <li><b>4. Umístění:</b> Zpracovává se v EU/EHP? Pokud ne → třetí země.</li>
+        <li><b>5. Mechanismus transferu:</b> Adekvátnost (DPF-certifikace ověřena)? Jinak SCC + TIA + doplňková opatření.</li>
+        <li><b>6. Minimalizace:</b> Odchází jen nezbytné minimum? Jde zvolit EU region / pseudonymizovat?</li>
+        <li><b>7. Trénink/sekundární užití:</b> U AI a analytiky vypnuto a smluvně zakázáno?</li>
+        <li><b>8. Zápis:</b> Dodavatel doplněn do <strong>RoPA</strong> (zpracovatelé + předání), smlouvy archivovány.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Stav DPF sledovat</div>
+    <p>Aktuální stav EU-US Data Privacy Framework (probíhá odvolání <span class="mono">C-703/25 P</span>) je nutné průběžně sledovat; SCC + TIA drží jako záloha, kdyby adekvátnost padla. Návaznost na inventář zpracování viz <strong>Mapa osobních údajů a RoPA</strong>, na režim AI viz <strong>Část V</strong>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení (EU) 2016/679 (GDPR) — <span class="mono">čl. 28</span> (zpracovatel, DPA), <span class="mono">čl. 32</span> (bezpečnost), <span class="mono">čl. 44–49</span> / kapitola V (předání do třetí země: adekvátnost čl. 45, vhodné záruky/SCC čl. 46, výjimky čl. 49).</li>
+    <li>SDEU <span class="mono">C-311/18</span> (Schrems II, 2020) — neplatnost Privacy Shield, potvrzení SCC, povinnost posoudit cílovou zemi a přijmout doplňková opatření.</li>
+    <li>EU-US Data Privacy Framework — rozhodnutí o adekvátnosti Komise (10. 7. 2023); <span class="mono">dataprivacyframework.gov</span>. Tribunál EU T-553/23 (Latombe) zamítl žalobu 3. 9. 2025; odvolání <span class="mono">C-703/25 P</span> u SDEU (podáno 31. 10. 2025), k 5/2026 bez termínu jednání — <em>stav ověřen 2026</em>.</li>
+    <li>EDPB — Doporučení 01/2020 k doplňkovým opatřením pro nástroje předání; CNIL — Praktický průvodce TIA (final, leden 2025).</li>
+    <li>Fact-check ledger v1.0 — položka <span class="mono">A9</span> (LLM/AI = zpracovatel → DPA + SCC/DPF, soukromý obsah netrénovat bez opt-in) a <span class="mono">A8</span> (zvláštní kategorie v UGC).</li>
+    <li>Navazuje: <strong>GDPR inventář a právní základy (22)</strong>, <strong>Část V — AI zpracovatel</strong>.</li>
+  </ul>
+</section>

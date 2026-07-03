@@ -1,0 +1,264 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část V — AI: obsah a transparentnost</div>
+    <h2>AI jako zpracovatel a moderace</h2>
+  </div>
+
+  <p class="lead">Ve chvíli, kdy Ikaros pošle jediný prompt do externího LLM, nezakládá jen technickou integraci — zakládá <strong>předání osobních údajů zpracovateli ve třetí zemi</strong>. Poskytovatel AI (chat za postavu, generátor portrétů, návrhy bestií, shrnutí kronik) není „nástroj", ale <strong>zpracovatel podle GDPR</strong>, se kterým musí existovat smlouva, transfer musí mít mechanismus a data nesmí odejít víc, než je nutné. Druhá polovina kapitoly řeší, co Ikaros generuje ven: <strong>moderaci AI obrázků</strong> — novou prohibici NCII/CSAM v AI Actu, filtry na deepfake a notice-and-action. Kapitola navazuje na GDPR inventář (Část II), na kapitolu o AI generovaném obsahu a AI Actu (kap. 50) a na moderaci a DSA (Část III).</p>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta pro celý tým</div>
+    <p>Externí AI = <strong>zpracovatel osobních údajů ve třetí zemi</strong>. Bez <strong>DPA (čl. 28 GDPR)</strong>, bez <strong>mechanismu transferu do USA</strong> (Data Privacy Framework nebo SCC) a bez smluvního <strong>vypnutí tréninku</strong> na datech Ikara nesmí do AI odejít žádný osobní údaj uživatele.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">čl. 28</div><div class="l">GDPR — zpracovatelská smlouva (DPA) s AI poskytovatelem</div></div>
+    <div class="stat"><div class="n">opt-in</div><div class="l">trénink na komunitním obsahu jen s výslovným souhlasem</div></div>
+    <div class="stat"><div class="n">2. 12. 2026</div><div class="l">konec grace prohibice NCII/CSAM (AI Act čl. 5)</div></div>
+  </div>
+
+  <h3>AI/LLM je zpracovatel — DPA podle čl. 28 GDPR</h3>
+
+  <p>Pokud AI funkce posílá do modelu prompty, jména, obsah světa nebo cokoli, z čeho lze určit konkrétní osobu, jedná poskytovatel modelu jako <strong>zpracovatel</strong> jménem Ikara (správce). To spouští <strong>zpracovatelskou smlouvu podle <span class="mono">čl. 28 GDPR</span></strong>. Bez ní je předání dat protiprávní bez ohledu na kvalitu služby. DPA není formalita — čl. 28 vyjmenovává minimální obsah, který musí smlouva pokrýt.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Co musí DPA (čl. 28) obsahovat</h4>
+      <ul>
+        <li>Zpracování jen podle <strong>doložených pokynů</strong> správce (vč. transferu).</li>
+        <li>Mlčenlivost osob u zpracovatele; bezpečnost dle <span class="mono">čl. 32</span>.</li>
+        <li>Sub-zpracovatelé jen se souhlasem; ručení zůstává na poskytovateli.</li>
+        <li>Součinnost u práv subjektů, DPIA a incidentů (bez zbytečného odkladu).</li>
+        <li>Výmaz / vrácení dat na konci; audit a doložení souladu.</li>
+        <li>Povinnost upozornit správce, pokud pokyn porušuje GDPR.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Právní tituly pro AI funkce</h4>
+      <ul>
+        <li><strong>Smlouva</strong> — provozní jádro funkce (chat, generátor jako součást služby).</li>
+        <li><strong>Oprávněný zájem</strong> — bezpečnost, moderace, analytika; nutná <strong>LIA</strong>.</li>
+        <li><strong>Souhlas</strong> — jen volitelné funkce a doporučování dle nastavení.</li>
+        <li><strong>Výslovný souhlas</strong> — nutný pro jakýkoli trénink na obsahu uživatele.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Transfer do USA — Data Privacy Framework a SCC</h3>
+
+  <p>Většina relevantních poskytovatelů (OpenAI, Anthropic, Google) zpracovává data v <strong>USA</strong> → jde o <strong>předání do třetí země</strong> a je nutný platný mechanismus. K roku 2026 existují dvě vrstvy, které se v praxi kombinují:</p>
+
+  <table>
+    <thead>
+      <tr><th>Mechanismus</th><th>Základ</th><th>Praxe u Ikara</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Data Privacy Framework (DPF)</strong></td>
+        <td>Rozhodnutí o adekvátnosti (<span class="mono">čl. 45 GDPR</span>), platné od 7/2023; poskytovatel musí být <strong>self-certified</strong>.</td>
+        <td>Ověřit, že konkrétní poskytovatel je na seznamu DPF pro relevantní účel; jinak neplatí.</td>
+      </tr>
+      <tr>
+        <td><strong>Standardní smluvní doložky (SCC)</strong></td>
+        <td>Smluvní záruky (<span class="mono">čl. 46 GDPR</span>) — fallback i tam, kde DPF nekryje nebo padne.</td>
+        <td>Mít na file vždy jako zálohu; SCC obvykle vyžadují <strong>posouzení dopadu transferu (TIA)</strong>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">DPF je adekvátnost, ne jistota napořád</div>
+    <p>Adekvátnost stojí a padá s americkým právním prostředím (EO 14086, dohledová omezení). <strong>Defenzivní postup: opřít se o DPF, ale mít SCC + TIA jako fallback</strong> pro případ, že by adekvátnost padla (jako Privacy Shield po Schrems II). Konkrétní volbu a znění TIA potvrdí advokát; data a status DPF poskytovatele ověřit před nasazením.</p>
+  </div>
+
+  <h3>Minimalizace: co vůbec do modelu odchází</h3>
+
+  <p>Nejlepší ochrana je data neposlat. Před každou AI funkcí platí trojice pravidel: <strong>minimalizovat</strong> (posílat jen nutné), <strong>nevkládat zvláštní kategorie</strong> a <strong>řídit retenci</strong>.</p>
+
+  <div class="feat">
+    <h4>Datový režim promptů</h4>
+    <ul>
+      <li><b>Minimalizace:</b> do promptu jen to, co funkce nutně potřebuje; ne celé profily, ne cizí osobní údaje hráčů.</li>
+      <li><b>Zvláštní kategorie (<span class="mono">čl. 9</span>):</b> zdraví, víra, sexuální orientace, etnicita, politika <b>NEPATŘÍ</b> do promptů — oprávněný zájem je nekryje, nutný samostatný titul (viz Část II, GDPR). Řešení preventivní: zákaz v podmínkách + varování v UI + filtr.</li>
+      <li><b>Retence:</b> zjistit a nastavit retenci promptů a logů u poskytovatele; kde to jde, uchování promptů vypnout.</li>
+      <li><b>Bez tréninku:</b> smluvně zajistit, že prompty a výstupy Ikara <b>neslouží k tréninku</b> modelu poskytovatele ani třetí strany.</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Zvláštní kategorie: odkaz do Části II</div>
+    <p>Past čl. 9 je řešená v kapitole GDPR inventář (Část II): v chatu, denících a promptech mohou uživatelé sami odhalit citlivé údaje. Provozovatel je <strong>nesmí legalizovat oprávněným zájmem</strong>. AI modul proto musí citlivá data minimalizovat a nepředávat do modelu; UI má varovat. U dětských účtů dvojnásob.</p>
+  </div>
+
+  <h3>Kontrolní otázky pro AI poskytovatele</h3>
+
+  <p>Před uzavřením smlouvy s libovolným AI poskytovatelem projít pět otázek. Odpověď „ne" nebo „nevíme" u kterékoli z nich je stopka nebo eskalace advokátovi.</p>
+
+  <table>
+    <thead>
+      <tr><th>Otázka</th><th>Proč</th><th>Přijatelný stav</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Trénink?</strong> Používá poskytovatel naše prompty a výstupy k tréninku?</td>
+        <td>Komunitní a soukromý obsah nesmí být bez souhlasu podkladem tréninku třetí strany.</td>
+        <td><span class="yes">Trénink na API/business datech vypnutý defaultně</span></td>
+      </tr>
+      <tr>
+        <td><strong>Lokalita dat?</strong> Kde se data zpracovávají a ukládají?</td>
+        <td>Určuje transfer do třetí země, GDPR a bezpečnost.</td>
+        <td><span class="partial">EU residency, nebo DPF/SCC + TIA</span></td>
+      </tr>
+      <tr>
+        <td><strong>DPA?</strong> Je dostupná zpracovatelská smlouva dle čl. 28?</td>
+        <td>Bez DPA nesmí odejít žádný osobní údaj.</td>
+        <td><span class="yes">DPA k dispozici a podepsaná</span></td>
+      </tr>
+      <tr>
+        <td><strong>Retence?</strong> Jaká je retence promptů a logů? Lze uchování vypnout?</td>
+        <td>Minimalizace a bezpečnost; kratší retence = menší riziko.</td>
+        <td><span class="partial">Krátká retence / zero-retention režim</span></td>
+      </tr>
+      <tr>
+        <td><strong>Filtry?</strong> Existují filtry na zakázaný obsah a deepfake?</td>
+        <td>Podpora souladu s prohibicí NCII/CSAM — ne náhrada vlastních pravidel.</td>
+        <td><span class="partial">Filtry ano, ale vlastní moderace navíc</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Zákaz skrytého tréninku — trénink je OPT-IN, ne opt-out</h3>
+
+  <p>Zásadní hranice: Ikaros <strong>nesmí trénovat generativní model na komunitním obsahu ve výchozím stavu</strong>. Trénink je jiný účel než provoz služby — spouští autorské licence, TDM výhrady, GDPR, AI Act, bezpečnost a dokumentaci modelu. Rozdíl mezi „opt-out" (data se berou, dokud uživatel neřekne ne) a „opt-in" (data se neberou, dokud uživatel výslovně neřekne ano) je právně propastný. <strong>Pro trénink platí výhradně opt-in.</strong></p>
+
+  <p>Přitéká sem i <strong>TDM výhrada práv</strong> podle <span class="mono">čl. 4(3) směrnice 2019/790 (DSM)</span>: nositelé práv mohou strojově čitelně vyhradit svá práva proti dolování textu a dat; AI Act (<span class="mono">čl. 53</span>) ukládá poskytovatelům obecných modelů tyto výhrady respektovat. Ikaros je na obou stranách — jako <strong>nositel/správce</strong> obsahu (může výhradu vyslovit) i jako potenciální <strong>trenér modelu</strong> (musel by cizí výhrady respektovat). Proto: bez opt-in licence od uživatelů a bez právního auditu se generativní model na komunitním obsahu netrénuje.</p>
+
+  <table>
+    <thead>
+      <tr><th>Účel</th><th>Právní základ</th><th>Souhlas / režim</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Interní index a vyhledávání obsahu</td>
+        <td>Plnění smlouvy / oprávněný zájem</td>
+        <td><span class="yes">Souhlas netřeba</span> (provoz služby)</td>
+      </tr>
+      <tr>
+        <td>Bezpečnost, prevence zneužití, moderace</td>
+        <td>Oprávněný zájem (nutná LIA)</td>
+        <td><span class="partial">Bez souhlasu, ale doložit balanční test</span></td>
+      </tr>
+      <tr>
+        <td>Doporučování obsahu dle nastavení</td>
+        <td>Souhlas / nastavení uživatele</td>
+        <td><span class="partial">Dle preferencí, oddělitelné a odvolatelné</span></td>
+      </tr>
+      <tr>
+        <td><strong>Trénink generativního modelu</strong></td>
+        <td>Souhlas + samostatná licence (+ TDM, AI Act)</td>
+        <td><span class="no">POVINNÝ výslovný opt-in</span> + právní audit</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Netrénovat na komunitním obsahu bez opt-in</div>
+    <p>Pokud by Ikaros trénoval vlastní model nebo dolaďoval cizí model na datech uživatelů, mění se celý právní režim — autorské licence, TDM výhrady, GDPR, AI Act, bezpečnost a dokumentace modelu. <strong>Výchozí pozice: netrénovat generativní modely na komunitním obsahu bez samostatné opt-in licence a právního auditu.</strong> Trénink „potichu na oplátku za free účet" je vyloučený (viz i data jako protiplnění, Část II).</p>
+  </div>
+
+  <h3>Moderace AI obrázků — nová prohibice NCII/CSAM</h3>
+
+  <p>Ikaros AI obrázky negeneruje jen dovnitř, ale i do veřejné galerie a komunitní knihovny. Tím se stává <strong>místem, kde může vzniknout zakázaný obsah</strong>. Digital Omnibus doplňuje do <span class="mono">čl. 5 AI Actu</span> <strong>novou prohibici</strong>: AI systémy generující nebo manipulující <strong>NCII</strong> (nekonsenzuální intimní materiál) a <strong>CSAM</strong> (materiál zobrazující sexuální zneužívání dětí) — zákaz uvedení na trh, do provozu i užití AI, které bez svobodného, konkrétního, informovaného, jednoznačného a výslovného souhlasu osoby generuje realistická zobrazení jejích intimních partií nebo osoby při sexuálně explicitní aktivitě. Prohibice má <strong>grace period do 2. 12. 2026</strong>.</p>
+
+  <div class="callout gold">
+    <div class="t">Status prohibice: dohodnuto, ne finálně publikováno</div>
+    <p>Prohibice NCII/CSAM je součástí <strong>Digital Omnibu</strong> (politická dohoda 2026); dokud není publikace v Úředním věstníku potvrzena, zůstává závazný čl. 5 ve znění z OJ 12. 7. 2024. <strong>Věcně je ale směr jasný a nesporný</strong> — Ikaros nasazuje moderaci bez ohledu na formální datum. Data a status ověřit před nasazením (ledger je autorita nad podklady).</p>
+  </div>
+
+  <div class="feat">
+    <h4>Moderační modul pro AI obrázky</h4>
+    <ul>
+      <li><b>Filtry na vstupu i výstupu:</b> blokovat prompty a výstupy směřující k NCII/CSAM, deepfake reálné osoby a k zakázanému obsahu — u vlastního generátoru i u nahrávaného AI obsahu.</li>
+      <li><b>Deepfake:</b> AI Act definuje deepfake jako uměle vytvořený/manipulovaný obraz podobný reálné osobě; u podoby reálného člověka <b>bez souhlasu blokovat</b>, jinak povinné označení „uměle vytvořeno" (čl. 50).</li>
+      <li><b>Notice-and-action (DSA čl. 16):</b> každý AI obrázek ve veřejné galerii i knihovně jde nahlásit; hlášení se řeší s odůvodněním (čl. 17).</li>
+      <li><b>Oznámení trestného činu (DSA čl. 18):</b> při podezření na trestný čin ohrožující život/bezpečnost osob (typicky CSAM) <b>promptně informovat orgány činné v trestním řízení</b>, případně Europol.</li>
+      <li><b>Lidská kontrola:</b> AI obsah se nezařazuje automaticky do oficiální ani doporučené knihovny bez lidského přezkumu.</li>
+    </ul>
+  </div>
+
+  <h3>Zakázané prompty</h3>
+
+  <p>AI štítek je transparentnostní nástroj, <strong>ne omluva pro porušení práv</strong>. Uživatel nesmí legalizovat výstup tím, že napíše „vygenerováno AI". Podmínky proto zakazují prompty, které cílí na cizí práva:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Zakázané kategorie promptů</h4>
+      <ul>
+        <li><b>Kopie cizí ilustrace:</b> „vytvoř přesnou kopii ilustrace z příručky X".</li>
+        <li><b>Podoba reálné osoby:</b> podobizna konkrétního člověka bez souhlasu — zvlášť v ponižujícím, sexuálním, politickém či klamavém kontextu.</li>
+        <li><b>Chráněná značka / design:</b> logo, znak, chráněný design cizího vydavatele bez licence.</li>
+        <li><b>Cizí chráněná postava / svět:</b> „udělej postavu jako [chráněná filmová/RPG postava]".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Proč zakázat</h4>
+      <ul>
+        <li>Riziko zásahu do <b>autorských práv</b> (podobnost s chráněným dílem).</li>
+        <li>Riziko <b>osobnostních práv a GDPR</b> u podoby reálné osoby (deepfake).</li>
+        <li>Riziko <b>nekalé soutěže</b> a záměny u cizí značky (<span class="mono">§ 2981 OZ</span>).</li>
+        <li>Prohibice <b>NCII/CSAM</b> u sexuálního/nekonsenzuálního obsahu (čl. 5).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>AI gramotnost týmu a moderátorů</h3>
+
+  <p>Compliance stojí a padá s lidmi, kteří AI obsluhují. Administrátoři a moderátoři pracující s AI musí být <strong>proškoleni</strong> dřív, než se AI modul spustí do provozu.</p>
+
+  <div class="feat">
+    <h4>Co musí tým vědět</h4>
+    <ul>
+      <li>Co AI <b>(ne)umí</b> — AI výstup není právní jistota ani autorita.</li>
+      <li>Jaké údaje se <b>nesmí vkládat</b> do promptů (zvláštní kategorie, soukromé zprávy, cizí osobní údaje).</li>
+      <li>Moderátor <b>nevkládá soukromé zprávy</b> do veřejného AI nástroje.</li>
+      <li>Jak rozeznat rizikový výstup (cizí IP, deepfake, NCII/CSAM) a <b>kdy eskalovat advokátovi</b>.</li>
+      <li>AI štítek se <b>nesmí odstranit</b>, pokud obsah vznikl převážně AI.</li>
+      <li>Oficiální knihovna <b>není plně automaticky generovaná</b> bez lidské kontroly.</li>
+    </ul>
+  </div>
+
+  <h3>Co udělat do 2. 12. 2026</h3>
+
+  <div class="phase">
+    <div class="num">DPA</div>
+    <div class="body"><b>Uzavřít zpracovatelskou smlouvu (čl. 28)</b> s každým AI poskytovatelem + ověřit mechanismus transferu (DPF na seznamu / SCC + TIA jako fallback). Smluvně vypnout trénink na datech Ikara.</div>
+  </div>
+  <div class="phase">
+    <div class="num">Data</div>
+    <div class="body"><b>Nastavit datový režim promptů</b> — minimalizace, zákaz zvláštních kategorií, retence/zero-retention, varování v UI. Trénink generativního modelu jen na opt-in.</div>
+  </div>
+  <div class="phase">
+    <div class="num flag">2. 12. 2026</div>
+    <div class="body"><b>Nasadit moderaci NCII/CSAM</b> (konec grace prohibice, čl. 5): filtry na deepfake a zakázaný obsah, notice-and-action (DSA čl. 16–17), oznámení trestného činu (DSA čl. 18), lidská kontrola u knihovny.</div>
+  </div>
+  <div class="phase">
+    <div class="num">Tým</div>
+    <div class="body"><b>Proškolit AI gramotnost</b> administrátorů a moderátorů dřív, než se AI modul spustí veřejně.</div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Provazba do zbytku knihy</div>
+    <p>Autorský status AI výstupu, časování AI Actu a governance třídy <span class="mono">ai_origin</span> → <strong>kap. 50 (AI generovaný obsah a AI Act)</strong>. Interakční transparentnost čl. 50 a značení AI → <strong>kap. 51</strong>. Zpracovatelé, transfer, DPA a zvláštní kategorie → <strong>Část II (GDPR inventář)</strong>. Notice-and-action, DSA a hostingový režim → <strong>Část III (moderace a DSA)</strong>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení 2016/679 (GDPR) — <span class="mono">čl. 28</span> (zpracovatel a povinný obsah DPA), <span class="mono">čl. 32</span> (bezpečnost), <span class="mono">čl. 9</span> (zvláštní kategorie), <span class="mono">čl. 45</span> (adekvátnost / Data Privacy Framework), <span class="mono">čl. 46</span> (SCC); posouzení dopadu transferu (TIA).</li>
+    <li>Nařízení EU 2024/1689 (AI Act) — <span class="mono">čl. 5</span> (prohibice vč. nové prohibice NCII/CSAM dle Digital Omnibu, grace do 2. 12. 2026), <span class="mono">čl. 50</span> (transparentnost, deepfake), <span class="mono">čl. 53</span> (povinnosti GPAI, respekt k TDM výhradám).</li>
+    <li>Směrnice EU 2019/790 (DSM) — <span class="mono">čl. 4(3)</span> (TDM výhrada práv strojově čitelně, opt-out nositelů práv vůči dolování).</li>
+    <li>Nařízení EU 2022/2065 (DSA) — <span class="mono">čl. 16</span> (notice-and-action), <span class="mono">čl. 17</span> (odůvodnění), <span class="mono">čl. 18</span> (oznámení podezření z trestného činu ohrožujícího život/bezpečnost).</li>
+    <li>Zákon č. 89/2012 Sb. (OZ) — <span class="mono">§ 2981</span> (nebezpečí záměny) u zakázaných promptů na cizí značku.</li>
+    <li>Data Privacy Framework — adekvátnost EU–US (7/2023), self-certifikace poskytovatelů (OpenAI, Anthropic, Google); defenzivně kombinovat s SCC + TIA.</li>
+    <li>Fact-check ledger Provozního rámce v1.0 — položky <strong>A9</strong> (LLM = zpracovatel, DPA čl. 28 + transfer SCC/DPF, netrénovat bez opt-in), <strong>A14</strong> (prohibice NCII/CSAM, moderace, filtry, notice-and-action, oznámení dle DSA čl. 18), <strong>A8</strong> (zvláštní kategorie čl. 9 nelze krýt oprávněným zájmem). Ledger je autorita nad podklady.</li>
+    <li>Navazuje: <strong>kap. 50</strong> (AI generovaný obsah a AI Act), <strong>kap. 51</strong> (transparentnost a značení), <strong>Část II</strong> (GDPR, zpracovatelé, transfer), <strong>Část III</strong> (moderace a DSA).</li>
+  </ul>
+</section>

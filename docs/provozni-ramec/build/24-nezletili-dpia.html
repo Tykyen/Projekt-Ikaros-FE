@@ -1,0 +1,204 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Osobní údaje a GDPR</div>
+    <h2>Nezletilí a DPIA: nejpřísnější režim platformy</h2>
+  </div>
+
+  <p class="lead">RPG komunita přitahuje mladší hráče a Ikaros navíc cílí na <strong>domy dětí a mládeže, kroužky a školy</strong> — účty nezletilých proto nejsou okrajová možnost, ale plánovaný scénář. Tím se u dětí sčítá <strong>několik vrstev práva a bezpečnosti najednou</strong>: věk digitálního souhlasu, souhlas zákonného zástupce, bezpečná výchozí konfigurace, moderace soukromých zpráv a AI nad osobními daty. Tato kapitola stanoví režimy dětského účtu, bezpečný default, institucionální režim pro DDM a školy, a vysvětluje, proč je pro Ikaros <strong>posouzení vlivu (DPIA) s vysokou pravděpodobností povinné</strong>. Výchozí postoj je jednoznačný: <strong>u dětí platí nejpřísnější ochranářský default, ne pohodlí.</strong></p>
+
+  <div class="callout gold">
+    <div class="t">Jedno pravidlo pro celý tým</div>
+    <p>Když u konkrétní funkce nevíme, zda ji smí použít dítě nebo za jakých podmínek, <strong>chováme se, jako by šlo o dítě mladší 15 let, a volíme přísnější variantu</strong>. Bezpečná konfigurace nezletilého je výchozí (privacy by default), ne odměna za nastavení. Focení dětí, veřejné profily a AI nad dětskými daty jsou vždy „krok navíc" s dodatečnou brzdou.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">15</div><div class="l">věk digitálního souhlasu v ČR (§ 7 zák. 110/2019 Sb.)</div></div>
+    <div class="stat"><div class="n">≥ 2</div><div class="l">kritéria WP248 stačí ke spuštění DPIA — Ikaros jich má víc</div></div>
+    <div class="stat"><div class="n">RoPA</div><div class="l">záznamy o zpracování povinné i pod 250 osob (čl. 30)</div></div>
+  </div>
+
+  <h3>Věk digitálního souhlasu — 15 let</h3>
+
+  <p>GDPR stanoví obecnou hranici pro souhlas se službou informační společnosti na <strong>16 let</strong> a umožňuje členským státům snížit ji nejvýše na 13 (<span class="mono">čl. 8 GDPR</span>). <strong>Česká republika ji stanovila na 15 let</strong> (<span class="mono">§ 7 zák. č. 110/2019 Sb.</span>). Pod touto hranicí musí zpracování osobních údajů dítěte v souvislosti s nabízenou online službou <strong>schválit nebo autorizovat zákonný zástupce</strong>. Ikaros — chat, deníky, AI, komunitní obsah — je službou informační společnosti přesně v tomto smyslu, hranice se tedy uplatní.</p>
+
+  <div class="callout cyan">
+    <div class="t">„Přiměřené úsilí" ověřit rodičovství</div>
+    <p>GDPR (<span class="mono">čl. 8 odst. 2</span>) žádá, aby provozovatel vyvinul <strong>přiměřené úsilí</strong> ověřit, že souhlas dal skutečně nositel rodičovské odpovědnosti, <strong>s ohledem na dostupné technologie</strong>. Nestačí slepě věřit zaškrtnutému políčku „je mi 15+". Konkrétní ověřovací tok (e-mail rodiče, potvrzení, doložitelnost) je otázka pro advokáta — ale nulové ověření je nepřijatelné.</p>
+  </div>
+
+  <h3>Čtyři režimy dětského účtu</h3>
+
+  <p>Ikaros nemá jeden „účet" — má škálu režimů podle věku a kontextu. Registrace musí do jednoho z nich uživatele zařadit dřív, než mu otevře chat a soukromé zprávy.</p>
+
+  <table>
+    <thead>
+      <tr><th>Věk / kontext</th><th>Právní režim</th><th>Co Ikaros musí zajistit</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>15 let a více</strong></td>
+        <td>Digitální souhlas dává dítě samo (<span class="mono">§ 7 z. 110/2019</span>)</td>
+        <td>Standardní režim; bezpečná konfigurace jako <strong>doporučený</strong> default</td>
+      </tr>
+      <tr>
+        <td><strong>Pod 15 let</strong></td>
+        <td>Souhlas / autorizace zákonného zástupce (<span class="mono">§ 7 z. 110/2019</span>, <span class="mono">čl. 8 GDPR</span>)</td>
+        <td>Ověřovací tok pro rodiče + přiměřené úsilí ověřit rodičovství + bezpečná konfigurace <strong>povinně</strong></td>
+      </tr>
+      <tr>
+        <td class="us"><strong>DDM / kroužek / škola</strong></td>
+        <td class="us">Institucionální režim pod správou vedoucího; rodičovské souhlasy sbírá organizace</td>
+        <td class="us">Neveřejné skupiny, komunikace přes vedoucího, minimalizace dat, vzory ČRDM</td>
+      </tr>
+      <tr>
+        <td><strong>Pod 13 let</strong></td>
+        <td>Nedoporučeno — pod evropskou minimální hranicí</td>
+        <td>Buď <strong>neumožnit samostatný účet</strong>, nebo jen institucionální režim pod plnou správou dospělého</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Neurčený / neověřený věk = přísnější režim</div>
+    <p>Dospělost <strong>nelze mlčky předpokládat</strong>. Ikaros nesmí u účtu bez ověřeného věku jet defaultně otevřený režim. Přesný věk se navíc u nezletilého <strong>nezveřejňuje</strong> — sbírat věk veřejně je rizikové samo o sobě. Při pochybnosti platí přísnější (dětský) režim, dokud se věk nevyjasní.</p>
+  </div>
+
+  <h3>Bezpečná konfigurace nezletilého — výchozí nastavení</h3>
+
+  <p>U účtu nezletilého se následující nastavuje <strong>jako výchozí</strong> (privacy by default). Nejde o kosmetiku — jsou to praktická opatření proti zneužití soukromých zpráv, kontaktování cizími osobami a úniku citlivých údajů dítěte.</p>
+
+  <div class="feat">
+    <h4>Povinný default u účtu nezletilého</h4>
+    <ul>
+      <li><b>Neveřejný profil</b> — dítě není dohledatelné ani indexovatelné bez aktivní volby; žádné veřejné vyhledávání.</li>
+      <li><b>Omezené soukromé zprávy</b> — kontaktovat nezletilého smí jen členové sdíleného světa / skupiny, ne kdokoli.</li>
+      <li><b>Zákaz veřejného věku, školy, adresy a fotek</b> — tato pole se u nezletilého veřejně vůbec neukazují.</li>
+      <li><b>Zvýšená moderace nahlášení</b> — hlášení týkající se nezletilého má prioritu a přísnější posouzení.</li>
+      <li><b>Jasné nouzové kontakty</b> — viditelná, jednoduchá cesta, jak nahlásit ohrožení nebo nevhodný kontakt.</li>
+      <li><b>Omezené AI</b> — minimalizace ukládání promptů a osobních údajů dítěte v AI funkcích; soukromá data dítěte nejdou do tréninku.</li>
+      <li><b>Pravidla pro správce</b> — kdo a za jakých podmínek smí nahlédnout do komunikace s nezletilým; přístup logovaný a omezený.</li>
+    </ul>
+  </div>
+
+  <p>Identita oznamovatele se u nezletilého <strong>nesmí automaticky předávat</strong> nahlášenému uživateli — vazba na moderaci a hlášení obsahu je v části o diskusi, hostingu a DSA. Bezpečnostní minimum (2FA pro citlivé role, zálohy, rate-limiting, logovaný a omezený administrátorský přístup) platí tak jako tak; u dětských účtů dvojnásob.</p>
+
+  <h3>DDM, kroužky a školy — institucionální režim</h3>
+
+  <p>Cílení na DDM a školy je pro Ikaros příležitost i nejvyšší odpovědnost zároveň. V tomto režimu <strong>děti nefigurují jako samostatní veřejní uživatelé</strong>: patří do uzavřené skupiny, kterou spravuje vedoucí kroužku či učitel, a organizace nese odpovědnost za rodičovské souhlasy. Ikaros je tu nástroj v rukou dospělého, ne veřejná sociální síť pro děti.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Jak institucionální režim staví</h4>
+      <ul>
+        <li>Neveřejné skupiny — žádné veřejné profily ani vyhledávání dětí</li>
+        <li>Komunikace primárně <strong>přes vedoucího</strong>, ne 1:1 mezi neznámými</li>
+        <li>Minimalizace dat — sbírat jen to, co kroužek nutně potřebuje</li>
+        <li>Rodičovské souhlasy shromažďuje a spravuje <strong>organizace</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Opřít se o hotové vzory</h4>
+      <ul>
+        <li><strong>ČRDM</strong> poskytuje bezplatné vzory souhlasů a GDPR poradnu pro dětské organizace</li>
+        <li><strong>ÚOOÚ (školství)</strong> — reportážní foto z činnosti default nekombinovat se strukturovanými údaji žáků; <strong>necílit na jednotlivé děti</strong>, minimalizovat</li>
+        <li>Souhlas rodiče je nutný zejména pro <strong>zveřejnění na sociálních sítích</strong> a u cíleného portrétu dítěte</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Foto dětí — provazba na kapitolu o podobě</div>
+    <p>Foto identifikovatelného dítěte je osobní údaj (GDPR) i podoba (<span class="mono">§ 84–90 OZ</span>). Pro veřejné či propagační užití snímku dítěte je nutný <strong>souhlas zákonného zástupce</strong> a výchozí je neveřejnost. Detailní rozhodovací strom (dav vs. cílený portrét, dokumentace vs. marketing) je v kapitole <strong>Podoba člověka</strong>; zde platí jen zpřísnění: <strong>u dětí se vždy chováme jako u cíleného portrétu určeného na promo</strong> — tedy souhlas rodiče.</p>
+  </div>
+
+  <h3>DPIA — proč je pro Ikaros pravděpodobně povinná</h3>
+
+  <p><strong>Posouzení vlivu na ochranu osobních údajů (DPIA, <span class="mono">čl. 35 GDPR</span>)</strong> je povinné, když druh zpracování — zejména při použití nových technologií — bude mít pravděpodobně za následek <strong>vysoké riziko</strong> pro práva a svobody osob. Pracovní skupina WP29 v pokynech <span class="mono">WP248</span> stanovila <strong>devět kritérií</strong> rizikovosti; praktické vodítko zní: <strong>naplnění alespoň dvou z nich obvykle znamená, že DPIA je nutné zpracovat</strong>, a čím víc kritérií, tím vyšší pravděpodobnost vysokého rizika.</p>
+
+  <table>
+    <thead>
+      <tr><th>Kritérium WP248</th><th>Naplňuje Ikaros?</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Zranitelné subjekty údajů</strong> — WP248 výslovně uvádí <strong>děti</strong></td>
+        <td class="us"><span class="yes">Ano</span> — účty nezletilých, DDM/školní režim</td>
+      </tr>
+      <tr>
+        <td><strong>Zvláštní / vysoce osobní údaje</strong> — soukromá komunikace, obsah promptů</td>
+        <td class="us"><span class="yes">Ano</span> — soukromé zprávy, deníky, čl. 9 v UGC</td>
+      </tr>
+      <tr>
+        <td><strong>Rozsáhlé zpracování</strong> — komunitní platforma s mnoha uživateli</td>
+        <td><span class="partial">Pravděpodobně</span> — dle růstu komunity</td>
+      </tr>
+      <tr>
+        <td><strong>Inovativní použití / nová technologie</strong> — AI nad osobními/soukromými daty</td>
+        <td class="us"><span class="yes">Ano</span> — AI asistence pracuje s texty hráčů</td>
+      </tr>
+      <tr>
+        <td><strong>Hodnocení / skórování, systematické monitorování</strong></td>
+        <td><span class="partial">Dle funkcí</span> — moderace ano; profilování ne</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">DPIA pravděpodobně POVINNÁ — minimálně pro AI a dětské účty</div>
+    <p>Ikaros naplňuje kritéria WP248 hned <strong>v několika bodech současně</strong>: <strong>děti</strong> (zranitelné subjekty), <strong>soukromá komunikace a moderace</strong> (vysoce osobní data) a <strong>AI</strong> nad osobními údaji (inovativní technologie). Kombinace daleko přesahuje práh „dvou kritérií". DPIA je proto nutné zpracovat <strong>minimálně pro AI modul a pro dětské / DDM účty</strong>, a to <strong>ještě před spuštěním veřejného provozu</strong>.</p>
+  </div>
+
+  <h4>Co DPIA musí obsahovat</h4>
+
+  <p>DPIA není jednorázové zaškrtnutí — je to živý dokument, který se aktualizuje při změně zpracování. Minimální osnova podle <span class="mono">čl. 35 odst. 7 GDPR</span>:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Jádro každé DPIA</h4>
+      <ul>
+        <li><strong>Systematický popis</strong> zpracování a jeho účelů (co, proč, čí data)</li>
+        <li><strong>Nezbytnost a přiměřenost</strong> vůči účelu</li>
+        <li><strong>Posouzení rizik</strong> pro práva a svobody subjektů</li>
+        <li><strong>Opatření</strong> ke zmírnění rizik a doložení souladu</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Minimum pro AI modul + dětské účty</h4>
+      <ul>
+        <li>Co konkrétně jde do LLM a co se ukládá (minimalizace)</li>
+        <li>Bezpečná konfigurace nezletilého jako mitigace</li>
+        <li>Zpracovatelská smlouva (<span class="mono">čl. 28</span>) + transfer do USA (<span class="mono">SCC</span>)</li>
+        <li>Zákaz tréninku na soukromém obsahu bez opt-in</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>RoPA i pod 250 osob a kdy zvážit DPO</h3>
+
+  <p><strong>Záznamy o činnostech zpracování (RoPA, <span class="mono">čl. 30 GDPR</span>)</strong> jsou u Ikara povinné <strong>bez ohledu na velikost</strong>. Výjimka pro subjekty pod 250 osob <strong>neplatí</strong>, je-li zpracování pravidelné, představuje riziko pro práva subjektů, nebo zahrnuje zvláštní kategorie údajů — Ikaros splňuje všechny tři podmínky: provoz je nepřetržitý, moderace/AI/děti jsou rizikové a v uživatelském obsahu vznikají údaje podle <span class="mono">čl. 9</span>. Soupis zpracování a právní tituly řeší kapitola <strong>GDPR inventář a právní základy</strong>.</p>
+
+  <div class="callout cyan">
+    <div class="t">Kdy zvážit pověřence (DPO)</div>
+    <p>Jmenování pověřence pro ochranu osobních údajů (DPO, <span class="mono">čl. 37 GDPR</span>) je povinné mj. při <strong>rozsáhlém pravidelném a systematickém monitorování</strong> subjektů nebo rozsáhlém zpracování zvláštních kategorií. U malého spolku to nemusí být povinné hned — ale <strong>kombinace dětí, soukromé komunikace a AI</strong> posouvá otázku DPO z „ne" na „nechat posoudit advokátem". I bez formální povinnosti se vyplatí mít jednu osobu odpovědnou za GDPR agendu.</p>
+  </div>
+
+  <h3>Než pustíme dětský / DDM režim</h3>
+
+  <p>Následující kroky patří <strong>před</strong> otevření registrace nezletilým a před nasazení do kroužků a škol — ne po něm.</p>
+
+  <div class="phase"><div class="num">1</div><div class="body"><b>Rozhodnout věkovou politiku.</b> 15+ samostatně, pod 15 s rodičovským souhlasem, pod 13 buď neumožnit, nebo jen institucionální režim. Zafixovat ve World-Terms / podmínkách (Část VIII, dětský režim).</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Postavit ověřovací tok rodiče.</b> Přiměřené úsilí ověřit rodičovství (<span class="mono">čl. 8 odst. 2</span>) — doložitelné, ne zaškrtávátko.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Zapnout bezpečnou konfiguraci jako default.</b> Neveřejný profil, omezené zprávy, skryté citlivé pole, zvýšená moderace, omezené AI — pro každý účet nezletilého automaticky.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Připravit institucionální režim + vzory ČRDM.</b> Neveřejné skupiny, komunikace přes vedoucího, minimalizace dat, rodičovské souhlasy sbírá organizace.</div></div>
+  <div class="phase"><div class="num flag">5</div><div class="body"><b>Zpracovat DPIA (AI + děti), vést RoPA, zvážit DPO.</b> DPIA před spuštěním veřejného provozu; RoPA jako živý dokument; otázku DPO nechat posoudit advokátem. <strong>Bez DPIA se dětský ani AI režim nespouští.</strong></div></div>
+
+  <ul class="sources">
+    <li>GDPR (nařízení EU 2016/679) — <span class="mono">čl. 8</span> (podmínky souhlasu dítěte, přiměřené úsilí ověřit rodičovství), <span class="mono">čl. 9</span> (zvláštní kategorie), <span class="mono">čl. 28</span> (zpracovatel), <span class="mono">čl. 30</span> (RoPA), <span class="mono">čl. 35</span> (DPIA + osnova odst. 7), <span class="mono">čl. 37</span> (DPO).</li>
+    <li>Zákon č. 110/2019 Sb., o zpracování osobních údajů — <span class="mono">§ 7</span> (věk digitálního souhlasu 15 let, souhlas/autorizace zákonného zástupce pod 15).</li>
+    <li>Zákon č. 89/2012 Sb., občanský zákoník — <span class="mono">§ 84–90</span> (podoba a soukromí, foto dětí — provazba na kapitolu <strong>Podoba člověka</strong>).</li>
+    <li>WP29 <span class="mono">WP248</span> — pokyny k DPIA, devět kritérií vysokého rizika; zranitelné subjekty (děti) výslovně uvedeny; ≥ 2 kritéria = DPIA obvykle nutná.</li>
+    <li>ÚOOÚ — Školství a fotografie dětí (Q&A): reportážní foto vs. souhlas, sociální sítě, necílit na jednotlivé děti, minimalizace. ČRDM — GDPR poradna a bezplatné vzory souhlasů pro dětské organizace.</li>
+    <li>Fact-check ledger v1.0 — položky A6 (věk 15, souhlas rodiče, přiměřené úsilí), A7 (DPIA pravděpodobně povinná dle WP248, RoPA i pod 250 osob), A8 (čl. 9 v UGC), A9 (LLM = zpracovatel + SCC), B8 (foto dětí, souhlas rodiče, ČRDM, ÚOOÚ školství).</li>
+    <li>Navazuje: <strong>GDPR inventář a právní základy</strong> (mapa údajů, RoPA, právní tituly), <strong>Podoba člověka</strong> (foto dětí), Část VIII (dětský režim v podmínkách).</li>
+  </ul>
+</section>

@@ -1,0 +1,264 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Osobní údaje a GDPR</div>
+    <h2>Mapa osobních údajů a RoPA</h2>
+  </div>
+
+  <p class="lead">Ikaros nezpracovává „jen e-mail a heslo". Osobní údaj vzniká v každém koutě platformy — v účtu, profilu, diskusích, soukromých zprávách, hlášeních, AI promptech, fotkách z akcí i uvnitř herních světů, kdykoli hráč sáhne po reálném jméně. Osobním údajem je i <strong>IP adresa</strong>, <strong>log přihlášení</strong>, <strong>push token</strong> a <strong>identifikátor zařízení</strong>. Než napíšeme jedinou větu zásad ochrany údajů, potřebujeme datovou mapu: kde údaje vznikají, jaké opatření k nim patří a jak dlouho je držíme. Tato mapa je zároveň polotovarem záznamů o činnostech zpracování (RoPA) podle <span class="mono">čl. 30</span> GDPR, které Ikaros vede povinně.</p>
+
+  <div class="callout cyan">
+    <div class="t">Datová mapa je nulový krok, ne příloha</div>
+    <p>Bez úplné mapy nelze určit právní základ, nastavit retenci ani odpovědět na žádost o výmaz či přístup. Mapa se dělá <strong>první</strong> — až z ní se odvozují zásady, informační povinnost i RoPA. Kdo píše politiku dřív než mapu, píše fikci. Právní tituly ke každému účelu řeší kapitola <strong>Právní základy a tituly</strong> (kap. 21); tady jde o <strong>inventuru</strong>: co, kde, jak dlouho, jaké opatření.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">13</div><div class="l">funkčních oblastí, kde vzniká osobní údaj</div></div>
+    <div class="stat"><div class="n">čl. 30</div><div class="l">RoPA — povinná i pod 250 osob</div></div>
+    <div class="stat"><div class="n">9</div><div class="l">položek kostry RoPA k udržování</div></div>
+  </div>
+
+  <h3>Co je vlastně osobní údaj — a proč se to podceňuje</h3>
+  <p>Osobní údaj je <strong>jakákoli informace o identifikované nebo identifikovatelné fyzické osobě</strong> (<span class="mono">čl. 4 odst. 1</span> GDPR). Identifikovatelnost stačí nepřímá — proto jsou osobním údajem i technické identifikátory. Tři místa, kde se Ikaros nejčastěji splete:</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Technická data jsou osobní údaj</h4>
+      <ul>
+        <li><b>IP adresa</b> je osobní údaj (potvrzeno judikaturou SDEU, <span class="mono">C-582/14 Breyer</span>) — i dynamická.</li>
+        <li><b>Push token, device ID, cookie ID</b> identifikují zařízení a přes něj osobu.</li>
+        <li><b>Log přihlášení</b> (čas + IP + účet) je záznam o chování konkrétní osoby.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Obsah světa může být osobní údaj</h4>
+      <ul>
+        <li>Deník, kronika či mapa se <b>stanou</b> osobním údajem, jakmile popisují reálnou osobu.</li>
+        <li>V UGC (chat, prompty, diskuse) mohou uživatelé sami odhalit <b>zvláštní kategorie</b> (<span class="mono">čl. 9</span>).</li>
+        <li>Foto identifikovatelné osoby je osobní údaj vždy (viz kap. 62).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Anonymní vs. pseudonymní — nezaměňovat</div>
+    <p>Přezdívka není anonymizace: pod přezdívkou stojí účet, e-mail a IP, které osobu spojí. Obsah pod přezdívkou je proto <strong>pseudonymní osobní údaj</strong>, ne anonymní. Skutečná anonymizace (nevratné odpojení od osoby) vyřazuje data z GDPR — pseudonymizace je jen bezpečnostní opatření, které GDPR nadále platí.</p>
+  </div>
+
+  <h3>Vyčerpávající mapa údajů napříč platformou</h3>
+  <p>Následující mapa pokrývá <strong>všechny funkce Ikara</strong>. U každé oblasti: kategorie údajů, doporučené opatření a orientační retence. Retenční doby jsou provozní default — v RoPA se ke každému účelu zapíše konkrétní doba a spouštěč mazání. Kde je uvedeno „do zániku účtu + X", běží X jako bezpečnostní okno po smazání.</p>
+
+  <table>
+    <thead>
+      <tr><th>Oblast</th><th>Kategorie osobních údajů</th><th>Doporučené opatření</th><th>Orientační retence</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Účet a přihlášení</strong></td>
+        <td>E-mail, přezdívka, hash hesla, 2FA secret, IP registrace/přihlášení, identifikátor zařízení, push token</td>
+        <td>Šifrování secretů, hash hesla (bcrypt/argon2), informační povinnost (čl. 13), minimalizace</td>
+        <td>Po dobu existence účtu; push token do odhlášení zařízení</td>
+      </tr>
+      <tr>
+        <td><strong>Profil</strong></td>
+        <td>Avatar, bio, odkazy, preference, seznam přátel, veřejná viditelnost</td>
+        <td>Nastavení viditelnosti, u dětí default neveřejný, zákaz zveřejnění adresy/školy/věku</td>
+        <td>Po dobu existence účtu; export na žádost</td>
+      </tr>
+      <tr>
+        <td><strong>Obsah světů</strong> (kroniky, deníky, mapy, postavy)</td>
+        <td>Texty a média; osobní údaj, pokud popisují reálnou osobu; možné zvláštní kategorie</td>
+        <td>Minimalizace, upozornění nevkládat reálné údaje třetích osob, oddělení UGC od interních dat</td>
+        <td>Po dobu existence světa; strukturovaný export (Data Act)</td>
+      </tr>
+      <tr>
+        <td><strong>Diskuse a fóra</strong></td>
+        <td>Příspěvky, zmínky, osobní informace, konflikty, IP autora</td>
+        <td>Moderace reaktivní, nahlášení, minimální indexace veřejného obsahu</td>
+        <td>Po dobu existence vlákna; smazané zálohovat krátce</td>
+      </tr>
+      <tr>
+        <td><strong>Soukromé zprávy</strong></td>
+        <td>Obsah 1:1 a skupinové komunikace, metadata (kdo–komu–kdy)</td>
+        <td>Zákaz plošného čtení, logovaný a odůvodněný přístup správce, zákaz obecného monitoringu (DSA čl. 8)</td>
+        <td>Do smazání účastníkem / zániku účtu; bez tréninku AI</td>
+      </tr>
+      <tr>
+        <td><strong>Hlášení a reporty</strong></td>
+        <td>Identita oznamovatele, nahlášeného, svědků; důkazy, právní tvrzení, snímky obrazovky</td>
+        <td>Omezený přístup, neodkrývat oznamovatele automaticky, oddělené úložiště</td>
+        <td>Krátká retence po vyřešení; delší jen u sporů/nároků</td>
+      </tr>
+      <tr>
+        <td><strong>Moderace</strong></td>
+        <td>Poznámky moderátorů, historie zásahů, sankce, odůvodnění (DSA čl. 17)</td>
+        <td>Přístup jen tým moderace, auditní stopa, doložení rozhodnutí</td>
+        <td>Po dobu potřebnou k obhajobě rozhodnutí a odvolání</td>
+      </tr>
+      <tr>
+        <td><strong>AI prompty a výstupy</strong></td>
+        <td>Texty s osobními údaji, jména, příběhy hráčů; možné zvláštní kategorie</td>
+        <td>Minimalizace vstupu, DPA se zpracovatelem (čl. 28), SCC při transferu do USA, žádný trénink na soukromém obsahu</td>
+        <td>Jen nezbytně nutně; soukromé prompty nedržet nad rámec funkce</td>
+      </tr>
+      <tr>
+        <td><strong>Foto a video z akcí</strong></td>
+        <td>Podoba identifikovatelných osob, děti; místo, datum; metadata souboru</td>
+        <td>Cedule + info leták (čl. 13), oprávněný zájem pro dokumentaci, souhlas pro promo a děti — viz kap. 62</td>
+        <td>Kronika akce dlouhodobě; promo do odvolání souhlasu</td>
+      </tr>
+      <tr>
+        <td><strong>Komunitní knihovny</strong></td>
+        <td>Autoři obsahu, historie úprav, atribuce, přezdívky přispěvatelů</td>
+        <td>Atribuce pod přezdívkou, oddělený interní audit, licenční ujednání</td>
+        <td>Po dobu publikace obsahu v knihovně</td>
+      </tr>
+      <tr>
+        <td><strong>Newsletter a marketing</strong></td>
+        <td>E-mail, jméno, historie otevření/prokliků, segment</td>
+        <td>Souhlas (opt-in), oddělení od provozních e-mailů, snadné odhlášení, evidence souhlasu</td>
+        <td>Do odvolání souhlasu / odhlášení</td>
+      </tr>
+      <tr>
+        <td><strong>Platby a dobrovolná podpora</strong></td>
+        <td>Jméno, e-mail, částka, doklad; ID transakce (kartová data drží brána)</td>
+        <td>Zpracovatel platební brány (DPA), Ikaros nedrží číslo karty, oddělení účetních dokladů</td>
+        <td>Účetní/daňové doklady dle zákonné lhůty (typicky roky)</td>
+      </tr>
+      <tr>
+        <td><strong>Logy a bezpečnost</strong></td>
+        <td>IP, časové značky, chybové stavy, bezpečnostní události, rate-limit záznamy</td>
+        <td>Oprávněný zájem + LIA, minimalizace, omezený přístup, šifrování, incident response</td>
+        <td>Krátká rotace (dny–měsíce); bezpečnostní incidenty déle dle potřeby</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Retence není „navždy pro jistotu"</div>
+    <p>Zásada omezení uložení (<span class="mono">čl. 5 odst. 1 písm. e</span>) žádá držet údaje <strong>jen po dobu nezbytnou</strong> k účelu. Každý řádek mapy proto musí mít spouštěč mazání — zánik účtu, uplynutí lhůty, odvolání souhlasu, vyřešení hlášení. „Zálohujeme všechno navěky" je porušení, ne opatrnost. Retenční matici drží RoPA a promítá ji do automatického mazání.</p>
+  </div>
+
+  <h3>Zvláštní kategorie údajů — past uvnitř UGC</h3>
+  <p>V chatu, denících, promptech a diskusích mohou uživatelé sami odhalit <strong>zvláštní kategorie</strong> podle <span class="mono">čl. 9</span> — zdraví, sexuální orientaci, náboženství, politické názory, etnicitu. Pro ně <strong>oprávněný zájem nestačí</strong>; čl. 9 vyžaduje samostatný titul (typicky výslovný souhlas, nebo údaje zjevně zveřejněné subjektem). Ikaros to neřeší dodatečně, ale <strong>preventivně</strong>: podmínky zakazují vkládat citlivé údaje třetích osob, UI varuje, AI funkce minimalizuje a nepředává citlivá data do modelu. U dětských účtů platí dvojnásob.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Prevence v UGC</h4>
+      <ul>
+        <li>Podmínky: zákaz vkládat citlivé údaje třetích osob</li>
+        <li>Varování v UI u volných textových polí</li>
+        <li>Nástroj pro rychlé stažení a výmaz na žádost</li>
+        <li>Moderace na podnět, ne plošné čtení</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Prevence v AI</h4>
+      <ul>
+        <li>Minimalizace vstupu — co nejmíň do modelu</li>
+        <li>DPA s poskytovatelem (čl. 28), bez tréninku</li>
+        <li>SCC při transferu do USA</li>
+        <li>Krátká retence promptů a výstupů</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>RoPA — záznamy o činnostech zpracování (čl. 30)</h2>
+
+  <p class="lead">Datová mapa se formalizuje do <strong>záznamů o činnostech zpracování</strong> (RoPA, <span class="mono">čl. 30</span> GDPR). RoPA není příloha zásad ani jednorázový dokument — je to <strong>živý interní registr</strong>, který správce vede a na vyžádání předloží ÚOOÚ. Je to zároveň nejlevnější nástroj compliance: donutí projekt vědět, co vlastně dělá s údaji.</p>
+
+  <h3>Co RoPA je a co obsahuje</h3>
+  <p>RoPA je strukturovaný přehled všech činností zpracování. Podle <span class="mono">čl. 30 odst. 1</span> musí záznam správce obsahovat:</p>
+  <table>
+    <thead>
+      <tr><th>Písm.</th><th>Povinná položka záznamu správce (čl. 30/1)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="mono">a)</span></td><td>Jméno a kontaktní údaje správce (případně společného správce, zástupce a pověřence pro ochranu údajů)</td></tr>
+      <tr><td><span class="mono">b)</span></td><td>Účely zpracování</td></tr>
+      <tr><td><span class="mono">c)</span></td><td>Popis kategorií subjektů údajů a kategorií osobních údajů</td></tr>
+      <tr><td><span class="mono">d)</span></td><td>Kategorie příjemců, kterým byly nebo budou údaje zpřístupněny (vč. příjemců ve třetích zemích)</td></tr>
+      <tr><td><span class="mono">e)</span></td><td>Předání do třetí země / mezinárodní organizaci a doložení vhodných záruk</td></tr>
+      <tr><td><span class="mono">f)</span></td><td>Plánované lhůty pro výmaz jednotlivých kategorií údajů (je-li to možné)</td></tr>
+      <tr><td><span class="mono">g)</span></td><td>Obecný popis technických a organizačních bezpečnostních opatření (odkaz na čl. 32, je-li to možné)</td></tr>
+    </tbody>
+  </table>
+  <p>Zpracovatel vede vlastní, kratší záznam podle <span class="mono">čl. 30 odst. 2</span> (kategorie zpracování prováděná pro každého správce, transfery, bezpečnost). Ikaros je u vlastní platformy <strong>správce</strong>; vůči hráčům, kteří tvoří obsah, není RoPA přenositelná — hráč není zpracovatel Ikara.</p>
+
+  <div class="callout gold">
+    <div class="t">RoPA je povinná i pod 250 osob</div>
+    <p>Výjimka z <span class="mono">čl. 30 odst. 5</span> (organizace do 250 zaměstnanců záznamy nevede) <strong>neplatí</strong>, pokud je splněna byť jediná ze tří podmínek: zpracování (i) pravděpodobně představuje <strong>riziko pro práva a svobody</strong> subjektů, (ii) <strong>není příležitostné</strong>, nebo (iii) zahrnuje <strong>zvláštní kategorie</strong> (čl. 9) či údaje o trestních deliktech (čl. 10). Ikaros splňuje <strong>všechny tři</strong>: provoz platformy je nepřetržitý (nepříležitostný), moderace/AI/děti nesou riziko a v UGC vznikají údaje podle čl. 9. RoPA je proto povinná bez ohledu na velikost týmu — výjimka pro Ikaros prakticky neexistuje.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Připravovaná úleva výjimku Ikara nezachrání</div>
+    <p>EU připravuje cílené zjednodušení, které by hranici výjimky posunulo z 250 na <strong>750 osob</strong> — ale <strong>jen tam, kde zpracování nepředstavuje vysoké riziko</strong>. Rizikové zpracování (děti, zvláštní kategorie, rozsáhlá moderace) zůstává povinné vést. Pro Ikaros se tím nemění nic: RoPA vede dál. Změnu netřeba předjímat, dokud není účinná.</p>
+  </div>
+
+  <h3>Kostra RoPA Ikara — k vyplnění a udržování</h3>
+  <p>Následující kostra pokrývá minimum, které Ikaros vede a udržuje aktuální. Každý řádek je jedna dimenze záznamu; naplní se pro každou činnost zpracování z datové mapy výše. RoPA se aktualizuje při <strong>každé změně</strong> účelu, zpracovatele, transferu nebo retence — ne jednou ročně.</p>
+
+  <table>
+    <thead>
+      <tr><th>Položka RoPA</th><th>Co pro Ikaros vyplnit</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Správce a kontakt</strong> <span class="mono">(a)</span></td>
+        <td>Identita provozovatele, kontakt na správce a případného pověřence; e-mail pro žádosti subjektů</td>
+      </tr>
+      <tr>
+        <td><strong>Účely zpracování</strong> <span class="mono">(b)</span></td>
+        <td>Registrace a přihlášení, provoz účtu a světů, komunikace, moderace, bezpečnost, hlášení, newsletter, dobrovolná podpora, AI asistence, foto a prezentace</td>
+      </tr>
+      <tr>
+        <td><strong>Právní základ</strong></td>
+        <td>Ke každému účelu titul dle čl. 6 (smlouva / oprávněný zájem + LIA / souhlas / právní povinnost); u čl. 9 samostatný titul — detail v kap. 21</td>
+      </tr>
+      <tr>
+        <td><strong>Kategorie subjektů a údajů</strong> <span class="mono">(c)</span></td>
+        <td>Uživatelé, hráči, PJ, nezletilí, návštěvníci akcí; identifikátory, obsah, logy, foto, případně zvláštní kategorie (čl. 9) v UGC</td>
+      </tr>
+      <tr>
+        <td><strong>Kategorie příjemců</strong> <span class="mono">(d)</span></td>
+        <td>Interní role (moderace, správa), zpracovatelé (hosting, e-mail, push, AI API, platební brána, úložiště), případně orgány na základě zákona</td>
+      </tr>
+      <tr>
+        <td><strong>Předání do třetí země</strong> <span class="mono">(e)</span></td>
+        <td>AI/LLM či cloud v USA → <span class="mono">SCC</span> nebo Data Privacy Framework + posouzení transferu</td>
+      </tr>
+      <tr>
+        <td><strong>Doba uchování / výmaz</strong> <span class="mono">(f)</span></td>
+        <td>Retenční doba a spouštěč mazání per účel: účty, logy, zprávy, světy, zálohy, reporty, foto, účetní doklady — dle mapy výše</td>
+      </tr>
+      <tr>
+        <td><strong>Bezpečnostní opatření</strong> <span class="mono">(g)</span></td>
+        <td>2FA, hash hesel, šifrování secretů, zálohy, rate limit, logování přístupů, řízení oprávnění, incident response (odkaz na čl. 32)</td>
+      </tr>
+      <tr>
+        <td><strong>Práva subjektů</strong></td>
+        <td>Přístup, oprava, výmaz, omezení, přenositelnost, námitka, odvolání souhlasu; proces a lhůta 1 měsíc; Ikaros už počítá s exportem dat</td>
+      </tr>
+      <tr>
+        <td><strong>Porušení zabezpečení</strong></td>
+        <td>Proces posouzení rizika a ohlášení ÚOOÚ do 72 h (čl. 33) a subjektům při vysokém riziku (čl. 34); evidence incidentů</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">RoPA je zdroj pravdy, ne dekorace</div>
+    <p>Z jednoho udržovaného RoPA se generuje polovina zbytku compliance: zásady ochrany údajů (co komu říct), retenční pravidla (kdy mazat), seznam zpracovatelů (s kým podepsat DPA), přehled transferů (kde nasadit SCC) a vstup do DPIA (kde je riziko). Kdo drží RoPA aktuální, má compliance z 60 % hotové; kdo ho nechá zestárnout, lže sám sobě i úřadu.</p>
+  </div>
+
+  <h3>Návaznost na DPIA</h3>
+  <p>RoPA odpovídá na otázku „<strong>co</strong> zpracováváme"; posouzení vlivu (DPIA, <span class="mono">čl. 35</span>) na otázku „<strong>jak rizikové</strong> to je a jak riziko snížíme". U Ikara se DPIA aktivuje kombinací rizikových faktorů podle kritérií <span class="mono">WP248</span> — <strong>zpracování údajů dětí</strong>, <strong>rozsáhlá moderace a soukromá komunikace</strong> a <strong>použití AI</strong> na osobní data. DPIA je proto nutné zpracovat minimálně pro <strong>AI modul a dětské účty</strong> ještě před spuštěním veřejného provozu. Detail DPIA řeší samostatná kapitola; RoPA je jejím povinným vstupem.</p>
+
+  <ul class="sources">
+    <li>Nařízení (EU) 2016/679 (GDPR) — <span class="mono">čl. 4 odst. 1</span> (osobní údaj / identifikovatelnost), <span class="mono">čl. 5 odst. 1 písm. e</span> (omezení uložení), <span class="mono">čl. 6</span> (právní základy), <span class="mono">čl. 9</span> (zvláštní kategorie), <span class="mono">čl. 28</span> (zpracovatel / DPA), <span class="mono">čl. 30 odst. 1, 2, 5</span> (RoPA a výjimka do 250 osob), <span class="mono">čl. 32</span> (bezpečnost), <span class="mono">čl. 33–34</span> (porušení zabezpečení), <span class="mono">čl. 35</span> (DPIA), <span class="mono">SCC</span> (transfer).</li>
+    <li>SDEU <span class="mono">C-582/14 Breyer</span> — dynamická IP adresa je osobní údaj.</li>
+    <li>WP29 <span class="mono">WP248</span> — kritéria pro povinnost DPIA (děti, rozsáhlá moderace, AI).</li>
+    <li>ÚOOÚ — Základní příručka k ochraně údajů (záznamy o činnostech zpracování, výjimka pro subjekty pod 250 osob a její meze, DPIA, zásady zpracování, práva subjektů). <span class="mono">uoou.gov.cz/verejnost/zakladni-prirucka-k-ochrane-udaju</span></li>
+    <li>ÚOOÚ — k cíleným úpravám GDPR (návrh posunu hranice výjimky u záznamů z 250 na 750 osob u nerizikového zpracování). <span class="mono">uoou.gov.cz/novinky</span></li>
+    <li>Fact-check ledger v1.0 — položky A7 (RoPA povinná i pod 250 osob; DPIA pravděpodobně povinná), A8 (zvláštní kategorie v UGC nelze krýt oprávněným zájmem), A9 (LLM = zpracovatel + SCC), A11 (data jako protiplnění).</li>
+    <li>Navazuje: <strong>Právní základy a tituly</strong> (kap. 21 — základy), <strong>GDPR u fotografií</strong> (kap. 62 — foto jako osobní údaj a promo režim).</li>
+  </ul>
+</section>

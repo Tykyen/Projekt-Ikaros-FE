@@ -1,0 +1,212 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část VIII — Podmínky užívání serveru</div>
+    <h2>Checklisty a formuláře před spuštěním</h2>
+  </div>
+
+  <p class="lead">Vzorové znění podmínek (<strong>kap. 80</strong>) a rizikový registr s červenými stopkami (<strong>kap. 81</strong>) říkají, <em>co</em> musí platit. Tato závěrečná kapitola říká, <strong>jak to před ostrým startem odškrtat</strong>: dává jeden kontrolní formulář, který se prochází řádek po řádku, než se otevře veřejná registrace; převádí podmínky na <strong>produktové požadavky</strong>, které musí umět kód; katalogizuje <strong>formuláře</strong>, jež web potřebuje, a odkazuje na jejich plná znění; shrnuje <strong>DSA proces krok za krokem</strong>; a končí <strong>zadáním pro právníka</strong> — přesným balíkem k revizi. Je to poslední strana knihy před dodatky a zároveň provozní odpalovací seznam.</p>
+
+  <div class="callout cyan">
+    <div class="t">Jak checklist používat</div>
+    <p>Sloupec „Vyřešeno" má tři stavy: <span class="yes">ANO</span> (hotovo a ověřeno), <span class="partial">ČÁST</span> (rozpracováno, chybí kus) a <span class="no">NE</span> (nezačato). <strong>Veřejná registrace se neotevírá, dokud kterýkoli řádek stojí na <span class="no">NE</span> nebo <span class="partial">ČÁST</span> u položky označené jako blokující.</strong> Poznámka u každého řádku říká, co konkrétně dořešit — je to zadání, ne popis.</p>
+  </div>
+
+  <h3>Kontrolní formulář pro spuštění veřejné registrace</h3>
+  <p>Následující tabulka je hlavní brána. Prochází se shora dolů; blokující řádky (<span class="pill">blok</span>) musí být na <span class="yes">ANO</span>, jinak se registrace neotvírá. Ostatní jsou silné doporučení. Vyplněný formulář se archivuje jako důkaz, že spuštění proběhlo vědomě.</p>
+
+  <table>
+    <thead>
+      <tr><th>Otázka před spuštěním</th><th>Vyřešeno</th><th class="us">Poznámka — co dořešit</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Registrační obrazovka odkazuje na všechny povinné dokumenty</strong> — podmínky užití, zásady soukromí, cookies a komunitní pravidla, čitelně a před dokončením registrace. <span class="pill">blok</span></td>
+        <td class="partial">ČÁST</td>
+        <td class="us">Ověřit, že odkazy vedou na aktuální znění a že souhlas je <strong>aktivní úkon</strong> (nezaškrtnuté políčko), ne předvyplněný. Verzovat znění + datum účinnosti. Viz kap. 11, 80.</td>
+      </tr>
+      <tr>
+        <td><strong>Vyřešen věk a DDM/dětský režim</strong> — minimální věk registrace, ověření souhlasu zástupce pod 15 let, samostatný režim pro kroužky. <span class="pill">blok</span></td>
+        <td class="no">NE</td>
+        <td class="us">Rozhodnout hranici (15+ / 16+) — otevřená otázka ledgeru. Nad 15 = digitální souhlas, pod 15 nutná autorizace zástupce (§ 7 z. 110/2019). Viz kap. 24.</td>
+      </tr>
+      <tr>
+        <td><strong>Při vytvoření světa je zřejmé soukromý/veřejný</strong> a <strong>default je soukromý</strong> — uživatel volí zveřejnění vědomě, ne omylem. <span class="pill">blok</span></td>
+        <td class="partial">ČÁST</td>
+        <td class="us">Ověřit, že nový svět vzniká jako neveřejný a že přepnutí na veřejný je samostatný, potvrzený krok s vysvětlením dopadů (index, katalog). Viz kap. 41.</td>
+      </tr>
+      <tr>
+        <td><strong>Před zveřejněním obsahu potvrzení práv</strong> — u obrázků, map, PDF, pravidel uživatel stvrzuje, že má práva / licenci k tomu, co zveřejňuje. <span class="pill">blok</span></td>
+        <td class="no">NE</td>
+        <td class="us">Doplnit potvrzovací krok („mám práva / vlastní obsah / CC") při přechodu na veřejné + licenční kartu. Chrání hosting i komunitu. Viz kap. 40–42.</td>
+      </tr>
+      <tr>
+        <td><strong>Snadné nahlášení z každé veřejné stránky</strong> — tlačítko Nahlásit u příspěvku, profilu, mapy, položky knihovny; předvyplněné ID obsahu. <span class="pill">blok</span></td>
+        <td class="partial">ČÁST</td>
+        <td class="us">Ověřit pokrytí všech veřejných povrchů UGC a anonymní variantu pro CSAM. Plný formulář viz kap. 31 (DSA čl. 16).</td>
+      </tr>
+      <tr>
+        <td><strong>Uživatel dostane při moderaci zprávu s důvodem</strong> — každý zásah generuje odůvodnění (statement of reasons) s poučením o nápravě. <span class="pill">blok</span></td>
+        <td class="no">NE</td>
+        <td class="us">Napojit generátor odůvodnění dle čl. 17 na moderační akce; default skrýt identitu oznamovatele. Vzor viz kap. 31.</td>
+      </tr>
+      <tr>
+        <td><strong>Testován export demo světa</strong> — uživatel si odnese svá data v čitelném formátu; ověřeno na reálném světě.</td>
+        <td class="no">NE</td>
+        <td class="us">Projít export deníku/postav/světa min. v jednom otevřeném formátu (Data Act). Ověřit, že výstup jde otevřít mimo Ikaros. Viz kap. 22.</td>
+      </tr>
+      <tr>
+        <td><strong>Jasné, co jde do AI funkcí</strong> — samostatná informační stránka, opt-in na trénink, značení AI výstupů.</td>
+        <td class="partial">ČÁST</td>
+        <td class="us">Sepsat AI info stránku (jaké vstupy, kam jdou, kdo je zpracovatel) + opt-in přepínač; soukromý obsah netrénovat bez souhlasu. Viz kap. 50, 52.</td>
+      </tr>
+      <tr>
+        <td><strong>Admin účty mají 2FA</strong> — všechny účty s moderačními či správcovskými právy chráněny druhým faktorem. <span class="pill">blok</span></td>
+        <td class="partial">ČÁST</td>
+        <td class="us">Vynutit 2FA u role admin/moderátor (ne jen nabídnout). Doporučení NÚKIB. 2FA/TOTP na platformě existuje — ověřit vynucení a zálohové kódy.</td>
+      </tr>
+      <tr>
+        <td><strong>Záložní vlastník sociálních sítí a domény</strong> — přístup k účtům a doméně nedrží jediná osoba; existuje recovery a druhý správce.</td>
+        <td class="no">NE</td>
+        <td class="us">Zavést sdílený správce hesel, druhého administrátora u FB/IG/Discord a u registrátora domény. Kdo přebírá při výpadku osoby? Viz kap. 81 (kontinuita).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="stats">
+    <div class="stat"><div class="n">10</div><div class="l">řádků kontrolního formuláře registrace</div></div>
+    <div class="stat"><div class="n">7</div><div class="l">z nich blokujících (musí být ANO)</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">formulářů, které web musí umět</div></div>
+  </div>
+
+  <h3>Systémová pravidla a produktové požadavky z podmínek</h3>
+  <p>Podmínky nejsou jen text pro uživatele — jsou to <strong>závazky, které musí umět software</strong>. Když podmínky slíbí něco, co kód neumí, vznikne rozpor mezi tím, co uživatel odsouhlasil, a tím, co platforma reálně dělá — přesně to, co červené stopky v kap. 81 zakazují. Následující požadavky jsou proto <strong>produktové zadání</strong> odvozené přímo z podmínek a předchozích částí knihy.</p>
+
+  <div class="feat">
+    <h4>Co musí platforma umět, aby podmínky nebyly prázdný slib</h4>
+    <ul>
+      <li><b>Každý veřejný obsah má autora, správce a viditelnost</b> — u položky je vždy dohledatelné, kdo ji vytvořil, kdo ji spravuje a komu je viditelná. Bez toho nejde plnit odůvodnění zásahu ani licenční kartu.</li>
+      <li><b>Audit log klíčových změn práv a viditelnosti</b> — přepnutí soukromý↔veřejný, změna oprávnění, sdílení, zpřístupnění chráněné záložky se logují (kdo, kdy, co). Důkaz konzistence a podklad pro incident.</li>
+      <li><b>Uživatel před zveřejněním ví o indexovatelnosti</b> — přechod na veřejné jasně sdělí, že obsah může být viditelný komukoli a indexován vyhledávači. Žádné tiché zveřejnění.</li>
+      <li><b>Export min. v jednom čitelném formátu</b> — uživatel si odnese deníky, postavy a světy strukturovaně, ne jen jako screenshot (Data Act, GDPR přenositelnost). Viz kap. 22.</li>
+      <li><b>Před smazáním účtu nabídnout export</b> — mazání účtu vždy nabídne stažení dat dřív, než je nevratně odstraní; soft-delete s lhůtou na rozmyšlenou.</li>
+      <li><b>Reportovací formulář i bez přihlášení u závažných věcí</b> — CSAM a ohrožení jde nahlásit anonymně a bez účtu (čl. 16 DSA). Ostatní kategorie mohou vyžadovat kontakt.</li>
+      <li><b>Moderátorské zásahy logované a přezkoumatelné</b> — každý zásah nese ID, důvod, moderátora, čas, notifikace a případné odvolání; rozhodnutí lze později přezkoumat.</li>
+      <li><b>Admin 2FA vynucené</b> — správcovská a moderační role bez druhého faktoru se nepřihlásí; ne volitelné.</li>
+      <li><b>U AI samostatná informační stránka a opt-in</b> — jasně kde a jak se používá AI, jaké vstupy bere, kdo je zpracovatel; trénink na soukromém obsahu jen po výslovném opt-in.</li>
+      <li><b>Dětský/DDM režim umí vypnout rizika</b> — účet v dětském režimu má vypnuté veřejné profily, omezený chat a znemožněný kontakt s cizími dospělými; default neveřejnost.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Pravidlo: co podmínky slíbí, to kód musí umět</div>
+    <p>Jestliže podmínky říkají „svá data si můžeš kdykoli exportovat", ale export neexistuje nebo dá nepoužitelný soubor, jsou podmínky <strong>klamavé</strong> — a to je spotřebitelský i DSA problém, ne kosmetika. Každý slib v podmínkách musí mít odpovídající funkci. Řádky výše jsou proto zároveň <strong>akceptační kritéria</strong>: bez nich se příslušná věta z podmínek nesmí slíbit.</p>
+  </div>
+
+  <h3>Přehled formulářů, které web potřebuje</h3>
+  <p>Ikaros pracuje s pěti opakujícími se formuláři. Tři jsou <strong>provozní</strong> (běží ve webu), dva jsou <strong>papírové/PDF</strong> pro akce a děti (dodatky). Zde je katalog s poli a odkazem na plné vzory — <strong>ta se tu neduplikují</strong>: notice-and-action formulář a odůvodnění moderace má v plném znění kap. 31, souhlasy s podobou a dětský souhlas mají dodatky.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>1. Reportovací formulář <span class="pill cyan">web</span></h4>
+      <p class="small">Nahlášení protiprávního obsahu (DSA čl. 16).</p>
+      <ul>
+        <li><b>Pole:</b> kategorie, URL/ID (předvyplněno), popis/odůvodnění, jméno + e-mail (mimo CSAM), prohlášení o dobré víře, u copyrightu doložení práv.</li>
+        <li><b>Plné znění:</b> kap. 31 (struktura formuláře).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>2. Autorský takedown <span class="pill cyan">web</span></h4>
+      <p class="small">Nárok držitele práv na stažení obsahu.</p>
+      <ul>
+        <li><b>Pole:</b> identifikace díla a sporného obsahu, doložení práv nebo zmocnění, popis porušení, kontakt, prohlášení v dobré víře.</li>
+        <li><b>Plné znění:</b> kap. 31 (kategorie copyright) + dodatek licencí.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>3. Odůvodnění moderace <span class="pill cyan">web</span></h4>
+      <p class="small">Statement of reasons autorovi (DSA čl. 17).</p>
+      <ul>
+        <li><b>Pole:</b> typ a rozsah zásahu, skutečnosti a podnět, automatizace ano/ne, právní/smluvní důvod + vysvětlení, možnosti nápravy; identita oznamovatele skryta.</li>
+        <li><b>Plné znění:</b> kap. 31 (vzor odůvodnění).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>4. Souhlas s užitím podoby <span class="pill">PDF</span></h4>
+      <p class="small">Model release pro promo fotky (§ 84–90 OZ + GDPR).</p>
+      <ul>
+        <li><b>Pole:</b> identifikace osoby, rozsah užití (web/social/tisk), doba, území, odvolatelnost, podpis; u dětí zástupce.</li>
+        <li><b>Plný vzor:</b> dodatek <strong>Vzor souhlasu s fotkou</strong>. Viz kap. 60.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>5. Dětský / rodičovský souhlas <span class="pill">PDF</span></h4>
+      <p class="small">Souhlas zástupce pro děti a kroužky (DDM).</p>
+      <ul>
+        <li><b>Pole:</b> jméno dítěte a zástupce, k čemu souhlas (foto, registrace, akce), rozsah, doba, odvolatelnost, podpis zástupce.</li>
+        <li><b>Plný vzor:</b> dodatek <strong>Vzor dětského souhlasu</strong>. Viz kap. 64.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Kde nejsou plné vzory zde</h4>
+      <ul>
+        <li><b>Webové formuláře (1–3):</b> plná znění + vzorové texty potvrzení a rozhodnutí v <strong>kap. 31</strong>.</li>
+        <li><b>Papírové (4–5):</b> kopírovatelné šablony v <strong>dodatcích</strong>.</li>
+        <li>Tato tabulka je jen rozcestník — nekopíruje, odkazuje.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>DSA proces krok za krokem</h3>
+  <p>Kap. 31 rozvádí notice-and-action a odůvodnění do plných náležitostí; zde je <strong>zhuštěná linka</strong> od nahlášení po evidenci, jak ji čte provoz — devět kroků, které musí každé hlášení projít, a u kterých existuje odpovědná role.</p>
+
+  <div class="phase"><div class="num">1</div><div class="body"><b>Přijetí.</b> Hlášení dorazí z tlačítka Nahlásit; systém pošle časově orazítkované potvrzení s ID (čl. 16/4).</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Třídění.</b> Podle kategorie se přidělí SLA a moderátor (stupně M0–M7, kap. 32); CSAM a ohrožení jdou na eskalační linku okamžitě.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Důkazy.</b> Zajistí se stav obsahu (snapshot), kontext a metadata dřív, než se cokoli změní — aby rozhodnutí bylo doložitelné a odvolání přezkoumatelné.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Předběžné opatření.</b> U závažného či zjevného porušení se obsah dočasně skryje do posouzení; u hraničních případů zůstává, dokud není rozhodnuto.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>Posouzení.</b> Hlášení se vyhodnotí včas, s péčí, nesvévolně a objektivně (čl. 16/6); rozhodne člověk, ne jen automat.</div></div>
+  <div class="phase"><div class="num">6</div><div class="body"><b>Opatření.</b> Obsah se ponechá / skryje / odstraní / omezí; volí se nejmírnější účinné opatření odpovídající závažnosti.</div></div>
+  <div class="phase"><div class="num">7</div><div class="body"><b>Informování.</b> Oznamovatel dostane rozhodnutí s poučením o nápravě (čl. 16/5); <b>autor</b> dostane odůvodnění zásahu (čl. 17), bez identity oznamovatele.</div></div>
+  <div class="phase"><div class="num">8</div><div class="body"><b>Odvolání.</b> Autor i oznamovatel se mohou obrátit na kontaktní místo pro uživatele (čl. 12); zásah lze přezkoumat a případně zvrátit.</div></div>
+  <div class="phase"><div class="num flag">9</div><div class="body"><b>Evidence.</b> ID, kategorie, rozhodnutí, moderátor, čas, obě notifikace a odvolání se uloží do moderačního logu jako důkaz konzistence.</div></div>
+
+  <div class="callout cyan">
+    <div class="t">Zvláštní odbočky, které nesmí zapadnout</div>
+    <p>Dvě situace vybočují z linky: <strong>oznámení podezření na trestný čin</strong> (ohrožení života/bezpečí — čl. 18, stupeň M7) se hlásí orgánům neprodleně souběžně s krokem 4; <strong>příkaz orgánu</strong> (čl. 9/10) se před vykonáním ověří, že má náležitosti, a o provedení se orgán informuje. Obojí v plném znění v kap. 31.</p>
+  </div>
+
+  <h3>Otevřené otázky a podklady před spuštěním</h3>
+  <p>Několik voleb kniha nemůže rozhodnout za provozovatele — a přitom na nich závisí znění podmínek, GDPR režim i foto pravidla. Následující body je potřeba mít <strong>utříděné a rozhodnuté</strong> před ostrým startem; jsou to zároveň otevřené otázky ledgeru (oddíl C).</p>
+
+  <div class="feat">
+    <h4>Co je potřeba rozhodnout a doložit</h4>
+    <ul>
+      <li><b>Provozovatel a monetizace</b> — kdo web provozuje (osoba / spolek / s.r.o.), IČO, sídlo, kontakt; zda a jak se vydělává (dary, předplatné, reklama). Určuje právní formu, odpovědnost a spotřebitelský režim.</li>
+      <li><b>Jaké údaje se zpracovávají</b> — mapa údajů a RoPA (kap. 20): registrační data, UGC, chat, foto, AI vstupy; které jsou zvláštní kategorie a jak jsou kryté.</li>
+      <li><b>Veřejný katalog vs. soukromé světy</b> — které funkce jsou veřejné šíření (online platforma dle DSA) a které jen hosting; kde končí soukromí uživatele a začíná veřejnost.</li>
+      <li><b>AI vstupy</b> — jaké AI funkce web nabízí, který poskytovatel je zpracovatelem, kam data tečou (transfer do USA), co se smí trénovat a co ne (kap. 52).</li>
+      <li><b>Placené tarify a refundace</b> — zda a jak se platí, odstoupení od smlouvy o digitálním obsahu (§ 1837 l OZ), informační povinnosti, data jako protiplnění (§ 2389a).</li>
+      <li><b>Export, mazání a zálohy</b> — jak dlouho se data drží, jak se mažou, jak fungují zálohy a jak se plní právo na výmaz i přenositelnost.</li>
+      <li><b>Děti a kroužky</b> — věková hranice, DDM režim, souhlas zástupce, foto dětí; případná smluvní spolupráce s DDM a školami.</li>
+      <li><b>Partnerství a reklama</b> — zda web zobrazuje reklamu nebo přijímá partnery, jak se značí sponzorovaný obsah, střet zájmů.</li>
+      <li><b>Externí služby</b> — seznam zpracovatelů a subdodavatelů (hosting, mailing, analytika, CDN, AI, platby) a jejich DPA/SCC pokrytí.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Bez těchto rozhodnutí zůstávají podmínky v návrhu</div>
+    <p>Několik položek výše je v ledgeru vedeno jako <strong>otevřená otázka</strong> — přesná identita provozovatele, věková hranice, zda budou placené a AI funkce, jaké cookies nad rámec nezbytných. Dokud je provozovatel nerozhodne, zůstávají vzorové podmínky (kap. 80) <strong>návrhem s prázdnými <span class="mono">[…]</span></strong>. Tento seznam je proto zároveň mapou, co je potřeba dořešit, než kniha přejde z „pracovní" do „platné".</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Vazba na zbytek knihy</div>
+    <p>Vzorové články podmínek 1–14 jsou v <strong>kap. 80</strong>; rizikový registr a červené stopky (kdy podmínky <em>nejsou</em> hotové) v <strong>kap. 81</strong>. Právní pozice, o které se checklist opírá, stojí na <strong>Částech I–VI</strong>: dokumenty webu a spotřebitel (I), GDPR a nezletilí (II), DSA a moderace (III, kap. 30–33), obsah a licence (IV), AI (V), foto a podoba (VI). Plná znění formulářů a souhlasů jsou v <strong>kap. 31</strong> a v <strong>dodatcích</strong> (model release, dětský souhlas, licence k UGC, disclaimery, akční plán). Tímto se Část VIII i celá kniha uzavírá — dál už jen hotové vzory k převzetí.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení (EU) 2022/2065 (DSA) — <span class="mono">čl. 16</span> (oznamovací mechanismus, potvrzení, rozhodnutí), <span class="mono">čl. 17</span> (odůvodnění zásahu), <span class="mono">čl. 12</span> (kontaktní místo pro uživatele), <span class="mono">čl. 18</span> (oznámení trestného činu), <span class="mono">čl. 9–10</span> (příkazy orgánů). Plné náležitosti v kap. 31.</li>
+    <li>GDPR (2016/679) — <span class="mono">čl. 8</span> (souhlas dítěte), <span class="mono">čl. 13</span> (informační povinnost), <span class="mono">čl. 20</span> (přenositelnost); z. č. 110/2019 Sb. <span class="mono">§ 7</span> (věk digitálního souhlasu 15 let). Nařízení (EU) 2023/2854 (Data Act) — strukturovaný export.</li>
+    <li>Zákon č. 89/2012 Sb. (OZ) — <span class="mono">§ 84–90</span> (podoba, souhlas s promo užitím), <span class="mono">§ 1837 písm. l</span> (odstoupení u digitálního obsahu), <span class="mono">§ 2389a</span> (data jako protiplnění). NÚKIB — doporučení pro správu účtů a 2FA.</li>
+    <li>Fact-check ledger Provozní rámec v1.0 — přejaté pozice A3–A4, A6, A9, A12–A14 (DSA per-feature, věk 15 let, AI zpracovatel, spotřebitel, export); oddíl C (otevřené otázky pro právníka: identita provozovatele, věková hranice, placené/AI funkce, cookies).</li>
+    <li>Navazuje: <strong>kap. 80</strong> (vzorové znění podmínek 1–14), <strong>kap. 81</strong> (rizikový registr a červené stopky), <strong>kap. 31</strong> (plná znění formulářů a odůvodnění), <strong>Části I–VI</strong> (právní pozice), <strong>dodatky</strong> (vzory souhlasů, licence, disclaimery, akční plán).</li>
+  </ul>
+</section>

@@ -1,0 +1,189 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část III — DSA, moderace a diskuse</div>
+    <h2>Klasifikace služby a bezpečný přístav</h2>
+  </div>
+
+  <p class="lead">Než se dá řešit jediné konkrétní nahlášení, musí být jasné, <strong>čím Ikaros z pohledu DSA vlastně je</strong>. Nařízení <span class="mono">(EU) 2022/2065</span> nepřiděluje jeden štítek celé službě — přiděluje ho <strong>každé funkci zvlášť</strong> podle toho, co s obsahem dělá. Veřejná knihovna světů a soukromý deník postavy stojí ve dvou různých vrstvách odpovědnosti, přestože běží na jednom serveru. Tato kapitola určuje, do které vrstvy patří která funkce, jak funguje bezpečný přístav hostingu, a proč výjimka pro malé podniky <strong>neruší</strong> odpovědnost za obsah ani povinnost reagovat na oznámení.</p>
+
+  <div class="callout cyan">
+    <div class="t">Věta, na které stojí celá Část III</div>
+    <p>DSA je <strong>přímo použitelné od 17. 2. 2024</strong> — povinnosti platí bez ohledu na to, že český prováděcí (adaptační) zákon dosud nenabyl účinnosti. Ikaros je pravděpodobně <strong>malý podnik</strong>, což ho zbavuje <strong>dodatečných povinností online platformy</strong>, <strong>ne</strong> hostingové odpovědnosti ani povinnosti notice-and-action a odůvodnění zásahu.</p>
+  </div>
+
+  <h3>Tři kategorie DSA: řetěz odpovědnosti</h3>
+  <p>Kapitola II nařízení (články <span class="mono">4–8</span>) staví odpovědnost do tří stupňů zprostředkovatelských služeb. Každý vyšší stupeň dělá s obsahem „víc" a nese proto přísnější režim. Klíčové je, že kategorie <strong>nejsou vzájemně výlučné pro celou službu</strong> — jedna platforma může současně provozovat funkce ze všech tří vrstev.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Prostý přenos <span class="mono">(§ čl. 4)</span></h4>
+      <p class="small">„Mere conduit" — služba jen přenáší cizí informace sítí (poskytovatel připojení, DNS, VPN). Neukládá je déle, než je nutné pro přenos.</p>
+      <ul>
+        <li>Nejnižší odpovědnost.</li>
+        <li><b>Ikaros sem nespadá</b> — obsah ukládá, nejen přenáší.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Ukládání do mezipaměti <span class="mono">(§ čl. 5)</span></h4>
+      <p class="small">„Caching" — automatické, dočasné a přechodné ukládání kvůli efektivnějšímu přenosu dál (CDN, proxy).</p>
+      <ul>
+        <li>Technický mezistupeň.</li>
+        <li>Pro Ikaros okrajové (CDN pro obrázky), ne jádro služby.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="feat">
+    <h4>Hosting <span class="mono">(§ čl. 6)</span> — jádro Ikara</h4>
+    <ul>
+      <li>Služba <b>ukládá informace poskytnuté příjemcem služby na jeho žádost</b>. To je přesně to, co Ikaros dělá s deníky, mapami, profily, knihovnami a chatem.</li>
+      <li>Sem spadá <b>úplně každá</b> funkce, kde uživatel vkládá a služba drží obsah.</li>
+      <li>Podskupinou hostingu je <b>online platforma</b> (čl. <span class="mono">3 písm. i</span>): hosting, který obsah na žádost uživatele navíc <b>šíří veřejnosti</b> — ledaže je veřejné šíření jen drobnou a čistě vedlejší funkcí jiné služby.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Online platforma je hosting „navíc", ne něco jiného</div>
+    <p>Online platforma <strong>není</strong> vedle hostingu — je to hosting <strong>plus</strong> veřejné šíření. Proto na veřejné funkce Ikara dopadají <strong>současně</strong> hostingová pravidla (čl. 6) <strong>i</strong> dodatečné povinnosti platforem (čl. 20 a dál). Naopak soukromé funkce zůstávají „jen hostingem" a povinnosti platforem se jich <strong>netýkají vůbec</strong>.</p>
+  </div>
+
+  <h3>Per-feature klasifikace Ikara</h3>
+  <p>Rozhodující test je jediná otázka: <strong>šíří tahle funkce obsah veřejnosti?</strong> „Veřejnost" znamená potenciálně neomezený okruh osob, kterému poskytovatel obsah zpřístupňuje. Sdílení uvnitř definované, uzavřené skupiny (družina, soukromý stůl) <strong>není</strong> šíření veřejnosti. Podle toho se každá funkce zařadí sama.</p>
+
+  <table>
+    <thead>
+      <tr><th>Funkce Ikara</th><th>Veřejné šíření?</th><th>Kvalifikace</th><th>Dopad</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Veřejné komunitní knihovny</strong> (světy, systémy, sdílený obsah)</td><td class="us"><span class="yes">ano</span></td><td class="us"><strong>online platforma</strong></td><td>Hosting (čl. 6) + dodatečné povinnosti platformy v mezích výjimky čl. 19</td></tr>
+      <tr><td><strong>Veřejné bestiáře</strong> a herní obsah označený jako veřejný</td><td class="us"><span class="yes">ano</span></td><td class="us"><strong>online platforma</strong></td><td>Jako výše — nahlasitelnost, odůvodnění zásahu, pravidla moderace</td></tr>
+      <tr><td><strong>Veřejné profily</strong> / veřejně publikované stránky postav a světů</td><td class="us"><span class="yes">ano</span></td><td class="us"><strong>online platforma</strong></td><td>Jako výše</td></tr>
+      <tr><td><strong>Soukromý chat</strong> (kanály, konverzace uvnitř světa/skupiny)</td><td><span class="no">ne</span></td><td>jen hosting</td><td>Hostingová odpovědnost (čl. 6), notice-and-action, žádné povinnosti platformy</td></tr>
+      <tr><td><strong>Deníky postav</strong>, soukromé poznámky PJ, deník práce</td><td><span class="no">ne</span></td><td>jen hosting</td><td>Jako výše</td></tr>
+      <tr><td><strong>Skupinová / družinová komunikace</strong> uvnitř uzavřené skupiny</td><td><span class="no">ne</span></td><td>jen hosting</td><td>Jako výše — uzavřený okruh ≠ veřejnost</td></tr>
+      <tr><td><strong>Taktická mapa, kostky, live orchestrace</strong> u stolu</td><td><span class="no">ne</span></td><td>jen hosting</td><td>Jako výše</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Hranici drží nastavení viditelnosti, ne typ obsahu</div>
+    <p>Tentýž bestiář je „jen hosting", dokud je soukromý, a stane se „platformou" v okamžiku, kdy ho uživatel zveřejní. Klasifikaci proto v Ikaru fakticky řídí <strong>přepínač veřejné/soukromé</strong>. Z toho plyne provozní pravidlo: každá funkce musí mít jednoznačný, auditovatelný stav viditelnosti — protože ten určuje, který právní režim na obsah dopadá.</p>
+  </div>
+
+  <h3>Bezpečný přístav hostingu (čl. 6)</h3>
+  <p>Srdce celé konstrukce: podle článku <span class="mono">6</span> poskytovatel hostingu <strong>není odpovědný</strong> za informace uložené na žádost příjemce služby — <strong>pokud</strong> splní obě podmínky. Není to bianco imunita; je to podmíněná ochrana, kterou lze ztratit.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Podmínka vědomosti</h4>
+      <p class="small">Přístav platí, dokud poskytovatel <strong>nemá skutečnou vědomost</strong> o protiprávní činnosti nebo obsahu — a u nároků na náhradu škody ani vědomost o skutečnostech, z nichž je protiprávnost zjevná.</p>
+    </div>
+    <div class="card">
+      <h4>Podmínka urychlené reakce</h4>
+      <p class="small">Jakmile vědomost <strong>získá</strong> (typicky dostatečně určitým oznámením), musí <strong>urychleně</strong> obsah odstranit nebo k němu znemožnit přístup. Nečinnost po oznámení = ztráta přístavu.</p>
+    </div>
+  </div>
+
+  <p>Vědomost přitom musí být <strong>konkrétní</strong>. Obecné tušení, že „na platformě někde asi je protiprávní obsah", přístav neruší — ruší ho až dostatečně určité oznámení konkrétní položky (viz notice-and-action, kap. 31). Ochrana se dále <strong>ztrácí nebo oslabuje</strong>, když:</p>
+  <ul>
+    <li>uživatel jedná <strong>pod autoritou nebo kontrolou</strong> poskytovatele (obsah už není „cizí"),</li>
+    <li>poskytovatel obsah <strong>sám vytváří</strong> nebo si ho osvojuje jako vlastní,</li>
+    <li>poskytovatel po <strong>dostatečně určitém oznámení nejedná urychleně</strong>,</li>
+    <li>u online platformy vzniká zdání, že obsah je platformy vlastní (samostatné pravidlo pro spotřebitelské transakce — pro Ikaros okrajové).</li>
+  </ul>
+
+  <h3>Good Samaritan (čl. 7): moderovat se smí i má</h3>
+  <p>Nejrozšířenější mýtus zní „když na obsah sáhneme, převezmeme za něj odpovědnost, tak radši nic nedělat". Článek <span class="mono">7</span> tento mýtus výslovně vyvrací. <strong>Dobrovolná, vlastní iniciativou vedená a v dobré víře pečlivě prováděná moderace</strong> — vyšetřování, filtrování, mazání protiprávního obsahu — <strong>sama o sobě nezbavuje poskytovatele bezpečného přístavu</strong> podle článků 4–6.</p>
+
+  <div class="callout cyan">
+    <div class="t">Aktivní moderace přístav neruší — chaotická moderace ho ohrožuje</div>
+    <p>Ikaros <strong>musí</strong> mít pravidla a řešit konkrétní oznámení; to je legitimní a bezpečné. Rizikové není <em>že</em> se moderuje, ale <em>jak</em> — svévolné, selektivní, nedoložené nebo nekonzistentní rozhodování oslabuje jak přístav, tak obranu proti nařčení z cenzury. Article 7 odstraňuje historický paradox, kdy platforma, která nesledovala nic, byla chráněná svou nevědomostí, zatímco pečlivý moderátor byl trestán vědomostí, kterou si moderací opatřil.</p>
+  </div>
+
+  <h3>Zákaz obecné monitorovací povinnosti (čl. 8)</h3>
+  <p>Článek <span class="mono">8</span> je protiváhou k článku 7. Poskytovateli <strong>nelze uložit obecnou povinnost</strong> sledovat veškerý přenášený či ukládaný obsah ani aktivně vyhledávat skutečnosti nasvědčující protiprávní činnosti. Moderace tedy stojí na <strong>reakci na podnět</strong>, ne na plošném prediktivním dozoru.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Smí (reaktivní model)</h4>
+      <ul>
+        <li>Notice-and-action: řešit konkrétní nahlášené položky.</li>
+        <li>Cílené reakce na příkaz orgánu k odstranění.</li>
+        <li>Dobrovolné filtry a automatizace v dobré víře (čl. 7).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Nesmí být uloženo (prediktivní model)</h4>
+      <ul>
+        <li>Povinnost skenovat <strong>veškerý</strong> obsah všech uživatelů.</li>
+        <li>Povinnost aktivně lovit protiprávnost bez podnětu.</li>
+        <li>Plošný dozor jako podmínka provozu.</li>
+      </ul>
+    </div>
+  </div>
+  <p>Automatizovaná detekce (antispam, hash-matching u známého závadného materiálu) je <strong>možná</strong> a u některých kategorií (např. materiál zneužívání dětí) i žádoucí — čl. 8 ji nezakazuje, jen z ní nedělá vynutitelnou obecnou povinnost. Rozdíl je mezi „smíme skenovat" a „musíme skenovat všechno".</p>
+
+  <h3>Výjimka pro mikro a malé podniky (čl. 19)</h3>
+  <p>Zde je nejčastější a nejnebezpečnější omyl malých provozovatelů. Článek <span class="mono">19</span> stanoví, že <strong>oddíl 3 kapitoly III</strong> — tedy <strong>dodatečné povinnosti online platforem</strong> — <strong>se nepoužije</strong> na platformy, které jsou mikro nebo malým podnikem (mimo těch, které byly určeny jako VLOP podle čl. 33). Klíčem je, <strong>co v oddílu 3 leží</strong> a co ne.</p>
+
+  <div class="callout gold">
+    <div class="t">Architektura nařízení rozhoduje: co výjimka NEobsahuje</div>
+    <p>Hostingová odpovědnost (čl. <span class="mono">6</span>) je v <strong>kapitole II</strong>. Notice-and-action (čl. <span class="mono">16</span>) a odůvodnění zásahu (čl. <span class="mono">17</span>) jsou v <strong>oddílu 2</strong> kapitoly III — pro <strong>všechny hostingové služby</strong>. Výjimka čl. 19 se týká jen <strong>oddílu 3</strong>. Proto malý Ikaros z čl. 16 a 17 <strong>vyvázán není</strong> — leží mimo dosah výjimky. Osvobozeny jsou pouze povinnosti platforem z oddílu 3.</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Článek</th><th>Povinnost</th><th>Kde v DSA</th><th>Dopadá na malý Ikaros?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="mono">čl. 6</span></td><td>Bezpečný přístav hostingu + reakce na vědomost</td><td>kap. II (odpovědnost)</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 7</span></td><td>Good Samaritan — moderace neruší přístav</td><td>kap. II</td><td><span class="yes">ano</span> (ochrana, ne zátěž)</td></tr>
+      <tr><td><span class="mono">čl. 8</span></td><td>Zákaz obecné monitorovací povinnosti</td><td>kap. II</td><td><span class="yes">ano</span> (ochrana)</td></tr>
+      <tr><td><span class="mono">čl. 9 / 10</span></td><td>Reakce na příkazy orgánů (odstranění / informace)</td><td>kap. III, odd. 1</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 11 / 12</span></td><td>Kontaktní místo pro orgány / pro uživatele</td><td>kap. III, odd. 1</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 14</span></td><td>Podmínky užití + pravidla moderace jasným jazykem</td><td>kap. III, odd. 1</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 16</span></td><td>Notice-and-action (mechanismus oznámení)</td><td>kap. III, <strong>odd. 2</strong> (hosting)</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 17</span></td><td>Odůvodnění zásahu (statement of reasons)</td><td>kap. III, <strong>odd. 2</strong> (hosting)</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 18</span></td><td>Oznámení podezření na trestný čin (ohrožení života/bezpečí)</td><td>kap. III, odd. 2</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 20–21</span></td><td>Interní stížnosti + mimosoudní řešení sporů</td><td>kap. III, <strong>odd. 3</strong></td><td><span class="no">ne</span> (výjimka)</td></tr>
+      <tr><td><span class="mono">čl. 22</span></td><td>Důvěryhodní oznamovatelé (trusted flaggers)</td><td>kap. III, odd. 3</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 15 / 24</span></td><td>Transparenční zprávy o moderaci</td><td>kap. III, odd. 1/3</td><td><span class="partial">jen malý rozsah</span></td></tr>
+      <tr><td><span class="mono">čl. 25–27</span></td><td>Dark patterns, transparentnost reklamy a doporučování</td><td>kap. III, odd. 3</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 28</span></td><td>Ochrana nezletilých (platformová vrstva)</td><td>kap. III, odd. 3</td><td><span class="no">ne*</span></td></tr>
+    </tbody>
+  </table>
+  <p class="small" style="color:var(--muted);"><span class="mono">*</span> Výjimka čl. 28 na úrovni DSA <strong>neruší</strong> povinnosti podle GDPR (věk digitálního souhlasu 15 let, čl. 8 GDPR) ani obecnou péči vůči dětem — jen sundává platformovou vrstvu DSA. Podrobně v Části IV.</p>
+
+  <div class="callout gold">
+    <div class="t">Co si z čl. 19 odnést</div>
+    <p>Výjimka je úleva, ne pardon. Odpadá administrativně nákladná <strong>platformová nadstavba</strong> (interní odvolací systém, trusted flaggers, transparenční reporting, pravidla reklamy a doporučování). <strong>Nezmizí</strong> ale povinnost mít funkční nahlašování, jednat po oznámení, odůvodňovat zásahy a nést hostingovou odpovědnost. Kdo si čl. 19 vyloží jako „malých se DSA netýká", buduje na písku.</p>
+  </div>
+
+  <h3>Stav českého adaptačního rámce</h3>
+  <p>Samotné nařízení je <strong>přímo použitelné od 17. 2. 2024</strong> — hostingová odpovědnost, notice-and-action i odůvodnění zásahu platí <strong>bez ohledu</strong> na český prováděcí předpis. Co český adaptační zákon (návrh <strong>zákona o digitální ekonomice</strong>, <span class="mono">sněmovní tisk 69</span>) zatím řeší, není <em>zda</em> DSA platí, ale <strong>kdo a jak ho v ČR vymáhá</strong>.</p>
+  <p>Zákon je stále <strong>v legislativním procesu</strong> a k datu zpracování <strong>nenabyl účinnosti</strong>. Do jeho přijetí nemá <span class="mono">ČTÚ</span> jako budoucí koordinátor digitálních služeb plné dozorové a sankční pravomoci — sám úřad uvádí, že „může aktuálně vykonávat pouze ty kompetence podle nařízení DSA, kterými nezasáhne do práv a povinností subjektů, neboť příslušný adaptační zákon je stále v legislativním procesu".</p>
+
+  <div class="callout gold">
+    <div class="t">Pozor na tvrzení o platném adaptačním zákoně</div>
+    <p>Neuvádět konkrétní číslo ani datum účinnosti českého adaptačního zákona jako hotový fakt — k datu zpracování nebyl přijat a jeho podoba se v legislativním procesu ještě mění. Na přímé použitelnosti samotného nařízení to <strong>nic nemění</strong>; posouvá se jen okamžik, kdy ČTÚ získá plné vymáhací pravomoci.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">3</div><div class="l">kategorie DSA (přenos / hosting / platforma)</div></div>
+    <div class="stat"><div class="n">6/7/8</div><div class="l">články přístavu, které Ikaros vždy drží</div></div>
+    <div class="stat"><div class="n">16 · 17</div><div class="l">povinnosti, které čl. 19 NEruší</div></div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Návaznost</div>
+    <p>Tahle kapitola určila <strong>režim</strong>. Jak vypadá povinný mechanismus oznámení a jeho pole, řeší kapitola <strong>31 (Notice-and-action)</strong>. Jak vypadá odůvodnění zásahu, moderační stupně a lhůty, řeší kapitola <strong>32 (Moderace)</strong>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení Evropského parlamentu a Rady (EU) 2022/2065 (DSA) — přímo použitelné od 17. 2. 2024. Kap. II: <span class="mono">čl. 4</span> (prostý přenos), <span class="mono">čl. 5</span> (caching), <span class="mono">čl. 6</span> (hosting, bezpečný přístav), <span class="mono">čl. 7</span> (dobrovolná vlastní iniciativa / Good Samaritan), <span class="mono">čl. 8</span> (zákaz obecné monitorovací povinnosti). Kap. III odd. 2 (hosting): <span class="mono">čl. 16</span> (notice-and-action), <span class="mono">čl. 17</span> (odůvodnění), <span class="mono">čl. 18</span>. Kap. III odd. 3 (platformy): <span class="mono">čl. 19</span> (výjimka mikro/malý — vylučuje pouze oddíl 3), <span class="mono">čl. 20–28</span>. Definice online platformy: <span class="mono">čl. 3 písm. i</span>.</li>
+    <li>Návrh českého adaptačního zákona — „zákon o digitální ekonomice", <span class="mono">sněmovní tisk 69</span> (k datu zpracování neschválen, v legislativním procesu; ČTÚ bez plných dozorových/sankčních pravomocí).</li>
+    <li>ČTÚ — koordinátor digitálních služeb / „Co je to DSA": stav adaptačního rámce a rozsah současných pravomocí úřadu.</li>
+    <li>Fact-check ledger — Provozní rámec Ikaros v1.0, položky <strong>A3</strong> (přímá použitelnost + stav adaptačního zákona), <strong>A4</strong> (per-feature klasifikace, výjimka čl. 19 neruší hosting/čl. 16/17), <strong>A5</strong> (Good Samaritan + zákaz obecného monitoringu).</li>
+    <li>Navazuje: <strong>Notice-and-action</strong> (kap. 31), <strong>Moderace, stupně a lhůty</strong> (kap. 32); souvislost s ochranou nezletilých viz Část IV (GDPR, věk 15 let).</li>
+  </ul>
+</section>

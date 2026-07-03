@@ -1,0 +1,152 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část IV — Obsah, UGC a licence</div>
+    <h2>Databáze, anti-scraping a AI trénink</h2>
+  </div>
+
+  <p class="lead">Komunitní knihovny Ikara — světy, bestiáře, předměty, šablony, generátory — nejsou hromada souborů. Jsou to systematicky uspořádané <strong>databáze</strong> s metadaty, verzemi, tagy, vazbami, historií klonů a licencemi. Tuto strukturu chrání zvláštní vrstva práva, kterou se v této kapitole naučíme používat jako <strong>štít pro katalog</strong> — a zároveň si přesně vymezíme, kde končí. Protože databázové právo <strong>nedává Ikaru autorská práva k položkám uživatelů</strong>. To je ta nejdůležitější věta celé kapitoly.</p>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta, kterou musí znát celý tým</div>
+    <p>Zvláštní právo pořizovatele databáze chrání <strong>naši investici do katalogu a struktury</strong> — ne obsah uvnitř. Autorská práva ke světu, bestii nebo šabloně zůstávají <strong>jejich autorovi</strong> (uživateli). Databázové právo je vrstva navíc, ne zadní vrátka k přisvojení cizího obsahu.</p>
+  </div>
+
+  <h3>Dvojí ochrana: dílo vs. investice</h3>
+  <p>Databáze může být chráněna dvěma nezávislými způsoby současně. Nezaměňovat je — mají jiného nositele, jinou podmínku vzniku i jinou dobu trvání.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Autorské dílo — výběr a uspořádání</h4>
+      <p class="small">Je-li <strong>výběr nebo uspořádání</strong> obsahu databáze autorovým vlastním duševním výtvorem, je databáze chráněna jako autorské dílo (dílo souborné).</p>
+      <ul>
+        <li>Chrání <b>tvůrčí strukturu</b> katalogu, ne jednotlivé položky.</li>
+        <li>Nositel = autor uspořádání; doba = autorská (život + 70 let).</li>
+        <li>Nízko relevantní: kurátorská struktura Ikara je spíš systematická než tvůrčí.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Zvláštní právo pořizovatele (sui generis)</h4>
+      <p class="small">Vzniká pořizovateli, jehož <strong>pořízení, ověření nebo předvedení</strong> obsahu představuje kvalitativně nebo kvantitativně <strong>podstatný vklad</strong> — bez ohledu na tvůrčí úroveň.</p>
+      <ul>
+        <li>Chrání <b>investici</b>, ne originalitu (<span class="mono">§ 88a</span>).</li>
+        <li>Nositel = pořizovatel (provozovatel Ikara); doba = <b>15 let</b> (<span class="mono">§ 93</span>).</li>
+        <li>Vysoce relevantní: přesně kryje náš scénář budování katalogu.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Podmínka vzniku = podstatný vklad, ne nápad</div>
+    <p>Zvláštní právo nevzniká z toho, že něco „máme na serveru". Vzniká, protože jsme <strong>investovali</strong> do pořízení, ověření a předvedení obsahu — do vývoje schémat, indexace, moderace, propojení, verzování a provozu. To je náš <span class="mono">§ 88a</span> podstatný vklad. Každý další podstatný vklad (velká rozšíření katalogu) navíc <strong>rozbíhá běh 15 let znovu</strong>.</p>
+  </div>
+
+  <h3>Co zvláštní právo chrání — a co ne</h3>
+  <p>Toto je hranice, u které se rozhoduje, zda je Ikaros v právu, nebo si osobuje cizí. Nauč se ji zpaměti.</p>
+  <table>
+    <thead>
+      <tr><th>Zvláštní právo CHRÁNÍ</th><th class="us">Zvláštní právo NECHRÁNÍ</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Investici do pořízení, ověření a předvedení katalogu (<span class="mono">§ 88a</span>).</td>
+        <td class="us">Autorská práva k jednotlivým položkám — ta zůstávají uživateli-autorovi.</td>
+      </tr>
+      <tr>
+        <td>Užití celého obsahu databáze nebo její podstatné části bez oprávnění (<span class="mono">§ 90</span>).</td>
+        <td class="us">Samotné herní nápady, mechaniky a fakta — ty právo nemonopolizuje.</td>
+      </tr>
+      <tr>
+        <td>Opakované a systematické vytěžování i <strong>nepodstatných částí</strong>, poškozuje-li to oprávněné zájmy pořizovatele (<span class="mono">§ 90</span>).</td>
+        <td class="us">Běžné přiměřené užití nepodstatných částí oprávněným uživatelem (<span class="mono">§ 91</span>).</td>
+      </tr>
+      <tr>
+        <td>Strukturu, metadata, vazby, tagy a přístupovou logiku jako celek.</td>
+        <td class="us">Zákonné licence pro osobní/vědecké užití a veřejnou bezpečnost (<span class="mono">§ 92</span>).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">DŮSLEDEK PRO LICENCE</div>
+    <p>Databázové právo <strong>nenahrazuje</strong> licenční ujednání s uživateli. K jednotlivým položkám ber vlastní licenci od autora (viz kapitoly o licencích a klonování, kap. 40/41). Zvláštní právo řeš jako obranu katalogu proti <em>cizímu</em> odsávání — ne jako titul k <em>obsahu</em> uvnitř.</p>
+  </div>
+
+  <h3>Anti-scraping režim: co povolit a co zakázat</h3>
+  <p>Podmínky Ikara musí <strong>výslovně zakázat</strong> hromadné automatizované vytěžování veřejných knihoven nad rámec běžných uživatelských funkcí. Zákaz je smluvní opora navíc ke zvláštnímu právu — a kreslí ostrou čáru mezi <span class="pill">botem řízeným odsáváním</span> a <span class="pill cyan">běžnou prací s knihovnou</span>. Rozhodující není formát přenosu, ale <strong>kdo a v jakém rozsahu</strong> data odebírá.</p>
+
+  <table>
+    <thead>
+      <tr><th>Činnost</th><th>Doporučený režim</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Klon jedné položky dle licence</td><td><span class="yes">Povolit</span> přes oficiální funkci klonování.</td></tr>
+      <tr><td>Export vlastního světa vlastníkem</td><td><span class="yes">Povolit</span> v rozsahu vlastních práv a práv členů světa.</td></tr>
+      <tr><td>Archivace pro právní důkaz</td><td><span class="yes">Povolit</span> provozovateli v retenčním režimu.</td></tr>
+      <tr><td>Hromadný export cizí veřejné knihovny</td><td><span class="no">Zakázat</span> bez zvláštního souhlasu.</td></tr>
+      <tr><td>Scraping / crawling katalogu botem</td><td><span class="no">Zakázat</span>; rate-limit; detekce botů; technická ochrana.</td></tr>
+      <tr><td>Trénink AI z komunitního obsahu</td><td><span class="no">Zakázat</span> defaultně; <span class="partial">jen opt-in</span> u obsahu s AI/TDM kompatibilní licencí.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="feat">
+    <h4>Anti-scraping — čtyři vrstvy obrany</h4>
+    <ul>
+      <li><b>Smluvní:</b> výslovný zákaz v podmínkách — scraping, crawling nad rámec vyhledávačů, hromadné exporty cizích knihoven, budování konkurenční databáze, obcházení technických limitů.</li>
+      <li><b>Právní:</b> zvláštní právo pořizovatele (<span class="mono">§ 88a, § 90</span>) proti užití celé databáze i proti opakovanému systematickému vytěžování nepodstatných částí.</li>
+      <li><b>Technická:</b> rate-limit, detekce botů, ochrana katalogu a hromadných endpointů.</li>
+      <li><b>Funkční:</b> ponechat legitimní cesty — vyhledávání, klon dle licence, strukturovaný export <em>vlastního</em> obsahu.</li>
+    </ul>
+  </div>
+
+  <h3>TDM: zákonná licence, kterou přebijeme výhradou práv</h3>
+  <p>Novela autorského zákona (transpozice směrnice 2019/790, účinnost <span class="mono">5. 1. 2023</span>) zavedla v <span class="mono">§ 39c</span> zákonnou licenci pro <strong>vytěžování textů a dat (TDM)</strong>: kdokoli s oprávněným přístupem smí zhotovit rozmnoženinu díla pro účely automatizované analýzy a uchovat ji jen po nezbytnou dobu. Klíčové ale je, že obecná TDM licence má <strong>výhradu práv (opt-out)</strong> — nositel práv může užití pro TDM výslovně, strojově čitelně vyloučit.</p>
+
+  <div class="callout gold">
+    <div class="t">UPLATNI VÝHRADU PRÁV NAD KOMUNITNÍM OBSAHEM</div>
+    <p>Aby komunitní obsah nespadl automaticky pod obecnou TDM výjimku, Ikaros <strong>výslovně uplatní výhradu práv</strong> podle <span class="mono">§ 39c</span> — v podmínkách textově (např. „rozmnožování obsahu pro účely automatizované analýzy textů nebo dat je zakázáno") <strong>i strojově čitelně</strong> (metadata, <span class="mono">robots.txt</span>, hlavičky, <span class="mono">TDM Reservation Protocol</span>). Pozor na hranu: <strong>vědecká TDM výjimka</strong> (univerzity, paměťové instituce) opt-out neumožňuje — proti ní výhrada neplatí.</p>
+  </div>
+
+  <h3>AI trénink je OPT-IN, ne opt-out</h3>
+  <p>TDM licence umožňuje analýzu, ale <strong>trénink generativního modelu</strong> je jiný právní i etický problém než interní index. Proto Ikaros rozlišuje účel zpracování — a jen u skutečného učení modelu vyžaduje výslovný souhlas autora. Do podmínek patří věta, že <strong>nahráním obsahu uživatel automaticky nedává souhlas k tréninku generativních modelů</strong>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Účel zpracování</th><th>Právní základ / režim</th><th>Souhlas autora</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Interní vyhledávací index</td><td>Platformní licence + GDPR (provoz)</td><td><span class="no">netřeba</span> (v rámci provozu)</td></tr>
+      <tr><td>Bezpečnost / moderace obsahu</td><td>Oprávněný zájem (nutná LIA)</td><td><span class="no">netřeba</span></td></tr>
+      <tr><td>Doporučování obsahu</td><td>Oprávněný zájem / smlouva</td><td><span class="partial">dle nastavení</span></td></tr>
+      <tr><td>Trénink generativního modelu</td><td>Samostatný titul + AI/TDM licence</td><td><span class="yes">POVINNÝ opt-in</span></td></tr>
+    </tbody>
+  </table>
+
+  <p>GDPR souvislosti tréninku (LLM jako zpracovatel, DPA dle čl. 28, transfer do USA přes SCC, LIA u oprávněného zájmu) rozvádí <strong>Část V</strong> o ochraně osobních údajů a AI modulu. Zde platí zásada: <strong>trénink potřebuje vlastní právní základ a nikdy se neopírá o provozní licenci.</strong></p>
+
+  <h3>Data Act: právo na export vlastního — ne na scraping cizího</h3>
+  <p>Nařízení EU <strong>2023/2854 (Data Act)</strong> je použitelné od <span class="mono">12. 9. 2025</span>. Zavádí právo uživatele na <strong>strukturovaný, strojově čitelný export</strong> vlastních dat (v Ikaru typicky deníky, postavy, světy), přenositelnost mezi službami (cloud switching) a rušení egress poplatků za odchod dat od <span class="mono">12. 1. 2027</span>.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">15 let</div><div class="l">trvání zvláštního práva (§ 93)</div></div>
+    <div class="stat"><div class="n">§ 39c</div><div class="l">TDM licence + výhrada práv</div></div>
+    <div class="stat"><div class="n">opt-in</div><div class="l">AI trénink z komunitního obsahu</div></div>
+  </div>
+
+  <p>Ikaros už má funkci <strong>export světa (ZIP)</strong> (kap. 22). Data Act ji směřuje dál: export nemá být jen archivní balík, ale <strong>strukturovaná strojově čitelná data</strong> s jasným schématem, přenositelná k jiné službě. Doporučený krok je export nad ZIP posílit o strukturovaný formát deníků, postav a světů.</p>
+
+  <div class="callout gold">
+    <div class="t">POZOR NA HRANU: vlastnictví, ne formát</div>
+    <p>Právo na export vlastních dat (Data Act) a zákaz hromadného scrapingu cizí knihovny se <strong>nepletou</strong>. Export je vázán na <strong>vlastní práva uživatele a práva členů jeho světa</strong>; hromadný odběr cizí veřejné knihovny botem zůstává zakázán a technicky omezen (rate-limit). Rozhodující je <strong>vlastnictví dat, ne formát přenosu</strong>. Strukturovaný export vlastního obsahu je zároveň jedna z povolených funkcí v anti-scraping tabulce.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">NÁVAZNOST</div>
+    <p>Klonování a licence k jednotlivým položkám → <strong>kap. 40/41</strong>. Strukturovaný export a soulad s Data Act → <strong>kap. 22</strong>. GDPR a právní základ AI tréninku → <strong>Část V</strong>. Databázové právo tu řešíme jako obranu katalogu; titul k obsahu uvnitř dávají vždy licence od autorů.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Autorský zákon (č. 121/2000 Sb.), Hlava III — <span class="mono">§ 88</span> (pojem databáze), <span class="mono">§ 88a</span> (podstatný vklad), <span class="mono">§ 89</span> (pořizovatel), <span class="mono">§ 90</span> (obsah práva; užití celé databáze/podstatné části; zákaz opakovaného systematického vytěžování nepodstatných částí), <span class="mono">§ 91</span> (nepodstatné části oprávněným uživatelem), <span class="mono">§ 92</span> (bezúplatné zákonné licence), <span class="mono">§ 93</span> (trvání 15 let od pořízení / od zpřístupnění), <span class="mono">§ 94</span>.</li>
+    <li>Autorský zákon <span class="mono">§ 39c</span> — TDM licence a výhrada práv (opt-out); transpozice směrnice (EU) 2019/790, účinnost 5. 1. 2023; samostatná vědecká TDM výjimka bez opt-out.</li>
+    <li>Nařízení EU <strong>2023/2854 (Data Act)</strong> — použitelnost od 12. 9. 2025; strukturovaný strojově čitelný export, cloud switching; egress poplatky zrušeny od 12. 1. 2027 <span class="mono">(ledger A13)</span>.</li>
+    <li>Navazuje: <strong>Databáze, scraping a AI trénink</strong> (Právní rámec, 3. část); licence a klonování (kap. 40/41); export světa (kap. 22); GDPR a AI modul (Část V).</li>
+  </ul>
+</section>

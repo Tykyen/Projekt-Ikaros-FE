@@ -1,0 +1,183 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II — Osobní údaje a GDPR</div>
+    <h2>Práva subjektů, export a incident</h2>
+  </div>
+
+  <p class="lead">GDPR nedává uživateli jen ochranu, ale i sadu vymahatelných práv, na která musí Ikaros umět technicky odpovědět — do zákonné lhůty a bez výmluv. Tato kapitola překládá práva subjektů (<span class="mono">čl. 15–22</span>) do konkrétních funkcí platformy, staví nad rámec obyčejného ZIP <strong>strukturovaný strojově čitelný export</strong> podle práva na přenositelnost i podle Data Actu, nastavuje retenční doby a mazání účtu a končí procesem pro nejhorší den — <strong>porušení zabezpečení</strong> a jeho ohlášení do 72 hodin.</p>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta pro celý tým</div>
+    <p>Práva subjektů nejsou právní formalita, ale <strong>produktová funkce</strong>. Když je uživatel uplatní, běží nám lhůta <strong>jeden měsíc</strong> — a platí, že co Ikaros neumí exportovat, opravit ani smazat tlačítkem, bude muset dělat ručně pod časovým tlakem. Export a mazání proto patří do architektury od začátku, ne až k žádosti.</p>
+  </div>
+
+  <h3>Práva subjektů a jak je Ikaros naplní</h3>
+  <p>Uživatel má vůči Ikarosu jako správci sadu práv, která musí platforma vyřídit <strong>bez zbytečného odkladu, nejpozději do jednoho měsíce</strong> od žádosti (<span class="mono">čl. 12 odst. 3</span> GDPR). Lhůtu lze prodloužit o další dva měsíce, je-li žádost složitá nebo je jich mnoho — o prodloužení i jeho důvodech ale musíme subjekt vyrozumět <strong>ještě v prvním měsíci</strong>. Vyřízení je v zásadě <strong>bezplatné</strong>; poplatek nebo odmítnutí připadá v úvahu jen u zjevně nedůvodných či nepřiměřených (opakovaných) žádostí, a i to je nutné doložit.</p>
+
+  <table>
+    <thead>
+      <tr><th>Právo (článek)</th><th>Jak to Ikaros naplní</th><th class="us">Úskalí</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Přístup</strong> <span class="mono">čl. 15</span></td>
+        <td>Přehled dat v profilu + strojový export účtu; informace o účelech, příjemcích, retenci, zdroji.</td>
+        <td class="us">Nesmí prozradit údaje třetích osob (autoři cizích světů, protistrany v chatu) — export čistit na „data subjektu".</td>
+      </tr>
+      <tr>
+        <td><strong>Oprava</strong> <span class="mono">čl. 16</span></td>
+        <td>Editace profilu, přezdívky, e-mailu; oprava obsahu, který uživatel spravuje.</td>
+        <td class="us">Nelze „opravit" cizí obsah ani historii úprav v týmovém světě — jen vlastní údaje.</td>
+      </tr>
+      <tr>
+        <td><strong>Výmaz / „být zapomenut"</strong> <span class="mono">čl. 17</span></td>
+        <td>Smazání účtu → kaskáda přes vlastní obsah; anonymizace stop v týmovém obsahu; zálohy doběhnou.</td>
+        <td class="us">Právo NENÍ absolutní: kolize s klony, týmovými světy a zálohami; výjimky dle <span class="mono">čl. 17 odst. 3</span> (viz níže).</td>
+      </tr>
+      <tr>
+        <td><strong>Omezení</strong> <span class="mono">čl. 18</span></td>
+        <td>Dočasné „zmrazení" účtu / obsahu — data se uchovají, ale nezpracovávají nad rámec uložení.</td>
+        <td class="us">Musí existovat stav „zmrazeno" odlišný od smazání; typicky po dobu řešení námitky nebo sporu o přesnost.</td>
+      </tr>
+      <tr>
+        <td><strong>Přenositelnost</strong> <span class="mono">čl. 20</span></td>
+        <td>Strojový export dat, která uživatel poskytl, ve strukturovaném formátu (JSON/CSV) — viz sekce o exportu.</td>
+        <td class="us">Jen data na základě <strong>souhlasu nebo smlouvy</strong> a <strong>poskytnutá subjektem</strong>; ne odvozená data ani cizí obsah.</td>
+      </tr>
+      <tr>
+        <td><strong>Námitka</strong> <span class="mono">čl. 21</span></td>
+        <td>Odmítnutí zpracování opřeného o oprávněný zájem (analytika, doporučování); vždy vůči přímému marketingu.</td>
+        <td class="us">U oprávněného zájmu musíme vážit; u přímého marketingu je námitka <strong>bezvýjimečná</strong> — hned zastavit.</td>
+      </tr>
+      <tr>
+        <td><strong>Odvolání souhlasu</strong> <span class="mono">čl. 7 odst. 3</span></td>
+        <td>Přepínač u každé souhlasové funkce (newsletter, marketingové cookies, veřejné prvky, opt-in AI trénink).</td>
+        <td class="us">Odvolání musí být <strong>stejně snadné</strong> jako udělení; působí do budoucna, nezpětně.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Výmaz naráží na tři reality — klony, týmové světy, zálohy</div>
+    <p>„Právo být zapomenut" v komunitní platformě není `DROP`. <strong>(1) Klony a forky:</strong> jakmile někdo zkopíruje veřejně sdílený svět, vzniká samostatné dílo jiného autora — smazání originálu nemaže klon. <strong>(2) Týmové světy:</strong> u společně tvořeného obsahu nelze vytrhnout jednoho spoluautora bez zničení díla ostatních — řešením je <strong>anonymizace atribuce</strong> (přezdívka → „bývalý člen"), ne destrukce obsahu. <strong>(3) Zálohy:</strong> data v zálohách se nemažou okamžitě — je legitimní nechat je <strong>doběhnout v rámci retenčního cyklu záloh</strong>, pokud jsou po dobu doběhu chráněná před běžným zpracováním. Tento režim musí být popsán v podmínkách a v RoPA.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Výmaz není absolutní (čl. 17 odst. 3)</div>
+    <p>Žádost o výmaz lze <strong>zčásti odmítnout</strong> tam, kde uchování ukládá <strong>právní povinnost</strong> (daňové/účetní doklady u darů, AML), kde jsou data nutná pro <strong>určení, výkon či obhajobu právních nároků</strong> (spor, moderační důkaz), nebo pro <strong>svobodu projevu</strong>. Odmítnutí musí být <strong>odůvodněné</strong> — uvést konkrétní výjimku a poučit o právu na stížnost u ÚOOÚ. Nikdy nemazat tiše ani nemazat nad rámec toho, co uchovat opravdu musíme.</p>
+  </div>
+
+  <h3>Strukturovaný export: nad rámec ZIP</h3>
+  <p>Vize Ikara počítá s tím, že si uživatel své světy, kroniky a postavy <strong>odnese</strong>. Právo na přenositelnost (<span class="mono">čl. 20</span>) i Data Act tuto ambici mění z laskavosti na povinnost. Rozlišujeme dvě úrovně exportu: lidsky čitelný archiv a <strong>strojově čitelný strukturovaný export</strong>.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>ZIP archiv (lidský)</h4>
+      <p class="small">To, co uživatel „vidí" — HTML/PDF deníků, obrázky, přílohy.</p>
+      <ul>
+        <li>Pro čtení, tisk, osobní archiv.</li>
+        <li>Splní právo na <strong>přístup</strong> (čl. 15).</li>
+        <li>Sám o sobě <strong>nestačí</strong> na přenositelnost — není strojově čitelný ve smyslu čl. 20.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Strukturovaný export (strojový)</h4>
+      <p class="small">Deníky, postavy, světy jako <strong>strukturovaná data</strong> — JSON/CSV se schématem.</p>
+      <ul>
+        <li>Strukturovaný, běžně používaný, <strong>strojově čitelný</strong> formát.</li>
+        <li>Splní <strong>přenositelnost</strong> (čl. 20) i <strong>Data Act</strong>.</li>
+        <li>Umožní import jinam / migraci — data nezůstávají „v zajetí".</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>GDPR nepředepisuje konkrétní formát, jen tři vlastnosti: <strong>strukturovaný, běžně používaný a strojově čitelný</strong> (v praxi JSON, CSV, XML). Prostý textový výpis bez polí, sken v PDF ani proprietární formát nevyhoví. Pozor na hranice čl. 20: přenositelnost pokrývá jen data zpracovávaná <strong>automatizovaně na základě souhlasu nebo smlouvy</strong> a <strong>poskytnutá subjektem</strong> — ne data odvozená (skóre, doporučení) a ne obsah cizích autorů.</p>
+
+  <div class="callout gold">
+    <div class="t">Data Act 2023/2854: strukturovaný export a konec egress poplatků</div>
+    <p>Nařízení o datech je použitelné od <strong>12.&nbsp;9.&nbsp;2025</strong> a doplňuje GDPR o právo přenést data <strong>ve strukturovaném, běžně používaném a strojově čitelném formátu</strong> — a hlavně usnadňuje <strong>přechod mezi službami</strong> (cloud switching). Klíčové datum pro provoz: od <strong>12.&nbsp;1.&nbsp;2027</strong> se ruší <strong>poplatky za přechod včetně poplatků za egress</strong> (odchod dat). Do té doby smí poskytovatel účtovat jen náklady přímo spojené s přechodem. Pro Ikaros to znamená: strukturovaný export deníků/postav/světů musí být <strong>plnohodnotná funkce</strong>, ne prémiová brzda odchodu, a <strong>nezpoplatňovat samotný odchod dat</strong>.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Vlastní obsah ANO, hromadný scraping cizí knihovny NE</div>
+    <p>Export je právo na <strong>vlastní</strong> data a obsah, který uživatel vytvořil. <strong>Není</strong> to licence na stažení cizí komunitní knihovny, cizích světů či profilů „do zásoby". Hromadné vytěžování (scraping) obsahu jiných autorů je zakázané — spadá pod ochranu databáze, autorská a osobnostní práva a řeší je <strong>Část IV (komunitní knihovny, licence a IP)</strong>. Export tedy vždy scopujeme na „data subjektu a jím vytvořený obsah", nikdy na cizí knihovnu.</p>
+  </div>
+
+  <h3>Retence: jak dlouho co držíme</h3>
+  <p>Osobní údaje se uchovávají <strong>jen po dobu nezbytnou k účelu</strong>, pro který byly získány (zásada omezení uložení, <span class="mono">čl. 5 odst. 1 písm. e</span>). „Navždy pro jistotu" není retenční doba. Každá kategorie dat proto potřebuje účel a k němu navázanou dobu — a tento přehled je součástí RoPA (viz <strong>GDPR inventář a právní základy</strong>).</p>
+
+  <table>
+    <thead>
+      <tr><th>Kategorie</th><th>Účel</th><th>Orientační retence</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Aktivní účet a obsah</strong></td><td>Poskytování služby (smlouva)</td><td>Po dobu trvání účtu</td></tr>
+      <tr><td><strong>Smazaný účet</strong></td><td>Storno, možnost obnovy, doběh záloh</td><td>Krátká ochranná lhůta, pak výmaz/anonymizace</td></tr>
+      <tr><td><strong>Provozní a bezpečnostní logy</strong></td><td>Bezpečnost, prevence zneužití (opráv. zájem + LIA)</td><td>Řádově měsíce dle typu logu</td></tr>
+      <tr><td><strong>Hlášení a moderační spisy</strong></td><td>Řešení stížností, obhajoba nároků</td><td>Přiměřeně účelu, pak výmaz</td></tr>
+      <tr><td><strong>Doklady o darech / platbách</strong></td><td>Právní povinnost (účetní, daňová)</td><td>Zákonná archivační lhůta (delší než účet)</td></tr>
+      <tr><td><strong>Zálohy</strong></td><td>Obnova po havárii</td><td>Rotační cyklus záloh (data doběhnou)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Mazání účtu: nejdřív nabídnout export</h3>
+  <p>Zrušení účtu je okamžik, kdy se protíná právo na výmaz s právem na přenositelnost. Ikaros proto mazání navrhne jako <strong>řízený tok</strong>, ne jako destruktivní tlačítko.</p>
+  <div class="feat">
+    <h4>Tok „smazat účet"</h4>
+    <ul>
+      <li><b>Nabídnout export před smazáním:</b> uživatel si nejdřív může stáhnout ZIP i strukturovaný export — data si odnese, ať to myslí vážně, nebo se rozmyslí.</li>
+      <li><b>Vysvětlit dopad:</b> co se smaže hned, co se anonymizuje (atribuce v týmových světech), co zůstává z právní povinnosti (doklady o darech).</li>
+      <li><b>Ochranná lhůta:</b> krátké „období vychladnutí" na zrušení omylem, pak nevratný výmaz vlastního obsahu.</li>
+      <li><b>Zálohy doběhnou:</b> data v zálohách zmizí v rámci retenčního cyklu; po dobu doběhu jsou chráněná před běžným zpracováním.</li>
+    </ul>
+  </div>
+
+  <h3>Incident: porušení zabezpečení osobních údajů</h3>
+  <p>Porušení zabezpečení (<span class="mono">čl. 4 odst. 12</span>) je jakékoli narušení vedoucí k <strong>zpřístupnění, ztrátě, změně nebo zničení</strong> osobních údajů — únik databáze, kompromitace účtu administrátora, ztráta zálohy, ale i chybné rozeslání e-mailů. GDPR na něj váže <strong>dvě samostatné oznamovací povinnosti</strong> s odlišnou spouští: ohlášení dozorovému úřadu (ÚOOÚ) a informování subjektů.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Úřadu — čl. 33</h4>
+      <p class="small">Spoušť: <strong>jakékoli riziko</strong> pro práva a svobody.</p>
+      <ul>
+        <li>Ohlásit ÚOOÚ <strong>do 72 hodin</strong> od okamžiku, kdy jsme se o porušení dozvěděli.</li>
+        <li>Výjimka: <strong>není pravděpodobné</strong>, že vznikne riziko → neohlašuje se (ale eviduje).</li>
+        <li>Pozdě než po 72 h → přiložit <strong>důvody prodlení</strong>.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Subjektům — čl. 34</h4>
+      <p class="small">Spoušť: <strong>vysoké riziko</strong> pro práva a svobody.</p>
+      <ul>
+        <li>Informovat dotčené uživatele <strong>bez zbytečného odkladu</strong>, srozumitelně.</li>
+        <li>Výjimky (čl. 34 odst. 3): data <strong>šifrovaná</strong>, riziko následně <strong>odvráceno</strong>, nebo neúměrné úsilí → veřejné oznámení.</li>
+        <li>Sdělit povahu, kontakt (pověřenec), následky, opatření a doporučení pro uživatele.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Postup při incidentu</h3>
+  <div class="phase"><div class="num">1</div><div class="body"><b>Detekce a zastavení.</b> Zaznamenat okamžik zjištění (běží 72 h), izolovat příčinu, zastavit únik, zajistit důkazy a logy. Od této chvíle vše zapisovat.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Posouzení rizika.</b> Jaká data, kolik subjektů, jaká citlivost (jsou mezi nimi zvláštní kategorie dle čl. 9? děti?), jsou šifrovaná? Výstup: <b>žádné / běžné / vysoké riziko</b>.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Ohlášení ÚOOÚ (čl. 33).</b> Je-li pravděpodobné riziko → do <b>72 hodin</b> nahlásit povahu, kategorie a počty subjektů, pravděpodobné následky a přijatá opatření. Při zpoždění doložit důvody.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Informování subjektů (čl. 34).</b> Je-li riziko <b>vysoké</b> → bez zbytečného odkladu informovat dotčené uživatele — ledaže platí výjimka (šifrování, odvrácené riziko, veřejné oznámení).</div></div>
+  <div class="phase"><div class="num flag">5</div><div class="body"><b>Evidence a poučení.</b> Zapsat do <b>evidence incidentů</b> (i ty neohlášené — čl. 33 odst. 5), doplnit nápravná opatření a promítnout je do bezpečnosti a RoPA.</div></div>
+
+  <div class="callout gold">
+    <div class="t">Evidence incidentů je povinná i u neohlášených případů</div>
+    <p>Podle <span class="mono">čl. 33 odst. 5</span> musí správce <strong>dokumentovat každé porušení</strong> — jeho okolnosti, dopady i přijatá opatření — <strong>bez ohledu na to, zda se ohlašuje</strong>. Rozhodnutí „neohlašujeme, protože riziko není pravděpodobné" tedy musí být <strong>písemně odůvodněné</strong> v evidenci, aby bylo obhajitelné při kontrole. Bez evidence nelze doložit, že jsme posoudili správně.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Provazba</div>
+    <p>Export v podmínkách užití a smluvní ošetření odchodu dat řeší <strong>Část VIII</strong>. Ambici „uživatel si své světy odnese" formuluje vize v <strong>Části I</strong>. Zákaz hromadného vytěžování cizí knihovny a licenční režim obsahu rozvádí <strong>Část IV</strong>. Datovou mapu, právní základy a RoPA, na které tato práva navazují, viz kapitola <strong>GDPR inventář a právní základy</strong>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení 2016/679 (GDPR) — <span class="mono">čl. 12 odst. 3</span> (lhůta 1 měsíc + prodloužení o 2), <span class="mono">čl. 15</span> (přístup), <span class="mono">čl. 16</span> (oprava), <span class="mono">čl. 17</span> vč. odst. 3 (výmaz a výjimky), <span class="mono">čl. 18</span> (omezení), <span class="mono">čl. 20</span> (přenositelnost — struktur./strojově čitelný, jen souhlas/smlouva a data poskytnutá subjektem), <span class="mono">čl. 21</span> (námitka), <span class="mono">čl. 7 odst. 3</span> (odvolání souhlasu).</li>
+    <li>GDPR — <span class="mono">čl. 5 odst. 1 písm. e</span> (omezení uložení), <span class="mono">čl. 4 odst. 12</span> (porušení zabezpečení), <span class="mono">čl. 33</span> (ohlášení ÚOOÚ do 72 h, evidence dle odst. 5), <span class="mono">čl. 34</span> vč. odst. 3 (informování subjektů při vysokém riziku a výjimky).</li>
+    <li>Nařízení 2023/2854 (Data Act) — použitelnost od <span class="mono">12.&nbsp;9.&nbsp;2025</span>; strukturovaný export a přechod mezi službami; zrušení poplatků za přechod a egress od <span class="mono">12.&nbsp;1.&nbsp;2027</span>.</li>
+    <li>Fact-check ledger v1.0 — položka <span class="mono">A13</span> (Data Act: strukturovaný export nad rámec ZIP, egress).</li>
+    <li>Navazuje: <strong>Část VIII</strong> (export v podmínkách), <strong>Část IV</strong> (komunitní knihovny a licence — scraping), <strong>Část I</strong> (vize „odnes si svá data"), <strong>GDPR inventář a právní základy</strong> (RoPA, retence, datová mapa).</li>
+  </ul>
+</section>

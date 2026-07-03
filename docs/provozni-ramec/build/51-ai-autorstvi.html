@@ -1,0 +1,202 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část V — AI: obsah a transparentnost</div>
+    <h2>Autorství AI výstupů a třídy původu</h2>
+  </div>
+
+  <p class="lead">Ikaros generuje bestiáře, portréty, texty i repliky postav — a uživatelé je pak klonují a sdílejí. Než se jednoho takového výstupu chytne komunita, musí platforma vědět jednu věc: <strong>komu ten výstup patří.</strong> Odpověď je pro laika překvapivá. Čistě AI vygenerovaný obsah <strong>není autorské dílo</strong> a <strong>nepatří nikomu</strong> — ani uživateli, který napsal prompt, ani platformě, která model provozuje. Tuto kapitolu proto nestavíme na přání „ať to má vlastníka", ale na tom, co říká zákon a první česká judikatura. Z toho pak odvodíme třídy původu <span class="mono">ai_origin A0–A6</span>, podle kterých se řídí štítkování, moderace i podmínky klonování.</p>
+
+  <div class="callout gold">
+    <div class="t">Jedna věta, kterou musí znát celý produkt</div>
+    <p><strong>Prompt zadaný uživatelem není tvůrčí ztvárnění, je to jen námět — proto je čistě AI výstup volný a autorství se nesmí nikomu automaticky přiznat.</strong> Podmínky, UI ani klonovací tlačítko nesmí uživateli tvrdit, že „jeho" AI obrázek nebo AI text je jeho chráněné dílo. Lidská ochrana vzniká až tam, kde je prokazatelný <strong>významný lidský tvůrčí vstup</strong> — ne pouhé kliknutí na „vygenerovat".</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">§ 5</div><div class="l">autor = jen fyzická osoba (autorský zákon)</div></div>
+    <div class="stat"><div class="n">10 C 13/2023</div><div class="l">MS Praha — AI výstup není dílo, prompt = námět</div></div>
+    <div class="stat"><div class="n">A0–A6</div><div class="l">třídy původu obsahu <span class="mono">ai_origin</span></div></div>
+  </div>
+
+  <h3>Kdo může být autorem — a proč jím není AI ani prompt</h3>
+
+  <p>České autorské právo stojí na jediné podmínce: dílo je <strong>jedinečný výsledek tvůrčí činnosti fyzické osoby</strong> (<span class="mono">§ 2 autorského zákona</span>) a autorem může být <strong>jen fyzická osoba</strong> (<span class="mono">§ 5 AZ</span>). Stroj autorem být nemůže — stejně jako se autorem fotografie nestává fotoaparát. To není teoretická poznámka; je to hrana, o kterou se láme celý licenční model komunitní knihovny.</p>
+
+  <p>Klíčovou otázku vyřešil <strong>Městský soud v Praze</strong> v rozsudku <span class="mono">10 C 13/2023</span> — prvním českém rozhodnutí o autorství AI výstupu. Žalobce zadal generátoru obrazu prompt (vizuál dvou stran podepisujících obchodní smlouvu v kanceláři) a domáhal se, aby vygenerovaný obrázek byl uznán za jeho autorské dílo. Soud žalobu zamítl: obrázek <strong>není autorské dílo podle <span class="mono">§ 2 AZ</span></strong>, protože není jedinečným výsledkem tvůrčí činnosti fyzické osoby — chybí lidský tvůrčí vklad do samotného ztvárnění. A <strong>samotný prompt je jen námět či myšlenka</strong> (<span class="mono">§ 2</span>, srov. i vyloučení námětu z ochrany v <span class="mono">§ 6 AZ</span>), a námět ani myšlenka autorskoprávní ochraně nepodléhají.</p>
+
+  <div class="callout cyan">
+    <div class="t">Co z toho plyne pro Ikaros — bez omáček</div>
+    <p>Čistě AI výstup je <strong>fakticky volný</strong>. Autorství se <strong>nepřiřazuje</strong> uživateli, který napsal prompt, ani provozovateli platformy. Poskytovatel může smluvně přenechat jen práva, která má — ale nemůže „vyrobit" autorské právo tam, kde žádné nevzniklo. Klon čistě AI obsahu proto nelze prezentovat jako chráněné dílo uživatele. UI, podmínky i klonovací shrnutí to musí říkat rovně.</p>
+  </div>
+
+  <h3>Kdy naopak lidská ochrana VZNIKÁ</h3>
+
+  <p>Rozhodnutí nezavírá dveře nadobro — vytyčuje laťku. Soud naznačil, že budoucí nárok by uspěl při <strong>významnějším lidském tvůrčím vstupu</strong>: kreativní kontrole nad výstupem, netriviální úpravě výsledku, komplexnějším nastavení a takové míře lidského rozhodování, aby výsledek <strong>odrážel tvůrčí osobnost autora</strong>. Stejným směrem míří i evropská praxe roku 2025–2026: napříč EU (německá judikatura, italský zákon o AI z 10/2025, stanoviska Evropského parlamentu) platí, že chráněno je jen to, co je produktem <strong>dostatečné lidské tvůrčí činnosti</strong> — jednoduché prompty, vágní instrukce a čistě technické korekce nestačí.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Nestačí (výstup zůstává volný)</h4>
+      <ul>
+        <li>Krátký prompt, výstup vložen <b>bez úprav</b>.</li>
+        <li>Iterace promptu, ladění formulace „lepší světlo".</li>
+        <li>Drobná technická korekce (oříznutí, změna velikosti).</li>
+        <li>Výběr „nejhezčí ze čtyř" bez dalšího zásahu.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Může zakládat chráněné lidské zpracování</h4>
+      <ul>
+        <li><b>Podstatná editace</b> — přepis textu vlastním stylem, přemalba, kompozice.</li>
+        <li><b>Výběr a uspořádání</b> více výstupů do díla s vlastní strukturou.</li>
+        <li><b>Kombinace</b> AI výstupu s vlastní tvorbou (kresba, text, statistiky).</li>
+        <li>Kreativní dotvoření, které nese <b>tvůrčí osobnost</b> autora.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Hranice je citlivá — proto ji evidujeme, ne hádáme</div>
+    <p>Kde přesně končí „technická korekce" a začíná „chráněné zpracování", je právně sporné a bez advokáta se to u konkrétní položky netvrdí napevno. Ikaros proto <strong>eviduje</strong> míru lidského vstupu (třída <span class="mono">ai_origin</span>) a <strong>autora lidských úprav</strong>, ať existuje doložitelný podklad, kdyby o ochranu šlo. Nepředstíráme jistotu tam, kde jistota není.</p>
+  </div>
+
+  <h3>Důsledky pro klonování a sdílení</h3>
+
+  <p>Komunitní knihovna žije z klonování. Právě proto na ní stojí nejvíc: klon nesmí uživateli „darovat" autorství, které neexistuje.</p>
+
+  <ul>
+    <li><strong>Podmínky nesmí přiznat autorství čistě AI výstupu</strong> — ani klonujícímu, ani původnímu promptérovi. Volný obsah zůstává volný i po naklonování.</li>
+    <li><strong>Klonovací shrnutí musí být pravdivé.</strong> U položky třídy <span class="mono">A3</span> (čistě AI) se nezobrazuje „dílo uživatele X", ale AI původ a volný status.</li>
+    <li><strong>Atribuce ≠ autorství.</strong> Uvést, kdo výstup vygeneroval nebo nahrál, lze jako provozní/slušnostní údaj — ale nezakládá to autorské právo a nesmí se tak prezentovat.</li>
+    <li><strong>Lidské zpracování se atribuuje autorovi úprav</strong> (třída <span class="mono">A2</span>), ne AI a ne původnímu promptu.</li>
+  </ul>
+
+  <div class="callout cyan">
+    <div class="t">Vazba na datový model licenční karty</div>
+    <p>Tohle není jen text v podmínkách — je to hodnota v kartě. Pole <span class="mono">ai_origin</span> u licenční karty rozhoduje, jestli se ukáže klonovací tlačítko, jestli položka smí do veřejné knihovny a jaký nese štítek. Podrobný datový model (pole, stavy, role, workflow klonování) je v Části IV — <span class="mono">Datový model licenčních karet</span>. Tato kapitola dodává právní důvod, proč tam pole <span class="mono">ai_origin</span> musí být first-class.</p>
+  </div>
+
+  <h3>AI výstup může porušovat cizí práva — štítek NENÍ omluva</h3>
+
+  <p>Volný status se týká <strong>autorství</strong> — ne beztrestnosti. I když AI výstup sám o sobě není chráněným dílem, může <strong>zasahovat do cizích práv</strong>: být příliš podobný chráněné ilustraci, herní postavě, mapě, logu, značce, chráněnému světu, textu pravidel — nebo zobrazovat <strong>reálnou osobu</strong>. Uživatel nesmí mít možnost tohle legalizovat větou „vždyť to udělala AI".</p>
+
+  <div class="callout gold">
+    <div class="t">AI štítek = transparentnost, ne beztrestnost</div>
+    <p>Značka „vytvořeno AI" plní povinnost transparentnosti (AI Act čl. 50, viz kapitola o značení) — <strong>neomlouvá</strong> porušení autorských práv, práv k ochranné známce, osobnostních práv ani ochrany osobních údajů. Podobnost s chráněnou ilustrací nebo napodobení reálné osoby je zásah bez ohledu na to, že obsah vygeneroval stroj.</p>
+  </div>
+
+  <ul>
+    <li>Zakázat prompty typu „vytvoř přesnou kopii ilustrace z příručky X" nebo „udělej postavu jako [chráněná filmová/RPG postava]".</li>
+    <li>Zakázat AI obrázky s logem, znakem či chráněným designem cizího vydavatele bez licence.</li>
+    <li>Zakázat AI obsah napodobující reálnou osobu bez souhlasu — zvlášť v ponižujícím, sexuálním, politickém nebo klamavém kontextu (osobnostní práva, GDPR, deepfake).</li>
+    <li>Vyžadovat <strong>lidskou kontrolu</strong> před zařazením AI obsahu do oficiální nebo doporučené knihovny.</li>
+  </ul>
+
+  <h3>Třídy původu obsahu — <span class="mono">ai_origin A0–A6</span></h3>
+
+  <p>Aby se autorský status a míra rizika daly v aplikaci vynutit, každý obsah nese metadatový atribut <span class="mono">ai_origin</span>. Třídy odstupňují lidský vklad od čistě lidského díla (<span class="mono">A0</span>) po zakázaný obsah (<span class="mono">A6</span>) a ke každé váží autorství i provozní režim. Hodnoty jsou návrh k odsouhlasení a implementaci; matice níže je rešeršní opora.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Třída</th>
+        <th>Situace</th>
+        <th>Autorství</th>
+        <th>Režim / dopad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pill">A0</span></td>
+        <td>Čistě lidský obsah, bez AI</td>
+        <td><span class="yes">lidské dílo</span></td>
+        <td>Standardní režim; bez AI štítku</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A1</span></td>
+        <td>Lidský obsah, AI jen návrh/brainstorming — <strong>nepoužit</strong></td>
+        <td><span class="yes">lidské dílo</span></td>
+        <td>Bez štítku; AI asistenci evidovat interně</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A2</span></td>
+        <td>AI výstup s <strong>podstatnou lidskou editací</strong></td>
+        <td><span class="partial">chráněné lidské zpracování</span></td>
+        <td>AI štítek + autor úprav; klon atribuuje autora zpracování</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A3</span></td>
+        <td>Čistě AI výstup (prompt bez úprav)</td>
+        <td><span class="no">volný (10 C 13/2023)</span></td>
+        <td>Neodstranitelný AI štítek; auto NE do oficiální knihovny; klon neprezentovat jako dílo uživatele</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A4</span></td>
+        <td>AI obraz/audio/video — <strong>deepfake reálné osoby</strong></td>
+        <td><span class="no">volný, ale rizikový</span></td>
+        <td>Povinné označení „uměle vytvořeno" (čl. 50) + souhlas osoby; jinak blokovat</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A5</span></td>
+        <td>AI interakce (chat za postavu / asistent)</td>
+        <td>n/a (interakce, ne dílo)</td>
+        <td>Uživatele informovat, že komunikuje s AI (čl. 50)</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A6</span></td>
+        <td>Zakázaný obsah (NCII/CSAM, kopie cizí IP)</td>
+        <td><span class="no">nepřípustné</span></td>
+        <td>Moderace/blokace; grace u NCII/CSAM do 2. 12. 2026</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Rozhraní tříd — jak si je nesplést</div>
+    <p><span class="mono">A1</span> vs. <span class="mono">A2</span>: u A1 se AI návrh <strong>vůbec nepoužil</strong> (dílo je čistě lidské), u A2 se AI výstup použil, ale prošel podstatnou lidskou editací. — <span class="mono">A2</span> vs. <span class="mono">A3</span>: hranicí je <strong>významnost</strong> lidského vstupu (viz laťka výše); pochybnost řeš ve prospěch A3 (přísnější režim). — <span class="mono">A3</span> vs. <span class="mono">A4</span>: A4 je podmnožina čistě AI výstupu, která navíc zobrazuje reálnou osobu → přidává rizika osobnostních práv a deepfake. — <span class="mono">A6</span> přebíjí vše ostatní: zakázaný obsah se neštítkuje, blokuje se.</p>
+  </div>
+
+  <h3>Metadata a neodstranitelný štítek</h3>
+
+  <p>Atribut <span class="mono">ai_origin</span> je <strong>first-class</strong> — ne kosmetika, ne volitelný příznak. Z jeho hodnoty se odvozuje AI štítek v UI, metadata v exportu i chování moderace a klonování. Dva tvrdé požadavky:</p>
+
+  <div class="feat">
+    <h4>Invarianty <span class="mono">ai_origin</span></h4>
+    <ul>
+      <li><b>Každý AI obsah má <span class="mono">ai_origin</span></b> (priorita P0 v checklistu pro vývojáře) — bez hodnoty se položka nepublikuje.</li>
+      <li><b>Štítek u třídy <span class="mono">A3</span> a výše je neodstranitelný.</b> Vzniklo-li to převážně AI, uživatel štítek nesundá — je to podmínka transparentnosti, ne dekorace.</li>
+      <li><b>Změna třídy = nová právní událost</b>, ne tichý přepis (např. po podstatné editaci A3 → A2 s doplněním autora úprav); historie zůstává dohledatelná.</li>
+      <li><b>Štítek putuje do exportu.</b> AI původ, případná genealogie a licence jsou součástí strukturovaného exportu (Data Act), ne jen interní příznak.</li>
+    </ul>
+  </div>
+
+  <h3>Provazba na zbytek knihy</h3>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Kam tahle kapitola ústí</h4>
+      <ul>
+        <li><b>Kap. 50 — značení AI:</b> jak štítek vypadá a kdy je vymahatelný (čl. 50, grace do 2. 12. 2026).</li>
+        <li><b>Kap. 52 — moderace:</b> třídy <span class="mono">A4/A6</span>, notice-and-action, NCII/CSAM.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Odkud čerpá a co doplňuje</h4>
+      <ul>
+        <li><b>Část IV — licence a klonování:</b> pole <span class="mono">ai_origin</span> v licenční kartě, workflow klonu.</li>
+        <li><b>Část VI — AI v promo:</b> AI vizuály v marketingu, zákaz podoby reálné osoby bez souhlasu.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Shrnutí do jedné karty</div>
+    <p>Autorem je <strong>jen člověk</strong> (<span class="mono">§ 5 AZ</span>). Čistě AI výstup <strong>není dílo</strong> a je volný (<span class="mono">10 C 13/2023</span>) — prompt je jen námět (<span class="mono">§ 2</span>/<span class="mono">§ 6 AZ</span>). Autorství proto <strong>nikomu nepřiznáváme automaticky</strong>. Ochrana vzniká až <strong>významným lidským vstupem</strong> (třída <span class="mono">A2</span>). AI štítek je transparentnost, <strong>ne omluva</strong> pro porušení cizích práv. Vše řídí atribut <span class="mono">ai_origin A0–A6</span>, u <span class="mono">A3+</span> neodstranitelný.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Zákon č. 121/2000 Sb., autorský zákon — <span class="mono">§ 2</span> (pojmové znaky díla), <span class="mono">§ 5</span> (autor = fyzická osoba), <span class="mono">§ 6</span> (námět a myšlenka mimo ochranu).</li>
+    <li>Městský soud v Praze, <span class="mono">10 C 13/2023</span> — čistě AI vygenerovaný obrázek není autorské dílo (§ 2 AZ); prompt = pouhý námět/myšlenka bez ochrany; budoucí nárok vyžaduje významnější lidský tvůrčí vstup. Ověřeno proti rozsudku a odborným rozborům (Havel &amp; Partners, epravo.cz, Lupa.cz).</li>
+    <li>Evropská praxe 2025–2026 (kontext, potvrzuje směr): EPRS briefing „Copyright of AI-generated works" (EP, 2025); německá judikatura (Bird &amp; Bird, 2026) a italský zákon o AI (10/2025) — chráněno jen při dostatečném lidském tvůrčím vstupu; prosté prompty a technické korekce nestačí.</li>
+    <li>Fact-check ledger v1.0 — položka <span class="mono">A2</span> (AI výstup není dílo; autorství nepřiřazovat), <span class="mono">A10</span> (CC licencuje jen majetková práva; osobnostní práva § 11 AZ nepřevoditelná), <span class="mono">A14</span> (NCII/CSAM, grace do 2. 12. 2026).</li>
+    <li>Navazuje: kap. 50 <strong>Značení AI obsahu</strong>, kap. 52 <strong>Moderace a DSA</strong>, Část IV <strong>Datový model licenčních karet</strong> a <strong>Licence komunitního obsahu</strong>, Část VI <strong>AI v propagaci</strong>.</li>
+  </ul>
+</section>

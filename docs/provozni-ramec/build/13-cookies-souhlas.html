@@ -1,0 +1,135 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část I — Web a jeho minimum</div>
+    <h2>Cookies, analytika a správa souhlasu</h2>
+  </div>
+
+  <p class="lead">Jakmile web Ikara načte první stránku, hraje se o cookies. Přihlášení, bezpečnost a základní běh potřebují technické cookies bez ptaní — ale jakmile chceme měřit návštěvnost nebo cílit reklamu, přehazuje český zákon výhybku: v Česku platí od <strong>1. ledna 2022</strong> tvrdý režim <strong>opt-in</strong>. Analytické a marketingové cookies smíme uložit <strong>až poté</strong>, co uživatel aktivně řekne ano. Tato kapitola vymezuje, co je které, a jak musí vypadat cookie lišta, aby souhlas obstál.</p>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta pro celý web</div>
+    <p><strong>Nezbytné cookies běží samy a jen o nich informujeme; všechno ostatní — analytika, marketing, i „obdobné technologie" jako local storage — smíme spustit teprve po svobodném, aktivním souhlasu, a odmítnout musí jít stejně snadno jako přijmout.</strong> Dokud uživatel nesouhlasí, netechnické cookies zůstávají vypnuté.</p>
+  </div>
+
+  <h3>Dvě rodiny cookies — a jen jedna se ptá</h3>
+  <p>Rozhodující dělicí čára nevede podle toho, čí cookie to je (vlastní vs. třetí strany), ale podle <strong>účelu</strong>. ÚOOÚ i zákon rozlišují cookies <strong>technické (nezbytné)</strong> a <strong>netechnické</strong>.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Nezbytné (technické)</h4>
+      <p class="small">Cookies bez nichž web nefunguje: přihlašovací session, CSRF/bezpečnostní token, obsah košíku, rozložení zátěže, uložená volba cookie lišty.</p>
+      <ul>
+        <li>Souhlas <b>není třeba</b> — stačí o nich <b>informovat</b> (v zásadách cookies).</li>
+        <li>Kryje je výjimka <span class="mono">§ 89 odst. 3</span> ZEK: uložení výhradně pro přenos zprávy nebo pro službu <b>výslovně vyžádanou</b> uživatelem.</li>
+        <li>„Výslovně vyžádaná služba" = to, co uživatel chtěl (přihlásit se, otevřít deník), ne co chceme my (měřit ho).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Netechnické (analytika + marketing)</h4>
+      <p class="small">Cookies pro měření návštěvnosti, analýzu chování, profilování, cílenou reklamu a remarketing — vlastní i třetích stran.</p>
+      <ul>
+        <li>Uložit lze <b>jen na základě souhlasu</b> uděleného <b>PŘED</b> uložením.</li>
+        <li>Dokud souhlas není, musí zůstat <b>deaktivované</b> (opt-in, ne opt-out).</li>
+        <li>Souběžně jde o osobní údaj → řídí se i GDPR (zásady OÚ, Část II).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Český režim: opt-in od 1. 1. 2022</h3>
+  <p>Do konce roku 2021 se český web opíral o <strong>opt-out</strong> — cookies se braly jako povolené, dokud je uživatel neodmítl. Novela zákona o elektronických komunikacích (<span class="mono">z. č. 127/2005 Sb.</span>, novela <span class="mono">č. 374/2021 Sb.</span>) tuto výhybku k <strong>1. 1. 2022</strong> přehodila na <strong>opt-in</strong>: podle <span class="mono">§ 89 odst. 3 ZEK</span> je pro ukládání cookies a přístup k údajům v koncovém zařízení nutný <strong>předchozí prokazatelný souhlas</strong> uživatele s jejich <strong>rozsahem a účelem</strong>. Bez souhlasu smějí zůstat jen technicky nezbytné cookies.</p>
+  <div class="callout gold">
+    <div class="t">Past: „lišta na pozadí už měří" je porušení</div>
+    <p>Nejčastější chyba je nasadit analytiku (typicky Google Analytics) tak, že skript běží hned při načtení a cookie lišta se jen ukazuje „pro formu". To je <strong>opt-out</strong> a v ČR je od 2022 <strong>protiprávní</strong>. Netechnické cookies i analytické skripty se smějí spustit <strong>až po kliknutí na souhlas</strong>. Technicky to znamená blokovat skripty do udělení souhlasu, ne je jen schovat.</p>
+  </div>
+
+  <h3>Cookie lišta: šest tvrdých požadavků</h3>
+  <p>Aby souhlas z lišty právně platil, musí splnit standard GDPR (svobodný, konkrétní, informovaný, jednoznačný projev vůle) i výklad ÚOOÚ. Prakticky šest podmínek:</p>
+  <div class="feat">
+    <h4>Co musí cookie lišta Ikara splňovat</h4>
+    <ul>
+      <li><b>Svobodný a informovaný:</b> jasně kdo, co, proč, na jak dlouho a třetí strany — bez nátlaku a bez blokování přístupu k webu.</li>
+      <li><b>Odmítnout stejně snadno jako přijmout:</b> tlačítko „Odmítnout vše" ve <b>stejné vrstvě</b> a stejně viditelné jako „Přijmout vše". Žádné „Přijmout" na první obrazovce a „Odmítnout" schované o dvě kliknutí dál.</li>
+      <li><b>Žádná předzaškrtnutá políčka:</b> předem zaškrtnuté volby ÚOOÚ neuznává jako souhlas. Kategorie začínají <b>vypnuté</b> (kromě nezbytných).</li>
+      <li><b>Granularita kategorií:</b> uživatel může říct ano analytice a ne marketingu — souhlas po <b>kategoriích</b>, ne jen paušální „všechno".</li>
+      <li><b>Odvolatelnost:</b> stálý přístup k nastavení (odkaz „Nastavení cookies" v patičce), kde jde souhlas <b>kdykoli změnit či odvolat</b> stejně snadno, jako byl udělen.</li>
+      <li><b>Doložitelnost:</b> uchovat záznam, kdo, kdy a k čemu souhlasil (verze lišty), pro případ kontroly.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <div class="t">Local storage a „obdobné technologie" — stejný režim</div>
+    <p>Režim se netýká jen souborů cookie. ÚOOÚ výslovně rozšiřuje pravidla i na <strong>local storage, session storage, místně sdílené objekty a fingerprinting (otisk prohlížeče)</strong>. Cokoli, co ukládá do zařízení uživatele nebo z něj čte pro netechnický účel, potřebuje <strong>stejný souhlas</strong> jako cookie. Nelze obejít zákon tím, že měření přesuneme z cookie do <span class="mono">localStorage</span>.</p>
+  </div>
+
+  <h3>Kategorie × příklad × režim souhlasu</h3>
+  <table>
+    <thead>
+      <tr><th>Kategorie</th><th>Příklad u Ikara</th><th>Právní základ</th><th class="us">Souhlas?</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Nezbytné</strong></td>
+        <td>Přihlašovací session, CSRF/bezpečnostní token, uložená volba cookie lišty.</td>
+        <td><span class="mono">§ 89/3 ZEK</span> — výjimka (vyžádaná služba).</td>
+        <td class="us"><span class="no">NE</span> — jen informovat</td>
+      </tr>
+      <tr>
+        <td><strong>Funkční / preferenční</strong></td>
+        <td>Zapamatovaný jazyk, motiv/skin, rozložení panelů nad rámec nutného provozu.</td>
+        <td>Souhlas (nejde-li o vyžádanou službu).</td>
+        <td class="us"><span class="partial">ANO</span> — opt-in</td>
+      </tr>
+      <tr>
+        <td><strong>Analytické</strong></td>
+        <td>Měření návštěvnosti, chování na webu (Google Analytics, Matomo s cookies).</td>
+        <td>Souhlas + GDPR (osobní údaj).</td>
+        <td class="us"><span class="yes">ANO</span> — opt-in předem</td>
+      </tr>
+      <tr>
+        <td><strong>Marketingové</strong></td>
+        <td>Cílená reklama, remarketing, měřicí pixely sociálních sítí, sdílení s reklamní sítí.</td>
+        <td>Souhlas + GDPR; u dětí zvláštní režim.</td>
+        <td class="us"><span class="yes">ANO</span> — opt-in předem</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Méně rizikem: analytika bez cookies</h3>
+  <p>Existuje cesta, jak měřit návštěvnost a přitom neřešit souhlasovou lištu pro analytiku: <strong>bezcookiová, anonymizovaná analytika</strong> (např. Matomo v režimu bez cookies, Plausible), která neukládá do zařízení a nepracuje s identifikátorem jednotlivce. Pokud zpracování skutečně nedosáhne osobního údaje a neukládá do koncového zařízení, odpadá jak <span class="mono">§ 89 ZEK</span>, tak souhlas. <strong>Pozor</strong>: je to výhodné, jen když nasazení opravdu neukládá cookie ani neprovádí fingerprinting — jinak platí plný opt-in. Pro Ikaros je bezcookiová analytika doporučená první volba; teprve když nestačí, sáhneme po cookie analytice se souhlasem.</p>
+
+  <div class="callout gold">
+    <div class="t">Děti: žádná behaviorální reklama</div>
+    <p>Ikaros míří i na nezletilé (věk digitálního souhlasu v ČR je 15 let, <span class="mono">§ 7 z. 110/2019 Sb.</span>). Na uživatele, u nichž nelze vyloučit, že jsou děti, <strong>nenasazujeme profilování ani cílenou (behaviorální) reklamu</strong> — ani se souhlasem. Marketingová kategorie u dětí odpadá; zůstává nanejvýš nezbytná a bezcookiová analytika.</p>
+  </div>
+
+  <h3>Než zapneme analytiku nebo marketing</h3>
+  <div class="phase"><div class="num">1</div><div class="body"><b>Potřebujeme to vůbec?</b> Nejdřív zvaž bezcookiovou anonymizovanou analytiku — bez souhlasu, bez lišty pro tuto kategorii. Postačí-li, dál neřeš.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Postav cookie lištu, která blokuje skripty.</b> Netechnické cookies i měřicí skripty se načtou až po souhlasu; „Odmítnout vše" je rovnocenné „Přijmout vše"; kategorie granularitně, nic předzaškrtnuté.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Sepiš úplný inventář cookies.</b> Každá položka: název, účel, kategorie, doba platnosti, kdo ji zpracovává — to je podklad pro Zásady cookies (kapitola 10).</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Propoj dokumenty.</b> Lišta odkazuje na <b>Zásady cookies</b> (kap. 10) a ty na <b>Zásady zpracování OÚ</b> (Část II) — analytika/marketing jsou zároveň zpracování osobních údajů.</div></div>
+  <div class="phase"><div class="num flag">5</div><div class="body"><b>Zajisti odvolání a doklad.</b> Trvalý odkaz „Nastavení cookies" v patičce + záznam uděleného souhlasu (kdo, kdy, verze) pro případ kontroly ÚOOÚ.</div></div>
+
+  <h3>Vazba na zbytek knihy</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>→ Zásady cookies (kap. 10)</h4>
+      <p class="small">Tato kapitola říká <b>režim</b>; Zásady cookies jsou <b>dokument</b> s konkrétním inventářem (tabulka název × účel × doba × zpracovatel), na který lišta odkazuje.</p>
+    </div>
+    <div class="card">
+      <h4>→ Zásady zpracování OÚ (Část II)</h4>
+      <p class="small">Analytické a marketingové cookies jsou <b>osobní údaj</b>. Právní základ, práva subjektu a informační povinnost dle GDPR čl. 13 patří do zásad OÚ, ne sem.</p>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Bezpečný default pro Ikaros</div>
+    <p><strong>Fáze 1 (start):</strong> jen nezbytné cookies + bezcookiová anonymizovaná analytika → žádná souhlasová lišta pro měření, jen informace v zásadách. <strong>Fáze 2 (růst):</strong> teprve pokud potřebujeme cookie analytiku nebo marketing, nasadíme plnohodnotnou opt-in lištu s rovnocenným odmítnutím a granularitou. Marketingové cookies u dětí nezapínáme nikdy.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Zákon č. 127/2005 Sb., o elektronických komunikacích — <span class="mono">§ 89 odst. 3</span> (souhlas s ukládáním/přístupem k údajům v koncovém zařízení; výjimka pro technicky nezbytné). Novela <span class="mono">č. 374/2021 Sb.</span>, účinná od <strong>1. 1. 2022</strong> — přechod opt-out → opt-in. <span class="pill green">ověřeno</span></li>
+    <li>ÚOOÚ — Cookies (otázky a odpovědi): technické bez souhlasu, netechnické jen se souhlasem; „předem zaškrtnutá políčka nelze považovat za souhlas"; „mělo by být možno souhlas stejně jednoduše neudělit jako udělit"; rozšíření na local storage, místně sdílené objekty a otisk prohlížeče. <span class="mono">uoou.gov.cz/verejnost/qa-otazky-a-odpovedi/cookies</span> <span class="pill green">ověřeno</span></li>
+    <li>Nařízení (EU) 2016/679 (GDPR) — <span class="mono">čl. 4/11</span> (souhlas), <span class="mono">čl. 7</span> (podmínky a odvolatelnost souhlasu), <span class="mono">čl. 13</span> (informační povinnost); vztah cookies ↔ osobní údaj.</li>
+    <li>Zákon č. 110/2019 Sb. — <span class="mono">§ 7</span> (věk digitálního souhlasu 15 let); u dětí bez behaviorální reklamy.</li>
+    <li>Navazuje: <strong>Zásady cookies</strong> (kap. 10, inventář a dokument), <strong>Zásady zpracování OÚ</strong> (Část II, GDPR základ analytiky/marketingu).</li>
+  </ul>
+</section>

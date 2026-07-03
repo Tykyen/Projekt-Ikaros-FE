@@ -1,0 +1,190 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část VIII — Podmínky užívání serveru</div>
+    <h2>Rizikový registr a červené stopky</h2>
+  </div>
+
+  <p class="lead">Vzorové znění podmínek v předchozí kapitole je hotový text k převzetí. Tato kapitola je jeho <strong>bezpečnostní pojistka</strong>: říká, co se stane, když se text minul s realitou provozu. Nejdřív <strong>rizikový registr</strong> — sedm scénářů, kterými Ikaros reálně padá (uživatel nahraje cizí příručku, komunita obviní platformu z krádeže světů, dítě vleze do veřejného chatu bez dohledu), a ke každému pravděpodobnost, dopad, prevence v podmínkách a připravená reakce. Pak <strong>červené stopky</strong> — seznam stavů, za nichž se veřejná registrace <strong>nesmí</strong> spustit, i kdyby byl text podmínek dokonalý. Registr říká „na tohle se připrav"; stopky říkají „tohle ještě neroztáčej".</p>
+
+  <div class="callout cyan">
+    <div class="t">Jak registr číst</div>
+    <p>Pravděpodobnosti a dopady níže jsou <strong>expertní odhad rizika pro plánování</strong>. Registr slouží k tomu, aby žádné z rizik nezůstalo bez majitele a bez připravené reakce. Vzorové <strong>znění článků 1–14</strong> je v kapitole <em>Vzorové znění podmínek</em>; spustitelné <strong>checklisty a formuláře</strong> (registrace, report, takedown) v kapitole <em>Checklisty a formuláře před spuštěním</em>.</p>
+  </div>
+
+  <h3>Jak číst registr</h3>
+  <p>Každý řádek je jeden způsob, jak provoz selže. <strong>Pravděpodobnost</strong> a <strong>dopad</strong> se čtou nezávisle — nízká pravděpodobnost a katastrofický dopad (únik dat, obsah týkající se dětí) patří stejně vysoko jako běžné, ale nepříjemné riziko. <strong>Prevence</strong> je to, co má stát přímo v podmínkách nebo v produktu <em>předem</em>; <strong>reakce</strong> je připravený postup pro chvíli, kdy prevence nestačila. Registr není inventář obav — je to zadání: každé riziko má mít majitele, klauzuli a nacvičenou odpověď dřív, než nastane.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Pravděpodobnost</h4>
+      <ul>
+        <li><span class="pill">vysoká</span> — nastane rutinně, počítej s ním jako s běžným provozem.</li>
+        <li><span class="pill cyan">střední</span> — nastane dřív či později, ne však denně.</li>
+        <li><span class="pill green">nízká</span> — vzácné, ale nevylučitelné.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Dopad</h4>
+      <ul>
+        <li><b>Kritický</b> — právní/bezpečnostní ohrožení, ztráta bezpečného přístavu, únik dat, obsah týkající se dětí.</li>
+        <li><b>Vážný</b> — nárok, sankce, hromadný odchod komunity, reputační krize.</li>
+        <li><b>Střední</b> — lokální spor, jednotlivá stížnost, náprava v rámci procesu.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Rizikový registr podmínek</h3>
+  <p>Sedm scénářů, které pracovní návrh podmínek musí ustát. Sloupec <strong>prevence</strong> ukazuje na klauzuli znění (Část VIII) nebo na kapitolu, kde je věc vyřešená do hloubky; sloupec <strong>reakce</strong> předpokládá aparát z Části III (moderační žebřík M0–M7) a z Části II (práva subjektů, breach).</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Riziko</th>
+        <th>Pravděp.</th>
+        <th>Dopad</th>
+        <th>Prevence (v podmínkách / produktu)</th>
+        <th class="us">Reakce, když nastane</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Uživatel nahraje cizí pravidla nebo mapu</strong><br><span class="small">celá příručka, statblocky, cizí ilustrace či komerční mapa jako „vlastní" obsah</span></td>
+        <td><span class="pill">vysoká</span></td>
+        <td><strong>Vážný</strong><br>autorský nárok, riziko ztráty přístavu při nečinnosti</td>
+        <td>Podmínky: uživatel ručí, že má práva; zákaz nahrávat cizí chráněný obsah; notice-and-action a kontakt pro nároky (DSA čl. 16). Produkt: licenční karta a viditelnost obsahu (Část IV).</td>
+        <td class="us">Skrýt do posouzení (M3) → vyžádat licenci/oprávnění → při nedoložení odstranit (M4) s odůvodněním (čl. 17). Opakování = omezení účtu (M5).</td>
+      </tr>
+      <tr>
+        <td><strong>Komunita obviní Ikaros z „krádeže světů"</strong><br><span class="small">dojem, že platforma si přivlastňuje obsah tvůrců nebo ho volně přebírá</span></td>
+        <td><span class="pill cyan">střední</span></td>
+        <td><strong>Vážný</strong><br>ztráta důvěry, hromadný odchod tvůrců, reputační krize</td>
+        <td>Podmínky: <strong>úzká provozní licence</strong> (jen provoz služby, ne převod, ne marketing/AI bez opt-in); autor zůstává autorem; jasná genealogie klonů. Osobnostní práva nepřevoditelná (§ 11 AZ).</td>
+        <td class="us">Veřejně a rychle doložit rozsah licence (odkaz na článek podmínek), vyvrátit dezinterpretaci; případnou spornou klauzuli opravit, ne obhajovat. Komunikaci vede vedení, ne moderátor.</td>
+      </tr>
+      <tr>
+        <td><strong>Dítě použije veřejný chat bez dohledu</strong><br><span class="small">uživatel pod věkovou hranicí v otevřené diskusi / veřejné knihovně</span></td>
+        <td><span class="pill cyan">střední</span></td>
+        <td class="us"><strong>Kritický</strong><br>GDPR (děti), DSA, bezpečnostní a reputační riziko</td>
+        <td>Podmínky: věková hranice a režim souhlasu (15 let, § 7 z. 110/2019); u mladších souhlas/autorizace zástupce. Produkt: default neveřejnost dětského obsahu, DDM režim (Část II, kap. Nezletilí a DPIA).</td>
+        <td class="us">Podle věku omezit/uzavřít účet, zúžit viditelnost, kontaktovat zástupce; u škodlivého kontaktu M7 a ochrana dítěte přednostně. DPIA jako doklad, že riziko bylo ošetřeno předem.</td>
+      </tr>
+      <tr>
+        <td><strong>Moderátor smaže obsah svévolně</strong><br><span class="small">zásah bez důvodu, nekonzistentně, nebo ve vlastním sporu</span></td>
+        <td><span class="pill cyan">střední</span></td>
+        <td><strong>Vážný</strong><br>nárok z „cenzury", ztráta bezpečného přístavu, ztráta důvěry</td>
+        <td>Podmínky + interní pravidla: každý zásah má odůvodnění (čl. 17), nejnižší účinný stupeň, nestrannost a možnost odvolání. Moderační matice a žebřík M0–M7 (Část III), profesní pravidla v etickém kodexu (Část VII).</td>
+        <td class="us">Odvolání posoudí <strong>jiný, nezapojený</strong> moderátor; chybný zásah se obnoví a zápis opraví. Vzorec svévole = personální důsledek, ne obhajoba.</td>
+      </tr>
+      <tr>
+        <td><strong>Změna monetizace vyvolá odpor</strong><br><span class="small">zpoplatnění dosud bezplatné funkce, „paywall na to, co bylo zdarma"</span></td>
+        <td><span class="pill cyan">střední</span></td>
+        <td><strong>Vážný</strong><br>odchod komunity, spotřebitelský spor, obvinění z „bait-and-switch"</td>
+        <td>Podmínky: <strong>předem</strong> popsané placené funkce a co se stane při neplacení (data zůstávají / jen čtení / export); spotřebitelský blok (§ 1837 l, § 1829/2 OZ), data jako protiplnění (§ 2389a OZ). Změny s předstihem a možností exportu.</td>
+        <td class="us">Oznámit změnu předem, zachovat přístup k vlastnímu obsahu a export (Data Act), nikdy neuzamknout data zpětně bez varování. Sporné body korigovat, ne prosazovat silou.</td>
+      </tr>
+      <tr>
+        <td><strong>Únik soukromých poznámek</strong><br><span class="small">deníky, poznámky PJ, soukromé zprávy, neveřejné světy uniknou nebo se omylem zveřejní</span></td>
+        <td><span class="pill green">nízká</span></td>
+        <td class="us"><strong>Kritický</strong><br>porušení GDPR, ohlašovací povinnost (breach), ztráta důvěry</td>
+        <td>Podmínky + produkt: soukromý obsah je soukromý <strong>by design</strong>, netrénovat AI bez opt-in (A9), minimalizace, šifrování citlivého; jasné hranice viditelnosti a varování před zveřejněním.</td>
+        <td class="us">Breach postup: posoudit, do 72 h ohlásit ÚOOÚ, informovat dotčené (GDPR čl. 33–34), obsah stáhnout, příčinu odstranit. Evidovat jako incident.</td>
+      </tr>
+      <tr>
+        <td><strong>Nejasné neoficiální užití názvu systému</strong><br><span class="small">landing page systému působí jako oficiální produkt značky (DrD, Shadowrun, GURPS…)</span></td>
+        <td><span class="pill">vysoká</span></td>
+        <td><strong>Vážný</strong><br>vyvolání nebezpečí záměny (§ 2981 OZ), nárok držitele značky, cease-and-desist</td>
+        <td>Podmínky + obsah: cizí značky jen <strong>popisně</strong>, viditelný disclaimer „neoficiální, nezávislé na držiteli", žádné logo/oficiální vizuál; matice systémů (A15, Část IV). U „vyhnout se" systémů zdrženlivost.</td>
+        <td class="us">Na výzvu držitele rychle upravit formulaci/vizuál, doplnit disclaimer, u rizikových značek stránku stáhnout. Nikdy netvrdit „oficiální/schváleno".</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Čtyři rizika z registru sdílejí jeden kořen: „provozní licence ≠ všechno"</div>
+    <p>Cizí pravidla, obvinění z krádeže světů, únik soukromých poznámek i marketingové užití obsahu se vracejí k jedné hranici — <strong>licence, kterou uživatel dá Ikaru, kryje jen provoz služby, nikoli převod, marketing ani trénink AI</strong>. Jakmile podmínky tuto hranici rozmažou (nebo si ji přisvojí příliš široce), spustí se hned několik řádků registru najednou. Úzce vymezená provozní licence je proto nejlevnější prevence, jakou text podmínek nabízí.</p>
+  </div>
+
+  <h3>Priorita: co ošetřit nejdřív</h3>
+  <p>Ne všechna rizika váží stejně. Registr se do práce převádí jednoduchým pravidlem: <strong>nejdřív kritický dopad bez ohledu na pravděpodobnost, pak vysoká pravděpodobnost.</strong> Tři čísla, která má mít vedení na očích:</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">3</div><div class="l">rizika s kritickým dopadem — děti v chatu, únik poznámek, breach</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">rizika s vysokou pravděpodobností — cizí obsah, název systému</div></div>
+    <div class="stat"><div class="n">72 h</div><div class="l">lhůta na ohlášení úniku dat ÚOOÚ (GDPR čl. 33)</div></div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Kritický dopad přeskakuje frontu — stejně jako M7 v moderaci</div>
+    <p>Riziko s nízkou pravděpodobností a kritickým dopadem (únik soukromých poznámek) se <strong>neodkládá</strong> s odůvodněním „skoro nikdy nenastane". Stejně jako moderační stupeň M7 obchází žebřík, kritický dopad obchází prioritizaci podle pravděpodobnosti: připravená reakce (breach postup, ochrana dítěte) musí existovat <strong>před</strong> spuštěním, ne se dopisovat v krizi.</p>
+  </div>
+
+  <h3>Červené stopky — kdy podmínky ještě nejsou připravené</h3>
+  <p>Registr říká, na co se připravit; stopky říkají, kdy <strong>ještě nespouštět veřejnou registraci</strong>, i kdyby byl text podmínek jinak hotový. Každá stopka je stav, který podmínky buď činí neplatnými, neúčinnými, nebo komunitně toxickými. Dokud svítí byť jediná červená, provozovatel běží na vlastní riziko — a některá z těchto rizik jsou nevratná (ztráta dat dítěte, únik, reputační krize).</p>
+
+  <div class="callout gold">
+    <div class="t">Stopky před spuštěním veřejné registrace</div>
+    <ul>
+      <li><b>Není jasné, kdo je provozovatel a kontakt.</b> Podmínky bez identity (název/IČO/sídlo) a bez funkčního kontaktu pro nároky a reporty jsou neúčinné a v rozporu s DSA čl. 16 i GDPR čl. 13. <span class="small">(Otevřená otázka C — doplnit do vzorů <span class="mono">[…]</span>.)</span></li>
+      <li><b>Nerozhodnutý věkový limit a DDM režim.</b> Bez rozhodnutí o hranici (15+ / 16+) a o režimu pro dětské organizace nelze nastavit souhlas, GDPR ani foto režim dětí — a nelze bránit stavu „dítě v otevřeném chatu".</li>
+      <li><b>Podmínky tvrdí, že Ikaros může volně používat všechen obsah pro marketing/AI.</b> Přisvojení široké licence na marketing a trénink AI bez opt-in je <strong>komunitně toxické i právně sporné</strong> (osobnostní práva § 11 AZ, soukromý obsah netrénovat — A9). Tohle je hlavní spouštěč obvinění z „krádeže světů".</li>
+      <li><b>Neexistuje export vlastního obsahu.</b> Bez strukturovaného exportu deníků/postav/světů (Data Act, nad rámec ZIP) chybí důvěryhodná „úniková cesta" a Ikaros nesplní právo na přenositelnost.</li>
+      <li><b>Chybí reportovací formulář.</b> Bez cesty, jak nahlásit obsah (notice-and-action, DSA čl. 16), nemůže platforma legálně a včas reagovat — a ztrácí bezpečný přístav.</li>
+      <li><b>Chybí postup odvolání.</b> Zásah bez možnosti obrany je svévole; bez odvolacího přezkumu (jiný, nezapojený moderátor) se nedá ustát nárok z „cenzury".</li>
+      <li><b>Systémové landing pages vypadají jako oficiální produkty.</b> Dokud stránky systémů nesou dojem oficiálního/schváleného produktu značky, hrozí záměna (§ 2981 OZ) a výzva držitele — stopka až do doplnění disclaimeru a odstranění oficiálních vizuálů.</li>
+      <li><b>Placené funkce nepopsány.</b> Není-li předem jasné, co se děje při neplacení (data zůstávají / jen čtení / export), spouští se spotřebitelský blok (§ 1837 l, § 1829/2 OZ) a riziko „bait-and-switch".</li>
+      <li><b>Soukromé světy lze omylem zveřejnit bez varování.</b> Když jde přepnout neveřejný svět do veřejného bez zřetelného varování a náhledu, hrozí únik soukromých poznámek a osobních údajů — kritický dopad z registru.</li>
+      <li><b>Admini/moderátoři bez interních pravidel a bezpečných přístupů.</b> Bez profesních pravidel (podjatost, mlčenlivost), bez 2FA a správy přístupů (NÚKIB) je i dobrý text podmínek nevymahatelný — svévolný zásah i únik začínají zevnitř.</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Stopka není „udělejte to dokonale", ale „nespouštějte, dokud tohle chybí"</div>
+    <p>Červené stopky nejsou seznam přání — je to <strong>minimální práh pro veřejný start</strong>. Rozdíl mezi stopkou a doporučením: doporučení zlepšuje, stopka <em>blokuje</em>. Dokud svítí, veřejná registrace nejede; zavřený beta provoz s ručně zvanými dospělými uživateli je legitimní mezikrok, ale <strong>otevřená registrace ne</strong>. Každou stopku má někdo jmenovitě vypnout a doložit čím.</p>
+  </div>
+
+  <h3>Shrnutí pro vedení projektu</h3>
+  <p>Když se registr a stopky přeloží do jedné věty pro rozhodování, rozpadá se citlivost na dvě osy, které se nesmí zaměňovat: <strong>právně nejcitlivější</strong> (kde hrozí sankce, nárok, ztráta přístavu) a <strong>komunitně nejcitlivější</strong> (kde hrozí ztráta důvěry a odchod tvůrců). Některé věci jsou obojí — a právě ty patří nejvýš.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Právně nejcitlivější</h4>
+      <ul>
+        <li><b>Autorská práva</b> — cizí obsah, značky systémů (§ 2981), licenční hranice.</li>
+        <li><b>UGC a licence</b> — úzká provozní licence vs. přisvojení; § 11 AZ.</li>
+        <li><b>Děti</b> — věk souhlasu, DDM režim, DPIA, veřejný chat.</li>
+        <li><b>Data</b> — GDPR, breach (72 h), export, minimalizace, soukromí by design.</li>
+        <li><b>DSA moderace</b> — notice-and-action, odůvodnění (čl. 17), odvolání, bezpečný přístav.</li>
+        <li><b>Monetizace</b> — spotřebitelský režim, data jako protiplnění, poučení o odstoupení.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Komunitně nejcitlivější</h4>
+      <ul>
+        <li><b>AI trénink</b> — soukromý obsah netrénovat bez výslovného opt-in.</li>
+        <li><b>Export</b> — důvěryhodná úniková cesta; „nejsme past".</li>
+        <li><b>Soukromé poznámky</b> — deníky a poznámky PJ zůstávají soukromé.</li>
+        <li><b>Veřejné ukázky cizích světů</b> — jen se souhlasem autora / demo z vlastního obsahu.</li>
+        <li><b>Agresivní reklama</b> — žádné vnucené promo z komunitního obsahu; transparentnost monetizace.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Průnik obou os = absolutní priorita</div>
+    <p>Tři témata jsou <strong>právně i komunitně</strong> na špici zároveň: <strong>marketingové/AI užití obsahu, ochrana dětí a soukromí poznámek</strong>. U nich se sankce a ztráta důvěry sčítají — jedno selhání zasáhne obě osy najednou. Podmínky, které tato tři témata řeší konzervativně (úzká licence, opt-in na AI, default neveřejnost dětského a soukromého obsahu), zhasnou zdaleka nejvíc červených stopek a nejvíc řádků registru současně.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Jedna věta pro vedení</div>
+    <p><strong>Nespouštějte veřejnou registraci, dokud svítí byť jediná červená stopka; a než spustíte, mějte ke každému kritickému riziku připravenou reakci, ne jen klauzuli.</strong> Text podmínek je nutná, ne postačující podmínka — chrání jen tehdy, když za ním stojí produkt, který ho umí naplnit, a lidé, kteří ho umí vymáhat.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Zákon č. 89/2012 Sb., občanský zákoník — <span class="mono">§ 11</span> (osobnostní práva nepřevoditelná), <span class="mono">§ 84–90</span> (podoba a soukromí), <span class="mono">§ 1829/2</span> a <span class="mono">§ 1837 písm. l</span> (spotřebitel u digitálního obsahu), <span class="mono">§ 2389a</span> (data jako protiplnění), <span class="mono">§ 2981</span> (vyvolání nebezpečí záměny).</li>
+    <li>Zákon č. 121/2000 Sb. (autorský zákon) — <span class="mono">§ 2, § 5, § 11</span> (dílo, autor, osobnostní práva) pro nahraný cizí obsah a licenci k UGC.</li>
+    <li>Zákon č. 110/2019 Sb. — <span class="mono">§ 7</span> (věk digitálního souhlasu 15 let); GDPR (2016/679) — <span class="mono">čl. 8</span> (děti), <span class="mono">čl. 13</span> (informační povinnost), <span class="mono">čl. 33–34</span> (ohlášení a oznámení porušení zabezpečení, 72 h), <span class="mono">čl. 35</span> (DPIA), <span class="mono">čl. 5</span> (minimalizace).</li>
+    <li>DSA — Nařízení (EU) 2022/2065 — <span class="mono">čl. 16</span> (notice-and-action a kontakt), <span class="mono">čl. 17</span> (odůvodnění zásahu), <span class="mono">čl. 7–8</span> (bezpečný přístav, zákaz obecného monitoringu). Data Act — Nařízení (EU) 2023/2854 (strukturovaný export). NÚKIB — správa účtů a 2FA (bezpečné přístupy adminů/moderátorů).</li>
+    <li>Fact-check ledger Provozní rámec v1.0 — <span class="mono">A6</span> (věk 15 let), <span class="mono">A7</span> (DPIA/RoPA), <span class="mono">A9</span> (AI zpracovatel, soukromý obsah netrénovat bez opt-in), <span class="mono">A11–A13</span> (data jako platba, spotřebitel, Data Act export), <span class="mono">A15</span> (matice systémů, cizí značky popisně), <span class="mono">B9</span> (screenshoty do promo nekryté provozní licencí), oddíl <span class="mono">C</span> (otevřené otázky: identita provozovatele, věková hranice, placené funkce).</li>
+    <li>Navazuje: <strong>Vzorové znění podmínek</strong> (články 1–14 — prevence z registru jako konkrétní klauzule) a <strong>Checklisty a formuláře před spuštěním</strong> (report, takedown, registrace — jak stopky odškrtat) v Části VIII; moderační žebřík M0–M7 v <strong>Části III</strong>; práva subjektů a breach v <strong>Části II</strong>; UGC licence a matice značek v <strong>Části IV</strong>; návaznost na <strong>Části I–VI</strong> (dokumenty webu, GDPR, DSA, licence, AI, foto/prezentace).</li>
+  </ul>
+</section>

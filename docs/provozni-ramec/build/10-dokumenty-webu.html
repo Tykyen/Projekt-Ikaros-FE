@@ -1,0 +1,195 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část I — Web a jeho minimum</div>
+    <h2>Dokumentová architektura webu: co do které stránky patří</h2>
+  </div>
+
+  <p class="lead">Než Ikaros pustíme veřejně, potřebuje sadu právních a provozních dokumentů. Častá chyba začínajících projektů je nacpat všechno do jedněch „obchodních podmínek". To nefunguje: jedny podmínky <strong>neunesou</strong> smluvní vztah, GDPR, cookies, moderaci, autorská práva, ceník i etiku najednou — dokument, který se snaží pokrýt vše, nepřečte nikdo a právně stejně neobstojí. Ikaros proto staví <strong>architekturu dokumentů</strong>: jeden hlavní rámec (podmínky užívání), který se odkazuje na specializované stránky, každou s jedním jasným úkolem.</p>
+
+  <div class="callout cyan">
+    <div class="t">Princip celé Části I</div>
+    <p><strong>Hlavní rámec + specializované dokumenty.</strong> Podmínky užívání serveru jsou <strong>rozcestník a smluvní páteř</strong> — vymezují vztah provozovatel⇄uživatel a <strong>odkazují</strong> na Zásady ochrany osobních údajů, Zásady cookies, Komunitní pravidla, Etický kodex, Autorská/oznamovací pravidla a Ceník. Každý z těch dokumentů řeší jednu vrstvu a je psaný ve svém jazyce a rozsahu. Uživatel při registraci odsouhlasí <strong>podmínky + zásady OÚ</strong>; ostatní jsou závazné odkazem z podmínek nebo souhlasem podle své povahy (cookie lišta, souhlas rodiče).</p>
+  </div>
+
+  <h3>Proč ne jeden dokument: různé vrstvy, různé právo</h3>
+  <p>Každý dokument stojí na jiném právním základu a míří na jiného čtenáře. Smíchat je znamená rozředit platnost všech.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Různé právní režimy</h4>
+      <ul>
+        <li><b>Podmínky</b> = smlouva (občanský zákoník, spotřebitel).</li>
+        <li><b>Zásady OÚ</b> = informační povinnost <b>GDPR čl. 13</b> — nesmí být „souhlasem", je to informace.</li>
+        <li><b>Cookies</b> = zákon o el. komunikacích + GDPR, vlastní <b>souhlas</b> (lišta).</li>
+        <li><b>Takedown</b> = <b>DSA čl. 16</b> notice-and-action.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Různí čtenáři, různý jazyk</h4>
+      <ul>
+        <li><b>Komunitní pravidla</b> a <b>kodex</b> čte hráč — musí být lidská a krátká.</li>
+        <li><b>Podmínky</b> a <b>zásady OÚ</b> čtou dozor (ÚOOÚ, ČOI) i uživatel — musí být úplné a přesné.</li>
+        <li>Zásada: <strong>čitelnost neobětovat úplnosti a naopak</strong> — proto oddělit.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Hlavní tabulka: devět dokumentů webu</h3>
+  <p>Toto je jádro kapitoly — kompletní architektura. Sloupec „Povinný před spuštěním?" říká, co <strong>musí</strong> být veřejně živé v den, kdy web pustíme ven, a co může přijít až s příslušnou funkcí (monetizace, cookies nad rámec nezbytných).</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Dokument</th>
+        <th>Účel a co řeší</th>
+        <th class="us">Povinný před spuštěním?</th>
+        <th>Poznámka / vazba</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Podmínky užívání serveru</strong></td>
+        <td>Smluvní a provozní rámec vztahu provozovatel⇄uživatel: účet, pravidla užití, práva a povinnosti, licence k obsahu, odpovědnost, ukončení, rozhodné právo. <strong>Rozcestník</strong> na ostatní dokumenty.</td>
+        <td class="us"><span class="yes">ANO</span></td>
+        <td>Uživatel odsouhlasí při registraci. Rozbor v následující kapitole; vzorové znění v <strong>Části VIII</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>2. Zásady ochrany osobních údajů</strong></td>
+        <td>GDPR informační povinnost: totožnost správce, účely a právní základy, příjemci a zpracovatelé, doby uložení, předání do třetí země, práva subjektů, kontakt a stížnost u ÚOOÚ.</td>
+        <td class="us"><span class="yes">ANO</span></td>
+        <td>Není souhlas, je to <strong>informace</strong> (čl. 13). Detailně <strong>Část II</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>3. Zásady cookies</strong></td>
+        <td>Rozlišení technicky nezbytných vs. analytických/marketingových cookies; co ukládáme, jak dlouho, kdo je příjemcem; jak souhlas udělit a odvolat.</td>
+        <td class="us"><span class="partial">PODMÍNĚNĚ</span></td>
+        <td>Povinné + <strong>cookie lišta</strong>, jakmile nasadíme cokoli nad rámec nezbytných. Detailně <strong>Část I — Cookies</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>4. Komunitní pravidla</strong></td>
+        <td>Stručná, lidsky psaná pravidla chování v diskusích, chatech a u obsahu — čitelnější a kratší než podmínky; „co se smí a nesmí" na první přečtení.</td>
+        <td class="us"><span class="yes">ANO</span></td>
+        <td>Provozní páteř moderace (DSA). Vazba na notice-and-action, <strong>Část III</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>5. Etický kodex</strong></td>
+        <td>Hodnoty a kultura komunity: bezpečí, fair-play, hranice temné fikce vs. reálného útoku, ochrana dětí, etika AI, role PJ/hráč/tvůrce/partner, moderace.</td>
+        <td class="us"><span class="yes">ANO</span></td>
+        <td>Plné znění a rozbor v <strong>Části VII</strong>. Nadstavba nad komunitními pravidly.</td>
+      </tr>
+      <tr>
+        <td><strong>6. Autorská a oznamovací pravidla / takedown</strong></td>
+        <td>Jak nahlásit protiprávní nebo kradený obsah, jak doložit autorství, průběh a lhůty odstranění, odůvodnění zásahu a odvolání. Kontakt pro oznámení.</td>
+        <td class="us"><span class="yes">ANO</span></td>
+        <td>Naplňuje <strong>DSA čl. 16–17</strong> (notice-and-action + odůvodnění). Mechanismus v <strong>Části III</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>7. Pravidla pro partnery</strong></td>
+        <td>Rámec pro herny, DDM, festivaly, con-y, média a tvůrce: co partnerství znamená, práva a povinnosti, užití značky, ochrana dětí u akcí, prezentace.</td>
+        <td class="us"><span class="no">NE — před 1. partnerstvím</span></td>
+        <td>Nemusí být v den spuštění; musí být hotové, než uzavřeme první partnerství. Vazba na <strong>Část VI</strong> a <strong>VII</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>8. Ceník a pravidla placených funkcí</strong></td>
+        <td>Tarify a co obsahují, fakturace a platby, odstoupení a refundace, změny cen a jejich oznamování, trvání a výpověď předplatného.</td>
+        <td class="us"><span class="no">NE — před monetizací</span></td>
+        <td>Spouští spotřebitelský blok (§1837 l, §1829/2 OZ). Detailně <strong>Část I — Spotřebitel</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>9. Bezpečnostní a exportní politika</strong></td>
+        <td>Export a přenositelnost dat, zálohy, řešení incidentů a úniků, vlastnictví a osud účtů, 2FA a zabezpečení přihlášení, kontakt pro bezpečnostní hlášení.</td>
+        <td class="us"><span class="partial">DOPORUČENO</span></td>
+        <td>Ne striktně povinné jako veřejný dokument, ale silně doporučené. Vazba na <strong>Data Act</strong> a incident (Část II).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Pozor: zásady OÚ nejsou souhlas</div>
+    <p>Nejčastější omyl webů. <strong>Zásady ochrany osobních údajů plní informační povinnost (GDPR čl. 13), NEjsou souhlasem</strong> a uživatel je „neodsouhlasuje". Odsouhlasit se dají <strong>podmínky</strong> (smlouva). Souhlas se sbírá tam, kde je právním základem — <strong>cookie lišta</strong>, marketingový newsletter, foto dítěte. Míchat „souhlasím se zásadami ochrany osobních údajů" do registračního checkboxu je vada, kterou ÚOOÚ vytýká.</p>
+  </div>
+
+  <h3>Jak dokumenty na sebe odkazují</h3>
+  <p>Architektura drží pohromadě odkazy. Podmínky jsou uzel; ostatní dokumenty se z nich větví a samy zpět odkazují, kam patří kompetenčně.</p>
+  <div class="feat">
+    <h4>Podmínky užívání = rozcestník</h4>
+    <ul>
+      <li>Podmínky <b>vymezují vztah</b> a v příslušných článcích <b>odkazují</b>: „Zpracování osobních údajů se řídí <b>Zásadami ochrany osobních údajů</b>."; „Chování v komunitě upravují <b>Komunitní pravidla</b> a <b>Etický kodex</b>."; „Nahlášení protiprávního obsahu řeší <b>Oznamovací pravidla</b>."; „Ceny a platby stanoví <b>Ceník</b>."</li>
+      <li>Specializovaný dokument zpět odkazuje na podmínky jako na nadřazený rámec, aby čtenář viděl kontext.</li>
+      <li>Výsledek: <b>jeden vstupní bod</b>, odkud se uživatel i dozor dostanou ke všemu, bez duplicit a rozporů.</li>
+    </ul>
+  </div>
+
+  <h3>Co uživatel odsouhlasí při registraci</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>Aktivní souhlas (checkbox)</h4>
+      <ul>
+        <li><b>Podmínky užívání serveru</b> — smluvní akceptace, nezaškrtnuté políčko, odkaz na plné znění.</li>
+        <li>Případný <b>samostatný souhlas</b> jen tam, kde je právním základem (marketing, u nezletilých souhlas/autorizace rodiče).</li>
+        <li>Věk digitálního souhlasu v ČR = <b>15 let</b> (viz Část II).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Vzato na vědomí / závazné odkazem</h4>
+      <ul>
+        <li><b>Zásady ochrany osobních údajů</b> — uživatel potvrdí, že se <b>seznámil</b> (ne „souhlasí").</li>
+        <li><b>Komunitní pravidla</b> a <b>Etický kodex</b> — závazné jako součást podmínek.</li>
+        <li><b>Cookies</b> — řeší samostatná <b>lišta</b>, ne registrační formulář.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Registrační checkbox, který obstojí</div>
+    <p>„☐ Souhlasím s <strong>Podmínkami užívání</strong> a beru na vědomí <strong>Zásady ochrany osobních údajů</strong>, <strong>Komunitní pravidla</strong> a <strong>Etický kodex</strong>." — jedno políčko pro smluvní akceptaci podmínek, s odkazy na ostatní dokumenty. Souhlasy s odlišným základem (cookies, marketing, foto) se sbírají <strong>samostatně a granulárně</strong>, nikdy nesloučené do jednoho zaškrtnutí. Předzaškrtnuté políčko není platný souhlas.</p>
+  </div>
+
+  <h3>Doporučené minimální veřejné stránky</h3>
+  <p>Sada URL, které mají být živé a dohledatelné z patičky každé stránky, ještě než web pustíme ven:</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Musí být živé v den spuštění</h4>
+      <ul>
+        <li><span class="mono">/podminky</span> — Podmínky užívání serveru</li>
+        <li><span class="mono">/soukromi</span> — Zásady ochrany osobních údajů</li>
+        <li><span class="mono">/komunita</span> — Komunitní pravidla</li>
+        <li><span class="mono">/kodex</span> — Etický kodex</li>
+        <li><span class="mono">/nahlasit</span> — Oznamovací/takedown pravidla + formulář</li>
+        <li><span class="mono">/kontakt</span> — identita provozovatele (název, IČO, sídlo, e-mail)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Podle nasazených funkcí</h4>
+      <ul>
+        <li><span class="mono">/cookies</span> + lišta — jakmile jsou cookies nad rámec nezbytných</li>
+        <li><span class="mono">/cenik</span> — jakmile jsou placené funkce</li>
+        <li><span class="mono">/partneri</span> — před prvním partnerstvím</li>
+        <li><span class="mono">/bezpecnost</span> — export, zálohy, 2FA, incidenty (doporučeno)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout gold">
+    <div class="t">Identita provozovatele = otevřená položka</div>
+    <p>Všechny dokumenty musí uvádět <strong>kdo je provozovatel a správce</strong>: název/jméno, IČO, sídlo a funkční kontakt. Dokud není tato identita doplněna, jsou vzory v knize s <span class="mono">[…]</span> a web nelze pustit veřejně. Vede se jako otevřená otázka fact-check ledgeru (oddíl C).</p>
+  </div>
+
+  <h3>Než web pustíme veřejně — dokumenty</h3>
+  <div class="phase"><div class="num">1</div><div class="body"><b>Doplnit identitu provozovatele</b> do všech vzorů (název, IČO, sídlo, kontakt) — bez toho žádný dokument neplatí.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Nasadit 5 povinných dokumentů</b>: Podmínky, Zásady OÚ, Komunitní pravidla, Etický kodex, Oznamovací/takedown pravidla — všechny živé a dostupné z patičky.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Rozhodnout o cookies</b>: máme-li jen technicky nezbytné, stačí zmínka; jakmile analytika/marketing → <b>Zásady cookies + lišta</b> s odmítnutím.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Postavit registrační souhlas</b>: jedno políčko na podmínky + „beru na vědomí" ostatní, granulární souhlasy zvlášť, nic předzaškrtnuté, u &lt;15 let režim rodičovského souhlasu.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>Provázat odkazy</b>: podmínky odkazují na všechny ostatní dokumenty, ostatní zpět na podmínky; žádné rozpory mezi zněními.</div></div>
+  <div class="phase"><div class="num flag">6</div><div class="body"><b>Podmíněné dokumenty připravit „do šuplíku"</b>: Ceník (před monetizací), Pravidla pro partnery (před 1. partnerstvím), Bezpečnostní politika (doporučeno hned).</div></div>
+
+  <div class="callout cyan">
+    <div class="t">Shrnutí architektury</div>
+    <p>Ikaros nemá „obchodní podmínky, kde je všechno". Má <strong>páteř (podmínky)</strong> a <strong>specializované dokumenty</strong> propojené odkazy. Pět z nich musí být živých v den spuštění, čtyři přicházejí s funkcemi. Tato kapitola říká <em>co existuje a jak to do sebe zapadá</em>; následující kapitoly Části I až VIII říkají <em>co přesně v každém dokumentu stojí</em>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>GDPR — Nařízení (EU) 2016/679, <span class="mono">čl. 13</span> (informační povinnost = zásady OÚ, ne souhlas), <span class="mono">čl. 6/7</span> (souhlas granulární, nepředzaškrtnutý), <span class="mono">čl. 8</span> (děti); ÚOOÚ — Základní příručka a Cookies Q&A.</li>
+    <li>Zákon č. 127/2005 Sb. o elektronických komunikacích (cookie lišta, souhlas s cookies nad rámec nezbytných); Zákon č. 89/2012 Sb. (OZ) — spotřebitel u digitálního obsahu <span class="mono">§1837 l</span>, <span class="mono">§1829/2</span>, data jako platba <span class="mono">§2389a</span>.</li>
+    <li>DSA — Nařízení (EU) 2022/2065, <span class="mono">čl. 16</span> (notice-and-action = oznamovací/takedown pravidla), <span class="mono">čl. 17</span> (odůvodnění zásahu); Zákon č. 110/2019 Sb. <span class="mono">§7</span> (věk 15 let).</li>
+    <li>Fact-check ledger v1.0 — položky A3–A6, A11–A13 (DSA per-feature, spotřebitel, data jako platba, export); oddíl C (otevřené otázky: identita provozovatele, cookies, monetizace).</li>
+    <li>Navazuje: <strong>Podmínky užití — co v nich musí být</strong> (Část I), <strong>GDPR do hloubky</strong> (Část II), <strong>DSA, notice-and-action a moderace</strong> (Část III), <strong>Etický kodex Ikaru</strong> (Část VII), <strong>Podmínky užívání serveru — vzorové znění</strong> (Část VIII).</li>
+  </ul>
+</section>

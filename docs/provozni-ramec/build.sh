@@ -15,7 +15,7 @@ OUT_PDF="$DIR/Ikaros-provozni-ramec.pdf"
 # Pořadí fragmentů (bez přípony .html). Kapitoly doplní writing workflow.
 ORDER=(
   _head _cover _orientace _toc
-  00-uvod 01-shrnuti
+  00-uvod 01-shrnuti 02-varianty
   _div1 10-dokumenty-webu 11-podminky-uziti 12-spotrebitel-platby 13-cookies-souhlas
   _div2 20-gdpr-mapa 21-gdpr-zaklady 22-prava-export 23-zpracovatele-transfer 24-nezletili-dpia
   _div3 30-dsa-klasifikace 31-notice-action 32-moderacni-matice 33-ochrana-osobnosti
@@ -23,7 +23,7 @@ ORDER=(
   _div5 50-ai-act-cl50 51-ai-autorstvi 52-ai-zpracovatel-moderace
   _div6 60-podoba-cloveka 61-fotograf-osoba 62-foto-gdpr 63-foceni-akce 64-deti-akce 65-screenshoty-promo 66-ai-znacky-promo 67-prezentacni-kanaly
   _div7 70-kodex-hodnoty 71-chovani-fikce 72-role-etika 73-report-krize 74-monetizace-ai-revize
-  _div8 80-podminky-zneni 81-podminky-rizika 82-podminky-checklisty
+  _div8 80-podminky-zneni 80a-podminky-spolek 80b-podminky-fyzicka 81-podminky-rizika 82-podminky-checklisty
   _div9 90-vzor-podoba 91-vzor-deti 92-vzor-ugc-fotograf 93-vzor-disclaimery 94-akcni-plan 95-zdroje 96-slovnicek
   _colophon _foot
 )
