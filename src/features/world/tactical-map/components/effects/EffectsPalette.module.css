@@ -8,10 +8,14 @@
    ven z docku. */
 .palette {
   position: relative;
+  /* 15.5 — sloupec: toolbar nahoře (order:-1), inline parametr-panel pod ním. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Toolbar — řádek tlačítek (zalomí se, pokud se nevejde) ───────────────── */
 .toolbar {
+  order: -1;
   display: flex;
   flex-flow: row wrap;
   gap: 4px;
@@ -72,32 +76,26 @@
   border-color: rgb(var(--map-ui-danger-rgb) / 0.5);
 }
 
-/* ── Rozbalovací parametr-panel — vyjede vlevo VEN z docku ────────────────── */
+/* ── Parametr-panel — inline v docku pod toolbarem (15.5; dřív vyjížděl vlevo,
+   zrušeno kvůli scrollujícímu stacku, viz MapToolDock `.stack`). ──────────── */
 .panel {
-  position: absolute;
-  right: calc(100% + 12px);
-  bottom: 0;
-  width: 210px;
-  padding: 12px;
-  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  margin-top: 8px;
+  padding: 10px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.05);
   color: var(--map-toolbar-text);
   border: 1px solid var(--accent, rgb(var(--map-ui-accent-rgb) / 0.3));
-  border-radius: 10px;
-  box-shadow:
-    var(--shadow-lg, 0 8px 28px rgb(var(--map-ui-shadow-rgb) / 0.5)),
-    0 0 16px color-mix(in srgb, var(--accent, var(--map-ui-accent-solid)) 22%, transparent);
+  border-radius: 8px;
   animation: panelIn 0.15s ease;
-  z-index: 1;
 }
 
 @keyframes panelIn {
   from {
     opacity: 0;
-    transform: translateX(8px);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
@@ -302,9 +300,6 @@
 
 /* ── Mobil ───────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .panel {
-    width: 180px;
-  }
   /* Touch target min 44×44px na dotyku (mobil-desktop pravidlo). */
   .toolBtn {
     width: 44px;

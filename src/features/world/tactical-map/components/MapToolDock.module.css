@@ -7,7 +7,17 @@
 .stack {
   position: absolute;
   bottom: 20px;
-  right: calc(20px + var(--map-dock-width, 0px));
+  right: calc(12px + var(--map-dock-width, 0px));
+  /* 15.5 — strop výšky jako u levého stacku (10.2o): rozbalení víc docků
+     nikdy nepřeroste přes horní okraj (pod header) — místo toho stack scrolluje.
+     Vyjížděcí panel palety efektů byl zrušen (inline), takže overflow nic neořízne.
+     `padding-right` drží scrollbar mimo pravou hranu docků. */
+  max-height: calc(100svh - var(--header-h, 60px) - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--map-ui-accent-rgb) / 0.5) transparent;
+  padding-right: 8px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -87,7 +97,9 @@
 @media (max-width: 768px) {
   .stack {
     bottom: 12px;
-    right: calc(12px + var(--map-dock-width, 0px));
+    /* 4px + 8px padding-right = ~12px jako dřív */
+    right: calc(4px + var(--map-dock-width, 0px));
+    max-height: calc(100svh - var(--header-h, 60px) - 24px);
   }
   .dock {
     width: 200px;
